@@ -133,6 +133,14 @@ function BirthCardCalculator() {
                   </div>
                 </div>
 
+                {result.magi_formula && (
+                  <div className="glass-card p-4" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>
+                    <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#D4AF37' }}>Magi Formula (Robert Lee Camp)</p>
+                    <p className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>{result.magi_formula}</p>
+                    <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>Solar Value: {result.solar_value}</p>
+                  </div>
+                )}
+
                 <div className="glass-card p-5">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#FDA4AF' }}>
                     <Heart size={10} className="inline mr-1" /> Love & Relationships
@@ -352,7 +360,7 @@ export default function Cardology() {
             Cards of Life & Love
           </h1>
           <p className="text-base mb-10" style={{ color: 'var(--text-secondary)' }}>
-            Discover your birth card, daily guidance, and love compatibility through the ancient system of sacred cardology.
+            Discover your birth card, daily guidance, and love compatibility through the ancient system of sacred cardology — based on the Magi Formula from Robert Lee Camp's "Cards of Your Destiny."
           </p>
         </motion.div>
 

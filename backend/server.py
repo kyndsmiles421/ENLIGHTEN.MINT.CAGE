@@ -3763,58 +3763,54 @@ CARD_MEANINGS = {
     "JK": {"title": "The Joker", "keyword": "The Wild Card", "desc": "Born outside the system. You follow no predetermined path — you create your own.", "love": "Unpredictable and free-spirited. Love must be unconventional.", "life": "Innovation, disruption, and complete creative freedom."},
 }
 
-# Birthday-to-card mapping: Based on the standard cardology system
-# Each date maps to a specific card. Simplified deterministic mapping using day-of-year
-BIRTHDAY_CARDS = [
-    "KS","AC","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C",
-    "7D","8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC",
-    "AD","2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C",
-    "8D","9S","10H","JC","QD","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D",
-    "3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D",
-    "10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D",
-    "4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D",
-    "JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D",
-    "5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD",
-    "QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D",
-    "6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD",
-    "KS","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D",
-    "7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD",
-    "AS","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C","7D",
-    "8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD",
-    "2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C","8D",
-    "9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D",
-    "3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D",
-    "10S","JH","QC","JK","AS",
-]
+# Birthday-to-card mapping: Robert Lee Camp's Magi Formula
+# Solar Value = 55 - (2 * month + day)
+# SV 0 = Joker, SV 1-13 = Hearts, SV 14-26 = Clubs, SV 27-39 = Diamonds, SV 40-52 = Spades
+
+SOLAR_VALUE_SUITS = [(1, 13, "H"), (14, 26, "C"), (27, 39, "D"), (40, 52, "S")]
 
 PLANETARY_RULERS = {
-    1: {"planet": "Sun", "meaning": "Identity, ego, and life force", "color": "#FCD34D"},
+    1: {"planet": "Mercury", "meaning": "Communication, wit, and versatility", "color": "#22C55E"},
     2: {"planet": "Moon", "meaning": "Emotions, intuition, and the subconscious", "color": "#E2E8F0"},
-    3: {"planet": "Jupiter", "meaning": "Expansion, wisdom, and abundance", "color": "#8B5CF6"},
-    4: {"planet": "Uranus", "meaning": "Innovation, freedom, and sudden change", "color": "#06B6D4"},
-    5: {"planet": "Mercury", "meaning": "Communication, adaptability, and wit", "color": "#22C55E"},
-    6: {"planet": "Venus", "meaning": "Love, beauty, and harmony", "color": "#FDA4AF"},
-    7: {"planet": "Neptune", "meaning": "Spirituality, dreams, and mysticism", "color": "#93C5FD"},
-    8: {"planet": "Saturn", "meaning": "Discipline, karma, and life lessons", "color": "#6B7280"},
-    9: {"planet": "Mars", "meaning": "Action, courage, and passion", "color": "#EF4444"},
+    3: {"planet": "Venus", "meaning": "Love, beauty, and harmony", "color": "#FDA4AF"},
+    4: {"planet": "Mars", "meaning": "Action, courage, and determination", "color": "#EF4444"},
+    5: {"planet": "Jupiter", "meaning": "Expansion, wisdom, and abundance", "color": "#8B5CF6"},
+    6: {"planet": "Saturn", "meaning": "Discipline, karma, and life lessons", "color": "#6B7280"},
+    7: {"planet": "Uranus", "meaning": "Innovation, freedom, and spiritual awakening", "color": "#06B6D4"},
+    8: {"planet": "Neptune", "meaning": "Spirituality, dreams, and mysticism", "color": "#93C5FD"},
+    9: {"planet": "Mars", "meaning": "Completion, universal love, and release", "color": "#EF4444"},
     10: {"planet": "Pluto", "meaning": "Transformation, power, and rebirth", "color": "#7C3AED"},
-    11: {"planet": "Mercury", "meaning": "Quick thinking, youthful energy", "color": "#22C55E"},
+    11: {"planet": "Mercury", "meaning": "Quick thinking, youthful creative energy", "color": "#22C55E"},
     12: {"planet": "Venus", "meaning": "Receptive power, nurturing wisdom", "color": "#FDA4AF"},
     13: {"planet": "Sun", "meaning": "Mastery, authority, and leadership", "color": "#FCD34D"},
 }
 
 def get_birth_card(month: int, day: int):
-    from datetime import date
-    try:
-        d = date(2000, month, day)
-        day_of_year = d.timetuple().tm_yday - 1
-        card_code = BIRTHDAY_CARDS[day_of_year % len(BIRTHDAY_CARDS)]
-    except (ValueError, IndexError):
-        card_code = "JK"
-    return card_code
+    solar_value = 55 - (2 * month + day)
+    if solar_value <= 0:
+        return "JK"
+    if solar_value > 52:
+        return "JK"
+    for lo, hi, suit in SOLAR_VALUE_SUITS:
+        if lo <= solar_value <= hi:
+            val = solar_value - lo + 1
+            val_codes = {1: "A", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "J", 12: "Q", 13: "K"}
+            return val_codes[val] + suit
+    return "JK"
 
 def get_card_details(code):
     info = CARD_MEANINGS.get(code, CARD_MEANINGS.get("JK"))
+    # Handle Joker case explicitly
+    if code == "JK":
+        return {
+            "code": code,
+            "suit": "Joker",
+            "value": "Joker",
+            "element": "Spirit",
+            "suit_theme": SUIT_THEMES.get("H"),  # Default theme for Joker
+            "planet": {"planet": "All Planets", "meaning": "The wild card transcends all planetary influences", "color": "#D8B4FE"},
+            **info,
+        }
     suit_code = code[-1] if len(code) <= 3 else code[-1]
     val_str = code[:-1]
     val_map = {"A": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13}
@@ -3838,6 +3834,9 @@ async def get_birth_card_reading(month: int, day: int):
         raise HTTPException(status_code=400, detail="Invalid date")
     code = get_birth_card(month, day)
     details = get_card_details(code)
+    solar_value = 55 - (2 * month + day)
+    details["solar_value"] = solar_value
+    details["magi_formula"] = f"55 - (2 x {month} + {day}) = {solar_value}"
     return {"card": details}
 
 
@@ -3890,8 +3889,10 @@ async def get_daily_card(user=Depends(get_current_user_optional)):
     from datetime import date
     today = date.today()
     seed = (today.year * 1000 + today.timetuple().tm_yday)
-    idx = seed % len(BIRTHDAY_CARDS)
-    code = BIRTHDAY_CARDS[idx]
+    rng = random.Random(seed)
+    month = rng.randint(1, 12)
+    day = rng.randint(1, 28)
+    code = get_birth_card(month, day)
     details = get_card_details(code)
     details["date"] = today.isoformat()
     return {"card": details}
