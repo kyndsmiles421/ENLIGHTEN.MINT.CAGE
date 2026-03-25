@@ -21,158 +21,59 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 │   ├── src/
 │   │   ├── App.js        # Router with lazy-loaded pages (Suspense)
 │   │   ├── components/
-│   │   │   ├── Navigation.js      # Primary nav + "More" dropdown
-│   │   │   ├── NarrationPlayer.js # TTS with voice selection
-│   │   │   └── DeepDive.js        # AI knowledge modal
+│   │   │   ├── Navigation.js
+│   │   │   ├── NarrationPlayer.js
+│   │   │   └── DeepDive.js
 │   │   ├── context/AuthContext.js
-│   │   ├── lib/api.js             # Shared axios config with timeout
-│   │   └── pages/                 # 23 page components (lazy loaded)
+│   │   └── pages/        # 25+ page components (lazy loaded)
 ```
 
-## Implemented Features (All Tested & Working)
+## Implemented Features
 
-### Phase 1 - Core MVP
-- JWT Authentication (register/login)
-- Breathing exercises (5 patterns: Box, 4-7-8, Energizing, Wim Hof, Pranayama)
-- Meditation timer with ambient sound (Web Audio)
-- AI-powered affirmations (GPT-5.2)
-- Mood tracker with emotion logging
-- Journal with entries
-- Dashboard with stats & quick actions
+### Phase 1-8 — Core MVP through Rich Content
+- JWT Auth, Breathing, Meditation, Affirmations, Mood Tracker, Journal, Dashboard
+- Soundscapes, Frequencies, Exercises, Nourishment
+- Daily Rituals, Community, Challenges
+- Oracle Divination, Personalized Profiles
+- Mudras, Yantra, Tantra, Videos, Classes
+- Creation Studio, AI Knowledge, Voice Narration
+- Performance optimization
 
-### Phase 2 - Wellness & Content
-- Soundscapes mixer (9 layerable sounds, real Web Audio API)
-- Frequencies (12 solfeggio/binaural tones, real oscillator audio)
-- Exercises (Qigong & Tai Chi)
-- Nourishment (energy-boosting foods)
+### Phase 9-11 — Visual & Sensory Overhaul
+- Cosmic canvas background, ambient audio, interaction sounds
+- Glassmorphism, aurora effects, page transitions
+- CelebrationBurst, Light Therapy, Zen Garden (5 tabs)
 
-### Phase 3 - Engagement & Social
-- Daily Ritual builder with templates
-- Community feed (posts, likes, comments, follow)
-- Community Challenges with streaks & leaderboards (7 challenges)
+### Phase 12-15 — Customization & Spiritual Tools
+- Guided Meditations (6 built-in + Build Your Own)
+- Custom Breathing, Affirmations, Soundscapes (Build Your Own)
+- Mantras page, Ho'oponopono page
+- Beginner's Journey (5-stage, 20-lesson guided path)
 
-### Phase 4 - Spiritual Tools & Personalization
-- Oracle Divination (Tarot, Western Astrology, Chinese Astrology, I Ching, Sacred Geometry)
-- Personalized Profile Pages (MySpace-style)
-- Public profile viewing (/profile/:userId)
+### Phase 16 — Applied Evolution (Feb 2026)
+- **Recommendation Engine**: Personalized "For You" section on Dashboard
+- **Advanced Progressive Learning Modules** (`/learn`): 4-level structured curriculum
 
-### Phase 5 - Spiritual Practice & Learning
-- Mudras (25 sacred hand gestures with AI Deep Dive)
-- Yantra (9 sacred geometric diagrams with SVG, mantras, meditation)
-- Tantra (10 practices: energy work, breathwork, mantra)
-- Videos (10 guided practice videos with category filters)
-- Classes (5 structured courses with lessons, enrollment, certifications)
-- Audio across all pages: Web Audio API + OpenAI TTS (tts-1-hd) with voice selection
-
-### Phase 9 - Mudras Visual Enhancement (Feb 2026)
-- 25 unique AI-generated images for each mudra showing correct hand positions
-- Embedded YouTube tutorial videos for each individual mudra
-- New visual gallery layout with image cards (replaced generic Hand icon)
-- Category filter buttons (All, Meditation, Healing, Energy, Devotional)
-- Detail modal with 3 tabs: Overview, How to Practice, Watch Video
-- Hand Position quick-reference descriptions for each mudra
-- YouTube iframe embedding with "Watch Tutorial" button
-- NarrationPlayer and DeepDive AI tools accessible from practice tab
-
-### Phase 10 - Full Sensory Overhaul (Feb 2026)
-- Animated cosmic canvas background (twinkling stars, nebula glow, shooting stars) on all pages
-- Ambient audio system with cosmic drone (layered oscillators + filtered noise) via Web Audio API
-- UI interaction sounds (click chimes) for navigation and buttons
-- Volume toggle in navigation bar with pulsing indicator when active
-- Enhanced CSS: glassmorphism glow effects, aurora keyframes, text shimmer, orbit glow, breathing borders
-- Page transition animations (framer-motion AnimatePresence) between all routes
-- Enhanced navigation with pulsing logo, active glow, dropdown animations
-- Enhanced Landing page: aurora overlays, breathing orb with particle ring, text shimmer gradient
-- Enhanced Dashboard: animated stat cards, icon glow on hover, breathing borders
-- Transparent backgrounds on all pages to show cosmic canvas
-- Custom scrollbar, enhanced selection colors, ripple effects on buttons
-
-### Phase 11 - Celebration Effects, Light Therapy & Zen Garden (Feb 2026)
-- **CelebrationBurst component**: Radial particle burst + "Namaste" text overlay + rising chime audio, triggered on mood logging and journal saving
-- **Light Therapy page** (`/light-therapy`): 7 chromotherapy colors (red-violet) aligned to chakras. Color detail cards with benefits, frequency, wavelength. Timer-based immersive full-screen sessions with color-bath gradients and breathing-synced orb. Ambient healing tones per color.
-- **Zen Garden page** (`/zen-garden`) with 5 interactive tabs:
-  - Plant Garden: 5 plant types (lotus, bamboo, bonsai, fern, sage), persistent growth through stages via watering (MongoDB `zen_plants` collection), max 10 plants, one water per day
-  - Koi Pond: Canvas-based animated koi fish, click to create ripples that attract fish
-  - Sand Drawing: Touch/mouse canvas with fade-over-time, 8 color palette (Amethyst, Ocean, Sunlight, Rose, Sapphire, Emerald, Moonlight, Ember)
-  - Lantern Release: Write worries and release as glowing lanterns that float up and fade
-  - Rain Scene: Adjustable-intensity rainfall with procedural audio (bandpass-filtered noise)
-- Navigation and Landing page updated with Light Therapy and Zen Garden links
-- Dashboard quick actions include Light and Zen buttons
-
-### Phase 12 - Guided Meditations & Build Your Own (Feb 2026)
-- **6 built-in guided meditations** with 10-15 timed narration steps each: Body Scan Relaxation, Loving Kindness (Metta), Breath Awareness, Chakra Energy Journey, Sacred Garden Visualization, Sleep & Deep Rest
-- **Category filters**: All, Relaxation, Compassion, Focus, Energy, Visualization, Sleep
-- **Immersive guided session**: Full-screen overlay with breathing color orb, step text with animated transitions, progress dots, timer ring, pause/end controls, voice narration
-- **Build Your Own**: 4-step AI-powered wizard: 1) Set intention + focus area (7 options), 2) Configure name/duration/sound/color, 3) AI generation (GPT-5.2), 4) Review/edit steps + Save & Play
-- **Custom meditation persistence**: MongoDB `custom_meditations` collection with CRUD endpoints
-- **Timer mode preserved** as third tab alongside Guided and Build Your Own
-
-### Phase 13 - Universal Build Your Own Customization (Feb 2026)
-- **Custom Breathing Patterns**: Mode toggle (Presets / Build Your Own). Users define inhale, hold-in, exhale, hold-out durations via sliders (1-15s), choose theme color, name, and description. Save to MongoDB `custom_breathing` collection. Saved patterns shown in grid with "Use This Pattern" button that loads them into the presets player.
-- **Custom Affirmation Sets**: Mode toggle (Daily / Build Your Own Set). 3-step AI wizard: 1) Set goal + name + color, 2) AI generating spinner, 3) Review/edit generated affirmations. GPT-5.2 generates 7 personalized affirmations. Save to MongoDB `custom_affirmations` collection. Saved sets viewable in carousel with Previous/Next navigation, progress dots, and per-affirmation narration.
-- **Custom Soundscape Mixes**: "Save This Mix" button appears when sounds active + user logged in. Name input + save. Saved mixes displayed above mixer grid. Click to reload volume levels. Delete on hover. MongoDB `custom_soundscapes` collection.
-
-### Phase 14 - Mantras & Ho'oponopono Pages (Feb 2026)
-- **Mantras Page** (`/mantras`): Full mantra library of 10 traditional mantras with Sanskrit, pronunciation, meanings, benefits, chakra associations. Category filters. Full-screen MantraSession overlay with tap counter, mala bead visualization, ambient sounds, voice narration. "Build Your Own" tab for custom mantra practices.
-- **Ho'oponopono Page** (`/hooponopono`): Hawaiian forgiveness practice. Four sacred phrases, target selection, duration picker, immersive guided session.
-
-### Phase 15 - Beginner's Journey (Feb 2026)
-- **Journey Page** (`/journey`): Guided 5-stage, 20-lesson path with AI-generated hero images.
-  - Stage 1: Foundation — Stage 2: Breath & Body — Stage 3: Mind & Meditation — Stage 4: Sound & Senses — Stage 5: Sacred Practices
-- Embedded mini-tools: breathing timers, mantra counter, Ho'oponopono mini, chakra visual, routine builder
-- Progress tracking with stage unlocking. Each lesson has narration, visual aids, "Try It Now" links.
-- Journey added to primary nav bar. New endpoints: `GET /api/journey/progress`, `POST /api/journey/complete-lesson`
-
-### Phase 6 - Creation Studio & AI Knowledge
-- Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
-- AI-powered creation generation from user intentions
-- Community sharing of user-created content with likes
-- AI Knowledge Engine (Deep Dive): In-depth AI-generated guides on any topic
-- Voice narration (NarrationPlayer) with 9 voices, 3 speeds, persistent preferences
-
-### Phase 7 - Performance & Optimization
-- React.lazy/Suspense code splitting — only loads pages when navigated
-- Backend Cache-Control headers on static data endpoints
-- asyncio.gather for concurrent DB queries (Dashboard stats, Profile)
-- asyncio.wait_for timeouts (30-45s) on ALL AI/LLM calls to prevent server blocking
-- Knowledge endpoint retry logic for transient failures
-- Shared API config with 30s default timeout
-- Health check endpoint (/api/health)
-
-### Phase 8 - Rich Content & Videos (Latest)
-- **23 YouTube videos** across 10 categories: mudras (3), yantra (3), tantra (3), breathing (3), meditation (3), frequencies (3), soundscapes (2), exercises (1), mantra (1), nourishment (1)
-- Exercises page rebuilt with embedded YouTube per exercise + philosophy, 8 detailed steps, practice tips
-- **Reusable `FeaturedVideos` component** integrated into ALL practice pages: Mudras, Breathing, Meditation, Frequencies, Soundscapes, Yantra, Tantra, Nourishment
-- Videos page rebuilt with category filters, inline player with autoplay, and full video library
-- All AI endpoints protected with `asyncio.wait_for` timeouts (30-45s) to prevent server blocking
-- Rebranded to "The Cosmic Collective — A Gathering Place for Conscious Minds"
+### Phase 17 — User Experience & Conversion (Feb 2026)
+- **Quick Reset Flow**: "How do you feel?" modal on Landing page with 11 feelings (5 positive + 6 challenge states). Each feeling maps to a personalized 5-min session: frequency + mindset tool + nourishment recommendation.
+- **Social Proof**: 6 beta tester testimonials on Landing page
+- **Founding 100 Waitlist**: Email collection for physical Enlightenment Cafe opening Late 2026. Backend stores in MongoDB `waitlist` collection with position tracking.
+- **Culinary Science Section**: 4 engineering breakdown cards on Nourishment page (flash-chilling espresso, precise macros, piperine-curcumin synergy, bone broth protocol)
+- **Privacy Policy & Wellness Disclaimer**: Footer modals with comprehensive content
+- **PWA Manifest**: Proper manifest.json + apple-mobile-web-app meta tags for Add to Home Screen
 
 ## Key API Endpoints
 - `/api/health` - service health check
 - `/api/auth/` - register, login, me
-- `/api/dashboard/stats` - user statistics (concurrent queries)
+- `/api/dashboard/stats` - user statistics
+- `/api/recommendations` - personalized tool recommendations
+- `/api/learning/modules` - progressive learning modules with progress
+- `/api/learning/complete-lesson` - mark learning lesson complete
+- `/api/quick-reset/{feeling}` - personalized 5-min reset flow (NEW)
+- `/api/waitlist/join` - join founding 100 waitlist (NEW)
+- `/api/waitlist/count` - get waitlist count (NEW)
 - `/api/moods/`, `/api/journal/` - tracking
-- `/api/affirmations/generate` - AI affirmations
-- `/api/rituals/` - CRUD + completion + history + templates
-- `/api/community/` - feed, posts, likes, comments, follow, profile
-- `/api/challenges/` - join, checkin, leaderboard, details
-- `/api/profile/` - customize, me, public/{userId}, covers
-- `/api/oracle/` - reading, zodiac, chinese-zodiac, sacred-geometry, tarot-deck
-- `/api/mudras`, `/api/yantras`, `/api/tantra` - spiritual tools (cached)
-- `/api/videos`, `/api/classes` - content & learning (cached)
-- `/api/classes/enroll`, `/api/classes/complete-lesson` - enrollment
-- `/api/certifications/my` - user certifications
-- `/api/frequencies` - healing tones (cached)
-- `/api/exercises` - Qigong/Tai Chi (cached)
-- `/api/nourishment` - energy foods
-- `/api/creations/` - CRUD, share, like, ai-generate
-- `/api/knowledge/deep-dive` - AI knowledge generation (with retry)
-- `/api/knowledge/suggestions/{category}` - topic suggestions
-- `/api/tts/narrate` - text-to-speech generation
-- `/api/breathing/save-custom`, `/api/breathing/my-custom`, `/api/breathing/custom/{id}` - custom breathing CRUD
-- `/api/affirmations/generate-set`, `/api/affirmations/save-set`, `/api/affirmations/my-sets`, `/api/affirmations/set/{id}` - custom affirmation sets CRUD
-- `/api/soundscapes/save-mix`, `/api/soundscapes/my-mixes`, `/api/soundscapes/mix/{id}` - custom soundscape mixes CRUD
-- `/api/meditation/generate-guided`, `/api/meditation/save-custom`, `/api/meditation/my-custom`, `/api/meditation/custom/{id}` - custom meditation CRUD
+- All other existing endpoints preserved
 
 ## Database Collections
 - users, moods, journal_entries, rituals, ritual_completions
@@ -180,13 +81,14 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - enrollments, certifications
 - creations, knowledge_cache, affirmations
 - custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes, custom_mantras
-- zen_plants, journey_progress
+- zen_plants, journey_progress, learning_progress
+- waitlist (NEW)
 
 ## Backlog (P0/P1/P2)
-- P0: Display user-created content in existing pages (Affirmations, Meditation, Rituals) - integrate /api/creations/mine
-- P1: Certifications page/section in user profile to view earned certificates
+- P1: Display user-created content in existing pages (integrate /api/creations/mine)
 - P1: Backend refactoring (split server.py into APIRouter modules)
-- P2: User-uploaded audio/video content for meditations and rituals
-- P2: Recommended "Beginner's Journey" learning path
+- P1: Certifications page/section in user profile
+- P2: 3-Click Rule navigation audit
+- P2: User-uploaded audio/video content
 - P2: Weekly/monthly wellness reports
 - P2: Meditation session history tracking

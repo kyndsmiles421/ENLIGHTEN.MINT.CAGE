@@ -2882,6 +2882,111 @@ async def complete_learning_lesson(data: dict, user=Depends(get_current_user)):
     return {"completed_lessons": completed, "current_module": current_module, "lesson_id": lesson_id}
 
 
+# ========== WAITLIST ==========
+
+class WaitlistEntry(BaseModel):
+    email: str
+    name: Optional[str] = None
+
+@api_router.post("/waitlist/join")
+async def join_waitlist(entry: WaitlistEntry):
+    existing = await db.waitlist.find_one({"email": entry.email}, {"_id": 0})
+    if existing:
+        return {"status": "already_joined", "message": "You're already on the list!"}
+    doc = {
+        "id": str(uuid.uuid4()),
+        "email": entry.email,
+        "name": entry.name or "",
+        "joined_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.waitlist.insert_one(doc)
+    count = await db.waitlist.count_documents({})
+    return {"status": "joined", "message": "Welcome to the Founding 100!", "position": count}
+
+@api_router.get("/waitlist/count")
+async def get_waitlist_count():
+    count = await db.waitlist.count_documents({})
+    return {"count": count}
+
+# ========== QUICK RESET ==========
+
+QUICK_RESET_FLOWS = {
+    "happy": {
+        "label": "Happy",
+        "frequency": {"name": "528 Hz — Love Frequency", "hz": 528, "path": "/frequencies", "desc": "Amplify your joy with the universal frequency of love and harmony"},
+        "tool": {"name": "Gratitude Meditation", "path": "/meditation", "desc": "Deepen your happiness through mindful appreciation"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "Raw cacao releases endorphins and amplifies bliss naturally"},
+    },
+    "curious": {
+        "label": "Curious",
+        "frequency": {"name": "852 Hz — Spiritual Order", "hz": 852, "path": "/frequencies", "desc": "Open your Third Eye and deepen intuitive insight"},
+        "tool": {"name": "Oracle Divination", "path": "/oracle", "desc": "Explore tarot, I Ching, or astrology for cosmic guidance"},
+        "nourishment": {"name": "Mushroom Elixir", "desc": "Lion's Mane for cognition, Reishi for grounded exploration"},
+    },
+    "peaceful": {
+        "label": "Peaceful",
+        "frequency": {"name": "963 Hz — Divine Connection", "hz": 963, "path": "/frequencies", "desc": "The highest solfeggio tone — connect with universal consciousness"},
+        "tool": {"name": "Silent Meditation", "path": "/meditation", "desc": "Ride the wave of calm into deeper stillness"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "L-theanine sustains your calm with gentle alertness"},
+    },
+    "energized": {
+        "label": "Energized",
+        "frequency": {"name": "417 Hz — Change", "hz": 417, "path": "/frequencies", "desc": "Channel your energy into transformation and forward momentum"},
+        "tool": {"name": "Qigong Flow", "path": "/exercises", "desc": "Move your energy with ancient body cultivation techniques"},
+        "nourishment": {"name": "Prana Smoothie", "desc": "Spirulina + moringa + wheatgrass: concentrated life force"},
+    },
+    "grateful": {
+        "label": "Grateful",
+        "frequency": {"name": "639 Hz — Connection", "hz": 639, "path": "/frequencies", "desc": "Harmonize relationships and radiate your gratitude outward"},
+        "tool": {"name": "Journaling", "path": "/journal", "desc": "Capture this feeling — your future self will thank you"},
+        "nourishment": {"name": "Golden Milk", "desc": "A warm ritual to honor the moment with nourishing intention"},
+    },
+    "stressed": {
+        "label": "Stressed",
+        "frequency": {"name": "396 Hz — Liberation", "hz": 396, "path": "/frequencies", "desc": "Release guilt, fear, and tension from your body"},
+        "tool": {"name": "4-7-8 Breathing", "path": "/breathing", "desc": "The Navy SEAL technique for instant calm"},
+        "nourishment": {"name": "Golden Milk", "desc": "Anti-inflammatory turmeric latte for deep nervous system calm"},
+    },
+    "anxious": {
+        "label": "Anxious",
+        "frequency": {"name": "528 Hz — Transformation", "hz": 528, "path": "/frequencies", "desc": "The 'Love frequency' — repairs DNA and calms the mind"},
+        "tool": {"name": "Box Breathing", "path": "/breathing", "desc": "4-4-4-4 cadence used by elite performers to reset"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "L-theanine promotes calm alertness without the jitters"},
+    },
+    "tired": {
+        "label": "Low Energy",
+        "frequency": {"name": "417 Hz — Change", "hz": 417, "path": "/frequencies", "desc": "Undoes stagnation and facilitates change in your energy field"},
+        "tool": {"name": "Energizing Breath", "path": "/breathing", "desc": "Fast-paced Kapalabhati breathwork to ignite your fire"},
+        "nourishment": {"name": "Prana Smoothie", "desc": "Spirulina + moringa + wheatgrass: concentrated life force"},
+    },
+    "sad": {
+        "label": "Down / Sad",
+        "frequency": {"name": "639 Hz — Connection", "hz": 639, "path": "/frequencies", "desc": "Harmonize relationships and re-open the heart chakra"},
+        "tool": {"name": "Loving Kindness Meditation", "path": "/meditation", "desc": "Metta practice to cultivate warmth and self-compassion"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "Raw cacao opens the heart and releases endorphins"},
+    },
+    "unfocused": {
+        "label": "Unfocused",
+        "frequency": {"name": "741 Hz — Intuition", "hz": 741, "path": "/frequencies", "desc": "Awakens intuition and sharpens mental clarity"},
+        "tool": {"name": "Breath Awareness Meditation", "path": "/meditation", "desc": "Single-point focus training for laser concentration"},
+        "nourishment": {"name": "Mushroom Elixir", "desc": "Lion's Mane for cognition, Reishi for calm focus"},
+    },
+    "restless": {
+        "label": "Restless / Can't Sleep",
+        "frequency": {"name": "174 Hz — Foundation", "hz": 174, "path": "/frequencies", "desc": "The lowest solfeggio tone — sedative, pain-reducing, grounding"},
+        "tool": {"name": "Body Scan Meditation", "path": "/meditation", "desc": "Progressive relaxation from head to toe for deep rest"},
+        "nourishment": {"name": "Golden Milk", "desc": "Turmeric + warm milk = nature's sleep medicine"},
+    },
+}
+
+@api_router.get("/quick-reset/{feeling}")
+async def get_quick_reset(feeling: str):
+    flow = QUICK_RESET_FLOWS.get(feeling)
+    if not flow:
+        raise HTTPException(status_code=404, detail="Unknown feeling. Try: stressed, anxious, tired, sad, unfocused, restless")
+    return flow
+
+
 app.include_router(api_router)
 
 app.add_middleware(

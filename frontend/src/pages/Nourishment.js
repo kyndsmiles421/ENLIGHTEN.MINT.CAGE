@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Leaf, Sparkles, Loader2 } from 'lucide-react';
+import { Leaf, Sparkles, Loader2, FlaskConical, Thermometer, Scale, Clock } from 'lucide-react';
 import DeepDive from '../components/DeepDive';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
@@ -169,6 +169,67 @@ export default function Nourishment() {
             );
           })}
         </div>
+
+        {/* Culinary Science Section */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          className="mb-16" data-testid="culinary-science-section">
+          <div className="flex items-center gap-2 mb-8">
+            <FlaskConical size={14} style={{ color: '#2DD4BF' }} />
+            <p className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: '#2DD4BF' }}>
+              The Science Behind the Fuel
+            </p>
+          </div>
+          <p className="text-sm mb-8 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
+            Every recipe is engineered with precision — the intersection of culinary craft and biochemistry. Here's why these specific combinations work.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {[
+              {
+                icon: Thermometer, color: '#EF4444',
+                title: 'Why Flash-Chill Espresso?',
+                text: 'Rapid cooling locks in volatile aromatic compounds that degrade above 70°C. By flash-chilling immediately after extraction, we preserve 40% more flavor complexity than slow-cooled methods. The result: a smoother, more nuanced base for adaptogen lattes.',
+              },
+              {
+                icon: Scale, color: '#FCD34D',
+                title: 'Why Precise Macros Matter',
+                text: '60g carbs in the Power Bowl isn\'t arbitrary. It\'s the glycogen replenishment sweet spot for a 2-hour practice session. Paired with 20g protein from hemp + quinoa, you get sustained energy without insulin spikes that cause the 2pm crash.',
+              },
+              {
+                icon: FlaskConical, color: '#8B5CF6',
+                title: 'Black Pepper + Turmeric Synergy',
+                text: 'Piperine in black pepper increases curcumin bioavailability by 2,000%. Without it, your body absorbs less than 5% of turmeric\'s active compound. Every Golden Milk recipe includes precisely 1/4 tsp black pepper — the minimum effective dose.',
+              },
+              {
+                icon: Clock, color: '#2DD4BF',
+                title: '24-Hour Bone Broth Protocol',
+                text: 'Collagen extraction requires sustained heat at 85-95°C. Below 85°C, the collagen triple helix doesn\'t fully denature. Above 95°C, you break down amino acids. Our 24-hour simmer at exactly 90°C maximizes gelatin yield — the signature "jiggly" test of a proper broth.',
+              },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className="glass-card p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{ background: `${item.color}12`, border: `1px solid ${item.color}20` }}>
+                      <Icon size={14} style={{ color: item.color }} />
+                    </div>
+                    <h3 className="text-base font-medium" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                      {item.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    {item.text}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* AI Suggestion */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
