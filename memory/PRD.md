@@ -74,6 +74,19 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - YouTube iframe embedding with "Watch Tutorial" button
 - NarrationPlayer and DeepDive AI tools accessible from practice tab
 
+### Phase 10 - Full Sensory Overhaul (Feb 2026)
+- Animated cosmic canvas background (twinkling stars, nebula glow, shooting stars) on all pages
+- Ambient audio system with cosmic drone (layered oscillators + filtered noise) via Web Audio API
+- UI interaction sounds (click chimes) for navigation and buttons
+- Volume toggle in navigation bar with pulsing indicator when active
+- Enhanced CSS: glassmorphism glow effects, aurora keyframes, text shimmer, orbit glow, breathing borders
+- Page transition animations (framer-motion AnimatePresence) between all routes
+- Enhanced navigation with pulsing logo, active glow, dropdown animations
+- Enhanced Landing page: aurora overlays, breathing orb with particle ring, text shimmer gradient
+- Enhanced Dashboard: animated stat cards, icon glow on hover, breathing borders
+- Transparent backgrounds on all pages to show cosmic canvas
+- Custom scrollbar, enhanced selection colors, ripple effects on buttons
+
 ### Phase 6 - Creation Studio & AI Knowledge
 - Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
 - AI-powered creation generation from user intentions
