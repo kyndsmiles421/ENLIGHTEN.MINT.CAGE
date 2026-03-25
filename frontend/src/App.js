@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import Exercises from './pages/Exercises';
 import Nourishment from './pages/Nourishment';
 import Frequencies from './pages/Frequencies';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/nourishment" element={<Nourishment />} />
             <Route path="/frequencies" element={<Frequencies />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </BrowserRouter>
