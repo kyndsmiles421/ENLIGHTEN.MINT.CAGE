@@ -164,10 +164,25 @@ function PlantCare({ user, authHeaders }) {
 }
 
 /* ========== SAND DRAWING ========== */
+const SAND_COLORS = [
+  { id: 'purple', label: 'Amethyst', stroke: 'rgba(216, 180, 254, 0.5)', glow: 'rgba(216, 180, 254, 0.15)', hex: '#D8B4FE' },
+  { id: 'teal', label: 'Ocean', stroke: 'rgba(45, 212, 191, 0.5)', glow: 'rgba(45, 212, 191, 0.15)', hex: '#2DD4BF' },
+  { id: 'gold', label: 'Sunlight', stroke: 'rgba(252, 211, 77, 0.5)', glow: 'rgba(252, 211, 77, 0.15)', hex: '#FCD34D' },
+  { id: 'rose', label: 'Rose', stroke: 'rgba(253, 164, 175, 0.5)', glow: 'rgba(253, 164, 175, 0.15)', hex: '#FDA4AF' },
+  { id: 'blue', label: 'Sapphire', stroke: 'rgba(59, 130, 246, 0.5)', glow: 'rgba(59, 130, 246, 0.15)', hex: '#3B82F6' },
+  { id: 'green', label: 'Emerald', stroke: 'rgba(34, 197, 94, 0.5)', glow: 'rgba(34, 197, 94, 0.15)', hex: '#22C55E' },
+  { id: 'white', label: 'Moonlight', stroke: 'rgba(248, 250, 252, 0.45)', glow: 'rgba(248, 250, 252, 0.12)', hex: '#F8FAFC' },
+  { id: 'orange', label: 'Ember', stroke: 'rgba(251, 146, 60, 0.5)', glow: 'rgba(251, 146, 60, 0.15)', hex: '#FB923C' },
+];
+
 function SandCanvas() {
   const canvasRef = useRef(null);
   const drawing = useRef(false);
   const points = useRef([]);
+  const [colorIdx, setColorIdx] = useState(0);
+  const colorRef = useRef(SAND_COLORS[0]);
+
+  useEffect(() => { colorRef.current = SAND_COLORS[colorIdx]; }, [colorIdx]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -179,7 +194,6 @@ function SandCanvas() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Fade timer
     const interval = setInterval(() => {
       ctx.fillStyle = 'rgba(11, 12, 21, 0.015)';
       ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
@@ -209,16 +223,16 @@ function SandCanvas() {
     points.current.push(p);
     const ctx = canvasRef.current.getContext('2d');
     const prev = points.current[points.current.length - 2];
+    const c = colorRef.current;
     ctx.beginPath();
     ctx.moveTo(prev.x, prev.y);
     ctx.lineTo(p.x, p.y);
-    ctx.strokeStyle = 'rgba(216, 180, 254, 0.5)';
+    ctx.strokeStyle = c.stroke;
     ctx.lineWidth = 2;
     ctx.stroke();
-    // Glow
     ctx.beginPath();
     ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(216, 180, 254, 0.15)';
+    ctx.fillStyle = c.glow;
     ctx.fill();
   };
 
@@ -232,6 +246,23 @@ function SandCanvas() {
 
   return (
     <div className="relative">
+      {/* Color picker */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap" data-testid="sand-color-picker">
+        {SAND_COLORS.map((c, i) => (
+          <button key={c.id} onClick={() => setColorIdx(i)}
+            className="w-7 h-7 rounded-full transition-all duration-200 flex-shrink-0"
+            style={{
+              background: c.hex,
+              border: colorIdx === i ? '2px solid #fff' : '2px solid transparent',
+              boxShadow: colorIdx === i ? `0 0 12px ${c.hex}80` : 'none',
+              transform: colorIdx === i ? 'scale(1.15)' : 'scale(1)',
+            }}
+            title={c.label}
+            data-testid={`sand-color-${c.id}`}
+          />
+        ))}
+        <span className="text-[11px] ml-2" style={{ color: 'var(--text-muted)' }}>{SAND_COLORS[colorIdx].label}</span>
+      </div>
       <canvas
         ref={canvasRef}
         className="w-full rounded-2xl cursor-crosshair touch-none"
@@ -240,7 +271,7 @@ function SandCanvas() {
         onTouchStart={startDraw} onTouchMove={moveDraw} onTouchEnd={endDraw}
         data-testid="sand-canvas"
       />
-      <button onClick={clear} className="absolute top-3 right-3 text-xs px-3 py-1.5 rounded-full"
+      <button onClick={clear} className="absolute top-14 right-3 text-xs px-3 py-1.5 rounded-full"
         style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
         data-testid="sand-clear">Clear</button>
       <p className="text-center mt-3 text-xs" style={{ color: 'var(--text-muted)' }}>
