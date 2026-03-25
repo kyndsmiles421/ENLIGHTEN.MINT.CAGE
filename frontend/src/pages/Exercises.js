@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Zap, Sparkles, Loader2, Clock, BarChart3, ChevronDown, Play, BookOpen, Lightbulb, Heart } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import GuidedExperience from '../components/GuidedExperience';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -168,8 +169,16 @@ export default function Exercises() {
                     </button>
                     <NarrationPlayer
                       text={`${ex.name}. ${ex.description}. ${ex.philosophy || ''} Let us begin the practice. ${ex.steps.join('. ')}. ${ex.tips || ''} Well done. Feel the energy flowing through your body.`}
-                      label="Voice Guide"
+                      label="Quick Narration"
                       color={ex.color}
+                    />
+                    <GuidedExperience
+                      practiceName={ex.name}
+                      description={ex.description}
+                      instructions={ex.steps}
+                      category="exercise"
+                      color={ex.color}
+                      durationMinutes={parseInt(ex.duration) || 8}
                     />
                     <DeepDive topic={ex.name} category="exercise" color={ex.color} label="Deep Dive" />
                   </div>

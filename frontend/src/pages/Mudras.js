@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Hand, Clock, Sparkles, ChevronDown, ChevronUp, Play, X, Fingerprint, Zap, Heart, Brain, Flame, Wind, Droplets, Globe } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import GuidedExperience from '../components/GuidedExperience';
 import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -224,9 +225,19 @@ function MudraDetail({ mudra, onClose }) {
                   </span>
                 </div>
                 <div className="pt-2">
+                  <GuidedExperience
+                    practiceName={mudra.name}
+                    description={mudra.description}
+                    instructions={[mudra.practice, `Hold this mudra for ${mudra.duration}`, `Focus on the ${mudra.chakra} chakra`, `Feel the ${mudra.element} element flowing through you`, ...mudra.benefits.map(b => `Notice: ${b}`)]}
+                    category="mudra"
+                    color={mudra.color}
+                    durationMinutes={5}
+                  />
+                </div>
+                <div className="pt-2">
                   <NarrationPlayer
                     text={`${mudra.name}. ${mudra.description}. Here is how to practice. ${mudra.practice}. Hold this mudra for ${mudra.duration}. The ${mudra.name} activates the ${mudra.chakra} chakra and is associated with the ${mudra.element} element. Benefits include ${mudra.benefits.join(', ')}.`}
-                    label="Listen to Voice Guide"
+                    label="Quick Narration"
                     color={mudra.color}
                   />
                 </div>

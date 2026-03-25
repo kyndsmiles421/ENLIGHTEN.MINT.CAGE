@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Triangle, Eye, Volume2 } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import GuidedExperience from '../components/GuidedExperience';
 import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -137,9 +138,24 @@ export default function Yantra() {
                         </p>
                         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{active.meditation}</p>
                         <div className="mt-3">
+                          <GuidedExperience
+                            practiceName={active.name}
+                            description={active.description}
+                            instructions={[
+                              `Gaze softly at the ${active.name} yantra. Let your eyes relax.`,
+                              active.meditation,
+                              `Silently repeat the mantra: ${active.mantra}`,
+                              `Let the geometric pattern dissolve into pure awareness.`,
+                            ]}
+                            category="yantra"
+                            color={active.color}
+                            durationMinutes={8}
+                          />
+                        </div>
+                        <div className="mt-3">
                           <NarrationPlayer
                             text={`${active.name}. ${active.description}. The mantra for this yantra is: ${active.mantra}. Now, let us meditate. ${active.meditation}. Rest in this sacred space as long as you need. ${active.mantra}.`}
-                            label="Guided Meditation"
+                            label="Quick Narration"
                             color={active.color}
                           />
                         </div>

@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import GuidedExperience from '../components/GuidedExperience';
 import CelebrationBurst from '../components/CelebrationBurst';
 import FeaturedVideos from '../components/FeaturedVideos';
 
@@ -544,6 +545,20 @@ export default function Mantras() {
                     <NarrationPlayer
                       text={`${selected.name}. ${selected.pronunciation}. ${selected.meaning}. ${selected.practice_tips}`}
                       label="Learn Pronunciation" color={selected.color} />
+                    <GuidedExperience
+                      practiceName={selected.name}
+                      description={`${selected.meaning}. ${selected.practice_tips}`}
+                      instructions={[
+                        `Sit comfortably. Close your eyes and take three deep breaths.`,
+                        `The mantra is: ${selected.name}, pronounced as ${selected.pronunciation}.`,
+                        `Begin chanting slowly. Feel the vibration of each syllable.`,
+                        `Continue for ${selected.recommended_reps || 108} repetitions, deepening with each round.`,
+                        `Let the mantra become effortless. It chants itself through you.`,
+                      ]}
+                      category="mantra"
+                      color={selected.color}
+                      durationMinutes={8}
+                    />
                     <DeepDive topic={`${selected.name} mantra`} category="general" color={selected.color} label="AI Deep Dive" />
                   </div>
                 </motion.div>

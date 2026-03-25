@@ -9,7 +9,7 @@ import {
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map,
-  Gamepad2, Globe
+  Gamepad2, Globe, Star, Compass
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -34,6 +34,8 @@ const MORE_NAV = [
   { path: '/mantras', label: 'Mantras', icon: Music },
   { path: '/hooponopono', label: "Ho'oponopono", icon: HeartHandshake },
   { path: '/oracle', label: 'Oracle', icon: Sparkles },
+  { path: '/cardology', label: 'Cardology', icon: Star },
+  { path: '/mayan', label: 'Mayan', icon: Compass },
   { path: '/create', label: 'Create', icon: PenTool },
   { path: '/community', label: 'Community', icon: Users },
   { path: '/yantra', label: 'Yantra', icon: Triangle },

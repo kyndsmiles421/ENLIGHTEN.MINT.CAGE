@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Radio, Play, Pause, Info, Square } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import GuidedExperience from '../components/GuidedExperience';
 import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -312,8 +313,22 @@ export default function Frequencies() {
                 </button>
                 <NarrationPlayer
                   text={`${selected.frequency} Hertz. ${selected.name}. This is a ${CATEGORY_LABELS[selected.category]} frequency associated with the ${selected.chakra} chakra. ${selected.description}. Benefits include ${selected.benefits.join(', ')}. Close your eyes and allow this frequency to resonate through your being.`}
-                  label="About this Frequency"
+                  label="Quick Narration"
                   color={selected.color}
+                />
+                <GuidedExperience
+                  practiceName={`${selected.frequency}Hz ${selected.name}`}
+                  description={`${selected.description}. This frequency is associated with the ${selected.chakra} chakra.`}
+                  instructions={[
+                    `Close your eyes and take three deep breaths to settle.`,
+                    `Begin listening to the ${selected.frequency}Hz frequency.`,
+                    `Feel the vibration resonating with your ${selected.chakra} chakra.`,
+                    ...selected.benefits.map(b => `Allow the frequency to support: ${b}`),
+                    `Let the sound wash through you completely, dissolving tension.`,
+                  ]}
+                  category="frequency"
+                  color={selected.color}
+                  durationMinutes={8}
                 />
                 <DeepDive topic={`${selected.frequency}Hz ${selected.name}`} category="frequency" color={selected.color} label="AI Deep Dive" />
                 <button

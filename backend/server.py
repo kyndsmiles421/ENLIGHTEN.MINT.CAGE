@@ -2125,6 +2125,80 @@ async def knowledge_suggestions(category: str):
 # --- Text-to-Speech Narration ---
 tts_cache = {}
 
+
+class GuidedExperienceRequest(BaseModel):
+    practice_name: str
+    description: str
+    instructions: list
+    category: str = "meditation"
+    duration_minutes: int = 10
+
+
+@api_router.post("/guided-experience/generate")
+async def generate_guided_experience(req: GuidedExperienceRequest, user=Depends(get_current_user)):
+    """Transform raw practice instructions into an immersive guided meditation script."""
+    steps_text = "\n".join(f"Step {i+1}: {s}" for i, s in enumerate(req.instructions))
+    num_segments = max(5, min(15, req.duration_minutes))
+    secs_per = (req.duration_minutes * 60) // num_segments
+
+    prompt = f"""Transform these practice instructions into an immersive guided meditation experience.
+
+Practice: "{req.practice_name}"
+Category: {req.category}
+Description: {req.description}
+Original steps:
+{steps_text}
+
+Create {num_segments} meditation segments. Each segment should feel like a guided meditation — NOT just reading instructions. Include:
+- Breathing cues ("Take a slow, deep breath in...")
+- Sensory imagery ("Feel warmth spreading through your chest...")
+- Pacing pauses ("Allow a moment of silence...")
+- Body awareness ("Notice the sensation in your palms...")
+- Emotional guidance ("Let any tension dissolve with each exhale...")
+
+Return ONLY a JSON array. Each item must have:
+- "text": narration text (3-5 sentences, second person, warm and present-tense, as if guiding someone through the experience in real-time)
+- "duration": seconds for this segment (around {secs_per}s each)
+- "cue": one of "breathe", "feel", "visualize", "move", "listen", "rest", "chant" — the primary action
+- "intensity": 1-10 scale of energy level for this segment
+
+Flow: gentle opening -> warm-up/settling -> core practice segments -> peak/deepening -> integration -> gentle closing.
+Make it feel like a real meditation teacher is with you, guiding you moment by moment.
+Return ONLY valid JSON array, no markdown."""
+
+    try:
+        chat = LlmChat(
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            session_id=f"guided-exp-{str(uuid.uuid4())}",
+            system_message="You are a master meditation and wellness guide. Transform instructional content into deeply immersive, sensory-rich guided experiences. Always return valid JSON only.",
+        )
+        chat.with_model("openai", "gpt-5.2")
+        msg = UserMessage(text=prompt)
+        raw = await asyncio.wait_for(chat.send_message(msg), timeout=45)
+
+        import json as json_mod
+        cleaned = raw.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
+            cleaned = cleaned.strip()
+            if cleaned.startswith("json"):
+                cleaned = cleaned[4:].strip()
+        segments = json_mod.loads(cleaned)
+        if not isinstance(segments, list):
+            raise ValueError("Not a list")
+        return {
+            "practice_name": req.practice_name,
+            "category": req.category,
+            "segments": segments,
+            "total_duration": sum(s.get("duration", secs_per) for s in segments),
+        }
+    except Exception as e:
+        logger.error(f"Guided experience generation error: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate guided experience")
+
+
 @api_router.post("/tts/narrate")
 async def generate_narration(req: NarrationRequest):
     if not req.text or len(req.text.strip()) < 5:
@@ -3137,6 +3211,404 @@ async def get_game_scores(user=Depends(get_current_user)):
     for r in results:
         scores[r["_id"]] = {"best_score": r["best"], "total_plays": r["plays"], "last_played": r["last_played"]}
     return {"scores": scores}
+
+
+# ========== MAYAN ASTROLOGY (TZOLK'IN) ==========
+
+MAYAN_DAY_SIGNS = [
+    {"num": 1, "name": "Imix", "glyph": "Red Dragon", "meaning": "Primordial Mother, Nurturing, Birth", "element": "Water",
+     "desc": "You are the origin point — a nurturer and creator. Your energy is primal, protective, and deeply connected to the source of all life. You trust instinct over logic and have a powerful ability to birth new beginnings.",
+     "shadow": "Codependency, over-giving, difficulty receiving",
+     "affirmation": "I am the source. I nurture creation with trust and ease.",
+     "color": "#EF4444", "direction": "East"},
+    {"num": 2, "name": "Ik", "glyph": "White Wind", "meaning": "Communication, Spirit, Breath", "element": "Air",
+     "desc": "You carry divine messages. Your words have power to inspire, heal, and transform. You are a channel for spirit, deeply sensitive to the unseen currents that move through all things.",
+     "shadow": "Scattered energy, over-talking, difficulty grounding",
+     "affirmation": "I am the breath of spirit. My words carry truth and healing.",
+     "color": "#F8FAFC", "direction": "North"},
+    {"num": 3, "name": "Akbal", "glyph": "Blue Night", "meaning": "Dreams, Intuition, Abundance", "element": "Water",
+     "desc": "You are the dreamer — connected to the vast inner world of the subconscious. Your intuition is your compass. In darkness, you find the deepest treasures of wisdom and unlimited possibility.",
+     "shadow": "Materialism, nightmares, fear of the unknown",
+     "affirmation": "I journey into the deep and return with treasures of wisdom.",
+     "color": "#3B82F6", "direction": "West"},
+    {"num": 4, "name": "Kan", "glyph": "Yellow Seed", "meaning": "Flowering, Potential, Awareness", "element": "Fire",
+     "desc": "You are pure potential waiting to bloom. Every thought you plant grows into reality. You carry the blueprint of your highest expression within you, like a seed carries an entire forest.",
+     "shadow": "Self-doubt, unrealized potential, scattered focus",
+     "affirmation": "I plant seeds of intention that blossom into my highest vision.",
+     "color": "#FCD34D", "direction": "South"},
+    {"num": 5, "name": "Chicchan", "glyph": "Red Serpent", "meaning": "Life Force, Instinct, Kundalini", "element": "Fire",
+     "desc": "Primal life force energy pulses through you. You are deeply embodied, sensual, and vitally alive. Your body is your temple and your instincts are razor-sharp. Kundalini energy rises naturally within you.",
+     "shadow": "Anger, manipulation, survival-mode thinking",
+     "affirmation": "I honor my body as sacred. My life force flows freely and powerfully.",
+     "color": "#EF4444", "direction": "East"},
+    {"num": 6, "name": "Cimi", "glyph": "White Worldbridger", "meaning": "Death, Surrender, Release", "element": "Earth",
+     "desc": "You walk between worlds — a bridge between what was and what will be. Letting go is your superpower. Through surrender, you access profound transformation and rebirth.",
+     "shadow": "Fear of change, control issues, grief avoidance",
+     "affirmation": "I release what no longer serves me and embrace sacred transformation.",
+     "color": "#F8FAFC", "direction": "North"},
+    {"num": 7, "name": "Manik", "glyph": "Blue Hand", "meaning": "Healing, Accomplishment, Knowing", "element": "Water",
+     "desc": "Healing flows through your hands and your presence. You accomplish through dedicated practice and have the gift of completion. Your touch — physical or energetic — restores balance.",
+     "shadow": "Overwork, martyrdom, physical depletion",
+     "affirmation": "I am a vessel of healing. My hands carry the power to restore wholeness.",
+     "color": "#3B82F6", "direction": "West"},
+    {"num": 8, "name": "Lamat", "glyph": "Yellow Star", "meaning": "Beauty, Elegance, Harmony", "element": "Air",
+     "desc": "You are a star being — drawn to beauty, art, and cosmic harmony. Your very presence brings elegance and grace. You see the sacred geometry in all things and radiate light naturally.",
+     "shadow": "Vanity, judgment of imperfection, escapism through beauty",
+     "affirmation": "I am a radiant star. Beauty flows through me and transforms all it touches.",
+     "color": "#FCD34D", "direction": "South"},
+    {"num": 9, "name": "Muluc", "glyph": "Red Moon", "meaning": "Universal Water, Purification, Flow", "element": "Water",
+     "desc": "You move with the tides of emotion and cosmic rhythm. Water is your teacher — it shows you how to purify, how to flow around obstacles, and how to trust the current of life.",
+     "shadow": "Emotional overwhelm, stagnation, resistance to change",
+     "affirmation": "I flow with life's sacred rhythm. My emotions are my wisdom.",
+     "color": "#EF4444", "direction": "East"},
+    {"num": 10, "name": "Oc", "glyph": "White Dog", "meaning": "Love, Loyalty, Heart", "element": "Fire",
+     "desc": "Unconditional love is your essence. You are loyal, devoted, and deeply heart-centered. Your capacity to love without conditions inspires others to open their own hearts.",
+     "shadow": "Neediness, jealousy, conditional love",
+     "affirmation": "My heart is infinite. I love without conditions and attract deep loyalty.",
+     "color": "#F8FAFC", "direction": "North"},
+    {"num": 11, "name": "Chuen", "glyph": "Blue Monkey", "meaning": "Play, Magic, Illusion", "element": "Water",
+     "desc": "You are the divine trickster — playful, magical, and endlessly creative. Humor is your medicine. Through play, you access higher truths that serious minds cannot reach.",
+     "shadow": "Manipulation, deception, avoiding responsibility through humor",
+     "affirmation": "I embrace the cosmic play. Through joy and laughter, I access divine magic.",
+     "color": "#3B82F6", "direction": "West"},
+    {"num": 12, "name": "Eb", "glyph": "Yellow Human", "meaning": "Free Will, Wisdom, Influence", "element": "Earth",
+     "desc": "You embody the gift of free will — the ability to choose your path consciously. Your choices ripple outward, influencing the collective. Wisdom grows through honoring your own sovereignty.",
+     "shadow": "Overthinking, indecision, using free will destructively",
+     "affirmation": "I choose wisely and with love. My decisions shape a beautiful reality.",
+     "color": "#FCD34D", "direction": "South"},
+    {"num": 13, "name": "Ben", "glyph": "Red Skywalker", "meaning": "Exploration, Space, Wakefulness", "element": "Air",
+     "desc": "You walk between heaven and earth — a cosmic explorer bridging dimensions. Your spirit yearns for expansion beyond ordinary reality. You are here to explore the vastness of consciousness.",
+     "shadow": "Restlessness, inability to ground, spiritual bypassing",
+     "affirmation": "I bridge heaven and earth. My explorations expand consciousness for all.",
+     "color": "#EF4444", "direction": "East"},
+    {"num": 14, "name": "Ix", "glyph": "White Wizard", "meaning": "Timelessness, Receptivity, Enchantment", "element": "Earth",
+     "desc": "You are a natural enchanter — your presence alone shifts energy. Timeless wisdom flows through you effortlessly. You access magic through stillness, receptivity, and alignment with heart.",
+     "shadow": "Manipulation, control through charm, disconnection from emotion",
+     "affirmation": "I am aligned with timeless wisdom. My magic comes from an open heart.",
+     "color": "#F8FAFC", "direction": "North"},
+    {"num": 15, "name": "Men", "glyph": "Blue Eagle", "meaning": "Vision, Mind, Creativity", "element": "Water",
+     "desc": "You see from the highest perspective — the eagle's view. Your visionary mind creates powerful blueprints for reality. Creativity and technical mastery combine in everything you do.",
+     "shadow": "Judgment from above, cold intellectualism, escapism",
+     "affirmation": "I see with the eyes of the eagle. My vision creates beauty and truth.",
+     "color": "#3B82F6", "direction": "West"},
+    {"num": 16, "name": "Cib", "glyph": "Yellow Warrior", "meaning": "Intelligence, Fearlessness, Grace", "element": "Fire",
+     "desc": "You are a spiritual warrior — courageous, questioning, and deeply intelligent. You face fear with grace and transform obstacles into stepping stones. Your quest is for truth above all else.",
+     "shadow": "Aggression, stubbornness, fight without purpose",
+     "affirmation": "I walk my path with courage and grace. I question everything with love.",
+     "color": "#FCD34D", "direction": "South"},
+    {"num": 17, "name": "Caban", "glyph": "Red Earth", "meaning": "Navigation, Synchronicity, Evolution", "element": "Earth",
+     "desc": "You are deeply attuned to Earth's intelligence. Synchronicities are your guideposts. You navigate life through signs, feelings, and an innate knowing of where to go and when.",
+     "shadow": "Overthinking signs, losing touch with body, ignoring practical needs",
+     "affirmation": "I trust the signs. The Earth guides my every step toward evolution.",
+     "color": "#EF4444", "direction": "East"},
+    {"num": 18, "name": "Etznab", "glyph": "White Mirror", "meaning": "Reflection, Endlessness, Truth", "element": "Air",
+     "desc": "You are the mirror of truth — reflecting reality without distortion. Your clarity cuts through illusion like a sacred blade. You see the infinite in the finite and the truth in every story.",
+     "shadow": "Harsh judgment, projection, shattering others' illusions painfully",
+     "affirmation": "I am a clear mirror. I reflect truth with compassion and clarity.",
+     "color": "#F8FAFC", "direction": "North"},
+    {"num": 19, "name": "Cauac", "glyph": "Blue Storm", "meaning": "Catalysis, Transformation, Energy", "element": "Water",
+     "desc": "You are the storm that clears the sky. Transformation is your constant companion. Where you go, old structures dissolve and new life emerges. You catalyze evolution in everyone you meet.",
+     "shadow": "Chaos, destruction without purpose, emotional storms",
+     "affirmation": "I am the sacred storm. I clear the way for new life and beauty.",
+     "color": "#3B82F6", "direction": "West"},
+    {"num": 20, "name": "Ahau", "glyph": "Yellow Sun", "meaning": "Enlightenment, Wholeness, Ascension", "element": "Fire",
+     "desc": "You carry the energy of the Sun itself — enlightenment, wholeness, and unconditional love. You are the culmination of all 20 day signs. Your path is one of solar consciousness and divine mastery.",
+     "shadow": "Ego inflation, spiritual pride, burnout from shining too bright",
+     "affirmation": "I am the Sun. I shine my light equally on all beings with unconditional love.",
+     "color": "#FCD34D", "direction": "South"},
+]
+
+MAYAN_TONES = [
+    {"num": 1, "name": "Magnetic", "purpose": "Unify", "action": "Attract", "desc": "You set things in motion. Your energy draws experiences and people toward you. You are a beginning point.", "color": "#EF4444"},
+    {"num": 2, "name": "Lunar", "purpose": "Polarize", "action": "Stabilize", "desc": "You see both sides. Duality teaches you balance. Challenge refines your understanding.", "color": "#F8FAFC"},
+    {"num": 3, "name": "Electric", "purpose": "Activate", "action": "Bond", "desc": "You spark energy into action. Service to others electrifies your gifts. You catalyze connection.", "color": "#3B82F6"},
+    {"num": 4, "name": "Self-Existing", "purpose": "Define", "action": "Measure", "desc": "You create structure and form. Your clarity defines the container for growth.", "color": "#FCD34D"},
+    {"num": 5, "name": "Overtone", "purpose": "Empower", "action": "Command", "desc": "You radiate authority. Your empowerment comes from aligning with your core purpose.", "color": "#EF4444"},
+    {"num": 6, "name": "Rhythmic", "purpose": "Organize", "action": "Balance", "desc": "You bring order from chaos. Physical balance and organic flow are your gifts.", "color": "#F8FAFC"},
+    {"num": 7, "name": "Resonant", "purpose": "Channel", "action": "Inspire", "desc": "You are a cosmic channel. Attunement to higher frequencies allows you to inspire and align.", "color": "#3B82F6"},
+    {"num": 8, "name": "Galactic", "purpose": "Harmonize", "action": "Model", "desc": "You walk your talk. Integrity and harmony between inner and outer worlds is your mastery.", "color": "#FCD34D"},
+    {"num": 9, "name": "Solar", "purpose": "Pulse", "action": "Realize", "desc": "You bring intention into form. Your solar will manifests through focused pulse and action.", "color": "#EF4444"},
+    {"num": 10, "name": "Planetary", "purpose": "Perfect", "action": "Produce", "desc": "You manifest tangible results. Your creations are perfect expressions of divine intention.", "color": "#F8FAFC"},
+    {"num": 11, "name": "Spectral", "purpose": "Dissolve", "action": "Release", "desc": "You liberate and release. Dissolution of what no longer serves creates space for the new.", "color": "#3B82F6"},
+    {"num": 12, "name": "Crystal", "purpose": "Dedicate", "action": "Cooperate", "desc": "You shine through cooperation. Sharing your clarity with community amplifies your light.", "color": "#FCD34D"},
+    {"num": 13, "name": "Cosmic", "purpose": "Endure", "action": "Transcend", "desc": "You transcend all limitation. Your cosmic nature endures beyond time and space. You are the completion.", "color": "#C084FC"},
+]
+
+# Tzolk'in reference date: Aug 11, 3114 BCE (Long Count 0.0.0.0.0) = Kin 1 (1 Imix)
+TZOLKIN_EPOCH_JDN = 584283  # Julian Day Number for the Mayan epoch
+
+def _jdn_from_date(year, month, day):
+    """Compute Julian Day Number from a Gregorian date."""
+    a = (14 - month) // 12
+    y = year + 4800 - a
+    m = month + 12 * a - 3
+    return day + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
+
+def get_mayan_sign(year: int, month: int, day: int):
+    jdn = _jdn_from_date(year, month, day)
+    diff = jdn - TZOLKIN_EPOCH_JDN
+    kin = (diff % 260)
+    if kin <= 0:
+        kin += 260
+    tone_num = ((kin - 1) % 13) + 1
+    sign_num = ((kin - 1) % 20) + 1
+    sign = MAYAN_DAY_SIGNS[sign_num - 1]
+    tone = MAYAN_TONES[tone_num - 1]
+    return {
+        "kin": kin,
+        "sign": sign,
+        "tone": tone,
+        "galactic_signature": f"{tone['name']} {sign['glyph']}",
+    }
+
+
+@api_router.get("/mayan/birth-sign")
+async def mayan_birth_sign(year: int, month: int, day: int):
+    if month < 1 or month > 12 or day < 1 or day > 31 or year < 1:
+        raise HTTPException(status_code=400, detail="Invalid date")
+    result = get_mayan_sign(year, month, day)
+    return result
+
+
+@api_router.get("/mayan/compatibility")
+async def mayan_compatibility(year1: int, month1: int, day1: int, year2: int, month2: int, day2: int):
+    r1 = get_mayan_sign(year1, month1, day1)
+    r2 = get_mayan_sign(year2, month2, day2)
+    score = 50
+    if r1["sign"]["element"] == r2["sign"]["element"]:
+        score += 20
+    if r1["sign"]["direction"] == r2["sign"]["direction"]:
+        score += 10
+    if r1["tone"]["num"] == r2["tone"]["num"]:
+        score += 15
+    if abs(r1["sign"]["num"] - r2["sign"]["num"]) <= 2:
+        score += 10
+    comp_elements = {("Fire", "Air"), ("Air", "Fire"), ("Water", "Earth"), ("Earth", "Water")}
+    if (r1["sign"]["element"], r2["sign"]["element"]) in comp_elements:
+        score += 15
+    score = min(100, score)
+    msgs = []
+    if score >= 80:
+        msgs.append("A powerful galactic resonance. Your souls vibrate in deep harmony across the Tzolk'in.")
+    elif score >= 60:
+        msgs.append("Strong cosmic compatibility. Your energies complement and amplify each other's growth.")
+    else:
+        msgs.append("A journey of growth. Your differences create a rich tapestry of learning and evolution.")
+    if r1["sign"]["element"] == r2["sign"]["element"]:
+        msgs.append(f"Shared {r1['sign']['element']} element — you speak the same elemental language.")
+    if r1["sign"]["direction"] == r2["sign"]["direction"]:
+        msgs.append(f"Both oriented {r1['sign']['direction']} — aligned purpose and worldview.")
+    return {"person1": r1, "person2": r2, "score": score, "messages": msgs}
+
+
+@api_router.get("/mayan/today")
+async def mayan_today():
+    from datetime import date
+    today = date.today()
+    result = get_mayan_sign(today.year, today.month, today.day)
+    result["date"] = today.isoformat()
+    return result
+
+
+# ========== SACRED CARDOLOGY ==========
+
+CARD_SUITS = {"H": "Hearts", "C": "Clubs", "D": "Diamonds", "S": "Spades"}
+CARD_VALUES = {1: "Ace", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "Jack", 12: "Queen", 13: "King"}
+SUIT_ELEMENTS = {"H": "Water", "C": "Fire", "D": "Earth", "S": "Air"}
+SUIT_THEMES = {
+    "H": {"theme": "Love & Relationships", "color": "#FDA4AF", "desc": "Hearts govern emotions, love, family, and the inner world of feelings."},
+    "C": {"theme": "Knowledge & Communication", "color": "#22C55E", "desc": "Clubs rule the mind — ideas, learning, communication, and creative expression."},
+    "D": {"theme": "Values & Resources", "color": "#FCD34D", "desc": "Diamonds relate to material values, finances, health, and self-worth."},
+    "S": {"theme": "Wisdom & Transformation", "color": "#93C5FD", "desc": "Spades represent life's deeper lessons — wisdom through challenge and spiritual growth."},
+}
+CARD_MEANINGS = {
+    "AH": {"title": "Ace of Hearts", "keyword": "The Desire for Love", "desc": "You are driven by deep emotional connections. Your life path centers around love — giving it, receiving it, and understanding it at its highest form.", "love": "You love deeply and seek a soulmate connection. Relationships are your greatest teacher.", "life": "Creativity, compassion, and emotional intelligence guide your journey."},
+    "2H": {"title": "Two of Hearts", "keyword": "The Union", "desc": "Partnership is your birthright. You thrive in connection and are a natural peacemaker.", "love": "You are destined for deep, balanced partnerships. Trust the bonds that form naturally.", "life": "Cooperation and diplomacy are your superpowers."},
+    "3H": {"title": "Three of Hearts", "keyword": "Creative Love", "desc": "Artistic expression and emotional variety define your path. You spread joy through creative gifts.", "love": "You need creative stimulation in relationships. Variety and depth both call to you.", "life": "Self-expression and social connections fuel your growth."},
+    "4H": {"title": "Four of Hearts", "keyword": "Stability in Love", "desc": "You seek security in emotional bonds. Family and home are sacred to you.", "love": "Loyalty and commitment are your foundation. You build love that lasts.", "life": "Creating safe, nurturing spaces is your gift to the world."},
+    "5H": {"title": "Five of Hearts", "keyword": "Emotional Change", "desc": "Your path involves transforming through emotional experiences. Each change deepens your wisdom.", "love": "Growth through relationship lessons. Each love teaches you something profound.", "life": "Adaptability and emotional courage define your journey."},
+    "6H": {"title": "Six of Hearts", "keyword": "The Peacemaker", "desc": "Harmony and responsibility in love. You carry karmic duties toward family and close ones.", "love": "You bring peace and healing to your relationships. Past-life connections are common.", "life": "Service through love. You heal others by being present."},
+    "7H": {"title": "Seven of Hearts", "keyword": "Spiritual Love", "desc": "You are learning to love unconditionally. Your path transcends personal attachment.", "love": "Idealistic in love — seeking the divine in every connection.", "life": "Spiritual growth through emotional mastery."},
+    "8H": {"title": "Eight of Hearts", "keyword": "Power of the Heart", "desc": "Emotional power and magnetic charm. You influence others through the depth of your feeling.", "love": "Intense, transformative love experiences. You love with your whole being.", "life": "Leadership through emotional intelligence and authenticity."},
+    "9H": {"title": "Nine of Hearts", "keyword": "Universal Love", "desc": "The wish card. You carry the energy of compassion for all beings.", "love": "Your love extends beyond personal — you love humanity itself.", "life": "Philanthropy, healing arts, and emotional wisdom."},
+    "10H": {"title": "Ten of Hearts", "keyword": "Success in Love", "desc": "Group happiness and social fulfillment. You succeed when surrounded by community.", "love": "Your love life flourishes in social settings. Friendships become family.", "life": "Public success, popularity, and community leadership."},
+    "JH": {"title": "Jack of Hearts", "keyword": "The Sacrificial Love", "desc": "Youthful heart energy. You inspire others through romantic idealism and creative passion.", "love": "A romantic at heart — always seeking the beautiful and poetic in love.", "life": "Creative pursuits and emotional adventures drive your growth."},
+    "QH": {"title": "Queen of Hearts", "keyword": "The Loving Mother", "desc": "Nurturing power and emotional mastery. You are the heart of every circle you enter.", "love": "Devoted, warm, and deeply caring. Your love is a sanctuary.", "life": "Healing, teaching, and nurturing are your calling."},
+    "KH": {"title": "King of Hearts", "keyword": "The Benevolent Ruler", "desc": "Mastery of the emotional realm. You lead with compassion and wisdom.", "love": "Generous and wise in love. You set the standard for how love should be.", "life": "Authority earned through kindness and emotional depth."},
+    "AC": {"title": "Ace of Clubs", "keyword": "The Desire for Knowledge", "desc": "Insatiable curiosity drives you. Your mind is your greatest asset.", "love": "Mental connection is essential. You fall in love with minds first.", "life": "Lifelong learning, teaching, and intellectual exploration."},
+    "2C": {"title": "Two of Clubs", "keyword": "The Conversation", "desc": "You thrive through dialogue and intellectual partnership.", "love": "Deep conversations create your deepest bonds.", "life": "Communication, writing, and cooperative thinking."},
+    "3C": {"title": "Three of Clubs", "keyword": "Creative Worry", "desc": "A brilliant creative mind that sometimes overthinks. Channel anxiety into art.", "love": "You need intellectual stimulation and variety in partnerships.", "life": "Writing, speaking, and creative problem-solving."},
+    "4C": {"title": "Four of Clubs", "keyword": "Mental Foundation", "desc": "Structured thinking and solid knowledge base. You build systems of understanding.", "love": "Stability and intellectual compatibility are paramount.", "life": "Organization, teaching, and systematic knowledge."},
+    "5C": {"title": "Five of Clubs", "keyword": "Mental Restlessness", "desc": "A versatile mind that craves new ideas and experiences.", "love": "You need freedom and intellectual adventure in love.", "life": "Travel, change, and diverse learning experiences."},
+    "6C": {"title": "Six of Clubs", "keyword": "The Intuitive Mind", "desc": "Strong intuition combined with analytical ability. You know things before you learn them.", "love": "Psychic connections with partners. Trust your gut about people.", "life": "Intuitive decision-making and karmic knowledge."},
+    "7C": {"title": "Seven of Clubs", "keyword": "Spiritual Knowledge", "desc": "Seeker of higher truth. You question everything until you find the spiritual core.", "love": "You seek partners who share your quest for deeper meaning.", "life": "Philosophy, spirituality, and metaphysical studies."},
+    "8C": {"title": "Eight of Clubs", "keyword": "Mental Power", "desc": "Powerful mind, strong will. You can manifest through focused thought.", "love": "Intellectual equals attract you. Power dynamics must be balanced.", "life": "Business acumen, strategic thinking, and mental fortitude."},
+    "9C": {"title": "Nine of Clubs", "keyword": "Universal Knowledge", "desc": "Vast understanding and wisdom. You are a natural teacher and philosopher.", "love": "You attract those who seek your wisdom and guidance.", "life": "Teaching, publishing, and spreading knowledge globally."},
+    "10C": {"title": "Ten of Clubs", "keyword": "Success of the Mind", "desc": "Mental achievement and group learning. Your ideas reach many.", "love": "Social intelligence strengthens your bonds.", "life": "Public speaking, education, and thought leadership."},
+    "JC": {"title": "Jack of Clubs", "keyword": "The Quick Mind", "desc": "Youthful intellect and clever communication. Always learning, always curious.", "love": "Witty, playful, and intellectually stimulating in relationships.", "life": "Innovation, entrepreneurship, and creative ideas."},
+    "QC": {"title": "Queen of Clubs", "keyword": "The Intuitive Organizer", "desc": "Combining intuition with mental clarity. You see patterns others miss.", "love": "Perceptive and nurturing through understanding.", "life": "Organization, intuition-based leadership, service."},
+    "KC": {"title": "King of Clubs", "keyword": "The Master Communicator", "desc": "Authority in knowledge and communication. Your words carry weight.", "love": "You lead in love through wisdom and clear expression.", "life": "Mastery of communication, teaching, and mental pursuits."},
+    "AD": {"title": "Ace of Diamonds", "keyword": "The Desire for Wealth", "desc": "Driven by material security and self-worth. You create value wherever you go.", "love": "Generosity and shared resources strengthen your bonds.", "life": "Entrepreneurship, finance, and creating abundance."},
+    "2D": {"title": "Two of Diamonds", "keyword": "Business Partnerships", "desc": "You excel in financial cooperation and fair exchanges.", "love": "Material compatibility matters — shared goals and values.", "life": "Deals, negotiations, and cooperative ventures."},
+    "3D": {"title": "Three of Diamonds", "keyword": "Financial Creativity", "desc": "Creative approaches to money and value. Multiple income streams.", "love": "You express love through thoughtful generosity.", "life": "Diverse talents, multiple projects, creative finance."},
+    "4D": {"title": "Four of Diamonds", "keyword": "Financial Stability", "desc": "Security-oriented. You build solid financial foundations.", "love": "Practical and dependable in relationships.", "life": "Real estate, savings, and long-term planning."},
+    "5D": {"title": "Five of Diamonds", "keyword": "Financial Change", "desc": "Value shifts define your journey. Learning the true meaning of wealth.", "love": "Growth through changing values. Flexibility in giving and receiving.", "life": "Business pivots, travel, and evolving self-worth."},
+    "6D": {"title": "Six of Diamonds", "keyword": "Karmic Debts", "desc": "Settling accounts — financial and spiritual. Fairness is your compass.", "love": "Past-life connections around shared resources.", "life": "Responsibility, fair dealings, and karmic balance."},
+    "7D": {"title": "Seven of Diamonds", "keyword": "Spiritual Values", "desc": "Questioning material values to find spiritual wealth.", "love": "Seeking partners who value depth over surface.", "life": "Philanthropy, spiritual economics, and inner riches."},
+    "8D": {"title": "Eight of Diamonds", "keyword": "Material Power", "desc": "Business mastery and financial authority. You understand the flow of value.", "love": "Power couples — building empires together.", "life": "Large-scale business, investments, and influence."},
+    "9D": {"title": "Nine of Diamonds", "keyword": "Universal Values", "desc": "Philanthropic and generous. Your wealth serves the greater good.", "love": "Love through service and shared abundance.", "life": "Charity, global business, and values-driven leadership."},
+    "10D": {"title": "Ten of Diamonds", "keyword": "Blessed Fortune", "desc": "Material success in groups and public settings.", "love": "Social status and shared success strengthen bonds.", "life": "Public wealth, community prosperity, group abundance."},
+    "JD": {"title": "Jack of Diamonds", "keyword": "The Salesperson", "desc": "Youthful energy in commerce. Persuasive and quick to spot opportunity.", "love": "Charming and generous. Values grow through relationships.", "life": "Sales, marketing, and entrepreneurial ventures."},
+    "QD": {"title": "Queen of Diamonds", "keyword": "The Philanthropist", "desc": "Financial wisdom combined with generosity. You manage resources for the good of all.", "love": "Giving and nurturing through practical support.", "life": "Financial planning, charity, and resource management."},
+    "KD": {"title": "King of Diamonds", "keyword": "The Business Master", "desc": "Supreme authority in material matters. Your business sense is legendary.", "love": "Provider and protector through material abundance.", "life": "Empire building, mastery of finance, and leadership."},
+    "AS": {"title": "Ace of Spades", "keyword": "The Card of Transformation", "desc": "The most powerful card in the deck. Deep transformation and spiritual awakening.", "love": "Intense, karmic love connections. Nothing shallow satisfies you.", "life": "Profound spiritual journey, death and rebirth cycles."},
+    "2S": {"title": "Two of Spades", "keyword": "The Partnership of Work", "desc": "Collaborative labor and shared effort build your character.", "love": "Working together strengthens your deepest bonds.", "life": "Business partnerships, cooperative projects, shared labor."},
+    "3S": {"title": "Three of Spades", "keyword": "Creative Indecision", "desc": "Too many choices can paralyze. Learning to commit strengthens your path.", "love": "Exploring many options before finding the right one.", "life": "Creative work, varied interests, eventual mastery."},
+    "4S": {"title": "Four of Spades", "keyword": "Satisfaction Through Work", "desc": "Hard work brings deep satisfaction. You find peace through accomplishment.", "love": "Building together, sweating side by side, creates the strongest bonds.", "life": "Discipline, craftsmanship, and earned accomplishment."},
+    "5S": {"title": "Five of Spades", "keyword": "Travel and Change", "desc": "Movement and transformation through action. You learn by doing.", "love": "Adventurous love — growing through shared challenges.", "life": "Travel, health transformations, and active growth."},
+    "6S": {"title": "Six of Spades", "keyword": "Karmic Responsibility", "desc": "Past-life duties define much of your current work. Fulfillment comes through service.", "love": "Deep karmic ties with partners — old souls reuniting.", "life": "Duty, service, and settling spiritual accounts."},
+    "7S": {"title": "Seven of Spades", "keyword": "Spiritual Initiation", "desc": "One of the most spiritual cards. You are here to awaken.", "love": "Transcendent love — beyond the physical into the spiritual.", "life": "Mystic, healer, and spiritual teacher."},
+    "8S": {"title": "Eight of Spades", "keyword": "Power Through Work", "desc": "Tremendous work ethic and transformative power. You reshape reality.", "love": "Intense partnerships that transform both people.", "life": "Healing professions, psychology, and organizational power."},
+    "9S": {"title": "Nine of Spades", "keyword": "Universal Completion", "desc": "Endings and completions. You help others let go and move forward.", "love": "Deep letting go — releasing what no longer serves love.", "life": "Counseling, end-of-life work, and transformation services."},
+    "10S": {"title": "Ten of Spades", "keyword": "Group Transformation", "desc": "Working with groups toward collective evolution.", "love": "Social activism and community transformation through love.", "life": "Public service, group leadership, and mass healing."},
+    "JS": {"title": "Jack of Spades", "keyword": "The Spiritual Actor", "desc": "Youthful spiritual energy. Learning through experience and exploration.", "love": "Playful yet deep — always seeking the meaning beneath the surface.", "life": "Acting, psychology, and spiritual exploration."},
+    "QS": {"title": "Queen of Spades", "keyword": "The Mystic Queen", "desc": "Deep feminine wisdom and organizational mastery. You see through illusion.", "love": "Perceptive and transformative in relationships.", "life": "Mastery of inner work, therapy, and organizational healing."},
+    "KS": {"title": "King of Spades", "keyword": "The Master of Wisdom", "desc": "The most accomplished card. Mastery through lifetimes of experience.", "love": "Wise, patient, and supremely self-aware in love.", "life": "Ultimate authority, wisdom traditions, and legacy."},
+    "JK": {"title": "The Joker", "keyword": "The Wild Card", "desc": "Born outside the system. You follow no predetermined path — you create your own.", "love": "Unpredictable and free-spirited. Love must be unconventional.", "life": "Innovation, disruption, and complete creative freedom."},
+}
+
+# Birthday-to-card mapping: Based on the standard cardology system
+# Each date maps to a specific card. Simplified deterministic mapping using day-of-year
+BIRTHDAY_CARDS = [
+    "KS","AC","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C",
+    "7D","8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC",
+    "AD","2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C",
+    "8D","9S","10H","JC","QD","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D",
+    "3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D",
+    "10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D",
+    "4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D",
+    "JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D",
+    "5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD",
+    "QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D",
+    "6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD",
+    "KS","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D",
+    "7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD",
+    "AS","2H","3C","4D","5S","6H","7C","8D","9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C","7D",
+    "8S","9H","10C","JD","QS","KH","AC","2D","3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD",
+    "2S","3H","4C","5D","6S","7H","8C","9D","10S","JH","QC","KD","AS","2H","3C","4D","5S","6H","7C","8D",
+    "9S","10H","JC","QD","KS","AH","2C","3D","4S","5H","6C","7D","8S","9H","10C","JD","QS","KH","AC","2D",
+    "3S","4H","5C","6D","7S","8H","9C","10D","JS","QH","KC","AD","2S","3H","4C","5D","6S","7H","8C","9D",
+    "10S","JH","QC","JK","AS",
+]
+
+PLANETARY_RULERS = {
+    1: {"planet": "Sun", "meaning": "Identity, ego, and life force", "color": "#FCD34D"},
+    2: {"planet": "Moon", "meaning": "Emotions, intuition, and the subconscious", "color": "#E2E8F0"},
+    3: {"planet": "Jupiter", "meaning": "Expansion, wisdom, and abundance", "color": "#8B5CF6"},
+    4: {"planet": "Uranus", "meaning": "Innovation, freedom, and sudden change", "color": "#06B6D4"},
+    5: {"planet": "Mercury", "meaning": "Communication, adaptability, and wit", "color": "#22C55E"},
+    6: {"planet": "Venus", "meaning": "Love, beauty, and harmony", "color": "#FDA4AF"},
+    7: {"planet": "Neptune", "meaning": "Spirituality, dreams, and mysticism", "color": "#93C5FD"},
+    8: {"planet": "Saturn", "meaning": "Discipline, karma, and life lessons", "color": "#6B7280"},
+    9: {"planet": "Mars", "meaning": "Action, courage, and passion", "color": "#EF4444"},
+    10: {"planet": "Pluto", "meaning": "Transformation, power, and rebirth", "color": "#7C3AED"},
+    11: {"planet": "Mercury", "meaning": "Quick thinking, youthful energy", "color": "#22C55E"},
+    12: {"planet": "Venus", "meaning": "Receptive power, nurturing wisdom", "color": "#FDA4AF"},
+    13: {"planet": "Sun", "meaning": "Mastery, authority, and leadership", "color": "#FCD34D"},
+}
+
+def get_birth_card(month: int, day: int):
+    from datetime import date
+    try:
+        d = date(2000, month, day)
+        day_of_year = d.timetuple().tm_yday - 1
+        card_code = BIRTHDAY_CARDS[day_of_year % len(BIRTHDAY_CARDS)]
+    except (ValueError, IndexError):
+        card_code = "JK"
+    return card_code
+
+def get_card_details(code):
+    info = CARD_MEANINGS.get(code, CARD_MEANINGS.get("JK"))
+    suit_code = code[-1] if len(code) <= 3 else code[-1]
+    val_str = code[:-1]
+    val_map = {"A": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13}
+    val = val_map.get(val_str, 0)
+    suit_info = SUIT_THEMES.get(suit_code, SUIT_THEMES["H"])
+    planet = PLANETARY_RULERS.get(val, PLANETARY_RULERS[1])
+    return {
+        "code": code,
+        "suit": CARD_SUITS.get(suit_code, "Joker"),
+        "value": CARD_VALUES.get(val, "Joker"),
+        "element": SUIT_ELEMENTS.get(suit_code, "Spirit"),
+        "suit_theme": suit_info,
+        "planet": planet,
+        **info,
+    }
+
+
+@api_router.get("/cardology/birth-card")
+async def get_birth_card_reading(month: int, day: int):
+    if month < 1 or month > 12 or day < 1 or day > 31:
+        raise HTTPException(status_code=400, detail="Invalid date")
+    code = get_birth_card(month, day)
+    details = get_card_details(code)
+    return {"card": details}
+
+
+@api_router.get("/cardology/compatibility")
+async def get_compatibility(month1: int, day1: int, month2: int, day2: int):
+    code1 = get_birth_card(month1, day1)
+    code2 = get_birth_card(month2, day2)
+    card1 = get_card_details(code1)
+    card2 = get_card_details(code2)
+
+    # Compatibility scoring
+    score = 50
+    if card1["suit"] == card2["suit"]:
+        score += 20  # Same suit = strong connection
+    if card1["element"] == card2["element"]:
+        score += 15
+    # Hearts + Diamonds = complementary, Clubs + Spades = complementary
+    comp_pairs = {("H", "D"), ("D", "H"), ("C", "S"), ("S", "C")}
+    s1, s2 = code1[-1], code2[-1]
+    if (s1, s2) in comp_pairs:
+        score += 10
+    # Same value = mirror connection
+    if code1[:-1] == code2[:-1]:
+        score += 15
+    score = min(100, score)
+
+    messages = []
+    if score >= 80:
+        messages.append("A deeply karmic and harmonious connection. You share soul-level resonance.")
+    elif score >= 60:
+        messages.append("Strong natural compatibility. Your energies complement and support each other.")
+    else:
+        messages.append("An opportunity for growth. Your differences create dynamic tension that catalyzes evolution.")
+
+    if card1["suit"] == card2["suit"]:
+        messages.append(f"Both {card1['suit']} — you speak the same emotional language.")
+    if card1["element"] == card2["element"]:
+        messages.append(f"Shared {card1['element']} element creates natural understanding.")
+
+    return {
+        "person1": card1,
+        "person2": card2,
+        "score": score,
+        "messages": messages,
+    }
+
+
+@api_router.get("/cardology/daily-card")
+async def get_daily_card(user=Depends(get_current_user_optional)):
+    from datetime import date
+    today = date.today()
+    seed = (today.year * 1000 + today.timetuple().tm_yday)
+    idx = seed % len(BIRTHDAY_CARDS)
+    code = BIRTHDAY_CARDS[idx]
+    details = get_card_details(code)
+    details["date"] = today.isoformat()
+    return {"card": details}
 
 
 # ========== DAILY CHALLENGES ==========

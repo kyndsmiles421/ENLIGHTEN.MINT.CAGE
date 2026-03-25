@@ -147,18 +147,18 @@ export default function Soundscapes() {
 
   useEffect(() => { loadSavedMixes(); }, [loadSavedMixes]);
 
-  const getAudioCtx = useCallback(() => {
+  const getAudioCtx = useCallback(async () => {
     if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
       audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
     if (audioCtxRef.current.state === 'suspended') {
-      audioCtxRef.current.resume();
+      await audioCtxRef.current.resume();
     }
     return audioCtxRef.current;
   }, []);
 
-  const startSound = useCallback((soundId) => {
-    const ctx = getAudioCtx();
+  const startSound = useCallback(async (soundId) => {
+    const ctx = await getAudioCtx();
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(volumes[soundId] / 100 * 0.25, ctx.currentTime);
     gain.connect(ctx.destination);

@@ -42,6 +42,8 @@ const Journey = lazy(() => import('./pages/Journey'));
 const Learn = lazy(() => import('./pages/Learn'));
 const Games = lazy(() => import('./pages/Games'));
 const Friends = lazy(() => import('./pages/Friends'));
+const Cardology = lazy(() => import('./pages/Cardology'));
+const MayanAstrology = lazy(() => import('./pages/MayanAstrology'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -102,6 +104,8 @@ function AnimatedRoutes() {
             <Route path="/learn" element={<Learn />} />
             <Route path="/games" element={<Games />} />
             <Route path="/friends" element={<Friends />} />
+            <Route path="/cardology" element={<Cardology />} />
+            <Route path="/mayan" element={<MayanAstrology />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
