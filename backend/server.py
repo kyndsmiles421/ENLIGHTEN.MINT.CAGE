@@ -1635,6 +1635,148 @@ async def delete_custom_meditation(meditation_id: str, user=Depends(get_current_
         raise HTTPException(status_code=404, detail="Not found")
     return {"deleted": True}
 
+# --- Custom Breathing Patterns ---
+
+@api_router.post("/breathing/save-custom")
+async def save_custom_breathing(data: dict, user=Depends(get_current_user)):
+    """Save a user-defined custom breathing pattern."""
+    doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "name": data.get("name", "My Pattern"),
+        "inhale": max(1, min(20, data.get("inhale", 4))),
+        "hold1": max(0, min(20, data.get("hold1", 4))),
+        "exhale": max(1, min(20, data.get("exhale", 4))),
+        "hold2": max(0, min(20, data.get("hold2", 0))),
+        "color": data.get("color", "#2DD4BF"),
+        "description": data.get("description", ""),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.custom_breathing.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/breathing/my-custom")
+async def get_custom_breathing(user=Depends(get_current_user)):
+    items = await db.custom_breathing.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return items
+
+@api_router.delete("/breathing/custom/{pattern_id}")
+async def delete_custom_breathing(pattern_id: str, user=Depends(get_current_user)):
+    result = await db.custom_breathing.delete_one({"id": pattern_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+    return {"deleted": True}
+
+# --- Custom Affirmation Sets ---
+
+@api_router.post("/affirmations/generate-set")
+async def generate_affirmation_set(data: dict, user=Depends(get_current_user)):
+    """AI-generate a personalized set of affirmations based on user's goal."""
+    goal = data.get("goal", "").strip()
+    if not goal:
+        raise HTTPException(status_code=400, detail="Please provide a goal or intention")
+    count = max(3, min(10, data.get("count", 7)))
+
+    prompt = f"""Create {count} deeply personal, powerful affirmations for someone whose intention is: "{goal}"
+
+Rules:
+- Each affirmation must start with "I am", "I have", "I attract", "I choose", "I embrace", "I release", or similar empowering first-person language
+- Make them specific to the intention, not generic
+- They should feel warm, compassionate, and deeply resonant
+- Each affirmation should be 1-2 sentences max
+- Make each one unique in its approach — some emotional, some grounding, some aspirational
+
+Return ONLY a JSON array of strings. No markdown, no explanation."""
+
+    try:
+        chat = LlmChat(
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            session_id=f"affirmation-set-{str(uuid.uuid4())}",
+            system_message="You are a compassionate life coach and spiritual guide. Generate deeply personal affirmations. Always respond with valid JSON only.",
+        )
+        chat.with_model("openai", "gpt-5.2")
+        msg = UserMessage(text=prompt)
+        raw = await asyncio.wait_for(chat.send_message(msg), timeout=30)
+
+        import json as json_mod
+        cleaned = raw.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
+            cleaned = cleaned.strip()
+            if cleaned.startswith("json"):
+                cleaned = cleaned[4:].strip()
+
+        affirmations = json_mod.loads(cleaned)
+        if not isinstance(affirmations, list):
+            raise ValueError("Expected a list")
+        return {"affirmations": affirmations[:count], "goal": goal}
+    except Exception as e:
+        logger.error(f"Affirmation set generate error: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate affirmations. Please try again.")
+
+@api_router.post("/affirmations/save-set")
+async def save_affirmation_set(data: dict, user=Depends(get_current_user)):
+    """Save a user's custom affirmation set."""
+    doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "name": data.get("name", "My Affirmations"),
+        "goal": data.get("goal", ""),
+        "affirmations": data.get("affirmations", []),
+        "color": data.get("color", "#FCD34D"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.custom_affirmations.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/affirmations/my-sets")
+async def get_affirmation_sets(user=Depends(get_current_user)):
+    items = await db.custom_affirmations.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return items
+
+@api_router.delete("/affirmations/set/{set_id}")
+async def delete_affirmation_set(set_id: str, user=Depends(get_current_user)):
+    result = await db.custom_affirmations.delete_one({"id": set_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+    return {"deleted": True}
+
+# --- Custom Soundscape Mixes ---
+
+@api_router.post("/soundscapes/save-mix")
+async def save_soundscape_mix(data: dict, user=Depends(get_current_user)):
+    """Save a user's soundscape mix configuration."""
+    volumes = data.get("volumes", {})
+    active = {k: v for k, v in volumes.items() if v and v > 0}
+    if not active:
+        raise HTTPException(status_code=400, detail="No sounds active in this mix")
+    doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "name": data.get("name", "My Mix"),
+        "volumes": active,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.custom_soundscapes.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/soundscapes/my-mixes")
+async def get_soundscape_mixes(user=Depends(get_current_user)):
+    items = await db.custom_soundscapes.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return items
+
+@api_router.delete("/soundscapes/mix/{mix_id}")
+async def delete_soundscape_mix(mix_id: str, user=Depends(get_current_user)):
+    result = await db.custom_soundscapes.delete_one({"id": mix_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+    return {"deleted": True}
+
 # --- AI Knowledge Engine ---
 KNOWLEDGE_PROMPTS = {
     "mudra": "You are an expert in yogic mudra science. Give a thorough guide about '{topic}' covering: origins, precise hand position, benefits (physical/mental/spiritual), chakra and element associations, duration and timing, contraindications, combinations with pranayama and mantras, and any scientific research. Be warm and authoritative.",
