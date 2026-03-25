@@ -1705,17 +1705,23 @@ async def get_active_users():
         {"$limit": 20}
     ]).to_list(20)
     
-    result = []
-    for u in users_with_posts:
-        follower_count = await db.follows.count_documents({"following_id": u["_id"]})
-        result.append({
+    # Batch follower counts in a single query instead of N+1
+    user_ids = [u["_id"] for u in users_with_posts]
+    follower_counts = {doc["_id"]: doc["count"] for doc in await db.follows.aggregate([
+        {"$match": {"following_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$following_id", "count": {"$sum": 1}}}
+    ]).to_list(None)} if user_ids else {}
+    
+    return [
+        {
             "id": u["_id"],
             "name": u["name"],
             "post_count": u["post_count"],
-            "follower_count": follower_count,
+            "follower_count": follower_counts.get(u["_id"], 0),
             "last_active": u["last_post"]
-        })
-    return result
+        }
+        for u in users_with_posts
+    ]
 
 # --- Rituals ---
 @api_router.post("/rituals")
