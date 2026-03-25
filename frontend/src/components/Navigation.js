@@ -24,6 +24,7 @@ const PRIMARY_NAV = [
 ];
 
 const MORE_NAV = [
+  { path: '/learn', label: 'Learn', icon: GraduationCap },
   { path: '/mantras', label: 'Mantras', icon: Music },
   { path: '/hooponopono', label: "Ho'oponopono", icon: HeartHandshake },
   { path: '/oracle', label: 'Oracle', icon: Sparkles },

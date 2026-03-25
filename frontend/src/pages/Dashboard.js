@@ -6,10 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
-  Play, GraduationCap, Headphones, Lightbulb, Sprout
+  Play, GraduationCap, Headphones, Lightbulb, Sprout,
+  ChevronRight, Music, HeartHandshake, Map, TrendingUp
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const REC_ICON_MAP = {
+  wind: Wind, timer: Timer, sun: Sparkles, 'book-open': BookOpen,
+  heart: Heart, headphones: Headphones, radio: Radio, sprout: Sprout,
+  lightbulb: Lightbulb, hand: Hand, music: Music, 'heart-handshake': HeartHandshake,
+  zap: Zap, sunrise: Sunrise, map: Map, 'graduation-cap': GraduationCap,
+};
 
 const QUICK_ACTIONS = [
   { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#D8B4FE' },
@@ -29,7 +37,7 @@ const QUICK_ACTIONS = [
   { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
   { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
   { icon: Play, label: 'Videos', path: '/videos', color: '#2DD4BF' },
-  { icon: GraduationCap, label: 'Classes', path: '/classes', color: '#FCD34D' },
+  { icon: GraduationCap, label: 'Learn', path: '/learn', color: '#E879F9' },
   { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
 ];
 
@@ -37,6 +45,7 @@ export default function Dashboard() {
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
+  const [recs, setRecs] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,10 +54,10 @@ export default function Dashboard() {
       return;
     }
     if (user) {
-      axios.get(`${API}/dashboard/stats`, { headers: authHeaders })
-        .then(res => setStats(res.data))
-        .catch(() => {})
-        .finally(() => setLoading(false));
+      Promise.all([
+        axios.get(`${API}/dashboard/stats`, { headers: authHeaders }).then(res => setStats(res.data)).catch(() => {}),
+        axios.get(`${API}/recommendations`, { headers: authHeaders }).then(res => setRecs(res.data)).catch(() => {}),
+      ]).finally(() => setLoading(false));
     }
   }, [user, authLoading, authHeaders, navigate]);
 
@@ -123,6 +132,58 @@ export default function Dashboard() {
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{m.mood?.substring(0, 3)}</p>
                 </motion.div>
               ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* For You — Personalized Recommendations */}
+        {recs?.recommendations?.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}
+            className="mb-12" data-testid="recommendations-section"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>For You</p>
+                {recs.engagement_score > 0 && (
+                  <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full"
+                    style={{ background: 'rgba(45,212,191,0.1)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.15)' }}>
+                    <TrendingUp size={9} /> {recs.engagement_score} awareness
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] capitalize" style={{ color: 'var(--text-muted)' }}>
+                {recs.time_period} picks
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {recs.recommendations.map((rec, i) => {
+                const Icon = REC_ICON_MAP[rec.icon] || Sparkles;
+                return (
+                  <motion.button
+                    key={rec.id + '-' + i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.04 }}
+                    onClick={() => navigate(rec.path)}
+                    className="glass-card p-4 flex items-start gap-3 text-left group hover:scale-[1.02] transition-all cursor-pointer"
+                    style={{ borderColor: `${rec.color}08` }}
+                    whileHover={{ borderColor: `${rec.color}25`, boxShadow: `0 0 20px ${rec.color}10` }}
+                    data-testid={`rec-${rec.id}`}
+                  >
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                      style={{ background: `${rec.color}10`, border: `1px solid ${rec.color}18` }}>
+                      <Icon size={16} style={{ color: rec.color }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{rec.name}</p>
+                      <p className="text-[10px] mt-0.5 leading-relaxed" style={{ color: rec.color }}>{rec.reason}</p>
+                      <p className="text-[10px] mt-1 line-clamp-1" style={{ color: 'var(--text-muted)' }}>{rec.desc}</p>
+                    </div>
+                    <ChevronRight size={14} style={{ color: 'var(--text-muted)' }}
+                      className="mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                  </motion.button>
+                );
+              })}
             </div>
           </motion.div>
         )}

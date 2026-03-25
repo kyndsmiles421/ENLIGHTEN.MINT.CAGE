@@ -38,6 +38,7 @@ const ZenGarden = lazy(() => import('./pages/ZenGarden'));
 const Mantras = lazy(() => import('./pages/Mantras'));
 const Hooponopono = lazy(() => import('./pages/Hooponopono'));
 const Journey = lazy(() => import('./pages/Journey'));
+const Learn = lazy(() => import('./pages/Learn'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -95,6 +96,7 @@ function AnimatedRoutes() {
             <Route path="/mantras" element={<Mantras />} />
             <Route path="/hooponopono" element={<Hooponopono />} />
             <Route path="/journey" element={<Journey />} />
+            <Route path="/learn" element={<Learn />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
