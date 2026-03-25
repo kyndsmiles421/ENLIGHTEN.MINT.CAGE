@@ -20,26 +20,32 @@ Build a full-stack wellness platform ("positive energy bar") — a mobile wellne
 - Light Therapy, Zen Garden (Koi Pond, Sand, Lanterns, Plants, Rain)
 - Ho'oponopono, Mantras
 
-### Spiritual Teachings Study Section (NEW - Phase 24)
-- **10 Spiritual Teachers**: Buddha, Jesus, Muhammad, Krishna, Lao Tzu, Rumi, Thich Nhat Hanh, Yogananda, Ram Dass, Alan Watts
-- **44 Deep Teachings**: Each teacher has 3-5 detailed study lessons with content, practice exercises
-- **70+ Wisdom Quotes**: Rotating quote display per teacher
-- **9 Themes**: Love, Suffering, Consciousness, Mindfulness, Surrender, Compassion, Impermanence, Nature, Simplicity
-- **AI Guided Contemplation**: GPT-5.2 generates personalized contemplation sessions based on any teaching
-- **Audio Narration**: Listen to teachings and contemplations via TTS
-- **Search & Filter**: Search teachers by name/tradition, browse by theme
-- **Teachers/Themes View Toggle**: Two ways to explore the wisdom library
+### Daily Wisdom (NEW - Phase 25)
+- **Dashboard Widget**: Daily quote + teaching from a different spiritual master each day
+- **Deterministic**: Same wisdom per day using day-of-year seed
+- **Clickable**: Navigates to /teachings for deeper study
+- **Shows**: Teacher name, tradition, quote, teaching title, practice suggestion
 
-### Avatar Integration in Yoga (NEW - Phase 24)
-- **YogaAvatarMini**: User's custom holographic avatar displays alongside yoga sequences
-- **Pose-Adaptive Silhouette**: Avatar automatically matches the current pose (warrior, lotus, standing)
-- **Seamless Integration**: Uses saved avatar config (aura, body type, robe, glow, chakras)
+### Thoth / Ancient Egyptian Mysticism (NEW - Phase 25)
+- **11th Spiritual Teacher**: Thoth / Hermes Trismegistus (Ancient Egyptian Mysticism / Hermeticism)
+- **5 Teachings**: The Emerald Tablet, The Seven Hermetic Principles, The Book of Coming Forth by Day, The Divine Mind (Nous), The Great Work (Spiritual Alchemy)
+- **8 Wisdom Quotes**: Including "As above, so below", "The lips of wisdom are closed, except to the ears of understanding"
+- **2 New Themes**: Mysticism & Alchemy, Sacred Transformation
+
+### Spiritual Teachings Study Section (Phase 24)
+- **11 Spiritual Teachers**: Buddha, Jesus, Muhammad, Krishna, Lao Tzu, Rumi, Thich Nhat Hanh, Yogananda, Ram Dass, Alan Watts, Thoth
+- **49 Deep Teachings** with practices, **78+ Wisdom Quotes**
+- **11 Themes** for cross-teacher exploration
+- **AI Guided Contemplation** (GPT-5.2), **Audio Narration** (TTS)
+
+### Avatar Integration in Yoga (Phase 24)
+- YogaAvatarMini with pose-adaptive silhouette during sequences
 
 ### 3D Holographic Avatar Creator (Phase 23)
-- Canvas-based 3D Avatar with customizable body type, aura, pose, robe, glow, particles, chakras, energy trails
+- Canvas-based 3D Avatar with full customization
 
 ### Yoga Module (Phase 23)
-- 7 Yoga Styles (Hatha, Vinyasa, Kundalini, Yin, Restorative, Pranayama, Nidra) with sequences and poses
+- 7 Yoga Styles with sequences and poses
 
 ### 3D Holographic Guided Meditation (Phase 22)
 - AI Script Generation, Holographic 3D Mode, Auto-Narrated Segments
@@ -47,35 +53,21 @@ Build a full-stack wellness platform ("positive energy bar") — a mobile wellne
 ### Quick Meditation Widget (Phase 22)
 - Floating button, 4 healing frequencies, 30-second sessions
 
-### Sacred Cardology (Phase 21)
-- Birth Card Calculator, Daily Card, Love Compatibility
-
-### Mayan Astrology (Phase 21)
-- Birth Sign Calculator, Today's Energy, Galactic Compatibility
-
-### Social Networking (Phase 20)
-- Friends, Open Messaging, Message Privacy, User Discovery
-
-### Daily Challenges (Phase 20)
-- 30 rotating challenges, XP system, leaderboard
-
-### Previous Features
-- Applied Evolution, Progressive Learning, Gamification (streaks, 4 games)
-- Multi-language (6 languages), PWA, Quick Reset Flow
+### Sacred Cardology (Phase 21) & Mayan Astrology (Phase 21)
+### Social Networking & Daily Challenges (Phase 20)
+### Previous: Applied Evolution, Progressive Learning, Gamification, Multi-language, PWA
 
 ## Key API Endpoints
-- `/api/teachings/teachers`, `/api/teachings/teacher/{id}`, `/api/teachings/themes`, `/api/teachings/theme/{id}`, `/api/teachings/contemplate`
-- `/api/yoga/styles`, `/api/yoga/style/{id}`, `/api/yoga/complete`, `/api/yoga/history`
+- `/api/teachings/daily-wisdom` — deterministic daily wisdom
+- `/api/teachings/teachers`, `/api/teachings/teacher/{id}`, `/api/teachings/themes`, `/api/teachings/contemplate`
+- `/api/yoga/styles`, `/api/yoga/style/{id}`, `/api/yoga/complete`
 - `/api/avatar` (GET/POST)
 - `/api/guided-experience/generate`
-- `/api/cardology/birth-card`, `/api/cardology/daily-card`, `/api/cardology/compatibility`
-- `/api/mayan/birth-sign`, `/api/mayan/today`, `/api/mayan/compatibility`
-- `/api/daily-challenge`, `/api/daily-challenge/complete`
+- `/api/cardology/*`, `/api/mayan/*`, `/api/daily-challenge/*`
 - `/api/users/discover`, `/api/friends/*`, `/api/messages/*`
-- `/api/tts/narrate`, `/api/profile/me`, `/api/profile/customize`
 
 ## Backlog
-- P1: Backend refactoring (server.py -> modular APIRouter files — 5000+ lines)
+- P1: Backend refactoring (server.py -> modular APIRouter files — 5200+ lines)
 - P1: Certifications page for completed classes
 - P2: User-uploaded audio/video content
 - P2: Weekly/monthly wellness reports
