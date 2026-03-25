@@ -20,6 +20,11 @@ import Community from './pages/Community';
 import Challenges from './pages/Challenges';
 import ProfilePage from './pages/ProfilePage';
 import Oracle from './pages/Oracle';
+import Mudras from './pages/Mudras';
+import Yantra from './pages/Yantra';
+import Tantra from './pages/Tantra';
+import Videos from './pages/Videos';
+import Classes from './pages/Classes';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -58,6 +63,11 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<ProfilePage />} />
             <Route path="/oracle" element={<Oracle />} />
+            <Route path="/mudras" element={<Mudras />} />
+            <Route path="/yantra" element={<Yantra />} />
+            <Route path="/tantra" element={<Tantra />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/classes" element={<Classes />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

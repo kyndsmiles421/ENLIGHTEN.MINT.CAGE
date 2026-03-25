@@ -3,22 +3,32 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio, Sunrise, Users, Trophy, Sparkles, User } from 'lucide-react';
+import {
+  Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
+  Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
+  Play, GraduationCap, Headphones
+} from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const QUICK_ACTIONS = [
   { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#D8B4FE' },
-  { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
-  { icon: Sunrise, label: 'Rituals', path: '/rituals', color: '#FCD34D' },
-  { icon: Trophy, label: 'Challenges', path: '/challenges', color: '#FB923C' },
-  { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
   { icon: Wind, label: 'Breathe', path: '/breathing', color: '#2DD4BF' },
   { icon: Timer, label: 'Meditate', path: '/meditation', color: '#D8B4FE' },
+  { icon: Headphones, label: 'Sounds', path: '/soundscapes', color: '#3B82F6' },
+  { icon: Radio, label: 'Frequencies', path: '/frequencies', color: '#8B5CF6' },
+  { icon: Hand, label: 'Mudras', path: '/mudras', color: '#FDA4AF' },
+  { icon: Triangle, label: 'Yantra', path: '/yantra', color: '#EF4444' },
+  { icon: Flame, label: 'Tantra', path: '/tantra', color: '#FCD34D' },
   { icon: Zap, label: 'Exercise', path: '/exercises', color: '#FB923C' },
+  { icon: Sunrise, label: 'Rituals', path: '/rituals', color: '#FCD34D' },
+  { icon: Trophy, label: 'Challenges', path: '/challenges', color: '#FB923C' },
   { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
   { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
-  { icon: Radio, label: 'Frequencies', path: '/frequencies', color: '#8B5CF6' },
+  { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
+  { icon: Play, label: 'Videos', path: '/videos', color: '#2DD4BF' },
+  { icon: GraduationCap, label: 'Classes', path: '/classes', color: '#FCD34D' },
+  { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
 ];
 
 export default function Dashboard() {
@@ -130,18 +140,18 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Continue Your Practice</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Explore & Practice</p>
+          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
             {QUICK_ACTIONS.map(action => {
               const Icon = action.icon;
               return (
                 <button
                   key={action.label}
                   onClick={() => navigate(action.path)}
-                  className="glass-card glass-card-hover p-5 flex flex-col items-center gap-3"
+                  className="glass-card glass-card-hover p-4 flex flex-col items-center gap-2.5"
                   data-testid={`dashboard-action-${action.label.toLowerCase()}`}
                 >
-                  <Icon size={22} style={{ color: action.color }} />
+                  <Icon size={20} style={{ color: action.color }} />
                   <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{action.label}</span>
                 </button>
               );

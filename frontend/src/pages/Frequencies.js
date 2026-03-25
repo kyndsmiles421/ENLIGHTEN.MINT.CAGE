@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Radio, Play, Pause, Info } from 'lucide-react';
+import { Radio, Play, Pause, Info, Square } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -27,6 +27,9 @@ export default function Frequencies() {
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState('all');
   const [playing, setPlaying] = useState(null);
+  const audioCtxRef = useRef(null);
+  const oscRef = useRef(null);
+  const gainRef = useRef(null);
 
   useEffect(() => {
     axios.get(`${API}/frequencies`)
@@ -36,9 +39,60 @@ export default function Frequencies() {
 
   const filtered = filter === 'all' ? frequencies : frequencies.filter(f => f.category === filter);
 
-  const togglePlay = (id) => {
-    setPlaying(playing === id ? null : id);
-  };
+  const stopAudio = useCallback(() => {
+    if (oscRef.current) { try { oscRef.current.stop(); } catch {} oscRef.current = null; }
+    if (gainRef.current) { try { gainRef.current.disconnect(); } catch {} gainRef.current = null; }
+    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} audioCtxRef.current = null; }
+  }, []);
+
+  const startAudio = useCallback((freq) => {
+    stopAudio();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtxRef.current = ctx;
+
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    // Gentle envelope
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
+
+    // Subtle tremolo for richness
+    const lfo = ctx.createOscillator();
+    lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.setValueAtTime(0.02, ctx.currentTime);
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain.gain);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    lfo.start();
+    oscRef.current = osc;
+    gainRef.current = gain;
+  }, [stopAudio]);
+
+  const togglePlay = useCallback((id) => {
+    if (playing === id) {
+      stopAudio();
+      setPlaying(null);
+    } else {
+      const freq = frequencies.find(f => f.id === id);
+      if (freq) {
+        startAudio(freq.frequency);
+        setPlaying(id);
+      }
+    }
+  }, [playing, frequencies, startAudio, stopAudio]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => stopAudio();
+  }, [stopAudio]);
 
   return (
     <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'var(--bg-default)' }}>
@@ -54,13 +108,13 @@ export default function Frequencies() {
           <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
             Solfeggio tones, Earth resonances, and binaural beats that harmonize your biofield and expand consciousness.
           </p>
-          <p className="text-xs mb-12" style={{ color: 'var(--text-muted)' }}>
-            Explore each frequency to learn about its healing properties and chakra associations.
+          <p className="text-xs mb-12" style={{ color: playing ? '#2DD4BF' : 'var(--text-muted)' }}>
+            {playing ? `Now playing: ${frequencies.find(f => f.id === playing)?.name || ''} (${frequencies.find(f => f.id === playing)?.frequency}Hz)` : 'Tap play to hear each frequency tone.'}
           </p>
         </motion.div>
 
         {/* Filter */}
-        <div className="flex gap-2 mb-10">
+        <div className="flex gap-2 mb-10 flex-wrap">
           {[{ k: 'all', l: 'All Frequencies' }, { k: 'solfeggio', l: 'Solfeggio' }, { k: 'earth', l: 'Earth Tones' }, { k: 'binaural', l: 'Binaural' }].map(f => (
             <button
               key={f.k}
@@ -134,7 +188,7 @@ export default function Frequencies() {
                 transition={{ delay: i * 0.04 }}
                 className="glass-card p-6"
                 style={{
-                  borderColor: selected?.id === freq.id ? `${freq.color}40` : 'rgba(255,255,255,0.08)',
+                  borderColor: isPlaying ? `${freq.color}40` : selected?.id === freq.id ? `${freq.color}25` : 'rgba(255,255,255,0.08)',
                   transition: 'border-color 0.3s',
                 }}
                 data-testid={`freq-card-${freq.id}`}
@@ -158,7 +212,7 @@ export default function Frequencies() {
                     }}
                     data-testid={`freq-play-${freq.id}`}
                   >
-                    {isPlaying ? <Pause size={14} style={{ color: freq.color }} /> : <Play size={14} style={{ color: 'var(--text-muted)' }} />}
+                    {isPlaying ? <Square size={12} style={{ color: freq.color }} fill={freq.color} /> : <Play size={14} style={{ color: 'var(--text-muted)' }} />}
                   </button>
                 </div>
 
@@ -202,7 +256,7 @@ export default function Frequencies() {
                         />
                       ))}
                     </div>
-                    <span className="text-xs ml-2" style={{ color: freq.color }}>Visual mode active</span>
+                    <span className="text-xs ml-2" style={{ color: freq.color }}>Playing {freq.frequency}Hz</span>
                   </motion.div>
                 )}
               </motion.div>
@@ -237,21 +291,31 @@ export default function Frequencies() {
               <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
                 {selected.description}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-6">
                 {selected.benefits.map(b => (
                   <span key={b} className="text-xs px-3 py-1.5 rounded-full" style={{ background: `${selected.color}12`, color: selected.color, border: `1px solid ${selected.color}20` }}>
                     {b}
                   </span>
                 ))}
               </div>
-              <button
-                onClick={() => setSelected(null)}
-                className="mt-6 text-xs underline"
-                style={{ color: 'var(--text-muted)' }}
-                data-testid="freq-close-detail"
-              >
-                Close details
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => togglePlay(selected.id)}
+                  className="btn-glass px-6 py-3 text-sm flex items-center gap-2"
+                  style={{ borderColor: playing === selected.id ? `${selected.color}40` : 'rgba(255,255,255,0.1)' }}
+                  data-testid="freq-detail-play"
+                >
+                  {playing === selected.id ? <><Square size={12} fill={selected.color} style={{ color: selected.color }} /> Stop</> : <><Play size={14} /> Listen to {selected.frequency}Hz</>}
+                </button>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="text-xs underline"
+                  style={{ color: 'var(--text-muted)' }}
+                  data-testid="freq-close-detail"
+                >
+                  Close
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

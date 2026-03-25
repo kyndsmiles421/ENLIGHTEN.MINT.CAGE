@@ -11,13 +11,141 @@ const PRESETS = [
 ];
 
 const AMBIENT_SOUNDS = [
-  { name: 'Silence', emoji: '', id: 'silence' },
-  { name: 'Rain', emoji: '', id: 'rain' },
-  { name: 'Ocean Waves', emoji: '', id: 'ocean' },
-  { name: 'Forest', emoji: '', id: 'forest' },
-  { name: 'Singing Bowls', emoji: '', id: 'bowls' },
-  { name: 'Wind', emoji: '', id: 'wind' },
+  { name: 'Silence', id: 'silence' },
+  { name: 'Rain', id: 'rain' },
+  { name: 'Ocean Waves', id: 'ocean' },
+  { name: 'Forest', id: 'forest' },
+  { name: 'Singing Bowls', id: 'bowls' },
+  { name: 'Wind', id: 'wind' },
 ];
+
+function createNoiseBuffer(ctx, seconds = 2) {
+  const size = ctx.sampleRate * seconds;
+  const buf = ctx.createBuffer(1, size, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
+  return buf;
+}
+
+function startAmbientSound(audioCtx, soundId) {
+  const nodes = [];
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  gain.connect(audioCtx.destination);
+  nodes.push(gain);
+
+  if (soundId === 'rain') {
+    const buf = createNoiseBuffer(audioCtx, 2);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const hp = audioCtx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.setValueAtTime(4000, audioCtx.currentTime);
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(8000, audioCtx.currentTime);
+    src.connect(hp);
+    hp.connect(lp);
+    lp.connect(gain);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    src.start();
+    nodes.push(src);
+  } else if (soundId === 'ocean') {
+    const buf = createNoiseBuffer(audioCtx, 4);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(500, audioCtx.currentTime);
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.setValueAtTime(0.1, audioCtx.currentTime);
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain.gain);
+    lfo.start();
+    src.connect(lp);
+    lp.connect(gain);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    src.start();
+    nodes.push(src, lfo);
+  } else if (soundId === 'forest') {
+    const buf = createNoiseBuffer(audioCtx, 2);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const bp = audioCtx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.setValueAtTime(3000, audioCtx.currentTime);
+    bp.Q.setValueAtTime(2, audioCtx.currentTime);
+    src.connect(bp);
+    bp.connect(gain);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+    src.start();
+    nodes.push(src);
+    // Birdsong: intermittent high sine tones
+    const bird = audioCtx.createOscillator();
+    bird.type = 'sine';
+    bird.frequency.setValueAtTime(2200, audioCtx.currentTime);
+    const birdGain = audioCtx.createGain();
+    birdGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    const birdLfo = audioCtx.createOscillator();
+    birdLfo.frequency.setValueAtTime(3, audioCtx.currentTime);
+    const birdLfoGain = audioCtx.createGain();
+    birdLfoGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    birdLfo.connect(birdLfoGain);
+    birdLfoGain.connect(birdGain.gain);
+    bird.connect(birdGain);
+    birdGain.connect(audioCtx.destination);
+    bird.start();
+    birdLfo.start();
+    nodes.push(bird, birdLfo);
+  } else if (soundId === 'bowls') {
+    [528, 396, 639].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      const oscGain = audioCtx.createGain();
+      oscGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      const lfo = audioCtx.createOscillator();
+      lfo.frequency.setValueAtTime(0.2 + i * 0.1, audioCtx.currentTime);
+      const lfoGain = audioCtx.createGain();
+      lfoGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+      lfo.connect(lfoGain);
+      lfoGain.connect(oscGain.gain);
+      osc.connect(oscGain);
+      oscGain.connect(audioCtx.destination);
+      osc.start();
+      lfo.start();
+      nodes.push(osc, lfo);
+    });
+  } else if (soundId === 'wind') {
+    const buf = createNoiseBuffer(audioCtx, 3);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const bp = audioCtx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.setValueAtTime(800, audioCtx.currentTime);
+    bp.Q.setValueAtTime(0.5, audioCtx.currentTime);
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.setValueAtTime(0.15, audioCtx.currentTime);
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.setValueAtTime(400, audioCtx.currentTime);
+    lfo.connect(lfoGain);
+    lfoGain.connect(bp.frequency);
+    src.connect(bp);
+    bp.connect(gain);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    lfo.start();
+    src.start();
+    nodes.push(src, lfo);
+  }
+
+  return nodes;
+}
 
 export default function Meditation() {
   const [preset, setPreset] = useState(PRESETS[1]);
@@ -25,6 +153,8 @@ export default function Meditation() {
   const [running, setRunning] = useState(false);
   const [sound, setSound] = useState('silence');
   const intervalRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const nodesRef = useRef([]);
 
   const formatTime = (s) => {
     const m = Math.floor(s / 60);
@@ -33,6 +163,32 @@ export default function Meditation() {
   };
 
   const progress = 1 - timeLeft / (preset.minutes * 60);
+
+  // Audio management
+  const stopAudio = useCallback(() => {
+    nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
+    nodesRef.current = [];
+    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} }
+    audioCtxRef.current = null;
+  }, []);
+
+  const startAudio = useCallback((soundId) => {
+    stopAudio();
+    if (soundId === 'silence') return;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtxRef.current = ctx;
+    nodesRef.current = startAmbientSound(ctx, soundId);
+  }, [stopAudio]);
+
+  // Start/stop audio when sound selection or running state changes
+  useEffect(() => {
+    if (running && sound !== 'silence') {
+      startAudio(sound);
+    } else {
+      stopAudio();
+    }
+    return stopAudio;
+  }, [running, sound, startAudio, stopAudio]);
 
   const toggle = useCallback(() => {
     if (running) {
@@ -63,7 +219,7 @@ export default function Meditation() {
     if (!running) setTimeLeft(preset.minutes * 60);
   }, [preset, running]);
 
-  useEffect(() => () => clearInterval(intervalRef.current), []);
+  useEffect(() => () => { clearInterval(intervalRef.current); stopAudio(); }, [stopAudio]);
 
   const circumference = 2 * Math.PI * 140;
   const strokeDashoffset = circumference * (1 - progress);
@@ -124,6 +280,11 @@ export default function Meditation() {
                   </button>
                 ))}
               </div>
+              {running && sound !== 'silence' && (
+                <p className="text-xs mt-3 text-center" style={{ color: '#2DD4BF' }}>
+                  Playing: {AMBIENT_SOUNDS.find(s => s.id === sound)?.name}
+                </p>
+              )}
             </div>
           </div>
 
