@@ -1,53 +1,55 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { Toaster } from 'sonner';
+import Navigation from './components/Navigation';
+import Landing from './pages/Landing';
+import Auth from './pages/Auth';
+import Breathing from './pages/Breathing';
+import Meditation from './pages/Meditation';
+import Affirmations from './pages/Affirmations';
+import MoodTracker from './pages/MoodTracker';
+import Journal from './pages/Journal';
+import Soundscapes from './pages/Soundscapes';
+import Dashboard from './pages/Dashboard';
+import Exercises from './pages/Exercises';
+import Nourishment from './pages/Nourishment';
+import Frequencies from './pages/Frequencies';
 
 function App() {
   return (
-    <div className="App">
+    <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <div style={{ minHeight: '100vh', background: '#0B0C15' }}>
+          <Navigation />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: 'rgba(22, 24, 38, 0.95)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#F8FAFC',
+                backdropFilter: 'blur(20px)',
+              },
+            }}
+          />
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/breathing" element={<Breathing />} />
+            <Route path="/meditation" element={<Meditation />} />
+            <Route path="/affirmations" element={<Affirmations />} />
+            <Route path="/mood" element={<MoodTracker />} />
+            <Route path="/journal" element={<Journal />} />
+            <Route path="/soundscapes" element={<Soundscapes />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/exercises" element={<Exercises />} />
+            <Route path="/nourishment" element={<Nourishment />} />
+            <Route path="/frequencies" element={<Frequencies />} />
+          </Routes>
+        </div>
       </BrowserRouter>
-    </div>
+    </AuthProvider>
   );
 }
 
