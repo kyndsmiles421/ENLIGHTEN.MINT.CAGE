@@ -1,8 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { Play, Pause, SkipForward, X, Volume2, Loader2, Wind, Eye, Ear, Hand, Heart, Moon, Music } from 'lucide-react';
+import { Play, Pause, SkipForward, X, Volume2, Loader2, Wind, Eye, Ear, Hand, Heart, Moon, Music, Maximize2, Minimize2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import HolographicCanvas from './HolographicCanvas';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -48,6 +49,7 @@ export default function GuidedExperience({ practiceName, description, instructio
   const segmentTimerRef = useRef(null);
   const ttsQueueRef = useRef([]);
   const [ttsLoading, setTtsLoading] = useState(false);
+  const [holographic, setHolographic] = useState(false);
   const voicePrefs = loadVoicePrefs();
 
   // Generate the guided experience
@@ -221,6 +223,17 @@ export default function GuidedExperience({ practiceName, description, instructio
           })}
           {segments.length > 5 && <span className="text-[10px] px-2 py-1" style={{ color: 'var(--text-muted)' }}>+{segments.length - 5} more</span>}
         </div>
+        {/* Holographic mode toggle */}
+        <button onClick={() => setHolographic(h => !h)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs mb-4 transition-all"
+          style={{
+            background: holographic ? `${color}12` : 'rgba(255,255,255,0.02)',
+            border: `1px solid ${holographic ? `${color}20` : 'rgba(255,255,255,0.06)'}`,
+            color: holographic ? color : 'var(--text-muted)',
+          }}
+          data-testid="holographic-toggle">
+          <Maximize2 size={12} /> Holographic 3D Mode {holographic ? 'ON' : 'OFF'}
+        </button>
         <button onClick={startPlaying}
           className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
           style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}
@@ -236,22 +249,34 @@ export default function GuidedExperience({ practiceName, description, instructio
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="glass-card overflow-hidden relative"
+      className={`glass-card overflow-hidden relative ${holographic ? 'min-h-[500px]' : ''}`}
       style={{ borderColor: `${color}15` }}
       data-testid="guided-immersive-player"
     >
-      {/* Ambient glow background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          animate={{
-            opacity: mode === 'playing' ? [0.03, 0.08, 0.03] : 0.02,
-            scale: mode === 'playing' ? [1, 1.1, 1] : 1,
-          }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full"
-          style={{ background: `radial-gradient(circle, ${color}30, transparent 70%)` }}
+      {/* Holographic 3D Canvas */}
+      {holographic && (
+        <HolographicCanvas
+          color={color}
+          cue={currentSeg?.cue || 'breathe'}
+          intensity={currentSeg?.intensity || 5}
+          playing={mode === 'playing'}
         />
-      </div>
+      )}
+
+      {/* Ambient glow background (shown when holographic is off) */}
+      {!holographic && (
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div
+            animate={{
+              opacity: mode === 'playing' ? [0.03, 0.08, 0.03] : 0.02,
+              scale: mode === 'playing' ? [1, 1.1, 1] : 1,
+            }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full"
+            style={{ background: `radial-gradient(circle, ${color}30, transparent 70%)` }}
+          />
+        </div>
+      )}
 
       <div className="relative z-10 p-6">
         {/* Header */}
@@ -275,6 +300,12 @@ export default function GuidedExperience({ practiceName, description, instructio
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button onClick={() => setHolographic(h => !h)}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ background: holographic ? `${color}15` : 'rgba(255,255,255,0.03)', color: holographic ? color : 'var(--text-muted)' }}
+              data-testid="holographic-toggle-play">
+              {holographic ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            </button>
             <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
               {formatTime(elapsed)} / {formatTime(totalDuration)}
             </span>

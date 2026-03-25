@@ -450,3 +450,71 @@ select.input-glass option {
   background: #161826;
   color: var(--text-primary);
 }
+
+
+/* ============ ACCESSIBILITY ============ */
+
+/* High contrast focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #D8B4FE;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip nav for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Minimum touch target 44px for stressed users */
+.btn-glass,
+.btn-glass-sm,
+button[data-testid] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Ensure CTA buttons are bold and high-contrast */
+.btn-glass {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 14px 32px;
+  font-size: 0.9375rem;
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.btn-glass:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(192, 132, 252, 0.12);
+}
+
+.btn-glass:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 0.08s;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode for text readability */
+.text-high-contrast {
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}

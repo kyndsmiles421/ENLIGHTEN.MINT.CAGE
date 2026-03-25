@@ -7,6 +7,7 @@ import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
+import QuickMeditationWidget from './components/QuickMeditationWidget';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -136,6 +137,7 @@ function App() {
               }}
             />
             <AnimatedRoutes />
+            <QuickMeditationWidget />
           </div>
         </BrowserRouter>
       </SensoryProvider>

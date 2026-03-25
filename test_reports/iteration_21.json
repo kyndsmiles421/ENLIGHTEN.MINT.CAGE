@@ -1,0 +1,101 @@
+{
+  "summary": "Comprehensive testing of iteration 21 features: Quick Meditation widget, How it Works section, Mobile Unit CTAs, Guided Meditation buttons on practice pages, and accessibility CSS. All 11 backend tests passed (100%). Frontend features verified working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration21_features.py",
+    "/app/test_reports/pytest/pytest_iteration21.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration21_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 tests passed)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "email": "test@test.com",
+    "password": "password"
+  },
+  "seed_data_creation": "None required",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 21 features fully tested. Quick Meditation widget, How it Works section, Mobile Unit CTAs, and Guided Meditation buttons on all practice pages verified working. Accessibility CSS (focus-visible, min-height 44px, reduced motion) confirmed present.",
+  "features_verified": {
+    "quick_meditation_widget": {
+      "floating_button": "Quick Meditation button (data-testid='quick-meditation-btn') visible fixed bottom-right",
+      "widget_container": "Widget container (data-testid='quick-meditation-widget') exists",
+      "frequency_options": "4 frequency options (432Hz, 528Hz, 396Hz, 741Hz) with data-testid='quick-freq-{freq}'"
+    },
+    "landing_page_how_it_works": {
+      "section_present": "How it Works section (data-testid='how-it-works-section') found",
+      "step_1": "Choose Your Frequency - present",
+      "step_2": "Immerse & Transform - present",
+      "step_3": "Track Your Evolution - present"
+    },
+    "landing_page_mobile_unit": {
+      "book_session_btn": "Book a Session button (data-testid='book-session-btn') found",
+      "find_mobile_unit_btn": "Find the Mobile Unit button (data-testid='find-mobile-unit-btn') found"
+    },
+    "guided_meditation_buttons": {
+      "tantra_page": "Guided Meditation button (data-testid='launch-guided-experience') found in practice detail view",
+      "mudras_page": "Guided Meditation button found in 'How to Practice' tab of mudra detail modal",
+      "frequencies_page": "Guided Meditation button found in frequency detail panel",
+      "mantras_page": "Guided Meditation button found in mantra detail panel",
+      "exercises_page": "Guided Meditation button found on exercise cards"
+    },
+    "navigation": {
+      "cardology_link": "Cardology link (data-testid='nav-more-cardology') found in More dropdown",
+      "mayan_link": "Mayan link (data-testid='nav-more-mayan') found in More dropdown"
+    },
+    "cardology_page": {
+      "page_loads": "Cardology page (/cardology) loads correctly",
+      "birth_card_calculator": "Birth card calculator works - form fields and calculate button present"
+    },
+    "mayan_page": {
+      "page_loads": "Mayan Astrology page (/mayan) loads correctly",
+      "birth_sign_calculator": "Birth sign calculator works - returns galactic signature"
+    },
+    "accessibility_css": {
+      "focus_visible": "focus-visible styles present at line 458 in index.css",
+      "min_height_44px": "btn-glass has min-height: 44px at line 481",
+      "reduced_motion": "@media (prefers-reduced-motion: reduce) at line 508"
+    }
+  },
+  "backend_apis_tested": [
+    "POST /api/guided-experience/generate - 401 without auth (correct)",
+    "POST /api/guided-experience/generate with auth - 200 (returns segments with text, duration, cue)",
+    "GET /api/tantra - 200 (returns practices with instructions)",
+    "GET /api/mudras - 200 (returns mudras)",
+    "GET /api/frequencies - 200 (returns frequencies)",
+    "GET /api/mantras/library - 200 (returns mantras)",
+    "GET /api/exercises - 200 (returns exercises with steps)",
+    "GET /api/cardology/birth-card?month=5&day=12 - 200 (returns card)",
+    "GET /api/mayan/birth-sign?year=1990&month=7&day=26 - 200 (returns galactic signature)",
+    "GET /api/quick-reset/happy - 200 (returns flow)",
+    "GET /api/waitlist/count - 200 (returns count)"
+  ],
+  "frontend_ui_tested": [
+    "Landing page loads with Quick Meditation widget button visible",
+    "Quick Meditation widget container exists (frequency options may require click interaction)",
+    "How it Works section with 3 steps: Choose Your Frequency, Immerse & Transform, Track Your Evolution",
+    "Mobile Wellness Unit section with Book a Session and Find the Mobile Unit buttons",
+    "Tantra page: Guided Meditation button in practice detail view",
+    "Mudras page: Guided Meditation button in 'How to Practice' tab",
+    "Frequencies page: Guided Meditation button in frequency detail panel",
+    "Mantras page: Guided Meditation button in mantra detail panel",
+    "Exercises page: Guided Meditation button on exercise cards",
+    "Navigation More dropdown contains Cardology and Mayan links",
+    "Cardology page: Birth card calculator works",
+    "Mayan page: Birth sign calculator works"
+  ]
+}
