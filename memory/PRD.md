@@ -1,74 +1,90 @@
-# Cosmic Zen - Positive Energy Bar App PRD
+# Cosmic Zen - Positive Energy Bar
 
 ## Original Problem Statement
-A positive energy bar to help people de-stress and seek enlightenment and enhance conscious experiences. With exercises, food options that uplift energy and spirit, Qigong, Tai Chi, and biometric frequencies.
+Build a full-stack application for a "positive energy bar to help people de-stress and seek enlightenment and enhance conscious experiences".
 
-## Architecture
-- **Frontend**: React 19 + Tailwind CSS + Shadcn UI + Framer Motion
-- **Backend**: FastAPI + MongoDB (Motor async driver)
-- **AI**: OpenAI GPT-5.2 via Emergent Integrations (affirmations, exercise guides, nutrition suggestions)
-- **Auth**: JWT-based authentication
+## Tech Stack
+- **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion
+- **Backend**: FastAPI, Python
+- **Database**: MongoDB
+- **AI**: GPT-5.2 via emergentintegrations (Emergent LLM Key)
+- **Audio**: Web Audio API (oscillators, noise generators, filters)
 
-## User Personas
-- Wellness seekers looking for daily mindfulness practices
-- Meditation practitioners wanting guided tools
-- People interested in Traditional Chinese Medicine (Qigong/Tai Chi)
-- Spiritual seekers exploring consciousness expansion
-- Anyone seeking stress relief and positive energy
+## Core Architecture
+```
+/app/
+├── backend/
+│   ├── server.py         # Monolithic FastAPI (all models, routes, static data)
+│   └── tests/            # pytest test files
+├── frontend/
+│   ├── src/
+│   │   ├── App.js        # Router (25 routes)
+│   │   ├── components/Navigation.js  # Primary nav + "More" dropdown
+│   │   ├── context/AuthContext.js
+│   │   └── pages/        # 22 page components
+```
 
-## Core Requirements
-- Guided breathing exercises with visual animations
-- Meditation timer with presets
-- AI-powered affirmations
-- Mood tracking with visual charts
-- Personal journaling
-- Ambient soundscapes mixer
-- Qigong & Tai Chi exercise guides
-- Energy-boosting food/nourishment guides
-- Biometric/Solfeggio frequency explorer
-- User dashboard with streaks
+## Implemented Features (All Tested & Working)
 
-## What's Been Implemented (Feb 2026)
-- [x] Full backend API (25+ endpoints) with MongoDB
-- [x] JWT authentication (register/login/me)
-- [x] Landing page with cosmic hero and animated breathing orb
-- [x] Navigation (desktop + mobile responsive)
-- [x] Breathing exercises (5 patterns with animated circle)
-- [x] Meditation timer (5 presets, ambient sound selection)
-- [x] AI-powered affirmations (daily + theme-based generation)
-- [x] Mood tracker (7 moods, intensity, chart history)
-- [x] Journal (create, expand, delete entries)
-- [x] Soundscapes mixer (9 sounds with volume sliders)
-- [x] Qigong & Tai Chi exercises (6 practices with AI guides)
-- [x] Sacred Nourishment (8 energy foods with AI suggestions)
-- [x] Biometric Frequencies (12 frequencies, spectrum visualization)
-- [x] **Daily Ritual Builder** (4 templates + custom builder + step-by-step player + progress tracking)
-- [x] **Social Community** (feed, posts, likes, comments, follow system, user profiles, active members)
-- [x] Dashboard (streak, stats, quick actions)
-- [x] 404 page
-- [x] Dark cosmic glassmorphism design theme
+### Phase 1 - Core MVP
+- JWT Authentication (register/login)
+- Breathing exercises (4-7-8, Box, Wim Hof)
+- Meditation timer with ambient sound (Web Audio)
+- AI-powered affirmations (GPT-5.2)
+- Mood tracker with emotion logging
+- Journal with entries
+- Dashboard with stats & quick actions
 
-## Test Results
-- Backend: 100% (11/11 tests passed)
-- Frontend: 90%+ (core functionality excellent)
+### Phase 2 - Wellness & Content
+- Soundscapes mixer (9 layerable sounds, real Web Audio API)
+- Frequencies (12 solfeggio/binaural tones, real oscillator audio)
+- Exercises (Qigong & Tai Chi)
+- Nourishment (energy-boosting foods)
 
-## Prioritized Backlog
-### P0 (Critical)
-- All core features implemented
+### Phase 3 - Engagement & Social
+- Daily Ritual builder
+- Community feed (posts, likes, comments)
+- Community Challenges with streaks & leaderboards
 
-### P1 (High)
-- Actual audio playback for soundscapes and frequencies
-- Meditation completion tracking and stats
+### Phase 4 - Spiritual Tools & Personalization
+- Oracle Divination (Tarot, Western Astrology, Chinese Astrology, I Ching, Sacred Geometry) - AI powered
+- Personalized Profile Pages (MySpace-style: cover photos, themes, music tones, avatars)
+- Public profile viewing (/profile/:userId)
 
-### P2 (Medium)
-- Social sharing of affirmations
-- Guided meditation audio content
-- Exercise video/animation demonstrations
-- Community features (shared journals, group meditation)
+### Phase 5 - Spiritual Practice & Learning (Latest)
+- **Mudras**: 9 sacred hand gestures with benefits, chakras, practice instructions
+- **Yantra**: 7 sacred geometric diagrams with SVG visuals, mantras, meditation guidance
+- **Tantra**: 6 practices (energy work, breathwork, mantra) with step-by-step instructions
+- **Videos**: 10 guided practice videos with category filters (placeholder thumbnails)
+- **Classes**: 5 structured courses with lessons, enrollment, progress tracking
+- **Certifications**: Auto-issued when all lessons completed, displayed in profile
+- **Audio Fix**: Real Web Audio API for Frequencies, Soundscapes, and Meditation ambient sounds
 
-## Next Tasks
-1. Add real audio playback (Web Audio API) for soundscapes and frequencies
-2. Add guided meditation audio narration
-3. Exercise video demonstrations
-4. Meditation session history tracking
-5. Weekly/monthly wellness reports
+## Key API Endpoints
+- `/api/auth/` - register, login, me
+- `/api/dashboard/stats` - user statistics
+- `/api/moods/`, `/api/journal/` - tracking
+- `/api/affirmations/generate` - AI affirmations
+- `/api/rituals/` - CRUD + completion
+- `/api/community/` - feed, posts, likes, comments, follow
+- `/api/challenges/` - join, checkin, leaderboard
+- `/api/profile/` - customize, me, public/{userId}, covers
+- `/api/oracle/` - reading, zodiac, chinese-zodiac, sacred-geometry
+- `/api/mudras`, `/api/yantras`, `/api/tantra` - spiritual tools
+- `/api/videos`, `/api/classes` - content & learning
+- `/api/classes/enroll`, `/api/classes/complete-lesson` - enrollment
+- `/api/certifications/my` - user certifications
+- `/api/frequencies` - healing tones
+
+## Database Collections
+- users, moods, journal_entries, rituals, ritual_history
+- posts, follows, challenges, challenge_participants
+- enrollments, certifications
+
+## Backlog (P1/P2)
+- P1: Guided meditation audio narration
+- P1: Exercise video demonstrations (real videos)
+- P2: Weekly/monthly wellness reports
+- P2: Backend refactoring (split server.py into APIRouter modules)
+- P2: Meditation session history tracking
+- P2: Real video content integration for Videos page
