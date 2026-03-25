@@ -19,18 +19,18 @@ Build a full-stack wellness platform ("positive energy bar") — a mobile wellne
 - Mudras, Yantra, Tantra, Videos, Classes
 - Light Therapy, Zen Garden, Ho'oponopono, Mantras
 
-### Sacred Cardology — Robert Lee Camp System (FIXED - Phase 26)
+### Sacred Cardology — Robert Lee Camp System (Phase 26-27)
 - **Magi Formula**: Solar Value = 55 - (2 x month + day)
-- **Verified Mappings**: Jan 1 = K♠ (SV 52), Jul 4 = J♦ (SV 37), Nov 7 = K♣ (SV 26), Dec 31 = Joker (SV 0)
-- **Suit Order**: SV 1-13 = Hearts, SV 14-26 = Clubs, SV 27-39 = Diamonds, SV 40-52 = Spades
-- **UI Shows**: Magi formula, solar value, Robert Lee Camp attribution
-- Birth Card, Daily Card, Love Compatibility all using correct formula
+- **Yearly Spread** (NEW Phase 27): 7 planetary periods (Mercury through Neptune), 52 days each from birthday
+  - Shows birth card, age, card year, period cards, current period highlight with "Now" badge
+  - Each period: planet, focus area, date range, card with meaning
+- Birth Card, Daily Card, Love Compatibility — all using correct Magi Formula
 
 ### Wisdom Journal (Phase 26)
 - Personal reflections linked to spiritual teachers/teachings/quotes, CRUD, MongoDB persistence
 
 ### Numerology Module (Phase 26)
-- 5 Core Numbers (Life Path, Destiny, Soul Urge, Personality, Birthday), Compatibility, Master Numbers 11/22/33
+- 5 Core Numbers, Compatibility, Master Numbers 11/22/33
 
 ### Daily Wisdom (Phase 25), Thoth/Egyptian Mysticism (Phase 25)
 ### Spiritual Teachings (Phase 24) — 11 Teachers, 49 Teachings, 78+ Quotes, 11 Themes
@@ -40,8 +40,15 @@ Build a full-stack wellness platform ("positive energy bar") — a mobile wellne
 ### Social Networking & Daily Challenges (Phase 20)
 ### Previous: Applied Evolution, Progressive Learning, Gamification, Multi-language, PWA
 
+## Key API Endpoints
+- `/api/cardology/yearly-spread` — 7 planetary period cards for current year
+- `/api/cardology/birth-card`, `/api/cardology/daily-card`, `/api/cardology/compatibility`
+- `/api/wisdom-journal` (GET/POST/DELETE), `/api/numerology/calculate`, `/api/numerology/compatibility`
+- `/api/teachings/*`, `/api/yoga/*`, `/api/avatar`, `/api/guided-experience/generate`
+- `/api/mayan/*`, `/api/daily-challenge/*`, `/api/users/discover`, `/api/friends/*`, `/api/messages/*`
+
 ## Backlog
-- P1: Backend refactoring (server.py -> modular APIRouter files — 5100+ lines)
+- P1: Backend refactoring (server.py -> modular APIRouter files — 5200+ lines)
 - P1: Certifications page for completed classes
 - P2: User-uploaded audio/video content
 - P2: Weekly/monthly wellness reports
