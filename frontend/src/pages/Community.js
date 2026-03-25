@@ -44,11 +44,20 @@ function PostCard({ post, currentUserId, authHeaders, onDelete, onUpdate }) {
 
   const toggleLike = async () => {
     if (!currentUserId) { toast.error('Sign in to interact'); return; }
+    // Optimistic update for instant feedback
+    const wasLiked = liked;
+    setLiked(!wasLiked);
+    setLikeCount(prev => wasLiked ? prev - 1 : prev + 1);
     try {
       const res = await axios.post(`${API}/community/posts/${post.id}/like`, {}, { headers: authHeaders });
       setLiked(res.data.action === 'liked');
       setLikeCount(res.data.like_count);
-    } catch { toast.error('Could not like'); }
+    } catch {
+      // Revert on error
+      setLiked(wasLiked);
+      setLikeCount(prev => wasLiked ? prev + 1 : prev - 1);
+      toast.error('Could not like');
+    }
   };
 
   const loadComments = async () => {
@@ -149,15 +158,33 @@ function PostCard({ post, currentUserId, authHeaders, onDelete, onUpdate }) {
       </div>
 
       {/* Actions */}
-      <div className="px-6 py-3 flex items-center gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-        <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm" data-testid={`like-btn-${post.id}`}
-          style={{ color: liked ? '#FDA4AF' : 'var(--text-muted)', transition: 'color 0.2s' }}>
-          <Heart size={16} fill={liked ? '#FDA4AF' : 'none'} /> {likeCount}
-        </button>
-        <button onClick={toggleComments} className="flex items-center gap-1.5 text-sm" data-testid={`comment-btn-${post.id}`}
-          style={{ color: showComments ? 'var(--text-primary)' : 'var(--text-muted)', transition: 'color 0.2s' }}>
-          <MessageCircle size={16} /> {post.comment_count || 0}
-        </button>
+      <div className="px-6 py-3 flex items-center gap-6" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+        <motion.button
+          onClick={toggleLike}
+          whileTap={{ scale: 1.3 }}
+          className="flex items-center gap-2 text-sm py-1 px-2 rounded-lg"
+          data-testid={`like-btn-${post.id}`}
+          style={{
+            color: liked ? '#FDA4AF' : 'var(--text-muted)',
+            background: liked ? 'rgba(253,164,175,0.08)' : 'transparent',
+            transition: 'color 0.2s, background 0.2s',
+          }}>
+          <Heart size={16} fill={liked ? '#FDA4AF' : 'none'} style={{ transition: 'fill 0.2s' }} />
+          <span>{likeCount}</span>
+        </motion.button>
+        <motion.button
+          onClick={toggleComments}
+          whileTap={{ scale: 1.1 }}
+          className="flex items-center gap-2 text-sm py-1 px-2 rounded-lg"
+          data-testid={`comment-btn-${post.id}`}
+          style={{
+            color: showComments ? 'var(--text-primary)' : 'var(--text-muted)',
+            background: showComments ? 'rgba(255,255,255,0.06)' : 'transparent',
+            transition: 'color 0.2s, background 0.2s',
+          }}>
+          <MessageCircle size={16} />
+          <span>{post.comment_count || 0}</span>
+        </motion.button>
       </div>
 
       {/* Comments Section */}

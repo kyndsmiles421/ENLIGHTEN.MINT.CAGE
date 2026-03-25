@@ -43,6 +43,7 @@ A positive energy bar to help people de-stress and seek enlightenment and enhanc
 - [x] Sacred Nourishment (8 energy foods with AI suggestions)
 - [x] Biometric Frequencies (12 frequencies, spectrum visualization)
 - [x] **Daily Ritual Builder** (4 templates + custom builder + step-by-step player + progress tracking)
+- [x] **Social Community** (feed, posts, likes, comments, follow system, user profiles, active members)
 - [x] Dashboard (streak, stats, quick actions)
 - [x] 404 page
 - [x] Dark cosmic glassmorphism design theme
