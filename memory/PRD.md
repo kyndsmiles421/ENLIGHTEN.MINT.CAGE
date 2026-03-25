@@ -22,84 +22,69 @@ Build a full-stack wellness platform ("positive energy bar") for stress relief, 
 ### Build Your Own (AI-Powered)
 - Custom Breathing, Meditations, Affirmations, Soundscapes, Mantras
 
-### Spiritual Tools
-- Mantras, Ho'oponopono
+### Sacred Cardology (NEW - Phase 21)
+- **Birth Card Calculator**: Enter birthday → reveals personal card from 52-card deck
+- **Card Meanings**: Full interpretations for all 52 cards + Joker (keyword, description, love, life path, element, planet)
+- **Daily Card**: Deterministic daily card rotation with guidance
+- **Love Compatibility**: Two-person compatibility scoring based on suit, element, and value
+- **Suit Themes**: Hearts (Love), Clubs (Knowledge), Diamonds (Values), Spades (Wisdom)
+- **Planetary Rulers**: Each card value maps to a planetary influence
 
-### Learning
-- Beginner's Journey (5 stages, 20 lessons)
-- Advanced Progressive Learning Modules (4 levels, 16 lessons)
+### Mayan Astrology - Tzolk'in (NEW - Phase 21)
+- **Birth Sign Calculator**: Enter full birth date → Galactic Signature (day sign + tone)
+- **20 Day Signs**: Full descriptions, elements, directions, shadows, affirmations (Imix through Ahau)
+- **13 Galactic Tones**: Purpose, action, and description for each tone
+- **Kin Number**: Position within the 260-day sacred calendar
+- **Today's Energy**: Daily Mayan energy reading
+- **Galactic Compatibility**: Two-person compatibility based on elements, directions, tones
+- **Accurate Tzolk'in Math**: Julian Day Number calculation from Mayan epoch
 
-### Applied Evolution
-- Recommendation Engine ("For You" on Dashboard — mood, time, engagement-based)
-- Daily Streak Tracker with auto check-in, best streak, total active days
+### Guided Meditation Experience (NEW - Phase 21)
+- **AI-Generated Immersive Scripts**: Transforms raw practice instructions into paced, sensory-rich guided meditations
+- **Breathing Cues**: Automatic breathing animations during breathe segments
+- **Step-by-Step Progress**: Visual segment dots, elapsed time, progress bar
+- **Auto-Narration**: Each segment is narrated via TTS with ambient pacing
+- **Integrated Into**: Tantra, Mudras, Mantras, Yantra, Exercises, Frequencies
+- **Cue Types**: breathe, feel, visualize, move, listen, rest, chant
 
-### Wellness Games
-- **Sacred Symbols** (Memory Match) — Enhances Memory
-- **Breath of Life** (Breathing Bubble) — Deep Relaxation
-- **Color Harmony** (Palette Sorter) — Uplifts Mood
-- **Inner Rhythm** (Pattern Recall) — Reduces Stress
-- Score tracking with personal bests per game
+### Audio Fixes (Phase 21)
+- **NarrationPlayer**: Fixed audio stopping mid-sentence. Now tracks playback position, supports pause/resume, handles browser-initiated pauses gracefully
+- **Soundscapes**: Fixed AudioContext suspension issue — `resume()` now properly awaited before starting sounds
 
-### Social Networking (NEW - Phase 20)
-- **Friends System**: Send/accept/decline friend requests, friends list, suggested friends
-- **Open Messaging**: Message any user on the platform (not restricted to friends)
-- **Message Privacy**: Users control who can message them (Everyone / Friends Only / Nobody)
-- **User Discovery**: Browse all platform users via Discover People section
-- **Activity Feed**: See friends' activities (challenges, achievements, shares)
-- **Share**: Share achievements, milestones, and wellness tools with friends
-- **Search**: Find users by name
+### Social Networking (Phase 20)
+- Friends System, Open Messaging, Message Privacy, User Discovery, Activity Feed, Share
 
-### Daily Challenges (NEW - Phase 20)
-- **30 rotating challenges** across 9 categories: breathing, meditation, journaling, physical, movement, mindfulness, social, spiritual, sounds
-- **XP system**: Each challenge awards XP (25-100 based on difficulty)
-- **Completion tracking**: Mark daily challenge as complete, view history
-- **Leaderboard**: Ranked by total XP earned across all completions
-- **Dashboard integration**: Today's Challenge card with completion status
-- **Social integration**: Completions appear in friends' activity feed
+### Daily Challenges (Phase 20)
+- 30 rotating challenges, XP system, history, leaderboard, dashboard integration
 
-### UX & Conversion
-- Quick Reset Flow (11 feelings → personalized frequency + tool + nourishment)
-- Social Proof (6 testimonials)
-- Founding 100 Waitlist
-- Culinary Science Section
-- Privacy Policy & Wellness Disclaimer
-- PWA Manifest
+### Enhanced Visual Design (Phase 21)
+- Richer glass-morphism with multi-layer shadows and inset highlights
+- Subtle background radial gradients (purple/teal/blue)
+- Enhanced select styling for dark theme
+- Dimensional hover lifts with perspective transforms
+- Color accent variables (coral, sapphire)
 
-### Profile & Privacy
-- Visibility: Public / Friends Only / Private
-- Message Privacy: Everyone / Friends Only / Nobody
-- Restricted profile view for unauthorized viewers
-
-### Multi-Language Support
-- 6 languages: English, Spanish, French, Hindi, Japanese, Portuguese
-- Language selector on Landing page + Navigation bar
-- localStorage persistence
+### Previous Features
+- Progressive Learning Modules (4 levels, 16 lessons)
+- Recommendation Engine, Streak Tracker, Wellness Games (4 mini-games)
+- Multi-language (6 languages), PWA, Quick Reset Flow
+- Profile Visibility Controls, Ho'oponopono, Mantras
 
 ## Key API Endpoints
-- `/api/auth/` - register, login, me
-- `/api/dashboard/stats`, `/api/recommendations` - analytics
-- `/api/streak`, `/api/streak/checkin` - daily streak
-- `/api/games/score`, `/api/games/scores` - game score tracking
-- `/api/learning/modules`, `/api/learning/complete-lesson`
-- `/api/quick-reset/{feeling}` - personalized reset
-- `/api/waitlist/join`, `/api/waitlist/count`
-- `/api/profile/me`, `/api/profile/customize`, `/api/profile/public/{id}`
+- `/api/cardology/birth-card`, `/api/cardology/daily-card`, `/api/cardology/compatibility`
+- `/api/mayan/birth-sign`, `/api/mayan/today`, `/api/mayan/compatibility`
+- `/api/guided-experience/generate`
 - `/api/daily-challenge`, `/api/daily-challenge/complete`, `/api/daily-challenge/history`, `/api/daily-challenge/leaderboard`
-- `/api/users/discover` - browse all users
-- `/api/friends/request`, `/api/friends/respond`, `/api/friends/list`, `/api/friends/search`, `/api/friends/suggested`, `/api/friends/feed`, `/api/friends/share`
-- `/api/messages/send`, `/api/messages/conversations`, `/api/messages/{conversation_id}`
+- `/api/users/discover`, `/api/friends/*`, `/api/messages/*`
+- `/api/tts/narrate`, `/api/profile/me`, `/api/profile/customize`
 
 ## Database Collections
-- users, moods, journal_entries, rituals, ritual_completions
-- posts, follows, challenges, challenge_participants
-- enrollments, certifications, creations, affirmations
-- custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes, custom_mantras
-- zen_plants, journey_progress, learning_progress
-- waitlist, streaks, game_scores, profiles
+- users, moods, journal_entries, rituals, profiles, streaks, game_scores
 - friendships, friend_requests, messages, feed_activities, challenge_completions
+- community_posts, follows, enrollments, creations, learning_progress, zen_plants
 
 ## Backlog
-- P1: Backend refactoring (server.py → modular APIRouter files — 3500+ lines)
+- P1: Backend refactoring (server.py → modular APIRouter files — 4100+ lines)
 - P1: Certifications page for completed classes
 - P2: User-uploaded audio/video content
 - P2: Weekly/monthly wellness reports
