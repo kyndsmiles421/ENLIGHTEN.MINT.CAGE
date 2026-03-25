@@ -87,6 +87,18 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - Transparent backgrounds on all pages to show cosmic canvas
 - Custom scrollbar, enhanced selection colors, ripple effects on buttons
 
+### Phase 11 - Celebration Effects, Light Therapy & Zen Garden (Feb 2026)
+- **CelebrationBurst component**: Radial particle burst + "Namaste" text overlay + rising chime audio, triggered on mood logging and journal saving
+- **Light Therapy page** (`/light-therapy`): 7 chromotherapy colors (red-violet) aligned to chakras. Color detail cards with benefits, frequency, wavelength. Timer-based immersive full-screen sessions with color-bath gradients and breathing-synced orb. Ambient healing tones per color.
+- **Zen Garden page** (`/zen-garden`) with 5 interactive tabs:
+  - Plant Garden: 5 plant types (lotus, bamboo, bonsai, fern, sage), persistent growth through stages via watering (MongoDB `zen_plants` collection), max 10 plants, one water per day
+  - Koi Pond: Canvas-based animated koi fish, click to create ripples that attract fish
+  - Sand Drawing: Touch/mouse canvas with fade-over-time, cosmic purple trails
+  - Lantern Release: Write worries and release as glowing lanterns that float up and fade
+  - Rain Scene: Adjustable-intensity rainfall with procedural audio (bandpass-filtered noise)
+- Navigation and Landing page updated with Light Therapy and Zen Garden links
+- Dashboard quick actions include Light and Zen buttons
+
 ### Phase 6 - Creation Studio & AI Knowledge
 - Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
 - AI-powered creation generation from user intentions
