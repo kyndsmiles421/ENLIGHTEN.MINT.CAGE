@@ -29,7 +29,7 @@ A positive energy bar to help people de-stress and seek enlightenment and enhanc
 - User dashboard with streaks
 
 ## What's Been Implemented (Feb 2026)
-- [x] Full backend API (20+ endpoints) with MongoDB
+- [x] Full backend API (25+ endpoints) with MongoDB
 - [x] JWT authentication (register/login/me)
 - [x] Landing page with cosmic hero and animated breathing orb
 - [x] Navigation (desktop + mobile responsive)
@@ -42,6 +42,7 @@ A positive energy bar to help people de-stress and seek enlightenment and enhanc
 - [x] Qigong & Tai Chi exercises (6 practices with AI guides)
 - [x] Sacred Nourishment (8 energy foods with AI suggestions)
 - [x] Biometric Frequencies (12 frequencies, spectrum visualization)
+- [x] **Daily Ritual Builder** (4 templates + custom builder + step-by-step player + progress tracking)
 - [x] Dashboard (streak, stats, quick actions)
 - [x] 404 page
 - [x] Dark cosmic glassmorphism design theme
