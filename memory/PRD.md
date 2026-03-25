@@ -107,6 +107,12 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - **Custom meditation persistence**: MongoDB `custom_meditations` collection with CRUD endpoints
 - **Timer mode preserved** as third tab alongside Guided and Build Your Own
 
+### Phase 13 - Universal Build Your Own Customization (Feb 2026)
+- **Custom Breathing Patterns**: Mode toggle (Presets / Build Your Own). Users define inhale, hold-in, exhale, hold-out durations via sliders (1-15s), choose theme color, name, and description. Save to MongoDB `custom_breathing` collection. Saved patterns shown in grid with "Use This Pattern" button that loads them into the presets player.
+- **Custom Affirmation Sets**: Mode toggle (Daily / Build Your Own Set). 3-step AI wizard: 1) Set goal + name + color, 2) AI generating spinner, 3) Review/edit generated affirmations. GPT-5.2 generates 7 personalized affirmations. Save to MongoDB `custom_affirmations` collection. Saved sets viewable in carousel with Previous/Next navigation, progress dots, and per-affirmation narration.
+- **Custom Soundscape Mixes**: "Save This Mix" button appears when sounds active + user logged in. Name input + save. Saved mixes displayed above mixer grid. Click to reload volume levels. Delete on hover. MongoDB `custom_soundscapes` collection.
+- **New API endpoints**: `/api/breathing/save-custom`, `GET /my-custom`, `DELETE /custom/{id}`, `/api/affirmations/generate-set`, `/api/affirmations/save-set`, `GET /my-sets`, `DELETE /set/{id}`, `/api/soundscapes/save-mix`, `GET /my-mixes`, `DELETE /mix/{id}`
+
 ### Phase 6 - Creation Studio & AI Knowledge
 - Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
 - AI-powered creation generation from user intentions
@@ -153,12 +159,18 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - `/api/knowledge/deep-dive` - AI knowledge generation (with retry)
 - `/api/knowledge/suggestions/{category}` - topic suggestions
 - `/api/tts/narrate` - text-to-speech generation
+- `/api/breathing/save-custom`, `/api/breathing/my-custom`, `/api/breathing/custom/{id}` - custom breathing CRUD
+- `/api/affirmations/generate-set`, `/api/affirmations/save-set`, `/api/affirmations/my-sets`, `/api/affirmations/set/{id}` - custom affirmation sets CRUD
+- `/api/soundscapes/save-mix`, `/api/soundscapes/my-mixes`, `/api/soundscapes/mix/{id}` - custom soundscape mixes CRUD
+- `/api/meditation/generate-guided`, `/api/meditation/save-custom`, `/api/meditation/my-custom`, `/api/meditation/custom/{id}` - custom meditation CRUD
 
 ## Database Collections
 - users, moods, journal_entries, rituals, ritual_completions
 - posts, follows, challenges, challenge_participants
 - enrollments, certifications
 - creations, knowledge_cache, affirmations
+- custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes
+- zen_plants
 
 ## Backlog (P0/P1/P2)
 - P0: Display user-created content in existing pages (Affirmations, Meditation, Rituals) - integrate /api/creations/mine
