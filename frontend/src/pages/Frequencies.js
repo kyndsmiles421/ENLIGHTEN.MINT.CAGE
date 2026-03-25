@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Radio, Play, Pause, Info, Square } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -327,6 +328,7 @@ export default function Frequencies() {
             </motion.div>
           )}
         </AnimatePresence>
+        <FeaturedVideos category="frequencies" color="#8B5CF6" title="Frequency & Sound Healing Videos" />
       </div>
     </div>
   );

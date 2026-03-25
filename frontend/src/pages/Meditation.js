@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const PRESETS = [
   { name: 'Quick Center', minutes: 5, color: '#2DD4BF' },
@@ -340,6 +341,7 @@ export default function Meditation() {
             </div>
           </div>
         </div>
+        <FeaturedVideos category="meditation" color="#D8B4FE" title="Guided Meditation Videos" />
       </div>
     </div>
   );

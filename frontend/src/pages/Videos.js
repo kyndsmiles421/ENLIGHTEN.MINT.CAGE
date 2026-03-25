@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { Play, Clock, Filter, User } from 'lucide-react';
+import { Play, Clock, Filter, User, X } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -20,6 +20,7 @@ export default function Videos() {
   const [videos, setVideos] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [playing, setPlaying] = useState(null);
 
   useEffect(() => {
     axios.get(`${API}/videos`)
@@ -62,6 +63,47 @@ export default function Videos() {
           ))}
         </div>
 
+        {/* Now Playing */}
+        <AnimatePresence>
+          {playing && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="glass-card overflow-hidden mb-8"
+            >
+              <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <div>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#2DD4BF' }}>Now Playing</p>
+                  <h3 className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{playing.title}</h3>
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{playing.instructor} &middot; {playing.duration} &middot; {playing.level}</p>
+                </div>
+                <button
+                  onClick={() => setPlaying(null)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}
+                  data-testid="video-close-player"
+                >
+                  <X size={16} style={{ color: 'var(--text-muted)' }} />
+                </button>
+              </div>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%', background: '#000' }}>
+                <iframe
+                  src={`${playing.video_url}?autoplay=1`}
+                  title={playing.title}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ border: 'none' }}
+                />
+              </div>
+              <div className="p-5">
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{playing.description}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {loading ? (
           <div className="flex justify-center py-20"><p style={{ color: 'var(--text-muted)' }}>Loading video library...</p></div>
         ) : (
@@ -70,21 +112,26 @@ export default function Videos() {
               <motion.div key={video.id}
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
-                className="glass-card overflow-hidden group"
+                className="glass-card overflow-hidden group cursor-pointer"
+                onClick={() => setPlaying(video)}
+                style={{
+                  borderColor: playing?.id === video.id ? 'rgba(45,212,191,0.3)' : undefined,
+                }}
                 data-testid={`video-${video.id}`}>
                 {/* Thumbnail */}
                 <div className="relative h-44 overflow-hidden">
-                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover"
-                    style={{ filter: 'brightness(0.7)', transition: 'transform 0.5s' }} />
+                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105"
+                    style={{ filter: 'brightness(0.7)', transition: 'transform 0.5s' }}
+                    loading="lazy" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)' }}>
-                      <Play size={24} style={{ color: 'white', marginLeft: '2px' }} />
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110"
+                      style={{ background: 'rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)', transition: 'transform 0.3s' }}>
+                      <Play size={24} fill="white" style={{ color: 'white', marginLeft: '2px' }} />
                     </div>
                   </div>
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs"
+                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs flex items-center gap-1"
                     style={{ background: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'blur(10px)' }}>
-                    {video.duration}
+                    <Clock size={10} /> {video.duration}
                   </div>
                   <div className="absolute bottom-3 left-3 px-2 py-1 rounded-full text-xs"
                     style={{ background: 'rgba(0,0,0,0.6)', color: '#2DD4BF', backdropFilter: 'blur(10px)' }}>

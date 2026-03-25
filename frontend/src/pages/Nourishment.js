@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Leaf, Sparkles, Loader2 } from 'lucide-react';
 import DeepDive from '../components/DeepDive';
 import NarrationPlayer from '../components/NarrationPlayer';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -213,6 +214,7 @@ export default function Nourishment() {
             </motion.div>
           )}
         </motion.div>
+        <FeaturedVideos category="nourishment" color="#22C55E" title="Mindful Eating Videos" />
       </div>
     </div>
   );

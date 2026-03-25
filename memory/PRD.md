@@ -81,11 +81,12 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - Health check endpoint (/api/health)
 
 ### Phase 8 - Rich Content & Videos (Latest)
-- Exercises page completely rebuilt with embedded YouTube videos for each practice
-- Each exercise now includes: detailed description, philosophy quote, 6+ benefits, 8 step-by-step instructions, practice tips
-- Video embeds toggle inline with smooth animation
-- All AI endpoints protected with asyncio.wait_for timeouts to prevent server blocking
-- Rebranded from "Cosmic Zen" to "The Cosmic Collective — A Gathering Place for Conscious Minds"
+- **23 YouTube videos** across 10 categories: mudras (3), yantra (3), tantra (3), breathing (3), meditation (3), frequencies (3), soundscapes (2), exercises (1), mantra (1), nourishment (1)
+- Exercises page rebuilt with embedded YouTube per exercise + philosophy, 8 detailed steps, practice tips
+- **Reusable `FeaturedVideos` component** integrated into ALL practice pages: Mudras, Breathing, Meditation, Frequencies, Soundscapes, Yantra, Tantra, Nourishment
+- Videos page rebuilt with category filters, inline player with autoplay, and full video library
+- All AI endpoints protected with `asyncio.wait_for` timeouts (30-45s) to prevent server blocking
+- Rebranded to "The Cosmic Collective — A Gathering Place for Conscious Minds"
 
 ## Key API Endpoints
 - `/api/health` - service health check

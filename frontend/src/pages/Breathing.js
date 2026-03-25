@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import NarrationPlayer from '../components/NarrationPlayer';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const PATTERNS = [
   { name: 'Box Breathing', inhale: 4, hold1: 4, exhale: 4, hold2: 4, color: '#2DD4BF', desc: 'Equal parts breathing for calm focus' },
@@ -199,6 +200,7 @@ export default function Breathing() {
             )}
           </div>
         </div>
+        <FeaturedVideos category="breathwork" color="#2DD4BF" title="Breathing Practice Videos" />
       </div>
     </div>
   );

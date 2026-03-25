@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Slider } from '../components/ui/slider';
 import { Volume2, VolumeX } from 'lucide-react';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const SOUNDS = [
   { id: 'rain', name: 'Gentle Rain', desc: 'Soft rainfall on leaves', color: '#3B82F6' },
@@ -293,6 +294,7 @@ export default function Soundscapes() {
             </div>
           </motion.div>
         )}
+        <FeaturedVideos category="soundscapes" color="#3B82F6" title="Ambient Sound Videos" />
       </div>
     </div>
   );

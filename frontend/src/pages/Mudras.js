@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Hand, Clock, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -125,6 +126,7 @@ export default function Mudras() {
             ))}
           </div>
         )}
+        <FeaturedVideos category="mudras" color="#FDA4AF" title="Mudra Practice Videos" />
       </div>
     </div>
   );

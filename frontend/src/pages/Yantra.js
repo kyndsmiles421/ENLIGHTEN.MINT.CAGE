@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Triangle, Eye, Volume2 } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -167,6 +168,7 @@ export default function Yantra() {
             </div>
           </div>
         )}
+        <FeaturedVideos category="yantra" color="#EF4444" title="Yantra & Sacred Geometry Videos" />
       </div>
     </div>
   );

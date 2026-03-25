@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Flame, Clock, ChevronRight, Activity } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
+import FeaturedVideos from '../components/FeaturedVideos';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -169,6 +170,7 @@ export default function Tantra() {
             )}
           </AnimatePresence>
         )}
+        <FeaturedVideos category="tantra" color="#FCD34D" title="Tantra & Energy Practice Videos" />
       </div>
     </div>
   );
