@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Flame, Clock, ChevronRight, Activity } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import DeepDive from '../components/DeepDive';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -110,12 +111,13 @@ export default function Tantra() {
                   {/* Instructions */}
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Step-by-Step Practice</p>
-                    <div className="mb-4">
+                    <div className="mb-4 flex items-center gap-3 flex-wrap">
                       <NarrationPlayer
                         text={`${active.name}. ${active.description}. Let us begin. ${active.instructions.join('. ')}. Take a moment to rest in stillness and integrate this practice.`}
                         label="Guided Narration"
                         color={active.color}
                       />
+                      <DeepDive topic={active.name} category="tantra" color={active.color} label="AI Deep Dive" />
                     </div>
                     <div className="space-y-3">
                       {active.instructions.map((step, i) => (

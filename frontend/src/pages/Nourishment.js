@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Leaf, Sparkles, Loader2 } from 'lucide-react';
+import DeepDive from '../components/DeepDive';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -146,12 +148,17 @@ export default function Nourishment() {
                         </div>
 
                         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--text-muted)' }}>Benefits</p>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap gap-1.5 mb-4">
                           {item.benefits.map(b => (
                             <span key={b} className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}>
                               {b}
                             </span>
                           ))}
+                        </div>
+
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <NarrationPlayer text={`${item.name}. ${item.description}. Key ingredients: ${item.ingredients.join(', ')}. Benefits include: ${item.benefits.join(', ')}.`} label="Listen" color={item.color} />
+                          <DeepDive topic={item.name} category="nourishment" color={item.color} label="AI Deep Dive" />
                         </div>
                       </div>
                     </motion.div>
@@ -199,9 +206,10 @@ export default function Nourishment() {
               className="glass-card p-6"
               style={{ background: 'rgba(34,197,94,0.03)', borderColor: 'rgba(34,197,94,0.1)' }}
             >
-              <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="nourish-ai-result">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--text-secondary)' }} data-testid="nourish-ai-result">
                 {aiSuggestion}
               </p>
+              <NarrationPlayer text={aiSuggestion} label="Listen" color="#22C55E" />
             </motion.div>
           )}
         </motion.div>

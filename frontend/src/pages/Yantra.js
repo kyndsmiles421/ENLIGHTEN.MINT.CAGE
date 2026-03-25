@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Triangle, Eye, Volume2 } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import DeepDive from '../components/DeepDive';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -140,6 +141,9 @@ export default function Yantra() {
                             label="Guided Meditation"
                             color={active.color}
                           />
+                        </div>
+                        <div className="mt-3">
+                          <DeepDive topic={active.name} category="yantra" color={active.color} label="AI Deep Dive" />
                         </div>
                       </div>
                     </div>

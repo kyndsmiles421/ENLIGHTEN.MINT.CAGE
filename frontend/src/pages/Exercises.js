@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Zap, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import DeepDive from '../components/DeepDive';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -151,12 +152,13 @@ export default function Exercises() {
                   {/* Steps */}
                   <div className="mb-8">
                     <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--text-muted)' }}>Practice Steps</p>
-                    <div className="mb-4">
+                    <div className="mb-4 flex items-center gap-3 flex-wrap">
                       <NarrationPlayer
                         text={`${selected.name}. ${selected.description}. Let us begin the practice. ${selected.steps.join('. ')}. Well done. Take a moment to feel the energy flowing through your body.`}
                         label="Voice Guide"
                         color={selected.color}
                       />
+                      <DeepDive topic={selected.name} category="exercise" color={selected.color} label="AI Deep Dive" />
                     </div>
                     <div className="space-y-3">
                       {selected.steps.map((step, i) => (

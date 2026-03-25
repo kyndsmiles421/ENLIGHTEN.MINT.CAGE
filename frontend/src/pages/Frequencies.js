@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Radio, Play, Pause, Info, Square } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import DeepDive from '../components/DeepDive';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -313,6 +314,7 @@ export default function Frequencies() {
                   label="About this Frequency"
                   color={selected.color}
                 />
+                <DeepDive topic={`${selected.frequency}Hz ${selected.name}`} category="frequency" color={selected.color} label="AI Deep Dive" />
                 <button
                   onClick={() => setSelected(null)}
                   className="text-xs underline"

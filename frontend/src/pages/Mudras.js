@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Hand, Clock, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import DeepDive from '../components/DeepDive';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -92,6 +93,10 @@ export default function Mudras() {
                     {expanded === mudra.id ? 'Hide Practice' : 'How to Practice'}
                     {expanded === mudra.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                   </button>
+
+                  <div className="mt-2">
+                    <DeepDive topic={mudra.name} category="mudra" color={mudra.color} label="AI Deep Dive" />
+                  </div>
 
                   <AnimatePresence>
                     {expanded === mudra.id && (

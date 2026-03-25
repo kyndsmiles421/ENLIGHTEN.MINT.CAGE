@@ -120,6 +120,22 @@ class LessonComplete(BaseModel):
 class NarrationRequest(BaseModel):
     text: str
     speed: Optional[float] = 1.0
+    voice: Optional[str] = "nova"
+
+class KnowledgeRequest(BaseModel):
+    topic: str
+    category: str
+    context: Optional[str] = None
+
+class CustomCreation(BaseModel):
+    type: str  # affirmation, meditation, ritual, breathwork, mantra
+    title: str
+    content: str
+    tags: Optional[list] = []
+
+class AICreateRequest(BaseModel):
+    type: str
+    intention: str
 
 # --- Auth Helpers ---
 def create_token(user_id: str, name: str):
@@ -1169,46 +1185,21 @@ async def save_reading(user=Depends(get_current_user), reading: dict = {}):
     return doc
 
 # --- Mudras ---
-MUDRAS_DATA = [
-    {"id": "gyan", "name": "Gyan Mudra", "sanskrit": "Jnana Mudra", "description": "The gesture of knowledge. Touch the tip of the index finger to the tip of the thumb, keeping the other three fingers straight.", "benefits": ["Enhances concentration", "Improves memory", "Calms the mind", "Relieves insomnia"], "chakra": "Crown", "element": "Air", "duration": "15-45 minutes", "practice": "Sit in a comfortable meditation posture. Rest your hands on your knees with palms facing up. Touch the tip of your index finger to the tip of your thumb. Keep the other three fingers extended and relaxed. Breathe naturally and focus on the point of contact.", "color": "#D8B4FE"},
-    {"id": "anjali", "name": "Anjali Mudra", "sanskrit": "Namaste Mudra", "description": "The gesture of greeting and reverence. Press palms together at heart center with fingers pointing upward.", "benefits": ["Centers the mind", "Reduces stress", "Promotes gratitude", "Balances left and right hemispheres"], "chakra": "Heart", "element": "All", "duration": "1-5 minutes", "practice": "Bring your palms together at the center of your chest. Press the fingers and palms evenly. Close your eyes and bow your head slightly. Feel the connection between your two hands, symbolizing the union of individual and universal consciousness.", "color": "#FDA4AF"},
-    {"id": "dhyana", "name": "Dhyana Mudra", "sanskrit": "Samadhi Mudra", "description": "The gesture of meditation. Both hands rest on the lap, right hand on top of left, thumbs touching to form a triangle.", "benefits": ["Deepens meditation", "Tranquilizes the mind", "Promotes inner peace", "Enhances spiritual connection"], "chakra": "Sacral", "element": "Fire", "duration": "15-60 minutes", "practice": "Sit in lotus or half-lotus position. Place your left hand on your lap, palm up. Place your right hand on top, palm up. Touch the tips of your thumbs together, forming a triangle. This triangle represents the Three Jewels: Buddha, Dharma, Sangha.", "color": "#FCD34D"},
-    {"id": "prana", "name": "Prana Mudra", "sanskrit": "Life Force Mudra", "description": "The gesture of life force. Touch the tips of the ring finger and little finger to the thumb tip.", "benefits": ["Activates dormant energy", "Boosts immunity", "Improves eyesight", "Reduces fatigue"], "chakra": "Root", "element": "Earth + Water", "duration": "15-30 minutes", "practice": "Sit comfortably with your spine straight. Touch the tips of your ring finger and little finger to the tip of your thumb. Keep the index and middle fingers extended. Practice on both hands simultaneously. Breathe deeply and visualize vital energy flowing through your body.", "color": "#22C55E"},
-    {"id": "apana", "name": "Apana Mudra", "sanskrit": "Purification Mudra", "description": "The gesture of purification. Touch the tips of the middle finger and ring finger to the thumb tip.", "benefits": ["Detoxifies the body", "Regulates digestion", "Promotes patience", "Balances earth element"], "chakra": "Solar Plexus", "element": "Earth", "duration": "15-45 minutes", "practice": "Touch the tips of your middle and ring fingers to the tip of your thumb. Keep the index and little fingers extended. This mudra activates the downward-moving energy in the body, aiding elimination and purification. Practice after meals for improved digestion.", "color": "#FB923C"},
-    {"id": "vayu", "name": "Vayu Mudra", "sanskrit": "Wind Mudra", "description": "The gesture of air. Fold the index finger to touch the base of the thumb, then press the thumb over it.", "benefits": ["Reduces gas and bloating", "Calms nervous system", "Relieves joint pain", "Balances air element"], "chakra": "Heart", "element": "Air", "duration": "10-15 minutes", "practice": "Fold your index finger and press it at the base of your thumb. Gently press your thumb over the folded index finger. Keep the other three fingers straight. This controls excess air (Vata) in the body. Practice until symptoms subside.", "color": "#3B82F6"},
-    {"id": "surya", "name": "Surya Mudra", "sanskrit": "Sun Mudra", "description": "The gesture of the sun. Bend the ring finger to the base of the thumb and press the thumb over it.", "benefits": ["Increases body heat", "Boosts metabolism", "Aids weight management", "Improves thyroid function"], "chakra": "Solar Plexus", "element": "Fire", "duration": "10-15 minutes", "practice": "Bend your ring finger and press it at the base of your thumb. Place your thumb gently over the ring finger. Keep the other fingers straight. This increases the fire element in the body. Practice in the morning for best results. Avoid if you have fever.", "color": "#EF4444"},
-    {"id": "shuni", "name": "Shuni Mudra", "sanskrit": "Patience Mudra", "description": "The gesture of patience and discipline. Touch the tip of the middle finger to the tip of the thumb.", "benefits": ["Promotes patience", "Enhances intuition", "Builds courage", "Strengthens discipline"], "chakra": "Throat", "element": "Ether", "duration": "15-30 minutes", "practice": "Touch the tip of your middle finger to the tip of your thumb. Keep the other three fingers straight and relaxed. The middle finger represents Saturn, the planet of discipline and responsibility. This mudra helps transform negative emotions into understanding.", "color": "#8B5CF6"},
-    {"id": "buddhi", "name": "Buddhi Mudra", "sanskrit": "Mental Clarity Mudra", "description": "The gesture of mental clarity. Touch the tip of the little finger to the tip of the thumb.", "benefits": ["Enhances communication", "Improves intuition", "Strengthens mental clarity", "Balances water element"], "chakra": "Sacral", "element": "Water", "duration": "15-30 minutes", "practice": "Touch the tip of your little finger to the tip of your thumb. Keep the other three fingers extended. The little finger represents Mercury, the planet of communication. This mudra helps you understand intuitive messages from your subconscious.", "color": "#06B6D4"},
-]
+from data.mudras import MUDRAS_DATA
 
 @api_router.get("/mudras")
 async def get_mudras():
     return MUDRAS_DATA
 
 # --- Yantra ---
-YANTRAS_DATA = [
-    {"id": "sri-yantra", "name": "Sri Yantra", "sanskrit": "Shri Yantra", "description": "The most revered of all yantras, representing the cosmic creation and the union of Shiva and Shakti. Composed of 9 interlocking triangles that surround and radiate from a central bindu point.", "meaning": "Supreme creation, divine feminine power, abundance", "deity": "Tripura Sundari / Lalita", "mantra": "Om Shreem Hreem Shreem Kamale Kamalaleyi Praseed Praseed", "meditation": "Gaze softly at the central bindu point. Allow your vision to slowly expand outward through the interlocking triangles. The 4 upward triangles represent Shiva (masculine), the 5 downward represent Shakti (feminine). Feel the union of these energies within you.", "color": "#EF4444", "pattern": "sri-yantra"},
-    {"id": "ganesh-yantra", "name": "Ganesh Yantra", "sanskrit": "Ganapati Yantra", "description": "Dedicated to Lord Ganesha, the remover of obstacles. This yantra features a central triangle surrounded by lotus petals and geometric gates.", "meaning": "Obstacle removal, new beginnings, wisdom", "deity": "Ganesha", "mantra": "Om Gam Ganapataye Namaha", "meditation": "Focus on the central triangle, representing the three aspects of creation. Visualize golden light dissolving all obstacles in your path. Chant the Ganesha mantra 108 times while gazing at the yantra.", "color": "#FB923C", "pattern": "ganesh-yantra"},
-    {"id": "kali-yantra", "name": "Kali Yantra", "sanskrit": "Kalika Yantra", "description": "The yantra of Goddess Kali, representing the fierce transformative power that destroys ego and illusion. Features interlocking triangles within a circle of flames.", "meaning": "Transformation, liberation, destruction of ego", "deity": "Kali", "mantra": "Om Kreem Kalikaye Namaha", "meditation": "Contemplate the five downward-pointing triangles representing the five elements being transformed. The circle of flames burns away ignorance. Surrender what no longer serves you as you gaze upon this powerful yantra.", "color": "#7C3AED", "pattern": "kali-yantra"},
-    {"id": "saraswati-yantra", "name": "Saraswati Yantra", "sanskrit": "Sarasvati Yantra", "description": "The yantra of Goddess Saraswati, bestowing knowledge, creativity, and eloquence. Features a central hexagram surrounded by lotus petals.", "meaning": "Knowledge, art, music, wisdom, learning", "deity": "Saraswati", "mantra": "Om Aim Saraswatyai Namaha", "meditation": "Focus on the central hexagram where two triangles merge, representing the union of knowledge and creativity. Visualize white light flowing into your throat and third eye chakras. This yantra is especially powerful before study or creative work.", "color": "#F8FAFC", "pattern": "saraswati-yantra"},
-    {"id": "lakshmi-yantra", "name": "Lakshmi Yantra", "sanskrit": "Shri Lakshmi Yantra", "description": "The yantra of Goddess Lakshmi, attracting abundance, prosperity, and spiritual wealth. Features lotus petals radiating from a golden center.", "meaning": "Abundance, prosperity, grace, beauty", "deity": "Lakshmi", "mantra": "Om Shreem Mahalakshmiyei Namaha", "meditation": "Gaze at the golden center, representing the seed of abundance. The radiating lotus petals represent the unfolding of prosperity in all directions of your life. Visualize golden light filling every aspect of your existence.", "color": "#FCD34D", "pattern": "lakshmi-yantra"},
-    {"id": "durga-yantra", "name": "Durga Yantra", "sanskrit": "Durga Yantra", "description": "The yantra of Goddess Durga, the invincible protector. A powerful shield against negative energies, featuring a star pattern within protective circles.", "meaning": "Protection, courage, strength, victory", "deity": "Durga", "mantra": "Om Dum Durgaye Namaha", "meditation": "Visualize the yantra as an impenetrable shield of divine light surrounding you. Each point of the star radiates protective energy. Feel the fierce love of the divine mother guarding you from all harm.", "color": "#EF4444", "pattern": "durga-yantra"},
-    {"id": "shiva-yantra", "name": "Shiva Yantra", "sanskrit": "Mahamrityunjaya Yantra", "description": "The yantra of Lord Shiva in his healing aspect. Used for health, longevity, and overcoming the fear of death. Features a central point surrounded by concentric geometric forms.", "meaning": "Healing, longevity, liberation from fear", "deity": "Shiva", "mantra": "Om Tryambakam Yajamahe Sugandhim Pushtivardhanam", "meditation": "Focus on the central bindu, representing pure consciousness. Feel healing energy spiraling outward through each geometric layer. This yantra is traditionally used for healing meditations and overcoming life-threatening situations.", "color": "#3B82F6", "pattern": "shiva-yantra"},
-]
+from data.yantras import YANTRAS_DATA
 
 @api_router.get("/yantras")
 async def get_yantras():
     return YANTRAS_DATA
 
 # --- Tantra ---
-TANTRA_DATA = [
-    {"id": "chakra-activation", "name": "Chakra Activation Sequence", "category": "energy", "description": "A systematic practice of awakening each of the seven major chakras through visualization, mantra, and breath.", "duration": "30 min", "level": "Intermediate", "instructions": ["Sit in a comfortable position with spine erect", "Begin with 3 deep breaths to center yourself", "Root Chakra (Muladhara): Visualize red light at the base of your spine. Chant LAM 7 times", "Sacral Chakra (Svadhisthana): Visualize orange light below the navel. Chant VAM 7 times", "Solar Plexus (Manipura): Visualize yellow light at the navel. Chant RAM 7 times", "Heart Chakra (Anahata): Visualize green light at the heart. Chant YAM 7 times", "Throat Chakra (Vishuddha): Visualize blue light at the throat. Chant HAM 7 times", "Third Eye (Ajna): Visualize indigo light between the brows. Chant OM 7 times", "Crown Chakra (Sahasrara): Visualize violet/white light above the head. Sit in silence", "Feel all chakras connected by a column of light"], "color": "#D8B4FE", "chakras": ["Root", "Sacral", "Solar Plexus", "Heart", "Throat", "Third Eye", "Crown"]},
-    {"id": "kundalini-breathwork", "name": "Kundalini Breath of Fire", "category": "breathwork", "description": "A rapid rhythmic breath technique that activates kundalini energy, detoxifies the body, and energizes the nervous system.", "duration": "15 min", "level": "Advanced", "instructions": ["Sit in easy pose with spine straight", "Rest hands on knees in Gyan Mudra", "Begin rapid rhythmic breathing through the nose", "Emphasis is on the exhale - the inhale happens naturally", "Start with 30-second rounds, building to 3 minutes", "Pump the navel point with each exhale", "After each round, inhale deeply, hold, and apply root lock", "Exhale and relax. Feel the energy rising along the spine", "Practice 3-7 rounds", "End with 3 long deep breaths"], "color": "#EF4444", "chakras": ["Root", "Sacral", "Solar Plexus"]},
-    {"id": "heart-opening", "name": "Heart Opening Practice", "category": "energy", "description": "A gentle practice combining breath, visualization, and mantra to open the heart chakra and cultivate unconditional love.", "duration": "20 min", "level": "Beginner", "instructions": ["Sit comfortably with palms on your heart center", "Take 7 slow, deep breaths, feeling your chest rise and fall", "Visualize a green emerald light glowing in your heart", "With each breath, see this light expanding outward", "Silently repeat: 'I am love. I give love. I receive love.'", "Chant YAM (the heart chakra seed mantra) 21 times", "Visualize sending love to yourself, then to loved ones, then to all beings", "Feel gratitude filling your entire being", "Rest in the open-hearted awareness for 5 minutes", "Seal the practice by pressing palms together at heart center"], "color": "#22C55E", "chakras": ["Heart"]},
-    {"id": "mantra-meditation", "name": "Sacred Mantra Meditation", "category": "mantra", "description": "A practice of repeating sacred sound vibrations to alter consciousness, purify the mind, and connect with divine energy.", "duration": "20 min", "level": "Beginner", "instructions": ["Choose your mantra: Om, Om Mani Padme Hum, So Hum, or Om Namah Shivaya", "Sit with spine erect, eyes gently closed", "Begin chanting the mantra aloud 21 times", "Transition to whispering the mantra 21 times", "Move to silent mental repetition for 10 minutes", "Use a mala (108 beads) if available for counting", "When the mind wanders, gently return to the mantra", "Feel the vibration of the mantra resonating in your body", "End by sitting in silence, absorbing the vibration", "Chant Om three times to close"], "color": "#FCD34D", "chakras": ["Throat", "Crown"]},
-    {"id": "tantric-breathwork", "name": "Tantric Circular Breathing", "category": "breathwork", "description": "A connected breathing technique where there is no pause between inhale and exhale, creating a continuous circle of energy.", "duration": "25 min", "level": "Intermediate", "instructions": ["Lie down or sit comfortably", "Begin breathing through the mouth with no pause between inhale and exhale", "Inhale fully into the belly, then chest", "Exhale with a relaxed release (no forcing)", "Create a continuous circular rhythm", "After 10 minutes, you may feel tingling or waves of energy", "Allow any emotions or sensations to flow through you", "Continue for 20 minutes", "Transition to natural nasal breathing for 5 minutes of integration", "Rest in stillness and observe the energy within"], "color": "#06B6D4", "chakras": ["Sacral", "Heart", "Crown"]},
-    {"id": "third-eye-activation", "name": "Third Eye Activation", "category": "energy", "description": "A focused practice to awaken the Ajna chakra (third eye), enhancing intuition, inner vision, and spiritual sight.", "duration": "20 min", "level": "Intermediate", "instructions": ["Sit in a dark or dimly lit room", "Apply gentle pressure between your eyebrows with your thumb for 30 seconds", "Close your eyes and direct your internal gaze to the third eye point", "Breathe in through the nose for 4 counts, hold for 4, exhale for 4", "Chant OM, feeling the vibration at the point between your brows", "Visualize an indigo sphere of light pulsing at your third eye", "With each breath, see this light growing brighter and more vivid", "Practice Trataka: gaze at a candle flame for 5 minutes without blinking", "Close your eyes and observe the afterimage at your third eye", "Sit in the inner vision for 5 minutes"], "color": "#8B5CF6", "chakras": ["Third Eye"]},
-]
+from data.tantra import TANTRA_DATA
 
 @api_router.get("/tantra")
 async def get_tantra_practices():
@@ -1346,6 +1337,159 @@ async def get_my_certifications(user=Depends(get_current_user)):
     certs = await db.certifications.find({"user_id": user["id"]}, {"_id": 0}).to_list(50)
     return certs
 
+# --- User Creations (Custom Affirmations, Meditations, etc.) ---
+@api_router.post("/creations")
+async def create_custom(data: CustomCreation, user=Depends(get_current_user)):
+    doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", ""),
+        "type": data.type,
+        "title": data.title,
+        "content": data.content,
+        "tags": data.tags or [],
+        "shared": False,
+        "likes": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.creations.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/creations/my")
+async def get_my_creations(user=Depends(get_current_user)):
+    items = await db.creations.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return items
+
+@api_router.get("/creations/my/{creation_type}")
+async def get_my_creations_by_type(creation_type: str, user=Depends(get_current_user)):
+    items = await db.creations.find({"user_id": user["id"], "type": creation_type}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return items
+
+@api_router.delete("/creations/{creation_id}")
+async def delete_creation(creation_id: str, user=Depends(get_current_user)):
+    result = await db.creations.delete_one({"id": creation_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Creation not found")
+    return {"status": "deleted"}
+
+@api_router.put("/creations/{creation_id}/share")
+async def toggle_share(creation_id: str, user=Depends(get_current_user)):
+    doc = await db.creations.find_one({"id": creation_id, "user_id": user["id"]})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Creation not found")
+    new_shared = not doc.get("shared", False)
+    await db.creations.update_one({"id": creation_id}, {"$set": {"shared": new_shared}})
+    return {"shared": new_shared}
+
+@api_router.get("/creations/shared")
+async def get_shared_creations(creation_type: Optional[str] = None):
+    query = {"shared": True}
+    if creation_type:
+        query["type"] = creation_type
+    items = await db.creations.find(query, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return items
+
+@api_router.put("/creations/{creation_id}/like")
+async def like_creation(creation_id: str):
+    result = await db.creations.update_one({"id": creation_id, "shared": True}, {"$inc": {"likes": 1}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Creation not found")
+    return {"status": "liked"}
+
+@api_router.post("/creations/ai-generate")
+async def ai_generate_creation(req: AICreateRequest, user=Depends(get_current_user)):
+    type_prompts = {
+        "affirmation": f"Create a powerful, personal affirmation for someone whose intention is: '{req.intention}'. Write 3-5 affirmations that are positive, present-tense, emotionally resonant, and deeply personal. Each on a new line.",
+        "meditation": f"Create a guided meditation script for the intention: '{req.intention}'. Include an opening (settling in), body scan, visualization, the core meditation aligned with the intention, and a gentle closing. Write it as a narration script, about 300 words.",
+        "breathwork": f"Design a custom breathwork sequence for the intention: '{req.intention}'. Include the breath pattern (inhale/hold/exhale counts), duration, visualization to pair with the breath, and the energetic effect. Be specific and practical.",
+        "mantra": f"Create a personal mantra or set of mantras for the intention: '{req.intention}'. Include the mantra text, its meaning, how to chant it (aloud, whispered, silent), recommended repetitions, and which mudra to pair with it.",
+        "ritual": f"Design a personal daily ritual for the intention: '{req.intention}'. Include morning and evening components, specific practices (mudras, mantras, breathing), timing, and how to track progress. Make it practical and sustainable.",
+    }
+    prompt = type_prompts.get(req.type, f"Create a personal spiritual practice for: '{req.intention}'")
+    try:
+        chat = LlmChat(
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            session_id=f"create-{str(uuid.uuid4())}",
+            system_message="You are a wise, compassionate spiritual guide. Create deeply personal, meaningful practices. Be specific and practical. Write with warmth.",
+        )
+        chat.with_model("openai", "gpt-5.2")
+        msg = UserMessage(text=prompt)
+        response = await chat.send_message(msg)
+        return {"type": req.type, "content": response, "intention": req.intention}
+    except Exception as e:
+        logger.error(f"AI create error: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate content")
+
+# --- AI Knowledge Engine ---
+KNOWLEDGE_PROMPTS = {
+    "mudra": "You are an expert in yogic mudra science. Give a thorough guide about '{topic}' covering: origins, precise hand position, benefits (physical/mental/spiritual), chakra and element associations, duration and timing, contraindications, combinations with pranayama and mantras, and any scientific research. Be warm and authoritative.",
+    "yantra": "You are a scholar of sacred geometry. Give a thorough guide about '{topic}' covering: origins, geometric symbolism, deity association, complete mantra with pronunciation, meditation technique, consecration, placement, benefits, and advanced practices. Write with reverence.",
+    "tantra": "You are a tantric meditation teacher. Give a thorough guide about '{topic}' covering: lineage, energetic mechanisms, detailed step-by-step instructions, common mistakes, signs of progress, safety precautions, chakra connections, preparatory practices, integration, and advanced variations.",
+    "frequency": "You are a sound healing specialist. Give a thorough guide about '{topic}' covering: history, scientific research, chakra/organ resonance, listening protocol, brainwave effects, frequency combinations, cultural uses, cellular effects, and practice recommendations.",
+    "exercise": "You are a Qigong and Tai Chi master. Give a thorough guide about '{topic}' covering: origins, detailed movement instructions with breathing, alignment corrections, meridians activated, health benefits, modifications, advanced variations, and internal energy dynamics.",
+    "nourishment": "You are an Ayurvedic nutrition expert. Give a thorough guide about '{topic}' covering: nutritional profile, Ayurvedic properties, TCM properties, spiritual/energetic effects, preparation methods, timing, contraindications, recipes, cultural significance, and research.",
+    "general": "You are a wise spiritual teacher. Give a thorough guide about '{topic}'. {context} Cover it from historical, practical, scientific, and spiritual perspectives with actionable guidance.",
+}
+
+@api_router.post("/knowledge/deep-dive")
+async def knowledge_deep_dive(req: KnowledgeRequest):
+    if not req.topic or len(req.topic.strip()) < 2:
+        raise HTTPException(status_code=400, detail="Topic too short")
+
+    # Check MongoDB cache first
+    cached = await db.knowledge_cache.find_one(
+        {"topic": req.topic, "category": req.category}, {"_id": 0}
+    )
+    if cached:
+        return cached
+
+    category = req.category if req.category in KNOWLEDGE_PROMPTS else "general"
+    prompt_template = KNOWLEDGE_PROMPTS[category]
+    prompt = prompt_template.replace("{topic}", req.topic)
+    if req.context:
+        prompt = prompt.replace("{context}", f"Additional context: {req.context}")
+    else:
+        prompt = prompt.replace("{context}", "")
+
+    try:
+        chat = LlmChat(
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            session_id=f"knowledge-{str(uuid.uuid4())}",
+            system_message=prompt,
+        )
+        chat.with_model("openai", "gpt-5.2")
+        msg = UserMessage(text=f"Please provide a comprehensive, deeply detailed guide about: {req.topic}")
+        response = await chat.send_message(msg)
+
+        result = {
+            "topic": req.topic,
+            "category": req.category,
+            "content": response,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        # Cache in MongoDB
+        await db.knowledge_cache.insert_one({**result})
+        result.pop("_id", None)
+        return result
+
+    except Exception as e:
+        logger.error(f"Knowledge AI error: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate knowledge content")
+
+@api_router.get("/knowledge/suggestions/{category}")
+async def knowledge_suggestions(category: str):
+    suggestions = {
+        "mudra": ["Gyan Mudra advanced techniques", "Mudras for anxiety and depression", "Mudras during pregnancy", "Combining mudras with pranayama", "Healing mudras for specific diseases", "Mudras for chakra activation", "The science behind mudras", "Mudras in Buddhist tradition", "Mudras for better sleep", "Hasta mudras vs Kaya mudras"],
+        "yantra": ["How to draw Sri Yantra by hand", "Yantra consecration ritual", "Yantra placement in home", "The mathematics of sacred geometry", "Difference between yantra and mandala", "Yantras for specific planets", "Creating personal yantras", "Yantra meditation for beginners", "The 10 Mahavidya Yantras", "Yantra and Vastu Shastra"],
+        "tantra": ["Kundalini awakening safety guide", "Chakra blockages and how to clear them", "Tantric breathwork for beginners", "The Nadi system explained", "Bandhas and their effects", "Tantric meditation vs Buddhist meditation", "Working with Shakti energy", "The role of the Guru in Tantra", "Tantra and modern psychology", "Advanced pranayama techniques"],
+        "frequency": ["432Hz vs 440Hz tuning", "Binaural beats for deep sleep", "Schumann resonance and Earth connection", "Sound healing with crystal bowls", "Cymatics and visible sound", "Planetary frequencies explained", "Theta waves for creativity", "Sound therapy for pain relief", "Ancient use of sound healing", "Creating a frequency healing practice"],
+        "exercise": ["Standing meditation (Zhan Zhuang)", "Eight Pieces of Brocade Qigong", "Tai Chi 24 Form complete guide", "Five Animal Frolics", "Iron Shirt Chi Kung", "Microcosmic orbit meditation", "Dao Yin stretching exercises", "Walking meditation techniques", "Yoga vs Qigong comparison", "Building a daily energy practice"],
+        "nourishment": ["Ayurvedic food combining rules", "Foods for each dosha type", "Sattvic diet for meditation", "Adaptogens and their effects", "Fasting for spiritual practice", "The energetics of spices", "Raw food vs cooked in Ayurveda", "Foods that open the third eye", "Healing teas and elixirs", "Conscious eating practice guide"],
+    }
+    return suggestions.get(category, suggestions.get("general", []))
+
 # --- Text-to-Speech Narration ---
 import hashlib
 
@@ -1356,7 +1500,8 @@ async def generate_narration(req: NarrationRequest):
     if not req.text or len(req.text.strip()) < 5:
         raise HTTPException(status_code=400, detail="Text too short")
     text = req.text[:4000]
-    cache_key = hashlib.md5(f"{text}:{req.speed}".encode()).hexdigest()
+    voice = req.voice if req.voice in ["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"] else "nova"
+    cache_key = hashlib.md5(f"{text}:{req.speed}:{voice}".encode()).hexdigest()
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
     try:
@@ -1364,7 +1509,7 @@ async def generate_narration(req: NarrationRequest):
         audio_b64 = await tts.generate_speech_base64(
             text=text,
             model="tts-1-hd",
-            voice="nova",
+            voice=voice,
             speed=req.speed or 1.0,
             response_format="mp3"
         )
