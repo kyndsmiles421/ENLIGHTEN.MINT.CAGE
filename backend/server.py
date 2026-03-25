@@ -27,7 +27,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
-JWT_SECRET = "cosmic-zen-secret-key-2024-quantum-energy-flow"
+JWT_SECRET = os.environ.get('JWT_SECRET')
 JWT_ALGORITHM = "HS256"
 
 app = FastAPI()
@@ -665,8 +665,8 @@ async def get_dashboard_stats(user=Depends(get_current_user)):
         db.moods.count_documents({"user_id": uid}),
         db.journal.count_documents({"user_id": uid}),
         db.moods.find({"user_id": uid}, {"_id": 0}).sort("created_at", -1).to_list(7),
-        db.moods.find({"user_id": uid}, {"_id": 0, "created_at": 1}).to_list(1000),
-        db.journal.find({"user_id": uid}, {"_id": 0, "created_at": 1}).to_list(1000),
+        db.moods.find({"user_id": uid}, {"_id": 0, "created_at": 1}).sort("created_at", -1).to_list(365),
+        db.journal.find({"user_id": uid}, {"_id": 0, "created_at": 1}).sort("created_at", -1).to_list(365),
     )
     
     today = datetime.now(timezone.utc).date()
