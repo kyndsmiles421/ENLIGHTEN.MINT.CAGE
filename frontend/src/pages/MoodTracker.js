@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSensory } from '../context/SensoryContext';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import CelebrationBurst from '../components/CelebrationBurst';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -19,11 +21,13 @@ const MOODS = [
 
 export default function MoodTracker() {
   const { user, authHeaders } = useAuth();
+  const { playCelebration } = useSensory();
   const [selected, setSelected] = useState(null);
   const [intensity, setIntensity] = useState(5);
   const [note, setNote] = useState('');
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -47,6 +51,8 @@ export default function MoodTracker() {
       setSelected(null);
       setNote('');
       setIntensity(5);
+      setCelebrating(true);
+      playCelebration();
       toast.success('Mood captured');
     } catch {
       toast.error('Could not save mood');
@@ -63,6 +69,7 @@ export default function MoodTracker() {
 
   return (
     <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+      <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
       <div className="max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--accent-rose)' }}>Mood Tracker</p>

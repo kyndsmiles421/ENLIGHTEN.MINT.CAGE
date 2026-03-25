@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSensory } from '../context/SensoryContext';
 import { toast } from 'sonner';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import CelebrationBurst from '../components/CelebrationBurst';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Journal() {
   const { user, authHeaders } = useAuth();
+  const { playCelebration } = useSensory();
   const [entries, setEntries] = useState([]);
   const [showForm, setShowForm] = useState(true);
   const [title, setTitle] = useState('');
@@ -16,6 +19,7 @@ export default function Journal() {
   const [mood, setMood] = useState('');
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(null);
+  const [celebrating, setCelebrating] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -38,6 +42,8 @@ export default function Journal() {
       setContent('');
       setMood('');
       setShowForm(false);
+      setCelebrating(true);
+      playCelebration();
       toast.success('Entry saved to your sacred journal');
     } catch {
       toast.error('Could not save entry');
@@ -62,6 +68,7 @@ export default function Journal() {
 
   return (
     <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+      <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-start justify-between mb-12">

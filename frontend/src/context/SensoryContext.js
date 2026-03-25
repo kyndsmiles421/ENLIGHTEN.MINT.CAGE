@@ -132,6 +132,41 @@ export function SensoryProvider({ children }) {
     } catch(e) {}
   }, [getAudioCtx]);
 
+  const playCelebration = useCallback(() => {
+    try {
+      const ctx = getAudioCtx();
+      // Rising arpeggio chime
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+      notes.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        const g = ctx.createGain();
+        g.gain.value = 0;
+        const t = ctx.currentTime + i * 0.12;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.07, t + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+        osc.connect(g);
+        g.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.8);
+      });
+      // Low resonant gong
+      const gong = ctx.createOscillator();
+      gong.type = 'sine';
+      gong.frequency.value = 130.81;
+      const gg = ctx.createGain();
+      gg.gain.value = 0;
+      gg.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.1);
+      gg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2);
+      gong.connect(gg);
+      gg.connect(ctx.destination);
+      gong.start();
+      gong.stop(ctx.currentTime + 2);
+    } catch(e) {}
+  }, [getAudioCtx]);
+
   const toggleAmbient = useCallback(() => {
     setAmbientOn(prev => {
       if (!prev) { startAmbient(); } else { stopAmbient(); }
@@ -153,7 +188,7 @@ export function SensoryProvider({ children }) {
   }, []);
 
   return (
-    <SensoryContext.Provider value={{ ambientOn, volume, setVolume, toggleAmbient, playClick, playChime }}>
+    <SensoryContext.Provider value={{ ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration }}>
       {children}
     </SensoryContext.Provider>
   );

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
-  Play, GraduationCap, Headphones
+  Play, GraduationCap, Headphones, Lightbulb, Sprout
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -15,6 +15,8 @@ const QUICK_ACTIONS = [
   { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#D8B4FE' },
   { icon: Wind, label: 'Breathe', path: '/breathing', color: '#2DD4BF' },
   { icon: Timer, label: 'Meditate', path: '/meditation', color: '#D8B4FE' },
+  { icon: Lightbulb, label: 'Light', path: '/light-therapy', color: '#A855F7' },
+  { icon: Sprout, label: 'Zen', path: '/zen-garden', color: '#22C55E' },
   { icon: Headphones, label: 'Sounds', path: '/soundscapes', color: '#3B82F6' },
   { icon: Radio, label: 'Frequencies', path: '/frequencies', color: '#8B5CF6' },
   { icon: Hand, label: 'Mudras', path: '/mudras', color: '#FDA4AF' },

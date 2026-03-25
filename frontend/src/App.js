@@ -33,6 +33,8 @@ const Tantra = lazy(() => import('./pages/Tantra'));
 const Videos = lazy(() => import('./pages/Videos'));
 const Classes = lazy(() => import('./pages/Classes'));
 const Create = lazy(() => import('./pages/Create'));
+const LightTherapy = lazy(() => import('./pages/LightTherapy'));
+const ZenGarden = lazy(() => import('./pages/ZenGarden'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -85,6 +87,8 @@ function AnimatedRoutes() {
             <Route path="/videos" element={<Videos />} />
             <Route path="/classes" element={<Classes />} />
             <Route path="/create" element={<Create />} />
+            <Route path="/light-therapy" element={<LightTherapy />} />
+            <Route path="/zen-garden" element={<ZenGarden />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

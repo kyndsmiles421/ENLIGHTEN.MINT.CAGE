@@ -8,7 +8,7 @@ import {
   LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio,
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
-  Volume2, VolumeX
+  Volume2, VolumeX, Lightbulb, Sprout
 } from 'lucide-react';
 
 const PRIMARY_NAV = [
@@ -18,11 +18,13 @@ const PRIMARY_NAV = [
   { path: '/frequencies', label: 'Hz', icon: Radio },
   { path: '/exercises', label: 'Exercises', icon: Zap },
   { path: '/mudras', label: 'Mudras', icon: Hand },
-  { path: '/oracle', label: 'Oracle', icon: Sparkles },
-  { path: '/create', label: 'Create', icon: PenTool },
+  { path: '/light-therapy', label: 'Light', icon: Lightbulb },
+  { path: '/zen-garden', label: 'Zen', icon: Sprout },
 ];
 
 const MORE_NAV = [
+  { path: '/oracle', label: 'Oracle', icon: Sparkles },
+  { path: '/create', label: 'Create', icon: PenTool },
   { path: '/community', label: 'Community', icon: Users },
   { path: '/yantra', label: 'Yantra', icon: Triangle },
   { path: '/tantra', label: 'Tantra', icon: TantraIcon },

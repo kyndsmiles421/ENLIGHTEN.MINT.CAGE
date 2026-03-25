@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap, Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2 } from 'lucide-react';
+import { Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap, Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2, Lightbulb, Sprout } from 'lucide-react';
 
 const FEATURES = [
   { icon: Wind, title: 'Breathing', desc: 'Guided breathwork to center your being', path: '/breathing', color: '#2DD4BF' },
   { icon: Timer, title: 'Meditation', desc: 'Timed sessions with ambient sound', path: '/meditation', color: '#D8B4FE' },
   { icon: Headphones, title: 'Soundscapes', desc: 'Layer ambient sounds into your sanctuary', path: '/soundscapes', color: '#38BDF8' },
+  { icon: Lightbulb, title: 'Light Therapy', desc: 'Immersive chromotherapy color healing', path: '/light-therapy', color: '#A855F7' },
+  { icon: Sprout, title: 'Zen Garden', desc: 'Nurture plants, feed koi, release lanterns', path: '/zen-garden', color: '#22C55E' },
   { icon: Radio, title: 'Frequencies', desc: 'Solfeggio & biometric healing tones', path: '/frequencies', color: '#8B5CF6' },
   { icon: Hand, title: 'Mudras', desc: 'Sacred hand gestures for healing', path: '/mudras', color: '#FDA4AF' },
   { icon: Triangle, title: 'Yantras', desc: 'Sacred geometric meditation diagrams', path: '/yantra', color: '#EF4444' },
