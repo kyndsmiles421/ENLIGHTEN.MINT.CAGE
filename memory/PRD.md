@@ -119,8 +119,6 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 
 ## Backlog (P1/P2)
 - P1: Display user-created content in existing pages (Affirmations, Meditation, Rituals)
-- P1: Flesh out Videos/Classes with real content and video playback
 - P2: Weekly/monthly wellness reports
 - P2: Backend refactoring (split server.py into APIRouter modules)
-- P2: Real video content integration
 - P2: Meditation session history tracking
