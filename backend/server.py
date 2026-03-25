@@ -119,7 +119,7 @@ class LessonComplete(BaseModel):
 
 class NarrationRequest(BaseModel):
     text: str
-    speed: Optional[float] = 0.9
+    speed: Optional[float] = 1.0
 
 # --- Auth Helpers ---
 def create_token(user_id: str, name: str):
@@ -1363,9 +1363,9 @@ async def generate_narration(req: NarrationRequest):
         tts = OpenAITextToSpeech(api_key=os.getenv("EMERGENT_LLM_KEY"))
         audio_b64 = await tts.generate_speech_base64(
             text=text,
-            model="tts-1",
-            voice="sage",
-            speed=req.speed or 0.9,
+            model="tts-1-hd",
+            voice="nova",
+            speed=req.speed or 1.0,
             response_format="mp3"
         )
         tts_cache[cache_key] = audio_b64
