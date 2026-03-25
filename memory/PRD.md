@@ -111,6 +111,12 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - **Custom Breathing Patterns**: Mode toggle (Presets / Build Your Own). Users define inhale, hold-in, exhale, hold-out durations via sliders (1-15s), choose theme color, name, and description. Save to MongoDB `custom_breathing` collection. Saved patterns shown in grid with "Use This Pattern" button that loads them into the presets player.
 - **Custom Affirmation Sets**: Mode toggle (Daily / Build Your Own Set). 3-step AI wizard: 1) Set goal + name + color, 2) AI generating spinner, 3) Review/edit generated affirmations. GPT-5.2 generates 7 personalized affirmations. Save to MongoDB `custom_affirmations` collection. Saved sets viewable in carousel with Previous/Next navigation, progress dots, and per-affirmation narration.
 - **Custom Soundscape Mixes**: "Save This Mix" button appears when sounds active + user logged in. Name input + save. Saved mixes displayed above mixer grid. Click to reload volume levels. Delete on hover. MongoDB `custom_soundscapes` collection.
+
+### Phase 14 - Mantras & Ho'oponopono Pages (Feb 2026)
+- **Mantras Page** (`/mantras`): Full mantra library of 10 traditional mantras with Sanskrit, pronunciation, meanings, benefits, chakra associations. Category filters (Meditation, Compassion, Devotion, Healing, Peace, Illumination). Detail panel with "Begin Practice" button. Full-screen MantraSession overlay with tap counter, mala bead visualization (27 beads), progress ring, ambient sound options (Bowls/Ocean/Forest/Wind), voice narration. "Build Your Own" tab to create custom mantra practices with repetition presets (11-1008), save/load/delete.
+- **Ho'oponopono Page** (`/hooponopono`): Hawaiian forgiveness practice. Four sacred phrases (I'm sorry, Please forgive me, Thank you, I love you) displayed as cards. About section with 5-step how-it-works guide. Target selection (Myself/Person/Situation/World) with optional name input. Duration picker (5-20 min). Immersive full-screen session with phrases cycling every ~6 seconds, breathing orb animation, progress ring, countdown timer, cycle counter, phrase dots, ambient singing bowl drone, voice guide narration.
+- **New API endpoints**: `/api/mantras/library`, `/api/mantras/save-custom`, `GET /my-custom`, `DELETE /custom/{id}`
+- **Navigation**: Both pages added to "More" dropdown with Music and HeartHandshake icons.
 - **New API endpoints**: `/api/breathing/save-custom`, `GET /my-custom`, `DELETE /custom/{id}`, `/api/affirmations/generate-set`, `/api/affirmations/save-set`, `GET /my-sets`, `DELETE /set/{id}`, `/api/soundscapes/save-mix`, `GET /my-mixes`, `DELETE /mix/{id}`
 
 ### Phase 6 - Creation Studio & AI Knowledge
@@ -169,7 +175,7 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - posts, follows, challenges, challenge_participants
 - enrollments, certifications
 - creations, knowledge_cache, affirmations
-- custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes
+- custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes, custom_mantras
 - zen_plants
 
 ## Backlog (P0/P1/P2)
