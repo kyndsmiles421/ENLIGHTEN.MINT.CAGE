@@ -105,6 +105,7 @@ class ProfileCustomize(BaseModel):
     music_frequency: Optional[float] = None
     show_stats: Optional[bool] = True
     show_activity: Optional[bool] = True
+    visibility: Optional[str] = None  # "public", "private", "friends"
 
 class ReadingRequest(BaseModel):
     reading_type: str
@@ -168,6 +169,17 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+optional_security = HTTPBearer(auto_error=False)
+
+async def get_current_user_optional(credentials: HTTPAuthorizationCredentials = Depends(optional_security)):
+    if not credentials:
+        return None
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return {"id": payload["sub"], "name": payload["name"]}
+    except Exception:
+        return None
 
 # --- Auth Routes ---
 @api_router.post("/auth/register")
@@ -998,23 +1010,61 @@ async def get_my_profile(user=Depends(get_current_user)):
     profile = await db.profiles.find_one({"user_id": user["id"]}, {"_id": 0})
     user_doc = await db.users.find_one({"id": user["id"]}, {"_id": 0, "password": 0})
     if not profile:
-        return {"user_id": user["id"], "display_name": user_doc.get("name"), "bio": "", "cover_image": COVER_PRESETS[0]["url"], "theme_color": "#D8B4FE", "avatar_style": "purple-teal", "vibe_status": "", "favorite_quote": "", "music_choice": "none", "music_frequency": 432, "show_stats": True, "show_activity": True}
+        return {"user_id": user["id"], "display_name": user_doc.get("name"), "bio": "", "cover_image": COVER_PRESETS[0]["url"], "theme_color": "#D8B4FE", "avatar_style": "purple-teal", "vibe_status": "", "favorite_quote": "", "music_choice": "none", "music_frequency": 432, "show_stats": True, "show_activity": True, "visibility": "public"}
     profile["display_name"] = profile.get("display_name") or user_doc.get("name")
+    profile.setdefault("visibility", "public")
     return profile
 
 @api_router.get("/profile/public/{user_id}")
-async def get_public_profile_full(user_id: str):
+async def get_public_profile_full(user_id: str, user=Depends(get_current_user_optional)):
     user_doc = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0, "email": 0})
     if not user_doc:
         raise HTTPException(status_code=404, detail="User not found")
     profile = await db.profiles.find_one({"user_id": user_id}, {"_id": 0}) or {}
-    mood_count = await db.moods.count_documents({"user_id": user_id})
-    journal_count = await db.journal.count_documents({"user_id": user_id})
-    post_count = await db.community_posts.count_documents({"user_id": user_id})
-    ritual_sessions = await db.ritual_completions.count_documents({"user_id": user_id})
-    challenge_count = await db.challenge_participants.count_documents({"user_id": user_id})
-    follower_count = await db.follows.count_documents({"following_id": user_id})
-    recent_posts = await db.community_posts.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1).to_list(5)
+
+    visibility = profile.get("visibility", "public")
+    viewer_id = user.get("id") if user else None
+    is_owner = viewer_id == user_id
+
+    # Check visibility permissions
+    if not is_owner:
+        if visibility == "private":
+            return {
+                "id": user_id,
+                "display_name": profile.get("display_name") or user_doc.get("name"),
+                "avatar_style": profile.get("avatar_style", "purple-teal"),
+                "theme_color": profile.get("theme_color", "#D8B4FE"),
+                "visibility": "private",
+                "restricted": True,
+                "message": "This profile is private.",
+            }
+        if visibility == "friends":
+            is_friend = False
+            if viewer_id:
+                # Check mutual follows (both follow each other = friends)
+                fwd = await db.follows.find_one({"follower_id": viewer_id, "following_id": user_id})
+                rev = await db.follows.find_one({"follower_id": user_id, "following_id": viewer_id})
+                is_friend = bool(fwd and rev)
+            if not is_friend:
+                return {
+                    "id": user_id,
+                    "display_name": profile.get("display_name") or user_doc.get("name"),
+                    "avatar_style": profile.get("avatar_style", "purple-teal"),
+                    "theme_color": profile.get("theme_color", "#D8B4FE"),
+                    "visibility": "friends",
+                    "restricted": True,
+                    "message": "This profile is only visible to friends.",
+                }
+
+    mood_count, journal_count, post_count, ritual_sessions, challenge_count, follower_count, recent_posts = await asyncio.gather(
+        db.moods.count_documents({"user_id": user_id}),
+        db.journal.count_documents({"user_id": user_id}),
+        db.community_posts.count_documents({"user_id": user_id}),
+        db.ritual_completions.count_documents({"user_id": user_id}),
+        db.challenge_participants.count_documents({"user_id": user_id}),
+        db.follows.count_documents({"following_id": user_id}),
+        db.community_posts.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1).to_list(5),
+    )
     return {
         "id": user_id,
         "name": user_doc.get("name"),
@@ -1030,6 +1080,8 @@ async def get_public_profile_full(user_id: str):
         "music_frequency": profile.get("music_frequency", 432),
         "show_stats": profile.get("show_stats", True),
         "show_activity": profile.get("show_activity", True),
+        "visibility": visibility,
+        "restricted": False,
         "member_since": user_doc.get("created_at"),
         "stats": {"moods": mood_count, "journals": journal_count, "posts": post_count, "rituals": ritual_sessions, "challenges": challenge_count, "followers": follower_count},
         "recent_posts": recent_posts

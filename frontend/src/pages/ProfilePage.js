@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
-import { Settings, Camera, Music, Palette, Save, Eye, Loader2, X, Quote } from 'lucide-react';
+import { Settings, Camera, Music, Palette, Save, Eye, Loader2, X, Quote, Globe, Lock, Users, Shield } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -129,6 +129,29 @@ export default function ProfilePage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
   if (!user && !userId) return <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }}><div className="text-center"><h2 className="text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Sign in to customize your profile</h2><a href="/auth" className="btn-glass" data-testid="profile-signin">Sign In</a></div></div>;
 
+  // Restricted profile view
+  if (profile?.restricted) {
+    const themeColor = profile.theme_color || '#D8B4FE';
+    const VisIcon = profile.visibility === 'private' ? Lock : Users;
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }} data-testid="restricted-profile">
+        <div className="glass-card p-12 text-center max-w-md">
+          <AvatarDisplay style={profile.avatar_style} size={80} name={profile.display_name || '?'} />
+          <h2 className="text-2xl font-light mt-6 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+            {profile.display_name}
+          </h2>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <VisIcon size={14} style={{ color: themeColor }} />
+            <span className="text-xs" style={{ color: themeColor }}>
+              {profile.visibility === 'private' ? 'Private Profile' : 'Friends Only'}
+            </span>
+          </div>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{profile.message}</p>
+        </div>
+      </div>
+    );
+  }
+
   const p = editing ? draft : (profile || {});
   const themeColor = p.theme_color || '#D8B4FE';
 
@@ -169,6 +192,14 @@ export default function ProfilePage() {
                 ) : (
                   <h1 className="text-3xl md:text-4xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                     {p.display_name || p.name || user?.name}
+                    {isOwnProfile && p.visibility && p.visibility !== 'public' && (
+                      <span className="inline-flex items-center gap-1 ml-3 text-xs px-2 py-0.5 rounded-full align-middle"
+                        style={{ background: p.visibility === 'private' ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)', color: p.visibility === 'private' ? '#EF4444' : '#3B82F6', border: `1px solid ${p.visibility === 'private' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}` }}
+                        data-testid="visibility-badge">
+                        {p.visibility === 'private' ? <Lock size={10} /> : <Users size={10} />}
+                        {p.visibility === 'private' ? 'Private' : 'Friends'}
+                      </span>
+                    )}
                   </h1>
                 )}
               </div>
@@ -274,6 +305,32 @@ export default function ProfilePage() {
                         {m.name}
                       </button>
                     ))}
+                  </div>
+                </div>
+                {/* Profile Visibility */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}><Shield size={12} className="inline mr-1" /> Profile Visibility</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { id: 'public', label: 'Public', icon: Globe, desc: 'Anyone can see your profile', color: '#22C55E' },
+                      { id: 'friends', label: 'Friends Only', icon: Users, desc: 'Only mutual followers can see', color: '#3B82F6' },
+                      { id: 'private', label: 'Private', icon: Lock, desc: 'Only you can see your profile', color: '#EF4444' },
+                    ].map(v => {
+                      const VIcon = v.icon;
+                      const sel = (draft.visibility || 'public') === v.id;
+                      return (
+                        <button key={v.id} onClick={() => update('visibility', v.id)}
+                          className="glass-card p-4 text-left transition-all"
+                          style={{ borderColor: sel ? `${v.color}40` : 'rgba(255,255,255,0.06)' }}
+                          data-testid={`visibility-${v.id}`}>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <VIcon size={14} style={{ color: sel ? v.color : 'var(--text-muted)' }} />
+                            <span className="text-sm font-medium" style={{ color: sel ? v.color : 'var(--text-secondary)' }}>{v.label}</span>
+                          </div>
+                          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{v.desc}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

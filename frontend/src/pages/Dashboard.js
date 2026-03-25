@@ -28,6 +28,8 @@ const QUICK_ACTIONS = [
   { icon: Headphones, label: 'Sounds', path: '/soundscapes', color: '#3B82F6' },
   { icon: Radio, label: 'Frequencies', path: '/frequencies', color: '#8B5CF6' },
   { icon: Hand, label: 'Mudras', path: '/mudras', color: '#FDA4AF' },
+  { icon: Music, label: 'Mantras', path: '/mantras', color: '#FB923C' },
+  { icon: HeartHandshake, label: "Ho'opono", path: '/hooponopono', color: '#E879F9' },
   { icon: Triangle, label: 'Yantra', path: '/yantra', color: '#EF4444' },
   { icon: Flame, label: 'Tantra', path: '/tantra', color: '#FCD34D' },
   { icon: Zap, label: 'Exercise', path: '/exercises', color: '#FB923C' },
@@ -36,8 +38,9 @@ const QUICK_ACTIONS = [
   { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
   { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
   { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
-  { icon: Play, label: 'Videos', path: '/videos', color: '#2DD4BF' },
+  { icon: Map, label: 'Journey', path: '/journey', color: '#2DD4BF' },
   { icon: GraduationCap, label: 'Learn', path: '/learn', color: '#E879F9' },
+  { icon: Play, label: 'Videos', path: '/videos', color: '#2DD4BF' },
   { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
 ];
 
