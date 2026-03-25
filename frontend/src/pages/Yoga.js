@@ -1,12 +1,153 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Clock, Flame, ChevronRight, Check, Heart, Wind, Sparkles, Star, Moon } from 'lucide-react';
+import { ArrowLeft, Clock, Flame, ChevronRight, Check, Heart, Wind, Sparkles, Star, Moon, User } from 'lucide-react';
 import GuidedExperience from '../components/GuidedExperience';
 import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const BODY_TYPES_MAP = {
+  slender: { widthMul: 0.28, headMul: 0.42 },
+  balanced: { widthMul: 0.35, headMul: 0.45 },
+  broad: { widthMul: 0.42, headMul: 0.48 },
+};
+
+function YogaAvatarMini({ avatarConfig, poseName, color }) {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const timeRef = useRef(0);
+
+  const silhouette = poseName
+    ? poseName.toLowerCase().includes('warrior') ? 'warrior'
+    : poseName.toLowerCase().includes('lotus') || poseName.toLowerCase().includes('seated') || poseName.toLowerCase().includes('cross') ? 'lotus'
+    : poseName.toLowerCase().includes('stand') || poseName.toLowerCase().includes('mountain') || poseName.toLowerCase().includes('tree') ? 'standing'
+    : avatarConfig?.silhouette || 'default'
+    : avatarConfig?.silhouette || 'default';
+
+  const hexToRgb = (hex) => ({ r: parseInt(hex.slice(1, 3), 16), g: parseInt(hex.slice(3, 5), 16), b: parseInt(hex.slice(5, 7), 16) });
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const t = timeRef.current;
+    const auraColor = avatarConfig?.aura_color || color || '#D8B4FE';
+    const rgb = hexToRgb(auraColor);
+    const intensity = avatarConfig?.aura_intensity || 0.6;
+    const bt = BODY_TYPES_MAP[avatarConfig?.body_type] || BODY_TYPES_MAP.balanced;
+    const breathCycle = Math.sin(t * 0.0012) * 0.5 + 0.5;
+
+    ctx.fillStyle = 'rgba(5, 5, 12, 0.15)';
+    ctx.fillRect(0, 0, w, h);
+
+    const cx = w / 2;
+    const cy = h * 0.44;
+    const bodyH = h * 0.52;
+    const bodyW = bodyH * bt.widthMul;
+    const headR = bodyW * bt.headMul;
+    const headY = cy - bodyH * 0.32;
+    const pulse = 0.85 + breathCycle * 0.15;
+
+    // Aura
+    for (let layer = 3; layer >= 0; layer--) {
+      const spread = 1 + layer * 0.18;
+      const a = 0.12 * (1 - layer / 4) * intensity;
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, bodyH * spread * 0.55);
+      grad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${a * pulse})`);
+      grad.addColorStop(0.6, `rgba(${rgb.r},${rgb.g},${rgb.b},${a * 0.15})`);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, bodyW * spread * 1.2, bodyH * spread * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const robeHex = avatarConfig?.robe_color || '#1E1B4B';
+    const rr = hexToRgb(robeHex);
+    ctx.fillStyle = `rgba(${rr.r},${rr.g},${rr.b},0.7)`;
+    ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${0.2 * intensity})`;
+    ctx.lineWidth = 1;
+
+    if (silhouette === 'lotus') {
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + bodyH * 0.15, bodyW * 0.7, bodyH * 0.12, 0, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - bodyW * 0.35, cy + bodyH * 0.08);
+      ctx.quadraticCurveTo(cx - bodyW * 0.4, cy - bodyH * 0.1, cx - bodyW * 0.2, headY + headR);
+      ctx.lineTo(cx + bodyW * 0.2, headY + headR);
+      ctx.quadraticCurveTo(cx + bodyW * 0.4, cy - bodyH * 0.1, cx + bodyW * 0.35, cy + bodyH * 0.08);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else if (silhouette === 'warrior') {
+      ctx.beginPath();
+      ctx.moveTo(cx - bodyW * 0.5, cy + bodyH * 0.32);
+      ctx.lineTo(cx - bodyW * 0.15, cy + bodyH * 0.08);
+      ctx.quadraticCurveTo(cx - bodyW * 0.35, cy - bodyH * 0.08, cx - bodyW * 0.15, headY + headR);
+      ctx.lineTo(cx + bodyW * 0.15, headY + headR);
+      ctx.quadraticCurveTo(cx + bodyW * 0.35, cy - bodyH * 0.08, cx + bodyW * 0.15, cy + bodyH * 0.08);
+      ctx.lineTo(cx + bodyW * 0.5, cy + bodyH * 0.32);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - bodyW * 0.2, cy - bodyH * 0.05);
+      ctx.lineTo(cx - bodyW * 0.85, cy - bodyH * 0.05);
+      ctx.moveTo(cx + bodyW * 0.2, cy - bodyH * 0.05);
+      ctx.lineTo(cx + bodyW * 0.85, cy - bodyH * 0.05);
+      ctx.stroke();
+    } else {
+      const ls = silhouette === 'standing' ? 0.15 : 0.12;
+      ctx.beginPath();
+      ctx.moveTo(cx - bodyW * ls, cy + bodyH * 0.32);
+      ctx.lineTo(cx - bodyW * 0.18, cy + bodyH * 0.08);
+      ctx.quadraticCurveTo(cx - bodyW * 0.35, cy - bodyH * 0.08, cx - bodyW * 0.2, headY + headR);
+      ctx.lineTo(cx + bodyW * 0.2, headY + headR);
+      ctx.quadraticCurveTo(cx + bodyW * 0.35, cy - bodyH * 0.08, cx + bodyW * 0.18, cy + bodyH * 0.08);
+      ctx.lineTo(cx + bodyW * ls, cy + bodyH * 0.32);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+
+    // Head
+    ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${0.2 * intensity})`;
+    ctx.beginPath(); ctx.arc(cx, headY, headR, 0, Math.PI * 2); ctx.stroke();
+
+    // Chakras
+    const cc = ['#EF4444','#FB923C','#FCD34D','#22C55E','#3B82F6','#6366F1','#C084FC'];
+    for (let i = 0; i < 7; i++) {
+      const py = headY + headR * 0.5 + (bodyH * 0.42) * (i / 6);
+      const cr = 2 + Math.sin(t * 0.003 + i) * 1;
+      const ca = 0.4 + Math.sin(t * 0.004 + i * 0.7) * 0.2;
+      const c = hexToRgb(cc[i]);
+      ctx.fillStyle = `rgba(${c.r},${c.g},${c.b},${ca})`;
+      ctx.beginPath(); ctx.arc(cx, py, cr, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Scan line
+    const scanY = (t * 0.25 % h);
+    ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},0.01)`;
+    ctx.fillRect(0, scanY - 0.5, w, 1);
+
+    timeRef.current += 16;
+    animRef.current = requestAnimationFrame(draw);
+  }, [avatarConfig, silhouette, color]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = 180; canvas.height = 220;
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [draw]);
+
+  return (
+    <div className="rounded-xl overflow-hidden" style={{ width: 180, height: 220, background: 'rgba(5,5,12,0.95)', border: `1px solid ${avatarConfig?.aura_color || color}15` }}
+      data-testid="yoga-avatar-mini">
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+    </div>
+  );
+}
 
 const STYLE_ICONS = { hatha: Star, vinyasa: Flame, kundalini: Sparkles, yin: Moon, restorative: Heart, pranayama: Wind, nidra: Moon };
 
@@ -43,7 +184,7 @@ function StyleCard({ style, onClick }) {
   );
 }
 
-function SequenceView({ style, sequence, onBack, authHeaders }) {
+function SequenceView({ style, sequence, onBack, authHeaders, avatarConfig }) {
   const [currentPose, setCurrentPose] = useState(null);
   const [completedPoses, setCompletedPoses] = useState(new Set());
   const [sessionComplete, setSessionComplete] = useState(false);
@@ -95,15 +236,27 @@ function SequenceView({ style, sequence, onBack, authHeaders }) {
       </div>
 
       {/* Guided Experience */}
-      <div className="mb-6">
-        <GuidedExperience
-          practiceName={`${style.name}: ${sequence.name}`}
-          description={style.desc}
-          instructions={sequence.poses.map(p => `${p.name}: ${p.instruction}. Breath: ${p.breath}.`)}
-          category="yoga"
-          color={style.color}
-          durationMinutes={sequence.duration}
-        />
+      <div className="flex gap-5 mb-6 flex-col md:flex-row">
+        <div className="flex-1">
+          <GuidedExperience
+            practiceName={`${style.name}: ${sequence.name}`}
+            description={style.desc}
+            instructions={sequence.poses.map(p => `${p.name}: ${p.instruction}. Breath: ${p.breath}.`)}
+            category="yoga"
+            color={style.color}
+            durationMinutes={sequence.duration}
+          />
+        </div>
+        {avatarConfig && (
+          <div className="flex flex-col items-center gap-2 flex-shrink-0">
+            <YogaAvatarMini
+              avatarConfig={avatarConfig}
+              poseName={currentPose !== null ? sequence.poses[currentPose]?.name : sequence.name}
+              color={style.color}
+            />
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Your Avatar</p>
+          </div>
+        )}
       </div>
 
       {/* Progress */}
@@ -195,7 +348,7 @@ function SequenceView({ style, sequence, onBack, authHeaders }) {
   );
 }
 
-function StyleDetail({ style, onBack, authHeaders }) {
+function StyleDetail({ style, onBack, authHeaders, avatarConfig }) {
   const [sequences, setSequences] = useState(null);
   const [activeSeq, setActiveSeq] = useState(null);
   const Icon = STYLE_ICONS[style.id] || Star;
@@ -205,7 +358,7 @@ function StyleDetail({ style, onBack, authHeaders }) {
   }, [style.id]);
 
   if (activeSeq && sequences) {
-    return <SequenceView style={style} sequence={activeSeq} onBack={() => setActiveSeq(null)} authHeaders={authHeaders} />;
+    return <SequenceView style={style} sequence={activeSeq} onBack={() => setActiveSeq(null)} authHeaders={authHeaders} avatarConfig={avatarConfig} />;
   }
 
   return (
@@ -267,10 +420,16 @@ export default function Yoga() {
   const { authHeaders } = useAuth();
   const [styles, setStyles] = useState([]);
   const [activeStyle, setActiveStyle] = useState(null);
+  const [avatarConfig, setAvatarConfig] = useState(null);
 
   useEffect(() => {
     axios.get(`${API}/yoga/styles`).then(r => setStyles(r.data.styles)).catch(() => {});
-  }, []);
+    if (authHeaders?.Authorization) {
+      axios.get(`${API}/avatar`, { headers: authHeaders }).then(r => {
+        if (r.data?.body_type) setAvatarConfig(r.data);
+      }).catch(() => {});
+    }
+  }, [authHeaders]);
 
   return (
     <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="yoga-page">
@@ -278,7 +437,7 @@ export default function Yoga() {
         <AnimatePresence mode="wait">
           {activeStyle ? (
             <motion.div key={activeStyle.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <StyleDetail style={activeStyle} onBack={() => setActiveStyle(null)} authHeaders={authHeaders} />
+              <StyleDetail style={activeStyle} onBack={() => setActiveStyle(null)} authHeaders={authHeaders} avatarConfig={avatarConfig} />
             </motion.div>
           ) : (
             <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
