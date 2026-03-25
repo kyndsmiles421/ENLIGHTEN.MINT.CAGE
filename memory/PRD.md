@@ -93,11 +93,19 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - **Zen Garden page** (`/zen-garden`) with 5 interactive tabs:
   - Plant Garden: 5 plant types (lotus, bamboo, bonsai, fern, sage), persistent growth through stages via watering (MongoDB `zen_plants` collection), max 10 plants, one water per day
   - Koi Pond: Canvas-based animated koi fish, click to create ripples that attract fish
-  - Sand Drawing: Touch/mouse canvas with fade-over-time, cosmic purple trails
+  - Sand Drawing: Touch/mouse canvas with fade-over-time, 8 color palette (Amethyst, Ocean, Sunlight, Rose, Sapphire, Emerald, Moonlight, Ember)
   - Lantern Release: Write worries and release as glowing lanterns that float up and fade
   - Rain Scene: Adjustable-intensity rainfall with procedural audio (bandpass-filtered noise)
 - Navigation and Landing page updated with Light Therapy and Zen Garden links
 - Dashboard quick actions include Light and Zen buttons
+
+### Phase 12 - Guided Meditations & Build Your Own (Feb 2026)
+- **6 built-in guided meditations** with 10-15 timed narration steps each: Body Scan Relaxation, Loving Kindness (Metta), Breath Awareness, Chakra Energy Journey, Sacred Garden Visualization, Sleep & Deep Rest
+- **Category filters**: All, Relaxation, Compassion, Focus, Energy, Visualization, Sleep
+- **Immersive guided session**: Full-screen overlay with breathing color orb, step text with animated transitions, progress dots, timer ring, pause/end controls, voice narration
+- **Build Your Own**: 4-step AI-powered wizard: 1) Set intention + focus area (7 options), 2) Configure name/duration/sound/color, 3) AI generation (GPT-5.2), 4) Review/edit steps + Save & Play
+- **Custom meditation persistence**: MongoDB `custom_meditations` collection with CRUD endpoints
+- **Timer mode preserved** as third tab alongside Guided and Build Your Own
 
 ### Phase 6 - Creation Studio & AI Knowledge
 - Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
