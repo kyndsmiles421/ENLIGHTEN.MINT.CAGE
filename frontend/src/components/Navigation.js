@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones,
-  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise, Users
+  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise, Users, Flame
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -12,12 +12,13 @@ const NAV_ITEMS = [
   { path: '/meditation', label: 'Meditate', icon: Timer },
   { path: '/exercises', label: 'Exercises', icon: Zap },
   { path: '/rituals', label: 'Rituals', icon: Sunrise },
+  { path: '/challenges', label: 'Challenges', icon: Flame },
   { path: '/affirmations', label: 'Affirm', icon: Sun },
   { path: '/mood', label: 'Mood', icon: Heart },
   { path: '/journal', label: 'Journal', icon: BookOpen },
   { path: '/soundscapes', label: 'Sounds', icon: Headphones },
   { path: '/nourishment', label: 'Nourish', icon: Leaf },
-  { path: '/frequencies', label: 'Frequencies', icon: Radio },
+  { path: '/frequencies', label: 'Hz', icon: Radio },
   { path: '/community', label: 'Community', icon: Users },
 ];
 

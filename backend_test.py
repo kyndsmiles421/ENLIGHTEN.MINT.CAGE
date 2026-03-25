@@ -700,6 +700,232 @@ class ZenEnergyAPITester:
             self.log_result("Ritual User Login", False, f"Status: {response.status_code if response else 'No response'}")
         return False
 
+    # === CHALLENGES API TESTS ===
+    
+    def test_challenges_list(self):
+        """Test GET /api/challenges returns 7 challenge templates with participant counts"""
+        response = self.make_request('GET', 'challenges')
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list) and len(data) == 7:
+                # Check if challenges have required fields
+                required_fields = ['id', 'name', 'description', 'duration_days', 'category', 'difficulty', 'rewards', 'participant_count']
+                all_valid = all(all(field in challenge for field in required_fields) for challenge in data)
+                if all_valid:
+                    # Check specific challenge IDs
+                    challenge_ids = [c['id'] for c in data]
+                    expected_ids = ['7day-meditation', '14day-breathwork', '21day-ritual', '30day-journal', '7day-qigong', '10day-mood', '5day-frequency']
+                    if all(cid in challenge_ids for cid in expected_ids):
+                        self.log_result("Challenges List", True)
+                        return True
+                    else:
+                        self.log_result("Challenges List", False, f"Missing expected challenge IDs. Got: {challenge_ids}")
+                else:
+                    self.log_result("Challenges List", False, "Missing required fields in challenges")
+            else:
+                self.log_result("Challenges List", False, f"Expected 7 challenges, got {len(data) if isinstance(data, list) else 'non-list'}")
+        else:
+            self.log_result("Challenges List", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_challenge_join(self):
+        """Test POST /api/challenges/{id}/join joins a challenge (requires auth)"""
+        if not self.token:
+            self.log_result("Challenge Join", False, "No auth token available")
+            return False
+            
+        # Use 7day-qigong as mentioned in the requirements (different from user's existing challenges)
+        challenge_id = "7day-qigong"
+        
+        response = self.make_request('POST', f'challenges/{challenge_id}/join', {}, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            required_fields = ['id', 'challenge_id', 'challenge_name', 'user_id', 'joined_at', 'checkins', 'current_streak', 'total_checkins', 'completed']
+            if all(field in data for field in required_fields):
+                if data['challenge_id'] == challenge_id and data['user_id'] == self.user_id:
+                    self.joined_challenge_id = challenge_id  # Store for later tests
+                    self.log_result("Challenge Join", True)
+                    return True
+                else:
+                    self.log_result("Challenge Join", False, "Invalid challenge or user ID in response")
+            else:
+                self.log_result("Challenge Join", False, "Missing required fields in join response")
+        elif response and response.status_code == 400:
+            # User might already be joined - this is also a valid test result
+            error_data = response.json()
+            if "Already joined" in error_data.get('detail', ''):
+                self.log_result("Challenge Join", True, "User already joined (expected behavior)")
+                self.joined_challenge_id = challenge_id
+                return True
+            else:
+                self.log_result("Challenge Join", False, f"Unexpected 400 error: {error_data.get('detail', 'Unknown')}")
+        else:
+            self.log_result("Challenge Join", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_challenge_checkin(self):
+        """Test POST /api/challenges/{id}/checkin daily check-in (requires auth)"""
+        if not self.token:
+            self.log_result("Challenge Check-in", False, "No auth token available")
+            return False
+            
+        if not hasattr(self, 'joined_challenge_id'):
+            self.log_result("Challenge Check-in", False, "No joined challenge ID available")
+            return False
+            
+        checkin_data = {"note": "Test check-in from backend test"}
+        
+        response = self.make_request('POST', f'challenges/{self.joined_challenge_id}/checkin', checkin_data, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            required_fields = ['checkin_date', 'current_streak', 'best_streak', 'total_checkins', 'completed', 'challenge_name']
+            if all(field in data for field in required_fields):
+                if isinstance(data['current_streak'], int) and isinstance(data['total_checkins'], int):
+                    self.log_result("Challenge Check-in", True)
+                    return True
+                else:
+                    self.log_result("Challenge Check-in", False, "Streak and checkin counts should be integers")
+            else:
+                self.log_result("Challenge Check-in", False, "Missing required fields in checkin response")
+        elif response and response.status_code == 400:
+            # User might have already checked in today - this is also valid
+            error_data = response.json()
+            if "Already checked in" in error_data.get('detail', ''):
+                self.log_result("Challenge Check-in", True, "Already checked in today (expected behavior)")
+                return True
+            else:
+                self.log_result("Challenge Check-in", False, f"Unexpected 400 error: {error_data.get('detail', 'Unknown')}")
+        else:
+            self.log_result("Challenge Check-in", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_my_challenges(self):
+        """Test GET /api/challenges/my returns user's joined challenges with progress (requires auth)"""
+        if not self.token:
+            self.log_result("My Challenges", False, "No auth token available")
+            return False
+            
+        response = self.make_request('GET', 'challenges/my', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                # Each challenge should have required fields
+                if len(data) > 0:
+                    required_fields = ['id', 'challenge_id', 'challenge', 'progress', 'current_streak', 'total_checkins', 'completed']
+                    if all(all(field in challenge for field in required_fields) for challenge in data):
+                        # Check that progress is a percentage (0-100)
+                        if all(0 <= challenge['progress'] <= 100 for challenge in data):
+                            self.log_result("My Challenges", True)
+                            return True
+                        else:
+                            self.log_result("My Challenges", False, "Progress should be between 0-100")
+                    else:
+                        self.log_result("My Challenges", False, "Missing required fields in challenge objects")
+                else:
+                    # Empty list is valid if user hasn't joined any challenges
+                    self.log_result("My Challenges", True, "No challenges joined yet (valid)")
+                    return True
+            else:
+                self.log_result("My Challenges", False, "Response should be a list")
+        else:
+            self.log_result("My Challenges", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_challenge_leaderboard(self):
+        """Test GET /api/challenges/{id}/leaderboard returns sorted participants"""
+        challenge_id = "7day-meditation"  # Use a challenge that likely has participants
+        
+        response = self.make_request('GET', f'challenges/{challenge_id}/leaderboard')
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                # Each participant should have required fields
+                if len(data) > 0:
+                    required_fields = ['user_id', 'user_name', 'current_streak', 'best_streak', 'total_checkins', 'completed']
+                    if all(all(field in participant for field in required_fields) for participant in data):
+                        # Check that leaderboard is sorted by current_streak (descending)
+                        streaks = [p['current_streak'] for p in data]
+                        if streaks == sorted(streaks, reverse=True):
+                            self.log_result("Challenge Leaderboard", True)
+                            return True
+                        else:
+                            self.log_result("Challenge Leaderboard", False, "Leaderboard not sorted by current_streak descending")
+                    else:
+                        self.log_result("Challenge Leaderboard", False, "Missing required fields in participant objects")
+                else:
+                    # Empty list is valid if no participants
+                    self.log_result("Challenge Leaderboard", True, "No participants yet (valid)")
+                    return True
+            else:
+                self.log_result("Challenge Leaderboard", False, "Response should be a list")
+        else:
+            self.log_result("Challenge Leaderboard", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_challenge_details(self):
+        """Test GET /api/challenges/{id}/details returns challenge info"""
+        challenge_id = "7day-meditation"
+        
+        response = self.make_request('GET', f'challenges/{challenge_id}/details')
+        if response and response.status_code == 200:
+            data = response.json()
+            required_fields = ['id', 'name', 'description', 'duration_days', 'category', 'difficulty', 'rewards', 'participant_count', 'completion_count']
+            if all(field in data for field in required_fields):
+                if data['id'] == challenge_id and data['name'] == "7-Day Meditation Marathon":
+                    if isinstance(data['participant_count'], int) and isinstance(data['completion_count'], int):
+                        self.log_result("Challenge Details", True)
+                        return True
+                    else:
+                        self.log_result("Challenge Details", False, "Participant and completion counts should be integers")
+                else:
+                    self.log_result("Challenge Details", False, f"Expected challenge ID {challenge_id} and correct name")
+            else:
+                self.log_result("Challenge Details", False, "Missing required fields in challenge details")
+        else:
+            self.log_result("Challenge Details", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_ritual_user_challenges(self):
+        """Test challenges endpoints with ritual user that has existing challenge data"""
+        if not hasattr(self, 'ritual_token'):
+            self.log_result("Ritual User Challenges", False, "No ritual user token available")
+            return False
+            
+        # Store current token and switch to ritual user
+        old_token = self.token
+        old_user_id = self.user_id
+        self.token = self.ritual_token
+        self.user_id = self.ritual_user_id
+        
+        # Test my challenges with user that has existing data
+        response = self.make_request('GET', 'challenges/my', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list) and len(data) >= 2:  # Should have 7day-meditation and 5day-frequency
+                # Check that user has the expected challenges
+                challenge_ids = [c['challenge_id'] for c in data]
+                if '7day-meditation' in challenge_ids and '5day-frequency' in challenge_ids:
+                    # Check that each has at least 1 checkin
+                    if all(c['total_checkins'] >= 1 for c in data):
+                        self.log_result("Ritual User Challenges", True)
+                        # Restore original token
+                        self.token = old_token
+                        self.user_id = old_user_id
+                        return True
+                    else:
+                        self.log_result("Ritual User Challenges", False, "Expected at least 1 checkin for each challenge")
+                else:
+                    self.log_result("Ritual User Challenges", False, f"Expected 7day-meditation and 5day-frequency, got: {challenge_ids}")
+            else:
+                self.log_result("Ritual User Challenges", False, f"Expected at least 2 challenges, got {len(data) if isinstance(data, list) else 'non-list'}")
+        else:
+            self.log_result("Ritual User Challenges", False, f"Status: {response.status_code if response else 'No response'}")
+        
+        # Restore original token
+        self.token = old_token
+        self.user_id = old_user_id
+        return False
+
     def run_all_tests(self):
         """Run all backend API tests"""
         print("🚀 Starting Zen Energy Bar Backend API Tests")
@@ -770,6 +996,22 @@ class ZenEnergyAPITester:
             # Restore original token
             self.token = old_token
             self.user_id = old_user_id
+        
+        # Test challenges endpoints
+        print("\n🔥 Testing Challenges & Streaks Endpoints...")
+        self.test_challenges_list()
+        self.test_challenge_details()
+        self.test_challenge_leaderboard()
+        
+        # Test authenticated challenge endpoints if auth succeeded
+        if auth_success:
+            self.test_challenge_join()
+            self.test_challenge_checkin()
+            self.test_my_challenges()
+        
+        # Test challenges with ritual user (has existing challenge data)
+        if ritual_auth_success:
+            self.test_ritual_user_challenges()
         
         # Print summary
         print("\n" + "=" * 60)

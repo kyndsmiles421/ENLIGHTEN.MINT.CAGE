@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap, Leaf, Radio, Users } from 'lucide-react';
+import { Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap, Leaf, Radio, Users, Flame } from 'lucide-react';
 
 const FEATURES = [
   { icon: Sunrise, title: 'Daily Rituals', desc: 'Build your personalized daily practice', path: '/rituals', color: '#FCD34D' },
-  { icon: Users, title: 'Community', desc: 'Share, connect, and rise together', path: '/community', color: '#FDA4AF' },
+  { icon: Flame, title: 'Challenges', desc: 'Join group streaks and rise together', path: '/challenges', color: '#FB923C' },
+  { icon: Users, title: 'Community', desc: 'Share, connect, and inspire others', path: '/community', color: '#FDA4AF' },
   { icon: Wind, title: 'Breathing', desc: 'Guided breathwork to center your being', path: '/breathing', color: '#2DD4BF' },
   { icon: Timer, title: 'Meditation', desc: 'Timed sessions for deeper awareness', path: '/meditation', color: '#D8B4FE' },
-  { icon: Zap, title: 'Exercises', desc: 'Qigong & Tai Chi energy cultivation', path: '/exercises', color: '#FB923C' },
-  { icon: Sun, title: 'Affirmations', desc: 'AI-powered mantras for your soul', path: '/affirmations', color: '#E879F9' },
+  { icon: Zap, title: 'Exercises', desc: 'Qigong & Tai Chi energy cultivation', path: '/exercises', color: '#E879F9' },
+  { icon: Sun, title: 'Affirmations', desc: 'AI-powered mantras for your soul', path: '/affirmations', color: '#93C5FD' },
   { icon: Heart, title: 'Mood Tracker', desc: 'Map your emotional landscape', path: '/mood', color: '#F87171' },
   { icon: BookOpen, title: 'Journal', desc: 'Sacred space for your thoughts', path: '/journal', color: '#86EFAC' },
-  { icon: Headphones, title: 'Soundscapes', desc: 'Immersive ambient environments', path: '/soundscapes', color: '#93C5FD' },
+  { icon: Headphones, title: 'Soundscapes', desc: 'Immersive ambient environments', path: '/soundscapes', color: '#38BDF8' },
   { icon: Leaf, title: 'Nourishment', desc: 'Foods that uplift energy & spirit', path: '/nourishment', color: '#22C55E' },
   { icon: Radio, title: 'Frequencies', desc: 'Solfeggio & biometric healing tones', path: '/frequencies', color: '#8B5CF6' },
 ];
