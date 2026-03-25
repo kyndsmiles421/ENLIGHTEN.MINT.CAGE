@@ -8,7 +8,7 @@ import {
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
   Play, GraduationCap, Headphones, Lightbulb, Sprout,
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
-  Gamepad2
+  Gamepad2, UserPlus
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -39,6 +39,7 @@ const QUICK_ACTIONS = [
   { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
   { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
   { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
+  { icon: UserPlus, label: 'Friends', path: '/friends', color: '#3B82F6' },
   { icon: Map, label: 'Journey', path: '/journey', color: '#2DD4BF' },
   { icon: GraduationCap, label: 'Learn', path: '/learn', color: '#E879F9' },
   { icon: Gamepad2, label: 'Games', path: '/games', color: '#FB923C' },

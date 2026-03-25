@@ -41,6 +41,7 @@ const Hooponopono = lazy(() => import('./pages/Hooponopono'));
 const Journey = lazy(() => import('./pages/Journey'));
 const Learn = lazy(() => import('./pages/Learn'));
 const Games = lazy(() => import('./pages/Games'));
+const Friends = lazy(() => import('./pages/Friends'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -100,6 +101,7 @@ function AnimatedRoutes() {
             <Route path="/journey" element={<Journey />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/games" element={<Games />} />
+            <Route path="/friends" element={<Friends />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

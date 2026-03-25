@@ -28,6 +28,7 @@ const PRIMARY_NAV = [
 ];
 
 const MORE_NAV = [
+  { path: '/friends', label: 'Friends', icon: Users },
   { path: '/learn', label: 'Learn', icon: GraduationCap },
   { path: '/games', label: 'Games', icon: Gamepad2 },
   { path: '/mantras', label: 'Mantras', icon: Music },
