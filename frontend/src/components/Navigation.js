@@ -73,7 +73,7 @@ export default function Navigation() {
         <Link to="/" className="flex items-center gap-3 flex-shrink-0" data-testid="nav-logo">
           <div className="w-8 h-8 rounded-full" style={{ background: 'radial-gradient(circle, #C084FC 0%, #7C3AED 100%)' }} />
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', color: 'var(--text-primary)' }}>
-            Cosmic Zen
+            Cosmic Collective
           </span>
         </Link>
 
@@ -214,7 +214,7 @@ export default function Navigation() {
       >
         <Link to="/" className="flex items-center gap-2" data-testid="nav-logo-mobile">
           <div className="w-7 h-7 rounded-full" style={{ background: 'radial-gradient(circle, #C084FC 0%, #7C3AED 100%)' }} />
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Cosmic Zen</span>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Cosmic Collective</span>
         </Link>
         <button onClick={() => setMobileOpen(!mobileOpen)} data-testid="mobile-menu-btn" style={{ color: 'var(--text-primary)' }}>
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}

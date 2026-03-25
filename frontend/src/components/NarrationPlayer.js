@@ -23,7 +23,7 @@ const SPEEDS = [
   { value: 1.15, label: 'Brisk' },
 ];
 
-const STORAGE_KEY = 'cosmiczen_voice_prefs';
+const STORAGE_KEY = 'cosmiccollective_voice_prefs';
 
 function loadPrefs() {
   try {

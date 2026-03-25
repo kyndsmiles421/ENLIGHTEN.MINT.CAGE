@@ -1273,7 +1273,7 @@ CLASSES_DATA = [
          {"id": "l3", "title": "Binaural Beats & Brainwaves", "description": "Using stereo frequencies to entrain your brain into desired states.", "duration": "25 min", "order": 3},
          {"id": "l4", "title": "Planetary Frequencies", "description": "The music of the spheres — planetary tones for cosmic alignment.", "duration": "25 min", "order": 4},
      ]},
-    {"id": "cls-consciousness-explorer", "title": "Consciousness Explorer", "description": "A transformative journey combining all practices — mudras, yantras, tantra, frequencies, and divination — into a unified path of awakening.", "category": "advanced", "instructor": "Cosmic Zen Masters", "duration": "8 weeks", "level": "Advanced", "thumbnail": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop", "color": "#2DD4BF",
+    {"id": "cls-consciousness-explorer", "title": "Consciousness Explorer", "description": "A transformative journey combining all practices — mudras, yantras, tantra, frequencies, and divination — into a unified path of awakening.", "category": "advanced", "instructor": "Cosmic Collective Masters", "duration": "8 weeks", "level": "Advanced", "thumbnail": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop", "color": "#2DD4BF",
      "lessons": [
          {"id": "l1", "title": "The Map of Consciousness", "description": "Understanding levels of consciousness and your current state.", "duration": "25 min", "order": 1},
          {"id": "l2", "title": "Energy Mastery", "description": "Combining mudras, breathwork, and visualization for energy control.", "duration": "35 min", "order": 2},
@@ -1544,11 +1544,11 @@ async def generate_narration(req: NarrationRequest):
 # --- Health ---
 @api_router.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "Cosmic Zen API"}
+    return {"status": "ok", "service": "Cosmic Collective API"}
 
 @api_router.get("/")
 async def root():
-    return {"message": "Cosmic Zen API is alive"}
+    return {"message": "Cosmic Collective API is alive"}
 
 # --- Community ---
 @api_router.post("/community/posts")

@@ -110,14 +110,14 @@ export default function Landing() {
           >
             <p className="text-xs font-bold uppercase tracking-[0.25em] mb-6" style={{ color: 'var(--secondary)' }}>
               <Sparkles size={14} className="inline mr-2" style={{ color: 'var(--accent-gold)' }} />
-              Your Daily Sanctuary
+              A Gathering Place for Conscious Minds
             </p>
             <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              Elevate Your
-              <span className="block text-glow" style={{ color: 'var(--primary)' }}> Consciousness</span>
+              The Cosmic
+              <span className="block text-glow" style={{ color: 'var(--primary)' }}> Collective</span>
             </h1>
             <p className="text-base md:text-lg leading-relaxed max-w-md mb-10" style={{ color: 'var(--text-secondary)' }}>
-              A sacred digital space for breathing, meditation, journaling, and expanding your awareness. Let the cosmos guide your inner journey.
+              A sacred digital space for breathing, meditation, journaling, and expanding your awareness alongside like-minded souls.
             </p>
             <div className="flex flex-wrap gap-4">
               <button
