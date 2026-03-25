@@ -4,31 +4,36 @@
 Build a full-stack application for a "positive energy bar to help people de-stress and seek enlightenment and enhance conscious experiences".
 
 ## Tech Stack
-- **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion
-- **Backend**: FastAPI, Python
+- **Frontend**: React (with React.lazy/Suspense code splitting), Tailwind CSS, Shadcn UI, Framer Motion
+- **Backend**: FastAPI, Python (with asyncio.gather for concurrent DB queries)
 - **Database**: MongoDB
 - **AI**: GPT-5.2 via emergentintegrations (Emergent LLM Key)
-- **Audio**: Web Audio API (oscillators, noise generators, filters)
+- **Audio**: Web Audio API (oscillators, noise generators, filters), OpenAI TTS (tts-1-hd)
 
 ## Core Architecture
 ```
 /app/
 ├── backend/
 │   ├── server.py         # Monolithic FastAPI (all models, routes, static data)
+│   ├── data/             # External static data (mudras, yantras, tantra)
 │   └── tests/            # pytest test files
 ├── frontend/
 │   ├── src/
-│   │   ├── App.js        # Router (25 routes)
-│   │   ├── components/Navigation.js  # Primary nav + "More" dropdown
+│   │   ├── App.js        # Router with lazy-loaded pages (Suspense)
+│   │   ├── components/
+│   │   │   ├── Navigation.js      # Primary nav + "More" dropdown
+│   │   │   ├── NarrationPlayer.js # TTS with voice selection
+│   │   │   └── DeepDive.js        # AI knowledge modal
 │   │   ├── context/AuthContext.js
-│   │   └── pages/        # 22 page components
+│   │   ├── lib/api.js             # Shared axios config with timeout
+│   │   └── pages/                 # 23 page components (lazy loaded)
 ```
 
 ## Implemented Features (All Tested & Working)
 
 ### Phase 1 - Core MVP
 - JWT Authentication (register/login)
-- Breathing exercises (4-7-8, Box, Wim Hof)
+- Breathing exercises (5 patterns: Box, 4-7-8, Energizing, Wim Hof, Pranayama)
 - Meditation timer with ambient sound (Web Audio)
 - AI-powered affirmations (GPT-5.2)
 - Mood tracker with emotion logging
@@ -42,49 +47,71 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - Nourishment (energy-boosting foods)
 
 ### Phase 3 - Engagement & Social
-- Daily Ritual builder
-- Community feed (posts, likes, comments)
-- Community Challenges with streaks & leaderboards
+- Daily Ritual builder with templates
+- Community feed (posts, likes, comments, follow)
+- Community Challenges with streaks & leaderboards (7 challenges)
 
 ### Phase 4 - Spiritual Tools & Personalization
-- Oracle Divination (Tarot, Western Astrology, Chinese Astrology, I Ching, Sacred Geometry) - AI powered
-- Personalized Profile Pages (MySpace-style: cover photos, themes, music tones, avatars)
+- Oracle Divination (Tarot, Western Astrology, Chinese Astrology, I Ching, Sacred Geometry)
+- Personalized Profile Pages (MySpace-style)
 - Public profile viewing (/profile/:userId)
 
-### Phase 5 - Spiritual Practice & Learning (Latest)
-- **Mudras**: 9 sacred hand gestures with benefits, chakras, practice instructions
-- **Yantra**: 7 sacred geometric diagrams with SVG visuals, mantras, meditation guidance
-- **Tantra**: 6 practices (energy work, breathwork, mantra) with step-by-step instructions
-- **Videos**: 10 guided practice videos with category filters (placeholder thumbnails)
-- **Classes**: 5 structured courses with lessons, enrollment, progress tracking
-- **Certifications**: Auto-issued when all lessons completed, displayed in profile
-- **Audio Fix**: Real Web Audio API for Frequencies, Soundscapes, and Meditation ambient sounds
+### Phase 5 - Spiritual Practice & Learning
+- Mudras (25 sacred hand gestures with AI Deep Dive)
+- Yantra (9 sacred geometric diagrams with SVG, mantras, meditation)
+- Tantra (10 practices: energy work, breathwork, mantra)
+- Videos (10 guided practice videos with category filters)
+- Classes (5 structured courses with lessons, enrollment, certifications)
+- Audio across all pages: Web Audio API + OpenAI TTS (tts-1-hd) with voice selection
+
+### Phase 6 - Creation Studio & AI Knowledge
+- Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
+- AI-powered creation generation from user intentions
+- Community sharing of user-created content with likes
+- AI Knowledge Engine (Deep Dive): In-depth AI-generated guides on any topic
+- Voice narration (NarrationPlayer) with 9 voices, 3 speeds, persistent preferences
+
+### Phase 7 - Performance & Optimization (Latest)
+- React.lazy/Suspense code splitting — only loads pages when navigated
+- Backend Cache-Control headers on static data endpoints
+- asyncio.gather for concurrent DB queries (Dashboard stats, Profile)
+- Knowledge endpoint retry logic for transient failures
+- Shared API config with 30s default timeout
+- Health check endpoint (/api/health)
 
 ## Key API Endpoints
+- `/api/health` - service health check
 - `/api/auth/` - register, login, me
-- `/api/dashboard/stats` - user statistics
+- `/api/dashboard/stats` - user statistics (concurrent queries)
 - `/api/moods/`, `/api/journal/` - tracking
 - `/api/affirmations/generate` - AI affirmations
-- `/api/rituals/` - CRUD + completion
-- `/api/community/` - feed, posts, likes, comments, follow
-- `/api/challenges/` - join, checkin, leaderboard
+- `/api/rituals/` - CRUD + completion + history + templates
+- `/api/community/` - feed, posts, likes, comments, follow, profile
+- `/api/challenges/` - join, checkin, leaderboard, details
 - `/api/profile/` - customize, me, public/{userId}, covers
-- `/api/oracle/` - reading, zodiac, chinese-zodiac, sacred-geometry
-- `/api/mudras`, `/api/yantras`, `/api/tantra` - spiritual tools
-- `/api/videos`, `/api/classes` - content & learning
+- `/api/oracle/` - reading, zodiac, chinese-zodiac, sacred-geometry, tarot-deck
+- `/api/mudras`, `/api/yantras`, `/api/tantra` - spiritual tools (cached)
+- `/api/videos`, `/api/classes` - content & learning (cached)
 - `/api/classes/enroll`, `/api/classes/complete-lesson` - enrollment
 - `/api/certifications/my` - user certifications
-- `/api/frequencies` - healing tones
+- `/api/frequencies` - healing tones (cached)
+- `/api/exercises` - Qigong/Tai Chi (cached)
+- `/api/nourishment` - energy foods
+- `/api/creations/` - CRUD, share, like, ai-generate
+- `/api/knowledge/deep-dive` - AI knowledge generation (with retry)
+- `/api/knowledge/suggestions/{category}` - topic suggestions
+- `/api/tts/narrate` - text-to-speech generation
 
 ## Database Collections
-- users, moods, journal_entries, rituals, ritual_history
+- users, moods, journal_entries, rituals, ritual_completions
 - posts, follows, challenges, challenge_participants
 - enrollments, certifications
+- creations, knowledge_cache, affirmations
 
 ## Backlog (P1/P2)
-- P1: Guided meditation audio narration
-- P1: Exercise video demonstrations (real videos)
+- P1: Display user-created content in existing pages (Affirmations, Meditation, Rituals)
+- P1: Flesh out Videos/Classes with real content and video playback
 - P2: Weekly/monthly wellness reports
 - P2: Backend refactoring (split server.py into APIRouter modules)
+- P2: Real video content integration
 - P2: Meditation session history tracking
-- P2: Real video content integration for Videos page
