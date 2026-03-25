@@ -30,6 +30,8 @@ const PRIMARY_NAV = [
 const MORE_NAV = [
   { path: '/yoga', label: 'Yoga', icon: Flame },
   { path: '/teachings', label: 'Teachings', icon: BookOpen },
+  { path: '/wisdom-journal', label: 'Wisdom Log', icon: PenTool },
+  { path: '/numerology', label: 'Numerology', icon: Star },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
   { path: '/friends', label: 'Friends', icon: Users },
   { path: '/learn', label: 'Learn', icon: GraduationCap },

@@ -48,6 +48,8 @@ const MayanAstrology = lazy(() => import('./pages/MayanAstrology'));
 const AvatarCreator = lazy(() => import('./pages/AvatarCreator'));
 const Yoga = lazy(() => import('./pages/Yoga'));
 const Teachings = lazy(() => import('./pages/Teachings'));
+const WisdomJournal = lazy(() => import('./pages/WisdomJournal'));
+const Numerology = lazy(() => import('./pages/Numerology'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -113,6 +115,8 @@ function AnimatedRoutes() {
             <Route path="/avatar" element={<AvatarCreator />} />
             <Route path="/yoga" element={<Yoga />} />
             <Route path="/teachings" element={<Teachings />} />
+            <Route path="/wisdom-journal" element={<WisdomJournal />} />
+            <Route path="/numerology" element={<Numerology />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
