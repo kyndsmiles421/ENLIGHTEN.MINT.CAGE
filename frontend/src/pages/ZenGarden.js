@@ -370,6 +370,21 @@ function KoiPond() {
       };
     });
 
+    // Helper to convert hex to rgba for canvas compatibility
+    const hexToRgba = (hex, alpha) => {
+      let r, g, b;
+      if (hex.length === 4) {
+        r = parseInt(hex[1] + hex[1], 16);
+        g = parseInt(hex[2] + hex[2], 16);
+        b = parseInt(hex[3] + hex[3], 16);
+      } else {
+        r = parseInt(hex.slice(1, 3), 16);
+        g = parseInt(hex.slice(3, 5), 16);
+        b = parseInt(hex.slice(5, 7), 16);
+      }
+      return `rgba(${r},${g},${b},${alpha})`;
+    };
+
     const drawFish = (f) => {
       const angle = Math.atan2(f.vy, f.vx);
       const speed = Math.sqrt(f.vx * f.vx + f.vy * f.vy);
@@ -461,8 +476,8 @@ function KoiPond() {
       ctx.beginPath();
       ctx.arc(f.x, f.y, f.size * 1.8, 0, Math.PI * 2);
       const glowGrad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.size * 1.8);
-      glowGrad.addColorStop(0, `${f.base}12`);
-      glowGrad.addColorStop(1, 'transparent');
+      glowGrad.addColorStop(0, hexToRgba(f.base, 0.07));
+      glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = glowGrad;
       ctx.fill();
     };
