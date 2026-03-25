@@ -37,6 +37,7 @@ const LightTherapy = lazy(() => import('./pages/LightTherapy'));
 const ZenGarden = lazy(() => import('./pages/ZenGarden'));
 const Mantras = lazy(() => import('./pages/Mantras'));
 const Hooponopono = lazy(() => import('./pages/Hooponopono'));
+const Journey = lazy(() => import('./pages/Journey'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -93,6 +94,7 @@ function AnimatedRoutes() {
             <Route path="/zen-garden" element={<ZenGarden />} />
             <Route path="/mantras" element={<Mantras />} />
             <Route path="/hooponopono" element={<Hooponopono />} />
+            <Route path="/journey" element={<Journey />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

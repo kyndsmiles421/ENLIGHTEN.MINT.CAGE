@@ -1777,6 +1777,55 @@ async def delete_soundscape_mix(mix_id: str, user=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Not found")
     return {"deleted": True}
 
+# --- Beginner's Journey ---
+
+@api_router.get("/journey/progress")
+async def get_journey_progress(user=Depends(get_current_user)):
+    """Get user's journey progress."""
+    doc = await db.journey_progress.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not doc:
+        doc = {
+            "user_id": user["id"],
+            "completed_lessons": [],
+            "current_stage": 0,
+            "started_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.journey_progress.insert_one(doc)
+        doc.pop("_id", None)
+    return doc
+
+@api_router.post("/journey/complete-lesson")
+async def complete_journey_lesson(data: dict, user=Depends(get_current_user)):
+    """Mark a lesson as completed."""
+    lesson_id = data.get("lesson_id", "")
+    if not lesson_id:
+        raise HTTPException(status_code=400, detail="lesson_id required")
+    doc = await db.journey_progress.find_one({"user_id": user["id"]})
+    if not doc:
+        doc = {
+            "user_id": user["id"],
+            "completed_lessons": [],
+            "current_stage": 0,
+            "started_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.journey_progress.insert_one(doc)
+    completed = doc.get("completed_lessons", [])
+    if lesson_id not in completed:
+        completed.append(lesson_id)
+    # Determine current stage based on completed lessons
+    stage_counts = [4, 4, 4, 4, 4]  # lessons per stage
+    unlocked_stage = 0
+    for i, count in enumerate(stage_counts):
+        stage_lessons = [item for item in completed if item.startswith(f"s{i}-")]
+        if len(stage_lessons) >= count:
+            unlocked_stage = i + 1
+    await db.journey_progress.update_one(
+        {"user_id": user["id"]},
+        {"$set": {"completed_lessons": completed, "current_stage": unlocked_stage}},
+        upsert=True
+    )
+    return {"completed_lessons": completed, "current_stage": unlocked_stage, "lesson_id": lesson_id}
+
 # --- Custom Mantra Practices ---
 
 @api_router.get("/mantras/library")
