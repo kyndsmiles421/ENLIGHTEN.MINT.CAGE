@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap, Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap } from 'lucide-react';
+import { Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap, Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool } from 'lucide-react';
 
 const FEATURES = [
   { icon: Wind, title: 'Breathing', desc: 'Guided breathwork to center your being', path: '/breathing', color: '#2DD4BF' },
@@ -12,6 +12,7 @@ const FEATURES = [
   { icon: Triangle, title: 'Yantras', desc: 'Sacred geometric meditation diagrams', path: '/yantra', color: '#EF4444' },
   { icon: Flame, title: 'Tantra', desc: 'Expand consciousness through energy work', path: '/tantra', color: '#FCD34D' },
   { icon: Sparkles, title: 'Oracle', desc: 'Tarot, I Ching, astrology & divination', path: '/oracle', color: '#E879F9' },
+  { icon: PenTool, title: 'Create', desc: 'Write your own meditations & affirmations', path: '/create', color: '#E879F9' },
   { icon: Zap, title: 'Exercises', desc: 'Qigong & Tai Chi energy cultivation', path: '/exercises', color: '#FB923C' },
   { icon: Sunrise, title: 'Daily Rituals', desc: 'Build your personalized daily practice', path: '/rituals', color: '#FCD34D' },
   { icon: Sun, title: 'Affirmations', desc: 'AI-powered mantras for your soul', path: '/affirmations', color: '#93C5FD' },

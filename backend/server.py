@@ -1,16 +1,19 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import random
+import asyncio
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
 import jwt
+import hashlib
 import bcrypt
 from datetime import datetime, timezone, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
@@ -24,7 +27,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
-JWT_SECRET = "cosmic-zen-secret-key-2024"
+JWT_SECRET = "cosmic-zen-secret-key-2024-quantum-energy-flow"
 JWT_ALGORITHM = "HS256"
 
 app = FastAPI()
@@ -395,7 +398,7 @@ EXERCISES_DATA = [
 
 @api_router.get("/exercises")
 async def get_exercises():
-    return EXERCISES_DATA
+    return JSONResponse(content=EXERCISES_DATA, headers={"Cache-Control": "public, max-age=3600"})
 
 @api_router.post("/exercises/ai-guide")
 async def get_exercise_guide(req: AIGenerateRequest):
@@ -651,22 +654,26 @@ FREQUENCIES_DATA = [
 
 @api_router.get("/frequencies")
 async def get_frequencies():
-    return FREQUENCIES_DATA
+    return JSONResponse(content=FREQUENCIES_DATA, headers={"Cache-Control": "public, max-age=3600"})
 
 # --- Dashboard Stats ---
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(user=Depends(get_current_user)):
-    mood_count = await db.moods.count_documents({"user_id": user["id"]})
-    journal_count = await db.journal.count_documents({"user_id": user["id"]})
-    recent_moods = await db.moods.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(7)
+    # Run all queries concurrently for speed
+    uid = user["id"]
+    mood_count_t, journal_count_t, recent_moods_t, all_moods_t, all_journals_t = await asyncio.gather(
+        db.moods.count_documents({"user_id": uid}),
+        db.journal.count_documents({"user_id": uid}),
+        db.moods.find({"user_id": uid}, {"_id": 0}).sort("created_at", -1).to_list(7),
+        db.moods.find({"user_id": uid}, {"_id": 0, "created_at": 1}).to_list(1000),
+        db.journal.find({"user_id": uid}, {"_id": 0, "created_at": 1}).to_list(1000),
+    )
     
     today = datetime.now(timezone.utc).date()
     dates_active = set()
-    all_moods = await db.moods.find({"user_id": user["id"]}, {"_id": 0, "created_at": 1}).to_list(1000)
-    all_journals = await db.journal.find({"user_id": user["id"]}, {"_id": 0, "created_at": 1}).to_list(1000)
-    for m in all_moods:
+    for m in all_moods_t:
         dates_active.add(datetime.fromisoformat(m["created_at"]).date())
-    for j in all_journals:
+    for j in all_journals_t:
         dates_active.add(datetime.fromisoformat(j["created_at"]).date())
     
     streak = 0
@@ -676,10 +683,10 @@ async def get_dashboard_stats(user=Depends(get_current_user)):
         check_date -= timedelta(days=1)
     
     return {
-        "mood_count": mood_count,
-        "journal_count": journal_count,
+        "mood_count": mood_count_t,
+        "journal_count": journal_count_t,
         "streak": streak,
-        "recent_moods": recent_moods
+        "recent_moods": recent_moods_t
     }
 
 # --- Challenges ---
@@ -1189,21 +1196,21 @@ from data.mudras import MUDRAS_DATA
 
 @api_router.get("/mudras")
 async def get_mudras():
-    return MUDRAS_DATA
+    return JSONResponse(content=MUDRAS_DATA, headers={"Cache-Control": "public, max-age=3600"})
 
 # --- Yantra ---
 from data.yantras import YANTRAS_DATA
 
 @api_router.get("/yantras")
 async def get_yantras():
-    return YANTRAS_DATA
+    return JSONResponse(content=YANTRAS_DATA, headers={"Cache-Control": "public, max-age=3600"})
 
 # --- Tantra ---
 from data.tantra import TANTRA_DATA
 
 @api_router.get("/tantra")
 async def get_tantra_practices():
-    return TANTRA_DATA
+    return JSONResponse(content=TANTRA_DATA, headers={"Cache-Control": "public, max-age=3600"})
 
 # --- Videos ---
 VIDEOS_DATA = [
@@ -1221,7 +1228,7 @@ VIDEOS_DATA = [
 
 @api_router.get("/videos")
 async def get_videos():
-    return VIDEOS_DATA
+    return JSONResponse(content=VIDEOS_DATA, headers={"Cache-Control": "public, max-age=3600"})
 
 # --- Classes & Certifications ---
 CLASSES_DATA = [
@@ -1452,31 +1459,38 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
     else:
         prompt = prompt.replace("{context}", "")
 
-    try:
-        chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
-            session_id=f"knowledge-{str(uuid.uuid4())}",
-            system_message=prompt,
-        )
-        chat.with_model("openai", "gpt-5.2")
-        msg = UserMessage(text=f"Please provide a comprehensive, deeply detailed guide about: {req.topic}")
-        response = await chat.send_message(msg)
+    # Retry up to 2 times on transient failures
+    last_error = None
+    for attempt in range(2):
+        try:
+            chat = LlmChat(
+                api_key=os.getenv("EMERGENT_LLM_KEY"),
+                session_id=f"knowledge-{str(uuid.uuid4())}",
+                system_message="You are a deeply knowledgeable spiritual teacher and wellness expert. Provide thorough, well-structured guides with markdown formatting.",
+            )
+            chat.with_model("openai", "gpt-5.2")
+            msg = UserMessage(text=prompt)
+            response = await chat.send_message(msg)
 
-        result = {
-            "topic": req.topic,
-            "category": req.category,
-            "content": response,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-        }
+            result = {
+                "topic": req.topic,
+                "category": req.category,
+                "content": response,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+            }
 
-        # Cache in MongoDB
-        await db.knowledge_cache.insert_one({**result})
-        result.pop("_id", None)
-        return result
+            # Cache in MongoDB (spread to avoid _id leaking)
+            await db.knowledge_cache.insert_one({**result})
+            return result
 
-    except Exception as e:
-        logger.error(f"Knowledge AI error: {e}")
-        raise HTTPException(status_code=500, detail="Could not generate knowledge content")
+        except Exception as e:
+            last_error = e
+            logger.warning(f"Knowledge AI attempt {attempt+1} failed: {e}")
+            if attempt == 0:
+                await asyncio.sleep(1)
+
+    logger.error(f"Knowledge AI error after retries: {last_error}")
+    raise HTTPException(status_code=500, detail="Could not generate knowledge content")
 
 @api_router.get("/knowledge/suggestions/{category}")
 async def knowledge_suggestions(category: str):
@@ -1491,8 +1505,6 @@ async def knowledge_suggestions(category: str):
     return suggestions.get(category, suggestions.get("general", []))
 
 # --- Text-to-Speech Narration ---
-import hashlib
-
 tts_cache = {}
 
 @api_router.post("/tts/narrate")
@@ -1520,6 +1532,10 @@ async def generate_narration(req: NarrationRequest):
         raise HTTPException(status_code=500, detail="Could not generate narration")
 
 # --- Health ---
+@api_router.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "Cosmic Zen API"}
+
 @api_router.get("/")
 async def root():
     return {"message": "Cosmic Zen API is alive"}
@@ -1639,16 +1655,16 @@ async def get_public_profile(user_id: str):
     if not user_doc:
         raise HTTPException(status_code=404, detail="User not found")
     
-    post_count = await db.community_posts.count_documents({"user_id": user_id})
-    mood_count = await db.moods.count_documents({"user_id": user_id})
-    journal_count = await db.journal.count_documents({"user_id": user_id})
-    ritual_sessions = await db.ritual_completions.count_documents({"user_id": user_id})
-    follower_count = await db.follows.count_documents({"following_id": user_id})
-    following_count = await db.follows.count_documents({"follower_id": user_id})
-    
-    recent_posts = await db.community_posts.find(
-        {"user_id": user_id}, {"_id": 0}
-    ).sort("created_at", -1).to_list(5)
+    # Run all counts concurrently
+    post_count, mood_count, journal_count, ritual_sessions, follower_count, following_count, recent_posts = await asyncio.gather(
+        db.community_posts.count_documents({"user_id": user_id}),
+        db.moods.count_documents({"user_id": user_id}),
+        db.journal.count_documents({"user_id": user_id}),
+        db.ritual_completions.count_documents({"user_id": user_id}),
+        db.follows.count_documents({"following_id": user_id}),
+        db.follows.count_documents({"follower_id": user_id}),
+        db.community_posts.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1).to_list(5),
+    )
     
     return {
         "id": user_doc["id"],

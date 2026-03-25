@@ -6,7 +6,7 @@ import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones,
   LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio,
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
-  Flame as TantraIcon, Play, GraduationCap, ChevronDown
+  Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool
 } from 'lucide-react';
 
 const PRIMARY_NAV = [
@@ -17,10 +17,11 @@ const PRIMARY_NAV = [
   { path: '/exercises', label: 'Exercises', icon: Zap },
   { path: '/mudras', label: 'Mudras', icon: Hand },
   { path: '/oracle', label: 'Oracle', icon: Sparkles },
-  { path: '/community', label: 'Community', icon: Users },
+  { path: '/create', label: 'Create', icon: PenTool },
 ];
 
 const MORE_NAV = [
+  { path: '/community', label: 'Community', icon: Users },
   { path: '/yantra', label: 'Yantra', icon: Triangle },
   { path: '/tantra', label: 'Tantra', icon: TantraIcon },
   { path: '/rituals', label: 'Rituals', icon: Sunrise },

@@ -70,7 +70,7 @@ export default function Create() {
     try {
       const res = await axios.post(`${API}/creations/ai-generate`, {
         type, intention: aiIntention.trim(),
-      }, { headers: authHeaders });
+      }, { headers: authHeaders, timeout: 60000 });
       setContent(res.data.content);
       setTitle(`${typeConfig.label}: ${aiIntention.trim().substring(0, 40)}`);
       toast.success('AI created your practice!');

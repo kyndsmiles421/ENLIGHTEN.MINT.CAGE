@@ -16,7 +16,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
     setOpen(true);
     setLoading(true);
     try {
-      const res = await axios.post(`${API}/knowledge/deep-dive`, { topic, category, context });
+      const res = await axios.post(`${API}/knowledge/deep-dive`, { topic, category, context }, { timeout: 90000 });
       setContent(res.data.content);
     } catch {
       setContent('Unable to generate content at this time. Please try again.');

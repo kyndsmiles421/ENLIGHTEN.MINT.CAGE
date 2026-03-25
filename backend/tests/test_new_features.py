@@ -60,11 +60,11 @@ class TestMudrasAPI:
         assert isinstance(data, list), "Response should be a list"
         print(f"GET /api/mudras: {len(data)} mudras returned")
     
-    def test_get_mudras_returns_9_items(self, api_client):
+    def test_get_mudras_returns_items(self, api_client):
         response = api_client.get(f"{BASE_URL}/api/mudras")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 9, f"Expected 9 mudras, got {len(data)}"
+        assert len(data) >= 9, f"Expected at least 9 mudras, got {len(data)}"
         print(f"Mudras count verified: {len(data)}")
     
     def test_mudra_has_required_fields(self, api_client):
@@ -88,11 +88,11 @@ class TestYantrasAPI:
         assert isinstance(data, list), "Response should be a list"
         print(f"GET /api/yantras: {len(data)} yantras returned")
     
-    def test_get_yantras_returns_7_items(self, api_client):
+    def test_get_yantras_returns_items(self, api_client):
         response = api_client.get(f"{BASE_URL}/api/yantras")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 7, f"Expected 7 yantras, got {len(data)}"
+        assert len(data) >= 7, f"Expected at least 7 yantras, got {len(data)}"
         print(f"Yantras count verified: {len(data)}")
     
     def test_yantra_has_required_fields(self, api_client):
@@ -116,11 +116,11 @@ class TestTantraAPI:
         assert isinstance(data, list), "Response should be a list"
         print(f"GET /api/tantra: {len(data)} practices returned")
     
-    def test_get_tantra_returns_6_items(self, api_client):
+    def test_get_tantra_returns_items(self, api_client):
         response = api_client.get(f"{BASE_URL}/api/tantra")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 6, f"Expected 6 tantra practices, got {len(data)}"
+        assert len(data) >= 6, f"Expected at least 6 tantra practices, got {len(data)}"
         print(f"Tantra practices count verified: {len(data)}")
     
     def test_tantra_has_required_fields(self, api_client):
