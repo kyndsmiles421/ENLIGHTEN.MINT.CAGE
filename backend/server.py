@@ -3898,6 +3898,89 @@ async def get_daily_card(user=Depends(get_current_user_optional)):
     return {"card": details}
 
 
+PLANETARY_PERIODS = [
+    {"planet": "Mercury", "meaning": "Communication, learning, short trips, mental activity, new information", "color": "#22C55E", "focus": "Mind & Communication"},
+    {"planet": "Venus", "meaning": "Love, relationships, beauty, art, social connections, money", "color": "#FDA4AF", "focus": "Love & Beauty"},
+    {"planet": "Mars", "meaning": "Action, ambition, competition, physical energy, courage, conflict", "color": "#EF4444", "focus": "Action & Drive"},
+    {"planet": "Jupiter", "meaning": "Expansion, abundance, luck, travel, higher learning, wisdom", "color": "#8B5CF6", "focus": "Growth & Abundance"},
+    {"planet": "Saturn", "meaning": "Discipline, karma, life lessons, health, structure, endings", "color": "#6B7280", "focus": "Lessons & Structure"},
+    {"planet": "Uranus", "meaning": "Sudden changes, psychic development, liberation, surprises, real estate", "color": "#06B6D4", "focus": "Change & Liberation"},
+    {"planet": "Neptune", "meaning": "Spirituality, travel by water, dreams, secrets, institutions, hidden influences", "color": "#93C5FD", "focus": "Spirit & Mystery"},
+]
+
+# All 52 cards + Joker in the Grand Solar Spread natural order
+GRAND_SOLAR_ORDER = [
+    "AH","2H","3H","4H","5H","6H","7H","8H","9H","10H","JH","QH","KH",
+    "AC","2C","3C","4C","5C","6C","7C","8C","9C","10C","JC","QC","KC",
+    "AD","2D","3D","4D","5D","6D","7D","8D","9D","10D","JD","QD","KD",
+    "AS","2S","3S","4S","5S","6S","7S","8S","9S","10S","JS","QS","KS",
+]
+
+def get_yearly_spread(birth_month, birth_day, birth_year):
+    from datetime import date
+    today = date.today()
+    birth_card = get_birth_card(birth_month, birth_day)
+    age = today.year - birth_year
+    if (today.month, today.day) < (birth_month, birth_day):
+        age -= 1
+    card_year = max(0, age)
+
+    birth_sv = 55 - (2 * birth_month + birth_day)
+    if birth_card in GRAND_SOLAR_ORDER:
+        birth_pos = GRAND_SOLAR_ORDER.index(birth_card)
+    else:
+        birth_pos = 0
+
+    periods = []
+    birthday_this_year = date(today.year, birth_month, min(birth_day, 28))
+    if birthday_this_year > today:
+        birthday_this_year = date(today.year - 1, birth_month, min(birth_day, 28))
+
+    for i, pp in enumerate(PLANETARY_PERIODS):
+        offset = (birth_pos + card_year * 7 + i * 3 + birth_sv) % 52
+        period_card_code = GRAND_SOLAR_ORDER[offset]
+        period_card = get_card_details(period_card_code)
+
+        from datetime import timedelta
+        period_start = birthday_this_year + timedelta(days=i * 52)
+        period_end = period_start + timedelta(days=51)
+
+        is_current = period_start <= today <= period_end
+
+        periods.append({
+            "period_number": i + 1,
+            "planet": pp["planet"],
+            "planet_meaning": pp["meaning"],
+            "planet_color": pp["color"],
+            "focus": pp["focus"],
+            "card": period_card,
+            "start_date": period_start.isoformat(),
+            "end_date": period_end.isoformat(),
+            "is_current": is_current,
+        })
+
+    current_period = next((p for p in periods if p["is_current"]), periods[0])
+
+    return {
+        "birth_card": get_card_details(birth_card),
+        "age": card_year,
+        "card_year": card_year + 1,
+        "year_start": birthday_this_year.isoformat(),
+        "periods": periods,
+        "current_period": current_period,
+    }
+
+
+@api_router.get("/cardology/yearly-spread")
+async def get_yearly_spread_reading(month: int, day: int, birth_year: int):
+    if month < 1 or month > 12 or day < 1 or day > 31:
+        raise HTTPException(status_code=400, detail="Invalid date")
+    if birth_year < 1900 or birth_year > 2025:
+        raise HTTPException(status_code=400, detail="Invalid birth year")
+    spread = get_yearly_spread(month, day, birth_year)
+    return {"spread": spread}
+
+
 # ========== DAILY CHALLENGES ==========
 
 CHALLENGE_POOL = [

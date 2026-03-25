@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Heart, Sparkles, Star, Sun, Moon, Flame, Compass, ChevronRight, RefreshCw } from 'lucide-react';
+import { Heart, Sparkles, Star, Sun, Moon, Flame, Compass, ChevronRight, RefreshCw, Calendar, Loader2 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -339,8 +339,168 @@ function DailyCard() {
   );
 }
 
+function YearlySpread() {
+  const [month, setMonth] = useState('');
+  const [day, setDay] = useState('');
+  const [birthYear, setBirthYear] = useState('');
+  const [spread, setSpread] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const calculate = async () => {
+    if (!month || !day || !birthYear) return;
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}/cardology/yearly-spread?month=${month}&day=${day}&birth_year=${birthYear}`);
+      setSpread(res.data.spread);
+    } catch { }
+    setLoading(false);
+  };
+
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <div data-testid="yearly-spread">
+      <div className="glass-card p-6 mb-6">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#D8B4FE' }}>
+          <Calendar size={12} className="inline mr-1" /> Your Yearly Spread
+        </p>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+          Based on Robert Lee Camp's "Cards of Your Destiny" — your birth card moves through 7 planetary periods each year, each lasting 52 days.
+        </p>
+        <div className="flex gap-3 items-end flex-wrap">
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Month</p>
+            <select value={month} onChange={e => setMonth(e.target.value)} className="input-glass text-sm" data-testid="yearly-month">
+              <option value="">--</option>
+              {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m, i) => (
+                <option key={i+1} value={i+1}>{m}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Day</p>
+            <select value={day} onChange={e => setDay(e.target.value)} className="input-glass text-sm" data-testid="yearly-day">
+              <option value="">--</option>
+              {Array.from({ length: 31 }, (_, i) => <option key={i+1} value={i+1}>{i+1}</option>)}
+            </select>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Birth Year</p>
+            <select value={birthYear} onChange={e => setBirthYear(e.target.value)} className="input-glass text-sm" data-testid="yearly-year">
+              <option value="">--</option>
+              {Array.from({ length: 80 }, (_, i) => <option key={i} value={currentYear - i}>{currentYear - i}</option>)}
+            </select>
+          </div>
+          <button onClick={calculate} disabled={loading || !month || !day || !birthYear}
+            className="px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2"
+            style={{ background: 'rgba(192,132,252,0.1)', color: '#D8B4FE', border: '1px solid rgba(192,132,252,0.15)' }}
+            data-testid="yearly-calculate">
+            {loading ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+            Reveal
+          </button>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {spread && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} data-testid="yearly-spread-result">
+            {/* Birth Card + Year Info */}
+            <div className="flex items-center gap-5 mb-8">
+              <CardVisual card={spread.birth_card} size="sm" />
+              <div>
+                <p className="text-xs uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Card Year {spread.card_year} &middot; Age {spread.age}
+                </p>
+                <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                  {spread.birth_card.title}
+                </p>
+                <p className="text-xs italic" style={{ color: spread.birth_card.suit_theme?.color }}>
+                  "{spread.birth_card.keyword}"
+                </p>
+              </div>
+            </div>
+
+            {/* 7 Planetary Periods */}
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
+              7 Planetary Periods
+            </p>
+            <div className="space-y-4">
+              {spread.periods.map((period, i) => {
+                const start = new Date(period.start_date);
+                const end = new Date(period.end_date);
+                const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return (
+                  <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
+                    className={`glass-card p-5 ${period.is_current ? 'ring-1' : ''}`}
+                    style={{ borderColor: period.is_current ? `${period.planet_color}30` : 'rgba(255,255,255,0.06)',
+                      ringColor: period.is_current ? period.planet_color : 'transparent' }}
+                    data-testid={`period-${i+1}`}>
+                    <div className="flex items-start gap-4">
+                      <div className="flex flex-col items-center flex-shrink-0" style={{ minWidth: 48 }}>
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold"
+                          style={{ background: `${period.planet_color}15`, color: period.planet_color, border: `1px solid ${period.planet_color}25` }}>
+                          {period.period_number}
+                        </div>
+                        {period.is_current && (
+                          <span className="text-[8px] mt-1 px-1.5 py-0.5 rounded-full font-bold uppercase"
+                            style={{ background: `${period.planet_color}20`, color: period.planet_color }}>
+                            Now
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-medium" style={{ color: period.planet_color }}>{period.planet}</p>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)' }}>
+                            {fmt(start)} — {fmt(end)}
+                          </span>
+                        </div>
+                        <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>{period.focus}</p>
+                        <div className="flex items-start gap-3">
+                          <CardVisual card={period.card} size="sm" />
+                          <div>
+                            <p className="text-sm font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                              {period.card.title}
+                            </p>
+                            <p className="text-xs italic mb-2" style={{ color: period.card.suit_theme?.color }}>"{period.card.keyword}"</p>
+                            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                              {period.card.desc?.slice(0, 150)}...
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-xs mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{period.planet_meaning}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Current Period Highlight */}
+            {spread.current_period && (
+              <div className="glass-card p-6 mt-6" style={{ borderColor: `${spread.current_period.planet_color}20` }}>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: spread.current_period.planet_color }}>
+                  Your Current Period: {spread.current_period.planet}
+                </p>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+                  {spread.current_period.planet_meaning}
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                  <strong style={{ color: spread.current_period.card.suit_theme?.color }}>{spread.current_period.card.title}</strong> governs this period.{' '}
+                  {spread.current_period.card.life}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 const TABS = [
   { id: 'birth', label: 'Birth Card', icon: Sun },
+  { id: 'yearly', label: 'Yearly Spread', icon: Calendar },
   { id: 'daily', label: 'Daily Card', icon: Sparkles },
   { id: 'love', label: 'Love Match', icon: Heart },
 ];
@@ -387,6 +547,7 @@ export default function Cardology() {
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             {tab === 'birth' && <BirthCardCalculator />}
+            {tab === 'yearly' && <YearlySpread />}
             {tab === 'daily' && <DailyCard />}
             {tab === 'love' && <CompatibilityChecker />}
           </motion.div>
