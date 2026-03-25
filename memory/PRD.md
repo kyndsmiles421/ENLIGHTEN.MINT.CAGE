@@ -1,4 +1,4 @@
-# Cosmic Zen - Positive Energy Bar
+# The Cosmic Collective - Positive Energy Bar
 
 ## Original Problem Statement
 Build a full-stack application for a "positive energy bar to help people de-stress and seek enlightenment and enhance conscious experiences".
@@ -64,6 +64,16 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - Classes (5 structured courses with lessons, enrollment, certifications)
 - Audio across all pages: Web Audio API + OpenAI TTS (tts-1-hd) with voice selection
 
+### Phase 9 - Mudras Visual Enhancement (Feb 2026)
+- 25 unique AI-generated images for each mudra showing correct hand positions
+- Embedded YouTube tutorial videos for each individual mudra
+- New visual gallery layout with image cards (replaced generic Hand icon)
+- Category filter buttons (All, Meditation, Healing, Energy, Devotional)
+- Detail modal with 3 tabs: Overview, How to Practice, Watch Video
+- Hand Position quick-reference descriptions for each mudra
+- YouTube iframe embedding with "Watch Tutorial" button
+- NarrationPlayer and DeepDive AI tools accessible from practice tab
+
 ### Phase 6 - Creation Studio & AI Knowledge
 - Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
 - AI-powered creation generation from user intentions
@@ -117,8 +127,11 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - enrollments, certifications
 - creations, knowledge_cache, affirmations
 
-## Backlog (P1/P2)
-- P1: Display user-created content in existing pages (Affirmations, Meditation, Rituals)
+## Backlog (P0/P1/P2)
+- P0: Display user-created content in existing pages (Affirmations, Meditation, Rituals) - integrate /api/creations/mine
+- P1: Certifications page/section in user profile to view earned certificates
+- P1: Backend refactoring (split server.py into APIRouter modules)
+- P2: User-uploaded audio/video content for meditations and rituals
+- P2: Recommended "Beginner's Journey" learning path
 - P2: Weekly/monthly wellness reports
-- P2: Backend refactoring (split server.py into APIRouter modules)
 - P2: Meditation session history tracking
