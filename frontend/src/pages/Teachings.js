@@ -19,6 +19,7 @@ const TRADITION_ICONS = {
   'Kriya Yoga / Vedanta': '&#2384;',
   'Hindu-inspired / Universal Spirituality': '&#10084;',
   'Zen / Comparative Mysticism': '&#8734;',
+  'Ancient Egyptian Mysticism / Hermeticism': '&#9883;',
 };
 
 function TeacherCard({ teacher, onClick }) {

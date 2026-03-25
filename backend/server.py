@@ -4741,19 +4741,49 @@ SPIRITUAL_TEACHERS = [
             "No one is more dangerously insane than one who is sane all the time.",
             "To have faith is to trust yourself to the water. When you swim you don't grab hold of the water, because if you do you will sink and drown."
         ]
+    },
+    {
+        "id": "thoth",
+        "name": "Thoth / Hermes Trismegistus",
+        "tradition": "Ancient Egyptian Mysticism / Hermeticism",
+        "era": "~3000 BCE (mythic) / 2nd–3rd Century CE (Corpus Hermeticum)",
+        "color": "#D4AF37",
+        "image": "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=400&h=400&fit=crop",
+        "bio": "Thoth (Djehuty) is the Egyptian god of wisdom, writing, magic, and the moon — credited with inventing hieroglyphs, science, and the sacred arts. Later merged with the Greek Hermes as 'Hermes Trismegistus' (Thrice-Great), his teachings became the foundation of Hermeticism, alchemy, and Western esoteric tradition. The Emerald Tablet and Corpus Hermeticum carry his attributed wisdom across millennia.",
+        "core_principle": "As above, so below; as within, so without — the microcosm reflects the macrocosm, and understanding one reveals the other.",
+        "themes": ["consciousness", "nature", "harmony", "mysticism", "alchemy"],
+        "teachings": [
+            {"id": "emerald-tablet", "title": "The Emerald Tablet", "content": "'That which is Below corresponds to that which is Above, and that which is Above corresponds to that which is Below, to accomplish the miracle of the One Thing.'\n\nThe Emerald Tablet is the most famous Hermetic text — a dense, cryptic formula for spiritual transformation. Its central teaching: the universe is a hologram, where every part contains the whole. Your body mirrors the cosmos. Your mind mirrors the divine mind. By understanding yourself, you understand everything. By transforming yourself, you transform your world.\n\n'The Sun is its father, the Moon its mother, the Wind hath carried it in its belly, the Earth is its nurse.' This alchemical language describes the creation of the Philosopher's Stone — which is not a physical object but the perfected human consciousness.", "practice": "Sit in stillness and contemplate: 'As above, so below.' Feel how the patterns in your life mirror larger cosmic patterns. What truth about the universe is your life reflecting right now?"},
+            {"id": "seven-principles", "title": "The Seven Hermetic Principles", "content": "The Kybalion, attributed to Hermetic tradition, outlines seven universal laws:\n\n1. MENTALISM: 'The All is Mind; the Universe is Mental.' — Reality is consciousness, not matter.\n2. CORRESPONDENCE: 'As above, so below.' — Patterns repeat across all scales of existence.\n3. VIBRATION: 'Nothing rests; everything moves; everything vibrates.' — All matter is energy in motion.\n4. POLARITY: 'Everything is dual; everything has poles; opposites are identical in nature, differing only in degree.' — Heat and cold are the same thing at different vibrations.\n5. RHYTHM: 'Everything flows, out and in; everything has its tides.' — There are cycles in all things.\n6. CAUSE AND EFFECT: 'Every cause has its effect; every effect has its cause.' — Nothing happens by chance.\n7. GENDER: 'Gender is in everything; everything has its masculine and feminine principles.' — Creation requires both receptive and projective forces.\n\nThese principles are not beliefs but observations about how reality operates at every level.", "practice": "Choose one Hermetic Principle. Spend the day observing it in action — in nature, in your relationships, in your own mind."},
+            {"id": "book-of-dead", "title": "The Book of Coming Forth by Day", "content": "Mistranslated as 'The Book of the Dead,' this collection of Egyptian funerary texts is actually a guide for spiritual transformation — a manual for the soul's journey through the afterlife (Duat) and its return to the light.\n\nThe Weighing of the Heart: Before Osiris, the deceased's heart is weighed against Ma'at's feather of truth. A heart heavy with regret, deception, or cruelty cannot pass. Only the light heart — one that has lived in truth — achieves immortality.\n\nThe 42 Negative Confessions are not sins to avoid but virtues to embody: 'I have not caused suffering. I have not told lies. I have not caused anyone to weep. I have not been angry without just cause.'\n\nThis is not about death — it is about how to live so that your heart is light.", "practice": "Imagine your heart being weighed against the feather of truth. What would make it heavy? What can you release today to make it lighter?"},
+            {"id": "divine-mind", "title": "The Divine Mind — Nous", "content": "'God is not mind, but the cause that mind exists. God is not spirit, but the cause that spirit exists. God is not light, but the cause that light exists.'\n\nIn the Corpus Hermeticum, Thoth/Hermes teaches his student Tat that the ultimate reality (The All) is beyond all categories — beyond being and non-being. Yet this incomprehensible source expresses itself through Mind (Nous), which is the first emanation of God.\n\nHumans are unique in creation because we possess Nous — divine intellect. This is not ordinary thinking but the capacity to know God directly. Most humans are 'asleep' — identified with the body and senses. Awakening means remembering that your truest nature is this divine Mind itself.\n\n'If you do not make yourself equal to God, you cannot understand God; for like is understood by like.'", "practice": "Move beyond thinking and try to sense the awareness behind your thoughts — the Nous. This is not the mind that thinks but the Mind that knows."},
+            {"id": "alchemy", "title": "The Great Work — Spiritual Alchemy", "content": "'Solve et Coagula' — Dissolve and Recombine.\n\nAlchemy is not about turning lead into gold. It is about turning the 'lead' of unconscious, conditioned existence into the 'gold' of awakened consciousness. The stages of the Great Work mirror psychological and spiritual transformation:\n\n1. NIGREDO (Blackening): The dark night of the soul. Old structures dissolve. You face your shadow.\n2. ALBEDO (Whitening): Purification. You separate truth from illusion. Clarity emerges.\n3. CITRINITAS (Yellowing): The dawn. Wisdom integrates with experience. The spiritual sun rises within.\n4. RUBEDO (Reddening): The Philosopher's Stone. The fully integrated human — matter and spirit unified. You become the gold.\n\nEvery crisis in your life is an alchemical process. The question is: will you resist the transformation or surrender to it?", "practice": "Reflect on a current challenge. Which alchemical stage are you in? How can you cooperate with the transformation instead of resisting it?"}
+        ],
+        "quotes": [
+            "As above, so below; as within, so without; as the universe, so the soul.",
+            "The lips of wisdom are closed, except to the ears of understanding.",
+            "Master your words. Master your thoughts. Never allow your body to do anything that degrades your soul.",
+            "Close your eyes and let the mind expand. Let no fear of death or darkness arrest its course.",
+            "The universe is mental — held in the Mind of the All.",
+            "True silence is the rest of the mind, and is to the spirit what sleep is to the body — nourishment and refreshment.",
+            "If you would know the invisible, look carefully at the visible.",
+            "Men are mortal gods, and gods are immortal men."
+        ]
     }
 ]
 
 TEACHING_THEMES = {
     "love": {"label": "Love & Devotion", "color": "#FB923C", "teachers": ["buddha", "jesus", "rumi", "krishna", "ramdass"]},
     "suffering": {"label": "Suffering & Transformation", "color": "#EF4444", "teachers": ["buddha", "rumi", "jesus", "thich-nhat-hanh"]},
-    "consciousness": {"label": "Consciousness & Awakening", "color": "#A78BFA", "teachers": ["buddha", "krishna", "watts", "yogananda", "ramdass"]},
+    "consciousness": {"label": "Consciousness & Awakening", "color": "#A78BFA", "teachers": ["buddha", "krishna", "watts", "yogananda", "ramdass", "thoth"]},
     "mindfulness": {"label": "Mindfulness & Presence", "color": "#22C55E", "teachers": ["buddha", "thich-nhat-hanh", "ramdass", "watts"]},
     "surrender": {"label": "Surrender & Trust", "color": "#3B82F6", "teachers": ["muhammad", "krishna", "rumi", "laotzu"]},
     "compassion": {"label": "Compassion & Service", "color": "#EC4899", "teachers": ["buddha", "jesus", "muhammad", "thich-nhat-hanh"]},
     "impermanence": {"label": "Impermanence & Change", "color": "#06B6D4", "teachers": ["buddha", "laotzu", "watts", "ramdass"]},
-    "nature": {"label": "Nature & Harmony", "color": "#2DD4BF", "teachers": ["laotzu", "watts", "thich-nhat-hanh"]},
+    "nature": {"label": "Nature & Harmony", "color": "#2DD4BF", "teachers": ["laotzu", "watts", "thich-nhat-hanh", "thoth"]},
     "simplicity": {"label": "Simplicity & Letting Go", "color": "#FCD34D", "teachers": ["laotzu", "thich-nhat-hanh", "watts", "yogananda"]},
+    "mysticism": {"label": "Mysticism & Alchemy", "color": "#D4AF37", "teachers": ["thoth", "rumi", "yogananda", "krishna"]},
+    "alchemy": {"label": "Sacred Transformation", "color": "#C084FC", "teachers": ["thoth", "rumi", "buddha", "jesus"]},
 }
 
 @api_router.get("/teachings/teachers")
@@ -4824,6 +4854,27 @@ Write in second person ("you"), present tense. Keep it under 300 words. Make it 
         return {"contemplation": response, "teacher": teacher["name"], "teaching": teaching["title"]}
     except Exception as e:
         return {"contemplation": f"Close your eyes and breathe deeply. Reflect on this teaching from {teacher['name']}:\n\n{teaching['content']}\n\nLet this wisdom settle into your heart. Consider: {teaching['practice']}", "teacher": teacher["name"], "teaching": teaching["title"], "fallback": True}
+
+
+@api_router.get("/teachings/daily-wisdom")
+async def get_daily_wisdom():
+    today = datetime.now(timezone.utc)
+    day_seed = today.year * 1000 + today.timetuple().tm_yday
+    rng = random.Random(day_seed)
+    teacher = rng.choice(SPIRITUAL_TEACHERS)
+    teaching = rng.choice(teacher["teachings"])
+    quote = rng.choice(teacher["quotes"])
+    return {
+        "teacher_id": teacher["id"],
+        "teacher_name": teacher["name"],
+        "tradition": teacher["tradition"],
+        "color": teacher["color"],
+        "quote": quote,
+        "teaching_title": teaching["title"],
+        "teaching_excerpt": teaching["content"][:200] + "...",
+        "practice": teaching.get("practice", ""),
+        "date": today.strftime("%Y-%m-%d"),
+    }
 
 
 app.include_router(api_router)

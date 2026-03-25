@@ -8,7 +8,7 @@ import {
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
   Play, GraduationCap, Headphones, Lightbulb, Sprout,
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
-  Gamepad2, UserPlus, Check
+  Gamepad2, UserPlus, Check, Quote
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -54,6 +54,7 @@ export default function Dashboard() {
   const [recs, setRecs] = useState(null);
   const [streak, setStreak] = useState(null);
   const [dailyChallenge, setDailyChallenge] = useState(null);
+  const [dailyWisdom, setDailyWisdom] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function Dashboard() {
         axios.get(`${API}/recommendations`, { headers: authHeaders }).then(res => setRecs(res.data)).catch(() => {}),
         axios.post(`${API}/streak/checkin`, {}, { headers: authHeaders }).then(res => setStreak(res.data)).catch(() => axios.get(`${API}/streak`, { headers: authHeaders }).then(r => setStreak(r.data)).catch(() => {})),
         axios.get(`${API}/daily-challenge`, { headers: authHeaders }).then(res => setDailyChallenge(res.data)).catch(() => {}),
+        axios.get(`${API}/teachings/daily-wisdom`).then(res => setDailyWisdom(res.data)).catch(() => {}),
       ]).finally(() => setLoading(false));
     }
   }, [user, authLoading, authHeaders, navigate]);
@@ -155,6 +157,43 @@ export default function Dashboard() {
                   +{dailyChallenge.challenge.xp} XP
                 </span>
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Recent Moods */}
+        {dailyWisdom && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
+            className="glass-card p-6 mb-12 cursor-pointer hover:scale-[1.01] transition-transform"
+            onClick={() => navigate('/teachings')}
+            data-testid="dashboard-daily-wisdom">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${dailyWisdom.color}12`, border: `1px solid ${dailyWisdom.color}15` }}>
+                <Quote size={20} style={{ color: dailyWisdom.color }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.15em] mb-1.5" style={{ color: dailyWisdom.color }}>
+                  Daily Wisdom &middot; {dailyWisdom.teacher_name}
+                </p>
+                <p className="text-sm italic leading-relaxed mb-2" style={{ color: 'var(--text-primary)' }}>
+                  "{dailyWisdom.quote}"
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: `${dailyWisdom.color}08`, color: dailyWisdom.color }}>
+                    {dailyWisdom.tradition}
+                  </span>
+                  <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                    {dailyWisdom.teaching_title}
+                  </span>
+                </div>
+                {dailyWisdom.practice && (
+                  <p className="text-xs mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    {dailyWisdom.practice}
+                  </p>
+                )}
+              </div>
+              <ChevronRight size={14} className="flex-shrink-0 mt-1" style={{ color: 'var(--text-muted)' }} />
             </div>
           </motion.div>
         )}
