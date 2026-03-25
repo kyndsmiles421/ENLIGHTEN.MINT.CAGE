@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import {
   Users, Search, UserPlus, UserCheck, MessageCircle, Share2,
   Clock, Send, ArrowLeft, X, ChevronRight, Flame, Check,
-  Heart, Sparkles, Trophy, Zap, BookOpen, Timer, XCircle
+  Heart, Sparkles, Trophy, Zap, BookOpen, Timer, XCircle, Loader2
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -20,6 +20,7 @@ const ACTIVITY_ICONS = {
   share_score: Sparkles,
   share_milestone: Zap,
   share_tool: Heart,
+  challenge_complete: Trophy,
 };
 
 const ACTIVITY_COLORS = {
@@ -30,6 +31,7 @@ const ACTIVITY_COLORS = {
   share_score: '#D8B4FE',
   share_milestone: '#2DD4BF',
   share_tool: '#FDA4AF',
+  challenge_complete: '#FCD34D',
 };
 
 function AvatarBubble({ style, name, size = 36, color }) {
@@ -48,7 +50,8 @@ function AvatarBubble({ style, name, size = 36, color }) {
   );
 }
 
-function UserCard({ u, onAction, actionLabel, actionIcon: ActionIcon, loading, actionColor }) {
+function UserCard({ u, onAction, actionLabel, actionIcon: ActionIcon, loading, actionColor, onMessage, showMessageBtn }) {
+  const canMessage = u.message_privacy !== 'nobody' && !(u.message_privacy === 'friends_only' && !u.is_friend);
   return (
     <div className="glass-card p-4 flex items-center gap-3">
       <AvatarBubble style={u.avatar_style} name={u.display_name || u.name} color={u.theme_color} />
@@ -57,28 +60,46 @@ function UserCard({ u, onAction, actionLabel, actionIcon: ActionIcon, loading, a
         {u.vibe_status && <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>{u.vibe_status}</p>}
         {u.streak > 0 && <p className="text-[10px] flex items-center gap-1" style={{ color: '#FCD34D' }}><Flame size={9} /> {u.streak} day streak</p>}
       </div>
-      {onAction && (
-        <button onClick={() => onAction(u)} disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-          style={{ background: `${actionColor || '#D8B4FE'}12`, color: actionColor || '#D8B4FE', border: `1px solid ${actionColor || '#D8B4FE'}20` }}
-          data-testid={`action-${u.id}`}>
-          {ActionIcon && <ActionIcon size={12} />} {actionLabel}
-        </button>
-      )}
+      <div className="flex items-center gap-1.5">
+        {showMessageBtn && canMessage && (
+          <button onClick={() => onMessage?.(u)}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+            style={{ background: 'rgba(59,130,246,0.08)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.15)' }}
+            data-testid={`msg-user-${u.id}`}>
+            <MessageCircle size={11} />
+          </button>
+        )}
+        {showMessageBtn && !canMessage && u.message_privacy === 'nobody' && (
+          <span className="text-[9px] px-2 py-1 rounded-full" style={{ background: 'rgba(239,68,68,0.06)', color: '#EF4444' }}>DMs off</span>
+        )}
+        {showMessageBtn && !canMessage && u.message_privacy === 'friends_only' && !u.is_friend && (
+          <span className="text-[9px] px-2 py-1 rounded-full" style={{ background: 'rgba(252,211,77,0.06)', color: '#FCD34D' }}>Friends only</span>
+        )}
+        {onAction && (
+          <button onClick={() => onAction(u)} disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            style={{ background: `${actionColor || '#D8B4FE'}12`, color: actionColor || '#D8B4FE', border: `1px solid ${actionColor || '#D8B4FE'}20` }}
+            data-testid={`action-${u.id}`}>
+            {ActionIcon && <ActionIcon size={12} />} {actionLabel}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
 /* ========== FIND TAB ========== */
-function FindTab({ authHeaders }) {
+function FindTab({ authHeaders, onMessage }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [suggested, setSuggested] = useState([]);
+  const [discover, setDiscover] = useState([]);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef(null);
 
   useEffect(() => {
     axios.get(`${API}/friends/suggested`, { headers: authHeaders }).then(r => setSuggested(r.data.suggested)).catch(() => {});
+    axios.get(`${API}/users/discover`, { headers: authHeaders }).then(r => setDiscover(r.data.users)).catch(() => {});
   }, [authHeaders]);
 
   useEffect(() => {
@@ -99,6 +120,7 @@ function FindTab({ authHeaders }) {
       toast.success(res.data.message);
       setResults(prev => prev.map(r => r.id === u.id ? { ...r, is_pending: true } : r));
       setSuggested(prev => prev.map(s => s.id === u.id ? { ...s, is_pending: true } : s));
+      setDiscover(prev => prev.map(d => d.id === u.id ? { ...d, is_pending: true } : d));
     } catch (e) {
       toast.error(e.response?.data?.detail || 'Failed to send request');
     }
@@ -122,6 +144,7 @@ function FindTab({ authHeaders }) {
               actionLabel={u.is_friend ? 'Friends' : u.is_pending ? 'Pending' : 'Add Friend'}
               actionIcon={u.is_friend ? UserCheck : u.is_pending ? Clock : UserPlus}
               actionColor={u.is_friend ? '#22C55E' : u.is_pending ? '#FCD34D' : '#D8B4FE'}
+              showMessageBtn onMessage={onMessage}
             />
           ))}
         </div>
@@ -129,24 +152,46 @@ function FindTab({ authHeaders }) {
         <p className="text-sm text-center py-8" style={{ color: 'var(--text-muted)' }}>
           {loading ? 'Searching...' : 'No users found'}
         </p>
-      ) : suggested.length > 0 ? (
-        <>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>People You May Know</p>
-          <div className="space-y-2">
-            {suggested.map(u => (
-              <UserCard key={u.id} u={u}
-                onAction={u.is_pending ? null : () => sendRequest(u)}
-                actionLabel={u.is_pending ? 'Pending' : 'Add Friend'}
-                actionIcon={u.is_pending ? Clock : UserPlus}
-                actionColor={u.is_pending ? '#FCD34D' : '#D8B4FE'}
-              />
-            ))}
-          </div>
-        </>
       ) : (
-        <p className="text-sm text-center py-8" style={{ color: 'var(--text-muted)' }}>
-          Invite friends to join The Cosmic Collective!
-        </p>
+        <>
+          {suggested.length > 0 && (
+            <>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>People You May Know</p>
+              <div className="space-y-2 mb-8">
+                {suggested.map(u => (
+                  <UserCard key={u.id} u={u}
+                    onAction={u.is_pending ? null : () => sendRequest(u)}
+                    actionLabel={u.is_pending ? 'Pending' : 'Add Friend'}
+                    actionIcon={u.is_pending ? Clock : UserPlus}
+                    actionColor={u.is_pending ? '#FCD34D' : '#D8B4FE'}
+                    showMessageBtn onMessage={onMessage}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {discover.length > 0 && (
+            <>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Discover People</p>
+              <div className="space-y-2">
+                {discover.map(u => (
+                  <UserCard key={u.id} u={u}
+                    onAction={u.is_friend ? null : u.is_pending ? null : () => sendRequest(u)}
+                    actionLabel={u.is_friend ? 'Friends' : u.is_pending ? 'Pending' : 'Add Friend'}
+                    actionIcon={u.is_friend ? UserCheck : u.is_pending ? Clock : UserPlus}
+                    actionColor={u.is_friend ? '#22C55E' : u.is_pending ? '#FCD34D' : '#D8B4FE'}
+                    showMessageBtn onMessage={onMessage}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {suggested.length === 0 && discover.length === 0 && (
+            <p className="text-sm text-center py-8" style={{ color: 'var(--text-muted)' }}>
+              Invite friends to join The Cosmic Collective!
+            </p>
+          )}
+        </>
       )}
     </div>
   );
@@ -489,9 +534,216 @@ function ShareModal({ open, onClose, authHeaders }) {
   );
 }
 
+/* ========== CHALLENGES TAB ========== */
+function ChallengesTab({ authHeaders }) {
+  const [challenge, setChallenge] = useState(null);
+  const [stats, setStats] = useState({ total_completed: 0, current_streak: 0 });
+  const [history, setHistory] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [view, setView] = useState('today');
+  const [completing, setCompleting] = useState(false);
+  const [totalXp, setTotalXp] = useState(0);
+
+  const load = useCallback(async () => {
+    try {
+      const [dailyRes, histRes, lbRes] = await Promise.all([
+        axios.get(`${API}/daily-challenge`, { headers: authHeaders }),
+        axios.get(`${API}/daily-challenge/history`, { headers: authHeaders }),
+        axios.get(`${API}/daily-challenge/leaderboard`, { headers: authHeaders }),
+      ]);
+      setChallenge(dailyRes.data.challenge);
+      setStats(dailyRes.data.stats);
+      setHistory(histRes.data.history);
+      setTotalXp(histRes.data.total_xp);
+      setLeaderboard(lbRes.data.leaderboard);
+    } catch {}
+  }, [authHeaders]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const complete = async () => {
+    setCompleting(true);
+    try {
+      const res = await axios.post(`${API}/daily-challenge/complete`, {}, { headers: authHeaders });
+      if (res.data.status === 'completed') {
+        toast.success(res.data.message);
+        setChallenge(prev => ({ ...prev, completed: true, completed_at: new Date().toISOString() }));
+        load();
+      } else {
+        toast.info('Already completed today!');
+      }
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Failed');
+    } finally { setCompleting(false); }
+  };
+
+  const CATEGORY_ICONS = { breathing: Timer, meditation: Sparkles, journaling: BookOpen, physical: Zap, movement: Flame, mindfulness: Heart, social: Users, spiritual: Sparkles, sounds: Sparkles };
+
+  if (!challenge) return <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>Loading challenge...</div>;
+
+  const CatIcon = CATEGORY_ICONS[challenge.category] || Sparkles;
+
+  return (
+    <div data-testid="challenges-tab">
+      {/* Sub-navigation */}
+      <div className="flex gap-2 mb-6">
+        {['today', 'history', 'leaderboard'].map(v => (
+          <button key={v} onClick={() => setView(v)}
+            className="text-xs px-4 py-1.5 rounded-full capitalize font-medium transition-all"
+            style={{
+              background: view === v ? 'rgba(252,211,77,0.1)' : 'rgba(255,255,255,0.02)',
+              color: view === v ? '#FCD34D' : 'var(--text-muted)',
+              border: `1px solid ${view === v ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.04)'}`,
+            }}
+            data-testid={`challenge-view-${v}`}>
+            {v}
+          </button>
+        ))}
+      </div>
+
+      {view === 'today' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          {/* Challenge Card */}
+          <div className="glass-card p-6 mb-6 relative overflow-hidden" data-testid="daily-challenge-card">
+            <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.04]"
+              style={{ background: challenge.color, filter: 'blur(40px)', transform: 'translate(30%, -30%)' }} />
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-[0.15em]"
+                style={{ background: `${challenge.color}12`, color: challenge.color, border: `1px solid ${challenge.color}20` }}>
+                <CatIcon size={10} className="inline mr-1" /> {challenge.category}
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
+                +{challenge.xp} XP
+              </span>
+              {challenge.duration > 0 && (
+                <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                  <Timer size={9} className="inline mr-0.5" /> {challenge.duration} min
+                </span>
+              )}
+            </div>
+            <h3 className="text-xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              {challenge.title}
+            </h3>
+            <p className="text-sm mb-5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              {challenge.description}
+            </p>
+
+            {challenge.completed ? (
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+                style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)' }}
+                data-testid="challenge-completed-badge">
+                <Check size={16} style={{ color: '#22C55E' }} />
+                <span className="text-sm font-medium" style={{ color: '#22C55E' }}>Completed!</span>
+                <span className="text-[10px] ml-auto" style={{ color: 'var(--text-muted)' }}>
+                  {challenge.completed_at && new Date(challenge.completed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ) : (
+              <button onClick={complete} disabled={completing}
+                className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
+                style={{ background: `${challenge.color}15`, color: challenge.color, border: `1px solid ${challenge.color}25` }}
+                data-testid="complete-challenge-btn">
+                {completing ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                {completing ? 'Completing...' : 'Mark Complete'}
+              </button>
+            )}
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="glass-card p-4 text-center">
+              <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FCD34D' }}>{stats.total_completed}</p>
+              <p className="text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Completed</p>
+            </div>
+            <div className="glass-card p-4 text-center">
+              <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#2DD4BF' }}>{totalXp}</p>
+              <p className="text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Total XP</p>
+            </div>
+            <div className="glass-card p-4 text-center">
+              <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FB923C' }}>{stats.current_streak}</p>
+              <p className="text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {view === 'history' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          {history.length === 0 ? (
+            <p className="text-sm text-center py-12" style={{ color: 'var(--text-muted)' }}>No challenges completed yet. Start today!</p>
+          ) : (
+            <div className="space-y-2">
+              {history.map(h => (
+                <div key={h.id} className="glass-card p-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: `${CATEGORY_COLORS[h.category] || '#D8B4FE'}12` }}>
+                    <Check size={14} style={{ color: CATEGORY_COLORS[h.category] || '#D8B4FE' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{h.challenge_title}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                      {new Date(h.completed_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                  <span className="text-xs font-medium" style={{ color: '#FCD34D' }}>+{h.xp_earned} XP</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {view === 'leaderboard' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          {leaderboard.length === 0 ? (
+            <p className="text-sm text-center py-12" style={{ color: 'var(--text-muted)' }}>No one on the leaderboard yet. Be the first!</p>
+          ) : (
+            <div className="space-y-2">
+              {leaderboard.map(l => (
+                <div key={l.user_id} className={`glass-card p-4 flex items-center gap-3 ${l.is_me ? 'ring-1 ring-yellow-500/20' : ''}`}
+                  data-testid={`lb-${l.rank}`}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{
+                      background: l.rank <= 3 ? ['rgba(252,211,77,0.15)', 'rgba(192,192,192,0.12)', 'rgba(205,127,50,0.12)'][l.rank - 1] : 'rgba(255,255,255,0.03)',
+                      color: l.rank <= 3 ? ['#FCD34D', '#C0C0C0', '#CD7F32'][l.rank - 1] : 'var(--text-muted)',
+                    }}>
+                    {l.rank}
+                  </div>
+                  <AvatarBubble style={l.avatar_style} name={l.display_name} size={32} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: l.is_me ? '#FCD34D' : 'var(--text-primary)' }}>
+                      {l.display_name} {l.is_me && <span className="text-[9px] opacity-60">(you)</span>}
+                    </p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{l.total_completed} challenges</p>
+                  </div>
+                  <span className="text-sm font-medium" style={{ color: '#FCD34D' }}>{l.total_xp} XP</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+const CATEGORY_COLORS = {
+  breathing: '#2DD4BF',
+  meditation: '#D8B4FE',
+  journaling: '#FCD34D',
+  physical: '#FB923C',
+  movement: '#22C55E',
+  mindfulness: '#3B82F6',
+  social: '#FDA4AF',
+  spiritual: '#C084FC',
+  sounds: '#06B6D4',
+};
+
 /* ========== MAIN PAGE ========== */
 const TABS = [
   { id: 'feed', label: 'Feed', icon: Sparkles },
+  { id: 'challenges', label: 'Challenges', icon: Trophy },
   { id: 'friends', label: 'Friends', icon: Users },
   { id: 'find', label: 'Find', icon: Search },
   { id: 'requests', label: 'Requests', icon: UserPlus },
@@ -577,8 +829,9 @@ export default function Friends() {
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
             {tab === 'feed' && <FeedTab authHeaders={authHeaders} />}
+            {tab === 'challenges' && <ChallengesTab authHeaders={authHeaders} />}
             {tab === 'friends' && <FriendsListTab authHeaders={authHeaders} onMessage={openMessage} />}
-            {tab === 'find' && <FindTab authHeaders={authHeaders} />}
+            {tab === 'find' && <FindTab authHeaders={authHeaders} onMessage={openMessage} />}
             {tab === 'requests' && <RequestsTab authHeaders={authHeaders} onUpdate={() => { setRequestCount(c => Math.max(0, c - 1)); }} />}
             {tab === 'messages' && <MessagesTab authHeaders={authHeaders} initialChat={chatTarget} onBack={() => setChatTarget(null)} />}
           </motion.div>

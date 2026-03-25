@@ -8,7 +8,7 @@ import {
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
   Play, GraduationCap, Headphones, Lightbulb, Sprout,
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
-  Gamepad2, UserPlus
+  Gamepad2, UserPlus, Check
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -35,7 +35,7 @@ const QUICK_ACTIONS = [
   { icon: Flame, label: 'Tantra', path: '/tantra', color: '#FCD34D' },
   { icon: Zap, label: 'Exercise', path: '/exercises', color: '#FB923C' },
   { icon: Sunrise, label: 'Rituals', path: '/rituals', color: '#FCD34D' },
-  { icon: Trophy, label: 'Challenges', path: '/challenges', color: '#FB923C' },
+  { icon: Trophy, label: 'Challenges', path: '/friends', color: '#FB923C' },
   { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
   { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
   { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [recs, setRecs] = useState(null);
   const [streak, setStreak] = useState(null);
+  const [dailyChallenge, setDailyChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -65,6 +66,7 @@ export default function Dashboard() {
         axios.get(`${API}/dashboard/stats`, { headers: authHeaders }).then(res => setStats(res.data)).catch(() => {}),
         axios.get(`${API}/recommendations`, { headers: authHeaders }).then(res => setRecs(res.data)).catch(() => {}),
         axios.post(`${API}/streak/checkin`, {}, { headers: authHeaders }).then(res => setStreak(res.data)).catch(() => axios.get(`${API}/streak`, { headers: authHeaders }).then(r => setStreak(r.data)).catch(() => {})),
+        axios.get(`${API}/daily-challenge`, { headers: authHeaders }).then(res => setDailyChallenge(res.data)).catch(() => {}),
       ]).finally(() => setLoading(false));
     }
   }, [user, authLoading, authHeaders, navigate]);
@@ -125,6 +127,37 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        {/* Daily Challenge Card */}
+        {dailyChallenge?.challenge && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="glass-card p-6 mb-12 cursor-pointer hover:scale-[1.01] transition-transform"
+            onClick={() => navigate('/friends')}
+            data-testid="dashboard-challenge-card">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${dailyChallenge.challenge.color}12` }}>
+                <Trophy size={22} style={{ color: dailyChallenge.challenge.color }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.15em] mb-1" style={{ color: '#FCD34D' }}>Today's Challenge</p>
+                <p className="text-base font-medium truncate" style={{ color: 'var(--text-primary)' }}>{dailyChallenge.challenge.title}</p>
+                <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{dailyChallenge.challenge.description}</p>
+              </div>
+              {dailyChallenge.challenge.completed ? (
+                <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium flex-shrink-0"
+                  style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}>
+                  <Check size={12} /> Done
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium flex-shrink-0"
+                  style={{ background: `${dailyChallenge.challenge.color}12`, color: dailyChallenge.challenge.color }}>
+                  +{dailyChallenge.challenge.xp} XP
+                </span>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         {/* Recent Moods */}
         {stats?.recent_moods?.length > 0 && (

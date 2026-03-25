@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
-import { Settings, Camera, Music, Palette, Save, Eye, Loader2, X, Quote, Globe, Lock, Users, Shield } from 'lucide-react';
+import { Settings, Camera, Music, Palette, Save, Eye, Loader2, X, Quote, Globe, Lock, Users, Shield, MessageCircle } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -323,6 +323,32 @@ export default function ProfilePage() {
                           className="glass-card p-4 text-left transition-all"
                           style={{ borderColor: sel ? `${v.color}40` : 'rgba(255,255,255,0.06)' }}
                           data-testid={`visibility-${v.id}`}>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <VIcon size={14} style={{ color: sel ? v.color : 'var(--text-muted)' }} />
+                            <span className="text-sm font-medium" style={{ color: sel ? v.color : 'var(--text-secondary)' }}>{v.label}</span>
+                          </div>
+                          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{v.desc}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                {/* Message Privacy */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}><MessageCircle size={12} className="inline mr-1" /> Who Can Message You</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { id: 'everyone', label: 'Everyone', icon: Globe, desc: 'Any user on the platform', color: '#22C55E' },
+                      { id: 'friends_only', label: 'Friends Only', icon: Users, desc: 'Only your friends can message', color: '#3B82F6' },
+                      { id: 'nobody', label: 'Nobody', icon: Lock, desc: 'Disable all messages', color: '#EF4444' },
+                    ].map(v => {
+                      const VIcon = v.icon;
+                      const sel = (draft.message_privacy || 'everyone') === v.id;
+                      return (
+                        <button key={v.id} onClick={() => update('message_privacy', v.id)}
+                          className="glass-card p-4 text-left transition-all"
+                          style={{ borderColor: sel ? `${v.color}40` : 'rgba(255,255,255,0.06)' }}
+                          data-testid={`msg-privacy-${v.id}`}>
                           <div className="flex items-center gap-2 mb-1.5">
                             <VIcon size={14} style={{ color: sel ? v.color : 'var(--text-muted)' }} />
                             <span className="text-sm font-medium" style={{ color: sel ? v.color : 'var(--text-secondary)' }}>{v.label}</span>
