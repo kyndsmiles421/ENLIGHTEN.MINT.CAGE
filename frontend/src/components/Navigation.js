@@ -8,8 +8,12 @@ import {
   LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio,
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
-  Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map
+  Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map,
+  Gamepad2, Globe
 } from 'lucide-react';
+
+import { useLanguage } from '../context/LanguageContext';
+import { LANGUAGES } from '../i18n/translations';
 
 const PRIMARY_NAV = [
   { path: '/journey', label: 'Journey', icon: Map },
@@ -25,6 +29,7 @@ const PRIMARY_NAV = [
 
 const MORE_NAV = [
   { path: '/learn', label: 'Learn', icon: GraduationCap },
+  { path: '/games', label: 'Games', icon: Gamepad2 },
   { path: '/mantras', label: 'Mantras', icon: Music },
   { path: '/hooponopono', label: "Ho'oponopono", icon: HeartHandshake },
   { path: '/oracle', label: 'Oracle', icon: Sparkles },
@@ -47,15 +52,19 @@ const ALL_NAV = [...PRIMARY_NAV, ...MORE_NAV];
 export default function Navigation() {
   const { user, logout } = useAuth();
   const { ambientOn, toggleAmbient, playClick } = useSensory();
+  const { lang, setLanguage } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const moreRef = useRef(null);
+  const langRef = useRef(null);
 
   useEffect(() => {
     const handler = (e) => {
       if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
+      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -171,6 +180,35 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Language Selector */}
+          <div className="relative" ref={langRef}>
+            <button
+              onClick={() => { setLangOpen(!langOpen); playClick(); }}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-full text-xs transition-all duration-300"
+              style={{ color: 'var(--text-muted)', background: langOpen ? 'rgba(192,132,252,0.08)' : 'transparent' }}
+              data-testid="nav-lang-btn"
+            >
+              <Globe size={13} />
+              <span className="uppercase text-[10px] font-bold">{lang}</span>
+            </button>
+            <AnimatePresence>
+              {langOpen && (
+                <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-36 rounded-xl overflow-hidden z-[100]"
+                  style={{ background: 'rgba(22, 24, 38, 0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(24px)' }}>
+                  {LANGUAGES.map(l => (
+                    <button key={l.code} onClick={() => { setLanguage(l.code); setLangOpen(false); playClick(); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-all"
+                      style={{ color: lang === l.code ? '#fff' : 'var(--text-secondary)', background: lang === l.code ? 'rgba(192,132,252,0.1)' : 'transparent' }}
+                      data-testid={`lang-${l.code}`}>
+                      <span className="text-[10px] font-bold uppercase w-5">{l.flag}</span>
+                      <span>{l.name}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           {/* Ambient Audio Toggle */}
           <button
             onClick={toggleAmbient}

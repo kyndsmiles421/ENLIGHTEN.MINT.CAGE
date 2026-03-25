@@ -3039,6 +3039,99 @@ async def get_quick_reset(feeling: str):
     return flow
 
 
+# ========== DAILY STREAK ==========
+
+@api_router.get("/streak")
+async def get_streak(user=Depends(get_current_user)):
+    uid = user["id"]
+    doc = await db.streaks.find_one({"user_id": uid}, {"_id": 0})
+    if not doc:
+        return {"current_streak": 0, "longest_streak": 0, "last_active": None, "total_active_days": 0}
+    return {
+        "current_streak": doc.get("current_streak", 0),
+        "longest_streak": doc.get("longest_streak", 0),
+        "last_active": doc.get("last_active"),
+        "total_active_days": doc.get("total_active_days", 0),
+    }
+
+@api_router.post("/streak/checkin")
+async def streak_checkin(user=Depends(get_current_user)):
+    uid = user["id"]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    doc = await db.streaks.find_one({"user_id": uid})
+    if not doc:
+        doc = {"user_id": uid, "current_streak": 1, "longest_streak": 1, "last_active": today, "total_active_days": 1, "active_dates": [today]}
+        await db.streaks.insert_one(doc)
+        return {"current_streak": 1, "longest_streak": 1, "last_active": today, "total_active_days": 1, "checked_in": True}
+
+    last = doc.get("last_active", "")
+    if last == today:
+        return {"current_streak": doc["current_streak"], "longest_streak": doc["longest_streak"], "last_active": today, "total_active_days": doc.get("total_active_days", 1), "checked_in": False, "message": "Already checked in today"}
+
+    # Calculate streak
+    from datetime import timedelta
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+    if last == yesterday:
+        new_streak = doc.get("current_streak", 0) + 1
+    else:
+        new_streak = 1
+
+    longest = max(doc.get("longest_streak", 0), new_streak)
+    total = doc.get("total_active_days", 0) + 1
+    active_dates = doc.get("active_dates", [])
+    if today not in active_dates:
+        active_dates.append(today)
+        if len(active_dates) > 60:
+            active_dates = active_dates[-60:]
+
+    await db.streaks.update_one(
+        {"user_id": uid},
+        {"$set": {"current_streak": new_streak, "longest_streak": longest, "last_active": today, "total_active_days": total, "active_dates": active_dates}}
+    )
+    return {"current_streak": new_streak, "longest_streak": longest, "last_active": today, "total_active_days": total, "checked_in": True}
+
+
+# ========== GAMES — SCORE TRACKING ==========
+
+@api_router.post("/games/score")
+async def save_game_score(data: dict, user=Depends(get_current_user)):
+    game_id = data.get("game_id", "")
+    score = data.get("score", 0)
+    if not game_id:
+        raise HTTPException(status_code=400, detail="game_id required")
+
+    doc = {
+        "user_id": user["id"],
+        "game_id": game_id,
+        "score": score,
+        "played_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.game_scores.insert_one(doc)
+
+    # Get best score
+    pipeline = [
+        {"$match": {"user_id": user["id"], "game_id": game_id}},
+        {"$group": {"_id": None, "best": {"$max": "$score"}, "plays": {"$sum": 1}}},
+    ]
+    agg = await db.game_scores.aggregate(pipeline).to_list(1)
+    best = agg[0]["best"] if agg else score
+    plays = agg[0]["plays"] if agg else 1
+
+    return {"game_id": game_id, "score": score, "best_score": best, "total_plays": plays}
+
+@api_router.get("/games/scores")
+async def get_game_scores(user=Depends(get_current_user)):
+    pipeline = [
+        {"$match": {"user_id": user["id"]}},
+        {"$group": {"_id": "$game_id", "best": {"$max": "$score"}, "plays": {"$sum": 1}, "last_played": {"$max": "$played_at"}}},
+    ]
+    results = await db.game_scores.aggregate(pipeline).to_list(20)
+    scores = {}
+    for r in results:
+        scores[r["_id"]] = {"best_score": r["best"], "total_plays": r["plays"], "last_played": r["last_played"]}
+    return {"scores": scores}
+
+
 app.include_router(api_router)
 
 app.add_middleware(

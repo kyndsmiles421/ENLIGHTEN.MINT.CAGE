@@ -7,7 +7,8 @@ import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
   Play, GraduationCap, Headphones, Lightbulb, Sprout,
-  ChevronRight, Music, HeartHandshake, Map, TrendingUp
+  ChevronRight, Music, HeartHandshake, Map, TrendingUp,
+  Gamepad2
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -40,6 +41,7 @@ const QUICK_ACTIONS = [
   { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
   { icon: Map, label: 'Journey', path: '/journey', color: '#2DD4BF' },
   { icon: GraduationCap, label: 'Learn', path: '/learn', color: '#E879F9' },
+  { icon: Gamepad2, label: 'Games', path: '/games', color: '#FB923C' },
   { icon: Play, label: 'Videos', path: '/videos', color: '#2DD4BF' },
   { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
 ];
@@ -49,6 +51,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recs, setRecs] = useState(null);
+  const [streak, setStreak] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,6 +63,7 @@ export default function Dashboard() {
       Promise.all([
         axios.get(`${API}/dashboard/stats`, { headers: authHeaders }).then(res => setStats(res.data)).catch(() => {}),
         axios.get(`${API}/recommendations`, { headers: authHeaders }).then(res => setRecs(res.data)).catch(() => {}),
+        axios.post(`${API}/streak/checkin`, {}, { headers: authHeaders }).then(res => setStreak(res.data)).catch(() => axios.get(`${API}/streak`, { headers: authHeaders }).then(r => setStreak(r.data)).catch(() => {})),
       ]).finally(() => setLoading(false));
     }
   }, [user, authLoading, authHeaders, navigate]);
@@ -86,28 +90,36 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-12">
           {[
-            { icon: Flame, color: '#FCD34D', label: 'Streak', value: stats?.streak || 0, sub: 'consecutive days', testId: 'dashboard-streak' },
+            { icon: Flame, color: '#FCD34D', label: 'Streak', value: streak?.current_streak || stats?.streak || 0, sub: `${streak?.longest_streak || 0} best | ${streak?.total_active_days || 0} total`, testId: 'dashboard-streak' },
             { icon: Heart, color: '#FDA4AF', label: 'Mood Logs', value: stats?.mood_count || 0, sub: 'emotions tracked', testId: 'dashboard-moods' },
-            { icon: BookOpen, color: '#86EFAC', label: 'Journal Entries', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals' },
+            { icon: BookOpen, color: '#86EFAC', label: 'Journal', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals' },
+            { icon: Gamepad2, color: '#FB923C', label: 'Games', value: '', sub: 'Play to earn', testId: 'dashboard-games', link: '/games' },
           ].map((card, i) => {
             const Icon = card.icon;
             return (
               <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}
-                className="glass-card p-8 animate-breathe-border group hover:scale-[1.02] transition-transform duration-300"
+                className="glass-card p-6 animate-breathe-border group hover:scale-[1.02] transition-transform duration-300 cursor-pointer"
+                onClick={() => card.link && navigate(card.link)}
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                     style={{ background: `${card.color}12` }}>
                     <Icon size={18} style={{ color: card.color, filter: `drop-shadow(0 0 6px ${card.color}60)` }} />
                   </div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
                 </div>
-                <p className="text-5xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid={card.testId}>
-                  {card.value}
-                </p>
-                <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
+                {card.value !== '' ? (
+                  <p className="text-4xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid={card.testId}>
+                    {card.value}
+                  </p>
+                ) : (
+                  <p className="text-sm font-medium" style={{ color: card.color }} data-testid={card.testId}>
+                    Play Now
+                  </p>
+                )}
+                <p className="text-[11px] mt-1.5" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
               </motion.div>
             );
           })}

@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from './components/Navigation';
@@ -39,6 +40,7 @@ const Mantras = lazy(() => import('./pages/Mantras'));
 const Hooponopono = lazy(() => import('./pages/Hooponopono'));
 const Journey = lazy(() => import('./pages/Journey'));
 const Learn = lazy(() => import('./pages/Learn'));
+const Games = lazy(() => import('./pages/Games'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -97,6 +99,7 @@ function AnimatedRoutes() {
             <Route path="/hooponopono" element={<Hooponopono />} />
             <Route path="/journey" element={<Journey />} />
             <Route path="/learn" element={<Learn />} />
+            <Route path="/games" element={<Games />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
@@ -107,6 +110,7 @@ function AnimatedRoutes() {
 
 function App() {
   return (
+  <LanguageProvider>
     <AuthProvider>
       <SensoryProvider>
         <BrowserRouter>
@@ -130,6 +134,7 @@ function App() {
         </BrowserRouter>
       </SensoryProvider>
     </AuthProvider>
+  </LanguageProvider>
   );
 }
 

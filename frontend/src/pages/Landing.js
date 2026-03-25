@@ -7,8 +7,10 @@ import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap,
   Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2,
   Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X,
-  Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map
+  Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { LANGUAGES } from '../i18n/translations';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -33,6 +35,7 @@ const FEATURES = [
   { icon: HeartHandshake, title: "Ho'oponopono", desc: 'Hawaiian forgiveness practice', path: '/hooponopono', color: '#E879F9' },
   { icon: Map, title: 'Journey', desc: 'Guided beginner pathway', path: '/journey', color: '#2DD4BF' },
   { icon: GraduationCap, title: 'Learn', desc: 'Advanced progressive modules', path: '/learn', color: '#E879F9' },
+  { icon: Gamepad2, title: 'Games', desc: 'Mindful games for focus and joy', path: '/games', color: '#FB923C' },
   { icon: Users, title: 'Community', desc: 'Share, connect, and inspire others', path: '/community', color: '#FDA4AF' },
   { icon: Play, title: 'Videos', desc: 'Guided practices from masters', path: '/videos', color: '#2DD4BF' },
   { icon: Leaf, title: 'Nourishment', desc: 'Foods that uplift energy & spirit', path: '/nourishment', color: '#22C55E' },
@@ -397,9 +400,12 @@ function Footer() {
 /* ========== MAIN LANDING ========== */
 export default function Landing() {
   const navigate = useNavigate();
+  const { t, lang, setLanguage } = useLanguage();
   const [breathScale, setBreathScale] = useState(1);
   const [showQuickReset, setShowQuickReset] = useState(false);
+  const [showLang, setShowLang] = useState(false);
   const animRef = useRef(null);
+  const langRef = useRef(null);
 
   const animateBreath = useCallback(() => {
     const duration = 8000;
@@ -423,6 +429,34 @@ export default function Landing() {
     <div className="min-h-screen relative" style={{ background: 'transparent' }}>
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
 
+      {/* Floating Language Selector */}
+      <div className="fixed top-4 right-4 z-50" ref={langRef}>
+        <button onClick={() => setShowLang(!showLang)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs transition-all"
+          style={{ background: 'rgba(22,24,38,0.8)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', color: 'var(--text-muted)' }}
+          data-testid="landing-lang-btn">
+          <Globe size={13} />
+          <span className="uppercase text-[10px] font-bold">{lang}</span>
+        </button>
+        <AnimatePresence>
+          {showLang && (
+            <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
+              className="absolute right-0 mt-2 w-36 rounded-xl overflow-hidden"
+              style={{ background: 'rgba(22,24,38,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(24px)' }}>
+              {LANGUAGES.map(l => (
+                <button key={l.code} onClick={() => { setLanguage(l.code); setShowLang(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-all"
+                  style={{ color: lang === l.code ? '#fff' : 'var(--text-secondary)', background: lang === l.code ? 'rgba(192,132,252,0.1)' : 'transparent' }}
+                  data-testid={`landing-lang-${l.code}`}>
+                  <span className="text-[10px] font-bold uppercase w-5">{l.flag}</span>
+                  <span>{l.name}</span>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Aurora gradient overlay */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full animate-aurora"
@@ -438,16 +472,16 @@ export default function Landing() {
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
               className="text-xs font-bold uppercase tracking-[0.3em] mb-6" style={{ color: 'var(--secondary)' }}>
               <Sparkles size={14} className="inline mr-2" style={{ color: 'var(--accent-gold)' }} />
-              A Gathering Place for Conscious Minds
+              {t.landing.tagline}
             </motion.p>
             <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>The Cosmic</motion.span>
+              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{t.landing.title1}</motion.span>
               <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Collective</motion.span>
+                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>{t.landing.title2}</motion.span>
             </h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
               className="text-base md:text-lg leading-relaxed max-w-md mb-10" style={{ color: 'var(--text-secondary)' }}>
-              A sacred digital space for breathing, meditation, journaling, sound healing, and expanding your awareness alongside like-minded souls.
+              {t.landing.subtitle}
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
@@ -455,7 +489,7 @@ export default function Landing() {
                 className="btn-glass glow-primary group"
                 data-testid="quick-reset-btn">
                 <span className="relative z-10 flex items-center gap-2">
-                  Quick Reset
+                  {t.landing.quickReset}
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
@@ -464,20 +498,20 @@ export default function Landing() {
                 style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
                 data-testid="begin-journey-btn">
                 <span className="flex items-center gap-2" style={{ color: '#2DD4BF' }}>
-                  Begin Journey <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  {t.landing.beginJourney} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
               <button onClick={() => navigate('/auth')} className="btn-glass"
                 style={{ background: 'transparent', borderColor: 'rgba(255,255,255,0.08)' }}
                 data-testid="sign-in-btn">
-                Sign In
+                {t.landing.signIn}
               </button>
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
               className="flex items-center gap-2 mt-8">
               <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
-              <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for the full experience</span>
+              <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{t.landing.enableAmbient}</span>
             </motion.div>
           </motion.div>
 
@@ -525,10 +559,10 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-12">
             <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
-              <Quote size={12} className="inline mr-2" /> What Beta Testers Are Saying
+              <Quote size={12} className="inline mr-2" /> {t.landing.testimonials}
             </p>
             <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              Real Results from Real Practice
+              {t.landing.realResults}
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -567,7 +601,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
             className="text-xs font-bold uppercase tracking-[0.3em] mb-12" style={{ color: 'var(--text-muted)' }}>
-            Explore Your Path
+            {t.landing.explorePath}
           </motion.p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f, i) => (
