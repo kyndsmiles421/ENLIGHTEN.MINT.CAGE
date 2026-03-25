@@ -772,11 +772,21 @@ CHALLENGES_DATA = [
 
 @api_router.get("/challenges")
 async def get_challenges():
+    # Single aggregation query instead of N+1 (was 14 queries, now 1)
+    pipeline = [
+        {"$group": {
+            "_id": "$challenge_id",
+            "total": {"$sum": 1},
+            "completed": {"$sum": {"$cond": ["$completed", 1, 0]}}
+        }}
+    ]
+    counts = {doc["_id"]: {"participant_count": doc["total"], "completion_count": doc["completed"]}
+              for doc in await db.challenge_participants.aggregate(pipeline).to_list(None)}
+    
     challenges = []
     for c in CHALLENGES_DATA:
-        participant_count = await db.challenge_participants.count_documents({"challenge_id": c["id"]})
-        completions = await db.challenge_participants.count_documents({"challenge_id": c["id"], "completed": True})
-        challenges.append({**c, "participant_count": participant_count, "completion_count": completions})
+        stats = counts.get(c["id"], {"participant_count": 0, "completion_count": 0})
+        challenges.append({**c, **stats})
     return challenges
 
 @api_router.post("/challenges/{challenge_id}/join")
