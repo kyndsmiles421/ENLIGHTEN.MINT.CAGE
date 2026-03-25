@@ -71,13 +71,21 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - AI Knowledge Engine (Deep Dive): In-depth AI-generated guides on any topic
 - Voice narration (NarrationPlayer) with 9 voices, 3 speeds, persistent preferences
 
-### Phase 7 - Performance & Optimization (Latest)
+### Phase 7 - Performance & Optimization
 - React.lazy/Suspense code splitting — only loads pages when navigated
 - Backend Cache-Control headers on static data endpoints
 - asyncio.gather for concurrent DB queries (Dashboard stats, Profile)
+- asyncio.wait_for timeouts (30-45s) on ALL AI/LLM calls to prevent server blocking
 - Knowledge endpoint retry logic for transient failures
 - Shared API config with 30s default timeout
 - Health check endpoint (/api/health)
+
+### Phase 8 - Rich Content & Videos (Latest)
+- Exercises page completely rebuilt with embedded YouTube videos for each practice
+- Each exercise now includes: detailed description, philosophy quote, 6+ benefits, 8 step-by-step instructions, practice tips
+- Video embeds toggle inline with smooth animation
+- All AI endpoints protected with asyncio.wait_for timeouts to prevent server blocking
+- Rebranded from "Cosmic Zen" to "The Cosmic Collective — A Gathering Place for Conscious Minds"
 
 ## Key API Endpoints
 - `/api/health` - service health check

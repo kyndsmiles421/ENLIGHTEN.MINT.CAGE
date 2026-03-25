@@ -278,7 +278,7 @@ async def generate_affirmation(req: AffirmationRequest):
         )
         chat.with_model("openai", "gpt-5.2")
         msg = UserMessage(text=f"Generate a unique affirmation about: {req.theme}")
-        response = await chat.send_message(msg)
+        response = await asyncio.wait_for(chat.send_message(msg), timeout=30)
         return {"text": response, "theme": req.theme, "generated": True}
     except Exception as e:
         logger.error(f"AI generation error: {e}")
@@ -292,15 +292,21 @@ EXERCISES_DATA = [
         "category": "qigong",
         "duration": "10-20 min",
         "level": "Beginner",
-        "description": "The foundational Qigong posture that cultivates deep internal energy. Stand with feet shoulder-width apart, knees slightly bent, arms rounded as if hugging a large tree. Focus on your lower dantian (below navel) and breathe naturally.",
-        "benefits": ["Builds Qi energy", "Strengthens legs and core", "Calms the nervous system", "Improves posture and balance"],
+        "video_url": "https://www.youtube.com/embed/y07FauHYlmg",
+        "description": "The foundational Qigong posture, also known as 'Embracing the Tree'. This deceptively simple standing meditation is considered the single most important practice in internal martial arts and Qigong healing. By holding a static posture with proper alignment, you allow Qi to gather in the lower Dantian (energy center below the navel), strengthen the fascial network, and develop deep root connection with the earth. Masters practice this daily for up to an hour.",
+        "philosophy": "In stillness, find the deepest movement. Zhan Zhuang teaches us that power comes not from effort, but from alignment with natural forces. Like a tree with deep roots, the practitioner becomes unshakable yet flexible.",
+        "benefits": ["Builds Qi energy in the Dantian", "Strengthens legs, core, and deep stabilizers", "Calms the nervous system and reduces cortisol", "Improves posture and spinal alignment", "Develops energetic sensitivity", "Increases bone density"],
         "steps": [
-            "Stand with feet shoulder-width apart, toes pointing forward",
-            "Bend knees slightly, tucking tailbone under",
-            "Raise arms to chest height as if embracing a large ball",
-            "Relax shoulders, soften gaze, breathe into lower belly",
-            "Hold for 5-20 minutes, gradually increasing time"
+            "Stand with feet parallel, shoulder-width apart, toes pointing straight forward. Feel even weight across both feet.",
+            "Soften and unlock the knees, bending them slightly. Tuck the tailbone gently under — imagine sitting on the edge of a high stool.",
+            "Let your arms rise to chest height, elbows slightly below shoulders, as if you are gently hugging a large balloon or tree trunk. Keep space under the armpits.",
+            "Relax the shoulders completely — let them drop away from the ears. Soften the chest. The tongue touches the roof of the mouth behind the front teeth.",
+            "Breathe naturally into the lower belly (Dantian, about 2 inches below the navel). Don't force the breath — let it settle into a slow, deep rhythm on its own.",
+            "Soften your gaze, looking straight ahead or slightly downward. Half-close the eyes. Release tension from the jaw, face, and forehead.",
+            "Hold this posture. Begin with 5 minutes and add 1-2 minutes each week. If trembling or heat arises, this is Qi moving — allow it.",
+            "To close: slowly lower the arms, bring palms to rest over the lower belly. Stand quietly for 1-2 minutes, feeling the Qi settling."
         ],
+        "tips": "If your shoulders ache, lower the arms slightly. The key is relaxation within structure. Pain means misalignment — adjust, don't push through.",
         "color": "#2DD4BF"
     },
     {
@@ -309,18 +315,21 @@ EXERCISES_DATA = [
         "category": "qigong",
         "duration": "15-25 min",
         "level": "Beginner",
-        "description": "An ancient set of eight exercises that stretch and strengthen the body, stimulate organ function, and cultivate Qi flow through the meridians.",
-        "benefits": ["Enhances flexibility", "Stimulates organ health", "Balances Qi flow", "Reduces stress and tension"],
+        "video_url": "https://www.youtube.com/embed/3Kij4UGz1yE",
+        "description": "One of the most widely practiced Qigong sets in the world, dating back over 800 years to the Song Dynasty. The 'Eight Brocades' (Ba Duan Jin) is a complete system of eight exercises that systematically work every organ, joint, and meridian in the body. Each movement targets specific organ systems according to Traditional Chinese Medicine, making this an ideal daily health maintenance routine. The movements are gentle enough for the elderly yet powerful enough to benefit martial artists.",
+        "philosophy": "Like eight pieces of fine brocade silk, each movement is beautiful on its own yet together they form a complete tapestry of health. This practice reminds us that wellness requires attention to every aspect of our being.",
+        "benefits": ["Stretches and strengthens the entire body", "Stimulates all major organ systems", "Balances Qi flow through all 12 primary meridians", "Reduces stress and muscular tension", "Improves digestion and immune function", "Enhances respiratory capacity"],
         "steps": [
-            "Two Hands Hold Up the Heavens - stretch arms overhead",
-            "Drawing the Bow - archer stance, pull imaginary bow",
-            "Separating Heaven and Earth - alternate arms up/down",
-            "Wise Owl Gazes Backward - turn head slowly side to side",
-            "Sway Head and Shake Tail - deep squat with side bends",
-            "Two Hands Hold the Feet - forward fold with spine stretch",
-            "Clench Fists and Glare - horse stance with punches",
-            "Bouncing on Toes - rise up and drop heels seven times"
+            "Two Hands Hold Up the Heavens (Shuang Shou Tuo Tian): Interlace fingers, turn palms upward and press toward the sky as you rise onto your toes. Stretch the entire Triple Burner meridian. This regulates all three energy centers of the body. Hold for 3 breaths, lower, repeat 8 times.",
+            "Drawing the Bow to Shoot the Eagle (Zuo You Kai Gong): Step into a wide horse stance. Extend one arm as if holding a bow, pull the other back as if drawing the string. Gaze at the extended finger. This opens the lungs and strengthens the arms. Alternate sides, 8 repetitions.",
+            "Separating Heaven and Earth (Tiao Li Pi Wei): One palm presses up, the other presses down, stretching the stomach and spleen meridians along the sides. This directly improves digestion and nutrient absorption. Alternate arms, 8 repetitions.",
+            "Wise Owl Gazes Backward (Wu Lao Qi Shang): Slowly turn your head to look behind you, first left then right. Keep shoulders still. This releases neck tension, stimulates the vagus nerve, and treats the 'five fatigues and seven injuries'. 8 repetitions each side.",
+            "Sway the Head and Shake the Tail (Yao Tou Bai Wei): From a deep horse stance, lean forward and circle the upper body side to side, like an ox shaking off water. This releases excess heart fire and calms the spirit. 8 circles each direction.",
+            "Two Hands Hold the Feet to Strengthen the Kidneys (Liang Shou Pan Zu): Reach down and hold the backs of your ankles or feet, then slowly rise, sliding hands up the backs of the legs and along the spine. This strengthens the kidneys and lower back. 8 repetitions.",
+            "Clench the Fists and Glare Fiercely (Zan Quan Nu Mu): From horse stance, punch forward slowly with intensity while glaring with wide eyes. This builds liver Qi, releases frustration, and increases vitality. 8 punches each side.",
+            "Bouncing on the Toes (Bei Hou Qi Dian): Rise up onto the balls of your feet, then drop your heels sharply to the ground. The vibration travels up through the bones and shakes loose stagnant energy. This is said to cure 100 diseases. Repeat 7 times."
         ],
+        "tips": "Move slowly with your breath — inhale on expansive movements, exhale on contracting ones. Quality over quantity. Even 1 round done mindfully is more valuable than 10 done mechanically.",
         "color": "#14B8A6"
     },
     {
@@ -329,69 +338,90 @@ EXERCISES_DATA = [
         "category": "tai_chi",
         "duration": "10-15 min",
         "level": "Beginner",
-        "description": "One of the most meditative Tai Chi movements. The hands move like clouds drifting across the sky while weight shifts from side to side, creating a flowing dance of Yin and Yang.",
-        "benefits": ["Improves coordination", "Calms the mind", "Enhances body awareness", "Promotes fluid movement"],
+        "video_url": "https://www.youtube.com/embed/W1UZ4E9Yj14",
+        "description": "Cloud Hands is considered the quintessential Tai Chi movement — a living meditation in motion. The hands move like clouds drifting across the sky while weight shifts from side to side. This single movement contains all the essential principles of Tai Chi: weight shifting, waist turning, continuous flow, and the interplay of Yin and Yang. Many masters say that if you could only practice one movement, Cloud Hands would be the one to choose.",
+        "philosophy": "Clouds move without effort, without destination, shaped by the wind yet always whole. In Cloud Hands, we learn to move like nature — effortlessly responsive, perpetually transforming, never grasping.",
+        "benefits": ["Develops smooth weight shifting and balance", "Calms the mind through rhythmic, meditative movement", "Enhances whole-body coordination and awareness", "Opens the waist and hips for fluid Qi circulation", "Teaches the integration of upper and lower body", "Relieves stress and promotes deep relaxation"],
         "steps": [
-            "Stand in shoulder-width stance, weight centered",
-            "Raise right hand to face level, palm facing you",
-            "Shift weight to right foot as right hand moves right",
-            "Left hand rises as right hand lowers",
-            "Shift weight to left foot, hands continue flowing",
-            "Repeat the cloud-like movement for 5-10 minutes"
+            "Begin in a shoulder-width stance, weight evenly distributed. Arms hang naturally at your sides. Take several deep breaths to center yourself.",
+            "Shift your weight to the right foot. As you do, the right hand begins to rise, palm facing you, moving from hip level up to face level. The left hand simultaneously descends.",
+            "As the right hand reaches face height, begin turning your waist to the right. The entire upper body moves as one unit — arms don't move independently from the torso.",
+            "Now shift weight to the left. The left hand rises as the right descends. The waist turns left. Feel the weight pour from one leg to the other like water.",
+            "As you grow comfortable, add stepping: when weight shifts fully left, step the right foot in toward the left. When weight shifts right, step the left foot out to shoulder width.",
+            "Move continuously without pause. There is no beginning and no end. The transitions between left and right are as important as the positions themselves.",
+            "Breathe naturally. Don't try to coordinate breath with movement — let the breath find its own rhythm within the movement.",
+            "Practice for 5-10 minutes. To close, gradually make the movements smaller until you return to standing stillness. Rest with hands on the lower Dantian."
         ],
+        "tips": "The secret is in the waist — the arms follow the torso, they don't lead it. If your arms are moving but your waist is still, you're doing arm waving, not Tai Chi. Move from the center.",
         "color": "#D8B4FE"
     },
     {
         "id": "taichi-ward-off",
-        "name": "Grasp Sparrow's Tail",
+        "name": "Grasp Sparrow's Tail (Lan Que Wei)",
         "category": "tai_chi",
         "duration": "15-20 min",
         "level": "Intermediate",
-        "description": "The cornerstone sequence of Yang-style Tai Chi containing four essential energies: Ward Off, Roll Back, Press, and Push. This sequence teaches the fundamental principles of yielding and expressing energy.",
-        "benefits": ["Develops root and structure", "Teaches energy sensitivity", "Strengthens legs", "Improves martial awareness"],
+        "video_url": "https://www.youtube.com/embed/hIOHGrYCEJ4",
+        "description": "Grasp Sparrow's Tail is the cornerstone sequence of Yang-style Tai Chi, containing the four primary energies (Si Zheng): Peng (Ward Off), Lu (Roll Back), Ji (Press), and An (Push). These four energies correspond to the four cardinal directions and represent the fundamental ways energy can be expressed or received. This sequence teaches the complete cycle of yielding and issuing, making it essential for both martial application and health cultivation.",
+        "philosophy": "To grasp a sparrow's tail without harming it requires sensitivity, gentleness, and perfect timing — the same qualities needed to handle life's challenges with grace. Too much force and you crush what you hold; too little and it slips away.",
+        "benefits": ["Develops structural integrity and rooting", "Teaches the four primary Tai Chi energies", "Strengthens legs and develops patience", "Improves martial awareness and sensitivity", "Cultivates the ability to yield without collapsing", "Trains whole-body connection (Zheng Ti Jin)"],
         "steps": [
-            "Begin in Wu Ji (standing meditation) posture",
-            "Ward Off (Peng) - expand outward with rounded arm",
-            "Roll Back (Lu) - yield and redirect incoming energy",
-            "Press (Ji) - compress and release forward energy",
-            "Push (An) - ground and express energy through palms",
-            "Return to beginning and repeat on other side"
+            "Begin in Wu Ji (standing meditation) — feet shoulder-width, arms at sides, mind empty. This is the stillness from which all Tai Chi emerges. Stand for 1-2 minutes.",
+            "WARD OFF (Peng): Step forward with the right foot. The right arm rises in front of the chest, forearm rounded as if holding a large balloon against your chest. Energy expands outward in all directions. This is yang energy expressing — don't lean forward, root down.",
+            "ROLL BACK (Lu): Turn the waist to the right, sitting back onto the rear leg. Both hands guide an incoming force past you, like a bullfighter's cape. This is yin energy — you receive, redirect, and neutralize. Weight shifts 70% to the rear leg.",
+            "PRESS (Ji): Shift weight forward again. The rear hand presses against the front wrist/forearm. Energy compresses then releases forward through the joined hands. Like a wave that draws back before crashing on shore.",
+            "PUSH (An): Separate the hands to shoulder width, sit back. Then shift forward and push both palms forward at chest height. Ground the push through your back foot — the power comes from the earth, through the legs, directed by the waist, expressed through the hands.",
+            "Complete the sequence on the right side, then turn and repeat on the left. Each transition should be smooth — there are no hard stops.",
+            "Repeat the full sequence 4-8 times on each side. With practice, the four distinct movements will blend into one continuous flow.",
+            "To close, return to Wu Ji standing. Place palms on the lower Dantian. Stand quietly for 2-3 minutes, allowing the Qi to settle and integrate."
         ],
+        "tips": "Each of the four energies has a distinct quality — Peng is expansive like inflating a balloon, Lu is yielding like a swinging door, Ji is compressing like a spring, An is rooting like a wave. Feel these qualities, don't just mimic the shapes.",
         "color": "#C084FC"
     },
     {
         "id": "qigong-five-elements",
-        "name": "Five Element Qigong",
+        "name": "Five Element Qigong (Wu Xing Gong)",
         "category": "qigong",
         "duration": "20-30 min",
         "level": "Intermediate",
-        "description": "A practice based on Traditional Chinese Medicine's Five Elements (Wood, Fire, Earth, Metal, Water). Each movement corresponds to an element, organ system, and emotion, creating holistic balance.",
-        "benefits": ["Balances organ systems", "Harmonizes emotions", "Deepens elemental awareness", "Promotes seasonal health"],
+        "video_url": "https://www.youtube.com/embed/nFeogMcDvME",
+        "description": "Five Element Qigong is a profound healing system based on Traditional Chinese Medicine's Five Element theory (Wu Xing). Each movement corresponds to one of the five elements — Wood, Fire, Earth, Metal, and Water — along with its associated organ system, emotion, season, color, and sound. By practicing all five movements, you create holistic balance throughout your body's energy system. This is both a physical exercise and an internal alchemy practice.",
+        "philosophy": "The five elements are not separate forces but aspects of one continuously transforming energy. Wood feeds Fire, Fire creates Earth (ash), Earth bears Metal (minerals), Metal enriches Water (minerals dissolve), Water nourishes Wood (trees). Understanding this cycle within yourself is the key to lasting health.",
+        "benefits": ["Balances all five major organ systems (liver, heart, spleen, lungs, kidneys)", "Harmonizes and transforms stuck emotions", "Deepens connection to seasonal and elemental awareness", "Promotes both physical health and spiritual growth", "Enhances understanding of TCM five-element theory", "Creates internal harmony between generating and controlling cycles"],
         "steps": [
-            "Wood (Liver) - Side stretches like a growing tree",
-            "Fire (Heart) - Open chest, radiate joy outward",
-            "Earth (Spleen) - Centering spiral movements",
-            "Metal (Lungs) - Drawing in pure Qi with breath",
-            "Water (Kidneys) - Flowing downward like a waterfall"
+            "WOOD (Liver/Gallbladder — Spring — Green — Anger→Kindness): Stand with feet shoulder-width. Stretch sideways like a tree bending in the wind — one arm reaches over the head to the opposite side while the other pushes down. The sound is 'SHHHH' (like wind through leaves). This releases frustration and cultivates decisiveness. 8 repetitions each side.",
+            "FIRE (Heart/Small Intestine — Summer — Red — Anxiety→Joy): Open the chest wide, arms spreading out and up like flames dancing. Bring palms together at the heart center. The sound is 'HAWWW' (like a sigh of relief). This releases anxiety and opens the heart to joy and connection. 8 repetitions.",
+            "EARTH (Spleen/Stomach — Late Summer — Yellow — Worry→Trust): Create gentle spiraling movements around the center of the body, hands circling the navel area. The sound is 'WHOOOO' (like a low hum). This settles overthinking, improves digestion, and cultivates groundedness. 8 circles each direction.",
+            "METAL (Lungs/Large Intestine — Autumn — White — Grief→Courage): Extend arms wide on the inhale, gathering pure Qi. On the exhale, draw arms in and compress toward the lungs. The sound is 'SSSSS' (like air releasing). This processes grief, strengthens immunity, and builds inner courage. 8 repetitions.",
+            "WATER (Kidneys/Bladder — Winter — Blue/Black — Fear→Wisdom): Bend forward, letting the upper body flow downward like a waterfall. Hands sweep down the backs of the legs. Rise slowly, hands tracing up the inner legs. The sound is 'CHEWWW' (like blowing out a candle). This dissolves fear, strengthens willpower, and nourishes deep reserves. 8 repetitions.",
+            "INTEGRATION: After completing all five elements, stand in Wu Ji for 3-5 minutes. Visualize the five elemental colors circling within you — green, red, yellow, white, and blue — blending into pure golden light at your center.",
+            "Place both palms on the lower Dantian. Feel the warmth gathering. This is the balanced energy of all five elements united.",
+            "Bow gently to honor the practice and the wisdom of the elements within you."
         ],
+        "tips": "Each element has a healing sound — practice the sounds softly on the exhale. The vibration of each sound resonates with its corresponding organ, amplifying the healing effect. Don't rush between elements; each one deserves full presence.",
         "color": "#FCD34D"
     },
     {
         "id": "taichi-24form",
-        "name": "24-Form Tai Chi (Simplified)",
+        "name": "24-Form Tai Chi (Simplified Yang Style)",
         "category": "tai_chi",
         "duration": "20-30 min",
         "level": "Intermediate",
-        "description": "The standardized 24-movement Tai Chi form created in 1956 to make Tai Chi accessible to all. A flowing sequence that embodies meditation in motion and cultivates deep internal harmony.",
-        "benefits": ["Full body workout", "Deep meditation in motion", "Improves balance", "Cultivates patience and presence"],
+        "video_url": "https://www.youtube.com/embed/qXwnWJiAGSA",
+        "description": "The 24-Form Tai Chi, created in 1956 by the Chinese Sports Commission, distills the essential movements of traditional Yang-style Tai Chi into an accessible yet complete sequence. It is the most practiced Tai Chi form in the world, performed daily by millions. Despite its simplicity compared to the traditional 108-movement form, it contains all the fundamental principles of Tai Chi and serves as both a standalone health practice and a gateway to deeper study.",
+        "philosophy": "Tai Chi is sometimes called 'meditation in motion' or 'moving stillness.' The 24-Form teaches us that true mastery lies not in complexity but in depth of understanding. A single step done with complete awareness is worth more than a hundred movements done mechanically.",
+        "benefits": ["Complete full-body exercise touching every joint and muscle", "Deep moving meditation that cultivates present-moment awareness", "Proven to improve balance, reducing fall risk by up to 50%", "Reduces blood pressure and improves cardiovascular health", "Builds patience, discipline, and embodied mindfulness", "Gateway to deeper Tai Chi and internal arts practice"],
         "steps": [
-            "Commencing Form - settle into stillness",
-            "Part Wild Horse's Mane - flowing diagonal steps",
-            "White Crane Spreads Wings - open and close",
-            "Brush Knee and Twist Step - walking with intent",
-            "Playing the Lute - single whip posture",
-            "Continue through all 24 movements mindfully"
+            "OPENING: Commencing Form (Qi Shi) — Rise from stillness. Arms float up to shoulder height, then sink down as knees bend. This represents the universe emerging from emptiness (Wu Ji) into Tai Chi (the interplay of Yin and Yang).",
+            "Part Wild Horse's Mane (Ye Ma Fen Zong) — Step diagonally forward, one hand sweeps up (mane), the other presses down. Alternate left and right, 3 repetitions. This teaches diagonal energy and weight shifting.",
+            "White Crane Spreads Wings (Bai He Liang Chi) — Shift weight to rear leg, one hand rises above the head, the other drops to the hip. A moment of beautiful stillness within the flow. Empty the front foot completely.",
+            "Brush Knee and Twist Step (Lou Xi Ao Bu) — Step forward, one hand brushes past the knee while the other pushes forward from the ear. This is one of the most practical self-defense movements, teaching simultaneous defense and attack.",
+            "Playing the Lute (Shou Hui Pi Pa) — Step the rear foot forward, hands form a playing-the-lute position with one hand at wrist height of the other. A moment of contained energy, like a coiled spring.",
+            "Repulse Monkey (Dao Juan Gong) — Step backward while one hand pulls back and the other pushes forward. Moving backward with confidence teaches us that retreat can be as powerful as advance.",
+            "Continue through: Grasp Sparrow's Tail (both sides), Single Whip, Wave Hands Like Clouds, High Pat on Horse, Kick with Right/Left Heel, Strike Ears with Fists, Turn and Kick, Deflect-Parry-Punch, Apparent Close-Up, Cross Hands.",
+            "CLOSING: Cross Hands (Shi Zi Shou) and Closing Form (Shou Shi) — Return to Wu Ji standing. All movement resolves back into stillness. The circle is complete. Stand quietly for 2-5 minutes."
         ],
+        "tips": "Learn the form in small sections — 3-4 movements at a time. Practice each section until it feels natural before adding more. It takes most people 3-6 months to learn the complete form. There's no rush. The journey IS the practice.",
         "color": "#FDA4AF"
     }
 ]
@@ -410,7 +440,7 @@ async def get_exercise_guide(req: AIGenerateRequest):
         )
         chat.with_model("openai", "gpt-5.2")
         msg = UserMessage(text=f"Guide me through a {req.topic} practice session. Include step-by-step instructions with breathing and energy visualization cues.")
-        response = await chat.send_message(msg)
+        response = await asyncio.wait_for(chat.send_message(msg), timeout=30)
         return {"guide": response, "topic": req.topic}
     except Exception as e:
         logger.error(f"AI exercise guide error: {e}")
@@ -522,7 +552,7 @@ async def suggest_nourishment(req: AIGenerateRequest):
         )
         chat.with_model("openai", "gpt-5.2")
         msg = UserMessage(text=f"Suggest a nourishing recipe for someone who wants to: {req.topic}")
-        response = await chat.send_message(msg)
+        response = await asyncio.wait_for(chat.send_message(msg), timeout=30)
         return {"suggestion": response, "topic": req.topic}
     except Exception as e:
         logger.error(f"AI nourishment error: {e}")
@@ -1097,7 +1127,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"tarot-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await chat.send_message(UserMessage(text=prompt))
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
             
             return {"type": "tarot", "cards": [{"name": c["name"], "reversed": r, "keywords": c["reversed"] if r else c["upright"], "element": c["element"]} for c, r in zip(cards, reversed_flags)], "interpretation": response}
         
@@ -1113,7 +1143,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"astro-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await chat.send_message(UserMessage(text=prompt))
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
             
             return {"type": "astrology", "sign": sign, "reading": response}
         
@@ -1133,7 +1163,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"chinese-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await chat.send_message(UserMessage(text=prompt))
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
             
             return {"type": "chinese_astrology", "animal": animal, "element": element, "year": year, "reading": response}
         
@@ -1150,7 +1180,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"iching-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await chat.send_message(UserMessage(text=prompt))
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
             
             return {"type": "iching", "hexagram_number": hex_num, "lines": hexagram_lines, "changing": changing, "interpretation": response}
         
@@ -1164,7 +1194,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"geometry-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await chat.send_message(UserMessage(text=prompt))
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
             
             return {"type": "sacred_geometry", "pattern": pattern, "meditation": response}
         
@@ -1432,7 +1462,7 @@ async def ai_generate_creation(req: AICreateRequest, user=Depends(get_current_us
         )
         chat.with_model("openai", "gpt-5.2")
         msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
+        response = await asyncio.wait_for(chat.send_message(msg), timeout=30)
         return {"type": req.type, "content": response, "intention": req.intention}
     except Exception as e:
         logger.error(f"AI create error: {e}")
@@ -1469,7 +1499,7 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
     else:
         prompt = prompt.replace("{context}", "")
 
-    # Retry up to 2 times on transient failures
+    # Retry up to 2 times on transient failures, with strict timeout
     last_error = None
     for attempt in range(2):
         try:
@@ -1480,7 +1510,7 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
             )
             chat.with_model("openai", "gpt-5.2")
             msg = UserMessage(text=prompt)
-            response = await chat.send_message(msg)
+            response = await asyncio.wait_for(chat.send_message(msg), timeout=45)
 
             result = {
                 "topic": req.topic,
@@ -1489,15 +1519,18 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
                 "generated_at": datetime.now(timezone.utc).isoformat(),
             }
 
-            # Cache in MongoDB (spread to avoid _id leaking)
             await db.knowledge_cache.insert_one({**result})
             return result
 
+        except asyncio.TimeoutError:
+            last_error = Exception("AI request timed out after 45s")
+            logger.warning(f"Knowledge AI attempt {attempt+1} timed out")
         except Exception as e:
             last_error = e
             logger.warning(f"Knowledge AI attempt {attempt+1} failed: {e}")
-            if attempt == 0:
-                await asyncio.sleep(1)
+        
+        if attempt == 0:
+            await asyncio.sleep(1)
 
     logger.error(f"Knowledge AI error after retries: {last_error}")
     raise HTTPException(status_code=500, detail="Could not generate knowledge content")
