@@ -3,16 +3,17 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio, Sunrise } from 'lucide-react';
+import { Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio, Sunrise, Users } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const QUICK_ACTIONS = [
   { icon: Sunrise, label: 'Rituals', path: '/rituals', color: '#FCD34D' },
+  { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
   { icon: Wind, label: 'Breathe', path: '/breathing', color: '#2DD4BF' },
   { icon: Timer, label: 'Meditate', path: '/meditation', color: '#D8B4FE' },
   { icon: Zap, label: 'Exercise', path: '/exercises', color: '#FB923C' },
-  { icon: Heart, label: 'Mood', path: '/mood', color: '#FDA4AF' },
+  { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
   { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
   { icon: Leaf, label: 'Nourish', path: '/nourishment', color: '#22C55E' },
   { icon: Radio, label: 'Frequencies', path: '/frequencies', color: '#8B5CF6' },

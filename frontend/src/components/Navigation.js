@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones,
-  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise
+  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise, Users
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { path: '/soundscapes', label: 'Sounds', icon: Headphones },
   { path: '/nourishment', label: 'Nourish', icon: Leaf },
   { path: '/frequencies', label: 'Frequencies', icon: Radio },
+  { path: '/community', label: 'Community', icon: Users },
 ];
 
 export default function Navigation() {

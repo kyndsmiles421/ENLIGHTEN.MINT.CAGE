@@ -431,6 +431,275 @@ class ZenEnergyAPITester:
             self.log_result("Ritual Deletion", False, f"Status: {response.status_code if response else 'No response'}")
         return False
 
+    # === COMMUNITY API TESTS ===
+    
+    def test_community_feed(self):
+        """Test GET /api/community/feed returns posts with total count"""
+        response = self.make_request('GET', 'community/feed')
+        if response and response.status_code == 200:
+            data = response.json()
+            required_fields = ['posts', 'total', 'page', 'has_more']
+            if all(field in data for field in required_fields):
+                if isinstance(data['posts'], list) and isinstance(data['total'], int):
+                    self.log_result("Community Feed", True)
+                    return True
+                else:
+                    self.log_result("Community Feed", False, "Posts should be list, total should be int")
+            else:
+                self.log_result("Community Feed", False, f"Missing required fields: {required_fields}")
+        else:
+            self.log_result("Community Feed", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_post_creation(self):
+        """Test POST /api/community/posts creates a post (requires auth)"""
+        if not self.token:
+            self.log_result("Community Post Creation", False, "No auth token available")
+            return False
+            
+        post_data = {
+            "post_type": "thought",
+            "content": "Testing community post creation from backend test",
+            "ritual_data": None,
+            "affirmation_text": None,
+            "milestone_type": None,
+            "milestone_value": None
+        }
+        
+        response = self.make_request('POST', 'community/posts', post_data, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'id' in data and data['content'] == post_data['content'] and data['post_type'] == 'thought':
+                self.created_post_id = data['id']  # Store for later tests
+                self.log_result("Community Post Creation", True)
+                return True
+            else:
+                self.log_result("Community Post Creation", False, "Invalid post data in response")
+        else:
+            self.log_result("Community Post Creation", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_post_like(self):
+        """Test POST /api/community/posts/{id}/like toggles like on a post (requires auth)"""
+        if not self.token:
+            self.log_result("Community Post Like", False, "No auth token available")
+            return False
+            
+        if not hasattr(self, 'created_post_id'):
+            self.log_result("Community Post Like", False, "No post ID available from creation test")
+            return False
+            
+        response = self.make_request('POST', f'community/posts/{self.created_post_id}/like', {}, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'action' in data and 'like_count' in data:
+                if data['action'] in ['liked', 'unliked'] and isinstance(data['like_count'], int):
+                    self.log_result("Community Post Like", True)
+                    return True
+                else:
+                    self.log_result("Community Post Like", False, "Invalid like response data")
+            else:
+                self.log_result("Community Post Like", False, "Missing action or like_count in response")
+        else:
+            self.log_result("Community Post Like", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_post_comment(self):
+        """Test POST /api/community/posts/{id}/comment adds comment (requires auth)"""
+        if not self.token:
+            self.log_result("Community Post Comment", False, "No auth token available")
+            return False
+            
+        if not hasattr(self, 'created_post_id'):
+            self.log_result("Community Post Comment", False, "No post ID available from creation test")
+            return False
+            
+        comment_data = {"text": "This is a test comment from backend test"}
+        
+        response = self.make_request('POST', f'community/posts/{self.created_post_id}/comment', comment_data, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'id' in data and data['text'] == comment_data['text'] and 'post_id' in data:
+                self.created_comment_id = data['id']  # Store for later tests
+                self.log_result("Community Post Comment", True)
+                return True
+            else:
+                self.log_result("Community Post Comment", False, "Invalid comment data in response")
+        else:
+            self.log_result("Community Post Comment", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_post_comments_list(self):
+        """Test GET /api/community/posts/{id}/comments returns comments list"""
+        if not hasattr(self, 'created_post_id'):
+            self.log_result("Community Post Comments List", False, "No post ID available from creation test")
+            return False
+            
+        response = self.make_request('GET', f'community/posts/{self.created_post_id}/comments')
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                # Should have at least the comment we created
+                if len(data) > 0 and any(c.get('text') == "This is a test comment from backend test" for c in data):
+                    self.log_result("Community Post Comments List", True)
+                    return True
+                else:
+                    self.log_result("Community Post Comments List", False, "Expected comment not found in list")
+            else:
+                self.log_result("Community Post Comments List", False, "Response should be a list")
+        else:
+            self.log_result("Community Post Comments List", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_post_deletion(self):
+        """Test DELETE /api/community/posts/{id} deletes own post (requires auth)"""
+        if not self.token:
+            self.log_result("Community Post Deletion", False, "No auth token available")
+            return False
+            
+        if not hasattr(self, 'created_post_id'):
+            self.log_result("Community Post Deletion", False, "No post ID available from creation test")
+            return False
+            
+        response = self.make_request('DELETE', f'community/posts/{self.created_post_id}', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'deleted' in data and data['deleted'] is True:
+                self.log_result("Community Post Deletion", True)
+                return True
+            else:
+                self.log_result("Community Post Deletion", False, "Invalid deletion response")
+        else:
+            self.log_result("Community Post Deletion", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_follow_toggle(self):
+        """Test POST /api/community/follow/{user_id} toggles follow (requires auth)"""
+        if not self.token:
+            self.log_result("Community Follow Toggle", False, "No auth token available")
+            return False
+            
+        # Use a dummy user ID for testing (we'll use the ritual user ID if we can get it)
+        # For now, let's try to get active users first to find someone to follow
+        active_response = self.make_request('GET', 'community/users/active')
+        if active_response and active_response.status_code == 200:
+            active_users = active_response.json()
+            if isinstance(active_users, list) and len(active_users) > 0:
+                # Find a user that's not us
+                target_user = None
+                for user in active_users:
+                    if user.get('id') != self.user_id:
+                        target_user = user
+                        break
+                
+                if target_user:
+                    response = self.make_request('POST', f'community/follow/{target_user["id"]}', {}, auth_required=True)
+                    if response and response.status_code == 200:
+                        data = response.json()
+                        if 'action' in data and data['action'] in ['followed', 'unfollowed']:
+                            self.log_result("Community Follow Toggle", True)
+                            return True
+                        else:
+                            self.log_result("Community Follow Toggle", False, "Invalid follow response")
+                    else:
+                        self.log_result("Community Follow Toggle", False, f"Status: {response.status_code if response else 'No response'}")
+                else:
+                    self.log_result("Community Follow Toggle", False, "No other users found to follow")
+            else:
+                self.log_result("Community Follow Toggle", False, "No active users found")
+        else:
+            self.log_result("Community Follow Toggle", False, "Could not get active users list")
+        return False
+
+    def test_community_public_profile(self):
+        """Test GET /api/community/profile/{user_id} returns public profile with stats"""
+        if not self.user_id:
+            self.log_result("Community Public Profile", False, "No user ID available")
+            return False
+            
+        response = self.make_request('GET', f'community/profile/{self.user_id}')
+        if response and response.status_code == 200:
+            data = response.json()
+            required_fields = ['id', 'name', 'post_count', 'mood_count', 'journal_count', 'ritual_sessions', 'follower_count', 'following_count']
+            if all(field in data for field in required_fields):
+                if all(isinstance(data[field], int) for field in ['post_count', 'mood_count', 'journal_count', 'ritual_sessions', 'follower_count', 'following_count']):
+                    self.log_result("Community Public Profile", True)
+                    return True
+                else:
+                    self.log_result("Community Public Profile", False, "Count fields should be integers")
+            else:
+                self.log_result("Community Public Profile", False, f"Missing required fields: {required_fields}")
+        else:
+            self.log_result("Community Public Profile", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_my_following(self):
+        """Test GET /api/community/me/following returns list of followed user IDs"""
+        if not self.token:
+            self.log_result("Community My Following", False, "No auth token available")
+            return False
+            
+        response = self.make_request('GET', 'community/me/following', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                # Should be a list of user IDs (strings)
+                if all(isinstance(user_id, str) for user_id in data):
+                    self.log_result("Community My Following", True)
+                    return True
+                else:
+                    self.log_result("Community My Following", False, "All items should be strings (user IDs)")
+            else:
+                self.log_result("Community My Following", False, "Response should be a list")
+        else:
+            self.log_result("Community My Following", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_community_active_users(self):
+        """Test GET /api/community/users/active returns active community members"""
+        response = self.make_request('GET', 'community/users/active')
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                # Each user should have required fields
+                if len(data) > 0:
+                    required_fields = ['id', 'name', 'post_count', 'follower_count']
+                    if all(all(field in user for field in required_fields) for user in data):
+                        self.log_result("Community Active Users", True)
+                        return True
+                    else:
+                        self.log_result("Community Active Users", False, "Missing required fields in user objects")
+                else:
+                    # Empty list is also valid
+                    self.log_result("Community Active Users", True)
+                    return True
+            else:
+                self.log_result("Community Active Users", False, "Response should be a list")
+        else:
+            self.log_result("Community Active Users", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_ritual_user_login(self):
+        """Test login with the ritual test user that has existing posts"""
+        login_data = {
+            "email": "ritual@test.com",
+            "password": "ritual123"
+        }
+        
+        response = self.make_request('POST', 'auth/login', login_data)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'token' in data and 'user' in data:
+                self.ritual_token = data['token']
+                self.ritual_user_id = data['user']['id']
+                self.log_result("Ritual User Login", True)
+                return True
+            else:
+                self.log_result("Ritual User Login", False, "Missing token or user in response")
+        else:
+            self.log_result("Ritual User Login", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
     def run_all_tests(self):
         """Run all backend API tests"""
         print("🚀 Starting Zen Energy Bar Backend API Tests")
@@ -446,6 +715,11 @@ class ZenEnergyAPITester:
         
         # Test ritual templates (public endpoint)
         self.test_ritual_templates()
+        
+        # Test community public endpoints
+        print("\n🌐 Testing Community Public Endpoints...")
+        self.test_community_feed()
+        self.test_community_active_users()
         
         # Test authentication
         auth_success = self.test_user_registration()
@@ -466,8 +740,36 @@ class ZenEnergyAPITester:
             self.test_ritual_completion()
             self.test_ritual_history()
             self.test_ritual_deletion()
+            
+            # Test community authenticated endpoints
+            print("\n👥 Testing Community Authenticated Endpoints...")
+            self.test_community_post_creation()
+            self.test_community_post_like()
+            self.test_community_post_comment()
+            self.test_community_post_comments_list()
+            self.test_community_follow_toggle()
+            self.test_community_public_profile()
+            self.test_community_my_following()
+            self.test_community_post_deletion()
         else:
             print("⚠️  Skipping authenticated tests due to auth failure")
+        
+        # Test with ritual user (has existing posts)
+        print("\n🧘 Testing with Ritual User (existing posts)...")
+        ritual_auth_success = self.test_ritual_user_login()
+        if ritual_auth_success:
+            # Test community endpoints with user that has existing data
+            old_token = self.token
+            old_user_id = self.user_id
+            self.token = self.ritual_token
+            self.user_id = self.ritual_user_id
+            
+            self.test_community_public_profile()
+            self.test_community_my_following()
+            
+            # Restore original token
+            self.token = old_token
+            self.user_id = old_user_id
         
         # Print summary
         print("\n" + "=" * 60)

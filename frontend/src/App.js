@@ -16,6 +16,7 @@ import Exercises from './pages/Exercises';
 import Nourishment from './pages/Nourishment';
 import Frequencies from './pages/Frequencies';
 import Rituals from './pages/Rituals';
+import Community from './pages/Community';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
             <Route path="/nourishment" element={<Nourishment />} />
             <Route path="/frequencies" element={<Frequencies />} />
             <Route path="/rituals" element={<Rituals />} />
+            <Route path="/community" element={<Community />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
