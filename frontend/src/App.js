@@ -18,6 +18,8 @@ import Frequencies from './pages/Frequencies';
 import Rituals from './pages/Rituals';
 import Community from './pages/Community';
 import Challenges from './pages/Challenges';
+import ProfilePage from './pages/ProfilePage';
+import Oracle from './pages/Oracle';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -53,6 +55,9 @@ function App() {
             <Route path="/rituals" element={<Rituals />} />
             <Route path="/community" element={<Community />} />
             <Route path="/challenges" element={<Challenges />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
+            <Route path="/oracle" element={<Oracle />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

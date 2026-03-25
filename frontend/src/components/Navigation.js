@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones,
-  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise, Users, Flame
+  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise, Users, Flame, Sparkles, User
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { path: '/nourishment', label: 'Nourish', icon: Leaf },
   { path: '/frequencies', label: 'Hz', icon: Radio },
   { path: '/community', label: 'Community', icon: Users },
+  { path: '/oracle', label: 'Oracle', icon: Sparkles },
 ];
 
 export default function Navigation() {
@@ -74,6 +75,18 @@ export default function Navigation() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              <Link
+                to="/profile"
+                data-testid="nav-profile"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm"
+                style={{
+                  color: location.pathname === '/profile' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  background: location.pathname === '/profile' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                }}
+              >
+                <User size={15} />
+                <span>Profile</span>
+              </Link>
               <Link
                 to="/dashboard"
                 data-testid="nav-dashboard"
@@ -157,6 +170,10 @@ export default function Navigation() {
               <div className="border-t border-white/10 pt-4 mt-4">
                 {user ? (
                   <>
+                    <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--text-secondary)' }}>
+                      <User size={18} />
+                      <span>Profile</span>
+                    </Link>
                     <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--text-secondary)' }}>
                       <LayoutDashboard size={18} />
                       <span>Dashboard</span>

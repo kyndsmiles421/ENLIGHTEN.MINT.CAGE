@@ -3,11 +3,13 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio, Sunrise, Users, Trophy } from 'lucide-react';
+import { Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio, Sunrise, Users, Trophy, Sparkles, User } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const QUICK_ACTIONS = [
+  { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#D8B4FE' },
+  { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
   { icon: Sunrise, label: 'Rituals', path: '/rituals', color: '#FCD34D' },
   { icon: Trophy, label: 'Challenges', path: '/challenges', color: '#FB923C' },
   { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
@@ -84,6 +85,7 @@ function AvatarDisplay({ style, size = 80, name = '?' }) {
 }
 
 export default function ProfilePage() {
+  const { userId } = useParams();
   const { user, authHeaders } = useAuth();
   const [profile, setProfile] = useState(null);
   const [covers, setCovers] = useState([]);
@@ -92,10 +94,17 @@ export default function ProfilePage() {
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [draft, setDraft] = useState({});
   const [loading, setLoading] = useState(true);
+  const isOwnProfile = !userId || (user && userId === user.id);
 
   useEffect(() => {
     axios.get(`${API}/profile/covers`).then(r => setCovers(r.data)).catch(() => {});
-    if (user) {
+    if (userId && (!user || userId !== user.id)) {
+      // Viewing someone else's public profile
+      axios.get(`${API}/profile/public/${userId}`)
+        .then(r => { setProfile(r.data); setDraft(r.data); })
+        .catch(() => toast.error('Profile not found'))
+        .finally(() => setLoading(false));
+    } else if (user) {
       axios.get(`${API}/profile/me`, { headers: authHeaders })
         .then(r => { setProfile(r.data); setDraft(r.data); })
         .catch(() => {})
@@ -103,7 +112,7 @@ export default function ProfilePage() {
     } else {
       setLoading(false);
     }
-  }, [user, authHeaders]);
+  }, [user, authHeaders, userId]);
 
   const save = async () => {
     setSaving(true);
@@ -118,7 +127,7 @@ export default function ProfilePage() {
   const update = (key, val) => setDraft({ ...draft, [key]: val });
 
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-default)' }}><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
-  if (!user) return <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--bg-default)' }}><div className="text-center"><h2 className="text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Sign in to customize your profile</h2><a href="/auth" className="btn-glass" data-testid="profile-signin">Sign In</a></div></div>;
+  if (!user && !userId) return <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--bg-default)' }}><div className="text-center"><h2 className="text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Sign in to customize your profile</h2><a href="/auth" className="btn-glass" data-testid="profile-signin">Sign In</a></div></div>;
 
   const p = editing ? draft : (profile || {});
   const themeColor = p.theme_color || '#D8B4FE';
@@ -142,7 +151,7 @@ export default function ProfilePage() {
         {/* Avatar + Name */}
         <div className="flex items-end gap-6 mb-8">
           <div className="relative">
-            <AvatarDisplay style={p.avatar_style} size={120} name={p.display_name || user.name} />
+            <AvatarDisplay style={p.avatar_style} size={120} name={p.display_name || p.name || user?.name || '?'} />
             {p.vibe_status && (
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs whitespace-nowrap"
                 style={{ background: `${themeColor}20`, border: `1px solid ${themeColor}30`, color: themeColor }}>
@@ -159,12 +168,12 @@ export default function ProfilePage() {
                     placeholder="Display Name" data-testid="edit-display-name" />
                 ) : (
                   <h1 className="text-3xl md:text-4xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                    {p.display_name || user.name}
+                    {p.display_name || p.name || user?.name}
                   </h1>
                 )}
               </div>
               <div className="flex gap-2">
-                {p.music_choice !== 'none' && (
+                {isOwnProfile && p.music_choice !== 'none' && (
                   <button onClick={() => setMusicPlaying(!musicPlaying)}
                     className="btn-glass px-3 py-2 text-xs flex items-center gap-1.5"
                     style={{ borderColor: musicPlaying ? `${themeColor}40` : 'rgba(255,255,255,0.1)', color: musicPlaying ? themeColor : 'var(--text-muted)' }}
@@ -172,13 +181,15 @@ export default function ProfilePage() {
                     <Music size={14} /> {musicPlaying ? `${p.music_frequency}Hz` : 'Play Music'}
                   </button>
                 )}
-                <button onClick={() => editing ? save() : setEditing(true)}
-                  className="btn-glass px-4 py-2 text-xs flex items-center gap-1.5"
-                  style={{ borderColor: editing ? `${themeColor}40` : 'rgba(255,255,255,0.1)' }}
-                  data-testid="edit-profile-btn">
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : editing ? <Save size={14} /> : <Settings size={14} />}
-                  {saving ? 'Saving...' : editing ? 'Save Profile' : 'Edit Profile'}
-                </button>
+                {isOwnProfile && (
+                  <button onClick={() => editing ? save() : setEditing(true)}
+                    className="btn-glass px-4 py-2 text-xs flex items-center gap-1.5"
+                    style={{ borderColor: editing ? `${themeColor}40` : 'rgba(255,255,255,0.1)' }}
+                    data-testid="edit-profile-btn">
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : editing ? <Save size={14} /> : <Settings size={14} />}
+                    {saving ? 'Saving...' : editing ? 'Save Profile' : 'Edit Profile'}
+                  </button>
+                )}
                 {editing && (
                   <button onClick={() => { setEditing(false); setDraft(profile); }} className="btn-glass px-3 py-2 text-xs" data-testid="cancel-edit-btn">
                     <X size={14} />
@@ -291,7 +302,7 @@ export default function ProfilePage() {
             {!p.bio && !p.favorite_quote && !editing && (
               <div className="glass-card p-8 text-center">
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Click "Edit Profile" to add your bio, favorite quote, cover photo, and personal music.
+                  {isOwnProfile ? 'Click "Edit Profile" to add your bio, favorite quote, cover photo, and personal music.' : 'This user hasn\'t customized their profile yet.'}
                 </p>
               </div>
             )}
@@ -312,7 +323,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span style={{ color: 'var(--text-secondary)' }}>Avatar</span>
-                  <AvatarDisplay style={p.avatar_style} size={24} name={p.display_name || user.name} />
+                  <AvatarDisplay style={p.avatar_style} size={24} name={p.display_name || p.name || user?.name || '?'} />
                 </div>
               </div>
             </div>
