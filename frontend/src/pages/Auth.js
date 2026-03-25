@@ -35,7 +35,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--bg-default)' }}>
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

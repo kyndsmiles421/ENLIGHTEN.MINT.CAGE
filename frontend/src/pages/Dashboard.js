@@ -52,19 +52,19 @@ export default function Dashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-default)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <p style={{ color: 'var(--text-muted)' }}>Aligning your energies...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'var(--bg-default)' }} data-testid="dashboard-page">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 relative" style={{ background: 'transparent' }} data-testid="dashboard-page">
+      <div className="max-w-6xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--primary)' }}>Dashboard</p>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--primary)' }}>Dashboard</p>
           <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Welcome back, {user?.name?.split(' ')[0]}
+            Welcome back, <span className="animate-text-shimmer">{user?.name?.split(' ')[0]}</span>
           </h1>
           <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
             Your consciousness practice at a glance.
@@ -73,44 +73,30 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="glass-card p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <Flame size={20} style={{ color: '#FCD34D' }} />
-              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Streak</p>
-            </div>
-            <p className="text-5xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid="dashboard-streak">
-              {stats?.streak || 0}
-            </p>
-            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>consecutive days</p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-            className="glass-card p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <Heart size={20} style={{ color: '#FDA4AF' }} />
-              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Mood Logs</p>
-            </div>
-            <p className="text-5xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid="dashboard-moods">
-              {stats?.mood_count || 0}
-            </p>
-            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>emotions tracked</p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="glass-card p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <BookOpen size={20} style={{ color: '#86EFAC' }} />
-              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Journal Entries</p>
-            </div>
-            <p className="text-5xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid="dashboard-journals">
-              {stats?.journal_count || 0}
-            </p>
-            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>reflections written</p>
-          </motion.div>
+          {[
+            { icon: Flame, color: '#FCD34D', label: 'Streak', value: stats?.streak || 0, sub: 'consecutive days', testId: 'dashboard-streak' },
+            { icon: Heart, color: '#FDA4AF', label: 'Mood Logs', value: stats?.mood_count || 0, sub: 'emotions tracked', testId: 'dashboard-moods' },
+            { icon: BookOpen, color: '#86EFAC', label: 'Journal Entries', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals' },
+          ].map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}
+                className="glass-card p-8 animate-breathe-border group hover:scale-[1.02] transition-transform duration-300"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                    style={{ background: `${card.color}12` }}>
+                    <Icon size={18} style={{ color: card.color, filter: `drop-shadow(0 0 6px ${card.color}60)` }} />
+                  </div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
+                </div>
+                <p className="text-5xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid={card.testId}>
+                  {card.value}
+                </p>
+                <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Recent Moods */}
@@ -121,18 +107,19 @@ export default function Dashboard() {
             <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Recent Mood Flow</p>
             <div className="flex items-end gap-3 h-24">
               {stats.recent_moods.map((m, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                <motion.div key={i} className="flex-1 flex flex-col items-center gap-2"
+                  initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} transition={{ delay: 0.3 + i * 0.05 }}>
                   <div
-                    className="w-full rounded-lg"
+                    className="w-full rounded-lg transition-all duration-500"
                     style={{
                       height: `${(m.intensity / 10) * 100}%`,
                       minHeight: '8px',
                       background: `linear-gradient(to top, rgba(192,132,252,0.3), rgba(45,212,191,0.3))`,
-                      transition: 'height 0.3s',
+                      boxShadow: '0 0 10px rgba(192,132,252,0.1)',
                     }}
                   />
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{m.mood?.substring(0, 3)}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -142,18 +129,26 @@ export default function Dashboard() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Explore & Practice</p>
           <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
-            {QUICK_ACTIONS.map(action => {
+            {QUICK_ACTIONS.map((action, i) => {
               const Icon = action.icon;
               return (
-                <button
+                <motion.button
                   key={action.label}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.35 + i * 0.02 }}
                   onClick={() => navigate(action.path)}
-                  className="glass-card glass-card-hover p-4 flex flex-col items-center gap-2.5"
+                  className="glass-card p-4 flex flex-col items-center gap-2.5 group cursor-pointer transition-all duration-300 hover:scale-105"
+                  style={{ border: '1px solid rgba(255,255,255,0.04)' }}
                   data-testid={`dashboard-action-${action.label.toLowerCase()}`}
+                  whileHover={{ borderColor: `${action.color}30`, boxShadow: `0 0 20px ${action.color}15` }}
                 >
-                  <Icon size={20} style={{ color: action.color }} />
-                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{action.label}</span>
-                </button>
+                  <div className="transition-all duration-300 group-hover:scale-110">
+                    <Icon size={20} style={{ color: action.color, transition: 'filter 0.3s' }}
+                      className="group-hover:drop-shadow-lg" />
+                  </div>
+                  <span className="text-xs transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>{action.label}</span>
+                </motion.button>
               );
             })}
           </div>
