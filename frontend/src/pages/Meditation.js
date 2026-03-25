@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import CelebrationBurst from '../components/CelebrationBurst';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /* ======== AMBIENT SOUND ENGINE ======== */
 function createNoiseBuffer(ctx, seconds = 2) {
@@ -469,9 +474,404 @@ function TimerMode() {
   );
 }
 
+const BUILD_FOCUSES = [
+  { id: 'stress', label: 'Stress Relief', icon: Waves, color: '#3B82F6' },
+  { id: 'sleep', label: 'Deep Sleep', icon: Moon, color: '#6366F1' },
+  { id: 'focus', label: 'Mental Clarity', icon: Brain, color: '#2DD4BF' },
+  { id: 'healing', label: 'Healing', icon: Heart, color: '#FDA4AF' },
+  { id: 'gratitude', label: 'Gratitude', icon: Sun, color: '#FCD34D' },
+  { id: 'confidence', label: 'Confidence', icon: Flame, color: '#FB923C' },
+  { id: 'letting-go', label: 'Letting Go', icon: Wind, color: '#C084FC' },
+];
+
+const BUILD_DURATIONS = [5, 8, 10, 15, 20];
+const BUILD_COLORS = ['#D8B4FE', '#2DD4BF', '#FCD34D', '#FDA4AF', '#6366F1', '#22C55E', '#FB923C', '#3B82F6'];
+
+function BuildYourOwn({ onPlay }) {
+  const { user, authHeaders } = useAuth();
+  const { playChime } = useSensory();
+  const [step, setStep] = useState(1); // 1=intention, 2=settings, 3=generating, 4=review
+  const [intention, setIntention] = useState('');
+  const [focus, setFocus] = useState('stress');
+  const [duration, setDuration] = useState(10);
+  const [sound, setSound] = useState('ocean');
+  const [color, setColor] = useState('#D8B4FE');
+  const [name, setName] = useState('');
+  const [generatedSteps, setGeneratedSteps] = useState([]);
+  const [generating, setGenerating] = useState(false);
+  const [editIdx, setEditIdx] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [saved, setSaved] = useState([]);
+  const [saving, setSaving] = useState(false);
+
+  const loadSaved = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await axios.get(`${API}/meditation/my-custom`, { headers: authHeaders });
+      setSaved(res.data);
+    } catch {}
+  }, [user, authHeaders]);
+
+  useEffect(() => { loadSaved(); }, [loadSaved]);
+
+  const generate = async () => {
+    if (!intention.trim()) { toast.error('Please describe your intention'); return; }
+    setGenerating(true);
+    setStep(3);
+    try {
+      const res = await axios.post(`${API}/meditation/generate-guided`, {
+        intention: intention.trim(), duration, focus, name: name || `My ${BUILD_FOCUSES.find(f => f.id === focus)?.label} Meditation`,
+      }, { headers: authHeaders });
+      setGeneratedSteps(res.data.steps);
+      setStep(4);
+      playChime();
+    } catch (e) {
+      toast.error('Generation failed. Please try again.');
+      setStep(2);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const saveAndPlay = async () => {
+    const meditationName = name || `My ${BUILD_FOCUSES.find(f => f.id === focus)?.label} Meditation`;
+    const med = {
+      id: `custom-${Date.now()}`, name: meditationName, icon: Sparkles, color,
+      duration, sound, category: 'custom', description: intention,
+      steps: generatedSteps,
+    };
+
+    // Save to backend if logged in
+    if (user) {
+      setSaving(true);
+      try {
+        await axios.post(`${API}/meditation/save-custom`, {
+          name: meditationName, intention, focus, duration, sound, color, steps: generatedSteps,
+        }, { headers: authHeaders });
+        loadSaved();
+        toast.success('Meditation saved to your collection!');
+      } catch { toast.error('Could not save, but you can still play it.'); }
+      setSaving(false);
+    }
+
+    onPlay(med);
+  };
+
+  const playOnly = () => {
+    const meditationName = name || `My ${BUILD_FOCUSES.find(f => f.id === focus)?.label} Meditation`;
+    onPlay({
+      id: `temp-${Date.now()}`, name: meditationName, icon: Sparkles, color,
+      duration, sound, category: 'custom', description: intention,
+      steps: generatedSteps,
+    });
+  };
+
+  const playSaved = (s) => {
+    onPlay({
+      id: s.id, name: s.name, icon: Sparkles, color: s.color || '#D8B4FE',
+      duration: s.duration, sound: s.sound || 'silence', category: 'custom',
+      description: s.intention, steps: s.steps,
+    });
+  };
+
+  const deleteSaved = async (id) => {
+    try {
+      await axios.delete(`${API}/meditation/custom/${id}`, { headers: authHeaders });
+      setSaved(prev => prev.filter(s => s.id !== id));
+      toast.success('Deleted');
+    } catch {}
+  };
+
+  const startEdit = (i) => { setEditIdx(i); setEditText(generatedSteps[i].text); };
+  const saveEdit = () => {
+    if (editIdx === null) return;
+    setGeneratedSteps(prev => prev.map((s, i) => i === editIdx ? { ...s, text: editText } : s));
+    setEditIdx(null);
+  };
+
+  if (!user) return (
+    <div className="glass-card p-12 text-center">
+      <Wand2 size={32} style={{ color: 'rgba(216,180,254,0.3)', margin: '0 auto 12px' }} />
+      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to build personalized guided meditations with AI.</p>
+    </div>
+  );
+
+  const focusConfig = BUILD_FOCUSES.find(f => f.id === focus);
+
+  return (
+    <div className="space-y-8">
+      {/* Saved Custom Meditations */}
+      {saved.length > 0 && step === 1 && (
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Your Custom Meditations</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {saved.map((s, i) => (
+              <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                className="glass-card p-5 group" data-testid={`saved-meditation-${s.id}`}>
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{s.name}</h4>
+                    <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.duration} min &middot; {s.focus}</p>
+                  </div>
+                  <button onClick={() => deleteSaved(s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                    data-testid={`delete-custom-${s.id}`}>
+                    <Trash2 size={14} style={{ color: 'var(--text-muted)' }} />
+                  </button>
+                </div>
+                <p className="text-xs line-clamp-2 mb-3" style={{ color: 'var(--text-secondary)' }}>{s.intention}</p>
+                <button onClick={() => playSaved(s)}
+                  className="w-full py-2 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-all"
+                  style={{ background: `${s.color || '#D8B4FE'}12`, color: s.color || '#D8B4FE', border: `1px solid ${s.color || '#D8B4FE'}25` }}
+                  data-testid={`play-custom-${s.id}`}>
+                  <Play size={12} fill={s.color || '#D8B4FE'} /> Begin Session
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Builder */}
+      <div className="glass-card p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 rounded-full" style={{
+          background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`, filter: 'blur(30px)',
+        }} />
+
+        {/* Step indicator */}
+        <div className="flex items-center gap-3 mb-8 relative z-10">
+          {[1, 2, 3, 4].map(s => (
+            <div key={s} className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-medium transition-all"
+                style={{
+                  background: step >= s ? `${color}20` : 'rgba(255,255,255,0.03)',
+                  color: step >= s ? color : 'var(--text-muted)',
+                  border: `1px solid ${step >= s ? `${color}40` : 'rgba(255,255,255,0.06)'}`,
+                }}>
+                {s}
+              </div>
+              {s < 4 && <div className="w-8 h-px" style={{ background: step > s ? `${color}30` : 'rgba(255,255,255,0.06)' }} />}
+            </div>
+          ))}
+          <span className="text-xs ml-2" style={{ color: 'var(--text-muted)' }}>
+            {step === 1 && 'Set Intention'}{step === 2 && 'Configure'}{step === 3 && 'Generating...'}{step === 4 && 'Review & Play'}
+          </span>
+        </div>
+
+        {/* Step 1: Intention */}
+        {step === 1 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 relative z-10">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest block mb-3" style={{ color: 'var(--text-muted)' }}>
+                What do you need right now?
+              </label>
+              <textarea
+                value={intention}
+                onChange={e => setIntention(e.target.value)}
+                placeholder="I want to release the stress from today and find deep inner calm... / I need to quiet my racing mind before sleep... / I want to heal from a painful experience..."
+                className="input-glass w-full h-28 resize-none text-sm leading-relaxed"
+                data-testid="build-intention-input"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest block mb-3" style={{ color: 'var(--text-muted)' }}>
+                Focus Area
+              </label>
+              <div className="flex flex-wrap gap-2" data-testid="build-focus-selector">
+                {BUILD_FOCUSES.map(f => {
+                  const Icon = f.icon;
+                  return (
+                    <button key={f.id} onClick={() => setFocus(f.id)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all"
+                      style={{
+                        background: focus === f.id ? `${f.color}15` : 'rgba(255,255,255,0.02)',
+                        color: focus === f.id ? f.color : 'var(--text-muted)',
+                        border: `1px solid ${focus === f.id ? `${f.color}30` : 'rgba(255,255,255,0.06)'}`,
+                      }}
+                      data-testid={`build-focus-${f.id}`}>
+                      <Icon size={13} /> {f.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <button onClick={() => { if (!intention.trim()) { toast.error('Please describe your intention'); return; } setStep(2); }}
+                className="btn-glass px-6 py-2.5 text-sm flex items-center gap-2"
+                style={{ background: `${color}12`, borderColor: `${color}30`, color }}
+                data-testid="build-next-step2">
+                Next <ChevronRight size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Step 2: Settings */}
+        {step === 2 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 relative z-10">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest block mb-3" style={{ color: 'var(--text-muted)' }}>
+                Name your meditation (optional)
+              </label>
+              <input value={name} onChange={e => setName(e.target.value)}
+                placeholder={`My ${focusConfig?.label} Meditation`}
+                className="input-glass w-full text-sm" data-testid="build-name-input" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest block mb-3" style={{ color: 'var(--text-muted)' }}>Duration</label>
+              <div className="flex gap-2">
+                {BUILD_DURATIONS.map(d => (
+                  <button key={d} onClick={() => setDuration(d)}
+                    className="px-4 py-2 rounded-xl text-xs transition-all"
+                    style={{
+                      background: duration === d ? `${color}15` : 'rgba(255,255,255,0.02)',
+                      color: duration === d ? color : 'var(--text-muted)',
+                      border: `1px solid ${duration === d ? `${color}30` : 'rgba(255,255,255,0.06)'}`,
+                    }}
+                    data-testid={`build-duration-${d}`}>{d} min</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest block mb-3" style={{ color: 'var(--text-muted)' }}>Ambient Sound</label>
+              <div className="flex flex-wrap gap-2">
+                {AMBIENT_SOUNDS.map(s => (
+                  <button key={s.id} onClick={() => setSound(s.id)}
+                    className="px-3 py-2 rounded-xl text-xs transition-all"
+                    style={{
+                      background: sound === s.id ? `${color}15` : 'rgba(255,255,255,0.02)',
+                      color: sound === s.id ? color : 'var(--text-muted)',
+                      border: `1px solid ${sound === s.id ? `${color}30` : 'rgba(255,255,255,0.06)'}`,
+                    }}
+                    data-testid={`build-sound-${s.id}`}>{s.name}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-widest block mb-3" style={{ color: 'var(--text-muted)' }}>Theme Color</label>
+              <div className="flex gap-2">
+                {BUILD_COLORS.map(c => (
+                  <button key={c} onClick={() => setColor(c)}
+                    className="w-8 h-8 rounded-full transition-all"
+                    style={{
+                      background: c,
+                      border: color === c ? '2px solid #fff' : '2px solid transparent',
+                      boxShadow: color === c ? `0 0 12px ${c}60` : 'none',
+                      transform: color === c ? 'scale(1.15)' : 'scale(1)',
+                    }}
+                    data-testid={`build-color-${c}`} />
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <button onClick={() => setStep(1)} className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                <ArrowLeft size={14} /> Back
+              </button>
+              <button onClick={generate}
+                className="btn-glass px-6 py-2.5 text-sm flex items-center gap-2"
+                style={{ background: `${color}12`, borderColor: `${color}30`, color }}
+                data-testid="build-generate-btn">
+                <Wand2 size={14} /> Generate My Meditation
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Step 3: Generating */}
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-16 text-center relative z-10">
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              className="w-12 h-12 mx-auto mb-6 rounded-full"
+              style={{ border: `2px solid ${color}30`, borderTopColor: color }} />
+            <p className="text-base" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
+              Crafting your personal meditation...
+            </p>
+            <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+              AI is weaving your intention into a unique guided journey
+            </p>
+          </motion.div>
+        )}
+
+        {/* Step 4: Review & Edit */}
+        {step === 4 && generatedSteps.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 relative z-10">
+            <div className="flex items-center gap-3 mb-2">
+              <Sparkles size={16} style={{ color }} />
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                {name || `My ${focusConfig?.label} Meditation`} — {duration} min, {generatedSteps.length} steps
+              </p>
+            </div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              Review and edit any step to make it truly yours. Tap a step to edit.
+            </p>
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-2" data-testid="build-steps-list">
+              {generatedSteps.map((s, i) => (
+                <div key={i} className="p-4 rounded-xl transition-all cursor-pointer group"
+                  style={{ background: editIdx === i ? `${color}08` : 'rgba(255,255,255,0.02)', border: `1px solid ${editIdx === i ? `${color}20` : 'rgba(255,255,255,0.04)'}` }}
+                  onClick={() => editIdx !== i && startEdit(i)}
+                  data-testid={`build-step-${i}`}>
+                  <div className="flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
+                      style={{ background: `${color}15`, color }}>
+                      {i + 1}
+                    </span>
+                    {editIdx === i ? (
+                      <div className="flex-1">
+                        <textarea value={editText} onChange={e => setEditText(e.target.value)}
+                          className="input-glass w-full text-sm h-20 resize-none" autoFocus
+                          data-testid={`build-step-edit-${i}`} />
+                        <div className="flex gap-2 mt-2">
+                          <button onClick={saveEdit} className="text-xs px-3 py-1 rounded-full"
+                            style={{ background: `${color}15`, color }}>Save</button>
+                          <button onClick={() => setEditIdx(null)} className="text-xs px-3 py-1 rounded-full"
+                            style={{ color: 'var(--text-muted)' }}>Cancel</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-relaxed flex-1" style={{ color: 'var(--text-secondary)' }}>
+                        {s.text}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <button onClick={() => { setStep(1); setGeneratedSteps([]); }}
+                className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                <ArrowLeft size={14} /> Start Over
+              </button>
+              <button onClick={generate}
+                className="text-xs flex items-center gap-1 px-3 py-1.5 rounded-full"
+                style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)' }}
+                data-testid="build-regenerate">
+                <RotateCcw size={12} /> Regenerate
+              </button>
+              <div className="ml-auto flex gap-3">
+                <button onClick={playOnly}
+                  className="btn-glass px-5 py-2 text-sm flex items-center gap-2"
+                  data-testid="build-play-only">
+                  <Play size={14} /> Play Now
+                </button>
+                <button onClick={saveAndPlay} disabled={saving}
+                  className="btn-glass px-5 py-2 text-sm flex items-center gap-2"
+                  style={{ background: `${color}15`, borderColor: `${color}30`, color }}
+                  data-testid="build-save-play">
+                  {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  Save & Play
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ======== MAIN PAGE ======== */
 export default function Meditation() {
-  const [mode, setMode] = useState('guided'); // 'guided' | 'timer'
+  const { user } = useAuth();
+  const [mode, setMode] = useState('guided');
   const [filter, setFilter] = useState('all');
   const [activeSession, setActiveSession] = useState(null);
 
@@ -491,8 +891,12 @@ export default function Meditation() {
         </motion.div>
 
         {/* Mode Toggle */}
-        <div className="flex gap-2 mb-8" data-testid="meditation-mode-toggle">
-          {[{ id: 'guided', label: 'Guided Meditations', icon: Sparkles }, { id: 'timer', label: 'Timer Mode', icon: RotateCcw }].map(m => {
+        <div className="flex gap-2 mb-8 flex-wrap" data-testid="meditation-mode-toggle">
+          {[
+            { id: 'guided', label: 'Guided Meditations', icon: Sparkles },
+            { id: 'build', label: 'Build Your Own', icon: Wand2 },
+            { id: 'timer', label: 'Timer Mode', icon: RotateCcw },
+          ].map(m => {
             const Icon = m.icon;
             return (
               <button key={m.id} onClick={() => setMode(m.id)}
@@ -565,6 +969,8 @@ export default function Meditation() {
               })}
             </div>
           </>
+        ) : mode === 'build' ? (
+          <BuildYourOwn onPlay={setActiveSession} />
         ) : (
           <TimerMode />
         )}
