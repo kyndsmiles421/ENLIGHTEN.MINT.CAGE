@@ -1,69 +1,84 @@
-# The Cosmic Collective - Positive Energy Bar
+# The Cosmic Collective - PRD
 
 ## Original Problem Statement
-Build a full-stack application for a "positive energy bar to help people de-stress and seek enlightenment and enhance conscious experiences".
+Build a full-stack wellness platform ("positive energy bar") for stress relief, enlightenment, and conscious experience enhancement.
 
 ## Tech Stack
-- **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion, PWA manifest
+- **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion, PWA
 - **Backend**: FastAPI, Python, asyncio
 - **Database**: MongoDB
-- **AI**: GPT-5.2 via emergentintegrations (Emergent LLM Key)
-- **Audio**: Web Audio API, OpenAI TTS (tts-1-hd)
+- **AI**: GPT-5.2 + TTS-1-HD via emergentintegrations (Emergent LLM Key)
+- **Image Gen**: Gemini Nano Banana
 
-## Implemented Features
+## All Implemented Features
 
 ### Core Wellness Tools
-- Breathing, Meditation, Affirmations, Mood Tracker, Journal, Dashboard
-- Soundscapes, Frequencies, Exercises, Nourishment
-- Daily Rituals, Community, Challenges
-- Oracle Divination, Personalized Profiles
+- JWT Auth, Breathing, Meditation, Affirmations, Mood Tracker, Journal, Dashboard
+- Soundscapes, Frequencies, Exercises, Nourishment, Daily Rituals
+- Community, Challenges, Oracle Divination, Profiles
 - Mudras, Yantra, Tantra, Videos, Classes
-- Creation Studio, AI Knowledge, Voice Narration
-- Light Therapy, Zen Garden (5 tabs: Koi Pond, Sand, Lanterns, Plants, Rain)
+- Light Therapy, Zen Garden (Koi Pond, Sand, Lanterns, Plants, Rain)
 
 ### Build Your Own (AI-Powered)
 - Custom Breathing, Meditations, Affirmations, Soundscapes, Mantras
 
 ### Spiritual Tools
-- Mantras page, Ho'oponopono page
+- Mantras, Ho'oponopono
 
-### Learning & Onboarding
-- Beginner's Journey (5-stage, 20-lesson guided path)
+### Learning
+- Beginner's Journey (5 stages, 20 lessons)
 - Advanced Progressive Learning Modules (4 levels, 16 lessons)
 
-### Recommendation Engine
-- Personalized "For You" section on Dashboard
-- Mood-based, time-of-day, and engagement-based suggestions
-- Engagement score tracking
+### Applied Evolution
+- Recommendation Engine ("For You" on Dashboard — mood, time, engagement-based)
+- Daily Streak Tracker with auto check-in, best streak, total active days
 
-### UX & Conversion (Phase 17)
-- Quick Reset Flow ("How do you feel?" with 11 options — 5 positive, 6 challenge)
-- Social Proof (6 beta tester testimonials)
-- Founding 100 Waitlist (email collection)
-- Culinary Science Section (4 engineering breakdown cards)
-- Privacy Policy & Wellness Disclaimer (footer modals)
-- PWA Manifest (Add to Home Screen)
+### Wellness Games (NEW - Phase 19)
+- **Sacred Symbols** (Memory Match) — Enhances Memory
+- **Breath of Life** (Breathing Bubble) — Deep Relaxation
+- **Color Harmony** (Palette Sorter) — Uplifts Mood
+- **Inner Rhythm** (Pattern Recall) — Reduces Stress
+- Score tracking with personal bests per game
 
-### Profile & Privacy (Phase 18)
-- Profile Visibility: Public / Friends Only / Private
-- Friends = mutual followers (both follow each other)
-- Restricted profile view for non-authorized viewers
-- Visibility badge on own profile
-- 3-Click Rule audit: all tools reachable in ≤2 clicks from nav
-- Dashboard quick actions: 22 tools, all 1-click from Dashboard
-- User-created content displays on respective tool pages (already working)
+### UX & Conversion
+- Quick Reset Flow (11 feelings → personalized frequency + tool + nourishment)
+- Social Proof (6 testimonials)
+- Founding 100 Waitlist
+- Culinary Science Section
+- Privacy Policy & Wellness Disclaimer
+- PWA Manifest
+
+### Profile & Privacy
+- Visibility: Public / Friends Only / Private
+- Restricted profile view for unauthorized viewers
+
+### Multi-Language Support (NEW - Phase 19)
+- 6 languages: English, Spanish, French, Hindi, Japanese, Portuguese
+- Language selector on Landing page + Navigation bar
+- localStorage persistence
+- Translations: nav, dashboard, landing, quickReset, games, learn, profile, common
 
 ## Key API Endpoints
 - `/api/auth/` - register, login, me
-- `/api/profile/me`, `/api/profile/customize`, `/api/profile/public/{user_id}` - profile with visibility
-- `/api/recommendations` - personalized recommendations
-- `/api/learning/modules`, `/api/learning/complete-lesson` - progressive learning
-- `/api/quick-reset/{feeling}` - 5-min personalized reset
-- `/api/waitlist/join`, `/api/waitlist/count` - founding 100 waitlist
+- `/api/dashboard/stats`, `/api/recommendations` - analytics
+- `/api/streak`, `/api/streak/checkin` - daily streak
+- `/api/games/score`, `/api/games/scores` - game score tracking
+- `/api/learning/modules`, `/api/learning/complete-lesson`
+- `/api/quick-reset/{feeling}` - personalized reset
+- `/api/waitlist/join`, `/api/waitlist/count`
+- `/api/profile/me`, `/api/profile/customize`, `/api/profile/public/{id}`
 - All CRUD for moods, journal, rituals, community, challenges, etc.
 
+## Database Collections
+- users, moods, journal_entries, rituals, ritual_completions
+- posts, follows, challenges, challenge_participants
+- enrollments, certifications, creations, affirmations
+- custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes, custom_mantras
+- zen_plants, journey_progress, learning_progress
+- waitlist, streaks, game_scores, profiles
+
 ## Backlog
-- P1: Backend refactoring (split server.py into APIRouter modules — 3000+ lines)
+- P1: Backend refactoring (server.py → modular APIRouter files — 3100+ lines)
 - P1: Certifications page for completed classes
 - P2: User-uploaded audio/video content
 - P2: Weekly/monthly wellness reports
