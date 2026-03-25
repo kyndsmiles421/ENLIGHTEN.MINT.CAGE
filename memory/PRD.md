@@ -113,11 +113,15 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - **Custom Soundscape Mixes**: "Save This Mix" button appears when sounds active + user logged in. Name input + save. Saved mixes displayed above mixer grid. Click to reload volume levels. Delete on hover. MongoDB `custom_soundscapes` collection.
 
 ### Phase 14 - Mantras & Ho'oponopono Pages (Feb 2026)
-- **Mantras Page** (`/mantras`): Full mantra library of 10 traditional mantras with Sanskrit, pronunciation, meanings, benefits, chakra associations. Category filters (Meditation, Compassion, Devotion, Healing, Peace, Illumination). Detail panel with "Begin Practice" button. Full-screen MantraSession overlay with tap counter, mala bead visualization (27 beads), progress ring, ambient sound options (Bowls/Ocean/Forest/Wind), voice narration. "Build Your Own" tab to create custom mantra practices with repetition presets (11-1008), save/load/delete.
-- **Ho'oponopono Page** (`/hooponopono`): Hawaiian forgiveness practice. Four sacred phrases (I'm sorry, Please forgive me, Thank you, I love you) displayed as cards. About section with 5-step how-it-works guide. Target selection (Myself/Person/Situation/World) with optional name input. Duration picker (5-20 min). Immersive full-screen session with phrases cycling every ~6 seconds, breathing orb animation, progress ring, countdown timer, cycle counter, phrase dots, ambient singing bowl drone, voice guide narration.
-- **New API endpoints**: `/api/mantras/library`, `/api/mantras/save-custom`, `GET /my-custom`, `DELETE /custom/{id}`
-- **Navigation**: Both pages added to "More" dropdown with Music and HeartHandshake icons.
-- **New API endpoints**: `/api/breathing/save-custom`, `GET /my-custom`, `DELETE /custom/{id}`, `/api/affirmations/generate-set`, `/api/affirmations/save-set`, `GET /my-sets`, `DELETE /set/{id}`, `/api/soundscapes/save-mix`, `GET /my-mixes`, `DELETE /mix/{id}`
+- **Mantras Page** (`/mantras`): Full mantra library of 10 traditional mantras with Sanskrit, pronunciation, meanings, benefits, chakra associations. Category filters. Full-screen MantraSession overlay with tap counter, mala bead visualization, ambient sounds, voice narration. "Build Your Own" tab for custom mantra practices.
+- **Ho'oponopono Page** (`/hooponopono`): Hawaiian forgiveness practice. Four sacred phrases, target selection, duration picker, immersive guided session.
+
+### Phase 15 - Beginner's Journey (Feb 2026)
+- **Journey Page** (`/journey`): Guided 5-stage, 20-lesson path with AI-generated hero images.
+  - Stage 1: Foundation — Stage 2: Breath & Body — Stage 3: Mind & Meditation — Stage 4: Sound & Senses — Stage 5: Sacred Practices
+- Embedded mini-tools: breathing timers, mantra counter, Ho'oponopono mini, chakra visual, routine builder
+- Progress tracking with stage unlocking. Each lesson has narration, visual aids, "Try It Now" links.
+- Journey added to primary nav bar. New endpoints: `GET /api/journey/progress`, `POST /api/journey/complete-lesson`
 
 ### Phase 6 - Creation Studio & AI Knowledge
 - Creation Studio (/create): Write your own affirmations, meditations, breathwork, mantras, rituals
@@ -176,7 +180,7 @@ Build a full-stack application for a "positive energy bar to help people de-stre
 - enrollments, certifications
 - creations, knowledge_cache, affirmations
 - custom_meditations, custom_breathing, custom_affirmations, custom_soundscapes, custom_mantras
-- zen_plants
+- zen_plants, journey_progress
 
 ## Backlog (P0/P1/P2)
 - P0: Display user-created content in existing pages (Affirmations, Meditation, Rituals) - integrate /api/creations/mine
