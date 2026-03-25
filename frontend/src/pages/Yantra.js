@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Triangle, Eye, Volume2 } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -133,6 +134,13 @@ export default function Yantra() {
                           <Eye size={12} className="inline mr-1" /> Meditation Practice
                         </p>
                         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{active.meditation}</p>
+                        <div className="mt-3">
+                          <NarrationPlayer
+                            text={`${active.name}. ${active.description}. The mantra for this yantra is: ${active.mantra}. Now, let us meditate. ${active.meditation}. Rest in this sacred space as long as you need. ${active.mantra}.`}
+                            label="Guided Meditation"
+                            color={active.color}
+                          />
+                        </div>
                       </div>
                     </div>
                   </motion.div>

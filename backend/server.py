@@ -14,6 +14,7 @@ import jwt
 import bcrypt
 from datetime import datetime, timezone, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+from emergentintegrations.llm.openai import OpenAITextToSpeech
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -115,6 +116,10 @@ class ClassEnroll(BaseModel):
 class LessonComplete(BaseModel):
     class_id: str
     lesson_id: str
+
+class NarrationRequest(BaseModel):
+    text: str
+    speed: Optional[float] = 0.9
 
 # --- Auth Helpers ---
 def create_token(user_id: str, name: str):
@@ -1101,9 +1106,9 @@ async def get_reading(req: ReadingRequest):
         
         elif req.reading_type == "iching":
             hexagram_lines = [random.choice([6, 7, 8, 9]) for _ in range(6)]
-            hex_binary = "".join(["1" if l in [7, 9] else "0" for l in hexagram_lines])
+            hex_binary = "".join(["1" if ln in [7, 9] else "0" for ln in hexagram_lines])
             hex_num = int(hex_binary, 2) % 64 + 1
-            changing = any(l in [6, 9] for l in hexagram_lines)
+            changing = any(ln in [6, 9] for ln in hexagram_lines)
             
             system_msg = "You are a sage I Ching reader with deep understanding of the Book of Changes. Interpret the hexagram with wisdom, referencing the traditional meaning while making it personal and relevant. Include guidance for the seeker. Keep under 250 words."
             prompt = f"I Ching reading: Hexagram #{hex_num}. Lines from bottom to top: {hexagram_lines}. {'There are changing lines.' if changing else 'No changing lines.'}"
@@ -1340,6 +1345,34 @@ async def get_my_enrollments(user=Depends(get_current_user)):
 async def get_my_certifications(user=Depends(get_current_user)):
     certs = await db.certifications.find({"user_id": user["id"]}, {"_id": 0}).to_list(50)
     return certs
+
+# --- Text-to-Speech Narration ---
+import hashlib
+
+tts_cache = {}
+
+@api_router.post("/tts/narrate")
+async def generate_narration(req: NarrationRequest):
+    if not req.text or len(req.text.strip()) < 5:
+        raise HTTPException(status_code=400, detail="Text too short")
+    text = req.text[:4000]
+    cache_key = hashlib.md5(f"{text}:{req.speed}".encode()).hexdigest()
+    if cache_key in tts_cache:
+        return {"audio": tts_cache[cache_key]}
+    try:
+        tts = OpenAITextToSpeech(api_key=os.getenv("EMERGENT_LLM_KEY"))
+        audio_b64 = await tts.generate_speech_base64(
+            text=text,
+            model="tts-1",
+            voice="sage",
+            speed=req.speed or 0.9,
+            response_format="mp3"
+        )
+        tts_cache[cache_key] = audio_b64
+        return {"audio": audio_b64}
+    except Exception as e:
+        logger.error(f"TTS error: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate narration")
 
 # --- Health ---
 @api_router.get("/")

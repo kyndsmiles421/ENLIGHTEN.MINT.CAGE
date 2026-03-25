@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Flame, Clock, ChevronRight, Activity } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -109,6 +110,13 @@ export default function Tantra() {
                   {/* Instructions */}
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Step-by-Step Practice</p>
+                    <div className="mb-4">
+                      <NarrationPlayer
+                        text={`${active.name}. ${active.description}. Let us begin. ${active.instructions.join('. ')}. Take a moment to rest in stillness and integrate this practice.`}
+                        label="Guided Narration"
+                        color={active.color}
+                      />
+                    </div>
                     <div className="space-y-3">
                       {active.instructions.map((step, i) => (
                         <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const PRESETS = [
   { name: 'Quick Center', minutes: 5, color: '#2DD4BF' },
@@ -329,6 +330,13 @@ export default function Meditation() {
                   <RotateCcw size={20} />
                 </button>
               )}
+            </div>
+            <div className="mt-6">
+              <NarrationPlayer
+                text={`Welcome to your ${preset.name} meditation. Find a comfortable position and gently close your eyes. Take a deep breath in through your nose. And slowly exhale through your mouth. Allow your body to relax with each breath. For the next ${preset.minutes} minutes, simply be present. Notice the sensations in your body without judgment. If thoughts arise, acknowledge them and gently return to your breath. You are safe. You are at peace. Let the stillness embrace you.`}
+                label="Guided Voice"
+                color={preset.color}
+              />
             </div>
           </div>
         </div>

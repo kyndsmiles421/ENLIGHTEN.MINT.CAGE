@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Sparkles, Loader2, RotateCcw, Star, Sun, Moon, Hexagon, Triangle } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -257,6 +258,9 @@ export default function Oracle() {
                         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="tarot-interpretation">
                           {reading.interpretation}
                         </p>
+                        <div className="mt-4">
+                          <NarrationPlayer text={`Your Tarot Reading. ${reading.cards?.map(c => c.name).join(', ')}. ${reading.interpretation}`} label="Hear Your Reading" color="#D8B4FE" />
+                        </div>
                       </div>
                     </>
                   )}
@@ -281,6 +285,9 @@ export default function Oracle() {
                       <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="astrology-reading">
                         {reading.reading}
                       </p>
+                      <div className="mt-4">
+                        <NarrationPlayer text={`${reading.sign?.sign}. ${reading.reading}`} label="Hear Your Reading" color={reading.sign?.color || '#FCD34D'} />
+                      </div>
                     </>
                   )}
 
@@ -304,6 +311,9 @@ export default function Oracle() {
                       <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="chinese-reading">
                         {reading.reading}
                       </p>
+                      <div className="mt-4">
+                        <NarrationPlayer text={`The ${reading.element} ${reading.animal?.animal}. ${reading.reading}`} label="Hear Your Reading" color={reading.animal?.color || '#EF4444'} />
+                      </div>
                     </>
                   )}
 
@@ -326,6 +336,9 @@ export default function Oracle() {
                         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="iching-interpretation">
                           {reading.interpretation}
                         </p>
+                        <div className="mt-4">
+                          <NarrationPlayer text={`Hexagram number ${reading.hexagram_number}. ${reading.interpretation}`} label="Hear the Oracle" color="#2DD4BF" />
+                        </div>
                       </div>
                     </>
                   )}
@@ -348,6 +361,9 @@ export default function Oracle() {
                         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="geometry-meditation">
                           {reading.meditation}
                         </p>
+                        <div className="mt-4">
+                          <NarrationPlayer text={`${reading.pattern?.name}. ${reading.pattern?.meaning}. ${reading.meditation}`} label="Guided Meditation" color={reading.pattern?.color || '#D8B4FE'} />
+                        </div>
                       </div>
                     </>
                   )}

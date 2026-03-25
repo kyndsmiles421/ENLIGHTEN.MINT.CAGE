@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { RefreshCw, Sparkles, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -92,14 +93,21 @@ export default function Affirmations() {
               </motion.p>
             </AnimatePresence>
             {displayText && (
-              <button
-                onClick={() => copyText(displayText)}
-                className="btn-glass px-6 py-2 text-sm inline-flex items-center gap-2"
-                data-testid="copy-affirmation-btn"
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-                {copied ? 'Copied' : 'Copy'}
-              </button>
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  onClick={() => copyText(displayText)}
+                  className="btn-glass px-6 py-2 text-sm inline-flex items-center gap-2"
+                  data-testid="copy-affirmation-btn"
+                >
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+                <NarrationPlayer
+                  text={displayText}
+                  label="Speak Affirmation"
+                  color="#FCD34D"
+                />
+              </div>
             )}
           </div>
         </motion.div>

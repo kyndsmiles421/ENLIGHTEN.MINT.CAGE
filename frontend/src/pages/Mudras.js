@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Hand, Clock, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -102,6 +103,13 @@ export default function Mudras() {
                           </p>
                           <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
                             <span>Element: {mudra.element}</span>
+                          </div>
+                          <div className="mt-3">
+                            <NarrationPlayer
+                              text={`${mudra.name}. ${mudra.description}. Here is how to practice. ${mudra.practice}. Hold this mudra for ${mudra.duration}. The ${mudra.name} activates the ${mudra.chakra} chakra and is associated with the ${mudra.element} element. Benefits include ${mudra.benefits.join(', ')}.`}
+                              label="Voice Guide"
+                              color={mudra.color}
+                            />
                           </div>
                         </div>
                       </motion.div>

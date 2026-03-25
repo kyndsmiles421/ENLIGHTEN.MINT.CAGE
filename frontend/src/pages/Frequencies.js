@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Radio, Play, Pause, Info, Square } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -307,6 +308,11 @@ export default function Frequencies() {
                 >
                   {playing === selected.id ? <><Square size={12} fill={selected.color} style={{ color: selected.color }} /> Stop</> : <><Play size={14} /> Listen to {selected.frequency}Hz</>}
                 </button>
+                <NarrationPlayer
+                  text={`${selected.frequency} Hertz. ${selected.name}. This is a ${CATEGORY_LABELS[selected.category]} frequency associated with the ${selected.chakra} chakra. ${selected.description}. Benefits include ${selected.benefits.join(', ')}. Close your eyes and allow this frequency to resonate through your being.`}
+                  label="About this Frequency"
+                  color={selected.color}
+                />
                 <button
                   onClick={() => setSelected(null)}
                   className="text-xs underline"

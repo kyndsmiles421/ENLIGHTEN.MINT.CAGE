@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Zap, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -149,7 +150,14 @@ export default function Exercises() {
 
                   {/* Steps */}
                   <div className="mb-8">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Practice Steps</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--text-muted)' }}>Practice Steps</p>
+                    <div className="mb-4">
+                      <NarrationPlayer
+                        text={`${selected.name}. ${selected.description}. Let us begin the practice. ${selected.steps.join('. ')}. Well done. Take a moment to feel the energy flowing through your body.`}
+                        label="Voice Guide"
+                        color={selected.color}
+                      />
+                    </div>
                     <div className="space-y-3">
                       {selected.steps.map((step, i) => (
                         <div key={i} className="flex items-start gap-4">

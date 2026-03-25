@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import NarrationPlayer from '../components/NarrationPlayer';
 
 const PATTERNS = [
   { name: 'Box Breathing', inhale: 4, hold1: 4, exhale: 4, hold2: 4, color: '#2DD4BF', desc: 'Equal parts breathing for calm focus' },
@@ -183,6 +184,13 @@ export default function Breathing() {
               >
                 {active ? 'Stop' : 'Begin Breathwork'}
               </button>
+            </div>
+            <div className="mt-6">
+              <NarrationPlayer
+                text={`Welcome to ${pattern.name} practice. ${pattern.desc}. When you're ready, inhale slowly through your nose for ${pattern.inhale} seconds. ${pattern.hold1 > 0 ? `Hold your breath gently for ${pattern.hold1} seconds.` : ''} Then exhale smoothly for ${pattern.exhale} seconds. ${pattern.hold2 > 0 ? `Hold empty for ${pattern.hold2} seconds.` : ''} Repeat this cycle, finding your natural rhythm. Let each breath draw you deeper into stillness. Your body knows how to breathe. Simply observe and follow.`}
+                label="Guided Voice"
+                color={pattern.color}
+              />
             </div>
             {cycles > 0 && (
               <p className="mt-6 text-sm" style={{ color: 'var(--text-muted)' }}>
