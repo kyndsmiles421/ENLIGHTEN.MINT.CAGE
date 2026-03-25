@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import Exercises from './pages/Exercises';
 import Nourishment from './pages/Nourishment';
 import Frequencies from './pages/Frequencies';
+import Rituals from './pages/Rituals';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/nourishment" element={<Nourishment />} />
             <Route path="/frequencies" element={<Frequencies />} />
+            <Route path="/rituals" element={<Rituals />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

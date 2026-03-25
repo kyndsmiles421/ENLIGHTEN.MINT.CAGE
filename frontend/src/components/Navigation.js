@@ -4,13 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones,
-  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio
+  LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio, Sunrise
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { path: '/breathing', label: 'Breathe', icon: Wind },
   { path: '/meditation', label: 'Meditate', icon: Timer },
   { path: '/exercises', label: 'Exercises', icon: Zap },
+  { path: '/rituals', label: 'Rituals', icon: Sunrise },
   { path: '/affirmations', label: 'Affirm', icon: Sun },
   { path: '/mood', label: 'Mood', icon: Heart },
   { path: '/journal', label: 'Journal', icon: BookOpen },

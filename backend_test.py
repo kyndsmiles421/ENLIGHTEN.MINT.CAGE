@@ -288,6 +288,149 @@ class ZenEnergyAPITester:
             self.log_result("Dashboard Stats", False, f"Status: {response.status_code if response else 'No response'}")
         return False
 
+    def test_ritual_templates(self):
+        """Test GET /api/rituals/templates returns 4 ritual templates"""
+        response = self.make_request('GET', 'rituals/templates')
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list) and len(data) == 4:
+                # Check if templates have required fields
+                required_fields = ['id', 'name', 'time_of_day', 'steps', 'total_duration']
+                all_valid = all(all(field in tmpl for field in required_fields) for tmpl in data)
+                if all_valid:
+                    # Check specific template names
+                    template_names = [t['name'] for t in data]
+                    expected_names = ['Morning Awakening', 'Evening Unwind', 'Midday Energy Boost', 'Deep Consciousness']
+                    if all(name in template_names for name in expected_names):
+                        self.log_result("Ritual Templates", True)
+                        return True
+                    else:
+                        self.log_result("Ritual Templates", False, f"Missing expected template names. Got: {template_names}")
+                else:
+                    self.log_result("Ritual Templates", False, "Missing required fields in templates")
+            else:
+                self.log_result("Ritual Templates", False, f"Expected 4 templates, got {len(data) if isinstance(data, list) else 'non-list'}")
+        else:
+            self.log_result("Ritual Templates", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_ritual_creation(self):
+        """Test POST /api/rituals creates a custom ritual (requires auth)"""
+        if not self.token:
+            self.log_result("Ritual Creation", False, "No auth token available")
+            return False
+            
+        ritual_data = {
+            "name": "Test Morning Ritual",
+            "time_of_day": "morning",
+            "steps": [
+                {"type": "breathing", "name": "Box Breathing", "duration": 120, "config": None},
+                {"type": "meditation", "name": "Quick Center", "duration": 300, "config": None}
+            ]
+        }
+        
+        response = self.make_request('POST', 'rituals', ritual_data, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'id' in data and data['name'] == 'Test Morning Ritual' and 'steps' in data:
+                self.created_ritual_id = data['id']  # Store for later tests
+                self.log_result("Ritual Creation", True)
+                return True
+            else:
+                self.log_result("Ritual Creation", False, "Invalid ritual data in response")
+        else:
+            self.log_result("Ritual Creation", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_get_user_rituals(self):
+        """Test GET /api/rituals returns user's saved rituals (requires auth)"""
+        if not self.token:
+            self.log_result("Get User Rituals", False, "No auth token available")
+            return False
+            
+        response = self.make_request('GET', 'rituals', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                self.log_result("Get User Rituals", True)
+                return True
+            else:
+                self.log_result("Get User Rituals", False, "Response is not a list")
+        else:
+            self.log_result("Get User Rituals", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_ritual_completion(self):
+        """Test POST /api/rituals/{id}/complete marks ritual as completed (requires auth)"""
+        if not self.token:
+            self.log_result("Ritual Completion", False, "No auth token available")
+            return False
+            
+        if not hasattr(self, 'created_ritual_id'):
+            self.log_result("Ritual Completion", False, "No ritual ID available from creation test")
+            return False
+            
+        completion_data = {
+            "duration_seconds": 420,
+            "steps_completed": 2
+        }
+        
+        response = self.make_request('POST', f'rituals/{self.created_ritual_id}/complete', completion_data, auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'id' in data and 'ritual_id' in data and data['duration_seconds'] == 420:
+                self.log_result("Ritual Completion", True)
+                return True
+            else:
+                self.log_result("Ritual Completion", False, "Invalid completion data in response")
+        else:
+            self.log_result("Ritual Completion", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_ritual_history(self):
+        """Test GET /api/rituals/history returns completion history with streak/stats (requires auth)"""
+        if not self.token:
+            self.log_result("Ritual History", False, "No auth token available")
+            return False
+            
+        response = self.make_request('GET', 'rituals/history', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            required_fields = ['completions', 'total_sessions', 'total_minutes', 'ritual_streak']
+            if all(field in data for field in required_fields):
+                if isinstance(data['completions'], list):
+                    self.log_result("Ritual History", True)
+                    return True
+                else:
+                    self.log_result("Ritual History", False, "Completions field is not a list")
+            else:
+                self.log_result("Ritual History", False, "Missing required history fields")
+        else:
+            self.log_result("Ritual History", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
+    def test_ritual_deletion(self):
+        """Test DELETE /api/rituals/{id} deletes a ritual (requires auth)"""
+        if not self.token:
+            self.log_result("Ritual Deletion", False, "No auth token available")
+            return False
+            
+        if not hasattr(self, 'created_ritual_id'):
+            self.log_result("Ritual Deletion", False, "No ritual ID available from creation test")
+            return False
+            
+        response = self.make_request('DELETE', f'rituals/{self.created_ritual_id}', auth_required=True)
+        if response and response.status_code == 200:
+            data = response.json()
+            if 'deleted' in data and data['deleted'] is True:
+                self.log_result("Ritual Deletion", True)
+                return True
+            else:
+                self.log_result("Ritual Deletion", False, "Invalid deletion response")
+        else:
+            self.log_result("Ritual Deletion", False, f"Status: {response.status_code if response else 'No response'}")
+        return False
+
     def run_all_tests(self):
         """Run all backend API tests"""
         print("🚀 Starting Zen Energy Bar Backend API Tests")
@@ -301,6 +444,9 @@ class ZenEnergyAPITester:
         self.test_frequencies_endpoint()
         self.test_daily_affirmation()
         
+        # Test ritual templates (public endpoint)
+        self.test_ritual_templates()
+        
         # Test authentication
         auth_success = self.test_user_registration()
         if not auth_success:
@@ -313,6 +459,13 @@ class ZenEnergyAPITester:
             self.test_journal_creation()
             self.test_journal_history()
             self.test_dashboard_stats()
+            
+            # Test ritual endpoints (authenticated)
+            self.test_ritual_creation()
+            self.test_get_user_rituals()
+            self.test_ritual_completion()
+            self.test_ritual_history()
+            self.test_ritual_deletion()
         else:
             print("⚠️  Skipping authenticated tests due to auth failure")
         
