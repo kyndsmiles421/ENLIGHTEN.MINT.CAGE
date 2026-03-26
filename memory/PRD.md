@@ -80,6 +80,16 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - **Bug Fix**: Fixed guided meditation "Build Your Own" mode and TTS Voice Guide — `os.getenv("EMERGENT_LLM_KEY")` used without `os` import in meditations.py, knowledge.py, media.py; replaced with already-imported `EMERGENT_LLM_KEY` from deps
 - **Bug Fix**: Fixed TTS caching — `hashlib` used without import in knowledge.py
 
+## Phase 39 Changes (2026-03-26)
+- **Feature**: Constellation Mythology Overlays (Star Walk 2 style)
+  - Added rich mythology data to all 16 constellations: figure names, Greek/Egyptian/Sumerian origins, deity associations, full narrative stories, cosmic lessons
+  - Canvas-drawn mythology figure outlines (ram, bull, twins, crab, lion, maiden, scales, scorpion, archer, sea-goat, water bearer, fish, hunter, bear, lyre, swan) rendered as Three.js sprite overlays with additive blending and glow effects
+  - "Mythology" toggle button in Star Chart header with purple glow when active
+  - Enhanced constellation detail panel with Mythology/Stars tabs
+  - Mythology tab shows figure name, origin, deity, full story narrative, and "Cosmic Lesson" card
+  - Stars tab shows individual star names and magnitudes
+  - Mythology mode indicator banner at bottom of screen
+
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/mudras (25 items)
