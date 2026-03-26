@@ -128,6 +128,16 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
   - XP counts toward global leaderboard
   - Auto-awards XP when exploring constellations, listening to stories, completing journeys
 
+## Phase 42 Changes (2026-03-26)
+- **Feature**: Celestial Badges System
+  - 12 constellation-themed badges with progress tracking
+  - Badges: First Light, Stargazer, Constellation Collector, Story Seeker, Myth Keeper, Orion's Hunter, Neptune's Child, Gaia's Guardian, Zephyr's Voice, Lyra's Musician, Cosmic Voyager, Celestial Master
+  - Element-color coded badges (Fire red, Water blue, Air purple, Earth green, Universal cosmic purple)
+  - GET /api/badges/celestial endpoint with auto-award on criteria met
+  - Progress bars, earned tags, glow effects
+  - Badges panel (data-testid='badges-panel') accessible from Star Chart header
+  - Stats display: constellations explored, stories listened, journeys completed
+
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/mudras (25 items)
