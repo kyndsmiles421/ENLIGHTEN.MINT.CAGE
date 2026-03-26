@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from datetime import datetime, timezone
+from routes.plants import auto_water_plant_for_activity
 import uuid
 
 router = APIRouter()
@@ -45,4 +46,7 @@ async def log_meditation(data: dict = Body(...), user=Depends(get_current_user))
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.custom_meditations.insert_one(doc)
-    return {"status": "logged", "id": doc["id"]}
+    doc.pop("_id", None)
+    # Auto-water a zen garden plant as reward
+    plant_growth = await auto_water_plant_for_activity(user["id"], "meditation")
+    return {"status": "logged", "id": doc["id"], "plant_growth": plant_growth}

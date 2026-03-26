@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2 } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -303,7 +303,7 @@ function createMythologyTexture(constellationId, color, size = 256) {
   return tex;
 }
 
-function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived }) {
+function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled }) {
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
@@ -317,6 +317,10 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
   const mythModeRef = useRef(mythologyMode);
   const journeyTargetRef = useRef(null);
   const onJourneyArrivedRef = useRef(onJourneyArrived);
+  const gyroEnabledRef = useRef(gyroEnabled);
+  const gyroOffset = useRef({ alpha: null, beta: null });
+
+  useEffect(() => { gyroEnabledRef.current = gyroEnabled; }, [gyroEnabled]);
 
   useEffect(() => { mythModeRef.current = mythologyMode; }, [mythologyMode]);
   useEffect(() => { onJourneyArrivedRef.current = onJourneyArrived; }, [onJourneyArrived]);
@@ -539,6 +543,35 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
     const onResize = () => { const nw = container.clientWidth, nh = container.clientHeight; camera.aspect = nw/nh; camera.updateProjectionMatrix(); renderer.setSize(nw, nh); };
     window.addEventListener('resize', onResize);
 
+    // ── GYROSCOPE / DEVICE ORIENTATION ──
+    const onDeviceOrientation = (e) => {
+      if (!gyroEnabledRef.current) return;
+      if (isDragging.current) return;
+      const alpha = e.alpha || 0; // compass heading (0-360)
+      const beta = e.beta || 0;   // front-back tilt (-180 to 180)
+      const gamma = e.gamma || 0; // left-right tilt (-90 to 90)
+
+      // Capture initial offset on first reading
+      if (gyroOffset.current.alpha === null) {
+        gyroOffset.current = { alpha, beta };
+      }
+
+      // Map device orientation to spherical coordinates
+      // Alpha = compass direction → theta (horizontal rotation)
+      const deltaAlpha = alpha - gyroOffset.current.alpha;
+      const targetTheta = (deltaAlpha * Math.PI / 180);
+
+      // Beta = tilt forward/back → phi (vertical angle)
+      // When phone is held up at ~45-90 degrees, map to looking up at sky
+      const clampedBeta = Math.max(0, Math.min(90, beta));
+      const targetPhi = ((90 - clampedBeta) / 90) * Math.PI * 0.8 + 0.1;
+
+      // Smooth interpolation
+      spherical.current.theta += (targetTheta - spherical.current.theta) * 0.08;
+      spherical.current.phi += (targetPhi - spherical.current.phi) * 0.08;
+    };
+    window.addEventListener('deviceorientation', onDeviceOrientation);
+
     // ── ANIMATION LOOP ──
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
@@ -618,6 +651,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       el.removeEventListener('touchstart', onTouchStart); el.removeEventListener('touchend', onTouchEnd);
       el.removeEventListener('touchmove', onTouchMove); el.removeEventListener('click', onClick);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('deviceorientation', onDeviceOrientation);
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
@@ -1273,11 +1307,28 @@ export default function StarChart() {
   const [journeyTarget, setJourneyTarget] = useState(null);
   const [journeyComplete, setJourneyComplete] = useState(false);
   const [showBadges, setShowBadges] = useState(false);
+  const [gyroEnabled, setGyroEnabled] = useState(false);
   const journeyAudioRef = useRef(null);
   const journeyAmbient = useCosmicAmbient();
   const journeyPausedRef = useRef(false);
 
   useEffect(() => { journeyPausedRef.current = journeyPaused; }, [journeyPaused]);
+
+  const toggleGyro = useCallback(async () => {
+    if (gyroEnabled) {
+      setGyroEnabled(false);
+      return;
+    }
+    // iOS 13+ requires permission
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const perm = await DeviceOrientationEvent.requestPermission();
+        if (perm !== 'granted') { toast.error('Gyroscope permission denied'); return; }
+      } catch { toast.error('Could not request gyroscope permission'); return; }
+    }
+    setGyroEnabled(true);
+    toast.success('Gyroscope active — move your phone to explore the sky');
+  }, [gyroEnabled]);
 
   const fetchChart = useCallback((lat, lng) => {
     if (!token) { setLoading(false); return; }
@@ -1427,7 +1478,7 @@ export default function StarChart() {
             <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>
               <Star size={16} style={{ color: '#818CF8' }} /> Constellation Chart
             </h1>
-            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars for details</p>
+            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars | Gyro for AR mode</p>
           </div>
           <div className="flex items-center gap-2 pointer-events-auto">
             {/* Stargazing Journey button */}
@@ -1438,6 +1489,18 @@ export default function StarChart() {
                 <Compass size={10} /> Stargazing Journey
               </button>
             )}
+            {/* Gyroscope toggle */}
+            <button onClick={toggleGyro} data-testid="gyro-toggle"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              style={{
+                background: gyroEnabled ? 'rgba(45,212,191,0.15)' : 'rgba(8,10,18,0.8)',
+                border: `1px solid ${gyroEnabled ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
+                color: gyroEnabled ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: gyroEnabled ? '0 0 20px rgba(45,212,191,0.15)' : 'none',
+              }}>
+              <Smartphone size={10} /> {gyroEnabled ? 'Gyro On' : 'Gyro'}
+            </button>
             {/* Mythology Mode toggle */}
             <button onClick={() => setMythologyMode(!mythologyMode)} data-testid="mythology-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
@@ -1590,7 +1653,7 @@ export default function StarChart() {
             </div>
           </div>
         ) : data ? (
-          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} />
+          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} />
         ) : null}
       </div>
     </div>

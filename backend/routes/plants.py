@@ -89,3 +89,44 @@ async def reset_plant_watering():
     )
 
 
+
+
+async def auto_water_plant_for_activity(user_id: str, activity_type: str):
+    """Auto-water one of the user's plants as a reward for completing a wellness activity.
+    Only waters a plant that hasn't been watered today. Returns growth info or None."""
+    today = datetime.now(timezone.utc).date().isoformat()
+    # Find a plant that hasn't been watered today
+    plant = await db.zen_plants.find_one(
+        {"user_id": user_id, "last_watered": {"$ne": today}},
+        {"_id": 0}
+    )
+    if not plant:
+        return None
+
+    stages = PLANT_STAGES.get(plant["plant_type"], ["Seed"])
+    waters_needed = PLANT_WATERS_PER_STAGE.get(plant["plant_type"], 5)
+    new_waters = plant.get("waters_this_stage", 0) + 1
+    grew = False
+    new_stage = plant["stage"]
+    if new_waters >= waters_needed:
+        current_idx = stages.index(plant["stage"]) if plant["stage"] in stages else 0
+        if current_idx < len(stages) - 1:
+            new_stage = stages[current_idx + 1]
+            grew = True
+            new_waters = 0
+
+    await db.zen_plants.update_one({"id": plant["id"]}, {"$set": {
+        "water_count": plant.get("water_count", 0) + 1,
+        "waters_this_stage": new_waters,
+        "watered_today": True,
+        "last_watered": today,
+        "stage": new_stage,
+    }})
+    type_names = {"lotus": "Sacred Lotus", "bamboo": "Lucky Bamboo", "bonsai": "Zen Bonsai", "fern": "Peace Fern", "sage": "White Sage"}
+    return {
+        "plant_name": type_names.get(plant["plant_type"], plant["plant_type"]),
+        "plant_id": plant["id"],
+        "grew": grew,
+        "new_stage": new_stage,
+        "activity": activity_type,
+    }

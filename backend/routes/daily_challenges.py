@@ -5,6 +5,7 @@ import uuid
 
 router = APIRouter()
 from deps import create_activity
+from routes.plants import auto_water_plant_for_activity
 import random
 
 # ========== DAILY CHALLENGES ==========
@@ -121,11 +122,14 @@ async def complete_daily_challenge(user=Depends(get_current_user)):
     )
 
     total = await db.challenge_completions.count_documents({"user_id": user["id"]})
+    # Auto-water a zen garden plant as reward
+    plant_growth = await auto_water_plant_for_activity(user["id"], "challenge")
     return {
         "status": "completed",
         "message": f"Challenge complete! +{challenge['xp']} XP",
         "xp_earned": challenge["xp"],
         "total_completed": total,
+        "plant_growth": plant_growth,
     }
 
 
@@ -152,17 +156,17 @@ async def get_challenge_leaderboard(user=Depends(get_current_user)):
     ]
     leaders = await db.challenge_completions.aggregate(pipeline).to_list(20)
     result = []
-    for i, l in enumerate(leaders):
-        user_doc = await db.users.find_one({"id": l["_id"]}, {"_id": 0, "password": 0, "email": 0})
-        profile = await db.profiles.find_one({"user_id": l["_id"]}, {"_id": 0}) or {}
+    for i, leader in enumerate(leaders):
+        user_doc = await db.users.find_one({"id": leader["_id"]}, {"_id": 0, "password": 0, "email": 0})
+        profile = await db.profiles.find_one({"user_id": leader["_id"]}, {"_id": 0}) or {}
         result.append({
             "rank": i + 1,
-            "user_id": l["_id"],
+            "user_id": leader["_id"],
             "display_name": profile.get("display_name") or (user_doc.get("name", "") if user_doc else ""),
             "avatar_style": profile.get("avatar_style", "purple-teal"),
-            "total_xp": l["total_xp"],
-            "total_completed": l["total_completed"],
-            "is_me": l["_id"] == user["id"],
+            "total_xp": leader["total_xp"],
+            "total_completed": leader["total_completed"],
+            "is_me": leader["_id"] == user["id"],
         })
     return {"leaderboard": result}
 
