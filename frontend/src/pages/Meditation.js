@@ -1225,10 +1225,14 @@ export default function Meditation() {
                 type: activeSession.category || 'guided',
                 duration_minutes: activeSession.duration,
                 focus: activeSession.name,
+                share_to_community: true,
               }, { headers: authHeaders });
               const pg = res.data?.plant_growth;
               if (pg) {
                 toast.success(`${pg.plant_name} received cosmic nourishment${pg.grew ? ` and grew to ${pg.new_stage}!` : '!'}`);
+              }
+              if (res.data?.shared) {
+                toast.success('Shared to community!');
               }
             } catch {}
             setActiveSession(null);

@@ -32,6 +32,8 @@ export default function VirtualReality() {
   const [hoveredPortal, setHoveredPortal] = useState(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [ambientAudio, setAmbientAudio] = useState(false);
+  const [vrMeditation, setVrMeditation] = useState(null); // { phase, step, elapsed, total }
+  const vrMedRef = useRef(null);
   const audioCtxRef = useRef(null);
   const audioNodesRef = useRef([]);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -335,7 +337,12 @@ export default function VirtualReality() {
       for (const pm of portalMeshes) {
         const hits = raycasterRef.current.intersectObject(pm.core);
         if (hits.length > 0) {
-          navigate(pm.data.path);
+          if (pm.data.id === 'meditation') {
+            // Start VR meditation instead of navigating
+            startVrMeditation();
+          } else {
+            navigate(pm.data.path);
+          }
           return;
         }
       }
@@ -509,6 +516,71 @@ export default function VirtualReality() {
     }
   }, [energyState, avatarConfig]);
 
+  // ===== VR MEDITATION MODE =====
+  const VR_MED_STEPS = [
+    { text: 'Close your eyes. Feel the cosmos around you.', duration: 8 },
+    { text: 'Breathe in slowly... filling your lungs with starlight.', duration: 6 },
+    { text: 'Hold... let the light settle in your chest.', duration: 4 },
+    { text: 'Breathe out... releasing all tension into the void.', duration: 6 },
+    { text: 'Feel your energy body expanding with each breath.', duration: 6 },
+    { text: 'Breathe in... drawing cosmic energy through your crown.', duration: 6 },
+    { text: 'Hold... feel it flowing through each chakra.', duration: 4 },
+    { text: 'Breathe out... your aura grows brighter.', duration: 6 },
+    { text: 'You are one with the stars. One with the light.', duration: 6 },
+    { text: 'Breathe in... peace. Breathe out... love.', duration: 6 },
+    { text: 'Hold this sacred space within you.', duration: 5 },
+    { text: 'Slowly return. Carry this light with you always.', duration: 7 },
+  ];
+
+  const startVrMeditation = useCallback(() => {
+    setVrMeditation({ step: 0, elapsed: 0, total: VR_MED_STEPS.reduce((a, s) => a + s.duration, 0) });
+  }, []);
+
+  useEffect(() => {
+    if (!vrMeditation) return;
+    const interval = setInterval(() => {
+      setVrMeditation(prev => {
+        if (!prev) return null;
+        const newElapsed = prev.elapsed + 1;
+        let cumulative = 0;
+        let newStep = prev.step;
+        for (let i = 0; i < VR_MED_STEPS.length; i++) {
+          cumulative += VR_MED_STEPS[i].duration;
+          if (newElapsed < cumulative) { newStep = i; break; }
+          if (i === VR_MED_STEPS.length - 1 && newElapsed >= cumulative) {
+            return null; // Meditation complete
+          }
+        }
+        return { ...prev, step: newStep, elapsed: newElapsed };
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [vrMeditation]);
+
+  // Sync VR meditation with 3D scene visuals
+  useEffect(() => {
+    const s = sceneRef.current;
+    if (!s.auraMat) return;
+    if (vrMeditation) {
+      const progress = vrMeditation.elapsed / vrMeditation.total;
+      // Intensify aura during meditation
+      s.auraMat.opacity = 0.08 + progress * 0.1;
+      s.innerAuraMat.opacity = 0.1 + progress * 0.12;
+      s.aura.scale.setScalar(1.2 + Math.sin(vrMeditation.elapsed * 0.3) * 0.3 + progress * 0.5);
+      s.pointLight.intensity = 1.5 + progress * 2;
+      // Chakras pulse faster
+      s.chakraMeshes.forEach((c, i) => {
+        c.scale.setScalar(1 + Math.sin(vrMeditation.elapsed * 0.5 + i * 0.8) * 0.8);
+        c.material.opacity = 0.6 + Math.sin(vrMeditation.elapsed * 0.5 + i) * 0.3;
+      });
+      // Rings expand
+      s.ringMeshes.forEach((r, i) => {
+        r.material.opacity = 0.15 + progress * 0.15;
+        r.scale.setScalar(1 + progress * 0.3);
+      });
+    }
+  }, [vrMeditation]);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       mountRef.current?.parentElement?.requestFullscreen();
@@ -611,6 +683,77 @@ export default function VirtualReality() {
           </div>
         ))}
       </div>
+
+      {/* VR Meditation Overlay */}
+      <AnimatePresence>
+        {vrMeditation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+            data-testid="vr-meditation-overlay"
+          >
+            {/* Breathing ring */}
+            <motion.div
+              animate={{
+                scale: [1, 1.3, 1.3, 1],
+                opacity: [0.3, 0.6, 0.6, 0.3],
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute rounded-full"
+              style={{ width: 300, height: 300, border: '1px solid rgba(192,132,252,0.15)', boxShadow: '0 0 60px rgba(192,132,252,0.08)' }}
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1.2, 1],
+                opacity: [0.2, 0.4, 0.4, 0.2],
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              className="absolute rounded-full"
+              style={{ width: 400, height: 400, border: '1px solid rgba(192,132,252,0.08)' }}
+            />
+
+            {/* Text */}
+            <div className="text-center px-8 max-w-lg">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={vrMeditation.step}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 1 }}
+                  className="text-lg md:text-xl font-light leading-relaxed"
+                  style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 0 30px rgba(192,132,252,0.3)' }}
+                >
+                  {VR_MED_STEPS[vrMeditation.step]?.text}
+                </motion.p>
+              </AnimatePresence>
+
+              {/* Progress */}
+              <div className="mt-8 w-48 mx-auto">
+                <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: 'rgba(192,132,252,0.5)', width: `${(vrMeditation.elapsed / vrMeditation.total) * 100}%` }}
+                  />
+                </div>
+                <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  {Math.floor((vrMeditation.total - vrMeditation.elapsed) / 60)}:{String((vrMeditation.total - vrMeditation.elapsed) % 60).padStart(2, '0')} remaining
+                </p>
+              </div>
+            </div>
+
+            {/* Close button */}
+            <button onClick={() => setVrMeditation(null)}
+              className="absolute top-20 right-4 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto"
+              style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
+              data-testid="vr-meditation-close">
+              End Session
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Instructions overlay */}
       <motion.div

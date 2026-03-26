@@ -45,6 +45,7 @@ from routes.coach import router as coach_router
 from routes.cosmic_context import router as cosmic_context_router
 from routes.daily_briefing import router as daily_briefing_router
 from routes.forecasts import router as forecasts_router
+from routes.cosmic_profile import router as cosmic_profile_router
 
 app = FastAPI()
 
@@ -61,6 +62,7 @@ all_routers = [
     cosmic_calendar_router, wellness_reports_router, meditation_history_router,
     uploads_router, coach_router, cosmic_context_router, daily_briefing_router,
     forecasts_router,
+    cosmic_profile_router,
 ]
 
 for r in all_routers:
