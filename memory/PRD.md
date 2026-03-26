@@ -76,6 +76,10 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - **Bug Fix**: Restored missing JSONResponse import in media.py, practices.py, wellness.py → Mudras/Videos/Exercises pages now display all content
 - **Enhancement**: Star Chart upgraded to Star Walk 2 style with constellation drawing animation, nebula clouds, shader-based stars, and birth constellation pulsing
 
+## Phase 38 Changes (2026-03-26)
+- **Bug Fix**: Fixed guided meditation "Build Your Own" mode and TTS Voice Guide — `os.getenv("EMERGENT_LLM_KEY")` used without `os` import in meditations.py, knowledge.py, media.py; replaced with already-imported `EMERGENT_LLM_KEY` from deps
+- **Bug Fix**: Fixed TTS caching — `hashlib` used without import in knowledge.py
+
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/mudras (25 items)
