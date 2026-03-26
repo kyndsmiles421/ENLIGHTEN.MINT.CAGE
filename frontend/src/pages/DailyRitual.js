@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Sun, Moon, Check, Loader2, ChevronRight, Sparkles, Wind, Flame, Target } from 'lucide-react';
+import { Sun, Moon, Check, Loader2, ChevronRight, Sparkles, Wind, Flame, Target, Play, Pause, SkipForward, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -12,39 +12,210 @@ const STEP_ICONS = {
   reiki: Sparkles, acupressure: Target, elixir: Sparkles, journal: ChevronRight,
 };
 
-function RitualStep({ step, index, completed, onComplete }) {
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function RitualStep({ step, index, completed, activeIndex, onActivate, onComplete }) {
   const isCompleted = completed.includes(index);
+  const isActive = activeIndex === index && !isCompleted;
   const Icon = STEP_ICONS[step.type] || Sparkles;
+
+  const [timeLeft, setTimeLeft] = useState(step.duration * 60);
+  const [running, setRunning] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
+  const intervalRef = useRef(null);
+
+  // Reset timer when step becomes active
+  useEffect(() => {
+    if (isActive) {
+      setTimeLeft(step.duration * 60);
+      setRunning(false);
+      setTimerDone(false);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [isActive, step.duration]);
+
+  // Countdown logic
+  useEffect(() => {
+    if (running && timeLeft > 0) {
+      intervalRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(intervalRef.current);
+            setRunning(false);
+            setTimerDone(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [running, timeLeft]);
+
+  const handleClick = () => {
+    if (isCompleted) return;
+    onActivate(isActive ? null : index);
+  };
+
+  const handleStartPause = () => {
+    setRunning(prev => !prev);
+  };
+
+  const handleSkipTimer = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setTimeLeft(0);
+    setRunning(false);
+    setTimerDone(true);
+  };
+
+  const handleMarkComplete = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setRunning(false);
+    onComplete(index);
+  };
+
+  const totalSec = step.duration * 60;
+  const progress = totalSec > 0 ? ((totalSec - timeLeft) / totalSec) * 100 : 0;
+
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.08 }}
-      className="flex items-start gap-4 p-4 rounded-xl transition-all"
+      transition={{ delay: index * 0.06, layout: { duration: 0.3 } }}
       data-testid={`ritual-step-${index}`}
+      className="rounded-xl overflow-hidden transition-all cursor-pointer"
       style={{
-        background: isCompleted ? 'rgba(34,197,94,0.06)' : 'rgba(15,17,28,0.5)',
-        border: `1px solid ${isCompleted ? 'rgba(34,197,94,0.2)' : 'rgba(248,250,252,0.06)'}`,
+        background: isCompleted ? 'rgba(34,197,94,0.06)' : isActive ? 'rgba(216,180,254,0.06)' : 'rgba(15,17,28,0.5)',
+        border: `1px solid ${isCompleted ? 'rgba(34,197,94,0.2)' : isActive ? 'rgba(216,180,254,0.25)' : 'rgba(248,250,252,0.06)'}`,
       }}>
-      <button onClick={() => onComplete(index)} data-testid={`complete-step-${index}`}
-        className="mt-0.5 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
-        style={{
-          background: isCompleted ? 'rgba(34,197,94,0.2)' : 'rgba(248,250,252,0.05)',
-          border: `2px solid ${isCompleted ? '#22C55E' : 'rgba(248,250,252,0.12)'}`,
-        }}>
-        {isCompleted && <Check size={14} style={{ color: '#22C55E' }} />}
-      </button>
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <Icon size={14} style={{ color: isCompleted ? '#22C55E' : 'rgba(248,250,252,0.5)' }} />
-          <p className={`text-sm font-medium ${isCompleted ? 'line-through' : ''}`}
-            style={{ color: isCompleted ? 'rgba(248,250,252,0.35)' : '#F8FAFC' }}>{step.name}</p>
-          <span className="text-[10px] ml-auto px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(248,250,252,0.05)', color: 'rgba(248,250,252,0.3)' }}>{step.duration} min</span>
+      {/* Step Header - always visible */}
+      <div
+        onClick={handleClick}
+        data-testid={`step-header-${index}`}
+        className="flex items-start gap-4 p-4"
+      >
+        <div
+          className="mt-0.5 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
+          style={{
+            background: isCompleted ? 'rgba(34,197,94,0.2)' : isActive ? 'rgba(216,180,254,0.15)' : 'rgba(248,250,252,0.05)',
+            border: `2px solid ${isCompleted ? '#22C55E' : isActive ? '#D8B4FE' : 'rgba(248,250,252,0.12)'}`,
+          }}>
+          {isCompleted ? <Check size={14} style={{ color: '#22C55E' }} /> :
+           isActive ? <Play size={12} style={{ color: '#D8B4FE' }} /> :
+           <span className="text-[10px] font-bold" style={{ color: 'rgba(248,250,252,0.3)' }}>{index + 1}</span>}
         </div>
-        <p className="text-xs" style={{ color: isCompleted ? 'rgba(248,250,252,0.25)' : 'rgba(248,250,252,0.5)' }}>
-          {step.instruction}
-        </p>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon size={14} style={{ color: isCompleted ? '#22C55E' : isActive ? '#D8B4FE' : 'rgba(248,250,252,0.5)' }} />
+            <p className={`text-sm font-medium ${isCompleted ? 'line-through' : ''}`}
+              style={{ color: isCompleted ? 'rgba(248,250,252,0.35)' : isActive ? '#F8FAFC' : '#F8FAFC' }}>{step.name}</p>
+            <span className="text-[10px] ml-auto px-2 py-0.5 rounded-full"
+              style={{ background: 'rgba(248,250,252,0.05)', color: isActive ? '#D8B4FE' : 'rgba(248,250,252,0.3)' }}>{step.duration} min</span>
+          </div>
+          {!isActive && (
+            <p className="text-xs" style={{ color: isCompleted ? 'rgba(248,250,252,0.25)' : 'rgba(248,250,252,0.5)' }}>
+              {step.instruction}
+            </p>
+          )}
+        </div>
       </div>
+
+      {/* Expanded Active State */}
+      <AnimatePresence>
+        {isActive && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-5 pt-0">
+              {/* Instruction box */}
+              <div className="rounded-lg p-3 mb-4"
+                style={{ background: 'rgba(216,180,254,0.05)', border: '1px solid rgba(216,180,254,0.1)' }}>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.7)' }}>
+                  {step.instruction}
+                </p>
+              </div>
+
+              {/* Timer */}
+              <div className="flex flex-col items-center gap-3 mb-4">
+                <div className="relative w-28 h-28">
+                  <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                    <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(248,250,252,0.06)" strokeWidth="5" />
+                    <circle cx="50" cy="50" r="44" fill="none" stroke={timerDone ? '#22C55E' : '#D8B4FE'}
+                      strokeWidth="5" strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 44}`}
+                      strokeDashoffset={`${2 * Math.PI * 44 * (1 - progress / 100)}`}
+                      style={{ transition: 'stroke-dashoffset 1s linear' }} />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <Timer size={14} style={{ color: timerDone ? '#22C55E' : '#D8B4FE', marginBottom: '2px' }} />
+                    <span className="text-lg font-mono font-bold" data-testid={`timer-${index}`}
+                      style={{ color: timerDone ? '#22C55E' : '#F8FAFC' }}>{formatTime(timeLeft)}</span>
+                  </div>
+                </div>
+
+                {/* Timer controls */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleStartPause}
+                    data-testid={`timer-toggle-${index}`}
+                    disabled={timerDone}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all"
+                    style={{
+                      background: running ? 'rgba(248,250,252,0.08)' : 'rgba(216,180,254,0.15)',
+                      border: `1px solid ${running ? 'rgba(248,250,252,0.12)' : 'rgba(216,180,254,0.3)'}`,
+                      color: running ? '#F8FAFC' : '#D8B4FE',
+                      opacity: timerDone ? 0.4 : 1,
+                    }}>
+                    {running ? <><Pause size={12} /> Pause</> : <><Play size={12} /> {timeLeft === step.duration * 60 ? 'Start' : 'Resume'}</>}
+                  </button>
+                  <button
+                    onClick={handleSkipTimer}
+                    data-testid={`skip-timer-${index}`}
+                    disabled={timerDone}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all"
+                    style={{
+                      background: 'rgba(248,250,252,0.04)',
+                      border: '1px solid rgba(248,250,252,0.08)',
+                      color: 'rgba(248,250,252,0.4)',
+                      opacity: timerDone ? 0.4 : 1,
+                    }}>
+                    <SkipForward size={12} /> Skip
+                  </button>
+                </div>
+              </div>
+
+              {/* Mark Complete Button */}
+              <motion.button
+                onClick={handleMarkComplete}
+                data-testid={`complete-step-${index}`}
+                animate={{ scale: timerDone ? [1, 1.02, 1] : 1 }}
+                transition={{ duration: 0.4, repeat: timerDone ? 2 : 0 }}
+                className="w-full py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                style={{
+                  background: timerDone ? 'linear-gradient(135deg, #22C55E, #16A34A)' : 'rgba(248,250,252,0.06)',
+                  color: timerDone ? '#FFF' : 'rgba(248,250,252,0.4)',
+                  border: `1px solid ${timerDone ? 'rgba(34,197,94,0.4)' : 'rgba(248,250,252,0.08)'}`,
+                }}>
+                <Check size={16} />
+                {timerDone ? 'Mark Complete' : 'Complete Step'}
+              </motion.button>
+              {!timerDone && (
+                <p className="text-center text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  Start the timer or skip to mark this step complete
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -53,6 +224,7 @@ export default function DailyRitual() {
   const { token, authHeaders } = useAuth();
   const [ritual, setRitual] = useState(null);
   const [completed, setCompleted] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
   const [timeOfDay, setTimeOfDay] = useState(() => {
     const h = new Date().getHours();
     return h < 14 ? 'morning' : 'evening';
@@ -60,7 +232,7 @@ export default function DailyRitual() {
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
 
-  const fetchRitual = async (tod) => {
+  const fetchRitual = useCallback(async (tod) => {
     if (!token) return;
     setLoading(true);
     try {
@@ -69,15 +241,15 @@ export default function DailyRitual() {
       setCompleted(r.data.completed_steps || []);
     } catch { toast.error('Failed to generate ritual'); }
     setLoading(false);
-  };
+  }, [token, authHeaders]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!token) return;
     try {
       const r = await axios.get(`${API}/daily-ritual/profile`, { headers: authHeaders });
       setProfile(r.data);
     } catch {}
-  };
+  }, [token, authHeaders]);
 
   useEffect(() => {
     fetchRitual(timeOfDay);
@@ -92,8 +264,18 @@ export default function DailyRitual() {
         ritual_id: ritual.id, step_index: index,
       }, { headers: authHeaders });
       setCompleted(r.data.completed_steps);
-      if (r.data.is_complete) toast.success('Ritual complete! Namaste.');
-    } catch { toast.error('Failed'); }
+      setActiveIndex(null);
+      if (r.data.is_complete) {
+        toast.success('Ritual complete! Namaste.');
+      } else {
+        // Auto-advance to next incomplete step
+        const steps = ritual?.ritual?.steps || [];
+        const nextIncomplete = steps.findIndex((_, i) => i > index && !r.data.completed_steps.includes(i));
+        if (nextIncomplete !== -1) {
+          setTimeout(() => setActiveIndex(nextIncomplete), 400);
+        }
+      }
+    } catch { toast.error('Failed to save progress'); }
   };
 
   const steps = ritual?.ritual?.steps || [];
@@ -121,7 +303,7 @@ export default function DailyRitual() {
         <div className="flex gap-3 justify-center mb-6">
           {[{ id: 'morning', label: 'Morning Ritual', icon: Sun, color: '#FCD34D' },
             { id: 'evening', label: 'Evening Ritual', icon: Moon, color: '#818CF8' }].map(t => (
-            <button key={t.id} onClick={() => { setTimeOfDay(t.id); }}
+            <button key={t.id} onClick={() => { setTimeOfDay(t.id); setActiveIndex(null); }}
               data-testid={`tod-${t.id}`}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all"
               style={{
@@ -165,9 +347,23 @@ export default function DailyRitual() {
             {/* Steps */}
             <div className="space-y-3">
               {steps.map((step, i) => (
-                <RitualStep key={i} step={step} index={i} completed={completed} onComplete={completeStep} />
+                <RitualStep key={i} step={step} index={i} completed={completed}
+                  activeIndex={activeIndex} onActivate={setActiveIndex} onComplete={completeStep} />
               ))}
             </div>
+
+            {progressPct === 100 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                className="mt-6 rounded-2xl p-6 text-center"
+                style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)' }}>
+                <Check size={32} style={{ color: '#22C55E', margin: '0 auto 8px' }} />
+                <h3 className="text-lg font-bold mb-1" style={{ color: '#22C55E' }}>Ritual Complete</h3>
+                <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  You've completed your {timeOfDay} ritual. Honor this moment of self-care.
+                </p>
+              </motion.div>
+            )}
           </>
         ) : null}
       </motion.div>
