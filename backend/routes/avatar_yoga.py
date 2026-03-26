@@ -283,3 +283,131 @@ async def get_yoga_history(user=Depends(get_current_user)):
 
 
 
+
+
+# ========== DYNAMIC ENERGY STATE ==========
+
+MOOD_ENERGY_MAP = {
+    "peaceful": 0.7, "happy": 0.85, "grateful": 0.8, "energized": 0.95,
+    "content": 0.65, "focused": 0.75, "loving": 0.9, "inspired": 0.9,
+    "calm": 0.6, "neutral": 0.5, "tired": 0.3, "anxious": 0.25,
+    "sad": 0.2, "stressed": 0.15, "angry": 0.1, "depressed": 0.05,
+}
+
+ACTIVITY_ENERGY_BOOST = {
+    "meditation": 0.15, "yoga": 0.18, "breathwork": 0.12,
+    "star_chart": 0.08, "ritual": 0.10, "journal": 0.06,
+    "affirmation": 0.05, "exercise": 0.14,
+}
+
+@router.get("/avatar/energy-state")
+async def get_energy_state(user=Depends(get_current_user)):
+    uid = user["id"]
+    now = datetime.now(timezone.utc)
+    day_ago = (now - timedelta(hours=24)).isoformat()
+    week_ago = (now - timedelta(days=7)).isoformat()
+
+    # Get recent moods (last 24h)
+    recent_moods = await db.moods.find(
+        {"user_id": uid, "created_at": {"$gte": day_ago}}, {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+
+    # Get recent activities (last 24h)
+    recent_activities = await db.activity_feed.find(
+        {"user_id": uid, "created_at": {"$gte": day_ago}}, {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+
+    # Get 7-day mood trend
+    week_moods = await db.moods.find(
+        {"user_id": uid, "created_at": {"$gte": week_ago}}, {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+
+    # Compute base energy from latest mood
+    base_energy = 0.5
+    current_mood = "neutral"
+    if recent_moods:
+        current_mood = recent_moods[0].get("mood", "neutral")
+        base_energy = MOOD_ENERGY_MAP.get(current_mood, 0.5)
+
+    # Compute activity boosts
+    activity_boosts = []
+    total_boost = 0
+    for act in recent_activities:
+        act_type = act.get("action", "")
+        for key, boost in ACTIVITY_ENERGY_BOOST.items():
+            if key in act_type.lower():
+                total_boost += boost
+                activity_boosts.append({
+                    "type": key,
+                    "boost": boost,
+                    "description": act.get("description", ""),
+                    "time": act.get("created_at", ""),
+                })
+                break
+
+    # Compute energy shifts (before vs after activities)
+    energy_before = base_energy
+    energy_after = min(1.0, base_energy + total_boost)
+    energy_shift = energy_after - energy_before
+
+    # Compute 7-day trend
+    trend_data = []
+    for m in week_moods[:14]:  # Last 14 entries
+        trend_data.append({
+            "mood": m.get("mood", "neutral"),
+            "energy": MOOD_ENERGY_MAP.get(m.get("mood", "neutral"), 0.5),
+            "time": m.get("created_at", ""),
+        })
+
+    # Determine dominant chakra based on energy level
+    if energy_after >= 0.85:
+        dominant_chakra = {"index": 6, "name": "Crown", "color": "#C084FC", "message": "Your energy field is radiant. The crown chakra opens to cosmic consciousness."}
+    elif energy_after >= 0.7:
+        dominant_chakra = {"index": 5, "name": "Third Eye", "color": "#6366F1", "message": "Your intuition is sharp. The third eye perceives beyond the visible."}
+    elif energy_after >= 0.55:
+        dominant_chakra = {"index": 3, "name": "Heart", "color": "#22C55E", "message": "Your heart center is balanced. Compassion flows freely."}
+    elif energy_after >= 0.4:
+        dominant_chakra = {"index": 2, "name": "Solar Plexus", "color": "#FCD34D", "message": "Your inner fire is building. Personal power is developing."}
+    elif energy_after >= 0.25:
+        dominant_chakra = {"index": 1, "name": "Sacral", "color": "#FB923C", "message": "Emotional energy is stirring. Creativity seeks expression."}
+    else:
+        dominant_chakra = {"index": 0, "name": "Root", "color": "#EF4444", "message": "Ground yourself. The root chakra needs attention and stability."}
+
+    # Aura state
+    if energy_after >= 0.8:
+        aura_state = {"intensity": 0.95, "glow": "radiant", "particles": "cosmic", "description": "Your aura blazes with cosmic radiance"}
+    elif energy_after >= 0.6:
+        aura_state = {"intensity": 0.75, "glow": "crystalline", "particles": "dense", "description": "Your energy field shimmers with clarity"}
+    elif energy_after >= 0.4:
+        aura_state = {"intensity": 0.55, "glow": "soft", "particles": "medium", "description": "Your aura glows gently, building strength"}
+    else:
+        aura_state = {"intensity": 0.3, "glow": "soft", "particles": "sparse", "description": "Your energy field needs nurturing. Practice will restore it."}
+
+    # Constellation alignment message
+    profile = await db.profiles.find_one({"user_id": uid}, {"_id": 0}) or {}
+    zodiac = profile.get("zodiac_sign", "")
+
+    return {
+        "current_energy": round(energy_after, 2),
+        "base_energy": round(base_energy, 2),
+        "energy_shift": round(energy_shift, 2),
+        "current_mood": current_mood,
+        "dominant_chakra": dominant_chakra,
+        "aura_state": aura_state,
+        "activity_boosts": activity_boosts[:8],
+        "total_boost": round(total_boost, 2),
+        "trend": trend_data[:10],
+        "zodiac": zodiac,
+        "recommendation": _energy_recommendation(energy_after, current_mood),
+    }
+
+
+def _energy_recommendation(energy, mood):
+    if energy < 0.3:
+        return {"action": "meditation", "message": "A gentle meditation will help lift your energy field. Try a 5-minute guided session.", "urgency": "high"}
+    elif energy < 0.5:
+        return {"action": "breathwork", "message": "Breathwork can quickly restore balance. Try alternate nostril breathing.", "urgency": "medium"}
+    elif energy < 0.7:
+        return {"action": "star_chart", "message": "Explore the constellations to connect with cosmic energy and expand your field.", "urgency": "low"}
+    else:
+        return {"action": "share", "message": "Your energy is high! Share your light with the community.", "urgency": "none"}
