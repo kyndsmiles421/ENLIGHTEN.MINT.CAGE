@@ -1,0 +1,150 @@
+{
+  "summary": "Comprehensive testing of Phase 31 features: Cosmic Calendar, Certifications, Wellness Reports, Meditation History, and Uploads/Media Library. All 19 backend tests passed (100%). All 5 frontend pages working correctly with proper navigation integration.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_phase31_features.py",
+    "/app/test_reports/pytest/pytest_phase31.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_phase31_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (19/19 tests passed)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "email": "test@test.com",
+    "password": "password"
+  },
+  "seed_data_creation": "Test meditation sessions created during testing (prefixed with TEST_), test audio file uploaded",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase 31 features fully functional: Cosmic Calendar (4 cosmic systems), Certifications (user achievements), Wellness Reports (weekly/monthly with insights), Meditation History (log and view sessions), Uploads/Media Library (audio/video upload). All regression tests pass.",
+  "features_verified": {
+    "cosmic_calendar": {
+      "GET /api/cosmic-calendar/today": {
+        "status": "200 OK",
+        "returns": "date, energy_summary, numerology (personal_year/month/day), moon (phase, code, age, guidance), mayan (kin, day_sign, glyph, tone, galactic_signature), cardology (card, suit, value, color)"
+      },
+      "frontend_page": {
+        "url": "/cosmic-calendar",
+        "birth_inputs": "Month, Day, Year selectors present",
+        "cosmic_cards": "4 cards - Numerology, Moon Phase, Mayan Tzolk'in, Daily Card",
+        "energy_summary": "Dynamic summary based on all cosmic systems"
+      }
+    },
+    "wellness_reports": {
+      "GET /api/wellness-reports/weekly (auth)": {
+        "status": "200 OK",
+        "returns": "period, start, end, summary (total_activities, mood_entries, dominant_mood, avg_intensity, mood_breakdown, current_streak), activities (journals, meditations, yoga_sessions, meals_logged, dreams_logged, reiki_sessions, acupressure_sessions, rituals_completed), insights"
+      },
+      "GET /api/wellness-reports/monthly (auth)": {
+        "status": "200 OK",
+        "returns": "Same structure as weekly but for 30-day period"
+      },
+      "frontend_page": {
+        "url": "/wellness-reports",
+        "toggles": "Weekly/Monthly period selector",
+        "stats": "Activities, Streak, Mood Avg, Moods Logged",
+        "activity_breakdown": "8 activity types with counts",
+        "insights": "Dynamic insights based on activity level and mood"
+      }
+    },
+    "meditation_history": {
+      "GET /api/meditation-history (auth)": {
+        "status": "200 OK",
+        "returns": "sessions, guided_sessions, stats (total_sessions, total_minutes, avg_duration)"
+      },
+      "POST /api/meditation-history/log (auth)": {
+        "status": "200 OK",
+        "body": "{type, duration_minutes, focus, intention, notes, mood_before, mood_after, depth_rating}",
+        "returns": "status: logged, id"
+      },
+      "frontend_page": {
+        "url": "/meditation-history",
+        "stats": "Sessions, Minutes, Avg Min",
+        "log_form": "Type, Duration, Mood Before/After, Intention, Notes, Depth slider, Save button",
+        "session_list": "Shows logged sessions with type, duration, date, intention, notes"
+      }
+    },
+    "certifications": {
+      "GET /api/certifications/my (auth)": {
+        "status": "200 OK",
+        "returns": "Array of certifications with id, class_name, completed_at"
+      },
+      "frontend_page": {
+        "url": "/certifications",
+        "empty_state": "Shows 'No certifications yet' message when empty",
+        "cert_cards": "Shows certification cards with class name, certified badge, date, ID"
+      }
+    },
+    "uploads_media_library": {
+      "POST /api/uploads/media (auth, multipart)": {
+        "status": "200 OK",
+        "accepts": "file (audio/video), title, description, media_type, tags",
+        "returns": "status: uploaded, id, filename",
+        "validation": "Rejects invalid file types (400), enforces 50MB limit (413)"
+      },
+      "GET /api/uploads/my (auth)": {
+        "status": "200 OK",
+        "returns": "uploads array with id, title, description, media_type, filename, file_size, tags, created_at"
+      },
+      "frontend_page": {
+        "url": "/media-library",
+        "upload_form": "Title, Type (audio/video), Description, Tags, File input, Upload button",
+        "media_list": "Shows uploaded files with play controls for audio, video player for video"
+      }
+    },
+    "navigation": {
+      "primary_nav": {
+        "calendar_link": "Present - navigates to /cosmic-calendar"
+      },
+      "more_dropdown": {
+        "reports_link": "Present - navigates to /wellness-reports",
+        "certs_link": "Present - navigates to /certifications",
+        "med_history_link": "Present - navigates to /meditation-history",
+        "my_media_link": "Present - navigates to /media-library"
+      }
+    },
+    "regression_tests": {
+      "GET /api/health": "200 OK - status: ok",
+      "POST /api/auth/login": "200 OK - returns token and user",
+      "GET /api/acupressure/points": "200 OK - 10 points",
+      "GET /api/reiki/chakras": "200 OK - 7 chakras",
+      "GET /api/daily-ritual/generate?time_of_day=morning": "200 OK - returns ritual with steps"
+    }
+  },
+  "backend_tests_summary": {
+    "total_tests": 19,
+    "passed": 19,
+    "failed": 0,
+    "test_classes": [
+      "TestCosmicCalendar (2 tests)",
+      "TestWellnessReports (3 tests)",
+      "TestMeditationHistory (3 tests)",
+      "TestCertifications (2 tests)",
+      "TestUploads (4 tests)",
+      "TestRegression (5 tests)"
+    ]
+  },
+  "frontend_tests_summary": {
+    "pages_tested": [
+      "/cosmic-calendar - 4 cosmic system cards, birth date inputs, energy summary",
+      "/certifications - Certification cards with class name, date, ID",
+      "/wellness-reports - Weekly/Monthly toggle, stats, activity breakdown, insights",
+      "/meditation-history - Stats, log form with all fields, session list",
+      "/media-library - Upload form with title, type, file input, submit button"
+    ],
+    "navigation_verified": "Calendar in primary nav, More dropdown has Reports, Certs, Med History, My Media"
+  }
+}

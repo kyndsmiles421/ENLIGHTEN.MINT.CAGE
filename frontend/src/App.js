@@ -61,6 +61,11 @@ const Acupressure = lazy(() => import('./pages/Acupressure'));
 const Reiki = lazy(() => import('./pages/Reiki'));
 const TrySomethingNew = lazy(() => import('./pages/TrySomethingNew'));
 const DailyRitual = lazy(() => import('./pages/DailyRitual'));
+const CosmicCalendar = lazy(() => import('./pages/CosmicCalendar'));
+const Certifications = lazy(() => import('./pages/Certifications'));
+const WellnessReports = lazy(() => import('./pages/WellnessReports'));
+const MeditationHistory = lazy(() => import('./pages/MeditationHistory'));
+const UserUploads = lazy(() => import('./pages/UserUploads'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -139,6 +144,11 @@ function AnimatedRoutes() {
             <Route path="/reiki" element={<Reiki />} />
             <Route path="/discover" element={<TrySomethingNew />} />
             <Route path="/daily-ritual" element={<DailyRitual />} />
+            <Route path="/cosmic-calendar" element={<CosmicCalendar />} />
+            <Route path="/certifications" element={<Certifications />} />
+            <Route path="/wellness-reports" element={<WellnessReports />} />
+            <Route path="/meditation-history" element={<MeditationHistory />} />
+            <Route path="/media-library" element={<UserUploads />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

@@ -9,7 +9,8 @@ import {
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
-  Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets
+  Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
+  Calendar, BarChart3, Award, Upload
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -17,6 +18,7 @@ import { LANGUAGES } from '../i18n/translations';
 
 const PRIMARY_NAV = [
   { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
+  { path: '/cosmic-calendar', label: 'Calendar', icon: Calendar },
   { path: '/journey', label: 'Journey', icon: Map },
   { path: '/breathing', label: 'Breathe', icon: Wind },
   { path: '/meditation', label: 'Meditate', icon: Timer },
@@ -30,6 +32,10 @@ const PRIMARY_NAV = [
 
 const MORE_NAV = [
   { path: '/discover', label: 'Try New', icon: Compass },
+  { path: '/wellness-reports', label: 'Reports', icon: BarChart3 },
+  { path: '/certifications', label: 'Certs', icon: Award },
+  { path: '/meditation-history', label: 'Med History', icon: Timer },
+  { path: '/media-library', label: 'My Media', icon: Upload },
   { path: '/acupressure', label: 'Acupressure', icon: Target },
   { path: '/reiki', label: 'Reiki & Aura', icon: Eye },
   { path: '/yoga', label: 'Yoga', icon: Flame },

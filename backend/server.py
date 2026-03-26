@@ -37,6 +37,10 @@ from routes.acupressure import router as acupressure_router
 from routes.reiki import router as reiki_router
 from routes.discover import router as discover_router
 from routes.daily_ritual import router as daily_ritual_router
+from routes.cosmic_calendar import router as cosmic_calendar_router
+from routes.wellness_reports import router as wellness_reports_router
+from routes.meditation_history import router as meditation_history_router
+from routes.uploads import router as uploads_router
 
 app = FastAPI()
 
@@ -50,6 +54,8 @@ all_routers = [
     numerology_router, nature_router,
     aromatherapy_router, herbology_router, elixirs_router, meals_router,
     acupressure_router, reiki_router, discover_router, daily_ritual_router,
+    cosmic_calendar_router, wellness_reports_router, meditation_history_router,
+    uploads_router,
 ]
 
 for r in all_routers:
