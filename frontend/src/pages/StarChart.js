@@ -1156,6 +1156,95 @@ function JourneyComplete({ count, onClose, authHeaders, token }) {
   );
 }
 
+/* ── Celestial Badges Panel ── */
+const BADGE_ICONS = {
+  star: Star, telescope: Eye, globe: Compass, book: BookOpen, scroll: Scroll,
+  flame: Sparkles, droplet: Volume2, leaf: Sparkles, wind: Sparkles,
+  music: Volume2, rocket: Compass, crown: Star,
+};
+const BADGE_ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Earth: '#22C55E', universal: '#C084FC' };
+
+function CelestialBadgesPanel({ onClose, token, authHeaders }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API}/badges/celestial`, { headers: authHeaders })
+      .then(r => setData(r.data))
+      .catch(() => toast.error('Failed to load badges'))
+      .finally(() => setLoading(false));
+  }, [token, authHeaders]);
+
+  return (
+    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+      data-testid="badges-panel"
+      className="absolute top-20 left-4 w-80 max-h-[75vh] overflow-y-auto rounded-2xl z-20"
+      style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(192,132,252,0.15)', backdropFilter: 'blur(24px)', boxShadow: '0 0 30px rgba(192,132,252,0.08)' }}>
+      <div className="sticky top-0 z-10 px-5 pt-5 pb-3" style={{ background: 'rgba(8,10,18,0.98)' }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.25)' }}>
+              <Star size={14} style={{ color: '#C084FC' }} />
+            </div>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Celestial Badges</p>
+              {data && <p className="text-[10px]" style={{ color: '#C084FC' }}>{data.total_earned}/{data.total_badges} earned</p>}
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+        </div>
+        {data && (
+          <div className="flex gap-3 text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <span>{data.stats.constellations_explored} explored</span>
+            <span>{data.stats.stories_listened} stories</span>
+            <span>{data.stats.journeys_completed} journeys</span>
+          </div>
+        )}
+      </div>
+
+      <div className="px-5 pb-5">
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="animate-spin" size={20} style={{ color: '#C084FC' }} /></div>
+        ) : data?.badges?.map(badge => {
+          const Icon = BADGE_ICONS[badge.icon] || Star;
+          const color = BADGE_ELEMENT_COLORS[badge.element] || '#C084FC';
+          const pct = badge.target > 0 ? (badge.progress / badge.target) * 100 : 0;
+          return (
+            <div key={badge.id} data-testid={`badge-${badge.id}`}
+              className="flex items-center gap-3 py-3" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                style={{
+                  background: badge.earned ? `${color}18` : 'rgba(248,250,252,0.02)',
+                  border: `1px solid ${badge.earned ? `${color}35` : 'rgba(248,250,252,0.04)'}`,
+                  boxShadow: badge.earned ? `0 0 12px ${color}20` : 'none',
+                  opacity: badge.earned ? 1 : 0.4,
+                }}>
+                <Icon size={16} style={{ color: badge.earned ? color : 'rgba(248,250,252,0.2)' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <p className="text-[11px] font-semibold truncate" style={{ color: badge.earned ? '#F8FAFC' : 'rgba(248,250,252,0.35)' }}>{badge.name}</p>
+                  {badge.earned && <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>Earned</span>}
+                </div>
+                <p className="text-[9px] truncate" style={{ color: 'rgba(248,250,252,0.25)' }}>{badge.description}</p>
+                {!badge.earned && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+                    </div>
+                    <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{badge.progress}/{badge.target}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function StarChart() {
   const { token, authHeaders } = useAuth();
   const navigate = useNavigate();
@@ -1177,6 +1266,7 @@ export default function StarChart() {
   const [journeyPaused, setJourneyPaused] = useState(false);
   const [journeyTarget, setJourneyTarget] = useState(null);
   const [journeyComplete, setJourneyComplete] = useState(false);
+  const [showBadges, setShowBadges] = useState(false);
   const journeyAudioRef = useRef(null);
   const journeyAmbient = useCosmicAmbient();
   const journeyPausedRef = useRef(false);
@@ -1354,6 +1444,16 @@ export default function StarChart() {
               }}>
               <Scroll size={10} /> {mythologyMode ? 'Mythology On' : 'Mythology'}
             </button>
+            <button onClick={() => setShowBadges(!showBadges)} data-testid="badges-toggle"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              style={{
+                background: showBadges ? 'rgba(192,132,252,0.15)' : 'rgba(8,10,18,0.8)',
+                border: `1px solid ${showBadges ? 'rgba(192,132,252,0.4)' : 'rgba(248,250,252,0.06)'}`,
+                color: showBadges ? '#C084FC' : 'rgba(248,250,252,0.5)',
+                backdropFilter: 'blur(12px)',
+              }}>
+              <Star size={10} /> Badges
+            </button>
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]"
               style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'blur(12px)' }}>
@@ -1421,6 +1521,11 @@ export default function StarChart() {
           <Compass size={10} /> Today: {data.mayan_glyph} ({data.mayan_element})
         </div>
       )}
+
+      {/* Badges Panel */}
+      <AnimatePresence>
+        {showBadges && <CelestialBadgesPanel onClose={() => setShowBadges(false)} token={token} authHeaders={authHeaders} />}
+      </AnimatePresence>
 
       {/* Detail Panel (with Mythology) */}
       <AnimatePresence>

@@ -213,3 +213,129 @@ async def get_game_scores(user=Depends(get_current_user)):
 
 
 
+
+
+# ========== CELESTIAL BADGES ==========
+
+CELESTIAL_BADGES = [
+    {"id": "first_light", "name": "First Light", "icon": "star", "element": "universal",
+     "description": "Explore your first constellation", "requirement": {"type": "constellations_explored", "count": 1}},
+    {"id": "stargazer", "name": "Stargazer", "icon": "telescope", "element": "universal",
+     "description": "Explore 5 different constellations", "requirement": {"type": "constellations_explored", "count": 5}},
+    {"id": "constellation_collector", "name": "Constellation Collector", "icon": "globe", "element": "universal",
+     "description": "Explore all 16 constellations", "requirement": {"type": "constellations_explored", "count": 16}},
+    {"id": "story_seeker", "name": "Story Seeker", "icon": "book", "element": "universal",
+     "description": "Listen to 3 constellation stories", "requirement": {"type": "stories_listened", "count": 3}},
+    {"id": "myth_keeper", "name": "Myth Keeper", "icon": "scroll", "element": "universal",
+     "description": "Listen to 10 constellation stories", "requirement": {"type": "stories_listened", "count": 10}},
+    {"id": "orions_hunter", "name": "Orion's Hunter", "icon": "flame", "element": "Fire",
+     "description": "Explore all Fire constellations", "requirement": {"type": "element_complete", "element": "Fire", "names": ["Aries", "Leo", "Sagittarius", "Orion"]}},
+    {"id": "neptunes_child", "name": "Neptune's Child", "icon": "droplet", "element": "Water",
+     "description": "Explore all Water constellations", "requirement": {"type": "element_complete", "element": "Water", "names": ["Cancer", "Scorpio", "Pisces", "Cygnus"]}},
+    {"id": "gaias_guardian", "name": "Gaia's Guardian", "icon": "leaf", "element": "Earth",
+     "description": "Explore all Earth constellations", "requirement": {"type": "element_complete", "element": "Earth", "names": ["Taurus", "Virgo", "Capricorn", "Ursa Major"]}},
+    {"id": "zephyrs_voice", "name": "Zephyr's Voice", "icon": "wind", "element": "Air",
+     "description": "Explore all Air constellations", "requirement": {"type": "element_complete", "element": "Air", "names": ["Gemini", "Libra", "Aquarius", "Lyra"]}},
+    {"id": "lyras_musician", "name": "Lyra's Musician", "icon": "music", "element": "Air",
+     "description": "Listen to all 16 constellation stories", "requirement": {"type": "stories_listened", "count": 16}},
+    {"id": "cosmic_voyager", "name": "Cosmic Voyager", "icon": "rocket", "element": "universal",
+     "description": "Complete a Stargazing Journey", "requirement": {"type": "journey_completed", "count": 1}},
+    {"id": "celestial_master", "name": "Celestial Master", "icon": "crown", "element": "universal",
+     "description": "Earn all other celestial badges", "requirement": {"type": "all_badges"}},
+]
+
+@router.get("/badges/celestial")
+async def get_celestial_badges(user=Depends(get_current_user)):
+    uid = user["id"]
+
+    # Get user's star chart completions
+    completions = []
+    async for c in db.challenge_completions.find({"user_id": uid, "category": "star_chart"}, {"_id": 0}):
+        completions.append(c)
+
+    # Parse completions into stats
+    explored_names = set()
+    stories_names = set()
+    journeys = 0
+    for c in completions:
+        cid = c.get("challenge_id", "")
+        if "constellation_explored" in cid:
+            name = cid.replace("star_constellation_explored_", "")
+            if name:
+                explored_names.add(name)
+        elif "story_listened" in cid:
+            name = cid.replace("star_story_listened_", "")
+            if name:
+                stories_names.add(name)
+        elif "journey_completed" in cid:
+            journeys += 1
+
+    # Get already earned badges
+    earned_docs = []
+    async for b in db.celestial_badges.find({"user_id": uid}, {"_id": 0}):
+        earned_docs.append(b)
+    earned_ids = {b["badge_id"] for b in earned_docs}
+
+    # Check each badge
+    badges_result = []
+    newly_earned = []
+    non_master_ids = [b["id"] for b in CELESTIAL_BADGES if b["id"] != "celestial_master"]
+
+    for badge in CELESTIAL_BADGES:
+        req = badge["requirement"]
+        earned = badge["id"] in earned_ids
+        progress = 0
+        target = 1
+
+        if req["type"] == "constellations_explored":
+            target = req["count"]
+            progress = len(explored_names)
+        elif req["type"] == "stories_listened":
+            target = req["count"]
+            progress = len(stories_names)
+        elif req["type"] == "element_complete":
+            target = len(req["names"])
+            progress = len([n for n in req["names"] if n in explored_names])
+        elif req["type"] == "journey_completed":
+            target = req["count"]
+            progress = journeys
+        elif req["type"] == "all_badges":
+            target = len(non_master_ids)
+            progress = len([bid for bid in non_master_ids if bid in earned_ids])
+
+        # Check if newly earned
+        is_complete = progress >= target
+        if is_complete and not earned:
+            earned = True
+            newly_earned.append(badge)
+            await db.celestial_badges.insert_one({
+                "user_id": uid,
+                "badge_id": badge["id"],
+                "badge_name": badge["name"],
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+            })
+            await create_activity(uid, "badge_earned", f"earned the '{badge['name']}' celestial badge!", {"badge_id": badge["id"], "badge_name": badge["name"]})
+
+        badges_result.append({
+            "id": badge["id"],
+            "name": badge["name"],
+            "icon": badge["icon"],
+            "element": badge["element"],
+            "description": badge["description"],
+            "earned": earned,
+            "progress": min(progress, target),
+            "target": target,
+            "earned_at": next((b["earned_at"] for b in earned_docs if b["badge_id"] == badge["id"]), None),
+        })
+
+    return {
+        "badges": badges_result,
+        "total_earned": sum(1 for b in badges_result if b["earned"]),
+        "total_badges": len(badges_result),
+        "newly_earned": [{"id": b["id"], "name": b["name"], "icon": b["icon"], "element": b["element"], "description": b["description"]} for b in newly_earned],
+        "stats": {
+            "constellations_explored": len(explored_names),
+            "stories_listened": len(stories_names),
+            "journeys_completed": journeys,
+        }
+    }
