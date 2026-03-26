@@ -22,7 +22,7 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 │   ├── src/
 │   │   ├── components/      # Reusable components
 │   │   └── pages/           # 50+ page components
-│   └── .env                 # REACT_APP_BACKEND_URL
+│   └── .env
 └── memory/
     └── PRD.md
 ```
@@ -30,8 +30,7 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 ## Implemented Features
 
 ### Core Platform
-- User auth (JWT), profiles, dashboard
-- Mood tracking, journaling, affirmations
+- User auth (JWT), profiles, dashboard, mood tracking, journaling, affirmations
 - Gamification (XP, levels, streaks, badges, leaderboard)
 
 ### Wellness Content
@@ -52,21 +51,27 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Zen Garden (plant garden, koi pond, sand drawing, lantern release, rain scene)
 
 ### Phase 44 (2026-03-26)
-- **Dynamic Avatar Energy State** - Avatar visuals dynamically reflect user's wellness journey
-- **Virtual Reality Cosmic Sanctuary** (`/vr`) - Immersive 3D environment with avatar, portals, energy HUD, ambient audio
+- Dynamic Avatar Energy State — avatar visuals reflect wellness journey
+- Virtual Reality Cosmic Sanctuary (`/vr`) — immersive 3D portal environment
 
 ### Phase 45 (2026-03-26)
-- **Constellation-Linked Personalized Guided Meditations** - 12 zodiac themes with AI-generated immersive meditations
+- Constellation-Linked Personalized Guided Meditations — 12 zodiac AI meditations
 
 ### Phase 46 (2026-03-26)
-- **Bug Fix: Zen Garden Watering** - Added missing `PLANT_STAGES` and `PLANT_WATERS_PER_STAGE` constants to plants.py (lost during server.py modular refactor). Called `reset_plant_watering()` in get_plants to reset `watered_today` on new days.
-- **Star Chart → Constellation Meditation Integration** - Clicking a constellation in the 3D Star Chart now shows a "Meditate" button that navigates to `/meditation?constellation={id}`, auto-switching to Cosmic Meditations mode with that constellation highlighted and scrolled into view.
+- Bug Fix: Zen Garden watering (missing PLANT_STAGES/PLANT_WATERS_PER_STAGE constants)
+- Star Chart → Constellation Meditation Integration (Meditate button in mythology panel)
+
+### Phase 47 (2026-03-26)
+- **Gyroscope/DeviceOrientation Star Chart** — Phone movement controls camera for AR-like stargazing experience. Uses alpha (compass) for horizontal rotation, beta (tilt) for vertical angle. iOS permission request handled. Gyro toggle in toolbar with "Gyro for AR mode" hint.
+- **Auto-Water Zen Garden from Wellness Activities** — Completing meditations or daily challenges automatically waters one unwatered zen garden plant. Returns `plant_growth` in API response showing which plant was watered and whether it grew to a new stage. Connected in `meditation_history.py` and `daily_challenges.py`.
 
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/avatar, POST /api/avatar, GET /api/avatar/energy-state
 - GET /api/meditation/constellation-themes, POST /api/meditation/generate-constellation
 - GET /api/meditation/my-constellation, DELETE /api/meditation/constellation/{id}
+- POST /api/meditation-history/log (now returns plant_growth)
+- POST /api/daily-challenges/complete (now returns plant_growth)
 - GET /api/zen-garden/plants, POST /api/zen-garden/plants, POST /api/zen-garden/plants/{id}/water
 - GET /api/mudras, GET /api/videos, GET /api/exercises
 - POST /api/knowledge/tts, GET /api/gamification/badges, GET /api/star-chart/constellations
@@ -77,9 +82,11 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 ## Known Constraints
 - NO React Three Fiber/Drei — pure vanilla Three.js only
 - All backend routes prefixed with /api
+- Gyroscope only works on devices with DeviceOrientation API (phones, tablets)
 
 ## Backlog
-- P2: StarChart.js component splitting (>1500 lines)
+- P2: StarChart.js component splitting (>1600 lines)
 - Potential: In-VR guided meditation mode
 - Potential: Meditation completion auto-sharing to community
 - Potential: More complex gamification tied to VR interactions
+- Potential: Plant growth animations when completing wellness activities
