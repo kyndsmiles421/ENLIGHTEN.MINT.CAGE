@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2 } from 'lucide-react';
+import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import CelebrationBurst from '../components/CelebrationBurst';
@@ -868,6 +868,222 @@ function BuildYourOwn({ onPlay }) {
   );
 }
 
+/* ======== CONSTELLATION MEDITATIONS ======== */
+
+const ELEMENT_SOUNDS = { Fire: 'bowls', Earth: 'forest', Air: 'wind', Water: 'ocean' };
+
+function ConstellationMeditations({ onPlay }) {
+  const { user, authHeaders } = useAuth();
+  const { playChime } = useSensory();
+  const [themes, setThemes] = useState([]);
+  const [userZodiac, setUserZodiac] = useState(null);
+  const [saved, setSaved] = useState([]);
+  const [generating, setGenerating] = useState(null);
+  const [selectedDuration, setSelectedDuration] = useState(10);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    if (!user) { setLoading(false); return; }
+    try {
+      const [themesRes, savedRes] = await Promise.all([
+        axios.get(`${API}/meditation/constellation-themes`, { headers: authHeaders }),
+        axios.get(`${API}/meditation/my-constellation`, { headers: authHeaders }),
+      ]);
+      setThemes(themesRes.data.themes || []);
+      setUserZodiac(themesRes.data.user_zodiac);
+      setSaved(savedRes.data || []);
+    } catch {}
+    setLoading(false);
+  }, [user, authHeaders]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const generate = async (constellationId) => {
+    setGenerating(constellationId);
+    try {
+      const res = await axios.post(`${API}/meditation/generate-constellation`, {
+        constellation_id: constellationId, duration: selectedDuration,
+      }, { headers: authHeaders });
+      const med = res.data.meditation;
+      const constellation = res.data.constellation;
+      playChime();
+      setSaved(prev => [med, ...prev]);
+      // Auto-play
+      onPlay({
+        id: med.id, name: `${constellation.name} Journey`, icon: Star,
+        color: constellation.color, duration: med.duration,
+        sound: ELEMENT_SOUNDS[constellation.element] || 'bowls',
+        category: 'constellation', description: `A cosmic meditation through ${constellation.name} — ${constellation.theme}`,
+        steps: med.steps,
+      });
+    } catch {
+      toast.error('Could not generate constellation meditation. Please try again.');
+    }
+    setGenerating(null);
+  };
+
+  const playSavedMed = (med) => {
+    const theme = themes.find(t => t.id === med.constellation_id);
+    onPlay({
+      id: med.id, name: `${med.constellation_name} Journey`, icon: Star,
+      color: theme?.color || '#C084FC', duration: med.duration,
+      sound: ELEMENT_SOUNDS[med.element] || 'bowls',
+      category: 'constellation', description: `A cosmic meditation through ${med.constellation_name}`,
+      steps: med.steps,
+    });
+  };
+
+  const deleteMed = async (id) => {
+    try {
+      await axios.delete(`${API}/meditation/constellation/${id}`, { headers: authHeaders });
+      setSaved(prev => prev.filter(s => s.id !== id));
+      toast.success('Removed');
+    } catch {}
+  };
+
+  if (!user) return (
+    <div className="glass-card p-12 text-center">
+      <Star size={32} style={{ color: 'rgba(252,211,77,0.3)', margin: '0 auto 12px' }} />
+      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to access constellation-linked meditations.</p>
+    </div>
+  );
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <Loader2 className="animate-spin" size={24} style={{ color: 'var(--text-muted)' }} />
+    </div>
+  );
+
+  // Sort: birth sign first, then by name
+  const sortedThemes = [...themes].sort((a, b) => {
+    if (a.is_birth_sign && !b.is_birth_sign) return -1;
+    if (!a.is_birth_sign && b.is_birth_sign) return 1;
+    return 0;
+  });
+
+  return (
+    <div className="space-y-8" data-testid="constellation-meditations">
+      {/* Duration selector */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Duration</span>
+        {[5, 8, 10, 15].map(d => (
+          <button key={d} onClick={() => setSelectedDuration(d)}
+            className="px-3 py-1.5 rounded-lg text-xs transition-all"
+            style={{
+              background: selectedDuration === d ? 'rgba(252,211,77,0.12)' : 'rgba(255,255,255,0.02)',
+              color: selectedDuration === d ? '#FCD34D' : 'var(--text-muted)',
+              border: `1px solid ${selectedDuration === d ? 'rgba(252,211,77,0.25)' : 'rgba(255,255,255,0.06)'}`,
+            }}
+            data-testid={`constellation-duration-${d}`}>{d} min</button>
+        ))}
+      </div>
+
+      {/* Saved constellation meditations */}
+      {saved.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>Your Cosmic Journeys</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+            {saved.slice(0, 6).map((med, i) => {
+              const theme = themes.find(t => t.id === med.constellation_id);
+              return (
+                <motion.div key={med.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                  className="glass-card p-4 group" data-testid={`saved-constellation-${med.id}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ background: theme?.color || '#C084FC', boxShadow: `0 0 6px ${theme?.color || '#C084FC'}60` }} />
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{med.constellation_name}</span>
+                    </div>
+                    <button onClick={() => deleteMed(med.id)} className="opacity-0 group-hover:opacity-100 transition-opacity" data-testid={`del-constellation-${med.id}`}>
+                      <Trash2 size={12} style={{ color: 'var(--text-muted)' }} />
+                    </button>
+                  </div>
+                  <p className="text-[11px] mb-3" style={{ color: 'var(--text-muted)' }}>
+                    {med.duration} min &middot; {med.element} &middot; {med.steps?.length} steps
+                    {med.is_birth_sign && <span className="ml-1" style={{ color: '#FCD34D' }}>&middot; Birth Sign</span>}
+                  </p>
+                  <button onClick={() => playSavedMed(med)}
+                    className="w-full py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all"
+                    style={{ background: `${theme?.color || '#C084FC'}10`, color: theme?.color || '#C084FC', border: `1px solid ${theme?.color || '#C084FC'}20` }}
+                    data-testid={`play-constellation-${med.id}`}>
+                    <Play size={11} fill={theme?.color || '#C084FC'} /> Journey Again
+                  </button>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Constellation cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {sortedThemes.map((c, i) => (
+          <motion.div key={c.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+            className="glass-card glass-card-hover p-6 relative overflow-hidden group"
+            data-testid={`constellation-card-${c.id}`}>
+            {/* Background glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 rounded-full"
+              style={{ background: `radial-gradient(circle, ${c.color}08 0%, transparent 70%)`, filter: 'blur(20px)' }} />
+
+            {/* Birth sign badge */}
+            {c.is_birth_sign && (
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+                style={{ background: 'rgba(252,211,77,0.12)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)' }}
+                data-testid={`birth-sign-badge-${c.id}`}>
+                Your Sign
+              </div>
+            )}
+
+            <div className="relative z-10">
+              {/* Constellation header */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: `${c.color}12`, border: `1px solid ${c.color}15` }}>
+                  <Star size={18} style={{ color: c.color, filter: `drop-shadow(0 0 6px ${c.color}60)` }} />
+                </div>
+                <div>
+                  <h3 className="text-base font-medium" style={{ color: 'var(--text-primary)' }}>{c.name}</h3>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                    {c.figure} &middot; {c.element} &middot; {c.deity}
+                  </p>
+                </div>
+              </div>
+
+              {/* Theme description */}
+              <p className="text-sm leading-relaxed mb-3 capitalize" style={{ color: 'var(--text-secondary)' }}>
+                {c.theme}
+              </p>
+
+              {/* Cosmic lesson */}
+              <p className="text-[11px] leading-relaxed mb-4 italic" style={{ color: `${c.color}AA` }}>
+                &ldquo;{c.lesson}&rdquo;
+              </p>
+
+              {/* Generate button */}
+              <button
+                onClick={() => generate(c.id)}
+                disabled={generating !== null}
+                className="w-full py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-all group-hover:scale-[1.01]"
+                style={{
+                  background: `${c.color}10`,
+                  color: c.color,
+                  border: `1px solid ${c.color}20`,
+                  opacity: generating && generating !== c.id ? 0.4 : 1,
+                }}
+                data-testid={`generate-constellation-${c.id}`}>
+                {generating === c.id ? (
+                  <><Loader2 size={13} className="animate-spin" /> Channeling {c.name} energy...</>
+                ) : (
+                  <><Star size={13} /> Begin {c.name} Meditation</>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ======== MAIN PAGE ======== */
 export default function Meditation() {
   const { user } = useAuth();
@@ -894,6 +1110,7 @@ export default function Meditation() {
         <div className="flex gap-2 mb-8 flex-wrap" data-testid="meditation-mode-toggle">
           {[
             { id: 'guided', label: 'Guided Meditations', icon: Sparkles },
+            { id: 'constellation', label: 'Cosmic Meditations', icon: Star },
             { id: 'build', label: 'Build Your Own', icon: Wand2 },
             { id: 'timer', label: 'Timer Mode', icon: RotateCcw },
           ].map(m => {
@@ -969,6 +1186,8 @@ export default function Meditation() {
               })}
             </div>
           </>
+        ) : mode === 'constellation' ? (
+          <ConstellationMeditations onPlay={setActiveSession} />
         ) : mode === 'build' ? (
           <BuildYourOwn onPlay={setActiveSession} />
         ) : (
