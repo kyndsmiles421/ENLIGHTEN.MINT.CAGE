@@ -99,6 +99,35 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
   - Narrates full mythology story + cosmic lesson when "Listen to Story" is clicked
   - Ambient drones fade in/out gracefully with narration
 
+## Phase 41 Changes (2026-03-26)
+- **Feature (P0)**: Stargazing Journey — Planetarium Show Mode
+  - "Stargazing Journey" button in Star Chart header
+  - Auto-navigates camera through all 16 constellations in sequence
+  - Smooth cinematic camera transitions using spherical coordinate lerp
+  - Per-constellation TTS narration with "fable" voice + persistent ambient cosmic drones
+  - JourneyOverlay with timeline dots, progress bar, play/pause/skip/stop controls
+  - JourneyComplete card after visiting all constellations
+  - Auto-enables mythology mode when journey starts
+
+- **Feature (P1)**: Enhanced Constellation Figure Illustrations
+  - Multi-stroke canvas-drawn mythology figures for all 16 constellations
+  - Recognizable silhouettes: ram horns, bull head, twin figures, crab claws, lion mane, maiden with wheat, scales of justice, scorpion stinger, centaur archer, sea-goat, water bearer pouring, bound fish, Orion with club/shield, great bear, lyre with strings, swan wings
+  - Glow effects with additive blending per stroke
+
+- **Feature (P2)**: Social Sharing Enhancements
+  - Share constellation discoveries to community (post_type: 'shared_constellation')
+  - Share Stargazing Journey completion (post_type: 'shared_journey')
+  - Share button in MythologyPanel detail card
+  - Share button in Journey Complete card
+  - New post type labels in Community page: "Star Discovery", "Stargazing Journey", "Meditation"
+
+- **Feature (P3)**: Gamification — Star Chart XP System
+  - POST /api/star-chart/award-xp endpoint
+  - XP rewards: constellation_explored (10), mythology_read (15), story_listened (25), journey_completed (100)
+  - Duplicate prevention per action+constellation per day
+  - XP counts toward global leaderboard
+  - Auto-awards XP when exploring constellations, listening to stories, completing journeys
+
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/mudras (25 items)
@@ -119,5 +148,7 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - All backend routes prefixed with /api via server.py include_router
 
 ## Backlog
-- Awaiting user feedback on new features
-- Potential: Social sharing, community features expansion, avatar customization
+- Awaiting user feedback on all new features
+- Potential: More complex gamification badges specific to star chart mastery
+- Potential: Avatar customization linked to constellation alignment
+- Potential: Meditation completion auto-sharing to community
