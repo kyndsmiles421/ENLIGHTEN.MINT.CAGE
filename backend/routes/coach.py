@@ -38,6 +38,12 @@ COACHING_MODES = {
         "desc": "Emotional and energetic healing support",
         "system_addon": "You specialize in emotional healing, trauma release, grief processing, and energetic restoration. Recommend specific healing modalities (reiki, acupressure points, herbs, essential oils, elixirs) based on their needs."
     },
+    "dream_oracle": {
+        "name": "Dream Oracle",
+        "color": "#818CF8",
+        "desc": "Deep dream analysis through your cosmic lens",
+        "system_addon": "You are an expert dream interpreter, weaving Jungian depth psychology, shamanic dreamwork, and spiritual symbolism. You analyze dreams through the seeker's unique cosmic profile — their aura color, moon phase at the time of dreaming, numerology life path, and birth card. Every symbol in their dream is read through these personal lenses for deeply relevant insight."
+    },
 }
 
 
@@ -253,3 +259,131 @@ async def chat(data: dict = Body(...), user=Depends(get_current_user)):
 async def delete_session(session_id: str, user=Depends(get_current_user)):
     await db.coach_sessions.delete_one({"id": session_id, "user_id": user["id"]})
     return {"status": "deleted"}
+
+
+@router.get("/coach/dreams")
+async def get_user_dreams_for_coach(user=Depends(get_current_user)):
+    """Get user's recent dreams for the dream oracle picker."""
+    dreams = await db.dreams.find(
+        {"user_id": user["id"]}, {"_id": 0, "id": 1, "title": 1, "content": 1, "mood": 1, "moon_phase": 1, "vividness": 1, "lucid": 1, "symbols": 1, "created_at": 1}
+    ).sort("created_at", -1).to_list(30)
+    return {"dreams": dreams}
+
+
+@router.post("/coach/analyze-dream")
+async def analyze_dream(data: dict = Body(...), user=Depends(get_current_user)):
+    """Deep AI dream analysis cross-referenced with user's cosmic profile."""
+    dream_id = data.get("dream_id")
+    session_id = data.get("session_id")
+
+    if not dream_id or not session_id:
+        raise HTTPException(status_code=400, detail="dream_id and session_id required")
+
+    # Fetch dream
+    dream = await db.dreams.find_one({"id": dream_id, "user_id": user["id"]}, {"_id": 0})
+    if not dream:
+        raise HTTPException(status_code=404, detail="Dream not found")
+
+    # Verify session
+    session = await db.coach_sessions.find_one({"id": session_id, "user_id": user["id"]}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Gather cosmic profile data in parallel
+    profile, aura_doc, numerology_doc, cardology_doc = await asyncio.gather(
+        _get_user_profile(user["id"]),
+        db.aura_readings.find_one({"user_id": user["id"]}, {"_id": 0}, sort=[("created_at", -1)]),
+        db.profiles.find_one({"user_id": user["id"]}, {"_id": 0, "life_path": 1, "birth_date": 1}),
+        db.profiles.find_one({"user_id": user["id"]}, {"_id": 0, "birth_card": 1}),
+    )
+
+    # Build cosmic context
+    cosmic_parts = []
+    aura_color = aura_doc.get("aura_color", "") if aura_doc else ""
+    if aura_color:
+        cosmic_parts.append(f"AURA COLOR: {aura_color} — this colors the emotional and energetic lens through which their dream should be interpreted.")
+    moon_phase = dream.get("moon_phase", "")
+    if moon_phase:
+        cosmic_parts.append(f"MOON PHASE when dreamed: {moon_phase} — this affects the dream's intensity and symbolic depth.")
+    life_path = numerology_doc.get("life_path", "") if numerology_doc else ""
+    if life_path:
+        cosmic_parts.append(f"NUMEROLOGY LIFE PATH: {life_path} — this reveals the soul's core lessons and how they manifest in dreamscape.")
+    birth_card = cardology_doc.get("birth_card", "") if cardology_doc else ""
+    if birth_card:
+        cosmic_parts.append(f"BIRTH CARD (Sacred Cardology): {birth_card} — this card's energy shapes the archetypal patterns in their dreams.")
+
+    cosmic_context = "\n".join(cosmic_parts) if cosmic_parts else "No cosmic profile data available yet — provide a universal interpretation."
+
+    # Build the dream analysis prompt
+    dream_text = f"""DREAM TITLE: {dream.get('title', 'Untitled')}
+DREAM CONTENT: {dream.get('content', '')}
+DREAM MOOD: {dream.get('mood', 'unknown')}
+VIVIDNESS: {dream.get('vividness', 5)}/10
+LUCID: {'Yes' if dream.get('lucid') else 'No'}
+SYMBOLS DETECTED: {', '.join(dream.get('symbols', [])) if dream.get('symbols') else 'None detected'}
+DATE: {dream.get('created_at', 'Unknown')}"""
+
+    system_prompt = f"""You are the Dream Oracle within The Cosmic Collective — a deeply wise interpreter of dreams who weaves together Jungian depth psychology, shamanic dreamwork, archetypal mythology, and the seeker's personal cosmic signature.
+
+{COACHING_MODES['dream_oracle']['system_addon']}
+
+SEEKER'S COSMIC PROFILE:
+{cosmic_context}
+
+SEEKER'S WELLNESS DATA:
+- Dominant mood: {profile.get('dominant_mood', 'neutral')}
+- Practice streak: {profile.get('streak', 0)} days
+- Experience level: {profile.get('experience_level', 'beginner')}
+- Total dreams logged: {profile.get('dreams_count', 0)}
+
+ANALYSIS GUIDELINES:
+1. COSMIC MIRROR — Show how the dream reflects their aura color's energy and current moon phase influence
+2. KEY SYMBOLS — Identify 3-5 major symbols with layered meanings (personal, collective unconscious, spiritual)
+3. NUMEROLOGICAL THREAD — Connect dream themes to their life path number's lessons
+4. SHADOW WHISPER — What the dream reveals about their unconscious/shadow self
+5. SOUL MESSAGE — The higher self's communication through this dream
+6. PRACTICAL ORACLE — Specific, actionable guidance for waking life (suggest platform practices: specific yoga flows, essential oils, herbs, meditation types, acupressure points, or journal prompts)
+
+Be poetic, wise, and deeply personal. This is not a generic interpretation — it's THEIR dream through THEIR cosmic lens. Address them directly in second person."""
+
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"dream-oracle-{session_id}-{uuid.uuid4().hex[:8]}",
+            system_message=system_prompt,
+        )
+        response = await asyncio.wait_for(
+            chat.send_message(UserMessage(text=f"Please provide a deep cosmic interpretation of this dream:\n\n{dream_text}")),
+            timeout=60
+        )
+        reply = response
+    except Exception as e:
+        logger.error(f"Dream analysis error: {e}")
+        reply = "The dream veil is thick at this moment. I sense the symbols stirring but cannot fully reach them. Please try again — your dream holds important messages."
+
+    # Save to session
+    now = datetime.now(timezone.utc).isoformat()
+    dream_context_msg = {"role": "system_context", "text": f"[Dream Selected: \"{dream.get('title', 'Untitled')}\"] {dream.get('content', '')[:200]}...", "timestamp": now, "dream_id": dream_id}
+    assistant_msg = {"role": "assistant", "text": reply, "timestamp": now}
+
+    await db.coach_sessions.update_one(
+        {"id": session_id},
+        {"$push": {"messages": {"$each": [dream_context_msg, assistant_msg]}},
+         "$set": {"updated_at": now, "dream_id": dream_id}}
+    )
+
+    return {
+        "reply": reply,
+        "session_id": session_id,
+        "dream": {
+            "title": dream.get("title", "Untitled"),
+            "mood": dream.get("mood", ""),
+            "moon_phase": moon_phase,
+        },
+        "cosmic_profile": {
+            "aura_color": aura_color,
+            "life_path": life_path,
+            "birth_card": birth_card,
+            "moon_phase": moon_phase,
+        }
+    }
