@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -54,27 +54,189 @@ function createNebulaTexture(color, size = 256) {
   const tex = new THREE.CanvasTexture(canvas); tex.needsUpdate = true; return tex;
 }
 
-/* Mythology figure outline paths (simplified line art) */
+/* Mythology figure outline paths — multi-stroke for richer illustrations */
 const MYTHOLOGY_PATHS = {
-  aries: [[0,-1.8],[0.3,-1.2],[0.8,-0.3],[0.5,0.3],[0.2,0.8],[-0.3,1.2],[-0.8,0.8],[-0.6,0.2],[-0.2,-0.4],[0.5,-0.8],[1.2,-0.5],[1.5,0],[1.2,0.6],[0.7,0.4]], // Ram horns
-  taurus: [[-1.5,0],[-0.8,0.4],[-0.2,0.6],[0.3,0.4],[0.8,0.8],[1.2,1.5],[0.8,0.8],[1.5,0.2],[1.8,-0.3],[1.5,0.2],[0.8,-0.2],[0.3,-0.5],[-0.2,-0.3],[-0.8,-0.5],[-1.2,-0.2],[-1.5,0]], // Bull head
-  gemini: [[-0.5,1.5],[-0.5,0.5],[-0.5,-0.5],[-0.5,-1.5],[-0.5,-0.5],[0.5,-0.5],[0.5,0.5],[0.5,1.5],[0.5,0.5],[-0.5,0.5]], // Twin figures
-  cancer: [[-0.8,0.8],[-0.2,0.3],[0.2,0.3],[0.8,0.8],[0.4,0.2],[0.2,-0.2],[0,-0.6],[-0.2,-0.2],[-0.4,0.2],[-0.8,0.8]], // Crab shape
-  leo: [[-1.2,0.5],[-0.6,1],[0,1.2],[0.6,1],[1,0.5],[1.2,0],[1,-0.5],[0.5,-0.8],[0,-0.5],[-0.5,-0.8],[-1,-0.5],[-1.2,0],[-1.2,0.5]], // Lion
-  virgo: [[0,1.8],[0,0.8],[0,0],[-0.5,-0.5],[-1,-1],[0,0],[0.5,-0.5],[1,-1],[0,0],[0,-1],[0.3,-1.5],[0.6,-1.8]], // Maiden
-  libra: [[-1,0.5],[0,1],[1,0.5],[0,1],[0,-0.5],[-1,-1],[1,-1],[0,-0.5]], // Scales
-  scorpio: [[-1.5,0],[-1,0.3],[-0.5,0.2],[0,0],[0.5,-0.2],[1,-0.5],[1.3,-0.8],[1.5,-0.5],[1.2,-0.2],[1.5,0.2]], // Scorpion tail
-  sagittarius: [[-0.5,-1],[-0.3,0],[0,0.8],[0.3,0],[-0.3,0],[0.8,0.5],[1.2,0.8],[0.8,0.5],[0.8,-0.2]], // Archer
-  capricorn: [[-1,0.5],[-0.5,0.8],[0,0.5],[0.5,0],[0.8,-0.3],[1,-0.8],[0.8,-1.2],[0.5,-1],[0.2,-0.8],[0,-0.5],[-0.3,-0.3],[-0.7,0],[-1,0.5]], // Sea-goat
-  aquarius: [[0,1.5],[0,0.5],[0,0],[-0.8,-0.5],[-0.3,-1],[0.3,-0.5],[0.8,-1],[1.3,-0.5]], // Water pouring
-  pisces: [[-1.2,0.5],[-0.8,0.8],[-0.4,0.5],[-0.1,0],[0.1,0],[0.4,-0.5],[0.8,-0.8],[1.2,-0.5],[0.8,-0.2],[0.4,0],[0.1,0],[-0.1,0],[-0.4,0.2],[-0.8,0.5]], // Two fish
-  orion: [[-0.3,2],[0,1.5],[0.3,2],[0,1.5],[0,0.8],[-0.6,0.3],[-1.2,0.5],[0,0.8],[0.6,0.3],[1.2,0.5],[0,0.8],[0,0],[-0.2,-0.1],[0.2,-0.1],[0,0],[0,-0.8],[-0.4,-1.5],[0,-0.8],[0.4,-1.5]], // Hunter figure
-  ursa_major: [[-1.5,0.5],[-0.8,0.3],[-0.3,0.5],[0,0],[0.5,0.3],[1,0.2],[1.5,-0.3]], // Big Dipper
-  lyra: [[0,1],[-0.6,0.3],[-0.4,-0.6],[0,-0.8],[0.4,-0.6],[0.6,0.3],[0,1]], // Lyre
-  cygnus: [[0,1.5],[0,0.5],[0,-0.5],[0,-1.5],[0,0],[-1,0.3],[0,0],[1,0.3]], // Cross/Swan
+  aries: {
+    strokes: [
+      [[0.6,1.4],[0.3,1.2],[0,0.9],[-0.1,0.5],[0,0.1],[0.1,-0.3],[0.2,-0.7],[0.1,-1.2]], // Body
+      [[0,0.9],[0.4,1.3],[0.8,1.5],[1.0,1.2],[0.9,0.8]], // Right horn
+      [[0,0.9],[-0.4,1.3],[-0.8,1.5],[-1.0,1.2],[-0.9,0.8]], // Left horn
+      [[0.1,-0.3],[0.5,-0.6],[0.5,-1.2]], // Front leg
+      [[0.2,-0.7],[-0.3,-0.8],[-0.3,-1.3]], // Back leg
+    ]
+  },
+  taurus: {
+    strokes: [
+      [[-0.3,0],[0,0.2],[0.5,0.3],[0.8,0.2],[1.0,0],[0.8,-0.2],[0.3,-0.3],[-0.1,-0.2],[-0.3,0]], // Head
+      [[1.0,0],[1.3,0.6],[1.2,1.1]], // Right horn
+      [[0.8,0.2],[0.5,0.8],[0.3,1.2]], // Left horn
+      [[-0.3,0],[-0.8,-0.1],[-1.2,-0.3],[-1.5,-0.2]], // Neck/body
+      [[0.3,-0.3],[0.2,-0.5],[0.3,-0.8]], // Nostril/chin
+      [[-0.1,0.1],[0.1,0.05],[0.25,0.15]], // Eye
+    ]
+  },
+  gemini: {
+    strokes: [
+      [[-0.4,1.5],[-0.4,0.8],[-0.4,0],[-0.4,-0.5],[-0.5,-1.2]], // Left twin body
+      [[0.4,1.5],[0.4,0.8],[0.4,0],[0.4,-0.5],[0.5,-1.2]], // Right twin body
+      [[-0.4,0.8],[-0.8,0.4]], // Left arm out
+      [[0.4,0.8],[0.8,0.4]], // Right arm out
+      [[-0.4,0.5],[0.4,0.5]], // Holding hands
+      [[-0.6,1.5],[-0.4,1.7],[-0.2,1.5]], // Left head
+      [[0.2,1.5],[0.4,1.7],[0.6,1.5]], // Right head
+    ]
+  },
+  cancer: {
+    strokes: [
+      [[-0.2,0],[0.2,0]], // Body center
+      [[-0.2,0],[-0.6,0.3],[-1.0,0.6],[-1.2,1.0]], // Left claw upper
+      [[-0.6,0.3],[-1.0,0.1],[-1.1,0.5]], // Left claw lower
+      [[0.2,0],[0.6,0.3],[1.0,0.6],[1.2,1.0]], // Right claw upper
+      [[0.6,0.3],[1.0,0.1],[1.1,0.5]], // Right claw lower
+      [[-0.2,0],[-0.5,-0.4],[-0.8,-0.7]], // Left legs
+      [[0.2,0],[0.5,-0.4],[0.8,-0.7]], // Right legs
+      [[-0.3,-0.2],[-0.6,-0.5]], // Extra legs
+      [[0.3,-0.2],[0.6,-0.5]], // Extra legs
+    ]
+  },
+  leo: {
+    strokes: [
+      [[0.8,0.8],[0.5,1.0],[0.1,1.1],[-0.3,1.0],[-0.6,0.8],[-0.7,0.5],[-0.6,0.2],[-0.3,0.1],[0,0.2],[0.3,0.1],[0.5,0]], // Mane
+      [[0.5,0],[0.4,-0.3],[0.2,-0.5],[0,-0.4],[-0.3,-0.5],[-0.6,-0.3],[-0.8,-0.1]], // Body
+      [[-0.8,-0.1],[-1.0,-0.5],[-1.1,-0.9]], // Back leg
+      [[0.4,-0.3],[0.5,-0.7],[0.6,-1.0]], // Front leg
+      [[-0.8,-0.1],[-1.1,0],[-1.3,0.2],[-1.4,0.5],[-1.2,0.4]], // Tail
+      [[0.8,0.8],[1.0,0.6],[1.0,0.3]], // Ear
+    ]
+  },
+  virgo: {
+    strokes: [
+      [[0,1.6],[0,1.2],[0,0.6],[0,0],[-0.1,-0.5],[0,-1.0],[0.1,-1.4]], // Body/dress
+      [[0,0.6],[-0.5,0.3],[-0.9,0.5],[-1.1,0.8]], // Left arm with wheat
+      [[0,0.6],[0.5,0.3],[0.8,0.1]], // Right arm
+      [[-1.1,0.8],[-1.0,1.1],[-0.9,0.9]], // Wheat sheaf
+      [[-1.1,0.8],[-1.2,1.0],[-1.0,1.0]], // Wheat
+      [[-0.2,1.6],[0,1.8],[0.2,1.6]], // Head crown
+      [[-0.1,-1.0],[-0.4,-1.3]], // Left foot
+      [[0.1,-1.0],[0.4,-1.3]], // Right foot
+    ]
+  },
+  libra: {
+    strokes: [
+      [[0,0.3],[0,-0.8]], // Central post
+      [[-1.0,-0.8],[1.0,-0.8]], // Base
+      [[-0.7,0.3],[0.7,0.3]], // Beam
+      [[-0.7,0.3],[-0.9,0.6],[-0.7,0.9],[-0.5,0.6],[-0.7,0.3]], // Left pan
+      [[0.7,0.3],[0.5,0.6],[0.7,0.9],[0.9,0.6],[0.7,0.3]], // Right pan
+      [[-0.7,0.3],[-0.7,0.1]], // Left chain
+      [[0.7,0.3],[0.7,0.1]], // Right chain
+    ]
+  },
+  scorpio: {
+    strokes: [
+      [[-1.3,0],[-0.9,0.2],[-0.5,0.1],[-0.1,0],[0.3,-0.1],[0.7,-0.3],[1.0,-0.5]], // Body
+      [[1.0,-0.5],[1.2,-0.8],[1.4,-0.5],[1.3,-0.2]], // Stinger curl
+      [[-1.3,0],[-1.5,0.4],[-1.7,0.2]], // Left claw
+      [[-1.3,0],[-1.5,-0.3],[-1.7,-0.1]], // Right claw
+      [[-0.5,0.1],[-0.6,-0.4]], // Leg pair 1
+      [[-0.1,0],[-0.2,-0.5]], // Leg pair 2
+      [[0.3,-0.1],[0.2,-0.5]], // Leg pair 3
+      [[0.7,-0.3],[0.6,-0.7]], // Leg pair 4
+    ]
+  },
+  sagittarius: {
+    strokes: [
+      [[0,0.5],[0,0],[-0.2,-0.5],[-0.5,-0.8],[-0.3,-1.2]], // Upper body + front legs
+      [[0,0],[0.3,-0.3],[0.7,-0.5],[0.8,-0.9],[0.6,-1.2]], // Back body + hind legs
+      [[0,0.5],[-0.4,0.8],[-0.8,1.2]], // Bow arm
+      [[0,0.5],[0.3,0.9],[0.5,1.3]], // Arrow arm up
+      [[-0.8,1.2],[0.5,1.3]], // Bow string
+      [[0.5,1.3],[1.0,1.5],[1.5,1.7]], // Arrow
+      [[-0.1,0.8],[0,1.0],[0.1,0.8]], // Head
+    ]
+  },
+  capricorn: {
+    strokes: [
+      [[-0.8,0.8],[-0.4,0.6],[0,0.4],[0.3,0.2],[0.5,0]], // Upper goat body
+      [[0.5,0],[0.7,-0.3],[0.8,-0.6],[0.6,-0.9],[0.3,-1.1],[0,-1.0],[-0.2,-0.8]], // Fish tail curl
+      [[-0.8,0.8],[-1.0,1.0],[-0.8,1.2],[-0.6,1.0],[-0.8,0.8]], // Head
+      [[-0.6,1.0],[-0.4,1.3]], // Horn
+      [[0,0.4],[-0.1,-0.1],[-0.2,-0.5]], // Front leg
+      [[0.3,0.2],[0.2,-0.2],[0.1,-0.5]], // Mid leg
+      [[-0.2,-0.8],[-0.4,-0.6]], // Tail fin
+    ]
+  },
+  aquarius: {
+    strokes: [
+      [[0,1.6],[0,1.0],[0,0.4],[0,-0.2]], // Body standing
+      [[0,1.0],[-0.5,0.8],[-0.8,0.5],[-0.8,0.2]], // Left arm holding urn
+      [[-0.8,0.2],[-1.0,0],[-0.8,-0.2]], // Urn
+      [[-0.8,0.2],[-0.6,-0.3],[-0.3,-0.7],[0,-1.0],[0.3,-1.2],[0.7,-1.0],[0.5,-0.7]], // Water stream flowing
+      [[0,1.0],[0.5,0.7],[0.7,0.5]], // Right arm
+      [[-0.1,1.6],[0,1.8],[0.1,1.6]], // Head
+      [[-0.1,-0.2],[-0.3,-0.8]], // Left leg
+      [[0.1,-0.2],[0.3,-0.8]], // Right leg
+    ]
+  },
+  pisces: {
+    strokes: [
+      [[-0.8,0.6],[-0.6,0.8],[-0.3,0.7],[-0.5,0.5],[-0.8,0.6]], // Upper fish body
+      [[-0.3,0.7],[-0.1,0.5]], // Upper fish tail
+      [[0.8,-0.6],[0.6,-0.8],[0.3,-0.7],[0.5,-0.5],[0.8,-0.6]], // Lower fish body
+      [[0.3,-0.7],[0.1,-0.5]], // Lower fish tail
+      [[-0.1,0.5],[0,0.3],[0,-0.1],[0,-0.3],[0.1,-0.5]], // Connecting cord
+      [[-0.6,0.8],[-0.9,0.9]], // Upper fish fin
+      [[0.6,-0.8],[0.9,-0.9]], // Lower fish fin
+    ]
+  },
+  orion: {
+    strokes: [
+      [[-0.1,1.8],[0,2.0],[0.1,1.8]], // Head
+      [[0,1.8],[0,1.2],[0,0.5],[0,0]], // Torso
+      [[0,1.2],[-0.6,1.0],[-1.0,1.3],[-1.2,1.6]], // Left arm (raised with club)
+      [[0,1.2],[0.5,0.9],[0.9,0.6],[1.0,0.3]], // Right arm (holding shield)
+      [[1.0,0.3],[1.1,0.8],[0.9,1.1],[1.1,0.8]], // Shield
+      [[-0.2,0.1],[0.2,0.1]], // Belt
+      [[0,0],[-0.3,-0.5],[-0.4,-1.2]], // Left leg
+      [[0,0],[0.3,-0.5],[0.4,-1.2]], // Right leg
+      [[-1.2,1.6],[-1.0,1.8],[-1.3,1.9]], // Club
+    ]
+  },
+  ursa_major: {
+    strokes: [
+      [[-0.3,0.5],[0.2,0.6],[0.6,0.4],[0.8,0.1],[0.6,-0.2],[0.2,-0.3],[-0.2,-0.2],[-0.5,0],[-0.3,0.5]], // Body
+      [[-0.5,0],[-0.8,0.2],[-1.0,0.4],[-0.9,0.7]], // Head
+      [[-0.9,0.7],[-1.0,0.9]], // Ear
+      [[0.8,0.1],[1.1,0.2],[1.4,0.1],[1.6,-0.1]], // Tail
+      [[-0.2,-0.2],[-0.3,-0.6],[-0.4,-0.9]], // Front left leg
+      [[0.2,-0.3],[0.1,-0.7],[0,-1.0]], // Front right leg
+      [[0.6,-0.2],[0.5,-0.6],[0.4,-0.9]], // Back left leg
+      [[0.6,0.4],[0.7,0],[0.8,-0.3],[0.9,-0.6]], // Back right leg
+    ]
+  },
+  lyra: {
+    strokes: [
+      [[0,1.2],[-0.3,0.8],[-0.5,0.3],[-0.4,-0.2],[-0.2,-0.6],[0,-0.8],[0.2,-0.6],[0.4,-0.2],[0.5,0.3],[0.3,0.8],[0,1.2]], // Lyre frame
+      [[-0.3,0.8],[0.3,0.8]], // Cross bar
+      [[-0.2,0.8],[-0.1,-0.5]], // String 1
+      [[0,0.8],[0,-0.6]], // String 2
+      [[0.2,0.8],[0.1,-0.5]], // String 3
+    ]
+  },
+  cygnus: {
+    strokes: [
+      [[0,1.5],[0,0.8],[0,0],[0,-0.5],[0,-1.2]], // Body (vertical)
+      [[0,0.3],[-0.8,0.7],[-1.3,0.9]], // Left wing
+      [[0,0.3],[0.8,0.7],[1.3,0.9]], // Right wing
+      [[-0.8,0.7],[-1.0,0.5]], // Left wing tip
+      [[0.8,0.7],[1.0,0.5]], // Right wing tip
+      [[-0.1,1.5],[0,1.7],[0.1,1.5]], // Head
+      [[0,-1.2],[-0.2,-1.4],[0.2,-1.4]], // Tail feathers
+    ]
+  },
 };
 
-/* Canvas-drawn mythology figure texture */
+/* Canvas-drawn mythology figure texture — multi-stroke rendering */
 function createMythologyTexture(constellationId, color, size = 256) {
   const canvas = document.createElement('canvas');
   canvas.width = size; canvas.height = size;
@@ -82,41 +244,58 @@ function createMythologyTexture(constellationId, color, size = 256) {
   const cx = size / 2, cy = size / 2;
   const scale = size / 5;
 
-  const path = MYTHOLOGY_PATHS[constellationId];
-  if (!path || path.length < 2) return null;
+  const figData = MYTHOLOGY_PATHS[constellationId];
+  if (!figData) return null;
+  const strokes = figData.strokes || [];
+  if (strokes.length === 0) return null;
 
-  // Outer glow
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.strokeStyle = color + '50';
-  ctx.lineWidth = 2;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.beginPath();
-  ctx.moveTo(cx + path[0][0] * scale, cy - path[0][1] * scale);
-  for (let i = 1; i < path.length; i++) {
-    ctx.lineTo(cx + path[i][0] * scale, cy - path[i][1] * scale);
-  }
-  ctx.stroke();
 
-  // Inner line
-  ctx.shadowBlur = 8;
-  ctx.strokeStyle = color + '90';
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  ctx.moveTo(cx + path[0][0] * scale, cy - path[0][1] * scale);
-  for (let i = 1; i < path.length; i++) {
-    ctx.lineTo(cx + path[i][0] * scale, cy - path[i][1] * scale);
-  }
-  ctx.stroke();
+  // Draw each stroke with glow
+  strokes.forEach((path, si) => {
+    if (path.length < 2) return;
 
-  // Dot at joints
-  ctx.shadowBlur = 6;
-  ctx.fillStyle = color + '80';
-  path.forEach(p => {
+    // Outer glow pass
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = color + '35';
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.arc(cx + p[0] * scale, cy - p[1] * scale, 2, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(cx + path[0][0] * scale, cy - path[0][1] * scale);
+    for (let i = 1; i < path.length; i++) {
+      ctx.lineTo(cx + path[i][0] * scale, cy - path[i][1] * scale);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // Inner bright line
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = color + '70';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(cx + path[0][0] * scale, cy - path[0][1] * scale);
+    for (let i = 1; i < path.length; i++) {
+      ctx.lineTo(cx + path[i][0] * scale, cy - path[i][1] * scale);
+    }
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Dot at key joints (first and last of each stroke)
+  ctx.fillStyle = color + '60';
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 4;
+  strokes.forEach(path => {
+    if (path.length < 1) return;
+    [path[0], path[path.length - 1]].forEach(p => {
+      ctx.beginPath();
+      ctx.arc(cx + p[0] * scale, cy - p[1] * scale, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
   });
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -552,7 +731,7 @@ function useCosmicAmbient() {
 }
 
 /* ── Constellation Story Narrator ── */
-function CosmicNarrator({ text, constellationName, color }) {
+function CosmicNarrator({ text, constellationName, color, authHeaders, token }) {
   const [state, setState] = useState('idle'); // idle, loading, playing, paused
   const [progress, setProgress] = useState(0);
   const [waveData, setWaveData] = useState(new Array(20).fill(0.3));
@@ -589,6 +768,10 @@ function CosmicNarrator({ text, constellationName, color }) {
       audio.play();
       ambient.start();
       setState('playing');
+      // Award XP for listening to story
+      if (token) {
+        axios.post(`${API}/star-chart/award-xp`, { action: 'story_listened', constellation_name: constellationName }, { headers: authHeaders }).catch(() => {});
+      }
 
       // Waveform animation
       const updateWave = () => {
@@ -689,11 +872,31 @@ function CosmicNarrator({ text, constellationName, color }) {
 /* Mythology Detail Panel — the rich storytelling view */
 function MythologyPanel({ constellation, onClose }) {
   const navigate = useNavigate();
+  const { token, authHeaders } = useAuth();
   const [showMyth, setShowMyth] = useState(true);
+  const [sharing, setSharing] = useState(false);
 
   if (!constellation) return null;
   const color = ELEMENT_COLORS[constellation.element] || '#A78BFA';
   const myth = constellation.mythology;
+
+  const shareToComm = async () => {
+    if (!token) { toast.error('Sign in to share'); return; }
+    setSharing(true);
+    try {
+      const content = myth
+        ? `Discovered ${constellation.name} (${myth.figure}) in the cosmic star chart. "${myth.lesson}"`
+        : `Exploring the constellation ${constellation.name} (${constellation.symbol}) — ${constellation.meaning}`;
+      await axios.post(`${API}/community/posts`, {
+        post_type: 'shared_constellation',
+        content,
+        affirmation_text: constellation.name,
+        milestone_type: constellation.element,
+      }, { headers: authHeaders });
+      toast.success('Shared to community!');
+    } catch { toast.error('Failed to share'); }
+    setSharing(false);
+  };
 
   return (
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
@@ -769,7 +972,7 @@ function MythologyPanel({ constellation, onClose }) {
 
               {/* Narration Player */}
               <div className="mb-3">
-                <CosmicNarrator text={`${myth.story} The cosmic lesson: ${myth.lesson}`} constellationName={constellation.name} color={color} />
+                <CosmicNarrator text={`${myth.story} The cosmic lesson: ${myth.lesson}`} constellationName={constellation.name} color={color} authHeaders={authHeaders} token={token} />
               </div>
 
               {/* Cosmic Lesson */}
@@ -801,12 +1004,20 @@ function MythologyPanel({ constellation, onClose }) {
           )}
         </AnimatePresence>
 
-        <button onClick={() => navigate('/cosmic-calendar')}
-          className="w-full flex items-center justify-center gap-1 py-2 mt-4 rounded-lg text-[10px] font-medium"
-          style={{ background: `${color}08`, border: `1px solid ${color}15`, color }}
-          data-testid="view-calendar-btn">
-          View in Cosmic Calendar <ChevronRight size={10} />
-        </button>
+        <div className="flex gap-2 mt-4">
+          <button onClick={() => navigate('/cosmic-calendar')}
+            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[10px] font-medium"
+            style={{ background: `${color}08`, border: `1px solid ${color}15`, color }}
+            data-testid="view-calendar-btn">
+            View Calendar <ChevronRight size={10} />
+          </button>
+          <button onClick={shareToComm} disabled={sharing}
+            className="flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[10px] font-medium"
+            style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}
+            data-testid="share-constellation-btn">
+            {sharing ? <Loader2 size={10} className="animate-spin" /> : <Share2 size={10} />}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -898,7 +1109,23 @@ function JourneyOverlay({ constellations, active, currentIdx, phase, onPlay, onP
 }
 
 /* ── Journey Complete Card ── */
-function JourneyComplete({ count, onClose }) {
+function JourneyComplete({ count, onClose, authHeaders, token }) {
+  const [shared, setShared] = useState(false);
+
+  const shareJourney = async () => {
+    if (!token) return;
+    try {
+      await axios.post(`${API}/community/posts`, {
+        post_type: 'shared_journey',
+        content: `Completed a Stargazing Journey through ${count} constellations, listening to their ancient mythology stories. The cosmos has shared its wisdom.`,
+        milestone_type: 'stargazing_journey',
+        milestone_value: count,
+      }, { headers: authHeaders });
+      setShared(true);
+      toast.success('Journey shared to community!');
+    } catch { toast.error('Failed to share'); }
+  };
+
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
       className="absolute inset-0 z-30 flex items-center justify-center" style={{ background: 'rgba(5,5,12,0.85)', backdropFilter: 'blur(12px)' }}
@@ -909,11 +1136,21 @@ function JourneyComplete({ count, onClose }) {
         <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.45)' }}>
           You've traversed {count} constellations and heard their ancient stories. The cosmos has shared its wisdom with you.
         </p>
-        <button onClick={onClose} data-testid="journey-complete-close"
-          className="px-6 py-2 rounded-xl text-xs font-medium"
-          style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2))', border: '1px solid rgba(167,139,250,0.3)', color: '#A78BFA' }}>
-          Return to the Stars
-        </button>
+        <div className="flex gap-2 justify-center">
+          <button onClick={onClose} data-testid="journey-complete-close"
+            className="px-6 py-2 rounded-xl text-xs font-medium"
+            style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2))', border: '1px solid rgba(167,139,250,0.3)', color: '#A78BFA' }}>
+            Return to the Stars
+          </button>
+          {!shared && (
+            <button onClick={shareJourney} data-testid="share-journey-btn"
+              className="px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-1"
+              style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.25)', color: '#C084FC' }}>
+              <Share2 size={12} /> Share
+            </button>
+          )}
+          {shared && <span className="text-[10px] py-2" style={{ color: '#22C55E' }}>Shared!</span>}
+        </div>
       </div>
     </motion.div>
   );
@@ -964,7 +1201,13 @@ export default function StarChart() {
     } else { fetchChart(40.7, -74.0); }
   }, [token]);
 
-  const handleSelect = useCallback((c) => setSelected(c), []);
+  const handleSelect = useCallback((c) => {
+    setSelected(c);
+    // Award XP for exploring constellation
+    if (token) {
+      axios.post(`${API}/star-chart/award-xp`, { action: 'constellation_explored', constellation_name: c.name }, { headers: authHeaders }).catch(() => {});
+    }
+  }, [token, authHeaders]);
   const handleBirthMessage = useCallback((info) => setBirthMsg(info), []);
   const updateLocation = () => {
     const lat = parseFloat(latInput), lng = parseFloat(lngInput);
@@ -1027,6 +1270,10 @@ export default function StarChart() {
       setJourneyComplete(true);
       journeyAmbient.stop();
       setSelected(null);
+      // Award journey completion XP
+      if (token) {
+        axios.post(`${API}/star-chart/award-xp`, { action: 'journey_completed', constellation_name: '' }, { headers: authHeaders }).catch(() => {});
+      }
       return;
     }
     setJourneyIdx(nextIdx);
@@ -1218,7 +1465,7 @@ export default function StarChart() {
       {/* Journey Complete */}
       <AnimatePresence>
         {journeyComplete && data && (
-          <JourneyComplete count={data.constellations.length} onClose={() => setJourneyComplete(false)} />
+          <JourneyComplete count={data.constellations.length} onClose={() => setJourneyComplete(false)} authHeaders={authHeaders} token={token} />
         )}
       </AnimatePresence>
 

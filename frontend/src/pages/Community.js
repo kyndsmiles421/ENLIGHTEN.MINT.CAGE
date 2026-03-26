@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
   Users, Heart, MessageCircle, Send, Sparkles, Flame,
   Sunrise, Share2, Award, PenLine, ChevronDown, ChevronUp,
-  UserPlus, UserCheck, Trash2, Loader2, X
+  UserPlus, UserCheck, Trash2, Loader2, X, Star, Volume2
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -16,6 +16,9 @@ const POST_TYPE_CONFIG = {
   shared_ritual: { label: 'Shared Ritual', icon: Sunrise, color: '#FCD34D', bg: 'rgba(252,211,77,0.08)' },
   shared_affirmation: { label: 'Affirmation', icon: Sparkles, color: '#D8B4FE', bg: 'rgba(216,180,254,0.08)' },
   milestone: { label: 'Milestone', icon: Award, color: '#2DD4BF', bg: 'rgba(45,212,191,0.08)' },
+  shared_constellation: { label: 'Star Discovery', icon: Star, color: '#818CF8', bg: 'rgba(129,140,248,0.08)' },
+  shared_meditation: { label: 'Meditation', icon: Volume2, color: '#A78BFA', bg: 'rgba(167,139,250,0.08)' },
+  shared_journey: { label: 'Stargazing Journey', icon: Sparkles, color: '#C084FC', bg: 'rgba(192,132,252,0.08)' },
 };
 
 function timeAgo(dateStr) {

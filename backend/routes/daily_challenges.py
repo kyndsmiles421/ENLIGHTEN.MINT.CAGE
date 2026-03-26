@@ -167,4 +167,59 @@ async def get_challenge_leaderboard(user=Depends(get_current_user)):
     return {"leaderboard": result}
 
 
+# ========== STAR CHART XP REWARDS ==========
+
+STAR_XP = {
+    "constellation_explored": 10,
+    "mythology_read": 15,
+    "story_listened": 25,
+    "journey_completed": 100,
+}
+
+@router.post("/star-chart/award-xp")
+async def award_star_chart_xp(
+    action: str = Body(...),
+    constellation_name: str = Body(default=""),
+    user=Depends(get_current_user)
+):
+    xp = STAR_XP.get(action, 0)
+    if xp == 0:
+        raise HTTPException(status_code=400, detail="Unknown action")
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # Prevent duplicate XP for same action+constellation per day
+    existing = await db.challenge_completions.find_one({
+        "user_id": user["id"],
+        "challenge_id": f"star_{action}_{constellation_name}",
+        "date": today,
+    }, {"_id": 0})
+    if existing:
+        return {"status": "already_awarded", "xp_earned": 0, "message": "XP already earned today for this"}
+
+    doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "challenge_id": f"star_{action}_{constellation_name}",
+        "challenge_title": f"Star Chart: {action.replace('_', ' ').title()} — {constellation_name}" if constellation_name else f"Star Chart: {action.replace('_', ' ').title()}",
+        "category": "star_chart",
+        "xp_earned": xp,
+        "date": today,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.challenge_completions.insert_one(doc)
+
+    await create_activity(
+        user["id"],
+        "star_chart_xp",
+        f"earned {xp} XP: {action.replace('_', ' ')} — {constellation_name}" if constellation_name else f"earned {xp} XP: {action.replace('_', ' ')}",
+        {"action": action, "constellation": constellation_name, "xp": xp}
+    )
+
+    total_xp = 0
+    async for c in db.challenge_completions.find({"user_id": user["id"]}, {"_id": 0, "xp_earned": 1}):
+        total_xp += c.get("xp_earned", 0)
+
+    return {"status": "awarded", "xp_earned": xp, "total_xp": total_xp, "message": f"+{xp} XP!"}
+
+
 
