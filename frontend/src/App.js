@@ -50,6 +50,9 @@ const Yoga = lazy(() => import('./pages/Yoga'));
 const Teachings = lazy(() => import('./pages/Teachings'));
 const WisdomJournal = lazy(() => import('./pages/WisdomJournal'));
 const Numerology = lazy(() => import('./pages/Numerology'));
+const AnimalTotems = lazy(() => import('./pages/AnimalTotems'));
+const Dreams = lazy(() => import('./pages/Dreams'));
+const GreenJournal = lazy(() => import('./pages/GreenJournal'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -117,6 +120,9 @@ function AnimatedRoutes() {
             <Route path="/teachings" element={<Teachings />} />
             <Route path="/wisdom-journal" element={<WisdomJournal />} />
             <Route path="/numerology" element={<Numerology />} />
+            <Route path="/animal-totems" element={<AnimalTotems />} />
+            <Route path="/dreams" element={<Dreams />} />
+            <Route path="/green-journal" element={<GreenJournal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

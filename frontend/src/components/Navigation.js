@@ -8,7 +8,7 @@ import {
   LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio,
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
-  Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map,
+  Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass
 } from 'lucide-react';
 
@@ -32,6 +32,9 @@ const MORE_NAV = [
   { path: '/teachings', label: 'Teachings', icon: BookOpen },
   { path: '/wisdom-journal', label: 'Wisdom Log', icon: PenTool },
   { path: '/numerology', label: 'Numerology', icon: Star },
+  { path: '/animal-totems', label: 'Totems', icon: Leaf },
+  { path: '/dreams', label: 'Dreams', icon: Moon },
+  { path: '/green-journal', label: 'Green Log', icon: Sprout },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
   { path: '/friends', label: 'Friends', icon: Users },
   { path: '/learn', label: 'Learn', icon: GraduationCap },
