@@ -5,17 +5,17 @@ Build a full-stack wellness platform — an immersive spiritual & wellness compa
 
 ## Tech Stack
 - **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion, Canvas API
-- **Backend**: FastAPI, Python — **37 modular route files** in `/app/backend/routes/`
+- **Backend**: FastAPI, Python — **38 modular route files** in `/app/backend/routes/`
 - **Database**: MongoDB
 - **AI**: GPT-5.2 via emergentintegrations (Emergent LLM Key)
 
 ## Architecture
 ```
 /app/backend/
-├── server.py          # Slim entrypoint (~75 lines)
+├── server.py          # Slim entrypoint (~80 lines)
 ├── deps.py            # Shared: db, auth, LLM key, create_activity
 ├── models.py          # All Pydantic models
-├── routes/            # 37 modular route files
+├── routes/            # 38 modular route files
 │   ├── Core: auth, wellness, dashboard, challenges, profiles
 │   ├── Spirit: oracle, practices, teachings, meditations, journey, knowledge
 │   ├── Body: avatar_yoga, acupressure, meals
@@ -23,40 +23,41 @@ Build a full-stack wellness platform — an immersive spiritual & wellness compa
 │   ├── Mind: numerology, cardology, mayan, nature (totems/dreams/green)
 │   ├── Social: community, social, gamification, daily_challenges
 │   ├── Media: media, learning, rituals, plants, recommendations
-│   ├── New: cosmic_calendar, wellness_reports, meditation_history
-│   ├── New: uploads, discover, daily_ritual
+│   ├── Intelligence: coach, daily_ritual, discover
+│   ├── Analytics: cosmic_calendar, wellness_reports, meditation_history
+│   └── Storage: uploads
 └── data/              # Static data (mudras, yantras, tantra)
 ```
 
-## All Implemented Features (37 modules)
+## All Implemented Features (38 modules)
+
+### AI Spiritual Coach — "Sage" (Phase 32 - NEW)
+- **5 coaching modes**: Spiritual Guidance, Life Coaching, Shadow Work, Manifestation, Healing Guide
+- **Deep personalization**: reads mood patterns, aura color, practice history, streak, birth data, favorite herbs/oils
+- **Persistent sessions**: multi-turn conversations stored in MongoDB
+- **Context-aware recommendations**: suggests specific practices, oils, herbs, acupressure points
 
 ### Personalization Engine
-- **Daily Wellness Ritual Builder** — Adaptive morning/evening rituals based on mood, streak, history
-- **Try Something New** — Discovery engine tracking 23+ features, mood-based recommendations
-- **Cosmic Calendar** — Daily energetic dashboard: Numerology + Moon Phase + Mayan Tzolk'in + Cardology
+- Daily Wellness Ritual Builder (adaptive morning/evening), Try Something New discovery engine
+- Cosmic Calendar (Numerology + Moon + Mayan + Cardology daily overlay)
 
 ### Divination & Mystical Systems
-- Sacred Cardology (Robert Lee Camp Magi Formula), Mayan Astrology, Numerology
-- Oracle Divination (Tarot, I Ching, Zodiac), Animal Totems, Dream Interpretation
+- Sacred Cardology (Magi Formula), Mayan Astrology, Numerology, Oracle, Animal Totems, Dreams
 
 ### Healing Modalities
-- Acupressure (10 points, 6 routines), Reiki & Aura Energy (AI-powered readings)
-- Aromatherapy (12 oils, 8 blends), Herbology (12 herbs, body system filter)
+- Acupressure (10 points, 6 routines), Reiki & Aura (AI readings), Aromatherapy, Herbology
 
 ### Body & Movement
-- Yoga (7 styles), 3D Holographic Avatar, Breathing, Exercises, Mudras
+- Yoga (7 styles), 3D Avatar, Breathing, Exercises, Mudras
 
 ### Nourishment
-- Elixirs & Drinks (10 recipes, 5 categories), Meal Planning (5 plans, AI suggestions)
+- Elixirs (10 recipes, 5 categories), Meal Planning (5 plans, AI suggestions)
 
-### Mind & Wisdom
-- Spiritual Teachings (11 Teachers), Wisdom Journal, Green/Nature Journal
-- Meditation History & Logging, Wellness Reports (weekly/monthly)
+### Analytics & Growth
+- Wellness Reports (weekly/monthly), Meditation History, Certifications, Media Library
 
-### Community & Growth
-- Social Networking, Certifications, User Media Library (audio/video uploads)
-- Daily Challenges, Gamification, Streaks, Mantras, Frequencies
-- Light Therapy, Zen Garden, Ho'oponopono, Rituals
+### Community & More
+- Social Networking, Challenges, Mantras, Frequencies, Light Therapy, Zen Garden, Ho'oponopono, Rituals
 
 ## Credentials
 - Test: `test@test.com` / `password`
