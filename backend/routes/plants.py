@@ -6,8 +6,26 @@ import uuid
 router = APIRouter()
 from models import PlantCreate
 
+PLANT_STAGES = {
+    "lotus": ["Seed", "Sprout", "Bud", "Bloom", "Full Bloom"],
+    "bamboo": ["Seed", "Shoot", "Young", "Tall", "Flourishing"],
+    "bonsai": ["Seed", "Seedling", "Sapling", "Shaped", "Ancient"],
+    "fern": ["Spore", "Fiddlehead", "Unfurling", "Lush", "Majestic"],
+    "sage": ["Seed", "Sprout", "Growing", "Mature", "Sacred"],
+}
+
+PLANT_WATERS_PER_STAGE = {
+    "lotus": 5,
+    "bamboo": 4,
+    "bonsai": 7,
+    "fern": 3,
+    "sage": 5,
+}
+
+
 @router.get("/zen-garden/plants")
 async def get_plants(user=Depends(get_current_user)):
+    await reset_plant_watering()
     plants = await db.zen_plants.find({"user_id": user["id"]}, {"_id": 0}).to_list(50)
     return plants
 

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
+import { useSearchParams } from 'react-router-dom';
 import CelebrationBurst from '../components/CelebrationBurst';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
@@ -872,7 +873,7 @@ function BuildYourOwn({ onPlay }) {
 
 const ELEMENT_SOUNDS = { Fire: 'bowls', Earth: 'forest', Air: 'wind', Water: 'ocean' };
 
-function ConstellationMeditations({ onPlay }) {
+function ConstellationMeditations({ onPlay, highlightId }) {
   const { user, authHeaders } = useAuth();
   const { playChime } = useSensory();
   const [themes, setThemes] = useState([]);
@@ -881,6 +882,7 @@ function ConstellationMeditations({ onPlay }) {
   const [generating, setGenerating] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState(10);
   const [loading, setLoading] = useState(true);
+  const highlightRef = useRef(null);
 
   const load = useCallback(async () => {
     if (!user) { setLoading(false); return; }
@@ -897,6 +899,13 @@ function ConstellationMeditations({ onPlay }) {
   }, [user, authHeaders]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Auto-scroll to highlighted constellation from Star Chart
+  useEffect(() => {
+    if (highlightId && !loading && highlightRef.current) {
+      setTimeout(() => highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    }
+  }, [highlightId, loading]);
 
   const generate = async (constellationId) => {
     setGenerating(constellationId);
@@ -1016,9 +1025,13 @@ function ConstellationMeditations({ onPlay }) {
 
       {/* Constellation cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {sortedThemes.map((c, i) => (
+        {sortedThemes.map((c, i) => {
+          const isHighlighted = c.id === highlightId;
+          return (
           <motion.div key={c.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+            ref={isHighlighted ? highlightRef : null}
             className="glass-card glass-card-hover p-6 relative overflow-hidden group"
+            style={isHighlighted ? { border: `1px solid ${c.color}40`, boxShadow: `0 0 30px ${c.color}15` } : {}}
             data-testid={`constellation-card-${c.id}`}>
             {/* Background glow */}
             <div className="absolute top-0 right-0 w-32 h-32 rounded-full"
@@ -1078,7 +1091,8 @@ function ConstellationMeditations({ onPlay }) {
               </button>
             </div>
           </motion.div>
-        ))}
+        );
+        })}
       </div>
     </div>
   );
@@ -1087,7 +1101,9 @@ function ConstellationMeditations({ onPlay }) {
 /* ======== MAIN PAGE ======== */
 export default function Meditation() {
   const { user } = useAuth();
-  const [mode, setMode] = useState('guided');
+  const [searchParams] = useSearchParams();
+  const constellationParam = searchParams.get('constellation');
+  const [mode, setMode] = useState(constellationParam ? 'constellation' : 'guided');
   const [filter, setFilter] = useState('all');
   const [activeSession, setActiveSession] = useState(null);
 
@@ -1187,7 +1203,7 @@ export default function Meditation() {
             </div>
           </>
         ) : mode === 'constellation' ? (
-          <ConstellationMeditations onPlay={setActiveSession} />
+          <ConstellationMeditations onPlay={setActiveSession} highlightId={constellationParam} />
         ) : mode === 'build' ? (
           <BuildYourOwn onPlay={setActiveSession} />
         ) : (

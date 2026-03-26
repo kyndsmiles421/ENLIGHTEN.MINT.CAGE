@@ -1005,11 +1005,17 @@ function MythologyPanel({ constellation, onClose }) {
         </AnimatePresence>
 
         <div className="flex gap-2 mt-4">
+          <button onClick={() => navigate(`/meditation?constellation=${constellation.id}`)}
+            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[10px] font-medium transition-all"
+            style={{ background: `${color}10`, border: `1px solid ${color}20`, color }}
+            data-testid="constellation-meditate-btn">
+            <Sparkles size={10} /> Meditate
+          </button>
           <button onClick={() => navigate('/cosmic-calendar')}
             className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[10px] font-medium"
             style={{ background: `${color}08`, border: `1px solid ${color}15`, color }}
             data-testid="view-calendar-btn">
-            View Calendar <ChevronRight size={10} />
+            Calendar <ChevronRight size={10} />
           </button>
           <button onClick={shareToComm} disabled={sharing}
             className="flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[10px] font-medium"
