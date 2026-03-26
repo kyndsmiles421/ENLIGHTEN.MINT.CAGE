@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Leaf, Sparkles, Loader2, X, ChevronRight, Search } from 'lucide-react';
+import { CosmicBanner } from '../components/CosmicBanner';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -148,6 +149,8 @@ export default function Herbology() {
             Ancient plant wisdom for modern wellness
           </p>
         </div>
+
+        <CosmicBanner filter={['herbology']} compact />
 
         <div className="max-w-md mx-auto mb-8">
           <div className="relative">

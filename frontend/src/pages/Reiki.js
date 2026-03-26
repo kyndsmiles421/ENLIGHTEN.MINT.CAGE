@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Sparkles, Loader2, X, ChevronRight, Zap, Heart, Eye, Activity } from 'lucide-react';
+import { CosmicBanner } from '../components/CosmicBanner';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -159,6 +160,8 @@ export default function Reiki() {
             Channel universal life force energy for deep healing
           </p>
         </div>
+
+        <CosmicBanner filter={['reiki']} compact />
 
         <div className="flex gap-2 mb-8 justify-center flex-wrap">
           {TABS.map(t => (

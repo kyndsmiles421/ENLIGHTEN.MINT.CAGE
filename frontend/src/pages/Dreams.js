@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight } from 'lucide-react';
+import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight, Compass, Star, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { CosmicBanner, CosmicMiniTag } from '../components/CosmicBanner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const MOODS = ['peaceful','joyful','anxious','confused','mysterious','frightening','neutral','profound'];
@@ -153,6 +155,139 @@ function DreamEntry({ dream, onDelete }) {
   );
 }
 
+function DreamPatterns({ authHeaders }) {
+  const [patterns, setPatterns] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`${API}/dreams/patterns`, { headers: authHeaders })
+      .then(r => setPatterns(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin" size={24} style={{ color: '#818CF8' }} /></div>;
+  if (!patterns || patterns.total === 0) return (
+    <div className="text-center py-12">
+      <TrendingUp size={32} className="mx-auto mb-3" style={{ color: 'rgba(129,140,248,0.25)' }} />
+      <p className="text-sm mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>Not enough data yet</p>
+      <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>Log more dreams to reveal patterns in your dreamscape</p>
+    </div>
+  );
+
+  const symbolEntries = Object.entries(patterns.symbol_frequency || {});
+  const maxCount = symbolEntries.length > 0 ? symbolEntries[0][1] : 1;
+
+  return (
+    <div className="space-y-6" data-testid="dream-patterns">
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'Dreams Logged', value: patterns.total, color: '#818CF8' },
+          { label: 'Lucid Dreams', value: patterns.lucid_count, color: '#22C55E' },
+          { label: 'Avg Vividness', value: `${patterns.avg_vividness}/10`, color: '#D8B4FE' },
+        ].map(s => (
+          <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: `${s.color}06`, border: `1px solid ${s.color}12` }}>
+            <p className="text-xl font-bold" style={{ color: s.color }}>{s.value}</p>
+            <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(248,250,252,0.35)' }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Insights */}
+      {patterns.insights?.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#FCD34D' }}>
+            <Sparkles size={10} className="inline mr-1" /> Dream Insights
+          </p>
+          {patterns.insights.map((ins, i) => (
+            <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+              className="rounded-xl p-4" style={{ background: `${ins.color}06`, border: `1px solid ${ins.color}12` }}>
+              <p className="text-xs font-semibold mb-1" style={{ color: ins.color }}>{ins.title}</p>
+              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{ins.text}</p>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Symbol frequency */}
+      {symbolEntries.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#A78BFA' }}>
+            Recurring Symbols
+          </p>
+          <div className="space-y-2">
+            {symbolEntries.map(([symbol, count]) => (
+              <div key={symbol} className="flex items-center gap-3">
+                <span className="text-xs capitalize w-24 truncate" style={{ color: 'rgba(248,250,252,0.6)' }}>{symbol}</span>
+                <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${(count / maxCount) * 100}%` }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    className="h-full rounded-full" style={{ background: 'linear-gradient(90deg, #A78BFA, #818CF8)' }} />
+                </div>
+                <span className="text-xs font-bold w-6 text-right" style={{ color: '#A78BFA' }}>{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Moon Phase Correlations */}
+      {patterns.moon_correlations?.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#93C5FD' }}>
+            <Moon size={10} className="inline mr-1" /> Moon-Symbol Connections
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {patterns.moon_correlations.map((mc, i) => (
+              <div key={i} className="rounded-xl p-3 flex items-center gap-3"
+                style={{ background: 'rgba(147,197,253,0.04)', border: '1px solid rgba(147,197,253,0.1)' }}>
+                <Moon size={14} style={{ color: '#93C5FD' }} />
+                <div>
+                  <p className="text-xs font-medium capitalize" style={{ color: '#F8FAFC' }}>{mc.symbol}</p>
+                  <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{mc.count}x during {mc.moon_phase}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Moon Mood Map */}
+      {Object.keys(patterns.moon_moods || {}).length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#FCD34D' }}>
+            Moon Phase Dream Moods
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(patterns.moon_moods).map(([phase, data]) => (
+              <div key={phase} className="rounded-xl px-3 py-2" style={{ background: 'rgba(252,211,77,0.04)', border: '1px solid rgba(252,211,77,0.1)' }}>
+                <p className="text-[10px] font-medium" style={{ color: '#FCD34D' }}>{phase}</p>
+                <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{data.count} dreams - {data.dominant_mood}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Deep analysis CTA */}
+      <button onClick={() => navigate('/coach')} data-testid="dream-oracle-cta"
+        className="w-full rounded-xl p-4 flex items-center gap-3 transition-all hover:scale-[1.01]"
+        style={{ background: 'rgba(129,140,248,0.06)', border: '1px solid rgba(129,140,248,0.15)' }}>
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(129,140,248,0.1)' }}>
+          <Eye size={18} style={{ color: '#818CF8' }} />
+        </div>
+        <div className="text-left flex-1">
+          <p className="text-sm font-medium" style={{ color: '#F8FAFC' }}>Deep Dream Analysis with Sage</p>
+          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Get cosmic interpretation through your aura, moon phase, and numerology</p>
+        </div>
+        <ChevronRight size={16} style={{ color: '#818CF8' }} />
+      </button>
+    </div>
+  );
+}
+
 function SymbolLibrary({ symbols }) {
   const [search, setSearch] = useState('');
   const filtered = search ? Object.entries(symbols).filter(([k]) => k.includes(search.toLowerCase())) : Object.entries(symbols);
@@ -230,7 +365,7 @@ export default function Dreams() {
         </motion.div>
 
         <div className="flex rounded-xl overflow-hidden mb-8" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-          {[{ id: 'journal', label: 'Journal' }, { id: 'symbols', label: 'Symbol Library' }].map(t => (
+          {[{ id: 'journal', label: 'Journal' }, { id: 'patterns', label: 'Patterns' }, { id: 'symbols', label: 'Symbol Library' }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className="flex-1 px-4 py-2.5 text-xs font-medium transition-all"
               style={{ background: tab === t.id ? 'rgba(167,139,250,0.12)' : 'transparent', color: tab === t.id ? '#A78BFA' : 'var(--text-muted)' }}
@@ -239,6 +374,9 @@ export default function Dreams() {
             </button>
           ))}
         </div>
+
+        {/* Cosmic Banner */}
+        <CosmicBanner filter={['dreams', 'meditation', 'journal']} compact />
 
         {tab === 'journal' ? (
           <>
@@ -251,6 +389,8 @@ export default function Dreams() {
               {dreams.length === 0 && <p className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>No dreams recorded yet. Start by writing one above.</p>}
             </div>
           </>
+        ) : tab === 'patterns' ? (
+          <DreamPatterns authHeaders={authHeaders} />
         ) : (
           <SymbolLibrary symbols={symbols} />
         )}

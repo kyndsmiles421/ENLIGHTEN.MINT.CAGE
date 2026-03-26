@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Droplets, Heart, Sparkles, Loader2, Star, X, ChevronRight } from 'lucide-react';
+import { CosmicBanner } from '../components/CosmicBanner';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -157,6 +158,8 @@ export default function Aromatherapy() {
             Explore the healing power of nature's aromatic essences
           </p>
         </div>
+
+        <CosmicBanner filter={['aromatherapy']} compact />
 
         <div className="flex gap-2 mb-8 justify-center">
           {TABS.map(t => (

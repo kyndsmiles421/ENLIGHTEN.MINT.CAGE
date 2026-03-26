@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Hash, Heart, Sparkles, Loader2, ChevronRight, Star, ArrowLeft } from 'lucide-react';
+import { Hash, Heart, Sparkles, Loader2, ChevronRight, Star, ArrowLeft, Compass, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -309,6 +310,45 @@ export default function Numerology() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Connected Systems */}
+        <NumerologyCrossLinks />
+      </div>
+    </div>
+  );
+}
+
+function NumerologyCrossLinks() {
+  const navigate = useNavigate();
+  const links = [
+    { label: 'Cosmic Calendar', desc: 'See your personal year, month & day numerology in context', path: '/cosmic-calendar', color: '#D8B4FE' },
+    { label: 'Mayan Astrology', desc: 'Cross-reference your life path with your galactic signature', path: '/mayan', color: '#2DD4BF' },
+    { label: 'Dream Oracle', desc: 'Get dream interpretations through your numerological lens', path: '/coach', color: '#818CF8' },
+    { label: 'Daily Ritual', desc: 'Your ritual adapts to your numerology cycle', path: '/daily-ritual', color: '#22C55E' },
+  ];
+  return (
+    <div className="mt-8 rounded-2xl p-5" style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(212,175,55,0.08)' }}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <Star size={10} className="inline mr-1" /> Connected Systems
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {links.map(l => (
+          <button key={l.path} onClick={() => navigate(l.path)}
+            data-testid={`numerology-link-${l.path.slice(1)}`}
+            className="flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:scale-[1.01]"
+            style={{ background: `${l.color}04`, border: `1px solid ${l.color}10` }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${l.color}10` }}>
+              {l.path === '/mayan' ? <Compass size={12} style={{ color: l.color }} /> :
+               l.path === '/sage' ? <Moon size={12} style={{ color: l.color }} /> :
+               <Sparkles size={12} style={{ color: l.color }} />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{l.label}</p>
+              <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.35)' }}>{l.desc}</p>
+            </div>
+            <ChevronRight size={12} style={{ color: 'rgba(248,250,252,0.15)' }} />
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Sun, Moon, Check, Loader2, ChevronRight, Sparkles, Wind, Flame, Target, Play, Pause, SkipForward, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { CosmicBanner } from '../components/CosmicBanner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -313,6 +314,9 @@ export default function DailyRitual() {
               }}><t.icon size={16} />{t.label}</button>
           ))}
         </div>
+
+        {/* Cosmic Alignment Banner */}
+        {token && <CosmicBanner filter={['yoga', 'aromatherapy', 'breathing', 'reiki', 'acupressure']} compact />}
 
         {!token ? (
           <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to receive your personalized daily ritual</p>

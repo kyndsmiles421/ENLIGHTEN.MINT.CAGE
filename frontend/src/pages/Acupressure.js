@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Target, Loader2, X, ChevronRight, Play, Clock, Check } from 'lucide-react';
+import { CosmicBanner } from '../components/CosmicBanner';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -169,6 +170,8 @@ export default function Acupressure() {
             Ancient pressure points for healing and energy flow
           </p>
         </div>
+
+        <CosmicBanner filter={['acupressure']} compact />
 
         <div className="flex gap-2 mb-8 justify-center">
           {TABS.map(t => (
