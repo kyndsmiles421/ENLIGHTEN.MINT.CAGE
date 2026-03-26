@@ -9,13 +9,14 @@ import {
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
-  Gamepad2, Globe, Star, Compass
+  Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 
 const PRIMARY_NAV = [
+  { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
   { path: '/journey', label: 'Journey', icon: Map },
   { path: '/breathing', label: 'Breathe', icon: Wind },
   { path: '/meditation', label: 'Meditate', icon: Timer },
@@ -28,6 +29,9 @@ const PRIMARY_NAV = [
 ];
 
 const MORE_NAV = [
+  { path: '/discover', label: 'Try New', icon: Compass },
+  { path: '/acupressure', label: 'Acupressure', icon: Target },
+  { path: '/reiki', label: 'Reiki & Aura', icon: Eye },
   { path: '/yoga', label: 'Yoga', icon: Flame },
   { path: '/teachings', label: 'Teachings', icon: BookOpen },
   { path: '/wisdom-journal', label: 'Wisdom Log', icon: PenTool },
@@ -35,10 +39,10 @@ const MORE_NAV = [
   { path: '/animal-totems', label: 'Totems', icon: Leaf },
   { path: '/dreams', label: 'Dreams', icon: Moon },
   { path: '/green-journal', label: 'Green Log', icon: Sprout },
-  { path: '/aromatherapy', label: 'Aromatherapy', icon: Sparkles },
+  { path: '/aromatherapy', label: 'Aromatherapy', icon: Droplets },
   { path: '/herbology', label: 'Herbology', icon: Leaf },
   { path: '/elixirs', label: 'Elixirs', icon: Flame },
-  { path: '/meal-planning', label: 'Meals', icon: Leaf },
+  { path: '/meal-planning', label: 'Meals', icon: UtensilsCrossed },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
   { path: '/friends', label: 'Friends', icon: Users },
   { path: '/learn', label: 'Learn', icon: GraduationCap },
