@@ -67,6 +67,8 @@ const WellnessReports = lazy(() => import('./pages/WellnessReports'));
 const MeditationHistory = lazy(() => import('./pages/MeditationHistory'));
 const UserUploads = lazy(() => import('./pages/UserUploads'));
 const SpiritualCoach = lazy(() => import('./pages/SpiritualCoach'));
+const DailyBriefing = lazy(() => import('./pages/DailyBriefing'));
+const StarChart = lazy(() => import('./pages/StarChart'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -151,6 +153,8 @@ function AnimatedRoutes() {
             <Route path="/meditation-history" element={<MeditationHistory />} />
             <Route path="/media-library" element={<UserUploads />} />
             <Route path="/coach" element={<SpiritualCoach />} />
+            <Route path="/daily-briefing" element={<DailyBriefing />} />
+            <Route path="/star-chart" element={<StarChart />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

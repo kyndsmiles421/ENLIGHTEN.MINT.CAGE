@@ -17,8 +17,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 
 const PRIMARY_NAV = [
+  { path: '/daily-briefing', label: 'Today', icon: Sun },
   { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
   { path: '/coach', label: 'Sage', icon: MessageCircle },
+  { path: '/star-chart', label: 'Stars', icon: Star },
   { path: '/cosmic-calendar', label: 'Calendar', icon: Calendar },
   { path: '/journey', label: 'Journey', icon: Map },
   { path: '/breathing', label: 'Breathe', icon: Wind },
