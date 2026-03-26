@@ -53,6 +53,10 @@ const Numerology = lazy(() => import('./pages/Numerology'));
 const AnimalTotems = lazy(() => import('./pages/AnimalTotems'));
 const Dreams = lazy(() => import('./pages/Dreams'));
 const GreenJournal = lazy(() => import('./pages/GreenJournal'));
+const Aromatherapy = lazy(() => import('./pages/Aromatherapy'));
+const Herbology = lazy(() => import('./pages/Herbology'));
+const Elixirs = lazy(() => import('./pages/Elixirs'));
+const MealPlanning = lazy(() => import('./pages/MealPlanning'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -123,6 +127,10 @@ function AnimatedRoutes() {
             <Route path="/animal-totems" element={<AnimalTotems />} />
             <Route path="/dreams" element={<Dreams />} />
             <Route path="/green-journal" element={<GreenJournal />} />
+            <Route path="/aromatherapy" element={<Aromatherapy />} />
+            <Route path="/herbology" element={<Herbology />} />
+            <Route path="/elixirs" element={<Elixirs />} />
+            <Route path="/meal-planning" element={<MealPlanning />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
