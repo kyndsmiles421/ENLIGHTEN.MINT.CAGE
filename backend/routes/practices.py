@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi.responses import JSONResponse
 from deps import db, get_current_user, get_current_user_optional, EMERGENT_LLM_KEY, logger
 from datetime import datetime, timezone, timedelta
 import uuid

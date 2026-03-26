@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, MapPin, Star, X, Compass, Moon, Sparkles, ChevronRight } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Earth: '#22C55E' };
+const ELEMENT_HEX = { Fire: 0xEF4444, Water: 0x3B82F6, Air: 0xA78BFA, Earth: 0x22C55E };
 
 function raDecToXYZ(ra, dec, radius = 50) {
   const raRad = (ra / 24) * 2 * Math.PI;
@@ -20,16 +21,69 @@ function raDecToXYZ(ra, dec, radius = 50) {
   );
 }
 
-function ThreeStarChart({ data, containerRef, onSelectConstellation }) {
+/* Star glow sprite texture generated on-canvas */
+function createStarTexture(color = '#ffffff', size = 128) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const cx = size / 2, cy = size / 2;
+
+  // Outer soft glow
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, size / 2);
+  grad.addColorStop(0, color);
+  grad.addColorStop(0.15, color + 'CC');
+  grad.addColorStop(0.35, color + '44');
+  grad.addColorStop(0.7, color + '08');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  // Cross flare (Star Walk 2 style diffraction spikes)
+  ctx.globalCompositeOperation = 'screen';
+  ctx.strokeStyle = color + '60';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cx, 0);
+  ctx.lineTo(cx, size);
+  ctx.moveTo(0, cy);
+  ctx.lineTo(size, cy);
+  ctx.stroke();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/* Nebula cloud sprite texture */
+function createNebulaTexture(color, size = 256) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const cx = size / 2, cy = size / 2;
+  const grad = ctx.createRadialGradient(cx * 0.8, cy * 1.1, 0, cx, cy, size / 2);
+  grad.addColorStop(0, color + '18');
+  grad.addColorStop(0.4, color + '0A');
+  grad.addColorStop(0.8, color + '03');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage }) {
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
   const frameRef = useRef(null);
-  const spherical = useRef({ theta: 0.5, phi: Math.PI / 3, radius: 70 });
+  const spherical = useRef({ theta: 0.5, phi: Math.PI / 3, radius: 60 });
   const isDragging = useRef(false);
   const prevMouse = useRef({ x: 0, y: 0 });
-  const labelsRef = useRef([]);
   const constellationMeshes = useRef([]);
+  const animState = useRef({ startTime: 0, lineGroups: [] });
 
   useEffect(() => {
     if (!containerRef.current || !data) return;
@@ -37,159 +91,285 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation }) {
     const w = container.clientWidth;
     const h = container.clientHeight;
 
-    // Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 200);
+    const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 500);
     cameraRef.current = camera;
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
+    renderer.setClearColor(0x000005, 1);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Background star field
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 2500;
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
+    // ───────────── DEEP SPACE BACKGROUND ─────────────
+    // Dense starfield with magnitude-based rendering
+    const bgStarCount = 6000;
+    const bgGeo = new THREE.BufferGeometry();
+    const bgPositions = new Float32Array(bgStarCount * 3);
+    const bgSizes = new Float32Array(bgStarCount);
+    const bgColors = new Float32Array(bgStarCount * 3);
+    const starTints = [
+      [1, 1, 1], [0.85, 0.9, 1], [1, 0.95, 0.8], [0.8, 0.85, 1], [1, 0.85, 0.75],
+    ];
+    for (let i = 0; i < bgStarCount; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const r = 80 + Math.random() * 40;
-      starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      starPositions[i * 3 + 2] = r * Math.cos(phi);
+      const r = 100 + Math.random() * 80;
+      bgPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      bgPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      bgPositions[i * 3 + 2] = r * Math.cos(phi);
+      bgSizes[i] = 0.08 + Math.random() * 0.25;
+      const tint = starTints[Math.floor(Math.random() * starTints.length)];
+      bgColors[i * 3] = tint[0];
+      bgColors[i * 3 + 1] = tint[1];
+      bgColors[i * 3 + 2] = tint[2];
     }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.15, color: 0xE8E8FF, transparent: true, opacity: 0.6 }));
-    scene.add(stars);
+    bgGeo.setAttribute('position', new THREE.BufferAttribute(bgPositions, 3));
+    bgGeo.setAttribute('aSize', new THREE.BufferAttribute(bgSizes, 1));
+    bgGeo.setAttribute('color', new THREE.BufferAttribute(bgColors, 3));
 
-    // Nebula glow
-    const elementColor = ELEMENT_COLORS[data.mayan_element] || '#D8B4FE';
-    const nebulaGeo = new THREE.SphereGeometry(35, 32, 32);
-    const nebulaMat = new THREE.MeshBasicMaterial({ color: elementColor, transparent: true, opacity: 0.03, side: THREE.BackSide });
-    const nebula = new THREE.Mesh(nebulaGeo, nebulaMat);
-    scene.add(nebula);
+    const bgStarMat = new THREE.ShaderMaterial({
+      vertexShader: `
+        attribute float aSize;
+        varying vec3 vColor;
+        varying float vBrightness;
+        void main() {
+          vColor = color;
+          vBrightness = aSize;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = aSize * (300.0 / -mvPos.z);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vBrightness;
+        void main() {
+          float d = length(gl_PointCoord - 0.5) * 2.0;
+          float alpha = smoothstep(1.0, 0.0, d) * vBrightness * 2.0;
+          gl_FragColor = vec4(vColor, alpha);
+        }
+      `,
+      transparent: true,
+      vertexColors: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const bgStars = new THREE.Points(bgGeo, bgStarMat);
+    scene.add(bgStars);
 
-    // Constellations
+    // ───────────── NEBULA CLOUDS (Star Walk 2 style) ─────────────
+    const nebulaColors = ['#4338CA', '#7C3AED', '#1E40AF', '#164E63', '#6D28D9'];
+    nebulaColors.forEach((c, i) => {
+      const tex = createNebulaTexture(c, 512);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
+      const sprite = new THREE.Sprite(mat);
+      const angle = (i / nebulaColors.length) * Math.PI * 2 + Math.random() * 0.5;
+      const elev = (Math.random() - 0.5) * 80;
+      sprite.position.set(Math.cos(angle) * 70, elev, Math.sin(angle) * 70);
+      sprite.scale.set(60 + Math.random() * 40, 40 + Math.random() * 30, 1);
+      scene.add(sprite);
+    });
+
+    // ───────────── CONSTELLATION STARS & ANIMATED LINES ─────────────
+    const elementColor = data.mayan_element ? ELEMENT_COLORS[data.mayan_element] : '#D8B4FE';
     const meshMap = [];
-    data.constellations.forEach(c => {
+    const lineAnimGroups = [];
+    const birthConstellation = data.user_zodiac ? data.constellations.find(c => c.id === data.user_zodiac) : null;
+
+    data.constellations.forEach((c, ci) => {
       const color = ELEMENT_COLORS[c.element] || '#A78BFA';
+      const hexColor = ELEMENT_HEX[c.element] || 0xA78BFA;
       const isAligned = c.aligned || c.alignment_reason?.length > 0;
+      const isBirth = birthConstellation && c.id === birthConstellation.id;
 
-      // Constellation lines
-      if (c.stars.length >= 2) {
-        const points = c.stars.map(s => raDecToXYZ(s.ra, s.dec));
-        const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-        const lineMat = new THREE.LineBasicMaterial({
-          color: isAligned ? color : '#4A4A6A',
-          transparent: true,
-          opacity: isAligned ? 0.5 : 0.15,
-        });
-        scene.add(new THREE.Line(lineGeo, lineMat));
-      }
-
-      // Stars
+      // Individual stars with glow sprites
       c.stars.forEach(s => {
         const pos = raDecToXYZ(s.ra, s.dec);
-        const brightness = Math.max(0.3, 1 - s.mag / 5);
-        const size = Math.max(0.2, (5 - s.mag) / 5 * 0.8);
+        const brightness = Math.max(0.4, 1 - s.mag / 5);
+        const baseSize = Math.max(0.3, (5 - s.mag) / 5 * 0.9);
 
+        // Core star mesh (for raycasting)
         const starMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(size, 8, 8),
-          new THREE.MeshBasicMaterial({ color: isAligned ? color : '#E8E8FF', transparent: true, opacity: brightness })
+          new THREE.SphereGeometry(baseSize * 0.5, 8, 8),
+          new THREE.MeshBasicMaterial({ color: isAligned || isBirth ? hexColor : 0xE8E8FF, transparent: true, opacity: brightness })
         );
         starMesh.position.copy(pos);
         scene.add(starMesh);
-
-        // Glow
-        const glowMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(size * 2.5, 8, 8),
-          new THREE.MeshBasicMaterial({ color: isAligned ? color : '#B8B8FF', transparent: true, opacity: brightness * 0.15 })
-        );
-        glowMesh.position.copy(pos);
-        scene.add(glowMesh);
-
         meshMap.push({ mesh: starMesh, constellation: c });
+
+        // Star glow sprite
+        const starTex = createStarTexture(isBirth ? '#D8B4FE' : isAligned ? color : '#C8CCFF', 128);
+        const spriteMat = new THREE.SpriteMaterial({
+          map: starTex,
+          transparent: true,
+          opacity: brightness * (isBirth ? 1.0 : isAligned ? 0.85 : 0.5),
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.position.copy(pos);
+        sprite.scale.set(baseSize * 4, baseSize * 4, 1);
+        if (isBirth) {
+          sprite.userData.isBirthStar = true;
+          sprite.userData.baseScale = baseSize * 4;
+        }
+        scene.add(sprite);
       });
 
-      // Label position (center of constellation for 2D projection)
-      labelsRef.current.push({
-        id: c.id,
-        name: c.name,
-        pos3D: raDecToXYZ(c.ra, c.dec, 52),
-        aligned: isAligned,
-        element: c.element,
-      });
-    });
-    constellationMeshes.current = meshMap;
+      // Constellation lines (animated draw-in)
+      if (c.stars.length >= 2) {
+        const points = c.stars.map(s => raDecToXYZ(s.ra, s.dec));
+        // Build line segments for sequential drawing
+        const segments = [];
+        for (let i = 0; i < points.length - 1; i++) {
+          segments.push({ from: points[i], to: points[i + 1] });
+        }
 
-    // Avatar marker at user's zodiac constellation
-    if (data.user_zodiac) {
-      const zodiacC = data.constellations.find(c => c.id === data.user_zodiac);
-      if (zodiacC) {
-        const aColor = data.aura_color === 'blue' ? '#3B82F6' : data.aura_color === 'green' ? '#22C55E' : data.aura_color === 'purple' ? '#A855F7' : data.aura_color === 'gold' ? '#EAB308' : '#D8B4FE';
-        const avatarPos = raDecToXYZ(zodiacC.ra, zodiacC.dec, 48);
+        const lineGroup = new THREE.Group();
+        const segLines = [];
+        segments.forEach((seg) => {
+          const numSubPts = 30;
+          const fullPositions = new Float32Array(numSubPts * 3);
+          for (let k = 0; k < numSubPts; k++) {
+            const t = k / (numSubPts - 1);
+            fullPositions[k * 3] = seg.from.x + (seg.to.x - seg.from.x) * t;
+            fullPositions[k * 3 + 1] = seg.from.y + (seg.to.y - seg.from.y) * t;
+            fullPositions[k * 3 + 2] = seg.from.z + (seg.to.z - seg.from.z) * t;
+          }
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.BufferAttribute(fullPositions, 3));
+          geo.setDrawRange(0, 0); // Start hidden
 
-        // Holographic rings
-        const ring1 = new THREE.Mesh(
-          new THREE.TorusGeometry(2.5, 0.08, 8, 32),
-          new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.6 })
-        );
-        ring1.position.copy(avatarPos);
-        ring1.userData.isRing = true;
-        scene.add(ring1);
+          const mat = new THREE.LineBasicMaterial({
+            color: isBirth ? 0xD8B4FE : isAligned ? hexColor : 0x3A3A5A,
+            transparent: true,
+            opacity: isBirth ? 0.9 : isAligned ? 0.55 : 0.2,
+            linewidth: 1,
+          });
+          const line = new THREE.Line(geo, mat);
+          lineGroup.add(line);
+          segLines.push({ line, totalPoints: numSubPts });
+        });
 
-        const ring2 = new THREE.Mesh(
-          new THREE.TorusGeometry(2.5, 0.05, 8, 32),
-          new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.3 })
-        );
-        ring2.position.copy(avatarPos);
-        ring2.rotation.x = Math.PI / 2;
-        scene.add(ring2);
+        // Glowing trail line (brighter, slightly larger)
+        if (isBirth || isAligned) {
+          segments.forEach((seg) => {
+            const numSubPts = 30;
+            const trailPos = new Float32Array(numSubPts * 3);
+            for (let k = 0; k < numSubPts; k++) {
+              const t = k / (numSubPts - 1);
+              trailPos[k * 3] = seg.from.x + (seg.to.x - seg.from.x) * t;
+              trailPos[k * 3 + 1] = seg.from.y + (seg.to.y - seg.from.y) * t;
+              trailPos[k * 3 + 2] = seg.from.z + (seg.to.z - seg.from.z) * t;
+            }
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+            geo.setDrawRange(0, 0);
+            const mat = new THREE.LineBasicMaterial({
+              color: isBirth ? 0xE8D0FF : hexColor,
+              transparent: true,
+              opacity: isBirth ? 0.35 : 0.2,
+              linewidth: 1,
+            });
+            const trailLine = new THREE.Line(geo, mat);
+            lineGroup.add(trailLine);
+            segLines.push({ line: trailLine, totalPoints: numSubPts });
+          });
+        }
 
-        // Core
-        const core = new THREE.Mesh(
-          new THREE.SphereGeometry(0.6, 16, 16),
-          new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.8 })
-        );
-        core.position.copy(avatarPos);
-        scene.add(core);
-
-        const aura = new THREE.Mesh(
-          new THREE.SphereGeometry(4, 16, 16),
-          new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.04 })
-        );
-        aura.position.copy(avatarPos);
-        scene.add(aura);
+        scene.add(lineGroup);
+        lineAnimGroups.push({
+          group: lineGroup,
+          segLines,
+          delay: ci * 0.12, // Staggered entrance per constellation
+          isBirth,
+        });
       }
+    });
+
+    constellationMeshes.current = meshMap;
+    animState.current = { startTime: performance.now(), lineGroups: lineAnimGroups };
+
+    // ───────────── BIRTH CONSTELLATION AVATAR ─────────────
+    const birthObjects = [];
+    if (birthConstellation) {
+      const aColor = data.aura_color === 'blue' ? 0x3B82F6 : data.aura_color === 'green' ? 0x22C55E : data.aura_color === 'purple' ? 0xA855F7 : data.aura_color === 'gold' ? 0xEAB308 : 0xD8B4FE;
+      const avatarPos = raDecToXYZ(birthConstellation.ra, birthConstellation.dec, 48);
+
+      // Holographic rings
+      [2.2, 3.0].forEach((rr, ri) => {
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(rr, 0.06, 8, 48),
+          new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.5 - ri * 0.2 })
+        );
+        ring.position.copy(avatarPos);
+        ring.rotation.x = ri * Math.PI / 3;
+        ring.userData.isRing = true;
+        ring.userData.ringSpeed = 0.015 + ri * 0.008;
+        scene.add(ring);
+        birthObjects.push(ring);
+      });
+
+      // Core orb
+      const core = new THREE.Mesh(
+        new THREE.SphereGeometry(0.45, 16, 16),
+        new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.9 })
+      );
+      core.position.copy(avatarPos);
+      core.userData.isBirthCore = true;
+      scene.add(core);
+      birthObjects.push(core);
+
+      // Aura halo
+      const aura = new THREE.Mesh(
+        new THREE.SphereGeometry(5, 16, 16),
+        new THREE.MeshBasicMaterial({ color: aColor, transparent: true, opacity: 0.03, side: THREE.BackSide })
+      );
+      aura.position.copy(avatarPos);
+      aura.userData.isBirthAura = true;
+      scene.add(aura);
+      birthObjects.push(aura);
+
+      // Fire birth constellation message after drawing animation
+      setTimeout(() => {
+        if (onBirthMessage) {
+          onBirthMessage({
+            name: birthConstellation.name,
+            symbol: birthConstellation.symbol,
+            element: birthConstellation.element,
+            meaning: birthConstellation.meaning,
+          });
+        }
+      }, 3500);
     }
 
-    // Controls
+    // ───────────── CONTROLS ─────────────
     const onPointerDown = (e) => { isDragging.current = true; prevMouse.current = { x: e.clientX, y: e.clientY }; };
     const onPointerUp = () => { isDragging.current = false; };
     const onPointerMove = (e) => {
       if (!isDragging.current) return;
-      spherical.current.theta -= (e.clientX - prevMouse.current.x) * 0.005;
-      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - (e.clientY - prevMouse.current.y) * 0.005));
+      spherical.current.theta -= (e.clientX - prevMouse.current.x) * 0.004;
+      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - (e.clientY - prevMouse.current.y) * 0.004));
       prevMouse.current = { x: e.clientX, y: e.clientY };
     };
-    const onWheel = (e) => { spherical.current.radius = Math.max(15, Math.min(120, spherical.current.radius + e.deltaY * 0.05)); };
-    const onTouchStart = (e) => { if (e.touches.length === 1) { isDragging.current = true; prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } };
+    const onWheel = (e) => { spherical.current.radius = Math.max(12, Math.min(120, spherical.current.radius + e.deltaY * 0.04)); };
+    const onTouchStart = (e) => {
+      if (e.touches.length === 1) { isDragging.current = true; prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
+    };
     const onTouchEnd = () => { isDragging.current = false; };
     const onTouchMove = (e) => {
       if (!isDragging.current || e.touches.length !== 1) return;
-      spherical.current.theta -= (e.touches[0].clientX - prevMouse.current.x) * 0.005;
-      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - (e.touches[0].clientY - prevMouse.current.y) * 0.005));
+      spherical.current.theta -= (e.touches[0].clientX - prevMouse.current.x) * 0.004;
+      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - (e.touches[0].clientY - prevMouse.current.y) * 0.004));
       prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     };
 
-    // Click detection for constellations
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const onClick = (e) => {
@@ -215,7 +395,6 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation }) {
     el.addEventListener('touchmove', onTouchMove, { passive: true });
     el.addEventListener('click', onClick);
 
-    // Resize handler
     const onResize = () => {
       const nw = container.clientWidth, nh = container.clientHeight;
       camera.aspect = nw / nh;
@@ -224,10 +403,13 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation }) {
     };
     window.addEventListener('resize', onResize);
 
-    // Animate
+    // ───────────── ANIMATION LOOP ─────────────
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
+      const now = performance.now();
+      const elapsed = (now - animState.current.startTime) / 1000;
       const { theta, phi, radius } = spherical.current;
+
       camera.position.set(
         radius * Math.sin(phi) * Math.cos(theta),
         radius * Math.cos(phi),
@@ -235,13 +417,45 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation }) {
       );
       camera.lookAt(0, 0, 0);
 
-      // Rotate star field
-      stars.rotation.y += 0.0001;
-      nebula.rotation.z += 0.00005;
+      // Slow rotation of star field
+      bgStars.rotation.y += 0.00008;
 
-      // Animate rings
+      // Constellation line drawing animation
+      const drawSpeed = 2.5; // seconds per constellation
+      animState.current.lineGroups.forEach(lg => {
+        const localTime = elapsed - lg.delay;
+        if (localTime < 0) return;
+        const progress = Math.min(localTime / drawSpeed, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+
+        lg.segLines.forEach((sl, si) => {
+          const segCount = lg.segLines.length;
+          const segIdx = si % (segCount / (lg.isBirth ? 2 : 1) || segCount);
+          const segStart = segIdx / (segCount / (lg.isBirth ? 2 : 1) || segCount);
+          const segEnd = (segIdx + 1) / (segCount / (lg.isBirth ? 2 : 1) || segCount);
+          const segProgress = Math.max(0, Math.min(1, (eased - segStart) / (segEnd - segStart)));
+          const visibleCount = Math.floor(segProgress * sl.totalPoints);
+          sl.line.geometry.setDrawRange(0, visibleCount);
+        });
+      });
+
+      // Birth constellation pulsing
       scene.traverse(obj => {
-        if (obj.userData.isRing) obj.rotation.y += 0.02;
+        if (obj.userData.isRing) {
+          obj.rotation.y += obj.userData.ringSpeed || 0.015;
+          obj.rotation.z += 0.005;
+        }
+        if (obj.userData.isBirthStar) {
+          const pulse = 1 + Math.sin(now * 0.003) * 0.15;
+          const s = obj.userData.baseScale * pulse;
+          obj.scale.set(s, s, 1);
+        }
+        if (obj.userData.isBirthCore) {
+          obj.material.opacity = 0.7 + Math.sin(now * 0.004) * 0.3;
+        }
+        if (obj.userData.isBirthAura) {
+          obj.material.opacity = 0.02 + Math.sin(now * 0.002) * 0.015;
+        }
       });
 
       renderer.render(scene, camera);
@@ -262,9 +476,35 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation }) {
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
-  }, [data, containerRef, onSelectConstellation]);
+  }, [data, containerRef, onSelectConstellation, onBirthMessage]);
 
   return null;
+}
+
+function BirthConstellationToast({ info, onClose }) {
+  if (!info) return null;
+  const color = ELEMENT_COLORS[info.element] || '#D8B4FE';
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 20, scale: 0.95 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 w-80 max-w-[90vw] rounded-2xl p-5 text-center"
+      style={{ background: 'rgba(8,10,18,0.92)', border: `1px solid ${color}30`, backdropFilter: 'blur(24px)', boxShadow: `0 0 40px ${color}15` }}
+      data-testid="birth-constellation-toast"
+    >
+      <button onClick={onClose} className="absolute top-2 right-2 p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+      <div className="text-2xl mb-1">{info.symbol}</div>
+      <p className="text-xs uppercase tracking-[0.25em] mb-1" style={{ color }}>Your Constellation</p>
+      <p className="text-base font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>{info.name}</p>
+      <p className="text-[11px] mt-2 leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{info.meaning}</p>
+      <div className="mt-3 flex items-center justify-center gap-1">
+        <Sparkles size={10} style={{ color }} />
+        <span className="text-[10px]" style={{ color }}>Aligned with your cosmic path</span>
+      </div>
+    </motion.div>
+  );
 }
 
 function ConstellationDetail({ constellation, onClose }) {
@@ -275,7 +515,7 @@ function ConstellationDetail({ constellation, onClose }) {
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
       data-testid="constellation-detail"
       className="absolute top-20 right-4 w-72 max-h-[70vh] overflow-y-auto rounded-2xl p-5 z-20"
-      style={{ background: 'rgba(10,12,20,0.92)', border: `1px solid ${color}25`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'rgba(8,10,18,0.94)', border: `1px solid ${color}25`, backdropFilter: 'blur(24px)', boxShadow: `0 0 30px ${color}10` }}>
       <button onClick={onClose} className="absolute top-3 right-3 p-1 rounded-lg hover:bg-white/5"><X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
       <div className="flex items-center gap-2 mb-3">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}15` }}><Star size={14} style={{ color }} /></div>
@@ -320,6 +560,7 @@ export default function StarChart() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [birthMsg, setBirthMsg] = useState(null);
   const [locationName, setLocationName] = useState('New York');
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [latInput, setLatInput] = useState('40.7');
@@ -329,6 +570,7 @@ export default function StarChart() {
   const fetchChart = useCallback((lat, lng) => {
     if (!token) { setLoading(false); return; }
     setLoading(true);
+    setBirthMsg(null);
     axios.get(`${API}/star-chart/constellations?lat=${lat}&lng=${lng}`, { headers: authHeaders })
       .then(r => setData(r.data))
       .catch(() => toast.error('Failed to load star chart'))
@@ -353,6 +595,7 @@ export default function StarChart() {
   }, [token]);
 
   const handleSelect = useCallback((c) => setSelected(c), []);
+  const handleBirthMessage = useCallback((info) => setBirthMsg(info), []);
 
   const updateLocation = () => {
     const lat = parseFloat(latInput), lng = parseFloat(lngInput);
@@ -375,27 +618,27 @@ export default function StarChart() {
   );
 
   return (
-    <div className="min-h-screen pt-16 relative" data-testid="star-chart-page">
+    <div className="min-h-screen pt-16 relative overflow-hidden" data-testid="star-chart-page">
       {/* Header */}
       <div className="absolute top-16 left-0 right-0 z-10 px-4 py-4 pointer-events-none">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold" style={{ color: '#F8FAFC' }}>
-              <Star size={16} className="inline mr-2" style={{ color: '#818CF8' }} />
+            <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>
+              <Star size={16} style={{ color: '#818CF8' }} />
               Constellation Chart
             </h1>
-            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>Drag to rotate | Scroll to zoom | Click stars for details</p>
+            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars for details</p>
           </div>
           <div className="flex items-center gap-2 pointer-events-auto">
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]"
-              style={{ background: 'rgba(15,17,28,0.7)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'blur(12px)' }}>
+              style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'blur(12px)' }}>
               <MapPin size={10} /> {locationName}
             </button>
             {data && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]"
-                style={{ background: 'rgba(15,17,28,0.7)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8', backdropFilter: 'blur(12px)' }}>
-                <Compass size={10} /> {data.constellations?.length} visible
+                style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8', backdropFilter: 'blur(12px)' }}>
+                <Eye size={10} /> {data.constellations?.length} visible
               </div>
             )}
           </div>
@@ -407,7 +650,7 @@ export default function StarChart() {
         {showLocationPicker && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="absolute top-28 right-4 z-20 w-64 rounded-2xl p-4" data-testid="location-picker"
-            style={{ background: 'rgba(10,12,20,0.95)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'blur(24px)' }}>
+            style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'blur(24px)' }}>
             <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: 'rgba(248,250,252,0.4)' }}>Set Location</p>
             <div className="flex gap-2 mb-3">
               <input type="text" value={latInput} onChange={e => setLatInput(e.target.value)} placeholder="Lat" data-testid="lat-input"
@@ -429,19 +672,19 @@ export default function StarChart() {
         )}
       </AnimatePresence>
 
-      {/* Legend */}
+      {/* Element Legend */}
       {data && (
         <div className="absolute bottom-4 left-4 z-10 flex flex-wrap gap-2 pointer-events-none">
           {Object.entries(ELEMENT_COLORS).map(([elem, col]) => (
             <div key={elem} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
-              style={{ background: 'rgba(10,12,20,0.7)', border: `1px solid ${col}20`, color: col, backdropFilter: 'blur(8px)' }}>
-              <div className="w-2 h-2 rounded-full" style={{ background: col }} /> {elem}
+              style={{ background: 'rgba(8,10,18,0.8)', border: `1px solid ${col}20`, color: col, backdropFilter: 'blur(8px)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: col, boxShadow: `0 0 6px ${col}80` }} /> {elem}
             </div>
           ))}
           {data.user_zodiac && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
-              style={{ background: 'rgba(10,12,20,0.7)', border: '1px solid rgba(216,180,254,0.2)', color: '#D8B4FE', backdropFilter: 'blur(8px)' }}>
-              <div className="w-2 h-2 rounded-full" style={{ background: '#D8B4FE' }} /> Your Constellation
+              style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(216,180,254,0.2)', color: '#D8B4FE', backdropFilter: 'blur(8px)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: '#D8B4FE', boxShadow: '0 0 6px rgba(216,180,254,0.8)' }} /> Your Constellation
             </div>
           )}
         </div>
@@ -450,7 +693,7 @@ export default function StarChart() {
       {/* Mayan badge */}
       {data && (
         <div className="absolute bottom-4 right-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] pointer-events-none"
-          style={{ background: 'rgba(10,12,20,0.7)', border: '1px solid rgba(167,139,250,0.15)', color: '#A78BFA', backdropFilter: 'blur(8px)' }}>
+          style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(167,139,250,0.15)', color: '#A78BFA', backdropFilter: 'blur(8px)' }}>
           <Compass size={10} /> Today: {data.mayan_glyph} ({data.mayan_element})
         </div>
       )}
@@ -460,9 +703,14 @@ export default function StarChart() {
         {selected && <ConstellationDetail constellation={selected} onClose={() => setSelected(null)} />}
       </AnimatePresence>
 
+      {/* Birth Constellation Message */}
+      <AnimatePresence>
+        {birthMsg && <BirthConstellationToast info={birthMsg} onClose={() => setBirthMsg(null)} />}
+      </AnimatePresence>
+
       {/* 3D Canvas Container */}
       <div ref={canvasContainerRef} className="w-full h-[calc(100vh-4rem)]" data-testid="star-chart-canvas"
-        style={{ background: 'radial-gradient(ellipse at center, #0A0C14 0%, #000000 100%)' }}>
+        style={{ background: '#000005' }}>
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -471,7 +719,7 @@ export default function StarChart() {
             </div>
           </div>
         ) : data ? (
-          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} />
+          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} />
         ) : null}
       </div>
     </div>
