@@ -1,98 +1,68 @@
 # The Cosmic Collective - PRD
 
 ## Original Problem Statement
-Build a full-stack wellness platform ("positive energy bar") — a mobile wellness cafe that brings high-frequency services directly to people for stress relief, enlightenment, and conscious experience enhancement. The platform features mystical calculators, daily gamification, 3D holographic avatar creation, Yoga, spiritual teachings, interactive journals, aromatherapy, herbology, elixirs/drinks, meal planning, acupressure, reiki/aura readings, personalized daily rituals, and a discovery engine.
+Build a full-stack wellness platform — an immersive spiritual & wellness companion blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, healing modalities, and conscious nourishment.
 
 ## Tech Stack
 - **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion, Canvas API
-- **Backend**: FastAPI, Python — **33 modular route files** in `/app/backend/routes/`
+- **Backend**: FastAPI, Python — **37 modular route files** in `/app/backend/routes/`
 - **Database**: MongoDB
-- **AI**: GPT-5.2 via emergentintegrations (Emergent LLM Key) — used for aura readings, meal suggestions, dream interpretation, oracle readings
+- **AI**: GPT-5.2 via emergentintegrations (Emergent LLM Key)
 
 ## Architecture
 ```
 /app/backend/
-├── server.py          # 70 lines - slim entrypoint
+├── server.py          # Slim entrypoint (~75 lines)
 ├── deps.py            # Shared: db, auth, LLM key, create_activity
 ├── models.py          # All Pydantic models
-├── routes/            # 33 modular route files
-│   ├── auth.py, wellness.py, dashboard.py, challenges.py
-│   ├── profiles.py, oracle.py, practices.py, media.py
-│   ├── meditations.py, journey.py, knowledge.py, community.py
-│   ├── rituals.py, plants.py, recommendations.py, learning.py
-│   ├── gamification.py, avatar_yoga.py, mayan.py, cardology.py
-│   ├── daily_challenges.py, social.py, teachings.py, numerology.py
-│   ├── nature.py, aromatherapy.py, herbology.py, elixirs.py, meals.py
-│   ├── acupressure.py, reiki.py, discover.py, daily_ritual.py
+├── routes/            # 37 modular route files
+│   ├── Core: auth, wellness, dashboard, challenges, profiles
+│   ├── Spirit: oracle, practices, teachings, meditations, journey, knowledge
+│   ├── Body: avatar_yoga, acupressure, meals
+│   ├── Energy: reiki, aromatherapy, herbology, elixirs
+│   ├── Mind: numerology, cardology, mayan, nature (totems/dreams/green)
+│   ├── Social: community, social, gamification, daily_challenges
+│   ├── Media: media, learning, rituals, plants, recommendations
+│   ├── New: cosmic_calendar, wellness_reports, meditation_history
+│   ├── New: uploads, discover, daily_ritual
 └── data/              # Static data (mudras, yantras, tantra)
 ```
 
-## All Implemented Features
+## All Implemented Features (37 modules)
 
-### Core Wellness Tools
-- JWT Auth, Breathing, Meditation, Affirmations, Mood Tracker, Journal, Dashboard
-- Soundscapes, Frequencies, Exercises, Nourishment, Daily Rituals
-- Community, Challenges, Oracle Divination, Profiles
-- Mudras, Yantra, Tantra, Videos, Classes
-- Light Therapy, Zen Garden, Ho'oponopono, Mantras
+### Personalization Engine
+- **Daily Wellness Ritual Builder** — Adaptive morning/evening rituals based on mood, streak, history
+- **Try Something New** — Discovery engine tracking 23+ features, mood-based recommendations
+- **Cosmic Calendar** — Daily energetic dashboard: Numerology + Moon Phase + Mayan Tzolk'in + Cardology
 
-### Sacred Cardology — Robert Lee Camp System
-- Magi Formula: Solar Value = 55 - (2 x month + day)
-- Yearly Spread: 7 planetary periods, 52 days each
-- Birth Card, Daily Card, Love Compatibility
+### Divination & Mystical Systems
+- Sacred Cardology (Robert Lee Camp Magi Formula), Mayan Astrology, Numerology
+- Oracle Divination (Tarot, I Ching, Zodiac), Animal Totems, Dream Interpretation
 
-### Aromatherapy (Phase 29)
-- 12 essential oils with chakra, element, spiritual properties
-- 8 curated blend recipes
-- User favorites
+### Healing Modalities
+- Acupressure (10 points, 6 routines), Reiki & Aura Energy (AI-powered readings)
+- Aromatherapy (12 oils, 8 blends), Herbology (12 herbs, body system filter)
 
-### Herbology (Phase 29)
-- 12 herbs with preparations, dosage, body system filter
-- Personal herb cabinet
+### Body & Movement
+- Yoga (7 styles), 3D Holographic Avatar, Breathing, Exercises, Mudras
 
-### Elixirs & Drinks (Phase 29)
-- 10 healing drink recipes across 5 categories
-- Full ingredients, instructions, tradition, intention
+### Nourishment
+- Elixirs & Drinks (10 recipes, 5 categories), Meal Planning (5 plans, AI suggestions)
 
-### Meal Planning (Phase 29)
-- 5 themed meal plans (Energizing, Calming, Detox, Grounding, Heart-Opening)
-- AI-powered meal suggestions (GPT-5.2)
-- Food journal with mindful eating tracking
+### Mind & Wisdom
+- Spiritual Teachings (11 Teachers), Wisdom Journal, Green/Nature Journal
+- Meditation History & Logging, Wellness Reports (weekly/monthly)
 
-### Acupressure & Massage (Phase 30 - NEW)
-- 10 acupressure points with meridian, element, technique, spiritual significance
-- 6 healing routines (Stress Relief, Energy Boost, Deep Sleep, Headache, Emotional Balance, Immune Shield)
-- Session logging and tracking
+### Community & Growth
+- Social Networking, Certifications, User Media Library (audio/video uploads)
+- Daily Challenges, Gamification, Streaks, Mantras, Frequencies
+- Light Therapy, Zen Garden, Ho'oponopono, Rituals
 
-### Reiki & Aura Energy (Phase 30 - NEW)
-- 7 chakras with frequencies, qualities, healing suggestions
-- 10 Reiki hand positions with placement and intentions
-- AI-powered personalized aura readings (GPT-5.2) based on mood history and birth data
-- 8 aura color profiles with strengths, shadows, guidance
-- Healing session logging
-
-### Personalized Daily Wellness Ritual Builder (Phase 30 - NEW)
-- Adaptive AI-generated morning and evening rituals
-- Combines breathing, aromatherapy, yoga, reiki, acupressure, meditation, elixirs, journaling
-- Personalization based on: mood patterns, experience level, streak, activity history
-- Step-by-step completion tracking with progress bar
-- 3 personalization levels: New, Growing, Deep
-
-### Try Something New Discovery Engine (Phase 30 - NEW)
-- Tracks exploration across 23 features
-- Mood-based personalized recommendations
-- Exploration progress bar with percentage
-- Surfaces unexplored features to encourage platform discovery
-
-### Other Completed Features
-- Wisdom Journal, Numerology (5 Core Numbers + Compatibility)
-- Daily Wisdom, Thoth/Egyptian Mysticism, Spiritual Teachings (11 Teachers)
-- 3D Holographic Avatar Creator + Yoga Module (7 styles)
-- Animal Totems, Dream Interpretation, Green/Nature Journal
-- Mayan Astrology (Tzolk'in), Social Networking, Daily Challenges
+## Credentials
+- Test: `test@test.com` / `password`
 
 ## Backlog
-- P1: Certifications page for completed classes
-- P2: User-uploaded audio/video content
-- P2: Weekly/monthly wellness reports
-- P2: Meditation session history tracking
+- P3: Push notifications for daily rituals
+- P3: Guided audio meditations with TTS
+- P3: Social sharing of cosmic calendar readings
+- P3: Community leaderboards
