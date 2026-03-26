@@ -49,20 +49,25 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Classes & Certifications, Constellation Mythology Overlays
 - TTS Narration & Ambient Music, Stargazing Journeys
 - Social Sharing, Celestial Badges (12)
+- Zen Garden (plant garden, koi pond, sand drawing, lantern release, rain scene)
 
 ### Phase 44 (2026-03-26)
-- **Dynamic Avatar Energy State** - Avatar visuals dynamically reflect user's wellness journey (particle density, aura, glow, chakra emphasis driven by moods/activities)
-- **Virtual Reality Cosmic Sanctuary** (`/vr`) - Immersive 3D Three.js environment with avatar, 8000-star starfield, 6 interactive portal orbs, energy HUD, ambient cosmic audio, orbital camera
+- **Dynamic Avatar Energy State** - Avatar visuals dynamically reflect user's wellness journey
+- **Virtual Reality Cosmic Sanctuary** (`/vr`) - Immersive 3D environment with avatar, portals, energy HUD, ambient audio
 
 ### Phase 45 (2026-03-26)
-- **Constellation-Linked Personalized Guided Meditations** - 12 zodiac constellation meditation themes with AI-generated immersive meditations. Each draws from constellation mythology, element energy, deity connections. User's birth sign highlighted. Saved meditations replayable/deletable.
-  - Endpoints: GET /api/meditation/constellation-themes, POST /api/meditation/generate-constellation, GET /api/meditation/my-constellation, DELETE /api/meditation/constellation/{id}
+- **Constellation-Linked Personalized Guided Meditations** - 12 zodiac themes with AI-generated immersive meditations
+
+### Phase 46 (2026-03-26)
+- **Bug Fix: Zen Garden Watering** - Added missing `PLANT_STAGES` and `PLANT_WATERS_PER_STAGE` constants to plants.py (lost during server.py modular refactor). Called `reset_plant_watering()` in get_plants to reset `watered_today` on new days.
+- **Star Chart → Constellation Meditation Integration** - Clicking a constellation in the 3D Star Chart now shows a "Meditate" button that navigates to `/meditation?constellation={id}`, auto-switching to Cosmic Meditations mode with that constellation highlighted and scrolled into view.
 
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/avatar, POST /api/avatar, GET /api/avatar/energy-state
 - GET /api/meditation/constellation-themes, POST /api/meditation/generate-constellation
 - GET /api/meditation/my-constellation, DELETE /api/meditation/constellation/{id}
+- GET /api/zen-garden/plants, POST /api/zen-garden/plants, POST /api/zen-garden/plants/{id}/water
 - GET /api/mudras, GET /api/videos, GET /api/exercises
 - POST /api/knowledge/tts, GET /api/gamification/badges, GET /api/star-chart/constellations
 
@@ -74,7 +79,7 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - All backend routes prefixed with /api
 
 ## Backlog
-- P2: StarChart.js component splitting (extract JourneyOverlay, CelestialBadgesPanel, MythologyPanel)
+- P2: StarChart.js component splitting (>1500 lines)
+- Potential: In-VR guided meditation mode
 - Potential: Meditation completion auto-sharing to community
-- Potential: In-VR guided meditation mode (breathing inside the 3D sanctuary)
 - Potential: More complex gamification tied to VR interactions
