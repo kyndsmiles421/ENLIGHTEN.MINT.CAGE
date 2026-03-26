@@ -1,91 +1,100 @@
 # The Cosmic Collective - Product Requirements Document
 
 ## Original Problem Statement
-An immersive, highly personalized spiritual and wellness companion platform ("The Cosmic Collective") that seamlessly blends standard wellness tracking (Yoga, meditations, challenges) with deep mystical/divination systems and personalized AI guidance.
+Build "The Cosmic Collective," a highly immersive full-stack wellness platform blending standard wellness tracking (Yoga, meditations, challenges) with deep mystical/divination systems and personalized AI guidance.
 
 ## Tech Stack
-- **Frontend**: React 19, Tailwind CSS, Framer Motion, Shadcn/UI, Three.js
-- **Backend**: FastAPI (modular APIRouter), Pydantic
-- **Database**: MongoDB (Motor Async)
-- **AI**: Emergent LLM Key (GPT-5.2/Claude/Gemini via LlmChat)
+- **Frontend**: React, Tailwind CSS, Framer Motion, Vanilla Three.js (NO React Three Fiber/Drei)
+- **Backend**: FastAPI (Modular APIRouter), Pydantic, Motor (Async MongoDB)
+- **Database**: MongoDB
+- **Integrations**: Emergent LLM Key (OpenAI GPT-5.2 / Claude / Gemini via emergentintegrations)
 
 ## Architecture
 ```
-/app/backend/routes/       # 28+ modular route files
-  daily_briefing.py        # Briefing + Star chart APIs
-  cosmic_context.py        # Unified cosmic API + dream patterns
-  coach.py                 # AI Coach + Dream Oracle
-  ...
-
-/app/frontend/src/
-  components/CosmicBanner.js  # Cross-page cosmic interconnection
-  pages/
-    DailyBriefing.js          # Cosmic morning forecast
-    StarChart.js              # 3D constellation chart (vanilla Three.js)
-    CosmicCalendar.js         # Hub with suggestions & cross-links
-    DailyRitual.js            # Timer-based ritual steps
-    SpiritualCoach.js         # AI Coach with Dream Oracle mode
-    Dreams.js                 # Journal + Patterns dashboard
-    MayanAstrology.js         # With cross-links
-    Numerology.js             # With cross-links
-    ...
+/app/
+├── backend/
+│   ├── server.py            # Main FastAPI app, mounts all routers with /api prefix
+│   ├── deps.py              # Shared dependencies (db, auth, logger, LLM key)
+│   ├── models.py            # Pydantic models
+│   ├── data/                # Static data files (mudras.py, yantras.py, tantra.py)
+│   └── routes/              # 40+ modular route files
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # Reusable components (CosmicBanner, NarrationPlayer, etc.)
+│   │   └── pages/           # Page components (50+ pages)
+│   └── .env                 # REACT_APP_BACKEND_URL
+└── memory/
+    └── PRD.md
 ```
 
-## Implemented Features
+## Implemented Features (Phases 1-37)
 
-### Core
-- Auth (JWT), profiles, avatars, dashboard, gamification, streaks, community
+### Core Platform
+- User auth (JWT), profiles, dashboard
+- Mood tracking, journaling, affirmations (daily + AI-generated)
+- Gamification (XP, levels, streaks, badges, leaderboard)
 
-### Wellness Modules (all with CosmicBanner)
-- Avatar Yoga, Breathing, Meditations, Aromatherapy, Herbology
-- Elixirs, Meal Planning, Acupressure, Reiki, Sound Healing
-- Light Therapy, Mudras, Daily Ritual (timer + active states)
+### Wellness Content
+- **Mudras** (25 sacred hand gestures with images, videos, guided practice)
+- **Yantras** (sacred geometry meditation)
+- **Tantra** (philosophy, breathwork, energy practices)
+- **Exercises** (6 Qigong & Tai Chi practices with step-by-step instructions)
+- **Videos** (23 curated videos across 10 categories)
+- **Meditations** (guided sessions with timer)
+- **Breathwork** (box breathing, pranayama)
+- **Frequencies** (solfeggio, binaural, planetary)
+- **Nourishment** (Ayurvedic recipes, energy foods)
 
-### Mystical Systems (all interconnected)
-- Mayan Calendar, Numerology, Sacred Cardology, Animal Totems
-- Dream Journal + Symbol Library + **Dream Patterns Dashboard**
-- Oracle readings, Cosmic Calendar Hub
+### Mystical/Divination Systems
+- Oracle (I Ching, Tarot, Runes)
+- Mayan Astrology, Western Numerology, Cardology
+- Cosmic Calendar with planetary events
+- Aromatherapy, Herbology, Acupressure, Reiki
 
 ### AI Features
-- Sage: 6 modes (Spiritual, Life, Shadow, Manifestation, Healing, Dream Oracle)
-- Dream interpretation cross-referencing aura/moon/numerology
+- AI Spiritual Coach "Sage" with Dream Analysis ("Dream Oracle" mode)
+- AI-generated affirmations, meditations, breathwork, mantras, rituals
+- AI Deep Dive for any topic
+- AI Exercise Guide
 
-### Cosmic Interconnection System
-- **Cosmic Context API**: Unified snapshot (Mayan, moon, numerology, aura, suggestions)
-- **CosmicBanner**: Shared across 6+ pages with clickable cross-navigation
-- **Cross-links**: Mayan <-> Numerology <-> Calendar <-> Dreams <-> Ritual <-> Coach
+### Advanced Features
+- **Daily Rituals** (morning/evening practice tracking with instant completion)
+- **Cross-Page Cosmic Interconnection System** (CosmicBanner component)
+- **Cosmic Daily Briefing** (/daily-briefing with element energy, lunar guidance)
+- **Interactive 3D Star Chart** (/star-chart) - Star Walk 2 style visuals:
+  - Pure Three.js with shader-based star rendering
+  - 6000+ background stars with magnitude-based glow
+  - Nebula cloud sprites with additive blending
+  - Constellation line drawing animation (staggered entrance)
+  - Birth constellation pulsing with personalized toast message
+  - Element-color coded constellations
+  - Location-based rendering with preset cities
+  - Drag/zoom/touch controls
+- **Classes & Certifications** (Mudra Mastery, Yantra Wisdom, Tantra Foundations, Frequency Healing, Consciousness Explorer)
 
-### NEW: Cosmic Daily Briefing (`/daily-briefing`)
-- Personalized morning spiritual forecast
-- Sections: Element Energy, Lunar Guidance, Mayan Tzolk'in, Numerology Cycle, Dream Echoes, Aura Field, Today's Practices
-- Quick links to Star Chart, Calendar, Sage
+## Phase 37 Changes (2026-03-26)
+- **Bug Fix**: Restored missing JSONResponse import in media.py, practices.py, wellness.py → Mudras/Videos/Exercises pages now display all content
+- **Enhancement**: Star Chart upgraded to Star Walk 2 style with constellation drawing animation, nebula clouds, shader-based stars, and birth constellation pulsing
 
-### NEW: 3D Constellation Chart (`/star-chart`)
-- Interactive Three.js star field with 2500 background stars + nebula glow
-- 16 constellations (12 zodiac + Orion, Ursa Major, Lyra, Cygnus) with labeled stars and connecting lines
-- **Location-based visibility**: Stars filtered by observer latitude/longitude via LST calculation
-- **Controls**: Drag to rotate, scroll to zoom, touch support for mobile
-- **Location picker**: 6 preset cities + custom lat/lng coordinates
-- **Avatar marker**: Holographic spinning rings at user's zodiac constellation
-- **Element colors**: Fire=red, Water=blue, Air=purple, Earth=green
-- **Constellation details**: Clickable stars open side panel with name, symbol, element, meaning, stars list, alignment reasons
-
-## Key Endpoints
-- `GET /api/daily-briefing` — Morning cosmic forecast
-- `GET /api/star-chart/constellations?lat=X&lng=Y` — Location-based constellation data
-- `GET /api/cosmic-context` — Unified cosmic snapshot
-- `GET /api/dreams/patterns` — Dream pattern analytics
-- `POST /api/coach/analyze-dream` — AI dream analysis
+## Key API Endpoints
+- POST /api/auth/login, /api/auth/register
+- GET /api/mudras (25 items)
+- GET /api/videos (23 items)
+- GET /api/exercises (6 items)
+- GET /api/media/classes, /api/media/videos
+- GET /api/wellness/nourishment, /api/wellness/frequencies
+- POST /api/coach/analyze-dream
+- GET /api/cosmic/context, /api/cosmic/daily-briefing
+- GET /api/star-chart/constellations
 
 ## Test Credentials
 - Email: test@test.com, Password: password
 
-## Test Reports
-- iteration_33: Daily Ritual bug fix — 100% PASS
-- iteration_34: Dream Oracle — 100% PASS
-- iteration_35: Cross-page interconnection — 100% PASS
-- iteration_36: Daily Briefing + Star Chart — 100% PASS
+## Known Constraints
+- DO NOT install React Three Fiber or Drei (conflicts with lucide-react SVG line elements)
+- Three.js Star Chart uses pure vanilla Three.js only
+- All backend routes prefixed with /api via server.py include_router
 
 ## Backlog
-- P2: Polish/refine based on user feedback
-- P3: Additional features per user request
+- Awaiting user feedback on new features
+- Potential: Social sharing, community features expansion, avatar customization
