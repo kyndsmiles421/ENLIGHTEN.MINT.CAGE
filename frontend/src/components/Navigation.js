@@ -60,6 +60,7 @@ const MORE_NAV = [
   { path: '/mantras', label: 'Mantras', icon: Music },
   { path: '/hooponopono', label: "Ho'oponopono", icon: HeartHandshake },
   { path: '/oracle', label: 'Oracle', icon: Sparkles },
+  { path: '/forecasts', label: 'Forecasts', icon: Eye },
   { path: '/cardology', label: 'Cardology', icon: Star },
   { path: '/mayan', label: 'Mayan', icon: Compass },
   { path: '/create', label: 'Create', icon: PenTool },

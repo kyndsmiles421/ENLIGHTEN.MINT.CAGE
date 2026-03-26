@@ -567,6 +567,10 @@ function ChallengesTab({ authHeaders }) {
       const res = await axios.post(`${API}/daily-challenge/complete`, {}, { headers: authHeaders });
       if (res.data.status === 'completed') {
         toast.success(res.data.message);
+        const pg = res.data.plant_growth;
+        if (pg) {
+          setTimeout(() => toast.success(`${pg.plant_name} received cosmic nourishment${pg.grew ? ` and grew to ${pg.new_stage}!` : '!'}`), 1500);
+        }
         setChallenge(prev => ({ ...prev, completed: true, completed_at: new Date().toISOString() }));
         load();
       } else {

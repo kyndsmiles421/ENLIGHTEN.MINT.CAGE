@@ -70,6 +70,7 @@ const SpiritualCoach = lazy(() => import('./pages/SpiritualCoach'));
 const DailyBriefing = lazy(() => import('./pages/DailyBriefing'));
 const StarChart = lazy(() => import('./pages/StarChart'));
 const VirtualReality = lazy(() => import('./pages/VirtualReality'));
+const Forecasts = lazy(() => import('./pages/Forecasts'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -157,6 +158,7 @@ function AnimatedRoutes() {
             <Route path="/daily-briefing" element={<DailyBriefing />} />
             <Route path="/star-chart" element={<StarChart />} />
             <Route path="/vr" element={<VirtualReality />} />
+            <Route path="/forecasts" element={<Forecasts />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

@@ -1218,7 +1218,21 @@ export default function Meditation() {
       {/* Guided Session Overlay */}
       <AnimatePresence>
         {activeSession && (
-          <GuidedSession meditation={activeSession} onEnd={() => setActiveSession(null)} />
+          <GuidedSession meditation={activeSession} onEnd={async () => {
+            // Log meditation completion and get plant growth
+            try {
+              const res = await axios.post(`${API}/meditation-history/log`, {
+                type: activeSession.category || 'guided',
+                duration_minutes: activeSession.duration,
+                focus: activeSession.name,
+              }, { headers: authHeaders });
+              const pg = res.data?.plant_growth;
+              if (pg) {
+                toast.success(`${pg.plant_name} received cosmic nourishment${pg.grew ? ` and grew to ${pg.new_stage}!` : '!'}`);
+              }
+            } catch {}
+            setActiveSession(null);
+          }} />
         )}
       </AnimatePresence>
     </div>
