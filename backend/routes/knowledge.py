@@ -10,6 +10,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from emergentintegrations.llm.openai import OpenAITextToSpeech
 import random
+import hashlib
 
 # --- AI Knowledge Engine ---
 KNOWLEDGE_PROMPTS = {
@@ -47,7 +48,7 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
     for attempt in range(2):
         try:
             chat = LlmChat(
-                api_key=os.getenv("EMERGENT_LLM_KEY"),
+                api_key=EMERGENT_LLM_KEY,
                 session_id=f"knowledge-{str(uuid.uuid4())}",
                 system_message="You are a deeply knowledgeable spiritual teacher and wellness expert. Provide thorough, well-structured guides with markdown formatting.",
             )
@@ -136,7 +137,7 @@ Return ONLY valid JSON array, no markdown."""
 
     try:
         chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            api_key=EMERGENT_LLM_KEY,
             session_id=f"guided-exp-{str(uuid.uuid4())}",
             system_message="You are a master meditation and wellness guide. Transform instructional content into deeply immersive, sensory-rich guided experiences. Always return valid JSON only.",
         )
@@ -177,7 +178,7 @@ async def generate_narration(req: NarrationRequest):
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
     try:
-        tts = OpenAITextToSpeech(api_key=os.getenv("EMERGENT_LLM_KEY"))
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
         audio_b64 = await tts.generate_speech_base64(
             text=text,
             model="tts-1-hd",

@@ -263,7 +263,7 @@ async def ai_generate_creation(req: AICreateRequest, user=Depends(get_current_us
     prompt = type_prompts.get(req.type, f"Create a personal spiritual practice for: '{req.intention}'")
     try:
         chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            api_key=EMERGENT_LLM_KEY,
             session_id=f"create-{str(uuid.uuid4())}",
             system_message="You are a wise, compassionate spiritual guide. Create deeply personal, meaningful practices. Be specific and practical. Write with warmth.",
         )

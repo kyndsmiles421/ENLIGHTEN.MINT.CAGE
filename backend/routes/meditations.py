@@ -41,7 +41,7 @@ Return ONLY valid JSON array, no markdown, no explanation."""
 
     try:
         chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            api_key=EMERGENT_LLM_KEY,
             session_id=f"guided-meditation-{str(uuid.uuid4())}",
             system_message="You are a master meditation teacher. Generate deeply personal, transformative guided meditation scripts. Always respond with valid JSON only.",
         )
@@ -175,7 +175,7 @@ Return ONLY a JSON array of strings. No markdown, no explanation."""
 
     try:
         chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            api_key=EMERGENT_LLM_KEY,
             session_id=f"affirmation-set-{str(uuid.uuid4())}",
             system_message="You are a compassionate life coach and spiritual guide. Generate deeply personal affirmations. Always respond with valid JSON only.",
         )
