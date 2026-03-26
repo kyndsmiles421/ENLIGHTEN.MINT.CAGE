@@ -12,16 +12,19 @@ An immersive, highly personalized spiritual and wellness companion platform ("Th
 ## Architecture
 ```
 /app/backend/
-├── server.py          # Slim entry point (~62 lines)
+├── server.py          # Slim entry point (~80 lines)
 ├── deps.py            # Shared dependencies
 ├── models.py          # Pydantic models
-└── routes/            # 26+ modular route files
+└── routes/            # 27+ modular route files
+    └── cosmic_context.py  # NEW: Unified cosmic API + dream patterns
 
 /app/frontend/src/
 ├── App.js
 ├── context/AuthContext.js
-├── components/Navigation.js
-└── pages/             # All feature pages
+├── components/
+│   ├── Navigation.js
+│   └── CosmicBanner.js    # NEW: Shared cosmic interconnection component
+└── pages/                  # All feature pages (interconnected)
 ```
 
 ## Implemented Features (All Tested & Working)
@@ -33,65 +36,72 @@ An immersive, highly personalized spiritual and wellness companion platform ("Th
 
 ### Wellness Modules
 - Avatar Yoga, Breathing Exercises, Meditations (custom + guided)
-- Aromatherapy (oil library + favorites)
-- Herbology (herb cabinet + remedies)
+- Aromatherapy (oil library + favorites) — with cosmic banner
+- Herbology (herb cabinet + remedies) — with cosmic banner
 - Elixirs & Meal Planning
-- Acupressure Points & Reiki Aura Healing
-- Daily Wellness Ritual Builder (with timer + active states)
+- Acupressure Points — with cosmic banner
+- Reiki Aura Healing — with cosmic banner
+- Daily Wellness Ritual Builder (with timer + active states) — with cosmic banner
 - Sound Healing, Light Therapy, Mudras
 
 ### Mystical/Divination Systems
-- Mayan Calendar, Numerology, Sacred Cardology
+- Mayan Calendar — with cross-links to Calendar, Dreams, Numerology, Ritual
+- Numerology — with cross-links to Calendar, Mayan, Coach, Ritual
+- Sacred Cardology
 - Animal Totems, Dream Journal + Symbol Library
-- Oracle readings, Cosmic Calendar
+- Oracle readings
+
+### Cosmic Interconnection System (NEW)
+- **Cosmic Context API** (`GET /api/cosmic-context`): Returns unified snapshot — Mayan energy, moon phase, numerology, aura color, streak, mood, recent dreams, recurring symbols, and personalized practice suggestions
+- **Dream Patterns Dashboard** (`GET /api/dreams/patterns`): Recurring symbol frequency, moon-symbol correlations, moon phase mood analysis, lucid dream stats, vividness trends, and auto-generated insights
+- **CosmicBanner Component**: Shared across Dreams, Daily Ritual, Aromatherapy, Herbology, Reiki, Acupressure — shows today's cosmic alignment with clickable navigation to Mayan, Numerology, Calendar
+- **Cosmic Calendar Hub**: Enhanced with Today's Cosmic Practices (element-based yoga, oil, herb, acupoint suggestions), Recent Dreams section, and explore links on every card
+- **Cross-Page Connected Systems**: Mayan page links to Calendar, Dreams, Numerology, Ritual. Numerology page links to Calendar, Mayan, Coach, Ritual
 
 ### AI Features
 - **Sage** (AI Spiritual & Life Coach) - 6 coaching modes:
   - Spiritual Guidance, Life Coaching, Shadow Work
-  - Manifestation, Healing Guide, **Dream Oracle** (NEW)
-- AI Dream Interpretation (basic + deep cosmic analysis)
+  - Manifestation, Healing Guide, Dream Oracle
+- AI Dream Interpretation (basic + deep cosmic analysis with aura/moon/numerology cross-reference)
 
 ### Tracking & Progress
 - Wellness Reports, Certifications
 - Meditation History, Journey Progress
 - User Uploads, Challenge System
 
-## Completed in This Session (March 2026)
-
-### Bug Fix: Daily Ritual Instant-Completion (P0)
-- **Problem**: Clicking a ritual step instantly marked it complete, bypassing the actual exercise
-- **Fix**: Redesigned `RitualStep` component with collapsed/active/completed states, countdown timer, Start/Pause/Skip controls, and deliberate "Mark Complete" button
-- **Testing**: iteration_33.json - 100% pass (10/10 features)
-
-### Feature: AI Dream Oracle Integration (P1)
-- Added "Dream Oracle" as 6th coaching mode to Sage
-- Dream picker UI showing logged dreams with metadata
-- Deep AI analysis cross-referencing aura color, moon phase, numerology, and birth card
-- Cosmic Profile Badge displaying the interpretation lens
-- Follow-up chat maintaining dream context
-- **Backend**: `GET /api/coach/dreams`, `POST /api/coach/analyze-dream`
-- **Frontend**: `DreamPicker`, `CosmicProfileBadge` components
-- **Testing**: iteration_34.json - 100% pass (10/10 features)
+## Key Routes
+| Frontend Path | Page |
+|---|---|
+| /cosmic-calendar | Cosmic Calendar Hub |
+| /daily-ritual | Daily Wellness Ritual |
+| /coach | Sage AI Coach |
+| /dreams | Dream Journal + Patterns |
+| /mayan | Mayan Astrology |
+| /numerology | Numerology |
+| /aromatherapy | Aromatherapy |
+| /herbology | Herbology |
+| /reiki | Reiki |
+| /acupressure | Acupressure |
 
 ## Key Endpoints
-- Auth: POST /api/auth/login, POST /api/auth/register
-- Coach: POST /api/coach/chat, POST /api/coach/analyze-dream, GET /api/coach/dreams
-- Ritual: GET /api/daily-ritual/generate, POST /api/daily-ritual/complete-step
-- Dreams: POST /api/dreams, GET /api/dreams, POST /api/dreams/interpret
-
-## DB Collections
-- users, profiles, coach_sessions, daily_rituals, dreams, moods, streaks
-- yoga_sessions, custom_meditations, aura_readings, reiki_sessions, acupressure_sessions
-- aroma_favorites, herb_cabinet, meal_logs, journal, certifications, user_uploads
+- `GET /api/cosmic-context` — Unified cosmic snapshot (authenticated)
+- `GET /api/dreams/patterns` — Dream pattern analytics (authenticated)
+- `POST /api/coach/analyze-dream` — Deep AI dream analysis
+- `GET /api/coach/dreams` — Dreams for oracle picker
+- `POST /api/coach/chat` — Coach conversation
+- `GET /api/cosmic-calendar/today` — Calendar data (public)
+- `GET /api/daily-ritual/generate` — Generate personalized ritual
+- `POST /api/daily-ritual/complete-step` — Complete a ritual step
 
 ## Test Credentials
 - Email: test@test.com, Password: password
 
 ## Backlog / Future Tasks
-- P2: Polish/refine Acupressure, Reiki, Cosmic Calendar based on user feedback
-- P3: Additional integrations or features as requested by user
+- P2: Polish/refine based on user feedback
+- P3: Additional integrations or features as requested
 
 ## Critical Technical Notes
 - `emergentintegrations` `send_message` returns `str`, not an object with `.text`
 - All new routes go in `/app/backend/routes/` and are included via `app.include_router()`
 - MongoDB `_id` must be excluded from all responses
+- Frontend routes: `/cosmic-calendar`, `/coach`, `/auth`, `/daily-ritual`
