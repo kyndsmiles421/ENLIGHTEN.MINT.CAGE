@@ -10,7 +10,7 @@ import {
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
-  Calendar, BarChart3, Award, Upload, MessageCircle
+  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -52,6 +52,7 @@ const MORE_NAV = [
   { path: '/herbology', label: 'Herbology', icon: Leaf },
   { path: '/elixirs', label: 'Elixirs', icon: Flame },
   { path: '/meal-planning', label: 'Meals', icon: UtensilsCrossed },
+  { path: '/vr', label: 'Sanctuary', icon: Orbit },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
   { path: '/friends', label: 'Friends', icon: Users },
   { path: '/learn', label: 'Learn', icon: GraduationCap },
@@ -98,7 +99,7 @@ export default function Navigation() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  if (location.pathname === '/' || location.pathname === '/auth') return null;
+  if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr') return null;
 
   const moreActive = MORE_NAV.some(item => location.pathname === item.path);
 
