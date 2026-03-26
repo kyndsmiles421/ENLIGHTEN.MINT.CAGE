@@ -124,7 +124,7 @@ function createMythologyTexture(constellationId, color, size = 256) {
   return tex;
 }
 
-function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode }) {
+function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived }) {
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
@@ -136,8 +136,25 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
   const animState = useRef({ startTime: 0, lineGroups: [] });
   const mythSprites = useRef([]);
   const mythModeRef = useRef(mythologyMode);
+  const journeyTargetRef = useRef(null);
+  const onJourneyArrivedRef = useRef(onJourneyArrived);
 
   useEffect(() => { mythModeRef.current = mythologyMode; }, [mythologyMode]);
+  useEffect(() => { onJourneyArrivedRef.current = onJourneyArrived; }, [onJourneyArrived]);
+  useEffect(() => {
+    if (journeyTarget) {
+      const pos = raDecToXYZ(journeyTarget.ra, journeyTarget.dec, 50);
+      const len = Math.sqrt(pos.x*pos.x + pos.y*pos.y + pos.z*pos.z);
+      journeyTargetRef.current = {
+        theta: Math.atan2(pos.z, pos.x),
+        phi: Math.acos(pos.y / len),
+        radius: 35,
+        id: journeyTarget.id,
+      };
+    } else {
+      journeyTargetRef.current = null;
+    }
+  }, [journeyTarget]);
 
   useEffect(() => {
     if (!containerRef.current || !data) return;
@@ -352,6 +369,27 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       camera.position.set(radius * Math.sin(phi) * Math.cos(theta), radius * Math.cos(phi), radius * Math.sin(phi) * Math.sin(theta));
       camera.lookAt(0, 0, 0);
       bgStars.rotation.y += 0.00008;
+
+      // Journey camera animation (smooth cinematic movement)
+      const jt = journeyTargetRef.current;
+      if (jt) {
+        const lerpSpeed = 0.025;
+        const dTheta = jt.theta - spherical.current.theta;
+        const dPhi = jt.phi - spherical.current.phi;
+        const dR = jt.radius - spherical.current.radius;
+        // Wrap theta for shortest path
+        let adjustedDTheta = dTheta;
+        if (adjustedDTheta > Math.PI) adjustedDTheta -= Math.PI * 2;
+        if (adjustedDTheta < -Math.PI) adjustedDTheta += Math.PI * 2;
+        spherical.current.theta += adjustedDTheta * lerpSpeed;
+        spherical.current.phi += dPhi * lerpSpeed;
+        spherical.current.radius += dR * lerpSpeed;
+        // Detect arrival
+        if (Math.abs(adjustedDTheta) < 0.02 && Math.abs(dPhi) < 0.02 && Math.abs(dR) < 0.5) {
+          if (onJourneyArrivedRef.current) onJourneyArrivedRef.current(jt.id);
+          journeyTargetRef.current = null;
+        }
+      }
 
       // Constellation line drawing
       const drawSpeed = 2.5;
@@ -774,6 +812,113 @@ function MythologyPanel({ constellation, onClose }) {
   );
 }
 
+/* ── Stargazing Journey Overlay ── */
+function JourneyOverlay({ constellations, active, currentIdx, phase, onPlay, onPause, onSkip, onStop, isPaused }) {
+  if (!active) return null;
+  const current = constellations[currentIdx];
+  const color = current ? (ELEMENT_COLORS[current.element] || '#A78BFA') : '#818CF8';
+  const progress = constellations.length > 0 ? ((currentIdx + (phase === 'narrating' ? 0.5 : phase === 'moving' ? 0.2 : 0)) / constellations.length) * 100 : 0;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+      className="absolute bottom-0 left-0 right-0 z-20" data-testid="journey-overlay">
+      {/* Gradient fade */}
+      <div className="h-24 pointer-events-none" style={{ background: 'linear-gradient(transparent, rgba(5,5,12,0.9))' }} />
+
+      <div className="px-6 pb-6 pt-2" style={{ background: 'rgba(5,5,12,0.95)' }}>
+        {/* Current constellation info */}
+        {current && (
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}12`, border: `1px solid ${color}20` }}>
+              <Star size={14} style={{ color }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold truncate" style={{ color: '#F8FAFC' }}>{current.name}</p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${color}10`, color, border: `1px solid ${color}20` }}>
+                  {currentIdx + 1}/{constellations.length}
+                </span>
+              </div>
+              <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                {phase === 'moving' ? 'Navigating to constellation...' : phase === 'narrating' ? 'Listening to the story...' : phase === 'waiting' ? 'Preparing next story...' : current.mythology?.figure || current.symbol}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Timeline dots */}
+        <div className="flex items-center gap-1 mb-3 overflow-x-auto pb-1">
+          {constellations.map((c, i) => {
+            const cColor = ELEMENT_COLORS[c.element] || '#A78BFA';
+            const done = i < currentIdx;
+            const isCurrent = i === currentIdx;
+            return (
+              <div key={c.id} className="flex flex-col items-center gap-0.5 flex-shrink-0" style={{ width: 28 }}>
+                <div className="w-3 h-3 rounded-full transition-all" style={{
+                  background: done ? cColor : isCurrent ? cColor : 'rgba(248,250,252,0.08)',
+                  boxShadow: isCurrent ? `0 0 8px ${cColor}60` : 'none',
+                  border: `1px solid ${done || isCurrent ? cColor + '60' : 'rgba(248,250,252,0.06)'}`,
+                  transform: isCurrent ? 'scale(1.3)' : 'scale(1)',
+                }} />
+                <span className="text-[7px] leading-none truncate w-full text-center" style={{ color: done || isCurrent ? cColor : 'rgba(248,250,252,0.15)' }}>
+                  {c.name.length > 4 ? c.name.slice(0, 4) : c.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Full progress bar */}
+        <div className="w-full h-1 rounded-full mb-3 overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+          <motion.div className="h-full rounded-full" animate={{ width: `${progress}%` }} transition={{ duration: 0.5 }}
+            style={{ background: 'linear-gradient(90deg, #818CF8, #A78BFA, #C084FC)' }} />
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-4">
+          <button onClick={onStop} data-testid="journey-stop-btn"
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}>
+            <X size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          </button>
+          <button onClick={isPaused ? onPlay : onPause} data-testid="journey-play-pause-btn"
+            className="w-12 h-12 rounded-full flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2))', border: '1px solid rgba(167,139,250,0.3)', boxShadow: '0 0 20px rgba(167,139,250,0.15)' }}>
+            {isPaused ? <Play size={16} style={{ color: '#A78BFA' }} /> : <Pause size={16} style={{ color: '#A78BFA' }} />}
+          </button>
+          <button onClick={onSkip} data-testid="journey-skip-btn"
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}>
+            <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Journey Complete Card ── */
+function JourneyComplete({ count, onClose }) {
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+      className="absolute inset-0 z-30 flex items-center justify-center" style={{ background: 'rgba(5,5,12,0.85)', backdropFilter: 'blur(12px)' }}
+      data-testid="journey-complete">
+      <div className="text-center max-w-sm px-6">
+        <div className="text-4xl mb-3">&#10024;</div>
+        <p className="text-lg font-bold mb-1" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>Journey Complete</p>
+        <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          You've traversed {count} constellations and heard their ancient stories. The cosmos has shared its wisdom with you.
+        </p>
+        <button onClick={onClose} data-testid="journey-complete-close"
+          className="px-6 py-2 rounded-xl text-xs font-medium"
+          style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2))', border: '1px solid rgba(167,139,250,0.3)', color: '#A78BFA' }}>
+          Return to the Stars
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function StarChart() {
   const { token, authHeaders } = useAuth();
   const navigate = useNavigate();
@@ -787,6 +932,19 @@ export default function StarChart() {
   const [latInput, setLatInput] = useState('40.7');
   const [lngInput, setLngInput] = useState('-74.0');
   const canvasContainerRef = useRef(null);
+
+  // Journey state
+  const [journeyActive, setJourneyActive] = useState(false);
+  const [journeyIdx, setJourneyIdx] = useState(0);
+  const [journeyPhase, setJourneyPhase] = useState('idle'); // idle, moving, narrating, waiting, complete
+  const [journeyPaused, setJourneyPaused] = useState(false);
+  const [journeyTarget, setJourneyTarget] = useState(null);
+  const [journeyComplete, setJourneyComplete] = useState(false);
+  const journeyAudioRef = useRef(null);
+  const journeyAmbient = useCosmicAmbient();
+  const journeyPausedRef = useRef(false);
+
+  useEffect(() => { journeyPausedRef.current = journeyPaused; }, [journeyPaused]);
 
   const fetchChart = useCallback((lat, lng) => {
     if (!token) { setLoading(false); return; }
@@ -819,6 +977,98 @@ export default function StarChart() {
     { name: 'Cairo', lat: 30.0, lng: 31.2 }, { name: 'Sao Paulo', lat: -23.5, lng: -46.6 },
   ];
 
+  // ── Journey Control Functions ──
+  const startJourney = useCallback(() => {
+    if (!data?.constellations?.length) return;
+    setJourneyActive(true);
+    setJourneyIdx(0);
+    setJourneyPhase('moving');
+    setJourneyPaused(false);
+    setJourneyComplete(false);
+    setSelected(null);
+    setMythologyMode(true);
+    journeyAmbient.start();
+    // Set first target
+    const first = data.constellations[0];
+    setJourneyTarget({ ra: first.ra, dec: first.dec, id: first.id });
+  }, [data, journeyAmbient]);
+
+  const narrateRef = useRef(null);
+  const advanceRef = useRef(null);
+
+  const narrateConstellation = useCallback(async (idx) => {
+    if (!data?.constellations?.[idx]) return;
+    const c = data.constellations[idx];
+    setSelected(c);
+    setJourneyPhase('narrating');
+
+    const myth = c.mythology;
+    if (!myth) { if (advanceRef.current) advanceRef.current(idx); return; }
+    const storyText = `${c.name}. ${myth.figure}. ${myth.story} The cosmic lesson: ${myth.lesson}`;
+
+    try {
+      const res = await axios.post(`${API}/tts/narrate`, { text: storyText, voice: 'fable', speed: 0.9 });
+      const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
+      journeyAudioRef.current = audio;
+      audio.onended = () => {
+        if (!journeyPausedRef.current && advanceRef.current) advanceRef.current(idx);
+      };
+      if (!journeyPausedRef.current) audio.play();
+    } catch {
+      setTimeout(() => { if (!journeyPausedRef.current && advanceRef.current) advanceRef.current(idx); }, 3000);
+    }
+  }, [data]);
+
+  const advanceJourney = useCallback((fromIdx) => {
+    const nextIdx = fromIdx + 1;
+    if (!data?.constellations || nextIdx >= data.constellations.length) {
+      setJourneyPhase('complete');
+      setJourneyActive(false);
+      setJourneyComplete(true);
+      journeyAmbient.stop();
+      setSelected(null);
+      return;
+    }
+    setJourneyIdx(nextIdx);
+    setJourneyPhase('moving');
+    setSelected(null);
+    const next = data.constellations[nextIdx];
+    setJourneyTarget({ ra: next.ra, dec: next.dec, id: next.id });
+  }, [data, journeyAmbient]);
+
+  useEffect(() => { narrateRef.current = narrateConstellation; }, [narrateConstellation]);
+  useEffect(() => { advanceRef.current = advanceJourney; }, [advanceJourney]);
+
+  const handleJourneyArrived = useCallback((id) => {
+    const idx = data?.constellations?.findIndex(c => c.id === id);
+    if (idx >= 0 && narrateRef.current) narrateRef.current(idx);
+  }, [data]);
+
+  const pauseJourney = useCallback(() => {
+    setJourneyPaused(true);
+    if (journeyAudioRef.current) journeyAudioRef.current.pause();
+  }, []);
+
+  const resumeJourney = useCallback(() => {
+    setJourneyPaused(false);
+    if (journeyAudioRef.current && journeyPhase === 'narrating') journeyAudioRef.current.play();
+  }, [journeyPhase]);
+
+  const skipJourney = useCallback(() => {
+    if (journeyAudioRef.current) { journeyAudioRef.current.pause(); journeyAudioRef.current = null; }
+    if (advanceRef.current) advanceRef.current(journeyIdx);
+  }, [journeyIdx]);
+
+  const stopJourney = useCallback(() => {
+    if (journeyAudioRef.current) { journeyAudioRef.current.pause(); journeyAudioRef.current = null; }
+    journeyAmbient.stop();
+    setJourneyActive(false);
+    setJourneyPhase('idle');
+    setJourneyTarget(null);
+    setSelected(null);
+    setJourneyPaused(false);
+  }, [journeyAmbient]);
+
   if (!token) return (
     <div className="min-h-screen flex items-center justify-center pt-20">
       <p className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to explore the cosmic star chart</p>
@@ -837,6 +1087,14 @@ export default function StarChart() {
             <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars for details</p>
           </div>
           <div className="flex items-center gap-2 pointer-events-auto">
+            {/* Stargazing Journey button */}
+            {data && !journeyActive && (
+              <button onClick={startJourney} data-testid="journey-start-btn"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+                style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.12), rgba(192,132,252,0.12))', border: '1px solid rgba(167,139,250,0.3)', color: '#C084FC', backdropFilter: 'blur(12px)', boxShadow: '0 0 15px rgba(192,132,252,0.1)' }}>
+                <Compass size={10} /> Stargazing Journey
+              </button>
+            )}
             {/* Mythology Mode toggle */}
             <button onClick={() => setMythologyMode(!mythologyMode)} data-testid="mythology-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
@@ -929,7 +1187,7 @@ export default function StarChart() {
 
       {/* Mythology Mode indicator */}
       <AnimatePresence>
-        {mythologyMode && !selected && (
+        {mythologyMode && !selected && !journeyActive && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
             className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-xl text-center pointer-events-none"
             style={{ background: 'rgba(8,10,18,0.85)', border: '1px solid rgba(167,139,250,0.2)', backdropFilter: 'blur(12px)' }}>
@@ -937,6 +1195,30 @@ export default function StarChart() {
               <Scroll size={10} /> Mythology figures visible | Click a constellation for its story
             </p>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Journey Overlay */}
+      <AnimatePresence>
+        {journeyActive && data && (
+          <JourneyOverlay
+            constellations={data.constellations}
+            active={journeyActive}
+            currentIdx={journeyIdx}
+            phase={journeyPhase}
+            isPaused={journeyPaused}
+            onPlay={resumeJourney}
+            onPause={pauseJourney}
+            onSkip={skipJourney}
+            onStop={stopJourney}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Journey Complete */}
+      <AnimatePresence>
+        {journeyComplete && data && (
+          <JourneyComplete count={data.constellations.length} onClose={() => setJourneyComplete(false)} />
         )}
       </AnimatePresence>
 
@@ -950,7 +1232,7 @@ export default function StarChart() {
             </div>
           </div>
         ) : data ? (
-          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} />
+          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} />
         ) : null}
       </div>
     </div>
