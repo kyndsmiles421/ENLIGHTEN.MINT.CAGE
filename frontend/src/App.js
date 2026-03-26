@@ -66,6 +66,7 @@ const Certifications = lazy(() => import('./pages/Certifications'));
 const WellnessReports = lazy(() => import('./pages/WellnessReports'));
 const MeditationHistory = lazy(() => import('./pages/MeditationHistory'));
 const UserUploads = lazy(() => import('./pages/UserUploads'));
+const SpiritualCoach = lazy(() => import('./pages/SpiritualCoach'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -149,6 +150,7 @@ function AnimatedRoutes() {
             <Route path="/wellness-reports" element={<WellnessReports />} />
             <Route path="/meditation-history" element={<MeditationHistory />} />
             <Route path="/media-library" element={<UserUploads />} />
+            <Route path="/coach" element={<SpiritualCoach />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

@@ -10,7 +10,7 @@ import {
   Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
-  Calendar, BarChart3, Award, Upload
+  Calendar, BarChart3, Award, Upload, MessageCircle
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -18,6 +18,7 @@ import { LANGUAGES } from '../i18n/translations';
 
 const PRIMARY_NAV = [
   { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
+  { path: '/coach', label: 'Sage', icon: MessageCircle },
   { path: '/cosmic-calendar', label: 'Calendar', icon: Calendar },
   { path: '/journey', label: 'Journey', icon: Map },
   { path: '/breathing', label: 'Breathe', icon: Wind },

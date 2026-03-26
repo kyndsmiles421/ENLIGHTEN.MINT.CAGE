@@ -124,7 +124,7 @@ async def suggest_meal(data: dict = Body(...), user=Depends(get_current_user)):
                         system_message="You are a holistic nutritionist combining Ayurveda, Traditional Chinese Medicine, and modern nutrition science. Suggest a meal that nourishes both body and spirit. Be specific with ingredients and brief preparation. Include the energetic/spiritual quality of the meal.")
         prompt = f"Suggest a {time_of_day} meal for someone feeling {mood}. Dietary preference: {dietary}. Include: dish name, ingredients list, brief prep steps, and the energetic intention/benefit."
         response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
-        return {"suggestion": response.text}
+        return {"suggestion": response}
     except Exception as e:
         logger.error(f"Meal suggestion error: {e}")
         fallback_plan = random.choice(list(MEAL_TEMPLATES.values()))

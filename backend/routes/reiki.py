@@ -156,7 +156,7 @@ async def aura_reading(data: dict = Body(...), user=Depends(get_current_user)):
         mood_str = ", ".join(mood_list[:5]) if mood_list else "no recent moods recorded"
         prompt = f"Give an aura reading for someone with a {aura['name']}. Their recent moods: {mood_str}. Born month {birth_month}, day {birth_day}. Their dominant chakra is {chakra_data['name']}. Include: current energy state, what their aura reveals about their spiritual journey, and guidance for the coming days."
         response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
-        reading_text = response.text
+        reading_text = response
     except Exception as e:
         logger.error(f"Aura reading AI error: {e}")
         reading_text = f"Your energy radiates {aura['name']} — {aura['meaning']}. Your {chakra_data['name']} is calling for attention. {aura['advice']}"
