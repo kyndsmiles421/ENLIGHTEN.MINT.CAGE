@@ -90,6 +90,15 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
   - Stars tab shows individual star names and magnitudes
   - Mythology mode indicator banner at bottom of screen
 
+## Phase 40 Changes (2026-03-26)
+- **Feature**: Constellation Story Narration with Ambient Cosmic Music
+  - CosmicNarrator component with TTS narration using "fable" (British storyteller) voice at 0.9x speed
+  - Ambient cosmic drone generator via Web Audio API: base C2 drone, G2 fifth harmonic, LFO-modulated triangle pad, high shimmer sweep
+  - Real-time waveform visualization using Web Audio analyser
+  - Progress bar, play/pause/stop controls
+  - Narrates full mythology story + cosmic lesson when "Listen to Story" is clicked
+  - Ambient drones fade in/out gracefully with narration
+
 ## Key API Endpoints
 - POST /api/auth/login, /api/auth/register
 - GET /api/mudras (25 items)
