@@ -8,7 +8,9 @@ import {
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
   Play, GraduationCap, Headphones, Lightbulb, Sprout,
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
-  Gamepad2, UserPlus, Check, Quote
+  Gamepad2, UserPlus, Check, Quote, Sun, Eye, Star, Moon,
+  Compass, Droplets, UtensilsCrossed, Target, PenTool, Globe,
+  Calendar, BarChart3, MessageCircle, Orbit
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 
@@ -21,31 +23,56 @@ const REC_ICON_MAP = {
   zap: Zap, sunrise: Sunrise, map: Map, 'graduation-cap': GraduationCap,
 };
 
-const QUICK_ACTIONS = [
-  { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#D8B4FE' },
-  { icon: Wind, label: 'Breathe', path: '/breathing', color: '#2DD4BF' },
-  { icon: Timer, label: 'Meditate', path: '/meditation', color: '#D8B4FE' },
-  { icon: Lightbulb, label: 'Light', path: '/light-therapy', color: '#A855F7' },
-  { icon: Sprout, label: 'Zen', path: '/zen-garden', color: '#22C55E' },
-  { icon: Headphones, label: 'Sounds', path: '/soundscapes', color: '#3B82F6' },
-  { icon: Radio, label: 'Frequencies', path: '/frequencies', color: '#8B5CF6' },
-  { icon: Hand, label: 'Mudras', path: '/mudras', color: '#FDA4AF' },
-  { icon: Music, label: 'Mantras', path: '/mantras', color: '#FB923C' },
-  { icon: HeartHandshake, label: "Ho'opono", path: '/hooponopono', color: '#E879F9' },
-  { icon: Triangle, label: 'Yantra', path: '/yantra', color: '#EF4444' },
-  { icon: Flame, label: 'Tantra', path: '/tantra', color: '#FCD34D' },
-  { icon: Zap, label: 'Exercise', path: '/exercises', color: '#FB923C' },
-  { icon: Sunrise, label: 'Rituals', path: '/rituals', color: '#FCD34D' },
-  { icon: Trophy, label: 'Challenges', path: '/friends', color: '#FB923C' },
-  { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
-  { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
-  { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
-  { icon: UserPlus, label: 'Friends', path: '/friends', color: '#3B82F6' },
-  { icon: Map, label: 'Journey', path: '/journey', color: '#2DD4BF' },
-  { icon: GraduationCap, label: 'Learn', path: '/learn', color: '#E879F9' },
-  { icon: Gamepad2, label: 'Games', path: '/games', color: '#FB923C' },
-  { icon: Play, label: 'Videos', path: '/videos', color: '#2DD4BF' },
-  { icon: User, label: 'Profile', path: '/profile', color: '#E879F9' },
+const CATEGORIZED_ACTIONS = [
+  {
+    label: 'Today', color: '#FCD34D', items: [
+      { icon: Sun, label: 'Briefing', path: '/daily-briefing', color: '#FCD34D' },
+      { icon: Sparkles, label: 'My Ritual', path: '/daily-ritual', color: '#FCD34D' },
+      { icon: Calendar, label: 'Calendar', path: '/cosmic-calendar', color: '#FCD34D' },
+      { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171' },
+    ],
+  },
+  {
+    label: 'Practice', color: '#D8B4FE', items: [
+      { icon: Wind, label: 'Breathe', path: '/breathing', color: '#2DD4BF' },
+      { icon: Timer, label: 'Meditate', path: '/meditation', color: '#D8B4FE' },
+      { icon: Flame, label: 'Yoga', path: '/yoga', color: '#FB923C' },
+      { icon: Zap, label: 'Qigong', path: '/exercises', color: '#FB923C' },
+      { icon: Hand, label: 'Mudras', path: '/mudras', color: '#FDA4AF' },
+      { icon: Music, label: 'Mantras', path: '/mantras', color: '#FB923C' },
+      { icon: Lightbulb, label: 'Light', path: '/light-therapy', color: '#A855F7' },
+      { icon: Sun, label: 'Affirm', path: '/affirmations', color: '#93C5FD' },
+    ],
+  },
+  {
+    label: 'Divination', color: '#E879F9', items: [
+      { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#E879F9' },
+      { icon: Star, label: 'Stars', path: '/star-chart', color: '#E879F9' },
+      { icon: Eye, label: 'Forecasts', path: '/forecasts', color: '#E879F9' },
+      { icon: Star, label: 'Numerology', path: '/numerology', color: '#E879F9' },
+      { icon: Moon, label: 'Dreams', path: '/dreams', color: '#E879F9' },
+      { icon: BarChart3, label: 'Cosmic', path: '/cosmic-profile', color: '#E879F9' },
+    ],
+  },
+  {
+    label: 'Sanctuary', color: '#2DD4BF', items: [
+      { icon: Sprout, label: 'Zen', path: '/zen-garden', color: '#22C55E' },
+      { icon: Headphones, label: 'Sounds', path: '/soundscapes', color: '#3B82F6' },
+      { icon: Radio, label: 'Hz', path: '/frequencies', color: '#8B5CF6' },
+      { icon: Orbit, label: 'VR', path: '/vr', color: '#2DD4BF' },
+      { icon: BookOpen, label: 'Journal', path: '/journal', color: '#86EFAC' },
+    ],
+  },
+  {
+    label: 'Explore', color: '#FB923C', items: [
+      { icon: MessageCircle, label: 'Sage', path: '/coach', color: '#38BDF8' },
+      { icon: Globe, label: 'Stories', path: '/creation-stories', color: '#FB923C' },
+      { icon: Map, label: 'Journey', path: '/journey', color: '#2DD4BF' },
+      { icon: Gamepad2, label: 'Games', path: '/games', color: '#FB923C' },
+      { icon: Users, label: 'Community', path: '/community', color: '#FDA4AF' },
+      { icon: Flame, label: 'Challenges', path: '/challenges', color: '#FB923C' },
+    ],
+  },
 ];
 
 export default function Dashboard() {
@@ -284,32 +311,43 @@ export default function Dashboard() {
           </motion.div>
         )}
 
-        {/* Quick Actions */}
+        {/* Categorized Quick Actions */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Explore & Practice</p>
-          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
-            {QUICK_ACTIONS.map((action, i) => {
-              const Icon = action.icon;
-              return (
-                <motion.button
-                  key={action.label}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.35 + i * 0.02 }}
-                  onClick={() => navigate(action.path)}
-                  className="glass-card p-4 flex flex-col items-center gap-2.5 group cursor-pointer transition-all duration-300 hover:scale-105"
-                  style={{ border: '1px solid rgba(255,255,255,0.04)' }}
-                  data-testid={`dashboard-action-${action.label.toLowerCase()}`}
-                  whileHover={{ borderColor: `${action.color}30`, boxShadow: `0 0 20px ${action.color}15` }}
-                >
-                  <div className="transition-all duration-300 group-hover:scale-110">
-                    <Icon size={20} style={{ color: action.color, transition: 'filter 0.3s' }}
-                      className="group-hover:drop-shadow-lg" />
-                  </div>
-                  <span className="text-xs transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>{action.label}</span>
-                </motion.button>
-              );
-            })}
+          <div className="space-y-6">
+            {CATEGORIZED_ACTIONS.map((group, gi) => (
+              <div key={group.label}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3 flex items-center gap-2"
+                  style={{ color: group.color }}>
+                  <span className="w-4 h-px" style={{ background: group.color, opacity: 0.3 }} />
+                  {group.label}
+                </p>
+                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                  {group.items.map((action, i) => {
+                    const Icon = action.icon;
+                    return (
+                      <motion.button
+                        key={action.label + action.path}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.35 + gi * 0.05 + i * 0.02 }}
+                        onClick={() => navigate(action.path)}
+                        className="glass-card p-3 flex flex-col items-center gap-2 group cursor-pointer transition-all duration-300 hover:scale-105"
+                        style={{ border: '1px solid rgba(255,255,255,0.04)' }}
+                        data-testid={`dashboard-action-${action.label.toLowerCase()}`}
+                        whileHover={{ borderColor: `${action.color}30`, boxShadow: `0 0 20px ${action.color}15` }}
+                      >
+                        <div className="transition-all duration-300 group-hover:scale-110">
+                          <Icon size={18} style={{ color: action.color, transition: 'filter 0.3s' }}
+                            className="group-hover:drop-shadow-lg" />
+                        </div>
+                        <span className="text-[10px] transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>{action.label}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

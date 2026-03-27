@@ -10,10 +10,11 @@ import {
   Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
-  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit
+  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
+import SearchCommand from './SearchCommand';
 
 /* ─── Category definitions ─── */
 const NAV_CATEGORIES = [
@@ -281,6 +282,7 @@ export default function Navigation() {
   const [mobileCat, setMobileCat] = useState(null);
   const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const langRef = useRef(null);
   const profileRef = useRef(null);
   const profileTimeout = useRef(null);
@@ -293,6 +295,18 @@ export default function Navigation() {
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  /* Cmd+K / Ctrl+K shortcut */
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(prev => !prev);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
   }, []);
 
   /* Close mobile menu on route change */
@@ -356,6 +370,20 @@ export default function Navigation() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* Search */}
+          <button
+            onClick={() => { setSearchOpen(true); playClick(); }}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs transition-all duration-300 hover:bg-white/[0.04]"
+            style={{ color: 'var(--text-muted)' }}
+            data-testid="nav-search-btn"
+          >
+            <Search size={13} />
+            <kbd className="hidden xl:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-mono"
+              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              &#8984;K
+            </kbd>
+          </button>
+
           {/* Language */}
           <div className="relative" ref={langRef}>
             <button
@@ -503,6 +531,9 @@ export default function Navigation() {
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', color: 'var(--text-primary)' }}>Cosmic Collective</span>
         </Link>
         <div className="flex items-center gap-2">
+          <button onClick={() => { setSearchOpen(true); playClick(); }} className="p-2 rounded-full" style={{ color: 'var(--text-muted)' }} data-testid="nav-search-btn-mobile">
+            <Search size={18} />
+          </button>
           <button onClick={toggleAmbient} className="p-2 rounded-full" style={{ color: ambientOn ? 'var(--primary)' : 'var(--text-muted)' }} data-testid="nav-ambient-toggle-mobile">
             {ambientOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
@@ -598,6 +629,9 @@ export default function Navigation() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Search Command Palette */}
+      <SearchCommand open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       {/* Spacer */}
       <div className="h-14" />
