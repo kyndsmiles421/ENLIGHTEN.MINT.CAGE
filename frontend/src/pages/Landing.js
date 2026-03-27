@@ -11,6 +11,7 @@ import {
   Eye, Star, Compass, Droplets, MessageCircle, Orbit
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { LANGUAGES } from '../i18n/translations';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -423,6 +424,7 @@ function Footer() {
 export default function Landing() {
   const navigate = useNavigate();
   const { t, lang, setLanguage } = useLanguage();
+  const { user } = useAuth();
   const [breathScale, setBreathScale] = useState(1);
   const [showQuickReset, setShowQuickReset] = useState(false);
   const [showLang, setShowLang] = useState(false);
@@ -513,18 +515,13 @@ export default function Landing() {
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
-              <button onClick={() => navigate('/journey')}
+              <button onClick={() => navigate(user ? '/dashboard' : '/auth')}
                 className="btn-glass group"
                 style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
                 data-testid="begin-journey-btn">
                 <span className="flex items-center gap-2" style={{ color: '#2DD4BF' }}>
-                  {t.landing.beginJourney} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  {user ? 'Continue Journey' : t.landing.beginJourney} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
-              </button>
-              <button onClick={() => navigate('/auth')} className="btn-glass"
-                style={{ background: 'transparent', borderColor: 'rgba(255,255,255,0.08)' }}
-                data-testid="sign-in-btn">
-                {t.landing.signIn}
               </button>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
