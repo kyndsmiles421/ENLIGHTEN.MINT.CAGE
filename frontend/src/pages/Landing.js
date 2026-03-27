@@ -165,8 +165,8 @@ function PillarCard({ pillar, index }) {
       <p className="text-xs mb-5" style={{ color: 'var(--text-muted)' }}>{pillar.subtitle}</p>
       <div className="flex flex-wrap gap-1.5">
         {pillar.highlights.map(h => (
-          <span key={h.label} onClick={() => navigate(h.path)}
-            className="text-[10px] px-2.5 py-1 rounded-full transition-all duration-300 cursor-pointer hover:scale-105"
+          <span key={h.label} onClick={(e) => { e.stopPropagation(); navigate(h.path); }}
+            className="text-[11px] px-3 py-1.5 rounded-full transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
             style={{ background: `${pillar.color}08`, color: `${pillar.color}cc`, border: `1px solid ${pillar.color}10` }}
             data-testid={`pillar-link-${h.path.slice(1)}`}>
             {h.label}
