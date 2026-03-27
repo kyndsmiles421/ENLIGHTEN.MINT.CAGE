@@ -10,9 +10,8 @@ import {
   Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2,
   Eye, Star, Compass, Droplets, MessageCircle, Orbit
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { LANGUAGES } from '../i18n/translations';
+import ShareButton from '../components/ShareButton';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -484,13 +483,10 @@ function Footer() {
 /* ─── Main Landing ─── */
 export default function Landing() {
   const navigate = useNavigate();
-  const { t, lang, setLanguage } = useLanguage();
   const { user } = useAuth();
   const [breathScale, setBreathScale] = useState(1);
   const [showQuickReset, setShowQuickReset] = useState(false);
-  const [showLang, setShowLang] = useState(false);
   const animRef = useRef(null);
-  const langRef = useRef(null);
 
   const animateBreath = useCallback(() => {
     const duration = 8000;
@@ -514,32 +510,9 @@ export default function Landing() {
     <div className="min-h-screen relative" style={{ background: 'transparent' }}>
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
 
-      {/* Language Selector */}
-      <div className="fixed top-4 right-4 z-50" ref={langRef}>
-        <button onClick={() => setShowLang(!showLang)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs transition-all"
-          style={{ background: 'rgba(22,24,38,0.8)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', color: 'var(--text-muted)' }}
-          data-testid="landing-lang-btn">
-          <Globe size={13} />
-          <span className="uppercase text-[10px] font-bold">{lang}</span>
-        </button>
-        <AnimatePresence>
-          {showLang && (
-            <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
-              className="absolute right-0 mt-2 w-36 rounded-xl overflow-hidden"
-              style={{ background: 'rgba(22,24,38,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(24px)' }}>
-              {LANGUAGES.map(l => (
-                <button key={l.code} onClick={() => { setLanguage(l.code); setShowLang(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-all"
-                  style={{ color: lang === l.code ? '#fff' : 'var(--text-secondary)', background: lang === l.code ? 'rgba(192,132,252,0.1)' : 'transparent' }}
-                  data-testid={`landing-lang-${l.code}`}>
-                  <span className="text-[10px] font-bold uppercase w-5">{l.flag}</span>
-                  <span>{l.name}</span>
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Share Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <ShareButton />
       </div>
 
       {/* Aurora overlays */}
@@ -557,22 +530,22 @@ export default function Landing() {
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
               className="text-xs font-bold uppercase tracking-[0.3em] mb-6" style={{ color: 'var(--secondary)' }}>
               <Sparkles size={14} className="inline mr-2" style={{ color: 'var(--accent-gold)' }} />
-              {t.landing.tagline}
+              Ancient Wisdom, Modern Practice
             </motion.p>
             <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{t.landing.title1}</motion.span>
+              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>The Cosmic</motion.span>
               <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>{t.landing.title2}</motion.span>
+                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Collective</motion.span>
             </h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
               className="text-base md:text-lg leading-relaxed max-w-md mb-10" style={{ color: 'var(--text-secondary)' }}>
-              {t.landing.subtitle}
+              Your sanctuary for breathwork, meditation, divination, and spiritual growth — guided by ancient wisdom and modern technology.
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
               <button onClick={() => setShowQuickReset(true)} className="btn-glass glow-primary group" data-testid="quick-reset-btn">
                 <span className="relative z-10 flex items-center gap-2">
-                  {t.landing.quickReset}
+                  Quick Reset
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
@@ -581,14 +554,14 @@ export default function Landing() {
                 style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
                 data-testid="begin-journey-btn">
                 <span className="flex items-center gap-2" style={{ color: '#2DD4BF' }}>
-                  {user ? 'Continue Journey' : t.landing.beginJourney} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  {user ? 'Continue Journey' : 'Begin Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
               className="flex items-center gap-2 mt-8">
               <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
-              <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{t.landing.enableAmbient}</span>
+              <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for full experience</span>
             </motion.div>
           </motion.div>
 
@@ -636,7 +609,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12">
             <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
-              {t.landing.explorePath}
+              Explore Your Path
             </p>
             <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
               Six Pillars of <span className="animate-text-shimmer">Transformation</span>
@@ -655,10 +628,10 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-12">
             <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
-              <Quote size={12} className="inline mr-2" /> {t.landing.testimonials}
+              <Quote size={12} className="inline mr-2" /> What Our Community Says
             </p>
             <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              {t.landing.realResults}
+              Real Results from Real Practitioners
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

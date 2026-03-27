@@ -1,0 +1,51 @@
+import React, { useState } from 'react';
+import { Share2, Copy, Check } from 'lucide-react';
+import { toast } from 'sonner';
+
+export default function ShareButton() {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = window.location.origin;
+    const shareData = {
+      title: 'The Cosmic Collective',
+      text: 'Your sanctuary for breathwork, meditation, and spiritual growth. Join The Cosmic Collective.',
+      url,
+    };
+
+    // Use native share on mobile if available
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // User cancelled or not supported — fall through to copy
+      }
+    }
+
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success('Link copied!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
+  return (
+    <button onClick={handleShare}
+      className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs transition-all hover:scale-105"
+      style={{
+        background: 'rgba(22,24,38,0.8)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(12px)',
+        color: 'var(--text-muted)',
+      }}
+      data-testid="share-btn">
+      {copied ? <Check size={13} style={{ color: '#22C55E' }} /> : <Share2 size={13} />}
+      <span className="text-[10px] font-bold">{copied ? 'Copied!' : 'Share'}</span>
+    </button>
+  );
+}

@@ -14,6 +14,7 @@ import {
   CreditCard, Crown, Settings, Gem, Link2
 } from 'lucide-react';
 import SearchCommand from './SearchCommand';
+import ShareButton from './ShareButton';
 import NotificationSettings from './NotificationSettings';
 import { useCreditsContext } from '../context/CreditContext';
 
@@ -399,6 +400,9 @@ export default function Navigation() {
               &#8984;K
             </kbd>
           </button>
+
+          {/* Share */}
+          <ShareButton />
 
           {/* Ambient Toggle */}
           <button
