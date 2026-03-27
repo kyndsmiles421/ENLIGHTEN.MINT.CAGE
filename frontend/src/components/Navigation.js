@@ -11,7 +11,7 @@ import {
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp,
-  CreditCard, Crown
+  CreditCard, Crown, Settings
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
@@ -116,6 +116,7 @@ const PROFILE_ITEMS = [
   { path: '/meditation-history', label: 'Med. History', icon: Timer },
   { path: '/media-library', label: 'My Media', icon: Upload },
   { path: '/tutorial', label: 'Tutorial', icon: GraduationCap },
+  { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
 const ALL_PATHS = NAV_CATEGORIES.flatMap(c => c.items.map(i => i.path));

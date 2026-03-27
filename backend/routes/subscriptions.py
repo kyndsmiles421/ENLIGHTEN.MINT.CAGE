@@ -425,3 +425,66 @@ async def get_credit_history(user=Depends(get_current_user)):
         {"user_id": user["id"]}, {"_id": 0}
     ).sort("created_at", -1).limit(30).to_list(30)
     return {"history": logs}
+
+
+
+TIER_GATED_FEATURES = {
+    "sora_video": "premium",
+    "voice_session": "premium",
+    "dream_journal": "premium",
+    "cosmic_calendar": "premium",
+    "quantum_experiments": "premium",
+    "export_all": "premium",
+    "cosmic_blueprint": "plus",
+    "extended_oracle": "plus",
+    "guided_stargazing": "plus",
+    "custom_meditation": "plus",
+    "advanced_analytics": "plus",
+    "exclusive_stories": "plus",
+    "white_label": "super_user",
+    "api_access": "super_user",
+    "multi_profile": "super_user",
+    "private_trade_room": "super_user",
+    "custom_ai_personality": "super_user",
+}
+
+
+@router.get("/subscriptions/check-access/{feature}")
+async def check_feature_access(feature: str, user=Depends(get_current_user)):
+    """Check if user's tier grants access to a gated feature."""
+    credits = await get_user_credits(user["id"])
+    user_tier = credits.get("tier", "free")
+    user_level = tier_level(user_tier)
+
+    required_tier = TIER_GATED_FEATURES.get(feature)
+    if not required_tier:
+        return {"allowed": True, "feature": feature, "tier": user_tier}
+
+    required_level = tier_level(required_tier)
+    allowed = user_level >= required_level
+
+    return {
+        "allowed": allowed,
+        "feature": feature,
+        "tier": user_tier,
+        "required_tier": required_tier,
+        "required_tier_name": TIERS.get(required_tier, {}).get("name", ""),
+    }
+
+
+@router.get("/subscriptions/gated-features")
+async def get_gated_features(user=Depends(get_current_user)):
+    """Return all gated features and whether the user has access."""
+    credits = await get_user_credits(user["id"])
+    user_tier = credits.get("tier", "free")
+    user_level = tier_level(user_tier)
+
+    features = {}
+    for feat, required in TIER_GATED_FEATURES.items():
+        req_level = tier_level(required)
+        features[feat] = {
+            "allowed": user_level >= req_level,
+            "required_tier": required,
+            "required_tier_name": TIERS.get(required, {}).get("name", ""),
+        }
+    return {"tier": user_tier, "features": features}

@@ -2,12 +2,59 @@ import React, { createContext, useContext, useState, useRef, useCallback, useEff
 
 const SensoryContext = createContext(null);
 
+const THEMES = {
+  cosmic: { label: 'Dark Cosmic', bg: '#0B0C15', bgSecondary: '#161826', primary: '#C084FC', textPrimary: '#F8FAFC', textSecondary: '#CBD5E1', textMuted: '#64748B' },
+  midnight: { label: 'Deep Midnight', bg: '#070B14', bgSecondary: '#0F1525', primary: '#818CF8', textPrimary: '#E2E8F0', textSecondary: '#94A3B8', textMuted: '#475569' },
+  earth: { label: 'Warm Earth', bg: '#1A1410', bgSecondary: '#231C15', primary: '#D97706', textPrimary: '#FEF3C7', textSecondary: '#D6C9A8', textMuted: '#78716C' },
+  forest: { label: 'Sacred Forest', bg: '#0A1410', bgSecondary: '#12201A', primary: '#22C55E', textPrimary: '#ECFDF5', textSecondary: '#A7F3D0', textMuted: '#4B7A5C' },
+};
+
+const DEFAULT_PREFS = {
+  theme: 'cosmic',
+  reduceMotion: false,
+  reduceParticles: false,
+  reduceFlashing: false,
+  soundEffects: true,
+  ambientVolume: 15,
+};
+
+function loadPrefs() {
+  try {
+    const stored = localStorage.getItem('cosmic_prefs');
+    return stored ? { ...DEFAULT_PREFS, ...JSON.parse(stored) } : DEFAULT_PREFS;
+  } catch { return DEFAULT_PREFS; }
+}
+
 export function SensoryProvider({ children }) {
+  const [prefs, setPrefs] = useState(loadPrefs);
   const [ambientOn, setAmbientOn] = useState(false);
-  const [volume, setVolume] = useState(0.15);
+  const volume = prefs.ambientVolume / 100;
   const audioCtxRef = useRef(null);
   const gainRef = useRef(null);
   const nodesRef = useRef([]);
+
+  // Persist prefs
+  useEffect(() => {
+    localStorage.setItem('cosmic_prefs', JSON.stringify(prefs));
+    // Apply theme CSS variables
+    const t = THEMES[prefs.theme] || THEMES.cosmic;
+    const root = document.documentElement;
+    root.style.setProperty('--bg-primary', t.bg);
+    root.style.setProperty('--bg-secondary', t.bgSecondary);
+    root.style.setProperty('--primary', t.primary);
+    root.style.setProperty('--text-primary', t.textPrimary);
+    root.style.setProperty('--text-secondary', t.textSecondary);
+    root.style.setProperty('--text-muted', t.textMuted);
+    document.body.style.background = t.bg;
+  }, [prefs]);
+
+  const updatePref = useCallback((key, value) => {
+    setPrefs(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const setVolume = useCallback((v) => {
+    setPrefs(prev => ({ ...prev, ambientVolume: Math.round(v * 100) }));
+  }, []);
 
   const getAudioCtx = useCallback(() => {
     if (!audioCtxRef.current) {
@@ -96,6 +143,7 @@ export function SensoryProvider({ children }) {
   }, []);
 
   const playClick = useCallback(() => {
+    if (!prefs.soundEffects) return;
     try {
       const ctx = getAudioCtx();
       const osc = ctx.createOscillator();
@@ -112,6 +160,7 @@ export function SensoryProvider({ children }) {
   }, [getAudioCtx]);
 
   const playChime = useCallback(() => {
+    if (!prefs.soundEffects) return;
     try {
       const ctx = getAudioCtx();
       const freqs = [523.25, 659.25, 783.99];
@@ -133,6 +182,7 @@ export function SensoryProvider({ children }) {
   }, [getAudioCtx]);
 
   const playCelebration = useCallback(() => {
+    if (!prefs.soundEffects) return;
     try {
       const ctx = getAudioCtx();
       // Rising arpeggio chime
@@ -188,7 +238,10 @@ export function SensoryProvider({ children }) {
   }, []);
 
   return (
-    <SensoryContext.Provider value={{ ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration }}>
+    <SensoryContext.Provider value={{
+      ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
+      prefs, updatePref, themes: THEMES,
+    }}>
       {children}
     </SensoryContext.Provider>
   );

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react';
+import { useSensory } from '../context/SensoryContext';
 
 export default function CosmicBackground() {
   const canvasRef = useRef(null);
@@ -6,35 +7,38 @@ export default function CosmicBackground() {
   const starsRef = useRef([]);
   const shootingRef = useRef([]);
   const nebulaRef = useRef([]);
+  const { prefs } = useSensory();
 
   const init = useCallback((canvas) => {
     const w = canvas.width = window.innerWidth;
     const h = canvas.height = window.innerHeight;
 
-    // Stars
-    starsRef.current = Array.from({ length: 200 }, () => ({
+    const starCount = prefs.reduceParticles ? 40 : 200;
+
+    starsRef.current = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       r: Math.random() * 1.5 + 0.3,
       baseAlpha: Math.random() * 0.7 + 0.2,
-      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinkleSpeed: prefs.reduceFlashing ? 0.002 : Math.random() * 0.02 + 0.005,
       twinkleOffset: Math.random() * Math.PI * 2,
       color: ['#fff', '#D8B4FE', '#2DD4BF', '#FCD34D', '#FDA4AF'][Math.floor(Math.random() * 5)],
     }));
 
-    // Nebula blobs
-    nebulaRef.current = Array.from({ length: 5 }, () => ({
+    const nebulaCount = prefs.reduceParticles ? 1 : 5;
+    nebulaRef.current = Array.from({ length: nebulaCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       r: Math.random() * 300 + 150,
       color: ['rgba(192,132,252,', 'rgba(45,212,191,', 'rgba(139,92,246,', 'rgba(253,164,175,', 'rgba(252,211,77,'][Math.floor(Math.random() * 5)],
-      drift: { x: (Math.random() - 0.5) * 0.15, y: (Math.random() - 0.5) * 0.1 },
-      pulseSpeed: Math.random() * 0.003 + 0.001,
+      drift: { x: (Math.random() - 0.5) * (prefs.reduceMotion ? 0.02 : 0.15), y: (Math.random() - 0.5) * (prefs.reduceMotion ? 0.01 : 0.1) },
+      pulseSpeed: prefs.reduceFlashing ? 0.0005 : Math.random() * 0.003 + 0.001,
       pulseOffset: Math.random() * Math.PI * 2,
     }));
-  }, []);
+  }, [prefs.reduceParticles, prefs.reduceFlashing, prefs.reduceMotion]);
 
   const spawnShootingStar = useCallback((w, h) => {
+    if (prefs.reduceFlashing || prefs.reduceMotion) return;
     if (shootingRef.current.length < 2 && Math.random() < 0.003) {
       const startX = Math.random() * w;
       shootingRef.current.push({
@@ -46,7 +50,7 @@ export default function CosmicBackground() {
         len: Math.random() * 60 + 40,
       });
     }
-  }, []);
+  }, [prefs.reduceFlashing, prefs.reduceMotion]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -145,7 +149,7 @@ export default function CosmicBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0, opacity: 0.7 }}
+      style={{ zIndex: 0, opacity: prefs.reduceParticles ? 0.3 : 0.7 }}
       data-testid="cosmic-background"
     />
   );

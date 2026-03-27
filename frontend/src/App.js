@@ -82,6 +82,7 @@ const CosmicProfile = lazy(() => import('./pages/CosmicProfile'));
 const Tutorial = lazy(() => import('./pages/Tutorial'));
 const CreationStories = lazy(() => import('./pages/CreationStories'));
 const Pricing = lazy(() => import('./pages/Pricing'));
+const Settings = lazy(() => import('./pages/Settings'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -176,6 +177,7 @@ function AnimatedRoutes() {
             <Route path="/tutorial" element={<Tutorial />} />
             <Route path="/creation-stories" element={<CreationStories />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

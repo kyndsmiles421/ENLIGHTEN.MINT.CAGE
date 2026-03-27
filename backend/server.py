@@ -180,11 +180,38 @@ async def push_scheduler_loop():
             await asyncio.sleep(60)
 
 
+async def credit_refresh_loop():
+    """Background loop: refresh credits monthly for free/starter/plus tiers."""
+    from routes.subscriptions import TIERS
+    while True:
+        try:
+            await asyncio.sleep(3600)  # Check every hour
+            now = datetime.now(timezone.utc)
+            # Only run on the 1st of each month between 00:00-01:00 UTC
+            if now.day == 1 and now.hour == 0:
+                tiers_to_refresh = {k: v for k, v in TIERS.items() if v["credits_per_month"] > 0}
+                for tier_id, tier_info in tiers_to_refresh.items():
+                    result = await db.user_credits.update_many(
+                        {"tier": tier_id},
+                        {"$set": {
+                            "balance": tier_info["credits_per_month"],
+                            "credits_refreshed_at": now.isoformat(),
+                        }}
+                    )
+                    if result.modified_count > 0:
+                        logger.info(f"Credit refresh: {tier_id} - {result.modified_count} users reset to {tier_info['credits_per_month']}")
+        except Exception as e:
+            logger.error(f"Credit refresh error: {e}")
+            await asyncio.sleep(300)
+
+
 @app.on_event("startup")
 async def startup_tasks():
     await reset_plant_watering()
     asyncio.create_task(push_scheduler_loop())
+    asyncio.create_task(credit_refresh_loop())
     logger.info("Push scheduler loop started")
+    logger.info("Credit refresh loop started")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
