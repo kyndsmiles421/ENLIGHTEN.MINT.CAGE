@@ -134,7 +134,7 @@ export default function Settings() {
             <div className="grid grid-cols-2 gap-2" data-testid="theme-picker">
               {Object.entries(themes).map(([id, t]) => {
                 const active = prefs.theme === id;
-                const icons = { cosmic: Moon, midnight: Moon, earth: Sun, forest: TreePine };
+                const icons = { cosmic: Moon, midnight: Moon, earth: Sun, forest: TreePine, light: Sun };
                 const ThemeIcon = icons[id] || Moon;
                 return (
                   <button key={id}

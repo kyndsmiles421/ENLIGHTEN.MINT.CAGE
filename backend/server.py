@@ -57,6 +57,8 @@ from routes.notifications import router as notifications_router
 from routes.achievements import router as achievements_router
 from routes.trade_circle import router as trade_circle_router
 from routes.subscriptions import router as subscriptions_router
+from routes.crystals import router as crystals_router
+from routes.entanglement import router as entanglement_router
 
 app = FastAPI()
 
@@ -81,6 +83,8 @@ all_routers = [
     achievements_router,
     trade_circle_router,
     subscriptions_router,
+    crystals_router,
+    entanglement_router,
 ]
 
 for r in all_routers:

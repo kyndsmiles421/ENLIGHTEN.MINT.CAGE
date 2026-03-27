@@ -7,6 +7,7 @@ const THEMES = {
   midnight: { label: 'Deep Midnight', bg: '#070B14', bgSecondary: '#0F1525', primary: '#818CF8', textPrimary: '#E2E8F0', textSecondary: '#94A3B8', textMuted: '#475569' },
   earth: { label: 'Warm Earth', bg: '#1A1410', bgSecondary: '#231C15', primary: '#D97706', textPrimary: '#FEF3C7', textSecondary: '#D6C9A8', textMuted: '#78716C' },
   forest: { label: 'Sacred Forest', bg: '#0A1410', bgSecondary: '#12201A', primary: '#22C55E', textPrimary: '#ECFDF5', textSecondary: '#A7F3D0', textMuted: '#4B7A5C' },
+  light: { label: 'Light Celestial', bg: '#F8F6F3', bgSecondary: '#FFFFFF', primary: '#7C3AED', textPrimary: '#1E1B2E', textSecondary: '#4A4458', textMuted: '#8E8A9A' },
 };
 
 const DEFAULT_PREFS = {
@@ -46,6 +47,7 @@ export function SensoryProvider({ children }) {
     root.style.setProperty('--text-secondary', t.textSecondary);
     root.style.setProperty('--text-muted', t.textMuted);
     document.body.style.background = t.bg;
+    document.body.setAttribute('data-theme', prefs.theme === 'light' ? 'light' : 'dark');
   }, [prefs]);
 
   const updatePref = useCallback((key, value) => {

@@ -11,7 +11,7 @@ import {
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp,
-  CreditCard, Crown, Settings
+  CreditCard, Crown, Settings, Gem, Link2
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
@@ -98,6 +98,8 @@ const NAV_CATEGORIES = [
       { path: '/classes', label: 'Classes', icon: GraduationCap },
       { path: '/community', label: 'Community', icon: Users },
       { path: '/trade-circle', label: 'Trade Circle', icon: HeartHandshake },
+      { path: '/crystals', label: 'Crystals & Stones', icon: Gem },
+      { path: '/entanglement', label: 'Entanglement', icon: Link2 },
       { path: '/friends', label: 'Friends', icon: Users },
       { path: '/challenges', label: 'Challenges', icon: Flame },
       { path: '/create', label: 'Create', icon: PenTool },
