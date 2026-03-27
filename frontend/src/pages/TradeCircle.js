@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Plus, Package, Wrench, Search, X, Send,
   Check, XCircle, RefreshCw, Filter, ChevronRight, User,
-  ArrowRightLeft, Sparkles, Clock, Tag
+  ArrowRightLeft, Sparkles, Clock, Tag, Star, Award, Trophy, MessageCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -191,6 +191,173 @@ function OfferModal({ listing, onClose, authHeaders, onOffered }) {
             </button>
           </div>
         </form>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function KarmaBadge({ points, tier, size = 'sm' }) {
+  if (!tier) return null;
+  const s = size === 'sm' ? 'text-[8px] px-1.5 py-0.5' : 'text-[10px] px-2 py-1';
+  return (
+    <span className={`${s} rounded-full inline-flex items-center gap-1`}
+      style={{ background: `${tier.color}12`, color: tier.color, border: `1px solid ${tier.color}25` }}
+      data-testid="karma-badge">
+      <Award size={size === 'sm' ? 8 : 10} /> {tier.name} ({points})
+    </span>
+  );
+}
+
+function ReviewModal({ offer, onClose, authHeaders, onReviewed }) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (rating < 1) { toast.error('Please select a rating'); return; }
+    setSubmitting(true);
+    try {
+      await axios.post(`${API}/trade-circle/reviews`, {
+        offer_id: offer.id, rating, comment,
+      }, { headers: authHeaders });
+      toast.success('Review submitted! +3 karma');
+      onReviewed();
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to submit review');
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+      onClick={onClose}>
+      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }}
+        className="w-full max-w-sm rounded-xl overflow-hidden"
+        style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(248,250,252,0.06)' }}
+        onClick={e => e.stopPropagation()}
+        data-testid="review-modal">
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+          <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Leave a Review</h3>
+          <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>
+            Trade: <span style={{ color: '#C084FC' }}>{offer.listing_title}</span>
+          </p>
+        </div>
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <div>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'var(--text-muted)' }}>Rating</label>
+            <div className="flex gap-2 justify-center" data-testid="review-stars">
+              {[1,2,3,4,5].map(s => (
+                <button key={s} type="button" onClick={() => setRating(s)}
+                  className="p-1 transition-transform hover:scale-110"
+                  data-testid={`review-star-${s}`}>
+                  <Star size={24} fill={s <= rating ? '#EAB308' : 'none'}
+                    style={{ color: s <= rating ? '#EAB308' : 'rgba(248,250,252,0.15)' }} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-1.5 block" style={{ color: 'var(--text-muted)' }}>Comment (optional)</label>
+            <textarea value={comment} onChange={e => setComment(e.target.value)}
+              placeholder="How was the trade experience?"
+              rows={2}
+              className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+              style={{ background: 'rgba(248,250,252,0.03)', color: 'var(--text-primary)', border: '1px solid rgba(248,250,252,0.08)' }}
+              data-testid="review-comment-input" />
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose}
+              className="flex-1 py-2 rounded-lg text-sm transition-all"
+              style={{ color: 'var(--text-muted)', border: '1px solid rgba(248,250,252,0.06)' }}>Cancel</button>
+            <button type="submit" disabled={submitting || rating < 1}
+              className="flex-1 py-2 rounded-lg text-sm font-medium transition-all"
+              style={{ background: 'rgba(234,179,8,0.12)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.2)' }}
+              data-testid="review-submit-btn">
+              {submitting ? 'Submitting...' : 'Submit Review'}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function KarmaProfileModal({ userId, onClose, authHeaders }) {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API}/trade-circle/karma/${userId}`, { headers: authHeaders })
+      .then(r => { setProfile(r.data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [userId, authHeaders]);
+
+  if (loading) return null;
+  if (!profile) return null;
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+      onClick={onClose}>
+      <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }}
+        className="w-full max-w-sm max-h-[70vh] overflow-y-auto rounded-xl"
+        style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(248,250,252,0.06)' }}
+        onClick={e => e.stopPropagation()}
+        data-testid="karma-profile-modal">
+        <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+          <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Trade Karma</h3>
+          <button onClick={onClose} className="p-1 rounded hover:bg-white/5"><X size={14} style={{ color: 'var(--text-muted)' }} /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="text-center">
+            <div className="w-14 h-14 rounded-full mx-auto mb-2 flex items-center justify-center"
+              style={{ background: `${profile.tier.color}15`, border: `2px solid ${profile.tier.color}40` }}>
+              <Award size={24} style={{ color: profile.tier.color }} />
+            </div>
+            <p className="text-lg font-light" style={{ color: profile.tier.color, fontFamily: 'Cormorant Garamond, serif' }}>{profile.tier.name}</p>
+            <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{profile.points}</p>
+            <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Karma Points</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg p-2" style={{ background: 'rgba(248,250,252,0.02)' }}>
+              <p className="text-sm font-medium" style={{ color: '#2DD4BF' }}>{profile.completed_trades}</p>
+              <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>Trades</p>
+            </div>
+            <div className="rounded-lg p-2" style={{ background: 'rgba(248,250,252,0.02)' }}>
+              <p className="text-sm font-medium" style={{ color: '#EAB308' }}>{profile.avg_rating || '—'}</p>
+              <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>Rating</p>
+            </div>
+            <div className="rounded-lg p-2" style={{ background: 'rgba(248,250,252,0.02)' }}>
+              <p className="text-sm font-medium" style={{ color: '#C084FC' }}>{profile.review_count}</p>
+              <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>Reviews</p>
+            </div>
+          </div>
+
+          {profile.reviews?.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-widest font-bold mb-2" style={{ color: 'var(--text-muted)' }}>Recent Reviews</p>
+              <div className="space-y-2">
+                {profile.reviews.slice(0, 5).map(r => (
+                  <div key={r.id} className="rounded-lg p-2.5" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{r.reviewer_name}</span>
+                      <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#EAB308' }}>
+                        {Array.from({ length: r.rating }, (_, i) => <Star key={i} size={8} fill="#EAB308" />)}
+                      </span>
+                    </div>
+                    {r.comment && <p className="text-[10px] italic" style={{ color: 'var(--text-muted)' }}>"{r.comment}"</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -415,6 +582,9 @@ export default function TradeCircle() {
   const [showCreate, setShowCreate] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [myOffers, setMyOffers] = useState({ sent: [], received: [] });
+  const [showReview, setShowReview] = useState(null);
+  const [showKarmaProfile, setShowKarmaProfile] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
 
   const fetchListings = useCallback(async () => {
     setLoading(true);
@@ -439,8 +609,16 @@ export default function TradeCircle() {
     } catch {}
   }, [authHeaders]);
 
+  const fetchLeaderboard = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/trade-circle/karma-leaderboard`, { headers: authHeaders });
+      setLeaderboard(res.data.leaderboard || []);
+    } catch {}
+  }, [authHeaders]);
+
   useEffect(() => { fetchListings(); }, [fetchListings]);
   useEffect(() => { if (tab === 'offers') fetchMyOffers(); }, [tab, fetchMyOffers]);
+  useEffect(() => { if (tab === 'karma') fetchLeaderboard(); }, [tab, fetchLeaderboard]);
 
   return (
     <div className="min-h-screen pt-20 pb-24 px-4" style={{ background: 'var(--bg-primary)' }} data-testid="trade-circle-page">
@@ -467,16 +645,20 @@ export default function TradeCircle() {
 
         {/* Stats */}
         {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
             {[
               { label: 'Active Listings', value: stats.total_active, color: '#2DD4BF' },
               { label: 'Trades Completed', value: stats.total_traded, color: '#22C55E' },
               { label: 'My Listings', value: stats.my_listings, color: '#C084FC' },
               { label: 'Pending Offers', value: stats.pending_offers, color: '#FB923C' },
+              { label: 'Trade Karma', value: stats.karma || 0, color: stats.karma_tier?.color || '#94A3B8', sub: stats.karma_tier?.name },
             ].map(s => (
-              <div key={s.label} className="glass-card p-3 text-center">
+              <div key={s.label} className="glass-card p-3 text-center cursor-pointer hover:scale-[1.02] transition-transform"
+                onClick={s.label === 'Trade Karma' ? () => setShowKarmaProfile(user?.id) : undefined}
+                data-testid={`stat-${s.label.toLowerCase().replace(/\s/g, '-')}`}>
                 <p className="text-xl font-light" style={{ color: s.color, fontFamily: 'Cormorant Garamond, serif' }}>{s.value}</p>
                 <p className="text-[8px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+                {s.sub && <p className="text-[7px] mt-0.5" style={{ color: s.color }}>{s.sub}</p>}
               </div>
             ))}
           </div>
@@ -488,6 +670,7 @@ export default function TradeCircle() {
             { id: 'browse', label: 'Browse' },
             { id: 'my', label: 'My Listings' },
             { id: 'offers', label: 'My Offers' },
+            { id: 'karma', label: 'Karma Board' },
           ].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className="flex-1 py-2 rounded-lg text-xs transition-all"
@@ -606,6 +789,14 @@ export default function TradeCircle() {
                               }}>{o.status}</span>
                           </div>
                           <p className="text-[11px]" style={{ color: '#2DD4BF' }}>Offers: {o.offer_items}</p>
+                          {o.status === 'accepted' && (
+                            <button onClick={() => setShowReview(o)}
+                              className="mt-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-all hover:scale-105"
+                              style={{ background: 'rgba(234,179,8,0.08)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.15)' }}
+                              data-testid={`review-btn-${o.id}`}>
+                              <Star size={10} /> Leave Review
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -630,10 +821,95 @@ export default function TradeCircle() {
                               }}>{o.status}</span>
                           </div>
                           <p className="text-[11px]" style={{ color: '#2DD4BF' }}>Your offer: {o.offer_items}</p>
+                          {o.status === 'accepted' && (
+                            <button onClick={() => setShowReview(o)}
+                              className="mt-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-all hover:scale-105"
+                              style={{ background: 'rgba(234,179,8,0.08)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.15)' }}
+                              data-testid={`review-btn-sent-${o.id}`}>
+                              <Star size={10} /> Leave Review
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
                   )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Karma Board Tab */}
+            {tab === 'karma' && (
+              <motion.div key="karma" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="text-center mb-6">
+                  <Trophy size={24} className="mx-auto mb-2" style={{ color: '#EAB308' }} />
+                  <h2 className="text-lg font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>Karma Leaderboard</h2>
+                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Top traders in the collective</p>
+                </div>
+                {leaderboard.length === 0 ? (
+                  <p className="text-xs text-center py-8" style={{ color: 'var(--text-muted)' }}>No karma earned yet. Complete trades to earn points!</p>
+                ) : (
+                  <div className="space-y-2" data-testid="karma-leaderboard">
+                    {leaderboard.map((entry, idx) => (
+                      <div key={entry.user_id}
+                        className="glass-card p-3 flex items-center gap-3 cursor-pointer hover:scale-[1.01] transition-transform"
+                        onClick={() => setShowKarmaProfile(entry.user_id)}
+                        data-testid={`leaderboard-entry-${idx}`}>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                          style={{
+                            background: idx === 0 ? 'rgba(234,179,8,0.12)' : idx === 1 ? 'rgba(148,163,184,0.12)' : idx === 2 ? 'rgba(180,83,9,0.12)' : 'rgba(248,250,252,0.04)',
+                            color: idx === 0 ? '#EAB308' : idx === 1 ? '#94A3B8' : idx === 2 ? '#B45309' : 'var(--text-muted)',
+                            border: `1px solid ${idx === 0 ? 'rgba(234,179,8,0.25)' : idx === 1 ? 'rgba(148,163,184,0.2)' : idx === 2 ? 'rgba(180,83,9,0.2)' : 'rgba(248,250,252,0.06)'}`,
+                          }}>
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{entry.name}</p>
+                          <KarmaBadge points={entry.points} tier={entry.tier} />
+                        </div>
+                        <p className="text-lg font-light" style={{ color: entry.tier.color, fontFamily: 'Cormorant Garamond, serif' }}>{entry.points}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Karma Tier Guide */}
+                <div className="mt-8">
+                  <p className="text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: 'var(--text-muted)' }}>Karma Tiers</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      { name: 'Seedling', min: 0, color: '#94A3B8' },
+                      { name: 'Sprout', min: 10, color: '#22C55E' },
+                      { name: 'Bloom', min: 30, color: '#2DD4BF' },
+                      { name: 'Guardian', min: 60, color: '#818CF8' },
+                      { name: 'Elder', min: 100, color: '#C084FC' },
+                      { name: 'Luminary', min: 200, color: '#EAB308' },
+                    ].map(t => (
+                      <div key={t.name} className="rounded-lg p-2 text-center"
+                        style={{ background: `${t.color}06`, border: `1px solid ${t.color}15` }}>
+                        <Award size={14} className="mx-auto mb-1" style={{ color: t.color }} />
+                        <p className="text-[10px] font-medium" style={{ color: t.color }}>{t.name}</p>
+                        <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{t.min}+ pts</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* How to earn */}
+                <div className="mt-6 rounded-lg p-4" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+                  <p className="text-[10px] uppercase tracking-widest font-bold mb-2" style={{ color: 'var(--text-muted)' }}>How to Earn Karma</p>
+                  <div className="space-y-1.5">
+                    {[
+                      { action: 'Complete a trade', pts: '+10', color: '#22C55E' },
+                      { action: 'Leave a review', pts: '+3', color: '#EAB308' },
+                      { action: 'Create a listing', pts: '+1', color: '#C084FC' },
+                      { action: 'Make an offer', pts: '+1', color: '#2DD4BF' },
+                    ].map(a => (
+                      <div key={a.action} className="flex items-center justify-between text-[10px]">
+                        <span style={{ color: 'var(--text-secondary)' }}>{a.action}</span>
+                        <span className="font-medium" style={{ color: a.color }}>{a.pts}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -645,6 +921,8 @@ export default function TradeCircle() {
       <AnimatePresence>
         {showCreate && <CreateListingModal onClose={() => setShowCreate(false)} onCreated={() => fetchListings()} authHeaders={authHeaders} />}
         {selectedListing && <ListingDetail listing={selectedListing} onClose={() => setSelectedListing(null)} authHeaders={authHeaders} userId={user?.id} onRefresh={fetchListings} />}
+        {showReview && <ReviewModal offer={showReview} onClose={() => setShowReview(null)} authHeaders={authHeaders} onReviewed={() => { fetchMyOffers(); fetchListings(); }} />}
+        {showKarmaProfile && <KarmaProfileModal userId={showKarmaProfile} onClose={() => setShowKarmaProfile(null)} authHeaders={authHeaders} />}
       </AnimatePresence>
     </div>
   );

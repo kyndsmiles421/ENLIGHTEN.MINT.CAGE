@@ -5,6 +5,52 @@ import uuid
 
 router = APIRouter()
 
+KARMA_AWARDS = {
+    "trade_completed": 10,
+    "review_given": 3,
+    "listing_created": 1,
+    "offer_made": 1,
+}
+KARMA_TIERS = [
+    {"min": 0, "name": "Seedling", "color": "#94A3B8"},
+    {"min": 10, "name": "Sprout", "color": "#22C55E"},
+    {"min": 30, "name": "Bloom", "color": "#2DD4BF"},
+    {"min": 60, "name": "Guardian", "color": "#818CF8"},
+    {"min": 100, "name": "Elder", "color": "#C084FC"},
+    {"min": 200, "name": "Luminary", "color": "#EAB308"},
+]
+
+
+def get_karma_tier(points: int):
+    tier = KARMA_TIERS[0]
+    for t in KARMA_TIERS:
+        if points >= t["min"]:
+            tier = t
+    return tier
+
+
+async def award_karma(user_id: str, action: str, related_id: str = ""):
+    pts = KARMA_AWARDS.get(action, 0)
+    if pts == 0:
+        return
+    await db.trade_karma.update_one(
+        {"user_id": user_id},
+        {
+            "$inc": {"points": pts, f"breakdown.{action}": pts},
+            "$setOnInsert": {"user_id": user_id, "created_at": datetime.now(timezone.utc).isoformat()},
+            "$set": {"updated_at": datetime.now(timezone.utc).isoformat()},
+        },
+        upsert=True,
+    )
+    await db.karma_log.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "action": action,
+        "points": pts,
+        "related_id": related_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
 
 @router.post("/trade-circle/listings")
 async def create_listing(data: dict = Body(...), user=Depends(get_current_user)):
@@ -39,6 +85,7 @@ async def create_listing(data: dict = Body(...), user=Depends(get_current_user))
 
     await db.trade_listings.insert_one(listing)
     await create_activity(user["id"], "trade_listing", f"Listed: {title}")
+    await award_karma(user["id"], "listing_created", listing["id"])
     listing.pop("_id", None)
     return listing
 
@@ -158,6 +205,7 @@ async def make_offer(data: dict = Body(...), user=Depends(get_current_user)):
     await db.trade_offers.insert_one(offer)
     await db.trade_listings.update_one({"id": listing_id}, {"$inc": {"offer_count": 1}})
     await create_activity(user["id"], "trade_offer", f"Offered on: {listing['title']}")
+    await award_karma(user["id"], "offer_made", offer["id"])
     offer.pop("_id", None)
     return offer
 
@@ -204,18 +252,28 @@ async def respond_to_offer(offer_id: str, data: dict = Body(...), user=Depends(g
             {"$set": {"status": "declined", "responded_at": datetime.now(timezone.utc).isoformat()}}
         )
         await create_activity(user["id"], "trade_complete", f"Trade completed: {offer['listing_title']}")
+        # Award karma to both parties
+        await award_karma(user["id"], "trade_completed", offer_id)
+        await award_karma(offer["offerer_id"], "trade_completed", offer_id)
 
     return {"status": new_status, "offer_id": offer_id}
 
 
 @router.get("/trade-circle/stats")
 async def get_trade_stats(user=Depends(get_current_user)):
-    """Get trade circle stats."""
+    """Get trade circle stats including karma."""
     total_active = await db.trade_listings.count_documents({"status": "active"})
     total_traded = await db.trade_listings.count_documents({"status": "traded"})
     my_listings = await db.trade_listings.count_documents({"user_id": user["id"]})
     my_trades = await db.trade_listings.count_documents({"user_id": user["id"], "status": "traded"})
     pending_offers = await db.trade_offers.count_documents({"lister_id": user["id"], "status": "pending"})
+
+    karma = await db.trade_karma.find_one({"user_id": user["id"]}, {"_id": 0})
+    karma_points = karma["points"] if karma else 0
+    tier = get_karma_tier(karma_points)
+
+    reviews = await db.trade_reviews.find({"reviewee_id": user["id"]}, {"_id": 0}).to_list(100)
+    avg_rating = round(sum(r["rating"] for r in reviews) / len(reviews), 1) if reviews else 0
 
     return {
         "total_active": total_active,
@@ -223,4 +281,114 @@ async def get_trade_stats(user=Depends(get_current_user)):
         "my_listings": my_listings,
         "my_trades": my_trades,
         "pending_offers": pending_offers,
+        "karma": karma_points,
+        "karma_tier": tier,
+        "review_count": len(reviews),
+        "avg_rating": avg_rating,
     }
+
+
+@router.get("/trade-circle/karma/{user_id}")
+async def get_user_karma(user_id: str, user=Depends(get_current_user)):
+    """Get a user's public karma profile."""
+    karma = await db.trade_karma.find_one({"user_id": user_id}, {"_id": 0})
+    points = karma["points"] if karma else 0
+    tier = get_karma_tier(points)
+
+    reviews = await db.trade_reviews.find(
+        {"reviewee_id": user_id}, {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+    avg_rating = round(sum(r["rating"] for r in reviews) / len(reviews), 1) if reviews else 0
+
+    completed_trades = await db.trade_listings.count_documents({
+        "$or": [{"user_id": user_id, "status": "traded"}]
+    })
+    offers_accepted = await db.trade_offers.count_documents({
+        "offerer_id": user_id, "status": "accepted"
+    })
+
+    return {
+        "user_id": user_id,
+        "points": points,
+        "tier": tier,
+        "reviews": reviews,
+        "avg_rating": avg_rating,
+        "review_count": len(reviews),
+        "completed_trades": completed_trades + offers_accepted,
+    }
+
+
+@router.post("/trade-circle/reviews")
+async def leave_review(data: dict = Body(...), user=Depends(get_current_user)):
+    """Leave a review for a trade partner after a completed trade."""
+    offer_id = data.get("offer_id", "").strip()
+    rating = data.get("rating", 0)
+    comment = data.get("comment", "").strip()
+
+    if not offer_id:
+        raise HTTPException(status_code=400, detail="Offer ID required")
+    if not isinstance(rating, (int, float)) or rating < 1 or rating > 5:
+        raise HTTPException(status_code=400, detail="Rating must be 1-5")
+
+    offer = await db.trade_offers.find_one({"id": offer_id, "status": "accepted"}, {"_id": 0})
+    if not offer:
+        raise HTTPException(status_code=404, detail="Accepted offer not found")
+
+    # Determine who is reviewing whom
+    if user["id"] == offer["lister_id"]:
+        reviewee_id = offer["offerer_id"]
+        reviewee_name = offer["offerer_name"]
+    elif user["id"] == offer["offerer_id"]:
+        reviewee_id = offer["lister_id"]
+        # Look up lister name
+        listing = await db.trade_listings.find_one({"id": offer["listing_id"]}, {"_id": 0})
+        reviewee_name = listing["user_name"] if listing else "Unknown"
+    else:
+        raise HTTPException(status_code=403, detail="You are not part of this trade")
+
+    existing = await db.trade_reviews.find_one({
+        "offer_id": offer_id, "reviewer_id": user["id"]
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="You already reviewed this trade")
+
+    review = {
+        "id": str(uuid.uuid4()),
+        "offer_id": offer_id,
+        "listing_id": offer["listing_id"],
+        "reviewer_id": user["id"],
+        "reviewer_name": user.get("name", "Anonymous"),
+        "reviewee_id": reviewee_id,
+        "reviewee_name": reviewee_name,
+        "rating": int(rating),
+        "comment": comment[:300],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.trade_reviews.insert_one(review)
+    await award_karma(user["id"], "review_given", offer_id)
+    review.pop("_id", None)
+    return review
+
+
+@router.get("/trade-circle/karma-leaderboard")
+async def karma_leaderboard(user=Depends(get_current_user)):
+    """Top 10 karma holders in the Trade Circle."""
+    top = await db.trade_karma.find(
+        {}, {"_id": 0}
+    ).sort("points", -1).limit(10).to_list(10)
+
+    results = []
+    for k in top:
+        tier = get_karma_tier(k["points"])
+        # Get user name
+        u = await db.users.find_one({"id": k["user_id"]}, {"_id": 0, "name": 1})
+        results.append({
+            "user_id": k["user_id"],
+            "name": u.get("name", "Anonymous") if u else "Anonymous",
+            "points": k["points"],
+            "tier": tier,
+        })
+
+    return {"leaderboard": results}
+
