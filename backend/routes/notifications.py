@@ -63,6 +63,8 @@ async def notification_status(user=Depends(get_current_user)):
             "daily_relaxation": True,
             "cosmic_insights": True,
             "practice_reminders": True,
+            "reminder_hour": 8,
+            "evening_hour": 20,
         },
     }
 
@@ -74,6 +76,8 @@ async def update_preferences(data: dict = Body(...), user=Depends(get_current_us
         "daily_relaxation": data.get("daily_relaxation", True),
         "cosmic_insights": data.get("cosmic_insights", True),
         "practice_reminders": data.get("practice_reminders", True),
+        "reminder_hour": data.get("reminder_hour", 8),
+        "evening_hour": data.get("evening_hour", 20),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.notification_prefs.update_one(
@@ -134,3 +138,103 @@ async def send_test_notification(user=Depends(get_current_user)):
         "test",
     )
     return {"sent": sent}
+
+
+
+QUANTUM_REMINDERS = {
+    "morning": [
+        ("Superposition Activated", "Infinite possibilities await you today. Collapse the wave function with your first breath.", "/breathing"),
+        ("Quantum Coherence Check", "Your biofield is calibrating. A 5-minute meditation will bring all particles into alignment.", "/meditation"),
+        ("Observer Effect: Active", "Your awareness shapes today's reality. Where will you place your cosmic gaze?", "/daily-briefing"),
+        ("Entanglement Pulse", "You are connected to everyone you love — across any distance. Send them light.", "/coach"),
+        ("Zero-Point Stillness", "Even in the void, energy hums. Start your day from the field of infinite potential.", "/meditation"),
+    ],
+    "evening": [
+        ("Wave Function Settling", "The day's probabilities have collapsed into experience. Time to return to wave-state.", "/breathing"),
+        ("Quantum Tunneling Complete", "Whatever barriers you faced today, your spirit passed through them. Rest now.", "/meditation"),
+        ("Decoherence Release", "Let scattered energies re-harmonize. Your quantum field is resetting.", "/soundscapes"),
+        ("Entanglement Gratitude", "Every connection today rippled across the quantum web. Feel the web hum with thanks.", "/journal"),
+        ("Superposition Restoration", "Sleep returns you to superposition — holding all possibilities for tomorrow.", "/meditation"),
+    ],
+}
+
+
+@router.get("/notifications/quantum-coherence")
+async def get_quantum_coherence(user=Depends(get_current_user)):
+    """Calculate quantum coherence score based on practice consistency."""
+    now = datetime.now(timezone.utc)
+    week_ago = (now - __import__('datetime').timedelta(days=7)).isoformat()
+
+    # Gather practice signals
+    mood_count = await db.mood_logs.count_documents({"user_id": user["id"], "timestamp": {"$gte": week_ago}})
+    journal_count = await db.journals.count_documents({"user_id": user["id"], "created_at": {"$gte": week_ago}})
+    med_count = await db.meditation_sessions.count_documents({"user_id": user["id"], "created_at": {"$gte": week_ago}})
+    breath_count = await db.breath_sessions.count_documents({"user_id": user["id"], "created_at": {"$gte": week_ago}})
+    streak_doc = await db.streaks.find_one({"user_id": user["id"]}, {"_id": 0})
+    streak = streak_doc.get("current_streak", 0) if streak_doc else 0
+
+    # Coherence formula: variety of practices + consistency
+    variety_score = min(5, sum(1 for c in [mood_count, journal_count, med_count, breath_count] if c > 0)) * 10
+    frequency_score = min(50, (mood_count + journal_count + med_count + breath_count) * 3)
+    streak_bonus = min(25, streak * 5)
+    coherence = min(100, variety_score + frequency_score + streak_bonus)
+
+    # Determine quantum state description
+    if coherence >= 80:
+        state = "Quantum Coherence"
+        desc = "All systems in phase — your biofield is amplifying exponentially"
+        phase = "coherent"
+    elif coherence >= 55:
+        state = "Partial Alignment"
+        desc = "Wave patterns converging — approaching coherence threshold"
+        phase = "aligning"
+    elif coherence >= 30:
+        state = "Decoherence"
+        desc = "Scattered frequencies detected — more practice will re-harmonize your field"
+        phase = "decoherent"
+    else:
+        state = "Zero-Point"
+        desc = "Resting in the void of potential — even one practice session activates the field"
+        phase = "zeropoint"
+
+    return {
+        "coherence_score": coherence,
+        "state": state,
+        "description": desc,
+        "phase": phase,
+        "breakdown": {
+            "variety": variety_score,
+            "frequency": frequency_score,
+            "streak_bonus": streak_bonus,
+        },
+        "signals": {
+            "mood_logs": mood_count,
+            "journal_entries": journal_count,
+            "meditations": med_count,
+            "breathwork": breath_count,
+            "streak": streak,
+        },
+    }
+
+
+@router.post("/notifications/send-scheduled")
+async def send_scheduled_reminders(data: dict = Body(...)):
+    """Trigger scheduled reminders for a given time slot (morning/evening). Called by scheduler."""
+    import random
+    slot = data.get("slot", "morning")
+    messages = QUANTUM_REMINDERS.get(slot, QUANTUM_REMINDERS["morning"])
+
+    # Find all users with active subscriptions and matching preference
+    pref_key = "daily_relaxation"
+    prefs_cursor = db.notification_prefs.find(
+        {pref_key: True}, {"_id": 0, "user_id": 1}
+    )
+    user_ids = [p["user_id"] async for p in prefs_cursor]
+
+    sent_total = 0
+    for uid in user_ids:
+        title, body, url = random.choice(messages)
+        count = await send_push_to_user(uid, title, body, url, f"daily-{slot}")
+        sent_total += count
+
+    return {"slot": slot, "users_targeted": len(user_ids), "notifications_sent": sent_total}

@@ -320,7 +320,7 @@ export default function Teachings() {
                   Wisdom of the Ages
                 </h1>
                 <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>
-                  Study the teachings of humanity's greatest spiritual masters. From ancient wisdom to modern insight — all paths lead to the same truth.
+                  Study the teachings of humanity's greatest spiritual and quantum-conscious masters. From ancient wisdom to modern insight — all paths converge at the same truth.
                 </p>
               </motion.div>
 

@@ -11,11 +11,11 @@ import FeaturedVideos from '../components/FeaturedVideos';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const PATTERNS = [
-  { name: 'Box Breathing', inhale: 4, hold1: 4, exhale: 4, hold2: 4, color: '#2DD4BF', desc: 'Equal parts breathing for calm focus' },
-  { name: '4-7-8 Relaxation', inhale: 4, hold1: 7, exhale: 8, hold2: 0, color: '#D8B4FE', desc: 'Deep relaxation and sleep preparation' },
-  { name: 'Energizing Breath', inhale: 6, hold1: 0, exhale: 6, hold2: 0, color: '#FCD34D', desc: 'Rhythmic breathing for vitality' },
-  { name: 'Wim Hof Style', inhale: 2, hold1: 0, exhale: 2, hold2: 0, color: '#FDA4AF', desc: 'Power breathing for energy activation' },
-  { name: 'Pranayama Flow', inhale: 5, hold1: 5, exhale: 5, hold2: 5, color: '#86EFAC', desc: 'Yogic breathing for prana cultivation' },
+  { name: 'Box Breathing', inhale: 4, hold1: 4, exhale: 4, hold2: 4, color: '#2DD4BF', desc: 'Equal-phase breathing — wave-particle coherence in action' },
+  { name: '4-7-8 Relaxation', inhale: 4, hold1: 7, exhale: 8, hold2: 0, color: '#D8B4FE', desc: 'Quantum decoherence release — settle into wave-state' },
+  { name: 'Energizing Breath', inhale: 6, hold1: 0, exhale: 6, hold2: 0, color: '#FCD34D', desc: 'Rhythmic breathing — excite your quantum field' },
+  { name: 'Wim Hof Style', inhale: 2, hold1: 0, exhale: 2, hold2: 0, color: '#FDA4AF', desc: 'Power breathing — quantum tunneling through limits' },
+  { name: 'Pranayama Flow', inhale: 5, hold1: 5, exhale: 5, hold2: 5, color: '#86EFAC', desc: 'Yogic prana — the quantum energy of breath' },
 ];
 
 const BUILD_COLORS = ['#2DD4BF', '#D8B4FE', '#FCD34D', '#FDA4AF', '#86EFAC', '#FB923C', '#3B82F6', '#E879F9'];

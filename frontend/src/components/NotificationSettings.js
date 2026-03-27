@@ -29,6 +29,8 @@ export default function NotificationSettings({ onClose }) {
     daily_relaxation: true,
     cosmic_insights: true,
     practice_reminders: true,
+    reminder_hour: 8,
+    evening_hour: 20,
   });
   const [supported] = useState('serviceWorker' in navigator && 'PushManager' in window);
 
@@ -203,6 +205,35 @@ export default function NotificationSettings({ onClose }) {
                     </div>
                   </button>
                 ))}
+
+                {/* Test notification */}
+                {/* Reminder Times */}
+                <div className="space-y-2 mt-1">
+                  <p className="text-[8px] uppercase tracking-widest font-bold" style={{ color: 'rgba(248,250,252,0.25)' }}>Reminder Times</p>
+                  {[
+                    { key: 'reminder_hour', label: 'Morning', desc: 'Superposition activation' },
+                    { key: 'evening_hour', label: 'Evening', desc: 'Wave-function settling' },
+                  ].map(({ key, label, desc }) => (
+                    <div key={key} className="flex items-center justify-between px-3 py-1.5 rounded-lg"
+                      style={{ border: '1px solid rgba(248,250,252,0.03)' }}>
+                      <div>
+                        <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{label}</p>
+                        <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{desc}</p>
+                      </div>
+                      <select
+                        value={prefs[key]}
+                        onChange={(e) => updatePref(key, parseInt(e.target.value))}
+                        className="text-[10px] rounded px-1.5 py-0.5 outline-none"
+                        style={{ background: 'rgba(248,250,252,0.05)', color: 'rgba(248,250,252,0.5)', border: '1px solid rgba(248,250,252,0.08)' }}
+                        data-testid={`notification-time-${key}`}
+                      >
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <option key={i} value={i}>{i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
 
                 {/* Test notification */}
                 <button onClick={sendTest} disabled={sendingTest}

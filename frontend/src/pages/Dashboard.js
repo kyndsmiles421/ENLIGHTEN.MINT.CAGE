@@ -10,7 +10,7 @@ import {
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
   Gamepad2, UserPlus, Check, Quote, Sun, Eye, Star, Moon,
   Compass, Droplets, UtensilsCrossed, Target, PenTool, Globe,
-  Calendar, BarChart3, MessageCircle, Orbit
+  Calendar, BarChart3, MessageCircle, Orbit, Atom
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 
@@ -85,6 +85,7 @@ export default function Dashboard() {
   const [dailyWisdom, setDailyWisdom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showWalkthrough, setShowWalkthrough] = useState(false);
+  const [coherence, setCoherence] = useState(null);
 
   useEffect(() => {
     // Check if first visit
@@ -104,6 +105,7 @@ export default function Dashboard() {
         axios.post(`${API}/streak/checkin`, {}, { headers: authHeaders }).then(res => setStreak(res.data)).catch(() => axios.get(`${API}/streak`, { headers: authHeaders }).then(r => setStreak(r.data)).catch(() => {})),
         axios.get(`${API}/daily-challenge`, { headers: authHeaders }).then(res => setDailyChallenge(res.data)).catch(() => {}),
         axios.get(`${API}/teachings/daily-wisdom`).then(res => setDailyWisdom(res.data)).catch(() => {}),
+        axios.get(`${API}/notifications/quantum-coherence`, { headers: authHeaders }).then(res => setCoherence(res.data)).catch(() => {}),
       ]).finally(() => setLoading(false));
     }
   }, [user, authLoading, authHeaders, navigate]);
@@ -164,6 +166,93 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        {/* Quantum Coherence Widget */}
+        {coherence && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+            className="glass-card p-6 mb-12 relative overflow-hidden group cursor-pointer hover:scale-[1.01] transition-transform"
+            onClick={() => navigate('/vr')}
+            data-testid="quantum-coherence-widget"
+          >
+            {/* Animated background wave */}
+            <div className="absolute inset-0 overflow-hidden opacity-30">
+              {[...Array(3)].map((_, i) => (
+                <motion.div key={i}
+                  className="absolute bottom-0 left-0 right-0"
+                  style={{
+                    height: `${30 + i * 15}%`,
+                    background: coherence.phase === 'coherent'
+                      ? `linear-gradient(to top, rgba(0,229,255,${0.08 - i * 0.02}), transparent)`
+                      : coherence.phase === 'aligning'
+                      ? `linear-gradient(to top, rgba(192,132,252,${0.08 - i * 0.02}), transparent)`
+                      : `linear-gradient(to top, rgba(248,250,252,${0.03 - i * 0.01}), transparent)`,
+                    borderRadius: '50% 50% 0 0',
+                  }}
+                  animate={{
+                    x: coherence.phase === 'coherent' ? [0, 5, 0, -5, 0] : [0, 15, -10, 20, 0],
+                    scaleY: coherence.phase === 'coherent' ? [1, 1.05, 1] : [1, 1.15, 0.9, 1.1, 1],
+                  }}
+                  transition={{ duration: coherence.phase === 'coherent' ? 4 : 6, repeat: Infinity, delay: i * 0.5 }}
+                />
+              ))}
+            </div>
+
+            <div className="relative z-10 flex items-center gap-6">
+              {/* Coherence ring */}
+              <div className="relative w-20 h-20 flex-shrink-0">
+                <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                  <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(248,250,252,0.04)" strokeWidth="2" />
+                  <motion.circle cx="18" cy="18" r="16" fill="none"
+                    stroke={coherence.phase === 'coherent' ? '#00E5FF' : coherence.phase === 'aligning' ? '#C084FC' : '#FCD34D'}
+                    strokeWidth="2" strokeLinecap="round"
+                    strokeDasharray={`${coherence.coherence_score} ${100 - coherence.coherence_score}`}
+                    initial={{ strokeDasharray: '0 100' }}
+                    animate={{ strokeDasharray: `${coherence.coherence_score} ${100 - coherence.coherence_score}` }}
+                    transition={{ duration: 1.5, ease: 'easeOut' }}
+                    style={{ filter: `drop-shadow(0 0 6px ${coherence.phase === 'coherent' ? '#00E5FF' : '#C084FC'}60)` }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center flex-col">
+                  <span className="text-lg font-light" style={{
+                    color: coherence.phase === 'coherent' ? '#00E5FF' : coherence.phase === 'aligning' ? '#C084FC' : 'var(--text-primary)',
+                    fontFamily: 'Cormorant Garamond, serif',
+                  }}>{coherence.coherence_score}</span>
+                  <span className="text-[7px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>%</span>
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Atom size={12} style={{ color: coherence.phase === 'coherent' ? '#00E5FF' : '#C084FC' }} />
+                  <p className="text-xs font-bold uppercase tracking-[0.15em]" style={{
+                    color: coherence.phase === 'coherent' ? '#00E5FF' : coherence.phase === 'aligning' ? '#C084FC' : '#FCD34D',
+                  }}>
+                    {coherence.state}
+                  </p>
+                </div>
+                <p className="text-sm leading-relaxed mb-2" style={{ color: 'var(--text-secondary)' }}>{coherence.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: 'Moods', val: coherence.signals.mood_logs, color: '#FDA4AF' },
+                    { label: 'Journal', val: coherence.signals.journal_entries, color: '#86EFAC' },
+                    { label: 'Meditate', val: coherence.signals.meditations, color: '#D8B4FE' },
+                    { label: 'Breathe', val: coherence.signals.breathwork, color: '#2DD4BF' },
+                    { label: 'Streak', val: coherence.signals.streak, color: '#FCD34D' },
+                  ].map(s => (
+                    <span key={s.label} className="text-[9px] px-1.5 py-0.5 rounded"
+                      style={{ background: `${s.color}08`, color: s.color, border: `1px solid ${s.color}12` }}>
+                      {s.label}: {s.val}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <ChevronRight size={14} style={{ color: 'var(--text-muted)' }}
+                className="flex-shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </div>
+          </motion.div>
+        )}
 
         {/* Daily Challenge Card */}
         {dailyChallenge?.challenge && (

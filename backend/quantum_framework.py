@@ -118,6 +118,42 @@ QUANTUM_MEDITATIONS = [
             {"text": "You are the quantum tunneler. No wall can contain your light.", "duration": 7},
         ],
     },
+    {
+        "id": "wave_particle_meditation",
+        "name": "Wave-Particle Duality",
+        "principle": "wave_particle_duality",
+        "steps": [
+            {"text": "Settle in. You are about to experience the deepest truth of your nature.", "duration": 7},
+            {"text": "Breathe in — feel yourself as a wave. Boundless. Expanding in all directions.", "duration": 7},
+            {"text": "You are energy without edges, rippling through the fabric of space.", "duration": 6},
+            {"text": "Hold — in this formless state, you are pure potential. Free. Infinite.", "duration": 6},
+            {"text": "Breathe out — now feel yourself condense. A particle. Focused. Here.", "duration": 7},
+            {"text": "You are presence itself — one point of awareness in the vast field.", "duration": 6},
+            {"text": "Breathe in — wave again. Spirit. Expanded consciousness. No boundaries.", "duration": 7},
+            {"text": "Hold — notice: you don't switch between them. You are always both.", "duration": 6},
+            {"text": "Breathe out — particle. Body. Heartbeat. Grounded in this moment.", "duration": 6},
+            {"text": "This is your duality: limitless spirit wearing a body of light.", "duration": 7},
+            {"text": "Carry both within you. You are the wave and the particle. Always.", "duration": 7},
+        ],
+    },
+    {
+        "id": "observer_effect_meditation",
+        "name": "Observer Effect Awakening",
+        "principle": "observer_effect",
+        "steps": [
+            {"text": "Close your eyes. Become aware of your awareness. The observer is awakening.", "duration": 7},
+            {"text": "Notice a thought passing by. Don't follow it. Just observe it.", "duration": 6},
+            {"text": "In quantum physics, observation changes the observed. Watch what happens to the thought.", "duration": 7},
+            {"text": "Breathe in — your attention is not passive. It is creative force.", "duration": 6},
+            {"text": "Hold — feel the power of your gaze. Where you look, reality rearranges.", "duration": 6},
+            {"text": "Breathe out — turn your awareness toward your heart. Feel it respond.", "duration": 7},
+            {"text": "Your body listens to your consciousness. Every cell is being observed into coherence.", "duration": 7},
+            {"text": "Now expand your observation outward. Feel the room. The air. The space around you.", "duration": 6},
+            {"text": "Breathe in — you are the cosmic observer. The universe experiences itself through your eyes.", "duration": 7},
+            {"text": "Hold — in this moment, your observation is creating this moment.", "duration": 6},
+            {"text": "You are not witnessing reality. You are participating in its creation.", "duration": 7},
+        ],
+    },
 ]
 
 QUANTUM_VISUAL_THEMES = {
