@@ -73,6 +73,7 @@ const SEARCH_INDEX = [
   { path: '/videos', label: 'Videos', keywords: 'explore videos guided practices watch', icon: Play, category: 'Explore', color: '#FB923C' },
   { path: '/classes', label: 'Classes', keywords: 'explore classes courses structured learning', icon: GraduationCap, category: 'Explore', color: '#FB923C' },
   { path: '/community', label: 'Community', keywords: 'explore community feed share connect inspire social', icon: Users, category: 'Explore', color: '#FB923C' },
+  { path: '/trade-circle', label: 'Trade Circle', keywords: 'trade barter exchange goods services swap marketplace', icon: HeartHandshake, category: 'Explore', color: '#FB923C' },
   { path: '/friends', label: 'Friends', keywords: 'explore friends challenges social connect', icon: Users, category: 'Explore', color: '#FB923C' },
   { path: '/challenges', label: 'Challenges', keywords: 'explore challenges daily streak xp gamification', icon: Flame, category: 'Explore', color: '#FB923C' },
   { path: '/create', label: 'Create', keywords: 'explore create write meditation affirmation custom', icon: PenTool, category: 'Explore', color: '#FB923C' },

@@ -37,6 +37,7 @@ const Yantra = lazy(() => import('./pages/Yantra'));
 const Tantra = lazy(() => import('./pages/Tantra'));
 const Videos = lazy(() => import('./pages/Videos'));
 const Analytics = lazy(() => import('./pages/Analytics'));
+const TradeCircle = lazy(() => import('./pages/TradeCircle'));
 const Classes = lazy(() => import('./pages/Classes'));
 const Create = lazy(() => import('./pages/Create'));
 const LightTherapy = lazy(() => import('./pages/LightTherapy'));
@@ -129,6 +130,7 @@ function AnimatedRoutes() {
             <Route path="/tantra" element={<Tantra />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/trade-circle" element={<TradeCircle />} />
             <Route path="/classes" element={<Classes />} />
             <Route path="/create" element={<Create />} />
             <Route path="/light-therapy" element={<LightTherapy />} />

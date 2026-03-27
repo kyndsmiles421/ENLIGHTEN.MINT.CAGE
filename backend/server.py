@@ -54,6 +54,7 @@ from routes.creation_stories import router as creation_stories_router
 from routes.ai_visuals import router as ai_visuals_router
 from routes.notifications import router as notifications_router
 from routes.achievements import router as achievements_router
+from routes.trade_circle import router as trade_circle_router
 
 app = FastAPI()
 
@@ -76,6 +77,7 @@ all_routers = [
     ai_visuals_router,
     notifications_router,
     achievements_router,
+    trade_circle_router,
 ]
 
 for r in all_routers:

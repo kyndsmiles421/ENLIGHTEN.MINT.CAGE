@@ -95,6 +95,7 @@ const NAV_CATEGORIES = [
       { path: '/videos', label: 'Videos', icon: Play },
       { path: '/classes', label: 'Classes', icon: GraduationCap },
       { path: '/community', label: 'Community', icon: Users },
+      { path: '/trade-circle', label: 'Trade Circle', icon: HeartHandshake },
       { path: '/friends', label: 'Friends', icon: Users },
       { path: '/challenges', label: 'Challenges', icon: Flame },
       { path: '/create', label: 'Create', icon: PenTool },
