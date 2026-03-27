@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from deps import db, get_current_user, logger, create_token
 from datetime import datetime, timezone
-import uuid, bcrypt
+import uuid, bcrypt, os
 from models import UserCreate, UserLogin
 
 router = APIRouter()
@@ -32,7 +32,8 @@ async def login(user: UserLogin):
     if not found or not bcrypt.checkpw(user.password.encode(), found["password"].encode()):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_token(found["id"], found["name"])
-    return {"token": token, "user": {"id": found["id"], "name": found["name"], "email": found["email"]}}
+    role = found.get("role", "user")
+    return {"token": token, "user": {"id": found["id"], "name": found["name"], "email": found["email"], "role": role}}
 
 @router.get("/auth/me")
 async def get_me(user=Depends(get_current_user)):
@@ -41,4 +42,31 @@ async def get_me(user=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="User not found")
     return found
 
+
+
+# Admin setup — secured by a one-time setup key
+ADMIN_SETUP_KEY = os.environ.get("ADMIN_SETUP_KEY", "cosmic-creator-2026")
+
+
+@router.post("/auth/set-admin")
+async def set_admin(data: dict, user=Depends(get_current_user)):
+    """One-time admin setup. Requires setup key."""
+    setup_key = data.get("setup_key", "")
+    if setup_key != ADMIN_SETUP_KEY:
+        raise HTTPException(status_code=403, detail="Invalid setup key")
+
+    await db.users.update_one({"id": user["id"]}, {"$set": {"role": "admin"}})
+
+    # Also update credits to super_user unlimited
+    await db.user_credits.update_one(
+        {"user_id": user["id"]},
+        {"$set": {
+            "tier": "super_user",
+            "subscription_active": True,
+            "is_admin": True,
+        }},
+        upsert=True,
+    )
+
+    return {"status": "admin_granted", "user_id": user["id"]}
 

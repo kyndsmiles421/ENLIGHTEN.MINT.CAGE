@@ -111,15 +111,19 @@ def tier_level(tier_id: str) -> int:
 async def get_user_credits(user_id: str) -> dict:
     doc = await db.user_credits.find_one({"user_id": user_id}, {"_id": 0})
     if not doc:
+        # Check if user is admin — give them unlimited
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        is_admin = user_doc.get("role") == "admin" if user_doc else False
         doc = {
             "user_id": user_id,
             "balance": 50,
-            "tier": "free",
-            "subscription_active": False,
+            "tier": "super_user" if is_admin else "free",
+            "subscription_active": is_admin,
             "subscription_id": None,
             "credits_refreshed_at": datetime.now(timezone.utc).isoformat(),
             "total_spent": 0,
             "total_credits_used": 0,
+            "is_admin": is_admin,
         }
         await db.user_credits.insert_one({**doc})
     return doc
@@ -130,13 +134,21 @@ async def deduct_credits(user_id: str, action: str, amount: int = None) -> dict:
     tier = credits.get("tier", "free")
     cost = amount if amount is not None else AI_COSTS.get(action, 1)
 
+    # Admin users always pass
+    if credits.get("is_admin"):
+        await db.user_credits.update_one(
+            {"user_id": user_id},
+            {"$inc": {"total_credits_used": cost}}
+        )
+        return {"allowed": True, "remaining": -1, "cost": cost, "tier": tier, "low_credits": False}
+
     # Unlimited tiers skip deduction
     if TIERS.get(tier, {}).get("credits_per_month", 0) == -1 and credits.get("subscription_active"):
         await db.user_credits.update_one(
             {"user_id": user_id},
             {"$inc": {"total_credits_used": cost}}
         )
-        return {"allowed": True, "remaining": -1, "cost": cost, "tier": tier}
+        return {"allowed": True, "remaining": -1, "cost": cost, "tier": tier, "low_credits": False}
 
     if credits["balance"] < cost:
         return {"allowed": False, "remaining": credits["balance"], "cost": cost, "tier": tier, "low_credits": True}
@@ -192,6 +204,7 @@ async def get_my_plan(user=Depends(get_current_user)):
         "total_credits_used": credits.get("total_credits_used", 0),
         "perks": tier_info["perks"],
         "tier_order": TIER_ORDER,
+        "is_admin": credits.get("is_admin", False),
     }
 
 
@@ -453,6 +466,11 @@ TIER_GATED_FEATURES = {
 async def check_feature_access(feature: str, user=Depends(get_current_user)):
     """Check if user's tier grants access to a gated feature."""
     credits = await get_user_credits(user["id"])
+
+    # Admins have full access
+    if credits.get("is_admin"):
+        return {"allowed": True, "feature": feature, "tier": "super_user", "is_admin": True}
+
     user_tier = credits.get("tier", "free")
     user_level = tier_level(user_tier)
 

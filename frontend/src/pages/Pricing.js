@@ -188,6 +188,12 @@ export default function Pricing() {
         {/* Current plan badge */}
         {myPlan && (
           <div className="mb-6 flex items-center gap-3 flex-wrap" data-testid="current-plan-badge">
+            {myPlan.is_admin && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs"
+                style={{ background: 'rgba(234,179,8,0.12)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.25)' }}>
+                <Shield size={12} /> Creator / Admin
+              </div>
+            )}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs"
               style={{ background: `${TIER_COLORS[myPlan.tier]}12`, color: TIER_COLORS[myPlan.tier], border: `1px solid ${TIER_COLORS[myPlan.tier]}25` }}>
               {(() => { const Icon = TIER_ICONS[myPlan.tier]; return <Icon size={12} />; })()}
@@ -196,7 +202,7 @@ export default function Pricing() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
               style={{ background: 'rgba(248,250,252,0.04)', color: 'var(--text-secondary)', border: '1px solid rgba(248,250,252,0.06)' }}>
               <CreditCard size={12} />
-              {myPlan.credits_per_month === -1 ? 'Unlimited' : `${myPlan.balance} credits`}
+              {myPlan.is_admin || (myPlan.credits_per_month === -1 && myPlan.subscription_active) ? 'Unlimited' : `${myPlan.balance} credits`}
             </div>
           </div>
         )}

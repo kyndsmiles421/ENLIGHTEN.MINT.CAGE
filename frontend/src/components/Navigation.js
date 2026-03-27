@@ -477,21 +477,30 @@ export default function Navigation() {
               onClick={playClick}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] transition-all hover:scale-105"
               style={{
-                background: creditInfo.credits_per_month === -1 && creditInfo.subscription_active
-                  ? 'rgba(192,132,252,0.08)'
-                  : creditInfo.balance <= 10
-                    ? 'rgba(239,68,68,0.08)'
-                    : 'rgba(45,212,191,0.08)',
-                color: creditInfo.credits_per_month === -1 && creditInfo.subscription_active
-                  ? '#C084FC'
-                  : creditInfo.balance <= 10
-                    ? '#EF4444'
-                    : '#2DD4BF',
-                border: `1px solid ${creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? 'rgba(192,132,252,0.15)' : creditInfo.balance <= 10 ? 'rgba(239,68,68,0.12)' : 'rgba(45,212,191,0.12)'}`,
+                background: creditInfo.is_admin
+                  ? 'rgba(234,179,8,0.08)'
+                  : creditInfo.credits_per_month === -1 && creditInfo.subscription_active
+                    ? 'rgba(192,132,252,0.08)'
+                    : creditInfo.balance <= 10
+                      ? 'rgba(239,68,68,0.08)'
+                      : 'rgba(45,212,191,0.08)',
+                color: creditInfo.is_admin
+                  ? '#EAB308'
+                  : creditInfo.credits_per_month === -1 && creditInfo.subscription_active
+                    ? '#C084FC'
+                    : creditInfo.balance <= 10
+                      ? '#EF4444'
+                      : '#2DD4BF',
+                border: `1px solid ${creditInfo.is_admin ? 'rgba(234,179,8,0.15)' : creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? 'rgba(192,132,252,0.15)' : creditInfo.balance <= 10 ? 'rgba(239,68,68,0.12)' : 'rgba(45,212,191,0.12)'}`,
               }}
               data-testid="nav-credits-badge"
             >
-              {creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? (
+              {creditInfo.is_admin ? (
+                <>
+                  <Crown size={10} />
+                  <span>Creator</span>
+                </>
+              ) : creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? (
                 <>
                   <Crown size={10} />
                   <span>{creditInfo.tier_name}</span>
