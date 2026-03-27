@@ -11,8 +11,8 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 ## All Implemented Features
 
 ### Onboarding & Tutorial
-- Interactive 10-step walkthrough on first login (localStorage-persisted)
-- Comprehensive Tutorial page (/tutorial) with 38 feature cards across 8 sections + Pro Tips
+- Interactive 10-step walkthrough on first login
+- Comprehensive Tutorial page (/tutorial) with 38 feature cards + Pro Tips
 
 ### Core: Auth, profiles, dashboard, mood tracking, journaling, affirmations, gamification
 
@@ -20,43 +20,34 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 
 ### Mystical: Oracle (I Ching/Tarot/Runes), Mayan/Chinese Astrology, Numerology, Cardology, Cosmic Calendar, Aromatherapy, Herbology, Acupressure, Reiki
 
-### AI: Sage Coach (text + voice conversations), Dream Oracle, AI-generated content, constellation meditations, cosmic forecasts
+### AI: Sage Coach (text + voice), Dream Oracle, constellation meditations, cosmic forecasts
 
 ### Voice Conversations (Feb 2026)
-- Microphone recording in Sage chat with visual recording indicator
-- Speech-to-Text via OpenAI Whisper (whisper-1 model)
-- Text-to-Speech via OpenAI TTS (tts-1 model, "sage" voice)
-- Audio playback with animated indicators on AI response bubbles
-- Seamless toggle between voice and text input modes
+- Microphone recording, Whisper STT, OpenAI TTS ("sage" voice)
+- Audio playback with animated indicators, seamless voice/text toggle
 
 ### Multi-Cultural Star Chart (Feb 2026)
-- 4 cultural sky systems: Mayan, Egyptian, Australian Aboriginal, Lakota
-- 20 total cultural constellations with unique mythologies, deity stories, and life lessons
-- Three.js overlay with cultural-colored constellation lines, figure sprites, star rings, and labels
-- "World Skies" toggle in header with dropdown selector
-- Backend: GET /api/star-chart/cultures and /api/star-chart/cultures/{id}
+- 4 sky systems: Mayan (5), Egyptian (5), Aboriginal (5), Lakota (5) = 20 cultural constellations
+- Three.js overlay with cultural-colored lines, figure sprites, star rings, labels
+- **Cultural Story Explorer** panel with tabbed navigation between constellations
+- Full mythology, deity, origin stories, and cosmic lessons per constellation
 
 ### Social Sharing for Forecasts (Feb 2026)
-- Share button on each forecast card (appears on hover)
-- Posts forecast summary + affirmation to community feed
-- Visual confirmation (shared state) after posting
+- Share button on forecast cards, posts to community feed with confirmation state
 
 ### Guided VR Constellation Journeys (Feb 2026)
-- 3 guided journeys: "The Hero's Path", "The Cosmic River", "The Zodiac Circle"
-- Camera flythrough with smooth interpolation between constellation waypoints
-- Narrated text overlays with progress bar
-- Journey constellation markers and connection lines in 3D scene
-- Journey picker accessible from VR page compass button
+- 3 journeys: "The Hero's Path", "The Cosmic River", "The Zodiac Circle"
+- Camera flythrough, narrated waypoints, constellation markers, progress bar
 
-### 3D/Immersive: Star Chart (gyroscope AR mode), VR Sanctuary (meditation + journeys), 3D Avatar (energy-state driven)
+### 3D/Immersive: Star Chart (gyroscope AR), VR Sanctuary (meditation + journeys), 3D Avatar
 
-### Analytics: Cosmic Profile (recurring patterns), Cosmic Forecasts (6 systems x 4 periods), Zen Garden (auto-water from activities)
+### Analytics: Cosmic Profile, Forecasts (6 systems x 4 periods), Zen Garden
 
-### Social: Community feed, meditation auto-sharing, forecast sharing, plant growth toasts
+### Social: Community feed, meditation/forecast sharing
 
-## Test: 52 iterations, all 100% pass rate
+## Test: 53 iterations, all passing
 ## Credentials: test@test.com / password
 ## Status: PRODUCTION READY
 
-## Pending Tasks (Priority Order)
-- P2: StarChart.js component splitting (1600+ lines refactoring)
+## Remaining Tasks
+- P2: StarChart.js component splitting (~2000 lines)
