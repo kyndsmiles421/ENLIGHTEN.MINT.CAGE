@@ -1,53 +1,57 @@
-# The Cosmic Collective - Product Requirements Document
+# The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective," a highly immersive full-stack wellness platform blending wellness tracking with mystical/divination systems, personalized AI guidance, and cinematic visuals. Add quantum mechanics as a complementary avenue. Wrap as PWA, Push Notifications, Multi-Cultural Star Chart, Trade Circle barter marketplace, Subscription/Monetization, Settings/Accessibility.
+Build "The Cosmic Collective," a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals. Wrap as a PWA, implement Push Notifications, add a "Quantum Mechanics" avenue, expand Star Chart to global cultures, build a "Trade Circle" barter marketplace. Implement a 5-tier Stripe subscription and credit system, add a hidden Creator/Admin role for unlimited access, add accessibility settings (Light Mode, reduce motion/particles), integrate a "Crystals & Stones" encyclopedia with a "Virtual Rock Hounding" game, and add a "Quantum Entanglement" social meditation feature.
 
 ## Tech Stack
-- Frontend: React, Tailwind CSS, Framer Motion, Vanilla Three.js
-- Backend: FastAPI, Motor (Async MongoDB)
-- Integrations: Emergent LLM Key (OpenAI GPT-5.2, Whisper STT, TTS-1-HD, GPT Image 1, Sora 2)
-- Payments: Stripe (via emergentintegrations library)
-- Mobile: PWA (iOS + Android), Push Notifications (pywebpush)
+- Frontend: React, Tailwind CSS, Framer Motion, Context API
+- Backend: FastAPI, Motor Async MongoDB
+- Monetization: Stripe (Test Mode, Emergent environment key)
+- AI: OpenAI GPT-4o, TTS/STT, Sora 2 — all via Emergent LLM Key
+- PWA: Service Worker, Push Notifications
 
-## All Implemented Features
+## Completed Features (All Verified)
+1. 6-pillar navigation system (Today, Practice, Divination, Sanctuary, Nourish, Explore)
+2. Multi-cultural 3D Star Chart (8 cultures: Hindu/Vedic, Norse, Polynesian, etc.)
+3. Voice AI Sage (GPT-4o + TTS/STT)
+4. Sora 2 Video Gallery
+5. Push Notifications with scheduler
+6. Analytics dashboard
+7. Trade Circle marketplace with Karma reputation system
+8. 5-tier Stripe Subscription system (Free, Starter, Plus, Premium, Super User)
+9. Credit pack purchases
+10. API tier-gating for premium AI features
+11. Hidden Creator/Admin role (/admin-setup, password: cosmic-creator-2026)
+12. Accessibility Settings (Sound toggles, 5 themes, reduce motion/particles)
+13. 5 Color Themes: Dark Cosmic, Deep Midnight, Warm Earth, Sacred Forest, Light Celestial
+14. Crystals & Stones Encyclopedia + Virtual Rock Hounding game
+15. Quantum Entanglement social meditations
+16. "Begin Journey" branding (replaced "Sign In" app-wide)
+17. Simplified Chinese (中文) language translations
+18. **Light Celestial Theme — Full text readability polish (Mar 27, 2026)**
+    - CosmicBackground hidden in light mode
+    - Navigation, SearchCommand, NotificationSettings, dropdowns: theme-aware backgrounds
+    - App wrapper uses CSS var(--bg-primary) instead of hardcoded #0B0C15
+    - 12+ page headings converted from #F8FAFC to var(--text-primary)
+    - Subtitles converted from rgba(248,250,252,0.45) to var(--text-muted)
+    - Dashboard coherence badges: darker accent colors in light mode
+    - Settings Section/Toggle/Slider: theme-aware borders and backgrounds
+    - Comprehensive CSS overrides for inline white text, borders, and backgrounds
+    - Pastel badge tag darkening filter for light mode
+    - Shimmer text animation: darker gradient in light mode
+    - Production cleanup: zero debug console.logs
 
-### Core Platform
-- Auth, profiles, dashboard, mood tracking, journaling, affirmations, gamification
-- "Begin Journey" CTA (replaced all "Sign In" / "Login" with cosmic language)
-- Global Search (Cmd+K), 6-category mega-menu nav, notification bell
-- Mobile accordion navigation
+## Key Architecture
+- Frontend entry: /app/frontend/src/App.js
+- Theme system: /app/frontend/src/context/SensoryContext.js (5 themes, CSS vars)
+- Credits: /app/frontend/src/context/CreditContext.js + /app/backend/routes/subscriptions.py
+- Light mode CSS: /app/frontend/src/index.css (bottom section — body[data-theme="light"] rules)
 
-### Admin/Creator Role (Mar 2026)
-- Admin role with unlimited AI, all features unlocked, bypasses all credit checks
-- Setup via POST /api/auth/set-admin with one-time setup key
-- Nav badge shows "Creator" in gold for admin users
-- Pricing page shows "Creator / Admin" badge
-- Setup key: cosmic-creator-2026 (configurable via ADMIN_SETUP_KEY env)
+## Critical Config
+- Admin setup: /admin-setup page, password=cosmic-creator-2026, sets is_admin=true
+- Stripe: Uses Emergent test key (no user key needed)
+- All AI features use Emergent LLM Key
 
-### Settings & Accessibility (Mar 2026)
-- Sound & Audio: Ambient toggle, Sound Effects toggle, Volume slider
-- Visual: 4 Color Themes (Dark Cosmic, Deep Midnight, Warm Earth, Sacred Forest)
-- Accessibility: Reduce Motion, Reduce Particles, Reduce Flashing toggles
-- CosmicBackground respects all prefs
-- Persists in localStorage, Reset to Defaults
-
-### 5-Tier Subscription System with Stripe
-- Free $0/50 cr/mo, Starter $4.99/100, Plus $9.99/300, Premium $24.99/Unlimited, Super User $49.99/Unlimited
-- Pay-As-You-Go: $5=100, $10=225, $20=500 credits
-- Stripe Checkout, payment polling, credit deduction, low-credits nudge
-- Tier-Gated Features (17 features locked by tier), monthly credit refresh cron
-- CreditContext global state
-
-### Trade Circle with Karma, Star Chart (8 cultures), Analytics, Quantum, PWA, Push Notifications
-
-## Test: 71 iterations, all 100% pass rate
-## Credentials: test@test.com / password (admin)
-## Admin Setup Key: cosmic-creator-2026
-
-## Future/Backlog (Next Session)
-- Light Mode theme
-- Crystals & Stones section (encyclopedia, collection, AI advisor)
-- Virtual Rock Hounding game
-- Quantum Entanglement social feature
-- Production launch final polish
+## Backlog / Future Tasks
+- P2: Refactor star_cultures.py — move hardcoded coordinate arrays to JSON/MongoDB
+- P3: Convert remaining inline rgba(248,250,252,...) styles in secondary pages to CSS variables
