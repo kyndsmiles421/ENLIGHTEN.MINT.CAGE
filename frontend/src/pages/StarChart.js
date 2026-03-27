@@ -1452,6 +1452,7 @@ export default function StarChart() {
   const [cultureData, setCultureData] = useState(null);
   const [showCulturePicker, setShowCulturePicker] = useState(false);
   const [cultureLoading, setCultureLoading] = useState(false);
+  const [selectedCulturalConst, setSelectedCulturalConst] = useState(null);
 
   useEffect(() => { journeyPausedRef.current = journeyPaused; }, [journeyPaused]);
 
@@ -1499,10 +1500,12 @@ export default function StarChart() {
     if (activeCulture === cultureId) {
       setActiveCulture(null);
       setCultureData(null);
+      setSelectedCulturalConst(null);
       setShowCulturePicker(false);
       return;
     }
     setCultureLoading(true);
+    setSelectedCulturalConst(null);
     try {
       const r = await axios.get(`${API}/star-chart/cultures/${cultureId}`);
       setActiveCulture(cultureId);
@@ -1769,7 +1772,7 @@ export default function StarChart() {
             <div className="space-y-1.5">
               {/* Clear selection option */}
               {activeCulture && (
-                <button onClick={() => { setActiveCulture(null); setCultureData(null); setShowCulturePicker(false); }}
+                <button onClick={() => { setActiveCulture(null); setCultureData(null); setSelectedCulturalConst(null); setShowCulturePicker(false); }}
                   data-testid="culture-clear"
                   className="w-full text-left rounded-xl px-3 py-2.5 text-[10px] transition-all"
                   style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}>
@@ -1861,16 +1864,126 @@ export default function StarChart() {
         )}
       </AnimatePresence>
 
-      {/* Cultural Sky Overlay indicator */}
+      {/* Cultural Sky Overlay indicator — clickable */}
       <AnimatePresence>
-        {activeCulture && cultureData && !journeyActive && (
+        {activeCulture && cultureData && !journeyActive && !selectedCulturalConst && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-xl text-center pointer-events-none"
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-xl text-center cursor-pointer"
+            onClick={() => setSelectedCulturalConst(cultureData.constellations?.[0] || null)}
             data-testid="culture-overlay-indicator"
             style={{ background: 'rgba(8,10,18,0.85)', border: `1px solid ${cultureData.color}25`, backdropFilter: 'blur(12px)' }}>
             <p className="text-[10px] flex items-center gap-1.5" style={{ color: cultureData.color }}>
-              <Globe size={10} /> {cultureData.name} — {cultureData.constellations?.length} cultural constellation patterns overlaid
+              <Globe size={10} /> {cultureData.name} — {cultureData.constellations?.length} patterns | Tap to explore stories
             </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Cultural Story Explorer Panel */}
+      <AnimatePresence>
+        {selectedCulturalConst && cultureData && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+            className="absolute top-20 right-4 w-80 max-h-[75vh] overflow-y-auto rounded-2xl z-20"
+            data-testid="cultural-story-panel"
+            style={{ background: 'rgba(8,10,18,0.96)', border: `1px solid ${cultureData.color}20`, backdropFilter: 'blur(24px)', boxShadow: `0 0 30px ${cultureData.color}10` }}>
+            <button onClick={() => setSelectedCulturalConst(null)} className="absolute top-3 right-3 p-1 rounded-lg hover:bg-white/5 z-10" data-testid="close-cultural-story">
+              <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            </button>
+
+            {/* Culture header */}
+            <div className="p-5 pb-3" style={{ background: `linear-gradient(180deg, ${cultureData.color}08 0%, transparent 100%)` }}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: cultureData.color, boxShadow: `0 0 8px ${cultureData.color}80` }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: cultureData.color }}>{cultureData.name}</p>
+              </div>
+              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.4)' }}>{cultureData.description}</p>
+            </div>
+
+            {/* Constellation tabs */}
+            <div className="flex gap-1 px-4 pb-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+              {cultureData.constellations?.map(c => {
+                const isActive = selectedCulturalConst?.id === c.id;
+                return (
+                  <button key={c.id} onClick={() => setSelectedCulturalConst(c)}
+                    data-testid={`cultural-tab-${c.id}`}
+                    className="flex-shrink-0 px-2.5 py-1 rounded-lg text-[9px] transition-all whitespace-nowrap"
+                    style={{
+                      background: isActive ? `${cultureData.color}15` : 'transparent',
+                      border: `1px solid ${isActive ? `${cultureData.color}30` : 'rgba(248,250,252,0.04)'}`,
+                      color: isActive ? cultureData.color : 'rgba(248,250,252,0.35)',
+                    }}>
+                    {c.name.split('(')[0].trim()}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected constellation story */}
+            <div className="px-5 pb-5 pt-2">
+              <AnimatePresence mode="wait">
+                <motion.div key={selectedCulturalConst.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${cultureData.color}12`, border: `1px solid ${cultureData.color}20` }}>
+                      <Star size={14} style={{ color: cultureData.color }} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>{selectedCulturalConst.name}</p>
+                      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                        {selectedCulturalConst.element} element &middot; {selectedCulturalConst.stars?.length || 0} stars
+                      </p>
+                    </div>
+                  </div>
+
+                  {selectedCulturalConst.mythology && (
+                    <>
+                      {/* Figure card */}
+                      <div className="rounded-xl p-3 mb-3" style={{ background: `${cultureData.color}06`, border: `1px solid ${cultureData.color}10` }}>
+                        <p className="text-[9px] uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(248,250,252,0.25)' }}>Figure</p>
+                        <p className="text-sm font-semibold" style={{ color: cultureData.color, fontFamily: 'Cormorant Garamond, serif' }}>{selectedCulturalConst.mythology.figure}</p>
+                        <div className="flex gap-3 text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                          <span>Origin: {selectedCulturalConst.mythology.origin}</span>
+                          <span>Deity: {selectedCulturalConst.mythology.deity}</span>
+                        </div>
+                      </div>
+
+                      {/* Story */}
+                      <div className="mb-3">
+                        <p className="text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                          <BookOpen size={9} /> The Story
+                        </p>
+                        <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif', fontSize: '13px' }}>
+                          {selectedCulturalConst.mythology.story}
+                        </p>
+                      </div>
+
+                      {/* Lesson */}
+                      <div className="rounded-xl p-3" style={{ background: `${cultureData.color}06`, border: `1px solid ${cultureData.color}12` }}>
+                        <p className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: cultureData.color }}>Cosmic Lesson</p>
+                        <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                          "{selectedCulturalConst.mythology.lesson}"
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Stars list */}
+                  {selectedCulturalConst.stars && (
+                    <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+                      <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Stars</p>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedCulturalConst.stars.map((s, i) => (
+                          <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-lg" style={{ background: `${cultureData.color}06`, border: `1px solid ${cultureData.color}08` }}>
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: cultureData.color }} />
+                            <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{s.name}</span>
+                            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>m{s.mag}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
