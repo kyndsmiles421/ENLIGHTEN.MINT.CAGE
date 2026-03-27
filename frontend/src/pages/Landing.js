@@ -24,7 +24,14 @@ const CATEGORY_PILLARS = [
     icon: Wind,
     color: '#D8B4FE',
     path: '/breathing',
-    highlights: ['Breathwork', 'Meditation', 'Yoga', 'Mudras', 'Mantras', 'Light Therapy'],
+    highlights: [
+      { label: 'Breathwork', path: '/breathing' },
+      { label: 'Meditation', path: '/meditation' },
+      { label: 'Yoga', path: '/yoga' },
+      { label: 'Mudras', path: '/mudras' },
+      { label: 'Mantras', path: '/mantras' },
+      { label: 'Light Therapy', path: '/light-therapy' },
+    ],
   },
   {
     id: 'divination',
@@ -33,7 +40,14 @@ const CATEGORY_PILLARS = [
     icon: Eye,
     color: '#E879F9',
     path: '/oracle',
-    highlights: ['Oracle & Tarot', 'Star Chart', 'Numerology', 'Forecasts', 'Dream Journal', 'Mayan Astrology'],
+    highlights: [
+      { label: 'Oracle & Tarot', path: '/oracle' },
+      { label: 'Star Chart', path: '/star-chart' },
+      { label: 'Numerology', path: '/numerology' },
+      { label: 'Forecasts', path: '/forecasts' },
+      { label: 'Dream Journal', path: '/dreams' },
+      { label: 'Mayan Astrology', path: '/mayan' },
+    ],
   },
   {
     id: 'sanctuary',
@@ -42,7 +56,14 @@ const CATEGORY_PILLARS = [
     icon: Sprout,
     color: '#2DD4BF',
     path: '/zen-garden',
-    highlights: ['Zen Garden', 'Soundscapes', 'Frequencies', 'VR Sanctuary', 'Journaling'],
+    highlights: [
+      { label: 'Zen Garden', path: '/zen-garden' },
+      { label: 'Soundscapes', path: '/soundscapes' },
+      { label: 'Music Lounge', path: '/music-lounge' },
+      { label: 'Frequencies', path: '/frequencies' },
+      { label: 'VR Sanctuary', path: '/vr' },
+      { label: 'Journaling', path: '/journal' },
+    ],
   },
   {
     id: 'nourish',
@@ -51,7 +72,14 @@ const CATEGORY_PILLARS = [
     icon: Leaf,
     color: '#22C55E',
     path: '/nourishment',
-    highlights: ['Nourishment', 'Aromatherapy', 'Herbology', 'Elixirs', 'Acupressure', 'Reiki'],
+    highlights: [
+      { label: 'Nourishment', path: '/nourishment' },
+      { label: 'Aromatherapy', path: '/aromatherapy' },
+      { label: 'Herbology', path: '/herbology' },
+      { label: 'Elixirs', path: '/elixirs' },
+      { label: 'Acupressure', path: '/acupressure' },
+      { label: 'Reiki', path: '/reiki' },
+    ],
   },
   {
     id: 'explore',
@@ -60,7 +88,14 @@ const CATEGORY_PILLARS = [
     icon: Compass,
     color: '#FB923C',
     path: '/journey',
-    highlights: ['Creation Stories', 'Teachings', 'Games', 'Community', 'Challenges', 'Videos'],
+    highlights: [
+      { label: 'Creation Stories', path: '/creation-stories' },
+      { label: 'Teachings', path: '/teachings' },
+      { label: 'Games', path: '/games' },
+      { label: 'Community', path: '/community' },
+      { label: 'Blessings', path: '/blessings' },
+      { label: 'Videos', path: '/videos' },
+    ],
   },
   {
     id: 'sage',
@@ -69,7 +104,12 @@ const CATEGORY_PILLARS = [
     icon: MessageCircle,
     color: '#38BDF8',
     path: '/coach',
-    highlights: ['Voice Conversations', 'Spiritual Guidance', 'Personalized Wisdom', 'Real-time Support'],
+    highlights: [
+      { label: 'Voice Conversations', path: '/coach' },
+      { label: 'Spiritual Guidance', path: '/coach' },
+      { label: 'Personalized Wisdom', path: '/coach' },
+      { label: 'Crystals & Stones', path: '/crystals' },
+    ],
   },
 ];
 
@@ -106,29 +146,30 @@ function PillarCard({ pillar, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ delay: index * 0.08, duration: 0.5 }}
-      onClick={() => navigate(pillar.path)}
-      className="glass-card glass-card-hover p-8 cursor-pointer group relative"
+      className="glass-card glass-card-hover p-8 group relative"
       data-testid={`pillar-${pillar.id}`}
     >
       {/* Accent glow */}
       <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-500"
         style={{ background: pillar.color, filter: 'blur(40px)', transform: 'translate(30%, -30%)' }} />
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-6 cursor-pointer" onClick={() => navigate(pillar.path)}>
         <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
           style={{ background: `${pillar.color}12`, border: `1px solid ${pillar.color}15` }}>
           <Icon size={22} style={{ color: pillar.color }} />
         </div>
         <ArrowRight size={16} className="opacity-0 group-hover:opacity-60 transition-all duration-300 group-hover:translate-x-1" style={{ color: pillar.color }} />
       </div>
-      <h3 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+      <h3 className="text-xl font-light mb-1 cursor-pointer" onClick={() => navigate(pillar.path)} style={{ fontFamily: 'Cormorant Garamond, serif' }}>
         {pillar.title}
       </h3>
       <p className="text-xs mb-5" style={{ color: 'var(--text-muted)' }}>{pillar.subtitle}</p>
       <div className="flex flex-wrap gap-1.5">
         {pillar.highlights.map(h => (
-          <span key={h} className="text-[10px] px-2.5 py-1 rounded-full transition-all duration-300"
-            style={{ background: `${pillar.color}08`, color: `${pillar.color}cc`, border: `1px solid ${pillar.color}10` }}>
-            {h}
+          <span key={h.label} onClick={() => navigate(h.path)}
+            className="text-[10px] px-2.5 py-1 rounded-full transition-all duration-300 cursor-pointer hover:scale-105"
+            style={{ background: `${pillar.color}08`, color: `${pillar.color}cc`, border: `1px solid ${pillar.color}10` }}
+            data-testid={`pillar-link-${h.path.slice(1)}`}>
+            {h.label}
           </span>
         ))}
       </div>
