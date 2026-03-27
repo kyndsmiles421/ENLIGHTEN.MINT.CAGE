@@ -10,6 +10,7 @@ import {
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
   Gamepad2, UserPlus, Check, Quote
 } from 'lucide-react';
+import Walkthrough from '../components/Walkthrough';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -56,6 +57,13 @@ export default function Dashboard() {
   const [dailyChallenge, setDailyChallenge] = useState(null);
   const [dailyWisdom, setDailyWisdom] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showWalkthrough, setShowWalkthrough] = useState(false);
+
+  useEffect(() => {
+    // Check if first visit
+    const seen = localStorage.getItem('cosmic_walkthrough_seen');
+    if (!seen) setShowWalkthrough(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -305,6 +313,12 @@ export default function Dashboard() {
           </div>
         </motion.div>
       </div>
+      {showWalkthrough && (
+        <Walkthrough onComplete={() => {
+          setShowWalkthrough(false);
+          localStorage.setItem('cosmic_walkthrough_seen', 'true');
+        }} />
+      )}
     </div>
   );
 }

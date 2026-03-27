@@ -72,6 +72,7 @@ const StarChart = lazy(() => import('./pages/StarChart'));
 const VirtualReality = lazy(() => import('./pages/VirtualReality'));
 const Forecasts = lazy(() => import('./pages/Forecasts'));
 const CosmicProfile = lazy(() => import('./pages/CosmicProfile'));
+const Tutorial = lazy(() => import('./pages/Tutorial'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -161,6 +162,7 @@ function AnimatedRoutes() {
             <Route path="/vr" element={<VirtualReality />} />
             <Route path="/forecasts" element={<Forecasts />} />
             <Route path="/cosmic-profile" element={<CosmicProfile />} />
+            <Route path="/tutorial" element={<Tutorial />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
