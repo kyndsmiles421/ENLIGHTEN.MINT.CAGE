@@ -623,7 +623,7 @@ export default function Community() {
                 <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                   Join the community to share, connect, and grow together.
                 </p>
-                <a href="/auth" className="btn-glass text-sm inline-block" data-testid="community-signin-btn">Sign In</a>
+                <a href="/auth" className="btn-glass text-sm inline-block" data-testid="community-signin-btn">Begin Journey</a>
               </div>
             )}
           </div>
