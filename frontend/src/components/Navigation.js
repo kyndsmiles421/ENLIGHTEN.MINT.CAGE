@@ -10,11 +10,12 @@ import {
   Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
-  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search
+  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 import SearchCommand from './SearchCommand';
+import NotificationSettings from './NotificationSettings';
 
 /* ─── Category definitions ─── */
 const NAV_CATEGORIES = [
@@ -283,8 +284,10 @@ export default function Navigation() {
   const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const langRef = useRef(null);
   const profileRef = useRef(null);
+  const notifRef = useRef(null);
   const profileTimeout = useRef(null);
 
   /* Close dropdowns on outside click */
@@ -292,6 +295,7 @@ export default function Navigation() {
     const handler = (e) => {
       if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
+      if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -433,6 +437,31 @@ export default function Navigation() {
                 style={{ border: '1px solid var(--primary)' }} />
             )}
           </button>
+
+          {/* Notification Bell */}
+          {user && (
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => { setNotifOpen(!notifOpen); playClick(); }}
+                className="p-2 rounded-full transition-all duration-300 relative"
+                style={{
+                  color: notifOpen ? '#C084FC' : 'var(--text-muted)',
+                  background: notifOpen ? 'rgba(192,132,252,0.1)' : 'transparent',
+                }}
+                data-testid="nav-notification-btn"
+                title="Notifications"
+              >
+                <Bell size={14} />
+              </button>
+              <AnimatePresence>
+                {notifOpen && (
+                  <div className="absolute top-full right-0 mt-2 z-[100]">
+                    <NotificationSettings onClose={() => setNotifOpen(false)} />
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* User Area */}
           {user ? (

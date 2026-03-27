@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause, Sparkles } from 'lucide-react';
+import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause, Sparkles, Atom } from 'lucide-react';
 import * as THREE from 'three';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const PORTALS = [
   { id: 'meditation', label: 'Meditation', icon: Timer, color: '#C084FC', path: '/meditation', desc: 'Enter the stillness' },
+  { id: 'quantum', label: 'Quantum Field', icon: Atom, color: '#00E5FF', path: null, desc: 'Collapse the wave function' },
   { id: 'breathing', label: 'Breathwork', icon: Wind, color: '#2DD4BF', path: '/breathing', desc: 'Master your breath' },
   { id: 'yoga', label: 'Yoga', icon: Flame, color: '#FB923C', path: '/yoga', desc: 'Move with intention' },
   { id: 'starchart', label: 'Star Chart', icon: Star, color: '#FCD34D', path: '/star-chart', desc: 'Explore the cosmos' },
@@ -57,10 +58,19 @@ export default function VirtualReality() {
   const theaterVideoRef = useRef(null);
   const theaterPollRef = useRef(null);
 
+  // Quantum meditation state
+  const [quantumMeditations, setQuantumMeditations] = useState([]);
+  const [showQuantumPicker, setShowQuantumPicker] = useState(false);
+  const [quantumPrinciples, setQuantumPrinciples] = useState([]);
+
   // Load data
   useEffect(() => {
     axios.get(`${API}/avatar`, { headers: authHeaders }).then(r => setAvatarConfig(r.data)).catch(() => {});
     axios.get(`${API}/avatar/energy-state`, { headers: authHeaders }).then(r => setEnergyState(r.data)).catch(() => {});
+    axios.get(`${API}/ai-visuals/quantum-principles`).then(r => {
+      setQuantumPrinciples(r.data.principles || []);
+      setQuantumMeditations(r.data.meditations || []);
+    }).catch(() => {});
   }, [authHeaders]);
 
   // Ambient cosmic audio
@@ -355,9 +365,10 @@ export default function VirtualReality() {
         const hits = raycasterRef.current.intersectObject(pm.core);
         if (hits.length > 0) {
           if (pm.data.id === 'meditation') {
-            // Start VR meditation instead of navigating
             startVrMeditation();
-          } else {
+          } else if (pm.data.id === 'quantum') {
+            setShowQuantumPicker(true);
+          } else if (pm.data.path) {
             navigate(pm.data.path);
           }
           return;
@@ -563,22 +574,24 @@ export default function VirtualReality() {
   ];
 
   const startVrMeditation = useCallback(() => {
-    setVrMeditation({ step: 0, elapsed: 0, total: VR_MED_STEPS.reduce((a, s) => a + s.duration, 0) });
+    setVrMeditation({ step: 0, elapsed: 0, total: VR_MED_STEPS.reduce((a, s) => a + s.duration, 0), steps: VR_MED_STEPS, name: 'Cosmic Meditation', color: '#C084FC' });
   }, []);
 
   useEffect(() => {
     if (!vrMeditation) return;
+    const steps = vrMeditation.steps || VR_MED_STEPS;
     const interval = setInterval(() => {
       setVrMeditation(prev => {
         if (!prev) return null;
+        const curSteps = prev.steps || VR_MED_STEPS;
         const newElapsed = prev.elapsed + 1;
         let cumulative = 0;
         let newStep = prev.step;
-        for (let i = 0; i < VR_MED_STEPS.length; i++) {
-          cumulative += VR_MED_STEPS[i].duration;
+        for (let i = 0; i < curSteps.length; i++) {
+          cumulative += curSteps[i].duration;
           if (newElapsed < cumulative) { newStep = i; break; }
-          if (i === VR_MED_STEPS.length - 1 && newElapsed >= cumulative) {
-            return null; // Meditation complete
+          if (i === curSteps.length - 1 && newElapsed >= cumulative) {
+            return null;
           }
         }
         return { ...prev, step: newStep, elapsed: newElapsed };
@@ -660,6 +673,20 @@ export default function VirtualReality() {
         { pos: [-14, 8, 14], look: [-18, 6, 18], text: "Leo to Scorpio — the lion's courage faces the scorpion's transforming sting.", duration: 8 },
         { pos: [-14, 6, -14], look: [-18, 4, -18], text: "Sagittarius to Pisces — the archer's arrow flies toward the ocean of dreams.", duration: 8 },
         { pos: [0, 14, 0], look: [0, 2, 0], text: "The wheel turns eternal. You carry all twelve signs within you.", duration: 7 },
+      ],
+    },
+    {
+      id: 'quantum_realm',
+      name: 'The Quantum Realm',
+      color: '#00E5FF',
+      description: 'Journey into the subatomic cosmos — where physics and consciousness merge.',
+      waypoints: [
+        { pos: [0, 3, 20], look: [0, 2, 25], text: "You shrink past atoms, past quarks... into the quantum foam where reality shimmers with probability.", duration: 8 },
+        { pos: [15, 8, 15], look: [20, 6, 20], text: "Superposition: here, every particle holds all possibilities. You too exist in infinite states — until you choose.", duration: 9 },
+        { pos: [-12, 12, -8], look: [-16, 10, -12], text: "Entanglement: two particles, once connected, share their fate across the cosmos. Love is the human word for this.", duration: 9 },
+        { pos: [-18, 6, 10], look: [-22, 4, 14], text: "The Observer Effect: your gaze changes what you see. Consciousness is not passive — it creates.", duration: 9 },
+        { pos: [8, 15, -5], look: [12, 12, -8], text: "Quantum tunneling: the impossible is merely improbable. Your spirit passes through walls that only seem solid.", duration: 9 },
+        { pos: [0, 18, 0], look: [0, 2, 0], text: "You are the zero-point field — infinite potential vibrating in the stillness. The cosmos dreams through you.", duration: 8 },
       ],
     },
   ];
@@ -872,7 +899,7 @@ export default function VirtualReality() {
             <ArrowLeft size={16} />
           </button>
           <div className="px-4 py-2 rounded-xl" style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#C084FC' }}>Cosmic Sanctuary</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#C084FC' }}>Quantum Cosmic Sanctuary</span>
           </div>
         </div>
 
@@ -1176,6 +1203,71 @@ export default function VirtualReality() {
       </AnimatePresence>
 
       {/* Active Journey Narration Overlay */}
+
+      {/* Quantum Field Picker */}
+      <AnimatePresence>
+        {showQuantumPicker && !vrMeditation && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+            className="absolute top-20 right-4 w-72 z-50 pointer-events-auto"
+            data-testid="vr-quantum-picker">
+            <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,20,0.95)', backdropFilter: 'blur(16px)', border: '1px solid rgba(0,229,255,0.12)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Atom size={12} style={{ color: '#00E5FF' }} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,229,255,0.7)' }}>Quantum Field</span>
+                </div>
+                <button onClick={() => setShowQuantumPicker(false)} className="p-1 rounded hover:bg-white/5">
+                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                </button>
+              </div>
+              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                Guided quantum meditations — where physics meets consciousness
+              </p>
+
+              {/* Quantum Meditations from backend */}
+              <div className="space-y-2 mb-3">
+                <p className="text-[8px] uppercase tracking-widest font-bold" style={{ color: 'rgba(0,229,255,0.4)' }}>Meditations</p>
+                {quantumMeditations.map(m => {
+                  const principle = quantumPrinciples.find(p => p.id === m.principle);
+                  return (
+                    <button key={m.id} onClick={() => {
+                      setVrMeditation({ step: 0, elapsed: 0, total: m.total_duration, steps: m.steps, name: m.name, color: principle?.color || '#00E5FF' });
+                      setShowQuantumPicker(false);
+                    }}
+                      data-testid={`vr-quantum-${m.id}`}
+                      className="w-full text-left rounded-lg px-3 py-2 transition-all hover:bg-white/5"
+                      style={{ background: 'rgba(0,229,255,0.03)', border: '1px solid rgba(0,229,255,0.06)' }}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full" style={{ background: principle?.color || '#00E5FF', boxShadow: `0 0 6px ${principle?.color || '#00E5FF'}80` }} />
+                        <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{m.name}</span>
+                      </div>
+                      <p className="text-[9px] pl-4 mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                        {Math.floor(m.total_duration / 60)}:{String(m.total_duration % 60).padStart(2, '0')} min
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Quantum Principles */}
+              <div className="space-y-1.5">
+                <p className="text-[8px] uppercase tracking-widest font-bold" style={{ color: 'rgba(0,229,255,0.4)' }}>Principles</p>
+                {quantumPrinciples.slice(0, 4).map(p => (
+                  <div key={p.id} className="px-3 py-1.5 rounded-lg" style={{ background: 'rgba(248,250,252,0.015)', border: '1px solid rgba(248,250,252,0.03)' }}>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: p.color }} />
+                      <span className="text-[10px] font-medium capitalize" style={{ color: `${p.color}CC` }}>{p.id.replace(/_/g, ' ')}</span>
+                    </div>
+                    <p className="text-[8px] pl-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.25)' }}>{p.spiritual.slice(0, 80)}...</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Active Journey Narration Overlay */}
       <AnimatePresence>
         {activeJourney && (
           <motion.div
@@ -1261,7 +1353,16 @@ export default function VirtualReality() {
             className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
             data-testid="vr-meditation-overlay"
           >
-            {/* Breathing ring */}
+            {/* Meditation name label */}
+            {vrMeditation.name && (
+              <div className="absolute top-20 left-1/2 -translate-x-1/2">
+                <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: `${vrMeditation.color || '#C084FC'}90` }}>
+                  {vrMeditation.name}
+                </span>
+              </div>
+            )}
+
+            {/* Breathing ring — uses meditation color */}
             <motion.div
               animate={{
                 scale: [1, 1.3, 1.3, 1],
@@ -1269,7 +1370,7 @@ export default function VirtualReality() {
               }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
               className="absolute rounded-full"
-              style={{ width: 300, height: 300, border: '1px solid rgba(192,132,252,0.15)', boxShadow: '0 0 60px rgba(192,132,252,0.08)' }}
+              style={{ width: 300, height: 300, border: `1px solid ${vrMeditation.color || '#C084FC'}25`, boxShadow: `0 0 60px ${vrMeditation.color || '#C084FC'}14` }}
             />
             <motion.div
               animate={{
@@ -1278,7 +1379,7 @@ export default function VirtualReality() {
               }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
               className="absolute rounded-full"
-              style={{ width: 400, height: 400, border: '1px solid rgba(192,132,252,0.08)' }}
+              style={{ width: 400, height: 400, border: `1px solid ${vrMeditation.color || '#C084FC'}14` }}
             />
 
             {/* Text */}
@@ -1291,9 +1392,9 @@ export default function VirtualReality() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 1 }}
                   className="text-lg md:text-xl font-light leading-relaxed"
-                  style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 0 30px rgba(192,132,252,0.3)' }}
+                  style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: `0 0 30px ${vrMeditation.color || '#C084FC'}50` }}
                 >
-                  {VR_MED_STEPS[vrMeditation.step]?.text}
+                  {(vrMeditation.steps || VR_MED_STEPS)[vrMeditation.step]?.text}
                 </motion.p>
               </AnimatePresence>
 
@@ -1302,7 +1403,7 @@ export default function VirtualReality() {
                 <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <motion.div
                     className="h-full rounded-full"
-                    style={{ background: 'rgba(192,132,252,0.5)', width: `${(vrMeditation.elapsed / vrMeditation.total) * 100}%` }}
+                    style={{ background: `${vrMeditation.color || '#C084FC'}80`, width: `${(vrMeditation.elapsed / vrMeditation.total) * 100}%` }}
                   />
                 </div>
                 <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.3)' }}>
@@ -1330,7 +1431,7 @@ export default function VirtualReality() {
         className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-50"
       >
         <p className="text-[11px] tracking-wider" style={{ color: 'var(--text-muted)' }}>
-          Drag to orbit &middot; Scroll to zoom &middot; Click portals to enter
+          Drag to orbit &middot; Scroll to zoom &middot; Click portals to enter &middot; Quantum field active
         </p>
       </motion.div>
     </div>
