@@ -10,7 +10,8 @@ import {
   Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
-  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp
+  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp,
+  CreditCard, Crown
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
@@ -106,6 +107,7 @@ const NAV_CATEGORIES = [
 const PROFILE_ITEMS = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/analytics', label: 'Analytics', icon: TrendingUp },
+  { path: '/pricing', label: 'Subscription', icon: Crown },
   { path: '/profile', label: 'Profile', icon: User },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
   { path: '/wellness-reports', label: 'Wellness Reports', icon: BarChart3 },
@@ -287,6 +289,7 @@ export default function Navigation() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [creditInfo, setCreditInfo] = useState(null);
   const langRef = useRef(null);
   const profileRef = useRef(null);
   const notifRef = useRef(null);
@@ -317,6 +320,18 @@ export default function Navigation() {
 
   /* Close mobile menu on route change */
   useEffect(() => { setMobileOpen(false); setMobileCat(null); }, [location.pathname]);
+
+  /* Fetch credit balance */
+  useEffect(() => {
+    if (!user) { setCreditInfo(null); return; }
+    const tkn = localStorage.getItem('zen_token');
+    if (!tkn) return;
+    const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+    fetch(`${API}/subscriptions/my-plan`, { headers: { Authorization: `Bearer ${tkn}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setCreditInfo(d); })
+      .catch(() => {});
+  }, [user, location.pathname]);
 
   /* Hide nav on landing, auth, VR */
   if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr') return null;
@@ -463,6 +478,41 @@ export default function Navigation() {
                 )}
               </AnimatePresence>
             </div>
+          )}
+
+          {/* Credits & Upgrade */}
+          {user && creditInfo && (
+            <Link
+              to="/pricing"
+              onClick={playClick}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] transition-all hover:scale-105"
+              style={{
+                background: creditInfo.credits_per_month === -1 && creditInfo.subscription_active
+                  ? 'rgba(192,132,252,0.08)'
+                  : creditInfo.balance <= 10
+                    ? 'rgba(239,68,68,0.08)'
+                    : 'rgba(45,212,191,0.08)',
+                color: creditInfo.credits_per_month === -1 && creditInfo.subscription_active
+                  ? '#C084FC'
+                  : creditInfo.balance <= 10
+                    ? '#EF4444'
+                    : '#2DD4BF',
+                border: `1px solid ${creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? 'rgba(192,132,252,0.15)' : creditInfo.balance <= 10 ? 'rgba(239,68,68,0.12)' : 'rgba(45,212,191,0.12)'}`,
+              }}
+              data-testid="nav-credits-badge"
+            >
+              {creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? (
+                <>
+                  <Crown size={10} />
+                  <span>{creditInfo.tier_name}</span>
+                </>
+              ) : (
+                <>
+                  <CreditCard size={10} />
+                  <span>{creditInfo.balance}</span>
+                </>
+              )}
+            </Link>
           )}
 
           {/* User Area */}
@@ -625,10 +675,26 @@ export default function Navigation() {
                         style={{ background: 'rgba(192,132,252,0.15)', color: '#D8B4FE' }}>
                         {user.name?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</p>
                         <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
                       </div>
+                      {creditInfo && (
+                        <Link to="/pricing" onClick={() => { setMobileOpen(false); playClick(); }}
+                          className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px]"
+                          style={{
+                            background: creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? 'rgba(192,132,252,0.08)' : 'rgba(45,212,191,0.08)',
+                            color: creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? '#C084FC' : '#2DD4BF',
+                            border: `1px solid ${creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? 'rgba(192,132,252,0.15)' : 'rgba(45,212,191,0.12)'}`,
+                          }}
+                          data-testid="mobile-credits-badge">
+                          {creditInfo.credits_per_month === -1 && creditInfo.subscription_active ? (
+                            <><Crown size={10} /> {creditInfo.tier_name}</>
+                          ) : (
+                            <><CreditCard size={10} /> {creditInfo.balance}</>
+                          )}
+                        </Link>
+                      )}
                     </div>
                     {PROFILE_ITEMS.map(item => {
                       const Icon = item.icon;

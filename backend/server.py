@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 import os
 import asyncio
 from pathlib import Path
+from datetime import datetime, timezone
 from deps import client, db, logger
 
 from routes.auth import router as auth_router
@@ -55,6 +56,7 @@ from routes.ai_visuals import router as ai_visuals_router
 from routes.notifications import router as notifications_router
 from routes.achievements import router as achievements_router
 from routes.trade_circle import router as trade_circle_router
+from routes.subscriptions import router as subscriptions_router
 
 app = FastAPI()
 
@@ -78,10 +80,40 @@ all_routers = [
     notifications_router,
     achievements_router,
     trade_circle_router,
+    subscriptions_router,
 ]
 
 for r in all_routers:
     app.include_router(r, prefix="/api")
+
+
+# Stripe webhook handler (at /api/webhook/stripe)
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request):
+    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    try:
+        body = await request.body()
+        stripe_sig = request.headers.get("Stripe-Signature", "")
+        host_url = str(request.base_url).rstrip("/")
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(
+            api_key=os.environ.get("STRIPE_API_KEY", ""),
+            webhook_url=webhook_url,
+        )
+        event = await stripe_checkout.handle_webhook(body, stripe_sig)
+        logger.info(f"Stripe webhook: {event.event_type} session={event.session_id}")
+
+        if event.payment_status == "paid":
+            tx = await db.payment_transactions.find_one({"session_id": event.session_id}, {"_id": 0})
+            if tx and tx.get("payment_status") != "paid":
+                await db.payment_transactions.update_one(
+                    {"session_id": event.session_id},
+                    {"$set": {"payment_status": "paid", "paid_at": datetime.now(timezone.utc).isoformat()}}
+                )
+        return {"status": "ok"}
+    except Exception as e:
+        logger.error(f"Stripe webhook error: {e}")
+        return {"status": "error"}
 
 # Serve generated videos as static files
 videos_dir = Path(__file__).parent / "static" / "videos"
