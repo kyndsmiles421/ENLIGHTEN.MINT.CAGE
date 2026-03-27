@@ -199,7 +199,7 @@ function App() {
       <CreditProvider>
       <SensoryProvider>
         <BrowserRouter>
-          <div style={{ minHeight: '100vh', background: '#0B0C15', position: 'relative' }}>
+          <div style={{ minHeight: '100vh', background: 'var(--bg-primary, #0B0C15)', position: 'relative' }}>
             <CosmicBackground />
             <Navigation />
             <ScrollToTop />
@@ -207,9 +207,9 @@ function App() {
               position="top-right"
               toastOptions={{
                 style: {
-                  background: 'rgba(22, 24, 38, 0.95)',
+                  background: 'var(--bg-secondary, rgba(22, 24, 38, 0.95))',
                   border: '1px solid rgba(192,132,252,0.15)',
-                  color: '#F8FAFC',
+                  color: 'var(--text-primary, #F8FAFC)',
                   backdropFilter: 'blur(24px)',
                   boxShadow: '0 0 30px rgba(192,132,252,0.08)',
                 },

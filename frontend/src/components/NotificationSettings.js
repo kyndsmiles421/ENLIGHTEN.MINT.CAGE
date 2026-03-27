@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, BellOff, X, Check, Zap, Sun, Sparkles, TestTube } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSensory } from '../context/SensoryContext';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -20,6 +21,8 @@ function urlBase64ToUint8Array(base64String) {
 
 export default function NotificationSettings({ onClose }) {
   const { authHeaders } = useAuth();
+  const { prefs: sensoryPrefs } = useSensory();
+  const isLight = sensoryPrefs?.theme === 'light';
   const [vapidKey, setVapidKey] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -127,17 +130,17 @@ export default function NotificationSettings({ onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       className="w-80 rounded-xl overflow-hidden"
-      style={{ background: 'rgba(8,8,18,0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}
+      style={{ background: isLight ? 'rgba(255,255,255,0.96)' : 'rgba(8,8,18,0.95)', backdropFilter: 'blur(20px)', border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(255,255,255,0.06)'}`, boxShadow: isLight ? '0 16px 48px rgba(30,27,46,0.12)' : '0 20px 60px rgba(0,0,0,0.6)' }}
       data-testid="notification-settings"
     >
-      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)'}` }}>
         <div className="flex items-center gap-2">
           <Bell size={14} style={{ color: '#C084FC' }} />
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.6)' }}>Notifications</span>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Notifications</span>
         </div>
         {onClose && (
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5" data-testid="notification-close-btn">
-            <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+          <button onClick={onClose} className={`p-1 rounded-lg ${isLight ? 'hover:bg-black/[0.04]' : 'hover:bg-white/5'}`} data-testid="notification-close-btn">
+            <X size={12} style={{ color: 'var(--text-muted)' }} />
           </button>
         )}
       </div>

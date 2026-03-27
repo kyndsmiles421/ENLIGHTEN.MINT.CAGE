@@ -126,8 +126,9 @@ const ALL_PATHS = NAV_CATEGORIES.flatMap(c => c.items.map(i => i.path));
 /* ─── Mega Menu Dropdown (Desktop) ─── */
 function MegaDropdown({ category, onClose }) {
   const location = useLocation();
-  const { playClick } = useSensory();
+  const { playClick, prefs } = useSensory();
   const cols = category.items.length > 6 ? 'grid-cols-2' : 'grid-cols-1';
+  const isLight = prefs.theme === 'light';
 
   return (
     <motion.div
@@ -137,10 +138,12 @@ function MegaDropdown({ category, onClose }) {
       transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
       className="absolute top-full left-1/2 -translate-x-1/2 mt-2 rounded-2xl overflow-hidden"
       style={{
-        background: 'rgba(13, 14, 26, 0.96)',
-        border: '1px solid rgba(192,132,252,0.08)',
+        background: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(13, 14, 26, 0.96)',
+        border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(192,132,252,0.08)'}`,
         backdropFilter: 'blur(32px)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(192,132,252,0.04)',
+        boxShadow: isLight
+          ? '0 16px 48px rgba(30,27,46,0.12), 0 0 0 1px rgba(30,27,46,0.04)'
+          : '0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(192,132,252,0.04)',
         minWidth: category.items.length > 6 ? '340px' : '200px',
       }}
       data-testid={`mega-menu-${category.id}`}
@@ -159,10 +162,10 @@ function MegaDropdown({ category, onClose }) {
               key={item.path}
               to={item.path}
               onClick={() => { onClose(); playClick(); }}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs transition-all duration-200 hover:bg-white/[0.04]"
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs transition-all duration-200 ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/[0.04]'}`}
               style={{
-                color: active ? '#fff' : 'var(--text-secondary)',
-                background: active ? 'rgba(192,132,252,0.08)' : 'transparent',
+                color: active ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)',
+                background: active ? (isLight ? 'rgba(124,58,237,0.06)' : 'rgba(192,132,252,0.08)') : 'transparent',
               }}
               data-testid={`nav-item-${item.path.slice(1)}`}
             >
@@ -179,10 +182,11 @@ function MegaDropdown({ category, onClose }) {
 /* ─── Category Button (Desktop) ─── */
 function CategoryButton({ category, isOpen, onOpen, onClose }) {
   const location = useLocation();
-  const { playClick } = useSensory();
+  const { playClick, prefs } = useSensory();
   const timeoutRef = useRef(null);
   const Icon = category.icon;
   const hasActiveChild = category.items.some(i => location.pathname === i.path);
+  const isLight = prefs.theme === 'light';
 
   const handleEnter = () => {
     clearTimeout(timeoutRef.current);
@@ -200,8 +204,8 @@ function CategoryButton({ category, isOpen, onOpen, onClose }) {
         onClick={() => { isOpen ? onClose() : onOpen(); playClick(); }}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all duration-300"
         style={{
-          color: hasActiveChild || isOpen ? '#fff' : 'var(--text-muted)',
-          background: hasActiveChild ? `${category.color}12` : isOpen ? 'rgba(255,255,255,0.04)' : 'transparent',
+          color: hasActiveChild || isOpen ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-muted)',
+          background: hasActiveChild ? `${category.color}12` : isOpen ? (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)') : 'transparent',
         }}
         data-testid={`nav-cat-${category.id}`}
       >
@@ -219,8 +223,10 @@ function CategoryButton({ category, isOpen, onOpen, onClose }) {
 /* ─── Mobile Accordion Category ─── */
 function MobileCategory({ category, expanded, onToggle, onNavigate }) {
   const location = useLocation();
+  const { prefs } = useSensory();
   const Icon = category.icon;
   const hasActiveChild = category.items.some(i => location.pathname === i.path);
+  const isLight = prefs.theme === 'light';
 
   return (
     <div className="mb-1">
@@ -228,8 +234,8 @@ function MobileCategory({ category, expanded, onToggle, onNavigate }) {
         onClick={onToggle}
         className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all"
         style={{
-          color: hasActiveChild ? '#fff' : 'var(--text-secondary)',
-          background: expanded ? 'rgba(255,255,255,0.03)' : 'transparent',
+          color: hasActiveChild ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)',
+          background: expanded ? (isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)') : 'transparent',
         }}
         data-testid={`mobile-cat-${category.id}`}
       >
@@ -262,7 +268,7 @@ function MobileCategory({ category, expanded, onToggle, onNavigate }) {
                     onClick={onNavigate}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs transition-all"
                     style={{
-                      color: active ? '#fff' : 'var(--text-muted)',
+                      color: active ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-muted)',
                       background: active ? `${category.color}12` : 'transparent',
                     }}
                   >
@@ -282,7 +288,7 @@ function MobileCategory({ category, expanded, onToggle, onNavigate }) {
 /* ─── Main Navigation ─── */
 export default function Navigation() {
   const { user, logout } = useAuth();
-  const { ambientOn, toggleAmbient, playClick } = useSensory();
+  const { ambientOn, toggleAmbient, playClick, prefs } = useSensory();
   const { lang, setLanguage } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
@@ -298,6 +304,7 @@ export default function Navigation() {
   const profileRef = useRef(null);
   const notifRef = useRef(null);
   const profileTimeout = useRef(null);
+  const isLight = prefs.theme === 'light';
 
   /* Close dropdowns on outside click */
   useEffect(() => {
@@ -336,9 +343,9 @@ export default function Navigation() {
       <nav
         className="hidden lg:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-5 py-2.5"
         style={{
-          background: 'rgba(11, 12, 21, 0.8)',
+          background: isLight ? 'rgba(248, 246, 243, 0.88)' : 'rgba(11, 12, 21, 0.8)',
           backdropFilter: 'blur(28px)',
-          borderBottom: '1px solid rgba(192,132,252,0.05)',
+          borderBottom: `1px solid ${isLight ? 'rgba(30,27,46,0.06)' : 'rgba(192,132,252,0.05)'}`,
         }}
         data-testid="desktop-nav"
       >
@@ -392,7 +399,7 @@ export default function Navigation() {
           >
             <Search size={13} />
             <kbd className="hidden xl:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-mono"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)'}` }}>
               &#8984;K
             </kbd>
           </button>
@@ -412,11 +419,11 @@ export default function Navigation() {
               {langOpen && (
                 <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
                   className="absolute right-0 mt-2 w-36 rounded-xl overflow-hidden z-[100]"
-                  style={{ background: 'rgba(22, 24, 38, 0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(24px)' }}>
+                  style={{ background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(22, 24, 38, 0.98)', border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(192,132,252,0.1)'}`, backdropFilter: 'blur(24px)', boxShadow: isLight ? '0 8px 32px rgba(30,27,46,0.12)' : 'none' }}>
                   {LANGUAGES.map(l => (
                     <button key={l.code} onClick={() => { setLanguage(l.code); setLangOpen(false); playClick(); }}
                       className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-all"
-                      style={{ color: lang === l.code ? '#fff' : 'var(--text-secondary)', background: lang === l.code ? 'rgba(192,132,252,0.1)' : 'transparent' }}
+                      style={{ color: lang === l.code ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)', background: lang === l.code ? (isLight ? 'rgba(124,58,237,0.06)' : 'rgba(192,132,252,0.1)') : 'transparent' }}
                       data-testid={`lang-${l.code}`}>
                       <span className="text-[10px] font-bold uppercase w-5">{l.flag}</span>
                       <span>{l.name}</span>
@@ -526,8 +533,8 @@ export default function Navigation() {
                 onClick={() => { setProfileOpen(!profileOpen); playClick(); }}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all duration-300"
                 style={{
-                  color: profileOpen ? '#fff' : 'var(--text-secondary)',
-                  background: profileOpen ? 'rgba(192,132,252,0.1)' : 'transparent',
+                  color: profileOpen ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)',
+                  background: profileOpen ? (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(192,132,252,0.1)') : 'transparent',
                 }}
                 data-testid="nav-profile-btn"
               >
@@ -547,10 +554,10 @@ export default function Navigation() {
                     transition={{ duration: 0.18 }}
                     className="absolute top-full right-0 mt-2 w-48 rounded-xl overflow-hidden"
                     style={{
-                      background: 'rgba(13, 14, 26, 0.96)',
-                      border: '1px solid rgba(192,132,252,0.08)',
+                      background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(13, 14, 26, 0.96)',
+                      border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(192,132,252,0.08)'}`,
                       backdropFilter: 'blur(32px)',
-                      boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+                      boxShadow: isLight ? '0 16px 48px rgba(30,27,46,0.12)' : '0 24px 80px rgba(0,0,0,0.5)',
                     }}
                     data-testid="nav-profile-dropdown"
                   >
@@ -563,18 +570,18 @@ export default function Navigation() {
                             key={item.path}
                             to={item.path}
                             onClick={() => { setProfileOpen(false); playClick(); }}
-                            className="flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all hover:bg-white/[0.04]"
-                            style={{ color: active ? '#fff' : 'var(--text-secondary)', background: active ? 'rgba(192,132,252,0.08)' : 'transparent' }}
+                            className={`flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/[0.04]'}`}
+                            style={{ color: active ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)', background: active ? (isLight ? 'rgba(124,58,237,0.06)' : 'rgba(192,132,252,0.08)') : 'transparent' }}
                           >
                             <Icon size={13} style={active ? { color: 'var(--primary)' } : { color: 'var(--text-muted)' }} />
                             <span>{item.label}</span>
                           </Link>
                         );
                       })}
-                      <div className="my-1 mx-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }} />
+                      <div className="my-1 mx-3 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)' }} />
                       <button
                         onClick={() => { logout(); navigate('/'); setProfileOpen(false); playClick(); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all hover:bg-white/[0.04]"
+                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/[0.04]'}`}
                         style={{ color: 'var(--text-muted)' }}
                         data-testid="nav-logout"
                       >
@@ -603,9 +610,9 @@ export default function Navigation() {
       {/* ═══ Mobile Nav Bar ═══ */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
         style={{
-          background: 'rgba(11, 12, 21, 0.85)',
+          background: isLight ? 'rgba(248, 246, 243, 0.88)' : 'rgba(11, 12, 21, 0.85)',
           backdropFilter: 'blur(28px)',
-          borderBottom: '1px solid rgba(192,132,252,0.05)',
+          borderBottom: `1px solid ${isLight ? 'rgba(30,27,46,0.06)' : 'rgba(192,132,252,0.05)'}`,
         }}
       >
         <Link to="/" className="flex items-center gap-2" data-testid="nav-logo-mobile" onClick={playClick}>
@@ -633,7 +640,7 @@ export default function Navigation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="lg:hidden fixed inset-0 z-40 pt-16 overflow-y-auto"
-            style={{ background: 'rgba(11, 12, 21, 0.98)', backdropFilter: 'blur(24px)' }}
+            style={{ background: isLight ? 'rgba(248, 246, 243, 0.98)' : 'rgba(11, 12, 21, 0.98)', backdropFilter: 'blur(24px)' }}
             data-testid="mobile-menu-overlay"
           >
             <div className="p-4 pb-24">
@@ -668,7 +675,7 @@ export default function Navigation() {
               ))}
 
               {/* User Section */}
-              <div className="mt-4 pt-4 border-t" style={{ borderColor: 'rgba(192,132,252,0.06)' }}>
+              <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(192,132,252,0.06)' }}>
                 {user ? (
                   <>
                     <div className="flex items-center gap-3 px-4 py-2 mb-2">
@@ -702,7 +709,7 @@ export default function Navigation() {
                       return (
                         <Link key={item.path} to={item.path} onClick={() => { setMobileOpen(false); playClick(); }}
                           className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs transition-all"
-                          style={{ color: location.pathname === item.path ? '#fff' : 'var(--text-secondary)' }}>
+                          style={{ color: location.pathname === item.path ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)' }}>
                           <Icon size={14} style={{ color: 'var(--text-muted)' }} />
                           <span>{item.label}</span>
                         </Link>

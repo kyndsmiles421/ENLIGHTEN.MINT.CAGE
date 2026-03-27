@@ -24,7 +24,7 @@ function HerbCard({ herb, onSelect, selected }) {
           <Leaf size={18} style={{ color: herb.color }} />
         </div>
         <div>
-          <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{herb.name}</p>
+          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{herb.name}</p>
           <p className="text-[10px] italic" style={{ color: 'rgba(248,250,252,0.35)' }}>{herb.latin}</p>
         </div>
       </div>
@@ -46,7 +46,7 @@ function HerbDetail({ herb, onClose }) {
       style={{ background: 'rgba(15,17,28,0.8)', border: `1px solid ${herb.color}30`, backdropFilter: 'blur(24px)' }}>
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{herb.name}</h3>
+          <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{herb.name}</h3>
           <p className="text-xs italic mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{herb.latin} | {herb.family} family</p>
         </div>
         <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
@@ -142,10 +142,10 @@ export default function Herbology() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#22C55E' }}>
             <Leaf size={12} className="inline mr-1" /> Sacred Herbology
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             The Healing Herb Garden
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Ancient plant wisdom for modern wellness
           </p>
         </div>

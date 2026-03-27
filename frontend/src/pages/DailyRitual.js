@@ -290,10 +290,10 @@ export default function DailyRitual() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D8B4FE' }}>
             <Sparkles size={12} className="inline mr-1" /> Personalized For You
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Your Daily Wellness Ritual
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             {profile?.personalization_level === 'Deep' ? 'Deeply personalized to your journey' :
              profile?.personalization_level === 'Growing' ? 'Getting to know your practice' :
              'A ritual crafted just for you — it evolves as you do'}

@@ -69,7 +69,7 @@ export default function WellnessReports() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#818CF8' }}>
             <BarChart3 size={12} className="inline mr-1" /> Wellness Insights
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Wellness Reports
           </h1>
         </div>

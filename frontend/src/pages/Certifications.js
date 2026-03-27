@@ -33,10 +33,10 @@ export default function Certifications() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D4AF37' }}>
             <Award size={12} className="inline mr-1" /> Your Achievements
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Certifications
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Earned through dedication to your practice
           </p>
         </div>
@@ -67,7 +67,7 @@ export default function Certifications() {
                       <Award size={24} style={{ color: '#D4AF37' }} />
                     </div>
                     <div>
-                      <p className="font-bold text-sm" style={{ color: '#F8FAFC' }}>{cert.class_name || 'Course Completed'}</p>
+                      <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{cert.class_name || 'Course Completed'}</p>
                       <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
                         <CheckCircle size={10} style={{ color: '#22C55E' }} /> Certified
                       </p>

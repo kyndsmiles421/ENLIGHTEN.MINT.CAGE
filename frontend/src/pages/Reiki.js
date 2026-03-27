@@ -17,7 +17,7 @@ function ChakraBar({ chakra }) {
         <div className="w-3 h-3 rounded-full" style={{ background: chakra.color }} />
       </div>
       <div className="flex-1">
-        <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{chakra.name}</p>
+        <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{chakra.name}</p>
         <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{chakra.location} | {chakra.frequency}</p>
       </div>
       <div className="flex flex-wrap gap-1 max-w-[200px]">
@@ -41,7 +41,7 @@ function ReikiPositionCard({ pos, chakras }) {
           style={{ background: `${color}20` }}>
           <Sparkles size={12} style={{ color }} />
         </div>
-        <p className="text-sm font-medium" style={{ color: '#F8FAFC' }}>{pos.name}</p>
+        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{pos.name}</p>
         <span className="text-[10px] ml-auto" style={{ color: 'rgba(248,250,252,0.3)' }}>{pos.duration}</span>
       </div>
       <p className="text-xs mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>{pos.placement}</p>
@@ -69,7 +69,7 @@ function AuraReading({ reading, onClose }) {
               <Eye size={24} style={{ color }} />
             </div>
             <div>
-              <h3 className="text-lg font-bold" style={{ color: '#F8FAFC' }}>{aura?.name || 'Your Aura'}</h3>
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{aura?.name || 'Your Aura'}</h3>
               <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Dominant: {chakra?.name}</p>
             </div>
           </div>
@@ -153,10 +153,10 @@ export default function Reiki() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#818CF8' }}>
             <Sparkles size={12} className="inline mr-1" /> Reiki & Energy Healing
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Aura Readings & Reiki Healing
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Channel universal life force energy for deep healing
           </p>
         </div>
@@ -194,7 +194,7 @@ export default function Reiki() {
                   <select value={birthMonth} onChange={e => setBirthMonth(+e.target.value)}
                     data-testid="aura-birth-month"
                     className="px-3 py-2 rounded-xl text-xs"
-                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC' }}>
+                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}>
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]}</option>
                     ))}
@@ -202,7 +202,7 @@ export default function Reiki() {
                   <select value={birthDay} onChange={e => setBirthDay(+e.target.value)}
                     data-testid="aura-birth-day"
                     className="px-3 py-2 rounded-xl text-xs"
-                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC' }}>
+                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}>
                     {Array.from({ length: 31 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>{i + 1}</option>
                     ))}

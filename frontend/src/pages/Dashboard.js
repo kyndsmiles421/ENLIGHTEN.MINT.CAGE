@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useSensory } from '../context/SensoryContext';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
@@ -78,6 +79,8 @@ const CATEGORIZED_ACTIONS = [
 export default function Dashboard() {
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { prefs } = useSensory();
+  const isLight = prefs.theme === 'light';
   const [stats, setStats] = useState(null);
   const [recs, setRecs] = useState(null);
   const [streak, setStreak] = useState(null);
@@ -226,7 +229,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2 mb-1.5">
                   <Atom size={12} style={{ color: coherence.phase === 'coherent' ? '#00E5FF' : '#C084FC' }} />
                   <p className="text-xs font-bold uppercase tracking-[0.15em]" style={{
-                    color: coherence.phase === 'coherent' ? '#00E5FF' : coherence.phase === 'aligning' ? '#C084FC' : '#FCD34D',
+                    color: coherence.phase === 'coherent' ? (isLight ? '#0891B2' : '#00E5FF') : coherence.phase === 'aligning' ? (isLight ? '#7C3AED' : '#C084FC') : (isLight ? '#B45309' : '#FCD34D'),
                   }}>
                     {coherence.state}
                   </p>
@@ -234,17 +237,19 @@ export default function Dashboard() {
                 <p className="text-sm leading-relaxed mb-2" style={{ color: 'var(--text-secondary)' }}>{coherence.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { label: 'Moods', val: coherence.signals.mood_logs, color: '#FDA4AF' },
-                    { label: 'Journal', val: coherence.signals.journal_entries, color: '#86EFAC' },
-                    { label: 'Meditate', val: coherence.signals.meditations, color: '#D8B4FE' },
-                    { label: 'Breathe', val: coherence.signals.breathwork, color: '#2DD4BF' },
-                    { label: 'Streak', val: coherence.signals.streak, color: '#FCD34D' },
-                  ].map(s => (
+                    { label: 'Moods', val: coherence.signals.mood_logs, color: '#FDA4AF', lightColor: '#DB2777' },
+                    { label: 'Journal', val: coherence.signals.journal_entries, color: '#86EFAC', lightColor: '#16A34A' },
+                    { label: 'Meditate', val: coherence.signals.meditations, color: '#D8B4FE', lightColor: '#7C3AED' },
+                    { label: 'Breathe', val: coherence.signals.breathwork, color: '#2DD4BF', lightColor: '#0D9488' },
+                    { label: 'Streak', val: coherence.signals.streak, color: '#FCD34D', lightColor: '#B45309' },
+                  ].map(s => {
+                    const c = isLight ? s.lightColor : s.color;
+                    return (
                     <span key={s.label} className="text-[9px] px-1.5 py-0.5 rounded"
-                      style={{ background: `${s.color}08`, color: s.color, border: `1px solid ${s.color}12` }}>
+                      style={{ background: `${c}12`, color: c, border: `1px solid ${c}20` }}>
                       {s.label}: {s.val}
                     </span>
-                  ))}
+                  );})}
                 </div>
               </div>
 
@@ -266,7 +271,7 @@ export default function Dashboard() {
                 <Trophy size={22} style={{ color: dailyChallenge.challenge.color }} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold uppercase tracking-[0.15em] mb-1" style={{ color: '#FCD34D' }}>Today's Challenge</p>
+                <p className="text-xs font-bold uppercase tracking-[0.15em] mb-1" style={{ color: isLight ? '#B45309' : '#FCD34D' }}>Today's Challenge</p>
                 <p className="text-base font-medium truncate" style={{ color: 'var(--text-primary)' }}>{dailyChallenge.challenge.title}</p>
                 <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{dailyChallenge.challenge.description}</p>
               </div>
@@ -422,7 +427,6 @@ export default function Dashboard() {
                         transition={{ delay: 0.35 + gi * 0.05 + i * 0.02 }}
                         onClick={() => navigate(action.path)}
                         className="glass-card p-3 flex flex-col items-center gap-2 group cursor-pointer transition-all duration-300 hover:scale-105"
-                        style={{ border: '1px solid rgba(255,255,255,0.04)' }}
                         data-testid={`dashboard-action-${action.label.toLowerCase()}`}
                         whileHover={{ borderColor: `${action.color}30`, boxShadow: `0 0 20px ${action.color}15` }}
                       >

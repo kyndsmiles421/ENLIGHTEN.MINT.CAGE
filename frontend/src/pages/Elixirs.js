@@ -44,7 +44,7 @@ function ElixirCard({ elixir, onSelect }) {
           <Wine size={20} style={{ color: elixir.color }} />
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{elixir.name}</p>
+          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{elixir.name}</p>
           <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{elixir.subtitle}</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ function ElixirDetail({ elixir, onClose }) {
       style={{ background: 'rgba(15,17,28,0.85)', border: `1px solid ${elixir.color}30`, backdropFilter: 'blur(24px)' }}>
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{elixir.name}</h3>
+          <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{elixir.name}</h3>
           <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{elixir.subtitle}</p>
         </div>
         <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
@@ -149,10 +149,10 @@ export default function Elixirs() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#FB923C' }}>
             <Wine size={12} className="inline mr-1" /> Sacred Elixirs
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Healing Elixirs & Drinks
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Ancient recipes for body, mind, and spirit
           </p>
         </div>

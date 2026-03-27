@@ -74,10 +74,10 @@ export default function DailyBriefing() {
           className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: '#D8B4FE' }}>
           <Sparkles size={12} className="inline mr-1" /> {data.date}
         </motion.p>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
           {data.greeting}
         </h1>
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
           Your personalized cosmic forecast for today
         </p>
         {data.streak > 0 && (
@@ -124,7 +124,7 @@ export default function DailyBriefing() {
         {/* Elemental Energy */}
         <Section title={`${data.element.name} Element Day`} icon={ElemIcon} color={data.element.color} delay={0.1}>
           <div className="rounded-xl p-4 mb-3" style={{ background: `${data.element.color}06`, border: `1px solid ${data.element.color}12` }}>
-            <p className="text-lg font-bold mb-1" style={{ color: '#F8FAFC' }}>{data.element.energy}</p>
+            <p className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{data.element.energy}</p>
             <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)' }}>{data.element.focus}</p>
           </div>
         </Section>
@@ -150,7 +150,7 @@ export default function DailyBriefing() {
         {/* Mayan Energy */}
         <Section title="Mayan Tzolk'in" icon={Compass} color="#A78BFA" delay={0.3}>
           <button onClick={() => navigate('/mayan')} className="w-full text-left">
-            <p className="text-lg font-bold mb-1" style={{ color: '#F8FAFC' }}>{data.mayan.galactic_signature}</p>
+            <p className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{data.mayan.galactic_signature}</p>
             <p className="text-xs mb-2" style={{ color: '#A78BFA' }}>Kin {data.mayan.kin} — Tone: {data.mayan.tone}</p>
             <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{data.mayan.meaning}</p>
           </button>
@@ -215,7 +215,7 @@ export default function DailyBriefing() {
                 boxShadow: `0 0 30px ${data.aura_color === 'blue' ? '#3B82F6' : '#D8B4FE'}20`,
               }} />
               <div>
-                <p className="text-sm font-medium capitalize" style={{ color: '#F8FAFC' }}>{data.aura_color} Aura</p>
+                <p className="text-sm font-medium capitalize" style={{ color: 'var(--text-primary)' }}>{data.aura_color} Aura</p>
                 <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Your current energetic signature</p>
               </div>
             </div>
@@ -235,7 +235,7 @@ export default function DailyBriefing() {
                   <Sparkles size={14} style={{ color: '#22C55E' }} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{p.name}</p>
+                  <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
                   <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>{p.duration}</p>
                 </div>
                 <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.15)' }} />

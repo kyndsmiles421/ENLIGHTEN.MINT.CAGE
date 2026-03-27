@@ -84,7 +84,7 @@ export default function CosmicCalendar() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D8B4FE' }}>
             <Calendar size={12} className="inline mr-1" /> {data?.date}
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
             Cosmic Calendar
           </h1>
         </div>

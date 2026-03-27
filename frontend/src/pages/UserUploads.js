@@ -91,7 +91,7 @@ function MediaCard({ item, onDelete }) {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {isAudio ? <FileAudio size={14} style={{ color: '#3B82F6' }} /> : <Video size={14} style={{ color: '#8B5CF6' }} />}
-          <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{item.title}</p>
+          <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.title}</p>
           <span className="text-[10px] px-2 py-0.5 rounded-full"
             style={{ background: isAudio ? 'rgba(59,130,246,0.1)' : 'rgba(139,92,246,0.1)', color: isAudio ? '#3B82F6' : '#8B5CF6' }}>
             {item.media_type}
@@ -162,10 +162,10 @@ export default function UserUploads() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#3B82F6' }}>
             <Music size={12} className="inline mr-1" /> Your Collection
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Media Library
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Upload personal meditations, mantras, and healing sounds
           </p>
         </div>

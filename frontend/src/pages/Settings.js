@@ -9,12 +9,15 @@ import {
 import { useSensory } from '../context/SensoryContext';
 
 function Section({ title, children }) {
+  const { prefs } = useSensory();
+  const isLight = prefs.theme === 'light';
+  const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
   return (
     <div className="mb-6">
       <p className="text-[10px] uppercase tracking-widest font-bold mb-3 px-1"
         style={{ color: 'var(--text-muted)' }}>{title}</p>
       <div className="rounded-xl overflow-hidden"
-        style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+        style={{ background: `${subtle}0.02)`, border: `1px solid ${subtle}0.05)` }}>
         {children}
       </div>
     </div>
@@ -22,9 +25,12 @@ function Section({ title, children }) {
 }
 
 function Toggle({ label, description, checked, onChange, testId, icon: Icon }) {
+  const { prefs } = useSensory();
+  const isLight = prefs.theme === 'light';
+  const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
   return (
     <div className="flex items-center justify-between px-4 py-3"
-      style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+      style={{ borderBottom: `1px solid ${subtle}0.04)` }}>
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {Icon && <Icon size={14} style={{ color: 'var(--text-muted)' }} />}
         <div>
@@ -36,8 +42,8 @@ function Toggle({ label, description, checked, onChange, testId, icon: Icon }) {
         onClick={() => onChange(!checked)}
         className="w-10 h-5 rounded-full relative transition-all flex-shrink-0"
         style={{
-          background: checked ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.06)',
-          border: `1px solid ${checked ? 'rgba(192,132,252,0.4)' : 'rgba(248,250,252,0.1)'}`,
+          background: checked ? 'rgba(192,132,252,0.3)' : `${subtle}0.08)`,
+          border: `1px solid ${checked ? 'rgba(192,132,252,0.4)' : `${subtle}0.12)`}`,
         }}
         data-testid={testId}>
         <div className="w-3.5 h-3.5 rounded-full absolute top-0.5 transition-all"
@@ -51,9 +57,12 @@ function Toggle({ label, description, checked, onChange, testId, icon: Icon }) {
 }
 
 function Slider({ label, value, min, max, onChange, testId, icon: Icon, suffix }) {
+  const { prefs } = useSensory();
+  const isLight = prefs.theme === 'light';
+  const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
   return (
     <div className="px-4 py-3"
-      style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+      style={{ borderBottom: `1px solid ${subtle}0.04)` }}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {Icon && <Icon size={14} style={{ color: 'var(--text-muted)' }} />}
@@ -66,7 +75,7 @@ function Slider({ label, value, min, max, onChange, testId, icon: Icon, suffix }
         onChange={e => onChange(parseInt(e.target.value))}
         className="w-full h-1 rounded-full appearance-none cursor-pointer"
         style={{
-          background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((value - min) / (max - min)) * 100}%, rgba(248,250,252,0.08) ${((value - min) / (max - min)) * 100}%, rgba(248,250,252,0.08) 100%)`,
+          background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((value - min) / (max - min)) * 100}%, ${subtle}0.1) ${((value - min) / (max - min)) * 100}%, ${subtle}0.1) 100%)`,
         }}
         data-testid={testId}
       />
@@ -77,13 +86,15 @@ function Slider({ label, value, min, max, onChange, testId, icon: Icon, suffix }
 export default function Settings() {
   const navigate = useNavigate();
   const { ambientOn, toggleAmbient, prefs, updatePref, themes } = useSensory();
+  const isLight = prefs.theme === 'light';
+  const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-white/5 transition-all"
+          <button onClick={() => navigate(-1)} className={`p-2 rounded-lg ${isLight ? 'hover:bg-black/[0.04]' : 'hover:bg-white/5'} transition-all`}
             data-testid="settings-back-btn">
             <ArrowLeft size={18} style={{ color: 'var(--text-muted)' }} />
           </button>
@@ -126,7 +137,7 @@ export default function Settings() {
 
         {/* Visual & Display */}
         <Section title="Visual & Display">
-          <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+          <div className="px-4 py-3" style={{ borderBottom: `1px solid ${subtle}0.04)` }}>
             <div className="flex items-center gap-2 mb-3">
               <Palette size={14} style={{ color: 'var(--text-muted)' }} />
               <p className="text-xs" style={{ color: 'var(--text-primary)' }}>Color Theme</p>
@@ -141,8 +152,8 @@ export default function Settings() {
                     onClick={() => { updatePref('theme', id); toast.success(`Theme: ${t.label}`); }}
                     className="flex items-center gap-2 p-2.5 rounded-lg text-left transition-all hover:scale-[1.02]"
                     style={{
-                      background: active ? `${t.primary}12` : 'rgba(248,250,252,0.02)',
-                      border: `1px solid ${active ? `${t.primary}30` : 'rgba(248,250,252,0.06)'}`,
+                      background: active ? `${t.primary}12` : `${subtle}0.03)`,
+                      border: `1px solid ${active ? `${t.primary}30` : `${subtle}0.06)`}`,
                     }}
                     data-testid={`theme-${id}`}>
                     <div className="w-6 h-6 rounded-full flex items-center justify-center"
@@ -154,7 +165,7 @@ export default function Settings() {
                       <div className="flex gap-0.5 mt-0.5">
                         <div className="w-2 h-2 rounded-full" style={{ background: t.primary }} />
                         <div className="w-2 h-2 rounded-full" style={{ background: t.textPrimary }} />
-                        <div className="w-2 h-2 rounded-full" style={{ background: t.bg, border: '1px solid rgba(255,255,255,0.2)' }} />
+                        <div className="w-2 h-2 rounded-full" style={{ background: t.bg, border: `1px solid ${subtle}0.2)` }} />
                       </div>
                     </div>
                   </button>
@@ -197,8 +208,8 @@ export default function Settings() {
           ].map(item => (
             <button key={item.path}
               onClick={() => navigate(item.path)}
-              className="w-full flex items-center justify-between px-4 py-3 text-left transition-all hover:bg-white/[0.02]"
-              style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all ${isLight ? 'hover:bg-black/[0.02]' : 'hover:bg-white/[0.02]'}`}
+              style={{ borderBottom: `1px solid ${subtle}0.04)` }}
               data-testid={`settings-link-${item.label.toLowerCase().replace(/\s/g, '-')}`}>
               <div className="flex items-center gap-3">
                 <item.icon size={14} style={{ color: 'var(--text-muted)' }} />
@@ -224,8 +235,8 @@ export default function Settings() {
               updatePref('ambientVolume', 15);
               toast.success('Settings reset to defaults');
             }}
-            className="text-[10px] px-4 py-2 rounded-lg transition-all hover:bg-white/5"
-            style={{ color: 'var(--text-muted)', border: '1px solid rgba(248,250,252,0.06)' }}
+            className={`text-[10px] px-4 py-2 rounded-lg transition-all ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/5'}`}
+            style={{ color: 'var(--text-muted)', border: `1px solid ${subtle}0.08)` }}
             data-testid="reset-settings-btn">
             Reset to Defaults
           </button>

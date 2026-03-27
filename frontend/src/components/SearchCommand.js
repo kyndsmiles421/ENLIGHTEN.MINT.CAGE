@@ -95,11 +95,12 @@ const SEARCH_INDEX = [
 
 export default function SearchCommand({ open, onClose }) {
   const navigate = useNavigate();
-  const { playClick } = useSensory();
+  const { playClick, prefs } = useSensory();
   const inputRef = useRef(null);
   const listRef = useRef(null);
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
+  const isLight = prefs.theme === 'light';
 
   /* Filter results */
   const results = useMemo(() => {
@@ -195,14 +196,14 @@ export default function SearchCommand({ open, onClose }) {
           transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
           className="w-full max-w-xl rounded-2xl overflow-hidden"
           style={{
-            background: 'rgba(13, 14, 26, 0.97)',
-            border: '1px solid rgba(192,132,252,0.1)',
-            boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 60px rgba(192,132,252,0.04)',
+            background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(13, 14, 26, 0.97)',
+            border: `1px solid ${isLight ? 'rgba(30,27,46,0.1)' : 'rgba(192,132,252,0.1)'}`,
+            boxShadow: isLight ? '0 24px 60px rgba(30,27,46,0.15)' : '0 24px 80px rgba(0,0,0,0.6), 0 0 60px rgba(192,132,252,0.04)',
           }}
           data-testid="search-palette"
         >
           {/* Search Input */}
-          <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+          <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)' }}>
             <Search size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
             <input
               ref={inputRef}
@@ -220,7 +221,7 @@ export default function SearchCommand({ open, onClose }) {
               </button>
             )}
             <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}` }}>
               esc
             </kbd>
           </div>
@@ -251,8 +252,8 @@ export default function SearchCommand({ open, onClose }) {
                         onMouseEnter={() => setActiveIdx(idx)}
                         className="w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors duration-100"
                         style={{
-                          background: isActive ? 'rgba(192,132,252,0.08)' : 'transparent',
-                          color: isActive ? '#fff' : 'var(--text-secondary)',
+                          background: isActive ? (isLight ? 'rgba(124,58,237,0.06)' : 'rgba(192,132,252,0.08)') : 'transparent',
+                          color: isActive ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)',
                         }}
                         data-testid={`search-result-${item.path.slice(1)}`}
                       >
@@ -270,15 +271,15 @@ export default function SearchCommand({ open, onClose }) {
           </div>
 
           {/* Footer hints */}
-          <div className="flex items-center gap-4 px-5 py-2.5 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+          <div className="flex items-center gap-4 px-5 py-2.5 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)' }}>
             <div className="flex items-center gap-1.5">
               <div className="flex gap-0.5">
                 <kbd className="flex items-center justify-center w-5 h-5 rounded text-[10px]"
-                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}` }}>
                   <ArrowUp size={9} />
                 </kbd>
                 <kbd className="flex items-center justify-center w-5 h-5 rounded text-[10px]"
-                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}` }}>
                   <ArrowDown size={9} />
                 </kbd>
               </div>
@@ -286,7 +287,7 @@ export default function SearchCommand({ open, onClose }) {
             </div>
             <div className="flex items-center gap-1.5">
               <kbd className="flex items-center justify-center px-1.5 h-5 rounded text-[10px]"
-                style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}` }}>
                 <CornerDownLeft size={9} />
               </kbd>
               <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Open</span>

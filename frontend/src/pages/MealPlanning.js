@@ -24,7 +24,7 @@ function PlanCard({ plan, onSelect, active }) {
           <UtensilsCrossed size={18} style={{ color: plan.color }} />
         </div>
         <div>
-          <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{plan.name}</p>
+          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{plan.name}</p>
           <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{plan.meal_count} meals planned</p>
         </div>
       </div>
@@ -40,7 +40,7 @@ function PlanDetail({ plan, onClose }) {
       style={{ background: 'rgba(15,17,28,0.85)', border: `1px solid ${plan.color}30`, backdropFilter: 'blur(24px)' }}>
       <div className="flex justify-between items-start mb-5">
         <div>
-          <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{plan.name}</h3>
+          <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{plan.name}</h3>
           <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{plan.focus}</p>
         </div>
         <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
@@ -52,7 +52,7 @@ function PlanDetail({ plan, onClose }) {
               <p className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: plan.color }}>{m.meal}</p>
               <p className="text-xs italic" style={{ color: 'rgba(248,250,252,0.3)' }}>{m.intention}</p>
             </div>
-            <p className="text-sm font-semibold mb-2" style={{ color: '#F8FAFC' }}>{m.name}</p>
+            <p className="text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{m.name}</p>
             {m.items.map((item, j) => (
               <div key={j} className="flex items-start gap-2 mb-1">
                 <ChevronRight size={10} style={{ color: plan.color, marginTop: 3 }} />
@@ -225,10 +225,10 @@ export default function MealPlanning() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#22C55E' }}>
             <UtensilsCrossed size={12} className="inline mr-1" /> Conscious Nourishment
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Meal Planning & Food Journal
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Eat with intention, nourish body and spirit
           </p>
         </div>

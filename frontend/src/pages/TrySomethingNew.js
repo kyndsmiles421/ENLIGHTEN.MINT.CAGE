@@ -25,7 +25,7 @@ function SuggestionCard({ feat, index }) {
           <Sparkles size={20} style={{ color: feat.color }} />
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{feat.name}</p>
+          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{feat.name}</p>
           <p className="text-[10px] uppercase tracking-wider" style={{ color: feat.color }}>{feat.category}</p>
         </div>
         <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: feat.color }} />
@@ -68,10 +68,10 @@ export default function TrySomethingNew() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#E879F9' }}>
             <Compass size={12} className="inline mr-1" /> Discovery Engine
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Try Something New
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Expand your practice with unexplored features
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function TrySomethingNew() {
             <div className="max-w-md mx-auto mb-8 rounded-2xl p-5"
               style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(232,121,249,0.1)', backdropFilter: 'blur(12px)' }}>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>Your Exploration Journey</p>
+                <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Your Exploration Journey</p>
                 <span className="text-xs font-bold" style={{ color: '#E879F9' }}>{stats.percent || 0}%</span>
               </div>
               <div className="w-full h-2 rounded-full overflow-hidden mb-2" style={{ background: 'rgba(248,250,252,0.06)' }}>

@@ -32,7 +32,7 @@ function ModeSelector({ modes, onSelect }) {
                 {mode.id === 'dream_oracle' ? <Moon size={14} style={{ color: mode.color }} /> :
                  <Sparkles size={14} style={{ color: mode.color }} />}
               </div>
-              <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{mode.name}</p>
+              <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{mode.name}</p>
             </div>
             <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{mode.desc}</p>
           </motion.button>
@@ -61,7 +61,7 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
           style={{ background: 'rgba(129,140,248,0.1)', boxShadow: '0 0 40px rgba(129,140,248,0.08)' }}>
           <Moon size={24} style={{ color: '#818CF8' }} />
         </div>
-        <h2 className="text-lg font-bold mb-1" style={{ color: '#F8FAFC' }}>Select a Dream to Analyze</h2>
+        <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Select a Dream to Analyze</h2>
         <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>
           The Dream Oracle will interpret it through your cosmic profile
         </p>
@@ -94,7 +94,7 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium truncate" style={{ color: '#F8FAFC' }}>{dream.title || 'Untitled Dream'}</p>
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{dream.title || 'Untitled Dream'}</p>
                     {dream.lucid && (
                       <span className="text-[9px] px-1.5 py-0.5 rounded-full flex-shrink-0"
                         style={{ background: 'rgba(216,180,254,0.15)', color: '#D8B4FE' }}>Lucid</span>
@@ -252,7 +252,7 @@ function SessionList({ sessions, onSelect, onNew, onDelete, modes }) {
                       {s.mode === 'dream_oracle' ? <Moon size={10} style={{ color: mode?.color || '#818CF8' }} /> :
                        <Sparkles size={10} style={{ color: mode?.color || '#D8B4FE' }} />}
                     </div>
-                    <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{mode?.name || s.mode}</span>
+                    <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{mode?.name || s.mode}</span>
                     <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
                       {s.message_count} msgs
                     </span>
@@ -578,12 +578,12 @@ export default function SpiritualCoach() {
               <><Moon size={12} className="inline mr-1" /> Dream Oracle</> :
               <><MessageCircle size={12} className="inline mr-1" /> AI Spiritual Coach</>}
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             {view === 'dream_picker' ? 'Dream Oracle' :
              view === 'chat' && modeInfo ? modeInfo.name : 'Sage'}
           </h1>
           {view !== 'chat' && view !== 'dream_picker' && (
-            <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
               Your personal spiritual and life guide
             </p>
           )}

@@ -151,10 +151,10 @@ export default function Aromatherapy() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#C084FC' }}>
             <Droplets size={12} className="inline mr-1" /> Sacred Aromatherapy
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Essential Oils & Blends
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Explore the healing power of nature's aromatic essences
           </p>
         </div>

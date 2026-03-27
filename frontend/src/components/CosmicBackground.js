@@ -145,11 +145,13 @@ export default function CosmicBackground() {
     };
   }, [init, spawnShootingStar]);
 
+  const isLight = prefs.theme === 'light';
+  
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0, opacity: prefs.reduceParticles ? 0.3 : 0.7 }}
+      style={{ zIndex: 0, opacity: isLight ? 0 : (prefs.reduceParticles ? 0.3 : 0.7) }}
       data-testid="cosmic-background"
     />
   );

@@ -50,7 +50,7 @@ export default function MeditationHistory() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D8B4FE' }}>
             <Timer size={12} className="inline mr-1" /> Practice Timeline
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Meditation History
           </h1>
         </div>
@@ -152,7 +152,7 @@ export default function MeditationHistory() {
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <Brain size={14} style={{ color: '#D8B4FE' }} />
-                        <span className="text-xs font-medium capitalize" style={{ color: '#F8FAFC' }}>{s.type || 'Meditation'}</span>
+                        <span className="text-xs font-medium capitalize" style={{ color: 'var(--text-primary)' }}>{s.type || 'Meditation'}</span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full"
                           style={{ background: 'rgba(216,180,254,0.1)', color: '#D8B4FE' }}>
                           {s.duration_minutes || s.duration || '?'} min
