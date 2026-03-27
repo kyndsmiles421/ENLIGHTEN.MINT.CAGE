@@ -7,59 +7,68 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Frontend: React, Tailwind CSS, Framer Motion, Vanilla Three.js
 - Backend: FastAPI, Motor (Async MongoDB)
 - Integrations: Emergent LLM Key (OpenAI GPT-5.2, Whisper STT, TTS-1-HD, GPT Image 1, Sora 2)
+- Mobile: Progressive Web App (PWA) — installable on iOS + Android
 
 ## All Implemented Features
 
-### Core: Auth, profiles, dashboard, mood, journaling, affirmations, gamification
-### Wellness: Mudras (25), Yantras, Tantra, Exercises, Videos, Meditations, Breathwork, Frequencies, Soundscapes, Nourishment, Rituals
-### Mystical: Oracle, Astrology, Numerology, Cardology, Cosmic Calendar, Aromatherapy, Herbology, Acupressure, Reiki
-### Tutorial: Interactive walkthrough + Tutorial page
+### Core Platform
+- Auth, profiles, dashboard (categorized), mood tracking, journaling, affirmations, gamification
+- Global Search Command Palette (Cmd+K, 60-item index, fuzzy matching)
+- 6-category mega-menu navigation + Sage direct link + Profile dropdown
+- Mobile accordion navigation
 
-### AI Voice: Sage Coach (text+voice via Whisper STT + TTS "sage" voice)
-### Multi-Cultural Star Chart: Mayan/Egyptian/Aboriginal/Lakota (20 constellations) + Cultural Story Explorer with voice narration
-### Creation Stories: 15 world civilizations with full origin myths, region filtering, search, TTS narration
-### Social: Community feed, forecast sharing, meditation sharing
-### VR: Sanctuary (meditation + 3 guided constellation journeys + Story Theater)
-### Analytics: Cosmic Profile, Forecasts (6 systems x 4 periods), Zen Garden
-### 3D: Star Chart (gyroscope AR), VR Sanctuary, 3D Avatar
+### Wellness Practice
+- Mudras (25), Yantras, Tantra, Qigong/Tai Chi, Videos, Meditations, Breathwork
+- Frequencies/Solfeggio, Soundscapes, Nourishment/Recipes, Sacred Rituals
+- Light Therapy, Mantras, Affirmations, Ho'oponopono
 
-### AI Cinematic Visuals
-- Creation Stories Cinema, VR Story Theater, Forecast Visuals, Dream Visuals
-- Cosmic Portrait, Daily Card, Meditation Ambient
-- All using GPT Image 1 via Emergent LLM Key
+### Mystical & Divination
+- Oracle/Tarot, Astrology, Numerology, Cardology, Cosmic Calendar
+- Aromatherapy, Herbology, Acupressure, Reiki & Aura
+- Multi-Cultural Star Chart (Mayan/Egyptian/Aboriginal/Lakota, 20 constellations)
+- Cosmic Profile analytics, Forecasts (6 systems x 4 periods)
+- Dream Journal, Animal Totems, Mayan Astrology
 
-### Launch-Ready UI/UX Overhaul
-- Navigation: 60-item flat → 6 categorized mega-menu dropdowns + Sage + Profile
+### AI Features
+- Sage AI Coach (text + voice via Whisper STT + TTS "sage" voice)
+- AI Cinematic Visuals (GPT Image 1) — Creation Stories, VR Theater, Forecasts, Dreams, Cosmic Portrait
+- Sora 2 AI Video Generation — 15 creation story video clips (4s each) with batch generation
+- Video Gallery (Cosmic Cinema) — browse/generate/watch all 15 stories
+
+### Social & Explore
+- Community feed, forecast/meditation sharing
+- Creation Stories (15 cultures, TTS narration, Cinema mode)
+- VR Sanctuary (meditation + constellation journeys + Story Theater)
+- Journey, Games, Classes, Videos, Challenges, Friends
+
+### Launch-Ready UX (Feb 2026)
+- Navigation: 60-item flat → 6 categorized mega-menu dropdowns
 - Landing: 24 cards → 6 category pillar cards
-- Global Search: Cmd+K command palette with 60-item index
 - Dashboard: Flat grid → 5 categorized quick action sections
+- Scroll-to-top on route change
+- Back-to-top floating action button
+- Glass-card hover micro-interactions
+- Touch feedback for mobile
 
-### Sora 2 AI Video Generation
-- 4-second cinematic video clips for 15 creation stories
-- Background generation with polling, MongoDB + disk caching
-- Video toggles in CinematicStoryMode and VR Story Theater
+### PWA / Mobile App (Feb 2026)
+- Full Progressive Web App with manifest.json (display: standalone)
+- App shortcuts: Breathwork, Meditation, Sage, Daily Briefing
+- Service worker with network-first caching
+- App icons (192, 512, Apple touch icon, favicon)
+- Apple meta tags (apple-mobile-web-app-capable, black-translucent status bar)
+- Safe area insets for notched devices
+- Install prompt with iOS/Android detection
+- OG/Twitter social sharing meta tags
 
-### Video Gallery (Cosmic Cinema)
-- `/videos` page with two tabs: Cosmic Cinema (15 Sora 2 stories) + Practice Videos
-- Cinema cards with generate/watch per story, video player modal
-- SORA 2 badge for cached videos, progress counter (x/15)
+### Code Architecture
+- StarChart.js split: 2042 → 1424 lines (extracted StarChartOverlays.js + StarChartAudio.js)
+- Backend batch video generation with async task queue
 
-### StarChart.js Component Splitting
-- Reduced from ~2042 to ~1424 lines
-- Extracted: StarChartOverlays.js (5 overlay components), StarChartAudio.js (ambient + narrator)
-
-## Architecture
-- `/app/backend/routes/ai_visuals.py` — Image + Video generation with Sora 2
-- `/app/backend/static/videos/` — Generated video file cache
-- `/app/frontend/src/components/SearchCommand.js` — Command palette
-- `/app/frontend/src/components/Navigation.js` — 6 mega-menus + search
-- `/app/frontend/src/components/StarChartOverlays.js` — Extracted StarChart overlays
-- `/app/frontend/src/components/StarChartAudio.js` — Extracted StarChart audio
-- `/app/frontend/src/pages/Videos.js` — Video Gallery with Cosmic Cinema tab
-
-## Test: 59 iterations, all 100% pass rate
+## Test: 60 iterations, all 100% pass rate
 ## Credentials: test@test.com / password
-## Status: PRODUCTION READY
+## Status: LAUNCH READY
 
-## Remaining / Backlog
-- None — all requested features and refactoring complete
+## How to Install as Mobile App
+- **Android**: Open in Chrome → tap "Add to Home Screen" or "Install" in menu
+- **iOS**: Open in Safari → tap Share → "Add to Home Screen"
+- App launches in standalone mode (no browser chrome)
