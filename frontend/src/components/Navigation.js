@@ -13,8 +13,6 @@ import {
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp,
   CreditCard, Crown, Settings, Gem, Link2
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { LANGUAGES } from '../i18n/translations';
 import SearchCommand from './SearchCommand';
 import NotificationSettings from './NotificationSettings';
 import { useCreditsContext } from '../context/CreditContext';
@@ -290,18 +288,15 @@ function MobileCategory({ category, expanded, onToggle, onNavigate }) {
 export default function Navigation() {
   const { user, logout } = useAuth();
   const { ambientOn, toggleAmbient, playClick, prefs } = useSensory();
-  const { lang, setLanguage } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openCat, setOpenCat] = useState(null);
   const [mobileCat, setMobileCat] = useState(null);
-  const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const { creditInfo } = useCreditsContext();
-  const langRef = useRef(null);
   const profileRef = useRef(null);
   const notifRef = useRef(null);
   const profileTimeout = useRef(null);
@@ -310,7 +305,6 @@ export default function Navigation() {
   /* Close dropdowns on outside click */
   useEffect(() => {
     const handler = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
       if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
     };
@@ -404,36 +398,6 @@ export default function Navigation() {
               &#8984;K
             </kbd>
           </button>
-
-          {/* Language */}
-          <div className="relative" ref={langRef}>
-            <button
-              onClick={() => { setLangOpen(!langOpen); playClick(); }}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-full text-xs transition-all duration-300"
-              style={{ color: 'var(--text-muted)', background: langOpen ? 'rgba(192,132,252,0.08)' : 'transparent' }}
-              data-testid="nav-lang-btn"
-            >
-              <Globe size={12} />
-              <span className="uppercase text-[10px] font-bold">{lang}</span>
-            </button>
-            <AnimatePresence>
-              {langOpen && (
-                <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
-                  className="absolute right-0 mt-2 w-36 rounded-xl overflow-hidden z-[100]"
-                  style={{ background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(22, 24, 38, 0.98)', border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(192,132,252,0.1)'}`, backdropFilter: 'blur(24px)', boxShadow: isLight ? '0 8px 32px rgba(30,27,46,0.12)' : 'none' }}>
-                  {LANGUAGES.map(l => (
-                    <button key={l.code} onClick={() => { setLanguage(l.code); setLangOpen(false); playClick(); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-all"
-                      style={{ color: lang === l.code ? (isLight ? '#1E1B2E' : '#fff') : 'var(--text-secondary)', background: lang === l.code ? (isLight ? 'rgba(124,58,237,0.06)' : 'rgba(192,132,252,0.1)') : 'transparent' }}
-                      data-testid={`lang-${l.code}`}>
-                      <span className="text-[10px] font-bold uppercase w-5">{l.flag}</span>
-                      <span>{l.name}</span>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
 
           {/* Ambient Toggle */}
           <button
