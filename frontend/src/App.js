@@ -11,6 +11,7 @@ import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import InstallPrompt from './components/InstallPrompt';
 import CreditNudge from './components/CreditNudge';
+import CosmicMixer from './components/CosmicMixer';
 import { CreditProvider } from './context/CreditContext';
 
 // Eager load: Landing + Auth (first screens users see)
@@ -213,6 +214,7 @@ function App() {
             <BackToTop />
             <InstallPrompt />
             <CreditNudge />
+            <CosmicMixer />
           </div>
         </BrowserRouter>
       </SensoryProvider>
