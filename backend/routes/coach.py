@@ -1,9 +1,14 @@
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, UploadFile, File, Form
+from fastapi.responses import JSONResponse
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+from emergentintegrations.llm.openai import OpenAITextToSpeech, OpenAISpeechToText
 from datetime import datetime, timezone
 import uuid
 import asyncio
+import base64
+import tempfile
+import os
 
 router = APIRouter()
 
@@ -386,4 +391,120 @@ Be poetic, wise, and deeply personal. This is not a generic interpretation — i
             "birth_card": birth_card,
             "moon_phase": moon_phase,
         }
+    }
+
+
+
+@router.post("/coach/voice-chat")
+async def voice_chat(
+    audio: UploadFile = File(...),
+    session_id: str = Form(...),
+    user=Depends(get_current_user),
+):
+    """Voice conversation: transcribe user audio, get AI reply, return TTS audio."""
+    # Validate session
+    session = await db.coach_sessions.find_one(
+        {"id": session_id, "user_id": user["id"]}, {"_id": 0}
+    )
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Save uploaded audio to temp file for Whisper
+    tmp_path = None
+    try:
+        content = await audio.read()
+        suffix = ".webm"
+        if audio.filename:
+            ext = os.path.splitext(audio.filename)[1]
+            if ext in (".mp3", ".wav", ".m4a", ".mp4", ".webm", ".ogg", ".mpeg"):
+                suffix = ext
+        tmp_fd, tmp_path = tempfile.mkstemp(suffix=suffix)
+        os.close(tmp_fd)
+        with open(tmp_path, "wb") as f:
+            f.write(content)
+
+        # Transcribe with Whisper
+        stt = OpenAISpeechToText(api_key=EMERGENT_LLM_KEY)
+        with open(tmp_path, "rb") as audio_file:
+            stt_response = await stt.transcribe(
+                file=audio_file,
+                model="whisper-1",
+                response_format="json",
+                language="en",
+            )
+        transcribed_text = stt_response.text.strip()
+    except Exception as e:
+        logger.error(f"STT error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to transcribe audio")
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+    if not transcribed_text:
+        raise HTTPException(status_code=400, detail="Could not understand audio")
+
+    # Get AI response (reuse existing chat logic)
+    mode = session.get("mode", "spiritual")
+    messages = session.get("messages", [])
+    profile = await _get_user_profile(user["id"])
+    system_prompt = _build_system_prompt(profile, mode)
+
+    try:
+        history_text = ""
+        if messages:
+            recent = messages[-8:]
+            history_parts = []
+            for msg in recent:
+                role = "Seeker" if msg["role"] == "user" else "Sage"
+                history_parts.append(f"{role}: {msg['text']}")
+            history_text = "\n\nPREVIOUS CONVERSATION:\n" + "\n".join(history_parts)
+
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"coach-voice-{session_id}-{uuid.uuid4().hex[:8]}",
+            system_message=system_prompt + history_text,
+        )
+        response = await asyncio.wait_for(
+            chat.send_message(UserMessage(text=transcribed_text)),
+            timeout=45,
+        )
+        reply = response
+    except Exception as e:
+        logger.error(f"Coach voice chat LLM error: {e}")
+        reply = "I sense a momentary disruption in our connection. Please try sharing your thoughts again."
+
+    # Generate TTS audio for the reply
+    audio_b64 = None
+    try:
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        # Truncate to 4096 chars for TTS limit
+        tts_text = reply[:4096] if len(reply) > 4096 else reply
+        audio_b64 = await tts.generate_speech_base64(
+            text=tts_text,
+            model="tts-1",
+            voice="sage",
+            response_format="mp3",
+        )
+    except Exception as e:
+        logger.error(f"TTS error: {e}")
+        # Non-fatal: return text reply even if TTS fails
+
+    # Save messages to session
+    now = datetime.now(timezone.utc).isoformat()
+    user_msg = {"role": "user", "text": transcribed_text, "timestamp": now, "voice": True}
+    assistant_msg = {"role": "assistant", "text": reply, "timestamp": now, "voice": True}
+
+    await db.coach_sessions.update_one(
+        {"id": session_id},
+        {
+            "$push": {"messages": {"$each": [user_msg, assistant_msg]}},
+            "$set": {"updated_at": now},
+        },
+    )
+
+    return {
+        "reply": reply,
+        "transcribed_text": transcribed_text,
+        "audio_base64": audio_b64,
+        "session_id": session_id,
     }

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { MessageCircle, Loader2, Send, Plus, Trash2, ChevronLeft, Sparkles, Moon, Eye, Star, X } from 'lucide-react';
+import { MessageCircle, Loader2, Send, Plus, Trash2, ChevronLeft, Sparkles, Moon, Eye, Star, X, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -157,7 +157,7 @@ function CosmicProfileBadge({ profile }) {
   );
 }
 
-function ChatBubble({ msg, isUser }) {
+function ChatBubble({ msg, isUser, onPlayAudio, playingId, currentMsgId }) {
   if (msg.role === 'system_context') {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -170,6 +170,7 @@ function ChatBubble({ msg, isUser }) {
       </motion.div>
     );
   }
+  const isPlaying = playingId === currentMsgId;
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -185,12 +186,43 @@ function ChatBubble({ msg, isUser }) {
           background: isUser ? 'rgba(99,102,241,0.15)' : 'rgba(15,17,28,0.6)',
           border: `1px solid ${isUser ? 'rgba(99,102,241,0.2)' : 'rgba(248,250,252,0.06)'}`,
         }}>
+        {msg.voice && isUser && (
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Mic size={10} style={{ color: 'rgba(248,250,252,0.35)' }} />
+            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Voice message</span>
+          </div>
+        )}
         <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: 'rgba(248,250,252,0.8)' }}>
           {msg.text}
         </p>
-        <p className="text-[9px] mt-1.5 text-right" style={{ color: 'rgba(248,250,252,0.2)' }}>
-          {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-        </p>
+        <div className="flex items-center justify-between mt-1.5">
+          {!isUser && msg.voice && msg.audio_base64 && onPlayAudio && (
+            <button onClick={() => onPlayAudio(msg.audio_base64, currentMsgId)}
+              data-testid={`play-audio-${currentMsgId}`}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full transition-all"
+              style={{ background: isPlaying ? 'rgba(216,180,254,0.2)' : 'rgba(216,180,254,0.08)' }}>
+              {isPlaying ? (
+                <>
+                  <span className="flex gap-0.5 items-end h-3">
+                    {[0, 100, 200].map(d => (
+                      <span key={d} className="w-0.5 bg-purple-300 rounded-full animate-pulse" 
+                        style={{ height: `${8 + Math.random() * 4}px`, animationDelay: `${d}ms` }} />
+                    ))}
+                  </span>
+                  <span className="text-[9px] ml-1" style={{ color: '#D8B4FE' }}>Playing...</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 size={10} style={{ color: '#D8B4FE' }} />
+                  <span className="text-[9px]" style={{ color: '#D8B4FE' }}>Listen</span>
+                </>
+              )}
+            </button>
+          )}
+          <p className="text-[9px] text-right flex-1" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+          </p>
+        </div>
       </div>
     </motion.div>
   );
@@ -257,6 +289,15 @@ export default function SpiritualCoach() {
   const [cosmicProfile, setCosmicProfile] = useState(null);
   const [pendingDreamMode, setPendingDreamMode] = useState(false);
   const chatEndRef = useRef(null);
+
+  // Voice state
+  const [isRecording, setIsRecording] = useState(false);
+  const [voiceProcessing, setVoiceProcessing] = useState(false);
+  const [playingAudioId, setPlayingAudioId] = useState(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const currentAudioRef = useRef(null);
+  const streamRef = useRef(null);
 
   useEffect(() => {
     axios.get(`${API}/coach/modes`).then(r => setModes(r.data.modes)).catch(() => {});
@@ -384,6 +425,145 @@ export default function SpiritualCoach() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
 
+  // --- Voice functions ---
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      audioChunksRef.current = [];
+
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/mp4';
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (blob.size < 1000) {
+          toast.error('Recording too short. Hold longer to speak.');
+          setIsRecording(false);
+          return;
+        }
+        await sendVoiceMessage(blob, mimeType);
+      };
+
+      recorder.start(250); // collect in 250ms chunks
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Mic access error:', err);
+      toast.error('Microphone access denied. Please allow mic access.');
+    }
+  }, [activeSession]);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+  }, []);
+
+  const sendVoiceMessage = async (blob, mimeType) => {
+    if (!activeSession) return;
+    setVoiceProcessing(true);
+    setSending(true);
+
+    // Show a placeholder user message
+    const placeholderMsg = { role: 'user', text: 'Listening...', timestamp: new Date().toISOString(), voice: true, placeholder: true };
+    setMessages(prev => [...prev, placeholderMsg]);
+
+    try {
+      const ext = mimeType.includes('webm') ? 'webm' : 'mp4';
+      const formData = new FormData();
+      formData.append('audio', blob, `voice.${ext}`);
+      formData.append('session_id', activeSession);
+
+      const r = await axios.post(`${API}/coach/voice-chat`, formData, {
+        headers: { ...authHeaders, 'Content-Type': 'multipart/form-data' },
+        timeout: 60000,
+      });
+
+      const { reply, transcribed_text, audio_base64 } = r.data;
+
+      // Replace placeholder with actual transcription
+      setMessages(prev => {
+        const updated = [...prev];
+        const placeholderIdx = updated.findIndex(m => m.placeholder);
+        if (placeholderIdx !== -1) {
+          updated[placeholderIdx] = {
+            role: 'user', text: transcribed_text, timestamp: new Date().toISOString(), voice: true,
+          };
+        }
+        updated.push({
+          role: 'assistant', text: reply, timestamp: new Date().toISOString(), voice: true, audio_base64,
+        });
+        return updated;
+      });
+
+      // Auto-play Sage's response
+      if (audio_base64) {
+        playAudioBase64(audio_base64, `auto-${Date.now()}`);
+      }
+    } catch (err) {
+      console.error('Voice chat error:', err);
+      toast.error(err?.response?.data?.detail || 'Voice chat failed');
+      // Remove placeholder
+      setMessages(prev => prev.filter(m => !m.placeholder));
+    }
+    setSending(false);
+    setVoiceProcessing(false);
+  };
+
+  const playAudioBase64 = useCallback((b64, msgId) => {
+    // Stop any currently playing audio
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+
+    if (playingAudioId === msgId) {
+      setPlayingAudioId(null);
+      return;
+    }
+
+    try {
+      const audio = new Audio(`data:audio/mp3;base64,${b64}`);
+      currentAudioRef.current = audio;
+      setPlayingAudioId(msgId);
+
+      audio.onended = () => {
+        setPlayingAudioId(null);
+        currentAudioRef.current = null;
+      };
+      audio.onerror = () => {
+        setPlayingAudioId(null);
+        currentAudioRef.current = null;
+        toast.error('Audio playback failed');
+      };
+      audio.play();
+    } catch {
+      toast.error('Audio playback failed');
+      setPlayingAudioId(null);
+    }
+  }, [playingAudioId]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudioRef.current) currentAudioRef.current.pause();
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+    };
+  }, []);
+
   const activeMode = activeSession ? sessions.find(s => s.id === activeSession)?.mode : null;
   const modeInfo = modes.find(m => m.id === activeMode);
   const isDreamOracle = activeMode === 'dream_oracle';
@@ -452,49 +632,100 @@ export default function SpiritualCoach() {
                       <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>
                         {isDreamOracle ? 'Select a dream to begin the analysis...' : 'Share what\'s on your mind. Sage is here to listen.'}
                       </p>
+                      <p className="text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                        Tap the mic to speak or type below
+                      </p>
                     </div>
                   )}
                   {messages.map((msg, i) => (
-                    <ChatBubble key={i} msg={msg} isUser={msg.role === 'user'} />
+                    <ChatBubble key={i} msg={msg} isUser={msg.role === 'user'}
+                      onPlayAudio={playAudioBase64} playingId={playingAudioId} currentMsgId={`msg-${i}`} />
                   ))}
-                  {sending && (
+                  {(sending || voiceProcessing) && (
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center"
                         style={{ background: isDreamOracle ? 'rgba(129,140,248,0.15)' : 'rgba(216,180,254,0.15)' }}>
-                        {isDreamOracle ? <Moon size={12} style={{ color: '#818CF8' }} /> :
+                        {voiceProcessing ? <Volume2 size={12} style={{ color: '#D8B4FE' }} className="animate-pulse" /> :
+                         isDreamOracle ? <Moon size={12} style={{ color: '#818CF8' }} /> :
                          <Sparkles size={12} style={{ color: '#D8B4FE' }} />}
                       </div>
                       <div className="flex gap-1">
                         {[0, 150, 300].map(delay => (
                           <span key={delay} className="w-2 h-2 rounded-full animate-pulse"
-                            style={{ background: isDreamOracle ? '#818CF8' : '#D8B4FE', animationDelay: `${delay}ms` }} />
+                            style={{ background: voiceProcessing ? '#A78BFA' : (isDreamOracle ? '#818CF8' : '#D8B4FE'), animationDelay: `${delay}ms` }} />
                         ))}
                       </div>
-                      {isDreamOracle && <span className="text-[10px] ml-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Interpreting through your cosmic lens...</span>}
+                      {voiceProcessing && <span className="text-[10px] ml-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Sage is listening and composing a response...</span>}
+                      {isDreamOracle && !voiceProcessing && <span className="text-[10px] ml-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Interpreting through your cosmic lens...</span>}
                     </div>
                   )}
                   <div ref={chatEndRef} />
                 </div>
 
-                {/* Input */}
-                <div className="flex gap-2">
-                  <textarea value={input} onChange={e => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder={isDreamOracle ? "Ask about your dream's symbols, themes, or deeper meaning..." : "Share your thoughts with Sage..."}
-                    rows={1}
-                    data-testid="coach-input"
-                    className="flex-1 px-4 py-3 rounded-xl text-xs resize-none"
-                    style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
-                  <button onClick={sendMessage} disabled={sending || !input.trim()}
-                    data-testid="send-message-btn"
-                    className="px-4 py-3 rounded-xl transition-all flex items-center justify-center"
+                {/* Input with Voice */}
+                <div className="flex gap-2 items-end">
+                  {/* Voice record button */}
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={sending && !isRecording}
+                    data-testid="voice-record-btn"
+                    className="relative px-3 py-3 rounded-xl transition-all flex items-center justify-center flex-shrink-0"
                     style={{
-                      background: input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.15)' : 'rgba(216,180,254,0.15)') : 'rgba(15,17,28,0.4)',
-                      border: `1px solid ${input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.3)' : 'rgba(216,180,254,0.3)') : 'rgba(248,250,252,0.06)'}`,
-                      color: input.trim() ? (isDreamOracle ? '#818CF8' : '#D8B4FE') : 'rgba(248,250,252,0.2)',
+                      background: isRecording ? 'rgba(239,68,68,0.2)' : 'rgba(216,180,254,0.1)',
+                      border: `1px solid ${isRecording ? 'rgba(239,68,68,0.4)' : 'rgba(216,180,254,0.2)'}`,
+                      color: isRecording ? '#EF4444' : '#D8B4FE',
                     }}>
-                    <Send size={16} />
-                  </button>
+                    {isRecording ? (
+                      <>
+                        <MicOff size={16} />
+                        <motion.span
+                          className="absolute inset-0 rounded-xl"
+                          style={{ border: '2px solid rgba(239,68,68,0.4)' }}
+                          animate={{ opacity: [1, 0.3, 1] }}
+                          transition={{ repeat: Infinity, duration: 1.2 }}
+                        />
+                      </>
+                    ) : <Mic size={16} />}
+                  </motion.button>
+
+                  {isRecording ? (
+                    <div className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl"
+                      data-testid="recording-indicator"
+                      style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                      <span className="flex gap-0.5 items-end h-4">
+                        {[0, 80, 160, 240, 320].map(d => (
+                          <motion.span key={d} className="w-1 bg-red-400 rounded-full"
+                            animate={{ height: ['6px', '16px', '6px'] }}
+                            transition={{ repeat: Infinity, duration: 0.8, delay: d / 1000 }}
+                          />
+                        ))}
+                      </span>
+                      <span className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                        Recording... Tap mic to stop
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <textarea value={input} onChange={e => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={isDreamOracle ? "Ask about your dream's symbols, themes, or deeper meaning..." : "Share your thoughts with Sage..."}
+                        rows={1}
+                        data-testid="coach-input"
+                        className="flex-1 px-4 py-3 rounded-xl text-xs resize-none"
+                        style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
+                      <button onClick={sendMessage} disabled={sending || !input.trim()}
+                        data-testid="send-message-btn"
+                        className="px-4 py-3 rounded-xl transition-all flex items-center justify-center"
+                        style={{
+                          background: input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.15)' : 'rgba(216,180,254,0.15)') : 'rgba(15,17,28,0.4)',
+                          border: `1px solid ${input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.3)' : 'rgba(216,180,254,0.3)') : 'rgba(248,250,252,0.06)'}`,
+                          color: input.trim() ? (isDreamOracle ? '#818CF8' : '#D8B4FE') : 'rgba(248,250,252,0.2)',
+                        }}>
+                        <Send size={16} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
