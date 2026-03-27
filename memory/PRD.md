@@ -16,18 +16,24 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Global Search (Cmd+K), 6-category mega-menu nav, notification bell
 - Mobile accordion navigation
 
-### Trade Circle (Feb 2026)
-- **Pure barter marketplace** — no currency, goods and services only
+### Trade Circle with Karma System (Feb-Mar 2026)
+- **Pure barter marketplace** -- no currency, goods and services only
 - Listings with title, description, category (goods/services/both), offering, seeking
 - Full CRUD: create, browse, update, delete listings
 - **Offer/proposal flow**: make offers, accept/decline, auto-decline remaining on accept
 - Listing statuses: active, traded
 - Offer statuses: pending, accepted, declined
 - Search and category filtering
-- Stats dashboard: active listings, trades completed, my listings, pending offers
-- 3 tabs: Browse, My Listings, My Offers (sent + received)
-- Listing detail modal with offer management for owners
-- Cannot offer on own listing, no duplicate pending offers
+- **Trade Karma Reputation Score**:
+  - Points: +10 trade completed, +3 review given, +1 listing created, +1 offer made
+  - 6 Tiers: Seedling (0+), Sprout (10+), Bloom (30+), Guardian (60+), Elder (100+), Luminary (200+)
+  - Karma Profile modal with points, tier, trades, rating, reviews
+  - Karma Leaderboard tab showing top traders
+  - Review system: rate 1-5 stars + optional comment after completed trades
+  - Both trade parties can leave reviews; duplicate prevention
+  - Tier guide and earning rules displayed in Karma Board tab
+- Stats dashboard: active listings, trades completed, my listings, pending offers, trade karma
+- 4 tabs: Browse, My Listings, My Offers (sent + received), Karma Board
 - Activity feed integration
 - Accessible via Explore nav menu + Cmd+K search
 
@@ -44,17 +50,27 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - VAPID Web Push, service worker, bell UI with time preferences
 - Background auto-scheduler (asyncio 30min loop)
 
-### Multi-Cultural Star Chart (5 Cultures, 25 Constellations)
-- Mayan, Egyptian, Aboriginal, Lakota, **Chinese** (Azure Dragon, White Tiger, Vermilion Bird, Black Tortoise, Purple Forbidden Enclosure — Five Elements)
+### Multi-Cultural Star Chart (8 Cultures, 40 Constellations)
+- Mayan, Egyptian, Aboriginal, Lakota, Chinese, **Vedic**, **Norse**, **Polynesian**
+- Each culture: 5 constellations with RA/Dec coordinates, mythology, lessons, figure paths
+- Cultural overlay on 3D star chart with color-coded lines, labels, and mythology sprites
+- Culture picker dropdown, story explorer panel with constellation tabs
 
 ### Wellness, Mystical, AI, Social, PWA
 - Full feature set (40+ pages, 6 AI integrations, VR Sanctuary, Creation Stories, etc.)
 
-## Test: 66 iterations, all 100% pass rate
+## Test: 68 iterations, all 100% pass rate
 ## Credentials: test@test.com / password
 ## Status: LAUNCH READY
 
+## Key DB Collections (Trade Karma)
+- `trade_karma`: { user_id, points, breakdown, created_at, updated_at }
+- `karma_log`: { id, user_id, action, points, related_id, created_at }
+- `trade_reviews`: { id, offer_id, listing_id, reviewer_id, reviewer_name, reviewee_id, reviewee_name, rating, comment, created_at }
+
 ## Future/Backlog
+- Production launch final checks (remove stray console logs, optimize routes)
+- Refactor star_cultures.py into JSON seed file or MongoDB collection
 - Quantum Entanglement social feature (paired meditations)
 - Spatial computing VR headset support
 - Neural interface integration
