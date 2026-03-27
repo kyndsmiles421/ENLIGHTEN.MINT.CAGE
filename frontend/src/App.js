@@ -83,6 +83,7 @@ const Tutorial = lazy(() => import('./pages/Tutorial'));
 const CreationStories = lazy(() => import('./pages/CreationStories'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Settings = lazy(() => import('./pages/Settings'));
+const AdminSetup = lazy(() => import('./pages/AdminSetup'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -178,6 +179,7 @@ function AnimatedRoutes() {
             <Route path="/creation-stories" element={<CreationStories />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/admin-setup" element={<AdminSetup />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
