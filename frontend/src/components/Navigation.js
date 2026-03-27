@@ -63,6 +63,7 @@ const MORE_NAV = [
   { path: '/forecasts', label: 'Forecasts', icon: Eye },
   { path: '/cosmic-profile', label: 'Cosmic Profile', icon: BarChart3 },
   { path: '/tutorial', label: 'Tutorial', icon: GraduationCap },
+  { path: '/creation-stories', label: 'Creation Stories', icon: Globe },
   { path: '/cardology', label: 'Cardology', icon: Star },
   { path: '/mayan', label: 'Mayan', icon: Compass },
   { path: '/create', label: 'Create', icon: PenTool },

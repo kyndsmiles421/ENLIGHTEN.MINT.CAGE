@@ -1963,6 +1963,17 @@ export default function StarChart() {
                           "{selectedCulturalConst.mythology.lesson}"
                         </p>
                       </div>
+
+                      {/* Voice narration */}
+                      <div className="mt-3">
+                        <CosmicNarrator
+                          text={`${selectedCulturalConst.mythology.story} The cosmic lesson: ${selectedCulturalConst.mythology.lesson}`}
+                          constellationName={selectedCulturalConst.name}
+                          color={cultureData.color}
+                          authHeaders={authHeaders}
+                          token={token}
+                        />
+                      </div>
                     </>
                   )}
 
