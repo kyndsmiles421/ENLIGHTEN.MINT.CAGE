@@ -59,6 +59,7 @@ from routes.trade_circle import router as trade_circle_router
 from routes.subscriptions import router as subscriptions_router
 from routes.crystals import router as crystals_router
 from routes.entanglement import router as entanglement_router
+from routes.blessings import router as blessings_router
 
 app = FastAPI()
 
@@ -85,6 +86,7 @@ all_routers = [
     subscriptions_router,
     crystals_router,
     entanglement_router,
+    blessings_router,
 ]
 
 for r in all_routers:
