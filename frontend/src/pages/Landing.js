@@ -649,9 +649,9 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
             {[
-              { step: '01', title: 'Collapse Your Wave Function', desc: 'Select from healing soundscapes, quantum meditations, breathwork, or sacred practices — each one collapses infinite possibilities into focused intention.', color: '#D8B4FE' },
-              { step: '02', title: 'Enter the Quantum Field', desc: 'Our 3D immersive experiences use AI guidance, binaural coherence, and ancient techniques to shift your energy state at the quantum level.', color: '#2DD4BF' },
-              { step: '03', title: 'Track Your Entanglement', desc: 'Daily challenges, streaks, and quantum coherence tracking build momentum. Watch your consciousness evolve with every session.', color: '#FCD34D' },
+              { step: '01', title: 'Choose Your Frequency', desc: 'Select from healing soundscapes, guided meditations, breathwork, or sacred practices tailored to your current state.', color: '#D8B4FE' },
+              { step: '02', title: 'Immerse & Transform', desc: 'Our 3D holographic guided experiences use AI narration, binaural frequencies, and ancient techniques to shift your energy in minutes.', color: '#2DD4BF' },
+              { step: '03', title: 'Track Your Evolution', desc: 'Daily challenges, streaks, and your personal wellness journey build momentum. Watch yourself grow with every session.', color: '#FCD34D' },
             ].map((item, i) => (
               <motion.div key={i}
                 initial={{ opacity: 0, y: 20 }}

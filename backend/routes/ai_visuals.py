@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 from emergentintegrations.llm.openai.video_generation import OpenAIVideoGeneration
-from quantum_framework import get_quantum_visual_prompt, QUANTUM_VISUAL_THEMES
 from datetime import datetime, timezone
 from pathlib import Path
 import base64
@@ -212,8 +211,7 @@ async def generate_meditation_visual(
 ):
     """Generate ambient visual for meditation session."""
     theme = data.get("theme", "cosmic peace")
-    base_prompt = f"Abstract cosmic meditation visualization: {theme}. Deep space nebula, floating luminous particles, gentle aurora waves, spiritual energy field, peaceful serene atmosphere, dark background with soft glowing colors, suitable as meditation ambient background, ultra wide cinematic"
-    prompt = get_quantum_visual_prompt(base_prompt, "meditation")
+    prompt = f"Abstract cosmic meditation visualization: {theme}. Deep space nebula, floating luminous particles, gentle aurora waves, spiritual energy field, peaceful serene atmosphere, dark background with soft glowing colors, suitable as meditation ambient background, ultra wide cinematic"
     ref_id = hashlib.md5(theme.encode()).hexdigest()[:12]
     image_b64 = await get_or_generate_image(prompt, "meditation", ref_id)
     if not image_b64:
@@ -230,8 +228,7 @@ async def generate_forecast_visual(
     system = data.get("system", "astrology")
     period = data.get("period", "daily")
     summary = data.get("summary", "")[:200]
-    base_prompt = f"Mystical {system} divination cosmic scene for {period} forecast: {summary}. Celestial imagery with zodiac symbols, tarot cards, crystal spheres, cosmic energy flows, mystical purple and gold tones, dark spiritual background, cinematic prophetic atmosphere"
-    prompt = get_quantum_visual_prompt(base_prompt, "forecast")
+    prompt = f"Mystical {system} divination cosmic scene for {period} forecast: {summary}. Celestial imagery with zodiac symbols, tarot cards, crystal spheres, cosmic energy flows, mystical purple and gold tones, dark spiritual background, cinematic prophetic atmosphere"
     ref_id = hashlib.md5(f"{system}:{period}:{summary[:50]}".encode()).hexdigest()[:12]
     image_b64 = await get_or_generate_image(prompt, "forecast", ref_id)
     if not image_b64:
@@ -246,8 +243,7 @@ async def generate_dream_visual(
 ):
     """Generate AI visual interpretation of dream symbols."""
     description = data.get("description", "")[:300]
-    base_prompt = f"Surreal dreamscape visualization: {description}. Ethereal floating elements, dream-like distortions, soft luminous glow, symbolic imagery, Salvador Dali inspired cosmic surrealism, deep purples and midnight blues with golden dream light, mystical unconscious landscape"
-    prompt = get_quantum_visual_prompt(base_prompt, "dream")
+    prompt = f"Surreal dreamscape visualization: {description}. Ethereal floating elements, dream-like distortions, soft luminous glow, symbolic imagery, Salvador Dali inspired cosmic surrealism, deep purples and midnight blues with golden dream light, mystical unconscious landscape"
     ref_id = hashlib.md5(description.encode()).hexdigest()[:12]
     image_b64 = await get_or_generate_image(prompt, "dream", ref_id)
     if not image_b64:
@@ -265,8 +261,7 @@ async def generate_cosmic_portrait(
     energy = data.get("energy_level", 5)
     element = data.get("element", "")
     traits = data.get("traits", "")[:200]
-    base_prompt = f"Cosmic spiritual portrait: A luminous ethereal being embodying {zodiac} zodiac energy, {element} element, energy level {energy}/10. {traits}. Aura radiating with cosmic light, constellation patterns woven into the figure, celestial background with personal star map, spiritual portrait art, mystical luminous atmosphere, dark cosmic background"
-    prompt = get_quantum_visual_prompt(base_prompt, "cosmic_portrait")
+    prompt = f"Cosmic spiritual portrait: A luminous ethereal being embodying {zodiac} zodiac energy, {element} element, energy level {energy}/10. {traits}. Aura radiating with cosmic light, constellation patterns woven into the figure, celestial background with personal star map, spiritual portrait art, mystical luminous atmosphere, dark cosmic background"
     ref_id = hashlib.md5(f"{zodiac}:{element}:{energy}".encode()).hexdigest()[:12]
     image_b64 = await get_or_generate_image(prompt, "cosmic_portrait", ref_id)
     if not image_b64:
@@ -282,8 +277,7 @@ async def generate_daily_card(
     """Generate AI cosmic card of the day art."""
     theme = data.get("theme", "cosmic wisdom")
     affirmation = data.get("affirmation", "")[:150]
-    base_prompt = f"Cosmic card of the day artwork: '{affirmation}'. Theme: {theme}. Mystical tarot-card style illustration with ornate golden border, cosmic symbols, celestial imagery, dark rich background with luminous accents, spiritual divination art, vertical card format"
-    prompt = get_quantum_visual_prompt(base_prompt, "general")
+    prompt = f"Cosmic card of the day artwork: '{affirmation}'. Theme: {theme}. Mystical tarot-card style illustration with ornate golden border, cosmic symbols, celestial imagery, dark rich background with luminous accents, spiritual divination art, vertical card format"
     ref_id = hashlib.md5(f"daily:{theme}:{affirmation[:30]}".encode()).hexdigest()[:12]
     image_b64 = await get_or_generate_image(prompt, "daily_card", ref_id)
     if not image_b64:

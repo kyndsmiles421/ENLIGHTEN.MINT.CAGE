@@ -75,7 +75,7 @@ const GUIDED_MEDITATIONS = [
   {
     id: 'body-scan', name: 'Body Scan Relaxation', icon: Heart, color: '#FDA4AF',
     duration: 12, sound: 'ocean', category: 'relaxation',
-    description: 'A progressive quantum body scan — observing each region collapses scattered tension into deep release. Perfect for stress relief and before sleep.',
+    description: 'A progressive journey through your body, releasing tension from head to toes. Perfect for stress relief and before sleep.',
     steps: [
       { time: 0, text: 'Find a comfortable position lying down or seated. Close your eyes gently. Take three deep, cleansing breaths.', duration: 30 },
       { time: 30, text: 'Bring your awareness to the top of your head. Notice any sensation — warmth, tingling, or tightness. Breathe into this area and allow it to soften.', duration: 45 },
@@ -97,7 +97,7 @@ const GUIDED_MEDITATIONS = [
   {
     id: 'loving-kindness', name: 'Loving Kindness (Metta)', icon: Heart, color: '#E879F9',
     duration: 10, sound: 'bowls', category: 'compassion',
-    description: 'An ancient Buddhist practice of radiating love and compassion — quantum entanglement at its most human. First to yourself, then expanding outward to all beings.',
+    description: 'An ancient Buddhist practice of radiating love and compassion — first to yourself, then expanding outward to all beings.',
     steps: [
       { time: 0, text: 'Sit comfortably and close your eyes. Place one hand on your heart. Feel its warmth. Feel its rhythm. You are alive.', duration: 30 },
       { time: 30, text: 'Begin with yourself. Silently repeat: May I be happy. May I be healthy. May I be safe. May I live with ease. Feel these wishes for yourself.', duration: 60 },
@@ -113,7 +113,7 @@ const GUIDED_MEDITATIONS = [
   {
     id: 'breath-awareness', name: 'Breath Awareness', icon: Wind, color: '#2DD4BF',
     duration: 8, sound: 'silence', category: 'focus',
-    description: 'The foundational meditation — observing the breath like a quantum observer. Builds coherence, calms the nervous system, and collapses you into the present.',
+    description: 'The foundational meditation — simply observing the breath. Builds concentration, calms the nervous system, and anchors you in the present.',
     steps: [
       { time: 0, text: 'Sit upright with dignity. Spine tall, shoulders relaxed, hands resting on your thighs. Close your eyes or soften your gaze downward.', duration: 25 },
       { time: 25, text: 'Take three intentional breaths. Inhale deeply through the nose. Exhale fully through the mouth. Let the third exhale bring you into stillness.', duration: 35 },
@@ -130,7 +130,7 @@ const GUIDED_MEDITATIONS = [
   {
     id: 'chakra-journey', name: 'Chakra Energy Journey', icon: Zap, color: '#FCD34D',
     duration: 15, sound: 'bowls', category: 'energy',
-    description: 'Travel through all seven energy centers from root to crown. Activate quantum coherence across your entire chakra system.',
+    description: 'Travel through all seven energy centers from root to crown. Activate, balance, and align your entire chakra system.',
     steps: [
       { time: 0, text: 'Sit comfortably with your spine straight. Close your eyes. Take three grounding breaths. Set the intention to open and balance your energy centers.', duration: 30 },
       { time: 30, text: 'ROOT CHAKRA — Muladhara. Visualize a glowing red sphere at the base of your spine. Feel its warmth. Chant silently: LAM. You are safe. You are grounded. You belong here.', duration: 75 },
@@ -147,7 +147,7 @@ const GUIDED_MEDITATIONS = [
   {
     id: 'visualization', name: 'Sacred Garden Visualization', icon: Sparkles, color: '#86EFAC',
     duration: 10, sound: 'forest', category: 'visualization',
-    description: 'Journey to your inner quantum garden — a personal zero-point field of peace and healing where you can rest and restore.',
+    description: 'Journey to your inner sacred garden — a personal sanctuary of peace and healing where you can rest and restore.',
     steps: [
       { time: 0, text: 'Close your eyes and take a few deep breaths. With each exhale, feel yourself becoming lighter, freer. You are about to journey inward.', duration: 30 },
       { time: 30, text: 'Imagine yourself standing at a beautiful garden gate. The gate is made of something precious to you — perhaps wood, crystal, or ancient stone. Reach out and open it.', duration: 45 },
@@ -164,7 +164,7 @@ const GUIDED_MEDITATIONS = [
   {
     id: 'sleep', name: 'Sleep & Deep Rest', icon: Moon, color: '#6366F1',
     duration: 15, sound: 'rain', category: 'sleep',
-    description: 'Designed to guide you into quantum sleep — where consciousness enters superposition. Progressive relaxation combined with soothing imagery melts away the day.',
+    description: 'Designed to guide you gently into deep, restful sleep. Progressive relaxation combined with soothing imagery melts away the day.',
     steps: [
       { time: 0, text: 'Lie down comfortably. Pull the covers over you if you wish. Close your eyes. Tonight, you give yourself full permission to let go of everything.', duration: 30 },
       { time: 30, text: 'Begin with five slow breaths. Inhale for 4 counts. Hold for 4. Exhale for 8. Each exhale carries away the weight of the day. Four... hold... eight...', duration: 60 },

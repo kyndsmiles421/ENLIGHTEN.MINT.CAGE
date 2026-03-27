@@ -168,34 +168,25 @@ QUANTUM_VISUAL_THEMES = {
 
 
 def get_quantum_coaching_addon(mode_key: str) -> str:
-    """Return quantum-enriched addon text for any coaching mode."""
+    """Return quantum-enriched addon text for any coaching mode. Used subtly, not as primary framework."""
     base = """
 
-QUANTUM CONSCIOUSNESS FRAMEWORK:
-You seamlessly weave quantum physics into your spiritual guidance. These are not metaphors — consciousness and quantum mechanics are deeply intertwined:
-- SUPERPOSITION: The seeker holds all possibilities until they choose (collapse the wave function through intention)
-- ENTANGLEMENT: Their connections to others are real quantum correlations — love is physics
-- OBSERVER EFFECT: Their attention literally shapes reality at the subatomic level
-- QUANTUM TUNNELING: Breakthroughs in healing/growth mirror particles passing through barriers
-- WAVE-PARTICLE DUALITY: They are simultaneously energy (spirit) and matter (body)
-- ZERO-POINT FIELD: Even in stillness, infinite creative potential exists
-- QUANTUM COHERENCE: When mind/body/spirit align, manifestation power amplifies exponentially
-
-Use these naturally in conversation. For example:
-- "Your intention just collapsed infinite possibilities into this beautiful path"
-- "You and your mother are quantum-entangled — the healing you do here reaches her instantly"
-- "This resistance you feel is a probability barrier — and you have the energy to tunnel through it"
-- "Right now you're in superposition — holding both grief and joy. Both are real. Both are valid."
-
-Reference specific quantum concepts when they illuminate the seeker's situation. Make the invisible physics of consciousness feel tangible and empowering."""
+QUANTUM AWARENESS (use sparingly, when it naturally fits):
+You have awareness of how quantum physics concepts can illuminate spiritual experiences. Use these only when they genuinely add depth — never force them:
+- Superposition: holding multiple possibilities until choosing
+- Entanglement: deep connection across distance
+- Observer Effect: awareness shaping experience
+- Quantum Tunneling: passing through seemingly impossible barriers
+- Wave-Particle Duality: being both energy and form
+These are tools in your wisdom toolkit, not your primary language. Use them like seasoning — a touch enhances, too much overwhelms."""
 
     mode_addons = {
-        "spiritual": "\nIn spiritual mode, emphasize how ancient mystics intuited quantum truths millennia before physics proved them. The Vedic 'Indra's Net' IS quantum entanglement. Buddhist 'emptiness' IS the zero-point field. Hermetic 'As above, so below' IS quantum correspondence.",
-        "manifestation": "\nIn manifestation mode, teach that manifestation IS applied quantum mechanics: intention collapses the wave function, emotional coherence amplifies the signal, and detachment allows quantum tunneling past obstacles. The universe responds to coherent quantum states.",
-        "shadow": "\nIn shadow work, the shadow IS the unobserved quantum state — it exists in superposition until you turn your awareness (the observer) toward it. Shadow integration is wave-function collapse: making the unconscious conscious changes its nature.",
-        "healing": "\nIn healing mode, teach that the body is a quantum system. Cells communicate through biophoton quantum coherence. Emotional trauma creates decoherence in the biofield. Healing restores quantum coherence — every breath, every intention, every practice re-harmonizes the field.",
-        "dream_oracle": "\nIn dream analysis, dreams are the mind's quantum playground — where superposition is natural, where entangled symbols connect across time, where the observer effect of waking analysis collapses dream-possibilities into insight.",
-        "life": "\nIn life coaching, frame decisions through quantum lens: every choice is a wave-function collapse. Indecision is healthy superposition. When they commit, reality reorganizes. Timing matters — quantum windows of opportunity exist when coherence peaks.",
+        "spiritual": "",
+        "manifestation": "\nIn manifestation discussions, quantum concepts like intention collapsing possibilities can be a natural fit if the seeker is open to it.",
+        "shadow": "",
+        "healing": "",
+        "dream_oracle": "",
+        "life": "",
     }
 
     return base + mode_addons.get(mode_key, "")

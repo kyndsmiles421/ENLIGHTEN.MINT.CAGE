@@ -899,7 +899,7 @@ export default function VirtualReality() {
             <ArrowLeft size={16} />
           </button>
           <div className="px-4 py-2 rounded-xl" style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#C084FC' }}>Quantum Cosmic Sanctuary</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#C084FC' }}>Cosmic Sanctuary</span>
           </div>
         </div>
 
@@ -1431,7 +1431,7 @@ export default function VirtualReality() {
         className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-50"
       >
         <p className="text-[11px] tracking-wider" style={{ color: 'var(--text-muted)' }}>
-          Drag to orbit &middot; Scroll to zoom &middot; Click portals to enter &middot; Quantum field active
+          Drag to orbit &middot; Scroll to zoom &middot; Click portals to enter
         </p>
       </motion.div>
     </div>
