@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap,
-  Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2,
+  Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2, VolumeX,
   Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X,
   Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2,
   Eye, Star, Compass, Droplets, MessageCircle, Orbit
@@ -137,6 +137,64 @@ function PillarCard({ pillar, index }) {
   );
 }
 
+/* ─── Mantra Card with TTS ─── */
+function MantraCard({ mantra, accentColor }) {
+  const [speaking, setSpeaking] = useState(false);
+
+  const speakMantra = () => {
+    if (speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(mantra.text);
+    utterance.rate = 0.8;
+    utterance.pitch = 0.9;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  return (
+    <div className="glass-card p-4 relative overflow-hidden" data-testid="reset-mantra">
+      <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-[0.06]"
+        style={{ background: accentColor, filter: 'blur(20px)', transform: 'translate(30%, -30%)' }} />
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: mantra.type === 'protective' ? 'rgba(139,92,246,0.1)' : 'rgba(252,211,77,0.1)' }}>
+          <Shield size={16} style={{ color: mantra.type === 'protective' ? '#8B5CF6' : '#FCD34D' }} />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em]"
+              style={{ color: mantra.type === 'protective' ? '#8B5CF6' : '#FCD34D' }}>
+              {mantra.type === 'protective' ? 'Protective' : 'Uplifting'} Mantra
+            </p>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'var(--text-muted)08', color: 'var(--text-muted)' }}>
+              {mantra.tradition}
+            </span>
+          </div>
+          <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
+            "{mantra.text}"
+          </p>
+          <button onClick={speakMantra}
+            className="mt-2 flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-full transition-all hover:scale-[1.02]"
+            style={{
+              background: speaking ? `${accentColor}15` : 'var(--text-muted)08',
+              color: speaking ? accentColor : 'var(--text-muted)',
+              border: `1px solid ${speaking ? `${accentColor}30` : 'var(--text-muted)15'}`,
+            }}
+            data-testid="mantra-speak-btn">
+            {speaking ? <VolumeX size={12} /> : <Volume2 size={12} />}
+            {speaking ? 'Stop' : 'Hear Mantra'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Quick Reset Modal ─── */
 function QuickResetModal({ open, onClose }) {
   const navigate = useNavigate();
@@ -259,6 +317,9 @@ function QuickResetModal({ open, onClose }) {
                   </div>
                   <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 transition-all" />
                 </button>
+                {flow.mantra && (
+                  <MantraCard mantra={flow.mantra} accentColor={feeling.color} />
+                )}
               </div>
             </>
           ) : null}

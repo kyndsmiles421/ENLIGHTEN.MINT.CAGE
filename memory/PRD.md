@@ -26,11 +26,14 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 14. "Begin Journey" / "Continue Journey" smart landing buttons
 15. Simplified Chinese translations
 16. Light mode full text readability polish
-17. Performance optimization — removed page transitions, 30fps background, reduced particles
-18. Smart landing page: "Begin Journey" for new users, "Continue Journey" for logged-in users
+17. Performance optimization — instant page nav, 30fps background
+18. **Music Lounge** — 10 ambient/piano/cosmic/nature/uplifting tracks with Web Audio API synth, category filters, shuffle/radio mode, now-playing bar, volume control, favorites
+19. **Quick Reset Mantras** — Protective and uplifting mantras added to all 11 Quick Reset feelings, with tradition labels (Hindu/Vedic, Tibetan Buddhist, Kundalini, Modern Affirmation), text display + browser TTS audio playback
 
 ## Critical Config
 - Admin: /admin-setup, password=cosmic-creator-2026
 - Stripe: Emergent test key
 - AI: Emergent LLM Key
-- Auth: /auth page with login + "Create account" for new users
+
+## Backlog
+- P2: Refactor star_cultures.py (move coords to JSON/MongoDB)

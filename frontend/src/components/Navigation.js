@@ -66,6 +66,7 @@ const NAV_CATEGORIES = [
     items: [
       { path: '/zen-garden', label: 'Zen Garden', icon: Sprout },
       { path: '/soundscapes', label: 'Soundscapes', icon: Headphones },
+      { path: '/music-lounge', label: 'Music Lounge', icon: Music },
       { path: '/frequencies', label: 'Frequencies', icon: Radio },
       { path: '/vr', label: 'VR Sanctuary', icon: Orbit },
       { path: '/journal', label: 'Journal', icon: BookOpen },
