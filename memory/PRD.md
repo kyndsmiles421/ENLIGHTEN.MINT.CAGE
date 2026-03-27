@@ -1,7 +1,7 @@
 # The Cosmic Collective - Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective," a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals. Incorporate quantum mechanics theory throughout the entire app, making AI, VR, and all experiences interchangeable and coinciding. Architecture for easy adaptation to future technologies.
+Build "The Cosmic Collective," a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals. Add quantum mechanics as a complementary avenue/page within the app — not a rebrand. Architecture for easy adaptation to future technologies.
 
 ## Tech Stack
 - Frontend: React, Tailwind CSS, Framer Motion, Vanilla Three.js
@@ -12,49 +12,39 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 
 ## All Implemented Features
 
-### Core Platform
+### Core Platform (Unchanged Identity)
 - Auth, profiles, dashboard (categorized), mood tracking, journaling, affirmations, gamification
 - Global Search Command Palette (Cmd+K, 60-item index, fuzzy matching)
 - 6-category mega-menu navigation + Sage direct link + Profile dropdown + Notification bell
 - Mobile accordion navigation
+- Original landing page: "A Gathering Place for Conscious Minds"
+- Original coach modes: Spiritual Guidance, Life Coaching, Shadow Work, Manifestation, Healing Guide, Dream Oracle
 
-### Quantum Mechanics Framework (Feb 2026)
+### Quantum Mechanics Avenue (Additive, Feb 2026)
 - Modular `quantum_framework.py` with 8 quantum principles mapped to spiritual parallels
-- Quantum-enhanced AI coaching: all 6 Sage modes infused with quantum consciousness terminology
-- Quantum visual prompts: all AI-generated images enriched with quantum field aesthetics
-- 5 guided quantum meditations (Superposition Stillness, Quantum Entanglement, Quantum Tunneling, Wave-Particle Duality, Observer Effect Awakening)
+- 5 guided quantum meditations accessible via VR Sanctuary (Superposition Stillness, Quantum Entanglement, Quantum Tunneling, Wave-Particle Duality, Observer Effect Awakening)
+- Quantum Field portal in VR Sanctuary (sits alongside existing portals)
 - Quantum Realm VR journey (6 waypoints blending physics + mysticism)
-- Quantum Field portal in VR Sanctuary with picker panel
+- Quantum Coherence Dashboard Widget (animated SVG ring, 0-100 score from practice data)
+- Quantum visual themes library for future AI generation use
+- GET /api/ai-visuals/quantum-principles endpoint
+- GET /api/notifications/quantum-coherence endpoint
+- Subtle quantum awareness in Sage AI (only when contextually relevant, not forced)
 - Future-tech adaptation hooks: spatial computing, neural interface, haptic feedback, AI agents
-- Quantum-infused landing page tagline, "How it works" section, and dashboard subtitle
-- Quantum terminology woven into Dream Oracle, Meditation, Breathing, Teachings
-- GET /api/ai-visuals/quantum-principles endpoint for frontend access
-
-### Quantum Coherence Dashboard (Feb 2026)
-- Quantum Coherence Score (0-100) computed from practice variety, frequency, and streaks
-- Animated circular SVG progress ring with phase-based colors
-- Four quantum states: Coherent (80+), Partial Alignment (55-79), Decoherence (30-54), Zero-Point (0-29)
-- Wave animation background that becomes more coherent with higher scores
-- Practice breakdown badges (Moods, Journal, Meditate, Breathe, Streak)
-- Clickable — navigates to VR Sanctuary
 
 ### Push Notifications (Feb 2026)
-- VAPID key pair generation and storage in backend .env
-- Service Worker push event listener with notification display
-- Notification click handler with URL routing
-- Backend endpoints: subscribe, unsubscribe, status, preferences, send-test, send-scheduled, quantum-coherence
+- VAPID key pair in backend .env
+- Service Worker push event listener + notification click handler
+- Backend: subscribe, unsubscribe, status, preferences, send-test, send-scheduled
 - MongoDB collections: push_subscriptions, notification_prefs
-- Navigation bell icon with notification settings dropdown panel
+- Navigation bell icon with settings dropdown
 - Preference toggles: Daily Relaxation, Cosmic Insights, Practice Reminders
-- Morning/Evening reminder time pickers (user-configurable hours)
-- 10 rotating quantum-themed reminder messages (5 morning, 5 evening)
-- Batch scheduled notification delivery endpoint for cron integration
-- Test notification sender
-- Utility function `send_push_to_user()` for programmatic push delivery
-- Auto-cleanup of expired/invalid subscriptions (410/404 handling)
+- Morning/Evening reminder time pickers (configurable hours)
+- 10 rotating themed reminder messages (5 morning, 5 evening)
+- Batch scheduled delivery endpoint for cron
 
 ### Wellness Practice
-- Mudras (25), Yantras, Tantra, Qigong/Tai Chi, Videos, Meditations, Breathwork (quantum descriptions)
+- Mudras (25), Yantras, Tantra, Qigong/Tai Chi, Videos, Meditations, Breathwork
 - Frequencies/Solfeggio, Soundscapes, Nourishment/Recipes, Sacred Rituals
 - Light Therapy, Mantras, Affirmations, Ho'oponopono
 
@@ -66,68 +56,30 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Dream Journal, Animal Totems, Mayan Astrology
 
 ### AI Features
-- Sage AI Coach (text + voice via Whisper STT + TTS "sage" voice) — quantum-enhanced
-- AI Cinematic Visuals (GPT Image 1) — quantum visual overlays
-- Sora 2 AI Video Generation — 15 creation story video clips (4s each)
-- Video Gallery (Cosmic Cinema) — browse/generate/watch all 15 stories
-- Dream Oracle with quantum consciousness analysis
+- Sage AI Coach (text + voice via Whisper STT + TTS "sage" voice)
+- AI Cinematic Visuals (GPT Image 1)
+- Sora 2 AI Video Generation — 15 creation story clips
+- Video Gallery (Cosmic Cinema)
+- Dream Oracle
 
 ### Social & Explore
 - Community feed, forecast/meditation sharing
 - Creation Stories (15 cultures, TTS narration, Cinema mode)
-- VR Sanctuary (quantum meditation + constellation journeys + Story Theater + Quantum Field portal)
+- VR Sanctuary (meditation + constellation journeys + Story Theater + Quantum Field portal)
 - Journey, Games, Classes, Videos, Challenges, Friends
 
-### Launch-Ready UX
-- Navigation: 6 categorized mega-menu dropdowns + notification bell
-- Landing: 6 category pillar cards with quantum messaging
-- Dashboard: 5 categorized quick actions + Quantum Coherence Widget
-- Scroll-to-top, back-to-top, glass-card hover interactions
-- Touch feedback for mobile
-
 ### PWA / Mobile App
-- Full Progressive Web App with manifest.json (display: standalone)
-- App shortcuts: Breathwork, Meditation, Sage, Daily Briefing
-- Service worker with network-first caching + push notifications
-- App icons, Apple meta tags, safe area insets
+- Full PWA with manifest.json, service worker, push notifications
+- App shortcuts, icons, Apple meta tags, safe area insets
 - Install prompt with iOS/Android detection
 
-## Architecture
-```
-/app/backend/
-├── quantum_framework.py       # 8 principles, 5 meditations, visual themes, future hooks
-├── routes/
-│   ├── notifications.py       # Push sub + prefs + scheduled + coherence score
-│   ├── coach.py               # Quantum-enhanced AI coaching (6 modes)
-│   ├── ai_visuals.py          # Quantum visual gen + principles API
-│   └── ... (40+ route files)
-├── deps.py
-└── server.py
-
-/app/frontend/
-├── public/sw.js               # Service Worker with push listener
-├── src/
-│   ├── components/
-│   │   ├── NotificationSettings.js  # Bell dropdown + time pickers
-│   │   ├── Navigation.js            # With notification bell
-│   │   └── ...
-│   ├── pages/
-│   │   ├── Dashboard.js             # Quantum Coherence Widget
-│   │   ├── VirtualReality.js        # Quantum portal + 5 meditations + journey
-│   │   ├── Meditation.js            # Quantum descriptions
-│   │   ├── Breathing.js             # Quantum descriptions
-│   │   ├── Landing.js               # Quantum messaging
-│   │   └── ...
-│   └── i18n/translations.js         # Quantum taglines
-```
-
-## Test: 62 iterations, all 100% pass rate
+## Test: 63 iterations, all 100% pass rate
 ## Credentials: test@test.com / password
 ## Status: LAUNCH READY
 
 ## Future/Backlog
-- Quantum Entanglement social feature (synchronized paired meditations)
-- Spatial computing VR headset support (leveraging future-tech hooks)
 - Cron job for automated daily push delivery
+- Quantum Entanglement social feature (paired meditations)
+- Spatial computing VR headset support
+- Neural interface integration
 - User analytics dashboard
-- Neural interface integration (EEG-driven coherence biofeedback)
