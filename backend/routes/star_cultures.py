@@ -523,6 +523,142 @@ CULTURAL_CONSTELLATIONS = {
             },
         ],
     },
+    "chinese": {
+        "name": "Chinese Sky",
+        "color": "#EF4444",
+        "icon": "star",
+        "description": "Chinese astronomy is one of the oldest in the world (4,000+ years). The sky is divided into the Four Sacred Beasts guarding the cardinal directions, and the Purple Forbidden Enclosure — the Emperor's celestial palace at the pole.",
+        "constellations": [
+            {
+                "id": "qing_long", "name": "Qing Long (Azure Dragon)", "culture_name": "Chinese",
+                "ra": 16.5, "dec": -26.0,
+                "stars": [
+                    {"name": "Antares (Xin)", "ra": 16.49, "dec": -26.43, "mag": 0.96},
+                    {"name": "Shaula (Wei)", "ra": 17.56, "dec": -37.1, "mag": 1.63},
+                    {"name": "Sargas (Wei)", "ra": 17.62, "dec": -43.0, "mag": 1.87},
+                ],
+                "lines": [[0,1],[1,2]],
+                "element": "Wood",
+                "mythology": {
+                    "figure": "The Azure Dragon of the East",
+                    "origin": "Chinese",
+                    "deity": "Qing Long",
+                    "story": "The Azure Dragon guards the eastern sky and represents spring, dawn, and new growth. Its seven Lunar Mansions — Jiao (Horn), Kang (Neck), Di (Root), Fang (Chamber), Xin (Heart), Wei (Tail), and Ji (Winnowing Basket) — track the dragon from horn to tail. Antares is Xin, the Dragon's Heart, pulsing red with cosmic fire. When the Dragon's Horn rises at dusk in spring, farmers know it is time to plant. The Azure Dragon embodies the Yang energy of creation and the unstoppable force of renewal.",
+                    "lesson": "Like the dragon rising in spring, growth cannot be rushed — but when the season comes, nothing can hold it back."
+                },
+                "paths": [
+                    [[-1.2,0.6],[-0.8,0.4],[-0.3,0.2],[0,0],[0.3,-0.3],[0.7,-0.6],[1.0,-0.8],[1.2,-0.6]],
+                    [[0,0],[0.2,0.3],[0.1,0.6],[-0.1,0.8]],
+                    [[-0.8,0.4],[-1.0,0.7],[-0.8,0.9]],
+                ],
+            },
+            {
+                "id": "bai_hu", "name": "Bai Hu (White Tiger)", "culture_name": "Chinese",
+                "ra": 5.5, "dec": 0.0,
+                "stars": [
+                    {"name": "Betelgeuse (Shen)", "ra": 5.92, "dec": 7.41, "mag": 0.5},
+                    {"name": "Rigel (Shen)", "ra": 5.24, "dec": -8.2, "mag": 0.13},
+                    {"name": "Bellatrix (Shen)", "ra": 5.42, "dec": 6.35, "mag": 1.64},
+                    {"name": "Mintaka (Shen)", "ra": 5.53, "dec": -0.3, "mag": 2.23},
+                    {"name": "Alnilam (Shen)", "ra": 5.6, "dec": -1.2, "mag": 1.69},
+                    {"name": "Alnitak (Shen)", "ra": 5.68, "dec": -1.94, "mag": 1.77},
+                ],
+                "lines": [[0,2],[2,3],[3,4],[4,5],[5,1],[0,3]],
+                "element": "Metal",
+                "mythology": {
+                    "figure": "The White Tiger of the West",
+                    "origin": "Chinese",
+                    "deity": "Bai Hu",
+                    "story": "The White Tiger guards the western sky and represents autumn, dusk, and the setting sun. Its seven Lunar Mansions — Kui (Legs), Lou (Bond), Wei (Stomach), Mao (Hairy Head), Bi (Net), Zi (Turtle Beak), and Shen (Three Stars) — form the great celestial tiger. The Shen mansion (Orion's central stars) is the tiger's luminous body. In Chinese martial arts, the White Tiger represents fierce righteous power. Generals prayed to Bai Hu before battle, and white tiger amulets protected against evil spirits.",
+                    "lesson": "True courage is not the absence of fear, but righteous action in the face of it. The White Tiger strikes only to protect."
+                },
+                "paths": [
+                    [[-0.8,0.8],[-0.4,0.4],[0,0],[0.4,0.4],[0.8,0.8]],
+                    [[0,0],[0,-0.4],[0,-0.8]],
+                    [[-0.4,0.4],[-0.6,0.1],[-0.4,-0.2]],
+                    [[0.4,0.4],[0.6,0.1],[0.4,-0.2]],
+                    [[-0.8,0.8],[-1.0,0.6]],
+                    [[0.8,0.8],[1.0,0.6]],
+                ],
+            },
+            {
+                "id": "zhu_que", "name": "Zhu Que (Vermilion Bird)", "culture_name": "Chinese",
+                "ra": 10.5, "dec": 15.0,
+                "stars": [
+                    {"name": "Regulus (Xuan Yuan)", "ra": 10.14, "dec": 11.97, "mag": 1.35},
+                    {"name": "Denebola (Wu Di Zuo)", "ra": 11.82, "dec": 14.57, "mag": 2.14},
+                    {"name": "Algieba (Xuan Yuan)", "ra": 10.33, "dec": 19.84, "mag": 2.28},
+                ],
+                "lines": [[0,2],[2,1],[1,0]],
+                "element": "Fire",
+                "mythology": {
+                    "figure": "The Vermilion Bird of the South",
+                    "origin": "Chinese",
+                    "deity": "Zhu Que / Feng Huang",
+                    "story": "The Vermilion Bird guards the southern sky and represents summer, midday, and the peak of Yang energy. Its seven Lunar Mansions — Jing (Well), Gui (Ghosts), Liu (Willow), Xing (Star), Zhang (Extended Net), Yi (Wings), and Zhen (Chariot) — trace a magnificent phoenix across the heavens. Regulus, the brightest star in this region, was called Xuan Yuan after the Yellow Emperor himself. The Vermilion Bird is often conflated with the Feng Huang (Phoenix) — symbol of the empress, immortality, and the eternal cycle of death and rebirth.",
+                    "lesson": "Like the phoenix, transformation requires surrender to the flame. What burns away was never truly yours."
+                },
+                "paths": [
+                    [[0,0.8],[0,0.3],[0,0],[0.3,-0.2],[0,-0.5],[-0.3,-0.2],[0,0]],
+                    [[0,0.3],[-0.5,0.6],[-0.8,0.5]],
+                    [[0,0.3],[0.5,0.6],[0.8,0.5]],
+                    [[-0.5,0.6],[-0.3,0.9],[0,1.0],[0.3,0.9],[0.5,0.6]],
+                ],
+            },
+            {
+                "id": "xuan_wu", "name": "Xuan Wu (Black Tortoise)", "culture_name": "Chinese",
+                "ra": 18.9, "dec": 36.0,
+                "stars": [
+                    {"name": "Vega (Zhi Nu)", "ra": 18.62, "dec": 38.78, "mag": 0.03},
+                    {"name": "Sheliak", "ra": 18.83, "dec": 33.36, "mag": 3.45},
+                    {"name": "Sulafat", "ra": 18.98, "dec": 32.69, "mag": 3.24},
+                ],
+                "lines": [[0,1],[1,2],[2,0]],
+                "element": "Water",
+                "mythology": {
+                    "figure": "The Black Tortoise of the North",
+                    "origin": "Chinese",
+                    "deity": "Xuan Wu / Zhen Wu",
+                    "story": "The Black Tortoise — a tortoise entwined with a serpent — guards the northern sky and represents winter, midnight, and deep Yin energy. Its seven Lunar Mansions — Dou (Dipper), Niu (Ox), Nu (Girl), Xu (Emptiness), Wei (Rooftop), Shi (Encampment), and Bi (Wall) — form the shell of cosmic protection. Vega, the weaving star Zhi Nu, tells the famous love story: the Weaver Girl and the Cowherd, separated by the Milky Way, who reunite once a year on the seventh night of the seventh month when magpies build a bridge across the Silver River.",
+                    "lesson": "True love endures any separation. Patience and devotion can bridge even the river of stars."
+                },
+                "paths": [
+                    [[-0.6,0.4],[-0.3,0.6],[0.3,0.6],[0.6,0.4],[0.6,-0.2],[0.3,-0.5],[-0.3,-0.5],[-0.6,-0.2],[-0.6,0.4]],
+                    [[0.3,-0.5],[0.5,-0.7],[0.3,-0.9],[0,-0.8],[-0.3,-0.9],[-0.5,-0.7],[-0.3,-0.5]],
+                ],
+            },
+            {
+                "id": "zi_wei", "name": "Zi Wei Yuan (Purple Forbidden Enclosure)", "culture_name": "Chinese",
+                "ra": 11.0, "dec": 55.0,
+                "stars": [
+                    {"name": "Dubhe (Tian Shu)", "ra": 11.06, "dec": 61.75, "mag": 1.79},
+                    {"name": "Merak (Tian Xuan)", "ra": 11.03, "dec": 56.38, "mag": 2.37},
+                    {"name": "Phecda (Tian Ji)", "ra": 11.9, "dec": 53.69, "mag": 2.44},
+                    {"name": "Megrez (Tian Quan)", "ra": 12.26, "dec": 57.03, "mag": 3.31},
+                    {"name": "Alioth (Yu Heng)", "ra": 12.9, "dec": 55.96, "mag": 1.77},
+                    {"name": "Mizar (Kai Yang)", "ra": 13.4, "dec": 54.93, "mag": 2.27},
+                    {"name": "Alkaid (Yao Guang)", "ra": 13.79, "dec": 49.31, "mag": 1.86},
+                ],
+                "lines": [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]],
+                "element": "Earth",
+                "mythology": {
+                    "figure": "The Emperor's Celestial Palace",
+                    "origin": "Chinese",
+                    "deity": "Tian Di (Celestial Emperor)",
+                    "story": "The Bei Dou (Northern Dipper / Big Dipper) is the most important asterism in Chinese astronomy — the celestial chariot of the Jade Emperor, ruler of heaven. Its seven stars each carry a name: Tian Shu (Pivot of Heaven), Tian Xuan (Jade Rotating), Tian Ji (Pearl of Heaven), Tian Quan (Jade Balance), Yu Heng (Jade Transverse), Kai Yang (Opening Sun), and Yao Guang (Twinkling Brilliance). The Dipper's handle points to different seasons as it rotates around Polaris (the Celestial Emperor's throne). The Purple Forbidden Enclosure surrounding it mirrors the Forbidden City on Earth — as above, so below. Feng shui masters use the Dipper's orientation to align buildings, graves, and cities.",
+                    "lesson": "The center holds still while all things turn around it. Find your own celestial pole — the quiet center from which you govern your life."
+                },
+                "paths": [
+                    [[-0.5,0.3],[0.5,0.3],[0.5,-0.3],[-0.5,-0.3],[-0.5,0.3]],
+                    [[0.5,0.3],[0.9,0.5],[1.3,0.3],[1.7,0]],
+                    [[-0.7,0.5],[-0.5,0.3]],
+                    [[-0.7,-0.5],[-0.5,-0.3]],
+                    [[0.7,0.5],[0.5,0.3]],
+                    [[0.7,-0.5],[0.5,-0.3]],
+                ],
+            },
+        ],
+    },
 }
 
 
