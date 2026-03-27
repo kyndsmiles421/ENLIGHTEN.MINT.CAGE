@@ -55,7 +55,7 @@ export default function Auth() {
           {mode === 'login' ? 'Welcome Back' : 'Join the Light'}
         </h1>
         <p className="text-base mb-10" style={{ color: 'var(--text-secondary)' }}>
-          {mode === 'login' ? 'Continue your conscious journey' : 'Create your sanctuary account'}
+          {mode === 'login' ? 'Continue your cosmic journey' : 'Create your sanctuary account'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -109,19 +109,19 @@ export default function Auth() {
             data-testid="auth-submit-btn"
             style={{ opacity: loading ? 0.6 : 1 }}
           >
-            {loading ? 'Aligning energies...' : mode === 'login' ? 'Enter Sanctuary' : 'Begin Journey'}
+            {loading ? 'Aligning energies...' : mode === 'login' ? 'Begin Journey' : 'Begin Journey'}
           </button>
         </form>
 
         <p className="text-center mt-8 text-sm" style={{ color: 'var(--text-secondary)' }}>
-          {mode === 'login' ? "New to the cosmos? " : "Already enlightened? "}
+          {mode === 'login' ? "New to the cosmos? " : "Already a traveler? "}
           <button
             onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
             className="underline"
             style={{ color: 'var(--primary)' }}
             data-testid="auth-toggle-mode-btn"
           >
-            {mode === 'login' ? 'Create account' : 'Sign in'}
+            {mode === 'login' ? 'Create account' : 'Welcome back'}
           </button>
         </p>
       </motion.div>

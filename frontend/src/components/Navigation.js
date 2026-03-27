@@ -592,7 +592,7 @@ export default function Navigation() {
               data-testid="nav-signin"
             >
               <LogIn size={12} className="inline mr-1.5" />
-              Sign In
+              Begin Journey
             </Link>
           )}
         </div>
@@ -717,7 +717,7 @@ export default function Navigation() {
                   <Link to="/auth" onClick={() => { setMobileOpen(false); playClick(); }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--primary)' }}>
                     <LogIn size={18} />
-                    <span className="text-sm font-medium">Sign In</span>
+                    <span className="text-sm font-medium">Begin Journey</span>
                   </Link>
                 )}
               </div>

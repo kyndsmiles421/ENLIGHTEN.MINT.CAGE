@@ -932,7 +932,7 @@ export default function Journey() {
         {!user && (
           <div className="glass-card p-8 text-center mt-12">
             <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>Sign in to save your progress and unlock stages as you grow.</p>
-            <a href="/auth" className="btn-glass px-6 py-2 text-sm inline-block" style={{ color: '#C084FC' }}>Sign In to Begin</a>
+            <a href="/auth" className="btn-glass px-6 py-2 text-sm inline-block" style={{ color: '#C084FC' }}>Begin Journey</a>
           </div>
         )}
       </div>
