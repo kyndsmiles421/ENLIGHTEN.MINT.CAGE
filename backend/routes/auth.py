@@ -26,11 +26,25 @@ async def register(user: UserCreate):
     token = create_token(user_id, user.name)
     return {"token": token, "user": {"id": user_id, "name": user.name, "email": user.email}}
 
+CREATOR_EMAIL = "kyndsmiles@gmail.com"
+
 @router.post("/auth/login")
 async def login(user: UserLogin):
     found = await db.users.find_one({"email": user.email}, {"_id": 0})
     if not found or not bcrypt.checkpw(user.password.encode(), found["password"].encode()):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Auto-activate Creator mode for the owner
+    if user.email == CREATOR_EMAIL and not found.get("is_admin"):
+        await db.users.update_one({"id": found["id"]}, {"$set": {"role": "admin", "is_admin": True}})
+        await db.user_credits.update_one(
+            {"user_id": found["id"]},
+            {"$set": {"tier": "super_user", "subscription_active": True, "is_admin": True, "credits": 999999}},
+            upsert=True,
+        )
+        found["role"] = "admin"
+        found["is_admin"] = True
+    
     token = create_token(found["id"], found["name"])
     role = found.get("role", "user")
     return {"token": token, "user": {"id": found["id"], "name": found["name"], "email": found["email"], "role": role}}
