@@ -13,7 +13,7 @@ export default function CosmicBackground() {
     const w = canvas.width = window.innerWidth;
     const h = canvas.height = window.innerHeight;
 
-    const starCount = prefs.reduceParticles ? 40 : 200;
+    const starCount = prefs.reduceParticles ? 30 : 120;
 
     starsRef.current = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
@@ -127,11 +127,16 @@ export default function CosmicBackground() {
         ctx.fill();
         return true;
       });
-
-      animRef.current = requestAnimationFrame(draw);
     };
 
-    draw();
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 33; // ~30fps
+    animRef.current = requestAnimationFrame(function loop(now) {
+      animRef.current = requestAnimationFrame(loop);
+      if (now - lastFrame < FRAME_INTERVAL) return;
+      lastFrame = now;
+      draw();
+    });
 
     const handleResize = () => {
       canvas.width = window.innerWidth;

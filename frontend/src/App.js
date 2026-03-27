@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Toaster } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import QuickMeditationWidget from './components/QuickMeditationWidget';
@@ -100,95 +99,85 @@ function PageLoader() {
   );
 }
 
-const pageVariants = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -6, transition: { duration: 0.2, ease: 'easeIn' } },
-};
-
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div key={location.pathname} variants={pageVariants} initial="initial" animate="animate" exit="exit" style={{ position: 'relative', zIndex: 1 }}>
-        <Suspense fallback={<PageLoader />}>
-          <Routes location={location}>
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/breathing" element={<Breathing />} />
-            <Route path="/meditation" element={<Meditation />} />
-            <Route path="/affirmations" element={<Affirmations />} />
-            <Route path="/mood" element={<MoodTracker />} />
-            <Route path="/journal" element={<Journal />} />
-            <Route path="/soundscapes" element={<Soundscapes />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/exercises" element={<Exercises />} />
-            <Route path="/nourishment" element={<Nourishment />} />
-            <Route path="/frequencies" element={<Frequencies />} />
-            <Route path="/rituals" element={<Rituals />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/challenges" element={<Challenges />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/:userId" element={<ProfilePage />} />
-            <Route path="/oracle" element={<Oracle />} />
-            <Route path="/mudras" element={<Mudras />} />
-            <Route path="/yantra" element={<Yantra />} />
-            <Route path="/tantra" element={<Tantra />} />
-            <Route path="/videos" element={<Videos />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/trade-circle" element={<TradeCircle />} />
-            <Route path="/classes" element={<Classes />} />
-            <Route path="/create" element={<Create />} />
-            <Route path="/light-therapy" element={<LightTherapy />} />
-            <Route path="/zen-garden" element={<ZenGarden />} />
-            <Route path="/mantras" element={<Mantras />} />
-            <Route path="/hooponopono" element={<Hooponopono />} />
-            <Route path="/journey" element={<Journey />} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/games" element={<Games />} />
-            <Route path="/friends" element={<Friends />} />
-            <Route path="/cardology" element={<Cardology />} />
-            <Route path="/mayan" element={<MayanAstrology />} />
-            <Route path="/avatar" element={<AvatarCreator />} />
-            <Route path="/yoga" element={<Yoga />} />
-            <Route path="/teachings" element={<Teachings />} />
-            <Route path="/wisdom-journal" element={<WisdomJournal />} />
-            <Route path="/numerology" element={<Numerology />} />
-            <Route path="/animal-totems" element={<AnimalTotems />} />
-            <Route path="/dreams" element={<Dreams />} />
-            <Route path="/green-journal" element={<GreenJournal />} />
-            <Route path="/aromatherapy" element={<Aromatherapy />} />
-            <Route path="/herbology" element={<Herbology />} />
-            <Route path="/elixirs" element={<Elixirs />} />
-            <Route path="/meal-planning" element={<MealPlanning />} />
-            <Route path="/acupressure" element={<Acupressure />} />
-            <Route path="/reiki" element={<Reiki />} />
-            <Route path="/discover" element={<TrySomethingNew />} />
-            <Route path="/daily-ritual" element={<DailyRitual />} />
-            <Route path="/cosmic-calendar" element={<CosmicCalendar />} />
-            <Route path="/certifications" element={<Certifications />} />
-            <Route path="/wellness-reports" element={<WellnessReports />} />
-            <Route path="/meditation-history" element={<MeditationHistory />} />
-            <Route path="/media-library" element={<UserUploads />} />
-            <Route path="/coach" element={<SpiritualCoach />} />
-            <Route path="/daily-briefing" element={<DailyBriefing />} />
-            <Route path="/star-chart" element={<StarChart />} />
-            <Route path="/vr" element={<VirtualReality />} />
-            <Route path="/forecasts" element={<Forecasts />} />
-            <Route path="/cosmic-profile" element={<CosmicProfile />} />
-            <Route path="/tutorial" element={<Tutorial />} />
-            <Route path="/creation-stories" element={<CreationStories />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/admin-setup" element={<AdminSetup />} />
-            <Route path="/crystals" element={<Crystals />} />
-            <Route path="/entanglement" element={<Entanglement />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </motion.div>
-    </AnimatePresence>
+    <Suspense fallback={<PageLoader />}>
+      <Routes location={location}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/breathing" element={<Breathing />} />
+        <Route path="/meditation" element={<Meditation />} />
+        <Route path="/affirmations" element={<Affirmations />} />
+        <Route path="/mood" element={<MoodTracker />} />
+        <Route path="/journal" element={<Journal />} />
+        <Route path="/soundscapes" element={<Soundscapes />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/exercises" element={<Exercises />} />
+        <Route path="/nourishment" element={<Nourishment />} />
+        <Route path="/frequencies" element={<Frequencies />} />
+        <Route path="/rituals" element={<Rituals />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/challenges" element={<Challenges />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:userId" element={<ProfilePage />} />
+        <Route path="/oracle" element={<Oracle />} />
+        <Route path="/mudras" element={<Mudras />} />
+        <Route path="/yantra" element={<Yantra />} />
+        <Route path="/tantra" element={<Tantra />} />
+        <Route path="/videos" element={<Videos />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/trade-circle" element={<TradeCircle />} />
+        <Route path="/classes" element={<Classes />} />
+        <Route path="/create" element={<Create />} />
+        <Route path="/light-therapy" element={<LightTherapy />} />
+        <Route path="/zen-garden" element={<ZenGarden />} />
+        <Route path="/mantras" element={<Mantras />} />
+        <Route path="/hooponopono" element={<Hooponopono />} />
+        <Route path="/journey" element={<Journey />} />
+        <Route path="/learn" element={<Learn />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/friends" element={<Friends />} />
+        <Route path="/cardology" element={<Cardology />} />
+        <Route path="/mayan" element={<MayanAstrology />} />
+        <Route path="/avatar" element={<AvatarCreator />} />
+        <Route path="/yoga" element={<Yoga />} />
+        <Route path="/teachings" element={<Teachings />} />
+        <Route path="/wisdom-journal" element={<WisdomJournal />} />
+        <Route path="/numerology" element={<Numerology />} />
+        <Route path="/animal-totems" element={<AnimalTotems />} />
+        <Route path="/dreams" element={<Dreams />} />
+        <Route path="/green-journal" element={<GreenJournal />} />
+        <Route path="/aromatherapy" element={<Aromatherapy />} />
+        <Route path="/herbology" element={<Herbology />} />
+        <Route path="/elixirs" element={<Elixirs />} />
+        <Route path="/meal-planning" element={<MealPlanning />} />
+        <Route path="/acupressure" element={<Acupressure />} />
+        <Route path="/reiki" element={<Reiki />} />
+        <Route path="/discover" element={<TrySomethingNew />} />
+        <Route path="/daily-ritual" element={<DailyRitual />} />
+        <Route path="/cosmic-calendar" element={<CosmicCalendar />} />
+        <Route path="/certifications" element={<Certifications />} />
+        <Route path="/wellness-reports" element={<WellnessReports />} />
+        <Route path="/meditation-history" element={<MeditationHistory />} />
+        <Route path="/media-library" element={<UserUploads />} />
+        <Route path="/coach" element={<SpiritualCoach />} />
+        <Route path="/daily-briefing" element={<DailyBriefing />} />
+        <Route path="/star-chart" element={<StarChart />} />
+        <Route path="/vr" element={<VirtualReality />} />
+        <Route path="/forecasts" element={<Forecasts />} />
+        <Route path="/cosmic-profile" element={<CosmicProfile />} />
+        <Route path="/tutorial" element={<Tutorial />} />
+        <Route path="/creation-stories" element={<CreationStories />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/admin-setup" element={<AdminSetup />} />
+        <Route path="/crystals" element={<Crystals />} />
+        <Route path="/entanglement" element={<Entanglement />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 }
 
