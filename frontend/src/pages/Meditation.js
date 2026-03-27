@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star } from 'lucide-react';
+import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star, Image } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import { useSearchParams } from 'react-router-dom';
@@ -215,6 +215,7 @@ function GuidedSession({ meditation, onEnd }) {
   const [paused, setPaused] = useState(false);
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [celebrating, setCelebrating] = useState(false);
+  const [aiAmbient, setAiAmbient] = useState(null);
   const intervalRef = useRef(null);
   const audioCtxRef = useRef(null);
   const nodesRef = useRef([]);
@@ -229,11 +230,25 @@ function GuidedSession({ meditation, onEnd }) {
         nodesRef.current = startAmbientSound(ctx, meditation.sound);
       } catch {}
     }
+    // Try to generate AI ambient visual
+    const genAmbient = async () => {
+      try {
+        const { authHeaders } = JSON.parse(localStorage.getItem('auth_headers') || '{}');
+        const token = localStorage.getItem('token');
+        if (token) {
+          const r = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ai-visuals/meditation`, {
+            theme: `${meditation.name} ${meditation.category || 'cosmic peace'}`,
+          }, { headers: { Authorization: `Bearer ${token}` }, timeout: 90000 });
+          setAiAmbient(r.data.image_b64);
+        }
+      } catch {}
+    };
+    genAmbient();
     return () => {
       nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
       try { audioCtxRef.current?.close(); } catch {}
     };
-  }, [meditation.sound]);
+  }, [meditation.sound, meditation.name, meditation.category]);
 
   useEffect(() => {
     if (paused) return;
@@ -274,6 +289,21 @@ function GuidedSession({ meditation, onEnd }) {
       data-testid="guided-session"
     >
       <CelebrationBurst active={celebrating} onComplete={() => { setCelebrating(false); onEnd(); }} />
+
+      {/* AI Ambient Background */}
+      {aiAmbient && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.25 }}
+          transition={{ duration: 3 }}
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url(data:image/png;base64,${aiAmbient})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'blur(8px) saturate(1.3)',
+          }}
+        />
+      )}
 
       {/* Ambient background */}
       <motion.div className="absolute inset-0"

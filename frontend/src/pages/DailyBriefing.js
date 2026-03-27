@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Sun, Moon, Compass, Star, Sparkles, Loader2, ChevronRight, Flame, Droplets, Wind, Mountain, Eye, Zap, Check } from 'lucide-react';
+import { Sun, Moon, Compass, Star, Sparkles, Loader2, ChevronRight, Flame, Droplets, Wind, Mountain, Eye, Zap, Check, Image } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -36,6 +36,8 @@ export default function DailyBriefing() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dailyCard, setDailyCard] = useState(null);
+  const [genCard, setGenCard] = useState(false);
 
   useEffect(() => {
     if (!token) { setLoading(false); return; }
@@ -85,6 +87,36 @@ export default function DailyBriefing() {
             <Zap size={11} style={{ color: '#FCD34D' }} />
             <span className="text-[10px] font-medium" style={{ color: '#FCD34D' }}>{data.streak} day streak</span>
           </motion.div>
+        )}
+      </motion.div>
+
+      {/* AI Cosmic Card of the Day */}
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}
+        className="mb-6">
+        {dailyCard ? (
+          <div className="rounded-2xl overflow-hidden mx-auto max-w-sm" style={{ border: '1px solid rgba(216,180,254,0.15)', boxShadow: '0 0 40px rgba(216,180,254,0.05)' }}>
+            <img src={`data:image/png;base64,${dailyCard}`} alt="Card of the day" className="w-full h-48 object-cover" style={{ filter: 'saturate(1.15)' }} />
+            <div className="p-3 text-center" style={{ background: 'rgba(15,17,28,0.9)' }}>
+              <p className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#D8B4FE' }}>Your Cosmic Card</p>
+            </div>
+          </div>
+        ) : (
+          <button onClick={async () => {
+            setGenCard(true);
+            try {
+              const theme = data?.element?.name || 'cosmic wisdom';
+              const affirmation = data?.mayan?.meaning || data?.element?.focus || 'You are aligned with the cosmos';
+              const r = await axios.post(`${API}/ai-visuals/daily-card`, { theme, affirmation: affirmation.slice(0, 150) }, { headers: authHeaders, timeout: 120000 });
+              setDailyCard(r.data.image_b64);
+            } catch {}
+            setGenCard(false);
+          }} disabled={genCard}
+            data-testid="gen-daily-card"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs transition-all"
+            style={{ background: 'rgba(216,180,254,0.06)', border: '1px solid rgba(216,180,254,0.12)', color: '#D8B4FE' }}>
+            {genCard ? <Loader2 size={12} className="animate-spin" /> : <Image size={12} />}
+            {genCard ? 'Channeling your cosmic card...' : 'Reveal AI Cosmic Card of the Day'}
+          </button>
         )}
       </motion.div>
 

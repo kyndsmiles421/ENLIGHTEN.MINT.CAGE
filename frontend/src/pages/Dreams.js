@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight, Compass, Star, TrendingUp } from 'lucide-react';
+import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight, Compass, Star, TrendingUp, Image } from 'lucide-react';
 import { toast } from 'sonner';
 import { CosmicBanner, CosmicMiniTag } from '../components/CosmicBanner';
 
@@ -20,6 +20,8 @@ function NewDreamForm({ onSaved, symbols }) {
   const [saving, setSaving] = useState(false);
   const [interpreting, setInterpreting] = useState(false);
   const [interpretation, setInterpretation] = useState('');
+  const [dreamVisual, setDreamVisual] = useState(null);
+  const [genDreamVisual, setGenDreamVisual] = useState(false);
 
   const interpret = async () => {
     if (!content.trim()) { toast.error('Write your dream first'); return; }
@@ -81,6 +83,27 @@ function NewDreamForm({ onSaved, symbols }) {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-5 mb-4" style={{ borderColor: 'rgba(167,139,250,0.15)' }} data-testid="dream-interpretation">
           <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#A78BFA' }}>AI Interpretation</p>
           <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>{interpretation}</p>
+          {/* AI Dream Visual */}
+          {dreamVisual ? (
+            <div className="rounded-xl overflow-hidden mt-3" style={{ border: '1px solid rgba(167,139,250,0.15)' }}>
+              <img src={`data:image/png;base64,${dreamVisual}`} alt="Dream visualization" className="w-full h-40 object-cover" style={{ filter: 'saturate(1.15)' }} />
+            </div>
+          ) : (
+            <button onClick={async () => {
+              setGenDreamVisual(true);
+              try {
+                const r = await axios.post(`${API}/ai-visuals/dream`, { description: content.slice(0, 300) }, { headers: authHeaders, timeout: 120000 });
+                setDreamVisual(r.data.image_b64);
+              } catch {}
+              setGenDreamVisual(false);
+            }} disabled={genDreamVisual}
+              data-testid="gen-dream-visual"
+              className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg text-[10px]"
+              style={{ background: 'rgba(167,139,250,0.06)', border: '1px solid rgba(167,139,250,0.12)', color: '#A78BFA' }}>
+              {genDreamVisual ? <Loader2 size={10} className="animate-spin" /> : <Image size={10} />}
+              {genDreamVisual ? 'Visualizing your dream...' : 'Generate Dream Visualization'}
+            </button>
+          )}
         </motion.div>
       )}
 

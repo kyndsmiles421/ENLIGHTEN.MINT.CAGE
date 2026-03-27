@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X } from 'lucide-react';
+import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause } from 'lucide-react';
 import * as THREE from 'three';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -45,6 +45,12 @@ export default function VirtualReality() {
   const [activeJourney, setActiveJourney] = useState(null); // { journey, step, elapsed, total }
   const journeyCamRef = useRef({ active: false, target: null, lookTarget: null });
   const journeyGroupRef = useRef(null);
+
+  // VR Story Theater state
+  const [showTheaterPicker, setShowTheaterPicker] = useState(false);
+  const [theaterStories, setTheaterStories] = useState([]);
+  const [vrTheater, setVrTheater] = useState(null);
+  const theaterAudioRef = useRef(null);
 
   // Load data
   useEffect(() => {
@@ -749,6 +755,61 @@ export default function VirtualReality() {
     return () => clearInterval(interval);
   }, [activeJourney]);
 
+  // Load creation stories for VR Theater
+  useEffect(() => {
+    axios.get(`${API}/creation-stories`).then(r => {
+      setTheaterStories((r.data.stories || []).slice(0, 6));
+    }).catch(() => {});
+  }, []);
+
+  const startTheater = async (story) => {
+    setShowTheaterPicker(false);
+    setVrTheater({ story, scene: 0, scenes: [], loading: true, narrating: false, paused: false });
+    try {
+      // Fetch full story
+      const storyRes = await axios.get(`${API}/creation-stories/${story.id}`);
+      const fullStory = storyRes.data;
+      // Fetch cached scenes
+      const scenesRes = await axios.post(`${API}/ai-visuals/story-scenes/${story.id}`, {}, { headers: authHeaders, timeout: 10000 });
+      const scenes = scenesRes.data.scenes || [];
+      // Generate missing scenes
+      for (let i = 0; i < scenes.length; i++) {
+        if (!scenes[i].image_b64) {
+          try {
+            const gen = await axios.post(`${API}/ai-visuals/generate-scene`, { story_id: story.id, scene_index: i }, { headers: authHeaders, timeout: 120000 });
+            scenes[i] = { ...scenes[i], image_b64: gen.data.image_b64 };
+          } catch {}
+        }
+      }
+      setVrTheater(prev => prev ? { ...prev, scenes, fullStory, loading: false } : null);
+    } catch {
+      setVrTheater(prev => prev ? { ...prev, loading: false } : null);
+    }
+  };
+
+  const theaterNarrate = async () => {
+    if (!vrTheater?.story) return;
+    setVrTheater(prev => prev ? { ...prev, narrating: true, scene: 0 } : null);
+    try {
+      const r = await axios.post(`${API}/creation-stories/${vrTheater.story.id}/narrate`, {}, { headers: authHeaders, timeout: 90000 });
+      const audio = new Audio(`data:audio/mp3;base64,${r.data.audio}`);
+      theaterAudioRef.current = audio;
+      const totalScenes = vrTheater.scenes?.length || 3;
+      audio.onplay = () => {};
+      audio.ontimeupdate = () => {
+        if (audio.duration && audio.currentTime) {
+          const pct = audio.currentTime / audio.duration;
+          setVrTheater(prev => prev ? { ...prev, scene: Math.min(Math.floor(pct * totalScenes), totalScenes - 1) } : null);
+        }
+      };
+      audio.onended = () => setVrTheater(prev => prev ? { ...prev, narrating: false } : null);
+      audio.play();
+    } catch {
+      setVrTheater(prev => prev ? { ...prev, narrating: false } : null);
+    }
+  };
+
+
   const hoveredData = hoveredPortal ? PORTALS.find(p => p.id === hoveredPortal) : null;
 
   return (
@@ -771,6 +832,12 @@ export default function VirtualReality() {
         </div>
 
         <div className="flex items-center gap-2 pointer-events-auto">
+          <button onClick={() => setShowTheaterPicker(!showTheaterPicker)}
+            className="p-2.5 rounded-xl transition-all"
+            style={{ background: vrTheater ? 'rgba(249,115,22,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${vrTheater ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.06)'}`, color: vrTheater ? '#F97316' : 'var(--text-secondary)' }}
+            data-testid="vr-theater-btn">
+            <Film size={16} />
+          </button>
           <button onClick={() => setShowJourneyPicker(!showJourneyPicker)}
             className="p-2.5 rounded-xl transition-all"
             style={{ background: activeJourney ? 'rgba(252,211,77,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${activeJourney ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.06)'}`, color: activeJourney ? '#FCD34D' : 'var(--text-secondary)' }}
@@ -832,6 +899,136 @@ export default function VirtualReality() {
               <p className="text-sm font-medium mb-0.5" style={{ color: hoveredData.color }}>{hoveredData.label}</p>
               <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{hoveredData.desc}</p>
               <p className="text-[9px] mt-1 uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Click to enter</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VR Story Theater Picker */}
+      <AnimatePresence>
+        {showTheaterPicker && !vrTheater && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+            className="absolute top-20 right-4 w-64 z-50 pointer-events-auto"
+            data-testid="vr-theater-picker">
+            <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,20,0.9)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Film size={12} style={{ color: '#F97316' }} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.5)' }}>Story Theater</span>
+                </div>
+                <button onClick={() => setShowTheaterPicker(false)} className="p-1 rounded hover:bg-white/5">
+                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                </button>
+              </div>
+              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                Immersive AI-generated cinematic creation stories in VR
+              </p>
+              <div className="space-y-2">
+                {theaterStories.map(s => (
+                  <button key={s.id} onClick={() => startTheater(s)}
+                    data-testid={`vr-theater-${s.id}`}
+                    className="w-full text-left rounded-lg px-3 py-2 transition-all hover:bg-white/5"
+                    style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 6px ${s.color}80` }} />
+                      <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{s.culture}</span>
+                    </div>
+                    <p className="text-[9px] pl-4 mt-0.5 truncate" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.title}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VR Story Theater Overlay */}
+      <AnimatePresence>
+        {vrTheater && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 pointer-events-none" data-testid="vr-theater-overlay">
+            {/* Scene image as floating panel in VR space */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {vrTheater.loading ? (
+                <div className="flex flex-col items-center gap-3 pointer-events-auto">
+                  <Loader2 className="animate-spin" size={28} style={{ color: vrTheater.story?.color }} />
+                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>Generating cinematic scenes...</p>
+                </div>
+              ) : (
+                <motion.div
+                  className="relative rounded-2xl overflow-hidden pointer-events-auto"
+                  style={{ width: '60vw', maxWidth: 800, aspectRatio: '16/9', boxShadow: `0 0 60px ${vrTheater.story?.color || '#F97316'}20` }}
+                >
+                  <AnimatePresence mode="wait">
+                    {vrTheater.scenes?.[vrTheater.scene]?.image_b64 ? (
+                      <motion.img
+                        key={vrTheater.scene}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.2 }}
+                        src={`data:image/png;base64,${vrTheater.scenes[vrTheater.scene].image_b64}`}
+                        className="w-full h-full object-cover"
+                        style={{ filter: 'brightness(0.8) saturate(1.1)' }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(10,10,20,0.9)' }}>
+                        <Sparkles size={24} style={{ color: vrTheater.story?.color }} className="animate-pulse" />
+                      </div>
+                    )}
+                  </AnimatePresence>
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%)' }} />
+
+                  {/* Story text overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <p className="text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: vrTheater.story?.color }}>
+                      {vrTheater.story?.culture} Creation Story
+                    </p>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                      {vrTheater.fullStory?.story?.split('\n\n')[vrTheater.scene] || ''}
+                    </p>
+                  </div>
+
+                  {/* Scene dots */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {vrTheater.scenes?.map((_, i) => (
+                      <div key={i} className="rounded-full transition-all"
+                        style={{ width: i === vrTheater.scene ? 14 : 5, height: 5, background: i === vrTheater.scene ? vrTheater.story?.color : 'rgba(255,255,255,0.2)' }} />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Theater controls */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 pointer-events-auto">
+              <button onClick={() => setVrTheater(prev => prev ? { ...prev, scene: Math.max(0, prev.scene - 1) } : null)}
+                className="p-2 rounded-full" style={{ background: 'rgba(10,10,20,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <SkipBack size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
+              </button>
+              {!vrTheater.narrating ? (
+                <button onClick={theaterNarrate} disabled={vrTheater.loading}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-medium"
+                  style={{ background: `${vrTheater.story?.color || '#F97316'}15`, border: `1px solid ${vrTheater.story?.color || '#F97316'}30`, color: vrTheater.story?.color || '#F97316' }}>
+                  <Volume2 size={12} /> Narrate
+                </button>
+              ) : (
+                <button onClick={() => { if (theaterAudioRef.current) { theaterAudioRef.current.pause(); setVrTheater(prev => prev ? { ...prev, narrating: false } : null); } }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-medium"
+                  style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444' }}>
+                  <Pause size={12} /> Stop
+                </button>
+              )}
+              <button onClick={() => setVrTheater(prev => prev ? { ...prev, scene: Math.min((prev.scenes?.length || 1) - 1, prev.scene + 1) } : null)}
+                className="p-2 rounded-full" style={{ background: 'rgba(10,10,20,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <SkipForward size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
+              </button>
+              <button onClick={() => { if (theaterAudioRef.current) theaterAudioRef.current.pause(); setVrTheater(null); }}
+                className="px-3 py-2 rounded-full text-[10px]"
+                style={{ background: 'rgba(10,10,20,0.6)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}
+                data-testid="vr-theater-close">
+                Exit Theater
+              </button>
             </div>
           </motion.div>
         )}

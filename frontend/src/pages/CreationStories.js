@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Globe, BookOpen, Volume2, VolumeX, Loader2, Pause, Play, Sparkles, Star, MapPin, Clock, ChevronRight, Search, X } from 'lucide-react';
+import { ArrowLeft, Globe, BookOpen, Volume2, VolumeX, Loader2, Pause, Play, Sparkles, Star, MapPin, Clock, ChevronRight, Search, X, Film, SkipForward, SkipBack, Maximize2, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -11,6 +11,249 @@ const API = process.env.REACT_APP_BACKEND_URL + '/api';
 const REGION_ICONS = {
   'Africa': '🌍', 'Americas': '🌎', 'Asia': '🌏', 'Europe': '🏰', 'Oceania': '🌊', 'Arctic & Middle East': '❄️'
 };
+
+/* ════════════════════════════════════════════════════════
+   CINEMATIC STORY MODE — Full-screen AI visual + TTS cinema
+   ════════════════════════════════════════════════════════ */
+function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
+  const [scenes, setScenes] = useState([]);
+  const [currentScene, setCurrentScene] = useState(0);
+  const [generating, setGenerating] = useState(false);
+  const [genProgress, setGenProgress] = useState('');
+  const [narrating, setNarrating] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const audioRef = useRef(null);
+  const timerRef = useRef(null);
+  const paragraphs = fullStory?.story?.split('\n\n') || [];
+
+  // Load cached scenes first, then generate missing ones
+  useEffect(() => {
+    if (!story?.id) return;
+    loadScenes();
+    return () => { clearInterval(timerRef.current); if (audioRef.current) audioRef.current.pause(); };
+  }, [story?.id]);
+
+  const loadScenes = async () => {
+    setGenerating(true);
+    try {
+      // Check what's cached
+      const r = await axios.post(`${API}/ai-visuals/story-scenes/${story.id}`, {}, {
+        headers: authHeaders,
+      });
+      const existing = r.data.scenes || [];
+      setScenes(existing);
+
+      // Generate missing scenes one by one
+      for (let i = 0; i < existing.length; i++) {
+        if (!existing[i].image_b64) {
+          setGenProgress(`Painting scene ${i + 1} of ${existing.length}...`);
+          try {
+            const gen = await axios.post(`${API}/ai-visuals/generate-scene`, {
+              story_id: story.id,
+              scene_index: i,
+            }, { headers: authHeaders, timeout: 120000 });
+            setScenes(prev => {
+              const updated = [...prev];
+              updated[i] = { ...updated[i], image_b64: gen.data.image_b64 };
+              return updated;
+            });
+          } catch {
+            // Continue with others if one fails
+          }
+        }
+      }
+    } catch {
+      toast.error('Failed to prepare cinematic scenes');
+    }
+    setGenerating(false);
+    setGenProgress('');
+  };
+
+  const startNarration = async () => {
+    setNarrating(true);
+    setCurrentScene(0);
+    try {
+      const r = await axios.post(`${API}/creation-stories/${story.id}/narrate`, {}, {
+        headers: authHeaders, timeout: 90000,
+      });
+      const audio = new Audio(`data:audio/mp3;base64,${r.data.audio}`);
+      audioRef.current = audio;
+      audio.play();
+
+      // Auto-advance scenes based on narration time
+      const totalScenes = scenes.length;
+      audio.onplay = () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+          if (audio.duration && audio.currentTime) {
+            const pct = audio.currentTime / audio.duration;
+            const newScene = Math.min(Math.floor(pct * totalScenes), totalScenes - 1);
+            setCurrentScene(newScene);
+          }
+        }, 500);
+      };
+      audio.onended = () => {
+        clearInterval(timerRef.current);
+        setNarrating(false);
+      };
+    } catch {
+      toast.error('Failed to start narration');
+      setNarrating(false);
+    }
+  };
+
+  const togglePause = () => {
+    if (!audioRef.current) return;
+    if (paused) { audioRef.current.play(); setPaused(false); }
+    else { audioRef.current.pause(); setPaused(true); }
+  };
+
+  const prevScene = () => setCurrentScene(p => Math.max(0, p - 1));
+  const nextScene = () => setCurrentScene(p => Math.min(scenes.length - 1, p + 1));
+
+  const currentImg = scenes[currentScene]?.image_b64;
+  const currentParagraph = paragraphs[currentScene] || paragraphs[paragraphs.length - 1] || '';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex flex-col"
+      data-testid="cinematic-mode"
+      style={{ background: '#000' }}
+    >
+      {/* Close button */}
+      <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <button onClick={onClose} data-testid="close-cinema"
+          className="px-3 py-1.5 rounded-lg text-[10px] font-medium"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}>
+          <X size={14} />
+        </button>
+      </div>
+
+      {/* Scene display */}
+      <div className="flex-1 relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {currentImg ? (
+            <motion.div
+              key={`scene-${currentScene}`}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 1.5 }}
+              className="absolute inset-0"
+            >
+              <img
+                src={`data:image/png;base64,${currentImg}`}
+                alt={`Scene ${currentScene + 1}`}
+                className="w-full h-full object-cover"
+                style={{ filter: 'brightness(0.7) saturate(1.2)' }}
+              />
+              {/* Gradient overlays for text readability */}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 100%)' }} />
+            </motion.div>
+          ) : generating ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(15,17,28,1) 0%, #000 70%)' }}>
+              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}>
+                <Sparkles size={32} style={{ color: story.color }} />
+              </motion.div>
+              <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.5)' }}>{genProgress || 'Preparing the cosmic canvas...'}</p>
+              <p className="text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.2)' }}>AI is painting scenes from this ancient story</p>
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(15,17,28,1) 0%, #000 70%)' }}>
+              <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No scene generated yet</p>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Title overlay */}
+        <div className="absolute top-6 left-6 z-10">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-2 h-2 rounded-full" style={{ background: story.color, boxShadow: `0 0 8px ${story.color}80` }} />
+            <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: story.color }}>{story.culture}</span>
+          </div>
+          <p className="text-lg font-semibold" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>
+            {story.title}
+          </p>
+        </div>
+
+        {/* Story text overlay at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-8 pb-24">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentScene}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.8 }}
+              className="text-base md:text-lg leading-relaxed max-w-3xl mx-auto text-center"
+              style={{ color: 'rgba(248,250,252,0.85)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 20px rgba(0,0,0,0.9)' }}
+            >
+              {currentParagraph}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Controls bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 px-6 pb-5">
+        {/* Progress dots */}
+        <div className="flex items-center justify-center gap-2 mb-3">
+          {scenes.map((_, i) => (
+            <button key={i} onClick={() => setCurrentScene(i)}
+              className="transition-all"
+              style={{
+                width: i === currentScene ? 20 : 6,
+                height: 6,
+                borderRadius: 3,
+                background: i === currentScene ? story.color : i < currentScene ? `${story.color}60` : 'rgba(255,255,255,0.15)',
+                boxShadow: i === currentScene ? `0 0 8px ${story.color}60` : 'none',
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Playback controls */}
+        <div className="flex items-center justify-center gap-4">
+          <button onClick={prevScene} className="p-2 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}
+            data-testid="cinema-prev">
+            <SkipBack size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
+          </button>
+
+          {narrating ? (
+            <button onClick={togglePause} className="p-3 rounded-full" data-testid="cinema-pause"
+              style={{ background: `${story.color}20`, border: `1px solid ${story.color}40` }}>
+              {paused ? <Play size={18} style={{ color: story.color }} /> : <Pause size={18} style={{ color: story.color }} />}
+            </button>
+          ) : (
+            <button onClick={startNarration} disabled={generating || scenes.every(s => !s.image_b64)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium transition-all"
+              data-testid="cinema-play"
+              style={{
+                background: `${story.color}15`,
+                border: `1px solid ${story.color}30`,
+                color: story.color,
+                opacity: generating ? 0.5 : 1,
+              }}>
+              <Play size={14} /> Play with Narration
+            </button>
+          )}
+
+          <button onClick={nextScene} className="p-2 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}
+            data-testid="cinema-next">
+            <SkipForward size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
+          </button>
+        </div>
+
+        <p className="text-[9px] text-center mt-2" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          Scene {currentScene + 1} of {scenes.length} &middot; {narrating ? (paused ? 'Paused' : 'Narrating...') : 'Tap play to begin narrated cinema'}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
 
 function StoryNarrator({ storyId, color, storyTitle }) {
   const [state, setState] = useState('idle');
@@ -202,6 +445,7 @@ export default function CreationStories() {
   const [storyLoading, setStoryLoading] = useState(false);
   const [activeRegion, setActiveRegion] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [cinemaMode, setCinemaMode] = useState(null); // { story, fullStory }
 
   useEffect(() => {
     axios.get(`${API}/creation-stories`).then(r => {
@@ -393,6 +637,22 @@ export default function CreationStories() {
                           <StoryNarrator storyId={fullStory.id} color={fullStory.color} storyTitle={fullStory.title} />
                         </div>
 
+                        {/* Cinematic mode button */}
+                        <button onClick={() => setCinemaMode({ story: selected, fullStory })}
+                          data-testid="watch-cinema-btn"
+                          className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-medium transition-all group"
+                          style={{
+                            background: `linear-gradient(135deg, ${fullStory.color}10, ${fullStory.color}05)`,
+                            border: `1px solid ${fullStory.color}20`,
+                            color: fullStory.color,
+                          }}>
+                          <Film size={14} className="group-hover:scale-110 transition-transform" />
+                          Watch AI Cinematic Experience
+                          <span className="text-[9px] ml-1 px-1.5 py-0.5 rounded-full" style={{ background: `${fullStory.color}15` }}>
+                            3 AI scenes
+                          </span>
+                        </button>
+
                         {/* Story text */}
                         <div className="mb-5">
                           <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"
@@ -441,6 +701,18 @@ export default function CreationStories() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Cinematic Story Mode */}
+      <AnimatePresence>
+        {cinemaMode && (
+          <CinematicStoryMode
+            story={cinemaMode.story}
+            fullStory={cinemaMode.fullStory}
+            authHeaders={authHeaders}
+            onClose={() => setCinemaMode(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

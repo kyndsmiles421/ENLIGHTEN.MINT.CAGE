@@ -48,6 +48,7 @@ from routes.forecasts import router as forecasts_router
 from routes.cosmic_profile import router as cosmic_profile_router
 from routes.star_cultures import router as star_cultures_router
 from routes.creation_stories import router as creation_stories_router
+from routes.ai_visuals import router as ai_visuals_router
 
 app = FastAPI()
 
@@ -67,6 +68,7 @@ all_routers = [
     cosmic_profile_router,
     star_cultures_router,
     creation_stories_router,
+    ai_visuals_router,
 ]
 
 for r in all_routers:

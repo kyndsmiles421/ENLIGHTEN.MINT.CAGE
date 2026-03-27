@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Star, Hash, Heart, Sparkles, Loader2, Zap, Flame, Droplets, Wind, Globe, Trophy, Sprout, BarChart3, TrendingUp } from 'lucide-react';
+import { Star, Hash, Heart, Sparkles, Loader2, Zap, Flame, Droplets, Wind, Globe, Trophy, Sprout, BarChart3, TrendingUp, Image } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -56,6 +56,8 @@ export default function CosmicProfile() {
   const { user, authHeaders } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [portrait, setPortrait] = useState(null);
+  const [genPortrait, setGenPortrait] = useState(false);
 
   const load = useCallback(async () => {
     if (!user) { setLoading(false); return; }
@@ -101,6 +103,55 @@ export default function CosmicProfile() {
             Patterns emerging from your readings, meditations, and cosmic explorations.
           </p>
         </motion.div>
+
+        {/* AI Cosmic Portrait */}
+        <div className="glass-card p-5 mb-8 flex flex-col sm:flex-row items-center gap-5">
+          {portrait ? (
+            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden flex-shrink-0"
+              style={{ border: `2px solid ${domColor}30`, boxShadow: `0 0 30px ${domColor}15` }}>
+              <img src={`data:image/png;base64,${portrait}`} alt="Cosmic portrait" className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl flex-shrink-0 flex items-center justify-center"
+              style={{ background: `${domColor}08`, border: `2px dashed ${domColor}20` }}>
+              {genPortrait ? (
+                <div className="text-center">
+                  <Loader2 size={20} className="animate-spin mx-auto mb-2" style={{ color: domColor }} />
+                  <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Painting your cosmos...</p>
+                </div>
+              ) : (
+                <Sparkles size={24} style={{ color: `${domColor}40` }} />
+              )}
+            </div>
+          )}
+          <div className="text-center sm:text-left flex-1">
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: domColor }}>Your Cosmic Portrait</p>
+            <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
+              An AI-generated visualization of your unique cosmic energy signature based on your zodiac, element, and spiritual patterns.
+            </p>
+            {!portrait && (
+              <button onClick={async () => {
+                setGenPortrait(true);
+                try {
+                  const r = await axios.post(`${API}/ai-visuals/cosmic-portrait`, {
+                    zodiac: profile.zodiac_sign || '',
+                    energy_level: profile.avg_cosmic_energy || 5,
+                    element: profile.dominant_element || '',
+                    traits: `${profile.dominant_system || ''} focus, ${profile.dominant_energy_type || ''} energy, level ${profile.gamification?.level || 1}`,
+                  }, { headers: authHeaders, timeout: 120000 });
+                  setPortrait(r.data.image_b64);
+                } catch { /* silent */ }
+                setGenPortrait(false);
+              }} disabled={genPortrait}
+                data-testid="gen-portrait-btn"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-medium mx-auto sm:mx-0"
+                style={{ background: `${domColor}12`, border: `1px solid ${domColor}25`, color: domColor }}>
+                <Image size={12} />
+                Generate My Cosmic Portrait
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Hero stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">

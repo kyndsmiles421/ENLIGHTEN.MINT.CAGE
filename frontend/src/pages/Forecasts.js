@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Sparkles, Trash2, Clock, Zap, Heart, ArrowLeft, Share2, Check } from 'lucide-react';
+import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Sparkles, Trash2, Clock, Zap, Heart, ArrowLeft, Share2, Check, Image } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -27,6 +27,9 @@ function ForecastCard({ forecast, onDelete, onShare }) {
   const [expanded, setExpanded] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shared, setShared] = useState(false);
+  const [aiVisual, setAiVisual] = useState(null);
+  const [genVisual, setGenVisual] = useState(false);
+  const { authHeaders } = useAuth();
   const fc = forecast.forecast;
   const color = forecast.system_color || '#C084FC';
   const Icon = SYSTEM_ICONS[Object.values(SYSTEM_ICONS).find(i => i) ? 'star' : 'star'] || Star;
@@ -38,6 +41,23 @@ function ForecastCard({ forecast, onDelete, onShare }) {
     const success = await onShare(forecast);
     setSharing(false);
     if (success) setShared(true);
+  };
+
+  const generateVisual = async (e) => {
+    e.stopPropagation();
+    if (genVisual || aiVisual) return;
+    setGenVisual(true);
+    try {
+      const r = await axios.post(`${API}/ai-visuals/forecast`, {
+        system: forecast.system_name,
+        period: forecast.period,
+        summary: (fc?.summary || '').slice(0, 200),
+      }, { headers: authHeaders, timeout: 120000 });
+      setAiVisual(r.data.image_b64);
+    } catch {
+      toast.error('Failed to generate cosmic visual');
+    }
+    setGenVisual(false);
   };
 
   return (
@@ -105,6 +125,20 @@ function ForecastCard({ forecast, onDelete, onShare }) {
         {expanded && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
             <div className="px-5 pb-5 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+              {/* AI Cosmic Visual */}
+              {aiVisual ? (
+                <div className="rounded-xl overflow-hidden mt-3" style={{ border: `1px solid ${color}15` }}>
+                  <img src={`data:image/png;base64,${aiVisual}`} alt="Cosmic visual" className="w-full h-32 object-cover" style={{ filter: 'saturate(1.1)' }} />
+                </div>
+              ) : (
+                <button onClick={generateVisual} disabled={genVisual}
+                  data-testid={`gen-visual-${forecast.id}`}
+                  className="flex items-center gap-2 w-full mt-3 px-3 py-2 rounded-xl text-[10px] transition-all"
+                  style={{ background: `${color}06`, border: `1px solid ${color}10`, color: color }}>
+                  {genVisual ? <Loader2 size={10} className="animate-spin" /> : <Image size={10} />}
+                  {genVisual ? 'Generating cosmic visual...' : 'Generate AI Cosmic Visual'}
+                </button>
+              )}
               {/* Sections */}
               {fc?.sections?.map((s, i) => {
                 const energy = ENERGY_LABELS[s.energy] || ENERGY_LABELS.neutral;
