@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
@@ -7,81 +7,269 @@ import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones,
   LayoutDashboard, LogOut, LogIn, Menu, X, Zap, Leaf, Radio,
   Sunrise, Users, Flame, Sparkles, User, Hand, Triangle,
-  Flame as TantraIcon, Play, GraduationCap, ChevronDown, PenTool,
+  Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit
 } from 'lucide-react';
-
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 
-const PRIMARY_NAV = [
-  { path: '/daily-briefing', label: 'Today', icon: Sun },
-  { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
-  { path: '/coach', label: 'Sage', icon: MessageCircle },
-  { path: '/star-chart', label: 'Stars', icon: Star },
-  { path: '/cosmic-calendar', label: 'Calendar', icon: Calendar },
-  { path: '/journey', label: 'Journey', icon: Map },
-  { path: '/breathing', label: 'Breathe', icon: Wind },
-  { path: '/meditation', label: 'Meditate', icon: Timer },
-  { path: '/soundscapes', label: 'Sounds', icon: Headphones },
-  { path: '/frequencies', label: 'Hz', icon: Radio },
-  { path: '/exercises', label: 'Exercises', icon: Zap },
-  { path: '/mudras', label: 'Mudras', icon: Hand },
-  { path: '/light-therapy', label: 'Light', icon: Lightbulb },
-  { path: '/zen-garden', label: 'Zen', icon: Sprout },
+/* ─── Category definitions ─── */
+const NAV_CATEGORIES = [
+  {
+    id: 'today', label: 'Today', icon: Sun, color: '#FCD34D',
+    items: [
+      { path: '/daily-briefing', label: 'Daily Briefing', icon: Sun },
+      { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
+      { path: '/cosmic-calendar', label: 'Cosmic Calendar', icon: Calendar },
+      { path: '/mood', label: 'Mood Check', icon: Heart },
+    ],
+  },
+  {
+    id: 'practice', label: 'Practice', icon: Wind, color: '#D8B4FE',
+    items: [
+      { path: '/breathing', label: 'Breathwork', icon: Wind },
+      { path: '/meditation', label: 'Meditation', icon: Timer },
+      { path: '/yoga', label: 'Yoga', icon: Flame },
+      { path: '/exercises', label: 'Qigong & Tai Chi', icon: Zap },
+      { path: '/mudras', label: 'Mudras', icon: Hand },
+      { path: '/mantras', label: 'Mantras', icon: Music },
+      { path: '/light-therapy', label: 'Light Therapy', icon: Lightbulb },
+      { path: '/affirmations', label: 'Affirmations', icon: Sun },
+      { path: '/rituals', label: 'Sacred Rituals', icon: Sunrise },
+      { path: '/yantra', label: 'Yantras', icon: Triangle },
+      { path: '/tantra', label: 'Tantra', icon: Flame },
+      { path: '/hooponopono', label: "Ho'oponopono", icon: HeartHandshake },
+    ],
+  },
+  {
+    id: 'divination', label: 'Divination', icon: Eye, color: '#E879F9',
+    items: [
+      { path: '/oracle', label: 'Oracle', icon: Sparkles },
+      { path: '/star-chart', label: 'Star Chart', icon: Star },
+      { path: '/forecasts', label: 'Forecasts', icon: Eye },
+      { path: '/numerology', label: 'Numerology', icon: Star },
+      { path: '/cardology', label: 'Cardology', icon: Star },
+      { path: '/mayan', label: 'Mayan Astrology', icon: Compass },
+      { path: '/dreams', label: 'Dream Journal', icon: Moon },
+      { path: '/animal-totems', label: 'Animal Totems', icon: Leaf },
+      { path: '/cosmic-profile', label: 'Cosmic Profile', icon: BarChart3 },
+    ],
+  },
+  {
+    id: 'sanctuary', label: 'Sanctuary', icon: Sprout, color: '#2DD4BF',
+    items: [
+      { path: '/zen-garden', label: 'Zen Garden', icon: Sprout },
+      { path: '/soundscapes', label: 'Soundscapes', icon: Headphones },
+      { path: '/frequencies', label: 'Frequencies', icon: Radio },
+      { path: '/vr', label: 'VR Sanctuary', icon: Orbit },
+      { path: '/journal', label: 'Journal', icon: BookOpen },
+      { path: '/wisdom-journal', label: 'Wisdom Log', icon: PenTool },
+      { path: '/green-journal', label: 'Green Log', icon: Sprout },
+    ],
+  },
+  {
+    id: 'nourish', label: 'Nourish', icon: Leaf, color: '#22C55E',
+    items: [
+      { path: '/nourishment', label: 'Nourishment', icon: Leaf },
+      { path: '/aromatherapy', label: 'Aromatherapy', icon: Droplets },
+      { path: '/herbology', label: 'Herbology', icon: Leaf },
+      { path: '/elixirs', label: 'Elixirs', icon: Flame },
+      { path: '/meal-planning', label: 'Meal Planning', icon: UtensilsCrossed },
+      { path: '/acupressure', label: 'Acupressure', icon: Target },
+      { path: '/reiki', label: 'Reiki & Aura', icon: Eye },
+    ],
+  },
+  {
+    id: 'explore', label: 'Explore', icon: Compass, color: '#FB923C',
+    items: [
+      { path: '/creation-stories', label: 'Creation Stories', icon: Globe },
+      { path: '/teachings', label: 'Teachings', icon: BookOpen },
+      { path: '/learn', label: 'Learn', icon: GraduationCap },
+      { path: '/journey', label: 'Journey', icon: Map },
+      { path: '/discover', label: 'Try Something New', icon: Compass },
+      { path: '/games', label: 'Games', icon: Gamepad2 },
+      { path: '/videos', label: 'Videos', icon: Play },
+      { path: '/classes', label: 'Classes', icon: GraduationCap },
+      { path: '/community', label: 'Community', icon: Users },
+      { path: '/friends', label: 'Friends', icon: Users },
+      { path: '/challenges', label: 'Challenges', icon: Flame },
+      { path: '/create', label: 'Create', icon: PenTool },
+    ],
+  },
 ];
 
-const MORE_NAV = [
-  { path: '/discover', label: 'Try New', icon: Compass },
-  { path: '/wellness-reports', label: 'Reports', icon: BarChart3 },
-  { path: '/certifications', label: 'Certs', icon: Award },
-  { path: '/meditation-history', label: 'Med History', icon: Timer },
-  { path: '/media-library', label: 'My Media', icon: Upload },
-  { path: '/acupressure', label: 'Acupressure', icon: Target },
-  { path: '/reiki', label: 'Reiki & Aura', icon: Eye },
-  { path: '/yoga', label: 'Yoga', icon: Flame },
-  { path: '/teachings', label: 'Teachings', icon: BookOpen },
-  { path: '/wisdom-journal', label: 'Wisdom Log', icon: PenTool },
-  { path: '/numerology', label: 'Numerology', icon: Star },
-  { path: '/animal-totems', label: 'Totems', icon: Leaf },
-  { path: '/dreams', label: 'Dreams', icon: Moon },
-  { path: '/green-journal', label: 'Green Log', icon: Sprout },
-  { path: '/aromatherapy', label: 'Aromatherapy', icon: Droplets },
-  { path: '/herbology', label: 'Herbology', icon: Leaf },
-  { path: '/elixirs', label: 'Elixirs', icon: Flame },
-  { path: '/meal-planning', label: 'Meals', icon: UtensilsCrossed },
-  { path: '/vr', label: 'Sanctuary', icon: Orbit },
+const PROFILE_ITEMS = [
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/profile', label: 'Profile', icon: User },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
-  { path: '/friends', label: 'Friends', icon: Users },
-  { path: '/learn', label: 'Learn', icon: GraduationCap },
-  { path: '/games', label: 'Games', icon: Gamepad2 },
-  { path: '/mantras', label: 'Mantras', icon: Music },
-  { path: '/hooponopono', label: "Ho'oponopono", icon: HeartHandshake },
-  { path: '/oracle', label: 'Oracle', icon: Sparkles },
-  { path: '/forecasts', label: 'Forecasts', icon: Eye },
-  { path: '/cosmic-profile', label: 'Cosmic Profile', icon: BarChart3 },
+  { path: '/wellness-reports', label: 'Wellness Reports', icon: BarChart3 },
+  { path: '/certifications', label: 'Certifications', icon: Award },
+  { path: '/meditation-history', label: 'Med. History', icon: Timer },
+  { path: '/media-library', label: 'My Media', icon: Upload },
   { path: '/tutorial', label: 'Tutorial', icon: GraduationCap },
-  { path: '/creation-stories', label: 'Creation Stories', icon: Globe },
-  { path: '/cardology', label: 'Cardology', icon: Star },
-  { path: '/mayan', label: 'Mayan', icon: Compass },
-  { path: '/create', label: 'Create', icon: PenTool },
-  { path: '/community', label: 'Community', icon: Users },
-  { path: '/yantra', label: 'Yantra', icon: Triangle },
-  { path: '/tantra', label: 'Tantra', icon: TantraIcon },
-  { path: '/rituals', label: 'Rituals', icon: Sunrise },
-  { path: '/challenges', label: 'Challenges', icon: Flame },
-  { path: '/affirmations', label: 'Affirm', icon: Sun },
-  { path: '/mood', label: 'Mood', icon: Heart },
-  { path: '/journal', label: 'Journal', icon: BookOpen },
-  { path: '/nourishment', label: 'Nourish', icon: Leaf },
-  { path: '/videos', label: 'Videos', icon: Play },
-  { path: '/classes', label: 'Classes', icon: GraduationCap },
 ];
 
-const ALL_NAV = [...PRIMARY_NAV, ...MORE_NAV];
+const ALL_PATHS = NAV_CATEGORIES.flatMap(c => c.items.map(i => i.path));
 
+/* ─── Mega Menu Dropdown (Desktop) ─── */
+function MegaDropdown({ category, onClose }) {
+  const location = useLocation();
+  const { playClick } = useSensory();
+  const cols = category.items.length > 6 ? 'grid-cols-2' : 'grid-cols-1';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.97 }}
+      transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 rounded-2xl overflow-hidden"
+      style={{
+        background: 'rgba(13, 14, 26, 0.96)',
+        border: '1px solid rgba(192,132,252,0.08)',
+        backdropFilter: 'blur(32px)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(192,132,252,0.04)',
+        minWidth: category.items.length > 6 ? '340px' : '200px',
+      }}
+      data-testid={`mega-menu-${category.id}`}
+    >
+      <div className="px-3 pt-3 pb-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 mb-1" style={{ color: category.color }}>
+          {category.label}
+        </p>
+      </div>
+      <div className={`grid ${cols} gap-0.5 p-2`}>
+        {category.items.map(item => {
+          const Icon = item.icon;
+          const active = location.pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => { onClose(); playClick(); }}
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs transition-all duration-200 hover:bg-white/[0.04]"
+              style={{
+                color: active ? '#fff' : 'var(--text-secondary)',
+                background: active ? 'rgba(192,132,252,0.08)' : 'transparent',
+              }}
+              data-testid={`nav-item-${item.path.slice(1)}`}
+            >
+              <Icon size={14} style={active ? { color: category.color, filter: `drop-shadow(0 0 4px ${category.color}80)` } : { color: 'var(--text-muted)' }} />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Category Button (Desktop) ─── */
+function CategoryButton({ category, isOpen, onOpen, onClose }) {
+  const location = useLocation();
+  const { playClick } = useSensory();
+  const timeoutRef = useRef(null);
+  const Icon = category.icon;
+  const hasActiveChild = category.items.some(i => location.pathname === i.path);
+
+  const handleEnter = () => {
+    clearTimeout(timeoutRef.current);
+    onOpen();
+  };
+  const handleLeave = () => {
+    timeoutRef.current = setTimeout(onClose, 200);
+  };
+
+  useEffect(() => () => clearTimeout(timeoutRef.current), []);
+
+  return (
+    <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+      <button
+        onClick={() => { isOpen ? onClose() : onOpen(); playClick(); }}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all duration-300"
+        style={{
+          color: hasActiveChild || isOpen ? '#fff' : 'var(--text-muted)',
+          background: hasActiveChild ? `${category.color}12` : isOpen ? 'rgba(255,255,255,0.04)' : 'transparent',
+        }}
+        data-testid={`nav-cat-${category.id}`}
+      >
+        <Icon size={13} style={hasActiveChild ? { color: category.color } : {}} />
+        <span>{category.label}</span>
+        <ChevronDown size={10} style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }} />
+      </button>
+      <AnimatePresence>
+        {isOpen && <MegaDropdown category={category} onClose={onClose} />}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Mobile Accordion Category ─── */
+function MobileCategory({ category, expanded, onToggle, onNavigate }) {
+  const location = useLocation();
+  const Icon = category.icon;
+  const hasActiveChild = category.items.some(i => location.pathname === i.path);
+
+  return (
+    <div className="mb-1">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all"
+        style={{
+          color: hasActiveChild ? '#fff' : 'var(--text-secondary)',
+          background: expanded ? 'rgba(255,255,255,0.03)' : 'transparent',
+        }}
+        data-testid={`mobile-cat-${category.id}`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${category.color}10` }}>
+            <Icon size={16} style={{ color: category.color }} />
+          </div>
+          <span className="text-sm font-medium">{category.label}</span>
+          {hasActiveChild && <div className="w-1.5 h-1.5 rounded-full" style={{ background: category.color }} />}
+        </div>
+        <ChevronDown size={14} style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }} />
+      </button>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-2 gap-1 px-2 py-2">
+              {category.items.map(item => {
+                const ItemIcon = item.icon;
+                const active = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={onNavigate}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs transition-all"
+                    style={{
+                      color: active ? '#fff' : 'var(--text-muted)',
+                      background: active ? `${category.color}12` : 'transparent',
+                    }}
+                  >
+                    <ItemIcon size={13} style={active ? { color: category.color } : {}} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Main Navigation ─── */
 export default function Navigation() {
   const { user, logout } = useAuth();
   const { ambientOn, toggleAmbient, playClick } = useSensory();
@@ -89,131 +277,86 @@ export default function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [openCat, setOpenCat] = useState(null);
+  const [mobileCat, setMobileCat] = useState(null);
   const [langOpen, setLangOpen] = useState(false);
-  const moreRef = useRef(null);
+  const [profileOpen, setProfileOpen] = useState(false);
   const langRef = useRef(null);
+  const profileRef = useRef(null);
+  const profileTimeout = useRef(null);
 
+  /* Close dropdowns on outside click */
   useEffect(() => {
     const handler = (e) => {
-      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
       if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  /* Close mobile menu on route change */
+  useEffect(() => { setMobileOpen(false); setMobileCat(null); }, [location.pathname]);
+
+  /* Hide nav on landing, auth, VR */
   if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr') return null;
 
-  const moreActive = MORE_NAV.some(item => location.pathname === item.path);
-
-  const handleNav = () => {
-    playClick();
-  };
+  const isSageActive = location.pathname === '/coach';
 
   return (
     <>
-      {/* Desktop Nav */}
+      {/* ═══ Desktop Nav ═══ */}
       <nav
-        className="hidden lg:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-6 py-3"
+        className="hidden lg:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-5 py-2.5"
         style={{
-          background: 'rgba(11, 12, 21, 0.75)',
-          backdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(192,132,252,0.06)',
+          background: 'rgba(11, 12, 21, 0.8)',
+          backdropFilter: 'blur(28px)',
+          borderBottom: '1px solid rgba(192,132,252,0.05)',
         }}
+        data-testid="desktop-nav"
       >
-        <Link to="/" className="flex items-center gap-3 flex-shrink-0 group" data-testid="nav-logo" onClick={handleNav}>
-          <div className="w-8 h-8 rounded-full animate-orbit-glow relative"
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group" data-testid="nav-logo" onClick={playClick}>
+          <div className="w-7 h-7 rounded-full animate-orbit-glow relative"
             style={{ background: 'radial-gradient(circle, #C084FC 0%, #7C3AED 100%)' }}>
-            <div className="absolute inset-0 rounded-full animate-pulse-glow" style={{ opacity: 0.5 }} />
+            <div className="absolute inset-0 rounded-full animate-pulse-glow" style={{ opacity: 0.4 }} />
           </div>
-          <span className="group-hover:animate-text-shimmer transition-all duration-300" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', color: 'var(--text-primary)' }}>
+          <span className="group-hover:animate-text-shimmer transition-all text-sm" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Cosmic Collective
           </span>
         </Link>
 
+        {/* Category Menus */}
         <div className="flex items-center gap-0.5">
-          {PRIMARY_NAV.map(item => {
-            const Icon = item.icon;
-            const active = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={handleNav}
-                data-testid={`nav-${item.label.toLowerCase()}`}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs nav-glow transition-all duration-300"
-                style={{
-                  color: active ? '#fff' : 'var(--text-muted)',
-                  background: active ? 'rgba(192,132,252,0.12)' : 'transparent',
-                  boxShadow: active ? '0 0 15px rgba(192,132,252,0.15)' : 'none',
-                }}
-              >
-                <Icon size={13} style={active ? { filter: 'drop-shadow(0 0 4px rgba(192,132,252,0.6))' } : {}} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-
-          {/* More Dropdown */}
-          <div className="relative" ref={moreRef}>
-            <button
-              onClick={() => { setMoreOpen(!moreOpen); playClick(); }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs nav-glow transition-all duration-300"
-              style={{
-                color: moreActive ? '#fff' : 'var(--text-muted)',
-                background: moreActive || moreOpen ? 'rgba(192,132,252,0.12)' : 'transparent',
-              }}
-              data-testid="nav-more-btn"
-            >
-              <span>More</span>
-              <ChevronDown size={12} style={{ transform: moreOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' }} />
-            </button>
-            <AnimatePresence>
-              {moreOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="absolute top-full right-0 mt-2 w-52 rounded-xl overflow-hidden"
-                  style={{
-                    background: 'rgba(13, 14, 26, 0.95)',
-                    border: '1px solid rgba(192,132,252,0.1)',
-                    backdropFilter: 'blur(24px)',
-                    boxShadow: '0 0 40px rgba(192,132,252,0.06), 0 20px 60px rgba(0,0,0,0.5)',
-                  }}
-                >
-                  <div className="py-2">
-                    {MORE_NAV.map((item, i) => {
-                      const Icon = item.icon;
-                      const active = location.pathname === item.path;
-                      return (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          onClick={() => { setMoreOpen(false); playClick(); }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-xs transition-all duration-200"
-                          style={{
-                            color: active ? '#fff' : 'var(--text-secondary)',
-                            background: active ? 'rgba(192,132,252,0.1)' : 'transparent',
-                          }}
-                          data-testid={`nav-more-${item.label.toLowerCase()}`}
-                        >
-                          <Icon size={14} style={active ? { filter: 'drop-shadow(0 0 4px rgba(192,132,252,0.5))' } : {}} />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          {NAV_CATEGORIES.map(cat => (
+            <CategoryButton
+              key={cat.id}
+              category={cat}
+              isOpen={openCat === cat.id}
+              onOpen={() => setOpenCat(cat.id)}
+              onClose={() => setOpenCat(null)}
+            />
+          ))}
+          {/* Sage — Direct Link */}
+          <Link
+            to="/coach"
+            onClick={playClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all duration-300 ml-1"
+            style={{
+              color: isSageActive ? '#fff' : '#2DD4BF',
+              background: isSageActive ? 'rgba(45,212,191,0.15)' : 'rgba(45,212,191,0.06)',
+              border: '1px solid rgba(45,212,191,0.12)',
+            }}
+            data-testid="nav-sage"
+          >
+            <MessageCircle size={13} />
+            <span className="font-medium">Sage</span>
+          </Link>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Language Selector */}
+        {/* Right Controls */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* Language */}
           <div className="relative" ref={langRef}>
             <button
               onClick={() => { setLangOpen(!langOpen); playClick(); }}
@@ -221,7 +364,7 @@ export default function Navigation() {
               style={{ color: 'var(--text-muted)', background: langOpen ? 'rgba(192,132,252,0.08)' : 'transparent' }}
               data-testid="nav-lang-btn"
             >
-              <Globe size={13} />
+              <Globe size={12} />
               <span className="uppercase text-[10px] font-bold">{lang}</span>
             </button>
             <AnimatePresence>
@@ -242,70 +385,101 @@ export default function Navigation() {
               )}
             </AnimatePresence>
           </div>
-          {/* Ambient Audio Toggle */}
+
+          {/* Ambient Toggle */}
           <button
             onClick={toggleAmbient}
             className="p-2 rounded-full transition-all duration-300 relative"
             style={{
               color: ambientOn ? 'var(--primary)' : 'var(--text-muted)',
               background: ambientOn ? 'rgba(192,132,252,0.1)' : 'transparent',
-              boxShadow: ambientOn ? '0 0 15px rgba(192,132,252,0.2)' : 'none',
             }}
             data-testid="nav-ambient-toggle"
-            title={ambientOn ? 'Ambient sound on' : 'Ambient sound off'}
+            title={ambientOn ? 'Ambient on' : 'Ambient off'}
           >
-            {ambientOn ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            {ambientOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
             {ambientOn && (
-              <motion.div
-                className="absolute inset-0 rounded-full"
+              <motion.div className="absolute inset-0 rounded-full"
                 animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                style={{ border: '1px solid var(--primary)' }}
-              />
+                style={{ border: '1px solid var(--primary)' }} />
             )}
           </button>
 
+          {/* User Area */}
           {user ? (
-            <>
-              <Link
-                to="/profile"
-                onClick={handleNav}
-                data-testid="nav-profile"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs nav-glow transition-all duration-300"
-                style={{
-                  color: location.pathname === '/profile' ? '#fff' : 'var(--text-secondary)',
-                  background: location.pathname === '/profile' ? 'rgba(192,132,252,0.12)' : 'transparent',
-                }}
-              >
-                <User size={13} />
-                <span>Profile</span>
-              </Link>
-              <Link
-                to="/dashboard"
-                onClick={handleNav}
-                data-testid="nav-dashboard"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs nav-glow transition-all duration-300"
-                style={{
-                  color: location.pathname === '/dashboard' ? '#fff' : 'var(--text-secondary)',
-                  background: location.pathname === '/dashboard' ? 'rgba(192,132,252,0.12)' : 'transparent',
-                }}
-              >
-                <LayoutDashboard size={13} />
-                <span>{user.name?.split(' ')[0]}</span>
-              </Link>
+            <div className="relative" ref={profileRef}
+              onMouseEnter={() => { clearTimeout(profileTimeout.current); setProfileOpen(true); }}
+              onMouseLeave={() => { profileTimeout.current = setTimeout(() => setProfileOpen(false), 200); }}
+            >
               <button
-                onClick={() => { logout(); navigate('/'); playClick(); }}
-                className="p-1.5 rounded-full transition-all duration-300"
-                style={{ color: 'var(--text-muted)' }}
-                data-testid="nav-logout"
+                onClick={() => { setProfileOpen(!profileOpen); playClick(); }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all duration-300"
+                style={{
+                  color: profileOpen ? '#fff' : 'var(--text-secondary)',
+                  background: profileOpen ? 'rgba(192,132,252,0.1)' : 'transparent',
+                }}
+                data-testid="nav-profile-btn"
               >
-                <LogOut size={14} />
+                <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
+                  style={{ background: 'rgba(192,132,252,0.2)', color: '#D8B4FE' }}>
+                  {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <span className="max-w-[60px] truncate">{user.name?.split(' ')[0]}</span>
+                <ChevronDown size={10} style={{ transform: profileOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }} />
               </button>
-            </>
+              <AnimatePresence>
+                {profileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                    transition={{ duration: 0.18 }}
+                    className="absolute top-full right-0 mt-2 w-48 rounded-xl overflow-hidden"
+                    style={{
+                      background: 'rgba(13, 14, 26, 0.96)',
+                      border: '1px solid rgba(192,132,252,0.08)',
+                      backdropFilter: 'blur(32px)',
+                      boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+                    }}
+                    data-testid="nav-profile-dropdown"
+                  >
+                    <div className="py-1.5">
+                      {PROFILE_ITEMS.map(item => {
+                        const Icon = item.icon;
+                        const active = location.pathname === item.path;
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => { setProfileOpen(false); playClick(); }}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all hover:bg-white/[0.04]"
+                            style={{ color: active ? '#fff' : 'var(--text-secondary)', background: active ? 'rgba(192,132,252,0.08)' : 'transparent' }}
+                          >
+                            <Icon size={13} style={active ? { color: 'var(--primary)' } : { color: 'var(--text-muted)' }} />
+                            <span>{item.label}</span>
+                          </Link>
+                        );
+                      })}
+                      <div className="my-1 mx-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }} />
+                      <button
+                        onClick={() => { logout(); navigate('/'); setProfileOpen(false); playClick(); }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all hover:bg-white/[0.04]"
+                        style={{ color: 'var(--text-muted)' }}
+                        data-testid="nav-logout"
+                      >
+                        <LogOut size={13} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ) : (
             <Link
               to="/auth"
-              onClick={handleNav}
+              onClick={playClick}
               className="btn-glass text-xs px-4 py-2"
               data-testid="nav-signin"
             >
@@ -316,25 +490,20 @@ export default function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile Nav */}
+      {/* ═══ Mobile Nav Bar ═══ */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
         style={{
-          background: 'rgba(11, 12, 21, 0.8)',
-          backdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(192,132,252,0.06)',
+          background: 'rgba(11, 12, 21, 0.85)',
+          backdropFilter: 'blur(28px)',
+          borderBottom: '1px solid rgba(192,132,252,0.05)',
         }}
       >
-        <Link to="/" className="flex items-center gap-2" data-testid="nav-logo-mobile" onClick={handleNav}>
+        <Link to="/" className="flex items-center gap-2" data-testid="nav-logo-mobile" onClick={playClick}>
           <div className="w-7 h-7 rounded-full animate-orbit-glow" style={{ background: 'radial-gradient(circle, #C084FC 0%, #7C3AED 100%)' }} />
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Cosmic Collective</span>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', color: 'var(--text-primary)' }}>Cosmic Collective</span>
         </Link>
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleAmbient}
-            className="p-2 rounded-full"
-            style={{ color: ambientOn ? 'var(--primary)' : 'var(--text-muted)' }}
-            data-testid="nav-ambient-toggle-mobile"
-          >
+          <button onClick={toggleAmbient} className="p-2 rounded-full" style={{ color: ambientOn ? 'var(--primary)' : 'var(--text-muted)' }} data-testid="nav-ambient-toggle-mobile">
             {ambientOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
           <button onClick={() => { setMobileOpen(!mobileOpen); playClick(); }} data-testid="mobile-menu-btn" style={{ color: 'var(--text-primary)' }}>
@@ -343,56 +512,85 @@ export default function Navigation() {
         </div>
       </div>
 
+      {/* ═══ Mobile Fullscreen Menu ═══ */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="lg:hidden fixed inset-0 z-40 pt-16 overflow-y-auto"
-            style={{ background: 'rgba(11, 12, 21, 0.97)', backdropFilter: 'blur(24px)' }}
+            style={{ background: 'rgba(11, 12, 21, 0.98)', backdropFilter: 'blur(24px)' }}
+            data-testid="mobile-menu-overlay"
           >
-            <div className="p-6 space-y-1 pb-24">
-              {ALL_NAV.map((item, i) => {
-                const Icon = item.icon;
-                const active = location.pathname === item.path;
-                return (
-                  <motion.div key={item.path} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
-                    <Link
-                      to={item.path}
-                      onClick={() => { setMobileOpen(false); playClick(); }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
-                      style={{
-                        color: active ? '#fff' : 'var(--text-secondary)',
-                        background: active ? 'rgba(192,132,252,0.1)' : 'transparent',
-                      }}
-                    >
-                      <Icon size={18} style={active ? { filter: 'drop-shadow(0 0 4px rgba(192,132,252,0.5))' } : {}} />
-                      <span className="text-sm">{item.label}</span>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-              <div className="border-t pt-4 mt-4" style={{ borderColor: 'rgba(192,132,252,0.08)' }}>
+            <div className="p-4 pb-24">
+              {/* Sage CTA */}
+              <Link
+                to="/coach"
+                onClick={() => { setMobileOpen(false); playClick(); }}
+                className="flex items-center gap-3 px-4 py-3.5 rounded-xl mb-3 transition-all"
+                style={{
+                  background: 'rgba(45,212,191,0.08)',
+                  border: '1px solid rgba(45,212,191,0.15)',
+                  color: '#2DD4BF',
+                }}
+                data-testid="mobile-sage-link"
+              >
+                <MessageCircle size={18} />
+                <div>
+                  <span className="text-sm font-medium block">Sage — AI Coach</span>
+                  <span className="text-[10px] opacity-60">Voice & text guidance</span>
+                </div>
+              </Link>
+
+              {/* Category Accordions */}
+              {NAV_CATEGORIES.map(cat => (
+                <MobileCategory
+                  key={cat.id}
+                  category={cat}
+                  expanded={mobileCat === cat.id}
+                  onToggle={() => setMobileCat(mobileCat === cat.id ? null : cat.id)}
+                  onNavigate={() => { setMobileOpen(false); playClick(); }}
+                />
+              ))}
+
+              {/* User Section */}
+              <div className="mt-4 pt-4 border-t" style={{ borderColor: 'rgba(192,132,252,0.06)' }}>
                 {user ? (
                   <>
-                    <Link to="/profile" onClick={() => { setMobileOpen(false); playClick(); }} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--text-secondary)' }}>
-                      <User size={18} />
-                      <span className="text-sm">Profile</span>
-                    </Link>
-                    <Link to="/dashboard" onClick={() => { setMobileOpen(false); playClick(); }} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--text-secondary)' }}>
-                      <LayoutDashboard size={18} />
-                      <span className="text-sm">Dashboard</span>
-                    </Link>
-                    <button onClick={() => { logout(); navigate('/'); setMobileOpen(false); playClick(); }} className="flex items-center gap-3 px-4 py-3 rounded-xl w-full" style={{ color: 'var(--text-muted)' }}>
-                      <LogOut size={18} />
-                      <span className="text-sm">Sign Out</span>
+                    <div className="flex items-center gap-3 px-4 py-2 mb-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                        style={{ background: 'rgba(192,132,252,0.15)', color: '#D8B4FE' }}>
+                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</p>
+                        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
+                      </div>
+                    </div>
+                    {PROFILE_ITEMS.map(item => {
+                      const Icon = item.icon;
+                      return (
+                        <Link key={item.path} to={item.path} onClick={() => { setMobileOpen(false); playClick(); }}
+                          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs transition-all"
+                          style={{ color: location.pathname === item.path ? '#fff' : 'var(--text-secondary)' }}>
+                          <Icon size={14} style={{ color: 'var(--text-muted)' }} />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                    <button onClick={() => { logout(); navigate('/'); setMobileOpen(false); playClick(); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs mt-2"
+                      style={{ color: 'var(--text-muted)' }}>
+                      <LogOut size={14} />
+                      <span>Sign Out</span>
                     </button>
                   </>
                 ) : (
-                  <Link to="/auth" onClick={() => { setMobileOpen(false); playClick(); }} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--primary)' }}>
+                  <Link to="/auth" onClick={() => { setMobileOpen(false); playClick(); }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ color: 'var(--primary)' }}>
                     <LogIn size={18} />
-                    <span className="text-sm">Sign In</span>
+                    <span className="text-sm font-medium">Sign In</span>
                   </Link>
                 )}
               </div>
@@ -401,7 +599,7 @@ export default function Navigation() {
         )}
       </AnimatePresence>
 
-      {/* Spacer for fixed nav */}
+      {/* Spacer */}
       <div className="h-14" />
     </>
   );

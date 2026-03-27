@@ -7,38 +7,70 @@ import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap,
   Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2,
   Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X,
-  Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2
+  Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2,
+  Eye, Star, Compass, Droplets, MessageCircle, Orbit
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const FEATURES = [
-  { icon: Wind, title: 'Breathing', desc: 'Guided breathwork to center your being', path: '/breathing', color: '#2DD4BF' },
-  { icon: Timer, title: 'Meditation', desc: 'Timed sessions with ambient sound', path: '/meditation', color: '#D8B4FE' },
-  { icon: Headphones, title: 'Soundscapes', desc: 'Layer ambient sounds into your sanctuary', path: '/soundscapes', color: '#38BDF8' },
-  { icon: Lightbulb, title: 'Light Therapy', desc: 'Immersive chromotherapy color healing', path: '/light-therapy', color: '#A855F7' },
-  { icon: Sprout, title: 'Zen Garden', desc: 'Nurture plants, feed koi, release lanterns', path: '/zen-garden', color: '#22C55E' },
-  { icon: Radio, title: 'Frequencies', desc: 'Solfeggio & biometric healing tones', path: '/frequencies', color: '#8B5CF6' },
-  { icon: Hand, title: 'Mudras', desc: 'Sacred hand gestures for healing', path: '/mudras', color: '#FDA4AF' },
-  { icon: Triangle, title: 'Yantras', desc: 'Sacred geometric meditation diagrams', path: '/yantra', color: '#EF4444' },
-  { icon: Flame, title: 'Tantra', desc: 'Expand consciousness through energy work', path: '/tantra', color: '#FCD34D' },
-  { icon: Sparkles, title: 'Oracle', desc: 'Tarot, I Ching, astrology & divination', path: '/oracle', color: '#E879F9' },
-  { icon: PenTool, title: 'Create', desc: 'Write your own meditations & affirmations', path: '/create', color: '#E879F9' },
-  { icon: Zap, title: 'Exercises', desc: 'Qigong & Tai Chi energy cultivation', path: '/exercises', color: '#FB923C' },
-  { icon: Sunrise, title: 'Daily Rituals', desc: 'Build your personalized daily practice', path: '/rituals', color: '#FCD34D' },
-  { icon: Sun, title: 'Affirmations', desc: 'AI-powered mantras for your soul', path: '/affirmations', color: '#93C5FD' },
-  { icon: Heart, title: 'Mood Tracker', desc: 'Map your emotional landscape', path: '/mood', color: '#F87171' },
-  { icon: BookOpen, title: 'Journal', desc: 'Sacred space for your thoughts', path: '/journal', color: '#86EFAC' },
-  { icon: Music, title: 'Mantras', desc: 'Sacred chanting for vibrational healing', path: '/mantras', color: '#FB923C' },
-  { icon: HeartHandshake, title: "Ho'oponopono", desc: 'Hawaiian forgiveness practice', path: '/hooponopono', color: '#E879F9' },
-  { icon: Map, title: 'Journey', desc: 'Guided beginner pathway', path: '/journey', color: '#2DD4BF' },
-  { icon: GraduationCap, title: 'Learn', desc: 'Advanced progressive modules', path: '/learn', color: '#E879F9' },
-  { icon: Gamepad2, title: 'Games', desc: 'Mindful games for focus and joy', path: '/games', color: '#FB923C' },
-  { icon: Users, title: 'Community', desc: 'Share, connect, and inspire others', path: '/community', color: '#FDA4AF' },
-  { icon: Play, title: 'Videos', desc: 'Guided practices from masters', path: '/videos', color: '#2DD4BF' },
-  { icon: Leaf, title: 'Nourishment', desc: 'Foods that uplift energy & spirit', path: '/nourishment', color: '#22C55E' },
+/* ─── 6 Category Pillars ─── */
+const CATEGORY_PILLARS = [
+  {
+    id: 'practice',
+    title: 'Practice',
+    subtitle: 'Body, breath & energy',
+    icon: Wind,
+    color: '#D8B4FE',
+    path: '/breathing',
+    highlights: ['Breathwork', 'Meditation', 'Yoga', 'Mudras', 'Mantras', 'Light Therapy'],
+  },
+  {
+    id: 'divination',
+    title: 'Divination',
+    subtitle: 'Cosmic insight & guidance',
+    icon: Eye,
+    color: '#E879F9',
+    path: '/oracle',
+    highlights: ['Oracle & Tarot', 'Star Chart', 'Numerology', 'Forecasts', 'Dream Journal', 'Mayan Astrology'],
+  },
+  {
+    id: 'sanctuary',
+    title: 'Sanctuary',
+    subtitle: 'Inner peace & immersion',
+    icon: Sprout,
+    color: '#2DD4BF',
+    path: '/zen-garden',
+    highlights: ['Zen Garden', 'Soundscapes', 'Frequencies', 'VR Sanctuary', 'Journaling'],
+  },
+  {
+    id: 'nourish',
+    title: 'Nourish & Heal',
+    subtitle: 'Holistic body care',
+    icon: Leaf,
+    color: '#22C55E',
+    path: '/nourishment',
+    highlights: ['Nourishment', 'Aromatherapy', 'Herbology', 'Elixirs', 'Acupressure', 'Reiki'],
+  },
+  {
+    id: 'explore',
+    title: 'Explore',
+    subtitle: 'Learn, play & connect',
+    icon: Compass,
+    color: '#FB923C',
+    path: '/journey',
+    highlights: ['Creation Stories', 'Teachings', 'Games', 'Community', 'Challenges', 'Videos'],
+  },
+  {
+    id: 'sage',
+    title: 'Sage AI Coach',
+    subtitle: 'Voice & text guidance',
+    icon: MessageCircle,
+    color: '#38BDF8',
+    path: '/coach',
+    highlights: ['Voice Conversations', 'Spiritual Guidance', 'Personalized Wisdom', 'Real-time Support'],
+  },
 ];
 
 const FEELINGS = [
@@ -64,35 +96,47 @@ const TESTIMONIALS = [
   { name: 'Devon L.', role: 'Community Member', text: "Golden Milk recipe from the Nourishment section + 396Hz frequency = best sleep of my life. The science behind it makes sense.", color: '#FB923C' },
 ];
 
-function FeatureCard({ feature, index }) {
+/* ─── Category Pillar Card ─── */
+function PillarCard({ pillar, index }) {
   const navigate = useNavigate();
-  const Icon = feature.icon;
+  const Icon = pillar.icon;
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ delay: index * 0.03, duration: 0.5 }}
-      onClick={() => navigate(feature.path)}
-      className="glass-card glass-card-hover p-7 cursor-pointer group"
-      data-testid={`feature-card-${feature.title.toLowerCase()}`}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ delay: index * 0.08, duration: 0.5 }}
+      onClick={() => navigate(pillar.path)}
+      className="glass-card glass-card-hover p-8 cursor-pointer group relative"
+      data-testid={`pillar-${pillar.id}`}
     >
-      <div className="flex items-start justify-between mb-5">
-        <div className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-          style={{ background: `${feature.color}12` }}>
-          <Icon size={20} style={{ color: feature.color, transition: 'filter 0.3s' }} className="group-hover:drop-shadow-lg" />
+      {/* Accent glow */}
+      <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-500"
+        style={{ background: pillar.color, filter: 'blur(40px)', transform: 'translate(30%, -30%)' }} />
+      <div className="flex items-start justify-between mb-6">
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+          style={{ background: `${pillar.color}12`, border: `1px solid ${pillar.color}15` }}>
+          <Icon size={22} style={{ color: pillar.color }} />
         </div>
-        <ArrowRight size={16} className="transition-all duration-300" style={{ color: 'rgba(255,255,255,0.1)' }} />
+        <ArrowRight size={16} className="opacity-0 group-hover:opacity-60 transition-all duration-300 group-hover:translate-x-1" style={{ color: pillar.color }} />
       </div>
-      <h3 className="text-lg font-normal mb-1.5 transition-all duration-300" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-        {feature.title}
+      <h3 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+        {pillar.title}
       </h3>
-      <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{feature.desc}</p>
+      <p className="text-xs mb-5" style={{ color: 'var(--text-muted)' }}>{pillar.subtitle}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {pillar.highlights.map(h => (
+          <span key={h} className="text-[10px] px-2.5 py-1 rounded-full transition-all duration-300"
+            style={{ background: `${pillar.color}08`, color: `${pillar.color}cc`, border: `1px solid ${pillar.color}10` }}>
+            {h}
+          </span>
+        ))}
+      </div>
     </motion.div>
   );
 }
 
-/* ========== QUICK RESET MODAL ========== */
+/* ─── Quick Reset Modal ─── */
 function QuickResetModal({ open, onClose }) {
   const navigate = useNavigate();
   const [feeling, setFeeling] = useState(null);
@@ -148,13 +192,13 @@ function QuickResetModal({ open, onClose }) {
               </p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {FEELINGS.map(f => {
-                  const Icon = f.icon;
+                  const FIcon = f.icon;
                   return (
                     <button key={f.id} onClick={() => selectFeeling(f)}
                       className="glass-card p-3 flex flex-col items-center gap-1.5 hover:scale-[1.03] transition-all"
                       style={{ border: `1px solid ${f.color}15` }}
                       data-testid={`feeling-${f.id}`}>
-                      <Icon size={20} style={{ color: f.color }} />
+                      <FIcon size={20} style={{ color: f.color }} />
                       <span className="text-[10px] font-medium" style={{ color: 'var(--text-primary)' }}>{f.label}</span>
                     </button>
                   );
@@ -177,14 +221,11 @@ function QuickResetModal({ open, onClose }) {
               <h2 className="text-xl font-light mb-6" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                 Feeling {flow.label}? Try this:
               </h2>
-
               <div className="space-y-3">
-                {/* Frequency */}
                 <button onClick={() => { navigate(flow.frequency.path); onClose(); reset(); }}
                   className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
                   data-testid="reset-frequency">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${feeling.color}12` }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${feeling.color}12` }}>
                     <Radio size={16} style={{ color: feeling.color }} />
                   </div>
                   <div className="flex-1">
@@ -193,13 +234,10 @@ function QuickResetModal({ open, onClose }) {
                   </div>
                   <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 transition-all" />
                 </button>
-
-                {/* Tool */}
                 <button onClick={() => { navigate(flow.tool.path); onClose(); reset(); }}
                   className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
                   data-testid="reset-tool">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(45,212,191,0.1)' }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(45,212,191,0.1)' }}>
                     <Wind size={16} style={{ color: '#2DD4BF' }} />
                   </div>
                   <div className="flex-1">
@@ -208,13 +246,10 @@ function QuickResetModal({ open, onClose }) {
                   </div>
                   <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 transition-all" />
                 </button>
-
-                {/* Nourishment */}
                 <button onClick={() => { navigate('/nourishment'); onClose(); reset(); }}
                   className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
                   data-testid="reset-nourishment">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(34,197,94,0.1)' }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(34,197,94,0.1)' }}>
                     <Leaf size={16} style={{ color: '#22C55E' }} />
                   </div>
                   <div className="flex-1">
@@ -232,7 +267,7 @@ function QuickResetModal({ open, onClose }) {
   );
 }
 
-/* ========== WAITLIST SECTION ========== */
+/* ─── Waitlist Section ─── */
 function WaitlistSection() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -289,19 +324,10 @@ function WaitlistSection() {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                value={name} onChange={e => setName(e.target.value)}
-                placeholder="Your name (optional)"
-                className="input-glass text-sm flex-1"
-                data-testid="waitlist-name"
-              />
-              <input
-                value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                type="email"
-                className="input-glass text-sm flex-1"
-                data-testid="waitlist-email"
-              />
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name (optional)"
+                className="input-glass text-sm flex-1" data-testid="waitlist-name" />
+              <input value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" type="email"
+                className="input-glass text-sm flex-1" data-testid="waitlist-email" />
               <button onClick={join} disabled={loading}
                 className="btn-glass px-6 flex items-center justify-center gap-2 text-sm whitespace-nowrap"
                 style={{ background: 'rgba(45,212,191,0.1)', borderColor: 'rgba(45,212,191,0.2)', color: '#2DD4BF' }}
@@ -319,7 +345,7 @@ function WaitlistSection() {
   );
 }
 
-/* ========== FOOTER ========== */
+/* ─── Footer ─── */
 function Footer() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
@@ -335,19 +361,16 @@ function Footer() {
             </span>
           </div>
           <div className="flex items-center gap-6">
-            <button onClick={() => setShowPrivacy(true)} className="text-xs hover:underline" style={{ color: 'var(--text-muted)' }}
-              data-testid="privacy-link">
+            <button onClick={() => setShowPrivacy(true)} className="text-xs hover:underline" style={{ color: 'var(--text-muted)' }} data-testid="privacy-link">
               <Shield size={10} className="inline mr-1" /> Privacy Policy
             </button>
-            <button onClick={() => setShowDisclaimer(true)} className="text-xs hover:underline" style={{ color: 'var(--text-muted)' }}
-              data-testid="disclaimer-link">
+            <button onClick={() => setShowDisclaimer(true)} className="text-xs hover:underline" style={{ color: 'var(--text-muted)' }} data-testid="disclaimer-link">
               Wellness Disclaimer
             </button>
           </div>
         </div>
       </footer>
 
-      {/* Privacy Modal */}
       <AnimatePresence>
         {showPrivacy && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -363,7 +386,7 @@ function Footer() {
                 <p><strong style={{ color: 'var(--text-primary)' }}>What We Collect:</strong> Account info (name, email), mood logs, journal entries, and practice history. This data powers personalized recommendations and progress tracking.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>What We Don't Do:</strong> We never sell your data. We never share your journal entries, mood logs, or personal reflections with third parties. Your inner world stays private.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Security:</strong> All data is encrypted in transit and at rest. Authentication uses industry-standard JWT tokens. Passwords are bcrypt-hashed and never stored in plain text.</p>
-                <p><strong style={{ color: 'var(--text-primary)' }}>AI Features:</strong> When you use AI-powered features (affirmations, guided meditations), your prompts are processed by our AI partner to generate content. We do not store or train on these interactions beyond delivering the immediate response.</p>
+                <p><strong style={{ color: 'var(--text-primary)' }}>AI Features:</strong> When you use AI-powered features, your prompts are processed by our AI partner to generate content. We do not store or train on these interactions beyond delivering the immediate response.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Your Rights:</strong> You can request deletion of your account and all associated data at any time by contacting us.</p>
               </div>
             </motion.div>
@@ -371,7 +394,6 @@ function Footer() {
         )}
       </AnimatePresence>
 
-      {/* Disclaimer Modal */}
       <AnimatePresence>
         {showDisclaimer && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -397,7 +419,7 @@ function Footer() {
   );
 }
 
-/* ========== MAIN LANDING ========== */
+/* ─── Main Landing ─── */
 export default function Landing() {
   const navigate = useNavigate();
   const { t, lang, setLanguage } = useLanguage();
@@ -429,7 +451,7 @@ export default function Landing() {
     <div className="min-h-screen relative" style={{ background: 'transparent' }}>
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
 
-      {/* Floating Language Selector */}
+      {/* Language Selector */}
       <div className="fixed top-4 right-4 z-50" ref={langRef}>
         <button onClick={() => setShowLang(!showLang)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs transition-all"
@@ -457,7 +479,7 @@ export default function Landing() {
         </AnimatePresence>
       </div>
 
-      {/* Aurora gradient overlay */}
+      {/* Aurora overlays */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full animate-aurora"
           style={{ background: 'radial-gradient(ellipse, rgba(192,132,252,0.08) 0%, transparent 70%)', filter: 'blur(80px)' }} />
@@ -465,8 +487,8 @@ export default function Landing() {
           style={{ background: 'radial-gradient(ellipse, rgba(45,212,191,0.06) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'aurora 12s ease-in-out infinite reverse' }} />
       </div>
 
-      {/* Hero */}
-      <div className="relative z-10 px-6 md:px-12 lg:px-24 pt-32 pb-24">
+      {/* ═══ Hero ═══ */}
+      <div className="relative z-10 px-6 md:px-12 lg:px-24 pt-28 pb-20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -485,9 +507,7 @@ export default function Landing() {
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
-              <button onClick={() => setShowQuickReset(true)}
-                className="btn-glass glow-primary group"
-                data-testid="quick-reset-btn">
+              <button onClick={() => setShowQuickReset(true)} className="btn-glass glow-primary group" data-testid="quick-reset-btn">
                 <span className="relative z-10 flex items-center gap-2">
                   {t.landing.quickReset}
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
@@ -507,7 +527,6 @@ export default function Landing() {
                 {t.landing.signIn}
               </button>
             </motion.div>
-
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
               className="flex items-center gap-2 mt-8">
               <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
@@ -554,7 +573,26 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Social Proof / Testimonials */}
+      {/* ═══ Category Pillars (replaces 24-card grid) ═══ */}
+      <div className="relative z-10 px-6 md:px-12 lg:px-24 pb-20" data-testid="category-pillars-section">
+        <div className="max-w-7xl mx-auto">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12">
+            <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
+              {t.landing.explorePath}
+            </p>
+            <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+              Six Pillars of <span className="animate-text-shimmer">Transformation</span>
+            </h2>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {CATEGORY_PILLARS.map((pillar, i) => (
+              <PillarCard key={pillar.id} pillar={pillar} index={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ Testimonials ═══ */}
       <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="testimonials-section">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-12">
@@ -566,7 +604,7 @@ export default function Landing() {
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {TESTIMONIALS.map((t, i) => (
+            {TESTIMONIALS.map((item, i) => (
               <motion.div key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -575,19 +613,19 @@ export default function Landing() {
                 className="glass-card p-6 relative"
               >
                 <div className="absolute top-4 right-4 opacity-10">
-                  <Quote size={28} style={{ color: t.color }} />
+                  <Quote size={28} style={{ color: item.color }} />
                 </div>
                 <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  "{t.text}"
+                  "{item.text}"
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: `${t.color}15`, color: t.color }}>
-                    {t.name.charAt(0)}
+                    style={{ background: `${item.color}15`, color: item.color }}>
+                    {item.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{t.name}</p>
-                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{t.role}</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{item.role}</p>
                   </div>
                 </div>
               </motion.div>
@@ -596,13 +634,11 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* How it Works / Our Story */}
+      {/* ═══ How it Works ═══ */}
       <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="how-it-works-section">
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: '#2DD4BF' }}>
-              Our Story
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: '#2DD4BF' }}>Our Story</p>
             <h2 className="text-2xl md:text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
               High-Frequency Wellness, Delivered to You
             </h2>
@@ -646,7 +682,7 @@ export default function Landing() {
               We Come to You
             </h3>
             <p className="text-sm max-w-lg mx-auto mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Experience The Cosmic Collective in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location — events, offices, retreats, or private sessions.
+              Experience The Cosmic Collective in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <button onClick={() => navigate('/auth')}
@@ -666,25 +702,7 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="relative z-10 px-6 md:px-12 lg:px-24 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-            className="text-xs font-bold uppercase tracking-[0.3em] mb-12" style={{ color: 'var(--text-muted)' }}>
-            {t.landing.explorePath}
-          </motion.p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f, i) => (
-              <FeatureCard key={f.title} feature={f} index={i} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Waitlist */}
       <WaitlistSection />
-
-      {/* Footer */}
       <Footer />
     </div>
   );
