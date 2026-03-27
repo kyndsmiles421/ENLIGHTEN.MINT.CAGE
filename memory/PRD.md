@@ -22,25 +22,41 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 
 ### AI: Sage Coach (text + voice conversations), Dream Oracle, AI-generated content, constellation meditations, cosmic forecasts
 
-### Voice Conversations (NEW - Feb 2026)
+### Voice Conversations (Feb 2026)
 - Microphone recording in Sage chat with visual recording indicator
 - Speech-to-Text via OpenAI Whisper (whisper-1 model)
 - Text-to-Speech via OpenAI TTS (tts-1 model, "sage" voice)
 - Audio playback with animated indicators on AI response bubbles
 - Seamless toggle between voice and text input modes
-- Voice messages flagged in conversation history
 
-### 3D/Immersive: Star Chart (gyroscope AR mode), VR Sanctuary (in-VR meditation), 3D Avatar (energy-state driven)
+### Multi-Cultural Star Chart (Feb 2026)
+- 4 cultural sky systems: Mayan, Egyptian, Australian Aboriginal, Lakota
+- 20 total cultural constellations with unique mythologies, deity stories, and life lessons
+- Three.js overlay with cultural-colored constellation lines, figure sprites, star rings, and labels
+- "World Skies" toggle in header with dropdown selector
+- Backend: GET /api/star-chart/cultures and /api/star-chart/cultures/{id}
+
+### Social Sharing for Forecasts (Feb 2026)
+- Share button on each forecast card (appears on hover)
+- Posts forecast summary + affirmation to community feed
+- Visual confirmation (shared state) after posting
+
+### Guided VR Constellation Journeys (Feb 2026)
+- 3 guided journeys: "The Hero's Path", "The Cosmic River", "The Zodiac Circle"
+- Camera flythrough with smooth interpolation between constellation waypoints
+- Narrated text overlays with progress bar
+- Journey constellation markers and connection lines in 3D scene
+- Journey picker accessible from VR page compass button
+
+### 3D/Immersive: Star Chart (gyroscope AR mode), VR Sanctuary (meditation + journeys), 3D Avatar (energy-state driven)
 
 ### Analytics: Cosmic Profile (recurring patterns), Cosmic Forecasts (6 systems x 4 periods), Zen Garden (auto-water from activities)
 
-### Social: Community feed, meditation auto-sharing, plant growth toasts
+### Social: Community feed, meditation auto-sharing, forecast sharing, plant growth toasts
 
-## Test: 51 iterations, all 100% pass rate
+## Test: 52 iterations, all 100% pass rate
 ## Credentials: test@test.com / password
 ## Status: PRODUCTION READY
 
 ## Pending Tasks (Priority Order)
-- P1: Multi-Cultural Star Chart Options (Mayan, Egyptian, Australian, Lakota constellations)
-- P1: Social Sharing for Forecasts + Guided VR Constellation Journeys
 - P2: StarChart.js component splitting (1600+ lines refactoring)
