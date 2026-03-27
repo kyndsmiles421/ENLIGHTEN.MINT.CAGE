@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Globe, BookOpen, Volume2, VolumeX, Loader2, Pause, Play, Sparkles, Star, MapPin, Clock, ChevronRight, Search, X, Film, SkipForward, SkipBack, Maximize2, Image } from 'lucide-react';
+import { ArrowLeft, Globe, BookOpen, Volume2, VolumeX, Loader2, Pause, Play, Sparkles, Star, MapPin, Clock, ChevronRight, Search, X, Film, SkipForward, SkipBack, Maximize2, Image, Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -26,11 +26,23 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
   const timerRef = useRef(null);
   const paragraphs = fullStory?.story?.split('\n\n') || [];
 
+  // Video state
+  const [videoMode, setVideoMode] = useState(false);
+  const [videoStatus, setVideoStatus] = useState('idle'); // idle | generating | complete | failed
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [videoJobId, setVideoJobId] = useState(null);
+  const videoRef = useRef(null);
+  const pollRef = useRef(null);
+
   // Load cached scenes first, then generate missing ones
   useEffect(() => {
     if (!story?.id) return;
     loadScenes();
-    return () => { clearInterval(timerRef.current); if (audioRef.current) audioRef.current.pause(); };
+    return () => {
+      clearInterval(timerRef.current);
+      clearInterval(pollRef.current);
+      if (audioRef.current) audioRef.current.pause();
+    };
   }, [story?.id]);
 
   const loadScenes = async () => {
@@ -111,6 +123,61 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
   const prevScene = () => setCurrentScene(p => Math.max(0, p - 1));
   const nextScene = () => setCurrentScene(p => Math.min(scenes.length - 1, p + 1));
 
+  // ─── Video Generation ───
+  const startVideoGeneration = async () => {
+    setVideoStatus('generating');
+    setVideoUrl(null);
+    try {
+      const res = await axios.post(`${API}/ai-visuals/generate-video`, {
+        story_id: story.id,
+      }, { headers: authHeaders });
+
+      if (res.data.status === 'complete' && res.data.video_url) {
+        setVideoUrl(res.data.video_url);
+        setVideoStatus('complete');
+        return;
+      }
+
+      if (res.data.job_id) {
+        setVideoJobId(res.data.job_id);
+        // Start polling
+        pollRef.current = setInterval(async () => {
+          try {
+            const poll = await axios.get(`${API}/ai-visuals/video-status/${res.data.job_id}`, {
+              headers: authHeaders,
+            });
+            if (poll.data.status === 'complete' && poll.data.video_url) {
+              clearInterval(pollRef.current);
+              setVideoUrl(poll.data.video_url);
+              setVideoStatus('complete');
+            } else if (poll.data.status === 'failed') {
+              clearInterval(pollRef.current);
+              setVideoStatus('failed');
+              toast.error('Video generation failed');
+            }
+          } catch {
+            // Keep polling
+          }
+        }, 5000);
+      }
+    } catch (err) {
+      setVideoStatus('failed');
+      toast.error('Could not start video generation');
+    }
+  };
+
+  const toggleVideoMode = () => {
+    if (!videoMode) {
+      setVideoMode(true);
+      if (!videoUrl && videoStatus === 'idle') {
+        startVideoGeneration();
+      }
+    } else {
+      setVideoMode(false);
+      if (videoRef.current) videoRef.current.pause();
+    }
+  };
+
   const currentImg = scenes[currentScene]?.image_b64;
   const currentParagraph = paragraphs[currentScene] || paragraphs[paragraphs.length - 1] || '';
 
@@ -123,8 +190,17 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
       data-testid="cinematic-mode"
       style={{ background: '#000' }}
     >
-      {/* Close button */}
+      {/* Close button + Video toggle */}
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <button onClick={toggleVideoMode} data-testid="toggle-video-mode"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
+          style={{
+            background: videoMode ? `${story.color}20` : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${videoMode ? story.color + '40' : 'rgba(255,255,255,0.1)'}`,
+            color: videoMode ? story.color : 'rgba(255,255,255,0.5)',
+          }}>
+          <Video size={12} /> {videoMode ? 'Video On' : 'Video'}
+        </button>
         <button onClick={onClose} data-testid="close-cinema"
           className="px-3 py-1.5 rounded-lg text-[10px] font-medium"
           style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}>
@@ -135,7 +211,45 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
       {/* Scene display */}
       <div className="flex-1 relative overflow-hidden">
         <AnimatePresence mode="wait">
-          {currentImg ? (
+          {videoMode && videoStatus === 'complete' && videoUrl ? (
+            <motion.div
+              key="video-scene"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="absolute inset-0"
+            >
+              <video
+                ref={videoRef}
+                src={`${process.env.REACT_APP_BACKEND_URL}${videoUrl}`}
+                className="w-full h-full object-cover"
+                style={{ filter: 'brightness(0.7) saturate(1.2)' }}
+                autoPlay
+                loop
+                muted
+                playsInline
+                data-testid="cinema-video-player"
+              />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 100%)' }} />
+            </motion.div>
+          ) : videoMode && videoStatus === 'generating' ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(15,17,28,1) 0%, #000 70%)' }}>
+              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}>
+                <Video size={32} style={{ color: story.color }} />
+              </motion.div>
+              <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.5)' }}>Generating cinematic video with Sora 2...</p>
+              <p className="text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.2)' }}>This may take 2-5 minutes. The video will be cached for instant replay.</p>
+              <div className="mt-4 w-48 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: story.color }}
+                  animate={{ width: ['0%', '80%'] }}
+                  transition={{ duration: 120, ease: 'linear' }}
+                />
+              </div>
+            </div>
+          ) : currentImg ? (
             <motion.div
               key={`scene-${currentScene}`}
               initial={{ opacity: 0, scale: 1.05 }}

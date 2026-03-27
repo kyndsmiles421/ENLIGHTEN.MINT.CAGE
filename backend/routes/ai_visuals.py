@@ -1,12 +1,22 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+from emergentintegrations.llm.openai.video_generation import OpenAIVideoGeneration
 from datetime import datetime, timezone
+from pathlib import Path
 import base64
 import hashlib
 import asyncio
+import uuid
+import os
 
 router = APIRouter()
+
+VIDEOS_DIR = Path(__file__).parent.parent / "static" / "videos"
+VIDEOS_DIR.mkdir(parents=True, exist_ok=True)
+
+# In-memory job tracker for video generation
+_video_jobs = {}  # job_id -> { status, video_url, error, prompt }
 
 
 async def get_or_generate_image(prompt: str, category: str, ref_id: str):
@@ -273,3 +283,169 @@ async def generate_daily_card(
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate card")
     return {"image_b64": image_b64, "theme": theme}
+
+
+# ═══════════════════════════════════════════════════════
+# SORA 2 VIDEO GENERATION
+# ═══════════════════════════════════════════════════════
+
+# Cinematic video prompts adapted from scene prompts (shorter, action-focused for video)
+VIDEO_SCENE_PROMPTS = {
+    "mayan": "Vast primordial ocean under starlit sky, two luminous feathered serpent gods floating above calm turquoise waters, ethereal feathers glowing, mountains slowly emerging from the sea, Mayan artistic style, cinematic lighting, slow majestic camera movement",
+    "egyptian": "Infinite dark primordial ocean Nun, a luminous golden mound emerging from the waters, the god Atum standing atop it with arms raised commanding light to appear, Egyptian hieroglyphic style, cosmic dawn atmosphere, slow zoom in",
+    "aboriginal": "Giant luminous Rainbow Serpent breaking through the earth's crust in the Australian outback, creating rivers and mountains as it slithers, Aboriginal dot painting style with cosmic elements, camera follows the serpent's path",
+    "lakota": "White Buffalo Calf Woman descending from golden clouds carrying the Sacred Pipe, Lakota people gathered on the Great Plains below, buffalo herds in the distance, four sacred winds as colored streams, slow descent camera movement",
+    "hindu": "Vishnu resting on the coils of infinite serpent Shesha on the cosmic ocean, a luminous lotus growing from his navel with Brahma appearing, golden cosmic egg cracking in background, Hindu artistic style, slow cinematic reveal",
+    "norse": "The great void Ginnungagap between realms of ice and fire, sparks and frost meeting in the center, the giant Ymir slowly forming from melting ice, the cosmic cow Audhumla appearing, Norse mythological art, dramatic camera sweep",
+    "greek": "Formless Chaos as a vast luminous void, Gaia the Earth slowly emerging below, Ouranos the Sky forming above with stars appearing one by one, golden light of Eros weaving between them, Greek cosmic creation, dramatic lighting",
+    "japanese": "Izanagi and Izanami standing on the Floating Bridge of Heaven, thrusting the Jeweled Spear into the primordial brine below, salt water drops falling to form the first island, Japanese ukiyo-e style, slow motion spear movement",
+    "yoruba": "Obatala descending a golden chain from luminous heavens toward endless waters below, carrying sacred objects, a white hen scratching sand on the waters below creating dry land, Yoruba artistic style, dramatic vertical descent camera",
+    "maori": "Tane Mahuta lying on his back pushing his father Ranginui Sky upward with mighty legs, light flooding in for the first time between earth and sky, tears becoming rain, Maori creation scene, dramatic slow separation",
+    "chinese": "Pangu awakening inside the cosmic egg, swirling Yin and Yang energies surrounding him, raising his great axe to crack the shell, light bursting through the crack, Chinese mythological art, dramatic slow-motion crack",
+    "celtic": "Connla's Well of Wisdom surrounded by nine sacred hazel trees, hazelnuts falling into luminous water, the Salmon of Wisdom swimming below, five rivers flowing outward, Celtic knotwork borders, slow overhead camera",
+    "inuit": "Raven the trickster flying through black Arctic sky, finding a glowing pea pod on frozen tundra, cracking it open to reveal the first human, Northern Lights dancing above, Inuit artistic style, slow dramatic reveal",
+    "aztec": "Five Suns of Aztec creation as concentric cosmic circles each with its own world, the Fifth Sun blazing at center, Nanahuatzin leaping into the great bonfire, Aztec pyramid style, epic camera zoom into the fire",
+    "sumerian": "Primordial sea goddess Nammu stretching to infinity, Marduk confronting the chaos dragon Tiamat, splitting her body into sky and earth, Tablets of Destiny glowing, Babylonian epic cosmic battle, dramatic action movement",
+}
+
+
+async def _run_video_generation(job_id: str, prompt: str, cache_key: str, filename: str):
+    """Background coroutine for Sora 2 video generation."""
+    try:
+        _video_jobs[job_id]["status"] = "generating"
+        logger.info(f"Sora 2 generation started: {job_id}")
+
+        output_path = str(VIDEOS_DIR / filename)
+
+        def _generate():
+            gen = OpenAIVideoGeneration(api_key=EMERGENT_LLM_KEY)
+            video_bytes = gen.text_to_video(
+                prompt=prompt,
+                model="sora-2",
+                size="1280x720",
+                duration=4,
+                max_wait_time=600,
+            )
+            if video_bytes:
+                gen.save_video(video_bytes, output_path)
+                return True
+            return False
+
+        loop = asyncio.get_event_loop()
+        success = await loop.run_in_executor(None, _generate)
+
+        if success and os.path.exists(output_path):
+            video_url = f"/api/static/videos/{filename}"
+            _video_jobs[job_id]["status"] = "complete"
+            _video_jobs[job_id]["video_url"] = video_url
+
+            # Cache in MongoDB
+            await db.ai_video_cache.update_one(
+                {"cache_key": cache_key},
+                {"$set": {
+                    "cache_key": cache_key,
+                    "video_url": video_url,
+                    "filename": filename,
+                    "prompt_preview": prompt[:200],
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }},
+                upsert=True,
+            )
+            logger.info(f"Sora 2 generation complete: {job_id} -> {video_url}")
+        else:
+            _video_jobs[job_id]["status"] = "failed"
+            _video_jobs[job_id]["error"] = "Video generation returned empty"
+            logger.error(f"Sora 2 generation failed (empty): {job_id}")
+    except Exception as e:
+        _video_jobs[job_id]["status"] = "failed"
+        _video_jobs[job_id]["error"] = str(e)[:200]
+        logger.error(f"Sora 2 generation error: {job_id}: {e}")
+
+
+@router.post("/ai-visuals/generate-video")
+async def generate_video(
+    data: dict = Body(...),
+    user=Depends(get_current_user),
+):
+    """Start Sora 2 video generation. Returns immediately with job_id to poll."""
+    story_id = data.get("story_id")
+    custom_prompt = data.get("prompt", "")
+
+    if story_id:
+        prompt = VIDEO_SCENE_PROMPTS.get(story_id)
+        if not prompt:
+            raise HTTPException(status_code=404, detail="Story not found")
+    elif custom_prompt:
+        prompt = custom_prompt[:500]
+    else:
+        raise HTTPException(status_code=400, detail="Provide story_id or prompt")
+
+    cache_key = hashlib.md5(f"video:{prompt[:200]}".encode()).hexdigest()
+
+    # Check MongoDB cache first
+    cached = await db.ai_video_cache.find_one(
+        {"cache_key": cache_key}, {"_id": 0, "video_url": 1}
+    )
+    if cached and cached.get("video_url"):
+        # Verify file exists
+        file_path = str(Path(__file__).parent.parent / cached["video_url"].lstrip("/api/"))
+        if os.path.exists(file_path):
+            return {
+                "status": "complete",
+                "job_id": None,
+                "video_url": cached["video_url"],
+                "cached": True,
+            }
+
+    # Check if already generating
+    for jid, job in _video_jobs.items():
+        if job.get("cache_key") == cache_key and job["status"] == "generating":
+            return {"status": "generating", "job_id": jid, "cached": False}
+
+    # Start background generation
+    job_id = str(uuid.uuid4())[:12]
+    filename = f"{cache_key[:16]}_{job_id}.mp4"
+    _video_jobs[job_id] = {
+        "status": "queued",
+        "video_url": None,
+        "error": None,
+        "cache_key": cache_key,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    asyncio.create_task(_run_video_generation(job_id, prompt, cache_key, filename))
+
+    return {"status": "queued", "job_id": job_id, "cached": False}
+
+
+@router.get("/ai-visuals/video-status/{job_id}")
+async def get_video_status(job_id: str, user=Depends(get_current_user)):
+    """Poll video generation status."""
+    job = _video_jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    return {
+        "job_id": job_id,
+        "status": job["status"],
+        "video_url": job.get("video_url"),
+        "error": job.get("error"),
+    }
+
+
+@router.get("/ai-visuals/video-stories")
+async def get_video_stories(user=Depends(get_current_user)):
+    """Return available stories that can have video generation."""
+    stories = []
+    for sid in VIDEO_SCENE_PROMPTS:
+        # Check if video is already cached
+        cache_key = hashlib.md5(f"video:{VIDEO_SCENE_PROMPTS[sid][:200]}".encode()).hexdigest()
+        cached = await db.ai_video_cache.find_one(
+            {"cache_key": cache_key}, {"_id": 0, "video_url": 1}
+        )
+        stories.append({
+            "story_id": sid,
+            "has_video": bool(cached and cached.get("video_url")),
+            "video_url": cached.get("video_url") if cached else None,
+        })
+    return {"stories": stories}

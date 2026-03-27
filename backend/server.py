@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 import os
+from pathlib import Path
 from deps import client
 
 from routes.auth import router as auth_router
@@ -73,6 +75,11 @@ all_routers = [
 
 for r in all_routers:
     app.include_router(r, prefix="/api")
+
+# Serve generated videos as static files
+videos_dir = Path(__file__).parent / "static" / "videos"
+videos_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/api/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 
 app.add_middleware(
     CORSMiddleware,
