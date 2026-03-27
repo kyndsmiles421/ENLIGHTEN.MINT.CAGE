@@ -6,46 +6,37 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 ## Tech Stack
 - Frontend: React, Tailwind CSS, Framer Motion, Vanilla Three.js
 - Backend: FastAPI, Motor (Async MongoDB)
-- Integrations: Emergent LLM Key (OpenAI GPT-5.2, Whisper STT, TTS-1-HD)
+- Integrations: Emergent LLM Key (OpenAI GPT-5.2, Whisper STT, TTS-1-HD, GPT Image 1)
 
 ## All Implemented Features
 
-### Onboarding & Tutorial
-- Interactive walkthrough + Tutorial page (/tutorial)
-
 ### Core: Auth, profiles, dashboard, mood, journaling, affirmations, gamification
+### Wellness: Mudras (25), Yantras, Tantra, Exercises, Videos, Meditations, Breathwork, Frequencies, Soundscapes, Nourishment, Rituals
+### Mystical: Oracle, Astrology, Numerology, Cardology, Cosmic Calendar, Aromatherapy, Herbology, Acupressure, Reiki
+### Tutorial: Interactive walkthrough + Tutorial page
 
-### Wellness: Mudras (25), Yantras, Tantra, Exercises (6), Videos (23), Meditations (guided+AI+constellation), Breathwork, Frequencies, Soundscapes, Nourishment, Rituals
-
-### Mystical: Oracle (I Ching/Tarot/Runes), Mayan/Chinese Astrology, Numerology, Cardology, Cosmic Calendar, Aromatherapy, Herbology, Acupressure, Reiki
-
-### AI: Sage Coach (text+voice), Dream Oracle, constellation meditations, cosmic forecasts
-
-### Voice Conversations
-- Mic recording, Whisper STT, OpenAI TTS ("sage" voice), seamless voice/text toggle
-
-### Multi-Cultural Star Chart
-- 4 sky systems: Mayan, Egyptian, Aboriginal, Lakota (20 cultural constellations)
-- Three.js overlay with cultural lines, figure sprites, star rings, labels
-- **Cultural Story Explorer** with tabbed navigation + **Voice narration** (CosmicNarrator)
-
-### Creation Stories Page (NEW - Feb 2026)
-- 15 world civilizations: Mayan, Egyptian, Aboriginal, Lakota, Hindu, Norse, Greek, Japanese, Yoruba, Maori, Chinese, Celtic, Inuit, Aztec, Sumerian
-- Full origin myths with deities, eras, sacred symbols, and cosmic lessons
-- Region filtering (Africa, Americas, Asia, Europe, Oceania, Arctic & Middle East)
-- Search by culture, deity, or title
-- Split-view: story grid + detail panel with full narrative text
-- **Voice narration** via TTS-1-HD for every creation story
-- Backend: GET /api/creation-stories, GET /api/creation-stories/{id}, POST /api/creation-stories/{id}/narrate
-
-### Social Sharing: Forecast cards → community feed
-### Guided VR Journeys: 3 narrated constellation flythrough paths
-### 3D/Immersive: Star Chart (gyroscope AR), VR Sanctuary, 3D Avatar
+### AI Voice: Sage Coach (text+voice via Whisper STT + TTS "sage" voice)
+### Multi-Cultural Star Chart: Mayan/Egyptian/Aboriginal/Lakota (20 constellations) + Cultural Story Explorer with voice narration
+### Creation Stories: 15 world civilizations with full origin myths, region filtering, search, TTS narration
+### Social: Community feed, forecast sharing, meditation sharing
+### VR: Sanctuary (meditation + 3 guided constellation journeys + Story Theater)
 ### Analytics: Cosmic Profile, Forecasts (6 systems x 4 periods), Zen Garden
+### 3D: Star Chart (gyroscope AR), VR Sanctuary, 3D Avatar
 
-## Test: 54 iterations, all 100% pass rate
+### AI Cinematic Visuals (NEW - Feb 2026)
+- **Creation Stories Cinema**: Full-screen cinematic mode with 3 AI-generated scenes per story (GPT Image 1), synced with TTS narration, auto-advancing slideshow with progress controls
+- **VR Story Theater**: Immersive VR mode with floating AI art panels, narrated creation stories in 3D space
+- **Forecast Visuals**: AI cosmic imagery for divination readings (per-card generation)
+- **Dream Visuals**: AI surreal dreamscape visualization for dream interpretations
+- **Cosmic Portrait**: AI-generated personalized cosmic portrait from zodiac/element/energy data
+- **Daily Card**: AI cosmic card of the day art
+- **Meditation Ambient**: AI-generated ambient visual backgrounds during sessions
+- **Backend**: 7 AI visual endpoints with MongoDB caching (ai_visuals_cache collection)
+- **All using GPT Image 1 via Emergent LLM Key with intelligent prompt engineering per context**
+
+## Test: 55 iterations, all 100% pass rate
 ## Credentials: test@test.com / password
 ## Status: PRODUCTION READY
 
-## Remaining Tasks
+## Remaining
 - P2: StarChart.js component splitting (~2000 lines)
