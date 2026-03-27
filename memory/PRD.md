@@ -6,7 +6,7 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 ## Tech Stack
 - Frontend: React, Tailwind CSS, Framer Motion, Vanilla Three.js
 - Backend: FastAPI, Motor (Async MongoDB)
-- Integrations: Emergent LLM Key (OpenAI GPT-5.2)
+- Integrations: Emergent LLM Key (OpenAI GPT-5.2, Whisper STT, TTS)
 
 ## All Implemented Features
 
@@ -20,7 +20,15 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 
 ### Mystical: Oracle (I Ching/Tarot/Runes), Mayan/Chinese Astrology, Numerology, Cardology, Cosmic Calendar, Aromatherapy, Herbology, Acupressure, Reiki
 
-### AI: Sage Coach, Dream Oracle, AI-generated content, constellation meditations, cosmic forecasts
+### AI: Sage Coach (text + voice conversations), Dream Oracle, AI-generated content, constellation meditations, cosmic forecasts
+
+### Voice Conversations (NEW - Feb 2026)
+- Microphone recording in Sage chat with visual recording indicator
+- Speech-to-Text via OpenAI Whisper (whisper-1 model)
+- Text-to-Speech via OpenAI TTS (tts-1 model, "sage" voice)
+- Audio playback with animated indicators on AI response bubbles
+- Seamless toggle between voice and text input modes
+- Voice messages flagged in conversation history
 
 ### 3D/Immersive: Star Chart (gyroscope AR mode), VR Sanctuary (in-VR meditation), 3D Avatar (energy-state driven)
 
@@ -28,6 +36,11 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 
 ### Social: Community feed, meditation auto-sharing, plant growth toasts
 
-## Test: 50 iterations, all 100% pass rate
+## Test: 51 iterations, all 100% pass rate
 ## Credentials: test@test.com / password
 ## Status: PRODUCTION READY
+
+## Pending Tasks (Priority Order)
+- P1: Multi-Cultural Star Chart Options (Mayan, Egyptian, Australian, Lakota constellations)
+- P1: Social Sharing for Forecasts + Guided VR Constellation Journeys
+- P2: StarChart.js component splitting (1600+ lines refactoring)
