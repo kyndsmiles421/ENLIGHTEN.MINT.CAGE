@@ -9,7 +9,7 @@ import {
   Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, User,
-  ArrowUp, ArrowDown, CornerDownLeft
+  ArrowUp, ArrowDown, CornerDownLeft, TrendingUp
 } from 'lucide-react';
 
 /* ─── Complete searchable index ─── */
@@ -85,6 +85,7 @@ const SEARCH_INDEX = [
   { path: '/profile', label: 'Profile', keywords: 'profile account settings user info', icon: User, category: 'Profile', color: '#D8B4FE' },
   { path: '/avatar', label: 'Avatar', keywords: 'avatar creator 3d character customize', icon: Sparkles, category: 'Profile', color: '#D8B4FE' },
   { path: '/wellness-reports', label: 'Wellness Reports', keywords: 'wellness reports analytics progress tracking', icon: BarChart3, category: 'Profile', color: '#D8B4FE' },
+  { path: '/analytics', label: 'Analytics & Achievements', keywords: 'analytics achievements badges streaks coherence journey activity trends', icon: TrendingUp, category: 'Profile', color: '#D8B4FE' },
   { path: '/certifications', label: 'Certifications', keywords: 'certifications achievements badges earned', icon: Award, category: 'Profile', color: '#D8B4FE' },
   { path: '/meditation-history', label: 'Meditation History', keywords: 'meditation history sessions log time', icon: Timer, category: 'Profile', color: '#D8B4FE' },
   { path: '/media-library', label: 'My Media', keywords: 'media library uploads files images', icon: Upload, category: 'Profile', color: '#D8B4FE' },

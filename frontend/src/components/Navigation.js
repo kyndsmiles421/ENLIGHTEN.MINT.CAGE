@@ -10,7 +10,7 @@ import {
   Play, GraduationCap, ChevronDown, PenTool,
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
-  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell
+  Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
@@ -104,6 +104,7 @@ const NAV_CATEGORIES = [
 
 const PROFILE_ITEMS = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/analytics', label: 'Analytics', icon: TrendingUp },
   { path: '/profile', label: 'Profile', icon: User },
   { path: '/avatar', label: 'Avatar', icon: Sparkles },
   { path: '/wellness-reports', label: 'Wellness Reports', icon: BarChart3 },

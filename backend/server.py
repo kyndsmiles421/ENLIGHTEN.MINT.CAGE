@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 import os
+import asyncio
 from pathlib import Path
-from deps import client
+from deps import client, db, logger
 
 from routes.auth import router as auth_router
 from routes.wellness import router as wellness_router
@@ -52,6 +53,7 @@ from routes.star_cultures import router as star_cultures_router
 from routes.creation_stories import router as creation_stories_router
 from routes.ai_visuals import router as ai_visuals_router
 from routes.notifications import router as notifications_router
+from routes.achievements import router as achievements_router
 
 app = FastAPI()
 
@@ -73,6 +75,7 @@ all_routers = [
     creation_stories_router,
     ai_visuals_router,
     notifications_router,
+    achievements_router,
 ]
 
 for r in all_routers:
@@ -91,9 +94,63 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+async def push_scheduler_loop():
+    """Background loop: check every 30 min and send push reminders at user-preferred hours."""
+    from routes.notifications import send_push_to_user, QUANTUM_REMINDERS
+    import random
+    from datetime import datetime, timezone
+
+    sent_cache = set()
+
+    while True:
+        try:
+            await asyncio.sleep(1800)  # 30 min
+            now = datetime.now(timezone.utc)
+            current_hour = now.hour
+            today = now.strftime("%Y-%m-%d")
+
+            # Find users with active subscriptions
+            sub_user_ids = await db.push_subscriptions.distinct("user_id")
+            if not sub_user_ids:
+                continue
+
+            for uid in sub_user_ids:
+                prefs = await db.notification_prefs.find_one({"user_id": uid}, {"_id": 0})
+                if not prefs or not prefs.get("daily_relaxation", True):
+                    continue
+
+                morning_hour = prefs.get("reminder_hour", 8)
+                evening_hour = prefs.get("evening_hour", 20)
+
+                # Morning reminder
+                morning_key = f"{today}-morning-{uid}"
+                if current_hour == morning_hour and morning_key not in sent_cache:
+                    title, body, url = random.choice(QUANTUM_REMINDERS["morning"])
+                    await send_push_to_user(uid, title, body, url, "daily-morning")
+                    sent_cache.add(morning_key)
+
+                # Evening reminder
+                evening_key = f"{today}-evening-{uid}"
+                if current_hour == evening_hour and evening_key not in sent_cache:
+                    title, body, url = random.choice(QUANTUM_REMINDERS["evening"])
+                    await send_push_to_user(uid, title, body, url, "daily-evening")
+                    sent_cache.add(evening_key)
+
+            # Clear old cache entries daily
+            if len(sent_cache) > 1000:
+                sent_cache.clear()
+
+        except Exception as e:
+            logger.error(f"Push scheduler error: {e}")
+            await asyncio.sleep(60)
+
+
 @app.on_event("startup")
 async def startup_tasks():
     await reset_plant_watering()
+    asyncio.create_task(push_scheduler_loop())
+    logger.info("Push scheduler loop started")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

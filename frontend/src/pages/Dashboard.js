@@ -171,7 +171,7 @@ export default function Dashboard() {
         {coherence && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
             className="glass-card p-6 mb-12 relative overflow-hidden group cursor-pointer hover:scale-[1.01] transition-transform"
-            onClick={() => navigate('/vr')}
+            onClick={() => navigate('/analytics')}
             data-testid="quantum-coherence-widget"
           >
             {/* Animated background wave */}
