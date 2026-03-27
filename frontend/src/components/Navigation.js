@@ -17,6 +17,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 import SearchCommand from './SearchCommand';
 import NotificationSettings from './NotificationSettings';
+import { useCreditsContext } from '../context/CreditContext';
 
 /* ─── Category definitions ─── */
 const NAV_CATEGORIES = [
@@ -289,7 +290,7 @@ export default function Navigation() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [creditInfo, setCreditInfo] = useState(null);
+  const { creditInfo } = useCreditsContext();
   const langRef = useRef(null);
   const profileRef = useRef(null);
   const notifRef = useRef(null);
@@ -320,18 +321,6 @@ export default function Navigation() {
 
   /* Close mobile menu on route change */
   useEffect(() => { setMobileOpen(false); setMobileCat(null); }, [location.pathname]);
-
-  /* Fetch credit balance */
-  useEffect(() => {
-    if (!user) { setCreditInfo(null); return; }
-    const tkn = localStorage.getItem('zen_token');
-    if (!tkn) return;
-    const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-    fetch(`${API}/subscriptions/my-plan`, { headers: { Authorization: `Bearer ${tkn}` } })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setCreditInfo(d); })
-      .catch(() => {});
-  }, [user, location.pathname]);
 
   /* Hide nav on landing, auth, VR */
   if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr') return null;

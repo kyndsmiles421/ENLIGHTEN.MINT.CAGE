@@ -11,6 +11,8 @@ import QuickMeditationWidget from './components/QuickMeditationWidget';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import InstallPrompt from './components/InstallPrompt';
+import CreditNudge from './components/CreditNudge';
+import { CreditProvider } from './context/CreditContext';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -186,6 +188,7 @@ function App() {
   return (
   <LanguageProvider>
     <AuthProvider>
+      <CreditProvider>
       <SensoryProvider>
         <BrowserRouter>
           <div style={{ minHeight: '100vh', background: '#0B0C15', position: 'relative' }}>
@@ -208,9 +211,11 @@ function App() {
             <QuickMeditationWidget />
             <BackToTop />
             <InstallPrompt />
+            <CreditNudge />
           </div>
         </BrowserRouter>
       </SensoryProvider>
+      </CreditProvider>
     </AuthProvider>
   </LanguageProvider>
   );

@@ -139,13 +139,14 @@ async def deduct_credits(user_id: str, action: str, amount: int = None) -> dict:
         return {"allowed": True, "remaining": -1, "cost": cost, "tier": tier}
 
     if credits["balance"] < cost:
-        return {"allowed": False, "remaining": credits["balance"], "cost": cost, "tier": tier}
+        return {"allowed": False, "remaining": credits["balance"], "cost": cost, "tier": tier, "low_credits": True}
 
     await db.user_credits.update_one(
         {"user_id": user_id},
         {"$inc": {"balance": -cost, "total_credits_used": cost}}
     )
-    return {"allowed": True, "remaining": credits["balance"] - cost, "cost": cost, "tier": tier}
+    new_balance = credits["balance"] - cost
+    return {"allowed": True, "remaining": new_balance, "cost": cost, "tier": tier, "low_credits": new_balance <= 10}
 
 
 async def add_credits(user_id: str, amount: int, reason: str = ""):
