@@ -23,15 +23,14 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 11. Accessibility: Sound toggles, reduce motion/particles
 12. Crystals & Stones Encyclopedia + Rock Hounding game
 13. Quantum Entanglement social meditations
-14. "Begin Journey" branding, Simplified Chinese translations
-15. **Light mode full text readability polish** (Mar 27, 2026)
-16. **Performance optimization** (Mar 27, 2026) — removed page transition animations, throttled background to 30fps, reduced particle count
+14. "Begin Journey" / "Continue Journey" smart landing buttons
+15. Simplified Chinese translations
+16. Light mode full text readability polish
+17. Performance optimization — removed page transitions, 30fps background, reduced particles
+18. Smart landing page: "Begin Journey" for new users, "Continue Journey" for logged-in users
 
 ## Critical Config
 - Admin: /admin-setup, password=cosmic-creator-2026
-- Stripe: Emergent test key (no user key needed)
+- Stripe: Emergent test key
 - AI: Emergent LLM Key
-
-## Backlog
-- P2: Refactor star_cultures.py (move coords to JSON/MongoDB)
-- P3: Convert remaining inline rgba(248,250,252,...) to CSS vars in detail panels
+- Auth: /auth page with login + "Create account" for new users
