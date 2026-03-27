@@ -29,8 +29,8 @@ export function CreditProvider({ children }) {
     const token = localStorage.getItem('zen_token');
     if (!token) return { allowed: false, reason: 'not_authenticated' };
 
-    // Unlimited tiers always pass
-    if (creditInfo?.credits_per_month === -1 && creditInfo?.subscription_active) {
+    // Unlimited tiers or admin always pass
+    if (creditInfo?.is_admin || (creditInfo?.credits_per_month === -1 && creditInfo?.subscription_active)) {
       try {
         const res = await fetch(`${API}/subscriptions/use-credits`, {
           method: 'POST',

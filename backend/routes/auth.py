@@ -35,11 +35,12 @@ async def login(user: UserLogin):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Auto-activate Creator mode for the owner
-    if user.email == CREATOR_EMAIL and not found.get("is_admin"):
-        await db.users.update_one({"id": found["id"]}, {"$set": {"role": "admin", "is_admin": True}})
+    if user.email == CREATOR_EMAIL:
+        if found.get("role") != "admin":
+            await db.users.update_one({"id": found["id"]}, {"$set": {"role": "admin", "is_admin": True}})
         await db.user_credits.update_one(
             {"user_id": found["id"]},
-            {"$set": {"tier": "super_user", "subscription_active": True, "is_admin": True, "credits": 999999}},
+            {"$set": {"tier": "super_user", "subscription_active": True, "is_admin": True, "credits": 999999, "balance": 999999}},
             upsert=True,
         )
         found["role"] = "admin"
