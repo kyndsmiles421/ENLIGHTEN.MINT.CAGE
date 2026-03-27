@@ -2,12 +2,23 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="theme-color" content="#0B0C15" />
         <meta name="description" content="The Cosmic Collective — A sacred digital space for breathing, meditation, sound healing, and expanding your awareness." />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Cosmic" />
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
+        <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+        <meta property="og:title" content="The Cosmic Collective" />
+        <meta property="og:description" content="AI-powered wellness: meditation, breathwork, sound healing, divination, and cosmic guidance." />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="%PUBLIC_URL%/logo512.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="The Cosmic Collective" />
+        <meta name="twitter:description" content="AI-powered wellness: meditation, breathwork, sound healing, divination, and cosmic guidance." />
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -157,6 +168,13 @@
                     capturePerformance: false,
                 },
             });
+        </script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').catch(function() {});
+                });
+            }
         </script>
     </body>
 </html>

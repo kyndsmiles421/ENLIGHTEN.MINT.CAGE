@@ -8,6 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import QuickMeditationWidget from './components/QuickMeditationWidget';
+import ScrollToTop from './components/ScrollToTop';
+import BackToTop from './components/BackToTop';
+import InstallPrompt from './components/InstallPrompt';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -182,6 +185,7 @@ function App() {
           <div style={{ minHeight: '100vh', background: '#0B0C15', position: 'relative' }}>
             <CosmicBackground />
             <Navigation />
+            <ScrollToTop />
             <Toaster
               position="top-right"
               toastOptions={{
@@ -196,6 +200,8 @@ function App() {
             />
             <AnimatedRoutes />
             <QuickMeditationWidget />
+            <BackToTop />
+            <InstallPrompt />
           </div>
         </BrowserRouter>
       </SensoryProvider>

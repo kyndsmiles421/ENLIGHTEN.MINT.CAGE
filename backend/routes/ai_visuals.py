@@ -449,3 +449,114 @@ async def get_video_stories(user=Depends(get_current_user)):
             "video_url": cached.get("video_url") if cached else None,
         })
     return {"stories": stories}
+
+
+# Batch generation tracker
+_batch_jobs = {}
+
+
+async def _run_batch_generation(batch_id: str, story_ids: list):
+    """Sequentially generate videos for a batch of stories."""
+    batch = _batch_jobs[batch_id]
+    for i, sid in enumerate(story_ids):
+        if batch.get("cancelled"):
+            break
+        batch["current_idx"] = i
+        batch["current_story"] = sid
+        prompt = VIDEO_SCENE_PROMPTS.get(sid)
+        if not prompt:
+            batch["failed"].append(sid)
+            continue
+
+        cache_key = hashlib.md5(f"video:{prompt[:200]}".encode()).hexdigest()
+
+        cached = await db.ai_video_cache.find_one(
+            {"cache_key": cache_key}, {"_id": 0, "video_url": 1}
+        )
+        if cached and cached.get("video_url"):
+            batch["completed"].append(sid)
+            continue
+
+        job_id = str(uuid.uuid4())[:12]
+        filename = f"{cache_key[:16]}_{job_id}.mp4"
+        batch["job_ids"].append(job_id)
+        _video_jobs[job_id] = {
+            "status": "generating",
+            "video_url": None,
+            "error": None,
+            "cache_key": cache_key,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        try:
+            await _run_video_generation(job_id, prompt, cache_key, filename)
+            if _video_jobs[job_id]["status"] == "complete":
+                batch["completed"].append(sid)
+            else:
+                batch["failed"].append(sid)
+        except Exception as e:
+            logger.error(f"Batch gen error for {sid}: {e}")
+            batch["failed"].append(sid)
+
+    batch["status"] = "complete"
+    batch["current_story"] = None
+
+
+@router.post("/ai-visuals/generate-batch")
+async def generate_batch(
+    data: dict = Body(...),
+    user=Depends(get_current_user),
+):
+    """Start batch video generation for multiple stories."""
+    story_ids = data.get("story_ids", list(VIDEO_SCENE_PROMPTS.keys()))
+
+    for bid, batch in _batch_jobs.items():
+        if batch["status"] == "generating":
+            return {
+                "batch_id": bid,
+                "status": "already_running",
+                "current_story": batch.get("current_story"),
+                "completed": len(batch["completed"]),
+                "failed": len(batch["failed"]),
+                "total": len(batch["story_ids"]),
+            }
+
+    batch_id = str(uuid.uuid4())[:12]
+    _batch_jobs[batch_id] = {
+        "status": "generating",
+        "story_ids": story_ids,
+        "current_idx": 0,
+        "current_story": story_ids[0] if story_ids else None,
+        "completed": [],
+        "failed": [],
+        "job_ids": [],
+        "cancelled": False,
+    }
+
+    asyncio.create_task(_run_batch_generation(batch_id, story_ids))
+
+    return {
+        "batch_id": batch_id,
+        "status": "started",
+        "total": len(story_ids),
+    }
+
+
+@router.get("/ai-visuals/batch-status/{batch_id}")
+async def get_batch_status(batch_id: str, user=Depends(get_current_user)):
+    """Poll batch generation status."""
+    batch = _batch_jobs.get(batch_id)
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+
+    return {
+        "batch_id": batch_id,
+        "status": batch["status"],
+        "current_story": batch.get("current_story"),
+        "current_idx": batch.get("current_idx", 0),
+        "completed": len(batch["completed"]),
+        "completed_ids": batch["completed"],
+        "failed": len(batch["failed"]),
+        "failed_ids": batch["failed"],
+        "total": len(batch["story_ids"]),
+    }

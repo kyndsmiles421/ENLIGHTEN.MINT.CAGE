@@ -1,11 +1,11 @@
 {
   "short_name": "Cosmic",
   "name": "The Cosmic Collective",
-  "description": "A sacred digital space for breathing, meditation, sound healing, and expanding your awareness.",
+  "description": "AI-powered wellness: meditation, breathwork, sound healing, divination, and cosmic guidance.",
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "32x32",
       "type": "image/x-icon"
     },
     {
@@ -19,12 +19,47 @@
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#0B0C15",
   "background_color": "#0B0C15",
   "orientation": "portrait-primary",
-  "categories": ["health", "lifestyle", "wellness"]
+  "categories": ["health", "lifestyle", "wellness", "education"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Breathwork",
+      "short_name": "Breathe",
+      "url": "/breathing",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Meditation",
+      "short_name": "Meditate",
+      "url": "/meditation",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sage AI Coach",
+      "short_name": "Sage",
+      "url": "/coach",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Daily Briefing",
+      "short_name": "Today",
+      "url": "/daily-briefing",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ]
 }

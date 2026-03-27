@@ -209,6 +209,11 @@ export default function Videos() {
   const [playerModal, setPlayerModal] = useState(null);
   const pollRef = useRef(null);
 
+  // Batch state
+  const [batchId, setBatchId] = useState(null);
+  const [batchStatus, setBatchStatus] = useState(null);
+  const batchPollRef = useRef(null);
+
   // Load practice videos
   useEffect(() => {
     axios.get(`${API}/videos`)
@@ -270,6 +275,50 @@ export default function Videos() {
     }
   }, [authHeaders]);
 
+  // Batch generation
+  const startBatch = useCallback(async () => {
+    try {
+      const uncachedIds = Object.keys(CULTURE_META).filter(id => !cinemaStories[id]?.has_video);
+      if (uncachedIds.length === 0) { toast.success('All videos already generated!'); return; }
+
+      const res = await axios.post(`${API}/ai-visuals/generate-batch`, {
+        story_ids: uncachedIds,
+      }, { headers: authHeaders });
+
+      if (res.data.batch_id) {
+        setBatchId(res.data.batch_id);
+        setBatchStatus({ status: 'generating', completed: 0, total: uncachedIds.length, current_story: uncachedIds[0] });
+        toast.success(`Batch generation started for ${uncachedIds.length} videos`);
+
+        // Start polling
+        batchPollRef.current = setInterval(async () => {
+          try {
+            const poll = await axios.get(`${API}/ai-visuals/batch-status/${res.data.batch_id}`, { headers: authHeaders });
+            setBatchStatus(poll.data);
+
+            // Update completed stories in cinema map
+            if (poll.data.completed_ids?.length > 0) {
+              const refreshRes = await axios.get(`${API}/ai-visuals/video-stories`, { headers: authHeaders });
+              const map = {};
+              refreshRes.data.stories.forEach(s => { map[s.story_id] = s; });
+              setCinemaStories(map);
+            }
+
+            if (poll.data.status === 'complete') {
+              clearInterval(batchPollRef.current);
+              toast.success(`Batch complete! ${poll.data.completed} videos generated.`);
+              setBatchId(null);
+            }
+          } catch {}
+        }, 8000);
+      }
+    } catch {
+      toast.error('Could not start batch generation');
+    }
+  }, [authHeaders, cinemaStories]);
+
+  useEffect(() => () => clearInterval(batchPollRef.current), []);
+
   const filtered = filter === 'all' ? videos : videos.filter(v => v.category === filter);
   const generatedCount = Object.values(cinemaStories).filter(s => s.has_video).length;
 
@@ -320,22 +369,60 @@ export default function Videos() {
         {/* ═══ Cosmic Cinema Tab ═══ */}
         {tab === 'cinema' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="glass-card p-5 mb-8 flex items-center gap-4" data-testid="cinema-info-bar">
-              <Film size={20} style={{ color: '#E879F9', flexShrink: 0 }} />
-              <div className="flex-1">
-                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                  AI Cosmic Cinema — Powered by Sora 2
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  4-second cinematic video clips of 15 world creation stories. Each video takes 2-5 minutes to generate and is cached for instant replay.
-                </p>
+            <div className="glass-card p-5 mb-8" data-testid="cinema-info-bar">
+              <div className="flex items-center gap-4">
+                <Film size={20} style={{ color: '#E879F9', flexShrink: 0 }} />
+                <div className="flex-1">
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    AI Cosmic Cinema — Powered by Sora 2
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    4-second cinematic video clips of 15 world creation stories. Each video takes 2-5 minutes to generate and is cached for instant replay.
+                  </p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#E879F9' }}>
+                    {generatedCount}<span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>/15</span>
+                  </p>
+                  <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>generated</p>
+                </div>
+                {generatedCount < 15 && !batchId && (
+                  <button onClick={startBatch}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-[1.02] flex-shrink-0"
+                    style={{ background: 'rgba(232,121,249,0.1)', border: '1px solid rgba(232,121,249,0.2)', color: '#E879F9' }}
+                    data-testid="generate-all-btn">
+                    <Sparkles size={13} /> Generate All
+                  </button>
+                )}
               </div>
-              <div className="text-right flex-shrink-0">
-                <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#E879F9' }}>
-                  {generatedCount}<span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>/15</span>
-                </p>
-                <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>generated</p>
-              </div>
+
+              {/* Batch progress bar */}
+              {batchStatus && batchStatus.status === 'generating' && (
+                <div className="mt-4 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Loader2 size={12} className="animate-spin" style={{ color: '#E879F9' }} />
+                      <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                        Generating: <strong style={{ color: '#E879F9' }}>{CULTURE_META[batchStatus.current_story]?.name || batchStatus.current_story}</strong>
+                      </span>
+                    </div>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                      {batchStatus.completed}/{batchStatus.total}
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: 'linear-gradient(90deg, #E879F9, #C084FC)' }}
+                      animate={{ width: `${batchStatus.total > 0 ? (batchStatus.completed / batchStatus.total) * 100 : 0}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
+                  <p className="text-[9px] mt-1.5" style={{ color: 'var(--text-muted)' }}>
+                    Each video takes 2-5 minutes. You can leave this page and come back.
+                  </p>
+                </div>
+              )}
             </div>
 
             {cinemaLoading ? (
