@@ -659,6 +659,369 @@ CULTURAL_CONSTELLATIONS = {
             },
         ],
     },
+    "vedic": {
+        "name": "Vedic Sky",
+        "color": "#FF9800",
+        "icon": "star",
+        "description": "The Vedic Nakshatra system divides the sky into 27 lunar mansions, each ruled by a deity and carrying specific spiritual energy. Indian astronomy dates back over 5,000 years to the Vedas, the oldest scriptures of humanity.",
+        "constellations": [
+            {
+                "id": "sapta_rishi", "name": "Sapta Rishi (Seven Sages)", "culture_name": "Vedic",
+                "ra": 12.0, "dec": 55.0,
+                "stars": [
+                    {"name": "Kratu (Dubhe)", "ra": 11.06, "dec": 61.75, "mag": 1.79},
+                    {"name": "Pulaha (Merak)", "ra": 11.03, "dec": 56.38, "mag": 2.37},
+                    {"name": "Pulastya (Phecda)", "ra": 11.9, "dec": 53.69, "mag": 2.44},
+                    {"name": "Atri (Megrez)", "ra": 12.26, "dec": 57.03, "mag": 3.31},
+                    {"name": "Angiras (Alioth)", "ra": 12.9, "dec": 55.96, "mag": 1.77},
+                    {"name": "Vasishtha (Mizar)", "ra": 13.4, "dec": 54.93, "mag": 2.27},
+                    {"name": "Bhrigu (Alkaid)", "ra": 13.79, "dec": 49.31, "mag": 1.86},
+                ],
+                "lines": [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]],
+                "element": "Akasha",
+                "mythology": {
+                    "figure": "The Seven Sages",
+                    "origin": "Vedic",
+                    "deity": "Brahma",
+                    "story": "The Sapta Rishi are the seven great sages born from the mind of Brahma, the Creator. Each sage — Kratu, Pulaha, Pulastya, Atri, Angiras, Vasishtha, and Bhrigu — carries a fundamental aspect of cosmic knowledge. Vasishtha, the brightest, was the guru of Lord Rama. His companion star Arundhati (Alcor) symbolizes the ideal devoted wife. In Hindu weddings, the couple is shown this double star as a blessing. The seven sages eternally circle Dhruva (Polaris), the unmoving star representing Lord Vishnu's steadfast nature.",
+                    "lesson": "True knowledge is not acquired — it is remembered. The sages are within you, waiting to be awakened."
+                },
+                "paths": [
+                    [[-0.5,0.3],[0.5,0.3],[0.5,-0.3],[-0.5,-0.3],[-0.5,0.3]],
+                    [[0.5,0.3],[0.9,0.5],[1.3,0.3],[1.7,0]],
+                ],
+            },
+            {
+                "id": "rohini", "name": "Rohini (The Red One)", "culture_name": "Vedic",
+                "ra": 4.6, "dec": 16.5,
+                "stars": [
+                    {"name": "Aldebaran (Rohini)", "ra": 4.6, "dec": 16.51, "mag": 0.85},
+                    {"name": "Ain", "ra": 4.48, "dec": 19.18, "mag": 3.53},
+                    {"name": "Hyadum I", "ra": 4.33, "dec": 15.63, "mag": 3.65},
+                ],
+                "lines": [[0,1],[0,2]],
+                "element": "Prithvi",
+                "mythology": {
+                    "figure": "The Beloved of the Moon",
+                    "origin": "Vedic",
+                    "deity": "Chandra (Moon God)",
+                    "story": "Rohini is the most beloved of Chandra's 27 wives (the 27 Nakshatras). Her star Aldebaran glows red with passion and fertility. Chandra loved Rohini so much that he neglected his other wives, who complained to their father Daksha. Daksha cursed Chandra to waste away, which is why the moon wanes. Only Shiva's mercy restored the cycle of waxing and waning. Rohini Nakshatra is considered the most auspicious for new beginnings, love, and creative ventures in Vedic astrology.",
+                    "lesson": "Love must be shared equally, or it becomes attachment. The waxing and waning teaches balance."
+                },
+                "paths": [
+                    [[-0.3,0.3],[0,0],[0.3,0.3]],
+                    [[0,0],[0,-0.5]],
+                ],
+            },
+            {
+                "id": "trishul", "name": "Mrigashira (The Deer's Head)", "culture_name": "Vedic",
+                "ra": 5.9, "dec": 7.0,
+                "stars": [
+                    {"name": "Betelgeuse (Ardra)", "ra": 5.92, "dec": 7.41, "mag": 0.5},
+                    {"name": "Bellatrix", "ra": 5.42, "dec": 6.35, "mag": 1.64},
+                    {"name": "Mintaka", "ra": 5.53, "dec": -0.3, "mag": 2.23},
+                ],
+                "lines": [[0,1],[1,2]],
+                "element": "Vayu",
+                "mythology": {
+                    "figure": "Shiva's Deer Hunt",
+                    "origin": "Vedic",
+                    "deity": "Soma / Chandra",
+                    "story": "Mrigashira means 'deer's head' and tells the story of Brahma pursuing his own daughter Rohini in the form of a deer (Mriga). Shiva, as Rudra the cosmic hunter, shot an arrow to stop this transgression — the arrow became the three stars of Orion's Belt. This asterism marks the boundary between seeking and finding. Those born under Mrigashira are eternal seekers, always questing for truth but finding it in the journey itself.",
+                    "lesson": "The search is the destination. What you seek is seeking you."
+                },
+                "paths": [
+                    [[-0.4,0.3],[0,0],[0.4,0.3]],
+                    [[0,0],[0.2,-0.4],[0,-0.8],[-0.2,-0.4],[0,0]],
+                ],
+            },
+            {
+                "id": "magha", "name": "Magha (The Mighty One)", "culture_name": "Vedic",
+                "ra": 10.14, "dec": 12.0,
+                "stars": [
+                    {"name": "Regulus (Magha)", "ra": 10.14, "dec": 11.97, "mag": 1.35},
+                    {"name": "Algieba", "ra": 10.33, "dec": 19.84, "mag": 2.28},
+                    {"name": "Adhafera", "ra": 10.28, "dec": 23.42, "mag": 3.44},
+                ],
+                "lines": [[0,1],[1,2]],
+                "element": "Agni",
+                "mythology": {
+                    "figure": "The Throne of Kings",
+                    "origin": "Vedic",
+                    "deity": "Pitris (The Ancestors)",
+                    "story": "Magha is ruled by the Pitris — the divine ancestors who guide us from the celestial realm. Regulus, its royal star, has been called 'the heart of the lion' across cultures, but in Vedic astronomy it is the throne from which ancestral blessings flow. Magha Nakshatra bestows authority, leadership, and the power of lineage. The Shradh ceremonies honoring ancestors are timed to this star's movements. Those born under Magha carry the weight and dignity of their entire ancestral line.",
+                    "lesson": "You are the living prayer of ancestors who dreamed of your existence. Honor them by living fully."
+                },
+                "paths": [
+                    [[-0.3,-0.2],[0,0],[0.2,0.4],[0,0.8]],
+                    [[0,0],[0.4,0],[0.6,0.3]],
+                ],
+            },
+            {
+                "id": "swati", "name": "Swati (The Sword)", "culture_name": "Vedic",
+                "ra": 14.26, "dec": 19.2,
+                "stars": [
+                    {"name": "Arcturus (Swati)", "ra": 14.26, "dec": 19.18, "mag": -0.05},
+                    {"name": "Muphrid", "ra": 13.91, "dec": 18.4, "mag": 2.68},
+                    {"name": "Seginus", "ra": 14.53, "dec": 38.31, "mag": 3.03},
+                ],
+                "lines": [[0,1],[0,2]],
+                "element": "Vayu",
+                "mythology": {
+                    "figure": "The Independent Star",
+                    "origin": "Vedic",
+                    "deity": "Vayu (Wind God)",
+                    "story": "Swati is ruled by Vayu, the god of wind and breath — prana itself. Arcturus, the brightest star in the northern sky, burns with fierce independence. In Vedic tradition, when a raindrop falls into the ocean during Swati Nakshatra, it becomes a pearl inside an oyster. This is the alchemy of Swati — transforming ordinary experience into precious wisdom. Those born under Swati are fiercely independent, adaptable as the wind, and capable of turning adversity into beauty.",
+                    "lesson": "Be like the wind — belong everywhere, cling nowhere. Your freedom is your greatest gift."
+                },
+                "paths": [
+                    [[-0.4,0],[0,0],[0.3,-0.2]],
+                    [[0,0],[0.1,0.5],[0.3,1.0]],
+                ],
+            },
+        ],
+    },
+    "norse": {
+        "name": "Norse Sky",
+        "color": "#90CAF9",
+        "icon": "star",
+        "description": "The Norse saw the night sky as a cosmic tapestry woven by the Norns (Fates) upon the branches of Yggdrasil, the World Tree. Stars were sparks from Muspelheim placed by the gods to light the void, and the Milky Way was the Bifrost bridge to Asgard.",
+        "constellations": [
+            {
+                "id": "thors_wagon", "name": "Thor's Wagon (Karlavagnen)", "culture_name": "Norse",
+                "ra": 12.0, "dec": 55.0,
+                "stars": [
+                    {"name": "Dubhe", "ra": 11.06, "dec": 61.75, "mag": 1.79},
+                    {"name": "Merak", "ra": 11.03, "dec": 56.38, "mag": 2.37},
+                    {"name": "Phecda", "ra": 11.9, "dec": 53.69, "mag": 2.44},
+                    {"name": "Megrez", "ra": 12.26, "dec": 57.03, "mag": 3.31},
+                    {"name": "Alioth", "ra": 12.9, "dec": 55.96, "mag": 1.77},
+                    {"name": "Mizar", "ra": 13.4, "dec": 54.93, "mag": 2.27},
+                    {"name": "Alkaid", "ra": 13.79, "dec": 49.31, "mag": 1.86},
+                ],
+                "lines": [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[3,0]],
+                "element": "Lightning",
+                "mythology": {
+                    "figure": "Thor's Chariot",
+                    "origin": "Norse",
+                    "deity": "Thor",
+                    "story": "The Vikings saw the Big Dipper as Thor's great wagon (Karlavagnen), pulled across the heavens by his two goats, Tanngrisnir and Tanngnjostur. When Thor strikes his hammer Mjolnir upon the chariot's floor, thunder rolls across Midgard. Norse seafarers used the Wagon's pointer stars to find Polaris — the 'Veraldar Nagli' (World Nail) — around which the entire sky pivots. For the Vikings, this constellation was both a spiritual symbol of divine protection and a practical navigation tool that guided them across uncharted oceans.",
+                    "lesson": "The mightiest force in the universe also serves as a humble guide. True power is found in service."
+                },
+                "paths": [
+                    [[-0.5,0.3],[0.5,0.3],[0.5,-0.3],[-0.5,-0.3],[-0.5,0.3]],
+                    [[0.5,0.3],[0.9,0.5],[1.3,0.3],[1.7,0]],
+                ],
+            },
+            {
+                "id": "odins_eye", "name": "Odin's Eye (Thiazi's Eyes)", "culture_name": "Norse",
+                "ra": 5.2, "dec": 46.0,
+                "stars": [
+                    {"name": "Capella (Thiazi)", "ra": 5.28, "dec": 45.99, "mag": 0.08},
+                    {"name": "Menkalinan", "ra": 5.99, "dec": 44.95, "mag": 1.9},
+                    {"name": "Mahasim", "ra": 5.99, "dec": 37.21, "mag": 2.69},
+                ],
+                "lines": [[0,1],[1,2]],
+                "element": "Wisdom",
+                "mythology": {
+                    "figure": "The Giant's Eyes",
+                    "origin": "Norse",
+                    "deity": "Odin / Thiazi",
+                    "story": "When the frost giant Thiazi was slain by the Aesir for kidnapping Idun and her golden apples of immortality, his daughter Skadi came to Asgard seeking vengeance. As a peace offering, Odin took Thiazi's eyes and cast them into the sky as two brilliant stars. Capella, one of the brightest stars visible, is Thiazi's gleaming eye watching over Midgard for eternity. This asterism reminds us that even in death, the giant's gaze endures — watching, protecting, remembering.",
+                    "lesson": "What we lose in one realm, we gain in another. Death is not an ending but a transformation of form."
+                },
+                "paths": [
+                    [[-0.3,0],[0,0],[0.3,0]],
+                    [[0,0],[0.2,-0.5],[0,-0.9]],
+                ],
+            },
+            {
+                "id": "freyjas_distaff", "name": "Freyja's Distaff (Friggerock)", "culture_name": "Norse",
+                "ra": 5.6, "dec": 0.0,
+                "stars": [
+                    {"name": "Alnilam", "ra": 5.6, "dec": -1.2, "mag": 1.69},
+                    {"name": "Alnitak", "ra": 5.68, "dec": -1.94, "mag": 1.77},
+                    {"name": "Mintaka", "ra": 5.53, "dec": -0.3, "mag": 2.23},
+                ],
+                "lines": [[0,1],[1,2],[2,0]],
+                "element": "Fate",
+                "mythology": {
+                    "figure": "The Spindle of Fate",
+                    "origin": "Norse",
+                    "deity": "Freyja / Frigg",
+                    "story": "Orion's Belt was known to the Norse as Freyja's Distaff (Friggerock) — the spinning tool of the goddess of love, beauty, and destiny. Freyja spins the threads of fate alongside the Norns at the roots of Yggdrasil. The three aligned stars represent the cosmic spindle upon which all destinies are wound. Warriors who died bravely were chosen by Freyja to join her in Folkvangr. When you see these three stars in perfect alignment, remember: your thread of fate is being woven right now.",
+                    "lesson": "You cannot choose the thread given to you, but you can choose how bravely you weave it."
+                },
+                "paths": [
+                    [[-0.2,0.1],[0,0],[0.2,0.1]],
+                    [[-0.2,0.1],[0,0.3],[0.2,0.1]],
+                ],
+            },
+            {
+                "id": "fenrir", "name": "Fenrir (The Great Wolf)", "culture_name": "Norse",
+                "ra": 6.75, "dec": -16.7,
+                "stars": [
+                    {"name": "Sirius (Fenrir's Eye)", "ra": 6.75, "dec": -16.72, "mag": -1.46},
+                    {"name": "Mirzam", "ra": 6.38, "dec": -17.96, "mag": 1.98},
+                    {"name": "Adhara", "ra": 6.98, "dec": -28.97, "mag": 1.5},
+                ],
+                "lines": [[0,1],[0,2]],
+                "element": "Chaos",
+                "mythology": {
+                    "figure": "The Bound Wolf",
+                    "origin": "Norse",
+                    "deity": "Fenrir / Loki's Son",
+                    "story": "Sirius, the brightest star in the sky, was seen by some Norse traditions as the blazing eye of Fenrir, the great cosmic wolf bound by the gods with the magical ribbon Gleipnir. Son of Loki and the giantess Angrboda, Fenrir grows ever larger and will one day break free at Ragnarok to swallow Odin himself. The star's fierce brilliance is a reminder of primal power restrained but never extinguished. Fenrir teaches that what we chain within ourselves only grows stronger — better to transform it than to bind it.",
+                    "lesson": "What you suppress does not disappear — it grows in the dark. Face your shadow before it breaks its chains."
+                },
+                "paths": [
+                    [[0,0],[-0.4,0.3],[-0.7,0.2]],
+                    [[0,0],[0.3,-0.5],[0.1,-1.0]],
+                    [[-0.4,0.3],[-0.3,0.7]],
+                ],
+            },
+            {
+                "id": "bifrost", "name": "Bifrost (The Rainbow Bridge)", "culture_name": "Norse",
+                "ra": 20.7, "dec": 45.3,
+                "stars": [
+                    {"name": "Deneb (Bifrost Gate)", "ra": 20.69, "dec": 45.28, "mag": 1.25},
+                    {"name": "Sadr", "ra": 20.37, "dec": 40.26, "mag": 2.2},
+                    {"name": "Albireo", "ra": 19.51, "dec": 27.96, "mag": 3.18},
+                ],
+                "lines": [[0,1],[1,2]],
+                "element": "Bridge",
+                "mythology": {
+                    "figure": "The Bridge Between Worlds",
+                    "origin": "Norse",
+                    "deity": "Heimdall",
+                    "story": "The Milky Way was known to the Norse as Bifrost — the burning rainbow bridge connecting Midgard (Earth) to Asgard (realm of the gods). At its peak stands Deneb, marking the Asgard gate guarded eternally by Heimdall, the watchman of the gods, whose horn Gjallarhorn will sound at Ragnarok. The Cygnus cross-shape embedded in the Milky Way reinforced this image of a celestial crossing point. Norse shamans believed that during deep trance, the soul could travel Bifrost to commune with the gods.",
+                    "lesson": "Between every world lies a bridge. Between every ending and beginning, between grief and joy — Bifrost waits for those brave enough to cross."
+                },
+                "paths": [
+                    [[0,0.5],[0,0],[0,-0.5],[0,-1.0]],
+                    [[-0.4,0],[0,0],[0.4,0]],
+                ],
+            },
+        ],
+    },
+    "polynesian": {
+        "name": "Polynesian Sky",
+        "color": "#26C6DA",
+        "icon": "star",
+        "description": "Polynesian navigators crossed the vast Pacific Ocean using only stars, ocean swells, and bird flights. Their star knowledge — passed down orally for millennia — represents humanity's greatest feat of non-instrument navigation, spanning millions of square miles of open ocean.",
+        "constellations": [
+            {
+                "id": "hokulea", "name": "Hokule'a (Star of Joy)", "culture_name": "Polynesian",
+                "ra": 14.26, "dec": 19.2,
+                "stars": [
+                    {"name": "Arcturus (Hokule'a)", "ra": 14.26, "dec": 19.18, "mag": -0.05},
+                    {"name": "Muphrid", "ra": 13.91, "dec": 18.4, "mag": 2.68},
+                    {"name": "Izar", "ra": 14.75, "dec": 27.07, "mag": 2.37},
+                ],
+                "lines": [[0,1],[0,2]],
+                "element": "Navigation",
+                "mythology": {
+                    "figure": "The Zenith Star of Hawaii",
+                    "origin": "Polynesian",
+                    "deity": "Kanaloa (God of the Ocean)",
+                    "story": "Hokule'a — 'Star of Joy' — is Arcturus, the zenith star of Hawaii. When this star passes directly overhead, a navigator knows they have reached the latitude of the Hawaiian Islands. The famous voyaging canoe Hokule'a was named after this star and has sailed over 150,000 nautical miles using traditional Polynesian navigation. To the ancient Hawaiians, Hokule'a was a beacon of hope — proof that the ancestors had found paradise, and a promise that the way home could always be found by looking up.",
+                    "lesson": "You carry your compass within. Trust the star that shines directly above your heart — it knows where home is."
+                },
+                "paths": [
+                    [[-0.3,0],[0,0],[0.4,0.4]],
+                    [[0,0],[0,0.5]],
+                ],
+            },
+            {
+                "id": "matariki", "name": "Matariki (The Pleiades)", "culture_name": "Polynesian",
+                "ra": 3.79, "dec": 24.1,
+                "stars": [
+                    {"name": "Alcyone (Matariki)", "ra": 3.79, "dec": 24.1, "mag": 2.87},
+                    {"name": "Atlas", "ra": 3.82, "dec": 24.05, "mag": 3.62},
+                    {"name": "Electra", "ra": 3.75, "dec": 24.11, "mag": 3.7},
+                ],
+                "lines": [[0,1],[0,2],[1,2]],
+                "element": "Renewal",
+                "mythology": {
+                    "figure": "The Eyes of God",
+                    "origin": "Polynesian (Maori)",
+                    "deity": "Tane (God of Forests and Light)",
+                    "story": "Matariki (the Pleiades) marks the Maori New Year when this star cluster rises just before dawn in late June. The nine stars of Matariki are seen as a mother surrounded by her children, each star governing a different aspect of wellbeing: Matariki (health), Tupuanuku (food from the earth), Tupuarangi (food from the sky), Waiti (freshwater), Waita (saltwater), Waipuna-a-rangi (rain), Ururangi (winds), Pohutukawa (the dead), and Hiwa-i-te-rangi (wishes). Maori traditions include lighting fires, singing, and setting intentions for the coming year.",
+                    "lesson": "Every ending births a beginning. The darkest night of the year holds the seeds of all that will bloom."
+                },
+                "paths": [
+                    [[-0.2,0.2],[0,0],[0.2,0.2]],
+                    [[0,0],[0,-0.3]],
+                    [[-0.2,0.2],[0,0.4],[0.2,0.2]],
+                ],
+            },
+            {
+                "id": "newe", "name": "Newe (The Southern Cross)", "culture_name": "Polynesian",
+                "ra": 12.45, "dec": -63.1,
+                "stars": [
+                    {"name": "Acrux (Newe)", "ra": 12.44, "dec": -63.1, "mag": 0.76},
+                    {"name": "Mimosa", "ra": 12.79, "dec": -59.69, "mag": 1.25},
+                    {"name": "Gacrux", "ra": 12.52, "dec": -57.11, "mag": 1.63},
+                ],
+                "lines": [[0,2],[1,0]],
+                "element": "Direction",
+                "mythology": {
+                    "figure": "The Anchor of the Sky Canoe",
+                    "origin": "Polynesian (Tongan)",
+                    "deity": "Maui (Demigod)",
+                    "story": "The Southern Cross was the most important constellation for Polynesian navigators sailing south. In Tongan tradition, it is 'Toloa' — a duck flying south. In Hawaiian tradition, the four stars form 'Newe' — the anchor that holds the great celestial canoe of Maui in place. By extending the long axis of the cross 4.5 times, navigators could find true south — essential for crossing the equator. The Southern Cross guided the greatest ocean migration in human history, as Polynesian wayfinders settled every habitable island in the Pacific.",
+                    "lesson": "The smallest constellation can guide you across the largest ocean. Never underestimate what is small but true."
+                },
+                "paths": [
+                    [[0,0.5],[0,-0.5]],
+                    [[-0.4,0],[0.4,0]],
+                ],
+            },
+            {
+                "id": "manaiakalani", "name": "Manaiakalani (The Chief's Fishhook)", "culture_name": "Polynesian",
+                "ra": 16.9, "dec": -26.0,
+                "stars": [
+                    {"name": "Antares (Ka Hei Hei)", "ra": 16.49, "dec": -26.43, "mag": 0.96},
+                    {"name": "Shaula", "ra": 17.56, "dec": -37.1, "mag": 1.63},
+                    {"name": "Sargas", "ra": 17.62, "dec": -43.0, "mag": 1.87},
+                ],
+                "lines": [[0,1],[1,2]],
+                "element": "Creation",
+                "mythology": {
+                    "figure": "Maui's Fishhook",
+                    "origin": "Polynesian (Hawaiian)",
+                    "deity": "Maui (Demigod)",
+                    "story": "Manaiakalani is the magical fishhook of the demigod Maui, cast into the deep ocean to pull up new lands from the sea floor. With this hook, Maui fished up the Hawaiian Islands, the North Island of New Zealand, and islands across the Pacific. The scorpion's tail stars form the hook's curve. The story teaches that new worlds are not discovered — they are pulled from the depths by courage and determination. Every Polynesian island is a testament to Maui's fishhook and the audacity of those who followed the stars across the unknown.",
+                    "lesson": "The land beneath your feet was once hidden in the deep. What you need already exists — you just have to be brave enough to pull it up."
+                },
+                "paths": [
+                    [[0,0.3],[-0.2,0],[0,-0.3],[0.3,-0.5],[0.4,-0.8],[0.2,-1.0],[0,-0.9],[-0.2,-0.7]],
+                ],
+            },
+            {
+                "id": "ka_iwikuamoo", "name": "Ka Iwikuamo'o (The Backbone)", "culture_name": "Polynesian",
+                "ra": 18.6, "dec": 38.0,
+                "stars": [
+                    {"name": "Vega (Ka Hoku Ho'okele)", "ra": 18.62, "dec": 38.78, "mag": 0.03},
+                    {"name": "Deneb", "ra": 20.69, "dec": 45.28, "mag": 1.25},
+                    {"name": "Altair (Humu)", "ra": 19.85, "dec": 8.87, "mag": 0.77},
+                ],
+                "lines": [[0,1],[0,2]],
+                "element": "Sky Path",
+                "mythology": {
+                    "figure": "The Milky Way Backbone",
+                    "origin": "Polynesian (Hawaiian)",
+                    "deity": "Wakea (Sky Father)",
+                    "story": "Ka Iwikuamo'o — 'The Backbone of the Lizard' — is the Hawaiian name for the Milky Way, seen as the spine of a great celestial lizard stretching across the heavens. Vega, Deneb, and Altair (the Summer Triangle) form the key waypoints along this backbone. Vega (Ka Hoku Ho'okele, the 'steering star') was one of the most important navigation stars. The Milky Way itself served as a grand celestial highway, with Hawaiian navigators using its orientation to determine direction, season, and latitude. The backbone connects all things — earth to sky, island to island, mortal to divine.",
+                    "lesson": "You are a vertebra in the backbone of the universe. Without you, the great body of creation would be incomplete."
+                },
+                "paths": [
+                    [[-0.5,0.3],[0,0],[0.5,-0.5]],
+                    [[0,0],[0.3,0.3]],
+                ],
+            },
+        ],
+    },
 }
 
 
