@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X } from 'lucide-react';
 import * as THREE from 'three';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -39,6 +39,12 @@ export default function VirtualReality() {
   const mouseRef = useRef({ x: 0, y: 0 });
   const raycasterRef = useRef(new THREE.Raycaster());
   const pointerRef = useRef(new THREE.Vector2());
+
+  // Constellation Journey state
+  const [showJourneyPicker, setShowJourneyPicker] = useState(false);
+  const [activeJourney, setActiveJourney] = useState(null); // { journey, step, elapsed, total }
+  const journeyCamRef = useRef({ active: false, target: null, lookTarget: null });
+  const journeyGroupRef = useRef(null);
 
   // Load data
   useEffect(() => {
@@ -366,10 +372,23 @@ export default function VirtualReality() {
       orbitAngle += (targetAngle - orbitAngle) * 0.03;
       orbitRadius += (targetRadius - orbitRadius) * 0.03;
       orbitY += (targetY - orbitY) * 0.03;
-      camera.position.x = Math.sin(orbitAngle) * orbitRadius;
-      camera.position.z = Math.cos(orbitAngle) * orbitRadius;
-      camera.position.y = orbitY;
-      camera.lookAt(0, 2, 0);
+
+      // If journey is active, lerp camera to journey waypoint
+      if (journeyCamRef.current.active && journeyCamRef.current.target) {
+        const tgt = journeyCamRef.current.target;
+        const lookTgt = journeyCamRef.current.lookTarget;
+        camera.position.lerp(tgt, 0.015);
+        const curLook = new THREE.Vector3();
+        camera.getWorldDirection(curLook);
+        curLook.multiplyScalar(10).add(camera.position);
+        curLook.lerp(lookTgt, 0.02);
+        camera.lookAt(curLook);
+      } else {
+        camera.position.x = Math.sin(orbitAngle) * orbitRadius;
+        camera.position.z = Math.cos(orbitAngle) * orbitRadius;
+        camera.position.y = orbitY;
+        camera.lookAt(0, 2, 0);
+      }
 
       // Slow auto-rotate if not dragging
       if (!isDragging) {
@@ -591,6 +610,145 @@ export default function VirtualReality() {
     }
   };
 
+  // ===== GUIDED CONSTELLATION JOURNEYS =====
+  const JOURNEYS = [
+    {
+      id: 'heroes_path',
+      name: "The Hero's Path",
+      color: '#FCD34D',
+      description: 'Follow the trail of mythological heroes across the sky — from Orion the Hunter to the Great Bear.',
+      waypoints: [
+        { pos: [20, 5, -15], look: [25, 3, -20], text: "We begin at the celestial gateway... the first stars ancient navigators learned to read.", duration: 8 },
+        { pos: [10, 8, -25], look: [5, 6, -30], text: "Orion rises — the great hunter, belt gleaming with three ancient stars aligned.", duration: 8 },
+        { pos: [-15, 10, -20], look: [-20, 8, -25], text: "The bear constellation watches from the north, eternal guardian circling the pole star.", duration: 8 },
+        { pos: [-10, 6, 15], look: [-15, 4, 20], text: "The hero's journey always returns home — through trials of fire, water, and starlight.", duration: 8 },
+        { pos: [0, 12, 0], look: [0, 2, 0], text: "You stand at the center of all paths. The hero's journey is your own.", duration: 7 },
+      ],
+    },
+    {
+      id: 'cosmic_river',
+      name: 'The Cosmic River',
+      color: '#2DD4BF',
+      description: 'Drift along the Milky Way, following the celestial river that every civilization has seen and named.',
+      waypoints: [
+        { pos: [25, 3, 10], look: [30, 1, 15], text: "The river of stars begins its flow... the Milky Way, backbone of the night sky.", duration: 8 },
+        { pos: [15, 7, -10], look: [20, 5, -15], text: "Ancient Egyptians saw the Nile reflected here — as above, so below.", duration: 8 },
+        { pos: [-5, 10, -20], look: [-10, 8, -25], text: "The Maya called it Xibalba Be — the road to the underworld, paved with stars.", duration: 8 },
+        { pos: [-20, 6, 5], look: [-25, 4, 10], text: "Aboriginal Australians see the emu in the dark lanes — wisdom in the spaces between.", duration: 8 },
+        { pos: [0, 15, 0], look: [0, 2, 0], text: "All rivers lead to the ocean. All star-paths lead to the light within.", duration: 7 },
+      ],
+    },
+    {
+      id: 'zodiac_circle',
+      name: 'The Zodiac Circle',
+      color: '#C084FC',
+      description: 'Travel the ecliptic ring — the path the sun traces through the twelve zodiac constellations.',
+      waypoints: [
+        { pos: [20, 4, 0], look: [25, 2, 0], text: "The ecliptic begins — the sun's path through the heavens, marked by twelve gatekeepers.", duration: 8 },
+        { pos: [14, 6, 14], look: [18, 4, 18], text: "Aries to Cancer — the fire of new beginnings meets the waters of the soul.", duration: 8 },
+        { pos: [-14, 8, 14], look: [-18, 6, 18], text: "Leo to Scorpio — the lion's courage faces the scorpion's transforming sting.", duration: 8 },
+        { pos: [-14, 6, -14], look: [-18, 4, -18], text: "Sagittarius to Pisces — the archer's arrow flies toward the ocean of dreams.", duration: 8 },
+        { pos: [0, 14, 0], look: [0, 2, 0], text: "The wheel turns eternal. You carry all twelve signs within you.", duration: 7 },
+      ],
+    },
+  ];
+
+  const startJourney = useCallback((journey) => {
+    const total = journey.waypoints.reduce((a, w) => a + w.duration, 0);
+    setActiveJourney({ journey, step: 0, elapsed: 0, total });
+    setShowJourneyPicker(false);
+    journeyCamRef.current.active = true;
+
+    // Create journey constellation markers in the scene
+    const s = sceneRef.current;
+    if (s.scene) {
+      // Clean previous journey markers
+      if (journeyGroupRef.current) {
+        s.scene.remove(journeyGroupRef.current);
+        journeyGroupRef.current.traverse(c => { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); });
+      }
+      const group = new THREE.Group();
+      const color = new THREE.Color(journey.color);
+
+      journey.waypoints.forEach((wp, i) => {
+        // Constellation marker glow
+        const geo = new THREE.SphereGeometry(1.5, 16, 16);
+        const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false });
+        const sphere = new THREE.Mesh(geo, mat);
+        sphere.position.set(wp.look[0], wp.look[1], wp.look[2]);
+        group.add(sphere);
+
+        // Inner marker
+        const innerGeo = new THREE.SphereGeometry(0.4, 12, 12);
+        const innerMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3 });
+        const inner = new THREE.Mesh(innerGeo, innerMat);
+        inner.position.copy(sphere.position);
+        group.add(inner);
+
+        // Connection line to next waypoint
+        if (i < journey.waypoints.length - 1) {
+          const next = journey.waypoints[i + 1];
+          const points = [
+            new THREE.Vector3(wp.look[0], wp.look[1], wp.look[2]),
+            new THREE.Vector3(next.look[0], next.look[1], next.look[2]),
+          ];
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+          const lineMat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.12 });
+          const line = new THREE.Line(lineGeo, lineMat);
+          group.add(line);
+        }
+      });
+
+      s.scene.add(group);
+      journeyGroupRef.current = group;
+    }
+  }, []);
+
+  const stopJourney = useCallback(() => {
+    setActiveJourney(null);
+    journeyCamRef.current.active = false;
+    // Remove journey markers
+    const s = sceneRef.current;
+    if (s.scene && journeyGroupRef.current) {
+      s.scene.remove(journeyGroupRef.current);
+      journeyGroupRef.current.traverse(c => { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); });
+      journeyGroupRef.current = null;
+    }
+  }, []);
+
+  // Journey timer
+  useEffect(() => {
+    if (!activeJourney) return;
+    const interval = setInterval(() => {
+      setActiveJourney(prev => {
+        if (!prev) return null;
+        const newElapsed = prev.elapsed + 1;
+        let cumulative = 0;
+        let newStep = prev.step;
+        for (let i = 0; i < prev.journey.waypoints.length; i++) {
+          cumulative += prev.journey.waypoints[i].duration;
+          if (newElapsed < cumulative) { newStep = i; break; }
+          if (i === prev.journey.waypoints.length - 1 && newElapsed >= cumulative) {
+            journeyCamRef.current.active = false;
+            // Remove markers
+            const s = sceneRef.current;
+            if (s.scene && journeyGroupRef.current) {
+              s.scene.remove(journeyGroupRef.current);
+              journeyGroupRef.current = null;
+            }
+            return null; // Journey complete
+          }
+        }
+        // Update camera target
+        const wp = prev.journey.waypoints[newStep];
+        journeyCamRef.current.target = new THREE.Vector3(wp.pos[0], wp.pos[1], wp.pos[2]);
+        journeyCamRef.current.lookTarget = new THREE.Vector3(wp.look[0], wp.look[1], wp.look[2]);
+        return { ...prev, step: newStep, elapsed: newElapsed };
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [activeJourney]);
+
   const hoveredData = hoveredPortal ? PORTALS.find(p => p.id === hoveredPortal) : null;
 
   return (
@@ -613,6 +771,12 @@ export default function VirtualReality() {
         </div>
 
         <div className="flex items-center gap-2 pointer-events-auto">
+          <button onClick={() => setShowJourneyPicker(!showJourneyPicker)}
+            className="p-2.5 rounded-xl transition-all"
+            style={{ background: activeJourney ? 'rgba(252,211,77,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${activeJourney ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.06)'}`, color: activeJourney ? '#FCD34D' : 'var(--text-secondary)' }}
+            data-testid="vr-journey-btn">
+            <Compass size={16} />
+          </button>
           <button onClick={toggleAudio}
             className="p-2.5 rounded-xl transition-all"
             style={{ background: ambientAudio ? 'rgba(192,132,252,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${ambientAudio ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)'}`, color: ambientAudio ? '#C084FC' : 'var(--text-secondary)' }}
@@ -669,6 +833,109 @@ export default function VirtualReality() {
               <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{hoveredData.desc}</p>
               <p className="text-[9px] mt-1 uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Click to enter</p>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Constellation Journey Picker */}
+      <AnimatePresence>
+        {showJourneyPicker && !activeJourney && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+            className="absolute top-20 right-4 w-64 z-50 pointer-events-auto"
+            data-testid="vr-journey-picker">
+            <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,20,0.9)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Compass size={12} style={{ color: '#FCD34D' }} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.5)' }}>Star Journeys</span>
+                </div>
+                <button onClick={() => setShowJourneyPicker(false)} className="p-1 rounded hover:bg-white/5">
+                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                </button>
+              </div>
+              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                Guided flights through the cosmos with narrated constellation stories
+              </p>
+              <div className="space-y-2">
+                {JOURNEYS.map(j => (
+                  <button key={j.id} onClick={() => startJourney(j)}
+                    data-testid={`vr-journey-${j.id}`}
+                    className="w-full text-left rounded-lg px-3 py-2.5 transition-all hover:bg-white/5"
+                    style={{ background: 'rgba(248,250,252,0.02)', border: `1px solid rgba(248,250,252,0.04)` }}>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <div className="w-2 h-2 rounded-full" style={{ background: j.color, boxShadow: `0 0 6px ${j.color}80` }} />
+                      <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{j.name}</span>
+                    </div>
+                    <p className="text-[9px] pl-4" style={{ color: 'rgba(248,250,252,0.3)' }}>{j.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Active Journey Narration Overlay */}
+      <AnimatePresence>
+        {activeJourney && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-end justify-center pb-24 pointer-events-none"
+            data-testid="vr-journey-overlay"
+          >
+            {/* Narration text */}
+            <div className="text-center px-8 max-w-2xl">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeJourney.step}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 1.2 }}
+                >
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: activeJourney.journey.color, boxShadow: `0 0 8px ${activeJourney.journey.color}` }} />
+                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: activeJourney.journey.color }}>
+                      {activeJourney.journey.name}
+                    </span>
+                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      {activeJourney.step + 1} / {activeJourney.journey.waypoints.length}
+                    </span>
+                  </div>
+                  <p className="text-lg md:text-xl font-light leading-relaxed"
+                    style={{
+                      color: 'rgba(248,250,252,0.85)',
+                      fontFamily: 'Cormorant Garamond, serif',
+                      textShadow: `0 0 30px ${activeJourney.journey.color}40`,
+                    }}>
+                    {activeJourney.journey.waypoints[activeJourney.step]?.text}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Progress bar */}
+              <div className="mt-6 w-48 mx-auto">
+                <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: `${activeJourney.journey.color}80`, width: `${(activeJourney.elapsed / activeJourney.total) * 100}%` }}
+                  />
+                </div>
+                <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  {Math.floor((activeJourney.total - activeJourney.elapsed) / 60)}:{String((activeJourney.total - activeJourney.elapsed) % 60).padStart(2, '0')} remaining
+                </p>
+              </div>
+            </div>
+
+            {/* End journey button */}
+            <button onClick={stopJourney}
+              className="absolute top-20 right-4 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto"
+              style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${activeJourney.journey.color}20`, color: activeJourney.journey.color }}
+              data-testid="vr-journey-close">
+              End Journey
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

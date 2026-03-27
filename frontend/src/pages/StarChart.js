@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -303,7 +303,7 @@ function createMythologyTexture(constellationId, color, size = 256) {
   return tex;
 }
 
-function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled }) {
+function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled, cultureData }) {
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
@@ -319,8 +319,142 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
   const onJourneyArrivedRef = useRef(onJourneyArrived);
   const gyroEnabledRef = useRef(gyroEnabled);
   const gyroOffset = useRef({ alpha: null, beta: null });
+  const cultureGroupRef = useRef(null);
+  const cultureLabelSprites = useRef([]);
+  const cultureDataRef = useRef(cultureData);
 
   useEffect(() => { gyroEnabledRef.current = gyroEnabled; }, [gyroEnabled]);
+
+  useEffect(() => { cultureDataRef.current = cultureData; }, [cultureData]);
+
+  // Cultural overlay management — add/remove lines when cultureData changes
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    // Remove existing cultural overlays
+    if (cultureGroupRef.current) {
+      scene.remove(cultureGroupRef.current);
+      cultureGroupRef.current.traverse(child => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (child.material.map) child.material.map.dispose();
+          child.material.dispose();
+        }
+      });
+      cultureGroupRef.current = null;
+    }
+    cultureLabelSprites.current = [];
+
+    if (!cultureData || !cultureData.constellations) return;
+
+    const group = new THREE.Group();
+    group.userData.isCultureOverlay = true;
+    const cColor = cultureData.color || '#FFFFFF';
+    const hexColor = new THREE.Color(cColor).getHex();
+    const labelSprites = [];
+
+    cultureData.constellations.forEach(c => {
+      // Draw constellation lines between stars
+      if (c.lines && c.stars) {
+        c.lines.forEach(([fromIdx, toIdx]) => {
+          if (fromIdx >= c.stars.length || toIdx >= c.stars.length) return;
+          const from = raDecToXYZ(c.stars[fromIdx].ra, c.stars[fromIdx].dec);
+          const to = raDecToXYZ(c.stars[toIdx].ra, c.stars[toIdx].dec);
+          const n = 40;
+          const positions = new Float32Array(n * 3);
+          for (let k = 0; k < n; k++) {
+            const t = k / (n - 1);
+            positions[k * 3] = from.x + (to.x - from.x) * t;
+            positions[k * 3 + 1] = from.y + (to.y - from.y) * t;
+            positions[k * 3 + 2] = from.z + (to.z - from.z) * t;
+          }
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          // Bright cultural line
+          const mat = new THREE.LineBasicMaterial({ color: hexColor, transparent: true, opacity: 0.7, linewidth: 1 });
+          const line = new THREE.Line(geo, mat);
+          group.add(line);
+          // Glow line
+          const glowMat = new THREE.LineBasicMaterial({ color: hexColor, transparent: true, opacity: 0.25, linewidth: 1 });
+          const glowLine = new THREE.Line(geo.clone(), glowMat);
+          group.add(glowLine);
+        });
+      }
+
+      // Cultural mythology figure sprite (using paths from cultural data)
+      if (c.paths) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256; canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        const cx = 128, cy = 128, scale = 256 / 5;
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        c.paths.forEach(path => {
+          if (path.length < 2) return;
+          ctx.save();
+          ctx.shadowColor = cColor; ctx.shadowBlur = 10;
+          ctx.strokeStyle = cColor + '50'; ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(cx + path[0][0] * scale, cy - path[0][1] * scale);
+          for (let i = 1; i < path.length; i++) ctx.lineTo(cx + path[i][0] * scale, cy - path[i][1] * scale);
+          ctx.stroke(); ctx.restore();
+          ctx.save();
+          ctx.shadowColor = cColor; ctx.shadowBlur = 5;
+          ctx.strokeStyle = cColor + '80'; ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx + path[0][0] * scale, cy - path[0][1] * scale);
+          for (let i = 1; i < path.length; i++) ctx.lineTo(cx + path[i][0] * scale, cy - path[i][1] * scale);
+          ctx.stroke(); ctx.restore();
+        });
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+        const spMat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false });
+        const sp = new THREE.Sprite(spMat);
+        const center = raDecToXYZ(c.ra, c.dec, 49);
+        sp.position.copy(center);
+        sp.scale.set(12, 12, 1);
+        group.add(sp);
+      }
+
+      // Name label sprite
+      const labelCanvas = document.createElement('canvas');
+      labelCanvas.width = 256; labelCanvas.height = 64;
+      const lctx = labelCanvas.getContext('2d');
+      lctx.fillStyle = cColor;
+      lctx.font = 'bold 18px Arial';
+      lctx.textAlign = 'center';
+      lctx.textBaseline = 'middle';
+      lctx.shadowColor = cColor; lctx.shadowBlur = 8;
+      lctx.fillText(c.name, 128, 32);
+      const labelTex = new THREE.CanvasTexture(labelCanvas);
+      labelTex.needsUpdate = true;
+      const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, opacity: 0.8, depthWrite: false });
+      const labelSp = new THREE.Sprite(labelMat);
+      const labelPos = raDecToXYZ(c.ra, c.dec, 46);
+      labelSp.position.copy(labelPos);
+      labelSp.scale.set(8, 2, 1);
+      group.add(labelSp);
+      labelSprites.push(labelSp);
+
+      // Highlight stars with cultural color ring
+      if (c.stars) {
+        c.stars.forEach(s => {
+          const pos = raDecToXYZ(s.ra, s.dec);
+          const ring = new THREE.Mesh(
+            new THREE.RingGeometry(0.6, 0.9, 16),
+            new THREE.MeshBasicMaterial({ color: hexColor, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
+          );
+          ring.position.copy(pos);
+          ring.lookAt(0, 0, 0);
+          group.add(ring);
+        });
+      }
+    });
+
+    scene.add(group);
+    cultureGroupRef.current = group;
+    cultureLabelSprites.current = labelSprites;
+  }, [cultureData]);
 
   useEffect(() => { mythModeRef.current = mythologyMode; }, [mythologyMode]);
   useEffect(() => { onJourneyArrivedRef.current = onJourneyArrived; }, [onJourneyArrived]);
@@ -1312,6 +1446,13 @@ export default function StarChart() {
   const journeyAmbient = useCosmicAmbient();
   const journeyPausedRef = useRef(false);
 
+  // Multi-cultural sky state
+  const [cultures, setCultures] = useState([]);
+  const [activeCulture, setActiveCulture] = useState(null);
+  const [cultureData, setCultureData] = useState(null);
+  const [showCulturePicker, setShowCulturePicker] = useState(false);
+  const [cultureLoading, setCultureLoading] = useState(false);
+
   useEffect(() => { journeyPausedRef.current = journeyPaused; }, [journeyPaused]);
 
   const toggleGyro = useCallback(async () => {
@@ -1347,6 +1488,31 @@ export default function StarChart() {
       );
     } else { fetchChart(40.7, -74.0); }
   }, [token]);
+
+  // Fetch available cultures
+  useEffect(() => {
+    axios.get(`${API}/star-chart/cultures`).then(r => setCultures(r.data.cultures || [])).catch(() => {});
+  }, []);
+
+  // Fetch culture constellation data when a culture is selected
+  const selectCulture = useCallback(async (cultureId) => {
+    if (activeCulture === cultureId) {
+      setActiveCulture(null);
+      setCultureData(null);
+      setShowCulturePicker(false);
+      return;
+    }
+    setCultureLoading(true);
+    try {
+      const r = await axios.get(`${API}/star-chart/cultures/${cultureId}`);
+      setActiveCulture(cultureId);
+      setCultureData(r.data);
+      setShowCulturePicker(false);
+    } catch {
+      toast.error('Failed to load cultural sky data');
+    }
+    setCultureLoading(false);
+  }, [activeCulture]);
 
   const handleSelect = useCallback((c) => {
     setSelected(c);
@@ -1523,6 +1689,18 @@ export default function StarChart() {
               }}>
               <Star size={10} /> Badges
             </button>
+            {/* Multi-Cultural Sky toggle */}
+            <button onClick={() => setShowCulturePicker(!showCulturePicker)} data-testid="culture-toggle"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              style={{
+                background: activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}18` : 'rgba(8,10,18,0.8)',
+                border: `1px solid ${activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}40` : 'rgba(248,250,252,0.06)'}`,
+                color: activeCulture ? (cultures.find(c => c.id === activeCulture)?.color || '#818CF8') : 'rgba(248,250,252,0.5)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: activeCulture ? `0 0 15px ${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}15` : 'none',
+              }}>
+              <Globe size={10} /> {activeCulture ? cultures.find(c => c.id === activeCulture)?.name || 'Culture' : 'World Skies'}
+            </button>
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]"
               style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'blur(12px)' }}>
@@ -1565,6 +1743,64 @@ export default function StarChart() {
         )}
       </AnimatePresence>
 
+      {/* Multi-Cultural Sky Picker */}
+      <AnimatePresence>
+        {showCulturePicker && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="absolute top-28 right-4 z-20 w-72 rounded-2xl p-4" data-testid="culture-picker"
+            style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'blur(24px)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Globe size={12} style={{ color: '#818CF8' }} />
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.5)' }}>World Sky Views</p>
+              </div>
+              <button onClick={() => setShowCulturePicker(false)} className="p-1 rounded hover:bg-white/5">
+                <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+              </button>
+            </div>
+            <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              Explore how different civilizations mapped the same stars into their own mythologies
+            </p>
+            {cultureLoading && (
+              <div className="flex justify-center py-3">
+                <Loader2 className="animate-spin" size={16} style={{ color: '#818CF8' }} />
+              </div>
+            )}
+            <div className="space-y-1.5">
+              {/* Clear selection option */}
+              {activeCulture && (
+                <button onClick={() => { setActiveCulture(null); setCultureData(null); setShowCulturePicker(false); }}
+                  data-testid="culture-clear"
+                  className="w-full text-left rounded-xl px-3 py-2.5 text-[10px] transition-all"
+                  style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}>
+                  Show Western (Default)
+                </button>
+              )}
+              {cultures.map(c => {
+                const isActive = activeCulture === c.id;
+                return (
+                  <button key={c.id} onClick={() => selectCulture(c.id)}
+                    data-testid={`culture-${c.id}`}
+                    className="w-full text-left rounded-xl px-3 py-2.5 transition-all"
+                    style={{
+                      background: isActive ? `${c.color}12` : 'rgba(248,250,252,0.02)',
+                      border: `1px solid ${isActive ? `${c.color}35` : 'rgba(248,250,252,0.04)'}`,
+                      boxShadow: isActive ? `0 0 12px ${c.color}10` : 'none',
+                    }}>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <div className="w-2 h-2 rounded-full" style={{ background: c.color, boxShadow: `0 0 6px ${c.color}80` }} />
+                      <span className="text-[11px] font-semibold" style={{ color: isActive ? c.color : 'rgba(248,250,252,0.7)' }}>{c.name}</span>
+                      <span className="text-[9px] ml-auto" style={{ color: 'rgba(248,250,252,0.2)' }}>{c.constellation_count} patterns</span>
+                    </div>
+                    <p className="text-[9px] pl-4 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>{c.description?.substring(0, 80)}...</p>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Element Legend */}
       {data && (
         <div className="absolute bottom-4 left-4 z-10 flex flex-wrap gap-2 pointer-events-none">
@@ -1578,6 +1814,12 @@ export default function StarChart() {
             <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
               style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(216,180,254,0.2)', color: '#D8B4FE', backdropFilter: 'blur(8px)' }}>
               <div className="w-2 h-2 rounded-full" style={{ background: '#D8B4FE', boxShadow: '0 0 6px rgba(216,180,254,0.8)' }} /> Your Constellation
+            </div>
+          )}
+          {activeCulture && cultureData && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
+              style={{ background: 'rgba(8,10,18,0.8)', border: `1px solid ${cultureData.color}25`, color: cultureData.color, backdropFilter: 'blur(8px)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: cultureData.color, boxShadow: `0 0 6px ${cultureData.color}80` }} /> {cultureData.name}
             </div>
           )}
         </div>
@@ -1619,6 +1861,20 @@ export default function StarChart() {
         )}
       </AnimatePresence>
 
+      {/* Cultural Sky Overlay indicator */}
+      <AnimatePresence>
+        {activeCulture && cultureData && !journeyActive && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-xl text-center pointer-events-none"
+            data-testid="culture-overlay-indicator"
+            style={{ background: 'rgba(8,10,18,0.85)', border: `1px solid ${cultureData.color}25`, backdropFilter: 'blur(12px)' }}>
+            <p className="text-[10px] flex items-center gap-1.5" style={{ color: cultureData.color }}>
+              <Globe size={10} /> {cultureData.name} — {cultureData.constellations?.length} cultural constellation patterns overlaid
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Journey Overlay */}
       <AnimatePresence>
         {journeyActive && data && (
@@ -1653,7 +1909,7 @@ export default function StarChart() {
             </div>
           </div>
         ) : data ? (
-          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} />
+          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} cultureData={cultureData} />
         ) : null}
       </div>
     </div>

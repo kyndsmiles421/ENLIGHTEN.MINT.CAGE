@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Sparkles, Trash2, Clock, Zap, Heart, ArrowLeft } from 'lucide-react';
+import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Sparkles, Trash2, Clock, Zap, Heart, ArrowLeft, Share2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -23,11 +23,22 @@ const ENERGY_LABELS = {
   transformative: { color: '#C084FC', label: 'Transformative' },
 };
 
-function ForecastCard({ forecast, onDelete }) {
+function ForecastCard({ forecast, onDelete, onShare }) {
   const [expanded, setExpanded] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shared, setShared] = useState(false);
   const fc = forecast.forecast;
   const color = forecast.system_color || '#C084FC';
   const Icon = SYSTEM_ICONS[Object.values(SYSTEM_ICONS).find(i => i) ? 'star' : 'star'] || Star;
+
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    if (sharing || shared) return;
+    setSharing(true);
+    const success = await onShare(forecast);
+    setSharing(false);
+    if (success) setShared(true);
+  };
 
   return (
     <motion.div
@@ -57,6 +68,18 @@ function ForecastCard({ forecast, onDelete }) {
                 <span className="text-[10px] font-medium" style={{ color }}>{fc.overall_energy}/10</span>
               </div>
             )}
+            {/* Share button */}
+            <button onClick={handleShare} disabled={sharing || shared}
+              data-testid={`share-forecast-${forecast.id}`}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] transition-all opacity-0 group-hover:opacity-100"
+              style={{
+                background: shared ? 'rgba(34,197,94,0.1)' : `${color}08`,
+                border: `1px solid ${shared ? 'rgba(34,197,94,0.2)' : `${color}15`}`,
+                color: shared ? '#22C55E' : color,
+              }}>
+              {sharing ? <Loader2 size={10} className="animate-spin" /> : shared ? <Check size={10} /> : <Share2 size={10} />}
+              {shared ? 'Shared' : 'Share'}
+            </button>
             <button onClick={(e) => { e.stopPropagation(); onDelete(forecast.id); }}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
               data-testid={`delete-forecast-${forecast.id}`}>
@@ -187,6 +210,30 @@ export default function Forecasts() {
     } catch {}
   };
 
+  const shareForecast = async (forecast) => {
+    try {
+      const fc = forecast.forecast;
+      const periodLabel = PERIOD_LABELS[forecast.period]?.label || forecast.period;
+      const content = `${fc?.title || forecast.system_name}\n\n${fc?.summary || ''}\n\n${fc?.affirmation ? `"${fc.affirmation}"` : ''}`;
+
+      await axios.post(`${API}/community/posts`, {
+        post_type: 'forecast',
+        content: content.trim(),
+        ritual_data: {
+          system: forecast.system_name,
+          period: periodLabel,
+          energy: fc?.overall_energy,
+          system_color: forecast.system_color,
+        },
+      }, { headers: authHeaders });
+      toast.success(`${periodLabel} forecast shared to community`);
+      return true;
+    } catch {
+      toast.error('Failed to share forecast');
+      return false;
+    }
+  };
+
   // Filter history by current system
   const filteredHistory = history.filter(h => h.system === selectedSystem);
 
@@ -288,7 +335,7 @@ export default function Forecasts() {
         {/* Active Forecast */}
         {activeForecast && (
           <div className="mb-8">
-            <ForecastCard forecast={activeForecast} onDelete={deleteForecast} />
+            <ForecastCard forecast={activeForecast} onDelete={deleteForecast} onShare={shareForecast} />
           </div>
         )}
 
@@ -303,7 +350,7 @@ export default function Forecasts() {
             </div>
             <div className="space-y-3">
               {filteredHistory.filter(h => h.id !== activeForecast?.id).slice(0, 10).map((f, i) => (
-                <ForecastCard key={f.id} forecast={f} onDelete={deleteForecast} />
+                <ForecastCard key={f.id} forecast={f} onDelete={deleteForecast} onShare={shareForecast} />
               ))}
             </div>
           </div>
