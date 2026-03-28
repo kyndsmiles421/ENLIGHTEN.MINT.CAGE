@@ -26,13 +26,13 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 14. "Begin Journey" / "Continue Journey" smart landing buttons
 15. Light mode full text readability polish
 16. Performance optimization — instant page nav, 30fps background
-17. **Music Lounge** — 10 ambient/piano/cosmic/nature/uplifting tracks with Web Audio API synth, category filters, shuffle/radio mode, now-playing bar, volume control, favorites
-18. **Quick Reset Mantras** — Protective and uplifting mantras with tradition labels
-19. **Send a Blessing** community feed
-20. **Cosmic Mixer** floating widget (frequencies, ambient sounds, mantras, light therapy, vibration)
-21. **Share Button** in Navigation and Landing page
-22. **Natural TTS Mantras** — Replaced browser SpeechSynthesis with OpenAI TTS (shimmer voice, 0.8x speed) across Cosmic Mixer and Landing page MantraCard for warm, human-sounding mantra audio
-23. **Star Chart Mobile Fix** — Culture selection buttons now accessible on mobile via scrollable toolbar with World Skies as first button
+17. Music Lounge — 10 ambient tracks with Web Audio API
+18. Quick Reset Mantras with Natural TTS (shimmer voice)
+19. Send a Blessing community feed
+20. Cosmic Mixer floating widget (frequencies, ambient, mantras, light, vibration)
+21. Share Button in Navigation and Landing page
+22. **Akashic Records** (/akashic-records) — Guided meditative AI session under Divination. 6 gateway prompts (Soul Purpose, Past Lives, Karmic Patterns, Soul Relationships, Soul Healing, Soul Gifts). Multi-turn conversation with Akashic Records Keeper persona via GPT-4o. Session history saved to MongoDB.
+23. **Sacred Encyclopedia** (/encyclopedia) — 12 world spiritual traditions under Explore (Hinduism, Buddhism, Taoism, Sufism, Kabbalah, Indigenous/Shamanic, Mystical Christianity, Ancient Egyptian, Greek Philosophy, Zen, Yoga & Tantra, African). Each has key concepts, sacred texts, notable figures, practices. AI-powered "Ask Deeper" exploration on any element. Custom question box per tradition.
 
 ## Critical Config
 - Admin: /admin-setup, password=cosmic-creator-2026
@@ -41,6 +41,14 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - AI: Emergent LLM Key
 - Language: English only (translation toggle removed)
 - Performance: framer-motion page transitions removed (do not re-add)
+
+## Key API Endpoints
+- /api/akashic/prompts (GET, no auth)
+- /api/akashic/sessions (GET/POST, auth)
+- /api/akashic/chat (POST, auth)
+- /api/encyclopedia/traditions (GET, no auth)
+- /api/encyclopedia/traditions/{id} (GET, no auth)
+- /api/encyclopedia/explore (POST, auth — AI deep dive)
 
 ## Backlog
 - P2: Refactor star_cultures.py (move coords to JSON/MongoDB)
