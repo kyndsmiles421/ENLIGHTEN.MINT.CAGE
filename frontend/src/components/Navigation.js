@@ -50,6 +50,7 @@ const NAV_CATEGORIES = [
     id: 'divination', label: 'Divination', icon: Eye, color: '#E879F9',
     items: [
       { path: '/oracle', label: 'Oracle', icon: Sparkles },
+      { path: '/akashic-records', label: 'Akashic Records', icon: BookOpen },
       { path: '/star-chart', label: 'Star Chart', icon: Star },
       { path: '/forecasts', label: 'Forecasts', icon: Eye },
       { path: '/numerology', label: 'Numerology', icon: Star },
@@ -88,6 +89,7 @@ const NAV_CATEGORIES = [
   {
     id: 'explore', label: 'Explore', icon: Compass, color: '#FB923C',
     items: [
+      { path: '/encyclopedia', label: 'Sacred Encyclopedia', icon: Globe },
       { path: '/creation-stories', label: 'Creation Stories', icon: Globe },
       { path: '/teachings', label: 'Teachings', icon: BookOpen },
       { path: '/learn', label: 'Learn', icon: GraduationCap },

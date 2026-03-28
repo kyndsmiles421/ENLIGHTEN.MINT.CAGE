@@ -88,6 +88,8 @@ const Crystals = lazy(() => import('./pages/Crystals'));
 const Entanglement = lazy(() => import('./pages/Entanglement'));
 const MusicLounge = lazy(() => import('./pages/MusicLounge'));
 const Blessings = lazy(() => import('./pages/Blessings'));
+const AkashicRecords = lazy(() => import('./pages/AkashicRecords'));
+const Encyclopedia = lazy(() => import('./pages/Encyclopedia'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -180,6 +182,8 @@ function AnimatedRoutes() {
         <Route path="/entanglement" element={<Entanglement />} />
         <Route path="/music-lounge" element={<MusicLounge />} />
         <Route path="/blessings" element={<Blessings />} />
+        <Route path="/akashic-records" element={<AkashicRecords />} />
+        <Route path="/encyclopedia" element={<Encyclopedia />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
