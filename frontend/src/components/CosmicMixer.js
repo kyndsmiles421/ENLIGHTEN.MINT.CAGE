@@ -486,11 +486,31 @@ function LightOverlay({ mode }) {
 
   const currentColor = mode.colors[colorIdx];
   const nextColor = mode.colors[(colorIdx + 1) % mode.colors.length];
+  const prevColor = mode.colors[(colorIdx - 1 + mode.colors.length) % mode.colors.length];
 
   return (
-    <div className="w-full h-full" style={{
-      background: `radial-gradient(ellipse 80% 60% at 50% 40%, ${currentColor}18 0%, ${nextColor}08 50%, transparent 80%)`,
-      transition: `background ${mode.speed / 1000}s ease-in-out`,
-    }} />
+    <div className="w-full h-full" style={{ position: 'relative' }}>
+      {/* Primary radial glow — strong center */}
+      <div className="absolute inset-0" style={{
+        background: `radial-gradient(ellipse 90% 70% at 50% 40%, ${currentColor}55 0%, ${nextColor}30 40%, transparent 75%)`,
+        transition: `background ${mode.speed / 1000}s ease-in-out`,
+      }} />
+      {/* Secondary ambient wash — fills edges */}
+      <div className="absolute inset-0" style={{
+        background: `linear-gradient(135deg, ${prevColor}20 0%, transparent 40%, ${currentColor}25 70%, ${nextColor}15 100%)`,
+        transition: `background ${mode.speed / 1200}s ease-in-out`,
+      }} />
+      {/* Soft breathing pulse */}
+      <div className="absolute inset-0" style={{
+        background: `radial-gradient(circle at 50% 50%, ${currentColor}35 0%, transparent 60%)`,
+        animation: `lightPulse ${mode.speed / 1000 * 1.5}s ease-in-out infinite alternate`,
+      }} />
+      <style>{`
+        @keyframes lightPulse {
+          0% { opacity: 0.4; transform: scale(0.95); }
+          100% { opacity: 1; transform: scale(1.05); }
+        }
+      `}</style>
+    </div>
   );
 }
