@@ -8,7 +8,7 @@ import {
   Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2, VolumeX,
   Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X,
   Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2,
-  Eye, Star, Compass, Droplets, MessageCircle, Orbit
+  Eye, Star, Compass, Droplets, MessageCircle, Orbit, Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShareButton from '../components/ShareButton';
@@ -177,24 +177,36 @@ function PillarCard({ pillar, index }) {
   );
 }
 
-/* ─── Mantra Card with TTS ─── */
+/* ─── Mantra Card with Natural TTS ─── */
 function MantraCard({ mantra, accentColor }) {
   const [speaking, setSpeaking] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const audioRef = useRef(null);
 
-  const speakMantra = () => {
+  const speakMantra = async () => {
     if (speaking) {
-      window.speechSynthesis.cancel();
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
       setSpeaking(false);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(mantra.text);
-    utterance.rate = 0.8;
-    utterance.pitch = 0.9;
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, voice: 'shimmer', speed: 0.8 });
+      const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
+      audio.volume = 0.8;
+      audio.onended = () => { setSpeaking(false); audioRef.current = null; };
+      audio.onerror = () => { setSpeaking(false); audioRef.current = null; };
+      audioRef.current = audio;
+      setSpeaking(true);
+      setLoading(false);
+      audio.play().catch(() => { setSpeaking(false); });
+    } catch {
+      setLoading(false);
+      setSpeaking(false);
+    }
   };
+
+  useEffect(() => () => { if (audioRef.current) audioRef.current.pause(); }, []);
 
   return (
     <div className="glass-card p-4 relative overflow-hidden" data-testid="reset-mantra">
@@ -219,15 +231,17 @@ function MantraCard({ mantra, accentColor }) {
             "{mantra.text}"
           </p>
           <button onClick={speakMantra}
+            disabled={loading}
             className="mt-2 flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-full transition-all hover:scale-[1.02]"
             style={{
               background: speaking ? `${accentColor}15` : 'var(--text-muted)08',
               color: speaking ? accentColor : 'var(--text-muted)',
               border: `1px solid ${speaking ? `${accentColor}30` : 'var(--text-muted)15'}`,
+              opacity: loading ? 0.6 : 1,
             }}
             data-testid="mantra-speak-btn">
-            {speaking ? <VolumeX size={12} /> : <Volume2 size={12} />}
-            {speaking ? 'Stop' : 'Hear Mantra'}
+            {loading ? <Loader2 size={12} className="animate-spin" /> : speaking ? <VolumeX size={12} /> : <Volume2 size={12} />}
+            {loading ? 'Loading...' : speaking ? 'Stop' : 'Hear Mantra'}
           </button>
         </div>
       </div>

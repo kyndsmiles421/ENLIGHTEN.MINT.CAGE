@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Play, Pause, Square } from 'lucide-react';
+import { ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Play, Pause, Square, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /* ─── Layer Definitions ─── */
 const FREQUENCIES = [
@@ -118,8 +121,10 @@ export default function CosmicMixer() {
   const freqNodesRef = useRef([]);
   const soundNodesRef = useRef([]);
   const mantraIntervalRef = useRef(null);
+  const mantraAudioRef = useRef(null);
   const vibeIntervalRef = useRef(null);
   const lightIdxRef = useRef(0);
+  const [mantraLoading, setMantraLoading] = useState(false);
 
   const getCtx = useCallback(async () => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
@@ -170,19 +175,34 @@ export default function CosmicMixer() {
     setActiveSound(sound);
   }, [activeSound, getCtx]);
 
-  // ─── Mantra Layer ───
-  const toggleMantra = useCallback((mantra) => {
+  // ─── Mantra Layer (OpenAI TTS — natural human voice) ───
+  const toggleMantra = useCallback(async (mantra) => {
     if (mantraIntervalRef.current) { clearInterval(mantraIntervalRef.current); mantraIntervalRef.current = null; }
-    window.speechSynthesis.cancel();
+    if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
     if (activeMantra?.id === mantra.id) { setActiveMantra(null); return; }
-    const speak = () => {
-      const u = new SpeechSynthesisUtterance(mantra.text);
-      u.rate = 0.7; u.pitch = 0.85;
-      window.speechSynthesis.speak(u);
-    };
-    speak();
-    mantraIntervalRef.current = setInterval(speak, 8000);
     setActiveMantra(mantra);
+    setMantraLoading(true);
+    try {
+      const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, voice: 'shimmer', speed: 0.8 });
+      const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
+      audio.volume = 0.7;
+      mantraAudioRef.current = audio;
+      const playLoop = () => {
+        if (!mantraAudioRef.current) return;
+        const a = mantraAudioRef.current.cloneNode();
+        a.volume = 0.7;
+        mantraAudioRef.current = a;
+        a.onended = () => {};
+        a.play().catch(() => {});
+      };
+      audio.onended = () => {};
+      audio.play().catch(() => {});
+      mantraIntervalRef.current = setInterval(playLoop, 10000);
+      setMantraLoading(false);
+    } catch {
+      setMantraLoading(false);
+      setActiveMantra(null);
+    }
   }, [activeMantra]);
 
   // ─── Vibration Layer ───
@@ -223,7 +243,7 @@ export default function CosmicMixer() {
     stopNodes(freqNodesRef);
     stopNodes(soundNodesRef);
     if (mantraIntervalRef.current) clearInterval(mantraIntervalRef.current);
-    window.speechSynthesis.cancel();
+    if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
     if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
     try { navigator.vibrate(0); } catch {}
     setActiveFreq(null); setActiveSound(null); setActiveMantra(null);
@@ -372,17 +392,21 @@ export default function CosmicMixer() {
                 <div className="flex flex-wrap gap-1.5">
                   {MANTRAS.map(m => (
                     <button key={m.id} onClick={() => toggleMantra(m)}
-                      className="text-[10px] px-2.5 py-1.5 rounded-full transition-all"
+                      disabled={mantraLoading && activeMantra?.id !== m.id}
+                      className="text-[10px] px-2.5 py-1.5 rounded-full transition-all flex items-center gap-1"
                       style={{
                         background: activeMantra?.id === m.id ? `${m.color}20` : 'rgba(255,255,255,0.03)',
                         color: activeMantra?.id === m.id ? m.color : 'var(--text-muted)',
                         border: `1px solid ${activeMantra?.id === m.id ? `${m.color}40` : 'rgba(255,255,255,0.05)'}`,
+                        opacity: mantraLoading && activeMantra?.id !== m.id ? 0.5 : 1,
                       }}
                       data-testid={`mixer-mantra-${m.id}`}>
+                      {mantraLoading && activeMantra?.id === m.id && <Loader2 size={8} className="animate-spin" />}
                       {m.label}
                     </button>
                   ))}
                 </div>
+                {activeMantra && <p className="text-[9px] mt-1.5" style={{ color: 'rgba(255,255,255,0.25)' }}>{activeMantra.tradition} tradition</p>}
               </LayerSection>
 
               {/* Light Therapy Layer */}

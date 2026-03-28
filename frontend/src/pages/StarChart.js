@@ -1023,38 +1023,46 @@ export default function StarChart() {
   return (
     <div className="min-h-screen pt-16 relative overflow-hidden" data-testid="star-chart-page">
       {/* Header */}
-      <div className="absolute top-16 left-0 right-0 z-10 px-4 py-4 pointer-events-none">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>
-              <Star size={16} style={{ color: '#818CF8' }} /> Constellation Chart
-            </h1>
-            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars | Gyro for AR mode</p>
+      <div className="absolute top-16 left-0 right-0 z-10 px-4 py-3 pointer-events-none">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>
+                <Star size={16} style={{ color: '#818CF8' }} /> Constellation Chart
+              </h1>
+              <p className="text-[10px] hidden sm:block" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars | Gyro for AR mode</p>
+            </div>
+            {data && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto flex-shrink-0"
+                style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8', backdropFilter: 'blur(12px)' }}>
+                <Eye size={10} /> {data.constellations?.length} visible
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2 pointer-events-auto">
+          <div className="flex items-center gap-2 pointer-events-auto overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
+            {/* Multi-Cultural Sky toggle — prominent position */}
+            <button onClick={() => setShowCulturePicker(!showCulturePicker)} data-testid="culture-toggle"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
+              style={{
+                background: activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}18` : 'rgba(8,10,18,0.8)',
+                border: `1px solid ${activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}40` : 'rgba(248,250,252,0.06)'}`,
+                color: activeCulture ? (cultures.find(c => c.id === activeCulture)?.color || '#818CF8') : 'rgba(248,250,252,0.5)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: activeCulture ? `0 0 15px ${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}15` : 'none',
+              }}>
+              <Globe size={10} /> {activeCulture ? cultures.find(c => c.id === activeCulture)?.name || 'Culture' : 'World Skies'}
+            </button>
             {/* Stargazing Journey button */}
             {data && !journeyActive && (
               <button onClick={startJourney} data-testid="journey-start-btn"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
                 style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.12), rgba(192,132,252,0.12))', border: '1px solid rgba(167,139,250,0.3)', color: '#C084FC', backdropFilter: 'blur(12px)', boxShadow: '0 0 15px rgba(192,132,252,0.1)' }}>
                 <Compass size={10} /> Stargazing Journey
               </button>
             )}
-            {/* Gyroscope toggle */}
-            <button onClick={toggleGyro} data-testid="gyro-toggle"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
-              style={{
-                background: gyroEnabled ? 'rgba(45,212,191,0.15)' : 'rgba(8,10,18,0.8)',
-                border: `1px solid ${gyroEnabled ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
-                color: gyroEnabled ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
-                backdropFilter: 'blur(12px)',
-                boxShadow: gyroEnabled ? '0 0 20px rgba(45,212,191,0.15)' : 'none',
-              }}>
-              <Smartphone size={10} /> {gyroEnabled ? 'Gyro On' : 'Gyro'}
-            </button>
             {/* Mythology Mode toggle */}
             <button onClick={() => setMythologyMode(!mythologyMode)} data-testid="mythology-toggle"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
                 background: mythologyMode ? 'rgba(167,139,250,0.15)' : 'rgba(8,10,18,0.8)',
                 border: `1px solid ${mythologyMode ? 'rgba(167,139,250,0.4)' : 'rgba(248,250,252,0.06)'}`,
@@ -1065,7 +1073,7 @@ export default function StarChart() {
               <Scroll size={10} /> {mythologyMode ? 'Mythology On' : 'Mythology'}
             </button>
             <button onClick={() => setShowBadges(!showBadges)} data-testid="badges-toggle"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
                 background: showBadges ? 'rgba(192,132,252,0.15)' : 'rgba(8,10,18,0.8)',
                 border: `1px solid ${showBadges ? 'rgba(192,132,252,0.4)' : 'rgba(248,250,252,0.06)'}`,
@@ -1074,29 +1082,23 @@ export default function StarChart() {
               }}>
               <Star size={10} /> Badges
             </button>
-            {/* Multi-Cultural Sky toggle */}
-            <button onClick={() => setShowCulturePicker(!showCulturePicker)} data-testid="culture-toggle"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
-              style={{
-                background: activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}18` : 'rgba(8,10,18,0.8)',
-                border: `1px solid ${activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}40` : 'rgba(248,250,252,0.06)'}`,
-                color: activeCulture ? (cultures.find(c => c.id === activeCulture)?.color || '#818CF8') : 'rgba(248,250,252,0.5)',
-                backdropFilter: 'blur(12px)',
-                boxShadow: activeCulture ? `0 0 15px ${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}15` : 'none',
-              }}>
-              <Globe size={10} /> {activeCulture ? cultures.find(c => c.id === activeCulture)?.name || 'Culture' : 'World Skies'}
-            </button>
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 whitespace-nowrap"
               style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'blur(12px)' }}>
               <MapPin size={10} /> {locationName}
             </button>
-            {data && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]"
-                style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8', backdropFilter: 'blur(12px)' }}>
-                <Eye size={10} /> {data.constellations?.length} visible
-              </div>
-            )}
+            {/* Gyroscope toggle */}
+            <button onClick={toggleGyro} data-testid="gyro-toggle"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
+              style={{
+                background: gyroEnabled ? 'rgba(45,212,191,0.15)' : 'rgba(8,10,18,0.8)',
+                border: `1px solid ${gyroEnabled ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
+                color: gyroEnabled ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: gyroEnabled ? '0 0 20px rgba(45,212,191,0.15)' : 'none',
+              }}>
+              <Smartphone size={10} /> {gyroEnabled ? 'Gyro On' : 'Gyro'}
+            </button>
           </div>
         </div>
       </div>
