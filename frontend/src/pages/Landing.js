@@ -42,9 +42,9 @@ const CATEGORY_PILLARS = [
     path: '/oracle',
     highlights: [
       { label: 'Oracle & Tarot', path: '/oracle' },
+      { label: 'Akashic Records', path: '/akashic-records' },
       { label: 'Star Chart', path: '/star-chart' },
       { label: 'Numerology', path: '/numerology' },
-      { label: 'Forecasts', path: '/forecasts' },
       { label: 'Dream Journal', path: '/dreams' },
       { label: 'Mayan Astrology', path: '/mayan' },
     ],
@@ -89,12 +89,12 @@ const CATEGORY_PILLARS = [
     color: '#FB923C',
     path: '/journey',
     highlights: [
+      { label: 'Sacred Encyclopedia', path: '/encyclopedia' },
+      { label: 'Reading List', path: '/reading-list' },
       { label: 'Creation Stories', path: '/creation-stories' },
       { label: 'Teachings', path: '/teachings' },
-      { label: 'Games', path: '/games' },
       { label: 'Community', path: '/community' },
       { label: 'Blessings', path: '/blessings' },
-      { label: 'Videos', path: '/videos' },
     ],
   },
   {
