@@ -249,6 +249,163 @@ function MantraCard({ mantra, accentColor }) {
   );
 }
 
+/* ─── Personalized Dashboard (for logged-in returning users) ─── */
+function PersonalizedDashboard({ user, onQuickReset }) {
+  const navigate = useNavigate();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API}/dashboard/personalized`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => setData(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  if (loading || !data) return null;
+
+  const { greeting, wisdom, continue_items, new_for_you, progress, featured_tradition } = data;
+
+  return (
+    <div className="relative z-10 px-6 md:px-12 lg:px-24 pt-24 pb-12" data-testid="personalized-dashboard">
+      <div className="max-w-5xl mx-auto">
+        {/* Greeting + Wisdom */}
+        <div className="mb-8">
+          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="text-xl md:text-2xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            {greeting}
+          </motion.p>
+          {progress.streak_days > 0 && (
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+              className="text-[11px] flex items-center gap-1.5 mb-4" style={{ color: '#FCD34D' }}>
+              <Flame size={12} /> {progress.streak_days}-day streak
+            </motion.p>
+          )}
+        </div>
+
+        {/* Daily Wisdom */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="glass-card p-6 mb-6 relative overflow-hidden" data-testid="daily-wisdom">
+          <div className="absolute top-3 right-4 opacity-10">
+            <Quote size={36} style={{ color: wisdom.color }} />
+          </div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: wisdom.color }}>
+            Today's Cosmic Insight
+          </p>
+          <p className="text-sm md:text-base font-light leading-relaxed mb-3 max-w-2xl"
+            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            "{wisdom.text}"
+          </p>
+          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+            — {wisdom.source} <span style={{ color: wisdom.color }}>&middot; {wisdom.tradition}</span>
+          </p>
+        </motion.div>
+
+        {/* Action Row */}
+        <div className="flex gap-3 mb-8 flex-wrap">
+          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            onClick={onQuickReset}
+            className="btn-glass glow-primary group flex items-center gap-2 text-sm"
+            data-testid="dashboard-quick-reset">
+            <Zap size={14} /> Quick Reset
+          </motion.button>
+          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            onClick={() => navigate('/dashboard')}
+            className="btn-glass group flex items-center gap-2 text-sm"
+            style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
+            data-testid="dashboard-continue">
+            <span style={{ color: '#2DD4BF' }}>Full Dashboard <ArrowRight size={14} className="inline" /></span>
+          </motion.button>
+          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+            onClick={() => navigate('/coach')}
+            className="btn-glass group flex items-center gap-2 text-sm"
+            style={{ background: 'rgba(216,180,254,0.06)', borderColor: 'rgba(216,180,254,0.15)' }}
+            data-testid="dashboard-sage">
+            <span style={{ color: '#D8B4FE' }}>Talk to Sage <Sparkles size={14} className="inline" /></span>
+          </motion.button>
+        </div>
+
+        {/* Continue Where You Left Off */}
+        {continue_items.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            className="mb-8" data-testid="continue-section">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
+              Continue Where You Left Off
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {continue_items.map((item, i) => (
+                <motion.button key={i} whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }}
+                  onClick={() => navigate(item.page)}
+                  data-testid={`continue-item-${i}`}
+                  className="glass-card p-4 text-left group transition-all hover:scale-[1.01]"
+                  style={{ borderColor: `${item.color}08` }}>
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
+                    style={{ background: `${item.color}10` }}>
+                    <ChevronRight size={14} style={{ color: item.color }} />
+                  </div>
+                  <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.label}</p>
+                  <p className="text-[9px]" style={{ color: item.color }}>{item.category}</p>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* New For You */}
+        {new_for_you.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="mb-8" data-testid="new-for-you-section">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#FB923C' }}>
+              <Sparkles size={10} className="inline mr-1" /> New For You
+            </p>
+            <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+              {new_for_you.map((item, i) => (
+                <motion.button key={i} whileHover={{ y: -3 }}
+                  onClick={() => navigate(item.page)}
+                  data-testid={`new-item-${i}`}
+                  className="glass-card p-4 min-w-[160px] flex-shrink-0 text-left transition-all hover:scale-[1.02]"
+                  style={{ borderColor: `${item.color}08` }}>
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
+                    style={{ background: `${item.color}10` }}>
+                    <Star size={14} style={{ color: item.color }} />
+                  </div>
+                  <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+                  <p className="text-[9px]" style={{ color: item.color }}>{item.category}</p>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Progress Stats */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+          className="mb-4" data-testid="progress-stats">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
+            Your Journey So Far
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            {[
+              { label: 'Sessions', value: progress.total_sessions, color: '#D8B4FE' },
+              { label: 'AI Conversations', value: progress.ai_sessions, color: '#818CF8' },
+              { label: 'Mood Entries', value: progress.mood_entries, color: '#FDA4AF' },
+              { label: 'Journal Entries', value: progress.journal_entries, color: '#86EFAC' },
+              { label: 'Features Found', value: `${progress.features_discovered}/${progress.total_features}`, color: '#FB923C' },
+              { label: 'Streak Days', value: progress.streak_days, color: '#FCD34D' },
+            ].map((stat, i) => (
+              <div key={i} className="glass-card p-3 text-center">
+                <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: stat.color }}>{stat.value}</p>
+                <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Quick Reset Modal ─── */
 function QuickResetModal({ open, onClose }) {
   const navigate = useNavigate();
@@ -578,8 +735,13 @@ export default function Landing() {
           style={{ background: 'radial-gradient(ellipse, rgba(45,212,191,0.06) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'aurora 12s ease-in-out infinite reverse' }} />
       </div>
 
-      {/* ═══ Hero ═══ */}
-      <div className="relative z-10 px-6 md:px-12 lg:px-24 pt-28 pb-20">
+      {/* ═══ Personalized Dashboard for returning users ═══ */}
+      {user && (
+        <PersonalizedDashboard user={user} onQuickReset={() => setShowQuickReset(true)} />
+      )}
+
+      {/* ═══ Hero (shown for everyone, adjusted padding for logged-in) ═══ */}
+      <div className={`relative z-10 px-6 md:px-12 lg:px-24 ${user ? 'pt-8 pb-12' : 'pt-28 pb-20'}`}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}

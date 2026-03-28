@@ -62,6 +62,7 @@ from routes.entanglement import router as entanglement_router
 from routes.blessings import router as blessings_router
 from routes.akashic import router as akashic_router
 from routes.encyclopedia import router as encyclopedia_router
+from routes.dynamic import router as dynamic_router
 
 app = FastAPI()
 
@@ -91,6 +92,7 @@ all_routers = [
     blessings_router,
     akashic_router,
     encyclopedia_router,
+    dynamic_router,
 ]
 
 for r in all_routers:

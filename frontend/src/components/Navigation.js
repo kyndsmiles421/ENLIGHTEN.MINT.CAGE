@@ -90,6 +90,7 @@ const NAV_CATEGORIES = [
     id: 'explore', label: 'Explore', icon: Compass, color: '#FB923C',
     items: [
       { path: '/encyclopedia', label: 'Sacred Encyclopedia', icon: Globe },
+      { path: '/reading-list', label: 'Spiritual Reading List', icon: BookOpen },
       { path: '/creation-stories', label: 'Creation Stories', icon: Globe },
       { path: '/teachings', label: 'Teachings', icon: BookOpen },
       { path: '/learn', label: 'Learn', icon: GraduationCap },

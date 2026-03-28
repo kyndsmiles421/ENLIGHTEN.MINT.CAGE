@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useActivityTracker } from './hooks/useActivityTracker';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -90,6 +91,7 @@ const MusicLounge = lazy(() => import('./pages/MusicLounge'));
 const Blessings = lazy(() => import('./pages/Blessings'));
 const AkashicRecords = lazy(() => import('./pages/AkashicRecords'));
 const Encyclopedia = lazy(() => import('./pages/Encyclopedia'));
+const ReadingList = lazy(() => import('./pages/ReadingList'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -106,6 +108,7 @@ function PageLoader() {
 
 function AnimatedRoutes() {
   const location = useLocation();
+  useActivityTracker();
 
   return (
     <Suspense fallback={<PageLoader />}>
@@ -184,6 +187,7 @@ function AnimatedRoutes() {
         <Route path="/blessings" element={<Blessings />} />
         <Route path="/akashic-records" element={<AkashicRecords />} />
         <Route path="/encyclopedia" element={<Encyclopedia />} />
+        <Route path="/reading-list" element={<ReadingList />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
