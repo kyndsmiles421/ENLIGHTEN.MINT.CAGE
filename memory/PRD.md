@@ -31,14 +31,15 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 19. Send a Blessing community feed
 20. Cosmic Mixer floating widget (frequencies, ambient, mantras, light, vibration)
 21. Share Button in Navigation and Landing page
-22. **Akashic Records** (/akashic-records) — Guided AI session under Divination with 6 gateway prompts. Multi-turn conversation with Akashic Records Keeper persona.
-23. **Sacred Encyclopedia** (/encyclopedia) — 12 world spiritual traditions with AI "Ask Deeper" exploration.
-24. **Natural TTS Mantras** — OpenAI TTS (shimmer voice) replacing browser SpeechSynthesis across Cosmic Mixer and MantraCard.
-25. **Star Chart Mobile Fix** — Culture selection buttons accessible via scrollable toolbar.
-26. **Personalized Dashboard** — Dynamic time-of-day greeting, daily rotating wisdom quote (31 quotes, deterministic per date), "Continue Where You Left Off" (recent activities), "New For You" (undiscovered features), progress stats (sessions, AI convos, mood/journal entries, features found, streak days).
-27. **Activity Tracking Engine** — Lightweight background tracker logs page visits and interactions to MongoDB. Powers all personalization.
-28. **Spiritual Reading List** (/reading-list) — 24 curated sacred texts from 15+ traditions. Save/complete/filter by level. AI "Cosmic Librarian" personalized recommendations. Personalization based on user's explored traditions.
-29. **Daily Rotating Content** — Wisdom quotes, greetings, featured traditions all change daily but stay consistent within one day.
+22. Akashic Records (/akashic-records) — Guided AI session, 6 gateway prompts, multi-turn conversation
+23. Sacred Encyclopedia (/encyclopedia) — 12 world spiritual traditions, AI "Ask Deeper"
+24. Natural TTS Mantras — OpenAI TTS replacing browser SpeechSynthesis
+25. Star Chart Mobile Fix — Scrollable toolbar, World Skies first
+26. Personalized Dashboard — Dynamic greeting, daily wisdom, continue/new-for-you, progress stats
+27. Activity Tracking Engine — Background page visit tracker powering all personalization
+28. Spiritual Reading List (/reading-list) — 24 sacred texts, save/complete, AI Cosmic Librarian
+29. Daily Rotating Content — Date-seeded wisdom, greetings, featured traditions
+30. **Spiritual Growth Timeline** (/growth-timeline) — 12-week activity heatmap, category breakdown, 15 milestone badges (earned/locked), recent highlights, full journey stats, Share Journey. Under Today pillar and linked from dashboard.
 
 ## Critical Config
 - Admin: /admin-setup, password=cosmic-creator-2026
@@ -46,13 +47,14 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Stripe: Emergent test key
 - AI: Emergent LLM Key
 - Language: English only
-- Performance: framer-motion page transitions removed (do not re-add)
 - Auth localStorage key: zen_token
+- Performance: framer-motion page transitions removed (do not re-add)
 
 ## Key API Endpoints
 - /api/activity/track (POST, auth) — Track page visits
-- /api/dashboard/personalized (GET, auth) — Full personalized dashboard
-- /api/reading-list (GET, auth) — Curated reading list with personalization
+- /api/dashboard/personalized (GET, auth) — Personalized dashboard
+- /api/timeline (GET, auth) — Growth timeline with heatmap, milestones, stats
+- /api/reading-list (GET, auth) — Reading list with personalization
 - /api/reading-list/save (POST, auth) — Save/complete books
 - /api/reading-list/ai-recommendation (POST, auth) — AI librarian
 - /api/akashic/prompts (GET, no auth)
