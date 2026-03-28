@@ -325,6 +325,13 @@ function PersonalizedDashboard({ user, onQuickReset }) {
             data-testid="dashboard-sage">
             <span style={{ color: '#D8B4FE' }}>Talk to Sage <Sparkles size={14} className="inline" /></span>
           </motion.button>
+          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            onClick={() => navigate('/growth-timeline')}
+            className="btn-glass group flex items-center gap-2 text-sm"
+            style={{ background: 'rgba(252,211,77,0.06)', borderColor: 'rgba(252,211,77,0.15)' }}
+            data-testid="dashboard-timeline">
+            <span style={{ color: '#FCD34D' }}>My Journey <Star size={14} className="inline" /></span>
+          </motion.button>
         </div>
 
         {/* Continue Where You Left Off */}

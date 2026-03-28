@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone, date, timedelta
+from collections import defaultdict
 import asyncio
 import hashlib
 import uuid
@@ -442,3 +443,227 @@ Format as a numbered list. Be specific and passionate — you're a devoted libra
     except Exception as e:
         logger.error(f"Reading list AI error: {e}")
         raise HTTPException(status_code=500, detail="Could not generate recommendation")
+
+
+# ════════════════════════════════════════════
+# 4. SPIRITUAL GROWTH TIMELINE
+# ════════════════════════════════════════════
+
+PAGE_TO_CATEGORY = {
+    "/breathing": "Practice", "/meditation": "Practice", "/affirmations": "Practice",
+    "/yoga": "Practice", "/mudras": "Practice", "/mantras": "Practice",
+    "/hooponopono": "Practice", "/tantra": "Practice", "/coach": "Practice",
+    "/oracle": "Divination", "/akashic-records": "Divination", "/star-chart": "Divination",
+    "/numerology": "Divination", "/cardology": "Divination", "/dreams": "Divination",
+    "/mayan": "Divination", "/forecasts": "Divination", "/cosmic-profile": "Divination",
+    "/encyclopedia": "Knowledge", "/teachings": "Knowledge", "/creation-stories": "Knowledge",
+    "/reading-list": "Knowledge", "/learn": "Knowledge",
+    "/zen-garden": "Sanctuary", "/soundscapes": "Sanctuary", "/music-lounge": "Sanctuary",
+    "/frequencies": "Sanctuary", "/journal": "Sanctuary", "/reiki": "Sanctuary",
+    "/nourishment": "Nourish", "/aromatherapy": "Nourish", "/herbology": "Nourish",
+    "/community": "Connection", "/entanglement": "Connection", "/blessings": "Connection",
+    "/friends": "Connection", "/trade-circle": "Connection",
+    "/crystals": "Explore", "/games": "Explore", "/videos": "Explore",
+    "/discover": "Explore", "/challenges": "Explore",
+}
+
+CATEGORY_COLORS = {
+    "Practice": "#2DD4BF", "Divination": "#E879F9", "Knowledge": "#FB923C",
+    "Sanctuary": "#86EFAC", "Nourish": "#22C55E", "Connection": "#818CF8",
+    "Explore": "#FCD34D",
+}
+
+MILESTONES = [
+    {"threshold": 1, "type": "first_visit", "title": "First Step", "desc": "You began your journey", "color": "#D8B4FE"},
+    {"threshold": 5, "type": "visits", "title": "Curious Seeker", "desc": "Explored 5 different features", "color": "#2DD4BF"},
+    {"threshold": 10, "type": "visits", "title": "Dedicated Explorer", "desc": "Explored 10 different features", "color": "#818CF8"},
+    {"threshold": 20, "type": "visits", "title": "Wisdom Collector", "desc": "Explored 20 different features", "color": "#FCD34D"},
+    {"threshold": 1, "type": "akashic", "title": "Records Opened", "desc": "First Akashic Records reading", "color": "#D8B4FE"},
+    {"threshold": 1, "type": "journal", "title": "Inner Voice", "desc": "First journal entry", "color": "#86EFAC"},
+    {"threshold": 1, "type": "mood", "title": "Self Awareness", "desc": "First mood check-in", "color": "#FDA4AF"},
+    {"threshold": 1, "type": "blessing", "title": "Light Bearer", "desc": "First blessing sent", "color": "#FDA4AF"},
+    {"threshold": 3, "type": "streak", "title": "Rhythm Keeper", "desc": "3-day practice streak", "color": "#FCD34D"},
+    {"threshold": 7, "type": "streak", "title": "Week of Devotion", "desc": "7-day practice streak", "color": "#FB923C"},
+    {"threshold": 30, "type": "streak", "title": "Moon Cycle Master", "desc": "30-day practice streak", "color": "#E879F9"},
+    {"threshold": 5, "type": "ai_sessions", "title": "Sage's Companion", "desc": "5 AI coaching sessions", "color": "#38BDF8"},
+    {"threshold": 1, "type": "reading_save", "title": "Book Seeker", "desc": "First book saved to reading list", "color": "#FB923C"},
+    {"threshold": 1, "type": "reading_complete", "title": "Sacred Reader", "desc": "First sacred text completed", "color": "#22C55E"},
+    {"threshold": 5, "type": "encyclopedia", "title": "Tradition Scholar", "desc": "Explored 5 spiritual traditions", "color": "#FB923C"},
+]
+
+
+@router.get("/timeline")
+async def get_growth_timeline(user=Depends(get_current_user)):
+    uid = user["id"]
+
+    # Fetch all needed data in parallel
+    (
+        all_activities,
+        mood_count,
+        journal_count,
+        blessing_count,
+        akashic_count,
+        coach_count,
+        streak_doc,
+        reading_doc,
+        user_stats_doc,
+    ) = await asyncio.gather(
+        db.activity_log.find({"user_id": uid}, {"_id": 0}).sort("timestamp", 1).to_list(1000),
+        db.moods.count_documents({"user_id": uid}),
+        db.journal.count_documents({"user_id": uid}),
+        db.blessings.count_documents({"sender_id": uid}),
+        db.akashic_sessions.count_documents({"user_id": uid}),
+        db.coach_sessions.count_documents({"user_id": uid}),
+        db.streaks.find_one({"user_id": uid}, {"_id": 0}),
+        db.reading_lists.find_one({"user_id": uid}, {"_id": 0}),
+        db.user_stats.find_one({"user_id": uid}, {"_id": 0}),
+    )
+
+    streak = streak_doc.get("current_streak", 0) if streak_doc else 0
+    max_streak = streak_doc.get("max_streak", streak) if streak_doc else streak
+    saved_books = len(reading_doc.get("saved", [])) if reading_doc else 0
+    completed_books = len(reading_doc.get("completed", [])) if reading_doc else 0
+    visited_pages = set(user_stats_doc.get("visited_pages", [])) if user_stats_doc else set()
+    unique_features = len(visited_pages)
+
+    # Build weekly activity heatmap (last 12 weeks)
+    now = datetime.now(timezone.utc)
+    twelve_weeks_ago = now - timedelta(weeks=12)
+    weekly_data = defaultdict(lambda: {"count": 0, "categories": defaultdict(int), "pages": set()})
+
+    for act in all_activities:
+        ts = act.get("timestamp", "")
+        if not ts:
+            continue
+        try:
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if dt < twelve_weeks_ago:
+            continue
+        week_key = dt.strftime("%Y-W%V")
+        page = act.get("page", "")
+        cat = PAGE_TO_CATEGORY.get(page, "Explore")
+        weekly_data[week_key]["count"] += 1
+        weekly_data[week_key]["categories"][cat] += 1
+        weekly_data[week_key]["pages"].add(page)
+
+    # Convert to sorted list
+    weeks = []
+    for i in range(12):
+        week_dt = now - timedelta(weeks=11 - i)
+        week_key = week_dt.strftime("%Y-W%V")
+        week_start = week_dt - timedelta(days=week_dt.weekday())
+        wd = weekly_data.get(week_key, {"count": 0, "categories": defaultdict(int), "pages": set()})
+        top_cat = max(wd["categories"], key=wd["categories"].get) if wd["categories"] else None
+        weeks.append({
+            "week": week_key,
+            "label": week_start.strftime("%b %d"),
+            "count": wd["count"],
+            "top_category": top_cat,
+            "top_color": CATEGORY_COLORS.get(top_cat, "#818CF8") if top_cat else "#333",
+            "unique_pages": len(wd["pages"]),
+            "categories": dict(wd["categories"]),
+        })
+
+    # Build category breakdown (all-time)
+    cat_totals = defaultdict(int)
+    for act in all_activities:
+        page = act.get("page", "")
+        cat = PAGE_TO_CATEGORY.get(page, "Explore")
+        cat_totals[cat] += 1
+    category_breakdown = [
+        {"category": cat, "count": count, "color": CATEGORY_COLORS.get(cat, "#818CF8")}
+        for cat, count in sorted(cat_totals.items(), key=lambda x: -x[1])
+    ]
+
+    # Compute traditions explored (from encyclopedia deep dives)
+    encyclopedia_pages = [a.get("label", "") for a in all_activities if "/encyclopedia" in a.get("page", "")]
+    traditions_explored = len(set(encyclopedia_pages)) if encyclopedia_pages else 0
+
+    # Compute milestones earned
+    earned_milestones = []
+    for m in MILESTONES:
+        earned = False
+        if m["type"] == "first_visit" and len(all_activities) >= m["threshold"]:
+            earned = True
+        elif m["type"] == "visits" and unique_features >= m["threshold"]:
+            earned = True
+        elif m["type"] == "akashic" and akashic_count >= m["threshold"]:
+            earned = True
+        elif m["type"] == "journal" and journal_count >= m["threshold"]:
+            earned = True
+        elif m["type"] == "mood" and mood_count >= m["threshold"]:
+            earned = True
+        elif m["type"] == "blessing" and blessing_count >= m["threshold"]:
+            earned = True
+        elif m["type"] == "streak" and max_streak >= m["threshold"]:
+            earned = True
+        elif m["type"] == "ai_sessions" and (coach_count + akashic_count) >= m["threshold"]:
+            earned = True
+        elif m["type"] == "reading_save" and saved_books >= m["threshold"]:
+            earned = True
+        elif m["type"] == "reading_complete" and completed_books >= m["threshold"]:
+            earned = True
+        elif m["type"] == "encyclopedia" and traditions_explored >= m["threshold"]:
+            earned = True
+
+        earned_milestones.append({**m, "earned": earned})
+
+    earned_count = sum(1 for m in earned_milestones if m["earned"])
+
+    # Recent highlights — most interesting recent activities
+    recent_highlights = []
+    seen_highlight_pages = set()
+    for act in reversed(all_activities[-30:]):
+        page = act.get("page", "")
+        if page in seen_highlight_pages or page == "/":
+            continue
+        seen_highlight_pages.add(page)
+        cat = PAGE_TO_CATEGORY.get(page, "Explore")
+        feature = next((f for f in ALL_FEATURES if f["page"] == page), None)
+        recent_highlights.append({
+            "page": page,
+            "label": feature["name"] if feature else page.strip("/").replace("-", " ").title(),
+            "category": cat,
+            "color": CATEGORY_COLORS.get(cat, "#818CF8"),
+            "timestamp": act.get("timestamp", ""),
+        })
+        if len(recent_highlights) >= 8:
+            break
+
+    # Journey start date
+    first_activity = all_activities[0] if all_activities else None
+    journey_start = first_activity.get("timestamp", "")[:10] if first_activity else None
+
+    # Total days active
+    active_days = set()
+    for act in all_activities:
+        ts = act.get("timestamp", "")
+        if ts:
+            active_days.add(ts[:10])
+
+    return {
+        "weeks": weeks,
+        "category_breakdown": category_breakdown,
+        "milestones": earned_milestones,
+        "milestones_earned": earned_count,
+        "milestones_total": len(MILESTONES),
+        "recent_highlights": recent_highlights,
+        "stats": {
+            "journey_start": journey_start,
+            "days_active": len(active_days),
+            "total_activities": len(all_activities),
+            "unique_features": unique_features,
+            "current_streak": streak,
+            "max_streak": max_streak,
+            "traditions_explored": traditions_explored,
+            "mood_entries": mood_count,
+            "journal_entries": journal_count,
+            "blessings_sent": blessing_count,
+            "ai_sessions": coach_count + akashic_count,
+            "books_saved": saved_books,
+            "books_completed": completed_books,
+        },
+    }
+

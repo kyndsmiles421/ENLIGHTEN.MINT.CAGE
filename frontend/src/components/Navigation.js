@@ -25,6 +25,7 @@ const NAV_CATEGORIES = [
     items: [
       { path: '/daily-briefing', label: 'Daily Briefing', icon: Sun },
       { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
+      { path: '/growth-timeline', label: 'Growth Timeline', icon: BarChart3 },
       { path: '/cosmic-calendar', label: 'Cosmic Calendar', icon: Calendar },
       { path: '/mood', label: 'Mood Check', icon: Heart },
     ],
