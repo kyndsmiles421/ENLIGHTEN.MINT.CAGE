@@ -667,3 +667,195 @@ async def get_growth_timeline(user=Depends(get_current_user)):
         },
     }
 
+
+
+
+# ════════════════════════════════════════════
+# 5. MONTHLY SOUL REPORTS
+# ════════════════════════════════════════════
+
+@router.get("/soul-reports")
+async def get_soul_reports(user=Depends(get_current_user)):
+    """List all saved soul reports for the user."""
+    reports = await db.soul_reports.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).sort("month", -1).to_list(24)
+    return {"reports": reports}
+
+
+@router.get("/soul-reports/{month}")
+async def get_soul_report(month: str, user=Depends(get_current_user)):
+    """Get a specific month's report. month format: 2026-03"""
+    report = await db.soul_reports.find_one(
+        {"user_id": user["id"], "month": month}, {"_id": 0}
+    )
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return report
+
+
+@router.post("/soul-reports/generate")
+async def generate_soul_report(data: dict = Body(...), user=Depends(get_current_user)):
+    """Generate an AI soul report for a given month."""
+    uid = user["id"]
+    month = data.get("month", datetime.now(timezone.utc).strftime("%Y-%m"))
+
+    # Check if already generated
+    existing = await db.soul_reports.find_one(
+        {"user_id": uid, "month": month}, {"_id": 0}
+    )
+    if existing:
+        return existing
+
+    # Parse month boundaries
+    try:
+        year, mon = month.split("-")
+        start = datetime(int(year), int(mon), 1, tzinfo=timezone.utc)
+        if int(mon) == 12:
+            end = datetime(int(year) + 1, 1, 1, tzinfo=timezone.utc)
+        else:
+            end = datetime(int(year), int(mon) + 1, 1, tzinfo=timezone.utc)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
+
+    start_iso = start.isoformat()
+    end_iso = end.isoformat()
+
+    # Gather month's data
+    activities = await db.activity_log.find(
+        {"user_id": uid, "timestamp": {"$gte": start_iso, "$lt": end_iso}},
+        {"_id": 0}
+    ).to_list(500)
+
+    mood_entries = await db.moods.find(
+        {"user_id": uid, "created_at": {"$gte": start_iso, "$lt": end_iso}},
+        {"_id": 0, "mood": 1, "energy": 1, "note": 1, "created_at": 1}
+    ).to_list(100)
+
+    journal_entries = await db.journal.find(
+        {"user_id": uid, "created_at": {"$gte": start_iso, "$lt": end_iso}},
+        {"_id": 0, "type": 1, "content": 1, "created_at": 1}
+    ).to_list(50)
+
+    akashic_sessions = await db.akashic_sessions.find(
+        {"user_id": uid, "created_at": {"$gte": start_iso, "$lt": end_iso}},
+        {"_id": 0, "prompt_id": 1, "created_at": 1}
+    ).to_list(20)
+
+    # Build category summary
+    cat_counts = defaultdict(int)
+    page_counts = defaultdict(int)
+    for act in activities:
+        page = act.get("page", "")
+        cat = PAGE_TO_CATEGORY.get(page, "Explore")
+        cat_counts[cat] += 1
+        feature = next((f for f in ALL_FEATURES if f["page"] == page), None)
+        name = feature["name"] if feature else page.strip("/").replace("-", " ").title()
+        page_counts[name] += 1
+
+    top_categories = sorted(cat_counts.items(), key=lambda x: -x[1])[:5]
+    top_features = sorted(page_counts.items(), key=lambda x: -x[1])[:8]
+    total_activities = len(activities)
+    unique_days = len(set(a.get("timestamp", "")[:10] for a in activities if a.get("timestamp")))
+
+    # Mood summary
+    mood_summary = ""
+    if mood_entries:
+        moods = [m.get("mood", "") for m in mood_entries if m.get("mood")]
+        energies = [m.get("energy", 0) for m in mood_entries if m.get("energy")]
+        mood_summary = f"Mood check-ins: {len(mood_entries)}. "
+        if moods:
+            from collections import Counter
+            top_moods = Counter(moods).most_common(3)
+            mood_summary += f"Most common moods: {', '.join(f'{m} ({c}x)' for m, c in top_moods)}. "
+        if energies:
+            avg_e = sum(energies) / len(energies)
+            mood_summary += f"Average energy level: {avg_e:.1f}/10. "
+
+    # Build the prompt for AI
+    month_name = start.strftime("%B %Y")
+    profile = await db.users.find_one({"id": uid}, {"_id": 0, "name": 1, "zodiac": 1})
+    name = profile.get("name", "Seeker") if profile else "Seeker"
+    zodiac = profile.get("zodiac", "") if profile else ""
+
+    data_summary = f"""MONTH: {month_name}
+SEEKER: {name}{f' (Zodiac: {zodiac})' if zodiac else ''}
+TOTAL ACTIVITIES: {total_activities} across {unique_days} active days
+
+TOP FOCUS AREAS:
+{chr(10).join(f'- {cat}: {count} visits' for cat, count in top_categories)}
+
+MOST VISITED FEATURES:
+{chr(10).join(f'- {name}: {count} times' for name, count in top_features)}
+
+{mood_summary}
+
+JOURNAL ENTRIES: {len(journal_entries)}
+AKASHIC SESSIONS: {len(akashic_sessions)}{' (Topics: ' + ', '.join(set(s.get('prompt_id', '') for s in akashic_sessions)) + ')' if akashic_sessions else ''}
+"""
+
+    system = f"""You are the Soul Archivist of The Cosmic Collective — a wise, compassionate presence who reads the patterns of a seeker's spiritual journey and reflects them back with clarity, beauty, and encouragement.
+
+You are writing a Monthly Soul Report for {month_name}. Based on the data provided, create a deeply personal, insightful report.
+
+Your report MUST include these sections (use markdown headers):
+
+## Soul Overview
+A 3-4 sentence poetic summary of how this month felt energetically — what themes emerged, what the soul was working on.
+
+## Dominant Energies
+Analyze their top focus areas. What does gravitating toward these areas reveal about their inner state? What were they seeking?
+
+## Growth Patterns
+What shifts or patterns do you notice? Are they exploring broadly or going deep? Any new areas they ventured into?
+
+## Emotional Landscape
+Based on mood data (if available) and activity patterns, reflect on the emotional journey of this month.
+
+## Soul Guidance for Next Month
+Specific, actionable spiritual guidance for the upcoming month. Suggest practices, traditions to explore, and inner work based on what you've observed. Be specific — name actual practices.
+
+## Affirmation
+End with a powerful, personalized affirmation that captures the essence of their journey this month. Just 1-2 sentences.
+
+TONE: Warm, insightful, slightly poetic. Like a trusted spiritual mentor who truly sees them. Not generic — reference their actual data. Keep the total report between 400-600 words."""
+
+    if total_activities == 0:
+        # No data for this month
+        report_text = f"# Soul Report — {month_name}\n\nThis month holds space in stillness. No activities were recorded, but silence too is a teacher. Perhaps the soul was integrating, resting, preparing for what comes next. When you're ready, the path awaits."
+    else:
+        try:
+            chat = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"soul-report-{uid}-{month}-{uuid.uuid4().hex[:8]}",
+                system_message=system,
+            )
+            report_text = await asyncio.wait_for(
+                chat.send_message(UserMessage(text=data_summary)),
+                timeout=60
+            )
+        except Exception as e:
+            logger.error(f"Soul report generation error: {e}")
+            raise HTTPException(status_code=500, detail="Could not generate soul report")
+
+    # Save the report
+    report_doc = {
+        "user_id": uid,
+        "month": month,
+        "month_name": month_name,
+        "report": report_text,
+        "stats": {
+            "total_activities": total_activities,
+            "active_days": unique_days,
+            "top_categories": [{"category": c, "count": n} for c, n in top_categories],
+            "top_features": [{"name": n, "count": c} for n, c in top_features],
+            "mood_entries": len(mood_entries),
+            "journal_entries": len(journal_entries),
+            "akashic_sessions": len(akashic_sessions),
+        },
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.soul_reports.insert_one(report_doc)
+    del report_doc["_id"]  # remove ObjectId before returning
+    return report_doc

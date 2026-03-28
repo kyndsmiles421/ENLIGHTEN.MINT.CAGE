@@ -18,7 +18,7 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 6. Analytics dashboard
 7. Trade Circle marketplace with Karma system
 8. 5-tier Stripe Subscriptions + Credit packs
-9. Hidden Creator/Admin role (/admin-setup, pw: cosmic-creator-2026)
+9. Hidden Creator/Admin role
 10. 5 Color Themes
 11. Accessibility: Sound toggles, reduce motion/particles
 12. Crystals & Stones Encyclopedia + Rock Hounding game
@@ -40,7 +40,8 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 28. Spiritual Reading List (/reading-list) — 24 sacred texts, AI Cosmic Librarian
 29. Daily Rotating Content — Date-seeded wisdom, greetings, featured traditions
 30. Spiritual Growth Timeline (/growth-timeline) — 12-week heatmap, 15 milestones, stats
-31. **Light Therapy Fix** — Fixed invisible overlay; now shows visible color washes with breathing pulse animation
+31. Light Therapy Fix — Visible color washes with breathing pulse animation
+32. **Soul Reports** (/soul-reports) — AI-generated monthly reflections analyzing traditions explored, growth patterns, emotional landscape, and personalized guidance. Saved to MongoDB for revisiting. Share button. Month selector for last 6 months.
 
 ## Critical Config
 - Admin: /admin-setup, password=cosmic-creator-2026
@@ -50,6 +51,17 @@ Build "The Cosmic Collective," a highly immersive full-stack wellness platform b
 - Language: English only
 - Auth localStorage key: zen_token
 - Performance: framer-motion page transitions removed (do not re-add)
+
+## Key API Endpoints
+- /api/soul-reports (GET) — List all reports
+- /api/soul-reports/{month} (GET) — Get specific month's report
+- /api/soul-reports/generate (POST) — Generate AI report for a month
+- /api/activity/track (POST) — Track page visits
+- /api/dashboard/personalized (GET) — Personalized dashboard
+- /api/timeline (GET) — Growth timeline
+- /api/reading-list (GET/POST) — Reading list
+- /api/akashic/* — Akashic Records
+- /api/encyclopedia/* — Sacred Encyclopedia
 
 ## Backlog
 - P2: Refactor star_cultures.py (move coords to JSON/MongoDB)

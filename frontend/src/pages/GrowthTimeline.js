@@ -271,6 +271,27 @@ export default function GrowthTimeline() {
             ))}
           </div>
         </div>
+
+        {/* CTA: Soul Reports */}
+        <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          onClick={() => navigate('/soul-reports')}
+          data-testid="soul-reports-cta"
+          className="w-full glass-card p-5 mb-8 text-left transition-all hover:scale-[1.005] group"
+          style={{ borderColor: 'rgba(216,180,254,0.1)' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(216,180,254,0.1)', border: '1px solid rgba(216,180,254,0.15)' }}>
+                <Sparkles size={16} style={{ color: '#D8B4FE' }} />
+              </div>
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Monthly Soul Reports</p>
+                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>AI-generated reflections on your spiritual journey</p>
+              </div>
+            </div>
+            <ChevronRight size={16} style={{ color: '#D8B4FE' }} className="group-hover:translate-x-1 transition-transform" />
+          </div>
+        </motion.button>
       </div>
     </div>
   );

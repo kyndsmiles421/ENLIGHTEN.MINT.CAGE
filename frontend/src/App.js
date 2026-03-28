@@ -93,6 +93,7 @@ const AkashicRecords = lazy(() => import('./pages/AkashicRecords'));
 const Encyclopedia = lazy(() => import('./pages/Encyclopedia'));
 const ReadingList = lazy(() => import('./pages/ReadingList'));
 const GrowthTimeline = lazy(() => import('./pages/GrowthTimeline'));
+const SoulReports = lazy(() => import('./pages/SoulReports'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
@@ -190,6 +191,7 @@ function AnimatedRoutes() {
         <Route path="/encyclopedia" element={<Encyclopedia />} />
         <Route path="/reading-list" element={<ReadingList />} />
         <Route path="/growth-timeline" element={<GrowthTimeline />} />
+        <Route path="/soul-reports" element={<SoulReports />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

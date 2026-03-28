@@ -11,7 +11,7 @@ import {
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp,
-  CreditCard, Crown, Settings, Gem, Link2
+  CreditCard, Crown, Settings, Gem, Link2, FileText
 } from 'lucide-react';
 import SearchCommand from './SearchCommand';
 import ShareButton from './ShareButton';
@@ -26,6 +26,7 @@ const NAV_CATEGORIES = [
       { path: '/daily-briefing', label: 'Daily Briefing', icon: Sun },
       { path: '/daily-ritual', label: 'My Ritual', icon: Sparkles },
       { path: '/growth-timeline', label: 'Growth Timeline', icon: BarChart3 },
+      { path: '/soul-reports', label: 'Soul Reports', icon: FileText },
       { path: '/cosmic-calendar', label: 'Cosmic Calendar', icon: Calendar },
       { path: '/mood', label: 'Mood Check', icon: Heart },
     ],
