@@ -85,9 +85,9 @@ const SOUNDS = [
 ];
 
 const MANTRAS = [
-  { id: 'om', label: 'Om', text: 'Om', tradition: 'Universal', color: '#C084FC' },
-  { id: 'om-mani', label: 'Om Mani Padme Hum', text: 'Om Mani Padme Hum', tradition: 'Tibetan Buddhist', color: '#2DD4BF' },
-  { id: 'om-namah', label: 'Om Namah Shivaya', text: 'Om Namah Shivaya', tradition: 'Hindu', color: '#8B5CF6' },
+  { id: 'om', label: 'Om', text: 'Ommmmm. Ommmmm. Ommmmm.', tradition: 'Universal', color: '#C084FC' },
+  { id: 'om-mani', label: 'Om Mani Padme Hum', text: 'Om Mani Padme Hum. Om Mani Padme Hum.', tradition: 'Tibetan Buddhist', color: '#2DD4BF' },
+  { id: 'om-namah', label: 'Om Namah Shivaya', text: 'Om Namah Shivaya. Om Namah Shivaya.', tradition: 'Hindu', color: '#8B5CF6' },
   { id: 'so-hum', label: 'So Hum', text: 'So Hum... I am that I am', tradition: 'Vedic', color: '#3B82F6' },
   { id: 'ra-ma', label: 'Ra Ma Da Sa', text: 'Ra Ma Da Sa, Sa Say So Hung', tradition: 'Kundalini', color: '#FCD34D' },
   { id: 'peace', label: 'I Am Peace', text: 'I am peace. I am light. I am love.', tradition: 'Modern', color: '#22C55E' },
@@ -189,20 +189,12 @@ export default function CosmicMixer() {
     setMantraLoading(true);
     try {
       const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, context: 'mixer' });
+      if (!res.data.audio) { setMantraLoading(false); setActiveMantra(null); return; }
       const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
       audio.volume = 0.7;
+      audio.loop = true;
       mantraAudioRef.current = audio;
-      const playLoop = () => {
-        if (!mantraAudioRef.current) return;
-        const a = mantraAudioRef.current.cloneNode();
-        a.volume = 0.7;
-        mantraAudioRef.current = a;
-        a.onended = () => {};
-        a.play().catch(() => {});
-      };
-      audio.onended = () => {};
       audio.play().catch(() => {});
-      mantraIntervalRef.current = setInterval(playLoop, 10000);
       setMantraLoading(false);
     } catch {
       setMantraLoading(false);
