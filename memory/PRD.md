@@ -12,36 +12,31 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Implemented Features
 
+### SmartDock: Minimize + Drag + Persist (Mar 2026)
+- **Fully minimizable**: Dock collapses to a small sparkle dot; tap to restore
+- **Draggable**: Grip handle at top allows repositioning anywhere on screen
+- **Position persistence**: Both position and minimized state saved to localStorage
+- **Smart border-radius**: Adjusts from flat-edge to fully rounded when moved away from screen edge
+- **Vertical pill layout**: Icons for Sage, Mixer, Tones, Feedback, Help
+
 ### Interactive Cosmic Mood Ring (Mar 2026)
-- **Clickable card**: Tapping the ring navigates to `/mood` Mood Tracker page
-- **Quick Log panel**: 8 mood options (Happy, Peaceful, Energized, Grateful, Stressed, Anxious, Sad, Tired) with one-tap logging
-- **Empty state CTA**: When no mood data, shows "Tap to log your mood and watch the ring come alive"
-- **Visual feedback**: Hover glow, "Open Mood Tracker" hint on hover, animated orb
-- **Auto-refresh**: Ring data refreshes after quick logging a mood
+- **Clickable card**: Tapping navigates to `/mood` Mood Tracker page
+- **Quick Log panel**: 8 moods (Happy, Peaceful, Energized, Grateful, Stressed, Anxious, Sad, Tired) with one-tap logging
+- **Empty state CTA**: Shows prompt when no mood data exists
+- **Auto-refresh**: Ring data refreshes after quick logging
 
 ### Session Replay & Download (Mar 2026)
-- **Auto-recording**: When live sessions end, chat log + guided commands are saved as recordings
-- **Past Sessions tab**: Third tab on `/live` page showing recording cards with Replay and Download buttons
-- **Replay Modal**: Full-screen modal with guided command timeline player (auto-plays with 4s intervals), chat sidebar, and step-by-step navigation
-- **Download**: Export recordings as structured JSON files with session details, commands, and chat
+- **Auto-recording**: Chat + commands saved when sessions end
+- **Past Sessions tab**: Third tab on `/live` with Replay and Download buttons
+- **Replay Modal**: Command timeline auto-player + chat sidebar
+- **Download**: Export as structured JSON files
 
 ### Scheduled Recurring Live Sessions (Mar 2026)
-- Recurring series with recurrence patterns (Daily, Weekdays, Weekends, Weekly)
-- Subscription system with push notifications
-- Auto-spawn from templates within 15-minute window
-- Tab UI, create modal with One-Time/Recurring toggle
+- Recurring series (Daily, Weekdays, Weekends, Weekly) with subscriptions + push notifications
+- Auto-spawn from templates, tab UI, One-Time/Recurring toggle
 
-### Live Sessions (Mar 2026)
-- Browse & Create sessions, 8 session types, 6 virtual scenes
-- Host controls with guided commands
-- Avatar Circle, real-time chat + reactions via WebSocket (with REST fallback)
-
-### SmartDock (Mar 2026)
-- Vertical pill layout on right side of screen
-- Panels (Sage, Mixer, Tones) open to the left
-
-### Mood Insights, Crystal Pairing, Blessings, Creator Dashboard, Customizable Dashboard
-- All previously documented features
+### Live Sessions, Mood Insights, Crystal Pairing, Blessings, Creator Dashboard, Customizable Dashboard
+- All previously documented and tested
 
 ## Test Credentials
 - User: test@test.com / password
