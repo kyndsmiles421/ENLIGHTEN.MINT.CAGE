@@ -52,6 +52,7 @@ from routes.forecasts import router as forecasts_router
 from routes.cosmic_profile import router as cosmic_profile_router
 from routes.star_cultures import router as star_cultures_router
 from routes.creation_stories import router as creation_stories_router
+from routes.sacred_texts import router as sacred_texts_router
 from routes.ai_visuals import router as ai_visuals_router
 from routes.notifications import router as notifications_router
 from routes.achievements import router as achievements_router
@@ -82,6 +83,7 @@ all_routers = [
     cosmic_profile_router,
     star_cultures_router,
     creation_stories_router,
+    sacred_texts_router,
     ai_visuals_router,
     notifications_router,
     achievements_router,

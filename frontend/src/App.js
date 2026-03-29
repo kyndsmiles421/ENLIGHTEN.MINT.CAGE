@@ -86,6 +86,7 @@ const Forecasts = lazy(() => import('./pages/Forecasts'));
 const CosmicProfile = lazy(() => import('./pages/CosmicProfile'));
 const Tutorial = lazy(() => import('./pages/Tutorial'));
 const CreationStories = lazy(() => import('./pages/CreationStories'));
+const SacredTexts = lazy(() => import('./pages/SacredTexts'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Settings = lazy(() => import('./pages/Settings'));
 const AdminSetup = lazy(() => import('./pages/AdminSetup'));
@@ -190,6 +191,7 @@ function AnimatedRoutes() {
         <Route path="/cosmic-profile" element={<CosmicProfile />} />
         <Route path="/tutorial" element={<Tutorial />} />
         <Route path="/creation-stories" element={<CreationStories />} />
+        <Route path="/sacred-texts" element={<SacredTexts />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin-setup" element={<AdminSetup />} />

@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from deps import logger
+from data.extended_star_cultures import EXTENDED_CULTURES
 
 router = APIRouter()
 
@@ -1023,6 +1024,9 @@ CULTURAL_CONSTELLATIONS = {
         ],
     },
 }
+
+# Merge extended cultures (Greek, Japanese, Yoruba, Celtic, Inuit, Aztec, Sumerian, Persian, Bantu, Native American, Slavic, Maori)
+CULTURAL_CONSTELLATIONS.update(EXTENDED_CULTURES)
 
 
 @router.get("/star-chart/cultures")
