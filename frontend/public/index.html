@@ -171,19 +171,16 @@
         </script>
         <script>
             if ('serviceWorker' in navigator) {
+                // Force kill ALL old service workers and caches on load
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    regs.forEach(function(r) { r.unregister(); });
+                });
+                caches.keys().then(function(names) {
+                    names.forEach(function(n) { caches.delete(n); });
+                });
                 window.addEventListener('load', function() {
                     navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                        // Force check for updates immediately
                         reg.update();
-                        // When new SW is found, activate it immediately
-                        reg.addEventListener('updatefound', function() {
-                            var newWorker = reg.installing;
-                            newWorker.addEventListener('statechange', function() {
-                                if (newWorker.state === 'activated') {
-                                    window.location.reload();
-                                }
-                            });
-                        });
                     }).catch(function() {});
                 });
             }
