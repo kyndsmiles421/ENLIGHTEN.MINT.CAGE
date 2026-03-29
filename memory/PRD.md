@@ -1,67 +1,82 @@
 # The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective," a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals.
+Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals. PWA, Push Notifications, Quantum Mechanics, global Star Chart cultures, Trade Circle barter marketplace, Stripe subscription system, hidden Creator role, Accessibility settings, Crystals & Stones, Virtual Rock Hounding, Quantum Entanglement, Music Lounge, Send a Blessing, floating Cosmic Mixer, Guided App Tour, and Cinematic Intro Videos.
 
 ## Tech Stack
-- Frontend: React, Tailwind CSS, Framer Motion, Context API
-- Backend: FastAPI, Motor Async MongoDB
-- Monetization: Stripe (Test Mode, Emergent environment key)
-- AI: OpenAI GPT-4o, TTS/STT, Sora 2 — all via Emergent LLM Key
+- **Frontend**: React + Tailwind CSS + Framer Motion (micro-animations only, no page transitions)
+- **Backend**: FastAPI + Motor Async MongoDB
+- **AI**: OpenAI GPT-4o (text), OpenAI TTS tts-1 (voice), Sora 2 (video gen), Whisper (STT) — all via Emergent LLM Key
+- **Payments**: Stripe (test key in pod)
+- **PWA**: Service worker, manifest, install prompt
 
-## All Completed Features
-1. 6-pillar navigation (Today, Practice, Divination, Sanctuary, Nourish, Explore)
-2. Multi-cultural 3D Star Chart (8 cultures) with mobile-friendly scrollable toolbar
-3. Voice AI Sage (GPT-4o + TTS/STT)
+## User Personas
+- Spiritually-minded wellness seekers wanting immersive mystical digital experiences
+- Return users who want personalized, evolving content
+- Admin/Creator role: kyndsmiles@gmail.com
+
+## Core Requirements (All Implemented)
+1. 6-Pillar Navigation: Today, Practice, Divination, Sanctuary, Nourish, Explore
+2. 3D Star Chart with 8 world cultures
+3. Voice AI Sage (coach) with OpenAI TTS
 4. Sora 2 Video Gallery
-5. PWA + Push Notifications
-6. Analytics dashboard
-7. Trade Circle marketplace with Karma system
-8. 5-tier Stripe Subscriptions + Credit packs
-9. Hidden Creator/Admin role
-10. 5 Color Themes
-11. Accessibility: Sound toggles, reduce motion/particles
-12. Crystals & Stones Encyclopedia + Rock Hounding game
-13. Quantum Entanglement social meditations
-14. Smart landing buttons (Begin/Continue Journey)
-15. Light mode text readability polish
-16. Performance optimization — instant page nav, 30fps background
-17. Music Lounge — 10 ambient tracks with Web Audio API
-18. Quick Reset Mantras with Natural TTS (shimmer voice)
-19. Send a Blessing community feed
-20. Cosmic Mixer floating widget (frequencies, ambient, mantras, light, vibration)
-21. Share Button in Navigation and Landing page
-22. Akashic Records (/akashic-records) — Guided AI session, 6 gateway prompts
-23. Sacred Encyclopedia (/encyclopedia) — 12 world spiritual traditions, AI deep dives
-24. Natural TTS Mantras — OpenAI TTS replacing browser SpeechSynthesis
-25. Star Chart Mobile Fix — Scrollable toolbar, World Skies first
-26. Personalized Dashboard — Dynamic greeting, daily wisdom, continue/new-for-you, progress
-27. Activity Tracking Engine — Background page visit tracker
-28. Spiritual Reading List (/reading-list) — 24 sacred texts, AI Cosmic Librarian
-29. Daily Rotating Content — Date-seeded wisdom, greetings, featured traditions
-30. Spiritual Growth Timeline (/growth-timeline) — 12-week heatmap, 15 milestones, stats
-31. Light Therapy Fix — Visible color washes with breathing pulse animation
-32. **Soul Reports** (/soul-reports) — AI-generated monthly reflections analyzing traditions explored, growth patterns, emotional landscape, and personalized guidance. Saved to MongoDB for revisiting. Share button. Month selector for last 6 months.
+5. Trade Circle barter marketplace
+6. Cosmic Mixer (ambient sounds, binaural frequencies, light therapy, OpenAI TTS mantras)
+7. Akashic Records guided sessions
+8. Encyclopedia of 12 Spiritual Teachings
+9. Dynamic Return-User Dashboard with streak, greetings, recommendations
+10. Spiritual Reading List with AI librarian
+11. 12-Week Growth Timeline with heatmap and milestones
+12. AI-generated Monthly Soul Reports
+13. Interactive Guided Tour for new users
+14. Cinematic Sora 2 Intro Video on Landing page
+15. Draggable dashboard widgets via @dnd-kit
+16. Immersive visual experience: fluid mesh gradients, deep glassmorphism, multi-color nebulae, portal-pulse animations
 
-## Critical Config
-- Admin: /admin-setup, password=cosmic-creator-2026
-- Creator email: kyndsmiles@gmail.com
-- Stripe: Emergent test key
-- AI: Emergent LLM Key
-- Language: English only
-- Auth localStorage key: zen_token
-- Performance: framer-motion page transitions removed (do not re-add)
+## Completed Features (All Verified)
+- Full auth system (JWT + Stripe subscription tiers)
+- 6-pillar content system (Today, Practice, Divination, Sanctuary, Nourish, Explore)
+- 3D Star Chart (8 cultures: Western, Chinese, Vedic, Egyptian, Mayan, Aboriginal, Norse, Polynesian)
+- Voice AI Sage with conversation history
+- Sora 2 Video Gallery
+- Trade Circle marketplace
+- Cosmic Mixer floating widget (ambient, frequencies, light therapy, TTS mantras)
+- Akashic Records guided sessions
+- Encyclopedia of 12 spiritual teachings
+- Dynamic personalized dashboard (streak, greetings, wisdom, recommendations)
+- Spiritual Reading List with AI librarian
+- 12-Week Growth Timeline with heatmap
+- Monthly Soul Reports
+- Interactive Guided Tour
+- Sora 2 Cinematic Intro Video (fixed and working)
+- Draggable dashboard widgets (@dnd-kit)
+- Immersive visual overhaul (mesh gradients, enhanced glass cards, portal animations, multi-color nebulae)
+- PWA with install prompt
+- Accessibility settings (reduce motion, particles, flashing)
+- Music Lounge, Blessings Feed, Crystal Encyclopedia, Quantum Meditation, and more
 
-## Key API Endpoints
-- /api/soul-reports (GET) — List all reports
-- /api/soul-reports/{month} (GET) — Get specific month's report
-- /api/soul-reports/generate (POST) — Generate AI report for a month
-- /api/activity/track (POST) — Track page visits
-- /api/dashboard/personalized (GET) — Personalized dashboard
-- /api/timeline (GET) — Growth timeline
-- /api/reading-list (GET/POST) — Reading list
-- /api/akashic/* — Akashic Records
-- /api/encyclopedia/* — Sacred Encyclopedia
+## Architecture
+```
+/app/
+├── backend/
+│   ├── routes/ (ai_visuals.py, dynamic.py, akashic.py, encyclopedia.py, social.py, etc.)
+│   ├── server.py
+│   ├── static/videos/
+├── frontend/
+│   ├── src/
+│   │   ├── components/ (CosmicMixer.js, GuidedTour.js, IntroVideo.js, CosmicBackground.js, Navigation.js, etc.)
+│   │   ├── pages/ (Landing.js, GrowthTimeline.js, SoulReports.js, etc.)
+│   │   ├── context/ (AuthContext.js, SensoryContext.js, etc.)
+```
+
+## Key DB Collections
+- activity_log: {user_id, activity_type, timestamp, metadata}
+- soul_reports: {user_id, month, report_markdown, stats}
+- ai_video_cache: {cache_key, video_url, filename, created_at}
+
+## Test Credentials
+- User: test@test.com / password
+- Admin/Creator: kyndsmiles@gmail.com
 
 ## Backlog
-- P2: Refactor star_cultures.py (move coords to JSON/MongoDB)
+- **P2**: Refactor star_cultures.py — move massive hardcoded coordinate arrays into MongoDB collection or JSON seed file
