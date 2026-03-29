@@ -61,6 +61,15 @@ async def get_current_user_optional(credentials: HTTPAuthorizationCredentials = 
         return None
 
 
+def decode_token(token: str):
+    """Decode a JWT token and return payload, or None if invalid."""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return {"id": payload["sub"], "name": payload.get("name", "")}
+    except Exception:
+        return None
+
+
 async def create_activity(user_id: str, activity_type: str, message: str, data: dict = None):
     user_doc = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
     profile = await db.profiles.find_one({"user_id": user_id}, {"_id": 0}) or {}

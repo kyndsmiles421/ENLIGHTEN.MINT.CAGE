@@ -138,6 +138,7 @@ const NAV_CATEGORIES = [
       { path: '/crystals', label: 'Crystals & Stones', icon: Gem },
       { path: '/entanglement', label: 'Entanglement', icon: Link2 },
       { path: '/blessings', label: 'Send a Blessing', icon: Heart },
+      { path: '/live', label: 'Live Sessions', icon: Radio },
       { path: '/friends', label: 'Friends', icon: Users },
       { path: '/challenges', label: 'Challenges', icon: Flame },
       { path: '/create', label: 'Create', icon: PenTool },
