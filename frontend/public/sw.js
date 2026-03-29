@@ -1,5 +1,5 @@
 /* Service Worker for The Cosmic Collective PWA */
-const CACHE_NAME = 'cosmic-collective-v1';
+const CACHE_NAME = 'cosmic-collective-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
