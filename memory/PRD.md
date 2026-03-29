@@ -13,43 +13,56 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## All Implemented Features
 
-### SmartDock (NEW Mar 2026)
-- Unified floating dock replaces 3 overlapping widgets (FloatingAssistant, QuickMeditationWidget, CosmicMixer)
-- Bottom-right dock with Sage, Mixer, Tones icons
-- No background dimming — panels open inline
+### Creator Dashboard (NEW Mar 2026)
+- Auto-activated admin view for `kyndsmiles@gmail.com` only
+- **Overview**: Total users, Active today/week/month, App installs (PWA downloads), Mood logs, Journal entries, Sage sessions, Feedback counts (new/in-review/resolved)
+- **14-day Active Users chart** with bar graph
+- **Top Features by Usage** — ranked page visits with progress bars
+- **Feedback management** — View all submissions, filter by status, update status (New → In Review → Resolved → Dismissed)
+- **Comments moderation** — View all community comments, delete inappropriate content
+- **Users tab** — Total registered, PWA installs, new this week, recent signups list
+- **Popular tab** — Full feature usage rankings
+- **Nav integration**: Gold "Creator" badge + "Creator Studio" link in profile dropdown (admin only)
+- **Access control**: All `/api/creator/*` endpoints return 403 for non-creator users
 
-### Cosmic Mixer Page (NEW Mar 2026)
+### PWA Install Tracking (NEW Mar 2026)
+- Tracks `appinstalled` browser events to MongoDB
+- Creator Dashboard shows install count
+
+### SmartDock (Mar 2026)
+- Unified floating dock replaces 3 overlapping widgets
+- Bottom-right dock with Sage, Mixer, Tones icons; no background dimming
+
+### Cosmic Mixer Page (Mar 2026)
 - Full-page mixer at `/cosmic-mixer` with 5 audio layers
 
-### Customizable Dashboard (NEW Mar 2026)
+### Customizable Dashboard (Mar 2026)
 - "Customize" button enters edit mode to reorder/hide sections
 - Pinned Shortcuts grid (phone-home-screen style)
 - Persisted to MongoDB via `/api/dashboard/layout`
 
-### Quick Reset Modal Fix (Mar 2026)
-- Fixed invisible modal: glass-card bg was 3% opacity, replaced with solid dark background
-- Fixed position:fixed breaking: `page-enter` animation used `transform: translateY(0)` which creates a containing block; changed to `transform: none`
-- Applied createPortal for Landing page Quick Reset modal
+### Bug Fixes (Mar 2026)
+- Quick Reset modal invisible: glass-card bg + `createPortal`
+- Video player at bottom of page: `createPortal` escape transform
+- Quick Reset touch sensitivity: removed `onTouchEnd`, `touchAction: 'pan-y'`
+- Global CSS: `transform: none` in `.page-enter` keyframe
 
-### Dashboard (UPGRADED Mar 2026)
-- Mini sparklines, Smart Suggestions, clickable stat cards
-- 2x2 compact grid
-
-### Help Center, Feedback, Community Comments (Mar 2026)
-### Quick Reset (33 emotions + search)
-### Star Chart (20 cultures, pinch zoom, culture-aware stories)
-### Sacred Texts, Encyclopedia, Crystals (VR + TTS + AI Pairing)
-### Blessings (AI + stats), Accessibility, Guided Tour, Myths & Legends
-### All other features (40+ pages, AI Avatar, Cosmic Mixer, etc.)
+### All Prior Features
+- Dashboard with sparklines, Smart Suggestions
+- Help Center, Feedback, Community Comments
+- Quick Reset (33 emotions + search), Star Chart (20 cultures, pinch zoom)
+- Sacred Texts, Encyclopedia, Crystals (VR + TTS + AI Pairing)
+- Blessings (AI + stats), Accessibility, Guided Tour, Myths & Legends
+- 40+ pages, AI Avatar, Cosmic Mixer, etc.
 
 ## Test Credentials
 - User: test@test.com / password
 - Admin/Creator: kyndsmiles@gmail.com / password
 
-## Known CSS Fix
-- `.page-enter` keyframe must use `transform: none` (not `translateY(0)`) to avoid breaking `position: fixed` modals site-wide
+## Key Technical Notes
+- `.page-enter` keyframe must use `transform: none` (not `translateY(0)`)
+- All modals inside framer-motion pages need `createPortal(document.body)` to render correctly
 
 ## Backlog
-- P1: Creator Dashboard (admin view for feedback, comments, usage analytics)
 - P2: Capacitor mobile app build
 - P3: Crystal Pairing share, Blessing notifications, Mood trends analytics
