@@ -13,16 +13,38 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## All Implemented Features
 
+### SmartDock (NEW Mar 2026)
+- **Unified floating dock** replaces 3 overlapping widgets (FloatingAssistant, QuickMeditationWidget, CosmicMixer)
+- Bottom-right dock with icons: Sage (AI assistant), Mixer (link to full Cosmic Mixer page), Tones (solfeggio frequency player)
+- Expand to show Feedback and Help shortcuts
+- Usage-based sorting (most-used icons appear first)
+- **No background dimming** — panels open inline above dock
+- Portal-based rendering at z-[80]
+
+### Cosmic Mixer Page (NEW Mar 2026)
+- Full-page mixer at `/cosmic-mixer` route (previously only floating widget)
+- 5 audio layers: Solfeggio Frequencies (9), Ambient Sounds (5), Mantras (6 with TTS), Light Therapy (6 modes), Haptic Vibration
+- Master volume control, stop-all button
+- Back button returns to previous page
+
+### Customizable Dashboard (NEW Mar 2026)
+- **"Customize" button** — enter edit mode to reorder, hide/show dashboard sections
+- **9 reorderable sections**: Stats Cards, My Shortcuts, Suggested for You, Quantum Coherence, Daily Challenge, Daily Wisdom, Recent Moods, For You, Explore & Practice
+- **Pinned Shortcuts** — phone-home-screen style icon grid; users pin their favorites from 33+ actions
+- **Add Shortcuts sheet** — bottom sheet to browse all actions by category and pin/unpin
+- **Drag-and-drop** section reordering (desktop) + up/down arrow buttons (mobile)
+- **Persisted to MongoDB** via GET/PUT `/api/dashboard/layout`
+
 ### Dashboard (UPGRADED Mar 2026)
 - **Mini sparklines** on stat cards (7-day trend graphs for moods, journals, activity)
 - **Smart Suggestions** — personalized next-steps based on user activity
 - Stat cards navigate: Streak→Growth Timeline, Moods→Mood Tracker, Journal→Journal, Games→Games
 - 2x2 compact grid, "?" help button, no auto-blocking walkthrough
 
-### Floating AI Assistant (NEW Mar 2026)
-- **"?" button** visible on every page (except auth)
-- Opens Sage AI Coach mini-chat panel with session management
-- Quick action buttons: Help Center, Submit Feedback, Quick Reset
+### Floating AI Assistant (Moved to SmartDock Mar 2026)
+- "?" Sage button accessible from SmartDock on every page (except auth)
+- Opens AI Coach mini-chat panel with session management
+- Quick action buttons: Help Center, Submit Feedback
 
 ### Help Center (NEW Mar 2026)
 - **FAQs** — 12 questions with search + category filters + accordion
@@ -37,7 +59,6 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ### Community Comments (NEW Mar 2026)
 - **Reusable component** — integrated on Crystals and Blessings pages
 - Post comments, like comments, expand/collapse thread
-- Per-feature comment threads
 
 ### Quick Reset (33 emotions + search)
 ### Star Chart (20 cultures, pinch zoom, culture-aware stories/journey)
@@ -50,6 +71,6 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Admin/Creator: kyndsmiles@gmail.com / password
 
 ## Backlog
-- No P0/P1 remaining
+- P1: Creator Dashboard (admin view for feedback, comments, usage analytics)
 - P2: Capacitor mobile app build
-- P3: Crystal Pairing share, Blessing notifications, Mood trends
+- P3: Crystal Pairing share, Blessing notifications, Mood trends analytics
