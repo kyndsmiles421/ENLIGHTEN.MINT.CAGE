@@ -157,6 +157,7 @@ export default function Yantra() {
                             text={`${active.name}. ${active.description}. The mantra for this yantra is: ${active.mantra}. Now, let us meditate. ${active.meditation}. Rest in this sacred space as long as you need. ${active.mantra}.`}
                             label="Quick Narration"
                             color={active.color}
+                            context="meditation"
                           />
                         </div>
                         <div className="mt-3">

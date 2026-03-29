@@ -128,6 +128,7 @@ export default function Tantra() {
                         text={`${active.name}. ${active.description}. Let us begin. ${active.instructions.join('. ')}. Take a moment to rest in stillness and integrate this practice.`}
                         label="Quick Narration"
                         color={active.color}
+                        context="meditation"
                       />
                       <DeepDive topic={active.name} category="tantra" color={active.color} label="AI Deep Dive" />
                     </div>

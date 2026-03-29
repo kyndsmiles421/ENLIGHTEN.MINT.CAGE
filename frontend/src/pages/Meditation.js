@@ -418,7 +418,7 @@ function GuidedSession({ meditation, onEnd }) {
 
       {/* Narration */}
       <div className="mt-4 relative z-10">
-        <NarrationPlayer text={narrationText} label="Voice Guide" color={meditation.color} />
+        <NarrationPlayer text={narrationText} label="Voice Guide" color={meditation.color} context="meditation" />
       </div>
     </motion.div>
   );
@@ -542,7 +542,7 @@ function TimerMode() {
           <div className="mt-6">
             <NarrationPlayer
               text={`Welcome to your ${preset.name} meditation. Find a comfortable position and gently close your eyes. Take a deep breath in. And slowly exhale. For the next ${preset.minutes} minutes, simply be present. Notice the sensations in your body without judgment. If thoughts arise, acknowledge them and gently return to your breath. You are safe. You are at peace.`}
-              label="Guided Voice" color={preset.color} />
+              label="Guided Voice" color={preset.color} context="meditation" />
           </div>
         </div>
       </div>

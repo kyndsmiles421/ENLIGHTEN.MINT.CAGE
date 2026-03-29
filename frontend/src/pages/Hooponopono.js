@@ -204,7 +204,7 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
       </div>
 
       <div className="mt-4 relative z-10">
-        <NarrationPlayer text={narrationText} label="Voice Guide" color={phrase.color} />
+        <NarrationPlayer text={narrationText} label="Voice Guide" color={phrase.color} context="meditation" />
       </div>
     </motion.div>
   );
@@ -356,7 +356,7 @@ export default function Hooponopono() {
             </button>
             <NarrationPlayer
               text="Ho'oponopono is an ancient Hawaiian practice of forgiveness. It uses four simple yet powerful phrases: I'm sorry. Please forgive me. Thank you. I love you. By repeating these phrases with sincerity, you clear subconscious patterns, heal relationships, and restore harmony within yourself and with others. The practice teaches that by taking responsibility for your inner world, you transform your outer world."
-              label="Learn About Practice" color="#FDA4AF" />
+              label="Learn About Practice" color="#FDA4AF" context="meditation" />
           </div>
         </motion.div>
       </div>

@@ -326,6 +326,7 @@ function SequenceView({ style, sequence, onBack, authHeaders, avatarConfig }) {
                           text={`${pose.name}. ${pose.instruction}. Breath cue: ${pose.breath}. Focus on ${pose.focus}.`}
                           label="Listen"
                           color={style.color}
+                          context="yoga"
                         />
                         {!done && (
                           <button onClick={() => completePose(i)}

@@ -259,7 +259,7 @@ export default function Oracle() {
                           {reading.interpretation}
                         </p>
                         <div className="mt-4">
-                          <NarrationPlayer text={`Your Tarot Reading. ${reading.cards?.map(c => c.name).join(', ')}. ${reading.interpretation}`} label="Hear Your Reading" color="#D8B4FE" />
+                          <NarrationPlayer text={`Your Tarot Reading. ${reading.cards?.map(c => c.name).join(', ')}. ${reading.interpretation}`} label="Hear Your Reading" color="#D8B4FE" context="tarot" />
                         </div>
                       </div>
                     </>
@@ -286,7 +286,7 @@ export default function Oracle() {
                         {reading.reading}
                       </p>
                       <div className="mt-4">
-                        <NarrationPlayer text={`${reading.sign?.sign}. ${reading.reading}`} label="Hear Your Reading" color={reading.sign?.color || '#FCD34D'} />
+                        <NarrationPlayer text={`${reading.sign?.sign}. ${reading.reading}`} label="Hear Your Reading" color={reading.sign?.color || '#FCD34D'} context="oracle" />
                       </div>
                     </>
                   )}
@@ -312,7 +312,7 @@ export default function Oracle() {
                         {reading.reading}
                       </p>
                       <div className="mt-4">
-                        <NarrationPlayer text={`The ${reading.element} ${reading.animal?.animal}. ${reading.reading}`} label="Hear Your Reading" color={reading.animal?.color || '#EF4444'} />
+                        <NarrationPlayer text={`The ${reading.element} ${reading.animal?.animal}. ${reading.reading}`} label="Hear Your Reading" color={reading.animal?.color || '#EF4444'} context="oracle" />
                       </div>
                     </>
                   )}
@@ -337,7 +337,7 @@ export default function Oracle() {
                           {reading.interpretation}
                         </p>
                         <div className="mt-4">
-                          <NarrationPlayer text={`Hexagram number ${reading.hexagram_number}. ${reading.interpretation}`} label="Hear the Oracle" color="#2DD4BF" />
+                          <NarrationPlayer text={`Hexagram number ${reading.hexagram_number}. ${reading.interpretation}`} label="Hear the Oracle" color="#2DD4BF" context="oracle" />
                         </div>
                       </div>
                     </>
@@ -362,7 +362,7 @@ export default function Oracle() {
                           {reading.meditation}
                         </p>
                         <div className="mt-4">
-                          <NarrationPlayer text={`${reading.pattern?.name}. ${reading.pattern?.meaning}. ${reading.meditation}`} label="Guided Meditation" color={reading.pattern?.color || '#D8B4FE'} />
+                          <NarrationPlayer text={`${reading.pattern?.name}. ${reading.pattern?.meaning}. ${reading.meditation}`} label="Guided Meditation" color={reading.pattern?.color || '#D8B4FE'} context="oracle" />
                         </div>
                       </div>
                     </>

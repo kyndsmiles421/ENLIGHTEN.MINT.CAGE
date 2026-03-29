@@ -126,7 +126,7 @@ export default function Classes() {
                 <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: classDetail.color }}>
                   <BookOpen size={12} className="inline mr-2" /> Lesson Content
                 </p>
-                <NarrationPlayer text={lesson.content} label="Listen" color={classDetail.color} />
+                <NarrationPlayer text={lesson.content} label="Listen" color={classDetail.color} context="knowledge" />
               </div>
               <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
                 {lesson.content}

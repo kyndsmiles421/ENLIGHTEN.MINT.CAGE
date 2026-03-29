@@ -239,6 +239,7 @@ function MudraDetail({ mudra, onClose }) {
                     text={`${mudra.name}. ${mudra.description}. Here is how to practice. ${mudra.practice}. Hold this mudra for ${mudra.duration}. The ${mudra.name} activates the ${mudra.chakra} chakra and is associated with the ${mudra.element} element. Benefits include ${mudra.benefits.join(', ')}.`}
                     label="Quick Narration"
                     color={mudra.color}
+                    context="meditation"
                   />
                 </div>
                 <DeepDive topic={mudra.name} category="mudra" color={mudra.color} label="AI Deep Dive" />

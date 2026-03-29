@@ -158,7 +158,7 @@ export default function Nourishment() {
                         </div>
 
                         <div className="flex items-center gap-3 flex-wrap">
-                          <NarrationPlayer text={`${item.name}. ${item.description}. Key ingredients: ${item.ingredients.join(', ')}. Benefits include: ${item.benefits.join(', ')}.`} label="Listen" color={item.color} />
+                          <NarrationPlayer text={`${item.name}. ${item.description}. Key ingredients: ${item.ingredients.join(', ')}. Benefits include: ${item.benefits.join(', ')}.`} label="Listen" color={item.color} context="herbology" />
                           <DeepDive topic={item.name} category="nourishment" color={item.color} label="AI Deep Dive" />
                         </div>
                       </div>
@@ -271,7 +271,7 @@ export default function Nourishment() {
               <p className="text-sm leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--text-secondary)' }} data-testid="nourish-ai-result">
                 {aiSuggestion}
               </p>
-              <NarrationPlayer text={aiSuggestion} label="Listen" color="#22C55E" />
+              <NarrationPlayer text={aiSuggestion} label="Listen" color="#22C55E" context="herbology" />
             </motion.div>
           )}
         </motion.div>

@@ -503,6 +503,7 @@ export default function Breathing() {
                   text={`Welcome to ${pattern.name} practice. ${pattern.desc}. When you're ready, inhale slowly through your nose for ${pattern.inhale} seconds. ${pattern.hold1 > 0 ? `Hold your breath gently for ${pattern.hold1} seconds.` : ''} Then exhale smoothly for ${pattern.exhale} seconds. ${pattern.hold2 > 0 ? `Hold empty for ${pattern.hold2} seconds.` : ''} Repeat this cycle, finding your natural rhythm. Let each breath draw you deeper into stillness. Your body knows how to breathe. Simply observe and follow.`}
                   label="Guided Voice"
                   color={pattern.color}
+                  context="breathing"
                 />
               </div>
               {cycles > 0 && (

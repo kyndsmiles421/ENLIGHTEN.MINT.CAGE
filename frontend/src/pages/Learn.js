@@ -117,7 +117,7 @@ function LessonView({ lesson, moduleColor, onComplete, isCompleted }) {
 
       {/* Narration */}
       <div className="mb-6">
-        <NarrationPlayer text={lesson.content.substring(0, 500)} />
+        <NarrationPlayer text={lesson.content.substring(0, 500)} context="knowledge" />
       </div>
 
       {/* Content */}

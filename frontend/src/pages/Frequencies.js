@@ -315,6 +315,7 @@ export default function Frequencies() {
                   text={`${selected.frequency} Hertz. ${selected.name}. This is a ${CATEGORY_LABELS[selected.category]} frequency associated with the ${selected.chakra} chakra. ${selected.description}. Benefits include ${selected.benefits.join(', ')}. Close your eyes and allow this frequency to resonate through your being.`}
                   label="Quick Narration"
                   color={selected.color}
+                  context="frequency"
                 />
                 <GuidedExperience
                   practiceName={`${selected.frequency}Hz ${selected.name}`}

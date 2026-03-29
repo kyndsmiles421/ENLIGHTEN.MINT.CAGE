@@ -195,7 +195,7 @@ export default function Create() {
                       {!user ? 'Sign in to Save' : saving ? 'Saving...' : 'Save Creation'}
                     </button>
                     {content && (
-                      <NarrationPlayer text={content} label="Preview Voice" color={typeConfig.color} />
+                      <NarrationPlayer text={content} label="Preview Voice" color={typeConfig.color} context="knowledge" />
                     )}
                   </div>
                 </div>
@@ -278,7 +278,7 @@ export default function Create() {
                           {c.content}
                         </p>
                         <div className="flex items-center gap-3 flex-wrap">
-                          <NarrationPlayer text={c.content} label="Listen" color={tc.color} />
+                          <NarrationPlayer text={c.content} label="Listen" color={tc.color} context="knowledge" />
                           {c.tags?.length > 0 && c.tags.map(t => (
                             <span key={t} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)' }}>{t}</span>
                           ))}
@@ -340,7 +340,7 @@ export default function Create() {
                         <p className="text-sm leading-relaxed whitespace-pre-wrap mb-3" style={{ color: 'var(--text-secondary)' }}>
                           {c.content}
                         </p>
-                        <NarrationPlayer text={c.content} label="Listen" color={tc.color} />
+                        <NarrationPlayer text={c.content} label="Listen" color={tc.color} context="knowledge" />
                       </div>
                     );
                   })}

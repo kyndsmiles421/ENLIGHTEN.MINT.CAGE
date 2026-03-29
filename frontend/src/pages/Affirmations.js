@@ -134,7 +134,7 @@ function BuildYourOwn() {
               data-testid="viewing-next-btn">
               Next
             </button>
-            <NarrationPlayer text={aff} label="Speak" color={viewingSet.color || '#FCD34D'} />
+            <NarrationPlayer text={aff} label="Speak" color={viewingSet.color || '#FCD34D'} context="affirmations" />
           </div>
           {/* Progress dots */}
           <div className="flex justify-center gap-1.5 mt-6 relative z-10">
@@ -459,7 +459,7 @@ export default function Affirmations() {
                       {copied ? <Check size={14} /> : <Copy size={14} />}
                       {copied ? 'Copied' : 'Copy'}
                     </button>
-                    <NarrationPlayer text={displayText} label="Speak Affirmation" color="#FCD34D" />
+                    <NarrationPlayer text={displayText} label="Speak Affirmation" color="#FCD34D" context="affirmations" />
                   </div>
                 )}
               </div>

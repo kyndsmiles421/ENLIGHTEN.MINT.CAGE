@@ -171,6 +171,7 @@ export default function Exercises() {
                       text={`${ex.name}. ${ex.description}. ${ex.philosophy || ''} Let us begin the practice. ${ex.steps.join('. ')}. ${ex.tips || ''} Well done. Feel the energy flowing through your body.`}
                       label="Quick Narration"
                       color={ex.color}
+                      context="yoga"
                     />
                     <GuidedExperience
                       practiceName={ex.name}
@@ -275,7 +276,7 @@ export default function Exercises() {
                               <p className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: '#FCD34D' }}>
                                 <Sparkles size={12} className="inline mr-2" /> AI Practice Guide
                               </p>
-                              <NarrationPlayer text={guide} label="Listen" color="#FCD34D" />
+                              <NarrationPlayer text={guide} label="Listen" color="#FCD34D" context="yoga" />
                             </div>
                             <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="exercise-ai-guide-text">
                               {guide}

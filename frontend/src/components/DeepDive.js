@@ -86,6 +86,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
                       text={content.substring(0, 3500)}
                       label="Listen"
                       color={color}
+                      context={category || 'knowledge'}
                     />
                   )}
                   <button onClick={() => setOpen(false)} className="p-2 rounded-full"

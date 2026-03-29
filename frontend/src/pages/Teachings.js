@@ -83,7 +83,7 @@ function ContemplationModal({ contemplation, teacher, teaching, color, onClose }
           {contemplation}
         </div>
         <div className="flex items-center gap-3">
-          <NarrationPlayer text={contemplation} label="Listen" color={color} />
+          <NarrationPlayer text={contemplation} label="Listen" color={color} context="knowledge" />
           <button onClick={onClose} className="px-4 py-2 rounded-full text-xs" style={{ color: 'var(--text-muted)' }}>
             Close
           </button>
@@ -136,7 +136,7 @@ function TeachingCard({ teaching, teacher, color, authHeaders }) {
                   </div>
                 )}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <NarrationPlayer text={`${teaching.title}. ${teaching.content}`} label="Listen" color={color} />
+                  <NarrationPlayer text={`${teaching.title}. ${teaching.content}`} label="Listen" color={color} context="knowledge" />
                   <button onClick={generateContemplation} disabled={loading}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium"
                     style={{ background: `${color}12`, color, border: `1px solid ${color}20` }}

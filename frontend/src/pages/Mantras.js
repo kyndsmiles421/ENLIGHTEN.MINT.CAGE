@@ -210,7 +210,7 @@ function MantraSession({ mantra, targetReps, soundId, onEnd }) {
       <div className="mt-4 relative z-10">
         <NarrationPlayer
           text={`${mantra.text}. ${mantra.meaning || ''}`}
-          label="Chant Guide" color={color} />
+          label="Chant Guide" color={color} context="mantras" />
       </div>
     </motion.div>
   );
@@ -544,7 +544,7 @@ export default function Mantras() {
                     </button>
                     <NarrationPlayer
                       text={`${selected.name}. ${selected.pronunciation}. ${selected.meaning}. ${selected.practice_tips}`}
-                      label="Learn Pronunciation" color={selected.color} />
+                      label="Learn Pronunciation" color={selected.color} context="mantras" />
                     <GuidedExperience
                       practiceName={selected.name}
                       description={`${selected.meaning}. ${selected.practice_tips}`}

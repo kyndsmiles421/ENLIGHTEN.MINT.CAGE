@@ -686,7 +686,7 @@ function LessonView({ lesson, stage, onComplete, isCompleted, onBack }) {
 
       {/* Narration */}
       <div className="mb-8">
-        <NarrationPlayer text={lesson.narration} label="Listen to This Lesson" color={stage.color} />
+        <NarrationPlayer text={lesson.narration} label="Listen to This Lesson" color={stage.color} context="knowledge" />
       </div>
 
       {/* Content */}
