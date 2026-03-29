@@ -25,7 +25,7 @@ export function useActivityTracker() {
     axios.post(`${API}/activity/track`, {
       page,
       action: 'visit',
-      label: document.title || page.replace(/\//g, ' ').trim(),
+      label: page.replace(/^\//,'').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Home',
     }, {
       headers: { Authorization: `Bearer ${token}` },
     }).catch(() => {});

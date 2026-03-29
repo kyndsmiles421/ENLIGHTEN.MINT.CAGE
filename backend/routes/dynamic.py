@@ -196,9 +196,9 @@ async def get_personalized_dashboard(user=Depends(get_current_user)):
     for act in recent_activities:
         pg = act.get("page", "")
         if pg and pg not in seen_pages and pg != "/":
-            label = act.get("label") or pg.strip("/").replace("-", " ").title()
             seen_pages.add(pg)
             feature = next((f for f in ALL_FEATURES if f["page"] == pg), None)
+            label = feature["name"] if feature else pg.strip("/").replace("-", " ").title()
             continue_items.append({
                 "page": pg,
                 "label": label,
