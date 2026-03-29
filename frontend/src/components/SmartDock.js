@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, Waves, Headphones, Send, BookOpen, X, ChevronLeft, ChevronRight, Sparkles, Loader2, MessageCircle, Play, Pause } from 'lucide-react';
+import { HelpCircle, Waves, Headphones, Send, BookOpen, X, ChevronLeft, Sparkles, Loader2, MessageCircle, Play, Pause, GripVertical, Minimize2, Maximize2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
+const DOCK_POS_KEY = 'cosmic_dock_position';
+const DOCK_MIN_KEY = 'cosmic_dock_minimized';
 
 function getUsage() {
   try { return JSON.parse(localStorage.getItem(USAGE_KEY) || '{}'); } catch { return {}; }
@@ -15,6 +17,12 @@ function trackUsage(id) {
   const u = getUsage();
   u[id] = (u[id] || 0) + 1;
   localStorage.setItem(USAGE_KEY, JSON.stringify(u));
+}
+function getSavedPos() {
+  try { return JSON.parse(localStorage.getItem(DOCK_POS_KEY)); } catch { return null; }
+}
+function getSavedMin() {
+  try { return localStorage.getItem(DOCK_MIN_KEY) === 'true'; } catch { return false; }
 }
 
 const FREQUENCIES = [
@@ -32,8 +40,83 @@ export default function SmartDock() {
   const location = useLocation();
   const [activePanel, setActivePanel] = useState(null);
   const [dockExpanded, setDockExpanded] = useState(false);
+  const [minimized, setMinimized] = useState(() => getSavedMin());
+  const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef(null);
+  const dockRef = useRef(null);
+  const dragStartRef = useRef(null);
 
   const hidden = location.pathname === '/auth' || location.pathname === '/tutorial' || location.pathname.startsWith('/live/');
+
+  // Persist minimized state
+  useEffect(() => {
+    localStorage.setItem(DOCK_MIN_KEY, String(minimized));
+  }, [minimized]);
+
+  // Persist position
+  useEffect(() => {
+    if (position.x !== null) {
+      localStorage.setItem(DOCK_POS_KEY, JSON.stringify(position));
+    }
+  }, [position]);
+
+  // Clamp position to viewport
+  const clampPos = useCallback((x, y) => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const dockW = minimized ? 36 : 44;
+    const dockH = minimized ? 36 : 200;
+    return {
+      x: Math.max(0, Math.min(vw - dockW, x)),
+      y: Math.max(0, Math.min(vh - dockH, y)),
+    };
+  }, [minimized]);
+
+  // Drag handlers
+  const onPointerDown = useCallback((e) => {
+    if (e.target.closest('button') && !e.target.closest('[data-drag-handle]')) return;
+    e.preventDefault();
+    setIsDragging(true);
+    const rect = dockRef.current?.getBoundingClientRect();
+    dragStartRef.current = {
+      offsetX: e.clientX - (rect?.left || 0),
+      offsetY: e.clientY - (rect?.top || 0),
+    };
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const onMove = (e) => {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      if (dragStartRef.current) {
+        const newPos = clampPos(
+          clientX - dragStartRef.current.offsetX,
+          clientY - dragStartRef.current.offsetY
+        );
+        setPosition(newPos);
+      }
+    };
+
+    const onUp = () => {
+      setIsDragging(false);
+      document.body.style.userSelect = '';
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, [isDragging, clampPos]);
 
   const usage = getUsage();
   const DOCK_ITEMS = [
@@ -51,80 +134,149 @@ export default function SmartDock() {
     setActivePanel(activePanel === id ? null : id);
   };
 
+  const toggleMinimize = () => {
+    setMinimized(!minimized);
+    setActivePanel(null);
+    setDockExpanded(false);
+  };
+
   if (hidden) return null;
 
   const visibleItems = dockExpanded ? DOCK_ITEMS : DOCK_ITEMS.slice(0, 3);
 
-  return createPortal(
-    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-[80] flex items-center pointer-events-none" data-testid="smart-dock">
-      {/* Panel — opens to the LEFT of the dock */}
-      <div className="pointer-events-auto">
-        <AnimatePresence>
-          {activePanel === 'assistant' && <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />}
-          {activePanel === 'frequency' && <FrequencyPanel onClose={() => setActivePanel(null)} />}
-          {activePanel === 'mixer' && (
-            <motion.div initial={{ opacity: 0, x: 10, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.95 }}
-              className="mr-2">
-              <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(11,12,21,0.95)', border: '1px solid rgba(129,140,248,0.15)', backdropFilter: 'blur(16px)', width: '200px' }}>
-                <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#818CF8' }}>Cosmic Mixer</p>
-                <button onClick={() => { setActivePanel(null); navigate('/cosmic-mixer'); }}
-                  className="w-full py-2 rounded-lg text-xs"
-                  style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}>
-                  Open Full Mixer
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+  // Default position: right side, vertically centered
+  const hasCustomPos = position.x !== null;
+  const posStyle = hasCustomPos
+    ? { left: position.x, top: position.y, right: 'auto' }
+    : { right: 0, top: '50%', transform: 'translateY(-50%)' };
 
-      {/* Vertical Dock Rail */}
-      <motion.div
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex flex-col items-center gap-1 py-2 px-1 rounded-l-2xl pointer-events-auto"
-        style={{
-          background: 'rgba(11,12,21,0.92)',
-          border: '1px solid rgba(248,250,252,0.06)',
-          borderRight: 'none',
-          backdropFilter: 'blur(16px)',
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.3)',
-        }}>
-        {visibleItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activePanel === item.id;
-          return (
-            <motion.button
-              key={item.id}
-              whileTap={{ scale: 0.85 }}
-              onClick={() => openPanel(item.id)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all relative"
-              style={{
-                background: isActive ? `${item.color}15` : 'transparent',
-                border: isActive ? `1px solid ${item.color}30` : '1px solid transparent',
-              }}
-              data-testid={`dock-${item.id}`}
-              title={item.label}>
-              <Icon size={15} style={{ color: isActive ? item.color : 'rgba(248,250,252,0.4)' }} />
-            </motion.button>
-          );
-        })}
-        {!dockExpanded && DOCK_ITEMS.length > 3 && (
-          <button onClick={() => setDockExpanded(true)}
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            data-testid="dock-expand">
-            <ChevronLeft size={12} style={{ color: 'rgba(248,250,252,0.25)' }} />
-          </button>
-        )}
-        {dockExpanded && (
-          <button onClick={() => setDockExpanded(false)}
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            data-testid="dock-collapse">
-            <X size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />
-          </button>
-        )}
-      </motion.div>
+  return createPortal(
+    <div
+      ref={dockRef}
+      className="fixed z-[80]"
+      style={{
+        ...posStyle,
+        cursor: isDragging ? 'grabbing' : 'default',
+        touchAction: 'none',
+      }}
+      data-testid="smart-dock">
+
+      {/* ─── Minimized state: small floating dot ─── */}
+      {minimized ? (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="flex items-center"
+          onPointerDown={onPointerDown}>
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={() => { if (!isDragging) toggleMinimize(); }}
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{
+              background: 'rgba(11,12,21,0.92)',
+              border: '1px solid rgba(192,132,252,0.2)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+            }}
+            data-testid="dock-restore"
+            title="Open Dock">
+            <Sparkles size={14} style={{ color: '#C084FC' }} />
+          </motion.button>
+        </motion.div>
+      ) : (
+        /* ─── Expanded dock ─── */
+        <div className="flex items-start">
+          {/* Panel — opens to the LEFT of the dock */}
+          <div>
+            <AnimatePresence>
+              {activePanel === 'assistant' && <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />}
+              {activePanel === 'frequency' && <FrequencyPanel onClose={() => setActivePanel(null)} />}
+              {activePanel === 'mixer' && (
+                <motion.div initial={{ opacity: 0, x: 10, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.95 }}
+                  className="mr-2">
+                  <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(11,12,21,0.95)', border: '1px solid rgba(129,140,248,0.15)', backdropFilter: 'blur(16px)', width: '200px' }}>
+                    <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#818CF8' }}>Cosmic Mixer</p>
+                    <button onClick={() => { setActivePanel(null); navigate('/cosmic-mixer'); }}
+                      className="w-full py-2 rounded-lg text-xs"
+                      style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}>
+                      Open Full Mixer
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Vertical Dock Rail */}
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col items-center gap-0.5 py-1.5 px-1 pointer-events-auto"
+            style={{
+              background: 'rgba(11,12,21,0.92)',
+              border: '1px solid rgba(248,250,252,0.06)',
+              borderRadius: hasCustomPos ? '14px' : '14px 0 0 14px',
+              borderRight: hasCustomPos ? undefined : 'none',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.3)',
+            }}>
+
+            {/* Drag handle + Minimize */}
+            <div
+              className="w-9 h-5 flex items-center justify-center rounded-lg cursor-grab active:cursor-grabbing"
+              onPointerDown={onPointerDown}
+              data-drag-handle="true"
+              data-testid="dock-drag-handle"
+              title="Drag to move">
+              <GripVertical size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
+            </div>
+
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activePanel === item.id;
+              return (
+                <motion.button
+                  key={item.id}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={() => openPanel(item.id)}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center transition-all relative"
+                  style={{
+                    background: isActive ? `${item.color}15` : 'transparent',
+                    border: isActive ? `1px solid ${item.color}30` : '1px solid transparent',
+                  }}
+                  data-testid={`dock-${item.id}`}
+                  title={item.label}>
+                  <Icon size={15} style={{ color: isActive ? item.color : 'rgba(248,250,252,0.4)' }} />
+                </motion.button>
+              );
+            })}
+
+            {!dockExpanded && DOCK_ITEMS.length > 3 && (
+              <button onClick={() => setDockExpanded(true)}
+                className="w-9 h-7 rounded-xl flex items-center justify-center"
+                data-testid="dock-expand">
+                <ChevronLeft size={11} style={{ color: 'rgba(248,250,252,0.25)' }} />
+              </button>
+            )}
+            {dockExpanded && (
+              <button onClick={() => setDockExpanded(false)}
+                className="w-9 h-7 rounded-xl flex items-center justify-center"
+                data-testid="dock-collapse">
+                <X size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />
+              </button>
+            )}
+
+            {/* Minimize button */}
+            <button onClick={toggleMinimize}
+              className="w-9 h-7 rounded-xl flex items-center justify-center mt-0.5 hover:bg-white/5 transition-colors"
+              data-testid="dock-minimize"
+              title="Minimize Dock">
+              <Minimize2 size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
+            </button>
+          </motion.div>
+        </div>
+      )}
     </div>,
     document.body
   );
