@@ -241,3 +241,46 @@ async def get_smart_suggestions(user=Depends(get_current_user)):
 
     suggestions.sort(key=lambda s: s["priority"])
     return {"suggestions": suggestions[:4]}
+
+
+# ─── Customizable Dashboard Layout ───
+
+DEFAULT_SECTIONS = ["stats", "pinned", "suggestions", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"]
+DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/crystals"]
+
+
+@router.get("/dashboard/layout")
+async def get_dashboard_layout(user=Depends(get_current_user)):
+    """Get user's customizable dashboard layout."""
+    layout = await db.dashboard_layouts.find_one(
+        {"user_id": user["id"]}, {"_id": 0}
+    )
+    if not layout:
+        return {
+            "sections_order": DEFAULT_SECTIONS,
+            "hidden_sections": [],
+            "pinned_shortcuts": DEFAULT_PINNED,
+        }
+    return {
+        "sections_order": layout.get("sections_order", DEFAULT_SECTIONS),
+        "hidden_sections": layout.get("hidden_sections", []),
+        "pinned_shortcuts": layout.get("pinned_shortcuts", DEFAULT_PINNED),
+    }
+
+
+@router.put("/dashboard/layout")
+async def save_dashboard_layout(data: dict = Body(...), user=Depends(get_current_user)):
+    """Save user's customizable dashboard layout."""
+    update = {
+        "user_id": user["id"],
+        "sections_order": data.get("sections_order", DEFAULT_SECTIONS),
+        "hidden_sections": data.get("hidden_sections", []),
+        "pinned_shortcuts": data.get("pinned_shortcuts", DEFAULT_PINNED),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.dashboard_layouts.update_one(
+        {"user_id": user["id"]},
+        {"$set": update},
+        upsert=True,
+    )
+    return {"status": "saved"}

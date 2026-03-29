@@ -9,12 +9,11 @@ import { LanguageProvider } from './context/LanguageContext';
 import { Toaster } from 'sonner';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
-import QuickMeditationWidget from './components/QuickMeditationWidget';
+import SmartDock from './components/SmartDock';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import InstallPrompt from './components/InstallPrompt';
 import CreditNudge from './components/CreditNudge';
-import CosmicMixer from './components/CosmicMixer';
 import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
@@ -99,6 +98,7 @@ const Encyclopedia = lazy(() => import('./pages/Encyclopedia'));
 const ReadingList = lazy(() => import('./pages/ReadingList'));
 const GrowthTimeline = lazy(() => import('./pages/GrowthTimeline'));
 const SoulReports = lazy(() => import('./pages/SoulReports'));
+const CosmicMixerPage = lazy(() => import('./pages/CosmicMixerPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
@@ -114,8 +114,6 @@ function PageLoader() {
     </div>
   );
 }
-
-import FloatingAssistant from './components/FloatingAssistant';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -210,6 +208,7 @@ function AnimatedRoutes() {
         <Route path="/soul-reports" element={<SoulReports />} />
         <Route path="/help-center" element={<HelpCenter />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/cosmic-mixer" element={<CosmicMixerPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
@@ -247,12 +246,10 @@ function App() {
               }}
             />
             <AnimatedRoutes />
-            <FloatingAssistant />
-            <QuickMeditationWidget />
+            <SmartDock />
             <BackToTop />
             <InstallPrompt />
             <CreditNudge />
-            <CosmicMixer />
           </div>
           </SplitScreenProvider>
         </BrowserRouter>
