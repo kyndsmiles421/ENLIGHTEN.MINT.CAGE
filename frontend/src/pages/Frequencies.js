@@ -302,7 +302,7 @@ export default function Frequencies() {
                   </span>
                 ))}
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => togglePlay(selected.id)}
                   className="btn-glass px-6 py-3 text-sm flex items-center gap-2"
