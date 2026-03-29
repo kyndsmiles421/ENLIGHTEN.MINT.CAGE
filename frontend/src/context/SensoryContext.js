@@ -17,6 +17,8 @@ const DEFAULT_PREFS = {
   reduceFlashing: false,
   soundEffects: true,
   ambientVolume: 15,
+  fontSize: 'default',
+  highContrast: false,
 };
 
 function loadPrefs() {
@@ -48,6 +50,16 @@ export function SensoryProvider({ children }) {
     root.style.setProperty('--text-muted', t.textMuted);
     document.body.style.background = t.bg;
     document.body.setAttribute('data-theme', prefs.theme === 'light' ? 'light' : 'dark');
+    // Font size
+    const fontSizes = { small: '14px', default: '16px', large: '18px', xlarge: '20px' };
+    root.style.setProperty('--base-font-size', fontSizes[prefs.fontSize] || '16px');
+    root.style.fontSize = fontSizes[prefs.fontSize] || '16px';
+    // High contrast
+    if (prefs.highContrast) {
+      root.classList.add('high-contrast');
+    } else {
+      root.classList.remove('high-contrast');
+    }
   }, [prefs]);
 
   const updatePref = useCallback((key, value) => {

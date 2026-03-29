@@ -89,6 +89,190 @@ async def get_crystals(category: str = Query("all"), chakra: str = Query(""), se
     return {"crystals": results, "categories": CATEGORIES, "chakras": CHAKRAS, "total": len(results)}
 
 
+# NOTE: Specific routes MUST come before wildcard routes like /crystals/{crystal_id}
+# Moving /crystals/recommend, /crystals/pairing/*, /crystals/collection/*, /crystals/rockhound/* here
+
+@router.get("/crystals/recommend")
+async def recommend_crystals(mood: str = Query(""), intention: str = Query(""), user=Depends(get_current_user)):
+    """AI-free crystal recommendation based on mood/intention."""
+    mood_map = {
+        "stressed": ["amethyst", "selenite", "moonstone"],
+        "anxious": ["amethyst", "rose-quartz", "moonstone"],
+        "sad": ["rose-quartz", "citrine", "turquoise"],
+        "tired": ["citrine", "tigers-eye", "clear-quartz"],
+        "angry": ["obsidian", "amethyst", "malachite"],
+        "confused": ["lapis-lazuli", "clear-quartz", "labradorite"],
+        "blocked": ["citrine", "tigers-eye", "malachite"],
+        "lonely": ["rose-quartz", "turquoise", "moonstone"],
+    }
+    intention_map = {
+        "love": ["rose-quartz", "moonstone", "malachite"],
+        "protection": ["obsidian", "tigers-eye", "turquoise"],
+        "wisdom": ["lapis-lazuli", "amethyst", "labradorite"],
+        "abundance": ["citrine", "tigers-eye", "malachite"],
+        "healing": ["clear-quartz", "turquoise", "selenite"],
+        "intuition": ["amethyst", "moonstone", "labradorite"],
+        "courage": ["tigers-eye", "obsidian", "citrine"],
+        "peace": ["selenite", "amethyst", "moonstone"],
+    }
+
+    ids = set()
+    if mood and mood.lower() in mood_map:
+        ids.update(mood_map[mood.lower()])
+    if intention and intention.lower() in intention_map:
+        ids.update(intention_map[intention.lower()])
+    if not ids:
+        ids = {"clear-quartz", "amethyst", "rose-quartz"}
+
+    recs = [c for c in CRYSTAL_DATABASE if c["id"] in ids]
+    return {"recommendations": recs, "mood": mood, "intention": intention}
+
+
+MOODS = ["Stressed", "Anxious", "Sad", "Tired", "Angry", "Confused", "Blocked", "Lonely", "Restless", "Overwhelmed", "Grief", "Fearful"]
+INTENTIONS = ["Love", "Protection", "Wisdom", "Abundance", "Healing", "Intuition", "Courage", "Peace", "Grounding", "Creativity", "Clarity", "Transformation"]
+
+
+@router.get("/crystals/pairing/options")
+async def get_pairing_options():
+    """Get available moods and intentions for crystal pairing."""
+    return {"moods": MOODS, "intentions": INTENTIONS}
+
+
+@router.get("/crystals/pairing/history")
+async def get_pairing_history(user=Depends(get_current_user)):
+    """Get user's previous crystal pairings."""
+    pairings = await db.crystal_pairings.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+    # Attach crystal data
+    for p in pairings:
+        p["crystals"] = [c for c in CRYSTAL_DATABASE if c["id"] in p.get("crystal_ids", [])]
+    return {"pairings": pairings}
+
+
+@router.post("/crystals/pairing/narrate")
+async def narrate_pairing(data: dict, user=Depends(get_current_user)):
+    """TTS narration of crystal pairing explanation."""
+    text = data.get("text", "")
+    if not text or len(text) < 10:
+        raise HTTPException(status_code=400, detail="No text to narrate")
+
+    cache_key = hashlib.md5(f"pairing-{text[:200]}".encode()).hexdigest()
+    if cache_key in tts_cache:
+        return {"audio": tts_cache[cache_key]}
+
+    try:
+        from emergentintegrations.llm.openai import OpenAITextToSpeech
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        audio_b64 = await tts.generate_speech_base64(
+            text=text[:4096], model="tts-1-hd", voice="sage", speed=0.85, response_format="mp3",
+        )
+        tts_cache[cache_key] = audio_b64
+        return {"audio": audio_b64}
+    except Exception as e:
+        logger.error(f"Pairing TTS error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to narrate pairing")
+
+
+@router.post("/crystals/pairing")
+async def crystal_pairing(data: dict, user=Depends(get_current_user)):
+    """AI-powered crystal pairing: suggests 3 crystals based on mood + intention with explanation."""
+    import asyncio
+    mood = data.get("mood", "")
+    intention = data.get("intention", "")
+    custom = data.get("custom_note", "")
+
+    crystal_info = "\n".join([f"- {c['name']} ({c['aka']}): {c['chakra']} chakra, {c['element']} element. Uses: {', '.join(c['uses'])}" for c in CRYSTAL_DATABASE])
+
+    prompt = (
+        f"You are a wise crystal healer. A seeker comes to you feeling '{mood}' with the intention of '{intention}'."
+        + (f" They also share: '{custom}'" if custom else "")
+        + f"\n\nAvailable crystals:\n{crystal_info}\n\n"
+        f"Recommend exactly 3 crystals from the list above. For each, explain WHY it matches their energy in 2 sentences. "
+        f"Then give a brief ritual suggestion (1-2 sentences) for using the combination together. "
+        f"Format:\n1. [Crystal Name]: [Explanation]\n2. [Crystal Name]: [Explanation]\n3. [Crystal Name]: [Explanation]\n\nRitual: [suggestion]"
+    )
+
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"crystal-pair-{uuid.uuid4().hex[:8]}",
+            system_message="You are a wise and compassionate crystal healer with deep knowledge of crystal properties and their spiritual significance."
+        )
+        response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
+
+        # Parse crystal IDs from response
+        matched = []
+        resp_lower = response.lower()
+        for c in CRYSTAL_DATABASE:
+            if c["name"].lower() in resp_lower:
+                matched.append(c)
+        matched = matched[:3]
+        if not matched:
+            matched = [c for c in CRYSTAL_DATABASE if c["id"] in ["amethyst", "rose-quartz", "clear-quartz"]]
+
+        result = {
+            "crystals": matched,
+            "explanation": response,
+            "mood": mood,
+            "intention": intention,
+        }
+
+        # Save pairing to DB
+        pairing = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "mood": mood,
+            "intention": intention,
+            "crystal_ids": [c["id"] for c in matched],
+            "explanation": response,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.crystal_pairings.insert_one(pairing)
+
+        return result
+    except Exception as e:
+        logger.error(f"Crystal pairing AI error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate crystal pairing")
+
+
+@router.post("/crystals/collection/add")
+async def add_to_collection(data: dict, user=Depends(get_current_user)):
+    """Add a crystal to user's personal collection."""
+    crystal_id = data.get("crystal_id", "")
+    crystal = next((c for c in CRYSTAL_DATABASE if c["id"] == crystal_id), None)
+    if not crystal:
+        raise HTTPException(status_code=404, detail="Crystal not found")
+
+    existing = await db.crystal_collections.find_one({"user_id": user["id"], "crystal_id": crystal_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Already in your collection")
+
+    entry = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "crystal_id": crystal_id,
+        "crystal_name": crystal["name"],
+        "found_via": data.get("found_via", "encyclopedia"),
+        "notes": data.get("notes", ""),
+        "added_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.crystal_collections.insert_one(entry)
+    entry.pop("_id", None)
+    return entry
+
+
+@router.get("/crystals/collection/mine")
+async def get_my_collection(user=Depends(get_current_user)):
+    """Get user's crystal collection."""
+    entries = await db.crystal_collections.find({"user_id": user["id"]}, {"_id": 0}).sort("added_at", -1).to_list(100)
+    crystal_ids = [e["crystal_id"] for e in entries]
+    crystals = [c for c in CRYSTAL_DATABASE if c["id"] in crystal_ids]
+    return {"collection": entries, "crystals": crystals, "count": len(entries)}
+
+
+# Wildcard route MUST come AFTER all specific routes
 @router.get("/crystals/{crystal_id}")
 async def get_crystal(crystal_id: str):
     """Get a single crystal's full details."""
@@ -130,78 +314,6 @@ async def narrate_crystal(crystal_id: str):
         logger.error(f"Crystal TTS error: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate crystal narration")
 
-
-@router.get("/crystals/recommend")
-async def recommend_crystals(mood: str = Query(""), intention: str = Query(""), user=Depends(get_current_user)):
-    """AI-free crystal recommendation based on mood/intention."""
-    mood_map = {
-        "stressed": ["amethyst", "selenite", "moonstone"],
-        "anxious": ["amethyst", "rose-quartz", "moonstone"],
-        "sad": ["rose-quartz", "citrine", "turquoise"],
-        "tired": ["citrine", "tigers-eye", "clear-quartz"],
-        "angry": ["obsidian", "amethyst", "malachite"],
-        "confused": ["lapis-lazuli", "clear-quartz", "labradorite"],
-        "blocked": ["citrine", "tigers-eye", "malachite"],
-        "lonely": ["rose-quartz", "turquoise", "moonstone"],
-    }
-    intention_map = {
-        "love": ["rose-quartz", "moonstone", "malachite"],
-        "protection": ["obsidian", "tigers-eye", "turquoise"],
-        "wisdom": ["lapis-lazuli", "amethyst", "labradorite"],
-        "abundance": ["citrine", "tigers-eye", "malachite"],
-        "healing": ["clear-quartz", "turquoise", "selenite"],
-        "intuition": ["amethyst", "moonstone", "labradorite"],
-        "courage": ["tigers-eye", "obsidian", "citrine"],
-        "peace": ["selenite", "amethyst", "moonstone"],
-    }
-
-    ids = set()
-    if mood and mood.lower() in mood_map:
-        ids.update(mood_map[mood.lower()])
-    if intention and intention.lower() in intention_map:
-        ids.update(intention_map[intention.lower()])
-    if not ids:
-        ids = {"clear-quartz", "amethyst", "rose-quartz"}
-
-    recs = [c for c in CRYSTAL_DATABASE if c["id"] in ids]
-    return {"recommendations": recs, "mood": mood, "intention": intention}
-
-
-@router.post("/crystals/collection/add")
-async def add_to_collection(data: dict, user=Depends(get_current_user)):
-    """Add a crystal to user's personal collection."""
-    crystal_id = data.get("crystal_id", "")
-    crystal = next((c for c in CRYSTAL_DATABASE if c["id"] == crystal_id), None)
-    if not crystal:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="Crystal not found")
-
-    existing = await db.crystal_collections.find_one({"user_id": user["id"], "crystal_id": crystal_id})
-    if existing:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="Already in your collection")
-
-    entry = {
-        "id": str(uuid.uuid4()),
-        "user_id": user["id"],
-        "crystal_id": crystal_id,
-        "crystal_name": crystal["name"],
-        "found_via": data.get("found_via", "encyclopedia"),
-        "notes": data.get("notes", ""),
-        "added_at": datetime.now(timezone.utc).isoformat(),
-    }
-    await db.crystal_collections.insert_one(entry)
-    entry.pop("_id", None)
-    return entry
-
-
-@router.get("/crystals/collection/mine")
-async def get_my_collection(user=Depends(get_current_user)):
-    """Get user's crystal collection."""
-    entries = await db.crystal_collections.find({"user_id": user["id"]}, {"_id": 0}).sort("added_at", -1).to_list(100)
-    crystal_ids = [e["crystal_id"] for e in entries]
-    crystals = [c for c in CRYSTAL_DATABASE if c["id"] in crystal_ids]
-    return {"collection": entries, "crystals": crystals, "count": len(entries)}
 
 
 # ─── Rock Hounding Game ─────────────────────────────────────────────────

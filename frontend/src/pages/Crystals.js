@@ -6,7 +6,7 @@ import {
   ArrowLeft, Search, X, Loader2, Volume2, VolumeX, Play, Pause,
   Sparkles, ChevronRight, Maximize2, Minimize2, Gem, Heart, Shield,
   Sun, Moon, Droplets, Wind, Eye, Flame, Star, Zap, Compass,
-  Plus, Pickaxe, MapPin, Package, Headphones, RefreshCw
+  Plus, Pickaxe, MapPin, Package, Headphones, RefreshCw, Brain
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -490,6 +490,212 @@ function RockHoundPanel({ token, headers }) {
 }
 
 /* ═══════════════════════════════════════
+   CRYSTAL PAIRING AI
+   ═══════════════════════════════════════ */
+function CrystalPairingPanel({ token, headers }) {
+  const [moods, setMoods] = useState([]);
+  const [intentions, setIntentions] = useState([]);
+  const [selectedMood, setSelectedMood] = useState('');
+  const [selectedIntention, setSelectedIntention] = useState('');
+  const [customNote, setCustomNote] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [narrating, setNarrating] = useState(false);
+  const [audioRef] = useState({ current: null });
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${API}/crystals/pairing/options`).then(r => {
+      setMoods(r.data.moods || []);
+      setIntentions(r.data.intentions || []);
+    }).catch(() => {});
+    if (token) {
+      axios.get(`${API}/crystals/pairing/history`, { headers }).then(r => setHistory(r.data.pairings || [])).catch(() => {});
+    }
+  }, [token]);
+
+  const generatePairing = async () => {
+    if (!selectedMood && !selectedIntention) { toast.error('Select a mood or intention'); return; }
+    setLoading(true); setResult(null);
+    try {
+      const r = await axios.post(`${API}/crystals/pairing`, {
+        mood: selectedMood, intention: selectedIntention, custom_note: customNote,
+      }, { headers });
+      setResult(r.data);
+      // Refresh history
+      axios.get(`${API}/crystals/pairing/history`, { headers }).then(r2 => setHistory(r2.data.pairings || [])).catch(() => {});
+    } catch (e) { toast.error(e.response?.data?.detail || 'Failed to generate pairing'); }
+    setLoading(false);
+  };
+
+  const narratePairing = async () => {
+    if (!result?.explanation) return;
+    setNarrating(true);
+    try {
+      const r = await axios.post(`${API}/crystals/pairing/narrate`, { text: result.explanation }, { headers });
+      if (r.data.audio) {
+        if (audioRef.current) { audioRef.current.pause(); }
+        const audio = new Audio(`data:audio/mp3;base64,${r.data.audio}`);
+        audioRef.current = audio;
+        audio.play();
+      }
+    } catch { toast.error('Narration unavailable'); }
+    setNarrating(false);
+  };
+
+  return (
+    <div data-testid="crystal-pairing-panel">
+      <p className="text-[9px] uppercase tracking-[0.2em] mb-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+        <Brain size={9} className="inline mr-1" /> AI Crystal Pairing
+      </p>
+
+      {!token ? (
+        <p className="text-xs text-center py-6" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to get personalized crystal pairings</p>
+      ) : (
+        <div className="space-y-4">
+          {/* Mood selection */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              How are you feeling?
+            </label>
+            <div className="flex flex-wrap gap-1.5" data-testid="mood-picker">
+              {moods.map(m => (
+                <button key={m} onClick={() => setSelectedMood(selectedMood === m ? '' : m)}
+                  className="px-3 py-1.5 rounded-full text-[10px] transition-all"
+                  style={{
+                    background: selectedMood === m ? 'rgba(168,85,247,0.12)' : 'rgba(15,17,28,0.6)',
+                    color: selectedMood === m ? '#A855F7' : 'rgba(248,250,252,0.35)',
+                    border: `1px solid ${selectedMood === m ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`,
+                  }}>
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Intention selection */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              What is your intention?
+            </label>
+            <div className="flex flex-wrap gap-1.5" data-testid="intention-picker">
+              {intentions.map(i => (
+                <button key={i} onClick={() => setSelectedIntention(selectedIntention === i ? '' : i)}
+                  className="px-3 py-1.5 rounded-full text-[10px] transition-all"
+                  style={{
+                    background: selectedIntention === i ? 'rgba(45,212,191,0.12)' : 'rgba(15,17,28,0.6)',
+                    color: selectedIntention === i ? '#2DD4BF' : 'rgba(248,250,252,0.35)',
+                    border: `1px solid ${selectedIntention === i ? 'rgba(45,212,191,0.25)' : 'rgba(248,250,252,0.04)'}`,
+                  }}>
+                  {i}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom note */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              Additional context (optional)
+            </label>
+            <input value={customNote} onChange={e => setCustomNote(e.target.value)}
+              placeholder="E.g., preparing for a new job, healing from heartbreak..."
+              className="w-full px-4 py-2.5 rounded-xl text-xs outline-none"
+              style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }}
+              data-testid="pairing-custom-note" />
+          </div>
+
+          {/* Generate button */}
+          <button onClick={generatePairing} disabled={loading || (!selectedMood && !selectedIntention)}
+            className="w-full py-3 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+            style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.2)', color: '#A855F7' }}
+            data-testid="generate-pairing-btn">
+            {loading ? <Loader2 size={14} className="animate-spin" /> : <Brain size={14} />}
+            {loading ? 'Consulting the crystals...' : 'Find My Crystal Match'}
+          </button>
+
+          {/* Result */}
+          <AnimatePresence>
+            {result && (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="space-y-3" data-testid="pairing-result">
+                {/* Matched crystals */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(result.crystals || []).map((c, i) => (
+                    <motion.div key={c.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="rounded-xl p-4 text-center"
+                      style={{ background: 'rgba(15,17,28,0.5)', border: `1px solid ${c.color}20` }}>
+                      <div className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                        style={{ background: `${c.color}15`, boxShadow: `0 0 30px ${c.color}10` }}>
+                        <Gem size={20} style={{ color: c.color }} />
+                      </div>
+                      <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{c.name}</p>
+                      <p className="text-[9px]" style={{ color: c.color }}>{c.aka}</p>
+                      <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.3)' }}>{c.chakra} Chakra</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* AI explanation */}
+                <div className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#A855F7' }}>Crystal Guidance</p>
+                    <button onClick={narratePairing} disabled={narrating}
+                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] transition-all"
+                      style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.15)', color: '#A855F7' }}
+                      data-testid="narrate-pairing-btn">
+                      {narrating ? <Loader2 size={10} className="animate-spin" /> : <Headphones size={10} />}
+                      Listen
+                    </button>
+                  </div>
+                  <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    {result.explanation}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* History */}
+          {history.length > 0 && (
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.15em] mb-2 mt-4" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                Recent Pairings
+              </p>
+              <div className="space-y-2">
+                {history.slice(0, 5).map((p, i) => (
+                  <div key={p.id} className="rounded-lg p-3 flex items-center gap-3"
+                    style={{ background: 'rgba(15,17,28,0.3)', border: '1px solid rgba(248,250,252,0.03)' }}
+                    data-testid={`history-pairing-${i}`}>
+                    <div className="flex -space-x-1">
+                      {(p.crystals || []).slice(0, 3).map(c => (
+                        <div key={c.id} className="w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{ background: `${c.color}20`, border: `1px solid ${c.color}30` }}>
+                          <Gem size={10} style={{ color: c.color }} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                        {(p.crystals || []).map(c => c.name).join(', ')}
+                      </p>
+                      <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                        {p.mood && `Mood: ${p.mood}`}{p.mood && p.intention && ' · '}{p.intention && `Intent: ${p.intention}`}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
    MAIN PAGE
    ═══════════════════════════════════════ */
 export default function Crystals() {
@@ -538,6 +744,7 @@ export default function Crystals() {
 
   const tabs = [
     { id: 'encyclopedia', label: 'Crystal Guide', icon: Gem },
+    { id: 'pairing', label: 'Crystal Pairing', icon: Brain },
     { id: 'collection', label: 'My Collection', icon: Package },
     { id: 'rockhound', label: 'Rock Hounding', icon: Pickaxe },
   ];
@@ -651,6 +858,13 @@ export default function Crystals() {
           {activeTab === 'rockhound' && (
             <motion.div key="rock" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
               <RockHoundPanel token={token} headers={headers} />
+            </motion.div>
+          )}
+
+          {/* CRYSTAL PAIRING TAB */}
+          {activeTab === 'pairing' && (
+            <motion.div key="pair" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+              <CrystalPairingPanel token={token} headers={headers} />
             </motion.div>
           )}
         </AnimatePresence>

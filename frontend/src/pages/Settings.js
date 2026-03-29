@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Eye, Palette, Sparkles, Monitor,
-  Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight
+  Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 
@@ -197,6 +197,46 @@ export default function Settings() {
             testId="toggle-reduce-flashing"
             icon={Shield}
           />
+          <Toggle
+            label="High Contrast"
+            description="Increase text contrast and border visibility"
+            checked={prefs.highContrast}
+            onChange={v => updatePref('highContrast', v)}
+            testId="toggle-high-contrast"
+            icon={Contrast}
+          />
+        </Section>
+
+        {/* Accessibility */}
+        <Section title="Accessibility">
+          <div className="px-4 py-3" style={{ borderBottom: `1px solid ${subtle}0.04)` }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Type size={14} style={{ color: 'var(--text-muted)' }} />
+              <p className="text-xs" style={{ color: 'var(--text-primary)' }}>Font Size</p>
+            </div>
+            <div className="grid grid-cols-4 gap-2" data-testid="font-size-picker">
+              {[
+                { id: 'small', label: 'Small', sample: 'text-[10px]' },
+                { id: 'default', label: 'Default', sample: 'text-xs' },
+                { id: 'large', label: 'Large', sample: 'text-sm' },
+                { id: 'xlarge', label: 'X-Large', sample: 'text-base' },
+              ].map(fs => {
+                const active = prefs.fontSize === fs.id;
+                return (
+                  <button key={fs.id}
+                    onClick={() => { updatePref('fontSize', fs.id); toast.success(`Font: ${fs.label}`); }}
+                    className="p-2.5 rounded-lg text-center transition-all hover:scale-[1.02]"
+                    style={{
+                      background: active ? 'var(--primary)12' : `${subtle}0.03)`,
+                      border: `1px solid ${active ? 'var(--primary)30' : `${subtle}0.06)`}`,
+                    }}
+                    data-testid={`font-${fs.id}`}>
+                    <p className={`${fs.sample} font-medium`} style={{ color: active ? 'var(--primary)' : 'var(--text-secondary)' }}>{fs.label}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </Section>
 
         {/* Quick Links */}
@@ -233,6 +273,8 @@ export default function Settings() {
               updatePref('reduceFlashing', false);
               updatePref('soundEffects', true);
               updatePref('ambientVolume', 15);
+              updatePref('fontSize', 'default');
+              updatePref('highContrast', false);
               toast.success('Settings reset to defaults');
             }}
             className={`text-[10px] px-4 py-2 rounded-lg transition-all ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/5'}`}
