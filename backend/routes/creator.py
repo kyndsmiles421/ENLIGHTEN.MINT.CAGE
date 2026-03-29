@@ -165,10 +165,135 @@ async def track_install(data: dict = Body(...), user=Depends(get_current_user)):
         "platform": data.get("platform", "unknown"),
         "installed_at": datetime.now(timezone.utc).isoformat(),
     }
-    # Upsert — one install per user
     await db.app_installs.update_one(
         {"user_id": user["id"]},
         {"$set": doc},
         upsert=True,
     )
     return {"status": "tracked"}
+
+
+# ─── Interactive Creator Actions ───
+
+@router.post("/creator/broadcast")
+async def broadcast_notification(data: dict = Body(...), user=Depends(require_creator)):
+    """Send a notification to all users or a subset."""
+    import uuid
+    title = data.get("title", "")
+    body = data.get("body", "")
+    target = data.get("target", "all")  # "all", "active", "new"
+    if not title or not body:
+        raise HTTPException(status_code=400, detail="Title and body required")
+
+    now = datetime.now(timezone.utc)
+    query = {}
+    if target == "active":
+        week_ago = (now - timedelta(days=7)).isoformat()
+        active_ids = await db.activity_log.distinct("user_id", {"timestamp": {"$gte": week_ago}})
+        query = {"id": {"$in": active_ids}}
+    elif target == "new":
+        week_ago = (now - timedelta(days=7)).isoformat()
+        query = {"created_at": {"$gte": week_ago}}
+
+    users_list = await db.users.find(query, {"_id": 0, "id": 1}).to_list(5000)
+    notifications = []
+    for u in users_list:
+        notifications.append({
+            "id": str(uuid.uuid4()),
+            "user_id": u["id"],
+            "type": "announcement",
+            "title": title,
+            "body": body,
+            "url": data.get("url", "/"),
+            "read": False,
+            "created_at": now.isoformat(),
+        })
+    if notifications:
+        await db.in_app_notifications.insert_many(notifications)
+
+    # Log the broadcast
+    await db.creator_broadcasts.insert_one({
+        "id": str(uuid.uuid4()),
+        "title": title,
+        "body": body,
+        "target": target,
+        "sent_to": len(notifications),
+        "created_at": now.isoformat(),
+    })
+    return {"status": "sent", "recipients": len(notifications)}
+
+
+@router.get("/creator/broadcasts")
+async def get_broadcasts(user=Depends(require_creator)):
+    """Get broadcast history."""
+    items = await db.creator_broadcasts.find({}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return {"broadcasts": items}
+
+
+@router.get("/creator/user/{user_id}")
+async def get_user_detail(user_id: str, user=Depends(require_creator)):
+    """Get detailed info about a specific user."""
+    target = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    now = datetime.now(timezone.utc)
+    week_ago = (now - timedelta(days=7)).isoformat()
+
+    mood_count = await db.mood_entries.count_documents({"user_id": user_id})
+    journal_count = await db.journal_entries.count_documents({"user_id": user_id})
+    session_count = await db.coach_sessions.count_documents({"user_id": user_id})
+    activity_week = await db.activity_log.count_documents({"user_id": user_id, "timestamp": {"$gte": week_ago}})
+    last_activity = await db.activity_log.find_one({"user_id": user_id}, {"_id": 0}, sort=[("timestamp", -1)])
+
+    return {
+        **target,
+        "mood_count": mood_count,
+        "journal_count": journal_count,
+        "session_count": session_count,
+        "activity_this_week": activity_week,
+        "last_active": last_activity.get("timestamp") if last_activity else None,
+    }
+
+
+@router.post("/creator/user/{user_id}/toggle-status")
+async def toggle_user_status(user_id: str, data: dict = Body(...), user=Depends(require_creator)):
+    """Enable or disable a user account."""
+    disabled = data.get("disabled", False)
+    await db.users.update_one({"id": user_id}, {"$set": {"disabled": disabled, "updated_at": datetime.now(timezone.utc).isoformat()}})
+    return {"status": "disabled" if disabled else "enabled"}
+
+
+@router.get("/creator/search-users")
+async def search_users(q: str = "", user=Depends(require_creator)):
+    """Search users by name or email."""
+    if not q or len(q) < 2:
+        return {"users": []}
+    query = {"$or": [
+        {"name": {"$regex": q, "$options": "i"}},
+        {"email": {"$regex": q, "$options": "i"}},
+    ]}
+    results = await db.users.find(query, {"_id": 0, "password": 0}).limit(20).to_list(20)
+    return {"users": results}
+
+
+@router.get("/creator/export/{collection}")
+async def export_data(collection: str, user=Depends(require_creator)):
+    """Export data as JSON for download."""
+    allowed = {"users": db.users, "feedback": db.feedback, "comments": db.comments, "mood_entries": db.mood_entries}
+    if collection not in allowed:
+        raise HTTPException(status_code=400, detail=f"Invalid collection. Allowed: {', '.join(allowed.keys())}")
+
+    coll = allowed[collection]
+    projection = {"_id": 0}
+    if collection == "users":
+        projection["password"] = 0
+    items = await coll.find({}, projection).sort("created_at", -1).to_list(5000)
+
+    from fastapi.responses import Response
+    import json
+    return Response(
+        content=json.dumps(items, indent=2, default=str),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{collection}_export.json"'},
+    )
