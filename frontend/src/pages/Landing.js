@@ -776,14 +776,8 @@ export default function Landing() {
   const [showTour, setShowTour] = useState(false);
   const animRef = useRef(null);
 
-  // Auto-launch tour for first-time visitors
-  useEffect(() => {
-    const hasSeenTour = localStorage.getItem('zen_tour_seen');
-    if (!hasSeenTour) {
-      const timer = setTimeout(() => setShowTour(true), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+  // Tour only opens when user clicks "Take the Tour" button
+  // No auto-launch — first-time visitors should be able to navigate freely
 
   const handleTourFinish = () => {
     localStorage.setItem('zen_tour_seen', 'true');
