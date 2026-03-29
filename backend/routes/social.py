@@ -35,8 +35,13 @@ async def discover_users(page: int = 1, limit: int = 20, user=Depends(get_curren
     pending_set = {p["to_id"] if p["from_id"] == user["id"] else p["from_id"] for p in pending}
 
     results = []
+    # Batch-fetch all profiles in one query instead of N+1
+    batch_ids = [u["id"] for u in all_users]
+    profiles_list = await db.profiles.find({"user_id": {"$in": batch_ids}}, {"_id": 0}).to_list(len(batch_ids))
+    profiles_map = {p["user_id"]: p for p in profiles_list}
+
     for u in all_users:
-        profile = await db.profiles.find_one({"user_id": u["id"]}, {"_id": 0}) or {}
+        profile = profiles_map.get(u["id"], {})
         results.append({
             "id": u["id"],
             "name": u.get("name", ""),
