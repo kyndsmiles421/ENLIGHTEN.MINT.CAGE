@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import CommunityComments from '../components/CommunityComments';
 import {
   ArrowLeft, Search, X, Loader2, Volume2, VolumeX, Play, Pause,
   Sparkles, ChevronRight, Maximize2, Minimize2, Gem, Heart, Shield,
@@ -868,6 +869,9 @@ export default function Crystals() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Community Comments */}
+        <CommunityComments feature="crystals" title="Crystal Community" />
       </div>
 
       <AnimatePresence>

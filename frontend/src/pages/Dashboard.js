@@ -18,6 +18,31 @@ import Walkthrough from '../components/Walkthrough';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+function MiniSparkline({ data, color }) {
+  if (!data || data.length === 0) return null;
+  const max = Math.max(...data, 1);
+  const h = 40;
+  const w = 100;
+  const points = data.map((v, i) => ({
+    x: (i / (data.length - 1)) * w,
+    y: h - (v / max) * h * 0.8 - 2,
+  }));
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const area = line + ` L ${w} ${h} L 0 ${h} Z`;
+  return (
+    <svg className="absolute bottom-0 right-0 opacity-[0.12]" width={w} height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+      <defs>
+        <linearGradient id={`grad-${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.4" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#grad-${color.replace('#','')})`} />
+      <path d={line} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 const REC_ICON_MAP = {
   wind: Wind, timer: Timer, sun: Sparkles, 'book-open': BookOpen,
   heart: Heart, headphones: Headphones, radio: Radio, sprout: Sprout,
@@ -91,6 +116,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showWalkthrough, setShowWalkthrough] = useState(false);
   const [coherence, setCoherence] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -105,6 +131,7 @@ export default function Dashboard() {
         axios.get(`${API}/daily-challenge`, { headers: authHeaders }).then(res => setDailyChallenge(res.data)).catch(() => {}),
         axios.get(`${API}/teachings/daily-wisdom`).then(res => setDailyWisdom(res.data)).catch(() => {}),
         axios.get(`${API}/notifications/quantum-coherence`, { headers: authHeaders }).then(res => setCoherence(res.data)).catch(() => {}),
+        axios.get(`${API}/dashboard/suggestions`, { headers: authHeaders }).then(res => setSuggestions(res.data.suggestions || [])).catch(() => {}),
       ]).finally(() => setLoading(false));
     }
   }, [user, authLoading, authHeaders, navigate]);
@@ -159,12 +186,12 @@ export default function Dashboard() {
           </p>
         </motion.div>
 
-        {/* Stats Cards — Compact & Tappable */}
+        {/* Stats Cards — Compact & Tappable with Sparklines */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {[
-            { icon: Flame, color: '#FCD34D', label: 'Streak', value: streak?.current_streak || stats?.streak || 0, sub: `${streak?.longest_streak || 0} best | ${streak?.total_active_days || 0} total`, testId: 'dashboard-streak', link: '/growth-timeline' },
-            { icon: Heart, color: '#FDA4AF', label: 'Mood Logs', value: stats?.mood_count || 0, sub: 'emotions tracked', testId: 'dashboard-moods', link: '/mood' },
-            { icon: BookOpen, color: '#86EFAC', label: 'Journal', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals', link: '/journal' },
+            { icon: Flame, color: '#FCD34D', label: 'Streak', value: streak?.current_streak || stats?.streak || 0, sub: `${streak?.longest_streak || 0} best | ${streak?.total_active_days || 0} total`, testId: 'dashboard-streak', link: '/growth-timeline', sparkline: stats?.sparkline?.activity },
+            { icon: Heart, color: '#FDA4AF', label: 'Mood Logs', value: stats?.mood_count || 0, sub: 'emotions tracked', testId: 'dashboard-moods', link: '/mood', sparkline: stats?.sparkline?.moods },
+            { icon: BookOpen, color: '#86EFAC', label: 'Journal', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals', link: '/journal', sparkline: stats?.sparkline?.journals },
             { icon: Gamepad2, color: '#FB923C', label: 'Games', value: '', sub: 'Play to earn', testId: 'dashboard-games', link: '/games' },
           ].map((card, i) => {
             const Icon = card.icon;
@@ -172,33 +199,63 @@ export default function Dashboard() {
               <motion.button key={card.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.04 }}
                 onClick={() => navigate(card.link)}
                 onTouchEnd={(e) => { e.preventDefault(); navigate(card.link); }}
-                className="glass-card p-4 text-left group active:scale-[0.97] transition-all duration-200"
+                className="glass-card p-4 text-left group active:scale-[0.97] transition-all duration-200 relative overflow-hidden"
                 style={{ touchAction: 'manipulation' }}
                 data-testid={card.testId}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                      style={{ background: `${card.color}12` }}>
-                      <Icon size={14} style={{ color: card.color, filter: `drop-shadow(0 0 4px ${card.color}60)` }} />
+                {/* Sparkline background */}
+                {card.sparkline && <MiniSparkline data={card.sparkline} color={card.color} />}
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ background: `${card.color}12` }}>
+                        <Icon size={14} style={{ color: card.color, filter: `drop-shadow(0 0 4px ${card.color}60)` }} />
+                      </div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
                     </div>
-                    <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
+                    <ChevronRight size={12} style={{ color: card.color, opacity: 0.5 }}
+                      className="group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
                   </div>
-                  <ChevronRight size={12} style={{ color: card.color, opacity: 0.5 }}
-                    className="group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                  {card.value !== '' ? (
+                    <p className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                      {card.value}
+                    </p>
+                  ) : (
+                    <p className="text-sm font-medium" style={{ color: card.color }}>Play Now</p>
+                  )}
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
                 </div>
-                {card.value !== '' ? (
-                  <p className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                    {card.value}
-                  </p>
-                ) : (
-                  <p className="text-sm font-medium" style={{ color: card.color }}>Play Now</p>
-                )}
-                <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
               </motion.button>
             );
           })}
         </div>
+
+        {/* Smart Suggestions */}
+        {suggestions.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="mb-8" data-testid="smart-suggestions">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Suggested for You</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {suggestions.map((s, i) => (
+                <motion.button key={s.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.05 }}
+                  onClick={() => navigate(s.path)}
+                  className="glass-card p-3.5 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
+                  data-testid={`suggestion-${s.id}`}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${s.color}10`, border: `1px solid ${s.color}20` }}>
+                    <Sparkles size={15} style={{ color: s.color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{s.title}</p>
+                    <p className="text-[9px] truncate" style={{ color: 'var(--text-muted)' }}>{s.desc}</p>
+                  </div>
+                  <ChevronRight size={11} style={{ color: s.color, opacity: 0.5 }} />
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Quantum Coherence Widget */}
         {coherence && (

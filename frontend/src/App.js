@@ -100,6 +100,8 @@ const ReadingList = lazy(() => import('./pages/ReadingList'));
 const GrowthTimeline = lazy(() => import('./pages/GrowthTimeline'));
 const SoulReports = lazy(() => import('./pages/SoulReports'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const HelpCenter = lazy(() => import('./pages/HelpCenter'));
+const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
 
 function PageLoader() {
   return (
@@ -112,6 +114,8 @@ function PageLoader() {
     </div>
   );
 }
+
+import FloatingAssistant from './components/FloatingAssistant';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -204,6 +208,8 @@ function AnimatedRoutes() {
         <Route path="/reading-list" element={<ReadingList />} />
         <Route path="/growth-timeline" element={<GrowthTimeline />} />
         <Route path="/soul-reports" element={<SoulReports />} />
+        <Route path="/help-center" element={<HelpCenter />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
@@ -241,6 +247,7 @@ function App() {
               }}
             />
             <AnimatedRoutes />
+            <FloatingAssistant />
             <QuickMeditationWidget />
             <BackToTop />
             <InstallPrompt />

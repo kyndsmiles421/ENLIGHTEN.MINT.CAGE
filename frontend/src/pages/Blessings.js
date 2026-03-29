@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
+import CommunityComments from '../components/CommunityComments';
+
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const ICONS = {
@@ -332,7 +334,10 @@ export default function Blessings() {
       ) : view === 'sent' ? (
         <BlessingList items={mySent} emptyText="You haven't sent any blessings yet" label="sent" />
       ) : (
-        <BlessingList items={feed} emptyText="No blessings yet — be the first to share one" label="feed" />
+        <>
+          <BlessingList items={feed} emptyText="No blessings yet — be the first to share one" label="feed" />
+          <CommunityComments feature="blessings" title="Blessing Community" />
+        </>
       )}
     </div>
   );
