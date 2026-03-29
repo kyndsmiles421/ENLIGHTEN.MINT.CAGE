@@ -170,19 +170,16 @@
             });
         </script>
         <script>
+            // Unregister all service workers and clear all caches
             if ('serviceWorker' in navigator) {
-                // Force kill ALL old service workers and caches on load
                 navigator.serviceWorker.getRegistrations().then(function(regs) {
                     regs.forEach(function(r) { r.unregister(); });
                 });
-                caches.keys().then(function(names) {
-                    names.forEach(function(n) { caches.delete(n); });
-                });
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                        reg.update();
-                    }).catch(function() {});
-                });
+                if (window.caches) {
+                    caches.keys().then(function(names) {
+                        names.forEach(function(n) { caches.delete(n); });
+                    });
+                }
             }
         </script>
     </body>
