@@ -581,14 +581,13 @@ function QuickResetModal({ open, onClose }) {
                   data-testid="feeling-search"
                 />
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-[340px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-[340px] overflow-y-auto pr-1 overscroll-contain" style={{ scrollbarWidth: 'thin', WebkitOverflowScrolling: 'touch' }}>
                 {filteredFeelings.map(f => {
                   const FIcon = f.icon;
                   return (
                     <button key={f.id} onClick={() => selectFeeling(f)}
-                      onTouchEnd={(e) => { e.preventDefault(); selectFeeling(f); }}
                       className="glass-card p-3 flex flex-col items-center gap-1.5 hover:scale-[1.03] transition-all"
-                      style={{ border: `1px solid ${f.color}15`, touchAction: 'manipulation' }}
+                      style={{ border: `1px solid ${f.color}15`, touchAction: 'pan-y' }}
                       data-testid={`feeling-${f.id}`}>
                       <FIcon size={18} style={{ color: f.color }} />
                       <span className="text-[9px] font-medium text-center leading-tight" style={{ color: 'var(--text-primary)' }}>{f.label}</span>
