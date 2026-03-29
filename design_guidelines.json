@@ -1,159 +1,115 @@
 {
-  "design_system": {
-    "identity": {
-      "name": "Cosmic Zen - The Anti-AI Wellness App",
-      "tone": "Ethereal, Grounded, Mystical, Bioluminescent",
-      "core_values": [
-        "Fusion: Space meets Nature",
-        "Emotion: Every pixel must soothe",
-        "Depth: Layers > Flatness",
-        "Motion: Constant subtle flow"
-      ]
+  "theme": "Cosmic Immersive (Dark-First)",
+  "archetype": "Archetype 5 (Jewel) + Archetype 7 (Electric)",
+  "typography": {
+    "headings": {
+      "fontFamily": "Outfit, sans-serif",
+      "style": "Modern, crisp, VR-age tech feel. Use 'Cormorant Garamond' for specific mystical accents."
     },
-    "typography": {
-      "fonts": {
-        "headings": {
-          "family": "Cormorant Garamond, serif",
-          "weights": ["300", "400", "600"],
-          "usage": "Use for all H1-H3. Essential for the 'ancient wisdom' feel."
-        },
-        "body": {
-          "family": "Manrope, sans-serif",
-          "weights": ["400", "500", "700"],
-          "usage": "Use for all UI text, inputs, and long-form reading. High legibility."
-        },
-        "accents": {
-          "family": "Cinzel, serif",
-          "usage": "Use sparingly for 'Enlightenment' keywords or very large short phrases."
-        }
-      },
-      "rules": {
-        "h1": "text-5xl md:text-7xl font-light tracking-tight leading-none",
-        "h2": "text-4xl md:text-5xl font-normal tracking-tight",
-        "h3": "text-2xl md:text-3xl font-normal",
-        "body": "text-base md:text-lg text-muted-foreground leading-relaxed",
-        "label": "text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground"
-      }
+    "body": {
+      "fontFamily": "Manrope, sans-serif",
+      "style": "Clean, highly legible geometric sans for UI density."
+    }
+  },
+  "colors": {
+    "background": {
+      "base": "#030308",
+      "surface": "rgba(255, 255, 255, 0.03)"
     },
-    "colors": {
-      "palette": {
-        "background": {
-          "default": "#0B0C15",
-          "deep": "#050508",
-          "surface": "#161826"
-        },
-        "primary": {
-          "DEFAULT": "#D8B4FE",
-          "glow": "#C084FC"
-        },
-        "secondary": {
-          "DEFAULT": "#2DD4BF",
-          "glow": "#14B8A6"
-        },
-        "accent": {
-          "gold": "#FCD34D",
-          "rose": "#FDA4AF"
-        },
-        "text": {
-          "primary": "#F8FAFC",
-          "secondary": "#94A3B8",
-          "muted": "#475569"
-        }
-      },
-      "gradients": {
-        "cosmic": "bg-gradient-to-br from-[#1E1B4B] via-[#312E81] to-[#0F172A]",
-        "aurora": "bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-slate-900",
-        "glass": "bg-white/5 backdrop-blur-xl border-white/10"
-      },
-      "usage_rules": {
-        "dark_mode_only": true,
-        "transparency": "Never use solid cards. Always use semi-transparent glass layers to let the background nebula shine through.",
-        "text_contrast": "Ensure text is always readable against complex backgrounds. Use 'drop-shadow-md' on text if needed."
-      }
+    "primary": "#d946ef",
+    "secondary": "#06b6d4",
+    "accent": "#eab308",
+    "themes": [
+      { "name": "Nebula", "colors": ["#7e22ce", "#d946ef"] },
+      { "name": "Quantum", "colors": ["#06b6d4", "#3b82f6"] },
+      { "name": "Astral", "colors": ["#eab308", "#f97316"] },
+      { "name": "Void", "colors": ["#0f172a", "#334155"] },
+      { "name": "Gaia", "colors": ["#10b981", "#059669"] }
+    ],
+    "forbidden_colors": ["#1B93A4"]
+  },
+  "visual_enhancers": {
+    "background": "CSS Fluid Mesh Gradient. Use 3-4 soft radial gradients moving infinitely via CSS @keyframes. This achieves the 'flowing graphics' without the heavy JS payload.",
+    "surfaces": "Glassmorphism. bg-black/40 or bg-white/5, backdrop-blur-2xl, border border-white/10, shadow-[0_8px_32px_rgba(0,0,0,0.4)]. Must feel like floating crystal.",
+    "particles": "Use tsparticles for a subtle floating 'star dust' effect behind the glass, enhancing the depth.",
+    "hover": "Subtle inner glow on hover (box-shadow inset 0 0 15px rgba(255,255,255,0.1))."
+  },
+  "component_name": [
+    "CosmicMixer",
+    "WidgetGrid",
+    "GlassCard",
+    "DraggableWidget",
+    "NavigationDock"
+  ],
+  "grids": {
+    "type": "Floating Bento Grid Protocol (Mode A & B hybrid)",
+    "mobile": "grid-cols-1 gap-6",
+    "desktop": "grid-cols-4 or grid-cols-12 with wide gaps (gap-8) for a floating effect."
+  },
+  "layouts": {
+    "style": "Floating and asymmetrical. The layout should look like floating panes of crystal in space.",
+    "spacing": "Generous padding inside glass cards (p-6, p-8) to avoid content collision with borders."
+  },
+  "motion": {
+    "drag_and_drop": "Draggable widgets via @dnd-kit/core or framer-motion drag. Users can reposition their sanctuary tools.",
+    "page_transitions": "FORBIDDEN. Do not use Framer Motion for page routing to maintain high performance.",
+    "micro_animations": "Use Framer Motion for widget mounting (spring, scale 0.95 -> 1), drag feedback, and hover states."
+  },
+  "accessibility": {
+    "contrast": "Maintain 4.5:1 ratio over the fluid mesh by utilizing bg-black/40 in glass cards.",
+    "testing": "All interactive and key informational elements MUST include a `data-testid` attribute."
+  },
+  "media": {
+    "icons": "lucide-react (NO emojis)",
+    "images": "High-contrast mystical, cosmos, and refraction assets."
+  },
+  "3d_libraries": {
+    "recommendation": "Use Three.js / React Three Fiber specifically and ONLY for the '3D Star Chart' feature. Keep the rest of the app 2.5D with Parallax."
+  },
+  "image_urls": [
+    {
+      "url": "https://images.unsplash.com/photo-1712509846599-a77fb4958ac2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHw0fHxkYXJrJTIwY29zbWljJTIwbmVidWxhfGVufDB8fHx8MTc3NDc0NzExN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Dark cosmic nebula",
+      "category": "Star Chart / Deep Background"
     },
-    "layout": {
-      "spacing": {
-        "container_padding": "p-6 md:p-12 lg:p-24",
-        "section_gap": "gap-12 md:gap-24",
-        "component_gap": "gap-4 md:gap-8"
-      },
-      "grids": {
-        "dashboard": "grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6",
-        "gallery": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
-        "bento_rules": {
-          "hero_card": "col-span-full md:col-span-4 row-span-2",
-          "tall_card": "col-span-1 md:col-span-2 row-span-2",
-          "standard_card": "col-span-1 md:col-span-2 row-span-1"
-        }
-      },
-      "alignment": {
-        "default": "text-left",
-        "hero": "text-center md:text-left",
-        "rule": "Never center long paragraphs. Left align for readability."
-      }
+    {
+      "url": "https://images.pexels.com/photos/11785594/pexels-photo-11785594.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Glass monolith in forest",
+      "category": "Sanctuary / Portal"
     },
-    "components": {
-      "buttons": {
-        "primary": "rounded-full px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md text-white transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]",
-        "secondary": "rounded-full px-6 py-2 text-sm text-muted-foreground hover:text-white transition-colors"
-      },
-      "cards": {
-        "glass": "rounded-3xl border border-white/10 bg-black/20 backdrop-blur-xl shadow-xl overflow-hidden hover:border-white/20 transition-all duration-500",
-        "interactive": "cursor-pointer hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group"
-      },
-      "inputs": {
-        "style": "bg-white/5 border-white/10 focus:border-primary/50 rounded-xl px-4 py-3 text-white placeholder:text-white/20 backdrop-blur-sm"
-      },
-      "special_components": {
-        "BreathingCircle": {
-          "description": "A central animated circle that expands and contracts. MUST use framer-motion.",
-          "visuals": "Multiple concentric rings with different opacities (10%, 20%, 40%). Glow effect essential."
-        },
-        "MoodBoard": {
-          "description": "Grid of emotive colors/images representing feelings.",
-          "visuals": "No text initially, just colors/gradients. Hover reveals emotion name."
-        }
-      }
+    {
+      "url": "https://images.pexels.com/photos/4913385/pexels-photo-4913385.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Abstract light refraction",
+      "category": "Divination / Crystals"
     },
-    "motion": {
-      "philosophy": "Everything flows. No abrupt stops.",
-      "transitions": {
-        "page": "initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.6, ease: 'easeOut' }}",
-        "hover": "transition-all duration-300 ease-out",
-        "micro": "scale-[1.02] active:scale-[0.98]"
-      },
-      "libraries": [
-        "framer-motion",
-        "react-spring (for physics-based breathing)"
-      ]
+    {
+      "url": "https://images.unsplash.com/photo-1766430191904-f2ffb8e10267?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzl8MHwxfHNlYXJjaHw0fHxnbG93aW5nJTIwY3J5c3RhbCUyMGRhcmt8ZW58MHx8fHwxNzc0NzQ3MTE4fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Purple crystals",
+      "category": "Nourish / Crystal Encyclopedia"
     },
-    "images": {
-      "strategy": "Use abstract cosmic textures for backgrounds, and high-quality zen photography for cards.",
-      "urls": {
-        "backgrounds": [
-          "https://images.unsplash.com/photo-1617171073885-7a17050d0992?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHw0fHxjb3NtaWMlMjBuZWJ1bGElMjBhdXJvcmElMjBuaWdodCUyMHNreSUyMHN0YXJzfGVufDB8fHx8MTc3MzcyOTYwNXww&ixlib=rb-4.1.0&q=85",
-          "https://images.unsplash.com/photo-1624183720151-7396650072a9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwxfHxjb3NtaWMlMjBuZWJ1bGElMjBhdXJvcmElMjBuaWdodCUyMHNreSUyMHN0YXJzfGVufDB8fHx8MTc3MzcyOTYwNXww&ixlib=rb-4.1.0&q=85"
-        ],
-        "zen_elements": [
-          "https://images.unsplash.com/photo-1766585464526-3c66169a0eee?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHw0fHx6ZW4lMjBnYXJkZW4lMjBzdG9uZXMlMjBzaW5naW5nJTIwYm93bCUyMG1lZGl0YXRpb24lMjBwZWFjZWZ1bCUyMG5hdHVyZXxlbnwwfHx8fDE3NzM3Mjk2MDZ8MA&ixlib=rb-4.1.0&q=85",
-          "https://images.unsplash.com/photo-1769636417689-c3b0e9ad0fde?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwyfHx6ZW4lMjBnYXJkZW4lMjBzdG9uZXMlMjBzaW5naW5nJTIwYm93bCUyMG1lZGl0YXRpb24lMjBwZWFjZWZ1bCUyMG5hdHVyZXxlbnwwfHx8fDE3NzM3Mjk2MDZ8MA&ixlib=rb-4.1.0&q=85"
-        ]
-      }
-    },
-    "universal_guidelines": [
-      "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
-      "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
-      "Create depth through layered design elements with z-index hierarchy",
-      "Use glass-morphism effects with backdrop filters (12-24px blur)",
-      "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
-      "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file.",
-      "NEVER use AI assistant Emoji characters for icons.",
-      "Every interaction needs micro-animations - hover states, transitions, parallax effects.",
-      "Use 2-3x more spacing than feels comfortable.",
-      "Prioritize using pre-existing components from src/components/ui when applicable.",
-      "Use 'sonner' for toasts.",
-      "Ensure all interactive elements have data-testid attribute.",
-      "This project uses .js/.jsx, so do NOT use TypeScript syntax in examples."
-    ]
-  }
+    {
+      "url": "https://images.unsplash.com/photo-1634733049839-0292be607569?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwxfHxteXN0aWNhbCUyMHBvcnRyYWl0JTIwZGFya3xlbnwwfHx8fDE3NzQ3NDcxMzZ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Woman in dark",
+      "category": "Voice AI Sage / Guides"
+    }
+  ],
+  "component_path": "/app/frontend/src/components/",
+  "instructions_to_main_agent": [
+    "Install @dnd-kit/core, @dnd-kit/sortable, and @dnd-kit/utilities for draggable widgets.",
+    "Implement the fluid mesh gradient as a purely CSS-based background with `@keyframes` mapped across radial gradients. This provides the 'flowing' requirement without impacting 30fps performance.",
+    "Use framer-motion ONLY for component-level micro-animations (hover, drag feedback, entrance), explicitly do NOT use AnimatePresence for page routing.",
+    "Build a 'GlassCard' component (`bg-black/40 backdrop-blur-2xl border border-white/10`) to serve as the base for all widgets. Do NOT use solid backgrounds for dashboard widgets.",
+    "Incorporate `lucide-react` icons extensively for the mystical UI elements. DO NOT use emojis.",
+    "Make the 'Cosmic Mixer' a globally available, floating action widget that expands out into actions.",
+    "Integrate the 5 requested color themes by controlling the CSS variables used in the mesh gradient background."
+  ],
+  "universal_guidelines": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Use layered design elements with z-index hierarchy (Mesh Background -> Particles -> Glass Widgets -> Content) for a VR-age depth effect.",
+    "All interactive elements MUST include a data-testid attribute.",
+    "DO NOT use complete transparent backgrounds for overlays that have content underneath.",
+    "Never use pure #000000; use #030308 (Deep Cosmic Indigo) or similar deep shades.",
+    "Don't make generic centered layouts. Use asymmetrical or balanced floating bento structures.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects. Static = dead."
+  ]
 }
