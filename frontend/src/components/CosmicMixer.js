@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Play, Pause, Square, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -103,8 +104,12 @@ const LIGHT_MODES = [
 
 export default function CosmicMixer() {
   const { user } = useAuth();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  // Auto-close panel on route change so it never blocks navigation
+  useEffect(() => { setOpen(false); }, [location.pathname]);
   const [masterVol, setMasterVol] = useState(60);
   const [muted, setMuted] = useState(false);
 
@@ -296,19 +301,29 @@ export default function CosmicMixer() {
       {/* Mixer Panel */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ y: 300, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 300, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl"
-            style={{
-              background: 'var(--bg-secondary, rgba(13,14,26,0.98))',
-              border: '1px solid rgba(192,132,252,0.08)',
-              borderBottom: 'none',
-              backdropFilter: 'blur(32px)',
-              maxHeight: expanded ? '85vh' : '320px',
-              overflowY: 'auto',
-            }}
-            data-testid="cosmic-mixer-panel">
+          <>
+            {/* Backdrop — tap to close */}
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              style={{ background: 'rgba(0,0,0,0.3)' }}
+              onClick={() => setOpen(false)}
+              data-testid="mixer-backdrop"
+            />
+            <motion.div
+              initial={{ y: 300, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 300, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: 'var(--bg-secondary, rgba(13,14,26,0.98))',
+                border: '1px solid rgba(192,132,252,0.08)',
+                borderBottom: 'none',
+                backdropFilter: 'blur(32px)',
+                maxHeight: expanded ? '70vh' : '320px',
+                overflowY: 'auto',
+              }}
+              data-testid="cosmic-mixer-panel">
 
             {/* Handle bar */}
             <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-10"
@@ -451,6 +466,7 @@ export default function CosmicMixer() {
               </LayerSection>
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
