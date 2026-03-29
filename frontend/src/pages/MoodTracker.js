@@ -1,23 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import CelebrationBurst from '../components/CelebrationBurst';
+import {
+  Sparkles, Sun, Zap, Heart, Target, Lightbulb, Sunrise, Shield,
+  Brain, Wind, Battery, Frown, Moon, Angry, CloudRain, Waves,
+  HeartCrack, Meh, AlertTriangle, Ban, BatteryWarning, Orbit,
+  Eye, Clock, Coffee, Compass, Star, Mountain, TreePine, Globe,
+  Search, ChevronRight, Flower2, HeartHandshake, X
+} from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const MOODS = [
-  { name: 'Blissful', color: '#FCD34D', gradient: 'mood-blissful' },
-  { name: 'Peaceful', color: '#2DD4BF', gradient: 'mood-peaceful' },
-  { name: 'Content', color: '#86EFAC', gradient: 'mood-content' },
-  { name: 'Neutral', color: '#94A3B8', gradient: 'mood-neutral' },
-  { name: 'Anxious', color: '#FDA4AF', gradient: 'mood-anxious' },
-  { name: 'Melancholy', color: '#C084FC', gradient: 'mood-melancholy' },
-  { name: 'Restless', color: '#FB923C', gradient: 'mood-restless' },
+  // Positive
+  { id: 'happy', name: 'Happy', icon: Sparkles, color: '#FCD34D', group: 'positive' },
+  { id: 'peaceful', name: 'Peaceful', icon: Sun, color: '#2DD4BF', group: 'positive' },
+  { id: 'energized', name: 'Energized', icon: Zap, color: '#FB923C', group: 'positive' },
+  { id: 'grateful', name: 'Grateful', icon: Heart, color: '#FDA4AF', group: 'positive' },
+  { id: 'curious', name: 'Curious', icon: Target, color: '#8B5CF6', group: 'positive' },
+  { id: 'inspired', name: 'Inspired', icon: Lightbulb, color: '#FCD34D', group: 'positive' },
+  { id: 'hopeful', name: 'Hopeful', icon: Sunrise, color: '#86EFAC', group: 'positive' },
+  { id: 'creative', name: 'Creative', icon: Flower2, color: '#C084FC', group: 'positive' },
+  { id: 'connected', name: 'Connected', icon: HeartHandshake, color: '#FDA4AF', group: 'positive' },
+  { id: 'brave', name: 'Brave', icon: Shield, color: '#FB923C', group: 'positive' },
+  // Challenged
+  { id: 'stressed', name: 'Stressed', icon: Brain, color: '#EF4444', group: 'challenged' },
+  { id: 'anxious', name: 'Anxious', icon: Wind, color: '#FB923C', group: 'challenged' },
+  { id: 'tired', name: 'Low Energy', icon: Battery, color: '#FCD34D', group: 'challenged' },
+  { id: 'sad', name: 'Down / Sad', icon: Frown, color: '#3B82F6', group: 'challenged' },
+  { id: 'unfocused', name: 'Unfocused', icon: Target, color: '#8B5CF6', group: 'challenged' },
+  { id: 'restless', name: "Can't Sleep", icon: Moon, color: '#2DD4BF', group: 'challenged' },
+  { id: 'angry', name: 'Angry', icon: Angry, color: '#EF4444', group: 'challenged' },
+  { id: 'lonely', name: 'Lonely', icon: CloudRain, color: '#3B82F6', group: 'challenged' },
+  { id: 'overwhelmed', name: 'Overwhelmed', icon: Waves, color: '#8B5CF6', group: 'challenged' },
+  { id: 'grief', name: 'Grieving', icon: HeartCrack, color: '#6366F1', group: 'challenged' },
+  { id: 'numb', name: 'Numb / Empty', icon: Meh, color: '#94A3B8', group: 'challenged' },
+  { id: 'fearful', name: 'Fearful', icon: AlertTriangle, color: '#F59E0B', group: 'challenged' },
+  { id: 'frustrated', name: 'Frustrated', icon: Ban, color: '#EF4444', group: 'challenged' },
+  { id: 'burnout', name: 'Burned Out', icon: BatteryWarning, color: '#FB923C', group: 'challenged' },
+  { id: 'disconnected', name: 'Disconnected', icon: Orbit, color: '#94A3B8', group: 'challenged' },
+  { id: 'jealous', name: 'Jealous', icon: Eye, color: '#22C55E', group: 'challenged' },
+  { id: 'impatient', name: 'Impatient', icon: Clock, color: '#F59E0B', group: 'challenged' },
+  { id: 'bored', name: 'Bored', icon: Coffee, color: '#94A3B8', group: 'challenged' },
+  { id: 'nostalgic', name: 'Nostalgic', icon: Compass, color: '#C084FC', group: 'challenged' },
+  // Spiritual
+  { id: 'awakening', name: 'Spiritually Awakening', icon: Star, color: '#FCD34D', group: 'spiritual' },
+  { id: 'seeking', name: 'Seeking Purpose', icon: Mountain, color: '#2DD4BF', group: 'spiritual' },
+  { id: 'grounding', name: 'Need Grounding', icon: TreePine, color: '#22C55E', group: 'spiritual' },
+  { id: 'expansive', name: 'Expansive', icon: Globe, color: '#8B5CF6', group: 'spiritual' },
 ];
+
+const GROUP_META = {
+  positive: { label: 'Positive', color: '#22C55E' },
+  challenged: { label: 'Challenged', color: '#FB923C' },
+  spiritual: { label: 'Spiritual', color: '#C084FC' },
+};
 
 export default function MoodTracker() {
   const { user, authHeaders } = useAuth();
@@ -28,6 +70,8 @@ export default function MoodTracker() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
+  const [search, setSearch] = useState('');
+  const [activeGroup, setActiveGroup] = useState('all');
 
   useEffect(() => {
     if (user) {
@@ -36,6 +80,16 @@ export default function MoodTracker() {
         .catch(() => {});
     }
   }, [user, authHeaders]);
+
+  const filteredMoods = useMemo(() => {
+    let list = MOODS;
+    if (activeGroup !== 'all') list = list.filter(m => m.group === activeGroup);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(m => m.name.toLowerCase().includes(q) || m.id.includes(q));
+    }
+    return list;
+  }, [search, activeGroup]);
 
   const submit = async () => {
     if (!user) { toast.error('Sign in to track your mood'); return; }
@@ -51,6 +105,7 @@ export default function MoodTracker() {
       setSelected(null);
       setNote('');
       setIntensity(5);
+      setSearch('');
       setCelebrating(true);
       playCelebration();
       toast.success('Mood captured');
@@ -61,132 +116,198 @@ export default function MoodTracker() {
     }
   };
 
-  const chartData = history.slice(0, 14).reverse().map((m, i) => ({
+  const chartData = history.slice(0, 14).reverse().map((m) => ({
     name: new Date(m.created_at).toLocaleDateString('en', { weekday: 'short' }),
     intensity: m.intensity,
     fill: MOODS.find(mood => mood.name === m.mood)?.color || '#94A3B8',
   }));
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page px-4 md:px-12 lg:px-24 py-10" style={{ background: 'transparent' }} data-testid="mood-tracker-page">
       <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
       <div className="max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--accent-rose)' }}>Mood Tracker</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--accent-rose)' }}>Mood Tracker</p>
+          <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Emotional Landscape
           </h1>
-          <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
             Observe your emotions without judgment. Each feeling is a teacher.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Mood Selection */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left — Mood Selection */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>How are you feeling?</p>
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {MOODS.map(mood => (
-                <button
-                  key={mood.name}
-                  onClick={() => setSelected(mood)}
-                  className="glass-card p-5 text-left group"
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>How are you feeling?</p>
+
+            {/* Search */}
+            <div className="relative mb-4">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Search emotions..."
+                className="w-full pl-9 pr-8 py-2.5 rounded-xl text-xs"
+                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'var(--text-primary)', outline: 'none' }}
+                data-testid="mood-search" />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X size={12} style={{ color: 'var(--text-muted)' }} />
+                </button>
+              )}
+            </div>
+
+            {/* Group Filters */}
+            <div className="flex items-center gap-1.5 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+              {[{ id: 'all', label: 'All', color: '#F8FAFC' }, ...Object.entries(GROUP_META).map(([k, v]) => ({ id: k, ...v }))].map(g => (
+                <button key={g.id} onClick={() => setActiveGroup(g.id)}
+                  className="px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap transition-all"
                   style={{
-                    borderColor: selected?.name === mood.name ? `${mood.color}50` : 'rgba(255,255,255,0.08)',
-                    transition: 'border-color 0.3s',
+                    background: activeGroup === g.id ? `${g.color}15` : 'rgba(248,250,252,0.03)',
+                    border: `1px solid ${activeGroup === g.id ? `${g.color}30` : 'rgba(248,250,252,0.06)'}`,
+                    color: activeGroup === g.id ? g.color : 'rgba(248,250,252,0.5)',
                   }}
-                  data-testid={`mood-${mood.name.toLowerCase()}`}
-                >
-                  <div className={`w-8 h-8 rounded-full mb-3 ${mood.gradient}`} />
-                  <p className="text-sm font-medium" style={{ color: selected?.name === mood.name ? mood.color : 'var(--text-primary)' }}>
-                    {mood.name}
-                  </p>
+                  data-testid={`mood-group-${g.id}`}>
+                  {g.label}
                 </button>
               ))}
             </div>
 
-            {selected && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-[0.2em] mb-3 block" style={{ color: 'var(--text-muted)' }}>
-                    Intensity: {intensity}/10
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={intensity}
-                    onChange={(e) => setIntensity(parseInt(e.target.value))}
-                    className="w-full accent-purple-400"
-                    data-testid="mood-intensity-slider"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-[0.2em] mb-3 block" style={{ color: 'var(--text-muted)' }}>Note (optional)</label>
-                  <textarea
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    className="input-glass w-full h-24 resize-none"
-                    placeholder="What's on your mind?"
-                    data-testid="mood-note-input"
-                  />
-                </div>
-                <button
-                  onClick={submit}
-                  disabled={loading}
-                  className="btn-glass glow-primary"
-                  data-testid="mood-submit-btn"
-                  style={{ opacity: loading ? 0.6 : 1 }}
-                >
-                  {loading ? 'Saving...' : 'Log Mood'}
-                </button>
-              </motion.div>
+            {/* Mood Grid */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[380px] overflow-y-auto pr-1 overscroll-contain" style={{ scrollbarWidth: 'thin', WebkitOverflowScrolling: 'touch' }}>
+              {filteredMoods.map(mood => {
+                const Icon = mood.icon;
+                const isSelected = selected?.id === mood.id;
+                return (
+                  <motion.button key={mood.id}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelected(mood)}
+                    className="glass-card p-3 flex flex-col items-center gap-1.5 transition-all hover:scale-[1.03]"
+                    style={{
+                      border: `1px solid ${isSelected ? `${mood.color}50` : 'rgba(255,255,255,0.06)'}`,
+                      background: isSelected ? `${mood.color}10` : undefined,
+                      touchAction: 'pan-y',
+                    }}
+                    data-testid={`mood-${mood.id}`}>
+                    <Icon size={18} style={{ color: isSelected ? mood.color : 'rgba(248,250,252,0.5)', transition: 'color 0.2s' }} />
+                    <span className="text-[9px] font-medium text-center leading-tight" style={{ color: isSelected ? mood.color : 'var(--text-primary)' }}>
+                      {mood.name}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {filteredMoods.length === 0 && (
+              <p className="text-center py-6 text-xs" style={{ color: 'var(--text-muted)' }}>No emotions match "{search}"</p>
             )}
+
+            {/* Intensity + Note + Submit */}
+            <AnimatePresence>
+              {selected && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                  className="mt-6 space-y-4 glass-card p-5 rounded-2xl"
+                  style={{ border: `1px solid ${selected.color}20` }}>
+                  <div className="flex items-center gap-3 mb-2">
+                    {(() => { const SIcon = selected.icon; return <SIcon size={20} style={{ color: selected.color }} />; })()}
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: selected.color }}>{selected.name}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>How intense is this feeling?</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>
+                        Intensity
+                      </label>
+                      <span className="text-sm font-light tabular-nums" style={{ color: selected.color, fontFamily: 'Cormorant Garamond, serif' }}>
+                        {intensity}/10
+                      </span>
+                    </div>
+                    <input type="range" min="1" max="10" value={intensity}
+                      onChange={(e) => setIntensity(parseInt(e.target.value))}
+                      className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                      style={{ background: `linear-gradient(to right, ${selected.color} ${(intensity / 10) * 100}%, rgba(255,255,255,0.06) ${(intensity / 10) * 100}%)` }}
+                      data-testid="mood-intensity-slider" />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] mb-2 block" style={{ color: 'var(--text-muted)' }}>
+                      Note (optional)
+                    </label>
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)}
+                      className="w-full h-20 resize-none rounded-xl p-3 text-xs"
+                      style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'var(--text-primary)', outline: 'none' }}
+                      placeholder="What's on your mind?"
+                      data-testid="mood-note-input" />
+                  </div>
+
+                  <button onClick={submit} disabled={loading}
+                    className="w-full py-3 rounded-xl text-xs font-medium transition-all hover:scale-[1.01]"
+                    style={{
+                      background: `${selected.color}15`,
+                      border: `1px solid ${selected.color}30`,
+                      color: selected.color,
+                      opacity: loading ? 0.6 : 1,
+                    }}
+                    data-testid="mood-submit-btn">
+                    {loading ? 'Saving...' : 'Log This Mood'}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Mood History */}
+          {/* Right — History + Chart */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Your Journey</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Your Journey</p>
+
             {chartData.length > 0 ? (
-              <div className="glass-card p-6 mb-8">
-                <ResponsiveContainer width="100%" height={200}>
+              <div className="glass-card p-5 mb-6">
+                <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={chartData}>
-                    <XAxis dataKey="name" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
-                    <YAxis domain={[0, 10]} tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="name" tick={{ fill: 'rgba(248,250,252,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, 10]} tick={{ fill: 'rgba(248,250,252,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
                     <Tooltip
-                      contentStyle={{ background: 'rgba(22,24,38,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#F8FAFC' }}
+                      contentStyle={{ background: 'rgba(13,14,26,0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#F8FAFC', fontSize: '11px' }}
                     />
                     <Bar dataKey="intensity" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="glass-card p-8 text-center mb-8">
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  {user ? 'No moods logged yet. Start tracking above.' : 'Sign in to track your emotional journey.'}
+              <div className="glass-card p-8 text-center mb-6">
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  {user ? 'No moods logged yet. Start tracking to see your journey.' : 'Sign in to track your emotional journey.'}
                 </p>
               </div>
             )}
 
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-              {history.slice(0, 10).map(m => {
+            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+              {history.slice(0, 20).map(m => {
                 const moodObj = MOODS.find(mood => mood.name === m.mood);
+                const MIcon = moodObj?.icon || Meh;
                 return (
-                  <div key={m.id} className="glass-card p-4 flex items-center gap-4">
-                    <div className={`w-4 h-4 rounded-full ${moodObj?.gradient || 'mood-neutral'}`} />
-                    <div className="flex-1">
+                  <motion.div key={m.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                    className="glass-card p-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: `${moodObj?.color || '#94A3B8'}12` }}>
+                      <MIcon size={14} style={{ color: moodObj?.color || '#94A3B8' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium" style={{ color: moodObj?.color || 'var(--text-primary)' }}>{m.mood}</p>
-                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <p className="text-xs font-medium" style={{ color: moodObj?.color || 'var(--text-primary)' }}>{m.mood}</p>
+                        <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
                           {new Date(m.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
-                      {m.note && <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>{m.note}</p>}
+                      {m.note && <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--text-secondary)' }}>{m.note}</p>}
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}>
+                    <span className="text-[10px] px-2 py-1 rounded-full flex-shrink-0 tabular-nums"
+                      style={{ background: `${moodObj?.color || '#94A3B8'}10`, color: moodObj?.color || 'var(--text-muted)' }}>
                       {m.intensity}/10
                     </span>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
