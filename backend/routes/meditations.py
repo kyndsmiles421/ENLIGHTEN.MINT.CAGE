@@ -87,6 +87,68 @@ Return ONLY valid JSON array, no markdown, no explanation."""
         logger.error(f"Guided meditation generate error: {e}")
         raise HTTPException(status_code=500, detail="Could not generate meditation. Please try again.")
 
+@router.post("/meditation/generate-audio")
+async def generate_meditation_audio(data: dict = Body(...), user=Depends(get_current_user)):
+    """Generate TTS audio for meditation steps. Returns base64 audio."""
+    steps = data.get("steps", [])
+    voice = data.get("voice", "sage")  # sage, shimmer, nova, alloy, echo, fable, onyx
+    speed = data.get("speed", 0.85)
+
+    if not steps:
+        raise HTTPException(status_code=400, detail="No meditation steps provided")
+
+    # Combine all step texts into one narration with pauses
+    narration_parts = []
+    for i, step in enumerate(steps):
+        text = step.get("text", "").strip()
+        if text:
+            narration_parts.append(text)
+            # Add pause between steps (TTS interprets ... as a pause)
+            if i < len(steps) - 1:
+                narration_parts.append("... ... ...")
+
+    full_narration = "\n\n".join(narration_parts)
+    if not full_narration.strip():
+        raise HTTPException(status_code=400, detail="No narration text in steps")
+
+    # Limit to TTS max (4096 chars)
+    if len(full_narration) > 4096:
+        full_narration = full_narration[:4096]
+
+    try:
+        from emergentintegrations.llm.openai import OpenAITextToSpeech
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        audio_b64 = await tts.generate_speech_base64(
+            text=full_narration,
+            model="tts-1-hd",
+            voice=voice,
+            speed=speed,
+            response_format="mp3",
+        )
+        # Save meditation audio record
+        doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "voice": voice,
+            "step_count": len(steps),
+            "text_length": len(full_narration),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.meditation_audio.insert_one(doc)
+        return {"audio": audio_b64, "format": "mp3", "voice": voice}
+    except Exception as e:
+        logger.error(f"Meditation audio generation error: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate meditation audio. Please try again.")
+
+
+@router.get("/meditation/audio-history")
+async def get_meditation_audio_history(user=Depends(get_current_user)):
+    """Get user's meditation audio generation history."""
+    items = await db.meditation_audio.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(20)
+    return {"history": items}
+
+
+
 @router.post("/meditation/save-custom")
 async def save_custom_meditation(data: dict, user=Depends(get_current_user)):
     """Save a user-built custom guided meditation."""

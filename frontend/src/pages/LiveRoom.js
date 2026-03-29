@@ -7,7 +7,8 @@ import { useAvatar } from '../context/AvatarContext';
 import {
   ArrowLeft, Send, Users, Radio, Crown, Timer, Heart, Sparkles,
   MessageCircle, X, Play, Square, Volume2, VolumeX, Smile,
-  Hand, Star, Flame, Moon, Sun, Zap, Wind, ChevronUp, ChevronDown
+  Hand, Star, Flame, Moon, Sun, Zap, Wind, ChevronUp, ChevronDown,
+  Mic, MicOff
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -57,6 +58,10 @@ export default function LiveRoom() {
   const chatEndRef = useRef(null);
   const reconnectRef = useRef(null);
   const timerRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingStatus, setRecordingStatus] = useState(''); // '', 'recording', 'uploading', 'done'
 
   const isHost = session?.host_id === user?.id;
 
@@ -202,8 +207,65 @@ export default function LiveRoom() {
 
   const endSession = async () => {
     try {
+      // Stop recording first if active
+      if (mediaRecorderRef.current && isRecording) {
+        await stopRecording(true);
+      }
       await axios.post(`${API}/live/sessions/${sessionId}/end`, {}, { headers: authHeaders });
     } catch {}
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+      };
+      recorder.start(1000); // collect data every second
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+      setRecordingStatus('recording');
+    } catch (err) {
+      console.error('Could not start recording:', err);
+    }
+  };
+
+  const stopRecording = async (autoUpload = false) => {
+    if (!mediaRecorderRef.current) return;
+    return new Promise((resolve) => {
+      mediaRecorderRef.current.onstop = async () => {
+        mediaRecorderRef.current.stream?.getTracks().forEach(t => t.stop());
+        setIsRecording(false);
+        if (autoUpload && audioChunksRef.current.length > 0) {
+          await uploadAudio();
+        }
+        setRecordingStatus(autoUpload ? 'done' : '');
+        resolve();
+      };
+      mediaRecorderRef.current.stop();
+    });
+  };
+
+  const uploadAudio = async () => {
+    if (audioChunksRef.current.length === 0) return;
+    setRecordingStatus('uploading');
+    try {
+      const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', blob, `session_${sessionId}.webm`);
+      await axios.post(`${API}/live/sessions/${sessionId}/upload-audio`, formData, {
+        headers: { ...authHeaders, 'Content-Type': 'multipart/form-data' },
+      });
+      setRecordingStatus('done');
+    } catch (err) {
+      console.error('Upload error:', err);
+      setRecordingStatus('');
+    }
   };
 
   const addFloatingReaction = (emoji, name) => {
@@ -322,7 +384,34 @@ export default function LiveRoom() {
                         </button>
                       );
                     })}
+                    {/* Audio Recording Toggle */}
+                    <button onClick={() => isRecording ? stopRecording() : startRecording()}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
+                      style={{
+                        background: isRecording ? 'rgba(239,68,68,0.15)' : 'rgba(234,179,8,0.12)',
+                        border: `1px solid ${isRecording ? 'rgba(239,68,68,0.3)' : 'rgba(234,179,8,0.2)'}`,
+                        color: isRecording ? '#EF4444' : '#EAB308',
+                      }}
+                      data-testid="toggle-recording">
+                      {isRecording ? <><MicOff size={10} /> Stop Rec</> : <><Mic size={10} /> Record</>}
+                    </button>
                   </div>
+                  {recordingStatus === 'recording' && (
+                    <div className="flex items-center gap-2 px-2 py-1">
+                      <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />
+                      <span className="text-[9px]" style={{ color: '#EF4444' }}>Recording audio...</span>
+                    </div>
+                  )}
+                  {recordingStatus === 'uploading' && (
+                    <div className="flex items-center gap-2 px-2 py-1">
+                      <span className="text-[9px]" style={{ color: '#EAB308' }}>Uploading recording...</span>
+                    </div>
+                  )}
+                  {recordingStatus === 'done' && (
+                    <div className="flex items-center gap-2 px-2 py-1">
+                      <span className="text-[9px]" style={{ color: '#22C55E' }}>Audio saved</span>
+                    </div>
+                  )}
                   <button onClick={endSession}
                     className="w-full py-2 rounded-xl text-[10px] font-medium"
                     style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}

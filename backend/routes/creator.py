@@ -297,3 +297,34 @@ async def export_data(collection: str, user=Depends(require_creator)):
         media_type="application/json",
         headers={"Content-Disposition": f'attachment; filename="{collection}_export.json"'},
     )
+
+
+
+# ─── Real-time Live Feed ───
+
+@router.get("/creator/live-feed")
+async def creator_live_feed(user=Depends(require_creator)):
+    """Get the most recent activity events for real-time dashboard feed."""
+    pipeline = [
+        {"$sort": {"timestamp": -1}},
+        {"$limit": 60},
+        {"$lookup": {
+            "from": "users",
+            "localField": "user_id",
+            "foreignField": "id",
+            "as": "user_info",
+        }},
+        {"$unwind": {"path": "$user_info", "preserveNullAndEmptyArrays": True}},
+        {"$project": {
+            "_id": 0,
+            "user_id": 1,
+            "page": 1,
+            "action": 1,
+            "label": 1,
+            "timestamp": 1,
+            "user_name": {"$ifNull": ["$user_info.name", "Anonymous"]},
+            "user_email": {"$ifNull": ["$user_info.email", ""]},
+        }},
+    ]
+    events = await db.activity_log.aggregate(pipeline).to_list(60)
+    return {"events": events}

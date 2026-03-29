@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Body, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Body, WebSocket, WebSocketDisconnect, UploadFile, File
 from datetime import datetime, timezone, timedelta
 from deps import db, get_current_user
 import uuid
 import json
 import asyncio
 import logging
+import os
+import base64
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -259,6 +261,54 @@ async def download_recording(session_id: str, user=Depends(get_current_user)):
         media_type="application/json",
         headers={"Content-Disposition": f'attachment; filename="session_{session_id[:8]}.json"'},
     )
+
+
+# ─── Session Audio Recording Upload ───
+
+UPLOAD_DIR = "/app/uploads"
+
+@router.post("/live/sessions/{session_id}/upload-audio")
+async def upload_session_audio(session_id: str, audio: UploadFile = File(...), user=Depends(get_current_user)):
+    """Upload audio recording of a live session (host only)."""
+    session = await db.live_sessions.find_one({"id": session_id}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session["host_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Only the host can upload recordings")
+
+    # Read audio data
+    content = await audio.read()
+    if len(content) > 50 * 1024 * 1024:  # 50MB limit
+        raise HTTPException(status_code=400, detail="Audio file too large (max 50MB)")
+
+    # Save file
+    file_id = str(uuid.uuid4())
+    ext = audio.filename.split(".")[-1] if audio.filename and "." in audio.filename else "webm"
+    filename = f"{file_id}.{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    audio_url = f"/api/uploads/file/{filename}"
+
+    # Update the session recording with audio URL
+    await db.session_recordings.update_one(
+        {"session_id": session_id},
+        {"$set": {"audio_url": audio_url, "audio_filename": filename, "audio_size": len(content)}}
+    )
+
+    return {"status": "uploaded", "audio_url": audio_url, "size": len(content)}
+
+
+@router.get("/live/sessions/{session_id}/audio")
+async def get_session_audio_info(session_id: str, user=Depends(get_current_user)):
+    """Check if a session has audio recording."""
+    rec = await db.session_recordings.find_one({"session_id": session_id}, {"_id": 0, "audio_url": 1, "audio_filename": 1, "audio_size": 1})
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    return {"has_audio": bool(rec.get("audio_url")), "audio_url": rec.get("audio_url"), "audio_size": rec.get("audio_size", 0)}
+
 
 
 # ─── Recurring Sessions ───

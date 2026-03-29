@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star, Image } from 'lucide-react';
+import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star, Image, Headphones } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import { useSearchParams } from 'react-router-dom';
@@ -579,6 +579,9 @@ function BuildYourOwn({ onPlay }) {
   const [editText, setEditText] = useState('');
   const [saved, setSaved] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [generatingAudio, setGeneratingAudio] = useState(false);
+  const [meditationAudio, setMeditationAudio] = useState(null);
+  const [selectedVoice, setSelectedVoice] = useState('sage');
 
   const loadSaved = useCallback(async () => {
     if (!user) return;
@@ -656,6 +659,21 @@ function BuildYourOwn({ onPlay }) {
       setSaved(prev => prev.filter(s => s.id !== id));
       toast.success('Deleted');
     } catch {}
+  };
+
+  const generateAudio = async () => {
+    if (!generatedSteps.length) return;
+    setGeneratingAudio(true);
+    try {
+      const res = await axios.post(`${API}/meditation/generate-audio`, {
+        steps: generatedSteps, voice: selectedVoice, speed: 0.85,
+      }, { headers: authHeaders });
+      setMeditationAudio(`data:audio/mp3;base64,${res.data.audio}`);
+      toast.success('Meditation audio narration generated!');
+    } catch (e) {
+      toast.error('Could not generate audio. Please try again.');
+    }
+    setGeneratingAudio(false);
   };
 
   const startEdit = (i) => { setEditIdx(i); setEditText(generatedSteps[i].text); };
@@ -936,6 +954,49 @@ function BuildYourOwn({ onPlay }) {
                   Save & Play
                 </button>
               </div>
+            </div>
+
+            {/* AI Audio Narration */}
+            <div className="glass-card p-5 mt-2" data-testid="meditation-audio-section">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Headphones size={14} style={{ color }} />
+                  <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>AI Voice Narration</p>
+                </div>
+              </div>
+              <p className="text-[10px] mb-3" style={{ color: 'var(--text-muted)' }}>
+                Generate a spoken audio narration of your meditation using AI voices
+              </p>
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Voice:</span>
+                {['sage', 'shimmer', 'nova', 'alloy', 'echo', 'fable', 'onyx'].map(v => (
+                  <button key={v} onClick={() => setSelectedVoice(v)}
+                    className="px-2.5 py-1 rounded-lg text-[10px] capitalize transition-all"
+                    style={{
+                      background: selectedVoice === v ? `${color}15` : 'rgba(255,255,255,0.02)',
+                      color: selectedVoice === v ? color : 'var(--text-muted)',
+                      border: `1px solid ${selectedVoice === v ? `${color}30` : 'rgba(255,255,255,0.06)'}`,
+                    }}
+                    data-testid={`voice-${v}`}>{v}</button>
+                ))}
+              </div>
+              <button onClick={generateAudio} disabled={generatingAudio}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-[1.02]"
+                style={{ background: `${color}12`, border: `1px solid ${color}25`, color, opacity: generatingAudio ? 0.6 : 1 }}
+                data-testid="generate-audio-btn">
+                {generatingAudio ? <><Loader2 size={12} className="animate-spin" /> Generating Audio...</> : <><Headphones size={12} /> Generate Audio Narration</>}
+              </button>
+              {meditationAudio && (
+                <div className="mt-3 flex items-center gap-3">
+                  <audio controls src={meditationAudio} className="flex-1 h-10" style={{ filter: 'invert(1) hue-rotate(180deg)', opacity: 0.7 }} data-testid="meditation-audio-player" />
+                  <a href={meditationAudio} download={`meditation_${name || 'custom'}.mp3`}
+                    className="p-2 rounded-lg transition-all hover:scale-105"
+                    style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.15)' }}
+                    data-testid="download-meditation-audio">
+                    <Save size={12} style={{ color: '#2DD4BF' }} />
+                  </a>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

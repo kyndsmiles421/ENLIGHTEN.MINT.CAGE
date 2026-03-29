@@ -8,7 +8,8 @@ import {
   Radio, Users, Timer, Flame, Wind, Music, BookOpen, Heart,
   Zap, Plus, ChevronRight, Calendar, Crown, Sparkles,
   Play, Clock, X, Bell, BellOff, Repeat, CalendarClock,
-  CheckCircle, Archive, Download, Eye, MessageCircle, Pause
+  CheckCircle, Archive, Download, Eye, MessageCircle, Pause,
+  Volume2
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -653,6 +654,15 @@ function PastSessionCard({ recording, types, delay, onReplay, authHeaders }) {
   const Icon = ICON_MAP[type.icon] || Sparkles;
   const endedDate = recording.ended_at ? new Date(recording.ended_at) : null;
   const startedDate = recording.started_at ? new Date(recording.started_at) : null;
+  const [audioInfo, setAudioInfo] = useState(null);
+
+  useEffect(() => {
+    if (recording.session_id && authHeaders) {
+      axios.get(`${API}/live/sessions/${recording.session_id}/audio`, { headers: authHeaders })
+        .then(r => { if (r.data.has_audio) setAudioInfo(r.data); })
+        .catch(() => {});
+    }
+  }, [recording.session_id, authHeaders]);
 
   const downloadRecording = async () => {
     try {
@@ -708,6 +718,14 @@ function PastSessionCard({ recording, types, delay, onReplay, authHeaders }) {
           data-testid={`replay-btn-${recording.id}`}>
           <Eye size={10} /> Replay
         </button>
+        {audioInfo && (
+          <a href={`${process.env.REACT_APP_BACKEND_URL}${audioInfo.audio_url}`} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105"
+            style={{ background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.15)', color: '#EAB308' }}
+            data-testid={`audio-btn-${recording.id}`}>
+            <Volume2 size={10} /> Audio
+          </a>
+        )}
         <button onClick={downloadRecording}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105"
           style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.15)', color: '#2DD4BF' }}
@@ -725,6 +743,7 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
   const [playing, setPlaying] = useState(false);
   const [currentCommandIdx, setCurrentCommandIdx] = useState(-1);
   const [showChat, setShowChat] = useState(true);
+  const [audioUrl, setAudioUrl] = useState(null);
   const timerRef = React.useRef(null);
 
   const type = types.find(t => t.id === recording.session_type) || {};
@@ -732,6 +751,9 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
   React.useEffect(() => {
     axios.get(`${API}/live/sessions/${recording.session_id}/recording`, { headers: authHeaders })
       .then(r => setFullRecording(r.data))
+      .catch(() => {});
+    axios.get(`${API}/live/sessions/${recording.session_id}/audio`, { headers: authHeaders })
+      .then(r => { if (r.data.has_audio) setAudioUrl(`${process.env.REACT_APP_BACKEND_URL}${r.data.audio_url}`); })
       .catch(() => {});
   }, [recording.session_id, authHeaders]);
 
@@ -856,7 +878,7 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
             </div>
 
             {/* Controls */}
-            <div className="px-6 py-3 flex items-center justify-center gap-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+            <div className="px-6 py-3 flex items-center justify-center gap-3 flex-wrap" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
               {commands.length > 0 && (
                 <button onClick={() => { playing ? setPlaying(false) : startReplay(); }}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
@@ -876,6 +898,14 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
                 <MessageCircle size={10} /> Chat ({chatLog.length})
               </button>
             </div>
+
+            {/* Audio Player */}
+            {audioUrl && (
+              <div className="px-6 py-3 flex items-center gap-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+                <Volume2 size={12} style={{ color: '#EAB308', flexShrink: 0 }} />
+                <audio controls src={audioUrl} className="flex-1 h-8" style={{ filter: 'invert(1) hue-rotate(180deg)', opacity: 0.7 }} data-testid="replay-audio-player" />
+              </div>
+            )}
 
             {/* Command Timeline Steps */}
             {commands.length > 0 && (

@@ -33,6 +33,8 @@ export default function CreatorDashboard() {
   const [showUserDetail, setShowUserDetail] = useState(null);
   const [userSearch, setUserSearch] = useState('');
   const [searchResults, setSearchResults] = useState(null);
+  const [liveFeed, setLiveFeed] = useState([]);
+  const feedIntervalRef = React.useRef(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -86,6 +88,22 @@ export default function CreatorDashboard() {
     } catch { setSearchResults([]); }
   }, [authHeaders]);
 
+  // Live feed polling
+  const loadLiveFeed = useCallback(async () => {
+    try {
+      const r = await axios.get(`${API}/creator/live-feed`, { headers: authHeaders });
+      setLiveFeed(r.data.events || []);
+    } catch {}
+  }, [authHeaders]);
+
+  useEffect(() => {
+    if (activeTab === 'livefeed') {
+      loadLiveFeed();
+      feedIntervalRef.current = setInterval(loadLiveFeed, 5000);
+    }
+    return () => { if (feedIntervalRef.current) clearInterval(feedIntervalRef.current); };
+  }, [activeTab, loadLiveFeed]);
+
   const exportData = async (collection) => {
     try {
       const res = await axios.get(`${API}/creator/export/${collection}`, { headers: authHeaders, responseType: 'blob' });
@@ -131,6 +149,7 @@ export default function CreatorDashboard() {
 
   const TABS = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'livefeed', label: 'Live Feed', icon: Radio },
     { id: 'feedback', label: `Feedback (${overview?.new_feedback || 0})`, icon: MessageSquare },
     { id: 'comments', label: 'Comments', icon: MessageCircle },
     { id: 'users', label: 'Users', icon: Users },
@@ -211,6 +230,7 @@ export default function CreatorDashboard() {
         {/* Tab Content */}
         <AnimatePresence mode="wait">
           {activeTab === 'overview' && <OverviewTab key="ov" overview={overview} activeTrend={activeTrend} growthData={growthData} features={features} onExport={exportData} />}
+          {activeTab === 'livefeed' && <LiveFeedTab key="lf" events={liveFeed} onRefresh={loadLiveFeed} />}
           {activeTab === 'feedback' && <FeedbackTab key="fb" feedback={feedback} onStatusChange={updateFeedbackStatus} onExport={() => exportData('feedback')} />}
           {activeTab === 'comments' && <CommentsTab key="cm" comments={comments} onDelete={deleteComment} />}
           {activeTab === 'users' && <UsersTab key="us" users={recentUsers} overview={overview} userSearch={userSearch} searchResults={searchResults} onSearch={searchUsers} onViewUser={viewUserDetail} onExport={() => exportData('users')} />}
@@ -231,6 +251,83 @@ export default function CreatorDashboard() {
     </div>
   );
 }
+
+
+/* ─── Live Feed Tab ─── */
+function LiveFeedTab({ events, onRefresh }) {
+  const ACTION_ICONS = {
+    visit: { icon: Eye, color: '#3B82F6' },
+    interact: { icon: Flame, color: '#FB923C' },
+    complete: { icon: CheckCircle, color: '#22C55E' },
+  };
+  const formatPage = (page) => {
+    if (!page) return 'Unknown';
+    return page.replace(/^\//, '').replace(/-/g, ' ').replace(/\//g, ' > ') || 'Home';
+  };
+  const timeAgo = (ts) => {
+    const diff = (Date.now() - new Date(ts).getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} data-testid="creator-livefeed-tab">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#22C55E' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
+            Real-time Activity ({events.length} events)
+          </p>
+        </div>
+        <button onClick={onRefresh} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px]"
+          style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'var(--text-muted)' }}
+          data-testid="livefeed-refresh">
+          <Activity size={10} /> Refresh
+        </button>
+      </div>
+      <p className="text-[9px] mb-4" style={{ color: 'var(--text-muted)' }}>Auto-refreshes every 5 seconds</p>
+      {events.length === 0 ? (
+        <div className="glass-card p-8 text-center">
+          <Radio size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
+          <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No recent activity</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>User actions will appear here in real-time</p>
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          {events.map((e, i) => {
+            const ai = ACTION_ICONS[e.action] || ACTION_ICONS.visit;
+            const AIcon = ai.icon;
+            return (
+              <motion.div key={`${e.timestamp}-${i}`}
+                initial={i < 5 ? { opacity: 0, x: -10 } : false}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i < 5 ? i * 0.03 : 0 }}
+                className="glass-card px-4 py-2.5 flex items-center gap-3"
+                data-testid={`feed-event-${i}`}>
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${ai.color}12` }}>
+                  <AIcon size={11} style={{ color: ai.color }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-medium truncate" style={{ color: 'var(--text-primary)' }}>{e.user_name}</span>
+                    <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{e.action === 'visit' ? 'visited' : e.action === 'interact' ? 'used' : 'completed'}</span>
+                    <span className="text-[10px] font-medium truncate" style={{ color: ai.color }}>{formatPage(e.page)}</span>
+                  </div>
+                  {e.label && <p className="text-[9px] truncate" style={{ color: 'var(--text-muted)' }}>{e.label}</p>}
+                </div>
+                <span className="text-[8px] flex-shrink-0 tabular-nums" style={{ color: 'var(--text-muted)' }}>{timeAgo(e.timestamp)}</span>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 
 /* ─── Overview Tab ─── */
 function OverviewTab({ overview, activeTrend, growthData, features, onExport }) {
