@@ -896,9 +896,17 @@ export default function Landing() {
                 className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Collective</motion.span>
             </h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              className="text-base md:text-lg leading-relaxed max-w-md mb-10" style={{ color: 'var(--text-secondary)' }}>
+              className="text-base md:text-lg leading-relaxed max-w-md mb-6" style={{ color: 'var(--text-secondary)' }}>
               Your sanctuary for breathwork, meditation, divination, and spiritual growth — guided by ancient wisdom and modern technology.
             </motion.p>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+              className="flex items-center gap-3 mb-8">
+              <IntroVideo />
+              <div className="flex items-center gap-2">
+                <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
+                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for full experience</span>
+              </div>
+            </motion.div>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
               <button onClick={() => setShowQuickReset(true)}
@@ -940,14 +948,6 @@ export default function Landing() {
                   Take the Tour <Play size={14} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
-            </motion.div>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
-              <IntroVideo />
-              <div className="flex items-center gap-2">
-                <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
-                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for full experience</span>
-              </div>
             </motion.div>
           </motion.div>
 
