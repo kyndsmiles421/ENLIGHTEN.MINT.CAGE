@@ -205,7 +205,11 @@ function App() {
       <CreditProvider>
       <SensoryProvider>
         <BrowserRouter>
-          <div style={{ minHeight: '100vh', background: 'var(--bg-primary, #0B0C15)', position: 'relative' }}>
+          <div style={{ minHeight: '100vh', background: '#030308', position: 'relative' }}>
+            {/* Immersive Fluid Mesh Gradient */}
+            <div className="cosmic-mesh" aria-hidden="true">
+              <div className="cosmic-mesh-inner" />
+            </div>
             <CosmicBackground />
             <Navigation />
             <ScrollToTop />
@@ -213,11 +217,11 @@ function App() {
               position="top-right"
               toastOptions={{
                 style: {
-                  background: 'var(--bg-secondary, rgba(22, 24, 38, 0.95))',
-                  border: '1px solid rgba(192,132,252,0.15)',
-                  color: 'var(--text-primary, #F8FAFC)',
-                  backdropFilter: 'blur(24px)',
-                  boxShadow: '0 0 30px rgba(192,132,252,0.08)',
+                  background: 'rgba(10, 10, 18, 0.92)',
+                  border: '1px solid rgba(192,132,252,0.18)',
+                  color: '#F8FAFC',
+                  backdropFilter: 'blur(28px)',
+                  boxShadow: '0 0 30px rgba(192,132,252,0.1), 0 8px 32px rgba(0,0,0,0.4)',
                 },
               }}
             />

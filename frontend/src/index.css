@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@400;500;700&family=Cinzel:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@400;500;700&family=Cinzel:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -29,21 +29,84 @@
 body {
   margin: 0;
   font-family: 'Manrope', sans-serif;
-  background: var(--bg-default);
+  background: #030308;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* PWA safe area insets */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(192,132,252,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(45,212,191,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 30% at 10% 60%, rgba(59,130,246,0.02) 0%, transparent 50%);
-  background-attachment: fixed;
+}
+
+/* ═══ FLUID MESH GRADIENT — Immersive flowing background ═══ */
+.cosmic-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cosmic-mesh::before,
+.cosmic-mesh::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  will-change: transform;
+}
+.cosmic-mesh::before {
+  width: 60vw; height: 60vw;
+  top: -20%; left: -10%;
+  background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, rgba(217,70,239,0.08) 50%, transparent 80%);
+  animation: mesh-drift-1 18s ease-in-out infinite alternate;
+}
+.cosmic-mesh::after {
+  width: 50vw; height: 50vw;
+  bottom: -15%; right: -10%;
+  background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, rgba(45,212,191,0.07) 50%, transparent 80%);
+  animation: mesh-drift-2 22s ease-in-out infinite alternate;
+}
+.cosmic-mesh-inner {
+  position: absolute;
+  inset: 0;
+}
+.cosmic-mesh-inner::before,
+.cosmic-mesh-inner::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  will-change: transform;
+}
+.cosmic-mesh-inner::before {
+  width: 40vw; height: 40vw;
+  top: 30%; right: 15%;
+  background: radial-gradient(circle, rgba(234,179,8,0.10) 0%, rgba(249,115,22,0.05) 50%, transparent 80%);
+  animation: mesh-drift-3 25s ease-in-out infinite alternate;
+}
+.cosmic-mesh-inner::after {
+  width: 35vw; height: 35vw;
+  bottom: 20%; left: 25%;
+  background: radial-gradient(circle, rgba(253,164,175,0.09) 0%, rgba(192,132,252,0.05) 50%, transparent 80%);
+  animation: mesh-drift-4 20s ease-in-out infinite alternate;
+}
+@keyframes mesh-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(15vw, 10vh) scale(1.15); }
+}
+@keyframes mesh-drift-2 {
+  0% { transform: translate(0, 0) scale(1.1); }
+  100% { transform: translate(-12vw, -8vh) scale(0.9); }
+}
+@keyframes mesh-drift-3 {
+  0% { transform: translate(0, 0) scale(0.95); }
+  100% { transform: translate(-10vw, 12vh) scale(1.2); }
+}
+@keyframes mesh-drift-4 {
+  0% { transform: translate(0, 0) scale(1.05); }
+  100% { transform: translate(8vw, -15vh) scale(0.85); }
 }
 
 h1, h2, h3 {
@@ -56,16 +119,17 @@ h1, h2, h3 {
 
 /* ============ GLASS MORPHISM ============ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.025);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 1.5rem;
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.15) inset;
 }
 
 .glass-card::before {
@@ -73,7 +137,7 @@ h1, h2, h3 {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,0.035) 0%, transparent 40%, rgba(192,132,252,0.015) 100%);
+  background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, transparent 30%, rgba(192,132,252,0.02) 70%, rgba(6,182,212,0.015) 100%);
   pointer-events: none;
 }
 
@@ -83,11 +147,12 @@ h1, h2, h3 {
 
 .glass-card-hover:hover {
   transform: translateY(-6px) scale(1.01);
-  border-color: rgba(192, 132, 252, 0.18);
+  border-color: rgba(192, 132, 252, 0.2);
   box-shadow:
-    0 0 30px rgba(192, 132, 252, 0.08),
-    0 20px 60px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    0 0 40px rgba(192, 132, 252, 0.1),
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    inset 0 0 20px rgba(192, 132, 252, 0.03);
 }
 
 .glass-card-hover:active {
@@ -98,18 +163,30 @@ h1, h2, h3 {
 /* ============ GLOW EFFECTS ============ */
 .glow-primary {
   box-shadow:
-    0 0 20px rgba(192, 132, 252, 0.15),
-    0 0 60px rgba(192, 132, 252, 0.08);
+    0 0 24px rgba(192, 132, 252, 0.2),
+    0 0 60px rgba(192, 132, 252, 0.08),
+    inset 0 0 12px rgba(192, 132, 252, 0.04);
 }
 
 .glow-secondary {
   box-shadow:
-    0 0 20px rgba(45, 212, 191, 0.15),
-    0 0 60px rgba(45, 212, 191, 0.08);
+    0 0 24px rgba(45, 212, 191, 0.2),
+    0 0 60px rgba(45, 212, 191, 0.08),
+    inset 0 0 12px rgba(45, 212, 191, 0.04);
 }
 
 .text-glow {
-  text-shadow: 0 0 40px rgba(192, 132, 252, 0.4), 0 0 80px rgba(192, 132, 252, 0.15);
+  text-shadow: 0 0 40px rgba(192, 132, 252, 0.5), 0 0 80px rgba(192, 132, 252, 0.2), 0 0 120px rgba(192,132,252,0.08);
+}
+
+/* Color-shifting border glow */
+.glow-shift {
+  animation: glow-color-shift 6s ease-in-out infinite;
+}
+@keyframes glow-color-shift {
+  0%, 100% { box-shadow: 0 0 20px rgba(192,132,252,0.15), 0 0 60px rgba(192,132,252,0.05); }
+  33% { box-shadow: 0 0 20px rgba(6,182,212,0.15), 0 0 60px rgba(6,182,212,0.05); }
+  66% { box-shadow: 0 0 20px rgba(234,179,8,0.15), 0 0 60px rgba(234,179,8,0.05); }
 }
 
 /* ============ ANIMATIONS ============ */
@@ -218,6 +295,91 @@ body[data-theme="light"] .animate-text-shimmer {
 
 .animate-orbit-glow {
   animation: orbit-glow 6s ease-in-out infinite;
+}
+
+/* ═══ IMMERSIVE PORTAL ANIMATIONS ═══ */
+@keyframes portal-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 30px rgba(192,132,252,0.15), 0 0 80px rgba(124,58,237,0.08), 0 0 120px rgba(6,182,212,0.05);
+    border-color: rgba(192,132,252,0.12);
+  }
+  33% { 
+    box-shadow: 0 0 30px rgba(6,182,212,0.15), 0 0 80px rgba(45,212,191,0.08), 0 0 120px rgba(234,179,8,0.05);
+    border-color: rgba(6,182,212,0.12);
+  }
+  66% { 
+    box-shadow: 0 0 30px rgba(234,179,8,0.12), 0 0 80px rgba(253,164,175,0.08), 0 0 120px rgba(192,132,252,0.05);
+    border-color: rgba(234,179,8,0.10);
+  }
+}
+.animate-portal-pulse {
+  animation: portal-pulse 8s ease-in-out infinite;
+}
+
+@keyframes cosmic-breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+.animate-cosmic-breathe {
+  animation: cosmic-breathe 4s ease-in-out infinite;
+}
+
+@keyframes color-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-color-flow {
+  background-size: 300% 300%;
+  animation: color-flow 8s ease-in-out infinite;
+}
+
+/* Stagger reveal for children */
+.stagger-reveal > * {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fade-up 0.5s ease-out forwards;
+}
+.stagger-reveal > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-reveal > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-reveal > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-reveal > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-reveal > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-reveal > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* Draggable widget styles */
+.draggable-widget {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.draggable-widget:active,
+.draggable-widget.is-dragging {
+  cursor: grabbing;
+  z-index: 100;
+}
+.draggable-widget.is-dragging {
+  opacity: 0.85;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(192,132,252,0.15);
+  transform: scale(1.03);
+}
+.drag-handle {
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.draggable-widget:hover .drag-handle {
+  opacity: 0.4;
+}
+.drag-handle:active { cursor: grabbing; }
+
+/* Immersive hero entrance overlay */
+@keyframes hero-veil-lift {
+  0% { opacity: 1; backdrop-filter: blur(20px); }
+  100% { opacity: 0; backdrop-filter: blur(0px); pointer-events: none; }
+}
+.hero-entrance-veil {
+  animation: hero-veil-lift 1.5s ease-out 0.3s forwards;
 }
 
 /* ============ PARTICLE BACKGROUND ============ */
@@ -400,16 +562,16 @@ body[data-theme="light"] .animate-text-shimmer {
 
 /* ============ ENHANCED DEPTH & DIMENSION ============ */
 .glass-card-deep {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(32px) saturate(1.3);
-  -webkit-backdrop-filter: blur(32px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(36px) saturate(1.4);
+  -webkit-backdrop-filter: blur(36px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 1.5rem;
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.35),
-    0 2px 0 rgba(255, 255, 255, 0.03) inset,
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    0 2px 0 rgba(255, 255, 255, 0.04) inset,
     0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 }
 
@@ -419,11 +581,12 @@ body[data-theme="light"] .animate-text-shimmer {
 }
 
 .dimension-lift:hover {
-  transform: translateY(-4px) perspective(800px) rotateX(1deg);
+  transform: translateY(-6px) perspective(800px) rotateX(1deg);
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(192, 132, 252, 0.06),
-    0 2px 0 rgba(255, 255, 255, 0.05) inset;
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(192, 132, 252, 0.08),
+    0 2px 0 rgba(255, 255, 255, 0.06) inset,
+    inset 0 0 15px rgba(192, 132, 252, 0.03);
 }
 
 /* Subtle grain texture overlay for depth */
@@ -580,11 +743,11 @@ button[data-testid] {
 /* ═══ Light theme overrides ═══ */
 body[data-theme="light"] {
   background: #F8F6F3 !important;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(124,58,237,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(34,197,94,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 30% at 10% 60%, rgba(59,130,246,0.02) 0%, transparent 50%) !important;
   color: #1E1B2E;
+}
+body[data-theme="light"] .cosmic-mesh {
+  opacity: 0.3;
+  filter: saturate(0.5) brightness(1.5);
 }
 
 body[data-theme="light"] .glass-card {

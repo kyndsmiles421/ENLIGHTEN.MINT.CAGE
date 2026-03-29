@@ -4,11 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+} from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap,
   Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2, VolumeX,
   Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X,
   Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2,
-  Eye, Star, Compass, Droplets, MessageCircle, Orbit, Loader2
+  Eye, Star, Compass, Droplets, MessageCircle, Orbit, Loader2, GripVertical
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShareButton from '../components/ShareButton';
@@ -149,15 +154,22 @@ function PillarCard({ pillar, index }) {
       viewport={{ once: true, margin: '-40px' }}
       transition={{ delay: index * 0.08, duration: 0.5 }}
       className="glass-card glass-card-hover p-8 group relative"
+      style={{ borderColor: `${pillar.color}12` }}
       data-testid={`pillar-${pillar.id}`}
     >
-      {/* Accent glow */}
-      <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-500"
-        style={{ background: pillar.color, filter: 'blur(40px)', transform: 'translate(30%, -30%)' }} />
+      {/* Accent glow — dual layer for depth */}
+      <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-700"
+        style={{ background: pillar.color, filter: 'blur(50px)', transform: 'translate(30%, -30%)' }} />
+      <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full opacity-0 group-hover:opacity-[0.06] transition-opacity duration-700"
+        style={{ background: pillar.color, filter: 'blur(40px)', transform: 'translate(-30%, 30%)' }} />
       <div className="flex items-start justify-between mb-6 cursor-pointer" onClick={() => navigate(pillar.path)}>
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-          style={{ background: `${pillar.color}12`, border: `1px solid ${pillar.color}15` }}>
-          <Icon size={22} style={{ color: pillar.color }} />
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
+          style={{ 
+            background: `${pillar.color}10`, 
+            border: `1px solid ${pillar.color}18`,
+            boxShadow: `0 0 20px ${pillar.color}08`,
+          }}>
+          <Icon size={24} style={{ color: pillar.color }} />
         </div>
         <ArrowRight size={16} className="opacity-0 group-hover:opacity-60 transition-all duration-300 group-hover:translate-x-1" style={{ color: pillar.color }} />
       </div>
@@ -169,12 +181,19 @@ function PillarCard({ pillar, index }) {
         {pillar.highlights.map(h => (
           <span key={h.label} onClick={(e) => { e.stopPropagation(); navigate(h.path); }}
             className="text-[11px] px-3 py-1.5 rounded-full transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
-            style={{ background: `${pillar.color}08`, color: `${pillar.color}cc`, border: `1px solid ${pillar.color}10` }}
+            style={{ 
+              background: `${pillar.color}0a`, 
+              color: `${pillar.color}cc`, 
+              border: `1px solid ${pillar.color}12`,
+            }}
             data-testid={`pillar-link-${h.path.slice(1)}`}>
             {h.label}
           </span>
         ))}
       </div>
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-8 right-8 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: `linear-gradient(90deg, transparent, ${pillar.color}30, transparent)` }} />
     </motion.div>
   );
 }
@@ -251,12 +270,53 @@ function MantraCard({ mantra, accentColor }) {
   );
 }
 
+/* ─── Sortable Widget Wrapper ─── */
+function SortableWidget({ id, children }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    opacity: isDragging ? 0.85 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className={`relative group/drag ${isDragging ? 'is-dragging' : ''}`} {...attributes}>
+      <div className="drag-handle absolute top-3 right-3 z-10 p-1 rounded-lg hover:bg-white/5 transition-colors" {...listeners}
+        data-testid={`drag-handle-${id}`}>
+        <GripVertical size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+      </div>
+      {children}
+    </div>
+  );
+}
+
 /* ─── Personalized Dashboard (for logged-in returning users) ─── */
 function PersonalizedDashboard({ user, onQuickReset }) {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const [widgetOrder, setWidgetOrder] = useState(() => {
+    const saved = localStorage.getItem('zen_widget_order');
+    return saved ? JSON.parse(saved) : ['wisdom', 'actions', 'continue', 'new-for-you', 'progress'];
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      setWidgetOrder(prev => {
+        const oldIdx = prev.indexOf(active.id);
+        const newIdx = prev.indexOf(over.id);
+        const updated = arrayMove(prev, oldIdx, newIdx);
+        localStorage.setItem('zen_widget_order', JSON.stringify(updated));
+        return updated;
+      });
+    }
+  };
 
   useEffect(() => {
     if (!token) return;
@@ -269,6 +329,118 @@ function PersonalizedDashboard({ user, onQuickReset }) {
   if (loading || !data) return null;
 
   const { greeting, wisdom, continue_items, new_for_you, progress, featured_tradition } = data;
+
+  const widgetMap = {
+    'wisdom': (
+      <div className="glass-card p-6 relative overflow-hidden animate-portal-pulse" data-testid="daily-wisdom">
+        <div className="absolute top-3 right-10 opacity-10">
+          <Quote size={36} style={{ color: wisdom.color }} />
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: wisdom.color }}>
+          Today's Cosmic Insight
+        </p>
+        <p className="text-sm md:text-base font-light leading-relaxed mb-3 max-w-2xl"
+          style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+          "{wisdom.text}"
+        </p>
+        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+          — {wisdom.source} <span style={{ color: wisdom.color }}>&middot; {wisdom.tradition}</span>
+        </p>
+      </div>
+    ),
+    'actions': (
+      <div className="flex gap-3 flex-wrap" data-testid="dashboard-actions">
+        {[
+          { label: 'Quick Reset', icon: Zap, color: '#D8B4FE', action: onQuickReset, bg: 'rgba(192,132,252,0.08)', border: 'rgba(192,132,252,0.18)', id: 'dashboard-quick-reset' },
+          { label: 'Full Dashboard', icon: ArrowRight, color: '#2DD4BF', action: () => navigate('/dashboard'), bg: 'rgba(45,212,191,0.06)', border: 'rgba(45,212,191,0.15)', id: 'dashboard-continue' },
+          { label: 'Talk to Sage', icon: Sparkles, color: '#D8B4FE', action: () => navigate('/coach'), bg: 'rgba(216,180,254,0.06)', border: 'rgba(216,180,254,0.15)', id: 'dashboard-sage' },
+          { label: 'My Journey', icon: Star, color: '#FCD34D', action: () => navigate('/growth-timeline'), bg: 'rgba(252,211,77,0.06)', border: 'rgba(252,211,77,0.15)', id: 'dashboard-timeline' },
+        ].map(btn => {
+          const BIcon = btn.icon;
+          return (
+            <motion.button key={btn.id} whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.97 }}
+              onClick={btn.action}
+              className="btn-glass group flex items-center gap-2 text-sm"
+              style={{ background: btn.bg, borderColor: btn.border }}
+              data-testid={btn.id}>
+              <span style={{ color: btn.color }} className="flex items-center gap-2">
+                {btn.label} <BIcon size={14} />
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+    ),
+    'continue': continue_items.length > 0 ? (
+      <div data-testid="continue-section">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
+          Continue Where You Left Off
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {continue_items.map((item, i) => (
+            <motion.button key={i} whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }}
+              onClick={() => navigate(item.page)}
+              data-testid={`continue-item-${i}`}
+              className="glass-card p-4 text-left group transition-all"
+              style={{ borderColor: `${item.color}0a` }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
+                style={{ background: `${item.color}10`, boxShadow: `0 0 12px ${item.color}08` }}>
+                <ChevronRight size={14} style={{ color: item.color }} />
+              </div>
+              <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.label}</p>
+              <p className="text-[9px]" style={{ color: item.color }}>{item.category}</p>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    ) : null,
+    'new-for-you': new_for_you.length > 0 ? (
+      <div data-testid="new-for-you-section">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#FB923C' }}>
+          <Sparkles size={10} className="inline mr-1" /> New For You
+        </p>
+        <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+          {new_for_you.map((item, i) => (
+            <motion.button key={i} whileHover={{ y: -3 }}
+              onClick={() => navigate(item.page)}
+              data-testid={`new-item-${i}`}
+              className="glass-card p-4 min-w-[160px] flex-shrink-0 text-left transition-all hover:scale-[1.02]"
+              style={{ borderColor: `${item.color}0a` }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
+                style={{ background: `${item.color}10`, boxShadow: `0 0 12px ${item.color}08` }}>
+                <Star size={14} style={{ color: item.color }} />
+              </div>
+              <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+              <p className="text-[9px]" style={{ color: item.color }}>{item.category}</p>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    ) : null,
+    'progress': (
+      <div data-testid="progress-stats">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
+          Your Journey So Far
+        </p>
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+          {[
+            { label: 'Sessions', value: progress.total_sessions, color: '#D8B4FE' },
+            { label: 'AI Conversations', value: progress.ai_sessions, color: '#818CF8' },
+            { label: 'Mood Entries', value: progress.mood_entries, color: '#FDA4AF' },
+            { label: 'Journal Entries', value: progress.journal_entries, color: '#86EFAC' },
+            { label: 'Features Found', value: `${progress.features_discovered}/${progress.total_features}`, color: '#FB923C' },
+            { label: 'Streak Days', value: progress.streak_days, color: '#FCD34D' },
+          ].map((stat, i) => (
+            <motion.div key={i} whileHover={{ y: -2, scale: 1.03 }} className="glass-card p-3 text-center transition-all cursor-default"
+              style={{ borderColor: `${stat.color}08` }}>
+              <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: stat.color }}>{stat.value}</p>
+              <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{stat.label}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    ),
+  };
 
   return (
     <div className="relative z-10 px-6 md:px-12 lg:px-24 pt-24 pb-12" data-testid="personalized-dashboard">
@@ -285,131 +457,23 @@ function PersonalizedDashboard({ user, onQuickReset }) {
               <Flame size={12} /> {progress.streak_days}-day streak
             </motion.p>
           )}
-        </div>
-
-        {/* Daily Wisdom */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="glass-card p-6 mb-6 relative overflow-hidden" data-testid="daily-wisdom">
-          <div className="absolute top-3 right-4 opacity-10">
-            <Quote size={36} style={{ color: wisdom.color }} />
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: wisdom.color }}>
-            Today's Cosmic Insight
-          </p>
-          <p className="text-sm md:text-base font-light leading-relaxed mb-3 max-w-2xl"
-            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-            "{wisdom.text}"
-          </p>
           <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-            — {wisdom.source} <span style={{ color: wisdom.color }}>&middot; {wisdom.tradition}</span>
+            <GripVertical size={10} className="inline mr-1" /> Drag widgets to rearrange your sanctuary
           </p>
-        </motion.div>
-
-        {/* Action Row */}
-        <div className="flex gap-3 mb-8 flex-wrap">
-          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            onClick={onQuickReset}
-            className="btn-glass glow-primary group flex items-center gap-2 text-sm"
-            data-testid="dashboard-quick-reset">
-            <Zap size={14} /> Quick Reset
-          </motion.button>
-          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            onClick={() => navigate('/dashboard')}
-            className="btn-glass group flex items-center gap-2 text-sm"
-            style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
-            data-testid="dashboard-continue">
-            <span style={{ color: '#2DD4BF' }}>Full Dashboard <ArrowRight size={14} className="inline" /></span>
-          </motion.button>
-          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-            onClick={() => navigate('/coach')}
-            className="btn-glass group flex items-center gap-2 text-sm"
-            style={{ background: 'rgba(216,180,254,0.06)', borderColor: 'rgba(216,180,254,0.15)' }}
-            data-testid="dashboard-sage">
-            <span style={{ color: '#D8B4FE' }}>Talk to Sage <Sparkles size={14} className="inline" /></span>
-          </motion.button>
-          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            onClick={() => navigate('/growth-timeline')}
-            className="btn-glass group flex items-center gap-2 text-sm"
-            style={{ background: 'rgba(252,211,77,0.06)', borderColor: 'rgba(252,211,77,0.15)' }}
-            data-testid="dashboard-timeline">
-            <span style={{ color: '#FCD34D' }}>My Journey <Star size={14} className="inline" /></span>
-          </motion.button>
         </div>
 
-        {/* Continue Where You Left Off */}
-        {continue_items.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            className="mb-8" data-testid="continue-section">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
-              Continue Where You Left Off
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {continue_items.map((item, i) => (
-                <motion.button key={i} whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }}
-                  onClick={() => navigate(item.page)}
-                  data-testid={`continue-item-${i}`}
-                  className="glass-card p-4 text-left group transition-all hover:scale-[1.01]"
-                  style={{ borderColor: `${item.color}08` }}>
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
-                    style={{ background: `${item.color}10` }}>
-                    <ChevronRight size={14} style={{ color: item.color }} />
-                  </div>
-                  <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.label}</p>
-                  <p className="text-[9px]" style={{ color: item.color }}>{item.category}</p>
-                </motion.button>
-              ))}
+        {/* Draggable Widget Grid */}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={widgetOrder} strategy={rectSortingStrategy}>
+            <div className="space-y-6">
+              {widgetOrder.map(id => widgetMap[id] ? (
+                <SortableWidget key={id} id={id}>
+                  {widgetMap[id]}
+                </SortableWidget>
+              ) : null)}
             </div>
-          </motion.div>
-        )}
-
-        {/* New For You */}
-        {new_for_you.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            className="mb-8" data-testid="new-for-you-section">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#FB923C' }}>
-              <Sparkles size={10} className="inline mr-1" /> New For You
-            </p>
-            <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-              {new_for_you.map((item, i) => (
-                <motion.button key={i} whileHover={{ y: -3 }}
-                  onClick={() => navigate(item.page)}
-                  data-testid={`new-item-${i}`}
-                  className="glass-card p-4 min-w-[160px] flex-shrink-0 text-left transition-all hover:scale-[1.02]"
-                  style={{ borderColor: `${item.color}08` }}>
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
-                    style={{ background: `${item.color}10` }}>
-                    <Star size={14} style={{ color: item.color }} />
-                  </div>
-                  <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
-                  <p className="text-[9px]" style={{ color: item.color }}>{item.category}</p>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Progress Stats */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="mb-4" data-testid="progress-stats">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
-            Your Journey So Far
-          </p>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {[
-              { label: 'Sessions', value: progress.total_sessions, color: '#D8B4FE' },
-              { label: 'AI Conversations', value: progress.ai_sessions, color: '#818CF8' },
-              { label: 'Mood Entries', value: progress.mood_entries, color: '#FDA4AF' },
-              { label: 'Journal Entries', value: progress.journal_entries, color: '#86EFAC' },
-              { label: 'Features Found', value: `${progress.features_discovered}/${progress.total_features}`, color: '#FB923C' },
-              { label: 'Streak Days', value: progress.streak_days, color: '#FCD34D' },
-            ].map((stat, i) => (
-              <div key={i} className="glass-card p-3 text-center">
-                <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: stat.color }}>{stat.value}</p>
-                <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
   );
@@ -751,12 +815,16 @@ export default function Landing() {
         <ShareButton />
       </div>
 
-      {/* Aurora overlays */}
+      {/* Aurora overlays — immersive portal layers */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full animate-aurora"
-          style={{ background: 'radial-gradient(ellipse, rgba(192,132,252,0.08) 0%, transparent 70%)', filter: 'blur(80px)' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(45,212,191,0.06) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'aurora 12s ease-in-out infinite reverse' }} />
+        <div className="absolute top-0 left-1/4 w-[700px] h-[700px] rounded-full animate-aurora"
+          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, rgba(217,70,239,0.04) 40%, transparent 70%)', filter: 'blur(80px)' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(6,182,212,0.10) 0%, rgba(45,212,191,0.03) 40%, transparent 70%)', filter: 'blur(80px)', animation: 'aurora 12s ease-in-out infinite reverse' }} />
+        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(234,179,8,0.07) 0%, transparent 60%)', filter: 'blur(100px)', animation: 'aurora 16s ease-in-out infinite' }} />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[300px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(253,164,175,0.06) 0%, transparent 60%)', filter: 'blur(90px)', animation: 'aurora 20s ease-in-out infinite reverse' }} />
       </div>
 
       {/* ═══ Personalized Dashboard for returning users ═══ */}
@@ -817,38 +885,50 @@ export default function Landing() {
             </motion.div>
           </motion.div>
 
-          {/* Breathing orb */}
+          {/* Breathing orb — immersive cosmic sphere */}
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center justify-center">
             <div className="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
-              {Array.from({ length: 12 }).map((_, i) => {
-                const angle = (i / 12) * Math.PI * 2;
-                const radius = 48;
+              {/* Orbital particles */}
+              {Array.from({ length: 16 }).map((_, i) => {
+                const angle = (i / 16) * Math.PI * 2;
+                const radius = 42 + (i % 3) * 8;
+                const colors = ['#D8B4FE', '#2DD4BF', '#FCD34D', '#FDA4AF', '#818CF8', '#FB923C'];
                 return (
-                  <motion.div key={i} className="absolute w-1 h-1 rounded-full"
+                  <motion.div key={i} className="absolute rounded-full"
                     style={{
-                      background: i % 3 === 0 ? '#D8B4FE' : i % 3 === 1 ? '#2DD4BF' : '#FCD34D',
+                      width: i % 4 === 0 ? 3 : 2,
+                      height: i % 4 === 0 ? 3 : 2,
+                      background: colors[i % colors.length],
                       left: `calc(50% + ${Math.cos(angle) * radius}%)`,
                       top: `calc(50% + ${Math.sin(angle) * radius}%)`,
+                      boxShadow: `0 0 8px ${colors[i % colors.length]}40`,
                     }}
-                    animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1.2, 0.8] }}
-                    transition={{ duration: 3 + i * 0.3, repeat: Infinity, delay: i * 0.2 }} />
+                    animate={{ opacity: [0.2, 1, 0.2], scale: [0.6, 1.4, 0.6] }}
+                    transition={{ duration: 3 + i * 0.2, repeat: Infinity, delay: i * 0.15 }} />
                 );
               })}
-              {[0.3, 0.5, 0.7, 1].map((opacity, i) => (
+              {/* Multi-layered aura rings */}
+              {[
+                { size: 55, color1: 'rgba(124,58,237,0.12)', color2: 'rgba(6,182,212,0.04)', border: 'rgba(192,132,252,0.08)' },
+                { size: 70, color1: 'rgba(6,182,212,0.08)', color2: 'rgba(234,179,8,0.03)', border: 'rgba(6,182,212,0.06)' },
+                { size: 85, color1: 'rgba(217,70,239,0.06)', color2: 'rgba(253,164,175,0.02)', border: 'rgba(217,70,239,0.05)' },
+                { size: 100, color1: 'rgba(192,132,252,0.04)', color2: 'transparent', border: 'rgba(192,132,252,0.03)' },
+              ].map((ring, i) => (
                 <div key={i} className="absolute rounded-full"
                   style={{
-                    width: `${60 + i * 20}%`, height: `${60 + i * 20}%`,
-                    background: `radial-gradient(circle, rgba(192,132,252,${opacity * 0.12}) 0%, transparent 70%)`,
-                    border: `1px solid rgba(192,132,252,${opacity * 0.08})`,
-                    transform: `scale(${breathScale * (0.9 + i * 0.05)})`, transition: 'transform 0.1s linear',
+                    width: `${ring.size}%`, height: `${ring.size}%`,
+                    background: `radial-gradient(circle, ${ring.color1} 0%, ${ring.color2} 70%)`,
+                    border: `1px solid ${ring.border}`,
+                    transform: `scale(${breathScale * (0.92 + i * 0.03)})`, transition: 'transform 0.1s linear',
                   }} />
               ))}
+              {/* Inner core */}
               <div className="relative z-10 w-20 h-20 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(192,132,252,0.7) 0%, rgba(192,132,252,0.15) 60%, transparent 100%)',
-                  boxShadow: `0 0 ${40 + breathScale * 30}px rgba(192,132,252,${0.2 + breathScale * 0.15}), 0 0 ${80 + breathScale * 40}px rgba(192,132,252,0.08)`,
+                  background: 'radial-gradient(circle, rgba(217,70,239,0.7) 0%, rgba(124,58,237,0.35) 40%, rgba(6,182,212,0.15) 70%, transparent 100%)',
+                  boxShadow: `0 0 ${40 + breathScale * 30}px rgba(192,132,252,${0.25 + breathScale * 0.15}), 0 0 ${80 + breathScale * 40}px rgba(124,58,237,0.1), 0 0 ${120 + breathScale * 50}px rgba(6,182,212,0.06)`,
                   transform: `scale(${breathScale})`, transition: 'transform 0.1s linear',
                 }} />
             </div>
@@ -893,9 +973,13 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
                 transition={{ delay: i * 0.06 }}
-                className="glass-card p-6 relative"
+                className="glass-card glass-card-hover p-6 relative"
+                style={{ borderColor: `${item.color}0a` }}
               >
-                <div className="absolute top-4 right-4 opacity-10">
+                {/* Top accent line */}
+                <div className="absolute top-0 left-6 right-6 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${item.color}25, transparent)` }} />
+                <div className="absolute top-4 right-4 opacity-[0.08]">
                   <Quote size={28} style={{ color: item.color }} />
                 </div>
                 <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
@@ -903,7 +987,7 @@ export default function Landing() {
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: `${item.color}15`, color: item.color }}>
+                    style={{ background: `${item.color}15`, color: item.color, boxShadow: `0 0 12px ${item.color}10` }}>
                     {item.name.charAt(0)}
                   </div>
                   <div>
@@ -941,11 +1025,18 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="glass-card p-8 text-center"
+                className="glass-card glass-card-hover p-8 text-center relative overflow-hidden"
+                style={{ borderColor: `${item.color}08` }}
               >
-                <p className="text-4xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: item.color, opacity: 0.3 }}>{item.step}</p>
+                {/* Glow accent */}
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full opacity-[0.06]"
+                  style={{ background: item.color, filter: 'blur(30px)' }} />
+                <p className="text-4xl font-light mb-4 relative" style={{ fontFamily: 'Cormorant Garamond, serif', color: item.color, opacity: 0.4 }}>{item.step}</p>
                 <h3 className="text-base font-medium mb-3" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+                {/* Bottom accent */}
+                <div className="absolute bottom-0 left-6 right-6 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${item.color}20, transparent)` }} />
               </motion.div>
             ))}
           </div>

@@ -608,10 +608,27 @@ async def get_intro_video():
         if os.path.exists(file_path):
             return {"status": "ready", "video_url": cached["video_url"]}
 
-    # Check if currently generating
-    for jid, job in _video_jobs.items():
+    # Check if currently generating (with staleness detection — 15 min max)
+    for jid, job in list(_video_jobs.items()):
         if job.get("cache_key") == INTRO_CACHE_KEY:
-            return {"status": job["status"], "job_id": jid}
+            if job["status"] == "generating":
+                created = job.get("created_at", "")
+                if created:
+                    try:
+                        created_dt = datetime.fromisoformat(created)
+                        age = (datetime.now(timezone.utc) - created_dt).total_seconds()
+                        if age > 900:
+                            # Stale job — remove it so a fresh one can be triggered
+                            del _video_jobs[jid]
+                            continue
+                    except Exception:
+                        pass
+                return {"status": job["status"], "job_id": jid}
+            elif job["status"] == "complete" and job.get("video_url"):
+                return {"status": "ready", "video_url": job["video_url"]}
+            elif job["status"] == "failed":
+                del _video_jobs[jid]
+                continue
 
     return {"status": "not_generated"}
 

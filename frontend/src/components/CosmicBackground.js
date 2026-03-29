@@ -18,21 +18,21 @@ export default function CosmicBackground() {
     starsRef.current = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: Math.random() * 1.5 + 0.3,
-      baseAlpha: Math.random() * 0.7 + 0.2,
+      r: Math.random() * 1.8 + 0.3,
+      baseAlpha: Math.random() * 0.8 + 0.2,
       twinkleSpeed: prefs.reduceFlashing ? 0.002 : Math.random() * 0.02 + 0.005,
       twinkleOffset: Math.random() * Math.PI * 2,
-      color: ['#fff', '#D8B4FE', '#2DD4BF', '#FCD34D', '#FDA4AF'][Math.floor(Math.random() * 5)],
+      color: ['#fff', '#D8B4FE', '#2DD4BF', '#FCD34D', '#FDA4AF', '#818CF8', '#FB923C', '#E879F9'][Math.floor(Math.random() * 8)],
     }));
 
-    const nebulaCount = prefs.reduceParticles ? 1 : 5;
+    const nebulaCount = prefs.reduceParticles ? 1 : 7;
     nebulaRef.current = Array.from({ length: nebulaCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: Math.random() * 300 + 150,
-      color: ['rgba(192,132,252,', 'rgba(45,212,191,', 'rgba(139,92,246,', 'rgba(253,164,175,', 'rgba(252,211,77,'][Math.floor(Math.random() * 5)],
-      drift: { x: (Math.random() - 0.5) * (prefs.reduceMotion ? 0.02 : 0.15), y: (Math.random() - 0.5) * (prefs.reduceMotion ? 0.01 : 0.1) },
-      pulseSpeed: prefs.reduceFlashing ? 0.0005 : Math.random() * 0.003 + 0.001,
+      r: Math.random() * 350 + 150,
+      color: ['rgba(192,132,252,', 'rgba(45,212,191,', 'rgba(139,92,246,', 'rgba(253,164,175,', 'rgba(252,211,77,', 'rgba(6,182,212,', 'rgba(234,179,8,'][Math.floor(Math.random() * 7)],
+      drift: { x: (Math.random() - 0.5) * (prefs.reduceMotion ? 0.02 : 0.18), y: (Math.random() - 0.5) * (prefs.reduceMotion ? 0.01 : 0.12) },
+      pulseSpeed: prefs.reduceFlashing ? 0.0005 : Math.random() * 0.004 + 0.001,
       pulseOffset: Math.random() * Math.PI * 2,
     }));
   }, [prefs.reduceParticles, prefs.reduceFlashing, prefs.reduceMotion]);
@@ -75,7 +75,7 @@ export default function CosmicBackground() {
         if (n.y < -n.r) n.y = h + n.r;
         if (n.y > h + n.r) n.y = -n.r;
 
-        const pulse = 0.02 + 0.01 * Math.sin(time * n.pulseSpeed + n.pulseOffset);
+        const pulse = 0.03 + 0.015 * Math.sin(time * n.pulseSpeed + n.pulseOffset);
         const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
         grad.addColorStop(0, n.color + pulse + ')');
         grad.addColorStop(1, n.color + '0)');
@@ -156,7 +156,7 @@ export default function CosmicBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0, opacity: isLight ? 0 : (prefs.reduceParticles ? 0.3 : 0.7) }}
+      style={{ zIndex: 0, opacity: isLight ? 0 : (prefs.reduceParticles ? 0.4 : 0.85) }}
       data-testid="cosmic-background"
     />
   );

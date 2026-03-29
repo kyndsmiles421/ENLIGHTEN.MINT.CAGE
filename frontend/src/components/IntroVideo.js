@@ -52,7 +52,12 @@ export default function IntroVideo() {
   const openPlayer = () => {
     if (videoUrl) {
       setIsOpen(true);
-      setTimeout(() => videoRef.current?.play(), 300);
+    }
+  };
+
+  const handleVideoReady = () => {
+    if (videoRef.current && isOpen) {
+      videoRef.current.play().catch(() => {});
     }
   };
 
@@ -125,6 +130,9 @@ export default function IntroVideo() {
                   muted={muted}
                   loop
                   playsInline
+                  autoPlay
+                  onCanPlay={handleVideoReady}
+                  onError={() => {}}
                   className="w-full"
                   style={{ maxHeight: '70vh' }}
                   data-testid="intro-video-element" />
