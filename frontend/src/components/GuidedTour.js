@@ -353,12 +353,10 @@ function CardWalkthrough({ onClose, onFinish }) {
    ═══════════════════════════════════════════════ */
 
 export default function GuidedTour({ isOpen, onClose, onFinish }) {
-  const [phase, setPhase] = useState('video'); // 'video' | 'cards'
-
-  // Reset phase when tour opens
-  useEffect(() => {
-    if (isOpen) setPhase('video');
-  }, [isOpen]);
+  // Skip video phase entirely — go straight to card walkthrough
+  // The Sora 2 video is available separately on the landing page
+  // Video autoplay is unreliable across browsers/mobile and was causing
+  // users to get stuck on a black screen
 
   // Lock body scroll while tour is open
   useEffect(() => {
@@ -370,8 +368,6 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
 
   if (!isOpen) return null;
 
-  const handleVideoComplete = () => setPhase('cards');
-  const handleSkipVideo = () => setPhase('cards');
   const handleClose = () => {
     localStorage.setItem('zen_tour_seen', '1');
     onClose();
@@ -382,22 +378,10 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
   };
 
   return createPortal(
-    <AnimatePresence mode="wait">
-      {phase === 'video' && (
-        <VideoIntro
-          key="video"
-          onComplete={handleVideoComplete}
-          onSkip={handleSkipVideo}
-        />
-      )}
-      {phase === 'cards' && (
-        <CardWalkthrough
-          key="cards"
-          onClose={handleClose}
-          onFinish={handleFinish}
-        />
-      )}
-    </AnimatePresence>,
+    <CardWalkthrough
+      onClose={handleClose}
+      onFinish={handleFinish}
+    />,
     document.body
   );
 }
