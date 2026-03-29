@@ -605,6 +605,7 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
             "user": user_doc,
             "avatar": user_avatar[:200] if user_avatar else "",
             "camera_on": False,
+            "screen_sharing": False,
         }
 
         # Build participants list (include camera state)
@@ -615,6 +616,7 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
                 "name": data["user"].get("name", "Seeker"),
                 "avatar": data.get("avatar", ""),
                 "camera_on": data.get("camera_on", False),
+                "screen_sharing": data.get("screen_sharing", False),
             })
 
         # Get session video mode
@@ -738,6 +740,17 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
                         "from": user_id,
                         "candidate": raw.get("candidate"),
                     })
+
+            elif msg_type == "screen_share":
+                sharing = raw.get("sharing", False)
+                if session_id in active_connections and user_id in active_connections[session_id]:
+                    active_connections[session_id][user_id]["screen_sharing"] = sharing
+                await broadcast_to_session(session_id, {
+                    "type": "screen_share",
+                    "user_id": user_id,
+                    "name": user_name,
+                    "sharing": sharing,
+                })
 
     except WebSocketDisconnect:
         pass

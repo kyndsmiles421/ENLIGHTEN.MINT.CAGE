@@ -88,6 +88,13 @@ export default function LiveRoom() {
   const [cameraStates, setCameraStates] = useState({}); // { peerId: boolean }
   const [showVideoSettings, setShowVideoSettings] = useState(false);
 
+  // Screen sharing
+  const screenStreamRef = useRef(null);
+  const screenPeersRef = useRef({});
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [screenSharer, setScreenSharer] = useState(null); // user_id of person sharing
+  const [remoteScreenStream, setRemoteScreenStream] = useState(null);
+
   const isHost = session?.host_id === user?.id;
 
   // Whether current user can share video
@@ -183,10 +190,26 @@ export default function LiveRoom() {
           case 'video_mode':
             setVideoMode(msg.mode);
             if (msg.mode === 'off') {
-              // Force turn off all cameras
               if (isVideoOn) toggleLocalVideo(false);
+              if (isScreenSharing) stopScreenShare();
               cleanupAllPeers();
               setRemoteStreams({});
+              setRemoteScreenStream(null);
+              setScreenSharer(null);
+            }
+            break;
+          case 'screen_share':
+            if (msg.sharing) {
+              setScreenSharer(msg.user_id);
+              // If we have camera on, create offer to screen sharer for their screen stream
+              if (msg.user_id !== user.id && isVideoOn) {
+                createPeerOffer(msg.user_id);
+              }
+            } else {
+              if (screenSharer === msg.user_id) {
+                setScreenSharer(null);
+                setRemoteScreenStream(null);
+              }
             }
             break;
           case 'rtc_offer':
@@ -220,6 +243,10 @@ export default function LiveRoom() {
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach(t => t.stop());
       }
+      if (screenStreamRef.current) {
+        screenStreamRef.current.getTracks().forEach(t => t.stop());
+      }
+      Object.values(screenPeersRef.current).forEach(pc => pc.close());
     };
   }, [connectWS]);
 
@@ -413,6 +440,83 @@ export default function LiveRoom() {
     setShowVideoSettings(false);
   }, []);
 
+  // ─── Screen Sharing ───
+
+  const startScreenShare = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { cursor: 'always', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: true,
+      });
+
+      screenStreamRef.current = stream;
+      setIsScreenSharing(true);
+      setScreenSharer(user.id);
+
+      // Notify others
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'screen_share', sharing: true }));
+      }
+
+      // Create screen-sharing peer connections to all peers with camera on
+      Object.entries(cameraStates).forEach(([peerId, camOn]) => {
+        if (camOn && peerId !== user.id) {
+          const pc = new RTCPeerConnection(RTC_CONFIG);
+          stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+          pc.onicecandidate = (event) => {
+            if (event.candidate && wsRef.current?.readyState === WebSocket.OPEN) {
+              wsRef.current.send(JSON.stringify({
+                type: 'ice_candidate',
+                target: peerId,
+                candidate: event.candidate.toJSON(),
+              }));
+            }
+          };
+
+          pc.createOffer().then(offer => {
+            pc.setLocalDescription(offer);
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+              wsRef.current.send(JSON.stringify({
+                type: 'rtc_offer',
+                target: peerId,
+                offer: offer,
+              }));
+            }
+          });
+
+          screenPeersRef.current[peerId] = pc;
+        }
+      });
+
+      // Listen for when user stops sharing via browser UI
+      stream.getVideoTracks()[0].onended = () => {
+        stopScreenShare();
+      };
+    } catch (err) {
+      console.error('Screen share error:', err);
+    }
+  }, [cameraStates, user]);
+
+  const stopScreenShare = useCallback(() => {
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach(t => t.stop());
+      screenStreamRef.current = null;
+    }
+    // Close screen sharing peer connections
+    Object.values(screenPeersRef.current).forEach(pc => pc.close());
+    screenPeersRef.current = {};
+
+    setIsScreenSharing(false);
+    if (screenSharer === user?.id) {
+      setScreenSharer(null);
+    }
+
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'screen_share', sharing: false }));
+    }
+  }, [screenSharer, user]);
+
   // ─── Existing Functions ───
 
   const sendChat = () => {
@@ -440,6 +544,7 @@ export default function LiveRoom() {
   const endSession = async () => {
     try {
       if (mediaRecorderRef.current && isRecording) await stopRecording(true);
+      if (isScreenSharing) stopScreenShare();
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach(t => t.stop());
         localStreamRef.current = null;
@@ -503,7 +608,7 @@ export default function LiveRoom() {
 
   // ─── Count active videos ───
   const activeVideoCount = Object.values(cameraStates).filter(Boolean).length;
-  const hasAnyVideo = activeVideoCount > 0 || isVideoOn;
+  const hasAnyVideo = activeVideoCount > 0 || isVideoOn || screenSharer;
 
   if (!session) {
     return (
@@ -516,7 +621,7 @@ export default function LiveRoom() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden relative" style={{ background: '#0A0B14' }} data-testid="live-room">
+    <div className="flex flex-col overflow-hidden" style={{ background: '#0A0B14', height: 'calc(100vh - 56px)', position: 'relative', zIndex: 30 }} data-testid="live-room">
       {/* Scene Background */}
       <div className="absolute inset-0 z-0">
         <SceneBackground session={session} />
@@ -634,7 +739,7 @@ export default function LiveRoom() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden relative z-10">
+      <div className="flex-1 flex overflow-hidden relative z-10 min-h-0">
 
         {/* Center Area */}
         <div className="flex-1 flex flex-col relative">
@@ -652,6 +757,9 @@ export default function LiveRoom() {
                 isVideoOn={isVideoOn}
                 myAvatar={avatarB64}
                 hostId={session?.host_id}
+                screenSharer={screenSharer}
+                screenStream={isScreenSharing ? screenStreamRef.current : null}
+                remoteScreenStream={remoteScreenStream}
               />
             </div>
           )}
@@ -692,6 +800,22 @@ export default function LiveRoom() {
                 }}
                 data-testid="toggle-mic">
                 {isMicOn ? <><Mic size={12} /> Mic On</> : <><MicOff size={12} /> Muted</>}
+              </button>
+            )}
+
+            {/* Screen Share Toggle */}
+            {canShareVideo && session.status === 'active' && (
+              <button onClick={() => isScreenSharing ? stopScreenShare() : startScreenShare()}
+                disabled={screenSharer && screenSharer !== user?.id}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all hover:scale-105"
+                style={{
+                  background: isScreenSharing ? 'rgba(234,179,8,0.15)' : 'rgba(148,163,184,0.08)',
+                  border: `1px solid ${isScreenSharing ? 'rgba(234,179,8,0.3)' : 'rgba(148,163,184,0.1)'}`,
+                  color: isScreenSharing ? '#EAB308' : '#94A3B8',
+                  opacity: (screenSharer && screenSharer !== user?.id) ? 0.4 : 1,
+                }}
+                data-testid="toggle-screen-share">
+                {isScreenSharing ? <><X size={12} /> Stop Share</> : <><Monitor size={12} /> Share Screen</>}
               </button>
             )}
 
@@ -762,7 +886,7 @@ export default function LiveRoom() {
         <AnimatePresence>
           {(showChat || showParticipants) && (
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
-              className="flex flex-col overflow-hidden flex-shrink-0"
+              className="flex flex-col overflow-hidden flex-shrink-0 min-h-0"
               style={{ background: 'rgba(10,11,20,0.8)', backdropFilter: 'blur(16px)', borderLeft: '1px solid rgba(248,250,252,0.04)' }}>
 
               {/* Participants Panel */}
@@ -787,6 +911,9 @@ export default function LiveRoom() {
                         </span>
                         {cameraStates[p.user_id] && (
                           <Video size={7} style={{ color: '#3B82F6' }} />
+                        )}
+                        {screenSharer === p.user_id && (
+                          <Monitor size={7} style={{ color: '#EAB308' }} />
                         )}
                       </div>
                     ))}
@@ -849,8 +976,7 @@ export default function LiveRoom() {
 }
 
 /* ─── Video Grid ─── */
-function VideoGrid({ localStream, localVideoRef, remoteStreams, cameraStates, participants, currentUserId, isVideoOn, myAvatar, hostId }) {
-  // Build list of video tiles to show
+function VideoGrid({ localStream, localVideoRef, remoteStreams, cameraStates, participants, currentUserId, isVideoOn, myAvatar, hostId, screenSharer, screenStream, remoteScreenStream }) {
   const tiles = [];
 
   // Local video first
@@ -878,7 +1004,12 @@ function VideoGrid({ localStream, localVideoRef, remoteStreams, cameraStates, pa
     }
   });
 
-  // Grid layout based on tile count
+  // Determine if there's an active screen share
+  const activeScreenStream = screenStream || remoteScreenStream;
+  const sharerName = screenSharer === currentUserId ? 'You' :
+    (participants.find(p => p.user_id === screenSharer)?.name?.split(' ')[0] || 'Someone');
+
+  // Grid layout
   const count = tiles.length;
   let gridCols = 1;
   if (count === 2) gridCols = 2;
@@ -887,17 +1018,38 @@ function VideoGrid({ localStream, localVideoRef, remoteStreams, cameraStates, pa
   else gridCols = 4;
 
   return (
-    <div className="w-full h-full grid gap-2"
-      style={{
-        gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-        gridAutoRows: '1fr',
-      }}
-      data-testid="video-grid-container">
-      {tiles.map(tile => (
-        <VideoTile key={tile.id} tile={tile} localVideoRef={tile.isLocal ? localVideoRef : null} />
-      ))}
-      {tiles.length === 0 && (
-        <div className="flex items-center justify-center col-span-full">
+    <div className="w-full h-full flex flex-col gap-2" data-testid="video-grid-container">
+      {/* Screen Share (featured, top, full width) */}
+      {activeScreenStream && screenSharer && (
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+          className="relative rounded-2xl overflow-hidden flex-shrink-0"
+          style={{
+            background: 'rgba(13,14,26,0.9)',
+            border: '2px solid rgba(234,179,8,0.25)',
+            boxShadow: '0 0 30px rgba(234,179,8,0.1)',
+            height: tiles.length > 0 ? '55%' : '100%',
+            minHeight: 200,
+          }}
+          data-testid="screen-share-tile">
+          <ScreenShareTile stream={activeScreenStream} sharerName={sharerName} />
+        </motion.div>
+      )}
+
+      {/* Camera tiles grid */}
+      {tiles.length > 0 && (
+        <div className="flex-1 grid gap-2 min-h-0"
+          style={{
+            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+            gridAutoRows: '1fr',
+          }}>
+          {tiles.map(tile => (
+            <VideoTile key={tile.id} tile={tile} localVideoRef={tile.isLocal ? localVideoRef : null} />
+          ))}
+        </div>
+      )}
+
+      {tiles.length === 0 && !activeScreenStream && (
+        <div className="flex items-center justify-center h-full">
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No active cameras</p>
         </div>
       )}
@@ -953,6 +1105,42 @@ function VideoTile({ tile, localVideoRef }) {
         <span className="text-[7px] font-medium" style={{ color: '#93C5FD' }}>LIVE</span>
       </div>
     </motion.div>
+  );
+}
+
+
+/* ─── Screen Share Tile ─── */
+function ScreenShareTile({ stream, sharerName }) {
+  const videoEl = useRef(null);
+
+  useEffect(() => {
+    if (videoEl.current && stream) {
+      videoEl.current.srcObject = stream;
+    }
+  }, [stream]);
+
+  return (
+    <div className="relative w-full h-full" data-testid="screen-share-video">
+      <video
+        ref={videoEl}
+        autoPlay
+        playsInline
+        className="w-full h-full object-contain absolute inset-0"
+        style={{ background: '#000' }}
+      />
+      <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
+        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
+        <Monitor size={12} style={{ color: '#EAB308' }} />
+        <span className="text-[10px] font-medium" style={{ color: '#FDE68A' }}>
+          {sharerName}'s screen
+        </span>
+      </div>
+      <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-full"
+        style={{ background: 'rgba(234,179,8,0.15)', border: '1px solid rgba(234,179,8,0.2)' }}>
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#EAB308' }} />
+        <span className="text-[8px] font-bold" style={{ color: '#EAB308' }}>SCREEN SHARE</span>
+      </div>
+    </div>
   );
 }
 
