@@ -7,6 +7,15 @@ router = APIRouter()
 from models import ProfileCustomize
 import asyncio
 
+COVER_PRESETS = [
+    {"id": "cosmic-nebula", "url": "", "label": "Cosmic Nebula"},
+    {"id": "zen-garden", "url": "", "label": "Zen Garden"},
+    {"id": "ocean-waves", "url": "", "label": "Ocean Waves"},
+    {"id": "mountain-peak", "url": "", "label": "Mountain Peak"},
+    {"id": "sacred-geometry", "url": "", "label": "Sacred Geometry"},
+    {"id": "aurora-borealis", "url": "", "label": "Aurora Borealis"},
+]
+
 @router.get("/profile/covers")
 async def get_cover_presets():
     return COVER_PRESETS

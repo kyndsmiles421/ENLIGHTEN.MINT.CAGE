@@ -185,9 +185,16 @@ export default function SmartDock() {
 
   // Default position: right side, vertically centered
   const hasCustomPos = position.x !== null;
-  const posStyle = hasCustomPos
-    ? { left: position.x, top: position.y, right: 'auto' }
-    : { right: 0, top: '50%', transform: 'translateY(-50%)' };
+
+  // When minimized, always tuck into bottom-right corner regardless of saved position
+  let posStyle;
+  if (minimized) {
+    posStyle = { right: 12, bottom: 80, top: 'auto', left: 'auto' };
+  } else if (hasCustomPos) {
+    posStyle = { left: position.x, top: position.y, right: 'auto' };
+  } else {
+    posStyle = { right: 0, top: '50%', transform: 'translateY(-50%)' };
+  }
 
   return createPortal(
     <div
@@ -197,30 +204,30 @@ export default function SmartDock() {
         ...posStyle,
         cursor: isDragging ? 'grabbing' : 'default',
         touchAction: 'none',
-        transition: isDragging ? 'none' : 'left 0.3s cubic-bezier(0.25,1,0.5,1), top 0.3s cubic-bezier(0.25,1,0.5,1)',
+        transition: isDragging ? 'none' : 'all 0.35s cubic-bezier(0.25,1,0.5,1)',
       }}
       data-testid="smart-dock">
 
-      {/* ─── Minimized state: small floating dot ─── */}
+      {/* ─── Minimized state: tiny subtle dot ─── */}
       {minimized ? (
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="flex items-center"
-          onPointerDown={onPointerDown}>
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="flex items-center">
           <motion.button
+            whileHover={{ scale: 1.2, opacity: 1 }}
             whileTap={{ scale: 0.85 }}
             onClick={() => { if (!isDragging) toggleMinimize(); }}
-            className="w-9 h-9 rounded-full flex items-center justify-center"
+            className="w-6 h-6 rounded-full flex items-center justify-center group"
             style={{
-              background: 'rgba(11,12,21,0.92)',
-              border: '1px solid rgba(192,132,252,0.2)',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+              background: 'rgba(11,12,21,0.7)',
+              border: '1px solid rgba(192,132,252,0.15)',
+              backdropFilter: 'blur(12px)',
+              opacity: 0.5,
             }}
             data-testid="dock-restore"
             title="Open Dock">
-            <Sparkles size={14} style={{ color: '#C084FC' }} />
+            <Sparkles size={10} style={{ color: '#C084FC' }} className="animate-pulse" />
           </motion.button>
         </motion.div>
       ) : (
