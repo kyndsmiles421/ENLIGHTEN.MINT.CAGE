@@ -184,7 +184,7 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
-        style={{ background: '#0B0C15' }}
+        style={{ background: 'linear-gradient(135deg, #0B0C15 0%, #141530 50%, #0B0C15 100%)' }}
         data-testid="guided-tour-overlay">
 
         {/* Background glow */}
