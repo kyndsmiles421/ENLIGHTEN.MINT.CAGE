@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, Query
-from deps import db, get_current_user, logger
+from fastapi import APIRouter, Depends, Query, HTTPException
+from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from datetime import datetime, timezone
 import uuid
+import hashlib
 
 router = APIRouter()
+
+tts_cache = {}
 
 CRYSTAL_DATABASE = [
     {"id": "clear-quartz", "name": "Clear Quartz", "aka": "Master Healer", "color": "#E2E8F0", "category": "quartz", "chakra": "Crown", "element": "All", "zodiac": "All", "hardness": 7, "rarity": "common",
@@ -91,9 +94,41 @@ async def get_crystal(crystal_id: str):
     """Get a single crystal's full details."""
     crystal = next((c for c in CRYSTAL_DATABASE if c["id"] == crystal_id), None)
     if not crystal:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Crystal not found")
     return crystal
+
+
+@router.post("/crystals/{crystal_id}/narrate")
+async def narrate_crystal(crystal_id: str):
+    """Generate HD TTS narration for a crystal's properties."""
+    crystal = next((c for c in CRYSTAL_DATABASE if c["id"] == crystal_id), None)
+    if not crystal:
+        raise HTTPException(status_code=404, detail="Crystal not found")
+
+    cache_key = hashlib.md5(f"crystal-{crystal_id}".encode()).hexdigest()
+    if cache_key in tts_cache:
+        return {"audio": tts_cache[cache_key]}
+
+    narration = (
+        f"{crystal['name']}, also known as the {crystal['aka']}. "
+        f"{crystal['description']} "
+        f"Spiritual significance: {crystal['spiritual']} "
+        f"Healing properties: {crystal['healing']} "
+        f"This crystal is associated with the {crystal['chakra']} chakra and the element of {crystal['element']}. "
+        f"Best used for: {', '.join(crystal['uses'])}."
+    )
+
+    try:
+        from emergentintegrations.llm.openai import OpenAITextToSpeech
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        audio_b64 = await tts.generate_speech_base64(
+            text=narration[:4096], model="tts-1-hd", voice="shimmer", speed=0.85, response_format="mp3",
+        )
+        tts_cache[cache_key] = audio_b64
+        return {"audio": audio_b64}
+    except Exception as e:
+        logger.error(f"Crystal TTS error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate crystal narration")
 
 
 @router.get("/crystals/recommend")

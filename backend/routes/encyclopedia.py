@@ -3,8 +3,12 @@ from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 import uuid
+import hashlib
+import os
 
 router = APIRouter()
+
+tts_cache = {}
 
 # Curated encyclopedia of world spiritual traditions
 TRADITIONS = [
@@ -302,3 +306,68 @@ Keep responses between 200-400 words. Rich, substantive, and inspiring."""
     except Exception as e:
         logger.error(f"Encyclopedia explore error: {e}")
         raise HTTPException(status_code=500, detail="Could not generate exploration")
+
+
+TRADITION_VOICE_MAP = {
+    "hinduism": "sage", "buddhism": "shimmer", "taoism": "shimmer",
+    "sufism": "fable", "kabbalah": "sage", "indigenous": "onyx",
+    "mystical_christianity": "fable", "egyptian": "onyx",
+    "greek_philosophy": "sage", "zen": "shimmer",
+    "yoga_tantra": "sage", "african": "onyx",
+}
+
+
+@router.post("/encyclopedia/traditions/{tradition_id}/narrate")
+async def narrate_tradition(tradition_id: str):
+    """Generate HD TTS narration for a tradition overview."""
+    tradition = next((t for t in TRADITIONS if t["id"] == tradition_id), None)
+    if not tradition:
+        raise HTTPException(status_code=404, detail="Tradition not found")
+
+    cache_key = hashlib.md5(f"enc-{tradition_id}".encode()).hexdigest()
+    if cache_key in tts_cache:
+        return {"audio": tts_cache[cache_key]}
+
+    narration = (
+        f"{tradition['name']}. From {tradition['origin']}, dating to {tradition['era']}. "
+        f"{tradition['overview']} "
+        f"Key teachings include: {', '.join(c['name'] for c in tradition['key_concepts'][:4])}."
+    )
+
+    try:
+        from emergentintegrations.llm.openai import OpenAITextToSpeech
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        voice = TRADITION_VOICE_MAP.get(tradition_id, "fable")
+        audio_b64 = await tts.generate_speech_base64(
+            text=narration[:4096], model="tts-1-hd", voice=voice, speed=0.85, response_format="mp3",
+        )
+        tts_cache[cache_key] = audio_b64
+        return {"audio": audio_b64}
+    except Exception as e:
+        logger.error(f"Encyclopedia TTS error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate narration")
+
+
+@router.post("/encyclopedia/narrate-text")
+async def narrate_text(data: dict = Body(...)):
+    """Narrate any text block — used for AI exploration results."""
+    text = data.get("text", "")
+    voice = data.get("voice", "fable")
+    if not text or len(text) < 10:
+        raise HTTPException(status_code=400, detail="Text too short")
+
+    cache_key = hashlib.md5(f"enc-text-{text[:100]}".encode()).hexdigest()
+    if cache_key in tts_cache:
+        return {"audio": tts_cache[cache_key]}
+
+    try:
+        from emergentintegrations.llm.openai import OpenAITextToSpeech
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        audio_b64 = await tts.generate_speech_base64(
+            text=text[:4096], model="tts-1-hd", voice=voice, speed=0.85, response_format="mp3",
+        )
+        tts_cache[cache_key] = audio_b64
+        return {"audio": audio_b64}
+    except Exception as e:
+        logger.error(f"Encyclopedia text TTS error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to narrate text")
