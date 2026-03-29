@@ -5,54 +5,41 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Tech Stack
 - **Frontend**: React + Tailwind CSS + Framer Motion + Three.js
-- **Backend**: FastAPI + Motor Async MongoDB
+- **Backend**: FastAPI + Motor Async MongoDB + WebSockets
 - **AI**: OpenAI GPT-4o, TTS tts-1-hd, Sora 2, GPT Image 1, Whisper — all via Emergent LLM Key
 - **Payments**: Stripe (test key in pod)
 - **Mobile**: Capacitor configured
 
-## All Implemented Features
+## Implemented Features
 
-### Mood Insights & Trends (NEW Mar 2026)
-- AI-generated weekly emotional summary with patterns and recommendations (GPT-4o)
-- Stats: Day Streak, Total Logged, Average Intensity
-- Most Frequent Emotions breakdown with colored progress bars
-- Weekly activity chart
-- Mood Tracker unified with Quick Reset: 33+ emotions, search, group filters
+### Live Sessions (NEW Mar 2026)
+- **Browse & Create**: `/live` page with session cards (Live Now / Upcoming / Session Types)
+- **8 session types**: Group Meditation, Yoga Flow, Breathwork Circle, Sound Bath, Mantra Chanting, Prayer Circle, Qigong Practice, Open Circle
+- **6 virtual scenes**: Cosmic Temple, Zen Garden, Ocean Shore, Mountain Peak, Sacred Fire, Northern Lights
+- **Host controls**: Start/End session, guided commands (Begin, Breathe In/Out, Hold, Focus, Release, Om, End)
+- **Avatar Circle**: Users' AI avatars arranged in a circle with glowing rings and gentle floating animation
+- **Real-time chat + reactions**: WebSocket-powered (with REST fallback)
+- **Scene backgrounds**: Ambient particle effects matching each virtual environment
+- **Session lifecycle**: Scheduled → Active → Ended, host-only control
 
-### Crystal Pairing Share (NEW Mar 2026)
-- Share button on crystal pairing results (Web Share API + clipboard fallback)
-- Public share endpoint: GET /api/crystals/pairing/{id}/share
-- Formatted share text with crystal names, guidance excerpt, and link
+### Mood Insights & Trends (Mar 2026)
+- AI weekly emotional summary (GPT-4o)
+- Stats: Day Streak, Total Logged, Avg Intensity
+- Most Frequent Emotions breakdown, Weekly activity chart
 
-### Blessing Notifications (NEW Mar 2026)
-- In-app notification created when someone sends you a blessing
-- Push notification via web push (existing VAPID infrastructure)
-- Notification inbox in nav bell dropdown with unread count badge
-- Mark as read / Mark all read functionality
-- Auto-polls every 30 seconds
+### Crystal Pairing Share (Mar 2026)
+- Share button (Web Share API + clipboard fallback)
+- Public share endpoint
+
+### Blessing Notifications (Mar 2026)
+- In-app notifications + push when receiving a blessing
+- Notification inbox in nav bell with unread badge
 
 ### Creator Dashboard (Mar 2026)
-- Admin-only view for kyndsmiles@gmail.com
-- Overview: Total users, Active today/week/month, PWA installs, Feedback counts
-- Feedback management with status workflow
-- Comments moderation, Users tab, Popular features ranking
+- Admin-only: Total users, active users, PWA installs, feedback management, comments moderation
 
-### SmartDock (Mar 2026)
-- Unified floating dock (Sage, Mixer, Tones)
-- No background dimming
-
-### Customizable Dashboard (Mar 2026)
-- Reorder/hide sections, Pinned Shortcuts grid
-- Persisted to MongoDB
-
-### Bug Fixes (Mar 2026)
-- Quick Reset modal invisible (createPortal + opaque bg)
-- Video player at bottom (createPortal)
-- Touch sensitivity on Quick Reset (removed onTouchEnd, touchAction: pan-y)
-- Global CSS transform: none fix
-
-### All Prior Features
-- 40+ pages, AI Avatar, Star Chart (20 cultures), Sacred Texts, Crystals, Blessings, VR modes, etc.
+### SmartDock, Customizable Dashboard, Bug Fixes (Mar 2026)
+- All previously documented features
 
 ## Test Credentials
 - User: test@test.com / password
@@ -60,3 +47,4 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Backlog
 - P2: Capacitor mobile app build
+- P3: Live session recording/replay, AI-generated guided meditation audio for sessions
