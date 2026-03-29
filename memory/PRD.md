@@ -12,47 +12,35 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Implemented Features
 
-### Scheduled Recurring Live Sessions (NEW Mar 2026)
-- **Recurring series**: Hosts can create recurring session templates with recurrence patterns (Daily, Weekdays, Weekends, Weekly)
-- **Subscription system**: Users subscribe to recurring series and receive push notifications before sessions start
-- **Auto-spawn**: Backend endpoint spawns scheduled sessions from recurring templates within a 15-minute window
-- **Tab UI**: Live Sessions page now has "Live & Upcoming" and "Recurring Schedule" tabs
-- **Create modal**: One-Time / Recurring toggle with recurrence options, day-of-week picker (weekly), and UTC time picker
-- **Recurring cards**: Show recurrence badge, subscriber count, host info, next occurrence date
+### Interactive Cosmic Mood Ring (Mar 2026)
+- **Clickable card**: Tapping the ring navigates to `/mood` Mood Tracker page
+- **Quick Log panel**: 8 mood options (Happy, Peaceful, Energized, Grateful, Stressed, Anxious, Sad, Tired) with one-tap logging
+- **Empty state CTA**: When no mood data, shows "Tap to log your mood and watch the ring come alive"
+- **Visual feedback**: Hover glow, "Open Mood Tracker" hint on hover, animated orb
+- **Auto-refresh**: Ring data refreshes after quick logging a mood
+
+### Session Replay & Download (Mar 2026)
+- **Auto-recording**: When live sessions end, chat log + guided commands are saved as recordings
+- **Past Sessions tab**: Third tab on `/live` page showing recording cards with Replay and Download buttons
+- **Replay Modal**: Full-screen modal with guided command timeline player (auto-plays with 4s intervals), chat sidebar, and step-by-step navigation
+- **Download**: Export recordings as structured JSON files with session details, commands, and chat
+
+### Scheduled Recurring Live Sessions (Mar 2026)
+- Recurring series with recurrence patterns (Daily, Weekdays, Weekends, Weekly)
+- Subscription system with push notifications
+- Auto-spawn from templates within 15-minute window
+- Tab UI, create modal with One-Time/Recurring toggle
 
 ### Live Sessions (Mar 2026)
-- **Browse & Create**: `/live` page with session cards (Live Now / Upcoming / Session Types)
-- **8 session types**: Group Meditation, Yoga Flow, Breathwork Circle, Sound Bath, Mantra Chanting, Prayer Circle, Qigong Practice, Open Circle
-- **6 virtual scenes**: Cosmic Temple, Zen Garden, Ocean Shore, Mountain Peak, Sacred Fire, Northern Lights
-- **Host controls**: Start/End session, guided commands (Begin, Breathe In/Out, Hold, Focus, Release, Om, End)
-- **Avatar Circle**: Users' AI avatars arranged in a circle with glowing rings and gentle floating animation
-- **Real-time chat + reactions**: WebSocket-powered (with REST fallback)
-- **Scene backgrounds**: Ambient particle effects matching each virtual environment
-- **Session lifecycle**: Scheduled -> Active -> Ended, host-only control
+- Browse & Create sessions, 8 session types, 6 virtual scenes
+- Host controls with guided commands
+- Avatar Circle, real-time chat + reactions via WebSocket (with REST fallback)
 
 ### SmartDock (Mar 2026)
 - Vertical pill layout on right side of screen
-- No longer blocks bottom content (Sacred Symbols, etc.)
 - Panels (Sage, Mixer, Tones) open to the left
-- Expand/collapse for 5+ items
 
-### Mood Insights & Trends (Mar 2026)
-- AI weekly emotional summary (GPT-4o)
-- Stats: Day Streak, Total Logged, Avg Intensity
-- Most Frequent Emotions breakdown, Weekly activity chart
-
-### Crystal Pairing Share (Mar 2026)
-- Share button (Web Share API + clipboard fallback)
-- Public share endpoint
-
-### Blessing Notifications (Mar 2026)
-- In-app notifications + push when receiving a blessing
-- Notification inbox in nav bell with unread badge
-
-### Creator Dashboard (Mar 2026)
-- Admin-only: Total users, active users, PWA installs, feedback management, comments moderation
-
-### Customizable Dashboard, Bug Fixes (Mar 2026)
+### Mood Insights, Crystal Pairing, Blessings, Creator Dashboard, Customizable Dashboard
 - All previously documented features
 
 ## Test Credentials
@@ -70,10 +58,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - P3: AI Avatar Generator enhancements
 - P3: Split Screen Multitasking
 - P3: VR Immersive modes
-- P3: Live session recording/replay
-- P3: AI-generated guided meditation audio for sessions
 
 ## Critical Implementation Notes
-- **Modals & Overlays**: Always use `createPortal(document.body)` for fixed overlays — Framer Motion `page-enter` transforms break `position: fixed` centering.
+- **Modals & Overlays**: Always use `createPortal(document.body)` — Framer Motion page transitions break `position: fixed` centering.
 - **WebSockets**: Kubernetes ingress may block `wss://` — LiveRoom has REST polling fallback.
 - **MongoDB**: Exclude `_id` from all responses. Use `datetime.now(timezone.utc)` for timestamps.
