@@ -136,7 +136,18 @@ const TRACKS = [
   { id: 'earth-pulse', name: 'Earth Pulse', artist: 'Cosmic Collective', category: 'nature', color: '#78716C', duration: '∞', mood: 'Grounding',
     synth: (ctx, g) => {
       const nodes = [];
-      const hum = ctx.createOscillator(); hum.type = 'sine'; hum.frequency.value = 7.83; // Schumann resonance carrier
+      // Binaural Schumann resonance: 200 Hz left, 207.83 Hz right
+      const merger = ctx.createChannelMerger(2);
+      const oscL = ctx.createOscillator(); oscL.type = 'sine'; oscL.frequency.value = 200;
+      const gL = ctx.createGain(); gL.gain.value = 0.08;
+      oscL.connect(gL); gL.connect(merger, 0, 0);
+      const oscR = ctx.createOscillator(); oscR.type = 'sine'; oscR.frequency.value = 207.83;
+      const gR = ctx.createGain(); gR.gain.value = 0.08;
+      oscR.connect(gR); gR.connect(merger, 0, 1);
+      const binG = ctx.createGain(); binG.gain.value = 0.8;
+      merger.connect(binG); binG.connect(g);
+      oscL.start(); oscR.start(); nodes.push(oscL, oscR);
+      // OM carrier tone
       const carrier = ctx.createOscillator(); carrier.type = 'sine'; carrier.frequency.value = 136.1; // OM
       const cg = ctx.createGain(); cg.gain.value = 0.1;
       const lfo = ctx.createOscillator(); lfo.frequency.value = 0.1;

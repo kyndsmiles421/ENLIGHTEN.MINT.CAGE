@@ -54,30 +54,49 @@ export default function Frequencies() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     audioCtxRef.current = ctx;
 
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-    // Gentle envelope
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
-
-    // Subtle tremolo for richness
-    const lfo = ctx.createOscillator();
-    lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.setValueAtTime(0.02, ctx.currentTime);
-    lfo.connect(lfoGain);
-    lfoGain.connect(gain.gain);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    lfo.start();
-    oscRef.current = osc;
-    gainRef.current = gain;
+    if (freq < 20) {
+      // Sub-audible: binaural beats with a 200 Hz carrier tone
+      const carrier = 200;
+      const merger = ctx.createChannelMerger(2);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.5);
+      // Left ear: carrier
+      const oscL = ctx.createOscillator(); oscL.type = 'sine'; oscL.frequency.value = carrier;
+      const gL = ctx.createGain(); gL.gain.value = 1;
+      oscL.connect(gL); gL.connect(merger, 0, 0);
+      // Right ear: carrier + target = binaural beat
+      const oscR = ctx.createOscillator(); oscR.type = 'sine'; oscR.frequency.value = carrier + freq;
+      const gR = ctx.createGain(); gR.gain.value = 1;
+      oscR.connect(gR); gR.connect(merger, 0, 1);
+      // Gentle harmonic pad for body feel
+      const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = freq * 16;
+      const subG = ctx.createGain(); subG.gain.value = 0.05;
+      sub.connect(subG); subG.connect(gain);
+      merger.connect(gain); gain.connect(ctx.destination);
+      oscL.start(); oscR.start(); sub.start();
+      oscRef.current = oscL; // for cleanup
+      gainRef.current = gain;
+    } else {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
+      const lfo = ctx.createOscillator();
+      lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.setValueAtTime(0.02, ctx.currentTime);
+      lfo.connect(lfoGain);
+      lfoGain.connect(gain.gain);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      lfo.start();
+      oscRef.current = osc;
+      gainRef.current = gain;
+    }
   }, [stopAudio]);
 
   const togglePlay = useCallback((id) => {

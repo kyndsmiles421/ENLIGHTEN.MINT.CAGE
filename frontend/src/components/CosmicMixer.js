@@ -159,14 +159,37 @@ export default function CosmicMixer() {
     stopNodes(freqNodesRef);
     if (activeFreq?.hz === freq.hz) { setActiveFreq(null); return; }
     const ctx = await getCtx();
-    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq.hz;
-    const g = ctx.createGain(); g.gain.value = 0.12;
-    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
-    const lg = ctx.createGain(); lg.gain.value = 0.04;
-    lfo.connect(lg); lg.connect(g.gain);
-    o.connect(g); g.connect(masterGainRef.current);
-    o.start(); lfo.start();
-    freqNodesRef.current = [o, lfo];
+
+    if (freq.hz < 20) {
+      // Sub-audible: use binaural beats (stereo) with a 200 Hz carrier
+      const carrier = 200;
+      const merger = ctx.createChannelMerger(2);
+      const g = ctx.createGain(); g.gain.value = 0.15;
+      // Left ear: carrier frequency
+      const oscL = ctx.createOscillator(); oscL.type = 'sine'; oscL.frequency.value = carrier;
+      const gL = ctx.createGain(); gL.gain.value = 1;
+      oscL.connect(gL); gL.connect(merger, 0, 0);
+      // Right ear: carrier + target frequency = binaural beat
+      const oscR = ctx.createOscillator(); oscR.type = 'sine'; oscR.frequency.value = carrier + freq.hz;
+      const gR = ctx.createGain(); gR.gain.value = 1;
+      oscR.connect(gR); gR.connect(merger, 0, 1);
+      // Gentle sub-bass pad for body feel
+      const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = freq.hz * 16;
+      const subG = ctx.createGain(); subG.gain.value = 0.06;
+      sub.connect(subG); subG.connect(g);
+      merger.connect(g); g.connect(masterGainRef.current);
+      oscL.start(); oscR.start(); sub.start();
+      freqNodesRef.current = [oscL, oscR, sub, merger];
+    } else {
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq.hz;
+      const g = ctx.createGain(); g.gain.value = 0.12;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
+      const lg = ctx.createGain(); lg.gain.value = 0.04;
+      lfo.connect(lg); lg.connect(g.gain);
+      o.connect(g); g.connect(masterGainRef.current);
+      o.start(); lfo.start();
+      freqNodesRef.current = [o, lfo];
+    }
     setActiveFreq(freq);
   }, [activeFreq, getCtx]);
 
