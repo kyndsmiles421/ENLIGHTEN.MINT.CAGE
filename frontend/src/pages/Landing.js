@@ -300,7 +300,7 @@ function MantraCard({ mantra, accentColor }) {
 }
 
 /* ─── Sortable Widget Wrapper ─── */
-function SortableWidget({ id, children }) {
+function SortableWidget({ id, children, editMode }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -310,10 +310,12 @@ function SortableWidget({ id, children }) {
   };
   return (
     <div ref={setNodeRef} style={style} className={`relative group/drag ${isDragging ? 'is-dragging' : ''}`} {...attributes}>
-      <div className="drag-handle absolute top-3 right-3 z-10 p-1 rounded-lg hover:bg-white/5 transition-colors" {...listeners}
-        data-testid={`drag-handle-${id}`}>
-        <GripVertical size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
-      </div>
+      {editMode && (
+        <div className="drag-handle absolute top-3 right-3 z-10 p-1 rounded-lg bg-white/5 animate-pulse" {...listeners}
+          data-testid={`drag-handle-${id}`}>
+          <GripVertical size={14} style={{ color: 'rgba(192,132,252,0.5)' }} />
+        </div>
+      )}
       {children}
     </div>
   );
@@ -329,6 +331,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
     const saved = localStorage.getItem('zen_widget_order');
     return saved ? JSON.parse(saved) : ['mood-ring', 'wisdom', 'actions', 'continue', 'new-for-you', 'progress'];
   });
+  const [editMode, setEditMode] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -487,8 +490,18 @@ function PersonalizedDashboard({ user, onQuickReset }) {
               <Flame size={12} /> {progress.streak_days}-day streak
             </motion.p>
           )}
-          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-            <GripVertical size={10} className="inline mr-1" /> Drag widgets to rearrange your sanctuary
+          <p className="text-[10px] flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
+            <button onClick={() => setEditMode(!editMode)}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg transition-all"
+              style={{
+                background: editMode ? 'rgba(192,132,252,0.1)' : 'transparent',
+                border: `1px solid ${editMode ? 'rgba(192,132,252,0.2)' : 'rgba(248,250,252,0.06)'}`,
+                color: editMode ? '#C084FC' : 'var(--text-muted)',
+              }}
+              data-testid="edit-layout-toggle">
+              <GripVertical size={10} />
+              {editMode ? 'Done' : 'Rearrange'}
+            </button>
           </p>
         </div>
 
@@ -497,7 +510,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
           <SortableContext items={widgetOrder} strategy={rectSortingStrategy}>
             <div className="space-y-6">
               {widgetOrder.map(id => widgetMap[id] ? (
-                <SortableWidget key={id} id={id}>
+                <SortableWidget key={id} id={id} editMode={editMode}>
                   {widgetMap[id]}
                 </SortableWidget>
               ) : null)}

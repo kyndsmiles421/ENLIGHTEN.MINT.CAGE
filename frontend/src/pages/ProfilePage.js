@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
-import { Settings, Camera, Music, Palette, Save, Eye, Loader2, X, Quote, Globe, Lock, Users, Shield, MessageCircle } from 'lucide-react';
+import { Settings, Camera, Music, Palette, Save, Eye, Loader2, X, Quote, Globe, Lock, Users, Shield, MessageCircle, Share2 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -204,6 +204,26 @@ export default function ProfilePage() {
                 )}
               </div>
               <div className="flex gap-2">
+                {isOwnProfile && (
+                  <button onClick={async () => {
+                    const shareData = {
+                      title: `${p.display_name || user?.name}'s Sanctuary — The Cosmic Collective`,
+                      text: `Check out my cosmic sanctuary on The Cosmic Collective! ${p.bio || ''}`.trim(),
+                      url: `${window.location.origin}/profile/${user?.id}`,
+                    };
+                    if (navigator.share) {
+                      try { await navigator.share(shareData); } catch {}
+                    } else {
+                      await navigator.clipboard.writeText(shareData.url);
+                      toast.success('Profile link copied to clipboard');
+                    }
+                  }}
+                    className="btn-glass px-3 py-2 text-xs flex items-center gap-1.5"
+                    style={{ color: 'var(--text-muted)' }}
+                    data-testid="share-profile-btn">
+                    <Share2 size={14} /> Share
+                  </button>
+                )}
                 {isOwnProfile && p.music_choice !== 'none' && (
                   <button onClick={() => setMusicPlaying(!musicPlaying)}
                     className="btn-glass px-3 py-2 text-xs flex items-center gap-1.5"
