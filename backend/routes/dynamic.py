@@ -378,7 +378,6 @@ async def get_reading_list(user=Depends(get_current_user)):
 
     # Separate into personalized and general
     personalized = [b for b in scored if b["score"] >= 10][:8]
-    general = [b for b in scored if b["score"] < 10]
 
     return {
         "personalized": personalized,
@@ -859,3 +858,121 @@ TONE: Warm, insightful, slightly poetic. Like a trusted spiritual mentor who tru
     await db.soul_reports.insert_one(report_doc)
     del report_doc["_id"]  # remove ObjectId before returning
     return report_doc
+
+
+
+# ════════════════════════════════════════════
+# COSMIC MOOD RING
+# ════════════════════════════════════════════
+
+MOOD_COLORS = {
+    "joyful": {"primary": "#FCD34D", "secondary": "#FB923C", "glow": "#EAB308"},
+    "peaceful": {"primary": "#2DD4BF", "secondary": "#22D3EE", "glow": "#14B8A6"},
+    "energized": {"primary": "#F97316", "secondary": "#EF4444", "glow": "#EA580C"},
+    "reflective": {"primary": "#818CF8", "secondary": "#A78BFA", "glow": "#6366F1"},
+    "grateful": {"primary": "#86EFAC", "secondary": "#34D399", "glow": "#10B981"},
+    "anxious": {"primary": "#FDA4AF", "secondary": "#FB7185", "glow": "#E11D48"},
+    "tired": {"primary": "#94A3B8", "secondary": "#64748B", "glow": "#475569"},
+    "inspired": {"primary": "#E879F9", "secondary": "#C084FC", "glow": "#A855F7"},
+    "neutral": {"primary": "#D8B4FE", "secondary": "#C4B5FD", "glow": "#8B5CF6"},
+}
+
+
+@router.get("/mood-ring")
+async def get_mood_ring(user=Depends(get_current_user)):
+    """Return current mood ring state based on recent mood entries and activity patterns."""
+    user_id = user["id"]
+
+    # Get recent mood entries (last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    moods = await db.mood_logs.find(
+        {"user_id": user_id, "timestamp": {"$gte": week_ago}},
+        {"_id": 0, "mood": 1, "energy": 1, "timestamp": 1}
+    ).sort("timestamp", -1).to_list(30)
+
+    # Get recent activity for pattern detection
+    activities = await db.activity_log.find(
+        {"user_id": user_id, "timestamp": {"$gte": week_ago}},
+        {"_id": 0, "page": 1, "action": 1}
+    ).to_list(100)
+
+    # Determine dominant mood
+    if moods:
+        mood_counts = defaultdict(int)
+        for m in moods:
+            mood_name = m.get("mood", "neutral")
+            mood_counts[mood_name] += 1
+        dominant = max(mood_counts, key=mood_counts.get)
+        latest_mood = moods[0].get("mood", "neutral") if moods else "neutral"
+        latest_energy = moods[0].get("energy", 5) if moods else 5
+    else:
+        # Infer mood from activity patterns
+        page_set = set(a.get("page", "") for a in activities)
+        if "/meditation" in page_set or "/breathing" in page_set:
+            dominant = "peaceful"
+        elif "/yoga" in page_set or "/exercises" in page_set:
+            dominant = "energized"
+        elif "/journal" in page_set or "/dreams" in page_set:
+            dominant = "reflective"
+        elif "/star-chart" in page_set or "/oracle" in page_set:
+            dominant = "inspired"
+        else:
+            dominant = "neutral"
+        latest_mood = dominant
+        latest_energy = 5
+
+    colors = MOOD_COLORS.get(dominant, MOOD_COLORS["neutral"])
+
+    # Build layers for the orb visualization
+    layers = []
+    recent_moods = list(set(m.get("mood", "neutral") for m in moods[:5]))
+    for i, mood in enumerate(recent_moods[:4]):
+        mc = MOOD_COLORS.get(mood, MOOD_COLORS["neutral"])
+        layers.append({
+            "color": mc["primary"],
+            "opacity": max(0.15, 0.5 - i * 0.1),
+            "speed": 3 + i * 0.8,
+        })
+    if not layers:
+        layers = [{"color": colors["primary"], "opacity": 0.4, "speed": 3}]
+
+    # Mood trend
+    if len(moods) >= 3:
+        energy_vals = [m.get("energy", 5) for m in moods[:5]]
+        avg_recent = sum(energy_vals[:2]) / min(2, len(energy_vals[:2]))
+        avg_older = sum(energy_vals[2:]) / max(1, len(energy_vals[2:]))
+        trend = "rising" if avg_recent > avg_older + 0.5 else "falling" if avg_recent < avg_older - 0.5 else "stable"
+    else:
+        trend = "stable"
+
+    return {
+        "dominant_mood": dominant,
+        "latest_mood": latest_mood,
+        "energy_level": latest_energy,
+        "colors": colors,
+        "layers": layers,
+        "trend": trend,
+        "mood_count": len(moods),
+        "pulse_speed": max(2, min(6, 8 - latest_energy)),  # Higher energy = faster pulse
+        "message": _mood_message(dominant, trend),
+    }
+
+
+def _mood_message(mood, trend):
+    messages = {
+        "joyful": "Your spirit radiates golden light today.",
+        "peaceful": "A calm sea of turquoise flows through you.",
+        "energized": "Solar fire courses through your being.",
+        "reflective": "Deep indigo mirrors the starlit sky within.",
+        "grateful": "Emerald gratitude blooms from your heart.",
+        "anxious": "Gentle rose quartz soothes your restless waves.",
+        "tired": "Silver moonlight invites you to rest.",
+        "inspired": "Cosmic violet sparks dance in your aura.",
+        "neutral": "Your energy field hums with quiet potential.",
+    }
+    base = messages.get(mood, messages["neutral"])
+    if trend == "rising":
+        base += " Your energy is ascending."
+    elif trend == "falling":
+        base += " Honor your need for gentle restoration."
+    return base

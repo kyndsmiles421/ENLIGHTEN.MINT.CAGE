@@ -19,6 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import ShareButton from '../components/ShareButton';
 import GuidedTour from '../components/GuidedTour';
 import IntroVideo from '../components/IntroVideo';
+import CosmicMoodRing from '../components/CosmicMoodRing';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -298,7 +299,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
   const { token } = useAuth();
   const [widgetOrder, setWidgetOrder] = useState(() => {
     const saved = localStorage.getItem('zen_widget_order');
-    return saved ? JSON.parse(saved) : ['wisdom', 'actions', 'continue', 'new-for-you', 'progress'];
+    return saved ? JSON.parse(saved) : ['mood-ring', 'wisdom', 'actions', 'continue', 'new-for-you', 'progress'];
   });
 
   const sensors = useSensors(
@@ -331,6 +332,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
   const { greeting, wisdom, continue_items, new_for_you, progress, featured_tradition } = data;
 
   const widgetMap = {
+    'mood-ring': <CosmicMoodRing />,
     'wisdom': (
       <div className="glass-card p-6 relative overflow-hidden animate-portal-pulse" data-testid="daily-wisdom">
         <div className="absolute top-3 right-10 opacity-10">

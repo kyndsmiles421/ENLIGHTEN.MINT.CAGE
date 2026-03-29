@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe } from 'lucide-react';
@@ -23,36 +27,85 @@ function raDecToXYZ(ra, dec, radius = 50) {
   );
 }
 
-/* Star glow sprite texture */
+/* Star glow sprite texture — enhanced diffraction spikes */
 function createStarTexture(color = '#ffffff', size = 128) {
   const canvas = document.createElement('canvas');
   canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext('2d');
   const cx = size / 2, cy = size / 2;
+  // Core glow
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, size / 2);
   grad.addColorStop(0, color);
-  grad.addColorStop(0.15, color + 'CC');
-  grad.addColorStop(0.35, color + '44');
+  grad.addColorStop(0.08, color + 'E0');
+  grad.addColorStop(0.2, color + '80');
+  grad.addColorStop(0.4, color + '30');
   grad.addColorStop(0.7, color + '08');
   grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
+  // 4-point diffraction spikes
   ctx.globalCompositeOperation = 'screen';
-  ctx.strokeStyle = color + '60'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, size); ctx.moveTo(0, cy); ctx.lineTo(size, cy); ctx.stroke();
+  ctx.strokeStyle = color + '50'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cx, 2); ctx.lineTo(cx, size - 2); ctx.moveTo(2, cy); ctx.lineTo(size - 2, cy); ctx.stroke();
+  // Diagonal spikes (fainter)
+  ctx.strokeStyle = color + '25'; ctx.lineWidth = 0.8;
+  const d = size * 0.35;
+  ctx.beginPath();
+  ctx.moveTo(cx - d, cy - d); ctx.lineTo(cx + d, cy + d);
+  ctx.moveTo(cx + d, cy - d); ctx.lineTo(cx - d, cy + d);
+  ctx.stroke();
   const tex = new THREE.CanvasTexture(canvas); tex.needsUpdate = true; return tex;
 }
 
-/* Nebula cloud sprite texture */
-function createNebulaTexture(color, size = 256) {
+/* Milky Way band texture */
+function createMilkyWayTexture(size = 512) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Build up a misty band with random noise
+  for (let i = 0; i < 3000; i++) {
+    const x = Math.random() * size;
+    const y = (size / 2) + (Math.random() - 0.5) * size * 0.35 + Math.sin(x / size * Math.PI * 2) * size * 0.08;
+    const r = Math.random() * 3 + 0.5;
+    const a = Math.random() * 0.04 + 0.01;
+    const colors = ['180,180,220', '200,190,240', '160,180,255', '220,200,180'];
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${colors[Math.floor(Math.random() * colors.length)]}, ${a})`;
+    ctx.fill();
+  }
+  // Gaussian-like center brightness
+  const grad = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size * 0.4);
+  grad.addColorStop(0, 'rgba(200,190,230,0.03)');
+  grad.addColorStop(0.5, 'rgba(180,170,220,0.015)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas); tex.needsUpdate = true; return tex;
+}
+
+/* Nebula cloud sprite texture — enhanced multi-layer */
+function createNebulaTexture(color, size = 512) {
   const canvas = document.createElement('canvas');
   canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext('2d');
   const cx = size / 2, cy = size / 2;
+  // Primary cloud
   const grad = ctx.createRadialGradient(cx * 0.8, cy * 1.1, 0, cx, cy, size / 2);
-  grad.addColorStop(0, color + '18'); grad.addColorStop(0.4, color + '0A');
-  grad.addColorStop(0.8, color + '03'); grad.addColorStop(1, 'transparent');
+  grad.addColorStop(0, color + '22'); grad.addColorStop(0.3, color + '12');
+  grad.addColorStop(0.6, color + '06'); grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad; ctx.fillRect(0, 0, size, size);
+  // Secondary wisps
+  const grad2 = ctx.createRadialGradient(cx * 1.3, cy * 0.7, 0, cx, cy, size * 0.4);
+  grad2.addColorStop(0, color + '14'); grad2.addColorStop(0.5, color + '06'); grad2.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad2; ctx.fillRect(0, 0, size, size);
+  // Noise particles
+  for (let i = 0; i < 200; i++) {
+    const x = cx + (Math.random() - 0.5) * size * 0.6;
+    const y = cy + (Math.random() - 0.5) * size * 0.6;
+    ctx.beginPath(); ctx.arc(x, y, Math.random() * 2, 0, Math.PI * 2);
+    ctx.fillStyle = color + '08'; ctx.fill();
+  }
   const tex = new THREE.CanvasTexture(canvas); tex.needsUpdate = true; return tex;
 }
 
@@ -309,8 +362,10 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
+  const composerRef = useRef(null);
   const frameRef = useRef(null);
-  const spherical = useRef({ theta: 0.5, phi: Math.PI / 3, radius: 60 });
+  const spherical = useRef({ theta: 0.5, phi: Math.PI / 3, radius: 55 });
+  const velocity = useRef({ theta: 0, phi: 0 }); // Camera momentum
   const isDragging = useRef(false);
   const prevMouse = useRef({ x: 0, y: 0 });
   const constellationMeshes = useRef([]);
@@ -482,58 +537,111 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;
-    const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 500);
+    const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 500);
     cameraRef.current = camera;
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000005, 1);
+    renderer.setClearColor(0x000003, 1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.4;
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // ── DEEP SPACE BACKGROUND ──
-    const bgStarCount = 6000;
+    // ── BLOOM POST-PROCESSING ──
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(w, h),
+      0.8,   // strength
+      0.4,   // radius
+      0.85   // threshold
+    );
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+    composerRef.current = composer;
+
+    // ── DEEP SPACE BACKGROUND — 15000 stars ──
+    const bgStarCount = 15000;
     const bgGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(bgStarCount * 3);
     const bgSz = new Float32Array(bgStarCount);
     const bgCol = new Float32Array(bgStarCount * 3);
-    const tints = [[1,1,1],[0.85,0.9,1],[1,0.95,0.8],[0.8,0.85,1],[1,0.85,0.75]];
+    // Spectral class colors: O(blue), B(blue-white), A(white), F(yellow-white), G(yellow), K(orange), M(red)
+    const spectralColors = [
+      [0.6,0.7,1.0],[0.75,0.82,1.0],[0.95,0.95,1.0],[1.0,0.98,0.9],
+      [1.0,0.95,0.8],[1.0,0.85,0.6],[1.0,0.7,0.5],[0.85,0.85,1.0],
+      [0.7,0.8,1.0],[1.0,0.9,0.95]
+    ];
     for (let i = 0; i < bgStarCount; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const r = 100 + Math.random() * 80;
+      const r = 90 + Math.random() * 100;
       bgPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
       bgPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
       bgPos[i*3+2] = r * Math.cos(phi);
-      bgSz[i] = 0.08 + Math.random() * 0.25;
-      const t = tints[Math.floor(Math.random() * tints.length)];
-      bgCol[i*3]=t[0]; bgCol[i*3+1]=t[1]; bgCol[i*3+2]=t[2];
+      // Magnitude distribution — most stars dim, few bright
+      const mag = Math.pow(Math.random(), 2.5);
+      bgSz[i] = 0.05 + mag * 0.4;
+      const t = spectralColors[Math.floor(Math.random() * spectralColors.length)];
+      const bright = 0.5 + mag * 0.5;
+      bgCol[i*3]=t[0]*bright; bgCol[i*3+1]=t[1]*bright; bgCol[i*3+2]=t[2]*bright;
     }
     bgGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
     bgGeo.setAttribute('aSize', new THREE.BufferAttribute(bgSz, 1));
     bgGeo.setAttribute('color', new THREE.BufferAttribute(bgCol, 3));
     const bgMat = new THREE.ShaderMaterial({
-      vertexShader: `attribute float aSize; varying vec3 vColor; varying float vBr;
-        void main() { vColor = color; vBr = aSize; vec4 mv = modelViewMatrix * vec4(position,1.0);
-        gl_PointSize = aSize * (300.0 / -mv.z); gl_Position = projectionMatrix * mv; }`,
-      fragmentShader: `varying vec3 vColor; varying float vBr;
-        void main() { float d = length(gl_PointCoord - 0.5) * 2.0;
-        float a = smoothstep(1.0, 0.0, d) * vBr * 2.0; gl_FragColor = vec4(vColor, a); }`,
+      vertexShader: `
+        attribute float aSize;
+        varying vec3 vColor;
+        varying float vBr;
+        void main() {
+          vColor = color;
+          vBr = aSize;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = aSize * (350.0 / -mv.z);
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vBr;
+        void main() {
+          float d = length(gl_PointCoord - 0.5) * 2.0;
+          float core = smoothstep(1.0, 0.0, d) * vBr * 2.5;
+          float halo = exp(-d * d * 3.0) * vBr * 0.5;
+          float a = core + halo;
+          gl_FragColor = vec4(vColor * (1.0 + halo * 0.3), a);
+        }`,
       transparent: true, vertexColors: true, depthWrite: false, blending: THREE.AdditiveBlending,
     });
     const bgStars = new THREE.Points(bgGeo, bgMat);
     scene.add(bgStars);
 
-    // ── NEBULA CLOUDS ──
-    ['#4338CA','#7C3AED','#1E40AF','#164E63','#6D28D9'].forEach((c, i) => {
+    // ── MILKY WAY BAND ──
+    const mwTex = createMilkyWayTexture(1024);
+    const mwMat = new THREE.SpriteMaterial({ map: mwTex, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false });
+    // Two overlapping panels for the galactic plane
+    for (let i = 0; i < 3; i++) {
+      const mwSprite = new THREE.Sprite(mwMat.clone());
+      mwSprite.material.opacity = 0.15 + i * 0.05;
+      mwSprite.position.set(Math.cos(i * 2.1) * 10, (i - 1) * 5, Math.sin(i * 2.1) * 10);
+      mwSprite.scale.set(200 + i * 20, 50 + i * 8, 1);
+      mwSprite.rotation.z = -0.3 + i * 0.15;
+      mwSprite.userData.milkyWay = true;
+      scene.add(mwSprite);
+    }
+
+    // ── NEBULA CLOUDS — 10 vibrant clouds ──
+    const nebulaColors = ['#4338CA','#7C3AED','#1E40AF','#164E63','#6D28D9','#BE185D','#B45309','#047857','#7E22CE','#0369A1'];
+    nebulaColors.forEach((c, i) => {
       const tex = createNebulaTexture(c, 512);
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false });
       const sp = new THREE.Sprite(mat);
-      const a = (i / 5) * Math.PI * 2 + Math.random() * 0.5;
-      sp.position.set(Math.cos(a)*70, (Math.random()-0.5)*80, Math.sin(a)*70);
-      sp.scale.set(60+Math.random()*40, 40+Math.random()*30, 1);
+      const a = (i / nebulaColors.length) * Math.PI * 2 + Math.random() * 0.5;
+      const dist = 60 + Math.random() * 30;
+      sp.position.set(Math.cos(a)*dist, (Math.random()-0.5)*90, Math.sin(a)*dist);
+      sp.scale.set(70+Math.random()*50, 50+Math.random()*35, 1);
+      sp.userData.nebulaDrift = { x: (Math.random()-0.5)*0.01, y: (Math.random()-0.5)*0.006 };
       scene.add(sp);
     });
 
@@ -549,23 +657,24 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       const isAligned = c.aligned || c.alignment_reason?.length > 0;
       const isBirth = birthConstellation && c.id === birthConstellation.id;
 
-      // Stars with glow sprites
+      // Stars with enhanced glow sprites
       c.stars.forEach(s => {
         const pos = raDecToXYZ(s.ra, s.dec);
-        const brightness = Math.max(0.4, 1 - s.mag / 5);
-        const baseSize = Math.max(0.3, (5 - s.mag) / 5 * 0.9);
+        const brightness = Math.max(0.5, 1 - s.mag / 5);
+        const baseSize = Math.max(0.4, (5 - s.mag) / 5 * 1.1);
         const starMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(baseSize * 0.5, 8, 8),
+          new THREE.SphereGeometry(baseSize * 0.5, 12, 12),
           new THREE.MeshBasicMaterial({ color: isAligned || isBirth ? hexColor : 0xE8E8FF, transparent: true, opacity: brightness })
         );
         starMesh.position.copy(pos); scene.add(starMesh);
         meshMap.push({ mesh: starMesh, constellation: c });
 
-        const starTex = createStarTexture(isBirth ? '#D8B4FE' : isAligned ? color : '#C8CCFF', 128);
-        const spMat = new THREE.SpriteMaterial({ map: starTex, transparent: true, opacity: brightness * (isBirth ? 1.0 : isAligned ? 0.85 : 0.5), blending: THREE.AdditiveBlending, depthWrite: false });
+        // Enhanced glow sprite — larger halo with bloom interaction
+        const starTex = createStarTexture(isBirth ? '#E8D0FF' : isAligned ? color : '#D0D4FF', 128);
+        const spMat = new THREE.SpriteMaterial({ map: starTex, transparent: true, opacity: brightness * (isBirth ? 1.0 : isAligned ? 0.9 : 0.6), blending: THREE.AdditiveBlending, depthWrite: false });
         const sp = new THREE.Sprite(spMat);
-        sp.position.copy(pos); sp.scale.set(baseSize*4, baseSize*4, 1);
-        if (isBirth) { sp.userData.isBirthStar = true; sp.userData.baseScale = baseSize * 4; }
+        sp.position.copy(pos); sp.scale.set(baseSize*5, baseSize*5, 1);
+        if (isBirth) { sp.userData.isBirthStar = true; sp.userData.baseScale = baseSize * 5; }
         scene.add(sp);
       });
 
@@ -635,22 +744,28 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       setTimeout(() => { if (onBirthMessage) onBirthMessage({ name: birthConstellation.name, symbol: birthConstellation.symbol, element: birthConstellation.element, meaning: birthConstellation.meaning }); }, 3500);
     }
 
-    // ── CONTROLS ──
-    const onPointerDown = (e) => { isDragging.current = true; prevMouse.current = { x: e.clientX, y: e.clientY }; };
+    // ── CONTROLS WITH MOMENTUM ──
+    const onPointerDown = (e) => { isDragging.current = true; velocity.current = { theta: 0, phi: 0 }; prevMouse.current = { x: e.clientX, y: e.clientY }; };
     const onPointerUp = () => { isDragging.current = false; };
     const onPointerMove = (e) => {
       if (!isDragging.current) return;
-      spherical.current.theta -= (e.clientX - prevMouse.current.x) * 0.004;
-      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - (e.clientY - prevMouse.current.y) * 0.004));
+      const dx = (e.clientX - prevMouse.current.x) * 0.004;
+      const dy = (e.clientY - prevMouse.current.y) * 0.004;
+      spherical.current.theta -= dx;
+      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - dy));
+      velocity.current = { theta: -dx, phi: -dy };
       prevMouse.current = { x: e.clientX, y: e.clientY };
     };
-    const onWheel = (e) => { spherical.current.radius = Math.max(12, Math.min(120, spherical.current.radius + e.deltaY * 0.04)); };
-    const onTouchStart = (e) => { if (e.touches.length === 1) { isDragging.current = true; prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } };
+    const onWheel = (e) => { spherical.current.radius = Math.max(10, Math.min(130, spherical.current.radius + e.deltaY * 0.04)); };
+    const onTouchStart = (e) => { if (e.touches.length === 1) { isDragging.current = true; velocity.current = { theta: 0, phi: 0 }; prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } };
     const onTouchEnd = () => { isDragging.current = false; };
     const onTouchMove = (e) => {
       if (!isDragging.current || e.touches.length !== 1) return;
-      spherical.current.theta -= (e.touches[0].clientX - prevMouse.current.x) * 0.004;
-      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - (e.touches[0].clientY - prevMouse.current.y) * 0.004));
+      const dx = (e.touches[0].clientX - prevMouse.current.x) * 0.004;
+      const dy = (e.touches[0].clientY - prevMouse.current.y) * 0.004;
+      spherical.current.theta -= dx;
+      spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi - dy));
+      velocity.current = { theta: -dx, phi: -dy };
       prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     };
     const raycaster = new THREE.Raycaster();
@@ -676,7 +791,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
     el.addEventListener('touchend', onTouchEnd);
     el.addEventListener('touchmove', onTouchMove, { passive: true });
     el.addEventListener('click', onClick);
-    const onResize = () => { const nw = container.clientWidth, nh = container.clientHeight; camera.aspect = nw/nh; camera.updateProjectionMatrix(); renderer.setSize(nw, nh); };
+    const onResize = () => { const nw = container.clientWidth, nh = container.clientHeight; camera.aspect = nw/nh; camera.updateProjectionMatrix(); renderer.setSize(nw, nh); composer.setSize(nw, nh); };
     window.addEventListener('resize', onResize);
 
     // ── GYROSCOPE / DEVICE ORIENTATION ──
@@ -708,15 +823,42 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
     };
     window.addEventListener('deviceorientation', onDeviceOrientation);
 
-    // ── ANIMATION LOOP ──
+    // ── ANIMATION LOOP WITH BLOOM ──
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
       const now = performance.now();
       const elapsed = (now - animState.current.startTime) / 1000;
+
+      // Apply camera momentum when not dragging
+      if (!isDragging.current) {
+        spherical.current.theta += velocity.current.theta;
+        spherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.current.phi + velocity.current.phi));
+        velocity.current.theta *= 0.96; // Friction
+        velocity.current.phi *= 0.96;
+        if (Math.abs(velocity.current.theta) < 0.00001) velocity.current.theta = 0;
+        if (Math.abs(velocity.current.phi) < 0.00001) velocity.current.phi = 0;
+      }
+
       const { theta, phi, radius } = spherical.current;
       camera.position.set(radius * Math.sin(phi) * Math.cos(theta), radius * Math.cos(phi), radius * Math.sin(phi) * Math.sin(theta));
       camera.lookAt(0, 0, 0);
-      bgStars.rotation.y += 0.00008;
+      bgStars.rotation.y += 0.00005;
+
+      // Star twinkling effect via shader uniform time (approximate with size attribute)
+      const sizeArr = bgGeo.attributes.aSize.array;
+      for (let i = 0; i < bgStarCount; i += 50) { // Twinkle every 50th star for perf
+        const base = 0.05 + Math.pow(i / bgStarCount, 2.5) * 0.4;
+        sizeArr[i] = base * (0.8 + 0.4 * Math.sin(now * 0.002 + i));
+      }
+      bgGeo.attributes.aSize.needsUpdate = true;
+
+      // Nebula drift
+      scene.traverse(obj => {
+        if (obj.userData.nebulaDrift) {
+          obj.position.x += obj.userData.nebulaDrift.x;
+          obj.position.y += obj.userData.nebulaDrift.y;
+        }
+      });
 
       // Journey camera animation (smooth cinematic movement)
       const jt = journeyTargetRef.current;
@@ -776,7 +918,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
         if (obj.userData.isBirthAura) { obj.material.opacity = 0.02 + Math.sin(now * 0.002) * 0.015; }
       });
 
-      renderer.render(scene, camera);
+      composer.render();
     };
     animate();
 
@@ -788,6 +930,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       el.removeEventListener('touchmove', onTouchMove); el.removeEventListener('click', onClick);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('deviceorientation', onDeviceOrientation);
+      composer.dispose();
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
