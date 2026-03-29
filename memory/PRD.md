@@ -20,7 +20,10 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - UnrealBloomPass bloom, Milky Way band, 15k stars, camera momentum
 - 20 cultures: Mayan, Egyptian, Aboriginal, Lakota, Chinese, Vedic, Norse, Polynesian, Greek, Japanese, Yoruba, Celtic, Inuit, Aztec, Sumerian, Persian, Bantu, Native American, Slavic, Maori
 - Each: 5 constellations with real RA/Dec star coordinates, mythology, deities, lessons, drawing paths
-- **REFACTORED** (Mar 2026): Data moved from 2500 lines of Python to JSON seed file (`data/star_cultures_data.json`)
+- **REFACTORED** (Mar 2026): Data moved from 2500 lines of Python to JSON seed file
+- **FIXED** (Mar 2026): Pinch-to-zoom for mobile + zoom +/- buttons
+- **FIXED** (Mar 2026): Cultural constellation click → opens that culture's story (not Western)
+- **FIXED** (Mar 2026): Journey mode uses cultural constellations when a culture is active
 
 ### Sacred Texts Audiobook Reader
 - 15 scriptures with AI chapter generation, VR Immersive Reader, HD TTS, progress tracking
@@ -29,14 +32,14 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - 12 living traditions, VR Immersive Mode, HD Voice Narration, AI "Ask the Oracle"
 
 ### Crystals & Stones (UPGRADED Mar 2026)
-- 12 sacred crystals with VR Crystal Meditation, HD Voice Guide, 3 tabs + NEW Crystal Pairing tab
-- **Crystal Pairing AI** (NEW): Select mood (12 options) + intention (12 options), AI recommends 3 crystals with personalized explanation and ritual suggestion, TTS narration, pairing history
+- 12 sacred crystals with VR Crystal Meditation, HD Voice Guide
+- **Crystal Pairing AI**: Select mood + intention → AI recommends 3 crystals with explanation, TTS, history
 - **Rock Hounding**: 3 environments, daily dig limit, auto-add to collection
 
 ### Send a Blessing (UPGRADED Mar 2026)
-- 12 blessing templates, **AI-generated custom blessings**, stats dashboard (sent/received/community)
+- 12 blessing templates, **AI-generated custom blessings**, stats dashboard
 - 4 tabs: Send, Stream, Received, Sent
-- Template mode + AI Blessing mode with context input
+- Template mode + AI Blessing mode
 
 ### Accessibility Settings (UPGRADED Mar 2026)
 - Font size picker (Small/Default/Large/X-Large)
@@ -44,24 +47,19 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Reduce motion, particles, flashing
 - 5 color themes
 
+### Guided App Tour (FIXED Mar 2026)
+- 12-step card walkthrough with swipe navigation
+- **FIXED**: Tour button reliable on mobile (touchEnd handler, no btn-glass CSS transform)
+- Video phase bypassed for reliability
+
 ### Myths & Legends Database
 - 20 civilizations, 120+ seed myths, AI generation, search, HD voice narration
 
-### AI Avatar Generator
-- AI Manifestation + Energy Builder + Avatar Gallery + Global Display
-
-### Context-Aware Human Voices (tts-1-hd)
-- 35+ NarrationPlayer instances + encyclopedia/crystal narrators with tradition-mapped voices
-
-### Guided App Tour
-- 12-step card walkthrough (video phase bypassed for reliability)
-
 ### Other
-- Cosmic Mixer, Split Screen, Dashboard, Ambient Soundscapes, 40+ content pages, Sora 2 Videos
-- Trade Circle barter marketplace with karma system
-- Stripe subscription system with tiers and credits
-- Quantum Entanglement meditation sessions
-- Hidden Creator role (auto-activates for kyndsmiles@gmail.com)
+- AI Avatar Generator, Cosmic Mixer, Split Screen, Dashboard, Ambient Soundscapes
+- 40+ content pages, Sora 2 Videos, Trade Circle, Stripe subscriptions
+- Quantum Entanglement meditation, Hidden Creator role
+- Context-aware voices (tts-1-hd), 35+ NarrationPlayer instances
 
 ## Test Credentials
 - User: test@test.com / password
