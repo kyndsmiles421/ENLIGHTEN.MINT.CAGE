@@ -195,6 +195,7 @@ function CardWalkthrough({ onClose, onFinish }) {
   const current = TOUR_STEPS[step];
   const total = TOUR_STEPS.length;
   const progress = ((step + 1) / total) * 100;
+  const touchStart = useRef(null);
 
   const next = useCallback(() => {
     if (step < total - 1) setStep(s => s + 1);
@@ -217,6 +218,16 @@ function CardWalkthrough({ onClose, onFinish }) {
     return () => window.removeEventListener('keydown', handler);
   }, [next, prev, onClose]);
 
+  // Swipe gesture for mobile
+  const onTouchStart = (e) => { touchStart.current = e.touches[0].clientX; };
+  const onTouchEnd = (e) => {
+    if (touchStart.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart.current;
+    if (diff < -50) next();
+    else if (diff > 50) prev();
+    touchStart.current = null;
+  };
+
   const Icon = current.icon;
 
   return (
@@ -226,7 +237,9 @@ function CardWalkthrough({ onClose, onFinish }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
       className="fixed inset-0 z-[9999]"
-      style={{ background: '#0B0C15', touchAction: 'none', overscrollBehavior: 'none' }}
+      style={{ background: '#0B0C15', touchAction: 'pan-y', overscrollBehavior: 'none' }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
       data-testid="guided-tour-overlay"
     >
       {/* Background glow */}

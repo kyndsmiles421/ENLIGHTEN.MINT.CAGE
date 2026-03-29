@@ -7,10 +7,10 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useCosmicAmbient } from '../components/StarChartAudio';
+import { useCosmicAmbient, CosmicNarrator } from '../components/StarChartAudio';
 import { BirthConstellationToast, MythologyPanel, JourneyOverlay, JourneyComplete, CelestialBadgesPanel } from '../components/StarChartOverlays';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -358,7 +358,7 @@ function createMythologyTexture(constellationId, color, size = 256) {
   return tex;
 }
 
-function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled, cultureData }) {
+function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCulturalConst, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled, cultureData, zoomDelta, zoomKey }) {
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
@@ -378,6 +378,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
   const gyroOffset = useRef({ alpha: null, beta: null });
   const cultureGroupRef = useRef(null);
   const cultureLabelSprites = useRef([]);
+  const pinchDistRef = useRef(null);
   const cultureDataRef = useRef(cultureData);
 
   useEffect(() => { gyroEnabledRef.current = gyroEnabled; }, [gyroEnabled]);
@@ -470,6 +471,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
         const center = raDecToXYZ(c.ra, c.dec, 49);
         sp.position.copy(center);
         sp.scale.set(12, 12, 1);
+        sp.userData.culturalConst = c;
         group.add(sp);
       }
 
@@ -490,6 +492,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       const labelPos = raDecToXYZ(c.ra, c.dec, 46);
       labelSp.position.copy(labelPos);
       labelSp.scale.set(8, 2, 1);
+      labelSp.userData.culturalConst = c;
       group.add(labelSp);
       labelSprites.push(labelSp);
 
@@ -515,6 +518,12 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
 
   useEffect(() => { mythModeRef.current = mythologyMode; }, [mythologyMode]);
   useEffect(() => { onJourneyArrivedRef.current = onJourneyArrived; }, [onJourneyArrived]);
+  // Handle zoom button presses from parent
+  useEffect(() => {
+    if (zoomKey > 0 && zoomDelta !== null && spherical.current) {
+      spherical.current.radius = Math.max(10, Math.min(130, spherical.current.radius + zoomDelta));
+    }
+  }, [zoomKey, zoomDelta]);
   useEffect(() => {
     if (journeyTarget) {
       const pos = raDecToXYZ(journeyTarget.ra, journeyTarget.dec, 50);
@@ -757,9 +766,33 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
       prevMouse.current = { x: e.clientX, y: e.clientY };
     };
     const onWheel = (e) => { spherical.current.radius = Math.max(10, Math.min(130, spherical.current.radius + e.deltaY * 0.04)); };
-    const onTouchStart = (e) => { if (e.touches.length === 1) { isDragging.current = true; velocity.current = { theta: 0, phi: 0 }; prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } };
-    const onTouchEnd = () => { isDragging.current = false; };
+    const onTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        // Pinch start — record initial distance
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchDistRef.current = Math.sqrt(dx * dx + dy * dy);
+        isDragging.current = false;
+      } else if (e.touches.length === 1) {
+        isDragging.current = true;
+        velocity.current = { theta: 0, phi: 0 };
+        prevMouse.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        pinchDistRef.current = null;
+      }
+    };
+    const onTouchEnd = () => { isDragging.current = false; pinchDistRef.current = null; };
     const onTouchMove = (e) => {
+      if (e.touches.length === 2 && pinchDistRef.current !== null) {
+        // Pinch-to-zoom
+        e.preventDefault();
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const delta = pinchDistRef.current - dist;
+        spherical.current.radius = Math.max(10, Math.min(130, spherical.current.radius + delta * 0.15));
+        pinchDistRef.current = dist;
+        return;
+      }
       if (!isDragging.current || e.touches.length !== 1) return;
       const dx = (e.touches[0].clientX - prevMouse.current.x) * 0.004;
       const dy = (e.touches[0].clientY - prevMouse.current.y) * 0.004;
@@ -770,11 +803,32 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
     };
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    const onSelectCulturalConstRef = { current: null };
     const onClick = (e) => {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
+
+      // Check cultural constellation sprites first (when a culture is active)
+      if (cultureDataRef.current && cultureGroupRef.current) {
+        const cultureSprites = [];
+        cultureGroupRef.current.traverse(child => {
+          if (child.isSprite && child.userData.culturalConst) cultureSprites.push(child);
+        });
+        if (cultureSprites.length > 0) {
+          const cHits = raycaster.intersectObjects(cultureSprites);
+          if (cHits.length > 0) {
+            const hitSprite = cHits[0].object;
+            if (hitSprite.userData.culturalConst && onSelectCulturalConst) {
+              onSelectCulturalConst(hitSprite.userData.culturalConst);
+              return;
+            }
+          }
+        }
+      }
+
+      // Fallback to Western constellations
       const intersects = raycaster.intersectObjects(meshMap.map(m => m.mesh));
       if (intersects.length > 0) {
         const hit = meshMap.find(m => m.mesh === intersects[0].object);
@@ -789,7 +843,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onBirthMess
     el.addEventListener('wheel', onWheel, { passive: true });
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchend', onTouchEnd);
-    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
     el.addEventListener('click', onClick);
     const onResize = () => { const nw = container.clientWidth, nh = container.clientHeight; camera.aspect = nw/nh; camera.updateProjectionMatrix(); renderer.setSize(nw, nh); composer.setSize(nw, nh); };
     window.addEventListener('resize', onResize);
@@ -978,6 +1032,13 @@ export default function StarChart() {
   const [showCulturePicker, setShowCulturePicker] = useState(false);
   const [cultureLoading, setCultureLoading] = useState(false);
   const [selectedCulturalConst, setSelectedCulturalConst] = useState(null);
+  const [zoomCounter, setZoomCounter] = useState(0);
+  const [lastZoomDelta, setLastZoomDelta] = useState(null);
+
+  const handleZoom = useCallback((delta) => {
+    setLastZoomDelta(delta);
+    setZoomCounter(c => c + 1);
+  }, []);
 
   useEffect(() => { journeyPausedRef.current = journeyPaused; }, [journeyPaused]);
 
@@ -1062,33 +1123,51 @@ export default function StarChart() {
   ];
 
   // ── Journey Control Functions ──
+  // Compute the constellation list for Journey mode — uses cultural constellations when active
+  const journeyConstellations = activeCulture && cultureData?.constellations?.length
+    ? cultureData.constellations
+    : data?.constellations || [];
+
   const startJourney = useCallback(() => {
-    if (!data?.constellations?.length) return;
+    if (!journeyConstellations.length) return;
     setJourneyActive(true);
     setJourneyIdx(0);
     setJourneyPhase('moving');
     setJourneyPaused(false);
     setJourneyComplete(false);
     setSelected(null);
+    setSelectedCulturalConst(null);
     setMythologyMode(true);
     journeyAmbient.start();
-    // Set first target
-    const first = data.constellations[0];
+    const first = journeyConstellations[0];
     setJourneyTarget({ ra: first.ra, dec: first.dec, id: first.id });
-  }, [data, journeyAmbient]);
+  }, [journeyConstellations, journeyAmbient]);
 
   const narrateRef = useRef(null);
   const advanceRef = useRef(null);
 
   const narrateConstellation = useCallback(async (idx) => {
-    if (!data?.constellations?.[idx]) return;
-    const c = data.constellations[idx];
-    setSelected(c);
+    if (!journeyConstellations[idx]) return;
+    const c = journeyConstellations[idx];
+
+    // If it's a cultural constellation, open the cultural panel; otherwise open the Western panel
+    if (activeCulture && cultureData) {
+      setSelectedCulturalConst(c);
+      setSelected(null);
+    } else {
+      setSelected(c);
+      setSelectedCulturalConst(null);
+    }
     setJourneyPhase('narrating');
 
     const myth = c.mythology;
     if (!myth) { if (advanceRef.current) advanceRef.current(idx); return; }
-    const storyText = `${c.name}. ${myth.figure}. ${myth.story} The cosmic lesson: ${myth.lesson}`;
+    // Build story text — cultural data uses 'story' and 'lesson', Western uses 'origin_story'
+    const storyText = myth.story
+      ? `${c.name}. ${myth.figure}. ${myth.story} The cosmic lesson: ${myth.lesson}`
+      : myth.origin_story
+        ? `${c.name}. ${myth.figure}. ${myth.origin_story}`
+        : `${c.name}. ${myth.figure}.`;
 
     try {
       const res = await axios.post(`${API}/tts/narrate`, { text: storyText, context: 'constellation' });
@@ -1101,17 +1180,17 @@ export default function StarChart() {
     } catch {
       setTimeout(() => { if (!journeyPausedRef.current && advanceRef.current) advanceRef.current(idx); }, 3000);
     }
-  }, [data]);
+  }, [journeyConstellations, activeCulture, cultureData]);
 
   const advanceJourney = useCallback((fromIdx) => {
     const nextIdx = fromIdx + 1;
-    if (!data?.constellations || nextIdx >= data.constellations.length) {
+    if (nextIdx >= journeyConstellations.length) {
       setJourneyPhase('complete');
       setJourneyActive(false);
       setJourneyComplete(true);
       journeyAmbient.stop();
       setSelected(null);
-      // Award journey completion XP
+      setSelectedCulturalConst(null);
       if (token) {
         axios.post(`${API}/star-chart/award-xp`, { action: 'journey_completed', constellation_name: '' }, { headers: authHeaders }).catch(() => {});
       }
@@ -1120,17 +1199,18 @@ export default function StarChart() {
     setJourneyIdx(nextIdx);
     setJourneyPhase('moving');
     setSelected(null);
-    const next = data.constellations[nextIdx];
+    setSelectedCulturalConst(null);
+    const next = journeyConstellations[nextIdx];
     setJourneyTarget({ ra: next.ra, dec: next.dec, id: next.id });
-  }, [data, journeyAmbient]);
+  }, [journeyConstellations, journeyAmbient]);
 
   useEffect(() => { narrateRef.current = narrateConstellation; }, [narrateConstellation]);
   useEffect(() => { advanceRef.current = advanceJourney; }, [advanceJourney]);
 
   const handleJourneyArrived = useCallback((id) => {
-    const idx = data?.constellations?.findIndex(c => c.id === id);
+    const idx = journeyConstellations.findIndex(c => c.id === id);
     if (idx >= 0 && narrateRef.current) narrateRef.current(idx);
-  }, [data]);
+  }, [journeyConstellations]);
 
   const pauseJourney = useCallback(() => {
     setJourneyPaused(true);
@@ -1173,7 +1253,7 @@ export default function StarChart() {
               <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>
                 <Star size={16} style={{ color: '#818CF8' }} /> Constellation Chart
               </h1>
-              <p className="text-[10px] hidden sm:block" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll to zoom | Click stars | Gyro for AR mode</p>
+              <p className="text-[10px] hidden sm:block" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll/pinch to zoom | Click constellations for stories</p>
             </div>
             {data && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto flex-shrink-0"
@@ -1200,7 +1280,7 @@ export default function StarChart() {
               <button onClick={startJourney} data-testid="journey-start-btn"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
                 style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.12), rgba(192,132,252,0.12))', border: '1px solid rgba(167,139,250,0.3)', color: '#C084FC', backdropFilter: 'blur(12px)', boxShadow: '0 0 15px rgba(192,132,252,0.1)' }}>
-                <Compass size={10} /> Stargazing Journey
+                <Compass size={10} /> {activeCulture && cultureData ? `${cultureData.name} Journey` : 'Stargazing Journey'}
               </button>
             )}
             {/* Mythology Mode toggle */}
@@ -1530,7 +1610,7 @@ export default function StarChart() {
       <AnimatePresence>
         {journeyActive && data && (
           <JourneyOverlay
-            constellations={data.constellations}
+            constellations={journeyConstellations}
             active={journeyActive}
             currentIdx={journeyIdx}
             phase={journeyPhase}
@@ -1546,7 +1626,7 @@ export default function StarChart() {
       {/* Journey Complete */}
       <AnimatePresence>
         {journeyComplete && data && (
-          <JourneyComplete count={data.constellations.length} onClose={() => setJourneyComplete(false)} authHeaders={authHeaders} token={token} />
+          <JourneyComplete count={journeyConstellations.length} onClose={() => setJourneyComplete(false)} authHeaders={authHeaders} token={token} />
         )}
       </AnimatePresence>
 
@@ -1560,9 +1640,29 @@ export default function StarChart() {
             </div>
           </div>
         ) : data ? (
-          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} cultureData={cultureData} />
+          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onSelectCulturalConst={(c) => setSelectedCulturalConst(c)} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} cultureData={cultureData} zoomDelta={lastZoomDelta} zoomKey={zoomCounter} />
         ) : null}
       </div>
+
+      {/* Zoom Controls — always visible on the map */}
+      {data && !journeyActive && (
+        <div className="absolute bottom-20 right-4 z-10 flex flex-col gap-1.5" data-testid="zoom-controls">
+          <button onClick={() => handleZoom(-8)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
+            style={{ background: 'rgba(8,10,18,0.85)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'blur(12px)', color: 'rgba(248,250,252,0.6)' }}
+            data-testid="zoom-in-btn"
+            aria-label="Zoom In">
+            <Plus size={16} />
+          </button>
+          <button onClick={() => handleZoom(8)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
+            style={{ background: 'rgba(8,10,18,0.85)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'blur(12px)', color: 'rgba(248,250,252,0.6)' }}
+            data-testid="zoom-out-btn"
+            aria-label="Zoom Out">
+            <Minus size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

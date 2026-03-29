@@ -863,8 +863,15 @@ export default function Landing() {
                 </span>
               </button>
               <button onClick={() => setShowTour(true)}
-                className="btn-glass group"
-                style={{ background: 'rgba(216,180,254,0.06)', borderColor: 'rgba(216,180,254,0.15)' }}
+                onTouchEnd={(e) => { e.preventDefault(); setShowTour(true); }}
+                className="group py-3 px-6 rounded-full cursor-pointer"
+                style={{
+                  background: 'rgba(216,180,254,0.08)',
+                  border: '1px solid rgba(216,180,254,0.2)',
+                  backdropFilter: 'blur(12px)',
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'rgba(216,180,254,0.1)',
+                }}
                 data-testid="take-tour-btn">
                 <span className="flex items-center gap-2" style={{ color: '#D8B4FE' }}>
                   Take the Tour <Play size={14} className="transition-transform duration-300 group-hover:scale-110" />
