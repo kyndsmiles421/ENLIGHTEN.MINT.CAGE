@@ -11,6 +11,15 @@ router = APIRouter()
 
 CREATOR_EMAIL = "kyndsmiles@gmail.com"
 
+RECURRENCE_LABELS = {
+    "daily": "Every Day",
+    "weekdays": "Weekdays (Mon–Fri)",
+    "weekends": "Weekends (Sat–Sun)",
+    "weekly": "Once a Week",
+}
+
+WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
 # ─── In-memory WebSocket connections ───
 # { session_id: { user_id: { "ws": WebSocket, "user": dict, "avatar": str } } }
 active_connections: dict = {}
@@ -161,6 +170,224 @@ async def end_session(session_id: str, user=Depends(get_current_user)):
     active_connections.pop(session_id, None)
     session_chat_history.pop(session_id, None)
     return {"status": "ended"}
+
+
+# ─── Recurring Sessions ───
+
+def compute_next_occurrence(recurrence: str, day_of_week: int, time_utc: str, after: datetime = None):
+    """Compute the next occurrence datetime for a recurring session."""
+    if after is None:
+        after = datetime.now(timezone.utc)
+    hour, minute = int(time_utc.split(":")[0]), int(time_utc.split(":")[1])
+
+    if recurrence == "daily":
+        candidate = after.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if candidate <= after:
+            candidate += timedelta(days=1)
+        return candidate
+
+    if recurrence == "weekdays":
+        candidate = after.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if candidate <= after:
+            candidate += timedelta(days=1)
+        while candidate.weekday() >= 5:  # 5=Sat, 6=Sun
+            candidate += timedelta(days=1)
+        return candidate
+
+    if recurrence == "weekends":
+        candidate = after.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if candidate <= after:
+            candidate += timedelta(days=1)
+        while candidate.weekday() < 5:
+            candidate += timedelta(days=1)
+        return candidate
+
+    if recurrence == "weekly":
+        candidate = after.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        days_ahead = day_of_week - candidate.weekday()
+        if days_ahead < 0 or (days_ahead == 0 and candidate <= after):
+            days_ahead += 7
+        candidate += timedelta(days=days_ahead)
+        return candidate
+
+    # fallback daily
+    candidate = after.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    if candidate <= after:
+        candidate += timedelta(days=1)
+    return candidate
+
+
+@router.post("/live/recurring")
+async def create_recurring_session(data: dict = Body(...), user=Depends(get_current_user)):
+    """Create a recurring session series."""
+    recurrence = data.get("recurrence", "daily")
+    if recurrence not in RECURRENCE_LABELS:
+        raise HTTPException(status_code=400, detail="Invalid recurrence type")
+
+    time_utc = data.get("time_utc", "07:00")
+    day_of_week = data.get("day_of_week", 0)
+    next_occ = compute_next_occurrence(recurrence, day_of_week, time_utc)
+
+    series = {
+        "id": str(uuid.uuid4()),
+        "host_id": user["id"],
+        "host_name": user.get("name", "Anonymous"),
+        "title": data.get("title", "Recurring Session"),
+        "description": data.get("description", ""),
+        "session_type": data.get("session_type", "meditation"),
+        "scene": data.get("scene", "cosmic-temple"),
+        "duration_minutes": data.get("duration_minutes", 20),
+        "recurrence": recurrence,
+        "day_of_week": day_of_week,
+        "time_utc": time_utc,
+        "subscribers": [user["id"]],
+        "subscriber_count": 1,
+        "status": "active",
+        "next_occurrence": next_occ.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.recurring_sessions.insert_one({**series})
+    series.pop("_id", None)
+    return series
+
+
+@router.get("/live/recurring")
+async def list_recurring_sessions(user=Depends(get_current_user)):
+    """List all active recurring session series."""
+    series_list = await db.recurring_sessions.find(
+        {"status": "active"}, {"_id": 0}
+    ).sort("next_occurrence", 1).to_list(50)
+    # Mark which ones the user is subscribed to
+    for s in series_list:
+        s["is_subscribed"] = user["id"] in s.get("subscribers", [])
+        s.pop("subscribers", None)  # Don't expose full list
+    return {"series": series_list}
+
+
+@router.get("/live/recurring/subscriptions")
+async def my_subscriptions(user=Depends(get_current_user)):
+    """Get recurring sessions the current user is subscribed to."""
+    series_list = await db.recurring_sessions.find(
+        {"status": "active", "subscribers": user["id"]}, {"_id": 0}
+    ).sort("next_occurrence", 1).to_list(50)
+    for s in series_list:
+        s["is_subscribed"] = True
+        s.pop("subscribers", None)
+    return {"series": series_list}
+
+
+@router.post("/live/recurring/{series_id}/subscribe")
+async def subscribe_recurring(series_id: str, user=Depends(get_current_user)):
+    """Subscribe to a recurring session series."""
+    series = await db.recurring_sessions.find_one({"id": series_id}, {"_id": 0})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    if user["id"] in series.get("subscribers", []):
+        return {"status": "already_subscribed"}
+    await db.recurring_sessions.update_one(
+        {"id": series_id},
+        {"$addToSet": {"subscribers": user["id"]}, "$inc": {"subscriber_count": 1}}
+    )
+    # Create in-app notification
+    await db.in_app_notifications.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "type": "recurring_subscribed",
+        "title": f"Subscribed to {series['title']}",
+        "body": f"You'll be notified before each {RECURRENCE_LABELS.get(series['recurrence'], 'recurring')} session.",
+        "url": "/live",
+        "read": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"status": "subscribed"}
+
+
+@router.delete("/live/recurring/{series_id}/subscribe")
+async def unsubscribe_recurring(series_id: str, user=Depends(get_current_user)):
+    """Unsubscribe from a recurring session series."""
+    await db.recurring_sessions.update_one(
+        {"id": series_id},
+        {"$pull": {"subscribers": user["id"]}, "$inc": {"subscriber_count": -1}}
+    )
+    return {"status": "unsubscribed"}
+
+
+@router.post("/live/recurring/spawn")
+async def spawn_recurring_sessions():
+    """Spawn live sessions from recurring templates that are due within the next 15 minutes.
+    In production this would be called by a cron job. For now, it's triggered on page load."""
+    now = datetime.now(timezone.utc)
+    window = now + timedelta(minutes=15)
+
+    due = await db.recurring_sessions.find(
+        {"status": "active", "next_occurrence": {"$lte": window.isoformat()}},
+        {"_id": 0}
+    ).to_list(20)
+
+    spawned = []
+    for series in due:
+        # Check if a session was already spawned for this occurrence
+        existing = await db.live_sessions.find_one({
+            "recurring_series_id": series["id"],
+            "scheduled_at": series["next_occurrence"],
+        })
+        if existing:
+            # Already spawned — just advance next_occurrence
+            next_occ = compute_next_occurrence(
+                series["recurrence"], series.get("day_of_week", 0), series["time_utc"],
+                after=datetime.fromisoformat(series["next_occurrence"])
+            )
+            await db.recurring_sessions.update_one(
+                {"id": series["id"]},
+                {"$set": {"next_occurrence": next_occ.isoformat()}}
+            )
+            continue
+
+        # Spawn a new session
+        session = {
+            "id": str(uuid.uuid4()),
+            "host_id": series["host_id"],
+            "host_name": series.get("host_name", "Anonymous"),
+            "title": series["title"],
+            "description": series.get("description", ""),
+            "session_type": series.get("session_type", "meditation"),
+            "scene": series.get("scene", "cosmic-temple"),
+            "max_participants": 50,
+            "duration_minutes": series.get("duration_minutes", 20),
+            "scheduled_at": series["next_occurrence"],
+            "status": "scheduled",
+            "recurring_series_id": series["id"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.live_sessions.insert_one({**session})
+        session.pop("_id", None)
+        spawned.append(session)
+
+        # Advance next_occurrence
+        next_occ = compute_next_occurrence(
+            series["recurrence"], series.get("day_of_week", 0), series["time_utc"],
+            after=datetime.fromisoformat(series["next_occurrence"])
+        )
+        await db.recurring_sessions.update_one(
+            {"id": series["id"]},
+            {"$set": {"next_occurrence": next_occ.isoformat()}}
+        )
+
+        # Send push notifications to subscribers
+        try:
+            from routes.notifications import send_push_to_user
+            for sub_id in series.get("subscribers", []):
+                await send_push_to_user(
+                    sub_id,
+                    f"Starting Soon: {series['title']}",
+                    f"Your {RECURRENCE_LABELS.get(series['recurrence'], 'recurring')} session begins in ~15 minutes.",
+                    f"/live/{session['id']}",
+                    "live-reminder",
+                )
+        except Exception as e:
+            logger.warning(f"Failed to send recurring push notifications: {e}")
+
+    return {"spawned": len(spawned), "sessions": spawned}
 
 
 # ─── WebSocket ───
