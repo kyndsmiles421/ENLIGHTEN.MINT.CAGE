@@ -933,13 +933,22 @@ export default function AvatarCreator() {
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={generateAIAvatar}
-                    disabled={generating || !aiDescription.trim()}
-                    className="w-full py-4 rounded-xl text-sm font-medium flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-40"
+                    onClick={() => {
+                      if (!aiDescription.trim()) {
+                        toast.error('Type a description above first — describe the cosmic being you want to create');
+                        const el = document.querySelector('[data-testid="ai-avatar-description"]');
+                        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+                        return;
+                      }
+                      generateAIAvatar();
+                    }}
+                    disabled={generating}
+                    className="w-full py-4 rounded-xl text-sm font-medium flex items-center justify-center gap-3 transition-all duration-300"
                     style={{
                       background: `linear-gradient(135deg, ${selectedAiStyle.color}15, ${selectedAiStyle.color}08)`,
                       border: `1px solid ${selectedAiStyle.color}25`,
                       color: selectedAiStyle.color,
+                      opacity: generating ? 0.4 : aiDescription.trim() ? 1 : 0.6,
                       boxShadow: !generating && aiDescription.trim() ? `0 0 30px ${selectedAiStyle.color}10` : 'none',
                     }}
                     data-testid="ai-generate-btn"
