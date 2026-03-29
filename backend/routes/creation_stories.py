@@ -410,10 +410,13 @@ Write it as an immersive, richly detailed narrative — not an academic summary.
 Return as JSON with keys: title, type, characters (list of {{name, role}}), story, lesson, symbols (list), connected_myths (list)"""
 
     try:
-        chat = LlmChat(api_key=EMERGENT_LLM_KEY, model="gpt-4o")
-        chat.add_message(UserMessage(text=prompt))
-        response = await chat.send_async()
-        text = response.text.strip()
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"myth-gen-{civ_id}-{uuid.uuid4().hex[:8]}",
+            system_message="You are a master storyteller and cultural historian. Return responses as valid JSON only.",
+        )
+        response = await chat.send_message(UserMessage(text=prompt))
+        text = response.strip()
 
         # Parse JSON from response
         import json as _json
@@ -450,6 +453,41 @@ Return as JSON with keys: title, type, characters (list of {{name, role}}), stor
         logger.error(f"Myth generation error: {e}")
         from fastapi import HTTPException
         raise HTTPException(status_code=500, detail="Failed to generate myth")
+
+
+@router.post("/myths/{myth_id}/narrate")
+async def narrate_myth(myth_id: str):
+    """Generate TTS audio for a generated myth."""
+    myth = await db.myths.find_one({"id": myth_id}, {"_id": 0})
+    if not myth:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Myth not found or not yet generated")
+
+    narration = (
+        f"{myth.get('title', 'A Myth')} — from the {myth.get('culture', '')} tradition. "
+        f"{myth.get('story', '')[:3500]} "
+        f"The wisdom of this tale: {myth.get('lesson', '')}"
+    )
+
+    cache_key = hashlib.md5(f"myth-{myth_id}".encode()).hexdigest()
+    if cache_key in tts_cache:
+        return {"audio": tts_cache[cache_key], "myth_id": myth_id}
+
+    try:
+        tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+        audio_b64 = await tts.generate_speech_base64(
+            text=narration[:4096],
+            model="tts-1-hd",
+            voice="fable",
+            speed=0.85,
+            response_format="mp3",
+        )
+        tts_cache[cache_key] = audio_b64
+        return {"audio": audio_b64, "myth_id": myth_id}
+    except Exception as e:
+        logger.error(f"Myth TTS error: {e}")
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail="Failed to generate myth narration")
 
 
 @router.get("/myths/search/{query}")
