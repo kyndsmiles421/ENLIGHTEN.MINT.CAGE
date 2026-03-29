@@ -46,6 +46,37 @@ async def send_blessing(data: dict = Body(...), user=Depends(get_current_user)):
     }
     await db.blessings.insert_one({**blessing})
     blessing.pop("_id", None)
+
+    # Create in-app notification for recipient
+    to_user_id = data.get("to_user_id", "")
+    if to_user_id:
+        notif = {
+            "id": str(uuid.uuid4()),
+            "user_id": to_user_id,
+            "type": "blessing",
+            "title": "New Blessing Received",
+            "message": f"{blessing['from_name']} sent you a blessing: \"{blessing['text'][:80]}...\"" if len(blessing['text']) > 80 else f"{blessing['from_name']} sent you a blessing: \"{blessing['text']}\"",
+            "color": blessing["color"],
+            "link": "/blessings",
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.in_app_notifications.insert_one({**notif})
+        notif.pop("_id", None)
+
+        # Send push notification
+        try:
+            from routes.notifications import send_push_to_user
+            await send_push_to_user(
+                to_user_id,
+                f"Blessing from {blessing['from_name']}",
+                blessing["text"][:120],
+                "/blessings",
+                "blessing",
+            )
+        except Exception:
+            pass
+
     return {"status": "sent", "blessing": blessing}
 
 

@@ -150,6 +150,21 @@ async def get_pairing_history(user=Depends(get_current_user)):
     return {"pairings": pairings}
 
 
+@router.get("/crystals/pairing/{pairing_id}/share")
+async def get_pairing_share(pairing_id: str):
+    """Get a crystal pairing for sharing (public endpoint)."""
+    pairing = await db.crystal_pairings.find_one({"id": pairing_id}, {"_id": 0})
+    if not pairing:
+        raise HTTPException(status_code=404, detail="Pairing not found")
+    crystals = [c for c in CRYSTAL_DATABASE if c["id"] in pairing.get("crystal_ids", [])]
+    user_doc = await db.users.find_one({"id": pairing["user_id"]}, {"_id": 0, "password": 0})
+    return {
+        "pairing": pairing,
+        "crystals": crystals,
+        "user_name": user_doc.get("name", "Cosmic Seeker") if user_doc else "Cosmic Seeker",
+    }
+
+
 @router.post("/crystals/pairing/narrate")
 async def narrate_pairing(data: dict, user=Depends(get_current_user)):
     """TTS narration of crystal pairing explanation."""

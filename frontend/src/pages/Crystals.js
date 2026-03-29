@@ -7,7 +7,7 @@ import {
   ArrowLeft, Search, X, Loader2, Volume2, VolumeX, Play, Pause,
   Sparkles, ChevronRight, Maximize2, Minimize2, Gem, Heart, Shield,
   Sun, Moon, Droplets, Wind, Eye, Flame, Star, Zap, Compass,
-  Plus, Pickaxe, MapPin, Package, Headphones, RefreshCw, Brain
+  Plus, Pickaxe, MapPin, Package, Headphones, RefreshCw, Brain, Share2, Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -642,13 +642,16 @@ function CrystalPairingPanel({ token, headers }) {
                 <div className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#A855F7' }}>Crystal Guidance</p>
-                    <button onClick={narratePairing} disabled={narrating}
-                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] transition-all"
-                      style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.15)', color: '#A855F7' }}
-                      data-testid="narrate-pairing-btn">
-                      {narrating ? <Loader2 size={10} className="animate-spin" /> : <Headphones size={10} />}
-                      Listen
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <SharePairingButton result={result} />
+                      <button onClick={narratePairing} disabled={narrating}
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] transition-all"
+                        style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.15)', color: '#A855F7' }}
+                        data-testid="narrate-pairing-btn">
+                        {narrating ? <Loader2 size={10} className="animate-spin" /> : <Headphones size={10} />}
+                        Listen
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {result.explanation}
@@ -878,5 +881,39 @@ export default function Crystals() {
         {vrCrystal && <VRCrystalView crystal={vrCrystal} onClose={() => setVrCrystal(null)} />}
       </AnimatePresence>
     </div>
+  );
+}
+
+
+function SharePairingButton({ result }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (!result) return;
+    const crystalNames = (result.crystals || []).map(c => c.name).join(', ');
+    const text = `My Crystal Pairing from The Cosmic Collective:\n${crystalNames}\n\n"${result.explanation?.substring(0, 150)}..."\n\nDiscover your cosmic crystals at ${window.location.origin}/crystals`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'My Crystal Pairing', text });
+        return;
+      } catch {}
+    }
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+
+  return (
+    <button onClick={handleShare}
+      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] transition-all"
+      style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.15)', color: '#2DD4BF' }}
+      data-testid="share-pairing-btn">
+      {copied ? <Check size={10} /> : <Share2 size={10} />}
+      {copied ? 'Copied!' : 'Share'}
+    </button>
   );
 }

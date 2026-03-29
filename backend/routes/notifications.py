@@ -238,3 +238,36 @@ async def send_scheduled_reminders(data: dict = Body(...)):
         sent_total += count
 
     return {"slot": slot, "users_targeted": len(user_ids), "notifications_sent": sent_total}
+
+
+
+# ─── In-App Notifications ───
+
+@router.get("/notifications/inbox")
+async def get_inbox(user=Depends(get_current_user)):
+    """Get in-app notifications for the current user."""
+    notifs = await db.in_app_notifications.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    unread = sum(1 for n in notifs if not n.get("read"))
+    return {"notifications": notifs, "unread_count": unread}
+
+
+@router.post("/notifications/read/{notif_id}")
+async def mark_read(notif_id: str, user=Depends(get_current_user)):
+    """Mark a notification as read."""
+    await db.in_app_notifications.update_one(
+        {"id": notif_id, "user_id": user["id"]},
+        {"$set": {"read": True}}
+    )
+    return {"status": "read"}
+
+
+@router.post("/notifications/read-all")
+async def mark_all_read(user=Depends(get_current_user)):
+    """Mark all notifications as read."""
+    await db.in_app_notifications.update_many(
+        {"user_id": user["id"], "read": False},
+        {"$set": {"read": True}}
+    )
+    return {"status": "all_read"}

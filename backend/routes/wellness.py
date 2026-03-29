@@ -29,6 +29,89 @@ async def get_moods(user=Depends(get_current_user)):
     moods = await db.moods.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
     return moods
 
+
+@router.get("/moods/insights")
+async def get_mood_insights(user=Depends(get_current_user)):
+    """Get mood trends, frequency breakdown, and AI-generated weekly insight."""
+    moods = await db.moods.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(200)
+    if not moods:
+        return {"has_data": False}
+
+    now = datetime.now(timezone.utc)
+
+    # Frequency breakdown
+    freq = {}
+    for m in moods:
+        freq[m["mood"]] = freq.get(m["mood"], 0) + 1
+    top_moods = sorted(freq.items(), key=lambda x: -x[1])[:8]
+
+    # Average intensity
+    avg_intensity = round(sum(m.get("intensity", 5) for m in moods) / len(moods), 1) if moods else 5
+
+    # Weekly breakdown (last 7 days)
+    weekly = []
+    for i in range(6, -1, -1):
+        day = now - timedelta(days=i)
+        day_str = day.strftime("%Y-%m-%d")
+        day_moods = [m for m in moods if m["created_at"][:10] == day_str]
+        avg = round(sum(m.get("intensity", 5) for m in day_moods) / len(day_moods), 1) if day_moods else None
+        weekly.append({
+            "date": day.strftime("%b %d"),
+            "day": day.strftime("%a"),
+            "count": len(day_moods),
+            "avg_intensity": avg,
+            "moods": [m["mood"] for m in day_moods],
+        })
+
+    # Logging streak
+    logging_days = set()
+    for m in moods:
+        logging_days.add(m["created_at"][:10])
+    streak = 0
+    d = now
+    while d.strftime("%Y-%m-%d") in logging_days:
+        streak += 1
+        d -= timedelta(days=1)
+
+    # AI insight (if 3+ moods)
+    ai_insight = None
+    if len(moods) >= 3:
+        recent = moods[:15]
+        mood_summary = ", ".join([f"{m['mood']} ({m.get('intensity', 5)}/10)" for m in recent])
+        notes = [m.get("note", "") for m in recent if m.get("note")]
+        notes_str = " | ".join(notes[:5]) if notes else "No notes provided."
+
+        try:
+            chat = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"mood-insight-{uuid.uuid4().hex[:8]}",
+                system_message=(
+                    "You are a compassionate wellness coach who provides brief, warm emotional insights. "
+                    "Be encouraging but honest. Keep responses under 100 words. Use 'you' language."
+                )
+            )
+            prompt = (
+                f"A person's recent moods (newest first): {mood_summary}\n"
+                f"Their notes: {notes_str}\n\n"
+                f"Give a brief, warm insight about their emotional patterns. "
+                f"Mention any trends you notice. End with one specific, actionable suggestion."
+            )
+            ai_insight = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=20)
+        except Exception as e:
+            logger.error(f"Mood insight AI error: {e}")
+            ai_insight = None
+
+    return {
+        "has_data": True,
+        "total_entries": len(moods),
+        "avg_intensity": avg_intensity,
+        "top_moods": [{"mood": m, "count": c} for m, c in top_moods],
+        "weekly": weekly,
+        "logging_streak": streak,
+        "ai_insight": ai_insight,
+        "latest_mood": moods[0] if moods else None,
+    }
+
 # --- Journal Routes ---
 @router.post("/journal")
 async def create_journal(entry: JournalCreate, user=Depends(get_current_user)):

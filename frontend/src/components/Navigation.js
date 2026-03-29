@@ -20,6 +20,9 @@ import NotificationSettings from './NotificationSettings';
 import { setAmbientEnabled, getAmbientEnabled } from '../hooks/useAmbientSoundscape';
 import { useCreditsContext } from '../context/CreditContext';
 import { useAvatar } from '../context/AvatarContext';
+import axios from 'axios';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /* Soundscape on/off toggle */
 function SoundscapeToggle() {
@@ -324,7 +327,7 @@ function MobileCategory({ category, expanded, onToggle, onNavigate }) {
 
 /* ─── Main Navigation ─── */
 export default function Navigation() {
-  const { user, logout } = useAuth();
+  const { user, logout, authHeaders } = useAuth();
   const { ambientOn, toggleAmbient, playClick, prefs } = useSensory();
   const location = useLocation();
   const navigate = useNavigate();
@@ -334,6 +337,8 @@ export default function Navigation() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [inboxNotifs, setInboxNotifs] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { creditInfo } = useCreditsContext();
   const { avatarB64 } = useAvatar();
   const profileRef = useRef(null);
@@ -365,6 +370,19 @@ export default function Navigation() {
 
   /* Close mobile menu on route change */
   useEffect(() => { setMobileOpen(false); setMobileCat(null); }, [location.pathname]);
+
+  /* Fetch in-app notifications */
+  useEffect(() => {
+    if (!user) return;
+    const fetchInbox = () => {
+      axios.get(`${API}/notifications/inbox`, { headers: authHeaders })
+        .then(r => { setInboxNotifs(r.data.notifications || []); setUnreadCount(r.data.unread_count || 0); })
+        .catch(() => {});
+    };
+    fetchInbox();
+    const iv = setInterval(fetchInbox, 30000);
+    return () => clearInterval(iv);
+  }, [user, authHeaders]);
 
   /* Hide nav on landing, auth, VR */
   if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr') return null;
@@ -481,11 +499,31 @@ export default function Navigation() {
                 title="Notifications"
               >
                 <Bell size={14} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold"
+                    style={{ background: '#EF4444', color: '#fff' }} data-testid="notif-badge">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
               <AnimatePresence>
                 {notifOpen && (
                   <div className="absolute top-full right-0 mt-2 z-[100]">
-                    <NotificationSettings onClose={() => setNotifOpen(false)} />
+                    <NotificationInbox
+                      notifications={inboxNotifs}
+                      onClose={() => setNotifOpen(false)}
+                      onMarkRead={(id) => {
+                        axios.post(`${API}/notifications/read/${id}`, {}, { headers: authHeaders }).catch(() => {});
+                        setInboxNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+                        setUnreadCount(prev => Math.max(0, prev - 1));
+                      }}
+                      onMarkAllRead={() => {
+                        axios.post(`${API}/notifications/read-all`, {}, { headers: authHeaders }).catch(() => {});
+                        setInboxNotifs(prev => prev.map(n => ({ ...n, read: true })));
+                        setUnreadCount(0);
+                      }}
+                      navigate={navigate}
+                    />
                   </div>
                 )}
               </AnimatePresence>
@@ -798,5 +836,64 @@ export default function Navigation() {
       {/* Spacer */}
       <div className="h-14" />
     </>
+  );
+}
+
+
+function NotificationInbox({ notifications, onClose, onMarkRead, onMarkAllRead, navigate }) {
+  const unread = notifications.filter(n => !n.read);
+  return (
+    <motion.div initial={{ opacity: 0, y: -8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.96 }}
+      className="w-80 max-h-[420px] rounded-2xl overflow-hidden flex flex-col"
+      style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(20px)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}
+      data-testid="notification-inbox">
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="flex items-center gap-2">
+          <Bell size={13} style={{ color: '#C084FC' }} />
+          <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Notifications</span>
+          {unread.length > 0 && <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444' }}>{unread.length} new</span>}
+        </div>
+        {unread.length > 0 && (
+          <button onClick={onMarkAllRead} className="text-[9px] px-2 py-1 rounded-lg"
+            style={{ background: 'rgba(192,132,252,0.06)', color: '#C084FC' }} data-testid="mark-all-read">
+            Read all
+          </button>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+        {notifications.length === 0 ? (
+          <div className="px-4 py-10 text-center">
+            <Bell size={20} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 8px' }} />
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>No notifications yet</p>
+          </div>
+        ) : (
+          notifications.slice(0, 20).map(n => (
+            <button key={n.id}
+              onClick={() => { if (!n.read) onMarkRead(n.id); if (n.link) navigate(n.link); onClose(); }}
+              className="w-full px-4 py-3 flex items-start gap-3 text-left transition-all hover:bg-white/[0.02]"
+              style={{ borderBottom: '1px solid rgba(248,250,252,0.02)', background: n.read ? 'transparent' : 'rgba(192,132,252,0.03)' }}
+              data-testid={`notif-item-${n.id}`}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ background: `${n.color || '#C084FC'}12` }}>
+                <HeartHandshake size={12} style={{ color: n.color || '#C084FC' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] font-medium truncate" style={{ color: n.read ? 'var(--text-secondary)' : 'var(--text-primary)' }}>{n.title}</p>
+                  {!n.read && <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#C084FC' }} />}
+                </div>
+                <p className="text-[9px] mt-0.5 line-clamp-2" style={{ color: 'var(--text-muted)' }}>{n.message}</p>
+                <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  {n.created_at ? new Date(n.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                </p>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+      <div className="px-4 py-2" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+        <NotificationSettings onClose={onClose} />
+      </div>
+    </motion.div>
   );
 }

@@ -72,12 +72,20 @@ export default function MoodTracker() {
   const [celebrating, setCelebrating] = useState(false);
   const [search, setSearch] = useState('');
   const [activeGroup, setActiveGroup] = useState('all');
+  const [insights, setInsights] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       axios.get(`${API}/moods`, { headers: authHeaders })
         .then(res => setHistory(res.data))
         .catch(() => {});
+      // Load insights
+      setInsightsLoading(true);
+      axios.get(`${API}/moods/insights`, { headers: authHeaders })
+        .then(res => setInsights(res.data))
+        .catch(() => {})
+        .finally(() => setInsightsLoading(false));
     }
   }, [user, authHeaders]);
 
@@ -258,8 +266,93 @@ export default function MoodTracker() {
             </AnimatePresence>
           </div>
 
-          {/* Right — History + Chart */}
+          {/* Right — Insights + History + Chart */}
           <div>
+            {/* AI Insights Panel */}
+            {insights?.has_data && (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6 space-y-3" data-testid="mood-insights">
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="glass-card p-3 text-center">
+                    <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FCD34D' }}>{insights.logging_streak}</p>
+                    <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
+                  </div>
+                  <div className="glass-card p-3 text-center">
+                    <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FDA4AF' }}>{insights.total_entries}</p>
+                    <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Logged</p>
+                  </div>
+                  <div className="glass-card p-3 text-center">
+                    <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#2DD4BF' }}>{insights.avg_intensity}</p>
+                    <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg Feel</p>
+                  </div>
+                </div>
+
+                {/* Top Moods */}
+                {insights.top_moods?.length > 0 && (
+                  <div className="glass-card p-4">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>Most Frequent Emotions</p>
+                    <div className="space-y-1.5">
+                      {insights.top_moods.slice(0, 5).map((tm, i) => {
+                        const moodObj = MOODS.find(m => m.name === tm.mood);
+                        const MIcon = moodObj?.icon || Meh;
+                        const maxCount = insights.top_moods[0]?.count || 1;
+                        return (
+                          <div key={tm.mood} className="flex items-center gap-2">
+                            <MIcon size={12} style={{ color: moodObj?.color || '#94A3B8' }} />
+                            <span className="text-[10px] w-20 truncate" style={{ color: 'var(--text-primary)' }}>{tm.mood}</span>
+                            <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                              <motion.div initial={{ width: 0 }} animate={{ width: `${(tm.count / maxCount) * 100}%` }}
+                                transition={{ duration: 0.5, delay: i * 0.05 }}
+                                className="h-full rounded-full" style={{ background: moodObj?.color || '#94A3B8' }} />
+                            </div>
+                            <span className="text-[9px] tabular-nums w-4 text-right" style={{ color: moodObj?.color || 'var(--text-muted)' }}>{tm.count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Weekly Activity */}
+                {insights.weekly?.some(d => d.count > 0) && (
+                  <div className="glass-card p-4">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>This Week</p>
+                    <div className="flex items-end gap-1.5 h-16">
+                      {insights.weekly.map((d, i) => (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-full rounded-t-md transition-all" style={{
+                            height: d.count > 0 ? `${Math.max(d.count * 20, 8)}px` : '3px',
+                            background: d.count > 0
+                              ? `linear-gradient(to top, ${d.avg_intensity > 6 ? 'rgba(34,197,94,0.4)' : d.avg_intensity > 3 ? 'rgba(192,132,252,0.3)' : 'rgba(251,146,60,0.3)'}, transparent)`
+                              : 'rgba(248,250,252,0.04)',
+                            minHeight: '3px',
+                          }} />
+                          <span className="text-[7px]" style={{ color: d.count > 0 ? 'var(--text-secondary)' : 'var(--text-muted)' }}>{d.day}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* AI Insight */}
+                {insights.ai_insight && (
+                  <div className="glass-card p-4" style={{ border: '1px solid rgba(192,132,252,0.1)' }} data-testid="mood-ai-insight">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles size={12} style={{ color: '#C084FC' }} />
+                      <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: '#C084FC' }}>AI Insight</p>
+                    </div>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{insights.ai_insight}</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {insightsLoading && !insights && (
+              <div className="glass-card p-6 mb-6 text-center">
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Analyzing your emotional patterns...</p>
+              </div>
+            )}
+
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Your Journey</p>
 
             {chartData.length > 0 ? (
