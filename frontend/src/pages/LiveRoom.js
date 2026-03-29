@@ -8,33 +8,46 @@ import {
   ArrowLeft, Send, Users, Radio, Crown, Timer, Heart, Sparkles,
   MessageCircle, X, Play, Square, Volume2, VolumeX, Smile,
   Hand, Star, Flame, Moon, Sun, Zap, Wind, ChevronUp, ChevronDown,
-  Mic, MicOff, Video, VideoOff
+  Mic, MicOff, Video, VideoOff, Settings, Monitor, UserCheck
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const WS_URL = `${process.env.REACT_APP_BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/api/live/ws`;
 
-const REACTIONS = [
-  { emoji: '🙏', label: 'Namaste' },
-  { emoji: '✨', label: 'Sparkle' },
-  { emoji: '💜', label: 'Love' },
-  { emoji: '🔥', label: 'Fire' },
-  { emoji: '🌊', label: 'Wave' },
-  { emoji: '🕯️', label: 'Candle' },
-  { emoji: '🌙', label: 'Moon' },
-  { emoji: '☀️', label: 'Sun' },
-];
+const RTC_CONFIG = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+  ],
+};
 
 const HOST_COMMANDS = [
   { id: 'begin', label: 'Begin Practice', icon: Play, color: '#22C55E' },
-  { id: 'breathe-in', label: 'Breathe In', icon: Wind, color: '#2DD4BF' },
-  { id: 'breathe-out', label: 'Breathe Out', icon: Wind, color: '#3B82F6' },
-  { id: 'hold', label: 'Hold', icon: Hand, color: '#FCD34D' },
-  { id: 'focus', label: 'Focus', icon: Star, color: '#C084FC' },
-  { id: 'release', label: 'Release & Let Go', icon: Sparkles, color: '#FDA4AF' },
-  { id: 'om', label: 'Om', icon: Moon, color: '#8B5CF6' },
-  { id: 'end', label: 'End Practice', icon: Square, color: '#EF4444' },
+  { id: 'breathe_in', label: 'Breathe In', icon: Sparkles, color: '#C084FC' },
+  { id: 'breathe_out', label: 'Breathe Out', icon: Wind, color: '#2DD4BF' },
+  { id: 'hold', label: 'Hold', icon: Timer, color: '#F59E0B' },
+  { id: 'focus', label: 'Focus', icon: Star, color: '#3B82F6' },
+  { id: 'release', label: 'Release & Let Go', icon: Moon, color: '#8B5CF6' },
+  { id: 'om', label: 'Om', icon: Sun, color: '#F97316' },
+  { id: 'end_practice', label: 'End Practice', icon: Square, color: '#EF4444' },
 ];
+
+const REACTIONS = [
+  { emoji: '\u{1F64F}', label: 'Namaste' },
+  { emoji: '\u2728', label: 'Sparkles' },
+  { emoji: '\u{1F49C}', label: 'Love' },
+  { emoji: '\u{1F525}', label: 'Fire' },
+  { emoji: '\u{1F44B}', label: 'Wave' },
+  { emoji: '\u{1F31F}', label: 'Star' },
+  { emoji: '\u{1F31C}', label: 'Moon' },
+  { emoji: '\u{1F9D8}', label: 'Meditate' },
+];
+
+const VIDEO_MODES = {
+  everyone: { label: 'Everyone', icon: Users, desc: 'All participants can share video' },
+  host_only: { label: 'Host Only', icon: Crown, desc: 'Only host can share video' },
+  off: { label: 'Video Off', icon: VideoOff, desc: 'No video in this session' },
+};
 
 export default function LiveRoom() {
   const { sessionId } = useParams();
@@ -54,28 +67,39 @@ export default function LiveRoom() {
   const [elapsed, setElapsed] = useState(0);
   const [showParticipants, setShowParticipants] = useState(true);
 
+  // Audio recording
   const wsRef = useRef(null);
   const chatEndRef = useRef(null);
   const reconnectRef = useRef(null);
   const timerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-  const videoRef = useRef(null);
-  const videoStreamRef = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingStatus, setRecordingStatus] = useState('');
+
+  // Video / WebRTC
+  const localVideoRef = useRef(null);
+  const localStreamRef = useRef(null);
+  const peerConnectionsRef = useRef({}); // { peerId: RTCPeerConnection }
   const [isVideoOn, setIsVideoOn] = useState(false);
+  const [isMicOn, setIsMicOn] = useState(false);
+  const [videoMode, setVideoMode] = useState('everyone');
+  const [remoteStreams, setRemoteStreams] = useState({}); // { peerId: MediaStream }
+  const [cameraStates, setCameraStates] = useState({}); // { peerId: boolean }
+  const [showVideoSettings, setShowVideoSettings] = useState(false);
 
   const isHost = session?.host_id === user?.id;
 
-  // Load session details + add self
+  // Whether current user can share video
+  const canShareVideo = videoMode === 'everyone' || (videoMode === 'host_only' && isHost);
+
+  // Load session
   useEffect(() => {
     if (!user) { navigate('/auth'); return; }
     axios.get(`${API}/live/sessions/${sessionId}`, { headers: authHeaders })
       .then(r => {
         setSession(r.data);
-        // Ensure current user appears in participants
-        const existing = (r.data.participants || []);
+        const existing = r.data.participants || [];
         if (!existing.find(p => p.user_id === user.id)) {
           setParticipants([...existing, { user_id: user.id, name: user.name || 'You', avatar: '' }]);
         } else {
@@ -85,18 +109,15 @@ export default function LiveRoom() {
       .catch(() => navigate('/live'));
   }, [sessionId, user, authHeaders, navigate]);
 
-  // WebSocket connection
+  // WebSocket
   const connectWS = useCallback(() => {
     if (!user || !sessionId) return;
     const token = localStorage.getItem('token');
     if (!token) return;
-
     const ws = new WebSocket(`${WS_URL}/${sessionId}`);
     wsRef.current = ws;
 
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'auth', token }));
-    };
+    ws.onopen = () => { ws.send(JSON.stringify({ type: 'auth', token })); };
 
     ws.onmessage = (e) => {
       try {
@@ -106,16 +127,26 @@ export default function LiveRoom() {
             setConnected(true);
             setParticipants(msg.participants || []);
             setMessages(msg.chat_history || []);
+            if (msg.video_mode) setVideoMode(msg.video_mode);
+            // Init camera states from participants
+            const camStates = {};
+            (msg.participants || []).forEach(p => { camStates[p.user_id] = p.camera_on || false; });
+            setCameraStates(camStates);
             break;
           case 'user_joined':
             setParticipants(prev => {
               if (prev.find(p => p.user_id === msg.user_id)) return prev;
               return [...prev, { user_id: msg.user_id, name: msg.name, avatar: msg.avatar }];
             });
+            setCameraStates(prev => ({ ...prev, [msg.user_id]: false }));
             setMessages(prev => [...prev, { type: 'system', text: `${msg.name} joined the circle`, timestamp: new Date().toISOString() }]);
             break;
           case 'user_left':
             setParticipants(prev => prev.filter(p => p.user_id !== msg.user_id));
+            setCameraStates(prev => { const n = { ...prev }; delete n[msg.user_id]; return n; });
+            // Close peer connection for that user
+            closePeerConnection(msg.user_id);
+            setRemoteStreams(prev => { const n = { ...prev }; delete n[msg.user_id]; return n; });
             setMessages(prev => [...prev, { type: 'system', text: `${msg.name} left`, timestamp: new Date().toISOString() }]);
             break;
           case 'chat':
@@ -134,7 +165,38 @@ export default function LiveRoom() {
             break;
           case 'session_ended':
             setMessages(prev => [...prev, { type: 'system', text: msg.message, timestamp: new Date().toISOString() }]);
+            cleanupAllPeers();
             setTimeout(() => navigate('/live'), 3000);
+            break;
+          // WebRTC signaling
+          case 'camera_toggle':
+            setCameraStates(prev => ({ ...prev, [msg.user_id]: msg.camera_on }));
+            if (msg.camera_on && msg.user_id !== user.id && isVideoOn) {
+              // Remote user turned on camera — create offer to them
+              createPeerOffer(msg.user_id);
+            }
+            if (!msg.camera_on && msg.user_id !== user.id) {
+              closePeerConnection(msg.user_id);
+              setRemoteStreams(prev => { const n = { ...prev }; delete n[msg.user_id]; return n; });
+            }
+            break;
+          case 'video_mode':
+            setVideoMode(msg.mode);
+            if (msg.mode === 'off') {
+              // Force turn off all cameras
+              if (isVideoOn) toggleLocalVideo(false);
+              cleanupAllPeers();
+              setRemoteStreams({});
+            }
+            break;
+          case 'rtc_offer':
+            handleRTCOffer(msg.from, msg.offer);
+            break;
+          case 'rtc_answer':
+            handleRTCAnswer(msg.from, msg.answer);
+            break;
+          case 'ice_candidate':
+            handleICECandidate(msg.from, msg.candidate);
             break;
           default:
             break;
@@ -144,104 +206,263 @@ export default function LiveRoom() {
 
     ws.onclose = () => {
       setConnected(false);
-      // Only reconnect if still on this page
-      if (document.location.pathname.includes(sessionId)) {
-        reconnectRef.current = setTimeout(connectWS, 5000);
-      }
+      reconnectRef.current = setTimeout(connectWS, 3000);
     };
-
-    ws.onerror = () => {
-      // WS may not be supported in preview env — fallback to REST polling
-      setConnected(false);
-      // Add self as participant from REST data
-      if (session) {
-        setParticipants(prev => {
-          if (prev.find(p => p.user_id === user?.id)) return prev;
-          return [...prev, { user_id: user?.id, name: user?.name || 'You', avatar: '' }];
-        });
-      }
-    };
-  }, [user, sessionId, navigate]);
+    ws.onerror = () => ws.close();
+  }, [user, sessionId]);
 
   useEffect(() => {
     connectWS();
     return () => {
       if (wsRef.current) wsRef.current.close();
       if (reconnectRef.current) clearTimeout(reconnectRef.current);
-      if (timerRef.current) clearInterval(timerRef.current);
+      cleanupAllPeers();
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(t => t.stop());
+      }
     };
   }, [connectWS]);
 
   // Timer
   useEffect(() => {
     if (session?.status === 'active') {
-      timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
-      return () => clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => setElapsed(p => p + 1), 1000);
     }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [session?.status]);
 
   // Auto-scroll chat
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+
+  // ─── WebRTC Functions ───
+
+  const createPeerConnection = useCallback((peerId) => {
+    if (peerConnectionsRef.current[peerId]) return peerConnectionsRef.current[peerId];
+
+    const pc = new RTCPeerConnection(RTC_CONFIG);
+
+    // Add local tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => {
+        pc.addTrack(track, localStreamRef.current);
+      });
+    }
+
+    // Handle remote tracks
+    pc.ontrack = (event) => {
+      const stream = event.streams[0];
+      if (stream) {
+        setRemoteStreams(prev => ({ ...prev, [peerId]: stream }));
+      }
+    };
+
+    // Handle ICE candidates
+    pc.onicecandidate = (event) => {
+      if (event.candidate && wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'ice_candidate',
+          target: peerId,
+          candidate: event.candidate.toJSON(),
+        }));
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+        closePeerConnection(peerId);
+        setRemoteStreams(prev => { const n = { ...prev }; delete n[peerId]; return n; });
+      }
+    };
+
+    peerConnectionsRef.current[peerId] = pc;
+    return pc;
+  }, []);
+
+  const createPeerOffer = useCallback(async (peerId) => {
+    try {
+      const pc = createPeerConnection(peerId);
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'rtc_offer',
+          target: peerId,
+          offer: pc.localDescription.toJSON(),
+        }));
+      }
+    } catch (err) {
+      console.error('Create offer error:', err);
+    }
+  }, [createPeerConnection]);
+
+  const handleRTCOffer = useCallback(async (fromId, offer) => {
+    try {
+      // Only handle if we have local video on
+      if (!localStreamRef.current) return;
+      const pc = createPeerConnection(fromId);
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'rtc_answer',
+          target: fromId,
+          answer: pc.localDescription.toJSON(),
+        }));
+      }
+    } catch (err) {
+      console.error('Handle offer error:', err);
+    }
+  }, [createPeerConnection]);
+
+  const handleRTCAnswer = useCallback(async (fromId, answer) => {
+    try {
+      const pc = peerConnectionsRef.current[fromId];
+      if (pc) {
+        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+      }
+    } catch (err) {
+      console.error('Handle answer error:', err);
+    }
+  }, []);
+
+  const handleICECandidate = useCallback(async (fromId, candidate) => {
+    try {
+      const pc = peerConnectionsRef.current[fromId];
+      if (pc && candidate) {
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    } catch (err) {
+      console.error('ICE candidate error:', err);
+    }
+  }, []);
+
+  const closePeerConnection = useCallback((peerId) => {
+    const pc = peerConnectionsRef.current[peerId];
+    if (pc) {
+      pc.close();
+      delete peerConnectionsRef.current[peerId];
+    }
+  }, []);
+
+  const cleanupAllPeers = useCallback(() => {
+    Object.keys(peerConnectionsRef.current).forEach(closePeerConnection);
+    peerConnectionsRef.current = {};
+    setRemoteStreams({});
+  }, [closePeerConnection]);
+
+  // ─── Camera / Mic Toggle ───
+
+  const toggleLocalVideo = useCallback(async (forceOff) => {
+    const shouldTurnOff = forceOff === true || isVideoOn;
+
+    if (shouldTurnOff) {
+      // Turn off
+      if (localStreamRef.current) {
+        localStreamRef.current.getVideoTracks().forEach(t => t.stop());
+        localStreamRef.current.getAudioTracks().forEach(t => t.stop());
+        localStreamRef.current = null;
+      }
+      if (localVideoRef.current) localVideoRef.current.srcObject = null;
+      cleanupAllPeers();
+      setIsVideoOn(false);
+      setIsMicOn(false);
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'camera_toggle', camera_on: false }));
+      }
+    } else {
+      // Turn on
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+          audio: true,
+        });
+        localStreamRef.current = stream;
+        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+        setIsVideoOn(true);
+        setIsMicOn(true);
+
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({ type: 'camera_toggle', camera_on: true }));
+        }
+
+        // Connect to all existing peers who have camera on
+        Object.entries(cameraStates).forEach(([peerId, camOn]) => {
+          if (camOn && peerId !== user.id) {
+            createPeerOffer(peerId);
+          }
+        });
+      } catch (err) {
+        console.error('Camera access error:', err);
+      }
+    }
+  }, [isVideoOn, cleanupAllPeers, cameraStates, user, createPeerOffer]);
+
+  const toggleMic = useCallback(() => {
+    if (localStreamRef.current) {
+      const audioTracks = localStreamRef.current.getAudioTracks();
+      audioTracks.forEach(t => { t.enabled = !t.enabled; });
+      setIsMicOn(prev => !prev);
+    }
+  }, []);
+
+  const changeVideoMode = useCallback((mode) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'video_mode', mode }));
+    }
+    setShowVideoSettings(false);
+  }, []);
+
+  // ─── Existing Functions ───
 
   const sendChat = () => {
-    if (!chatInput.trim() || !wsRef.current) return;
-    wsRef.current.send(JSON.stringify({ type: 'chat', text: chatInput }));
+    if (!chatInput.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+    wsRef.current.send(JSON.stringify({ type: 'chat', text: chatInput.trim() }));
     setChatInput('');
   };
 
   const sendReaction = (emoji) => {
-    if (!wsRef.current) return;
-    wsRef.current.send(JSON.stringify({ type: 'reaction', emoji }));
-    addFloatingReaction(emoji, 'You');
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'reaction', emoji }));
+    }
   };
 
   const sendHostCommand = (cmd) => {
-    if (!wsRef.current || !isHost) return;
-    wsRef.current.send(JSON.stringify({ type: 'host_command', command: cmd.id, data: { label: cmd.label } }));
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'host_command', command: cmd.id, data: { label: cmd.label, color: cmd.color } }));
+    }
   };
 
   const startSession = async () => {
-    try {
-      await axios.post(`${API}/live/sessions/${sessionId}/start`, {}, { headers: authHeaders });
-    } catch {}
+    try { await axios.post(`${API}/live/sessions/${sessionId}/start`, {}, { headers: authHeaders }); } catch {}
   };
 
   const endSession = async () => {
     try {
-      // Stop recording first if active
-      if (mediaRecorderRef.current && isRecording) {
-        await stopRecording(true);
-      }
-      // Stop video if active
-      if (videoStreamRef.current) {
-        videoStreamRef.current.getTracks().forEach(t => t.stop());
-        videoStreamRef.current = null;
+      if (mediaRecorderRef.current && isRecording) await stopRecording(true);
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(t => t.stop());
+        localStreamRef.current = null;
         setIsVideoOn(false);
       }
+      cleanupAllPeers();
       await axios.post(`${API}/live/sessions/${sessionId}/end`, {}, { headers: authHeaders });
     } catch {}
   };
 
+  // Audio recording
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       audioChunksRef.current = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
-      };
-      recorder.onstop = () => {
-        stream.getTracks().forEach(t => t.stop());
-      };
-      recorder.start(1000); // collect data every second
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); };
+      recorder.start(1000);
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
       setRecordingStatus('recording');
-    } catch (err) {
-      console.error('Could not start recording:', err);
-    }
+    } catch (err) { console.error('Recording error:', err); }
   };
 
   const stopRecording = async (autoUpload = false) => {
@@ -250,9 +471,7 @@ export default function LiveRoom() {
       mediaRecorderRef.current.onstop = async () => {
         mediaRecorderRef.current.stream?.getTracks().forEach(t => t.stop());
         setIsRecording(false);
-        if (autoUpload && audioChunksRef.current.length > 0) {
-          await uploadAudio();
-        }
+        if (autoUpload && audioChunksRef.current.length > 0) await uploadAudio();
         setRecordingStatus(autoUpload ? 'done' : '');
         resolve();
       };
@@ -271,42 +490,8 @@ export default function LiveRoom() {
         headers: { ...authHeaders, 'Content-Type': 'multipart/form-data' },
       });
       setRecordingStatus('done');
-    } catch (err) {
-      console.error('Upload error:', err);
-      setRecordingStatus('');
-    }
+    } catch { setRecordingStatus(''); }
   };
-
-  const toggleVideo = async () => {
-    if (isVideoOn) {
-      // Turn off
-      if (videoStreamRef.current) {
-        videoStreamRef.current.getTracks().forEach(t => t.stop());
-        videoStreamRef.current = null;
-      }
-      if (videoRef.current) videoRef.current.srcObject = null;
-      setIsVideoOn(false);
-    } else {
-      // Turn on
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' } });
-        videoStreamRef.current = stream;
-        if (videoRef.current) videoRef.current.srcObject = stream;
-        setIsVideoOn(true);
-      } catch (err) {
-        console.error('Could not access camera:', err);
-      }
-    }
-  };
-
-  // Cleanup video on unmount
-  useEffect(() => {
-    return () => {
-      if (videoStreamRef.current) {
-        videoStreamRef.current.getTracks().forEach(t => t.stop());
-      }
-    };
-  }, []);
 
   const addFloatingReaction = (emoji, name) => {
     const id = Date.now() + Math.random();
@@ -316,10 +501,16 @@ export default function LiveRoom() {
 
   const formatTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
+  // ─── Count active videos ───
+  const activeVideoCount = Object.values(cameraStates).filter(Boolean).length;
+  const hasAnyVideo = activeVideoCount > 0 || isVideoOn;
+
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p style={{ color: 'var(--text-muted)' }}>Entering the circle...</p>
+      <div className="h-screen flex items-center justify-center" style={{ background: '#0A0B14' }}>
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
+          <Sparkles size={24} style={{ color: '#C084FC' }} />
+        </motion.div>
       </div>
     );
   }
@@ -361,38 +552,6 @@ export default function LiveRoom() {
         )}
       </AnimatePresence>
 
-      {/* Video Preview (PiP) */}
-      <AnimatePresence>
-        {isVideoOn && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute z-50"
-            style={{ bottom: 90, right: 16 }}
-            data-testid="video-preview-container">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl"
-              style={{ width: 200, height: 150, border: '2px solid rgba(59,130,246,0.3)', boxShadow: '0 0 30px rgba(59,130,246,0.15)' }}>
-              <video ref={videoRef} autoPlay playsInline muted
-                className="w-full h-full object-cover"
-                style={{ transform: 'scaleX(-1)' }}
-                data-testid="video-preview" />
-              <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#3B82F6' }} />
-                <span className="text-[8px] font-medium" style={{ color: '#93C5FD' }}>LIVE</span>
-              </div>
-              <button onClick={toggleVideo}
-                className="absolute top-2 right-2 p-1 rounded-full transition-all hover:scale-110"
-                style={{ background: 'rgba(0,0,0,0.5)' }}
-                data-testid="video-preview-close">
-                <X size={10} style={{ color: '#F8FAFC' }} />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Top Bar */}
       <div className="relative z-20 px-4 py-3 flex items-center justify-between" style={{ background: 'rgba(10,11,20,0.6)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-3">
@@ -401,108 +560,200 @@ export default function LiveRoom() {
           </button>
           <div>
             <div className="flex items-center gap-2">
-              {session.status === 'active' && <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
+              {session.status === 'active' && <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />}
               <h1 className="text-sm font-medium" style={{ color: '#F8FAFC' }}>{session.title}</h1>
             </div>
-            <div className="flex items-center gap-2 text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
-              <span className="flex items-center gap-1"><Crown size={8} /> {session.host_name}</span>
-              <span>•</span>
-              <span className="flex items-center gap-1"><Users size={8} /> {participants.length}</span>
-              {session.status === 'active' && <><span>•</span><span className="flex items-center gap-1"><Timer size={8} /> {formatTime(elapsed)}</span></>}
-            </div>
+            <p className="text-[9px] flex items-center gap-2" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <Crown size={8} style={{ color: '#EAB308' }} /> {session.host_name}
+              <span style={{ color: 'rgba(248,250,252,0.15)' }}>|</span>
+              <Users size={8} /> {participants.length}
+              {session.status === 'active' && <>
+                <span style={{ color: 'rgba(248,250,252,0.15)' }}>|</span>
+                <Timer size={8} /> {formatTime(elapsed)}
+              </>}
+            </p>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
-          {connected && <div className="w-2 h-2 rounded-full" style={{ background: '#22C55E', boxShadow: '0 0 6px #22C55E' }} />}
-          <button onClick={() => setShowParticipants(!showParticipants)}
-            className="p-1.5 rounded-lg hover:bg-white/5" data-testid="toggle-participants">
+          {/* Video mode indicator */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(248,250,252,0.04)' }}>
+            {videoMode === 'everyone' && <Users size={10} style={{ color: '#22C55E' }} />}
+            {videoMode === 'host_only' && <Crown size={10} style={{ color: '#EAB308' }} />}
+            {videoMode === 'off' && <VideoOff size={10} style={{ color: '#EF4444' }} />}
+            <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{VIDEO_MODES[videoMode]?.label}</span>
+          </div>
+
+          {isHost && session.status === 'active' && (
+            <div className="relative">
+              <button onClick={() => setShowVideoSettings(!showVideoSettings)}
+                className="p-1.5 rounded-lg hover:bg-white/5 transition-all"
+                data-testid="video-settings-btn">
+                <Settings size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
+              </button>
+              <AnimatePresence>
+                {showVideoSettings && (
+                  <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                    className="absolute right-0 top-10 z-50 w-56 rounded-xl overflow-hidden"
+                    style={{ background: 'rgba(20,22,40,0.95)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'blur(16px)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
+                    data-testid="video-settings-dropdown">
+                    <div className="p-2">
+                      <p className="text-[9px] font-bold uppercase tracking-wider px-2 pb-2" style={{ color: 'var(--text-muted)' }}>Video Mode</p>
+                      {Object.entries(VIDEO_MODES).map(([key, mode]) => {
+                        const MIcon = mode.icon;
+                        return (
+                          <button key={key} onClick={() => changeVideoMode(key)}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all hover:bg-white/5"
+                            style={{
+                              background: videoMode === key ? 'rgba(192,132,252,0.08)' : 'transparent',
+                              border: videoMode === key ? '1px solid rgba(192,132,252,0.15)' : '1px solid transparent',
+                            }}
+                            data-testid={`video-mode-${key}`}>
+                            <MIcon size={12} style={{ color: videoMode === key ? '#C084FC' : 'var(--text-muted)' }} />
+                            <div>
+                              <p className="text-[10px] font-medium" style={{ color: videoMode === key ? '#C084FC' : 'var(--text-secondary)' }}>{mode.label}</p>
+                              <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{mode.desc}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          <button onClick={() => setShowParticipants(!showParticipants)} className="p-1.5 rounded-lg hover:bg-white/5">
             <Users size={14} style={{ color: showParticipants ? '#C084FC' : 'rgba(248,250,252,0.5)' }} />
           </button>
-          <button onClick={() => setShowChat(!showChat)}
-            className="p-1.5 rounded-lg hover:bg-white/5" data-testid="toggle-chat">
+          <button onClick={() => setShowChat(!showChat)} className="p-1.5 rounded-lg hover:bg-white/5">
             <MessageCircle size={14} style={{ color: showChat ? '#C084FC' : 'rgba(248,250,252,0.5)' }} />
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 relative z-10 flex overflow-hidden">
-        {/* Center — Avatar Circle */}
-        <div className="flex-1 flex items-center justify-center relative">
-          <AvatarCircle participants={participants} currentUserId={user?.id} myAvatar={avatarB64} />
+      <div className="flex-1 flex overflow-hidden relative z-10">
 
-          {/* Host Controls */}
-          {isHost && (
-            <div className="absolute bottom-4 left-4 right-4 z-20" data-testid="host-controls">
-              {session.status === 'scheduled' && (
-                <button onClick={startSession}
-                  className="w-full py-3 rounded-xl text-sm font-medium mb-2 transition-all hover:scale-[1.01]"
-                  style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#22C55E' }}
-                  data-testid="start-session-btn">
-                  <Play size={14} className="inline mr-2" /> Start Session
+        {/* Center Area */}
+        <div className="flex-1 flex flex-col relative">
+
+          {/* Video Grid (when any video is active) */}
+          {hasAnyVideo && videoMode !== 'off' && (
+            <div className="flex-1 p-3 overflow-hidden" data-testid="video-grid">
+              <VideoGrid
+                localStream={localStreamRef.current}
+                localVideoRef={localVideoRef}
+                remoteStreams={remoteStreams}
+                cameraStates={cameraStates}
+                participants={participants}
+                currentUserId={user?.id}
+                isVideoOn={isVideoOn}
+                myAvatar={avatarB64}
+                hostId={session?.host_id}
+              />
+            </div>
+          )}
+
+          {/* Avatar Circle (when no video) */}
+          {(!hasAnyVideo || videoMode === 'off') && (
+            <div className="flex-1 flex items-center justify-center">
+              <AvatarCircle participants={participants} currentUserId={user?.id} myAvatar={avatarB64} />
+            </div>
+          )}
+
+          {/* Bottom Controls Bar */}
+          <div className="relative z-20 px-4 py-3 flex items-center justify-center gap-2" style={{ background: 'rgba(10,11,20,0.7)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(248,250,252,0.04)' }}
+            data-testid="bottom-controls">
+
+            {/* Camera Toggle (all users when allowed) */}
+            {canShareVideo && session.status === 'active' && (
+              <button onClick={() => toggleLocalVideo()}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all hover:scale-105"
+                style={{
+                  background: isVideoOn ? 'rgba(59,130,246,0.15)' : 'rgba(148,163,184,0.08)',
+                  border: `1px solid ${isVideoOn ? 'rgba(59,130,246,0.3)' : 'rgba(148,163,184,0.1)'}`,
+                  color: isVideoOn ? '#3B82F6' : '#94A3B8',
+                }}
+                data-testid="toggle-video">
+                {isVideoOn ? <><VideoOff size={12} /> Cam Off</> : <><Video size={12} /> Cam On</>}
+              </button>
+            )}
+
+            {/* Mic Toggle (when camera is on) */}
+            {isVideoOn && (
+              <button onClick={toggleMic}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all hover:scale-105"
+                style={{
+                  background: isMicOn ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+                  border: `1px solid ${isMicOn ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                  color: isMicOn ? '#22C55E' : '#EF4444',
+                }}
+                data-testid="toggle-mic">
+                {isMicOn ? <><Mic size={12} /> Mic On</> : <><MicOff size={12} /> Muted</>}
+              </button>
+            )}
+
+            {/* Host Commands */}
+            {isHost && session.status === 'active' && (
+              <>
+                {HOST_COMMANDS.map(cmd => {
+                  const CIcon = cmd.icon;
+                  return (
+                    <button key={cmd.id} onClick={() => sendHostCommand(cmd)}
+                      className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[9px] font-medium transition-all hover:scale-105"
+                      style={{ background: `${cmd.color}10`, border: `1px solid ${cmd.color}18`, color: cmd.color }}
+                      data-testid={`host-cmd-${cmd.id}`}>
+                      <CIcon size={10} /> {cmd.label}
+                    </button>
+                  );
+                })}
+
+                {/* Record */}
+                <button onClick={() => isRecording ? stopRecording() : startRecording()}
+                  className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[9px] font-medium transition-all hover:scale-105"
+                  style={{
+                    background: isRecording ? 'rgba(239,68,68,0.15)' : 'rgba(234,179,8,0.12)',
+                    border: `1px solid ${isRecording ? 'rgba(239,68,68,0.3)' : 'rgba(234,179,8,0.2)'}`,
+                    color: isRecording ? '#EF4444' : '#EAB308',
+                  }}
+                  data-testid="toggle-recording">
+                  {isRecording ? <><MicOff size={10} /> Stop Rec</> : <><Mic size={10} /> Record</>}
                 </button>
-              )}
-              {session.status === 'active' && (
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-1.5">
-                    {HOST_COMMANDS.map(cmd => {
-                      const CIcon = cmd.icon;
-                      return (
-                        <button key={cmd.id} onClick={() => sendHostCommand(cmd)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
-                          style={{ background: `${cmd.color}12`, border: `1px solid ${cmd.color}20`, color: cmd.color }}
-                          data-testid={`host-cmd-${cmd.id}`}>
-                          <CIcon size={10} /> {cmd.label}
-                        </button>
-                      );
-                    })}
-                    {/* Audio Recording Toggle */}
-                    <button onClick={() => isRecording ? stopRecording() : startRecording()}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
-                      style={{
-                        background: isRecording ? 'rgba(239,68,68,0.15)' : 'rgba(234,179,8,0.12)',
-                        border: `1px solid ${isRecording ? 'rgba(239,68,68,0.3)' : 'rgba(234,179,8,0.2)'}`,
-                        color: isRecording ? '#EF4444' : '#EAB308',
-                      }}
-                      data-testid="toggle-recording">
-                      {isRecording ? <><MicOff size={10} /> Stop Rec</> : <><Mic size={10} /> Record</>}
-                    </button>
-                    {/* Video Toggle */}
-                    <button onClick={toggleVideo}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
-                      style={{
-                        background: isVideoOn ? 'rgba(59,130,246,0.15)' : 'rgba(148,163,184,0.12)',
-                        border: `1px solid ${isVideoOn ? 'rgba(59,130,246,0.3)' : 'rgba(148,163,184,0.15)'}`,
-                        color: isVideoOn ? '#3B82F6' : '#94A3B8',
-                      }}
-                      data-testid="toggle-video">
-                      {isVideoOn ? <><VideoOff size={10} /> Cam Off</> : <><Video size={10} /> Cam On</>}
-                    </button>
-                  </div>
-                  {recordingStatus === 'recording' && (
-                    <div className="flex items-center gap-2 px-2 py-1">
-                      <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />
-                      <span className="text-[9px]" style={{ color: '#EF4444' }}>Recording audio...</span>
-                    </div>
-                  )}
-                  {recordingStatus === 'uploading' && (
-                    <div className="flex items-center gap-2 px-2 py-1">
-                      <span className="text-[9px]" style={{ color: '#EAB308' }}>Uploading recording...</span>
-                    </div>
-                  )}
-                  {recordingStatus === 'done' && (
-                    <div className="flex items-center gap-2 px-2 py-1">
-                      <span className="text-[9px]" style={{ color: '#22C55E' }}>Audio saved</span>
-                    </div>
-                  )}
-                  <button onClick={endSession}
-                    className="w-full py-2 rounded-xl text-[10px] font-medium"
-                    style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
-                    data-testid="end-session-btn">
-                    End Session
-                  </button>
-                </div>
-              )}
+              </>
+            )}
+
+            {/* Start / End Session (Host) */}
+            {isHost && session.status === 'scheduled' && (
+              <button onClick={startSession}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#22C55E' }}
+                data-testid="start-session-btn">
+                <Play size={14} /> Start Session
+              </button>
+            )}
+
+            {isHost && session.status === 'active' && (
+              <button onClick={endSession}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all hover:scale-105"
+                style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
+                data-testid="end-session-btn">
+                <Square size={10} /> End
+              </button>
+            )}
+          </div>
+
+          {/* Recording Status */}
+          {recordingStatus && (
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+              {recordingStatus === 'recording' && <>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />
+                <span className="text-[9px]" style={{ color: '#EF4444' }}>Recording...</span>
+              </>}
+              {recordingStatus === 'uploading' && <span className="text-[9px]" style={{ color: '#EAB308' }}>Uploading...</span>}
+              {recordingStatus === 'done' && <span className="text-[9px]" style={{ color: '#22C55E' }}>Saved</span>}
             </div>
           )}
         </div>
@@ -534,6 +785,9 @@ export default function LiveRoom() {
                           {p.name?.split(' ')[0]}
                           {p.user_id === session?.host_id && <Crown size={7} className="inline ml-0.5" style={{ color: '#EAB308' }} />}
                         </span>
+                        {cameraStates[p.user_id] && (
+                          <Video size={7} style={{ color: '#3B82F6' }} />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -591,6 +845,114 @@ export default function LiveRoom() {
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+/* ─── Video Grid ─── */
+function VideoGrid({ localStream, localVideoRef, remoteStreams, cameraStates, participants, currentUserId, isVideoOn, myAvatar, hostId }) {
+  // Build list of video tiles to show
+  const tiles = [];
+
+  // Local video first
+  if (isVideoOn) {
+    tiles.push({
+      id: currentUserId,
+      name: 'You',
+      isLocal: true,
+      stream: localStream,
+      isHost: currentUserId === hostId,
+    });
+  }
+
+  // Remote videos
+  participants.forEach(p => {
+    if (p.user_id !== currentUserId && cameraStates[p.user_id] && remoteStreams[p.user_id]) {
+      tiles.push({
+        id: p.user_id,
+        name: p.name?.split(' ')[0] || 'Peer',
+        isLocal: false,
+        stream: remoteStreams[p.user_id],
+        avatar: p.avatar,
+        isHost: p.user_id === hostId,
+      });
+    }
+  });
+
+  // Grid layout based on tile count
+  const count = tiles.length;
+  let gridCols = 1;
+  if (count === 2) gridCols = 2;
+  else if (count <= 4) gridCols = 2;
+  else if (count <= 9) gridCols = 3;
+  else gridCols = 4;
+
+  return (
+    <div className="w-full h-full grid gap-2"
+      style={{
+        gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+        gridAutoRows: '1fr',
+      }}
+      data-testid="video-grid-container">
+      {tiles.map(tile => (
+        <VideoTile key={tile.id} tile={tile} localVideoRef={tile.isLocal ? localVideoRef : null} />
+      ))}
+      {tiles.length === 0 && (
+        <div className="flex items-center justify-center col-span-full">
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No active cameras</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Video Tile ─── */
+function VideoTile({ tile, localVideoRef }) {
+  const videoEl = useRef(null);
+
+  useEffect(() => {
+    const el = tile.isLocal ? localVideoRef?.current : videoEl.current;
+    if (el && tile.stream) {
+      el.srcObject = tile.stream;
+    }
+  }, [tile.stream, tile.isLocal, localVideoRef]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="relative rounded-2xl overflow-hidden"
+      style={{
+        background: 'rgba(13,14,26,0.9)',
+        border: '1px solid rgba(248,250,252,0.08)',
+        boxShadow: tile.isLocal ? '0 0 20px rgba(59,130,246,0.1)' : '0 0 20px rgba(0,0,0,0.3)',
+        minHeight: 120,
+      }}
+      data-testid={`video-tile-${tile.id}`}>
+      <video
+        ref={tile.isLocal ? localVideoRef : videoEl}
+        autoPlay
+        playsInline
+        muted={tile.isLocal}
+        className="w-full h-full object-cover absolute inset-0"
+        style={{ transform: tile.isLocal ? 'scaleX(-1)' : 'none' }}
+      />
+
+      {/* Name badge */}
+      <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-lg"
+        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+        <span className="text-[9px] font-medium" style={{ color: '#F8FAFC' }}>
+          {tile.name}
+        </span>
+        {tile.isHost && <Crown size={8} style={{ color: '#EAB308' }} />}
+      </div>
+
+      {/* Live indicator */}
+      <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full"
+        style={{ background: 'rgba(0,0,0,0.5)' }}>
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#3B82F6' }} />
+        <span className="text-[7px] font-medium" style={{ color: '#93C5FD' }}>LIVE</span>
+      </div>
+    </motion.div>
   );
 }
 
@@ -653,7 +1015,6 @@ function AvatarCircle({ participants, currentUserId, myAvatar }) {
                   <span className="text-sm font-bold" style={{ color: '#D8B4FE' }}>{p.name?.charAt(0)?.toUpperCase()}</span>
                 )}
               </div>
-              {/* Glow ring for active breathing */}
               <motion.div
                 animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}
@@ -668,7 +1029,6 @@ function AvatarCircle({ participants, currentUserId, myAvatar }) {
         );
       })}
 
-      {/* Empty state */}
       {count === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Waiting for seekers to join...</p>
@@ -696,7 +1056,6 @@ function SceneBackground({ session }) {
   return (
     <div className="w-full h-full relative">
       <div className="absolute inset-0" style={{ background: config.bg }} />
-      {/* Floating particles */}
       {[...Array(20)].map((_, i) => (
         <motion.div key={i}
           className="absolute rounded-full"

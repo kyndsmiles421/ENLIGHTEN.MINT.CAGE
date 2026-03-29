@@ -531,17 +531,30 @@ async def spawn_recurring_sessions():
 
 # ─── WebSocket ───
 
-async def broadcast_to_session(session_id: str, message: dict):
+async def broadcast_to_session(session_id: str, message: dict, exclude_uid=None):
     """Send a message to all connected users in a session."""
     connections = active_connections.get(session_id, {})
     dead = []
     for uid, data in connections.items():
+        if uid == exclude_uid:
+            continue
         try:
             await data["ws"].send_json(message)
         except Exception:
             dead.append(uid)
     for uid in dead:
         connections.pop(uid, None)
+
+
+async def send_to_user(session_id: str, target_uid: str, message: dict):
+    """Send a message to a specific user in a session."""
+    connections = active_connections.get(session_id, {})
+    data = connections.get(target_uid)
+    if data:
+        try:
+            await data["ws"].send_json(message)
+        except Exception:
+            connections.pop(target_uid, None)
 
 
 @router.websocket("/live/ws/{session_id}")
@@ -590,24 +603,31 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
         active_connections[session_id][user_id] = {
             "ws": websocket,
             "user": user_doc,
-            "avatar": user_avatar[:200] if user_avatar else "",  # Truncated for broadcast
+            "avatar": user_avatar[:200] if user_avatar else "",
+            "camera_on": False,
         }
 
-        # Build participants list
+        # Build participants list (include camera state)
         participants = []
         for uid, data in active_connections[session_id].items():
             participants.append({
                 "user_id": uid,
                 "name": data["user"].get("name", "Seeker"),
                 "avatar": data.get("avatar", ""),
+                "camera_on": data.get("camera_on", False),
             })
 
-        # Send welcome + recent chat
+        # Get session video mode
+        ses_doc = await db.live_sessions.find_one({"id": session_id}, {"_id": 0, "video_mode": 1})
+        video_mode = ses_doc.get("video_mode", "everyone") if ses_doc else "everyone"
+
+        # Send welcome + recent chat + video state
         await websocket.send_json({
             "type": "connected",
             "user_id": user_id,
             "participants": participants,
             "chat_history": session_chat_history[session_id][-50:],
+            "video_mode": video_mode,
         })
 
         # Broadcast join
@@ -665,6 +685,60 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
             elif msg_type == "ping":
                 await websocket.send_json({"type": "pong"})
 
+            # ─── WebRTC Signaling ───
+
+            elif msg_type == "camera_toggle":
+                cam_on = raw.get("camera_on", False)
+                if session_id in active_connections and user_id in active_connections[session_id]:
+                    active_connections[session_id][user_id]["camera_on"] = cam_on
+                await broadcast_to_session(session_id, {
+                    "type": "camera_toggle",
+                    "user_id": user_id,
+                    "name": user_name,
+                    "camera_on": cam_on,
+                })
+
+            elif msg_type == "video_mode":
+                # Host-only: set session video mode
+                session = await db.live_sessions.find_one({"id": session_id}, {"_id": 0})
+                if session and session["host_id"] == user_id:
+                    new_mode = raw.get("mode", "everyone")  # off, host_only, everyone
+                    await db.live_sessions.update_one(
+                        {"id": session_id},
+                        {"$set": {"video_mode": new_mode}},
+                    )
+                    await broadcast_to_session(session_id, {
+                        "type": "video_mode",
+                        "mode": new_mode,
+                    })
+
+            elif msg_type == "rtc_offer":
+                target = raw.get("target")
+                if target:
+                    await send_to_user(session_id, target, {
+                        "type": "rtc_offer",
+                        "from": user_id,
+                        "offer": raw.get("offer"),
+                    })
+
+            elif msg_type == "rtc_answer":
+                target = raw.get("target")
+                if target:
+                    await send_to_user(session_id, target, {
+                        "type": "rtc_answer",
+                        "from": user_id,
+                        "answer": raw.get("answer"),
+                    })
+
+            elif msg_type == "ice_candidate":
+                target = raw.get("target")
+                if target:
+                    await send_to_user(session_id, target, {
+                        "type": "ice_candidate",
+                        "from": user_id,
+                        "candidate": raw.get("candidate"),
+                    })
+
     except WebSocketDisconnect:
         pass
     except asyncio.TimeoutError:
@@ -683,6 +757,7 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
                 "user_id": user_id,
                 "name": user_name,
                 "participant_count": len(active_connections.get(session_id, {})),
+                "camera_off": True,
             })
             if not active_connections[session_id]:
                 active_connections.pop(session_id, None)
