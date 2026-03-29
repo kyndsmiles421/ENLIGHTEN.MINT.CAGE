@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -178,21 +179,21 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
 
   const Icon = current.icon;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center"
-        style={{ background: 'rgba(3,4,10,0.92)', backdropFilter: 'blur(20px)' }}
+        className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+        style={{ background: '#0B0C15' }}
         data-testid="guided-tour-overlay">
 
         {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: current.bg, transition: 'background 0.6s ease' }} />
+        <div className="absolute inset-0 pointer-events-none z-0" style={{ background: current.bg, transition: 'background 0.6s ease' }} />
 
         {/* Close button */}
         <button onClick={onClose} data-testid="tour-close-btn"
-          className="absolute top-6 right-6 p-2 rounded-xl z-10 transition-all hover:bg-white/5"
-          style={{ color: 'rgba(248,250,252,0.4)' }}>
+          className="absolute top-6 right-6 p-2 rounded-xl z-10 transition-all hover:bg-white/10"
+          style={{ color: 'rgba(248,250,252,0.7)' }}>
           <X size={20} />
         </button>
 
@@ -203,18 +204,17 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
         </div>
 
         {/* Step counter */}
-        <div className="absolute top-6 left-6 text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <div className="absolute top-6 left-6 text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.6)' }}>
           {step + 1} / {total}
         </div>
 
         {/* Main content */}
-        <AnimatePresence mode="wait">
           <motion.div key={step}
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.98 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="max-w-lg mx-auto px-8 text-center relative z-10"
+            className="max-w-lg w-full mx-4 px-10 py-12 text-center relative z-10 rounded-2xl"
+            style={{ background: 'rgba(25,27,50,1)', border: '1px solid rgba(192,132,252,0.2)', boxShadow: `0 0 100px ${current.color}15, 0 0 40px rgba(0,0,0,0.4)` }}
             data-testid={`tour-step-${current.id}`}>
 
             {/* Category pill */}
@@ -240,7 +240,7 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
             </h2>
 
             {/* Description */}
-            <p className="text-sm leading-relaxed mb-6 max-w-md mx-auto" style={{ color: 'rgba(248,250,252,0.6)' }}>
+            <p className="text-sm leading-relaxed mb-6 max-w-md mx-auto" style={{ color: 'rgba(248,250,252,0.8)' }}>
               {current.desc}
             </p>
 
@@ -266,7 +266,6 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
               </button>
             )}
           </motion.div>
-        </AnimatePresence>
 
         {/* Navigation */}
         <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-4 px-8">
@@ -302,6 +301,7 @@ export default function GuidedTour({ isOpen, onClose, onFinish }) {
           </button>
         </div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
