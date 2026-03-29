@@ -115,6 +115,161 @@ QUICK_RESET_FLOWS = {
         "nourishment": {"name": "Golden Milk", "desc": "Turmeric + warm milk = nature's sleep medicine"},
         "mantra": {"text": "I release the day. My body is heavy, my mind is still. Sleep comes easily to me.", "type": "protective", "tradition": "Modern Affirmation"},
     },
+    # ── New expanded feelings ──
+    "inspired": {
+        "label": "Inspired",
+        "frequency": {"name": "852 Hz — Spiritual Order", "hz": 852, "path": "/frequencies", "desc": "Open higher channels of creativity and divine inspiration"},
+        "tool": {"name": "Free-Write Journaling", "path": "/journal", "desc": "Capture the lightning of inspiration before it fades"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "Raw cacao amplifies heart-opening creative energy"},
+        "mantra": {"text": "The muse speaks through me. I am a vessel for infinite creativity.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "hopeful": {
+        "label": "Hopeful",
+        "frequency": {"name": "528 Hz — Love Frequency", "hz": 528, "path": "/frequencies", "desc": "The miracle tone that restores faith and transformation"},
+        "tool": {"name": "Gratitude Meditation", "path": "/meditation", "desc": "Water the seeds of hope with mindful gratitude"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "Grounded alertness to stay present with your hope"},
+        "mantra": {"text": "Every sunrise is proof that new beginnings are possible. I trust the unfolding.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "creative": {
+        "label": "Creative",
+        "frequency": {"name": "741 Hz — Intuition", "hz": 741, "path": "/frequencies", "desc": "Awakens intuitive channels and clears creative blocks"},
+        "tool": {"name": "Zen Garden", "path": "/zen-garden", "desc": "Meditative art practice — draw, create, release"},
+        "nourishment": {"name": "Mushroom Elixir", "desc": "Lion's Mane sparks neural pathways, Reishi grounds the flow"},
+        "mantra": {"text": "Om Aim Hreem Kleem — I invoke the creative goddess within.", "type": "uplifting", "tradition": "Hindu / Vedic"},
+    },
+    "connected": {
+        "label": "Connected",
+        "frequency": {"name": "639 Hz — Connection", "hz": 639, "path": "/frequencies", "desc": "Deepen your bonds and harmonize your heart with the world"},
+        "tool": {"name": "Loving Kindness Meditation", "path": "/meditation", "desc": "Expand your sense of connection to all beings"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "The heart-opening medicine of indigenous ceremonies"},
+        "mantra": {"text": "We are one breath, one heartbeat, one consciousness. I honor our connection.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "brave": {
+        "label": "Brave",
+        "frequency": {"name": "417 Hz — Change", "hz": 417, "path": "/frequencies", "desc": "Channel courage into bold transformation and forward action"},
+        "tool": {"name": "Qigong Flow", "path": "/exercises", "desc": "Warrior stance — build your inner strength with each movement"},
+        "nourishment": {"name": "Prana Smoothie", "desc": "Concentrated life force to fuel your courageous path"},
+        "mantra": {"text": "I am the warrior of light. Fear is only a shadow, and I walk through it.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "angry": {
+        "label": "Angry",
+        "frequency": {"name": "396 Hz — Liberation", "hz": 396, "path": "/frequencies", "desc": "Transmute anger into liberation — release what burns within"},
+        "tool": {"name": "4-7-8 Breathing", "path": "/breathing", "desc": "Cool the fire with this proven nervous system reset"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "L-theanine calms agitation while maintaining clarity"},
+        "mantra": {"text": "I acknowledge my anger. I choose to transform this fire into wisdom.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "lonely": {
+        "label": "Lonely",
+        "frequency": {"name": "639 Hz — Connection", "hz": 639, "path": "/frequencies", "desc": "The frequency of belonging — harmonize your heart with the collective"},
+        "tool": {"name": "Loving Kindness Meditation", "path": "/meditation", "desc": "Send love to yourself and feel the web of connection around you"},
+        "nourishment": {"name": "Golden Milk", "desc": "A warm embrace in a cup — comfort for body and spirit"},
+        "mantra": {"text": "I am never truly alone. The universe pulses through every atom of my being.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "overwhelmed": {
+        "label": "Overwhelmed",
+        "frequency": {"name": "174 Hz — Foundation", "hz": 174, "path": "/frequencies", "desc": "Ground yourself with the lowest, most stabilizing solfeggio frequency"},
+        "tool": {"name": "Box Breathing", "path": "/breathing", "desc": "4-4-4-4 — simplify everything down to four counts"},
+        "nourishment": {"name": "Golden Milk", "desc": "Anti-inflammatory calm for a system in overdrive"},
+        "mantra": {"text": "One breath at a time. One step at a time. I do not need to do it all right now.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "grief": {
+        "label": "Grieving",
+        "frequency": {"name": "528 Hz — Transformation", "hz": 528, "path": "/frequencies", "desc": "The healing frequency — repairs the emotional body gently"},
+        "tool": {"name": "Loving Kindness Meditation", "path": "/meditation", "desc": "Metta for the brokenhearted — hold yourself with infinite compassion"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "Cacao opens the heart to feel fully, then begin to heal"},
+        "mantra": {"text": "Om Mani Padme Hum — The jewel of the lotus. Even in darkness, beauty lives within me.", "type": "protective", "tradition": "Tibetan Buddhist"},
+    },
+    "numb": {
+        "label": "Numb / Empty",
+        "frequency": {"name": "417 Hz — Change", "hz": 417, "path": "/frequencies", "desc": "Undoes emotional stagnation — invites feeling back into the body"},
+        "tool": {"name": "Body Scan Meditation", "path": "/meditation", "desc": "Reconnect with physical sensation, one part at a time"},
+        "nourishment": {"name": "Prana Smoothie", "desc": "Spirulina and moringa re-energize dormant life force"},
+        "mantra": {"text": "I allow myself to feel again. My emotions are sacred messengers.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "fearful": {
+        "label": "Fearful",
+        "frequency": {"name": "396 Hz — Liberation", "hz": 396, "path": "/frequencies", "desc": "Release fear and guilt stored deep in the body"},
+        "tool": {"name": "4-7-8 Breathing", "path": "/breathing", "desc": "Activate the parasympathetic nervous system — your body's calm switch"},
+        "nourishment": {"name": "Golden Milk", "desc": "Warm, grounding medicine to soothe the nervous system"},
+        "mantra": {"text": "I am safe. The light within me is stronger than any darkness around me.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "frustrated": {
+        "label": "Frustrated",
+        "frequency": {"name": "741 Hz — Intuition", "hz": 741, "path": "/frequencies", "desc": "Clear mental fog and find the solution that lies beneath frustration"},
+        "tool": {"name": "Energizing Breath", "path": "/breathing", "desc": "Kapalabhati breathwork to shake off stuck energy"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "Calm alertness to step back and see the bigger picture"},
+        "mantra": {"text": "Om Gam Ganapataye Namaha — Ganesha, remove the obstacles from my path.", "type": "protective", "tradition": "Hindu / Vedic"},
+    },
+    "burnout": {
+        "label": "Burned Out",
+        "frequency": {"name": "174 Hz — Foundation", "hz": 174, "path": "/frequencies", "desc": "The deepest rest frequency — let your system recover"},
+        "tool": {"name": "Body Scan Meditation", "path": "/meditation", "desc": "Progressive relaxation — permission to do absolutely nothing"},
+        "nourishment": {"name": "Golden Milk", "desc": "Turmeric heals inflammation while ashwagandha restores adrenals"},
+        "mantra": {"text": "I give myself permission to rest. Rest is not weakness — it is wisdom.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "disconnected": {
+        "label": "Disconnected",
+        "frequency": {"name": "639 Hz — Connection", "hz": 639, "path": "/frequencies", "desc": "Re-harmonize your heart with the world and your sense of self"},
+        "tool": {"name": "Silent Meditation", "path": "/meditation", "desc": "Return to the stillness where your true self resides"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "Heart medicine — dissolve the walls you've built"},
+        "mantra": {"text": "I am part of something vast and beautiful. I choose to reconnect.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "jealous": {
+        "label": "Jealous / Envious",
+        "frequency": {"name": "639 Hz — Connection", "hz": 639, "path": "/frequencies", "desc": "Harmonize your relationship with abundance and self-worth"},
+        "tool": {"name": "Gratitude Meditation", "path": "/meditation", "desc": "Shift from scarcity to abundance through mindful appreciation"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "Grounded clarity to see your own unique path"},
+        "mantra": {"text": "Another's blessing does not diminish my own. The universe is abundant enough for all.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "impatient": {
+        "label": "Impatient",
+        "frequency": {"name": "963 Hz — Divine Connection", "hz": 963, "path": "/frequencies", "desc": "Connect with the cosmic timeline — trust divine timing"},
+        "tool": {"name": "Box Breathing", "path": "/breathing", "desc": "Practice the art of being present with 4-4-4-4 cadence"},
+        "nourishment": {"name": "Ceremonial Matcha", "desc": "The tea ceremony teaches patience — each sip a meditation"},
+        "mantra": {"text": "Everything arrives in divine timing. I trust the pace of my journey.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "bored": {
+        "label": "Bored",
+        "frequency": {"name": "852 Hz — Spiritual Order", "hz": 852, "path": "/frequencies", "desc": "Awaken dormant curiosity and open new channels of perception"},
+        "tool": {"name": "Oracle Divination", "path": "/oracle", "desc": "Let the cosmos surprise you — pull a card, read the signs"},
+        "nourishment": {"name": "Mushroom Elixir", "desc": "Lion's Mane reignites curiosity and cognitive spark"},
+        "mantra": {"text": "The universe is infinitely interesting. I open my eyes to see it fresh.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "nostalgic": {
+        "label": "Nostalgic",
+        "frequency": {"name": "528 Hz — Love Frequency", "hz": 528, "path": "/frequencies", "desc": "Hold the beauty of the past while staying rooted in the present"},
+        "tool": {"name": "Journaling", "path": "/journal", "desc": "Honor your memories — write what you cherish and what you've learned"},
+        "nourishment": {"name": "Golden Milk", "desc": "Warm comfort that connects you to generations of tradition"},
+        "mantra": {"text": "I honor my past. I am grateful for what was, and excited for what is becoming.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "awakening": {
+        "label": "Spiritually Awakening",
+        "frequency": {"name": "963 Hz — Divine Connection", "hz": 963, "path": "/frequencies", "desc": "The crown chakra frequency — pure connection to source"},
+        "tool": {"name": "Silent Meditation", "path": "/meditation", "desc": "Sit in the vast awareness — no technique, just being"},
+        "nourishment": {"name": "Mushroom Elixir", "desc": "Reishi: the mushroom of spiritual potency and immortality"},
+        "mantra": {"text": "I am awakening to my true nature. The veil is lifting, and I see clearly.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "seeking": {
+        "label": "Seeking Purpose",
+        "frequency": {"name": "852 Hz — Spiritual Order", "hz": 852, "path": "/frequencies", "desc": "The frequency of returning to spiritual order and life purpose"},
+        "tool": {"name": "Oracle Divination", "path": "/oracle", "desc": "Ask the cosmos for direction — your answer is waiting"},
+        "nourishment": {"name": "Cacao Ceremony Drink", "desc": "Open your heart and let your purpose reveal itself"},
+        "mantra": {"text": "My purpose is unfolding. Every step, even uncertainty, is part of the path.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
+    "grounding": {
+        "label": "Need Grounding",
+        "frequency": {"name": "174 Hz — Foundation", "hz": 174, "path": "/frequencies", "desc": "The root frequency — reconnect to earth, to body, to now"},
+        "tool": {"name": "Qigong Flow", "path": "/exercises", "desc": "Earth element practice — feel your feet, feel the ground"},
+        "nourishment": {"name": "Golden Milk", "desc": "Turmeric and warm spices root you in embodied presence"},
+        "mantra": {"text": "I am rooted in the earth. I am anchored in my body. I am here, now.", "type": "protective", "tradition": "Modern Affirmation"},
+    },
+    "expansive": {
+        "label": "Expansive",
+        "frequency": {"name": "963 Hz — Divine Connection", "hz": 963, "path": "/frequencies", "desc": "Ride the wave of expansion into cosmic consciousness"},
+        "tool": {"name": "Silent Meditation", "path": "/meditation", "desc": "Dissolve boundaries — become the sky, the stars, the everything"},
+        "nourishment": {"name": "Mushroom Elixir", "desc": "Reishi for spiritual depth, Lion's Mane for cosmic cognition"},
+        "mantra": {"text": "I am expanding beyond what I thought possible. The universe grows through me.", "type": "uplifting", "tradition": "Modern Affirmation"},
+    },
 }
 
 @router.get("/quick-reset/{feeling}")
@@ -155,7 +310,6 @@ async def streak_checkin(user=Depends(get_current_user)):
         return {"current_streak": doc["current_streak"], "longest_streak": doc["longest_streak"], "last_active": today, "total_active_days": doc.get("total_active_days", 1), "checked_in": False, "message": "Already checked in today"}
 
     # Calculate streak
-    from datetime import timedelta
     yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
     if last == yesterday:
         new_streak = doc.get("current_streak", 0) + 1

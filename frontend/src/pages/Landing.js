@@ -11,9 +11,11 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   Wind, Timer, Sun, Heart, BookOpen, Headphones, ArrowRight, Sparkles, Sunrise, Zap,
   Leaf, Radio, Users, Flame, Hand, Triangle, Play, GraduationCap, PenTool, Volume2, VolumeX,
-  Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X,
+  Lightbulb, Sprout, ChevronRight, Quote, MapPin, Mail, Shield, X, Search,
   Brain, Battery, Moon, Frown, Target, Music, HeartHandshake, Map, Globe, Gamepad2,
-  Eye, Star, Compass, Droplets, MessageCircle, Orbit, Loader2, GripVertical
+  Eye, Star, Compass, Droplets, MessageCircle, Orbit, Loader2, GripVertical,
+  CloudRain, Angry, Meh, ThumbsDown, Gauge, Coffee, Clock, BatteryWarning,
+  Waves, Mountain, TreePine, Flower2, HeartCrack, Ban, AlertTriangle, Smile
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShareButton from '../components/ShareButton';
@@ -122,17 +124,42 @@ const CATEGORY_PILLARS = [
 ];
 
 const FEELINGS = [
+  // Positive
   { id: 'happy', label: 'Happy', icon: Sparkles, color: '#FCD34D' },
   { id: 'peaceful', label: 'Peaceful', icon: Sun, color: '#2DD4BF' },
   { id: 'energized', label: 'Energized', icon: Zap, color: '#FB923C' },
   { id: 'grateful', label: 'Grateful', icon: Heart, color: '#FDA4AF' },
   { id: 'curious', label: 'Curious', icon: Target, color: '#8B5CF6' },
+  { id: 'inspired', label: 'Inspired', icon: Lightbulb, color: '#FCD34D' },
+  { id: 'hopeful', label: 'Hopeful', icon: Sunrise, color: '#86EFAC' },
+  { id: 'creative', label: 'Creative', icon: Flower2, color: '#C084FC' },
+  { id: 'connected', label: 'Connected', icon: HeartHandshake, color: '#FDA4AF' },
+  { id: 'brave', label: 'Brave', icon: Shield, color: '#FB923C' },
+  // Challenged
   { id: 'stressed', label: 'Stressed', icon: Brain, color: '#EF4444' },
   { id: 'anxious', label: 'Anxious', icon: Wind, color: '#FB923C' },
   { id: 'tired', label: 'Low Energy', icon: Battery, color: '#FCD34D' },
-  { id: 'sad', label: 'Down', icon: Frown, color: '#3B82F6' },
+  { id: 'sad', label: 'Down / Sad', icon: Frown, color: '#3B82F6' },
   { id: 'unfocused', label: 'Unfocused', icon: Target, color: '#8B5CF6' },
   { id: 'restless', label: "Can't Sleep", icon: Moon, color: '#2DD4BF' },
+  { id: 'angry', label: 'Angry', icon: Angry, color: '#EF4444' },
+  { id: 'lonely', label: 'Lonely', icon: CloudRain, color: '#3B82F6' },
+  { id: 'overwhelmed', label: 'Overwhelmed', icon: Waves, color: '#8B5CF6' },
+  { id: 'grief', label: 'Grieving', icon: HeartCrack, color: '#6366F1' },
+  { id: 'numb', label: 'Numb / Empty', icon: Meh, color: '#94A3B8' },
+  { id: 'fearful', label: 'Fearful', icon: AlertTriangle, color: '#F59E0B' },
+  { id: 'frustrated', label: 'Frustrated', icon: Ban, color: '#EF4444' },
+  { id: 'burnout', label: 'Burned Out', icon: BatteryWarning, color: '#FB923C' },
+  { id: 'disconnected', label: 'Disconnected', icon: Orbit, color: '#94A3B8' },
+  { id: 'jealous', label: 'Jealous / Envious', icon: Eye, color: '#22C55E' },
+  { id: 'impatient', label: 'Impatient', icon: Clock, color: '#F59E0B' },
+  { id: 'bored', label: 'Bored', icon: Coffee, color: '#94A3B8' },
+  { id: 'nostalgic', label: 'Nostalgic', icon: Compass, color: '#C084FC' },
+  // Spiritual
+  { id: 'awakening', label: 'Spiritually Awakening', icon: Star, color: '#FCD34D' },
+  { id: 'seeking', label: 'Seeking Purpose', icon: Mountain, color: '#2DD4BF' },
+  { id: 'grounding', label: 'Need Grounding', icon: TreePine, color: '#22C55E' },
+  { id: 'expansive', label: 'Expansive', icon: Globe, color: '#8B5CF6' },
 ];
 
 const TESTIMONIALS = [
@@ -487,6 +514,11 @@ function QuickResetModal({ open, onClose }) {
   const [feeling, setFeeling] = useState(null);
   const [flow, setFlow] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const filteredFeelings = search.trim()
+    ? FEELINGS.filter(f => f.label.toLowerCase().includes(search.toLowerCase()) || f.id.toLowerCase().includes(search.toLowerCase()))
+    : FEELINGS;
 
   const selectFeeling = async (f) => {
     setFeeling(f);
@@ -501,7 +533,7 @@ function QuickResetModal({ open, onClose }) {
     }
   };
 
-  const reset = () => { setFeeling(null); setFlow(null); };
+  const reset = () => { setFeeling(null); setFlow(null); setSearch(''); };
 
   if (!open) return null;
 
@@ -532,22 +564,40 @@ function QuickResetModal({ open, onClose }) {
               <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                 How are you feeling right now?
               </h2>
-              <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                 We'll build a personalized 5-minute reset just for you.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                {FEELINGS.map(f => {
+              {/* Search bar */}
+              <div className="relative mb-4">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search feelings..."
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
+                  style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}
+                  data-testid="feeling-search"
+                />
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-[340px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+                {filteredFeelings.map(f => {
                   const FIcon = f.icon;
                   return (
                     <button key={f.id} onClick={() => selectFeeling(f)}
+                      onTouchEnd={(e) => { e.preventDefault(); selectFeeling(f); }}
                       className="glass-card p-3 flex flex-col items-center gap-1.5 hover:scale-[1.03] transition-all"
-                      style={{ border: `1px solid ${f.color}15` }}
+                      style={{ border: `1px solid ${f.color}15`, touchAction: 'manipulation' }}
                       data-testid={`feeling-${f.id}`}>
-                      <FIcon size={20} style={{ color: f.color }} />
-                      <span className="text-[10px] font-medium" style={{ color: 'var(--text-primary)' }}>{f.label}</span>
+                      <FIcon size={18} style={{ color: f.color }} />
+                      <span className="text-[9px] font-medium text-center leading-tight" style={{ color: 'var(--text-primary)' }}>{f.label}</span>
                     </button>
                   );
                 })}
+                {filteredFeelings.length === 0 && (
+                  <div className="col-span-full text-center py-6">
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No matching feelings. Try a different word.</p>
+                  </div>
+                )}
               </div>
             </>
           ) : loading ? (
@@ -848,8 +898,18 @@ export default function Landing() {
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
-              <button onClick={() => setShowQuickReset(true)} className="btn-glass glow-primary group" data-testid="quick-reset-btn">
-                <span className="relative z-10 flex items-center gap-2">
+              <button onClick={() => setShowQuickReset(true)}
+                onTouchEnd={(e) => { e.preventDefault(); setShowQuickReset(true); }}
+                className="group py-3 px-6 rounded-full cursor-pointer glow-primary"
+                style={{
+                  background: 'rgba(192,132,252,0.08)',
+                  border: '1px solid rgba(192,132,252,0.18)',
+                  backdropFilter: 'blur(12px)',
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'rgba(192,132,252,0.1)',
+                }}
+                data-testid="quick-reset-btn">
+                <span className="relative z-10 flex items-center gap-2" style={{ color: '#D8B4FE' }}>
                   Quick Reset
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
