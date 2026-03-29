@@ -272,3 +272,211 @@ async def narrate_creation_story(story_id: str):
         logger.error(f"Creation story TTS error: {e}")
         from fastapi import HTTPException
         raise HTTPException(status_code=500, detail="Failed to generate narration")
+
+
+
+# ═══════════════════════════════════════════════
+# MYTHS, LEGENDS & FOLKLORE — AI-Generated per civilization
+# ═══════════════════════════════════════════════
+
+CIVILIZATIONS = [
+    {"id": "mayan", "name": "Mayan", "region": "Central America", "color": "#22C55E",
+     "myths_seed": ["Popol Vuh Hero Twins", "Xibalba Underworld", "Kukulkan the Feathered Serpent", "The Maize God", "The Jaguar Sun God", "The 400 Boys and Zipacna"]},
+    {"id": "egyptian", "name": "Egyptian", "region": "North Africa", "color": "#EAB308",
+     "myths_seed": ["Osiris and Isis", "The Eye of Ra", "Anubis and the Weighing of the Heart", "The Contendings of Horus and Set", "Thoth and the Moon", "The Book of the Dead Journey"]},
+    {"id": "aboriginal", "name": "Aboriginal Australian", "region": "Australia", "color": "#F97316",
+     "myths_seed": ["The Rainbow Serpent", "Tiddalik the Frog", "The Seven Sisters Songline", "Baiame the Sky Father", "The Emu and the Jabiru", "How the Kangaroo Got Its Tail"]},
+    {"id": "lakota", "name": "Lakota Sioux", "region": "North America", "color": "#DC2626",
+     "myths_seed": ["White Buffalo Calf Woman", "Iktomi the Spider Trickster", "The Thunderbirds", "Fallen Star Boy", "The Legend of Devil's Tower", "Coyote Steals Fire"]},
+    {"id": "hindu", "name": "Hindu", "region": "South Asia", "color": "#F59E0B",
+     "myths_seed": ["The Churning of the Ocean of Milk", "Rama and Sita (Ramayana)", "Krishna and the Serpent Kaliya", "Ganesha and the Broken Tusk", "Durga Slays Mahishasura", "Savitri and Yama"]},
+    {"id": "norse", "name": "Norse", "region": "Scandinavia", "color": "#6366F1",
+     "myths_seed": ["Thor and the Midgard Serpent", "Loki and Baldur's Death", "Odin's Quest for Wisdom", "Ragnarok", "Freya and the Necklace Brisingamen", "The Mead of Poetry"]},
+    {"id": "greek", "name": "Greek", "region": "Mediterranean", "color": "#8B5CF6",
+     "myths_seed": ["Orpheus and Eurydice", "Perseus and Medusa", "The Odyssey of Odysseus", "Persephone and Hades", "Theseus and the Minotaur", "Icarus and Daedalus"]},
+    {"id": "japanese", "name": "Japanese", "region": "East Asia", "color": "#EC4899",
+     "myths_seed": ["Amaterasu and the Cave", "Susanoo and the Yamata no Orochi", "The Tale of the Bamboo Cutter", "Urashima Taro", "Momotaro the Peach Boy", "Tanabata Star Lovers"]},
+    {"id": "yoruba", "name": "Yoruba", "region": "West Africa", "color": "#14B8A6",
+     "myths_seed": ["Shango God of Thunder", "Oshun and the River", "Eshu at the Crossroads", "Ogun Lord of Iron", "Yemoja Mother of Waters", "The Tortoise and the Wisdom Gourd"]},
+    {"id": "maori", "name": "Maori", "region": "Polynesia", "color": "#0EA5E9",
+     "myths_seed": ["Maui Fishes Up the North Island", "Maui Captures the Sun", "Hinemoa and Tutanekai", "Paikea the Whale Rider", "Hatupatu and the Bird Woman", "The Taniwha Guardians"]},
+    {"id": "chinese", "name": "Chinese", "region": "East Asia", "color": "#F43F5E",
+     "myths_seed": ["Journey to the West (Monkey King)", "Chang'e and the Moon", "The Cowherd and the Weaver Girl", "Hou Yi Shoots the Suns", "The Dragon Kings", "Mulan the Warrior"]},
+    {"id": "celtic", "name": "Celtic", "region": "Western Europe", "color": "#10B981",
+     "myths_seed": ["Cu Chulainn the Hound of Ulster", "The Children of Lir", "Deirdre of the Sorrows", "Finn McCool and the Salmon", "The Morrigan War Goddess", "Oisin in Tir na nOg"]},
+    {"id": "inuit", "name": "Inuit", "region": "Arctic", "color": "#64748B",
+     "myths_seed": ["Sedna Goddess of the Sea", "Raven Steals the Sun", "The Qallupilluit Under the Ice", "Kiviuq the Eternal Wanderer", "The Northern Lights Spirits", "Nanuk the Bear Spirit"]},
+    {"id": "aztec", "name": "Aztec", "region": "Central America", "color": "#B45309",
+     "myths_seed": ["Quetzalcoatl's Journey to Mictlan", "The Legend of the Five Suns", "Huitzilopochtli and Coyolxauhqui", "Tlaloc's Paradise", "Xochiquetzal Goddess of Beauty", "The Founding of Tenochtitlan"]},
+    {"id": "sumerian", "name": "Sumerian", "region": "Mesopotamia", "color": "#A855F7",
+     "myths_seed": ["Inanna's Descent to the Underworld", "Gilgamesh and Enkidu", "The Flood of Utnapishtim", "Enki and the World Order", "Dumuzi and the Seasons", "The Huluppu Tree"]},
+    {"id": "persian", "name": "Persian", "region": "Middle East", "color": "#D97706",
+     "myths_seed": ["Rostam and Sohrab", "Zahhak the Dragon King", "Simorgh the Divine Bird", "Jamshid's Golden Age", "Kaveh the Blacksmith's Revolt", "Zal and Rudabeh"]},
+    {"id": "african_bantu", "name": "Bantu", "region": "Central & Southern Africa", "color": "#059669",
+     "myths_seed": ["Anansi the Spider", "Mwindo the Epic Hero", "The Hare and the Moon", "Nyame and the Sky Stories", "Kintu First Man of Buganda", "The Chameleon and Death"]},
+    {"id": "polynesian", "name": "Polynesian", "region": "Pacific Islands", "color": "#0284C7",
+     "myths_seed": ["Maui and the Fire Goddess", "Pele of the Volcano", "Ta'aroa the Creator", "The Voyage of Rata", "Hina and the Eel", "The Origin of Coconut"]},
+    {"id": "native_american", "name": "Native American (Various)", "region": "North America", "color": "#B91C1C",
+     "myths_seed": ["Coyote Creates the Stars", "Grandmother Spider Brings Light", "The Trail of Tears Sky", "Raven and the First People", "Kokopelli the Flute Player", "Blue Corn Maiden"]},
+    {"id": "slavic", "name": "Slavic", "region": "Eastern Europe", "color": "#7C3AED",
+     "myths_seed": ["Baba Yaga's Hut", "The Firebird", "Koschei the Deathless", "Morana Goddess of Winter", "Perun vs Veles", "Vasilisa the Beautiful"]},
+]
+
+CIV_MAP = {c["id"]: c for c in CIVILIZATIONS}
+
+
+@router.get("/myths/civilizations")
+async def get_civilizations():
+    """Return all civilizations with their myth seed lists."""
+    return {
+        "civilizations": [{
+            "id": c["id"], "name": c["name"], "region": c["region"],
+            "color": c["color"], "myth_count": len(c["myths_seed"]),
+            "myths_preview": c["myths_seed"],
+        } for c in CIVILIZATIONS],
+        "total": len(CIVILIZATIONS),
+    }
+
+
+@router.get("/myths/{civ_id}")
+async def get_myths_for_civilization(civ_id: str):
+    """Return all myths for a civilization (cached from DB + seed list)."""
+    civ = CIV_MAP.get(civ_id)
+    if not civ:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Civilization not found")
+
+    # Fetch any previously generated myths from DB
+    stored = await db.myths.find(
+        {"civilization_id": civ_id}, {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+
+    stored_titles = {m["seed_title"] for m in stored}
+
+    # Build combined list: stored myths + ungenerated seeds
+    myths = []
+    for m in stored:
+        myths.append({**m, "generated": True})
+
+    for seed in civ["myths_seed"]:
+        if seed not in stored_titles:
+            myths.append({
+                "id": None, "seed_title": seed, "title": seed,
+                "civilization_id": civ_id, "culture": civ["name"],
+                "generated": False,
+            })
+
+    return {
+        "civilization": {
+            "id": civ["id"], "name": civ["name"],
+            "region": civ["region"], "color": civ["color"],
+        },
+        "myths": myths,
+        "total": len(myths),
+    }
+
+
+@router.post("/myths/{civ_id}/generate")
+async def generate_myth(civ_id: str, body: dict, user=Depends(get_current_user)):
+    """Generate a full myth/legend using AI for a given civilization and seed title."""
+    civ = CIV_MAP.get(civ_id)
+    if not civ:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Civilization not found")
+
+    seed_title = body.get("seed_title", "").strip()
+    if not seed_title:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="seed_title required")
+
+    # Check if already generated
+    existing = await db.myths.find_one(
+        {"civilization_id": civ_id, "seed_title": seed_title}, {"_id": 0}
+    )
+    if existing:
+        return existing
+
+    prompt = f"""You are a master storyteller and cultural historian. Tell the myth/legend of "{seed_title}" from the {civ['name']} tradition ({civ['region']}).
+
+Write it as an immersive, richly detailed narrative — not an academic summary. Include:
+1. **Title**: A evocative title for this myth
+2. **Type**: One of: creation, hero_journey, love, trickster, underworld, divine_conflict, origin, prophecy, transformation
+3. **Characters**: List the key figures with brief descriptions
+4. **Story**: The full myth told in vivid narrative prose (800-1200 words). Use sensory detail, dialogue where appropriate, and emotional depth.
+5. **Moral/Lesson**: The wisdom this myth teaches
+6. **Symbols**: Key symbols and their meanings
+7. **Connected myths**: Names of related myths from this or other traditions
+
+Return as JSON with keys: title, type, characters (list of {{name, role}}), story, lesson, symbols (list), connected_myths (list)"""
+
+    try:
+        chat = LlmChat(api_key=EMERGENT_LLM_KEY, model="gpt-4o")
+        chat.add_message(UserMessage(text=prompt))
+        response = await chat.send_async()
+        text = response.text.strip()
+
+        # Parse JSON from response
+        import json as _json
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+
+        data = _json.loads(text)
+        myth_id = str(uuid.uuid4())[:8]
+
+        myth_doc = {
+            "id": myth_id,
+            "seed_title": seed_title,
+            "civilization_id": civ_id,
+            "culture": civ["name"],
+            "region": civ["region"],
+            "color": civ["color"],
+            "title": data.get("title", seed_title),
+            "type": data.get("type", "myth"),
+            "characters": data.get("characters", []),
+            "story": data.get("story", ""),
+            "lesson": data.get("lesson", ""),
+            "symbols": data.get("symbols", []),
+            "connected_myths": data.get("connected_myths", []),
+            "generated_by": user["id"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        await db.myths.insert_one({**myth_doc, "_id": myth_id})
+        return myth_doc
+
+    except Exception as e:
+        logger.error(f"Myth generation error: {e}")
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail="Failed to generate myth")
+
+
+@router.get("/myths/search/{query}")
+async def search_myths(query: str):
+    """Search myths across all civilizations by keyword."""
+    results = await db.myths.find(
+        {"$or": [
+            {"title": {"$regex": query, "$options": "i"}},
+            {"seed_title": {"$regex": query, "$options": "i"}},
+            {"story": {"$regex": query, "$options": "i"}},
+            {"culture": {"$regex": query, "$options": "i"}},
+        ]},
+        {"_id": 0, "story": 0}
+    ).to_list(50)
+
+    # Also search seed titles from CIVILIZATIONS
+    seed_results = []
+    q = query.lower()
+    for civ in CIVILIZATIONS:
+        for seed in civ["myths_seed"]:
+            if q in seed.lower() or q in civ["name"].lower():
+                if not any(r["seed_title"] == seed and r["civilization_id"] == civ["id"] for r in results):
+                    seed_results.append({
+                        "seed_title": seed, "title": seed,
+                        "civilization_id": civ["id"], "culture": civ["name"],
+                        "region": civ["region"], "color": civ["color"],
+                        "generated": False,
+                    })
+
+    return {"results": results + seed_results, "query": query}
