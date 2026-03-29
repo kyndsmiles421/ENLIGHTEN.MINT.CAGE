@@ -25,6 +25,8 @@ WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 active_connections: dict = {}
 # { session_id: [ { message } ] }
 session_chat_history: dict = {}
+# { session_id: [ { command } ] }
+session_command_history: dict = {}
 
 SESSION_TYPES = [
     {"id": "meditation", "label": "Group Meditation", "icon": "timer", "color": "#D8B4FE",
@@ -152,15 +154,44 @@ async def start_session(session_id: str, user=Depends(get_current_user)):
 
 @router.post("/live/sessions/{session_id}/end")
 async def end_session(session_id: str, user=Depends(get_current_user)):
-    """End a live session (host only)."""
+    """End a live session (host only). Saves chat + command history as a recording."""
     session = await db.live_sessions.find_one({"id": session_id}, {"_id": 0})
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     if session["host_id"] != user["id"]:
         raise HTTPException(status_code=403, detail="Only the host can end the session")
+
+    ended_at = datetime.now(timezone.utc).isoformat()
+
+    # Save recording before clearing in-memory data
+    chat = session_chat_history.get(session_id, [])
+    commands = session_command_history.get(session_id, [])
+    participant_names = []
+    for uid, data in active_connections.get(session_id, {}).items():
+        participant_names.append(data["user"].get("name", "Seeker"))
+
+    recording = {
+        "id": str(uuid.uuid4()),
+        "session_id": session_id,
+        "title": session.get("title", "Live Session"),
+        "host_name": session.get("host_name", "Anonymous"),
+        "session_type": session.get("session_type", "meditation"),
+        "scene": session.get("scene", "cosmic-temple"),
+        "duration_minutes": session.get("duration_minutes", 20),
+        "started_at": session.get("started_at", session.get("scheduled_at", ended_at)),
+        "ended_at": ended_at,
+        "chat_log": chat[-200:],
+        "command_log": commands,
+        "participant_count": max(len(participant_names), len(active_connections.get(session_id, {}))),
+        "participant_names": participant_names[:50],
+        "created_at": ended_at,
+    }
+    await db.session_recordings.insert_one({**recording})
+    recording.pop("_id", None)
+
     await db.live_sessions.update_one(
         {"id": session_id},
-        {"$set": {"status": "ended", "ended_at": datetime.now(timezone.utc).isoformat()}}
+        {"$set": {"status": "ended", "ended_at": ended_at, "has_recording": True}}
     )
     await broadcast_to_session(session_id, {
         "type": "session_ended",
@@ -169,7 +200,65 @@ async def end_session(session_id: str, user=Depends(get_current_user)):
     # Clean up connections
     active_connections.pop(session_id, None)
     session_chat_history.pop(session_id, None)
-    return {"status": "ended"}
+    session_command_history.pop(session_id, None)
+    return {"status": "ended", "recording_id": recording["id"]}
+
+
+# ─── Past Sessions & Recordings ───
+
+@router.get("/live/past")
+async def list_past_sessions(user=Depends(get_current_user)):
+    """List past ended sessions with recordings."""
+    recordings = await db.session_recordings.find(
+        {}, {"_id": 0, "chat_log": 0, "command_log": 0}
+    ).sort("ended_at", -1).to_list(30)
+    return {"recordings": recordings}
+
+
+@router.get("/live/sessions/{session_id}/recording")
+async def get_recording(session_id: str, user=Depends(get_current_user)):
+    """Get the full recording of a past session."""
+    rec = await db.session_recordings.find_one({"session_id": session_id}, {"_id": 0})
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    return rec
+
+
+@router.get("/live/sessions/{session_id}/download")
+async def download_recording(session_id: str, user=Depends(get_current_user)):
+    """Download a session recording as structured JSON."""
+    rec = await db.session_recordings.find_one({"session_id": session_id}, {"_id": 0})
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recording not found")
+
+    # Build a clean export
+    export = {
+        "title": rec.get("title", "Session"),
+        "host": rec.get("host_name", ""),
+        "type": rec.get("session_type", ""),
+        "scene": rec.get("scene", ""),
+        "duration_minutes": rec.get("duration_minutes", 0),
+        "started_at": rec.get("started_at", ""),
+        "ended_at": rec.get("ended_at", ""),
+        "participants": rec.get("participant_names", []),
+        "participant_count": rec.get("participant_count", 0),
+        "guided_commands": [
+            {"time": c.get("timestamp", ""), "command": c.get("label", c.get("command", ""))}
+            for c in rec.get("command_log", [])
+        ],
+        "chat": [
+            {"time": m.get("timestamp", ""), "user": m.get("name", ""), "message": m.get("text", "")}
+            for m in rec.get("chat_log", [])
+            if m.get("type") == "chat"
+        ],
+    }
+
+    from fastapi.responses import Response
+    return Response(
+        content=json.dumps(export, indent=2),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="session_{session_id[:8]}.json"'},
+    )
 
 
 # ─── Recurring Sessions ───
@@ -445,6 +534,8 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
             active_connections[session_id] = {}
         if session_id not in session_chat_history:
             session_chat_history[session_id] = []
+        if session_id not in session_command_history:
+            session_command_history[session_id] = []
 
         active_connections[session_id][user_id] = {
             "ws": websocket,
@@ -508,10 +599,17 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
                 # Host-only commands (guided meditation phases, etc.)
                 session = await db.live_sessions.find_one({"id": session_id}, {"_id": 0})
                 if session and session["host_id"] == user_id:
-                    await broadcast_to_session(session_id, {
+                    cmd_data = {
                         "type": "host_command",
                         "command": raw.get("command", ""),
                         "data": raw.get("data", {}),
+                    }
+                    await broadcast_to_session(session_id, cmd_data)
+                    # Track for recording
+                    session_command_history[session_id].append({
+                        "command": raw.get("command", ""),
+                        "label": raw.get("data", {}).get("label", raw.get("command", "")),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                     })
 
             elif msg_type == "ping":

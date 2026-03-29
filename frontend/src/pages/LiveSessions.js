@@ -8,7 +8,7 @@ import {
   Radio, Users, Timer, Flame, Wind, Music, BookOpen, Heart,
   Zap, Plus, ChevronRight, Calendar, Crown, Sparkles,
   Play, Clock, X, Bell, BellOff, Repeat, CalendarClock,
-  CheckCircle
+  CheckCircle, Archive, Download, Eye, MessageCircle, Pause
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -34,9 +34,11 @@ export default function LiveSessions() {
   const [types, setTypes] = useState([]);
   const [scenes, setScenes] = useState([]);
   const [recurringSeries, setRecurringSeries] = useState([]);
+  const [pastRecordings, setPastRecordings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
-  const [activeTab, setActiveTab] = useState('live'); // 'live' | 'schedule'
+  const [activeTab, setActiveTab] = useState('live'); // 'live' | 'schedule' | 'past'
+  const [replaySession, setReplaySession] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -51,17 +53,23 @@ export default function LiveSessions() {
         promises.push(
           axios.get(`${API}/live/sessions`, { headers: authHeaders }).catch(() => ({ data: { sessions: [] } })),
           axios.get(`${API}/live/recurring`, { headers: authHeaders }).catch(() => ({ data: { series: [] } })),
+          axios.get(`${API}/live/past`, { headers: authHeaders }).catch(() => ({ data: { recordings: [] } })),
         );
         // Try spawning any due recurring sessions
         axios.post(`${API}/live/recurring/spawn`, {}, { headers: authHeaders }).catch(() => {});
       } else {
-        promises.push(Promise.resolve({ data: { sessions: [] } }), Promise.resolve({ data: { series: [] } }));
+        promises.push(
+          Promise.resolve({ data: { sessions: [] } }),
+          Promise.resolve({ data: { series: [] } }),
+          Promise.resolve({ data: { recordings: [] } }),
+        );
       }
-      const [typesRes, sessRes, recurRes] = await Promise.all(promises);
+      const [typesRes, sessRes, recurRes, pastRes] = await Promise.all(promises);
       setTypes(typesRes.data.types || []);
       setScenes(typesRes.data.scenes || []);
       setSessions(sessRes.data.sessions || []);
       setRecurringSeries(recurRes.data.series || []);
+      setPastRecordings(pastRes.data.recordings || []);
     } catch {}
     setLoading(false);
   };
@@ -87,6 +95,7 @@ export default function LiveSessions() {
   const TABS = [
     { id: 'live', label: 'Live & Upcoming', count: activeSessions.length + upcomingSessions.length },
     { id: 'schedule', label: 'Recurring Schedule', count: recurringSeries.length },
+    { id: 'past', label: 'Past Sessions', count: pastRecordings.length },
   ];
 
   return (
@@ -129,7 +138,7 @@ export default function LiveSessions() {
                 border: activeTab === tab.id ? '1px solid rgba(192,132,252,0.15)' : '1px solid transparent',
               }}
               data-testid={`tab-${tab.id}`}>
-              {tab.id === 'live' ? <Radio size={12} /> : <CalendarClock size={12} />}
+              {tab.id === 'live' ? <Radio size={12} /> : tab.id === 'schedule' ? <CalendarClock size={12} /> : <Archive size={12} />}
               {tab.label}
               {tab.count > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[9px]" style={{ background: 'rgba(248,250,252,0.06)' }}>
@@ -205,7 +214,7 @@ export default function LiveSessions() {
                 </div>
               </div>
             </motion.div>
-          ) : (
+          ) : activeTab === 'schedule' ? (
             <motion.div key="schedule" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
               {/* Recurring Schedule Tab */}
               <div className="flex items-center justify-between mb-6">
@@ -241,9 +250,46 @@ export default function LiveSessions() {
                 </div>
               )}
             </motion.div>
+          ) : (
+            <motion.div key="past" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+              {/* Past Sessions Tab */}
+              <div className="mb-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: 'var(--text-muted)' }}>
+                  Session Recordings
+                </p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  Replay past sessions or download them to your device
+                </p>
+              </div>
+
+              {pastRecordings.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {pastRecordings.map((rec, i) => (
+                    <PastSessionCard key={rec.id} recording={rec} types={types} delay={i * 0.05}
+                      onReplay={() => setReplaySession(rec)}
+                      authHeaders={authHeaders} />
+                  ))}
+                </div>
+              ) : (
+                <div className="glass-card p-8 text-center">
+                  <Archive size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
+                  <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No recordings yet</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>When live sessions end, their guided commands and chat are saved here for replay</p>
+                </div>
+              )}
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Replay Modal */}
+      <AnimatePresence>
+        {replaySession && (
+          <ReplayModal recording={replaySession} types={types}
+            onClose={() => setReplaySession(null)}
+            authHeaders={authHeaders} />
+        )}
+      </AnimatePresence>
 
       {/* Create Session Modal */}
       <AnimatePresence>
@@ -593,6 +639,288 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
           data-testid="create-session-submit">
           {creating ? 'Creating...' : isRecurring ? 'Create Recurring Series' : 'Create & Enter Session'}
         </button>
+      </motion.div>
+    </motion.div>
+  );
+
+  return createPortal(modalContent, document.body);
+}
+
+
+/* ─── Past Session Card ─── */
+function PastSessionCard({ recording, types, delay, onReplay, authHeaders }) {
+  const type = types.find(t => t.id === recording.session_type) || {};
+  const Icon = ICON_MAP[type.icon] || Sparkles;
+  const endedDate = recording.ended_at ? new Date(recording.ended_at) : null;
+  const startedDate = recording.started_at ? new Date(recording.started_at) : null;
+
+  const downloadRecording = async () => {
+    try {
+      const res = await axios.get(
+        `${API}/live/sessions/${recording.session_id}/download`,
+        { headers: authHeaders, responseType: 'blob' }
+      );
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `session_${recording.session_id.slice(0, 8)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {}
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
+      className="glass-card p-5 relative overflow-hidden"
+      data-testid={`past-card-${recording.id}`}>
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: `${type.color || '#C084FC'}12`, border: `1px solid ${type.color || '#C084FC'}20` }}>
+            <Icon size={16} style={{ color: type.color || '#C084FC' }} />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{recording.title}</h3>
+            <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+              {type.label || recording.session_type}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 text-[9px] mb-3" style={{ color: 'var(--text-muted)' }}>
+        <span className="flex items-center gap-1"><Crown size={9} /> {recording.host_name}</span>
+        <span className="flex items-center gap-1"><Users size={9} /> {recording.participant_count} joined</span>
+        <span className="flex items-center gap-1"><Clock size={9} /> {recording.duration_minutes}m</span>
+        {endedDate && (
+          <span className="flex items-center gap-1">
+            <Calendar size={9} /> {endedDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button onClick={onReplay}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105"
+          style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC' }}
+          data-testid={`replay-btn-${recording.id}`}>
+          <Eye size={10} /> Replay
+        </button>
+        <button onClick={downloadRecording}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105"
+          style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.15)', color: '#2DD4BF' }}
+          data-testid={`download-btn-${recording.id}`}>
+          <Download size={10} /> Download
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Replay Modal ─── */
+function ReplayModal({ recording, types, onClose, authHeaders }) {
+  const [fullRecording, setFullRecording] = useState(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentCommandIdx, setCurrentCommandIdx] = useState(-1);
+  const [showChat, setShowChat] = useState(true);
+  const timerRef = React.useRef(null);
+
+  const type = types.find(t => t.id === recording.session_type) || {};
+
+  React.useEffect(() => {
+    axios.get(`${API}/live/sessions/${recording.session_id}/recording`, { headers: authHeaders })
+      .then(r => setFullRecording(r.data))
+      .catch(() => {});
+  }, [recording.session_id, authHeaders]);
+
+  const commands = fullRecording?.command_log || [];
+  const chatLog = (fullRecording?.chat_log || []).filter(m => m.type === 'chat');
+
+  // Auto-play commands with timing
+  React.useEffect(() => {
+    if (!playing || commands.length === 0) return;
+    const idx = currentCommandIdx + 1;
+    if (idx >= commands.length) {
+      setPlaying(false);
+      return;
+    }
+    timerRef.current = setTimeout(() => {
+      setCurrentCommandIdx(idx);
+    }, idx === 0 ? 500 : 4000); // 4s between commands
+    return () => clearTimeout(timerRef.current);
+  }, [playing, currentCommandIdx, commands.length]);
+
+  const startReplay = () => {
+    setCurrentCommandIdx(-1);
+    setPlaying(true);
+  };
+
+  const downloadRecording = async () => {
+    try {
+      const res = await axios.get(
+        `${API}/live/sessions/${recording.session_id}/download`,
+        { headers: authHeaders, responseType: 'blob' }
+      );
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `session_${recording.session_id.slice(0, 8)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {}
+  };
+
+  const modalContent = (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      onClick={onClose}>
+      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.7)' }} />
+      <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+        className="relative w-full max-w-2xl rounded-2xl overflow-hidden"
+        style={{ background: 'rgba(10,11,20,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(20px)', maxHeight: '85vh' }}
+        onClick={e => e.stopPropagation()} data-testid="replay-modal">
+
+        {/* Header */}
+        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(248,250,252,0.05)' }}>
+          <div>
+            <h2 className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              {recording.title}
+            </h2>
+            <div className="flex items-center gap-3 mt-1 text-[9px]" style={{ color: 'var(--text-muted)' }}>
+              <span className="flex items-center gap-1"><Crown size={9} /> {recording.host_name}</span>
+              <span className="flex items-center gap-1"><Users size={9} /> {recording.participant_count}</span>
+              <span className="flex items-center gap-1"><Clock size={9} /> {recording.duration_minutes}m</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={downloadRecording}
+              className="p-2 rounded-lg hover:bg-white/5 transition-all"
+              title="Download Recording"
+              data-testid="replay-download">
+              <Download size={14} style={{ color: '#2DD4BF' }} />
+            </button>
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5">
+              <X size={14} style={{ color: 'var(--text-muted)' }} />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex overflow-hidden" style={{ height: '60vh' }}>
+          {/* Command Timeline */}
+          <div className="flex-1 flex flex-col">
+            {/* Guided Command Display */}
+            <div className="flex-1 flex items-center justify-center relative">
+              <AnimatePresence mode="wait">
+                {currentCommandIdx >= 0 && currentCommandIdx < commands.length ? (
+                  <motion.div key={currentCommandIdx}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="text-center px-8">
+                    <p className="text-3xl md:text-4xl font-light"
+                      style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC', textShadow: '0 0 40px rgba(192,132,252,0.3)' }}>
+                      {commands[currentCommandIdx].label || commands[currentCommandIdx].command}
+                    </p>
+                    <p className="text-[9px] mt-3" style={{ color: 'var(--text-muted)' }}>
+                      Step {currentCommandIdx + 1} of {commands.length}
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center px-8">
+                    {commands.length > 0 ? (
+                      <>
+                        <p className="text-lg font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
+                          {playing ? 'Preparing...' : 'Ready to replay'}
+                        </p>
+                        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                          {commands.length} guided commands recorded
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-lg font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
+                          No guided commands
+                        </p>
+                        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                          This was a free-form session — check the chat log
+                        </p>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Controls */}
+            <div className="px-6 py-3 flex items-center justify-center gap-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+              {commands.length > 0 && (
+                <button onClick={() => { playing ? setPlaying(false) : startReplay(); }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
+                  style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
+                  data-testid="replay-play-btn">
+                  {playing ? <><Pause size={12} /> Pause</> : <><Play size={12} /> {currentCommandIdx >= 0 ? 'Resume' : 'Play Replay'}</>}
+                </button>
+              )}
+              <button onClick={() => setShowChat(!showChat)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all"
+                style={{
+                  background: showChat ? 'rgba(45,212,191,0.08)' : 'rgba(248,250,252,0.03)',
+                  border: `1px solid ${showChat ? 'rgba(45,212,191,0.15)' : 'rgba(248,250,252,0.05)'}`,
+                  color: showChat ? '#2DD4BF' : 'var(--text-muted)',
+                }}
+                data-testid="replay-toggle-chat">
+                <MessageCircle size={10} /> Chat ({chatLog.length})
+              </button>
+            </div>
+
+            {/* Command Timeline Steps */}
+            {commands.length > 0 && (
+              <div className="px-6 py-3 flex items-center gap-1 overflow-x-auto" style={{ borderTop: '1px solid rgba(248,250,252,0.03)' }}>
+                {commands.map((cmd, i) => (
+                  <button key={i}
+                    onClick={() => { setCurrentCommandIdx(i); setPlaying(false); }}
+                    className="flex-shrink-0 px-2.5 py-1 rounded-lg text-[9px] transition-all"
+                    style={{
+                      background: i === currentCommandIdx ? 'rgba(192,132,252,0.15)' : i < currentCommandIdx ? 'rgba(192,132,252,0.05)' : 'rgba(248,250,252,0.03)',
+                      border: `1px solid ${i === currentCommandIdx ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.04)'}`,
+                      color: i === currentCommandIdx ? '#C084FC' : i < currentCommandIdx ? 'rgba(192,132,252,0.5)' : 'var(--text-muted)',
+                    }}>
+                    {cmd.label || cmd.command}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Chat Sidebar */}
+          <AnimatePresence>
+            {showChat && (
+              <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 260, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+                className="overflow-hidden flex-shrink-0 flex flex-col"
+                style={{ borderLeft: '1px solid rgba(248,250,252,0.04)' }}>
+                <div className="px-3 py-2.5" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+                  <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                    Chat Log ({chatLog.length} messages)
+                  </p>
+                </div>
+                <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1" style={{ scrollbarWidth: 'thin' }}>
+                  {chatLog.length > 0 ? chatLog.map((msg, i) => (
+                    <div key={i}>
+                      <span className="text-[9px] font-medium mr-1.5" style={{ color: '#2DD4BF' }}>{msg.name}</span>
+                      <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{msg.text}</span>
+                    </div>
+                  )) : (
+                    <p className="text-[9px] text-center py-4" style={{ color: 'var(--text-muted)' }}>No chat messages</p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
     </motion.div>
   );
