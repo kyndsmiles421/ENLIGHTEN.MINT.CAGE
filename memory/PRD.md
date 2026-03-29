@@ -14,54 +14,30 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## All Implemented Features
 
 ### SmartDock (NEW Mar 2026)
-- **Unified floating dock** replaces 3 overlapping widgets (FloatingAssistant, QuickMeditationWidget, CosmicMixer)
-- Bottom-right dock with icons: Sage (AI assistant), Mixer (link to full Cosmic Mixer page), Tones (solfeggio frequency player)
-- Expand to show Feedback and Help shortcuts
-- Usage-based sorting (most-used icons appear first)
-- **No background dimming** — panels open inline above dock
-- Portal-based rendering at z-[80]
+- Unified floating dock replaces 3 overlapping widgets (FloatingAssistant, QuickMeditationWidget, CosmicMixer)
+- Bottom-right dock with Sage, Mixer, Tones icons
+- No background dimming — panels open inline
 
 ### Cosmic Mixer Page (NEW Mar 2026)
-- Full-page mixer at `/cosmic-mixer` route (previously only floating widget)
-- 5 audio layers: Solfeggio Frequencies (9), Ambient Sounds (5), Mantras (6 with TTS), Light Therapy (6 modes), Haptic Vibration
-- Master volume control, stop-all button
-- Back button returns to previous page
+- Full-page mixer at `/cosmic-mixer` with 5 audio layers
 
 ### Customizable Dashboard (NEW Mar 2026)
-- **"Customize" button** — enter edit mode to reorder, hide/show dashboard sections
-- **9 reorderable sections**: Stats Cards, My Shortcuts, Suggested for You, Quantum Coherence, Daily Challenge, Daily Wisdom, Recent Moods, For You, Explore & Practice
-- **Pinned Shortcuts** — phone-home-screen style icon grid; users pin their favorites from 33+ actions
-- **Add Shortcuts sheet** — bottom sheet to browse all actions by category and pin/unpin
-- **Drag-and-drop** section reordering (desktop) + up/down arrow buttons (mobile)
-- **Persisted to MongoDB** via GET/PUT `/api/dashboard/layout`
+- "Customize" button enters edit mode to reorder/hide sections
+- Pinned Shortcuts grid (phone-home-screen style)
+- Persisted to MongoDB via `/api/dashboard/layout`
+
+### Quick Reset Modal Fix (Mar 2026)
+- Fixed invisible modal: glass-card bg was 3% opacity, replaced with solid dark background
+- Fixed position:fixed breaking: `page-enter` animation used `transform: translateY(0)` which creates a containing block; changed to `transform: none`
+- Applied createPortal for Landing page Quick Reset modal
 
 ### Dashboard (UPGRADED Mar 2026)
-- **Mini sparklines** on stat cards (7-day trend graphs for moods, journals, activity)
-- **Smart Suggestions** — personalized next-steps based on user activity
-- Stat cards navigate: Streak→Growth Timeline, Moods→Mood Tracker, Journal→Journal, Games→Games
-- 2x2 compact grid, "?" help button, no auto-blocking walkthrough
+- Mini sparklines, Smart Suggestions, clickable stat cards
+- 2x2 compact grid
 
-### Floating AI Assistant (Moved to SmartDock Mar 2026)
-- "?" Sage button accessible from SmartDock on every page (except auth)
-- Opens AI Coach mini-chat panel with session management
-- Quick action buttons: Help Center, Submit Feedback
-
-### Help Center (NEW Mar 2026)
-- **FAQs** — 12 questions with search + category filters + accordion
-- **Guides** — 9 feature tutorials with direct navigation
-- **Contact** — links to AI Coach and Feedback form
-
-### Feedback & Suggestions (NEW Mar 2026)
-- **Submit feedback** — type (Suggestion/Feedback/Bug/Question) + category + message
-- **History** — view your submitted feedback with status
-- **Creator dashboard** — creator email sees all feedback
-
-### Community Comments (NEW Mar 2026)
-- **Reusable component** — integrated on Crystals and Blessings pages
-- Post comments, like comments, expand/collapse thread
-
+### Help Center, Feedback, Community Comments (Mar 2026)
 ### Quick Reset (33 emotions + search)
-### Star Chart (20 cultures, pinch zoom, culture-aware stories/journey)
+### Star Chart (20 cultures, pinch zoom, culture-aware stories)
 ### Sacred Texts, Encyclopedia, Crystals (VR + TTS + AI Pairing)
 ### Blessings (AI + stats), Accessibility, Guided Tour, Myths & Legends
 ### All other features (40+ pages, AI Avatar, Cosmic Mixer, etc.)
@@ -69,6 +45,9 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Test Credentials
 - User: test@test.com / password
 - Admin/Creator: kyndsmiles@gmail.com / password
+
+## Known CSS Fix
+- `.page-enter` keyframe must use `transform: none` (not `translateY(0)`) to avoid breaking `position: fixed` modals site-wide
 
 ## Backlog
 - P1: Creator Dashboard (admin view for feedback, comments, usage analytics)
