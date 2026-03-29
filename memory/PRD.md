@@ -12,28 +12,25 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Implemented Features
 
-### SmartDock: Minimize + Drag + Persist (Mar 2026)
+### SmartDock: Minimize + Drag + Snap Zones (Mar 2026)
 - **Fully minimizable**: Dock collapses to a small sparkle dot; tap to restore
 - **Draggable**: Grip handle at top allows repositioning anywhere on screen
+- **Snap zones**: Dock auto-snaps to nearest screen edge/corner on release with smooth spring animation
 - **Position persistence**: Both position and minimized state saved to localStorage
 - **Smart border-radius**: Adjusts from flat-edge to fully rounded when moved away from screen edge
-- **Vertical pill layout**: Icons for Sage, Mixer, Tones, Feedback, Help
 
 ### Interactive Cosmic Mood Ring (Mar 2026)
-- **Clickable card**: Tapping navigates to `/mood` Mood Tracker page
-- **Quick Log panel**: 8 moods (Happy, Peaceful, Energized, Grateful, Stressed, Anxious, Sad, Tired) with one-tap logging
-- **Empty state CTA**: Shows prompt when no mood data exists
-- **Auto-refresh**: Ring data refreshes after quick logging
+- Clickable card navigates to Mood Tracker
+- Quick Log panel with 8 moods for one-tap logging
+- Empty state CTA, auto-refresh after logging
 
 ### Session Replay & Download (Mar 2026)
-- **Auto-recording**: Chat + commands saved when sessions end
-- **Past Sessions tab**: Third tab on `/live` with Replay and Download buttons
-- **Replay Modal**: Command timeline auto-player + chat sidebar
-- **Download**: Export as structured JSON files
+- Auto-recording of chat + commands when sessions end
+- Past Sessions tab with Replay modal and Download (JSON export)
 
 ### Scheduled Recurring Live Sessions (Mar 2026)
 - Recurring series (Daily, Weekdays, Weekends, Weekly) with subscriptions + push notifications
-- Auto-spawn from templates, tab UI, One-Time/Recurring toggle
+- Auto-spawn from templates
 
 ### Live Sessions, Mood Insights, Crystal Pairing, Blessings, Creator Dashboard, Customizable Dashboard
 - All previously documented and tested

@@ -73,6 +73,40 @@ export default function SmartDock() {
     };
   }, [minimized]);
 
+  // Snap to nearest edge/corner on release
+  const snapToEdge = useCallback((x, y) => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const dockW = minimized ? 36 : 44;
+    const dockH = minimized ? 36 : 200;
+    const SNAP = 60; // snap threshold in px
+
+    const midX = x + dockW / 2;
+    const midY = y + dockH / 2;
+
+    let sx = x, sy = y;
+
+    // Horizontal: snap to left or right edge
+    if (midX < vw / 2) {
+      // Closer to left
+      sx = x < SNAP ? 0 : x;
+    } else {
+      // Closer to right
+      sx = (vw - x - dockW) < SNAP ? vw - dockW : x;
+    }
+
+    // Vertical: snap to top, center, or bottom
+    if (y < SNAP) {
+      sy = 8;
+    } else if (Math.abs(midY - vh / 2) < SNAP) {
+      sy = (vh - dockH) / 2;
+    } else if ((vh - y - dockH) < SNAP) {
+      sy = vh - dockH - 8;
+    }
+
+    return { x: sx, y: sy };
+  }, [minimized]);
+
   // Drag handlers
   const onPointerDown = useCallback((e) => {
     if (e.target.closest('button') && !e.target.closest('[data-drag-handle]')) return;
@@ -104,6 +138,11 @@ export default function SmartDock() {
     const onUp = () => {
       setIsDragging(false);
       document.body.style.userSelect = '';
+      // Snap to nearest edge
+      setPosition(prev => {
+        if (prev.x === null) return prev;
+        return snapToEdge(prev.x, prev.y);
+      });
     };
 
     window.addEventListener('pointermove', onMove);
@@ -158,6 +197,7 @@ export default function SmartDock() {
         ...posStyle,
         cursor: isDragging ? 'grabbing' : 'default',
         touchAction: 'none',
+        transition: isDragging ? 'none' : 'left 0.3s cubic-bezier(0.25,1,0.5,1), top 0.3s cubic-bezier(0.25,1,0.5,1)',
       }}
       data-testid="smart-dock">
 
