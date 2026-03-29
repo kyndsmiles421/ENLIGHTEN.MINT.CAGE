@@ -21,6 +21,7 @@ export default function FloatingAssistant() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
   const scrollRef = useRef(null);
 
   // Don't show on auth page or during tour
@@ -38,10 +39,23 @@ export default function FloatingAssistant() {
     setLoading(true);
 
     try {
+      // Create session if first message
+      let sid = sessionId;
+      if (!sid) {
+        const sessionRes = await fetch(`${API}/api/coach/sessions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          body: JSON.stringify({ mode: 'spiritual' }),
+        });
+        const sessionData = await sessionRes.json();
+        sid = sessionData.session_id;
+        setSessionId(sid);
+      }
+
       const res = await fetch(`${API}/api/coach/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeaders },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ session_id: sid, message: input }),
       });
       const data = await res.json();
       setMessages(prev => [...prev, { role: 'assistant', text: data.reply || data.message || 'I hear you. Let me think about that...' }]);
