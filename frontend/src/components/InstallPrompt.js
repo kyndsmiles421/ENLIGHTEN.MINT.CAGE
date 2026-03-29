@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X, Smartphone, Share } from 'lucide-react';
+import axios from 'axios';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function InstallPrompt() {
   const [show, setShow] = useState(false);
@@ -21,6 +24,17 @@ export default function InstallPrompt() {
     };
     window.addEventListener('beforeinstallprompt', handler);
 
+    // Track actual installs
+    const onInstalled = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        axios.post(`${API}/app-install`, { platform: platform || 'unknown' }, {
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
+    };
+    window.addEventListener('appinstalled', onInstalled);
+
     // Show prompt after 30 seconds if not installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches
       || window.navigator.standalone;
@@ -28,11 +42,11 @@ export default function InstallPrompt() {
 
     if (!isInstalled && !dismissed) {
       const timer = setTimeout(() => setShow(true), 30000);
-      return () => { clearTimeout(timer); window.removeEventListener('beforeinstallprompt', handler); };
+      return () => { clearTimeout(timer); window.removeEventListener('beforeinstallprompt', handler); window.removeEventListener('appinstalled', onInstalled); };
     }
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+    return () => { window.removeEventListener('beforeinstallprompt', handler); window.removeEventListener('appinstalled', onInstalled); };
+  }, [platform]);
 
   const install = async () => {
     if (deferredPrompt.current) {

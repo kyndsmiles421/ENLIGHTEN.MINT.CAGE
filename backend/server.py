@@ -64,6 +64,7 @@ from routes.blessings import router as blessings_router
 from routes.akashic import router as akashic_router
 from routes.encyclopedia import router as encyclopedia_router
 from routes.dynamic import router as dynamic_router
+from routes.creator import router as creator_router
 
 app = FastAPI()
 
@@ -95,6 +96,7 @@ all_routers = [
     akashic_router,
     encyclopedia_router,
     dynamic_router,
+    creator_router,
 ]
 
 for r in all_routers:

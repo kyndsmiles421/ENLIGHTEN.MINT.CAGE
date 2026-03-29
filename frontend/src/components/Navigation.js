@@ -156,6 +156,8 @@ const PROFILE_ITEMS = [
   { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
+const CREATOR_ITEM = { path: '/creator', label: 'Creator Studio', icon: Crown };
+
 const ALL_PATHS = NAV_CATEGORIES.flatMap(c => c.items.map(i => i.path));
 
 /* ─── Mega Menu Dropdown (Desktop) ─── */
@@ -577,6 +579,26 @@ export default function Navigation() {
                     data-testid="nav-profile-dropdown"
                   >
                     <div className="py-1.5">
+                      {/* Creator Studio — only for admin */}
+                      {creditInfo?.is_admin && (() => {
+                        const CIcon = CREATOR_ITEM.icon;
+                        const cActive = location.pathname === CREATOR_ITEM.path;
+                        return (
+                          <>
+                            <Link
+                              to={CREATOR_ITEM.path}
+                              onClick={() => { setProfileOpen(false); playClick(); }}
+                              className={`flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/[0.04]'}`}
+                              style={{ color: '#EAB308', background: cActive ? 'rgba(234,179,8,0.08)' : 'transparent' }}
+                              data-testid="nav-creator-link"
+                            >
+                              <CIcon size={13} style={{ color: '#EAB308' }} />
+                              <span className="font-medium">{CREATOR_ITEM.label}</span>
+                            </Link>
+                            <div className="my-1 mx-3 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(234,179,8,0.08)' }} />
+                          </>
+                        );
+                      })()}
                       {PROFILE_ITEMS.map(item => {
                         const Icon = item.icon;
                         const active = location.pathname === item.path;
@@ -723,6 +745,22 @@ export default function Navigation() {
                         </Link>
                       )}
                     </div>
+                    {/* Creator Studio — mobile, admin only */}
+                    {creditInfo?.is_admin && (() => {
+                      const CIcon = CREATOR_ITEM.icon;
+                      return (
+                        <Link to={CREATOR_ITEM.path} onClick={() => { setMobileOpen(false); playClick(); }}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl mb-2 transition-all"
+                          style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.12)', color: '#EAB308' }}
+                          data-testid="mobile-creator-link">
+                          <CIcon size={16} />
+                          <div>
+                            <span className="text-sm font-medium block">Creator Studio</span>
+                            <span className="text-[10px] opacity-60">Analytics & management</span>
+                          </div>
+                        </Link>
+                      );
+                    })()}
                     {PROFILE_ITEMS.map(item => {
                       const Icon = item.icon;
                       return (

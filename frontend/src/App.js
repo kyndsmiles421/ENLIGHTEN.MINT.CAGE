@@ -102,6 +102,7 @@ const CosmicMixerPage = lazy(() => import('./pages/CosmicMixerPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
+const CreatorDashboard = lazy(() => import('./pages/CreatorDashboard'));
 
 function PageLoader() {
   return (
@@ -209,6 +210,7 @@ function AnimatedRoutes() {
         <Route path="/help-center" element={<HelpCenter />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/cosmic-mixer" element={<CosmicMixerPage />} />
+        <Route path="/creator" element={<CreatorDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
