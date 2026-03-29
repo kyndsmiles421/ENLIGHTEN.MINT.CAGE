@@ -17,7 +17,33 @@ import SearchCommand from './SearchCommand';
 import ShareButton from './ShareButton';
 import { SplitScreenLauncher } from './SplitScreen';
 import NotificationSettings from './NotificationSettings';
+import { setAmbientEnabled, getAmbientEnabled } from '../hooks/useAmbientSoundscape';
 import { useCreditsContext } from '../context/CreditContext';
+
+/* Soundscape on/off toggle */
+function SoundscapeToggle() {
+  const [on, setOn] = React.useState(getAmbientEnabled());
+  const toggle = () => {
+    const next = !on;
+    setOn(next);
+    setAmbientEnabled(next);
+  };
+  return (
+    <button onClick={toggle}
+      className="p-2 rounded-full transition-all duration-300 relative"
+      style={{ color: on ? '#2DD4BF' : 'var(--text-muted)', background: on ? 'rgba(45,212,191,0.1)' : 'transparent' }}
+      data-testid="nav-soundscape-toggle"
+      title={on ? 'Celestial Soundscape on' : 'Celestial Soundscape off'}>
+      <Music size={14} />
+      {on && (
+        <motion.div className="absolute inset-0 rounded-full"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0, 0.2] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          style={{ border: '1px solid rgba(45,212,191,0.4)' }} />
+      )}
+    </button>
+  );
+}
 
 /* ─── Category definitions ─── */
 const NAV_CATEGORIES = [
@@ -432,6 +458,9 @@ export default function Navigation() {
                 style={{ border: '1px solid var(--primary)' }} />
             )}
           </button>
+
+          {/* Celestial Soundscape Toggle */}
+          <SoundscapeToggle />
 
           {/* Notification Bell */}
           {user && (

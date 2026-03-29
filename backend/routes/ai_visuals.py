@@ -664,3 +664,152 @@ async def generate_intro_video(user=Depends(get_current_user)):
     asyncio.create_task(_run_video_generation(job_id, INTRO_VIDEO_PROMPT, INTRO_CACHE_KEY, filename))
 
     return {"status": "queued", "job_id": job_id}
+
+
+
+# ════════════════════════════════════════════
+# AVATAR GENERATION (AI-powered)
+# ════════════════════════════════════════════
+
+AVATAR_STYLES = {
+    "ethereal": "mystical ethereal celestial being made of light and cosmic energy, glowing aura, translucent form, surrounded by stars and nebulae, spiritual",
+    "stylized": "stylized character portrait with cosmic elements, anime-inspired art style, vibrant colors, celestial accessories, third eye glowing",
+    "realistic": "realistic portrait with spiritual accessories, crystal jewelry, glowing third eye marking, aurora borealis aura, mystical atmosphere",
+    "abstract": "abstract energy form made of pure light and color, sacred geometry patterns, chakra energy visualization, cosmic spiral form",
+}
+
+
+@router.post("/ai-visuals/generate-avatar")
+async def generate_avatar(
+    body: dict = Body(...),
+    user=Depends(get_current_user),
+):
+    """Generate an AI avatar from text description + style. Stores result for user."""
+    description = body.get("description", "").strip()
+    style = body.get("style", "ethereal")
+    extras = body.get("extras", {})
+
+    if not description:
+        raise HTTPException(400, "Description is required")
+
+    style_prefix = AVATAR_STYLES.get(style, AVATAR_STYLES["ethereal"])
+
+    # Build rich prompt
+    prompt_parts = [
+        f"Create a stunning avatar portrait: {description}.",
+        f"Art direction: {style_prefix}.",
+    ]
+    if extras.get("element"):
+        prompt_parts.append(f"Elemental affinity: {extras['element']} energy radiating from their form.")
+    if extras.get("aura_color"):
+        prompt_parts.append(f"Aura color: {extras['aura_color']} glowing halo.")
+    if extras.get("spirit_animal"):
+        prompt_parts.append(f"Spirit animal companion: {extras['spirit_animal']} appearing as a spectral guardian.")
+    if extras.get("sacred_geometry"):
+        prompt_parts.append(f"Sacred geometry: {extras['sacred_geometry']} pattern integrated into the background.")
+
+    prompt_parts.append("High quality digital art, rich detail, mystical atmosphere, dark cosmic background with stars. Square format portrait, centered composition.")
+    full_prompt = " ".join(prompt_parts)
+
+    try:
+        gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await asyncio.wait_for(
+            gen.generate_images(
+                prompt=full_prompt,
+                model="gpt-image-1",
+                number_of_images=1,
+            ),
+            timeout=120,
+        )
+        if not images or len(images) == 0:
+            raise HTTPException(500, "Image generation failed")
+
+        image_b64 = base64.b64encode(images[0]).decode("utf-8")
+
+        # Store as user's avatar
+        avatar_doc = {
+            "user_id": user["id"],
+            "image_b64": image_b64,
+            "description": description,
+            "style": style,
+            "extras": extras,
+            "prompt_used": full_prompt[:500],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "is_active": True,
+        }
+        # Deactivate previous avatars
+        await db.user_avatars.update_many(
+            {"user_id": user["id"], "is_active": True},
+            {"$set": {"is_active": False}},
+        )
+        await db.user_avatars.insert_one(avatar_doc)
+
+        # Also update user profile
+        await db.users.update_one(
+            {"email": user["email"]},
+            {"$set": {"avatar_b64": image_b64, "avatar_style": style, "avatar_desc": description}},
+        )
+
+        return {
+            "status": "success",
+            "image_b64": image_b64,
+            "style": style,
+            "description": description,
+        }
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "Avatar generation timed out")
+    except Exception as e:
+        logger.error(f"Avatar generation error: {e}")
+        raise HTTPException(500, f"Generation failed: {str(e)}")
+
+
+@router.get("/ai-visuals/my-avatar")
+async def get_my_avatar(user=Depends(get_current_user)):
+    """Get the user's active avatar."""
+    avatar = await db.user_avatars.find_one(
+        {"user_id": user["id"], "is_active": True},
+        {"_id": 0, "image_b64": 1, "description": 1, "style": 1, "extras": 1, "created_at": 1},
+    )
+    if not avatar:
+        return {"status": "none"}
+    return {"status": "active", **avatar}
+
+
+@router.get("/ai-visuals/my-avatars")
+async def get_my_avatars(user=Depends(get_current_user)):
+    """Get all user avatars (gallery)."""
+    avatars = await db.user_avatars.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "image_b64": 1, "description": 1, "style": 1, "extras": 1, "created_at": 1, "is_active": 1},
+    ).sort("created_at", -1).to_list(20)
+    return {"avatars": avatars}
+
+
+@router.post("/ai-visuals/set-active-avatar")
+async def set_active_avatar(body: dict = Body(...), user=Depends(get_current_user)):
+    """Set a specific avatar as active (by created_at timestamp)."""
+    created_at = body.get("created_at")
+    if not created_at:
+        raise HTTPException(400, "created_at is required")
+
+    await db.user_avatars.update_many(
+        {"user_id": user["id"]}, {"$set": {"is_active": False}}
+    )
+    result = await db.user_avatars.update_one(
+        {"user_id": user["id"], "created_at": created_at},
+        {"$set": {"is_active": True}},
+    )
+    if result.modified_count == 0:
+        raise HTTPException(404, "Avatar not found")
+
+    avatar = await db.user_avatars.find_one(
+        {"user_id": user["id"], "created_at": created_at},
+        {"_id": 0, "image_b64": 1},
+    )
+    if avatar:
+        await db.users.update_one(
+            {"email": user["email"]},
+            {"$set": {"avatar_b64": avatar["image_b64"]}},
+        )
+
+    return {"status": "success"}

@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
+import { useAmbientSoundscape } from './hooks/useAmbientSoundscape';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -113,7 +114,8 @@ function PageLoader() {
 function AnimatedRoutes() {
   const location = useLocation();
   useActivityTracker();
-  useGlobalSounds(); // Attach global interaction sounds
+  useGlobalSounds();
+  useAmbientSoundscape();
 
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
