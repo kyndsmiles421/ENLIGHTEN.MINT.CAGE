@@ -213,13 +213,13 @@ function App() {
       <CreditProvider>
       <SensoryProvider>
         <BrowserRouter>
+          {/* Immersive Fluid Mesh Gradient — outside all wrappers */}
+          <div className="cosmic-mesh" aria-hidden="true">
+            <div className="cosmic-mesh-inner" />
+          </div>
+          <CosmicBackground />
           <SplitScreenProvider>
-          <div style={{ minHeight: '100vh', background: '#030308', position: 'relative' }}>
-            {/* Immersive Fluid Mesh Gradient */}
-            <div className="cosmic-mesh" aria-hidden="true">
-              <div className="cosmic-mesh-inner" />
-            </div>
-            <CosmicBackground />
+          <div style={{ minHeight: '100vh', position: 'relative' }}>
             <Navigation />
             <ScrollToTop />
             <Toaster

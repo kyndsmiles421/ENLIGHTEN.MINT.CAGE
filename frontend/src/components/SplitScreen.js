@@ -39,9 +39,9 @@ const SPLIT_PAGES = {
   '/hooponopono': { label: "Ho'oponopono", color: '#22D3EE' },
 };
 
-export function SplitScreenProvider({ children, navigate, CurrentPageComponent, currentPath }) {
-  const [splitPanel, setSplitPanel] = useState(null); // { path, width }
-  const [splitWidth, setSplitWidth] = useState(50); // percentage
+export function SplitScreenProvider({ children }) {
+  const [splitPanel, setSplitPanel] = useState(null);
+  const [splitWidth, setSplitWidth] = useState(50);
   const [isResizing, setIsResizing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -94,113 +94,106 @@ export function SplitScreenProvider({ children, navigate, CurrentPageComponent, 
 
   return (
     <SplitScreenContext.Provider value={contextValue}>
-      <div className="flex h-full w-full" style={{ minHeight: '100vh' }}>
-        {/* Main panel */}
-        <div
-          className="relative transition-all duration-300"
-          style={{ width: splitPanel && !isCollapsed ? `${splitWidth}%` : '100%', minWidth: splitPanel ? '25%' : 'auto' }}
-        >
-          {children}
-        </div>
+      {children}
 
-        {/* Split panel */}
-        <AnimatePresence>
-          {splitPanel && !isCollapsed && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: `${100 - splitWidth}%`, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-              className="relative flex-shrink-0 border-l overflow-hidden"
+      {/* Split panel — rendered as a fixed overlay */}
+      <AnimatePresence>
+        {splitPanel && !isCollapsed && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: `${100 - splitWidth}%`, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            className="fixed top-0 right-0 bottom-0 border-l overflow-hidden"
+            style={{
+              borderColor: 'rgba(192,132,252,0.1)',
+              background: 'rgba(3,3,8,0.98)',
+              zIndex: 55,
+              minWidth: '25%',
+            }}
+            data-testid="split-screen-panel"
+          >
+            {/* Resize handle */}
+            <div
+              className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize z-50 flex items-center justify-center group hover:bg-purple-500/10 transition-colors"
+              onMouseDown={handleResizeStart}
+              onTouchStart={handleResizeStart}
+              data-testid="split-resize-handle"
+            >
+              <div className="w-0.5 h-12 rounded-full bg-purple-400/20 group-hover:bg-purple-400/40 transition-colors" />
+            </div>
+
+            {/* Split panel header */}
+            <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 border-b"
               style={{
-                borderColor: 'rgba(192,132,252,0.1)',
-                background: 'rgba(3,3,8,0.98)',
-                minWidth: '25%',
-              }}
-              data-testid="split-screen-panel"
-            >
-              {/* Resize handle */}
-              <div
-                className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize z-50 flex items-center justify-center group hover:bg-purple-500/10 transition-colors"
-                onMouseDown={handleResizeStart}
-                onTouchStart={handleResizeStart}
-                data-testid="split-resize-handle"
-              >
-                <div className="w-0.5 h-12 rounded-full bg-purple-400/20 group-hover:bg-purple-400/40 transition-colors" />
-              </div>
-
-              {/* Split panel header */}
-              <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 border-b"
-                style={{
-                  background: 'rgba(3,3,8,0.95)',
-                  backdropFilter: 'blur(20px)',
-                  borderColor: 'rgba(192,132,252,0.08)',
-                }}>
-                <div className="flex items-center gap-2">
-                  <Columns size={12} style={{ color: SPLIT_PAGES[splitPanel.path]?.color || '#D8B4FE' }} />
-                  <span className="text-xs font-medium" style={{ color: SPLIT_PAGES[splitPanel.path]?.color || '#D8B4FE' }}>
-                    {SPLIT_PAGES[splitPanel.path]?.label || 'Panel'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={toggleCollapse}
-                    className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
-                    data-testid="split-collapse-btn">
-                    <Minimize2 size={12} style={{ color: 'var(--text-muted)' }} />
-                  </button>
-                  <button onClick={closeSplit}
-                    className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
-                    data-testid="split-close-btn">
-                    <X size={12} style={{ color: 'var(--text-muted)' }} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Split panel content via iframe */}
-              <iframe
-                src={`${window.location.origin}${splitPanel.path}?splitview=true`}
-                className="w-full border-0"
-                style={{ height: 'calc(100vh - 40px)' }}
-                title={`Split: ${SPLIT_PAGES[splitPanel.path]?.label || 'Panel'}`}
-                data-testid="split-screen-iframe"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Collapsed split indicator */}
-        <AnimatePresence>
-          {splitPanel && isCollapsed && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="fixed right-0 top-1/2 -translate-y-1/2 z-50"
-            >
-              <button
-                onClick={toggleCollapse}
-                className="flex items-center gap-2 px-2 py-4 rounded-l-xl transition-all hover:px-3"
-                style={{
-                  background: 'rgba(3,3,8,0.9)',
-                  border: '1px solid rgba(192,132,252,0.15)',
-                  borderRight: 'none',
-                  backdropFilter: 'blur(20px)',
-                }}
-                data-testid="split-expand-btn"
-              >
-                <Maximize2 size={14} style={{ color: SPLIT_PAGES[splitPanel.path]?.color || '#D8B4FE' }} />
-                <span className="text-[10px] writing-mode-vertical"
-                  style={{ color: SPLIT_PAGES[splitPanel.path]?.color, writingMode: 'vertical-rl' }}>
-                  {SPLIT_PAGES[splitPanel.path]?.label}
+                background: 'rgba(3,3,8,0.95)',
+                backdropFilter: 'blur(20px)',
+                borderColor: 'rgba(192,132,252,0.08)',
+              }}>
+              <div className="flex items-center gap-2">
+                <Columns size={12} style={{ color: SPLIT_PAGES[splitPanel.path]?.color || '#D8B4FE' }} />
+                <span className="text-xs font-medium" style={{ color: SPLIT_PAGES[splitPanel.path]?.color || '#D8B4FE' }}>
+                  {SPLIT_PAGES[splitPanel.path]?.label || 'Panel'}
                 </span>
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </div>
+              <div className="flex items-center gap-1">
+                <button onClick={toggleCollapse}
+                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                  data-testid="split-collapse-btn">
+                  <Minimize2 size={12} style={{ color: 'var(--text-muted)' }} />
+                </button>
+                <button onClick={closeSplit}
+                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                  data-testid="split-close-btn">
+                  <X size={12} style={{ color: 'var(--text-muted)' }} />
+                </button>
+              </div>
+            </div>
 
-        {/* Resize overlay */}
-        {isResizing && <div className="fixed inset-0 z-[100] cursor-col-resize" />}
-      </div>
+            {/* Split panel content via iframe */}
+            <iframe
+              src={`${window.location.origin}${splitPanel.path}?splitview=true`}
+              className="w-full border-0"
+              style={{ height: 'calc(100vh - 40px)' }}
+              title={`Split: ${SPLIT_PAGES[splitPanel.path]?.label || 'Panel'}`}
+              data-testid="split-screen-iframe"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Collapsed split indicator */}
+      <AnimatePresence>
+        {splitPanel && isCollapsed && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed right-0 top-1/2 -translate-y-1/2 z-50"
+          >
+            <button
+              onClick={toggleCollapse}
+              className="flex items-center gap-2 px-2 py-4 rounded-l-xl transition-all hover:px-3"
+              style={{
+                background: 'rgba(3,3,8,0.9)',
+                border: '1px solid rgba(192,132,252,0.15)',
+                borderRight: 'none',
+                backdropFilter: 'blur(20px)',
+              }}
+              data-testid="split-expand-btn"
+            >
+              <Maximize2 size={14} style={{ color: SPLIT_PAGES[splitPanel.path]?.color || '#D8B4FE' }} />
+              <span className="text-[10px]"
+                style={{ color: SPLIT_PAGES[splitPanel.path]?.color, writingMode: 'vertical-rl' }}>
+                {SPLIT_PAGES[splitPanel.path]?.label}
+              </span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Resize overlay */}
+      {isResizing && <div className="fixed inset-0 z-[100] cursor-col-resize" />}
     </SplitScreenContext.Provider>
   );
 }
