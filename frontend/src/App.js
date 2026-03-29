@@ -17,6 +17,7 @@ import CreditNudge from './components/CreditNudge';
 import CosmicMixer from './components/CosmicMixer';
 import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
+import { AvatarProvider } from './context/AvatarContext';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -213,6 +214,7 @@ function App() {
   <LanguageProvider>
     <AuthProvider>
       <CreditProvider>
+      <AvatarProvider>
       <SensoryProvider>
         <BrowserRouter>
           {/* Immersive Fluid Mesh Gradient — outside all wrappers */}
@@ -246,6 +248,7 @@ function App() {
           </SplitScreenProvider>
         </BrowserRouter>
       </SensoryProvider>
+      </AvatarProvider>
       </CreditProvider>
     </AuthProvider>
   </LanguageProvider>

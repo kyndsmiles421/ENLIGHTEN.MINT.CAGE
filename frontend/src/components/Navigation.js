@@ -19,6 +19,7 @@ import { SplitScreenLauncher } from './SplitScreen';
 import NotificationSettings from './NotificationSettings';
 import { setAmbientEnabled, getAmbientEnabled } from '../hooks/useAmbientSoundscape';
 import { useCreditsContext } from '../context/CreditContext';
+import { useAvatar } from '../context/AvatarContext';
 
 /* Soundscape on/off toggle */
 function SoundscapeToggle() {
@@ -331,6 +332,7 @@ export default function Navigation() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const { creditInfo } = useCreditsContext();
+  const { avatarB64 } = useAvatar();
   const profileRef = useRef(null);
   const notifRef = useRef(null);
   const profileTimeout = useRef(null);
@@ -546,9 +548,13 @@ export default function Navigation() {
                 }}
                 data-testid="nav-profile-btn"
               >
-                <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
-                  style={{ background: 'rgba(192,132,252,0.2)', color: '#D8B4FE' }}>
-                  {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold overflow-hidden"
+                  style={{ background: avatarB64 ? 'transparent' : 'rgba(192,132,252,0.2)', color: '#D8B4FE' }}>
+                  {avatarB64 ? (
+                    <img src={`data:image/png;base64,${avatarB64}`} alt="" className="w-full h-full object-cover" data-testid="nav-avatar-img" />
+                  ) : (
+                    user.name?.charAt(0)?.toUpperCase() || 'U'
+                  )}
                 </div>
                 <span className="max-w-[60px] truncate">{user.name?.split(' ')[0]}</span>
                 <ChevronDown size={10} style={{ transform: profileOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }} />
@@ -687,9 +693,13 @@ export default function Navigation() {
                 {user ? (
                   <>
                     <div className="flex items-center gap-3 px-4 py-2 mb-2">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                        style={{ background: 'rgba(192,132,252,0.15)', color: '#D8B4FE' }}>
-                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden"
+                        style={{ background: avatarB64 ? 'transparent' : 'rgba(192,132,252,0.15)', color: '#D8B4FE' }}>
+                        {avatarB64 ? (
+                          <img src={`data:image/png;base64,${avatarB64}`} alt="" className="w-full h-full object-cover" data-testid="nav-avatar-img-mobile" />
+                        ) : (
+                          user.name?.charAt(0)?.toUpperCase() || 'U'
+                        )}
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</p>

@@ -746,7 +746,7 @@ async def generate_avatar(
 
         # Also update user profile
         await db.users.update_one(
-            {"email": user["email"]},
+            {"id": user["id"]},
             {"$set": {"avatar_b64": image_b64, "avatar_style": style, "avatar_desc": description}},
         )
 
@@ -808,7 +808,7 @@ async def set_active_avatar(body: dict = Body(...), user=Depends(get_current_use
     )
     if avatar:
         await db.users.update_one(
-            {"email": user["email"]},
+            {"id": user["id"]},
             {"$set": {"avatar_b64": avatar["image_b64"]}},
         )
 

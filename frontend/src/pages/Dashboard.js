@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useAvatar } from '../context/AvatarContext';
 import { useNavigate } from 'react-router-dom';
 import { useSensory } from '../context/SensoryContext';
 import {
@@ -78,6 +79,7 @@ const CATEGORIZED_ACTIONS = [
 
 export default function Dashboard() {
   const { user, authHeaders, loading: authLoading } = useAuth();
+  const { avatarB64 } = useAvatar();
   const navigate = useNavigate();
   const { prefs } = useSensory();
   const isLight = prefs.theme === 'light';
@@ -125,10 +127,26 @@ export default function Dashboard() {
     <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 relative immersive-page" style={{ background: 'transparent' }} data-testid="dashboard-page">
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--primary)' }}>Dashboard</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Welcome back, <span className="animate-text-shimmer">{user?.name?.split(' ')[0]}</span>
-          </h1>
+          <div className="flex items-center gap-5 mb-2">
+            {avatarB64 && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: 'spring' }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden flex-shrink-0"
+                style={{ border: '2px solid rgba(192,132,252,0.3)', boxShadow: '0 0 30px rgba(192,132,252,0.15)' }}
+                data-testid="dashboard-avatar"
+              >
+                <img src={`data:image/png;base64,${avatarB64}`} alt="" className="w-full h-full object-cover" />
+              </motion.div>
+            )}
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: 'var(--primary)' }}>Dashboard</p>
+              <h1 className="text-4xl md:text-5xl font-light tracking-tight" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                Welcome back, <span className="animate-text-shimmer">{user?.name?.split(' ')[0]}</span>
+              </h1>
+            </div>
+          </div>
           <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
             Your consciousness practice at a glance.
           </p>
