@@ -30,8 +30,16 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ### Context-Aware Human Voices (tts-1-hd)
 - All 35 NarrationPlayer instances + 6 direct TTS calls pass `context` parameter
-- 25+ voice-context mappings: Shimmer for meditation/breathing, Fable for star chart/oracle, Sage for coaching, Onyx for creation stories, Nova for knowledge/encyclopedia
+- 25+ voice-context mappings: Shimmer for meditation/breathing, Fable for star chart/oracle/myths, Sage for coaching, Onyx for creation stories, Nova for knowledge/encyclopedia
 - All backend TTS endpoints use `tts-1-hd` model
+
+### Myths & Legends Database (NEW — Feb 2026)
+- **20 civilizations**: Mayan, Egyptian, Aboriginal, Lakota, Hindu, Norse, Greek, Japanese, Yoruba, Maori, Chinese, Celtic, Inuit, Aztec, Sumerian, Persian, Bantu, Polynesian, Native American, Slavic
+- **120+ seed myths** with AI generation per myth
+- **Backend**: `/api/myths/civilizations`, `/api/myths/{civ_id}`, `/api/myths/{civ_id}/generate`, `/api/myths/{myth_id}/narrate`, `/api/myths/search/{query}`
+- **Frontend**: Dual-tab page ("Creation Stories" + "Myths & Legends") with animated tab bar, civilization browser grid, per-civ myth list, myth detail with narrative paragraph reveal, characters, symbols, connected myths, HD voice narration
+- **Animations**: Staggered card entrances (spring physics), hover glow effects, animated gradient headers, blur-to-clear narrative reveal for story paragraphs, pulsing civilization dots, tab underline layout animation
+- **15 original creation stories** preserved with cinematic mode + Sora 2 video
 
 ### AI & Voice
 - Voice AI Sage, Sora 2 Video Gallery + Cinematic Intro Video, Monthly Soul Reports, OpenAI TTS mantras
@@ -68,6 +76,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - **Page dimming on auth**: `page-enter` animation started from opacity:0. Changed to 0.7 with faster 0.25s transition.
 - **Guided Tour blocking**: Auto-launched on first visit covering entire page. Removed auto-launch.
 - **Cosmic Mixer blocking buttons**: No backdrop dismiss, no auto-close. Added backdrop + route-change auto-close.
+- **LlmChat init bug**: Myth generation used invalid `model` param. Fixed to use `session_id` + `system_message`.
 
 ## Test Credentials
 - User: test@test.com / password
