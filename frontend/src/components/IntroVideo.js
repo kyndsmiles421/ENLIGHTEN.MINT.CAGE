@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Play, X, Loader2, Sparkles, Volume2, VolumeX } from 'lucide-react';
@@ -106,59 +107,62 @@ export default function IntroVideo() {
         </div>
       </motion.button>
 
-      {/* Fullscreen Player */}
-      <AnimatePresence>
-        {isOpen && videoUrl && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9998] flex items-center justify-center"
-            style={{ background: 'rgba(3,4,10,0.95)', backdropFilter: 'blur(24px)' }}
-            onClick={closePlayer}
-            data-testid="intro-video-player">
-            <div onClick={e => e.stopPropagation()} className="relative w-full max-w-4xl mx-4">
-              {/* Close */}
-              <button onClick={closePlayer} data-testid="intro-video-close"
-                className="absolute -top-12 right-0 p-2 rounded-xl transition-all hover:bg-white/5 z-10"
-                style={{ color: 'rgba(248,250,252,0.5)' }}>
-                <X size={20} />
-              </button>
-
-              {/* Video */}
-              <div className="rounded-2xl overflow-hidden relative" style={{ border: '1px solid rgba(216,180,254,0.1)' }}>
-                <video ref={videoRef}
-                  src={`${process.env.REACT_APP_BACKEND_URL}${videoUrl}`}
-                  muted={muted}
-                  loop
-                  playsInline
-                  autoPlay
-                  onCanPlay={handleVideoReady}
-                  onError={() => {}}
-                  className="w-full"
-                  style={{ maxHeight: '70vh' }}
-                  data-testid="intro-video-element" />
-
-                {/* Mute toggle */}
-                <button onClick={() => setMuted(m => !m)}
-                  className="absolute bottom-4 right-4 p-2 rounded-lg"
-                  style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
-                  {muted ? <VolumeX size={14} style={{ color: '#F8FAFC' }} /> : <Volume2 size={14} style={{ color: '#F8FAFC' }} />}
+      {/* Fullscreen Player — portaled to body to escape transform parents */}
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && videoUrl && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9998] flex items-center justify-center"
+              style={{ background: 'rgba(3,4,10,0.95)', backdropFilter: 'blur(24px)' }}
+              onClick={closePlayer}
+              data-testid="intro-video-player">
+              <div onClick={e => e.stopPropagation()} className="relative w-full max-w-4xl mx-4">
+                {/* Close */}
+                <button onClick={closePlayer} data-testid="intro-video-close"
+                  className="absolute -top-12 right-0 p-2 rounded-xl transition-all hover:bg-white/5 z-10"
+                  style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  <X size={20} />
                 </button>
 
-                {/* Title overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6"
-                  style={{ background: 'linear-gradient(transparent, rgba(3,4,10,0.8))' }}>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#D8B4FE' }}>
-                    The Cosmic Collective
-                  </p>
-                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
-                    A cinematic vision powered by Sora 2 AI
-                  </p>
+                {/* Video */}
+                <div className="rounded-2xl overflow-hidden relative" style={{ border: '1px solid rgba(216,180,254,0.1)' }}>
+                  <video ref={videoRef}
+                    src={`${process.env.REACT_APP_BACKEND_URL}${videoUrl}`}
+                    muted={muted}
+                    loop
+                    playsInline
+                    autoPlay
+                    onCanPlay={handleVideoReady}
+                    onError={() => {}}
+                    className="w-full"
+                    style={{ maxHeight: '70vh' }}
+                    data-testid="intro-video-element" />
+
+                  {/* Mute toggle */}
+                  <button onClick={() => setMuted(m => !m)}
+                    className="absolute bottom-4 right-4 p-2 rounded-lg"
+                    style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+                    {muted ? <VolumeX size={14} style={{ color: '#F8FAFC' }} /> : <Volume2 size={14} style={{ color: '#F8FAFC' }} />}
+                  </button>
+
+                  {/* Title overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6"
+                    style={{ background: 'linear-gradient(transparent, rgba(3,4,10,0.8))' }}>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#D8B4FE' }}>
+                      The Cosmic Collective
+                    </p>
+                    <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                      A cinematic vision powered by Sora 2 AI
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }
