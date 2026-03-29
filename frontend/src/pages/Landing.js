@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShareButton from '../components/ShareButton';
+import GuidedTour from '../components/GuidedTour';
+import IntroVideo from '../components/IntroVideo';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -705,7 +707,21 @@ export default function Landing() {
   const { user } = useAuth();
   const [breathScale, setBreathScale] = useState(1);
   const [showQuickReset, setShowQuickReset] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const animRef = useRef(null);
+
+  // Auto-launch tour for first-time visitors
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('zen_tour_seen');
+    if (!hasSeenTour) {
+      const timer = setTimeout(() => setShowTour(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleTourFinish = () => {
+    localStorage.setItem('zen_tour_seen', 'true');
+  };
 
   const animateBreath = useCallback(() => {
     const duration = 8000;
@@ -728,6 +744,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen relative" style={{ background: 'transparent' }}>
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
+      <GuidedTour isOpen={showTour} onClose={() => { setShowTour(false); handleTourFinish(); }} onFinish={handleTourFinish} />
 
       {/* Share Button */}
       <div className="fixed top-4 right-4 z-50">
@@ -781,11 +798,22 @@ export default function Landing() {
                   {user ? 'Continue Journey' : 'Begin Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
+              <button onClick={() => setShowTour(true)}
+                className="btn-glass group"
+                style={{ background: 'rgba(216,180,254,0.06)', borderColor: 'rgba(216,180,254,0.15)' }}
+                data-testid="take-tour-btn">
+                <span className="flex items-center gap-2" style={{ color: '#D8B4FE' }}>
+                  Take the Tour <Play size={14} className="transition-transform duration-300 group-hover:scale-110" />
+                </span>
+              </button>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
-              className="flex items-center gap-2 mt-8">
-              <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
-              <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for full experience</span>
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
+              <IntroVideo />
+              <div className="flex items-center gap-2">
+                <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
+                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for full experience</span>
+              </div>
             </motion.div>
           </motion.div>
 

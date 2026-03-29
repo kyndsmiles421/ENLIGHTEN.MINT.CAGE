@@ -581,3 +581,69 @@ async def get_batch_status(batch_id: str, user=Depends(get_current_user)):
         "failed_ids": batch["failed"],
         "total": len(batch["story_ids"]),
     }
+
+
+# ════════════════════════════════════════════
+# INTRO VIDEO — Cinematic App Tour (Sora 2)
+# ════════════════════════════════════════════
+
+INTRO_VIDEO_PROMPT = """A cinematic, ethereal journey through cosmic spiritual realms. 
+Opening: camera drifts through a vast nebula of swirling violet and teal stardust, revealing ancient constellation patterns from different world cultures. 
+Transition: golden light rays pierce through crystal formations as sacred geometric patterns (Flower of Life, Metatron's Cube) slowly rotate and pulse. 
+Middle: a serene figure sits in meditation surrounded by floating symbols from world traditions — Om, Yin-Yang, Eye of Horus, Tree of Life, Medicine Wheel — each glowing in its tradition's color. 
+Ending: camera pulls back to reveal an infinite cosmic library with scrolls of light, settling on a luminous portal that opens invitingly. 
+Style: ultra cinematic, magical realism, soft focus bokeh, volumetric light rays, deep space colors (indigo, violet, teal, gold), 4K quality, spiritual and awe-inspiring atmosphere."""
+
+INTRO_CACHE_KEY = "cosmic_collective_intro_v1"
+
+
+@router.get("/ai-visuals/intro-video")
+async def get_intro_video():
+    """Get the pre-generated cinematic intro video. No auth required."""
+    cached = await db.ai_video_cache.find_one(
+        {"cache_key": INTRO_CACHE_KEY}, {"_id": 0, "video_url": 1}
+    )
+    if cached and cached.get("video_url"):
+        file_path = str(Path(__file__).parent.parent / cached["video_url"].lstrip("/api/"))
+        if os.path.exists(file_path):
+            return {"status": "ready", "video_url": cached["video_url"]}
+
+    # Check if currently generating
+    for jid, job in _video_jobs.items():
+        if job.get("cache_key") == INTRO_CACHE_KEY:
+            return {"status": job["status"], "job_id": jid}
+
+    return {"status": "not_generated"}
+
+
+@router.post("/ai-visuals/intro-video/generate")
+async def generate_intro_video(user=Depends(get_current_user)):
+    """Trigger generation of the cinematic intro video (admin/creator only)."""
+    # Check if already exists
+    cached = await db.ai_video_cache.find_one(
+        {"cache_key": INTRO_CACHE_KEY}, {"_id": 0, "video_url": 1}
+    )
+    if cached and cached.get("video_url"):
+        file_path = str(Path(__file__).parent.parent / cached["video_url"].lstrip("/api/"))
+        if os.path.exists(file_path):
+            return {"status": "complete", "video_url": cached["video_url"], "cached": True}
+
+    # Check if already generating
+    for jid, job in _video_jobs.items():
+        if job.get("cache_key") == INTRO_CACHE_KEY and job["status"] == "generating":
+            return {"status": "generating", "job_id": jid}
+
+    # Start generation
+    job_id = str(uuid.uuid4())[:12]
+    filename = f"intro_{INTRO_CACHE_KEY[:12]}_{job_id}.mp4"
+    _video_jobs[job_id] = {
+        "status": "queued",
+        "video_url": None,
+        "error": None,
+        "cache_key": INTRO_CACHE_KEY,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    asyncio.create_task(_run_video_generation(job_id, INTRO_VIDEO_PROMPT, INTRO_CACHE_KEY, filename))
+
+    return {"status": "queued", "job_id": job_id}
