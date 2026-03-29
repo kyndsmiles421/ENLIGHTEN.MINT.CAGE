@@ -37,7 +37,7 @@ function savePrefs(prefs) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); } catch {}
 }
 
-export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4FE' }) {
+export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4FE', context = '' }) {
   const [state, setState] = useState('idle');
   const [showSettings, setShowSettings] = useState(false);
   const [voice, setVoice] = useState(() => loadPrefs().voice);
@@ -107,7 +107,7 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
     // Fetch new TTS audio
     setState('loading');
     try {
-      const res = await axios.post(`${API}/tts/narrate`, { text: currentText, speed, voice });
+      const res = await axios.post(`${API}/tts/narrate`, { text: currentText, speed, voice, context });
       const b64 = res.data.audio;
       cacheRef.current[cacheKey] = b64;
       playAudio(b64, 0);

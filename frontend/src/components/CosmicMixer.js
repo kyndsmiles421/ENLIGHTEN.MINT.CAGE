@@ -183,7 +183,7 @@ export default function CosmicMixer() {
     setActiveMantra(mantra);
     setMantraLoading(true);
     try {
-      const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, voice: 'shimmer', speed: 0.8 });
+      const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, context: 'mixer' });
       const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
       audio.volume = 0.7;
       mantraAudioRef.current = audio;

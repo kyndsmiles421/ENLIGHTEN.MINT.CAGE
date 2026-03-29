@@ -262,8 +262,8 @@ async def narrate_creation_story(story_id: str):
         audio_b64 = await tts.generate_speech_base64(
             text=narration[:4096],
             model="tts-1-hd",
-            voice="fable",
-            speed=0.9,
+            voice="onyx",
+            speed=0.85,
             response_format="mp3",
         )
         tts_cache[cache_key] = audio_b64

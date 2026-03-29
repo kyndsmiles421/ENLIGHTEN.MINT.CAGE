@@ -108,7 +108,7 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
     }
     setState('loading');
     try {
-      const res = await axios.post(`${API}/tts/narrate`, { text: fullText, voice: 'fable', speed: 0.9 });
+      const res = await axios.post(`${API}/tts/narrate`, { text: fullText, context: 'constellation' });
       const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
       audioRef.current = audio;
 

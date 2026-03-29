@@ -85,6 +85,7 @@ export default function GuidedExperience({ practiceName, description, instructio
         text,
         voice: voicePrefs.voice,
         speed: voicePrefs.speed || 0.8,
+        context: category || 'meditation',
       });
       const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
       audioRef.current = audio;

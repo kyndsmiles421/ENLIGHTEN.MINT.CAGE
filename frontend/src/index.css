@@ -954,10 +954,10 @@ body[data-theme="light"] .glass-card span[class*="rounded-full"] {
 
 /* Auto-entrance animation for all page content */
 .page-enter {
-  animation: page-rise 0.5s ease-out forwards;
+  animation: page-rise 0.25s ease-out forwards;
 }
 @keyframes page-rise {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0.7; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

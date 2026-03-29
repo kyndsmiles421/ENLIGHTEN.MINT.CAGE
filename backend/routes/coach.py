@@ -486,7 +486,7 @@ async def voice_chat(
         tts_text = reply[:4096] if len(reply) > 4096 else reply
         audio_b64 = await tts.generate_speech_base64(
             text=tts_text,
-            model="tts-1",
+            model="tts-1-hd",
             voice="sage",
             response_format="mp3",
         )

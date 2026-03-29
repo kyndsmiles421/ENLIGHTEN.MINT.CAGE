@@ -37,7 +37,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen immersive-page flex items-center justify-center px-6" style={{ background: 'transparent' }}>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-md"

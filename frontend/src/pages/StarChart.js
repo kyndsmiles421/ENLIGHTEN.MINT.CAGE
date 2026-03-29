@@ -1091,7 +1091,7 @@ export default function StarChart() {
     const storyText = `${c.name}. ${myth.figure}. ${myth.story} The cosmic lesson: ${myth.lesson}`;
 
     try {
-      const res = await axios.post(`${API}/tts/narrate`, { text: storyText, voice: 'fable', speed: 0.9 });
+      const res = await axios.post(`${API}/tts/narrate`, { text: storyText, context: 'constellation' });
       const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
       journeyAudioRef.current = audio;
       audio.onended = () => {

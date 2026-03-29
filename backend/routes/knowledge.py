@@ -168,13 +168,50 @@ Return ONLY valid JSON array, no markdown."""
         raise HTTPException(status_code=500, detail="Could not generate guided experience")
 
 
+# Context-aware voice mapping: each context maps to the most fitting voice + speed
+# for a natural, human feel that matches the feature's mood
+VOICE_CONTEXT_MAP = {
+    "meditation":   {"voice": "shimmer", "speed": 0.85},  # calm, soothing, slow
+    "breathing":    {"voice": "shimmer", "speed": 0.80},  # gentle, measured pace
+    "yoga":         {"voice": "nova",    "speed": 0.90},  # warm, encouraging
+    "mantras":      {"voice": "shimmer", "speed": 0.75},  # reverent, spiritual
+    "affirmations": {"voice": "nova",    "speed": 0.90},  # warm, affirming
+    "starchart":    {"voice": "fable",   "speed": 0.88},  # storyteller, mythical
+    "constellation":{"voice": "fable",   "speed": 0.88},
+    "creation":     {"voice": "onyx",    "speed": 0.85},  # dramatic narrator
+    "oracle":       {"voice": "fable",   "speed": 0.85},  # mystical, prophetic
+    "tarot":        {"voice": "fable",   "speed": 0.85},
+    "akashic":      {"voice": "sage",    "speed": 0.82},  # ancient, wise
+    "sage":         {"voice": "sage",    "speed": 0.88},  # AI coach, wise guide
+    "coach":        {"voice": "sage",    "speed": 0.88},
+    "encyclopedia": {"voice": "nova",    "speed": 0.95},  # scholarly but warm
+    "knowledge":    {"voice": "nova",    "speed": 0.95},
+    "reiki":        {"voice": "shimmer", "speed": 0.80},  # healing, gentle
+    "frequency":    {"voice": "shimmer", "speed": 0.82},
+    "soundscape":   {"voice": "shimmer", "speed": 0.80},
+    "mixer":        {"voice": "shimmer", "speed": 0.80},
+    "journal":      {"voice": "nova",    "speed": 0.90},  # reflective, personal
+    "ritual":       {"voice": "fable",   "speed": 0.85},  # ceremonial
+    "dream":        {"voice": "fable",   "speed": 0.82},  # dreamlike, mystical
+    "crystal":      {"voice": "nova",    "speed": 0.88},  # earthy, grounded
+    "numerology":   {"voice": "sage",    "speed": 0.90},  # analytical, wise
+    "herbology":    {"voice": "nova",    "speed": 0.90},  # nurturing, grounded
+}
+VALID_VOICES = {"alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"}
+
+
 @router.post("/tts/narrate")
 async def generate_narration(req: NarrationRequest):
     if not req.text or len(req.text.strip()) < 5:
         raise HTTPException(status_code=400, detail="Text too short")
     text = req.text[:4000]
-    voice = req.voice if req.voice in ["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"] else "nova"
-    cache_key = hashlib.md5(f"{text}:{req.speed}:{voice}".encode()).hexdigest()
+
+    # Resolve voice + speed from context, with explicit overrides taking priority
+    ctx_defaults = VOICE_CONTEXT_MAP.get(req.context, {"voice": "nova", "speed": 0.92})
+    voice = req.voice if req.voice and req.voice in VALID_VOICES else ctx_defaults["voice"]
+    speed = req.speed if req.speed else ctx_defaults["speed"]
+
+    cache_key = hashlib.md5(f"{text}:{speed}:{voice}".encode()).hexdigest()
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
     try:
@@ -183,7 +220,7 @@ async def generate_narration(req: NarrationRequest):
             text=text,
             model="tts-1-hd",
             voice=voice,
-            speed=req.speed or 1.0,
+            speed=speed,
             response_format="mp3"
         )
         tts_cache[cache_key] = audio_b64

@@ -88,8 +88,9 @@ class LessonComplete(BaseModel):
 
 class NarrationRequest(BaseModel):
     text: str
-    speed: Optional[float] = 1.0
-    voice: Optional[str] = "nova"
+    speed: Optional[float] = None
+    voice: Optional[str] = None
+    context: Optional[str] = None
 
 class KnowledgeRequest(BaseModel):
     topic: str
