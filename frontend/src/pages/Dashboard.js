@@ -12,7 +12,7 @@ import {
   ChevronRight, Music, HeartHandshake, Map, TrendingUp,
   Gamepad2, UserPlus, Check, Quote, Sun, Eye, Star, Moon,
   Compass, Droplets, UtensilsCrossed, Target, PenTool, Globe,
-  Calendar, BarChart3, MessageCircle, Orbit, Atom
+  Calendar, BarChart3, MessageCircle, Orbit, Atom, HelpCircle
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 
@@ -93,12 +93,6 @@ export default function Dashboard() {
   const [coherence, setCoherence] = useState(null);
 
   useEffect(() => {
-    // Check if first visit
-    const seen = localStorage.getItem('cosmic_walkthrough_seen');
-    if (!seen) setShowWalkthrough(true);
-  }, []);
-
-  useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
       return;
@@ -124,66 +118,84 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 relative immersive-page" style={{ background: 'transparent' }} data-testid="dashboard-page">
+    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10 relative immersive-page" style={{ background: 'transparent' }} data-testid="dashboard-page">
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center gap-5 mb-2">
+          <div className="flex items-center gap-4 mb-1">
             {avatarB64 && (
-              <motion.div
+              <motion.button
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
-                className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden flex-shrink-0"
-                style={{ border: '2px solid rgba(192,132,252,0.3)', boxShadow: '0 0 30px rgba(192,132,252,0.15)' }}
+                onClick={() => navigate('/avatar')}
+                className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0"
+                style={{ border: '2px solid rgba(192,132,252,0.3)', boxShadow: '0 0 20px rgba(192,132,252,0.1)' }}
                 data-testid="dashboard-avatar"
               >
                 <img src={`data:image/png;base64,${avatarB64}`} alt="" className="w-full h-full object-cover" />
-              </motion.div>
+              </motion.button>
             )}
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: 'var(--primary)' }}>Dashboard</p>
-              <h1 className="text-4xl md:text-5xl font-light tracking-tight" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+            <div className="flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: 'var(--primary)' }}>Dashboard</p>
+              <h1 className="text-3xl md:text-4xl font-light tracking-tight" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                 Welcome back, <span className="animate-text-shimmer">{user?.name?.split(' ')[0]}</span>
               </h1>
             </div>
+            <button onClick={() => setShowWalkthrough(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all hover:scale-110"
+              style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}
+              data-testid="dashboard-help-btn"
+              title="App guide">
+              <HelpCircle size={14} style={{ color: 'var(--text-muted)' }} />
+            </button>
           </div>
-          <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+            {(streak?.current_streak || 0) > 0 && (
+              <span style={{ color: '#FCD34D' }}>
+                <Flame size={11} className="inline" /> {streak?.current_streak}-day streak &middot;{' '}
+              </span>
+            )}
             Your consciousness practice at a glance.
           </p>
         </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-12">
+        {/* Stats Cards — Compact & Tappable */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {[
-            { icon: Flame, color: '#FCD34D', label: 'Streak', value: streak?.current_streak || stats?.streak || 0, sub: `${streak?.longest_streak || 0} best | ${streak?.total_active_days || 0} total`, testId: 'dashboard-streak' },
-            { icon: Heart, color: '#FDA4AF', label: 'Mood Logs', value: stats?.mood_count || 0, sub: 'emotions tracked', testId: 'dashboard-moods' },
-            { icon: BookOpen, color: '#86EFAC', label: 'Journal', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals' },
+            { icon: Flame, color: '#FCD34D', label: 'Streak', value: streak?.current_streak || stats?.streak || 0, sub: `${streak?.longest_streak || 0} best | ${streak?.total_active_days || 0} total`, testId: 'dashboard-streak', link: '/growth-timeline' },
+            { icon: Heart, color: '#FDA4AF', label: 'Mood Logs', value: stats?.mood_count || 0, sub: 'emotions tracked', testId: 'dashboard-moods', link: '/mood' },
+            { icon: BookOpen, color: '#86EFAC', label: 'Journal', value: stats?.journal_count || 0, sub: 'reflections written', testId: 'dashboard-journals', link: '/journal' },
             { icon: Gamepad2, color: '#FB923C', label: 'Games', value: '', sub: 'Play to earn', testId: 'dashboard-games', link: '/games' },
           ].map((card, i) => {
             const Icon = card.icon;
             return (
-              <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}
-                className="glass-card p-6 animate-breathe-border group hover:scale-[1.02] transition-transform duration-300 cursor-pointer"
-                onClick={() => card.link && navigate(card.link)}
+              <motion.button key={card.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.04 }}
+                onClick={() => navigate(card.link)}
+                onTouchEnd={(e) => { e.preventDefault(); navigate(card.link); }}
+                className="glass-card p-4 text-left group active:scale-[0.97] transition-all duration-200"
+                style={{ touchAction: 'manipulation' }}
+                data-testid={card.testId}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                    style={{ background: `${card.color}12` }}>
-                    <Icon size={18} style={{ color: card.color, filter: `drop-shadow(0 0 6px ${card.color}60)` }} />
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                      style={{ background: `${card.color}12` }}>
+                      <Icon size={14} style={{ color: card.color, filter: `drop-shadow(0 0 4px ${card.color}60)` }} />
+                    </div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
                   </div>
-                  <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
+                  <ChevronRight size={12} style={{ color: card.color, opacity: 0.5 }}
+                    className="group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
                 </div>
                 {card.value !== '' ? (
-                  <p className="text-4xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }} data-testid={card.testId}>
+                  <p className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                     {card.value}
                   </p>
                 ) : (
-                  <p className="text-sm font-medium" style={{ color: card.color }} data-testid={card.testId}>
-                    Play Now
-                  </p>
+                  <p className="text-sm font-medium" style={{ color: card.color }}>Play Now</p>
                 )}
-                <p className="text-[11px] mt-1.5" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
-              </motion.div>
+                <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>{card.sub}</p>
+              </motion.button>
             );
           })}
         </div>
@@ -191,7 +203,7 @@ export default function Dashboard() {
         {/* Quantum Coherence Widget */}
         {coherence && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
-            className="glass-card p-6 mb-12 relative overflow-hidden group cursor-pointer hover:scale-[1.01] transition-transform"
+            className="glass-card p-5 mb-6 relative overflow-hidden group cursor-pointer hover:scale-[1.01] transition-transform"
             onClick={() => navigate('/analytics')}
             data-testid="quantum-coherence-widget"
           >
@@ -280,7 +292,7 @@ export default function Dashboard() {
         {/* Daily Challenge Card */}
         {dailyChallenge?.challenge && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="glass-card p-6 mb-12 cursor-pointer hover:scale-[1.01] transition-transform"
+            className="glass-card p-5 mb-6 cursor-pointer hover:scale-[1.01] transition-transform"
             onClick={() => navigate('/friends')}
             data-testid="dashboard-challenge-card">
             <div className="flex items-center gap-4">
@@ -311,7 +323,7 @@ export default function Dashboard() {
         {/* Recent Moods */}
         {dailyWisdom && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
-            className="glass-card p-6 mb-12 cursor-pointer hover:scale-[1.01] transition-transform"
+            className="glass-card p-5 mb-6 cursor-pointer hover:scale-[1.01] transition-transform"
             onClick={() => navigate('/teachings')}
             data-testid="dashboard-daily-wisdom">
             <div className="flex items-start gap-4">
@@ -348,9 +360,13 @@ export default function Dashboard() {
         {/* Recent Moods */}
         {stats?.recent_moods?.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            className="glass-card p-8 mb-12"
+            className="glass-card p-6 mb-6 cursor-pointer hover:scale-[1.01] transition-transform"
+            onClick={() => navigate('/mood')}
           >
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Recent Mood Flow</p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Recent Mood Flow</p>
+              <ChevronRight size={12} style={{ color: 'var(--text-muted)' }} />
+            </div>
             <div className="flex items-end gap-3 h-24">
               {stats.recent_moods.map((m, i) => (
                 <motion.div key={i} className="flex-1 flex flex-col items-center gap-2"
@@ -374,7 +390,7 @@ export default function Dashboard() {
         {/* For You — Personalized Recommendations */}
         {recs?.recommendations?.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}
-            className="mb-12" data-testid="recommendations-section"
+            className="mb-8" data-testid="recommendations-section"
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
