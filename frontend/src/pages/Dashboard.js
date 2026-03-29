@@ -122,7 +122,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 relative" style={{ background: 'transparent' }} data-testid="dashboard-page">
+    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 relative immersive-page" style={{ background: 'transparent' }} data-testid="dashboard-page">
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--primary)' }}>Dashboard</p>

@@ -126,7 +126,7 @@ export default function ProfilePage() {
 
   const update = (key, val) => setDraft({ ...draft, [key]: val });
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
+  if (loading) return <div className="min-h-screen immersive-page flex items-center justify-center" style={{ background: 'transparent' }}><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
   if (!user && !userId) return <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }}><div className="text-center"><h2 className="text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Begin your journey to customize your profile</h2><a href="/auth" className="btn-glass" data-testid="profile-signin">Begin Journey</a></div></div>;
 
   // Restricted profile view

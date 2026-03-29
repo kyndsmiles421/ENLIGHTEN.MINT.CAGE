@@ -144,7 +144,7 @@ export default function Pricing() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+      <div className="min-h-screen immersive-page flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
         <Loader2 className="animate-spin" size={24} style={{ color: 'var(--text-muted)' }} />
       </div>
     );

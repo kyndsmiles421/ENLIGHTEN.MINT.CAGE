@@ -303,7 +303,7 @@ export default function Teachings() {
     : teachers;
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" data-testid="teachings-page">
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" data-testid="teachings-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {activeTeacher ? (

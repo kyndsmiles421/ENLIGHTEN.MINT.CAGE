@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useActivityTracker } from './hooks/useActivityTracker';
+import { useGlobalSounds } from './hooks/useSoundEngine';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -13,6 +14,7 @@ import BackToTop from './components/BackToTop';
 import InstallPrompt from './components/InstallPrompt';
 import CreditNudge from './components/CreditNudge';
 import CosmicMixer from './components/CosmicMixer';
+import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
 
 // Eager load: Landing + Auth (first screens users see)
@@ -111,8 +113,13 @@ function PageLoader() {
 function AnimatedRoutes() {
   const location = useLocation();
   useActivityTracker();
+  useGlobalSounds(); // Attach global interaction sounds
+
+  // Don't show nav/chrome in split view iframe
+  const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
 
   return (
+    <div className="page-enter" key={location.pathname}>
     <Suspense fallback={<PageLoader />}>
       <Routes location={location}>
         <Route path="/" element={<Landing />} />
@@ -195,6 +202,7 @@ function AnimatedRoutes() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    </div>
   );
 }
 
@@ -205,6 +213,7 @@ function App() {
       <CreditProvider>
       <SensoryProvider>
         <BrowserRouter>
+          <SplitScreenProvider>
           <div style={{ minHeight: '100vh', background: '#030308', position: 'relative' }}>
             {/* Immersive Fluid Mesh Gradient */}
             <div className="cosmic-mesh" aria-hidden="true">
@@ -232,6 +241,7 @@ function App() {
             <CreditNudge />
             <CosmicMixer />
           </div>
+          </SplitScreenProvider>
         </BrowserRouter>
       </SensoryProvider>
       </CreditProvider>

@@ -182,7 +182,7 @@ export default function GreenJournal() {
     } catch { toast.error('Failed to delete'); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
+  if (loading) return <div className="min-h-screen immersive-page flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
 
   return (
     <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" data-testid="green-journal-page">

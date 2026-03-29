@@ -356,7 +356,7 @@ export default function Breathing() {
   };
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
       <div className="max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--secondary)' }}>Breathwork</p>
@@ -426,29 +426,55 @@ export default function Breathing() {
               </div>
             </div>
 
-            {/* Breathing Circle */}
+            {/* Breathing Circle — Enhanced Immersive */}
             <div className="lg:col-span-2 flex flex-col items-center justify-center min-h-[500px]">
               <div className="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center mb-12">
-                {[0.15, 0.25, 0.4, 0.6].map((opacity, i) => (
+                {/* Outer aura glow */}
+                <motion.div className="absolute rounded-full" style={{ width: '130%', height: '130%' }}
+                  animate={{ opacity: active ? [0.1, 0.2, 0.1] : 0.05, scale: active ? [1, 1.05, 1] : 1 }}
+                  transition={{ duration: 5, repeat: Infinity }}>
+                  <div className="w-full h-full rounded-full"
+                    style={{ background: `radial-gradient(circle, ${pattern.color}08 0%, transparent 70%)`, filter: 'blur(30px)' }} />
+                </motion.div>
+                {/* Pulsing rings with color dynamics */}
+                {[0.15, 0.25, 0.4, 0.6, 0.8].map((opacity, i) => (
                   <div
                     key={i}
                     className="absolute rounded-full"
                     style={{
-                      width: `${55 + i * 18}%`,
-                      height: `${55 + i * 18}%`,
-                      background: `radial-gradient(circle, ${pattern.color}${Math.round(opacity * 25).toString(16).padStart(2, '0')} 0%, transparent 70%)`,
-                      border: `1px solid ${pattern.color}${Math.round(opacity * 20).toString(16).padStart(2, '0')}`,
+                      width: `${50 + i * 16}%`,
+                      height: `${50 + i * 16}%`,
+                      background: `radial-gradient(circle, ${pattern.color}${Math.round(opacity * 30).toString(16).padStart(2, '0')} 0%, transparent 70%)`,
+                      border: `1px solid ${pattern.color}${Math.round(opacity * 22).toString(16).padStart(2, '0')}`,
+                      boxShadow: active ? `0 0 ${12 + i * 6}px ${pattern.color}${Math.round(opacity * 8).toString(16).padStart(2, '0')}` : 'none',
                       transform: `scale(${scale})`,
-                      transition: `transform ${phaseRef.current.phase === 'inhale' ? pattern.inhale : phaseRef.current.phase === 'exhale' ? pattern.exhale : 0.3}s ease-in-out`,
+                      transition: `transform ${phaseRef.current.phase === 'inhale' ? pattern.inhale : phaseRef.current.phase === 'exhale' ? pattern.exhale : 0.3}s ease-in-out, box-shadow 0.5s ease`,
                     }}
                   />
                 ))}
+                {/* Orbital particles */}
+                {active && Array.from({ length: 8 }).map((_, i) => {
+                  const angle = (i / 8) * Math.PI * 2;
+                  const radius = 42;
+                  return (
+                    <motion.div key={i} className="absolute rounded-full"
+                      style={{
+                        width: 3, height: 3, background: pattern.color,
+                        left: `calc(50% + ${Math.cos(angle) * radius}%)`,
+                        top: `calc(50% + ${Math.sin(angle) * radius}%)`,
+                        boxShadow: `0 0 6px ${pattern.color}60`,
+                      }}
+                      animate={{ opacity: [0.2, 0.7, 0.2], scale: [0.6, 1.3, 0.6] }}
+                      transition={{ duration: 3 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}
+                    />
+                  );
+                })}
                 <div
                   className="relative z-10 flex flex-col items-center justify-center"
                   style={{
                     width: '120px', height: '120px', borderRadius: '50%',
-                    background: `radial-gradient(circle, ${pattern.color}40 0%, ${pattern.color}10 70%)`,
-                    boxShadow: `0 0 60px ${pattern.color}30`,
+                    background: `radial-gradient(circle, ${pattern.color}50 0%, ${pattern.color}15 70%)`,
+                    boxShadow: `0 0 60px ${pattern.color}30, inset 0 0 30px ${pattern.color}10`,
                     transform: `scale(${scale})`,
                     transition: `transform ${phaseRef.current.phase === 'inhale' ? pattern.inhale : phaseRef.current.phase === 'exhale' ? pattern.exhale : 0.3}s ease-in-out`,
                   }}

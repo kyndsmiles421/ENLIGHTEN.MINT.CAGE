@@ -134,7 +134,7 @@ export default function Aromatherapy() {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-20">
+    <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
       <Loader2 className="animate-spin" size={28} style={{ color: '#C084FC' }} />
     </div>
   );

@@ -285,7 +285,7 @@ function GuidedSession({ meditation, onEnd }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
-      style={{ background: '#0B0C15' }}
+      style={{ background: '#030308' }}
       data-testid="guided-session"
     >
       <CelebrationBurst active={celebrating} onComplete={() => { setCelebrating(false); onEnd(); }} />
@@ -294,41 +294,86 @@ function GuidedSession({ meditation, onEnd }) {
       {aiAmbient && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.25 }}
+          animate={{ opacity: 0.3 }}
           transition={{ duration: 3 }}
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: `url(data:image/png;base64,${aiAmbient})`,
             backgroundSize: 'cover', backgroundPosition: 'center',
-            filter: 'blur(8px) saturate(1.3)',
+            filter: 'blur(12px) saturate(1.5)',
           }}
         />
       )}
 
-      {/* Ambient background */}
+      {/* Multi-layer ambient background — immersive portal */}
       <motion.div className="absolute inset-0"
         animate={{ background: [
-          `radial-gradient(ellipse at 40% 40%, ${meditation.color}10 0%, transparent 60%)`,
-          `radial-gradient(ellipse at 60% 60%, ${meditation.color}18 0%, transparent 60%)`,
-          `radial-gradient(ellipse at 40% 40%, ${meditation.color}10 0%, transparent 60%)`,
+          `radial-gradient(ellipse at 40% 40%, ${meditation.color}15 0%, transparent 55%)`,
+          `radial-gradient(ellipse at 60% 60%, ${meditation.color}22 0%, transparent 55%)`,
+          `radial-gradient(ellipse at 40% 40%, ${meditation.color}15 0%, transparent 55%)`,
         ] }}
         transition={{ duration: 12, repeat: Infinity }}
       />
+      {/* Secondary aurora layer */}
+      <motion.div className="absolute inset-0 opacity-40"
+        animate={{ background: [
+          `radial-gradient(ellipse at 70% 30%, rgba(6,182,212,0.08) 0%, transparent 50%)`,
+          `radial-gradient(ellipse at 30% 70%, rgba(234,179,8,0.06) 0%, transparent 50%)`,
+          `radial-gradient(ellipse at 70% 30%, rgba(6,182,212,0.08) 0%, transparent 50%)`,
+        ] }}
+        transition={{ duration: 18, repeat: Infinity }}
+      />
 
-      {/* Progress ring */}
+      {/* Floating particles around the meditation circle */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div key={i} className="absolute rounded-full"
+          style={{
+            width: i % 3 === 0 ? 3 : 2,
+            height: i % 3 === 0 ? 3 : 2,
+            background: meditation.color,
+            opacity: 0.15,
+            top: `${35 + Math.sin(i * 0.5) * 20}%`,
+            left: `${35 + Math.cos(i * 0.8) * 25}%`,
+          }}
+          animate={{
+            y: [0, -20 - i * 3, 0],
+            x: [0, (i % 2 === 0 ? 10 : -10), 0],
+            opacity: [0.08, 0.25, 0.08],
+          }}
+          transition={{ duration: 5 + i * 0.5, repeat: Infinity, delay: i * 0.3 }}
+        />
+      ))}
+
+      {/* Progress ring — enhanced with multi-ring glow */}
       <div className="relative w-56 h-56 flex items-center justify-center mb-8">
+        {/* Outer glow rings */}
+        {[1.15, 1.3].map((s, i) => (
+          <motion.div key={i}
+            className="absolute rounded-full"
+            style={{
+              width: `${s * 100}%`, height: `${s * 100}%`,
+              border: `1px solid ${meditation.color}${i === 0 ? '10' : '06'}`,
+            }}
+            animate={{ scale: [1, 1.03, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 4 + i * 2, repeat: Infinity }}
+          />
+        ))}
         <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 200 200">
           <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="2" />
-          <circle cx="100" cy="100" r="90" fill="none" stroke={meditation.color} strokeWidth="2" strokeLinecap="round"
+          <circle cx="100" cy="100" r="90" fill="none" stroke={meditation.color} strokeWidth="2.5" strokeLinecap="round"
             strokeDasharray={2 * Math.PI * 90} strokeDashoffset={2 * Math.PI * 90 * (1 - progress)}
-            style={{ transition: 'stroke-dashoffset 1s linear' }} opacity="0.5" />
+            style={{ transition: 'stroke-dashoffset 1s linear', filter: `drop-shadow(0 0 8px ${meditation.color}40)` }} opacity="0.6" />
         </svg>
         <motion.div
           animate={{ scale: [1, 1.08, 1] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           className="w-24 h-24 rounded-full flex items-center justify-center"
-          style={{ background: `${meditation.color}12`, border: `1px solid ${meditation.color}20` }}>
-          <Icon size={32} style={{ color: meditation.color, filter: `drop-shadow(0 0 12px ${meditation.color}60)` }} />
+          style={{
+            background: `${meditation.color}12`,
+            border: `1px solid ${meditation.color}20`,
+            boxShadow: `0 0 30px ${meditation.color}15, inset 0 0 20px ${meditation.color}08`,
+          }}>
+          <Icon size={32} style={{ color: meditation.color, filter: `drop-shadow(0 0 16px ${meditation.color}80)` }} />
         </motion.div>
       </div>
 
@@ -1140,7 +1185,7 @@ export default function Meditation() {
   const filtered = filter === 'all' ? GUIDED_MEDITATIONS : GUIDED_MEDITATIONS.filter(m => m.category === filter);
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--primary)' }}>Meditation</p>

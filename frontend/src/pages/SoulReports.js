@@ -195,7 +195,7 @@ export default function SoulReports() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen immersive-page flex items-center justify-center">
         <Loader2 className="animate-spin" size={24} style={{ color: '#D8B4FE' }} />
       </div>
     );

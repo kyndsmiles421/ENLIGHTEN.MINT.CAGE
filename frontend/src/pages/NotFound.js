@@ -6,7 +6,7 @@ import { Home } from 'lucide-react';
 export default function NotFound() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page flex items-center justify-center px-6" style={{ background: 'transparent' }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

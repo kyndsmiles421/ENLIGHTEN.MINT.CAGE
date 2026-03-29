@@ -584,7 +584,7 @@ export default function Games() {
   if (activeGame) {
     const GameComponent = activeGame.Component;
     return (
-      <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+      <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
         <div className="max-w-2xl mx-auto relative z-10">
           <button onClick={() => setActiveGame(null)}
             className="flex items-center gap-2 text-xs mb-8 group" style={{ color: 'var(--text-muted)' }}

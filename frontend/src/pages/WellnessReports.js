@@ -63,7 +63,7 @@ export default function WellnessReports() {
   const maxMood = s?.mood_breakdown ? Math.max(...Object.values(s.mood_breakdown), 1) : 1;
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 max-w-4xl mx-auto" data-testid="wellness-reports-page">
+    <div className="min-h-screen immersive-page pt-24 pb-20 px-4 max-w-4xl mx-auto" data-testid="wellness-reports-page">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#818CF8' }}>

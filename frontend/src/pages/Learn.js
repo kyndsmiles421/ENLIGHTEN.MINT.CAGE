@@ -218,7 +218,7 @@ export default function Learn() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
+      <div className="min-h-screen immersive-page flex items-center justify-center" style={{ background: 'transparent' }}>
         <p style={{ color: 'var(--text-muted)' }}>Preparing your learning path...</p>
       </div>
     );

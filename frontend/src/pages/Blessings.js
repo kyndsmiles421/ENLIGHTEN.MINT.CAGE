@@ -52,7 +52,7 @@ export default function Blessings() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-4 max-w-3xl mx-auto" data-testid="blessings-page">
+    <div className="min-h-screen immersive-page pt-20 pb-24 px-4 max-w-3xl mx-auto" data-testid="blessings-page">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-white/5 transition-all" data-testid="blessings-back">

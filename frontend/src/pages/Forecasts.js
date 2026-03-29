@@ -272,7 +272,7 @@ export default function Forecasts() {
   const filteredHistory = history.filter(h => h.system === selectedSystem);
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="min-h-screen immersive-page flex items-center justify-center px-6">
       <div className="glass-card p-12 text-center max-w-md">
         <Star size={32} style={{ color: 'rgba(192,132,252,0.3)', margin: '0 auto 12px' }} />
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to access cosmic forecasts.</p>

@@ -621,7 +621,7 @@ export default function TradeCircle() {
   useEffect(() => { if (tab === 'karma') fetchLeaderboard(); }, [tab, fetchLeaderboard]);
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-4" style={{ background: 'var(--bg-primary)' }} data-testid="trade-circle-page">
+    <div className="min-h-screen immersive-page pt-20 pb-24 px-4" style={{ background: 'var(--bg-primary)' }} data-testid="trade-circle-page">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

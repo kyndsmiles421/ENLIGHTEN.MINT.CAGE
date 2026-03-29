@@ -432,7 +432,7 @@ export default function Yoga() {
   }, [authHeaders]);
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="yoga-page">
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="yoga-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {activeStyle ? (

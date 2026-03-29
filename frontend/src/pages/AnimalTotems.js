@@ -178,7 +178,7 @@ export default function AnimalTotems() {
   const filtered = search ? totems.filter(t => t.name.toLowerCase().includes(search.toLowerCase())) : totems;
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" data-testid="animal-totems-page">
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" data-testid="animal-totems-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {active ? (

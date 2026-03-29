@@ -808,7 +808,7 @@ export default function Landing() {
   }, [animateBreath]);
 
   return (
-    <div className="min-h-screen relative" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page relative" style={{ background: 'transparent' }}>
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
       <GuidedTour isOpen={showTour} onClose={() => { setShowTour(false); handleTourFinish(); }} onFinish={handleTourFinish} />
 

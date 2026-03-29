@@ -784,7 +784,7 @@ export default function Journey() {
   // Lesson detail view
   if (activeLesson && activeStage) {
     return (
-      <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+      <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
         <div className="max-w-3xl mx-auto">
           <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
           <LessonView

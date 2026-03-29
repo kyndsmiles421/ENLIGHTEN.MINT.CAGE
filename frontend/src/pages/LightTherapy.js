@@ -249,7 +249,7 @@ export default function LightTherapy() {
   const [sessionActive, setSessionActive] = useState(false);
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 relative" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12 relative" style={{ background: 'transparent' }}>
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#A855F7' }}>

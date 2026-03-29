@@ -351,7 +351,7 @@ export default function Rituals() {
   // Active ritual mode
   if (activeRitual) {
     return (
-      <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+      <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
         <div className="max-w-3xl mx-auto">
           <RitualPlayer
             ritual={activeRitual}

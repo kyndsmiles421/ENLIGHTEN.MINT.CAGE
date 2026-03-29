@@ -90,7 +90,7 @@ export default function Settings() {
   const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen immersive-page pb-24" style={{ background: 'var(--bg-primary)' }}>
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

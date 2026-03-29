@@ -137,7 +137,7 @@ export default function Elixirs() {
   const filtered = activeCategory ? elixirs.filter(e => e.category === activeCategory) : elixirs;
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-20">
+    <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
       <Loader2 className="animate-spin" size={28} style={{ color: '#FB923C' }} />
     </div>
   );

@@ -75,7 +75,7 @@ export default function Classes() {
   const getEnrollment = (classId) => enrollments.find(e => e.class_id === classId);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page flex items-center justify-center" style={{ background: 'transparent' }}>
       <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
     </div>
   );

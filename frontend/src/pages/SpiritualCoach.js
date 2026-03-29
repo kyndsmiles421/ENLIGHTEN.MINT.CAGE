@@ -569,7 +569,10 @@ export default function SpiritualCoach() {
   const isDreamOracle = activeMode === 'dream_oracle';
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="coach-page">
+    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto immersive-page" data-testid="coach-page">
+      {/* Sage ambient aura */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.04) 0%, transparent 60%)', filter: 'blur(60px)' }} />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2"
@@ -623,7 +626,12 @@ export default function SpiritualCoach() {
                 {/* Messages */}
                 <div className="rounded-2xl p-4 mb-4 min-h-[300px] max-h-[55vh] overflow-y-auto"
                   data-testid="chat-messages"
-                  style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+                  style={{
+                    background: 'rgba(10,10,18,0.5)',
+                    border: '1px solid rgba(192,132,252,0.06)',
+                    backdropFilter: 'blur(20px)',
+                    boxShadow: 'inset 0 0 40px rgba(0,0,0,0.2)',
+                  }}>
                   {messages.length === 0 && (
                     <div className="text-center py-12">
                       {isDreamOracle ?

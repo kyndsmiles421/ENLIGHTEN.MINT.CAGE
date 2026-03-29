@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import SearchCommand from './SearchCommand';
 import ShareButton from './ShareButton';
+import { SplitScreenLauncher } from './SplitScreen';
 import NotificationSettings from './NotificationSettings';
 import { useCreditsContext } from '../context/CreditContext';
 
@@ -408,6 +409,9 @@ export default function Navigation() {
 
           {/* Share */}
           <ShareButton />
+
+          {/* Split Screen */}
+          <SplitScreenLauncher />
 
           {/* Ambient Toggle */}
           <button

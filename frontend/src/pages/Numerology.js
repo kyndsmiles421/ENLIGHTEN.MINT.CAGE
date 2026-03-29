@@ -189,7 +189,7 @@ export default function Numerology() {
   };
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" data-testid="numerology-page">
+    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" data-testid="numerology-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {result ? (

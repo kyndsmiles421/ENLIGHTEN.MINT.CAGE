@@ -37,7 +37,7 @@ export default function AdminSetup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen immersive-page flex items-center justify-center px-4" style={{ background: 'var(--bg-primary)' }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

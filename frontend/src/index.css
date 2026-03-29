@@ -957,3 +957,130 @@ body[data-theme="light"] .glass-card span[class*="rounded"][class*="px-"],
 body[data-theme="light"] .glass-card span[class*="rounded-full"] {
   filter: saturate(1.8) brightness(0.6);
 }
+
+
+/* ════════════════════════════════════════════════
+   GLOBAL IMMERSIVE PAGE ENHANCEMENTS
+   — Gaming-level depth on all content pages
+   ════════════════════════════════════════════════ */
+
+/* Auto-entrance animation for all page content */
+.page-enter {
+  animation: page-rise 0.5s ease-out;
+}
+@keyframes page-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Enhanced section headers throughout the app */
+.section-glow-header {
+  position: relative;
+}
+.section-glow-header::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(192,132,252,0.2), transparent);
+}
+
+/* Immersive page wrapper — adds depth to every page */
+.immersive-page {
+  position: relative;
+  z-index: 1;
+}
+.immersive-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 350px;
+  background: linear-gradient(180deg, rgba(192,132,252,0.03) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Enhanced btn-glass with color dynamics */
+.btn-glass {
+  position: relative;
+  overflow: hidden;
+}
+.btn-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* All interactive cards get subtle color border on hover */
+.glass-card {
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Enhanced scrollbar for immersive feel */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(192,132,252,0.12);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(192,132,252,0.25);
+}
+* { scrollbar-width: thin; scrollbar-color: rgba(192,132,252,0.12) transparent; }
+
+/* Content cards — auto glass depth with subtle shine */
+.glass-card > :first-child {
+  position: relative;
+  z-index: 1;
+}
+
+/* Split screen styles */
+.split-active .cosmic-mesh { opacity: 0.6; }
+
+/* Ambient glow for section dividers */
+hr, .divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(192,132,252,0.12), rgba(45,212,191,0.08), transparent);
+}
+
+/* Gaming-level button states */
+button:active:not(:disabled),
+[role="button"]:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.08s ease;
+}
+
+/* Floating label effect on inputs */
+.input-glass:focus {
+  box-shadow: 0 0 0 2px rgba(192,132,252,0.15), 0 0 20px rgba(192,132,252,0.05);
+}
+
+/* Pulse ring on important interactive elements */
+@keyframes ring-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(192,132,252,0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(192,132,252,0); }
+  100% { box-shadow: 0 0 0 0 rgba(192,132,252,0); }
+}
+.animate-ring-pulse {
+  animation: ring-pulse 2s infinite;
+}
+
+/* Responsive split screen */
+@media (max-width: 768px) {
+  [data-testid="split-screen-panel"] {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    z-index: 60;
+  }
+  [data-testid="split-resize-handle"] { display: none; }
+}
