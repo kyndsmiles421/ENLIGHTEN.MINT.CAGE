@@ -4,13 +4,11 @@
 Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals.
 
 ## Tech Stack
-- **Frontend**: React + Tailwind CSS + Framer Motion + Three.js (Star Chart with UnrealBloomPass)
+- **Frontend**: React + Tailwind CSS + Framer Motion + Three.js
 - **Backend**: FastAPI + Motor Async MongoDB
 - **AI**: OpenAI GPT-4o, TTS tts-1-hd, Sora 2, GPT Image 1, Whisper — all via Emergent LLM Key
 - **Payments**: Stripe (test key in pod)
 - **3D**: Three.js + UnrealBloomPass + EffectComposer
-- **DnD**: @dnd-kit for draggable dashboard widgets
-- **Sound**: Web Audio API synthesized interaction sounds + Celestial Ambient Soundscapes
 - **Mobile**: Capacitor configured for App Store / Play Store wrapping
 
 ## All Implemented Features
@@ -18,69 +16,40 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ### Core
 - 6-Pillar Navigation, JWT Auth + Stripe, PWA, Accessibility
 
-### Gaming-Level Star Chart
-- UnrealBloomPass bloom, Milky Way band, 15k stars, camera momentum, 10 nebulae, constellation journey mode, 8 world cultures
+### Gaming-Level Star Chart — NOW 20 WORLD CULTURES (100 constellations)
+- UnrealBloomPass bloom, Milky Way band, 15k stars, camera momentum, 10 nebulae, constellation journey mode
+- **8 Original Cultures**: Mayan, Egyptian, Aboriginal, Lakota, Chinese, Vedic, Norse, Polynesian
+- **12 NEW Cultures (Feb 2026)**: Greek, Japanese, Yoruba, Celtic, Inuit, Aztec, Sumerian, Persian, Bantu, Native American, Slavic, Maori
+- Each culture: 5 constellations with real RA/Dec star coordinates, mythology, deity, lesson, drawing paths
+- Cultural overlay rendering in Three.js with color-coded lines and labels
+
+### Sacred Texts Audiobook Reader (NEW — Feb 2026)
+- **15 Ancient Scriptures**: Bhagavad Gita, Tao Te Ching, Egyptian Book of the Dead, Popol Vuh, Upanishads, Dhammapada, Rumi's Masnavi, Poetic Edda, Bardo Thodol, I Ching, Emerald Tablet, Yoga Sutras, Kojiki, Odu Ifa, Kalevala
+- **AI Chapter Generation**: GPT-4o generates retellings + curated excerpts + scholarly commentary per chapter
+- **HD Voice Narration**: tts-1-hd with tradition-matched voices (Sage for Hindu, Shimmer for Taoist/Buddhist, Fable for Sufi/Finnish, Onyx for Egyptian/Yoruba)
+- **VR Immersive Reader**: Fullscreen cinematic reading with:
+  - Animated particle effects matched to each tradition (golden particles, water ink, hieroglyph reveal, lotus bloom, whirling stars, rune frost, mandala pulse, emerald glow, sakura drift)
+  - Narrative paragraph reveal (blur-to-clear with staggered timing)
+  - Animation speed controls (slow/normal/fast)
+  - Three content sections: Retelling, Sacred Passages, Deeper Meaning
+  - Progress tracking (bookmarks per user/text)
+- **Backend**: `/api/sacred-texts`, `/api/sacred-texts/{id}`, `/api/sacred-texts/{id}/chapters/{ch}/generate`, `/api/sacred-texts/{id}/chapters/{ch}/narrate`, `/api/sacred-texts/progress/{user_id}`
+
+### Myths & Legends Database (Feb 2026)
+- 20 civilizations, 120+ seed myths, AI generation, search, HD voice narration
+- Dual-tab page: "Creation Stories" (15 original) + "Myths & Legends"
 
 ### AI Avatar Generator
-- **AI Manifestation tab**: Text description + 4 styles (Ethereal, Stylized, Realistic, Abstract) + Advanced Options (Element, Spirit Animal, Sacred Geometry, Aura Color) -> GPT Image 1 generation
-- **Energy Builder tab**: Canvas-based manual avatar with body type, aura, pose, robe, glow, chakras, particles, energy trails
-- **Avatar Gallery**: View all generated avatars, click to set any as active
-- **Global Avatar Display**: Active avatar shown in Navigation profile button and Dashboard greeting area
-- Backend endpoints: `/api/ai-visuals/generate-avatar`, `/api/ai-visuals/my-avatar`, `/api/ai-visuals/my-avatars`, `/api/ai-visuals/set-active-avatar`
+- AI Manifestation tab + Energy Builder tab + Avatar Gallery + Global Avatar Display
 
 ### Context-Aware Human Voices (tts-1-hd)
-- All 35 NarrationPlayer instances + 6 direct TTS calls pass `context` parameter
-- 25+ voice-context mappings: Shimmer for meditation/breathing, Fable for star chart/oracle/myths, Sage for coaching, Onyx for creation stories, Nova for knowledge/encyclopedia
-- All backend TTS endpoints use `tts-1-hd` model
+- 35+ NarrationPlayer instances with 25+ voice-context mappings
 
-### Myths & Legends Database (NEW — Feb 2026)
-- **20 civilizations**: Mayan, Egyptian, Aboriginal, Lakota, Hindu, Norse, Greek, Japanese, Yoruba, Maori, Chinese, Celtic, Inuit, Aztec, Sumerian, Persian, Bantu, Polynesian, Native American, Slavic
-- **120+ seed myths** with AI generation per myth
-- **Backend**: `/api/myths/civilizations`, `/api/myths/{civ_id}`, `/api/myths/{civ_id}/generate`, `/api/myths/{myth_id}/narrate`, `/api/myths/search/{query}`
-- **Frontend**: Dual-tab page ("Creation Stories" + "Myths & Legends") with animated tab bar, civilization browser grid, per-civ myth list, myth detail with narrative paragraph reveal, characters, symbols, connected myths, HD voice narration
-- **Animations**: Staggered card entrances (spring physics), hover glow effects, animated gradient headers, blur-to-clear narrative reveal for story paragraphs, pulsing civilization dots, tab underline layout animation
-- **15 original creation stories** preserved with cinematic mode + Sora 2 video
-
-### AI & Voice
-- Voice AI Sage, Sora 2 Video Gallery + Cinematic Intro Video, Monthly Soul Reports, OpenAI TTS mantras
-
-### Immersive Visuals (Applied to ALL 60+ pages)
-- Fluid mesh gradients, deep glassmorphism, page entrance animations, immersive-page class, cosmic scrollbars
-
-### Ambient Audio
-- Celestial Ambient Soundscapes: auto-adapting per page
-- Global Sound Engine: Web Audio API synthesized clicks, hovers, success, error, whoosh, chime, open, close sounds
-
-### Split Screen
-- Side-by-side multitasking via fixed overlay panel, 26+ pages, resizable, collapsible
-
-### Cosmic Mixer
-- Floating panel with frequencies, ambient sounds, mantras, light therapy, haptic vibration
-- **Fixed**: Backdrop dismiss (tap outside to close), auto-close on route change, no longer blocks buttons
-
-### Dashboard
-- Cosmic Mood Ring, draggable widgets, dynamic personalized dashboard, Growth Timeline, Avatar greeting
-
-### Mobile App (Capacitor)
-- `capacitor.config.ts` configured with app ID `com.cosmiccollective.app`
-- Plugins: SplashScreen, StatusBar, Haptics, Keyboard, PushNotifications, Browser, Share
-- Dark theme native background (#0B0C15) — no white flash
-- Full guide at `frontend/MOBILE_APP_GUIDE.md`
-
-### Content
-- 40+ content pages: Meditation, Breathing, Divination, Journal, Crystals, Music, etc.
-
-## Bug Fix Log
-- **Blank screen bug**: Conflicting `.page-enter` CSS definitions. Fixed by removing old transition pattern.
-- **Avatar generation bug**: `user["email"]` in ai_visuals.py. Fixed to use `user["id"]`.
-- **Page dimming on auth**: `page-enter` animation started from opacity:0. Changed to 0.7 with faster 0.25s transition.
-- **Guided Tour blocking**: Auto-launched on first visit covering entire page. Removed auto-launch.
-- **Cosmic Mixer blocking buttons**: No backdrop dismiss, no auto-close. Added backdrop + route-change auto-close.
-- **LlmChat init bug**: Myth generation used invalid `model` param. Fixed to use `session_id` + `system_message`.
+### Immersive Visuals, Ambient Audio, Split Screen, Cosmic Mixer, Dashboard, 40+ content pages
 
 ## Test Credentials
 - User: test@test.com / password
 - Admin/Creator: kyndsmiles@gmail.com / password
 
 ## Backlog
-- **P2**: Refactor star_cultures.py — move data to MongoDB/JSON
+- **P2**: Refactor star_cultures.py data into MongoDB/JSON seed file
