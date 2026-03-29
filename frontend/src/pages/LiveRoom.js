@@ -8,7 +8,7 @@ import {
   ArrowLeft, Send, Users, Radio, Crown, Timer, Heart, Sparkles,
   MessageCircle, X, Play, Square, Volume2, VolumeX, Smile,
   Hand, Star, Flame, Moon, Sun, Zap, Wind, ChevronUp, ChevronDown,
-  Mic, MicOff
+  Mic, MicOff, Video, VideoOff
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -60,8 +60,11 @@ export default function LiveRoom() {
   const timerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const videoRef = useRef(null);
+  const videoStreamRef = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingStatus, setRecordingStatus] = useState(''); // '', 'recording', 'uploading', 'done'
+  const [recordingStatus, setRecordingStatus] = useState('');
+  const [isVideoOn, setIsVideoOn] = useState(false);
 
   const isHost = session?.host_id === user?.id;
 
@@ -211,6 +214,12 @@ export default function LiveRoom() {
       if (mediaRecorderRef.current && isRecording) {
         await stopRecording(true);
       }
+      // Stop video if active
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach(t => t.stop());
+        videoStreamRef.current = null;
+        setIsVideoOn(false);
+      }
       await axios.post(`${API}/live/sessions/${sessionId}/end`, {}, { headers: authHeaders });
     } catch {}
   };
@@ -268,6 +277,37 @@ export default function LiveRoom() {
     }
   };
 
+  const toggleVideo = async () => {
+    if (isVideoOn) {
+      // Turn off
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach(t => t.stop());
+        videoStreamRef.current = null;
+      }
+      if (videoRef.current) videoRef.current.srcObject = null;
+      setIsVideoOn(false);
+    } else {
+      // Turn on
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' } });
+        videoStreamRef.current = stream;
+        if (videoRef.current) videoRef.current.srcObject = stream;
+        setIsVideoOn(true);
+      } catch (err) {
+        console.error('Could not access camera:', err);
+      }
+    }
+  };
+
+  // Cleanup video on unmount
+  useEffect(() => {
+    return () => {
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach(t => t.stop());
+      }
+    };
+  }, []);
+
   const addFloatingReaction = (emoji, name) => {
     const id = Date.now() + Math.random();
     setFloatingReactions(prev => [...prev, { id, emoji, name, x: 20 + Math.random() * 60 }]);
@@ -316,6 +356,38 @@ export default function LiveRoom() {
               <p className="text-4xl md:text-6xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC', textShadow: '0 0 40px rgba(192,132,252,0.4)' }}>
                 {hostCommand.data?.label || hostCommand.command}
               </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Video Preview (PiP) */}
+      <AnimatePresence>
+        {isVideoOn && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute z-50"
+            style={{ bottom: 90, right: 16 }}
+            data-testid="video-preview-container">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl"
+              style={{ width: 200, height: 150, border: '2px solid rgba(59,130,246,0.3)', boxShadow: '0 0 30px rgba(59,130,246,0.15)' }}>
+              <video ref={videoRef} autoPlay playsInline muted
+                className="w-full h-full object-cover"
+                style={{ transform: 'scaleX(-1)' }}
+                data-testid="video-preview" />
+              <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#3B82F6' }} />
+                <span className="text-[8px] font-medium" style={{ color: '#93C5FD' }}>LIVE</span>
+              </div>
+              <button onClick={toggleVideo}
+                className="absolute top-2 right-2 p-1 rounded-full transition-all hover:scale-110"
+                style={{ background: 'rgba(0,0,0,0.5)' }}
+                data-testid="video-preview-close">
+                <X size={10} style={{ color: '#F8FAFC' }} />
+              </button>
             </div>
           </motion.div>
         )}
@@ -394,6 +466,17 @@ export default function LiveRoom() {
                       }}
                       data-testid="toggle-recording">
                       {isRecording ? <><MicOff size={10} /> Stop Rec</> : <><Mic size={10} /> Record</>}
+                    </button>
+                    {/* Video Toggle */}
+                    <button onClick={toggleVideo}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
+                      style={{
+                        background: isVideoOn ? 'rgba(59,130,246,0.15)' : 'rgba(148,163,184,0.12)',
+                        border: `1px solid ${isVideoOn ? 'rgba(59,130,246,0.3)' : 'rgba(148,163,184,0.15)'}`,
+                        color: isVideoOn ? '#3B82F6' : '#94A3B8',
+                      }}
+                      data-testid="toggle-video">
+                      {isVideoOn ? <><VideoOff size={10} /> Cam Off</> : <><Video size={10} /> Cam On</>}
                     </button>
                   </div>
                   {recordingStatus === 'recording' && (
