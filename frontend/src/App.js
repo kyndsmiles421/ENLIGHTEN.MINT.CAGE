@@ -105,6 +105,7 @@ const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
 const CreatorDashboard = lazy(() => import('./pages/CreatorDashboard'));
 const LiveSessions = lazy(() => import('./pages/LiveSessions'));
 const LiveRoom = lazy(() => import('./pages/LiveRoom'));
+const DanceMusicStudio = lazy(() => import('./pages/DanceMusicStudio'));
 
 function PageLoader() {
   return (
@@ -215,6 +216,7 @@ function AnimatedRoutes() {
         <Route path="/creator" element={<CreatorDashboard />} />
         <Route path="/live" element={<LiveSessions />} />
         <Route path="/live/:sessionId" element={<LiveRoom />} />
+        <Route path="/dance-music" element={<DanceMusicStudio />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

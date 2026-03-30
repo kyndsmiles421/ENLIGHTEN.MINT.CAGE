@@ -66,6 +66,7 @@ from routes.encyclopedia import router as encyclopedia_router
 from routes.dynamic import router as dynamic_router
 from routes.creator import router as creator_router
 from routes.live import router as live_router
+from routes.music_studio import router as music_studio_router
 
 app = FastAPI()
 
@@ -99,6 +100,7 @@ all_routers = [
     dynamic_router,
     creator_router,
     live_router,
+    music_studio_router,
 ]
 
 for r in all_routers:
