@@ -8,6 +8,7 @@ import {
   Scroll, Eye, Cross, Sparkles, Star, ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { ScriptureVisualizer, VisionModeToggle, detectScenes } from '../components/ScriptureVisualizer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -113,6 +114,8 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
   const [activeTab, setActiveTab] = useState('retelling');
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [visionMode, setVisionMode] = useState(false);
+  const [detectedScenes, setDetectedScenes] = useState([]);
   const color = CAT_COLORS[book.category] || '#A78BFA';
 
   useEffect(() => {
@@ -121,7 +124,11 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
     setChapter(null);
     setActiveTab('retelling');
     axios.post(`${API}/bible/books/${book.id}/chapters/${chapterNum}/generate`, {}, { headers: authHeaders })
-      .then(r => setChapter(r.data))
+      .then(r => {
+        setChapter(r.data);
+        const allText = `${r.data.retelling || ''} ${r.data.key_verses || ''} ${r.data.commentary || ''}`;
+        setDetectedScenes(detectScenes(allText));
+      })
       .catch(() => toast.error('Failed to generate chapter'))
       .finally(() => setLoading(false));
   }, [book.id, chapterNum, token, authHeaders]);
@@ -172,14 +179,29 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
   ];
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto relative">
+      {/* Vision Mode Background */}
+      <ScriptureVisualizer
+        text={chapter ? `${chapter.retelling || ''} ${chapter.key_verses || ''}` : ''}
+        category={book.category}
+        themes={book.themes}
+        isActive={visionMode && !!chapter}
+      />
+
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 relative z-10">
         <button onClick={onBack} data-testid="chapter-back" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
           style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
           <ArrowLeft size={12} /> {book.title}
         </button>
         <div className="flex items-center gap-2">
+          {chapter && (
+            <VisionModeToggle
+              isActive={visionMode}
+              onToggle={() => setVisionMode(v => !v)}
+              scenes={detectedScenes}
+            />
+          )}
           <button onClick={speak} data-testid="chapter-tts" className="p-2 rounded-lg"
             style={{ background: speaking ? `${color}15` : 'rgba(248,250,252,0.04)', border: `1px solid ${speaking ? `${color}30` : 'rgba(248,250,252,0.08)'}`, color: speaking ? color : 'rgba(248,250,252,0.4)' }}>
             {speaking ? <Pause size={14} /> : <Volume2 size={14} />}
@@ -192,7 +214,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
       </div>
 
       {/* Chapter title */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 relative z-10">
         <p className="text-[10px] uppercase tracking-[0.25em] mb-1" style={{ color }}>{book.title}</p>
         <h2 className="text-2xl font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
           Chapter {chapterNum}
@@ -203,12 +225,12 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center gap-3 py-20">
+        <div className="flex flex-col items-center gap-3 py-20 relative z-10">
           <Loader2 className="animate-spin" size={24} style={{ color }} />
           <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Generating sacred text...</p>
         </div>
       ) : chapter ? (
-        <>
+        <div className="relative z-10">
           {/* Tabs */}
           <div className="flex gap-1 mb-5 justify-center">
             {tabs.map(t => {
@@ -231,7 +253,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
           {/* Content */}
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-              className="rounded-2xl p-6" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.05)' }}>
+              className="rounded-2xl p-6" style={{ background: visionMode ? 'rgba(6,6,18,0.75)' : 'rgba(248,250,252,0.02)', border: `1px solid ${visionMode ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.05)'}`, backdropFilter: visionMode ? 'blur(8px)' : 'none' }}>
               {activeTab === 'retelling' && chapter.retelling && (
                 <div className="prose prose-invert max-w-none">
                   {chapter.retelling.split('\n\n').map((p, i) => (
@@ -277,7 +299,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
 
           {/* AI Chat */}
           <AIChat bookTitle={book.title} chapterNum={chapterNum} contextText={chapter?.retelling?.slice(0, 300) || ''} />
-        </>
+        </div>
       ) : (
         <p className="text-center text-xs py-10" style={{ color: 'rgba(248,250,252,0.3)' }}>Failed to load chapter</p>
       )}
@@ -335,7 +357,7 @@ export default function Bible() {
 
   if (activeChapter && selectedBook) {
     return (
-      <div className="min-h-screen pt-20 pb-12 px-4" data-testid="bible-page">
+      <div className="min-h-screen pt-20 pb-12 px-4 relative overflow-hidden" data-testid="bible-page">
         <ChapterReader
           book={selectedBook}
           chapterNum={activeChapter}
