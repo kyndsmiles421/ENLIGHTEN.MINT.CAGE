@@ -1,6 +1,7 @@
 import React, { useState, useCallback, createContext, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Columns, Maximize2, Minimize2, GripVertical, ArrowLeft } from 'lucide-react';
+import { X, Columns, Maximize2, Minimize2, GripVertical, ArrowLeft, Sparkles } from 'lucide-react';
 import { playOpen, playClose } from '../hooks/useSoundEngine';
 
 const SplitScreenContext = createContext(null);
@@ -42,6 +43,58 @@ const SPLIT_PAGES = {
   '/cosmic-mixer': { label: 'Cosmic Mixer', color: '#EC4899' },
   '/videos': { label: 'Videos', color: '#F97316' },
 };
+
+// Curated multi-sensory experience pairs
+export const COSMIC_PAIRS = [
+  {
+    id: 'sitar-indigo',
+    name: 'Third Eye Journey',
+    description: 'Sitar melodies with indigo light for deep intuition',
+    pages: ['/dance-music', '/light-therapy'],
+    colors: ['#F59E0B', '#6366F1'],
+    icon: 'eye',
+  },
+  {
+    id: 'bowl-frequencies',
+    name: 'Harmonic Resonance',
+    description: 'Singing bowls layered with healing frequencies',
+    pages: ['/dance-music', '/frequencies'],
+    colors: ['#7C3AED', '#FB923C'],
+    icon: 'waves',
+  },
+  {
+    id: 'flute-healing',
+    name: 'Forest Healing',
+    description: 'Cedar flute with green heart chakra light',
+    pages: ['/dance-music', '/light-therapy'],
+    colors: ['#059669', '#22C55E'],
+    icon: 'leaf',
+  },
+  {
+    id: 'drums-soundscape',
+    name: 'Tribal Immersion',
+    description: 'Djembe rhythms over ambient soundscapes',
+    pages: ['/dance-music', '/soundscapes'],
+    colors: ['#B91C1C', '#22D3EE'],
+    icon: 'flame',
+  },
+  {
+    id: 'hang-meditation',
+    name: 'Celestial Stillness',
+    description: 'Hang drum tones with guided meditation',
+    pages: ['/dance-music', '/meditation'],
+    colors: ['#4338CA', '#D8B4FE'],
+    icon: 'moon',
+  },
+  {
+    id: 'kalimba-zen',
+    name: 'Zen Flow',
+    description: 'Kalimba plucks in a serene zen garden',
+    pages: ['/dance-music', '/zen-garden'],
+    colors: ['#0891B2', '#86EFAC'],
+    icon: 'droplet',
+  },
+];
 
 export function SplitScreenProvider({ children }) {
   const [splitPanel, setSplitPanel] = useState(null);
@@ -206,10 +259,19 @@ export function SplitScreenProvider({ children }) {
 export function SplitScreenLauncher() {
   const ctx = useSplitScreen();
   const [isOpen, setIsOpen] = useState(false);
+  const [showAllPages, setShowAllPages] = useState(false);
+  const navigate = useNavigate();
 
   if (!ctx) return null;
 
   const pages = Object.entries(ctx.availablePages);
+
+  const launchPair = (pair) => {
+    const [primary, secondary] = pair.pages;
+    navigate(primary);
+    ctx.openSplit(secondary);
+    setIsOpen(false);
+  };
 
   return (
     <div className="relative" data-testid="split-screen-launcher">
@@ -233,20 +295,53 @@ export function SplitScreenLauncher() {
             initial={{ opacity: 0, y: -8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
-            className="absolute right-0 top-full mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl z-50 p-2"
+            className="absolute right-0 top-full mt-2 w-64 max-h-[420px] overflow-y-auto rounded-2xl z-50 p-2"
             style={{
               background: 'rgba(10,10,18,0.95)',
               border: '1px solid rgba(192,132,252,0.12)',
               backdropFilter: 'blur(24px)',
               boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 20px rgba(192,132,252,0.05)',
+              scrollbarWidth: 'none',
             }}
             data-testid="split-screen-menu"
           >
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-1.5 mb-1"
-              style={{ color: 'var(--text-muted)' }}>
-              Open in Split View
+            {/* Cosmic Pairs Section */}
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-1.5 mb-1 flex items-center gap-1.5"
+              style={{ color: '#C084FC' }}>
+              <Sparkles size={9} /> Cosmic Pairs
             </p>
-            {pages.map(([path, info]) => (
+            {COSMIC_PAIRS.slice(0, 3).map(pair => (
+              <button
+                key={pair.id}
+                onClick={() => launchPair(pair)}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all hover:bg-white/5 group"
+                data-testid={`pair-${pair.id}`}
+              >
+                <div className="flex -space-x-1 flex-shrink-0">
+                  {pair.colors.map((c, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full ring-1 ring-black/50" style={{ background: c }} />
+                  ))}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-medium truncate" style={{ color: 'var(--text-secondary)' }}>{pair.name}</p>
+                  <p className="text-[8px] truncate" style={{ color: 'var(--text-muted)' }}>{pair.description}</p>
+                </div>
+              </button>
+            ))}
+
+            {/* Divider */}
+            <div className="my-1.5 mx-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }} />
+
+            {/* Regular pages toggle */}
+            <button
+              onClick={() => setShowAllPages(!showAllPages)}
+              className="w-full text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-1.5 mb-1 text-left flex items-center justify-between"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Open in Split View
+              <span className="text-[8px] font-normal normal-case tracking-normal">{showAllPages ? 'Hide' : `${pages.length} apps`}</span>
+            </button>
+            {showAllPages && pages.map(([path, info]) => (
               <button
                 key={path}
                 onClick={() => { ctx.openSplit(path); setIsOpen(false); }}

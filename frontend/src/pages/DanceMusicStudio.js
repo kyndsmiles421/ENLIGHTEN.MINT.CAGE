@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSplitScreen, COSMIC_PAIRS } from '../components/SplitScreen';
 import {
   Music, Disc3, Play, Square, Circle, Save, Trash2, Download, ArrowLeft,
   Pause, RotateCcw, ChevronRight, Clock, Globe, Sparkles, Layers,
-  Volume2, VolumeX, Mic, Search, X
+  Volume2, VolumeX, Mic, Search, X, Columns
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -135,6 +136,7 @@ const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 
 
 export default function DanceMusicStudio() {
   const { user, authHeaders } = useAuth();
+  const splitScreen = useSplitScreen();
   const [activeTab, setActiveTab] = useState('instruments');
   const [selectedInstrument, setSelectedInstrument] = useState(INSTRUMENTS[0]);
   const [selectedScale, setSelectedScale] = useState('pentatonic');
@@ -387,6 +389,44 @@ export default function DanceMusicStudio() {
           );
         })}
       </div>
+
+      {/* Cosmic Pairs — multi-sensory combos */}
+      {splitScreen && (
+        <div className="px-6 mb-5" data-testid="cosmic-pairs-section">
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2.5 flex items-center gap-1.5"
+            style={{ color: '#C084FC' }}>
+            <Sparkles size={9} /> Cosmic Pairs — Launch a multi-sensory experience
+          </p>
+          <div className="flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+            {COSMIC_PAIRS.map((pair, i) => (
+              <motion.button
+                key={pair.id}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                onClick={() => splitScreen.openSplit(pair.pages[1])}
+                className="flex-shrink-0 w-48 p-3.5 rounded-xl text-left transition-all hover:scale-[1.02] group"
+                style={{
+                  background: `linear-gradient(135deg, ${pair.colors[0]}08, ${pair.colors[1]}08)`,
+                  border: `1px solid ${pair.colors[0]}15`,
+                }}
+                data-testid={`cosmic-pair-${pair.id}`}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex -space-x-1">
+                    {pair.colors.map((c, ci) => (
+                      <div key={ci} className="w-3 h-3 rounded-full ring-1 ring-black/40" style={{ background: c }} />
+                    ))}
+                  </div>
+                  <Columns size={9} style={{ color: 'var(--text-muted)' }} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <p className="text-[10px] font-medium mb-0.5" style={{ color: 'var(--text-primary)' }}>{pair.name}</p>
+                <p className="text-[8px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{pair.description}</p>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {activeTab === 'instruments' && (

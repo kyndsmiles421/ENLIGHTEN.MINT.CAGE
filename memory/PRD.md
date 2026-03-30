@@ -50,6 +50,9 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Search bars for Instruments (by name/origin/category) and Sacred Dances (by name/origin/tradition) — DONE
 - Category filter chips for instruments (by origin/region) — DONE
 - Split Screen: Added Dance & Music, Light Therapy, Cosmic Mixer, Videos to split-view registry — DONE
+- Cosmic Pairs: 6 curated multi-sensory combos (Third Eye Journey, Harmonic Resonance, Forest Healing, Tribal Immersion, Celestial Stillness, Zen Flow) — DONE
+  - Placement 1: Horizontal card strip on Dance & Music Studio page
+  - Placement 2: Top section of Split View dropdown (accessible from any page)
 
 ## Post-Launch
 - Capacitor native: `npx cap add android && npx cap add ios` after `yarn build`
