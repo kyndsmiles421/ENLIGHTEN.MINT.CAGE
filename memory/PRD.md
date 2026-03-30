@@ -7,7 +7,10 @@
 - **Payments:** Stripe (test key) | **PWA:** Service worker + manifest
 
 ## Complete Feature List
-- Landing, Auth (JWT), Creator Dashboard (DND), Star Chart (3D), Crystals & Stones, Sacred Texts
+- Landing, Auth (JWT), Creator Dashboard (DND), Star Chart (3D), Crystals & Stones
+- **Sacred Texts** — 15 ancient scriptures with AI generation, inline reading, VR immersive mode, HD narration
+  - **Inline Reader**: Tap chapter to read text directly on page. Tradition label, serif font, Listen (TTS), VR Mode button, close, chapter navigation
+  - Separate VR button per chapter for immersive 3D reading
 - Starseed Adventure/Realm/Worlds, Spiritual Avatar Creator + Gallery
 - Cosmic Ledger, Meditation, Breathwork, Yoga, Journal, Zen Garden
 - Cosmic Mixer (multi-layer, accordion, voice commands, tempo sync, founder/seasonal)
@@ -16,31 +19,27 @@
 - **Dashboard Customize** — pointer-based drag-to-reorder sections
 - Founder Badge, Enhanced Leaderboard, Seasonal Sonic Crystals
 
-### Cosmic Harmonics Engine (NEW)
-- **Backend**: `/api/harmonics/celestial` — Real-time moon phase (astronomical math), solar cycle, zodiac transit, personalized frequency/meditation recommendations, atmosphere settings
-- **SmartDock Cosmos Panel**: Shows current moon phase + zodiac + solar period at a glance. One-tap activate recommended solfeggio frequency (binaural beat). Suggested meditation and celestial guidance affirmation.
-- **VR Atmosphere Adaptation**: 3D scene dynamically adapts nebula colors (celestial accent), fog density (moon illumination), star brightness (particle density) based on current celestial state.
-- **VR Celestial Badge**: Top-right HUD showing moon phase + zodiac + solar period.
+### Cosmic Harmonics Engine
+- Backend: `/api/harmonics/celestial` — astronomical moon phase, solar cycle, zodiac transit
+- SmartDock Cosmos Panel: celestial state + one-tap frequency + meditation suggestion
+- VR atmosphere adaptation: nebula colors, fog, star brightness adapt to celestial state
 
 ### VR Immersive Modes
-- 3D Cosmic Sanctuary, 7 Portal Orbs with particle ring halos
-- Color-coded translucent glass-morphism HUD
+- 3D Sanctuary, 7 Portal Orbs with particle halos, translucent glass-morphism HUD
 - Guided Journeys, Story Theater (video sound FIXED), Quantum Meditation
-- 3 concentric breathing rings, ambient cosmic audio
+- Celestial badge in VR HUD
 
 ### Capacitor Native (Scaffolded)
 - Config, splash, icon assets, NATIVE_BUILD.md. Requires Node 22+ for build.
 
 ## Session History
-### Session 1-2: Items 1-12 (Mixer, refactoring, toolbar, dock, draggable, dashboard rearrange)
-### Session 3: Items 13-15 (Cleanup, Capacitor scaffolding, VR enhancement)
-### Session 4: Item 16 (Color-coordinated widgets)
-### Session 5 (Current):
-17. **Video Sound Fix** — Removed `muted` attribute from VR Story Theater video element
-18. **Cosmic Harmonics Engine** — Built backend with astronomical moon phase calculation, solar cycle, zodiac transit detection, and phase-based recommendations (8 phases × frequency/meditation/atmosphere). Added Cosmos panel to SmartDock. VR 3D scene dynamically adapts to celestial state. Celestial badge in VR HUD.
+### Sessions 1-4: Items 1-16
+### Session 5:
+17. Video Sound Fix — removed `muted` from VR Story Theater video
+18. Cosmic Harmonics Engine — celestial awareness + atmosphere adaptation
+19. **Sacred Texts Inline Reader** — Fixed critical UX bug where generated chapters could only be opened in VR mode. Added InlineReader component with full text display, Listen (TTS narration with play/pause/progress), VR Mode button, close button, and chapter navigation. Split onRead (inline) from onVR (immersive). Chapter subtitle changed from "Tap to read in VR mode" to "Tap to read".
 
-## Test Reports: Iterations 123-131 all 100% pass rate
+## Test Reports: Iterations 123-132 all 100% pass rate
 
 ## Backlog
-- No pending P1/P2 items
-- Future: WebXR HMD, native app store submission, haptic mantra pulse, AI-generated affirmations
+- Future: Haptic mantra pulse, AI affirmations from mood trends, WebXR HMD, native app store submission
