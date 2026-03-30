@@ -243,6 +243,33 @@ async def get_smart_suggestions(user=Depends(get_current_user)):
             "priority": 3,
         })
 
+    # Scripture suggestions
+    chapters_read = await db.bible_chapters.count_documents({"user_id": uid})
+    journey_progress = await db.scripture_journey_progress.find(
+        {"user_id": uid}, {"_id": 0}
+    ).to_list(20)
+
+    if chapters_read == 0:
+        suggestions.append({
+            "id": "explore-scriptures",
+            "title": "Explore Sacred Scriptures",
+            "desc": "136 texts across 7 traditions — Bible, Quran, Torah, Kabbalah & more.",
+            "path": "/bible",
+            "icon": "BookOpen",
+            "color": "#D97706",
+            "priority": 2,
+        })
+    elif len(journey_progress) == 0:
+        suggestions.append({
+            "id": "start-scripture-journey",
+            "title": "Start a Scripture Journey",
+            "desc": "Guided cross-tradition reading paths through sacred texts.",
+            "path": "/bible?tab=journeys",
+            "icon": "Map",
+            "color": "#818CF8",
+            "priority": 2,
+        })
+
     suggestions.append({
         "id": "explore-myths",
         "title": "Explore World Myths",
@@ -259,7 +286,7 @@ async def get_smart_suggestions(user=Depends(get_current_user)):
 
 # ─── Customizable Dashboard Layout ───
 
-DEFAULT_SECTIONS = ["stats", "pinned", "suggestions", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"]
+DEFAULT_SECTIONS = ["stats", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"]
 DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/crystals"]
 
 

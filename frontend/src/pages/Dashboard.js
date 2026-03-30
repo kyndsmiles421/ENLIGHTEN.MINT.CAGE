@@ -14,7 +14,7 @@ import {
   Compass, Droplets, UtensilsCrossed, Target, PenTool, Globe,
   Calendar, BarChart3, MessageCircle, Orbit, Atom, HelpCircle,
   Pencil, GripVertical, EyeOff, Plus, X, ArrowUp, ArrowDown,
-  Pin, LayoutGrid, Save, ChevronDown
+  Pin, LayoutGrid, Save, ChevronDown, ScrollText
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 
@@ -77,6 +77,7 @@ const ALL_ACTIONS = [
   { icon: Atom, label: 'Crystals', path: '/crystals', color: '#8B5CF6', group: 'Explore' },
   { icon: Globe, label: 'Myths', path: '/encyclopedia', color: '#FB923C', group: 'Explore' },
   { icon: BookOpen, label: 'Sacred', path: '/sacred-texts', color: '#FCD34D', group: 'Explore' },
+  { icon: ScrollText, label: 'Scriptures', path: '/bible', color: '#D97706', group: 'Explore' },
 ];
 
 const REC_ICON_MAP = {
@@ -90,6 +91,7 @@ const SECTION_META = {
   stats:           { label: 'Stats Cards',      color: '#FCD34D' },
   pinned:          { label: 'My Shortcuts',      color: '#C084FC' },
   suggestions:     { label: 'Suggested for You', color: '#2DD4BF' },
+  scripture:       { label: 'Sacred Scriptures', color: '#D97706' },
   coherence:       { label: 'Quantum Coherence', color: '#00E5FF' },
   challenge:       { label: 'Daily Challenge',   color: '#FCD34D' },
   wisdom:          { label: 'Daily Wisdom',      color: '#FB923C' },
@@ -98,8 +100,8 @@ const SECTION_META = {
   actions:         { label: 'Explore & Practice', color: '#86EFAC' },
 };
 
-const DEFAULT_ORDER = ["stats", "pinned", "suggestions", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
-const DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/crystals"];
+const DEFAULT_ORDER = ["stats", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
+const DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/bible"];
 
 export default function Dashboard() {
   const { user, authHeaders, loading: authLoading } = useAuth();
@@ -218,6 +220,7 @@ export default function Dashboard() {
       case 'stats': return <StatsSection key="stats" stats={stats} streak={streak} navigate={navigate} />;
       case 'pinned': return pinnedShortcuts.length > 0 ? <PinnedSection key="pinned" pinned={pinnedShortcuts} navigate={navigate} editMode={editMode} onRemove={togglePin} /> : null;
       case 'suggestions': return suggestions.length > 0 ? <SuggestionsSection key="suggestions" suggestions={suggestions} navigate={navigate} /> : null;
+      case 'scripture': return stats?.scripture ? <ScriptureSection key="scripture" scripture={stats.scripture} navigate={navigate} /> : null;
       case 'coherence': return coherence ? <CoherenceSection key="coherence" coherence={coherence} isLight={isLight} navigate={navigate} /> : null;
       case 'challenge': return dailyChallenge?.challenge ? <ChallengeSection key="challenge" dailyChallenge={dailyChallenge} isLight={isLight} navigate={navigate} /> : null;
       case 'wisdom': return dailyWisdom ? <WisdomSection key="wisdom" dailyWisdom={dailyWisdom} navigate={navigate} /> : null;
@@ -534,6 +537,83 @@ function SuggestionsSection({ suggestions, navigate }) {
           </motion.button>
         ))}
       </div>
+    </motion.div>
+  );
+}
+
+function ScriptureSection({ scripture, navigate }) {
+  const { chapters_read, active_journeys, recent_chapters } = scripture;
+  if (chapters_read === 0 && active_journeys === 0) return null;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+      className="mb-8" data-testid="scripture-section">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <ScrollText size={11} style={{ color: '#D97706' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Sacred Scriptures</p>
+        </div>
+        <button onClick={() => navigate('/bible')}
+          className="text-[10px] flex items-center gap-1 transition-all hover:gap-2"
+          style={{ color: '#D97706' }}
+          data-testid="scripture-browse-all">
+          Browse Library <ChevronRight size={10} />
+        </button>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-2.5 mb-3">
+        <button onClick={() => navigate('/bible')}
+          className="glass-card p-3.5 text-left group hover:scale-[1.01] transition-all"
+          data-testid="scripture-chapters-card">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(217,119,6,0.1)' }}>
+              <BookOpen size={13} style={{ color: '#D97706' }} />
+            </div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Chapters</p>
+          </div>
+          <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{chapters_read}</p>
+          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>chapters explored</p>
+        </button>
+        <button onClick={() => navigate('/bible?tab=journeys')}
+          className="glass-card p-3.5 text-left group hover:scale-[1.01] transition-all"
+          data-testid="scripture-journeys-card">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(129,140,248,0.1)' }}>
+              <Map size={13} style={{ color: '#818CF8' }} />
+            </div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Journeys</p>
+          </div>
+          <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{active_journeys}</p>
+          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>guided paths started</p>
+        </button>
+      </div>
+
+      {/* Continue Reading */}
+      {recent_chapters && recent_chapters.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.15em] mb-1" style={{ color: 'rgba(217,119,6,0.6)' }}>Continue Reading</p>
+          {recent_chapters.map((ch, i) => (
+            <motion.button key={`${ch.book_id}-${ch.chapter_num}`}
+              initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.04 }}
+              onClick={() => navigate(`/bible?book=${ch.book_id}&chapter=${ch.chapter_num}`)}
+              className="w-full glass-card p-3 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
+              data-testid={`scripture-recent-${i}`}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.12)' }}>
+                <ScrollText size={13} style={{ color: '#D97706' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                  {ch.book_title || ch.book_id} — Chapter {ch.chapter_num}
+                </p>
+                <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Pick up where you left off</p>
+              </div>
+              <ChevronRight size={11} style={{ color: '#D97706', opacity: 0.5 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </motion.button>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }

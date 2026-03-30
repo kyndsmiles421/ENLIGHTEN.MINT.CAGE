@@ -929,6 +929,73 @@ export default function Journey() {
           })}
         </div>
 
+        {/* Discover Sacred Scriptures Cross-Link */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+          className="mt-12 mb-8" data-testid="journey-scripture-discovery">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4 text-center" style={{ color: 'var(--text-muted)' }}>
+            Go Deeper
+          </p>
+          <button onClick={() => navigate('/bible')}
+            className="w-full glass-card p-6 md:p-8 text-left group hover:scale-[1.01] transition-all relative overflow-hidden"
+            style={{ borderColor: 'rgba(217,119,6,0.15)' }}
+            data-testid="journey-to-scriptures-btn">
+            <div className="absolute inset-0 opacity-[0.04]"
+              style={{ background: 'radial-gradient(ellipse at 30% 50%, #D97706 0%, transparent 60%)' }} />
+            <div className="relative flex items-start gap-5">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.15)' }}>
+                <BookOpen size={24} style={{ color: '#D97706' }} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#D97706' }}>
+                  Sacred Scriptures Library
+                </p>
+                <h3 className="text-lg md:text-xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  Explore 136 Sacred Texts
+                </h3>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+                  Dive into the Bible, Quran, Torah, Kabbalah, Lost Books & more with AI-powered chapter summaries, Vision Mode scene recreations, and guided cross-tradition journeys.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {['Bible', 'Quran', 'Kabbalah', 'Torah', 'Lost Books'].map(t => (
+                    <span key={t} className="text-[9px] px-2 py-0.5 rounded-full"
+                      style={{ background: 'rgba(217,119,6,0.08)', color: '#D97706', border: '1px solid rgba(217,119,6,0.12)' }}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <ChevronRight size={18} style={{ color: '#D97706' }} className="flex-shrink-0 mt-2 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </div>
+          </button>
+
+          {/* Scripture Journeys Quick Links */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+            {[
+              { title: 'The Life of Moses', sub: 'Bible, Quran & Kabbalah', color: '#D97706', id: 'life-of-moses' },
+              { title: 'In the Beginning', sub: 'Creation across all traditions', color: '#818CF8', id: 'creation-stories' },
+              { title: 'Mary & Jesus', sub: 'Gospels, Quran & lost texts', color: '#DC2626', id: 'mary-and-jesus' },
+              { title: 'The Path of Divine Love', sub: 'Love & mercy across faiths', color: '#EC4899', id: 'divine-love' },
+            ].map((j, i) => (
+              <motion.button key={j.id}
+                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55 + i * 0.04 }}
+                onClick={() => navigate(`/bible?tab=journeys`)}
+                className="glass-card p-3.5 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
+                data-testid={`journey-link-${j.id}`}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${j.color}10`, border: `1px solid ${j.color}18` }}>
+                  <BookOpen size={13} style={{ color: j.color }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{j.title}</p>
+                  <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{j.sub}</p>
+                </div>
+                <ChevronRight size={10} style={{ color: j.color, opacity: 0.4 }} />
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+
         {!user && (
           <div className="glass-card p-8 text-center mt-12">
             <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>Sign in to save your progress and unlock stages as you grow.</p>
