@@ -257,9 +257,9 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
                 <motion.div key={ch.id} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.06 }}
                   className="relative overflow-hidden rounded-2xl border transition-all"
                   style={{ background: `linear-gradient(135deg, ${origin.color}08, rgba(0,0,0,0.3))`, borderColor: `${origin.color}20` }}>
-                  <button
+                  <div
                     onClick={() => setExpandedChar(isExpanded ? null : ch.origin_id)}
-                    className="w-full p-4 text-left flex items-center gap-3"
+                    className="w-full p-4 text-left flex items-center gap-3 cursor-pointer"
                     data-testid={`continue-${ch.origin_id}`}>
                     <AvatarBadge originId={ch.origin_id} authHeaders={authHeaders} size={40} />
                     <div className="flex-1 min-w-0">
@@ -285,7 +285,7 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
                       </button>
                       <ChevronDown size={14} style={{ color: origin.color, opacity: 0.5, transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                     </div>
-                  </button>
+                  </div>
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
