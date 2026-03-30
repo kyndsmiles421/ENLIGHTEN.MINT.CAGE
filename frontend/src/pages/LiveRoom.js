@@ -8,8 +8,10 @@ import {
   ArrowLeft, Send, Users, Radio, Crown, Timer, Heart, Sparkles,
   MessageCircle, X, Play, Square, Volume2, VolumeX, Smile,
   Hand, Star, Flame, Moon, Sun, Zap, Wind, ChevronUp, ChevronDown,
-  Mic, MicOff, Video, VideoOff, Settings, Monitor, UserCheck
+  Mic, MicOff, Video, VideoOff, Settings, Monitor, UserCheck, Layers
 } from 'lucide-react';
+import { useVirtualBackground } from '../hooks/useVirtualBackground';
+import BackgroundPicker from '../components/BackgroundPicker';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const WS_URL = `${process.env.REACT_APP_BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/api/live/ws`;
@@ -94,6 +96,11 @@ export default function LiveRoom() {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [screenSharer, setScreenSharer] = useState(null); // user_id of person sharing
   const [remoteScreenStream, setRemoteScreenStream] = useState(null);
+
+  // Virtual background
+  const virtualBg = useVirtualBackground();
+  const [showBgPicker, setShowBgPicker] = useState(false);
+  const hiddenVideoRef = useRef(null);
 
   const isHost = session?.host_id === user?.id;
 
@@ -384,12 +391,12 @@ export default function LiveRoom() {
     const shouldTurnOff = forceOff === true || isVideoOn;
 
     if (shouldTurnOff) {
-      // Turn off
       if (localStreamRef.current) {
         localStreamRef.current.getVideoTracks().forEach(t => t.stop());
         localStreamRef.current.getAudioTracks().forEach(t => t.stop());
         localStreamRef.current = null;
       }
+      virtualBg.stopProcessing();
       if (localVideoRef.current) localVideoRef.current.srcObject = null;
       cleanupAllPeers();
       setIsVideoOn(false);
@@ -398,14 +405,43 @@ export default function LiveRoom() {
         wsRef.current.send(JSON.stringify({ type: 'camera_toggle', camera_on: false }));
       }
     } else {
-      // Turn on
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
           audio: true,
         });
-        localStreamRef.current = stream;
-        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+
+        // If virtual background is active, process through segmenter
+        if (virtualBg.currentBg) {
+          // Create hidden video element to feed to segmenter
+          const hiddenVideo = hiddenVideoRef.current || document.createElement('video');
+          hiddenVideoRef.current = hiddenVideo;
+          hiddenVideo.srcObject = stream;
+          hiddenVideo.muted = true;
+          hiddenVideo.autoplay = true;
+          hiddenVideo.playsInline = true;
+          await hiddenVideo.play();
+          // Wait for video to have dimensions
+          await new Promise(resolve => {
+            if (hiddenVideo.videoWidth > 0) resolve();
+            else hiddenVideo.onloadeddata = resolve;
+          });
+
+          const processedStream = await virtualBg.startProcessing(hiddenVideo, virtualBg.currentBg);
+          if (processedStream) {
+            // Add audio track from original stream to processed stream
+            stream.getAudioTracks().forEach(t => processedStream.addTrack(t));
+            localStreamRef.current = processedStream;
+            // Keep reference to raw stream for cleanup
+            localStreamRef.current._rawStream = stream;
+          } else {
+            localStreamRef.current = stream;
+          }
+        } else {
+          localStreamRef.current = stream;
+        }
+
+        if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
         setIsVideoOn(true);
         setIsMicOn(true);
 
@@ -413,7 +449,6 @@ export default function LiveRoom() {
           wsRef.current.send(JSON.stringify({ type: 'camera_toggle', camera_on: true }));
         }
 
-        // Connect to all existing peers who have camera on
         Object.entries(cameraStates).forEach(([peerId, camOn]) => {
           if (camOn && peerId !== user.id) {
             createPeerOffer(peerId);
@@ -423,7 +458,7 @@ export default function LiveRoom() {
         console.error('Camera access error:', err);
       }
     }
-  }, [isVideoOn, cleanupAllPeers, cameraStates, user, createPeerOffer]);
+  }, [isVideoOn, cleanupAllPeers, cameraStates, user, createPeerOffer, virtualBg]);
 
   const toggleMic = useCallback(() => {
     if (localStreamRef.current) {
@@ -503,7 +538,6 @@ export default function LiveRoom() {
       screenStreamRef.current.getTracks().forEach(t => t.stop());
       screenStreamRef.current = null;
     }
-    // Close screen sharing peer connections
     Object.values(screenPeersRef.current).forEach(pc => pc.close());
     screenPeersRef.current = {};
 
@@ -516,6 +550,40 @@ export default function LiveRoom() {
       wsRef.current.send(JSON.stringify({ type: 'screen_share', sharing: false }));
     }
   }, [screenSharer, user]);
+
+  // Handle background selection
+  const handleBgSelect = useCallback(async (bgConfig) => {
+    if (!bgConfig) {
+      // Remove background
+      virtualBg.stopProcessing();
+      // If camera is on, revert to raw stream
+      if (isVideoOn && localStreamRef.current?._rawStream) {
+        localStreamRef.current = localStreamRef.current._rawStream;
+        if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
+      }
+      setShowBgPicker(false);
+      return;
+    }
+
+    if (isVideoOn) {
+      // Camera already on — apply/change background live
+      await virtualBg.changeBackground(bgConfig);
+
+      // If not already processing, start processing
+      if (!virtualBg.isActive && hiddenVideoRef.current) {
+        const processedStream = await virtualBg.startProcessing(hiddenVideoRef.current, bgConfig);
+        if (processedStream) {
+          const rawStream = localStreamRef.current?._rawStream || localStreamRef.current;
+          rawStream?.getAudioTracks().forEach(t => processedStream.addTrack(t));
+          localStreamRef.current = processedStream;
+          localStreamRef.current._rawStream = rawStream;
+          if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
+        }
+      }
+    }
+    // Store the selection so it applies when camera turns on
+    setShowBgPicker(false);
+  }, [isVideoOn, virtualBg]);
 
   // ─── Existing Functions ───
 
@@ -819,6 +887,20 @@ export default function LiveRoom() {
               </button>
             )}
 
+            {/* Virtual Background Button */}
+            {canShareVideo && session.status === 'active' && (
+              <button onClick={() => setShowBgPicker(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all hover:scale-105"
+                style={{
+                  background: virtualBg.currentBg ? 'rgba(192,132,252,0.15)' : 'rgba(148,163,184,0.08)',
+                  border: `1px solid ${virtualBg.currentBg ? 'rgba(192,132,252,0.3)' : 'rgba(148,163,184,0.1)'}`,
+                  color: virtualBg.currentBg ? '#C084FC' : '#94A3B8',
+                }}
+                data-testid="toggle-virtual-bg">
+                <Layers size={12} /> {virtualBg.currentBg ? 'BG Active' : 'Background'}
+              </button>
+            )}
+
             {/* Host Commands */}
             {isHost && session.status === 'active' && (
               <>
@@ -971,6 +1053,15 @@ export default function LiveRoom() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Background Picker Modal */}
+      <BackgroundPicker
+        isOpen={showBgPicker}
+        onClose={() => setShowBgPicker(false)}
+        onSelect={handleBgSelect}
+        currentBg={virtualBg.currentBg}
+        isLoading={virtualBg.isLoading}
+      />
     </div>
   );
 }
