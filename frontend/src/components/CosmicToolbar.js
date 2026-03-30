@@ -50,26 +50,40 @@ export default function CosmicToolbar() {
     return () => window.removeEventListener('scroll', h);
   }, []);
 
-  // Auto-collapse after 4s of inactivity
+  // Auto-collapse after 5s of inactivity
   useEffect(() => {
     if (expanded) {
-      collapseRef.current = setTimeout(() => setExpanded(false), 4000);
+      collapseRef.current = setTimeout(() => setExpanded(false), 5000);
       return () => clearTimeout(collapseRef.current);
     }
   }, [expanded]);
 
-  const toggleExpand = () => {
+  // Reset collapse timer on any interaction
+  const refreshCollapse = useCallback(() => {
+    if (collapseRef.current) clearTimeout(collapseRef.current);
+    collapseRef.current = setTimeout(() => setExpanded(false), 5000);
+  }, []);
+
+  const toggleExpand = useCallback(() => {
     haptic('Light');
     setExpanded(e => !e);
-  };
+  }, []);
+
+  // Tap on the pill body expands; tapping a button inside won't trigger this
+  const handlePillTap = useCallback((e) => {
+    // Don't expand when clicking a child button
+    if (e.target.closest('button') || e.target.closest('[data-tool-btn]')) return;
+    toggleExpand();
+  }, [toggleExpand]);
 
   /* ── Voice ── */
   const handleMicDown = useCallback((e) => {
     e.preventDefault();
     setHoldActive(true);
     haptic('Medium');
+    refreshCollapse();
     holdRef.current = setTimeout(() => startRecording(), 150);
-  }, [startRecording]);
+  }, [startRecording, refreshCollapse]);
   const handleMicUp = useCallback((e) => {
     e.preventDefault();
     setHoldActive(false);
@@ -88,6 +102,7 @@ export default function CosmicToolbar() {
 
   const toggleMeditate = useCallback(() => {
     haptic('Heavy');
+    refreshCollapse();
     if (meditating) {
       try { if (masterRef.current && ctxRef.current) masterRef.current.gain.linearRampToValueAtTime(0.001, ctxRef.current.currentTime + 1.2); } catch {}
       setTimeout(() => { stopMeditate(); setMeditating(false); }, 1400);
@@ -126,11 +141,11 @@ export default function CosmicToolbar() {
       setBpm(60);
       setMeditating(true);
       toast('Deep Zen activated', {
-        description: '528Hz + 174Hz + Ocean · 60 BPM',
+        description: '528Hz + 174Hz + Ocean \u00b7 60 BPM',
         style: { background: 'linear-gradient(135deg, rgba(10,10,18,0.95), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80' },
       });
     } catch { toast.error('Audio unavailable'); }
-  }, [meditating, stopMeditate, setBpm]);
+  }, [meditating, stopMeditate, setBpm, refreshCollapse]);
 
   useEffect(() => () => stopMeditate(), [stopMeditate]);
 
@@ -140,12 +155,22 @@ export default function CosmicToolbar() {
 
   const anyActive = meditating || isRecording || wakeWordEnabled;
 
+  // Determine halo color based on highest-priority active state
+  const haloColor = meditating
+    ? 'rgba(34,197,94,0.25)'
+    : isRecording
+      ? 'rgba(239,68,68,0.25)'
+      : wakeWordEnabled
+        ? 'rgba(34,197,94,0.15)'
+        : 'transparent';
+
   return createPortal(
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="fixed flex items-center"
+      onClick={handlePillTap}
       style={{
         top: 12,
         right: 12,
@@ -153,18 +178,25 @@ export default function CosmicToolbar() {
         padding: expanded ? '5px 8px' : '5px 6px',
         borderRadius: 24,
         background: anyActive ? 'rgba(10,10,18,0.55)' : 'rgba(10,10,18,0.35)',
-        border: `1px solid ${anyActive ? 'rgba(192,132,252,0.1)' : 'rgba(255,255,255,0.05)'}`,
+        border: `1px solid ${anyActive ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.05)'}`,
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        transition: 'background 0.4s, border 0.4s, padding 0.3s',
+        boxShadow: anyActive
+          ? `0 0 20px ${haloColor}, 0 0 40px ${haloColor}, 0 4px 16px rgba(0,0,0,0.3)`
+          : '0 4px 16px rgba(0,0,0,0.2)',
+        transition: 'background 0.4s, border 0.4s, padding 0.3s, box-shadow 0.6s',
+        cursor: 'pointer',
       }}
       data-testid="cosmic-toolbar"
     >
+      {/* Outer animated halo for active states */}
+      {anyActive && <ActiveHalo color={haloColor} />}
+
       {/* ── Meditate (hidden on Mixer) ── */}
       {!onMixer && (
         <ToolBtn
           testId="toolbar-meditate"
-          onClick={toggleMeditate}
+          onClick={(e) => { e.stopPropagation(); toggleMeditate(); }}
           active={meditating}
           glowColor="rgba(34,197,94,0.35)"
           expanded={expanded}
@@ -196,7 +228,7 @@ export default function CosmicToolbar() {
       {/* ── Wake Word ── */}
       <ToolBtn
         testId="toolbar-wake"
-        onClick={() => { haptic('Light'); toggleWakeWord(); }}
+        onClick={(e) => { e.stopPropagation(); haptic('Light'); toggleWakeWord(); }}
         active={wakeWordEnabled}
         glowColor="rgba(34,197,94,0.2)"
         expanded={expanded}
@@ -204,6 +236,7 @@ export default function CosmicToolbar() {
         small
       >
         <Radio size={12} style={{ color: wakeWordEnabled ? '#22C55E' : 'rgba(255,255,255,0.3)' }} />
+        {wakeWordEnabled && <Glow color="rgba(34,197,94,0.2)" speed={4} />}
       </ToolBtn>
 
       {/* ── Scroll-to-top ── */}
@@ -212,7 +245,7 @@ export default function CosmicToolbar() {
           <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }}>
             <ToolBtn
               testId="toolbar-top"
-              onClick={() => { haptic('Light'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onClick={(e) => { e.stopPropagation(); haptic('Light'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               expanded={expanded}
               label="Top"
               small
@@ -223,29 +256,45 @@ export default function CosmicToolbar() {
         )}
       </AnimatePresence>
 
-      {/* ── Expand/Collapse Toggle ── */}
-      <button
-        onClick={toggleExpand}
-        className="flex items-center justify-center rounded-full ml-0.5"
-        style={{
-          width: 20,
-          height: 20,
-          background: 'rgba(255,255,255,0.04)',
-          cursor: 'pointer',
-          flexShrink: 0,
-        }}
-        data-testid="toolbar-expand"
+      {/* ── Expand indicator dots ── */}
+      <div
+        className="flex items-center justify-center ml-0.5"
+        style={{ width: 16, height: 20, flexShrink: 0, pointerEvents: 'none' }}
+        data-testid="toolbar-expand-indicator"
       >
-        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-            <circle cx="2" cy="4" r="1" fill="rgba(192,132,252,0.5)" />
-            <circle cx="6" cy="4" r="1" fill="rgba(192,132,252,0.5)" />
-            {!expanded && <circle cx="4" cy="4" r="1" fill="rgba(192,132,252,0.3)" />}
-          </svg>
+        <motion.div
+          animate={{ rotate: expanded ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex flex-col items-center gap-[2px]"
+        >
+          <div style={{ width: 3, height: 3, borderRadius: '50%', background: expanded ? 'rgba(192,132,252,0.6)' : 'rgba(192,132,252,0.35)' }} />
+          <div style={{ width: 3, height: 3, borderRadius: '50%', background: expanded ? 'rgba(192,132,252,0.6)' : 'rgba(192,132,252,0.35)' }} />
+          {!expanded && <div style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(192,132,252,0.2)' }} />}
         </motion.div>
-      </button>
+      </div>
     </motion.div>,
     document.body
+  );
+}
+
+/* ── Animated outer halo that pulses around the entire toolbar ── */
+function ActiveHalo({ color }) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{
+        inset: -4,
+        borderRadius: 28,
+        border: `1.5px solid ${color}`,
+        filter: `blur(1px)`,
+      }}
+      animate={{
+        scale: [1, 1.06, 1],
+        opacity: [0.6, 0.2, 0.6],
+      }}
+      transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+      data-testid="toolbar-active-halo"
+    />
   );
 }
 
@@ -259,6 +308,7 @@ function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPoin
       onPointerLeave={onPointerLeave}
       whileTap={{ scale: 0.82 }}
       className="relative flex items-center gap-1.5 rounded-full transition-all overflow-hidden"
+      data-tool-btn="true"
       style={{
         height: small ? 28 : 32,
         padding: expanded ? `0 ${small ? 8 : 10}px 0 ${small ? 6 : 8}px` : `0 ${small ? 6 : 8}px`,

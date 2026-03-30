@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, Waves, Headphones, Send, BookOpen, X, ChevronLeft, Sparkles, Loader2, MessageCircle, Play, Pause, GripVertical, Minimize2, Maximize2 } from 'lucide-react';
+import { HelpCircle, Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, MessageCircle, Play, Pause } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
-const DOCK_POS_KEY = 'cosmic_dock_position';
 const DOCK_MIN_KEY = 'cosmic_dock_minimized';
+
+/* ── Try native haptics, fallback to vibrate ── */
+let Haptics;
+try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
+function haptic(style = 'Light') {
+  try { Haptics?.impact({ style }); } catch { navigator.vibrate?.(8); }
+}
 
 function getUsage() {
   try { return JSON.parse(localStorage.getItem(USAGE_KEY) || '{}'); } catch { return {}; }
@@ -17,12 +23,6 @@ function trackUsage(id) {
   const u = getUsage();
   u[id] = (u[id] || 0) + 1;
   localStorage.setItem(USAGE_KEY, JSON.stringify(u));
-}
-function getSavedPos() {
-  try { return JSON.parse(localStorage.getItem(DOCK_POS_KEY)); } catch { return null; }
-}
-function getSavedMin() {
-  try { return localStorage.getItem(DOCK_MIN_KEY) === 'true'; } catch { return false; }
 }
 
 const FREQUENCIES = [
@@ -39,299 +39,262 @@ export default function SmartDock() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activePanel, setActivePanel] = useState(null);
-  const [dockExpanded, setDockExpanded] = useState(false);
-  const [minimized, setMinimized] = useState(() => getSavedMin());
-  const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragRef = useRef(null);
-  const dockRef = useRef(null);
-  const dragStartRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [minimized, setMinimized] = useState(() => {
+    try { return localStorage.getItem(DOCK_MIN_KEY) === 'true'; } catch { return false; }
+  });
+  const collapseRef = useRef(null);
 
-  const hidden = location.pathname === '/auth' || location.pathname === '/tutorial' || location.pathname.startsWith('/live/');
+  const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname.startsWith('/live/');
 
-  // Persist minimized state
   useEffect(() => {
     localStorage.setItem(DOCK_MIN_KEY, String(minimized));
   }, [minimized]);
 
-  // Persist position
+  // Auto-collapse labels after 5s
   useEffect(() => {
-    if (position.x !== null) {
-      localStorage.setItem(DOCK_POS_KEY, JSON.stringify(position));
+    if (expanded) {
+      collapseRef.current = setTimeout(() => setExpanded(false), 5000);
+      return () => clearTimeout(collapseRef.current);
     }
-  }, [position]);
+  }, [expanded]);
 
-  // Clamp position to viewport
-  const clampPos = useCallback((x, y) => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const dockW = minimized ? 36 : 44;
-    const dockH = minimized ? 36 : 200;
-    return {
-      x: Math.max(0, Math.min(vw - dockW, x)),
-      y: Math.max(0, Math.min(vh - dockH, y)),
-    };
-  }, [minimized]);
-
-  // Snap to nearest edge/corner on release
-  const snapToEdge = useCallback((x, y) => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const dockW = minimized ? 36 : 44;
-    const dockH = minimized ? 36 : 200;
-    const SNAP = 60; // snap threshold in px
-
-    const midX = x + dockW / 2;
-    const midY = y + dockH / 2;
-
-    let sx = x, sy = y;
-
-    // Horizontal: snap to left or right edge
-    if (midX < vw / 2) {
-      // Closer to left
-      sx = x < SNAP ? 0 : x;
-    } else {
-      // Closer to right
-      sx = (vw - x - dockW) < SNAP ? vw - dockW : x;
-    }
-
-    // Vertical: snap to top, center, or bottom
-    if (y < SNAP) {
-      sy = 8;
-    } else if (Math.abs(midY - vh / 2) < SNAP) {
-      sy = (vh - dockH) / 2;
-    } else if ((vh - y - dockH) < SNAP) {
-      sy = vh - dockH - 8;
-    }
-
-    return { x: sx, y: sy };
-  }, [minimized]);
-
-  // Drag handlers
-  const onPointerDown = useCallback((e) => {
-    if (e.target.closest('button') && !e.target.closest('[data-drag-handle]')) return;
-    e.preventDefault();
-    setIsDragging(true);
-    const rect = dockRef.current?.getBoundingClientRect();
-    dragStartRef.current = {
-      offsetX: e.clientX - (rect?.left || 0),
-      offsetY: e.clientY - (rect?.top || 0),
-    };
-    document.body.style.userSelect = 'none';
+  const refreshCollapse = useCallback(() => {
+    if (collapseRef.current) clearTimeout(collapseRef.current);
+    collapseRef.current = setTimeout(() => setExpanded(false), 5000);
   }, []);
 
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const onMove = (e) => {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      if (dragStartRef.current) {
-        const newPos = clampPos(
-          clientX - dragStartRef.current.offsetX,
-          clientY - dragStartRef.current.offsetY
-        );
-        setPosition(newPos);
-      }
-    };
-
-    const onUp = () => {
-      setIsDragging(false);
-      document.body.style.userSelect = '';
-      // Snap to nearest edge
-      setPosition(prev => {
-        if (prev.x === null) return prev;
-        return snapToEdge(prev.x, prev.y);
-      });
-    };
-
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onUp);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onUp);
-    };
-  }, [isDragging, clampPos]);
-
-  const usage = getUsage();
   const DOCK_ITEMS = [
-    { id: 'assistant', icon: HelpCircle, label: 'Sage', color: '#C084FC' },
-    { id: 'mixer', icon: Waves, label: 'Mixer', color: '#818CF8' },
+    { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
+    { id: 'mixer', icon: Waves, label: 'Mixer', color: '#818CF8' },
     { id: 'feedback', icon: Send, label: 'Feedback', color: '#86EFAC' },
     { id: 'help', icon: BookOpen, label: 'Help', color: '#FCD34D' },
-  ].sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
+  ];
 
-  const openPanel = (id) => {
+  // Sort by usage frequency
+  const usage = getUsage();
+  const sortedItems = [...DOCK_ITEMS].sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
+
+  const openPanel = useCallback((id) => {
+    haptic('Light');
     trackUsage(id);
+    refreshCollapse();
     if (id === 'feedback') { navigate('/feedback'); setActivePanel(null); return; }
     if (id === 'help') { navigate('/help-center'); setActivePanel(null); return; }
-    setActivePanel(activePanel === id ? null : id);
-  };
+    setActivePanel(prev => prev === id ? null : id);
+  }, [navigate, refreshCollapse]);
 
-  const toggleMinimize = () => {
-    setMinimized(!minimized);
-    setActivePanel(null);
-    setDockExpanded(false);
-  };
+  const toggleExpand = useCallback(() => {
+    haptic('Light');
+    setExpanded(e => !e);
+  }, []);
+
+  const handlePillTap = useCallback((e) => {
+    if (e.target.closest('button') || e.target.closest('[data-dock-btn]')) return;
+    toggleExpand();
+  }, [toggleExpand]);
 
   if (hidden) return null;
 
-  const visibleItems = dockExpanded ? DOCK_ITEMS : DOCK_ITEMS.slice(0, 3);
-
-  // Default position: right side, vertically centered
-  const hasCustomPos = position.x !== null;
-
-  // When minimized, always tuck into bottom-right corner regardless of saved position
-  let posStyle;
+  // Minimized: tiny restore dot
   if (minimized) {
-    posStyle = { right: 12, bottom: 80, top: 'auto', left: 'auto' };
-  } else if (hasCustomPos) {
-    posStyle = { left: position.x, top: position.y, right: 'auto' };
-  } else {
-    posStyle = { right: 0, top: '50%', transform: 'translateY(-50%)' };
+    return createPortal(
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.15, opacity: 0.9 }}
+        whileTap={{ scale: 0.85 }}
+        onClick={() => { haptic('Light'); setMinimized(false); }}
+        className="fixed flex items-center justify-center"
+        style={{
+          bottom: 80,
+          right: 12,
+          zIndex: 79,
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          background: 'rgba(11,12,21,0.6)',
+          border: '1px solid rgba(192,132,252,0.12)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          cursor: 'pointer',
+          opacity: 0.5,
+        }}
+        data-testid="dock-restore"
+        title="Open Dock"
+      >
+        <Sparkles size={10} style={{ color: '#C084FC' }} className="animate-pulse" />
+      </motion.button>,
+      document.body
+    );
   }
 
   return createPortal(
-    <div
-      ref={dockRef}
-      className="fixed z-[80]"
-      style={{
-        ...posStyle,
-        cursor: isDragging ? 'grabbing' : 'default',
-        touchAction: 'none',
-        transition: isDragging ? 'none' : 'all 0.35s cubic-bezier(0.25,1,0.5,1)',
-      }}
-      data-testid="smart-dock">
+    <div className="fixed" style={{ bottom: 80, right: 12, zIndex: 79 }} data-testid="smart-dock">
+      {/* ── Floating panels (render above the dock) ── */}
+      <AnimatePresence>
+        {activePanel === 'assistant' && (
+          <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
+        )}
+        {activePanel === 'frequency' && (
+          <FrequencyPanel onClose={() => setActivePanel(null)} />
+        )}
+        {activePanel === 'mixer' && (
+          <MixerPanel onClose={() => setActivePanel(null)} navigate={navigate} />
+        )}
+      </AnimatePresence>
 
-      {/* ─── Minimized state: tiny subtle dot ─── */}
-      {minimized ? (
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="flex items-center">
-          <motion.button
-            whileHover={{ scale: 1.2, opacity: 1 }}
-            whileTap={{ scale: 0.85 }}
-            onClick={() => { if (!isDragging) toggleMinimize(); }}
-            className="w-6 h-6 rounded-full flex items-center justify-center group"
-            style={{
-              background: 'rgba(11,12,21,0.7)',
-              border: '1px solid rgba(192,132,252,0.15)',
-              backdropFilter: 'blur(12px)',
-              opacity: 0.5,
-            }}
-            data-testid="dock-restore"
-            title="Open Dock">
-            <Sparkles size={10} style={{ color: '#C084FC' }} className="animate-pulse" />
-          </motion.button>
-        </motion.div>
-      ) : (
-        /* ─── Expanded dock ─── */
-        <div className="flex items-start">
-          {/* Panel — opens to the LEFT of the dock */}
-          <div>
-            <AnimatePresence>
-              {activePanel === 'assistant' && <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />}
-              {activePanel === 'frequency' && <FrequencyPanel onClose={() => setActivePanel(null)} />}
-              {activePanel === 'mixer' && (
-                <motion.div initial={{ opacity: 0, x: 10, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.95 }}
-                  className="mr-2">
-                  <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(11,12,21,0.95)', border: '1px solid rgba(129,140,248,0.15)', backdropFilter: 'blur(16px)', width: '200px' }}>
-                    <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#818CF8' }}>Production Console</p>
-                    <button onClick={() => { setActivePanel(null); document.querySelector('[data-testid="mixer-toggle"]')?.click(); }}
-                      className="w-full py-2 rounded-lg text-xs mb-1.5"
-                      style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}
-                      data-testid="dock-open-mixer">
-                      Open Console
-                    </button>
-                    <button onClick={() => { setActivePanel(null); navigate('/cosmic-mixer'); }}
-                      className="w-full py-2 rounded-lg text-xs"
-                      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
-                      Full Mixer Page
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+      {/* ── Horizontal pill dock ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        className="flex items-center"
+        onClick={handlePillTap}
+        style={{
+          padding: expanded ? '4px 6px' : '4px 5px',
+          borderRadius: 22,
+          background: activePanel ? 'rgba(10,10,18,0.55)' : 'rgba(10,10,18,0.35)',
+          border: `1px solid ${activePanel ? 'rgba(192,132,252,0.1)' : 'rgba(255,255,255,0.05)'}`,
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+          transition: 'background 0.4s, border 0.4s, padding 0.3s',
+          cursor: 'pointer',
+          marginTop: 8,
+        }}
+        data-testid="smart-dock-pill"
+      >
+        {sortedItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activePanel === item.id;
+          return (
+            <DockBtn
+              key={item.id}
+              testId={`dock-${item.id}`}
+              onClick={(e) => { e.stopPropagation(); openPanel(item.id); }}
+              active={isActive}
+              color={item.color}
+              expanded={expanded}
+              label={item.label}
+            >
+              <Icon size={13} style={{ color: isActive ? item.color : 'rgba(248,250,252,0.4)' }} />
+            </DockBtn>
+          );
+        })}
 
-          {/* Vertical Dock Rail */}
+        {/* ── Minimize ── */}
+        <DockBtn
+          testId="dock-minimize"
+          onClick={(e) => { e.stopPropagation(); haptic('Light'); setMinimized(true); setActivePanel(null); }}
+          expanded={expanded}
+          label="Hide"
+          small
+        >
+          <X size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />
+        </DockBtn>
+
+        {/* ── Expand indicator ── */}
+        <div
+          className="flex items-center justify-center ml-0.5"
+          style={{ width: 14, height: 18, flexShrink: 0, pointerEvents: 'none' }}
+        >
           <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col items-center gap-0.5 py-1.5 px-1 pointer-events-auto"
-            style={{
-              background: 'rgba(11,12,21,0.92)',
-              border: '1px solid rgba(248,250,252,0.06)',
-              borderRadius: hasCustomPos ? '14px' : '14px 0 0 14px',
-              borderRight: hasCustomPos ? undefined : 'none',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '-4px 0 24px rgba(0,0,0,0.3)',
-            }}>
-
-            {/* Drag handle + Minimize */}
-            <div
-              className="w-9 h-5 flex items-center justify-center rounded-lg cursor-grab active:cursor-grabbing"
-              onPointerDown={onPointerDown}
-              data-drag-handle="true"
-              data-testid="dock-drag-handle"
-              title="Drag to move">
-              <GripVertical size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
-            </div>
-
-            {visibleItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activePanel === item.id;
-              return (
-                <motion.button
-                  key={item.id}
-                  whileTap={{ scale: 0.85 }}
-                  onClick={() => openPanel(item.id)}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center transition-all relative"
-                  style={{
-                    background: isActive ? `${item.color}15` : 'transparent',
-                    border: isActive ? `1px solid ${item.color}30` : '1px solid transparent',
-                  }}
-                  data-testid={`dock-${item.id}`}
-                  title={item.label}>
-                  <Icon size={15} style={{ color: isActive ? item.color : 'rgba(248,250,252,0.4)' }} />
-                </motion.button>
-              );
-            })}
-
-            {!dockExpanded && DOCK_ITEMS.length > 3 && (
-              <button onClick={() => setDockExpanded(true)}
-                className="w-9 h-7 rounded-xl flex items-center justify-center"
-                data-testid="dock-expand">
-                <ChevronLeft size={11} style={{ color: 'rgba(248,250,252,0.25)' }} />
-              </button>
-            )}
-            {dockExpanded && (
-              <button onClick={() => setDockExpanded(false)}
-                className="w-9 h-7 rounded-xl flex items-center justify-center"
-                data-testid="dock-collapse">
-                <X size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />
-              </button>
-            )}
-
-            {/* Minimize button */}
-            <button onClick={toggleMinimize}
-              className="w-9 h-7 rounded-xl flex items-center justify-center mt-0.5 hover:bg-white/5 transition-colors"
-              data-testid="dock-minimize"
-              title="Minimize Dock">
-              <Minimize2 size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
-            </button>
+            animate={{ rotate: expanded ? 90 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-col items-center gap-[2px]"
+          >
+            <div style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: expanded ? 'rgba(192,132,252,0.55)' : 'rgba(192,132,252,0.3)' }} />
+            <div style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: expanded ? 'rgba(192,132,252,0.55)' : 'rgba(192,132,252,0.3)' }} />
           </motion.div>
         </div>
-      )}
+      </motion.div>
     </div>,
     document.body
+  );
+}
+
+/* ── Reusable dock button (horizontal pill style) ── */
+function DockBtn({ children, testId, onClick, active, color, expanded, label, small }) {
+  return (
+    <motion.button
+      onClick={onClick}
+      whileTap={{ scale: 0.82 }}
+      data-dock-btn="true"
+      className="relative flex items-center gap-1 rounded-full transition-all overflow-hidden"
+      style={{
+        height: small ? 26 : 30,
+        padding: expanded ? `0 ${small ? 7 : 9}px 0 ${small ? 5 : 7}px` : `0 ${small ? 5 : 7}px`,
+        background: active ? `${color || 'rgba(192,132,252)'}15` : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${active ? `${color || 'rgba(192,132,252)'}25` : 'rgba(255,255,255,0.03)'}`,
+        cursor: 'pointer',
+        boxShadow: active ? `0 0 10px ${color || 'rgba(192,132,252)'}15` : 'none',
+        transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s',
+      }}
+      data-testid={testId}
+    >
+      <span className="relative flex items-center justify-center" style={{ width: small ? 10 : 13, height: small ? 10 : 13, flexShrink: 0 }}>
+        {children}
+      </span>
+      <AnimatePresence>
+        {expanded && label && (
+          <motion.span
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 'auto', opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-[8px] font-medium whitespace-nowrap overflow-hidden"
+            style={{ color: active ? (color || 'rgba(255,255,255,0.8)') : 'rgba(255,255,255,0.35)' }}
+          >
+            {label}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+}
+
+/* ─── Mixer Quick-Panel ─── */
+function MixerPanel({ onClose, navigate }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      className="mb-2 rounded-xl overflow-hidden"
+      style={{
+        background: 'rgba(11,12,21,0.95)',
+        border: '1px solid rgba(129,140,248,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        width: '200px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      }}
+      data-testid="dock-mixer-panel"
+    >
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+        <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#818CF8' }}>Production Console</span>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+      </div>
+      <div className="p-2 space-y-1.5">
+        <button
+          onClick={() => { onClose(); document.querySelector('[data-testid="mixer-toggle"]')?.click(); }}
+          className="w-full py-2 rounded-lg text-[10px]"
+          style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.12)', color: '#818CF8' }}
+          data-testid="dock-open-mixer"
+        >
+          Open Console
+        </button>
+        <button
+          onClick={() => { onClose(); navigate('/cosmic-mixer'); }}
+          className="w-full py-2 rounded-lg text-[10px]"
+          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', color: 'rgba(248,250,252,0.45)' }}
+        >
+          Full Mixer Page
+        </button>
+      </div>
+    </motion.div>
   );
 }
 
@@ -371,24 +334,36 @@ function AssistantPanel({ onClose, token, authHeaders }) {
       const d = await r.json();
       setMessages(prev => [...prev, { role: 'assistant', text: d.reply || d.message || 'Let me reflect on that...' }]);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Connection issue — try the Help Center for quick answers.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: 'Connection issue \u2014 try the Help Center for quick answers.' }]);
     }
     setLoading(false);
   };
 
   return (
-    <motion.div initial={{ opacity: 0, x: 10, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.95 }}
-      className="mr-2 rounded-xl overflow-hidden"
-      style={{ background: 'rgba(11,12,21,0.97)', border: '1px solid rgba(192,132,252,0.12)', backdropFilter: 'blur(20px)', width: '300px', maxHeight: '380px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
-      data-testid="assistant-panel">
-      <div className="flex items-center justify-between px-3 py-2.5" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      className="mb-2 rounded-xl overflow-hidden"
+      style={{
+        background: 'rgba(11,12,21,0.97)',
+        border: '1px solid rgba(192,132,252,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        width: '280px',
+        maxHeight: '350px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      }}
+      data-testid="assistant-panel"
+    >
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
         <div className="flex items-center gap-2">
-          <Sparkles size={12} style={{ color: '#C084FC' }} />
+          <Sparkles size={11} style={{ color: '#C084FC' }} />
           <span className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>Sage</span>
         </div>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
       </div>
-      <div ref={scrollRef} className="px-3 py-2 space-y-2 overflow-y-auto" style={{ maxHeight: '250px', scrollbarWidth: 'thin' }}>
+      <div ref={scrollRef} className="px-3 py-2 space-y-2 overflow-y-auto" style={{ maxHeight: '220px', scrollbarWidth: 'thin' }}>
         {messages.length === 0 && (
           <p className="text-[9px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
             {token ? 'Ask anything about wellness or the app' : 'Sign in to chat'}
@@ -417,15 +392,22 @@ function AssistantPanel({ onClose, token, authHeaders }) {
       {token && (
         <div className="px-3 py-2" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
           <div className="flex gap-1.5">
-            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && send()}
               placeholder="Ask Sage..."
               className="flex-1 px-2.5 py-1.5 rounded-lg text-[10px] outline-none"
               style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }}
-              data-testid="assistant-input" />
-            <button onClick={send} disabled={loading || !input.trim()}
+              data-testid="assistant-input"
+            />
+            <button
+              onClick={send}
+              disabled={loading || !input.trim()}
               className="px-2 rounded-lg disabled:opacity-30"
               style={{ background: 'rgba(192,132,252,0.08)' }}
-              data-testid="assistant-send">
+              data-testid="assistant-send"
+            >
               <Send size={10} style={{ color: '#C084FC' }} />
             </button>
           </div>
@@ -477,25 +459,41 @@ function FrequencyPanel({ onClose }) {
   useEffect(() => () => stop(), [stop]);
 
   return (
-    <motion.div initial={{ opacity: 0, x: 10, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.95 }}
-      className="mr-2 rounded-xl overflow-hidden"
-      style={{ background: 'rgba(11,12,21,0.97)', border: '1px solid rgba(45,212,191,0.12)', backdropFilter: 'blur(20px)', width: '220px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
-      data-testid="frequency-panel">
-      <div className="flex items-center justify-between px-3 py-2.5" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
-        <span className="text-[10px] font-medium" style={{ color: '#2DD4BF' }}>Solfeggio Tones</span>
-        <button onClick={() => { stop(); onClose(); }} className="p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      className="mb-2 rounded-xl overflow-hidden"
+      style={{
+        background: 'rgba(11,12,21,0.97)',
+        border: '1px solid rgba(45,212,191,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        width: '200px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      }}
+      data-testid="frequency-panel"
+    >
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+        <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#2DD4BF' }}>Solfeggio Tones</span>
+        <button onClick={() => { stop(); onClose(); }} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
       </div>
-      <div className="p-2 space-y-1">
+      <div className="p-2 space-y-0.5">
         {FREQUENCIES.map(f => (
-          <button key={f.freq} onClick={() => playing === f.freq ? stop() : playFreq(f.freq)}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all text-left"
+          <button
+            key={f.freq}
+            onClick={() => playing === f.freq ? stop() : playFreq(f.freq)}
+            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all text-left"
             style={{
               background: playing === f.freq ? `${f.color}10` : 'transparent',
               border: `1px solid ${playing === f.freq ? `${f.color}20` : 'transparent'}`,
             }}
-            data-testid={`freq-${f.freq}`}>
-            {playing === f.freq ? <Pause size={11} style={{ color: f.color }} /> : <Play size={11} style={{ color: 'rgba(248,250,252,0.3)' }} />}
-            <span className="text-[10px]" style={{ color: playing === f.freq ? f.color : 'rgba(248,250,252,0.5)' }}>{f.name}</span>
+            data-testid={`freq-${f.freq}`}
+          >
+            {playing === f.freq
+              ? <Pause size={10} style={{ color: f.color }} />
+              : <Play size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />}
+            <span className="text-[9px]" style={{ color: playing === f.freq ? f.color : 'rgba(248,250,252,0.45)' }}>{f.name}</span>
           </button>
         ))}
       </div>
