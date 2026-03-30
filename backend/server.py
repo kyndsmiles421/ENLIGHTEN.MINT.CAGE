@@ -79,6 +79,7 @@ from routes.spiritual_avatar import router as spiritual_avatar_router
 from routes.avatar_gallery import router as avatar_gallery_router
 from routes.cosmic_ledger import router as cosmic_ledger_router
 from routes.voice_command import router as voice_command_router
+from routes.seasonal import router as seasonal_router
 
 app = FastAPI()
 
@@ -125,6 +126,7 @@ all_routers = [
     avatar_gallery_router,
     cosmic_ledger_router,
     voice_command_router,
+    seasonal_router,
 ]
 
 for r in all_routers:

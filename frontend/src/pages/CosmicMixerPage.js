@@ -99,18 +99,53 @@ export default function CosmicMixerPage() {
   const [masterVol, setMasterVol] = useState(60);
   const [muted, setMuted] = useState(false);
   const [founderFreq, setFounderFreq] = useState(null);
+  const [seasonalFreqs, setSeasonalFreqs] = useState([]);
 
   useEffect(() => {
     if (authHeaders?.Authorization) {
       axios.get(`${API}/starseed/realm/founder-status`, { headers: authHeaders })
         .then(r => { if (r.data.is_founder && r.data.exclusive_frequency) setFounderFreq(r.data.exclusive_frequency); })
         .catch(() => {});
+      axios.get(`${API}/seasonal/active`, { headers: authHeaders })
+        .then(r => {
+          const unlocked = [];
+          for (const f of (r.data.active || [])) {
+            if (f.available) unlocked.push({ hz: f.hz, label: f.name, desc: f.desc, color: f.color, isSeasonal: true, seasonId: f.id, collected: f.collected, lore: f.lore, icon: f.icon });
+          }
+          for (const c of (r.data.collected || [])) {
+            if (!unlocked.find(u => u.seasonId === c.frequency_id)) {
+              unlocked.push({ hz: c.hz, label: c.frequency_name, desc: `Collected ${c.season} frequency`, color: c.color, isSeasonal: true, seasonId: c.frequency_id, collected: true });
+            }
+          }
+          setSeasonalFreqs(unlocked);
+        })
+        .catch(() => {});
     }
   }, [authHeaders]);
 
-  const allFrequencies = founderFreq
-    ? [...FREQUENCIES, { hz: founderFreq.hz, label: founderFreq.label, desc: founderFreq.desc, color: founderFreq.color, isFounder: true }]
-    : FREQUENCIES;
+  const collectSeasonal = async (seasonId) => {
+    try {
+      const res = await axios.post(`${API}/seasonal/collect`, { frequency_id: seasonId }, { headers: authHeaders });
+      if (res.data.status === 'collected') {
+        toast('Sonic Crystal Collected!', {
+          description: `${res.data.frequency.name} (${res.data.frequency.hz}Hz) is now permanently yours`,
+          style: {
+            background: `linear-gradient(135deg, ${res.data.frequency.color}15, rgba(10,10,18,0.95))`,
+            border: `1px solid ${res.data.frequency.color}40`,
+            color: res.data.frequency.color,
+            boxShadow: `0 0 24px ${res.data.frequency.color}15`,
+          },
+        });
+        setSeasonalFreqs(prev => prev.map(f => f.seasonId === seasonId ? { ...f, collected: true } : f));
+      }
+    } catch {}
+  };
+
+  const allFrequencies = [
+    ...FREQUENCIES,
+    ...(founderFreq ? [{ hz: founderFreq.hz, label: founderFreq.label, desc: founderFreq.desc, color: founderFreq.color, isFounder: true }] : []),
+    ...seasonalFreqs,
+  ];
 
   const [activeFreqs, setActiveFreqs] = useState(new Set());
   const [activeSounds, setActiveSounds] = useState(new Set());
@@ -537,19 +572,28 @@ export default function CosmicMixerPage() {
 
           <AccordionSection title="Solfeggio Frequency" icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>
             <div className="flex flex-wrap gap-1.5">
-              {allFrequencies.map(f => (
-                <button key={f.hz} onClick={() => toggleFreq(f)} className="flex-shrink-0 text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97] relative"
-                  style={{
-                    background: activeFreqs.has(f.hz) ? `${f.color}15` : f.isFounder ? 'rgba(252,211,77,0.04)' : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : f.isFounder ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.04)'}`,
-                    boxShadow: f.isFounder ? '0 0 12px rgba(252,211,77,0.06)' : 'none',
-                  }}
-                  data-testid={`mixer-freq-${f.hz}`}>
-                  {f.isFounder && <span className="absolute -top-1.5 -right-1.5 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{ background: 'rgba(252,211,77,0.15)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.3)' }}>FOUNDER</span>}
-                  <span className="text-[11px] font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : f.isFounder ? '#FCD34D' : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
-                  <span className="text-[8px] block" style={{ color: f.isFounder ? 'rgba(252,211,77,0.4)' : 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
-                </button>
-              ))}
+              {allFrequencies.map(f => {
+                const special = f.isFounder || f.isSeasonal;
+                const badgeLabel = f.isFounder ? 'FOUNDER' : f.isSeasonal ? (f.collected ? f.icon?.toUpperCase() || 'SEASONAL' : 'COLLECT') : null;
+                const badgeColor = f.isFounder ? '#FCD34D' : f.color;
+                const key = f.isFounder ? `founder-${f.hz}` : f.isSeasonal ? `seasonal-${f.seasonId}` : `freq-${f.hz}`;
+                return (
+                  <button key={key} onClick={() => {
+                    if (f.isSeasonal && !f.collected) { collectSeasonal(f.seasonId); return; }
+                    toggleFreq(f);
+                  }} className="flex-shrink-0 text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97] relative"
+                    style={{
+                      background: activeFreqs.has(f.hz) ? `${f.color}15` : special ? `${badgeColor}06` : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : special ? `${badgeColor}18` : 'rgba(255,255,255,0.04)'}`,
+                      boxShadow: special ? `0 0 12px ${badgeColor}08` : 'none',
+                    }}
+                    data-testid={`mixer-freq-${f.hz}`}>
+                    {badgeLabel && <span className="absolute -top-1.5 -right-1.5 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{ background: `${badgeColor}18`, color: badgeColor, border: `1px solid ${badgeColor}35` }}>{badgeLabel}</span>}
+                    <span className="text-[11px] font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : special ? badgeColor : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
+                    <span className="text-[8px] block" style={{ color: special ? `${badgeColor}60` : 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
+                  </button>
+                );
+              })}
             </div>
           </AccordionSection>
 
