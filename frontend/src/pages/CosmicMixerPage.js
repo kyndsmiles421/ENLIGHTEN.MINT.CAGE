@@ -448,7 +448,42 @@ export default function CosmicMixerPage() {
         </div>
       )}
 
-      <div className={`max-w-2xl mx-auto px-4 pb-28 relative z-20 ${sessionActive ? 'pt-24' : 'pt-6'}`}>
+      {/* ─── Sticky Master Controls Footer ─── */}
+      <div className="fixed bottom-0 left-0 right-0 z-50" data-testid="mixer-sticky-footer"
+        style={{ background: 'rgba(10,10,18,0.94)', backdropFilter: 'blur(24px)', borderTop: `1px solid ${hasActive ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.05)'}` }}>
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setMuted(m => !m)} className="p-1.5 rounded-lg flex-shrink-0 transition-all active:scale-90"
+              style={{ background: muted ? 'rgba(239,68,68,0.1)' : 'transparent' }} data-testid="sticky-mute">
+              {muted ? <VolumeX size={18} style={{ color: '#EF4444' }} /> : <Volume2 size={18} style={{ color: '#C084FC' }} />}
+            </button>
+            <input type="range" min={0} max={100} value={muted ? 0 : masterVol}
+              onChange={e => { setMasterVol(parseInt(e.target.value)); setMuted(false); }}
+              className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
+              style={{ background: `linear-gradient(to right, #C084FC ${muted ? 0 : masterVol}%, rgba(255,255,255,0.08) ${muted ? 0 : masterVol}%)` }}
+              data-testid="sticky-volume" />
+            <span className="text-[11px] w-8 text-right tabular-nums flex-shrink-0" style={{ color: 'rgba(248,250,252,0.5)' }}>{muted ? 0 : masterVol}%</span>
+            <button onClick={stopAll}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl flex-shrink-0 transition-all active:scale-95"
+              style={{
+                background: hasActive ? 'rgba(239,68,68,0.15)' : 'rgba(248,250,252,0.04)',
+                border: `1px solid ${hasActive ? 'rgba(239,68,68,0.3)' : 'rgba(248,250,252,0.06)'}`,
+              }}
+              data-testid="sticky-stop-all">
+              <Square size={12} style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }} />
+              <span className="text-[11px] font-medium" style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }}>Stop All</span>
+            </button>
+          </div>
+          {hasActive && (
+            <div className="flex items-center justify-center gap-1.5 mt-1.5">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#C084FC' }} />
+              <span className="text-[9px]" style={{ color: 'rgba(192,132,252,0.6)' }}>{activeCount} layer{activeCount !== 1 ? 's' : ''} active</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={`max-w-2xl mx-auto px-4 pb-32 relative z-20 ${sessionActive ? 'pt-24' : 'pt-6'}`}>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <button onClick={() => { stopAll(); stopSession(); navigate(-1); }} className="p-2 rounded-xl transition-all hover:scale-105" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }} data-testid="mixer-back">
@@ -459,21 +494,8 @@ export default function CosmicMixerPage() {
               <Waves size={16} style={{ color: '#C084FC' }} />
               <h1 className="text-lg font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>Cosmic Mixer</h1>
             </div>
-            {activeCount > 0 && <p className="text-[10px] mt-0.5" style={{ color: '#C084FC' }}>{activeCount} layer{activeCount > 1 ? 's' : ''} active</p>}
           </div>
-          <div className="flex items-center gap-1">
-            {hasActive && <button onClick={stopAll} className="p-2 rounded-xl" style={{ color: '#EF4444' }} data-testid="mixer-stop-all"><Square size={16} /></button>}
-          </div>
-        </div>
-
-        {/* Master Volume */}
-        <div className="flex items-center gap-3 mb-3 px-3 py-3 rounded-xl" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
-          <button onClick={() => setMuted(m => !m)} className="p-1" data-testid="mixer-mute">
-            {muted ? <VolumeX size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /> : <Volume2 size={16} style={{ color: '#C084FC' }} />}
-          </button>
-          <input type="range" min={0} max={100} value={muted ? 0 : masterVol} onChange={e => { setMasterVol(parseInt(e.target.value)); setMuted(false); }}
-            className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer" style={{ background: `linear-gradient(to right, #C084FC ${masterVol}%, rgba(255,255,255,0.06) ${masterVol}%)` }} data-testid="mixer-volume" />
-          <span className="text-xs w-8 text-right tabular-nums" style={{ color: 'rgba(248,250,252,0.5)' }}>{masterVol}%</span>
+          <div className="w-10" /> {/* spacer for alignment */}
         </div>
 
         {/* Accordion Sections */}
