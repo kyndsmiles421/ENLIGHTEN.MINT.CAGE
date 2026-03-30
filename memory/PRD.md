@@ -44,6 +44,11 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - User: test@test.com / password
 - Admin: kyndsmiles@gmail.com / password
 
+### Recent Updates (2026-03-30)
+- Dance & Music Studio: 17 instruments, 6 scales, 8 sacred dances, recording — DONE (iteration_105: 100%)
+- Custom Virtual Background Uploads in Live Sessions — DONE (iteration_105: 100%)
+- Search bars for Instruments (by name/origin/category) and Sacred Dances (by name/origin/tradition) — DONE
+
 ## Post-Launch
 - Capacitor native: `npx cap add android && npx cap add ios` after `yarn build`
 - SFU for 10+ participant video calls

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   Music, Disc3, Play, Square, Circle, Save, Trash2, Download, ArrowLeft,
   Pause, RotateCcw, ChevronRight, Clock, Globe, Sparkles, Layers,
-  Volume2, VolumeX, Mic
+  Volume2, VolumeX, Mic, Search, X
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -437,17 +437,45 @@ export default function DanceMusicStudio() {
 
 // ─── Instrument Panel ───
 function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange, baseOctave, onOctaveChange, scaleNotes, onPlayNote, activePads, volume, onVolumeChange, isRecording, recordedNotes, onStartRecording, onStopRecording, onPlayRecorded, onSaveRecording, onClearRecording }) {
-  const categories = [...new Set(instruments.map(i => i.origin))];
+  const [instrumentSearch, setInstrumentSearch] = useState('');
+  const filteredInstruments = instruments.filter(inst => {
+    if (!instrumentSearch.trim()) return true;
+    const q = instrumentSearch.toLowerCase();
+    return inst.name.toLowerCase().includes(q) || inst.origin.toLowerCase().includes(q) || inst.category.toLowerCase().includes(q);
+  });
 
   return (
     <div className="space-y-5">
       {/* Instrument Selector */}
       <div className="glass-card p-5" data-testid="instrument-selector">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>
-          Select Instrument
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
+            Select Instrument
+          </p>
+          <div className="relative" data-testid="instrument-search-wrapper">
+            <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              value={instrumentSearch}
+              onChange={e => setInstrumentSearch(e.target.value)}
+              placeholder="Search instruments..."
+              className="pl-7 pr-7 py-1.5 rounded-lg text-[10px] outline-none w-44"
+              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'var(--text-primary)' }}
+              data-testid="instrument-search-input"
+            />
+            {instrumentSearch && (
+              <button onClick={() => setInstrumentSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2" data-testid="instrument-search-clear">
+                <X size={10} style={{ color: 'var(--text-muted)' }} />
+              </button>
+            )}
+          </div>
+        </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-          {instruments.map(inst => (
+          {filteredInstruments.length === 0 ? (
+            <div className="col-span-full py-4 text-center">
+              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>No instruments match "{instrumentSearch}"</p>
+            </div>
+          ) : filteredInstruments.map(inst => (
             <motion.button key={inst.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => onSelect(inst)}
               className="p-3 rounded-xl text-center transition-all"
@@ -592,11 +620,41 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
 
 // ─── Dance Explorer ───
 function DanceExplorer({ dances, selected, onSelect }) {
+  const [danceSearch, setDanceSearch] = useState('');
+  const filteredDances = dances.filter(d => {
+    if (!danceSearch.trim()) return true;
+    const q = danceSearch.toLowerCase();
+    return d.name.toLowerCase().includes(q) || d.origin.toLowerCase().includes(q) || d.tradition.toLowerCase().includes(q);
+  });
+
   return (
     <div className="space-y-4" data-testid="dance-explorer">
       {!selected ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {dances.map((dance, i) => (
+        <>
+          <div className="relative" data-testid="dance-search-wrapper">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              value={danceSearch}
+              onChange={e => setDanceSearch(e.target.value)}
+              placeholder="Search sacred dances..."
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs outline-none"
+              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'var(--text-primary)' }}
+              data-testid="dance-search-input"
+            />
+            {danceSearch && (
+              <button onClick={() => setDanceSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" data-testid="dance-search-clear">
+                <X size={12} style={{ color: 'var(--text-muted)' }} />
+              </button>
+            )}
+          </div>
+          {filteredDances.length === 0 ? (
+            <div className="glass-card p-8 text-center">
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No dances match "{danceSearch}"</p>
+            </div>
+          ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredDances.map((dance, i) => (
             <motion.button key={dance.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -625,7 +683,9 @@ function DanceExplorer({ dances, selected, onSelect }) {
               </div>
             </motion.button>
           ))}
-        </div>
+          </div>
+          )}
+        </>
       ) : (
         <DanceDetail dance={selected} onBack={() => onSelect(null)} />
       )}
