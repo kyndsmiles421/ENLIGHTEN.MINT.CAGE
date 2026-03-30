@@ -12,7 +12,6 @@ import CosmicBackground from './components/CosmicBackground';
 import SmartDock from './components/SmartDock';
 import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
-import BackToTop from './components/BackToTop';
 import InstallPrompt from './components/InstallPrompt';
 import CreditNudge from './components/CreditNudge';
 import { SplitScreenProvider } from './components/SplitScreen';
@@ -20,8 +19,6 @@ import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
-import VoiceCommandButton from './components/VoiceCommandButton';
-import QuickMeditateFAB from './components/QuickMeditateFAB';
 import CosmicToolbar from './components/CosmicToolbar';
 
 // Eager load: Landing + Auth (first screens users see)
