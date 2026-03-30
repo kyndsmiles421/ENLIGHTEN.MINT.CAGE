@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useCosmicAmbient, CosmicNarrator } from '../components/StarChartAudio';
 import { BirthConstellationToast, MythologyPanel, JourneyOverlay, JourneyComplete, CelestialBadgesPanel } from '../components/StarChartOverlays';
+import { AstrologyReadingPanel } from '../components/AstrologyReading';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Earth: '#22C55E' };
@@ -1034,6 +1035,7 @@ export default function StarChart() {
   const [selectedCulturalConst, setSelectedCulturalConst] = useState(null);
   const [zoomCounter, setZoomCounter] = useState(0);
   const [lastZoomDelta, setLastZoomDelta] = useState(null);
+  const [astrologyReading, setAstrologyReading] = useState(null);
 
   const handleZoom = useCallback((delta) => {
     setLastZoomDelta(delta);
@@ -1111,6 +1113,25 @@ export default function StarChart() {
     }
   }, [token, authHeaders]);
   const handleBirthMessage = useCallback((info) => setBirthMsg(info), []);
+
+  const [readingLoading, setReadingLoading] = useState(false);
+  const getMyReading = useCallback(async () => {
+    if (!data || !token || readingLoading) return;
+    const zodiac = data.user_zodiac;
+    const myConst = zodiac ? data.constellations.find(c => c.id === zodiac) : data.constellations[0];
+    if (!myConst) { toast.error('No constellation data available'); return; }
+    setReadingLoading(true);
+    try {
+      const res = await axios.post(`${API}/star-chart/astrology-reading`, {
+        constellation_id: myConst.id,
+        constellation_name: myConst.name,
+        constellation_element: myConst.element,
+        constellation_meaning: myConst.meaning || '',
+      }, { headers: authHeaders });
+      setAstrologyReading(res.data);
+    } catch { toast.error('Could not generate reading'); }
+    setReadingLoading(false);
+  }, [data, token, authHeaders, readingLoading]);
   const updateLocation = () => {
     const lat = parseFloat(latInput), lng = parseFloat(lngInput);
     if (isNaN(lat) || isNaN(lng)) { toast.error('Invalid coordinates'); return; }
@@ -1283,6 +1304,21 @@ export default function StarChart() {
                 <Compass size={10} /> {activeCulture && cultureData ? `${cultureData.name} Journey` : 'Stargazing Journey'}
               </button>
             )}
+            {/* Astrology Reading button */}
+            {data && (
+              <button onClick={getMyReading} disabled={readingLoading} data-testid="my-reading-btn"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
+                style={{
+                  background: astrologyReading ? 'rgba(236,72,153,0.15)' : 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(129,140,248,0.1))',
+                  border: `1px solid ${astrologyReading ? 'rgba(236,72,153,0.35)' : 'rgba(236,72,153,0.2)'}`,
+                  color: astrologyReading ? '#EC4899' : '#F472B6',
+                  backdropFilter: 'blur(12px)',
+                  boxShadow: astrologyReading ? '0 0 15px rgba(236,72,153,0.1)' : 'none',
+                }}>
+                {readingLoading ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                {readingLoading ? 'Reading...' : 'My Reading'}
+              </button>
+            )}
             {/* Mythology Mode toggle */}
             <button onClick={() => setMythologyMode(!mythologyMode)} data-testid="mythology-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
@@ -1450,7 +1486,12 @@ export default function StarChart() {
 
       {/* Detail Panel (with Mythology) */}
       <AnimatePresence>
-        {selected && <MythologyPanel constellation={selected} onClose={() => setSelected(null)} />}
+        {selected && <MythologyPanel constellation={selected} onClose={() => setSelected(null)} onReadingReady={(data) => { setAstrologyReading(data); }} />}
+      </AnimatePresence>
+
+      {/* Astrology Reading Panel */}
+      <AnimatePresence>
+        {astrologyReading && <AstrologyReadingPanel readingData={astrologyReading} onClose={() => setAstrologyReading(null)} />}
       </AnimatePresence>
 
       {/* Birth Message */}

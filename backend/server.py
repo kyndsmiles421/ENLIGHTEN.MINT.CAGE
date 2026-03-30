@@ -69,6 +69,7 @@ from routes.live import router as live_router
 from routes.music_studio import router as music_studio_router
 from routes.mixer_presets import router as mixer_presets_router
 from routes.media_library import router as media_library_router
+from routes.astrology_reading import router as astrology_reading_router
 
 app = FastAPI()
 
@@ -105,6 +106,7 @@ all_routers = [
     music_studio_router,
     mixer_presets_router,
     media_library_router,
+    astrology_reading_router,
 ]
 
 for r in all_routers:

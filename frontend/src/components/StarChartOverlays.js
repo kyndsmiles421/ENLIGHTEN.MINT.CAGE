@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Star, X, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, Play, Pause, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CosmicNarrator } from './StarChartAudio';
+import { AstrologyReadingButton } from './AstrologyReading';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Earth: '#22C55E' };
@@ -31,7 +32,7 @@ export function BirthConstellationToast({ info, onClose }) {
 }
 
 /* ── Mythology Detail Panel ── */
-export function MythologyPanel({ constellation, onClose }) {
+export function MythologyPanel({ constellation, onClose, onReadingReady }) {
   const navigate = useNavigate();
   const { token, authHeaders } = useAuth();
   const [showMyth, setShowMyth] = useState(true);
@@ -136,7 +137,10 @@ export function MythologyPanel({ constellation, onClose }) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center gap-2 mt-4 pt-3" style={{ borderTop: `1px solid ${color}10` }}>
+          <div className="flex items-center gap-2 mt-4 pt-3 flex-wrap" style={{ borderTop: `1px solid ${color}10` }}>
+            {onReadingReady && (
+              <AstrologyReadingButton constellation={constellation} onReadingReady={onReadingReady} />
+            )}
             <button onClick={shareToFeed} disabled={sharing}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium"
               style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC' }}
