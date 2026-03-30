@@ -16,12 +16,18 @@ const CAT_COLORS = {
   'new-testament': '#DC2626',
   'deuterocanonical': '#7C3AED',
   'lost-apocryphal': '#0891B2',
+  'torah-talmud': '#2563EB',
+  'kabbalah': '#E879F9',
+  'quran': '#059669',
 };
 const CAT_ICONS = {
   'old-testament': Scroll,
   'new-testament': Cross,
   'deuterocanonical': BookOpen,
   'lost-apocryphal': Eye,
+  'torah-talmud': Star,
+  'kabbalah': Sparkles,
+  'quran': BookOpen,
 };
 
 function AIChat({ bookTitle, chapterNum, contextText }) {
@@ -390,10 +396,10 @@ export default function Bible() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
-            The Holy Bible & Lost Books
+            Sacred Scriptures & Lost Books
           </h1>
           <p className="text-sm max-w-lg mx-auto" style={{ color: 'rgba(248,250,252,0.45)' }}>
-            The complete biblical canon plus deuterocanonical and lost apocryphal texts — with AI-powered deep-dive exploration
+            Bible, Torah, Kabbalah, Quran, and lost apocryphal texts — with AI-powered deep-dive exploration
           </p>
         </div>
 

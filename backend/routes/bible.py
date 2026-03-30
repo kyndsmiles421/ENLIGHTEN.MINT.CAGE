@@ -17,6 +17,9 @@ BIBLE_CATEGORIES = [
     {"id": "new-testament", "name": "New Testament", "color": "#DC2626", "description": "The life of Jesus Christ and the early Christian church", "icon": "cross"},
     {"id": "deuterocanonical", "name": "Deuterocanonical", "color": "#7C3AED", "description": "Books included in Catholic and Orthodox canons — Wisdom, Sirach, Maccabees, and more", "icon": "book-open"},
     {"id": "lost-apocryphal", "name": "Lost & Apocryphal", "color": "#0891B2", "description": "Ancient texts excluded from mainstream canons — mystical gospels, apocalypses, and hidden wisdom", "icon": "eye"},
+    {"id": "torah-talmud", "name": "Torah & Talmud", "color": "#2563EB", "description": "The oral and written law of Judaism — Mishnah, Talmud, Midrash, and the wisdom of the sages", "icon": "star"},
+    {"id": "kabbalah", "name": "Kabbalah", "color": "#E879F9", "description": "Jewish mysticism — the Zohar, Sefer Yetzirah, and the hidden dimensions of creation", "icon": "sparkles"},
+    {"id": "quran", "name": "The Quran", "color": "#059669", "description": "The holy revelation of Islam — 114 Surahs of divine guidance, mercy, and wisdom", "icon": "moon"},
 ]
 
 BIBLE_BOOKS = [
@@ -117,6 +120,58 @@ BIBLE_BOOKS = [
     {"id": "didache", "title": "The Didache", "category": "lost-apocryphal", "chapters": 16, "description": "The 'Teaching of the Twelve Apostles' — the earliest known Christian catechism on ethics, worship, and church order.", "era": "~70 CE", "themes": ["Ethics", "Baptism", "Eucharist", "Church Order"]},
     {"id": "infancy-gospel-thomas", "title": "Infancy Gospel of Thomas", "category": "lost-apocryphal", "chapters": 19, "description": "Stories of Jesus' childhood miracles from age 5 to 12 — raising the dead, animating clay birds, and astonishing teachers.", "era": "~150 CE", "themes": ["Childhood", "Miracles", "Wonder"]},
     {"id": "pistis-sophia", "title": "Pistis Sophia", "category": "lost-apocryphal", "chapters": 20, "description": "A Gnostic text of Jesus' post-resurrection teachings to his disciples about the fall and redemption of the divine feminine 'Pistis Sophia'.", "era": "~250 CE", "themes": ["Divine Feminine", "Redemption", "Gnosis"]},
+
+    # ─── TORAH & TALMUD (12 texts) ───
+    {"id": "pirke-avot", "title": "Pirke Avot (Ethics of the Fathers)", "category": "torah-talmud", "chapters": 6, "description": "The most widely studied tractate of the Mishnah — timeless ethical teachings and wisdom sayings of the great rabbis.", "era": "~200 CE", "themes": ["Ethics", "Wisdom", "Character"]},
+    {"id": "mishnah-berachot", "title": "Mishnah Berachot (Blessings)", "category": "torah-talmud", "chapters": 9, "description": "Laws of prayer, blessings, and the Shema — the foundation of Jewish daily worship and gratitude.", "era": "~200 CE", "themes": ["Prayer", "Blessings", "Devotion"]},
+    {"id": "mishnah-shabbat", "title": "Mishnah Shabbat", "category": "torah-talmud", "chapters": 24, "description": "The laws of the Sabbath — rest, holiness, and the sacred rhythm of creation and cessation.", "era": "~200 CE", "themes": ["Sabbath", "Rest", "Holiness"]},
+    {"id": "talmud-sanhedrin", "title": "Talmud Sanhedrin", "category": "torah-talmud", "chapters": 11, "description": "The tractate on courts, justice, and capital law — includes 'He who saves one life saves the entire world.'", "era": "~500 CE", "themes": ["Justice", "Courts", "Life"]},
+    {"id": "talmud-bava-metzia", "title": "Talmud Bava Metzia", "category": "torah-talmud", "chapters": 10, "description": "Civil law, lost property, labor relations — the ethics of commerce and interpersonal responsibility.", "era": "~500 CE", "themes": ["Commerce", "Ethics", "Responsibility"]},
+    {"id": "midrash-rabbah-genesis", "title": "Midrash Rabbah (Genesis)", "category": "torah-talmud", "chapters": 12, "description": "Rabbinic commentary on Genesis — rich allegories, parables, and hidden meanings within creation.", "era": "~400 CE", "themes": ["Commentary", "Allegory", "Creation"]},
+    {"id": "midrash-rabbah-exodus", "title": "Midrash Rabbah (Exodus)", "category": "torah-talmud", "chapters": 10, "description": "Midrashic explorations of the Exodus — liberation, revelation, and covenant.", "era": "~400 CE", "themes": ["Liberation", "Revelation", "Covenant"]},
+    {"id": "talmud-berakhot", "title": "Talmud Berakhot", "category": "torah-talmud", "chapters": 9, "description": "The first tractate of the Babylonian Talmud — discussions on prayer, dreams, and divine encounter.", "era": "~500 CE", "themes": ["Prayer", "Dreams", "Divine Encounter"]},
+    {"id": "mekhilta", "title": "Mekhilta de-Rabbi Ishmael", "category": "torah-talmud", "chapters": 8, "description": "Halakhic midrash on Exodus — legal and narrative interpretations of the giving of the Torah.", "era": "~300 CE", "themes": ["Law", "Passover", "Interpretation"]},
+    {"id": "sifra", "title": "Sifra (Torat Kohanim)", "category": "torah-talmud", "chapters": 10, "description": "Halakhic midrash on Leviticus — the holiness code interpreted through rabbinic reasoning.", "era": "~300 CE", "themes": ["Holiness", "Law", "Priesthood"]},
+    {"id": "tanya-book", "title": "Tanya", "category": "torah-talmud", "chapters": 53, "description": "Foundational text of Chabad Hasidism by Rabbi Schneur Zalman — the soul's journey and divine service.", "era": "1797 CE", "themes": ["Soul", "Divine Service", "Unity"]},
+    {"id": "derech-hashem", "title": "Derech Hashem (The Way of God)", "category": "torah-talmud", "chapters": 8, "description": "Rabbi Luzzatto's systematic guide to God's purpose in creation, free will, prophecy, and the soul.", "era": "1736 CE", "themes": ["Purpose", "Free Will", "Prophecy"]},
+
+    # ─── KABBALAH (10 texts) ───
+    {"id": "zohar", "title": "The Zohar", "category": "kabbalah", "chapters": 25, "description": "The masterwork of Jewish mysticism — mystical commentary on the Torah revealing hidden dimensions of God, creation, and the human soul.", "era": "~1290 CE", "themes": ["Mysticism", "Sefirot", "Hidden Torah"]},
+    {"id": "sefer-yetzirah", "title": "Sefer Yetzirah (Book of Formation)", "category": "kabbalah", "chapters": 6, "description": "The oldest kabbalistic text — how God created the universe through 10 Sefirot and 22 Hebrew letters.", "era": "~200 CE", "themes": ["Creation", "Letters", "Sefirot"]},
+    {"id": "sefer-bahir", "title": "Sefer HaBahir (Book of Illumination)", "category": "kabbalah", "chapters": 12, "description": "Cryptic parables on divine light, the Sefirot, and the mystical structure of the soul.", "era": "~1100 CE", "themes": ["Light", "Parables", "Soul Structure"]},
+    {"id": "etz-chaim", "title": "Etz Chaim (Tree of Life)", "category": "kabbalah", "chapters": 15, "description": "The Ari's revolutionary kabbalistic system — Tzimtzum, the shattering of vessels, and Tikkun Olam.", "era": "~1590 CE", "themes": ["Tzimtzum", "Tikkun", "Lurianic Kabbalah"]},
+    {"id": "tikkunei-zohar", "title": "Tikkunei Zohar", "category": "kabbalah", "chapters": 70, "description": "70 mystical commentaries on the first word of Torah 'Bereishit' — each revealing a different dimension of divine reality.", "era": "~1290 CE", "themes": ["Bereishit", "70 Faces", "Mystical Torah"]},
+    {"id": "sefer-raziel", "title": "Sefer Raziel HaMalakh", "category": "kabbalah", "chapters": 7, "description": "The Book of the Angel Raziel — angel names, mystical formulas, and cosmic secrets.", "era": "~1200 CE", "themes": ["Angels", "Mysteries", "Protection"]},
+    {"id": "pardes-rimonim", "title": "Pardes Rimonim (Orchard of Pomegranates)", "category": "kabbalah", "chapters": 32, "description": "Rabbi Cordovero's encyclopedia of Kabbalah — mapping the Sefirot, divine names, and the architecture of all worlds.", "era": "1548 CE", "themes": ["Sefirot", "Systematic Kabbalah", "Divine Names"]},
+    {"id": "shaarei-orah", "title": "Sha'arei Orah (Gates of Light)", "category": "kabbalah", "chapters": 10, "description": "Joseph Gikatilla's guide to the divine names of each Sefirah — a luminous map of prayer ascending through heavenly spheres.", "era": "~1290 CE", "themes": ["Divine Names", "Prayer", "Sefirot"]},
+    {"id": "sefer-ha-temunah", "title": "Sefer HaTemunah", "category": "kabbalah", "chapters": 5, "description": "The Book of the Figure — cosmic cycles (Shemitot), the shapes of Hebrew letters, and seven cosmic sabbaticals.", "era": "~1250 CE", "themes": ["Cosmic Cycles", "Letters", "Sabbaticals"]},
+    {"id": "nefesh-ha-chaim", "title": "Nefesh HaChaim", "category": "kabbalah", "chapters": 4, "description": "How human actions impact all spiritual worlds — the soul, prayer, Torah study, and cosmic responsibility.", "era": "1824 CE", "themes": ["Soul", "Prayer", "Spiritual Impact"]},
+
+    # ─── THE QURAN (114 Surahs — grouped as composite texts for deeper exploration) ───
+    {"id": "al-fatiha", "title": "Al-Fatiha (The Opening)", "category": "quran", "chapters": 1, "description": "The most recited prayer in Islam — a supplication for divine guidance on the straight path.", "era": "610 CE", "themes": ["Guidance", "Mercy", "Worship"]},
+    {"id": "al-baqarah", "title": "Al-Baqarah (The Cow)", "category": "quran", "chapters": 40, "description": "The longest surah — comprehensive guidance on faith, law, stories of the prophets, and the nature of divine covenant.", "era": "624 CE", "themes": ["Law", "Faith", "Covenant"]},
+    {"id": "al-imran", "title": "Al-Imran (Family of Imran)", "category": "quran", "chapters": 20, "description": "The family of Mary and Jesus in Islamic tradition — interfaith dialogue and steadfastness in faith.", "era": "625 CE", "themes": ["Jesus & Mary", "Patience", "Unity"]},
+    {"id": "an-nisa", "title": "An-Nisa (The Women)", "category": "quran", "chapters": 24, "description": "Rights of women, orphans, and family law — justice, inheritance, and social ethics.", "era": "625 CE", "themes": ["Women's Rights", "Justice", "Family"]},
+    {"id": "al-maidah", "title": "Al-Ma'idah (The Table Spread)", "category": "quran", "chapters": 16, "description": "Covenants, dietary laws, and the table from heaven — the completion of divine law.", "era": "631 CE", "themes": ["Covenant", "Law", "Interfaith"]},
+    {"id": "al-anam", "title": "Al-An'am (The Cattle)", "category": "quran", "chapters": 20, "description": "The oneness of God, rejection of idolatry, and Abraham's journey to monotheism.", "era": "621 CE", "themes": ["Monotheism", "Abraham", "Creation"]},
+    {"id": "al-araf", "title": "Al-A'raf (The Heights)", "category": "quran", "chapters": 24, "description": "The barrier between paradise and hellfire — stories of Adam, Noah, Moses.", "era": "620 CE", "themes": ["Judgment", "Prophets", "Consequences"]},
+    {"id": "yusuf", "title": "Yusuf (Joseph)", "category": "quran", "chapters": 12, "description": "The 'most beautiful of stories' — Joseph's journey from betrayal to power, and the triumph of faith.", "era": "620 CE", "themes": ["Beauty", "Forgiveness", "Providence"]},
+    {"id": "al-isra", "title": "Al-Isra (The Night Journey)", "category": "quran", "chapters": 12, "description": "Muhammad's miraculous night journey and ascension — ethical commandments and spiritual elevation.", "era": "621 CE", "themes": ["Night Journey", "Ascension", "Ethics"]},
+    {"id": "al-kahf", "title": "Al-Kahf (The Cave)", "category": "quran", "chapters": 12, "description": "The sleepers of the cave, Moses and Khidr — four parables of faith, knowledge, wealth, and power.", "era": "618 CE", "themes": ["Faith", "Hidden Knowledge", "Humility"]},
+    {"id": "maryam", "title": "Maryam (Mary)", "category": "quran", "chapters": 6, "description": "The miraculous birth of Jesus, Mary's devotion — divine mercy across generations.", "era": "615 CE", "themes": ["Mary", "Jesus", "Mercy"]},
+    {"id": "ta-ha", "title": "Ta-Ha", "category": "quran", "chapters": 8, "description": "Moses in extraordinary detail — from the burning bush to Pharaoh's defeat, and Adam's repentance.", "era": "618 CE", "themes": ["Moses", "Revelation", "Repentance"]},
+    {"id": "ya-sin", "title": "Ya-Sin (Heart of the Quran)", "category": "quran", "chapters": 5, "description": "Called the Heart of the Quran — resurrection, signs in nature, and a parable of the messengers.", "era": "618 CE", "themes": ["Heart", "Resurrection", "Signs"]},
+    {"id": "ar-rahman", "title": "Ar-Rahman (The Most Merciful)", "category": "quran", "chapters": 4, "description": "The most lyrical surah — 'Which of your Lord's favors will you deny?' A hymn to divine mercy.", "era": "614 CE", "themes": ["Mercy", "Beauty", "Creation"]},
+    {"id": "al-waqiah", "title": "Al-Waqi'ah (The Event)", "category": "quran", "chapters": 3, "description": "The three groups on Judgment Day — the forerunners, the right, and the left.", "era": "618 CE", "themes": ["Judgment", "Groups", "Destiny"]},
+    {"id": "al-mulk", "title": "Al-Mulk (Sovereignty)", "category": "quran", "chapters": 3, "description": "The sovereignty of God — creation of death and life as a test, protection from the grave.", "era": "618 CE", "themes": ["Sovereignty", "Test", "Protection"]},
+    {"id": "al-jinn", "title": "Al-Jinn (The Jinn)", "category": "quran", "chapters": 2, "description": "The jinn who heard the Quran and believed — the unseen world and the limits of knowledge.", "era": "619 CE", "themes": ["Jinn", "Unseen", "Belief"]},
+    {"id": "al-muzzammil", "title": "Al-Muzzammil (The Enshrouded One)", "category": "quran", "chapters": 2, "description": "Rise at night for prayer — the night vigil, patience, and the sweetness of recitation.", "era": "610 CE", "themes": ["Night Prayer", "Solitude", "Recitation"]},
+    {"id": "al-insan", "title": "Al-Insan (The Human)", "category": "quran", "chapters": 2, "description": "Was there not a time when human was nothing? — creation, free will, and the reward of gratitude.", "era": "614 CE", "themes": ["Creation", "Free Will", "Gratitude"]},
+    {"id": "al-alaq", "title": "Al-Alaq (The Clot / First Revelation)", "category": "quran", "chapters": 1, "description": "Read! The first revelation to Muhammad — humanity created from a clot, the pen, and knowledge.", "era": "610 CE", "themes": ["First Revelation", "Reading", "Knowledge"]},
+    {"id": "al-qadr", "title": "Al-Qadr (The Night of Power)", "category": "quran", "chapters": 1, "description": "The Night of Power is better than a thousand months — angels descend, peace until dawn.", "era": "614 CE", "themes": ["Night of Power", "Angels", "Peace"]},
+    {"id": "al-ikhlas", "title": "Al-Ikhlas (Sincerity / Purity)", "category": "quran", "chapters": 1, "description": "Say: He is God, the One. Equal to one-third of the Quran — absolute monotheism distilled.", "era": "614 CE", "themes": ["Oneness", "Purity", "Monotheism"]},
+    {"id": "al-hujurat", "title": "Al-Hujurat (The Chambers)", "category": "quran", "chapters": 3, "description": "Charter of Islamic social ethics — no racism, no backbiting, all humanity from one soul.", "era": "630 CE", "themes": ["Social Ethics", "Equality", "Brotherhood"]},
+    {"id": "an-nas", "title": "An-Nas (Humankind)", "category": "quran", "chapters": 1, "description": "The final surah — seek refuge in the Lord of humankind from the whisperer among jinn and humans.", "era": "614 CE", "themes": ["Protection", "Humankind", "Refuge"]},
 ]
 
 
@@ -187,12 +242,26 @@ async def generate_bible_chapter(book_id: str, chapter_num: int, user=Depends(ge
 
     is_apocryphal = book["category"] == "lost-apocryphal"
     is_deutero = book["category"] == "deuterocanonical"
+    is_torah = book["category"] == "torah-talmud"
+    is_kabbalah = book["category"] == "kabbalah"
+    is_quran = book["category"] == "quran"
 
-    system_msg = f"""You are a biblical scholar and sacred text narrator for The Cosmic Collective, a spiritual wellness platform.
+    tradition_note = ""
+    if is_apocryphal:
+        tradition_note = "This is from the Lost/Apocryphal texts — present faithfully while noting its non-canonical status."
+    elif is_deutero:
+        tradition_note = "This is a Deuterocanonical text — present with the same reverence as canonical scripture."
+    elif is_torah:
+        tradition_note = "This is from the Jewish oral tradition (Talmud/Mishnah/Midrash). Present with deep respect for rabbinic discourse, including multiple perspectives of the sages where relevant."
+    elif is_kabbalah:
+        tradition_note = "This is a Kabbalistic text from the Jewish mystical tradition. Present with reverence for the esoteric symbolism, the Sefirot, and the hidden dimensions of Torah."
+    elif is_quran:
+        tradition_note = "This is a Surah from the Holy Quran. Present with deep reverence for Islamic scripture. Use 'peace be upon him' after prophets' names. Include the Arabic transliteration of key phrases where meaningful."
 
-You are generating content for Chapter {chapter_num} of {book['title']}.
-{"This is from the Lost/Apocryphal texts — present the content faithfully while noting its non-canonical status." if is_apocryphal else ""}
-{"This is a Deuterocanonical text — present with the same reverence as canonical scripture." if is_deutero else ""}
+    system_msg = f"""You are a scholar of world sacred texts and spiritual narrator for The Cosmic Collective, a spiritual wellness platform.
+
+You are generating content for Chapter/Section {chapter_num} of {book['title']}.
+{tradition_note}
 
 Provide three sections:
 
@@ -323,10 +392,10 @@ async def bible_ai_question(data: dict = Body(...), user=Depends(get_current_use
         raise HTTPException(status_code=400, detail="Question is required")
 
     system_msg = (
-        "You are a wise biblical scholar, theologian, and spiritual guide in The Cosmic Collective. "
-        "Answer questions about the Bible, its lost books, and related spiritual topics with depth, "
-        "scholarship, and compassion. Reference specific verses and historical context. "
-        "Be interfaith-respectful while deeply knowledgeable about Christian scripture. "
+        "You are a wise scholar of world sacred texts, theologian, and spiritual guide in The Cosmic Collective. "
+        "You have deep knowledge of the Bible (all canons), Torah, Talmud, Midrash, Kabbalah, and the Quran. "
+        "Answer questions with depth, scholarship, and compassion. Reference specific verses and historical context. "
+        "Be interfaith-respectful and deeply knowledgeable about all Abrahamic traditions. "
         "Keep answers focused and 2-4 paragraphs."
     )
 
