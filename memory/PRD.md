@@ -11,77 +11,74 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - **Payments**: Stripe (test key)
 - **Mobile**: Capacitor (iOS + Android configs)
 
-## Launch Status: COMPLETE (Iteration 104 — 100% pass rate)
-
-### All Verified Features (42+)
-1. SmartDock — Minimize, drag, snap zones, persist
-2. Cosmic Mood Ring — Interactive quick log, 8 moods
-3. Session Replay & Download — Auto-recording, Past Sessions tab
-4. Recurring Live Sessions — Subscribe, push notifications, auto-spawn
-5. Live Sessions — WebSocket, avatars, guided commands, 8 types, 6 scenes
-6. **Zoom-Like Video Calling** — WebRTC P2P, camera/mic toggles, responsive video grid, 3 host modes
-7. **Screen Sharing** — Share Screen, featured tile, single-sharer lock
-8. **Virtual Backgrounds** — 15 backgrounds + 3 blur levels, MediaPipe AI segmentation
-9. AI-Generated Meditation Audio — TTS with 7 voice options
-10. Real-time Live Feed on Creator Dashboard
-11. Creator Dashboard — 7 interactive tabs, broadcast, user management
-12. Mood Insights, Crystal Pairing, Blessings
-13. Trade Circle, Stripe Subscriptions (5 tiers)
-14. Sacred Texts (15), Encyclopedia (12 traditions)
-15. Music Lounge, Cosmic Mixer, Frequencies (binaural beats)
-16. Soundscapes, Crystals (13), Avatar Creator, VR Modes
-17. Star Charts, Numerology, Oracle, Mayan Calendar, Cardology
-18. Profile, Settings, Split Screen, PWA, Capacitor scaffolding
-19. Dance & Music Studio — 17 instruments, 6 scales, 8 sacred dances, recording
-20. Custom Virtual Background Uploads in Live Sessions
-21. Cosmic Pairs — 6 curated multi-sensory split-screen combos
-22. Production Console (CosmicMixer) — Full mixing board with 7 channel strips
-23. Mixer Presets System — Save/load/share/like community presets
-24. Preset Playlists (Journeys) — Auto-advancing playlists with transition effects
-25. Multi-Layer Visual Stack Mixing Board — Fractals, videos, lights simultaneous
-26. FractalVisualizer — Audio-reactive canvas fractals
-27. VisualFilters — Post-processing CSS/Canvas overlays
-28. Media Library (/my-creations) — Full CRUD, community sharing
-29. Live Session Mixer Sync — WebSocket mixer_sync for host-to-participant sync
-30. Mixer Recording Engine — Record, save, share mixer sessions
-
-### Latest Features (2026-03-30)
-31. **In-Star-Chart Astrology Reading** (iteration_111: 100%)
-    - "My Reading" toolbar button + "Astrology Reading" in MythologyPanel
-    - AI-powered personalized readings using GPT-4o
-    - Birth zodiac, mood history, aura color, moon phase, planetary transits
-    - Tabbed panel: Cosmic Influence, Planets, Guidance with affirmation
-    - API: POST /api/star-chart/astrology-reading
-    - Readings saved to astrology_readings collection
-
-32. **Daily Cosmic Briefing Push Notification**
-    - Morning push notification with personalized astrology reading
-    - Uses birth chart, moon phase, planetary transits
-    - Integrated into push_scheduler_loop in server.py
-    - 5 rotating cosmic briefing templates
-
-33. **Sacred Scriptures & Lost Books** (iteration_112: 100%, 29/29 backend + all frontend)
-    - 136 total texts across 7 categories:
-      - Old Testament (39), New Testament (27), Deuterocanonical (7)
-      - Lost & Apocryphal (17), Torah & Talmud (12), Kabbalah (10), Quran (24)
-    - AI-generated chapter content: Retelling, Key Verses, Commentary
-    - AI Q&A "Ask the Scholar" deep-dive chat per chapter
-    - Bookmarks system with persistent storage
-    - TTS (Text-to-Speech) read-aloud
-    - Chapter navigation (prev/next)
-    - Search and category filter chips
-    - Tradition-aware AI prompts (respects each tradition's context)
-    - API: GET /api/bible/categories, GET /api/bible/books, POST /api/bible/ask, etc.
-    - Page: /bible
-
 ## Test Credentials
 - User: test@test.com / password
 - Admin: kyndsmiles@gmail.com / password
 
+## All Verified Features (45+)
+
+### Core Platform
+1. SmartDock, Cosmic Mood Ring, Session Replay & Download
+2. Recurring Live Sessions, Push Notifications
+3. Zoom-Like Video Calling (WebRTC P2P), Screen Sharing, Virtual Backgrounds
+4. AI-Generated Meditation Audio (7 TTS voices)
+5. Creator Dashboard (7 tabs, broadcast, user management)
+6. Mood Insights, Crystal Pairing, Blessings, Trade Circle
+7. Stripe Subscriptions (5 tiers)
+8. Sacred Texts (15), Encyclopedia (12 traditions), Music Lounge
+9. Cosmic Mixer / Production Console (7 channels)
+10. Soundscapes, Crystals (13), Avatar Creator, VR Modes
+11. Star Charts, Numerology, Oracle, Mayan Calendar, Cardology
+12. Profile, Settings, Split Screen, PWA, Capacitor scaffolding
+13. Dance & Music Studio (17 instruments, 8 dances)
+14. Cosmic Pairs (6 curated split-screen combos)
+15. Mixer Presets, Journeys (playlists), Multi-Layer Visual Stack
+16. FractalVisualizer, VisualFilters, Media Library (/my-creations)
+17. Live Session Mixer Sync (WebSocket), Recording Engine
+
+### Latest Session Features (2026-03-30)
+18. **In-Star-Chart Astrology Reading** (iteration_111: 100%)
+    - "My Reading" toolbar + MythologyPanel buttons
+    - AI-powered via GPT-4o: birth zodiac, mood, aura, moon phase, transits
+    - Tabbed panel: Cosmic Influence, Planets, Guidance
+
+19. **Daily Cosmic Briefing Push Notification**
+    - Morning push with personalized astrology based on birth chart + transits
+    - 5 rotating cosmic briefing templates
+    - Integrated into push_scheduler_loop
+
+20. **Sacred Scriptures & Lost Books** (iteration_112: 100%, 29/29 backend)
+    - 136 total texts across 7 categories:
+      - Old Testament (39), New Testament (27), Deuterocanonical (7)
+      - Lost & Apocryphal (17), Torah & Talmud (12), Kabbalah (10), Quran (24)
+    - AI-generated chapter content: Retelling, Key Verses, Commentary
+    - AI Q&A "Ask the Scholar" deep-dive per chapter
+    - Bookmarks, TTS read-aloud, chapter navigation
+    - Tradition-aware AI prompts (Bible, Torah, Kabbalah, Quran contexts)
+    - Page: /bible
+
+21. **Scripture Vision Mode** — Animated scene recreations while reading
+    - Canvas-based particle systems detect text keywords (water, fire, light, creation, etc.)
+    - Tradition-specific palettes and visual themes
+    - Scene types: fire, water, light, darkness, creation, mountain, garden, sky, storm, peace, battle, journey, divine, mystical
+    - Glass-morphism text overlay for readability
+
+22. **Global Immersion Level Toggle** (iteration_113: 100%)
+    - Three tiers: Calm / Standard / Full Immersive
+    - Quick-access toggle in navigation bar
+    - Full settings in Settings > Experience Level
+    - **Calm**: No particles, fractals, or flashing. Safe for epilepsy/motion sensitivity
+    - **Standard**: Moderate animations, gentle effects
+    - **Full Immersive**: All visual effects enabled
+    - Affects: ScriptureVisualizer, FractalVisualizer, Star Chart, Vision Mode
+    - Accessibility warning for photosensitive users
+    - Persisted in SensoryContext localStorage
+
 ## Key Routes
-- `/bible` — Sacred Scriptures (Bible, Torah, Kabbalah, Quran)
+- `/bible` — Sacred Scriptures (7 traditions, 136 texts)
 - `/star-chart` — Star Chart with Astrology Reading
 - `/my-creations` — Media Library
+- `/settings` — Experience Level + all preferences
 - `/live/:id` — Live Sessions with Mixer Sync
 
 ## Upcoming Tasks
