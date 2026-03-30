@@ -110,6 +110,7 @@ const DanceMusicStudio = lazy(() => import('./pages/DanceMusicStudio'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
 const Bible = lazy(() => import('./pages/Bible'));
 const StarseedAdventure = lazy(() => import('./pages/StarseedAdventure'));
+const StarseedRealm = lazy(() => import('./pages/StarseedRealm'));
 
 function PageLoader() {
   return (
@@ -225,6 +226,7 @@ function AnimatedRoutes() {
         <Route path="/my-creations/:id" element={<MediaLibrary />} />
         <Route path="/bible" element={<Bible />} />
         <Route path="/starseed-adventure" element={<StarseedAdventure />} />
+        <Route path="/starseed-realm" element={<StarseedRealm />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

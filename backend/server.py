@@ -73,6 +73,7 @@ from routes.astrology_reading import router as astrology_reading_router
 from routes.bible import router as bible_router
 from routes.scripture_journeys import router as scripture_journeys_router
 from routes.starseed_adventure import router as starseed_router
+from routes.starseed_realm import router as starseed_realm_router
 
 app = FastAPI()
 
@@ -113,6 +114,7 @@ all_routers = [
     bible_router,
     scripture_journeys_router,
     starseed_router,
+    starseed_realm_router,
 ]
 
 for r in all_routers:

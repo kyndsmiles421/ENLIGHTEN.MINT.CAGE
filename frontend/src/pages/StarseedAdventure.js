@@ -8,7 +8,7 @@ import { useSensory } from '../context/SensoryContext';
 import {
   ArrowLeft, Sparkles, Star, Shield, Heart, Eye, Flame,
   ChevronRight, Loader2, Trophy, Zap, Swords,
-  Brain, ChevronDown
+  Brain, ChevronDown, Globe
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -210,6 +210,16 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
         <p className="text-sm max-w-lg mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
           An AI-powered cosmic RPG. Select your starseed origin and embark on a branching journey through the stars. Every choice shapes your destiny.
         </p>
+        {existingCharacters.length > 0 && (
+          <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+            onClick={() => window.location.href = '/starseed-realm'}
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105 mx-auto"
+            style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
+            data-testid="enter-realm-btn">
+            <Globe size={13} /> Enter the Cosmic Realm
+            <ChevronRight size={11} className="opacity-60" />
+          </motion.button>
+        )}
       </motion.div>
 
       {/* Continue existing adventures */}

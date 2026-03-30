@@ -79,6 +79,7 @@ const ALL_ACTIONS = [
   { icon: BookOpen, label: 'Sacred', path: '/sacred-texts', color: '#FCD34D', group: 'Explore' },
   { icon: ScrollText, label: 'Scriptures', path: '/bible', color: '#D97706', group: 'Explore' },
   { icon: Star, label: 'Starseed', path: '/starseed-adventure', color: '#818CF8', group: 'Explore' },
+  { icon: Globe, label: 'Realm', path: '/starseed-realm', color: '#C084FC', group: 'Explore' },
 ];
 
 const REC_ICON_MAP = {
