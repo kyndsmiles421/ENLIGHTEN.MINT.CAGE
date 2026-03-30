@@ -438,10 +438,14 @@ export default function DanceMusicStudio() {
 // ─── Instrument Panel ───
 function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange, baseOctave, onOctaveChange, scaleNotes, onPlayNote, activePads, volume, onVolumeChange, isRecording, recordedNotes, onStartRecording, onStopRecording, onPlayRecorded, onSaveRecording, onClearRecording }) {
   const [instrumentSearch, setInstrumentSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState(null);
+  const categories = [...new Set(instruments.map(i => i.origin))];
+
   const filteredInstruments = instruments.filter(inst => {
-    if (!instrumentSearch.trim()) return true;
+    const matchesCategory = !activeCategory || inst.origin === activeCategory;
+    if (!instrumentSearch.trim()) return matchesCategory;
     const q = instrumentSearch.toLowerCase();
-    return inst.name.toLowerCase().includes(q) || inst.origin.toLowerCase().includes(q) || inst.category.toLowerCase().includes(q);
+    return matchesCategory && (inst.name.toLowerCase().includes(q) || inst.origin.toLowerCase().includes(q) || inst.category.toLowerCase().includes(q));
   });
 
   return (
@@ -470,10 +474,35 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
             )}
           </div>
         </div>
+        {/* Category filter chips */}
+        <div className="flex flex-wrap gap-1.5 mb-3" data-testid="instrument-category-chips">
+          <button
+            onClick={() => setActiveCategory(null)}
+            className="px-2.5 py-1 rounded-lg text-[9px] font-medium transition-all"
+            style={{
+              background: !activeCategory ? 'rgba(192,132,252,0.1)' : 'rgba(248,250,252,0.02)',
+              border: `1px solid ${!activeCategory ? 'rgba(192,132,252,0.2)' : 'rgba(248,250,252,0.04)'}`,
+              color: !activeCategory ? '#C084FC' : 'var(--text-muted)',
+            }}
+            data-testid="cat-chip-all"
+          >All</button>
+          {categories.map(cat => (
+            <button key={cat}
+              onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+              className="px-2.5 py-1 rounded-lg text-[9px] font-medium transition-all"
+              style={{
+                background: activeCategory === cat ? 'rgba(192,132,252,0.1)' : 'rgba(248,250,252,0.02)',
+                border: `1px solid ${activeCategory === cat ? 'rgba(192,132,252,0.2)' : 'rgba(248,250,252,0.04)'}`,
+                color: activeCategory === cat ? '#C084FC' : 'var(--text-muted)',
+              }}
+              data-testid={`cat-chip-${cat.toLowerCase().replace(/\s+/g, '-')}`}
+            >{cat}</button>
+          ))}
+        </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
           {filteredInstruments.length === 0 ? (
             <div className="col-span-full py-4 text-center">
-              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>No instruments match "{instrumentSearch}"</p>
+              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>No instruments found{instrumentSearch ? ` for "${instrumentSearch}"` : ''}{activeCategory ? ` in ${activeCategory}` : ''}</p>
             </div>
           ) : filteredInstruments.map(inst => (
             <motion.button key={inst.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
