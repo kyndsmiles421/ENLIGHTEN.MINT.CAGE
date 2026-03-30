@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   BookOpen, ChevronRight, ChevronLeft, Search, Loader2, X,
   Bookmark, BookmarkCheck, MessageCircle, Send, Volume2, Pause,
-  Scroll, Eye, Cross, Sparkles, Star, ArrowLeft
+  Scroll, Eye, Cross, Sparkles, Star, ArrowLeft, Map, CheckCircle, Lock, Trophy
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ScriptureVisualizer, VisionModeToggle, detectScenes } from '../components/ScriptureVisualizer';
@@ -320,6 +320,9 @@ export default function Bible() {
   const [bookmarks, setBookmarks] = useState([]);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [journeys, setJourneys] = useState([]);
+  const [activeJourney, setActiveJourney] = useState(null);
+  const [journeyDetail, setJourneyDetail] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -331,6 +334,14 @@ export default function Bible() {
     }).catch(() => toast.error('Failed to load Bible data'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      axios.get(`${API}/scripture-journeys`, { headers: authHeaders })
+        .then(r => setJourneys(r.data.journeys || []))
+        .catch(() => {});
+    }
+  }, [token, authHeaders]);
 
   useEffect(() => {
     if (token) {
@@ -356,6 +367,147 @@ export default function Bible() {
       setActiveChapter(null);
     } catch { toast.error('Failed to load book'); }
   }, []);
+
+  const openJourney = useCallback(async (journeyId) => {
+    if (!token) return;
+    try {
+      const res = await axios.get(`${API}/scripture-journeys/${journeyId}`, { headers: authHeaders });
+      setJourneyDetail(res.data);
+      setActiveJourney(journeyId);
+    } catch { toast.error('Failed to load journey'); }
+  }, [token, authHeaders]);
+
+  const completeStep = useCallback(async (journeyId, stepIndex, step) => {
+    if (!token) return;
+    try {
+      const res = await axios.post(`${API}/scripture-journeys/${journeyId}/complete-step`,
+        { step_index: stepIndex }, { headers: authHeaders });
+      if (res.data.achievement_earned) {
+        toast.success('Journey Complete! Achievement unlocked!');
+      }
+      // Refresh journey detail
+      const refresh = await axios.get(`${API}/scripture-journeys/${journeyId}`, { headers: authHeaders });
+      setJourneyDetail(refresh.data);
+      // Also refresh journeys list
+      axios.get(`${API}/scripture-journeys`, { headers: authHeaders })
+        .then(r => setJourneys(r.data.journeys || [])).catch(() => {});
+      // Navigate to the chapter
+      await openBook(step.book_id);
+      setActiveChapter(step.chapter);
+    } catch { toast.error('Failed to start step'); }
+  }, [token, authHeaders, openBook]);
+
+  // ── Journey Detail View ──
+  if (activeJourney && journeyDetail) {
+    return (
+      <div className="min-h-screen pt-20 pb-12 px-4" data-testid="bible-page">
+        <div className="max-w-3xl mx-auto">
+          <button onClick={() => { setActiveJourney(null); setJourneyDetail(null); }} data-testid="journey-back"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs mb-6"
+            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
+            <ArrowLeft size={12} /> All Journeys
+          </button>
+
+          <div className="text-center mb-6">
+            <p className="text-[10px] uppercase tracking-[0.25em] mb-1" style={{ color: journeyDetail.color }}>
+              {journeyDetail.difficulty} journey
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
+              {journeyDetail.title}
+            </h1>
+            <p className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.45)' }}>{journeyDetail.description}</p>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              {journeyDetail.traditions?.map(t => (
+                <span key={t} className="text-[8px] px-2 py-0.5 rounded"
+                  style={{ background: `${journeyDetail.color}10`, color: journeyDetail.color, border: `1px solid ${journeyDetail.color}18` }}>{t}</span>
+              ))}
+            </div>
+            {/* Progress bar */}
+            <div className="max-w-xs mx-auto">
+              <div className="flex items-center justify-between text-[9px] mb-1">
+                <span style={{ color: 'rgba(248,250,252,0.3)' }}>Progress</span>
+                <span style={{ color: journeyDetail.color }}>{journeyDetail.progress_pct}%</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.06)' }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${journeyDetail.progress_pct}%` }}
+                  transition={{ duration: 0.8 }}
+                  className="h-full rounded-full"
+                  style={{ background: journeyDetail.color }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Steps */}
+          <div className="space-y-2">
+            {journeyDetail.steps.map((step, i) => {
+              const isCompleted = step.completed;
+              const isUnlocked = step.unlocked;
+              const isNext = isUnlocked && !isCompleted;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex items-center gap-3 p-3 rounded-xl transition-all"
+                  style={{
+                    background: isNext ? `${journeyDetail.color}08` : 'rgba(248,250,252,0.02)',
+                    border: `1px solid ${isNext ? `${journeyDetail.color}18` : 'rgba(248,250,252,0.05)'}`,
+                    opacity: isUnlocked ? 1 : 0.4,
+                  }}
+                >
+                  {/* Step number */}
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: isCompleted ? `${journeyDetail.color}18` : 'rgba(248,250,252,0.04)',
+                      border: `1px solid ${isCompleted ? `${journeyDetail.color}30` : 'rgba(248,250,252,0.08)'}`,
+                    }}>
+                    {isCompleted ? <CheckCircle size={14} style={{ color: journeyDetail.color }} />
+                      : !isUnlocked ? <Lock size={12} style={{ color: 'rgba(248,250,252,0.2)' }} />
+                      : <span className="text-xs font-medium" style={{ color: isNext ? journeyDetail.color : 'rgba(248,250,252,0.3)' }}>{i + 1}</span>}
+                  </div>
+
+                  {/* Step content */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium" style={{ color: isCompleted ? journeyDetail.color : '#F8FAFC' }}>{step.label}</p>
+                    <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>{step.tradition}</p>
+                  </div>
+
+                  {/* Action */}
+                  {isUnlocked && (
+                    <button
+                      onClick={() => completeStep(activeJourney, i, step)}
+                      data-testid={`journey-step-${i}`}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
+                      style={{
+                        background: isCompleted ? 'rgba(248,250,252,0.04)' : `${journeyDetail.color}12`,
+                        border: `1px solid ${isCompleted ? 'rgba(248,250,252,0.08)' : `${journeyDetail.color}25`}`,
+                        color: isCompleted ? 'rgba(248,250,252,0.4)' : journeyDetail.color,
+                      }}>
+                      {isCompleted ? 'Re-read' : 'Read'} <ChevronRight size={10} />
+                    </button>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {journeyDetail.progress_pct >= 100 && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+              className="mt-6 p-4 rounded-2xl text-center"
+              style={{ background: `${journeyDetail.color}08`, border: `1px solid ${journeyDetail.color}20` }}>
+              <Trophy size={24} className="mx-auto mb-2" style={{ color: journeyDetail.color }} />
+              <p className="text-sm font-semibold mb-1" style={{ color: journeyDetail.color }}>Journey Complete!</p>
+              <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>You've completed "{journeyDetail.title}" — achievement unlocked</p>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (activeChapter && selectedBook) {
     return (
@@ -471,6 +623,50 @@ export default function Bible() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Guided Journeys */}
+        {token && journeys.length > 0 && (
+          <div className="mb-8" data-testid="scripture-journeys-section">
+            <div className="flex items-center gap-2 mb-3">
+              <Map size={14} style={{ color: '#A78BFA' }} />
+              <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Guided Journeys</span>
+              <span className="text-[9px] px-2 py-0.5 rounded" style={{ background: 'rgba(167,139,250,0.1)', color: '#A78BFA', border: '1px solid rgba(167,139,250,0.15)' }}>
+                Cross-Tradition
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {journeys.map(j => (
+                <button key={j.id} onClick={() => openJourney(j.id)} data-testid={`journey-${j.id}`}
+                  className="text-left p-3.5 rounded-xl transition-all hover:scale-[1.01] group"
+                  style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.06)' }}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>{j.title}</p>
+                      <p className="text-[9px]" style={{ color: j.color }}>{j.subtitle}</p>
+                    </div>
+                    {j.completed ? (
+                      <Trophy size={14} style={{ color: j.color }} />
+                    ) : j.started ? (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${j.color}10`, color: j.color }}>{j.progress_pct}%</span>
+                    ) : null}
+                  </div>
+                  <p className="text-[10px] line-clamp-2 mb-2" style={{ color: 'rgba(248,250,252,0.35)' }}>{j.description}</p>
+                  <div className="flex items-center gap-2">
+                    {j.traditions?.slice(0, 3).map(t => (
+                      <span key={t} className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: `${j.color}08`, color: `${j.color}CC`, border: `1px solid ${j.color}10` }}>{t}</span>
+                    ))}
+                    <span className="text-[8px] ml-auto" style={{ color: 'rgba(248,250,252,0.25)' }}>{j.total_steps} steps</span>
+                  </div>
+                  {j.started && !j.completed && (
+                    <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.06)' }}>
+                      <div className="h-full rounded-full" style={{ background: j.color, width: `${j.progress_pct}%` }} />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Category chips */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 justify-center flex-wrap" style={{ scrollbarWidth: 'none' }}>

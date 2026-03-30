@@ -49,6 +49,15 @@ async def get_dashboard_stats(user=Depends(get_current_user)):
         sparkline_journals.append(journal_day)
         sparkline_activity.append(1 if d in dates_active else 0)
 
+    # Scripture reading progress
+    scripture_progress = await db.scripture_journey_progress.find(
+        {"user_id": uid}, {"_id": 0}
+    ).to_list(20)
+    active_journeys = [p for p in scripture_progress if p.get("completed_steps")]
+    recent_chapters = await db.bible_chapters.find(
+        {"user_id": uid}, {"_id": 0, "book_title": 1, "chapter_num": 1, "book_id": 1, "generated_at": 1}
+    ).sort("generated_at", -1).to_list(3)
+
     return {
         "mood_count": mood_count_t,
         "journal_count": journal_count_t,
@@ -58,6 +67,11 @@ async def get_dashboard_stats(user=Depends(get_current_user)):
             "moods": sparkline_moods,
             "journals": sparkline_journals,
             "activity": sparkline_activity,
+        },
+        "scripture": {
+            "active_journeys": len(active_journeys),
+            "chapters_read": await db.bible_chapters.count_documents({"user_id": uid}),
+            "recent_chapters": [{k: v for k, v in ch.items() if k != "_id"} for ch in recent_chapters],
         },
     }
 
