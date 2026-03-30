@@ -92,6 +92,27 @@ jobs:
           path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
+      # ─── Firebase App Distribution ──────────────────────────
+      # Sends the APK directly to testers' phones via Firebase.
+      # Setup: 1) Create a Firebase project at console.firebase.google.com
+      #        2) Enable App Distribution in the Firebase console
+      #        3) Create a service account and download the JSON key
+      #        4) Add these GitHub secrets:
+      #           - FIREBASE_SERVICE_ACCOUNT: The entire JSON key file content
+      #           - FIREBASE_APP_ID: Your Firebase Android App ID (from Project Settings)
+      - name: Distribute to Firebase (Beta Testers)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          groups: beta-testers
+          file: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          releaseNotes: |
+            Cosmic Collective - Build ${{ github.run_number }}
+            Commit: ${{ github.sha }}
+            Branch: ${{ github.ref_name }}
+
   # ─── iOS (build check only — full archive requires macOS + signing) ───
   ios-build:
     name: Build iOS (Xcode Check)
