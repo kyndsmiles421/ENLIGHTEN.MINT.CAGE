@@ -277,7 +277,7 @@ function MantraCard({ mantra, accentColor }) {
               {mantra.tradition}
             </span>
           </div>
-          <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
+          <p className="text-sm italic leading-relaxed" style={{ color: '#F1F0F5', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 1px 8px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.4)' }}>
             "{mantra.text}"
           </p>
           <button onClick={speakMantra}
@@ -373,7 +373,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
           Today's Cosmic Insight
         </p>
         <p className="text-sm md:text-base font-light leading-relaxed mb-3 max-w-2xl"
-          style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+          style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F1F0F5', textShadow: '0 1px 8px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.4)' }}>
           "{wisdom.text}"
         </p>
         <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
@@ -908,7 +908,7 @@ export default function Landing() {
                 className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Collective</motion.span>
             </h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              className="text-base md:text-lg leading-relaxed max-w-md mb-6" style={{ color: 'var(--text-secondary)' }}>
+              className="text-base md:text-lg leading-relaxed max-w-md mb-6" style={{ color: '#C8C5D0', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
               Your sanctuary for breathwork, meditation, divination, and spiritual growth — guided by ancient wisdom and modern technology.
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}

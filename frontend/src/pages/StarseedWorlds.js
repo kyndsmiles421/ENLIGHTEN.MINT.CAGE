@@ -289,7 +289,7 @@ function RealmDetailPanel({ realm, onExplore, exploring, onClose }) {
           </button>
         </div>
 
-        <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>
+        <p className="text-sm leading-relaxed mb-4" style={{ color: '#D4D0DC', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px', textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
           {realm.lore}
         </p>
 
@@ -314,9 +314,14 @@ function RealmDetailPanel({ realm, onExplore, exploring, onClose }) {
         )}
 
         {realm.unlocked && (
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+          <motion.button
+            whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            animate={!exploring ? {
+              boxShadow: [`0 0 15px ${realm.color}10`, `0 0 30px ${realm.color}20`, `0 0 15px ${realm.color}10`]
+            } : {}}
+            transition={!exploring ? { duration: 2.5, repeat: Infinity } : {}}
             onClick={onExplore} disabled={exploring}
-            className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all relative overflow-hidden"
             style={{
               background: `linear-gradient(135deg, ${realm.color}20, ${realm.color}10)`,
               border: `1px solid ${realm.color}30`, color: realm.color,
@@ -410,55 +415,83 @@ function CraftingPanel({ recipes, enchantOptions, gems, equipment, originId, aut
 /* ─── Exploration Result Modal ─── */
 function ExplorationResult({ result, onClose }) {
   if (!result) return null;
+  const hasDiscoveries = result.discoveries.length > 0;
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(16px)' }}
+      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)' }}
       onClick={onClose}>
-      <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', duration: 0.6 }}
+      <motion.div initial={{ scale: 0.3, opacity: 0, rotateY: -20 }}
+        animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+        transition={{ type: 'spring', duration: 0.8, bounce: 0.3 }}
         className="rounded-2xl p-8 text-center max-w-sm mx-4 relative overflow-hidden"
-        style={{ background: 'rgba(20,20,30,0.95)', border: '1px solid rgba(255,255,255,0.1)' }}
+        style={{ background: 'rgba(16,14,28,0.97)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}
         onClick={e => e.stopPropagation()}
         data-testid="exploration-result">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#C084FC' }}>
-          Exploration Report
-        </p>
+        {/* Decorative glow */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: hasDiscoveries ? 'radial-gradient(ellipse at 50% 20%, rgba(192,132,252,0.06), transparent 60%)' : 'none' }} />
 
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <span className="text-xs px-3 py-1.5 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
+        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="text-[10px] font-bold uppercase tracking-[0.3em] mb-5 relative"
+          style={{ color: '#C084FC', textShadow: '0 0 15px rgba(192,132,252,0.3)' }}>
+          Exploration Report
+        </motion.p>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+          className="flex items-center justify-center gap-3 mb-5">
+          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4, type: 'spring' }}
+            className="text-xs px-3 py-1.5 rounded-lg font-medium"
+            style={{ background: 'rgba(252,211,77,0.1)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.15)' }}>
             +{result.xp_gained} XP
-          </span>
+          </motion.span>
           {result.leveled_up && (
-            <span className="text-xs px-3 py-1.5 rounded-lg font-bold" style={{ background: 'rgba(252,211,77,0.12)', color: '#FCD34D' }}>
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: 'spring' }}
+              className="text-xs px-3 py-1.5 rounded-lg font-bold"
+              style={{ background: 'rgba(252,211,77,0.12)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)',
+                boxShadow: '0 0 20px rgba(252,211,77,0.15)' }}>
               Level Up! Lvl {result.new_level}
-            </span>
+            </motion.span>
           )}
-        </div>
+        </motion.div>
 
         {result.encounter && (
-          <div className="rounded-xl p-3 mb-4" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)' }}>
-            <p className="text-xs" style={{ color: '#EF4444' }}>Encountered: {result.encounter}</p>
-          </div>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+            className="rounded-xl p-3 mb-4" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.12)' }}>
+            <p className="text-xs" style={{ color: '#EF4444', textShadow: '0 0 8px rgba(220,38,38,0.2)' }}>
+              Encountered: {result.encounter}
+            </p>
+          </motion.div>
         )}
 
-        {result.discoveries.length > 0 ? (
-          <div className="space-y-3 mb-4">
+        {hasDiscoveries ? (
+          <div className="space-y-3 mb-5">
             {result.discoveries.map((d, i) => {
               const item = d.item;
               const rarity = RARITY_STYLES[item.rarity] || RARITY_STYLES.common;
               const Icon = ITEM_ICONS[item.icon] || Gem;
               return (
-                <motion.div key={i} initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ delay: 0.2 + i * 0.15 }}
-                  className="rounded-xl p-4" style={{ background: `${item.color}08`, border: `1px solid ${item.color}20` }}>
-                  <div className="flex items-center gap-2 justify-center mb-2">
-                    <Icon size={18} style={{ color: item.color }} />
-                    <span className="text-sm font-medium" style={{ color: item.color }}>{item.name}</span>
+                <motion.div key={i}
+                  initial={{ scale: 0.3, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 + i * 0.2, type: 'spring', bounce: 0.4 }}
+                  className="rounded-xl p-4 relative overflow-hidden"
+                  style={{ background: `${item.color}08`, border: `1px solid ${item.color}18`,
+                    boxShadow: `0 0 25px ${item.color}08` }}>
+                  <div className="absolute inset-0 opacity-[0.03]"
+                    style={{ background: `radial-gradient(circle at 50% 50%, ${item.color}, transparent 60%)` }} />
+                  <div className="relative flex items-center gap-2 justify-center mb-2">
+                    <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ delay: 0.8 + i * 0.2, duration: 0.5 }}>
+                      <Icon size={18} style={{ color: item.color }} />
+                    </motion.div>
+                    <span className="text-sm font-medium" style={{ color: item.color, textShadow: `0 0 10px ${item.color}30` }}>
+                      {item.name}
+                    </span>
                     <span className="text-[7px] px-1.5 py-0.5 rounded-full uppercase font-bold"
                       style={{ background: rarity.bg, color: rarity.color }}>{rarity.label}</span>
                   </div>
-                  <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
-                  <span className="text-[8px] uppercase font-bold tracking-wider mt-1 inline-block"
+                  <p className="text-[10px] relative" style={{ color: '#C8C5D0' }}>{item.desc}</p>
+                  <span className="text-[8px] uppercase font-bold tracking-wider mt-1 inline-block relative"
                     style={{ color: d.type === 'gem' ? '#A855F7' : '#F59E0B' }}>
                     {d.type === 'gem' ? 'Gem Found' : 'Equipment Found'}
                   </span>
@@ -467,17 +500,19 @@ function ExplorationResult({ result, onClose }) {
             })}
           </div>
         ) : (
-          <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-            No rare discoveries this time. Keep exploring!
-          </p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+            className="text-xs mb-5" style={{ color: '#9896A3' }}>
+            No rare discoveries this time. The cosmos rewards persistence.
+          </motion.p>
         )}
 
-        <button onClick={onClose}
-          className="px-6 py-2 rounded-xl text-xs font-medium transition-all hover:scale-105"
+        <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+          onClick={onClose}
+          className="px-8 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
           style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
           data-testid="exploration-close">
-          Continue
-        </button>
+          Continue Exploring
+        </motion.button>
       </motion.div>
     </motion.div>
   );

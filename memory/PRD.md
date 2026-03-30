@@ -35,43 +35,42 @@ A highly immersive full-stack wellness platform blending standard wellness track
 - Simple Avatar Generation (quick mode)
 
 ### Cosmic Realm — Multiplayer System
-- Live Star Map — Canvas constellation with active player nodes
-- Cross-Path Encounters — AI-generated shared scenes
-- NPC Encounters — Named AI characters when no players online
-- World Events — 7 rotating events every 6 hours with stat bonuses
-- Leaderboard — Top players ranked by level with crowns
-- Alliance System — Create/join (max 6 members)
-- Alliance Chat — In-character messaging for alliance members
-- Cooperative Boss Encounters — 5 cosmic bosses, 3-phase battles
-  - Weakness/resistance system, NPC allies for solo play, XP rewards
+- Live Star Map, Cross-Path Encounters, NPC Encounters
+- World Events (7 rotating every 6 hours), Leaderboard
+- Alliance System with Chat, Cooperative Boss Encounters (5 bosses, 3-phase battles)
 
-### Multiverse Realms System (NEW)
-- **4 Distinct Realms:** Astral Sanctum (Novice), Shadow Nexus (Veteran), Crystal Caverns (Expert), Void Between (Master)
+### Multiverse Realms System
+- **4 Distinct Realms:** Astral Sanctum, Shadow Nexus, Crystal Caverns, Void Between
 - **Portal Unlock System:** Layered conditions (level + gems + story choices)
 - **Exploration:** Discover gems, equipment, encounter enemies, gain XP
-- **Realm-specific loot:** Unique gems and equipment per realm
+- **Realm-specific loot tables**
 
-### Cosmic Gem & Relic System (NEW)
+### Cosmic Gem & Relic System
 - **15 Gem Types:** 6 Elemental, 6 Starseed (origin-specific), 3 Cosmic (legendary)
 - **Discovery Methods:** Exploration, boss drops, secret locations
 - **Gem Collection:** Per-character tracking with full catalog
 
-### Full RPG Equipment System (NEW)
+### Full RPG Equipment System
 - **4 Slots:** Weapon, Armor, Accessory, Talisman
-- **3 Equipment Sets:** Celestial Guardian, Void Walker, Starforged (2-piece and 4-piece set bonuses)
-- **16 Equipment Items:** Including 4 standalone legendaries
-- **Gem Sockets:** 1-3 sockets per item, socket/unsocket gems for bonus stats
-- **Enchanting:** 3 enchantment types (Fortify, Attune, Awaken) using gems as fuel
-- **Crafting:** 6 recipes to forge equipment and legendary gems from materials
+- **3 Equipment Sets:** Celestial Guardian, Void Walker, Starforged (2pc/4pc set bonuses)
+- **16 Equipment Items** including 4 standalone legendaries
+- **Gem Sockets:** 1-3 per item, socket/unsocket for bonus stats
+- **Enchanting:** Fortify, Attune, Awaken using gems as fuel
+- **Crafting:** 6 recipes (forge equipment and legendary gems from materials)
 
-### Spiritual Avatar Creator — Spore-Style (NEW)
+### Spiritual Avatar Creator — Spore-Style
 - **6-Step Builder:** Base Form, Aura, Cosmic Features, Markings, Accessories, Background
-- **48+ Customization Options:** 8 base forms, 8 auras, 12 cosmic features, 8 markings, 10 accessories, 8 backgrounds
-- **Multi-Select Categories:** Mix and match up to 3-4 traits per category
-- **Level-Gated Evolution:** Features unlock as character levels up (e.g., Third Eye at Lvl 3, Tentacles at Lvl 5)
-- **AI Render:** GPT Image 1 generates composite portrait from selections
-- **Profile Integration:** Generated avatar saved as profile picture across app
-- **Download:** Users can download their avatar as PNG
+- **48+ Customization Options** with multi-select categories
+- **Level-Gated Evolution:** Features unlock as character levels up
+- **AI Render:** GPT Image 1 composite portrait from selections
+- **Cinematic Generation Animation:** Multi-phase "transmitting to the cosmos" loading with particle convergence canvas
+- **Profile Integration:** Avatar saved as profile picture, downloadable as PNG
+
+### UI/UX Polish (Latest)
+- **Enhanced Typography Contrast:** Text shadows on wisdom quotes, lore text, and hero subtitle for readability at any brightness level
+- **Cinematic Loading States:** Multi-phase cosmic animation for avatar generation with progress bar, elapsed timer, and rotating phase messages
+- **Fluid Micro-Interactions:** Pulsing glow buttons, spring animations, selection glow effects, staggered reveals on discovery modals
+- **Glassmorphic Modals:** Exploration results with backdrop blur, radial glow, spring entrance animations
 
 ### Platform Features
 - Creator Dashboard, Live WebRTC, Production Console
@@ -81,28 +80,28 @@ A highly immersive full-stack wellness platform blending standard wellness track
 - Split-screen multitasking, Share functionality
 
 ## Routes
-- `/starseed-adventure` — CYOA RPG (with nav to Realm, Multiverse, Avatar Creator)
-- `/starseed-realm` — Multiplayer Realm (map, bosses, alliances, chat, leaderboard)
-- `/starseed-worlds` — Multiverse Realms (exploration, gems, equipment, crafting)
-- `/spiritual-avatar` — Spiritual Avatar Creator (Spore-style builder)
+- `/starseed-adventure` — CYOA RPG (nav to Realm, Multiverse, Avatar Creator)
+- `/starseed-realm` — Multiplayer Realm
+- `/starseed-worlds` — Multiverse (exploration, gems, equipment, crafting)
+- `/spiritual-avatar` — Spiritual Avatar Creator
 - `/bible` — Sacred Scriptures Library
 
 ## 3rd Party Integrations
-- OpenAI GPT-4o — Emergent LLM Key
-- OpenAI GPT Image 1 — Emergent LLM Key
-- OpenAI TTS (tts-1-hd) / Whisper STT — Emergent LLM Key
-- Sora 2 Video Generation — Emergent LLM Key
+- OpenAI GPT-4o, GPT Image 1, TTS/Whisper, Sora 2 — Emergent LLM Key
 - Stripe Payments — Emergent Environment Test Key
 
 ## Upcoming / Backlog
+- **P1:** Wire gem discoveries into single-player adventure story choices
+- **P1:** Integrate equipment stat bonuses into boss battle combat
 - **P1:** Starseed depth (more chapters, cross-origin unlockables)
 - **P2:** Mobile App Store scaffolding (Capacitor)
 - **P2:** VR Immersive modes completion
-- **P3:** Refactoring large files (StarseedAdventure.js, StarseedRealm.js, Bible.js)
+- **P2:** Avatar Showcase Gallery (community sharing + voting)
+- **P3:** Refactoring large files (StarseedAdventure.js, StarseedRealm.js)
 
 ## Test Reports
-- Iteration 113: Bible, Vision Mode, Immersion toggle
+- Iteration 117: Multiverse Realms + Spiritual Avatar Creator + Equipment System (100% pass)
+- Iteration 116: Alliance Chat + Boss Encounters (18/18 backend)
+- Iteration 115: Cosmic Realm (encounters, alliances, leaderboard)
 - Iteration 114: Dashboard Scripture, Starseed Adventure RPG
-- Iteration 115: Cosmic Realm (encounters, alliances, leaderboard, world events)
-- Iteration 116: Alliance Chat + Boss Encounters (18/18 backend, all frontend passed)
-- Iteration 117: Multiverse Realms + Spiritual Avatar Creator + Equipment System (20/20 backend, all frontend 100%)
+- Iteration 113: Bible, Vision Mode, Immersion toggle

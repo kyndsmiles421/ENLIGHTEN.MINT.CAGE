@@ -737,7 +737,7 @@ function WisdomSection({ dailyWisdom, navigate }) {
           <p className="text-xs font-bold uppercase tracking-[0.15em] mb-1.5" style={{ color: dailyWisdom.color }}>
             Daily Wisdom &middot; {dailyWisdom.teacher_name}
           </p>
-          <p className="text-sm italic leading-relaxed mb-2" style={{ color: 'var(--text-primary)' }}>"{dailyWisdom.quote}"</p>
+          <p className="text-sm italic leading-relaxed mb-2" style={{ color: '#F1F0F5', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>"{dailyWisdom.quote}"</p>
           <div className="flex items-center gap-2">
             <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: `${dailyWisdom.color}08`, color: dailyWisdom.color }}>{dailyWisdom.tradition}</span>
             <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{dailyWisdom.teaching_title}</span>
