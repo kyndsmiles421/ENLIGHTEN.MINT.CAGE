@@ -101,6 +101,7 @@ const NAV_CATEGORIES = [
       { path: '/soundscapes', label: 'Soundscapes', icon: Headphones },
       { path: '/music-lounge', label: 'Music Lounge', icon: Music },
       { path: '/dance-music', label: 'Dance & Music Studio', icon: Music },
+      { path: '/my-creations', label: 'My Creations', icon: Music },
       { path: '/frequencies', label: 'Frequencies', icon: Radio },
       { path: '/vr', label: 'VR Sanctuary', icon: Orbit },
       { path: '/journal', label: 'Journal', icon: BookOpen },

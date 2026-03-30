@@ -687,6 +687,16 @@ async def live_session_ws(websocket: WebSocket, session_id: str):
             elif msg_type == "ping":
                 await websocket.send_json({"type": "pong"})
 
+            elif msg_type == "mixer_sync":
+                # Host broadcasts their mixer state (visual layers, audio settings) to all participants
+                session = await db.live_sessions.find_one({"id": session_id}, {"_id": 0})
+                if session and session["host_id"] == user_id:
+                    await broadcast_to_session(session_id, {
+                        "type": "mixer_sync",
+                        "visual_layers": raw.get("visual_layers", []),
+                        "audio_state": raw.get("audio_state", {}),
+                    }, exclude_uid=user_id)
+
             # ─── WebRTC Signaling ───
 
             elif msg_type == "camera_toggle":

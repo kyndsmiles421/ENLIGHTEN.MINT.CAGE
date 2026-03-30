@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useVirtualBackground } from '../hooks/useVirtualBackground';
 import BackgroundPicker from '../components/BackgroundPicker';
+import FractalVisualizer from '../components/FractalVisualizer';
+import { LIGHT_MODES, VIDEO_OVERLAYS, FRACTAL_TYPES, VISUAL_FILTERS } from '../components/VisualLayersMixer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const WS_URL = `${process.env.REACT_APP_BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/api/live/ws`;
@@ -66,6 +68,8 @@ export default function LiveRoom() {
   const [showReactions, setShowReactions] = useState(false);
   const [floatingReactions, setFloatingReactions] = useState([]);
   const [hostCommand, setHostCommand] = useState(null);
+  const [liveMixerState, setLiveMixerState] = useState(null); // Received from host's mixer_sync
+  const [showLiveMixer, setShowLiveMixer] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [showParticipants, setShowParticipants] = useState(true);
 
@@ -172,6 +176,9 @@ export default function LiveRoom() {
           case 'host_command':
             setHostCommand(msg);
             setTimeout(() => setHostCommand(null), 5000);
+            break;
+          case 'mixer_sync':
+            setLiveMixerState(msg);
             break;
           case 'session_started':
             setSession(prev => prev ? { ...prev, status: 'active' } : prev);
@@ -697,6 +704,35 @@ export default function LiveRoom() {
 
       {/* Floating Reactions */}
       <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
+        {/* Host Mixer Visual Overlays (received via WebSocket) */}
+        {liveMixerState?.visual_layers?.filter(l => l.visible).map((layer, i) => {
+          if (layer.type === 'light') {
+            const mode = LIGHT_MODES.find(m => m.id === layer.itemId);
+            if (!mode) return null;
+            return (
+              <div key={`live-${layer.type}-${layer.itemId}-${i}`} className="absolute inset-0" style={{ opacity: (layer.opacity || 60) / 100 }}>
+                <LiveLightOverlay mode={mode} />
+              </div>
+            );
+          }
+          if (layer.type === 'video') {
+            const vid = VIDEO_OVERLAYS.find(v => v.id === layer.itemId);
+            if (!vid) return null;
+            return (
+              <div key={`live-${layer.type}-${layer.itemId}-${i}`} className="absolute inset-0 overflow-hidden" style={{ opacity: (layer.opacity || 40) / 100 }}>
+                <video src={vid.url} autoPlay loop muted playsInline className="w-full h-full object-cover" style={{ mixBlendMode: 'screen' }} />
+              </div>
+            );
+          }
+          if (layer.type === 'fractal') {
+            return (
+              <div key={`live-${layer.type}-${layer.itemId}-${i}`} className="absolute inset-0" style={{ opacity: (layer.opacity || 60) / 100 }}>
+                <FractalVisualizer type={layer.itemId} opacity={1} />
+              </div>
+            );
+          }
+          return null;
+        })}
         <AnimatePresence>
           {floatingReactions.map(r => (
             <motion.div key={r.id}
@@ -1358,5 +1394,22 @@ function SceneBackground({ session }) {
           }} />
       ))}
     </div>
+  );
+}
+
+
+function LiveLightOverlay({ mode }) {
+  const [idx, setIdx] = React.useState(0);
+  React.useEffect(() => {
+    const iv = setInterval(() => setIdx(i => (i + 1) % mode.colors.length), mode.speed);
+    return () => clearInterval(iv);
+  }, [mode]);
+  const c = mode.colors[idx];
+  const n = mode.colors[(idx + 1) % mode.colors.length];
+  return (
+    <div className="w-full h-full" style={{
+      background: `radial-gradient(ellipse at 50% 40%, ${c}55 0%, ${n}30 40%, transparent 75%)`,
+      transition: `background ${mode.speed / 1000}s ease-in-out`,
+    }} />
   );
 }

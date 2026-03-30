@@ -39,6 +39,8 @@ const SPLIT_PAGES = {
   '/zen-garden': { label: 'Zen Garden', color: '#86EFAC' },
   '/hooponopono': { label: "Ho'oponopono", color: '#22D3EE' },
   '/dance-music': { label: 'Dance & Music', color: '#F59E0B' },
+  '/media-library': { label: 'Media Library', color: '#C084FC' },
+  '/my-creations': { label: 'My Creations', color: '#C084FC' },
   '/light-therapy': { label: 'Light Therapy', color: '#A855F7' },
   '/cosmic-mixer': { label: 'Cosmic Mixer', color: '#EC4899' },
   '/videos': { label: 'Videos', color: '#F97316' },

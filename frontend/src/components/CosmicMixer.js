@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import {
   ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen,
   Vibrate, Play, Pause, Square, Loader2, Music, Film, Sliders, Maximize2, Minimize2,
-  Save, Heart, Globe, Lock, Trash2, Star, Users, Hexagon,
+  Save, Heart, Globe, Lock, Trash2, Star, Users, Hexagon, Circle, Radio, Library,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -159,6 +159,21 @@ export default function CosmicMixer() {
   const [saveDesc, setSaveDesc] = useState('');
   const [savePublic, setSavePublic] = useState(false);
   const authHeaders = user ? { Authorization: `Bearer ${localStorage.getItem('zen_token')}` } : {};
+
+  // Session Recording
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTimeline, setRecordingTimeline] = useState([]);
+  const [recordingElapsed, setRecordingElapsed] = useState(0);
+  const [showSaveRecording, setShowSaveRecording] = useState(false);
+  const [recordTitle, setRecordTitle] = useState('');
+  const [recordDesc, setRecordDesc] = useState('');
+  const [recordPublic, setRecordPublic] = useState(false);
+  const recordTimerRef = useRef(null);
+  const recordSnapshotRef = useRef(null);
+
+  // Live Session Broadcast Mode
+  const [broadcastMode, setBroadcastMode] = useState(false);
+  const broadcastWsRef = useRef(null);
 
   // Playlists
   const [showPlaylists, setShowPlaylists] = useState(false);
@@ -582,6 +597,90 @@ export default function CosmicMixer() {
     stopAll();
   }, [stopAll]);
 
+  // ─── Recording Engine ───
+  const getFullSnapshot = useCallback(() => {
+    return {
+      frequency: activeFreq ? { hz: activeFreq.hz, label: activeFreq.label } : null,
+      sound: activeSound ? { id: activeSound.id } : null,
+      drone: activeDrone ? { id: activeDrone.id } : null,
+      mantra: activeMantra ? { id: activeMantra.id } : null,
+      visualLayers: visualLayers.map(l => ({ type: l.type, itemId: l.itemId, opacity: l.opacity, visible: l.visible })),
+      volumes: { masterVol, freqVol, soundVol, mantraVol, droneVol },
+    };
+  }, [activeFreq, activeSound, activeDrone, activeMantra, visualLayers, masterVol, freqVol, soundVol, mantraVol, droneVol]);
+
+  const startRecording = useCallback(() => {
+    const snapshot = getFullSnapshot();
+    setRecordingTimeline([{ time_sec: 0, state: snapshot }]);
+    setRecordingElapsed(0);
+    setIsRecording(true);
+  }, [getFullSnapshot]);
+
+  const stopRecording = useCallback(() => {
+    setIsRecording(false);
+    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+    if (recordSnapshotRef.current) clearInterval(recordSnapshotRef.current);
+    setShowSaveRecording(true);
+  }, []);
+
+  // Recording timer + periodic snapshot capture
+  useEffect(() => {
+    if (!isRecording) return;
+    recordTimerRef.current = setInterval(() => {
+      setRecordingElapsed(prev => prev + 1);
+    }, 1000);
+    recordSnapshotRef.current = setInterval(() => {
+      const snapshot = getFullSnapshot();
+      setRecordingTimeline(prev => [...prev, { time_sec: prev.length > 0 ? prev[prev.length - 1].time_sec + 2 : 0, state: snapshot }]);
+    }, 2000); // Capture state every 2 seconds
+    return () => {
+      clearInterval(recordTimerRef.current);
+      clearInterval(recordSnapshotRef.current);
+    };
+  }, [isRecording, getFullSnapshot]);
+
+  const saveRecording = useCallback(async () => {
+    try {
+      await axios.post(`${API}/media-library`, {
+        title: recordTitle || 'Untitled Session',
+        description: recordDesc,
+        media_type: 'mix_recording',
+        duration_seconds: recordingElapsed,
+        timeline: recordingTimeline,
+        mixer_snapshot: recordingTimeline.length > 0 ? recordingTimeline[0].state : {},
+        thumbnail_layers: visualLayers.map(l => ({ type: l.type, itemId: l.itemId })),
+        is_public: recordPublic,
+        tags: [],
+      }, { headers: authHeaders });
+      setShowSaveRecording(false);
+      setRecordTitle('');
+      setRecordDesc('');
+      setRecordPublic(false);
+      setRecordingTimeline([]);
+    } catch {}
+  }, [recordTitle, recordDesc, recordPublic, recordingElapsed, recordingTimeline, visualLayers, authHeaders]);
+
+  // ─── Live Broadcast (send mixer state to live session participants) ───
+  const broadcastMixerState = useCallback(() => {
+    if (!broadcastMode || !broadcastWsRef.current) return;
+    try {
+      broadcastWsRef.current.send(JSON.stringify({
+        type: 'mixer_sync',
+        visual_layers: visualLayers.map(l => ({ type: l.type, itemId: l.itemId, opacity: l.opacity, visible: l.visible })),
+        audio_state: {
+          frequency: activeFreq ? { hz: activeFreq.hz, label: activeFreq.label } : null,
+          sound: activeSound ? { id: activeSound.id } : null,
+          drone: activeDrone ? { id: activeDrone.id } : null,
+        },
+      }));
+    } catch {}
+  }, [broadcastMode, visualLayers, activeFreq, activeSound, activeDrone]);
+
+  // Auto-broadcast when mixer state changes in broadcast mode
+  useEffect(() => {
+    if (broadcastMode) broadcastMixerState();
+  }, [broadcastMode, broadcastMixerState]);
+
   const hasActive = activeFreq || activeSound || activeMantra || activeDrone || vibeOn || visualLayers.length > 0;
   const activeCount = [activeFreq, activeSound, activeMantra, activeDrone, vibeOn].filter(Boolean).length + visualLayers.length;
 
@@ -699,6 +798,25 @@ export default function CosmicMixer() {
                   )}
                 </div>
                 <div className="flex items-center gap-1">
+                  {/* Record button */}
+                  {hasActive && !isRecording && (
+                    <button onClick={startRecording} className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors" style={{ color: 'var(--text-muted)' }} data-testid="mixer-record" title="Record Session">
+                      <Circle size={12} />
+                    </button>
+                  )}
+                  {isRecording && (
+                    <button onClick={stopRecording} className="p-1.5 rounded-lg transition-colors flex items-center gap-1" style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444' }} data-testid="mixer-stop-record" title="Stop Recording">
+                      <Circle size={10} className="fill-current animate-pulse" />
+                      <span className="text-[8px] tabular-nums">{Math.floor(recordingElapsed / 60)}:{String(recordingElapsed % 60).padStart(2, '0')}</span>
+                    </button>
+                  )}
+                  {/* Broadcast mode */}
+                  <button onClick={() => setBroadcastMode(b => !b)}
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ background: broadcastMode ? 'rgba(59,130,246,0.15)' : 'transparent', color: broadcastMode ? '#3B82F6' : 'var(--text-muted)' }}
+                    data-testid="mixer-broadcast" title={broadcastMode ? 'Broadcasting to Live Session' : 'Enable Live Broadcast'}>
+                    <Radio size={12} />
+                  </button>
                   {hasActive && (
                     <button onClick={stopAll} className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors" style={{ color: '#EF4444' }} data-testid="mixer-stop-all" title="Stop All">
                       <Square size={12} />
@@ -758,6 +876,12 @@ export default function CosmicMixer() {
                       <Save size={10} /> Save Mix
                     </button>
                   )}
+                  <a href="/my-creations"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-[1.02]"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-muted)', textDecoration: 'none' }}
+                    data-testid="library-link">
+                    <Library size={10} /> My Library
+                  </a>
                 </div>
 
                 {/* Presets Browser */}
@@ -845,6 +969,50 @@ export default function CosmicMixer() {
                               style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.25)', color: '#22C55E' }}
                               data-testid="save-preset-submit">
                               <Save size={10} className="inline mr-1" /> Save
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Save Recording Modal */}
+                <AnimatePresence>
+                  {showSaveRecording && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden">
+                      <div className="rounded-xl p-4 mb-2" style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.1)' }}
+                        data-testid="save-recording-form">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#EF4444' }}>Save Recording to Library</p>
+                        <p className="text-[8px] mb-3" style={{ color: 'var(--text-muted)' }}>
+                          {Math.floor(recordingElapsed / 60)}:{String(recordingElapsed % 60).padStart(2, '0')} recorded
+                          — {recordingTimeline.length} snapshots captured
+                        </p>
+                        <input type="text" placeholder="Title..." value={recordTitle} onChange={e => setRecordTitle(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg text-xs mb-2 outline-none"
+                          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }}
+                          data-testid="record-title" />
+                        <input type="text" placeholder="Description (optional)..." value={recordDesc} onChange={e => setRecordDesc(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg text-xs mb-3 outline-none"
+                          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }}
+                          data-testid="record-desc" />
+                        <div className="flex items-center justify-between">
+                          <button onClick={() => setRecordPublic(v => !v)}
+                            className="flex items-center gap-1.5 text-[10px] px-2.5 py-1.5 rounded-lg transition-all"
+                            style={{ background: recordPublic ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${recordPublic ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.05)'}`, color: recordPublic ? '#3B82F6' : 'var(--text-muted)' }}
+                            data-testid="record-public-toggle">
+                            {recordPublic ? <Globe size={10} /> : <Lock size={10} />}
+                            {recordPublic ? 'Share with Community' : 'Private'}
+                          </button>
+                          <div className="flex gap-1.5">
+                            <button onClick={() => { setShowSaveRecording(false); setRecordingTimeline([]); }}
+                              className="px-3 py-1.5 rounded-lg text-[10px]" style={{ color: 'var(--text-muted)' }}>Discard</button>
+                            <button onClick={saveRecording}
+                              className="px-4 py-1.5 rounded-lg text-[10px] font-medium"
+                              style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.25)', color: '#EF4444' }}
+                              data-testid="record-save-submit">
+                              <Save size={10} className="inline mr-1" /> Save to Library
                             </button>
                           </div>
                         </div>

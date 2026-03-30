@@ -68,6 +68,7 @@ from routes.creator import router as creator_router
 from routes.live import router as live_router
 from routes.music_studio import router as music_studio_router
 from routes.mixer_presets import router as mixer_presets_router
+from routes.media_library import router as media_library_router
 
 app = FastAPI()
 
@@ -103,6 +104,7 @@ all_routers = [
     live_router,
     music_studio_router,
     mixer_presets_router,
+    media_library_router,
 ]
 
 for r in all_routers:
