@@ -13,37 +13,41 @@ A highly immersive full-stack wellness platform blending standard wellness track
 ## Core Features Implemented
 
 ### Wellness & Practice
-- Mood tracking, Journaling, Breathing exercises, Meditation, Yoga
-- Quantum Coherence, Sleep tracking, Gratitude journal
-- Acupressure, Energy healing, Reiki
-- Nutrition tracking, Recipe finder, Herbal remedies
+- Mood tracking, Journaling, Breathing, Meditation, Yoga, Quantum Coherence
+- Sleep tracking, Gratitude journal, Acupressure, Energy healing, Reiki
+- Nutrition tracking, Recipes, Herbal remedies
 
 ### Divination & Spirituality
-- Oracle/Tarot, Rune casting, I-Ching, Numerology, Palmistry
-- Crystal ball, Pendulum, Animal totems, Creation stories (120+)
-- 3D Star Chart with AI astrology readings
+- Oracle/Tarot, Runes, I-Ching, Numerology, Palmistry, Crystal ball, Pendulum
+- Animal totems, Creation stories (120+), 3D Star Chart with AI astrology
 
 ### Sacred Scriptures Library (136 books)
 - Bible (66), Quran (114), Torah (5), Kabbalah (2+), Lost Books (50+)
-- AI chapter summaries, Vision Mode (canvas scene recreations)
-- Guided Scripture Journeys (cross-tradition reading paths)
+- AI chapter summaries, Vision Mode, Guided Scripture Journeys
+- Dashboard: chapters read, journeys, continue reading, smart suggestions
 
 ### Starseed Choose Your Own Adventure RPG
 - 6 Origins: Pleiadian, Sirian, Arcturian, Lyran, Andromedan, Orion
 - AI branching narrative (GPT-4o), RPG stats, XP/leveling, achievements
 - AI-generated scene artwork (GPT Image 1)
-- Cinematic cosmic canvas background (stars, nebulas, shooting stars)
-- Routes: `/starseed-adventure`
+- Cinematic cosmic canvas (stars, nebulas, shooting stars)
 
-### Cosmic Realm — Multiplayer System *(NEW)*
-- **Live Star Map** — Canvas-rendered constellation showing active player nodes
-- **Cross-Path Encounters** — AI-generated shared scenes when two starseeds meet
-- **NPC Encounters** — When no other players online, encounter named AI characters
-- **World Events** — 7 rotating cosmic events every 6 hours with stat bonuses
-- **Leaderboard** — Top players ranked by level with crown badges
-- **Alliance System** — Create/join cosmic alliances (max 6 members)
-- **Encounter History** — Track past encounters and achievements
-- Routes: `/starseed-realm`
+### Cosmic Realm — Multiplayer System
+- **Live Star Map** — Canvas constellation with active player nodes
+- **Cross-Path Encounters** — AI-generated shared scenes
+- **NPC Encounters** — Named AI characters when no players online
+- **World Events** — 7 rotating events every 6 hours with stat bonuses
+- **Leaderboard** — Top players ranked by level with crowns
+- **Alliance System** — Create/join (max 6 members)
+- **Alliance Chat** — In-character messaging for alliance members *(NEW)*
+- **Cooperative Boss Encounters** — 5 cosmic bosses, 3-phase battles *(NEW)*
+  - The Void Leviathan (Epic, HP:300, Void)
+  - The Entropy Weaver (Legendary, HP:400, Chaos)
+  - The Fallen Archon (Epic, HP:350, Crystal-Shadow)
+  - The Dream Parasite (Hard, HP:250, Psychic)
+  - Zar'ghul the Star Devourer (Legendary, HP:450, Fire-Void)
+  - Weakness/resistance system (1.5x/0.6x damage)
+  - NPC allies for solo play, XP rewards, achievements
 
 ### Platform Features
 - Creator Dashboard, Live WebRTC, Production Console
@@ -52,30 +56,26 @@ A highly immersive full-stack wellness platform blending standard wellness track
 - Global Immersion Level toggle (Calm/Standard/Full)
 - Split-screen multitasking, Share functionality
 
-### Dashboard Integration
-- Sacred Scriptures section with chapters/journeys stats, continue reading
-- Smart suggestions engine with scripture and journey recommendations
-- Starseed Adventure + Cosmic Realm shortcuts in Explore grid
+## Routes
+- `/starseed-adventure` — CYOA RPG
+- `/starseed-realm` — Multiplayer Realm (map, bosses, alliances, chat, leaderboard)
+- `/bible` — Sacred Scriptures Library
 
 ## 3rd Party Integrations
 - OpenAI GPT-4o — Emergent LLM Key
-- OpenAI TTS (tts-1-hd) / Whisper STT — Emergent LLM Key
 - OpenAI GPT Image 1 — Emergent LLM Key
+- OpenAI TTS (tts-1-hd) / Whisper STT — Emergent LLM Key
 - Sora 2 Video Generation — Emergent LLM Key
 - Stripe Payments — Emergent Environment Test Key
 
-## Key Architecture
-- Immersion Levels: Visual effects MUST check `useSensory()` values
-- AI Text: Bible reader expects markdown headers
-- Sacred Scriptures: `/bible` route, Starseed: `/starseed-adventure`, Realm: `/starseed-realm`
-
 ## Upcoming / Backlog
-- **P1:** Starseed enhancements (more chapters, cross-origin interactions)
+- **P1:** Starseed depth (more chapters, cross-origin unlockables)
 - **P2:** Mobile App Store scaffolding (Capacitor)
 - **P2:** VR Immersive modes completion
-- **P2:** Refactoring Bible.js, CosmicMixer.js
+- **P3:** Refactoring Bible.js, CosmicMixer.js
 
 ## Test Reports
 - Iteration 113: Bible, Vision Mode, Immersion toggle
-- Iteration 114: Dashboard Scripture integration, Starseed Adventure RPG
-- Iteration 115: Cosmic Realm multiplayer (encounters, alliances, leaderboard, world events)
+- Iteration 114: Dashboard Scripture, Starseed Adventure RPG
+- Iteration 115: Cosmic Realm (encounters, alliances, leaderboard, world events)
+- Iteration 116: Alliance Chat + Boss Encounters (18/18 backend, all frontend passed)
