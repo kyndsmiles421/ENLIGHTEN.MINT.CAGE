@@ -9,8 +9,9 @@ import {
   Star, Users, Trophy, Swords, Shield, Heart, Eye, Brain,
   ChevronRight, Loader2, Sparkles, Zap, Globe, Crown,
   ArrowLeft, Plus, Clock, Flame, UserPlus, Send, Skull,
-  Target, AlertTriangle, MessageCircle
+  Target, AlertTriangle, MessageCircle, Package
 } from 'lucide-react';
+import { LootDropReveal, AvatarBadge } from '../components/StarseedInventory';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -456,6 +457,7 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
   const [bosses, setBosses] = useState([]);
   const [activeBattle, setActiveBattle] = useState(null);
   const [battleResult, setBattleResult] = useState(null);
+  const [lootDrop, setLootDrop] = useState(null);
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
 
@@ -494,6 +496,9 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
       if (res.data.battle_over) {
         setBattleResult(res.data);
         setActiveBattle(null);
+        if (res.data.boss_defeated && res.data.reward?.loot_drop) {
+          setLootDrop(res.data.reward.loot_drop);
+        }
       } else {
         setActiveBattle(prev => ({
           ...prev,

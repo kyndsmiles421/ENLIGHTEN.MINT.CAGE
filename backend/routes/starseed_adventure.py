@@ -437,3 +437,209 @@ async def generate_scene_image(data: dict = Body(...), user=Depends(get_current_
         logger.error(f"Starseed image gen error: {e}")
         bgs = ORIGIN_BACKGROUNDS.get(origin_id, ORIGIN_BACKGROUNDS["pleiadian"])
         return {"image_url": random.choice(bgs), "image_base64": None}
+
+
+# ─── Loot System ───
+
+BOSS_LOOT_TABLES = {
+    "void-leviathan": [
+        {"id": "void-shard", "name": "Void Shard", "rarity": "epic", "color": "#6366F1", "icon": "crystal", "stat_bonus": {"resilience": 2}, "desc": "A fragment of compressed nothingness. Pulses with anti-light."},
+        {"id": "leviathan-scale", "name": "Leviathan Scale", "rarity": "rare", "color": "#818CF8", "icon": "shield", "stat_bonus": {"courage": 1}, "desc": "An impossibly dark scale from the beast's hide."},
+        {"id": "abyssal-eye", "name": "Abyssal Eye", "rarity": "legendary", "color": "#4F46E5", "icon": "eye", "stat_bonus": {"intuition": 3}, "desc": "The Leviathan's severed eye. It still sees into the void."},
+    ],
+    "entropy-weaver": [
+        {"id": "chaos-thread", "name": "Chaos Thread", "rarity": "epic", "color": "#DC2626", "icon": "flame", "stat_bonus": {"wisdom": 2}, "desc": "A strand of unraveled reality. Handle with extreme caution."},
+        {"id": "entropy-crystal", "name": "Entropy Crystal", "rarity": "rare", "color": "#EF4444", "icon": "crystal", "stat_bonus": {"resilience": 1}, "desc": "Crystallized chaos energy. Time flows differently near it."},
+        {"id": "weavers-loom", "name": "Weaver's Loom", "rarity": "legendary", "color": "#B91C1C", "icon": "star", "stat_bonus": {"wisdom": 2, "intuition": 2}, "desc": "The tool that unravels dimensions. Now yours to command."},
+    ],
+    "fallen-archon": [
+        {"id": "fractured-prism", "name": "Fractured Prism", "rarity": "epic", "color": "#A855F7", "icon": "crystal", "stat_bonus": {"intuition": 2}, "desc": "A shard of the Archon's crystalline core, half-light, half-shadow."},
+        {"id": "grid-key", "name": "Grid Key Fragment", "rarity": "rare", "color": "#C084FC", "icon": "key", "stat_bonus": {"wisdom": 1}, "desc": "Part of the key to the Arcturian dimensional gateway."},
+        {"id": "archons-crown", "name": "Archon's Crown", "rarity": "legendary", "color": "#7C3AED", "icon": "crown", "stat_bonus": {"wisdom": 3, "courage": 1}, "desc": "The crown of the fallen guardian. It hums with ancient authority."},
+    ],
+    "dream-parasite": [
+        {"id": "lucid-gem", "name": "Lucid Gem", "rarity": "epic", "color": "#EC4899", "icon": "crystal", "stat_bonus": {"compassion": 2}, "desc": "A gem that reveals truth in any illusion."},
+        {"id": "dream-catcher", "name": "Psychic Dream Catcher", "rarity": "rare", "color": "#F472B6", "icon": "shield", "stat_bonus": {"intuition": 1}, "desc": "Woven from the Parasite's own psychic threads."},
+        {"id": "parasites-heart", "name": "Parasite's Heart", "rarity": "legendary", "color": "#BE185D", "icon": "heart", "stat_bonus": {"compassion": 2, "resilience": 2}, "desc": "The core of the psychic entity. It still beats with stolen dreams."},
+    ],
+    "star-devourer": [
+        {"id": "dragon-fang", "name": "Zar'ghul's Fang", "rarity": "epic", "color": "#F59E0B", "icon": "sword", "stat_bonus": {"courage": 2}, "desc": "A fang torn from the Star Devourer. Burns eternally."},
+        {"id": "stellar-core", "name": "Consumed Stellar Core", "rarity": "rare", "color": "#D97706", "icon": "flame", "stat_bonus": {"resilience": 1}, "desc": "The compressed heart of a devoured star."},
+        {"id": "devourers-eye", "name": "Devourer's Third Eye", "rarity": "legendary", "color": "#B45309", "icon": "eye", "stat_bonus": {"courage": 2, "wisdom": 2}, "desc": "The eye that can see across dimensions. It chose you."},
+    ],
+}
+
+RARITY_CONFIG = {
+    "common": {"color": "#9CA3AF", "chance": 0.0},
+    "rare": {"color": "#38BDF8", "chance": 0.45},
+    "epic": {"color": "#A855F7", "chance": 0.40},
+    "legendary": {"color": "#FCD34D", "chance": 0.15},
+}
+
+
+def roll_loot(boss_id):
+    """Roll for loot drops from a boss."""
+    table = BOSS_LOOT_TABLES.get(boss_id, [])
+    if not table:
+        return None
+
+    roll = random.random()
+    # Always drop something on boss kill
+    if roll < RARITY_CONFIG["legendary"]["chance"]:
+        candidates = [i for i in table if i["rarity"] == "legendary"]
+    elif roll < RARITY_CONFIG["legendary"]["chance"] + RARITY_CONFIG["epic"]["chance"]:
+        candidates = [i for i in table if i["rarity"] == "epic"]
+    else:
+        candidates = [i for i in table if i["rarity"] == "rare"]
+
+    if candidates:
+        return random.choice(candidates)
+    return random.choice(table)
+
+
+@router.get("/starseed/inventory/{origin_id}")
+async def get_inventory(origin_id: str, user=Depends(get_current_user)):
+    """Get character's inventory."""
+    char = await db.starseed_characters.find_one(
+        {"user_id": user["id"], "origin_id": origin_id},
+        {"_id": 0, "inventory": 1, "equipped": 1},
+    )
+    if not char:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return {
+        "inventory": char.get("inventory", []),
+        "equipped": char.get("equipped", []),
+    }
+
+
+@router.post("/starseed/inventory/equip")
+async def equip_item(data: dict = Body(...), user=Depends(get_current_user)):
+    """Equip an item (max 3 equipped)."""
+    uid = user["id"]
+    origin_id = data.get("origin_id")
+    item_id = data.get("item_id")
+
+    char = await db.starseed_characters.find_one(
+        {"user_id": uid, "origin_id": origin_id}, {"_id": 0}
+    )
+    if not char:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    inventory = char.get("inventory", [])
+    equipped = char.get("equipped", [])
+
+    item = next((i for i in inventory if i["id"] == item_id), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not in inventory")
+
+    if item_id in equipped:
+        equipped.remove(item_id)
+    else:
+        if len(equipped) >= 3:
+            equipped.pop(0)
+        equipped.append(item_id)
+
+    # Recalculate stat bonuses from equipped items
+    equip_bonus = {}
+    for eid in equipped:
+        eq_item = next((i for i in inventory if i["id"] == eid), None)
+        if eq_item:
+            for stat, val in eq_item.get("stat_bonus", {}).items():
+                equip_bonus[stat] = equip_bonus.get(stat, 0) + val
+
+    await db.starseed_characters.update_one(
+        {"user_id": uid, "origin_id": origin_id},
+        {"$set": {"equipped": equipped, "equip_bonus": equip_bonus}},
+    )
+    return {"equipped": equipped, "equip_bonus": equip_bonus}
+
+
+@router.get("/starseed/loot-table/{boss_id}")
+async def get_loot_table(boss_id: str):
+    """Get possible loot drops for a boss."""
+    table = BOSS_LOOT_TABLES.get(boss_id, [])
+    if not table:
+        raise HTTPException(status_code=404, detail="Boss not found")
+    return {"loot": table}
+
+
+# ─── Avatar System ───
+
+ORIGIN_AVATAR_STYLES = {
+    "pleiadian": "luminous ethereal being with pale violet skin, glowing eyes, flowing crystalline robes, soft light emanating from within, seven stars in the background",
+    "sirian": "aquatic-featured being with blue-silver skin, bioluminescent markings, fluid armor that looks like living water, the Dog Star shining behind them",
+    "arcturian": "geometric light-being with translucent crystalline form, sacred geometry patterns flowing through their body, sharp precise features, gateway of light behind them",
+    "lyran": "powerful warrior with golden-bronze skin, lion-like features, fire-element armor, fierce confident eyes, the forge of Vega burning in the background",
+    "andromedan": "tall slender being with deep blue skin, telepathic aura visible as shimmering field, flowing robes that blend into space itself, Andromeda galaxy spiral behind them",
+    "orion": "dual-natured warrior with half-light half-shadow appearance, battle-scarred armor, intense eyes that glow red and gold, Orion's belt visible behind them",
+}
+
+
+@router.post("/starseed/avatar/generate")
+async def generate_avatar(data: dict = Body(...), user=Depends(get_current_user)):
+    """Generate an AI avatar for a character."""
+    uid = user["id"]
+    origin_id = data.get("origin_id")
+    custom_description = data.get("description", "")
+
+    char = await db.starseed_characters.find_one(
+        {"user_id": uid, "origin_id": origin_id}, {"_id": 0}
+    )
+    if not char:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    origin = next((o for o in STARSEED_ORIGINS if o["id"] == origin_id), None)
+    if not origin:
+        raise HTTPException(status_code=400, detail="Invalid origin")
+
+    base_style = ORIGIN_AVATAR_STYLES.get(origin_id, "cosmic being of light")
+    name = char.get("character_name", "Traveler")
+
+    if custom_description:
+        prompt = f"Portrait of {name}, a {origin['name']} starseed: {custom_description}. Cosmic fantasy art style, dramatic lighting, deep space background with {origin['star_system']} visible. Painted portrait, no text, no words. Square format, head and shoulders portrait."
+    else:
+        prompt = f"Portrait of {name}, a {origin['name']} starseed from {origin['star_system']}. {base_style}. Cosmic fantasy art style, dramatic lighting. Painted portrait, no text, no words. Square format, head and shoulders portrait."
+
+    try:
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await asyncio.wait_for(
+            image_gen.generate_images(
+                prompt=prompt,
+                model="gpt-image-1",
+                number_of_images=1,
+            ),
+            timeout=45,
+        )
+        if images and len(images) > 0:
+            avatar_b64 = base64.b64encode(images[0]).decode("utf-8")
+
+            await db.starseed_characters.update_one(
+                {"user_id": uid, "origin_id": origin_id},
+                {"$set": {
+                    "avatar_base64": avatar_b64,
+                    "avatar_prompt": custom_description or "default",
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }},
+            )
+            return {"avatar_base64": avatar_b64}
+        raise HTTPException(status_code=500, detail="Image generation returned no results")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Avatar gen error: {e}")
+        raise HTTPException(status_code=500, detail="Avatar generation failed. Try again.")
+
+
+@router.get("/starseed/avatar/{origin_id}")
+async def get_avatar(origin_id: str, user=Depends(get_current_user)):
+    """Get character's avatar."""
+    char = await db.starseed_characters.find_one(
+        {"user_id": user["id"], "origin_id": origin_id},
+        {"_id": 0, "avatar_base64": 1, "avatar_prompt": 1},
+    )
+    if not char:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return {
+        "avatar_base64": char.get("avatar_base64"),
+        "avatar_prompt": char.get("avatar_prompt"),
+    }

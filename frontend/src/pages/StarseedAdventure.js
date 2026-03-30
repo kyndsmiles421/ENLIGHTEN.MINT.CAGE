@@ -8,8 +8,9 @@ import { useSensory } from '../context/SensoryContext';
 import {
   ArrowLeft, Sparkles, Star, Shield, Heart, Eye, Flame,
   ChevronRight, Loader2, Trophy, Zap, Swords,
-  Brain, ChevronDown, Globe
+  Brain, ChevronDown, Globe, Package, User
 } from 'lucide-react';
+import { InventoryPanel, AvatarGenerator, AvatarBadge } from '../components/StarseedInventory';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -183,9 +184,10 @@ function XPBar({ xp, xpToNext, level }) {
 }
 
 /* ─── Character Select ─── */
-function CharacterSelect({ origins, existingCharacters, onSelect, onResume, loading }) {
+function CharacterSelect({ origins, existingCharacters, onSelect, onResume, loading, authHeaders }) {
   const [selected, setSelected] = useState(null);
   const [charName, setCharName] = useState('');
+  const [expandedChar, setExpandedChar] = useState(null);
   const { reduceMotion } = useSensory();
 
   return (
@@ -232,20 +234,16 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
             {existingCharacters.map((ch, i) => {
               const origin = origins.find(o => o.id === ch.origin_id);
               if (!origin) return null;
+              const isExpanded = expandedChar === ch.origin_id;
               return (
-                <motion.button key={ch.id} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.06 }}
-                  onClick={() => onResume(ch.origin_id)}
-                  disabled={loading}
-                  className="relative overflow-hidden rounded-2xl p-4 text-left group transition-all hover:scale-[1.02] border"
-                  style={{ background: `linear-gradient(135deg, ${origin.color}08, rgba(0,0,0,0.3))`, borderColor: `${origin.color}20` }}
-                  data-testid={`continue-${ch.origin_id}`}>
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: `radial-gradient(ellipse at 30% 50%, ${origin.color}15, transparent 70%)` }} />
-                  <div className="relative flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{ background: `${origin.color}15`, border: `1px solid ${origin.color}25` }}>
-                      <Star size={20} style={{ color: origin.color }} />
-                    </div>
+                <motion.div key={ch.id} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.06 }}
+                  className="relative overflow-hidden rounded-2xl border transition-all"
+                  style={{ background: `linear-gradient(135deg, ${origin.color}08, rgba(0,0,0,0.3))`, borderColor: `${origin.color}20` }}>
+                  <button
+                    onClick={() => setExpandedChar(isExpanded ? null : ch.origin_id)}
+                    className="w-full p-4 text-left flex items-center gap-3"
+                    data-testid={`continue-${ch.origin_id}`}>
+                    <AvatarBadge originId={ch.origin_id} authHeaders={authHeaders} size={40} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium" style={{ color: origin.color }}>{ch.character_name}</p>
                       <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{origin.name} &middot; {origin.star_system}</p>
@@ -254,11 +252,38 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
                           Lvl {ch.level}
                         </span>
                         <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Ch.{ch.chapter} &middot; Scene {ch.scene}</span>
+                        {(ch.inventory?.length || 0) > 0 && (
+                          <span className="text-[9px] flex items-center gap-0.5" style={{ color: '#A855F7' }}>
+                            <Package size={8} /> {ch.inventory.length}
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <ChevronRight size={16} className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all" style={{ color: origin.color }} />
-                  </div>
-                </motion.button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button onClick={(e) => { e.stopPropagation(); onResume(ch.origin_id); }}
+                        className="text-[9px] px-3 py-1.5 rounded-lg font-medium transition-all hover:scale-105"
+                        style={{ background: `${origin.color}15`, color: origin.color, border: `1px solid ${origin.color}25` }}>
+                        Play
+                      </button>
+                      <ChevronDown size={14} style={{ color: origin.color, opacity: 0.5, transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                    </div>
+                  </button>
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden">
+                        <div className="px-4 pb-4 space-y-4" style={{ borderTop: `1px solid ${origin.color}10` }}>
+                          <div className="pt-3">
+                            <AvatarGenerator originId={ch.origin_id} authHeaders={authHeaders} />
+                          </div>
+                          <InventoryPanel originId={ch.origin_id} authHeaders={authHeaders} compact />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
               );
             })}
           </div>
@@ -807,6 +832,7 @@ export default function StarseedAdventure() {
                   onSelect={startNewAdventure}
                   onResume={resumeAdventure}
                   loading={loading}
+                  authHeaders={authHeaders}
                 />
               </motion.div>
             ) : (

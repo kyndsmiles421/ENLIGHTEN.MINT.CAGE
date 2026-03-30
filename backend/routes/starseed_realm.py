@@ -984,17 +984,32 @@ async def boss_action(data: dict = Body(...), user=Depends(get_current_user)):
                     new_achievements.append({"id": "boss_slayer", "title": "Boss Slayer", "desc": f"Defeated {battle.get('boss_name')}"})
 
                 stats = char.get("stats", {})
+                loot_drop = None
                 if boss_defeated:
                     for stat in stats:
                         stats[stat] = min(15, stats[stat] + 1)
+                    # Roll for loot
+                    from routes.starseed_adventure import roll_loot
+                    loot_drop = roll_loot(battle.get("boss_id"))
+                    if loot_drop:
+                        inventory = char.get("inventory", [])
+                        # Don't add duplicate
+                        if not any(i["id"] == loot_drop["id"] for i in inventory):
+                            inventory.append(loot_drop)
+
+                update_fields = {
+                    "xp": new_xp, "level": new_level, "xp_to_next": xp_to_next,
+                    "stats": stats, "achievements": achievements,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }
+                if loot_drop:
+                    update_fields["inventory"] = char.get("inventory", [])
+                    if not any(i["id"] == loot_drop["id"] for i in update_fields["inventory"]):
+                        update_fields["inventory"].append(loot_drop)
 
                 await db.starseed_characters.update_one(
                     {"user_id": uid, "origin_id": origin_id},
-                    {"$set": {
-                        "xp": new_xp, "level": new_level, "xp_to_next": xp_to_next,
-                        "stats": stats, "achievements": achievements,
-                        "updated_at": datetime.now(timezone.utc).isoformat(),
-                    }},
+                    {"$set": update_fields},
                 )
 
                 update["reward"] = {
@@ -1003,6 +1018,7 @@ async def boss_action(data: dict = Body(...), user=Depends(get_current_user)):
                     "new_level": new_level,
                     "new_achievements": new_achievements,
                     "stat_bonus": "+1 all stats" if boss_defeated else None,
+                    "loot_drop": loot_drop,
                 }
 
     await db.starseed_boss_battles.update_one({"id": battle_id}, {"$set": update})
