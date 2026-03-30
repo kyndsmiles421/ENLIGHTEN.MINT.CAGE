@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 import math
+import asyncio
+import uuid
 
 router = APIRouter(prefix="/harmonics", tags=["harmonics"])
 
@@ -185,4 +188,72 @@ async def get_atmosphere():
         "moon_phase": moon["phase"],
         "moon_illumination": moon["illumination"],
         **guidance["atmosphere"],
+    }
+
+
+@router.get("/affirmation")
+async def get_personalized_affirmation(user=Depends(get_current_user)):
+    """Generate AI affirmation based on mood trends + celestial alignment."""
+    uid = user["id"]
+    moon = get_moon_phase()
+    zodiac = get_zodiac_transit()
+    guidance = PHASE_GUIDANCE.get(moon["phase_id"], PHASE_GUIDANCE["new"])
+
+    # Gather last 7 days of mood + journal data
+    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    recent_moods = await db.moods.find(
+        {"user_id": uid, "created_at": {"$gte": week_ago.isoformat()}},
+        {"_id": 0, "mood": 1, "energy": 1}
+    ).sort("created_at", -1).to_list(20)
+
+    recent_journals = await db.journals.find(
+        {"user_id": uid, "created_at": {"$gte": week_ago.isoformat()}},
+        {"_id": 0, "content": 1, "mood": 1}
+    ).sort("created_at", -1).to_list(5)
+
+    mood_list = [m.get("mood", "") for m in recent_moods if m.get("mood")]
+    energy_list = [m.get("energy", 0) for m in recent_moods if m.get("energy")]
+    journal_snippets = [j.get("content", "")[:100] for j in recent_journals if j.get("content")]
+
+    mood_summary = ", ".join(mood_list[:8]) if mood_list else "no recent moods recorded"
+    avg_energy = round(sum(energy_list) / len(energy_list), 1) if energy_list else None
+    journal_summary = " | ".join(journal_snippets[:3]) if journal_snippets else ""
+
+    # Build the affirmation
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"affirmation-{uuid.uuid4()}",
+            system_message=(
+                "You are a celestial wisdom guide for The Cosmic Collective. "
+                "Generate a deeply personal, spiritually resonant affirmation (2-3 sentences). "
+                "Weave together the person's emotional patterns, the current moon phase, and zodiac transit. "
+                "Be warm, specific, and empowering. Do NOT use generic platitudes. "
+                "Speak as if the cosmos is addressing them directly."
+            )
+        )
+        prompt = (
+            f"Generate a personalized affirmation for someone with these recent moods: {mood_summary}. "
+            f"{'Average energy level: ' + str(avg_energy) + '/10. ' if avg_energy else ''}"
+            f"{'Recent journal themes: ' + journal_summary + '. ' if journal_summary else ''}"
+            f"Current moon: {moon['phase']} ({moon['illumination']*100:.0f}% illumination). "
+            f"Zodiac transit: {zodiac['sign']} ({zodiac['element']}), theme: {zodiac['theme']}. "
+            f"Cosmic energy: {guidance['energy']}. Affirmation seed: {guidance['affirmation_seed']}."
+        )
+        response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=20)
+        affirmation_text = response
+    except Exception as e:
+        logger.error(f"Affirmation AI error: {e}")
+        # Fallback: use the seed directly
+        seed = guidance["affirmation_seed"]
+        affirmation_text = f"Under the {moon['phase']}, the {zodiac['sign']} energy guides you toward {seed}. Trust this cosmic rhythm."
+
+    return {
+        "affirmation": affirmation_text,
+        "moon_phase": moon["phase"],
+        "zodiac": zodiac["sign"],
+        "energy_type": guidance["energy"],
+        "mood_trend": mood_summary,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
     }

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio, ChevronDown,
-  Play, Pause, Square, Loader2, X
+  Play, Pause, Square, Loader2, X, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
@@ -459,11 +459,46 @@ export default function CosmicMixerPage() {
   const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   // ─── Collapsible accordion state ───
-  const [openSections, setOpenSections] = useState({ freq: true, sound: false, drone: false, mantra: false, light: false, haptic: false, tempo: false, session: false });
+  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, light: false, haptic: false, tempo: false, session: false });
   const toggleSection = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
 
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra || activeLight || vibeOn;
   const activeCount = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0) + (activeLight ? 1 : 0) + (vibeOn ? 1 : 0);
+
+  const [activeMoodPreset, setActiveMoodPreset] = useState(null);
+  const MOOD_PRESETS = [
+    { id: 'deep-sleep', label: 'Deep Sleep', desc: '174Hz + Ocean Waves', color: '#6366F1', freq: 174, sound: 'ocean', bpm: 50, light: 'calm-blue' },
+    { id: 'focus-flow', label: 'Focus Flow', desc: '396Hz + Rain', color: '#22C55E', freq: 396, sound: 'rain', bpm: 72, light: 'healing-green' },
+    { id: 'active-refinement', label: 'Active Refinement', desc: '417Hz + Forest', color: '#2DD4BF', freq: 417, sound: 'forest', bpm: 90, light: 'aurora' },
+    { id: 'heart-opening', label: 'Heart Opening', desc: '528Hz + Singing Bowl', color: '#EC4899', freq: 528, sound: 'singing-bowl', bpm: 60, light: 'violet-flame' },
+    { id: 'cosmic-download', label: 'Cosmic Download', desc: '963Hz + Night Sky', color: '#A855F7', freq: 963, sound: 'night', bpm: 40, light: 'golden' },
+  ];
+
+  const activateMoodPreset = useCallback(async (preset) => {
+    if (activeMoodPreset?.id === preset.id) {
+      stopAll();
+      stopTempo();
+      setActiveMoodPreset(null);
+      return;
+    }
+    stopAll();
+    setActiveMoodPreset(preset);
+
+    // Activate frequency
+    const freqObj = allFrequencies.find(f => f.hz === preset.freq) || { hz: preset.freq };
+    await toggleFreq(freqObj);
+
+    // Activate sound
+    const soundObj = SOUNDS.find(s => s.id === preset.sound);
+    if (soundObj) await toggleSound(soundObj);
+
+    // Set BPM
+    setBpm(preset.bpm);
+
+    // Set light mode
+    const lightObj = LIGHT_MODES.find(l => l.id === preset.light);
+    if (lightObj) setActiveLight(lightObj);
+  }, [activeMoodPreset, allFrequencies, stopAll, stopTempo, toggleFreq, toggleSound, setBpm]);
 
   return (
     <div className="min-h-screen relative" data-testid="cosmic-mixer-page">
@@ -568,6 +603,33 @@ export default function CosmicMixerPage() {
                 ))}
               </div>
             )}
+          </AccordionSection>
+
+          {/* ── Mood Presets ── */}
+          <AccordionSection title="Mood Presets" icon={Sparkles} color="#2DD4BF" open={openSections.mood} onToggle={() => toggleSection('mood')} badge={activeMoodPreset ? activeMoodPreset.label : null}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {MOOD_PRESETS.map(p => {
+                const isActive = activeMoodPreset?.id === p.id;
+                return (
+                  <button key={p.id} onClick={() => activateMoodPreset(p)}
+                    className="text-left px-4 py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{
+                      background: isActive ? `${p.color}15` : `${p.color}05`,
+                      border: `1px solid ${isActive ? `${p.color}40` : `${p.color}15`}`,
+                      boxShadow: isActive ? `0 0 20px ${p.color}15` : 'none',
+                    }}
+                    data-testid={`mood-${p.id}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium" style={{ color: isActive ? p.color : `${p.color}CC` }}>{p.label}</span>
+                      {isActive && (
+                        <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${p.color}20`, color: p.color }}>ACTIVE</span>
+                      )}
+                    </div>
+                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{p.desc} — {p.bpm} BPM</span>
+                  </button>
+                );
+              })}
+            </div>
           </AccordionSection>
 
           <AccordionSection title="Solfeggio Frequency" icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>

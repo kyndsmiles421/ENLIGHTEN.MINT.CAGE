@@ -393,6 +393,8 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [playingRec, setPlayingRec] = useState(false);
+  const [affirmation, setAffirmation] = useState(null);
+  const [affirmationLoading, setAffirmationLoading] = useState(false);
   const audioCtxRef = useRef(null);
   const nodesRef = useRef(null);
 
@@ -402,6 +404,15 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  const fetchAffirmation = useCallback(() => {
+    if (!token || affirmationLoading) return;
+    setAffirmationLoading(true);
+    fetch(`${API}/api/harmonics/affirmation`, { headers: authHeaders })
+      .then(r => r.json())
+      .then(d => { setAffirmation(d); setAffirmationLoading(false); })
+      .catch(() => setAffirmationLoading(false));
+  }, [token, authHeaders, affirmationLoading]);
 
   const stopRec = useCallback(() => {
     if (nodesRef.current) {
@@ -541,12 +552,28 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
             <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.65)' }}>{data.guidance.recommended_meditation}</p>
           </div>
 
-          {/* Affirmation seed */}
+          {/* AI Affirmation — personalized from mood trends + celestial */}
           <div className="rounded-lg px-3 py-2" style={{ background: `${data.zodiac.color}04`, border: `1px solid ${data.zodiac.color}08` }}>
-            <p className="text-[8px] uppercase tracking-widest mb-1" style={{ color: `${data.zodiac.color}50` }}>Celestial Guidance</p>
-            <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>
-              {data.guidance.affirmation_seed.charAt(0).toUpperCase() + data.guidance.affirmation_seed.slice(1)}
-            </p>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[8px] uppercase tracking-widest" style={{ color: `${data.zodiac.color}50` }}>Personal Affirmation</p>
+              {token && (
+                <button onClick={fetchAffirmation} disabled={affirmationLoading}
+                  className="text-[8px] px-1.5 py-0.5 rounded-full hover:bg-white/5 transition-colors"
+                  style={{ color: `${data.zodiac.color}70`, border: `1px solid ${data.zodiac.color}15` }}
+                  data-testid="harmonics-gen-affirmation">
+                  {affirmationLoading ? 'Generating...' : affirmation ? 'Refresh' : 'Generate'}
+                </button>
+              )}
+            </div>
+            {affirmation ? (
+              <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                {affirmation.affirmation}
+              </p>
+            ) : (
+              <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                {data.guidance.affirmation_seed.charAt(0).toUpperCase() + data.guidance.affirmation_seed.slice(1)}
+              </p>
+            )}
           </div>
         </div>
       ) : (

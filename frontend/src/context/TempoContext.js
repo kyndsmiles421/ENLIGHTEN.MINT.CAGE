@@ -51,6 +51,29 @@ export function TempoProvider({ children }) {
     };
   }, [bpm]);
 
+  // Haptic pulse synced to BPM
+  const hapticIntervalRef = useRef(null);
+
+  useEffect(() => {
+    if (hapticIntervalRef.current) clearInterval(hapticIntervalRef.current);
+    if (bpm <= 0) return;
+
+    let Hap;
+    try { Hap = require('@capacitor/haptics').Haptics; } catch {}
+    const doHaptic = () => {
+      try { Hap?.impact({ style: 'Light' }); } catch { navigator.vibrate?.([8]); }
+    };
+
+    const interval = 60000 / bpm;
+    // Double-pulse heartbeat pattern: thump-thump-(pause)
+    hapticIntervalRef.current = setInterval(() => {
+      doHaptic();
+      setTimeout(doHaptic, Math.min(120, interval * 0.18));
+    }, interval);
+
+    return () => { if (hapticIntervalRef.current) clearInterval(hapticIntervalRef.current); };
+  }, [bpm]);
+
   // Visual beat pulse
   useEffect(() => {
     if (beatIntervalRef.current) clearInterval(beatIntervalRef.current);
