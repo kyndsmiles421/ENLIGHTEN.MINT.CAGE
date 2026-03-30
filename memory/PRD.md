@@ -56,6 +56,7 @@
 23. **3D Spatial Audio in VR** — Web Audio PannerNode (HRTF model, inverse distance) routed through all ambient oscillators. AudioListener position synced to THREE.js camera in animation loop. Sound source orbits a nebula point in 3D space, creating near/far/left/right panning as user rotates camera. AudioContext auto-resumes on user gesture.
 24. **Virtualized Sacred Texts Lists** — react-window v1.8.10 FixedSizeList for chapter lists (>6 chapters) and text grid (>9 items). Reduces DOM nodes from 15+ complex blocks to only 2-3 visible in viewport. Smart threshold: skip virtualization for small lists to avoid overhead.
 25. **WebXR HMD Gaze Reticle** — Centered 2px dot reticle with SVG fuse progress ring. 1500ms gaze timer: staring at a portal fills the ring, then triggers portal activation (navigate, meditation, quantum picker). Removes need for external controllers for basic navigation.
+26. **Capacitor Native Build Unblocked** — Installed nvm + Node 22.22.2 alongside Node 20. `cap add android`, `cap add ios`, `cap sync` all succeeded. Both `android/` and `ios/` project directories generated with production web build. 8 Capacitor plugins synced (haptics, splash, status-bar, keyboard, push-notifications, share, browser, app).
 
 ## Test Reports: Iterations 123-134 all 100% pass rate
 

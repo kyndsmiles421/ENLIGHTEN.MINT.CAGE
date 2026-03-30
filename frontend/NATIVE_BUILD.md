@@ -80,3 +80,6 @@ All native config is in `capacitor.config.ts`:
 - Android uses `https` scheme for secure context
 - iOS uses automatic content inset for safe areas
 - The PWA service worker will be disabled in native mode (Capacitor handles caching)
+- **Node 22 via nvm:** Use `nvm use 22` before running Capacitor CLI commands. The dev server runs on Node 20.
+- **Platforms synced:** Both `android/` and `ios/` directories are generated with the latest web build.
+- To rebuild and re-sync: `nvm use 22 && npx craco build && npx cap sync`
