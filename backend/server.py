@@ -70,6 +70,7 @@ from routes.music_studio import router as music_studio_router
 from routes.mixer_presets import router as mixer_presets_router
 from routes.media_library import router as media_library_router
 from routes.astrology_reading import router as astrology_reading_router
+from routes.bible import router as bible_router
 
 app = FastAPI()
 
@@ -107,6 +108,7 @@ all_routers = [
     mixer_presets_router,
     media_library_router,
     astrology_reading_router,
+    bible_router,
 ]
 
 for r in all_routers:
@@ -158,10 +160,19 @@ app.add_middleware(
 async def push_scheduler_loop():
     """Background loop: check every 30 min and send push reminders at user-preferred hours."""
     from routes.notifications import send_push_to_user, QUANTUM_REMINDERS
+    from routes.astrology_reading import _zodiac_from_date, ZODIAC_INFO, _get_current_planetary_context
     import random
     from datetime import datetime, timezone
 
     sent_cache = set()
+
+    COSMIC_BRIEFING_TEMPLATES = [
+        "The {moon_phase} amplifies your {element} energy today. {transit_msg} Trust the cosmic current, {sign_name}.",
+        "{sign_name}, the stars speak clearly: {transit_msg} Under the {moon_phase}, your {element} nature is heightened.",
+        "Good morning, {sign_name}. The {moon_phase} whispers of {moon_energy}. {transit_msg} Embrace your {element} power.",
+        "Cosmic alignment detected, {sign_name}. {transit_msg} The {moon_phase} calls for {moon_energy}. Shine brightly.",
+        "Today's celestial message for {sign_name}: The {moon_phase} supports {moon_energy}. {transit_msg}",
+    ]
 
     while True:
         try:
@@ -175,6 +186,11 @@ async def push_scheduler_loop():
             if not sub_user_ids:
                 continue
 
+            # Get planetary context once for all users
+            planetary = _get_current_planetary_context(now)
+            transit_names = [t["planet"] for t in planetary["active_transits"]]
+            transit_msg = f"{' and '.join(transit_names[:2])} {'guide' if len(transit_names) <= 2 else 'align to guide'} your path." if transit_names else "The cosmic web hums with potential."
+
             for uid in sub_user_ids:
                 prefs = await db.notification_prefs.find_one({"user_id": uid}, {"_id": 0})
                 if not prefs or not prefs.get("daily_relaxation", True):
@@ -182,6 +198,30 @@ async def push_scheduler_loop():
 
                 morning_hour = prefs.get("reminder_hour", 8)
                 evening_hour = prefs.get("evening_hour", 20)
+
+                # ── Cosmic Briefing (morning, 1 hour before regular reminder) ──
+                briefing_key = f"{today}-briefing-{uid}"
+                briefing_hour = max(0, morning_hour - 1)
+                if current_hour == briefing_hour and briefing_key not in sent_cache:
+                    try:
+                        profile = await db.profiles.find_one({"user_id": uid}, {"_id": 0, "birth_date": 1})
+                        birth_date = profile.get("birth_date", "") if profile else ""
+                        zodiac = _zodiac_from_date(birth_date) if birth_date else None
+                        z_info = ZODIAC_INFO.get(zodiac, {})
+                        sign_name = z_info.get("name", "Cosmic Traveler")
+                        element = z_info.get("element", "cosmic")
+
+                        body = random.choice(COSMIC_BRIEFING_TEMPLATES).format(
+                            moon_phase=planetary["moon_phase"],
+                            moon_energy=planetary["moon_energy"],
+                            element=element.lower(),
+                            sign_name=sign_name,
+                            transit_msg=transit_msg,
+                        )
+                        await send_push_to_user(uid, f"Your Daily Cosmic Briefing", body, "/star-chart", "cosmic-briefing")
+                        sent_cache.add(briefing_key)
+                    except Exception as be:
+                        logger.error(f"Cosmic briefing error for {uid}: {be}")
 
                 # Morning reminder
                 morning_key = f"{today}-morning-{uid}"

@@ -108,6 +108,7 @@ const LiveSessions = lazy(() => import('./pages/LiveSessions'));
 const LiveRoom = lazy(() => import('./pages/LiveRoom'));
 const DanceMusicStudio = lazy(() => import('./pages/DanceMusicStudio'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
+const Bible = lazy(() => import('./pages/Bible'));
 
 function PageLoader() {
   return (
@@ -221,6 +222,7 @@ function AnimatedRoutes() {
         <Route path="/dance-music" element={<DanceMusicStudio />} />
         <Route path="/my-creations" element={<MediaLibrary />} />
         <Route path="/my-creations/:id" element={<MediaLibrary />} />
+        <Route path="/bible" element={<Bible />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

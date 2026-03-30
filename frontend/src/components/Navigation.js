@@ -128,6 +128,7 @@ const NAV_CATEGORIES = [
       { path: '/reading-list', label: 'Spiritual Reading List', icon: BookOpen },
       { path: '/creation-stories', label: 'Myths & Legends', icon: Globe },
       { path: '/sacred-texts', label: 'Sacred Texts', icon: BookOpen },
+      { path: '/bible', label: 'Bible & Lost Books', icon: BookOpen },
       { path: '/teachings', label: 'Teachings', icon: BookOpen },
       { path: '/learn', label: 'Learn', icon: GraduationCap },
       { path: '/journey', label: 'Journey', icon: Map },

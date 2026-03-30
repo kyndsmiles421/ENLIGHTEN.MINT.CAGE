@@ -80,6 +80,7 @@ ALL_FEATURES = [
     {"page": "/blessings", "name": "Send a Blessing", "category": "Explore", "color": "#FDA4AF"},
     {"page": "/coach", "name": "Spiritual Coach", "category": "Practice", "color": "#D8B4FE"},
     {"page": "/reading-list", "name": "Spiritual Reading List", "category": "Explore", "color": "#FB923C"},
+    {"page": "/bible", "name": "Bible & Lost Books", "category": "Explore", "color": "#DC2626"},
 ]
 
 DAILY_WISDOM = [
