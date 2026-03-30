@@ -12,6 +12,7 @@ const THEMES = {
 
 const DEFAULT_PREFS = {
   theme: 'cosmic',
+  immersionLevel: 'full',  // 'calm' | 'standard' | 'full'
   reduceMotion: false,
   reduceParticles: false,
   reduceFlashing: false,
@@ -251,10 +252,22 @@ export function SensoryProvider({ children }) {
     };
   }, []);
 
+  // Immersion level computed flags
+  const immersion = prefs.immersionLevel || 'full';
+  const showParticles = immersion !== 'calm' && !prefs.reduceParticles;
+  const showAnimations = immersion !== 'calm' && !prefs.reduceMotion;
+  const showFlashing = immersion === 'full' && !prefs.reduceFlashing;
+  const showVisualEffects = immersion !== 'calm';
+  const showVisionMode = immersion === 'full';
+  const showFractals = immersion === 'full' && !prefs.reduceParticles;
+  const animationSpeed = immersion === 'calm' ? 0 : immersion === 'standard' ? 0.5 : 1;
+
   return (
     <SensoryContext.Provider value={{
       ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
       prefs, updatePref, themes: THEMES,
+      immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
+      showVisionMode, showFractals, animationSpeed,
     }}>
       {children}
     </SensoryContext.Provider>

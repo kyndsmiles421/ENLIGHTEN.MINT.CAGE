@@ -7,6 +7,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSensory } from '../context/SensoryContext';
 import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -1001,6 +1002,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
 
 export default function StarChart() {
   const { token, authHeaders } = useAuth();
+  const { showParticles, showAnimations, animationSpeed } = useSensory();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

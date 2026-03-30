@@ -18,6 +18,7 @@ import ShareButton from './ShareButton';
 import { SplitScreenLauncher } from './SplitScreen';
 import NotificationSettings from './NotificationSettings';
 import { setAmbientEnabled, getAmbientEnabled } from '../hooks/useAmbientSoundscape';
+import { ImmersionToggle } from './ImmersionToggle';
 import { useCreditsContext } from '../context/CreditContext';
 import { useAvatar } from '../context/AvatarContext';
 import axios from 'axios';
@@ -465,6 +466,9 @@ export default function Navigation() {
 
           {/* Split Screen */}
           <SplitScreenLauncher />
+
+          {/* Immersion Level */}
+          <ImmersionToggle />
 
           {/* Ambient Toggle */}
           <button

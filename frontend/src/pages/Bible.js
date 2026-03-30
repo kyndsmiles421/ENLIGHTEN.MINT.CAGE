@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ScriptureVisualizer, VisionModeToggle, detectScenes } from '../components/ScriptureVisualizer';
+import { useSensory } from '../context/SensoryContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -109,6 +110,7 @@ function AIChat({ bookTitle, chapterNum, contextText }) {
 
 function ChapterReader({ book, chapterNum, onBack, onNav }) {
   const { token, authHeaders } = useAuth();
+  const { showVisualEffects, showVisionMode } = useSensory();
   const [chapter, setChapter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('retelling');
@@ -185,7 +187,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
         text={chapter ? `${chapter.retelling || ''} ${chapter.key_verses || ''}` : ''}
         category={book.category}
         themes={book.themes}
-        isActive={visionMode && !!chapter}
+        isActive={visionMode && !!chapter && showVisualEffects}
       />
 
       {/* Header */}
@@ -195,7 +197,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
           <ArrowLeft size={12} /> {book.title}
         </button>
         <div className="flex items-center gap-2">
-          {chapter && (
+          {chapter && showVisionMode && (
             <VisionModeToggle
               isActive={visionMode}
               onToggle={() => setVisionMode(v => !v)}

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { useSensory } from '../context/SensoryContext';
 
 /* ─── Fractal Types ─── */
 const FRACTAL_TYPES = [
@@ -16,6 +17,8 @@ export default function FractalVisualizer({ type = 'mandelbrot', audioData, opac
   const canvasRef = useRef(null);
   const frameRef = useRef(null);
   const timeRef = useRef(0);
+  const sensory = useSensory();
+  const showFractals = sensory?.showFractals ?? true;
 
   const draw = useCallback((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
@@ -54,7 +57,7 @@ export default function FractalVisualizer({ type = 'mandelbrot', audioData, opac
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !showFractals) return;
     const ctx = canvas.getContext('2d');
 
     const resize = () => {
@@ -75,7 +78,9 @@ export default function FractalVisualizer({ type = 'mandelbrot', audioData, opac
       cancelAnimationFrame(frameRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, [draw]);
+  }, [draw, showFractals]);
+
+  if (!showFractals) return null;
 
   return (
     <canvas

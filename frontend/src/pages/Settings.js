@@ -135,6 +135,61 @@ export default function Settings() {
           />
         </Section>
 
+        {/* Immersion Level */}
+        <Section title="Experience Level">
+          <div className="px-4 py-3">
+            <p className="text-[10px] mb-3" style={{ color: `${subtle}0.4)` }}>
+              Control the visual intensity of the entire app. Choose Calm for a safe, minimal experience.
+            </p>
+            <div className="grid grid-cols-3 gap-2" data-testid="immersion-level-picker">
+              {[
+                { id: 'calm', label: 'Calm', desc: 'No effects', icon: Shield, color: '#22C55E' },
+                { id: 'standard', label: 'Standard', desc: 'Moderate', icon: Sun, color: '#F59E0B' },
+                { id: 'full', label: 'Full Immersive', desc: 'All effects', icon: Sparkles, color: '#A78BFA' },
+              ].map(level => {
+                const active = prefs.immersionLevel === level.id;
+                const LIcon = level.icon;
+                return (
+                  <button key={level.id}
+                    onClick={() => {
+                      updatePref('immersionLevel', level.id);
+                      if (level.id === 'calm') {
+                        updatePref('reduceMotion', true);
+                        updatePref('reduceParticles', true);
+                        updatePref('reduceFlashing', true);
+                      } else if (level.id === 'standard') {
+                        updatePref('reduceMotion', false);
+                        updatePref('reduceParticles', false);
+                        updatePref('reduceFlashing', true);
+                      } else {
+                        updatePref('reduceMotion', false);
+                        updatePref('reduceParticles', false);
+                        updatePref('reduceFlashing', false);
+                      }
+                      toast.success(`Experience: ${level.label}`);
+                    }}
+                    data-testid={`immersion-settings-${level.id}`}
+                    className="p-3 rounded-xl text-center transition-all hover:scale-[1.02]"
+                    style={{
+                      background: active ? `${level.color}12` : `${subtle}0.03)`,
+                      border: `1px solid ${active ? `${level.color}30` : `${subtle}0.06)`}`,
+                    }}>
+                    <LIcon size={18} className="mx-auto mb-1.5" style={{ color: active ? level.color : 'var(--text-muted)' }} />
+                    <p className="text-[10px] font-medium" style={{ color: active ? level.color : 'var(--text-secondary)' }}>{level.label}</p>
+                    <p className="text-[8px] mt-0.5" style={{ color: `${subtle}0.3)` }}>{level.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex items-start gap-2 mt-3 p-2 rounded-lg" style={{ background: `${subtle}0.02)`, border: `1px solid ${subtle}0.04)` }}>
+              <Shield size={11} style={{ color: '#22C55E', marginTop: 2, flexShrink: 0 }} />
+              <p className="text-[9px]" style={{ color: `${subtle}0.35)` }}>
+                <strong style={{ color: '#22C55E' }}>Calm</strong> mode disables all particles, fractals, and flashing effects. Recommended for photosensitive epilepsy or motion sensitivity.
+              </p>
+            </div>
+          </div>
+        </Section>
+
         {/* Visual & Display */}
         <Section title="Visual & Display">
           <div className="px-4 py-3" style={{ borderBottom: `1px solid ${subtle}0.04)` }}>
