@@ -62,6 +62,7 @@ export default function VirtualReality() {
   const [quantumMeditations, setQuantumMeditations] = useState([]);
   const [showQuantumPicker, setShowQuantumPicker] = useState(false);
   const [quantumPrinciples, setQuantumPrinciples] = useState([]);
+  const [celestial, setCelestial] = useState(null);
 
   // Load data
   useEffect(() => {
@@ -71,6 +72,8 @@ export default function VirtualReality() {
       setQuantumPrinciples(r.data.principles || []);
       setQuantumMeditations(r.data.meditations || []);
     }).catch(() => {});
+    // Fetch celestial harmonics for atmosphere adaptation
+    axios.get(`${API}/harmonics/celestial`).then(r => setCelestial(r.data)).catch(() => {});
   }, [authHeaders]);
 
   // Ambient cosmic audio
@@ -586,6 +589,32 @@ export default function VirtualReality() {
     }
   }, [energyState, avatarConfig]);
 
+  // ===== CELESTIAL ATMOSPHERE ADAPTATION =====
+  useEffect(() => {
+    if (!celestial || !sceneRef.current) return;
+    const s = sceneRef.current;
+    const atmo = celestial.atmosphere;
+    const accent = atmo.accent || '#818CF8';
+    const [ar, ag, ab] = hexToRgb(accent);
+
+    // Adapt nebula colors to celestial accent
+    s.nebulaGroup.children.forEach((n, i) => {
+      const blend = 0.3 + (i % 3) * 0.15;
+      n.material.color.setRGB(ar * blend, ag * blend, ab * blend);
+      n.material.opacity = 0.02 + atmo.nebula_intensity * 0.04;
+    });
+
+    // Adapt fog density based on moon illumination
+    if (s.scene.fog) {
+      s.scene.fog.density = 0.0006 + (1 - celestial.moon.illumination) * 0.0004;
+    }
+
+    // Adapt star brightness based on particle density
+    if (s.stars?.material) {
+      s.stars.material.opacity = 0.3 + atmo.particle_density * 0.5;
+    }
+  }, [celestial]);
+
   // ===== VR MEDITATION MODE =====
   const VR_MED_STEPS = [
     { text: 'Close your eyes. Feel the cosmos around you.', duration: 8 },
@@ -1032,6 +1061,46 @@ export default function VirtualReality() {
         </motion.div>
       )}
 
+      {/* Celestial harmonics badge */}
+      {celestial && (
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.8 }}
+          className="absolute right-4 w-52 pointer-events-none z-50"
+          style={{ top: energyState ? 180 : 80 }}
+        >
+          <div className="rounded-xl p-2.5" style={{
+            background: 'rgba(10,10,20,0.4)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid ${celestial.atmosphere.accent}15`,
+            boxShadow: `0 0 16px ${celestial.atmosphere.accent}06`,
+          }}>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: celestial.atmosphere.accent, boxShadow: `0 0 6px ${celestial.atmosphere.accent}` }} />
+                  <span className="text-[9px] font-medium" style={{ color: `${celestial.atmosphere.accent}CC` }}>
+                    {celestial.moon.phase}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: celestial.zodiac.color, boxShadow: `0 0 6px ${celestial.zodiac.color}` }} />
+                  <span className="text-[9px]" style={{ color: `${celestial.zodiac.color}90` }}>
+                    {celestial.zodiac.sign} {celestial.zodiac.element}
+                  </span>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{Math.round(celestial.moon.illumination * 100)}% lit</p>
+                <p className="text-[8px]" style={{ color: `${celestial.solar.color}80` }}>{celestial.solar.period}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Portal tooltip — translucent glass with portal color glow */}
       <AnimatePresence>
         {hoveredData && (
@@ -1122,7 +1191,7 @@ export default function VirtualReality() {
                     src={`${API.replace('/api', '')}${theaterVideoUrl}`}
                     className="w-full h-full object-cover"
                     style={{ filter: 'brightness(0.8) saturate(1.1)' }}
-                    autoPlay loop muted playsInline
+                    autoPlay loop playsInline
                     data-testid="vr-theater-video"
                   />
                   <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%)' }} />

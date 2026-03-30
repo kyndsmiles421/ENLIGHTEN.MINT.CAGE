@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -154,6 +154,7 @@ export default function SmartDock() {
   }, [isDragging, snapToEdge]);
 
   const DOCK_ITEMS = [
+    { id: 'harmonics', icon: Moon, label: 'Cosmos', color: '#818CF8' },
     { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
     { id: 'mixer', icon: Waves, label: 'Mixer', color: '#818CF8' },
@@ -243,6 +244,9 @@ export default function SmartDock() {
     >
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>
+        {activePanel === 'harmonics' && (
+          <HarmonicsPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
+        )}
         {activePanel === 'assistant' && (
           <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
         )}
@@ -381,6 +385,174 @@ function DockBtn({ children, testId, onClick, active, color, expanded, label, sm
         )}
       </AnimatePresence>
     </motion.button>
+  );
+}
+
+/* ─── Harmonics Panel — Celestial awareness + environmental guidance ─── */
+function HarmonicsPanel({ onClose, token, authHeaders }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [playingRec, setPlayingRec] = useState(false);
+  const audioCtxRef = useRef(null);
+  const nodesRef = useRef(null);
+
+  useEffect(() => {
+    fetch(`${API}/api/harmonics/celestial`)
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const stopRec = useCallback(() => {
+    if (nodesRef.current) {
+      nodesRef.current.gain.gain.linearRampToValueAtTime(0, (audioCtxRef.current?.currentTime || 0) + 0.5);
+      setTimeout(() => {
+        try { nodesRef.current?.osc.stop(); } catch {}
+        try { nodesRef.current?.osc2.stop(); } catch {}
+        nodesRef.current = null;
+      }, 600);
+    }
+    setPlayingRec(false);
+  }, []);
+
+  const playRecommended = useCallback(() => {
+    if (playingRec) { stopRec(); return; }
+    if (!data?.guidance?.recommended_frequency) return;
+    const freq = data.guidance.recommended_frequency;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtxRef.current = ctx;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 1);
+    gain.connect(ctx.destination);
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    osc.start();
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.value = freq + 4;
+    osc2.connect(gain);
+    osc2.start();
+    nodesRef.current = { osc, osc2, gain };
+    setPlayingRec(true);
+  }, [data, playingRec, stopRec]);
+
+  useEffect(() => () => stopRec(), [stopRec]);
+
+  const MOON_GLYPHS = {
+    new: '\u25CF', waxing_crescent: '\u25D1', first_quarter: '\u25D1',
+    waxing_gibbous: '\u25D0', full: '\u25CB', waning_gibbous: '\u25D0',
+    last_quarter: '\u25D1', waning_crescent: '\u25D1',
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      className="mb-2 rounded-xl overflow-hidden"
+      style={{
+        background: 'rgba(11,12,21,0.97)',
+        border: `1px solid ${data?.atmosphere?.accent || '#818CF8'}18`,
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        width: '260px',
+        boxShadow: `0 0 24px ${data?.atmosphere?.accent || '#818CF8'}08, 0 8px 32px rgba(0,0,0,0.4)`,
+      }}
+      data-testid="harmonics-panel"
+    >
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="flex items-center gap-2">
+          <Moon size={11} style={{ color: data?.atmosphere?.accent || '#818CF8' }} />
+          <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: `${data?.atmosphere?.accent || '#818CF8'}CC` }}>Cosmic Harmonics</span>
+        </div>
+        <button onClick={() => { stopRec(); onClose(); }} className="p-1 rounded-lg hover:bg-white/5">
+          <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-6">
+          <Loader2 size={14} className="animate-spin" style={{ color: '#818CF8' }} />
+        </div>
+      ) : data ? (
+        <div className="p-3 space-y-3">
+          {/* Moon + Solar + Zodiac row */}
+          <div className="flex items-stretch gap-2">
+            {/* Moon */}
+            <div className="flex-1 rounded-lg p-2" style={{ background: `${data.atmosphere.accent}08`, border: `1px solid ${data.atmosphere.accent}12` }}>
+              <div className="text-center">
+                <div className="text-lg leading-none mb-1" style={{ color: data.atmosphere.accent, textShadow: `0 0 8px ${data.atmosphere.accent}40` }}>
+                  {MOON_GLYPHS[data.moon.phase_id] || '\u25CF'}
+                </div>
+                <p className="text-[8px] font-medium" style={{ color: `${data.atmosphere.accent}CC` }}>{data.moon.phase}</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{Math.round(data.moon.illumination * 100)}% lit</p>
+              </div>
+            </div>
+            {/* Zodiac */}
+            <div className="flex-1 rounded-lg p-2" style={{ background: `${data.zodiac.color}08`, border: `1px solid ${data.zodiac.color}12` }}>
+              <div className="text-center">
+                <p className="text-[10px] font-medium" style={{ color: `${data.zodiac.color}CC` }}>{data.zodiac.sign}</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{data.zodiac.element}</p>
+                <p className="text-[7px] mt-0.5 leading-tight" style={{ color: `${data.zodiac.color}80` }}>{data.zodiac.theme.split(' & ')[0]}</p>
+              </div>
+            </div>
+            {/* Solar */}
+            <div className="flex-1 rounded-lg p-2" style={{ background: `${data.solar.color}08`, border: `1px solid ${data.solar.color}12` }}>
+              <div className="text-center">
+                <p className="text-[10px] font-medium" style={{ color: `${data.solar.color}CC` }}>{data.solar.period}</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>Energy: {data.guidance.energy}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommended frequency — one-tap activate */}
+          <button
+            onClick={playRecommended}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all"
+            style={{
+              background: playingRec ? `${data.atmosphere.accent}15` : `${data.atmosphere.accent}06`,
+              border: `1px solid ${playingRec ? `${data.atmosphere.accent}30` : `${data.atmosphere.accent}10`}`,
+              boxShadow: playingRec ? `0 0 16px ${data.atmosphere.accent}15` : 'none',
+            }}
+            data-testid="harmonics-play-freq"
+          >
+            {playingRec
+              ? <Pause size={12} style={{ color: data.atmosphere.accent }} />
+              : <Play size={12} style={{ color: data.atmosphere.accent }} />}
+            <div className="text-left flex-1">
+              <p className="text-[10px] font-medium" style={{ color: playingRec ? data.atmosphere.accent : `${data.atmosphere.accent}CC` }}>
+                {data.guidance.recommended_frequency_name}
+              </p>
+              <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                Aligned with {data.moon.phase}
+              </p>
+            </div>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${data.atmosphere.accent}10`, color: `${data.atmosphere.accent}90` }}>
+              {playingRec ? 'Stop' : 'Play'}
+            </span>
+          </button>
+
+          {/* Meditation suggestion */}
+          <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+            <p className="text-[8px] uppercase tracking-widest mb-1" style={{ color: `${data.atmosphere.accent}60` }}>Suggested Practice</p>
+            <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.65)' }}>{data.guidance.recommended_meditation}</p>
+          </div>
+
+          {/* Affirmation seed */}
+          <div className="rounded-lg px-3 py-2" style={{ background: `${data.zodiac.color}04`, border: `1px solid ${data.zodiac.color}08` }}>
+            <p className="text-[8px] uppercase tracking-widest mb-1" style={{ color: `${data.zodiac.color}50` }}>Celestial Guidance</p>
+            <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>
+              {data.guidance.affirmation_seed.charAt(0).toUpperCase() + data.guidance.affirmation_seed.slice(1)}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>Unable to load celestial data</p>
+      )}
+    </motion.div>
   );
 }
 
