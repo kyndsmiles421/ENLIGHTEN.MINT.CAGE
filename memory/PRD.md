@@ -57,6 +57,8 @@
 24. **Virtualized Sacred Texts Lists** — react-window v1.8.10 FixedSizeList for chapter lists (>6 chapters) and text grid (>9 items). Reduces DOM nodes from 15+ complex blocks to only 2-3 visible in viewport. Smart threshold: skip virtualization for small lists to avoid overhead.
 25. **WebXR HMD Gaze Reticle** — Centered 2px dot reticle with SVG fuse progress ring. 1500ms gaze timer: staring at a portal fills the ring, then triggers portal activation (navigate, meditation, quantum picker). Removes need for external controllers for basic navigation.
 26. **Capacitor Native Build Unblocked** — Installed nvm + Node 22.22.2 alongside Node 20. `cap add android`, `cap add ios`, `cap sync` all succeeded. Both `android/` and `ios/` project directories generated with production web build. 8 Capacitor plugins synced (haptics, splash, status-bar, keyboard, push-notifications, share, browser, app).
+27. **Native App Icons & Splash Screens** — Ran `@capacitor/assets generate` from source images in `resources/`. Generated 162 assets total: 60 Android (adaptive icons, round icons, splash in all DPIs + dark mode) and 10 iOS (AppIcon 1024px, splash @1x-3x + dark). All icons use the cosmic lotus branding.
+28. **GitHub Actions CI/CD Pipeline** — Created `.github/workflows/build.yml` with 4 jobs: web-build (craco), android-build (Gradle APK), ios-build (Xcode simulator check), and notify. Produces downloadable debug APK artifact on every push to `main`. iOS TestFlight deployment is scaffolded with commented configuration for when signing credentials are added.
 
 ## Test Reports: Iterations 123-134 all 100% pass rate
 

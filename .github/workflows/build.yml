@@ -1,0 +1,174 @@
+name: Build Native Apps
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ─── Web Build ───────────────────────────────────────────
+  web-build:
+    name: Build Web Assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: Build production web
+        working-directory: frontend
+        run: npx craco build
+        env:
+          REACT_APP_BACKEND_URL: ${{ secrets.REACT_APP_BACKEND_URL }}
+          CI: false
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: frontend/build/
+          retention-days: 7
+
+  # ─── Android APK ─────────────────────────────────────────
+  android-build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    needs: web-build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Setup Java (Android SDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: frontend/build/
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: Capacitor sync Android
+        working-directory: frontend
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: frontend/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cosmic-collective-debug.apk
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+  # ─── iOS (build check only — full archive requires macOS + signing) ───
+  ios-build:
+    name: Build iOS (Xcode Check)
+    runs-on: macos-latest
+    needs: web-build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: frontend/build/
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: Capacitor sync iOS
+        working-directory: frontend
+        run: npx cap sync ios
+
+      - name: Build iOS (no signing)
+        working-directory: frontend/ios/App
+        run: |
+          xcodebuild build \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            | tail -20
+
+      # For full App Store / TestFlight builds, uncomment and add secrets:
+      # - name: Archive for distribution
+      #   run: |
+      #     xcodebuild archive \
+      #       -workspace App.xcworkspace \
+      #       -scheme App \
+      #       -archivePath $RUNNER_TEMP/App.xcarchive \
+      #       -configuration Release \
+      #       CODE_SIGN_IDENTITY="${{ secrets.IOS_SIGNING_IDENTITY }}" \
+      #       PROVISIONING_PROFILE_SPECIFIER="${{ secrets.IOS_PROVISIONING_PROFILE }}"
+      #
+      # - name: Export IPA
+      #   run: |
+      #     xcodebuild -exportArchive \
+      #       -archivePath $RUNNER_TEMP/App.xcarchive \
+      #       -exportPath $RUNNER_TEMP/export \
+      #       -exportOptionsPlist ExportOptions.plist
+      #
+      # - name: Upload to TestFlight
+      #   uses: apple-actions/upload-testflight-build@v1
+      #   with:
+      #     app-path: $RUNNER_TEMP/export/App.ipa
+      #     issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+      #     api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+      #     api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+
+  # ─── Notify ──────────────────────────────────────────────
+  notify:
+    name: Build Complete
+    runs-on: ubuntu-latest
+    needs: [android-build, ios-build]
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "## Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Android: ${{ needs.android-build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- iOS: ${{ needs.ios-build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the APK from the Artifacts tab above." >> $GITHUB_STEP_SUMMARY
