@@ -58,9 +58,10 @@
 25. **WebXR HMD Gaze Reticle** — Centered 2px dot reticle with SVG fuse progress ring. 1500ms gaze timer: staring at a portal fills the ring, then triggers portal activation (navigate, meditation, quantum picker). Removes need for external controllers for basic navigation.
 26. **Capacitor Native Build Unblocked** — Installed nvm + Node 22.22.2 alongside Node 20. `cap add android`, `cap add ios`, `cap sync` all succeeded. Both `android/` and `ios/` project directories generated with production web build. 8 Capacitor plugins synced (haptics, splash, status-bar, keyboard, push-notifications, share, browser, app).
 27. **Native App Icons & Splash Screens** — Ran `@capacitor/assets generate` from source images in `resources/`. Generated 162 assets total: 60 Android (adaptive icons, round icons, splash in all DPIs + dark mode) and 10 iOS (AppIcon 1024px, splash @1x-3x + dark). All icons use the cosmic lotus branding.
-28. **GitHub Actions CI/CD Pipeline** — Created `.github/workflows/build.yml` with 4 jobs: web-build (craco), android-build (Gradle APK), ios-build (Xcode simulator check), and notify. Produces downloadable debug APK artifact on every push to `main`. iOS TestFlight deployment is scaffolded with commented configuration for when signing credentials are added.
+28. **GitHub Actions CI/CD Pipeline** — Created `.github/workflows/build.yml` with 4 jobs: web-build (craco), android-build (Gradle APK + Firebase App Distribution), ios-build (Xcode simulator check), and notify. Produces downloadable debug APK artifact on every push to `main`. Firebase App Distribution auto-sends APK to beta-testers group on merge. iOS TestFlight deployment scaffolded with commented config.
+29. **PWA Push Notifications Live** — Service worker (`sw.js`) now handles `push` events with vibration patterns, action buttons (Open/Later), and `notificationclick` navigation to deep links. Registered in `index.js` on app load. Backend has full VAPID-based Web Push via `pywebpush`: subscribe/unsubscribe, preference management (morning/evening reminders), quantum coherence scoring, scheduled bulk delivery, and in-app notification inbox.
 
-## Test Reports: Iterations 123-134 all 100% pass rate
+## Test Reports: Iterations 123-135 all 100% pass rate
 
 ## Backlog
 - Native app store submission (Node 22+ required)
