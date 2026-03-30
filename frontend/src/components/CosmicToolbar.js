@@ -3,15 +3,21 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ChevronUp, Mic, Loader2, Radio, X } from 'lucide-react';
+import { ChevronUp, Mic, Loader2, Radio } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
 
 const HIDDEN_ROUTES = ['/auth', '/'];
 
-/* ── Lotus icon (inline SVG for crispness) ── */
-function LotusIcon({ size = 16, color = '#C084FC' }) {
+/* ── Try native haptics, fallback to vibrate ── */
+let Haptics;
+try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
+function haptic(style = 'Light') {
+  try { Haptics?.impact({ style }); } catch { navigator.vibrate?.(8); }
+}
+
+function LotusIcon({ size = 15, color = '#C084FC' }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
       style={{ width: size, height: size, stroke: color }}>
@@ -28,27 +34,41 @@ export default function CosmicToolbar() {
   const { setBpm } = useTempo();
   const { isRecording, isProcessing, startRecording, stopRecording, wakeWordEnabled, toggleWakeWord } = useVoiceCommand();
 
-  /* ── Meditate state ── */
+  const [expanded, setExpanded] = useState(false);
   const [meditating, setMeditating] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const [holdActive, setHoldActive] = useState(false);
   const ctxRef = useRef(null);
   const nodesRef = useRef([]);
   const masterRef = useRef(null);
+  const holdRef = useRef(null);
+  const collapseRef = useRef(null);
 
-  /* ── Scroll-to-top ── */
-  const [showTop, setShowTop] = useState(false);
   useEffect(() => {
     const h = () => setShowTop(window.scrollY > 400);
     window.addEventListener('scroll', h, { passive: true });
     return () => window.removeEventListener('scroll', h);
   }, []);
 
-  /* ── Voice recording ── */
-  const holdRef = useRef(null);
-  const [holdActive, setHoldActive] = useState(false);
+  // Auto-collapse after 4s of inactivity
+  useEffect(() => {
+    if (expanded) {
+      collapseRef.current = setTimeout(() => setExpanded(false), 4000);
+      return () => clearTimeout(collapseRef.current);
+    }
+  }, [expanded]);
+
+  const toggleExpand = () => {
+    haptic('Light');
+    setExpanded(e => !e);
+  };
+
+  /* ── Voice ── */
   const handleMicDown = useCallback((e) => {
     e.preventDefault();
     setHoldActive(true);
-    holdRef.current = setTimeout(() => startRecording(), 200);
+    haptic('Medium');
+    holdRef.current = setTimeout(() => startRecording(), 150);
   }, [startRecording]);
   const handleMicUp = useCallback((e) => {
     e.preventDefault();
@@ -57,7 +77,7 @@ export default function CosmicToolbar() {
     if (isRecording) stopRecording();
   }, [isRecording, stopRecording]);
 
-  /* ── Meditate audio ── */
+  /* ── Meditate ── */
   const stopMeditate = useCallback(() => {
     nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
     nodesRef.current = [];
@@ -67,6 +87,7 @@ export default function CosmicToolbar() {
   }, []);
 
   const toggleMeditate = useCallback(() => {
+    haptic('Heavy');
     if (meditating) {
       try { if (masterRef.current && ctxRef.current) masterRef.current.gain.linearRampToValueAtTime(0.001, ctxRef.current.currentTime + 1.2); } catch {}
       setTimeout(() => { stopMeditate(); setMeditating(false); }, 1400);
@@ -87,7 +108,6 @@ export default function CosmicToolbar() {
       const osc528 = ctx.createOscillator(); osc528.type = 'sine'; osc528.frequency.value = 528;
       const g528 = ctx.createGain(); g528.gain.value = 0.18;
       osc528.connect(g528); g528.connect(master); osc528.start();
-
       const osc174 = ctx.createOscillator(); osc174.type = 'sine'; osc174.frequency.value = 174;
       const g174 = ctx.createGain(); g174.gain.value = 0.12;
       osc174.connect(g174); g174.connect(master); osc174.start();
@@ -101,17 +121,15 @@ export default function CosmicToolbar() {
       const lfoG = ctx.createGain(); lfoG.gain.value = 200;
       lfo.connect(lfoG); lfoG.connect(lp.frequency);
       const oG = ctx.createGain(); oG.gain.value = 0.4;
-      noise.connect(lp); lp.connect(oG); oG.connect(master);
-      lfo.start(); noise.start();
-
+      noise.connect(lp); lp.connect(oG); oG.connect(master); lfo.start(); noise.start();
       nodesRef.current = [osc528, osc174, noise, lfo];
       setBpm(60);
       setMeditating(true);
       toast('Deep Zen activated', {
         description: '528Hz + 174Hz + Ocean · 60 BPM',
-        style: { background: 'linear-gradient(135deg, rgba(10,10,18,0.95), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80', boxShadow: '0 0 20px rgba(34,197,94,0.1)' },
+        style: { background: 'linear-gradient(135deg, rgba(10,10,18,0.95), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80' },
       });
-    } catch { toast.error('Audio unavailable — tap again'); }
+    } catch { toast.error('Audio unavailable'); }
   }, [meditating, stopMeditate, setBpm]);
 
   useEffect(() => () => stopMeditate(), [stopMeditate]);
@@ -120,112 +138,171 @@ export default function CosmicToolbar() {
   const onMixer = location.pathname === '/cosmic-mixer';
   if (hidden) return null;
 
-  const TOOLS = [
-    !onMixer && {
-      id: 'meditate',
-      icon: <LotusIcon size={15} color={meditating ? '#4ADE80' : '#C084FC'} />,
-      onClick: toggleMeditate,
-      active: meditating,
-      activeColor: 'rgba(34,197,94,0.25)',
-      activeBorder: 'rgba(34,197,94,0.4)',
-      label: meditating ? 'Stop Zen' : 'Quick Zen',
-      testId: 'toolbar-meditate',
-    },
-    {
-      id: 'voice',
-      icon: isProcessing
-        ? <Loader2 size={14} className="animate-spin" style={{ color: '#E9D5FF' }} />
-        : <Mic size={14} style={{ color: isRecording ? '#FCA5A5' : 'rgba(192,132,252,0.7)' }} />,
-      onPointerDown: handleMicDown,
-      onPointerUp: handleMicUp,
-      onPointerLeave: handleMicUp,
-      active: isRecording || holdActive,
-      activeColor: isRecording ? 'rgba(239,68,68,0.25)' : 'rgba(59,130,246,0.2)',
-      activeBorder: isRecording ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.3)',
-      pulse: isRecording,
-      label: isRecording ? 'Listening...' : 'Voice',
-      testId: 'toolbar-voice',
-    },
-    {
-      id: 'wake',
-      icon: <Radio size={13} style={{ color: wakeWordEnabled ? '#22C55E' : 'rgba(255,255,255,0.35)' }} />,
-      onClick: toggleWakeWord,
-      active: wakeWordEnabled,
-      activeColor: 'rgba(34,197,94,0.15)',
-      activeBorder: 'rgba(34,197,94,0.3)',
-      small: true,
-      label: wakeWordEnabled ? '"Hey Cosmos" on' : 'Wake word',
-      testId: 'toolbar-wake',
-    },
-    showTop && {
-      id: 'top',
-      icon: <ChevronUp size={14} style={{ color: '#C084FC' }} />,
-      onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-      label: 'Top',
-      testId: 'toolbar-top',
-    },
-  ].filter(Boolean);
+  const anyActive = meditating || isRecording || wakeWordEnabled;
 
   return createPortal(
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed flex items-center gap-1"
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      className="fixed flex items-center"
       style={{
         top: 12,
         right: 12,
         zIndex: 9998,
-        padding: '4px 6px',
-        borderRadius: 28,
-        background: 'rgba(10,10,18,0.45)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        padding: expanded ? '5px 8px' : '5px 6px',
+        borderRadius: 24,
+        background: anyActive ? 'rgba(10,10,18,0.55)' : 'rgba(10,10,18,0.35)',
+        border: `1px solid ${anyActive ? 'rgba(192,132,252,0.1)' : 'rgba(255,255,255,0.05)'}`,
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        transition: 'background 0.4s, border 0.4s, padding 0.3s',
       }}
       data-testid="cosmic-toolbar"
     >
-      {TOOLS.map(tool => (
-        <motion.button
-          key={tool.id}
-          onClick={tool.onClick}
-          onPointerDown={tool.onPointerDown}
-          onPointerUp={tool.onPointerUp}
-          onPointerLeave={tool.onPointerLeave}
-          whileTap={{ scale: 0.85 }}
-          className="relative flex items-center justify-center rounded-full transition-all"
-          style={{
-            width: tool.small ? 30 : 34,
-            height: tool.small ? 30 : 34,
-            background: tool.active ? tool.activeColor : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${tool.active ? tool.activeBorder : 'rgba(255,255,255,0.06)'}`,
-            cursor: 'pointer',
-          }}
-          title={tool.label}
-          data-testid={tool.testId}
+      {/* ── Meditate (hidden on Mixer) ── */}
+      {!onMixer && (
+        <ToolBtn
+          testId="toolbar-meditate"
+          onClick={toggleMeditate}
+          active={meditating}
+          glowColor="rgba(34,197,94,0.35)"
+          expanded={expanded}
+          label={meditating ? 'Stop' : 'Zen'}
         >
-          {tool.icon}
-          {tool.pulse && (
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{ border: '1.5px solid rgba(239,68,68,0.4)' }}
-              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ repeat: Infinity, duration: 1 }}
-            />
-          )}
-          {tool.id === 'voice' && wakeWordEnabled && !isRecording && (
-            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: '#22C55E', border: '1.5px solid rgba(10,10,18,0.9)' }} />
-          )}
-          {tool.id === 'meditate' && meditating && (
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
-              transition={{ repeat: Infinity, duration: 3 }}
-              style={{ border: '1px solid rgba(34,197,94,0.35)' }}
-            />
-          )}
-        </motion.button>
-      ))}
+          <LotusIcon size={15} color={meditating ? '#4ADE80' : '#C084FC'} />
+          {meditating && <Glow color="rgba(34,197,94,0.3)" speed={3} />}
+        </ToolBtn>
+      )}
+
+      {/* ── Voice ── */}
+      <ToolBtn
+        testId="toolbar-voice"
+        onPointerDown={handleMicDown}
+        onPointerUp={handleMicUp}
+        onPointerLeave={handleMicUp}
+        active={isRecording || holdActive}
+        glowColor={isRecording ? 'rgba(239,68,68,0.35)' : 'rgba(59,130,246,0.25)'}
+        expanded={expanded}
+        label={isRecording ? 'Listening' : 'Voice'}
+        badge={wakeWordEnabled && !isRecording}
+      >
+        {isProcessing
+          ? <Loader2 size={14} className="animate-spin" style={{ color: '#E9D5FF' }} />
+          : <Mic size={14} style={{ color: isRecording ? '#FCA5A5' : 'rgba(192,132,252,0.65)' }} />}
+        {isRecording && <Glow color="rgba(239,68,68,0.4)" speed={1} />}
+      </ToolBtn>
+
+      {/* ── Wake Word ── */}
+      <ToolBtn
+        testId="toolbar-wake"
+        onClick={() => { haptic('Light'); toggleWakeWord(); }}
+        active={wakeWordEnabled}
+        glowColor="rgba(34,197,94,0.2)"
+        expanded={expanded}
+        label={wakeWordEnabled ? 'Wake On' : 'Wake'}
+        small
+      >
+        <Radio size={12} style={{ color: wakeWordEnabled ? '#22C55E' : 'rgba(255,255,255,0.3)' }} />
+      </ToolBtn>
+
+      {/* ── Scroll-to-top ── */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }}>
+            <ToolBtn
+              testId="toolbar-top"
+              onClick={() => { haptic('Light'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              expanded={expanded}
+              label="Top"
+              small
+            >
+              <ChevronUp size={13} style={{ color: 'rgba(192,132,252,0.6)' }} />
+            </ToolBtn>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Expand/Collapse Toggle ── */}
+      <button
+        onClick={toggleExpand}
+        className="flex items-center justify-center rounded-full ml-0.5"
+        style={{
+          width: 20,
+          height: 20,
+          background: 'rgba(255,255,255,0.04)',
+          cursor: 'pointer',
+          flexShrink: 0,
+        }}
+        data-testid="toolbar-expand"
+      >
+        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+            <circle cx="2" cy="4" r="1" fill="rgba(192,132,252,0.5)" />
+            <circle cx="6" cy="4" r="1" fill="rgba(192,132,252,0.5)" />
+            {!expanded && <circle cx="4" cy="4" r="1" fill="rgba(192,132,252,0.3)" />}
+          </svg>
+        </motion.div>
+      </button>
     </motion.div>,
     document.body
+  );
+}
+
+/* ── Reusable toolbar button ── */
+function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPointerLeave, active, glowColor, expanded, label, small, badge }) {
+  return (
+    <motion.button
+      onClick={onClick}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerLeave}
+      whileTap={{ scale: 0.82 }}
+      className="relative flex items-center gap-1.5 rounded-full transition-all overflow-hidden"
+      style={{
+        height: small ? 28 : 32,
+        padding: expanded ? `0 ${small ? 8 : 10}px 0 ${small ? 6 : 8}px` : `0 ${small ? 6 : 8}px`,
+        background: active ? (glowColor || 'rgba(192,132,252,0.15)') : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${active ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}`,
+        cursor: 'pointer',
+        boxShadow: active ? `0 0 14px ${glowColor || 'rgba(192,132,252,0.1)'}` : 'none',
+        transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s',
+      }}
+      data-testid={testId}
+    >
+      <span className="relative flex items-center justify-center" style={{ width: small ? 12 : 15, height: small ? 12 : 15, flexShrink: 0 }}>
+        {children}
+      </span>
+      {badge && (
+        <div className="absolute -top-0.5 -right-0.5 w-[6px] h-[6px] rounded-full"
+          style={{ background: '#22C55E', border: '1.5px solid rgba(10,10,18,0.9)' }} />
+      )}
+      <AnimatePresence>
+        {expanded && label && (
+          <motion.span
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 'auto', opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-[9px] font-medium whitespace-nowrap overflow-hidden"
+            style={{ color: active ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)' }}
+          >
+            {label}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+}
+
+/* ── Animated glow ring ── */
+function Glow({ color, speed = 2 }) {
+  return (
+    <motion.div
+      className="absolute inset-[-3px] rounded-full pointer-events-none"
+      style={{ border: `1.5px solid ${color}` }}
+      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+      transition={{ repeat: Infinity, duration: speed, ease: 'easeInOut' }}
+    />
   );
 }

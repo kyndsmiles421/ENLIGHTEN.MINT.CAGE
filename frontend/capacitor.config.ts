@@ -29,6 +29,9 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
+    Haptics: {
+      enabled: true,
+    },
   },
   ios: {
     contentInset: 'automatic',
