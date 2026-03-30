@@ -67,6 +67,12 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   - My Presets: Personal library with delete
   - One-tap Load: Activates all layers and applies volume/opacity settings
   - API: /api/mixer-presets (CRUD + /featured, /community, /mine, /:id/like)
+- Preset Playlists (Journeys) — DONE (iteration_108: 100%, 17/17 backend + all frontend)
+  - 4 curated journeys: Morning to Night (155min/5 steps), Deep Sleep Protocol (45min/3), Cosmic Exploration (55min/4), Quick Recharge (15min/3)
+  - Now Playing bar: step info, elapsed timer, progress bar, step dots, Prev/Pause/Next/Stop controls
+  - Auto-advance when step duration exceeded, loads next preset automatically
+  - Community sharing, likes, personal library (same as presets)
+  - API: /api/mixer-presets/playlists (CRUD + /featured, /community, /mine, /:id/like)
 
 ## Post-Launch
 - Capacitor native: `npx cap add android && npx cap add ios` after `yarn build`
