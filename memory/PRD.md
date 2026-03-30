@@ -1,72 +1,71 @@
-# The Cosmic Collective - Product Requirements Document
+# The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals. Features include PWA, Push Notifications, Quantum Mechanics, Global Star Chart cultures, Trade Circle barter marketplace, Stripe subscription, Creator role, Crystals & Stones, Virtual Rock Hounding, Guided Tour, Cinematic Intro Videos, Gaming-Level Immersive Graphics, Split Screen Multitasking, AI Avatar Generator, Context-aware AI voices, Mobile App scaffolding, Myths & Legends encyclopedia, Sacred Texts Audiobook Reader, VR Immersive modes, Star Chart astrology, Comprehensive Sacred Scriptures with AI Scene Recreations (Vision Mode), Global Immersion toggles.
+Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and cinematic visuals.
 
-Recent Additions: Starseed Choose Your Own Adventure (Single-player RPG & Multiplayer WoW-style realm), Cooperative Boss encounters, Loot/Inventory, Multiverse realms (Starseed Worlds), Spore-like Spiritual Avatar Creator, Avatar Showcase Gallery, Gem Resonance, Cosmic Ledger (Cross-Origin Persistence), Expanded Cosmic Mixer with multi-select layers, Global Tempo/Beat Engine, and Voice Command System.
+## Architecture
+- **Frontend:** React + Tailwind CSS + Framer Motion + Web Audio API (GainNodes, LFOs for Tempo sync) + Context API
+- **Backend:** FastAPI + Motor Async MongoDB
+- **AI:** OpenAI GPT-4o (text/intent), GPT Image 1, TTS (nova), Whisper STT — all via Emergent LLM Key
+- **Payments:** Stripe (test key)
+- **PWA:** Service worker + manifest
 
-## Tech Stack
-- Frontend: React, Tailwind CSS, Canvas API, Context API (SensoryContext, TempoContext, VoiceCommandContext), Framer Motion, @dnd-kit
-- Backend: FastAPI, Motor Async MongoDB
-- AI: OpenAI GPT-4o (text + intent parsing), GPT Image 1 (images), TTS/STT (Whisper + nova voice), Sora 2 (video) — all via Emergent LLM Key
-- Payments: Stripe (test key)
-- Package: emergentintegrations library
-
-## Core Architecture
-```
-/app/backend/routes/ — FastAPI route modules
-  voice_command.py — Whisper STT + GPT intent parsing + TTS responses
-  cosmic_ledger.py — Cross-origin persistence state
-  starseed_adventure.py — RPG adventure engine
-  starseed_realm.py — Multiplayer realm bosses
-  starseed_worlds.py — Multiverse exploration
-  spiritual_avatar.py — Spore-style avatar creator
-  avatar_gallery.py — Avatar showcase gallery
-/app/frontend/src/
-  context/TempoContext.js — Global BPM provider with LFO modulation
-  context/VoiceCommandContext.js — Voice recognition (hold-to-talk + wake word)
-  components/VoiceCommandButton.js — Floating voice command UI
-  components/CosmicMixer.js — Floating mixer panel (multi-select, tempo, voice)
-  pages/CosmicMixerPage.js — Full-page mixer
-  pages/CosmicLedger.js — Global state panel
-```
-
-## What's Been Implemented (Complete)
-- Full authentication (JWT), user profiles, settings
-- Interactive Creator Dashboard
-- 3D Star Chart with global cultures
-- Sacred Scriptures library with Vision Mode (AI scene recreation)
-- Starseed RPG: Single-player adventure, Multiplayer realm bosses, Alliances
-- Spore-style Spiritual Avatar Creator
-- Avatar Showcase Gallery with "Radiate" upvoting
-- Multiverse "Worlds" system with equippable gems/artifacts
-- Gem Resonance in story/combat calculations
-- Cosmic Ledger (Cross-Origin Persistence) — global state, achievements, legendary paths, realm leaderboards
-- Color-coded combat toasts (purple/gold resonance, red weakness, cyan equipment)
-- Expanded Cosmic Mixer (15 frequencies, 11 ambient sounds, 18 mantras, 16 world instruments)
-- Multi-select mixer: layer multiple frequencies, sounds, and instruments simultaneously
-- Improved mantra voice quality (nova voice, natural breathing patterns)
-- Global Tempo/Beat Engine: BPM slider (0-200), 7 preset modes, tap tempo, LFO modulation of all gain nodes
-- Voice Command System: hold-to-talk, "Hey Cosmos" wake word, mixer/navigation/AI Sage voice control
-- Homepage rearrange drag-and-drop fix (dnd-kit compatibility)
-- PWA with service worker, push notifications
-- Cinematic intro videos (Sora 2)
-- Split Screen multitasking
-- Guided app tour
+## Core Pages & Features (Implemented)
+- Landing page with Sora 2 cinematic intro, Guided App Tour
+- Auth (JWT-based)
+- Creator Dashboard with DND widget rearranging (@dnd-kit/sortable@8.0.0)
+- Star Chart (3D, multi-culture)
+- Starseed Adventure (AI RPG with branching scenes, image generation)
+- Starseed Realm (Multiplayer: encounters, alliances, chat, boss fights, loot)
+- Starseed Worlds (Multiverse portals)
+- Spiritual Avatar Creator (Spore-like, AI-generated images)
+- Avatar Gallery (community showcase + Radiate votes)
+- Cosmic Ledger (cross-origin persistence, milestones)
+- Cosmic Mixer (multi-layer audio: 15+ frequencies, 11 ambient, 16 instruments, 18 mantras)
+  - Global Tempo & Beat Engine (TempoContext with LFOs)
+  - Voice Commands (Whisper STT + GPT intent parsing)
+  - Accordion UI (mobile-first)
+  - **Sticky Master Controls Footer** (Stop All + Master Volume, always visible)
+- Crystals & Stones encyclopedia
+- Meditation, Breathwork, Yoga, Journal, Zen Garden
+- Sacred Texts with AI Scene Recreations
 - Stripe subscription system
-- Crystals & Stones with narration
-- Trade Circle marketplace
-- Myths & Legends encyclopedia
-- VR immersive modes (partial)
 
-## Prioritized Backlog
-### P1
-- Refactor massive files (StarseedAdventure.js, StarseedRealm.js, SpiritualAvatarCreator.js) into smaller reusable components
+## Completed This Session (2026-03-30)
+1. **Sticky Master Controls Footer** on Cosmic Mixer — pinned bottom bar with Stop All + Master Volume + Mute toggle + active layer count. Wellness-first UX for stress relief.
+2. **Major Refactoring (P1)** — Extracted 15 reusable components from 3 massive files:
+   - `StarseedAdventure.js`: 945 → 210 lines (78% reduction)
+   - `StarseedRealm.js`: 1290 → 431 lines (67% reduction)
+   - `SpiritualAvatarCreator.js`: 737 → 341 lines (54% reduction)
+   - New components: `/app/frontend/src/components/starseed/` (constants, StatBar, XPBar, CosmicCanvas, SceneImage, CharacterSelect, GameScene, RealmStarMap, WorldEventBanner, EncounterScene, EncounterResult, AllianceChat, BossEncounterPanel, AvatarComponents)
 
-### P2
-- Mobile App Store scaffolding (Capacitor native build)
-- VR Immersive modes completion/verification
+## Backlog (Prioritized)
+### P2 — Realm Leaderboard Enhancements
+- Add "Brightest Aura" / "Most Helpful" categories based on Gallery Radiate votes
+- Add "Founder" badge for early portal explorers (future live events tie-in)
+- Positive wellness-themed framing (not competitive stress)
 
-### P3
-- Additional realm leaderboard categories
-- Cross-platform sync improvements
+### P2 — Mobile App Store Scaffolding (Capacitor)
+- Native build checks
+- Haptics integration
+
+### P2 — VR Immersive Modes
+- Completion and verification
+- Leverages newly cleaned component architecture
+
+## Technical Constraints
+- `@dnd-kit/sortable` MUST stay at 8.0.0 (version 10 breaks with core@6.3.1)
+- Mixer uses JavaScript `Map` objects for multi-select state
+- Emergent LLM Key for all AI integrations
+- MongoDB `_id` exclusion in all API responses
+
+## Key API Endpoints
+- `/api/voice/command` — Whisper STT + GPT intent
+- `/api/cosmic_ledger/*` — Global spiritual state
+- `/api/starseed/origins`, `/api/starseed/generate-scene`, `/api/starseed/realm/*`
+- `/api/spiritual_avatar/*`
+- `/api/starseed/worlds/explore`
+
+## Test Credentials
+- Email: kyndsmiles@gmail.com
+- Password: password
