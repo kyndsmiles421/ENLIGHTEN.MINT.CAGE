@@ -4,10 +4,12 @@ import { useLocation } from 'react-router-dom';
 import {
   ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen,
   Vibrate, Play, Pause, Square, Loader2, Music, Film, Sliders, Maximize2, Minimize2,
-  Save, Heart, Globe, Lock, Trash2, Star, Users,
+  Save, Heart, Globe, Lock, Trash2, Star, Users, Hexagon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import FractalVisualizer from './FractalVisualizer';
+import { VisualLayersMixer, LIGHT_MODES, VIDEO_OVERLAYS, FRACTAL_TYPES, VISUAL_FILTERS } from './VisualLayersMixer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -93,15 +95,6 @@ const MANTRAS = [
   { id: 'peace', label: 'I Am Peace', text: 'I am peace. I am light. I am love.', tradition: 'Modern', color: '#22C55E' },
 ];
 
-const LIGHT_MODES = [
-  { id: 'sunrise', label: 'Sunrise Glow', colors: ['#FCD34D', '#FB923C', '#EF4444'], speed: 4000 },
-  { id: 'aurora', label: 'Aurora', colors: ['#22C55E', '#2DD4BF', '#3B82F6', '#8B5CF6'], speed: 3000 },
-  { id: 'calm-blue', label: 'Calm Blue', colors: ['#1E3A5F', '#3B82F6', '#06B6D4'], speed: 5000 },
-  { id: 'healing-green', label: 'Healing Green', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500 },
-  { id: 'violet-flame', label: 'Violet Flame', colors: ['#4C1D95', '#8B5CF6', '#C084FC', '#E879F9'], speed: 3500 },
-  { id: 'golden', label: 'Golden Light', colors: ['#78350F', '#F59E0B', '#FCD34D'], speed: 5000 },
-];
-
 // World instrument drones for the mixer
 const INSTRUMENT_DRONES = [
   { id: 'sitar-drone', label: 'Sitar', color: '#F59E0B', wave: 'sawtooth', freq: 146.83, filterFreq: 1200, filterQ: 8, vibratoRate: 5, vibratoDepth: 8 },
@@ -110,15 +103,6 @@ const INSTRUMENT_DRONES = [
   { id: 'bowl-drone', label: 'Singing Bowl', color: '#7C3AED', wave: 'sine', freq: 261.63, filterFreq: 800, filterQ: 12, vibratoRate: 1.5, vibratoDepth: 2 },
   { id: 'flute-drone', label: 'Cedar Flute', color: '#059669', wave: 'sine', freq: 329.63, filterFreq: 2000, filterQ: 1, vibratoRate: 4.5, vibratoDepth: 12 },
   { id: 'erhu-drone', label: 'Erhu', color: '#E11D48', wave: 'sawtooth', freq: 293.66, filterFreq: 2500, filterQ: 4, vibratoRate: 5.5, vibratoDepth: 15 },
-];
-
-const VIDEO_OVERLAYS = [
-  { id: 'none', label: 'None' },
-  { id: 'stars', label: 'Starfield', url: 'https://videos.pexels.com/video-files/857195/857195-hd_1920_1080_25fps.mp4', color: '#818CF8' },
-  { id: 'northern-lights', label: 'Northern Lights', url: 'https://videos.pexels.com/video-files/3214448/3214448-uhd_2560_1440_25fps.mp4', color: '#2DD4BF' },
-  { id: 'ocean-waves', label: 'Ocean', url: 'https://videos.pexels.com/video-files/1093662/1093662-hd_1920_1080_30fps.mp4', color: '#3B82F6' },
-  { id: 'forest', label: 'Forest', url: 'https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4', color: '#22C55E' },
-  { id: 'fire', label: 'Campfire', url: 'https://videos.pexels.com/video-files/855535/855535-hd_1920_1080_30fps.mp4', color: '#F59E0B' },
 ];
 
 export default function CosmicMixer() {
@@ -138,18 +122,19 @@ export default function CosmicMixer() {
   const [activeFreq, setActiveFreq] = useState(null);
   const [activeSound, setActiveSound] = useState(null);
   const [activeMantra, setActiveMantra] = useState(null);
-  const [activeLight, setActiveLight] = useState(null);
   const [activeDrone, setActiveDrone] = useState(null);
-  const [activeVideo, setActiveVideo] = useState(null);
   const [vibeOn, setVibeOn] = useState(false);
+
+  // Visual layers (multi-stack)
+  const [visualLayers, setVisualLayers] = useState([]);
+  const analyserRef = useRef(null);
+  const analyserDataRef = useRef(new Uint8Array(64));
 
   // Per-channel volumes (0-100)
   const [freqVol, setFreqVol] = useState(50);
   const [soundVol, setSoundVol] = useState(50);
   const [mantraVol, setMantraVol] = useState(70);
   const [droneVol, setDroneVol] = useState(40);
-  const [lightOpacity, setLightOpacity] = useState(60);
-  const [videoOpacity, setVideoOpacity] = useState(40);
 
   // Audio refs
   const ctxRef = useRef(null);
@@ -217,11 +202,16 @@ export default function CosmicMixer() {
     if (activeSound) layers.sound = { id: activeSound.id };
     if (activeDrone) layers.drone = { id: activeDrone.id };
     if (activeMantra) layers.mantra = { id: activeMantra.id };
-    if (activeLight) layers.light = { id: activeLight.id };
-    if (activeVideo) layers.video = { id: activeVideo.id };
-    const volumes = { freqVol, soundVol, mantraVol, droneVol, lightOpacity, videoOpacity, masterVol };
+    // Store visual layers
+    if (visualLayers.length > 0) layers.visualStack = visualLayers.map(l => ({ type: l.type, itemId: l.itemId, opacity: l.opacity }));
+    // Backwards compat: also set light/video if single layer present
+    const lightLayer = visualLayers.find(l => l.type === 'light');
+    const videoLayer = visualLayers.find(l => l.type === 'video');
+    if (lightLayer) layers.light = { id: lightLayer.itemId };
+    if (videoLayer) layers.video = { id: videoLayer.itemId };
+    const volumes = { freqVol, soundVol, mantraVol, droneVol, masterVol };
     return { layers, volumes };
-  }, [activeFreq, activeSound, activeDrone, activeMantra, activeLight, activeVideo, freqVol, soundVol, mantraVol, droneVol, lightOpacity, videoOpacity, masterVol]);
+  }, [activeFreq, activeSound, activeDrone, activeMantra, visualLayers, freqVol, soundVol, mantraVol, droneVol, masterVol]);
 
   const savePreset = useCallback(async () => {
     const { layers, volumes } = getCurrentLayers();
@@ -268,6 +258,11 @@ export default function CosmicMixer() {
       soundGainRef.current.connect(masterGainRef.current);
       droneGainRef.current = ctxRef.current.createGain();
       droneGainRef.current.connect(masterGainRef.current);
+      // Audio analyser for fractal reactivity
+      analyserRef.current = ctxRef.current.createAnalyser();
+      analyserRef.current.fftSize = 128;
+      analyserDataRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
+      masterGainRef.current.connect(analyserRef.current);
     }
     if (ctxRef.current.state === 'suspended') await ctxRef.current.resume();
     masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
@@ -384,12 +379,6 @@ export default function CosmicMixer() {
     }
   }, [activeMantra, mantraVol]);
 
-  // ─── Video Overlay Layer ───
-  const toggleVideo = useCallback((video) => {
-    if (video.id === 'none' || activeVideo?.id === video.id) { setActiveVideo(null); return; }
-    setActiveVideo(video);
-  }, [activeVideo]);
-
   // ─── Vibration ───
   const toggleVibe = useCallback(() => {
     if (vibeOn) {
@@ -423,10 +412,25 @@ export default function CosmicMixer() {
     if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
     try { navigator.vibrate(0); } catch {}
     setActiveFreq(null); setActiveSound(null); setActiveMantra(null);
-    setActiveLight(null); setActiveDrone(null); setActiveVideo(null); setVibeOn(false);
+    setActiveDrone(null); setVibeOn(false);
+    setVisualLayers([]);
   }, []);
 
   useEffect(() => () => { stopAll(); if (ctxRef.current) try { ctxRef.current.close(); } catch {} }, [stopAll]);
+
+  // Feed audio analyser data for fractal reactivity
+  useEffect(() => {
+    const hasFractal = visualLayers.some(l => l.type === 'fractal' && l.visible);
+    if (!hasFractal || !analyserRef.current) return;
+    let running = true;
+    const read = () => {
+      if (!running || !analyserRef.current) return;
+      analyserRef.current.getByteFrequencyData(analyserDataRef.current);
+      requestAnimationFrame(read);
+    };
+    read();
+    return () => { running = false; };
+  }, [visualLayers]);
 
   // ─── Load Preset (must be after toggle functions) ───
   const loadPresetFn = useCallback(async (preset) => {
@@ -439,8 +443,6 @@ export default function CosmicMixer() {
     if (v.soundVol !== undefined) setSoundVol(v.soundVol);
     if (v.mantraVol !== undefined) setMantraVol(v.mantraVol);
     if (v.droneVol !== undefined) setDroneVol(v.droneVol);
-    if (v.lightOpacity !== undefined) setLightOpacity(v.lightOpacity);
-    if (v.videoOpacity !== undefined) setVideoOpacity(v.videoOpacity);
 
     const l = preset.layers || {};
     if (l.frequency) {
@@ -459,14 +461,15 @@ export default function CosmicMixer() {
       const mantra = MANTRAS.find(m => m.id === l.mantra.id);
       if (mantra) setTimeout(() => toggleMantra(mantra), 450);
     }
-    if (l.light) {
-      const light = LIGHT_MODES.find(x => x.id === l.light.id);
-      if (light) setActiveLight(light);
+    // Load visual layers
+    const newVisuals = [];
+    if (l.visualStack) {
+      l.visualStack.forEach(vs => newVisuals.push({ uid: `vl-${Date.now()}-${Math.random()}`, type: vs.type, itemId: vs.itemId, opacity: vs.opacity || 60, visible: true }));
+    } else {
+      if (l.light) newVisuals.push({ uid: `vl-${Date.now()}-l`, type: 'light', itemId: l.light.id, opacity: v.lightOpacity || 60, visible: true });
+      if (l.video) newVisuals.push({ uid: `vl-${Date.now()}-v`, type: 'video', itemId: l.video.id, opacity: v.videoOpacity || 40, visible: true });
     }
-    if (l.video) {
-      const video = VIDEO_OVERLAYS.find(x => x.id === l.video.id);
-      if (video) setActiveVideo(video);
-    }
+    if (newVisuals.length) setVisualLayers(newVisuals);
     setShowPresets(false);
   }, [stopAll, toggleFreq, toggleSound, toggleDrone, toggleMantra]);
 
@@ -479,14 +482,19 @@ export default function CosmicMixer() {
     if (v.freqVol !== undefined) setFreqVol(v.freqVol);
     if (v.soundVol !== undefined) setSoundVol(v.soundVol);
     if (v.droneVol !== undefined) setDroneVol(v.droneVol);
-    if (v.lightOpacity !== undefined) setLightOpacity(v.lightOpacity);
-    if (v.videoOpacity !== undefined) setVideoOpacity(v.videoOpacity);
     const l = presetData.layers || {};
     if (l.frequency) { const f = FREQUENCIES.find(x => x.hz === l.frequency.hz); if (f) setTimeout(() => toggleFreq(f), 150); }
     if (l.sound) { const s = SOUNDS.find(x => x.id === l.sound.id); if (s) setTimeout(() => toggleSound(s), 250); }
     if (l.drone) { const d = INSTRUMENT_DRONES.find(x => x.id === l.drone.id); if (d) setTimeout(() => toggleDrone(d), 350); }
-    if (l.light) { const x = LIGHT_MODES.find(m => m.id === l.light.id); if (x) setActiveLight(x); }
-    if (l.video) { const x = VIDEO_OVERLAYS.find(m => m.id === l.video.id); if (x) setActiveVideo(x); }
+    // Load visual layers
+    const newVisuals = [];
+    if (l.visualStack) {
+      l.visualStack.forEach(vs => newVisuals.push({ uid: `vl-${Date.now()}-${Math.random()}`, type: vs.type, itemId: vs.itemId, opacity: vs.opacity || 60, visible: true }));
+    } else {
+      if (l.light) newVisuals.push({ uid: `vl-${Date.now()}-l`, type: 'light', itemId: l.light.id, opacity: v.lightOpacity || 60, visible: true });
+      if (l.video) newVisuals.push({ uid: `vl-${Date.now()}-v`, type: 'video', itemId: l.video.id, opacity: v.videoOpacity || 40, visible: true });
+    }
+    if (newVisuals.length) setVisualLayers(newVisuals);
   }, [stopAll, toggleFreq, toggleSound, toggleDrone]);
 
   const startPlaylist = useCallback(async (playlist) => {
@@ -574,8 +582,8 @@ export default function CosmicMixer() {
     stopAll();
   }, [stopAll]);
 
-  const hasActive = activeFreq || activeSound || activeMantra || activeLight || activeDrone || activeVideo || vibeOn;
-  const activeCount = [activeFreq, activeSound, activeMantra, activeLight, activeDrone, activeVideo, vibeOn].filter(Boolean).length;
+  const hasActive = activeFreq || activeSound || activeMantra || activeDrone || vibeOn || visualLayers.length > 0;
+  const activeCount = [activeFreq, activeSound, activeMantra, activeDrone, vibeOn].filter(Boolean).length + visualLayers.length;
 
   if (!user) return null;
 
@@ -583,30 +591,54 @@ export default function CosmicMixer() {
 
   return (
     <>
-      {/* Visual Overlays — rendered behind everything but above the page */}
-      <AnimatePresence>
-        {activeLight && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: lightOpacity / 100 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 pointer-events-none z-30" data-testid="light-overlay"
-            style={{ opacity: lightOpacity / 100 }}>
-            <LightOverlay mode={activeLight} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {activeVideo && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: videoOpacity / 100 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 pointer-events-none z-30 overflow-hidden" data-testid="video-overlay"
-            style={{ opacity: videoOpacity / 100 }}>
-            <video
-              src={activeVideo.url}
-              autoPlay loop muted playsInline
-              className="w-full h-full object-cover"
-              style={{ mixBlendMode: 'screen' }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Multi-Layer Visual Overlays */}
+      {visualLayers.filter(l => l.visible).map((layer, i) => {
+        if (layer.type === 'light') {
+          const mode = LIGHT_MODES.find(m => m.id === layer.itemId);
+          if (!mode) return null;
+          return (
+            <div key={layer.uid} className="fixed inset-0 pointer-events-none" style={{ zIndex: 30 + i, opacity: layer.opacity / 100 }} data-testid={`overlay-${layer.uid}`}>
+              <LightOverlay mode={mode} />
+            </div>
+          );
+        }
+        if (layer.type === 'video') {
+          const vid = VIDEO_OVERLAYS.find(v => v.id === layer.itemId);
+          if (!vid) return null;
+          return (
+            <div key={layer.uid} className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 30 + i, opacity: layer.opacity / 100 }} data-testid={`overlay-${layer.uid}`}>
+              <video src={vid.url} autoPlay loop muted playsInline className="w-full h-full object-cover" style={{ mixBlendMode: 'screen' }} />
+            </div>
+          );
+        }
+        if (layer.type === 'fractal') {
+          return (
+            <div key={layer.uid} style={{ zIndex: 30 + i }} data-testid={`overlay-${layer.uid}`}>
+              <FractalVisualizer type={layer.itemId} opacity={layer.opacity / 100} audioData={analyserDataRef.current} colorShift={i} />
+            </div>
+          );
+        }
+        if (layer.type === 'filter') {
+          const filter = VISUAL_FILTERS.find(f => f.id === layer.itemId);
+          if (!filter) return null;
+          const intensity = layer.opacity / 100;
+          const cssFilter = filter.css(intensity);
+          if (filter.hasCanvas) {
+            return (
+              <div key={layer.uid} className="fixed inset-0 pointer-events-none" style={{ zIndex: 30 + i, opacity: intensity * 0.6, mixBlendMode: 'overlay' }} data-testid={`overlay-${layer.uid}`}>
+                {layer.itemId === 'film-grain' && <GrainOverlay intensity={intensity} />}
+                {layer.itemId === 'vhs-retro' && <VHSOverlay intensity={intensity} />}
+                {layer.itemId === 'chromatic' && <ChromaticOverlay intensity={intensity} />}
+                {layer.itemId === 'kaleidoscope' && <KaleidoOverlay intensity={intensity} />}
+              </div>
+            );
+          }
+          return (
+            <div key={layer.uid} className="fixed inset-0 pointer-events-none" style={{ zIndex: 30 + i, filter: cssFilter }} data-testid={`overlay-${layer.uid}`} />
+          );
+        }
+        return null;
+      })}
 
       {/* Floating Mixer Button */}
       {!open && (
@@ -926,42 +958,10 @@ export default function CosmicMixer() {
                   {activeMantra && <p className="text-[9px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>{activeMantra.tradition} tradition</p>}
                 </ChannelStrip>
 
-                {/* Light Therapy — uses opacity fader */}
-                <ChannelStrip title="Light" icon={Sun} active={activeLight} color="#FCD34D"
-                  volume={lightOpacity} onVolumeChange={setLightOpacity} faderLabel="Opacity">
-                  <div className="flex flex-wrap gap-1.5">
-                    {LIGHT_MODES.map(l => (
-                      <button key={l.id} onClick={() => { if (activeLight?.id === l.id) setActiveLight(null); else setActiveLight(l); }}
-                        className="text-[10px] px-2.5 py-1.5 rounded-full transition-all flex items-center gap-1.5"
-                        style={{
-                          background: activeLight?.id === l.id ? `${l.colors[0]}20` : 'rgba(255,255,255,0.03)',
-                          color: activeLight?.id === l.id ? l.colors[1] : 'var(--text-muted)',
-                          border: `1px solid ${activeLight?.id === l.id ? `${l.colors[1]}40` : 'rgba(255,255,255,0.05)'}`,
-                        }}
-                        data-testid={`mixer-light-${l.id}`}>
-                        <div className="flex gap-0.5">
-                          {l.colors.slice(0, 3).map((c, i) => (
-                            <div key={i} className="w-2 h-2 rounded-full" style={{ background: c }} />
-                          ))}
-                        </div>
-                        {l.label}
-                      </button>
-                    ))}
-                  </div>
-                </ChannelStrip>
+                {/* ── Visual Layers Mixing Board ── */}
+                <VisualLayersMixer layers={visualLayers} onLayersChange={setVisualLayers} />
 
-                {/* Video Overlay — uses opacity fader */}
-                <ChannelStrip title="Video" icon={Film} active={activeVideo} color="#818CF8"
-                  volume={videoOpacity} onVolumeChange={setVideoOpacity} faderLabel="Opacity">
-                  <div className="flex flex-wrap gap-1.5">
-                    {VIDEO_OVERLAYS.map(v => (
-                      <ChipButton key={v.id} active={activeVideo?.id === v.id} color={v.color || '#64748B'}
-                        onClick={() => toggleVideo(v)} testId={`mixer-video-${v.id}`}>{v.label}</ChipButton>
-                    ))}
-                  </div>
-                </ChannelStrip>
-
-                {/* Vibration */}
+                {/* Haptic / Vibration */}
                 <ChannelStrip title="Haptic" icon={Vibrate} active={vibeOn} color="#FB923C" noFader>
                   <button onClick={toggleVibe}
                     className="text-[10px] px-3 py-2 rounded-full transition-all flex items-center gap-2"
@@ -1079,6 +1079,88 @@ function LightOverlay({ mode }) {
     </div>
   );
 }
+
+/* ─── Canvas Filter Overlays ─── */
+function GrainOverlay({ intensity }) {
+  const canvasRef = React.useRef(null);
+  const frameRef = React.useRef(null);
+  React.useEffect(() => {
+    const c = canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d');
+    c.width = window.innerWidth / 3; c.height = window.innerHeight / 3;
+    const render = () => {
+      const d = ctx.createImageData(c.width, c.height);
+      const g = intensity * 80;
+      for (let i = 0; i < d.data.length; i += 4) {
+        const v = (Math.random() - 0.5) * g;
+        d.data[i] = d.data[i+1] = d.data[i+2] = 128 + v;
+        d.data[i+3] = Math.abs(v) * 1.5;
+      }
+      ctx.putImageData(d, 0, 0);
+      frameRef.current = requestAnimationFrame(render);
+    };
+    render();
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [intensity]);
+  return <canvas ref={canvasRef} className="w-full h-full" style={{ mixBlendMode: 'overlay' }} />;
+}
+
+function VHSOverlay({ intensity }) {
+  const [scan, setScan] = React.useState(0);
+  React.useEffect(() => {
+    const iv = setInterval(() => setScan(Math.random() * 100), 100);
+    return () => clearInterval(iv);
+  }, []);
+  return (
+    <>
+      <div className="absolute inset-0" style={{ background: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,${intensity * 0.08}) 2px, rgba(0,0,0,${intensity * 0.08}) 4px)` }} />
+      <div className="absolute left-0 right-0 h-1" style={{ top: `${scan}%`, background: `rgba(255,255,255,${intensity * 0.15})`, filter: 'blur(1px)' }} />
+    </>
+  );
+}
+
+function ChromaticOverlay({ intensity }) {
+  const offset = Math.round(intensity * 6);
+  return (
+    <>
+      <div className="absolute inset-0" style={{ background: `rgba(255,0,0,${intensity * 0.05})`, transform: `translateX(${offset}px)`, mixBlendMode: 'screen' }} />
+      <div className="absolute inset-0" style={{ background: `rgba(0,0,255,${intensity * 0.05})`, transform: `translateX(${-offset}px)`, mixBlendMode: 'screen' }} />
+    </>
+  );
+}
+
+function KaleidoOverlay({ intensity }) {
+  const canvasRef = React.useRef(null);
+  const frameRef = React.useRef(null);
+  const tRef = React.useRef(0);
+  React.useEffect(() => {
+    const c = canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d');
+    c.width = 400; c.height = 400;
+    const render = () => {
+      tRef.current += 0.02;
+      ctx.clearRect(0, 0, 400, 400);
+      const segs = 8 + Math.floor(intensity * 8);
+      for (let s = 0; s < segs; s++) {
+        ctx.save();
+        ctx.translate(200, 200);
+        ctx.rotate((s / segs) * Math.PI * 2);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(180 * Math.cos(tRef.current + s * 0.5), 180 * Math.sin(tRef.current * 1.3 + s * 0.3));
+        ctx.strokeStyle = `hsla(${s * (360 / segs) + tRef.current * 30}, 80%, 60%, ${0.3 + intensity * 0.3})`;
+        ctx.lineWidth = 1 + intensity * 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+      frameRef.current = requestAnimationFrame(render);
+    };
+    render();
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [intensity]);
+  return <canvas ref={canvasRef} className="w-full h-full" style={{ mixBlendMode: 'screen' }} />;
+}
+
 
 
 /* ─── Preset Card ─── */
