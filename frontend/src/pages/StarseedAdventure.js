@@ -213,14 +213,32 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
           An AI-powered cosmic RPG. Select your starseed origin and embark on a branching journey through the stars. Every choice shapes your destiny.
         </p>
         {existingCharacters.length > 0 && (
-          <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-            onClick={() => window.location.href = '/starseed-realm'}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105 mx-auto"
-            style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
-            data-testid="enter-realm-btn">
-            <Globe size={13} /> Enter the Cosmic Realm
-            <ChevronRight size={11} className="opacity-60" />
-          </motion.button>
+          <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+              onClick={() => window.location.href = '/starseed-realm'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
+              style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
+              data-testid="enter-realm-btn">
+              <Globe size={13} /> Cosmic Realm
+              <ChevronRight size={11} className="opacity-60" />
+            </motion.button>
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+              onClick={() => window.location.href = '/starseed-worlds'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
+              style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38BDF8' }}
+              data-testid="enter-multiverse-btn">
+              <Star size={13} /> Multiverse
+              <ChevronRight size={11} className="opacity-60" />
+            </motion.button>
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+              onClick={() => window.location.href = '/spiritual-avatar'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
+              style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.2)', color: '#EC4899' }}
+              data-testid="avatar-creator-btn">
+              <User size={13} /> Avatar Creator
+              <ChevronRight size={11} className="opacity-60" />
+            </motion.button>
+          </div>
         )}
       </motion.div>
 

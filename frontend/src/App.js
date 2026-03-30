@@ -111,6 +111,8 @@ const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
 const Bible = lazy(() => import('./pages/Bible'));
 const StarseedAdventure = lazy(() => import('./pages/StarseedAdventure'));
 const StarseedRealm = lazy(() => import('./pages/StarseedRealm'));
+const StarseedWorlds = lazy(() => import('./pages/StarseedWorlds'));
+const SpiritualAvatarCreator = lazy(() => import('./pages/SpiritualAvatarCreator'));
 
 function PageLoader() {
   return (
@@ -227,6 +229,8 @@ function AnimatedRoutes() {
         <Route path="/bible" element={<Bible />} />
         <Route path="/starseed-adventure" element={<StarseedAdventure />} />
         <Route path="/starseed-realm" element={<StarseedRealm />} />
+        <Route path="/starseed-worlds" element={<StarseedWorlds />} />
+        <Route path="/spiritual-avatar" element={<SpiritualAvatarCreator />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
