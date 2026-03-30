@@ -500,6 +500,17 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
           setLootDrop(res.data.reward.loot_drop);
         }
       } else {
+        // Show combat feedback
+        const equipBonus = res.data.equipment_bonus || 0;
+        const resMult = res.data.resonance_multiplier || 1.0;
+        const gemFx = res.data.active_gem_effects || [];
+        let feedbackMsg = `${res.data.damage_dealt} damage dealt`;
+        if (equipBonus > 0) feedbackMsg += ` (+${equipBonus} from gear)`;
+        if (resMult > 1.0) feedbackMsg += ` (x${resMult} resonance!)`;
+        if (res.data.was_weakness) feedbackMsg += ' WEAKNESS HIT!';
+        if (gemFx.length > 0) feedbackMsg += ` [${gemFx.join(', ')} glowing]`;
+        toast.success(feedbackMsg);
+
         setActiveBattle(prev => ({
           ...prev,
           boss_current_hp: res.data.boss_hp,
@@ -556,6 +567,34 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
                 Level Up! Lvl {battleResult.reward.new_level}
               </span>
             )}
+          </div>
+        )}
+        {/* Equipment & Resonance Combat Summary */}
+        {(battleResult.equipment_bonus > 0 || battleResult.resonance_multiplier > 1.0 || (battleResult.active_gem_effects?.length > 0)) && (
+          <div className="rounded-xl p-3 mb-4 text-center"
+            style={{ background: 'rgba(192,132,252,0.04)', border: '1px solid rgba(192,132,252,0.1)' }}>
+            <p className="text-[8px] font-bold uppercase tracking-widest mb-2" style={{ color: '#C084FC' }}>Combat Resonance</p>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {battleResult.equipment_bonus > 0 && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(56,189,248,0.08)', color: '#38BDF8' }}>
+                  +{battleResult.equipment_bonus} Gear Bonus
+                </span>
+              )}
+              {battleResult.resonance_multiplier > 1.0 && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(168,85,247,0.08)', color: '#A855F7' }}>
+                  x{battleResult.resonance_multiplier} Resonance
+                </span>
+              )}
+              {battleResult.active_gem_effects?.map((gem, i) => (
+                <motion.span key={i}
+                  animate={{ boxShadow: ['0 0 4px rgba(192,132,252,0.2)', '0 0 12px rgba(192,132,252,0.4)', '0 0 4px rgba(192,132,252,0.2)'] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-[9px] px-2 py-0.5 rounded-full"
+                  style={{ background: 'rgba(240,171,252,0.08)', color: '#F0ABFC' }}>
+                  {gem}
+                </motion.span>
+              ))}
+            </div>
           </div>
         )}
         {battleResult.reward?.new_achievements?.map(a => (

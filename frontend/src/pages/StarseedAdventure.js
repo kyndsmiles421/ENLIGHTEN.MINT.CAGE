@@ -8,7 +8,7 @@ import { useSensory } from '../context/SensoryContext';
 import {
   ArrowLeft, Sparkles, Star, Shield, Heart, Eye, Flame,
   ChevronRight, Loader2, Trophy, Zap, Swords,
-  Brain, ChevronDown, Globe, Package, User
+  Brain, ChevronDown, Globe, Package, User, Gem
 } from 'lucide-react';
 import { InventoryPanel, AvatarGenerator, AvatarBadge } from '../components/StarseedInventory';
 
@@ -561,6 +561,7 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
               const statCfg = STAT_CONFIG[statKey];
               const statDelta = choice.stat_effect?.[statKey] || 0;
               const isHovered = choiceHover === i;
+              const isResonance = !!(choice.resonance_element || (choice.text && choice.text.includes('(Resonance)')));
 
               return (
                 <motion.button key={i}
@@ -573,14 +574,24 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
                   disabled={loading}
                   className="w-full relative overflow-hidden rounded-xl p-4 md:p-5 text-left transition-all group border"
                   style={{
-                    background: isHovered
-                      ? `linear-gradient(135deg, ${statCfg?.color || theme.glow}10, rgba(0,0,0,0.3))`
-                      : 'rgba(255,255,255,0.02)',
-                    borderColor: isHovered ? `${statCfg?.color || theme.glow}30` : 'rgba(255,255,255,0.05)',
+                    background: isResonance
+                      ? `linear-gradient(135deg, rgba(192,132,252,0.06), rgba(0,0,0,0.3))`
+                      : isHovered
+                        ? `linear-gradient(135deg, ${statCfg?.color || theme.glow}10, rgba(0,0,0,0.3))`
+                        : 'rgba(255,255,255,0.02)',
+                    borderColor: isResonance ? 'rgba(192,132,252,0.2)' : isHovered ? `${statCfg?.color || theme.glow}30` : 'rgba(255,255,255,0.05)',
                     transform: isHovered ? 'scale(1.01)' : 'scale(1)',
-                    boxShadow: isHovered ? `0 0 25px ${statCfg?.color || theme.glow}10` : 'none',
+                    boxShadow: isResonance ? '0 0 20px rgba(192,132,252,0.06)' : isHovered ? `0 0 25px ${statCfg?.color || theme.glow}10` : 'none',
                   }}
                   data-testid={`choice-${i}`}>
+                  {/* Resonance shimmer */}
+                  {isResonance && (
+                    <motion.div
+                      animate={{ x: ['-100%', '200%'] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 3 }}
+                      className="absolute inset-0 pointer-events-none opacity-20"
+                      style={{ background: 'linear-gradient(90deg, transparent, rgba(192,132,252,0.15), transparent)', width: '40%' }} />
+                  )}
                   {/* Glow on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
                     style={{ background: `radial-gradient(ellipse at 0% 50%, ${statCfg?.color || '#fff'}08, transparent 60%)` }} />
@@ -588,16 +599,28 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
                     {/* Letter badge */}
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
                       style={{
-                        background: isHovered ? `${statCfg?.color || '#fff'}15` : 'rgba(255,255,255,0.04)',
-                        border: `1px solid ${isHovered ? (statCfg?.color || '#fff') + '30' : 'rgba(255,255,255,0.06)'}`,
+                        background: isResonance ? 'rgba(192,132,252,0.12)' : isHovered ? `${statCfg?.color || '#fff'}15` : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${isResonance ? 'rgba(192,132,252,0.3)' : isHovered ? (statCfg?.color || '#fff') + '30' : 'rgba(255,255,255,0.06)'}`,
                       }}>
-                      <span className="text-sm font-bold" style={{ color: statCfg?.color || '#fff' }}>
-                        {String.fromCharCode(65 + i)}
-                      </span>
+                      {isResonance ? (
+                        <Gem size={14} style={{ color: '#C084FC' }} />
+                      ) : (
+                        <span className="text-sm font-bold" style={{ color: statCfg?.color || '#fff' }}>
+                          {String.fromCharCode(65 + i)}
+                        </span>
+                      )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium mb-1.5 leading-relaxed" style={{ color: 'var(--text-primary)' }}>{choice.text}</p>
+                      <p className="text-sm font-medium mb-1.5 leading-relaxed" style={{ color: isResonance ? '#D8C5F5' : 'var(--text-primary)' }}>
+                        {choice.text}
+                      </p>
                       <div className="flex items-center gap-2.5 flex-wrap">
+                        {isResonance && (
+                          <span className="text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 font-bold"
+                            style={{ background: 'rgba(192,132,252,0.1)', color: '#C084FC', border: '1px solid rgba(192,132,252,0.15)' }}>
+                            <Gem size={8} /> Gem Resonance
+                          </span>
+                        )}
                         {statCfg && (
                           <span className="text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 font-bold"
                             style={{ background: `${statCfg.color}12`, color: statCfg.color, border: `1px solid ${statCfg.color}15` }}>
@@ -615,7 +638,7 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
                       </div>
                     </div>
                     <ChevronRight size={16} className="flex-shrink-0 mt-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                      style={{ color: statCfg?.color || 'var(--text-muted)' }} />
+                      style={{ color: isResonance ? '#C084FC' : statCfg?.color || 'var(--text-muted)' }} />
                   </div>
                 </motion.button>
               );

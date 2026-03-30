@@ -171,6 +171,60 @@ async def generate_scene(data: dict = Body(...), user=Depends(get_current_user))
     stats = char.get("stats", origin["starting_stats"])
     character_name = char.get("character_name", "Traveler")
 
+    # ─── GEM RESONANCE SYSTEM ───
+    gem_collection = char.get("gem_collection", [])
+    equipped_gear = char.get("equipped_gear", {})
+    equipment_collection = char.get("equipment_collection", [])
+
+    # Build resonance context from gems and equipment
+    resonance_elements = set()
+    resonance_gems = []
+    socketed_gem_names = []
+    equipment_names = []
+
+    for gem in gem_collection:
+        resonance_elements.add(gem.get("element", ""))
+        resonance_gems.append(gem.get("name", ""))
+
+    for slot, iid in equipped_gear.items():
+        eq = next((e for e in equipment_collection if e.get("instance_id") == iid), None)
+        if eq:
+            equipment_names.append(eq.get("name", ""))
+            for sg in eq.get("socketed_gems", []):
+                socketed_gem_names.append(sg.get("name", ""))
+
+    resonance_prompt = ""
+    if resonance_elements or resonance_gems:
+        resonance_prompt = "\n\nGEM RESONANCE SYSTEM:"
+        if resonance_elements:
+            resonance_prompt += f"\nThe player carries gems attuned to these elements: {', '.join(resonance_elements)}."
+            resonance_prompt += "\nIMPORTANT: Include AT LEAST ONE hidden choice or narrative branch that RESPONDS to a gem the player has."
+            resonance_prompt += "\nExamples of resonance:"
+            if "Water" in resonance_elements:
+                resonance_prompt += "\n- Water gems (Tide Pearl, Sirian Trident) → aquatic entities become peaceful, water paths open"
+            if "Fire" in resonance_elements:
+                resonance_prompt += "\n- Fire gems (Ember Shard, Vega's Flame) → flame barriers part, forge spirits offer gifts"
+            if "Shadow" in resonance_elements:
+                resonance_prompt += "\n- Shadow gems (Shadow Amber, Orion Scar) → shadow entities reveal shortcuts, darkness becomes navigable"
+            if "Crystal" in resonance_elements:
+                resonance_prompt += "\n- Crystal gems (Crystal Node, Arcturian Prism) → crystalline structures activate, hidden codes visible"
+            if "Light" in resonance_elements:
+                resonance_prompt += "\n- Light gems (Prism Dust, Pleiadian Heart) → healing paths open, light barriers dissolve"
+            if "Void" in resonance_elements:
+                resonance_prompt += "\n- Void gems (Void Glass, Andromedan Lens) → dimensional rifts stabilize, void creatures communicate"
+            if "All" in resonance_elements:
+                resonance_prompt += "\n- Cosmic gems (Singularity Seed, Akashic Shard) → reality bends, secret cosmic paths reveal themselves"
+
+        if resonance_gems:
+            resonance_prompt += f"\nSpecific gems the player has: {', '.join(resonance_gems[:8])}."
+        if equipment_names:
+            resonance_prompt += f"\nEquipment worn: {', '.join(equipment_names)}."
+        if socketed_gem_names:
+            resonance_prompt += f"\nSocketed gems empowering gear: {', '.join(socketed_gem_names)}."
+
+        resonance_prompt += "\nMark gem-resonance choices with a '(Resonance)' tag in the choice text. These should feel like hidden paths only the attuned can perceive."
+        resonance_prompt += "\nAdd 'resonance_element' field to choices that are gem-gated (e.g., \"resonance_element\": \"Water\")."
+
     # If a choice was made, record it
     if choice_index is not None and story_memory:
         last_scene = story_memory[-1] if story_memory else {}
@@ -226,6 +280,7 @@ RULES:
 - Make the {origin['element']} element central to the narrative
 - Include an "image_prompt" field: a 1-sentence cinematic scene description for AI art generation (cosmic, painterly, no text/words)
 - Return ONLY valid JSON with no markdown formatting
+{resonance_prompt}
 
 JSON format:
 {{
@@ -236,7 +291,7 @@ JSON format:
   "choices": [
     {{"text": "Choice description", "stat_effect": {{"courage": 1}}, "preview": "Brief hint of consequence"}},
     {{"text": "Choice description", "stat_effect": {{"wisdom": 1}}, "preview": "Brief hint"}},
-    {{"text": "Choice description", "stat_effect": {{"compassion": 1}}, "preview": "Brief hint"}}
+    {{"text": "Choice description (Resonance)", "stat_effect": {{"compassion": 1, "intuition": 1}}, "preview": "A gem-attuned path", "resonance_element": "Water"}}
   ],
   "xp_earned": 15
 }}"""

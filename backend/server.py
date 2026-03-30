@@ -76,6 +76,7 @@ from routes.starseed_adventure import router as starseed_router
 from routes.starseed_realm import router as starseed_realm_router
 from routes.starseed_worlds import router as starseed_worlds_router
 from routes.spiritual_avatar import router as spiritual_avatar_router
+from routes.avatar_gallery import router as avatar_gallery_router
 
 app = FastAPI()
 
@@ -119,6 +120,7 @@ all_routers = [
     starseed_realm_router,
     starseed_worlds_router,
     spiritual_avatar_router,
+    avatar_gallery_router,
 ]
 
 for r in all_routers:

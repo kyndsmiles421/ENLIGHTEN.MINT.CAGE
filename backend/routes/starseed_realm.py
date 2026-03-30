@@ -916,6 +916,77 @@ async def boss_action(data: dict = Body(...), user=Depends(get_current_user)):
     stat_used = chosen.get("stat_used", "courage")
     boss_dmg = scene.get("boss_damage_to_party", 15)
 
+    # ─── EQUIPMENT & GEM COMBAT INTEGRATION ───
+    origin_id = None
+    for p in battle.get("participants", []):
+        if p.get("user_id") == uid:
+            origin_id = p.get("origin_id")
+            break
+
+    equipment_bonus = 0
+    resonance_multiplier = 1.0
+    active_gem_effects = []
+
+    if origin_id:
+        char_data = await db.starseed_characters.find_one(
+            {"user_id": uid, "origin_id": origin_id}, {"_id": 0}
+        )
+        if char_data:
+            equipped_gear = char_data.get("equipped_gear", {})
+            equipment_coll = char_data.get("equipment_collection", [])
+            active_set_bonuses = char_data.get("active_set_bonuses", [])
+
+            # Sum stat bonuses from equipped gear
+            for slot, iid in equipped_gear.items():
+                eq = next((e for e in equipment_coll if e.get("instance_id") == iid), None)
+                if eq:
+                    stat_bonus = eq.get("stat_bonus", {})
+                    relevant = stat_bonus.get(stat_used, 0)
+                    equipment_bonus += relevant * 3  # Each stat point = 3 damage
+
+                    # Socketed gem bonuses
+                    for sg in eq.get("socketed_gems", []):
+                        socket_bonus = sg.get("socket_bonus", {})
+                        gem_relevant = socket_bonus.get(stat_used, 0)
+                        equipment_bonus += gem_relevant * 2
+                        if sg.get("name"):
+                            active_gem_effects.append(sg["name"])
+
+                    # Enchantment effects
+                    for ench in eq.get("enchantments", []):
+                        if ench["id"] == "fortify":
+                            equipment_bonus += 5
+                        elif ench["id"] == "awaken":
+                            resonance_multiplier += 0.15
+
+            # Set bonus effects
+            for sb in active_set_bonuses:
+                bonus_stats = sb.get("bonus", {}).get("stats", {})
+                set_relevant = bonus_stats.get(stat_used, 0)
+                equipment_bonus += set_relevant * 2
+                special = sb.get("bonus", {}).get("special")
+                if special == "star_strike":
+                    resonance_multiplier += 0.2
+                elif special == "void_step":
+                    boss_dmg = max(5, boss_dmg - 5)
+                elif special == "portal_sight":
+                    team_heal += 10
+
+            # Gem resonance: if boss weakness matches a carried gem element
+            gem_collection = char_data.get("gem_collection", [])
+            boss_obj = next((b for b in COSMIC_BOSSES if b["id"] == battle["boss_id"]), None)
+            if boss_obj and gem_collection:
+                boss_weak_element = {
+                    "courage": "Fire", "wisdom": "Crystal", "compassion": "Light",
+                    "intuition": "Void", "resilience": "Shadow"
+                }.get(boss_obj.get("weakness"), "")
+                has_resonance = any(g.get("element") == boss_weak_element for g in gem_collection)
+                if has_resonance:
+                    resonance_multiplier += 0.25
+
+    # Apply formula: Damage = (Base + Equipment Bonus) × Resonance Multiplier
+    damage = int((damage + equipment_bonus) * resonance_multiplier)
+
     # Get boss weakness/resistance
     boss = next((b for b in COSMIC_BOSSES if b["id"] == battle["boss_id"]), None)
     if boss and stat_used == boss.get("weakness"):
@@ -1036,6 +1107,9 @@ async def boss_action(data: dict = Body(...), user=Depends(get_current_user)):
         "boss_defeated": boss_defeated,
         "phase": next_phase,
         "choice_text": chosen["text"],
+        "equipment_bonus": equipment_bonus,
+        "resonance_multiplier": round(resonance_multiplier, 2),
+        "active_gem_effects": active_gem_effects[:5],
     }
 
     if battle_over:

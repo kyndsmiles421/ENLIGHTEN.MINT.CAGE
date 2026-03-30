@@ -543,6 +543,12 @@ export default function SpiritualAvatarCreator() {
           style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="avatar-reset">
           <RotateCcw size={14} style={{ color: 'var(--text-muted)' }} />
         </button>
+        <button onClick={() => navigate('/avatar-gallery')}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all hover:scale-105"
+          style={{ background: 'rgba(252,211,77,0.08)', border: '1px solid rgba(252,211,77,0.15)', color: '#FCD34D' }}
+          data-testid="gallery-link">
+          <Eye size={11} /> Gallery
+        </button>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 pt-6 relative z-10">
