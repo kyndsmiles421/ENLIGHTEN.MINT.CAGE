@@ -34,6 +34,16 @@ const ORIGIN_COLORS = {
   lyran: '#F59E0B', andromedan: '#0EA5E9', orion: '#DC2626',
 };
 
+// Origin → Mixer soundscape presets
+const ORIGIN_SOUNDSCAPES = {
+  pleiadian: { label: 'Pleiadian Light', freq: [528, 963], sound: 'singing-bowl', drone: 'harp-drone', bpm: 60 },
+  sirian: { label: 'Sirian Ocean', freq: [639, 852], sound: 'ocean', drone: 'bowl-drone', bpm: 72 },
+  arcturian: { label: 'Arcturian Cosmos', freq: [741, 963], sound: 'wind', drone: 'shakuhachi-drone', bpm: 50 },
+  lyran: { label: 'Lyran Fire', freq: [396, 528], sound: 'fire', drone: 'sitar-drone', bpm: 80 },
+  andromedan: { label: 'Andromedan Stream', freq: [432, 639], sound: 'stream', drone: 'kalimba-drone', bpm: 65 },
+  orion: { label: 'Orion Thunder', freq: [174, 396], sound: 'thunder', drone: 'didgeridoo-drone', bpm: 100 },
+};
+
 /* ─── Stat Card ─── */
 function StatCard({ label, value, icon: Icon, color }) {
   return (
@@ -273,8 +283,9 @@ export default function CosmicLedger() {
                 {['pleiadian', 'sirian', 'arcturian', 'lyran', 'andromedan', 'orion'].map(o => {
                   const active = stats.origin_ids?.includes(o);
                   const color = ORIGIN_COLORS[o];
+                  const soundscape = ORIGIN_SOUNDSCAPES[o];
                   return (
-                    <div key={o} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+                    <div key={o} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg group"
                       style={{
                         background: active ? `${color}10` : 'rgba(255,255,255,0.02)',
                         border: `1px solid ${active ? `${color}20` : 'rgba(255,255,255,0.05)'}`,
@@ -284,6 +295,14 @@ export default function CosmicLedger() {
                       <span className="text-[9px] font-medium capitalize" style={{ color: active ? color : 'var(--text-muted)' }}>
                         {o}
                       </span>
+                      {active && soundscape && (
+                        <button onClick={() => navigate(`/cosmic-mixer?origin=${o}`)}
+                          className="text-[7px] ml-1 px-1.5 py-0.5 rounded-md transition-all hover:scale-105"
+                          style={{ background: `${color}15`, border: `1px solid ${color}30`, color }}
+                          data-testid={`origin-soundscape-${o}`}>
+                          Soundscape
+                        </button>
+                      )}
                     </div>
                   );
                 })}

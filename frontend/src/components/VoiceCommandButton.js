@@ -260,9 +260,28 @@ export default function VoiceCommandButton() {
 
             <div className="overflow-y-auto px-4 py-2 space-y-2" style={{ maxHeight: 220, scrollbarWidth: 'thin' }}>
               {commandHistory.length === 0 ? (
-                <p className="text-[10px] text-center py-4" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                  No commands yet. Hold the mic and speak.
-                </p>
+                <div className="text-center py-4">
+                  {isRecording ? (
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      {[0, 1, 2, 3, 4].map(i => (
+                        <motion.div key={i}
+                          className="w-1 rounded-full"
+                          style={{ background: '#C084FC' }}
+                          animate={{ height: [4, 16, 4] }}
+                          transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1, ease: 'easeInOut' }}
+                        />
+                      ))}
+                    </div>
+                  ) : isProcessing ? (
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Loader2 size={14} className="animate-spin" style={{ color: '#C084FC' }} />
+                      <span className="text-[10px]" style={{ color: 'rgba(192,132,252,0.6)' }}>Processing...</span>
+                    </div>
+                  ) : null}
+                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                    {isRecording ? 'Listening...' : 'Hold the mic and speak.'}
+                  </p>
+                </div>
               ) : (
                 [...commandHistory].reverse().map((cmd, i) => {
                   const CmdIcon = INTENT_ICONS[cmd.intent] || MessageCircle;

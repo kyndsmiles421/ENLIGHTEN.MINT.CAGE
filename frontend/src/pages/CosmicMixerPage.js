@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio,
+  ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio, ChevronDown,
   Play, Pause, Square, Loader2, X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -278,25 +278,180 @@ export default function CosmicMixerPage() {
     return () => { if (tempoCleanupRef.current) { tempoCleanupRef.current(); tempoCleanupRef.current = null; } };
   }, [bpm, connectToGains]);
 
+  // ─── Session Mode ───
+  const [sessionActive, setSessionActive] = useState(false);
+  const [sessionData, setSessionData] = useState(null);
+  const [sessionPhaseIdx, setSessionPhaseIdx] = useState(0);
+  const [sessionTimeLeft, setSessionTimeLeft] = useState(0);
+  const [sessionPhaseTimeLeft, setSessionPhaseTimeLeft] = useState(0);
+  const sessionIntervalRef = useRef(null);
+
+  const SESSIONS = [
+    { id: 'morning', label: 'Morning Awakening', duration: 900, icon: '☀', color: '#F59E0B',
+      phases: [
+        { dur: 180, bpm: 40, freq: [7.83], sound: ['ocean'], drone: [], mantra: null, light: 'calm-blue', desc: 'Gentle Awakening' },
+        { dur: 180, bpm: 60, freq: [432], sound: ['stream'], drone: ['bowl-drone'], mantra: null, light: 'sunrise', desc: 'Rising Energy' },
+        { dur: 180, bpm: 72, freq: [528], sound: ['forest'], drone: ['flute-drone'], mantra: 'om', light: 'healing-green', desc: 'Heart Opening' },
+        { dur: 180, bpm: 80, freq: [639, 741], sound: ['singing-bowl'], drone: ['tanpura-drone'], mantra: 'gayatri', light: 'golden', desc: 'Full Radiance' },
+        { dur: 180, bpm: 60, freq: [528], sound: ['stream'], drone: [], mantra: 'peace', light: 'sunrise', desc: 'Gentle Integration' },
+      ]},
+    { id: 'deep-sleep', label: 'Deep Sleep Descent', duration: 1200, icon: '🌙', color: '#6366F1',
+      phases: [
+        { dur: 240, bpm: 60, freq: [432], sound: ['rain'], drone: ['harmonium-drone'], mantra: 'so-hum', light: 'calm-blue', desc: 'Settling In' },
+        { dur: 240, bpm: 50, freq: [174, 285], sound: ['ocean'], drone: ['cello-drone'], mantra: null, light: 'calm-blue', desc: 'Deepening' },
+        { dur: 240, bpm: 40, freq: [7.83], sound: ['cave'], drone: ['tibetan-horn'], mantra: null, light: 'violet', desc: 'Delta Descent' },
+        { dur: 240, bpm: 40, freq: [7.83], sound: ['night'], drone: [], mantra: null, light: null, desc: 'Deep Rest' },
+        { dur: 240, bpm: 0, freq: [], sound: ['rain'], drone: [], mantra: null, light: null, desc: 'Silence' },
+      ]},
+    { id: 'chakra', label: 'Chakra Activation', duration: 840, icon: '🔮', color: '#C084FC',
+      phases: [
+        { dur: 120, bpm: 60, freq: [396], sound: ['thunder'], drone: ['didgeridoo-drone'], mantra: 'om', light: null, desc: 'Root — Grounding' },
+        { dur: 120, bpm: 65, freq: [417], sound: ['ocean'], drone: ['oud-drone'], mantra: null, light: null, desc: 'Sacral — Flow' },
+        { dur: 120, bpm: 70, freq: [528], sound: ['fire'], drone: ['sitar-drone'], mantra: 'ra-ma', light: 'golden', desc: 'Solar Plexus — Power' },
+        { dur: 120, bpm: 72, freq: [639], sound: ['forest'], drone: ['harp-drone'], mantra: 'lokah', light: 'healing-green', desc: 'Heart — Love' },
+        { dur: 120, bpm: 75, freq: [741], sound: ['wind'], drone: ['flute-drone'], mantra: 'ham-sa', light: 'calm-blue', desc: 'Throat — Expression' },
+        { dur: 120, bpm: 72, freq: [852], sound: ['singing-bowl'], drone: ['bowl-drone'], mantra: 'om-mani', light: 'violet', desc: 'Third Eye — Insight' },
+        { dur: 120, bpm: 60, freq: [963], sound: ['singing-bowl'], drone: ['kalimba-drone'], mantra: 'gate-gate', light: 'aurora', desc: 'Crown — Connection' },
+      ]},
+    { id: 'shamanic', label: 'Shamanic Journey', duration: 900, icon: '🦅', color: '#78350F',
+      phases: [
+        { dur: 180, bpm: 80, freq: [111], sound: ['fire'], drone: ['didgeridoo-drone'], mantra: 'hu', light: null, desc: 'Calling In' },
+        { dur: 180, bpm: 120, freq: [7.83, 40], sound: ['thunder'], drone: ['didgeridoo-drone', 'tibetan-horn'], mantra: null, light: null, desc: 'Descent' },
+        { dur: 180, bpm: 140, freq: [40], sound: ['wind'], drone: ['bagpipe-drone', 'didgeridoo-drone'], mantra: null, light: 'violet', desc: 'Deep Trance' },
+        { dur: 180, bpm: 100, freq: [528], sound: ['forest'], drone: ['flute-drone'], mantra: 'om-tare', light: 'healing-green', desc: 'Return Journey' },
+        { dur: 180, bpm: 60, freq: [432], sound: ['stream'], drone: [], mantra: 'peace', light: 'golden', desc: 'Integration' },
+      ]},
+    { id: 'ocean-calm', label: 'Ocean Calm', duration: 600, icon: '🌊', color: '#06B6D4',
+      phases: [
+        { dur: 150, bpm: 60, freq: [432], sound: ['ocean'], drone: ['hang-drum-drone'], mantra: null, light: 'calm-blue', desc: 'Arrival' },
+        { dur: 150, bpm: 50, freq: [528, 639], sound: ['ocean', 'stream'], drone: ['harp-drone'], mantra: 'hooponopono', light: 'calm-blue', desc: 'Immersion' },
+        { dur: 150, bpm: 40, freq: [174], sound: ['ocean', 'waterfall'], drone: [], mantra: null, light: 'calm-blue', desc: 'Deep Calm' },
+        { dur: 150, bpm: 50, freq: [432], sound: ['ocean'], drone: [], mantra: 'peace', light: 'calm-blue', desc: 'Gentle Return' },
+      ]},
+  ];
+
+  const startSession = useCallback((session) => {
+    stopAll();
+    setSessionData(session);
+    setSessionPhaseIdx(0);
+    setSessionTimeLeft(session.duration);
+    setSessionPhaseTimeLeft(session.phases[0].dur);
+    setSessionActive(true);
+  }, [stopAll]);
+
+  const stopSession = useCallback(() => {
+    if (sessionIntervalRef.current) clearInterval(sessionIntervalRef.current);
+    setSessionActive(false);
+    setSessionData(null);
+    stopAll();
+  }, [stopAll]);
+
+  // Load phase layers
+  const loadPhase = useCallback((phase) => {
+    stopAll();
+    setTimeout(() => {
+      if (phase.bpm > 0) setBpm(phase.bpm);
+      else stopTempo();
+      phase.freq.forEach((hz, i) => {
+        const f = FREQUENCIES.find(x => x.hz === hz);
+        if (f) setTimeout(() => toggleFreq(f), 100 + i * 60);
+      });
+      (phase.sound || []).forEach((id, i) => {
+        const s = SOUNDS.find(x => x.id === id);
+        if (s) setTimeout(() => toggleSound(s), 200 + i * 60);
+      });
+      (phase.drone || []).forEach((id, i) => {
+        const d = INSTRUMENT_DRONES.find(x => x.id === id);
+        if (d) setTimeout(() => toggleDrone(d), 300 + i * 60);
+      });
+      if (phase.mantra) {
+        const m = MANTRAS.find(x => x.id === phase.mantra);
+        if (m) setTimeout(() => toggleMantra(m), 500);
+      }
+      if (phase.light) {
+        const l = LIGHT_MODES.find(x => x.id === phase.light);
+        if (l) setActiveLight(l);
+      } else {
+        setActiveLight(null);
+      }
+    }, 200);
+  }, [stopAll, setBpm, stopTempo, toggleFreq, toggleSound, toggleDrone, toggleMantra]);
+
+  // Session timer
+  useEffect(() => {
+    if (!sessionActive || !sessionData) return;
+    loadPhase(sessionData.phases[0]);
+
+    sessionIntervalRef.current = setInterval(() => {
+      setSessionTimeLeft(prev => {
+        if (prev <= 1) { stopSession(); return 0; }
+        return prev - 1;
+      });
+      setSessionPhaseTimeLeft(prev => {
+        if (prev <= 1) {
+          setSessionPhaseIdx(idx => {
+            const nextIdx = idx + 1;
+            if (nextIdx >= sessionData.phases.length) { stopSession(); return idx; }
+            loadPhase(sessionData.phases[nextIdx]);
+            setSessionPhaseTimeLeft(sessionData.phases[nextIdx].dur);
+            return nextIdx;
+          });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => { if (sessionIntervalRef.current) clearInterval(sessionIntervalRef.current); };
+  }, [sessionActive, sessionData]);
+
+  // ─── Haptic intensity ───
+  const [hapticIntensity, setHapticIntensity] = useState(70);
+
+  const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+  // ─── Collapsible accordion state ───
+  const [openSections, setOpenSections] = useState({ freq: true, sound: false, drone: false, mantra: false, light: false, haptic: false, tempo: false, session: false });
+  const toggleSection = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
+
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra || activeLight || vibeOn;
   const activeCount = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0) + (activeLight ? 1 : 0) + (vibeOn ? 1 : 0);
 
   return (
     <div className="min-h-screen relative" data-testid="cosmic-mixer-page">
-      {/* Light therapy overlay */}
-      {activeLight && (
-        <div className="fixed inset-0 pointer-events-none z-10">
-          <LightOverlay mode={activeLight} />
+      {activeLight && <div className="fixed inset-0 pointer-events-none z-10"><LightOverlay mode={activeLight} /></div>}
+
+      {/* Session progress bar */}
+      {sessionActive && sessionData && (
+        <div className="fixed top-0 left-0 right-0 z-40" style={{ background: 'rgba(10,10,18,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="max-w-2xl mx-auto px-4 py-2.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">{sessionData.icon}</span>
+                <span className="text-xs font-medium" style={{ color: sessionData.color }}>{sessionData.label}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs tabular-nums" style={{ color: 'rgba(248,250,252,0.5)' }}>{fmtTime(sessionTimeLeft)}</span>
+                <button onClick={stopSession} className="text-[10px] px-2.5 py-1 rounded-lg" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }} data-testid="session-stop">End</button>
+              </div>
+            </div>
+            <div className="flex gap-1 mb-1">
+              {sessionData.phases.map((p, i) => (
+                <div key={i} className="h-1 rounded-full flex-1 transition-all" style={{ background: i < sessionPhaseIdx ? sessionData.color : i === sessionPhaseIdx ? `${sessionData.color}80` : 'rgba(255,255,255,0.06)' }} />
+              ))}
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px]" style={{ color: sessionData.color }}>Phase {sessionPhaseIdx + 1}/{sessionData.phases.length}: {sessionData.phases[sessionPhaseIdx]?.desc}</span>
+              <span className="text-[9px] tabular-nums" style={{ color: 'rgba(248,250,252,0.3)' }}>{fmtTime(sessionPhaseTimeLeft)} left</span>
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto px-4 pt-6 pb-28 relative z-20">
+      <div className={`max-w-2xl mx-auto px-4 pb-28 relative z-20 ${sessionActive ? 'pt-24' : 'pt-6'}`}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button onClick={() => { stopAll(); navigate(-1); }}
-            className="p-2 rounded-xl transition-all hover:scale-105"
-            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
-            data-testid="mixer-back">
+        <div className="flex items-center justify-between mb-5">
+          <button onClick={() => { stopAll(); stopSession(); navigate(-1); }} className="p-2 rounded-xl transition-all hover:scale-105" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }} data-testid="mixer-back">
             <ArrowLeft size={18} style={{ color: 'rgba(248,250,252,0.6)' }} />
           </button>
           <div className="text-center">
@@ -304,245 +459,198 @@ export default function CosmicMixerPage() {
               <Waves size={16} style={{ color: '#C084FC' }} />
               <h1 className="text-lg font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>Cosmic Mixer</h1>
             </div>
-            {activeCount > 0 && (
-              <p className="text-[10px] mt-0.5" style={{ color: '#C084FC' }}>{activeCount} layer{activeCount > 1 ? 's' : ''} active</p>
-            )}
+            {activeCount > 0 && <p className="text-[10px] mt-0.5" style={{ color: '#C084FC' }}>{activeCount} layer{activeCount > 1 ? 's' : ''} active</p>}
           </div>
           <div className="flex items-center gap-1">
-            {hasActive && (
-              <button onClick={stopAll} className="p-2 rounded-xl" style={{ color: '#EF4444' }} data-testid="mixer-stop-all">
-                <Square size={16} />
-              </button>
-            )}
+            {hasActive && <button onClick={stopAll} className="p-2 rounded-xl" style={{ color: '#EF4444' }} data-testid="mixer-stop-all"><Square size={16} /></button>}
           </div>
         </div>
 
         {/* Master Volume */}
-        <div className="flex items-center gap-3 mb-6 px-3 py-3 rounded-xl"
-          style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="flex items-center gap-3 mb-3 px-3 py-3 rounded-xl" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
           <button onClick={() => setMuted(m => !m)} className="p-1" data-testid="mixer-mute">
             {muted ? <VolumeX size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /> : <Volume2 size={16} style={{ color: '#C084FC' }} />}
           </button>
-          <input type="range" min={0} max={100} value={muted ? 0 : masterVol}
-            onChange={e => { setMasterVol(parseInt(e.target.value)); setMuted(false); }}
-            className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
-            style={{ background: `linear-gradient(to right, #C084FC ${masterVol}%, rgba(255,255,255,0.06) ${masterVol}%)` }}
-            data-testid="mixer-volume" />
+          <input type="range" min={0} max={100} value={muted ? 0 : masterVol} onChange={e => { setMasterVol(parseInt(e.target.value)); setMuted(false); }}
+            className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer" style={{ background: `linear-gradient(to right, #C084FC ${masterVol}%, rgba(255,255,255,0.06) ${masterVol}%)` }} data-testid="mixer-volume" />
           <span className="text-xs w-8 text-right tabular-nums" style={{ color: 'rgba(248,250,252,0.5)' }}>{masterVol}%</span>
         </div>
 
-        {/* Layers */}
-        <div className="space-y-5">
-          {/* Frequency Layer (multi-select) */}
-          <LayerSection title="Solfeggio Frequency" icon={Waves} active={activeFreqs.size > 0} color="#C084FC">
-            <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+        {/* Accordion Sections */}
+        <div className="space-y-2">
+          <AccordionSection title="Session Mode" icon={Play} color="#EC4899" open={openSections.session} onToggle={() => toggleSection('session')} badge={sessionActive ? sessionData?.label : null}>
+            {sessionActive ? (
+              <div className="text-center py-3">
+                <p className="text-xs mb-2" style={{ color: 'rgba(248,250,252,0.5)' }}>Session in progress</p>
+                <button onClick={stopSession} className="text-xs px-5 py-2 rounded-xl" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }} data-testid="session-stop-inner">End Session</button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SESSIONS.map(s => (
+                  <button key={s.id} onClick={() => startSession(s)} className="text-left px-4 py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${s.color}20` }} data-testid={`session-${s.id}`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm">{s.icon}</span>
+                      <span className="text-xs font-medium" style={{ color: s.color }}>{s.label}</span>
+                    </div>
+                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{fmtTime(s.duration)} — {s.phases.length} phases</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </AccordionSection>
+
+          <AccordionSection title="Solfeggio Frequency" icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>
+            <div className="flex flex-wrap gap-1.5">
               {FREQUENCIES.map(f => (
-                <button key={f.hz} onClick={() => toggleFreq(f)}
-                  className="text-left px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02]"
-                  style={{
-                    background: activeFreqs.has(f.hz) ? `${f.color}15` : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : 'rgba(255,255,255,0.04)'}`,
-                  }}
+                <button key={f.hz} onClick={() => toggleFreq(f)} className="flex-shrink-0 text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
+                  style={{ background: activeFreqs.has(f.hz) ? `${f.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : 'rgba(255,255,255,0.04)'}` }}
                   data-testid={`mixer-freq-${f.hz}`}>
-                  <span className="text-xs font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
-                  <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{f.desc}</span>
+                  <span className="text-[11px] font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
+                  <span className="text-[8px] block" style={{ color: 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
                 </button>
               ))}
             </div>
-            {activeFreqs.size > 1 && <p className="text-[9px] mt-2" style={{ color: '#C084FC' }}>{activeFreqs.size} frequencies layered</p>}
-          </LayerSection>
+          </AccordionSection>
 
-          {/* Sound Layer (multi-select) */}
-          <LayerSection title="Ambient Sound" icon={Volume2} active={activeSounds.size > 0} color="#3B82F6">
-            <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+          <AccordionSection title="Ambient Sound" icon={Volume2} color="#3B82F6" open={openSections.sound} onToggle={() => toggleSection('sound')} badge={activeSounds.size > 0 ? `${activeSounds.size} active` : null}>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
               {SOUNDS.map(s => (
-                <button key={s.id} onClick={() => toggleSound(s)}
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02]"
-                  style={{
-                    background: activeSounds.has(s.id) ? `${s.color}15` : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${activeSounds.has(s.id) ? `${s.color}35` : 'rgba(255,255,255,0.04)'}`,
-                  }}
+                <button key={s.id} onClick={() => toggleSound(s)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
+                  style={{ background: activeSounds.has(s.id) ? `${s.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeSounds.has(s.id) ? `${s.color}35` : 'rgba(255,255,255,0.04)'}` }}
                   data-testid={`mixer-sound-${s.id}`}>
-                  {activeSounds.has(s.id) ? <Pause size={12} style={{ color: s.color }} /> : <Play size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />}
-                  <span className="text-xs" style={{ color: activeSounds.has(s.id) ? s.color : 'rgba(248,250,252,0.6)' }}>{s.label}</span>
+                  {activeSounds.has(s.id) ? <Pause size={10} style={{ color: s.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+                  <span className="text-[11px]" style={{ color: activeSounds.has(s.id) ? s.color : 'rgba(248,250,252,0.55)' }}>{s.label}</span>
                 </button>
               ))}
             </div>
-            {activeSounds.size > 1 && <p className="text-[9px] mt-2" style={{ color: '#3B82F6' }}>{activeSounds.size} sounds layered</p>}
-          </LayerSection>
+          </AccordionSection>
 
-          {/* Instrument Drones Layer (multi-select) */}
-          <LayerSection title="World Instruments" icon={Music} active={activeDrones.size > 0} color="#F59E0B">
-            <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+          <AccordionSection title="World Instruments" icon={Music} color="#F59E0B" open={openSections.drone} onToggle={() => toggleSection('drone')} badge={activeDrones.size > 0 ? `${activeDrones.size} active` : null}>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
               {INSTRUMENT_DRONES.map(d => (
-                <button key={d.id} onClick={() => toggleDrone(d)}
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02]"
-                  style={{
-                    background: activeDrones.has(d.id) ? `${d.color}15` : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${activeDrones.has(d.id) ? `${d.color}35` : 'rgba(255,255,255,0.04)'}`,
-                  }}
+                <button key={d.id} onClick={() => toggleDrone(d)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
+                  style={{ background: activeDrones.has(d.id) ? `${d.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeDrones.has(d.id) ? `${d.color}35` : 'rgba(255,255,255,0.04)'}` }}
                   data-testid={`mixer-drone-${d.id}`}>
-                  {activeDrones.has(d.id) ? <Pause size={12} style={{ color: d.color }} /> : <Play size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />}
-                  <span className="text-xs" style={{ color: activeDrones.has(d.id) ? d.color : 'rgba(248,250,252,0.6)' }}>{d.label}</span>
+                  {activeDrones.has(d.id) ? <Pause size={10} style={{ color: d.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+                  <span className="text-[11px]" style={{ color: activeDrones.has(d.id) ? d.color : 'rgba(248,250,252,0.55)' }}>{d.label}</span>
                 </button>
               ))}
             </div>
-            {activeDrones.size > 1 && <p className="text-[9px] mt-2" style={{ color: '#F59E0B' }}>{activeDrones.size} instruments layered</p>}
-          </LayerSection>
+          </AccordionSection>
 
-          {/* Mantra Layer */}
-          <LayerSection title="Mantra" icon={BookOpen} active={activeMantra} color="#2DD4BF">
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+          <AccordionSection title="Mantra" icon={BookOpen} color="#2DD4BF" open={openSections.mantra} onToggle={() => toggleSection('mantra')} badge={activeMantra ? activeMantra.label : null}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               {MANTRAS.map(m => (
-                <button key={m.id} onClick={() => toggleMantra(m)}
-                  disabled={mantraLoading && activeMantra?.id !== m.id}
-                  className="text-left px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02] flex items-center gap-2"
-                  style={{
-                    background: activeMantra?.id === m.id ? `${m.color}15` : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${activeMantra?.id === m.id ? `${m.color}35` : 'rgba(255,255,255,0.04)'}`,
-                    opacity: mantraLoading && activeMantra?.id !== m.id ? 0.5 : 1,
-                  }}
+                <button key={m.id} onClick={() => toggleMantra(m)} disabled={mantraLoading && activeMantra?.id !== m.id}
+                  className="text-left px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97] flex items-center gap-1.5"
+                  style={{ background: activeMantra?.id === m.id ? `${m.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeMantra?.id === m.id ? `${m.color}35` : 'rgba(255,255,255,0.04)'}`, opacity: mantraLoading && activeMantra?.id !== m.id ? 0.4 : 1 }}
                   data-testid={`mixer-mantra-${m.id}`}>
-                  {mantraLoading && activeMantra?.id === m.id && <Loader2 size={10} className="animate-spin flex-shrink-0" style={{ color: m.color }} />}
+                  {mantraLoading && activeMantra?.id === m.id && <Loader2 size={9} className="animate-spin flex-shrink-0" style={{ color: m.color }} />}
                   <div>
-                    <span className="text-xs font-medium block" style={{ color: activeMantra?.id === m.id ? m.color : 'rgba(248,250,252,0.7)' }}>{m.label}</span>
-                    <span className="text-[9px] block" style={{ color: 'rgba(248,250,252,0.25)' }}>{m.tradition}</span>
+                    <span className="text-[11px] font-medium block" style={{ color: activeMantra?.id === m.id ? m.color : 'rgba(248,250,252,0.65)' }}>{m.label}</span>
+                    <span className="text-[8px] block" style={{ color: 'rgba(248,250,252,0.2)' }}>{m.tradition}</span>
                   </div>
                 </button>
               ))}
             </div>
-          </LayerSection>
+          </AccordionSection>
 
-          {/* Light Therapy Layer */}
-          <LayerSection title="Light Therapy" icon={Sun} active={activeLight} color="#FCD34D">
-            <div className="grid grid-cols-2 gap-2">
+          <AccordionSection title="Light Therapy" icon={Sun} color="#FCD34D" open={openSections.light} onToggle={() => toggleSection('light')} badge={activeLight ? activeLight.label : null}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               {LIGHT_MODES.map(l => (
-                <button key={l.id} onClick={() => toggleLight(l)}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02]"
-                  style={{
-                    background: activeLight?.id === l.id ? `${l.colors[0]}15` : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${activeLight?.id === l.id ? `${l.colors[1]}35` : 'rgba(255,255,255,0.04)'}`,
-                  }}
+                <button key={l.id} onClick={() => toggleLight(l)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02]"
+                  style={{ background: activeLight?.id === l.id ? `${l.colors[0]}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeLight?.id === l.id ? `${l.colors[1]}35` : 'rgba(255,255,255,0.04)'}` }}
                   data-testid={`mixer-light-${l.id}`}>
-                  <div className="flex gap-0.5 flex-shrink-0">
-                    {l.colors.slice(0, 3).map((c, i) => (
-                      <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
-                    ))}
-                  </div>
-                  <span className="text-xs" style={{ color: activeLight?.id === l.id ? l.colors[1] : 'rgba(248,250,252,0.6)' }}>{l.label}</span>
+                  <div className="flex gap-0.5 flex-shrink-0">{l.colors.slice(0, 3).map((c, i) => <div key={i} className="w-2 h-2 rounded-full" style={{ background: c }} />)}</div>
+                  <span className="text-[11px]" style={{ color: activeLight?.id === l.id ? l.colors[1] : 'rgba(248,250,252,0.55)' }}>{l.label}</span>
                 </button>
               ))}
             </div>
-          </LayerSection>
+          </AccordionSection>
 
-          {/* Vibration Layer */}
-          <LayerSection title="Haptic Vibration" icon={Vibrate} active={vibeOn} color="#FB923C">
-            <button onClick={toggleVibe}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:scale-[1.01] w-full"
-              style={{
-                background: vibeOn ? 'rgba(251,146,60,0.12)' : 'rgba(255,255,255,0.02)',
-                border: `1px solid ${vibeOn ? 'rgba(251,146,60,0.25)' : 'rgba(255,255,255,0.04)'}`,
-              }}
-              data-testid="mixer-vibe-toggle">
-              <Vibrate size={16} style={{ color: vibeOn ? '#FB923C' : 'rgba(248,250,252,0.4)' }} />
-              <div className="text-left">
-                <span className="text-xs block" style={{ color: vibeOn ? '#FB923C' : 'rgba(248,250,252,0.6)' }}>
-                  {vibeOn ? 'Vibrating — Tap to Stop' : 'Enable Haptic Pulse'}
-                </span>
-                <span className="text-[9px] block" style={{ color: 'rgba(248,250,252,0.3)' }}>
-                  {firstActiveFreq ? `Synced to ${firstActiveFreq.label}` : 'Pulses at a calm rhythm'}
-                </span>
-              </div>
-            </button>
-          </LayerSection>
+          <AccordionSection title="Haptic Vibration" icon={Vibrate} color="#FB923C" open={openSections.haptic} onToggle={() => toggleSection('haptic')} badge={vibeOn ? `${hapticIntensity}%` : null}>
+            <div className="space-y-2.5">
+              <button onClick={toggleVibe} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:scale-[1.01] w-full"
+                style={{ background: vibeOn ? 'rgba(251,146,60,0.12)' : 'rgba(255,255,255,0.02)', border: `1px solid ${vibeOn ? 'rgba(251,146,60,0.25)' : 'rgba(255,255,255,0.04)'}` }}
+                data-testid="mixer-vibe-toggle">
+                <Vibrate size={16} style={{ color: vibeOn ? '#FB923C' : 'rgba(248,250,252,0.4)' }} />
+                <div className="text-left">
+                  <span className="text-xs block" style={{ color: vibeOn ? '#FB923C' : 'rgba(248,250,252,0.6)' }}>{vibeOn ? 'Vibrating — Tap to Stop' : 'Enable Haptic Pulse'}</span>
+                  <span className="text-[9px] block" style={{ color: 'rgba(248,250,252,0.3)' }}>{firstActiveFreq ? `Synced to ${firstActiveFreq.label}` : 'Pulses at a calm rhythm'}</span>
+                </div>
+              </button>
+              {vibeOn && (
+                <div className="flex items-center gap-3 px-2">
+                  <span className="text-[10px] w-14" style={{ color: 'rgba(251,146,60,0.6)' }}>Intensity</span>
+                  <input type="range" min={10} max={100} value={hapticIntensity} onChange={e => setHapticIntensity(Number(e.target.value))}
+                    className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
+                    style={{ background: `linear-gradient(to right, #FB923C ${hapticIntensity}%, rgba(255,255,255,0.06) ${hapticIntensity}%)`, accentColor: '#FB923C' }}
+                    data-testid="haptic-intensity" />
+                  <span className="text-[10px] w-8 text-right tabular-nums" style={{ color: 'rgba(251,146,60,0.5)' }}>{hapticIntensity}%</span>
+                </div>
+              )}
+            </div>
+          </AccordionSection>
 
-          {/* Tempo / Beat Control */}
-          <LayerSection title="Tempo & Beat" icon={Radio} active={bpm > 0} color="#EC4899">
+          <AccordionSection title="Tempo & Beat" icon={Radio} color="#EC4899" open={openSections.tempo} onToggle={() => toggleSection('tempo')} badge={bpm > 0 ? `${bpm} BPM` : null}>
             <div className="space-y-3">
-              {/* BPM Slider */}
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold tabular-nums w-16" style={{ color: bpm > 0 ? '#EC4899' : 'rgba(248,250,252,0.35)' }}>
-                  {bpm > 0 ? `${bpm} BPM` : 'Off'}
-                </span>
-                <input type="range" min="0" max="200" step="1" value={bpm}
-                  onChange={e => setBpm(Number(e.target.value))}
-                  className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, #EC4899 ${bpm / 2}%, rgba(255,255,255,0.06) ${bpm / 2}%)`,
-                    accentColor: '#EC4899',
-                  }}
-                  data-testid="tempo-slider-page"
-                />
+                <span className="text-sm font-bold tabular-nums w-16" style={{ color: bpm > 0 ? '#EC4899' : 'rgba(248,250,252,0.35)' }}>{bpm > 0 ? `${bpm} BPM` : 'Off'}</span>
+                <input type="range" min="0" max="200" step="1" value={bpm} onChange={e => setBpm(Number(e.target.value))}
+                  className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer" style={{ background: `linear-gradient(to right, #EC4899 ${bpm / 2}%, rgba(255,255,255,0.06) ${bpm / 2}%)`, accentColor: '#EC4899' }}
+                  data-testid="tempo-slider-page" />
               </div>
-              {/* Controls row */}
-              <div className="flex items-center gap-2">
-                <button onClick={tapTempo}
-                  className="text-xs px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
-                  style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.2)', color: '#EC4899' }}
-                  data-testid="tap-tempo-page">
-                  Tap Tempo
-                </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button onClick={tapTempo} className="text-xs px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95" style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.2)', color: '#EC4899' }} data-testid="tap-tempo-page">Tap Tempo</button>
                 {bpm > 0 && (
                   <>
-                    <button onClick={stopTempo}
-                      className="text-xs px-3 py-2 rounded-xl transition-all hover:scale-105"
-                      style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
-                      data-testid="tempo-stop-page">
-                      Stop
-                    </button>
-                    <div className="flex items-center gap-2 ml-2">
-                      <div className="w-2.5 h-2.5 rounded-full transition-all" style={{
-                        background: beatPulse ? '#EC4899' : 'rgba(236,72,153,0.15)',
-                        boxShadow: beatPulse ? '0 0 16px rgba(236,72,153,0.6)' : 'none',
-                        transform: beatPulse ? 'scale(1.5)' : 'scale(1)',
-                      }} />
-                      <span className="text-[10px]" style={{ color: 'rgba(236,72,153,0.5)' }}>
-                        All layers breathing to the beat
-                      </span>
+                    <button onClick={stopTempo} className="text-xs px-3 py-2 rounded-xl" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }} data-testid="tempo-stop-page">Stop</button>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full transition-all" style={{ background: beatPulse ? '#EC4899' : 'rgba(236,72,153,0.15)', boxShadow: beatPulse ? '0 0 12px rgba(236,72,153,0.5)' : 'none', transform: beatPulse ? 'scale(1.4)' : 'scale(1)' }} />
+                      <span className="text-[10px]" style={{ color: 'rgba(236,72,153,0.5)' }}>Breathing</span>
                     </div>
                   </>
                 )}
               </div>
-              {/* Preset modes */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {TEMPO_PRESETS.map(p => (
-                  <button key={p.id} onClick={() => setTempoFromPreset(p)}
-                    className="text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02]"
-                    style={{
-                      background: activePreset?.id === p.id ? `${p.color}12` : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${activePreset?.id === p.id ? `${p.color}35` : 'rgba(255,255,255,0.04)'}`,
-                    }}
-                    data-testid={`tempo-preset-page-${p.id}`}>
-                    <span className="text-xs font-medium block" style={{ color: activePreset?.id === p.id ? p.color : 'rgba(248,250,252,0.6)' }}>
-                      {p.label}
-                    </span>
-                    <span className="text-[9px] block" style={{ color: 'rgba(248,250,252,0.25)' }}>
-                      {p.bpm} BPM — {p.desc}
-                    </span>
-                  </button>
+                  <button key={p.id} onClick={() => setTempoFromPreset(p)} className="text-[10px] px-2.5 py-1.5 rounded-xl transition-all hover:scale-[1.03]"
+                    style={{ background: activePreset?.id === p.id ? `${p.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activePreset?.id === p.id ? `${p.color}35` : 'rgba(255,255,255,0.04)'}`, color: activePreset?.id === p.id ? p.color : 'rgba(248,250,252,0.5)' }}
+                    data-testid={`tempo-preset-page-${p.id}`}>{p.label}</button>
                 ))}
               </div>
             </div>
-          </LayerSection>
+          </AccordionSection>
         </div>
       </div>
     </div>
   );
 }
 
-function LayerSection({ title, icon: Icon, active, color, children }) {
+function AccordionSection({ title, icon: Icon, color, open, onToggle, badge, children }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl p-4"
-      style={{ background: 'rgba(248,250,252,0.015)', border: `1px solid ${active ? `${color}18` : 'rgba(248,250,252,0.03)'}` }}>
-      <div className="flex items-center gap-2 mb-3">
-        <Icon size={13} style={{ color: active ? color : 'rgba(248,250,252,0.4)' }} />
-        <span className="text-[10px] uppercase tracking-[0.15em] font-semibold" style={{ color: active ? color : 'rgba(248,250,252,0.4)' }}>
-          {title}
-        </span>
-        {active && <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: color }} />}
-      </div>
-      {children}
+    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl overflow-hidden"
+      style={{ background: 'rgba(248,250,252,0.015)', border: `1px solid ${badge ? `${color}18` : 'rgba(248,250,252,0.03)'}` }}>
+      <button onClick={onToggle} className="w-full flex items-center justify-between px-4 py-3 transition-colors hover:bg-white/[0.02]"
+        data-testid={`accordion-${title.toLowerCase().replace(/[^a-z]/g, '-')}`}>
+        <div className="flex items-center gap-2">
+          <Icon size={14} style={{ color: badge ? color : 'rgba(248,250,252,0.4)' }} />
+          <span className="text-[11px] uppercase tracking-[0.12em] font-semibold" style={{ color: badge ? color : 'rgba(248,250,252,0.45)' }}>{title}</span>
+          {badge && <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: `${color}12`, color, border: `1px solid ${color}25` }}>{badge}</span>}
+        </div>
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <ChevronDown size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div key="content" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
+            <div className="px-4 pb-4">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
