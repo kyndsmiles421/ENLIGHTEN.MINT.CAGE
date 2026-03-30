@@ -625,6 +625,52 @@ export default function Games() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Featured: Starseed Adventure */}
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            onClick={() => navigate('/starseed-adventure')}
+            className="glass-card p-6 text-left group hover:scale-[1.02] transition-all md:col-span-2 relative overflow-hidden"
+            style={{ borderColor: 'rgba(129,140,248,0.15)' }}
+            data-testid="game-card-starseed">
+            <div className="absolute inset-0 opacity-[0.04]"
+              style={{ background: 'radial-gradient(ellipse at 20% 50%, #818CF8 0%, transparent 60%)' }} />
+            <div className="relative flex items-start gap-5">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.2)' }}>
+                <Star size={24} style={{ color: '#818CF8' }} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase"
+                    style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.2)' }}>
+                    RPG Adventure
+                  </span>
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase"
+                    style={{ background: 'rgba(252,211,77,0.1)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)' }}>
+                    AI-Powered
+                  </span>
+                </div>
+                <h3 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  Starseed: Choose Your Destiny
+                </h3>
+                <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  An AI-powered cosmic RPG. Choose your starseed origin — Pleiadian, Sirian, Arcturian, Lyran, Andromedan, or Orion — and embark on a branching adventure through the stars. Every choice shapes your stats, unlocks achievements, and determines your cosmic destiny.
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {['Pleiadian', 'Sirian', 'Arcturian', 'Lyran', 'Andromedan', 'Orion'].map(t => (
+                    <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full"
+                      style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.1)' }}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <ChevronRight size={18} style={{ color: '#818CF8' }} className="flex-shrink-0 mt-2 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </div>
+          </motion.button>
+
           {GAMES.map((game, i) => {
             const Icon = game.icon;
             const s = scores[game.id];
