@@ -13,29 +13,42 @@
 - Cosmic Ledger, Meditation, Breathwork, Yoga, Journal, Zen Garden
 - Cosmic Mixer (multi-layer, accordion, voice commands, tempo sync)
   - Sticky Master Controls Footer, Founder's Harmonic, Seasonal Frequencies
-- **Cosmic Toolbar** — unified translucent pill (top-right): Quick Zen, Voice, Wake Word, Scroll-to-top
-  - Tap-to-expand (entire pill tappable), active glow halos, Capacitor haptics, auto-collapse 5s
-- **SmartDock** — redesigned horizontal pill (bottom-right): Sage AI, Tones, Mixer, Feedback, Help
-  - Tap-to-expand labels, panels open upward, minimize/restore, glass-morphism aesthetic
+- **Cosmic Toolbar** — unified translucent pill: Quick Zen, Voice, Wake Word, Scroll-to-top
+  - Tap-to-expand, active glow halos, Capacitor haptics, auto-collapse 5s
+  - **Freely draggable** with grip handle, edge snapping, localStorage persistence
+- **SmartDock** — horizontal pill: Sage AI, Tones, Mixer, Feedback, Help
+  - Tap-to-expand labels, panels open upward, minimize/restore
+  - **Freely draggable** with grip handle, edge snapping, localStorage persistence
+- **Dashboard Customize** — Touch-friendly pointer-based drag-to-reorder sections
+  - Grip handles, arrow up/down buttons, visibility toggles, Add Shortcuts sheet
+  - Layout persisted via PUT /api/dashboard/layout
 - Founder Badge, Enhanced Leaderboard (4 categories), Seasonal Sonic Crystals
 
-## Session Work (2026-03-30 continued)
+## Session Work History
+### 2026-03-30 (Session 1)
 1. Sticky Master Controls Footer on Mixer
 2. Major Refactoring: 2,969 → 982 lines (15 components extracted)
 3. Quick Meditate FAB (fixed AudioContext + createPortal)
 4. Founder Badge + exclusive frequency
 5. Enhanced 4-category leaderboard
 6. Seasonal Exclusive Frequencies
-7. **Cosmic Toolbar** — merged Voice, Meditate, Wake Word, Back-to-Top into one translucent glass-morphism pill at top-right. Uses createPortal(document.body) at z-9998.
-8. **Cosmic Toolbar Enhanced** — Tap-to-expand (entire pill body tappable, not just expand button). ActiveHalo pulsing ring for active states. Glow rings on Wake Word. Capacitor haptics on all interactions. Auto-collapse after 5s.
-9. **SmartDock Streamlined** — Converted from vertical rail to horizontal compact pill at bottom-right. Glass-morphism matching Cosmic Toolbar. Tap-to-expand labels. Panels open upward. Haptics integrated. Minimize to subtle dot, restore on tap.
+7. Cosmic Toolbar — merged Voice, Meditate, Wake Word, Back-to-Top
+
+### 2026-03-30 (Session 2)
+8. Cosmic Toolbar Enhanced — Tap-to-expand, ActiveHalo, haptics
+9. SmartDock Streamlined — Vertical rail → horizontal pill, glass-morphism
+10. **CosmicToolbar Draggable** — Grip handle, pointer-based drag, edge snapping, localStorage position persistence
+11. **SmartDock Draggable** — Grip handle, pointer-based drag, edge snapping, localStorage position persistence
+12. **Dashboard Rearrange Fixed** — Replaced broken native HTML5 drag with pointer-event based touch-friendly drag-to-reorder. Visual feedback (highlight/scale on drag, drop target indicators). Arrow buttons + eye visibility toggles confirmed working.
 
 ## Backlog
 - P2: Capacitor (Mobile App Store scaffolding completion)
 - P2: VR Immersive modes completion
-- Cleanup: Remove deprecated QuickMeditateFAB.js, VoiceCommandButton.js, BackToTop.js
+- Cleanup: Remove deprecated QuickMeditateFAB.js, VoiceCommandButton.js, BackToTop.js (unused, functionality in CosmicToolbar)
 
 ## Technical Constraints
-- `@dnd-kit/sortable` at 8.0.0 | Seasonal Hz values .5 offset | createPortal for toolbar/dock
-- SmartDock z-index: 79, CosmicToolbar z-index: 9998 — no overlap
+- `@dnd-kit/sortable` at 8.0.0 | Seasonal Hz values .5 offset
+- createPortal for toolbar (z-9998) / dock (z-79) — no conflicts
 - Haptics fallback: `navigator.vibrate?.(8)` when Capacitor unavailable
+- Dashboard drag uses pointer events (not native HTML5 drag) for touch support
+- Toolbar/Dock positions: localStorage keys `cosmic_toolbar_pos`, `cosmic_dock_pos`
