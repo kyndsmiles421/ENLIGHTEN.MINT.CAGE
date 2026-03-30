@@ -284,8 +284,6 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
                 </motion.div>
               );
             })}
-              );
-            })}
           </div>
         </motion.div>
       )}

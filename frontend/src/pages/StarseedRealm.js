@@ -516,11 +516,20 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
 
   if (initLoading) return <div className="flex justify-center py-8"><Loader2 className="animate-spin" size={20} style={{ color: '#DC2626' }} /></div>;
 
+  // Loot Drop Overlay (renders on top of any state)
+  const lootOverlay = (
+    <AnimatePresence>
+      {lootDrop && <LootDropReveal loot={lootDrop} onClose={() => setLootDrop(null)} />}
+    </AnimatePresence>
+  );
+
   // Battle Result Screen
   if (battleResult) {
     const won = battleResult.boss_defeated;
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+      <>
+        {lootOverlay}
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
         className="rounded-2xl p-8 text-center" style={{ background: won ? 'rgba(252,211,77,0.05)' : 'rgba(220,38,38,0.05)', border: `1px solid ${won ? 'rgba(252,211,77,0.2)' : 'rgba(220,38,38,0.2)'}` }}
         data-testid="boss-result">
         <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 0.5 }}>
@@ -562,6 +571,7 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
           Return to Bosses
         </button>
       </motion.div>
+      </>
     );
   }
 
