@@ -242,11 +242,17 @@ export default function SmartDock() {
                 <motion.div initial={{ opacity: 0, x: 10, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.95 }}
                   className="mr-2">
                   <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(11,12,21,0.95)', border: '1px solid rgba(129,140,248,0.15)', backdropFilter: 'blur(16px)', width: '200px' }}>
-                    <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#818CF8' }}>Cosmic Mixer</p>
+                    <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#818CF8' }}>Production Console</p>
+                    <button onClick={() => { setActivePanel(null); document.querySelector('[data-testid="mixer-toggle"]')?.click(); }}
+                      className="w-full py-2 rounded-lg text-xs mb-1.5"
+                      style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}
+                      data-testid="dock-open-mixer">
+                      Open Console
+                    </button>
                     <button onClick={() => { setActivePanel(null); navigate('/cosmic-mixer'); }}
                       className="w-full py-2 rounded-lg text-xs"
-                      style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}>
-                      Open Full Mixer
+                      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+                      Full Mixer Page
                     </button>
                   </div>
                 </motion.div>

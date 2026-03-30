@@ -10,6 +10,7 @@ import { Toaster } from 'sonner';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import SmartDock from './components/SmartDock';
+import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import InstallPrompt from './components/InstallPrompt';
@@ -255,6 +256,7 @@ function App() {
             />
             <AnimatedRoutes />
             <SmartDock />
+            <CosmicMixer />
             <BackToTop />
             <InstallPrompt />
             <CreditNudge />
