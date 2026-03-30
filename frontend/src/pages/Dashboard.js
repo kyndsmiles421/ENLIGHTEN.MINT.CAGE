@@ -130,9 +130,13 @@ export default function Dashboard() {
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [layoutLoaded, setLayoutLoaded] = useState(false);
 
-  // Drag state
+  // Drag state for pointer-based reorder
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
+  const [dragIdx, setDragIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
+  const listRef = useRef(null);
+  const itemRectsRef = useRef([]);
 
   useEffect(() => {
     if (!authLoading && !user) { navigate('/auth'); return; }
@@ -193,18 +197,63 @@ export default function Dashboard() {
     saveLayout(sectionsOrder, hiddenSections, pinnedShortcuts);
   };
 
-  // Drag handlers for sections
-  const onDragStart = (idx) => { dragItem.current = idx; };
-  const onDragEnter = (idx) => { dragOverItem.current = idx; };
-  const onDragEnd = () => {
-    if (dragItem.current === null || dragOverItem.current === null) return;
-    const next = [...sectionsOrder];
-    const dragged = next.splice(dragItem.current, 1)[0];
-    next.splice(dragOverItem.current, 0, dragged);
-    setSectionsOrder(next);
-    dragItem.current = null;
-    dragOverItem.current = null;
-  };
+  // Pointer-based drag handlers for touch-friendly section reordering
+  const captureItemRects = useCallback(() => {
+    if (!listRef.current) return;
+    const items = listRef.current.querySelectorAll('[data-reorder-item]');
+    itemRectsRef.current = Array.from(items).map(el => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, mid: r.top + r.height / 2 };
+    });
+  }, []);
+
+  const onReorderPointerDown = useCallback((idx, e) => {
+    e.preventDefault();
+    setDragIdx(idx);
+    setDragOverIdx(idx);
+    dragItem.current = idx;
+    dragOverItem.current = idx;
+    captureItemRects();
+    document.body.style.userSelect = 'none';
+
+    const onMove = (ev) => {
+      const cy = ev.clientY ?? ev.touches?.[0]?.clientY;
+      if (cy == null) return;
+      const rects = itemRectsRef.current;
+      for (let i = 0; i < rects.length; i++) {
+        if (cy < rects[i].mid) {
+          setDragOverIdx(i);
+          dragOverItem.current = i;
+          return;
+        }
+      }
+      setDragOverIdx(rects.length - 1);
+      dragOverItem.current = rects.length - 1;
+    };
+
+    const onUp = () => {
+      document.body.style.userSelect = '';
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      const from = dragItem.current;
+      const to = dragOverItem.current;
+      if (from !== null && to !== null && from !== to) {
+        setSectionsOrder(prev => {
+          const next = [...prev];
+          const dragged = next.splice(from, 1)[0];
+          next.splice(to, 0, dragged);
+          return next;
+        });
+      }
+      setDragIdx(null);
+      setDragOverIdx(null);
+      dragItem.current = null;
+      dragOverItem.current = null;
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [captureItemRects]);
 
   if (authLoading || loading) {
     return (
@@ -306,25 +355,38 @@ export default function Dashboard() {
 
         {/* Sections */}
         {editMode ? (
-          <div className="space-y-2 mb-8" data-testid="edit-sections-list">
+          <div className="space-y-2 mb-8" ref={listRef} data-testid="edit-sections-list">
             {sectionsOrder.map((sectionId, idx) => {
               const meta = SECTION_META[sectionId];
               const isHidden = hiddenSections.includes(sectionId);
+              const isBeingDragged = dragIdx === idx;
+              const isDropTarget = dragOverIdx === idx && dragIdx !== null && dragIdx !== idx;
               return (
                 <motion.div key={sectionId} layout
-                  draggable
-                  onDragStart={() => onDragStart(idx)}
-                  onDragEnter={() => onDragEnter(idx)}
-                  onDragEnd={onDragEnd}
-                  onDragOver={(e) => e.preventDefault()}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-grab active:cursor-grabbing transition-all"
+                  data-reorder-item={sectionId}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
                   style={{
-                    background: isHidden ? 'rgba(248,250,252,0.01)' : 'rgba(248,250,252,0.03)',
-                    border: `1px solid ${isHidden ? 'rgba(248,250,252,0.03)' : `${meta?.color || '#fff'}15`}`,
-                    opacity: isHidden ? 0.4 : 1,
+                    background: isBeingDragged
+                      ? 'rgba(192,132,252,0.08)'
+                      : isDropTarget
+                        ? 'rgba(192,132,252,0.04)'
+                        : isHidden ? 'rgba(248,250,252,0.01)' : 'rgba(248,250,252,0.03)',
+                    border: `1px solid ${isBeingDragged ? 'rgba(192,132,252,0.25)' : isDropTarget ? 'rgba(192,132,252,0.15)' : isHidden ? 'rgba(248,250,252,0.03)' : `${meta?.color || '#fff'}15`}`,
+                    opacity: isHidden ? 0.4 : isBeingDragged ? 0.85 : 1,
+                    transform: isBeingDragged ? 'scale(1.02)' : isDropTarget ? 'translateY(4px)' : 'none',
+                    boxShadow: isBeingDragged ? '0 4px 20px rgba(192,132,252,0.15)' : 'none',
+                    transition: 'background 0.2s, border 0.2s, opacity 0.2s, transform 0.15s, box-shadow 0.2s',
                   }}
                   data-testid={`edit-section-${sectionId}`}>
-                  <GripVertical size={14} style={{ color: 'rgba(248,250,252,0.25)' }} className="flex-shrink-0" />
+                  <div
+                    onPointerDown={(e) => onReorderPointerDown(idx, e)}
+                    className="flex-shrink-0 cursor-grab active:cursor-grabbing p-1 -m-1 rounded-lg hover:bg-white/5"
+                    style={{ touchAction: 'none' }}
+                    data-testid={`drag-handle-${sectionId}`}
+                    title="Drag to reorder"
+                  >
+                    <GripVertical size={14} style={{ color: isBeingDragged ? 'rgba(192,132,252,0.6)' : 'rgba(248,250,252,0.25)' }} />
+                  </div>
                   <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: meta?.color || '#fff' }} />
                   <span className="text-xs font-medium flex-1" style={{ color: isHidden ? 'rgba(248,250,252,0.3)' : 'rgba(248,250,252,0.8)' }}>
                     {meta?.label || sectionId}

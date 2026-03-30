@@ -3,18 +3,23 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ChevronUp, Mic, Loader2, Radio } from 'lucide-react';
+import { ChevronUp, Mic, Loader2, Radio, GripHorizontal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
 
 const HIDDEN_ROUTES = ['/auth', '/'];
+const POS_KEY = 'cosmic_toolbar_pos';
 
 /* ── Try native haptics, fallback to vibrate ── */
 let Haptics;
 try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
 function haptic(style = 'Light') {
   try { Haptics?.impact({ style }); } catch { navigator.vibrate?.(8); }
+}
+
+function getSavedPos() {
+  try { return JSON.parse(localStorage.getItem(POS_KEY)); } catch { return null; }
 }
 
 function LotusIcon({ size = 15, color = '#C084FC' }) {
@@ -38,17 +43,29 @@ export default function CosmicToolbar() {
   const [meditating, setMeditating] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [holdActive, setHoldActive] = useState(false);
+  const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
+  const [isDragging, setIsDragging] = useState(false);
   const ctxRef = useRef(null);
   const nodesRef = useRef([]);
   const masterRef = useRef(null);
   const holdRef = useRef(null);
   const collapseRef = useRef(null);
+  const toolbarRef = useRef(null);
+  const dragStartRef = useRef(null);
+  const dragMoved = useRef(false);
 
   useEffect(() => {
     const h = () => setShowTop(window.scrollY > 400);
     window.addEventListener('scroll', h, { passive: true });
     return () => window.removeEventListener('scroll', h);
   }, []);
+
+  // Persist position
+  useEffect(() => {
+    if (position.x !== null) {
+      localStorage.setItem(POS_KEY, JSON.stringify(position));
+    }
+  }, [position]);
 
   // Auto-collapse after 5s of inactivity
   useEffect(() => {
@@ -58,7 +75,6 @@ export default function CosmicToolbar() {
     }
   }, [expanded]);
 
-  // Reset collapse timer on any interaction
   const refreshCollapse = useCallback(() => {
     if (collapseRef.current) clearTimeout(collapseRef.current);
     collapseRef.current = setTimeout(() => setExpanded(false), 5000);
@@ -69,12 +85,87 @@ export default function CosmicToolbar() {
     setExpanded(e => !e);
   }, []);
 
-  // Tap on the pill body expands; tapping a button inside won't trigger this
   const handlePillTap = useCallback((e) => {
-    // Don't expand when clicking a child button
-    if (e.target.closest('button') || e.target.closest('[data-tool-btn]')) return;
+    if (e.target.closest('button') || e.target.closest('[data-tool-btn]') || e.target.closest('[data-drag-handle]')) return;
+    if (dragMoved.current) return;
     toggleExpand();
   }, [toggleExpand]);
+
+  /* ── Drag handlers ── */
+  const snapToEdge = useCallback((x, y) => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const el = toolbarRef.current;
+    const w = el?.offsetWidth || 160;
+    const h = el?.offsetHeight || 36;
+    const SNAP = 50;
+    let sx = x, sy = y;
+
+    // Horizontal snap
+    const midX = x + w / 2;
+    if (midX < vw / 2) {
+      sx = x < SNAP ? 8 : x;
+    } else {
+      sx = (vw - x - w) < SNAP ? vw - w - 8 : x;
+    }
+
+    // Vertical snap
+    if (y < SNAP) {
+      sy = 12;
+    } else if ((vh - y - h) < SNAP) {
+      sy = vh - h - 12;
+    }
+
+    return { x: Math.max(4, Math.min(vw - w - 4, sx)), y: Math.max(4, Math.min(vh - h - 4, sy)) };
+  }, []);
+
+  const onDragStart = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+    dragMoved.current = false;
+    const rect = toolbarRef.current?.getBoundingClientRect();
+    dragStartRef.current = {
+      offsetX: (e.clientX || e.touches?.[0]?.clientX || 0) - (rect?.left || 0),
+      offsetY: (e.clientY || e.touches?.[0]?.clientY || 0) - (rect?.top || 0),
+    };
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMove = (e) => {
+      const cx = e.clientX ?? e.touches?.[0]?.clientX;
+      const cy = e.clientY ?? e.touches?.[0]?.clientY;
+      if (cx == null || cy == null) return;
+      dragMoved.current = true;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const el = toolbarRef.current;
+      const w = el?.offsetWidth || 160;
+      const h = el?.offsetHeight || 36;
+      setPosition({
+        x: Math.max(0, Math.min(vw - w, cx - dragStartRef.current.offsetX)),
+        y: Math.max(0, Math.min(vh - h, cy - dragStartRef.current.offsetY)),
+      });
+    };
+    const onUp = () => {
+      setIsDragging(false);
+      document.body.style.userSelect = '';
+      setPosition(prev => {
+        if (prev.x === null) return prev;
+        return snapToEdge(prev.x, prev.y);
+      });
+      // Reset dragMoved after a tick so click handler can check it
+      setTimeout(() => { dragMoved.current = false; }, 50);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+  }, [isDragging, snapToEdge]);
 
   /* ── Voice ── */
   const handleMicDown = useCallback((e) => {
@@ -154,8 +245,6 @@ export default function CosmicToolbar() {
   if (hidden) return null;
 
   const anyActive = meditating || isRecording || wakeWordEnabled;
-
-  // Determine halo color based on highest-priority active state
   const haloColor = meditating
     ? 'rgba(34,197,94,0.25)'
     : isRecording
@@ -164,16 +253,22 @@ export default function CosmicToolbar() {
         ? 'rgba(34,197,94,0.15)'
         : 'transparent';
 
+  // Position: custom or default top-right
+  const hasCustomPos = position.x !== null;
+  const posStyle = hasCustomPos
+    ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
+    : { top: 12, right: 12 };
+
   return createPortal(
     <motion.div
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
+      ref={toolbarRef}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="fixed flex items-center"
       onClick={handlePillTap}
       style={{
-        top: 12,
-        right: 12,
+        ...posStyle,
         zIndex: 9998,
         padding: expanded ? '5px 8px' : '5px 6px',
         borderRadius: 24,
@@ -184,13 +279,31 @@ export default function CosmicToolbar() {
         boxShadow: anyActive
           ? `0 0 20px ${haloColor}, 0 0 40px ${haloColor}, 0 4px 16px rgba(0,0,0,0.3)`
           : '0 4px 16px rgba(0,0,0,0.2)',
-        transition: 'background 0.4s, border 0.4s, padding 0.3s, box-shadow 0.6s',
-        cursor: 'pointer',
+        transition: isDragging ? 'none' : 'background 0.4s, border 0.4s, padding 0.3s, box-shadow 0.6s',
+        cursor: isDragging ? 'grabbing' : 'pointer',
+        touchAction: 'none',
       }}
       data-testid="cosmic-toolbar"
     >
-      {/* Outer animated halo for active states */}
       {anyActive && <ActiveHalo color={haloColor} />}
+
+      {/* ── Drag handle ── */}
+      <div
+        data-drag-handle="true"
+        onPointerDown={onDragStart}
+        className="flex items-center justify-center rounded-full mr-0.5"
+        style={{
+          width: 18,
+          height: 24,
+          cursor: isDragging ? 'grabbing' : 'grab',
+          flexShrink: 0,
+          touchAction: 'none',
+        }}
+        data-testid="toolbar-drag-handle"
+        title="Drag to reposition"
+      >
+        <GripHorizontal size={10} style={{ color: 'rgba(192,132,252,0.3)' }} />
+      </div>
 
       {/* ── Meditate (hidden on Mixer) ── */}
       {!onMixer && (
@@ -256,10 +369,10 @@ export default function CosmicToolbar() {
         )}
       </AnimatePresence>
 
-      {/* ── Expand indicator dots ── */}
+      {/* ── Expand indicator ── */}
       <div
         className="flex items-center justify-center ml-0.5"
-        style={{ width: 16, height: 20, flexShrink: 0, pointerEvents: 'none' }}
+        style={{ width: 14, height: 20, flexShrink: 0, pointerEvents: 'none' }}
         data-testid="toolbar-expand-indicator"
       >
         <motion.div
@@ -277,21 +390,13 @@ export default function CosmicToolbar() {
   );
 }
 
-/* ── Animated outer halo that pulses around the entire toolbar ── */
+/* ── Animated outer halo ── */
 function ActiveHalo({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{
-        inset: -4,
-        borderRadius: 28,
-        border: `1.5px solid ${color}`,
-        filter: `blur(1px)`,
-      }}
-      animate={{
-        scale: [1, 1.06, 1],
-        opacity: [0.6, 0.2, 0.6],
-      }}
+      style={{ inset: -4, borderRadius: 28, border: `1.5px solid ${color}`, filter: 'blur(1px)' }}
+      animate={{ scale: [1, 1.06, 1], opacity: [0.6, 0.2, 0.6] }}
       transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
       data-testid="toolbar-active-halo"
     />
@@ -307,8 +412,8 @@ function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPoin
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerLeave}
       whileTap={{ scale: 0.82 }}
-      className="relative flex items-center gap-1.5 rounded-full transition-all overflow-hidden"
       data-tool-btn="true"
+      className="relative flex items-center gap-1.5 rounded-full transition-all overflow-hidden"
       style={{
         height: small ? 28 : 32,
         padding: expanded ? `0 ${small ? 8 : 10}px 0 ${small ? 6 : 8}px` : `0 ${small ? 6 : 8}px`,

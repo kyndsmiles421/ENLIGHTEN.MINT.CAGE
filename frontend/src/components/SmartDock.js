@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, MessageCircle, Play, Pause } from 'lucide-react';
+import { HelpCircle, Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
 const DOCK_MIN_KEY = 'cosmic_dock_minimized';
+const DOCK_POS_KEY = 'cosmic_dock_pos';
 
 /* ── Try native haptics, fallback to vibrate ── */
 let Haptics;
@@ -23,6 +24,9 @@ function trackUsage(id) {
   const u = getUsage();
   u[id] = (u[id] || 0) + 1;
   localStorage.setItem(USAGE_KEY, JSON.stringify(u));
+}
+function getSavedPos() {
+  try { return JSON.parse(localStorage.getItem(DOCK_POS_KEY)); } catch { return null; }
 }
 
 const FREQUENCIES = [
@@ -43,13 +47,25 @@ export default function SmartDock() {
   const [minimized, setMinimized] = useState(() => {
     try { return localStorage.getItem(DOCK_MIN_KEY) === 'true'; } catch { return false; }
   });
+  const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
+  const [isDragging, setIsDragging] = useState(false);
   const collapseRef = useRef(null);
+  const dockRef = useRef(null);
+  const dragStartRef = useRef(null);
+  const dragMoved = useRef(false);
 
   const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname.startsWith('/live/');
 
   useEffect(() => {
     localStorage.setItem(DOCK_MIN_KEY, String(minimized));
   }, [minimized]);
+
+  // Persist position
+  useEffect(() => {
+    if (position.x !== null) {
+      localStorage.setItem(DOCK_POS_KEY, JSON.stringify(position));
+    }
+  }, [position]);
 
   // Auto-collapse labels after 5s
   useEffect(() => {
@@ -64,6 +80,79 @@ export default function SmartDock() {
     collapseRef.current = setTimeout(() => setExpanded(false), 5000);
   }, []);
 
+  /* ── Drag handlers ── */
+  const snapToEdge = useCallback((x, y) => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const el = dockRef.current;
+    const w = el?.offsetWidth || 200;
+    const h = el?.offsetHeight || 36;
+    const SNAP = 50;
+    let sx = x, sy = y;
+
+    const midX = x + w / 2;
+    if (midX < vw / 2) {
+      sx = x < SNAP ? 8 : x;
+    } else {
+      sx = (vw - x - w) < SNAP ? vw - w - 8 : x;
+    }
+
+    if (y < SNAP) {
+      sy = 12;
+    } else if ((vh - y - h) < SNAP) {
+      sy = vh - h - 12;
+    }
+
+    return { x: Math.max(4, Math.min(vw - w - 4, sx)), y: Math.max(4, Math.min(vh - h - 4, sy)) };
+  }, []);
+
+  const onDragStart = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+    dragMoved.current = false;
+    const rect = dockRef.current?.getBoundingClientRect();
+    dragStartRef.current = {
+      offsetX: (e.clientX || e.touches?.[0]?.clientX || 0) - (rect?.left || 0),
+      offsetY: (e.clientY || e.touches?.[0]?.clientY || 0) - (rect?.top || 0),
+    };
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMove = (e) => {
+      const cx = e.clientX ?? e.touches?.[0]?.clientX;
+      const cy = e.clientY ?? e.touches?.[0]?.clientY;
+      if (cx == null || cy == null) return;
+      dragMoved.current = true;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const el = dockRef.current;
+      const w = el?.offsetWidth || 200;
+      const h = el?.offsetHeight || 36;
+      setPosition({
+        x: Math.max(0, Math.min(vw - w, cx - dragStartRef.current.offsetX)),
+        y: Math.max(0, Math.min(vh - h, cy - dragStartRef.current.offsetY)),
+      });
+    };
+    const onUp = () => {
+      setIsDragging(false);
+      document.body.style.userSelect = '';
+      setPosition(prev => {
+        if (prev.x === null) return prev;
+        return snapToEdge(prev.x, prev.y);
+      });
+      setTimeout(() => { dragMoved.current = false; }, 50);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+  }, [isDragging, snapToEdge]);
+
   const DOCK_ITEMS = [
     { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
@@ -72,7 +161,6 @@ export default function SmartDock() {
     { id: 'help', icon: BookOpen, label: 'Help', color: '#FCD34D' },
   ];
 
-  // Sort by usage frequency
   const usage = getUsage();
   const sortedItems = [...DOCK_ITEMS].sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
 
@@ -91,14 +179,22 @@ export default function SmartDock() {
   }, []);
 
   const handlePillTap = useCallback((e) => {
-    if (e.target.closest('button') || e.target.closest('[data-dock-btn]')) return;
+    if (e.target.closest('button') || e.target.closest('[data-dock-btn]') || e.target.closest('[data-drag-handle]')) return;
+    if (dragMoved.current) return;
     toggleExpand();
   }, [toggleExpand]);
 
   if (hidden) return null;
 
+  // Position logic
+  const hasCustomPos = position.x !== null;
+  const defaultPos = { bottom: 80, right: 12 };
+
   // Minimized: tiny restore dot
   if (minimized) {
+    const minStyle = hasCustomPos
+      ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
+      : { bottom: 80, right: 12 };
     return createPortal(
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
@@ -108,8 +204,7 @@ export default function SmartDock() {
         onClick={() => { haptic('Light'); setMinimized(false); }}
         className="fixed flex items-center justify-center"
         style={{
-          bottom: 80,
-          right: 12,
+          ...minStyle,
           zIndex: 79,
           width: 28,
           height: 28,
@@ -130,8 +225,22 @@ export default function SmartDock() {
     );
   }
 
+  const posStyle = hasCustomPos
+    ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
+    : defaultPos;
+
   return createPortal(
-    <div className="fixed" style={{ bottom: 80, right: 12, zIndex: 79 }} data-testid="smart-dock">
+    <div
+      ref={dockRef}
+      className="fixed"
+      style={{
+        ...posStyle,
+        zIndex: 79,
+        touchAction: 'none',
+        transition: isDragging ? 'none' : 'left 0.3s ease, top 0.3s ease, bottom 0.3s ease, right 0.3s ease',
+      }}
+      data-testid="smart-dock"
+    >
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>
         {activePanel === 'assistant' && (
@@ -161,11 +270,29 @@ export default function SmartDock() {
           WebkitBackdropFilter: 'blur(24px)',
           boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
           transition: 'background 0.4s, border 0.4s, padding 0.3s',
-          cursor: 'pointer',
+          cursor: isDragging ? 'grabbing' : 'pointer',
           marginTop: 8,
         }}
         data-testid="smart-dock-pill"
       >
+        {/* ── Drag handle ── */}
+        <div
+          data-drag-handle="true"
+          onPointerDown={onDragStart}
+          className="flex items-center justify-center rounded-full mr-0.5"
+          style={{
+            width: 16,
+            height: 22,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            flexShrink: 0,
+            touchAction: 'none',
+          }}
+          data-testid="dock-drag-handle"
+          title="Drag to reposition"
+        >
+          <GripHorizontal size={9} style={{ color: 'rgba(192,132,252,0.25)' }} />
+        </div>
+
         {sortedItems.map((item) => {
           const Icon = item.icon;
           const isActive = activePanel === item.id;
@@ -215,7 +342,7 @@ export default function SmartDock() {
   );
 }
 
-/* ── Reusable dock button (horizontal pill style) ── */
+/* ── Reusable dock button ── */
 function DockBtn({ children, testId, onClick, active, color, expanded, label, small }) {
   return (
     <motion.button
