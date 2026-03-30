@@ -225,6 +225,21 @@ async def generate_scene(data: dict = Body(...), user=Depends(get_current_user))
         resonance_prompt += "\nMark gem-resonance choices with a '(Resonance)' tag in the choice text. These should feel like hidden paths only the attuned can perceive."
         resonance_prompt += "\nAdd 'resonance_element' field to choices that are gem-gated (e.g., \"resonance_element\": \"Water\")."
 
+    # ─── LEGENDARY PATH DETECTION ───
+    from routes.cosmic_ledger import LEGENDARY_PATHS, _check_legendary_paths
+    all_char_gems = char.get("gem_collection", [])
+    unlocked_legendary = _check_legendary_paths(all_char_gems)
+    legendary_prompt = ""
+    if unlocked_legendary:
+        active_paths = [p for p in LEGENDARY_PATHS if p["id"] in unlocked_legendary]
+        legendary_prompt = "\n\nLEGENDARY PATH UNLOCKED:"
+        for lp in active_paths[:2]:
+            legendary_prompt += f"\nThe '{lp['name']}' path is available ({lp['element']} element)."
+            legendary_prompt += f"\nStory hook: {lp['story_hook']}"
+        legendary_prompt += "\nIMPORTANT: Include ONE choice tagged as '(Legendary)' that leads into this epic narrative arc."
+        legendary_prompt += "\nAdd 'legendary_path' field with the path id to legendary choices."
+        resonance_prompt += legendary_prompt
+
     # If a choice was made, record it
     if choice_index is not None and story_memory:
         last_scene = story_memory[-1] if story_memory else {}

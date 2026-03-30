@@ -8,7 +8,7 @@ import { useSensory } from '../context/SensoryContext';
 import {
   ArrowLeft, Sparkles, Star, Shield, Heart, Eye, Flame,
   ChevronRight, Loader2, Trophy, Zap, Swords,
-  Brain, ChevronDown, Globe, Package, User, Gem
+  Brain, ChevronDown, Globe, Package, User, Gem, Crown
 } from 'lucide-react';
 import { InventoryPanel, AvatarGenerator, AvatarBadge } from '../components/StarseedInventory';
 
@@ -562,6 +562,7 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
               const statDelta = choice.stat_effect?.[statKey] || 0;
               const isHovered = choiceHover === i;
               const isResonance = !!(choice.resonance_element || (choice.text && choice.text.includes('(Resonance)')));
+              const isLegendary = !!(choice.legendary_path || (choice.text && choice.text.includes('(Legendary)')));
 
               return (
                 <motion.button key={i}
@@ -574,23 +575,25 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
                   disabled={loading}
                   className="w-full relative overflow-hidden rounded-xl p-4 md:p-5 text-left transition-all group border"
                   style={{
-                    background: isResonance
-                      ? `linear-gradient(135deg, rgba(192,132,252,0.06), rgba(0,0,0,0.3))`
-                      : isHovered
-                        ? `linear-gradient(135deg, ${statCfg?.color || theme.glow}10, rgba(0,0,0,0.3))`
-                        : 'rgba(255,255,255,0.02)',
-                    borderColor: isResonance ? 'rgba(192,132,252,0.2)' : isHovered ? `${statCfg?.color || theme.glow}30` : 'rgba(255,255,255,0.05)',
+                    background: isLegendary
+                      ? `linear-gradient(135deg, rgba(252,211,77,0.08), rgba(0,0,0,0.3))`
+                      : isResonance
+                        ? `linear-gradient(135deg, rgba(192,132,252,0.06), rgba(0,0,0,0.3))`
+                        : isHovered
+                          ? `linear-gradient(135deg, ${statCfg?.color || theme.glow}10, rgba(0,0,0,0.3))`
+                          : 'rgba(255,255,255,0.02)',
+                    borderColor: isLegendary ? 'rgba(252,211,77,0.25)' : isResonance ? 'rgba(192,132,252,0.2)' : isHovered ? `${statCfg?.color || theme.glow}30` : 'rgba(255,255,255,0.05)',
                     transform: isHovered ? 'scale(1.01)' : 'scale(1)',
-                    boxShadow: isResonance ? '0 0 20px rgba(192,132,252,0.06)' : isHovered ? `0 0 25px ${statCfg?.color || theme.glow}10` : 'none',
+                    boxShadow: isLegendary ? '0 0 25px rgba(252,211,77,0.08)' : isResonance ? '0 0 20px rgba(192,132,252,0.06)' : isHovered ? `0 0 25px ${statCfg?.color || theme.glow}10` : 'none',
                   }}
                   data-testid={`choice-${i}`}>
-                  {/* Resonance shimmer */}
-                  {isResonance && (
+                  {/* Legendary / Resonance shimmer */}
+                  {(isResonance || isLegendary) && (
                     <motion.div
                       animate={{ x: ['-100%', '200%'] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 3 }}
+                      transition={{ duration: isLegendary ? 3 : 4, repeat: Infinity, ease: 'easeInOut', repeatDelay: isLegendary ? 1.5 : 3 }}
                       className="absolute inset-0 pointer-events-none opacity-20"
-                      style={{ background: 'linear-gradient(90deg, transparent, rgba(192,132,252,0.15), transparent)', width: '40%' }} />
+                      style={{ background: `linear-gradient(90deg, transparent, ${isLegendary ? 'rgba(252,211,77,0.2)' : 'rgba(192,132,252,0.15)'}, transparent)`, width: '40%' }} />
                   )}
                   {/* Glow on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -599,10 +602,12 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
                     {/* Letter badge */}
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
                       style={{
-                        background: isResonance ? 'rgba(192,132,252,0.12)' : isHovered ? `${statCfg?.color || '#fff'}15` : 'rgba(255,255,255,0.04)',
-                        border: `1px solid ${isResonance ? 'rgba(192,132,252,0.3)' : isHovered ? (statCfg?.color || '#fff') + '30' : 'rgba(255,255,255,0.06)'}`,
+                        background: isLegendary ? 'rgba(252,211,77,0.15)' : isResonance ? 'rgba(192,132,252,0.12)' : isHovered ? `${statCfg?.color || '#fff'}15` : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${isLegendary ? 'rgba(252,211,77,0.35)' : isResonance ? 'rgba(192,132,252,0.3)' : isHovered ? (statCfg?.color || '#fff') + '30' : 'rgba(255,255,255,0.06)'}`,
                       }}>
-                      {isResonance ? (
+                      {isLegendary ? (
+                        <Crown size={14} style={{ color: '#FCD34D' }} />
+                      ) : isResonance ? (
                         <Gem size={14} style={{ color: '#C084FC' }} />
                       ) : (
                         <span className="text-sm font-bold" style={{ color: statCfg?.color || '#fff' }}>
@@ -611,10 +616,19 @@ function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneI
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium mb-1.5 leading-relaxed" style={{ color: isResonance ? '#D8C5F5' : 'var(--text-primary)' }}>
+                      <p className="text-sm font-medium mb-1.5 leading-relaxed" style={{ color: isLegendary ? '#FDE68A' : isResonance ? '#D8C5F5' : 'var(--text-primary)' }}>
                         {choice.text}
                       </p>
                       <div className="flex items-center gap-2.5 flex-wrap">
+                        {isLegendary && (
+                          <motion.span
+                            animate={{ boxShadow: ['0 0 4px rgba(252,211,77,0.2)', '0 0 10px rgba(252,211,77,0.4)', '0 0 4px rgba(252,211,77,0.2)'] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 font-bold"
+                            style={{ background: 'rgba(252,211,77,0.12)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)' }}>
+                            <Crown size={8} /> Legendary Path
+                          </motion.span>
+                        )}
                         {isResonance && (
                           <span className="text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 font-bold"
                             style={{ background: 'rgba(192,132,252,0.1)', color: '#C084FC', border: '1px solid rgba(192,132,252,0.15)' }}>
