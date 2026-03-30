@@ -13,7 +13,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Launch Status: COMPLETE (Iteration 104 — 100% pass rate)
 
-### All Verified Features (38+)
+### All Verified Features (39+)
 1. SmartDock — Minimize, drag, snap zones, persist
 2. Cosmic Mood Ring — Interactive quick log, 8 moods
 3. Session Replay & Download — Auto-recording, Past Sessions tab
@@ -47,41 +47,36 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ### Recent Updates (2026-03-30)
 - Dance & Music Studio: 17 instruments, 6 scales, 8 sacred dances, recording — DONE (iteration_105: 100%)
 - Custom Virtual Background Uploads in Live Sessions — DONE (iteration_105: 100%)
-- Search bars for Instruments (by name/origin/category) and Sacred Dances (by name/origin/tradition) — DONE
+- Search bars for Instruments and Sacred Dances — DONE
 - Category filter chips for instruments (by origin/region) — DONE
-- Split Screen: Added Dance & Music, Light Therapy, Cosmic Mixer, Videos to split-view registry — DONE
-- Cosmic Pairs: 6 curated multi-sensory combos (Third Eye Journey, Harmonic Resonance, Forest Healing, Tribal Immersion, Celestial Stillness, Zen Flow) — DONE
-  - Placement 1: Horizontal card strip on Dance & Music Studio page
-  - Placement 2: Top section of Split View dropdown (accessible from any page)
+- Split Screen: Added Dance & Music, Light Therapy, Cosmic Mixer, Videos — DONE
+- Cosmic Pairs: 6 curated multi-sensory combos — DONE
 - Production Console (CosmicMixer upgrade): Full mixing board with 7 channel strips — DONE (iteration_106: 100%)
-  - Channels: Frequency (9), Ambient (5), Instrument Drones (6), Mantra (6), Light (6), Video (5), Haptic
-  - Per-channel volume/opacity faders for active layers
-  - Master volume + mute + stop all
-  - Full-screen light therapy overlay with adjustable opacity
-  - Video overlay (Starfield, Northern Lights, Ocean, Forest, Campfire) with adjustable opacity
-  - Accessible from floating button (bottom-right), SmartDock, and Cosmic Pairs
 - Mixer Presets System — DONE (iteration_107: 100%, 19/19 backend + all frontend)
-  - 8 Staff Pick starter presets (Morning Awakening, Deep Meditation, Creative Flow, Sleep Journey, Heart Opening, Third Eye Activation, Forest Retreat, Cosmic Dance)
-  - Save current mix as preset (name, description, public/private, tags)
-  - Community sharing: Browse public presets sorted by likes, heart/like system
-  - My Presets: Personal library with delete
-  - One-tap Load: Activates all layers and applies volume/opacity settings
-  - API: /api/mixer-presets (CRUD + /featured, /community, /mine, /:id/like)
 - Preset Playlists (Journeys) — DONE (iteration_108: 100%, 17/17 backend + all frontend)
-  - 4 curated journeys: Morning to Night (155min/5 steps), Deep Sleep Protocol (45min/3), Cosmic Exploration (55min/4), Quick Recharge (15min/3)
-  - Now Playing bar: step info, elapsed timer, progress bar, step dots, Prev/Pause/Next/Stop controls
-  - Auto-advance when step duration exceeded, loads next preset automatically
-  - Community sharing, likes, personal library (same as presets)
-  - API: /api/mixer-presets/playlists (CRUD + /featured, /community, /mine, /:id/like)
 - Multi-Layer Visual Stack Mixing Board — DONE (iteration_109: 100%, all 13 features)
-  - 4 layer types: Light (6), Video (5), Fractal (6), Filter (12) — all stackable simultaneously
-  - Per-layer opacity faders, visibility toggle (eye icon), remove, z-index reorder
-  - 6 fractal types: Mandelbrot, Julia Set, Sacred Geometry, Fibonacci Spiral, Flower of Life, Sri Yantra (Canvas-based, audio-reactive)
-  - 12 visual filters: Bloom, Film Grain, Chromatic, Sepia, Neon Glow, Dream Haze, VHS Retro, Ethereal, Kaleidoscope, Infrared, Cyberpunk, Vintage
-  - Canvas-based effects for Film Grain, VHS, Chromatic, Kaleidoscope
-  - Backward-compatible with presets (light/video layers auto-populate stack)
+- Media Library (/my-creations) — DONE (iteration_110: 100%, 13/13 backend + 16/16 frontend)
+- Live Session Mixer Sync (WebSocket mixer_sync) — DONE
+- Mixer Recording Engine — DONE
+- **In-Star-Chart Astrology Reading** — DONE (iteration_111: 100%, 10/10 backend + all frontend)
+  - Two access points: "My Reading" toolbar button + "Astrology Reading" in MythologyPanel
+  - AI-powered personalized readings using GPT-4o via Emergent LLM Key
+  - Considers user's birth zodiac, mood history, aura color, current moon phase, planetary transits
+  - Beautiful tabbed panel: Cosmic Influence, Planets, Guidance with affirmation
+  - Cosmic intensity meter, moon phase display, active transit badges
+  - API: POST /api/star-chart/astrology-reading
+  - Readings saved to astrology_readings MongoDB collection
 
 ## Post-Launch
 - Capacitor native: `npx cap add android && npx cap add ios` after `yarn build`
 - SFU for 10+ participant video calls
 - Additional virtual backgrounds (user uploads)
+
+## Upcoming Tasks
+1. Full Launch-Ready Polish & Flow Streamlining (P1) — Interactive flow charts, seamless functionality
+2. Mobile App Store scaffolding / Capacitor native build checks (P2)
+3. VR Immersive modes completion/verification (P2)
+
+## Refactoring Needed
+- CosmicMixer.js (~1500 lines) → Break into custom hooks (useMixerEngine, useMixerRecording)
+- LiveRoom.js complexity → Handles WebRTC, MediaPipe, chat, AND visual overlay sync
