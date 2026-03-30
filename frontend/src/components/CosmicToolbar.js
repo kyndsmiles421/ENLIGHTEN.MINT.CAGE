@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
 
-const HIDDEN_ROUTES = ['/auth', '/'];
+const HIDDEN_ROUTES = ['/auth', '/', '/vr'];
 const POS_KEY = 'cosmic_toolbar_pos';
 
 /* ── Try native haptics, fallback to vibrate ── */

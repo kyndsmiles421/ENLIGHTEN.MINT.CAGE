@@ -54,7 +54,7 @@ export default function SmartDock() {
   const dragStartRef = useRef(null);
   const dragMoved = useRef(false);
 
-  const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname.startsWith('/live/');
+  const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname === '/vr' || location.pathname.startsWith('/live/');
 
   useEffect(() => {
     localStorage.setItem(DOCK_MIN_KEY, String(minimized));

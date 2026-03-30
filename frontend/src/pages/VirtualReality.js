@@ -273,7 +273,7 @@ export default function VirtualReality() {
 
     scene.add(avatarGroup);
 
-    // ===== PORTAL ORBS =====
+    // ===== PORTAL ORBS (Enhanced with particle halos) =====
     const portalMeshes = [];
     const portalGroup = new THREE.Group();
     PORTALS.forEach((p, i) => {
@@ -283,9 +283,9 @@ export default function VirtualReality() {
       const z = Math.sin(angle) * radius;
       const [r, g, b] = hexToRgb(p.color);
 
-      // Outer glow
-      const glowGeo = new THREE.SphereGeometry(1.4, 24, 24);
-      const glowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(r, g, b), transparent: true, opacity: 0.1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide });
+      // Outer glow (enhanced - larger, more vibrant)
+      const glowGeo = new THREE.SphereGeometry(1.8, 24, 24);
+      const glowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(r, g, b), transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide });
       const glow = new THREE.Mesh(glowGeo, glowMat);
 
       // Core
@@ -298,14 +298,35 @@ export default function VirtualReality() {
       const innerMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(Math.min(1, r * 1.5), Math.min(1, g * 1.5), Math.min(1, b * 1.5)), transparent: true, opacity: 0.8 });
       const inner = new THREE.Mesh(innerGeo, innerMat);
 
+      // Particle ring halo — orbiting sparkles around each portal
+      const ringParticleCount = 24;
+      const ringParticleGeo = new THREE.BufferGeometry();
+      const ringPosArr = new Float32Array(ringParticleCount * 3);
+      const ringColArr = new Float32Array(ringParticleCount * 3);
+      for (let j = 0; j < ringParticleCount; j++) {
+        const a = (j / ringParticleCount) * Math.PI * 2;
+        const pr = 1.1 + Math.random() * 0.3;
+        ringPosArr[j * 3] = Math.cos(a) * pr;
+        ringPosArr[j * 3 + 1] = (Math.random() - 0.5) * 0.4;
+        ringPosArr[j * 3 + 2] = Math.sin(a) * pr;
+        ringColArr[j * 3] = r;
+        ringColArr[j * 3 + 1] = g;
+        ringColArr[j * 3 + 2] = b;
+      }
+      ringParticleGeo.setAttribute('position', new THREE.BufferAttribute(ringPosArr, 3));
+      ringParticleGeo.setAttribute('color', new THREE.BufferAttribute(ringColArr, 3));
+      const ringParticleMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+      const ringParticles = new THREE.Points(ringParticleGeo, ringParticleMat);
+
       const group = new THREE.Group();
       group.add(glow);
       group.add(core);
       group.add(inner);
+      group.add(ringParticles);
       group.position.set(x, 2.5 + Math.sin(i * 1.2) * 0.5, z);
       group.userData = { portalId: p.id, path: p.path, baseY: group.position.y };
       portalGroup.add(group);
-      portalMeshes.push({ group, core, glow, inner, data: p });
+      portalMeshes.push({ group, core, glow, inner, ringParticles, data: p });
     });
     scene.add(portalGroup);
 
@@ -453,7 +474,7 @@ export default function VirtualReality() {
         r.rotation.x = Math.PI / 2 + Math.sin(t * 0.3 + i) * 0.2;
       });
 
-      // Portal float & pulse
+      // Portal float & pulse (+ particle ring rotation)
       let newHovered = null;
       raycasterRef.current.setFromCamera(pointerRef.current, camera);
       portalMeshes.forEach((pm) => {
@@ -462,17 +483,25 @@ export default function VirtualReality() {
         pm.core.rotation.y = t * 0.5;
         pm.inner.rotation.y = -t * 0.8;
 
+        // Rotate particle ring halo
+        if (pm.ringParticles) {
+          pm.ringParticles.rotation.y = t * 0.4 + g.position.x;
+          pm.ringParticles.rotation.x = Math.sin(t * 0.2 + g.position.z) * 0.15;
+        }
+
         // Check hover
         const hits = raycasterRef.current.intersectObject(pm.core);
         if (hits.length > 0) {
           newHovered = pm.data.id;
-          pm.glow.scale.setScalar(1.4 + Math.sin(t * 3) * 0.15);
+          pm.glow.scale.setScalar(1.5 + Math.sin(t * 3) * 0.2);
           pm.core.scale.setScalar(1.2);
-          pm.glow.material.opacity = 0.15;
+          pm.glow.material.opacity = 0.18;
+          if (pm.ringParticles) pm.ringParticles.material.opacity = 0.9;
         } else {
           pm.glow.scale.setScalar(1 + Math.sin(t * 1.5 + pm.data.id.length) * 0.08);
           pm.core.scale.setScalar(1);
           pm.glow.material.opacity = 0.06;
+          if (pm.ringParticles) pm.ringParticles.material.opacity = 0.5;
         }
       });
       setHoveredPortal(prev => prev !== newHovered ? newHovered : prev);
@@ -889,16 +918,28 @@ export default function VirtualReality() {
       {/* 3D Scene */}
       <div ref={mountRef} className="w-full h-full" data-testid="vr-canvas-container" />
 
-      {/* Top HUD */}
+      {/* Top HUD — translucent glass */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-50">
         <div className="flex items-center gap-3 pointer-events-auto">
           <button onClick={() => navigate(-1)}
             className="p-2.5 rounded-xl transition-all"
-            style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-secondary)' }}
+            style={{
+              background: 'rgba(10,10,20,0.4)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              color: 'var(--text-secondary)',
+            }}
             data-testid="vr-back-btn">
             <ArrowLeft size={16} />
           </button>
-          <div className="px-4 py-2 rounded-xl" style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-4 py-2 rounded-xl" style={{
+            background: 'rgba(10,10,20,0.4)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(192,132,252,0.12)',
+            boxShadow: '0 0 16px rgba(192,132,252,0.06)',
+          }}>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#C084FC' }}>Cosmic Sanctuary</span>
           </div>
         </div>
@@ -906,32 +947,59 @@ export default function VirtualReality() {
         <div className="flex items-center gap-2 pointer-events-auto">
           <button onClick={() => setShowTheaterPicker(!showTheaterPicker)}
             className="p-2.5 rounded-xl transition-all"
-            style={{ background: vrTheater ? 'rgba(249,115,22,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${vrTheater ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.06)'}`, color: vrTheater ? '#F97316' : 'var(--text-secondary)' }}
+            style={{
+              background: vrTheater ? 'rgba(249,115,22,0.12)' : 'rgba(10,10,20,0.4)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: `1px solid ${vrTheater ? 'rgba(249,115,22,0.25)' : 'rgba(255,255,255,0.06)'}`,
+              color: vrTheater ? '#F97316' : 'var(--text-secondary)',
+              boxShadow: vrTheater ? '0 0 12px rgba(249,115,22,0.1)' : 'none',
+            }}
             data-testid="vr-theater-btn">
             <Film size={16} />
           </button>
           <button onClick={() => setShowJourneyPicker(!showJourneyPicker)}
             className="p-2.5 rounded-xl transition-all"
-            style={{ background: activeJourney ? 'rgba(252,211,77,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${activeJourney ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.06)'}`, color: activeJourney ? '#FCD34D' : 'var(--text-secondary)' }}
+            style={{
+              background: activeJourney ? 'rgba(252,211,77,0.12)' : 'rgba(10,10,20,0.4)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: `1px solid ${activeJourney ? 'rgba(252,211,77,0.25)' : 'rgba(255,255,255,0.06)'}`,
+              color: activeJourney ? '#FCD34D' : 'var(--text-secondary)',
+              boxShadow: activeJourney ? '0 0 12px rgba(252,211,77,0.1)' : 'none',
+            }}
             data-testid="vr-journey-btn">
             <Compass size={16} />
           </button>
           <button onClick={toggleAudio}
             className="p-2.5 rounded-xl transition-all"
-            style={{ background: ambientAudio ? 'rgba(192,132,252,0.15)' : 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${ambientAudio ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)'}`, color: ambientAudio ? '#C084FC' : 'var(--text-secondary)' }}
+            style={{
+              background: ambientAudio ? 'rgba(192,132,252,0.12)' : 'rgba(10,10,20,0.4)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: `1px solid ${ambientAudio ? 'rgba(192,132,252,0.25)' : 'rgba(255,255,255,0.06)'}`,
+              color: ambientAudio ? '#C084FC' : 'var(--text-secondary)',
+              boxShadow: ambientAudio ? '0 0 12px rgba(192,132,252,0.1)' : 'none',
+            }}
             data-testid="vr-audio-btn">
             {ambientAudio ? <Volume2 size={16} /> : <VolumeX size={16} />}
           </button>
           <button onClick={toggleFullscreen}
             className="p-2.5 rounded-xl transition-all"
-            style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-secondary)' }}
+            style={{
+              background: 'rgba(10,10,20,0.4)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              color: 'var(--text-secondary)',
+            }}
             data-testid="vr-fullscreen-btn">
             {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </button>
         </div>
       </div>
 
-      {/* Energy HUD */}
+      {/* Energy HUD — color-coded translucent glass */}
       {energyState && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -939,18 +1007,24 @@ export default function VirtualReality() {
           transition={{ delay: 0.5 }}
           className="absolute top-20 right-4 w-52 pointer-events-none z-50"
         >
-          <div className="rounded-xl p-3" style={{ background: 'rgba(10,10,20,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="rounded-xl p-3" style={{
+            background: 'rgba(10,10,20,0.45)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid ${energyState.dominant_chakra?.color || '#C084FC'}25`,
+            boxShadow: `0 0 24px ${energyState.dominant_chakra?.color || '#C084FC'}08, 0 4px 16px rgba(0,0,0,0.3)`,
+          }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Energy</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: `${energyState.dominant_chakra?.color || '#C084FC'}90` }}>Energy</span>
               <span className="text-sm font-light" style={{ color: energyState.dominant_chakra?.color || '#C084FC', fontFamily: 'Cormorant Garamond, serif' }}>
                 {Math.round(energyState.current_energy * 100)}%
               </span>
             </div>
             <div className="h-1 rounded-full overflow-hidden mb-2" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${energyState.current_energy * 100}%`, background: energyState.dominant_chakra?.color || '#C084FC' }} />
+              <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${energyState.current_energy * 100}%`, background: `linear-gradient(90deg, ${energyState.dominant_chakra?.color || '#C084FC'}80, ${energyState.dominant_chakra?.color || '#C084FC'})`, boxShadow: `0 0 8px ${energyState.dominant_chakra?.color || '#C084FC'}40` }} />
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: energyState.dominant_chakra?.color, boxShadow: `0 0 6px ${energyState.dominant_chakra?.color}` }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: energyState.dominant_chakra?.color, boxShadow: `0 0 8px ${energyState.dominant_chakra?.color}` }} />
               <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{energyState.dominant_chakra?.name} Chakra</span>
             </div>
             <p className="text-[10px] mt-1.5 capitalize" style={{ color: 'var(--text-muted)' }}>Mood: {energyState.current_mood}</p>
@@ -958,7 +1032,7 @@ export default function VirtualReality() {
         </motion.div>
       )}
 
-      {/* Portal tooltip */}
+      {/* Portal tooltip — translucent glass with portal color glow */}
       <AnimatePresence>
         {hoveredData && (
           <motion.div
@@ -967,10 +1041,16 @@ export default function VirtualReality() {
             exit={{ opacity: 0, y: 10 }}
             className="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-none z-50"
           >
-            <div className="px-5 py-3 rounded-xl text-center" style={{ background: 'rgba(10,10,20,0.7)', backdropFilter: 'blur(16px)', border: `1px solid ${hoveredData.color}30` }}>
-              <p className="text-sm font-medium mb-0.5" style={{ color: hoveredData.color }}>{hoveredData.label}</p>
+            <div className="px-5 py-3 rounded-xl text-center" style={{
+              background: 'rgba(10,10,20,0.5)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: `1px solid ${hoveredData.color}35`,
+              boxShadow: `0 0 30px ${hoveredData.color}12, 0 4px 16px rgba(0,0,0,0.3)`,
+            }}>
+              <p className="text-sm font-medium mb-0.5" style={{ color: hoveredData.color, textShadow: `0 0 12px ${hoveredData.color}40` }}>{hoveredData.label}</p>
               <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{hoveredData.desc}</p>
-              <p className="text-[9px] mt-1 uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Click to enter</p>
+              <p className="text-[9px] mt-1 uppercase tracking-widest" style={{ color: `${hoveredData.color}60` }}>Click to enter</p>
             </div>
           </motion.div>
         )}
@@ -982,11 +1062,17 @@ export default function VirtualReality() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
             className="absolute top-20 right-4 w-64 z-50 pointer-events-auto"
             data-testid="vr-theater-picker">
-            <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,20,0.9)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="rounded-xl p-4" style={{
+              background: 'rgba(10,10,20,0.5)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(249,115,22,0.15)',
+              boxShadow: '0 0 30px rgba(249,115,22,0.06), 0 4px 16px rgba(0,0,0,0.3)',
+            }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Film size={12} style={{ color: '#F97316' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.5)' }}>Story Theater</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(249,115,22,0.7)' }}>Story Theater</span>
                 </div>
                 <button onClick={() => setShowTheaterPicker(false)} className="p-1 rounded hover:bg-white/5">
                   <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
@@ -1170,11 +1256,17 @@ export default function VirtualReality() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
             className="absolute top-20 right-4 w-64 z-50 pointer-events-auto"
             data-testid="vr-journey-picker">
-            <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,20,0.9)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="rounded-xl p-4" style={{
+              background: 'rgba(10,10,20,0.5)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(252,211,77,0.15)',
+              boxShadow: '0 0 30px rgba(252,211,77,0.06), 0 4px 16px rgba(0,0,0,0.3)',
+            }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Compass size={12} style={{ color: '#FCD34D' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.5)' }}>Star Journeys</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(252,211,77,0.7)' }}>Star Journeys</span>
                 </div>
                 <button onClick={() => setShowJourneyPicker(false)} className="p-1 rounded hover:bg-white/5">
                   <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
@@ -1188,10 +1280,10 @@ export default function VirtualReality() {
                   <button key={j.id} onClick={() => startJourney(j)}
                     data-testid={`vr-journey-${j.id}`}
                     className="w-full text-left rounded-lg px-3 py-2.5 transition-all hover:bg-white/5"
-                    style={{ background: 'rgba(248,250,252,0.02)', border: `1px solid rgba(248,250,252,0.04)` }}>
+                    style={{ background: `${j.color}06`, border: `1px solid ${j.color}12` }}>
                     <div className="flex items-center gap-2 mb-0.5">
-                      <div className="w-2 h-2 rounded-full" style={{ background: j.color, boxShadow: `0 0 6px ${j.color}80` }} />
-                      <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{j.name}</span>
+                      <div className="w-2 h-2 rounded-full" style={{ background: j.color, boxShadow: `0 0 8px ${j.color}80` }} />
+                      <span className="text-[11px] font-medium" style={{ color: `${j.color}CC` }}>{j.name}</span>
                     </div>
                     <p className="text-[9px] pl-4" style={{ color: 'rgba(248,250,252,0.3)' }}>{j.description}</p>
                   </button>
@@ -1210,7 +1302,13 @@ export default function VirtualReality() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
             className="absolute top-20 right-4 w-72 z-50 pointer-events-auto"
             data-testid="vr-quantum-picker">
-            <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,20,0.95)', backdropFilter: 'blur(16px)', border: '1px solid rgba(0,229,255,0.12)' }}>
+            <div className="rounded-xl p-4" style={{
+              background: 'rgba(10,10,20,0.45)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,229,255,0.15)',
+              boxShadow: '0 0 30px rgba(0,229,255,0.06), 0 4px 16px rgba(0,0,0,0.3)',
+            }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Atom size={12} style={{ color: '#00E5FF' }} />
@@ -1321,10 +1419,17 @@ export default function VirtualReality() {
               </div>
             </div>
 
-            {/* End journey button */}
+            {/* End journey button — translucent glass with journey color */}
             <button onClick={stopJourney}
               className="absolute top-20 right-4 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto"
-              style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: `1px solid ${activeJourney.journey.color}20`, color: activeJourney.journey.color }}
+              style={{
+                background: 'rgba(10,10,20,0.4)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: `1px solid ${activeJourney.journey.color}25`,
+                color: activeJourney.journey.color,
+                boxShadow: `0 0 12px ${activeJourney.journey.color}08`,
+              }}
               data-testid="vr-journey-close">
               End Journey
             </button>
@@ -1332,18 +1437,24 @@ export default function VirtualReality() {
         )}
       </AnimatePresence>
 
-      {/* Bottom portal legend */}
+      {/* Bottom portal legend — translucent glass with per-portal color glow */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 pointer-events-none z-50">
         {PORTALS.map(p => (
           <div key={p.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all"
-            style={{ background: hoveredPortal === p.id ? `${p.color}15` : 'rgba(10,10,20,0.4)', border: `1px solid ${hoveredPortal === p.id ? `${p.color}30` : 'rgba(255,255,255,0.04)'}`, backdropFilter: 'blur(8px)' }}>
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: p.color, boxShadow: `0 0 6px ${p.color}60` }} />
-            <span className="text-[10px]" style={{ color: hoveredPortal === p.id ? p.color : 'var(--text-muted)' }}>{p.label}</span>
+            style={{
+              background: hoveredPortal === p.id ? `${p.color}12` : 'rgba(10,10,20,0.35)',
+              border: `1px solid ${hoveredPortal === p.id ? `${p.color}40` : `${p.color}10`}`,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              boxShadow: hoveredPortal === p.id ? `0 0 16px ${p.color}15` : 'none',
+            }}>
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: p.color, boxShadow: `0 0 8px ${p.color}80` }} />
+            <span className="text-[10px]" style={{ color: hoveredPortal === p.id ? p.color : `${p.color}80` }}>{p.label}</span>
           </div>
         ))}
       </div>
 
-      {/* VR Meditation Overlay */}
+      {/* VR Meditation Overlay — enhanced breathing rings with deeper color glow */}
       <AnimatePresence>
         {vrMeditation && (
           <motion.div
@@ -1356,30 +1467,38 @@ export default function VirtualReality() {
             {/* Meditation name label */}
             {vrMeditation.name && (
               <div className="absolute top-20 left-1/2 -translate-x-1/2">
-                <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: `${vrMeditation.color || '#C084FC'}90` }}>
-                  {vrMeditation.name}
-                </span>
+                <div className="px-4 py-1.5 rounded-full" style={{
+                  background: `${vrMeditation.color || '#C084FC'}08`,
+                  border: `1px solid ${vrMeditation.color || '#C084FC'}20`,
+                  backdropFilter: 'blur(12px)',
+                }}>
+                  <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: `${vrMeditation.color || '#C084FC'}90` }}>
+                    {vrMeditation.name}
+                  </span>
+                </div>
               </div>
             )}
 
-            {/* Breathing ring — uses meditation color */}
+            {/* Outer breathing ring — expanded, color-themed */}
             <motion.div
-              animate={{
-                scale: [1, 1.3, 1.3, 1],
-                opacity: [0.3, 0.6, 0.6, 0.3],
-              }}
+              animate={{ scale: [1, 1.35, 1.35, 1], opacity: [0.2, 0.5, 0.5, 0.2] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
               className="absolute rounded-full"
-              style={{ width: 300, height: 300, border: `1px solid ${vrMeditation.color || '#C084FC'}25`, boxShadow: `0 0 60px ${vrMeditation.color || '#C084FC'}14` }}
+              style={{ width: 350, height: 350, border: `1.5px solid ${vrMeditation.color || '#C084FC'}30`, boxShadow: `0 0 80px ${vrMeditation.color || '#C084FC'}12, inset 0 0 40px ${vrMeditation.color || '#C084FC'}06` }}
             />
+            {/* Middle breathing ring */}
             <motion.div
-              animate={{
-                scale: [1, 1.2, 1.2, 1],
-                opacity: [0.2, 0.4, 0.4, 0.2],
-              }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              animate={{ scale: [1, 1.25, 1.25, 1], opacity: [0.15, 0.35, 0.35, 0.15] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
               className="absolute rounded-full"
-              style={{ width: 400, height: 400, border: `1px solid ${vrMeditation.color || '#C084FC'}14` }}
+              style={{ width: 440, height: 440, border: `1px solid ${vrMeditation.color || '#C084FC'}18` }}
+            />
+            {/* Outer faint ring */}
+            <motion.div
+              animate={{ scale: [1, 1.15, 1.15, 1], opacity: [0.08, 0.2, 0.2, 0.08] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+              className="absolute rounded-full"
+              style={{ width: 530, height: 530, border: `1px solid ${vrMeditation.color || '#C084FC'}0C` }}
             />
 
             {/* Text */}
@@ -1403,7 +1522,7 @@ export default function VirtualReality() {
                 <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <motion.div
                     className="h-full rounded-full"
-                    style={{ background: `${vrMeditation.color || '#C084FC'}80`, width: `${(vrMeditation.elapsed / vrMeditation.total) * 100}%` }}
+                    style={{ background: `${vrMeditation.color || '#C084FC'}80`, width: `${(vrMeditation.elapsed / vrMeditation.total) * 100}%`, boxShadow: `0 0 6px ${vrMeditation.color || '#C084FC'}40` }}
                   />
                 </div>
                 <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.3)' }}>
@@ -1412,10 +1531,17 @@ export default function VirtualReality() {
               </div>
             </div>
 
-            {/* Close button */}
+            {/* Close button — translucent glass */}
             <button onClick={() => setVrMeditation(null)}
               className="absolute top-20 right-4 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto"
-              style={{ background: 'rgba(10,10,20,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
+              style={{
+                background: 'rgba(10,10,20,0.45)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: `1px solid ${vrMeditation.color || '#C084FC'}20`,
+                color: `${vrMeditation.color || '#C084FC'}90`,
+                boxShadow: `0 0 12px ${vrMeditation.color || '#C084FC'}08`,
+              }}
               data-testid="vr-meditation-close">
               End Session
             </button>
