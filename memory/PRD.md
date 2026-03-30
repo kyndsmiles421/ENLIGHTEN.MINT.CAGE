@@ -73,6 +73,13 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   - Auto-advance when step duration exceeded, loads next preset automatically
   - Community sharing, likes, personal library (same as presets)
   - API: /api/mixer-presets/playlists (CRUD + /featured, /community, /mine, /:id/like)
+- Multi-Layer Visual Stack Mixing Board — DONE (iteration_109: 100%, all 13 features)
+  - 4 layer types: Light (6), Video (5), Fractal (6), Filter (12) — all stackable simultaneously
+  - Per-layer opacity faders, visibility toggle (eye icon), remove, z-index reorder
+  - 6 fractal types: Mandelbrot, Julia Set, Sacred Geometry, Fibonacci Spiral, Flower of Life, Sri Yantra (Canvas-based, audio-reactive)
+  - 12 visual filters: Bloom, Film Grain, Chromatic, Sepia, Neon Glow, Dream Haze, VHS Retro, Ethereal, Kaleidoscope, Infrared, Cyberpunk, Vintage
+  - Canvas-based effects for Film Grain, VHS, Chromatic, Kaleidoscope
+  - Backward-compatible with presets (light/video layers auto-populate stack)
 
 ## Post-Launch
 - Capacitor native: `npx cap add android && npx cap add ios` after `yarn build`
