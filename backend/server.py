@@ -67,6 +67,7 @@ from routes.dynamic import router as dynamic_router
 from routes.creator import router as creator_router
 from routes.live import router as live_router
 from routes.music_studio import router as music_studio_router
+from routes.mixer_presets import router as mixer_presets_router
 
 app = FastAPI()
 
@@ -101,6 +102,7 @@ all_routers = [
     creator_router,
     live_router,
     music_studio_router,
+    mixer_presets_router,
 ]
 
 for r in all_routers:

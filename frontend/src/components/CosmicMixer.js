@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import {
   ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen,
   Vibrate, Play, Pause, Square, Loader2, Music, Film, Sliders, Maximize2, Minimize2,
+  Save, Heart, Globe, Lock, Trash2, Star, Users,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -162,6 +163,74 @@ export default function CosmicMixer() {
   const mantraAudioRef = useRef(null);
   const vibeIntervalRef = useRef(null);
   const [mantraLoading, setMantraLoading] = useState(false);
+
+  // Presets
+  const [presetsTab, setPresetsTab] = useState('featured'); // featured | community | mine
+  const [showPresets, setShowPresets] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [presets, setPresets] = useState([]);
+  const [presetsLoading, setPresetsLoading] = useState(false);
+  const [saveName, setSaveName] = useState('');
+  const [saveDesc, setSaveDesc] = useState('');
+  const [savePublic, setSavePublic] = useState(false);
+  const authHeaders = user ? { Authorization: `Bearer ${localStorage.getItem('zen_token')}` } : {};
+
+  const fetchPresets = useCallback(async (tab) => {
+    setPresetsLoading(true);
+    try {
+      const endpoint = tab === 'mine' ? '/mine' : tab === 'community' ? '/community' : '/featured';
+      const res = await axios.get(`${API}/mixer-presets${endpoint}`, { headers: authHeaders });
+      setPresets(res.data);
+    } catch { setPresets([]); }
+    setPresetsLoading(false);
+  }, [authHeaders]);
+
+  useEffect(() => { if (showPresets) fetchPresets(presetsTab); }, [showPresets, presetsTab]);
+
+  const getCurrentLayers = useCallback(() => {
+    const layers = {};
+    if (activeFreq) layers.frequency = { hz: activeFreq.hz, label: activeFreq.label };
+    if (activeSound) layers.sound = { id: activeSound.id };
+    if (activeDrone) layers.drone = { id: activeDrone.id };
+    if (activeMantra) layers.mantra = { id: activeMantra.id };
+    if (activeLight) layers.light = { id: activeLight.id };
+    if (activeVideo) layers.video = { id: activeVideo.id };
+    const volumes = { freqVol, soundVol, mantraVol, droneVol, lightOpacity, videoOpacity, masterVol };
+    return { layers, volumes };
+  }, [activeFreq, activeSound, activeDrone, activeMantra, activeLight, activeVideo, freqVol, soundVol, mantraVol, droneVol, lightOpacity, videoOpacity, masterVol]);
+
+  const savePreset = useCallback(async () => {
+    const { layers, volumes } = getCurrentLayers();
+    try {
+      await axios.post(`${API}/mixer-presets`, {
+        name: saveName || 'Untitled Mix',
+        description: saveDesc,
+        layers, volumes,
+        is_public: savePublic,
+      }, { headers: authHeaders });
+      setShowSaveModal(false);
+      setSaveName(''); setSaveDesc(''); setSavePublic(false);
+      if (showPresets && presetsTab === 'mine') fetchPresets('mine');
+    } catch {}
+  }, [saveName, saveDesc, savePublic, getCurrentLayers, authHeaders, showPresets, presetsTab, fetchPresets]);
+
+  const loadPreset = useCallback(async (preset) => {
+    // Placeholder - will be moved after toggle functions
+  }, []);
+
+  const toggleLike = useCallback(async (presetId) => {
+    try {
+      const res = await axios.post(`${API}/mixer-presets/${presetId}/like`, {}, { headers: authHeaders });
+      setPresets(prev => prev.map(p => p.id === presetId ? { ...p, liked: res.data.liked, like_count: res.data.like_count, likes: res.data.liked ? [...(p.likes || []), user?.id] : (p.likes || []).filter(x => x !== user?.id) } : p));
+    } catch {}
+  }, [authHeaders, user]);
+
+  const deletePreset = useCallback(async (presetId) => {
+    try {
+      await axios.delete(`${API}/mixer-presets/${presetId}`, { headers: authHeaders });
+      setPresets(prev => prev.filter(p => p.id !== presetId));
+    } catch {}
+  }, [authHeaders]);
 
   const getCtx = useCallback(async () => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
@@ -335,6 +404,48 @@ export default function CosmicMixer() {
 
   useEffect(() => () => { stopAll(); if (ctxRef.current) try { ctxRef.current.close(); } catch {} }, [stopAll]);
 
+  // ─── Load Preset (must be after toggle functions) ───
+  const loadPresetFn = useCallback(async (preset) => {
+    stopAll();
+    await new Promise(r => setTimeout(r, 100));
+
+    const v = preset.volumes || {};
+    if (v.masterVol !== undefined) setMasterVol(v.masterVol);
+    if (v.freqVol !== undefined) setFreqVol(v.freqVol);
+    if (v.soundVol !== undefined) setSoundVol(v.soundVol);
+    if (v.mantraVol !== undefined) setMantraVol(v.mantraVol);
+    if (v.droneVol !== undefined) setDroneVol(v.droneVol);
+    if (v.lightOpacity !== undefined) setLightOpacity(v.lightOpacity);
+    if (v.videoOpacity !== undefined) setVideoOpacity(v.videoOpacity);
+
+    const l = preset.layers || {};
+    if (l.frequency) {
+      const freq = FREQUENCIES.find(f => f.hz === l.frequency.hz);
+      if (freq) setTimeout(() => toggleFreq(freq), 150);
+    }
+    if (l.sound) {
+      const sound = SOUNDS.find(s => s.id === l.sound.id);
+      if (sound) setTimeout(() => toggleSound(sound), 250);
+    }
+    if (l.drone) {
+      const drone = INSTRUMENT_DRONES.find(d => d.id === l.drone.id);
+      if (drone) setTimeout(() => toggleDrone(drone), 350);
+    }
+    if (l.mantra) {
+      const mantra = MANTRAS.find(m => m.id === l.mantra.id);
+      if (mantra) setTimeout(() => toggleMantra(mantra), 450);
+    }
+    if (l.light) {
+      const light = LIGHT_MODES.find(x => x.id === l.light.id);
+      if (light) setActiveLight(light);
+    }
+    if (l.video) {
+      const video = VIDEO_OVERLAYS.find(x => x.id === l.video.id);
+      if (video) setActiveVideo(video);
+    }
+    setShowPresets(false);
+  }, [stopAll, toggleFreq, toggleSound, toggleDrone, toggleMantra]);
+
   const hasActive = activeFreq || activeSound || activeMantra || activeLight || activeDrone || activeVideo || vibeOn;
   const activeCount = [activeFreq, activeSound, activeMantra, activeLight, activeDrone, activeVideo, vibeOn].filter(Boolean).length;
 
@@ -446,6 +557,121 @@ export default function CosmicMixer() {
               </div>
 
               <div className="px-5 pb-5 space-y-4">
+                {/* Presets Toolbar */}
+                <div className="flex items-center gap-2 py-1">
+                  <button onClick={() => setShowPresets(!showPresets)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-[1.02]"
+                    style={{
+                      background: showPresets ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${showPresets ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.05)'}`,
+                      color: showPresets ? '#C084FC' : 'var(--text-muted)',
+                    }}
+                    data-testid="presets-browse-btn">
+                    <Star size={10} /> Presets
+                  </button>
+                  {hasActive && (
+                    <button onClick={() => setShowSaveModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-[1.02]"
+                      style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', color: '#22C55E' }}
+                      data-testid="presets-save-btn">
+                      <Save size={10} /> Save Mix
+                    </button>
+                  )}
+                </div>
+
+                {/* Presets Browser */}
+                <AnimatePresence>
+                  {showPresets && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden">
+                      <div className="rounded-xl p-3 mb-2" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                        {/* Tabs */}
+                        <div className="flex gap-1 mb-3" data-testid="presets-tabs">
+                          {[
+                            { id: 'featured', label: 'Staff Picks', icon: Star },
+                            { id: 'community', label: 'Community', icon: Users },
+                            { id: 'mine', label: 'My Presets', icon: Lock },
+                          ].map(t => (
+                            <button key={t.id} onClick={() => setPresetsTab(t.id)}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all"
+                              style={{
+                                background: presetsTab === t.id ? 'rgba(192,132,252,0.1)' : 'transparent',
+                                color: presetsTab === t.id ? '#C084FC' : 'var(--text-muted)',
+                              }}
+                              data-testid={`presets-tab-${t.id}`}>
+                              <t.icon size={9} /> {t.label}
+                            </button>
+                          ))}
+                        </div>
+                        {/* Preset Cards */}
+                        {presetsLoading ? (
+                          <div className="flex items-center justify-center py-4">
+                            <Loader2 size={14} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
+                          </div>
+                        ) : presets.length === 0 ? (
+                          <p className="text-[10px] text-center py-4" style={{ color: 'var(--text-muted)' }}>
+                            {presetsTab === 'mine' ? 'No saved presets yet. Activate layers and tap Save Mix!' : 'No presets found.'}
+                          </p>
+                        ) : (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                            {presets.map(p => (
+                              <PresetCard key={p.id} preset={p} userId={user?.id}
+                                onLoad={() => loadPresetFn(p)}
+                                onLike={() => toggleLike(p.id)}
+                                onDelete={presetsTab === 'mine' ? () => deletePreset(p.id) : null} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Save Modal */}
+                <AnimatePresence>
+                  {showSaveModal && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden">
+                      <div className="rounded-xl p-4 mb-2" style={{ background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)' }}
+                        data-testid="save-preset-form">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#22C55E' }}>Save Current Mix</p>
+                        <input type="text" placeholder="Preset name..." value={saveName} onChange={e => setSaveName(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg text-xs mb-2 outline-none"
+                          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }}
+                          data-testid="save-preset-name" />
+                        <input type="text" placeholder="Description (optional)..." value={saveDesc} onChange={e => setSaveDesc(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg text-xs mb-3 outline-none"
+                          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }}
+                          data-testid="save-preset-desc" />
+                        <div className="flex items-center justify-between">
+                          <button onClick={() => setSavePublic(v => !v)}
+                            className="flex items-center gap-1.5 text-[10px] px-2.5 py-1.5 rounded-lg transition-all"
+                            style={{
+                              background: savePublic ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.03)',
+                              border: `1px solid ${savePublic ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.05)'}`,
+                              color: savePublic ? '#3B82F6' : 'var(--text-muted)',
+                            }}
+                            data-testid="save-preset-public">
+                            {savePublic ? <Globe size={10} /> : <Lock size={10} />}
+                            {savePublic ? 'Share with Community' : 'Private'}
+                          </button>
+                          <div className="flex gap-1.5">
+                            <button onClick={() => setShowSaveModal(false)}
+                              className="px-3 py-1.5 rounded-lg text-[10px]"
+                              style={{ color: 'var(--text-muted)' }}>Cancel</button>
+                            <button onClick={savePreset}
+                              className="px-4 py-1.5 rounded-lg text-[10px] font-medium"
+                              style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.25)', color: '#22C55E' }}
+                              data-testid="save-preset-submit">
+                              <Save size={10} className="inline mr-1" /> Save
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {/* Master Fader */}
                 <div className="flex items-center gap-3 py-1">
                   <button onClick={() => setMuted(m => !m)} className="p-1" data-testid="mixer-mute">
@@ -657,6 +883,66 @@ function LightOverlay({ mode }) {
           100% { opacity: 1; transform: scale(1.05); }
         }
       `}</style>
+    </div>
+  );
+}
+
+
+/* ─── Preset Card ─── */
+function PresetCard({ preset, userId, onLoad, onLike, onDelete }) {
+  const layerKeys = Object.keys(preset.layers || {});
+  const isLiked = (preset.likes || []).includes(userId);
+
+  return (
+    <div className="rounded-xl p-2.5 transition-all hover:bg-white/[0.02] group"
+      style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)' }}
+      data-testid={`preset-card-${preset.id}`}>
+      <div className="flex items-start justify-between mb-1.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-medium truncate" style={{ color: 'var(--text-primary)' }}>{preset.name}</p>
+          {preset.description && (
+            <p className="text-[8px] truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{preset.description}</p>
+          )}
+        </div>
+        {preset.is_featured && <Star size={8} className="flex-shrink-0 mt-0.5 fill-current" style={{ color: '#FCD34D' }} />}
+      </div>
+      {/* Layer indicators */}
+      <div className="flex flex-wrap gap-1 mb-2">
+        {layerKeys.map(k => (
+          <span key={k} className="text-[7px] px-1.5 py-0.5 rounded-full"
+            style={{ background: 'rgba(192,132,252,0.06)', color: 'rgba(192,132,252,0.6)' }}>
+            {k}
+          </span>
+        ))}
+      </div>
+      <div className="flex items-center justify-between">
+        <button onClick={onLoad}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
+          style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC' }}
+          data-testid={`preset-load-${preset.id}`}>
+          <Play size={8} /> Load
+        </button>
+        <div className="flex items-center gap-1.5">
+          {onLike && (
+            <button onClick={onLike} className="flex items-center gap-0.5 text-[8px] transition-all"
+              style={{ color: isLiked ? '#EF4444' : 'var(--text-muted)' }}
+              data-testid={`preset-like-${preset.id}`}>
+              <Heart size={9} className={isLiked ? 'fill-current' : ''} />
+              {preset.like_count || 0}
+            </button>
+          )}
+          {onDelete && (
+            <button onClick={onDelete} className="p-0.5 transition-all opacity-0 group-hover:opacity-100"
+              style={{ color: 'var(--text-muted)' }}
+              data-testid={`preset-delete-${preset.id}`}>
+              <Trash2 size={9} />
+            </button>
+          )}
+        </div>
+      </div>
+      {preset.creator_name && preset.creator_name !== 'Cosmic Collective' && (
+        <p className="text-[7px] mt-1.5" style={{ color: 'rgba(255,255,255,0.15)' }}>by {preset.creator_name}</p>
+      )}
     </div>
   );
 }
