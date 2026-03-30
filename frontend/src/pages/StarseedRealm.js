@@ -8,7 +8,8 @@ import { useSensory } from '../context/SensoryContext';
 import {
   Star, Users, Trophy, Swords, Shield, Heart, Eye, Brain,
   ChevronRight, Loader2, Sparkles, Zap, Globe, Crown,
-  ArrowLeft, Plus, Clock, Flame, UserPlus
+  ArrowLeft, Plus, Clock, Flame, UserPlus, Send, Skull,
+  Target, AlertTriangle, MessageCircle
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -361,6 +362,414 @@ function EncounterResult({ result, onContinue }) {
 }
 
 /* ─── Main Realm Page ─── */
+/* ─── Alliance Chat ─── */
+function AllianceChat({ allianceId, authHeaders, userId }) {
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState('');
+  const [sending, setSending] = useState(false);
+  const chatEndRef = useRef(null);
+  const pollRef = useRef(null);
+
+  const loadMessages = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/starseed/realm/chat/${allianceId}`, { headers: authHeaders });
+      setMessages(res.data.messages || []);
+    } catch {}
+  }, [allianceId, authHeaders]);
+
+  useEffect(() => {
+    loadMessages();
+    pollRef.current = setInterval(loadMessages, 8000);
+    return () => clearInterval(pollRef.current);
+  }, [loadMessages]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!text.trim() || sending) return;
+    setSending(true);
+    try {
+      await axios.post(`${API}/starseed/realm/chat/send`, {
+        text: text.trim(), type: 'message',
+      }, { headers: authHeaders });
+      setText('');
+      loadMessages();
+    } catch (err) {
+      toast.error('Could not send message');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div data-testid="alliance-chat">
+      <div className="flex items-center gap-2 mb-2">
+        <MessageCircle size={11} style={{ color: '#C084FC' }} />
+        <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(192,132,252,0.6)' }}>Alliance Chat</span>
+      </div>
+      <div className="rounded-xl p-3 mb-2 overflow-y-auto" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.04)', maxHeight: 240, minHeight: 120 }}>
+        {messages.length === 0 && (
+          <p className="text-[10px] text-center py-4" style={{ color: 'var(--text-muted)' }}>No messages yet. Start the conversation!</p>
+        )}
+        {messages.map((msg, i) => {
+          const isSelf = msg.user_id === userId;
+          const color = ORIGIN_COLORS[msg.origin_id] || '#818CF8';
+          return (
+            <div key={msg.id || i} className={`mb-2 ${isSelf ? 'text-right' : ''}`}>
+              <div className={`inline-block max-w-[85%] rounded-xl px-3 py-2 text-left ${isSelf ? 'ml-auto' : ''}`}
+                style={{ background: isSelf ? `${color}12` : 'rgba(255,255,255,0.03)', border: `1px solid ${isSelf ? color + '20' : 'rgba(255,255,255,0.04)'}` }}>
+                {!isSelf && (
+                  <p className="text-[8px] font-bold mb-0.5" style={{ color }}>{msg.character_name}</p>
+                )}
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)' }}>{msg.text}</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={chatEndRef} />
+      </div>
+      <div className="flex gap-2">
+        <input type="text" placeholder="Message your alliance..." maxLength={500}
+          value={text} onChange={e => setText(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && sendMessage()}
+          className="flex-1 px-3 py-2 rounded-lg text-xs"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-primary)', outline: 'none' }}
+          data-testid="chat-input" />
+        <button onClick={sendMessage} disabled={sending || !text.trim()}
+          className="px-3 py-2 rounded-lg transition-all hover:scale-105"
+          style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC', opacity: (!text.trim() || sending) ? 0.4 : 1 }}
+          data-testid="chat-send-btn">
+          <Send size={12} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Boss Encounter Panel ─── */
+function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
+  const [bosses, setBosses] = useState([]);
+  const [activeBattle, setActiveBattle] = useState(null);
+  const [battleResult, setBattleResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [initLoading, setInitLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API}/starseed/realm/bosses`, { headers: authHeaders })
+      .then(r => setBosses(r.data.bosses))
+      .catch(() => {})
+      .finally(() => setInitLoading(false));
+  }, [authHeaders]);
+
+  const initiateBoss = useCallback(async (bossId) => {
+    if (!activeOrigin || loading) return;
+    setLoading(true);
+    setBattleResult(null);
+    try {
+      const res = await axios.post(`${API}/starseed/realm/boss/initiate`, {
+        boss_id: bossId, origin_id: activeOrigin,
+      }, { headers: authHeaders });
+      setActiveBattle(res.data);
+      toast.success('Boss encounter initiated!');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Could not start boss fight');
+    } finally {
+      setLoading(false);
+    }
+  }, [activeOrigin, authHeaders, loading]);
+
+  const bossAction = useCallback(async (choiceIndex) => {
+    if (!activeBattle || loading) return;
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/starseed/realm/boss/action`, {
+        battle_id: activeBattle.id, choice_index: choiceIndex,
+      }, { headers: authHeaders });
+
+      if (res.data.battle_over) {
+        setBattleResult(res.data);
+        setActiveBattle(null);
+      } else {
+        setActiveBattle(prev => ({
+          ...prev,
+          boss_current_hp: res.data.boss_hp,
+          phase: res.data.phase,
+          current_scene: res.data.next_scene,
+        }));
+      }
+    } catch (err) {
+      toast.error('Action failed');
+    } finally {
+      setLoading(false);
+    }
+  }, [activeBattle, authHeaders, loading]);
+
+  if (initLoading) return <div className="flex justify-center py-8"><Loader2 className="animate-spin" size={20} style={{ color: '#DC2626' }} /></div>;
+
+  // Battle Result Screen
+  if (battleResult) {
+    const won = battleResult.boss_defeated;
+    return (
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        className="rounded-2xl p-8 text-center" style={{ background: won ? 'rgba(252,211,77,0.05)' : 'rgba(220,38,38,0.05)', border: `1px solid ${won ? 'rgba(252,211,77,0.2)' : 'rgba(220,38,38,0.2)'}` }}
+        data-testid="boss-result">
+        <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 0.5 }}>
+          {won ? <Trophy size={36} className="mx-auto mb-3" style={{ color: '#FCD34D' }} /> : <Skull size={36} className="mx-auto mb-3" style={{ color: '#DC2626' }} />}
+        </motion.div>
+        <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: won ? '#FCD34D' : '#DC2626' }}>
+          {won ? 'Victory!' : 'Defeat'}
+        </h3>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+          {won ? 'The cosmic threat has been vanquished! Your power echoes across the realm.' : 'The enemy proved too powerful this time. Regroup and try again.'}
+        </p>
+        {battleResult.reward && (
+          <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
+            <span className="text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
+              +{battleResult.reward.xp_earned} XP
+            </span>
+            {battleResult.reward.stat_bonus && (
+              <span className="text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(74,222,128,0.08)', color: '#4ADE80' }}>
+                {battleResult.reward.stat_bonus}
+              </span>
+            )}
+            {battleResult.reward.leveled_up && (
+              <span className="text-xs px-2 py-1 rounded-lg font-bold" style={{ background: 'rgba(252,211,77,0.12)', color: '#FCD34D' }}>
+                Level Up! Lvl {battleResult.reward.new_level}
+              </span>
+            )}
+          </div>
+        )}
+        {battleResult.reward?.new_achievements?.map(a => (
+          <div key={a.id} className="flex items-center justify-center gap-2 mb-2">
+            <Trophy size={12} style={{ color: '#C084FC' }} />
+            <span className="text-xs" style={{ color: '#C084FC' }}>{a.title} — {a.desc}</span>
+          </div>
+        ))}
+        <button onClick={() => setBattleResult(null)}
+          className="mt-4 px-6 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105"
+          style={{ background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
+          data-testid="boss-return-btn">
+          Return to Bosses
+        </button>
+      </motion.div>
+    );
+  }
+
+  // Active Battle
+  if (activeBattle) {
+    const scene = activeBattle.current_scene || {};
+    const hpPct = (activeBattle.boss_current_hp / activeBattle.boss_hp) * 100;
+    const bossColor = activeBattle.boss_color || '#DC2626';
+    const atm = { epic: '#F59E0B', dark: '#DC2626', tense: '#EF4444', triumphant: '#FCD34D', mystical: '#818CF8' };
+    const sceneColor = atm[scene.atmosphere] || '#DC2626';
+
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} data-testid="boss-battle">
+        {/* Boss Header */}
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => setActiveBattle(null)} className="text-xs flex items-center gap-1 group" style={{ color: 'var(--text-muted)' }}
+            data-testid="boss-exit-btn">
+            <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" /> Exit
+          </button>
+          <span className="text-[9px] px-3 py-1 rounded-full uppercase font-bold"
+            style={{ background: `${bossColor}10`, color: bossColor, border: `1px solid ${bossColor}20` }}>
+            Phase {activeBattle.phase}/{activeBattle.max_phases}
+          </span>
+        </div>
+
+        {/* Boss HP Bar */}
+        <div className="mb-6 p-4 rounded-2xl" style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${bossColor}15` }}
+          data-testid="boss-hp-bar">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Skull size={16} style={{ color: bossColor }} />
+              <span className="text-sm font-bold" style={{ color: bossColor }}>{activeBattle.boss_name}</span>
+            </div>
+            <span className="text-xs tabular-nums" style={{ color: bossColor }}>
+              {activeBattle.boss_current_hp}/{activeBattle.boss_hp} HP
+            </span>
+          </div>
+          <div className="h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <motion.div className="h-full rounded-full" animate={{ width: `${hpPct}%` }} transition={{ duration: 0.8 }}
+              style={{
+                background: hpPct > 50 ? `linear-gradient(90deg, ${bossColor}80, ${bossColor})` : hpPct > 25 ? 'linear-gradient(90deg, #F59E0B80, #F59E0B)' : 'linear-gradient(90deg, #EF444480, #EF4444)',
+                boxShadow: `0 0 12px ${bossColor}30`,
+              }} />
+          </div>
+        </div>
+
+        {/* Party */}
+        <div className="flex items-center justify-center gap-3 mb-5 flex-wrap">
+          {activeBattle.participants?.map((p, i) => (
+            <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[9px]"
+              style={{ background: `${ORIGIN_COLORS[p.origin_id] || '#818CF8'}08`, border: `1px solid ${ORIGIN_COLORS[p.origin_id] || '#818CF8'}15` }}>
+              <Star size={8} style={{ color: ORIGIN_COLORS[p.origin_id] || '#818CF8' }} />
+              <span style={{ color: ORIGIN_COLORS[p.origin_id] || '#818CF8' }}>{p.character_name}</span>
+              {p.is_npc && <span className="opacity-40">(NPC)</span>}
+            </div>
+          ))}
+        </div>
+
+        {/* Phase Title */}
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-center mb-3" style={{ color: sceneColor }}>
+          {scene.phase_title}
+        </p>
+
+        {/* Boss Action */}
+        {scene.boss_action && (
+          <div className="rounded-xl p-3 mb-4 flex items-center gap-3"
+            style={{ background: `${bossColor}08`, border: `1px solid ${bossColor}12` }}>
+            <AlertTriangle size={14} style={{ color: bossColor }} />
+            <p className="text-xs" style={{ color: bossColor }}>{scene.boss_action}</p>
+            <span className="text-[9px] ml-auto px-1.5 py-0.5 rounded" style={{ background: `${bossColor}15`, color: bossColor }}>
+              -{scene.boss_damage_to_party} DMG
+            </span>
+          </div>
+        )}
+
+        {/* Narrative */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.8 }}
+          className="rounded-2xl p-6 md:p-8 mb-6 relative overflow-hidden"
+          style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${sceneColor}12`, backdropFilter: 'blur(12px)' }}
+          data-testid="boss-narrative">
+          <p className="text-base md:text-lg leading-loose" style={{
+            fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)', fontSize: '18px', lineHeight: '2',
+          }}>{scene.narrative}</p>
+        </motion.div>
+
+        {/* Choices */}
+        <div className="space-y-3" data-testid="boss-choices">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, transparent, ${sceneColor}30, transparent)` }} />
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] px-3" style={{ color: sceneColor }}>Rally Your Forces</p>
+            <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, transparent, ${sceneColor}30, transparent)` }} />
+          </div>
+          {scene.choices?.map((choice, i) => {
+            const StatIcon = STAT_ICONS[choice.stat_used] || Star;
+            return (
+              <motion.button key={i}
+                initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.1 }}
+                onClick={() => !loading && bossAction(i)}
+                disabled={loading}
+                className="w-full rounded-xl p-4 text-left transition-all hover:scale-[1.01] group border"
+                style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.05)', opacity: loading ? 0.5 : 1 }}
+                data-testid={`boss-choice-${i}`}>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(255,255,255,0.04)' }}>
+                    <span className="text-sm font-bold" style={{ color: sceneColor }}>{String.fromCharCode(65 + i)}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium mb-1.5" style={{ color: 'var(--text-primary)' }}>{choice.text}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1"
+                        style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
+                        <Target size={8} /> {choice.damage} DMG
+                      </span>
+                      {choice.team_heal > 0 && (
+                        <span className="text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1"
+                          style={{ background: 'rgba(74,222,128,0.08)', color: '#4ADE80' }}>
+                          <Heart size={8} /> +{choice.team_heal} HEAL
+                        </span>
+                      )}
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full flex items-center gap-1"
+                        style={{ background: `rgba(255,255,255,0.04)` }}>
+                        <StatIcon size={8} /> {choice.stat_used}
+                      </span>
+                      <span className="text-[9px] italic" style={{ color: 'var(--text-muted)' }}>{choice.outcome_hint}</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: sceneColor }} />
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {loading && (
+          <div className="flex items-center justify-center py-6 gap-3">
+            <Loader2 className="animate-spin" size={16} style={{ color: bossColor }} />
+            <span className="text-xs" style={{ color: bossColor }}>Resolving battle phase...</span>
+          </div>
+        )}
+      </motion.div>
+    );
+  }
+
+  // Boss Selection Grid
+  return (
+    <div data-testid="boss-select">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2" style={{ color: '#DC2626' }}>
+        <Skull size={11} /> Cosmic Threats
+      </p>
+      <div className="space-y-3">
+        {bosses.map((boss, i) => (
+          <motion.div key={boss.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+            className="rounded-2xl p-5 border relative overflow-hidden group"
+            style={{ background: `linear-gradient(135deg, ${boss.color}06, rgba(0,0,0,0.3))`, borderColor: `${boss.color}15` }}
+            data-testid={`boss-card-${boss.id}`}>
+            <div className="absolute inset-0 opacity-[0.03]"
+              style={{ background: `radial-gradient(ellipse at 20% 50%, ${boss.color}, transparent 60%)` }} />
+            <div className="relative flex items-start gap-4">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${boss.color}12`, border: `1px solid ${boss.color}20` }}>
+                <Skull size={24} style={{ color: boss.color }} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-sm font-semibold" style={{ color: boss.color }}>{boss.name}</h3>
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full uppercase font-bold"
+                    style={{ background: `${boss.color}10`, color: boss.color, border: `1px solid ${boss.color}15` }}>
+                    {boss.difficulty}
+                  </span>
+                </div>
+                <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-secondary)' }}>{boss.description}</p>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-[9px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                    <Heart size={8} /> HP: {boss.hp}
+                  </span>
+                  <span className="text-[9px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                    <Flame size={8} /> {boss.element}
+                  </span>
+                  <span className="text-[9px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                    <Target size={8} /> {boss.phases} phases
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(74,222,128,0.08)', color: '#4ADE80' }}>
+                    Weak: {boss.weakness}
+                  </span>
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
+                    Resists: {boss.resistance}
+                  </span>
+                </div>
+              </div>
+              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+                onClick={() => initiateBoss(boss.id)}
+                disabled={loading || !activeOrigin}
+                className="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all flex-shrink-0 mt-1"
+                style={{
+                  background: `linear-gradient(135deg, ${boss.color}20, ${boss.color}10)`,
+                  border: `1px solid ${boss.color}30`,
+                  color: boss.color,
+                  opacity: (loading || !activeOrigin) ? 0.4 : 1,
+                }}
+                data-testid={`boss-fight-${boss.id}`}>
+                <Swords size={12} /> Fight
+              </motion.button>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function StarseedRealm() {
   const { user, authHeaders, loading: authLoading } = useAuth();
   const { reduceParticles } = useSensory();
@@ -503,6 +912,7 @@ export default function StarseedRealm() {
 
   const TABS = [
     { id: 'realm', label: 'Realm', icon: Globe },
+    { id: 'bosses', label: 'Bosses', icon: Skull },
     { id: 'leaderboard', label: 'Ranks', icon: Trophy },
     { id: 'alliances', label: 'Alliances', icon: Users },
   ];
@@ -691,6 +1101,17 @@ export default function StarseedRealm() {
                 </motion.div>
               )}
 
+              {activeTab === 'bosses' && (
+                <motion.div key="bosses" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  data-testid="realm-bosses">
+                  <BossEncounterPanel
+                    activeOrigin={activeOrigin}
+                    authHeaders={authHeaders}
+                    userId={user?.id}
+                  />
+                </motion.div>
+              )}
+
               {activeTab === 'alliances' && (
                 <motion.div key="alliances" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   data-testid="realm-alliances">
@@ -703,7 +1124,7 @@ export default function StarseedRealm() {
                         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#C084FC' }}>Your Alliance</span>
                       </div>
                       <h3 className="text-lg font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{myAlliance.name}</h3>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mb-4">
                         {myAlliance.member_details?.map((m, i) => (
                           <div key={i} className="flex items-center gap-2 text-xs">
                             <Star size={10} style={{ color: ORIGIN_COLORS[m.origin_id] || '#818CF8' }} />
@@ -713,6 +1134,8 @@ export default function StarseedRealm() {
                           </div>
                         ))}
                       </div>
+                      {/* Alliance Chat */}
+                      <AllianceChat allianceId={myAlliance.id} authHeaders={authHeaders} userId={user?.id} />
                     </div>
                   ) : (
                     <div className="rounded-2xl p-5 mb-6 border"

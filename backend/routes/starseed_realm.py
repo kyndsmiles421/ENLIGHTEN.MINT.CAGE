@@ -580,3 +580,462 @@ async def get_encounter_history(user=Depends(get_current_user)):
         {"_id": 0},
     ).sort("created_at", -1).to_list(20)
     return {"encounters": encounters}
+
+
+# ─── Alliance Chat ───
+
+@router.post("/starseed/realm/chat/send")
+async def send_chat_message(data: dict = Body(...), user=Depends(get_current_user)):
+    """Send a message in alliance chat."""
+    uid = user["id"]
+    text = data.get("text", "").strip()
+    if not text or len(text) > 500:
+        raise HTTPException(status_code=400, detail="Message must be 1-500 chars")
+
+    alliance = await db.starseed_alliances.find_one({"members": uid}, {"_id": 0})
+    if not alliance:
+        raise HTTPException(status_code=403, detail="Join an alliance to chat")
+
+    char = await db.starseed_characters.find_one(
+        {"user_id": uid}, {"_id": 0, "character_name": 1, "origin_id": 1, "level": 1}
+    )
+
+    msg_type = data.get("type", "message")  # message, encounter_share, achievement
+    msg = {
+        "id": str(uuid.uuid4()),
+        "alliance_id": alliance["id"],
+        "user_id": uid,
+        "character_name": char.get("character_name", "Traveler") if char else "Traveler",
+        "origin_id": char.get("origin_id") if char else None,
+        "level": char.get("level", 1) if char else 1,
+        "text": text,
+        "type": msg_type,
+        "metadata": data.get("metadata", {}),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.starseed_chat.insert_one({**msg})
+    return msg
+
+
+@router.get("/starseed/realm/chat/{alliance_id}")
+async def get_chat_messages(alliance_id: str, user=Depends(get_current_user)):
+    """Get recent chat messages for an alliance."""
+    alliance = await db.starseed_alliances.find_one(
+        {"id": alliance_id, "members": user["id"]}, {"_id": 0}
+    )
+    if not alliance:
+        raise HTTPException(status_code=403, detail="Not a member of this alliance")
+
+    messages = await db.starseed_chat.find(
+        {"alliance_id": alliance_id}, {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    messages.reverse()
+    return {"messages": messages}
+
+
+# ─── Cooperative Boss Encounters ───
+
+COSMIC_BOSSES = [
+    {
+        "id": "void-leviathan",
+        "name": "The Void Leviathan",
+        "description": "A colossal entity born from the space between galaxies. It feeds on the light of dying stars and leaves only silence in its wake.",
+        "element": "Void",
+        "color": "#6366F1",
+        "difficulty": "epic",
+        "hp": 300,
+        "phases": 3,
+        "weakness": "compassion",
+        "resistance": "courage",
+        "lore": "When the first stars formed, one was born inverted — a star that consumed light instead of creating it. Over eons, it grew into the Void Leviathan, a being so vast that entire nebulae serve as its scales. It drifts through the cosmos, drawn to concentrations of starseed energy.",
+    },
+    {
+        "id": "entropy-weaver",
+        "name": "The Entropy Weaver",
+        "description": "A fractal intelligence that unravels the fabric of reality itself. Where it passes, time flows backwards and dimensions fold in on themselves.",
+        "element": "Chaos",
+        "color": "#DC2626",
+        "difficulty": "legendary",
+        "hp": 400,
+        "phases": 3,
+        "weakness": "wisdom",
+        "resistance": "resilience",
+        "lore": "Born at the moment of the Big Bang, the Entropy Weaver is the universe's memory of its own death. It weaves threads of chaos through the cosmic tapestry, unmaking what was made. Only those who understand the deepest patterns can perceive — and resist — its influence.",
+    },
+    {
+        "id": "fallen-archon",
+        "name": "The Fallen Archon",
+        "description": "Once a guardian of the Arcturian crystalline grid, this being was corrupted by the Orion Wars. It now seeks to shatter the dimensional barriers.",
+        "element": "Crystal-Shadow",
+        "color": "#A855F7",
+        "difficulty": "epic",
+        "hp": 350,
+        "phases": 3,
+        "weakness": "intuition",
+        "resistance": "wisdom",
+        "lore": "The Archon once held the highest seat in the Arcturian council — the Keeper of the Grid. But during the Orion Wars, it absorbed too much shadow energy trying to protect the gateway. Now it exists as a being of fractured light, neither fully dark nor light, driven by a corrupted desire to 'protect' reality by destroying it.",
+    },
+    {
+        "id": "dream-parasite",
+        "name": "The Dream Parasite",
+        "description": "A psychic entity that infiltrates the collective consciousness, trapping starseeds in loops of illusion and false memory.",
+        "element": "Psychic",
+        "color": "#EC4899",
+        "difficulty": "hard",
+        "hp": 250,
+        "phases": 3,
+        "weakness": "courage",
+        "resistance": "intuition",
+        "lore": "In the Andromedan telepathic networks, whispers spread of an entity that was never born but somehow exists — the Dream Parasite. It slips between thoughts, feeding on fear and doubt. Its victims don't know they're trapped, living out false lives while their true cosmic essence is slowly drained.",
+    },
+    {
+        "id": "star-devourer",
+        "name": "Zar'ghul the Star Devourer",
+        "description": "An ancient dragon-like entity from before the Lyran civilization. It consumes stars to fuel its impossible existence across multiple dimensions.",
+        "element": "Fire-Void",
+        "color": "#F59E0B",
+        "difficulty": "legendary",
+        "hp": 450,
+        "phases": 3,
+        "weakness": "resilience",
+        "resistance": "compassion",
+        "lore": "Before the Lyrans built their first cities, Zar'ghul already ancient. A being of primordial fire twisted by the void, it is said to have devoured three star systems during the Lyran Age. Now it stirs again, drawn by the concentrated starseed energy gathering on Earth.",
+    },
+]
+
+
+@router.get("/starseed/realm/bosses")
+async def get_available_bosses(user=Depends(get_current_user)):
+    """Get list of available boss encounters."""
+    bosses = [{k: v for k, v in b.items() if k != "lore"} for b in COSMIC_BOSSES]
+    return {"bosses": bosses}
+
+
+@router.get("/starseed/realm/boss/history")
+async def get_boss_history(user=Depends(get_current_user)):
+    """Get user's boss battle history."""
+    uid = user["id"]
+    battles = await db.starseed_boss_battles.find(
+        {"participants.user_id": uid},
+        {"_id": 0, "id": 1, "boss_id": 1, "boss_name": 1, "status": 1, "created_at": 1, "boss_current_hp": 1, "boss_hp": 1},
+    ).sort("created_at", -1).to_list(20)
+    return {"battles": battles}
+
+
+@router.get("/starseed/realm/boss/{boss_id}")
+async def get_boss_detail(boss_id: str):
+    """Get full boss details including lore."""
+    boss = next((b for b in COSMIC_BOSSES if b["id"] == boss_id), None)
+    if not boss:
+        raise HTTPException(status_code=404, detail="Boss not found")
+    return boss
+
+
+@router.post("/starseed/realm/boss/initiate")
+async def initiate_boss_encounter(data: dict = Body(...), user=Depends(get_current_user)):
+    """Start a boss encounter. Solo or alliance-based."""
+    uid = user["id"]
+    boss_id = data.get("boss_id")
+    origin_id = data.get("origin_id")
+
+    boss = next((b for b in COSMIC_BOSSES if b["id"] == boss_id), None)
+    if not boss:
+        raise HTTPException(status_code=404, detail="Boss not found")
+
+    char = await db.starseed_characters.find_one(
+        {"user_id": uid, "origin_id": origin_id}, {"_id": 0}
+    )
+    if not char:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # Get alliance members if in alliance
+    alliance = await db.starseed_alliances.find_one({"members": uid}, {"_id": 0})
+    participants = [{
+        "user_id": uid,
+        "character_name": char.get("character_name", "Traveler"),
+        "origin_id": char.get("origin_id"),
+        "level": char.get("level", 1),
+        "stats": char.get("stats", {}),
+        "is_leader": True,
+    }]
+
+    # Add NPC allies for solo or small groups
+    import random as rnd
+    npc_allies_needed = max(0, 2 - len(participants))
+    npc_names_pool = [
+        ("Aelara the Lightweaver", "pleiadian"),
+        ("Thalok the Tidecaller", "sirian"),
+        ("Zyn'ari the Gridwalker", "arcturian"),
+        ("Kael the Fireborn", "lyran"),
+        ("Nexia the Mindbreaker", "andromedan"),
+        ("Vex'thar the Shadowblade", "orion"),
+    ]
+    available_npcs = [n for n in npc_names_pool if n[1] != origin_id]
+    for npc_name, npc_origin in rnd.sample(available_npcs, min(npc_allies_needed, len(available_npcs))):
+        participants.append({
+            "user_id": "npc",
+            "character_name": npc_name,
+            "origin_id": npc_origin,
+            "level": max(1, char.get("level", 1) + rnd.randint(-1, 2)),
+            "stats": {k: max(1, v + rnd.randint(-2, 3)) for k, v in char.get("stats", {}).items()},
+            "is_npc": True,
+        })
+
+    battle_id = str(uuid.uuid4())
+    battle = {
+        "id": battle_id,
+        "boss_id": boss_id,
+        "boss_name": boss["name"],
+        "boss_hp": boss["hp"],
+        "boss_current_hp": boss["hp"],
+        "boss_color": boss["color"],
+        "phase": 1,
+        "max_phases": boss["phases"],
+        "participants": participants,
+        "alliance_id": alliance["id"] if alliance else None,
+        "rounds": [],
+        "status": "active",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.starseed_boss_battles.insert_one({**battle})
+
+    # Generate first phase
+    scene = await _generate_boss_phase(battle, boss)
+
+    await db.starseed_boss_battles.update_one(
+        {"id": battle_id},
+        {"$set": {"current_scene": scene}},
+    )
+
+    battle["current_scene"] = scene
+    return battle
+
+
+async def _generate_boss_phase(battle, boss):
+    """Generate a boss encounter phase using AI."""
+    phase = battle.get("phase", 1)
+    participants_desc = ", ".join([
+        f"{p['character_name']} (Lvl {p['level']} {STARSEED_ORIGIN_NAMES.get(p['origin_id'], 'Unknown')})"
+        for p in battle["participants"]
+    ])
+    rounds = battle.get("rounds", [])
+    prev_summary = ""
+    if rounds:
+        prev_summary = "PREVIOUS ROUNDS:\n" + "\n".join([
+            f"- Phase {r.get('phase')}: {r.get('choice_text', 'N/A')} → {r.get('outcome', 'N/A')[:80]}"
+            for r in rounds[-3:]
+        ])
+
+    hp_pct = (battle["boss_current_hp"] / battle["boss_hp"]) * 100
+
+    system_msg = f"""You are narrating a cooperative boss encounter in a cosmic starseed RPG.
+
+THE BOSS: {boss['name']} - {boss['description']}
+Element: {boss['element']} | HP: {battle['boss_current_hp']}/{battle['boss_hp']} ({hp_pct:.0f}%)
+Weakness: {boss['weakness']} | Resistance: {boss['resistance']}
+Phase {phase}/{boss['phases']}
+
+HEROES: {participants_desc}
+
+RULES:
+- Write a dramatic 2nd-person plural narrative (150-200 words) describing the current battle phase
+- Phase 1 = Boss emerges, Phase 2 = Boss enrages, Phase 3 = Final stand
+- Create exactly 3 tactical choices that involve the whole party
+- Each choice should leverage different stats and have different damage/healing outcomes
+- Include a "damage" field (int 50-120) and "team_heal" field (int 0-30) for each choice
+- The boss's weakness stat deals bonus damage, resistance stat deals less
+- Return ONLY valid JSON
+
+JSON format:
+{{
+  "narrative": "Battle narrative...",
+  "phase_title": "Phase title",
+  "atmosphere": "epic/dark/tense/triumphant",
+  "boss_action": "What the boss does this round",
+  "boss_damage_to_party": 15,
+  "choices": [
+    {{"text": "Tactical choice", "stat_used": "courage", "damage": 80, "team_heal": 10, "outcome_hint": "Brief hint"}},
+    {{"text": "Tactical choice", "stat_used": "wisdom", "damage": 60, "team_heal": 20, "outcome_hint": "Brief hint"}},
+    {{"text": "Tactical choice", "stat_used": "compassion", "damage": 70, "team_heal": 15, "outcome_hint": "Brief hint"}}
+  ]
+}}"""
+
+    prompt = f"""{prev_summary}
+Generate Phase {phase} of the boss battle against {boss['name']}. {"The heroes approach the cosmic threat..." if phase == 1 else f"The battle rages — the boss is at {hp_pct:.0f}% HP." if phase == 2 else "This is the FINAL PHASE — everything leads to this moment!"}"""
+
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"boss-{battle['id'][:8]}",
+            system_message=system_msg,
+        )
+        chat.with_model("openai", "gpt-4o")
+        raw = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=25)
+        raw_text = raw.text if hasattr(raw, "text") else str(raw)
+        raw_text = raw_text.strip()
+        if raw_text.startswith("```"):
+            raw_text = raw_text.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+        return json.loads(raw_text)
+    except Exception as e:
+        logger.error(f"Boss phase gen error: {e}")
+        return {
+            "narrative": f"The {boss['name']} looms before you, its {boss['element']} energy crackling through the void. Your party stands united — {participants_desc}. The cosmic beast prepares its next assault. You must decide how to face this phase of the battle.",
+            "phase_title": f"Phase {phase}: {'The Awakening' if phase == 1 else 'The Fury' if phase == 2 else 'Final Stand'}",
+            "atmosphere": "epic" if phase < 3 else "dark",
+            "boss_action": f"The {boss['name']} unleashes a wave of {boss['element']} energy",
+            "boss_damage_to_party": 15,
+            "choices": [
+                {"text": "Coordinate a combined assault, channeling all your courage", "stat_used": "courage", "damage": 90, "team_heal": 5, "outcome_hint": "Maximum damage, risky"},
+                {"text": "Analyze the boss's weakness pattern and strike precisely", "stat_used": "wisdom", "damage": 70, "team_heal": 15, "outcome_hint": "Balanced approach"},
+                {"text": "Shield the party and heal while looking for an opening", "stat_used": "resilience", "damage": 50, "team_heal": 25, "outcome_hint": "Defensive, sustaining"},
+            ],
+        }
+
+
+@router.post("/starseed/realm/boss/action")
+async def boss_action(data: dict = Body(...), user=Depends(get_current_user)):
+    """Make a choice in a boss encounter phase."""
+    uid = user["id"]
+    battle_id = data.get("battle_id")
+    choice_index = data.get("choice_index", 0)
+
+    battle = await db.starseed_boss_battles.find_one({"id": battle_id}, {"_id": 0})
+    if not battle:
+        raise HTTPException(status_code=404, detail="Battle not found")
+    if battle.get("status") != "active":
+        raise HTTPException(status_code=400, detail="Battle already ended")
+
+    scene = battle.get("current_scene", {})
+    choices = scene.get("choices", [])
+    if not (0 <= choice_index < len(choices)):
+        choice_index = 0
+
+    chosen = choices[choice_index]
+    damage = chosen.get("damage", 60)
+    team_heal = chosen.get("team_heal", 10)
+    stat_used = chosen.get("stat_used", "courage")
+    boss_dmg = scene.get("boss_damage_to_party", 15)
+
+    # Get boss weakness/resistance
+    boss = next((b for b in COSMIC_BOSSES if b["id"] == battle["boss_id"]), None)
+    if boss and stat_used == boss.get("weakness"):
+        damage = int(damage * 1.5)
+    elif boss and stat_used == boss.get("resistance"):
+        damage = int(damage * 0.6)
+
+    new_hp = max(0, battle["boss_current_hp"] - damage)
+    current_phase = battle.get("phase", 1)
+    max_phases = battle.get("max_phases", 3)
+
+    rounds = battle.get("rounds", [])
+    rounds.append({
+        "phase": current_phase,
+        "choice_text": chosen["text"],
+        "stat_used": stat_used,
+        "damage_dealt": damage,
+        "team_healed": team_heal,
+        "boss_damage": boss_dmg,
+        "outcome": chosen.get("outcome_hint", ""),
+    })
+
+    # Check boss defeated
+    boss_defeated = new_hp <= 0
+    battle_over = boss_defeated or current_phase >= max_phases
+
+    # Advance phase if not defeated
+    next_phase = current_phase + 1 if not boss_defeated else current_phase
+
+    update = {
+        "boss_current_hp": new_hp,
+        "phase": next_phase,
+        "rounds": rounds,
+    }
+
+    if battle_over:
+        update["status"] = "victory" if boss_defeated else "defeat"
+
+        # Award XP and achievements to player
+        origin_id = None
+        for p in battle.get("participants", []):
+            if p.get("user_id") == uid:
+                origin_id = p.get("origin_id")
+                break
+
+        if origin_id:
+            char = await db.starseed_characters.find_one(
+                {"user_id": uid, "origin_id": origin_id}, {"_id": 0}
+            )
+            if char:
+                xp_reward = 100 if boss_defeated else 30
+                new_xp = char.get("xp", 0) + xp_reward
+                new_level = char.get("level", 1)
+                xp_to_next = char.get("xp_to_next", 100)
+                leveled_up = False
+                while new_xp >= xp_to_next:
+                    new_xp -= xp_to_next
+                    new_level += 1
+                    xp_to_next = int(xp_to_next * 1.4)
+                    leveled_up = True
+
+                achievements = char.get("achievements", [])
+                new_achievements = []
+                if boss_defeated and "boss_slayer" not in achievements:
+                    achievements.append("boss_slayer")
+                    new_achievements.append({"id": "boss_slayer", "title": "Boss Slayer", "desc": f"Defeated {battle.get('boss_name')}"})
+
+                stats = char.get("stats", {})
+                if boss_defeated:
+                    for stat in stats:
+                        stats[stat] = min(15, stats[stat] + 1)
+
+                await db.starseed_characters.update_one(
+                    {"user_id": uid, "origin_id": origin_id},
+                    {"$set": {
+                        "xp": new_xp, "level": new_level, "xp_to_next": xp_to_next,
+                        "stats": stats, "achievements": achievements,
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                    }},
+                )
+
+                update["reward"] = {
+                    "xp_earned": xp_reward,
+                    "leveled_up": leveled_up,
+                    "new_level": new_level,
+                    "new_achievements": new_achievements,
+                    "stat_bonus": "+1 all stats" if boss_defeated else None,
+                }
+
+    await db.starseed_boss_battles.update_one({"id": battle_id}, {"$set": update})
+
+    result = {
+        "damage_dealt": damage,
+        "team_healed": team_heal,
+        "boss_damage": boss_dmg,
+        "boss_hp": new_hp,
+        "boss_max_hp": battle["boss_hp"],
+        "stat_used": stat_used,
+        "was_weakness": boss and stat_used == boss.get("weakness"),
+        "was_resistance": boss and stat_used == boss.get("resistance"),
+        "battle_over": battle_over,
+        "boss_defeated": boss_defeated,
+        "phase": next_phase,
+        "choice_text": chosen["text"],
+    }
+
+    if battle_over:
+        result["reward"] = update.get("reward", {})
+        return result
+
+    # Generate next phase
+    battle["boss_current_hp"] = new_hp
+    battle["phase"] = next_phase
+    battle["rounds"] = rounds
+    next_scene = await _generate_boss_phase(battle, boss)
+
+    await db.starseed_boss_battles.update_one(
+        {"id": battle_id},
+        {"$set": {"current_scene": next_scene}},
+    )
+
+    result["next_scene"] = next_scene
+    return result
