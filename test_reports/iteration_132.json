@@ -1,0 +1,95 @@
+{
+  "summary": "Iteration 132: Tested Sacred Texts inline reader fix. All features working correctly - texts can now be read directly on the page without requiring VR mode. Generated chapters show 'Tap to read' subtitle with separate VR button. Inline reader displays chapter content with Listen (TTS), VR Mode, and close buttons. Non-generated chapters show 'Tap to generate with AI' with sparkle icon.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    ".screenshots/sacred_texts_chapters.png",
+    ".screenshots/sacred_texts_inline_reader.png",
+    ".screenshots/sacred_texts_harmonics_panel.png"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only test)",
+    "frontend": "100%"
+  },
+  "test_credentials": "kyndsmiles@gmail.com / password",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Sacred Texts inline reader fix verified. Page at /sacred-texts shows 15 texts. Bhagavad Gita has 1 generated chapter (The Yoga of Arjuna's Despair) and 4 non-generated chapters. Generated chapters have 'Tap to read' subtitle and separate VR button (data-testid='vr-btn-{chapter-id}'). Clicking generated chapter opens InlineReader (data-testid='inline-reader') with Listen button (data-testid='inline-narrate'), VR Mode button (data-testid='inline-to-vr'), and close button (data-testid='close-inline-reader'). Non-generated chapters show 'Tap to generate with AI' with sparkle icon. Cosmic Harmonics panel (dock-harmonics) works from Sacred Texts page.",
+  "features_tested": {
+    "sacred_texts_page_load": {
+      "url": "/sacred-texts",
+      "status": "PASS",
+      "texts_count": 15
+    },
+    "text_card_click": {
+      "data_testid": "text-card-bhagavad-gita",
+      "status": "PASS",
+      "opens_detail_panel": true
+    },
+    "chapter_list": {
+      "status": "PASS",
+      "chapters_found": 5,
+      "generated_chapters": 1,
+      "non_generated_chapters": 4
+    },
+    "generated_chapter_subtitle": {
+      "expected": "Tap to read",
+      "actual": "Tap to read",
+      "status": "PASS",
+      "no_vr_mode_text": true
+    },
+    "separate_vr_button": {
+      "data_testid": "vr-btn-bg-1",
+      "status": "PASS",
+      "count": 1
+    },
+    "inline_reader": {
+      "data_testid": "inline-reader",
+      "status": "PASS",
+      "opens_on_chapter_click": true,
+      "components": {
+        "tradition_label": "PASS - shows 'Hindu'",
+        "chapter_title": "PASS - shows 'The Yoga of Arjuna's Despair'",
+        "text_content": "PASS - 3814 chars of content",
+        "listen_button": "PASS - data-testid='inline-narrate'",
+        "vr_mode_button": "PASS - data-testid='inline-to-vr'",
+        "close_button": "PASS - data-testid='close-inline-reader'"
+      }
+    },
+    "close_inline_reader": {
+      "status": "PASS",
+      "returns_to_chapter_list": true
+    },
+    "non_generated_chapter_subtitle": {
+      "expected": "Tap to generate with AI",
+      "status": "PASS",
+      "count": 4,
+      "has_sparkle_icon": true
+    },
+    "vr_immersive_mode_indicator": {
+      "location": "top-right header",
+      "text": "VR immersive reading mode",
+      "status": "PASS"
+    },
+    "vr_button_opens_vr_reader": {
+      "data_testid": "vr-reader",
+      "status": "PASS"
+    },
+    "cosmic_harmonics_panel": {
+      "data_testid": "dock-harmonics",
+      "status": "PASS",
+      "works_from_sacred_texts_page": true
+    }
+  }
+}

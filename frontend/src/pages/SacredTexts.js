@@ -402,9 +402,221 @@ function TextCard({ text, onSelect, index }) {
 }
 
 /* ══════════════════════════════════════
+   INLINE READER — Read text directly on page
+   ══════════════════════════════════════ */
+function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders }) {
+  const [narrating, setNarrating] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef(null);
+  const readerRef = useRef(null);
+
+  const paragraphs = chapter.content?.split('\n\n').filter(Boolean) || [];
+  const excerptParagraphs = chapter.excerpt?.split('\n\n').filter(Boolean) || [];
+  const commentaryParagraphs = chapter.commentary?.split('\n\n').filter(Boolean) || [];
+  const hasContent = paragraphs.length > 0 || excerptParagraphs.length > 0;
+
+  // Scroll into view when opened
+  useEffect(() => {
+    setTimeout(() => {
+      readerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  }, [chapter.chapter_id]);
+
+  const startNarration = async () => {
+    setNarrating(true);
+    try {
+      const r = await axios.post(
+        `${API}/sacred-texts/${text.id}/chapters/${chapter.chapter_id || chapter.id}/narrate`,
+        {}, { headers: authHeaders, timeout: 120000 }
+      );
+      const audio = new Audio(`data:audio/mp3;base64,${r.data.audio}`);
+      audioRef.current = audio;
+      audio.ontimeupdate = () => { if (audio.duration) setProgress(audio.currentTime / audio.duration); };
+      audio.onended = () => { setNarrating(false); setPaused(false); setProgress(0); };
+      audio.play();
+    } catch { toast.error('Failed to generate narration'); setNarrating(false); }
+  };
+
+  const togglePause = () => {
+    if (!audioRef.current) return;
+    if (paused) { audioRef.current.play(); setPaused(false); }
+    else { audioRef.current.pause(); setPaused(true); }
+  };
+
+  const stopNarration = () => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
+    setNarrating(false); setPaused(false); setProgress(0);
+  };
+
+  useEffect(() => () => { if (audioRef.current) audioRef.current.pause(); }, []);
+
+  // Navigate to next/prev chapter
+  const chapters = textDetail?.chapters || [];
+  const currentIdx = chapters.findIndex(c => c.id === chapter.id);
+  const prevCh = currentIdx > 0 ? chapters[currentIdx - 1] : null;
+  const nextCh = currentIdx < chapters.length - 1 ? chapters[currentIdx + 1] : null;
+
+  return (
+    <div ref={readerRef} className="mt-4 rounded-2xl overflow-hidden" data-testid="inline-reader"
+      style={{ background: 'rgba(8,10,18,0.7)', border: `1px solid ${text.color}15`, backdropFilter: 'blur(8px)' }}>
+
+      {/* Reader header */}
+      <div className="px-5 py-4 flex items-center justify-between"
+        style={{ borderBottom: `1px solid ${text.color}10` }}>
+        <div>
+          <p className="text-[9px] uppercase tracking-[0.2em] mb-0.5" style={{ color: `${text.color}70` }}>{text.tradition}</p>
+          <p className="text-base font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
+            {chapter.title || chapter.chapter_title}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => onVR(chapter)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] transition-all hover:bg-white/5"
+            style={{ background: `${text.color}08`, border: `1px solid ${text.color}15`, color: text.color }}
+            data-testid="inline-to-vr">
+            <Maximize2 size={10} /> VR Mode
+          </button>
+          <button onClick={() => { stopNarration(); onClose(); }}
+            className="p-1.5 rounded-lg hover:bg-white/5 transition-colors" data-testid="close-inline-reader">
+            <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+          </button>
+        </div>
+      </div>
+
+      {/* Narration controls */}
+      <div className="px-5 py-3 flex items-center gap-3"
+        style={{ borderBottom: `1px solid ${text.color}08`, background: `${text.color}03` }}>
+        {!narrating ? (
+          <button onClick={startNarration}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all hover:bg-white/5"
+            style={{ background: `${text.color}08`, border: `1px solid ${text.color}15`, color: text.color }}
+            data-testid="inline-narrate">
+            <Volume2 size={10} /> Listen
+          </button>
+        ) : (
+          <div className="flex items-center gap-2 flex-1">
+            <button onClick={togglePause}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ background: `${text.color}12`, color: text.color }}>
+              {paused ? <Play size={12} /> : <Pause size={12} />}
+            </button>
+            <button onClick={stopNarration}
+              className="p-1.5 rounded-lg hover:bg-white/5 transition-all"
+              style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <X size={12} />
+            </button>
+            <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: `${text.color}10` }}>
+              <div className="h-full rounded-full transition-all duration-300"
+                style={{ background: text.color, width: `${progress * 100}%` }} />
+            </div>
+            <span className="text-[9px]" style={{ color: `${text.color}80` }}>{Math.round(progress * 100)}%</span>
+          </div>
+        )}
+      </div>
+
+      {/* Text content */}
+      <div className="px-5 py-6 max-h-[60vh] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+        {!hasContent ? (
+          <p className="text-center text-sm py-8" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            This chapter has not been generated yet. Tap it from the chapter list to generate.
+          </p>
+        ) : (
+          <>
+            {/* Main content */}
+            {paragraphs.map((para, i) => (
+              <motion.p key={`p-${i}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05, duration: 0.4 }}
+                className="text-sm leading-[2] mb-5"
+                style={{ color: 'rgba(248,250,252,0.75)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>
+                {para}
+              </motion.p>
+            ))}
+
+            {/* Excerpt / Key verses */}
+            {excerptParagraphs.length > 0 && (
+              <div className="my-8">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex-1 h-px" style={{ background: `${text.color}15` }} />
+                  <Sparkles size={12} style={{ color: text.color }} />
+                  <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: `${text.color}60` }}>Key Passages</span>
+                  <div className="flex-1 h-px" style={{ background: `${text.color}15` }} />
+                </div>
+                {excerptParagraphs.map((para, i) => (
+                  <motion.div key={`e-${i}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 + i * 0.08 }}
+                    className="pl-4 mb-4"
+                    style={{ borderLeft: `2px solid ${text.color}30` }}>
+                    <p className="text-sm leading-[1.9] italic"
+                      style={{ color: `${text.color}CC`, fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
+                      {para}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {/* Commentary */}
+            {commentaryParagraphs.length > 0 && (
+              <div className="my-8">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex-1 h-px" style={{ background: `${text.color}15` }} />
+                  <Eye size={12} style={{ color: text.color }} />
+                  <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: `${text.color}60` }}>Deeper Meaning</span>
+                  <div className="flex-1 h-px" style={{ background: `${text.color}15` }} />
+                </div>
+                {commentaryParagraphs.map((para, i) => (
+                  <motion.p key={`c-${i}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + i * 0.08 }}
+                    className="text-xs leading-[1.9] mb-4"
+                    style={{ color: 'rgba(248,250,252,0.45)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    {para}
+                  </motion.p>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Chapter navigation */}
+      <div className="px-5 py-3 flex items-center justify-between"
+        style={{ borderTop: `1px solid ${text.color}08`, background: `${text.color}03` }}>
+        {prevCh ? (
+          <button
+            onClick={() => prevCh.generated ? onClose() || setTimeout(() => document.querySelector(`[data-testid="chapter-${prevCh.id}"]`)?.click(), 100) : null}
+            className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
+            style={{ color: prevCh.generated ? 'rgba(248,250,252,0.5)' : 'rgba(248,250,252,0.15)' }}
+            disabled={!prevCh.generated}
+            data-testid="prev-chapter">
+            <ArrowLeft size={10} /> {prevCh.title?.slice(0, 20)}{prevCh.title?.length > 20 ? '...' : ''}
+          </button>
+        ) : <div />}
+        {nextCh ? (
+          <button
+            onClick={() => nextCh.generated ? onClose() || setTimeout(() => document.querySelector(`[data-testid="chapter-${nextCh.id}"]`)?.click(), 100) : null}
+            className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
+            style={{ color: nextCh.generated ? 'rgba(248,250,252,0.5)' : 'rgba(248,250,252,0.15)' }}
+            disabled={!nextCh.generated}
+            data-testid="next-chapter">
+            {nextCh.title?.slice(0, 20)}{nextCh.title?.length > 20 ? '...' : ''} <ChevronRight size={10} />
+          </button>
+        ) : <div />}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
    CHAPTER LIST
    ══════════════════════════════════════ */
-function ChapterList({ text, chapters, onGenerate, onRead, generating }) {
+function ChapterList({ text, chapters, onGenerate, onRead, onVR, generating }) {
   return (
     <div className="space-y-2">
       {chapters.map((ch, i) => (
@@ -428,14 +640,23 @@ function ChapterList({ text, chapters, onGenerate, onRead, generating }) {
                 {ch.title}
               </p>
               <p className="text-[9px] mt-0.5" style={{ color: ch.generated ? `${text.color}80` : 'rgba(248,250,252,0.2)' }}>
-                {ch.generated ? 'Tap to read in VR mode' : 'Tap to generate with AI'}
+                {ch.generated ? 'Tap to read' : 'Tap to generate with AI'}
               </p>
             </div>
             {generating === ch.id ? (
               <Loader2 size={14} className="animate-spin flex-shrink-0" style={{ color: text.color }} />
             ) : ch.generated ? (
               <div className="flex items-center gap-1.5">
-                <Maximize2 size={12} style={{ color: text.color, opacity: 0.6 }} />
+                {/* VR mode button */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); onVR(ch); }}
+                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                  style={{ border: `1px solid ${text.color}15` }}
+                  title="Open in VR immersive mode"
+                  data-testid={`vr-btn-${ch.id}`}
+                >
+                  <Maximize2 size={12} style={{ color: text.color, opacity: 0.6 }} />
+                </button>
                 <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.12)' }} className="group-hover:translate-x-1 transition-transform" />
               </div>
             ) : (
@@ -466,6 +687,7 @@ export default function SacredTexts() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [generating, setGenerating] = useState(null);
   const [vrChapter, setVrChapter] = useState(null);
+  const [readingChapter, setReadingChapter] = useState(null);
 
   useEffect(() => {
     axios.get(`${API}/sacred-texts`).then(r => setTexts(r.data.texts || []))
@@ -651,8 +873,32 @@ export default function SacredTexts() {
                         <Loader2 className="animate-spin" size={16} style={{ color: selectedText.color }} />
                       </div>
                     ) : textDetail ? (
-                      <ChapterList text={selectedText} chapters={textDetail.chapters}
-                        onGenerate={generateChapter} onRead={openVR} generating={generating} />
+                      <div>
+                        <ChapterList text={selectedText} chapters={textDetail.chapters}
+                          onGenerate={generateChapter} onRead={setReadingChapter} onVR={openVR} generating={generating} />
+
+                        {/* Inline Reader — shows text content below chapter list */}
+                        <AnimatePresence>
+                          {readingChapter && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.4, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <InlineReader
+                                chapter={readingChapter}
+                                text={selectedText}
+                                textDetail={textDetail}
+                                onClose={() => setReadingChapter(null)}
+                                onVR={(ch) => { setReadingChapter(null); openVR(ch); }}
+                                authHeaders={authHeaders}
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     ) : null}
                   </div>
                 </div>
