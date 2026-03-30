@@ -175,6 +175,30 @@ export default function CosmicMixer() {
   const [savePublic, setSavePublic] = useState(false);
   const authHeaders = user ? { Authorization: `Bearer ${localStorage.getItem('zen_token')}` } : {};
 
+  // Playlists
+  const [showPlaylists, setShowPlaylists] = useState(false);
+  const [playlistsTab, setPlaylistsTab] = useState('featured');
+  const [playlists, setPlaylists] = useState([]);
+  const [playlistsLoading, setPlaylistsLoading] = useState(false);
+  // Active playlist playback
+  const [activePlaylist, setActivePlaylist] = useState(null);
+  const [playlistStepIdx, setPlaylistStepIdx] = useState(0);
+  const [playlistElapsed, setPlaylistElapsed] = useState(0); // seconds elapsed in current step
+  const [playlistPaused, setPlaylistPaused] = useState(false);
+  const playlistTimerRef = useRef(null);
+
+  const fetchPlaylists = useCallback(async (tab) => {
+    setPlaylistsLoading(true);
+    try {
+      const endpoint = tab === 'mine' ? '/mine' : tab === 'community' ? '/community' : '/featured';
+      const res = await axios.get(`${API}/mixer-presets/playlists${endpoint}`, { headers: authHeaders });
+      setPlaylists(res.data);
+    } catch { setPlaylists([]); }
+    setPlaylistsLoading(false);
+  }, [authHeaders]);
+
+  useEffect(() => { if (showPlaylists) fetchPlaylists(playlistsTab); }, [showPlaylists, playlistsTab]);
+
   const fetchPresets = useCallback(async (tab) => {
     setPresetsLoading(true);
     try {
@@ -446,6 +470,110 @@ export default function CosmicMixer() {
     setShowPresets(false);
   }, [stopAll, toggleFreq, toggleSound, toggleDrone, toggleMantra]);
 
+  // ─── Playlist Playback Engine ───
+  const loadPresetByData = useCallback(async (presetData) => {
+    stopAll();
+    await new Promise(r => setTimeout(r, 100));
+    const v = presetData.volumes || {};
+    if (v.masterVol !== undefined) setMasterVol(v.masterVol);
+    if (v.freqVol !== undefined) setFreqVol(v.freqVol);
+    if (v.soundVol !== undefined) setSoundVol(v.soundVol);
+    if (v.droneVol !== undefined) setDroneVol(v.droneVol);
+    if (v.lightOpacity !== undefined) setLightOpacity(v.lightOpacity);
+    if (v.videoOpacity !== undefined) setVideoOpacity(v.videoOpacity);
+    const l = presetData.layers || {};
+    if (l.frequency) { const f = FREQUENCIES.find(x => x.hz === l.frequency.hz); if (f) setTimeout(() => toggleFreq(f), 150); }
+    if (l.sound) { const s = SOUNDS.find(x => x.id === l.sound.id); if (s) setTimeout(() => toggleSound(s), 250); }
+    if (l.drone) { const d = INSTRUMENT_DRONES.find(x => x.id === l.drone.id); if (d) setTimeout(() => toggleDrone(d), 350); }
+    if (l.light) { const x = LIGHT_MODES.find(m => m.id === l.light.id); if (x) setActiveLight(x); }
+    if (l.video) { const x = VIDEO_OVERLAYS.find(m => m.id === l.video.id); if (x) setActiveVideo(x); }
+  }, [stopAll, toggleFreq, toggleSound, toggleDrone]);
+
+  const startPlaylist = useCallback(async (playlist) => {
+    if (!playlist.steps?.length) return;
+    setActivePlaylist(playlist);
+    setPlaylistStepIdx(0);
+    setPlaylistElapsed(0);
+    setPlaylistPaused(false);
+    setShowPlaylists(false);
+    // Load first step's preset
+    const firstStep = playlist.steps[0];
+    try {
+      const res = await axios.get(`${API}/mixer-presets/featured`, { headers: authHeaders });
+      const allPresets = res.data;
+      const communityRes = await axios.get(`${API}/mixer-presets/community`, { headers: authHeaders });
+      const allCombined = [...allPresets, ...communityRes.data];
+      const preset = allCombined.find(p => p.id === firstStep.preset_id || p.name === firstStep.preset_name);
+      if (preset) await loadPresetByData(preset);
+    } catch {}
+  }, [authHeaders, loadPresetByData]);
+
+  // Playlist timer — ticks every second
+  useEffect(() => {
+    if (!activePlaylist || playlistPaused) {
+      if (playlistTimerRef.current) clearInterval(playlistTimerRef.current);
+      return;
+    }
+    playlistTimerRef.current = setInterval(() => {
+      setPlaylistElapsed(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(playlistTimerRef.current);
+  }, [activePlaylist, playlistPaused]);
+
+  // Auto-advance when step duration exceeded
+  useEffect(() => {
+    if (!activePlaylist) return;
+    const currentStep = activePlaylist.steps[playlistStepIdx];
+    if (!currentStep) return;
+    const stepDurationSec = currentStep.duration * 60;
+    if (playlistElapsed >= stepDurationSec) {
+      const nextIdx = playlistStepIdx + 1;
+      if (nextIdx < activePlaylist.steps.length) {
+        setPlaylistStepIdx(nextIdx);
+        setPlaylistElapsed(0);
+        // Load next preset
+        const nextStep = activePlaylist.steps[nextIdx];
+        (async () => {
+          try {
+            const res = await axios.get(`${API}/mixer-presets/featured`, { headers: authHeaders });
+            const communityRes = await axios.get(`${API}/mixer-presets/community`, { headers: authHeaders });
+            const all = [...res.data, ...communityRes.data];
+            const preset = all.find(p => p.id === nextStep.preset_id || p.name === nextStep.preset_name);
+            if (preset) await loadPresetByData(preset);
+          } catch {}
+        })();
+      } else {
+        // Playlist complete
+        setActivePlaylist(null);
+        stopAll();
+      }
+    }
+  }, [playlistElapsed, activePlaylist, playlistStepIdx, authHeaders, loadPresetByData, stopAll]);
+
+  const skipPlaylistStep = useCallback(async (direction) => {
+    if (!activePlaylist) return;
+    const nextIdx = playlistStepIdx + direction;
+    if (nextIdx < 0 || nextIdx >= activePlaylist.steps.length) return;
+    setPlaylistStepIdx(nextIdx);
+    setPlaylistElapsed(0);
+    const step = activePlaylist.steps[nextIdx];
+    try {
+      const res = await axios.get(`${API}/mixer-presets/featured`, { headers: authHeaders });
+      const communityRes = await axios.get(`${API}/mixer-presets/community`, { headers: authHeaders });
+      const all = [...res.data, ...communityRes.data];
+      const preset = all.find(p => p.id === step.preset_id || p.name === step.preset_name);
+      if (preset) await loadPresetByData(preset);
+    } catch {}
+  }, [activePlaylist, playlistStepIdx, authHeaders, loadPresetByData]);
+
+  const stopPlaylist = useCallback(() => {
+    setActivePlaylist(null);
+    setPlaylistStepIdx(0);
+    setPlaylistElapsed(0);
+    if (playlistTimerRef.current) clearInterval(playlistTimerRef.current);
+    stopAll();
+  }, [stopAll]);
+
   const hasActive = activeFreq || activeSound || activeMantra || activeLight || activeDrone || activeVideo || vibeOn;
   const activeCount = [activeFreq, activeSound, activeMantra, activeLight, activeDrone, activeVideo, vibeOn].filter(Boolean).length;
 
@@ -557,9 +685,20 @@ export default function CosmicMixer() {
               </div>
 
               <div className="px-5 pb-5 space-y-4">
-                {/* Presets Toolbar */}
+                {/* Presets & Journeys Toolbar */}
+                {activePlaylist && (
+                  <PlaylistNowPlaying
+                    playlist={activePlaylist}
+                    stepIdx={playlistStepIdx}
+                    elapsed={playlistElapsed}
+                    paused={playlistPaused}
+                    onPause={() => setPlaylistPaused(p => !p)}
+                    onSkip={skipPlaylistStep}
+                    onStop={stopPlaylist}
+                  />
+                )}
                 <div className="flex items-center gap-2 py-1">
-                  <button onClick={() => setShowPresets(!showPresets)}
+                  <button onClick={() => { setShowPresets(!showPresets); setShowPlaylists(false); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-[1.02]"
                     style={{
                       background: showPresets ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.03)',
@@ -568,6 +707,16 @@ export default function CosmicMixer() {
                     }}
                     data-testid="presets-browse-btn">
                     <Star size={10} /> Presets
+                  </button>
+                  <button onClick={() => { setShowPlaylists(!showPlaylists); setShowPresets(false); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-[1.02]"
+                    style={{
+                      background: showPlaylists ? 'rgba(59,130,246,0.12)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${showPlaylists ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.05)'}`,
+                      color: showPlaylists ? '#3B82F6' : 'var(--text-muted)',
+                    }}
+                    data-testid="playlists-browse-btn">
+                    <Play size={10} /> Journeys
                   </button>
                   {hasActive && (
                     <button onClick={() => setShowSaveModal(true)}
@@ -667,6 +816,50 @@ export default function CosmicMixer() {
                             </button>
                           </div>
                         </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Playlists Browser */}
+                <AnimatePresence>
+                  {showPlaylists && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden">
+                      <div className="rounded-xl p-3 mb-2" style={{ background: 'rgba(59,130,246,0.02)', border: '1px solid rgba(59,130,246,0.06)' }}>
+                        <div className="flex gap-1 mb-3" data-testid="playlists-tabs">
+                          {[
+                            { id: 'featured', label: 'Curated', icon: Star },
+                            { id: 'community', label: 'Community', icon: Users },
+                            { id: 'mine', label: 'My Journeys', icon: Lock },
+                          ].map(t => (
+                            <button key={t.id} onClick={() => setPlaylistsTab(t.id)}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all"
+                              style={{
+                                background: playlistsTab === t.id ? 'rgba(59,130,246,0.1)' : 'transparent',
+                                color: playlistsTab === t.id ? '#3B82F6' : 'var(--text-muted)',
+                              }}
+                              data-testid={`playlists-tab-${t.id}`}>
+                              <t.icon size={9} /> {t.label}
+                            </button>
+                          ))}
+                        </div>
+                        {playlistsLoading ? (
+                          <div className="flex items-center justify-center py-4">
+                            <Loader2 size={14} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
+                          </div>
+                        ) : playlists.length === 0 ? (
+                          <p className="text-[10px] text-center py-4" style={{ color: 'var(--text-muted)' }}>No journeys found.</p>
+                        ) : (
+                          <div className="space-y-2 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                            {playlists.map(pl => (
+                              <PlaylistCard key={pl.id} playlist={pl} userId={user?.id}
+                                isPlaying={activePlaylist?.id === pl.id}
+                                onStart={() => startPlaylist(pl)}
+                                onStop={stopPlaylist} />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   )}
@@ -943,6 +1136,132 @@ function PresetCard({ preset, userId, onLoad, onLike, onDelete }) {
       {preset.creator_name && preset.creator_name !== 'Cosmic Collective' && (
         <p className="text-[7px] mt-1.5" style={{ color: 'rgba(255,255,255,0.15)' }}>by {preset.creator_name}</p>
       )}
+    </div>
+  );
+}
+
+
+/* ─── Playlist Card ─── */
+function PlaylistCard({ playlist, userId, isPlaying, onStart, onStop }) {
+  const totalMin = playlist.total_minutes || playlist.steps?.reduce((a, s) => a + s.duration, 0) || 0;
+
+  return (
+    <div className="rounded-xl p-3 transition-all"
+      style={{
+        background: isPlaying ? 'rgba(59,130,246,0.05)' : 'rgba(255,255,255,0.01)',
+        border: `1px solid ${isPlaying ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.03)'}`,
+      }}
+      data-testid={`playlist-card-${playlist.id}`}>
+      <div className="flex items-start justify-between mb-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-medium" style={{ color: 'var(--text-primary)' }}>
+            {playlist.name}
+            {playlist.is_featured && <Star size={7} className="inline ml-1 fill-current" style={{ color: '#FCD34D' }} />}
+          </p>
+          {playlist.description && (
+            <p className="text-[8px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{playlist.description}</p>
+          )}
+        </div>
+        <span className="text-[8px] flex-shrink-0 px-1.5 py-0.5 rounded-full ml-2"
+          style={{ background: 'rgba(59,130,246,0.06)', color: '#60A5FA' }}>
+          {totalMin}min
+        </span>
+      </div>
+      {/* Steps */}
+      <div className="flex items-center gap-1 mb-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+        {playlist.steps?.map((step, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <div className="w-2 h-px flex-shrink-0" style={{ background: 'rgba(255,255,255,0.1)' }} />}
+            <span className="text-[7px] px-1.5 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap"
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.04)' }}>
+              {step.preset_name} ({step.duration}m)
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+      <button onClick={isPlaying ? onStop : onStart}
+        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[9px] font-medium transition-all hover:scale-105"
+        style={{
+          background: isPlaying ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.08)',
+          border: `1px solid ${isPlaying ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.15)'}`,
+          color: isPlaying ? '#EF4444' : '#3B82F6',
+        }}
+        data-testid={`playlist-${isPlaying ? 'stop' : 'start'}-${playlist.id}`}>
+        {isPlaying ? <><Square size={8} /> Stop Journey</> : <><Play size={8} /> Begin Journey</>}
+      </button>
+      {playlist.creator_name && playlist.creator_name !== 'Cosmic Collective' && (
+        <p className="text-[7px] mt-1.5" style={{ color: 'rgba(255,255,255,0.15)' }}>by {playlist.creator_name}</p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Now Playing Bar (Playlist Playback) ─── */
+function PlaylistNowPlaying({ playlist, stepIdx, elapsed, paused, onPause, onSkip, onStop }) {
+  const currentStep = playlist.steps?.[stepIdx];
+  if (!currentStep) return null;
+
+  const stepDurationSec = currentStep.duration * 60;
+  const progress = Math.min((elapsed / stepDurationSec) * 100, 100);
+  const totalSteps = playlist.steps.length;
+  const elapsedMin = Math.floor(elapsed / 60);
+  const elapsedSec = elapsed % 60;
+
+  return (
+    <div className="rounded-xl p-3 mb-2" style={{ background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.1)' }}
+      data-testid="playlist-now-playing">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: paused ? '#F59E0B' : '#3B82F6' }} />
+          <div className="min-w-0">
+            <p className="text-[9px] font-bold uppercase tracking-wider truncate" style={{ color: '#3B82F6' }}>
+              {paused ? 'Paused' : 'Now Playing'} — {playlist.name}
+            </p>
+            <p className="text-[8px] truncate" style={{ color: 'var(--text-muted)' }}>
+              Step {stepIdx + 1}/{totalSteps}: {currentStep.preset_name}
+            </p>
+          </div>
+        </div>
+        <span className="text-[9px] tabular-nums flex-shrink-0 ml-2" style={{ color: 'var(--text-muted)' }}>
+          {elapsedMin}:{String(elapsedSec).padStart(2, '0')} / {currentStep.duration}:00
+        </span>
+      </div>
+      {/* Progress bar */}
+      <div className="h-1 rounded-full mb-2 overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${progress}%`, background: 'linear-gradient(to right, #3B82F6, #8B5CF6)' }} />
+      </div>
+      {/* Step dots */}
+      <div className="flex items-center gap-1 mb-2">
+        {playlist.steps.map((s, i) => (
+          <div key={i} className="flex-1 h-1 rounded-full" style={{
+            background: i < stepIdx ? '#22C55E' : i === stepIdx ? '#3B82F6' : 'rgba(255,255,255,0.06)',
+          }} title={s.preset_name} />
+        ))}
+      </div>
+      {/* Controls */}
+      <div className="flex items-center gap-1.5">
+        <button onClick={() => onSkip(-1)} disabled={stepIdx === 0}
+          className="p-1.5 rounded-lg text-[9px] transition-all disabled:opacity-30"
+          style={{ color: 'var(--text-muted)' }} data-testid="playlist-prev">
+          <ChevronDown size={10} className="rotate-90" />
+        </button>
+        <button onClick={onPause}
+          className="p-1.5 rounded-lg transition-all"
+          style={{ background: 'rgba(59,130,246,0.1)', color: '#3B82F6' }}
+          data-testid="playlist-pause">
+          {paused ? <Play size={12} /> : <Pause size={12} />}
+        </button>
+        <button onClick={() => onSkip(1)} disabled={stepIdx === totalSteps - 1}
+          className="p-1.5 rounded-lg text-[9px] transition-all disabled:opacity-30"
+          style={{ color: 'var(--text-muted)' }} data-testid="playlist-next">
+          <ChevronUp size={10} className="rotate-90" />
+        </button>
+        <button onClick={onStop}
+          className="ml-auto p-1.5 rounded-lg transition-all hover:bg-red-500/10"
+          style={{ color: '#EF4444' }} data-testid="playlist-stop">
+          <Square size={10} />
+        </button>
+      </div>
     </div>
   );
 }
