@@ -93,11 +93,24 @@ const LIGHT_MODES = [
 ];
 
 export default function CosmicMixerPage() {
-  const { user } = useAuth();
+  const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
   const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
   const [masterVol, setMasterVol] = useState(60);
   const [muted, setMuted] = useState(false);
+  const [founderFreq, setFounderFreq] = useState(null);
+
+  useEffect(() => {
+    if (authHeaders?.Authorization) {
+      axios.get(`${API}/starseed/realm/founder-status`, { headers: authHeaders })
+        .then(r => { if (r.data.is_founder && r.data.exclusive_frequency) setFounderFreq(r.data.exclusive_frequency); })
+        .catch(() => {});
+    }
+  }, [authHeaders]);
+
+  const allFrequencies = founderFreq
+    ? [...FREQUENCIES, { hz: founderFreq.hz, label: founderFreq.label, desc: founderFreq.desc, color: founderFreq.color, isFounder: true }]
+    : FREQUENCIES;
 
   const [activeFreqs, setActiveFreqs] = useState(new Set());
   const [activeSounds, setActiveSounds] = useState(new Set());
@@ -227,7 +240,7 @@ export default function CosmicMixerPage() {
     }
   }, [activeMantra]);
 
-  const firstActiveFreq = activeFreqs.size > 0 ? FREQUENCIES.find(f => activeFreqs.has(f.hz)) : null;
+  const firstActiveFreq = activeFreqs.size > 0 ? allFrequencies.find(f => activeFreqs.has(f.hz)) : null;
 
   const toggleVibe = useCallback(() => {
     if (vibeOn) {
@@ -353,7 +366,7 @@ export default function CosmicMixerPage() {
       if (phase.bpm > 0) setBpm(phase.bpm);
       else stopTempo();
       phase.freq.forEach((hz, i) => {
-        const f = FREQUENCIES.find(x => x.hz === hz);
+        const f = allFrequencies.find(x => x.hz === hz);
         if (f) setTimeout(() => toggleFreq(f), 100 + i * 60);
       });
       (phase.sound || []).forEach((id, i) => {
@@ -524,12 +537,17 @@ export default function CosmicMixerPage() {
 
           <AccordionSection title="Solfeggio Frequency" icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>
             <div className="flex flex-wrap gap-1.5">
-              {FREQUENCIES.map(f => (
-                <button key={f.hz} onClick={() => toggleFreq(f)} className="flex-shrink-0 text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
-                  style={{ background: activeFreqs.has(f.hz) ? `${f.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : 'rgba(255,255,255,0.04)'}` }}
+              {allFrequencies.map(f => (
+                <button key={f.hz} onClick={() => toggleFreq(f)} className="flex-shrink-0 text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97] relative"
+                  style={{
+                    background: activeFreqs.has(f.hz) ? `${f.color}15` : f.isFounder ? 'rgba(252,211,77,0.04)' : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : f.isFounder ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.04)'}`,
+                    boxShadow: f.isFounder ? '0 0 12px rgba(252,211,77,0.06)' : 'none',
+                  }}
                   data-testid={`mixer-freq-${f.hz}`}>
-                  <span className="text-[11px] font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
-                  <span className="text-[8px] block" style={{ color: 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
+                  {f.isFounder && <span className="absolute -top-1.5 -right-1.5 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{ background: 'rgba(252,211,77,0.15)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.3)' }}>FOUNDER</span>}
+                  <span className="text-[11px] font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : f.isFounder ? '#FCD34D' : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
+                  <span className="text-[8px] block" style={{ color: f.isFounder ? 'rgba(252,211,77,0.4)' : 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
                 </button>
               ))}
             </div>

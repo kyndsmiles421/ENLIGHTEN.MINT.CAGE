@@ -21,6 +21,7 @@ import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import VoiceCommandButton from './components/VoiceCommandButton';
+import QuickMeditateFAB from './components/QuickMeditateFAB';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -280,6 +281,7 @@ function App() {
             <SmartDock />
             <CosmicMixer />
             <VoiceCommandButton />
+            <QuickMeditateFAB />
             <BackToTop />
             <InstallPrompt />
             <CreditNudge />

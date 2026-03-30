@@ -131,21 +131,83 @@ async def get_active_players(user=Depends(get_current_user)):
     return {"players": enriched, "total": len(enriched)}
 
 
-# ─── Leaderboard ───
+# ─── Founder Badge ───
+
+FOUNDER_FREQUENCY = {
+    "hz": 432.11,
+    "label": "Founder's Harmonic",
+    "desc": "A sacred 432Hz harmonic blend exclusive to Cosmic Founders",
+    "color": "#FCD34D",
+    "id": "founders-harmonic",
+}
+
+@router.get("/starseed/realm/founder-status")
+async def get_founder_status(user=Depends(get_current_user)):
+    """Check if user has Founder badge and return their status."""
+    uid = user["id"]
+    badge = await db.founder_badges.find_one({"user_id": uid}, {"_id": 0})
+    if badge:
+        return {
+            "is_founder": True,
+            "badge": badge,
+            "exclusive_frequency": FOUNDER_FREQUENCY,
+        }
+    return {"is_founder": False, "badge": None, "exclusive_frequency": None}
+
+
+@router.post("/starseed/realm/claim-founder")
+async def claim_founder_badge(user=Depends(get_current_user)):
+    """Claim Founder badge if user explored a portal early."""
+    uid = user["id"]
+    existing = await db.founder_badges.find_one({"user_id": uid})
+    if existing:
+        return {"status": "already_claimed", "badge": {k: v for k, v in existing.items() if k != "_id"}}
+
+    # Check if user has explored any portal or entered the realm
+    char = await db.starseed_characters.find_one({"user_id": uid}, {"_id": 0, "origin_id": 1, "character_name": 1, "created_at": 1})
+    world_entry = await db.starseed_world_visits.find_one({"user_id": uid}, {"_id": 0, "first_visited": 1, "world_id": 1})
+    realm_presence = await db.starseed_realm_presence.find_one({"user_id": uid}, {"_id": 0})
+
+    if not char and not world_entry and not realm_presence:
+        return {"status": "not_eligible", "reason": "Explore a portal or create a character to earn your Founder badge"}
+
+    now = datetime.now(timezone.utc).isoformat()
+    badge = {
+        "user_id": uid,
+        "user_name": user.get("name", "Traveler"),
+        "type": "founder",
+        "title": "Cosmic Founder",
+        "aura_color": "#FCD34D",
+        "granted_at": now,
+        "origin_id": char.get("origin_id") if char else None,
+        "character_name": char.get("character_name") if char else user.get("name"),
+        "first_portal": world_entry.get("world_id") if world_entry else None,
+        "haptic_pattern": [60, 200, 40, 300, 60],
+    }
+    await db.founder_badges.insert_one({**badge})
+    badge.pop("_id", None)
+    return {"status": "claimed", "badge": badge, "exclusive_frequency": FOUNDER_FREQUENCY}
+
+
+# ─── Leaderboard (Enhanced) ───
 
 @router.get("/starseed/realm/leaderboard")
 async def get_leaderboard(user=Depends(get_current_user)):
-    """Get top adventurers ranked by level and XP."""
-    pipeline = [
+    """Enhanced multi-category leaderboard with wellness-positive framing."""
+    uid = user["id"]
+
+    # 1. Shining Brightest (by level & XP)
+    pipeline_level = [
         {"$sort": {"level": -1, "xp": -1}},
-        {"$limit": 30},
+        {"$limit": 20},
         {"$project": {"_id": 0, "user_id": 1, "character_name": 1, "origin_id": 1, "level": 1, "xp": 1, "chapter": 1, "achievements": 1}},
     ]
-    chars = await db.starseed_characters.aggregate(pipeline).to_list(30)
+    chars = await db.starseed_characters.aggregate(pipeline_level).to_list(20)
 
-    leaderboard = []
+    shining = []
     for i, ch in enumerate(chars):
-        leaderboard.append({
+        is_founder = await db.founder_badges.find_one({"user_id": ch.get("user_id")}) is not None
+        shining.append({
             "rank": i + 1,
             "character_name": ch.get("character_name", "Traveler"),
             "origin_id": ch.get("origin_id"),
@@ -155,10 +217,90 @@ async def get_leaderboard(user=Depends(get_current_user)):
             "xp": ch.get("xp", 0),
             "chapter": ch.get("chapter", 1),
             "achievements": len(ch.get("achievements", [])),
-            "is_self": ch.get("user_id") == user["id"],
+            "is_self": ch.get("user_id") == uid,
+            "is_founder": is_founder,
         })
 
-    return {"leaderboard": leaderboard}
+    # 2. Brightest Aura (by total radiates received across gallery)
+    pipeline_aura = [
+        {"$sort": {"radiate_count": -1}},
+        {"$limit": 20},
+        {"$project": {"_id": 0, "user_id": 1, "avatar_name": 1, "origin_id": 1, "radiate_count": 1}},
+    ]
+    gallery = await db.avatar_gallery.aggregate(pipeline_aura).to_list(20)
+
+    brightest_aura = []
+    seen_users = set()
+    for entry in gallery:
+        eu = entry.get("user_id")
+        if eu in seen_users:
+            continue
+        seen_users.add(eu)
+        char = await db.starseed_characters.find_one({"user_id": eu}, {"_id": 0, "character_name": 1, "origin_id": 1, "level": 1})
+        is_founder = await db.founder_badges.find_one({"user_id": eu}) is not None
+        brightest_aura.append({
+            "rank": len(brightest_aura) + 1,
+            "character_name": char.get("character_name", entry.get("avatar_name", "Traveler")) if char else entry.get("avatar_name", "Traveler"),
+            "origin_id": (char or {}).get("origin_id", entry.get("origin_id")),
+            "origin_name": STARSEED_ORIGIN_NAMES.get((char or {}).get("origin_id", ""), "Unknown"),
+            "color": STARSEED_ORIGIN_COLORS.get((char or {}).get("origin_id", ""), "#818CF8"),
+            "radiates": entry.get("radiate_count", 0),
+            "level": (char or {}).get("level", 1),
+            "is_self": eu == uid,
+            "is_founder": is_founder,
+        })
+        if len(brightest_aura) >= 15:
+            break
+
+    # 3. Most Helpful (by alliance chat activity + boss contributions)
+    pipeline_helpful = [
+        {"$match": {"type": "message"}},
+        {"$group": {"_id": "$user_id", "msg_count": {"$sum": 1}}},
+        {"$sort": {"msg_count": -1}},
+        {"$limit": 15},
+    ]
+    helpful_raw = await db.starseed_alliance_chat.aggregate(pipeline_helpful).to_list(15)
+
+    most_helpful = []
+    for entry in helpful_raw:
+        eu = entry["_id"]
+        char = await db.starseed_characters.find_one({"user_id": eu}, {"_id": 0, "character_name": 1, "origin_id": 1, "level": 1})
+        is_founder = await db.founder_badges.find_one({"user_id": eu}) is not None
+        most_helpful.append({
+            "rank": len(most_helpful) + 1,
+            "character_name": (char or {}).get("character_name", "Traveler"),
+            "origin_id": (char or {}).get("origin_id"),
+            "origin_name": STARSEED_ORIGIN_NAMES.get((char or {}).get("origin_id", ""), "Unknown"),
+            "color": STARSEED_ORIGIN_COLORS.get((char or {}).get("origin_id", ""), "#818CF8"),
+            "contributions": entry.get("msg_count", 0),
+            "level": (char or {}).get("level", 1),
+            "is_self": eu == uid,
+            "is_founder": is_founder,
+        })
+
+    # 4. Founders list
+    founders = []
+    founder_docs = await db.founder_badges.find({}, {"_id": 0}).sort("granted_at", 1).to_list(20)
+    for i, f in enumerate(founder_docs):
+        founders.append({
+            "rank": i + 1,
+            "character_name": f.get("character_name", f.get("user_name", "Traveler")),
+            "origin_id": f.get("origin_id"),
+            "origin_name": STARSEED_ORIGIN_NAMES.get(f.get("origin_id", ""), "Unknown"),
+            "color": STARSEED_ORIGIN_COLORS.get(f.get("origin_id", ""), "#FCD34D"),
+            "aura_color": f.get("aura_color", "#FCD34D"),
+            "granted_at": f.get("granted_at"),
+            "first_portal": f.get("first_portal"),
+            "is_self": f.get("user_id") == uid,
+            "is_founder": True,
+        })
+
+    return {
+        "leaderboard": shining,
+        "brightest_aura": brightest_aura,
+        "most_helpful": most_helpful,
+        "founders": founders,
+    }
 
 
 # ─── Cross-Path Encounters ───

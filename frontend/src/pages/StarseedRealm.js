@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import {
   Star, Swords, ArrowLeft, Loader2, Globe, Trophy, Skull,
-  Users, Crown, UserPlus, Plus
+  Users, Crown, UserPlus, Plus, Heart, Sparkles, Award
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
@@ -28,6 +28,10 @@ export default function StarseedRealm() {
 
   const [players, setPlayers] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [brightestAura, setBrightestAura] = useState([]);
+  const [mostHelpful, setMostHelpful] = useState([]);
+  const [founders, setFounders] = useState([]);
+  const [founderStatus, setFounderStatus] = useState(null);
   const [worldEvent, setWorldEvent] = useState(null);
   const [myAlliance, setMyAlliance] = useState(null);
   const [alliances, setAlliances] = useState([]);
@@ -39,6 +43,7 @@ export default function StarseedRealm() {
   const [myCharacters, setMyCharacters] = useState([]);
   const [activeOrigin, setActiveOrigin] = useState(null);
   const [allianceName, setAllianceName] = useState('');
+  const [leaderCategory, setLeaderCategory] = useState('shining');
 
   useEffect(() => {
     if (authLoading) return;
@@ -47,9 +52,15 @@ export default function StarseedRealm() {
     Promise.all([
       axios.get(`${API}/starseed/realm/world-event`).then(r => setWorldEvent(r.data)).catch(() => {}),
       axios.get(`${API}/starseed/realm/active-players`, { headers: authHeaders }).then(r => setPlayers(r.data.players)).catch(() => {}),
-      axios.get(`${API}/starseed/realm/leaderboard`, { headers: authHeaders }).then(r => setLeaderboard(r.data.leaderboard)).catch(() => {}),
+      axios.get(`${API}/starseed/realm/leaderboard`, { headers: authHeaders }).then(r => {
+        setLeaderboard(r.data.leaderboard || []);
+        setBrightestAura(r.data.brightest_aura || []);
+        setMostHelpful(r.data.most_helpful || []);
+        setFounders(r.data.founders || []);
+      }).catch(() => {}),
       axios.get(`${API}/starseed/realm/my-alliance`, { headers: authHeaders }).then(r => setMyAlliance(r.data.alliance)).catch(() => {}),
       axios.get(`${API}/starseed/realm/alliances`, { headers: authHeaders }).then(r => setAlliances(r.data.alliances)).catch(() => {}),
+      axios.get(`${API}/starseed/realm/founder-status`, { headers: authHeaders }).then(r => setFounderStatus(r.data)).catch(() => {}),
       axios.get(`${API}/starseed/my-characters`, { headers: authHeaders }).then(r => {
         setMyCharacters(r.data.characters);
         if (r.data.characters.length > 0) setActiveOrigin(r.data.characters[0].origin_id);
@@ -120,6 +131,31 @@ export default function StarseedRealm() {
       toast.error(err.response?.data?.detail || 'Could not create alliance');
     }
   }, [allianceName, authHeaders]);
+
+  const claimFounderBadge = useCallback(async () => {
+    try {
+      const res = await axios.post(`${API}/starseed/realm/claim-founder`, {}, { headers: authHeaders });
+      if (res.data.status === 'claimed') {
+        setFounderStatus({ is_founder: true, badge: res.data.badge, exclusive_frequency: res.data.exclusive_frequency });
+        toast('Cosmic Founder Badge Claimed!', {
+          description: 'You now have access to the exclusive Founder\'s Harmonic frequency',
+          style: {
+            background: 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(10,10,18,0.92))',
+            border: '1px solid rgba(252,211,77,0.3)',
+            color: '#FCD34D',
+            boxShadow: '0 0 30px rgba(252,211,77,0.15)',
+          },
+        });
+        if (res.data.badge?.haptic_pattern) navigator.vibrate?.(res.data.badge.haptic_pattern);
+      } else if (res.data.status === 'already_claimed') {
+        toast.info('You already have the Founder badge!');
+      } else {
+        toast.error(res.data.reason || 'Not eligible yet');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Could not claim badge');
+    }
+  }, [authHeaders]);
 
   const joinAlliance = useCallback(async (allianceId) => {
     try {
@@ -302,42 +338,192 @@ export default function StarseedRealm() {
               {activeTab === 'leaderboard' && (
                 <motion.div key="leaderboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   data-testid="realm-leaderboard">
-                  <div className="space-y-2">
-                    {leaderboard.map((entry, i) => (
-                      <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
-                        className="rounded-xl p-3 flex items-center gap-3 border"
-                        style={{
-                          background: entry.is_self ? `${entry.color}08` : 'rgba(255,255,255,0.02)',
-                          borderColor: entry.is_self ? `${entry.color}20` : 'rgba(255,255,255,0.04)',
-                        }}>
-                        <div className="w-8 text-center">
-                          {i < 3 ? (
-                            <Crown size={16} style={{ color: ['#FCD34D', '#C0C0C0', '#CD7F32'][i], margin: '0 auto' }} />
-                          ) : (
-                            <span className="text-xs tabular-nums font-bold" style={{ color: 'var(--text-muted)' }}>#{entry.rank}</span>
-                          )}
-                        </div>
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ background: `${entry.color}12` }}>
-                          <Star size={14} style={{ color: entry.color }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium truncate" style={{ color: entry.color }}>
-                            {entry.character_name} {entry.is_self && <span className="text-[8px] opacity-50">(You)</span>}
-                          </p>
-                          <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
-                            {entry.origin_name} &middot; Ch.{entry.chapter} &middot; {entry.achievements} achievements
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-xs font-bold" style={{ color: '#FCD34D' }}>Lvl {entry.level}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                    {leaderboard.length === 0 && (
-                      <p className="text-xs text-center py-8" style={{ color: 'var(--text-muted)' }}>No adventurers yet. Be the first!</p>
-                    )}
+
+                  {/* Founder Badge Claim */}
+                  {founderStatus && !founderStatus.is_founder && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                      className="rounded-2xl p-5 mb-6 border text-center"
+                      style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.04), rgba(0,0,0,0.3))', borderColor: 'rgba(252,211,77,0.15)' }}>
+                      <Award size={24} className="mx-auto mb-2" style={{ color: '#FCD34D' }} />
+                      <h3 className="text-sm font-medium mb-1" style={{ color: '#FCD34D' }}>Become a Cosmic Founder</h3>
+                      <p className="text-[10px] mb-3 max-w-sm mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                        Early explorers earn an exclusive badge, unique aura color, and access to the secret Founder's Harmonic frequency.
+                      </p>
+                      <button onClick={claimFounderBadge}
+                        className="px-5 py-2 rounded-xl text-xs font-medium transition-all hover:scale-105"
+                        style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.25)', color: '#FCD34D' }}
+                        data-testid="claim-founder-btn">
+                        <Sparkles size={12} className="inline mr-1.5" />Claim Founder Badge
+                      </button>
+                    </motion.div>
+                  )}
+                  {founderStatus?.is_founder && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="rounded-2xl p-4 mb-6 flex items-center gap-3 border"
+                      style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.06), rgba(0,0,0,0.2))', borderColor: 'rgba(252,211,77,0.2)' }}
+                      data-testid="founder-badge-display">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.3)' }}>
+                        <Award size={18} style={{ color: '#FCD34D' }} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium" style={{ color: '#FCD34D' }}>Cosmic Founder</p>
+                        <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Exclusive Founder's Harmonic unlocked in Mixer</p>
+                      </div>
+                      <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FCD34D', boxShadow: '0 0 8px rgba(252,211,77,0.5)' }} />
+                    </motion.div>
+                  )}
+
+                  {/* Category Tabs */}
+                  <div className="flex items-center gap-1 mb-5 p-1 rounded-xl overflow-x-auto scrollbar-hide"
+                    style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    {[
+                      { id: 'shining', label: 'Shining Brightest', icon: Star, color: '#FCD34D' },
+                      { id: 'aura', label: 'Brightest Aura', icon: Heart, color: '#EC4899' },
+                      { id: 'helpful', label: 'Most Helpful', icon: Users, color: '#2DD4BF' },
+                      { id: 'founders', label: 'Founders', icon: Award, color: '#FCD34D' },
+                    ].map(cat => {
+                      const Icon = cat.icon;
+                      return (
+                        <button key={cat.id} onClick={() => setLeaderCategory(cat.id)}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[9px] font-medium transition-all whitespace-nowrap flex-shrink-0"
+                          style={{
+                            background: leaderCategory === cat.id ? `${cat.color}12` : 'transparent',
+                            color: leaderCategory === cat.id ? cat.color : 'var(--text-muted)',
+                          }}
+                          data-testid={`leader-cat-${cat.id}`}>
+                          <Icon size={11} /> {cat.label}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {/* Shining Brightest */}
+                  {leaderCategory === 'shining' && (
+                    <div className="space-y-2">
+                      {leaderboard.map((entry, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
+                          className="rounded-xl p-3 flex items-center gap-3 border"
+                          style={{ background: entry.is_self ? `${entry.color}08` : 'rgba(255,255,255,0.02)', borderColor: entry.is_self ? `${entry.color}20` : 'rgba(255,255,255,0.04)' }}>
+                          <div className="w-8 text-center">
+                            {i < 3 ? <Crown size={16} style={{ color: ['#FCD34D', '#C0C0C0', '#CD7F32'][i], margin: '0 auto' }} /> : <span className="text-xs tabular-nums font-bold" style={{ color: 'var(--text-muted)' }}>#{entry.rank}</span>}
+                          </div>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${entry.color}12` }}>
+                            <Star size={14} style={{ color: entry.color }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-medium truncate" style={{ color: entry.color }}>
+                                {entry.character_name} {entry.is_self && <span className="text-[8px] opacity-50">(You)</span>}
+                              </p>
+                              {entry.is_founder && <Award size={10} style={{ color: '#FCD34D' }} />}
+                            </div>
+                            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{entry.origin_name} &middot; Ch.{entry.chapter} &middot; {entry.achievements} achievements</p>
+                          </div>
+                          <span className="text-xs font-bold" style={{ color: '#FCD34D' }}>Lvl {entry.level}</span>
+                        </motion.div>
+                      ))}
+                      {leaderboard.length === 0 && <p className="text-xs text-center py-8" style={{ color: 'var(--text-muted)' }}>No adventurers yet. Be the first!</p>}
+                    </div>
+                  )}
+
+                  {/* Brightest Aura */}
+                  {leaderCategory === 'aura' && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] mb-3 text-center" style={{ color: 'var(--text-secondary)' }}>
+                        Starseeds whose creations radiate the most love across the Gallery
+                      </p>
+                      {brightestAura.map((entry, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
+                          className="rounded-xl p-3 flex items-center gap-3 border"
+                          style={{ background: entry.is_self ? 'rgba(236,72,153,0.06)' : 'rgba(255,255,255,0.02)', borderColor: entry.is_self ? 'rgba(236,72,153,0.15)' : 'rgba(255,255,255,0.04)' }}>
+                          <div className="w-8 text-center">
+                            {i < 3 ? <Crown size={16} style={{ color: ['#FCD34D', '#C0C0C0', '#CD7F32'][i], margin: '0 auto' }} /> : <span className="text-xs tabular-nums font-bold" style={{ color: 'var(--text-muted)' }}>#{entry.rank}</span>}
+                          </div>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${entry.color}12` }}>
+                            <Heart size={14} style={{ color: '#EC4899' }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-medium truncate" style={{ color: entry.color }}>{entry.character_name}</p>
+                              {entry.is_founder && <Award size={10} style={{ color: '#FCD34D' }} />}
+                            </div>
+                            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{entry.origin_name} &middot; Lvl {entry.level}</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Heart size={11} style={{ color: '#EC4899' }} />
+                            <span className="text-xs font-bold tabular-nums" style={{ color: '#EC4899' }}>{entry.radiates}</span>
+                          </div>
+                        </motion.div>
+                      ))}
+                      {brightestAura.length === 0 && <p className="text-xs text-center py-8" style={{ color: 'var(--text-muted)' }}>No radiates yet. Share your avatar in the Gallery!</p>}
+                    </div>
+                  )}
+
+                  {/* Most Helpful */}
+                  {leaderCategory === 'helpful' && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] mb-3 text-center" style={{ color: 'var(--text-secondary)' }}>
+                        The most supportive souls in alliance chats and cooperative battles
+                      </p>
+                      {mostHelpful.map((entry, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
+                          className="rounded-xl p-3 flex items-center gap-3 border"
+                          style={{ background: entry.is_self ? 'rgba(45,212,191,0.06)' : 'rgba(255,255,255,0.02)', borderColor: entry.is_self ? 'rgba(45,212,191,0.15)' : 'rgba(255,255,255,0.04)' }}>
+                          <div className="w-8 text-center">
+                            {i < 3 ? <Crown size={16} style={{ color: ['#FCD34D', '#C0C0C0', '#CD7F32'][i], margin: '0 auto' }} /> : <span className="text-xs tabular-nums font-bold" style={{ color: 'var(--text-muted)' }}>#{entry.rank}</span>}
+                          </div>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(45,212,191,0.08)' }}>
+                            <Users size={14} style={{ color: '#2DD4BF' }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-medium truncate" style={{ color: entry.color }}>{entry.character_name}</p>
+                              {entry.is_founder && <Award size={10} style={{ color: '#FCD34D' }} />}
+                            </div>
+                            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{entry.origin_name} &middot; Lvl {entry.level}</p>
+                          </div>
+                          <span className="text-xs font-bold tabular-nums" style={{ color: '#2DD4BF' }}>{entry.contributions} msgs</span>
+                        </motion.div>
+                      ))}
+                      {mostHelpful.length === 0 && <p className="text-xs text-center py-8" style={{ color: 'var(--text-muted)' }}>Join an alliance and start chatting to appear here!</p>}
+                    </div>
+                  )}
+
+                  {/* Founders */}
+                  {leaderCategory === 'founders' && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] mb-3 text-center" style={{ color: 'var(--text-secondary)' }}>
+                        The first starseeds to explore the portals — bearers of the sacred Founder's Harmonic
+                      </p>
+                      {founders.map((entry, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
+                          className="rounded-xl p-3 flex items-center gap-3 border"
+                          style={{
+                            background: entry.is_self ? 'rgba(252,211,77,0.06)' : 'rgba(255,255,255,0.02)',
+                            borderColor: entry.is_self ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.04)',
+                          }}>
+                          <div className="w-8 text-center">
+                            <span className="text-xs tabular-nums font-bold" style={{ color: '#FCD34D' }}>#{entry.rank}</span>
+                          </div>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.2)' }}>
+                            <Award size={14} style={{ color: '#FCD34D' }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium truncate" style={{ color: entry.color || '#FCD34D' }}>
+                              {entry.character_name} {entry.is_self && <span className="text-[8px] opacity-50">(You)</span>}
+                            </p>
+                            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                              {entry.origin_name}{entry.first_portal ? ` &middot; First: ${entry.first_portal}` : ''}
+                            </p>
+                          </div>
+                          <div className="w-2 h-2 rounded-full" style={{ background: entry.aura_color || '#FCD34D', boxShadow: `0 0 6px ${entry.aura_color || '#FCD34D'}50` }} />
+                        </motion.div>
+                      ))}
+                      {founders.length === 0 && <p className="text-xs text-center py-8" style={{ color: 'var(--text-muted)' }}>No founders yet. Claim your badge above!</p>}
+                    </div>
+                  )}
                 </motion.div>
               )}
 
