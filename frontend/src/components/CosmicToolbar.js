@@ -305,54 +305,54 @@ export default function CosmicToolbar() {
         <GripHorizontal size={10} style={{ color: 'rgba(192,132,252,0.3)' }} />
       </div>
 
-      {/* ── Meditate (hidden on Mixer) ── */}
+      {/* ── Meditate (hidden on Mixer) — GREEN ── */}
       {!onMixer && (
         <ToolBtn
           testId="toolbar-meditate"
           onClick={(e) => { e.stopPropagation(); toggleMeditate(); }}
           active={meditating}
-          glowColor="rgba(34,197,94,0.35)"
+          color="#4ADE80"
           expanded={expanded}
-          label={meditating ? 'Stop' : 'Zen'}
+          label={meditating ? 'Stop Zen' : 'Zen'}
         >
-          <LotusIcon size={15} color={meditating ? '#4ADE80' : '#C084FC'} />
-          {meditating && <Glow color="rgba(34,197,94,0.3)" speed={3} />}
+          <LotusIcon size={15} color={meditating ? '#4ADE80' : '#4ADE80'} />
+          {meditating && <Glow color="rgba(34,197,94,0.4)" speed={3} />}
         </ToolBtn>
       )}
 
-      {/* ── Voice ── */}
+      {/* ── Voice — BLUE ── */}
       <ToolBtn
         testId="toolbar-voice"
         onPointerDown={handleMicDown}
         onPointerUp={handleMicUp}
         onPointerLeave={handleMicUp}
         active={isRecording || holdActive}
-        glowColor={isRecording ? 'rgba(239,68,68,0.35)' : 'rgba(59,130,246,0.25)'}
+        color="#60A5FA"
         expanded={expanded}
-        label={isRecording ? 'Listening' : 'Voice'}
+        label={isRecording ? 'Release' : 'Voice'}
         badge={wakeWordEnabled && !isRecording}
       >
         {isProcessing
-          ? <Loader2 size={14} className="animate-spin" style={{ color: '#E9D5FF' }} />
-          : <Mic size={14} style={{ color: isRecording ? '#FCA5A5' : 'rgba(192,132,252,0.65)' }} />}
+          ? <Loader2 size={14} className="animate-spin" style={{ color: '#60A5FA' }} />
+          : <Mic size={14} style={{ color: isRecording ? '#FCA5A5' : '#60A5FA' }} />}
         {isRecording && <Glow color="rgba(239,68,68,0.4)" speed={1} />}
       </ToolBtn>
 
-      {/* ── Wake Word ── */}
+      {/* ── Wake Word — AMBER ── */}
       <ToolBtn
         testId="toolbar-wake"
         onClick={(e) => { e.stopPropagation(); haptic('Light'); toggleWakeWord(); }}
         active={wakeWordEnabled}
-        glowColor="rgba(34,197,94,0.2)"
+        color="#FBBF24"
         expanded={expanded}
-        label={wakeWordEnabled ? 'Wake On' : 'Wake'}
+        label={wakeWordEnabled ? 'Wake Off' : 'Wake'}
         small
       >
-        <Radio size={12} style={{ color: wakeWordEnabled ? '#22C55E' : 'rgba(255,255,255,0.3)' }} />
-        {wakeWordEnabled && <Glow color="rgba(34,197,94,0.2)" speed={4} />}
+        <Radio size={12} style={{ color: wakeWordEnabled ? '#FBBF24' : '#FBBF24' }} />
+        {wakeWordEnabled && <Glow color="rgba(251,191,36,0.3)" speed={4} />}
       </ToolBtn>
 
-      {/* ── Scroll-to-top ── */}
+      {/* ── Scroll-to-top — VIOLET ── */}
       <AnimatePresence>
         {showTop && (
           <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }}>
@@ -361,9 +361,10 @@ export default function CosmicToolbar() {
               onClick={(e) => { e.stopPropagation(); haptic('Light'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               expanded={expanded}
               label="Top"
+              color="#A78BFA"
               small
             >
-              <ChevronUp size={13} style={{ color: 'rgba(192,132,252,0.6)' }} />
+              <ChevronUp size={13} style={{ color: '#A78BFA' }} />
             </ToolBtn>
           </motion.div>
         )}
@@ -403,8 +404,9 @@ function ActiveHalo({ color }) {
   );
 }
 
-/* ── Reusable toolbar button ── */
-function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPointerLeave, active, glowColor, expanded, label, small, badge }) {
+/* ── Reusable toolbar button — always shows its identity color ── */
+function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPointerLeave, active, color, expanded, label, small, badge }) {
+  const c = color || '#C084FC';
   return (
     <motion.button
       onClick={onClick}
@@ -417,11 +419,11 @@ function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPoin
       style={{
         height: small ? 28 : 32,
         padding: expanded ? `0 ${small ? 8 : 10}px 0 ${small ? 6 : 8}px` : `0 ${small ? 6 : 8}px`,
-        background: active ? (glowColor || 'rgba(192,132,252,0.15)') : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${active ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}`,
+        background: active ? `${c}20` : `${c}08`,
+        border: `1px solid ${active ? `${c}40` : `${c}18`}`,
         cursor: 'pointer',
-        boxShadow: active ? `0 0 14px ${glowColor || 'rgba(192,132,252,0.1)'}` : 'none',
-        transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s',
+        boxShadow: active ? `0 0 16px ${c}25, 0 0 4px ${c}15` : `0 0 4px ${c}06`,
+        transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s, border 0.3s',
       }}
       data-testid={testId}
     >
@@ -440,7 +442,7 @@ function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPoin
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="text-[9px] font-medium whitespace-nowrap overflow-hidden"
-            style={{ color: active ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)' }}
+            style={{ color: active ? c : `${c}90` }}
           >
             {label}
           </motion.span>

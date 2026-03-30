@@ -304,22 +304,23 @@ export default function SmartDock() {
               active={isActive}
               color={item.color}
               expanded={expanded}
-              label={item.label}
+              label={isActive ? `Close ${item.label}` : item.label}
             >
-              <Icon size={13} style={{ color: isActive ? item.color : 'rgba(248,250,252,0.4)' }} />
+              <Icon size={13} style={{ color: item.color }} />
             </DockBtn>
           );
         })}
 
-        {/* ── Minimize ── */}
+        {/* ── Minimize — RED tinted ── */}
         <DockBtn
           testId="dock-minimize"
           onClick={(e) => { e.stopPropagation(); haptic('Light'); setMinimized(true); setActivePanel(null); }}
           expanded={expanded}
           label="Hide"
+          color="#F87171"
           small
         >
-          <X size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />
+          <X size={10} style={{ color: '#F87171' }} />
         </DockBtn>
 
         {/* ── Expand indicator ── */}
@@ -342,8 +343,9 @@ export default function SmartDock() {
   );
 }
 
-/* ── Reusable dock button ── */
+/* ── Reusable dock button — always shows its identity color ── */
 function DockBtn({ children, testId, onClick, active, color, expanded, label, small }) {
+  const c = color || '#C084FC';
   return (
     <motion.button
       onClick={onClick}
@@ -353,11 +355,11 @@ function DockBtn({ children, testId, onClick, active, color, expanded, label, sm
       style={{
         height: small ? 26 : 30,
         padding: expanded ? `0 ${small ? 7 : 9}px 0 ${small ? 5 : 7}px` : `0 ${small ? 5 : 7}px`,
-        background: active ? `${color || 'rgba(192,132,252)'}15` : 'rgba(255,255,255,0.02)',
-        border: `1px solid ${active ? `${color || 'rgba(192,132,252)'}25` : 'rgba(255,255,255,0.03)'}`,
+        background: active ? `${c}18` : `${c}08`,
+        border: `1px solid ${active ? `${c}35` : `${c}15`}`,
         cursor: 'pointer',
-        boxShadow: active ? `0 0 10px ${color || 'rgba(192,132,252)'}15` : 'none',
-        transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s',
+        boxShadow: active ? `0 0 14px ${c}20, 0 0 4px ${c}12` : `0 0 3px ${c}05`,
+        transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s, border 0.3s',
       }}
       data-testid={testId}
     >
@@ -372,7 +374,7 @@ function DockBtn({ children, testId, onClick, active, color, expanded, label, sm
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="text-[8px] font-medium whitespace-nowrap overflow-hidden"
-            style={{ color: active ? (color || 'rgba(255,255,255,0.8)') : 'rgba(255,255,255,0.35)' }}
+            style={{ color: active ? c : `${c}90` }}
           >
             {label}
           </motion.span>
