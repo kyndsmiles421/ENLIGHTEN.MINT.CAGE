@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause, Sparkles, Atom } from 'lucide-react';
+import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause, Sparkles, Atom, Crosshair } from 'lucide-react';
 import * as THREE from 'three';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -41,6 +41,18 @@ export default function VirtualReality() {
   const raycasterRef = useRef(new THREE.Raycaster());
   const pointerRef = useRef(new THREE.Vector2());
 
+  // Spatial audio refs
+  const pannerRef = useRef(null);
+  const spatialSourceRef = useRef({ x: 0, y: 5, z: -15 }); // Nebula emission point
+  const [spatialAudioActive, setSpatialAudioActive] = useState(false);
+
+  // Gaze reticle refs
+  const [gazeTarget, setGazeTarget] = useState(null);
+  const gazeTimerRef = useRef(null);
+  const gazeProgressRef = useRef(0);
+  const [gazeProgress, setGazeProgress] = useState(0);
+  const GAZE_FUSE_MS = 1500;
+
   // Constellation Journey state
   const [showJourneyPicker, setShowJourneyPicker] = useState(false);
   const [activeJourney, setActiveJourney] = useState(null); // { journey, step, elapsed, total }
@@ -76,40 +88,76 @@ export default function VirtualReality() {
     axios.get(`${API}/harmonics/celestial`).then(r => setCelestial(r.data)).catch(() => {});
   }, [authHeaders]);
 
-  // Ambient cosmic audio
+  // Ambient cosmic audio with 3D Spatial Panner
   const toggleAudio = useCallback(() => {
     if (ambientAudio) {
       audioNodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
       audioNodesRef.current = [];
+      pannerRef.current = null;
       if (audioCtxRef.current) { audioCtxRef.current.close(); audioCtxRef.current = null; }
       setAmbientAudio(false);
+      setSpatialAudioActive(false);
       return;
     }
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     audioCtxRef.current = ctx;
+
+    // Resume on user gesture (browser autoplay policy)
+    if (ctx.state === 'suspended') ctx.resume();
+
     const nodes = [];
 
-    // Deep cosmic drone
+    // Create a PannerNode for 3D spatial positioning
+    const panner = ctx.createPanner();
+    panner.panningModel = 'HRTF';
+    panner.distanceModel = 'inverse';
+    panner.refDistance = 5;
+    panner.maxDistance = 200;
+    panner.rolloffFactor = 1.2;
+    panner.coneInnerAngle = 360;
+    panner.coneOuterAngle = 360;
+    panner.coneOuterGain = 0.4;
+    // Initial sound source position (a nebula point in the scene)
+    panner.positionX.setValueAtTime(spatialSourceRef.current.x, ctx.currentTime);
+    panner.positionY.setValueAtTime(spatialSourceRef.current.y, ctx.currentTime);
+    panner.positionZ.setValueAtTime(spatialSourceRef.current.z, ctx.currentTime);
+    panner.connect(ctx.destination);
+    pannerRef.current = panner;
+
+    // Set initial listener position (will be updated each frame)
+    if (ctx.listener.positionX) {
+      ctx.listener.positionX.setValueAtTime(0, ctx.currentTime);
+      ctx.listener.positionY.setValueAtTime(4, ctx.currentTime);
+      ctx.listener.positionZ.setValueAtTime(18, ctx.currentTime);
+      ctx.listener.forwardX.setValueAtTime(0, ctx.currentTime);
+      ctx.listener.forwardY.setValueAtTime(0, ctx.currentTime);
+      ctx.listener.forwardZ.setValueAtTime(-1, ctx.currentTime);
+      ctx.listener.upX.setValueAtTime(0, ctx.currentTime);
+      ctx.listener.upY.setValueAtTime(1, ctx.currentTime);
+      ctx.listener.upZ.setValueAtTime(0, ctx.currentTime);
+    }
+
+    // Deep cosmic drone -> panner (spatial)
     const drone = ctx.createOscillator();
     drone.type = 'sine';
     drone.frequency.value = 65.41; // C2
     const droneGain = ctx.createGain();
     droneGain.gain.value = 0.06;
-    drone.connect(droneGain).connect(ctx.destination);
+    drone.connect(droneGain).connect(panner);
     drone.start();
     nodes.push(drone);
 
-    // Fifth harmonic
+    // Fifth harmonic -> panner (spatial)
     const fifth = ctx.createOscillator();
     fifth.type = 'sine';
     fifth.frequency.value = 98;
     const fifthGain = ctx.createGain();
     fifthGain.gain.value = 0.03;
-    fifth.connect(fifthGain).connect(ctx.destination);
+    fifth.connect(fifthGain).connect(panner);
     fifth.start();
     nodes.push(fifth);
 
-    // Shimmer pad
+    // Shimmer pad -> panner (spatial)
     const shimmer = ctx.createOscillator();
     shimmer.type = 'triangle';
     shimmer.frequency.value = 523.25;
@@ -121,12 +169,13 @@ export default function VirtualReality() {
     lfoGain.gain.value = 0.005;
     lfo.connect(lfoGain).connect(shimGain.gain);
     lfo.start();
-    shimmer.connect(shimGain).connect(ctx.destination);
+    shimmer.connect(shimGain).connect(panner);
     shimmer.start();
     nodes.push(shimmer, lfo);
 
     audioNodesRef.current = nodes;
     setAmbientAudio(true);
+    setSpatialAudioActive(true);
   }, [ambientAudio]);
 
   useEffect(() => {
@@ -361,6 +410,10 @@ export default function VirtualReality() {
     let isDragging = false;
     let lastMouse = { x: 0, y: 0 };
 
+    // Gaze reticle tracking
+    let gazePortalId = null;
+    let gazeStartTime = 0;
+
     const onMouseDown = (e) => { isDragging = true; lastMouse = { x: e.clientX, y: e.clientY }; };
     const onMouseUp = () => { isDragging = false; };
     const onMouseMove = (e) => {
@@ -441,6 +494,34 @@ export default function VirtualReality() {
         targetAngle += 0.0008;
       }
 
+      // === SPATIAL AUDIO: Update AudioListener to match camera position ===
+      if (audioCtxRef.current && pannerRef.current) {
+        const ctx = audioCtxRef.current;
+        const now = ctx.currentTime;
+        if (ctx.listener.positionX) {
+          ctx.listener.positionX.setValueAtTime(camera.position.x, now);
+          ctx.listener.positionY.setValueAtTime(camera.position.y, now);
+          ctx.listener.positionZ.setValueAtTime(camera.position.z, now);
+          // Forward direction: camera looks toward origin
+          const fwd = new THREE.Vector3(0, 2, 0).sub(camera.position).normalize();
+          ctx.listener.forwardX.setValueAtTime(fwd.x, now);
+          ctx.listener.forwardY.setValueAtTime(fwd.y, now);
+          ctx.listener.forwardZ.setValueAtTime(fwd.z, now);
+          ctx.listener.upX.setValueAtTime(0, now);
+          ctx.listener.upY.setValueAtTime(1, now);
+          ctx.listener.upZ.setValueAtTime(0, now);
+        }
+        // Move the sound source in a slow orbit around a nebula point
+        const srcAngle = t * 0.15;
+        const srcX = Math.sin(srcAngle) * 12;
+        const srcY = 5 + Math.sin(t * 0.3) * 3;
+        const srcZ = Math.cos(srcAngle) * 12 - 10;
+        pannerRef.current.positionX.setValueAtTime(srcX, now);
+        pannerRef.current.positionY.setValueAtTime(srcY, now);
+        pannerRef.current.positionZ.setValueAtTime(srcZ, now);
+        spatialSourceRef.current = { x: srcX, y: srcY, z: srcZ };
+      }
+
       // Stars slow rotation
       stars.rotation.y = t * 0.005;
       stars.rotation.x = Math.sin(t * 0.002) * 0.02;
@@ -508,6 +589,43 @@ export default function VirtualReality() {
         }
       });
       setHoveredPortal(prev => prev !== newHovered ? newHovered : prev);
+
+      // === GAZE FUSE: Track how long user looks at a portal (HMD prep) ===
+      if (newHovered) {
+        if (gazePortalId !== newHovered) {
+          gazePortalId = newHovered;
+          gazeStartTime = t;
+          setGazeProgress(0);
+        } else {
+          const elapsed = (t - gazeStartTime) * 1000;
+          const progress = Math.min(elapsed / 1500, 1);
+          setGazeProgress(progress);
+          if (progress >= 1) {
+            // Fuse triggered — activate portal
+            const pm = portalMeshes.find(p => p.data.id === gazePortalId);
+            if (pm) {
+              if (pm.data.id === 'meditation') {
+                // Will be handled by React state
+              } else if (pm.data.id === 'quantum') {
+                // Will be handled by React state
+              } else if (pm.data.path) {
+                // Navigate on fuse complete
+              }
+            }
+            setGazeTarget(gazePortalId);
+            gazePortalId = null;
+            gazeStartTime = 0;
+            setGazeProgress(0);
+          }
+        }
+      } else {
+        if (gazePortalId) {
+          gazePortalId = null;
+          gazeStartTime = 0;
+          setGazeProgress(0);
+        }
+      }
+      setGazeTarget(prev => prev !== newHovered ? newHovered : prev);
 
       // Nebula drift
       nebulaGroup.children.forEach((n, i) => {
@@ -939,6 +1057,25 @@ export default function VirtualReality() {
     }
   };
 
+
+  // Gaze fuse trigger handler
+  useEffect(() => {
+    if (!gazeTarget) return;
+    const portal = PORTALS.find(p => p.id === gazeTarget);
+    if (!portal) return;
+    // Reset after triggering
+    const timeout = setTimeout(() => {
+      if (portal.id === 'meditation') {
+        startVrMeditation();
+      } else if (portal.id === 'quantum') {
+        setShowQuantumPicker(true);
+      } else if (portal.path) {
+        navigate(portal.path);
+      }
+      setGazeTarget(null);
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [gazeTarget, navigate, startVrMeditation]);
 
   const hoveredData = hoveredPortal ? PORTALS.find(p => p.id === hoveredPortal) : null;
 
@@ -1618,6 +1755,54 @@ export default function VirtualReality() {
         )}
       </AnimatePresence>
 
+      {/* Gaze Reticle — HMD center dot with fuse progress ring */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[45]" data-testid="gaze-reticle">
+        <div className="relative w-10 h-10 flex items-center justify-center">
+          {/* Center dot */}
+          <div className="w-2 h-2 rounded-full" style={{
+            background: gazeTarget ? PORTALS.find(p => p.id === gazeTarget)?.color || '#C084FC' : 'rgba(248,250,252,0.25)',
+            boxShadow: gazeTarget ? `0 0 12px ${PORTALS.find(p => p.id === gazeTarget)?.color || '#C084FC'}80` : '0 0 6px rgba(248,250,252,0.1)',
+            transition: 'all 0.2s ease',
+          }} />
+          {/* Fuse progress ring (SVG) */}
+          {gazeProgress > 0 && (
+            <svg className="absolute inset-0" viewBox="0 0 40 40" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="20" cy="20" r="16" fill="none"
+                stroke={PORTALS.find(p => p.id === hoveredPortal)?.color || '#C084FC'}
+                strokeWidth="1.5"
+                strokeDasharray={`${gazeProgress * 100.53} 100.53`}
+                strokeLinecap="round"
+                style={{ opacity: 0.7, transition: 'stroke-dasharray 0.1s linear' }}
+              />
+            </svg>
+          )}
+        </div>
+      </div>
+
+      {/* Spatial Audio Indicator */}
+      {spatialAudioActive && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute bottom-28 right-4 pointer-events-none z-50"
+          data-testid="spatial-audio-indicator"
+        >
+          <div className="px-3 py-1.5 rounded-lg flex items-center gap-2" style={{
+            background: 'rgba(10,10,20,0.4)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(192,132,252,0.12)',
+          }}>
+            <motion.div
+              animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: '#C084FC', boxShadow: '0 0 6px #C084FC' }}
+            />
+            <span className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(192,132,252,0.6)' }}>3D Spatial Audio</span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Instructions overlay */}
       <motion.div
         initial={{ opacity: 1 }}
@@ -1626,7 +1811,7 @@ export default function VirtualReality() {
         className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-50"
       >
         <p className="text-[11px] tracking-wider" style={{ color: 'var(--text-muted)' }}>
-          Drag to orbit &middot; Scroll to zoom &middot; Click portals to enter
+          Drag to orbit &middot; Scroll to zoom &middot; Click or gaze at portals to enter
         </p>
       </motion.div>
     </div>

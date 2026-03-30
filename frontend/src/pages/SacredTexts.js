@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { FixedSizeList } from 'react-window';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -614,19 +615,21 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
 }
 
 /* ══════════════════════════════════════
-   CHAPTER LIST
+   CHAPTER LIST (Virtualized with react-window)
    ══════════════════════════════════════ */
-function ChapterList({ text, chapters, onGenerate, onRead, onVR, generating }) {
+function ChapterRowItem({ index, style, text, chapters, onGenerate, onRead, onVR, generating }) {
+  const ch = chapters[index];
+  if (!ch) return null;
   return (
-    <div className="space-y-2">
-      {chapters.map((ch, i) => (
-        <motion.div key={ch.id}
+    <div style={style}>
+      <div style={{ paddingBottom: 8 }}>
+        <motion.div
           initial={{ opacity: 0, x: -15 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.05 }}
+          transition={{ delay: Math.min(index * 0.03, 0.3) }}
           data-testid={`chapter-${ch.id}`}
           className="rounded-xl p-4 cursor-pointer group relative overflow-hidden"
-          style={{ background: ch.generated ? `rgba(15,17,28,0.4)` : 'rgba(15,17,28,0.3)', border: `1px solid ${ch.generated ? text.color + '12' : 'rgba(248,250,252,0.04)'}` }}
+          style={{ background: ch.generated ? 'rgba(15,17,28,0.4)' : 'rgba(15,17,28,0.3)', border: `1px solid ${ch.generated ? text.color + '12' : 'rgba(248,250,252,0.04)'}`, height: 64 }}
           onClick={() => ch.generated ? onRead(ch) : onGenerate(ch)}
           whileHover={{ x: 4, transition: { duration: 0.15 } }}
         >
@@ -647,7 +650,6 @@ function ChapterList({ text, chapters, onGenerate, onRead, onVR, generating }) {
               <Loader2 size={14} className="animate-spin flex-shrink-0" style={{ color: text.color }} />
             ) : ch.generated ? (
               <div className="flex items-center gap-1.5">
-                {/* VR mode button */}
                 <button
                   onClick={(e) => { e.stopPropagation(); onVR(ch); }}
                   className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
@@ -667,7 +669,112 @@ function ChapterList({ text, chapters, onGenerate, onRead, onVR, generating }) {
             )}
           </div>
         </motion.div>
-      ))}
+      </div>
+    </div>
+  );
+}
+
+function ChapterList({ text, chapters, onGenerate, onRead, onVR, generating }) {
+  const ITEM_HEIGHT = 72;
+  const listHeight = Math.min(chapters.length * ITEM_HEIGHT, 420);
+
+  // For small lists, render directly without virtualization
+  if (chapters.length <= 6) {
+    return (
+      <div className="space-y-2">
+        {chapters.map((ch, i) => (
+          <ChapterRowItem key={ch.id} index={i} style={{}}
+            text={text} chapters={chapters}
+            onGenerate={onGenerate} onRead={onRead} onVR={onVR} generating={generating} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <FixedSizeList
+      height={listHeight}
+      itemCount={chapters.length}
+      itemSize={ITEM_HEIGHT}
+      width="100%"
+      style={{ scrollbarWidth: 'thin' }}
+    >
+      {({ index, style }) => (
+        <ChapterRowItem index={index} style={style}
+          text={text} chapters={chapters}
+          onGenerate={onGenerate} onRead={onRead} onVR={onVR} generating={generating} />
+      )}
+    </FixedSizeList>
+  );
+}
+
+/* ══════════════════════════════════════
+   VIRTUALIZED TEXT GRID — renders only visible rows
+   ══════════════════════════════════════ */
+function VirtualizedTextGrid({ items, onSelect, columns: forceCols }) {
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) setContainerWidth(entry.contentRect.width);
+    });
+    ro.observe(containerRef.current);
+    setContainerWidth(containerRef.current.offsetWidth);
+    return () => ro.disconnect();
+  }, []);
+
+  const cols = forceCols || (containerWidth >= 1024 ? 3 : containerWidth >= 640 ? 2 : 1);
+
+  const rows = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < items.length; i += cols) {
+      result.push(items.slice(i, i + cols));
+    }
+    return result;
+  }, [items, cols]);
+
+  const ROW_HEIGHT = 180;
+
+  // For small lists (≤ 9 items), skip virtualization
+  if (items.length <= 9) {
+    return (
+      <div ref={containerRef}
+        className={`grid gap-4 ${forceCols === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
+        {items.map((text, i) => <TextCard key={text.id} text={text} onSelect={onSelect} index={i} />)}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={containerRef}>
+      {containerWidth > 0 && (
+        <FixedSizeList
+          height={Math.min(rows.length * ROW_HEIGHT, 800)}
+          itemCount={rows.length}
+          itemSize={ROW_HEIGHT}
+          width={containerWidth}
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          {({ index, style }) => {
+            const row = rows[index];
+            if (!row) return null;
+            return (
+              <div style={{ ...style, display: 'flex', gap: 16 }}>
+                {row.map((text, i) => (
+                  <div key={text.id} style={{ flex: `1 1 ${100 / cols}%`, minWidth: 0 }}>
+                    <TextCard text={text} onSelect={onSelect} index={index * cols + i} />
+                  </div>
+                ))}
+                {Array.from({ length: cols - row.length }).map((_, i) => (
+                  <div key={`empty-${i}`} style={{ flex: `1 1 ${100 / cols}%` }} />
+                ))}
+              </div>
+            );
+          }}
+        </FixedSizeList>
+      )}
     </div>
   );
 }
@@ -790,7 +897,7 @@ export default function SacredTexts() {
 
         {/* Content */}
         <div className="flex gap-6">
-          {/* Text grid */}
+          {/* Text grid — virtualized for performance */}
           <div className={`transition-all duration-300 ${selectedText ? 'hidden lg:block lg:w-1/3' : 'w-full'}`}>
             {!loading && filtered.length === 0 && (
               <div className="text-center py-16">
@@ -798,9 +905,11 @@ export default function SacredTexts() {
                 <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No texts match your search</p>
               </div>
             )}
-            <div className={`grid gap-4 ${selectedText ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
-              {filtered.map((text, i) => <TextCard key={text.id} text={text} onSelect={selectText} index={i} />)}
-            </div>
+            <VirtualizedTextGrid
+              items={filtered}
+              onSelect={selectText}
+              columns={selectedText ? 1 : undefined}
+            />
           </div>
 
           {/* Detail panel */}
