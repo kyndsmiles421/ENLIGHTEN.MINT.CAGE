@@ -189,7 +189,7 @@ VOICE_CONTEXT_MAP = {
     "reiki":        {"voice": "shimmer", "speed": 0.80},  # healing, gentle
     "frequency":    {"voice": "shimmer", "speed": 0.82},
     "soundscape":   {"voice": "shimmer", "speed": 0.80},
-    "mixer":        {"voice": "shimmer", "speed": 0.80},
+    "mixer":        {"voice": "nova", "speed": 0.88},
     "journal":      {"voice": "nova",    "speed": 0.90},  # reflective, personal
     "ritual":       {"voice": "fable",   "speed": 0.85},  # ceremonial
     "dream":        {"voice": "fable",   "speed": 0.82},  # dreamlike, mystical

@@ -87,12 +87,12 @@ const SOUNDS = [
 ];
 
 const MANTRAS = [
-  { id: 'om', label: 'Om', text: 'Ommmmm. Ommmmm. Ommmmm.', tradition: 'Universal', color: '#C084FC' },
-  { id: 'om-mani', label: 'Om Mani Padme Hum', text: 'Om Mani Padme Hum. Om Mani Padme Hum.', tradition: 'Tibetan Buddhist', color: '#2DD4BF' },
-  { id: 'om-namah', label: 'Om Namah Shivaya', text: 'Om Namah Shivaya. Om Namah Shivaya.', tradition: 'Hindu', color: '#8B5CF6' },
-  { id: 'so-hum', label: 'So Hum', text: 'So Hum... I am that I am', tradition: 'Vedic', color: '#3B82F6' },
-  { id: 'ra-ma', label: 'Ra Ma Da Sa', text: 'Ra Ma Da Sa, Sa Say So Hung', tradition: 'Kundalini', color: '#FCD34D' },
-  { id: 'peace', label: 'I Am Peace', text: 'I am peace. I am light. I am love.', tradition: 'Modern', color: '#22C55E' },
+  { id: 'om', label: 'Om', text: 'Om... Om... Om... Let the vibration settle into your being. Om... Om... Om...', tradition: 'Universal', color: '#C084FC' },
+  { id: 'om-mani', label: 'Om Mani Padme Hum', text: 'Om Mani Padme Hum... Om Mani Padme Hum... Let compassion fill every cell. Om Mani Padme Hum...', tradition: 'Tibetan Buddhist', color: '#2DD4BF' },
+  { id: 'om-namah', label: 'Om Namah Shivaya', text: 'Om Namah Shivaya... I bow to the divine within. Om Namah Shivaya... Om Namah Shivaya...', tradition: 'Hindu', color: '#8B5CF6' },
+  { id: 'so-hum', label: 'So Hum', text: 'So... Hum... I am that I am. So... Hum... Breathe in, I am. Breathe out, that. So... Hum...', tradition: 'Vedic', color: '#3B82F6' },
+  { id: 'ra-ma', label: 'Ra Ma Da Sa', text: 'Ra Ma Da Sa... Sa Say So Hung... Feel the healing energy flow. Ra Ma Da Sa... Sa Say So Hung...', tradition: 'Kundalini', color: '#FCD34D' },
+  { id: 'peace', label: 'I Am Peace', text: 'I am peace... I am light... I am love... With every breath, I return to stillness. I am peace... I am light... I am love...', tradition: 'Modern', color: '#22C55E' },
 ];
 
 // World instrument drones for the mixer
@@ -118,11 +118,11 @@ export default function CosmicMixer() {
   const [masterVol, setMasterVol] = useState(60);
   const [muted, setMuted] = useState(false);
 
-  // Active layers
-  const [activeFreq, setActiveFreq] = useState(null);
-  const [activeSound, setActiveSound] = useState(null);
+  // Active layers (multi-select for freq, sounds, drones)
+  const [activeFreqs, setActiveFreqs] = useState(new Set());
+  const [activeSounds, setActiveSounds] = useState(new Set());
   const [activeMantra, setActiveMantra] = useState(null);
-  const [activeDrone, setActiveDrone] = useState(null);
+  const [activeDrones, setActiveDrones] = useState(new Set());
   const [vibeOn, setVibeOn] = useState(false);
 
   // Visual layers (multi-stack)
@@ -136,15 +136,15 @@ export default function CosmicMixer() {
   const [mantraVol, setMantraVol] = useState(70);
   const [droneVol, setDroneVol] = useState(40);
 
-  // Audio refs
+  // Audio refs — Maps for multi-select layers
   const ctxRef = useRef(null);
   const masterGainRef = useRef(null);
   const freqGainRef = useRef(null);
   const soundGainRef = useRef(null);
   const droneGainRef = useRef(null);
-  const freqNodesRef = useRef([]);
-  const soundNodesRef = useRef([]);
-  const droneNodesRef = useRef([]);
+  const freqNodesMapRef = useRef({});
+  const soundNodesMapRef = useRef({});
+  const droneNodesMapRef = useRef({});
   const mantraAudioRef = useRef(null);
   const vibeIntervalRef = useRef(null);
   const [mantraLoading, setMantraLoading] = useState(false);
@@ -213,20 +213,26 @@ export default function CosmicMixer() {
 
   const getCurrentLayers = useCallback(() => {
     const layers = {};
-    if (activeFreq) layers.frequency = { hz: activeFreq.hz, label: activeFreq.label };
-    if (activeSound) layers.sound = { id: activeSound.id };
-    if (activeDrone) layers.drone = { id: activeDrone.id };
+    if (activeFreqs.size > 0) layers.frequencies = [...activeFreqs].map(hz => {
+      const f = FREQUENCIES.find(x => x.hz === hz);
+      return f ? { hz: f.hz, label: f.label } : { hz };
+    });
+    if (activeSounds.size > 0) layers.sounds = [...activeSounds].map(id => ({ id }));
+    if (activeDrones.size > 0) layers.drones = [...activeDrones].map(id => ({ id }));
     if (activeMantra) layers.mantra = { id: activeMantra.id };
+    // Backwards compat: single frequency/sound/drone
+    if (activeFreqs.size > 0) layers.frequency = { hz: [...activeFreqs][0], label: FREQUENCIES.find(f => f.hz === [...activeFreqs][0])?.label };
+    if (activeSounds.size > 0) layers.sound = { id: [...activeSounds][0] };
+    if (activeDrones.size > 0) layers.drone = { id: [...activeDrones][0] };
     // Store visual layers
     if (visualLayers.length > 0) layers.visualStack = visualLayers.map(l => ({ type: l.type, itemId: l.itemId, opacity: l.opacity }));
-    // Backwards compat: also set light/video if single layer present
     const lightLayer = visualLayers.find(l => l.type === 'light');
     const videoLayer = visualLayers.find(l => l.type === 'video');
     if (lightLayer) layers.light = { id: lightLayer.itemId };
     if (videoLayer) layers.video = { id: videoLayer.itemId };
     const volumes = { freqVol, soundVol, mantraVol, droneVol, masterVol };
     return { layers, volumes };
-  }, [activeFreq, activeSound, activeDrone, activeMantra, visualLayers, freqVol, soundVol, mantraVol, droneVol, masterVol]);
+  }, [activeFreqs, activeSounds, activeDrones, activeMantra, visualLayers, freqVol, soundVol, mantraVol, droneVol, masterVol]);
 
   const savePreset = useCallback(async () => {
     const { layers, volumes } = getCurrentLayers();
@@ -299,12 +305,28 @@ export default function CosmicMixer() {
     nodesRef.current = [];
   };
 
-  // ─── Frequency Layer ───
+  const stopNodesForKey = (mapRef, key) => {
+    const nodes = mapRef.current[key];
+    if (!nodes) return;
+    nodes.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+    if (nodes._interval) clearInterval(nodes._interval);
+    delete mapRef.current[key];
+  };
+
+  const stopAllInMap = (mapRef) => {
+    Object.keys(mapRef.current).forEach(key => stopNodesForKey(mapRef, key));
+  };
+
+  // ─── Frequency Layer (multi-select) ───
   const toggleFreq = useCallback(async (freq) => {
-    stopNodes(freqNodesRef);
-    if (activeFreq?.hz === freq.hz) { setActiveFreq(null); return; }
+    if (activeFreqs.has(freq.hz)) {
+      stopNodesForKey(freqNodesMapRef, freq.hz);
+      setActiveFreqs(prev => { const next = new Set(prev); next.delete(freq.hz); return next; });
+      return;
+    }
     const ctx = await getCtx();
     const channelGain = freqGainRef.current;
+    let nodes;
 
     if (freq.hz < 20) {
       const carrier = 200;
@@ -320,7 +342,7 @@ export default function CosmicMixer() {
       sub.connect(subG); subG.connect(channelGain);
       merger.connect(channelGain);
       oscL.start(); oscR.start(); sub.start();
-      freqNodesRef.current = [oscL, oscR, sub, merger];
+      nodes = [oscL, oscR, sub, merger];
     } else {
       const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq.hz;
       const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
@@ -328,25 +350,32 @@ export default function CosmicMixer() {
       lfo.connect(lg); lg.connect(o.frequency);
       o.connect(channelGain);
       o.start(); lfo.start();
-      freqNodesRef.current = [o, lfo];
+      nodes = [o, lfo];
     }
-    setActiveFreq(freq);
-  }, [activeFreq, getCtx]);
+    freqNodesMapRef.current[freq.hz] = nodes;
+    setActiveFreqs(prev => new Set(prev).add(freq.hz));
+  }, [activeFreqs, getCtx]);
 
-  // ─── Sound Layer ───
+  // ─── Sound Layer (multi-select) ───
   const toggleSound = useCallback(async (sound) => {
-    stopNodes(soundNodesRef);
-    if (activeSound?.id === sound.id) { setActiveSound(null); return; }
+    if (activeSounds.has(sound.id)) {
+      stopNodesForKey(soundNodesMapRef, sound.id);
+      setActiveSounds(prev => { const next = new Set(prev); next.delete(sound.id); return next; });
+      return;
+    }
     const ctx = await getCtx();
     const nodes = sound.gen(ctx, soundGainRef.current);
-    soundNodesRef.current = nodes;
-    setActiveSound(sound);
-  }, [activeSound, getCtx]);
+    soundNodesMapRef.current[sound.id] = nodes;
+    setActiveSounds(prev => new Set(prev).add(sound.id));
+  }, [activeSounds, getCtx]);
 
-  // ─── Instrument Drone Layer ───
+  // ─── Instrument Drone Layer (multi-select) ───
   const toggleDrone = useCallback(async (drone) => {
-    stopNodes(droneNodesRef);
-    if (activeDrone?.id === drone.id) { setActiveDrone(null); return; }
+    if (activeDrones.has(drone.id)) {
+      stopNodesForKey(droneNodesMapRef, drone.id);
+      setActiveDrones(prev => { const next = new Set(prev); next.delete(drone.id); return next; });
+      return;
+    }
     const ctx = await getCtx();
     const channelGain = droneGainRef.current;
 
@@ -357,21 +386,18 @@ export default function CosmicMixer() {
     filter.type = 'bandpass';
     filter.frequency.value = drone.filterFreq;
     filter.Q.value = drone.filterQ;
-    // Vibrato
     const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = drone.vibratoRate;
     const lfoGain = ctx.createGain(); lfoGain.gain.value = drone.vibratoDepth;
     lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-    // Sub harmonic
     const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = drone.freq / 2;
     const subGain = ctx.createGain(); subGain.gain.value = 0.3;
     sub.connect(subGain); subGain.connect(filter);
-
     osc.connect(filter);
     filter.connect(channelGain);
     osc.start(); lfo.start(); sub.start();
-    droneNodesRef.current = [osc, lfo, sub];
-    setActiveDrone(drone);
-  }, [activeDrone, getCtx]);
+    droneNodesMapRef.current[drone.id] = [osc, lfo, sub];
+    setActiveDrones(prev => new Set(prev).add(drone.id));
+  }, [activeDrones, getCtx]);
 
   // ─── Mantra Layer ───
   const toggleMantra = useCallback(async (mantra) => {
@@ -395,39 +421,41 @@ export default function CosmicMixer() {
   }, [activeMantra, mantraVol]);
 
   // ─── Vibration ───
+  const firstActiveFreq = activeFreqs.size > 0 ? FREQUENCIES.find(f => activeFreqs.has(f.hz)) : null;
+
   const toggleVibe = useCallback(() => {
     if (vibeOn) {
       if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
       try { navigator.vibrate(0); } catch {}
       setVibeOn(false);
     } else {
-      const pattern = activeFreq ? Math.max(50, Math.round(1000 / activeFreq.hz * 10)) : 200;
+      const pattern = firstActiveFreq ? Math.max(50, Math.round(1000 / firstActiveFreq.hz * 10)) : 200;
       const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch {} };
       pulse();
       vibeIntervalRef.current = setInterval(pulse, pattern * 2 + 50);
       setVibeOn(true);
     }
-  }, [vibeOn, activeFreq]);
+  }, [vibeOn, firstActiveFreq]);
 
   useEffect(() => {
-    if (vibeOn && activeFreq) {
+    if (vibeOn && firstActiveFreq) {
       if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
-      const pattern = Math.max(50, Math.round(1000 / activeFreq.hz * 10));
+      const pattern = Math.max(50, Math.round(1000 / firstActiveFreq.hz * 10));
       const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch {} };
       vibeIntervalRef.current = setInterval(pulse, pattern * 2 + 50);
     }
-  }, [activeFreq, vibeOn]);
+  }, [firstActiveFreq, vibeOn]);
 
   // ─── Stop All ───
   const stopAll = useCallback(() => {
-    stopNodes(freqNodesRef);
-    stopNodes(soundNodesRef);
-    stopNodes(droneNodesRef);
+    stopAllInMap(freqNodesMapRef);
+    stopAllInMap(soundNodesMapRef);
+    stopAllInMap(droneNodesMapRef);
     if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
     if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
     try { navigator.vibrate(0); } catch {}
-    setActiveFreq(null); setActiveSound(null); setActiveMantra(null);
-    setActiveDrone(null); setVibeOn(false);
+    setActiveFreqs(new Set()); setActiveSounds(new Set()); setActiveMantra(null);
+    setActiveDrones(new Set()); setVibeOn(false);
     setVisualLayers([]);
   }, []);
 
@@ -460,18 +488,24 @@ export default function CosmicMixer() {
     if (v.droneVol !== undefined) setDroneVol(v.droneVol);
 
     const l = preset.layers || {};
-    if (l.frequency) {
-      const freq = FREQUENCIES.find(f => f.hz === l.frequency.hz);
-      if (freq) setTimeout(() => toggleFreq(freq), 150);
-    }
-    if (l.sound) {
-      const sound = SOUNDS.find(s => s.id === l.sound.id);
-      if (sound) setTimeout(() => toggleSound(sound), 250);
-    }
-    if (l.drone) {
-      const drone = INSTRUMENT_DRONES.find(d => d.id === l.drone.id);
-      if (drone) setTimeout(() => toggleDrone(drone), 350);
-    }
+    // Multi-frequency support
+    const freqsToLoad = l.frequencies || (l.frequency ? [l.frequency] : []);
+    freqsToLoad.forEach((fData, i) => {
+      const freq = FREQUENCIES.find(f => f.hz === fData.hz);
+      if (freq) setTimeout(() => toggleFreq(freq), 150 + i * 80);
+    });
+    // Multi-sound support
+    const soundsToLoad = l.sounds || (l.sound ? [l.sound] : []);
+    soundsToLoad.forEach((sData, i) => {
+      const sound = SOUNDS.find(s => s.id === sData.id);
+      if (sound) setTimeout(() => toggleSound(sound), 250 + i * 80);
+    });
+    // Multi-drone support
+    const dronesToLoad = l.drones || (l.drone ? [l.drone] : []);
+    dronesToLoad.forEach((dData, i) => {
+      const drone = INSTRUMENT_DRONES.find(d => d.id === dData.id);
+      if (drone) setTimeout(() => toggleDrone(drone), 350 + i * 80);
+    });
     if (l.mantra) {
       const mantra = MANTRAS.find(m => m.id === l.mantra.id);
       if (mantra) setTimeout(() => toggleMantra(mantra), 450);
@@ -498,9 +532,12 @@ export default function CosmicMixer() {
     if (v.soundVol !== undefined) setSoundVol(v.soundVol);
     if (v.droneVol !== undefined) setDroneVol(v.droneVol);
     const l = presetData.layers || {};
-    if (l.frequency) { const f = FREQUENCIES.find(x => x.hz === l.frequency.hz); if (f) setTimeout(() => toggleFreq(f), 150); }
-    if (l.sound) { const s = SOUNDS.find(x => x.id === l.sound.id); if (s) setTimeout(() => toggleSound(s), 250); }
-    if (l.drone) { const d = INSTRUMENT_DRONES.find(x => x.id === l.drone.id); if (d) setTimeout(() => toggleDrone(d), 350); }
+    const freqsToLoad = l.frequencies || (l.frequency ? [l.frequency] : []);
+    freqsToLoad.forEach((fData, i) => { const f = FREQUENCIES.find(x => x.hz === fData.hz); if (f) setTimeout(() => toggleFreq(f), 150 + i * 80); });
+    const soundsToLoad = l.sounds || (l.sound ? [l.sound] : []);
+    soundsToLoad.forEach((sData, i) => { const s = SOUNDS.find(x => x.id === sData.id); if (s) setTimeout(() => toggleSound(s), 250 + i * 80); });
+    const dronesToLoad = l.drones || (l.drone ? [l.drone] : []);
+    dronesToLoad.forEach((dData, i) => { const d = INSTRUMENT_DRONES.find(x => x.id === dData.id); if (d) setTimeout(() => toggleDrone(d), 350 + i * 80); });
     // Load visual layers
     const newVisuals = [];
     if (l.visualStack) {
@@ -600,14 +637,17 @@ export default function CosmicMixer() {
   // ─── Recording Engine ───
   const getFullSnapshot = useCallback(() => {
     return {
-      frequency: activeFreq ? { hz: activeFreq.hz, label: activeFreq.label } : null,
-      sound: activeSound ? { id: activeSound.id } : null,
-      drone: activeDrone ? { id: activeDrone.id } : null,
+      frequencies: [...activeFreqs].map(hz => ({ hz, label: FREQUENCIES.find(f => f.hz === hz)?.label })),
+      sounds: [...activeSounds].map(id => ({ id })),
+      drones: [...activeDrones].map(id => ({ id })),
+      frequency: activeFreqs.size > 0 ? { hz: [...activeFreqs][0] } : null,
+      sound: activeSounds.size > 0 ? { id: [...activeSounds][0] } : null,
+      drone: activeDrones.size > 0 ? { id: [...activeDrones][0] } : null,
       mantra: activeMantra ? { id: activeMantra.id } : null,
       visualLayers: visualLayers.map(l => ({ type: l.type, itemId: l.itemId, opacity: l.opacity, visible: l.visible })),
       volumes: { masterVol, freqVol, soundVol, mantraVol, droneVol },
     };
-  }, [activeFreq, activeSound, activeDrone, activeMantra, visualLayers, masterVol, freqVol, soundVol, mantraVol, droneVol]);
+  }, [activeFreqs, activeSounds, activeDrones, activeMantra, visualLayers, masterVol, freqVol, soundVol, mantraVol, droneVol]);
 
   const startRecording = useCallback(() => {
     const snapshot = getFullSnapshot();
@@ -668,21 +708,21 @@ export default function CosmicMixer() {
         type: 'mixer_sync',
         visual_layers: visualLayers.map(l => ({ type: l.type, itemId: l.itemId, opacity: l.opacity, visible: l.visible })),
         audio_state: {
-          frequency: activeFreq ? { hz: activeFreq.hz, label: activeFreq.label } : null,
-          sound: activeSound ? { id: activeSound.id } : null,
-          drone: activeDrone ? { id: activeDrone.id } : null,
+          frequencies: [...activeFreqs].map(hz => ({ hz })),
+          sounds: [...activeSounds].map(id => ({ id })),
+          drones: [...activeDrones].map(id => ({ id })),
         },
       }));
     } catch {}
-  }, [broadcastMode, visualLayers, activeFreq, activeSound, activeDrone]);
+  }, [broadcastMode, visualLayers, activeFreqs, activeSounds, activeDrones]);
 
   // Auto-broadcast when mixer state changes in broadcast mode
   useEffect(() => {
     if (broadcastMode) broadcastMixerState();
   }, [broadcastMode, broadcastMixerState]);
 
-  const hasActive = activeFreq || activeSound || activeMantra || activeDrone || vibeOn || visualLayers.length > 0;
-  const activeCount = [activeFreq, activeSound, activeMantra, activeDrone, vibeOn].filter(Boolean).length + visualLayers.length;
+  const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeMantra || activeDrones.size > 0 || vibeOn || visualLayers.length > 0;
+  const activeCount = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0) + (vibeOn ? 1 : 0) + visualLayers.length;
 
   if (!user) return null;
 
@@ -1077,37 +1117,52 @@ export default function CosmicMixer() {
 
                 {/* ── Channel Strips ── */}
 
-                {/* Frequency */}
-                <ChannelStrip title="Frequency" icon={Waves} active={activeFreq} color="#C084FC"
+                {/* Frequency (multi-select) */}
+                <ChannelStrip title="Frequency" icon={Waves} active={activeFreqs.size > 0} color="#C084FC"
                   volume={freqVol} onVolumeChange={setFreqVol}>
                   <div className="flex flex-wrap gap-1.5">
                     {FREQUENCIES.map(f => (
-                      <ChipButton key={f.hz} active={activeFreq?.hz === f.hz} color={f.color}
+                      <ChipButton key={f.hz} active={activeFreqs.has(f.hz)} color={f.color}
                         onClick={() => toggleFreq(f)} testId={`mixer-freq-${f.hz}`}>{f.label}</ChipButton>
                     ))}
                   </div>
+                  {activeFreqs.size > 1 && (
+                    <p className="text-[8px] mt-1" style={{ color: 'rgba(192,132,252,0.5)' }}>
+                      {activeFreqs.size} frequencies layered
+                    </p>
+                  )}
                 </ChannelStrip>
 
-                {/* Ambient Sound */}
-                <ChannelStrip title="Ambient" icon={Volume2} active={activeSound} color="#3B82F6"
+                {/* Ambient Sound (multi-select) */}
+                <ChannelStrip title="Ambient" icon={Volume2} active={activeSounds.size > 0} color="#3B82F6"
                   volume={soundVol} onVolumeChange={setSoundVol}>
                   <div className="flex flex-wrap gap-1.5">
                     {SOUNDS.map(s => (
-                      <ChipButton key={s.id} active={activeSound?.id === s.id} color={s.color}
+                      <ChipButton key={s.id} active={activeSounds.has(s.id)} color={s.color}
                         onClick={() => toggleSound(s)} testId={`mixer-sound-${s.id}`}>{s.label}</ChipButton>
                     ))}
                   </div>
+                  {activeSounds.size > 1 && (
+                    <p className="text-[8px] mt-1" style={{ color: 'rgba(59,130,246,0.5)' }}>
+                      {activeSounds.size} sounds layered
+                    </p>
+                  )}
                 </ChannelStrip>
 
-                {/* Instrument Drones */}
-                <ChannelStrip title="Instrument" icon={Music} active={activeDrone} color="#F59E0B"
+                {/* Instrument Drones (multi-select) */}
+                <ChannelStrip title="Instrument" icon={Music} active={activeDrones.size > 0} color="#F59E0B"
                   volume={droneVol} onVolumeChange={setDroneVol}>
                   <div className="flex flex-wrap gap-1.5">
                     {INSTRUMENT_DRONES.map(d => (
-                      <ChipButton key={d.id} active={activeDrone?.id === d.id} color={d.color}
+                      <ChipButton key={d.id} active={activeDrones.has(d.id)} color={d.color}
                         onClick={() => toggleDrone(d)} testId={`mixer-drone-${d.id}`}>{d.label}</ChipButton>
                     ))}
                   </div>
+                  {activeDrones.size > 1 && (
+                    <p className="text-[8px] mt-1" style={{ color: 'rgba(245,158,11,0.5)' }}>
+                      {activeDrones.size} instruments layered
+                    </p>
+                  )}
                 </ChannelStrip>
 
                 {/* Mantra */}
@@ -1143,7 +1198,7 @@ export default function CosmicMixer() {
                     {vibeOn ? 'Active' : 'Enable Pulse'}
                   </button>
                   <p className="text-[9px] mt-1" style={{ color: 'var(--text-muted)' }}>
-                    {activeFreq ? `Synced to ${activeFreq.label}` : 'Pulses at a calm rhythm'}
+                    {firstActiveFreq ? `Synced to ${firstActiveFreq.label}` : 'Pulses at a calm rhythm'}
                   </p>
                 </ChannelStrip>
               </div>

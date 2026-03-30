@@ -154,7 +154,10 @@ export default function CosmicLedger() {
   const [tab, setTab] = useState('overview');
 
   useEffect(() => {
-    if (!authHeaders?.Authorization) return;
+    if (!authHeaders?.Authorization) {
+      setLoading(false);
+      return;
+    }
     const load = async () => {
       try {
         const [ledgerRes, pathsRes, lbRes] = await Promise.all([

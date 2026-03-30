@@ -116,7 +116,6 @@ async def _compute_ledger(user_id):
     unique_origins = set()
     all_gems = []
     bosses_defeated = 0
-    realms_explored = set()
     full_sets_equipped = False
 
     for ch in chars:

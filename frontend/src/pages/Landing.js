@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
-  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+  DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors,
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -309,11 +309,15 @@ function SortableWidget({ id, children, editMode }) {
     opacity: isDragging ? 0.85 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} className={`relative group/drag ${isDragging ? 'is-dragging' : ''}`} {...attributes}>
+    <div ref={setNodeRef} style={style}
+      className={`relative group/drag ${isDragging ? 'is-dragging' : ''}`}
+      {...attributes}
+      {...(editMode ? listeners : {})}>
       {editMode && (
-        <div className="drag-handle absolute top-3 right-3 z-10 p-1 rounded-lg bg-white/5 animate-pulse" {...listeners}
+        <div className="drag-handle absolute top-3 right-3 z-10 p-1.5 rounded-lg cursor-grab active:cursor-grabbing"
+          style={{ background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.2)' }}
           data-testid={`drag-handle-${id}`}>
-          <GripVertical size={14} style={{ color: 'rgba(192,132,252,0.5)' }} />
+          <GripVertical size={14} style={{ color: 'rgba(192,132,252,0.7)' }} />
         </div>
       )}
       {children}
@@ -334,7 +338,8 @@ function PersonalizedDashboard({ user, onQuickReset }) {
   const [editMode, setEditMode] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
   );
 
   const handleDragEnd = (event) => {

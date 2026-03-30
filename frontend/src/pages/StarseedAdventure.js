@@ -238,6 +238,14 @@ function CharacterSelect({ origins, existingCharacters, onSelect, onResume, load
               <User size={13} /> Avatar Creator
               <ChevronRight size={11} className="opacity-60" />
             </motion.button>
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+              onClick={() => window.location.href = '/cosmic-ledger'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
+              style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.2)', color: '#FCD34D' }}
+              data-testid="cosmic-ledger-btn">
+              <Crown size={13} /> Cosmic Ledger
+              <ChevronRight size={11} className="opacity-60" />
+            </motion.button>
           </div>
         )}
       </motion.div>

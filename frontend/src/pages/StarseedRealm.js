@@ -500,16 +500,53 @@ function BossEncounterPanel({ activeOrigin, authHeaders, userId }) {
           setLootDrop(res.data.reward.loot_drop);
         }
       } else {
-        // Show combat feedback
+        // Show color-coded combat feedback
         const equipBonus = res.data.equipment_bonus || 0;
         const resMult = res.data.resonance_multiplier || 1.0;
         const gemFx = res.data.active_gem_effects || [];
-        let feedbackMsg = `${res.data.damage_dealt} damage dealt`;
-        if (equipBonus > 0) feedbackMsg += ` (+${equipBonus} from gear)`;
-        if (resMult > 1.0) feedbackMsg += ` (x${resMult} resonance!)`;
-        if (res.data.was_weakness) feedbackMsg += ' WEAKNESS HIT!';
-        if (gemFx.length > 0) feedbackMsg += ` [${gemFx.join(', ')} glowing]`;
-        toast.success(feedbackMsg);
+        const dmg = res.data.damage_dealt || 0;
+
+        // Resonance hit — gold/purple shimmer
+        if (resMult > 1.0) {
+          toast(`RESONANCE x${resMult}`, {
+            description: `${dmg} damage dealt${equipBonus > 0 ? ` (+${equipBonus} gear)` : ''}${gemFx.length > 0 ? ` — ${gemFx.join(', ')} glowing` : ''}`,
+            style: {
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.92), rgba(252,211,77,0.88))',
+              border: '1px solid rgba(252,211,77,0.5)',
+              color: '#FFF',
+              boxShadow: '0 0 24px rgba(168,85,247,0.4), 0 0 60px rgba(252,211,77,0.15)',
+              animation: 'pulse 1.5s ease-in-out',
+            },
+          });
+        }
+        // Weakness hit — red glow
+        else if (res.data.was_weakness) {
+          toast(`WEAKNESS HIT!`, {
+            description: `${dmg} damage dealt${equipBonus > 0 ? ` (+${equipBonus} gear)` : ''}`,
+            style: {
+              background: 'rgba(220,38,38,0.92)',
+              border: '1px solid rgba(239,68,68,0.5)',
+              color: '#FFF',
+              boxShadow: '0 0 24px rgba(220,38,38,0.4)',
+            },
+          });
+        }
+        // Equipment-boosted hit — cyan
+        else if (equipBonus > 0) {
+          toast(`${dmg} damage dealt`, {
+            description: `+${equipBonus} from gear${gemFx.length > 0 ? ` — ${gemFx.join(', ')} active` : ''}`,
+            style: {
+              background: 'rgba(56,189,248,0.15)',
+              border: '1px solid rgba(56,189,248,0.3)',
+              color: '#E0F2FE',
+              boxShadow: '0 0 16px rgba(56,189,248,0.2)',
+            },
+          });
+        }
+        // Standard hit
+        else {
+          toast.success(`${dmg} damage dealt${gemFx.length > 0 ? ` — ${gemFx.join(', ')} active` : ''}`);
+        }
 
         setActiveBattle(prev => ({
           ...prev,
