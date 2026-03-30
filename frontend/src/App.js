@@ -18,6 +18,9 @@ import CreditNudge from './components/CreditNudge';
 import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
+import { TempoProvider } from './context/TempoContext';
+import { VoiceCommandProvider } from './context/VoiceCommandContext';
+import VoiceCommandButton from './components/VoiceCommandButton';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -248,8 +251,10 @@ function App() {
     <AuthProvider>
       <CreditProvider>
       <AvatarProvider>
+      <TempoProvider>
       <SensoryProvider>
         <BrowserRouter>
+          <VoiceCommandProvider>
           {/* Immersive Fluid Mesh Gradient — outside all wrappers */}
           <div className="cosmic-mesh" aria-hidden="true">
             <div className="cosmic-mesh-inner" />
@@ -274,13 +279,16 @@ function App() {
             <AnimatedRoutes />
             <SmartDock />
             <CosmicMixer />
+            <VoiceCommandButton />
             <BackToTop />
             <InstallPrompt />
             <CreditNudge />
           </div>
           </SplitScreenProvider>
+          </VoiceCommandProvider>
         </BrowserRouter>
       </SensoryProvider>
+      </TempoProvider>
       </AvatarProvider>
       </CreditProvider>
     </AuthProvider>

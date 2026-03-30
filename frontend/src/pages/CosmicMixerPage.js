@@ -2,10 +2,11 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music,
+  ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio,
   Play, Pause, Square, Loader2, X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTempo } from '../context/TempoContext';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -94,6 +95,7 @@ const LIGHT_MODES = [
 export default function CosmicMixerPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
   const [masterVol, setMasterVol] = useState(60);
   const [muted, setMuted] = useState(false);
 
@@ -265,6 +267,16 @@ export default function CosmicMixerPage() {
   }, []);
 
   useEffect(() => () => { stopAll(); if (ctxRef.current) ctxRef.current.close(); }, [stopAll]);
+
+  // Tempo LFO: modulate master gain to the beat
+  const tempoCleanupRef = useRef(null);
+  useEffect(() => {
+    if (tempoCleanupRef.current) { tempoCleanupRef.current(); tempoCleanupRef.current = null; }
+    if (bpm > 0 && ctxRef.current && masterGainRef.current) {
+      tempoCleanupRef.current = connectToGains(ctxRef.current, [masterGainRef.current]);
+    }
+    return () => { if (tempoCleanupRef.current) { tempoCleanupRef.current(); tempoCleanupRef.current = null; } };
+  }, [bpm, connectToGains]);
 
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra || activeLight || vibeOn;
   const activeCount = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0) + (activeLight ? 1 : 0) + (vibeOn ? 1 : 0);
@@ -442,6 +454,75 @@ export default function CosmicMixerPage() {
                 </span>
               </div>
             </button>
+          </LayerSection>
+
+          {/* Tempo / Beat Control */}
+          <LayerSection title="Tempo & Beat" icon={Radio} active={bpm > 0} color="#EC4899">
+            <div className="space-y-3">
+              {/* BPM Slider */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-bold tabular-nums w-16" style={{ color: bpm > 0 ? '#EC4899' : 'rgba(248,250,252,0.35)' }}>
+                  {bpm > 0 ? `${bpm} BPM` : 'Off'}
+                </span>
+                <input type="range" min="0" max="200" step="1" value={bpm}
+                  onChange={e => setBpm(Number(e.target.value))}
+                  className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #EC4899 ${bpm / 2}%, rgba(255,255,255,0.06) ${bpm / 2}%)`,
+                    accentColor: '#EC4899',
+                  }}
+                  data-testid="tempo-slider-page"
+                />
+              </div>
+              {/* Controls row */}
+              <div className="flex items-center gap-2">
+                <button onClick={tapTempo}
+                  className="text-xs px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
+                  style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.2)', color: '#EC4899' }}
+                  data-testid="tap-tempo-page">
+                  Tap Tempo
+                </button>
+                {bpm > 0 && (
+                  <>
+                    <button onClick={stopTempo}
+                      className="text-xs px-3 py-2 rounded-xl transition-all hover:scale-105"
+                      style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
+                      data-testid="tempo-stop-page">
+                      Stop
+                    </button>
+                    <div className="flex items-center gap-2 ml-2">
+                      <div className="w-2.5 h-2.5 rounded-full transition-all" style={{
+                        background: beatPulse ? '#EC4899' : 'rgba(236,72,153,0.15)',
+                        boxShadow: beatPulse ? '0 0 16px rgba(236,72,153,0.6)' : 'none',
+                        transform: beatPulse ? 'scale(1.5)' : 'scale(1)',
+                      }} />
+                      <span className="text-[10px]" style={{ color: 'rgba(236,72,153,0.5)' }}>
+                        All layers breathing to the beat
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+              {/* Preset modes */}
+              <div className="flex flex-wrap gap-2">
+                {TEMPO_PRESETS.map(p => (
+                  <button key={p.id} onClick={() => setTempoFromPreset(p)}
+                    className="text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02]"
+                    style={{
+                      background: activePreset?.id === p.id ? `${p.color}12` : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${activePreset?.id === p.id ? `${p.color}35` : 'rgba(255,255,255,0.04)'}`,
+                    }}
+                    data-testid={`tempo-preset-page-${p.id}`}>
+                    <span className="text-xs font-medium block" style={{ color: activePreset?.id === p.id ? p.color : 'rgba(248,250,252,0.6)' }}>
+                      {p.label}
+                    </span>
+                    <span className="text-[9px] block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      {p.bpm} BPM — {p.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </LayerSection>
         </div>
       </div>

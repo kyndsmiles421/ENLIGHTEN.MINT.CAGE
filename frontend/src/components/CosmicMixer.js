@@ -7,6 +7,7 @@ import {
   Save, Heart, Globe, Lock, Trash2, Star, Users, Hexagon, Circle, Radio, Library,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTempo } from '../context/TempoContext';
 import axios from 'axios';
 import FractalVisualizer from './FractalVisualizer';
 import { VisualLayersMixer, LIGHT_MODES, VIDEO_OVERLAYS, FRACTAL_TYPES, VISUAL_FILTERS } from './VisualLayersMixer';
@@ -205,6 +206,7 @@ const INSTRUMENT_DRONES = [
 export default function CosmicMixer() {
   const { user } = useAuth();
   const location = useLocation();
+  const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
@@ -395,6 +397,18 @@ export default function CosmicMixer() {
   useEffect(() => { if (soundGainRef.current) soundGainRef.current.gain.value = soundVol / 100; }, [soundVol]);
   useEffect(() => { if (droneGainRef.current) droneGainRef.current.gain.value = droneVol / 100; }, [droneVol]);
   useEffect(() => { if (mantraAudioRef.current) mantraAudioRef.current.volume = mantraVol / 100; }, [mantraVol]);
+
+  // ─── Tempo LFO: modulate all channel gains to the beat ───
+  const tempoCleanupRef = useRef(null);
+  useEffect(() => {
+    if (tempoCleanupRef.current) { tempoCleanupRef.current(); tempoCleanupRef.current = null; }
+    if (bpm > 0 && ctxRef.current && freqGainRef.current) {
+      tempoCleanupRef.current = connectToGains(ctxRef.current, [
+        freqGainRef.current, soundGainRef.current, droneGainRef.current,
+      ]);
+    }
+    return () => { if (tempoCleanupRef.current) { tempoCleanupRef.current(); tempoCleanupRef.current = null; } };
+  }, [bpm, connectToGains]);
 
   const stopNodes = (nodesRef) => {
     nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
@@ -820,6 +834,47 @@ export default function CosmicMixer() {
 
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeMantra || activeDrones.size > 0 || vibeOn || visualLayers.length > 0;
   const activeCount = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0) + (vibeOn ? 1 : 0) + visualLayers.length;
+
+  // ─── Voice Command Listener ───
+  useEffect(() => {
+    const handler = (e) => {
+      const { intent, params } = e.detail;
+      if (intent === 'mixer_play' && params?.target && params?.value) {
+        const val = String(params.value).toLowerCase();
+        if (params.target === 'frequency') {
+          const hz = parseFloat(val);
+          const freq = FREQUENCIES.find(f => f.hz === hz || f.label.toLowerCase().includes(val));
+          if (freq) toggleFreq(freq);
+        } else if (params.target === 'sound') {
+          const sound = SOUNDS.find(s => s.id === val || s.label.toLowerCase().includes(val));
+          if (sound) toggleSound(sound);
+        } else if (params.target === 'drone') {
+          const drone = INSTRUMENT_DRONES.find(d => d.id === val || d.label.toLowerCase().includes(val));
+          if (drone) toggleDrone(drone);
+        } else if (params.target === 'mantra') {
+          const mantra = MANTRAS.find(m => m.id === val || m.label.toLowerCase().includes(val));
+          if (mantra) toggleMantra(mantra);
+        }
+      } else if (intent === 'mixer_stop') {
+        if (params?.target === 'all') stopAll();
+      } else if (intent === 'mixer_volume') {
+        const dir = params?.direction;
+        if (params?.target === 'master' || !params?.target) {
+          if (dir === 'up') setMasterVol(v => Math.min(100, v + 15));
+          else if (dir === 'down') setMasterVol(v => Math.max(0, v - 15));
+          else if (dir === 'set' && params?.value != null) setMasterVol(Number(params.value));
+        }
+      } else if (intent === 'mixer_multi' && params?.commands) {
+        params.commands.forEach(cmd => {
+          window.dispatchEvent(new CustomEvent('cosmic-voice-command', {
+            detail: { intent: 'mixer_play', params: { target: cmd.target, value: cmd.value } }
+          }));
+        });
+      }
+    };
+    window.addEventListener('cosmic-voice-command', handler);
+    return () => window.removeEventListener('cosmic-voice-command', handler);
+  }, [toggleFreq, toggleSound, toggleDrone, toggleMantra, stopAll]);
 
   if (!user) return null;
 
@@ -1297,6 +1352,72 @@ export default function CosmicMixer() {
                   <p className="text-[9px] mt-1" style={{ color: 'var(--text-muted)' }}>
                     {firstActiveFreq ? `Synced to ${firstActiveFreq.label}` : 'Pulses at a calm rhythm'}
                   </p>
+                </ChannelStrip>
+
+                {/* ── Tempo / Beat Control ── */}
+                <ChannelStrip title="Tempo" icon={Radio} active={bpm > 0} color="#EC4899" noFader>
+                  {/* BPM Slider */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[9px] w-12 tabular-nums font-bold" style={{ color: bpm > 0 ? '#EC4899' : 'var(--text-muted)' }}>
+                      {bpm > 0 ? `${bpm} BPM` : 'Off'}
+                    </span>
+                    <input
+                      type="range" min="0" max="200" step="1" value={bpm}
+                      onChange={e => setBpm(Number(e.target.value))}
+                      className="flex-1 h-1 appearance-none rounded-full cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, ${bpm > 0 ? '#EC4899' : 'rgba(255,255,255,0.1)'} ${bpm / 2}%, rgba(255,255,255,0.06) ${bpm / 2}%)`,
+                        accentColor: '#EC4899',
+                      }}
+                      data-testid="tempo-slider"
+                    />
+                    <button onClick={tapTempo}
+                      className="text-[9px] px-2.5 py-1.5 rounded-lg transition-all hover:scale-105 active:scale-95"
+                      style={{
+                        background: 'rgba(236,72,153,0.1)',
+                        border: '1px solid rgba(236,72,153,0.2)',
+                        color: '#EC4899',
+                      }}
+                      data-testid="tap-tempo-btn">
+                      Tap
+                    </button>
+                    {bpm > 0 && (
+                      <button onClick={stopTempo}
+                        className="text-[9px] px-2 py-1.5 rounded-lg transition-all hover:scale-105"
+                        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
+                        data-testid="tempo-stop-btn">
+                        <Square size={9} />
+                      </button>
+                    )}
+                  </div>
+                  {/* Beat pulse indicator */}
+                  {bpm > 0 && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 rounded-full transition-all" style={{
+                        background: beatPulse ? '#EC4899' : 'rgba(236,72,153,0.15)',
+                        boxShadow: beatPulse ? '0 0 12px rgba(236,72,153,0.6)' : 'none',
+                        transform: beatPulse ? 'scale(1.4)' : 'scale(1)',
+                      }} />
+                      <span className="text-[8px]" style={{ color: 'rgba(236,72,153,0.5)' }}>
+                        All layers breathing to {bpm} BPM
+                      </span>
+                    </div>
+                  )}
+                  {/* Preset tempo modes */}
+                  <div className="flex flex-wrap gap-1">
+                    {TEMPO_PRESETS.map(p => (
+                      <button key={p.id} onClick={() => setTempoFromPreset(p)}
+                        className="text-[9px] px-2 py-1 rounded-full transition-all hover:scale-105"
+                        style={{
+                          background: activePreset?.id === p.id ? `${p.color}18` : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${activePreset?.id === p.id ? `${p.color}40` : 'rgba(255,255,255,0.05)'}`,
+                          color: activePreset?.id === p.id ? p.color : 'var(--text-muted)',
+                        }}
+                        data-testid={`tempo-preset-${p.id}`}>
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
                 </ChannelStrip>
               </div>
             </motion.div>
