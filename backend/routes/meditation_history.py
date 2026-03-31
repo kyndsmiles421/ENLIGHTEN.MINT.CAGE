@@ -81,4 +81,11 @@ async def log_meditation(data: dict = Body(...), user=Depends(get_current_user))
             return_data["quest_xp"] = quest_result
     except Exception:
         pass
+    try:
+        await db.multiverse_state.update_one(
+            {"user_id": user["id"]},
+            {"$inc": {"universe_resonance.ethereal": 2}},
+        )
+    except Exception:
+        pass
     return return_data

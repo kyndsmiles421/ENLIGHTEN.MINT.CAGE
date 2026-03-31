@@ -88,6 +88,7 @@ const ALL_ACTIONS = [
   { icon: Globe, label: 'Realm', path: '/starseed-realm', color: '#C084FC', group: 'Explore' },
   { icon: Compass, label: 'Multiverse', path: '/multiverse-map', color: '#06B6D4', group: 'Explore' },
   { icon: Swords, label: 'Cosmic RPG', path: '/rpg', color: '#EF4444', group: 'Explore' },
+  { icon: Star, label: 'Nexus', path: '/nexus', color: '#A855F7', group: 'Explore' },
   { icon: Sparkles, label: 'Journey', path: '/starseed', color: '#818CF8', group: 'Explore' },
 ];
 

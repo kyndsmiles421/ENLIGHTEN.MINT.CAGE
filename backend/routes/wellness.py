@@ -29,6 +29,13 @@ async def create_mood(mood: MoodCreate, user=Depends(get_current_user)):
             doc["quest_xp"] = quest_result
     except Exception:
         pass
+    try:
+        await db.multiverse_state.update_one(
+            {"user_id": user["id"]},
+            {"$inc": {"universe_resonance.terrestrial": 2}},
+        )
+    except Exception:
+        pass
     return doc
 
 @router.get("/moods")
@@ -138,6 +145,13 @@ async def create_journal(entry: JournalCreate, user=Depends(get_current_user)):
         quest_result = await award_quest_xp(user["id"], "journal")
         if quest_result:
             doc["quest_xp"] = quest_result
+    except Exception:
+        pass
+    try:
+        await db.multiverse_state.update_one(
+            {"user_id": user["id"]},
+            {"$inc": {"universe_resonance.astral": 2}},
+        )
     except Exception:
         pass
     return doc
