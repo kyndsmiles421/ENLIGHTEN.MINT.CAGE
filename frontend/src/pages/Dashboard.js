@@ -86,7 +86,7 @@ const ALL_ACTIONS = [
   { icon: Star, label: 'Starseed', path: '/starseed-adventure', color: '#818CF8', group: 'Explore' },
   { icon: Globe, label: 'Realm', path: '/starseed-realm', color: '#C084FC', group: 'Explore' },
   { icon: Compass, label: 'Multiverse', path: '/multiverse-realms', color: '#06B6D4', group: 'Explore' },
-  { icon: Swords, label: 'Realm', path: '/rpg', color: '#EF4444', group: 'Explore' },
+  { icon: Swords, label: 'Cosmic RPG', path: '/rpg', color: '#EF4444', group: 'Explore' },
   { icon: Sparkles, label: 'Journey', path: '/starseed', color: '#818CF8', group: 'Explore' },
 ];
 
