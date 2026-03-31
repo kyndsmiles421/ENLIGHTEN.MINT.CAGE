@@ -132,11 +132,20 @@ export default function CosmicAssistant() {
         timestamp: new Date().toISOString(),
       }]);
     } catch (err) {
-      const errMsg = err.response?.data?.detail || 'Connection disrupted';
-      toast.error(typeof errMsg === 'string' ? errMsg : 'Could not reach Cosmos');
+      const status = err?.response?.status;
+      const errText = status === 429
+        ? 'The cosmos needs a breath — try again in a moment.'
+        : status >= 500
+          ? 'A ripple in the astral plane. Your message is safe — try again.'
+          : 'The cosmic connection wavered. Try again.';
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        text: errText,
+        timestamp: new Date().toISOString(),
+      }]);
     }
     setLoading(false);
-  }, [input, loading, sessionId, authHeaders]);
+  }, [input, loading, sessionId, authHeaders, pageCtx, currentPath]);
 
   const startNewChat = useCallback(() => {
     setSessionId(null);

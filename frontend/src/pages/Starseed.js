@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Sparkles, ChevronRight, Play, RotateCcw, Trophy, Volume2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
+import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -20,9 +21,19 @@ export default function Starseed() {
   const [path, setPath] = useState([]);
   const [myOrigin, setMyOrigin] = useState(null);
   const [journeys, setJourneys] = useState([]);
+  const [fetchError, setFetchError] = useState(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`${API}/starseed/origins`).then(r => setOrigins(r.data)).catch(() => {});
+    setInitialLoading(true);
+    setFetchError(null);
+    axios.get(`${API}/starseed/origins`)
+      .then(r => setOrigins(r.data))
+      .catch(err => {
+        const cosmic = getCosmicErrorMessage(err);
+        setFetchError(cosmic);
+      })
+      .finally(() => setInitialLoading(false));
     if (authHeaders?.Authorization) {
       axios.get(`${API}/starseed/my-origin`, { headers: authHeaders }).then(r => setMyOrigin(r.data)).catch(() => {});
       axios.get(`${API}/starseed/my-journeys`, { headers: authHeaders }).then(r => setJourneys(r.data)).catch(() => {});
@@ -36,7 +47,10 @@ export default function Starseed() {
       setChapter(res.data);
       setPath(['awakening']);
       setPhase('adventure');
-    } catch { toast.error('Could not start journey'); }
+    } catch (err) {
+      const msg = getCosmicErrorMessage(err);
+      toast.error(msg.title);
+    }
     setLoading(false);
   }, []);
 
@@ -47,7 +61,10 @@ export default function Starseed() {
       setChapter(res.data);
       setPath(p => [...p, choice.leads_to]);
       if (res.data.ending) setPhase('ending');
-    } catch { toast.error('Path not found'); }
+    } catch (err) {
+      const msg = getCosmicErrorMessage(err);
+      toast.error(msg.message);
+    }
     setLoading(false);
   }, []);
 
@@ -90,6 +107,18 @@ export default function Starseed() {
           </div>
         </div>
 
+        {/* Initial Loading / Error States */}
+        {initialLoading && (
+          <CosmicInlineLoader message="Channeling starseed origins..." />
+        )}
+        {fetchError && !initialLoading && (
+          <CosmicError
+            title={fetchError.title}
+            message={fetchError.message}
+            onRetry={() => window.location.reload()}
+          />
+        )}
+        {!initialLoading && !fetchError && (
         <AnimatePresence mode="wait">
           {/* ─── INTRO PHASE ─── */}
           {phase === 'intro' && (
@@ -189,7 +218,10 @@ export default function Starseed() {
 
               <div className="space-y-3">
                 <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Choose your path</p>
-                {chapter.choices.map((c, i) => (
+                {loading ? (
+                  <CosmicInlineLoader message="The cosmos is revealing your path..." />
+                ) : (
+                chapter.choices.map((c, i) => (
                   <motion.button key={c.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }}
                     onClick={() => makeChoice(c)} disabled={loading}
                     className="w-full p-4 rounded-xl text-left flex items-start gap-3 group hover:scale-[1.01] transition-all"
@@ -206,7 +238,8 @@ export default function Starseed() {
                     <p className="text-xs leading-relaxed flex-1" style={{ color: 'var(--text-primary)' }}>{c.text}</p>
                     <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0" />
                   </motion.button>
-                ))}
+                ))
+                )}
               </div>
 
               <button onClick={restart} className="mt-6 flex items-center gap-1.5 text-[10px] mx-auto" style={{ color: 'var(--text-muted)' }}>
@@ -288,6 +321,7 @@ export default function Starseed() {
             </motion.div>
           )}
         </AnimatePresence>
+        )}
       </div>
     </div>
   );

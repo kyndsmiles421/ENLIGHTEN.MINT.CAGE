@@ -22,6 +22,11 @@ import { MixerProvider } from './context/MixerContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
+import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
+import { setupAxiosInterceptors } from './utils/axiosInterceptor';
+
+// Initialize global error handling
+setupAxiosInterceptors();
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -145,6 +150,7 @@ function AnimatedRoutes() {
 
   return (
     <div className="page-enter" key={location.pathname}>
+    <CosmicErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes location={location}>
         <Route path="/" element={<Landing />} />
@@ -246,6 +252,7 @@ function AnimatedRoutes() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    </CosmicErrorBoundary>
     </div>
   );
 }

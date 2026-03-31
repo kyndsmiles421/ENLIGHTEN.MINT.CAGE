@@ -415,8 +415,17 @@ export default function SpiritualCoach() {
       }, { headers: authHeaders });
       const assistantMsg = { role: 'assistant', text: r.data.reply, timestamp: new Date().toISOString() };
       setMessages(prev => [...prev, assistantMsg]);
-    } catch {
-      toast.error('Failed to get response');
+    } catch (err) {
+      const status = err?.response?.status;
+      const msg = status === 429
+        ? 'Sage needs a moment to center — try again shortly'
+        : 'The cosmic connection wavered — try again';
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        text: msg,
+        timestamp: new Date().toISOString(),
+        isError: true,
+      }]);
     }
     setSending(false);
   };

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Globe, Play, Volume2, Lock, Sparkles, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, SOUNDS as MIXER_SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
+import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -17,9 +18,19 @@ export default function MultiverseRealms() {
   const [activeRealm, setActiveRealm] = useState(null);
   const [visitStats, setVisitStats] = useState([]);
   const [entering, setEntering] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`${API}/realms/`).then(r => setRealms(r.data)).catch(() => {});
+    setInitialLoading(true);
+    setFetchError(null);
+    axios.get(`${API}/realms/`)
+      .then(r => setRealms(r.data))
+      .catch(err => {
+        const cosmic = getCosmicErrorMessage(err);
+        setFetchError(cosmic);
+      })
+      .finally(() => setInitialLoading(false));
     if (authHeaders?.Authorization) {
       axios.get(`${API}/realms/visits/stats`, { headers: authHeaders }).then(r => setVisitStats(r.data)).catch(() => {});
     }
@@ -50,7 +61,10 @@ export default function MultiverseRealms() {
 
       // Refresh stats
       axios.get(`${API}/realms/visits/stats`, { headers: authHeaders }).then(r => setVisitStats(r.data)).catch(() => {});
-    } catch { toast.error('Could not enter realm'); }
+    } catch (err) {
+      const msg = getCosmicErrorMessage(err);
+      toast.error(msg.title);
+    }
     setEntering(false);
   }, [authHeaders, stopAll, toggleFreq, toggleSound, toggleDrone, activeFreqs, activeSounds, activeDrones]);
 
@@ -78,11 +92,26 @@ export default function MultiverseRealms() {
           </div>
         </div>
 
+        {/* Loading / Error States */}
+        {initialLoading && (
+          <CosmicInlineLoader message="Opening dimensional gateways..." />
+        )}
+        {fetchError && !initialLoading && (
+          <CosmicError
+            title={fetchError.title}
+            message={fetchError.message}
+            onRetry={() => window.location.reload()}
+          />
+        )}
+        {!initialLoading && !fetchError && (
         <AnimatePresence mode="wait">
           {/* ─── REALM LIST ─── */}
           {!activeRealm && (
             <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <div className="space-y-3">
+              {entering && (
+                <CosmicInlineLoader message="Entering dimensional gateway..." />
+              )}
+              <div className="space-y-3" style={{ opacity: entering ? 0.4 : 1, transition: 'opacity 0.3s' }}>
                 {realms.map((realm, i) => {
                   const visits = getVisitCount(realm.id);
                   return (
@@ -192,6 +221,7 @@ export default function MultiverseRealms() {
             </motion.div>
           )}
         </AnimatePresence>
+        )}
       </div>
     </div>
   );
