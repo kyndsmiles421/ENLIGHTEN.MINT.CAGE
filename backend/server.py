@@ -86,6 +86,7 @@ from routes.voice_command import router as voice_command_router
 from routes.seasonal import router as seasonal_router
 from routes.harmonics import router as harmonics_router
 from routes.gemini_chat import router as gemini_chat_router
+from routes.rpg import router as rpg_router
 
 app = FastAPI()
 
@@ -139,6 +140,7 @@ all_routers = [
     seasonal_router,
     harmonics_router,
     gemini_chat_router,
+    rpg_router,
 ]
 
 for r in all_routers:

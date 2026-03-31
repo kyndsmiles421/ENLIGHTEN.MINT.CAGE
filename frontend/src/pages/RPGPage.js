@@ -1,0 +1,662 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft, Sword, Shield, Map, Users, Package, Star, Sparkles,
+  ChevronRight, Plus, Minus, Zap, Heart, Eye, Music, Brain,
+  Lock, Gift, Compass, Globe, X, Crown
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
+import { toast } from 'sonner';
+import axios from 'axios';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const STAT_ICONS = { wisdom: Brain, vitality: Heart, resonance: Music, harmony: Sparkles, focus: Eye };
+const STAT_COLORS = { wisdom: '#C084FC', vitality: '#EF4444', resonance: '#818CF8', harmony: '#22C55E', focus: '#F59E0B' };
+const SLOT_ICONS = { head: Crown, body: Shield, conduit: Sword, trinket: Star };
+const RARITY_BG = {
+  common: 'rgba(156,163,175,0.06)', uncommon: 'rgba(34,197,94,0.06)', rare: 'rgba(59,130,246,0.06)',
+  epic: 'rgba(168,85,247,0.06)', legendary: 'rgba(245,158,11,0.06)', mythic: 'rgba(239,68,68,0.06)',
+};
+
+// ── Stat Bar ──
+function StatBar({ name, value, bonus, icon: Icon, color, onAllocate, canAllocate }) {
+  const total = value + bonus;
+  return (
+    <div className="flex items-center gap-2">
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${color}12` }}>
+        <Icon size={13} style={{ color }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-0.5">
+          <span className="text-[10px] capitalize" style={{ color: 'var(--text-secondary)' }}>{name}</span>
+          <span className="text-[10px] font-semibold" style={{ color }}>
+            {total}{bonus > 0 && <span className="text-[8px] opacity-60"> (+{bonus})</span>}
+          </span>
+        </div>
+        <div className="w-full h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, total * 4)}%` }}
+            className="h-full rounded-full" style={{ background: color }} />
+        </div>
+      </div>
+      {canAllocate && (
+        <button onClick={() => onAllocate(name)} className="p-1 rounded hover:bg-white/5"
+          data-testid={`allocate-${name}`}>
+          <Plus size={10} style={{ color }} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Item Card ──
+function ItemCard({ item, onEquip, onUse, compact }) {
+  const SlotIcon = item.slot ? (SLOT_ICONS[item.slot] || Star) : Package;
+  return (
+    <motion.div whileHover={{ scale: 1.02 }} className="rounded-xl p-2.5 cursor-pointer group"
+      style={{ background: RARITY_BG[item.rarity] || RARITY_BG.common, border: `1px solid ${item.rarity_color || '#9CA3AF'}15` }}
+      data-testid={`item-${item.id}`}>
+      <div className="flex items-start gap-2">
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: `${item.rarity_color || '#9CA3AF'}12`, border: `1px solid ${item.rarity_color || '#9CA3AF'}20` }}>
+          <SlotIcon size={14} style={{ color: item.rarity_color || '#9CA3AF' }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-medium truncate" style={{ color: item.rarity_color || '#F8FAFC' }}>{item.name}</p>
+          <p className="text-[8px] capitalize" style={{ color: 'var(--text-muted)' }}>{item.rarity} {item.category}</p>
+          {!compact && item.stats && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {Object.entries(item.stats).map(([s, v]) => (
+                <span key={s} className="text-[7px] px-1 py-0.5 rounded"
+                  style={{ background: `${STAT_COLORS[s] || '#818CF8'}10`, color: STAT_COLORS[s] || '#818CF8' }}>
+                  +{v} {s}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {item.slot && onEquip && (
+            <button onClick={(e) => { e.stopPropagation(); onEquip(item.id); }}
+              className="p-1 rounded text-[7px]" style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }}
+              data-testid={`equip-${item.id}`}>Equip</button>
+          )}
+          {item.category === 'consumable' && onUse && (
+            <button onClick={(e) => { e.stopPropagation(); onUse(item.id); }}
+              className="p-1 rounded text-[7px]" style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}
+              data-testid={`use-${item.id}`}>Use</button>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Equipment Slot ──
+function EquipSlot({ slot, item, onUnequip }) {
+  const Icon = SLOT_ICONS[slot] || Star;
+  return (
+    <div className="rounded-xl p-3 text-center group"
+      style={{ background: item ? `${item.rarity_color}08` : 'rgba(255,255,255,0.02)', border: `1px solid ${item ? `${item.rarity_color}15` : 'rgba(255,255,255,0.04)'}` }}
+      data-testid={`slot-${slot}`}>
+      <div className="w-10 h-10 mx-auto rounded-xl flex items-center justify-center mb-1.5"
+        style={{ background: item ? `${item.rarity_color}10` : 'rgba(255,255,255,0.03)' }}>
+        <Icon size={18} style={{ color: item ? item.rarity_color : 'rgba(255,255,255,0.15)' }} />
+      </div>
+      <p className="text-[9px] capitalize mb-0.5" style={{ color: 'var(--text-muted)' }}>{slot}</p>
+      {item ? (
+        <>
+          <p className="text-[10px] font-medium truncate" style={{ color: item.rarity_color }}>{item.name}</p>
+          {onUnequip && (
+            <button onClick={() => onUnequip(slot)}
+              className="mt-1 text-[7px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}
+              data-testid={`unequip-${slot}`}>Remove</button>
+          )}
+        </>
+      ) : (
+        <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.1)' }}>Empty</p>
+      )}
+    </div>
+  );
+}
+
+// ── World Region Node ──
+function RegionNode({ region, onExplore }) {
+  const accessible = region.accessible;
+  const discovered = region.discovered;
+  return (
+    <motion.button whileHover={accessible ? { scale: 1.05 } : {}} whileTap={accessible ? { scale: 0.95 } : {}}
+      onClick={() => accessible && onExplore(region.id)}
+      disabled={!accessible}
+      className="absolute rounded-xl p-2.5 text-left transition-all"
+      style={{
+        left: `${region.x}%`, top: `${region.y}%`, transform: 'translate(-50%, -50%)',
+        width: '120px',
+        background: discovered ? `${region.color}08` : 'rgba(255,255,255,0.01)',
+        border: `1px solid ${discovered ? `${region.color}20` : 'rgba(255,255,255,0.03)'}`,
+        opacity: discovered ? 1 : 0.3,
+        cursor: accessible ? 'pointer' : 'default',
+      }}
+      data-testid={`region-${region.id}`}>
+      {!discovered ? (
+        <div className="flex items-center justify-center py-1">
+          <Lock size={14} style={{ color: 'rgba(255,255,255,0.1)' }} />
+        </div>
+      ) : (
+        <>
+          <div className="w-5 h-5 rounded flex items-center justify-center mb-1" style={{ background: `${region.color}15` }}>
+            <Compass size={10} style={{ color: region.color }} />
+          </div>
+          <p className="text-[9px] font-medium truncate" style={{ color: accessible ? region.color : 'var(--text-muted)' }}>{region.name}</p>
+          <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Lv {region.level_req}+</p>
+        </>
+      )}
+    </motion.button>
+  );
+}
+
+// ── Boss Card ──
+function BossCard({ boss, onJoin }) {
+  const hpPct = boss.active_encounter ? (boss.active_encounter.current_hp / boss.active_encounter.max_hp * 100) : 100;
+  const participants = boss.active_encounter?.participants?.length || 0;
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl overflow-hidden" style={{ background: `${boss.color}06`, border: `1px solid ${boss.color}15` }}
+      data-testid={`boss-${boss.id}`}>
+      <div className="p-4">
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <p className="text-sm font-medium" style={{ color: boss.color === '#1F2937' ? '#9CA3AF' : boss.color }}>{boss.name}</p>
+            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Level {boss.level} | {boss.region}</p>
+          </div>
+          <span className="text-[8px] px-2 py-0.5 rounded-full" style={{
+            background: boss.accessible ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+            color: boss.accessible ? '#22C55E' : '#EF4444',
+          }}>{boss.accessible ? 'Available' : 'Locked'}</span>
+        </div>
+        <p className="text-[10px] mb-3" style={{ color: 'var(--text-secondary)' }}>{boss.description}</p>
+        {/* HP Bar */}
+        <div className="mb-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>HP</span>
+            <span className="text-[8px]" style={{ color: boss.color }}>
+              {boss.active_encounter ? `${boss.active_encounter.current_hp.toLocaleString()} / ${boss.hp.toLocaleString()}` : `${boss.hp.toLocaleString()}`}
+            </span>
+          </div>
+          <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${hpPct}%`, background: boss.color }} />
+          </div>
+        </div>
+        {/* Phases */}
+        <div className="flex gap-1 mb-3">
+          {boss.phases.map((p, i) => (
+            <span key={i} className="text-[7px] px-1.5 py-0.5 rounded"
+              style={{
+                background: boss.active_encounter?.phase >= i ? `${boss.color}15` : 'rgba(255,255,255,0.02)',
+                color: boss.active_encounter?.phase >= i ? boss.color : 'var(--text-muted)',
+                border: `1px solid ${boss.active_encounter?.phase >= i ? `${boss.color}20` : 'rgba(255,255,255,0.03)'}`,
+              }}>{p.name}</span>
+          ))}
+        </div>
+        <div className="flex items-center justify-between">
+          {participants > 0 && <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{participants} warriors joined</span>}
+          <button onClick={() => onJoin(boss.id)} disabled={!boss.accessible}
+            className="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105 disabled:opacity-30"
+            style={{ background: `${boss.color}12`, border: `1px solid ${boss.color}20`, color: boss.color }}
+            data-testid={`join-boss-${boss.id}`}>
+            {boss.active_encounter ? 'Join Battle' : 'Awaken Boss'}
+          </button>
+        </div>
+      </div>
+      {/* Loot Preview */}
+      <div className="px-4 py-2" style={{ background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+        <p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Possible Drops</p>
+        <div className="flex gap-1 flex-wrap">
+          {boss.loot.map((l, i) => (
+            <span key={i} className="text-[7px] px-1.5 py-0.5 rounded"
+              style={{ background: RARITY_BG[l.rarity], border: `1px solid ${l.rarity_color || '#9CA3AF'}15`, color: l.rarity_color || '#9CA3AF' }}>
+              {l.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  MAIN PAGE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const TABS = [
+  { id: 'character', label: 'Character', icon: Star },
+  { id: 'inventory', label: 'Inventory', icon: Package },
+  { id: 'world', label: 'World', icon: Map },
+  { id: 'bosses', label: 'Bosses', icon: Sword },
+  { id: 'party', label: 'Circle', icon: Users },
+];
+
+export default function RPGPage() {
+  const navigate = useNavigate();
+  const { authHeaders } = useAuth();
+  const [tab, setTab] = useState('character');
+  const [character, setCharacter] = useState(null);
+  const [inventory, setInventory] = useState(null);
+  const [world, setWorld] = useState(null);
+  const [bosses, setBosses] = useState(null);
+  const [party, setParty] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [encounter, setEncounter] = useState(null);
+  const [attacking, setAttacking] = useState(false);
+
+  const headers = authHeaders;
+
+  const fetchData = useCallback(async () => {
+    if (!headers?.Authorization) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const [charRes, invRes, worldRes, bossRes, partyRes] = await Promise.all([
+        axios.get(`${API}/rpg/character`, { headers }),
+        axios.get(`${API}/rpg/inventory`, { headers }),
+        axios.get(`${API}/rpg/world`, { headers }),
+        axios.get(`${API}/rpg/bosses`, { headers }),
+        axios.get(`${API}/rpg/party`, { headers }),
+      ]);
+      setCharacter(charRes.data);
+      setInventory(invRes.data);
+      setWorld(worldRes.data);
+      setBosses(bossRes.data);
+      setParty(partyRes.data.party);
+    } catch (err) {
+      setError(getCosmicErrorMessage(err));
+    }
+    setLoading(false);
+  }, [headers]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const allocateStat = async (stat) => {
+    try {
+      await axios.post(`${API}/rpg/character/allocate-stat`, { stat }, { headers });
+      toast(`+1 ${stat}!`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const equipItem = async (itemId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/equip`, { item_id: itemId }, { headers });
+      toast(`Equipped ${res.data.equipped}`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const unequipItem = async (slot) => {
+    try {
+      const res = await axios.post(`${API}/rpg/unequip`, { slot }, { headers });
+      toast(`Removed ${res.data.unequipped}`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const useConsumable = async (itemId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/inventory/use-consumable`, { item_id: itemId }, { headers });
+      toast(`Used ${res.data.used}!`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const exploreRegion = async (regionId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/world/explore`, { region_id: regionId }, { headers });
+      const d = res.data;
+      let msg = `Explored ${d.region}! +${d.xp_gained} XP, +${d.cosmic_dust_earned} dust`;
+      if (d.loot) msg += ` — Found: ${d.loot.name} (${d.loot.rarity})!`;
+      if (d.newly_discovered?.length) msg += ` — Discovered: ${d.newly_discovered.join(', ')}`;
+      toast(msg);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const joinBoss = async (bossId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/bosses/join`, { boss_id: bossId }, { headers });
+      setEncounter(res.data);
+      toast(`Joined battle against ${res.data.boss}!`);
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const attackBoss = async (attackType) => {
+    if (!encounter || attacking) return;
+    setAttacking(true);
+    try {
+      const res = await axios.post(`${API}/rpg/bosses/attack`, {
+        encounter_id: encounter.encounter_id, attack_type: attackType,
+      }, { headers });
+      setEncounter(prev => ({ ...prev, current_hp: res.data.boss_hp, phase: res.data.phase }));
+      let msg = `${res.data.damage} damage (${attackType})!`;
+      if (res.data.defeated) {
+        msg = `BOSS DEFEATED! ${res.data.damage} final blow!`;
+        if (res.data.loot_drop) msg += ` LOOT: ${res.data.loot_drop.name}!`;
+        setEncounter(null);
+      }
+      toast(msg);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+    setAttacking(false);
+  };
+
+  const claimStarterKit = async () => {
+    try {
+      await axios.post(`${API}/rpg/character/starter-kit`, {}, { headers });
+      toast('Starter kit claimed!');
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Already claimed'); }
+  };
+
+  const createParty = async () => {
+    const name = prompt('Name your Circle:');
+    if (!name) return;
+    try {
+      const res = await axios.post(`${API}/rpg/party/create`, { name }, { headers });
+      toast(`Circle "${name}" created! Code: ${res.data.invite_code}`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  const joinParty = async () => {
+    const code = prompt('Enter invite code:');
+    if (!code) return;
+    try {
+      const res = await axios.post(`${API}/rpg/party/join`, { invite_code: code }, { headers });
+      toast(`Joined ${res.data.joined}!`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Invalid code'); }
+  };
+
+  const leaveParty = async () => {
+    try {
+      await axios.post(`${API}/rpg/party/leave`, {}, { headers });
+      toast('Left the Circle');
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+  };
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}><CosmicInlineLoader message="Loading your cosmic adventure..." /></div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}><CosmicError title={error.title} message={error.message} onRetry={fetchData} /></div>;
+
+  const c = character;
+  const equipMap = c?.equipped || {};
+  const equipBonuses = {};
+  Object.values(equipMap).forEach(item => {
+    Object.entries(item.stats || {}).forEach(([s, v]) => { equipBonuses[s] = (equipBonuses[s] || 0) + v; });
+  });
+
+  return (
+    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="rpg-page">
+      {/* Header */}
+      <div className="sticky top-0 z-10 px-4 py-3" style={{ background: 'rgba(8,8,16,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate('/dashboard')} className="p-1.5 rounded-lg hover:bg-white/5"><ArrowLeft size={16} style={{ color: 'var(--text-muted)' }} /></button>
+            <div>
+              <h1 className="text-base font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>Cosmic Realm</h1>
+              <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Level {c?.level} {c?.title}</p>
+            </div>
+          </div>
+          {/* XP Bar */}
+          <div className="flex items-center gap-2">
+            <div className="w-24">
+              <div className="flex justify-between text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>
+                <span>XP</span><span>{c?.xp_current}/{c?.xp_next}</span>
+              </div>
+              <div className="w-full h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <div className="h-full rounded-full" style={{ width: `${(c?.xp_current / c?.xp_next) * 100}%`, background: '#818CF8' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Tabs */}
+        <div className="flex gap-1">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              style={{
+                background: tab === t.id ? 'rgba(129,140,248,0.1)' : 'transparent',
+                color: tab === t.id ? '#818CF8' : 'var(--text-muted)',
+                border: tab === t.id ? '1px solid rgba(129,140,248,0.15)' : '1px solid transparent',
+              }}
+              data-testid={`tab-${t.id}`}>
+              <t.icon size={11} /> {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-4 py-4">
+        <AnimatePresence mode="wait">
+          {/* CHARACTER TAB */}
+          {tab === 'character' && (
+            <motion.div key="char" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {/* Equipment Slots */}
+              <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Equipment</p>
+              <div className="grid grid-cols-4 gap-2 mb-5">
+                {['head', 'body', 'conduit', 'trinket'].map(slot => (
+                  <EquipSlot key={slot} slot={slot} item={equipMap[slot]} onUnequip={unequipItem} />
+                ))}
+              </div>
+              {/* Stats */}
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Stats</p>
+                {c?.stat_points > 0 && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#F59E0B' }}>{c.stat_points} points</span>}
+              </div>
+              <div className="space-y-2.5 mb-5">
+                {Object.entries(c?.stats || {}).map(([name, val]) => (
+                  <StatBar key={name} name={name} value={val} bonus={equipBonuses[name] || 0}
+                    icon={STAT_ICONS[name] || Star} color={STAT_COLORS[name] || '#818CF8'}
+                    onAllocate={allocateStat} canAllocate={c?.stat_points > 0} />
+                ))}
+              </div>
+              {/* Currencies */}
+              <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Currencies</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { name: 'Cosmic Dust', val: inventory?.currencies?.cosmic_dust, color: '#F59E0B' },
+                  { name: 'Stardust', val: inventory?.currencies?.stardust_shards, color: '#818CF8' },
+                  { name: 'Soul Fragments', val: inventory?.currencies?.soul_fragments, color: '#EF4444' },
+                ].map(cur => (
+                  <div key={cur.name} className="rounded-xl p-3 text-center" style={{ background: `${cur.color}06`, border: `1px solid ${cur.color}10` }}>
+                    <p className="text-lg font-semibold" style={{ color: cur.color }}>{cur.val || 0}</p>
+                    <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{cur.name}</p>
+                  </div>
+                ))}
+              </div>
+              {/* Passive XP */}
+              {c?.passive_xp_rate > 0 && (
+                <p className="text-[8px] mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
+                  Passive: +{c.passive_xp_rate} XP/hr from equipped trinkets
+                </p>
+              )}
+            </motion.div>
+          )}
+
+          {/* INVENTORY TAB */}
+          {tab === 'inventory' && (
+            <motion.div key="inv" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                  Items ({inventory?.count}/{inventory?.capacity})
+                </p>
+                {inventory?.count === 0 && (
+                  <button onClick={claimStarterKit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px]"
+                    style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.15)', color: '#22C55E' }}
+                    data-testid="claim-starter-kit">
+                    <Gift size={11} /> Claim Starter Kit
+                  </button>
+                )}
+              </div>
+              {inventory?.items?.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {inventory.items.map(item => (
+                    <ItemCard key={item.id} item={item} onEquip={equipItem} onUse={useConsumable} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <Package size={32} style={{ color: 'rgba(255,255,255,0.06)' }} className="mx-auto mb-3" />
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Your inventory is empty</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* WORLD MAP TAB */}
+          {tab === 'world' && (
+            <motion.div key="world" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <p className="text-[9px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+                World Map — {world?.regions?.filter(r => r.discovered).length}/{world?.regions?.length} discovered
+              </p>
+              <div className="relative rounded-2xl overflow-hidden" style={{ height: '400px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                {/* Connection lines */}
+                <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+                  {world?.regions?.filter(r => r.discovered).flatMap(r =>
+                    r.connections?.map(connId => {
+                      const conn = world.regions.find(rr => rr.id === connId);
+                      if (!conn || !conn.discovered) return null;
+                      return (
+                        <line key={`${r.id}-${connId}`}
+                          x1={`${r.x}%`} y1={`${r.y}%`} x2={`${conn.x}%`} y2={`${conn.y}%`}
+                          stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="4 4" />
+                      );
+                    })
+                  )}
+                </svg>
+                {/* Regions */}
+                {world?.regions?.map(r => (
+                  <RegionNode key={r.id} region={r} onExplore={exploreRegion} />
+                ))}
+              </div>
+              {/* Secrets */}
+              {world?.secrets?.length > 0 && (
+                <>
+                  <p className="text-[9px] uppercase tracking-widest mt-5 mb-2" style={{ color: 'var(--text-muted)' }}>Secret Locations</p>
+                  <div className="space-y-2">
+                    {world.secrets.map(s => (
+                      <div key={s.id} className="rounded-xl p-3" style={{ background: s.unlocked ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.01)', border: `1px solid ${s.unlocked ? 'rgba(245,158,11,0.1)' : 'rgba(255,255,255,0.03)'}` }}>
+                        <div className="flex items-center gap-2">
+                          {s.unlocked ? <Star size={12} style={{ color: '#F59E0B' }} /> : <Lock size={12} style={{ color: 'rgba(255,255,255,0.15)' }} />}
+                          <div>
+                            <p className="text-[10px] font-medium" style={{ color: s.unlocked ? '#F59E0B' : 'var(--text-muted)' }}>{s.unlocked ? s.name : '???'}</p>
+                            <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{s.unlock_condition}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </motion.div>
+          )}
+
+          {/* BOSSES TAB */}
+          {tab === 'bosses' && (
+            <motion.div key="bosses" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {encounter ? (
+                /* Active Battle */
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>Battle in Progress</p>
+                    <button onClick={() => setEncounter(null)} className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Exit</button>
+                  </div>
+                  <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <p className="text-base font-medium mb-2" style={{ color: '#EF4444' }}>{encounter.boss}</p>
+                    <div className="mb-3">
+                      <div className="w-full h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <motion.div animate={{ width: `${(encounter.current_hp / encounter.max_hp) * 100}%` }}
+                          className="h-full rounded-full" style={{ background: '#EF4444' }} />
+                      </div>
+                      <p className="text-[8px] text-right mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                        {encounter.current_hp?.toLocaleString()} / {encounter.max_hp?.toLocaleString()} HP
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { type: 'meditate', label: 'Meditate', icon: Brain, color: '#C084FC', desc: 'Focus + Wisdom' },
+                        { type: 'frequency', label: 'Frequency', icon: Music, color: '#818CF8', desc: 'Resonance + Harmony' },
+                        { type: 'breathe', label: 'Breathe', icon: Heart, color: '#22C55E', desc: 'Harmony + Vitality' },
+                      ].map(atk => (
+                        <motion.button key={atk.type} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}
+                          onClick={() => attackBoss(atk.type)} disabled={attacking}
+                          className="rounded-xl p-3 text-center transition-all disabled:opacity-40"
+                          style={{ background: `${atk.color}08`, border: `1px solid ${atk.color}15` }}
+                          data-testid={`attack-${atk.type}`}>
+                          <atk.icon size={20} style={{ color: atk.color }} className="mx-auto mb-1" />
+                          <p className="text-[10px] font-medium" style={{ color: atk.color }}>{atk.label}</p>
+                          <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>{atk.desc}</p>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Boss List */
+                <div className="space-y-3">
+                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Cosmic Threats</p>
+                  {bosses?.map(b => <BossCard key={b.id} boss={b} onJoin={joinBoss} />)}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* PARTY / CIRCLE TAB */}
+          {tab === 'party' && (
+            <motion.div key="party" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {party ? (
+                <div>
+                  <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(129,140,248,0.04)', border: '1px solid rgba(129,140,248,0.1)' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: '#818CF8' }}>{party.name}</p>
+                        <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Invite: {party.invite_code}</p>
+                      </div>
+                      <button onClick={leaveParty} className="text-[9px] px-2 py-1 rounded" style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>Leave</button>
+                    </div>
+                    <div className="space-y-2">
+                      {party.members?.map((m, i) => (
+                        <div key={i} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <Users size={12} style={{ color: m.role === 'leader' ? '#F59E0B' : '#818CF8' }} />
+                          <span className="text-[10px]" style={{ color: 'var(--text-primary)' }}>{m.name}</span>
+                          {m.role === 'leader' && <span className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.1)', color: '#F59E0B' }}>Leader</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <Users size={32} style={{ color: 'rgba(255,255,255,0.06)' }} className="mx-auto mb-3" />
+                  <p className="text-sm font-light mb-1" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>No Circle Yet</p>
+                  <p className="text-[10px] mb-4" style={{ color: 'var(--text-muted)' }}>Create or join a Circle to fight bosses together</p>
+                  <div className="flex gap-2 justify-center">
+                    <button onClick={createParty} className="px-4 py-2 rounded-lg text-[10px]"
+                      style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}
+                      data-testid="create-party">Create Circle</button>
+                    <button onClick={joinParty} className="px-4 py-2 rounded-lg text-[10px]"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-secondary)' }}
+                      data-testid="join-party">Join with Code</button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
