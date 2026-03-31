@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio, ChevronDown,
-  Play, Pause, Square, Loader2, X, Sparkles
+  Play, Pause, Square, Loader2, X, Sparkles, Sliders, ArrowRightLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
@@ -114,6 +114,127 @@ function VoiceSlider({ label, value, min, max, color, unit, center, compact, onC
   );
 }
 
+/* Waveform Type Selector */
+const WAVEFORMS = ['sine', 'triangle', 'sawtooth', 'square'];
+const WAVE_LABELS = { sine: '~', triangle: '/\\', sawtooth: '/|', square: '[]' };
+
+function WaveformSelector({ value, onChange, color }) {
+  return (
+    <div className="flex gap-0.5">
+      {WAVEFORMS.map(w => (
+        <button key={w} onClick={() => onChange(w)}
+          className="px-1 py-0.5 rounded text-[8px] font-mono transition-all"
+          style={{
+            background: value === w ? `${color}18` : 'rgba(255,255,255,0.02)',
+            color: value === w ? color : 'rgba(248,250,252,0.25)',
+            border: `1px solid ${value === w ? `${color}30` : 'rgba(255,255,255,0.04)'}`,
+          }}
+          data-testid={`waveform-${w}`}
+          title={w}
+        >{WAVE_LABELS[w]}</button>
+      ))}
+    </div>
+  );
+}
+
+/* Channel Strip — per-channel fader + controls inline */
+function ChannelStrip({ label, volKey, vol, onVolChange, color, isActive, children }) {
+  if (!isActive) return null;
+  return (
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      className="overflow-hidden"
+    >
+      <div className="flex items-center gap-2 py-1 px-1" data-testid={`channel-${volKey}`}>
+        <input type="range" min={0} max={100} value={vol ?? 75}
+          onChange={e => onVolChange(volKey, Number(e.target.value))}
+          className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
+          style={{
+            background: `linear-gradient(to right, ${color} ${vol ?? 75}%, rgba(255,255,255,0.06) ${vol ?? 75}%)`,
+            accentColor: color,
+          }}
+          data-testid={`fader-${volKey}`} />
+        <span className="text-[8px] w-8 text-right tabular-nums" style={{ color: `${color}60` }}>{vol ?? 75}%</span>
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+/* Live Waveform Visualizer */
+function WaveformVisualizer({ analyserRef, isActive }) {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+
+  useEffect(() => {
+    if (!isActive || !analyserRef?.current || !canvasRef.current) return;
+    const analyser = analyserRef.current;
+    const canvas = canvasRef.current;
+    const ctx2d = canvas.getContext('2d');
+    const bufLen = analyser.frequencyBinCount;
+    const dataArr = new Uint8Array(bufLen);
+
+    const draw = () => {
+      animRef.current = requestAnimationFrame(draw);
+      analyser.getByteTimeDomainData(dataArr);
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx2d.clearRect(0, 0, w, h);
+
+      // Gradient background
+      const grad = ctx2d.createLinearGradient(0, 0, w, 0);
+      grad.addColorStop(0, 'rgba(192,132,252,0.03)');
+      grad.addColorStop(0.5, 'rgba(45,212,191,0.03)');
+      grad.addColorStop(1, 'rgba(129,140,248,0.03)');
+      ctx2d.fillStyle = grad;
+      ctx2d.fillRect(0, 0, w, h);
+
+      // Center line
+      ctx2d.beginPath();
+      ctx2d.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx2d.lineWidth = 0.5;
+      ctx2d.moveTo(0, h / 2);
+      ctx2d.lineTo(w, h / 2);
+      ctx2d.stroke();
+
+      // Waveform
+      ctx2d.beginPath();
+      const gd = ctx2d.createLinearGradient(0, 0, w, 0);
+      gd.addColorStop(0, '#C084FC');
+      gd.addColorStop(0.4, '#2DD4BF');
+      gd.addColorStop(0.7, '#818CF8');
+      gd.addColorStop(1, '#E879F9');
+      ctx2d.strokeStyle = gd;
+      ctx2d.lineWidth = 1.5;
+      ctx2d.shadowColor = '#C084FC';
+      ctx2d.shadowBlur = 4;
+
+      const sliceW = w / bufLen;
+      let x = 0;
+      for (let i = 0; i < bufLen; i++) {
+        const v = dataArr[i] / 128.0;
+        const y = (v * h) / 2;
+        if (i === 0) ctx2d.moveTo(x, y);
+        else ctx2d.lineTo(x, y);
+        x += sliceW;
+      }
+      ctx2d.stroke();
+      ctx2d.shadowBlur = 0;
+    };
+    draw();
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+  }, [isActive, analyserRef]);
+
+  return (
+    <div className="rounded-xl overflow-hidden" data-testid="waveform-visualizer"
+      style={{ background: 'rgba(10,10,20,0.3)', border: '1px solid rgba(255,255,255,0.04)', height: 48 }}>
+      <canvas ref={canvasRef} width={600} height={48} className="w-full h-full" />
+    </div>
+  );
+}
+
 export default function CosmicMixerPage() {
   const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
@@ -177,11 +298,34 @@ export default function CosmicMixerPage() {
   const [vibeOn, setVibeOn] = useState(false);
   const [mantraLoading, setMantraLoading] = useState(false);
 
+  // Per-channel volume (0-100) and parameters
+  const [channelVols, setChannelVols] = useState({});
+  const [freqWaveforms, setFreqWaveforms] = useState({});       // per-freq waveform type
+  const [soundFilters, setSoundFilters] = useState({});          // per-sound { cutoff, resonance }
+  const [droneFilters, setDroneFilters] = useState({});          // per-drone { cutoff, resonance }
+  // Master effects bus
+  const [masterFx, setMasterFx] = useState({
+    reverb: 0,
+    delay: 0,
+    delayTime: 400,
+    chorus: 0,
+    compressor: true,
+  });
+
   const ctxRef = useRef(null);
   const masterGainRef = useRef(null);
+  const masterFxChainRef = useRef(null);
+  const analyserRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animFrameRef = useRef(null);
   const freqNodesMapRef = useRef({});
+  const freqGainMapRef = useRef({});
   const soundNodesMapRef = useRef({});
+  const soundGainMapRef = useRef({});
+  const soundFilterMapRef = useRef({});
   const droneNodesMapRef = useRef({});
+  const droneGainMapRef = useRef({});
+  const droneFilterMapRef = useRef({});
   const mantraAudioRef = useRef(null);
   const mantraSourceRef = useRef(null);
   const voiceChainRef = useRef(null);
@@ -207,9 +351,28 @@ export default function CosmicMixerPage() {
 
   const getCtx = useCallback(async () => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
-      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      masterGainRef.current = ctxRef.current.createGain();
-      masterGainRef.current.connect(ctxRef.current.destination);
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      ctxRef.current = ctx;
+
+      // Analyser for waveform visualization
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      analyserRef.current = analyser;
+
+      // Compressor for glue and loudness
+      const compressor = ctx.createDynamicsCompressor();
+      compressor.threshold.value = -18;
+      compressor.knee.value = 12;
+      compressor.ratio.value = 4;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.15;
+
+      masterGainRef.current = ctx.createGain();
+      // Chain: master → analyser → compressor → destination
+      masterGainRef.current.connect(analyser);
+      analyser.connect(compressor);
+      compressor.connect(ctx.destination);
     }
     if (ctxRef.current.state === 'suspended') await ctxRef.current.resume();
     masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
@@ -416,71 +579,144 @@ export default function CosmicMixerPage() {
   const toggleFreq = useCallback(async (freq) => {
     if (activeFreqs.has(freq.hz)) {
       stopNodesForKey(freqNodesMapRef, freq.hz);
+      delete freqGainMapRef.current[freq.hz];
       setActiveFreqs(prev => { const n = new Set(prev); n.delete(freq.hz); return n; });
       return;
     }
     const ctx = await getCtx();
     const g = masterGainRef.current;
+    const waveform = freqWaveforms[freq.hz] || 'sine';
+    const vol = (channelVols[`freq-${freq.hz}`] ?? 75) / 100;
     let nodes;
+
+    // Per-channel gain node
+    const channelGain = ctx.createGain();
+    channelGain.gain.value = vol * 0.15;
+    channelGain.connect(g);
+    freqGainMapRef.current[freq.hz] = channelGain;
+
     if (freq.hz < 20) {
       const carrier = 200; const merger = ctx.createChannelMerger(2);
-      const gn = ctx.createGain(); gn.gain.value = 0.15;
-      const oscL = ctx.createOscillator(); oscL.type = 'sine'; oscL.frequency.value = carrier;
+      const oscL = ctx.createOscillator(); oscL.type = waveform; oscL.frequency.value = carrier;
       const gL = ctx.createGain(); gL.gain.value = 1; oscL.connect(gL); gL.connect(merger, 0, 0);
-      const oscR = ctx.createOscillator(); oscR.type = 'sine'; oscR.frequency.value = carrier + freq.hz;
+      const oscR = ctx.createOscillator(); oscR.type = waveform; oscR.frequency.value = carrier + freq.hz;
       const gR = ctx.createGain(); gR.gain.value = 1; oscR.connect(gR); gR.connect(merger, 0, 1);
       const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = freq.hz * 16;
       const subG = ctx.createGain(); subG.gain.value = 0.06;
-      sub.connect(subG); subG.connect(gn); merger.connect(gn); gn.connect(g);
+      sub.connect(subG); subG.connect(channelGain); merger.connect(channelGain);
       oscL.start(); oscR.start(); sub.start();
       nodes = [oscL, oscR, sub, merger];
     } else {
-      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq.hz;
-      const gn = ctx.createGain(); gn.gain.value = 0.12;
+      const o = ctx.createOscillator(); o.type = waveform; o.frequency.value = freq.hz;
       const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
       const lg = ctx.createGain(); lg.gain.value = 0.04;
-      lfo.connect(lg); lg.connect(gn.gain); o.connect(gn); gn.connect(g);
+      lfo.connect(lg); lg.connect(channelGain.gain); o.connect(channelGain);
       o.start(); lfo.start();
       nodes = [o, lfo];
     }
     freqNodesMapRef.current[freq.hz] = nodes;
+    if (!channelVols[`freq-${freq.hz}`]) setChannelVols(v => ({...v, [`freq-${freq.hz}`]: 75}));
     setActiveFreqs(prev => new Set(prev).add(freq.hz));
-  }, [activeFreqs, getCtx]);
+  }, [activeFreqs, getCtx, channelVols, freqWaveforms]);
+
+  // Update per-channel volume in real time
+  const setChannelVolume = useCallback((key, val) => {
+    setChannelVols(v => ({...v, [key]: val}));
+    // Apply to live gain node
+    const [type, id] = key.split('-');
+    if (type === 'freq' && freqGainMapRef.current[id]) {
+      freqGainMapRef.current[id].gain.value = (val / 100) * 0.15;
+    } else if (type === 'sound' && soundGainMapRef.current[id]) {
+      soundGainMapRef.current[id].gain.value = (val / 100) * 0.15;
+    } else if (type === 'drone' && droneGainMapRef.current[id]) {
+      droneGainMapRef.current[id].gain.value = (val / 100) * 0.15;
+    }
+  }, []);
+
+  // Update per-channel filter in real time
+  const setChannelFilter = useCallback((mapRef, stateSet, id, cutoff, resonance) => {
+    stateSet(prev => ({...prev, [id]: { cutoff, resonance }}));
+    const filter = mapRef.current[id];
+    if (filter) {
+      filter.frequency.value = cutoff;
+      filter.Q.value = resonance;
+    }
+  }, []);
 
   const toggleSound = useCallback(async (sound) => {
     if (activeSounds.has(sound.id)) {
       stopNodesForKey(soundNodesMapRef, sound.id);
+      delete soundGainMapRef.current[sound.id];
+      delete soundFilterMapRef.current[sound.id];
       setActiveSounds(prev => { const n = new Set(prev); n.delete(sound.id); return n; });
       return;
     }
     const ctx = await getCtx();
-    const nodes = sound.gen(ctx, masterGainRef.current);
+    const vol = (channelVols[`sound-${sound.id}`] ?? 75) / 100;
+
+    // Per-channel gain
+    const channelGain = ctx.createGain();
+    channelGain.gain.value = vol * 0.15;
+    soundGainMapRef.current[sound.id] = channelGain;
+
+    // Per-channel filter (LP sweep)
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    const sf = soundFilters[sound.id] || { cutoff: 20000, resonance: 1 };
+    filter.frequency.value = sf.cutoff;
+    filter.Q.value = sf.resonance;
+    soundFilterMapRef.current[sound.id] = filter;
+
+    filter.connect(channelGain);
+    channelGain.connect(masterGainRef.current);
+
+    // Generate sound nodes and connect to filter instead of master
+    const nodes = sound.gen(ctx, filter);
     soundNodesMapRef.current[sound.id] = nodes;
+    if (!channelVols[`sound-${sound.id}`]) setChannelVols(v => ({...v, [`sound-${sound.id}`]: 75}));
     setActiveSounds(prev => new Set(prev).add(sound.id));
-  }, [activeSounds, getCtx]);
+  }, [activeSounds, getCtx, channelVols, soundFilters]);
 
   const toggleDrone = useCallback(async (drone) => {
     if (activeDrones.has(drone.id)) {
       stopNodesForKey(droneNodesMapRef, drone.id);
+      delete droneGainMapRef.current[drone.id];
+      delete droneFilterMapRef.current[drone.id];
       setActiveDrones(prev => { const n = new Set(prev); n.delete(drone.id); return n; });
       return;
     }
     const ctx = await getCtx();
-    const g = masterGainRef.current;
+    const vol = (channelVols[`drone-${drone.id}`] ?? 75) / 100;
+
+    // Per-channel gain
+    const channelGain = ctx.createGain();
+    channelGain.gain.value = vol * 0.15;
+    droneGainMapRef.current[drone.id] = channelGain;
+
+    // Per-channel filter
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    const df = droneFilters[drone.id] || { cutoff: drone.filterFreq, resonance: drone.filterQ };
+    filter.frequency.value = df.cutoff;
+    filter.Q.value = df.resonance;
+    droneFilterMapRef.current[drone.id] = filter;
+
+    filter.connect(channelGain);
+    channelGain.connect(masterGainRef.current);
+
     const osc = ctx.createOscillator(); osc.type = drone.wave; osc.frequency.value = drone.freq;
-    const filter = ctx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = drone.filterFreq; filter.Q.value = drone.filterQ;
     const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = drone.vibratoRate;
     const lfoGain = ctx.createGain(); lfoGain.gain.value = drone.vibratoDepth;
     lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
     const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = drone.freq / 2;
     const subGain = ctx.createGain(); subGain.gain.value = 0.3;
     sub.connect(subGain); subGain.connect(filter);
-    const droneGain = ctx.createGain(); droneGain.gain.value = 0.12;
-    osc.connect(filter); filter.connect(droneGain); droneGain.connect(g);
+    osc.connect(filter);
     osc.start(); lfo.start(); sub.start();
     droneNodesMapRef.current[drone.id] = [osc, lfo, sub];
+    if (!channelVols[`drone-${drone.id}`]) setChannelVols(v => ({...v, [`drone-${drone.id}`]: 75}));
     setActiveDrones(prev => new Set(prev).add(drone.id));
-  }, [activeDrones, getCtx]);
+  }, [activeDrones, getCtx, channelVols, droneFilters]);
 
   const toggleMantra = useCallback(async (mantra) => {
     // Clean up existing
@@ -715,7 +951,7 @@ export default function CosmicMixerPage() {
   const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   // ─── Collapsible accordion state ───
-  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, light: false, haptic: false, tempo: false, session: false });
+  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, masterFx: false, crossfade: false, light: false, haptic: false, tempo: false, session: false });
   const toggleSection = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
 
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra || activeLight || vibeOn;
@@ -837,6 +1073,9 @@ export default function CosmicMixerPage() {
           <div className="w-10" /> {/* spacer for alignment */}
         </div>
 
+        {/* Live Waveform Visualizer */}
+        <WaveformVisualizer analyserRef={analyserRef} isActive={activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || !!activeMantra} />
+
         {/* Accordion Sections */}
         <div className="space-y-2">
           <AccordionSection title="Session Mode" icon={Play} color="#EC4899" open={openSections.session} onToggle={() => toggleSection('session')} badge={sessionActive ? sessionData?.label : null}>
@@ -889,55 +1128,156 @@ export default function CosmicMixerPage() {
           </AccordionSection>
 
           <AccordionSection title="Solfeggio Frequency" icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>
-            <div className="flex flex-wrap gap-1.5">
-              {allFrequencies.map(f => {
-                const special = f.isFounder || f.isSeasonal;
-                const badgeLabel = f.isFounder ? 'FOUNDER' : f.isSeasonal ? (f.collected ? f.icon?.toUpperCase() || 'SEASONAL' : 'COLLECT') : null;
-                const badgeColor = f.isFounder ? '#FCD34D' : f.color;
-                const key = f.isFounder ? `founder-${f.hz}` : f.isSeasonal ? `seasonal-${f.seasonId}` : `freq-${f.hz}`;
-                return (
-                  <button key={key} onClick={() => {
-                    if (f.isSeasonal && !f.collected) { collectSeasonal(f.seasonId); return; }
-                    toggleFreq(f);
-                  }} className="flex-shrink-0 text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97] relative"
-                    style={{
-                      background: activeFreqs.has(f.hz) ? `${f.color}15` : special ? `${badgeColor}06` : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${activeFreqs.has(f.hz) ? `${f.color}35` : special ? `${badgeColor}18` : 'rgba(255,255,255,0.04)'}`,
-                      boxShadow: special ? `0 0 12px ${badgeColor}08` : 'none',
-                    }}
-                    data-testid={`mixer-freq-${f.hz}`}>
-                    {badgeLabel && <span className="absolute -top-1.5 -right-1.5 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{ background: `${badgeColor}18`, color: badgeColor, border: `1px solid ${badgeColor}35` }}>{badgeLabel}</span>}
-                    <span className="text-[11px] font-medium block" style={{ color: activeFreqs.has(f.hz) ? f.color : special ? badgeColor : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
-                    <span className="text-[8px] block" style={{ color: special ? `${badgeColor}60` : 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
-                  </button>
-                );
-              })}
+            <div className="space-y-1">
+              <div className="flex flex-wrap gap-1.5">
+                {allFrequencies.map(f => {
+                  const special = f.isFounder || f.isSeasonal;
+                  const badgeLabel = f.isFounder ? 'FOUNDER' : f.isSeasonal ? (f.collected ? f.icon?.toUpperCase() || 'SEASONAL' : 'COLLECT') : null;
+                  const badgeColor = f.isFounder ? '#FCD34D' : f.color;
+                  const key = f.isFounder ? `founder-${f.hz}` : f.isSeasonal ? `seasonal-${f.seasonId}` : `freq-${f.hz}`;
+                  const isActive = activeFreqs.has(f.hz);
+                  return (
+                    <div key={key} className="flex-shrink-0">
+                      <button onClick={() => {
+                        if (f.isSeasonal && !f.collected) { collectSeasonal(f.seasonId); return; }
+                        toggleFreq(f);
+                      }} className="text-left px-3 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97] relative"
+                        style={{
+                          background: isActive ? `${f.color}15` : special ? `${badgeColor}06` : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${isActive ? `${f.color}35` : special ? `${badgeColor}18` : 'rgba(255,255,255,0.04)'}`,
+                          boxShadow: special ? `0 0 12px ${badgeColor}08` : 'none',
+                        }}
+                        data-testid={`mixer-freq-${f.hz}`}>
+                        {badgeLabel && <span className="absolute -top-1.5 -right-1.5 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{ background: `${badgeColor}18`, color: badgeColor, border: `1px solid ${badgeColor}35` }}>{badgeLabel}</span>}
+                        <span className="text-[11px] font-medium block" style={{ color: isActive ? f.color : special ? badgeColor : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
+                        <span className="text-[8px] block" style={{ color: special ? `${badgeColor}60` : 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Per-channel faders for active frequencies */}
+              <AnimatePresence>
+                {Array.from(activeFreqs).map(hz => {
+                  const f = allFrequencies.find(x => x.hz === hz);
+                  if (!f) return null;
+                  return (
+                    <ChannelStrip key={`ch-${hz}`} label={f.label} volKey={`freq-${hz}`}
+                      vol={channelVols[`freq-${hz}`]} onVolChange={setChannelVolume}
+                      color={f.color} isActive={true}>
+                      <WaveformSelector value={freqWaveforms[hz] || 'sine'} color={f.color}
+                        onChange={w => {
+                          setFreqWaveforms(prev => ({...prev, [hz]: w}));
+                          // Update live oscillator waveform
+                          const nodes = freqNodesMapRef.current[hz];
+                          if (nodes) nodes.forEach(n => { if (n.type !== undefined && n.frequency) { try { n.type = w; } catch {} } });
+                        }} />
+                    </ChannelStrip>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </AccordionSection>
 
           <AccordionSection title="Ambient Sound" icon={Volume2} color="#3B82F6" open={openSections.sound} onToggle={() => toggleSection('sound')} badge={activeSounds.size > 0 ? `${activeSounds.size} active` : null}>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
-              {SOUNDS.map(s => (
-                <button key={s.id} onClick={() => toggleSound(s)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
-                  style={{ background: activeSounds.has(s.id) ? `${s.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeSounds.has(s.id) ? `${s.color}35` : 'rgba(255,255,255,0.04)'}` }}
-                  data-testid={`mixer-sound-${s.id}`}>
-                  {activeSounds.has(s.id) ? <Pause size={10} style={{ color: s.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
-                  <span className="text-[11px]" style={{ color: activeSounds.has(s.id) ? s.color : 'rgba(248,250,252,0.55)' }}>{s.label}</span>
-                </button>
-              ))}
+            <div className="space-y-1">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
+                {SOUNDS.map(s => (
+                  <button key={s.id} onClick={() => toggleSound(s)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
+                    style={{ background: activeSounds.has(s.id) ? `${s.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeSounds.has(s.id) ? `${s.color}35` : 'rgba(255,255,255,0.04)'}` }}
+                    data-testid={`mixer-sound-${s.id}`}>
+                    {activeSounds.has(s.id) ? <Pause size={10} style={{ color: s.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+                    <span className="text-[11px]" style={{ color: activeSounds.has(s.id) ? s.color : 'rgba(248,250,252,0.55)' }}>{s.label}</span>
+                  </button>
+                ))}
+              </div>
+              {/* Per-channel faders + filter for active sounds */}
+              <AnimatePresence>
+                {Array.from(activeSounds).map(id => {
+                  const s = SOUNDS.find(x => x.id === id);
+                  if (!s) return null;
+                  const sf = soundFilters[id] || { cutoff: 20000, resonance: 1 };
+                  return (
+                    <motion.div key={`ch-sound-${id}`} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                      <div className="px-1 py-1 space-y-1" data-testid={`channel-sound-${id}`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] w-10 flex-shrink-0" style={{ color: `${s.color}70` }}>{s.label}</span>
+                          <input type="range" min={0} max={100} value={channelVols[`sound-${id}`] ?? 75}
+                            onChange={e => setChannelVolume(`sound-${id}`, Number(e.target.value))}
+                            className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, ${s.color} ${channelVols[`sound-${id}`] ?? 75}%, rgba(255,255,255,0.06) ${channelVols[`sound-${id}`] ?? 75}%)`, accentColor: s.color }}
+                            data-testid={`fader-sound-${id}`} />
+                          <span className="text-[8px] w-8 text-right tabular-nums" style={{ color: `${s.color}50` }}>{channelVols[`sound-${id}`] ?? 75}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[7px] w-10 flex-shrink-0" style={{ color: 'rgba(248,250,252,0.2)' }}>Filter</span>
+                          <input type="range" min={100} max={20000} value={sf.cutoff} step={100}
+                            onChange={e => setChannelFilter(soundFilterMapRef, setSoundFilters, id, Number(e.target.value), sf.resonance)}
+                            className="flex-1 h-0.5 rounded-full appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, ${s.color}60 ${(sf.cutoff / 20000) * 100}%, rgba(255,255,255,0.04) ${(sf.cutoff / 20000) * 100}%)` }}
+                            data-testid={`filter-sound-${id}`} />
+                          <input type="range" min={0.1} max={20} value={sf.resonance} step={0.5}
+                            onChange={e => setChannelFilter(soundFilterMapRef, setSoundFilters, id, sf.cutoff, Number(e.target.value))}
+                            className="w-12 h-0.5 rounded-full appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, #F97316 ${(sf.resonance / 20) * 100}%, rgba(255,255,255,0.04) ${(sf.resonance / 20) * 100}%)` }}
+                            data-testid={`resonance-sound-${id}`} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </AccordionSection>
 
           <AccordionSection title="World Instruments" icon={Music} color="#F59E0B" open={openSections.drone} onToggle={() => toggleSection('drone')} badge={activeDrones.size > 0 ? `${activeDrones.size} active` : null}>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
-              {INSTRUMENT_DRONES.map(d => (
-                <button key={d.id} onClick={() => toggleDrone(d)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
-                  style={{ background: activeDrones.has(d.id) ? `${d.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeDrones.has(d.id) ? `${d.color}35` : 'rgba(255,255,255,0.04)'}` }}
-                  data-testid={`mixer-drone-${d.id}`}>
-                  {activeDrones.has(d.id) ? <Pause size={10} style={{ color: d.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
-                  <span className="text-[11px]" style={{ color: activeDrones.has(d.id) ? d.color : 'rgba(248,250,252,0.55)' }}>{d.label}</span>
-                </button>
-              ))}
+            <div className="space-y-1">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
+                {INSTRUMENT_DRONES.map(d => (
+                  <button key={d.id} onClick={() => toggleDrone(d)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
+                    style={{ background: activeDrones.has(d.id) ? `${d.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeDrones.has(d.id) ? `${d.color}35` : 'rgba(255,255,255,0.04)'}` }}
+                    data-testid={`mixer-drone-${d.id}`}>
+                    {activeDrones.has(d.id) ? <Pause size={10} style={{ color: d.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+                    <span className="text-[11px]" style={{ color: activeDrones.has(d.id) ? d.color : 'rgba(248,250,252,0.55)' }}>{d.label}</span>
+                  </button>
+                ))}
+              </div>
+              {/* Per-channel faders + filter for active drones */}
+              <AnimatePresence>
+                {Array.from(activeDrones).map(id => {
+                  const d = INSTRUMENT_DRONES.find(x => x.id === id);
+                  if (!d) return null;
+                  const df = droneFilters[id] || { cutoff: d.filterFreq, resonance: d.filterQ };
+                  return (
+                    <motion.div key={`ch-drone-${id}`} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                      <div className="px-1 py-1 space-y-1" data-testid={`channel-drone-${id}`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] w-10 flex-shrink-0" style={{ color: `${d.color}70` }}>{d.label}</span>
+                          <input type="range" min={0} max={100} value={channelVols[`drone-${id}`] ?? 75}
+                            onChange={e => setChannelVolume(`drone-${id}`, Number(e.target.value))}
+                            className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, ${d.color} ${channelVols[`drone-${id}`] ?? 75}%, rgba(255,255,255,0.06) ${channelVols[`drone-${id}`] ?? 75}%)`, accentColor: d.color }}
+                            data-testid={`fader-drone-${id}`} />
+                          <span className="text-[8px] w-8 text-right tabular-nums" style={{ color: `${d.color}50` }}>{channelVols[`drone-${id}`] ?? 75}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[7px] w-10 flex-shrink-0" style={{ color: 'rgba(248,250,252,0.2)' }}>Filter</span>
+                          <input type="range" min={80} max={8000} value={df.cutoff} step={50}
+                            onChange={e => setChannelFilter(droneFilterMapRef, setDroneFilters, id, Number(e.target.value), df.resonance)}
+                            className="flex-1 h-0.5 rounded-full appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, ${d.color}60 ${(df.cutoff / 8000) * 100}%, rgba(255,255,255,0.04) ${(df.cutoff / 8000) * 100}%)` }}
+                            data-testid={`filter-drone-${id}`} />
+                          <input type="range" min={0.1} max={20} value={df.resonance} step={0.5}
+                            onChange={e => setChannelFilter(droneFilterMapRef, setDroneFilters, id, df.cutoff, Number(e.target.value))}
+                            className="w-12 h-0.5 rounded-full appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, #F97316 ${(df.resonance / 20) * 100}%, rgba(255,255,255,0.04) ${(df.resonance / 20) * 100}%)` }}
+                            data-testid={`resonance-drone-${id}`} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </AccordionSection>
 
@@ -1047,6 +1387,93 @@ export default function CosmicMixerPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
+          </AccordionSection>
+
+          {/* Master Effects Bus */}
+          <AccordionSection title="Master FX Bus" icon={Sliders} color="#06B6D4" open={openSections.masterFx} onToggle={() => toggleSection('masterFx')} badge={masterFx.reverb > 5 || masterFx.delay > 5 || masterFx.chorus > 5 ? 'Active' : null}>
+            <div className="space-y-2" data-testid="master-fx-bus">
+              <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Global effects on master output</p>
+
+              <VoiceSlider label="Reverb" value={masterFx.reverb} min={0} max={60} color="#3B82F6" unit="%"
+                onChange={v => setMasterFx(m => ({...m, reverb: v}))} testId="master-reverb" />
+              <p className="text-[7px] -mt-1 pl-[72px]" style={{ color: 'rgba(59,130,246,0.3)' }}>Ceiling: 60% to prevent muddiness</p>
+
+              <div className="grid grid-cols-2 gap-2">
+                <VoiceSlider label="Delay" value={masterFx.delay} min={0} max={70} color="#818CF8" unit="%"
+                  onChange={v => setMasterFx(m => ({...m, delay: v}))} testId="master-delay" />
+                <VoiceSlider label="Time" value={masterFx.delayTime} min={50} max={1500} color="#818CF8" unit="ms"
+                  onChange={v => setMasterFx(m => ({...m, delayTime: v}))} testId="master-delay-time" />
+              </div>
+
+              <VoiceSlider label="Chorus" value={masterFx.chorus} min={0} max={60} color="#22C55E" unit="%"
+                onChange={v => setMasterFx(m => ({...m, chorus: v}))} testId="master-chorus" />
+
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Compressor</span>
+                <button onClick={() => setMasterFx(m => ({...m, compressor: !m.compressor}))}
+                  className="px-2 py-0.5 rounded text-[8px] transition-all"
+                  style={{
+                    background: masterFx.compressor ? 'rgba(6,182,212,0.12)' : 'rgba(255,255,255,0.03)',
+                    color: masterFx.compressor ? '#06B6D4' : 'rgba(248,250,252,0.25)',
+                    border: `1px solid ${masterFx.compressor ? 'rgba(6,182,212,0.25)' : 'rgba(255,255,255,0.06)'}`,
+                  }}
+                  data-testid="master-compressor-toggle"
+                >{masterFx.compressor ? 'On' : 'Off'}</button>
+                <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.15)' }}>Glues layers, prevents clipping</span>
+              </div>
+            </div>
+          </AccordionSection>
+
+          {/* Layer Crossfade */}
+          <AccordionSection title="Layer Crossfade" icon={ArrowRightLeft} open={openSections.crossfade} onToggle={() => toggleSection('crossfade')} color="#A855F7" badge={null}>
+            <div className="space-y-2" data-testid="layer-crossfade">
+              <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Balance between layer groups</p>
+
+              {/* Freq vs Ambient crossfade */}
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] w-14 flex-shrink-0 text-right" style={{ color: '#C084FC' }}>Freq</span>
+                <input type="range" min={0} max={100} value={channelVols['xfade-freq-sound'] ?? 50}
+                  onChange={e => {
+                    const v = Number(e.target.value);
+                    setChannelVols(prev => ({...prev, 'xfade-freq-sound': v}));
+                    // Apply: freq gets (100-v)%, sound gets v%
+                    Object.keys(freqGainMapRef.current).forEach(k => {
+                      if (freqGainMapRef.current[k]) freqGainMapRef.current[k].gain.value = ((100 - v) / 100) * ((channelVols[`freq-${k}`] ?? 75) / 100) * 0.15;
+                    });
+                    Object.keys(soundGainMapRef.current).forEach(k => {
+                      if (soundGainMapRef.current[k]) soundGainMapRef.current[k].gain.value = (v / 100) * ((channelVols[`sound-${k}`] ?? 75) / 100) * 0.15;
+                    });
+                  }}
+                  className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #C084FC ${channelVols['xfade-freq-sound'] ?? 50}%, #3B82F6 ${channelVols['xfade-freq-sound'] ?? 50}%)`,
+                  }}
+                  data-testid="xfade-freq-sound" />
+                <span className="text-[9px] w-14 flex-shrink-0" style={{ color: '#3B82F6' }}>Ambient</span>
+              </div>
+
+              {/* Drone vs Voice crossfade */}
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] w-14 flex-shrink-0 text-right" style={{ color: '#F59E0B' }}>Instru</span>
+                <input type="range" min={0} max={100} value={channelVols['xfade-drone-voice'] ?? 50}
+                  onChange={e => {
+                    const v = Number(e.target.value);
+                    setChannelVols(prev => ({...prev, 'xfade-drone-voice': v}));
+                    Object.keys(droneGainMapRef.current).forEach(k => {
+                      if (droneGainMapRef.current[k]) droneGainMapRef.current[k].gain.value = ((100 - v) / 100) * ((channelVols[`drone-${k}`] ?? 75) / 100) * 0.15;
+                    });
+                    if (voiceChainRef.current?.input) {
+                      voiceChainRef.current.input.gain.value = (v / 100) * (voiceMorph.gain / 100) * 1.5;
+                    }
+                  }}
+                  className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #F59E0B ${channelVols['xfade-drone-voice'] ?? 50}%, #E879F9 ${channelVols['xfade-drone-voice'] ?? 50}%)`,
+                  }}
+                  data-testid="xfade-drone-voice" />
+                <span className="text-[9px] w-14 flex-shrink-0" style={{ color: '#E879F9' }}>Voice</span>
               </div>
             </div>
           </AccordionSection>
