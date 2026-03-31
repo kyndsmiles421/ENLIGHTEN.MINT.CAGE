@@ -61,12 +61,15 @@
 28. **GitHub Actions CI/CD Pipeline** — Created `.github/workflows/build.yml` with 4 jobs: web-build (craco), android-build (Gradle APK + Firebase App Distribution), ios-build (Xcode simulator check), and notify. Produces downloadable debug APK artifact on every push to `main`. Firebase App Distribution auto-sends APK to beta-testers group on merge. iOS TestFlight deployment scaffolded with commented config.
 29. **PWA Push Notifications Live** — Service worker (`sw.js`) now handles `push` events with vibration patterns, action buttons (Open/Later), and `notificationclick` navigation to deep links. Registered in `index.js` on app load. Backend has full VAPID-based Web Push via `pywebpush`: subscribe/unsubscribe, preference management (morning/evening reminders), quantum coherence scoring, scheduled bulk delivery, and in-app notification inbox.
 
-## Test Reports: Iterations 123-135 all 100% pass rate
+### Session 8 (Current — Trade Circle + Widget Fix):
+30. **Widget Overlap Fix** — Both SmartDock and CosmicToolbar now use shared `widget-focus` CustomEvent + localStorage key for bring-to-front z-index management. Clicking/dragging either widget raises it to z-9999, the other drops to z-9997. SmartDock default moved to bottom-left to prevent overlap. Both widgets have minimize (X) buttons that collapse them to a tiny restore dot.
+31. **Trade Circle Marketplace** — Full barter marketplace with wellness categories (Readings, Healing, Guidance, Meditation, Crafted, Goods, Services). Features: create/browse listings, make/accept/decline offers, category filtering, search, stats dashboard, karma leaderboard, reviews.
+32. **Cosmic Handshake** — Mutual trade confirmation system: after accepting an offer, listing moves to "in-trade" status. Both lister and offerer must independently POST `/handshake` to confirm fulfillment. Only after both confirm does the trade complete and karma is awarded.
+33. **Trust Score System** — Composite trust metric: Quantum Coherence (40%, from practice consistency) + Trade Rating (40%, from review stars) + Trade Volume (20%, from completed trades). 5 tiers: Newcomer → Seeker → Light Bearer → Star Guardian → Cosmic Elder. Displayed as badge on listing details.
+
+## Test Reports: Iterations 123-136 all 100% pass rate
 
 ## Backlog
-- Native app store submission (Node 22+ required)
-- PWA push notifications
-- Trade Circle barter marketplace
 - Starseed Choose Your Own Adventure
 - Cooperative Boss encounters
 - Loot/Inventory system
