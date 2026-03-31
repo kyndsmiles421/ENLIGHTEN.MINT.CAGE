@@ -10,39 +10,38 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Daily Quest System — Wellness-to-RPG Habit Loop (Mar 31, 2026) — NEW
-- **6 Daily Quests**: Still Mind (meditation +50 XP), Inner Scribe (journal +30 XP), Emotional Compass (mood +20 XP), Breath of Life (breathing +25 XP), Harmonic Resonance (soundscape +20 XP), 3-Breath Reset (micro-quest +10 XP)
-- **Perfect Day Bonus**: +100 XP for completing all 5 pillar quests in one day
-- **Streak System**: 3-day = 1.5x, 7-day = 2x, 14-day = 2.5x (capped) XP multiplier
-- **Auto-triggers**: Mood, journal, and meditation endpoints automatically award quest XP
-- **Frontend**: Quests tab (default) with quest board, streak display, Perfect Day progress bar, 3-Breath Reset button
-- **Backend**: `/api/rpg/quests/daily`, `/api/rpg/quests/complete`, `/api/rpg/quests/breath-reset`, `/api/rpg/quests/streak`
+### Dual Currency Economy & Shop System (Mar 31, 2026) — NEW
+- **Celestial Gems** (hard/premium): Purchased via Stripe ($0.99=100, $4.99=600+100 bonus, $9.99=1500+300 bonus)
+- **Cosmic Dust** (soft/earned): Earned through quests, exploration, bosses
+- **Currency Conversion**: 1 Gem = 10 Dust, with conversion UI
+- **Dust Shop**: 8 items (consumables, uncommon gear: Elixirs, Prayer Beads, Monk's Hood, Moonstone)
+- **Gem Shop**: 9 premium items (rare/epic/legendary: Starlight Nectar, Oracle Veil, Astral Armor, Ethereal Tuning Fork, Eye of the Cosmos)
+- **Equipment Slot Unlocks**: Slots 5-8 locked behind gems (Hands=50, Feet=75, Relic=125, Aura=200)
+- **Stripe Checkout**: One-tap gem purchase with checkout status polling and auto-fulfillment
+- **Backend**: `/api/rpg/shop`, `/api/rpg/shop/buy`, `/api/rpg/shop/convert`, `/api/rpg/shop/unlock-slot`, `/api/rpg/shop/purchase-gems`, `/api/rpg/shop/checkout-status/{id}`
+- **Frontend**: Shop tab with 4 sub-views (Dust Shop, Gem Shop, Buy Gems, Slots)
+
+### Daily Quest System — Wellness-to-RPG Habit Loop (Mar 31, 2026)
+- 6 daily quests bridging wellness to RPG progression
+- Perfect Day bonus (+100 XP), streak multipliers (capped at 2.5x)
+- Auto-triggers from mood/journal/meditation endpoints
 
 ### Wellness MMORPG — Cosmic Realm (Mar 31, 2026)
-- **Frontend**: RPGPage.js with 6 tabs (Quests, Character, Inventory, World Map, Bosses, Circle)
-- **Character**: Equipment slots (Head, Body, Conduit, Trinket), stat bars, currencies
-- **Inventory**: Item cards with rarity, equip/use, Starter Kit
-- **World Map**: 9 regions with fog-of-war, secret locations
-- **Bosses**: 3 cooperative bosses with battle UI (3 attack types)
-- **Circle**: Party system with invite codes
-- **Backend**: Full `/api/rpg/*` routes
-
-### Trial Graduation Modal (Mar 31, 2026)
-- Personalized graduation experience when 7-day Plus trial expires
-
-### Error Handling & Resilience (Mar 31, 2026)
-- CosmicErrorBoundary, Global Axios Interceptor, Cosmic-themed loaders
+- RPGPage with 7 tabs (Quests, Character, Inventory, Shop, World Map, Bosses, Circle)
+- Full RPG system: stats, equipment, fog-of-war map, cooperative bosses, party system
 
 ### Core Platform
-- Auth, dashboard, wellness, AI Coach, Star Chart (20 cultures), Oracle, Sacred Texts
+- Auth, Dashboard, AI Coach, Star Chart (20 cultures), Oracle, Sacred Texts
 - Trade Circle, Gamification, Starseed (8 origins), Multiverse Realms (6 dimensions)
-- MixerContext (Global Audio), SmartDock, Soundscapes, Stripe Premium Tiers
-- Multi-Language (7), VR, PWA
+- Gemini 3 Flash AI (35+ instances), Cosmic Concierge, Error Boundaries
+- 7-Day Trial System, Trial Graduation Modal, Stripe Premium Tiers
+- MixerContext (Global Audio), SmartDock, Soundscapes, Multi-Language (7), VR, PWA
 
 ## Test Report History
 - Iteration 145-149: All 100% pass
-- Iteration 150: RPG MMORPG (Backend 17/17, Frontend 100%)
-- Iteration 151: Daily Quest System (Backend 17/17, Frontend 100%)
+- Iteration 150: RPG MMORPG — 100%
+- Iteration 151: Daily Quest System — 100%
+- Iteration 152: Dual Currency Economy — 100% (18/18 backend, all frontend)
 
 ## Credentials
 - Admin: kyndsmiles@gmail.com / password
@@ -51,8 +50,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Upcoming Tasks
 
 ### Phase 1: Passive & Group Progression (P1)
-- **Trinket Boosts**: Background XP multipliers from equipped items
-- **Circle/Coven Goals**: Shared objectives requiring group participation for rare rewards
+- Trinket Boosts: Background XP multipliers from equipped items
+- Circle/Coven Goals: Shared objectives for group rewards
 
 ### Phase 2: Content Expansion (P2)
 - Virtual Rock Hounding (raw material searching)
@@ -60,8 +59,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Global Immersion Level Toggles
 
 ### Phase 3: Advanced Systems (P3)
-- 8-Slot Equipment Expansion (Hands, Feet, Relic)
-- Gem Resonance Engine (Amethyst→meditation bonus, Rose Quartz→mood, Clear Quartz→wildcard)
+- Gem Resonance Engine (Amethyst→meditation, Rose Quartz→mood, Clear Quartz→wildcard)
 - Elemental Crafting (forging gear with affinities/enchanting)
 - Spore-like Spiritual Avatar Creator
 - AI Scene Recreations
@@ -69,13 +67,16 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Architecture Rules
 - **Audio**: Always `useMixer()`, never `new AudioContext()`
 - **AI**: Always `.with_model("gemini", "gemini-3-flash-preview")`
-- **Errors**: Use `getCosmicErrorMessage()` + `CosmicError`
-- **Trial**: Auto-expiry in `get_user_credits()`, graduation modal via `TrialGraduation.js`
 - **RPG Terminology**: "Conduits" not "Weapons", "Circle" not "Party"
+- **Currency Mapping**: `stardust_shards` = Celestial Gems (hard), `cosmic_dust` = Cosmic Dust (soft)
+- **Equipment Phase 1**: 4 base slots + 4 premium-unlock slots
 - **Quest Integration**: Import `award_quest_xp` from `routes.rpg` in wellness endpoints
 
 ## Key DB Collections
 - `rpg_characters`, `rpg_inventory`, `rpg_equipped`, `rpg_currencies`
 - `rpg_discoveries`, `rpg_boss_encounters`, `rpg_parties`
-- `rpg_quest_log`: Daily quest completions (user_id, quest_id, date, xp_awarded)
-- `rpg_streaks`: User streak tracking (user_id, last_date, days)
+- `rpg_quest_log`, `rpg_streaks`
+- `rpg_purchases`: Shop purchase records (item_id, cost, currency)
+- `rpg_slot_unlocks`: Unlocked extra equipment slots per user
+- `rpg_transactions`: Currency conversion and slot unlock audit log
+- `payment_transactions`: Stripe checkout sessions for gem purchases
