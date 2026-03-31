@@ -7,6 +7,7 @@ import { ChevronUp, Mic, Loader2, Radio, GripHorizontal, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
+import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, SOUNDS as MIXER_SOUNDS } from '../context/MixerContext';
 
 const HIDDEN_ROUTES = ['/auth', '/', '/vr'];
 const POS_KEY = 'cosmic_toolbar_pos';
@@ -53,9 +54,6 @@ export default function CosmicToolbar() {
   const [zBoost, setZBoost] = useState(() => {
     try { return localStorage.getItem(WIDGET_FOCUS_KEY) === 'toolbar'; } catch { return false; }
   });
-  const ctxRef = useRef(null);
-  const nodesRef = useRef([]);
-  const masterRef = useRef(null);
   const holdRef = useRef(null);
   const collapseRef = useRef(null);
   const toolbarRef = useRef(null);
@@ -211,63 +209,45 @@ export default function CosmicToolbar() {
     if (isRecording) stopRecording();
   }, [isRecording, stopRecording]);
 
-  /* ── Meditate ── */
-  const stopMeditate = useCallback(() => {
-    nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
-    nodesRef.current = [];
-    if (masterRef.current) { try { masterRef.current.disconnect(); } catch {} masterRef.current = null; }
-    if (ctxRef.current && ctxRef.current.state !== 'closed') { try { ctxRef.current.close(); } catch {} }
-    ctxRef.current = null;
-  }, []);
+  /* ── Meditate — uses global MixerContext ── */
+  const { toggleFreq: mixerToggleFreq, toggleSound: mixerToggleSound, activeFreqs: mixerActiveFreqs, activeSounds: mixerActiveSounds, stopAll: mixerStopAll } = useMixer();
+  const zenFreqsRef = useRef([]);
+  const zenSoundsRef = useRef([]);
 
-  const toggleMeditate = useCallback(() => {
+  const toggleMeditate = useCallback(async () => {
     haptic('Heavy');
     refreshCollapse();
     if (meditating) {
-      try { if (masterRef.current && ctxRef.current) masterRef.current.gain.linearRampToValueAtTime(0.001, ctxRef.current.currentTime + 1.2); } catch {}
-      setTimeout(() => { stopMeditate(); setMeditating(false); }, 1400);
+      // Stop the zen frequencies and sounds we started
+      for (const f of zenFreqsRef.current) {
+        if (mixerActiveFreqs.has(f.hz)) await mixerToggleFreq(f);
+      }
+      for (const s of zenSoundsRef.current) {
+        if (mixerActiveSounds.has(s.id)) await mixerToggleSound(s);
+      }
+      zenFreqsRef.current = [];
+      zenSoundsRef.current = [];
+      setMeditating(false);
       setBpm(0);
       toast('Meditation ended', { style: { background: 'rgba(10,10,18,0.92)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(248,250,252,0.6)' } });
       return;
     }
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      ctxRef.current = ctx;
-      if (ctx.state === 'suspended') ctx.resume();
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.001, ctx.currentTime);
-      master.connect(ctx.destination);
-      masterRef.current = master;
-      master.gain.linearRampToValueAtTime(0.6, ctx.currentTime + 1.5);
-
-      const osc528 = ctx.createOscillator(); osc528.type = 'sine'; osc528.frequency.value = 528;
-      const g528 = ctx.createGain(); g528.gain.value = 0.18;
-      osc528.connect(g528); g528.connect(master); osc528.start();
-      const osc174 = ctx.createOscillator(); osc174.type = 'sine'; osc174.frequency.value = 174;
-      const g174 = ctx.createGain(); g174.gain.value = 0.12;
-      osc174.connect(g174); g174.connect(master); osc174.start();
-
-      const buf = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      const noise = ctx.createBufferSource(); noise.buffer = buf; noise.loop = true;
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 320;
-      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.06;
-      const lfoG = ctx.createGain(); lfoG.gain.value = 200;
-      lfo.connect(lfoG); lfoG.connect(lp.frequency);
-      const oG = ctx.createGain(); oG.gain.value = 0.4;
-      noise.connect(lp); lp.connect(oG); oG.connect(master); lfo.start(); noise.start();
-      nodesRef.current = [osc528, osc174, noise, lfo];
-      setBpm(60);
-      setMeditating(true);
-      toast('Deep Zen activated', {
-        description: '528Hz + 174Hz + Ocean \u00b7 60 BPM',
-        style: { background: 'linear-gradient(135deg, rgba(10,10,18,0.95), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80' },
-      });
-    } catch { toast.error('Audio unavailable'); }
-  }, [meditating, stopMeditate, setBpm, refreshCollapse]);
-
-  useEffect(() => () => stopMeditate(), [stopMeditate]);
+    // Start 528Hz + 174Hz + Ocean via MixerContext
+    const freq528 = MIXER_FREQUENCIES.find(f => f.hz === 528) || { hz: 528, label: '528 Hz', desc: 'Love', color: '#22C55E' };
+    const freq174 = MIXER_FREQUENCIES.find(f => f.hz === 174) || { hz: 174, label: '174 Hz', desc: 'Foundation', color: '#78716C' };
+    const oceanSound = MIXER_SOUNDS.find(s => s.id === 'ocean');
+    zenFreqsRef.current = [freq528, freq174];
+    zenSoundsRef.current = oceanSound ? [oceanSound] : [];
+    if (!mixerActiveFreqs.has(528)) await mixerToggleFreq(freq528);
+    if (!mixerActiveFreqs.has(174)) await mixerToggleFreq(freq174);
+    if (oceanSound && !mixerActiveSounds.has('ocean')) await mixerToggleSound(oceanSound);
+    setBpm(60);
+    setMeditating(true);
+    toast('Deep Zen activated', {
+      description: '528Hz + 174Hz + Ocean \u00b7 60 BPM',
+      style: { background: 'linear-gradient(135deg, rgba(10,10,18,0.95), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80' },
+    });
+  }, [meditating, setBpm, refreshCollapse, mixerToggleFreq, mixerToggleSound, mixerActiveFreqs, mixerActiveSounds]);
 
   const hidden = !user || HIDDEN_ROUTES.includes(location.pathname);
   const onMixer = location.pathname === '/cosmic-mixer';

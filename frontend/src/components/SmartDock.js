@@ -421,11 +421,9 @@ function DockBtn({ children, testId, onClick, active, color, expanded, label, sm
 function HarmonicsPanel({ onClose, token, authHeaders }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [playingRec, setPlayingRec] = useState(false);
   const [affirmation, setAffirmation] = useState(null);
   const [affirmationLoading, setAffirmationLoading] = useState(false);
-  const audioCtxRef = useRef(null);
-  const nodesRef = useRef(null);
+  const { toggleFreq, activeFreqs } = useMixer();
 
   useEffect(() => {
     fetch(`${API}/api/harmonics/celestial`)
@@ -443,43 +441,14 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
       .catch(() => setAffirmationLoading(false));
   }, [token, authHeaders, affirmationLoading]);
 
-  const stopRec = useCallback(() => {
-    if (nodesRef.current) {
-      nodesRef.current.gain.gain.linearRampToValueAtTime(0, (audioCtxRef.current?.currentTime || 0) + 0.5);
-      setTimeout(() => {
-        try { nodesRef.current?.osc.stop(); } catch {}
-        try { nodesRef.current?.osc2.stop(); } catch {}
-        nodesRef.current = null;
-      }, 600);
-    }
-    setPlayingRec(false);
-  }, []);
-
   const playRecommended = useCallback(() => {
-    if (playingRec) { stopRec(); return; }
     if (!data?.guidance?.recommended_frequency) return;
-    const freq = data.guidance.recommended_frequency;
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    audioCtxRef.current = ctx;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.001, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 1);
-    gain.connect(ctx.destination);
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    osc.connect(gain);
-    osc.start();
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = freq + 4;
-    osc2.connect(gain);
-    osc2.start();
-    nodesRef.current = { osc, osc2, gain };
-    setPlayingRec(true);
-  }, [data, playingRec, stopRec]);
+    const hz = data.guidance.recommended_frequency;
+    const freq = { hz, label: `${hz} Hz`, desc: data.guidance.recommended_frequency_name || '', color: data.atmosphere?.accent || '#818CF8' };
+    toggleFreq(freq);
+  }, [data, toggleFreq]);
 
-  useEffect(() => () => stopRec(), [stopRec]);
+  const isRecPlaying = data?.guidance?.recommended_frequency ? activeFreqs.has(data.guidance.recommended_frequency) : false;
 
   const MOON_GLYPHS = {
     new: '\u25CF', waxing_crescent: '\u25D1', first_quarter: '\u25D1',
@@ -508,7 +477,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
           <Moon size={11} style={{ color: data?.atmosphere?.accent || '#818CF8' }} />
           <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: `${data?.atmosphere?.accent || '#818CF8'}CC` }}>Cosmic Harmonics</span>
         </div>
-        <button onClick={() => { stopRec(); onClose(); }} className="p-1 rounded-lg hover:bg-white/5">
+        <button onClick={() => { onClose(); }} className="p-1 rounded-lg hover:bg-white/5">
           <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
         </button>
       </div>
@@ -553,17 +522,17 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
             onClick={playRecommended}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all"
             style={{
-              background: playingRec ? `${data.atmosphere.accent}15` : `${data.atmosphere.accent}06`,
-              border: `1px solid ${playingRec ? `${data.atmosphere.accent}30` : `${data.atmosphere.accent}10`}`,
-              boxShadow: playingRec ? `0 0 16px ${data.atmosphere.accent}15` : 'none',
+              background: isRecPlaying ? `${data.atmosphere.accent}15` : `${data.atmosphere.accent}06`,
+              border: `1px solid ${isRecPlaying ? `${data.atmosphere.accent}30` : `${data.atmosphere.accent}10`}`,
+              boxShadow: isRecPlaying ? `0 0 16px ${data.atmosphere.accent}15` : 'none',
             }}
             data-testid="harmonics-play-freq"
           >
-            {playingRec
+            {isRecPlaying
               ? <Pause size={12} style={{ color: data.atmosphere.accent }} />
               : <Play size={12} style={{ color: data.atmosphere.accent }} />}
             <div className="text-left flex-1">
-              <p className="text-[10px] font-medium" style={{ color: playingRec ? data.atmosphere.accent : `${data.atmosphere.accent}CC` }}>
+              <p className="text-[10px] font-medium" style={{ color: isRecPlaying ? data.atmosphere.accent : `${data.atmosphere.accent}CC` }}>
                 {data.guidance.recommended_frequency_name}
               </p>
               <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
@@ -571,7 +540,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
               </p>
             </div>
             <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${data.atmosphere.accent}10`, color: `${data.atmosphere.accent}90` }}>
-              {playingRec ? 'Stop' : 'Play'}
+              {isRecPlaying ? 'Stop' : 'Play'}
             </span>
           </button>
 
