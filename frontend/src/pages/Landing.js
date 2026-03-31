@@ -19,6 +19,7 @@ import {
   Waves, Mountain, TreePine, Flower2, HeartCrack, Ban, AlertTriangle, Smile
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, MANTRAS as MIXER_MANTRAS } from '../context/MixerContext';
 import ShareButton from '../components/ShareButton';
 import GuidedTour from '../components/GuidedTour';
 import IntroVideo from '../components/IntroVideo';
@@ -530,10 +531,13 @@ function PersonalizedDashboard({ user, onQuickReset }) {
 /* ─── Quick Reset Modal ─── */
 function QuickResetModal({ open, onClose }) {
   const navigate = useNavigate();
+  const { authHeaders } = useAuth();
+  const { toggleFreq, activeFreqs, toggleMantra, activeMantra, mantraLoading } = useMixer();
   const [feeling, setFeeling] = useState(null);
   const [flow, setFlow] = useState(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [freqPlaying, setFreqPlaying] = useState(false);
 
   const filteredFeelings = search.trim()
     ? FEELINGS.filter(f => f.label.toLowerCase().includes(search.toLowerCase()) || f.id.toLowerCase().includes(search.toLowerCase()))
@@ -552,7 +556,23 @@ function QuickResetModal({ open, onClose }) {
     }
   };
 
-  const reset = () => { setFeeling(null); setFlow(null); setSearch(''); };
+  const playFrequency = useCallback(async (hz) => {
+    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Healing Frequency', color: '#8B5CF6' };
+    await toggleFreq(freq);
+    setFreqPlaying(prev => !prev);
+    toast(activeFreqs.has(hz) ? `Stopped ${hz} Hz` : `Playing ${hz} Hz`, { description: freq.desc || 'Healing frequency activated' });
+  }, [toggleFreq, activeFreqs]);
+
+  const playMantra = useCallback(async (mantraText) => {
+    const match = MIXER_MANTRAS.find(m => mantraText.includes(m.text.split('...')[0]));
+    if (match) {
+      await toggleMantra(match, authHeaders);
+    } else {
+      toast('Mantra text loaded', { description: 'Open the Cosmic Mixer for voice morphing' });
+    }
+  }, [toggleMantra, authHeaders]);
+
+  const reset = () => { setFeeling(null); setFlow(null); setSearch(''); setFreqPlaying(false); };
 
   if (!open) return null;
 
@@ -636,17 +656,25 @@ function QuickResetModal({ open, onClose }) {
                 Feeling {flow.label}? Try this:
               </h2>
               <div className="space-y-3">
-                <button onClick={() => { navigate(flow.frequency.path); onClose(); reset(); }}
+                <button onClick={() => playFrequency(flow.frequency.hz)}
                   className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
+                  style={{ borderColor: activeFreqs.has(flow.frequency.hz) ? `${feeling.color}30` : undefined }}
                   data-testid="reset-frequency">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${feeling.color}12` }}>
-                    <Radio size={16} style={{ color: feeling.color }} />
+                    {activeFreqs.has(flow.frequency.hz) ? (
+                      <Volume2 size={16} style={{ color: feeling.color }} className="animate-pulse" />
+                    ) : (
+                      <Radio size={16} style={{ color: feeling.color }} />
+                    )}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{flow.frequency.name}</p>
                     <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>{flow.frequency.desc}</p>
+                    <span className="inline-flex items-center gap-1 mt-1.5 text-[9px] px-2 py-0.5 rounded-full"
+                      style={{ background: activeFreqs.has(flow.frequency.hz) ? `${feeling.color}15` : `${feeling.color}08`, color: feeling.color }}>
+                      {activeFreqs.has(flow.frequency.hz) ? <><Volume2 size={8} /> Playing — tap to stop</> : <><Play size={8} /> Tap to play instantly</>}
+                    </span>
                   </div>
-                  <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 transition-all" />
                 </button>
                 <button onClick={() => { navigate(flow.tool.path); onClose(); reset(); }}
                   className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
