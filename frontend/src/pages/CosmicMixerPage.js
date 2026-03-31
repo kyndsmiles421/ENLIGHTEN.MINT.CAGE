@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio, ChevronDown,
-  Play, Pause, Square, Loader2, X, Sparkles, Sliders, ArrowRightLeft
+  Play, Pause, Square, Loader2, X, Sparkles, Sliders, ArrowRightLeft, Save, Download, Trash2, Globe, Heart
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
@@ -178,7 +178,7 @@ export default function CosmicMixerPage() {
     voiceMorph, setVoiceMorph, mantraLoading,
     getCtx, toggleFreq: ctxToggleFreq, toggleSound: ctxToggleSound,
     toggleDrone: ctxToggleDrone, toggleMantra: ctxToggleMantra,
-    stopAll: ctxStopAll,
+    stopAll: ctxStopAll, getSnapshot, restoreSnapshot,
     analyserRef, masterGainRef, ctxRef,
     freqNodesMapRef, freqGainMapRef,
     soundNodesMapRef, soundGainMapRef, soundFilterMapRef,
@@ -460,7 +460,7 @@ export default function CosmicMixerPage() {
   const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   // ─── Collapsible accordion state ───
-  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, masterFx: false, crossfade: false, light: false, haptic: false, tempo: false, session: false });
+  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, masterFx: false, crossfade: false, light: false, haptic: false, tempo: false, session: false, soundscapes: false });
   const toggleSection = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
 
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra || activeLight || vibeOn;
@@ -500,6 +500,58 @@ export default function CosmicMixerPage() {
     const lightObj = LIGHT_MODES.find(l => l.id === preset.light);
     if (lightObj) setActiveLight(lightObj);
   }, [activeMoodPreset, allFrequencies, stopAll, stopTempo, toggleFreq, toggleSound, setBpm]);
+
+  // ─── Soundscape Save/Load ───
+  const [savedSoundscapes, setSavedSoundscapes] = useState([]);
+  const [communitySoundscapes, setCommunitySoundscapes] = useState([]);
+  const [soundscapeName, setSoundscapeName] = useState('');
+  const [soundscapeSaving, setSoundscapeSaving] = useState(false);
+  const [soundscapeTab, setSoundscapeTab] = useState('mine');
+
+  const fetchSoundscapes = useCallback(async () => {
+    if (!authHeaders?.Authorization) return;
+    try {
+      const [mine, community] = await Promise.all([
+        axios.get(`${API}/mixer-presets/sessions`, { headers: authHeaders }),
+        axios.get(`${API}/mixer-presets/sessions/community`),
+      ]);
+      setSavedSoundscapes(mine.data);
+      setCommunitySoundscapes(community.data);
+    } catch {}
+  }, [authHeaders]);
+
+  useEffect(() => { fetchSoundscapes(); }, [fetchSoundscapes]);
+
+  const saveSoundscape = useCallback(async (isPublic = false) => {
+    if (!hasActive) return;
+    setSoundscapeSaving(true);
+    try {
+      const snapshot = getSnapshot();
+      await axios.post(`${API}/mixer-presets/sessions`, {
+        name: soundscapeName || `Soundscape ${new Date().toLocaleTimeString()}`,
+        snapshot,
+        is_public: isPublic,
+      }, { headers: authHeaders });
+      setSoundscapeName('');
+      toast('Soundscape Saved', { description: isPublic ? 'Shared with the community' : 'Saved to your collection' });
+      fetchSoundscapes();
+    } catch {}
+    setSoundscapeSaving(false);
+  }, [hasActive, getSnapshot, soundscapeName, authHeaders, fetchSoundscapes]);
+
+  const loadSoundscape = useCallback(async (session) => {
+    if (session.snapshot) {
+      await restoreSnapshot(session.snapshot, authHeaders);
+      toast('Soundscape Loaded', { description: session.name });
+    }
+  }, [restoreSnapshot, authHeaders]);
+
+  const deleteSoundscape = useCallback(async (id) => {
+    try {
+      await axios.delete(`${API}/mixer-presets/sessions/${id}`, { headers: authHeaders });
+      fetchSoundscapes();
+    } catch {}
+  }, [authHeaders, fetchSoundscapes]);
 
   return (
     <div className="min-h-screen relative" data-testid="cosmic-mixer-page">
@@ -607,6 +659,83 @@ export default function CosmicMixerPage() {
                 ))}
               </div>
             )}
+          </AccordionSection>
+
+          {/* ── Soundscapes (Save/Load) ── */}
+          <AccordionSection title="Soundscapes" icon={Save} color="#818CF8" open={openSections.soundscapes} onToggle={() => toggleSection('soundscapes')} badge={savedSoundscapes.length > 0 ? `${savedSoundscapes.length} saved` : null}>
+            {/* Save current state */}
+            <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(129,140,248,0.04)', border: '1px solid rgba(129,140,248,0.1)' }}>
+              <div className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'rgba(129,140,248,0.5)' }}>Capture Current Mix</div>
+              <input
+                type="text" placeholder="Name your soundscape..." value={soundscapeName}
+                onChange={e => setSoundscapeName(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-xs mb-2"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: '#F8FAFC', outline: 'none' }}
+                data-testid="soundscape-name-input"
+              />
+              <div className="flex gap-2">
+                <button onClick={() => saveSoundscape(false)} disabled={!hasActive || soundscapeSaving}
+                  className="flex-1 py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 transition-all disabled:opacity-30"
+                  style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8' }}
+                  data-testid="save-soundscape-private">
+                  {soundscapeSaving ? <Loader2 size={10} className="animate-spin" /> : <Save size={10} />} Save
+                </button>
+                <button onClick={() => saveSoundscape(true)} disabled={!hasActive || soundscapeSaving}
+                  className="flex-1 py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 transition-all disabled:opacity-30"
+                  style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.15)', color: '#2DD4BF' }}
+                  data-testid="save-soundscape-public">
+                  {soundscapeSaving ? <Loader2 size={10} className="animate-spin" /> : <Globe size={10} />} Share
+                </button>
+              </div>
+              {!hasActive && <p className="text-[9px] mt-1.5 text-center" style={{ color: 'rgba(248,250,252,0.25)' }}>Activate layers to capture a soundscape</p>}
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-1 mb-2">
+              {[{ id: 'mine', label: 'My Soundscapes' }, { id: 'community', label: 'Community' }].map(t => (
+                <button key={t.id} onClick={() => setSoundscapeTab(t.id)}
+                  className="flex-1 py-1.5 rounded-lg text-[10px] transition-all"
+                  style={{ background: soundscapeTab === t.id ? 'rgba(129,140,248,0.1)' : 'transparent', border: `1px solid ${soundscapeTab === t.id ? 'rgba(129,140,248,0.15)' : 'rgba(255,255,255,0.04)'}`, color: soundscapeTab === t.id ? '#818CF8' : 'rgba(248,250,252,0.35)' }}
+                  data-testid={`soundscape-tab-${t.id}`}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Soundscape list */}
+            <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+              {(soundscapeTab === 'mine' ? savedSoundscapes : communitySoundscapes).length === 0 ? (
+                <p className="text-[10px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  {soundscapeTab === 'mine' ? 'No saved soundscapes yet' : 'No community soundscapes yet'}
+                </p>
+              ) : (
+                (soundscapeTab === 'mine' ? savedSoundscapes : communitySoundscapes).map(s => (
+                  <div key={s.id} className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:bg-white/[0.02]"
+                    style={{ border: '1px solid rgba(255,255,255,0.04)' }} data-testid={`soundscape-${s.id}`}>
+                    <button onClick={() => loadSoundscape(s)} className="flex-1 text-left">
+                      <div className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{s.name}</div>
+                      <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        {s.creator_name && soundscapeTab === 'community' ? `by ${s.creator_name} · ` : ''}
+                        {new Date(s.created_at).toLocaleDateString()}
+                      </div>
+                    </button>
+                    <button onClick={() => loadSoundscape(s)} className="p-1.5 rounded-lg hover:bg-white/5" data-testid={`load-soundscape-${s.id}`}>
+                      <Download size={12} style={{ color: '#818CF8' }} />
+                    </button>
+                    {soundscapeTab === 'community' && (
+                      <span className="text-[9px] flex items-center gap-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        <Heart size={9} /> {s.like_count || 0}
+                      </span>
+                    )}
+                    {soundscapeTab === 'mine' && (
+                      <button onClick={() => deleteSoundscape(s.id)} className="p-1.5 rounded-lg hover:bg-red-500/10" data-testid={`delete-soundscape-${s.id}`}>
+                        <Trash2 size={11} style={{ color: 'rgba(239,68,68,0.5)' }} />
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </AccordionSection>
 
           {/* ── Mood Presets ── */}

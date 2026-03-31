@@ -354,3 +354,80 @@ async def delete_playlist(playlist_id: str, user=Depends(get_current_user)):
         from fastapi import HTTPException
         raise HTTPException(404, "Playlist not found or not yours")
     return {"deleted": True}
+
+
+
+# ─── Session Recordings (Full Snapshot) ───
+
+@router.post("/sessions")
+async def save_session(body: dict, user=Depends(get_current_user)):
+    """Save a full mixer snapshot as a shareable soundscape."""
+    doc = {
+        "id": str(uuid.uuid4()),
+        "name": body.get("name", "Untitled Soundscape"),
+        "description": body.get("description", ""),
+        "snapshot": body.get("snapshot", {}),
+        "creator_id": user["id"],
+        "creator_name": user.get("name", ""),
+        "is_public": body.get("is_public", False),
+        "likes": [],
+        "like_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.mixer_sessions.insert_one(doc)
+    doc.pop("_id", None)
+    if body.get("is_public"):
+        await create_activity(user["id"], "mixer_session", f"shared a soundscape: {doc['name']}")
+    return doc
+
+
+@router.get("/sessions")
+async def get_my_sessions(user=Depends(get_current_user)):
+    sessions = await db.mixer_sessions.find(
+        {"creator_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return sessions
+
+
+@router.get("/sessions/community")
+async def get_community_sessions(skip: int = 0, limit: int = 30):
+    sessions = await db.mixer_sessions.find(
+        {"is_public": True}, {"_id": 0}
+    ).sort("like_count", -1).skip(skip).limit(limit).to_list(limit)
+    return sessions
+
+
+@router.get("/sessions/{session_id}")
+async def get_session(session_id: str):
+    session = await db.mixer_sessions.find_one({"id": session_id}, {"_id": 0})
+    if not session:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Session not found")
+    return session
+
+
+@router.post("/sessions/{session_id}/like")
+async def toggle_session_like(session_id: str, user=Depends(get_current_user)):
+    session = await db.mixer_sessions.find_one({"id": session_id}, {"_id": 0})
+    if not session:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Session not found")
+    likes = session.get("likes", [])
+    if user["id"] in likes:
+        likes.remove(user["id"])
+    else:
+        likes.append(user["id"])
+    await db.mixer_sessions.update_one(
+        {"id": session_id},
+        {"$set": {"likes": likes, "like_count": len(likes)}}
+    )
+    return {"liked": user["id"] in likes, "like_count": len(likes)}
+
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(session_id: str, user=Depends(get_current_user)):
+    result = await db.mixer_sessions.delete_one({"id": session_id, "creator_id": user["id"]})
+    if result.deleted_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Session not found or not yours")
+    return {"deleted": True}
