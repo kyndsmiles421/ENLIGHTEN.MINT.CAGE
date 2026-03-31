@@ -2,10 +2,41 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Loader2, Trash2, Plus, Sparkles, Languages, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// ── Page Context Map — Cosmic Concierge awareness ──
+const PAGE_CONTEXT = {
+  '/dashboard': { area: 'Dashboard', hint: 'their personal wellness overview with shortcuts, mood history, and daily challenges', suggest: 'Would you like a personalized practice recommendation based on your mood?' },
+  '/frequencies': { area: 'Frequencies', hint: 'the sacred healing frequency generator with solfeggio tones', suggest: 'Curious which frequency matches your energy right now?' },
+  '/cosmic-mixer': { area: 'Cosmic Mixer', hint: 'the multi-layer sound healing mixer with frequencies, ambient sounds, drones, and mantras', suggest: 'Need help crafting the perfect soundscape for your mood?' },
+  '/soundscapes': { area: 'Soundscapes', hint: 'saved mixer sessions and curated ambient playlists', suggest: 'Want me to suggest a soundscape for focus, sleep, or healing?' },
+  '/meditation': { area: 'Meditation', hint: 'guided meditation sessions and timers', suggest: 'Looking for a meditation style that fits your current state?' },
+  '/breathing': { area: 'Breathing', hint: 'breathing exercise patterns like box breathing and 4-7-8', suggest: 'Which breathing technique would serve you best right now?' },
+  '/mood': { area: 'Mood Tracker', hint: 'logging and tracking emotional states over time', suggest: 'Want insight on your mood patterns this week?' },
+  '/journal': { area: 'Journal', hint: 'personal reflection and gratitude journaling', suggest: 'Need a journal prompt to get the thoughts flowing?' },
+  '/oracle': { area: 'Oracle', hint: 'tarot, astrology, I Ching, and sacred geometry divination readings', suggest: 'Curious what the cosmos has to say? Ask about any oracle system.' },
+  '/star-chart': { area: 'Star Chart', hint: 'personalized astrology chart with 20 global cultural traditions', suggest: 'Want to understand what the stars say about you today?' },
+  '/starseed': { area: 'Starseed Journey', hint: 'a choose-your-own-adventure to discover their cosmic starseed origin', suggest: 'Ready to discover which star nation your soul calls home?' },
+  '/multiverse-realms': { area: 'Multiverse Realms', hint: 'dimensional travel through 6 consciousness realms with immersive soundscapes', suggest: 'Which realm is calling to you? I can guide you.' },
+  '/coach': { area: 'Spiritual Coach (Sage)', hint: 'deep AI spiritual coaching with multiple modes', suggest: 'Sage is here for deep sessions. Want a quick insight instead?' },
+  '/yoga': { area: 'Yoga', hint: 'yoga pose libraries and session tracking', suggest: 'Looking for a yoga flow that matches your energy level?' },
+  '/crystals': { area: 'Crystals', hint: 'crystal healing properties and resonance', suggest: 'Want to know which crystal aligns with your intention today?' },
+  '/sacred-texts': { area: 'Sacred Texts', hint: 'cross-tradition sacred scripture library', suggest: 'Seeking wisdom from a particular tradition? I can guide you.' },
+  '/dreams': { area: 'Dream Journal', hint: 'dream logging with symbol tracking', suggest: 'Had a vivid dream? I can help interpret the symbols.' },
+  '/numerology': { area: 'Numerology', hint: 'life path and numerological analysis', suggest: 'Want to know what your numbers reveal about this moment?' },
+  '/trade-circle': { area: 'Trade Circle', hint: 'community barter marketplace with trust scores', suggest: 'Need help navigating the Trade Circle or listing something?' },
+  '/pricing': { area: 'Pricing', hint: 'subscription tiers and Plus upgrade options', suggest: 'Questions about what\'s included in each tier? I can explain.' },
+  '/settings': { area: 'Settings', hint: 'app preferences, language, notifications', suggest: 'Need help configuring something?' },
+  '/vr': { area: 'Virtual Reality', hint: 'immersive WebXR meditation environment', suggest: 'Ready for an immersive experience? I can help you prepare.' },
+  '/light-therapy': { area: 'Light Therapy', hint: 'chromotherapy color healing overlays', suggest: 'Which color frequency would benefit you right now?' },
+  '/mantras': { area: 'Mantras', hint: 'sacred chants from world traditions', suggest: 'Looking for a mantra that resonates with your intention?' },
+  '/bible': { area: 'Scriptures', hint: 'comprehensive scripture reader and journey system', suggest: 'Want guidance on where to start reading?' },
+  '/exercises': { area: 'Qigong & Exercise', hint: 'energy movement exercises', suggest: 'Need an energy-boosting exercise recommendation?' },
+};
 
 function MessageBubble({ msg }) {
   const isUser = msg.role === 'user';
@@ -40,6 +71,7 @@ function MessageBubble({ msg }) {
 
 export default function CosmicAssistant() {
   const { authHeaders, user } = useAuth();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
@@ -49,6 +81,10 @@ export default function CosmicAssistant() {
   const [showSessions, setShowSessions] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Get current page context
+  const currentPath = location.pathname;
+  const pageCtx = PAGE_CONTEXT[currentPath] || null;
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -85,6 +121,7 @@ export default function CosmicAssistant() {
       const res = await axios.post(`${API}/gemini/chat`, {
         session_id: sessionId,
         message: userMsg.text,
+        page_context: pageCtx ? { area: pageCtx.area, hint: pageCtx.hint, path: currentPath } : null,
       }, { headers: authHeaders });
 
       if (!sessionId) setSessionId(res.data.session_id);
@@ -136,11 +173,14 @@ export default function CosmicAssistant() {
     }
   };
 
-  // Quick actions
-  const quickActions = [
+  // Quick actions — context-aware
+  const baseActions = [
     { label: 'Translate something', icon: Languages, prompt: 'I need help translating: ' },
     { label: 'Wellness guidance', icon: Sparkles, prompt: 'I could use some guidance on ' },
   ];
+  const quickActions = pageCtx
+    ? [{ label: pageCtx.suggest.slice(0, 40), icon: Sparkles, prompt: pageCtx.suggest }, ...baseActions]
+    : baseActions;
 
   if (!user) return null;
 
@@ -256,10 +296,10 @@ export default function CosmicAssistant() {
                     <Sparkles size={24} style={{ color: '#818CF8' }} />
                   </div>
                   <p className="text-sm font-light mb-1" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
-                    How can I help?
+                    {pageCtx ? `I see you're in ${pageCtx.area}` : 'How can I help?'}
                   </p>
                   <p className="text-[10px] mb-4" style={{ color: 'var(--text-muted)' }}>
-                    Ask anything, translate text, or get guidance
+                    {pageCtx ? pageCtx.suggest : 'Ask anything, translate text, or get guidance'}
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {quickActions.map(qa => (

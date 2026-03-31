@@ -153,6 +153,7 @@ async def aura_reading(data: dict = Body(...), user=Depends(get_current_user)):
     try:
         chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"aura-{uuid.uuid4()}",
                         system_message="You are a gifted energy reader and Reiki master. Give a deeply personal, compassionate aura reading. Be specific, warm, and spiritually insightful. 3-4 paragraphs.")
+        chat.with_model("gemini", "gemini-3-flash-preview")
         mood_str = ", ".join(mood_list[:5]) if mood_list else "no recent moods recorded"
         prompt = f"Give an aura reading for someone with a {aura['name']}. Their recent moods: {mood_str}. Born month {birth_month}, day {birth_day}. Their dominant chakra is {chakra_data['name']}. Include: current energy state, what their aura reveals about their spiritual journey, and guidance for the coming days."
         response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)

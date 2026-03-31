@@ -131,6 +131,7 @@ async def generate_ai_blessing(data: dict = Body(...), user=Depends(get_current_
             session_id=f"blessing-{uuid.uuid4().hex[:8]}",
             system_message="You are a compassionate spiritual guide who writes heartfelt blessings."
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=20)
         return {"blessing_text": response.strip(), "category": category}
     except Exception as e:

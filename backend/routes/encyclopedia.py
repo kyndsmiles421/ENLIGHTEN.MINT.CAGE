@@ -298,6 +298,7 @@ Keep responses between 200-400 words. Rich, substantive, and inspiring."""
             session_id=f"encyclopedia-{uuid.uuid4().hex[:12]}",
             system_message=system,
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         response = await asyncio.wait_for(
             chat.send_message(UserMessage(text=prompt_text)),
             timeout=45

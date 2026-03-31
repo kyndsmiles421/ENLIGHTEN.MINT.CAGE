@@ -233,6 +233,7 @@ async def get_personalized_affirmation(user=Depends(get_current_user)):
                 "Speak as if the cosmos is addressing them directly."
             )
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         prompt = (
             f"Generate a personalized affirmation for someone with these recent moods: {mood_summary}. "
             f"{'Average energy level: ' + str(avg_energy) + '/10. ' if avg_energy else ''}"

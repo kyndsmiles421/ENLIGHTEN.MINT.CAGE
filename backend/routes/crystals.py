@@ -215,6 +215,7 @@ async def crystal_pairing(data: dict, user=Depends(get_current_user)):
             session_id=f"crystal-pair-{uuid.uuid4().hex[:8]}",
             system_message="You are a wise and compassionate crystal healer with deep knowledge of crystal properties and their spiritual significance."
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
 
         # Parse crystal IDs from response

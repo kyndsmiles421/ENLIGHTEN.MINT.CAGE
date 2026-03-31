@@ -85,7 +85,8 @@ async def process_voice_command(req: VoiceCommandRequest, user=Depends(get_curre
         logger.info(f"Voice command transcript: {transcript}")
 
         # Parse intent with GPT
-        chat = LlmChat(api_key=EMERGENT_LLM_KEY, model="gpt-4o")
+        chat = LlmChat(api_key=EMERGENT_LLM_KEY)
+        chat.with_model("gemini", "gemini-3-flash-preview")
         chat.add_message(UserMessage(content=f"{INTENT_SYSTEM_PROMPT}\n\nUser said: \"{transcript}\"\n\nReturn ONLY valid JSON, nothing else."))
         intent_raw = await chat.chat()
 

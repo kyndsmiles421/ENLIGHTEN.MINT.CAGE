@@ -366,7 +366,8 @@ async def generate_contemplation(data: dict = Body(...), user=Depends(get_curren
     if not teaching:
         raise HTTPException(status_code=404, detail="Teaching not found")
     try:
-        chat = LlmChat(api_key=EMERGENT_LLM_KEY, model="gpt-5.2")
+        chat = LlmChat(api_key=EMERGENT_LLM_KEY)
+        chat.with_model("gemini", "gemini-3-flash-preview")
         prompt = f"""You are a wise, compassionate spiritual guide deeply versed in the teachings of {teacher['name']} ({teacher['tradition']}).
 
 Create a short, immersive guided contemplation (4-5 paragraphs) based on this teaching:

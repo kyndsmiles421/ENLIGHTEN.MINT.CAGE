@@ -122,6 +122,7 @@ async def suggest_meal(data: dict = Body(...), user=Depends(get_current_user)):
     try:
         chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"meal-{uuid.uuid4()}",
                         system_message="You are a holistic nutritionist combining Ayurveda, Traditional Chinese Medicine, and modern nutrition science. Suggest a meal that nourishes both body and spirit. Be specific with ingredients and brief preparation. Include the energetic/spiritual quality of the meal.")
+        chat.with_model("gemini", "gemini-3-flash-preview")
         prompt = f"Suggest a {time_of_day} meal for someone feeling {mood}. Dietary preference: {dietary}. Include: dish name, ingredients list, brief prep steps, and the energetic intention/benefit."
         response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
         return {"suggestion": response}

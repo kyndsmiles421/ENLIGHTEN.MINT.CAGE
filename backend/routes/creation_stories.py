@@ -415,6 +415,7 @@ Return as JSON with keys: title, type, characters (list of {{name, role}}), stor
             session_id=f"myth-gen-{civ_id}-{uuid.uuid4().hex[:8]}",
             system_message="You are a master storyteller and cultural historian. Return responses as valid JSON only.",
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         response = await chat.send_message(UserMessage(text=prompt))
         text = response.strip()
 

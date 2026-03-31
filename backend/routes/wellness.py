@@ -90,6 +90,7 @@ async def get_mood_insights(user=Depends(get_current_user)):
                     "Be encouraging but honest. Keep responses under 100 words. Use 'you' language."
                 )
             )
+            chat.with_model("gemini", "gemini-3-flash-preview")
             prompt = (
                 f"A person's recent moods (newest first): {mood_summary}\n"
                 f"Their notes: {notes_str}\n\n"

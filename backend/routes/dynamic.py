@@ -435,6 +435,7 @@ Format as a numbered list. Be specific and passionate — you're a devoted libra
             session_id=f"reading-{uuid.uuid4().hex[:12]}",
             system_message="You are a wise spiritual librarian with deep knowledge of sacred texts from every tradition. You match seekers with the perfect books for their journey.",
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         response = await asyncio.wait_for(
             chat.send_message(UserMessage(text=prompt)),
             timeout=30
@@ -830,6 +831,7 @@ TONE: Warm, insightful, slightly poetic. Like a trusted spiritual mentor who tru
                 session_id=f"soul-report-{uid}-{month}-{uuid.uuid4().hex[:8]}",
                 system_message=system,
             )
+            chat.with_model("gemini", "gemini-3-flash-preview")
             report_text = await asyncio.wait_for(
                 chat.send_message(UserMessage(text=data_summary)),
                 timeout=60

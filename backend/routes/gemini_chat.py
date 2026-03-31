@@ -36,6 +36,7 @@ async def gemini_chat(data: dict = Body(...), user=Depends(get_current_user)):
     """Conversational AI chat powered by Gemini 3 Flash."""
     session_id = data.get("session_id")
     message = data.get("message", "").strip()
+    page_context = data.get("page_context")
 
     if not message:
         raise HTTPException(400, "Message required")
@@ -69,13 +70,21 @@ async def gemini_chat(data: dict = Body(...), user=Depends(get_current_user)):
             parts.append(f"{role}: {msg['text']}")
         history_text = "\n\nCONVERSATION HISTORY:\n" + "\n".join(parts)
 
+    # Build page context awareness
+    page_awareness = ""
+    if page_context and isinstance(page_context, dict):
+        area = page_context.get("area", "")
+        hint = page_context.get("hint", "")
+        if area:
+            page_awareness = f"\n\nCURRENT PAGE CONTEXT: The user is currently on the {area} page ({hint}). Tailor your response to be relevant to what they're viewing. If their question relates to this page, give specific guidance about features available here."
+
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
 
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"gemini-{session_id}-{uuid.uuid4().hex[:6]}",
-            system_message=SYSTEM_PROMPT + history_text,
+            system_message=SYSTEM_PROMPT + page_awareness + history_text,
         )
         chat.with_model("gemini", "gemini-3-flash-preview")
 

@@ -382,6 +382,7 @@ async def generate_chapter(text_id: str, chapter_id: str, request: Request):
 The text is: {text['title']} from the {text['tradition']} tradition.
 Write with reverence, depth, and beauty.""",
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
 
         result = await chat.send_message(
             UserMessage(text=f"""Generate content for Chapter {chapter['number']}: "{chapter['title']}" from {text['title']}.

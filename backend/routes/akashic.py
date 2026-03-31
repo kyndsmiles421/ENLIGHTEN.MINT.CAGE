@@ -174,6 +174,7 @@ async def akashic_chat(data: dict = Body(...), user=Depends(get_current_user)):
             session_id=f"akashic-{session_id}-{uuid.uuid4().hex[:8]}",
             system_message=system + history_text,
         )
+        chat.with_model("gemini", "gemini-3-flash-preview")
         response = await asyncio.wait_for(
             chat.send_message(UserMessage(text=message)),
             timeout=45
