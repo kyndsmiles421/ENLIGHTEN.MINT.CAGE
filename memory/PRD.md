@@ -57,6 +57,13 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Tempo Engine with LFO modulation, tap tempo, presets
 - Layer Crossfade controls, Master FX Bus
 
+### Instant Frequency Play (Feb 2026)
+- Dashboard recommendations & suggestions include `action: play_frequency` + `frequency_hz` fields
+- MOOD_FREQUENCY_MAP maps 10 moods to healing frequencies (e.g. anxious→417Hz, happy→528Hz)
+- Dashboard "For You" and "Suggested for You" sections play frequencies instantly on click via MixerContext
+- Frequencies page rewired to use MixerContext (audio persists across navigation, no more isolated AudioContext)
+- All quick widgets now action-first: click = do the thing, not just navigate
+
 ### VR & Native
 - WebXR Virtual Reality scene with 3D Spatial Audio and Gaze Interaction Reticle
 - Capacitor native scaffolding (Android/iOS), app icons & splash screens
