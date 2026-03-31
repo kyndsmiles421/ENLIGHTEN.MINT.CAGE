@@ -15,6 +15,8 @@ STAT_NAMES = ["wisdom", "vitality", "resonance", "harmony", "focus"]
 
 def xp_for_level(level):
     """XP required to reach a given level."""
+    if level <= 1:
+        return 0
     return int(100 * (level ** 1.5))
 
 def level_from_xp(total_xp):
