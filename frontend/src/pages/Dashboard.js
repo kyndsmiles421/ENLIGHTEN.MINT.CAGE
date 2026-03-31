@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useAvatar } from '../context/AvatarContext';
 import { useNavigate } from 'react-router-dom';
 import { useSensory } from '../context/SensoryContext';
+import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
+import { toast } from 'sonner';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
   Sunrise, Users, Trophy, Sparkles, User, Hand, Triangle,
@@ -110,7 +112,15 @@ export default function Dashboard() {
   const { avatarB64 } = useAvatar();
   const navigate = useNavigate();
   const { prefs } = useSensory();
+  const { toggleFreq } = useMixer();
   const isLight = prefs.theme === 'light';
+
+  // Play a frequency from a recommendation action
+  const playFrequency = useCallback(async (hz) => {
+    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Healing Frequency', color: '#8B5CF6' };
+    await toggleFreq(freq);
+    toast(`Playing ${hz} Hz`, { description: freq.desc || 'Healing frequency activated' });
+  }, [toggleFreq]);
 
   const [stats, setStats] = useState(null);
   const [recs, setRecs] = useState(null);
@@ -270,13 +280,13 @@ export default function Dashboard() {
     switch (sectionId) {
       case 'stats': return <StatsSection key="stats" stats={stats} streak={streak} navigate={navigate} />;
       case 'pinned': return pinnedShortcuts.length > 0 ? <PinnedSection key="pinned" pinned={pinnedShortcuts} navigate={navigate} editMode={editMode} onRemove={togglePin} /> : null;
-      case 'suggestions': return suggestions.length > 0 ? <SuggestionsSection key="suggestions" suggestions={suggestions} navigate={navigate} /> : null;
+      case 'suggestions': return suggestions.length > 0 ? <SuggestionsSection key="suggestions" suggestions={suggestions} navigate={navigate} playFrequency={playFrequency} /> : null;
       case 'scripture': return stats?.scripture ? <ScriptureSection key="scripture" scripture={stats.scripture} navigate={navigate} /> : null;
       case 'coherence': return coherence ? <CoherenceSection key="coherence" coherence={coherence} isLight={isLight} navigate={navigate} /> : null;
       case 'challenge': return dailyChallenge?.challenge ? <ChallengeSection key="challenge" dailyChallenge={dailyChallenge} isLight={isLight} navigate={navigate} /> : null;
       case 'wisdom': return dailyWisdom ? <WisdomSection key="wisdom" dailyWisdom={dailyWisdom} navigate={navigate} /> : null;
       case 'moods': return stats?.recent_moods?.length > 0 ? <MoodsSection key="moods" stats={stats} navigate={navigate} /> : null;
-      case 'recommendations': return recs?.recommendations?.length > 0 ? <RecommendationsSection key="recs" recs={recs} isLight={isLight} navigate={navigate} /> : null;
+      case 'recommendations': return recs?.recommendations?.length > 0 ? <RecommendationsSection key="recs" recs={recs} isLight={isLight} navigate={navigate} playFrequency={playFrequency} /> : null;
       case 'actions': return <ActionsSection key="actions" navigate={navigate} />;
       default: return null;
     }
@@ -578,28 +588,37 @@ function PinnedSection({ pinned, navigate, editMode, onRemove }) {
   );
 }
 
-function SuggestionsSection({ suggestions, navigate }) {
+function SuggestionsSection({ suggestions, navigate, playFrequency }) {
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
       className="mb-8" data-testid="smart-suggestions">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Suggested for You</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        {suggestions.map((s, i) => (
-          <motion.button key={s.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.05 }}
-            onClick={() => navigate(s.path)}
-            className="glass-card p-3.5 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
-            data-testid={`suggestion-${s.id}`}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: `${s.color}10`, border: `1px solid ${s.color}20` }}>
-              <Sparkles size={15} style={{ color: s.color }} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{s.title}</p>
-              <p className="text-[9px] truncate" style={{ color: 'var(--text-muted)' }}>{s.desc}</p>
-            </div>
-            <ChevronRight size={11} style={{ color: s.color, opacity: 0.5 }} />
-          </motion.button>
-        ))}
+        {suggestions.map((s, i) => {
+          const isFreqAction = s.action === 'play_frequency' && s.frequency_hz;
+          return (
+            <motion.button key={s.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.05 }}
+              onClick={() => {
+                if (isFreqAction) {
+                  playFrequency(s.frequency_hz);
+                } else {
+                  navigate(s.path);
+                }
+              }}
+              className="glass-card p-3.5 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
+              data-testid={`suggestion-${s.id}`}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${s.color}10`, border: `1px solid ${s.color}20` }}>
+                {isFreqAction ? <Play size={15} style={{ color: s.color }} /> : <Sparkles size={15} style={{ color: s.color }} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{s.title}</p>
+                <p className="text-[9px] truncate" style={{ color: 'var(--text-muted)' }}>{s.desc}</p>
+              </div>
+              <ChevronRight size={11} style={{ color: s.color, opacity: 0.5 }} />
+            </motion.button>
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -839,7 +858,7 @@ function MoodsSection({ stats, navigate }) {
   );
 }
 
-function RecommendationsSection({ recs, isLight, navigate }) {
+function RecommendationsSection({ recs, isLight, navigate, playFrequency }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}
       className="mb-8" data-testid="recommendations-section">
@@ -858,20 +877,33 @@ function RecommendationsSection({ recs, isLight, navigate }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {recs.recommendations.map((rec, i) => {
           const Icon = REC_ICON_MAP[rec.icon] || Sparkles;
+          const isFreqAction = rec.action === 'play_frequency' && rec.frequency_hz;
           return (
             <motion.button key={rec.id + '-' + i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.04 }}
-              onClick={() => navigate(rec.path)}
+              onClick={() => {
+                if (isFreqAction) {
+                  playFrequency(rec.frequency_hz);
+                } else {
+                  navigate(rec.path);
+                }
+              }}
               className="glass-card p-4 flex items-start gap-3 text-left group hover:scale-[1.02] transition-all cursor-pointer"
-              style={{ borderColor: `${rec.color}08` }}
+              style={{ borderColor: isFreqAction ? `${rec.color}25` : `${rec.color}08` }}
               data-testid={`rec-${rec.id}`}>
               <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
                 style={{ background: `${rec.color}10`, border: `1px solid ${rec.color}18` }}>
-                <Icon size={16} style={{ color: rec.color }} />
+                {isFreqAction ? <Play size={16} style={{ color: rec.color }} /> : <Icon size={16} style={{ color: rec.color }} />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{rec.name}</p>
                 <p className="text-[10px] mt-0.5 leading-relaxed" style={{ color: rec.color }}>{rec.reason}</p>
                 <p className="text-[10px] mt-1 line-clamp-1" style={{ color: 'var(--text-muted)' }}>{rec.desc}</p>
+                {isFreqAction && (
+                  <span className="inline-flex items-center gap-1 mt-1.5 text-[9px] px-2 py-0.5 rounded-full"
+                    style={{ background: `${rec.color}10`, color: rec.color, border: `1px solid ${rec.color}20` }}>
+                    <Play size={8} /> Tap to play instantly
+                  </span>
+                )}
               </div>
               <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
             </motion.button>

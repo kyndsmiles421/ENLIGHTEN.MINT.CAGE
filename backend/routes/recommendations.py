@@ -56,6 +56,20 @@ MOOD_TOOL_MAP = {
     "neutral": ["mood", "breathing", "soundscapes", "journey"],
 }
 
+# Map moods to specific healing frequencies
+MOOD_FREQUENCY_MAP = {
+    "stressed": {"hz": 396, "label": "396 Hz — Liberation from Stress"},
+    "anxious": {"hz": 417, "label": "417 Hz — Dissolving Anxiety"},
+    "sad": {"hz": 639, "label": "639 Hz — Heart Connection & Joy"},
+    "angry": {"hz": 174, "label": "174 Hz — Foundation & Pain Relief"},
+    "happy": {"hz": 528, "label": "528 Hz — Love & Celebration"},
+    "peaceful": {"hz": 432, "label": "432 Hz — Universal Harmony"},
+    "tired": {"hz": 852, "label": "852 Hz — Spiritual Awakening"},
+    "grateful": {"hz": 963, "label": "963 Hz — Divine Connection"},
+    "confused": {"hz": 741, "label": "741 Hz — Intuition & Clarity"},
+    "neutral": {"hz": 432, "label": "432 Hz — Universal Harmony"},
+}
+
 TIME_OF_DAY_TOOLS = {
     "morning": ["breathing", "affirmations", "rituals", "exercises", "meditation"],
     "afternoon": ["frequencies", "light-therapy", "mudras", "soundscapes", "journal"],
@@ -94,19 +108,47 @@ async def get_recommendations(user=Depends(get_current_user)):
         time_period = "night"
 
     # 1. Mood-based recommendations
+    latest_mood = None
     if recent_moods:
         latest_mood = recent_moods[0].get("mood", "neutral").lower()
         suggested_tools = MOOD_TOOL_MAP.get(latest_mood, MOOD_TOOL_MAP["neutral"])
+
+        # Add a direct "play frequency" recommendation first
+        mood_freq = MOOD_FREQUENCY_MAP.get(latest_mood)
+        if mood_freq and "play_frequency" not in used_ids:
+            recommendations.append({
+                "id": "play_frequency",
+                "name": mood_freq["label"],
+                "path": "/cosmic-mixer",
+                "category": "frequency",
+                "icon": "radio",
+                "color": "#8B5CF6",
+                "desc": f"Tap to instantly play the healing frequency for your {latest_mood} mood",
+                "reason": f"Tuned to your {latest_mood} energy",
+                "priority": "high",
+                "source": "mood_frequency",
+                "action": "play_frequency",
+                "frequency_hz": mood_freq["hz"],
+            })
+            used_ids.add("play_frequency")
+
         for tool_id in suggested_tools[:2]:
             if tool_id not in used_ids:
                 tool = next((t for t in TOOL_CATALOG if t["id"] == tool_id), None)
                 if tool:
-                    recommendations.append({
+                    rec_entry = {
                         **tool,
                         "reason": f"Based on your recent {latest_mood} mood",
                         "priority": "high",
                         "source": "mood_analysis",
-                    })
+                    }
+                    # If it's the frequencies tool, attach the mood frequency for instant play
+                    if tool_id == "frequencies" and mood_freq:
+                        rec_entry["action"] = "play_frequency"
+                        rec_entry["frequency_hz"] = mood_freq["hz"]
+                        rec_entry["path"] = "/cosmic-mixer"
+                        rec_entry["desc"] = f"Play {mood_freq['label']} for your {latest_mood} mood"
+                    recommendations.append(rec_entry)
                     used_ids.add(tool_id)
     else:
         # No mood data — suggest tracking
@@ -161,12 +203,20 @@ async def get_recommendations(user=Depends(get_current_user)):
             if tool:
                 time_labels = {"morning": "Perfect for morning practice", "afternoon": "Great for an afternoon reset",
                                "evening": "Wind down this evening", "night": "Ideal for late-night calm"}
-                recommendations.append({
+                rec_entry = {
                     **tool,
                     "reason": time_labels.get(time_period, "Recommended for now"),
                     "priority": "medium",
                     "source": "time_of_day",
-                })
+                }
+                # Attach frequency action for frequency recommendations
+                if tool_id == "frequencies":
+                    mood_freq = MOOD_FREQUENCY_MAP.get(latest_mood or "neutral", MOOD_FREQUENCY_MAP["neutral"])
+                    rec_entry["action"] = "play_frequency"
+                    rec_entry["frequency_hz"] = mood_freq["hz"]
+                    rec_entry["path"] = "/cosmic-mixer"
+                    rec_entry["desc"] = f"Play {mood_freq['label']} — {time_labels.get(time_period, '')}"
+                recommendations.append(rec_entry)
                 used_ids.add(tool_id)
 
     # 4. Engagement nudges

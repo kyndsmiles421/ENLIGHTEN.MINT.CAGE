@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
 import GuidedExperience from '../components/GuidedExperience';
 import FeaturedVideos from '../components/FeaturedVideos';
+import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -30,92 +31,37 @@ export default function Frequencies() {
   const [frequencies, setFrequencies] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [playing, setPlaying] = useState(null);
-  const audioCtxRef = useRef(null);
-  const oscRef = useRef(null);
-  const gainRef = useRef(null);
+  const { activeFreqs, toggleFreq: ctxToggleFreq } = useMixer();
+
+  // Track which backend freq ID maps to which Hz for display
+  const [idToHz, setIdToHz] = useState({});
 
   useEffect(() => {
     axios.get(`${API}/frequencies`)
-      .then(res => setFrequencies(res.data))
+      .then(res => {
+        setFrequencies(res.data);
+        const map = {};
+        res.data.forEach(f => { map[f.id] = f.frequency; });
+        setIdToHz(map);
+      })
       .catch(() => toast.error('Could not load frequencies'));
   }, []);
 
   const filtered = filter === 'all' ? frequencies : frequencies.filter(f => f.category === filter);
 
-  const stopAudio = useCallback(() => {
-    if (oscRef.current) { try { oscRef.current.stop(); } catch {} oscRef.current = null; }
-    if (gainRef.current) { try { gainRef.current.disconnect(); } catch {} gainRef.current = null; }
-    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} audioCtxRef.current = null; }
-  }, []);
-
-  const startAudio = useCallback((freq) => {
-    stopAudio();
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    audioCtxRef.current = ctx;
-
-    if (freq < 20) {
-      // Sub-audible: binaural beats with a 200 Hz carrier tone
-      const carrier = 200;
-      const merger = ctx.createChannelMerger(2);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.5);
-      // Left ear: carrier
-      const oscL = ctx.createOscillator(); oscL.type = 'sine'; oscL.frequency.value = carrier;
-      const gL = ctx.createGain(); gL.gain.value = 1;
-      oscL.connect(gL); gL.connect(merger, 0, 0);
-      // Right ear: carrier + target = binaural beat
-      const oscR = ctx.createOscillator(); oscR.type = 'sine'; oscR.frequency.value = carrier + freq;
-      const gR = ctx.createGain(); gR.gain.value = 1;
-      oscR.connect(gR); gR.connect(merger, 0, 1);
-      // Gentle harmonic pad for body feel
-      const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = freq * 16;
-      const subG = ctx.createGain(); subG.gain.value = 0.05;
-      sub.connect(subG); subG.connect(gain);
-      merger.connect(gain); gain.connect(ctx.destination);
-      oscL.start(); oscR.start(); sub.start();
-      oscRef.current = oscL; // for cleanup
-      gainRef.current = gain;
-    } else {
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
-      const lfo = ctx.createOscillator();
-      lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
-      const lfoGain = ctx.createGain();
-      lfoGain.gain.setValueAtTime(0.02, ctx.currentTime);
-      lfo.connect(lfoGain);
-      lfoGain.connect(gain.gain);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      lfo.start();
-      oscRef.current = osc;
-      gainRef.current = gain;
-    }
-  }, [stopAudio]);
-
   const togglePlay = useCallback((id) => {
-    if (playing === id) {
-      stopAudio();
-      setPlaying(null);
-    } else {
-      const freq = frequencies.find(f => f.id === id);
-      if (freq) {
-        startAudio(freq.frequency);
-        setPlaying(id);
-      }
-    }
-  }, [playing, frequencies, startAudio, stopAudio]);
+    const freq = frequencies.find(f => f.id === id);
+    if (!freq) return;
+    // Use global MixerContext — find or create a freq object
+    const mixerFreq = MIXER_FREQUENCIES.find(mf => mf.hz === freq.frequency) || { hz: freq.frequency, label: `${freq.frequency} Hz`, desc: freq.name, color: freq.color || '#8B5CF6' };
+    ctxToggleFreq(mixerFreq);
+  }, [frequencies, ctxToggleFreq]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => stopAudio();
-  }, [stopAudio]);
+  // Check if a backend frequency is currently playing via MixerContext
+  const isFreqPlaying = useCallback((id) => {
+    const hz = idToHz[id];
+    return hz != null && activeFreqs.has(hz);
+  }, [activeFreqs, idToHz]);
 
   return (
     <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
@@ -131,8 +77,8 @@ export default function Frequencies() {
           <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
             Solfeggio tones, Earth resonances, and binaural beats that harmonize your biofield and expand consciousness.
           </p>
-          <p className="text-xs mb-12" style={{ color: playing ? '#2DD4BF' : 'var(--text-muted)' }}>
-            {playing ? `Now playing: ${frequencies.find(f => f.id === playing)?.name || ''} (${frequencies.find(f => f.id === playing)?.frequency}Hz)` : 'Tap play to hear each frequency tone.'}
+          <p className="text-xs mb-12" style={{ color: activeFreqs.size > 0 ? '#2DD4BF' : 'var(--text-muted)' }}>
+            {activeFreqs.size > 0 ? `Now playing: ${Array.from(activeFreqs).map(hz => `${hz}Hz`).join(', ')}` : 'Tap play to hear each frequency tone.'}
           </p>
         </motion.div>
 
@@ -161,7 +107,7 @@ export default function Frequencies() {
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Frequency Spectrum</p>
           <div className="flex items-end gap-1 h-32">
             {filtered.map((freq) => {
-              const isActive = selected?.id === freq.id || playing === freq.id;
+              const isActive = selected?.id === freq.id || isFreqPlaying(freq.id);
               const height = Math.min(100, Math.max(15, (freq.frequency / 10)));
               return (
                 <button
@@ -202,7 +148,7 @@ export default function Frequencies() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {filtered.map((freq, i) => {
             const chakraColor = CHAKRA_COLORS[freq.chakra] || '#94A3B8';
-            const isPlaying = playing === freq.id;
+            const isPlaying = isFreqPlaying(freq.id);
             return (
               <motion.div
                 key={freq.id}
@@ -325,10 +271,10 @@ export default function Frequencies() {
                 <button
                   onClick={() => togglePlay(selected.id)}
                   className="btn-glass px-6 py-3 text-sm flex items-center gap-2"
-                  style={{ borderColor: playing === selected.id ? `${selected.color}40` : 'rgba(255,255,255,0.1)' }}
+                  style={{ borderColor: isFreqPlaying(selected.id) ? `${selected.color}40` : 'rgba(255,255,255,0.1)' }}
                   data-testid="freq-detail-play"
                 >
-                  {playing === selected.id ? <><Square size={12} fill={selected.color} style={{ color: selected.color }} /> Stop</> : <><Play size={14} /> Listen to {selected.frequency}Hz</>}
+                  {isFreqPlaying(selected.id) ? <><Square size={12} fill={selected.color} style={{ color: selected.color }} /> Stop</> : <><Play size={14} /> Listen to {selected.frequency}Hz</>}
                 </button>
                 <NarrationPlayer
                   text={`${selected.frequency} Hertz. ${selected.name}. This is a ${CATEGORY_LABELS[selected.category]} frequency associated with the ${selected.chakra} chakra. ${selected.description}. Benefits include ${selected.benefits.join(', ')}. Close your eyes and allow this frequency to resonate through your being.`}

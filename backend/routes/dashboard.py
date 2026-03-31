@@ -222,6 +222,38 @@ async def get_smart_suggestions(user=Depends(get_current_user)):
         })
 
     if mood_count > 0 and journal_count > 0:
+        # Get latest mood for frequency suggestion
+        latest_mood_doc = await db.moods.find_one(
+            {"user_id": uid}, {"_id": 0, "mood": 1},
+            sort=[("created_at", -1)]
+        )
+        if latest_mood_doc:
+            latest_mood_name = latest_mood_doc.get("mood", "neutral").lower()
+            MOOD_FREQ = {
+                "stressed": {"hz": 396, "label": "396 Hz — Liberation from Stress"},
+                "anxious": {"hz": 417, "label": "417 Hz — Dissolving Anxiety"},
+                "sad": {"hz": 639, "label": "639 Hz — Heart Connection"},
+                "angry": {"hz": 174, "label": "174 Hz — Pain Relief"},
+                "happy": {"hz": 528, "label": "528 Hz — Love & Celebration"},
+                "peaceful": {"hz": 432, "label": "432 Hz — Universal Harmony"},
+                "tired": {"hz": 852, "label": "852 Hz — Awakening"},
+                "grateful": {"hz": 963, "label": "963 Hz — Divine Connection"},
+                "confused": {"hz": 741, "label": "741 Hz — Intuition"},
+                "neutral": {"hz": 432, "label": "432 Hz — Universal Harmony"},
+            }
+            mood_freq = MOOD_FREQ.get(latest_mood_name, MOOD_FREQ["neutral"])
+            suggestions.append({
+                "id": "mood-frequency",
+                "title": f"Play {mood_freq['label']}",
+                "desc": f"Healing frequency tuned to your {latest_mood_name} mood — tap to play instantly.",
+                "path": "/cosmic-mixer",
+                "icon": "Radio",
+                "color": "#8B5CF6",
+                "priority": 1,
+                "action": "play_frequency",
+                "frequency_hz": mood_freq["hz"],
+            })
+
         suggestions.append({
             "id": "explore-crystals",
             "title": "Discover Your Crystal Match",
