@@ -19,7 +19,7 @@ export default function MultiverseRealms() {
   const [entering, setEntering] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API}/realms`).then(r => setRealms(r.data)).catch(() => {});
+    axios.get(`${API}/realms/`).then(r => setRealms(r.data)).catch(() => {});
     if (authHeaders?.Authorization) {
       axios.get(`${API}/realms/visits/stats`, { headers: authHeaders }).then(r => setVisitStats(r.data)).catch(() => {});
     }

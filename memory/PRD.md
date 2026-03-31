@@ -6,7 +6,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Tech Stack
 - **Frontend**: React (CRA + craco), TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API
 - **Backend**: FastAPI, MongoDB (Motor)
-- **Integrations**: OpenAI GPT-4o (Emergent LLM Key), OpenAI TTS, Stripe, Capacitor (native), Firebase (CI/CD)
+- **Integrations**: Gemini 3 Flash (primary LLM via Emergent LLM Key), OpenAI TTS/STT, Stripe, Capacitor (native), Firebase (CI/CD)
 - **Node**: v20 (default for services), v22 (Capacitor only via nvm)
 
 ## Core Architecture
@@ -20,8 +20,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ├── frontend/ (React on port 3000)
 │   ├── src/
 │   │   ├── context/ (Auth, Avatar, Credit, Language, MixerContext, Sensory, Tempo, VoiceCommand)
-│   │   ├── pages/ (~40 pages)
-│   │   ├── components/ (CosmicToolbar, SmartDock, ui/)
+│   │   ├── pages/ (~42 pages)
+│   │   ├── components/ (CosmicToolbar, SmartDock, CosmicAssistant, ui/)
 │   │   └── App.js
 │   └── public/ (sw.js, manifest.json)
 ├── .github/workflows/build.yml (CI/CD)
@@ -40,6 +40,17 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Gamification, achievements, daily challenges
 - Community features, social sharing
 
+### Gemini AI Integration (Mar 2026)
+- **Unified LLM Brain**: Migrated all core AI features to Gemini 3 Flash (`gemini-3-flash-preview`)
+- **Cosmos Floating Assistant**: App-wide floating chat widget powered by Gemini, accessible from every page
+  - Quick actions: Translation, Wellness guidance
+  - Session management: Create, load, delete chat sessions
+  - Persistent conversation history in MongoDB (`gemini_sessions`)
+- **Endpoints migrated to Gemini**: `/api/gemini/chat`, `/api/gemini/translate`, `/api/gemini/sessions`
+- **Coach (Sage)**: Spiritual Coach chat, Dream Oracle analysis, Voice Chat — all now use Gemini 3 Flash
+- **AI Blend**: Mood-based frequency blending via Gemini
+- **Translation**: Dynamic AI translation via Gemini (replaces OpenAI)
+
 ### Audio & Mixer (MAJOR — Feb 2026)
 - **MixerContext (Global Audio Engine)**: Extracted from CosmicMixerPage into React Context for app-wide audio persistence
   - 15 Solfeggio/binaural frequencies with per-channel waveform selection
@@ -52,73 +63,61 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   - getSnapshot/restoreSnapshot for session recording
 - **SmartDock Mini Controls**: Live volume slider, mute toggle, active layer count, Stop All — accessible from any page
 - **Session Recording (Soundscapes)**: Save/load/delete/share full mixer snapshots via /api/mixer-presets/sessions
-- Mood Presets (5 curated combos), Timed Sessions (4 multi-phase journeys)
-- Light Therapy overlays, Haptic Vibration feedback
-- Tempo Engine with LFO modulation, tap tempo, presets
-- Layer Crossfade controls, Master FX Bus
+- Mood Presets, Timed Sessions, Light Therapy, Haptic Vibration, Tempo Engine, Layer Crossfade, Master FX Bus
 
-### Instant Frequency Play (Feb 2026)
-- Dashboard recommendations & suggestions include `action: play_frequency` + `frequency_hz` fields
-- MOOD_FREQUENCY_MAP maps 10 moods to healing frequencies (e.g. anxious→417Hz, happy→528Hz)
-- Dashboard "For You" and "Suggested for You" sections play frequencies instantly on click via MixerContext
-- Frequencies page rewired to use MixerContext (audio persists across navigation, no more isolated AudioContext)
-- All quick widgets now action-first: click = do the thing, not just navigate
+### Starseed & Multiverse Realms (Mar 2026)
+- **Starseed Journey**: Choose-your-own-adventure with 8 star origins (Pleiadian, Sirian, Arcturian, etc.)
+  - Branching narrative chapters with origin-specific endings
+  - Soul frequency assignment, gift reveal, journey save/replay
+- **Multiverse Realms**: 6 dimensional realms (Astral Garden, Crystal Caverns, Celestial Ocean, Solar Temple, Void Sanctum, Aurora Bridge)
+  - Each realm activates unique soundscape via MixerContext (frequency + ambient + drone)
+  - Visit tracking and stats
 
-### Premium Tier Gating & Revenue Infrastructure (Feb 2026)
-- **Tier-Gated Features**: `ai_frequency_blend`, `ai_translation`, `ai_coaching_blend` require Plus tier ($9.99/mo)
-- **useGatedFeature() hook**: Reusable frontend gate check with upgrade toast + navigate to /pricing
-- **Plus tier perks updated**: AI-Personalized Frequency Blends, AI-Powered Content Translation, AI Coaching Sound Blends
-
-### AI-Personalized Frequency Blend (Feb 2026)
-- `POST /api/mixer/ai-blend`: Analyzes user's 7-day mood journal history
-- **Free users**: Algorithmic blend (rule-based mood→frequency mapping, instant, no credit cost)
-- **Plus+ users**: GPT-4o deep analysis of emotional patterns → custom multi-layer blend with poetic name + insight
-- Auto-loads the blend into the Mixer (frequencies + sounds + drone activate instantly)
-- UI: "AI Frequency Blend" accordion section on Cosmic Mixer page with Generate button, result panel with tags
+### Premium Tier Gating & Revenue (Feb 2026)
+- Tier-Gated Features: `ai_frequency_blend`, `ai_translation`, `ai_coaching_blend` require Plus tier
+- useGatedFeature() hook, Plus tier perks
 
 ### Multi-Language Support (Feb 2026)
-- **LanguageContext** with 7 languages: English, Spanish, French, Hindi, Japanese, Arabic, Portuguese
-- **Static translations (Free)**: 60+ UI keys translated for nav, common actions, mixer, dashboard, auth, pricing
-- **AI Translation endpoint** (`POST /api/translate`): GPT-4o dynamic content translation, Plus-tier gated, cached in MongoDB
-- **Language selector**: Globe icon in SmartDock with panel showing all 7 languages, saves to localStorage
-- RTL support for Arabic (`document.documentElement.dir`)
+- LanguageContext with 7 languages, AI Translation (Gemini), RTL support for Arabic
 
 ### VR & Native
-- WebXR Virtual Reality scene with 3D Spatial Audio and Gaze Interaction Reticle
-- Capacitor native scaffolding (Android/iOS), app icons & splash screens
-- GitHub Actions CI/CD for Firebase App Distribution
-- PWA with Push Notifications (VAPID keys, service worker)
+- WebXR Virtual Reality scene with 3D Spatial Audio
+- Capacitor native scaffolding, GitHub Actions CI/CD, PWA with Push Notifications
 
 ### UI/UX
-- Draggable CosmicToolbar & SmartDock with collision management, dynamic z-index
-- Minimizable toolbar, safe default positions
-- Split View multitasking, Full Immersive mode
+- Draggable CosmicToolbar & SmartDock, Split View, Full Immersive mode
 
 ## Key DB Collections
+- `gemini_sessions`: Cosmos assistant chat sessions
+- `gemini_translations`: Cached AI translations
 - `mixer_sessions`: Saved soundscapes with full snapshots
-- `mixer_presets`: Curated and user-created mixer presets
-- `mixer_playlists`: Multi-step journey playlists
-- `trade_circle_listings`, `trade_circle_offers`: Marketplace with handshakes
-- `user_profiles`: Trust scores, achievements, preferences
+- `coach_sessions`: Spiritual Coach conversations
+- `starseed_journeys`: Completed starseed adventure results
+- `realm_visits`: Multiverse realm visit logs
+- `users`, `user_profiles`, `trade_circle_listings`, `trade_circle_offers`
 
 ## Credentials
 - Test user: kyndsmiles@gmail.com / password
 - App URL: https://zen-energy-bar.preview.emergentagent.com
 
 ## Upcoming Tasks (Prioritized)
+
 ### P1 — Next
-- Apply `useLanguage().t()` translations to more pages (Dashboard, Mixer, Settings, Pricing)
-- Add language preference to user profile (persist across devices via backend)
+- Migrate remaining ~30 secondary LLM route files to Gemini 3 Flash (oracle, meditations, wellness, etc.)
+- Add language preference persistence to user profile (sync across devices)
 - Settings page language section
 
-### P1 — Backlog
-- Starseed Choose Your Own Adventure module
-- Multiverse Realms integration
+### P2 — Backlog
+- Cooperative Boss Encounters (community meditation/frequency goals)
+- Virtual Rock Hounding (gem resonance tie-in)
+- Loot/Inventory System (manage gems & digital assets)
+- Myths & Legends Encyclopedia
+- Global Immersion Level Toggles
 
-### P2 — Future
-- Cooperative Boss encounters
-- Loot/Inventory system & Virtual Rock Hounding
-- Global Immersion Level toggles
+### P3 — Future
 - Spore-like Spiritual Avatar Creator enhancements
 - Gem Resonance engine
-- Myths & Legends encyclopedia
+- AI Scene Recreations (Vision Mode)
+
+## Refactoring Notes
+- Backend `routes/` has overlapping starseed files (`starseed.py`, `starseed_adventure.py`, `starseed_realm.py`, `starseed_worlds.py`) — needs consolidation

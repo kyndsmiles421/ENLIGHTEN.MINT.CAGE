@@ -83,6 +83,7 @@ Return ONLY a JSON object (no markdown):
         session_id=f"ai-blend-{user_id[:8]}",
         system_message="You are a wellness sound therapist specializing in frequency healing and mood analysis."
     )
+    llm.with_model("gemini", "gemini-3-flash-preview")
     response = await llm.send_message(UserMessage(text=prompt))
     text = response.strip()
 
