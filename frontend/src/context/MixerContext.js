@@ -65,6 +65,18 @@ export const MANTRAS = [
   { id: 'so-hum', label: 'So Hum', text: 'So... Hum... I am that I am. So... Hum... Breathe in, I am. Breathe out, that. So... Hum...', tradition: 'Vedic', color: '#3B82F6' },
   { id: 'ra-ma', label: 'Ra Ma Da Sa', text: 'Ra Ma Da Sa... Sa Say So Hung... Feel the healing energy flow. Ra Ma Da Sa... Sa Say So Hung...', tradition: 'Kundalini', color: '#FCD34D' },
   { id: 'peace', label: 'I Am Peace', text: 'I am peace... I am light... I am love... With every breath, I return to stillness. I am peace... I am light... I am love...', tradition: 'Modern', color: '#22C55E' },
+  { id: 'gayatri', label: 'Gayatri', text: 'Om Bhur Bhuvaswaha... Tat Savitur Varenyam... Bhargo Devasya Dhimahi... Dhiyo Yo Nah Prachodayat...', tradition: 'Hindu Vedic', color: '#F59E0B' },
+  { id: 'gate-gate', label: 'Gate Gate', text: 'Gate Gate... Paragate... Parasamgate... Bodhi Svaha... Gone, gone, gone beyond. Enlightenment. Gate Gate...', tradition: 'Buddhist', color: '#EC4899' },
+  { id: 'lokah', label: 'Lokah Samastah', text: 'Lokah Samastah Sukhino Bhavantu... May all beings everywhere be happy and free. Lokah Samastah Sukhino Bhavantu...', tradition: 'Sanskrit', color: '#10B981' },
+  { id: 'hu', label: 'Hu', text: 'Hu... Hu... Hu... The ancient sound of the soul. Let it carry you inward. Hu... Hu... Hu...', tradition: 'Sufi', color: '#F97316' },
+  { id: 'shema', label: 'Shema', text: 'Shema Yisrael... Adonai Eloheinu... Adonai Echad... Hear, O Israel. Shema Yisrael...', tradition: 'Jewish', color: '#818CF8' },
+  { id: 'allah-hu', label: 'Allah Hu', text: 'Allah Hu... Allah Hu... The breath of the Beloved. Allah Hu... Allah Hu...', tradition: 'Islamic Sufi', color: '#0EA5E9' },
+  { id: 'nam-myoho', label: 'Nam Myoho Renge Kyo', text: 'Nam Myoho Renge Kyo... I devote myself to the mystic law of cause and effect. Nam Myoho Renge Kyo...', tradition: 'Nichiren Buddhist', color: '#DC2626' },
+  { id: 'waheguru', label: 'Waheguru', text: 'Waheguru... Waheguru... Wonderful Lord. The darkness dissolves. Waheguru... Waheguru...', tradition: 'Sikh', color: '#EA580C' },
+  { id: 'hooponopono', label: "Ho'oponopono", text: 'I am sorry... Please forgive me... Thank you... I love you... I am sorry... Please forgive me...', tradition: 'Hawaiian', color: '#06B6D4' },
+  { id: 'abundance', label: 'I Am Abundance', text: 'I am abundance... I am prosperity... The universe provides for me endlessly. I am abundance...', tradition: 'Modern', color: '#FCD34D' },
+  { id: 'ham-sa', label: 'Ham Sa', text: 'Ham... Sa... I am that. The swan of consciousness glides upon the waters of being. Ham... Sa...', tradition: 'Vedantic', color: '#A855F7' },
+  { id: 'om-tare', label: 'Om Tare Tuttare', text: 'Om Tare Tuttare Ture Soha... Green Tara, swift protector, dispel all fears. Om Tare Tuttare Ture Soha...', tradition: 'Tibetan Buddhist', color: '#34D399' },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -82,6 +94,12 @@ export function MixerProvider({ children }) {
   const [activeMantra, setActiveMantra] = useState(null);
   const [channelVols, setChannelVols] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
+  const [mantraLoading, setMantraLoading] = useState(false);
+  const [voiceMorph, setVoiceMorph] = useState({
+    pitch: 0, formant: 0, reverb: 20, delay: 0, delayTime: 300,
+    chorus: 0, distortion: 0, eqLow: 0, eqMid: 0, eqHigh: 0,
+    speed: 100, width: 0, gain: 100,
+  });
 
   // Refs
   const ctxRef = useRef(null);
@@ -96,6 +114,8 @@ export function MixerProvider({ children }) {
   const droneGainMapRef = useRef({});
   const droneFilterMapRef = useRef({});
   const mantraAudioRef = useRef(null);
+  const mantraSourceRef = useRef(null);
+  const voiceChainRef = useRef(null);
 
   // Track active count for isPlaying indicator
   useEffect(() => {
@@ -139,7 +159,7 @@ export function MixerProvider({ children }) {
     delete mapRef.current[key];
   }, []);
 
-  const toggleFreq = useCallback(async (freq) => {
+  const toggleFreq = useCallback(async (freq, options = {}) => {
     if (activeFreqs.has(freq.hz)) {
       stopNodesForKey(freqNodesMapRef, freq.hz);
       delete freqGainMapRef.current[freq.hz];
@@ -147,6 +167,7 @@ export function MixerProvider({ children }) {
       return;
     }
     const ctx = await getCtx();
+    const waveform = options.waveform || 'sine';
     const vol = (channelVols[`freq-${freq.hz}`] ?? 75) / 100;
     const channelGain = ctx.createGain();
     channelGain.gain.value = vol * 0.15;
@@ -155,9 +176,9 @@ export function MixerProvider({ children }) {
     let nodes;
     if (freq.hz < 20) {
       const carrier = 200; const merger = ctx.createChannelMerger(2);
-      const oscL = ctx.createOscillator(); oscL.type = 'sine'; oscL.frequency.value = carrier;
+      const oscL = ctx.createOscillator(); oscL.type = waveform; oscL.frequency.value = carrier;
       const gL = ctx.createGain(); gL.gain.value = 1; oscL.connect(gL); gL.connect(merger, 0, 0);
-      const oscR = ctx.createOscillator(); oscR.type = 'sine'; oscR.frequency.value = carrier + freq.hz;
+      const oscR = ctx.createOscillator(); oscR.type = waveform; oscR.frequency.value = carrier + freq.hz;
       const gR = ctx.createGain(); gR.gain.value = 1; oscR.connect(gR); gR.connect(merger, 0, 1);
       const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = freq.hz * 16;
       const subG = ctx.createGain(); subG.gain.value = 0.06;
@@ -165,7 +186,7 @@ export function MixerProvider({ children }) {
       oscL.start(); oscR.start(); sub.start();
       nodes = [oscL, oscR, sub, merger];
     } else {
-      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq.hz;
+      const o = ctx.createOscillator(); o.type = waveform; o.frequency.value = freq.hz;
       const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
       const lg = ctx.createGain(); lg.gain.value = 0.04;
       lfo.connect(lg); lg.connect(channelGain.gain); o.connect(channelGain);
@@ -177,7 +198,7 @@ export function MixerProvider({ children }) {
     setActiveFreqs(prev => new Set(prev).add(freq.hz));
   }, [activeFreqs, getCtx, channelVols, stopNodesForKey]);
 
-  const toggleSound = useCallback(async (sound) => {
+  const toggleSound = useCallback(async (sound, options = {}) => {
     if (activeSounds.has(sound.id)) {
       stopNodesForKey(soundNodesMapRef, sound.id);
       delete soundGainMapRef.current[sound.id];
@@ -192,8 +213,9 @@ export function MixerProvider({ children }) {
     soundGainMapRef.current[sound.id] = channelGain;
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.value = 20000;
-    filter.Q.value = 1;
+    const sf = options.filter || { cutoff: 20000, resonance: 1 };
+    filter.frequency.value = sf.cutoff;
+    filter.Q.value = sf.resonance;
     soundFilterMapRef.current[sound.id] = filter;
     filter.connect(channelGain);
     channelGain.connect(masterGainRef.current);
@@ -203,7 +225,7 @@ export function MixerProvider({ children }) {
     setActiveSounds(prev => new Set(prev).add(sound.id));
   }, [activeSounds, getCtx, channelVols, stopNodesForKey]);
 
-  const toggleDrone = useCallback(async (drone) => {
+  const toggleDrone = useCallback(async (drone, options = {}) => {
     if (activeDrones.has(drone.id)) {
       stopNodesForKey(droneNodesMapRef, drone.id);
       delete droneGainMapRef.current[drone.id];
@@ -218,8 +240,9 @@ export function MixerProvider({ children }) {
     droneGainMapRef.current[drone.id] = channelGain;
     const filter = ctx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.frequency.value = drone.filterFreq;
-    filter.Q.value = drone.filterQ;
+    const df = options.filter || { cutoff: drone.filterFreq, resonance: drone.filterQ };
+    filter.frequency.value = df.cutoff;
+    filter.Q.value = df.resonance;
     droneFilterMapRef.current[drone.id] = filter;
     filter.connect(channelGain);
     channelGain.connect(masterGainRef.current);
@@ -237,31 +260,140 @@ export function MixerProvider({ children }) {
     setActiveDrones(prev => new Set(prev).add(drone.id));
   }, [activeDrones, getCtx, channelVols, stopNodesForKey]);
 
-  const toggleMantra = useCallback(async (mantra, authHeaders) => {
-    if (mantraAudioRef.current) {
-      mantraAudioRef.current.pause();
-      mantraAudioRef.current = null;
+  // Build impulse response for convolution reverb
+  const buildReverbIR = useCallback((ctx, duration = 2.5, decay = 3) => {
+    const rate = ctx.sampleRate;
+    const length = rate * duration;
+    const ir = ctx.createBuffer(2, length, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = ir.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
     }
+    return ir;
+  }, []);
+
+  // Build voice effects chain
+  const buildVoiceChain = useCallback((ctx, masterGain, morph) => {
+    if (voiceChainRef.current) {
+      voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} });
+    }
+    const nodes = [];
+    let last;
+    const inputGain = ctx.createGain();
+    inputGain.gain.value = (morph.gain / 100) * 1.5;
+    nodes.push(inputGain); last = inputGain;
+    // EQ
+    const eqLow = ctx.createBiquadFilter(); eqLow.type = 'lowshelf'; eqLow.frequency.value = 300; eqLow.gain.value = morph.eqLow;
+    last.connect(eqLow); nodes.push(eqLow); last = eqLow;
+    const eqMid = ctx.createBiquadFilter(); eqMid.type = 'peaking'; eqMid.frequency.value = 1500; eqMid.Q.value = 1; eqMid.gain.value = morph.eqMid;
+    last.connect(eqMid); nodes.push(eqMid); last = eqMid;
+    const eqHigh = ctx.createBiquadFilter(); eqHigh.type = 'highshelf'; eqHigh.frequency.value = 4000; eqHigh.gain.value = morph.eqHigh;
+    last.connect(eqHigh); nodes.push(eqHigh); last = eqHigh;
+    // Formant
+    if (morph.formant !== 0) {
+      const shift = morph.formant * 8;
+      [270, 730, 2000, 3400].forEach(f => {
+        const bp = ctx.createBiquadFilter(); bp.type = 'peaking'; bp.frequency.value = Math.max(80, f + shift); bp.Q.value = 4; bp.gain.value = 6;
+        last.connect(bp); nodes.push(bp); last = bp;
+      });
+    }
+    // Distortion
+    if (morph.distortion > 0) {
+      const ws = ctx.createWaveShaper();
+      const amount = morph.distortion / 100 * 50;
+      const curve = new Float32Array(44100);
+      for (let i = 0; i < 44100; i++) { const x = (i * 2) / 44100 - 1; curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x)); }
+      ws.curve = curve; ws.oversample = '4x';
+      last.connect(ws); nodes.push(ws); last = ws;
+    }
+    const dryGain = ctx.createGain();
+    const wetBus = ctx.createGain();
+    const outputMerge = ctx.createGain(); outputMerge.gain.value = 1;
+    // Chorus
+    if (morph.chorus > 0) {
+      const depth = morph.chorus / 100;
+      const chorusDelay = ctx.createDelay(0.05); chorusDelay.delayTime.value = 0.025;
+      const chorusLFO = ctx.createOscillator(); chorusLFO.frequency.value = 1.5;
+      const chorusLFOGain = ctx.createGain(); chorusLFOGain.gain.value = 0.015 * depth;
+      chorusLFO.connect(chorusLFOGain); chorusLFOGain.connect(chorusDelay.delayTime); chorusLFO.start();
+      const chorusGain = ctx.createGain(); chorusGain.gain.value = depth * 0.6;
+      last.connect(chorusDelay); chorusDelay.connect(chorusGain); chorusGain.connect(outputMerge);
+      nodes.push(chorusDelay, chorusLFO, chorusLFOGain, chorusGain);
+    }
+    // Delay
+    if (morph.delay > 0) {
+      const delayNode = ctx.createDelay(3); delayNode.delayTime.value = morph.delayTime / 1000;
+      const feedback = ctx.createGain(); feedback.gain.value = Math.min(0.85, morph.delay / 100 * 0.8);
+      const delayWet = ctx.createGain(); delayWet.gain.value = morph.delay / 100 * 0.5;
+      last.connect(delayNode); delayNode.connect(feedback); feedback.connect(delayNode);
+      delayNode.connect(delayWet); delayWet.connect(outputMerge);
+      nodes.push(delayNode, feedback, delayWet);
+    }
+    // Reverb
+    const reverbWet = morph.reverb / 100;
+    if (reverbWet > 0.05) {
+      const convolver = ctx.createConvolver(); convolver.buffer = buildReverbIR(ctx, 2.5, 2.5);
+      const reverbGain = ctx.createGain(); reverbGain.gain.value = reverbWet * 0.6;
+      last.connect(convolver); convolver.connect(reverbGain); reverbGain.connect(outputMerge);
+      nodes.push(convolver, reverbGain);
+    }
+    dryGain.gain.value = 1 - (reverbWet * 0.3);
+    last.connect(dryGain); dryGain.connect(outputMerge);
+    nodes.push(dryGain, wetBus, outputMerge);
+    // Stereo Width
+    if (morph.width > 0) {
+      const panner = ctx.createStereoPanner();
+      const panLFO = ctx.createOscillator(); panLFO.frequency.value = 0.3;
+      const panGain = ctx.createGain(); panGain.gain.value = morph.width / 100;
+      panLFO.connect(panGain); panGain.connect(panner.pan); panLFO.start();
+      outputMerge.connect(panner); panner.connect(masterGain);
+      nodes.push(panner, panLFO, panGain);
+    } else {
+      outputMerge.connect(masterGain);
+    }
+    voiceChainRef.current = { input: inputGain, nodes };
+    return inputGain;
+  }, [buildReverbIR]);
+
+  // Rebuild voice chain when voiceMorph changes
+  useEffect(() => {
+    if (!mantraAudioRef.current || !ctxRef.current || !masterGainRef.current) return;
+    const source = mantraSourceRef.current;
+    if (!source) return;
+    try { source.disconnect(); } catch {}
+    const chainInput = buildVoiceChain(ctxRef.current, masterGainRef.current, voiceMorph);
+    source.connect(chainInput);
+  }, [voiceMorph, buildVoiceChain]);
+
+  const toggleMantra = useCallback(async (mantra, authHeaders) => {
+    if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
+    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch {} mantraSourceRef.current = null; }
+    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} }); voiceChainRef.current = null; }
     if (activeMantra?.id === mantra.id) { setActiveMantra(null); return; }
     setActiveMantra(mantra);
+    setMantraLoading(true);
     try {
       const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, context: 'mixer' }, { headers: authHeaders });
-      if (!res.data.audio) { setActiveMantra(null); return; }
+      if (!res.data.audio) { setMantraLoading(false); setActiveMantra(null); return; }
       const ctx = await getCtx();
       const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
       audio.crossOrigin = 'anonymous';
       audio.loop = true;
       const source = ctx.createMediaElementSource(audio);
-      const gain = ctx.createGain();
-      gain.gain.value = 1.5;
-      source.connect(gain);
-      gain.connect(masterGainRef.current);
+      mantraSourceRef.current = source;
       mantraAudioRef.current = audio;
+      audio.playbackRate = Math.pow(2, voiceMorph.pitch / 12) * (voiceMorph.speed / 100);
+      const chainInput = buildVoiceChain(ctx, masterGainRef.current, voiceMorph);
+      source.connect(chainInput);
       await audio.play();
+      setMantraLoading(false);
     } catch {
+      setMantraLoading(false);
       setActiveMantra(null);
     }
-  }, [activeMantra, getCtx]);
+  }, [activeMantra, getCtx, voiceMorph, buildVoiceChain]);
 
   const setChannelVolume = useCallback((key, val) => {
     setChannelVols(v => ({...v, [key]: val}));
@@ -277,10 +409,12 @@ export function MixerProvider({ children }) {
     Object.keys(soundNodesMapRef.current).forEach(k => stopNodesForKey(soundNodesMapRef, k));
     Object.keys(droneNodesMapRef.current).forEach(k => stopNodesForKey(droneNodesMapRef, k));
     if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
+    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch {} mantraSourceRef.current = null; }
+    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} }); voiceChainRef.current = null; }
     setActiveFreqs(new Set()); setActiveSounds(new Set()); setActiveDrones(new Set()); setActiveMantra(null);
+    setMantraLoading(false);
   }, [stopNodesForKey]);
 
-  // Get snapshot of current state for saving
   const getSnapshot = useCallback(() => ({
     activeFreqs: Array.from(activeFreqs),
     activeSounds: Array.from(activeSounds),
@@ -288,14 +422,14 @@ export function MixerProvider({ children }) {
     activeMantra: activeMantra?.id || null,
     channelVols,
     masterVol,
-  }), [activeFreqs, activeSounds, activeDrones, activeMantra, channelVols, masterVol]);
+    voiceMorph,
+  }), [activeFreqs, activeSounds, activeDrones, activeMantra, channelVols, masterVol, voiceMorph]);
 
-  // Restore from snapshot
-  const restoreSnapshot = useCallback(async (snap) => {
+  const restoreSnapshot = useCallback(async (snap, authHeaders) => {
     stopAll();
-    if (snap.masterVol) setMasterVol(snap.masterVol);
+    if (snap.masterVol != null) setMasterVol(snap.masterVol);
     if (snap.channelVols) setChannelVols(snap.channelVols);
-    // Re-activate layers
+    if (snap.voiceMorph) setVoiceMorph(snap.voiceMorph);
     for (const hz of (snap.activeFreqs || [])) {
       const f = FREQUENCIES.find(x => x.hz === hz);
       if (f) await toggleFreq(f);
@@ -308,7 +442,11 @@ export function MixerProvider({ children }) {
       const d = INSTRUMENT_DRONES.find(x => x.id === id);
       if (d) await toggleDrone(d);
     }
-  }, [stopAll, toggleFreq, toggleSound, toggleDrone]);
+    if (snap.activeMantra && authHeaders) {
+      const m = MANTRAS.find(x => x.id === snap.activeMantra);
+      if (m) await toggleMantra(m, authHeaders);
+    }
+  }, [stopAll, toggleFreq, toggleSound, toggleDrone, toggleMantra]);
 
   const totalActive = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0);
 
@@ -316,15 +454,16 @@ export function MixerProvider({ children }) {
     masterVol, setMasterVol, muted, setMuted,
     activeFreqs, activeSounds, activeDrones, activeMantra,
     channelVols, setChannelVols, setChannelVolume,
-    isPlaying, totalActive,
+    isPlaying, totalActive, mantraLoading, setMantraLoading,
+    voiceMorph, setVoiceMorph,
     getCtx, toggleFreq, toggleSound, toggleDrone, toggleMantra,
     stopAll, getSnapshot, restoreSnapshot,
     analyserRef, masterGainRef, ctxRef,
     freqNodesMapRef, freqGainMapRef,
     soundNodesMapRef, soundGainMapRef, soundFilterMapRef,
     droneNodesMapRef, droneGainMapRef, droneFilterMapRef,
-    mantraAudioRef, setActiveMantra,
-    setActiveFreqs, setActiveSounds, setActiveDrones,
+    mantraAudioRef, mantraSourceRef, voiceChainRef,
+    setActiveMantra, setActiveFreqs, setActiveSounds, setActiveDrones,
   };
 
   return <MixerContext.Provider value={value}>{children}</MixerContext.Provider>;

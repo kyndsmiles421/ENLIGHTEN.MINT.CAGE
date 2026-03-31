@@ -7,81 +7,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
+import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES, MANTRAS } from '../context/MixerContext';
+import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-
-const FREQUENCIES = [
-  { hz: 174, label: '174 Hz', desc: 'Foundation & Pain Relief', color: '#78716C' },
-  { hz: 285, label: '285 Hz', desc: 'Tissue Healing & Safety', color: '#92400E' },
-  { hz: 396, label: '396 Hz', desc: 'Liberation from Fear', color: '#EF4444' },
-  { hz: 417, label: '417 Hz', desc: 'Undoing & Change', color: '#FB923C' },
-  { hz: 432, label: '432 Hz', desc: 'Universal Harmony', color: '#10B981' },
-  { hz: 528, label: '528 Hz', desc: 'Love & Transformation', color: '#22C55E' },
-  { hz: 639, label: '639 Hz', desc: 'Connection & Harmony', color: '#3B82F6' },
-  { hz: 741, label: '741 Hz', desc: 'Intuition & Expression', color: '#8B5CF6' },
-  { hz: 852, label: '852 Hz', desc: 'Spiritual Awakening', color: '#C084FC' },
-  { hz: 963, label: '963 Hz', desc: 'Divine Connection', color: '#E879F9' },
-  { hz: 7.83, label: '7.83 Hz', desc: 'Schumann Resonance', color: '#2DD4BF' },
-  { hz: 10, label: '10 Hz', desc: 'Alpha Relaxation', color: '#06B6D4' },
-  { hz: 40, label: '40 Hz', desc: 'Gamma Focus', color: '#F59E0B' },
-  { hz: 111, label: '111 Hz', desc: 'Cell Regeneration', color: '#DC2626' },
-  { hz: 1111, label: '1111 Hz', desc: 'Angel Frequency', color: '#FCD34D' },
-];
-
-const SOUNDS = [
-  { id: 'rain', label: 'Rain', color: '#3B82F6', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2500; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000; const sg = ctx.createGain(); sg.gain.value = 0.08; src.connect(hp); hp.connect(lp); lp.connect(sg); sg.connect(g); src.start(); return [src]; }},
-  { id: 'ocean', label: 'Ocean', color: '#06B6D4', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300; const lfo = ctx.createOscillator(); lfo.frequency.value = 0.08; const lg = ctx.createGain(); lg.gain.value = 150; lfo.connect(lg); lg.connect(lp.frequency); const sg = ctx.createGain(); sg.gain.value = 0.1; src.connect(lp); lp.connect(sg); sg.connect(g); lfo.start(); src.start(); return [src, lfo]; }},
-  { id: 'wind', label: 'Wind', color: '#A78BFA', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 800; bp.Q.value = 0.5; const lfo = ctx.createOscillator(); lfo.frequency.value = 0.12; const lg = ctx.createGain(); lg.gain.value = 400; lfo.connect(lg); lg.connect(bp.frequency); const sg = ctx.createGain(); sg.gain.value = 0.06; src.connect(bp); bp.connect(sg); sg.connect(g); lfo.start(); src.start(); return [src, lfo]; }},
-  { id: 'fire', label: 'Fire', color: '#F59E0B', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 400; bp.Q.value = 1.5; const lfo = ctx.createOscillator(); lfo.frequency.value = 3; const lg = ctx.createGain(); lg.gain.value = 200; lfo.connect(lg); lg.connect(bp.frequency); const sg = ctx.createGain(); sg.gain.value = 0.05; src.connect(bp); bp.connect(sg); sg.connect(g); lfo.start(); src.start(); return [src, lfo]; }},
-  { id: 'singing-bowl', label: 'Singing Bowl', color: '#FCD34D', gen: (ctx, g) => { const nodes = []; const play = () => { [293.66, 440, 587.33].forEach(f => { const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f; const eg = ctx.createGain(); eg.gain.setValueAtTime(0.06, ctx.currentTime); eg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 6); o.connect(eg); eg.connect(g); o.start(); o.stop(ctx.currentTime + 6); }); }; play(); const iv = setInterval(play, 5500); nodes._interval = iv; return nodes; }},
-  { id: 'thunder', label: 'Thunder', color: '#6366F1', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 180; const sg = ctx.createGain(); sg.gain.value = 0.08; src.connect(lp); lp.connect(sg); sg.connect(g); src.start(); return [src]; }},
-  { id: 'stream', label: 'Stream', color: '#22D3EE', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2000; bp.Q.value = 0.3; const sg = ctx.createGain(); sg.gain.value = 0.06; src.connect(bp); bp.connect(sg); sg.connect(g); src.start(); return [src]; }},
-  { id: 'forest', label: 'Forest', color: '#16A34A', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3500; bp.Q.value = 2; const sg = ctx.createGain(); sg.gain.value = 0.04; src.connect(bp); bp.connect(sg); sg.connect(g); src.start(); return [src]; }},
-  { id: 'cave', label: 'Cave', color: '#78716C', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 500; const sg = ctx.createGain(); sg.gain.value = 0.07; src.connect(lp); lp.connect(sg); sg.connect(g); src.start(); return [src]; }},
-  { id: 'night', label: 'Night', color: '#312E81', gen: (ctx, g) => { const nodes = []; const play = () => { [2800, 3200, 3600].forEach(f => { const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f + Math.random() * 200; const eg = ctx.createGain(); eg.gain.setValueAtTime(0.012, ctx.currentTime); eg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5); o.connect(eg); eg.connect(g); o.start(); o.stop(ctx.currentTime + 1.5); }); }; play(); const iv = setInterval(play, 2200); nodes._interval = iv; return nodes; }},
-  { id: 'waterfall', label: 'Waterfall', color: '#0EA5E9', gen: (ctx, g) => { const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1500; const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 200; const sg = ctx.createGain(); sg.gain.value = 0.07; src.connect(hp); hp.connect(lp); lp.connect(sg); sg.connect(g); src.start(); return [src]; }},
-];
-
-const MANTRAS = [
-  { id: 'om', label: 'Om', text: 'Om... Om... Om... Let the vibration settle into your being. Om... Om... Om...', tradition: 'Universal', color: '#C084FC' },
-  { id: 'om-mani', label: 'Om Mani Padme Hum', text: 'Om Mani Padme Hum... Om Mani Padme Hum... Let compassion fill every cell. Om Mani Padme Hum...', tradition: 'Tibetan Buddhist', color: '#2DD4BF' },
-  { id: 'om-namah', label: 'Om Namah Shivaya', text: 'Om Namah Shivaya... I bow to the divine within. Om Namah Shivaya... Om Namah Shivaya...', tradition: 'Hindu', color: '#8B5CF6' },
-  { id: 'so-hum', label: 'So Hum', text: 'So... Hum... I am that I am. So... Hum... Breathe in, I am. Breathe out, that. So... Hum...', tradition: 'Vedic', color: '#3B82F6' },
-  { id: 'ra-ma', label: 'Ra Ma Da Sa', text: 'Ra Ma Da Sa... Sa Say So Hung... Feel the healing energy flow. Ra Ma Da Sa... Sa Say So Hung...', tradition: 'Kundalini', color: '#FCD34D' },
-  { id: 'peace', label: 'I Am Peace', text: 'I am peace... I am light... I am love... With every breath, I return to stillness. I am peace... I am light... I am love...', tradition: 'Modern', color: '#22C55E' },
-  { id: 'gayatri', label: 'Gayatri', text: 'Om Bhur Bhuvaswaha... Tat Savitur Varenyam... Bhargo Devasya Dhimahi... Dhiyo Yo Nah Prachodayat...', tradition: 'Hindu Vedic', color: '#F59E0B' },
-  { id: 'gate-gate', label: 'Gate Gate', text: 'Gate Gate... Paragate... Parasamgate... Bodhi Svaha... Gone, gone, gone beyond. Enlightenment. Gate Gate...', tradition: 'Buddhist', color: '#EC4899' },
-  { id: 'lokah', label: 'Lokah Samastah', text: 'Lokah Samastah Sukhino Bhavantu... May all beings everywhere be happy and free. Lokah Samastah Sukhino Bhavantu...', tradition: 'Sanskrit', color: '#10B981' },
-  { id: 'hu', label: 'Hu', text: 'Hu... Hu... Hu... The ancient sound of the soul. Let it carry you inward. Hu... Hu... Hu...', tradition: 'Sufi', color: '#F97316' },
-  { id: 'shema', label: 'Shema', text: 'Shema Yisrael... Adonai Eloheinu... Adonai Echad... Hear, O Israel. Shema Yisrael...', tradition: 'Jewish', color: '#818CF8' },
-  { id: 'allah-hu', label: 'Allah Hu', text: 'Allah Hu... Allah Hu... The breath of the Beloved. Allah Hu... Allah Hu...', tradition: 'Islamic Sufi', color: '#0EA5E9' },
-  { id: 'nam-myoho', label: 'Nam Myoho Renge Kyo', text: 'Nam Myoho Renge Kyo... I devote myself to the mystic law of cause and effect. Nam Myoho Renge Kyo...', tradition: 'Nichiren Buddhist', color: '#DC2626' },
-  { id: 'waheguru', label: 'Waheguru', text: 'Waheguru... Waheguru... Wonderful Lord. The darkness dissolves. Waheguru... Waheguru...', tradition: 'Sikh', color: '#EA580C' },
-  { id: 'hooponopono', label: 'Ho\'oponopono', text: 'I am sorry... Please forgive me... Thank you... I love you... I am sorry... Please forgive me...', tradition: 'Hawaiian', color: '#06B6D4' },
-  { id: 'abundance', label: 'I Am Abundance', text: 'I am abundance... I am prosperity... The universe provides for me endlessly. I am abundance...', tradition: 'Modern', color: '#FCD34D' },
-  { id: 'ham-sa', label: 'Ham Sa', text: 'Ham... Sa... I am that. The swan of consciousness glides upon the waters of being. Ham... Sa...', tradition: 'Vedantic', color: '#A855F7' },
-  { id: 'om-tare', label: 'Om Tare Tuttare', text: 'Om Tare Tuttare Ture Soha... Green Tara, swift protector, dispel all fears. Om Tare Tuttare Ture Soha...', tradition: 'Tibetan Buddhist', color: '#34D399' },
-];
-
-const INSTRUMENT_DRONES = [
-  { id: 'sitar-drone', label: 'Sitar', color: '#F59E0B', wave: 'sawtooth', freq: 146.83, filterFreq: 1200, filterQ: 8, vibratoRate: 5, vibratoDepth: 8 },
-  { id: 'tanpura-drone', label: 'Tanpura', color: '#EA580C', wave: 'sawtooth', freq: 130.81, filterFreq: 600, filterQ: 3, vibratoRate: 2, vibratoDepth: 3 },
-  { id: 'didgeridoo-drone', label: 'Didgeridoo', color: '#78350F', wave: 'sawtooth', freq: 65.41, filterFreq: 300, filterQ: 6, vibratoRate: 2, vibratoDepth: 5 },
-  { id: 'bowl-drone', label: 'Singing Bowl', color: '#7C3AED', wave: 'sine', freq: 261.63, filterFreq: 800, filterQ: 12, vibratoRate: 1.5, vibratoDepth: 2 },
-  { id: 'flute-drone', label: 'Cedar Flute', color: '#059669', wave: 'sine', freq: 329.63, filterFreq: 2000, filterQ: 1, vibratoRate: 4.5, vibratoDepth: 12 },
-  { id: 'erhu-drone', label: 'Erhu', color: '#E11D48', wave: 'sawtooth', freq: 293.66, filterFreq: 2500, filterQ: 4, vibratoRate: 5.5, vibratoDepth: 15 },
-  { id: 'oud-drone', label: 'Oud', color: '#B45309', wave: 'sawtooth', freq: 196.00, filterFreq: 1000, filterQ: 5, vibratoRate: 3.5, vibratoDepth: 6 },
-  { id: 'harmonium-drone', label: 'Harmonium', color: '#9333EA', wave: 'sawtooth', freq: 174.61, filterFreq: 900, filterQ: 2, vibratoRate: 1, vibratoDepth: 2 },
-  { id: 'shakuhachi-drone', label: 'Shakuhachi', color: '#047857', wave: 'sine', freq: 392.00, filterFreq: 1800, filterQ: 2, vibratoRate: 3, vibratoDepth: 18 },
-  { id: 'koto-drone', label: 'Koto', color: '#DC2626', wave: 'triangle', freq: 440.00, filterFreq: 3000, filterQ: 6, vibratoRate: 6, vibratoDepth: 4 },
-  { id: 'hang-drum-drone', label: 'Hang Drum', color: '#2DD4BF', wave: 'sine', freq: 220.00, filterFreq: 700, filterQ: 15, vibratoRate: 0.8, vibratoDepth: 1 },
-  { id: 'cello-drone', label: 'Cello', color: '#92400E', wave: 'sawtooth', freq: 130.81, filterFreq: 1500, filterQ: 2, vibratoRate: 5, vibratoDepth: 6 },
-  { id: 'tibetan-horn', label: 'Tibetan Horn', color: '#7C2D12', wave: 'sawtooth', freq: 73.42, filterFreq: 250, filterQ: 4, vibratoRate: 1.5, vibratoDepth: 3 },
-  { id: 'harp-drone', label: 'Harp', color: '#EC4899', wave: 'sine', freq: 349.23, filterFreq: 2200, filterQ: 1, vibratoRate: 2, vibratoDepth: 5 },
-  { id: 'kalimba-drone', label: 'Kalimba', color: '#0EA5E9', wave: 'sine', freq: 523.25, filterFreq: 3500, filterQ: 10, vibratoRate: 0.5, vibratoDepth: 1 },
-  { id: 'bagpipe-drone', label: 'Bagpipe', color: '#4338CA', wave: 'sawtooth', freq: 146.83, filterFreq: 500, filterQ: 3, vibratoRate: 1, vibratoDepth: 2 },
-];
 
 const LIGHT_MODES = [
   { id: 'sunrise', label: 'Sunrise Glow', colors: ['#FCD34D', '#FB923C', '#EF4444'], speed: 4000 },
@@ -239,8 +169,24 @@ export default function CosmicMixerPage() {
   const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
   const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
-  const [masterVol, setMasterVol] = useState(60);
-  const [muted, setMuted] = useState(false);
+
+  // ─── Global audio state from MixerContext ───
+  const {
+    masterVol, setMasterVol, muted, setMuted,
+    activeFreqs, activeSounds, activeDrones, activeMantra,
+    channelVols, setChannelVols, setChannelVolume,
+    voiceMorph, setVoiceMorph, mantraLoading,
+    getCtx, toggleFreq: ctxToggleFreq, toggleSound: ctxToggleSound,
+    toggleDrone: ctxToggleDrone, toggleMantra: ctxToggleMantra,
+    stopAll: ctxStopAll,
+    analyserRef, masterGainRef, ctxRef,
+    freqNodesMapRef, freqGainMapRef,
+    soundNodesMapRef, soundGainMapRef, soundFilterMapRef,
+    droneNodesMapRef, droneGainMapRef, droneFilterMapRef,
+    mantraAudioRef, mantraSourceRef, voiceChainRef,
+  } = useMixer();
+
+  // ─── Page-local state ───
   const [founderFreq, setFounderFreq] = useState(null);
   const [seasonalFreqs, setSeasonalFreqs] = useState([]);
 
@@ -290,348 +236,46 @@ export default function CosmicMixerPage() {
     ...seasonalFreqs,
   ];
 
-  const [activeFreqs, setActiveFreqs] = useState(new Set());
-  const [activeSounds, setActiveSounds] = useState(new Set());
-  const [activeMantra, setActiveMantra] = useState(null);
-  const [activeDrones, setActiveDrones] = useState(new Set());
   const [activeLight, setActiveLight] = useState(null);
   const [vibeOn, setVibeOn] = useState(false);
-  const [mantraLoading, setMantraLoading] = useState(false);
 
-  // Per-channel volume (0-100) and parameters
-  const [channelVols, setChannelVols] = useState({});
-  const [freqWaveforms, setFreqWaveforms] = useState({});       // per-freq waveform type
-  const [soundFilters, setSoundFilters] = useState({});          // per-sound { cutoff, resonance }
-  const [droneFilters, setDroneFilters] = useState({});          // per-drone { cutoff, resonance }
-  // Master effects bus
+  // Per-channel UI parameters (page-local)
+  const [freqWaveforms, setFreqWaveforms] = useState({});
+  const [soundFilters, setSoundFilters] = useState({});
+  const [droneFilters, setDroneFilters] = useState({});
   const [masterFx, setMasterFx] = useState({
-    reverb: 0,
-    delay: 0,
-    delayTime: 400,
-    chorus: 0,
-    compressor: true,
+    reverb: 0, delay: 0, delayTime: 400, chorus: 0, compressor: true,
   });
-
-  const ctxRef = useRef(null);
-  const masterGainRef = useRef(null);
-  const masterFxChainRef = useRef(null);
-  const analyserRef = useRef(null);
-  const canvasRef = useRef(null);
-  const animFrameRef = useRef(null);
-  const freqNodesMapRef = useRef({});
-  const freqGainMapRef = useRef({});
-  const soundNodesMapRef = useRef({});
-  const soundGainMapRef = useRef({});
-  const soundFilterMapRef = useRef({});
-  const droneNodesMapRef = useRef({});
-  const droneGainMapRef = useRef({});
-  const droneFilterMapRef = useRef({});
-  const mantraAudioRef = useRef(null);
-  const mantraSourceRef = useRef(null);
-  const voiceChainRef = useRef(null);
   const vibeIntervalRef = useRef(null);
-
-  // Voice Morph Engine state — continuous parameters
-  const [voiceMorph, setVoiceMorph] = useState({
-    pitch: 0,         // -24 to +24 semitones
-    formant: 0,       // -100 to +100 (shifts formant filters)
-    reverb: 20,       // 0-100 wet/dry
-    delay: 0,         // 0-100 feedback amount
-    delayTime: 300,   // 50-2000ms
-    chorus: 0,        // 0-100 depth
-    distortion: 0,    // 0-100 drive amount
-    eqLow: 0,         // -12 to +12 dB
-    eqMid: 0,         // -12 to +12 dB
-    eqHigh: 0,        // -12 to +12 dB
-    speed: 100,       // 50-200 (playback rate %)
-    width: 0,         // 0-100 stereo width (LFO panning)
-    gain: 100,        // 0-200 voice volume boost
-  });
   const [showVoiceEngine, setShowVoiceEngine] = useState(false);
 
-  const getCtx = useCallback(async () => {
-    if (!ctxRef.current || ctxRef.current.state === 'closed') {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      ctxRef.current = ctx;
-
-      // Analyser for waveform visualization
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-      analyserRef.current = analyser;
-
-      // Compressor for glue and loudness
-      const compressor = ctx.createDynamicsCompressor();
-      compressor.threshold.value = -18;
-      compressor.knee.value = 12;
-      compressor.ratio.value = 4;
-      compressor.attack.value = 0.003;
-      compressor.release.value = 0.15;
-
-      masterGainRef.current = ctx.createGain();
-      // Chain: master → analyser → compressor → destination
-      masterGainRef.current.connect(analyser);
-      analyser.connect(compressor);
-      compressor.connect(ctx.destination);
-    }
-    if (ctxRef.current.state === 'suspended') await ctxRef.current.resume();
-    masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
-    return ctxRef.current;
-  }, [masterVol, muted]);
-
-  useEffect(() => {
-    if (masterGainRef.current) masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
-  }, [masterVol, muted]);
-
-  // Build an impulse response buffer for convolution reverb
-  const buildReverbIR = useCallback((ctx, duration = 2.5, decay = 3) => {
-    const rate = ctx.sampleRate;
-    const length = rate * duration;
-    const ir = ctx.createBuffer(2, length, rate);
-    for (let ch = 0; ch < 2; ch++) {
-      const d = ir.getChannelData(ch);
-      for (let i = 0; i < length; i++) {
-        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
-      }
-    }
-    return ir;
-  }, []);
-
-  // Build the voice effects chain (called when morph params change while mantra is playing)
-  const buildVoiceChain = useCallback((ctx, masterGain, morph) => {
-    // Clean up old chain
-    if (voiceChainRef.current) {
-      voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} });
-    }
-
-    const nodes = [];
-    let last; // tracks the last node in the chain
-
-    // 1. Input gain (voice boost)
-    const inputGain = ctx.createGain();
-    inputGain.gain.value = (morph.gain / 100) * 1.5; // boost voice significantly
-    nodes.push(inputGain);
-    last = inputGain;
-
-    // 2. EQ: Low shelf
-    const eqLow = ctx.createBiquadFilter();
-    eqLow.type = 'lowshelf';
-    eqLow.frequency.value = 300;
-    eqLow.gain.value = morph.eqLow;
-    last.connect(eqLow);
-    nodes.push(eqLow);
-    last = eqLow;
-
-    // 3. EQ: Mid peaking
-    const eqMid = ctx.createBiquadFilter();
-    eqMid.type = 'peaking';
-    eqMid.frequency.value = 1500;
-    eqMid.Q.value = 1;
-    eqMid.gain.value = morph.eqMid;
-    last.connect(eqMid);
-    nodes.push(eqMid);
-    last = eqMid;
-
-    // 4. EQ: High shelf
-    const eqHigh = ctx.createBiquadFilter();
-    eqHigh.type = 'highshelf';
-    eqHigh.frequency.value = 4000;
-    eqHigh.gain.value = morph.eqHigh;
-    last.connect(eqHigh);
-    nodes.push(eqHigh);
-    last = eqHigh;
-
-    // 5. Formant shift (series of bandpass filters)
-    if (morph.formant !== 0) {
-      const baseFormants = [270, 730, 2000, 3400]; // neutral vowel formants
-      const shift = morph.formant * 8; // ±800Hz range
-      baseFormants.forEach(f => {
-        const bp = ctx.createBiquadFilter();
-        bp.type = 'peaking';
-        bp.frequency.value = Math.max(80, f + shift);
-        bp.Q.value = 4;
-        bp.gain.value = 6;
-        last.connect(bp);
-        nodes.push(bp);
-        last = bp;
-      });
-    }
-
-    // 6. Distortion (waveshaper)
-    if (morph.distortion > 0) {
-      const ws = ctx.createWaveShaper();
-      const amount = morph.distortion / 100 * 50;
-      const curve = new Float32Array(44100);
-      for (let i = 0; i < 44100; i++) {
-        const x = (i * 2) / 44100 - 1;
-        curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
-      }
-      ws.curve = curve;
-      ws.oversample = '4x';
-      last.connect(ws);
-      nodes.push(ws);
-      last = ws;
-    }
-
-    // Split: dry path and wet effects
-    const dryGain = ctx.createGain();
-    const wetBus = ctx.createGain();
-    const outputMerge = ctx.createGain();
-    outputMerge.gain.value = 1;
-
-    // 7. Chorus (detuned copies with LFO)
-    if (morph.chorus > 0) {
-      const depth = morph.chorus / 100;
-      const chorusDelay = ctx.createDelay(0.05);
-      chorusDelay.delayTime.value = 0.025;
-      const chorusLFO = ctx.createOscillator();
-      chorusLFO.frequency.value = 1.5;
-      const chorusLFOGain = ctx.createGain();
-      chorusLFOGain.gain.value = 0.015 * depth;
-      chorusLFO.connect(chorusLFOGain);
-      chorusLFOGain.connect(chorusDelay.delayTime);
-      chorusLFO.start();
-      const chorusGain = ctx.createGain();
-      chorusGain.gain.value = depth * 0.6;
-      last.connect(chorusDelay);
-      chorusDelay.connect(chorusGain);
-      chorusGain.connect(outputMerge);
-      nodes.push(chorusDelay, chorusLFO, chorusLFOGain, chorusGain);
-    }
-
-    // 8. Delay/Echo
-    if (morph.delay > 0) {
-      const delayNode = ctx.createDelay(3);
-      delayNode.delayTime.value = morph.delayTime / 1000;
-      const feedback = ctx.createGain();
-      feedback.gain.value = Math.min(0.85, morph.delay / 100 * 0.8);
-      const delayWet = ctx.createGain();
-      delayWet.gain.value = morph.delay / 100 * 0.5;
-      last.connect(delayNode);
-      delayNode.connect(feedback);
-      feedback.connect(delayNode);
-      delayNode.connect(delayWet);
-      delayWet.connect(outputMerge);
-      nodes.push(delayNode, feedback, delayWet);
-    }
-
-    // 9. Convolution Reverb
-    const reverbWet = morph.reverb / 100;
-    if (reverbWet > 0.05) {
-      const convolver = ctx.createConvolver();
-      convolver.buffer = buildReverbIR(ctx, 2.5, 2.5);
-      const reverbGain = ctx.createGain();
-      reverbGain.gain.value = reverbWet * 0.6;
-      last.connect(convolver);
-      convolver.connect(reverbGain);
-      reverbGain.connect(outputMerge);
-      nodes.push(convolver, reverbGain);
-    }
-
-    // Dry path
-    dryGain.gain.value = 1 - (reverbWet * 0.3);
-    last.connect(dryGain);
-    dryGain.connect(outputMerge);
-    nodes.push(dryGain, wetBus, outputMerge);
-
-    // 10. Stereo Width (LFO panner)
-    if (morph.width > 0) {
-      const panner = ctx.createStereoPanner();
-      const panLFO = ctx.createOscillator();
-      panLFO.frequency.value = 0.3;
-      const panGain = ctx.createGain();
-      panGain.gain.value = morph.width / 100;
-      panLFO.connect(panGain);
-      panGain.connect(panner.pan);
-      panLFO.start();
-      outputMerge.connect(panner);
-      panner.connect(masterGain);
-      nodes.push(panner, panLFO, panGain);
-    } else {
-      outputMerge.connect(masterGain);
-    }
-
-    voiceChainRef.current = { input: inputGain, nodes };
-    return inputGain;
-  }, [buildReverbIR]);
-
-  // Update voice chain parameters in real-time when morph changes
-  useEffect(() => {
-    if (!mantraAudioRef.current || !ctxRef.current || !masterGainRef.current) return;
-    // Rebuild the chain with new parameters
-    const ctx = ctxRef.current;
-    const source = mantraSourceRef.current;
-    if (!source) return;
-
-    try { source.disconnect(); } catch {}
-    const chainInput = buildVoiceChain(ctx, masterGainRef.current, voiceMorph);
-    source.connect(chainInput);
-  }, [voiceMorph, buildVoiceChain]);
-
-  const stopNodesForKey = (mapRef, key) => {
-    const nodes = mapRef.current[key]; if (!nodes) return;
-    nodes.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
-    if (nodes._interval) clearInterval(nodes._interval);
-    delete mapRef.current[key];
-  };
-  const stopAllInMap = (mapRef) => { Object.keys(mapRef.current).forEach(key => stopNodesForKey(mapRef, key)); };
-
+  // ─── Page-local wrapper functions (shadow context names for seamless JSX) ───
   const toggleFreq = useCallback(async (freq) => {
-    if (activeFreqs.has(freq.hz)) {
-      stopNodesForKey(freqNodesMapRef, freq.hz);
-      delete freqGainMapRef.current[freq.hz];
-      setActiveFreqs(prev => { const n = new Set(prev); n.delete(freq.hz); return n; });
-      return;
-    }
-    const ctx = await getCtx();
-    const g = masterGainRef.current;
     const waveform = freqWaveforms[freq.hz] || 'sine';
-    const vol = (channelVols[`freq-${freq.hz}`] ?? 75) / 100;
-    let nodes;
+    await ctxToggleFreq(freq, { waveform });
+  }, [ctxToggleFreq, freqWaveforms]);
 
-    // Per-channel gain node
-    const channelGain = ctx.createGain();
-    channelGain.gain.value = vol * 0.15;
-    channelGain.connect(g);
-    freqGainMapRef.current[freq.hz] = channelGain;
+  const toggleSound = useCallback(async (sound) => {
+    const filter = soundFilters[sound.id];
+    await ctxToggleSound(sound, { filter });
+  }, [ctxToggleSound, soundFilters]);
 
-    if (freq.hz < 20) {
-      const carrier = 200; const merger = ctx.createChannelMerger(2);
-      const oscL = ctx.createOscillator(); oscL.type = waveform; oscL.frequency.value = carrier;
-      const gL = ctx.createGain(); gL.gain.value = 1; oscL.connect(gL); gL.connect(merger, 0, 0);
-      const oscR = ctx.createOscillator(); oscR.type = waveform; oscR.frequency.value = carrier + freq.hz;
-      const gR = ctx.createGain(); gR.gain.value = 1; oscR.connect(gR); gR.connect(merger, 0, 1);
-      const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = freq.hz * 16;
-      const subG = ctx.createGain(); subG.gain.value = 0.06;
-      sub.connect(subG); subG.connect(channelGain); merger.connect(channelGain);
-      oscL.start(); oscR.start(); sub.start();
-      nodes = [oscL, oscR, sub, merger];
-    } else {
-      const o = ctx.createOscillator(); o.type = waveform; o.frequency.value = freq.hz;
-      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
-      const lg = ctx.createGain(); lg.gain.value = 0.04;
-      lfo.connect(lg); lg.connect(channelGain.gain); o.connect(channelGain);
-      o.start(); lfo.start();
-      nodes = [o, lfo];
-    }
-    freqNodesMapRef.current[freq.hz] = nodes;
-    if (!channelVols[`freq-${freq.hz}`]) setChannelVols(v => ({...v, [`freq-${freq.hz}`]: 75}));
-    setActiveFreqs(prev => new Set(prev).add(freq.hz));
-  }, [activeFreqs, getCtx, channelVols, freqWaveforms]);
+  const toggleDrone = useCallback(async (drone) => {
+    const filter = droneFilters[drone.id];
+    await ctxToggleDrone(drone, { filter });
+  }, [ctxToggleDrone, droneFilters]);
 
-  // Update per-channel volume in real time
-  const setChannelVolume = useCallback((key, val) => {
-    setChannelVols(v => ({...v, [key]: val}));
-    // Apply to live gain node
-    const [type, id] = key.split('-');
-    if (type === 'freq' && freqGainMapRef.current[id]) {
-      freqGainMapRef.current[id].gain.value = (val / 100) * 0.15;
-    } else if (type === 'sound' && soundGainMapRef.current[id]) {
-      soundGainMapRef.current[id].gain.value = (val / 100) * 0.15;
-    } else if (type === 'drone' && droneGainMapRef.current[id]) {
-      droneGainMapRef.current[id].gain.value = (val / 100) * 0.15;
-    }
-  }, []);
+  const toggleMantra = useCallback(async (mantra) => {
+    await ctxToggleMantra(mantra, authHeaders);
+  }, [ctxToggleMantra, authHeaders]);
+
+  const stopAll = useCallback(() => {
+    ctxStopAll();
+    setActiveLight(null);
+    setVibeOn(false);
+    if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
+    try { navigator.vibrate(0); } catch {}
+  }, [ctxStopAll]);
 
   // Update per-channel filter in real time
   const setChannelFilter = useCallback((mapRef, stateSet, id, cutoff, resonance) => {
@@ -642,128 +286,6 @@ export default function CosmicMixerPage() {
       filter.Q.value = resonance;
     }
   }, []);
-
-  const toggleSound = useCallback(async (sound) => {
-    if (activeSounds.has(sound.id)) {
-      stopNodesForKey(soundNodesMapRef, sound.id);
-      delete soundGainMapRef.current[sound.id];
-      delete soundFilterMapRef.current[sound.id];
-      setActiveSounds(prev => { const n = new Set(prev); n.delete(sound.id); return n; });
-      return;
-    }
-    const ctx = await getCtx();
-    const vol = (channelVols[`sound-${sound.id}`] ?? 75) / 100;
-
-    // Per-channel gain
-    const channelGain = ctx.createGain();
-    channelGain.gain.value = vol * 0.15;
-    soundGainMapRef.current[sound.id] = channelGain;
-
-    // Per-channel filter (LP sweep)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    const sf = soundFilters[sound.id] || { cutoff: 20000, resonance: 1 };
-    filter.frequency.value = sf.cutoff;
-    filter.Q.value = sf.resonance;
-    soundFilterMapRef.current[sound.id] = filter;
-
-    filter.connect(channelGain);
-    channelGain.connect(masterGainRef.current);
-
-    // Generate sound nodes and connect to filter instead of master
-    const nodes = sound.gen(ctx, filter);
-    soundNodesMapRef.current[sound.id] = nodes;
-    if (!channelVols[`sound-${sound.id}`]) setChannelVols(v => ({...v, [`sound-${sound.id}`]: 75}));
-    setActiveSounds(prev => new Set(prev).add(sound.id));
-  }, [activeSounds, getCtx, channelVols, soundFilters]);
-
-  const toggleDrone = useCallback(async (drone) => {
-    if (activeDrones.has(drone.id)) {
-      stopNodesForKey(droneNodesMapRef, drone.id);
-      delete droneGainMapRef.current[drone.id];
-      delete droneFilterMapRef.current[drone.id];
-      setActiveDrones(prev => { const n = new Set(prev); n.delete(drone.id); return n; });
-      return;
-    }
-    const ctx = await getCtx();
-    const vol = (channelVols[`drone-${drone.id}`] ?? 75) / 100;
-
-    // Per-channel gain
-    const channelGain = ctx.createGain();
-    channelGain.gain.value = vol * 0.15;
-    droneGainMapRef.current[drone.id] = channelGain;
-
-    // Per-channel filter
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    const df = droneFilters[drone.id] || { cutoff: drone.filterFreq, resonance: drone.filterQ };
-    filter.frequency.value = df.cutoff;
-    filter.Q.value = df.resonance;
-    droneFilterMapRef.current[drone.id] = filter;
-
-    filter.connect(channelGain);
-    channelGain.connect(masterGainRef.current);
-
-    const osc = ctx.createOscillator(); osc.type = drone.wave; osc.frequency.value = drone.freq;
-    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = drone.vibratoRate;
-    const lfoGain = ctx.createGain(); lfoGain.gain.value = drone.vibratoDepth;
-    lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-    const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = drone.freq / 2;
-    const subGain = ctx.createGain(); subGain.gain.value = 0.3;
-    sub.connect(subGain); subGain.connect(filter);
-    osc.connect(filter);
-    osc.start(); lfo.start(); sub.start();
-    droneNodesMapRef.current[drone.id] = [osc, lfo, sub];
-    if (!channelVols[`drone-${drone.id}`]) setChannelVols(v => ({...v, [`drone-${drone.id}`]: 75}));
-    setActiveDrones(prev => new Set(prev).add(drone.id));
-  }, [activeDrones, getCtx, channelVols, droneFilters]);
-
-  const toggleMantra = useCallback(async (mantra) => {
-    // Clean up existing
-    if (mantraAudioRef.current) {
-      mantraAudioRef.current.pause();
-      mantraAudioRef.current = null;
-    }
-    if (mantraSourceRef.current) {
-      try { mantraSourceRef.current.disconnect(); } catch {}
-      mantraSourceRef.current = null;
-    }
-    if (voiceChainRef.current) {
-      voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} });
-      voiceChainRef.current = null;
-    }
-
-    if (activeMantra?.id === mantra.id) { setActiveMantra(null); return; }
-    setActiveMantra(mantra);
-    setMantraLoading(true);
-    try {
-      const res = await axios.post(`${API}/tts/narrate`, { text: mantra.text, context: 'mixer' });
-      if (!res.data.audio) { setMantraLoading(false); setActiveMantra(null); return; }
-
-      const ctx = await getCtx();
-      const audio = new Audio(`data:audio/mp3;base64,${res.data.audio}`);
-      audio.crossOrigin = 'anonymous';
-      audio.loop = true;
-
-      // Route through Web Audio API for voice effects processing
-      const source = ctx.createMediaElementSource(audio);
-      mantraSourceRef.current = source;
-      mantraAudioRef.current = audio;
-
-      // Apply pitch via playback rate
-      audio.playbackRate = Math.pow(2, voiceMorph.pitch / 12) * (voiceMorph.speed / 100);
-
-      // Build the voice effects chain
-      const chainInput = buildVoiceChain(ctx, masterGainRef.current, voiceMorph);
-      source.connect(chainInput);
-
-      await audio.play();
-      setMantraLoading(false);
-    } catch {
-      setMantraLoading(false);
-      setActiveMantra(null);
-    }
-  }, [activeMantra, getCtx, voiceMorph, buildVoiceChain]);
 
   const firstActiveFreq = activeFreqs.size > 0 ? allFrequencies.find(f => activeFreqs.has(f.hz)) : null;
 
@@ -794,19 +316,6 @@ export default function CosmicMixerPage() {
     if (activeLight?.id === mode.id) { setActiveLight(null); return; }
     setActiveLight(mode);
   }, [activeLight]);
-
-  const stopAll = useCallback(() => {
-    stopAllInMap(freqNodesMapRef); stopAllInMap(soundNodesMapRef); stopAllInMap(droneNodesMapRef);
-    if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
-    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch {} mantraSourceRef.current = null; }
-    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} }); voiceChainRef.current = null; }
-    if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
-    try { navigator.vibrate(0); } catch {}
-    setActiveFreqs(new Set()); setActiveSounds(new Set()); setActiveDrones(new Set());
-    setActiveMantra(null); setActiveLight(null); setVibeOn(false);
-  }, []);
-
-  useEffect(() => () => { stopAll(); if (ctxRef.current) ctxRef.current.close(); }, [stopAll]);
 
   // Tempo LFO: modulate master gain to the beat
   const tempoCleanupRef = useRef(null);

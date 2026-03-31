@@ -18,6 +18,7 @@ import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
+import { MixerProvider } from './context/MixerContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import CosmicToolbar from './components/CosmicToolbar';
 
@@ -251,6 +252,7 @@ function App() {
       <CreditProvider>
       <AvatarProvider>
       <TempoProvider>
+      <MixerProvider>
       <SensoryProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
@@ -286,6 +288,7 @@ function App() {
           </VoiceCommandProvider>
         </BrowserRouter>
       </SensoryProvider>
+      </MixerProvider>
       </TempoProvider>
       </AvatarProvider>
       </CreditProvider>

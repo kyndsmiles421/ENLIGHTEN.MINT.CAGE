@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useMixer } from '../context/MixerContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -608,6 +609,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
 
 /* ─── Mixer Quick-Panel ─── */
 function MixerPanel({ onClose, navigate }) {
+  const { masterVol, setMasterVol, muted, setMuted, isPlaying, totalActive, stopAll, activeMantra } = useMixer();
   return (
     <motion.div
       initial={{ opacity: 0, y: 8, scale: 0.95 }}
@@ -619,7 +621,7 @@ function MixerPanel({ onClose, navigate }) {
         border: '1px solid rgba(129,140,248,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        width: '200px',
+        width: '220px',
         boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
       }}
       data-testid="dock-mixer-panel"
@@ -628,7 +630,53 @@ function MixerPanel({ onClose, navigate }) {
         <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#818CF8' }}>Production Console</span>
         <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
       </div>
+
+      {/* Master Volume */}
+      <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+        <button
+          onClick={() => setMuted(m => !m)}
+          className="p-1.5 rounded-lg transition-colors"
+          style={{ background: muted ? 'rgba(239,68,68,0.12)' : 'rgba(129,140,248,0.08)' }}
+          data-testid="dock-mute-toggle"
+        >
+          {muted ? <VolumeX size={13} style={{ color: '#EF4444' }} /> : <Volume2 size={13} style={{ color: '#818CF8' }} />}
+        </button>
+        <input
+          type="range" min={0} max={100} value={masterVol}
+          onChange={e => setMasterVol(Number(e.target.value))}
+          className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
+          style={{
+            background: `linear-gradient(to right, #818CF8 ${masterVol}%, rgba(255,255,255,0.06) ${masterVol}%)`,
+            accentColor: '#818CF8',
+          }}
+          data-testid="dock-volume-slider"
+        />
+        <span className="text-[9px] w-7 text-right tabular-nums" style={{ color: 'rgba(129,140,248,0.6)' }}>{masterVol}%</span>
+      </div>
+
+      {/* Active layers indicator */}
+      {isPlaying && (
+        <div className="px-3 py-1.5 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22C55E', boxShadow: '0 0 6px #22C55E' }} />
+          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>
+            {totalActive} layer{totalActive !== 1 ? 's' : ''} active
+            {activeMantra && <span style={{ color: '#2DD4BF' }}> + voice</span>}
+          </span>
+        </div>
+      )}
+
       <div className="p-2 space-y-1.5">
+        {/* Stop All */}
+        {isPlaying && (
+          <button
+            onClick={stopAll}
+            className="w-full py-1.5 rounded-lg text-[10px] flex items-center justify-center gap-1.5 transition-colors hover:bg-red-500/15"
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', color: '#EF4444' }}
+            data-testid="dock-stop-all"
+          >
+            <Square size={10} /> Stop All
+          </button>
+        )}
         <button
           onClick={() => { onClose(); document.querySelector('[data-testid="mixer-toggle"]')?.click(); }}
           className="w-full py-2 rounded-lg text-[10px]"
@@ -641,6 +689,7 @@ function MixerPanel({ onClose, navigate }) {
           onClick={() => { onClose(); navigate('/cosmic-mixer'); }}
           className="w-full py-2 rounded-lg text-[10px]"
           style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', color: 'rgba(248,250,252,0.45)' }}
+          data-testid="dock-open-mixer-page"
         >
           Full Mixer Page
         </button>
