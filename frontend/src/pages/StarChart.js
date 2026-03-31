@@ -8,7 +8,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
-import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useCosmicAmbient, CosmicNarrator } from '../components/StarChartAudio';
@@ -1038,6 +1038,8 @@ export default function StarChart() {
   const [zoomCounter, setZoomCounter] = useState(0);
   const [lastZoomDelta, setLastZoomDelta] = useState(null);
   const [astrologyReading, setAstrologyReading] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
 
   const handleZoom = useCallback((delta) => {
     setLastZoomDelta(delta);
@@ -1260,6 +1262,30 @@ export default function StarChart() {
     setJourneyPaused(false);
   }, [journeyAmbient]);
 
+  // Fuzzy search — matches partial, misspelled constellation names
+  const fuzzyMatch = useCallback((query, name) => {
+    const q = query.toLowerCase().trim();
+    const n = name.toLowerCase();
+    if (n.includes(q)) return 3; // direct substring
+    if (n.startsWith(q.slice(0, 2))) return 2; // starts similar
+    // Levenshtein-lite: allow 1-2 char typos for short queries
+    let matches = 0;
+    const shorter = q.length < n.length ? q : n;
+    const longer = q.length < n.length ? n : q;
+    for (let i = 0; i < shorter.length; i++) {
+      if (longer.includes(shorter[i])) matches++;
+    }
+    const ratio = matches / longer.length;
+    return ratio > 0.6 ? 1 : 0;
+  }, []);
+
+  const searchResults = searchQuery.length >= 2
+    ? [
+        ...(data?.constellations || []).map(c => ({ ...c, type: 'western', score: fuzzyMatch(searchQuery, c.name) })),
+        ...(cultureData?.constellations || []).map(c => ({ ...c, type: 'cultural', score: fuzzyMatch(searchQuery, c.name) })),
+      ].filter(c => c.score > 0).sort((a, b) => b.score - a.score).slice(0, 8)
+    : [];
+
   if (!token) return (
     <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
       <p className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to explore the cosmic star chart</p>
@@ -1343,6 +1369,17 @@ export default function StarChart() {
               }}>
               <Star size={10} /> Badges
             </button>
+            {/* Search */}
+            <button onClick={() => setShowSearch(!showSearch)} data-testid="star-search-toggle"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
+              style={{
+                background: showSearch ? 'rgba(45,212,191,0.15)' : 'rgba(8,10,18,0.8)',
+                border: `1px solid ${showSearch ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
+                color: showSearch ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                backdropFilter: 'blur(12px)',
+              }}>
+              <Search size={10} /> Search
+            </button>
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 whitespace-nowrap"
               style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'blur(12px)' }}>
@@ -1387,6 +1424,77 @@ export default function StarChart() {
                   className="px-2 py-1 rounded text-[9px]" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}>{loc.name}</button>
               ))}
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Constellation Search */}
+      <AnimatePresence>
+        {showSearch && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="absolute top-28 left-4 z-20 w-72 rounded-2xl p-4" data-testid="star-search-panel"
+            style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(45,212,191,0.12)', backdropFilter: 'blur(24px)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Search size={12} style={{ color: '#2DD4BF' }} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search constellations..."
+                autoFocus
+                className="flex-1 text-[11px] bg-transparent outline-none placeholder:text-white/15"
+                style={{ color: '#F8FAFC' }}
+                data-testid="star-search-input"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="p-0.5">
+                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                </button>
+              )}
+            </div>
+            {searchQuery.length >= 2 ? (
+              searchResults.length > 0 ? (
+                <div className="space-y-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                  {searchResults.map((c, i) => (
+                    <button key={`${c.type}-${c.id || c.name}-${i}`}
+                      onClick={() => {
+                        if (c.type === 'cultural') {
+                          setSelectedCulturalConst(c);
+                          setSelected(null);
+                        } else {
+                          setSelected(c);
+                          setSelectedCulturalConst(null);
+                        }
+                        setShowSearch(false);
+                        setSearchQuery('');
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all hover:bg-white/3"
+                      style={{ border: '1px solid rgba(248,250,252,0.03)' }}
+                      data-testid={`search-result-${c.name?.toLowerCase().replace(/\s/g, '-')}`}>
+                      <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
+                        style={{ background: `${ELEMENT_COLORS[c.element] || '#818CF8'}15` }}>
+                        <Star size={9} style={{ color: ELEMENT_COLORS[c.element] || '#818CF8' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] truncate" style={{ color: '#F8FAFC' }}>{c.name}</p>
+                        <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                          {c.type === 'cultural' ? `Cultural` : c.element || 'Star'}
+                          {c.meaning && ` · ${c.meaning.slice(0, 30)}`}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-center py-3" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  No constellations found — try a different spelling
+                </p>
+              )
+            ) : (
+              <p className="text-[9px] text-center py-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                Type at least 2 characters to search
+              </p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

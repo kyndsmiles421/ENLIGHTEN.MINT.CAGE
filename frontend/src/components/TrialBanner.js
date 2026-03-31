@@ -19,7 +19,7 @@ export default function TrialBanner() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full rounded-xl px-4 py-3 flex items-center justify-between gap-3 cursor-pointer group"
-        onClick={() => navigate('/pricing')}
+        onClick={() => navigate('/pricing?from=trial&highlight=plus')}
         style={{
           background: urgency
             ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(249,115,22,0.06))'

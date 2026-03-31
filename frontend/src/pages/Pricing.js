@@ -151,6 +151,9 @@ export default function Pricing() {
   }
 
   const currentTierIdx = myPlan ? tierOrder.indexOf(myPlan.tier) : 0;
+  const isTrialUser = myPlan?.trial?.active;
+  const highlightTier = searchParams.get('highlight');
+  const fromTrial = searchParams.get('from') === 'trial';
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
@@ -207,6 +210,29 @@ export default function Pricing() {
           </div>
         )}
 
+        {/* Trial Upgrade Banner */}
+        {isTrialUser && (
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+            className="mb-6 rounded-xl p-4"
+            style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.08), rgba(192,132,252,0.06))', border: '1px solid rgba(129,140,248,0.15)' }}
+            data-testid="trial-upgrade-banner">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(129,140,248,0.12)' }}>
+                <Rocket size={18} style={{ color: '#818CF8' }} />
+              </div>
+              <div>
+                <p className="text-sm font-medium mb-0.5" style={{ color: 'var(--text-primary)' }}>
+                  You're on a free Plus trial — {myPlan.trial.days_left} day{myPlan.trial.days_left !== 1 ? 's' : ''} left
+                </p>
+                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  Lock in your Plus access now so you don't lose AI Frequency Blends, Translation, and your 300 monthly credits when the trial ends.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Subscription Tiers */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-10">
           {tierOrder.map((id, idx) => {
@@ -217,28 +243,36 @@ export default function Pricing() {
             const isCurrent = myPlan?.tier === id;
             const isUpgrade = idx > currentTierIdx;
             const isPopular = id === 'premium';
+            const isTrialHighlight = (fromTrial || highlightTier === id) && id === 'plus' && isTrialUser;
 
             return (
               <motion.div key={id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.08 }}
-                className={`relative rounded-xl overflow-hidden transition-all ${isPopular ? 'ring-1' : ''}`}
+                className={`relative rounded-xl overflow-hidden transition-all ${isPopular || isTrialHighlight ? 'ring-1' : ''}`}
                 style={{
                   background: TIER_GRADIENTS[id],
-                  border: `1px solid ${color}${isPopular ? '40' : '15'}`,
-                  ...(isPopular ? { ringColor: `${color}30` } : {}),
+                  border: `1px solid ${color}${isPopular || isTrialHighlight ? '40' : '15'}`,
+                  ...(isPopular || isTrialHighlight ? { ringColor: `${color}30`, boxShadow: isTrialHighlight ? `0 0 24px ${color}15` : undefined } : {}),
                 }}
                 data-testid={`tier-card-${id}`}>
 
-                {isPopular && (
+                {isTrialHighlight && (
+                  <div className="absolute top-0 left-0 right-0 py-1 text-center text-[8px] uppercase tracking-widest font-bold"
+                    style={{ background: `${color}20`, color }}>
+                    Keep Your Trial Features
+                  </div>
+                )}
+
+                {isPopular && !isTrialHighlight && (
                   <div className="absolute top-0 left-0 right-0 py-1 text-center text-[8px] uppercase tracking-widest font-bold"
                     style={{ background: `${color}15`, color }}>
                     Most Popular
                   </div>
                 )}
 
-                <div className={`p-4 ${isPopular ? 'pt-7' : ''}`}>
+                <div className={`p-4 ${isPopular || isTrialHighlight ? 'pt-7' : ''}`}>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                       style={{ background: `${color}12`, border: `1px solid ${color}20` }}>
