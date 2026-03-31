@@ -10,39 +10,39 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Cosmic Insights & Weather System (Mar 31, 2026) — NEW
-- **Cosmic Weather Engine**: AI-generated daily forecasts tied to zodiac season + lunar phase
-  - Tool-specific recommendations (Mixer frequencies, Sacred Text chapters)
-  - RPG elemental affinities (Fire/Water/Earth/Air stat boosts)
-  - Lunar phase XP bonuses (Full Moon: +25 XP)
-  - Quick Reset pulse alerts on high-tension cosmic days
-- **Featured Reports Dashboard** (`/cosmic-insights`):
-  - Stories-style Highlights Reel (last 24hr top insights with action buttons)
-  - Weekly Overview: Moods, Meditations, Journal, Soundscape stats
-  - Peak Spiritual Hours heatmap
-  - Soundscape Synergy Report (sound-mood correlations)
-  - Scholar's Bonus: +25 XP weekly for viewing reports
-- **Deep-Dive Monthly Analysis** (gem-locked premium):
-  - AI predictions, mood trends (best/worst days), sound-mood correlations
-  - Unlockable for 50 Celestial Gems or via Premium subscription
-- **Backend**: `/api/reports/cosmic-weather`, `/api/reports/insights`, `/api/reports/deep-dive`, `/api/reports/unlock-deep-dive`, `/api/reports/scholar-bonus`, `/api/reports/elemental-affinities`
+### Multiversal Layered Map System (Mar 31, 2026) — NEW
+- **4 Self-Contained Universes**: Terrestrial (Earth/vitality), Ethereal (Water/harmony), Astral (Fire/wisdom), Void (Air/resonance)
+- **27 total regions** across all 4 planes with unique NPCs, tools, and descriptions
+- **Interlocking Logic Engine**: Actions in one universe create ripples in the other three:
+  - Terrestrial→Ethereal (reveal NPCs), Terrestrial→Astral (boost loot), Terrestrial→Void (calm chaos)
+  - Ethereal→Terrestrial (grow flora), Ethereal→Astral (amplify stars), Ethereal→Void (weaken shadows)
+  - Astral→Terrestrial (reveal secrets), Astral→Ethereal (charge nexus), Astral→Void (illuminate)
+  - Void→Terrestrial (deepen roots), Void→Ethereal (expand aura), Void→Astral (bend time)
+- **Portal System**: Cross-universe portals connecting planes (Terrestrial↔Ethereal↔Astral↔Void)
+- **NPC Dialogue System**: 21+ unique dialogue themes with resonance-based progression
+- **Cosmic Weather Integration**: Zodiac season determines ascendant universe (+20% XP bonus)
+- **The Origin Point**: Nexus region in the Void where all 4 planes converge
+- **Backend**: `/api/multiverse/state`, `/api/multiverse/explore`, `/api/multiverse/interact-npc`, `/api/multiverse/travel`, `/api/multiverse/ripples`
+- **Frontend**: Full interactive SVG map, universe selectors, region detail panels, resonance bars, ripple feed
+
+### Cosmic Insights & Weather System (Mar 31, 2026)
+- AI-generated daily forecasts, tool recommendations, RPG elemental affinities
+- Featured Reports Dashboard, Stories-style Highlights, Deep-Dive Monthly Analysis (gem-locked)
+- Scholar's Bonus (+25 XP/week)
 
 ### Dual Currency Economy & Shop System (Mar 31, 2026)
-- Celestial Gems (hard) via Stripe, Cosmic Dust (soft) via gameplay
-- Gem packs ($0.99-$9.99), currency conversion (1 gem = 10 dust)
-- Dual-tier shop: Dust Shop (8 items) + Gem Shop (9 premium items)
-- Equipment Slot Unlocks: Slots 5-8 (Hands/Feet/Relic/Aura) behind gems
+- Celestial Gems (hard, Stripe) + Cosmic Dust (soft, gameplay)
+- Dual-tier shop (17 items), equipment slot unlocks, gem packs
 
-### Daily Quest System — Wellness-to-RPG Habit Loop (Mar 31, 2026)
+### Daily Quest System (Mar 31, 2026)
 - 6 daily quests, Perfect Day bonus, streak multipliers (capped 2.5x)
-- Auto-triggers from wellness endpoints
 
 ### Wellness MMORPG — Cosmic Realm (Mar 31, 2026)
-- RPGPage with 7 tabs (Quests, Character, Inventory, Shop, World Map, Bosses, Circle)
+- RPGPage: Quests, Character, Inventory, Shop, World Map, Bosses, Circle
 
 ### Core Platform
-- Auth, Dashboard, AI Coach, Star Chart, Oracle, Sacred Texts, Trade Circle
-- Gamification, Starseed, Multiverse Realms, Cosmic Concierge
+- Auth, Dashboard, AI Coach, Star Chart, Oracle, Sacred Texts
+- Trade Circle, Gamification, Starseed, Multiverse Realms, Cosmic Concierge
 - 7-Day Trial, Stripe Subscriptions, MixerContext, SmartDock
 - Multi-Language (7), VR, PWA, Error Boundaries
 
@@ -51,47 +51,40 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Iteration 150: RPG MMORPG — 100%
 - Iteration 151: Daily Quest System — 100%
 - Iteration 152: Dual Currency Economy — 100%
-- Iteration 153: Cosmic Insights & Weather — 100% (28/28)
+- Iteration 153: Cosmic Insights & Weather — 100%
+- Iteration 154: Multiversal Map — 100% (33/33)
 
 ## Credentials
 - Admin: kyndsmiles@gmail.com / password
 - RPG Test: rpg_test@test.com / password123
+- Multiverse Test: multiverse_test@test.com / password123
 
 ## Upcoming Tasks
 
 ### P1 — Next
-- Passive Trinket XP Boosts (background multipliers from equipped items)
-- Circle/Coven Goals (shared group objectives for rare rewards)
-- Natal Forecast unlockable via gems (30-day personalized astrology)
+- Passive Trinket XP Boosts
+- Natal Forecast (gem-locked personalized astrology)
+- Circle/Coven shared group objectives
+- Wellness-to-Universe auto-linking (mood→Terrestrial resonance, meditation→Ethereal, etc.)
 
 ### P2 — Backlog
-- Virtual Rock Hounding (raw material searching)
-- Myths & Legends Encyclopedia (Cosmic Realm lore)
-- Global Immersion Level Toggles
-- Printable PDF "Soul Map" export
-- Lunar Cycle global world events (Full Moon collaboration)
-- Month-Ahead proactive planning reports
+- Virtual Rock Hounding, Myths & Legends Encyclopedia
+- Global Immersion Level Toggles, PDF Soul Map exports
+- Lunar Cycle global events, Month-Ahead forecasts
 
 ### P3 — Future
-- Gem Resonance Engine (Amethyst→meditation, Rose Quartz→mood, Clear Quartz→wildcard)
-- Elemental Crafting (forging gear with affinities)
-- Spore-like Spiritual Avatar Creator
-- AI Scene Recreations
+- Gem Resonance Engine, Elemental Crafting, Avatar Creator, AI Scene Recreations
 
 ## Architecture Rules
-- **API Prefix**: Frontend must use `${REACT_APP_BACKEND_URL}/api` for all API calls
-- **Audio**: Always `useMixer()`, never `new AudioContext()`
-- **AI**: Always `.with_model("gemini", "gemini-3-flash-preview")`
+- **API Prefix**: Frontend must use `${REACT_APP_BACKEND_URL}/api`
 - **AuthHeaders**: `useAuth()` returns `authHeaders` as an object (not a function)
+- **AI**: `.with_model("gemini", "gemini-3-flash-preview")`
 - **RPG Terminology**: "Conduits" not "Weapons", "Circle" not "Party"
-- **Currency Mapping**: `stardust_shards` = Celestial Gems, `cosmic_dust` = Cosmic Dust
-- **Cosmic Weather**: Cached daily in `cosmic_weather_cache` collection
-- **Quest Integration**: Import `award_quest_xp` from `routes.rpg` in wellness endpoints
+- **Currency**: `stardust_shards` = Celestial Gems, `cosmic_dust` = Cosmic Dust
+- **Multiverse**: State tracked in `multiverse_state` collection, ripples capped at 50
 
 ## Key DB Collections
-- `rpg_characters`, `rpg_inventory`, `rpg_equipped`, `rpg_currencies`
-- `rpg_discoveries`, `rpg_boss_encounters`, `rpg_parties`
-- `rpg_quest_log`, `rpg_streaks`
-- `rpg_purchases`, `rpg_slot_unlocks`, `rpg_transactions`
-- `payment_transactions`: Stripe checkout sessions
-- `cosmic_weather_cache`: Daily AI forecast cache
+- RPG: `rpg_characters`, `rpg_inventory`, `rpg_equipped`, `rpg_currencies`, `rpg_quest_log`, `rpg_streaks`
+- Shop: `rpg_purchases`, `rpg_slot_unlocks`, `rpg_transactions`, `payment_transactions`
+- Reports: `cosmic_weather_cache`
+- Multiverse: `multiverse_state` (discovered regions, NPC met, portals, ripple_log, universe_resonance)
