@@ -309,6 +309,13 @@ async def save_soundscape_mix(data: dict, user=Depends(get_current_user)):
     }
     await db.custom_soundscapes.insert_one(doc)
     doc.pop("_id", None)
+    try:
+        from routes.rpg import award_quest_xp
+        quest_result = await award_quest_xp(user["id"], "soundscape")
+        if quest_result:
+            doc["quest_xp"] = quest_result
+    except Exception:
+        pass
     return doc
 
 @router.get("/soundscapes/my-mixes")

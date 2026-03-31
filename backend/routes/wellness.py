@@ -22,6 +22,13 @@ async def create_mood(mood: MoodCreate, user=Depends(get_current_user)):
     }
     await db.moods.insert_one(doc)
     doc.pop("_id", None)
+    try:
+        from routes.rpg import award_quest_xp
+        quest_result = await award_quest_xp(user["id"], "mood")
+        if quest_result:
+            doc["quest_xp"] = quest_result
+    except Exception:
+        pass
     return doc
 
 @router.get("/moods")
@@ -126,6 +133,13 @@ async def create_journal(entry: JournalCreate, user=Depends(get_current_user)):
     }
     await db.journal.insert_one(doc)
     doc.pop("_id", None)
+    try:
+        from routes.rpg import award_quest_xp
+        quest_result = await award_quest_xp(user["id"], "journal")
+        if quest_result:
+            doc["quest_xp"] = quest_result
+    except Exception:
+        pass
     return doc
 
 @router.get("/journal")

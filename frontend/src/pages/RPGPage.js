@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Sword, Shield, Map, Users, Package, Star, Sparkles,
   ChevronRight, Plus, Minus, Zap, Heart, Eye, Music, Brain,
-  Lock, Gift, Compass, Globe, X, Crown
+  Lock, Gift, Compass, Globe, X, Crown, Wind, PenLine, CheckCircle2,
+  Flame, Target
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
@@ -227,11 +228,59 @@ function BossCard({ boss, onJoin }) {
   );
 }
 
+const QUEST_ICONS = { brain: Brain, pen: PenLine, heart: Heart, wind: Wind, music: Music, zap: Zap };
+
+// ── Quest Card ──
+function QuestCard({ quest, onComplete }) {
+  const Icon = QUEST_ICONS[quest.icon] || Star;
+  const done = quest.completed;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl p-3 flex items-center gap-3 group transition-all"
+      style={{
+        background: done ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${done ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.04)'}`,
+      }}
+      data-testid={`quest-${quest.id}`}>
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{ background: done ? 'rgba(34,197,94,0.1)' : 'rgba(129,140,248,0.06)' }}>
+        {done ? <CheckCircle2 size={16} style={{ color: '#22C55E' }} />
+          : <Icon size={16} style={{ color: '#818CF8' }} />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <p className="text-[11px] font-medium" style={{ color: done ? '#22C55E' : 'var(--text-primary)' }}>{quest.name}</p>
+          {quest.pillar && <span className="text-[6px] px-1 py-0.5 rounded uppercase tracking-wider"
+            style={{ background: 'rgba(245,158,11,0.08)', color: '#F59E0B' }}>Pillar</span>}
+        </div>
+        <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{quest.description}</p>
+      </div>
+      <div className="text-right flex-shrink-0">
+        {done ? (
+          <span className="text-[9px] font-medium" style={{ color: '#22C55E' }}>Done</span>
+        ) : (
+          <div>
+            <p className="text-[10px] font-semibold" style={{ color: '#818CF8' }}>+{quest.xp_with_multiplier} XP</p>
+            {onComplete && (
+              <button onClick={() => onComplete(quest.id)}
+                className="mt-0.5 text-[7px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }}
+                data-testid={`complete-quest-${quest.id}`}>Complete</button>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  MAIN PAGE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const TABS = [
+  { id: 'quests', label: 'Quests', icon: Target },
   { id: 'character', label: 'Character', icon: Star },
   { id: 'inventory', label: 'Inventory', icon: Package },
   { id: 'world', label: 'World', icon: Map },
@@ -242,12 +291,13 @@ const TABS = [
 export default function RPGPage() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
-  const [tab, setTab] = useState('character');
+  const [tab, setTab] = useState('quests');
   const [character, setCharacter] = useState(null);
   const [inventory, setInventory] = useState(null);
   const [world, setWorld] = useState(null);
   const [bosses, setBosses] = useState(null);
   const [party, setParty] = useState(null);
+  const [quests, setQuests] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [encounter, setEncounter] = useState(null);
@@ -260,18 +310,20 @@ export default function RPGPage() {
     setLoading(true);
     setError(null);
     try {
-      const [charRes, invRes, worldRes, bossRes, partyRes] = await Promise.all([
+      const [charRes, invRes, worldRes, bossRes, partyRes, questRes] = await Promise.all([
         axios.get(`${API}/rpg/character`, { headers }),
         axios.get(`${API}/rpg/inventory`, { headers }),
         axios.get(`${API}/rpg/world`, { headers }),
         axios.get(`${API}/rpg/bosses`, { headers }),
         axios.get(`${API}/rpg/party`, { headers }),
+        axios.get(`${API}/rpg/quests/daily`, { headers }),
       ]);
       setCharacter(charRes.data);
       setInventory(invRes.data);
       setWorld(worldRes.data);
       setBosses(bossRes.data);
       setParty(partyRes.data.party);
+      setQuests(questRes.data);
     } catch (err) {
       setError(getCosmicErrorMessage(err));
     }
@@ -388,6 +440,25 @@ export default function RPGPage() {
     } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
   };
 
+  const completeQuest = async (questId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/quests/complete`, { quest_id: questId }, { headers });
+      let msg = `${res.data.quest} +${res.data.xp_awarded} XP`;
+      if (res.data.perfect_day) msg += ` | PERFECT DAY! +${res.data.perfect_day_xp} bonus XP`;
+      if (res.data.level_up) msg += ` | LEVEL UP!`;
+      toast(msg);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Already completed'); }
+  };
+
+  const doBreathReset = async () => {
+    try {
+      const res = await axios.post(`${API}/rpg/quests/breath-reset`, {}, { headers });
+      toast(`3-Breath Reset! +${res.data.xp_awarded} XP`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Already done today'); }
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}><CosmicInlineLoader message="Loading your cosmic adventure..." /></div>;
   if (error) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}><CosmicError title={error.title} message={error.message} onRetry={fetchData} /></div>;
 
@@ -426,7 +497,7 @@ export default function RPGPage() {
         <div className="flex gap-1">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all relative"
               style={{
                 background: tab === t.id ? 'rgba(129,140,248,0.1)' : 'transparent',
                 color: tab === t.id ? '#818CF8' : 'var(--text-muted)',
@@ -434,6 +505,12 @@ export default function RPGPage() {
               }}
               data-testid={`tab-${t.id}`}>
               <t.icon size={11} /> {t.label}
+              {t.id === 'quests' && quests && quests.completed_count < quests.total_count && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] font-bold"
+                  style={{ background: '#818CF8', color: '#fff' }}>
+                  {quests.total_count - quests.completed_count}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -441,6 +518,89 @@ export default function RPGPage() {
 
       <div className="px-4 py-4">
         <AnimatePresence mode="wait">
+          {/* QUESTS TAB */}
+          {tab === 'quests' && (
+            <motion.div key="quests" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {/* Streak & Summary Bar */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(129,140,248,0.04)', border: '1px solid rgba(129,140,248,0.1)' }}>
+                  <p className="text-lg font-semibold" style={{ color: '#818CF8' }}>{quests?.streak?.days || 0}</p>
+                  <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
+                </div>
+                <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.1)' }}>
+                  <p className="text-lg font-semibold" style={{ color: '#F59E0B' }}>{quests?.streak?.multiplier || 1}x</p>
+                  <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>XP Multiplier</p>
+                </div>
+                <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(34,197,94,0.04)', border: '1px solid rgba(34,197,94,0.1)' }}>
+                  <p className="text-lg font-semibold" style={{ color: '#22C55E' }}>{quests?.xp_earned_today || 0}</p>
+                  <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>XP Today</p>
+                </div>
+              </div>
+
+              {/* Perfect Day Progress */}
+              <div className="rounded-xl p-3 mb-4" style={{
+                background: quests?.perfect_day ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${quests?.perfect_day ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.04)'}`,
+              }} data-testid="perfect-day-progress">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <Flame size={13} style={{ color: quests?.perfect_day ? '#F59E0B' : 'var(--text-muted)' }} />
+                    <span className="text-[10px] font-medium" style={{ color: quests?.perfect_day ? '#F59E0B' : 'var(--text-primary)' }}>
+                      {quests?.perfect_day ? 'Perfect Day Achieved!' : 'Perfect Day'}
+                    </span>
+                  </div>
+                  <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                    {quests?.pillars_done || 0}/{quests?.pillars_total || 5} pillars
+                    {!quests?.perfect_day && ` | +${quests?.perfect_day_bonus || 100} XP bonus`}
+                  </span>
+                </div>
+                <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((quests?.pillars_done || 0) / (quests?.pillars_total || 5)) * 100}%` }}
+                    className="h-full rounded-full"
+                    style={{ background: quests?.perfect_day ? '#F59E0B' : '#818CF8' }} />
+                </div>
+              </div>
+
+              {/* Quest List */}
+              <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+                Daily Quests ({quests?.completed_count || 0}/{quests?.total_count || 6})
+              </p>
+              <div className="space-y-2 mb-4">
+                {quests?.quests?.map(q => (
+                  <QuestCard key={q.id} quest={q}
+                    onComplete={['breath_reset', 'breathing', 'soundscape'].includes(q.id) && !q.completed ? completeQuest : null} />
+                ))}
+              </div>
+
+              {/* 3-Breath Reset Quick Action */}
+              {!quests?.quests?.find(q => q.id === 'breath_reset')?.completed && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }}
+                  onClick={doBreathReset}
+                  className="w-full rounded-xl p-4 text-center transition-all"
+                  style={{ background: 'rgba(129,140,248,0.04)', border: '1px solid rgba(129,140,248,0.1)' }}
+                  data-testid="breath-reset-btn">
+                  <Zap size={20} style={{ color: '#818CF8' }} className="mx-auto mb-1" />
+                  <p className="text-[11px] font-medium" style={{ color: '#818CF8' }}>3-Breath Reset</p>
+                  <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>Quick center yourself — +{quests?.quests?.find(q => q.id === 'breath_reset')?.xp_with_multiplier || 10} XP</p>
+                </motion.button>
+              )}
+
+              {/* Streak Tip */}
+              <div className="mt-4 rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                  {quests?.streak?.days >= 7
+                    ? `${quests.streak.days}-day streak! You're earning ${quests.streak.multiplier}x XP on all quests.`
+                    : quests?.streak?.days >= 3
+                    ? `${quests.streak.days}-day streak! 1.5x XP active. Reach 7 days for 2x!`
+                    : 'Complete quests daily to build a streak. 3 days = 1.5x XP, 7 days = 2x XP!'}
+                </p>
+              </div>
+            </motion.div>
+          )}
+
           {/* CHARACTER TAB */}
           {tab === 'character' && (
             <motion.div key="char" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

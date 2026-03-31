@@ -73,4 +73,12 @@ async def log_meditation(data: dict = Body(...), user=Depends(get_current_user))
         share_doc.pop("_id", None)
         share_post = share_doc
 
-    return {"status": "logged", "id": doc["id"], "plant_growth": plant_growth, "shared": share_post}
+    return_data = {"status": "logged", "id": doc["id"], "plant_growth": plant_growth, "shared": share_post}
+    try:
+        from routes.rpg import award_quest_xp
+        quest_result = await award_quest_xp(user["id"], "meditation")
+        if quest_result:
+            return_data["quest_xp"] = quest_result
+    except Exception:
+        pass
+    return return_data

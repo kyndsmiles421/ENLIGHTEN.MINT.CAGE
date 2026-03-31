@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import uuid
 import random
 import math
@@ -861,3 +861,269 @@ async def claim_starter_kit(user=Depends(get_current_user)):
         upsert=True,
     )
     return {"items_received": len(items), "items": [{"name": i["name"], "rarity": i["rarity"]} for i in items]}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  DAILY QUEST SYSTEM — Wellness-to-RPG Habit Loop
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY_QUESTS = [
+    {"id": "meditation", "name": "Still Mind", "description": "Complete a meditation session",
+     "xp": 50, "currency": "cosmic_dust", "currency_amount": 15, "icon": "brain",
+     "pillar": True},
+    {"id": "journal", "name": "Inner Scribe", "description": "Write a journal entry",
+     "xp": 30, "currency": "cosmic_dust", "currency_amount": 10, "icon": "pen",
+     "pillar": True},
+    {"id": "mood", "name": "Emotional Compass", "description": "Log your mood",
+     "xp": 20, "currency": "cosmic_dust", "currency_amount": 5, "icon": "heart",
+     "pillar": True},
+    {"id": "breathing", "name": "Breath of Life", "description": "Complete a breathing exercise",
+     "xp": 25, "currency": "cosmic_dust", "currency_amount": 8, "icon": "wind",
+     "pillar": True},
+    {"id": "soundscape", "name": "Harmonic Resonance", "description": "Listen to a soundscape",
+     "xp": 20, "currency": "cosmic_dust", "currency_amount": 8, "icon": "music",
+     "pillar": True},
+    {"id": "breath_reset", "name": "3-Breath Reset", "description": "Take 3 deep breaths to center yourself",
+     "xp": 10, "currency": "cosmic_dust", "currency_amount": 3, "icon": "zap",
+     "pillar": False},
+]
+
+PERFECT_DAY_BONUS_XP = 100
+PERFECT_DAY_BONUS_DUST = 50
+STREAK_MULTIPLIERS = {3: 1.5, 7: 2.0, 14: 2.5}
+MAX_STREAK_MULTIPLIER = 2.5
+
+
+def _today_key():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+async def _get_streak(user_id: str) -> dict:
+    """Calculate current streak and multiplier."""
+    streak_doc = await db.rpg_streaks.find_one({"user_id": user_id}, {"_id": 0})
+    if not streak_doc:
+        return {"days": 0, "multiplier": 1.0, "last_date": None}
+
+    last_date = streak_doc.get("last_date", "")
+    days = streak_doc.get("days", 0)
+    today = _today_key()
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+
+    if last_date == today:
+        pass  # Already counted today
+    elif last_date == yesterday:
+        pass  # Streak is alive but not yet incremented for today
+    else:
+        days = 0  # Streak broken
+
+    multiplier = 1.0
+    for threshold in sorted(STREAK_MULTIPLIERS.keys()):
+        if days >= threshold:
+            multiplier = STREAK_MULTIPLIERS[threshold]
+    multiplier = min(multiplier, MAX_STREAK_MULTIPLIER)
+
+    return {"days": days, "multiplier": multiplier, "last_date": last_date}
+
+
+async def award_quest_xp(user_id: str, quest_id: str) -> dict:
+    """Called by wellness endpoints to award XP for completing a daily quest.
+    Returns the result dict or None if already completed today."""
+    today = _today_key()
+
+    # Check if already completed today
+    existing = await db.rpg_quest_log.find_one(
+        {"user_id": user_id, "quest_id": quest_id, "date": today}
+    )
+    if existing:
+        return None  # Already done today
+
+    quest = next((q for q in DAILY_QUESTS if q["id"] == quest_id), None)
+    if not quest:
+        return None
+
+    # Get streak multiplier
+    streak = await _get_streak(user_id)
+    multiplier = streak["multiplier"]
+    xp_raw = quest["xp"]
+    xp_final = int(xp_raw * multiplier)
+    dust_final = int(quest["currency_amount"] * multiplier)
+
+    # Record completion
+    await db.rpg_quest_log.insert_one({
+        "user_id": user_id,
+        "quest_id": quest_id,
+        "date": today,
+        "xp_awarded": xp_final,
+        "multiplier": multiplier,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    # Award XP
+    char = await get_or_create_character(user_id)
+    old_level = level_from_xp(char["xp"])
+    new_xp = char["xp"] + xp_final
+    new_level = level_from_xp(new_xp)
+    level_ups = new_level - old_level
+    points_earned = level_ups * 3
+
+    update = {"$inc": {"xp": xp_final}}
+    if points_earned > 0:
+        update["$inc"]["stat_points"] = points_earned
+    await db.rpg_characters.update_one({"user_id": user_id}, update)
+
+    # Award currency
+    await db.rpg_currencies.update_one(
+        {"user_id": user_id},
+        {"$inc": {quest["currency"]: dust_final}},
+        upsert=True,
+    )
+
+    # Check Perfect Day bonus
+    completed_today = await db.rpg_quest_log.find(
+        {"user_id": user_id, "date": today}
+    ).to_list(20)
+    completed_ids = {c["quest_id"] for c in completed_today}
+    pillar_ids = {q["id"] for q in DAILY_QUESTS if q["pillar"]}
+    perfect_day = pillar_ids.issubset(completed_ids)
+
+    perfect_day_awarded = False
+    if perfect_day:
+        already_awarded = await db.rpg_quest_log.find_one(
+            {"user_id": user_id, "quest_id": "__perfect_day__", "date": today}
+        )
+        if not already_awarded:
+            perfect_xp = int(PERFECT_DAY_BONUS_XP * multiplier)
+            perfect_dust = int(PERFECT_DAY_BONUS_DUST * multiplier)
+            await db.rpg_quest_log.insert_one({
+                "user_id": user_id, "quest_id": "__perfect_day__", "date": today,
+                "xp_awarded": perfect_xp, "multiplier": multiplier,
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+            })
+            await db.rpg_characters.update_one({"user_id": user_id}, {"$inc": {"xp": perfect_xp}})
+            await db.rpg_currencies.update_one(
+                {"user_id": user_id}, {"$inc": {"cosmic_dust": perfect_dust}}, upsert=True,
+            )
+            perfect_day_awarded = True
+            new_xp += perfect_xp
+
+    # Update streak
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+    streak_days = streak["days"]
+    if streak["last_date"] != today:
+        if streak["last_date"] == yesterday:
+            streak_days += 1
+        else:
+            streak_days = 1
+        await db.rpg_streaks.update_one(
+            {"user_id": user_id},
+            {"$set": {"last_date": today, "days": streak_days}},
+            upsert=True,
+        )
+
+    result = {
+        "quest": quest["name"],
+        "quest_id": quest_id,
+        "xp_awarded": xp_final,
+        "currency_awarded": dust_final,
+        "streak_days": streak_days,
+        "multiplier": multiplier,
+        "level": level_from_xp(new_xp),
+    }
+    if level_ups > 0:
+        result["level_up"] = True
+        result["stat_points_earned"] = points_earned
+    if perfect_day_awarded:
+        result["perfect_day"] = True
+        result["perfect_day_xp"] = int(PERFECT_DAY_BONUS_XP * multiplier)
+    return result
+
+
+@router.get("/quests/daily")
+async def get_daily_quests(user=Depends(get_current_user)):
+    today = _today_key()
+    char = await get_or_create_character(user["id"])
+
+    # Get today's completions
+    completed_today = await db.rpg_quest_log.find(
+        {"user_id": user["id"], "date": today}, {"_id": 0}
+    ).to_list(20)
+    completed_ids = {c["quest_id"] for c in completed_today}
+    total_xp_today = sum(c.get("xp_awarded", 0) for c in completed_today)
+
+    # Streak info
+    streak = await _get_streak(user["id"])
+
+    # Build quest list
+    quests = []
+    for q in DAILY_QUESTS:
+        quests.append({
+            **q,
+            "completed": q["id"] in completed_ids,
+            "xp_with_multiplier": int(q["xp"] * streak["multiplier"]),
+        })
+
+    pillar_ids = {q["id"] for q in DAILY_QUESTS if q["pillar"]}
+    pillars_done = len(pillar_ids.intersection(completed_ids))
+    perfect_day = "__perfect_day__" in completed_ids
+
+    return {
+        "quests": quests,
+        "date": today,
+        "completed_count": len([c for c in completed_ids if not c.startswith("__")]),
+        "total_count": len(DAILY_QUESTS),
+        "xp_earned_today": total_xp_today,
+        "streak": streak,
+        "pillars_done": pillars_done,
+        "pillars_total": len(pillar_ids),
+        "perfect_day": perfect_day,
+        "perfect_day_bonus": int(PERFECT_DAY_BONUS_XP * streak["multiplier"]),
+    }
+
+
+@router.post("/quests/breath-reset")
+async def do_breath_reset(user=Depends(get_current_user)):
+    """Quick 3-breath reset micro-quest."""
+    result = await award_quest_xp(user["id"], "breath_reset")
+    if not result:
+        raise HTTPException(400, "Already completed today")
+    return result
+
+
+@router.post("/quests/complete")
+async def complete_quest(data: dict = Body(...), user=Depends(get_current_user)):
+    """Generic quest completion endpoint for activities without built-in hooks."""
+    quest_id = data.get("quest_id")
+    valid_ids = {q["id"] for q in DAILY_QUESTS}
+    if quest_id not in valid_ids:
+        raise HTTPException(400, f"Invalid quest. Valid: {sorted(valid_ids)}")
+    result = await award_quest_xp(user["id"], quest_id)
+    if not result:
+        raise HTTPException(400, "Already completed today")
+    return result
+
+
+
+
+@router.get("/quests/streak")
+async def get_streak(user=Depends(get_current_user)):
+    streak = await _get_streak(user["id"])
+    # Get recent history
+    history = await db.rpg_quest_log.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "date": 1, "quest_id": 1, "xp_awarded": 1}
+    ).sort("completed_at", -1).to_list(50)
+
+    # Group by date
+    by_date = {}
+    for h in history:
+        d = h["date"]
+        if d not in by_date:
+            by_date[d] = {"date": d, "quests": 0, "xp": 0}
+        if not h["quest_id"].startswith("__"):
+            by_date[d]["quests"] += 1
+        by_date[d]["xp"] += h.get("xp_awarded", 0)
+
+    return {
+        **streak,
+        "history": list(by_date.values())[:14],
+    }
