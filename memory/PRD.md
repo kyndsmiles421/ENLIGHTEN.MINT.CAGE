@@ -64,6 +64,25 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Frequencies page rewired to use MixerContext (audio persists across navigation, no more isolated AudioContext)
 - All quick widgets now action-first: click = do the thing, not just navigate
 
+### Premium Tier Gating & Revenue Infrastructure (Feb 2026)
+- **Tier-Gated Features**: `ai_frequency_blend`, `ai_translation`, `ai_coaching_blend` require Plus tier ($9.99/mo)
+- **useGatedFeature() hook**: Reusable frontend gate check with upgrade toast + navigate to /pricing
+- **Plus tier perks updated**: AI-Personalized Frequency Blends, AI-Powered Content Translation, AI Coaching Sound Blends
+
+### AI-Personalized Frequency Blend (Feb 2026)
+- `POST /api/mixer/ai-blend`: Analyzes user's 7-day mood journal history
+- **Free users**: Algorithmic blend (rule-based mood→frequency mapping, instant, no credit cost)
+- **Plus+ users**: GPT-4o deep analysis of emotional patterns → custom multi-layer blend with poetic name + insight
+- Auto-loads the blend into the Mixer (frequencies + sounds + drone activate instantly)
+- UI: "AI Frequency Blend" accordion section on Cosmic Mixer page with Generate button, result panel with tags
+
+### Multi-Language Support (Feb 2026)
+- **LanguageContext** with 7 languages: English, Spanish, French, Hindi, Japanese, Arabic, Portuguese
+- **Static translations (Free)**: 60+ UI keys translated for nav, common actions, mixer, dashboard, auth, pricing
+- **AI Translation endpoint** (`POST /api/translate`): GPT-4o dynamic content translation, Plus-tier gated, cached in MongoDB
+- **Language selector**: Globe icon in SmartDock with panel showing all 7 languages, saves to localStorage
+- RTL support for Arabic (`document.documentElement.dir`)
+
 ### VR & Native
 - WebXR Virtual Reality scene with 3D Spatial Audio and Gaze Interaction Reticle
 - Capacitor native scaffolding (Android/iOS), app icons & splash screens
@@ -88,11 +107,9 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Upcoming Tasks (Prioritized)
 ### P1 — Next
-- Multi-language support (full UI static translations + AI-powered dynamic content translation)
-  - Language selector in nav bar + settings
-  - Start with: Spanish, French, Hindi, Japanese, Arabic, Portuguese
-  - Static translations for all UI elements
-  - AI translation for mantras, coach responses, dynamic content
+- Apply `useLanguage().t()` translations to more pages (Dashboard, Mixer, Settings, Pricing)
+- Add language preference to user profile (persist across devices via backend)
+- Settings page language section
 
 ### P1 — Backlog
 - Starseed Choose Your Own Adventure module
