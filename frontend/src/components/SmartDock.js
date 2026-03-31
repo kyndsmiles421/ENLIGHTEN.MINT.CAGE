@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
+import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -179,6 +180,7 @@ export default function SmartDock() {
     { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
     { id: 'mixer', icon: Waves, label: 'Mixer', color: '#818CF8' },
+    { id: 'language', icon: Globe, label: 'Lang', color: '#F59E0B' },
     { id: 'feedback', icon: Send, label: 'Feedback', color: '#86EFAC' },
     { id: 'help', icon: BookOpen, label: 'Help', color: '#FCD34D' },
   ];
@@ -279,6 +281,9 @@ export default function SmartDock() {
         )}
         {activePanel === 'mixer' && (
           <MixerPanel onClose={() => setActivePanel(null)} navigate={navigate} />
+        )}
+        {activePanel === 'language' && (
+          <LanguagePanel onClose={() => setActivePanel(null)} />
         )}
       </AnimatePresence>
 
@@ -819,44 +824,12 @@ function AssistantPanel({ onClose, token, authHeaders }) {
 
 /* ─── Frequency Panel ─── */
 function FrequencyPanel({ onClose }) {
-  const [playing, setPlaying] = useState(null);
-  const audioCtxRef = useRef(null);
-  const nodesRef = useRef(null);
+  const { activeFreqs, toggleFreq: ctxToggleFreq } = useMixer();
 
-  const stop = useCallback(() => {
-    if (nodesRef.current) {
-      nodesRef.current.gain.gain.linearRampToValueAtTime(0, (audioCtxRef.current?.currentTime || 0) + 0.3);
-      setTimeout(() => {
-        try { nodesRef.current?.osc.stop(); } catch {}
-        try { nodesRef.current?.osc2.stop(); } catch {}
-        nodesRef.current = null;
-      }, 400);
-    }
-    setPlaying(null);
-  }, []);
-
-  const playFreq = useCallback((freq) => {
-    stop();
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    audioCtxRef.current = ctx;
-    const gain = ctx.createGain();
-    gain.gain.value = 0.12;
-    gain.connect(ctx.destination);
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    osc.connect(gain);
-    osc.start();
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = freq + 4;
-    osc2.connect(gain);
-    osc2.start();
-    nodesRef.current = { osc, osc2, gain };
-    setPlaying(freq);
-  }, [stop]);
-
-  useEffect(() => () => stop(), [stop]);
+  const playFreq = useCallback((freq, color) => {
+    const mixerFreq = { hz: freq, label: `${freq} Hz`, desc: '', color };
+    ctxToggleFreq(mixerFreq);
+  }, [ctxToggleFreq]);
 
   return (
     <motion.div
@@ -876,24 +849,71 @@ function FrequencyPanel({ onClose }) {
     >
       <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
         <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#2DD4BF' }}>Solfeggio Tones</span>
-        <button onClick={() => { stop(); onClose(); }} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
       </div>
       <div className="p-2 space-y-0.5">
-        {FREQUENCIES.map(f => (
+        {FREQUENCIES.map(f => {
+          const isActive = activeFreqs.has(f.freq);
+          return (
+            <button
+              key={f.freq}
+              onClick={() => playFreq(f.freq, f.color)}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all text-left"
+              style={{
+                background: isActive ? `${f.color}10` : 'transparent',
+                border: `1px solid ${isActive ? `${f.color}20` : 'transparent'}`,
+              }}
+              data-testid={`freq-${f.freq}`}
+            >
+              {isActive
+                ? <Pause size={10} style={{ color: f.color }} />
+                : <Play size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />}
+              <span className="text-[9px]" style={{ color: isActive ? f.color : 'rgba(248,250,252,0.45)' }}>{f.name}</span>
+            </button>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+function LanguagePanel({ onClose }) {
+  const { language, setLanguage } = useLanguage();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      className="mb-2 rounded-xl overflow-hidden"
+      style={{
+        background: 'rgba(11,12,21,0.97)',
+        border: '1px solid rgba(245,158,11,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        width: '200px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      }}
+      data-testid="language-panel"
+    >
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+        <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#F59E0B' }}>Language</span>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+      </div>
+      <div className="p-2 space-y-0.5">
+        {LANGUAGES.map(l => (
           <button
-            key={f.freq}
-            onClick={() => playing === f.freq ? stop() : playFreq(f.freq)}
-            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all text-left"
+            key={l.code}
+            onClick={() => { setLanguage(l.code); onClose(); }}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all text-left"
             style={{
-              background: playing === f.freq ? `${f.color}10` : 'transparent',
-              border: `1px solid ${playing === f.freq ? `${f.color}20` : 'transparent'}`,
+              background: language === l.code ? 'rgba(245,158,11,0.08)' : 'transparent',
+              border: `1px solid ${language === l.code ? 'rgba(245,158,11,0.15)' : 'transparent'}`,
             }}
-            data-testid={`freq-${f.freq}`}
+            data-testid={`lang-${l.code}`}
           >
-            {playing === f.freq
-              ? <Pause size={10} style={{ color: f.color }} />
-              : <Play size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />}
-            <span className="text-[9px]" style={{ color: playing === f.freq ? f.color : 'rgba(248,250,252,0.45)' }}>{f.name}</span>
+            <span className="text-[9px] font-bold w-5" style={{ color: language === l.code ? '#F59E0B' : 'rgba(248,250,252,0.3)' }}>{l.flag}</span>
+            <span className="text-[10px] flex-1" style={{ color: language === l.code ? '#F59E0B' : 'rgba(248,250,252,0.5)' }}>{l.label}</span>
+            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{l.native}</span>
           </button>
         ))}
       </div>

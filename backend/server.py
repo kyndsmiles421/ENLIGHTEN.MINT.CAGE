@@ -68,6 +68,8 @@ from routes.creator import router as creator_router
 from routes.live import router as live_router
 from routes.music_studio import router as music_studio_router
 from routes.mixer_presets import router as mixer_presets_router
+from routes.ai_blend import router as ai_blend_router
+from routes.translation import router as translation_router
 from routes.media_library import router as media_library_router
 from routes.astrology_reading import router as astrology_reading_router
 from routes.bible import router as bible_router
@@ -116,6 +118,8 @@ all_routers = [
     live_router,
     music_studio_router,
     mixer_presets_router,
+    ai_blend_router,
+    translation_router,
     media_library_router,
     astrology_reading_router,
     bible_router,

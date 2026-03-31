@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio, ChevronDown,
-  Play, Pause, Square, Loader2, X, Sparkles, Sliders, ArrowRightLeft, Save, Download, Trash2, Globe, Heart
+  Play, Pause, Square, Loader2, X, Sparkles, Sliders, ArrowRightLeft, Save, Download, Trash2, Globe, Heart,
+  Wand2, Crown, Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES, MANTRAS } from '../context/MixerContext';
+import { useGatedFeature } from '../context/useGatedFeature';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -460,7 +462,7 @@ export default function CosmicMixerPage() {
   const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   // ─── Collapsible accordion state ───
-  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, masterFx: false, crossfade: false, light: false, haptic: false, tempo: false, session: false, soundscapes: false });
+  const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, masterFx: false, crossfade: false, light: false, haptic: false, tempo: false, session: false, soundscapes: false, aiblend: false });
   const toggleSection = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
 
   const hasActive = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra || activeLight || vibeOn;
@@ -507,6 +509,46 @@ export default function CosmicMixerPage() {
   const [soundscapeName, setSoundscapeName] = useState('');
   const [soundscapeSaving, setSoundscapeSaving] = useState(false);
   const [soundscapeTab, setSoundscapeTab] = useState('mine');
+
+  // ─── AI Blend ───
+  const { checkAccess, checking: gateChecking } = useGatedFeature();
+  const [aiBlend, setAiBlend] = useState(null);
+  const [aiBlendLoading, setAiBlendLoading] = useState(false);
+
+  const requestAiBlend = useCallback(async () => {
+    setAiBlendLoading(true);
+    try {
+      const res = await axios.post(`${API}/mixer/ai-blend`, {}, { headers: authHeaders });
+      const data = res.data;
+      setAiBlend(data);
+
+      // Auto-load the blend
+      stopAll();
+      for (const hz of (data.blend?.primary || [])) {
+        const f = FREQUENCIES.find(x => x.hz === hz);
+        if (f) await toggleFreq(f);
+      }
+      for (const id of (data.blend?.sounds || [])) {
+        const s = SOUNDS.find(x => x.id === id);
+        if (s) await toggleSound(s);
+      }
+      if (data.blend?.drone) {
+        const d = INSTRUMENT_DRONES.find(x => x.id === data.blend.drone);
+        if (d) await toggleDrone(d);
+      }
+
+      toast(data.blend_name || 'Blend Activated', {
+        description: data.summary || data.blend?.desc || 'Your personalized blend is playing',
+      });
+    } catch {
+      toast.error('Could not generate blend');
+    }
+    setAiBlendLoading(false);
+  }, [authHeaders, stopAll, toggleFreq, toggleSound, toggleDrone]);
+
+  const handleAiBlend = useCallback(() => {
+    checkAccess('ai_frequency_blend', requestAiBlend);
+  }, [checkAccess, requestAiBlend]);
 
   const fetchSoundscapes = useCallback(async () => {
     if (!authHeaders?.Authorization) return;
@@ -734,6 +776,70 @@ export default function CosmicMixerPage() {
                     )}
                   </div>
                 ))
+              )}
+            </div>
+          </AccordionSection>
+
+          {/* ── AI Frequency Blend ── */}
+          <AccordionSection title="AI Frequency Blend" icon={Wand2} color="#C084FC" open={openSections.aiblend} onToggle={() => toggleSection('aiblend')} badge={aiBlend ? (aiBlend.type === 'ai_enhanced' ? 'AI' : 'Auto') : null}>
+            <div className="space-y-3">
+              <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                Analyzes your mood journal patterns and creates a personalized healing frequency blend just for you.
+              </p>
+              <button
+                onClick={handleAiBlend}
+                disabled={aiBlendLoading || gateChecking}
+                className="w-full py-3 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.01] disabled:opacity-40"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(192,132,252,0.12), rgba(129,140,248,0.08))',
+                  border: '1px solid rgba(192,132,252,0.2)',
+                  color: '#C084FC',
+                }}
+                data-testid="ai-blend-button"
+              >
+                {aiBlendLoading ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+                {aiBlendLoading ? 'Analyzing Your Moods...' : 'Generate My Blend'}
+              </button>
+              <div className="flex items-center gap-2 text-[9px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <Crown size={9} style={{ color: '#C084FC' }} />
+                <span>Free: Algorithmic blend | Plus+: AI-enhanced with deep mood analysis</span>
+              </div>
+
+              {aiBlend && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  className="p-3 rounded-xl space-y-2"
+                  style={{ background: 'rgba(192,132,252,0.04)', border: '1px solid rgba(192,132,252,0.1)' }}
+                  data-testid="ai-blend-result">
+                  <div className="flex items-center gap-2">
+                    {aiBlend.type === 'ai_enhanced' ? (
+                      <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(192,132,252,0.15)', color: '#C084FC' }}>AI Enhanced</span>
+                    ) : (
+                      <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(45,212,191,0.15)', color: '#2DD4BF' }}>Algorithmic</span>
+                    )}
+                    {aiBlend.blend_name && <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{aiBlend.blend_name}</span>}
+                  </div>
+                  <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>{aiBlend.summary}</p>
+                  {aiBlend.insight && (
+                    <p className="text-[10px] leading-relaxed italic" style={{ color: 'rgba(192,132,252,0.5)' }}>{aiBlend.insight}</p>
+                  )}
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {(aiBlend.blend?.primary || []).map(hz => (
+                      <span key={hz} className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(192,132,252,0.08)', color: '#C084FC', border: '1px solid rgba(192,132,252,0.12)' }}>{hz} Hz</span>
+                    ))}
+                    {(aiBlend.blend?.sounds || []).map(s => (
+                      <span key={s} className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(59,130,246,0.08)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.12)' }}>{s}</span>
+                    ))}
+                    {aiBlend.blend?.drone && (
+                      <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.08)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.12)' }}>{aiBlend.blend.drone}</span>
+                    )}
+                  </div>
+                  {aiBlend.upgrade_hint && (
+                    <button onClick={() => navigate('/pricing')} className="w-full mt-2 py-2 rounded-lg text-[10px] flex items-center justify-center gap-1.5 transition-all hover:bg-purple-500/10"
+                      style={{ border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC' }}>
+                      <Lock size={10} /> {aiBlend.upgrade_hint}
+                    </button>
+                  )}
+                </motion.div>
               )}
             </div>
           </AccordionSection>
