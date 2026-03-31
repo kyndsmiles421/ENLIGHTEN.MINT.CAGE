@@ -24,6 +24,7 @@ import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
+import TrialGraduation from './components/TrialGraduation';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -294,6 +295,7 @@ function App() {
             <CosmicMixer />
             <CosmicToolbar />
             <CosmicAssistant />
+            <TrialGraduation />
             <InstallPrompt />
             <CreditNudge />
           </div>

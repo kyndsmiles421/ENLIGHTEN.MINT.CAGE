@@ -246,9 +246,61 @@ async def get_my_plan(user=Depends(get_current_user)):
             "started_at": credits.get("trial_started_at", ""),
         }
     elif credits.get("trial_expired_at"):
-        result["trial"] = {"active": False, "expired": True}
+        result["trial"] = {"active": False, "expired": True, "expired_at": credits.get("trial_expired_at", "")}
 
     return result
+
+
+@router.get("/subscriptions/trial-summary")
+async def get_trial_summary(user=Depends(get_current_user)):
+    """Get a personalized summary of what the user explored during their trial."""
+    uid = user["id"]
+    credits = await get_user_credits(uid)
+
+    # Only show for users whose trial just expired (or is still active)
+    if not credits.get("trial_started_at"):
+        return {"has_trial": False}
+
+    started = credits.get("trial_started_at", "")
+    expired = credits.get("trial_expired_at", "")
+    is_active = credits.get("trial_active", False)
+
+    # Gather activity counts
+    coach_count = await db.coach_sessions.count_documents({"user_id": uid})
+    cosmos_count = await db.gemini_sessions.count_documents({"user_id": uid})
+    mixer_count = await db.mixer_sessions.count_documents({"user_id": uid})
+    journal_count = await db.journal_entries.count_documents({"user_id": uid})
+    mood_count = await db.mood_entries.count_documents({"user_id": uid})
+    meditation_count = await db.meditation_sessions.count_documents({"user_id": uid})
+    oracle_count = await db.oracle_readings.count_documents({"user_id": uid})
+    starseed_count = await db.starseed_journeys.count_documents({"user_id": uid})
+    realm_count = await db.realm_visits.count_documents({"user_id": uid})
+
+    # Credits used during trial
+    credits_used = credits.get("total_credits_used", 0)
+
+    # Build highlights — only include features they actually used
+    highlights = []
+    if coach_count: highlights.append({"feature": "Spiritual Coaching", "count": coach_count, "icon": "sage"})
+    if cosmos_count: highlights.append({"feature": "Cosmos Conversations", "count": cosmos_count, "icon": "chat"})
+    if mixer_count: highlights.append({"feature": "Soundscapes Created", "count": mixer_count, "icon": "mixer"})
+    if journal_count: highlights.append({"feature": "Journal Entries", "count": journal_count, "icon": "journal"})
+    if mood_count: highlights.append({"feature": "Mood Check-ins", "count": mood_count, "icon": "mood"})
+    if meditation_count: highlights.append({"feature": "Meditation Sessions", "count": meditation_count, "icon": "meditate"})
+    if oracle_count: highlights.append({"feature": "Oracle Readings", "count": oracle_count, "icon": "oracle"})
+    if starseed_count: highlights.append({"feature": "Starseed Journeys", "count": starseed_count, "icon": "star"})
+    if realm_count: highlights.append({"feature": "Realm Explorations", "count": realm_count, "icon": "realm"})
+
+    return {
+        "has_trial": True,
+        "trial_active": is_active,
+        "trial_expired": not is_active and bool(expired),
+        "started_at": started,
+        "expired_at": expired,
+        "credits_used": credits_used,
+        "highlights": highlights[:6],
+        "total_activities": sum(h["count"] for h in highlights),
+    }
 
 
 @router.post("/subscriptions/checkout")
