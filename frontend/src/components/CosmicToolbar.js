@@ -3,13 +3,15 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ChevronUp, Mic, Loader2, Radio, GripHorizontal } from 'lucide-react';
+import { ChevronUp, Mic, Loader2, Radio, GripHorizontal, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
 
 const HIDDEN_ROUTES = ['/auth', '/', '/vr'];
 const POS_KEY = 'cosmic_toolbar_pos';
+const TOOLBAR_MIN_KEY = 'cosmic_toolbar_minimized';
+const WIDGET_FOCUS_KEY = 'cosmic_widget_focus';
 
 /* ── Try native haptics, fallback to vibrate ── */
 let Haptics;
@@ -45,6 +47,12 @@ export default function CosmicToolbar() {
   const [holdActive, setHoldActive] = useState(false);
   const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
   const [isDragging, setIsDragging] = useState(false);
+  const [minimized, setMinimized] = useState(() => {
+    try { return localStorage.getItem(TOOLBAR_MIN_KEY) === 'true'; } catch { return false; }
+  });
+  const [zBoost, setZBoost] = useState(() => {
+    try { return localStorage.getItem(WIDGET_FOCUS_KEY) === 'toolbar'; } catch { return false; }
+  });
   const ctxRef = useRef(null);
   const nodesRef = useRef([]);
   const masterRef = useRef(null);
@@ -53,6 +61,25 @@ export default function CosmicToolbar() {
   const toolbarRef = useRef(null);
   const dragStartRef = useRef(null);
   const dragMoved = useRef(false);
+
+  // Bring to front on any interaction
+  const bringToFront = useCallback(() => {
+    localStorage.setItem(WIDGET_FOCUS_KEY, 'toolbar');
+    setZBoost(true);
+    window.dispatchEvent(new CustomEvent('widget-focus', { detail: 'toolbar' }));
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail !== 'toolbar') setZBoost(false);
+    };
+    window.addEventListener('widget-focus', handler);
+    return () => window.removeEventListener('widget-focus', handler);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(TOOLBAR_MIN_KEY, String(minimized));
+  }, [minimized]);
 
   useEffect(() => {
     const h = () => setShowTop(window.scrollY > 400);
@@ -88,8 +115,9 @@ export default function CosmicToolbar() {
   const handlePillTap = useCallback((e) => {
     if (e.target.closest('button') || e.target.closest('[data-tool-btn]') || e.target.closest('[data-drag-handle]')) return;
     if (dragMoved.current) return;
+    bringToFront();
     toggleExpand();
-  }, [toggleExpand]);
+  }, [toggleExpand, bringToFront]);
 
   /* ── Drag handlers ── */
   const snapToEdge = useCallback((x, y) => {
@@ -122,6 +150,7 @@ export default function CosmicToolbar() {
   const onDragStart = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
+    bringToFront();
     setIsDragging(true);
     dragMoved.current = false;
     const rect = toolbarRef.current?.getBoundingClientRect();
@@ -130,7 +159,7 @@ export default function CosmicToolbar() {
       offsetY: (e.clientY || e.touches?.[0]?.clientY || 0) - (rect?.top || 0),
     };
     document.body.style.userSelect = 'none';
-  }, []);
+  }, [bringToFront]);
 
   useEffect(() => {
     if (!isDragging) return;
@@ -259,6 +288,42 @@ export default function CosmicToolbar() {
     ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
     : { top: 12, right: 12 };
 
+  const baseZ = zBoost ? 9999 : 9997;
+
+  // Minimized: tiny restore dot
+  if (minimized) {
+    const minStyle = hasCustomPos
+      ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
+      : { top: 12, right: 12 };
+    return createPortal(
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.15, opacity: 0.9 }}
+        whileTap={{ scale: 0.85 }}
+        onClick={() => { haptic('Light'); setMinimized(false); bringToFront(); }}
+        className="fixed flex items-center justify-center"
+        style={{
+          ...minStyle,
+          zIndex: baseZ,
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          background: 'rgba(11,12,21,0.6)',
+          border: '1px solid rgba(192,132,252,0.12)',
+          backdropFilter: 'blur(12px)',
+          cursor: 'pointer',
+          opacity: 0.5,
+        }}
+        data-testid="toolbar-restore"
+        title="Open Toolbar"
+      >
+        <LotusIcon size={10} color="#C084FC" />
+      </motion.button>,
+      document.body
+    );
+  }
+
   return createPortal(
     <motion.div
       ref={toolbarRef}
@@ -267,9 +332,10 @@ export default function CosmicToolbar() {
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="fixed flex items-center"
       onClick={handlePillTap}
+      onPointerDown={bringToFront}
       style={{
         ...posStyle,
-        zIndex: 9998,
+        zIndex: baseZ,
         padding: expanded ? '5px 8px' : '5px 6px',
         borderRadius: 24,
         background: anyActive ? 'rgba(10,10,18,0.55)' : 'rgba(10,10,18,0.35)',
@@ -366,6 +432,23 @@ export default function CosmicToolbar() {
             >
               <ChevronUp size={13} style={{ color: '#A78BFA' }} />
             </ToolBtn>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Minimize button ── */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }}>
+            <button
+              data-testid="toolbar-minimize"
+              onClick={(e) => { e.stopPropagation(); haptic('Light'); setMinimized(true); }}
+              className="flex items-center justify-center rounded-full hover:bg-white/5 transition-colors"
+              style={{ width: 22, height: 22, flexShrink: 0 }}
+              title="Minimize toolbar"
+            >
+              <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

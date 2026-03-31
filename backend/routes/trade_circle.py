@@ -64,7 +64,9 @@ async def create_listing(data: dict = Body(...), user=Depends(get_current_user))
 
     if not title or not offering:
         raise HTTPException(status_code=400, detail="Title and offering are required")
-    if category not in ("goods", "services", "both"):
+    # Valid categories: wellness categories + legacy goods/services
+    valid_categories = {"readings", "healing", "guidance", "meditation", "crafted", "other", "goods", "services", "both"}
+    if category not in valid_categories:
         raise HTTPException(status_code=400, detail="Invalid category")
 
     listing = {
@@ -243,20 +245,60 @@ async def respond_to_offer(offer_id: str, data: dict = Body(...), user=Depends(g
     await db.trade_offers.update_one({"id": offer_id}, {"$set": {
         "status": new_status,
         "responded_at": datetime.now(timezone.utc).isoformat(),
+        "lister_confirmed": False,
+        "offerer_confirmed": False,
     }})
 
     if action == "accept":
-        await db.trade_listings.update_one({"id": offer["listing_id"]}, {"$set": {"status": "traded"}})
+        # Move listing to "in-trade" (pending handshake), not fully completed yet
+        await db.trade_listings.update_one({"id": offer["listing_id"]}, {"$set": {"status": "in-trade"}})
         await db.trade_offers.update_many(
             {"listing_id": offer["listing_id"], "id": {"$ne": offer_id}, "status": "pending"},
             {"$set": {"status": "declined", "responded_at": datetime.now(timezone.utc).isoformat()}}
         )
-        await create_activity(user["id"], "trade_complete", f"Trade completed: {offer['listing_title']}")
-        # Award karma to both parties
-        await award_karma(user["id"], "trade_completed", offer_id)
-        await award_karma(offer["offerer_id"], "trade_completed", offer_id)
 
     return {"status": new_status, "offer_id": offer_id}
+
+
+@router.post("/trade-circle/offers/{offer_id}/handshake")
+async def cosmic_handshake(offer_id: str, user=Depends(get_current_user)):
+    """Cosmic Handshake — both parties independently confirm the trade was fulfilled."""
+    offer = await db.trade_offers.find_one({"id": offer_id}, {"_id": 0})
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+    if offer["status"] != "accepted":
+        raise HTTPException(status_code=400, detail="Offer must be accepted before handshake")
+
+    # Determine which party is confirming
+    update = {}
+    if user["id"] == offer["lister_id"]:
+        update["lister_confirmed"] = True
+    elif user["id"] == offer["offerer_id"]:
+        update["offerer_confirmed"] = True
+    else:
+        raise HTTPException(status_code=403, detail="You are not part of this trade")
+
+    await db.trade_offers.update_one({"id": offer_id}, {"$set": update})
+
+    # Reload to check if both confirmed
+    updated = await db.trade_offers.find_one({"id": offer_id}, {"_id": 0})
+    lister_ok = updated.get("lister_confirmed", False) or (user["id"] == offer["lister_id"])
+    offerer_ok = updated.get("offerer_confirmed", False) or (user["id"] == offer["offerer_id"])
+
+    if lister_ok and offerer_ok:
+        # Both confirmed — complete the trade
+        await db.trade_offers.update_one({"id": offer_id}, {"$set": {
+            "status": "completed",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+        }})
+        await db.trade_listings.update_one({"id": offer["listing_id"]}, {"$set": {"status": "traded"}})
+        await create_activity(offer["lister_id"], "trade_complete", f"Trade completed: {offer['listing_title']}")
+        await create_activity(offer["offerer_id"], "trade_complete", f"Trade completed: {offer['listing_title']}")
+        await award_karma(offer["lister_id"], "trade_completed", offer_id)
+        await award_karma(offer["offerer_id"], "trade_completed", offer_id)
+        return {"status": "completed", "message": "Cosmic Handshake complete — trade fulfilled!"}
+
+    return {"status": "waiting", "message": "Your confirmation recorded. Waiting for the other party."}
 
 
 @router.get("/trade-circle/stats")
@@ -391,4 +433,78 @@ async def karma_leaderboard(user=Depends(get_current_user)):
         })
 
     return {"leaderboard": results}
+
+
+@router.get("/trade-circle/trust-score/{user_id}")
+async def get_trust_score(user_id: str, user=Depends(get_current_user)):
+    """Composite Trust Score = Quantum Coherence (40%) + Trade Rating (40%) + Trade Volume (20%)."""
+    from datetime import timedelta
+
+    # 1. Quantum Coherence (practice consistency from last 7 days)
+    now = datetime.now(timezone.utc)
+    week_ago = (now - timedelta(days=7)).isoformat()
+    mood_count = await db.mood_logs.count_documents({"user_id": user_id, "timestamp": {"$gte": week_ago}})
+    journal_count = await db.journals.count_documents({"user_id": user_id, "created_at": {"$gte": week_ago}})
+    med_count = await db.meditation_sessions.count_documents({"user_id": user_id, "created_at": {"$gte": week_ago}})
+    breath_count = await db.breath_sessions.count_documents({"user_id": user_id, "created_at": {"$gte": week_ago}})
+    variety = min(4, sum(1 for c in [mood_count, journal_count, med_count, breath_count] if c > 0))
+    frequency = min(20, mood_count + journal_count + med_count + breath_count)
+    coherence_raw = (variety * 12.5) + (frequency * 2.5)  # max 100
+    coherence_score = min(100, coherence_raw)
+
+    # 2. Trade Rating (average stars from reviews)
+    reviews = await db.trade_reviews.find({"reviewee_id": user_id}, {"_id": 0, "rating": 1}).to_list(100)
+    avg_rating = (sum(r["rating"] for r in reviews) / len(reviews)) if reviews else 0
+    rating_score = (avg_rating / 5) * 100  # normalize to 0-100
+
+    # 3. Trade Volume (completed trades count)
+    completed = await db.trade_offers.count_documents({"status": "completed", "$or": [{"lister_id": user_id}, {"offerer_id": user_id}]})
+    volume_score = min(100, completed * 10)  # 10 trades = max
+
+    # Composite: 40% coherence + 40% rating + 20% volume
+    trust = round(coherence_score * 0.4 + rating_score * 0.4 + volume_score * 0.2)
+
+    # Trust tier
+    if trust >= 80:
+        trust_tier = {"name": "Cosmic Elder", "color": "#EAB308", "level": 5}
+    elif trust >= 60:
+        trust_tier = {"name": "Star Guardian", "color": "#C084FC", "level": 4}
+    elif trust >= 40:
+        trust_tier = {"name": "Light Bearer", "color": "#818CF8", "level": 3}
+    elif trust >= 20:
+        trust_tier = {"name": "Seeker", "color": "#2DD4BF", "level": 2}
+    else:
+        trust_tier = {"name": "Newcomer", "color": "#94A3B8", "level": 1}
+
+    return {
+        "user_id": user_id,
+        "trust_score": trust,
+        "trust_tier": trust_tier,
+        "breakdown": {
+            "coherence": round(coherence_score),
+            "rating": round(rating_score),
+            "volume": round(volume_score),
+        },
+        "details": {
+            "avg_rating": round(avg_rating, 1),
+            "review_count": len(reviews),
+            "completed_trades": completed,
+        },
+    }
+
+
+TRADE_CATEGORIES = [
+    {"id": "readings", "name": "Readings", "icon": "eye", "color": "#C084FC"},
+    {"id": "healing", "name": "Healing", "icon": "heart", "color": "#FDA4AF"},
+    {"id": "guidance", "name": "Guidance", "icon": "compass", "color": "#2DD4BF"},
+    {"id": "meditation", "name": "Meditation", "icon": "moon", "color": "#818CF8"},
+    {"id": "crafted", "name": "Crafted Items", "icon": "gem", "color": "#FCD34D"},
+    {"id": "other", "name": "Other", "icon": "sparkles", "color": "#94A3B8"},
+]
+
+
+@router.get("/trade-circle/categories")
+async def get_categories():
+    """Get available trade categories."""
+    return {"categories": TRADE_CATEGORIES}
 

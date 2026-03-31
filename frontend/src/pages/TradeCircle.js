@@ -6,7 +6,8 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Plus, Package, Wrench, Search, X, Send,
   Check, XCircle, RefreshCw, Filter, ChevronRight, User,
-  ArrowRightLeft, Sparkles, Clock, Tag, Star, Award, Trophy, MessageCircle
+  ArrowRightLeft, Sparkles, Clock, Tag, Star, Award, Trophy, MessageCircle,
+  Handshake, Shield, Eye, Heart, Compass, Moon, Gem
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,9 +15,13 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: ArrowRightLeft, color: '#C084FC' },
-  { id: 'goods', label: 'Goods', icon: Package, color: '#2DD4BF' },
-  { id: 'services', label: 'Services', icon: Wrench, color: '#FB923C' },
-  { id: 'both', label: 'Both', icon: Sparkles, color: '#E879F9' },
+  { id: 'readings', label: 'Readings', icon: Eye, color: '#C084FC' },
+  { id: 'healing', label: 'Healing', icon: Heart, color: '#FDA4AF' },
+  { id: 'guidance', label: 'Guidance', icon: Compass, color: '#2DD4BF' },
+  { id: 'meditation', label: 'Meditation', icon: Moon, color: '#818CF8' },
+  { id: 'crafted', label: 'Crafted', icon: Gem, color: '#FCD34D' },
+  { id: 'goods', label: 'Goods', icon: Package, color: '#FB923C' },
+  { id: 'services', label: 'Services', icon: Wrench, color: '#2DD4BF' },
 ];
 
 function CreateListingModal({ onClose, onCreated, authHeaders }) {
@@ -208,6 +213,77 @@ function KarmaBadge({ points, tier, size = 'sm' }) {
   );
 }
 
+function TrustScoreBadge({ userId, authHeaders }) {
+  const [trust, setTrust] = useState(null);
+  useEffect(() => {
+    if (!userId) return;
+    axios.get(`${API}/trade-circle/trust-score/${userId}`, { headers: authHeaders })
+      .then(r => setTrust(r.data))
+      .catch(() => {});
+  }, [userId, authHeaders]);
+
+  if (!trust) return null;
+  const tier = trust.trust_tier;
+  return (
+    <span className="text-[8px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-1"
+      style={{ background: `${tier.color}12`, color: tier.color, border: `1px solid ${tier.color}25` }}
+      data-testid="trust-score-badge"
+      title={`Trust: ${trust.trust_score}% — Coherence: ${trust.breakdown.coherence}%, Rating: ${trust.breakdown.rating}%, Volume: ${trust.breakdown.volume}%`}>
+      <Shield size={8} /> {tier.name} ({trust.trust_score}%)
+    </span>
+  );
+}
+
+function CosmicHandshakeButton({ offer, authHeaders, onComplete }) {
+  const [confirming, setConfirming] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleHandshake = async () => {
+    setConfirming(true);
+    try {
+      const res = await axios.post(`${API}/trade-circle/offers/${offer.id}/handshake`, {}, { headers: authHeaders });
+      if (res.data.status === 'completed') {
+        toast.success('Cosmic Handshake complete — trade fulfilled!');
+        setDone(true);
+        onComplete?.();
+      } else {
+        toast.success('Your confirmation recorded. Waiting for the other party.');
+        setDone(true);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Handshake failed');
+    }
+    setConfirming(false);
+  };
+
+  if (offer.status !== 'accepted') return null;
+  if (done) return (
+    <span className="text-[9px] px-2 py-1 rounded-lg inline-flex items-center gap-1"
+      style={{ background: 'rgba(34,197,94,0.08)', color: '#22C55E' }}>
+      <Check size={10} /> Confirmed
+    </span>
+  );
+
+  return (
+    <motion.button
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      onClick={handleHandshake}
+      disabled={confirming}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
+      style={{
+        background: 'linear-gradient(135deg, rgba(192,132,252,0.12), rgba(45,212,191,0.12))',
+        color: '#C084FC',
+        border: '1px solid rgba(192,132,252,0.2)',
+      }}
+      data-testid={`handshake-btn-${offer.id}`}
+    >
+      <Handshake size={12} />
+      {confirming ? 'Confirming...' : 'Cosmic Handshake'}
+    </motion.button>
+  );
+}
+
 function ReviewModal({ offer, onClose, authHeaders, onReviewed }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -388,7 +464,11 @@ function ListingCard({ listing, onSelect, isOwn }) {
             </p>
           </div>
         </div>
-        {listing.status === 'traded' ? (
+        {listing.status === 'in-trade' ? (
+          <span className="text-[8px] px-1.5 py-0.5 rounded flex items-center gap-1" style={{ background: 'rgba(192,132,252,0.1)', color: '#C084FC' }}>
+            <Handshake size={8} /> Handshake
+          </span>
+        ) : listing.status === 'traded' ? (
           <span className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}>Traded</span>
         ) : listing.offer_count > 0 ? (
           <span className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,146,60,0.1)', color: '#FB923C' }}>
@@ -446,7 +526,7 @@ function ListingDetail({ listing, onClose, authHeaders, userId, onRefresh }) {
   const respondOffer = async (offerId, action) => {
     try {
       await axios.post(`${API}/trade-circle/offers/${offerId}/respond`, { action }, { headers: authHeaders });
-      toast.success(action === 'accept' ? 'Trade accepted!' : 'Offer declined');
+      toast.success(action === 'accept' ? 'Trade accepted — awaiting Cosmic Handshake!' : 'Offer declined');
       onRefresh();
       onClose();
     } catch (err) {
@@ -469,8 +549,9 @@ function ListingDetail({ listing, onClose, authHeaders, userId, onRefresh }) {
         <div className="px-5 py-4 flex items-center justify-between sticky top-0" style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid rgba(248,250,252,0.04)', zIndex: 1 }}>
           <div>
             <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{listing.title}</h3>
-            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[10px] flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
               by {listing.user_name} &middot; {listing.category} &middot; {new Date(listing.created_at).toLocaleDateString()}
+              {!isOwn && <TrustScoreBadge userId={listing.user_id} authHeaders={authHeaders} />}
             </p>
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-white/5"><X size={14} style={{ color: 'var(--text-muted)' }} /></button>
@@ -500,6 +581,13 @@ function ListingDetail({ listing, onClose, authHeaders, userId, onRefresh }) {
               data-testid="make-offer-btn">
               <Send size={14} /> Make an Offer
             </button>
+          )}
+
+          {listing.status === 'in-trade' && (
+            <div className="text-center py-3 rounded-lg" style={{ background: 'rgba(192,132,252,0.06)', border: '1px solid rgba(192,132,252,0.12)' }}>
+              <Handshake size={16} className="mx-auto mb-1" style={{ color: '#C084FC' }} />
+              <p className="text-xs" style={{ color: '#C084FC' }}>Awaiting Cosmic Handshake — both parties must confirm</p>
+            </div>
           )}
 
           {listing.status === 'traded' && (
@@ -784,19 +872,24 @@ export default function TradeCircle() {
                             <p className="text-xs" style={{ color: 'var(--text-primary)' }}>{o.offerer_name} on <span style={{ color: '#C084FC' }}>{o.listing_title}</span></p>
                             <span className="text-[8px] px-1.5 py-0.5 rounded capitalize"
                               style={{
-                                background: o.status === 'accepted' ? 'rgba(34,197,94,0.1)' : o.status === 'declined' ? 'rgba(239,68,68,0.1)' : 'rgba(251,146,60,0.1)',
-                                color: o.status === 'accepted' ? '#22C55E' : o.status === 'declined' ? '#EF4444' : '#FB923C',
-                              }}>{o.status}</span>
+                                background: o.status === 'completed' ? 'rgba(34,197,94,0.1)' : o.status === 'accepted' ? 'rgba(192,132,252,0.1)' : o.status === 'declined' ? 'rgba(239,68,68,0.1)' : 'rgba(251,146,60,0.1)',
+                                color: o.status === 'completed' ? '#22C55E' : o.status === 'accepted' ? '#C084FC' : o.status === 'declined' ? '#EF4444' : '#FB923C',
+                              }}>{o.status === 'accepted' ? 'awaiting handshake' : o.status}</span>
                           </div>
                           <p className="text-[11px]" style={{ color: '#2DD4BF' }}>Offers: {o.offer_items}</p>
-                          {o.status === 'accepted' && (
-                            <button onClick={() => setShowReview(o)}
-                              className="mt-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-all hover:scale-105"
-                              style={{ background: 'rgba(234,179,8,0.08)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.15)' }}
-                              data-testid={`review-btn-${o.id}`}>
-                              <Star size={10} /> Leave Review
-                            </button>
-                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            {o.status === 'accepted' && (
+                              <CosmicHandshakeButton offer={o} authHeaders={authHeaders} onComplete={() => { fetchMyOffers(); fetchListings(); }} />
+                            )}
+                            {(o.status === 'accepted' || o.status === 'completed') && (
+                              <button onClick={() => setShowReview(o)}
+                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-all hover:scale-105"
+                                style={{ background: 'rgba(234,179,8,0.08)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.15)' }}
+                                data-testid={`review-btn-${o.id}`}>
+                                <Star size={10} /> Review
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -816,19 +909,24 @@ export default function TradeCircle() {
                             <p className="text-xs" style={{ color: 'var(--text-primary)' }}>You on <span style={{ color: '#C084FC' }}>{o.listing_title}</span></p>
                             <span className="text-[8px] px-1.5 py-0.5 rounded capitalize"
                               style={{
-                                background: o.status === 'accepted' ? 'rgba(34,197,94,0.1)' : o.status === 'declined' ? 'rgba(239,68,68,0.1)' : 'rgba(251,146,60,0.1)',
-                                color: o.status === 'accepted' ? '#22C55E' : o.status === 'declined' ? '#EF4444' : '#FB923C',
-                              }}>{o.status}</span>
+                                background: o.status === 'completed' ? 'rgba(34,197,94,0.1)' : o.status === 'accepted' ? 'rgba(192,132,252,0.1)' : o.status === 'declined' ? 'rgba(239,68,68,0.1)' : 'rgba(251,146,60,0.1)',
+                                color: o.status === 'completed' ? '#22C55E' : o.status === 'accepted' ? '#C084FC' : o.status === 'declined' ? '#EF4444' : '#FB923C',
+                              }}>{o.status === 'accepted' ? 'awaiting handshake' : o.status}</span>
                           </div>
                           <p className="text-[11px]" style={{ color: '#2DD4BF' }}>Your offer: {o.offer_items}</p>
-                          {o.status === 'accepted' && (
-                            <button onClick={() => setShowReview(o)}
-                              className="mt-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-all hover:scale-105"
-                              style={{ background: 'rgba(234,179,8,0.08)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.15)' }}
-                              data-testid={`review-btn-sent-${o.id}`}>
-                              <Star size={10} /> Leave Review
-                            </button>
-                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            {o.status === 'accepted' && (
+                              <CosmicHandshakeButton offer={o} authHeaders={authHeaders} onComplete={() => { fetchMyOffers(); fetchListings(); }} />
+                            )}
+                            {(o.status === 'accepted' || o.status === 'completed') && (
+                              <button onClick={() => setShowReview(o)}
+                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-all hover:scale-105"
+                                style={{ background: 'rgba(234,179,8,0.08)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.15)' }}
+                                data-testid={`review-btn-sent-${o.id}`}>
+                                <Star size={10} /> Review
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>

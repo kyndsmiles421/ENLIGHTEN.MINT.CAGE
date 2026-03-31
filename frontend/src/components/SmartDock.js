@@ -9,6 +9,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
 const DOCK_MIN_KEY = 'cosmic_dock_minimized';
 const DOCK_POS_KEY = 'cosmic_dock_pos';
+const WIDGET_FOCUS_KEY = 'cosmic_widget_focus';
 
 /* ── Try native haptics, fallback to vibrate ── */
 let Haptics;
@@ -49,10 +50,28 @@ export default function SmartDock() {
   });
   const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
   const [isDragging, setIsDragging] = useState(false);
+  const [zBoost, setZBoost] = useState(() => {
+    try { return localStorage.getItem(WIDGET_FOCUS_KEY) === 'dock'; } catch { return false; }
+  });
   const collapseRef = useRef(null);
   const dockRef = useRef(null);
   const dragStartRef = useRef(null);
   const dragMoved = useRef(false);
+
+  // Bring to front on interaction
+  const bringToFront = useCallback(() => {
+    localStorage.setItem(WIDGET_FOCUS_KEY, 'dock');
+    setZBoost(true);
+    window.dispatchEvent(new CustomEvent('widget-focus', { detail: 'dock' }));
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail !== 'dock') setZBoost(false);
+    };
+    window.addEventListener('widget-focus', handler);
+    return () => window.removeEventListener('widget-focus', handler);
+  }, []);
 
   const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname === '/vr' || location.pathname.startsWith('/live/');
 
@@ -109,6 +128,7 @@ export default function SmartDock() {
   const onDragStart = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
+    bringToFront();
     setIsDragging(true);
     dragMoved.current = false;
     const rect = dockRef.current?.getBoundingClientRect();
@@ -117,7 +137,7 @@ export default function SmartDock() {
       offsetY: (e.clientY || e.touches?.[0]?.clientY || 0) - (rect?.top || 0),
     };
     document.body.style.userSelect = 'none';
-  }, []);
+  }, [bringToFront]);
 
   useEffect(() => {
     if (!isDragging) return;
@@ -182,31 +202,33 @@ export default function SmartDock() {
   const handlePillTap = useCallback((e) => {
     if (e.target.closest('button') || e.target.closest('[data-dock-btn]') || e.target.closest('[data-drag-handle]')) return;
     if (dragMoved.current) return;
+    bringToFront();
     toggleExpand();
-  }, [toggleExpand]);
+  }, [toggleExpand, bringToFront]);
 
   if (hidden) return null;
 
   // Position logic
   const hasCustomPos = position.x !== null;
-  const defaultPos = { bottom: 80, right: 12 };
+  const defaultPos = { bottom: 80, left: 12 };
+  const baseZ = zBoost ? 9999 : 9997;
 
   // Minimized: tiny restore dot
   if (minimized) {
     const minStyle = hasCustomPos
       ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
-      : { bottom: 80, right: 12 };
+      : { bottom: 80, left: 12 };
     return createPortal(
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.15, opacity: 0.9 }}
         whileTap={{ scale: 0.85 }}
-        onClick={() => { haptic('Light'); setMinimized(false); }}
+        onClick={() => { haptic('Light'); setMinimized(false); bringToFront(); }}
         className="fixed flex items-center justify-center"
         style={{
           ...minStyle,
-          zIndex: 79,
+          zIndex: baseZ,
           width: 28,
           height: 28,
           borderRadius: '50%',
@@ -234,9 +256,10 @@ export default function SmartDock() {
     <div
       ref={dockRef}
       className="fixed"
+      onPointerDown={bringToFront}
       style={{
         ...posStyle,
-        zIndex: 79,
+        zIndex: baseZ,
         touchAction: 'none',
         transition: isDragging ? 'none' : 'left 0.3s ease, top 0.3s ease, bottom 0.3s ease, right 0.3s ease',
       }}
