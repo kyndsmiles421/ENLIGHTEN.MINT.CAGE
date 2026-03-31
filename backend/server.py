@@ -88,6 +88,7 @@ from routes.harmonics import router as harmonics_router
 from routes.gemini_chat import router as gemini_chat_router
 from routes.rpg import router as rpg_router
 from routes.reports import router as reports_router
+from routes.multiverse_map import router as multiverse_map_router
 
 app = FastAPI()
 
@@ -143,6 +144,7 @@ all_routers = [
     gemini_chat_router,
     rpg_router,
     reports_router,
+    multiverse_map_router,
 ]
 
 for r in all_routers:
