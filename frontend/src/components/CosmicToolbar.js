@@ -286,19 +286,20 @@ export default function CosmicToolbar() {
         style={{
           ...minStyle,
           zIndex: baseZ,
-          width: 28,
-          height: 28,
+          width: 36,
+          height: 36,
           borderRadius: '50%',
-          background: 'rgba(11,12,21,0.6)',
-          border: '1px solid rgba(192,132,252,0.12)',
-          backdropFilter: 'blur(12px)',
+          background: 'rgba(11,12,21,0.5)',
+          border: '1px solid rgba(192,132,252,0.15)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           cursor: 'pointer',
-          opacity: 0.5,
+          boxShadow: '0 2px 12px rgba(192,132,252,0.1)',
         }}
         data-testid="toolbar-restore"
         title="Open Toolbar"
       >
-        <LotusIcon size={10} color="#C084FC" />
+        <LotusIcon size={14} color="#C084FC" />
       </motion.button>,
       document.body
     );

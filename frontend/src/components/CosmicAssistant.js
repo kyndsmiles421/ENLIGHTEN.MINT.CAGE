@@ -209,14 +209,16 @@ export default function CosmicAssistant() {
               width: '52px',
               height: '52px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #818CF8, #C084FC)',
-              boxShadow: '0 4px 24px rgba(129,140,248,0.35), 0 0 0 3px rgba(129,140,248,0.08)',
-              border: 'none',
+              background: 'rgba(129,140,248,0.12)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: '0 4px 24px rgba(129,140,248,0.15), 0 0 0 1px rgba(129,140,248,0.1)',
+              border: '1px solid rgba(129,140,248,0.18)',
               cursor: 'pointer',
             }}
             data-testid="cosmic-assistant-btn"
           >
-            <MessageCircle size={22} color="#fff" />
+            <MessageCircle size={22} color="#818CF8" />
           </motion.button>
         )}
       </AnimatePresence>
