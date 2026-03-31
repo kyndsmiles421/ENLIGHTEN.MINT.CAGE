@@ -6,50 +6,55 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Tech Stack
 - **Frontend**: React (CRA + craco), TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API
 - **Backend**: FastAPI, MongoDB (Motor)
-- **Integrations**: Gemini 3 Flash (unified LLM via Emergent LLM Key), OpenAI TTS/STT, Stripe, Capacitor (native)
+- **Integrations**: Gemini 3 Flash (unified LLM via Emergent LLM Key), OpenAI TTS/STT, Stripe, Capacitor
 
 ## What's Been Implemented
 
-### Error Handling & Resilience (Mar 31, 2026) — NEW
-- **CosmicErrorBoundary**: React Error Boundary wraps all routes — "A dimensional rift appeared" with Try Again / Return Home
-- **Global Axios Interceptor**: Catches 429/500/502/503 with cosmic-themed toasts, 3s cooldown to prevent spam
-- **CosmicFeedback components**: CosmicLoader (spinning gradient ring), CosmicInlineLoader, CosmicPageLoader, CosmicError (with retry)
-- **Page-level error states**: Starseed, MultiverseRealms show loaders during fetch and error fallbacks with retry
-- **Inline chat errors**: Coach + Cosmos assistant show error messages as chat bubbles, not disruptive toasts
-- **No silent failures**: Replaced all `.catch(() => {})` on critical paths with themed error handling
+### Trial Graduation Modal (Mar 31, 2026) — NEW
+- **Personalized graduation experience**: When 7-day Plus trial expires, shows a warm modal with:
+  - "Your cosmic trial has concluded" header
+  - Activity highlight cards showing what the user explored (coaching sessions, Cosmos chats, soundscapes, journal entries, etc.)
+  - Total cosmic interactions count
+  - Credits used during trial
+  - "Keep your Plus access" upgrade button → `/pricing?from=trial&highlight=plus`
+  - "Continue with free plan" dismiss option
+- **Smart dismissal**: Stores `expired_at` timestamp in localStorage so modal only shows once per trial expiry
+- **Backend**: `/api/subscriptions/trial-summary` aggregates activity from 9 collections (coach, cosmos, mixer, journal, mood, meditation, oracle, starseed, realms)
+
+### Error Handling & Resilience (Mar 31, 2026)
+- CosmicErrorBoundary, Global Axios Interceptor, Cosmic-themed loaders and fallbacks
+- Inline chat errors for Coach and Cosmos assistant
 
 ### 7-Day Free Plus Trial (Mar 31, 2026)
-- Auto-activated on registration, auto-expires, trial-aware Pricing with "KEEP YOUR TRIAL FEATURES" badge
+- Auto-activated on registration, auto-expires, trial-aware Pricing page
+- TrialBanner with urgency state, "KEEP YOUR TRIAL FEATURES" badge on Plus card
 
 ### Gemini AI — Unified Brain (Mar 31, 2026)
-- ALL ~35 LlmChat instances on Gemini 3 Flash, Context-Aware Cosmos Assistant (26-page map)
+- ALL ~35 LlmChat instances on Gemini 3 Flash
+- Context-Aware Cosmos Floating Assistant (26-page map, translucent glass button)
 
 ### Star Chart Fuzzy Search (Mar 31, 2026)
-- Fuzzy match handles partial names and typos across Western + cultural constellations
+- Fuzzy match handles partial names and typos
 
-### Core Platform (Previously Built)
-- Auth, profiles, dashboard, wellness tracking, AI Coach, Star Chart (20 cultures)
-- Oracle, Numerology, Cardology, Sacred Texts, Trade Circle, Gamification
-- Starseed Journey (8 origins), Multiverse Realms (6 dimensions)
-- MixerContext (Global Audio), SmartDock, Session Recording, Premium Tier Gating (Stripe)
-- Multi-Language (7 languages), VR, PWA
+### Core Platform
+- Auth, dashboard, wellness, AI Coach, Star Chart (20 cultures), Oracle, Sacred Texts
+- Trade Circle, Gamification, Starseed (8 origins), Multiverse Realms (6 dimensions)
+- MixerContext (Global Audio), SmartDock, Soundscapes, Stripe Premium Tiers
+- Multi-Language (7), VR, PWA
 
 ## Test Report History
-- Iteration 145: Gemini chat + context-aware (100%)
-- Iteration 146: Trial registration + auto-expiry (100%)
-- Iteration 147: Dumb functionality checklist (Backend 21/21, Frontend 12/12)
-- Iteration 148: Error handling layer (Backend 14/14, Frontend 4/4)
+- Iteration 145-148: All 100% pass
+- Iteration 149: Trial Graduation (Backend 11/11, Frontend 10/10)
 
 ## Credentials
 - Admin: kyndsmiles@gmail.com / password
-- App URL: https://zen-energy-bar.preview.emergentagent.com
+- Expired trial test: grad_test_522@test.com / testpass123
 
 ## Upcoming Tasks
 
 ### P1 — Next
-- Trial Graduation modal (personalized summary when trial ends)
 - Cooperative Boss Encounters (community meditation/frequency goals)
-- Loot/Inventory System
+- Loot/Inventory System (manage gems & digital assets)
 
 ### P2 — Backlog
 - Virtual Rock Hounding, Myths & Legends Encyclopedia
@@ -59,7 +64,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Spore-like Spiritual Avatar Creator, Gem Resonance engine, AI Scene Recreations
 
 ## Architecture Rules
-- **Audio**: Always use `useMixer()`, never `new AudioContext()`
-- **AI**: Always use `.with_model("gemini", "gemini-3-flash-preview")`
-- **Errors**: Use `getCosmicErrorMessage()` for themed messages, `CosmicError` for fallback UI
-- **Trial**: Auto-expiry in `get_user_credits()` — no cron needed
+- **Audio**: Always `useMixer()`, never `new AudioContext()`
+- **AI**: Always `.with_model("gemini", "gemini-3-flash-preview")`
+- **Errors**: Use `getCosmicErrorMessage()` + `CosmicError` for themed fallbacks
+- **Trial**: Auto-expiry in `get_user_credits()`, graduation modal via `TrialGraduation.js`
