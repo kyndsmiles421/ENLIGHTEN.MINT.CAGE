@@ -17,7 +17,8 @@ import {
   Compass, Droplets, UtensilsCrossed, Target, PenTool, Globe,
   Calendar, BarChart3, MessageCircle, Orbit, Atom, HelpCircle,
   Pencil, GripVertical, EyeOff, Plus, X, ArrowUp, ArrowDown,
-  Pin, LayoutGrid, Save, ChevronDown, ScrollText, Swords
+  Pin, LayoutGrid, Save, ChevronDown, ScrollText, Swords,
+  CloudSun, Moon as MoonIcon, Waves
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 import TrialBanner from '../components/TrialBanner';
@@ -101,6 +102,7 @@ const REC_ICON_MAP = {
 
 const SECTION_META = {
   stats:           { label: 'Stats Cards',      tKey: null,                          color: '#FCD34D' },
+  cosmic_weather:  { label: 'Cosmic Weather',   tKey: null,                          color: '#E879F9' },
   pinned:          { label: 'My Shortcuts',      tKey: 'dashboard.myShortcuts',       color: '#C084FC' },
   suggestions:     { label: 'Suggested for You', tKey: 'dashboard.suggestedForYou',   color: '#2DD4BF' },
   scripture:       { label: 'Sacred Scriptures', tKey: null,                          color: '#D97706' },
@@ -112,7 +114,7 @@ const SECTION_META = {
   actions:         { label: 'Explore & Practice', tKey: 'dashboard.exploreAndPractice', color: '#86EFAC' },
 };
 
-const DEFAULT_ORDER = ["stats", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
+const DEFAULT_ORDER = ["stats", "cosmic_weather", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
 const DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/bible"];
 
 export default function Dashboard() {
@@ -140,6 +142,7 @@ export default function Dashboard() {
   const [showWalkthrough, setShowWalkthrough] = useState(false);
   const [coherence, setCoherence] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
+  const [cosmicWeather, setCosmicWeather] = useState(null);
 
   // Layout state
   const [editMode, setEditMode] = useState(false);
@@ -170,8 +173,19 @@ export default function Dashboard() {
         axios.get(`${API}/teachings/daily-wisdom`).then(r => setDailyWisdom(r.data)).catch(() => {}),
         axios.get(`${API}/notifications/quantum-coherence`, { headers: authHeaders }).then(r => setCoherence(r.data)).catch(() => {}),
         axios.get(`${API}/dashboard/suggestions`, { headers: authHeaders }).then(r => setSuggestions(r.data.suggestions || [])).catch(() => {}),
+        axios.get(`${API}/reports/cosmic-weather`, { headers: authHeaders }).then(r => setCosmicWeather(r.data)).catch(() => {}),
         axios.get(`${API}/dashboard/layout`, { headers: authHeaders }).then(r => {
-          setSectionsOrder(r.data.sections_order || DEFAULT_ORDER);
+          const savedOrder = r.data.sections_order || DEFAULT_ORDER;
+          // Merge new sections from DEFAULT_ORDER that aren't in saved layout
+          const merged = [...savedOrder];
+          DEFAULT_ORDER.forEach((section, idx) => {
+            if (!merged.includes(section)) {
+              // Insert at the same relative position as DEFAULT_ORDER
+              const insertAt = Math.min(idx, merged.length);
+              merged.splice(insertAt, 0, section);
+            }
+          });
+          setSectionsOrder(merged);
           setHiddenSections(r.data.hidden_sections || []);
           setPinnedShortcuts(r.data.pinned_shortcuts || DEFAULT_PINNED);
           setLayoutLoaded(true);
@@ -288,6 +302,7 @@ export default function Dashboard() {
   const renderSection = (sectionId) => {
     switch (sectionId) {
       case 'stats': return <StatsSection key="stats" stats={stats} streak={streak} navigate={navigate} />;
+      case 'cosmic_weather': return cosmicWeather ? <CosmicWeatherSection key="weather" weather={cosmicWeather} navigate={navigate} /> : null;
       case 'pinned': return pinnedShortcuts.length > 0 ? <PinnedSection key="pinned" pinned={pinnedShortcuts} navigate={navigate} editMode={editMode} onRemove={togglePin} /> : null;
       case 'suggestions': return suggestions.length > 0 ? <SuggestionsSection key="suggestions" suggestions={suggestions} navigate={navigate} playFrequency={playFrequency} /> : null;
       case 'scripture': return stats?.scripture ? <ScriptureSection key="scripture" scripture={stats.scripture} navigate={navigate} /> : null;
@@ -562,6 +577,92 @@ function StatsSection({ stats, streak, navigate }) {
     </div>
   );
 }
+
+function CosmicWeatherSection({ weather, navigate }) {
+  const LUNAR_ICONS = {
+    'New Moon': MoonIcon, 'Full Moon': CloudSun, 'Waxing Crescent': MoonIcon,
+    'Waning Crescent': MoonIcon, 'First Quarter': MoonIcon, 'Last Quarter': MoonIcon,
+    'Waxing Gibbous': MoonIcon, 'Waning Gibbous': MoonIcon,
+  };
+  const LunarIcon = LUNAR_ICONS[weather.lunar?.phase] || MoonIcon;
+  const elColor = { Fire: '#EF4444', Water: '#3B82F6', Earth: '#F59E0B', Air: '#94A3B8' }[weather.element] || '#C084FC';
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+      className="mb-8" data-testid="cosmic-weather-widget">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <CloudSun size={11} style={{ color: '#E879F9' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Cosmic Weather</p>
+        </div>
+        <button onClick={() => navigate('/cosmic-insights')}
+          className="text-[10px] flex items-center gap-1 transition-all hover:gap-2"
+          style={{ color: '#E879F9' }}
+          data-testid="weather-see-all">
+          Full Report <ChevronRight size={10} />
+        </button>
+      </div>
+      <div className="glass-card p-4 relative overflow-hidden group cursor-pointer hover:scale-[1.005] transition-transform"
+        onClick={() => navigate('/cosmic-insights')}
+        data-testid="cosmic-weather-card">
+        {/* Subtle element-colored ambient glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.04]"
+          style={{ background: `radial-gradient(circle, ${elColor}, transparent)`, transform: 'translate(30%, -30%)' }} />
+        <div className="relative z-10">
+          {/* Zodiac + Lunar row */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: `${elColor}10`, border: `1px solid ${elColor}18` }}>
+              <Waves size={18} style={{ color: elColor }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  {weather.zodiac?.sign} Season
+                </p>
+                <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${elColor}10`, color: elColor }}>
+                  {weather.element}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <LunarIcon size={9} style={{ color: 'var(--text-muted)' }} />
+                <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                  {weather.lunar?.phase} — {weather.lunar?.energy}
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* AI Forecast */}
+          <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic' }}>
+            {weather.forecast?.length > 200 ? weather.forecast.slice(0, 200) + '...' : weather.forecast}
+          </p>
+          {/* Tool recommendation chips */}
+          <div className="flex flex-wrap gap-1.5">
+            {weather.tool_recommendations?.mixer && (
+              <span className="text-[8px] px-2 py-0.5 rounded-full flex items-center gap-1"
+                style={{ background: 'rgba(139,92,246,0.06)', color: '#8B5CF6', border: '1px solid rgba(139,92,246,0.1)' }}>
+                <Music size={7} /> {weather.tool_recommendations.mixer.freq}
+              </span>
+            )}
+            {weather.rpg_bonuses?.lunar_xp_bonus > 0 && (
+              <span className="text-[8px] px-2 py-0.5 rounded-full flex items-center gap-1"
+                style={{ background: 'rgba(251,146,60,0.06)', color: '#FB923C', border: '1px solid rgba(251,146,60,0.1)' }}>
+                <Zap size={7} /> +{weather.rpg_bonuses.lunar_xp_bonus} XP
+              </span>
+            )}
+            {weather.tool_recommendations?.reset_pulse && (
+              <span className="text-[8px] px-2 py-0.5 rounded-full flex items-center gap-1"
+                style={{ background: 'rgba(239,68,68,0.06)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.1)' }}>
+                <Flame size={7} /> Reset Pulse
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 
 function PinnedSection({ pinned, navigate, editMode, onRemove }) {
   const pinnedActions = pinned.map(path => ALL_ACTIONS.find(a => a.path === path)).filter(Boolean);
