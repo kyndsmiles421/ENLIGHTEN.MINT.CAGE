@@ -6,7 +6,7 @@ import axios from 'axios';
 import {
   ChevronRight, ChevronLeft, X, Play, Sun, Flame, Eye, Leaf,
   Heart, Compass, Star, BookOpen, Music, Sparkles, Globe, Brain,
-  Waves, Trophy, Loader2
+  Waves, Trophy, Loader2, Volume2, VolumeX
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -101,6 +101,18 @@ function VideoIntro({ onComplete, onSkip }) {
   const [videoUrl, setVideoUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [muted, setMuted] = useState(true);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      const next = !videoRef.current.muted;
+      videoRef.current.muted = next;
+      setMuted(next);
+      if (!next && videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -147,7 +159,10 @@ function VideoIntro({ onComplete, onSkip }) {
       {videoUrl && !loading && (
         <>
           <video
-            ref={videoRef}
+            ref={(el) => {
+              videoRef.current = el;
+              if (el) el.muted = muted;
+            }}
             src={videoUrl}
             autoPlay
             playsInline
@@ -156,6 +171,17 @@ function VideoIntro({ onComplete, onSkip }) {
             style={{ maxHeight: '100vh' }}
             data-testid="tour-video-element"
           />
+          {/* Mute toggle */}
+          <button
+            onClick={toggleMute}
+            data-testid="tour-video-mute-toggle"
+            className="absolute bottom-8 left-8 p-2.5 rounded-lg transition-all hover:scale-110 z-10"
+            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {muted
+              ? <VolumeX size={16} style={{ color: '#F8FAFC' }} />
+              : <Volume2 size={16} style={{ color: '#D8B4FE' }} />
+            }
+          </button>
           {/* Skip button */}
           <button
             onClick={onSkip}

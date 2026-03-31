@@ -56,8 +56,22 @@ export default function IntroVideo() {
     }
   };
 
+  const toggleMute = () => {
+    if (videoRef.current) {
+      const next = !videoRef.current.muted;
+      videoRef.current.muted = next;
+      setMuted(next);
+      // If unmuting, ensure video is still playing (some browsers pause on unmute)
+      if (!next && videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
+
   const handleVideoReady = () => {
     if (videoRef.current && isOpen) {
+      // Force muted property on DOM node (React muted prop is unreliable)
+      videoRef.current.muted = muted;
       videoRef.current.play().catch(() => {});
     }
   };
@@ -127,9 +141,12 @@ export default function IntroVideo() {
 
                 {/* Video */}
                 <div className="rounded-2xl overflow-hidden relative" style={{ border: '1px solid rgba(216,180,254,0.1)' }}>
-                  <video ref={videoRef}
+                  <video ref={(el) => {
+                      videoRef.current = el;
+                      // Imperatively set muted on DOM node — React muted prop is unreliable
+                      if (el) el.muted = muted;
+                    }}
                     src={`${process.env.REACT_APP_BACKEND_URL}${videoUrl}`}
-                    muted={muted}
                     loop
                     playsInline
                     autoPlay
@@ -140,10 +157,11 @@ export default function IntroVideo() {
                     data-testid="intro-video-element" />
 
                   {/* Mute toggle */}
-                  <button onClick={() => setMuted(m => !m)}
-                    className="absolute bottom-4 right-4 p-2 rounded-lg"
-                    style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
-                    {muted ? <VolumeX size={14} style={{ color: '#F8FAFC' }} /> : <Volume2 size={14} style={{ color: '#F8FAFC' }} />}
+                  <button onClick={toggleMute}
+                    data-testid="intro-video-mute-toggle"
+                    className="absolute bottom-4 right-4 p-2.5 rounded-lg transition-all hover:scale-110"
+                    style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {muted ? <VolumeX size={16} style={{ color: '#F8FAFC' }} /> : <Volume2 size={16} style={{ color: '#D8B4FE' }} />}
                   </button>
 
                   {/* Title overlay */}
