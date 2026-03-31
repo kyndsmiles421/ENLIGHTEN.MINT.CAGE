@@ -70,6 +70,8 @@ from routes.music_studio import router as music_studio_router
 from routes.mixer_presets import router as mixer_presets_router
 from routes.ai_blend import router as ai_blend_router
 from routes.translation import router as translation_router
+from routes.starseed import router as starseed_journey_router
+from routes.realms import router as realms_router
 from routes.media_library import router as media_library_router
 from routes.astrology_reading import router as astrology_reading_router
 from routes.bible import router as bible_router
@@ -120,6 +122,8 @@ all_routers = [
     mixer_presets_router,
     ai_blend_router,
     translation_router,
+    starseed_journey_router,
+    realms_router,
     media_library_router,
     astrology_reading_router,
     bible_router,

@@ -6,6 +6,7 @@ import { useAvatar } from '../context/AvatarContext';
 import { useNavigate } from 'react-router-dom';
 import { useSensory } from '../context/SensoryContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
@@ -60,6 +61,7 @@ const ALL_ACTIONS = [
   { icon: Sun, label: 'Affirm', path: '/affirmations', color: '#93C5FD', group: 'Practice' },
   { icon: Sparkles, label: 'Oracle', path: '/oracle', color: '#E879F9', group: 'Divination' },
   { icon: Star, label: 'Stars', path: '/star-chart', color: '#E879F9', group: 'Divination' },
+  { icon: Sparkles, label: 'Starseed', path: '/starseed', color: '#C084FC', group: 'Divination' },
   { icon: Eye, label: 'Forecasts', path: '/forecasts', color: '#E879F9', group: 'Divination' },
   { icon: Star, label: 'Numerology', path: '/numerology', color: '#E879F9', group: 'Divination' },
   { icon: Moon, label: 'Dreams', path: '/dreams', color: '#E879F9', group: 'Divination' },
@@ -92,16 +94,16 @@ const REC_ICON_MAP = {
 };
 
 const SECTION_META = {
-  stats:           { label: 'Stats Cards',      color: '#FCD34D' },
-  pinned:          { label: 'My Shortcuts',      color: '#C084FC' },
-  suggestions:     { label: 'Suggested for You', color: '#2DD4BF' },
-  scripture:       { label: 'Sacred Scriptures', color: '#D97706' },
-  coherence:       { label: 'Quantum Coherence', color: '#00E5FF' },
-  challenge:       { label: 'Daily Challenge',   color: '#FCD34D' },
-  wisdom:          { label: 'Daily Wisdom',      color: '#FB923C' },
-  moods:           { label: 'Recent Moods',      color: '#FDA4AF' },
-  recommendations: { label: 'For You',           color: '#D8B4FE' },
-  actions:         { label: 'Explore & Practice', color: '#86EFAC' },
+  stats:           { label: 'Stats Cards',      tKey: null,                          color: '#FCD34D' },
+  pinned:          { label: 'My Shortcuts',      tKey: 'dashboard.myShortcuts',       color: '#C084FC' },
+  suggestions:     { label: 'Suggested for You', tKey: 'dashboard.suggestedForYou',   color: '#2DD4BF' },
+  scripture:       { label: 'Sacred Scriptures', tKey: null,                          color: '#D97706' },
+  coherence:       { label: 'Quantum Coherence', tKey: null,                          color: '#00E5FF' },
+  challenge:       { label: 'Daily Challenge',   tKey: 'dashboard.dailyChallenge',    color: '#FCD34D' },
+  wisdom:          { label: 'Daily Wisdom',      tKey: null,                          color: '#FB923C' },
+  moods:           { label: 'Recent Moods',      tKey: 'dashboard.recentMoods',       color: '#FDA4AF' },
+  recommendations: { label: 'For You',           tKey: 'dashboard.forYou',            color: '#D8B4FE' },
+  actions:         { label: 'Explore & Practice', tKey: 'dashboard.exploreAndPractice', color: '#86EFAC' },
 };
 
 const DEFAULT_ORDER = ["stats", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
@@ -113,6 +115,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { prefs } = useSensory();
   const { toggleFreq } = useMixer();
+  const { t } = useLanguage();
   const isLight = prefs.theme === 'light';
 
   // Play a frequency from a recommendation action
@@ -399,7 +402,7 @@ export default function Dashboard() {
                   </div>
                   <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: meta?.color || '#fff' }} />
                   <span className="text-xs font-medium flex-1" style={{ color: isHidden ? 'rgba(248,250,252,0.3)' : 'rgba(248,250,252,0.8)' }}>
-                    {meta?.label || sectionId}
+                    {meta?.tKey ? t(meta.tKey, meta.label) : (meta?.label || sectionId)}
                   </span>
                   <div className="flex items-center gap-1">
                     <button onClick={() => moveSection(idx, -1)} disabled={idx === 0}

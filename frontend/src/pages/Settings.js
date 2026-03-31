@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Eye, Palette, Sparkles, Monitor,
-  Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast
+  Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast, Globe, Check
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
+import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 
 function Section({ title, children }) {
   const { prefs } = useSensory();
@@ -86,6 +87,7 @@ function Slider({ label, value, min, max, onChange, testId, icon: Icon, suffix }
 export default function Settings() {
   const navigate = useNavigate();
   const { ambientOn, toggleAmbient, prefs, updatePref, themes } = useSensory();
+  const { language, setLanguage, t } = useLanguage();
   const isLight = prefs.theme === 'light';
   const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
 
@@ -100,11 +102,43 @@ export default function Settings() {
           </button>
           <div>
             <h1 className="text-2xl font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
-              Settings
+              {t('nav.settings', 'Settings')}
             </h1>
             <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Customize your experience</p>
           </div>
         </div>
+
+        {/* Language */}
+        <Section title="Language">
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-2 mb-3">
+              <Globe size={14} style={{ color: 'var(--text-muted)' }} />
+              <p className="text-xs" style={{ color: 'var(--text-primary)' }}>App Language</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2" data-testid="language-picker">
+              {LANGUAGES.map(l => {
+                const active = language === l.code;
+                return (
+                  <button key={l.code}
+                    onClick={() => { setLanguage(l.code); toast.success(`Language: ${l.label}`); }}
+                    className="flex items-center gap-2.5 p-2.5 rounded-lg text-left transition-all hover:scale-[1.02]"
+                    style={{
+                      background: active ? 'rgba(245,158,11,0.08)' : `${subtle}0.03)`,
+                      border: `1px solid ${active ? 'rgba(245,158,11,0.2)' : `${subtle}0.06)`}`,
+                    }}
+                    data-testid={`settings-lang-${l.code}`}>
+                    <span className="text-xs font-bold w-6" style={{ color: active ? '#F59E0B' : 'var(--text-muted)' }}>{l.flag}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-medium truncate" style={{ color: active ? '#F59E0B' : 'var(--text-secondary)' }}>{l.label}</p>
+                      <p className="text-[8px] truncate" style={{ color: `${subtle}0.3)` }}>{l.native}</p>
+                    </div>
+                    {active && <Check size={12} style={{ color: '#F59E0B' }} />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Section>
 
         {/* Sound & Audio */}
         <Section title="Sound & Audio">

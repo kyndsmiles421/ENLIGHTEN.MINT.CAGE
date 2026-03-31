@@ -103,6 +103,7 @@ const ReadingList = lazy(() => import('./pages/ReadingList'));
 const GrowthTimeline = lazy(() => import('./pages/GrowthTimeline'));
 const SoulReports = lazy(() => import('./pages/SoulReports'));
 const CosmicMixerPage = lazy(() => import('./pages/CosmicMixerPage'));
+const Starseed = lazy(() => import('./pages/Starseed'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
@@ -225,6 +226,7 @@ function AnimatedRoutes() {
         <Route path="/help-center" element={<HelpCenter />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/cosmic-mixer" element={<CosmicMixerPage />} />
+        <Route path="/starseed" element={<Starseed />} />
         <Route path="/creator" element={<CreatorDashboard />} />
         <Route path="/live" element={<LiveSessions />} />
         <Route path="/live/:sessionId" element={<LiveRoom />} />

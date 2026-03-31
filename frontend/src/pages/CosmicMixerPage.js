@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES, MANTRAS } from '../context/MixerContext';
 import { useGatedFeature } from '../context/useGatedFeature';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -171,6 +172,7 @@ export default function CosmicMixerPage() {
   const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
   const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
+  const { t } = useLanguage();
 
   // ─── Global audio state from MixerContext ───
   const {
@@ -649,7 +651,7 @@ export default function CosmicMixerPage() {
               }}
               data-testid="sticky-stop-all">
               <Square size={12} style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }} />
-              <span className="text-[11px] font-medium" style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }}>Stop All</span>
+              <span className="text-[11px] font-medium" style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }}>{t('mixer.stopAll', 'Stop All')}</span>
             </button>
           </div>
           {hasActive && (
@@ -681,7 +683,7 @@ export default function CosmicMixerPage() {
 
         {/* Accordion Sections */}
         <div className="space-y-2">
-          <AccordionSection title="Session Mode" icon={Play} color="#EC4899" open={openSections.session} onToggle={() => toggleSection('session')} badge={sessionActive ? sessionData?.label : null}>
+          <AccordionSection title={t("mixer.sessionMode", "Session Mode")} icon={Play} color="#EC4899" open={openSections.session} onToggle={() => toggleSection('session')} badge={sessionActive ? sessionData?.label : null}>
             {sessionActive ? (
               <div className="text-center py-3">
                 <p className="text-xs mb-2" style={{ color: 'rgba(248,250,252,0.5)' }}>Session in progress</p>
@@ -704,7 +706,7 @@ export default function CosmicMixerPage() {
           </AccordionSection>
 
           {/* ── Soundscapes (Save/Load) ── */}
-          <AccordionSection title="Soundscapes" icon={Save} color="#818CF8" open={openSections.soundscapes} onToggle={() => toggleSection('soundscapes')} badge={savedSoundscapes.length > 0 ? `${savedSoundscapes.length} saved` : null}>
+          <AccordionSection title={t("mixer.soundscapes", "Soundscapes")} icon={Save} color="#818CF8" open={openSections.soundscapes} onToggle={() => toggleSection('soundscapes')} badge={savedSoundscapes.length > 0 ? `${savedSoundscapes.length} saved` : null}>
             {/* Save current state */}
             <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(129,140,248,0.04)', border: '1px solid rgba(129,140,248,0.1)' }}>
               <div className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'rgba(129,140,248,0.5)' }}>Capture Current Mix</div>
@@ -781,7 +783,7 @@ export default function CosmicMixerPage() {
           </AccordionSection>
 
           {/* ── AI Frequency Blend ── */}
-          <AccordionSection title="AI Frequency Blend" icon={Wand2} color="#C084FC" open={openSections.aiblend} onToggle={() => toggleSection('aiblend')} badge={aiBlend ? (aiBlend.type === 'ai_enhanced' ? 'AI' : 'Auto') : null}>
+          <AccordionSection title={t("mixer.aiblend", "AI Frequency Blend")} icon={Wand2} color="#C084FC" open={openSections.aiblend} onToggle={() => toggleSection('aiblend')} badge={aiBlend ? (aiBlend.type === 'ai_enhanced' ? 'AI' : 'Auto') : null}>
             <div className="space-y-3">
               <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.4)' }}>
                 Analyzes your mood journal patterns and creates a personalized healing frequency blend just for you.
@@ -845,7 +847,7 @@ export default function CosmicMixerPage() {
           </AccordionSection>
 
           {/* ── Mood Presets ── */}
-          <AccordionSection title="Mood Presets" icon={Sparkles} color="#2DD4BF" open={openSections.mood} onToggle={() => toggleSection('mood')} badge={activeMoodPreset ? activeMoodPreset.label : null}>
+          <AccordionSection title={t("mixer.moodPresets", "Mood Presets")} icon={Sparkles} color="#2DD4BF" open={openSections.mood} onToggle={() => toggleSection('mood')} badge={activeMoodPreset ? activeMoodPreset.label : null}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {MOOD_PRESETS.map(p => {
                 const isActive = activeMoodPreset?.id === p.id;
@@ -871,7 +873,7 @@ export default function CosmicMixerPage() {
             </div>
           </AccordionSection>
 
-          <AccordionSection title="Solfeggio Frequency" icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>
+          <AccordionSection title={t("mixer.frequencies", "Solfeggio Frequency")} icon={Waves} color="#C084FC" open={openSections.freq} onToggle={() => toggleSection('freq')} badge={activeFreqs.size > 0 ? `${activeFreqs.size} active` : null}>
             <div className="space-y-1">
               <div className="flex flex-wrap gap-1.5">
                 {allFrequencies.map(f => {
@@ -923,7 +925,7 @@ export default function CosmicMixerPage() {
             </div>
           </AccordionSection>
 
-          <AccordionSection title="Ambient Sound" icon={Volume2} color="#3B82F6" open={openSections.sound} onToggle={() => toggleSection('sound')} badge={activeSounds.size > 0 ? `${activeSounds.size} active` : null}>
+          <AccordionSection title={t("mixer.sounds", "Ambient Sound")} icon={Volume2} color="#3B82F6" open={openSections.sound} onToggle={() => toggleSection('sound')} badge={activeSounds.size > 0 ? `${activeSounds.size} active` : null}>
             <div className="space-y-1">
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
                 {SOUNDS.map(s => (
@@ -974,7 +976,7 @@ export default function CosmicMixerPage() {
             </div>
           </AccordionSection>
 
-          <AccordionSection title="World Instruments" icon={Music} color="#F59E0B" open={openSections.drone} onToggle={() => toggleSection('drone')} badge={activeDrones.size > 0 ? `${activeDrones.size} active` : null}>
+          <AccordionSection title={t("mixer.instruments", "World Instruments")} icon={Music} color="#F59E0B" open={openSections.drone} onToggle={() => toggleSection('drone')} badge={activeDrones.size > 0 ? `${activeDrones.size} active` : null}>
             <div className="space-y-1">
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
                 {INSTRUMENT_DRONES.map(d => (
@@ -1025,7 +1027,7 @@ export default function CosmicMixerPage() {
             </div>
           </AccordionSection>
 
-          <AccordionSection title="Mantra" icon={BookOpen} color="#2DD4BF" open={openSections.mantra} onToggle={() => toggleSection('mantra')} badge={activeMantra ? activeMantra.label : null}>
+          <AccordionSection title={t("mixer.mantras", "Mantra")} icon={BookOpen} color="#2DD4BF" open={openSections.mantra} onToggle={() => toggleSection('mantra')} badge={activeMantra ? activeMantra.label : null}>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               {MANTRAS.map(m => (
                 <button key={m.id} onClick={() => toggleMantra(m)} disabled={mantraLoading && activeMantra?.id !== m.id}
@@ -1043,7 +1045,7 @@ export default function CosmicMixerPage() {
           </AccordionSection>
 
           {/* Voice Morphing Engine */}
-          <AccordionSection title="Voice Engine" icon={Sparkles} color="#E879F9" open={openSections.voice || showVoiceEngine} onToggle={() => { toggleSection('voice'); setShowVoiceEngine(s => !s); }} badge={activeMantra ? 'Active' : null}>
+          <AccordionSection title={t("mixer.voiceEngine", "Voice Engine")} icon={Sparkles} color="#E879F9" open={openSections.voice || showVoiceEngine} onToggle={() => { toggleSection('voice'); setShowVoiceEngine(s => !s); }} badge={activeMantra ? 'Active' : null}>
             <div className="space-y-3" data-testid="voice-morph-engine">
               {!activeMantra && (
                 <p className="text-[10px] text-center py-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Select a mantra above to activate the Voice Engine</p>
@@ -1136,7 +1138,7 @@ export default function CosmicMixerPage() {
           </AccordionSection>
 
           {/* Master Effects Bus */}
-          <AccordionSection title="Master FX Bus" icon={Sliders} color="#06B6D4" open={openSections.masterFx} onToggle={() => toggleSection('masterFx')} badge={masterFx.reverb > 5 || masterFx.delay > 5 || masterFx.chorus > 5 ? 'Active' : null}>
+          <AccordionSection title={t("mixer.masterFx", "Master FX Bus")} icon={Sliders} color="#06B6D4" open={openSections.masterFx} onToggle={() => toggleSection('masterFx')} badge={masterFx.reverb > 5 || masterFx.delay > 5 || masterFx.chorus > 5 ? 'Active' : null}>
             <div className="space-y-2" data-testid="master-fx-bus">
               <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Global effects on master output</p>
 
