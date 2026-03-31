@@ -67,7 +67,17 @@
 32. **Cosmic Handshake** — Mutual trade confirmation system: after accepting an offer, listing moves to "in-trade" status. Both lister and offerer must independently POST `/handshake` to confirm fulfillment. Only after both confirm does the trade complete and karma is awarded.
 33. **Trust Score System** — Composite trust metric: Quantum Coherence (40%, from practice consistency) + Trade Rating (40%, from review stars) + Trade Volume (20%, from completed trades). 5 tiers: Newcomer → Seeker → Light Bearer → Star Guardian → Cosmic Elder. Displayed as badge on listing details.
 
-## Test Reports: Iterations 123-136 all 100% pass rate
+### Session 9 (Current — Mixer Revamp):
+34. **Voice Morphing Engine** — 13-parameter real-time voice effects processor: Pitch Shift, Formant, Speed, Reverb (convolution), Echo (delay+feedback), Chorus, Distortion (waveshaper), 3-band EQ, Stereo Width, Voice Gain. Routes TTS audio through Web Audio API chain instead of HTML Audio, fixing the "voice drowned out" issue. 8 presets: Clean, Deep Elder, Celestial, Whisper, Cosmic Echo, Dark Oracle, Angelic, Glitch.
+35. **Per-Channel Volume Faders** — Every active frequency, ambient sound, and drone instrument gets its own gain slider appearing inline when activated. Real-time gain node control.
+36. **Waveform Selectors** — Per-frequency waveform type switcher (sine/triangle/sawtooth/square). Updates live oscillator type in real-time.
+37. **Per-Sound Filter Sweeps** — Cutoff + resonance controls on each active ambient sound and drone instrument. Uses BiquadFilter nodes (lowpass for sounds, bandpass for drones).
+38. **Live Waveform Visualizer** — Real-time canvas-based oscilloscope at top of mixer. Uses AnalyserNode with `getByteTimeDomainData` synced via `requestAnimationFrame`. Multi-color gradient waveform.
+39. **Master FX Bus** — Global reverb (60% ceiling), delay, chorus applied on master output. Compressor toggle (DynamicsCompressor: -18dB threshold, 4:1 ratio). Prevents clipping and glues layers.
+40. **Layer Crossfade Controls** — Two dual-gradient sliders: Freq↔Ambient and Instruments↔Voice. Adjusts gain proportionally across layer groups for smooth blending.
+41. **Audio Routing Upgrade** — Master chain: MasterGain → AnalyserNode → DynamicsCompressor → Destination. All per-channel gains feed into master. AudioContext auto-resumes on user gesture.
+
+## Test Reports: Iterations 123-138 all 100% pass rate
 
 ## Backlog
 - Starseed Choose Your Own Adventure
