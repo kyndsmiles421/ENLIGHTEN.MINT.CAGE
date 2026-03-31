@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from deps import db, get_current_user, logger, create_token
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import uuid, bcrypt, os
 from models import UserCreate, UserLogin
 
 router = APIRouter()
+
+TRIAL_DAYS = 7  # Free Premium trial for new users
 
 @router.post("/auth/register")
 async def register(user: UserCreate):
@@ -13,18 +15,41 @@ async def register(user: UserCreate):
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed = bcrypt.hashpw(user.password.encode(), bcrypt.gensalt()).decode()
     user_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc)
     doc = {
         "id": user_id,
         "name": user.name,
         "email": user.email,
         "password": hashed,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": now.isoformat(),
         "streak": 0,
-        "last_active": datetime.now(timezone.utc).isoformat()
+        "last_active": now.isoformat()
     }
     await db.users.insert_one(doc)
+
+    # Auto-activate 7-day Plus trial
+    trial_end = now + timedelta(days=TRIAL_DAYS)
+    await db.user_credits.insert_one({
+        "user_id": user_id,
+        "balance": 300,
+        "tier": "plus",
+        "subscription_active": True,
+        "subscription_id": None,
+        "credits_refreshed_at": now.isoformat(),
+        "total_spent": 0,
+        "total_credits_used": 0,
+        "is_admin": False,
+        "trial_active": True,
+        "trial_started_at": now.isoformat(),
+        "trial_expires_at": trial_end.isoformat(),
+    })
+
     token = create_token(user_id, user.name)
-    return {"token": token, "user": {"id": user_id, "name": user.name, "email": user.email}}
+    return {
+        "token": token,
+        "user": {"id": user_id, "name": user.name, "email": user.email},
+        "trial": {"active": True, "tier": "plus", "days": TRIAL_DAYS, "expires_at": trial_end.isoformat()},
+    }
 
 CREATOR_EMAIL = "kyndsmiles@gmail.com"
 

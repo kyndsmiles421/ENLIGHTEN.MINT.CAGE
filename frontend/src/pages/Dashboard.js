@@ -20,6 +20,7 @@ import {
   Pin, LayoutGrid, Save, ChevronDown, ScrollText
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
+import TrialBanner from '../components/TrialBanner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -344,6 +345,11 @@ export default function Dashboard() {
             Your consciousness practice at a glance.
           </p>
         </motion.div>
+
+        {/* Trial Banner */}
+        <div className="mb-4">
+          <TrialBanner />
+        </div>
 
         {/* Edit Mode Banner */}
         <AnimatePresence>

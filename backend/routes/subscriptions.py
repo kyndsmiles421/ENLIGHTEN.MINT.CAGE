@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, Body
 from deps import db, get_current_user, logger
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import os
 import uuid
 
@@ -129,6 +129,29 @@ async def get_user_credits(user_id: str) -> dict:
             "is_admin": is_admin,
         }
         await db.user_credits.insert_one({**doc})
+
+    # Auto-expire trial if past deadline
+    if doc.get("trial_active") and doc.get("trial_expires_at"):
+        expires = datetime.fromisoformat(doc["trial_expires_at"])
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        if datetime.now(timezone.utc) >= expires:
+            await db.user_credits.update_one(
+                {"user_id": user_id},
+                {"$set": {
+                    "trial_active": False,
+                    "tier": "free",
+                    "subscription_active": False,
+                    "balance": 50,
+                    "trial_expired_at": datetime.now(timezone.utc).isoformat(),
+                }}
+            )
+            doc["trial_active"] = False
+            doc["tier"] = "free"
+            doc["subscription_active"] = False
+            doc["balance"] = 50
+            logger.info(f"Trial expired for user {user_id}")
+
     return doc
 
 
@@ -198,7 +221,7 @@ async def get_my_plan(user=Depends(get_current_user)):
     tier_id = credits.get("tier", "free")
     tier_info = TIERS.get(tier_id, TIERS["free"])
 
-    return {
+    result = {
         "tier": tier_id,
         "tier_name": tier_info["name"],
         "credits_per_month": tier_info["credits_per_month"],
@@ -209,6 +232,23 @@ async def get_my_plan(user=Depends(get_current_user)):
         "tier_order": TIER_ORDER,
         "is_admin": credits.get("is_admin", False),
     }
+
+    # Include trial info
+    if credits.get("trial_active"):
+        expires = datetime.fromisoformat(credits["trial_expires_at"])
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        days_left = max(0, (expires - datetime.now(timezone.utc)).days)
+        result["trial"] = {
+            "active": True,
+            "days_left": days_left,
+            "expires_at": credits["trial_expires_at"],
+            "started_at": credits.get("trial_started_at", ""),
+        }
+    elif credits.get("trial_expired_at"):
+        result["trial"] = {"active": False, "expired": True}
+
+    return result
 
 
 @router.post("/subscriptions/checkout")
@@ -480,20 +520,31 @@ async def check_feature_access(feature: str, user=Depends(get_current_user)):
     user_tier = credits.get("tier", "free")
     user_level = tier_level(user_tier)
 
+    # Trial users get their trial tier access
+    is_trial = credits.get("trial_active", False)
+
     required_tier = TIER_GATED_FEATURES.get(feature)
     if not required_tier:
-        return {"allowed": True, "feature": feature, "tier": user_tier}
+        return {"allowed": True, "feature": feature, "tier": user_tier, "is_trial": is_trial}
 
     required_level = tier_level(required_tier)
     allowed = user_level >= required_level
 
-    return {
+    result = {
         "allowed": allowed,
         "feature": feature,
         "tier": user_tier,
         "required_tier": required_tier,
         "required_tier_name": TIERS.get(required_tier, {}).get("name", ""),
     }
+    if is_trial:
+        result["is_trial"] = True
+        expires = datetime.fromisoformat(credits.get("trial_expires_at", ""))
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        result["trial_days_left"] = max(0, (expires - datetime.now(timezone.utc)).days)
+
+    return result
 
 
 @router.get("/subscriptions/gated-features")
