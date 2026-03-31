@@ -21,6 +21,7 @@ import { TempoProvider } from './context/TempoContext';
 import { MixerProvider } from './context/MixerContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import CosmicToolbar from './components/CosmicToolbar';
+import CosmicAssistant from './components/CosmicAssistant';
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
@@ -119,6 +120,7 @@ const StarseedWorlds = lazy(() => import('./pages/StarseedWorlds'));
 const SpiritualAvatarCreator = lazy(() => import('./pages/SpiritualAvatarCreator'));
 const AvatarGallery = lazy(() => import('./pages/AvatarGallery'));
 const CosmicLedger = lazy(() => import('./pages/CosmicLedger'));
+const MultiverseRealms = lazy(() => import('./pages/MultiverseRealms'));
 
 function PageLoader() {
   return (
@@ -240,6 +242,7 @@ function AnimatedRoutes() {
         <Route path="/spiritual-avatar" element={<SpiritualAvatarCreator />} />
         <Route path="/avatar-gallery" element={<AvatarGallery />} />
         <Route path="/cosmic-ledger" element={<CosmicLedger />} />
+        <Route path="/multiverse-realms" element={<MultiverseRealms />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
@@ -283,6 +286,7 @@ function App() {
             <SmartDock />
             <CosmicMixer />
             <CosmicToolbar />
+            <CosmicAssistant />
             <InstallPrompt />
             <CreditNudge />
           </div>

@@ -85,6 +85,7 @@ from routes.cosmic_ledger import router as cosmic_ledger_router
 from routes.voice_command import router as voice_command_router
 from routes.seasonal import router as seasonal_router
 from routes.harmonics import router as harmonics_router
+from routes.gemini_chat import router as gemini_chat_router
 
 app = FastAPI()
 
@@ -137,6 +138,7 @@ all_routers = [
     voice_command_router,
     seasonal_router,
     harmonics_router,
+    gemini_chat_router,
 ]
 
 for r in all_routers:

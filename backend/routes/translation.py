@@ -76,6 +76,7 @@ Text to translate:
         session_id=f"translate-{cache_key[:8]}",
         system_message="You are a professional translator specializing in spiritual and wellness content."
     )
+    llm.with_model("gemini", "gemini-3-flash-preview")
     response = await llm.send_message(UserMessage(text=prompt))
     translated = response.strip()
 
