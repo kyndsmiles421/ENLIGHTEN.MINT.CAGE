@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, Request
 from deps import db, get_current_user, logger
 from datetime import datetime, timezone, timedelta
 import uuid
@@ -130,6 +130,7 @@ RARITY_COLORS = {
 RARITY_WEIGHTS = [40, 25, 18, 10, 5, 2]  # Drop chance weights
 
 EQUIPMENT_SLOTS = ["head", "body", "conduit", "trinket"]
+EXTRA_EQUIPMENT_SLOTS = ["hands", "feet", "relic", "aura"]
 
 ITEM_TEMPLATES = [
     # Conduits (weapons)
@@ -287,6 +288,13 @@ async def equip_item(data: dict = Body(...), user=Depends(get_current_user)):
         raise HTTPException(400, "Item cannot be equipped")
 
     slot = item["slot"]
+
+    # Check if slot requires unlock
+    if slot in EXTRA_EQUIPMENT_SLOTS:
+        unlocked = await _get_unlocked_slots(user["id"])
+        if slot not in unlocked:
+            raise HTTPException(403, f"Slot '{slot}' is locked. Unlock it in the Gem Shop.")
+
     # Unequip current item in that slot
     current = await db.rpg_equipped.find_one(
         {"user_id": user["id"], "slot": slot}, {"_id": 0}
@@ -306,7 +314,8 @@ async def equip_item(data: dict = Body(...), user=Depends(get_current_user)):
 @router.post("/unequip")
 async def unequip_item(data: dict = Body(...), user=Depends(get_current_user)):
     slot = data.get("slot")
-    if slot not in EQUIPMENT_SLOTS:
+    all_slots = EQUIPMENT_SLOTS + EXTRA_EQUIPMENT_SLOTS
+    if slot not in all_slots:
         raise HTTPException(400, "Invalid slot")
 
     current = await db.rpg_equipped.find_one(
@@ -1126,4 +1135,394 @@ async def get_streak(user=Depends(get_current_user)):
     return {
         **streak,
         "history": list(by_date.values())[:14],
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  DUAL CURRENCY ECONOMY & SHOP SYSTEM
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import os
+STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY", "")
+
+# ── Currency Config ──
+GEMS_TO_DUST_RATE = 10  # 1 gem = 10 dust
+MIN_GEM_CONVERSION = 1
+
+GEM_PACKS = [
+    {"id": "gems_100", "gems": 100, "price": 0.99, "label": "Pouch of Gems", "bonus": 0},
+    {"id": "gems_600", "gems": 600, "price": 4.99, "label": "Chest of Gems", "bonus": 100},
+    {"id": "gems_1500", "gems": 1500, "price": 9.99, "label": "Vault of Gems", "bonus": 300},
+]
+
+# ── Slot Unlock System (slots 5-8 behind gems) ──
+EXTRA_SLOTS = [
+    {"id": "hands", "name": "Hands", "gem_cost": 50, "description": "Equip Gloves & Gauntlets"},
+    {"id": "feet", "name": "Feet", "gem_cost": 75, "description": "Equip Boots & Sandals"},
+    {"id": "relic", "name": "Relic", "gem_cost": 125, "description": "Equip ancient relics of power"},
+    {"id": "aura", "name": "Aura", "gem_cost": 200, "description": "Equip aura enchantments"},
+]
+
+# ── Shop Inventory ──
+DUST_SHOP = [
+    {"id": "dust_elixir_focus", "name": "Elixir of Focus", "cost": 80, "currency": "dust",
+     "category": "consumable", "rarity": "common",
+     "description": "Temporarily sharpens concentration",
+     "effect": {"stat": "focus", "bonus": 5, "duration_minutes": 30}},
+    {"id": "dust_elixir_vitality", "name": "Elixir of Vitality", "cost": 80, "currency": "dust",
+     "category": "consumable", "rarity": "common",
+     "description": "Restores spiritual vitality",
+     "effect": {"stat": "vitality", "bonus": 5, "duration_minutes": 30}},
+    {"id": "dust_cosmic_potion", "name": "Cosmic Dust Potion", "cost": 120, "currency": "dust",
+     "category": "consumable", "rarity": "uncommon",
+     "description": "Doubles dust earned for 1 hour",
+     "effect": {"stat": "cosmic_dust_bonus", "bonus": 2, "duration_minutes": 60}},
+    {"id": "dust_xp_scroll", "name": "Scroll of Insight", "cost": 200, "currency": "dust",
+     "category": "consumable", "rarity": "rare",
+     "description": "Grants 100 bonus XP",
+     "effect": {"stat": "xp_grant", "bonus": 100}},
+    {"id": "dust_prayer_beads", "name": "Prayer Beads of Serenity", "cost": 350, "currency": "dust",
+     "category": "conduit", "rarity": "uncommon", "slot": "conduit",
+     "description": "108 sandalwood beads infused with centuries of devotion",
+     "stats": {"harmony": 3, "wisdom": 2}},
+    {"id": "dust_monks_hood", "name": "Monk's Hood", "cost": 250, "currency": "dust",
+     "category": "vestment", "rarity": "uncommon", "slot": "head",
+     "description": "Worn by wandering monks for inner stillness",
+     "stats": {"focus": 3, "vitality": 1}},
+    {"id": "dust_robe", "name": "Robe of Tranquility", "cost": 400, "currency": "dust",
+     "category": "vestment", "rarity": "uncommon", "slot": "body",
+     "description": "Silk robe that calms the wearer's auric field",
+     "stats": {"harmony": 3, "vitality": 2}},
+    {"id": "dust_moonstone", "name": "Moonstone Pendant", "cost": 500, "currency": "dust",
+     "category": "trinket", "rarity": "uncommon", "slot": "trinket",
+     "description": "Glows with lunar energy during meditation",
+     "stats": {"resonance": 2, "harmony": 2}, "passive_xp": 1},
+]
+
+GEM_SHOP = [
+    {"id": "gem_starlight", "name": "Starlight Nectar", "cost": 25, "currency": "gems",
+     "category": "consumable", "rarity": "rare",
+     "description": "Double XP for 30 minutes",
+     "effect": {"stat": "xp_multiplier", "bonus": 2, "duration_minutes": 30}},
+    {"id": "gem_astral_compass", "name": "Astral Compass", "cost": 60, "currency": "gems",
+     "category": "conduit", "rarity": "rare", "slot": "conduit",
+     "description": "Points toward your soul's true north",
+     "stats": {"focus": 4, "wisdom": 2}},
+    {"id": "gem_crown", "name": "Crown of Awareness", "cost": 80, "currency": "gems",
+     "category": "vestment", "rarity": "rare", "slot": "head",
+     "description": "A circlet that sharpens the third eye",
+     "stats": {"wisdom": 4, "focus": 2}},
+    {"id": "gem_oracle_veil", "name": "Veil of the Oracle", "cost": 120, "currency": "gems",
+     "category": "vestment", "rarity": "epic", "slot": "head",
+     "description": "Shimmering veil that grants prophetic visions",
+     "stats": {"wisdom": 6, "resonance": 3}},
+    {"id": "gem_astral_armor", "name": "Astral Armor", "cost": 150, "currency": "gems",
+     "category": "vestment", "rarity": "epic", "slot": "body",
+     "description": "Ethereal armor that shields against negative energy",
+     "stats": {"vitality": 5, "harmony": 3, "resonance": 2}},
+    {"id": "gem_phoenix", "name": "Phoenix Feather Charm", "cost": 100, "currency": "gems",
+     "category": "trinket", "rarity": "rare", "slot": "trinket",
+     "description": "Burns away stagnant energy, renewing vitality",
+     "stats": {"vitality": 3, "focus": 2}, "passive_xp": 2},
+    {"id": "gem_divination", "name": "Divination Mirror", "cost": 180, "currency": "gems",
+     "category": "conduit", "rarity": "epic", "slot": "conduit",
+     "description": "An obsidian mirror that reveals hidden truths",
+     "stats": {"wisdom": 5, "focus": 3}},
+    {"id": "gem_tuning_fork", "name": "Ethereal Tuning Fork", "cost": 350, "currency": "gems",
+     "category": "conduit", "rarity": "legendary", "slot": "conduit",
+     "description": "Vibrates at the frequency of creation itself",
+     "stats": {"resonance": 8, "harmony": 5, "focus": 3}},
+    {"id": "gem_eye_cosmos", "name": "Eye of the Cosmos", "cost": 500, "currency": "gems",
+     "category": "trinket", "rarity": "legendary", "slot": "trinket",
+     "description": "A gemstone containing a frozen galaxy",
+     "stats": {"wisdom": 5, "resonance": 4, "focus": 3}, "passive_xp": 5},
+]
+
+
+async def _get_currencies(user_id: str) -> dict:
+    cur = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0})
+    if not cur:
+        cur = {"cosmic_dust": 100, "stardust_shards": 0, "soul_fragments": 0}
+        await db.rpg_currencies.insert_one({"user_id": user_id, **cur})
+    return cur
+
+
+async def _get_unlocked_slots(user_id: str) -> list:
+    doc = await db.rpg_slot_unlocks.find_one({"user_id": user_id}, {"_id": 0})
+    return doc.get("slots", []) if doc else []
+
+
+@router.get("/shop")
+async def get_shop(user=Depends(get_current_user)):
+    currencies = await _get_currencies(user["id"])
+    unlocked = await _get_unlocked_slots(user["id"])
+    purchases = await db.rpg_purchases.find(
+        {"user_id": user["id"]}, {"_id": 0, "item_id": 1}
+    ).to_list(200)
+    purchased_ids = {p["item_id"] for p in purchases}
+
+    return {
+        "currencies": {
+            "gems": currencies.get("stardust_shards", 0),
+            "dust": currencies.get("cosmic_dust", 0),
+            "soul_fragments": currencies.get("soul_fragments", 0),
+        },
+        "gem_packs": GEM_PACKS,
+        "dust_shop": [{**i, "owned": i["id"] in purchased_ids} for i in DUST_SHOP],
+        "gem_shop": [{**i, "owned": i["id"] in purchased_ids} for i in GEM_SHOP],
+        "slot_unlocks": [{**s, "unlocked": s["id"] in unlocked} for s in EXTRA_SLOTS],
+        "unlocked_slots": unlocked,
+        "conversion_rate": GEMS_TO_DUST_RATE,
+    }
+
+
+@router.post("/shop/buy")
+async def buy_shop_item(data: dict = Body(...), user=Depends(get_current_user)):
+    """Purchase an item from the dust or gem shop."""
+    item_id = data.get("item_id")
+
+    # Find item in either shop
+    item = next((i for i in DUST_SHOP if i["id"] == item_id), None)
+    if not item:
+        item = next((i for i in GEM_SHOP if i["id"] == item_id), None)
+    if not item:
+        raise HTTPException(404, "Item not found in shop")
+
+    # Check for non-consumable duplicates
+    if item["category"] != "consumable":
+        existing = await db.rpg_purchases.find_one(
+            {"user_id": user["id"], "item_id": item_id}
+        )
+        if existing:
+            raise HTTPException(400, "Already purchased this item")
+
+    currencies = await _get_currencies(user["id"])
+    cost = item["cost"]
+
+    if item["currency"] == "dust":
+        if currencies.get("cosmic_dust", 0) < cost:
+            raise HTTPException(402, f"Not enough Cosmic Dust (need {cost})")
+        await db.rpg_currencies.update_one(
+            {"user_id": user["id"]}, {"$inc": {"cosmic_dust": -cost}}
+        )
+    else:  # gems
+        if currencies.get("stardust_shards", 0) < cost:
+            raise HTTPException(402, f"Not enough Celestial Gems (need {cost})")
+        await db.rpg_currencies.update_one(
+            {"user_id": user["id"]}, {"$inc": {"stardust_shards": -cost}}
+        )
+
+    # Record purchase
+    await db.rpg_purchases.insert_one({
+        "user_id": user["id"],
+        "item_id": item_id,
+        "item_name": item["name"],
+        "cost": cost,
+        "currency": item["currency"],
+        "purchased_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    # Create inventory item
+    inv_item = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "name": item["name"],
+        "description": item["description"],
+        "category": item["category"],
+        "rarity": item.get("rarity", "common"),
+        "rarity_color": RARITY_COLORS.get(item.get("rarity", "common"), "#9CA3AF"),
+        "slot": item.get("slot"),
+        "stats": item.get("stats", {}),
+        "passive_xp": item.get("passive_xp", 0),
+        "effect": item.get("effect"),
+        "template_name": item["name"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.rpg_inventory.insert_one(inv_item)
+
+    # Handle consumable instant effects (XP scroll)
+    bonus_msg = None
+    if item.get("effect", {}).get("stat") == "xp_grant":
+        xp_amount = item["effect"]["bonus"]
+        await db.rpg_characters.update_one(
+            {"user_id": user["id"]}, {"$inc": {"xp": xp_amount}}
+        )
+        bonus_msg = f"+{xp_amount} XP granted!"
+
+    return {
+        "purchased": item["name"],
+        "cost": cost,
+        "currency": item["currency"],
+        "item_id": inv_item["id"],
+        "bonus": bonus_msg,
+    }
+
+
+@router.post("/shop/convert")
+async def convert_gems_to_dust(data: dict = Body(...), user=Depends(get_current_user)):
+    """Convert Celestial Gems to Cosmic Dust."""
+    gems = data.get("gems", 0)
+    if gems < MIN_GEM_CONVERSION:
+        raise HTTPException(400, f"Minimum conversion: {MIN_GEM_CONVERSION} gem")
+
+    currencies = await _get_currencies(user["id"])
+    if currencies.get("stardust_shards", 0) < gems:
+        raise HTTPException(402, "Not enough Celestial Gems")
+
+    dust_gained = gems * GEMS_TO_DUST_RATE
+
+    await db.rpg_currencies.update_one(
+        {"user_id": user["id"]},
+        {"$inc": {"stardust_shards": -gems, "cosmic_dust": dust_gained}}
+    )
+
+    await db.rpg_transactions.insert_one({
+        "user_id": user["id"],
+        "type": "conversion",
+        "gems_spent": gems,
+        "dust_gained": dust_gained,
+        "rate": GEMS_TO_DUST_RATE,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {
+        "gems_spent": gems,
+        "dust_gained": dust_gained,
+        "new_gems": currencies.get("stardust_shards", 0) - gems,
+        "new_dust": currencies.get("cosmic_dust", 0) + dust_gained,
+    }
+
+
+@router.post("/shop/unlock-slot")
+async def unlock_equipment_slot(data: dict = Body(...), user=Depends(get_current_user)):
+    """Unlock an extra equipment slot with Celestial Gems."""
+    slot_id = data.get("slot_id")
+    slot = next((s for s in EXTRA_SLOTS if s["id"] == slot_id), None)
+    if not slot:
+        raise HTTPException(404, "Invalid slot")
+
+    unlocked = await _get_unlocked_slots(user["id"])
+    if slot_id in unlocked:
+        raise HTTPException(400, "Slot already unlocked")
+
+    currencies = await _get_currencies(user["id"])
+    if currencies.get("stardust_shards", 0) < slot["gem_cost"]:
+        raise HTTPException(402, f"Need {slot['gem_cost']} Celestial Gems")
+
+    await db.rpg_currencies.update_one(
+        {"user_id": user["id"]}, {"$inc": {"stardust_shards": -slot["gem_cost"]}}
+    )
+    await db.rpg_slot_unlocks.update_one(
+        {"user_id": user["id"]},
+        {"$addToSet": {"slots": slot_id}},
+        upsert=True,
+    )
+    await db.rpg_transactions.insert_one({
+        "user_id": user["id"],
+        "type": "slot_unlock",
+        "slot_id": slot_id,
+        "gems_spent": slot["gem_cost"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {"unlocked": slot["name"], "gems_spent": slot["gem_cost"]}
+
+
+@router.post("/shop/purchase-gems")
+async def purchase_gems_checkout(request: Request, data: dict = Body(...), user=Depends(get_current_user)):
+    """Create a Stripe checkout session for purchasing Celestial Gems."""
+    from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+
+    pack_id = data.get("pack_id")
+    origin_url = data.get("origin_url", "")
+
+    pack = next((p for p in GEM_PACKS if p["id"] == pack_id), None)
+    if not pack:
+        raise HTTPException(400, "Invalid gem pack")
+    if not origin_url:
+        raise HTTPException(400, "Origin URL required")
+
+    success_url = f"{origin_url}/rpg?session_id={{CHECKOUT_SESSION_ID}}&type=gems"
+    cancel_url = f"{origin_url}/rpg"
+
+    host_url = str(request.base_url).rstrip("/")
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+
+    checkout_req = CheckoutSessionRequest(
+        amount=float(pack["price"]),
+        currency="usd",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
+            "user_id": user["id"],
+            "type": "gems",
+            "pack_id": pack_id,
+            "gems": str(pack["gems"] + pack["bonus"]),
+        },
+    )
+
+    session = await stripe_checkout.create_checkout_session(checkout_req)
+
+    await db.payment_transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "session_id": session.session_id,
+        "user_id": user["id"],
+        "type": "gems",
+        "pack_id": pack_id,
+        "amount": pack["price"],
+        "gems": pack["gems"] + pack["bonus"],
+        "currency": "usd",
+        "payment_status": "initiated",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {"url": session.url, "session_id": session.session_id}
+
+
+@router.get("/shop/checkout-status/{session_id}")
+async def gem_checkout_status(session_id: str, request: Request, user=Depends(get_current_user)):
+    """Poll gem checkout status and fulfill if paid."""
+    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+
+    host_url = str(request.base_url).rstrip("/")
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+
+    status = await stripe_checkout.get_checkout_status(session_id)
+
+    tx = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+    if not tx:
+        raise HTTPException(404, "Transaction not found")
+
+    if tx.get("payment_status") == "paid":
+        return {
+            "status": status.status,
+            "payment_status": "paid",
+            "already_fulfilled": True,
+            "gems_added": tx.get("gems", 0),
+        }
+
+    if status.payment_status == "paid":
+        gems_total = tx.get("gems", 0)
+        await db.payment_transactions.update_one(
+            {"session_id": session_id},
+            {"$set": {"payment_status": "paid", "paid_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        await db.rpg_currencies.update_one(
+            {"user_id": user["id"]},
+            {"$inc": {"stardust_shards": gems_total}},
+            upsert=True,
+        )
+        return {
+            "status": status.status,
+            "payment_status": "paid",
+            "already_fulfilled": False,
+            "gems_added": gems_total,
+        }
+
+    return {
+        "status": status.status,
+        "payment_status": status.payment_status,
+        "already_fulfilled": False,
     }

@@ -5,7 +5,7 @@ import {
   ArrowLeft, Sword, Shield, Map, Users, Package, Star, Sparkles,
   ChevronRight, Plus, Minus, Zap, Heart, Eye, Music, Brain,
   Lock, Gift, Compass, Globe, X, Crown, Wind, PenLine, CheckCircle2,
-  Flame, Target
+  Flame, Target, ShoppingBag, Gem, ArrowRightLeft, Unlock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
@@ -20,6 +20,10 @@ const SLOT_ICONS = { head: Crown, body: Shield, conduit: Sword, trinket: Star };
 const RARITY_BG = {
   common: 'rgba(156,163,175,0.06)', uncommon: 'rgba(34,197,94,0.06)', rare: 'rgba(59,130,246,0.06)',
   epic: 'rgba(168,85,247,0.06)', legendary: 'rgba(245,158,11,0.06)', mythic: 'rgba(239,68,68,0.06)',
+};
+const RARITY_COLORS = {
+  common: '#9CA3AF', uncommon: '#22C55E', rare: '#3B82F6',
+  epic: '#A855F7', legendary: '#F59E0B', mythic: '#EF4444',
 };
 
 // ── Stat Bar ──
@@ -283,6 +287,7 @@ const TABS = [
   { id: 'quests', label: 'Quests', icon: Target },
   { id: 'character', label: 'Character', icon: Star },
   { id: 'inventory', label: 'Inventory', icon: Package },
+  { id: 'shop', label: 'Shop', icon: ShoppingBag },
   { id: 'world', label: 'World', icon: Map },
   { id: 'bosses', label: 'Bosses', icon: Sword },
   { id: 'party', label: 'Circle', icon: Users },
@@ -298,6 +303,9 @@ export default function RPGPage() {
   const [bosses, setBosses] = useState(null);
   const [party, setParty] = useState(null);
   const [quests, setQuests] = useState(null);
+  const [shop, setShop] = useState(null);
+  const [shopView, setShopView] = useState('dust');
+  const [convertAmount, setConvertAmount] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [encounter, setEncounter] = useState(null);
@@ -310,13 +318,14 @@ export default function RPGPage() {
     setLoading(true);
     setError(null);
     try {
-      const [charRes, invRes, worldRes, bossRes, partyRes, questRes] = await Promise.all([
+      const [charRes, invRes, worldRes, bossRes, partyRes, questRes, shopRes] = await Promise.all([
         axios.get(`${API}/rpg/character`, { headers }),
         axios.get(`${API}/rpg/inventory`, { headers }),
         axios.get(`${API}/rpg/world`, { headers }),
         axios.get(`${API}/rpg/bosses`, { headers }),
         axios.get(`${API}/rpg/party`, { headers }),
         axios.get(`${API}/rpg/quests/daily`, { headers }),
+        axios.get(`${API}/rpg/shop`, { headers }),
       ]);
       setCharacter(charRes.data);
       setInventory(invRes.data);
@@ -324,6 +333,7 @@ export default function RPGPage() {
       setBosses(bossRes.data);
       setParty(partyRes.data.party);
       setQuests(questRes.data);
+      setShop(shopRes.data);
     } catch (err) {
       setError(getCosmicErrorMessage(err));
     }
@@ -331,6 +341,26 @@ export default function RPGPage() {
   }, [headers]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Handle Stripe redirect for gem purchases
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    const type = params.get('type');
+    if (sessionId && type === 'gems') {
+      (async () => {
+        try {
+          const res = await axios.get(`${API}/rpg/shop/checkout-status/${sessionId}`, { headers });
+          if (res.data.payment_status === 'paid') {
+            toast(`${res.data.gems_added} Celestial Gems added to your account!`);
+            setTab('shop');
+            fetchData();
+          }
+        } catch { /* ignore */ }
+        window.history.replaceState({}, '', '/rpg');
+      })();
+    }
+  }, []);
 
   const allocateStat = async (stat) => {
     try {
@@ -457,6 +487,42 @@ export default function RPGPage() {
       toast(`3-Breath Reset! +${res.data.xp_awarded} XP`);
       fetchData();
     } catch (err) { toast.error(err.response?.data?.detail || 'Already done today'); }
+  };
+
+  const buyShopItem = async (itemId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/shop/buy`, { item_id: itemId }, { headers });
+      let msg = `Purchased ${res.data.purchased} for ${res.data.cost} ${res.data.currency === 'gems' ? 'Gems' : 'Dust'}`;
+      if (res.data.bonus) msg += ` | ${res.data.bonus}`;
+      toast(msg);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Purchase failed'); }
+  };
+
+  const convertGems = async () => {
+    if (convertAmount < 1) return;
+    try {
+      const res = await axios.post(`${API}/rpg/shop/convert`, { gems: convertAmount }, { headers });
+      toast(`Converted ${res.data.gems_spent} Gems → ${res.data.dust_gained} Dust`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Conversion failed'); }
+  };
+
+  const unlockSlot = async (slotId) => {
+    try {
+      const res = await axios.post(`${API}/rpg/shop/unlock-slot`, { slot_id: slotId }, { headers });
+      toast(`Unlocked ${res.data.unlocked} slot!`);
+      fetchData();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Unlock failed'); }
+  };
+
+  const purchaseGems = async (packId) => {
+    try {
+      const origin = window.location.origin;
+      const res = await axios.post(`${API}/rpg/shop/purchase-gems`,
+        { pack_id: packId, origin_url: origin }, { headers });
+      if (res.data.url) window.location.href = res.data.url;
+    } catch (err) { toast.error(err.response?.data?.detail || 'Checkout failed'); }
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}><CosmicInlineLoader message="Loading your cosmic adventure..." /></div>;
@@ -675,6 +741,252 @@ export default function RPGPage() {
               )}
             </motion.div>
           )}
+
+
+          {/* SHOP TAB */}
+          {tab === 'shop' && shop && (
+            <motion.div key="shop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {/* Currency Bar */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(168,85,247,0.04)', border: '1px solid rgba(168,85,247,0.1)' }}>
+                  <Gem size={14} className="mx-auto mb-0.5" style={{ color: '#A855F7' }} />
+                  <p className="text-lg font-semibold" style={{ color: '#A855F7' }}>{shop.currencies.gems}</p>
+                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Celestial Gems</p>
+                </div>
+                <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.1)' }}>
+                  <Sparkles size={14} className="mx-auto mb-0.5" style={{ color: '#F59E0B' }} />
+                  <p className="text-lg font-semibold" style={{ color: '#F59E0B' }}>{shop.currencies.dust}</p>
+                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Cosmic Dust</p>
+                </div>
+                <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.1)' }}>
+                  <Flame size={14} className="mx-auto mb-0.5" style={{ color: '#EF4444' }} />
+                  <p className="text-lg font-semibold" style={{ color: '#EF4444' }}>{shop.currencies.soul_fragments}</p>
+                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Soul Fragments</p>
+                </div>
+              </div>
+
+              {/* Shop View Toggle */}
+              <div className="flex gap-1 mb-4 p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                {[
+                  { id: 'dust', label: 'Dust Shop', icon: Sparkles, color: '#F59E0B' },
+                  { id: 'gems', label: 'Gem Shop', icon: Gem, color: '#A855F7' },
+                  { id: 'packs', label: 'Buy Gems', icon: ShoppingBag, color: '#22C55E' },
+                  { id: 'slots', label: 'Slots', icon: Unlock, color: '#3B82F6' },
+                ].map(v => (
+                  <button key={v.id} onClick={() => setShopView(v.id)}
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-[9px] transition-all"
+                    style={{
+                      background: shopView === v.id ? `${v.color}12` : 'transparent',
+                      color: shopView === v.id ? v.color : 'var(--text-muted)',
+                      border: shopView === v.id ? `1px solid ${v.color}22` : '1px solid transparent',
+                    }}
+                    data-testid={`shop-view-${v.id}`}>
+                    <v.icon size={10} /> {v.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* DUST SHOP */}
+              {shopView === 'dust' && (
+                <div className="space-y-2">
+                  {shop.dust_shop.map(item => (
+                    <div key={item.id} className="rounded-xl p-3 flex items-center gap-3 group"
+                      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}
+                      data-testid={`shop-item-${item.id}`}>
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ background: `${RARITY_COLORS[item.rarity] || '#9CA3AF'}10`, border: `1px solid ${RARITY_COLORS[item.rarity] || '#9CA3AF'}20` }}>
+                        <Package size={14} style={{ color: RARITY_COLORS[item.rarity] || '#9CA3AF' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-medium" style={{ color: RARITY_COLORS[item.rarity] || 'var(--text-primary)' }}>{item.name}</p>
+                        <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
+                        {item.stats && <p className="text-[7px] mt-0.5" style={{ color: '#818CF8' }}>
+                          {Object.entries(item.stats).map(([k,v]) => `+${v} ${k}`).join(', ')}
+                        </p>}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-[9px] font-semibold" style={{ color: '#F59E0B' }}>{item.cost} Dust</p>
+                        {item.owned ? (
+                          <span className="text-[7px]" style={{ color: '#22C55E' }}>Owned</span>
+                        ) : (
+                          <motion.button whileTap={{ scale: 0.9 }}
+                            onClick={() => buyShopItem(item.id)}
+                            className="mt-0.5 text-[7px] px-2 py-0.5 rounded"
+                            style={{ background: 'rgba(245,158,11,0.1)', color: '#F59E0B' }}
+                            data-testid={`buy-${item.id}`}>Buy</motion.button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* GEM SHOP */}
+              {shopView === 'gems' && (
+                <div className="space-y-2">
+                  {shop.gem_shop.map(item => (
+                    <div key={item.id} className="rounded-xl p-3 flex items-center gap-3"
+                      style={{ background: 'rgba(168,85,247,0.02)', border: `1px solid ${RARITY_COLORS[item.rarity] || '#A855F7'}15` }}
+                      data-testid={`shop-item-${item.id}`}>
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ background: `${RARITY_COLORS[item.rarity] || '#A855F7'}10`, border: `1px solid ${RARITY_COLORS[item.rarity] || '#A855F7'}20` }}>
+                        <Gem size={14} style={{ color: RARITY_COLORS[item.rarity] || '#A855F7' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1">
+                          <p className="text-[10px] font-medium" style={{ color: RARITY_COLORS[item.rarity] || '#A855F7' }}>{item.name}</p>
+                          <span className="text-[6px] px-1 py-0.5 rounded uppercase" style={{
+                            background: `${RARITY_COLORS[item.rarity]}10`, color: RARITY_COLORS[item.rarity]
+                          }}>{item.rarity}</span>
+                        </div>
+                        <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
+                        {item.stats && <p className="text-[7px] mt-0.5" style={{ color: '#818CF8' }}>
+                          {Object.entries(item.stats).map(([k,v]) => `+${v} ${k}`).join(', ')}
+                        </p>}
+                        {item.passive_xp > 0 && <p className="text-[7px]" style={{ color: '#22C55E' }}>+{item.passive_xp} XP/hr passive</p>}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-[9px] font-semibold" style={{ color: '#A855F7' }}>{item.cost} <Gem size={8} className="inline" /></p>
+                        {item.owned ? (
+                          <span className="text-[7px]" style={{ color: '#22C55E' }}>Owned</span>
+                        ) : (
+                          <motion.button whileTap={{ scale: 0.9 }}
+                            onClick={() => buyShopItem(item.id)}
+                            className="mt-0.5 text-[7px] px-2 py-0.5 rounded"
+                            style={{ background: 'rgba(168,85,247,0.1)', color: '#A855F7' }}
+                            data-testid={`buy-${item.id}`}>Buy</motion.button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* BUY GEM PACKS */}
+              {shopView === 'packs' && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+                    Purchase Celestial Gems
+                  </p>
+                  <div className="space-y-2 mb-5">
+                    {shop.gem_packs.map((pack, i) => (
+                      <motion.button key={pack.id} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                        onClick={() => purchaseGems(pack.id)}
+                        className="w-full rounded-xl p-4 flex items-center gap-3 text-left transition-all"
+                        style={{
+                          background: i === 2 ? 'rgba(168,85,247,0.06)' : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${i === 2 ? 'rgba(168,85,247,0.15)' : 'rgba(255,255,255,0.04)'}`,
+                        }}
+                        data-testid={`buy-pack-${pack.id}`}>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                          style={{ background: 'rgba(168,85,247,0.1)' }}>
+                          <Gem size={18} style={{ color: '#A855F7' }} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[11px] font-medium" style={{ color: '#A855F7' }}>{pack.label}</p>
+                          <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                            {pack.gems} gems{pack.bonus > 0 && <span style={{ color: '#22C55E' }}> +{pack.bonus} bonus!</span>}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>${pack.price.toFixed(2)}</p>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  {/* Currency Conversion */}
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(129,140,248,0.03)', border: '1px solid rgba(129,140,248,0.08)' }}
+                    data-testid="gem-conversion">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ArrowRightLeft size={13} style={{ color: '#818CF8' }} />
+                      <p className="text-[10px] font-medium" style={{ color: '#818CF8' }}>Convert Gems to Dust</p>
+                      <span className="text-[7px] ml-auto" style={{ color: 'var(--text-muted)' }}>
+                        1 Gem = {shop.conversion_rate} Dust
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 flex-1">
+                        <button onClick={() => setConvertAmount(Math.max(1, convertAmount - 5))}
+                          className="w-6 h-6 rounded flex items-center justify-center"
+                          style={{ background: 'rgba(255,255,255,0.04)' }}>
+                          <Minus size={10} style={{ color: 'var(--text-muted)' }} />
+                        </button>
+                        <input type="number" value={convertAmount}
+                          onChange={e => setConvertAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-16 text-center text-sm bg-transparent rounded py-1"
+                          style={{ border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }}
+                          data-testid="convert-amount-input" />
+                        <button onClick={() => setConvertAmount(convertAmount + 5)}
+                          className="w-6 h-6 rounded flex items-center justify-center"
+                          style={{ background: 'rgba(255,255,255,0.04)' }}>
+                          <Plus size={10} style={{ color: 'var(--text-muted)' }} />
+                        </button>
+                      </div>
+                      <div className="text-[9px] px-2" style={{ color: 'var(--text-muted)' }}>
+                        = {convertAmount * shop.conversion_rate} Dust
+                      </div>
+                      <motion.button whileTap={{ scale: 0.95 }}
+                        onClick={convertGems}
+                        className="px-3 py-1.5 rounded-lg text-[9px] font-medium"
+                        style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.15)' }}
+                        data-testid="convert-gems-btn">
+                        Convert
+                      </motion.button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SLOT UNLOCKS */}
+              {shopView === 'slots' && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>
+                    Equipment Slot Upgrades
+                  </p>
+                  <p className="text-[8px] mb-3" style={{ color: 'var(--text-muted)' }}>
+                    Unlock additional equipment slots with Celestial Gems
+                  </p>
+                  <div className="space-y-2">
+                    {shop.slot_unlocks.map(slot => (
+                      <div key={slot.id} className="rounded-xl p-3 flex items-center gap-3"
+                        style={{
+                          background: slot.unlocked ? 'rgba(34,197,94,0.03)' : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${slot.unlocked ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.04)'}`,
+                        }}
+                        data-testid={`slot-unlock-${slot.id}`}>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                          style={{ background: slot.unlocked ? 'rgba(34,197,94,0.08)' : 'rgba(129,140,248,0.06)' }}>
+                          {slot.unlocked ? <CheckCircle2 size={16} style={{ color: '#22C55E' }} />
+                            : <Lock size={16} style={{ color: '#818CF8' }} />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[11px] font-medium" style={{ color: slot.unlocked ? '#22C55E' : 'var(--text-primary)' }}>
+                            {slot.name} Slot
+                          </p>
+                          <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{slot.description}</p>
+                        </div>
+                        <div className="text-right">
+                          {slot.unlocked ? (
+                            <span className="text-[9px] font-medium" style={{ color: '#22C55E' }}>Unlocked</span>
+                          ) : (
+                            <motion.button whileTap={{ scale: 0.9 }}
+                              onClick={() => unlockSlot(slot.id)}
+                              className="text-[9px] px-3 py-1.5 rounded-lg font-medium"
+                              style={{ background: 'rgba(168,85,247,0.1)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.15)' }}
+                              data-testid={`unlock-${slot.id}`}>
+                              <Gem size={9} className="inline mr-1" />{slot.gem_cost} Gems
+                            </motion.button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
 
           {/* WORLD MAP TAB */}
           {tab === 'world' && (
