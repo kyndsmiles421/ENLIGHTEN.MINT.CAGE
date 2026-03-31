@@ -52,6 +52,7 @@ const ALL_ACTIONS = [
   { icon: Sparkles, label: 'My Ritual', path: '/daily-ritual', color: '#FCD34D', group: 'Today' },
   { icon: Calendar, label: 'Calendar', path: '/cosmic-calendar', color: '#FCD34D', group: 'Today' },
   { icon: Heart, label: 'Mood', path: '/mood', color: '#F87171', group: 'Today' },
+  { icon: Eye, label: 'Insights', path: '/cosmic-insights', color: '#C084FC', group: 'Today' },
   { icon: Wind, label: 'Breathe', path: '/breathing', color: '#2DD4BF', group: 'Practice' },
   { icon: Timer, label: 'Meditate', path: '/meditation', color: '#D8B4FE', group: 'Practice' },
   { icon: Flame, label: 'Yoga', path: '/yoga', color: '#FB923C', group: 'Practice' },
