@@ -472,5 +472,149 @@ async def use_forge_item(data: dict = Body(...), user=Depends(get_current_user))
     return {"used": True, "item_name": item["name"], "type": item["type"], "effect": effect}
 
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  FOUNDER'S MINTING — One-time Genesis Item
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post("/genesis/mint")
+async def mint_genesis_item(data: dict = Body(...), user=Depends(get_current_user)):
+    """Mint a unique 1-of-1 Genesis item. Available once per Founding Architect."""
+    user_id = user["id"]
+
+    # Verify Founding Architect status
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "founding_architect": 1})
+    fa = (u or {}).get("founding_architect", {})
+    if not fa.get("active"):
+        raise HTTPException(403, "Only Founding Architects can mint Genesis items")
+    if fa.get("genesis_minted"):
+        raise HTTPException(400, "You have already minted your Genesis item")
+
+    item_type = data.get("type", "resonator_key")
+    context = data.get("context", "Founding Architect's Genesis")
+
+    if item_type not in ALL_FORGE_TYPES:
+        raise HTTPException(400, f"Invalid type. Options: {list(ALL_FORGE_TYPES.keys())}")
+
+    type_def = ALL_FORGE_TYPES[item_type]
+
+    # Genesis items are always legendary
+    rarity = "legendary"
+    name = await _ai_forge_name(item_type, rarity, f"GENESIS — {context}")
+    name = f"Genesis: {name}"
+
+    # Build enhanced properties
+    properties = {}
+    if item_type == "resonator_key":
+        properties = {"frequency_gate": 963, "uses": 3, "potency": 10.0, "genesis": True}
+    elif item_type == "focus_lens":
+        properties = {"extend_hours": 72, "fidelity_target": "ultra", "genesis": True}
+    elif item_type == "resource_harvester":
+        properties = {"dust_per_hour": 20, "duration_hours": 48, "genesis": True}
+    elif item_type == "passive_buff":
+        properties = {"buff_type": "all_stats", "magnitude_pct": 50, "duration_hours": 168, "genesis": True}
+    elif item_type == "active_mantra":
+        properties = {"effect": "aura_flash", "power_multiplier": 10.0, "duration_minutes": 120, "cooldown_hours": 0, "genesis": True}
+    elif item_type == "skill_bottle":
+        properties = {"packaged_skill": context, "potency": 10.0, "transferable": True, "uses": 10, "genesis": True}
+
+    price = int(type_def["base_price"] * 10)
+
+    item_id = str(uuid.uuid4())
+    item = {
+        "id": item_id,
+        "type": item_type,
+        "category": type_def["category"],
+        "name": name,
+        "description": "A unique Genesis artifact forged by Founding Architect. 1-of-1.",
+        "rarity": rarity,
+        "properties": properties,
+        "base_price": price,
+        "creator_id": user_id,
+        "listed": False,
+        "is_genesis": True,
+        "genesis_number": fa.get("slot_number", 1),
+        "forged_at": datetime.now(timezone.utc).isoformat(),
+        "context": context,
+    }
+
+    await db.forge_items.insert_one({**item})
+    await db.users.update_one({"id": user_id}, {"$set": {"founding_architect.genesis_minted": True}})
+
+    return {"item": item, "message": "Your Genesis artifact has been forged. It is eternal."}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  GOD MODE — Level 5 Economy Dashboard
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/god-mode/economy")
+async def god_mode_economy(user=Depends(get_current_user)):
+    """Real-time economy data feed for Level 5 / Founding Architects."""
+    user_id = user["id"]
+
+    # Check Level 5 or Founding Architect
+    c = await get_consciousness(user_id)
+    level = level_from_consciousness_xp(c.get("xp", 0))
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "founding_architect": 1})
+    is_founder = (u or {}).get("founding_architect", {}).get("active", False)
+
+    if level < 5 and not is_founder:
+        raise HTTPException(403, "God Mode requires Level 5 Consciousness or Founding Architect status")
+
+    # Gather economy stats
+    total_users = await db.users.count_documents({})
+    total_architects = await db.users.count_documents({"founding_architect.active": True})
+    total_listings = await db.trade_circle_listings.count_documents({})
+    total_assets = await db.content_assets.count_documents({"listed": True})
+    total_forge_items = await db.forge_items.count_documents({})
+    total_genesis = await db.forge_items.count_documents({"is_genesis": True})
+
+    # Recent trades (last 20)
+    recent_trades = await db.broker_transactions.find(
+        {}, {"_id": 0, "pack_name": 1, "amount_usd": 1, "credits_granted": 1, "created_at": 1}
+    ).sort("created_at", -1).limit(20).to_list(20)
+
+    # Recent forge activity
+    recent_forges = await db.forge_items.find(
+        {}, {"_id": 0, "name": 1, "rarity": 1, "type": 1, "category": 1, "forged_at": 1, "generated_at": 1, "is_genesis": 1}
+    ).sort("forged_at", -1).limit(20).to_list(20)
+
+    # Asset type distribution
+    pipeline = [
+        {"$match": {"listed": True}},
+        {"$group": {"_id": "$type", "count": {"$sum": 1}, "total_purchases": {"$sum": "$purchases"}}},
+    ]
+    asset_dist = await db.content_assets.aggregate(pipeline).to_list(20)
+
+    # Consciousness level distribution
+    level_pipeline = [
+        {"$match": {"consciousness.xp": {"$exists": True}}},
+        {"$group": {"_id": "$consciousness.level", "count": {"$sum": 1}}},
+    ]
+    level_dist = await db.users.aggregate(level_pipeline).to_list(10)
+
+    # Boost transactions volume
+    boost_count = await db.boost_transactions.count_documents({})
+
+    return {
+        "economy": {
+            "total_users": total_users,
+            "founding_architects": total_architects,
+            "architect_slots_remaining": max(0, 144 - total_architects),
+            "total_listings": total_listings,
+            "total_marketplace_assets": total_assets,
+            "total_forge_items": total_forge_items,
+            "total_genesis_items": total_genesis,
+            "total_boost_transactions": boost_count,
+        },
+        "asset_distribution": {d["_id"]: {"count": d["count"], "purchases": d["total_purchases"]} for d in asset_dist},
+        "consciousness_distribution": {str(d["_id"]): d["count"] for d in level_dist},
+        "recent_trades": recent_trades,
+        "recent_forges": recent_forges,
+        "user_level": level,
+        "is_founding_architect": is_founder,
+    }
+
+
 # Level name helper used in error messages
 LEVEL_NAMES = {1: "Physical", 2: "Emotional", 3: "Mental", 4: "Intuitive", 5: "Pure Consciousness"}

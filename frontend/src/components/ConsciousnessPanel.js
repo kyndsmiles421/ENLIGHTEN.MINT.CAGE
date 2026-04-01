@@ -28,34 +28,43 @@ const ELEMENT_LABELS = {
 
 export function ConsciousnessAura({ level, size = 40, className = '' }) {
   const levels = {
-    1: { color: '#B45309', glow: 'rgba(180,83,9,0.25)' },
-    2: { color: '#EA580C', glow: 'rgba(234,88,12,0.25)' },
-    3: { color: '#D97706', glow: 'rgba(217,119,6,0.3)' },
-    4: { color: '#6366F1', glow: 'rgba(99,102,241,0.3)' },
-    5: { color: '#FBBF24', glow: 'rgba(251,191,36,0.35)' },
+    1: { color: '#D97706', glow: 'rgba(217,119,6,0.25)' },
+    2: { color: '#F472B6', glow: 'rgba(244,114,182,0.25)', secondary: '#2DD4BF' },
+    3: { color: '#94A3B8', glow: 'rgba(148,163,184,0.25)', secondary: '#3B82F6' },
+    4: { color: '#8B5CF6', glow: 'rgba(139,92,246,0.3)', secondary: '#6366F1' },
+    5: { color: '#FBBF24', glow: 'rgba(251,191,36,0.35)', secondary: '#FFFBEB' },
   };
-  const { color, glow } = levels[level] || levels[1];
+  const { color, glow, secondary } = levels[level] || levels[1];
+  const isMax = level === 5;
 
   return (
     <motion.div
       className={`rounded-full flex items-center justify-center ${className}`}
       style={{
         width: size, height: size,
-        background: `radial-gradient(circle, ${glow} 0%, transparent 70%)`,
-        boxShadow: `0 0 ${size / 2}px ${glow}, inset 0 0 ${size / 3}px ${glow}`,
+        background: isMax
+          ? `radial-gradient(circle, rgba(255,251,235,0.15) 0%, ${glow} 40%, transparent 70%)`
+          : `radial-gradient(circle, ${glow} 0%, transparent 70%)`,
+        boxShadow: isMax
+          ? `0 0 ${size}px ${glow}, 0 0 ${size * 1.5}px rgba(255,251,235,0.15), inset 0 0 ${size / 2}px ${glow}`
+          : `0 0 ${size / 2}px ${glow}, inset 0 0 ${size / 3}px ${glow}`,
         border: `1.5px solid ${color}40`,
       }}
       animate={{
-        boxShadow: [
+        boxShadow: isMax ? [
+          `0 0 ${size}px ${glow}, 0 0 ${size * 1.5}px rgba(255,251,235,0.15), inset 0 0 ${size / 2}px ${glow}`,
+          `0 0 ${size * 1.5}px ${glow}, 0 0 ${size * 2}px rgba(255,251,235,0.25), inset 0 0 ${size}px ${glow}`,
+          `0 0 ${size}px ${glow}, 0 0 ${size * 1.5}px rgba(255,251,235,0.15), inset 0 0 ${size / 2}px ${glow}`,
+        ] : [
           `0 0 ${size / 2}px ${glow}, inset 0 0 ${size / 3}px ${glow}`,
           `0 0 ${size}px ${glow}, inset 0 0 ${size / 2}px ${glow}`,
           `0 0 ${size / 2}px ${glow}, inset 0 0 ${size / 3}px ${glow}`,
         ],
       }}
-      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      transition={{ duration: isMax ? 2 : 3, repeat: Infinity, ease: 'easeInOut' }}
       data-testid="consciousness-aura"
     >
-      {React.createElement(LEVEL_ICONS[level] || Mountain, { size: size * 0.45, style: { color } })}
+      {React.createElement(LEVEL_ICONS[level] || Mountain, { size: size * 0.45, style: { color: secondary || color } })}
     </motion.div>
   );
 }

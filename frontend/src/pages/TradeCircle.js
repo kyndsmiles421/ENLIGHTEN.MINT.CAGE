@@ -7,7 +7,7 @@ import {
   ArrowLeft, Plus, Package, Wrench, Search, X, Send,
   Check, XCircle, RefreshCw, Filter, ChevronRight, User,
   ArrowRightLeft, Sparkles, Clock, Tag, Star, Award, Trophy, MessageCircle,
-  Handshake, Shield, Eye, Heart, Compass, Moon, Gem, Coins
+  Handshake, Shield, Eye, Heart, Compass, Moon, Gem, Coins, Crown
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CosmicBroker from '../components/trade/CosmicBroker';
@@ -16,6 +16,8 @@ import { MantraBanner } from '../components/MantraSystem';
 import GameAvatarPanel from '../components/GameAvatar';
 import ContentBroker from '../components/trade/ContentBroker';
 import CosmicForge from '../components/CosmicForge';
+import GodModeDashboard from '../components/GodModeDashboard';
+import GenesisMint from '../components/GenesisMint';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -680,6 +682,7 @@ export default function TradeCircle() {
   const [showReview, setShowReview] = useState(null);
   const [showKarmaProfile, setShowKarmaProfile] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [founderStatus, setFounderStatus] = useState(null);
 
   // Handle Stripe payment redirect
   useEffect(() => {
@@ -736,6 +739,13 @@ export default function TradeCircle() {
   useEffect(() => { if (tab === 'offers') fetchMyOffers(); }, [tab, fetchMyOffers]);
   useEffect(() => { if (tab === 'karma') fetchLeaderboard(); }, [tab, fetchLeaderboard]);
 
+  // Fetch founder status for Genesis Mint and God Mode access
+  useEffect(() => {
+    axios.get(`${API}/founding-architect/status`, { headers: authHeaders })
+      .then(r => setFounderStatus(r.data))
+      .catch(() => {});
+  }, [authHeaders]);
+
   return (
     <div className="min-h-screen immersive-page pt-20 pb-24 px-4" style={{ background: 'var(--bg-primary)' }} data-testid="trade-circle-page">
       <div className="max-w-4xl mx-auto">
@@ -789,6 +799,8 @@ export default function TradeCircle() {
             { id: 'forge', label: 'Forge', icon: Gem, color: '#D97706' },
             { id: 'content', label: 'Content', icon: Sparkles, color: '#C084FC' },
             { id: 'escrow', label: 'Escrow', icon: Shield, color: '#818CF8' },
+            { id: 'genesis', label: 'Genesis', icon: Star, color: '#FBBF24' },
+            { id: 'godmode', label: 'God Mode', icon: Crown, color: '#FBBF24' },
             { id: 'avatar', label: 'Avatar', icon: User, color: '#C084FC' },
             { id: 'my', label: 'My Listings' },
             { id: 'offers', label: 'Offers' },
@@ -893,6 +905,33 @@ export default function TradeCircle() {
             {tab === 'escrow' && (
               <motion.div key="escrow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <EscrowDashboard authHeaders={authHeaders} userId={user?.id} />
+              </motion.div>
+            )}
+
+            {/* Genesis Mint Tab */}
+            {tab === 'genesis' && (
+              <motion.div key="genesis" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <GenesisMint
+                  isFounder={founderStatus?.is_founding_architect}
+                  genesisMinted={founderStatus?.genesis_minted}
+                  onMinted={() => setFounderStatus(prev => ({ ...prev, genesis_minted: true }))}
+                />
+                {!founderStatus?.is_founding_architect && (
+                  <div className="text-center py-10 rounded-xl mt-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <Star size={20} className="mx-auto mb-2" style={{ color: 'var(--text-muted)' }} />
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                      Only Founding Architects can mint Genesis items.
+                      {founderStatus && ` ${founderStatus.slots_remaining} of 144 slots remaining.`}
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* God Mode Dashboard Tab */}
+            {tab === 'godmode' && (
+              <motion.div key="godmode" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <GodModeDashboard />
               </motion.div>
             )}
 

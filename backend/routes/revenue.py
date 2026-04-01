@@ -475,19 +475,28 @@ async def cosmic_prescription(user=Depends(get_current_user)):
 #  FOUNDING ARCHITECT — Tester Badge & Lifetime Elite
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+FOUNDING_ARCHITECT_MAX_SLOTS = 144
+
+
 @router.get("/founding-architect/status")
 async def founding_architect_status(user=Depends(get_current_user)):
     """Check if user has Founding Architect status."""
     u = await db.users.find_one({"id": user["id"]}, {"_id": 0, "founding_architect": 1})
     fa = u.get("founding_architect", {}) if u else {}
+    total_architects = await db.users.count_documents({"founding_architect.active": True})
     return {
         "is_founding_architect": fa.get("active", False),
         "granted_at": fa.get("granted_at"),
         "badge": "founding_architect" if fa.get("active") else None,
+        "genesis_minted": fa.get("genesis_minted", False),
+        "slots_filled": total_architects,
+        "slots_total": FOUNDING_ARCHITECT_MAX_SLOTS,
+        "slots_remaining": max(0, FOUNDING_ARCHITECT_MAX_SLOTS - total_architects),
         "perks": {
             "lifetime_elite_discount": 30,
             "badge_visible": True,
             "exclusive_title": "Founding Architect",
+            "genesis_mint_available": not fa.get("genesis_minted", False),
         } if fa.get("active") else None,
     }
 
@@ -538,7 +547,7 @@ async def grant_founding_architect(data: dict = Body(...), user=Depends(get_curr
 
 @router.post("/founding-architect/redeem")
 async def redeem_founding_code(data: dict = Body(...), user=Depends(get_current_user)):
-    """Redeem a Founding Architect invite code."""
+    """Redeem a Founding Architect invite code. Limited to 144 slots."""
     code = data.get("code", "").strip()
     VALID_CODES = ["COSMIC-FOUNDER-2026", "RAPID-CITY-ARCHITECT", "STARSEED-TESTER"]
 
@@ -550,13 +559,21 @@ async def redeem_founding_code(data: dict = Body(...), user=Depends(get_current_
     if u and u.get("founding_architect", {}).get("active"):
         raise HTTPException(status_code=400, detail="Already a Founding Architect")
 
+    # Check 144-slot cap
+    total = await db.users.count_documents({"founding_architect.active": True})
+    if total >= FOUNDING_ARCHITECT_MAX_SLOTS:
+        raise HTTPException(status_code=400, detail=f"All {FOUNDING_ARCHITECT_MAX_SLOTS} Founding Architect slots are filled")
+
     now = datetime.now(timezone.utc).isoformat()
+    slot_number = total + 1
     await db.users.update_one({"id": user["id"]}, {"$set": {
         "founding_architect": {
             "active": True,
             "granted_at": now,
             "granted_by": "self",
             "invite_code": code,
+            "slot_number": slot_number,
+            "genesis_minted": False,
         },
         "credits.tier": "premium",
     }})
@@ -566,5 +583,7 @@ async def redeem_founding_code(data: dict = Body(...), user=Depends(get_current_
         "badge": "founding_architect",
         "tier": "Elite (Lifetime)",
         "discount": 30,
-        "message": "Welcome, Founding Architect. Your legacy begins now.",
+        "slot_number": slot_number,
+        "slots_remaining": FOUNDING_ARCHITECT_MAX_SLOTS - slot_number,
+        "message": f"Welcome, Founding Architect #{slot_number}. Your legacy begins now.",
     }
