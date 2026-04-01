@@ -127,6 +127,15 @@ export default function useGameController(moduleId) {
     difficulty: scenarioState?.difficulty || null,
     loopActive: scenarioState?.loop_active || false,
     biomeContext: scenarioState?.biome_context || null,
+    // Marketplace / Premium effects
+    activeEffects: coreStats?.active_effects || {},
+    clearVisionActive: !!(coreStats?.active_effects?.disable_distortion),
+    rareOnlyScanner: !!(coreStats?.active_effects?.rare_only_scanner),
+    speedBoost: !!(coreStats?.active_effects?.speed_boost_3x),
+    doubleInventory: !!(coreStats?.active_effects?.double_inventory),
+    warpActive: !!(coreStats?.active_effects?.layer_warp),
+    nexusSubscriber: coreStats?.nexus_subscriber || false,
+    cosmicCredits: coreStats?.currencies?.cosmic_credits || 0,
     // Element color helper
     getElementColor: (el) => EL_COLORS[el] || '#A855F7',
     // Actions

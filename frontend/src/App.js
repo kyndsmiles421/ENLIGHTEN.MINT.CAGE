@@ -134,6 +134,7 @@ const ElementalNexus = lazy(() => import('./pages/ElementalNexus'));
 const DreamRealms = lazy(() => import('./pages/DreamRealms'));
 const RockHounding = lazy(() => import('./pages/RockHounding'));
 const ForgottenLanguages = lazy(() => import('./pages/ForgottenLanguages'));
+const CosmicStore = lazy(() => import('./pages/CosmicStore'));
 
 function PageLoader() {
   return (
@@ -264,6 +265,7 @@ function AnimatedRoutes() {
         <Route path="/dream-realms" element={<DreamRealms />} />
         <Route path="/rock-hounding" element={<RockHounding />} />
         <Route path="/forgotten-languages" element={<ForgottenLanguages />} />
+        <Route path="/cosmic-store" element={<CosmicStore />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

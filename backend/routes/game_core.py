@@ -193,13 +193,40 @@ async def get_active_pass(user_id: str) -> dict | None:
     return active
 
 
-def compute_active_layer(resonance_stat: int, active_pass: dict = None) -> dict:
-    """Determine which universe layer is active based on resonance stat + active pass."""
+async def get_marketplace_effects(user_id: str) -> dict:
+    """Get active marketplace effects (clear vision, warp key, etc.)."""
+    now = datetime.now(timezone.utc).isoformat()
+    effects = await db.marketplace_active_effects.find(
+        {"user_id": user_id, "expires_at": {"$gt": now}},
+        {"_id": 0},
+    ).to_list(20)
+    effect_map = {}
+    for e in effects:
+        effect_map[e.get("effect_type", "")] = e
+    return effect_map
+
+
+async def get_nexus_subscription(user_id: str) -> dict | None:
+    """Check for active Nexus subscription."""
+    sub = await db.nexus_subscriptions.find_one(
+        {"user_id": user_id, "status": "active"},
+        {"_id": 0},
+    )
+    return sub
+
+
+def compute_active_layer(resonance_stat: int, active_pass: dict = None, marketplace_effects: dict = None, nexus_sub: dict = None) -> dict:
+    """Determine which universe layer is active based on resonance stat + active pass + marketplace effects + subscription."""
+    # Nexus subscription boosts effective resonance
+    effective_resonance = resonance_stat
+    if nexus_sub:
+        effective_resonance = max(effective_resonance, 60)  # Guarantees Nexus access
+
     # Natural layer from resonance
     natural = "terrestrial"
     for lid in LAYER_ORDER:
         layer = UNIVERSE_LAYERS[lid]
-        if resonance_stat >= layer["resonance_required"]:
+        if effective_resonance >= layer["resonance_required"]:
             natural = lid
 
     # Pass override — if pass grants a higher layer, use it
@@ -216,11 +243,27 @@ def compute_active_layer(resonance_stat: int, active_pass: dict = None) -> dict:
                 "target_layer": pass_layer,
             }
 
+    # Warp Key override — marketplace consumable for instant layer access
+    if marketplace_effects and "layer_warp" in marketplace_effects:
+        warp = marketplace_effects["layer_warp"]
+        warp_target = warp.get("target_layer", "nexus")
+        if warp_target in LAYER_ORDER and LAYER_ORDER.index(warp_target) > LAYER_ORDER.index(active):
+            active = warp_target
+            pass_info = {
+                "pass_id": "warp_key",
+                "pass_name": "Warp Key",
+                "expires_at": warp.get("expires_at"),
+                "target_layer": warp_target,
+            }
+
     layer_data = UNIVERSE_LAYERS[active]
-    unlocked = [lid for lid in LAYER_ORDER if resonance_stat >= UNIVERSE_LAYERS[lid]["resonance_required"]]
+    unlocked = [lid for lid in LAYER_ORDER if effective_resonance >= UNIVERSE_LAYERS[lid]["resonance_required"]]
     # Pass also unlocks its target layer
     if pass_info and active not in unlocked:
         unlocked.append(active)
+    # Nexus sub unlocks all layers
+    if nexus_sub:
+        unlocked = list(LAYER_ORDER)
 
     return {
         "active_layer": active,
@@ -228,6 +271,7 @@ def compute_active_layer(resonance_stat: int, active_pass: dict = None) -> dict:
         "layer": layer_data,
         "unlocked_layers": unlocked,
         "active_pass": pass_info,
+        "nexus_subscriber": nexus_sub is not None,
         "all_layers": [
             {
                 "id": lid,
@@ -360,7 +404,7 @@ async def roll_loot(rarity_modifiers: dict = None, seed: int = None) -> str:
 
 
 async def get_user_stats(user_id: str) -> dict:
-    """Get full user game stats with active pass considered."""
+    """Get full user game stats with active pass, marketplace effects, and subscription considered."""
     char = await db.rpg_characters.find_one({"user_id": user_id}, {"_id": 0, "xp": 1})
     currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0})
     stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
@@ -368,14 +412,21 @@ async def get_user_stats(user_id: str) -> dict:
     total_xp = char.get("xp", 0) if char else 0
     stats = stats_doc.get("stats", {}) if stats_doc else {}
 
-    # Check for active pass
+    # Check for active pass, marketplace effects, and subscription
     active_pass = await get_active_pass(user_id)
+    marketplace_effects = await get_marketplace_effects(user_id)
+    nexus_sub = await get_nexus_subscription(user_id)
+
+    # Cosmic credits
+    credits_doc = await db.cosmic_credits.find_one({"user_id": user_id}, {"_id": 0})
+    cosmic_credits = (credits_doc or {}).get("balance", 0)
 
     return {
         "level": level_from_xp(total_xp),
         "currencies": {
             "cosmic_dust": (currencies or {}).get("cosmic_dust", 0),
             "stardust_shards": (currencies or {}).get("stardust_shards", 0),
+            "cosmic_credits": cosmic_credits,
         },
         "stats": {
             sid: {
@@ -384,7 +435,9 @@ async def get_user_stats(user_id: str) -> dict:
             }
             for sid, sdef in STATS.items()
         },
-        "layer": compute_active_layer(stats.get("resonance", 0), active_pass),
+        "layer": compute_active_layer(stats.get("resonance", 0), active_pass, marketplace_effects, nexus_sub),
+        "active_effects": {k: {"expires_at": v.get("expires_at"), "item_id": v.get("item_id")} for k, v in marketplace_effects.items()},
+        "nexus_subscriber": nexus_sub is not None,
     }
 
 
@@ -400,11 +453,13 @@ async def get_stats(user=Depends(get_current_user)):
 
 @router.get("/game-core/layer")
 async def get_layer(user=Depends(get_current_user)):
-    """Get user's current universe layer based on Resonance stat + active pass."""
+    """Get user's current universe layer based on Resonance stat + active pass + marketplace + subscription."""
     stats_doc = await db.game_core_stats.find_one({"user_id": user["id"]}, {"_id": 0})
     resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
     active_pass = await get_active_pass(user["id"])
-    return compute_active_layer(resonance, active_pass)
+    marketplace_effects = await get_marketplace_effects(user["id"])
+    nexus_sub = await get_nexus_subscription(user["id"])
+    return compute_active_layer(resonance, active_pass, marketplace_effects, nexus_sub)
 
 
 @router.get("/game-core/modules")

@@ -212,6 +212,10 @@ export default function GameModuleWrapper({
   // Visual directives from The Brain (Scenario Generator)
   visualDirectives = null,
   biomeContext = null,
+  // Marketplace effects
+  clearVisionActive = false,
+  premiumTheme = null,
+  auraGlow = null,
 }) {
   // Compute avg freshness from decay activity
   const avgFreshness = useMemo(() => {
@@ -240,13 +244,35 @@ export default function GameModuleWrapper({
   // Biome-driven tint (from Dream Realms active biome)
   const biomeTint = biomeContext?.color_primary || null;
 
+  // Premium theme override
+  const themeStyle = useMemo(() => {
+    if (!premiumTheme?.colors) return {};
+    return {
+      '--theme-primary': premiumTheme.colors.primary,
+      '--theme-secondary': premiumTheme.colors.secondary,
+      '--theme-accent': premiumTheme.colors.accent,
+    };
+  }, [premiumTheme]);
+
   return (
     <div className="relative min-h-screen overflow-hidden"
-      style={{ background: 'var(--bg-primary)' }}
+      style={{ background: premiumTheme?.colors?.bg || 'var(--bg-primary)', ...themeStyle }}
       data-testid={`game-module-${moduleName}`}>
 
       {/* Layer 0: Harmony Glow */}
       <HarmonyGlow element={dominantElement} intensity={harmonyScore / 100} />
+
+      {/* Premium Aura Glow */}
+      {auraGlow && (
+        <motion.div className="absolute inset-0 pointer-events-none z-[1]"
+          animate={{ opacity: [0.02, 0.08, 0.02] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            background: `radial-gradient(ellipse at 50% 50%, ${auraGlow}20, transparent 60%)`,
+            boxShadow: `inset 0 0 120px ${auraGlow}08`,
+          }}
+          data-testid="premium-aura" />
+      )}
 
       {/* Layer 1: Game Content */}
       <div className="relative z-10">
@@ -254,32 +280,44 @@ export default function GameModuleWrapper({
       </div>
 
       {/* Layer 2-7: Distortion Compositor overlay (The Skin) */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-[30]"
-        data-testid="distortion-compositor">
-        {/* Rule 1: Entropy blur/flicker */}
-        <EntropyLayer harmony={effectiveHarmony} />
-        {/* Rule 2: Element tinting from Nexus state */}
-        <ElementalTintLayer dominantElement={dominantElement} dominantPercentage={dominantPercentage} />
-        {/* Rule 3: Decay distortion from stale practices */}
-        <DecayDistortionLayer avgFreshness={avgFreshness} />
-        {/* Rule 4: Fracture lines on destructive cycle */}
-        <FractureLayer cycle={harmonyCycle} harmony={effectiveHarmony} />
-        {/* Rule 5: Layer-specific tint overlay */}
-        <LayerTintOverlay layerColor={layerColor} entropy={layerEntropy} />
-        {/* Biome tint from active Dream Realm */}
-        {biomeTint && <LayerTintOverlay layerColor={biomeTint} entropy={0.3} />}
-        {/* Mantra ripple on game action */}
-        <AnimatePresence>
-          {mantraActive && <MantraRipple active={mantraActive} color={mantraColor} />}
-        </AnimatePresence>
-        {/* Ambient grain */}
-        <GrainOverlay opacity={grainOpacity} />
-      </div>
+      {/* Clear Vision Tincture: Suppresses ALL distortion overlays */}
+      {!clearVisionActive && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-[30]"
+          data-testid="distortion-compositor">
+          {/* Rule 1: Entropy blur/flicker */}
+          <EntropyLayer harmony={effectiveHarmony} />
+          {/* Rule 2: Element tinting from Nexus state */}
+          <ElementalTintLayer dominantElement={dominantElement} dominantPercentage={dominantPercentage} />
+          {/* Rule 3: Decay distortion from stale practices */}
+          <DecayDistortionLayer avgFreshness={avgFreshness} />
+          {/* Rule 4: Fracture lines on destructive cycle */}
+          <FractureLayer cycle={harmonyCycle} harmony={effectiveHarmony} />
+          {/* Rule 5: Layer-specific tint overlay */}
+          <LayerTintOverlay layerColor={layerColor} entropy={layerEntropy} />
+          {/* Biome tint from active Dream Realm */}
+          {biomeTint && <LayerTintOverlay layerColor={biomeTint} entropy={0.3} />}
+          {/* Mantra ripple on game action */}
+          <AnimatePresence>
+            {mantraActive && <MantraRipple active={mantraActive} color={mantraColor} />}
+          </AnimatePresence>
+          {/* Ambient grain */}
+          <GrainOverlay opacity={grainOpacity} />
+        </div>
+      )}
+
+      {/* Clear Vision Active Indicator */}
+      {clearVisionActive && (
+        <div className="fixed top-2 left-2 z-[40] px-2 py-1 rounded-lg text-[8px] font-bold uppercase tracking-wider"
+          style={{ background: 'rgba(34,197,94,0.12)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.2)' }}
+          data-testid="clear-vision-indicator">
+          Clear Vision Active
+        </div>
+      )}
 
       {/* HUD Layer: Layer + Entropy indicators */}
       {showEntropyIndicator && (
         <EntropyIndicator
-          harmony={effectiveHarmony}
+          harmony={clearVisionActive ? 100 : effectiveHarmony}
           layerName={layerData?.name}
           layerColor={layerColor}
         />
