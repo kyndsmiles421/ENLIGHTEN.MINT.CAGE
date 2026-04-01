@@ -96,6 +96,9 @@ from routes.rock_hounding import router as rock_hounding_router
 from routes.forgotten_languages import router as forgotten_languages_router
 from routes.marketplace import router as marketplace_router
 from routes.evolution import router as evolution_router
+from routes.refinement import router as refinement_router
+from routes.smartdock import router as smartdock_router
+from routes.wisdom import router as wisdom_router
 
 app = FastAPI()
 
@@ -159,6 +162,9 @@ all_routers = [
     forgotten_languages_router,
     marketplace_router,
     evolution_router,
+    refinement_router,
+    smartdock_router,
+    wisdom_router,
 ]
 
 for r in all_routers:

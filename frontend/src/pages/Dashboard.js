@@ -805,6 +805,18 @@ function NexusIntentSection({ intent, navigate, playFrequency }) {
               data-testid="enter-evolution-lab">
               Evolve
             </button>
+            <button onClick={() => navigate('/refinement-lab')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(245,158,11,0.06)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.1)' }}
+              data-testid="enter-refinement-lab">
+              Refine
+            </button>
+            <button onClick={() => navigate('/smartdock')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}
+              data-testid="enter-smartdock">
+              Dock
+            </button>
           </div>
         </div>
       </div>
