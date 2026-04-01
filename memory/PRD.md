@@ -13,17 +13,19 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ### Five Levels of Consciousness & AI Product Generator (Apr 1, 2026) — LATEST
 
 **Consciousness Progression System:**
-- 5 levels: Physical (Earth), Emotional (Water), Mental (Fire), Intuitive (Air), Pure Consciousness (Ether)
+- 5 levels: Physical (Earth/Amber), Emotional (Water/Rose-Teal), Mental (Fire/Silver-Blue), Intuitive (Air/Indigo-Violet), Pure Consciousness (Ether/Golden-White Halo)
 - XP-based progression with 17 activity types (mood_log=10, quest_complete=25, boss_defeat=50, forge_creation=40, etc.)
-- Feature gating: Level 1=Basic RPG, Level 2=Social Hub, Level 3=AI Forge, Level 4=Predictive Wellness, Level 5=Master Creation
+- Feature gating: Level 1=Basic RPG, Level 2=Social Hub, Level 3=AI Forge, Level 4=Predictive Wellness, Level 5=Master Creation + God Mode
 - User-controlled display mode: Rank badge, Aura glow, or Hybrid (both)
 - Dashboard widget: ConsciousnessPanel with level info, XP progress bar, 5-level map, settings
+- **Aura UI**: Colors shift per level — social status symbol in trade/social hubs
+  - L1: Amber/Red, L2: Rose/Teal, L3: Silver/Blue, L4: Indigo/Violet, L5: Golden/White Halo
 
 **AI Product Generator — Tool Forge (Level 3+):**
 - Resonator Keys: Consumable items to unlock frequency gates
 - Focus Lenses: Extend Ultra fidelity duration for free
 - Resource Harvesters: Automate Dust collection during idle periods
-- Weighted rarity system (common→legendary), AI-generated names via Gemini
+- Weighted rarity system (common->legendary), AI-generated names via Gemini
 - Cost: 25 Dust per forge attempt
 
 **AI Product Generator — Skill Generator (Level 4-5+):**
@@ -32,12 +34,26 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Skill Bottling: Package mastered skills for Trade Circle sale (Level 5+)
 - Cost: 3 Credits per generation
 
-**Forge Marketplace Integration:**
-- Forged items can be listed on Trade Circle via content_assets
-- Use/consume items for immediate effects (extend fidelity, collect dust, activate buffs)
-- Full inventory management with category filters
+**God Mode Dashboard (Level 5 / Founding Architect):**
+- Real-time economy data feed: total users, architects, forge items, marketplace assets
+- Asset type distribution with purchase counts
+- Consciousness level distribution across all users
+- Recent forge activity (with Genesis tags), Recent broker trades
+- Accessible to Level 5 users OR Founding Architects
 
-**Tests**: Iteration 173 — 100% Backend (27/27) / 100% Frontend
+**Founder's Minting (Genesis Items):**
+- One-time-only 1-of-1 legendary item per Founding Architect
+- Always legendary rarity with 10x stats and "genesis" tag
+- 6 Genesis types (Resonator Key, Focus Lens, Harvester, Buff, Mantra, Skill Bottle)
+- AI-generated names with "Genesis:" prefix
+- Can be listed on Trade Circle marketplace
+
+**144-Slot Cap on Founding Architect:**
+- Maximum 144 Founding Architect slots
+- Slot number tracked per architect
+- Remaining slots visible in status endpoint and UI
+
+**Tests**: Iterations 173-174 — 100% Backend / 100% Frontend
 
 ### Closed-Loop Content Factory & Founding Architect (Apr 1, 2026)
 
@@ -87,8 +103,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ```
 /app/backend/routes/
   consciousness.py    # Five Levels progression, XP tracking, feature gating, display mode
-  forge.py            # Tool Forge, Skill Generator, inventory, marketplace listing
-  revenue.py          # Tiers, Fidelity Boost, AI Content Broker, Predictive Wellness, Founding Architect
+  forge.py            # Tool Forge, Skill Generator, Genesis Mint, God Mode Dashboard, inventory
+  revenue.py          # Tiers, Fidelity Boost, AI Content Broker, Predictive Wellness, Founding Architect (144-cap)
   content_factory.py  # Auto-generation functions (victory mantra, recovery frequency)
   trade_circle.py     # Central Bank, AI Merchant, Escrow, Broker (Stripe)
   content.py          # Mantras, Game Avatars
@@ -97,13 +113,16 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 /app/frontend/src/
   components/
-    ConsciousnessPanel.js  # Level display, XP bar, aura, rank badge, display mode toggle
+    ConsciousnessPanel.js  # Level display, XP bar, aura (updated colors), rank badge, display mode toggle
     CosmicForge.js         # Tool Forge + Skill Generator + Inventory UI
+    GodModeDashboard.js    # Level 5 / Founder real-time economy feed
+    GenesisMint.js         # 1-of-1 Genesis artifact minting UI
     FidelityHUD.js, CosmicPrescription.js, FoundingArchitect.js
     MantraSystem.js, GameAvatar.js, DevConsole.js, ImmersionToggle.js
     trade/CosmicBroker.js, trade/EscrowDashboard.js, trade/ContentBroker.js
   pages/
-    TradeCircle.js (9 tabs including Forge), Dashboard.js, Settings.js, RPGPage.js, CosmicMixerPage.js
+    TradeCircle.js (11 tabs: Browse, Broker, Forge, Content, Escrow, Genesis, God Mode, Avatar, My Listings, Offers, Karma)
+    Dashboard.js, Settings.js, RPGPage.js, CosmicMixerPage.js
 ```
 
 ## Key DB Collections
