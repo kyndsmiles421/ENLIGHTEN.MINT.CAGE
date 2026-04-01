@@ -15,6 +15,7 @@ import EscrowDashboard from '../components/trade/EscrowDashboard';
 import { MantraBanner } from '../components/MantraSystem';
 import GameAvatarPanel from '../components/GameAvatar';
 import ContentBroker from '../components/trade/ContentBroker';
+import CosmicForge from '../components/CosmicForge';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -785,6 +786,7 @@ export default function TradeCircle() {
           {[
             { id: 'browse', label: 'Browse' },
             { id: 'broker', label: 'Broker', icon: Sparkles, color: '#EAB308' },
+            { id: 'forge', label: 'Forge', icon: Gem, color: '#D97706' },
             { id: 'content', label: 'Content', icon: Sparkles, color: '#C084FC' },
             { id: 'escrow', label: 'Escrow', icon: Shield, color: '#818CF8' },
             { id: 'avatar', label: 'Avatar', icon: User, color: '#C084FC' },
@@ -877,6 +879,13 @@ export default function TradeCircle() {
             {tab === 'content' && (
               <motion.div key="content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <ContentBroker authHeaders={authHeaders} />
+              </motion.div>
+            )}
+
+            {/* Cosmic Forge Tab */}
+            {tab === 'forge' && (
+              <motion.div key="forge" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <CosmicForge />
               </motion.div>
             )}
 

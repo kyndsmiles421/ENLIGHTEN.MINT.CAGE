@@ -10,6 +10,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { MantraBanner } from '../components/MantraSystem';
 import CosmicPrescription from '../components/CosmicPrescription';
 import { FoundingArchitectBadge } from '../components/FoundingArchitect';
+import ConsciousnessPanel, { ConsciousnessRankBadge } from '../components/ConsciousnessPanel';
 import { toast } from 'sonner';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
@@ -382,6 +383,11 @@ export default function Dashboard() {
         {/* Cosmic Prescription */}
         <div className="mb-4">
           <CosmicPrescription authHeaders={authHeaders} />
+        </div>
+
+        {/* Consciousness Level */}
+        <div className="mb-4">
+          <ConsciousnessPanel />
         </div>
 
         {/* Edit Mode Banner */}
