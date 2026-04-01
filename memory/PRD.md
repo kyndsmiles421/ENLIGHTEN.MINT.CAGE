@@ -10,6 +10,21 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
+### Launch Polish & System Integration (Apr 1, 2026) — LATEST
+
+**Latency Pulse Indicator (NEW):**
+- `useLatencyPulse.js`: LatencyProvider context, LatencyHUD, LatencyDot, useLatency hook
+- Tracks response time on every critical action with color-coded dots (green <150ms, blue <300ms, amber <800ms, red >800ms)
+- Integrated into 6 pages: RPGPage, RockHounding, CosmicStore, SmartDockPage, EvolutionLab, RefinementLab
+- Global HUD in top-right with auto-clear after 4s
+
+**World Veins & NPC Rivals (Encounter Frontend — NEW):**
+- World Veins: collective boss encounters with resonance progress bar, "Contribute Resonance" button
+- NPC Rival: Compete/Evade buttons, rival archetype display with dialogue
+- Both integrated into RPG Bosses tab below Cosmic Threats
+
+**Tests**: Iterations 166 (100%), 167 (100%/95%), 168 (100%/100%)
+
 ### Full-Stack Deep Click Optimization & E2E Audit (Apr 1, 2026)
 
 **QuestCard Fix (RPG Page):**
