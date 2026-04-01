@@ -10,71 +10,67 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Central Bank Economy & Phygital Trade Circle (Apr 1, 2026) — LATEST
+### Session — Central Bank, Mantras, Avatars, Atmosphere Switch (Apr 1, 2026)
 
-**Cosmic Broker (Stripe Integration):**
+**Tiered Dust Sales:**
+- Base Tier: 500 Dust = 3 Credits (standard price)
+- Medium Tier: 2,000 Dust = 10 Credits (15% discount)
+- Premium Tier: 5,000 Dust = 18 Credits (30% "Supernova" discount)
+
+**30% Return Penalty:**
+- All sell-back/refund operations apply a 30% Central Bank Processing Fee
+- Response includes raw_credits, processing_fee, processing_fee_pct, credits_earned
+
+**Atmosphere Switch (Global Fidelity Toggle):**
+- 3 levels: Simplified / Standard / Ultra-Immersive
+- Controls CSS variables: --glass-blur, --glow-opacity, --particle-opacity, --transition-speed, --gradient-intensity, --shadow-depth
+- Available in nav bar (ImmersionToggle) AND Settings page
+- Device notes: "$50 phone friendly" / "Modern smartphones" / "High-end hardware"
+- data-fidelity attribute on root element for CSS targeting
+
+**Sacred Mantra System:**
+- 31 mantras across 12 categories: affirmation, release, mindfulness, breathing, gratitude, connection, patience, abundance, sacred, cosmic, healing, grounding, trade, mixer
+- GET /api/mantras (random), GET /api/mantras?category=X, GET /api/mantras/all
+- MantraBanner: rotating display in Dashboard, Mixer, Trade Circle headers
+- MantraOverlay: floating ambient text (hidden in Simplified mode)
+- LoadingMantra: appears in page loading spinner
+
+**Game Avatar System:**
+- 10 avatars: 4 Free (Seeker, Healer, Guardian, Mystic), 3 Earned (Alchemist, Starseed, Dreamwalker), 3 Premium (Phoenix 25cr, Oracle 35cr, Sovereign 50cr)
+- Mood-Resonant state: dormant → awakening → flowing → radiant → transcendent
+- Resonance Level (0-100) computed from mixer sessions + specimens mined + trade karma
+- AvatarOrb: animated orb with tier-specific style animations (ethereal, pulsing, blazing, etc.)
+- Avatar tab in Trade Circle for selection, purchase, and profile display
+- Purchase with Credits from Cosmic Broker
+
+**Tests**: Iteration 170 — 100% Backend / 100% Frontend
+
+### Previous Session — Central Bank Economy (Apr 1, 2026)
+
+**Cosmic Broker (Stripe):**
 - 4 Credit Packs: Spark ($0.99/5cr), Ember ($4.99/27cr), Flame ($9.99/68cr), Inferno ($24.99/175cr)
 - Stripe checkout session creation + payment verification endpoints
 - Wallet endpoint: credits, dust, gems
 - Broker transaction history
 
 **AI Merchant Storefront:**
-- 8-item catalog: 3 Dust packs, 2 Gem packs, 3 Starseed Components
-- Buy with credits (server-validated, deducts balance, delivers goods)
-- Sell-back to Broker at reduced rate (spread model)
-- Fixed prices, unlimited stock
+- 8-item catalog with tiered pricing
+- Buy with credits, sell-back with 30% penalty
+- Hidden Dev Console (triple-tap nav logo)
 
 **Cosmic Escrow (Phygital Shipping Bridge):**
 - Full lifecycle: Committed → Shipped → Received → Released
-- 5% Resonance Fee (transaction tax, burned on release)
-- Resonance Code for tracking
-- Dispute mechanism (freezes escrow for admin review)
-- Server-side asset locking from receiver's wallet
-
-**Trade Circle Frontend Overhaul:**
-- 6 tabs: Browse, Broker, Escrow, My Listings, Offers, Karma
-- CosmicBroker component: wallet strip, credit packs, merchant catalog, sell-back
-- EscrowDashboard component: state filters, timeline, ship/confirm/dispute actions
-- Stripe payment redirect handling
-
-**Hidden Dev Console:**
-- Triple-tap on nav logo to reveal
-- Performance Grade (A/B/C/D), Avg Latency, API Call count
-- System Status, Escrow Pipeline stats
-- Recent API calls with latency coloring
-- JS Heap memory usage
+- 5% Resonance Fee, dispute mechanism
 
 **Tests**: Iteration 169 — 100% Backend / 100% Frontend
 
-### Launch Polish & System Integration (Apr 1, 2026)
-
-**Latency Pulse Indicator:**
-- `useLatencyPulse.js`: LatencyProvider context, LatencyHUD, LatencyDot, useLatency hook
-- Color-coded dots (green <150ms, blue <300ms, amber <800ms, red >800ms)
-- Integrated into 6 pages
-
-**World Veins & NPC Rivals:**
-- World Veins: collective boss encounters with resonance progress
-- NPC Rival: Compete/Evade with rival archetype display
-- Both in RPG Bosses tab
-
-**Tests**: Iterations 166-168 — 100%
-
-### Full-Stack Deep Click Optimization (Apr 1, 2026)
-- QuestCard interactivity fix, IntroVideo mute button overlay fix
-- Universal Inventory Bridge (rock_hounding → rpg_inventory)
-- Transmute Panel (Dust-to-Credit exchange)
-- RockHounding.js refactored into modular MiningComponents.js
-
-### Earlier Systems (All 100% Tested)
-- Economy Admin (Alchemical Exchange, Feature Flags, Communal Goals)
-- Environmental Bosses & NPC Rivals, World Veins
-- Living Journal (AI-Generated Narratives)
-- Refinement Lab, SmartDock, Wisdom Evolution
-- PEP, Marketplace, Seasonal Cycles
-- Brain/Skin/Bridge, 5-Layer Universe, Forgotten Languages
-- Universal Game Core, Rock Hounding, Adaptive Dashboard
-- Dream Realms, Elemental Nexus, Multiversal Map, Daily Quests, RPG, Auth, AI Coach, Star Chart, Oracle
+### Earlier Systems (All Tested)
+- Deep Click E2E Optimization, Universal Inventory Bridge, Transmute Panel, Latency Pulse
+- World Veins, NPC Rivals, RPG Bosses
+- Economy Admin, Living Journal, Refinement Lab, SmartDock, Wisdom Evolution
+- PEP, Marketplace, Seasonal Cycles, Brain/Skin/Bridge, 5-Layer Universe
+- Rock Hounding, Dream Realms, Elemental Nexus, Multiversal Map
+- Daily Quests, RPG, Auth, AI Coach, Star Chart, Oracle
 
 ## Key Architecture
 
@@ -82,51 +78,45 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ```
 /app/backend/routes/
   trade_circle.py     # Central Bank, AI Merchant, Escrow, Broker (Stripe)
-  rock_hounding.py    # Mining + RPG Inventory bridge
-  refinement.py       # Tumbler, Starseed components
-  rpg.py              # Quests, Inventory, Bosses
-  marketplace.py      # Cosmic Store, Credits
-  encounters.py       # Bosses, Rivals, Veins
-  subscriptions.py    # Stripe subscriptions, Tiers
+  content.py          # Mantras (31), Game Avatars (10)
+  rock_hounding.py, refinement.py, rpg.py, marketplace.py, encounters.py
 
 /app/frontend/src/
-  components/trade/
-    CosmicBroker.js     # Broker storefront UI
-    EscrowDashboard.js  # Phygital escrow management
   components/
-    DevConsole.js       # Hidden performance console
-  pages/
-    TradeCircle.js      # 6-tab marketplace hub
+    trade/CosmicBroker.js     # Broker storefront with tiered pricing & 30% penalty
+    trade/EscrowDashboard.js  # Phygital escrow management
+    MantraSystem.js           # MantraBanner, MantraOverlay, LoadingMantra
+    GameAvatar.js             # AvatarOrb, AvatarBadge, GameAvatarPanel
+    DevConsole.js             # Hidden performance console
+    ImmersionToggle.js        # Atmosphere Switch (3 levels)
+  context/SensoryContext.js   # CSS var system for fidelity
+  pages/TradeCircle.js        # 7 tabs (Browse, Broker, Escrow, Avatar, My Listings, Offers, Karma)
 ```
 
 ### Key DB Collections
-- `users`: user_credit_balance, user_dust_balance, user_gem_balance
+- `users`: user_credit_balance, user_dust_balance, user_gem_balance, game_avatar, unlocked_avatars
+- `escrows`, `broker_transactions`, `merchant_transactions`
 - `trade_listings`, `trade_offers`, `trade_reviews`, `trade_karma`
-- `escrows`: Phygital escrow records with state_history
-- `broker_transactions`: Stripe credit purchase records
-- `merchant_transactions`: AI Merchant buy/sell records
 
 ## Credentials
-- RPG Test: rpg_test@test.com / password123
 - Trade Test: grad_test_522@test.com / password
+- RPG Test: rpg_test@test.com / password123
 
 ## Upcoming Tasks
 
 ### P0
 - **Starseed Energy Gates UI** — Progression interface where traded materials/polished gems unlock gates
-- **Global Rendering Toggle** — 3 levels: Simplified, Standard, Ultra-Immersive (app-wide visual quality)
+- **Premium Video Projections** — High-res cinematic video layers in the Mixer, gated by subscription
 
 ### P1
-- **Party System (Circle/Coven)** — Private social spaces for high-value trades and boss encounters
-- **Mixer Trades / Vibe Capsules** — Seal audio mixes into tradeable digital capsules
-- **Elemental Crafting** — Combine specimens using Universal Game Template
+- **Party System (Circle/Coven)** — Private social spaces for high-value trades
+- **Mixer Trades / Vibe Capsules** — Seal audio creations into tradeable digital capsules
+- **Practice Mechanic** — Mixer/Trade Circle usage increases Resonance Skill, unlocking avatar effects
 
 ### P2 — Backlog
+- Avatar "walking" navigation mechanic (spatial UI)
 - Myths & Legends Encyclopedia
-- Global Immersion Level toggles & Avatar Creator
 - AI Scene Recreations / Vision Mode
-- GPS Hotspot Spawning
-- Biometric Sync
-- On-device inference (Nano-Banana SLM)
+- GPS Hotspot Spawning, Biometric Sync
 - 3D mesh morphing for PEP visual evolution
-- RPGPage.js refactoring (currently >1200 lines)
+- RPGPage.js refactoring (>1200 lines)
