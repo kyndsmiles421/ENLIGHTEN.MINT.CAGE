@@ -260,7 +260,7 @@ export default function CinematicIntro() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/auth?trial=true')}
                 className="px-8 py-3 rounded-full text-sm font-semibold mx-auto flex items-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15))',

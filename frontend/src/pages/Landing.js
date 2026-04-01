@@ -22,7 +22,6 @@ import { useAuth } from '../context/AuthContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, MANTRAS as MIXER_MANTRAS } from '../context/MixerContext';
 import ShareButton from '../components/ShareButton';
 import GuidedTour from '../components/GuidedTour';
-import IntroVideo from '../components/IntroVideo';
 import CosmicMoodRing from '../components/CosmicMoodRing';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -946,11 +945,19 @@ export default function Landing() {
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
               className="flex items-center gap-3 mb-8">
-              <IntroVideo />
-              <div className="flex items-center gap-2">
-                <Volume2 size={12} style={{ color: 'var(--text-muted)' }} />
-                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Enable ambient sound for full experience</span>
-              </div>
+              <button
+                onClick={() => navigate('/intro')}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium transition-all hover:scale-105 group"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05))',
+                  border: '1px solid rgba(251,191,36,0.18)',
+                  color: '#FBBF24',
+                }}
+                data-testid="watch-intro-btn"
+              >
+                <Play size={13} className="transition-transform group-hover:scale-110" />
+                Watch the Journey
+              </button>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
