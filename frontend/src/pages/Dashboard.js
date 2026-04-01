@@ -793,6 +793,18 @@ function NexusIntentSection({ intent, navigate, playFrequency }) {
               data-testid="enter-dream-realm">
               <Eye size={10} /> Dream
             </button>
+            <button onClick={() => navigate('/cosmic-store')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(252,211,77,0.06)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.1)' }}
+              data-testid="enter-cosmic-store">
+              Store
+            </button>
+            <button onClick={() => navigate('/evolution-lab')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(34,197,94,0.06)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.1)' }}
+              data-testid="enter-evolution-lab">
+              Evolve
+            </button>
           </div>
         </div>
       </div>

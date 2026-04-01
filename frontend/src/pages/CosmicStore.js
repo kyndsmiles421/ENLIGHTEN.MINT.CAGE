@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-const ICON_MAP = { eye: Eye, radio: Radio, package: Package, zap: Zap, key: Key, sparkles: Sparkles, sun: Sun, flame: Flame, monitor: Monitor, film: Film, coins: Coins, crown: Crown };
+const ICON_MAP = { eye: Eye, radio: Radio, package: Package, zap: Zap, key: Key, sparkles: Sparkles, sun: Sun, flame: Flame, monitor: Monitor, film: Film, coins: Coins, crown: Crown, shield: Shield };
 const RARITY_COLORS = { common: '#9CA3AF', uncommon: '#22C55E', rare: '#3B82F6', epic: '#A855F7', legendary: '#FCD34D', mythic: '#EF4444' };
 
 function StoreHeader({ credits, onBack }) {

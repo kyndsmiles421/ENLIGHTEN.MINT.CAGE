@@ -140,6 +140,34 @@ CONSUMABLES = {
         "color": "#FCD34D",
         "rarity": "legendary",
     },
+    "preservation_salt": {
+        "id": "preservation_salt",
+        "name": "Preservation Salt",
+        "description": "Stops a favorite asset's decay for 30 days without manual renewal. Keeps your treasures alive.",
+        "category": "consumable",
+        "price_credits": 30,
+        "price_real_cents": 49,
+        "quantity_per_purchase": 3,
+        "duration_minutes": 43200,
+        "effect": "preserve_asset",
+        "icon": "shield",
+        "color": "#22C55E",
+        "rarity": "uncommon",
+    },
+    "digital_luster_polish": {
+        "id": "digital_luster_polish",
+        "name": "Digital Luster Polish",
+        "description": "One-time cosmetic upgrade: adds unique particle effects to a specific gem in your inventory.",
+        "category": "consumable",
+        "price_credits": 75,
+        "price_real_cents": 129,
+        "quantity_per_purchase": 1,
+        "duration_minutes": -1,
+        "effect": "luster_polish",
+        "icon": "sparkles",
+        "color": "#E2C6A0",
+        "rarity": "rare",
+    },
 }
 
 # ── Cosmetic Items ──
@@ -764,3 +792,49 @@ async def grant_test_credits(data: dict = Body(...), user=Depends(get_current_us
     amount = min(data.get("amount", 500), 5000)
     new_balance = await modify_credits(user["id"], amount, "dev_grant")
     return {"granted": amount, "new_balance": new_balance}
+
+
+@router.post("/marketplace/convert-dust")
+async def convert_dust_to_credits(data: dict = Body(...), user=Depends(get_current_user)):
+    """Convert Cosmic Dust into Cosmic Credits. Rate: 1000 Dust = 10 Credits."""
+    user_id = user["id"]
+    dust_amount = data.get("dust_amount", 0)
+
+    if dust_amount < 100:
+        raise HTTPException(400, "Minimum conversion: 100 Cosmic Dust (= 1 Credit)")
+
+    # Check dust balance
+    currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0, "user_id": 0})
+    current_dust = (currencies or {}).get("cosmic_dust", 0)
+
+    if current_dust < dust_amount:
+        raise HTTPException(400, f"Insufficient Dust. Have {current_dust}, need {dust_amount}.")
+
+    # Conversion: 1000 Dust = 10 Credits → 100 Dust = 1 Credit
+    credits_earned = dust_amount // 100
+    dust_consumed = credits_earned * 100
+
+    # Deduct dust
+    await db.rpg_currencies.update_one(
+        {"user_id": user_id}, {"$inc": {"cosmic_dust": -dust_consumed}}
+    )
+
+    # Add credits
+    new_balance = await modify_credits(user_id, credits_earned, "dust_conversion")
+
+    # Log
+    await db.marketplace_transactions.insert_one({
+        "user_id": user_id,
+        "type": "dust_conversion",
+        "dust_spent": dust_consumed,
+        "credits_earned": credits_earned,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {
+        "converted": True,
+        "dust_spent": dust_consumed,
+        "credits_earned": credits_earned,
+        "new_credit_balance": new_balance,
+        "remaining_dust": current_dust - dust_consumed,
+    }
