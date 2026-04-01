@@ -10,35 +10,31 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### 5-Layer Universe Structure + Layer-Gated Mining (Apr 1, 2026) — NEW
+### Brain/Skin/Bridge Integration (Apr 1, 2026) — NEW
+- **The Brain** (`GET /api/dream-realms/scenario-state`): Unified scenario controller that outputs layer state, difficulty, visual directives, harmony, elements, and biome context. Every game module calls this for environment state.
+- **The Skin** (`GameModuleWrapper.js`): Enhanced distortion compositor that renders 7 layered effects based on Brain output — EntropyLayer, ElementalTintLayer, DecayDistortionLayer, FractureLayer, LayerTintOverlay, MantraRipple, GrainOverlay. Now accepts `visualDirectives` and `biomeContext` from the Brain.
+- **The Bridge** (`POST /api/game-core/commit-reward`): Universal reward endpoint. Specimens now carry layer metadata (`layer_found`, `layer_name`, `layer_multiplier`) for full traceability.
+- **Test**: Iteration 160 — 100% (16/16 backend, all frontend verified)
+
+### 5-Layer Universe Structure (Apr 1, 2026)
 - **5 Environment States**: Terrestrial → Ethereal → Astral → Void → Nexus
-- **Entropy Scaling**: Entropy increases from Terrestrial (0%) to Void (75%), Nexus transcends (0%)
-- **Resonance-Gated Layers**: Resonance stat (0/5/15/30/50) determines accessible layers
-- **Layer-Aware Loot Tables**: Rock Hounding rewards scale with layer multipliers (1.0x → 3.0x)
-- **Distortion Compositor Integration**: Void/Astral layers amplify entropy blur/grain effects
-- **Layer HUD**: Universe Layer bar shows all 5 layers with active/locked states and loot multiplier
-- **Test**: Iteration 159 — 100% (15/15 backend, all frontend verified)
+- Entropy scaling, Resonance-gated layers, Layer-aware loot tables
+- Universe Layer HUD bar in game modules
+- **Test**: Iteration 159 — 100%
 
-### Forgotten Languages System Enhanced (Apr 1, 2026) — NEW
-- **Streak System**: Consecutive daily decoding with +10%/day XP bonus (max 2.0x)
-- **Glyph Journal**: Permanent history of all decoded glyphs with meanings and phonetics
-- **Streak Badge**: Visual indicator on daily cipher tab showing streak days and multiplier
-- **5 Script Families**: Verdant Runes (wood), Ignis Sigils (fire), Petroglyph Marks (earth), Crystalline Script (metal), Tidal Glyphs (water)
-- **Breath-to-Decode**: 3-cycle breath pattern unique per element to unlock glyphs
-- **5-Tier Progressive Reveal**: Novice Scribe (0H) → Archon of Tongues (85H)
-- **Permanent Nexus Modifiers**: Decoded glyphs permanently boost natal resonance
-- **Test**: Iterations 159 — 100%
+### Forgotten Languages System (Apr 1, 2026)
+- 5 Script Families, Breath-to-Decode, 5-Tier Progressive Reveal
+- Streak system (+10%/day XP bonus), Glyph Journal
+- Permanent Nexus Modifiers from decoded glyphs
+- **Test**: Iterations 159-160 — 100%
 
-### Universal Game Core + Rock Hounding Module (Apr 1, 2026)
-- **Universal Game Controller**: `useGameController` hook + `GameModuleWrapper` (5-Rule Distortion Compositor)
-- **Soul-to-Game Bridge**: `POST /api/game-core/commit-reward`
-- **Rock Hounding**: Procedural mines, 30+ specimens, 6-tier rarity, 5 depth layers
-- **Template Documentation**: `/app/docs/GAME_MODULE_TEMPLATE.md`
-- **Test**: Iteration 158 — 100% (29/29)
+### Universal Game Core + Rock Hounding (Apr 1, 2026)
+- Universal Game Controller hook, GameModuleWrapper, Soul-to-Game Bridge
+- Rock Hounding: Procedural mines, 30+ specimens, 6-tier rarity, 5 depths
+- **Test**: Iteration 158 — 100%
 
 ### Earlier Systems (All 100% Tested)
-- Adaptive Dashboard, Dream Realms, Elemental Nexus
-- Multiversal Map (4 universes, 27 regions), Cosmic Weather
+- Adaptive Dashboard, Dream Realms, Elemental Nexus, Multiversal Map
 - Dual Currency, Daily Quests, RPG, Auth, AI Coach, Star Chart, Oracle
 
 ## Credentials
@@ -46,35 +42,34 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Key Architecture
 
+### The Three Pillars (SOP for every game)
+1. **The Brain** (`/api/dream-realms/scenario-state`) — Computes environment
+2. **The Skin** (`GameModuleWrapper`) — Renders distortions
+3. **The Bridge** (`/api/game-core/commit-reward`) — Commits rewards
+
 ### 5-Layer Universe System
-| Layer | Resonance Req | Loot Mult | XP Mult | Entropy |
+| Layer | Resonance | Loot | XP | Entropy |
 |:---:|:---:|:---:|:---:|:---:|
 | Terrestrial | 0 | 1.0x | 1.0x | 0% |
 | Ethereal | 5 | 1.3x | 1.2x | 15% |
 | Astral | 15 | 1.7x | 1.5x | 40% |
 | Void | 30 | 2.5x | 2.0x | 75% |
-| Nexus | 50 | 3.0x | 3.0x | 0% (transcendent) |
+| Nexus | 50 | 3.0x | 3.0x | 0% |
 
 ### Game Module Pattern
 See `/app/docs/GAME_MODULE_TEMPLATE.md`
-
-### API Conventions
-- Prefix: `${REACT_APP_BACKEND_URL}/api`
-- Auth: `useAuth()` → `authHeaders`
-- AI: `.with_model("gemini", "gemini-3-flash-preview")`
-- Element CSS: `--el-wood: #22C55E`, `--el-fire: #EF4444`, `--el-earth: #F59E0B`, `--el-metal: #94A3B8`, `--el-water: #3B82F6`
 
 ## Key DB Collections
 - Game Core: `game_core_stats`, `game_core_transactions`
 - Rock Hounding: `rock_hounding_mines`, `rock_hounding_collection`
 - Forgotten Languages: `forgotten_languages_progress`, `forgotten_languages_mastery`, `forgotten_languages_streaks`, `forgotten_languages_journal`
 - Nexus: `nexus_alignments`, `nexus_birth_resonance`, `nexus_decoded_modifiers`
-- RPG/Other: `rpg_characters`, `rpg_inventory`, `rpg_currencies`, `rpg_quest_log`
+- Dream Realms: `dream_realms`, `legendary_frequencies`
 
 ## Upcoming Tasks
 ### P2 — Elemental Crafting
 - Second plug-in module using Universal Game Template
-- Combine Rock Hounding specimens, layer-gated recipes
+- Combine Rock Hounding specimens, layer-gated recipes, auto-inherits Brain/Skin/Bridge
 
 ### P2 — Party System
 - Circle/Coven for shared objectives

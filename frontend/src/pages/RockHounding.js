@@ -477,8 +477,8 @@ export default function RockHounding() {
                     {controller.difficulty && (
                       <div className="text-center">
                         <p className="text-[7px] uppercase" style={{ color: 'var(--text-muted)' }}>Difficulty</p>
-                        <p className="text-sm font-bold" style={{ color: controller.difficulty.level > 5 ? '#EF4444' : controller.difficulty.level > 3 ? '#F59E0B' : '#22C55E' }}>
-                          {controller.difficulty.level}
+                        <p className="text-sm font-bold" style={{ color: controller.difficulty.difficulty > 5 ? '#EF4444' : controller.difficulty.difficulty > 3 ? '#F59E0B' : '#22C55E' }}>
+                          {Math.round(controller.difficulty.difficulty * 10) / 10}
                         </p>
                       </div>
                     )}
