@@ -10,7 +10,31 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### GPS Location-based Hotspots (Apr 1, 2026) — LATEST
+### Chinese Language, Expanded Mantras & Cinematic Gameplay Showcase (Apr 1, 2026) — LATEST
+
+**Chinese (Mandarin) Language Mode:**
+- Added Chinese (中文) as 2nd language option (8 total: EN, ZH, ES, FR, HI, JA, AR, PT)
+- Full UI translations for all navigation, auth, pricing, mixer, dashboard, and common keys
+- Persisted in localStorage as `cosmic_lang`
+
+**Expanded Mantra Library (31 → 96 mantras, 17 categories):**
+- 15 Chinese/Daoist mantras (道可道非常道, 上善若水, 天人合一, 南无阿弥陀佛, etc.)
+- New categories: `chinese`, `gates`, `explore`, `cosmic` (expanded), `healing` (expanded)
+- Mantras with `lang: "zh"` field for language-specific filtering
+
+**Cinematic Intro Gameplay Showcase:**
+- Each of the 5 levels now shows 3 feature showcase cards with icons and descriptions
+- Level 1: Rock Hounding, RPG Battles, Daily Quests
+- Level 2: Dream Realms, Living Journal, Mood Tracker
+- Level 3: Cosmic Forge, Trade Circle, Energy Gates
+- Level 4: Cosmic Mixer, GPS Hotspots, Refinement Lab
+- Level 5: God Mode, Genesis Mint, Gate of Source
+- Cards animate in with staggered delays and glow pulses
+- 6 seconds per level (increased from 5 to accommodate cards)
+
+**Tests**: Iteration 179 — 100% Backend (12/12) / 100% Frontend
+
+### GPS Location-based Hotspots (Apr 1, 2026)
 
 **Static Sacred Sites (8 Landmarks):**
 - Sedona Vortex (Earth/Legendary), Stonehenge (Ether/Legendary), Machu Picchu (Air/Legendary), Mount Fuji (Fire/Legendary)
