@@ -10,26 +10,40 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Brain/Skin/Bridge Integration (Apr 1, 2026) — NEW
-- **The Brain** (`GET /api/dream-realms/scenario-state`): Unified scenario controller that outputs layer state, difficulty, visual directives, harmony, elements, and biome context. Every game module calls this for environment state.
-- **The Skin** (`GameModuleWrapper.js`): Enhanced distortion compositor that renders 7 layered effects based on Brain output — EntropyLayer, ElementalTintLayer, DecayDistortionLayer, FractureLayer, LayerTintOverlay, MantraRipple, GrainOverlay. Now accepts `visualDirectives` and `biomeContext` from the Brain.
-- **The Bridge** (`POST /api/game-core/commit-reward`): Universal reward endpoint. Specimens now carry layer metadata (`layer_found`, `layer_name`, `layer_multiplier`) for full traceability.
-- **Test**: Iteration 160 — 100% (16/16 backend, all frontend verified)
+### Cosmic Marketplace & Monetization System (Apr 1, 2026) — NEW
+- **Cosmic Credits**: Virtual currency purchasable via Stripe ($0.99–$24.99) or earnable in-game via mineral sell-back
+- **Premium Store** (`/cosmic-store`): 4-tab interface — Consumables, Cosmetics, Credits, Nexus Pass
+- **Consumables** (5 items):
+  - Clear Vision Tincture (50cc, 30min) — disables all visual distortions
+  - 963 Hz Frequency Tuner (80cc, 5min) — rare-only scanner lock
+  - Payload Booster (40cc, 60min) — doubles inventory space
+  - Dual-Motor Excavator (60cc, 60min) — 3x mining speed
+  - Warp Key (120cc, 30min) — instant layer travel, bypasses resonance gates
+- **Cosmetics** (5 items):
+  - Auras: Violet (200cc), Golden (350cc), Crimson (300cc)
+  - Premium Themes: Cyber-Neon (500cc), Hyper-Realistic (500cc)
+- **Nexus Pass** ($9.99/month via Stripe): Permanent +60 resonance, all layers unlocked, 500cc monthly, 3x XP
+- **Mineral Sell-Back**: Common=1cc, Uncommon=3cc, Rare=8cc, Epic=20cc, Legendary=50cc, Mythic=150cc
+- **Active Effects System**: Integrated into GameModuleWrapper (Clear Vision suppresses distortion compositor)
+- **Test**: Iteration 162 — 100% (26/26 backend, all frontend verified)
+
+### Brain/Skin/Bridge Integration (Apr 1, 2026)
+- **The Brain** (`GET /api/dream-realms/scenario-state`): Unified scenario controller
+- **The Skin** (`GameModuleWrapper.js`): 7-layer distortion compositor with Clear Vision override
+- **The Bridge** (`POST /api/game-core/commit-reward`): Universal reward endpoint
+- **Test**: Iteration 160 — 100%
 
 ### 5-Layer Universe Structure (Apr 1, 2026)
-- **5 Environment States**: Terrestrial → Ethereal → Astral → Void → Nexus
-- Entropy scaling, Resonance-gated layers, Layer-aware loot tables
-- Universe Layer HUD bar in game modules
+- Terrestrial → Ethereal → Astral → Void → Nexus
+- Layer gating now considers: Resonance stat + Nexus Passes + Warp Keys + Nexus Subscription
 - **Test**: Iteration 159 — 100%
 
 ### Forgotten Languages System (Apr 1, 2026)
-- 5 Script Families, Breath-to-Decode, 5-Tier Progressive Reveal
-- Streak system (+10%/day XP bonus), Glyph Journal
-- Permanent Nexus Modifiers from decoded glyphs
+- 5 Script Families, Breath-to-Decode, 5-Tier Progressive Reveal, Streak system, Glyph Journal
 - **Test**: Iterations 159-160 — 100%
 
 ### Universal Game Core + Rock Hounding (Apr 1, 2026)
-- Universal Game Controller hook, GameModuleWrapper, Soul-to-Game Bridge
+- `useGameController` hook, `GameModuleWrapper`, Soul-to-Game Bridge
 - Rock Hounding: Procedural mines, 30+ specimens, 6-tier rarity, 5 depths
 - **Test**: Iteration 158 — 100%
 
@@ -42,10 +56,11 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Key Architecture
 
-### The Three Pillars (SOP for every game)
+### The Three Pillars + Marketplace Hook
 1. **The Brain** (`/api/dream-realms/scenario-state`) — Computes environment
-2. **The Skin** (`GameModuleWrapper`) — Renders distortions
+2. **The Skin** (`GameModuleWrapper`) — Renders distortions (with Clear Vision override)
 3. **The Bridge** (`/api/game-core/commit-reward`) — Commits rewards
+4. **Marketplace Hook** (`/api/marketplace/*`) — Economy layer for premium items
 
 ### 5-Layer Universe System
 | Layer | Resonance | Loot | XP | Entropy |
@@ -65,16 +80,18 @@ See `/app/docs/GAME_MODULE_TEMPLATE.md`
 - Forgotten Languages: `forgotten_languages_progress`, `forgotten_languages_mastery`, `forgotten_languages_streaks`, `forgotten_languages_journal`
 - Nexus: `nexus_alignments`, `nexus_birth_resonance`, `nexus_decoded_modifiers`
 - Dream Realms: `dream_realms`, `legendary_frequencies`
+- **Marketplace**: `cosmic_credits`, `marketplace_inventory`, `marketplace_active_effects`, `marketplace_equipped`, `marketplace_transactions`, `nexus_subscriptions`
 
 ## Upcoming Tasks
-### P2 — Elemental Crafting
+### P1 — Elemental Crafting
 - Second plug-in module using Universal Game Template
 - Combine Rock Hounding specimens, layer-gated recipes, auto-inherits Brain/Skin/Bridge
 
-### P2 — Party System
+### P1 — Party System
 - Circle/Coven for shared objectives
 
 ### P2 — Backlog
 - Myths & Legends Encyclopedia, Global Immersion Toggles
 - On-device inference (Nano-Banana SLM), Avatar Creator
 - Dashboard.js refactoring (extract components)
+- RockHounding.js refactoring (extract NexusPassShop, ActivePassBanner into /components/game/)
