@@ -10,7 +10,37 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Chinese Language, Expanded Mantras & Cinematic Gameplay Showcase (Apr 1, 2026) — LATEST
+### Resonance Practice, Mantra of the Day & Rapid City Hotspots (Apr 1, 2026) — LATEST
+
+**Resonance Practice (5 Practice Types):**
+- Meditation (Water, 30s min, 5-15 dust, +10 XP)
+- Breathwork (Air, 20s min, 4-10 dust, +8 XP)
+- Earth Grounding (Earth, 45s min, 6-21 dust, +12 XP)
+- Flame Visualization (Fire, 60s min, 8-32 dust, +15 XP)
+- Mantra Chanting (Ether, 90s min, 10-50 dust, +20 XP)
+- Quality mini-game: rhythmic tapping for consistency score
+- Streak bonuses: 3d=1.1x, 7d=1.25x, 14d=1.4x, 30d=1.6x, 60d=1.8x, 90d=2.0x
+- Consciousness level multipliers: L1=1x, L2=1.3x, L3=1.6x, L4=2x, L5=2.5x
+- 10 sessions/day limit
+- Endpoints: practices, complete, history
+
+**Mantra of the Day Widget:**
+- Dashboard widget with daily rotating mantra
+- Cached in localStorage per day for consistency
+- Shows energy + category labels
+- Refresh button on hover
+
+**Rapid City Local Hotspots (5 sites):**
+- Memorial Park Spring (Water/Uncommon)
+- Skyline Drive Overlook (Earth/Uncommon)
+- Storybook Island Grove (Air/Uncommon)
+- Dinosaur Park Summit (Fire/Uncommon)
+- Canyon Lake Reflection (Water/Rare)
+- Collect radius tightened to 50m (was 300m)
+
+**Tests**: Iteration 180 — 100% Backend (15/15) / 100% Frontend
+
+### Chinese Language, Expanded Mantras & Cinematic Gameplay Showcase (Apr 1, 2026)
 
 **Chinese (Mandarin) Language Mode:**
 - Added Chinese (中文) as 2nd language option (8 total: EN, ZH, ES, FR, HI, JA, AR, PT)
@@ -187,8 +217,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Upcoming Tasks
 
 ### P1
-- **Resonance Skill / Practice Mechanic** — Primary Dust generation without trading (meditation timers, breathing, journaling)
 - **Earned Avatar Auto-Unlock** — Milestones trigger avatar unlocks
+- **Atmosphere Gate Switching** — Water Gate triggers Rose/Teal palette app-wide
 
 ### P2
 - **Party System (Circle/Coven)** — Private social spaces
