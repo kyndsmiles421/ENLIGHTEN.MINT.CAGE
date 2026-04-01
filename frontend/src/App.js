@@ -23,6 +23,7 @@ import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
+import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import TrialGraduation from './components/TrialGraduation';
 
@@ -284,6 +285,7 @@ function App() {
   return (
   <LanguageProvider>
     <AuthProvider>
+      <LatencyProvider>
       <CreditProvider>
       <AvatarProvider>
       <TempoProvider>
@@ -313,6 +315,7 @@ function App() {
               }}
             />
             <AnimatedRoutes />
+            <LatencyHUD />
             <SmartDock />
             <CosmicMixer />
             <CosmicToolbar />
@@ -329,6 +332,7 @@ function App() {
       </TempoProvider>
       </AvatarProvider>
       </CreditProvider>
+      </LatencyProvider>
     </AuthProvider>
   </LanguageProvider>
   );

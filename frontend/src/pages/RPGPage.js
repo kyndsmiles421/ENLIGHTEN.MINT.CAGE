@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
+import { useLatency, LatencyDot } from '../hooks/useLatencyPulse';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -337,6 +338,7 @@ const TABS = [
 export default function RPGPage() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
+  const latency = useLatency();
   const [tab, setTab] = useState('quests');
   const [character, setCharacter] = useState(null);
   const [inventory, setInventory] = useState(null);
@@ -352,6 +354,8 @@ export default function RPGPage() {
   const [error, setError] = useState(null);
   const [encounter, setEncounter] = useState(null);
   const [attacking, setAttacking] = useState(false);
+  const [worldVeins, setWorldVeins] = useState([]);
+  const [rival, setRival] = useState(null);
 
   const headers = authHeaders;
 
@@ -376,6 +380,9 @@ export default function RPGPage() {
       setParty(partyRes.data.party);
       setQuests(questRes.data);
       setShop(shopRes.data);
+      // Encounters — fire & forget (non-critical)
+      axios.get(`${API}/encounters/world-veins`, { headers }).then(r => setWorldVeins(r.data.active_veins || [])).catch(() => {});
+      axios.get(`${API}/encounters/rival`, { headers }).then(r => setRival(r.data)).catch(() => {});
     } catch (err) {
       setError(getCosmicErrorMessage(err));
     }
@@ -459,10 +466,12 @@ export default function RPGPage() {
   const attackBoss = async (attackType) => {
     if (!encounter || attacking) return;
     setAttacking(true);
+    latency?.startPulse('boss_attack');
     try {
       const res = await axios.post(`${API}/rpg/bosses/attack`, {
         encounter_id: encounter.encounter_id, attack_type: attackType,
       }, { headers });
+      latency?.endPulse('boss_attack', true);
       setEncounter(prev => ({ ...prev, current_hp: res.data.boss_hp, phase: res.data.phase }));
       let msg = `${res.data.damage} damage (${attackType})!`;
       if (res.data.defeated) {
@@ -472,7 +481,7 @@ export default function RPGPage() {
       }
       toast(msg);
       fetchData();
-    } catch (err) { toast.error(err.response?.data?.detail || 'Failed'); }
+    } catch (err) { latency?.endPulse('boss_attack', false); toast.error(err.response?.data?.detail || 'Failed'); }
     setAttacking(false);
   };
 
@@ -513,14 +522,16 @@ export default function RPGPage() {
   };
 
   const completeQuest = async (questId) => {
+    latency?.startPulse('quest_complete');
     try {
       const res = await axios.post(`${API}/rpg/quests/complete`, { quest_id: questId }, { headers });
+      latency?.endPulse('quest_complete', true);
       let msg = `${res.data.quest} +${res.data.xp_awarded} XP`;
       if (res.data.perfect_day) msg += ` | PERFECT DAY! +${res.data.perfect_day_xp} bonus XP`;
       if (res.data.level_up) msg += ` | LEVEL UP!`;
       toast(msg);
       fetchData();
-    } catch (err) { toast.error(err.response?.data?.detail || 'Already completed'); }
+    } catch (err) { latency?.endPulse('quest_complete', false); toast.error(err.response?.data?.detail || 'Already completed'); }
   };
 
   const doBreathReset = async () => {
@@ -532,13 +543,15 @@ export default function RPGPage() {
   };
 
   const buyShopItem = async (itemId) => {
+    latency?.startPulse('shop_buy');
     try {
       const res = await axios.post(`${API}/rpg/shop/buy`, { item_id: itemId }, { headers });
+      latency?.endPulse('shop_buy', true);
       let msg = `Purchased ${res.data.purchased} for ${res.data.cost} ${res.data.currency === 'gems' ? 'Gems' : 'Dust'}`;
       if (res.data.bonus) msg += ` | ${res.data.bonus}`;
       toast(msg);
       fetchData();
-    } catch (err) { toast.error(err.response?.data?.detail || 'Purchase failed'); }
+    } catch (err) { latency?.endPulse('shop_buy', false); toast.error(err.response?.data?.detail || 'Purchase failed'); }
   };
 
   const convertGems = async () => {
@@ -897,11 +910,14 @@ export default function RPGPage() {
                     </div>
                     <motion.button whileTap={{ scale: 0.95 }}
                       onClick={async () => {
+                        latency?.startPulse('transmute');
                         try {
                           const res = await axios.post(`${API}/marketplace/convert-dust`, { dust_amount: dustTransmuteAmt }, { headers });
+                          latency?.endPulse('transmute', true);
                           toast.success(`Transmuted ${res.data.dust_spent} Dust → ${res.data.credits_earned} Credits`);
                           fetchData();
                         } catch (err) {
+                          latency?.endPulse('transmute', false);
                           toast.error(err.response?.data?.detail || 'Conversion failed');
                         }
                       }}
@@ -1211,10 +1227,155 @@ export default function RPGPage() {
                   </div>
                 </div>
               ) : (
-                /* Boss List */
-                <div className="space-y-3">
-                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Cosmic Threats</p>
-                  {bosses?.map(b => <BossCard key={b.id} boss={b} onJoin={joinBoss} />)}
+                /* Boss List + World Veins + Rival */
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Cosmic Threats</p>
+                    <div className="space-y-2">
+                      {bosses?.map(b => <BossCard key={b.id} boss={b} onJoin={joinBoss} />)}
+                    </div>
+                  </div>
+
+                  {/* World Veins — Collective Bosses */}
+                  {worldVeins.length > 0 && (
+                    <div>
+                      <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#3B82F6' }}>
+                        World Veins — Collective Encounters
+                      </p>
+                      <div className="space-y-2">
+                        {worldVeins.map(vein => {
+                          const pct = Math.min((vein.current_resonance / vein.required_resonance) * 100, 100);
+                          const expired = new Date(vein.expires_at) < new Date();
+                          return (
+                            <motion.div key={vein.id} whileHover={{ scale: 1.01 }}
+                              className="rounded-xl p-3 relative overflow-hidden"
+                              style={{ background: 'rgba(59,130,246,0.03)', border: '1px solid rgba(59,130,246,0.08)' }}
+                              data-testid={`vein-${vein.id}`}>
+                              <motion.div className="absolute inset-0"
+                                animate={{ opacity: [0.02, 0.06, 0.02] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                                style={{ background: `radial-gradient(circle at 50% 50%, rgba(59,130,246,0.1), transparent 70%)` }} />
+                              <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <Globe size={12} style={{ color: '#3B82F6' }} />
+                                    <p className="text-[10px] font-medium" style={{ color: '#3B82F6' }}>{vein.name}</p>
+                                  </div>
+                                  {expired ? (
+                                    <span className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>Expired</span>
+                                  ) : (
+                                    <span className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(34,197,94,0.08)', color: '#22C55E' }}>Active</span>
+                                  )}
+                                </div>
+                                <p className="text-[8px] mb-2" style={{ color: 'var(--text-muted)' }}>{vein.description}</p>
+                                <div className="w-full h-1.5 rounded-full mb-1" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                                  <motion.div animate={{ width: `${pct}%` }}
+                                    className="h-full rounded-full" style={{ background: pct >= 100 ? '#22C55E' : '#3B82F6' }} />
+                                </div>
+                                <div className="flex items-center justify-between text-[7px]" style={{ color: 'var(--text-muted)' }}>
+                                  <span>{vein.contributors || 0} contributors</span>
+                                  <span>{Math.round(pct)}% resonance</span>
+                                </div>
+                                {!expired && pct < 100 && (
+                                  <motion.button whileTap={{ scale: 0.95 }}
+                                    onClick={async () => {
+                                      latency?.startPulse('contribute_vein');
+                                      try {
+                                        const res = await axios.post(`${API}/encounters/contribute-vein`, { vein_id: vein.id }, { headers });
+                                        latency?.endPulse('contribute_vein', true);
+                                        toast.success(`Contributed! +${res.data.resonance_added} resonance. ${res.data.rewards?.xp ? `+${res.data.rewards.xp} XP` : ''}`);
+                                        fetchData();
+                                      } catch (err) {
+                                        latency?.endPulse('contribute_vein', false);
+                                        toast.error(err.response?.data?.detail || 'Failed');
+                                      }
+                                    }}
+                                    className="w-full mt-2 py-1.5 rounded-lg text-[9px] font-medium"
+                                    style={{ background: 'rgba(59,130,246,0.08)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.12)', touchAction: 'manipulation' }}
+                                    data-testid={`contribute-vein-${vein.id}`}>
+                                    Contribute Resonance
+                                  </motion.button>
+                                )}
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* NPC Rival */}
+                  {rival && !rival.expired && (
+                    <div>
+                      <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: rival.color || '#A855F7' }}>
+                        Rival NPC — {rival.archetype?.title || 'Unknown'}
+                      </p>
+                      <div className="rounded-xl p-3 relative overflow-hidden"
+                        style={{ background: `${rival.color || '#A855F7'}04`, border: `1px solid ${rival.color || '#A855F7'}10` }}
+                        data-testid="npc-rival">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                            style={{ background: `${rival.color || '#A855F7'}10` }}>
+                            {rival.archetype?.icon === 'zap' ? <Zap size={18} style={{ color: rival.color }} /> : <Eye size={18} style={{ color: rival.color }} />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-[11px] font-medium" style={{ color: rival.color || '#A855F7', fontFamily: 'Cormorant Garamond, serif' }}>
+                              {rival.archetype?.name || rival.npc_type}
+                            </p>
+                            <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{rival.archetype?.description}</p>
+                          </div>
+                        </div>
+                        {rival.dialogue && (
+                          <p className="text-[9px] italic mb-2 p-2 rounded-lg"
+                            style={{ background: 'rgba(0,0,0,0.2)', color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>
+                            "{rival.dialogue}"
+                          </p>
+                        )}
+                        <div className="flex gap-2">
+                          <motion.button whileTap={{ scale: 0.95 }}
+                            onClick={async () => {
+                              latency?.startPulse('rival_action');
+                              try {
+                                const res = await axios.post(`${API}/encounters/rival-action`, { action: 'compete' }, { headers });
+                                latency?.endPulse('rival_action', true);
+                                if (res.data.success) {
+                                  toast.success(`You beat ${rival.archetype?.name}! +${res.data.rewards?.xp || 0} XP`);
+                                } else {
+                                  toast.error(`${rival.archetype?.name} got the specimen first!`);
+                                }
+                                fetchData();
+                              } catch (err) {
+                                latency?.endPulse('rival_action', false);
+                                toast.error(err.response?.data?.detail || 'Failed');
+                              }
+                            }}
+                            className="flex-1 py-2 rounded-lg text-[9px] font-medium"
+                            style={{ background: `${rival.color}10`, color: rival.color, border: `1px solid ${rival.color}15`, touchAction: 'manipulation' }}
+                            data-testid="rival-compete">
+                            Compete
+                          </motion.button>
+                          <motion.button whileTap={{ scale: 0.95 }}
+                            onClick={async () => {
+                              latency?.startPulse('rival_action');
+                              try {
+                                const res = await axios.post(`${API}/encounters/rival-action`, { action: 'evade' }, { headers });
+                                latency?.endPulse('rival_action', true);
+                                toast(res.data.success ? 'Evaded successfully. Rival moves on.' : 'Failed to evade!');
+                                fetchData();
+                              } catch (err) {
+                                latency?.endPulse('rival_action', false);
+                                toast.error(err.response?.data?.detail || 'Failed');
+                              }
+                            }}
+                            className="flex-1 py-2 rounded-lg text-[9px] font-medium"
+                            style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.06)', touchAction: 'manipulation' }}
+                            data-testid="rival-evade">
+                            Evade
+                          </motion.button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </motion.div>

@@ -12,6 +12,7 @@ import {
   ActivePassBanner, NexusPassShop, CoreStatsHUD,
   triggerHaptic, EL_COLORS, EL_ICONS, RARITY_COLORS
 } from '../components/game/MiningComponents';
+import { useLatency } from '../hooks/useLatencyPulse';
 import {
   ArrowLeft, Pickaxe, Gem, ChevronRight,
   Mountain, Sprout, Lock,
@@ -33,6 +34,7 @@ export default function RockHounding() {
 
   // Universal Game Controller Hook — provides Nexus state, distortions, commitReward
   const controller = useGameController('rock_hounding');
+  const latency = useLatency();
 
   const [mine, setMine] = useState(null);
   const [collection, setCollection] = useState(null);
@@ -67,8 +69,10 @@ export default function RockHounding() {
     triggerHaptic('strike');
     setMantraRipple(true);
     setTimeout(() => setMantraRipple(false), 2000);
+    latency?.startPulse('mine');
     try {
       const res = await axios.post(`${API}/rock-hounding/mine-action`, { depth }, { headers });
+      latency?.endPulse('mine', true);
       const { specimen, rewards, layer } = res.data;
       setLastFind({ specimen, rewards, layer });
 
@@ -84,6 +88,7 @@ export default function RockHounding() {
       }
       fetchMine();
     } catch (err) {
+      latency?.endPulse('mine', false);
       toast.error(err.response?.data?.detail || 'Mining failed');
     }
     setMining(false);

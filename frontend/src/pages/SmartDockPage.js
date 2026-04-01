@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import {
@@ -191,6 +192,7 @@ function StonePickerModal({ stones, onSlot, onClose }) {
 export default function SmartDockPage() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
+  const latency = useLatency();
   const headers = authHeaders;
   const controller = useGameController('smartdock');
 
@@ -216,13 +218,16 @@ export default function SmartDockPage() {
   useEffect(() => { fetchState(); }, [fetchState]);
 
   const handleSlot = async (specimenId) => {
+    latency?.startPulse('slot_stone');
     try {
       const res = await axios.post(`${API}/smartdock/slot`, { specimen_id: specimenId }, { headers });
+      latency?.endPulse('slot_stone', true);
       toast.success(`${res.data.resonance_effect.chakra} resonance activated at ${res.data.resonance_effect.frequency}Hz`);
       setShowPicker(false);
       fetchState();
       controller.refreshState();
     } catch (err) {
+      latency?.endPulse('slot_stone', false);
       toast.error(err.response?.data?.detail || 'Slotting failed');
     }
   };

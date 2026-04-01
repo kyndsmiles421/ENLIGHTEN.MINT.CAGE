@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import {
@@ -198,6 +199,7 @@ function StarSeedPanel({ components }) {
 export default function RefinementLab() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
+  const latency = useLatency();
   const headers = authHeaders;
   const controller = useGameController('refinement');
 
@@ -270,11 +272,14 @@ export default function RefinementLab() {
   };
 
   const handleInstantFinish = async (specimenId) => {
+    latency?.startPulse('instant_finish');
     try {
       const res = await axios.post(`${API}/refinement/instant-finish`, { specimen_id: specimenId }, { headers });
+      latency?.endPulse('instant_finish', true);
       toast.success(`Instant finish! ${res.data.credits_spent} credits spent`);
       fetchAll();
     } catch (err) {
+      latency?.endPulse('instant_finish', false);
       toast.error(err.response?.data?.detail || 'Instant finish failed');
     }
   };

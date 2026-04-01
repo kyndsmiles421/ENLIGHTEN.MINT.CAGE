@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import {
@@ -331,6 +332,7 @@ function ActiveEffectsBanner({ effects }) {
 export default function CosmicStore() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
+  const latency = useLatency();
   const headers = authHeaders;
   const controller = useGameController('marketplace');
 
@@ -353,12 +355,15 @@ export default function CosmicStore() {
 
   const handleBuyItem = async (itemId) => {
     setPurchasing(true);
+    latency?.startPulse('store_buy');
     try {
       const res = await axios.post(`${API}/marketplace/buy-item`, { item_id: itemId }, { headers });
+      latency?.endPulse('store_buy', true);
       toast.success(`Purchased ${res.data.item.name}!`);
       fetchStore();
       controller.refreshState();
     } catch (err) {
+      latency?.endPulse('store_buy', false);
       toast.error(err.response?.data?.detail || 'Purchase failed');
     }
     setPurchasing(false);

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import {
@@ -288,6 +289,7 @@ function DustConverter({ dust, onConvert }) {
 export default function EvolutionLab() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
+  const latency = useLatency();
   const headers = authHeaders;
   const controller = useGameController('evolution');
 
@@ -310,8 +312,10 @@ export default function EvolutionLab() {
 
   const handleInteract = async (assetId, type) => {
     setInteracting(true);
+    latency?.startPulse('evolve');
     try {
       const res = await axios.post(`${API}/evolution/interact`, { asset_id: assetId, type }, { headers });
+      latency?.endPulse('evolve', true);
       if (res.data.evolved) {
         toast.success(`${assetId} evolved to ${res.data.stage.name}!`);
       } else {
@@ -320,18 +324,22 @@ export default function EvolutionLab() {
       fetchData();
       controller.refreshState();
     } catch (err) {
+      latency?.endPulse('evolve', false);
       toast.error(err.response?.data?.detail || 'Interaction failed');
     }
     setInteracting(false);
   };
 
   const handleConvertDust = async (amount) => {
+    latency?.startPulse('convert_dust');
     try {
       const res = await axios.post(`${API}/marketplace/convert-dust`, { dust_amount: amount }, { headers });
+      latency?.endPulse('convert_dust', true);
       toast.success(`Converted ${res.data.dust_spent} Dust → ${res.data.credits_earned} Credits`);
       fetchData();
       controller.refreshState();
     } catch (err) {
+      latency?.endPulse('convert_dust', false);
       toast.error(err.response?.data?.detail || 'Conversion failed');
     }
   };
