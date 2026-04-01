@@ -90,6 +90,7 @@ from routes.rpg import router as rpg_router
 from routes.reports import router as reports_router
 from routes.multiverse_map import router as multiverse_map_router
 from routes.nexus import router as nexus_router
+from routes.dream_realms import router as dream_realms_router
 
 app = FastAPI()
 
@@ -147,6 +148,7 @@ all_routers = [
     reports_router,
     multiverse_map_router,
     nexus_router,
+    dream_realms_router,
 ]
 
 for r in all_routers:

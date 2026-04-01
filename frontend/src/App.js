@@ -131,6 +131,7 @@ const RPGPage = lazy(() => import('./pages/RPGPage'));
 const CosmicInsights = lazy(() => import('./pages/CosmicInsights'));
 const MultiverseMap = lazy(() => import('./pages/MultiverseMap'));
 const ElementalNexus = lazy(() => import('./pages/ElementalNexus'));
+const DreamRealms = lazy(() => import('./pages/DreamRealms'));
 
 function PageLoader() {
   return (
@@ -258,6 +259,7 @@ function AnimatedRoutes() {
         <Route path="/cosmic-insights" element={<CosmicInsights />} />
         <Route path="/multiverse-map" element={<MultiverseMap />} />
         <Route path="/nexus" element={<ElementalNexus />} />
+        <Route path="/dream-realms" element={<DreamRealms />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
