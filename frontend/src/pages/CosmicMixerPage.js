@@ -572,13 +572,18 @@ export default function CosmicMixerPage() {
     setSoundscapeSaving(true);
     try {
       const snapshot = getSnapshot();
-      await axios.post(`${API}/mixer-presets/sessions`, {
+      const res = await axios.post(`${API}/mixer-presets/sessions`, {
         name: soundscapeName || `Soundscape ${new Date().toLocaleTimeString()}`,
         snapshot,
         is_public: isPublic,
       }, { headers: authHeaders });
       setSoundscapeName('');
       toast('Soundscape Saved', { description: isPublic ? 'Shared with the community' : 'Saved to your collection' });
+      if (res.data?.generated_asset) {
+        setTimeout(() => {
+          toast.success(`New asset generated: ${res.data.generated_asset.name}`, { description: 'Listed in the Trade Circle marketplace' });
+        }, 1500);
+      }
       fetchSoundscapes();
     } catch {}
     setSoundscapeSaving(false);

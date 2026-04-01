@@ -8,6 +8,8 @@ import { useSensory } from '../context/SensoryContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MantraBanner } from '../components/MantraSystem';
+import CosmicPrescription from '../components/CosmicPrescription';
+import { FoundingArchitectBadge } from '../components/FoundingArchitect';
 import { toast } from 'sonner';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
@@ -343,6 +345,7 @@ export default function Dashboard() {
                 Welcome back, <span className="animate-text-shimmer">{user?.name?.split(' ')[0]}</span>
               </h1>
               <MantraBanner className="mt-1" />
+              <FoundingArchitectBadge authHeaders={authHeaders} compact />
             </div>
             <div className="flex items-center gap-1.5">
               <button onClick={() => editMode ? finishEditing() : setEditMode(true)}
@@ -374,6 +377,11 @@ export default function Dashboard() {
         {/* Trial Banner */}
         <div className="mb-4">
           <TrialBanner />
+        </div>
+
+        {/* Cosmic Prescription */}
+        <div className="mb-4">
+          <CosmicPrescription authHeaders={authHeaders} />
         </div>
 
         {/* Edit Mode Banner */}

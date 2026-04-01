@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import FoundingArchitectPanel from '../components/FoundingArchitect';
 
 function Section({ title, children }) {
   const { prefs } = useSensory();
@@ -88,6 +90,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const { ambientOn, toggleAmbient, prefs, updatePref, themes } = useSensory();
   const { language, setLanguage, t } = useLanguage();
+  const { authHeaders } = useAuth();
   const isLight = prefs.theme === 'light';
   const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
 
@@ -350,6 +353,13 @@ export default function Settings() {
               <ChevronRight size={12} style={{ color: 'var(--text-muted)' }} />
             </button>
           ))}
+        </Section>
+
+        {/* Founding Architect */}
+        <Section title="Founding Architect">
+          <div className="px-4 py-3">
+            <FoundingArchitectPanel authHeaders={authHeaders} />
+          </div>
         </Section>
 
         {/* Reset */}

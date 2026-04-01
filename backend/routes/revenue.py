@@ -424,3 +424,147 @@ async def my_generated_content(user=Depends(get_current_user)):
         "total_created": len(created),
         "total_purchased": len(purchased_assets),
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  PREDICTIVE WELLNESS — Time & Activity-Based Recommendations
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+from routes.content_factory import TIME_PRESETS, get_time_of_day, _ai_mantra
+
+
+@router.get("/wellness/prescription")
+async def cosmic_prescription(user=Depends(get_current_user)):
+    """Generate a personalized wellness prescription based on time of day and recent activity."""
+    user_id = user["id"]
+    tod = get_time_of_day()
+    preset = TIME_PRESETS[tod]
+
+    # Check recent activity for context
+    recent_quests = await db.rpg_quest_log.find(
+        {"user_id": user_id}, {"_id": 0, "quest_id": 1}
+    ).sort("completed_at", -1).limit(3).to_list(3)
+
+    recent_mixes = await db.custom_soundscapes.find(
+        {"user_id": user_id}, {"_id": 0, "name": 1}
+    ).sort("created_at", -1).limit(2).to_list(2)
+
+    # Build context for AI mantra
+    context_parts = [f"It is {tod}"]
+    if recent_quests:
+        context_parts.append(f"recently completed quests: {', '.join(q['quest_id'] for q in recent_quests)}")
+    if recent_mixes:
+        context_parts.append(f"recent mixes: {', '.join(m.get('name', 'mix') for m in recent_mixes)}")
+
+    mantra = await _ai_mantra(f"{preset['mantra_hint']} — {'. '.join(context_parts)}")
+
+    return {
+        "time_of_day": tod,
+        "recommended_frequency": preset["hz"],
+        "recommended_binaural": preset["binaural"],
+        "mood": preset["mood"],
+        "mantra": mantra,
+        "context": {
+            "recent_quests": len(recent_quests),
+            "recent_mixes": len(recent_mixes),
+        },
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  FOUNDING ARCHITECT — Tester Badge & Lifetime Elite
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/founding-architect/status")
+async def founding_architect_status(user=Depends(get_current_user)):
+    """Check if user has Founding Architect status."""
+    u = await db.users.find_one({"id": user["id"]}, {"_id": 0, "founding_architect": 1})
+    fa = u.get("founding_architect", {}) if u else {}
+    return {
+        "is_founding_architect": fa.get("active", False),
+        "granted_at": fa.get("granted_at"),
+        "badge": "founding_architect" if fa.get("active") else None,
+        "perks": {
+            "lifetime_elite_discount": 30,
+            "badge_visible": True,
+            "exclusive_title": "Founding Architect",
+        } if fa.get("active") else None,
+    }
+
+
+@router.post("/founding-architect/grant")
+async def grant_founding_architect(data: dict = Body(...), user=Depends(get_current_user)):
+    """Grant Founding Architect status to a user. Admin-only (checks user role)."""
+    target_email = data.get("email", "")
+    invite_code = data.get("code", "")
+
+    # Allow self-activation with a valid invite code
+    VALID_CODES = ["COSMIC-FOUNDER-2026", "RAPID-CITY-ARCHITECT", "STARSEED-TESTER"]
+
+    if invite_code not in VALID_CODES:
+        # Check if the granter is an admin
+        granter = await db.users.find_one({"id": user["id"]}, {"_id": 0, "role": 1})
+        if not granter or granter.get("role") not in ("admin", "creator"):
+            raise HTTPException(status_code=403, detail="Invalid invite code or insufficient permissions")
+
+    # Find target user
+    if target_email:
+        target = await db.users.find_one({"email": target_email}, {"_id": 0, "id": 1})
+        if not target:
+            raise HTTPException(status_code=404, detail="User not found")
+        target_id = target["id"]
+    else:
+        target_id = user["id"]
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.users.update_one({"id": target_id}, {"$set": {
+        "founding_architect": {
+            "active": True,
+            "granted_at": now,
+            "granted_by": user["id"],
+            "invite_code": invite_code,
+        },
+        "credits.tier": "premium",  # Lifetime Elite (maps to 30% discount)
+    }})
+
+    return {
+        "granted": True,
+        "target_id": target_id,
+        "badge": "founding_architect",
+        "tier_upgrade": "Elite (Lifetime)",
+        "discount": "30% on all assets and boosts",
+    }
+
+
+@router.post("/founding-architect/redeem")
+async def redeem_founding_code(data: dict = Body(...), user=Depends(get_current_user)):
+    """Redeem a Founding Architect invite code."""
+    code = data.get("code", "").strip()
+    VALID_CODES = ["COSMIC-FOUNDER-2026", "RAPID-CITY-ARCHITECT", "STARSEED-TESTER"]
+
+    if code not in VALID_CODES:
+        raise HTTPException(status_code=400, detail="Invalid invite code")
+
+    # Check if already a founder
+    u = await db.users.find_one({"id": user["id"]}, {"_id": 0, "founding_architect": 1})
+    if u and u.get("founding_architect", {}).get("active"):
+        raise HTTPException(status_code=400, detail="Already a Founding Architect")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.users.update_one({"id": user["id"]}, {"$set": {
+        "founding_architect": {
+            "active": True,
+            "granted_at": now,
+            "granted_by": "self",
+            "invite_code": code,
+        },
+        "credits.tier": "premium",
+    }})
+
+    return {
+        "redeemed": True,
+        "badge": "founding_architect",
+        "tier": "Elite (Lifetime)",
+        "discount": 30,
+        "message": "Welcome, Founding Architect. Your legacy begins now.",
+    }

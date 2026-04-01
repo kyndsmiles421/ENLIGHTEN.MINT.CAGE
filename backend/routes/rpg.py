@@ -1108,6 +1108,17 @@ async def complete_quest(data: dict = Body(...), user=Depends(get_current_user))
     result = await award_quest_xp(user["id"], quest_id)
     if not result:
         raise HTTPException(400, "Already completed today")
+
+    # Auto-generate Victory Mantra content asset
+    try:
+        from routes.content_factory import auto_generate_victory_mantra
+        quest_name = next((q["name"] for q in DAILY_QUESTS if q["id"] == quest_id), quest_id)
+        asset = await auto_generate_victory_mantra(user["id"], quest_name)
+        if asset:
+            result["generated_asset"] = {"id": asset["id"], "name": asset["name"], "type": "victory_mantra"}
+    except Exception as e:
+        logger.error(f"Quest auto-gen hook error: {e}")
+
     return result
 
 

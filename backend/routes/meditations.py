@@ -316,6 +316,17 @@ async def save_soundscape_mix(data: dict, user=Depends(get_current_user)):
             doc["quest_xp"] = quest_result
     except Exception:
         pass
+
+    # Auto-generate Recovery Frequency content asset
+    try:
+        from routes.content_factory import auto_generate_recovery_frequency
+        asset = await auto_generate_recovery_frequency(user["id"], doc.get("name", "Cosmic Mix"), active)
+        if asset:
+            doc["generated_asset"] = {"id": asset["id"], "name": asset["name"], "type": "recovery_frequency"}
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Mixer auto-gen hook error: {e}")
+
     return doc
 
 @router.get("/soundscapes/my-mixes")

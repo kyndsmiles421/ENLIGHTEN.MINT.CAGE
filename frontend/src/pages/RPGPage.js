@@ -530,6 +530,11 @@ export default function RPGPage() {
       if (res.data.perfect_day) msg += ` | PERFECT DAY! +${res.data.perfect_day_xp} bonus XP`;
       if (res.data.level_up) msg += ` | LEVEL UP!`;
       toast(msg);
+      if (res.data.generated_asset) {
+        setTimeout(() => {
+          toast.success(`Victory Mantra generated: "${res.data.generated_asset.name}"`, { description: 'Listed in the Trade Circle' });
+        }, 1500);
+      }
       fetchData();
     } catch (err) { latency?.endPulse('quest_complete', false); toast.error(err.response?.data?.detail || 'Already completed'); }
   };
