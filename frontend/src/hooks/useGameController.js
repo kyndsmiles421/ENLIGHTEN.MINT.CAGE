@@ -4,20 +4,6 @@ import { useAuth } from '../context/AuthContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Distortion rules — mapped from Nexus harmony score
-// These match the 5-Rule Visual Distortion System from Dream Realms
-function computeDistortions(harmonyScore) {
-  const h = harmonyScore ?? 50;
-  return {
-    blur: Math.max(0, (100 - h) / 25),           // 0-4px blur, worst at 0 harmony
-    tintOpacity: Math.max(0, (100 - h) / 200),    // 0-0.5 tint overlay
-    glitchIntensity: h < 30 ? (30 - h) / 30 : 0,  // only below 30 harmony
-    grainOpacity: Math.max(0.01, (100 - h) / 500), // subtle grain
-    pulseSpeed: 3 + (100 - h) / 20,                // faster pulse at low harmony
-    saturation: 0.7 + (h / 200),                    // 0.7-1.2 saturation
-  };
-}
-
 // Build CSS variable overrides from Nexus element state
 function buildElementCSS(nexusData) {
   if (!nexusData?.elements) return {};
@@ -45,7 +31,7 @@ export default function useGameController(moduleId) {
   // Fetch both Nexus state and Game Core stats
   const fetchState = useCallback(async (force = false) => {
     const now = Date.now();
-    if (!force && now - lastFetchRef.current < 5000) return; // debounce 5s
+    if (!force && now - lastFetchRef.current < 5000) return;
     lastFetchRef.current = now;
 
     try {
@@ -64,16 +50,10 @@ export default function useGameController(moduleId) {
 
   useEffect(() => { fetchState(true); }, [fetchState]);
 
-  // Computed distortions from harmony score
-  const distortions = useMemo(
-    () => computeDistortions(nexusState?.harmony_score),
-    [nexusState?.harmony_score]
-  );
-
   // CSS variables for element-aware theming
   const elementCSS = useMemo(() => buildElementCSS(nexusState), [nexusState]);
 
-  // Dominant element (for biome selection)
+  // Dominant element (highest percentage)
   const dominantElement = useMemo(() => {
     if (!nexusState?.elements) return 'earth';
     let max = 0, dom = 'earth';
@@ -84,7 +64,18 @@ export default function useGameController(moduleId) {
     return dom;
   }, [nexusState]);
 
-  // Deficient element (what needs feeding)
+  // Dominant element percentage
+  const dominantPercentage = useMemo(() => {
+    if (!nexusState?.elements) return 20;
+    let max = 0;
+    for (const [, el] of Object.entries(nexusState.elements)) {
+      const pct = el.percentage ?? 20;
+      if (pct > max) max = pct;
+    }
+    return max;
+  }, [nexusState]);
+
+  // Deficient element (lowest percentage)
   const deficientElement = useMemo(() => {
     if (!nexusState?.elements) return null;
     let min = 100, def = null;
@@ -97,26 +88,15 @@ export default function useGameController(moduleId) {
 
   // The Soul-to-Game Bridge: commit a game reward to the Core
   const commitReward = useCallback(async (rewardData) => {
-    try {
-      const res = await axios.post(`${API}/game-core/commit-reward`, {
-        module_id: moduleId,
-        ...rewardData,
-      }, { headers });
-
-      // Refresh state after reward commit
-      await fetchState(true);
-      return res.data;
-    } catch (err) {
-      throw err;
-    }
+    const res = await axios.post(`${API}/game-core/commit-reward`, {
+      module_id: moduleId,
+      ...rewardData,
+    }, { headers });
+    await fetchState(true);
+    return res.data;
   }, [headers, moduleId, fetchState]);
 
-  // Container style that applies harmony-driven distortions
-  const containerStyle = useMemo(() => ({
-    ...elementCSS,
-    filter: distortions.blur > 0.5 ? `blur(${distortions.blur * 0.3}px) saturate(${distortions.saturation})` : `saturate(${distortions.saturation})`,
-    transition: 'filter 2s ease',
-  }), [elementCSS, distortions]);
+  const EL_COLORS = { wood: '#22C55E', fire: '#EF4444', earth: '#F59E0B', metal: '#94A3B8', water: '#3B82F6' };
 
   return {
     // State
@@ -124,14 +104,17 @@ export default function useGameController(moduleId) {
     coreStats,
     loading,
     error,
-    // Computed
-    distortions,
-    elementCSS,
+    // Computed from Nexus
     dominantElement,
+    dominantPercentage,
     deficientElement,
     harmonyScore: nexusState?.harmony_score ?? 50,
-    // Style
-    containerStyle,
+    harmonyCycle: nexusState?.harmony_cycle || 'neutral',
+    decayActivity: nexusState?.decay_activity || null,
+    elements: nexusState?.elements || {},
+    elementCSS,
+    // Element color helper
+    getElementColor: (el) => EL_COLORS[el] || '#A855F7',
     // Actions
     commitReward,
     refreshState: () => fetchState(true),

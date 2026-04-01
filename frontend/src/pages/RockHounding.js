@@ -241,6 +241,7 @@ export default function RockHounding() {
   const [mining, setMining] = useState(false);
   const [lastFind, setLastFind] = useState(null);
   const [tab, setTab] = useState('mine');
+  const [mantraRipple, setMantraRipple] = useState(false);
 
   const fetchMine = useCallback(async () => {
     try {
@@ -264,6 +265,8 @@ export default function RockHounding() {
   const doMine = async (depth) => {
     setMining(true);
     triggerHaptic('strike');
+    setMantraRipple(true);
+    setTimeout(() => setMantraRipple(false), 2000);
     try {
       const res = await axios.post(`${API}/rock-hounding/mine-action`, { depth }, { headers });
       const { specimen, rewards } = res.data;
@@ -297,8 +300,8 @@ export default function RockHounding() {
   };
 
   if (loading || controller.loading) return (
-    <GameModuleWrapper distortions={{ blur: 0, grainOpacity: 0, glitchIntensity: 0, saturation: 1 }}
-      dominantElement="earth" harmonyScore={50} moduleName="rock_hounding">
+    <GameModuleWrapper harmonyScore={50} dominantElement="earth" dominantPercentage={20}
+      moduleName="rock_hounding" showEntropyIndicator={false}>
       <div className="min-h-screen flex items-center justify-center">
         <CosmicInlineLoader message="Opening the mine..." />
       </div>
@@ -306,8 +309,8 @@ export default function RockHounding() {
   );
 
   if (error) return (
-    <GameModuleWrapper distortions={{ blur: 0, grainOpacity: 0, glitchIntensity: 0, saturation: 1 }}
-      dominantElement="earth" harmonyScore={50} moduleName="rock_hounding">
+    <GameModuleWrapper harmonyScore={50} dominantElement="earth" dominantPercentage={20}
+      moduleName="rock_hounding" showEntropyIndicator={false}>
       <div className="min-h-screen flex items-center justify-center">
         <CosmicError title={error.title} message={error.message} onRetry={fetchMine} />
       </div>
@@ -323,9 +326,13 @@ export default function RockHounding() {
 
   return (
     <GameModuleWrapper
-      distortions={controller.distortions}
-      dominantElement={controller.dominantElement}
       harmonyScore={controller.harmonyScore}
+      dominantElement={controller.dominantElement}
+      dominantPercentage={controller.dominantPercentage}
+      harmonyCycle={controller.harmonyCycle}
+      decayActivity={controller.decayActivity}
+      mantraActive={mantraRipple}
+      mantraColor={biomeColor}
       moduleName="rock_hounding">
 
       <div className="pb-24" data-testid="rock-hounding-page">
@@ -391,7 +398,7 @@ export default function RockHounding() {
                 {/* Ambient pulse from harmony */}
                 <motion.div className="absolute inset-0"
                   animate={{ opacity: [0.02, 0.05, 0.02] }}
-                  transition={{ duration: controller.distortions.pulseSpeed || 4, repeat: Infinity }}
+                  transition={{ duration: 4, repeat: Infinity }}
                   style={{ background: `radial-gradient(circle at 30% 30%, ${biomeColor}15, transparent 60%)` }} />
                 <div className="relative z-10">
                   <div className="flex items-center gap-2.5 mb-2">

@@ -781,6 +781,12 @@ function NexusIntentSection({ intent, navigate, playFrequency }) {
               data-testid="enter-rock-hounding">
               Mine
             </button>
+            <button onClick={() => navigate('/forgotten-languages')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(59,130,246,0.06)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.1)' }}
+              data-testid="enter-forgotten-languages">
+              Decode
+            </button>
             <button onClick={() => navigate('/dream-realms')}
               className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
               style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}

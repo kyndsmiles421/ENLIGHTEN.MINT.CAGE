@@ -93,6 +93,7 @@ from routes.nexus import router as nexus_router
 from routes.dream_realms import router as dream_realms_router
 from routes.game_core import router as game_core_router
 from routes.rock_hounding import router as rock_hounding_router
+from routes.forgotten_languages import router as forgotten_languages_router
 
 app = FastAPI()
 
@@ -153,6 +154,7 @@ all_routers = [
     dream_realms_router,
     game_core_router,
     rock_hounding_router,
+    forgotten_languages_router,
 ]
 
 for r in all_routers:

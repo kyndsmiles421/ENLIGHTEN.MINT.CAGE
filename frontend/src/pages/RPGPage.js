@@ -5,7 +5,7 @@ import {
   ArrowLeft, Sword, Shield, Map, Users, Package, Star, Sparkles,
   ChevronRight, Plus, Minus, Zap, Heart, Eye, Music, Brain,
   Lock, Gift, Compass, Globe, X, Crown, Wind, PenLine, CheckCircle2,
-  Flame, Target, ShoppingBag, Gem, ArrowRightLeft, Unlock
+  Flame, Target, ShoppingBag, Gem, ArrowRightLeft, Unlock, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
@@ -588,7 +588,13 @@ export default function RPGPage() {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
           style={{ background: 'rgba(245,158,11,0.06)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.1)' }}
           data-testid="rpg-rock-hounding-link">
-          <Compass size={10} /> Rock Hounding
+          <Compass size={10} /> Mine
+        </button>
+        <button onClick={() => navigate('/forgotten-languages')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
+          style={{ background: 'rgba(59,130,246,0.06)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.1)' }}
+          data-testid="rpg-forgotten-languages-link">
+          <BookOpen size={10} /> Decode
         </button>
         <button onClick={() => navigate('/nexus')}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"

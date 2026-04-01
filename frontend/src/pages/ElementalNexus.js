@@ -9,7 +9,7 @@ import {
   ArrowLeft, Sprout, Flame, Mountain, Gem, Droplets,
   AlertTriangle, CheckCircle2, ChevronRight, Zap, Heart,
   Brain, Wind, Music, Star, Target, Activity, TrendingUp,
-  TrendingDown, Minus, Play, Calendar, Waves, Settings2
+  TrendingDown, Minus, Play, Calendar, Waves, Settings2, Eye
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -669,7 +669,7 @@ export default function ElementalNexus() {
             <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Feed elements through play</p>
           </div>
           <button onClick={() => navigate('/rock-hounding')}
-            className="w-full rounded-lg p-2.5 flex items-center gap-2.5 text-left group"
+            className="w-full rounded-lg p-2.5 flex items-center gap-2.5 text-left group mb-2"
             style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.06)' }}
             data-testid="nexus-rock-hounding-link">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -679,6 +679,20 @@ export default function ElementalNexus() {
             <div className="flex-1">
               <p className="text-[10px] font-semibold" style={{ color: '#F59E0B' }}>Rock Hounding</p>
               <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Mine specimens tied to your elemental balance</p>
+            </div>
+            <ChevronRight size={12} style={{ color: 'var(--text-muted)' }} />
+          </button>
+          <button onClick={() => navigate('/forgotten-languages')}
+            className="w-full rounded-lg p-2.5 flex items-center gap-2.5 text-left group"
+            style={{ background: 'rgba(168,85,247,0.04)', border: '1px solid rgba(168,85,247,0.06)' }}
+            data-testid="nexus-forgotten-languages-link">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: 'rgba(168,85,247,0.08)' }}>
+              <Eye size={14} style={{ color: '#A855F7' }} />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold" style={{ color: '#A855F7' }}>Forgotten Languages</p>
+              <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Decode ancient scripts to feed your resonance</p>
             </div>
             <ChevronRight size={12} style={{ color: 'var(--text-muted)' }} />
           </button>

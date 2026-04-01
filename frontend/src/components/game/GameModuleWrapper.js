@@ -1,13 +1,135 @@
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  UNIVERSAL GAME MODULE WRAPPER
+//  Provides the full 5-Rule Distortion Compositor
+//  as a visual overlay for ANY game module.
+//
+//  Layer Stack (bottom → top):
+//    1. Game content (children)
+//    2. HarmonyGlow (element-colored ambient)
+//    3. EntropyLayer (blur/flicker from low harmony)
+//    4. ElementalTintLayer (element-colored radial tint)
+//    5. DecayDistortionLayer (scan lines from staleness)
+//    6. FractureLayer (crack lines on destructive cycle)
+//    7. MantraRipple (expanding rings on active resonance)
+//    8. GrainOverlay (subtle noise)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const EL_COLORS = { wood: '#22C55E', fire: '#EF4444', earth: '#F59E0B', metal: '#94A3B8', water: '#3B82F6' };
 
-// Ambient grain overlay for low-harmony visual distortion
+// Rule 1: Entropy — Blur & Flicker based on harmony score
+function EntropyLayer({ harmony }) {
+  const blur = harmony >= 80 ? 0 : harmony >= 50 ? 0.5 : harmony >= 30 ? 1.5 : 3;
+  const flickerOpacity = harmony < 40 ? 0.06 : 0;
+  return (
+    <>
+      {blur > 0 && <div className="absolute inset-0 pointer-events-none z-[1]"
+        style={{ backdropFilter: `blur(${blur}px) saturate(${harmony >= 50 ? 1 : 0.7})` }} />}
+      {flickerOpacity > 0 && (
+        <motion.div className="absolute inset-0 pointer-events-none z-[2]"
+          animate={{ opacity: [0, flickerOpacity, 0, flickerOpacity * 0.5, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'steps(5)' }}
+          style={{ background: 'rgba(255,255,255,0.03)' }} />
+      )}
+    </>
+  );
+}
+
+// Rule 2: Elemental Tinting — dominant element colors the atmosphere
+function ElementalTintLayer({ dominantElement, dominantPercentage }) {
+  const intensity = Math.min(0.12, (dominantPercentage - 20) * 0.004);
+  if (intensity <= 0) return null;
+  const tints = {
+    wood: { grad: `rgba(34,197,94,${intensity})`, anim: { x: [0, 3, -3, 0], y: [0, 2, -1, 0] }, dur: 6 },
+    fire: { grad: `rgba(239,68,68,${intensity})`, anim: { scale: [1, 1.02, 1] }, dur: 3 },
+    water: { grad: `rgba(59,130,246,${intensity})`, anim: { y: [0, -2, 2, 0] }, dur: 8 },
+    earth: { grad: `rgba(245,158,11,${intensity})`, anim: { y: [0, 1, 0] }, dur: 10 },
+    metal: { grad: `rgba(148,163,184,${intensity})`, anim: { x: [0, 5, 0] }, dur: 5 },
+  };
+  const t = tints[dominantElement] || tints.water;
+  return (
+    <motion.div className="absolute inset-0 pointer-events-none z-[3]"
+      animate={t.anim} transition={{ duration: t.dur, repeat: Infinity, ease: 'easeInOut' }}
+      style={{ background: `radial-gradient(ellipse at 50% 50%, ${t.grad}, transparent 70%)` }} />
+  );
+}
+
+// Rule 3: Decay Distortion — scan lines & corruption from stale practices
+function DecayDistortionLayer({ avgFreshness }) {
+  const intensity = Math.max(0, (100 - avgFreshness) / 100);
+  if (intensity < 0.3) return null;
+  const count = Math.min(6, Math.round(intensity * 8));
+  return (
+    <div className="absolute inset-0 pointer-events-none z-[4] overflow-hidden">
+      {intensity > 0.5 && (
+        <motion.div className="absolute inset-0"
+          style={{ background: `repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,${intensity * 0.015}) 3px, rgba(255,255,255,${intensity * 0.015}) 4px)` }}
+          animate={{ y: [0, -4, 0] }} transition={{ duration: 0.3, repeat: Infinity }} />
+      )}
+      {[...Array(count)].map((_, i) => (
+        <motion.div key={i} className="absolute"
+          style={{ width: `${12 + i * 5}px`, height: '2px', background: `rgba(255,255,255,${intensity * 0.08})`, top: `${10 + i * 14}%`, left: `${5 + i * 12}%` }}
+          animate={{ x: [0, (i % 2 === 0 ? 6 : -6) * intensity, 0], opacity: [0, intensity * 0.15, 0] }}
+          transition={{ duration: 0.15 + Math.random() * 0.3, repeat: Infinity, repeatDelay: 2 + Math.random() * 4 }} />
+      ))}
+    </div>
+  );
+}
+
+// Rule 4: Fracture — red crack lines during destructive harmony cycle
+function FractureLayer({ cycle, harmony }) {
+  if (cycle !== 'destructive' && harmony >= 50) return null;
+  const count = cycle === 'destructive' ? 5 : 2;
+  return (
+    <div className="absolute inset-0 pointer-events-none z-[5] overflow-hidden">
+      {[...Array(count)].map((_, i) => (
+        <motion.div key={i} className="absolute"
+          style={{
+            width: `${40 + i * 20}px`, height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(239,68,68,0.06), transparent)',
+            top: `${20 + i * 12}%`, left: `${10 + i * 15}%`, transform: `rotate(${15 + i * 30}deg)`,
+          }}
+          animate={{ opacity: [0, 0.06, 0], scaleX: [0.5, 1, 0.5] }}
+          transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.4 }} />
+      ))}
+      {cycle === 'destructive' && (
+        <>
+          <motion.div className="absolute top-2 left-2 w-6 h-6"
+            style={{ borderTop: '1px solid rgba(239,68,68,0.08)', borderLeft: '1px solid rgba(239,68,68,0.08)' }}
+            animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+          <motion.div className="absolute bottom-2 right-2 w-6 h-6"
+            style={{ borderBottom: '1px solid rgba(239,68,68,0.08)', borderRight: '1px solid rgba(239,68,68,0.08)' }}
+            animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
+        </>
+      )}
+    </div>
+  );
+}
+
+// Rule 5: Mantra Ripple — expanding rings on active resonance (e.g. mining action)
+function MantraRipple({ active, color }) {
+  if (!active) return null;
+  return (
+    <motion.div className="absolute inset-0 pointer-events-none z-[10] flex items-center justify-center"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      {[0, 1, 2].map(i => (
+        <motion.div key={i} className="absolute rounded-full"
+          initial={{ width: 10, height: 10, opacity: 0.5 }}
+          animate={{ width: [10, 400], height: [10, 400], opacity: [0.4, 0] }}
+          transition={{ duration: 2, delay: i * 0.4, ease: 'easeOut' }}
+          style={{ border: `2px solid ${color || '#A855F7'}30`, boxShadow: `0 0 20px ${color || '#A855F7'}15` }} />
+      ))}
+    </motion.div>
+  );
+}
+
+// Ambient grain overlay
 function GrainOverlay({ opacity }) {
   if (opacity < 0.005) return null;
   return (
-    <div className="fixed inset-0 pointer-events-none z-50"
+    <div className="absolute inset-0 pointer-events-none z-[6]"
       style={{
         opacity,
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`,
@@ -18,12 +140,12 @@ function GrainOverlay({ opacity }) {
   );
 }
 
-// Harmony-based ambient glow
+// Harmony-based ambient glow (bottom layer)
 function HarmonyGlow({ element, intensity }) {
   const color = EL_COLORS[element] || '#A855F7';
   return (
     <motion.div
-      className="fixed inset-0 pointer-events-none z-0"
+      className="absolute inset-0 pointer-events-none z-0"
       animate={{ opacity: [intensity * 0.03, intensity * 0.08, intensity * 0.03] }}
       transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       style={{
@@ -33,44 +155,72 @@ function HarmonyGlow({ element, intensity }) {
   );
 }
 
-// Glitch stripe effect for very low harmony
-function GlitchStripes({ intensity }) {
-  if (intensity < 0.1) return null;
+// Entropy status label for HUD overlay
+function EntropyIndicator({ harmony }) {
+  const label = harmony >= 80 ? 'Clear' : harmony >= 50 ? 'Shifting' : harmony >= 30 ? 'Blurred' : 'De-Rezzed';
+  const color = harmony >= 80 ? '#22C55E' : harmony >= 50 ? '#F59E0B' : '#EF4444';
   return (
-    <motion.div
-      className="fixed inset-0 pointer-events-none z-50"
-      animate={{ opacity: [0, intensity * 0.15, 0] }}
-      transition={{ duration: 0.1, repeat: Infinity, repeatDelay: 3 + Math.random() * 5 }}
-      style={{
-        background: `repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,0,0,0.03) 4px, rgba(255,0,0,0.03) 5px)`,
-      }}
-    />
+    <div className="absolute top-2 right-2 z-[20] px-2 py-0.5 rounded-lg text-[7px] font-bold uppercase tracking-wider"
+      style={{ background: `${color}10`, color, border: `1px solid ${color}15` }}
+      data-testid="entropy-indicator">
+      Entropy: {label}
+    </div>
   );
 }
 
-export default function GameModuleWrapper({ children, distortions, dominantElement, harmonyScore, moduleName }) {
-  const elementColor = EL_COLORS[dominantElement] || '#F59E0B';
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  MAIN WRAPPER — Composites all 5 rules
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  const wrapperStyle = useMemo(() => ({
-    minHeight: '100vh',
-    background: 'var(--bg-primary)',
-    position: 'relative',
-    overflow: 'hidden',
-  }), []);
+export default function GameModuleWrapper({
+  children,
+  harmonyScore = 50,
+  dominantElement = 'earth',
+  dominantPercentage = 20,
+  harmonyCycle = 'neutral',
+  decayActivity = null,
+  mantraActive = false,
+  mantraColor = '#A855F7',
+  moduleName = 'unknown',
+  showEntropyIndicator = true,
+}) {
+  // Compute avg freshness from decay activity
+  const avgFreshness = useMemo(() => {
+    if (!decayActivity) return 100;
+    const vals = Object.values(decayActivity);
+    return vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 100;
+  }, [decayActivity]);
+
+  const grainOpacity = useMemo(() => Math.max(0.01, (100 - harmonyScore) / 500), [harmonyScore]);
 
   return (
-    <div style={wrapperStyle} data-testid={`game-module-${moduleName || 'unknown'}`}>
+    <div className="relative min-h-screen overflow-hidden"
+      style={{ background: 'var(--bg-primary)' }}
+      data-testid={`game-module-${moduleName}`}>
+
+      {/* Layer 0: Harmony Glow */}
       <HarmonyGlow element={dominantElement} intensity={harmonyScore / 100} />
-      <GrainOverlay opacity={distortions?.grainOpacity || 0} />
-      <GlitchStripes intensity={distortions?.glitchIntensity || 0} />
-      <div className="relative z-10" style={{
-        filter: distortions?.blur > 0.5
-          ? `blur(${distortions.blur * 0.2}px) saturate(${distortions.saturation})`
-          : undefined,
-        transition: 'filter 2s ease',
-      }}>
+
+      {/* Layer 1: Game Content */}
+      <div className="relative z-10">
         {children}
       </div>
+
+      {/* Layer 2-5: Distortion Compositor overlay */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-[30]"
+        data-testid="distortion-compositor">
+        <EntropyLayer harmony={harmonyScore} />
+        <ElementalTintLayer dominantElement={dominantElement} dominantPercentage={dominantPercentage} />
+        <DecayDistortionLayer avgFreshness={avgFreshness} />
+        <FractureLayer cycle={harmonyCycle} harmony={harmonyScore} />
+        <AnimatePresence>
+          {mantraActive && <MantraRipple active={mantraActive} color={mantraColor} />}
+        </AnimatePresence>
+        <GrainOverlay opacity={grainOpacity} />
+      </div>
+
+      {/* HUD Layer: Entropy status */}
+      {showEntropyIndicator && <EntropyIndicator harmony={harmonyScore} />}
     </div>
   );
 }
