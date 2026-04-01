@@ -10,7 +10,21 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Resonance Practice, Mantra of the Day & Rapid City Hotspots (Apr 1, 2026) — LATEST
+### Activity Loop & Streak Heatmap (Feb 2026) — LATEST
+
+**Activity Loop (Infinite Engagement):**
+- GET /api/activity-loop/progress — Unified view of 7 systems
+- GET /api/activity-loop/heatmap?days=91 — 91-day calendar
+- Connects: Resonance→Dust, GPS→Gems, Gems→Polish, Polish→Gates, Trades→Gates, All→Consciousness, Travel→Gates
+
+**Streak Heatmap Dashboard Widget:**
+- 91-day GitHub-style heatmap, element-color-coded, hover tooltips
+- Quick stats grid, Engagement Loops mini-panel, streak badge
+- CTA linking to Trade Circle
+
+**Tests**: Iteration 181 — 100% Backend (15/15) / 100% Frontend
+
+### Resonance Practice, Mantra of the Day & Rapid City Hotspots (Apr 1, 2026)
 
 **Resonance Practice (5 Practice Types):**
 - Meditation (Water, 30s min, 5-15 dust, +10 XP)
@@ -169,9 +183,36 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Key Architecture
 
+## Credentials
+- Trade Test: grad_test_522@test.com / password (Founding Architect, Elite)
+- RPG Test: rpg_test@test.com / password123
+- Founding Architect Codes: COSMIC-FOUNDER-2026, RAPID-CITY-ARCHITECT, STARSEED-TESTER
+
+### Activity Loop & Streak Heatmap (Feb 2026)
+
+**Activity Loop (Infinite Engagement):**
+- GET /api/activity-loop/progress — Unified view of 7 interconnected systems: Resonance→Dust, GPS→Gems, Gems→Polish, Polish→Gates, Trades→Gates, All→Consciousness, Travel→Gates
+- GET /api/activity-loop/heatmap?days=91 — 91-day activity calendar aggregating resonance practice, hotspot collections, and XP events per day
+- Overview: 12 metrics (consciousness_level, xp, dust, polished_gems, raw_gems, trades, gates_unlocked, resonance_sessions, resonance_streak, hotspot_collections, realms_visited, quests_done_today)
+
+**Streak Heatmap Dashboard Widget:**
+- 91-day GitHub-style heatmap with element-based color coding (earth/water/fire/air/ether)
+- Intensity levels (0-4) based on daily activity count
+- Hover tooltips showing per-day breakdown (practice, hotspot, dust earned)
+- Quick stats grid: Level, Dust, Gates, Gems
+- Engagement Loops mini-panel showing 7 active/inactive system connections
+- Streak badge for consecutive practice days
+- CTA linking to Trade Circle
+
+**Tests**: Iteration 181 — 100% Backend (15/15) / 100% Frontend
+
+## Key Architecture
+
 ```
 /app/backend/routes/
+  activity_loop.py    # Unified cross-system progress + 91-day heatmap
   gps_hotspots.py     # GPS static sites + dynamic hotspots, collection, history
+  resonance.py        # Practice mini-game (5 types, streak bonuses)
   energy_gates.py     # Starseed Energy Gates (5 gates, time/travel/warp)
   consciousness.py    # Five Levels progression, XP tracking, feature gating
   forge.py            # Tool Forge, Skill Generator, Genesis Mint, God Mode Dashboard
@@ -179,49 +220,66 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   content_factory.py  # Auto-generation functions
   trade_circle.py     # Central Bank, AI Merchant, Escrow, Broker
   refinement.py       # Gem polishing/tumbler (feeds into Energy Gates)
-  content.py          # Mantras, Game Avatars
+  content.py          # Mantras (96 total, 17 categories, Chinese support), Game Avatars
   rpg.py              # Quests, Inventory, Bosses
   meditations.py      # Mixer, Soundscapes
 
 /app/frontend/src/
   components/
-    EnergyGates.js          # Gate progression UI with Aura theming
-    GPSRadar.js             # Hotspot radar UI with cards, history, geolocation
-    ConsciousnessPanel.js   # Level display, XP bar, aura
-    CosmicForge.js          # Tool Forge + Skill Generator
-    GodModeDashboard.js     # Economy feed
-    GenesisMint.js          # 1-of-1 minting UI
+    StreakHeatmap.js         # 91-day activity heatmap + engagement loops
+    MantraOfTheDay.js        # Dashboard daily mantra widget
+    ResonancePractice.js     # Tapping mini-game
+    EnergyGates.js           # Gate progression UI with Aura theming
+    GPSRadar.js              # Hotspot radar UI with cards, history, geolocation
+    ConsciousnessPanel.js    # Level display, XP bar, aura
+    CosmicForge.js           # Tool Forge + Skill Generator
+    GodModeDashboard.js      # Economy feed
+    GenesisMint.js           # 1-of-1 minting UI
     trade/
-      TradeCircleWidgets.js # Extracted modals/cards (9 components)
+      TradeCircleWidgets.js  # Extracted modals/cards (9 components)
       CosmicBroker.js, EscrowDashboard.js, ContentBroker.js
     dashboard/
-      DashboardSections.js  # 12 dashboard widgets
+      DashboardSections.js   # 12 dashboard widgets
+  hooks/
+    useGateNotifications.js  # Global realm travel tracking
+    useGeolocation.js        # Reusable GPS hook
   pages/
     TradeCircle.js (12 tabs: Browse, Gates, Broker, Forge, Content, Escrow, Genesis, God Mode, Avatar, My Listings, Offers, Karma)
-    Dashboard.js, Settings.js, RPGPage.js, CinematicIntro.js
+    HotspotsPage.js, Dashboard.js, Settings.js, RPGPage.js, CinematicIntro.js
 ```
 
 ## Key DB Collections
-- `users`: wallet, consciousness (xp, level), founding_architect, credits
+- `users`: wallet, consciousness (xp, level, activity_log), founding_architect, credits
 - `energy_gates`: user_id, unlocked[], unlock_history[]
 - `energy_gate_travel`: user_id, realms[], visited_at
+- `resonance_practice`: user_id, total_sessions, current_streak, history[]
+- `hotspot_collections`: user_id, total_collections, history[]
 - `forge_items`: Tool/skill items with rarity
 - `content_assets`: AI-generated marketplace items
 - `rpg_inventory`: Items including polished gems (state: "polished")
 
-## Credentials
-- Trade Test: grad_test_522@test.com / password (Founding Architect, Elite)
-- RPG Test: rpg_test@test.com / password123
-- Founding Architect Codes: COSMIC-FOUNDER-2026, RAPID-CITY-ARCHITECT, STARSEED-TESTER
-
 ## Upcoming Tasks
 
+### P0 — Quantum Mechanics & Planetary Layering (User Vision)
+- **Superposition Mechanics** — Quest objectives exist in multiple states until "observed" by player
+- **Entanglement Bonds** — Two players/items share instant state via "Quantum Link" (feeds into Party/Circle system)
+- **Quantum Tunneling** — Traversal skill to pass through barriers by shifting probability density
+- **Planetary Depth Stratigraphy** — 4-layer planetary instances:
+  1. Crust (Surface) — Standard gameplay, climate-based
+  2. Mantle (Transition Zone) — Heavy haptics, sacred geometry stabilization
+  3. Outer Core (Plasma Sea) — Inconsistent gravity, Quantum Tunneling primary movement
+  4. Hollow Earth / Inner Core — Central Sun singularity, inverted gravity, sub-bass soundscapes
+- **Frequency Scaling** — Schumann Resonance shifts by depth (432 Hz surface → sub-bass core)
+- **Quantum Haptics** — Erratic vibration patterns at deeper layers
+
 ### P1
+- **Party System (Circle/Coven)** — Private social spaces with Quantum Entanglement integration
+- **Geology Information System** — Rock identification with educational content
+- **Community Garden Center** — Plant identification and cultivation tips
 - **Earned Avatar Auto-Unlock** — Milestones trigger avatar unlocks
 - **Atmosphere Gate Switching** — Water Gate triggers Rose/Teal palette app-wide
 
 ### P2
-- **Party System (Circle/Coven)** — Private social spaces
 - **Mixer Trades / Vibe Capsules** — Audio creations as tradeable assets
 - **Myths & Legends Encyclopedia** — AI Scene Recreations (Vision Mode)
 - Avatar spatial navigation, Biometric Sync
