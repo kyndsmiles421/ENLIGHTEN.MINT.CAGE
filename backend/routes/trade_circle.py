@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from deps import db, get_current_user, create_activity, logger
 from datetime import datetime, timezone
 import uuid
+import os
+
+STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY", "")
 
 router = APIRouter()
 
@@ -859,3 +862,120 @@ async def get_escrow(escrow_id: str, user=Depends(get_current_user)):
     if user["id"] not in (escrow["sender_id"], escrow["receiver_id"]):
         raise HTTPException(status_code=403, detail="Access denied")
     return escrow
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  COSMIC BROKER — Stripe Credit Purchase
+#  Real money → Resonance Credits. The ONLY gateway.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BROKER_CREDIT_PACKS = [
+    {"id": "broker_5", "name": "Spark", "credits": 5, "price_cents": 99, "price_display": "$0.99", "bonus": 0},
+    {"id": "broker_25", "name": "Ember", "credits": 25, "price_cents": 499, "price_display": "$4.99", "bonus": 2},
+    {"id": "broker_60", "name": "Flame", "credits": 60, "price_cents": 999, "price_display": "$9.99", "bonus": 8},
+    {"id": "broker_150", "name": "Inferno", "credits": 150, "price_cents": 2499, "price_display": "$24.99", "bonus": 25},
+]
+
+BROKER_PACK_MAP = {p["id"]: p for p in BROKER_CREDIT_PACKS}
+
+
+@router.get("/trade-circle/wallet")
+async def get_wallet(user=Depends(get_current_user)):
+    """Get user's Trade Circle wallet — credits, dust, gems."""
+    u = await db.users.find_one({"id": user["id"]}, {"_id": 0, "user_credit_balance": 1, "user_dust_balance": 1, "user_gem_balance": 1})
+    return {
+        "credits": u.get("user_credit_balance", 0) if u else 0,
+        "dust": u.get("user_dust_balance", 0) if u else 0,
+        "gems": u.get("user_gem_balance", 0) if u else 0,
+    }
+
+
+@router.get("/trade-circle/broker/packs")
+async def broker_packs(user=Depends(get_current_user)):
+    """Get available credit packs from the Cosmic Broker."""
+    return {"packs": BROKER_CREDIT_PACKS}
+
+
+@router.post("/trade-circle/broker/buy-credits")
+async def broker_buy_credits(data: dict = Body(...), user=Depends(get_current_user)):
+    """Purchase Resonance Credits from the Cosmic Broker via Stripe."""
+    pack_id = data.get("pack_id", "")
+    pack = BROKER_PACK_MAP.get(pack_id)
+    if not pack:
+        raise HTTPException(status_code=400, detail="Invalid credit pack")
+
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout
+        stripe_checkout = StripeCheckout(
+            api_key=STRIPE_API_KEY,
+            webhook_url=data.get("webhook_url", ""),
+        )
+        total_credits = pack["credits"] + pack["bonus"]
+        session = await stripe_checkout.create_session(
+            line_items=[{
+                "name": f"Cosmic Broker: {pack['name']}",
+                "description": f"{total_credits} Resonance Credits" + (f" (includes {pack['bonus']} bonus)" if pack["bonus"] else ""),
+                "amount": pack["price_cents"],
+                "quantity": 1,
+            }],
+            success_url=data.get("success_url", ""),
+            cancel_url=data.get("cancel_url", ""),
+        )
+
+        await db.broker_transactions.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "pack_id": pack_id,
+            "credits": total_credits,
+            "amount_cents": pack["price_cents"],
+            "session_id": session.session_id,
+            "payment_status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+        return {"checkout_url": session.checkout_url, "session_id": session.session_id}
+    except Exception as e:
+        logger.error(f"Broker Stripe error: {e}")
+        raise HTTPException(status_code=500, detail="Payment service unavailable")
+
+
+@router.post("/trade-circle/broker/verify-payment")
+async def broker_verify_payment(data: dict = Body(...), user=Depends(get_current_user)):
+    """Verify a Stripe payment and award credits. Called after Stripe redirect."""
+    session_id = data.get("session_id", "")
+    if not session_id:
+        raise HTTPException(status_code=400, detail="Session ID required")
+
+    tx = await db.broker_transactions.find_one({"session_id": session_id, "user_id": user["id"]}, {"_id": 0})
+    if not tx:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    if tx.get("payment_status") == "paid":
+        return {"status": "already_credited", "credits": tx["credits"]}
+
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout
+        stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url="")
+        session = await stripe_checkout.get_session(session_id)
+
+        if session.payment_status == "paid":
+            await db.users.update_one({"id": user["id"]}, {"$inc": {"user_credit_balance": tx["credits"]}})
+            await db.broker_transactions.update_one(
+                {"session_id": session_id},
+                {"$set": {"payment_status": "paid", "paid_at": datetime.now(timezone.utc).isoformat()}}
+            )
+            await create_activity(user["id"], "broker_purchase", f"Purchased {tx['credits']} Resonance Credits")
+            return {"status": "credited", "credits": tx["credits"]}
+        else:
+            return {"status": "pending", "payment_status": session.payment_status}
+    except Exception as e:
+        logger.error(f"Broker verify error: {e}")
+        raise HTTPException(status_code=500, detail="Verification failed")
+
+
+@router.get("/trade-circle/broker/history")
+async def broker_history(user=Depends(get_current_user)):
+    """Get user's Broker transaction history."""
+    txs = await db.broker_transactions.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).limit(20).to_list(20)
+    return {"transactions": txs}

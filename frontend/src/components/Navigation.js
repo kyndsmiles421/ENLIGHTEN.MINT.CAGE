@@ -21,6 +21,7 @@ import { setAmbientEnabled, getAmbientEnabled } from '../hooks/useAmbientSoundsc
 import { ImmersionToggle } from './ImmersionToggle';
 import { useCreditsContext } from '../context/CreditContext';
 import { useAvatar } from '../context/AvatarContext';
+import DevConsole, { useTripleTap } from './DevConsole';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -350,6 +351,8 @@ export default function Navigation() {
   const notifRef = useRef(null);
   const profileTimeout = useRef(null);
   const isLight = prefs.theme === 'light';
+  const [devConsoleOpen, setDevConsoleOpen] = useState(false);
+  const handleTripleTap = useTripleTap(() => setDevConsoleOpen(prev => !prev));
 
   /* Close dropdowns on outside click */
   useEffect(() => {
@@ -407,7 +410,9 @@ export default function Navigation() {
         data-testid="desktop-nav"
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group" data-testid="nav-logo" onClick={playClick}>
+        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group" data-testid="nav-logo"
+          onClick={(e) => { e.preventDefault(); handleTripleTap(); playClick(); }}
+          onDoubleClick={(e) => e.preventDefault()}>
           <div className="w-7 h-7 rounded-full animate-orbit-glow relative"
             style={{ background: 'radial-gradient(circle, #C084FC 0%, #7C3AED 100%)' }}>
             <div className="absolute inset-0 rounded-full animate-pulse-glow" style={{ opacity: 0.4 }} />
@@ -840,6 +845,9 @@ export default function Navigation() {
 
       {/* Search Command Palette */}
       <SearchCommand open={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* Hidden Dev Console */}
+      <DevConsole isOpen={devConsoleOpen} onClose={() => setDevConsoleOpen(false)} authHeaders={authHeaders} />
 
       {/* Spacer */}
       <div className="h-14" />

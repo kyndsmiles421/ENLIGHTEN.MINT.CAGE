@@ -7,9 +7,11 @@ import {
   ArrowLeft, Plus, Package, Wrench, Search, X, Send,
   Check, XCircle, RefreshCw, Filter, ChevronRight, User,
   ArrowRightLeft, Sparkles, Clock, Tag, Star, Award, Trophy, MessageCircle,
-  Handshake, Shield, Eye, Heart, Compass, Moon, Gem
+  Handshake, Shield, Eye, Heart, Compass, Moon, Gem, Coins
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import CosmicBroker from '../components/trade/CosmicBroker';
+import EscrowDashboard from '../components/trade/EscrowDashboard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -661,6 +663,7 @@ function ListingDetail({ listing, onClose, authHeaders, userId, onRefresh }) {
 export default function TradeCircle() {
   const { authHeaders, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [listings, setListings] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -673,6 +676,27 @@ export default function TradeCircle() {
   const [showReview, setShowReview] = useState(null);
   const [showKarmaProfile, setShowKarmaProfile] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+
+  // Handle Stripe payment redirect
+  useEffect(() => {
+    const payment = searchParams.get('payment');
+    const sessionId = searchParams.get('session_id');
+    if (payment === 'success' && sessionId) {
+      axios.post(`${API}/trade-circle/broker/verify-payment`, { session_id: sessionId }, { headers: authHeaders })
+        .then(r => {
+          if (r.data.status === 'credited') toast.success(`${r.data.credits} Resonance Credits added!`);
+          else if (r.data.status === 'already_credited') toast.info('Credits already applied');
+          else toast.info('Payment processing...');
+        })
+        .catch(() => toast.error('Payment verification failed'));
+      setSearchParams({});
+      setTab('broker');
+    } else if (payment === 'cancelled') {
+      toast.info('Payment cancelled');
+      setSearchParams({});
+      setTab('broker');
+    }
+  }, [searchParams, authHeaders, setSearchParams]);
 
   const fetchListings = useCallback(async () => {
     setLoading(true);
@@ -753,21 +777,24 @@ export default function TradeCircle() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-xl mb-4" style={{ background: 'rgba(248,250,252,0.02)' }}>
+        <div className="flex gap-1 p-1 rounded-xl mb-4 overflow-x-auto" style={{ background: 'rgba(248,250,252,0.02)' }}>
           {[
             { id: 'browse', label: 'Browse' },
+            { id: 'broker', label: 'Broker', icon: Sparkles, color: '#EAB308' },
+            { id: 'escrow', label: 'Escrow', icon: Shield, color: '#818CF8' },
             { id: 'my', label: 'My Listings' },
-            { id: 'offers', label: 'My Offers' },
-            { id: 'karma', label: 'Karma Board' },
+            { id: 'offers', label: 'Offers' },
+            { id: 'karma', label: 'Karma' },
           ].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex-1 py-2 rounded-lg text-xs transition-all"
+              className="flex-1 py-2 rounded-lg text-xs transition-all whitespace-nowrap flex items-center justify-center gap-1"
               style={{
                 background: tab === t.id ? 'rgba(192,132,252,0.08)' : 'transparent',
-                color: tab === t.id ? '#C084FC' : 'var(--text-muted)',
-                border: tab === t.id ? '1px solid rgba(192,132,252,0.15)' : '1px solid transparent',
+                color: tab === t.id ? (t.color || '#C084FC') : 'var(--text-muted)',
+                border: tab === t.id ? `1px solid ${(t.color || '#C084FC')}15` : '1px solid transparent',
               }}
               data-testid={`trade-tab-${t.id}`}>
+              {t.icon && <t.icon size={11} />}
               {t.label}
               {t.id === 'offers' && myOffers.received.filter(o => o.status === 'pending').length > 0 && (
                 <span className="ml-1 w-4 h-4 inline-flex items-center justify-center rounded-full text-[8px]"
@@ -830,6 +857,20 @@ export default function TradeCircle() {
                     ))}
                   </div>
                 )}
+              </motion.div>
+            )}
+
+            {/* Cosmic Broker Tab */}
+            {tab === 'broker' && (
+              <motion.div key="broker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <CosmicBroker authHeaders={authHeaders} />
+              </motion.div>
+            )}
+
+            {/* Escrow Tab */}
+            {tab === 'escrow' && (
+              <motion.div key="escrow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <EscrowDashboard authHeaders={authHeaders} userId={user?.id} />
               </motion.div>
             )}
 
