@@ -10,7 +10,35 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Activity Loop & Streak Heatmap (Feb 2026) — LATEST
+### Quantum Mechanics & Planetary Stratigraphy (Feb 2026) — LATEST
+
+**Planetary Stratigraphy (4-Layer Depth System):**
+- Crust (Surface, 432 Hz, Earth, Persona archetype) — Standard gameplay
+- Mantle (Transition, 396 Hz, Fire, Shadow archetype) — High pressure, sacred geometry
+- Outer Core (Plasma Sea, 285 Hz, Water, Anima archetype) — Fluid gravity, quantum tunneling
+- Hollow Earth (Inner Core, 174 Hz, Ether, The Self archetype) — Inverted gravity, Central Sun
+- Consciousness gating: Level 1/2/3/4 for each layer
+- Psyche state tracking maps Jungian archetypes to depth
+- Endpoints: layers, descend, depth-status, frequency-map
+
+**Quantum Mechanics (Phase 2):**
+- Shadow Sprites: Procedural entities in superposition at GPS locations (SHA256-seeded)
+  - 4 types: Echo (common), Fragment (uncommon), Archetype (rare), Doppelganger (legendary)
+  - 50m observation radius to collapse wave function
+  - Jungian integration prompts on collapse
+  - Dust + XP rewards per rarity
+- Quantum Tunneling: Direct layer traversal costing Cosmic Dust (level 2+)
+  - Ascending: 10 dust; Descending: 40 dust per layer crossed
+- Entanglement Bonds: Player-to-player quantum links (max 3)
+  - Track partner's layer position
+
+**Frontend:**
+- `/planetary-depths` — Cross-section visualization with 4 layer bands, frequency spectrum, descent modal with vibrational transition overlay
+- `/quantum-field` — Shadow sprite discovery page with GPS, collapse animations, history panel
+
+**Tests**: Iteration 182 — 100% Backend (39/39) / 100% Frontend
+
+### Activity Loop & Streak Heatmap (Feb 2026)
 
 **Activity Loop (Infinite Engagement):**
 - GET /api/activity-loop/progress — Unified view of 7 systems
@@ -210,6 +238,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ```
 /app/backend/routes/
+  planetary.py        # 4-layer planetary stratigraphy, psyche tracking, descent
+  quantum.py          # Shadow sprites, quantum tunneling, entanglement bonds
   activity_loop.py    # Unified cross-system progress + 91-day heatmap
   gps_hotspots.py     # GPS static sites + dynamic hotspots, collection, history
   resonance.py        # Practice mini-game (5 types, streak bonuses)
@@ -229,7 +259,6 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
     StreakHeatmap.js         # 91-day activity heatmap + engagement loops
     MantraOfTheDay.js        # Dashboard daily mantra widget
     ResonancePractice.js     # Tapping mini-game
-    EnergyGates.js           # Gate progression UI with Aura theming
     GPSRadar.js              # Hotspot radar UI with cards, history, geolocation
     ConsciousnessPanel.js    # Level display, XP bar, aura
     CosmicForge.js           # Tool Forge + Skill Generator
@@ -245,11 +274,15 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
     useGeolocation.js        # Reusable GPS hook
   pages/
     TradeCircle.js (12 tabs: Browse, Gates, Broker, Forge, Content, Escrow, Genesis, God Mode, Avatar, My Listings, Offers, Karma)
-    HotspotsPage.js, Dashboard.js, Settings.js, RPGPage.js, CinematicIntro.js
+    HotspotsPage.js, PlanetaryDepths.js, QuantumField.js
+    Dashboard.js, Settings.js, RPGPage.js, CinematicIntro.js
 ```
 
 ## Key DB Collections
 - `users`: wallet, consciousness (xp, level, activity_log), founding_architect, credits
+- `planetary_depth`: user_id, current_layer, psyche_state, unlocked_layers[], descent_history[]
+- `quantum_shadows`: user_id, collapsed[], total_collapsed, total_dust
+- `quantum_entanglements`: bond_id, user_a, user_b, active, resonance_score, shared_events[]
 - `energy_gates`: user_id, unlocked[], unlock_history[]
 - `energy_gate_travel`: user_id, realms[], visited_at
 - `resonance_practice`: user_id, total_sessions, current_streak, history[]
@@ -260,19 +293,14 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Upcoming Tasks
 
-### P0 — Quantum Mechanics & Planetary Layering (User Vision)
-- **Superposition Mechanics** — Quest objectives exist in multiple states until "observed" by player
-- **Entanglement Bonds** — Two players/items share instant state via "Quantum Link" (feeds into Party/Circle system)
-- **Quantum Tunneling** — Traversal skill to pass through barriers by shifting probability density
-- **Planetary Depth Stratigraphy** — 4-layer planetary instances:
-  1. Crust (Surface) — Standard gameplay, climate-based
-  2. Mantle (Transition Zone) — Heavy haptics, sacred geometry stabilization
-  3. Outer Core (Plasma Sea) — Inconsistent gravity, Quantum Tunneling primary movement
-  4. Hollow Earth / Inner Core — Central Sun singularity, inverted gravity, sub-bass soundscapes
-- **Frequency Scaling** — Schumann Resonance shifts by depth (432 Hz surface → sub-bass core)
-- **Quantum Haptics** — Erratic vibration patterns at deeper layers
+### P0 — Jungian Archetypes & Gatekeepers (Phase 3)
+- **Archetypal NPCs** at layer transitions (Wise Elder in Mantle, Anima/Animus in Outer Core, The Self in Hollow Earth)
+- **Shadow Integration Quests** — defeat/integrate Shadow to stabilize area frequency
+- **Vibrational Shift Audio** — Frequency scaling (432 Hz surface → sub-bass core) with Web Audio API
 
 ### P1
+- **Vibe Capsules** — Quantum-state trade items from depth frequencies
+- **Synchronicity Events** — Circle/Coven party system with entanglement-based events
 - **Party System (Circle/Coven)** — Private social spaces with Quantum Entanglement integration
 - **Geology Information System** — Rock identification with educational content
 - **Community Garden Center** — Plant identification and cultivation tips
@@ -280,6 +308,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - **Atmosphere Gate Switching** — Water Gate triggers Rose/Teal palette app-wide
 
 ### P2
+- **Vision Mode / Active Imagination** — AI dreamscapes from activity data
+- **Quantum Haptics** — Erratic vibration patterns at deeper layers
 - **Mixer Trades / Vibe Capsules** — Audio creations as tradeable assets
-- **Myths & Legends Encyclopedia** — AI Scene Recreations (Vision Mode)
+- **Myths & Legends Encyclopedia** — AI Scene Recreations
 - Avatar spatial navigation, Biometric Sync
