@@ -1,0 +1,109 @@
+{
+  "summary": "Iteration 159: 5-Layer Universe Structure + Forgotten Languages Streak/Journal - ALL BACKEND TESTS PASSED (15/15). Frontend UI verified with all key elements visible. New features: 5-layer universe system (Terrestrial/Ethereal/Astral/Void/Nexus), layer-aware loot/XP multipliers in Rock Hounding, streak system with XP bonuses in Forgotten Languages, glyph journal for decoded history.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_layer_universe_streak.py",
+    "/app/test_reports/pytest/pytest_layer_universe_streak.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_layer_universe_streak.py"
+  ],
+  "success_rate": {
+    "backend": "100% (15/15 tests passed)",
+    "frontend": "100% (all UI elements verified)"
+  },
+  "test_credentials": "rpg_test@test.com / password123",
+  "seed_data_creation": "User has resonance=11 (Ethereal layer), 3/3 glyphs decoded today, streak data present",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "5-Layer Universe Structure fully implemented. Key endpoints: GET /api/game-core/stats (includes layer data), GET /api/game-core/layer (layer info based on resonance), GET /api/rock-hounding/mine (includes layer with multipliers), POST /api/rock-hounding/mine-action (applies layer multipliers), GET /api/forgotten-languages/daily (includes streak data), POST /api/forgotten-languages/decode (returns streak info and bonus XP), GET /api/forgotten-languages/journal (decoded glyph history). Layer thresholds: terrestrial=0, ethereal=5, astral=15, void=30, nexus=50. User resonance=11 means Ethereal layer (1.3x loot, 1.2x XP). Key data-testids: layer-bar, core-stats-hud, biome-card, depth-1 through depth-5, fl-tab-cipher, fl-tab-mastery, fl-tab-scripts, script-header, streak-badge, glyph-*, layer-indicator, entropy-indicator.",
+  "features_tested": {
+    "GET /api/game-core/stats includes layer data": {
+      "status": "PASS",
+      "details": "Returns layer object with active_layer, unlocked_layers, all_layers (5 layers), layer details"
+    },
+    "GET /api/game-core/layer returns layer info": {
+      "status": "PASS",
+      "details": "Returns active_layer, layer details, unlocked_layers, all_layers based on resonance stat"
+    },
+    "Layer computation thresholds": {
+      "status": "PASS",
+      "details": "Verified: terrestrial=0, ethereal=5, astral=15, void=30, nexus=50 resonance required"
+    },
+    "GET /api/rock-hounding/mine includes layer data": {
+      "status": "PASS",
+      "details": "Returns layer object with loot_multiplier and xp_multiplier"
+    },
+    "POST /api/rock-hounding/mine-action applies layer multipliers": {
+      "status": "PASS",
+      "details": "Returns layer info with id, name, loot_multiplier, xp_multiplier applied to rewards"
+    },
+    "GET /api/forgotten-languages/daily includes streak data": {
+      "status": "PASS",
+      "details": "Returns streak object with current, best, multiplier fields"
+    },
+    "POST /api/forgotten-languages/decode returns streak info": {
+      "status": "PASS",
+      "details": "Returns streak info and bonus_xp in rewards (all glyphs already decoded today)"
+    },
+    "GET /api/forgotten-languages/journal returns glyph history": {
+      "status": "PASS",
+      "details": "Returns total_entries, entries list, by_element grouping, streak info"
+    },
+    "GET /api/forgotten-languages/mastery regression": {
+      "status": "PASS",
+      "details": "Returns current_tier, tier_name, harmony, total_decoded, by_element, modifiers, tiers, scripts"
+    },
+    "Frontend: Rock Hounding Universe Layer bar": {
+      "status": "PASS",
+      "details": "Shows 5 segments (Terrestrial, Ethereal, Astral, Void, Nexus) with Ethereal highlighted"
+    },
+    "Frontend: Active layer with loot multiplier": {
+      "status": "PASS",
+      "details": "Ethereal layer shows '1.3x loot' badge"
+    },
+    "Frontend: Layer and Entropy indicators": {
+      "status": "PASS",
+      "details": "Top-right shows layer indicator and entropy indicator ('Shifting')"
+    },
+    "Frontend: Forgotten Languages 3 tabs": {
+      "status": "PASS",
+      "details": "Daily Cipher, Mastery, Scripts tabs all visible"
+    },
+    "Frontend: Forgotten Languages glyphs": {
+      "status": "PASS",
+      "details": "3 glyph cards visible (Goryx, Ithyx, Koryx), all decoded"
+    },
+    "Frontend: Dashboard regression": {
+      "status": "PASS",
+      "details": "Mine, Decode, Dream buttons visible at bottom of dashboard"
+    }
+  },
+  "layer_system_details": {
+    "layers": [
+      {"id": "terrestrial", "resonance_required": 0, "loot_multiplier": 1.0, "xp_multiplier": 1.0, "entropy": 0.0},
+      {"id": "ethereal", "resonance_required": 5, "loot_multiplier": 1.3, "xp_multiplier": 1.2, "entropy": 0.15},
+      {"id": "astral", "resonance_required": 15, "loot_multiplier": 1.7, "xp_multiplier": 1.5, "entropy": 0.4},
+      {"id": "void", "resonance_required": 30, "loot_multiplier": 2.5, "xp_multiplier": 2.0, "entropy": 0.75},
+      {"id": "nexus", "resonance_required": 50, "loot_multiplier": 3.0, "xp_multiplier": 3.0, "entropy": 0.0}
+    ],
+    "user_resonance": 11,
+    "user_active_layer": "ethereal",
+    "user_unlocked_layers": ["terrestrial", "ethereal"]
+  },
+  "streak_system_details": {
+    "streak_multiplier_formula": "min(2.0, 1.0 + current_streak * 0.1)",
+    "bonus_xp_calculation": "base_xp * streak_mult - base_xp",
+    "streak_tracking": "Stored in forgotten_languages_streaks collection with last_date, current_streak, best_streak"
+  }
+}

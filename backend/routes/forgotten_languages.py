@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from routes.nexus import compute_elemental_balance, ELEMENTS
 from routes.game_core import award_xp, award_currency, modify_stat
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import hashlib
 import random
 
@@ -203,6 +203,26 @@ async def get_daily_cipher(user=Depends(get_current_user)):
     for g in glyphs:
         g["decoded"] = g["id"] in decoded_ids
 
+    # Get streak
+    streak_doc = await db.forgotten_languages_streaks.find_one(
+        {"user_id": user_id}, {"_id": 0, "user_id": 0}
+    )
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+    if streak_doc:
+        last_date = streak_doc.get("last_date", "")
+        if last_date == today:
+            current_streak = streak_doc.get("current_streak", 0)
+        elif last_date == yesterday:
+            current_streak = streak_doc.get("current_streak", 0)
+        else:
+            current_streak = 0
+        best_streak = streak_doc.get("best_streak", 0)
+    else:
+        current_streak = 0
+        best_streak = 0
+
+    streak_mult = min(2.0, 1.0 + current_streak * 0.1)
+
     return {
         "date": today,
         "element": deficient_el,
@@ -229,6 +249,11 @@ async def get_daily_cipher(user=Depends(get_current_user)):
             "xp": tier_info["xp_per_glyph"],
             "dust": tier_info["dust_per_glyph"],
             "modifier": tier_info["modifier_value"],
+        },
+        "streak": {
+            "current": current_streak,
+            "best": best_streak,
+            "multiplier": round(streak_mult, 1),
         },
     }
 
@@ -289,8 +314,43 @@ async def decode_glyph(data: dict = Body(...), user=Depends(get_current_user)):
         upsert=True,
     )
 
-    # Award rewards
-    xp_result = await award_xp(user_id, tier_info["xp_per_glyph"], f"forgotten_languages:{glyph['name']}")
+    # ── Streak tracking ──
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+    streak_doc = await db.forgotten_languages_streaks.find_one(
+        {"user_id": user_id}, {"_id": 0}
+    )
+    current_streak = 1
+    best_streak = 1
+    if streak_doc:
+        last_date = streak_doc.get("last_date", "")
+        if last_date == today:
+            current_streak = streak_doc.get("current_streak", 1)
+            best_streak = streak_doc.get("best_streak", 1)
+        elif last_date == yesterday:
+            current_streak = streak_doc.get("current_streak", 0) + 1
+            best_streak = max(current_streak, streak_doc.get("best_streak", 0))
+        else:
+            current_streak = 1
+            best_streak = max(1, streak_doc.get("best_streak", 0))
+
+    await db.forgotten_languages_streaks.update_one(
+        {"user_id": user_id},
+        {"$set": {
+            "user_id": user_id,
+            "last_date": today,
+            "current_streak": current_streak,
+            "best_streak": best_streak,
+        }},
+        upsert=True,
+    )
+
+    # Streak bonus: +10% XP per streak day (max 100%)
+    streak_mult = min(2.0, 1.0 + current_streak * 0.1)
+    base_xp = tier_info["xp_per_glyph"]
+    bonus_xp = int(base_xp * streak_mult) - base_xp
+
+    # Award rewards (with streak bonus)
+    xp_result = await award_xp(user_id, int(base_xp * streak_mult), f"forgotten_languages:{glyph['name']}")
     await award_currency(user_id, "cosmic_dust", tier_info["dust_per_glyph"], f"forgotten_languages:{glyph['name']}")
     await modify_stat(user_id, "wisdom", 1, f"forgotten_languages:{glyph['name']}")
 
@@ -313,13 +373,33 @@ async def decode_glyph(data: dict = Body(...), user=Depends(get_current_user)):
 
     all_decoded = len(decoded_ids) >= len(glyphs)
 
+    # ── Save to Glyph Journal (permanent history) ──
+    await db.forgotten_languages_journal.insert_one({
+        "user_id": user_id,
+        "glyph_name": glyph["name"],
+        "element": deficient_el,
+        "meaning": glyph["meaning"],
+        "phonetic": glyph["phonetic"],
+        "difficulty": glyph["difficulty"],
+        "geo_seed": glyph["geo_seed"],
+        "tier": tier,
+        "decoded_at": datetime.now(timezone.utc).isoformat(),
+        "date": today,
+    })
+
     return {
         "decoded": True,
         "glyph": glyph,
         "rewards": {
-            "xp": tier_info["xp_per_glyph"],
+            "xp": int(base_xp * streak_mult),
+            "bonus_xp": bonus_xp,
             "dust": tier_info["dust_per_glyph"],
             "modifier": f"+{tier_info['modifier_value']} {deficient_el}",
+        },
+        "streak": {
+            "current": current_streak,
+            "best": best_streak,
+            "multiplier": round(streak_mult, 1),
         },
         "level": xp_result,
         "progress": {
@@ -387,6 +467,35 @@ async def get_mastery(user=Depends(get_current_user)):
         "tiers": tiers,
         "scripts": {eid: {"name": s["name"], "color": s["color"], "origin": s["origin"]}
                      for eid, s in SCRIPT_FAMILIES.items()},
+    }
+
+
+@router.get("/forgotten-languages/journal")
+async def get_journal(user=Depends(get_current_user)):
+    """Get the user's glyph journal — all decoded glyphs ever."""
+    user_id = user["id"]
+    entries = await db.forgotten_languages_journal.find(
+        {"user_id": user_id}, {"_id": 0, "user_id": 0}
+    ).sort("decoded_at", -1).to_list(200)
+
+    # Group by element
+    by_element = {}
+    for e in entries:
+        el = e.get("element", "unknown")
+        if el not in by_element:
+            by_element[el] = []
+        by_element[el].append(e)
+
+    # Get streak
+    streak_doc = await db.forgotten_languages_streaks.find_one(
+        {"user_id": user_id}, {"_id": 0, "user_id": 0}
+    )
+
+    return {
+        "total_entries": len(entries),
+        "entries": entries,
+        "by_element": by_element,
+        "streak": streak_doc or {"current_streak": 0, "best_streak": 0},
     }
 
 

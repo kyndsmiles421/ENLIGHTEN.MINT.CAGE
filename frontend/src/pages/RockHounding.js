@@ -333,7 +333,9 @@ export default function RockHounding() {
       decayActivity={controller.decayActivity}
       mantraActive={mantraRipple}
       mantraColor={biomeColor}
-      moduleName="rock_hounding">
+      moduleName="rock_hounding"
+      layerData={controller.layerData}
+      activeLayer={controller.activeLayer}>
 
       <div className="pb-24" data-testid="rock-hounding-page">
         {/* Header */}
@@ -384,6 +386,48 @@ export default function RockHounding() {
         <div className="px-4">
           {/* Core Stats HUD — from Universal Game Controller */}
           <CoreStatsHUD coreStats={controller.coreStats} />
+
+          {/* Universe Layer Bar */}
+          {controller.allLayers.length > 0 && (
+            <div className="rounded-xl p-3 mb-4" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
+              data-testid="layer-bar">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Star size={10} style={{ color: controller.layerData?.color || '#A855F7' }} />
+                  <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Universe Layer</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[8px] font-bold" style={{ color: controller.layerData?.color || '#A855F7' }}>
+                    {controller.layerData?.name || 'Terrestrial'}
+                  </span>
+                  {controller.layerData?.loot_multiplier > 1 && (
+                    <span className="text-[7px] px-1.5 py-0.5 rounded-lg"
+                      style={{ background: `${controller.layerData.color}10`, color: controller.layerData.color }}>
+                      {controller.layerData.loot_multiplier}x loot
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-1">
+                {controller.allLayers.map(l => (
+                  <div key={l.id} className="flex-1 rounded-full h-1.5"
+                    style={{
+                      background: l.active ? l.color : l.unlocked ? `${l.color}30` : 'rgba(255,255,255,0.04)',
+                      boxShadow: l.active ? `0 0 6px ${l.color}40` : 'none',
+                    }} />
+                ))}
+              </div>
+              <div className="flex justify-between mt-1">
+                {controller.allLayers.map(l => (
+                  <div key={l.id} className="text-center" style={{ flex: 1 }}>
+                    <p className="text-[5px] uppercase" style={{ color: l.unlocked ? l.color : 'var(--text-muted)' }}>
+                      {l.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {tab === 'mine' && (
             <>

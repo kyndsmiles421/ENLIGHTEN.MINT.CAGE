@@ -211,8 +211,13 @@ async def _get_or_create_mine(user_id: str, element_bias: str = None) -> dict:
 
 @router.get("/rock-hounding/mine")
 async def get_mine(user=Depends(get_current_user)):
-    """Get the user's current mine session."""
+    """Get the user's current mine session with active universe layer."""
     mine = await _get_or_create_mine(user["id"])
+    # Attach layer info
+    from routes.game_core import compute_active_layer
+    stats_doc = await db.game_core_stats.find_one({"user_id": user["id"]}, {"_id": 0})
+    resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
+    mine["layer"] = compute_active_layer(resonance)
     return mine
 
 
@@ -253,14 +258,24 @@ async def mine_action(data: dict = Body(...), user=Depends(get_current_user)):
     balance = await compute_elemental_balance(user_id)
     harmony = balance["harmony_score"]
 
-    # Harmony improves quality
+    # ── Layer multipliers ──
+    from routes.game_core import compute_active_layer
+    stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
+    resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
+    layer_info = compute_active_layer(resonance)
+    active_layer = layer_info["layer"]
+    layer_loot_mult = active_layer.get("loot_multiplier", 1.0)
+    layer_xp_mult = active_layer.get("xp_multiplier", 1.0)
+    layer_rarity_shift = active_layer.get("rarity_shift", 0)
+
+    # Harmony improves quality, layer amplifies further
     harmony_mult = 1.0 + (harmony / 200)
     rarity_mods = {
-        "uncommon": harmony_mult,
-        "rare": harmony_mult * rarity_boost,
-        "epic": rarity_boost * 1.5,
-        "legendary": rarity_boost * 2.0,
-        "mythic": rarity_boost * 3.0,
+        "uncommon": harmony_mult * (1 + layer_rarity_shift * 0.2),
+        "rare": harmony_mult * rarity_boost * (1 + layer_rarity_shift * 0.3),
+        "epic": rarity_boost * 1.5 * (1 + layer_rarity_shift * 0.4),
+        "legendary": rarity_boost * 2.0 * (1 + layer_rarity_shift * 0.5),
+        "mythic": rarity_boost * 3.0 * (1 + layer_rarity_shift * 0.6),
     }
 
     rarity = await roll_loot(rarity_mods, seed=mine.get("seed", 0) + mine.get("total_mines", 0))
@@ -331,9 +346,11 @@ async def mine_action(data: dict = Body(...), user=Depends(get_current_user)):
         upsert=True,
     )
 
-    # Feed Core Engine
-    xp_result = await award_xp(user_id, rarity_info["xp_value"], f"rock_hounding:depth_{depth}:{found['id']}")
-    await award_currency(user_id, "cosmic_dust", rarity_info["dust_value"], f"rock_hounding:{found['id']}")
+    # Feed Core Engine (with layer multipliers)
+    layer_xp = int(rarity_info["xp_value"] * layer_xp_mult)
+    layer_dust = int(rarity_info["dust_value"] * layer_loot_mult)
+    xp_result = await award_xp(user_id, layer_xp, f"rock_hounding:depth_{depth}:{found['id']}")
+    await award_currency(user_id, "cosmic_dust", layer_dust, f"rock_hounding:{found['id']}")
 
     stat = found.get("stat", "wisdom")
     stat_val = found.get("stat_value", 1)
@@ -351,10 +368,16 @@ async def mine_action(data: dict = Body(...), user=Depends(get_current_user)):
         "specimen": specimen_result,
         "energy": {"current": new_energy, "max": ENERGY_MAX, "cost": cost},
         "rewards": {
-            "xp": rarity_info["xp_value"],
-            "dust": rarity_info["dust_value"],
+            "xp": layer_xp,
+            "dust": layer_dust,
             "stat": stat,
             "stat_delta": stat_val,
+        },
+        "layer": {
+            "id": active_layer["id"],
+            "name": active_layer["name"],
+            "loot_multiplier": layer_loot_mult,
+            "xp_multiplier": layer_xp_mult,
         },
         "level": xp_result,
         "stats": stat_result,

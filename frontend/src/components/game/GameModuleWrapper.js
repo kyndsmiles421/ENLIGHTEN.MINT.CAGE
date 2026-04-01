@@ -156,15 +156,38 @@ function HarmonyGlow({ element, intensity }) {
 }
 
 // Entropy status label for HUD overlay
-function EntropyIndicator({ harmony }) {
+function EntropyIndicator({ harmony, layerName, layerColor }) {
   const label = harmony >= 80 ? 'Clear' : harmony >= 50 ? 'Shifting' : harmony >= 30 ? 'Blurred' : 'De-Rezzed';
   const color = harmony >= 80 ? '#22C55E' : harmony >= 50 ? '#F59E0B' : '#EF4444';
   return (
-    <div className="absolute top-2 right-2 z-[20] px-2 py-0.5 rounded-lg text-[7px] font-bold uppercase tracking-wider"
-      style={{ background: `${color}10`, color, border: `1px solid ${color}15` }}
-      data-testid="entropy-indicator">
-      Entropy: {label}
+    <div className="absolute top-2 right-2 z-[20] flex items-center gap-1.5">
+      {layerName && (
+        <div className="px-2 py-0.5 rounded-lg text-[7px] font-bold uppercase tracking-wider"
+          style={{ background: `${layerColor || '#A855F7'}10`, color: layerColor || '#A855F7', border: `1px solid ${layerColor || '#A855F7'}15` }}
+          data-testid="layer-indicator">
+          {layerName}
+        </div>
+      )}
+      <div className="px-2 py-0.5 rounded-lg text-[7px] font-bold uppercase tracking-wider"
+        style={{ background: `${color}10`, color, border: `1px solid ${color}15` }}
+        data-testid="entropy-indicator">
+        {label}
+      </div>
     </div>
+  );
+}
+
+// Layer-specific ambient tint overlay
+function LayerTintOverlay({ layerColor, entropy }) {
+  if (!layerColor || entropy <= 0) return null;
+  return (
+    <motion.div className="absolute inset-0 pointer-events-none z-[7]"
+      animate={{ opacity: [entropy * 0.03, entropy * 0.08, entropy * 0.03] }}
+      transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        background: `radial-gradient(ellipse at 50% 30%, ${layerColor}12, transparent 70%)`,
+      }}
+    />
   );
 }
 
@@ -183,6 +206,9 @@ export default function GameModuleWrapper({
   mantraColor = '#A855F7',
   moduleName = 'unknown',
   showEntropyIndicator = true,
+  // Layer system
+  layerData = null,
+  activeLayer = 'terrestrial',
 }) {
   // Compute avg freshness from decay activity
   const avgFreshness = useMemo(() => {
@@ -191,7 +217,20 @@ export default function GameModuleWrapper({
     return vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 100;
   }, [decayActivity]);
 
-  const grainOpacity = useMemo(() => Math.max(0.01, (100 - harmonyScore) / 500), [harmonyScore]);
+  // Layer entropy amplifies grain/blur
+  const layerEntropy = layerData?.entropy || 0;
+  const grainOpacity = useMemo(() => {
+    const base = Math.max(0.01, (100 - harmonyScore) / 500);
+    return base + layerEntropy * 0.06;
+  }, [harmonyScore, layerEntropy]);
+
+  // Effective harmony — Void/Astral layers reduce effective clarity
+  const effectiveHarmony = useMemo(() => {
+    if (activeLayer === 'nexus') return Math.max(harmonyScore, 80); // Nexus transcends entropy
+    return Math.max(0, harmonyScore - layerEntropy * 30);
+  }, [harmonyScore, layerEntropy, activeLayer]);
+
+  const layerColor = layerData?.color || null;
 
   return (
     <div className="relative min-h-screen overflow-hidden"
@@ -209,18 +248,25 @@ export default function GameModuleWrapper({
       {/* Layer 2-5: Distortion Compositor overlay */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-[30]"
         data-testid="distortion-compositor">
-        <EntropyLayer harmony={harmonyScore} />
+        <EntropyLayer harmony={effectiveHarmony} />
         <ElementalTintLayer dominantElement={dominantElement} dominantPercentage={dominantPercentage} />
         <DecayDistortionLayer avgFreshness={avgFreshness} />
-        <FractureLayer cycle={harmonyCycle} harmony={harmonyScore} />
+        <FractureLayer cycle={harmonyCycle} harmony={effectiveHarmony} />
+        <LayerTintOverlay layerColor={layerColor} entropy={layerEntropy} />
         <AnimatePresence>
           {mantraActive && <MantraRipple active={mantraActive} color={mantraColor} />}
         </AnimatePresence>
         <GrainOverlay opacity={grainOpacity} />
       </div>
 
-      {/* HUD Layer: Entropy status */}
-      {showEntropyIndicator && <EntropyIndicator harmony={harmonyScore} />}
+      {/* HUD Layer: Layer + Entropy indicators */}
+      {showEntropyIndicator && (
+        <EntropyIndicator
+          harmony={effectiveHarmony}
+          layerName={layerData?.name}
+          layerColor={layerColor}
+        />
+      )}
     </div>
   );
 }

@@ -391,8 +391,9 @@ export default function ForgottenLanguages() {
     setTimeout(() => setMantraRipple(false), 2000);
     try {
       const res = await axios.post(`${API}/forgotten-languages/decode`, { glyph_id: glyphId }, { headers });
-      const { rewards, progress } = res.data;
-      toast(`Decoded! +${rewards.xp} XP, ${rewards.modifier}`);
+      const { rewards, progress, streak } = res.data;
+      const streakText = streak?.current > 0 ? ` (${streak.multiplier}x streak!)` : '';
+      toast(`Decoded! +${rewards.xp} XP${rewards.bonus_xp > 0 ? ` (+${rewards.bonus_xp} bonus)` : ''}, ${rewards.modifier}${streakText}`);
       controller.refreshState();
 
       // Update local state
@@ -432,7 +433,9 @@ export default function ForgottenLanguages() {
       decayActivity={controller.decayActivity}
       mantraActive={mantraRipple}
       mantraColor={scriptColor}
-      moduleName="forgotten_languages">
+      moduleName="forgotten_languages"
+      layerData={controller.layerData}
+      activeLayer={controller.activeLayer}>
 
       <div className="pb-24" data-testid="forgotten-languages-page">
         {/* Header */}
@@ -560,9 +563,17 @@ function DailyCipherTab({ daily, scriptColor, element, decoding, onDecode, contr
           <span className="text-[8px] font-bold" style={{ color: '#A855F7' }}>{daily.tier_name}</span>
           <span className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Tier {daily.tier}</span>
         </div>
-        <span className="text-[8px] px-2 py-0.5 rounded-lg" style={{ background: `${scriptColor}08`, color: scriptColor }}>
-          {daily.decoded_count}/{daily.total_glyphs} Decoded
-        </span>
+        <div className="flex items-center gap-2">
+          {daily.streak?.current > 0 && (
+            <span className="text-[8px] px-2 py-0.5 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}
+              data-testid="streak-badge">
+              {daily.streak.current} day streak ({daily.streak.multiplier}x)
+            </span>
+          )}
+          <span className="text-[8px] px-2 py-0.5 rounded-lg" style={{ background: `${scriptColor}08`, color: scriptColor }}>
+            {daily.decoded_count}/{daily.total_glyphs} Decoded
+          </span>
+        </div>
       </div>
 
       {/* Progress bar */}

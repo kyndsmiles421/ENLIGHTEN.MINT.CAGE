@@ -113,6 +113,11 @@ export default function useGameController(moduleId) {
     decayActivity: nexusState?.decay_activity || null,
     elements: nexusState?.elements || {},
     elementCSS,
+    // Layer system
+    activeLayer: coreStats?.layer?.active_layer || 'terrestrial',
+    layerData: coreStats?.layer?.layer || null,
+    unlockedLayers: coreStats?.layer?.unlocked_layers || ['terrestrial'],
+    allLayers: coreStats?.layer?.all_layers || [],
     // Element color helper
     getElementColor: (el) => EL_COLORS[el] || '#A855F7',
     // Actions
