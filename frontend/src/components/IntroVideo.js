@@ -168,14 +168,16 @@ export default function IntroVideo() {
                       backdropFilter: 'blur(8px)',
                       border: '1px solid rgba(255,255,255,0.12)',
                       touchAction: 'manipulation',
-                      zIndex: 20,
+                      zIndex: 30,
+                      pointerEvents: 'auto',
+                      position: 'absolute',
                     }}>
                     {muted ? <VolumeX size={18} style={{ color: '#F8FAFC' }} /> : <Volume2 size={18} style={{ color: '#D8B4FE' }} />}
                   </button>
 
                   {/* Title overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-6"
-                    style={{ background: 'linear-gradient(transparent, rgba(3,4,10,0.8))' }}>
+                    style={{ background: 'linear-gradient(transparent, rgba(3,4,10,0.8))', pointerEvents: 'none' }}>
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#D8B4FE' }}>
                       The Cosmic Collective
                     </p>

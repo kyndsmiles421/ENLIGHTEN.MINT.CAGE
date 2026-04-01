@@ -10,31 +10,32 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Full-Stack Click Audit & E2E Optimization (Apr 1, 2026) — NEW
+### Full-Stack Deep Click Optimization & E2E Audit (Apr 1, 2026)
 
-**QuestCard Fix (RPG Page — Critical):**
+**QuestCard Fix (RPG Page):**
 - Converted QuestCard from non-interactive `div` to clickable `button`
-- Added `onNavigate` prop mapping quest IDs to activity pages: meditation→`/meditation`, journal→`/journal`, mood→`/mood`
+- Added `onNavigate` prop mapping quest IDs to activity pages
 - Added `ChevronRight` indicator on navigable quests
-- Quests with direct completion (`breath_reset`, `breathing`, `soundscape`) still have `onComplete` inline
 
-**IntroVideo Mute Button (Landing — Critical):**
-- Fixed event propagation: added `e.stopPropagation()` and `e.preventDefault()`
-- Added `onTouchEnd` handler for mobile touch responsiveness
-- Increased button hit target (p-3, larger icon)
-- Added `touchAction: 'manipulation'` and z-index 20
+**IntroVideo Mute Button (Landing):**
+- Title gradient overlay now has `pointerEvents: 'none'`
+- Mute button z-index 30 with `pointerEvents: 'auto'`, 44x44 hit target
+- Added `onTouchEnd`, `stopPropagation` for mobile
 
-**RPG Tabs Mobile Fix:**
-- Added `touchAction: 'manipulation'` and `onTouchEnd` for mobile tab switching
-- Added `overflow-x-auto` with `WebkitOverflowScrolling: touch` for horizontal scroll
-- Tabs flex-shrink-0 for proper mobile layout
+**Universal Inventory Bridge (NEW):**
+- `rock_hounding.py` mine-action inserts specimens into `rpg_inventory`
+- `refinement.py` collect updates `rpg_inventory` state to polished
+- ItemCard shows Raw/Polished state badges
 
-**Ghost Click Audit — No Issues Found:**
-- All overlay components (BackgroundPicker, GuidedTour, DeepDive, StarseedInventory) properly conditional-rendered with `if (!isOpen) return null`
-- All visual overlay layers (CosmicMixer) use `pointer-events-none`
-- SmartDock positioned at `bottom:80, left:12` — small element, no full-screen blocking
-- No z-index collisions between nav (z-50), SmartDock (z-9997), and overlays (z-9999)
-- **Test**: Iteration 166 — 100% (Frontend + Backend)
+**Transmute Panel (RPG Shop — NEW):**
+- "Transmute" tab in shop with Alchemical Exchange panel
+- Preset buttons (150/300/450/750), rate display, Transmute button
+
+**RockHounding.js Refactored:**
+- 7 components extracted to `/components/game/MiningComponents.js`
+- Reduced from ~857 to ~440 lines
+
+**Tests**: Iterations 166 (100%), 167 (Backend 100%, Frontend 95%)
 
 ### Sweat Equity, Encounters & Living Journal (Apr 1, 2026)
 
