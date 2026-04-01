@@ -92,7 +92,7 @@ function DepthLayer({ depth, onMine, mining, currentEnergy, biomeColor }) {
 }
 
 // ── Specimen Discovery Card ──
-function SpecimenCard({ specimen, rewards }) {
+function SpecimenCard({ specimen, rewards, layer }) {
   const rc = RARITY_COLORS[specimen.actual_rarity] || '#9CA3AF';
   const ElIcon = EL_ICONS[specimen.element] || Gem;
   const isMythic = specimen.actual_rarity === 'mythic';
@@ -146,6 +146,13 @@ function SpecimenCard({ specimen, rewards }) {
           <span>Mohs {specimen.mohs}</span>
           <span>|</span>
           <span>Depth {specimen.depth_found}</span>
+          {layer && (
+            <>
+              <span>|</span>
+              <span style={{ color: '#A855F7' }}>{layer.name}</span>
+              {layer.loot_multiplier > 1 && <span style={{ color: '#FCD34D' }}>{layer.loot_multiplier}x</span>}
+            </>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[8px] px-2 py-0.5 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
@@ -269,8 +276,8 @@ export default function RockHounding() {
     setTimeout(() => setMantraRipple(false), 2000);
     try {
       const res = await axios.post(`${API}/rock-hounding/mine-action`, { depth }, { headers });
-      const { specimen, rewards } = res.data;
-      setLastFind({ specimen, rewards });
+      const { specimen, rewards, layer } = res.data;
+      setLastFind({ specimen, rewards, layer });
 
       // Refresh controller state (Nexus + Core stats update)
       controller.refreshState();
@@ -335,7 +342,9 @@ export default function RockHounding() {
       mantraColor={biomeColor}
       moduleName="rock_hounding"
       layerData={controller.layerData}
-      activeLayer={controller.activeLayer}>
+      activeLayer={controller.activeLayer}
+      visualDirectives={controller.visualDirectives}
+      biomeContext={controller.biomeContext}>
 
       <div className="pb-24" data-testid="rock-hounding-page">
         {/* Header */}
@@ -458,13 +467,21 @@ export default function RockHounding() {
                         {biome.element} biome | {biome.atmosphere}
                       </p>
                     </div>
-                    {/* Harmony badge */}
+                    {/* Harmony badge + Difficulty */}
                     <div className="text-center">
                       <p className="text-[7px] uppercase" style={{ color: 'var(--text-muted)' }}>Harmony</p>
                       <p className="text-sm font-bold" style={{ color: controller.harmonyScore > 50 ? '#22C55E' : '#F59E0B' }}>
                         {controller.harmonyScore}
                       </p>
                     </div>
+                    {controller.difficulty && (
+                      <div className="text-center">
+                        <p className="text-[7px] uppercase" style={{ color: 'var(--text-muted)' }}>Difficulty</p>
+                        <p className="text-sm font-bold" style={{ color: controller.difficulty.level > 5 ? '#EF4444' : controller.difficulty.level > 3 ? '#F59E0B' : '#22C55E' }}>
+                          {controller.difficulty.level}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <p className="text-[10px] italic mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {biome.description}
@@ -490,7 +507,7 @@ export default function RockHounding() {
                 {lastFind && (
                   <motion.div className="mb-4" exit={{ opacity: 0, y: -10 }}>
                     <p className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-muted)' }}>Last Discovery</p>
-                    <SpecimenCard specimen={lastFind.specimen} rewards={lastFind.rewards} />
+                    <SpecimenCard specimen={lastFind.specimen} rewards={lastFind.rewards} layer={lastFind.layer} />
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -314,6 +314,9 @@ async def mine_action(data: dict = Body(...), user=Depends(get_current_user)):
         "xp_value": rarity_info["xp_value"],
         "depth_found": depth,
         "found_at": datetime.now(timezone.utc).isoformat(),
+        "layer_found": active_layer["id"],
+        "layer_name": active_layer["name"],
+        "layer_multiplier": layer_loot_mult,
     }
 
     # Update mine state

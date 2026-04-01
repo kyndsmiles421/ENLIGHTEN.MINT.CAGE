@@ -601,6 +601,114 @@ async def get_legendary_frequencies(user=Depends(get_current_user)):
     return {"frequencies": discoveries}
 
 
+@router.get("/dream-realms/scenario-state")
+async def get_scenario_state(user=Depends(get_current_user)):
+    """THE BRAIN: Unified scenario state for any game module.
+    
+    Combines:
+    - 5-Layer Universe position (from Resonance stat)
+    - Dream Realms loop state (difficulty, biome, distortions)
+    - Nexus elemental balance (harmony, elements, decay)
+    - Computed visual directives (what the Skin should render)
+    
+    Any game module can call this to know:
+    - What layer the user is in
+    - What difficulty level applies
+    - What visual distortions to apply
+    - What loot modifiers are active
+    """
+    user_id = user["id"]
+    from routes.game_core import compute_active_layer
+
+    # Get elemental balance
+    balance = await compute_elemental_balance(user_id)
+    harmony = balance["harmony_score"]
+    elements = balance["elements"]
+    decay = balance.get("decay_activity", {})
+
+    # Get layer
+    stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
+    resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
+    layer_info = compute_active_layer(resonance)
+    layer = layer_info["layer"]
+
+    # Get active dream realm (if any)
+    active_realm = await db.dream_realms.find_one(
+        {"user_id": user_id, "status": {"$in": ["active", "entering", "choosing"]}},
+        {"_id": 0, "user_id": 0},
+    )
+
+    # Compute difficulty
+    loop_iter = active_realm.get("loop_iteration", 0) if active_realm else 0
+    difficulty = _compute_loop_difficulty(harmony, decay, loop_iter)
+
+    # Compute visual directives for The Skin
+    layer_entropy = layer.get("entropy", 0)
+    harmony_blur = max(0, (100 - harmony) / 25)
+    layer_blur = layer.get("blur", 0)
+
+    # Composite visual state
+    visual_directives = {
+        "entropy_level": "critical" if harmony < 20 else "high" if harmony < 40 else "moderate" if harmony < 60 else "low" if harmony < 80 else "clear",
+        "blur": max(harmony_blur, layer_blur),
+        "grain": max(0.01, (100 - harmony) / 500) + layer_entropy * 0.06,
+        "glitch": (30 - harmony) / 30 if harmony < 30 else 0,
+        "saturation": 0.7 + (harmony / 200),
+        "tint_color": layer.get("color", "#A855F7"),
+        "tint_opacity": layer_entropy * 0.08,
+        "glow_intensity": layer.get("glow_intensity", 0.3),
+        "fractures_active": balance.get("harmony_cycle") == "destructive",
+        "layer_name": layer.get("name", "Terrestrial"),
+        "layer_id": layer.get("id", "terrestrial"),
+    }
+
+    # Biome context from active realm
+    biome_context = None
+    if active_realm and active_realm.get("biome"):
+        biome = active_realm["biome"]
+        biome_context = {
+            "name": biome.get("name"),
+            "atmosphere": biome.get("atmosphere"),
+            "visual_distortion": biome.get("visual_distortion"),
+            "color_primary": biome.get("color_primary"),
+            "color_ambient": biome.get("color_ambient"),
+        }
+
+    # Dominant/deficient elements
+    dom_el, def_el = "earth", "earth"
+    max_pct, min_pct = 0, 100
+    for eid, edata in elements.items():
+        pct = edata.get("percentage", 20)
+        if pct > max_pct:
+            max_pct = pct
+            dom_el = eid
+        if pct < min_pct:
+            min_pct = pct
+            def_el = eid
+
+    return {
+        "layer": {
+            "id": layer["id"],
+            "name": layer["name"],
+            "subtitle": layer["subtitle"],
+            "color": layer["color"],
+            "entropy": layer_entropy,
+            "loot_multiplier": layer["loot_multiplier"],
+            "xp_multiplier": layer["xp_multiplier"],
+            "rarity_shift": layer["rarity_shift"],
+        },
+        "difficulty": difficulty,
+        "harmony": harmony,
+        "harmony_cycle": balance.get("harmony_cycle", "neutral"),
+        "dominant_element": dom_el,
+        "deficient_element": def_el,
+        "visual_directives": visual_directives,
+        "biome_context": biome_context,
+        "loop_active": active_realm is not None and active_realm.get("status") == "active",
+        "loop_iteration": loop_iter,
+    }
+
+
 # ── Internal helpers ──
 
 async def _break_loop(user_id: str, realm: dict, harmony: int, balance: dict) -> dict:

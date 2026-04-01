@@ -435,7 +435,9 @@ export default function ForgottenLanguages() {
       mantraColor={scriptColor}
       moduleName="forgotten_languages"
       layerData={controller.layerData}
-      activeLayer={controller.activeLayer}>
+      activeLayer={controller.activeLayer}
+      visualDirectives={controller.visualDirectives}
+      biomeContext={controller.biomeContext}>
 
       <div className="pb-24" data-testid="forgotten-languages-page">
         {/* Header */}

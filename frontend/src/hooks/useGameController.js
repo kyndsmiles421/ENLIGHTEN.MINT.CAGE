@@ -24,23 +24,26 @@ export default function useGameController(moduleId) {
   const headers = authHeaders;
   const [nexusState, setNexusState] = useState(null);
   const [coreStats, setCoreStats] = useState(null);
+  const [scenarioState, setScenarioState] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const lastFetchRef = useRef(0);
 
-  // Fetch both Nexus state and Game Core stats
+  // Fetch Nexus state, Game Core stats, and Scenario state (The Brain)
   const fetchState = useCallback(async (force = false) => {
     const now = Date.now();
     if (!force && now - lastFetchRef.current < 5000) return;
     lastFetchRef.current = now;
 
     try {
-      const [nexusRes, coreRes] = await Promise.all([
+      const [nexusRes, coreRes, scenarioRes] = await Promise.all([
         axios.get(`${API}/nexus/state`, { headers }),
         axios.get(`${API}/game-core/stats`, { headers }),
+        axios.get(`${API}/dream-realms/scenario-state`, { headers }).catch(() => ({ data: null })),
       ]);
       setNexusState(nexusRes.data);
       setCoreStats(coreRes.data);
+      setScenarioState(scenarioRes.data);
       setError(null);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load game state');
@@ -118,6 +121,12 @@ export default function useGameController(moduleId) {
     layerData: coreStats?.layer?.layer || null,
     unlockedLayers: coreStats?.layer?.unlocked_layers || ['terrestrial'],
     allLayers: coreStats?.layer?.all_layers || [],
+    // Scenario state (The Brain)
+    scenarioState,
+    visualDirectives: scenarioState?.visual_directives || null,
+    difficulty: scenarioState?.difficulty || null,
+    loopActive: scenarioState?.loop_active || false,
+    biomeContext: scenarioState?.biome_context || null,
     // Element color helper
     getElementColor: (el) => EL_COLORS[el] || '#A855F7',
     // Actions

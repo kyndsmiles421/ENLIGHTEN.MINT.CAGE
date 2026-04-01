@@ -209,6 +209,9 @@ export default function GameModuleWrapper({
   // Layer system
   layerData = null,
   activeLayer = 'terrestrial',
+  // Visual directives from The Brain (Scenario Generator)
+  visualDirectives = null,
+  biomeContext = null,
 }) {
   // Compute avg freshness from decay activity
   const avgFreshness = useMemo(() => {
@@ -220,17 +223,22 @@ export default function GameModuleWrapper({
   // Layer entropy amplifies grain/blur
   const layerEntropy = layerData?.entropy || 0;
   const grainOpacity = useMemo(() => {
+    // If Brain provides a directive, use it; otherwise compute
+    if (visualDirectives?.grain) return visualDirectives.grain;
     const base = Math.max(0.01, (100 - harmonyScore) / 500);
     return base + layerEntropy * 0.06;
-  }, [harmonyScore, layerEntropy]);
+  }, [harmonyScore, layerEntropy, visualDirectives]);
 
   // Effective harmony — Void/Astral layers reduce effective clarity
   const effectiveHarmony = useMemo(() => {
-    if (activeLayer === 'nexus') return Math.max(harmonyScore, 80); // Nexus transcends entropy
+    if (activeLayer === 'nexus') return Math.max(harmonyScore, 80);
     return Math.max(0, harmonyScore - layerEntropy * 30);
   }, [harmonyScore, layerEntropy, activeLayer]);
 
   const layerColor = layerData?.color || null;
+
+  // Biome-driven tint (from Dream Realms active biome)
+  const biomeTint = biomeContext?.color_primary || null;
 
   return (
     <div className="relative min-h-screen overflow-hidden"
@@ -245,17 +253,26 @@ export default function GameModuleWrapper({
         {children}
       </div>
 
-      {/* Layer 2-5: Distortion Compositor overlay */}
+      {/* Layer 2-7: Distortion Compositor overlay (The Skin) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-[30]"
         data-testid="distortion-compositor">
+        {/* Rule 1: Entropy blur/flicker */}
         <EntropyLayer harmony={effectiveHarmony} />
+        {/* Rule 2: Element tinting from Nexus state */}
         <ElementalTintLayer dominantElement={dominantElement} dominantPercentage={dominantPercentage} />
+        {/* Rule 3: Decay distortion from stale practices */}
         <DecayDistortionLayer avgFreshness={avgFreshness} />
+        {/* Rule 4: Fracture lines on destructive cycle */}
         <FractureLayer cycle={harmonyCycle} harmony={effectiveHarmony} />
+        {/* Rule 5: Layer-specific tint overlay */}
         <LayerTintOverlay layerColor={layerColor} entropy={layerEntropy} />
+        {/* Biome tint from active Dream Realm */}
+        {biomeTint && <LayerTintOverlay layerColor={biomeTint} entropy={0.3} />}
+        {/* Mantra ripple on game action */}
         <AnimatePresence>
           {mantraActive && <MantraRipple active={mantraActive} color={mantraColor} />}
         </AnimatePresence>
+        {/* Ambient grain */}
         <GrainOverlay opacity={grainOpacity} />
       </div>
 
