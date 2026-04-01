@@ -26,6 +26,7 @@ import CosmicForge from '../components/CosmicForge';
 import GodModeDashboard from '../components/GodModeDashboard';
 import GenesisMint from '../components/GenesisMint';
 import EnergyGates from '../components/EnergyGates';
+import ResonancePractice from '../components/ResonancePractice';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -43,6 +44,7 @@ const CATEGORIES = [
 const TABS = [
   { id: 'browse', label: 'Browse' },
   { id: 'gates', label: 'Gates', icon: Zap, color: '#D97706' },
+  { id: 'resonance', label: 'Resonance', icon: Sparkles, color: '#8B5CF6' },
   { id: 'broker', label: 'Broker', icon: Sparkles, color: '#EAB308' },
   { id: 'forge', label: 'Forge', icon: Gem, color: '#D97706' },
   { id: 'content', label: 'Content', icon: Sparkles, color: '#C084FC' },
@@ -262,6 +264,13 @@ export default function TradeCircle() {
             {tab === 'gates' && (
               <motion.div key="gates" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <EnergyGates />
+              </motion.div>
+            )}
+
+            {/* Resonance Practice */}
+            {tab === 'resonance' && (
+              <motion.div key="resonance" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <ResonancePractice />
               </motion.div>
             )}
 

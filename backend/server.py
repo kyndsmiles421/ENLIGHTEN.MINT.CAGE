@@ -108,6 +108,7 @@ from routes.consciousness import router as consciousness_router
 from routes.forge import router as forge_router
 from routes.energy_gates import router as energy_gates_router
 from routes.gps_hotspots import router as hotspots_router
+from routes.resonance import router as resonance_router
 
 app = FastAPI()
 
@@ -183,6 +184,7 @@ all_routers = [
     forge_router,
     energy_gates_router,
     hotspots_router,
+    resonance_router,
 ]
 
 for r in all_routers:

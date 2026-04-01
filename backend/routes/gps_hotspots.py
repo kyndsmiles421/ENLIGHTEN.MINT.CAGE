@@ -55,13 +55,29 @@ STATIC_HOTSPOTS = [
     {"id": "static_aurora", "name": "Aurora Gateway", "element": "ether",
      "lat": 69.6492, "lng": 18.9553, "tier": "rare",
      "lore": "When the northern lights dance, the Ether Gate opens briefly."},
+    # Rapid City local hotspots
+    {"id": "static_memorial_park", "name": "Memorial Park Spring", "element": "water",
+     "lat": 44.0752, "lng": -103.2310, "tier": "uncommon",
+     "lore": "The creek whispers through cottonwoods, carrying the memory of rain and snowmelt."},
+    {"id": "static_skyline_drive", "name": "Skyline Drive Overlook", "element": "earth",
+     "lat": 44.0614, "lng": -103.2570, "tier": "uncommon",
+     "lore": "At the crest of the ridge, the Badlands spread below like the spine of the Earth."},
+    {"id": "static_storybook_island", "name": "Storybook Island Grove", "element": "air",
+     "lat": 44.0735, "lng": -103.2420, "tier": "uncommon",
+     "lore": "Where imagination takes form. The Air element dances through the trees of childhood wonder."},
+    {"id": "static_dinosaur_park", "name": "Dinosaur Park Summit", "element": "fire",
+     "lat": 44.0745, "lng": -103.2515, "tier": "uncommon",
+     "lore": "Ancient titans once walked here. Their fire still smolders beneath the hilltop."},
+    {"id": "static_canyon_lake", "name": "Canyon Lake Reflection", "element": "water",
+     "lat": 44.0690, "lng": -103.2660, "tier": "rare",
+     "lore": "Still waters hold the sky. The Water Gate's frequency resonates off the canyon walls."},
 ]
 
-COLLECT_RADIUS_METERS = 300  # Must be within 300m to collect
-DYNAMIC_REFRESH_HOURS = 4   # Dynamic hotspots respawn every 4 hours
-DYNAMIC_SPAWN_COUNT = 5     # Number of dynamic hotspots per user
-DYNAMIC_SPAWN_RADIUS_KM = 2 # Spawn within 2km of user
-COLLECT_COOLDOWN_HOURS = 2  # Per-hotspot cooldown after collecting
+COLLECT_RADIUS_METERS = 50   # Must be within 50m to collect (geofence)
+DYNAMIC_REFRESH_HOURS = 4    # Dynamic hotspots respawn every 4 hours
+DYNAMIC_SPAWN_COUNT = 5      # Number of dynamic hotspots per user
+DYNAMIC_SPAWN_RADIUS_KM = 2  # Spawn within 2km of user
+COLLECT_COOLDOWN_HOURS = 2   # Per-hotspot cooldown after collecting
 
 
 def _haversine(lat1, lng1, lat2, lng2):
