@@ -276,6 +276,14 @@ async def complete_practice(data: dict = Body(...), user=Depends(get_current_use
         upsert=True,
     )
 
+    # Auto-complete daily quest "resonance"
+    quest_result = None
+    try:
+        from routes.rpg import award_quest_xp
+        quest_result = await award_quest_xp(user_id, "resonance")
+    except Exception:
+        pass
+
     return {
         "completed": True,
         "practice": p["name"],
@@ -293,6 +301,7 @@ async def complete_practice(data: dict = Body(...), user=Depends(get_current_use
             "multiplier": streak_mult,
         },
         "level_multiplier": level_mult,
+        "quest_completed": quest_result is not None,
     }
 
 

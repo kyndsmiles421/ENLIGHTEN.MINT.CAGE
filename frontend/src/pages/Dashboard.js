@@ -12,6 +12,7 @@ import CosmicPrescription from '../components/CosmicPrescription';
 import { FoundingArchitectBadge } from '../components/FoundingArchitect';
 import ConsciousnessPanel from '../components/ConsciousnessPanel';
 import MantraOfTheDay from '../components/MantraOfTheDay';
+import StreakHeatmap from '../components/StreakHeatmap';
 import { toast } from 'sonner';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
@@ -99,9 +100,10 @@ const SECTION_META = {
   recommendations: { label: 'For You',           tKey: 'dashboard.forYou',            color: '#D8B4FE' },
   actions:         { label: 'Explore & Practice', tKey: 'dashboard.exploreAndPractice', color: '#86EFAC' },
   mantra_day:      { label: 'Mantra of the Day',  tKey: null,                          color: '#8B5CF6' },
+  streak_heatmap:  { label: 'Activity Heatmap',  tKey: null,                          color: '#FB923C' },
 };
 
-const DEFAULT_ORDER = ["stats", "mantra_day", "cosmic_weather", "nexus_intent", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
+const DEFAULT_ORDER = ["stats", "mantra_day", "streak_heatmap", "cosmic_weather", "nexus_intent", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
 const DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/bible"];
 
 export default function Dashboard() {
@@ -275,6 +277,7 @@ export default function Dashboard() {
     switch (sectionId) {
       case 'stats': return <StatsSection key="stats" stats={stats} streak={streak} navigate={navigate} />;
       case 'mantra_day': return <MantraOfTheDay key="mantra-day" />;
+      case 'streak_heatmap': return <StreakHeatmap key="streak-heatmap" />;
       case 'cosmic_weather': return cosmicWeather ? <CosmicWeatherSection key="weather" weather={cosmicWeather} navigate={navigate} /> : null;
       case 'nexus_intent': return nexusIntent ? <NexusIntentSection key="nexus-intent" intent={nexusIntent} navigate={navigate} playFrequency={playFrequency} /> : null;
       case 'pinned': return pinnedShortcuts.length > 0 ? <PinnedSection key="pinned" pinned={pinnedShortcuts} navigate={navigate} editMode={editMode} onRemove={togglePin} allActions={ALL_ACTIONS} /> : null;

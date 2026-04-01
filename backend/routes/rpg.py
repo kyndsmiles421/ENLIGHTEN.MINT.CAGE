@@ -895,6 +895,22 @@ DAILY_QUESTS = [
     {"id": "breath_reset", "name": "3-Breath Reset", "description": "Take 3 deep breaths to center yourself",
      "xp": 10, "currency": "cosmic_dust", "currency_amount": 3, "icon": "zap",
      "pillar": False},
+    # Resonance / Gate / Hotspot quests (integrated loop)
+    {"id": "resonance", "name": "Resonance Attunement", "description": "Complete a Resonance Practice session",
+     "xp": 40, "currency": "cosmic_dust", "currency_amount": 12, "icon": "target",
+     "pillar": True},
+    {"id": "hotspot", "name": "Energy Harvester", "description": "Collect from a GPS Hotspot",
+     "xp": 35, "currency": "cosmic_dust", "currency_amount": 10, "icon": "map-pin",
+     "pillar": False},
+    {"id": "trade", "name": "Cosmic Exchange", "description": "Complete or offer a trade in Trade Circle",
+     "xp": 30, "currency": "cosmic_dust", "currency_amount": 10, "icon": "handshake",
+     "pillar": False},
+    {"id": "refine_gem", "name": "Gem Alchemist", "description": "Polish a gem in the Refinement Lab",
+     "xp": 35, "currency": "cosmic_dust", "currency_amount": 12, "icon": "gem",
+     "pillar": False},
+    {"id": "realm_travel", "name": "Realm Walker", "description": "Visit 3 different app realms today",
+     "xp": 25, "currency": "cosmic_dust", "currency_amount": 8, "icon": "compass",
+     "pillar": False},
 ]
 
 PERFECT_DAY_BONUS_XP = 100
@@ -1050,7 +1066,7 @@ async def award_quest_xp(user_id: str, quest_id: str) -> dict:
 @router.get("/quests/daily")
 async def get_daily_quests(user=Depends(get_current_user)):
     today = _today_key()
-    char = await get_or_create_character(user["id"])
+    await get_or_create_character(user["id"])
 
     # Get today's completions
     completed_today = await db.rpg_quest_log.find(

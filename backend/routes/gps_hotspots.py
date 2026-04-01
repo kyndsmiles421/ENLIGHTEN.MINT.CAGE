@@ -347,6 +347,14 @@ async def collect_hotspot(data: dict = Body(...), user=Depends(get_current_user)
         upsert=True,
     )
 
+    # Auto-complete daily quest "hotspot"
+    quest_result = None
+    try:
+        from routes.rpg import award_quest_xp
+        quest_result = await award_quest_xp(user_id, "hotspot")
+    except Exception:
+        pass
+
     return {
         "collected": True,
         "hotspot": hotspot["name"],
@@ -359,6 +367,7 @@ async def collect_hotspot(data: dict = Body(...), user=Depends(get_current_user)
         },
         "lore": hotspot.get("lore", ""),
         "cooldown_hours": COLLECT_COOLDOWN_HOURS,
+        "quest_completed": quest_result is not None,
     }
 
 
