@@ -148,20 +148,86 @@ UNIVERSE_LAYERS = {
 
 LAYER_ORDER = ["terrestrial", "ethereal", "astral", "void", "nexus"]
 
+# ── Nexus Passes — Temporary Layer Upgrades ──
+NEXUS_PASSES = {
+    "astral_pass": {
+        "id": "astral_pass",
+        "name": "Astral Pass",
+        "description": "1 hour in the Dream Plane. Enhanced rare drops.",
+        "target_layer": "astral",
+        "duration_minutes": 60,
+        "cost_dust": 200,
+        "color": "#3B82F6",
+        "icon": "sparkles",
+    },
+    "void_pass": {
+        "id": "void_pass",
+        "name": "Void Pass",
+        "description": "1 hour in the Shadow Expanse. Legendary drops possible.",
+        "target_layer": "void",
+        "duration_minutes": 60,
+        "cost_dust": 500,
+        "color": "#EF4444",
+        "icon": "flame",
+    },
+    "nexus_pass": {
+        "id": "nexus_pass",
+        "name": "Nexus Pass",
+        "description": "30 min of Convergence. Mythic drops. Transcendent clarity.",
+        "target_layer": "nexus",
+        "duration_minutes": 30,
+        "cost_dust": 1200,
+        "color": "#FCD34D",
+        "icon": "crown",
+    },
+}
 
-def compute_active_layer(resonance_stat: int) -> dict:
-    """Determine which universe layer is active based on resonance stat."""
-    active = "terrestrial"
+
+async def get_active_pass(user_id: str) -> dict | None:
+    """Check if user has an active (non-expired) Nexus Pass."""
+    now = datetime.now(timezone.utc).isoformat()
+    active = await db.nexus_passes.find_one(
+        {"user_id": user_id, "expires_at": {"$gt": now}, "active": True},
+        {"_id": 0, "user_id": 0},
+    )
+    return active
+
+
+def compute_active_layer(resonance_stat: int, active_pass: dict = None) -> dict:
+    """Determine which universe layer is active based on resonance stat + active pass."""
+    # Natural layer from resonance
+    natural = "terrestrial"
     for lid in LAYER_ORDER:
         layer = UNIVERSE_LAYERS[lid]
         if resonance_stat >= layer["resonance_required"]:
-            active = lid
+            natural = lid
+
+    # Pass override — if pass grants a higher layer, use it
+    active = natural
+    pass_info = None
+    if active_pass:
+        pass_layer = active_pass.get("target_layer", "terrestrial")
+        if LAYER_ORDER.index(pass_layer) > LAYER_ORDER.index(natural):
+            active = pass_layer
+            pass_info = {
+                "pass_id": active_pass.get("pass_id"),
+                "pass_name": active_pass.get("pass_name"),
+                "expires_at": active_pass.get("expires_at"),
+                "target_layer": pass_layer,
+            }
+
     layer_data = UNIVERSE_LAYERS[active]
     unlocked = [lid for lid in LAYER_ORDER if resonance_stat >= UNIVERSE_LAYERS[lid]["resonance_required"]]
+    # Pass also unlocks its target layer
+    if pass_info and active not in unlocked:
+        unlocked.append(active)
+
     return {
         "active_layer": active,
+        "natural_layer": natural,
         "layer": layer_data,
         "unlocked_layers": unlocked,
+        "active_pass": pass_info,
         "all_layers": [
             {
                 "id": lid,
@@ -294,13 +360,16 @@ async def roll_loot(rarity_modifiers: dict = None, seed: int = None) -> str:
 
 
 async def get_user_stats(user_id: str) -> dict:
-    """Get full user game stats."""
+    """Get full user game stats with active pass considered."""
     char = await db.rpg_characters.find_one({"user_id": user_id}, {"_id": 0, "xp": 1})
     currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0})
     stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
 
     total_xp = char.get("xp", 0) if char else 0
     stats = stats_doc.get("stats", {}) if stats_doc else {}
+
+    # Check for active pass
+    active_pass = await get_active_pass(user_id)
 
     return {
         "level": level_from_xp(total_xp),
@@ -315,7 +384,7 @@ async def get_user_stats(user_id: str) -> dict:
             }
             for sid, sdef in STATS.items()
         },
-        "layer": compute_active_layer(stats.get("resonance", 0)),
+        "layer": compute_active_layer(stats.get("resonance", 0), active_pass),
     }
 
 
@@ -331,10 +400,11 @@ async def get_stats(user=Depends(get_current_user)):
 
 @router.get("/game-core/layer")
 async def get_layer(user=Depends(get_current_user)):
-    """Get user's current universe layer based on Resonance stat."""
+    """Get user's current universe layer based on Resonance stat + active pass."""
     stats_doc = await db.game_core_stats.find_one({"user_id": user["id"]}, {"_id": 0})
     resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
-    return compute_active_layer(resonance)
+    active_pass = await get_active_pass(user["id"])
+    return compute_active_layer(resonance, active_pass)
 
 
 @router.get("/game-core/modules")
@@ -397,3 +467,138 @@ async def commit_reward(data: dict = Body(...), user=Depends(get_current_user)):
         results["nexus_modifier"] = f"+1 {element}"
     
     return {"status": "committed", "module": module_id, "results": results}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  NEXUS PASSES — Temporary Layer Upgrades
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/game-core/passes")
+async def get_passes(user=Depends(get_current_user)):
+    """Get available Nexus Passes and active pass status."""
+    user_id = user["id"]
+    active_pass = await get_active_pass(user_id)
+
+    # Get user's dust balance
+    currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0, "user_id": 0})
+    dust = (currencies or {}).get("cosmic_dust", 0)
+
+    # Natural layer
+    stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
+    resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
+    natural = "terrestrial"
+    for lid in LAYER_ORDER:
+        if resonance >= UNIVERSE_LAYERS[lid]["resonance_required"]:
+            natural = lid
+
+    # Build pass options (only show passes above natural layer)
+    available = []
+    for pid, pdata in NEXUS_PASSES.items():
+        target_order = LAYER_ORDER.index(pdata["target_layer"])
+        natural_order = LAYER_ORDER.index(natural)
+        if target_order > natural_order:
+            available.append({
+                **pdata,
+                "can_afford": dust >= pdata["cost_dust"],
+                "already_unlocked": False,
+            })
+
+    # Purchase history
+    history = await db.nexus_passes.find(
+        {"user_id": user_id}, {"_id": 0, "user_id": 0}
+    ).sort("purchased_at", -1).to_list(10)
+
+    return {
+        "available_passes": available,
+        "active_pass": active_pass,
+        "cosmic_dust": dust,
+        "natural_layer": natural,
+        "purchase_history": history,
+    }
+
+
+@router.post("/game-core/passes/purchase")
+async def purchase_pass(data: dict = Body(...), user=Depends(get_current_user)):
+    """Purchase a Nexus Pass with Cosmic Dust."""
+    user_id = user["id"]
+    pass_id = data.get("pass_id")
+
+    if pass_id not in NEXUS_PASSES:
+        raise HTTPException(400, f"Unknown pass: {pass_id}")
+
+    pass_def = NEXUS_PASSES[pass_id]
+
+    # Check for existing active pass
+    existing = await get_active_pass(user_id)
+    if existing:
+        raise HTTPException(400, "You already have an active pass. Wait for it to expire.")
+
+    # Check balance
+    currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0, "user_id": 0})
+    dust = (currencies or {}).get("cosmic_dust", 0)
+
+    if dust < pass_def["cost_dust"]:
+        raise HTTPException(400, f"Insufficient Cosmic Dust. Need {pass_def['cost_dust']}, have {dust}.")
+
+    # Check if pass is above natural layer
+    stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
+    resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
+    natural = "terrestrial"
+    for lid in LAYER_ORDER:
+        if resonance >= UNIVERSE_LAYERS[lid]["resonance_required"]:
+            natural = lid
+    if LAYER_ORDER.index(pass_def["target_layer"]) <= LAYER_ORDER.index(natural):
+        raise HTTPException(400, "You already have natural access to this layer.")
+
+    # Deduct dust
+    await db.rpg_currencies.update_one(
+        {"user_id": user_id}, {"$inc": {"cosmic_dust": -pass_def["cost_dust"]}}
+    )
+
+    # Create pass
+    from datetime import timedelta
+    now = datetime.now(timezone.utc)
+    expires = now + timedelta(minutes=pass_def["duration_minutes"])
+
+    await db.nexus_passes.insert_one({
+        "user_id": user_id,
+        "pass_id": pass_id,
+        "pass_name": pass_def["name"],
+        "target_layer": pass_def["target_layer"],
+        "cost_paid": pass_def["cost_dust"],
+        "duration_minutes": pass_def["duration_minutes"],
+        "purchased_at": now.isoformat(),
+        "expires_at": expires.isoformat(),
+        "active": True,
+    })
+
+    # Log transaction
+    await db.game_core_transactions.insert_one({
+        "user_id": user_id,
+        "type": "pass_purchase",
+        "pass_id": pass_id,
+        "cost": pass_def["cost_dust"],
+        "target_layer": pass_def["target_layer"],
+        "expires_at": expires.isoformat(),
+        "timestamp": now.isoformat(),
+    })
+
+    layer_info = compute_active_layer(resonance, {
+        "pass_id": pass_id,
+        "pass_name": pass_def["name"],
+        "target_layer": pass_def["target_layer"],
+        "expires_at": expires.isoformat(),
+    })
+
+    return {
+        "purchased": True,
+        "pass": {
+            "id": pass_id,
+            "name": pass_def["name"],
+            "target_layer": pass_def["target_layer"],
+            "expires_at": expires.isoformat(),
+            "duration_minutes": pass_def["duration_minutes"],
+        },
+        "dust_remaining": dust - pass_def["cost_dust"],
+        "layer": layer_info,
+    }

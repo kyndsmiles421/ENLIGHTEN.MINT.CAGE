@@ -213,11 +213,12 @@ async def _get_or_create_mine(user_id: str, element_bias: str = None) -> dict:
 async def get_mine(user=Depends(get_current_user)):
     """Get the user's current mine session with active universe layer."""
     mine = await _get_or_create_mine(user["id"])
-    # Attach layer info
-    from routes.game_core import compute_active_layer
+    # Attach layer info (with pass check)
+    from routes.game_core import compute_active_layer, get_active_pass
     stats_doc = await db.game_core_stats.find_one({"user_id": user["id"]}, {"_id": 0})
     resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
-    mine["layer"] = compute_active_layer(resonance)
+    active_pass = await get_active_pass(user["id"])
+    mine["layer"] = compute_active_layer(resonance, active_pass)
     return mine
 
 
@@ -259,10 +260,11 @@ async def mine_action(data: dict = Body(...), user=Depends(get_current_user)):
     harmony = balance["harmony_score"]
 
     # ── Layer multipliers ──
-    from routes.game_core import compute_active_layer
+    from routes.game_core import compute_active_layer, get_active_pass
     stats_doc = await db.game_core_stats.find_one({"user_id": user_id}, {"_id": 0})
     resonance = (stats_doc or {}).get("stats", {}).get("resonance", 0)
-    layer_info = compute_active_layer(resonance)
+    active_pass = await get_active_pass(user_id)
+    layer_info = compute_active_layer(resonance, active_pass)
     active_layer = layer_info["layer"]
     layer_loot_mult = active_layer.get("loot_multiplier", 1.0)
     layer_xp_mult = active_layer.get("xp_multiplier", 1.0)

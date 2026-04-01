@@ -10,7 +10,8 @@ import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../compo
 import {
   ArrowLeft, Pickaxe, Zap, Star, Gem, ChevronRight,
   Flame, Droplets, Mountain, Sprout, Lock,
-  TrendingUp, Award, BookOpen, Battery, RefreshCw
+  TrendingUp, Award, BookOpen, Battery, RefreshCw,
+  Crown, Sparkles, Clock, ShoppingBag, X
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -194,6 +195,187 @@ function CollectionItem({ item }) {
         {item.best_rarity}
       </span>
     </div>
+  );
+}
+
+// ── Active Pass Banner ──
+function ActivePassBanner({ pass: passInfo, layerColor }) {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    if (!passInfo) return;
+    const update = () => {
+      const exp = new Date(passInfo.expires_at);
+      const now = new Date();
+      const diff = exp - now;
+      if (diff <= 0) { setTimeLeft('Expired'); return; }
+      const m = Math.floor(diff / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setTimeLeft(`${m}:${s.toString().padStart(2, '0')}`);
+    };
+    update();
+    const i = setInterval(update, 1000);
+    return () => clearInterval(i);
+  }, [passInfo]);
+
+  if (!passInfo) return null;
+
+  const color = layerColor || '#A855F7';
+  return (
+    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl p-2.5 mb-3 flex items-center gap-2.5"
+      style={{ background: `${color}08`, border: `1px solid ${color}15` }}
+      data-testid="active-pass-banner">
+      <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 3, repeat: Infinity }}
+        className="w-8 h-8 rounded-lg flex items-center justify-center"
+        style={{ background: `${color}15` }}>
+        <Crown size={14} style={{ color }} />
+      </motion.div>
+      <div className="flex-1">
+        <p className="text-[9px] font-bold" style={{ color }}>{passInfo.pass_name} Active</p>
+        <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>
+          Mining in {passInfo.target_layer.charAt(0).toUpperCase() + passInfo.target_layer.slice(1)} layer
+        </p>
+      </div>
+      <div className="flex items-center gap-1 px-2 py-1 rounded-lg"
+        style={{ background: `${color}10` }}>
+        <Clock size={8} style={{ color }} />
+        <span className="text-[9px] font-mono font-bold" style={{ color }}>{timeLeft}</span>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Nexus Pass Shop ──
+function NexusPassShop({ headers, onPurchased, currentDust }) {
+  const [passes, setPasses] = useState(null);
+  const [purchasing, setPurchasing] = useState(false);
+  const [showShop, setShowShop] = useState(false);
+
+  const fetchPasses = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/game-core/passes`, { headers });
+      setPasses(res.data);
+    } catch {}
+  }, [headers]);
+
+  useEffect(() => { if (showShop) fetchPasses(); }, [showShop, fetchPasses]);
+
+  const purchase = async (passId) => {
+    setPurchasing(true);
+    try {
+      const res = await axios.post(`${API}/game-core/passes/purchase`, { pass_id: passId }, { headers });
+      toast(`${res.data.pass.name} activated! Mining in ${res.data.pass.target_layer} for ${res.data.pass.duration_minutes} minutes.`);
+      onPurchased?.();
+      setShowShop(false);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Purchase failed');
+    }
+    setPurchasing(false);
+  };
+
+  const PASS_ICONS = { astral_pass: Sparkles, void_pass: Flame, nexus_pass: Crown };
+
+  return (
+    <>
+      <button onClick={() => setShowShop(true)}
+        className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[9px] font-medium mb-4"
+        style={{ background: 'rgba(252,211,77,0.04)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.08)' }}
+        data-testid="open-pass-shop">
+        <Crown size={10} /> Nexus Passes
+      </button>
+
+      <AnimatePresence>
+        {showShop && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setShowShop(false)}>
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-md rounded-2xl p-5"
+              style={{ background: 'var(--bg-primary)', border: '1px solid rgba(252,211,77,0.1)' }}
+              data-testid="pass-shop-modal">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Crown size={16} style={{ color: '#FCD34D' }} />
+                  <h2 className="text-base font-bold" style={{ color: '#FCD34D', fontFamily: 'Cormorant Garamond, serif' }}>
+                    Nexus Passes
+                  </h2>
+                </div>
+                <button onClick={() => setShowShop(false)} className="w-6 h-6 rounded-lg flex items-center justify-center"
+                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <X size={12} style={{ color: 'var(--text-muted)' }} />
+                </button>
+              </div>
+
+              <p className="text-[9px] mb-1" style={{ color: 'var(--text-muted)' }}>
+                Temporarily unlock higher universe layers for enhanced loot and XP.
+              </p>
+              <p className="text-[9px] mb-4 flex items-center gap-1" style={{ color: '#FCD34D' }}>
+                <Gem size={8} /> Your Dust: {passes?.cosmic_dust ?? currentDust}
+              </p>
+
+              {!passes ? (
+                <CosmicInlineLoader message="Loading passes..." />
+              ) : passes.active_pass ? (
+                <div className="text-center py-6">
+                  <Crown size={24} className="mx-auto mb-2" style={{ color: '#FCD34D' }} />
+                  <p className="text-[10px]" style={{ color: '#FCD34D' }}>Pass already active.</p>
+                  <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>Wait for it to expire before buying another.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {passes.available_passes.map(p => {
+                    const PIcon = PASS_ICONS[p.id] || Sparkles;
+                    const layerDef = { astral: { color: '#3B82F6', mult: '1.7x' }, void: { color: '#EF4444', mult: '2.5x' }, nexus: { color: '#FCD34D', mult: '3.0x' } };
+                    const ld = layerDef[p.target_layer] || { color: '#A855F7', mult: '?' };
+                    return (
+                      <div key={p.id} className="rounded-xl p-3.5 relative overflow-hidden"
+                        style={{ background: `${ld.color}04`, border: `1px solid ${ld.color}10` }}>
+                        <motion.div className="absolute inset-0"
+                          animate={{ opacity: [0.01, 0.03, 0.01] }}
+                          transition={{ duration: 4, repeat: Infinity }}
+                          style={{ background: `radial-gradient(circle at 50% 50%, ${ld.color}15, transparent 70%)` }} />
+                        <div className="relative z-10 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                            style={{ background: `${ld.color}10`, border: `1px solid ${ld.color}20` }}>
+                            <PIcon size={18} style={{ color: ld.color }} />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-bold" style={{ color: ld.color, fontFamily: 'Cormorant Garamond, serif' }}>
+                              {p.name}
+                            </p>
+                            <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{p.description}</p>
+                            <div className="flex items-center gap-2 mt-1 text-[7px]" style={{ color: 'var(--text-muted)' }}>
+                              <span>{p.duration_minutes} min</span>
+                              <span>{ld.mult} loot</span>
+                            </div>
+                          </div>
+                          <button onClick={() => purchase(p.id)} disabled={!p.can_afford || purchasing}
+                            className="px-3 py-2 rounded-xl text-[9px] font-bold"
+                            style={{
+                              background: p.can_afford ? `${ld.color}15` : 'rgba(255,255,255,0.03)',
+                              color: p.can_afford ? ld.color : 'var(--text-muted)',
+                              border: `1px solid ${p.can_afford ? `${ld.color}20` : 'rgba(255,255,255,0.04)'}`,
+                              opacity: purchasing ? 0.5 : 1,
+                            }}
+                            data-testid={`buy-${p.id}`}>
+                            <div className="flex items-center gap-1">
+                              <Gem size={8} /> {p.cost_dust}
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -396,6 +578,14 @@ export default function RockHounding() {
           {/* Core Stats HUD — from Universal Game Controller */}
           <CoreStatsHUD coreStats={controller.coreStats} />
 
+          {/* Active Pass Banner */}
+          {controller.coreStats?.layer?.active_pass && (
+            <ActivePassBanner
+              pass={controller.coreStats.layer.active_pass}
+              layerColor={controller.layerData?.color}
+            />
+          )}
+
           {/* Universe Layer Bar */}
           {controller.allLayers.length > 0 && (
             <div className="rounded-xl p-3 mb-4" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
@@ -409,6 +599,12 @@ export default function RockHounding() {
                   <span className="text-[8px] font-bold" style={{ color: controller.layerData?.color || '#A855F7' }}>
                     {controller.layerData?.name || 'Terrestrial'}
                   </span>
+                  {controller.coreStats?.layer?.active_pass && (
+                    <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase font-bold"
+                      style={{ background: 'rgba(252,211,77,0.1)', color: '#FCD34D' }}>
+                      PASS
+                    </span>
+                  )}
                   {controller.layerData?.loot_multiplier > 1 && (
                     <span className="text-[7px] px-1.5 py-0.5 rounded-lg"
                       style={{ background: `${controller.layerData.color}10`, color: controller.layerData.color }}>
@@ -525,11 +721,18 @@ export default function RockHounding() {
 
               {/* Reset mine */}
               <button onClick={resetMine}
-                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[9px] font-medium mb-4"
+                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[9px] font-medium mb-3"
                 style={{ background: 'rgba(59,130,246,0.04)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.08)' }}
                 data-testid="reset-mine-btn">
                 <RefreshCw size={10} /> New Mine (Reset Biome)
               </button>
+
+              {/* Nexus Pass Shop */}
+              <NexusPassShop
+                headers={headers}
+                onPurchased={() => { controller.refreshState(); fetchMine(); }}
+                currentDust={controller.coreStats?.currencies?.cosmic_dust || 0}
+              />
             </>
           )}
 
