@@ -99,6 +99,9 @@ from routes.evolution import router as evolution_router
 from routes.refinement import router as refinement_router
 from routes.smartdock import router as smartdock_router
 from routes.wisdom import router as wisdom_router
+from routes.economy_admin import router as economy_admin_router
+from routes.encounters import router as encounters_router
+from routes.living_journal import router as living_journal_router
 
 app = FastAPI()
 
@@ -165,6 +168,9 @@ all_routers = [
     refinement_router,
     smartdock_router,
     wisdom_router,
+    economy_admin_router,
+    encounters_router,
+    living_journal_router,
 ]
 
 for r in all_routers:

@@ -796,45 +796,7 @@ async def grant_test_credits(data: dict = Body(...), user=Depends(get_current_us
 
 @router.post("/marketplace/convert-dust")
 async def convert_dust_to_credits(data: dict = Body(...), user=Depends(get_current_user)):
-    """Convert Cosmic Dust into Cosmic Credits. Rate: 1000 Dust = 10 Credits."""
-    user_id = user["id"]
-    dust_amount = data.get("dust_amount", 0)
-
-    if dust_amount < 100:
-        raise HTTPException(400, "Minimum conversion: 100 Cosmic Dust (= 1 Credit)")
-
-    # Check dust balance
-    currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0, "user_id": 0})
-    current_dust = (currencies or {}).get("cosmic_dust", 0)
-
-    if current_dust < dust_amount:
-        raise HTTPException(400, f"Insufficient Dust. Have {current_dust}, need {dust_amount}.")
-
-    # Conversion: 1000 Dust = 10 Credits → 100 Dust = 1 Credit
-    credits_earned = dust_amount // 100
-    dust_consumed = credits_earned * 100
-
-    # Deduct dust
-    await db.rpg_currencies.update_one(
-        {"user_id": user_id}, {"$inc": {"cosmic_dust": -dust_consumed}}
-    )
-
-    # Add credits
-    new_balance = await modify_credits(user_id, credits_earned, "dust_conversion")
-
-    # Log
-    await db.marketplace_transactions.insert_one({
-        "user_id": user_id,
-        "type": "dust_conversion",
-        "dust_spent": dust_consumed,
-        "credits_earned": credits_earned,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    })
-
-    return {
-        "converted": True,
-        "dust_spent": dust_consumed,
-        "credits_earned": credits_earned,
-        "new_credit_balance": new_balance,
-        "remaining_dust": current_dust - dust_consumed,
-    }
+    """Convert Cosmic Dust into Cosmic Credits using admin-controlled sliding scale. Redirects to economy endpoint."""
+    # Delegate to the economy admin route for centralized rate management
+    from routes.economy_admin import convert_dust
+    return await convert_dust(data, user)
