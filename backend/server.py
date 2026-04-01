@@ -58,6 +58,7 @@ from routes.notifications import router as notifications_router
 from routes.achievements import router as achievements_router
 from routes.trade_circle import router as trade_circle_router
 from routes.content import router as content_router
+from routes.revenue import router as revenue_router
 from routes.subscriptions import router as subscriptions_router
 from routes.crystals import router as crystals_router
 from routes.entanglement import router as entanglement_router
@@ -173,6 +174,7 @@ all_routers = [
     encounters_router,
     living_journal_router,
     content_router,
+    revenue_router,
 ]
 
 for r in all_routers:

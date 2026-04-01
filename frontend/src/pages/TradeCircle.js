@@ -14,6 +14,7 @@ import CosmicBroker from '../components/trade/CosmicBroker';
 import EscrowDashboard from '../components/trade/EscrowDashboard';
 import { MantraBanner } from '../components/MantraSystem';
 import GameAvatarPanel from '../components/GameAvatar';
+import ContentBroker from '../components/trade/ContentBroker';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -784,6 +785,7 @@ export default function TradeCircle() {
           {[
             { id: 'browse', label: 'Browse' },
             { id: 'broker', label: 'Broker', icon: Sparkles, color: '#EAB308' },
+            { id: 'content', label: 'Content', icon: Sparkles, color: '#C084FC' },
             { id: 'escrow', label: 'Escrow', icon: Shield, color: '#818CF8' },
             { id: 'avatar', label: 'Avatar', icon: User, color: '#C084FC' },
             { id: 'my', label: 'My Listings' },
@@ -868,6 +870,13 @@ export default function TradeCircle() {
             {tab === 'broker' && (
               <motion.div key="broker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <CosmicBroker authHeaders={authHeaders} />
+              </motion.div>
+            )}
+
+            {/* AI Content Broker Tab */}
+            {tab === 'content' && (
+              <motion.div key="content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <ContentBroker authHeaders={authHeaders} />
               </motion.div>
             )}
 

@@ -22,6 +22,7 @@ import { ImmersionToggle } from './ImmersionToggle';
 import { useCreditsContext } from '../context/CreditContext';
 import { useAvatar } from '../context/AvatarContext';
 import DevConsole, { useTripleTap } from './DevConsole';
+import FidelityHUD from './FidelityHUD';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -474,6 +475,9 @@ export default function Navigation() {
 
           {/* Immersion Level */}
           <ImmersionToggle />
+
+          {/* Fidelity HUD Boost */}
+          {user && <FidelityHUD authHeaders={authHeaders} />}
 
           {/* Ambient Toggle */}
           <button
