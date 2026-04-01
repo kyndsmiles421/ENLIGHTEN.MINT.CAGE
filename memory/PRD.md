@@ -10,39 +10,48 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Elemental Nexus — 5th Realm (Mar 31, 2026) — NEW
-- **Dynamic Decay & Momentum**: Half-life logic (3-day half-life) causes element values to decay toward neutral during inactivity, encouraging consistent engagement
-- **Birth Resonance Calibration**: One-time natal baseline from birth date (zodiac sign + numerological life path number) shifts ideal element ratios per user
-- **Frequency-Task Pairing**: Each alignment task maps to specific Hz frequencies and mantras (Wood=528Hz, Fire=396Hz, Earth=174Hz, Metal=285Hz, Water=432Hz)
-- **Bridge UI Transitions**: Animated flow visualization on alignment completion, constructive/destructive cycle glow on Harmony Score, shift indicators on element rings, trend sparkline
-- **Decoded Modifiers Hook**: Architecture slot in `nexus.py` for Phase 2 Forgotten Languages to permanently offset natal resonance
-- **Cosmic Weather Dashboard Widget**: Streamlined card on Dashboard showing zodiac season, lunar phase, AI forecast, frequency/XP chips
-- **Backend**: `/api/nexus/state`, `/api/nexus/align`, `/api/nexus/birth-resonance` (GET/POST), `/api/nexus/history`
-- **Frontend**: Full Nexus page with HarmonyGauge, ElementRings, DecayBar, ElementFlowVis, BirthResonanceCard, AlignmentCards with frequency info
-- **Test**: Iteration 155 — 100% (28/28 backend, all frontend verified)
+### Procedural Loop Engine — Dream Realms (Apr 1, 2026) — NEW
+- **Infinite Scenario Generator**: Procedurally generates unique "Dream Realms" seeded by user's elemental balance + birth resonance + cosmic weather. No two users see the same realm.
+- **Nexus-Seeded Biomes**: 11 biome templates (fire_excess → "Solar Flare Desert", water_deficient → "Drought Sanctum", etc.) with dynamic naming via cosmic weather suffix
+- **Tighten vs Expand Mechanics**: Inactive users face harder loops (difficulty scales with decay); active users expand the realm for more rewards
+- **Escape Velocity**: Harmony Score is "escape velocity" — must reach threshold (base 60, +3 per iteration) to break the loop
+- **Legendary Frequency Discovery**: Breaking a loop reveals unique Hz combos (111-1111 Hz range, legendary/epic/mythic rarity) with procedural mantra pairings
+- **Decoded Modifier Hooks**: Loop completion permanently boosts elemental resonance via nexus_decoded_modifiers
+- **AI Narratives**: Gemini generates unique realm entry descriptions and tighten narratives with fallback text
+- **5-Rule Visual Distortion System**:
+  - Rule 1 (Entropy): Harmony Score → lens clarity. High=crisp, Low=blur+flicker+derez
+  - Rule 2 (Elemental Tinting): Dominant element → color grade (Wood=green sway, Fire=bloom, Water=refraction, Earth=amber, Metal=shimmer)
+  - Rule 3 (Decay Distortion): Inactivity → glitch-shift scanlines and wireframe flickers
+  - Rule 4 (Geometric Fracturing): Destructive cycle → jagged edges and corner fractures
+  - Rule 5 (Mantra Feedback): Challenge completion → cleaning ripple animation clearing distortion
+- **Backend**: `/api/dream-realms/active`, `/dream-realms/complete-challenge`, `/dream-realms/abandon`, `/dream-realms/history`, `/dream-realms/legendary-frequencies`
+- **Frontend**: Full DreamRealms page with DistortionCompositor, EscapeGauge, ChallengeCards, LegendaryCards, LoopBrokenOverlay, TightenBanner, History/Discoveries tabs
+- **Test**: Iteration 156 — 100% (23/23 backend, all frontend verified)
+
+### Elemental Nexus — 5th Realm (Mar 31, 2026)
+- **Dynamic Decay & Momentum**: 3-day half-life decay on element values during inactivity
+- **Birth Resonance Calibration**: Natal baseline from birth date personalizes ideal element ratios
+- **Frequency-Task Pairing**: Hz frequencies mapped to alignment tasks (Wood=528Hz, Fire=396Hz, Earth=174Hz, Metal=285Hz, Water=432Hz)
+- **Bridge UI Transitions**: Trend indicators, constructive/destructive cycle glow, shift indicators
+- **Decoded Modifiers Hook**: Architecture slot for Phase 2 Forgotten Languages
+- **Cosmic Weather Dashboard Widget**: Streamlined card showing zodiac, lunar, forecast
+- **Test**: Iteration 155 — 100% (28/28)
 
 ### Multiversal Layered Map System (Mar 31, 2026)
-- **4 Self-Contained Universes**: Terrestrial (Earth/vitality), Ethereal (Water/harmony), Astral (Fire/wisdom), Void (Air/resonance)
-- **27 total regions** across all 4 planes with unique NPCs, tools, and descriptions
-- **Interlocking Logic Engine**: Actions in one universe create ripples in the other three
-- **Portal System**: Cross-universe portals connecting planes
-- **NPC Dialogue System**: 21+ unique dialogue themes with resonance-based progression
-- **Cosmic Weather Integration**: Zodiac season determines ascendant universe (+20% XP bonus)
+- 4 self-contained universes, 27 regions, interlocking logic engine, portal system, NPC dialogues
+- **Test**: Iteration 154 — 100% (33/33)
 
 ### Cosmic Insights & Weather System (Mar 31, 2026)
-- AI-generated daily forecasts, tool recommendations, RPG elemental affinities
-- Featured Reports Dashboard, Stories-style Highlights, Deep-Dive Monthly Analysis (gem-locked)
-- Scholar's Bonus (+25 XP/week)
+- AI forecasts, tool recommendations, RPG bonuses, featured reports, scholar's bonus
+- **Test**: Iteration 153 — 100%
 
 ### Dual Currency Economy & Shop System (Mar 31, 2026)
-- Celestial Gems (hard, Stripe) + Cosmic Dust (soft, gameplay)
-- Dual-tier shop (17 items), equipment slot unlocks, gem packs
+- Celestial Gems (Stripe) + Cosmic Dust (gameplay), dual-tier shop, equipment slots
+- **Test**: Iteration 152 — 100%
 
 ### Daily Quest System (Mar 31, 2026)
-- 6 daily quests, Perfect Day bonus, streak multipliers (capped 2.5x)
-
-### Wellness MMORPG — Cosmic Realm (Mar 31, 2026)
-- RPGPage: Quests, Character, Inventory, Shop, World Map, Bosses, Circle
+- 6 daily quests, Perfect Day bonus, streak multipliers
+- **Test**: Iteration 151 — 100%
 
 ### Core Platform
 - Auth, Dashboard, AI Coach, Star Chart, Oracle, Sacred Texts
@@ -50,44 +59,28 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - 7-Day Trial, Stripe Subscriptions, MixerContext, SmartDock
 - Multi-Language (7), VR, PWA, Error Boundaries
 
-## Test Report History
-- Iterations 145-149: All 100% pass
-- Iteration 150: RPG MMORPG — 100%
-- Iteration 151: Daily Quest System — 100%
-- Iteration 152: Dual Currency Economy — 100%
-- Iteration 153: Cosmic Insights & Weather — 100%
-- Iteration 154: Multiversal Map — 100% (33/33)
-- Iteration 155: Elemental Nexus Phase 1 — 100% (28/28)
-
 ## Credentials
 - Admin: kyndsmiles@gmail.com / password
 - RPG Test: rpg_test@test.com / password123
-- Multiverse Test: multiverse_test@test.com / password123
 
 ## Upcoming Tasks
 
-### P1 — Phase 2: Forgotten Languages System
-- Daily Deciphering widget (home screen puzzle with geometric scripts)
-- Five-tier script discovery tied to game world (Earth→Aether progression)
-- Mantra/frequency unlock through decoded languages
-- Phonetic approach (vocal tones → breathing exercises)
-- Visual Cipher (geometric shapes → emotional states/elements, react to elemental balance)
-- Boss door/vault gatekeeping via language mastery
-- Script mastery tied to Resonance (Fire-high = easier Fire scripts)
+### P1 — Forgotten Languages System (Phase 2)
+- Daily Deciphering widget, Five-tier script discovery
+- Visual Ciphers reactive to elemental balance (Fire-high = easier Fire scripts)
 - Phonetic-to-Breath loop (hum frequencies to decode)
 - Progressive Reveal (higher tiers need higher Harmony Scores)
-- Decoded Modifiers → permanent natal resonance offsets via nexus.py hook
+- Decoded Modifiers → permanent natal resonance offsets
+- Script mastery tied to Resonance
 
 ### P1 — Other
 - Party System (Circle/Coven shared objectives)
 - Passive Trinket XP Boosts
-- Wellness-to-Universe auto-linking (mood→Terrestrial, meditation→Ethereal, etc.)
 
 ### P2 — Backlog
-- Virtual Rock Hounding, Myths & Legends Encyclopedia
-- Global Immersion Level Toggles, PDF Soul Map exports
-- Lunar Cycle global events, Month-Ahead forecasts
-- Elemental Crafting (forging gear with elemental affinities)
+- Virtual Rock Hounding, Elemental Crafting
+- Myths & Legends Encyclopedia, Global Immersion Toggles
+- PDF Soul Map exports, Lunar Cycle global events
 
 ### P3 — Future
 - Gem Resonance Engine, Avatar Creator, AI Scene Recreations
@@ -97,14 +90,13 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - **AuthHeaders**: `useAuth()` returns `authHeaders` as an object (not a function)
 - **AI**: `.with_model("gemini", "gemini-3-flash-preview")`
 - **RPG Terminology**: "Conduits" not "Weapons", "Circle" not "Party"
-- **Currency**: `stardust_shards` = Celestial Gems, `cosmic_dust` = Cosmic Dust
-- **Multiverse**: State tracked in `multiverse_state` collection, ripples capped at 50
-- **Nexus**: Half-life decay at 3 days, natal baseline from `nexus_birth_resonance`, decoded modifiers from `nexus_decoded_modifiers`
-- **Element Frequencies**: Wood=528Hz, Fire=396Hz, Earth=174Hz, Metal=285Hz, Water=432Hz
+- **Nexus**: Half-life 3 days, natal from `nexus_birth_resonance`, decoded modifiers from `nexus_decoded_modifiers`
+- **Dream Realms**: Biome seeded by worst imbalance + cosmic weather, escape velocity = 60 + 3*iteration
 
 ## Key DB Collections
+- Dream Realms: `dream_realms`, `legendary_frequencies`
+- Nexus: `nexus_alignments`, `nexus_birth_resonance`, `nexus_decoded_modifiers`, `nexus_harmony_history`
 - RPG: `rpg_characters`, `rpg_inventory`, `rpg_equipped`, `rpg_currencies`, `rpg_quest_log`, `rpg_streaks`
-- Shop: `rpg_purchases`, `rpg_slot_unlocks`, `rpg_transactions`, `payment_transactions`
+- Shop: `rpg_purchases`, `rpg_slot_unlocks`, `rpg_transactions`
 - Reports: `cosmic_weather_cache`
 - Multiverse: `multiverse_state`
-- Nexus: `nexus_alignments`, `nexus_birth_resonance`, `nexus_decoded_modifiers`, `nexus_harmony_history`
