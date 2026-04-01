@@ -55,6 +55,26 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 **Tests**: Iterations 173-174 — 100% Backend / 100% Frontend
 
+### 90-Second Cinematic Intro & JS Modularization (Apr 1, 2026)
+
+**Cinematic Intro (/intro route):**
+- 5-level visual progression: Physical (amber) → Emotional (rose) → Mental (silver) → Intuitive (indigo) → Pure Consciousness (gold halo)
+- Auto-advances every 4 seconds through all levels
+- Manual navigation via clickable level dots
+- Skip button → /auth, CTA → "Start 7-Day Free Ultra Trial"
+- Fullscreen: hides Navigation, SmartDock, CosmicBackground, CosmicMesh
+
+**Dashboard.js Modularization:**
+- Reduced from 1250 → 496 lines (60% reduction)
+- 12 section components extracted to `components/dashboard/DashboardSections.js` (~740 lines)
+- StatsSection, CosmicWeatherSection, NexusIntentSection, PinnedSection, SuggestionsSection, ScriptureSection, CoherenceSection, ChallengeSection, WisdomSection, MoodsSection, RecommendationsSection, ActionsSection
+
+**RPGPage.js Cleanup:**
+- Inline sub-components reformatted and consolidated (StatBar, ItemCard, EquipSlot, RegionNode, BossCard, QuestCard)
+- Constants grouped at top (STAT_ICONS, STAT_COLORS, SLOT_ICONS, RARITY_BG, RARITY_COLORS)
+
+**Tests**: Iteration 175 — 100% Backend / 100% Frontend
+
 ### Closed-Loop Content Factory & Founding Architect (Apr 1, 2026)
 
 **Auto-Generation Hooks (The Content Factory):**
@@ -139,7 +159,6 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Upcoming Tasks
 
 ### P0
-- **90-Second Cinematic Intro** — Multi-step showcase: Level 1 "Physical" grit → Level 5 "Pure Consciousness" visuals → Atmosphere Switch → Trade Circle → 7-Day Free Trial CTA
 - **Starseed Energy Gates** — Progression checkpoints requiring traded materials/polished gems
 
 ### P1
@@ -151,4 +170,3 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ### P2
 - Avatar spatial navigation, Myths & Legends, AI Scene Recreations
 - GPS Hotspot Spawning, Biometric Sync
-- RPGPage.js refactoring (>1400 lines), Dashboard.js refactoring (>1200 lines)
