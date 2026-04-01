@@ -152,6 +152,9 @@ const SmartDockPage = lazy(() => import('./pages/SmartDockPage'));
 const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
 const PlanetaryDepths = lazy(() => import('./pages/PlanetaryDepths'));
 const QuantumField = lazy(() => import('./pages/QuantumField'));
+const DimensionalSpace = lazy(() => import('./pages/DimensionalSpace'));
+const MasterViewPage = lazy(() => import('./pages/MasterView'));
+const CollectiveShadowMap = lazy(() => import('./pages/CollectiveShadowMap'));
 
 function PageLoader() {
   return (
@@ -291,6 +294,9 @@ function AnimatedRoutes() {
         <Route path="/hotspots" element={<HotspotsPage />} />
         <Route path="/planetary-depths" element={<PlanetaryDepths />} />
         <Route path="/quantum-field" element={<QuantumField />} />
+        <Route path="/dimensional-space" element={<DimensionalSpace />} />
+        <Route path="/master-view" element={<MasterViewPage />} />
+        <Route path="/collective-shadow-map" element={<CollectiveShadowMap />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

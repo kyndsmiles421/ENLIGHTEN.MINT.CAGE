@@ -112,6 +112,8 @@ from routes.resonance import router as resonance_router
 from routes.activity_loop import router as activity_loop_router
 from routes.planetary import router as planetary_router
 from routes.quantum import router as quantum_router
+from routes.dimensions import router as dimensions_router
+from routes.master_view import router as master_view_router
 
 app = FastAPI()
 
@@ -191,6 +193,8 @@ all_routers = [
     activity_loop_router,
     planetary_router,
     quantum_router,
+    dimensions_router,
+    master_view_router,
 ]
 
 for r in all_routers:

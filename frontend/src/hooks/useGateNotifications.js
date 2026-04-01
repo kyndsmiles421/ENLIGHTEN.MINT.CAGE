@@ -19,6 +19,9 @@ const ROUTE_TO_REALM = {
   '/trade-circle': 'trade_circle',
   '/planetary-depths': 'dream_realms',
   '/quantum-field': 'starseed_journey',
+  '/dimensional-space': 'cosmic_mixer',
+  '/master-view': 'trade_circle',
+  '/collective-shadow-map': 'dream_realms',
 };
 
 // Gate-specific narrative messages
