@@ -508,3 +508,354 @@ async def get_categories():
     """Get available trade categories."""
     return {"categories": TRADE_CATEGORIES}
 
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  AI MERCHANT — The "Central Bank"
+#  All real-value transactions flow through here.
+#  No P2P cash. Server-managed closed-loop.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AI_MERCHANT_CATALOG = [
+    # Dust packs (purchased with Credits)
+    {"id": "dust_500", "name": "Dust Cache", "type": "dust", "amount": 500, "price_credits": 3, "description": "500 Cosmic Dust"},
+    {"id": "dust_2000", "name": "Dust Vein", "type": "dust", "amount": 2000, "price_credits": 10, "description": "2,000 Cosmic Dust"},
+    {"id": "dust_5000", "name": "Dust Motherlode", "type": "dust", "amount": 5000, "price_credits": 22, "description": "5,000 Cosmic Dust + 10% bonus"},
+    # Gem packs
+    {"id": "gems_50", "name": "Gem Cluster", "type": "gems", "amount": 50, "price_credits": 5, "description": "50 Stardust Shards"},
+    {"id": "gems_200", "name": "Gem Trove", "type": "gems", "amount": 200, "price_credits": 18, "description": "200 Stardust Shards"},
+    # Starseed components
+    {"id": "comp_hull", "name": "Hull Plating Blueprint", "type": "component", "component": "hull_plating", "category": "defense", "power": 5, "price_credits": 8, "description": "Pre-fabricated Hull Plating for your Starseed vessel"},
+    {"id": "comp_nav", "name": "Signal Booster Kit", "type": "component", "component": "signal_booster", "category": "navigation", "power": 4, "price_credits": 6, "description": "Navigation Signal Booster"},
+    {"id": "comp_engine", "name": "Resonance Drive Core", "type": "component", "component": "resonance_drive", "category": "propulsion", "power": 7, "price_credits": 12, "description": "High-tier engine component"},
+]
+
+# Transaction tax (Resonance Fee) — percentage taken by the Central Bank on P2P escrow trades
+RESONANCE_FEE_PCT = 5  # 5%
+
+
+@router.get("/trade-circle/ai-merchant")
+async def ai_merchant_catalog(user=Depends(get_current_user)):
+    """AI Merchant — the stabilized storefront. All items have fixed server-set prices."""
+    user_id = user["id"]
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "user_credit_balance": 1, "user_dust_balance": 1})
+    credits = u.get("user_credit_balance", 0) if u else 0
+    dust = u.get("user_dust_balance", 0) if u else 0
+
+    return {
+        "catalog": AI_MERCHANT_CATALOG,
+        "your_credits": credits,
+        "your_dust": dust,
+        "resonance_fee_pct": RESONANCE_FEE_PCT,
+        "merchant_message": "Welcome, Traveler. I trade in certainties. My prices are fixed, my stock unlimited.",
+    }
+
+
+@router.post("/trade-circle/ai-merchant/buy")
+async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)):
+    """Buy from the AI Merchant using Credits (closed-loop — Credits are server-issued)."""
+    item_id = data.get("item_id", "")
+    quantity = max(1, data.get("quantity", 1))
+
+    item = next((i for i in AI_MERCHANT_CATALOG if i["id"] == item_id), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found in Merchant catalog")
+
+    total_cost = item["price_credits"] * quantity
+    user_id = user["id"]
+
+    # Check credits
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "user_credit_balance": 1})
+    current_credits = u.get("user_credit_balance", 0) if u else 0
+    if current_credits < total_cost:
+        raise HTTPException(status_code=400, detail=f"Need {total_cost} Credits. Have {current_credits}.")
+
+    # Deduct credits
+    await db.users.update_one({"id": user_id}, {"$inc": {"user_credit_balance": -total_cost}})
+
+    # Deliver goods
+    total_amount = item.get("amount", 1) * quantity
+    delivery = {"type": item["type"], "amount": total_amount}
+
+    if item["type"] == "dust":
+        await db.users.update_one({"id": user_id}, {"$inc": {"user_dust_balance": total_amount}})
+    elif item["type"] == "gems":
+        await db.users.update_one({"id": user_id}, {"$inc": {"user_gem_balance": total_amount}})
+    elif item["type"] == "component":
+        comp = {
+            "user_id": user_id,
+            "id": str(uuid.uuid4()),
+            "specimen_id": f"merchant_{item_id}",
+            "component": item["component"],
+            "category": item["category"],
+            "power": item["power"] * quantity,
+            "source": "ai_merchant",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.starseed_components.insert_one(comp)
+        delivery["component"] = item["component"]
+
+    # Log transaction
+    await db.merchant_transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "item_id": item_id,
+        "item_name": item["name"],
+        "quantity": quantity,
+        "total_credits": total_cost,
+        "delivery": delivery,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    await create_activity(user_id, "merchant_purchase", f"Bought {item['name']} x{quantity} from AI Merchant")
+
+    return {
+        "purchased": item["name"],
+        "quantity": quantity,
+        "credits_spent": total_cost,
+        "delivered": delivery,
+        "remaining_credits": current_credits - total_cost,
+    }
+
+
+@router.post("/trade-circle/ai-merchant/sell")
+async def ai_merchant_sell(data: dict = Body(...), user=Depends(get_current_user)):
+    """Sell resources back to the AI Merchant at a reduced rate (Central Bank buyback)."""
+    resource = data.get("resource", "")  # "dust" or "gems"
+    amount = data.get("amount", 0)
+
+    if resource not in ("dust", "gems"):
+        raise HTTPException(status_code=400, detail="Can only sell dust or gems")
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+
+    user_id = user["id"]
+
+    # Buyback rates (lower than sell price — the bank takes a spread)
+    if resource == "dust":
+        field = "user_dust_balance"
+        credits_per_unit = 1 / 200  # 200 dust = 1 credit (vs 500 dust = 3 credits buy)
+    else:
+        field = "user_gem_balance"
+        credits_per_unit = 1 / 15   # 15 gems = 1 credit (vs 50 gems = 5 credits buy)
+
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, field: 1})
+    current = u.get(field, 0) if u else 0
+    if current < amount:
+        raise HTTPException(status_code=400, detail=f"Insufficient {resource}. Have {current}, need {amount}.")
+
+    credits_earned = max(1, int(amount * credits_per_unit))
+
+    await db.users.update_one({"id": user_id}, {"$inc": {field: -amount, "user_credit_balance": credits_earned}})
+
+    await db.merchant_transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "type": "sell",
+        "resource": resource,
+        "amount": amount,
+        "credits_earned": credits_earned,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {"sold": resource, "amount": amount, "credits_earned": credits_earned}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  COSMIC ESCROW — Phygital Hold & Release
+#  Server-managed. Digital assets locked until
+#  physical delivery is verified.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESCROW_STATES = ["committed", "shipped", "received", "released", "disputed", "cancelled"]
+
+
+@router.post("/trade-circle/escrow/create")
+async def create_escrow(data: dict = Body(...), user=Depends(get_current_user)):
+    """Create an escrow for a physical-digital trade. Locks digital assets server-side."""
+    offer_id = data.get("offer_id", "")
+    digital_asset_type = data.get("digital_asset_type", "credits")  # credits, dust, gems, component
+    digital_amount = data.get("digital_amount", 0)
+    physical_description = data.get("physical_description", "").strip()
+
+    if not offer_id or not physical_description:
+        raise HTTPException(status_code=400, detail="Offer ID and physical description required")
+    if digital_amount <= 0:
+        raise HTTPException(status_code=400, detail="Digital amount must be positive")
+
+    # Verify the offer is accepted
+    offer = await db.trade_offers.find_one({"id": offer_id, "status": "accepted"}, {"_id": 0})
+    if not offer:
+        raise HTTPException(status_code=404, detail="Accepted trade offer not found")
+
+    # Determine sender (physical) and receiver
+    sender_id = user["id"]
+    if sender_id == offer["lister_id"]:
+        receiver_id = offer["offerer_id"]
+    elif sender_id == offer["offerer_id"]:
+        receiver_id = offer["lister_id"]
+    else:
+        raise HTTPException(status_code=403, detail="You are not part of this trade")
+
+    # Lock the digital assets from the RECEIVER (they pay digital for the physical item)
+    balance_field = {"credits": "user_credit_balance", "dust": "user_dust_balance", "gems": "user_gem_balance"}.get(digital_asset_type)
+    if not balance_field:
+        raise HTTPException(status_code=400, detail="Invalid digital asset type")
+
+    u = await db.users.find_one({"id": receiver_id}, {"_id": 0, balance_field: 1})
+    current = u.get(balance_field, 0) if u else 0
+
+    # Apply resonance fee
+    fee = max(1, int(digital_amount * RESONANCE_FEE_PCT / 100))
+    total_locked = digital_amount + fee
+
+    if current < total_locked:
+        raise HTTPException(status_code=400, detail=f"Receiver needs {total_locked} {digital_asset_type} (incl. {fee} Resonance Fee). Has {current}.")
+
+    # Deduct from receiver and lock in escrow
+    await db.users.update_one({"id": receiver_id}, {"$inc": {balance_field: -total_locked}})
+
+    escrow_id = str(uuid.uuid4())
+    resonance_code = f"RC-{escrow_id[:8].upper()}"
+
+    escrow = {
+        "id": escrow_id,
+        "offer_id": offer_id,
+        "sender_id": sender_id,
+        "receiver_id": receiver_id,
+        "physical_description": physical_description[:500],
+        "digital_asset_type": digital_asset_type,
+        "digital_amount": digital_amount,
+        "resonance_fee": fee,
+        "total_locked": total_locked,
+        "resonance_code": resonance_code,
+        "tracking_id": None,
+        "state": "committed",
+        "state_history": [{"state": "committed", "at": datetime.now(timezone.utc).isoformat(), "by": sender_id}],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.escrows.insert_one(escrow)
+    escrow.pop("_id", None)
+
+    await create_activity(sender_id, "escrow_created", f"Escrow created: {physical_description[:50]}")
+
+    return {
+        "escrow": escrow,
+        "resonance_code": resonance_code,
+        "message": f"Digital assets locked. {digital_amount} {digital_asset_type} + {fee} fee held in Cosmic Escrow.",
+    }
+
+
+@router.post("/trade-circle/escrow/ship")
+async def escrow_ship(data: dict = Body(...), user=Depends(get_current_user)):
+    """Sender marks the physical item as shipped with a tracking ID."""
+    escrow_id = data.get("escrow_id", "")
+    tracking_id = data.get("tracking_id", "").strip()
+
+    if not escrow_id:
+        raise HTTPException(status_code=400, detail="Escrow ID required")
+
+    escrow = await db.escrows.find_one({"id": escrow_id}, {"_id": 0})
+    if not escrow:
+        raise HTTPException(status_code=404, detail="Escrow not found")
+    if escrow["sender_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Only the sender can mark as shipped")
+    if escrow["state"] != "committed":
+        raise HTTPException(status_code=400, detail=f"Cannot ship from state '{escrow['state']}'")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.escrows.update_one({"id": escrow_id}, {"$set": {
+        "state": "shipped",
+        "tracking_id": tracking_id or f"SELF-{escrow_id[:6].upper()}",
+        "shipped_at": now,
+    }, "$push": {"state_history": {"state": "shipped", "at": now, "by": user["id"], "tracking": tracking_id}}})
+
+    return {"state": "shipped", "tracking_id": tracking_id, "message": "Shipment recorded. Awaiting receiver confirmation."}
+
+
+@router.post("/trade-circle/escrow/confirm-receipt")
+async def escrow_confirm_receipt(data: dict = Body(...), user=Depends(get_current_user)):
+    """Receiver confirms physical delivery. Releases digital assets to sender."""
+    escrow_id = data.get("escrow_id", "")
+
+    escrow = await db.escrows.find_one({"id": escrow_id}, {"_id": 0})
+    if not escrow:
+        raise HTTPException(status_code=404, detail="Escrow not found")
+    if escrow["receiver_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Only the receiver can confirm receipt")
+    if escrow["state"] != "shipped":
+        raise HTTPException(status_code=400, detail=f"Cannot confirm from state '{escrow['state']}'")
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Release digital assets to sender (minus the fee — fee goes to the Central Bank / burned)
+    balance_field = {"credits": "user_credit_balance", "dust": "user_dust_balance", "gems": "user_gem_balance"}.get(escrow["digital_asset_type"])
+    await db.users.update_one({"id": escrow["sender_id"]}, {"$inc": {balance_field: escrow["digital_amount"]}})
+
+    # Mark escrow as released
+    await db.escrows.update_one({"id": escrow_id}, {"$set": {
+        "state": "released",
+        "released_at": now,
+    }, "$push": {"state_history": {"state": "released", "at": now, "by": user["id"]}}})
+
+    # Award karma to both parties
+    await award_karma(escrow["sender_id"], "trade_completed", escrow_id)
+    await award_karma(escrow["receiver_id"], "trade_completed", escrow_id)
+
+    await create_activity(escrow["sender_id"], "escrow_released", f"Escrow released! +{escrow['digital_amount']} {escrow['digital_asset_type']}")
+    await create_activity(escrow["receiver_id"], "escrow_released", "Physical item confirmed received")
+
+    return {
+        "state": "released",
+        "released_to_sender": escrow["digital_amount"],
+        "asset_type": escrow["digital_asset_type"],
+        "resonance_fee_burned": escrow["resonance_fee"],
+        "message": "Cosmic Escrow released! Trade complete.",
+    }
+
+
+@router.post("/trade-circle/escrow/dispute")
+async def escrow_dispute(data: dict = Body(...), user=Depends(get_current_user)):
+    """Either party can dispute an escrow. Freezes until admin resolution."""
+    escrow_id = data.get("escrow_id", "")
+    reason = data.get("reason", "").strip()
+
+    escrow = await db.escrows.find_one({"id": escrow_id}, {"_id": 0})
+    if not escrow:
+        raise HTTPException(status_code=404, detail="Escrow not found")
+    if user["id"] not in (escrow["sender_id"], escrow["receiver_id"]):
+        raise HTTPException(status_code=403, detail="You are not part of this escrow")
+    if escrow["state"] in ("released", "cancelled"):
+        raise HTTPException(status_code=400, detail="Cannot dispute a completed or cancelled escrow")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.escrows.update_one({"id": escrow_id}, {"$set": {
+        "state": "disputed",
+        "disputed_at": now,
+        "dispute_reason": reason[:500],
+        "disputed_by": user["id"],
+    }, "$push": {"state_history": {"state": "disputed", "at": now, "by": user["id"], "reason": reason}}})
+
+    return {"state": "disputed", "message": "Escrow frozen. Admin will review."}
+
+
+@router.get("/trade-circle/escrows")
+async def get_my_escrows(user=Depends(get_current_user)):
+    """Get all escrows involving the current user."""
+    escrows = await db.escrows.find(
+        {"$or": [{"sender_id": user["id"]}, {"receiver_id": user["id"]}]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return {"escrows": escrows}
+
+
+@router.get("/trade-circle/escrow/{escrow_id}")
+async def get_escrow(escrow_id: str, user=Depends(get_current_user)):
+    """Get a single escrow detail."""
+    escrow = await db.escrows.find_one({"id": escrow_id}, {"_id": 0})
+    if not escrow:
+        raise HTTPException(status_code=404, detail="Escrow not found")
+    if user["id"] not in (escrow["sender_id"], escrow["receiver_id"]):
+        raise HTTPException(status_code=403, detail="Access denied")
+    return escrow
