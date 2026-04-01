@@ -369,6 +369,30 @@ async def mine_action(data: dict = Body(...), user=Depends(get_current_user)):
         upsert=True,
     )
 
+    # ── Bridge to Universal Inventory ──
+    import uuid
+    inv_item = {
+        "user_id": user_id,
+        "id": str(uuid.uuid4()),
+        "name": found["name"],
+        "type": "material",
+        "category": "specimen",
+        "source": "rock_hounding",
+        "specimen_id": found["id"],
+        "element": found["element"],
+        "rarity": actual_rarity,
+        "mohs": found["mohs"],
+        "state": "raw",
+        "stat": found.get("stat", "wisdom"),
+        "stat_value": found.get("stat_value", 1),
+        "icon": "gem",
+        "description": found["description"],
+        "depth_found": depth,
+        "layer_found": active_layer["id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.rpg_inventory.insert_one(inv_item)
+
     return {
         "specimen": specimen_result,
         "energy": {"current": new_energy, "max": ENERGY_MAX, "cost": cost},

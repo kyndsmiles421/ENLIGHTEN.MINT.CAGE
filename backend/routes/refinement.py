@@ -357,6 +357,16 @@ async def collect_tumbled(data: dict = Body(...), user=Depends(get_current_user)
         }},
     )
 
+    # ── Bridge: Update Universal Inventory state ──
+    await db.rpg_inventory.update_one(
+        {"user_id": user_id, "specimen_id": specimen_id, "category": "specimen", "state": "raw"},
+        {"$set": {
+            "state": "polished",
+            "polished_at": datetime.now(timezone.utc).isoformat(),
+            "polish_quality": extraction_quality,
+        }},
+    )
+
     # Grant evolution VC boost for tumbling
     await db.evolution_tracker.update_one(
         {"user_id": user_id, "asset_id": specimen_id},

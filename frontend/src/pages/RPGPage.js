@@ -58,7 +58,8 @@ function StatBar({ name, value, bonus, icon: Icon, color, onAllocate, canAllocat
 
 // ── Item Card ──
 function ItemCard({ item, onEquip, onUse, compact }) {
-  const SlotIcon = item.slot ? (SLOT_ICONS[item.slot] || Star) : Package;
+  const SlotIcon = item.slot ? (SLOT_ICONS[item.slot] || Star) : (item.category === 'specimen' ? Gem : Package);
+  const stateLabel = item.state === 'polished' ? 'Polished' : item.state === 'raw' ? 'Raw' : null;
   return (
     <motion.div whileHover={{ scale: 1.02 }} className="rounded-xl p-2.5 cursor-pointer group"
       style={{ background: RARITY_BG[item.rarity] || RARITY_BG.common, border: `1px solid ${item.rarity_color || '#9CA3AF'}15` }}
@@ -69,7 +70,16 @@ function ItemCard({ item, onEquip, onUse, compact }) {
           <SlotIcon size={14} style={{ color: item.rarity_color || '#9CA3AF' }} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-medium truncate" style={{ color: item.rarity_color || '#F8FAFC' }}>{item.name}</p>
+          <div className="flex items-center gap-1">
+            <p className="text-[11px] font-medium truncate" style={{ color: item.rarity_color || '#F8FAFC' }}>{item.name}</p>
+            {stateLabel && (
+              <span className="text-[6px] px-1 py-0.5 rounded uppercase tracking-wider flex-shrink-0"
+                style={{
+                  background: item.state === 'polished' ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)',
+                  color: item.state === 'polished' ? '#22C55E' : '#F59E0B',
+                }}>{stateLabel}</span>
+            )}
+          </div>
           <p className="text-[8px] capitalize" style={{ color: 'var(--text-muted)' }}>{item.rarity} {item.category}</p>
           {!compact && item.stats && (
             <div className="flex flex-wrap gap-1 mt-1">
@@ -80,6 +90,12 @@ function ItemCard({ item, onEquip, onUse, compact }) {
                 </span>
               ))}
             </div>
+          )}
+          {!compact && item.element && (
+            <span className="text-[7px] px-1 py-0.5 rounded mt-1 inline-block capitalize"
+              style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8' }}>
+              {item.element}
+            </span>
           )}
         </div>
         <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -331,6 +347,7 @@ export default function RPGPage() {
   const [shop, setShop] = useState(null);
   const [shopView, setShopView] = useState('dust');
   const [convertAmount, setConvertAmount] = useState(10);
+  const [dustTransmuteAmt, setDustTransmuteAmt] = useState(150);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [encounter, setEncounter] = useState(null);
@@ -822,25 +839,86 @@ export default function RPGPage() {
               </div>
 
               {/* Shop View Toggle */}
-              <div className="flex gap-1 mb-4 p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
+              <div className="flex gap-1 mb-4 p-1 rounded-lg overflow-x-auto" style={{ background: 'rgba(255,255,255,0.02)', scrollbarWidth: 'none' }}>
                 {[
                   { id: 'dust', label: 'Dust Shop', icon: Sparkles, color: '#F59E0B' },
                   { id: 'gems', label: 'Gem Shop', icon: Gem, color: '#A855F7' },
                   { id: 'packs', label: 'Buy Gems', icon: ShoppingBag, color: '#22C55E' },
+                  { id: 'convert', label: 'Transmute', icon: ArrowRightLeft, color: '#FCD34D' },
                   { id: 'slots', label: 'Slots', icon: Unlock, color: '#3B82F6' },
                 ].map(v => (
                   <button key={v.id} onClick={() => setShopView(v.id)}
-                    className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-[9px] transition-all"
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-[9px] transition-all flex-shrink-0"
                     style={{
                       background: shopView === v.id ? `${v.color}12` : 'transparent',
                       color: shopView === v.id ? v.color : 'var(--text-muted)',
                       border: shopView === v.id ? `1px solid ${v.color}22` : '1px solid transparent',
+                      touchAction: 'manipulation',
                     }}
                     data-testid={`shop-view-${v.id}`}>
                     <v.icon size={10} /> {v.label}
                   </button>
                 ))}
               </div>
+
+              {/* TRANSMUTE - Dust to Credits */}
+              {shopView === 'convert' && (
+                <div className="space-y-3" data-testid="transmute-panel">
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(252,211,77,0.03)', border: '1px solid rgba(252,211,77,0.1)' }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <ArrowRightLeft size={14} style={{ color: '#FCD34D' }} />
+                      <p className="text-[11px] font-semibold" style={{ color: '#FCD34D' }}>Alchemical Exchange</p>
+                    </div>
+                    <p className="text-[9px] mb-3" style={{ color: 'var(--text-muted)' }}>
+                      Transmute Cosmic Dust into Credits. Current rate: <span style={{ color: '#FCD34D' }}>150 Dust = 1 Credit</span>
+                    </p>
+                    <div className="flex gap-2 mb-3">
+                      {[150, 300, 450, 750].map(amt => (
+                        <button key={amt} onClick={() => setDustTransmuteAmt(amt)}
+                          className="flex-1 py-1.5 rounded-lg text-[9px] font-medium transition-all"
+                          style={{
+                            background: dustTransmuteAmt === amt ? 'rgba(252,211,77,0.1)' : 'rgba(255,255,255,0.02)',
+                            color: dustTransmuteAmt === amt ? '#FCD34D' : 'var(--text-muted)',
+                            border: `1px solid ${dustTransmuteAmt === amt ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.04)'}`,
+                            touchAction: 'manipulation',
+                          }}
+                          data-testid={`convert-preset-${amt}`}>
+                          {amt}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-lg mb-3" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                      <div className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                        <span style={{ color: '#F59E0B' }}>{dustTransmuteAmt} Dust</span> → <span style={{ color: '#FCD34D' }}>{Math.floor(dustTransmuteAmt / 150)} Credits</span>
+                      </div>
+                      <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        Balance: {shop.currencies.dust} Dust
+                      </div>
+                    </div>
+                    <motion.button whileTap={{ scale: 0.95 }}
+                      onClick={async () => {
+                        try {
+                          const res = await axios.post(`${API}/marketplace/convert-dust`, { dust_amount: dustTransmuteAmt }, { headers });
+                          toast.success(`Transmuted ${res.data.dust_spent} Dust → ${res.data.credits_earned} Credits`);
+                          fetchData();
+                        } catch (err) {
+                          toast.error(err.response?.data?.detail || 'Conversion failed');
+                        }
+                      }}
+                      disabled={shop.currencies.dust < dustTransmuteAmt || dustTransmuteAmt < 150}
+                      className="w-full py-2.5 rounded-xl text-[11px] font-bold transition-all"
+                      style={{
+                        background: shop.currencies.dust >= dustTransmuteAmt ? 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(245,158,11,0.1))' : 'rgba(255,255,255,0.02)',
+                        color: shop.currencies.dust >= dustTransmuteAmt ? '#FCD34D' : 'rgba(248,250,252,0.2)',
+                        border: `1px solid ${shop.currencies.dust >= dustTransmuteAmt ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.04)'}`,
+                        touchAction: 'manipulation',
+                      }}
+                      data-testid="transmute-dust-btn">
+                      Transmute {dustTransmuteAmt} Dust
+                    </motion.button>
+                  </div>
+                </div>
+              )}
 
               {/* DUST SHOP */}
               {shopView === 'dust' && (
