@@ -20,6 +20,23 @@
   --text-primary: #F0F0F8;
   --text-secondary: #A0AEC0;
   --text-muted: #5A6478;
+
+  /* ── Elemental Style Guide ── */
+  --el-wood: #22C55E;
+  --el-wood-glow: rgba(34,197,94,0.15);
+  --el-wood-bg: rgba(34,197,94,0.04);
+  --el-fire: #EF4444;
+  --el-fire-glow: rgba(239,68,68,0.15);
+  --el-fire-bg: rgba(239,68,68,0.04);
+  --el-earth: #F59E0B;
+  --el-earth-glow: rgba(245,158,11,0.15);
+  --el-earth-bg: rgba(245,158,11,0.04);
+  --el-metal: #94A3B8;
+  --el-metal-glow: rgba(148,163,184,0.15);
+  --el-metal-bg: rgba(148,163,184,0.04);
+  --el-water: #3B82F6;
+  --el-water-glow: rgba(59,130,246,0.15);
+  --el-water-bg: rgba(59,130,246,0.04);
 }
 
 * {

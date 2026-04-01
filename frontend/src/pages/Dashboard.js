@@ -18,7 +18,8 @@ import {
   Calendar, BarChart3, MessageCircle, Orbit, Atom, HelpCircle,
   Pencil, GripVertical, EyeOff, Plus, X, ArrowUp, ArrowDown,
   Pin, LayoutGrid, Save, ChevronDown, ScrollText, Swords,
-  CloudSun, Moon as MoonIcon, Waves
+  CloudSun, Moon as MoonIcon, Waves,
+  Gem as GemIcon, Mountain as MountainIcon, Sprout as SproutIcon
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 import TrialBanner from '../components/TrialBanner';
@@ -103,6 +104,7 @@ const REC_ICON_MAP = {
 const SECTION_META = {
   stats:           { label: 'Stats Cards',      tKey: null,                          color: '#FCD34D' },
   cosmic_weather:  { label: 'Cosmic Weather',   tKey: null,                          color: '#E879F9' },
+  nexus_intent:    { label: 'Nexus Drift',      tKey: null,                          color: '#A855F7' },
   pinned:          { label: 'My Shortcuts',      tKey: 'dashboard.myShortcuts',       color: '#C084FC' },
   suggestions:     { label: 'Suggested for You', tKey: 'dashboard.suggestedForYou',   color: '#2DD4BF' },
   scripture:       { label: 'Sacred Scriptures', tKey: null,                          color: '#D97706' },
@@ -114,7 +116,7 @@ const SECTION_META = {
   actions:         { label: 'Explore & Practice', tKey: 'dashboard.exploreAndPractice', color: '#86EFAC' },
 };
 
-const DEFAULT_ORDER = ["stats", "cosmic_weather", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
+const DEFAULT_ORDER = ["stats", "cosmic_weather", "nexus_intent", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
 const DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/bible"];
 
 export default function Dashboard() {
@@ -143,6 +145,7 @@ export default function Dashboard() {
   const [coherence, setCoherence] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [cosmicWeather, setCosmicWeather] = useState(null);
+  const [nexusIntent, setNexusIntent] = useState(null);
 
   // Layout state
   const [editMode, setEditMode] = useState(false);
@@ -174,6 +177,7 @@ export default function Dashboard() {
         axios.get(`${API}/notifications/quantum-coherence`, { headers: authHeaders }).then(r => setCoherence(r.data)).catch(() => {}),
         axios.get(`${API}/dashboard/suggestions`, { headers: authHeaders }).then(r => setSuggestions(r.data.suggestions || [])).catch(() => {}),
         axios.get(`${API}/reports/cosmic-weather`, { headers: authHeaders }).then(r => setCosmicWeather(r.data)).catch(() => {}),
+        axios.get(`${API}/nexus/intent`, { headers: authHeaders }).then(r => setNexusIntent(r.data)).catch(() => {}),
         axios.get(`${API}/dashboard/layout`, { headers: authHeaders }).then(r => {
           const savedOrder = r.data.sections_order || DEFAULT_ORDER;
           // Merge new sections from DEFAULT_ORDER that aren't in saved layout
@@ -303,6 +307,7 @@ export default function Dashboard() {
     switch (sectionId) {
       case 'stats': return <StatsSection key="stats" stats={stats} streak={streak} navigate={navigate} />;
       case 'cosmic_weather': return cosmicWeather ? <CosmicWeatherSection key="weather" weather={cosmicWeather} navigate={navigate} /> : null;
+      case 'nexus_intent': return nexusIntent ? <NexusIntentSection key="nexus-intent" intent={nexusIntent} navigate={navigate} playFrequency={playFrequency} /> : null;
       case 'pinned': return pinnedShortcuts.length > 0 ? <PinnedSection key="pinned" pinned={pinnedShortcuts} navigate={navigate} editMode={editMode} onRemove={togglePin} /> : null;
       case 'suggestions': return suggestions.length > 0 ? <SuggestionsSection key="suggestions" suggestions={suggestions} navigate={navigate} playFrequency={playFrequency} /> : null;
       case 'scripture': return stats?.scripture ? <ScriptureSection key="scripture" scripture={stats.scripture} navigate={navigate} /> : null;
@@ -656,6 +661,126 @@ function CosmicWeatherSection({ weather, navigate }) {
                 <Flame size={7} /> Reset Pulse
               </span>
             )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+
+const INTENT_ICONS = { wind: Wind, timer: Timer, heart: Heart, 'book-open': BookOpen, map: Compass, zap: Zap, star: Star };
+
+function NexusIntentSection({ intent, navigate, playFrequency }) {
+  if (intent.state === 'balanced') {
+    return (
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+        className="mb-8" data-testid="nexus-intent-widget">
+        <div className="relative overflow-hidden rounded-2xl p-4"
+          style={{
+            background: 'linear-gradient(135deg, rgba(34,197,94,0.03), rgba(13,14,26,0.8))',
+            border: '1px solid rgba(34,197,94,0.08)',
+            backdropFilter: 'blur(16px)',
+          }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(34,197,94,0.08)' }}>
+              <Check size={18} style={{ color: '#22C55E' }} />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold" style={{ color: '#22C55E' }}>Elements in Harmony</p>
+              <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                Harmony: {intent.harmony} | Your practices are creating balance
+              </p>
+            </div>
+            <button onClick={() => navigate('/dream-realms')}
+              className="text-[9px] px-2 py-1 rounded-lg"
+              style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}
+              data-testid="enter-dream-realm">
+              Dream Realm
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  const color = intent.element_color || '#A855F7';
+  const ActionIcon = INTENT_ICONS[intent.action?.icon] || Star;
+  const confidence = intent.confidence || 0;
+  const freq = intent.frequency;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+      className="mb-8" data-testid="nexus-intent-widget">
+      <div className="relative overflow-hidden rounded-2xl p-4"
+        style={{
+          background: `linear-gradient(135deg, ${color}06, rgba(13,14,26,0.85))`,
+          border: `1px solid ${color}12`,
+          backdropFilter: 'blur(16px)',
+          boxShadow: `0 0 ${confidence * 30}px ${color}08`,
+        }}>
+        {/* Confidence pulse */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl"
+          animate={{
+            boxShadow: [
+              `inset 0 0 ${confidence * 15}px ${color}03`,
+              `inset 0 0 ${confidence * 30}px ${color}06`,
+              `inset 0 0 ${confidence * 15}px ${color}03`,
+            ],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center relative"
+              style={{ background: `${color}10`, border: `1px solid ${color}18` }}>
+              {/* Confidence glow ring */}
+              <motion.div
+                className="absolute inset-0 rounded-xl"
+                animate={{ opacity: [0.2 * confidence, 0.5 * confidence, 0.2 * confidence] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                style={{ border: `1px solid ${color}`, boxShadow: `0 0 8px ${color}30` }}
+              />
+              <Zap size={18} style={{ color }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-semibold" style={{ color }}>
+                  {intent.element_name} {intent.direction === 'excess' ? 'Excess' : 'Deficiency'}
+                </p>
+                <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase"
+                  style={{ background: `${color}10`, color }}>
+                  {(confidence * 100).toFixed(0)}% drift
+                </span>
+              </div>
+              <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+                {intent.warning || intent.message}
+              </p>
+            </div>
+          </div>
+
+          {/* Pre-filled action button — reduces decision fatigue */}
+          <div className="flex items-center gap-2">
+            <motion.button whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                if (freq?.hz) playFrequency(freq.hz);
+                navigate(intent.action?.path || '/nexus');
+              }}
+              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[10px] font-semibold"
+              style={{ background: `${color}12`, color, border: `1px solid ${color}20` }}
+              data-testid="nexus-intent-action">
+              <ActionIcon size={12} />
+              {intent.action?.label || 'Align'}
+              {freq && <span className="text-[8px] opacity-70">| {freq.hz} Hz</span>}
+            </motion.button>
+            <button onClick={() => navigate('/dream-realms')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}
+              data-testid="enter-dream-realm">
+              <Eye size={10} /> Dream
+            </button>
           </div>
         </div>
       </div>

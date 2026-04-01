@@ -628,3 +628,64 @@ async def get_nexus_history(user=Depends(get_current_user)):
         {"user_id": user["id"]}, {"_id": 0}
     ).sort("completed_at", -1).to_list(30)
     return {"alignments": history}
+
+
+@router.get("/nexus/intent")
+async def get_nexus_intent(user=Depends(get_current_user)):
+    """Predictive intent — tells the Dashboard what the user needs most right now."""
+    balance = await compute_elemental_balance(user["id"])
+
+    # Find the worst imbalance
+    worst = None
+    worst_dev = 0
+    for eid, edata in balance["elements"].items():
+        dev = abs(edata.get("deviation", 0))
+        if dev > worst_dev:
+            worst_dev = dev
+            worst = eid
+
+    if not worst or worst_dev < 0.05:
+        return {
+            "state": "balanced",
+            "message": "Your elements are in harmony",
+            "action": None,
+            "element": None,
+            "harmony": balance["harmony_score"],
+            "cycle": balance.get("harmony_cycle", "neutral"),
+        }
+
+    direction = "excess" if balance["elements"][worst].get("deviation", 0) > 0 else "deficient"
+    freq = ELEMENT_FREQUENCIES.get(worst, {})
+    edef = ELEMENTS.get(worst, {})
+
+    # Generate prescriptive action
+    action_map = {
+        "wood_excess": {"label": "Grounding Breath", "path": "/breathing", "icon": "wind"},
+        "wood_deficient": {"label": "Mood Reflection", "path": "/mood", "icon": "heart"},
+        "fire_excess": {"label": "Cooling Meditation", "path": "/meditation", "icon": "timer"},
+        "fire_deficient": {"label": "Passion Journal", "path": "/journal", "icon": "book-open"},
+        "earth_excess": {"label": "Multiverse Explore", "path": "/multiverse-map", "icon": "map"},
+        "earth_deficient": {"label": "Earth Meditation", "path": "/meditation", "icon": "timer"},
+        "metal_excess": {"label": "Heart Opening", "path": "/mood", "icon": "heart"},
+        "metal_deficient": {"label": "Precision Breath", "path": "/breathing", "icon": "wind"},
+        "water_excess": {"label": "Release Journal", "path": "/journal", "icon": "book-open"},
+        "water_deficient": {"label": "Flow Quests", "path": "/rpg", "icon": "zap"},
+    }
+
+    action = action_map.get(f"{worst}_{direction}", {"label": "Align", "path": "/nexus", "icon": "star"})
+
+    return {
+        "state": "drift",
+        "element": worst,
+        "direction": direction,
+        "element_name": edef.get("name", worst),
+        "element_color": edef.get("color", "#A855F7"),
+        "deviation": round(worst_dev, 3),
+        "message": edef.get(f"{direction}_warning", f"{worst} is {direction}"),
+        "warning": edef.get(f"{'excess' if direction == 'excess' else 'deficiency'}_warning", ""),
+        "action": action,
+        "frequency": freq,
+        "harmony": balance["harmony_score"],
+        "cycle": balance.get("harmony_cycle", "neutral"),
+        "confidence": round(min(1.0, worst_dev / 0.2), 2),
+    }

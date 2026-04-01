@@ -266,6 +266,38 @@ def _generate_legendary_frequency(seed: int, loop_iteration: int, harmony_score:
     }
 
 
+# ── Branching Resonance Gates (3 paths) ──
+RESONANCE_GATES = {
+    "purge": {
+        "name": "The Purge",
+        "subtitle": "High-intensity rebalancing",
+        "icon": "flame",
+        "description": "Burn off excess energy through intense, puzzle-heavy challenges",
+        "color": "#EF4444",
+        "elements": ["fire", "metal"],
+        "style": "active",
+    },
+    "root": {
+        "name": "The Root",
+        "subtitle": "Grounding restoration",
+        "icon": "sprout",
+        "description": "Slow-paced, audio-focused meditation to rebuild your foundation",
+        "color": "#22C55E",
+        "elements": ["earth", "wood"],
+        "style": "passive",
+    },
+    "void": {
+        "name": "The Void",
+        "subtitle": "Meditative dissolution",
+        "icon": "droplets",
+        "description": "Abstract, fluid space for deep water alignment and release",
+        "color": "#3B82F6",
+        "elements": ["water"],
+        "style": "meditative",
+    },
+}
+
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  API ENDPOINTS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -294,11 +326,17 @@ async def get_active_realm(user=Depends(get_current_user)):
 
     # Check for existing active realm
     active = await db.dream_realms.find_one(
-        {"user_id": user_id, "status": {"$in": ["active", "entering"]}},
+        {"user_id": user_id, "status": {"$in": ["active", "entering", "choosing"]}},
         {"_id": 0},
     )
 
     if active:
+        if active.get("status") == "choosing":
+            # Still in gate selection — return gates + realm shell
+            active["current_harmony"] = harmony
+            active["elements_snapshot"] = {eid: {"percentage": e.get("percentage", 20), "status": e.get("status")} for eid, e in elements.items()}
+            return active
+
         # Update difficulty based on current state
         diff = _compute_loop_difficulty(harmony, decay, active.get("loop_iteration", 0))
         escape_threshold = ESCAPE_VELOCITY_BASE + (active.get("loop_iteration", 0) * ESCAPE_VELOCITY_PER_LOOP)
@@ -313,23 +351,50 @@ async def get_active_realm(user=Depends(get_current_user)):
         active["elements_snapshot"] = {eid: {"percentage": e.get("percentage", 20), "status": e.get("status")} for eid, e in elements.items()}
         return active
 
-    # Generate new realm
+    # Generate new realm in "choosing" state with 3 resonance gates
     seed = _seed_hash(user_id, natal_sign, cosmic_element, today)
-    biome = _select_biome(elements, cosmic_element, seed)
+    rng = random.Random(seed)
     diff = _compute_loop_difficulty(harmony, decay, 0)
-    challenges = _generate_challenges(biome, diff, seed)
-    escape_threshold = ESCAPE_VELOCITY_BASE
+
+    # Build gate previews — each gate gets a biome preview
+    gates = {}
+    for gate_id, gate in RESONANCE_GATES.items():
+        # Pick a biome relevant to this gate's elements
+        best_el = None
+        best_dev = 0
+        for eid in gate["elements"]:
+            edata = elements.get(eid, {})
+            dev = abs(edata.get("deviation", 0))
+            if dev > best_dev:
+                best_dev = dev
+                best_el = eid
+        if not best_el:
+            best_el = gate["elements"][0]
+
+        direction = "excess" if elements.get(best_el, {}).get("deviation", 0) > 0 else "deficient"
+        template_key = f"{best_el}_{direction}"
+        template = BIOME_TEMPLATES.get(template_key, BIOME_TEMPLATES["balanced"])
+        biome_name = rng.choice(template["biomes"])
+
+        gates[gate_id] = {
+            **gate,
+            "biome_preview": biome_name,
+            "biome_color": template["color_primary"],
+            "target_element": best_el,
+            "target_direction": direction,
+            "challenge_count": diff["challenge_count"],
+        }
 
     realm = {
         "user_id": user_id,
         "realm_id": uuid.uuid4().hex[:12],
-        "status": "active",
-        "biome": biome,
+        "status": "choosing",
+        "gates": gates,
         "difficulty": diff,
-        "challenges": challenges,
+        "challenges": [],
         "challenges_completed": 0,
         "loop_iteration": 0,
-        "escape_threshold": escape_threshold,
+        "escape_threshold": ESCAPE_VELOCITY_BASE,
         "current_harmony": harmony,
         "seed": seed,
         "cosmic_context": {
@@ -344,12 +409,80 @@ async def get_active_realm(user=Depends(get_current_user)):
         "updated_at": now.isoformat(),
     }
 
-    # Generate AI narrative
-    realm["narrative"] = await _generate_narrative(biome, diff, cosmic_element, natal_sign, harmony)
-
     await db.dream_realms.insert_one({**realm})
     del realm["user_id"]
     return realm
+
+
+@router.post("/dream-realms/choose-gate")
+async def choose_gate(data: dict = Body(...), user=Depends(get_current_user)):
+    """Choose a Resonance Gate to enter a Dream Realm."""
+    user_id = user["id"]
+    gate_id = data.get("gate_id")
+
+    if gate_id not in RESONANCE_GATES:
+        raise HTTPException(400, "Invalid gate. Choose: purge, root, or void")
+
+    realm = await db.dream_realms.find_one(
+        {"user_id": user_id, "status": "choosing"},
+        {"_id": 0},
+    )
+    if not realm:
+        raise HTTPException(404, "No realm in gate selection")
+
+    gate = RESONANCE_GATES[gate_id]
+    seed = realm.get("seed", 0)
+    balance = await compute_elemental_balance(user_id)
+    harmony = balance["harmony_score"]
+    elements = balance["elements"]
+    decay = balance.get("decay_activity", {})
+    diff = _compute_loop_difficulty(harmony, decay, 0)
+
+    # Get cosmic weather
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    weather = await db.cosmic_weather_cache.find_one({"date": today}, {"_id": 0})
+    cosmic_element = weather.get("element", "Fire") if weather else "Fire"
+
+    natal_doc = await db.nexus_birth_resonance.find_one({"user_id": user_id}, {"_id": 0})
+    natal_sign = natal_doc.get("sign", "Unknown") if natal_doc else "Unknown"
+
+    # Build biome from gate choice
+    best_el = gate["elements"][0]
+    for eid in gate["elements"]:
+        if abs(elements.get(eid, {}).get("deviation", 0)) > abs(elements.get(best_el, {}).get("deviation", 0)):
+            best_el = eid
+
+    direction = "excess" if elements.get(best_el, {}).get("deviation", 0) > 0 else "deficient"  # noqa: F841
+    biome = _select_biome(
+        {k: v for k, v in elements.items()},
+        cosmic_element, seed + hash(gate_id)
+    )
+    biome["gate"] = gate_id
+    biome["gate_name"] = gate["name"]
+    biome["gate_style"] = gate["style"]
+
+    challenges = _generate_challenges(biome, diff, seed + hash(gate_id))
+    narrative = await _generate_narrative(biome, diff, cosmic_element, natal_sign, harmony)
+
+    await db.dream_realms.update_one(
+        {"user_id": user_id, "status": "choosing"},
+        {"$set": {
+            "status": "active",
+            "biome": biome,
+            "challenges": challenges,
+            "difficulty": diff,
+            "narrative": narrative,
+            "gate_chosen": gate_id,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }},
+    )
+
+    return {
+        "message": f"Entered {gate['name']}",
+        "gate": gate_id,
+        "biome": biome,
+        "narrative": narrative,
+    }
 
 
 @router.post("/dream-realms/complete-challenge")
@@ -441,7 +574,7 @@ async def abandon_realm(user=Depends(get_current_user)):
     """Abandon the current Dream Realm (no rewards)."""
     user_id = user["id"]
     result = await db.dream_realms.update_one(
-        {"user_id": user_id, "status": "active"},
+        {"user_id": user_id, "status": {"$in": ["active", "choosing"]}},
         {"$set": {"status": "abandoned", "updated_at": datetime.now(timezone.utc).isoformat()}},
     )
     if result.modified_count == 0:
