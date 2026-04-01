@@ -57,6 +57,7 @@ from routes.ai_visuals import router as ai_visuals_router
 from routes.notifications import router as notifications_router
 from routes.achievements import router as achievements_router
 from routes.trade_circle import router as trade_circle_router
+from routes.content import router as content_router
 from routes.subscriptions import router as subscriptions_router
 from routes.crystals import router as crystals_router
 from routes.entanglement import router as entanglement_router
@@ -171,6 +172,7 @@ all_routers = [
     economy_admin_router,
     encounters_router,
     living_journal_router,
+    content_router,
 ]
 
 for r in all_routers:
@@ -199,6 +201,17 @@ async def stripe_webhook(request: Request):
                 await db.payment_transactions.update_one(
                     {"session_id": event.session_id},
                     {"$set": {"payment_status": "paid", "paid_at": datetime.now(timezone.utc).isoformat()}}
+                )
+            # Also check Broker transactions
+            broker_tx = await db.broker_transactions.find_one({"session_id": event.session_id}, {"_id": 0})
+            if broker_tx and broker_tx.get("payment_status") != "paid":
+                await db.broker_transactions.update_one(
+                    {"session_id": event.session_id},
+                    {"$set": {"payment_status": "paid", "paid_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                await db.users.update_one(
+                    {"id": broker_tx["user_id"]},
+                    {"$inc": {"user_credit_balance": broker_tx["credits"]}}
                 )
         return {"status": "ok"}
     except Exception as e:

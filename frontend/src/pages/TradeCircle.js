@@ -12,6 +12,8 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CosmicBroker from '../components/trade/CosmicBroker';
 import EscrowDashboard from '../components/trade/EscrowDashboard';
+import { MantraBanner } from '../components/MantraSystem';
+import GameAvatarPanel from '../components/GameAvatar';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -746,6 +748,7 @@ export default function TradeCircle() {
               Trade Circle
             </h1>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Barter goods and services with the collective</p>
+            <MantraBanner category="trade" className="mt-1" />
           </div>
           <button onClick={() => setShowCreate(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all hover:scale-105"
@@ -782,6 +785,7 @@ export default function TradeCircle() {
             { id: 'browse', label: 'Browse' },
             { id: 'broker', label: 'Broker', icon: Sparkles, color: '#EAB308' },
             { id: 'escrow', label: 'Escrow', icon: Shield, color: '#818CF8' },
+            { id: 'avatar', label: 'Avatar', icon: User, color: '#C084FC' },
             { id: 'my', label: 'My Listings' },
             { id: 'offers', label: 'Offers' },
             { id: 'karma', label: 'Karma' },
@@ -871,6 +875,13 @@ export default function TradeCircle() {
             {tab === 'escrow' && (
               <motion.div key="escrow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <EscrowDashboard authHeaders={authHeaders} userId={user?.id} />
+              </motion.div>
+            )}
+
+            {/* Avatar Tab */}
+            {tab === 'avatar' && (
+              <motion.div key="avatar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <GameAvatarPanel authHeaders={authHeaders} />
               </motion.div>
             )}
 

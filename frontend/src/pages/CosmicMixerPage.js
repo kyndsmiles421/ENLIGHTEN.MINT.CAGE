@@ -11,6 +11,7 @@ import { useTempo } from '../context/TempoContext';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES, MANTRAS } from '../context/MixerContext';
 import { useGatedFeature } from '../context/useGatedFeature';
 import { useLanguage } from '../context/LanguageContext';
+import { MantraBanner } from '../components/MantraSystem';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -674,6 +675,7 @@ export default function CosmicMixerPage() {
               <Waves size={16} style={{ color: '#C084FC' }} />
               <h1 className="text-lg font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>Cosmic Mixer</h1>
             </div>
+            <MantraBanner category="mixer" />
           </div>
           <div className="w-10" /> {/* spacer for alignment */}
         </div>

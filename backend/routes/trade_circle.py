@@ -520,18 +520,23 @@ async def get_categories():
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 AI_MERCHANT_CATALOG = [
-    # Dust packs (purchased with Credits)
-    {"id": "dust_500", "name": "Dust Cache", "type": "dust", "amount": 500, "price_credits": 3, "description": "500 Cosmic Dust"},
-    {"id": "dust_2000", "name": "Dust Vein", "type": "dust", "amount": 2000, "price_credits": 10, "description": "2,000 Cosmic Dust"},
-    {"id": "dust_5000", "name": "Dust Motherlode", "type": "dust", "amount": 5000, "price_credits": 22, "description": "5,000 Cosmic Dust + 10% bonus"},
+    # Dust packs — Tiered pricing. Bigger = better discount.
+    # Base Tier: Standard price (no discount)
+    {"id": "dust_500", "name": "Dust Cache", "type": "dust", "amount": 500, "price_credits": 3, "tier": "base", "discount": 0, "description": "500 Cosmic Dust — Base Rate"},
+    # Medium Tier: 15% Discount
+    {"id": "dust_2000", "name": "Dust Vein", "type": "dust", "amount": 2000, "price_credits": 10, "tier": "medium", "discount": 15, "description": "2,000 Cosmic Dust — 15% Discount"},
+    # Premium Tier: 30% Discount (Supernova Bundle)
+    {"id": "dust_5000", "name": "Dust Supernova", "type": "dust", "amount": 5000, "price_credits": 18, "tier": "premium", "discount": 30, "description": "5,000 Cosmic Dust — 30% SUPERNOVA Discount"},
     # Gem packs
-    {"id": "gems_50", "name": "Gem Cluster", "type": "gems", "amount": 50, "price_credits": 5, "description": "50 Stardust Shards"},
-    {"id": "gems_200", "name": "Gem Trove", "type": "gems", "amount": 200, "price_credits": 18, "description": "200 Stardust Shards"},
+    {"id": "gems_50", "name": "Gem Cluster", "type": "gems", "amount": 50, "price_credits": 5, "tier": "base", "discount": 0, "description": "50 Stardust Shards"},
+    {"id": "gems_200", "name": "Gem Trove", "type": "gems", "amount": 200, "price_credits": 15, "tier": "medium", "discount": 15, "description": "200 Stardust Shards — 15% Discount"},
     # Starseed components
-    {"id": "comp_hull", "name": "Hull Plating Blueprint", "type": "component", "component": "hull_plating", "category": "defense", "power": 5, "price_credits": 8, "description": "Pre-fabricated Hull Plating for your Starseed vessel"},
-    {"id": "comp_nav", "name": "Signal Booster Kit", "type": "component", "component": "signal_booster", "category": "navigation", "power": 4, "price_credits": 6, "description": "Navigation Signal Booster"},
-    {"id": "comp_engine", "name": "Resonance Drive Core", "type": "component", "component": "resonance_drive", "category": "propulsion", "power": 7, "price_credits": 12, "description": "High-tier engine component"},
+    {"id": "comp_hull", "name": "Hull Plating Blueprint", "type": "component", "component": "hull_plating", "category": "defense", "power": 5, "price_credits": 8, "tier": "base", "discount": 0, "description": "Pre-fabricated Hull Plating for your Starseed vessel"},
+    {"id": "comp_nav", "name": "Signal Booster Kit", "type": "component", "component": "signal_booster", "category": "navigation", "power": 4, "price_credits": 6, "tier": "base", "discount": 0, "description": "Navigation Signal Booster"},
+    {"id": "comp_engine", "name": "Resonance Drive Core", "type": "component", "component": "resonance_drive", "category": "propulsion", "power": 7, "price_credits": 12, "tier": "base", "discount": 0, "description": "High-tier engine component"},
 ]
+
+RETURN_PENALTY_PCT = 30  # 30% processing fee on all sell-back/refunds
 
 # Transaction tax (Resonance Fee) — percentage taken by the Central Bank on P2P escrow trades
 RESONANCE_FEE_PCT = 5  # 5%
@@ -623,7 +628,7 @@ async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)
 
 @router.post("/trade-circle/ai-merchant/sell")
 async def ai_merchant_sell(data: dict = Body(...), user=Depends(get_current_user)):
-    """Sell resources back to the AI Merchant at a reduced rate (Central Bank buyback)."""
+    """Sell resources back to the Cosmic Broker. Applies a 30% Central Bank Processing Fee."""
     resource = data.get("resource", "")  # "dust" or "gems"
     amount = data.get("amount", 0)
 
@@ -634,20 +639,24 @@ async def ai_merchant_sell(data: dict = Body(...), user=Depends(get_current_user
 
     user_id = user["id"]
 
-    # Buyback rates (lower than sell price — the bank takes a spread)
+    # Buyback rates
     if resource == "dust":
         field = "user_dust_balance"
-        credits_per_unit = 1 / 200  # 200 dust = 1 credit (vs 500 dust = 3 credits buy)
+        credits_per_unit = 1 / 200  # 200 dust = 1 credit base
     else:
         field = "user_gem_balance"
-        credits_per_unit = 1 / 15   # 15 gems = 1 credit (vs 50 gems = 5 credits buy)
+        credits_per_unit = 1 / 15   # 15 gems = 1 credit base
 
     u = await db.users.find_one({"id": user_id}, {"_id": 0, field: 1})
     current = u.get(field, 0) if u else 0
     if current < amount:
         raise HTTPException(status_code=400, detail=f"Insufficient {resource}. Have {current}, need {amount}.")
 
-    credits_earned = max(1, int(amount * credits_per_unit))
+    # Calculate credits BEFORE penalty
+    raw_credits = max(1, int(amount * credits_per_unit))
+    # Apply 30% Central Bank Processing Fee
+    penalty = max(1, int(raw_credits * RETURN_PENALTY_PCT / 100))
+    credits_earned = max(1, raw_credits - penalty)
 
     await db.users.update_one({"id": user_id}, {"$inc": {field: -amount, "user_credit_balance": credits_earned}})
 
@@ -657,11 +666,20 @@ async def ai_merchant_sell(data: dict = Body(...), user=Depends(get_current_user
         "type": "sell",
         "resource": resource,
         "amount": amount,
+        "raw_credits": raw_credits,
+        "processing_fee": penalty,
+        "processing_fee_pct": RETURN_PENALTY_PCT,
         "credits_earned": credits_earned,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
 
-    return {"sold": resource, "amount": amount, "credits_earned": credits_earned}
+    return {
+        "sold": resource, "amount": amount,
+        "raw_credits": raw_credits,
+        "processing_fee": penalty,
+        "processing_fee_pct": RETURN_PENALTY_PCT,
+        "credits_earned": credits_earned,
+    }
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -52,6 +52,8 @@ function MerchantItem({ item, credits, onBuy }) {
   const iconMap = { dust: Wind, gems: Gem, component: Cpu };
   const Icon = iconMap[item.type] || ShoppingBag;
   const canAfford = credits >= item.price_credits;
+  const tierColors = { base: '#94A3B8', medium: '#2DD4BF', premium: '#EAB308' };
+  const tierColor = tierColors[item.tier] || '#94A3B8';
 
   return (
     <motion.div
@@ -68,7 +70,15 @@ function MerchantItem({ item, credits, onBuy }) {
         <Icon size={16} style={{ color: '#C084FC' }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+          {item.discount > 0 && (
+            <span className="text-[7px] px-1 py-0.5 rounded-full font-bold flex-shrink-0"
+              style={{ background: `${tierColor}15`, color: tierColor, border: `1px solid ${tierColor}25` }}>
+              {item.discount}% OFF
+            </span>
+          )}
+        </div>
         <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
       </div>
       <button
@@ -94,16 +104,18 @@ function SellPanel({ wallet, authHeaders, onRefresh }) {
   const [amount, setAmount] = useState(100);
   const [selling, setSelling] = useState(false);
 
-  const rates = { dust: { per: 200, label: '200 Dust = 1 Credit' }, gems: { per: 15, label: '15 Gems = 1 Credit' } };
+  const rates = { dust: { per: 200, label: '200 Dust = 1 Credit (base)' }, gems: { per: 15, label: '15 Gems = 1 Credit (base)' } };
   const max = resource === 'dust' ? wallet.dust : wallet.gems;
-  const creditsEarned = Math.max(1, Math.floor(amount / rates[resource].per));
+  const rawCredits = Math.max(1, Math.floor(amount / rates[resource].per));
+  const penalty = Math.max(1, Math.floor(rawCredits * 0.30));
+  const creditsEarned = Math.max(1, rawCredits - penalty);
 
   const handleSell = async () => {
     if (amount <= 0 || amount > max) return;
     setSelling(true);
     try {
       const res = await axios.post(`${API}/trade-circle/ai-merchant/sell`, { resource, amount }, { headers: authHeaders });
-      toast.success(`Sold ${amount} ${resource} for ${res.data.credits_earned} credits`);
+      toast.success(`Sold ${amount} ${resource} for ${res.data.credits_earned} credits (${res.data.processing_fee_pct}% fee applied)`);
       onRefresh();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Sale failed');
@@ -141,9 +153,19 @@ function SellPanel({ wallet, authHeaders, onRefresh }) {
           <Plus size={14} style={{ color: 'var(--text-muted)' }} />
         </button>
       </div>
-      <p className="text-[10px] text-center mb-3" style={{ color: 'var(--text-muted)' }}>
-        {rates[resource].label} &rarr; <span style={{ color: '#EAB308' }}>{creditsEarned} Credits</span>
+      <p className="text-[10px] text-center mb-1" style={{ color: 'var(--text-muted)' }}>
+        {rates[resource].label}
       </p>
+      {/* 30% Penalty Breakdown */}
+      <div className="rounded-lg p-2 mb-3 text-center" style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.08)' }}>
+        <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+          Base: <span style={{ color: '#818CF8' }}>{rawCredits}</span>
+          &nbsp;&middot;&nbsp;
+          <span style={{ color: '#EF4444' }}>30% Processing Fee: -{penalty}</span>
+          &nbsp;&middot;&nbsp;
+          You receive: <span style={{ color: '#22C55E' }}>{creditsEarned} Credits</span>
+        </p>
+      </div>
       <button onClick={handleSell} disabled={selling || amount <= 0 || amount > max}
         className="w-full py-2 rounded-lg text-xs font-medium transition-all"
         style={{ background: 'rgba(45,212,191,0.1)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.2)' }}

@@ -13,6 +13,7 @@ import SmartDock from './components/SmartDock';
 import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
+import { MantraOverlay, LoadingMantra } from './components/MantraSystem';
 import CreditNudge from './components/CreditNudge';
 import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
@@ -147,6 +148,7 @@ function PageLoader() {
         <div className="w-12 h-12 rounded-full animate-pulse-glow"
           style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.6) 0%, rgba(124,58,237,0.2) 70%)' }} />
         <p className="text-sm animate-fade-up" style={{ color: 'rgba(248,250,252,0.4)' }}>Loading...</p>
+        <LoadingMantra />
       </div>
     </div>
   );
@@ -315,6 +317,7 @@ function App() {
               }}
             />
             <AnimatedRoutes />
+            <MantraOverlay />
             <LatencyHUD />
             <SmartDock />
             <CosmicMixer />

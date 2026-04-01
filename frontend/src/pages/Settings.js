@@ -170,16 +170,16 @@ export default function Settings() {
         </Section>
 
         {/* Immersion Level */}
-        <Section title="Experience Level">
+        <Section title="Atmosphere Switch">
           <div className="px-4 py-3">
             <p className="text-[10px] mb-3" style={{ color: `${subtle}0.4)` }}>
-              Control the visual intensity of the entire app. Choose Calm for a safe, minimal experience.
+              Control the rendering resolution for the entire app — Mixer, Game, and Trade Circle. Choose based on your device.
             </p>
             <div className="grid grid-cols-3 gap-2" data-testid="immersion-level-picker">
               {[
-                { id: 'calm', label: 'Calm', desc: 'No effects', icon: Shield, color: '#22C55E' },
-                { id: 'standard', label: 'Standard', desc: 'Moderate', icon: Sun, color: '#F59E0B' },
-                { id: 'full', label: 'Full Immersive', desc: 'All effects', icon: Sparkles, color: '#A78BFA' },
+                { id: 'calm', label: 'Simplified', desc: 'Flat, fast', icon: Shield, color: '#22C55E', note: 'Older devices' },
+                { id: 'standard', label: 'Standard', desc: 'Balanced', icon: Sun, color: '#F59E0B', note: 'Modern phones' },
+                { id: 'full', label: 'Ultra', desc: 'Full engine', icon: Sparkles, color: '#A78BFA', note: 'High-end' },
               ].map(level => {
                 const active = prefs.immersionLevel === level.id;
                 const LIcon = level.icon;

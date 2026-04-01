@@ -6,27 +6,30 @@ import { Zap, Eye, EyeOff, Sparkles, Shield, Sun, Moon, Monitor, AlertTriangle, 
 const LEVELS = [
   {
     id: 'calm',
-    label: 'Calm',
+    label: 'Simplified',
     icon: Shield,
     color: '#22C55E',
-    description: 'Minimal animations, no particles or visual effects. Safe for photosensitive users.',
-    features: ['No particles or fractals', 'No flashing effects', 'Reduced motion', 'Clean text-focused UI'],
+    description: 'Flat UI, zero transparency, maximum speed. Perfect for older devices or quick utility tasks.',
+    features: ['No 3D shaders', 'Flat colors & clean icons', 'Zero battery drain', 'Max speed'],
+    device: '$50 phone friendly',
   },
   {
     id: 'standard',
     label: 'Standard',
     icon: Sun,
     color: '#F59E0B',
-    description: 'Moderate animations and gentle visual enhancements. A balanced experience.',
-    features: ['Gentle animations', 'Subtle visual effects', 'Standard transitions', 'Optional Vision Mode'],
+    description: 'The baseline Cosmic experience. Smooth gradients, glowing elements, standard transparency.',
+    features: ['Smooth gradients', 'Glowing UI elements', 'Standard animations', 'Balanced performance'],
+    device: 'Modern smartphones',
   },
   {
     id: 'full',
-    label: 'Full Immersive',
+    label: 'Ultra-Immersive',
     icon: Sparkles,
     color: '#A78BFA',
-    description: 'Maximum visual experience — particles, fractals, Vision Mode, and all effects enabled.',
-    features: ['Full particle systems', 'Audio-reactive fractals', 'Vision Mode for scriptures', 'All visual effects'],
+    description: 'Full engine unlocked. 3D particle effects, realistic light refraction, and maximum visual fidelity.',
+    features: ['3D particle effects', 'Light refraction on gems', '4K-style projections', 'Full immersion'],
+    device: 'High-end hardware',
   },
 ];
 
@@ -99,10 +102,10 @@ export function ImmersionToggle() {
             <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(248,250,252,0.06)' }}>
               <div className="flex items-center gap-2 mb-1">
                 <Monitor size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
-                <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Experience Level</span>
+                <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Atmosphere Switch</span>
               </div>
               <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
-                Control the visual intensity across the entire app
+                Control the rendering resolution across the entire app
               </p>
             </div>
 
@@ -149,6 +152,11 @@ export function ImmersionToggle() {
                             </span>
                           ))}
                         </div>
+                        {level.device && (
+                          <p className="text-[8px] mt-1.5 italic" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                            {level.device}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </button>

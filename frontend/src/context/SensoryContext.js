@@ -61,6 +61,38 @@ export function SensoryProvider({ children }) {
     } else {
       root.classList.remove('high-contrast');
     }
+
+    // Global Fidelity / Atmosphere Switch CSS
+    const il = prefs.immersionLevel || 'full';
+    root.setAttribute('data-fidelity', il);
+    if (il === 'calm') {
+      root.style.setProperty('--glass-blur', '0px');
+      root.style.setProperty('--glass-bg', 'rgba(248,250,252,0.04)');
+      root.style.setProperty('--glass-border', 'rgba(248,250,252,0.08)');
+      root.style.setProperty('--glow-opacity', '0');
+      root.style.setProperty('--particle-opacity', '0');
+      root.style.setProperty('--transition-speed', '0s');
+      root.style.setProperty('--gradient-intensity', '0');
+      root.style.setProperty('--shadow-depth', '0px 0px 0px');
+    } else if (il === 'standard') {
+      root.style.setProperty('--glass-blur', '8px');
+      root.style.setProperty('--glass-bg', 'rgba(248,250,252,0.03)');
+      root.style.setProperty('--glass-border', 'rgba(248,250,252,0.06)');
+      root.style.setProperty('--glow-opacity', '0.4');
+      root.style.setProperty('--particle-opacity', '0.5');
+      root.style.setProperty('--transition-speed', '0.2s');
+      root.style.setProperty('--gradient-intensity', '0.6');
+      root.style.setProperty('--shadow-depth', '0 4px 16px');
+    } else {
+      root.style.setProperty('--glass-blur', '24px');
+      root.style.setProperty('--glass-bg', 'rgba(248,250,252,0.02)');
+      root.style.setProperty('--glass-border', 'rgba(248,250,252,0.06)');
+      root.style.setProperty('--glow-opacity', '1');
+      root.style.setProperty('--particle-opacity', '1');
+      root.style.setProperty('--transition-speed', '0.3s');
+      root.style.setProperty('--gradient-intensity', '1');
+      root.style.setProperty('--shadow-depth', '0 8px 32px');
+    }
   }, [prefs]);
 
   const updatePref = useCallback((key, value) => {

@@ -1,0 +1,65 @@
+{
+  "summary": "Comprehensive testing of Iteration 170 features: Mantras API (31 entries), Game Avatar system (10 avatars: 4 free, 3 earned, 3 premium), Tiered Dust Sales (0/15/30% discounts), 30% Return Penalty, Atmosphere Switch (Simplified/Standard/Ultra-Immersive). Backend: 30/30 tests passed. Frontend: All features verified working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_mantras_avatar_tiered.py",
+    "/app/test_reports/pytest/pytest_mantras_avatar_tiered.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": ["/app/backend/tests/test_mantras_avatar_tiered.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "User has 51 credits, 100 dust, 100 gems. Active avatar: The Guardian (mood: dormant, resonance: 0/100)",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 170 features fully working. Key endpoints tested: GET /api/mantras (3 random), GET /api/mantras?category=trade (filtered), GET /api/mantras/all (31 total), GET /api/avatar/catalog (10 avatars), GET /api/avatar/profile (mood/resonance), POST /api/avatar/select, POST /api/avatar/purchase, GET /api/trade-circle/ai-merchant (tiered dust), POST /api/trade-circle/ai-merchant/sell (30% fee). Frontend verified: Trade Circle 7 tabs (Browse, Broker, Escrow, Avatar, My Listings, Offers, Karma), MantraBanner in Dashboard/TradeCircle/Mixer, Avatar tab with Free/Earned/Premium tiers, Sell Back panel with 30% Processing Fee breakdown, Merchant Goods with 15%/30% OFF badges, Atmosphere Switch in nav and Settings page with Simplified/Standard/Ultra-Immersive labels.",
+  "features_verified": {
+    "mantras_api": {
+      "GET /api/mantras": "Returns 3 random mantras by default",
+      "GET /api/mantras?count=5": "Returns specified count",
+      "GET /api/mantras?category=trade": "Returns only trade-category mantras",
+      "GET /api/mantras?category=mixer": "Returns only mixer-category mantras",
+      "GET /api/mantras?category=sacred": "Returns only sacred-category mantras",
+      "GET /api/mantras/all": "Returns full library (31 mantras) with categories"
+    },
+    "avatar_system": {
+      "GET /api/avatar/catalog": "Returns 10 avatars (4 free, 3 earned, 3 premium) with unlock status",
+      "GET /api/avatar/profile": "Returns active avatar with mood (dormant/awakening/flowing/radiant/transcendent) and resonance level (0-100)",
+      "POST /api/avatar/select": "Selects free avatar from unlocked collection",
+      "POST /api/avatar/purchase": "Purchases premium avatar with credits (Phoenix 25cr, Oracle 35cr, Sovereign 50cr)",
+      "free_avatars": ["seeker", "healer", "guardian", "mystic"],
+      "earned_avatars": ["alchemist", "starseed", "dreamwalker"],
+      "premium_avatars": ["phoenix (25cr)", "oracle (35cr)", "sovereign (50cr)"]
+    },
+    "tiered_dust_sales": {
+      "dust_500 (base)": "500 Dust, 3 credits, 0% discount",
+      "dust_2000 (medium)": "2,000 Dust, 10 credits, 15% discount",
+      "dust_5000 (premium)": "5,000 Dust, 18 credits, 30% discount"
+    },
+    "return_penalty": {
+      "sell_endpoint": "POST /api/trade-circle/ai-merchant/sell",
+      "processing_fee_pct": 30,
+      "response_fields": ["sold", "amount", "raw_credits", "processing_fee", "processing_fee_pct", "credits_earned"]
+    },
+    "atmosphere_switch": {
+      "nav_toggle": "ImmersionToggle shows current level (Simplified/Standard/Ultra-Immersive)",
+      "nav_panel": "Dropdown with 3 options and device recommendations",
+      "settings_section": "Atmosphere Switch section with 3 buttons and accessibility note"
+    },
+    "mantra_banner": {
+      "dashboard": "MantraBanner in greeting area",
+      "trade_circle": "MantraBanner in header with trade-category mantras",
+      "mixer": "MantraBanner in header with mixer-category mantras"
+    },
+    "trade_circle_tabs": ["Browse", "Broker", "Escrow", "Avatar", "My Listings", "Offers", "Karma"]
+  }
+}

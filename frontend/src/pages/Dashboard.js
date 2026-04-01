@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSensory } from '../context/SensoryContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
 import { useLanguage } from '../context/LanguageContext';
+import { MantraBanner } from '../components/MantraSystem';
 import { toast } from 'sonner';
 import {
   Flame, BookOpen, Heart, Wind, Timer, Zap, Leaf, Radio,
@@ -341,6 +342,7 @@ export default function Dashboard() {
               <h1 className="text-3xl md:text-4xl font-light tracking-tight" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                 Welcome back, <span className="animate-text-shimmer">{user?.name?.split(' ')[0]}</span>
               </h1>
+              <MantraBanner className="mt-1" />
             </div>
             <div className="flex items-center gap-1.5">
               <button onClick={() => editMode ? finishEditing() : setEditMode(true)}
