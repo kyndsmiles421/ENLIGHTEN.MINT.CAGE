@@ -75,7 +75,7 @@ export default function SmartDock() {
     return () => window.removeEventListener('widget-focus', handler);
   }, []);
 
-  const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname === '/vr' || location.pathname.startsWith('/live/');
+  const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname === '/vr' || location.pathname === '/intro' || location.pathname.startsWith('/live/');
 
   useEffect(() => {
     localStorage.setItem(DOCK_MIN_KEY, String(minimized));

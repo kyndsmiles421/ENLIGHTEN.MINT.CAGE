@@ -394,7 +394,7 @@ export default function Navigation() {
   }, [user, authHeaders]);
 
   /* Hide nav on landing, auth, VR */
-  if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr') return null;
+  if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/vr' || location.pathname === '/intro') return null;
 
   const isSageActive = location.pathname === '/coach';
 

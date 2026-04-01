@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useSensory } from '../context/SensoryContext';
+import { useLocation } from 'react-router-dom';
 
 export default function CosmicBackground() {
   const canvasRef = useRef(null);
@@ -8,6 +9,8 @@ export default function CosmicBackground() {
   const shootingRef = useRef([]);
   const nebulaRef = useRef([]);
   const { prefs } = useSensory();
+  const location = useLocation();
+  const hideOnIntro = location.pathname === '/intro';
 
   const init = useCallback((canvas) => {
     const w = canvas.width = window.innerWidth;
@@ -152,6 +155,8 @@ export default function CosmicBackground() {
 
   const isLight = prefs.theme === 'light';
   
+  if (hideOnIntro) return null;
+
   return (
     <canvas
       ref={canvasRef}

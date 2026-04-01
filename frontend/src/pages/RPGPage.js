@@ -26,8 +26,10 @@ const RARITY_COLORS = {
   common: '#9CA3AF', uncommon: '#22C55E', rare: '#3B82F6',
   epic: '#A855F7', legendary: '#F59E0B', mythic: '#EF4444',
 };
+const QUEST_ICONS = { brain: Brain, pen: PenLine, heart: Heart, wind: Wind, music: Music, zap: Zap };
+const QUEST_PATHS = { meditation: '/meditation', journal: '/journal', mood: '/mood', breathing: '/breathing', soundscape: '/soundscapes', breath_reset: null };
 
-// ── Stat Bar ──
+// ── Extracted Sub-Components ──
 function StatBar({ name, value, bonus, icon: Icon, color, onAllocate, canAllocate }) {
   const total = value + bonus;
   return (
@@ -57,7 +59,6 @@ function StatBar({ name, value, bonus, icon: Icon, color, onAllocate, canAllocat
   );
 }
 
-// ── Item Card ──
 function ItemCard({ item, onEquip, onUse, compact }) {
   const SlotIcon = item.slot ? (SLOT_ICONS[item.slot] || Star) : (item.category === 'specimen' ? Gem : Package);
   const stateLabel = item.state === 'polished' ? 'Polished' : item.state === 'raw' ? 'Raw' : null;
@@ -73,250 +74,95 @@ function ItemCard({ item, onEquip, onUse, compact }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
             <p className="text-[11px] font-medium truncate" style={{ color: item.rarity_color || '#F8FAFC' }}>{item.name}</p>
-            {stateLabel && (
-              <span className="text-[6px] px-1 py-0.5 rounded uppercase tracking-wider flex-shrink-0"
-                style={{
-                  background: item.state === 'polished' ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)',
-                  color: item.state === 'polished' ? '#22C55E' : '#F59E0B',
-                }}>{stateLabel}</span>
-            )}
+            {stateLabel && <span className="text-[6px] px-1 py-0.5 rounded uppercase tracking-wider flex-shrink-0"
+              style={{ background: item.state === 'polished' ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)', color: item.state === 'polished' ? '#22C55E' : '#F59E0B' }}>{stateLabel}</span>}
           </div>
           <p className="text-[8px] capitalize" style={{ color: 'var(--text-muted)' }}>{item.rarity} {item.category}</p>
-          {!compact && item.stats && (
-            <div className="flex flex-wrap gap-1 mt-1">
-              {Object.entries(item.stats).map(([s, v]) => (
-                <span key={s} className="text-[7px] px-1 py-0.5 rounded"
-                  style={{ background: `${STAT_COLORS[s] || '#818CF8'}10`, color: STAT_COLORS[s] || '#818CF8' }}>
-                  +{v} {s}
-                </span>
-              ))}
-            </div>
-          )}
-          {!compact && item.element && (
-            <span className="text-[7px] px-1 py-0.5 rounded mt-1 inline-block capitalize"
-              style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8' }}>
-              {item.element}
-            </span>
-          )}
+          {!compact && item.stats && <div className="flex flex-wrap gap-1 mt-1">{Object.entries(item.stats).map(([s, v]) => <span key={s} className="text-[7px] px-1 py-0.5 rounded" style={{ background: `${STAT_COLORS[s] || '#818CF8'}10`, color: STAT_COLORS[s] || '#818CF8' }}>+{v} {s}</span>)}</div>}
+          {!compact && item.element && <span className="text-[7px] px-1 py-0.5 rounded mt-1 inline-block capitalize" style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8' }}>{item.element}</span>}
         </div>
         <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {item.slot && onEquip && (
-            <button onClick={(e) => { e.stopPropagation(); onEquip(item.id); }}
-              className="p-1 rounded text-[7px]" style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }}
-              data-testid={`equip-${item.id}`}>Equip</button>
-          )}
-          {item.category === 'consumable' && onUse && (
-            <button onClick={(e) => { e.stopPropagation(); onUse(item.id); }}
-              className="p-1 rounded text-[7px]" style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}
-              data-testid={`use-${item.id}`}>Use</button>
-          )}
+          {item.slot && onEquip && <button onClick={(e) => { e.stopPropagation(); onEquip(item.id); }} className="p-1 rounded text-[7px]" style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }} data-testid={`equip-${item.id}`}>Equip</button>}
+          {item.category === 'consumable' && onUse && <button onClick={(e) => { e.stopPropagation(); onUse(item.id); }} className="p-1 rounded text-[7px]" style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }} data-testid={`use-${item.id}`}>Use</button>}
         </div>
       </div>
     </motion.div>
   );
 }
 
-// ── Equipment Slot ──
 function EquipSlot({ slot, item, onUnequip }) {
   const Icon = SLOT_ICONS[slot] || Star;
   return (
     <div className="rounded-xl p-3 text-center group"
       style={{ background: item ? `${item.rarity_color}08` : 'rgba(255,255,255,0.02)', border: `1px solid ${item ? `${item.rarity_color}15` : 'rgba(255,255,255,0.04)'}` }}
       data-testid={`slot-${slot}`}>
-      <div className="w-10 h-10 mx-auto rounded-xl flex items-center justify-center mb-1.5"
-        style={{ background: item ? `${item.rarity_color}10` : 'rgba(255,255,255,0.03)' }}>
+      <div className="w-10 h-10 mx-auto rounded-xl flex items-center justify-center mb-1.5" style={{ background: item ? `${item.rarity_color}10` : 'rgba(255,255,255,0.03)' }}>
         <Icon size={18} style={{ color: item ? item.rarity_color : 'rgba(255,255,255,0.15)' }} />
       </div>
       <p className="text-[9px] capitalize mb-0.5" style={{ color: 'var(--text-muted)' }}>{slot}</p>
       {item ? (
-        <>
-          <p className="text-[10px] font-medium truncate" style={{ color: item.rarity_color }}>{item.name}</p>
-          {onUnequip && (
-            <button onClick={() => onUnequip(slot)}
-              className="mt-1 text-[7px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}
-              data-testid={`unequip-${slot}`}>Remove</button>
-          )}
-        </>
-      ) : (
-        <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.1)' }}>Empty</p>
-      )}
+        <><p className="text-[10px] font-medium truncate" style={{ color: item.rarity_color }}>{item.name}</p>
+          {onUnequip && <button onClick={() => onUnequip(slot)} className="mt-1 text-[7px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }} data-testid={`unequip-${slot}`}>Remove</button>}</>
+      ) : <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.1)' }}>Empty</p>}
     </div>
   );
 }
 
-// ── World Region Node ──
 function RegionNode({ region, onExplore }) {
-  const accessible = region.accessible;
-  const discovered = region.discovered;
   return (
-    <motion.button whileHover={accessible ? { scale: 1.05 } : {}} whileTap={accessible ? { scale: 0.95 } : {}}
-      onClick={() => accessible && onExplore(region.id)}
-      disabled={!accessible}
+    <motion.button whileHover={region.accessible ? { scale: 1.05 } : {}} whileTap={region.accessible ? { scale: 0.95 } : {}}
+      onClick={() => region.accessible && onExplore(region.id)} disabled={!region.accessible}
       className="absolute rounded-xl p-2.5 text-left transition-all"
-      style={{
-        left: `${region.x}%`, top: `${region.y}%`, transform: 'translate(-50%, -50%)',
-        width: '120px',
-        background: discovered ? `${region.color}08` : 'rgba(255,255,255,0.01)',
-        border: `1px solid ${discovered ? `${region.color}20` : 'rgba(255,255,255,0.03)'}`,
-        opacity: discovered ? 1 : 0.3,
-        cursor: accessible ? 'pointer' : 'default',
-      }}
+      style={{ left: `${region.x}%`, top: `${region.y}%`, transform: 'translate(-50%, -50%)', width: '120px', background: region.discovered ? `${region.color}08` : 'rgba(255,255,255,0.01)', border: `1px solid ${region.discovered ? `${region.color}20` : 'rgba(255,255,255,0.03)'}`, opacity: region.discovered ? 1 : 0.3, cursor: region.accessible ? 'pointer' : 'default' }}
       data-testid={`region-${region.id}`}>
-      {!discovered ? (
-        <div className="flex items-center justify-center py-1">
-          <Lock size={14} style={{ color: 'rgba(255,255,255,0.1)' }} />
-        </div>
-      ) : (
-        <>
-          <div className="w-5 h-5 rounded flex items-center justify-center mb-1" style={{ background: `${region.color}15` }}>
-            <Compass size={10} style={{ color: region.color }} />
-          </div>
-          <p className="text-[9px] font-medium truncate" style={{ color: accessible ? region.color : 'var(--text-muted)' }}>{region.name}</p>
-          <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Lv {region.level_req}+</p>
-        </>
+      {!region.discovered ? <div className="flex items-center justify-center py-1"><Lock size={14} style={{ color: 'rgba(255,255,255,0.1)' }} /></div> : (
+        <><div className="w-5 h-5 rounded flex items-center justify-center mb-1" style={{ background: `${region.color}15` }}><Compass size={10} style={{ color: region.color }} /></div>
+          <p className="text-[9px] font-medium truncate" style={{ color: region.accessible ? region.color : 'var(--text-muted)' }}>{region.name}</p>
+          <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Lv {region.level_req}+</p></>
       )}
     </motion.button>
   );
 }
 
-// ── Boss Card ──
 function BossCard({ boss, onJoin }) {
   const hpPct = boss.active_encounter ? (boss.active_encounter.current_hp / boss.active_encounter.max_hp * 100) : 100;
   const participants = boss.active_encounter?.participants?.length || 0;
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl overflow-hidden" style={{ background: `${boss.color}06`, border: `1px solid ${boss.color}15` }}
-      data-testid={`boss-${boss.id}`}>
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl overflow-hidden" style={{ background: `${boss.color}06`, border: `1px solid ${boss.color}15` }} data-testid={`boss-${boss.id}`}>
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <div>
-            <p className="text-sm font-medium" style={{ color: boss.color === '#1F2937' ? '#9CA3AF' : boss.color }}>{boss.name}</p>
-            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Level {boss.level} | {boss.region}</p>
-          </div>
-          <span className="text-[8px] px-2 py-0.5 rounded-full" style={{
-            background: boss.accessible ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-            color: boss.accessible ? '#22C55E' : '#EF4444',
-          }}>{boss.accessible ? 'Available' : 'Locked'}</span>
+          <div><p className="text-sm font-medium" style={{ color: boss.color === '#1F2937' ? '#9CA3AF' : boss.color }}>{boss.name}</p><p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Level {boss.level} | {boss.region}</p></div>
+          <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: boss.accessible ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', color: boss.accessible ? '#22C55E' : '#EF4444' }}>{boss.accessible ? 'Available' : 'Locked'}</span>
         </div>
         <p className="text-[10px] mb-3" style={{ color: 'var(--text-secondary)' }}>{boss.description}</p>
-        {/* HP Bar */}
-        <div className="mb-2">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>HP</span>
-            <span className="text-[8px]" style={{ color: boss.color }}>
-              {boss.active_encounter ? `${boss.active_encounter.current_hp.toLocaleString()} / ${boss.hp.toLocaleString()}` : `${boss.hp.toLocaleString()}`}
-            </span>
-          </div>
-          <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${hpPct}%`, background: boss.color }} />
-          </div>
-        </div>
-        {/* Phases */}
-        <div className="flex gap-1 mb-3">
-          {boss.phases.map((p, i) => (
-            <span key={i} className="text-[7px] px-1.5 py-0.5 rounded"
-              style={{
-                background: boss.active_encounter?.phase >= i ? `${boss.color}15` : 'rgba(255,255,255,0.02)',
-                color: boss.active_encounter?.phase >= i ? boss.color : 'var(--text-muted)',
-                border: `1px solid ${boss.active_encounter?.phase >= i ? `${boss.color}20` : 'rgba(255,255,255,0.03)'}`,
-              }}>{p.name}</span>
-          ))}
-        </div>
-        <div className="flex items-center justify-between">
-          {participants > 0 && <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{participants} warriors joined</span>}
-          <button onClick={() => onJoin(boss.id)} disabled={!boss.accessible}
-            className="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105 disabled:opacity-30"
-            style={{ background: `${boss.color}12`, border: `1px solid ${boss.color}20`, color: boss.color }}
-            data-testid={`join-boss-${boss.id}`}>
-            {boss.active_encounter ? 'Join Battle' : 'Awaken Boss'}
-          </button>
-        </div>
+        <div className="mb-2"><div className="flex items-center justify-between mb-1"><span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>HP</span><span className="text-[8px]" style={{ color: boss.color }}>{boss.active_encounter ? `${boss.active_encounter.current_hp.toLocaleString()} / ${boss.hp.toLocaleString()}` : `${boss.hp.toLocaleString()}`}</span></div><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}><div className="h-full rounded-full transition-all" style={{ width: `${hpPct}%`, background: boss.color }} /></div></div>
+        <div className="flex gap-1 mb-3">{boss.phases.map((p, i) => <span key={i} className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: boss.active_encounter?.phase >= i ? `${boss.color}15` : 'rgba(255,255,255,0.02)', color: boss.active_encounter?.phase >= i ? boss.color : 'var(--text-muted)', border: `1px solid ${boss.active_encounter?.phase >= i ? `${boss.color}20` : 'rgba(255,255,255,0.03)'}` }}>{p.name}</span>)}</div>
+        <div className="flex items-center justify-between">{participants > 0 && <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{participants} warriors joined</span>}
+          <button onClick={() => onJoin(boss.id)} disabled={!boss.accessible} className="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all hover:scale-105 disabled:opacity-30" style={{ background: `${boss.color}12`, border: `1px solid ${boss.color}20`, color: boss.color }} data-testid={`join-boss-${boss.id}`}>{boss.active_encounter ? 'Join Battle' : 'Awaken Boss'}</button></div>
       </div>
-      {/* Loot Preview */}
-      <div className="px-4 py-2" style={{ background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-        <p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Possible Drops</p>
-        <div className="flex gap-1 flex-wrap">
-          {boss.loot.map((l, i) => (
-            <span key={i} className="text-[7px] px-1.5 py-0.5 rounded"
-              style={{ background: RARITY_BG[l.rarity], border: `1px solid ${l.rarity_color || '#9CA3AF'}15`, color: l.rarity_color || '#9CA3AF' }}>
-              {l.name}
-            </span>
-          ))}
-        </div>
-      </div>
+      <div className="px-4 py-2" style={{ background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}><p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Possible Drops</p><div className="flex gap-1 flex-wrap">{boss.loot.map((l, i) => <span key={i} className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: RARITY_BG[l.rarity], border: `1px solid ${l.rarity_color || '#9CA3AF'}15`, color: l.rarity_color || '#9CA3AF' }}>{l.name}</span>)}</div></div>
     </motion.div>
   );
 }
 
-const QUEST_ICONS = { brain: Brain, pen: PenLine, heart: Heart, wind: Wind, music: Music, zap: Zap };
-
-// Quest ID → Activity page path mapping
-const QUEST_PATHS = {
-  meditation: '/meditation',
-  journal: '/journal',
-  mood: '/mood',
-  breathing: '/breathing',
-  soundscape: '/soundscapes',
-  breath_reset: null, // handled inline
-};
-
-// ── Quest Card ──
 function QuestCard({ quest, onComplete, onNavigate }) {
   const Icon = QUEST_ICONS[quest.icon] || Star;
   const done = quest.completed;
   const questPath = QUEST_PATHS[quest.id];
-
-  const handleClick = () => {
-    if (done) return;
-    // For quests that can be completed directly (breath_reset, breathing, soundscape)
-    if (onComplete) {
-      onComplete(quest.id);
-      return;
-    }
-    // For quests that require navigating to an activity page
-    if (questPath && onNavigate) {
-      onNavigate(questPath);
-    }
-  };
-
+  const handleClick = () => { if (done) return; if (onComplete) { onComplete(quest.id); return; } if (questPath && onNavigate) { onNavigate(questPath); } };
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-      onClick={handleClick}
+    <motion.button initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} onClick={handleClick}
       className="w-full rounded-xl p-3 flex items-center gap-3 group transition-all text-left"
-      style={{
-        background: done ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)',
-        border: `1px solid ${done ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.04)'}`,
-        cursor: done ? 'default' : 'pointer',
-        touchAction: 'manipulation',
-      }}
+      style={{ background: done ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${done ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.04)'}`, cursor: done ? 'default' : 'pointer', touchAction: 'manipulation' }}
       data-testid={`quest-${quest.id}`}>
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{ background: done ? 'rgba(34,197,94,0.1)' : 'rgba(129,140,248,0.06)' }}>
-        {done ? <CheckCircle2 size={16} style={{ color: '#22C55E' }} />
-          : <Icon size={16} style={{ color: '#818CF8' }} />}
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: done ? 'rgba(34,197,94,0.1)' : 'rgba(129,140,248,0.06)' }}>
+        {done ? <CheckCircle2 size={16} style={{ color: '#22C55E' }} /> : <Icon size={16} style={{ color: '#818CF8' }} />}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <p className="text-[11px] font-medium" style={{ color: done ? '#22C55E' : 'var(--text-primary)' }}>{quest.name}</p>
-          {quest.pillar && <span className="text-[6px] px-1 py-0.5 rounded uppercase tracking-wider"
-            style={{ background: 'rgba(245,158,11,0.08)', color: '#F59E0B' }}>Pillar</span>}
-        </div>
+        <div className="flex items-center gap-1.5"><p className="text-[11px] font-medium" style={{ color: done ? '#22C55E' : 'var(--text-primary)' }}>{quest.name}</p>{quest.pillar && <span className="text-[6px] px-1 py-0.5 rounded uppercase tracking-wider" style={{ background: 'rgba(245,158,11,0.08)', color: '#F59E0B' }}>Pillar</span>}</div>
         <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{quest.description}</p>
       </div>
-      <div className="text-right flex-shrink-0">
-        {done ? (
-          <span className="text-[9px] font-medium" style={{ color: '#22C55E' }}>Done</span>
-        ) : (
-          <div className="flex items-center gap-1.5">
-            <p className="text-[10px] font-semibold" style={{ color: '#818CF8' }}>+{quest.xp_with_multiplier} XP</p>
-            {questPath && !onComplete && (
-              <ChevronRight size={12} style={{ color: '#818CF8', opacity: 0.5 }} />
-            )}
-          </div>
-        )}
-      </div>
+      <div className="text-right flex-shrink-0">{done ? <span className="text-[9px] font-medium" style={{ color: '#22C55E' }}>Done</span> : <div className="flex items-center gap-1.5"><p className="text-[10px] font-semibold" style={{ color: '#818CF8' }}>+{quest.xp_with_multiplier} XP</p>{questPath && !onComplete && <ChevronRight size={12} style={{ color: '#818CF8', opacity: 0.5 }} />}</div>}</div>
     </motion.button>
   );
 }

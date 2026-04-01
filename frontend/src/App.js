@@ -31,9 +31,17 @@ import TrialGraduation from './components/TrialGraduation';
 // Initialize global error handling
 setupAxiosInterceptors();
 
+// Cosmic mesh wrapper — hides on fullscreen pages
+function CosmicMeshWrapper() {
+  const loc = useLocation();
+  if (loc.pathname === '/intro') return null;
+  return <div className="cosmic-mesh" aria-hidden="true"><div className="cosmic-mesh-inner" /></div>;
+}
+
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
+import CinematicIntro from './pages/CinematicIntro';
 
 // Lazy load everything else
 const Breathing = lazy(() => import('./pages/Breathing'));
@@ -169,6 +177,7 @@ function AnimatedRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes location={location}>
         <Route path="/" element={<Landing />} />
+        <Route path="/intro" element={<CinematicIntro />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/breathing" element={<Breathing />} />
         <Route path="/meditation" element={<Meditation />} />
@@ -295,10 +304,7 @@ function App() {
       <SensoryProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
-          {/* Immersive Fluid Mesh Gradient — outside all wrappers */}
-          <div className="cosmic-mesh" aria-hidden="true">
-            <div className="cosmic-mesh-inner" />
-          </div>
+          <CosmicMeshWrapper />
           <CosmicBackground />
           <SplitScreenProvider>
           <div style={{ minHeight: '100vh', position: 'relative' }}>
