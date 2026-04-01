@@ -17,6 +17,8 @@ const ROUTE_TO_REALM = {
   '/soundscapes': 'cosmic_mixer',
   '/dream-realms': 'dream_realms',
   '/trade-circle': 'trade_circle',
+  '/planetary-depths': 'dream_realms',
+  '/quantum-field': 'starseed_journey',
 };
 
 // Gate-specific narrative messages

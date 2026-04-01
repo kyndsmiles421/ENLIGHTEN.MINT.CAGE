@@ -150,6 +150,8 @@ const EvolutionLab = lazy(() => import('./pages/EvolutionLab'));
 const RefinementLab = lazy(() => import('./pages/RefinementLab'));
 const SmartDockPage = lazy(() => import('./pages/SmartDockPage'));
 const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
+const PlanetaryDepths = lazy(() => import('./pages/PlanetaryDepths'));
+const QuantumField = lazy(() => import('./pages/QuantumField'));
 
 function PageLoader() {
   return (
@@ -287,6 +289,8 @@ function AnimatedRoutes() {
         <Route path="/evolution-lab" element={<EvolutionLab />} />
         <Route path="/refinement-lab" element={<RefinementLab />} />
         <Route path="/hotspots" element={<HotspotsPage />} />
+        <Route path="/planetary-depths" element={<PlanetaryDepths />} />
+        <Route path="/quantum-field" element={<QuantumField />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
