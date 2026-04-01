@@ -106,6 +106,7 @@ from routes.encounters import router as encounters_router
 from routes.living_journal import router as living_journal_router
 from routes.consciousness import router as consciousness_router
 from routes.forge import router as forge_router
+from routes.energy_gates import router as energy_gates_router
 
 app = FastAPI()
 
@@ -179,6 +180,7 @@ all_routers = [
     revenue_router,
     consciousness_router,
     forge_router,
+    energy_gates_router,
 ]
 
 for r in all_routers:
