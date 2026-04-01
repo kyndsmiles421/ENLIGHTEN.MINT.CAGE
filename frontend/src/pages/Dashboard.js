@@ -775,6 +775,12 @@ function NexusIntentSection({ intent, navigate, playFrequency }) {
               {intent.action?.label || 'Align'}
               {freq && <span className="text-[8px] opacity-70">| {freq.hz} Hz</span>}
             </motion.button>
+            <button onClick={() => navigate('/rock-hounding')}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
+              style={{ background: 'rgba(245,158,11,0.06)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.1)' }}
+              data-testid="enter-rock-hounding">
+              Mine
+            </button>
             <button onClick={() => navigate('/dream-realms')}
               className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium"
               style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}

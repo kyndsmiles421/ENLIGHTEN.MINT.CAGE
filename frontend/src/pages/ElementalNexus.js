@@ -658,6 +658,32 @@ export default function ElementalNexus() {
           </div>
         </div>
 
+        {/* Game Modules — Nexus-Linked */}
+        <div className="rounded-xl p-3 mb-4" style={{ background: 'rgba(245,158,11,0.02)', border: '1px solid rgba(245,158,11,0.08)' }}
+          data-testid="nexus-game-modules">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <Zap size={10} style={{ color: '#F59E0B' }} />
+              <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: '#F59E0B' }}>Game Modules</p>
+            </div>
+            <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Feed elements through play</p>
+          </div>
+          <button onClick={() => navigate('/rock-hounding')}
+            className="w-full rounded-lg p-2.5 flex items-center gap-2.5 text-left group"
+            style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.06)' }}
+            data-testid="nexus-rock-hounding-link">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: 'rgba(245,158,11,0.08)' }}>
+              <Mountain size={14} style={{ color: '#F59E0B' }} />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold" style={{ color: '#F59E0B' }}>Rock Hounding</p>
+              <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>Mine specimens tied to your elemental balance</p>
+            </div>
+            <ChevronRight size={12} style={{ color: 'var(--text-muted)' }} />
+          </button>
+        </div>
+
         {/* Element Details */}
         <p className="text-[8px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
           Element Details

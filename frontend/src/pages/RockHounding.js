@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import useGameController from '../hooks/useGameController';
+import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
 import {
   ArrowLeft, Pickaxe, Zap, Star, Gem, ChevronRight,
-  Flame, Droplets, Mountain, Sprout, Lock, Unlock,
-  TrendingUp, Award, BookOpen, Eye, Battery, RefreshCw
+  Flame, Droplets, Mountain, Sprout, Lock,
+  TrendingUp, Award, BookOpen, Battery, RefreshCw
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -35,7 +37,7 @@ function EnergyBar({ energy }) {
 }
 
 // ── Depth Layer Button ──
-function DepthLayer({ depth, onMine, mining, currentEnergy }) {
+function DepthLayer({ depth, onMine, mining, currentEnergy, biomeColor }) {
   const locked = !depth.unlocked;
   const canAfford = currentEnergy >= depth.energy_cost;
   const disabled = locked || !canAfford || mining;
@@ -45,19 +47,20 @@ function DepthLayer({ depth, onMine, mining, currentEnergy }) {
     <motion.button
       initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
       transition={{ delay: depth.depth * 0.05 }}
+      whileTap={!disabled ? { scale: 0.97 } : {}}
       onClick={() => !disabled && onMine(depth.depth)}
       disabled={disabled}
       className="w-full rounded-xl p-3 mb-2 text-left relative overflow-hidden group"
       style={{
-        background: locked ? 'rgba(255,255,255,0.01)' : `rgba(${depth.depth * 20},${150 - depth.depth * 15},${80 - depth.depth * 10},0.04)`,
-        border: `1px solid ${locked ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)'}`,
+        background: locked ? 'rgba(255,255,255,0.01)' : `${biomeColor}06`,
+        border: `1px solid ${locked ? 'rgba(255,255,255,0.03)' : `${biomeColor}12`}`,
         opacity: disabled ? 0.5 : 1,
       }}
       data-testid={`depth-${depth.depth}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {locked ? <Lock size={12} style={{ color: 'var(--text-muted)' }} />
-            : <Pickaxe size={12} style={{ color: '#F59E0B' }} />}
+            : <Pickaxe size={12} style={{ color: biomeColor }} />}
           <div>
             <p className="text-[10px] font-medium" style={{ color: locked ? 'var(--text-muted)' : 'var(--text-primary)' }}>
               {depth.name}
@@ -69,12 +72,21 @@ function DepthLayer({ depth, onMine, mining, currentEnergy }) {
         </div>
         {!locked && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[8px]"
-            style={{ background: canAfford ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.06)',
-              color: canAfford ? '#F59E0B' : '#EF4444' }}>
+            style={{
+              background: canAfford ? `${biomeColor}08` : 'rgba(239,68,68,0.06)',
+              color: canAfford ? biomeColor : '#EF4444'
+            }}>
             <Pickaxe size={8} /> {mining ? 'Mining...' : 'Mine'}
           </div>
         )}
       </div>
+      {/* Rarity gradient stripe */}
+      {!locked && depth.rarity_boost > 1.3 && (
+        <motion.div className="absolute bottom-0 left-0 right-0 h-0.5"
+          animate={{ opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          style={{ background: `linear-gradient(90deg, transparent, ${biomeColor}, transparent)` }} />
+      )}
     </motion.button>
   );
 }
@@ -83,6 +95,9 @@ function DepthLayer({ depth, onMine, mining, currentEnergy }) {
 function SpecimenCard({ specimen, rewards }) {
   const rc = RARITY_COLORS[specimen.actual_rarity] || '#9CA3AF';
   const ElIcon = EL_ICONS[specimen.element] || Gem;
+  const isMythic = specimen.actual_rarity === 'mythic';
+  const isLegendary = specimen.actual_rarity === 'legendary';
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.85, y: 20 }}
@@ -91,15 +106,28 @@ function SpecimenCard({ specimen, rewards }) {
       className="rounded-2xl p-4 relative overflow-hidden"
       style={{ background: `${rc}06`, border: `1px solid ${rc}15` }}
       data-testid="specimen-card">
+      {/* Legendary/Mythic shimmer */}
+      {(isLegendary || isMythic) && (
+        <motion.div className="absolute inset-0"
+          animate={{ backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          style={{
+            background: `linear-gradient(135deg, transparent 30%, ${rc}10 50%, transparent 70%)`,
+            backgroundSize: '200% 200%',
+          }} />
+      )}
       <motion.div className="absolute inset-0" animate={{ opacity: [0.02, 0.06, 0.02] }}
         transition={{ duration: 3, repeat: Infinity }}
         style={{ background: `radial-gradient(circle at 50% 50%, ${rc}20, transparent 70%)` }} />
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+          <motion.div
+            animate={isMythic ? { rotate: [0, 5, -5, 0] } : {}}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center"
             style={{ background: `${rc}12`, border: `1px solid ${rc}20` }}>
             <Gem size={22} style={{ color: rc }} />
-          </div>
+          </motion.div>
           <div className="flex-1">
             <div className="flex items-center gap-1.5 mb-0.5">
               <p className="text-sm font-bold" style={{ color: rc, fontFamily: 'Cormorant Garamond, serif' }}>
@@ -162,14 +190,50 @@ function CollectionItem({ item }) {
   );
 }
 
+// ── Core Stats HUD (shows data from Universal Game Controller) ──
+function CoreStatsHUD({ coreStats }) {
+  if (!coreStats) return null;
+  const lvl = coreStats.level;
+  return (
+    <div className="rounded-xl p-3 mb-4" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
+      data-testid="core-stats-hud">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <Award size={10} style={{ color: '#FCD34D' }} />
+          <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Core Stats</span>
+        </div>
+        <span className="text-[9px] font-bold" style={{ color: '#818CF8' }}>Lv.{lvl?.level}</span>
+      </div>
+      {/* XP bar */}
+      <div className="w-full h-1 rounded-full mb-2" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <motion.div initial={{ width: 0 }} animate={{ width: `${lvl?.percentage || 0}%` }}
+          className="h-full rounded-full" style={{ background: '#818CF8' }} />
+      </div>
+      <div className="flex items-center gap-3 text-[7px]" style={{ color: 'var(--text-muted)' }}>
+        <span>XP: {lvl?.total_xp}</span>
+        <span>Dust: {coreStats.currencies?.cosmic_dust || 0}</span>
+        {Object.entries(coreStats.stats || {}).map(([k, v]) => (
+          <span key={k} style={{ color: v.color }}>{v.name}: {v.value}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  MAIN PAGE
+//  MAIN PAGE — Rock Hounding Module
+//  Plugs into Universal Game Controller via hook
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function RockHounding() {
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;
+
+  // Universal Game Controller Hook — provides Nexus state, distortions, commitReward
+  const controller = useGameController('rock_hounding');
+
   const [mine, setMine] = useState(null);
   const [collection, setCollection] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -205,6 +269,9 @@ export default function RockHounding() {
       const { specimen, rewards } = res.data;
       setLastFind({ specimen, rewards });
 
+      // Refresh controller state (Nexus + Core stats update)
+      controller.refreshState();
+
       if (['legendary', 'mythic'].includes(specimen.actual_rarity)) {
         triggerHaptic('legendary');
         toast(`${specimen.actual_rarity.toUpperCase()}! ${specimen.name}!`);
@@ -225,147 +292,191 @@ export default function RockHounding() {
       setMine(res.data.mine);
       setLastFind(null);
       toast('New mine opened!');
+      controller.refreshState();
     } catch (err) { toast.error('Failed to open new mine'); }
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
-      <CosmicInlineLoader message="Opening the mine..." />
-    </div>
+  if (loading || controller.loading) return (
+    <GameModuleWrapper distortions={{ blur: 0, grainOpacity: 0, glitchIntensity: 0, saturation: 1 }}
+      dominantElement="earth" harmonyScore={50} moduleName="rock_hounding">
+      <div className="min-h-screen flex items-center justify-center">
+        <CosmicInlineLoader message="Opening the mine..." />
+      </div>
+    </GameModuleWrapper>
   );
+
   if (error) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
-      <CosmicError title={error.title} message={error.message} onRetry={fetchMine} />
-    </div>
+    <GameModuleWrapper distortions={{ blur: 0, grainOpacity: 0, glitchIntensity: 0, saturation: 1 }}
+      dominantElement="earth" harmonyScore={50} moduleName="rock_hounding">
+      <div className="min-h-screen flex items-center justify-center">
+        <CosmicError title={error.title} message={error.message} onRetry={fetchMine} />
+      </div>
+    </GameModuleWrapper>
   );
 
   const biome = mine?.biome || {};
   const depths = mine?.depths || [];
   const energy = mine?.energy_info || { current: 0, max: 20 };
-  const biomeColor = biome.color || '#F59E0B';
+  // Use Nexus-driven element color (falls back to biome color)
+  const biomeColor = EL_COLORS[biome.element] || biome.color || '#F59E0B';
   const BiomeIcon = EL_ICONS[biome.element] || Mountain;
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="rock-hounding-page">
-      {/* Header */}
-      <div className="px-4 pt-4 pb-3 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="rh-back-btn">
-          <ArrowLeft size={16} style={{ color: 'var(--text-muted)' }} />
-        </button>
-        <div className="flex-1">
-          <h1 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Rock Hounding</h1>
-          <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>
-            Discover minerals. Feed the Nexus. Build your collection.
-          </p>
+    <GameModuleWrapper
+      distortions={controller.distortions}
+      dominantElement={controller.dominantElement}
+      harmonyScore={controller.harmonyScore}
+      moduleName="rock_hounding">
+
+      <div className="pb-24" data-testid="rock-hounding-page">
+        {/* Header */}
+        <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="rh-back-btn">
+            <ArrowLeft size={16} style={{ color: 'var(--text-muted)' }} />
+          </button>
+          <div className="flex-1">
+            <h1 className="text-base font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
+              Rock Hounding
+            </h1>
+            <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>
+              Discover minerals. Feed the Nexus. Build your collection.
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => navigate('/nexus')} className="text-[8px] px-2 py-1 rounded-lg"
+              style={{ background: `${biomeColor}06`, color: biomeColor, border: `1px solid ${biomeColor}10` }}
+              data-testid="rh-nexus-link">Nexus</button>
+            <button onClick={() => navigate('/rpg')} className="text-[8px] px-2 py-1 rounded-lg"
+              style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.1)' }}
+              data-testid="rh-rpg-link">RPG</button>
+          </div>
         </div>
-        <button onClick={() => navigate('/nexus')} className="text-[8px] px-2 py-1 rounded-lg"
-          style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}
-          data-testid="rh-nexus-link">Nexus</button>
-      </div>
 
-      {/* Tabs */}
-      <div className="px-4 flex gap-2 mb-4" data-testid="rh-tabs">
-        {[
-          { id: 'mine', label: 'Mine', icon: Pickaxe },
-          { id: 'collection', label: 'Collection', icon: Gem },
-          { id: 'catalog', label: 'Catalog', icon: BookOpen },
-        ].map(t => {
-          const TIcon = t.icon;
-          return (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
-              style={{
-                background: tab === t.id ? `${biomeColor}12` : 'rgba(255,255,255,0.02)',
-                color: tab === t.id ? biomeColor : 'var(--text-muted)',
-                border: `1px solid ${tab === t.id ? `${biomeColor}20` : 'rgba(255,255,255,0.04)'}`,
-              }}
-              data-testid={`tab-${t.id}`}><TIcon size={10} /> {t.label}</button>
-          );
-        })}
-      </div>
+        {/* Tabs */}
+        <div className="px-4 flex gap-2 mb-4" data-testid="rh-tabs">
+          {[
+            { id: 'mine', label: 'Mine', icon: Pickaxe },
+            { id: 'collection', label: 'Collection', icon: Gem },
+            { id: 'catalog', label: 'Catalog', icon: BookOpen },
+          ].map(t => {
+            const TIcon = t.icon;
+            return (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
+                style={{
+                  background: tab === t.id ? `${biomeColor}12` : 'rgba(255,255,255,0.02)',
+                  color: tab === t.id ? biomeColor : 'var(--text-muted)',
+                  border: `1px solid ${tab === t.id ? `${biomeColor}20` : 'rgba(255,255,255,0.04)'}`,
+                }}
+                data-testid={`tab-${t.id}`}><TIcon size={10} /> {t.label}</button>
+            );
+          })}
+        </div>
 
-      <div className="px-4">
-        {tab === 'mine' && (
-          <>
-            {/* Biome Card */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl p-4 mb-4 relative overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg, ${biome.ambient || '#1a1a2e'}E0, ${biomeColor}08)`,
-                border: `1px solid ${biomeColor}15`,
-              }}
-              data-testid="biome-card">
-              <div className="relative z-10">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: `${biomeColor}10`, border: `1px solid ${biomeColor}20` }}>
-                    <BiomeIcon size={18} style={{ color: biomeColor }} />
+        <div className="px-4">
+          {/* Core Stats HUD — from Universal Game Controller */}
+          <CoreStatsHUD coreStats={controller.coreStats} />
+
+          {tab === 'mine' && (
+            <>
+              {/* Biome Card — colored by Nexus element state */}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl p-4 mb-4 relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${biome.ambient || '#1a1a2e'}E0, ${biomeColor}08)`,
+                  border: `1px solid ${biomeColor}15`,
+                }}
+                data-testid="biome-card">
+                {/* Ambient pulse from harmony */}
+                <motion.div className="absolute inset-0"
+                  animate={{ opacity: [0.02, 0.05, 0.02] }}
+                  transition={{ duration: controller.distortions.pulseSpeed || 4, repeat: Infinity }}
+                  style={{ background: `radial-gradient(circle at 30% 30%, ${biomeColor}15, transparent 60%)` }} />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: `${biomeColor}10`, border: `1px solid ${biomeColor}20` }}>
+                      <BiomeIcon size={18} style={{ color: biomeColor }} />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-sm font-bold" style={{ color: biomeColor, fontFamily: 'Cormorant Garamond, serif' }}>
+                        {biome.name || 'Mine'}
+                      </h2>
+                      <p className="text-[7px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                        {biome.element} biome | {biome.atmosphere}
+                      </p>
+                    </div>
+                    {/* Harmony badge */}
+                    <div className="text-center">
+                      <p className="text-[7px] uppercase" style={{ color: 'var(--text-muted)' }}>Harmony</p>
+                      <p className="text-sm font-bold" style={{ color: controller.harmonyScore > 50 ? '#22C55E' : '#F59E0B' }}>
+                        {controller.harmonyScore}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-sm font-bold" style={{ color: biomeColor, fontFamily: 'Cormorant Garamond, serif' }}>
-                      {biome.name || 'Mine'}
-                    </h2>
-                    <p className="text-[7px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-                      {biome.element} biome | {biome.atmosphere}
-                    </p>
+                  <p className="text-[10px] italic mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    {biome.description}
+                  </p>
+                  <div className="flex items-center gap-3 text-[7px]" style={{ color: 'var(--text-muted)' }}>
+                    <span>Mined: {mine?.total_mines || 0}</span>
+                    <span>Found: {mine?.specimens_found?.length || 0}</span>
+                    <span>Dominant: {controller.dominantElement}</span>
+                    {controller.deficientElement && (
+                      <span style={{ color: EL_COLORS[controller.deficientElement] }}>
+                        Feed: {controller.deficientElement}
+                      </span>
+                    )}
                   </div>
                 </div>
-                <p className="text-[10px] italic mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>
-                  {biome.description}
+              </motion.div>
+
+              {/* Energy */}
+              <EnergyBar energy={energy} />
+
+              {/* Last Find */}
+              <AnimatePresence>
+                {lastFind && (
+                  <motion.div className="mb-4" exit={{ opacity: 0, y: -10 }}>
+                    <p className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-muted)' }}>Last Discovery</p>
+                    <SpecimenCard specimen={lastFind.specimen} rewards={lastFind.rewards} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Depth Layers */}
+              <div className="mb-4">
+                <p className="text-[8px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+                  Mine Depths
                 </p>
-                <div className="flex items-center gap-3 text-[7px]" style={{ color: 'var(--text-muted)' }}>
-                  <span>Mined: {mine?.total_mines || 0}</span>
-                  <span>Harmony: {mine?.harmony_at_start || 0}</span>
-                  <span>Found: {mine?.specimens_found?.length || 0}</span>
-                </div>
+                {depths.map(d => (
+                  <DepthLayer key={d.depth} depth={d} onMine={doMine} mining={mining}
+                    currentEnergy={energy.current} biomeColor={biomeColor} />
+                ))}
               </div>
-            </motion.div>
 
-            {/* Energy */}
-            <EnergyBar energy={energy} />
+              {/* Reset mine */}
+              <button onClick={resetMine}
+                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[9px] font-medium mb-4"
+                style={{ background: 'rgba(59,130,246,0.04)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.08)' }}
+                data-testid="reset-mine-btn">
+                <RefreshCw size={10} /> New Mine (Reset Biome)
+              </button>
+            </>
+          )}
 
-            {/* Last Find */}
-            <AnimatePresence>
-              {lastFind && (
-                <motion.div className="mb-4" exit={{ opacity: 0, y: -10 }}>
-                  <p className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-muted)' }}>Last Discovery</p>
-                  <SpecimenCard specimen={lastFind.specimen} rewards={lastFind.rewards} />
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* Collection tab */}
+          {tab === 'collection' && (
+            <CollectionTab collection={collection} fetchCollection={fetchCollection} />
+          )}
 
-            {/* Depth Layers */}
-            <div className="mb-4">
-              <p className="text-[8px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
-                Mine Depths
-              </p>
-              {depths.map(d => (
-                <DepthLayer key={d.depth} depth={d} onMine={doMine} mining={mining} currentEnergy={energy.current} />
-              ))}
-            </div>
-
-            {/* Reset mine */}
-            <button onClick={resetMine}
-              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[9px] font-medium mb-4"
-              style={{ background: 'rgba(59,130,246,0.04)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.08)' }}
-              data-testid="reset-mine-btn">
-              <RefreshCw size={10} /> New Mine (Reset Biome)
-            </button>
-          </>
-        )}
-
-        {/* Collection tab */}
-        {tab === 'collection' && (
-          <CollectionTab collection={collection} fetchCollection={fetchCollection} />
-        )}
-
-        {/* Catalog tab */}
-        {tab === 'catalog' && (
-          <CatalogTab headers={headers} />
-        )}
+          {/* Catalog tab */}
+          {tab === 'catalog' && (
+            <CatalogTab headers={headers} />
+          )}
+        </div>
       </div>
-    </div>
+    </GameModuleWrapper>
   );
 }
 

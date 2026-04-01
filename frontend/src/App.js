@@ -132,6 +132,7 @@ const CosmicInsights = lazy(() => import('./pages/CosmicInsights'));
 const MultiverseMap = lazy(() => import('./pages/MultiverseMap'));
 const ElementalNexus = lazy(() => import('./pages/ElementalNexus'));
 const DreamRealms = lazy(() => import('./pages/DreamRealms'));
+const RockHounding = lazy(() => import('./pages/RockHounding'));
 
 function PageLoader() {
   return (
@@ -260,6 +261,7 @@ function AnimatedRoutes() {
         <Route path="/multiverse-map" element={<MultiverseMap />} />
         <Route path="/nexus" element={<ElementalNexus />} />
         <Route path="/dream-realms" element={<DreamRealms />} />
+        <Route path="/rock-hounding" element={<RockHounding />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

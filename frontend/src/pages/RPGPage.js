@@ -582,6 +582,28 @@ export default function RPGPage() {
         </div>
       </div>
 
+      {/* Game Modules Quick Access */}
+      <div className="px-4 py-2 flex gap-2" data-testid="rpg-game-modules">
+        <button onClick={() => navigate('/rock-hounding')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
+          style={{ background: 'rgba(245,158,11,0.06)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.1)' }}
+          data-testid="rpg-rock-hounding-link">
+          <Compass size={10} /> Rock Hounding
+        </button>
+        <button onClick={() => navigate('/nexus')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
+          style={{ background: 'rgba(168,85,247,0.06)', color: '#A855F7', border: '1px solid rgba(168,85,247,0.1)' }}
+          data-testid="rpg-nexus-link">
+          <Zap size={10} /> Nexus
+        </button>
+        <button onClick={() => navigate('/dream-realms')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium"
+          style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.1)' }}
+          data-testid="rpg-dream-realms-link">
+          <Eye size={10} /> Dreams
+        </button>
+      </div>
+
       <div className="px-4 py-4">
         <AnimatePresence mode="wait">
           {/* QUESTS TAB */}

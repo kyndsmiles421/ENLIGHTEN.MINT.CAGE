@@ -118,7 +118,7 @@ async def award_currency(user_id: str, currency_type: str, amount: int, source: 
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
 
-    currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0})
+    currencies = await db.rpg_currencies.find_one({"user_id": user_id}, {"_id": 0, "user_id": 0})
     return currencies or {}
 
 
@@ -218,3 +218,50 @@ async def get_transactions(user=Depends(get_current_user)):
         {"user_id": user["id"]}, {"_id": 0}
     ).sort("timestamp", -1).to_list(50)
     return {"transactions": txns}
+
+
+@router.post("/game-core/commit-reward")
+async def commit_reward(data: dict = Body(...), user=Depends(get_current_user)):
+    """Soul-to-Game Bridge: Commit a reward from any game module to the Core.
+    
+    This is the universal entry point. Any game module sends:
+      { module_id, xp, dust, stat, stat_delta, element }
+    The Core handles XP leveling, currency, stat updates, and Nexus feedback.
+    Future modules (Elemental Crafting, etc.) call this same endpoint.
+    """
+    user_id = user["id"]
+    module_id = data.get("module_id", "unknown")
+    
+    if module_id not in GAME_MODULES and module_id != "unknown":
+        raise HTTPException(400, f"Unknown game module: {module_id}")
+    
+    results = {}
+    source = f"{module_id}:commit"
+    
+    # XP award
+    xp_amount = data.get("xp", 0)
+    if xp_amount > 0:
+        results["level"] = await award_xp(user_id, xp_amount, source)
+    
+    # Currency award
+    dust_amount = data.get("dust", 0)
+    if dust_amount > 0:
+        results["currencies"] = await award_currency(user_id, "cosmic_dust", dust_amount, source)
+    
+    # Stat modification
+    stat = data.get("stat")
+    stat_delta = data.get("stat_delta", 0)
+    if stat and stat_delta:
+        results["stats"] = await modify_stat(user_id, stat, stat_delta, source)
+    
+    # Nexus element modifier feedback
+    element = data.get("element")
+    if element:
+        await db.nexus_decoded_modifiers.update_one(
+            {"user_id": user_id},
+            {"$inc": {f"modifiers.{element}": 1}},
+            upsert=True,
+        )
+        results["nexus_modifier"] = f"+1 {element}"
+    
+    return {"status": "committed", "module": module_id, "results": results}
