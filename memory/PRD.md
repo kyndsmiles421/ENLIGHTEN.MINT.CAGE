@@ -1,7 +1,7 @@
 # The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, cinematic visuals, and Wellness MMORPG mechanics.
+Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending wellness tracking with deep mystical/divination systems, personalized AI guidance, cinematic visuals, and Wellness MMORPG mechanics.
 
 ## Tech Stack
 - **Frontend**: React (CRA + craco), TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API
@@ -10,80 +10,66 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Full Integrated Evolution & Discovery Protocol (Apr 1, 2026)
+### Sweat Equity, Encounters & Living Journal (Apr 1, 2026) — NEW
 
-**Refinement Lab — Digital Tumbler & Extraction Tools:**
-- 3 extraction tools: Brush (Mohs 1-4), Pick (4-7), Chisel (7-10)
-- Quality-based extraction: optimal tool match = 85-100% quality
-- Digital Tumbler: 3-slot time-gated refinement (4h common → 48h mythic)
-- Nexus subscribers get 50% speed boost on tumble time
-- Instant-finish microtransaction (1 credit per remaining hour)
-- Polished specimens unlock Starseed components + spiritual data
+**Economy Admin (Alchemical Exchange — Sweat Equity):**
+- Admin-controlled sliding scale: `dust_per_credit` (10–10000 range)
+- Communal modifier: global goals can reduce exchange rate for all users
+- Feature Flags: 5 premium modules gatable by subscription OR credit purchase
+- Permanent module unlock via credits (Cosmic Mixer 500cc, Starseed Workbench 800cc, Dream Realms Deep 600cc, Wisdom Branches 300cc, Digital Seeds 400cc)
+- 3 Communal Goals: Global Enlightenment (rate reduction), Rapid Tumbling (speed), World Vein Resonance (drops)
+- **Test**: Iteration 165 — 100% (37/37)
+
+**Environmental Bosses & NPC Rivals:**
+- 3 Boss Types: Unstable Vein (60s/5 actions), Crystal Maze (90s/4 actions), Geothermal Surge (45s/6 actions)
+- Daily deterministic boss spawns per user
+- 2 Rival NPCs: The Sprinter (volume, speed 0.8), The Specialist (precision, speed 0.5)
+- Rival competition with stealth/speed buffs and steal mechanics
+- Bosses/rivals award XP + Dust + communal contributions
+- **Test**: Iteration 165 — 100%
+
+**World Veins (Collective Bosses):**
+- Heart Frequency Vein: 528 Hz, 10 participants, rewards Moldavite
+- Crown Resonance Vein: 963 Hz, 25 participants, rewards Alexandrite
+- Frequency tolerance ±10%, minimum meditation duration
+- 72h reward window when cracked
+
+**Living Journal (AI-Generated Narratives):**
+- Gemini 3 Flash generates personalized discovery narratives
+- Blends geological data + spiritual lore + personal context + current season
+- Per-specimen journal with personal reflections (max 1000 chars)
+- Auto-contributes to communal enlightenment goal
+- **Test**: Iteration 165 — 100%
+
+### Refinement Lab, SmartDock, Wisdom Evolution (Apr 1, 2026)
+- Digital Tumbler (3 slots, time-gated, instant-finish), Extraction Tools (Brush/Pick/Chisel)
+- SmartDock Nexus (14 chakra palettes, frequency audio blend, mantra display)
+- Starseed Components (30 mappings), Wisdom Evolution (4-tier curated + Canopy)
 - **Test**: Iteration 164 — 100%
 
-**SmartDock Nexus — The Relic Pedestal:**
-- Slot any collected stone to trigger global app transformation
-- Audio: Stone's Hz frequency auto-blends into soundscape
-- Visual: UI palette shifts to match stone's chakra correspondence
-- Functional: Unlocks tier-specific mantras and teachings
-- 14 chakra palettes mapped (Root through Crown/Soul Star)
-- Cosmic Ledger auto-logs all slotting activity
-- **Test**: Iteration 164 — 100%
-
-**Starseed Resource Conversion:**
-- 30 unique specimen-to-component mappings
-- Categories: defense, power, communication, navigation, life_support, energy, knowledge
-- Power scales with extraction quality
-- Component inventory with category aggregation
-- **Test**: Iteration 164 — 100%
-
-**Wisdom Evolution — 4-Tier Cognitive Growth:**
-- Seeds (0 interactions): Simple affirmations
-- Roots (5+ interactions): Curated folklore, history, geological facts
-- Branches (15+ interactions): Philosophy, alchemy, meditation scripts
-- Canopy (30+ interactions): User-planted peer-reviewed wisdom
-- 10 fully curated specimens (Peridot, Emerald, Obsidian, Diamond, Clear Quartz, Moonstone, Lapis, Ruby, Amber, Sapphire)
-- Canopy marketplace with planting rewards (25 XP + 15 Dust)
-- **Test**: Iteration 164 — 100%
-
-**Perpetual Evolution Protocol (PEP):**
-- VC = (Interaction × Growth_Rate) - (Time × Decay_Rate)
-- 3-Stage Evolution: Raw (1×) → Refined (2×, VC≥50) → Transcendental (3×, VC≥150)
-- -1%/24h decay (paused for Igneous+ subscribers)
-- Preservation Salts consumable (30-day freeze)
-- **Test**: Iteration 163 — 100%
-
-**Seasonal Cycles (90-day Geological Rotations):**
-- Compression (Metamorphic): deep work, 396 Hz
-- Eruption (Igneous): manifestation, 528 Hz
-- Erosion (Sedimentary): reflection, 852 Hz
-
-### Cosmic Marketplace & Monetization (Apr 1, 2026)
-- Cosmic Credits: Stripe-purchasable + earnable (Dust conversion 100:1)
-- 7 Consumables, 5 Cosmetics, Nexus Pass ($9.99/mo)
-- Active Effects integrate with GameModuleWrapper
-- Geological subscription tiers: Sedimentary(Free)/Igneous/Metamorphic
-- **Test**: Iteration 162 — 100%
+### PEP, Marketplace, Seasonal Cycles (Apr 1, 2026)
+- VC system, 3-stage evolution, -1%/24h decay, Preservation Salts
+- Cosmic Credits, 7 Consumables, 5 Cosmetics, Nexus Pass ($9.99/mo)
+- 90-day Geological Rotations (Compression/Eruption/Erosion)
+- **Test**: Iterations 162-163 — 100%
 
 ### Earlier Systems (All 100% Tested)
 - Brain/Skin/Bridge, 5-Layer Universe, Forgotten Languages
 - Universal Game Core, Rock Hounding, Adaptive Dashboard
-- Dream Realms, Elemental Nexus, Multiversal Map
-- Dual Currency, Daily Quests, RPG, Auth, AI Coach, Star Chart, Oracle
+- Dream Realms, Elemental Nexus, Multiversal Map, Daily Quests, RPG, Auth, AI Coach, Star Chart, Oracle
 
 ## Credentials
 - RPG Test: rpg_test@test.com / password123
 
 ## Key Architecture
 
-### The Five Pillars
-1. **The Brain** (`/api/dream-realms/scenario-state`) — Environment
-2. **The Skin** (`GameModuleWrapper`) — Visual distortions + premium overlays
-3. **The Bridge** (`/api/game-core/commit-reward`) — Rewards
-4. **Marketplace Hook** (`/api/marketplace/*`) — Economy
-5. **Evolution Engine** (`/api/evolution/*` + `/api/refinement/*` + `/api/smartdock/*` + `/api/wisdom/*`) — PEP + Discovery
+### Module Registration (server.py)
+economy_admin, encounters, living_journal, evolution, refinement, smartdock, wisdom, marketplace, game_core, rock_hounding, forgotten_languages, dream_realms, rpg, nexus, multiverse_map, reports, subscriptions
 
 ### Key DB Collections
+- **Economy**: `economy_config`, `module_unlocks`, `communal_progress`, `communal_bonuses`
+- **Encounters**: `boss_attempts`, `rival_state`, `world_vein_progress`, `world_vein_cracks`
+- **Journal**: `living_journal`
 - **Refinement**: `refinement_extractions`, `refinement_tumbler`, `starseed_components`
 - **SmartDock**: `smartdock_state`, `cosmic_ledger_entries`
 - **Wisdom**: `wisdom_canopy`
@@ -94,7 +80,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ### P1
 - **Elemental Crafting** — Combine specimens using Universal Game Template
 - **Party System** — Circle/Coven for shared objectives
-- **GPS Hotspot Spawning** — Location-based mineral discovery (Black Hills)
+- **GPS Hotspot Spawning** — Location-based mineral discovery
+- **Biometric Sync** — Heart-rate data influences stone visual glow
 
 ### P2 — Backlog
 - P2P Wisdom Trading Marketplace (10% platform fee)
@@ -102,9 +89,9 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Expansion Packs (themed specimen collections)
 - Cosmic Mixer "grind minerals into pigments" audio system
 - Camera-based scanning interface
-- Myths & Legends Encyclopedia
-- Global Immersion Toggles
+- Myths & Legends Encyclopedia, Global Immersion Toggles
 - Avatar Creator & AI Scene Recreations
 - On-device inference (Nano-Banana SLM)
 - 3D mesh morphing for PEP visual evolution
+- Encounter frontend pages (boss/rival/vein UI)
 - Dashboard.js / RockHounding.js refactoring
