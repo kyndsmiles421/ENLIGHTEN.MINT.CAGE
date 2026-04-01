@@ -10,7 +10,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Starseed Energy Gates & TradeCircle Modularization (Apr 1, 2026) — LATEST
+### Starseed Energy Gates, Gate Notifications & TradeCircle Modularization (Apr 1, 2026) — LATEST
 
 **Starseed Energy Gates (5 Dimensional Gateways):**
 - Gate of Earth (396 Hz, Amber) → Gate of Flow (417 Hz, Rose) → Gate of Transmutation (528 Hz, Silver) → Gate of the Unseen (741 Hz, Violet) → Gate of Pure Source (963 Hz, Gold)
@@ -23,13 +23,20 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Aura-themed UI with animated progress bars, expandable gate cards, and unlock animations
 - Backend: 7 endpoints (status, unlock, warp, travel, travel-log, history)
 
+**Gate Notifications (Feedback Loop Enhancement):**
+- Global `useGateNotifications` hook runs in AnimatedRoutes
+- Auto-records realm travel when visiting mapped routes (/starseed→starseed_journey, /refinement-lab→refinement_lab, etc.)
+- Checks gate readiness on route changes + 60s interval
+- Narrative toasts when gate becomes unlockable (e.g., "The Earth Gate trembles...")
+- Uses localStorage cache to track state transitions (only notifies on change)
+- First load initializes without notifications
+
 **TradeCircle.js Modularization:**
-- Reduced from 1136 → 526 lines (54% reduction)
+- Reduced from 1136 → 523 lines (54% reduction)
 - Extracted 9 components to `components/trade/TradeCircleWidgets.js` (~647 lines)
-- Components: CreateListingModal, OfferModal, ReviewModal, KarmaProfileModal, ListingCard, ListingDetail, KarmaBadge, TrustScoreBadge, CosmicHandshakeButton
 - Added "Gates" tab (12 total tabs now)
 
-**Tests**: Iteration 176 — 100% Backend (19/19) / 100% Frontend
+**Tests**: Iterations 176-177 — 100% Backend / 100% Frontend
 
 ### Five Levels of Consciousness & AI Product Generator (Apr 1, 2026)
 
