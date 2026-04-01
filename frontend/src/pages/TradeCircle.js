@@ -134,11 +134,6 @@ export default function TradeCircle() {
       .catch(() => {});
   }, [authHeaders]);
 
-  // Record travel to trade_circle for energy gate progress
-  useEffect(() => {
-    axios.post(`${API}/energy-gates/travel`, { realm: 'trade_circle' }, { headers: authHeaders }).catch(() => {});
-  }, [authHeaders]);
-
   const pendingCount = myOffers.received.filter(o => o.status === 'pending').length;
 
   return (

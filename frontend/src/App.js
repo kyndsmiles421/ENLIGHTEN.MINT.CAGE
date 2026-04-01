@@ -27,6 +27,7 @@ import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import TrialGraduation from './components/TrialGraduation';
+import { useGateNotifications } from './hooks/useGateNotifications';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -167,6 +168,7 @@ function AnimatedRoutes() {
   useActivityTracker();
   useGlobalSounds();
   useAmbientSoundscape();
+  useGateNotifications();
 
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
