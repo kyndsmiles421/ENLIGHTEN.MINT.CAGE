@@ -11,7 +11,7 @@ import {
   Volume2, VolumeX, Lightbulb, Sprout, Music, HeartHandshake, Map, Moon,
   Gamepad2, Globe, Star, Compass, Target, Eye, UtensilsCrossed, Droplets,
   Calendar, BarChart3, Award, Upload, MessageCircle, Orbit, Search, Bell, TrendingUp,
-  CreditCard, Crown, Settings, Gem, Link2, FileText
+  CreditCard, Crown, Settings, Gem, Link2, FileText, MapPin
 } from 'lucide-react';
 import SearchCommand from './SearchCommand';
 import ShareButton from './ShareButton';
@@ -141,6 +141,7 @@ const NAV_CATEGORIES = [
       { path: '/classes', label: 'Classes', icon: GraduationCap },
       { path: '/community', label: 'Community', icon: Users },
       { path: '/trade-circle', label: 'Trade Circle', icon: HeartHandshake },
+      { path: '/hotspots', label: 'Energy Hotspots', icon: MapPin },
       { path: '/crystals', label: 'Crystals & Stones', icon: Gem },
       { path: '/entanglement', label: 'Entanglement', icon: Link2 },
       { path: '/blessings', label: 'Send a Blessing', icon: Heart },

@@ -149,6 +149,7 @@ const CosmicStore = lazy(() => import('./pages/CosmicStore'));
 const EvolutionLab = lazy(() => import('./pages/EvolutionLab'));
 const RefinementLab = lazy(() => import('./pages/RefinementLab'));
 const SmartDockPage = lazy(() => import('./pages/SmartDockPage'));
+const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
 
 function PageLoader() {
   return (
@@ -285,6 +286,7 @@ function AnimatedRoutes() {
         <Route path="/cosmic-store" element={<CosmicStore />} />
         <Route path="/evolution-lab" element={<EvolutionLab />} />
         <Route path="/refinement-lab" element={<RefinementLab />} />
+        <Route path="/hotspots" element={<HotspotsPage />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
