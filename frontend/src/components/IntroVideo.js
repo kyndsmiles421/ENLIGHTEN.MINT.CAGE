@@ -56,9 +56,11 @@ export default function IntroVideo() {
     }
   };
 
-  const toggleMute = () => {
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (videoRef.current) {
-      const next = !videoRef.current.muted;
+      const next = !muted;
       videoRef.current.muted = next;
       setMuted(next);
       // If unmuting, ensure video is still playing (some browsers pause on unmute)
@@ -158,10 +160,17 @@ export default function IntroVideo() {
 
                   {/* Mute toggle */}
                   <button onClick={toggleMute}
+                    onTouchEnd={(e) => { e.preventDefault(); toggleMute(e); }}
                     data-testid="intro-video-mute-toggle"
-                    className="absolute bottom-4 right-4 p-2.5 rounded-lg transition-all hover:scale-110"
-                    style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    {muted ? <VolumeX size={16} style={{ color: '#F8FAFC' }} /> : <Volume2 size={16} style={{ color: '#D8B4FE' }} />}
+                    className="absolute bottom-4 right-4 p-3 rounded-xl transition-all hover:scale-110 active:scale-95"
+                    style={{
+                      background: 'rgba(0,0,0,0.7)',
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      touchAction: 'manipulation',
+                      zIndex: 20,
+                    }}>
+                    {muted ? <VolumeX size={18} style={{ color: '#F8FAFC' }} /> : <Volume2 size={18} style={{ color: '#D8B4FE' }} />}
                   </button>
 
                   {/* Title overlay */}

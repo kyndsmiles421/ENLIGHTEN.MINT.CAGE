@@ -234,17 +234,45 @@ function BossCard({ boss, onJoin }) {
 
 const QUEST_ICONS = { brain: Brain, pen: PenLine, heart: Heart, wind: Wind, music: Music, zap: Zap };
 
+// Quest ID → Activity page path mapping
+const QUEST_PATHS = {
+  meditation: '/meditation',
+  journal: '/journal',
+  mood: '/mood',
+  breathing: '/breathing',
+  soundscape: '/soundscapes',
+  breath_reset: null, // handled inline
+};
+
 // ── Quest Card ──
-function QuestCard({ quest, onComplete }) {
+function QuestCard({ quest, onComplete, onNavigate }) {
   const Icon = QUEST_ICONS[quest.icon] || Star;
   const done = quest.completed;
+  const questPath = QUEST_PATHS[quest.id];
+
+  const handleClick = () => {
+    if (done) return;
+    // For quests that can be completed directly (breath_reset, breathing, soundscape)
+    if (onComplete) {
+      onComplete(quest.id);
+      return;
+    }
+    // For quests that require navigating to an activity page
+    if (questPath && onNavigate) {
+      onNavigate(questPath);
+    }
+  };
+
   return (
-    <motion.div
+    <motion.button
       initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl p-3 flex items-center gap-3 group transition-all"
+      onClick={handleClick}
+      className="w-full rounded-xl p-3 flex items-center gap-3 group transition-all text-left"
       style={{
         background: done ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)',
         border: `1px solid ${done ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.04)'}`,
+        cursor: done ? 'default' : 'pointer',
+        touchAction: 'manipulation',
       }}
       data-testid={`quest-${quest.id}`}>
       <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -264,18 +292,15 @@ function QuestCard({ quest, onComplete }) {
         {done ? (
           <span className="text-[9px] font-medium" style={{ color: '#22C55E' }}>Done</span>
         ) : (
-          <div>
+          <div className="flex items-center gap-1.5">
             <p className="text-[10px] font-semibold" style={{ color: '#818CF8' }}>+{quest.xp_with_multiplier} XP</p>
-            {onComplete && (
-              <button onClick={() => onComplete(quest.id)}
-                className="mt-0.5 text-[7px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }}
-                data-testid={`complete-quest-${quest.id}`}>Complete</button>
+            {questPath && !onComplete && (
+              <ChevronRight size={12} style={{ color: '#818CF8', opacity: 0.5 }} />
             )}
           </div>
         )}
       </div>
-    </motion.div>
+    </motion.button>
   );
 }
 
@@ -560,14 +585,16 @@ export default function RPGPage() {
           </div>
         </div>
         {/* Tabs */}
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all relative"
+              onTouchEnd={(e) => { e.preventDefault(); setTab(t.id); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all relative flex-shrink-0"
               style={{
                 background: tab === t.id ? 'rgba(129,140,248,0.1)' : 'transparent',
                 color: tab === t.id ? '#818CF8' : 'var(--text-muted)',
                 border: tab === t.id ? '1px solid rgba(129,140,248,0.15)' : '1px solid transparent',
+                touchAction: 'manipulation',
               }}
               data-testid={`tab-${t.id}`}>
               <t.icon size={11} /> {t.label}
@@ -664,6 +691,7 @@ export default function RPGPage() {
               <div className="space-y-2 mb-4">
                 {quests?.quests?.map(q => (
                   <QuestCard key={q.id} quest={q}
+                    onNavigate={navigate}
                     onComplete={['breath_reset', 'breathing', 'soundscape'].includes(q.id) && !q.completed ? completeQuest : null} />
                 ))}
               </div>
