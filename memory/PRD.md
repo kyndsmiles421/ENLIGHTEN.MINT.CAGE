@@ -10,7 +10,33 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Sweat Equity, Encounters & Living Journal (Apr 1, 2026) — NEW
+### Full-Stack Click Audit & E2E Optimization (Apr 1, 2026) — NEW
+
+**QuestCard Fix (RPG Page — Critical):**
+- Converted QuestCard from non-interactive `div` to clickable `button`
+- Added `onNavigate` prop mapping quest IDs to activity pages: meditation→`/meditation`, journal→`/journal`, mood→`/mood`
+- Added `ChevronRight` indicator on navigable quests
+- Quests with direct completion (`breath_reset`, `breathing`, `soundscape`) still have `onComplete` inline
+
+**IntroVideo Mute Button (Landing — Critical):**
+- Fixed event propagation: added `e.stopPropagation()` and `e.preventDefault()`
+- Added `onTouchEnd` handler for mobile touch responsiveness
+- Increased button hit target (p-3, larger icon)
+- Added `touchAction: 'manipulation'` and z-index 20
+
+**RPG Tabs Mobile Fix:**
+- Added `touchAction: 'manipulation'` and `onTouchEnd` for mobile tab switching
+- Added `overflow-x-auto` with `WebkitOverflowScrolling: touch` for horizontal scroll
+- Tabs flex-shrink-0 for proper mobile layout
+
+**Ghost Click Audit — No Issues Found:**
+- All overlay components (BackgroundPicker, GuidedTour, DeepDive, StarseedInventory) properly conditional-rendered with `if (!isOpen) return null`
+- All visual overlay layers (CosmicMixer) use `pointer-events-none`
+- SmartDock positioned at `bottom:80, left:12` — small element, no full-screen blocking
+- No z-index collisions between nav (z-50), SmartDock (z-9997), and overlays (z-9999)
+- **Test**: Iteration 166 — 100% (Frontend + Backend)
+
+### Sweat Equity, Encounters & Living Journal (Apr 1, 2026)
 
 **Economy Admin (Alchemical Exchange — Sweat Equity):**
 - Admin-controlled sliding scale: `dust_per_credit` (10–10000 range)
@@ -77,21 +103,26 @@ economy_admin, encounters, living_journal, evolution, refinement, smartdock, wis
 - **Marketplace**: `cosmic_credits`, `marketplace_inventory`, `marketplace_active_effects`, `marketplace_equipped`, `marketplace_transactions`, `nexus_subscriptions`
 
 ## Upcoming Tasks
+### P0
+- **Starseed Game Module UI** — Build the Starseed journey interface where refined materials are used for ship components and passing Energy Gates
+
 ### P1
 - **Elemental Crafting** — Combine specimens using Universal Game Template
-- **Party System** — Circle/Coven for shared objectives
+- **Party System (Circle/Coven)** — Shared objectives bridging solo play and world bosses
 - **GPS Hotspot Spawning** — Location-based mineral discovery
 - **Biometric Sync** — Heart-rate data influences stone visual glow
+- **Encounter Frontend Pages** — Boss/rival/vein UI (backend exists)
+- **RockHounding.js Refactoring** — Abstract ~900-line component into modular files
 
 ### P2 — Backlog
 - P2P Wisdom Trading Marketplace (10% platform fee)
+- Myths & Legends Encyclopedia
+- Global Immersion Level toggles
+- Avatar Creator & AI Scene Recreations (Vision Mode)
 - Sponsorship Hooks & Promo Codes
 - Expansion Packs (themed specimen collections)
 - Cosmic Mixer "grind minerals into pigments" audio system
 - Camera-based scanning interface
-- Myths & Legends Encyclopedia, Global Immersion Toggles
-- Avatar Creator & AI Scene Recreations
 - On-device inference (Nano-Banana SLM)
 - 3D mesh morphing for PEP visual evolution
-- Encounter frontend pages (boss/rival/vein UI)
-- Dashboard.js / RockHounding.js refactoring
+- Dashboard.js refactoring
