@@ -12,6 +12,27 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ### Quantum Mechanics & Planetary Stratigraphy (Feb 2026) — LATEST
 
+**Dimensional Space — The "Demens" Grid (12-Cell Multiverse):**
+- 2-axis navigation: Vertical Depth (4 layers) × Horizontal Frequency (3D/4D/5D)
+- 3D (Physical): Linear Time, standard GPS, level 1+
+- 4D (Astral): Non-Linear / Superposition, Shadow Sprites, level 2+
+- 5D (Causal): Entanglement / Unity, shared consciousness, level 3+
+- Phase-Shifting: Costs 30 dust per dimension jump ascending, free descending
+- Endpoints: grid, phase-shift, status, collective-shadow-map
+
+**Master View — Central Nervous System Audit:**
+- Aggregates: player, stratigraphy, psyche, dimensional, quantum, frequency_scaling, subsystems, system_health
+- Real-time monitoring of all subsystem states
+- Endpoint: /api/master-view/audit
+
+**Collective Shadow Map:**
+- Global aggregate heatmap of all players' collapsed Shadow Sprites
+- MongoDB aggregation pipeline on quantum_shadows collection
+- Hotspot clustering by lat/lng with rarity breakdown
+- World map visualization with animated dots
+
+**Tests**: Iteration 183 — 100% Backend (39/39) / 100% Frontend
+
 **Planetary Stratigraphy (4-Layer Depth System):**
 - Crust (Surface, 432 Hz, Earth, Persona archetype) — Standard gameplay
 - Mantle (Transition, 396 Hz, Fire, Shadow archetype) — High pressure, sacred geometry
@@ -240,6 +261,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 /app/backend/routes/
   planetary.py        # 4-layer planetary stratigraphy, psyche tracking, descent
   quantum.py          # Shadow sprites, quantum tunneling, entanglement bonds
+  dimensions.py       # 3D/4D/5D dimensional grid, phase-shifting, collective shadow map
+  master_view.py      # Central nervous system audit dashboard
   activity_loop.py    # Unified cross-system progress + 91-day heatmap
   gps_hotspots.py     # GPS static sites + dynamic hotspots, collection, history
   resonance.py        # Practice mini-game (5 types, streak bonuses)
@@ -275,12 +298,14 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   pages/
     TradeCircle.js (12 tabs: Browse, Gates, Broker, Forge, Content, Escrow, Genesis, God Mode, Avatar, My Listings, Offers, Karma)
     HotspotsPage.js, PlanetaryDepths.js, QuantumField.js
+    DimensionalSpace.js, MasterView.js, CollectiveShadowMap.js
     Dashboard.js, Settings.js, RPGPage.js, CinematicIntro.js
 ```
 
 ## Key DB Collections
 - `users`: wallet, consciousness (xp, level, activity_log), founding_architect, credits
 - `planetary_depth`: user_id, current_layer, psyche_state, unlocked_layers[], descent_history[]
+- `dimensional_state`: user_id, current_dimension, total_shifts, shift_history[]
 - `quantum_shadows`: user_id, collapsed[], total_collapsed, total_dust
 - `quantum_entanglements`: bond_id, user_a, user_b, active, resonance_score, shared_events[]
 - `energy_gates`: user_id, unlocked[], unlock_history[]
@@ -293,23 +318,21 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## Upcoming Tasks
 
-### P0 — Jungian Archetypes & Gatekeepers (Phase 3)
+### P0 — Jungian Archetypes & Study Doorways (Phase 3B)
 - **Archetypal NPCs** at layer transitions (Wise Elder in Mantle, Anima/Animus in Outer Core, The Self in Hollow Earth)
+- **Knowledge Study Sections** — Educational doorways for Geology, Quantum Physics, Jungian Psychology, Botany — each linking into the game loop
 - **Shadow Integration Quests** — defeat/integrate Shadow to stabilize area frequency
-- **Vibrational Shift Audio** — Frequency scaling (432 Hz surface → sub-bass core) with Web Audio API
+- **Vibrational Shift Audio** — Frequency scaling with Web Audio API
 
 ### P1
 - **Vibe Capsules** — Quantum-state trade items from depth frequencies
 - **Synchronicity Events** — Circle/Coven party system with entanglement-based events
-- **Party System (Circle/Coven)** — Private social spaces with Quantum Entanglement integration
+- **Party System (Circle/Coven)** — Private social spaces with Quantum Entanglement
 - **Geology Information System** — Rock identification with educational content
 - **Community Garden Center** — Plant identification and cultivation tips
-- **Earned Avatar Auto-Unlock** — Milestones trigger avatar unlocks
-- **Atmosphere Gate Switching** — Water Gate triggers Rose/Teal palette app-wide
 
 ### P2
 - **Vision Mode / Active Imagination** — AI dreamscapes from activity data
 - **Quantum Haptics** — Erratic vibration patterns at deeper layers
-- **Mixer Trades / Vibe Capsules** — Audio creations as tradeable assets
 - **Myths & Legends Encyclopedia** — AI Scene Recreations
 - Avatar spatial navigation, Biometric Sync
