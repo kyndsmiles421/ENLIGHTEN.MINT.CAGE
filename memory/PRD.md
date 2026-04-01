@@ -10,7 +10,35 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Starseed Energy Gates, Gate Notifications & TradeCircle Modularization (Apr 1, 2026) — LATEST
+### GPS Location-based Hotspots (Apr 1, 2026) — LATEST
+
+**Static Sacred Sites (8 Landmarks):**
+- Sedona Vortex (Earth/Legendary), Stonehenge (Ether/Legendary), Machu Picchu (Air/Legendary), Mount Fuji (Fire/Legendary)
+- Ganges Source (Water/Rare), Cenote Ik Kil (Water/Rare), Uluru (Earth/Rare), Aurora Gateway (Ether/Rare)
+
+**Dynamic Hotspots (Procedural):**
+- 5 hotspots spawn within 2km of user position, refreshing every 4 hours
+- Deterministic generation using SHA256(user_id + time_window) for consistency
+- Random element assignment, weighted tier distribution (common/uncommon/rare)
+
+**Collection Mechanics:**
+- 300m collect radius (haversine distance)
+- 2-hour cooldown per hotspot after collection
+- Rewards: Cosmic Dust (5-120 based on tier), XP (15-150), raw gems (10-85% chance)
+- Raw gems feed into Refinement Lab → polished gems → Energy Gate requirements
+
+**Frontend:**
+- `/hotspots` page with GPSRadar component
+- `useGeolocation` hook (permission handling, watch mode, error states)
+- Hotspot cards with element icons, tier styling, bearing arrows, distance, expand/collect
+- Collection history panel
+- Added to Explore nav menu
+
+**Backend:** 4 endpoints (static-sites, nearby, collect, history)
+
+**Tests**: Iteration 178 — 100% Backend (19/19) / 100% Frontend
+
+### Starseed Energy Gates, Gate Notifications & TradeCircle Modularization (Apr 1, 2026)
 
 **Starseed Energy Gates (5 Dimensional Gateways):**
 - Gate of Earth (396 Hz, Amber) → Gate of Flow (417 Hz, Rose) → Gate of Transmutation (528 Hz, Silver) → Gate of the Unseen (741 Hz, Violet) → Gate of Pure Source (963 Hz, Gold)
@@ -89,6 +117,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ```
 /app/backend/routes/
+  gps_hotspots.py     # GPS static sites + dynamic hotspots, collection, history
   energy_gates.py     # Starseed Energy Gates (5 gates, time/travel/warp)
   consciousness.py    # Five Levels progression, XP tracking, feature gating
   forge.py            # Tool Forge, Skill Generator, Genesis Mint, God Mode Dashboard
@@ -103,6 +132,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 /app/frontend/src/
   components/
     EnergyGates.js          # Gate progression UI with Aura theming
+    GPSRadar.js             # Hotspot radar UI with cards, history, geolocation
     ConsciousnessPanel.js   # Level display, XP bar, aura
     CosmicForge.js          # Tool Forge + Skill Generator
     GodModeDashboard.js     # Economy feed
@@ -133,9 +163,8 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 ## Upcoming Tasks
 
 ### P1
-- **GPS / Location-based Hotspots** — Real-world location triggers for material gathering
+- **Resonance Skill / Practice Mechanic** — Primary Dust generation without trading (meditation timers, breathing, journaling)
 - **Earned Avatar Auto-Unlock** — Milestones trigger avatar unlocks
-- **Practice Mechanic** — Resonance Skill from Mixer/Trade usage
 
 ### P2
 - **Party System (Circle/Coven)** — Private social spaces
