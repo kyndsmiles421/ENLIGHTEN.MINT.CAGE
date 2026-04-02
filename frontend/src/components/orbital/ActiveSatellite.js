@@ -1,14 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export function ActiveSatellite({ sat, x, y, isHovered, onHover, onSelect, onDeactivate, dimmed }) {
+export function ActiveSatellite({ sat, x, y, isHovered, onHover, onSelect, onDeactivate, dimmed, gravityDamping = 20, gravityStiffness = 60 }) {
   const Icon = sat.icon;
   return (
     <motion.div
       className="absolute cursor-pointer"
       style={{ left: '50%', top: '50%', width: 68, height: 68, marginLeft: -34, marginTop: -34, zIndex: dimmed ? 3 : 10 }}
       animate={{ x, y, scale: isHovered ? 1.2 : dimmed ? 0.85 : 1, opacity: dimmed ? 0.2 : 1 }}
-      transition={{ type: 'spring', stiffness: 60, damping: 20 }}
+      transition={{ type: 'spring', stiffness: gravityStiffness, damping: gravityDamping }}
       whileTap={{ scale: 0.88 }}
       onClick={() => onSelect(sat)}
       onHoverStart={() => onHover(sat.id)}

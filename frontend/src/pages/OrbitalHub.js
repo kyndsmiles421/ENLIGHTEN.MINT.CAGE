@@ -12,7 +12,9 @@ import { WeatherRibbon } from '../components/orbital/WeatherRibbon';
 import { ActiveSatellite } from '../components/orbital/ActiveSatellite';
 import { ConnectionLines } from '../components/orbital/ConnectionLines';
 import { CentralOrb } from '../components/orbital/CentralOrb';
+import { GravityField } from '../components/orbital/GravityField';
 import { useHubAudio } from '../hooks/useHubAudio';
+import { useGravityManager } from '../hooks/useGravityManager';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -28,6 +30,7 @@ export default function OrbitalHub() {
   const [activeSatIds, setActiveSatIds] = useState(['mood', 'mixer', 'map', 'breathing', 'meditation', 'theory']);
   const [weather, setWeather] = useState(null);
   const [ambienceActive, setAmbienceActive] = useState(false);
+  const [gravityNodes, setGravityNodes] = useState([]);
 
   const animRef = useRef(null);
   const longPressRef = useRef(null);
@@ -36,7 +39,28 @@ export default function OrbitalHub() {
   const audio = useHubAudio();
   const pulseColor = activeFrequencies?.length > 0 ? '#A78BFA' : '#2DD4BF';
 
-  // ━━━ Load preferences + weather ━━━
+  // ━━━ Derived data (computed early for gravity) ━━━
+  const activeSats = ALL_SATELLITES.filter(s => activeSatIds.includes(s.id));
+  const dormantSats = ALL_SATELLITES.filter(s => !activeSatIds.includes(s.id));
+  const containerSize = 620;
+  const center = containerSize / 2;
+  const baseOrbitRadius = Math.min(200, 120 + activeSats.length * 12);
+  const orbitRadius = abyssOpen ? Math.min(280, baseOrbitRadius * 1.35) : baseOrbitRadius;
+
+  const positions = activeSats.map((_, i) => {
+    const a = (i / activeSats.length) * Math.PI * 2 + orbitAngle;
+    return { x: Math.cos(a) * orbitRadius, y: Math.sin(a) * orbitRadius };
+  });
+
+  const satPositions = activeSats.map((sat, i) => ({
+    x: positions[i]?.x || 0,
+    y: positions[i]?.y || 0,
+    color: sat.color,
+  }));
+
+  const { meshNodes, calculateDamping, calculateStiffness } = useGravityManager(gravityNodes, satPositions);
+
+  // ━━━ Load preferences + weather + gravity ━━━
   useEffect(() => {
     if (!authHeaders) return;
     axios.get(`${API}/hub/preferences`, { headers: authHeaders })
@@ -56,6 +80,10 @@ export default function OrbitalHub() {
     } else {
       fetchWeather();
     }
+
+    axios.get(`${API}/gravity/nodes`, { headers: authHeaders })
+      .then(r => setGravityNodes(r.data.nodes || []))
+      .catch(() => {});
   }, [authHeaders]);
 
   // ━━━ Orbital rotation ━━━
@@ -76,7 +104,7 @@ export default function OrbitalHub() {
     axios.post(`${API}/hub/preferences`, { active_satellites: ids }, { headers: authHeaders }).catch(() => {});
   }, [authHeaders]);
 
-  // ━━━ Start weather ambience on first user interaction ━━━
+  // ━━━ Weather ambience ━━━
   const tryStartAmbience = useCallback(() => {
     if (weather && !ambienceActive) {
       audio.startAmbience(weather);
@@ -153,24 +181,17 @@ export default function OrbitalHub() {
     }
   }, [abyssOpen, audio]);
 
-  // ━━━ Derived data ━━━
-  const activeSats = ALL_SATELLITES.filter(s => activeSatIds.includes(s.id));
-  const dormantSats = ALL_SATELLITES.filter(s => !activeSatIds.includes(s.id));
-  const containerSize = 620;
-  const center = containerSize / 2;
-  const baseOrbitRadius = Math.min(200, 120 + activeSats.length * 12);
-  const orbitRadius = abyssOpen ? Math.min(280, baseOrbitRadius * 1.35) : baseOrbitRadius;
-
-  const positions = activeSats.map((_, i) => {
-    const a = (i / activeSats.length) * Math.PI * 2 + orbitAngle;
-    return { x: Math.cos(a) * orbitRadius, y: Math.sin(a) * orbitRadius };
-  });
-
   const hoveredData = ALL_SATELLITES.find(s => s.id === hoveredSat);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ background: '#06060e' }}
       data-testid="orbital-hub-page">
+
+      {/* WebGL Gravity Field — deepest layer */}
+      <GravityField nodes={meshNodes} />
+
+      {/* Cosmic dust overlay */}
       <CosmicDust />
       <WeatherRibbon weather={weather} ambienceActive={ambienceActive} />
 
@@ -189,7 +210,7 @@ export default function OrbitalHub() {
       </motion.div>
 
       {/* Orbital System */}
-      <div className="relative" style={{ width: containerSize, height: containerSize }}>
+      <div className="relative" style={{ width: containerSize, height: containerSize, zIndex: 2 }}>
         {/* Orbit ring */}
         <motion.div className="absolute rounded-full"
           style={{ left: center - orbitRadius, top: center - orbitRadius, width: orbitRadius * 2, height: orbitRadius * 2, border: '1px solid rgba(248,250,252,0.025)' }}
@@ -197,15 +218,22 @@ export default function OrbitalHub() {
 
         <ConnectionLines positions={positions} hoveredSat={hoveredSat} activeSats={activeSats} cx={center} cy={center} dimmed={abyssOpen} />
 
-        {/* Active satellites */}
-        {activeSats.map((sat, i) => (
-          <ActiveSatellite key={sat.id} sat={sat}
-            x={positions[i].x} y={positions[i].y}
-            isHovered={hoveredSat === sat.id}
-            onHover={handleHover} onSelect={handleSelect} onDeactivate={deactivateSat}
-            dimmed={abyssOpen}
-          />
-        ))}
+        {/* Active satellites with gravity-responsive physics */}
+        {activeSats.map((sat, i) => {
+          const pos = positions[i];
+          const gDamping = calculateDamping(pos.x, pos.y);
+          const gStiffness = calculateStiffness(pos.x, pos.y);
+          return (
+            <ActiveSatellite key={sat.id} sat={sat}
+              x={pos.x} y={pos.y}
+              isHovered={hoveredSat === sat.id}
+              onHover={handleHover} onSelect={handleSelect} onDeactivate={deactivateSat}
+              dimmed={abyssOpen}
+              gravityDamping={gDamping}
+              gravityStiffness={gStiffness}
+            />
+          );
+        })}
 
         {/* Central Orb */}
         <div className="absolute" style={{ left: center - 65, top: center - 65, zIndex: 15 }}
@@ -222,7 +250,7 @@ export default function OrbitalHub() {
         </div>
       </div>
 
-      {/* Abyss backdrop — click to close */}
+      {/* Abyss backdrop */}
       <AnimatePresence>
         {abyssOpen && (
           <motion.div
