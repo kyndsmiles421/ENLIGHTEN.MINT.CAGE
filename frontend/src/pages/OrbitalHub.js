@@ -6,7 +6,7 @@ import { useMixer } from '../context/MixerContext';
 import {
   Music, Map, Triangle, Heart, Waves, HeartHandshake,
   BookOpen, Gamepad2, Wind, Sun, GraduationCap,
-  Eye, Star, Orbit
+  Eye, Star, Orbit, Telescope
 } from 'lucide-react';
 import MissionControl from '../components/MissionControl';
 
@@ -22,6 +22,7 @@ const SATELLITES = [
   // Outer ring — deeper tools (poles)
   { id: 'workshop', label: 'Workshop', icon: Triangle, path: '/workshop', color: '#F59E0B', ring: 1, desc: 'Sacred architecture & physics' },
   { id: 'star-chart', label: 'Star Chart', icon: Star, path: '/star-chart', color: '#818CF8', ring: 1, desc: 'Celestial navigation' },
+  { id: 'observatory', label: 'Observatory', icon: Telescope, path: '/observatory', color: '#6366F1', ring: 1, desc: 'Live sky events & data sonification' },
   { id: 'trade', label: 'Trade Circle', icon: HeartHandshake, path: '/trade-circle', color: '#FB923C', ring: 1, desc: 'Exchange resonant assets' },
   { id: 'oracle', label: 'Oracle', icon: Eye, path: '/oracle', color: '#C084FC', ring: 1, desc: 'Divination & insight' },
   { id: 'games', label: 'Games', icon: Gamepad2, path: '/games', color: '#34D399', ring: 1, desc: 'Starseed adventures' },

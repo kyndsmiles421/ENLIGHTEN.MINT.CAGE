@@ -165,6 +165,7 @@ const PowerSpotAdmin = lazy(() => import('./pages/PowerSpotAdmin'));
 const MusicTheory = lazy(() => import('./pages/MusicTheory'));
 const Workshop = lazy(() => import('./pages/Workshop'));
 const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
+const Observatory = lazy(() => import('./pages/Observatory'));
 
 function PageLoader() {
   return (
@@ -314,6 +315,7 @@ function AnimatedRoutes() {
         <Route path="/theory" element={<MusicTheory />} />
         <Route path="/workshop" element={<Workshop />} />
         <Route path="/hub" element={<OrbitalHub />} />
+        <Route path="/observatory" element={<Observatory />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
