@@ -684,6 +684,23 @@ async def harvest_power_spot(
         "date": today,
         "harvested_at": now,
         "location": {"lat": user_lat, "lng": user_lng},
+    })
+    await db.user_activity_log.insert_one({
+        "user_id": uid, "type": "power_spot_harvest",
+        "detail": f"Harvested Power Spot '{spot['name']}' (+{reward} Kinetic Dust)",
+        "timestamp": now,
+    })
+
+    return {
+        "success": True,
+        "node_name": spot["name"],
+        "reward_type": "kinetic_dust",
+        "reward_amount": reward,
+        "multiplier": spot.get("reward_multiplier", 5.0),
+        "distance_meters": round(dist_m),
+        "message": f"Power Spot Harvested: {spot['name']}! +{reward} Kinetic Dust ({spot.get('reward_multiplier', 5)}x legendary bonus)",
+    }
+
 
 @router.post("/power-spots/{spot_id}/go-live")
 async def toggle_go_live(
@@ -734,24 +751,6 @@ async def get_active_broadcasts(user=Depends(get_current_user)):
     ).sort("created_at", -1).to_list(10)
 
     return {"broadcasts": broadcasts, "count": len(broadcasts)}
-
-
-    })
-    await db.user_activity_log.insert_one({
-        "user_id": uid, "type": "power_spot_harvest",
-        "detail": f"Harvested Power Spot '{spot['name']}' (+{reward} Kinetic Dust)",
-        "timestamp": now,
-    })
-
-    return {
-        "success": True,
-        "node_name": spot["name"],
-        "reward_type": "kinetic_dust",
-        "reward_amount": reward,
-        "multiplier": spot.get("reward_multiplier", 5.0),
-        "distance_meters": round(dist_m),
-        "message": f"Power Spot Harvested: {spot['name']}! +{reward} Kinetic Dust ({spot.get('reward_multiplier', 5)}x legendary bonus)",
-    }
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
