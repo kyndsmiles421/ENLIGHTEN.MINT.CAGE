@@ -121,6 +121,7 @@ from routes.cosmic_map import router as cosmic_map_router
 from routes.mastery import router as mastery_router
 from routes.workshop import router as workshop_router
 from routes.observatory import router as observatory_router
+from routes.atmosphere import router as atmosphere_router
 from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
@@ -211,6 +212,7 @@ all_routers = [
     mastery_router,
     workshop_router,
     observatory_router,
+    atmosphere_router,
 ]
 
 for r in all_routers:
