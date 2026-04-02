@@ -1,0 +1,282 @@
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const ELEMENTS = [
+  { id: 'Wood', angle: -90, color: '#22C55E', freq: 396, label: 'Liberation', weight: 10 },
+  { id: 'Fire', angle: -18, color: '#EF4444', freq: 528, label: 'Transformation', weight: 15 },
+  { id: 'Earth', angle: 54, color: '#F59E0B', freq: 639, label: 'Connection', weight: 12 },
+  { id: 'Metal', angle: 126, color: '#94A3B8', freq: 741, label: 'Expression', weight: 8 },
+  { id: 'Water', angle: 198, color: '#3B82F6', freq: 852, label: 'Intuition', weight: 14 },
+];
+
+const GENERATING = [
+  ['Wood', 'Fire'], ['Fire', 'Earth'], ['Earth', 'Metal'], ['Metal', 'Water'], ['Water', 'Wood'],
+];
+const CONTROLLING = [
+  ['Wood', 'Earth'], ['Fire', 'Metal'], ['Earth', 'Water'], ['Metal', 'Wood'], ['Water', 'Fire'],
+];
+
+const NATURE_WEIGHTS = { Hot: 15, Warm: 10, Neutral: 5, Cool: 10, Cold: 15 };
+
+function getPos(angleDeg, radius, cx, cy) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+}
+
+function arrowPath(from, to, curvature = 0) {
+  if (curvature === 0) return `M${from.x},${from.y} L${to.x},${to.y}`;
+  const mx = (from.x + to.x) / 2 + curvature;
+  const my = (from.y + to.y) / 2 + curvature;
+  return `M${from.x},${from.y} Q${mx},${my} ${to.x},${to.y}`;
+}
+
+export function FiveElementsWheel({ activeElement, onElementClick, plants = [], gardenSummary }) {
+  const [hoveredElement, setHoveredElement] = useState(null);
+  const cx = 160, cy = 160, outerR = 120, nodeR = 24;
+
+  const elementMap = useMemo(() => {
+    const map = {};
+    ELEMENTS.forEach(e => { map[e.id] = e; });
+    return map;
+  }, []);
+
+  const plantsByElement = useMemo(() => {
+    const groups = {};
+    ELEMENTS.forEach(e => { groups[e.id] = []; });
+    plants.forEach(p => {
+      if (!p.locked && groups[p.element]) groups[p.element].push(p);
+    });
+    return groups;
+  }, [plants]);
+
+  const activeOrHovered = hoveredElement || activeElement;
+  const activeData = activeOrHovered ? elementMap[activeOrHovered] : null;
+
+  return (
+    <div className="rounded-xl overflow-hidden" data-testid="five-elements-wheel"
+      style={{ background: 'rgba(10,10,18,0.6)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(20px)' }}>
+
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+        <p className="text-[8px] uppercase tracking-[0.2em] font-medium" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          Five Elements Wheel
+        </p>
+        {activeElement && (
+          <button onClick={() => onElementClick(null)} className="text-[8px] px-2 py-0.5 rounded-full"
+            style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)' }}
+            data-testid="wheel-clear-filter">Clear</button>
+        )}
+      </div>
+
+      <div className="flex justify-center px-2">
+        <svg width={320} height={320} viewBox="0 0 320 320" data-testid="wheel-svg">
+          <defs>
+            {ELEMENTS.map(e => (
+              <radialGradient key={`glow-${e.id}`} id={`glow-${e.id}`}>
+                <stop offset="0%" stopColor={e.color} stopOpacity={activeOrHovered === e.id ? 0.4 : 0.1} />
+                <stop offset="100%" stopColor={e.color} stopOpacity={0} />
+              </radialGradient>
+            ))}
+            <marker id="arrow-gen" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+              <polygon points="0 0, 6 2, 0 4" fill="rgba(248,250,252,0.12)" />
+            </marker>
+            <marker id="arrow-ctrl" markerWidth="5" markerHeight="3" refX="4" refY="1.5" orient="auto">
+              <polygon points="0 0, 5 1.5, 0 3" fill="rgba(239,68,68,0.2)" />
+            </marker>
+          </defs>
+
+          {/* Center glow */}
+          <circle cx={cx} cy={cy} r={8} fill="rgba(248,250,252,0.03)" />
+          <circle cx={cx} cy={cy} r={3} fill="rgba(248,250,252,0.06)" />
+
+          {/* Generating cycle (Sheng) — outer smooth arcs */}
+          {GENERATING.map(([from, to]) => {
+            const f = getPos(elementMap[from].angle, outerR - nodeR - 4, cx, cy);
+            const t = getPos(elementMap[to].angle, outerR - nodeR - 4, cx, cy);
+            const dimmed = activeOrHovered && activeOrHovered !== from && activeOrHovered !== to;
+            return (
+              <path key={`gen-${from}-${to}`}
+                d={arrowPath(f, t)}
+                fill="none" stroke="rgba(248,250,252,0.08)" strokeWidth={1.5}
+                strokeDasharray="4 3" markerEnd="url(#arrow-gen)"
+                opacity={dimmed ? 0.15 : 0.6}
+                style={{ transition: 'opacity 0.3s' }} />
+            );
+          })}
+
+          {/* Controlling cycle (Ke) — inner star lines */}
+          {CONTROLLING.map(([from, to]) => {
+            const f = getPos(elementMap[from].angle, outerR * 0.55, cx, cy);
+            const t = getPos(elementMap[to].angle, outerR * 0.55, cx, cy);
+            const dimmed = activeOrHovered && activeOrHovered !== from && activeOrHovered !== to;
+            return (
+              <path key={`ctrl-${from}-${to}`}
+                d={`M${f.x},${f.y} L${t.x},${t.y}`}
+                fill="none" stroke="rgba(239,68,68,0.12)" strokeWidth={1}
+                strokeDasharray="2 4" markerEnd="url(#arrow-ctrl)"
+                opacity={dimmed ? 0.08 : 0.4}
+                style={{ transition: 'opacity 0.3s' }} />
+            );
+          })}
+
+          {/* Element nodes */}
+          {ELEMENTS.map(e => {
+            const pos = getPos(e.angle, outerR, cx, cy);
+            const isActive = activeOrHovered === e.id;
+            const dimmed = activeOrHovered && !isActive;
+            const plantCount = plantsByElement[e.id]?.length || 0;
+            return (
+              <g key={e.id}
+                onClick={() => onElementClick(activeElement === e.id ? null : e.id)}
+                onMouseEnter={() => setHoveredElement(e.id)}
+                onMouseLeave={() => setHoveredElement(null)}
+                style={{ cursor: 'pointer' }}
+                data-testid={`wheel-node-${e.id.toLowerCase()}`}>
+                {/* Glow */}
+                <circle cx={pos.x} cy={pos.y} r={isActive ? 38 : 30}
+                  fill={`url(#glow-${e.id})`}
+                  style={{ transition: 'r 0.3s' }} />
+                {/* Outer ring */}
+                <circle cx={pos.x} cy={pos.y} r={nodeR}
+                  fill={isActive ? `${e.color}20` : 'rgba(10,10,18,0.8)'}
+                  stroke={e.color} strokeWidth={isActive ? 2 : 1}
+                  opacity={dimmed ? 0.3 : 1}
+                  style={{ transition: 'all 0.3s' }} />
+                {/* Inner fill */}
+                <circle cx={pos.x} cy={pos.y} r={nodeR - 4}
+                  fill={isActive ? `${e.color}35` : `${e.color}10`}
+                  opacity={dimmed ? 0.3 : 1}
+                  style={{ transition: 'all 0.3s' }} />
+                {/* Element label */}
+                <text x={pos.x} y={pos.y - 3} textAnchor="middle" fill={dimmed ? 'rgba(248,250,252,0.15)' : e.color}
+                  fontSize={9} fontWeight={600} fontFamily="system-ui"
+                  style={{ transition: 'fill 0.3s' }}>
+                  {e.id}
+                </text>
+                {/* Plant count */}
+                <text x={pos.x} y={pos.y + 9} textAnchor="middle"
+                  fill={dimmed ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.35)'}
+                  fontSize={7} fontFamily="monospace"
+                  style={{ transition: 'fill 0.3s' }}>
+                  {plantCount} plant{plantCount !== 1 ? 's' : ''}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Cycle labels */}
+          <text x={cx} y={cy - 32} textAnchor="middle" fill="rgba(248,250,252,0.08)" fontSize={7}
+            fontFamily="system-ui" letterSpacing="0.1em">SHENG</text>
+          <text x={cx} y={cy + 38} textAnchor="middle" fill="rgba(239,68,68,0.08)" fontSize={7}
+            fontFamily="system-ui" letterSpacing="0.1em">KE</text>
+
+          {/* Formula display in center */}
+          <text x={cx} y={cy - 6} textAnchor="middle" fill="rgba(248,250,252,0.12)" fontSize={6.5}
+            fontFamily="monospace">Mass = B + E + N + M + R</text>
+          <text x={cx} y={cy + 6} textAnchor="middle" fill="rgba(248,250,252,0.08)" fontSize={5.5}
+            fontFamily="monospace">60 + elem + nat + mer + rar</text>
+        </svg>
+      </div>
+
+      {/* Info panel below wheel */}
+      <AnimatePresence mode="wait">
+        {activeData && (
+          <motion.div key={activeData.id}
+            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+            className="mx-3 mb-3 rounded-lg p-3"
+            style={{ background: `${activeData.color}08`, border: `1px solid ${activeData.color}15` }}>
+
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ background: activeData.color }} />
+                <span className="text-xs font-medium" style={{ color: activeData.color }}>{activeData.id}</span>
+                <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{activeData.label}</span>
+              </div>
+              <span className="text-[10px] font-mono" style={{ color: activeData.color }}>
+                {activeData.freq}Hz
+              </span>
+            </div>
+
+            {/* Gravity Mass Breakdown */}
+            <div className="mb-2">
+              <p className="text-[7px] uppercase tracking-[0.15em] mb-1" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                Gravity Contribution
+              </p>
+              <div className="flex gap-1 items-center">
+                <span className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                  style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.3)' }}>
+                  Base: 60
+                </span>
+                <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.1)' }}>+</span>
+                <span className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                  style={{ background: `${activeData.color}12`, color: activeData.color }}>
+                  Element: +{activeData.weight}
+                </span>
+                <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.1)' }}>+</span>
+                <span className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                  style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.3)' }}>
+                  Nature + Meridian + Rarity
+                </span>
+              </div>
+            </div>
+
+            {/* Cycle relationships */}
+            <div className="flex gap-3 text-[8px]">
+              <span style={{ color: 'rgba(248,250,252,0.2)' }}>
+                Generates: <span style={{ color: 'rgba(248,250,252,0.4)' }}>
+                  {GENERATING.find(([f]) => f === activeData.id)?.[1]}
+                </span>
+              </span>
+              <span style={{ color: 'rgba(248,250,252,0.2)' }}>
+                Controls: <span style={{ color: 'rgba(239,68,68,0.5)' }}>
+                  {CONTROLLING.find(([f]) => f === activeData.id)?.[1]}
+                </span>
+              </span>
+            </div>
+
+            {/* Plants in this element */}
+            {plantsByElement[activeData.id]?.length > 0 && (
+              <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${activeData.color}10` }}>
+                <div className="flex flex-wrap gap-1">
+                  {plantsByElement[activeData.id].map(p => (
+                    <span key={p.id} className="text-[8px] px-1.5 py-0.5 rounded"
+                      style={{ background: `${activeData.color}08`, color: `${activeData.color}cc`, border: `1px solid ${activeData.color}15` }}>
+                      {p.name} <span className="font-mono" style={{ opacity: 0.6 }}>m{p.gravity_mass}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Garden balance indicator */}
+      {gardenSummary && gardenSummary.total_plants > 0 && !activeData && (
+        <div className="mx-3 mb-3 rounded-lg p-2.5"
+          style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+          <p className="text-[7px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
+            Garden Balance
+          </p>
+          <div className="flex gap-0.5 h-2 rounded-full overflow-hidden">
+            {ELEMENTS.map(e => {
+              const count = gardenSummary.element_distribution?.[e.id] || 0;
+              const pct = gardenSummary.total_plants > 0 ? (count / gardenSummary.total_plants) * 100 : 0;
+              return pct > 0 ? (
+                <div key={e.id} style={{ width: `${pct}%`, background: e.color, minWidth: pct > 0 ? 4 : 0 }}
+                  title={`${e.id}: ${count}`} />
+              ) : null;
+            })}
+          </div>
+          <div className="flex justify-between mt-1">
+            <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
+              Total Mass: {gardenSummary.total_gravity_mass}
+            </span>
+            <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
+              {gardenSummary.garden_frequency}Hz
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

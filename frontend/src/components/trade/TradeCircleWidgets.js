@@ -22,6 +22,8 @@ const CATEGORIES = [
   { id: 'guidance', label: 'Guidance', icon: null, color: '#2DD4BF' },
   { id: 'meditation', label: 'Meditation', icon: null, color: '#818CF8' },
   { id: 'crafted', label: 'Crafted', icon: null, color: '#FCD34D' },
+  { id: 'botanical', label: 'Botanicals', icon: null, color: '#22C55E' },
+  { id: 'frequency_recipe', label: 'Recipes', icon: null, color: '#EAB308' },
   { id: 'goods', label: 'Goods', icon: Package, color: '#FB923C' },
   { id: 'services', label: 'Services', icon: null, color: '#2DD4BF' },
 ];
@@ -492,9 +494,18 @@ export function ListingCard({ listing, onSelect, isOwn }) {
       )}
 
       <div className="flex items-center justify-between">
-        <span className="text-[8px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-          <Clock size={8} /> {new Date(listing.created_at).toLocaleDateString()}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[8px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+            <Clock size={8} /> {new Date(listing.created_at).toLocaleDateString()}
+          </span>
+          {listing.gravity_mass && (
+            <span className="text-[7px] font-mono px-1.5 py-0.5 rounded"
+              style={{ background: `${listing.element_color || catColor}10`, color: listing.element_color || catColor, border: `1px solid ${listing.element_color || catColor}20` }}
+              data-testid={`listing-mass-${listing.id}`}>
+              m{listing.gravity_mass} {listing.frequency ? `${listing.frequency}Hz` : ''}
+            </span>
+          )}
+        </div>
         <ChevronRight size={12} style={{ color: 'var(--text-muted)' }}
           className="opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>

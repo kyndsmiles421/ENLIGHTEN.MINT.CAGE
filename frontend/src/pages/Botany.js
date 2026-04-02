@@ -9,6 +9,7 @@ import {
   Thermometer, Wind, Flame, Mountain, CircleDot, ChevronRight,
   TreePine, FlaskRound, Loader2, Star
 } from 'lucide-react';
+import { FiveElementsWheel } from '../components/FiveElementsWheel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -557,22 +558,18 @@ export default function Botany() {
               </div>
             </div>
 
-            {/* Center — Detail + Identify */}
+            {/* Center — Wheel + Detail */}
             <div className="col-span-5 space-y-4">
+              <FiveElementsWheel
+                activeElement={elementFilter}
+                onElementClick={setElementFilter}
+                plants={plants}
+                gardenSummary={gardenSummary}
+              />
               <AnimatePresence mode="wait">
-                {selected ? (
+                {selected && (
                   <PlantDetail key={selected.id} plant={selected} onClose={() => setSelected(null)}
                     onAddToGarden={handleAddToGarden} gardenIds={gardenIds} />
-                ) : (
-                  <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="rounded-xl p-8 flex flex-col items-center justify-center"
-                    style={{ background: 'rgba(10,10,18,0.3)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 400 }}>
-                    <Leaf size={32} style={{ color: 'rgba(248,250,252,0.08)' }} />
-                    <p className="text-xs mt-4" style={{ color: 'rgba(248,250,252,0.15)' }}>Select a plant to explore its energetic profile</p>
-                    <p className="text-[9px] mt-1" style={{ color: 'rgba(248,250,252,0.1)' }}>
-                      TCM Nature &middot; Five Elements &middot; Meridians &middot; Gravity Mass
-                    </p>
-                  </motion.div>
                 )}
               </AnimatePresence>
             </div>

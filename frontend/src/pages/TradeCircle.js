@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Plus, Package, Wrench, Search,
   ArrowRightLeft, Sparkles, Star, Award, Trophy,
-  Shield, Eye, Heart, Compass, Moon, Gem, Coins, Crown, User, Zap
+  Shield, Eye, Heart, Compass, Moon, Gem, Coins, Crown, User, Zap, Leaf
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -37,6 +37,8 @@ const CATEGORIES = [
   { id: 'guidance', label: 'Guidance', icon: Compass, color: '#2DD4BF' },
   { id: 'meditation', label: 'Meditation', icon: Moon, color: '#818CF8' },
   { id: 'crafted', label: 'Crafted', icon: Gem, color: '#FCD34D' },
+  { id: 'botanical', label: 'Botanicals', icon: Leaf, color: '#22C55E' },
+  { id: 'frequency_recipe', label: 'Recipes', icon: Zap, color: '#EAB308' },
   { id: 'goods', label: 'Goods', icon: Package, color: '#FB923C' },
   { id: 'services', label: 'Services', icon: Wrench, color: '#2DD4BF' },
 ];

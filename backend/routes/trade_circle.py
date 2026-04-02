@@ -68,9 +68,18 @@ async def create_listing(data: dict = Body(...), user=Depends(get_current_user))
     if not title or not offering:
         raise HTTPException(status_code=400, detail="Title and offering are required")
     # Valid categories: wellness categories + legacy goods/services
-    valid_categories = {"readings", "healing", "guidance", "meditation", "crafted", "other", "goods", "services", "both"}
+    valid_categories = {"readings", "healing", "guidance", "meditation", "crafted", "botanical", "frequency_recipe", "goods", "services", "other", "both"}
     if category not in valid_categories:
         raise HTTPException(status_code=400, detail="Invalid category")
+
+    # Gravity mass — items with heavier mass sink lower in the UI grid
+    gravity_mass = data.get("gravity_mass", 50)
+    if category == "botanical":
+        gravity_mass = max(60, min(100, gravity_mass))
+    elif category == "frequency_recipe":
+        gravity_mass = max(40, min(90, gravity_mass))
+    else:
+        gravity_mass = max(30, min(80, gravity_mass))
 
     listing = {
         "id": str(uuid.uuid4()),
@@ -82,6 +91,9 @@ async def create_listing(data: dict = Body(...), user=Depends(get_current_user))
         "offering": offering[:200],
         "seeking": seeking[:200],
         "images": images[:4],
+        "gravity_mass": gravity_mass,
+        "element": data.get("element"),
+        "frequency": data.get("frequency"),
         "status": "active",
         "offer_count": 0,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -502,6 +514,9 @@ TRADE_CATEGORIES = [
     {"id": "guidance", "name": "Guidance", "icon": "compass", "color": "#2DD4BF"},
     {"id": "meditation", "name": "Meditation", "icon": "moon", "color": "#818CF8"},
     {"id": "crafted", "name": "Crafted Items", "icon": "gem", "color": "#FCD34D"},
+    {"id": "botanical", "name": "Botanicals", "icon": "leaf", "color": "#22C55E"},
+    {"id": "frequency_recipe", "name": "Frequency Recipes", "icon": "zap", "color": "#EAB308"},
+    {"id": "goods", "name": "Physical Goods", "icon": "package", "color": "#FB923C"},
     {"id": "other", "name": "Other", "icon": "sparkles", "color": "#94A3B8"},
 ]
 
@@ -1144,3 +1159,80 @@ async def create_linguistic_listing(data: dict = Body(...), user=Depends(get_cur
     await award_karma(user["id"], "listing_created", listing["id"])
     listing.pop("_id", None)
     return listing
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  BOTANICAL TRADE — Plants & Frequency Recipes
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ELEMENT_FREQUENCY = {
+    "Wood": 396.0, "Fire": 528.0, "Earth": 639.0, "Metal": 741.0, "Water": 852.0,
+}
+
+@router.post("/trade-circle/botanical-listing")
+async def create_botanical_listing(data: dict = Body(...), user=Depends(get_current_user)):
+    """Create a trade listing for botanical seeds, cuttings, or frequency recipes."""
+    title = data.get("title", "").strip()
+    description = data.get("description", "").strip()
+    plant_id = data.get("plant_id", "")
+    element = data.get("element", "Earth")
+    nature = data.get("nature", "Neutral")
+    listing_type = data.get("listing_type", "botanical")  # botanical or frequency_recipe
+    frequency = ELEMENT_FREQUENCY.get(element, 639.0)
+
+    if not title:
+        raise HTTPException(status_code=400, detail="Title is required")
+
+    # Compute gravity mass from TCM properties
+    element_w = {"Wood": 10, "Fire": 15, "Earth": 12, "Metal": 8, "Water": 14}.get(element, 12)
+    nature_w = {"Hot": 15, "Warm": 10, "Neutral": 5, "Cool": 10, "Cold": 15}.get(nature, 5)
+    gravity_mass = 60 + element_w + nature_w
+
+    listing = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", "Anonymous"),
+        "title": title,
+        "description": description[:500],
+        "category": listing_type,
+        "offering": data.get("offering", title)[:200],
+        "seeking": data.get("seeking", "Resonance exchange")[:200],
+        "plant_id": plant_id,
+        "element": element,
+        "nature": nature,
+        "frequency": frequency,
+        "gravity_mass": gravity_mass,
+        "images": [],
+        "status": "active",
+        "offer_count": 0,
+        "requires_escrow": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.trade_listings.insert_one(listing)
+    await create_activity(user["id"], "trade_listing", f"Listed botanical: {title}")
+    await award_karma(user["id"], "listing_created", listing["id"])
+    listing.pop("_id", None)
+    return listing
+
+
+@router.get("/trade-circle/gravity-weighted")
+async def get_gravity_weighted_listings(user=Depends(get_current_user)):
+    """Get listings sorted by gravity mass — heavier items sink to bottom."""
+    listings = await db.trade_listings.find(
+        {"status": "active"},
+        {"_id": 0}
+    ).sort("gravity_mass", -1).to_list(50)
+
+    # Assign visual positioning based on mass
+    for i, listing in enumerate(listings):
+        mass = listing.get("gravity_mass", 50)
+        listing["visual_scale"] = 0.8 + (mass / 100) * 0.4  # 0.8x to 1.2x
+        listing["visual_depth"] = mass / 100  # 0.0 to 1.0 depth layer
+        listing["element_color"] = {
+            "Wood": "#22C55E", "Fire": "#EF4444", "Earth": "#F59E0B",
+            "Metal": "#94A3B8", "Water": "#3B82F6"
+        }.get(listing.get("element", ""), "#94A3B8")
+
+    return {"listings": listings}
