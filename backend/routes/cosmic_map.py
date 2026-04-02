@@ -500,3 +500,677 @@ async def get_harvest_history(user=Depends(get_current_user)):
         },
         "total_harvests": len(harvests),
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  POWER SPOTS — Admin-Configurable Legendary Nodes
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class PowerSpotCreate(BaseModel):
+    name: str
+    lat: float
+    lng: float
+    description: Optional[str] = "Legendary Power Spot"
+    reward_multiplier: Optional[float] = 5.0
+    harvest_radius_meters: Optional[int] = 100
+    active: Optional[bool] = True
+    active_hours: Optional[str] = None  # e.g. "08:00-18:00"
+
+
+@router.get("/power-spots")
+async def get_power_spots(user=Depends(get_current_user)):
+    """Get all active Power Spots."""
+    spots = await db.power_spots.find(
+        {"active": True}, {"_id": 0}
+    ).to_list(50)
+
+    uid = user["id"]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    harvested = await db.node_harvests.find(
+        {"user_id": uid, "date": today, "node_type": "power_spot"}, {"_id": 0, "node_id": 1}
+    ).to_list(50)
+    harvested_ids = {h["node_id"] for h in harvested}
+
+    result = []
+    for s in spots:
+        result.append({
+            "id": s["id"],
+            "name": s["name"],
+            "lat": s["lat"],
+            "lng": s["lng"],
+            "description": s.get("description", ""),
+            "reward_multiplier": s.get("reward_multiplier", 5.0),
+            "harvest_radius_meters": s.get("harvest_radius_meters", 100),
+            "active_hours": s.get("active_hours"),
+            "color": "#FBBF24",
+            "icon": "crown",
+            "rarity": "legendary",
+            "reward_type": "kinetic_dust",
+            "reward_amount": round(8 * s.get("reward_multiplier", 5.0)),
+            "harvested": s["id"] in harvested_ids,
+            "type": "power_spot",
+        })
+
+    return {"power_spots": result, "total": len(result)}
+
+
+@router.post("/power-spots")
+async def create_power_spot(spot: PowerSpotCreate, user=Depends(get_current_user)):
+    """Create or update a Power Spot (admin)."""
+    spot_id = hashlib.md5(f"{spot.name}_{spot.lat}_{spot.lng}".encode()).hexdigest()[:12]
+    now = datetime.now(timezone.utc).isoformat()
+
+    doc = {
+        "id": spot_id,
+        "name": spot.name,
+        "lat": spot.lat,
+        "lng": spot.lng,
+        "description": spot.description,
+        "reward_multiplier": spot.reward_multiplier,
+        "harvest_radius_meters": spot.harvest_radius_meters,
+        "active": spot.active,
+        "active_hours": spot.active_hours,
+        "created_by": user["id"],
+        "created_at": now,
+        "updated_at": now,
+    }
+
+    await db.power_spots.update_one(
+        {"id": spot_id}, {"$set": doc}, upsert=True,
+    )
+
+    return {
+        "success": True,
+        "id": spot_id,
+        "name": spot.name,
+        "lat": spot.lat,
+        "lng": spot.lng,
+        "reward_multiplier": spot.reward_multiplier,
+        "message": f"Power Spot '{spot.name}' deployed at ({spot.lat}, {spot.lng}). {spot.reward_multiplier}x multiplier active.",
+    }
+
+
+class PowerSpotUpdate(BaseModel):
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    active: Optional[bool] = None
+    active_hours: Optional[str] = None
+    reward_multiplier: Optional[float] = None
+    description: Optional[str] = None
+
+
+@router.put("/power-spots/{spot_id}")
+async def update_power_spot(spot_id: str, update: PowerSpotUpdate, user=Depends(get_current_user)):
+    """Update a Power Spot's location or status."""
+    existing = await db.power_spots.find_one({"id": spot_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(404, "Power Spot not found")
+
+    updates = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    if update.lat is not None:
+        updates["lat"] = update.lat
+    if update.lng is not None:
+        updates["lng"] = update.lng
+    if update.active is not None:
+        updates["active"] = update.active
+    if update.active_hours is not None:
+        updates["active_hours"] = update.active_hours
+    if update.reward_multiplier is not None:
+        updates["reward_multiplier"] = update.reward_multiplier
+    if update.description is not None:
+        updates["description"] = update.description
+
+    await db.power_spots.update_one({"id": spot_id}, {"$set": updates})
+
+    return {
+        "success": True,
+        "id": spot_id,
+        "updated_fields": list(updates.keys()),
+        "message": f"Power Spot updated.",
+    }
+
+
+@router.delete("/power-spots/{spot_id}")
+async def delete_power_spot(spot_id: str, user=Depends(get_current_user)):
+    """Delete a Power Spot."""
+    result = await db.power_spots.delete_one({"id": spot_id})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Power Spot not found")
+    return {"success": True, "message": "Power Spot removed."}
+
+
+@router.post("/power-spots/harvest")
+async def harvest_power_spot(
+    spot_id: str = Body(...),
+    user_lat: float = Body(...),
+    user_lng: float = Body(...),
+    user=Depends(get_current_user),
+):
+    """Harvest a Power Spot."""
+    uid = user["id"]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    existing_harvest = await db.node_harvests.find_one(
+        {"user_id": uid, "node_id": spot_id, "date": today, "node_type": "power_spot"}, {"_id": 0}
+    )
+    if existing_harvest:
+        raise HTTPException(400, "Already harvested this Power Spot today")
+
+    spot = await db.power_spots.find_one({"id": spot_id, "active": True}, {"_id": 0})
+    if not spot:
+        raise HTTPException(404, "Power Spot not found or inactive")
+
+    dlat = spot["lat"] - user_lat
+    dlng = spot["lng"] - user_lng
+    dist_m = math.sqrt(
+        (dlat * 111320) ** 2 + (dlng * 111320 * math.cos(math.radians(user_lat))) ** 2
+    )
+    radius = spot.get("harvest_radius_meters", 100)
+
+    if dist_m > radius:
+        raise HTTPException(400, f"Too far. Distance: {round(dist_m)}m. Must be within {radius}m.")
+
+    reward = round(8 * spot.get("reward_multiplier", 5.0))
+    now = datetime.now(timezone.utc).isoformat()
+
+    await db.users.update_one({"id": uid}, {"$inc": {"user_dust_balance": reward}})
+    await db.node_harvests.insert_one({
+        "user_id": uid,
+        "node_id": spot_id,
+        "node_name": spot["name"],
+        "node_type": "power_spot",
+        "reward_type": "kinetic_dust",
+        "reward_amount": reward,
+        "date": today,
+        "harvested_at": now,
+        "location": {"lat": user_lat, "lng": user_lng},
+    })
+    await db.user_activity_log.insert_one({
+        "user_id": uid, "type": "power_spot_harvest",
+        "detail": f"Harvested Power Spot '{spot['name']}' (+{reward} Kinetic Dust)",
+        "timestamp": now,
+    })
+
+    return {
+        "success": True,
+        "node_name": spot["name"],
+        "reward_type": "kinetic_dust",
+        "reward_amount": reward,
+        "multiplier": spot.get("reward_multiplier", 5.0),
+        "distance_meters": round(dist_m),
+        "message": f"Power Spot Harvested: {spot['name']}! +{reward} Kinetic Dust ({spot.get('reward_multiplier', 5)}x legendary bonus)",
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  DIMENSIONAL LAYERING — Celestial Realm
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CELESTIAL_NODES = [
+    {
+        "id": "orion_gate",
+        "name": "Orion's Gate",
+        "constellation": "Orion",
+        "ra": 5.92,  # Right Ascension in hours
+        "dec": -1.2,  # Declination in degrees
+        "frequency": 741,
+        "color": "#C084FC",
+        "reward_type": "science_resonance",
+        "base_reward": 15,
+        "rarity": "rare",
+        "description": "The Hunter's threshold. Orion's belt stars align at 741Hz — the frequency of awakening and intuition.",
+    },
+    {
+        "id": "sirius_nexus",
+        "name": "Sirius Nexus",
+        "constellation": "Canis Major",
+        "ra": 6.75,
+        "dec": -16.72,
+        "frequency": 852,
+        "color": "#A78BFA",
+        "reward_type": "science_resonance",
+        "base_reward": 20,
+        "rarity": "legendary",
+        "description": "The brightest star. Sirius pulses at 852Hz — the frequency of returning to spiritual order.",
+    },
+    {
+        "id": "pleiades_beacon",
+        "name": "Pleiades Beacon",
+        "constellation": "Taurus",
+        "ra": 3.79,
+        "dec": 24.12,
+        "frequency": 963,
+        "color": "#818CF8",
+        "reward_type": "science_resonance",
+        "base_reward": 25,
+        "rarity": "legendary",
+        "description": "The Seven Sisters. 963Hz — the frequency of the pineal gland and cosmic connection.",
+    },
+    {
+        "id": "vega_alignment",
+        "name": "Vega Alignment",
+        "constellation": "Lyra",
+        "ra": 18.62,
+        "dec": 38.78,
+        "frequency": 741,
+        "color": "#C4B5FD",
+        "reward_type": "science_resonance",
+        "base_reward": 12,
+        "rarity": "uncommon",
+        "description": "The Harp Star. Ancient navigators used Vega as the North Star 12,000 years ago.",
+    },
+    {
+        "id": "polaris_lock",
+        "name": "Polaris Lock",
+        "constellation": "Ursa Minor",
+        "ra": 2.53,
+        "dec": 89.26,
+        "frequency": 852,
+        "color": "#DDD6FE",
+        "reward_type": "science_resonance",
+        "base_reward": 18,
+        "rarity": "rare",
+        "description": "The axis mundi. Earth's rotational pole aligns here — the ultimate fixed point in a moving cosmos.",
+    },
+    {
+        "id": "antares_bridge",
+        "name": "Antares Bridge",
+        "constellation": "Scorpius",
+        "ra": 16.49,
+        "dec": -26.43,
+        "frequency": 963,
+        "color": "#F0ABFC",
+        "reward_type": "science_resonance",
+        "base_reward": 22,
+        "rarity": "legendary",
+        "description": "The Heart of the Scorpion. A red supergiant 700x the Sun's diameter. 963Hz cosmic pulse.",
+    },
+]
+
+QUADRATIC_DECAY_RATE = 0.9  # y = a * 0.9^(t^2) for celestial items
+
+
+@router.get("/celestial/nodes")
+async def get_celestial_nodes(user=Depends(get_current_user)):
+    """Get all celestial nodes for the star chart layer."""
+    uid = user["id"]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    harvested = await db.node_harvests.find(
+        {"user_id": uid, "date": today, "node_type": "celestial"}, {"_id": 0, "node_id": 1}
+    ).to_list(50)
+    harvested_ids = {h["node_id"] for h in harvested}
+
+    nodes = []
+    for cn in CELESTIAL_NODES:
+        nodes.append({
+            **cn,
+            "type": "celestial",
+            "harvested": cn["id"] in harvested_ids,
+            "icon": "star",
+            # Convert RA/Dec to screen-friendly x/y (0-1 range)
+            "chart_x": cn["ra"] / 24.0,
+            "chart_y": (cn["dec"] + 90) / 180.0,
+        })
+
+    return {"nodes": nodes, "total": len(nodes)}
+
+
+@router.post("/celestial/align")
+async def align_celestial_node(
+    node_id: str = Body(...),
+    alignment_accuracy: float = Body(...),
+    user=Depends(get_current_user),
+):
+    """Align with a celestial node (accuracy 0-1)."""
+    uid = user["id"]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    existing = await db.node_harvests.find_one(
+        {"user_id": uid, "node_id": node_id, "date": today, "node_type": "celestial"}, {"_id": 0}
+    )
+    if existing:
+        raise HTTPException(400, "Already aligned with this node today")
+
+    target = None
+    for cn in CELESTIAL_NODES:
+        if cn["id"] == node_id:
+            target = cn
+            break
+    if not target:
+        raise HTTPException(404, "Celestial node not found")
+
+    if alignment_accuracy < 0.6:
+        return {
+            "success": False,
+            "accuracy": round(alignment_accuracy * 100, 1),
+            "message": "Alignment too weak. Focus your resonance — 60% minimum required.",
+        }
+
+    reward = round(target["base_reward"] * alignment_accuracy)
+    now = datetime.now(timezone.utc).isoformat()
+
+    await db.avenue_progress.update_one(
+        {"user_id": uid},
+        {"$inc": {"science.resonance": reward}},
+        upsert=True,
+    )
+    await db.node_harvests.insert_one({
+        "user_id": uid,
+        "node_id": node_id,
+        "node_name": target["name"],
+        "node_type": "celestial",
+        "reward_type": "science_resonance",
+        "reward_amount": reward,
+        "date": today,
+        "harvested_at": now,
+        "alignment_accuracy": round(alignment_accuracy, 3),
+        "frequency": target["frequency"],
+    })
+    await db.user_activity_log.insert_one({
+        "user_id": uid, "type": "celestial_alignment",
+        "detail": f"Aligned with {target['name']} at {target['frequency']}Hz (+{reward} Science Resonance)",
+        "timestamp": now,
+    })
+
+    return {
+        "success": True,
+        "node_name": target["name"],
+        "constellation": target["constellation"],
+        "frequency": target["frequency"],
+        "accuracy": round(alignment_accuracy * 100, 1),
+        "reward_amount": reward,
+        "message": f"Aligned: {target['name']} ({target['constellation']}) at {target['frequency']}Hz. +{reward} Science Resonance.",
+    }
+
+
+@router.get("/celestial/decay-status")
+async def get_celestial_decay_status(user=Depends(get_current_user)):
+    """Get quadratic decay status for celestial resonance."""
+    uid = user["id"]
+    last_celestial = await db.user_activity_log.find_one(
+        {"user_id": uid, "type": "celestial_alignment"}, {"_id": 0},
+        sort=[("timestamp", -1)],
+    )
+
+    if not last_celestial:
+        return {
+            "quadratic_decay_active": False,
+            "days_inactive": 0,
+            "decay_factor": 1.0,
+            "message": "No celestial activity — begin aligning to build resonance.",
+        }
+
+    last_ts = last_celestial.get("timestamp", "")
+    try:
+        last_dt = datetime.fromisoformat(last_ts.replace("Z", "+00:00"))
+        days_inactive = (datetime.now(timezone.utc) - last_dt).total_seconds() / 86400
+    except (ValueError, AttributeError):
+        days_inactive = 0
+
+    # Quadratic decay: 0.9^(t^2)
+    if days_inactive > 0.5:
+        decay_factor = QUADRATIC_DECAY_RATE ** (days_inactive ** 2)
+    else:
+        decay_factor = 1.0
+
+    pulse_speed = min(4.0, 0.3 + (days_inactive ** 1.5 * 0.5)) if days_inactive > 0.5 else 0
+
+    return {
+        "quadratic_decay_active": days_inactive > 0.5,
+        "days_inactive": round(days_inactive, 2),
+        "decay_factor": round(decay_factor, 6),
+        "pulse_speed": round(pulse_speed, 2),
+        "message": f"Celestial decay: {round(decay_factor * 100, 1)}% resonance retained" if days_inactive > 0.5 else "Celestial resonance stable",
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  CELESTIAL FORGE — Higher Solfeggio Frequencies
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CELESTIAL_FORGE_PATTERNS = {
+    "astral_lens": {
+        "name": "Astral Lens",
+        "frequency": 741,
+        "waveform": [0.2, 0.6, 0.9, 0.4, 0.8, 0.1, 0.7, 0.5, 1.0, 0.3, 0.6, 0.9, 0.2],
+        "tolerance": 0.08,
+        "time_limit_seconds": 10,
+        "realm": "celestial",
+        "bonus_type": "celestial_vision",
+        "bonus_value": 1.4,
+        "description": "741Hz — Awakening Intuition. Unlocks enhanced star chart visibility.",
+        "required_alignments": 3,
+    },
+    "cosmic_bridge": {
+        "name": "Cosmic Bridge",
+        "frequency": 852,
+        "waveform": [0.5, 0.0, 1.0, 0.2, 0.8, 0.3, 0.7, 0.1, 0.9, 0.4, 0.6, 0.0, 0.5],
+        "tolerance": 0.07,
+        "time_limit_seconds": 8,
+        "realm": "celestial",
+        "bonus_type": "dimensional_bridge",
+        "bonus_value": 1.5,
+        "description": "852Hz — Returning to Spiritual Order. Bridges ground and celestial realms.",
+        "required_alignments": 5,
+    },
+    "pineal_resonator": {
+        "name": "Pineal Resonator",
+        "frequency": 963,
+        "waveform": [1.0, 0.5, 0.0, 0.5, 1.0, 0.5, 0.0, 0.5, 1.0, 0.5, 0.0, 0.5, 1.0],
+        "tolerance": 0.06,
+        "time_limit_seconds": 6,
+        "realm": "celestial",
+        "bonus_type": "pineal_activation",
+        "bonus_value": 1.75,
+        "description": "963Hz — The God Frequency. Perfect sine wave. The hardest forge in the cosmos.",
+        "required_alignments": 8,
+    },
+}
+
+
+@router.get("/celestial/forge-patterns")
+async def get_celestial_forge_patterns(user=Depends(get_current_user)):
+    """Get available celestial forge patterns based on alignment count."""
+    uid = user["id"]
+    alignment_count = await db.node_harvests.count_documents(
+        {"user_id": uid, "node_type": "celestial"}
+    )
+
+    patterns = []
+    for pid, p in CELESTIAL_FORGE_PATTERNS.items():
+        crafted = await db.resonance_builds.find_one(
+            {"user_id": uid, "build_id": pid}, {"_id": 0}
+        )
+        patterns.append({
+            "id": pid,
+            "name": p["name"],
+            "frequency": p["frequency"],
+            "description": p["description"],
+            "tolerance": p["tolerance"],
+            "time_limit_seconds": p["time_limit_seconds"],
+            "realm": p["realm"],
+            "bonus_type": p["bonus_type"],
+            "bonus_value": p["bonus_value"],
+            "required_alignments": p["required_alignments"],
+            "unlocked": alignment_count >= p["required_alignments"],
+            "crafted": crafted is not None,
+            "user_alignments": alignment_count,
+        })
+
+    return {"patterns": patterns, "user_alignments": alignment_count}
+
+
+@router.get("/celestial/forge-pattern/{pattern_id}")
+async def get_celestial_forge_pattern(pattern_id: str, user=Depends(get_current_user)):
+    """Get a specific celestial forge waveform."""
+    pattern = CELESTIAL_FORGE_PATTERNS.get(pattern_id)
+    if not pattern:
+        raise HTTPException(404, "Celestial forge pattern not found")
+
+    uid = user["id"]
+    alignment_count = await db.node_harvests.count_documents(
+        {"user_id": uid, "node_type": "celestial"}
+    )
+    if alignment_count < pattern["required_alignments"]:
+        raise HTTPException(
+            403,
+            f"Requires {pattern['required_alignments']} celestial alignments. You have {alignment_count}.",
+        )
+
+    return {
+        "build_id": pattern_id,
+        "name": pattern["name"],
+        "frequency": pattern["frequency"],
+        "waveform": pattern["waveform"],
+        "tolerance": pattern["tolerance"],
+        "time_limit_seconds": pattern["time_limit_seconds"],
+        "points_count": len(pattern["waveform"]),
+        "realm": "celestial",
+        "description": pattern["description"],
+    }
+
+
+@router.post("/celestial/forge-attempt")
+async def attempt_celestial_forge(attempt: ForgeAttempt, user=Depends(get_current_user)):
+    """Attempt a celestial forge (higher frequencies, tighter tolerance)."""
+    uid = user["id"]
+    pattern = CELESTIAL_FORGE_PATTERNS.get(attempt.build_id)
+    if not pattern:
+        raise HTTPException(404, "Celestial forge pattern not found")
+
+    existing = await db.resonance_builds.find_one(
+        {"user_id": uid, "build_id": attempt.build_id}, {"_id": 0}
+    )
+    if existing:
+        raise HTTPException(400, "Already forged")
+
+    alignment_count = await db.node_harvests.count_documents(
+        {"user_id": uid, "node_type": "celestial"}
+    )
+    if alignment_count < pattern["required_alignments"]:
+        raise HTTPException(
+            403,
+            f"Requires {pattern['required_alignments']} celestial alignments. You have {alignment_count}.",
+        )
+
+    target = pattern["waveform"]
+    user_wave = attempt.user_waveform
+    tolerance = pattern["tolerance"]
+
+    if len(user_wave) != len(target):
+        raise HTTPException(400, f"Waveform must have exactly {len(target)} points")
+
+    point_scores = []
+    for t, u in zip(target, user_wave):
+        error = abs(t - u)
+        # Squared error in celestial realm
+        squared_error = error ** 2
+        score = max(0, 1.0 - (squared_error / (tolerance ** 2)))
+        point_scores.append(round(score, 2))
+
+    accuracy = sum(point_scores) / len(point_scores) * 100
+    time_ok = attempt.time_taken_seconds <= pattern["time_limit_seconds"]
+    time_bonus = max(0, 1.0 - (attempt.time_taken_seconds / pattern["time_limit_seconds"])) * 15
+
+    total_score = round(accuracy + time_bonus, 1)
+    forged = accuracy >= 75 and time_ok  # Higher threshold for celestial
+
+    if forged:
+        now = datetime.now(timezone.utc).isoformat()
+        await db.resonance_builds.insert_one({
+            "user_id": uid,
+            "build_id": attempt.build_id,
+            "build_name": pattern["name"],
+            "bonus_type": pattern["bonus_type"],
+            "bonus_value": pattern["bonus_value"],
+            "realm": "celestial",
+            "frequency": pattern["frequency"],
+            "crafted_at": now,
+            "forge_score": total_score,
+            "forge_accuracy": round(accuracy, 1),
+        })
+        await db.user_activity_log.insert_one({
+            "user_id": uid, "type": "celestial_forge",
+            "detail": f"Celestial Forge: {pattern['name']} at {pattern['frequency']}Hz",
+            "timestamp": now,
+        })
+
+    return {
+        "forged": forged,
+        "accuracy": round(accuracy, 1),
+        "time_bonus": round(time_bonus, 1),
+        "total_score": total_score,
+        "point_scores": point_scores,
+        "time_ok": time_ok,
+        "time_taken": round(attempt.time_taken_seconds, 1),
+        "time_limit": pattern["time_limit_seconds"],
+        "realm": "celestial",
+        "frequency": pattern["frequency"],
+        "message": f"Celestial Forge Complete: {pattern['name']}!" if forged else "Waveform destabilized — the thin air demands precision",
+        "bonus": f"{pattern['bonus_type']}: {pattern['bonus_value']}x" if forged else None,
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  LOCATION-LOCKED EDUCATION PACKS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post("/location-locked-packs")
+async def get_location_locked_packs(
+    user_lat: float = Body(...),
+    user_lng: float = Body(...),
+    user=Depends(get_current_user),
+):
+    """Get education packs available at user's current location."""
+    uid = user["id"]
+    spots = await db.power_spots.find({"active": True}, {"_id": 0}).to_list(50)
+
+    nearby_spots = []
+    for s in spots:
+        dlat = s["lat"] - user_lat
+        dlng = s["lng"] - user_lng
+        dist_m = math.sqrt(
+            (dlat * 111320) ** 2 + (dlng * 111320 * math.cos(math.radians(user_lat))) ** 2
+        )
+        if dist_m <= s.get("harvest_radius_meters", 100):
+            nearby_spots.append(s)
+
+    if not nearby_spots:
+        return {
+            "at_power_spot": False,
+            "packs": [],
+            "message": "Not near a Power Spot. Location-locked packs require physical presence.",
+        }
+
+    location_packs = [
+        {
+            "id": "location_history_deep",
+            "name": "Deep History: Local Ley Lines",
+            "description": "Unlock the hidden energy grid beneath this Power Spot. Available only at Enlightenment Cafe locations.",
+            "cost": 0,
+            "currency": "free_at_location",
+            "rarity": "legendary",
+        },
+        {
+            "id": "location_science_field",
+            "name": "Field Science: Geomagnetic Survey",
+            "description": "Access real geomagnetic data for this Power Spot's coordinates. Study the Earth's magnetic field strength here.",
+            "cost": 0,
+            "currency": "free_at_location",
+            "rarity": "rare",
+        },
+    ]
+
+    purchases = await db.economy_purchases.find({"user_id": uid}, {"_id": 0}).to_list(200)
+    owned_ids = {p["item_id"] for p in purchases}
+
+    for pack in location_packs:
+        pack["owned"] = pack["id"] in owned_ids
+
+    return {
+        "at_power_spot": True,
+        "spot_name": nearby_spots[0]["name"],
+        "packs": location_packs,
+        "message": f"You're at {nearby_spots[0]['name']}! Location-locked content available.",
+    }
