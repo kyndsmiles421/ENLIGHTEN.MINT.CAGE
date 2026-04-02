@@ -173,24 +173,40 @@ function WeatherRibbon({ weather }) {
   );
 }
 
-// ━━━ Dormant Dot (inside Abyss) ━━━
-function DormantDot({ sat, index, total, onActivate }) {
-  const angle = (index / total) * Math.PI * 2;
-  const r = 22 + (index % 3) * 6;
+// ━━━ Dormant Satellite in Expanded Abyss (Fibonacci spiral positions) ━━━
+function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
+  const Icon = sat.icon;
+  // Fibonacci spiral positioning
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // ~137.5°
+  const angle = index * goldenAngle;
+  const r = Math.sqrt(index / Math.max(total, 1)) * (abyssRadius * 0.38);
   const x = Math.cos(angle) * r;
   const y = Math.sin(angle) * r;
 
   return (
     <motion.div
       className="absolute cursor-pointer"
-      style={{ left: '50%', top: '50%', width: 10, height: 10, marginLeft: -5, marginTop: -5 }}
-      animate={{ x, y, scale: [0.8, 1.1, 0.8], opacity: [0.3, 0.7, 0.3] }}
-      transition={{ scale: { duration: 3 + index * 0.4, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 3 + index * 0.4, repeat: Infinity, ease: 'easeInOut' } }}
+      style={{ left: '50%', top: '50%', width: 56, height: 56, marginLeft: -28, marginTop: -28 }}
+      initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
+      animate={{ scale: 1, opacity: 1, x, y }}
+      exit={{ scale: 0, opacity: 0, x: 0, y: 0 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 14, delay: index * 0.06 }}
       onClick={(e) => { e.stopPropagation(); onActivate(sat.id); }}
-      title={`Activate ${sat.label}`}
       data-testid={`dormant-${sat.id}`}
     >
-      <div className="w-full h-full rounded-full" style={{ background: sat.color, boxShadow: `0 0 6px ${sat.color}40` }} />
+      <motion.div
+        className="w-full h-full rounded-full flex flex-col items-center justify-center"
+        style={{
+          background: `${sat.color}0A`,
+          border: `1px solid ${sat.color}20`,
+          backdropFilter: 'blur(6px)',
+        }}
+        whileHover={{ scale: 1.2, boxShadow: `0 0 24px ${sat.color}30` }}
+        whileTap={{ scale: 0.85 }}
+      >
+        <Icon size={16} style={{ color: sat.color, opacity: 0.8 }} />
+        <p className="text-[6px] mt-0.5 font-medium" style={{ color: `${sat.color}90` }}>{sat.label}</p>
+      </motion.div>
     </motion.div>
   );
 }
@@ -246,44 +262,107 @@ function ConnectionLines({ positions, hoveredSat, activeSats, cx, cy }) {
   );
 }
 
-// ━━━ Central Orb with Abyss ━━━
-function CentralOrb({ onClick, pulseColor, abyssOpen, dormantSats, onActivate, dormantCount }) {
+// ━━━ Central Orb with Expandable Abyss ━━━
+function CentralOrb({ pulseColor, abyssOpen, dormantSats, onActivate, dormantCount }) {
+  // Abyss expands to ~65% of viewport (min 300, max 500)
+  const abyssRadius = abyssOpen ? Math.min(500, Math.max(300, window.innerHeight * 0.33)) : 0;
+  const orbSize = abyssOpen ? abyssRadius * 2 : 130;
+
   return (
-    <motion.div className="relative cursor-pointer" onClick={onClick}
-      whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.92 }}
-      data-testid="central-orb" style={{ width: 130, height: 130 }}>
-      {/* Outer glow */}
-      <motion.div className="absolute inset-0 rounded-full"
-        animate={{ boxShadow: [`0 0 40px ${pulseColor}15`, `0 0 60px ${pulseColor}25`, `0 0 40px ${pulseColor}15`] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
-      {/* Rings */}
-      <motion.div className="absolute rounded-full" style={{ inset: 6, border: `1px solid ${pulseColor}18` }}
-        animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: 'linear' }} />
-      <motion.div className="absolute rounded-full" style={{ inset: 14, border: `1px dashed ${pulseColor}10` }}
-        animate={{ rotate: -360 }} transition={{ duration: 25, repeat: Infinity, ease: 'linear' }} />
-      {/* Core */}
-      <motion.div className="absolute rounded-full flex items-center justify-center overflow-hidden"
-        style={{ inset: 22, background: `radial-gradient(circle at 38% 32%, ${pulseColor}35, ${pulseColor}10 55%, rgba(10,10,18,0.92) 85%)`, border: `1.5px solid ${pulseColor}25` }}
-        animate={{ scale: [1, 1.04, 1] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
-        {/* Dormant dots inside */}
-        <AnimatePresence>
-          {abyssOpen && dormantSats.map((sat, i) => (
-            <DormantDot key={sat.id} sat={sat} index={i} total={dormantSats.length} onActivate={onActivate} />
-          ))}
-        </AnimatePresence>
-        {!abyssOpen && <Orbit size={30} style={{ color: pulseColor, opacity: 0.6 }} />}
-      </motion.div>
-      {/* Label + count */}
-      <div className="absolute text-center w-full" style={{ bottom: -22 }}>
-        <p className="text-[8px] font-medium tracking-[0.2em] uppercase" style={{ color: `${pulseColor}60` }}>
-          {abyssOpen ? 'Select to Activate' : 'Mission Control'}
-        </p>
-        {dormantCount > 0 && !abyssOpen && (
-          <p className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
-            {dormantCount} dormant
-          </p>
+    <motion.div
+      className="relative cursor-pointer"
+      data-testid="central-orb"
+      animate={{ width: orbSize, height: orbSize }}
+      transition={{ type: 'spring', stiffness: 80, damping: 18 }}
+      style={{ marginLeft: -(orbSize / 2), marginTop: -(orbSize / 2) }}
+    >
+      {/* Expanded Abyss background */}
+      <AnimatePresence>
+        {abyssOpen && (
+          <motion.div
+            className="absolute rounded-full"
+            style={{ inset: 0 }}
+            initial={{ opacity: 0, scale: 0.3 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.3 }}
+            transition={{ type: 'spring', stiffness: 60, damping: 16 }}
+          >
+            {/* Abyss background sphere */}
+            <div className="absolute inset-0 rounded-full"
+              style={{
+                background: `radial-gradient(circle, rgba(10,10,18,0.85) 30%, ${pulseColor}08 60%, transparent 80%)`,
+                border: `1px solid ${pulseColor}10`,
+                boxShadow: `inset 0 0 80px ${pulseColor}08, 0 0 60px ${pulseColor}06`,
+              }} />
+            {/* Sacred geometry guide rings */}
+            {[0.25, 0.45, 0.65].map((r, i) => (
+              <motion.div key={i} className="absolute rounded-full"
+                style={{
+                  left: `${50 - r * 50}%`, top: `${50 - r * 50}%`,
+                  width: `${r * 100}%`, height: `${r * 100}%`,
+                  border: `1px dashed ${pulseColor}08`,
+                }}
+                animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
+                transition={{ duration: 60 + i * 20, repeat: Infinity, ease: 'linear' }}
+              />
+            ))}
+            {/* Dormant satellites in Fibonacci spiral */}
+            {dormantSats.map((sat, i) => (
+              <AbyssSatellite key={sat.id} sat={sat} index={i} total={dormantSats.length}
+                onActivate={onActivate} abyssRadius={abyssRadius} />
+            ))}
+            {/* Center label */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <p className="text-[9px] font-medium tracking-[0.2em] uppercase"
+                  style={{ color: `${pulseColor}50` }}>The Abyss</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                  Tap a module to activate
+                </p>
+              </div>
+            </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
+
+      {/* Collapsed orb core (visible when NOT expanded) */}
+      {!abyssOpen && (
+        <>
+          <motion.div className="absolute inset-0 rounded-full"
+            animate={{ boxShadow: [`0 0 40px ${pulseColor}15`, `0 0 60px ${pulseColor}25`, `0 0 40px ${pulseColor}15`] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
+          <motion.div className="absolute rounded-full" style={{ inset: 6, border: `1px solid ${pulseColor}18` }}
+            animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: 'linear' }} />
+          <motion.div className="absolute rounded-full" style={{ inset: 14, border: `1px dashed ${pulseColor}10` }}
+            animate={{ rotate: -360 }} transition={{ duration: 25, repeat: Infinity, ease: 'linear' }} />
+          <motion.div className="absolute rounded-full flex items-center justify-center"
+            style={{ inset: 22, background: `radial-gradient(circle at 38% 32%, ${pulseColor}35, ${pulseColor}10 55%, rgba(10,10,18,0.92) 85%)`, border: `1.5px solid ${pulseColor}25` }}
+            animate={{ scale: [1, 1.04, 1] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
+            {/* Tiny dormant glimmers inside collapsed orb */}
+            {dormantSats.slice(0, 7).map((sat, i) => {
+              const a = (i / 7) * Math.PI * 2;
+              const r = 14 + (i % 2) * 5;
+              return (
+                <motion.div key={sat.id} className="absolute rounded-full"
+                  style={{ width: 3, height: 3, background: sat.color, left: '50%', top: '50%', marginLeft: -1.5, marginTop: -1.5 }}
+                  animate={{ x: Math.cos(a) * r, y: Math.sin(a) * r, opacity: [0.2, 0.6, 0.2], scale: [0.7, 1.2, 0.7] }}
+                  transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              );
+            })}
+          </motion.div>
+          <div className="absolute text-center w-full" style={{ bottom: -22 }}>
+            <p className="text-[8px] font-medium tracking-[0.2em] uppercase" style={{ color: `${pulseColor}60` }}>
+              Mission Control
+            </p>
+            {dormantCount > 0 && (
+              <p className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                {dormantCount} dormant
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </motion.div>
   );
 }
@@ -301,6 +380,7 @@ export default function OrbitalHub() {
   const [weather, setWeather] = useState(null);
   const animRef = useRef(null);
   const longPressRef = useRef(null);
+  const lastTapRef = useRef(0);
   const { play: playAtmo, stop: stopAtmo, collapseSound } = useAtmosphericAudio();
 
   const pulseColor = activeFrequencies?.length > 0 ? '#A78BFA' : '#2DD4BF';
@@ -364,16 +444,35 @@ export default function OrbitalHub() {
     collapseSound();
   }, [savePrefs, collapseSound]);
 
+  // Zen Reset: deactivate ALL satellites back to Abyss
+  const zenReset = useCallback(() => {
+    setActiveSatIds([]);
+    savePrefs([]);
+    collapseSound();
+    setAbyssOpen(false);
+  }, [savePrefs, collapseSound]);
+
   const handleSelect = useCallback((sat) => { stopAtmo(); navigate(sat.path); }, [navigate, stopAtmo]);
   const handleHover = useCallback((id) => { setHoveredSat(id); if (id) playAtmo(id); else stopAtmo(); }, [playAtmo, stopAtmo]);
 
-  // Central orb: short press = Mission Control, long press = Abyss toggle
+  // Central orb: short tap = Mission Control, long press = Abyss, double-tap = Zen Reset
   const handleOrbDown = useCallback(() => {
+    const now = Date.now();
+    // Double-tap detection (within 300ms)
+    if (now - lastTapRef.current < 300) {
+      clearTimeout(longPressRef.current);
+      longPressRef.current = null;
+      zenReset();
+      lastTapRef.current = 0;
+      return;
+    }
+    lastTapRef.current = now;
+
     longPressRef.current = setTimeout(() => {
       setAbyssOpen(prev => !prev);
       longPressRef.current = null;
     }, 500);
-  }, []);
+  }, [zenReset]);
 
   const handleOrbUp = useCallback(() => {
     if (longPressRef.current) {
