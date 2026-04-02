@@ -1,7 +1,7 @@
 # The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a highly immersive full-stack wellness platform. V2 "Sovereign Core" — Unified Simulation Architecture. Recursive 3D orbital interface with 4-tier audio system, I Ching state-machine, convolution reverb, mantras/affirmations library, and tiered payable generator bonuses.
+Build "The Cosmic Collective", a highly immersive full-stack wellness platform. V3 "Divine Director" — Professional-grade multi-track spiritual composition engine with tiered subscription infrastructure, Speed Bridge commerce, and ghost-track upselling.
 
 ## Tech Stack
 - **Frontend**: React 19, TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Three.js
@@ -10,124 +10,143 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform. 
 
 ## Architecture
 ```
-/app/frontend/src/
-├── context/
-│   ├── SensoryContext.js (4-TIER AUDIO ENGINE: convolution reverb, confirmation chimes,
-│   │                       singing bowl synthesis, sympathetic resonance, tier mapping)
-│   ├── CosmicStateContext.js (UNIFIED MATH: ODE energies, stability, hexagram, tier-gated)
-│   ├── AuthContext.js, MixerContext.js, TempoContext.js, LanguageContext.js
-├── components/
-│   ├── OrbitalHubBase.js (UNIVERSAL 3D: gravity engine, gravitational pull zones,
-│   │                       deep-dive fly-in, confirmation chimes, depth breadcrumbs, portal)
-│   ├── OrbitalTransitionPortal.js (WORMHOLE NAV: 5 destinations, expanding ring animation)
-│   ├── ResonancePulse.js (audio breadcrumb + HexagramGlitch + HexagramBadge)
-│   ├── CosmicSparkline.js (SVG ODE curve + hexagram badge)
-│   ├── NanoGuide.js, FiveElementsWheel.js, SmartDock.js, CosmicAssistant.js, MissionControl.js
-│   ├── orbital/ (9 files), trade/
-├── pages/
-│   ├── OrbitalHub.js, BotanyOrbital.js, TradeCircleOrbital.js, CodexOrbital.js
-│   ├── HexagramJournal.js, Botany.js, StarChart.js, TradeCircle.js, Codex.js
-│   ├── SuanpanMixer.js (+ Generator Console slide-over), Archives.js
-
 /app/backend/routes/
-├── generators.py (TIERED PAYABLE BONUSES: 8 generators across 3 types,
-│                   hybrid deterministic+RNG bloom logic, purchase/vault/toggle endpoints)
-├── mantras_sovereign.py (43 entries: 10 ancient mantras, 10 phonic resonances,
-│                          15 affirmations, 8 wisdom prescriptions — all tier-gated)
-├── hexagram.py, hexagram_journal.py, cosmic_state.py, sovereign_math.py
-├── sovereign_codex.py, botany.py, mastery.py, trade_circle.py
+├── mixer_director.py    # NEW: Mixer subscription tiers + multi-track project CRUD + sources
+├── generators.py        # Tiered payable bonuses (8 generators, hybrid bloom logic)
+├── mantras_sovereign.py # 4-tier audio & wisdom prescriptions
+├── hexagram.py          # I Ching logic gates
+├── hexagram_journal.py  # Hexagram journal entries
+├── cosmic_state.py      # Unified math state
+├── sovereign_math.py    # ODEs & Chaos Theory math engine
+├── trade_circle.py      # Marketplace & exports
+├── botany.py            # Botanical elements
+
+/app/frontend/src/pages/
+├── SuanpanMixer.js      # REWRITTEN: "Divine Director" multi-track timeline
+├── BotanyOrbital.js     # 3D botanical orbital (z-fix: bottom-24 right-20)
+├── TradeCircleOrbital.js # 3D trade orbital (z-fix applied)
+├── CodexOrbital.js      # 3D codex orbital (z-fix applied)
+├── OrbitalHub.js        # Hub page
 ```
 
-## Generator System (Tiered Payable Bonuses)
+## Two-Axis Progression System (Separate but Coupled)
+
+### Mastery Tiers (Earned through practice)
 ```
-Three generator types purchasable with Trade Circle credits:
-
-Sub-Harmonic Generators:
-  - Sub-Harmonic Pulse (Synthesizer, 8c): 1.5Hz beating effect
-  - Deep Earth Resonator (Archivist, 15c): 7.83Hz Schumann resonance
-  - Sovereign Bass Field (Sovereign, 30c): Multi-layered sympathetic stack
-
-Mantra Extensions:
-  - Phonic Flourish (Synthesizer, 10c): 174-528Hz phonic layer, 2 layers
-  - Harmonic Density Weave (Archivist, 20c): 174-963Hz, 5 overtones
-  - Celestial Gate Resonance (Sovereign, 35c): 174-1074Hz, hexagram modulation
-
-Ultra-Lossless Rendering:
-  - Hi-Fi Session Boost (Archivist, 5c): 88.2kHz/24-bit single session
-  - Ultra-Lossless Sovereign Render (Sovereign, 12c): 96kHz/24-bit unlimited
-
-Hybrid Logic:
-  Deterministic Core: frequencies fixed from hexagram state (hex_factor)
-  Bloom: seeded RNG (SHA-256 of user_id:generator_id) modulates reverb
-         color and decay within variance bounds (10-25% range)
-
-API Endpoints:
-  GET  /api/trade-circle/generators/catalog — full catalog with ownership
-  POST /api/trade-circle/purchase — buy generator (tier→credits→deduct→unlock)
-  GET  /api/vault/generators — owned generators with live bloom coefficients
-  POST /api/vault/generators/toggle — toggle generator on/off
+Observer → Synthesizer → Archivist → Navigator → Sovereign
+Controls: mantras access, hexagram depth, ODE complexity
 ```
 
-## 4-Tier Audio Resolution System
+### Mixer Subscription Tiers (Paid infrastructure)
 ```
-Standard (Observer):    44.1kHz/16-bit, basic synthesis, 0.8s reverb, 0.1 mix
-Apprentice (Synthesizer): 48kHz/16-bit, harmonic overtones, 1.5s reverb, 0.2 mix
-Artisan (Archivist):    88.2kHz/24-bit, multi-sampled + convolution reverb, 2.5s decay, 0.3 mix
-Sovereign (Navigator+): 96kHz/24-bit, lossless + sympathetic resonance + full reverb, 4.0s decay, 0.4 mix
+Discovery (Free, Cold Path):
+  - 3 Static Tracks, 5 AI Credits/mo, Basic Tones, Standard Stereo
+  - 15-30s "Sacred Assembly" materialization delay
+  - Shadow/ghost tracks showing locked Sovereign features
+
+Resonance ($14.99/mo, Warm Path):
+  - 10 Tracks + Keyframes, 100 AI Credits/mo, 3000+ Sound Effects, HD Lossless
+  - 2-3s stabilization delay
+  - Shadow tracks still visible
+
+Sovereign ($49.99/mo, Hot Path):
+  - Unlimited layers + Nested Projects, 200+ Credits + NPU Priority
+  - Full Phonic Library, Ultra-Lossless / Atmos Spatial
+  - Instant (GPU edge), no shadow tracks
 ```
 
-## Mantras & Affirmations Library (43 entries)
+### API Endpoints — Mixer Director
 ```
-Ancient Mantras (10): Om, Om Mani Padme Hum, Gayatri, So Ham, etc.
-Phonic Resonances (10): 174Hz–1074Hz solfeggio scale
-Affirmations (15): Element-mapped positive expressions
-Wisdom Prescriptions (8): Hexagram-range-linked guidance
+GET  /api/mixer/subscription       — tier status, config, comparison table, all tiers
+POST /api/mixer/subscription/upgrade — atomic tier upgrade (instant latency lift)
+POST /api/mixer/projects            — save project (layer cap enforced)
+GET  /api/mixer/projects            — list user's projects
+GET  /api/mixer/projects/{id}       — load specific project with tracks
+DELETE /api/mixer/projects/{id}     — delete project
+GET  /api/mixer/sources             — track source library (tier-gated, 17 sources)
 ```
 
-## Orbital Transition Portal
+### API Endpoints — Generators
 ```
-5 destinations: Botany, Trade, Codex, Hub, Stars
-Wormhole effect: 5 expanding concentric rings (0.6s, staggered 80ms)
-Position: fixed bottom-12, z-40
+GET  /api/trade-circle/generators/catalog — full catalog with ownership
+POST /api/trade-circle/purchase           — buy generator (tier→credits→deduct→unlock)
+GET  /api/vault/generators                — owned generators with bloom coefficients
+POST /api/vault/generators/toggle         — toggle generator on/off
 ```
+
+## Multi-Track Project Data Model
+```
+mixer_projects: {
+  id, user_id, name, track_count, tier_at_save,
+  tracks: [{ index, type, source_id, source_label, volume, muted, solo,
+             start_time, duration, frequency, color, locked }],
+  created_at, updated_at
+}
+
+mixer_subscriptions: {
+  user_id, tier, ai_credits_remaining, speed_bonus_pct, created_at
+}
+```
+
+## Track Source Library (17 sources)
+```
+Discovery:  OM (136.1Hz), UT (174Hz), MI (528Hz), Schumann (7.83Hz)
+Resonance:  RE (285Hz), FA (639Hz), SOL (741Hz), LA (852Hz),
+            Sacred Forest, Temple Bells, Cosmic Rain
+Sovereign:  SI (963Hz), Celestial Gate (1074Hz), Om Mani Padme Hum,
+            Gayatri Mantra, Deep Space Resonance, Sacred Geometry Visual
+```
+
+## Speed Bridge Commerce
+When user hits layer cap or tries locked source, "Speed Bridge" modal shows:
+- 3-tier comparison (Discovery/Resonance/Sovereign)
+- Features per tier, pricing, and "Upgrade" buttons
+- "Your composition has reached Divine Complexity" messaging
 
 ## Iteration History
 
-### Iteration 222 — Tiered Payable Bonuses & Generator Console (Apr 2, 2026) — LATEST
-- **Generator System**: 8 generators across 3 types (sub-harmonic, mantra extension, ultra-lossless)
-- **Hybrid Bloom Logic**: Deterministic hexagram core + seeded RNG reverb/decay modulation
-- **Purchase Flow**: Tier validation → credit check → deduction → unlock with bloom coefficients
-- **Mixer Console**: Slide-over panel on SuanpanMixer with generator cards, purchase, toggle
-- **Bloom Visual Effects**: Active generators produce animated glow overlay
-- **Z-Index Fix**: Orbital page buttons moved to bottom-24 right-20 to clear platform badge
-- Tests: 100% (Iteration 222 — 14 features verified)
+### Iteration 223 — Divine Director Multi-Track Mixer (Apr 2, 2026) — LATEST
+- **Mixer Subscription System**: 3-tier (Discovery/Resonance/Sovereign) separate from mastery
+- **Multi-Track Projects**: Full CRUD with layer cap enforcement per subscription tier
+- **Divine Director UI**: Professional DAW-style timeline with track stack, volume/mute/solo/remove
+- **Suanpan Integration**: Collapsible frequency source panel preserved within timeline
+- **Ghost/Shadow Tracks**: Locked sources shown as translucent layers for upselling
+- **Speed Bridge Modal**: 3-tier comparison with atomic upgrade flow
+- **Track Source Library**: 17 tier-gated sources (phonic tones, mantras, ambience, visuals)
+- **Transport Controls**: Play/Stop all tracks with solo isolation
+- Tests: 100% pass (Iteration 223 — 17 features verified)
 
-### Iteration 221 — Sovereign Sensory + Mantras + Portal (Apr 2, 2026)
-### Iteration 220 — Trade + Codex Orbital + Gravitational Pull
-### Iteration 219 — Orbital Architecture + Hexagram Journal
-### Iteration 218 — I Ching Logic Gates + Resonance Pulse + Sparkline
-### Iteration 217 — Sovereign Math + Codex + Raycaster Fix
-### Iterations 211-216 — Foundation (Botany, Elements, Marketplace, Audio, Cinematic)
+### Iteration 222 — Tiered Payable Bonuses & Generator Console (Apr 2, 2026)
+- Generator system: 8 generators, hybrid bloom logic, purchase/vault/toggle
+- Tests: 100% (14 features verified)
+
+### Earlier Iterations (217-221)
+- Orbital Architecture, 4-Tier Audio, I Ching, Mantras Library, Convolution Reverb
 
 ## Upcoming Tasks (P1)
-- **Phase 3 Polish**: Light trails + bloom effects on orbital paths
-- **Generative Flourish Bonus**: AI improvised phonic resonance based on movement history
-- **Spatial Audio 3D Spatializer**: Wire Web Audio panners to orbital node proximity
+- **Keyframe Automation**: Draw volume curves over time per track
+- **AI "Mantra DJ" Auto-Edit**: Analyze session goal, auto-join best moments with cross-fades
+- **Ripple Editing**: Shortening segment auto-shifts subsequent layers
+- **Nested Sacred Projects**: Group mantra sequences into reusable blocks (Sovereign only)
+- **Snippet "Try-On"**: 10-second high-fidelity preview of locked instruments over active mix
 
 ## Future/Backlog (P2)
+- NPU Priority / GPU edge acceleration hooks
+- Haptic Guidance for tuned layers (micro-vibrations on alignment)
+- Gesture-based timeline controls (pinch-to-zoom, scrub)
+- Bonus-Wrapped Trade Circle assets (+10% speed boost mechanics)
 - Multi-Civilization Star Charts (Hopi, Egyptian, Vedic)
-- Sovereign Tier Perks, Wisdom Prescriptions personalization
 - External audio asset hosting (real instrument samples)
-- Haptic API integration for mobile tactile feedback
+- Predictive Micro-Interactions (anticipate compatible chants)
+- Atomic State Management for subscription changes
 
 ## Key Rules
-- LlmChat: Always session_id + system_message | MongoDB: Exclude _id
-- Audio: Check sovereignMute | Coordinates: isFinite() before Three.js
-- Events: stopPropagation() on panels | Cosmic State: 60s cache
-- Hexagram: Compute from ODE | Orbital: Sphere=auto, effects=none
-- Reverb: getConvolver() creates on first use, resets on tier change
+- MongoDB: Exclude _id | Audio: Check sovereignMute
+- Orbital: Sphere=auto, effects=none | Reverb: getConvolver()
 - Generators: Purchase through /api/trade-circle/purchase only
+- Mixer: Layer cap enforced on save, atomic upgrade lifts instantly
+- Subscriptions: Separate from mastery — two independent axes
 
 ## Test Credentials
-- User: `grad_test_522@test.com` / `password`
+- User: `grad_test_522@test.com` / `password` (Currently: Resonance tier)
 - Auth key: `zen_token`
