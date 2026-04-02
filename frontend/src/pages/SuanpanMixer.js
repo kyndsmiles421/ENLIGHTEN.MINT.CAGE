@@ -7,17 +7,16 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Plus, Trash2, Save, FolderOpen,
-  Sliders, Lock, Zap, Waves, Sparkles, ChevronDown, ChevronUp,
-  Crown, Layers, Music, Eye, Radio, X, Loader2, Play, Square,
-  ToggleLeft, ToggleRight, ArrowUpRight, Ghost, Star,
+  Sliders, Lock, Zap, Waves, Sparkles, ChevronDown, Crown,
+  Layers, Music, Eye, Radio, X, Loader2, Play, Square,
+  Ghost, Package, Gift, ShoppingCart, ArrowUpRight, GripVertical,
 } from 'lucide-react';
 import { NanoGuide } from '../components/NanoGuide';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-/* ━━━ Constants ━━━ */
-const BEAD_SIZE = 24;
-const COLUMN_WIDTH = 50;
+const BEAD_SIZE = 22;
+const COLUMN_WIDTH = 46;
 const HEAVEN_COUNT = 2;
 const EARTH_COUNT = 5;
 const HEAVEN_VALUE = 5;
@@ -35,70 +34,142 @@ const TRACK_TYPE_META = {
   visual: { icon: Eye, color: '#A78BFA', label: 'Visual' },
   suanpan: { icon: Sliders, color: '#EAB308', label: 'Suanpan' },
   generator: { icon: Zap, color: '#FB923C', label: 'Generator' },
+  bonus_pack: { icon: Gift, color: '#F472B6', label: 'Pack' },
   custom: { icon: Sparkles, color: '#94A3B8', label: 'Custom' },
 };
 
-const SUB_COLORS = { discovery: '#94A3B8', resonance: '#C084FC', sovereign: '#EAB308' };
+const SUB_COLORS = {
+  discovery: '#94A3B8', player: '#2DD4BF', ultra_player: '#C084FC', sovereign: '#EAB308',
+};
 
-/* ━━━ Suanpan Mini-Abacus (Frequency Source Panel) ━━━ */
+const TIER_DISPLAY = {
+  discovery: 'Discovery', player: 'Player', ultra_player: 'Ultra Player', sovereign: 'Sovereign',
+};
+
+/* ━━━ Sacred Assembly Loader ━━━ */
+function SacredAssemblyLoader({ delay, onComplete }) {
+  const [progress, setProgress] = useState(0);
+  const [phase, setPhase] = useState(0);
+  const phases = ['Aligning Frequencies', 'Weaving Harmonics', 'Assembling Resonance', 'Manifesting'];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(p => {
+        const next = p + (100 / (delay * 10));
+        if (next >= 100) { clearInterval(interval); setTimeout(onComplete, 300); return 100; }
+        return next;
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, [delay, onComplete]);
+
+  useEffect(() => {
+    setPhase(Math.min(3, Math.floor(progress / 25)));
+  }, [progress]);
+
+  return (
+    <motion.div className="fixed inset-0 z-[10002] flex flex-col items-center justify-center"
+      style={{ background: 'rgba(6,6,14,0.95)', backdropFilter: 'blur(16px)' }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      data-testid="sacred-assembly-loader"
+    >
+      {/* Concentric rings */}
+      <div className="relative w-40 h-40 mb-8">
+        {[0, 1, 2, 3, 4].map(i => (
+          <motion.div key={i} className="absolute inset-0 rounded-full border"
+            style={{
+              borderColor: `rgba(192,132,252,${0.08 + i * 0.04})`,
+              transform: `scale(${0.3 + i * 0.18})`,
+            }}
+            animate={{ rotate: i % 2 === 0 ? 360 : -360, scale: [0.3 + i * 0.18, 0.35 + i * 0.18, 0.3 + i * 0.18] }}
+            transition={{ duration: 4 + i, repeat: Infinity, ease: 'linear' }}
+          />
+        ))}
+        <motion.div className="absolute inset-0 flex items-center justify-center">
+          <p className="text-lg font-mono font-light" style={{ color: '#C084FC' }}>
+            {Math.round(progress)}%
+          </p>
+        </motion.div>
+      </div>
+
+      <motion.p className="text-[10px] tracking-[0.25em] uppercase mb-2"
+        style={{ color: 'rgba(248,250,252,0.2)' }}
+        key={phase} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+        Sacred Assembly
+      </motion.p>
+      <motion.p className="text-[11px] font-light"
+        style={{ color: '#C084FC', fontFamily: 'Cormorant Garamond, serif' }}
+        key={`phase-${phase}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        {phases[phase]}...
+      </motion.p>
+
+      {/* Progress bar */}
+      <div className="w-48 h-[2px] mt-6 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+        <motion.div className="h-full rounded-full"
+          style={{ background: 'linear-gradient(90deg, #C084FC, #EAB308)', width: `${progress}%` }}
+        />
+      </div>
+
+      <p className="text-[7px] mt-4 max-w-xs text-center" style={{ color: 'rgba(248,250,252,0.12)' }}>
+        Complex renders require assembly time. Upgrade your tier for faster materialization.
+      </p>
+    </motion.div>
+  );
+}
+
+/* ━━━ Suanpan Mini-Abacus ━━━ */
 function SuanpanSource({ onFrequencySet, color }) {
   const [values, setValues] = useState([5, 2, 8, 0]);
   const totalHz = COLUMNS.reduce((sum, col, i) => sum + values[i] * col.multiplier, 0);
 
   const handleChange = (colIdx, newVal) => {
-    setValues(prev => { const next = [...prev]; next[colIdx] = Math.min(newVal, 9); return next; });
+    setValues(prev => { const n = [...prev]; n[colIdx] = Math.min(newVal, 9); return n; });
   };
 
   return (
     <div className="p-3" data-testid="suanpan-source-panel">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.3)' }}>
-          Frequency Source
-        </p>
+        <p className="text-[8px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.25)' }}>Frequency Source</p>
         <p className="text-sm font-mono font-light" style={{ color }}>{totalHz.toFixed(1)} Hz</p>
       </div>
       <div className="flex items-start justify-center gap-1 mb-2">
         {COLUMNS.map((col, i) => (
           <div key={i} className="flex flex-col items-center" style={{ width: COLUMN_WIDTH }}>
-            <p className="text-[7px] font-mono mb-1" style={{ color: 'rgba(248,250,252,0.15)' }}>{col.label}</p>
+            <p className="text-[6px] font-mono mb-1" style={{ color: 'rgba(248,250,252,0.12)' }}>{col.label}</p>
             <div className="flex flex-col items-center gap-0.5 mb-0.5">
               {Array.from({ length: HEAVEN_COUNT }).map((_, bi) => {
-                const heavenActive = Math.floor(values[i] / HEAVEN_VALUE);
-                const active = bi < heavenActive;
+                const ha = Math.floor(values[i] / HEAVEN_VALUE);
+                const active = bi < ha;
                 return (
                   <button key={`h-${bi}`} className="rounded-full" style={{
                     width: BEAD_SIZE, height: BEAD_SIZE,
-                    background: active ? color : 'rgba(248,250,252,0.05)',
-                    border: `1.5px solid ${active ? color : 'rgba(248,250,252,0.08)'}`,
-                    boxShadow: active ? `0 0 8px ${color}30` : 'none',
-                    transform: active ? 'translateY(4px)' : 'none',
-                    transition: 'all 0.2s',
+                    background: active ? color : 'rgba(248,250,252,0.04)',
+                    border: `1.5px solid ${active ? color : 'rgba(248,250,252,0.06)'}`,
+                    boxShadow: active ? `0 0 6px ${color}30` : 'none',
+                    transform: active ? 'translateY(3px)' : 'none', transition: 'all 0.2s',
                   }} onClick={() => {
-                    const earthActive = values[i] % HEAVEN_VALUE;
-                    const targetActive = bi + 1;
-                    const newHeavenVal = heavenActive === targetActive ? targetActive - 1 : targetActive;
-                    handleChange(i, newHeavenVal * HEAVEN_VALUE + earthActive);
+                    const ea = values[i] % HEAVEN_VALUE;
+                    const tgt = bi + 1;
+                    handleChange(i, (ha === tgt ? tgt - 1 : tgt) * HEAVEN_VALUE + ea);
                   }} data-testid={`src-heaven-${i}-${bi}`} />
                 );
               })}
             </div>
-            <div className="w-full h-[1px] my-0.5" style={{ background: `${color}25` }} />
+            <div className="w-full h-[1px] my-0.5" style={{ background: `${color}20` }} />
             <div className="flex flex-col items-center gap-0.5 mt-0.5">
               {Array.from({ length: EARTH_COUNT }).map((_, bi) => {
-                const earthActive = values[i] % HEAVEN_VALUE;
-                const active = bi < earthActive;
+                const ea = values[i] % HEAVEN_VALUE;
+                const ha = Math.floor(values[i] / HEAVEN_VALUE);
+                const active = bi < ea;
                 return (
                   <button key={`e-${bi}`} className="rounded-full" style={{
                     width: BEAD_SIZE - 4, height: BEAD_SIZE - 4,
-                    background: active ? `${color}80` : 'rgba(248,250,252,0.03)',
-                    border: `1px solid ${active ? `${color}50` : 'rgba(248,250,252,0.06)'}`,
-                    transform: active ? 'translateY(-3px)' : 'none',
-                    transition: 'all 0.2s',
+                    background: active ? `${color}70` : 'rgba(248,250,252,0.02)',
+                    border: `1px solid ${active ? `${color}40` : 'rgba(248,250,252,0.04)'}`,
+                    transform: active ? 'translateY(-2px)' : 'none', transition: 'all 0.2s',
                   }} onClick={() => {
-                    const heavenActive = Math.floor(values[i] / HEAVEN_VALUE);
-                    const targetActive = bi + 1;
-                    const newEarthVal = earthActive === targetActive ? targetActive - 1 : targetActive;
-                    handleChange(i, heavenActive * HEAVEN_VALUE + newEarthVal);
+                    const tgt = bi + 1;
+                    handleChange(i, ha * HEAVEN_VALUE + (ea === tgt ? tgt - 1 : tgt));
                   }} data-testid={`src-earth-${i}-${bi}`} />
                 );
               })}
@@ -106,197 +177,147 @@ function SuanpanSource({ onFrequencySet, color }) {
           </div>
         ))}
       </div>
-      <motion.button
-        className="w-full py-1.5 rounded-lg text-[9px] font-medium tracking-wider uppercase"
-        style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}
+      <motion.button className="w-full py-1.5 rounded-lg text-[8px] font-medium tracking-wider uppercase cursor-pointer"
+        style={{ background: `${color}12`, color, border: `1px solid ${color}20` }}
         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-        onClick={() => onFrequencySet(totalHz)}
-        data-testid="add-suanpan-track-btn"
-      >
+        onClick={() => onFrequencySet(totalHz)} data-testid="add-suanpan-track-btn">
         Add as Track ({totalHz.toFixed(1)} Hz)
       </motion.button>
     </div>
   );
 }
 
-/* ━━━ Single Track Row ━━━ */
-function TrackRow({ track, index, onUpdate, onRemove, isGhost }) {
+/* ━━━ Track Row ━━━ */
+function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick }) {
   const meta = TRACK_TYPE_META[track.type] || TRACK_TYPE_META.custom;
   const Icon = meta.icon;
 
   if (isGhost) {
     return (
-      <motion.div
-        className="flex items-center gap-2 px-3 py-2 rounded-lg mb-1 relative overflow-hidden"
-        style={{
-          background: 'rgba(248,250,252,0.01)',
-          border: '1px dashed rgba(248,250,252,0.06)',
-          opacity: 0.4,
-        }}
-        initial={{ opacity: 0 }} animate={{ opacity: 0.4 }}
-        data-testid={`ghost-track-${index}`}
-      >
-        <Ghost size={12} style={{ color: 'rgba(248,250,252,0.2)' }} />
-        <div className="flex-1">
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
-            {track.source_label || 'Locked Layer'}
-          </p>
-        </div>
-        <Lock size={10} style={{ color: 'rgba(248,250,252,0.15)' }} />
-      </motion.div>
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-1 cursor-pointer"
+        style={{ background: 'rgba(248,250,252,0.01)', border: '1px dashed rgba(248,250,252,0.05)', opacity: 0.35 }}
+        onClick={onGhostClick} data-testid={`ghost-track-${index}`}>
+        <Ghost size={11} style={{ color: 'rgba(248,250,252,0.15)' }} />
+        <p className="flex-1 text-[9px]" style={{ color: 'rgba(248,250,252,0.15)' }}>{track.source_label || 'Locked Layer'}</p>
+        <Lock size={9} style={{ color: 'rgba(248,250,252,0.1)' }} />
+      </div>
     );
   }
 
   return (
-    <motion.div
-      className="flex items-center gap-2 px-3 py-2 rounded-lg mb-1 relative group"
+    <motion.div className="flex items-center gap-2 px-2 py-1.5 rounded-lg mb-1 group"
       style={{
-        background: track.muted ? 'rgba(248,250,252,0.01)' : `${meta.color}06`,
-        border: `1px solid ${track.muted ? 'rgba(248,250,252,0.04)' : `${meta.color}15`}`,
+        background: track.muted ? 'rgba(248,250,252,0.01)' : `${meta.color}05`,
+        border: `1px solid ${track.muted ? 'rgba(248,250,252,0.03)' : `${meta.color}12`}`,
       }}
-      layout
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      data-testid={`track-row-${index}`}
-    >
-      {/* Track type icon */}
-      <div className="p-1 rounded" style={{ background: `${meta.color}12` }}>
-        <Icon size={11} style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : meta.color }} />
+      layout initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }}
+      data-testid={`track-row-${index}`}>
+
+      <GripVertical size={9} className="opacity-0 group-hover:opacity-30 transition-opacity cursor-grab" style={{ color: '#F8FAFC' }} />
+
+      <div className="p-1 rounded" style={{ background: `${meta.color}10` }}>
+        <Icon size={10} style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : meta.color }} />
       </div>
 
-      {/* Track label + info */}
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-medium truncate" style={{
-          color: track.muted ? 'rgba(248,250,252,0.25)' : 'rgba(248,250,252,0.7)',
-        }}>
+        <p className="text-[9px] font-medium truncate" style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.6)' }}>
           {track.source_label}
         </p>
-        {track.frequency && (
-          <p className="text-[7px] font-mono" style={{ color: `${meta.color}60` }}>
-            {track.frequency} Hz
-          </p>
-        )}
+        {track.frequency && <p className="text-[7px] font-mono" style={{ color: `${meta.color}50` }}>{track.frequency} Hz</p>}
+      </div>
+
+      {/* Waveform visualization bar */}
+      <div className="w-20 h-3 flex items-end gap-[1px] mx-1">
+        {Array.from({ length: 12 }).map((_, bi) => {
+          const h = track.muted ? 2 : Math.random() * 10 + 2;
+          return <motion.div key={bi} className="flex-1 rounded-sm"
+            style={{ background: track.muted ? 'rgba(248,250,252,0.05)' : `${meta.color}30`, height: h }}
+            animate={track.muted ? {} : { height: [h, h * 0.5, h] }}
+            transition={{ duration: 0.8 + bi * 0.1, repeat: Infinity }} />;
+        })}
       </div>
 
       {/* Volume bar */}
-      <div className="w-16 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
-        style={{ background: 'rgba(248,250,252,0.06)' }}
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const vol = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          onUpdate(index, { volume: vol });
-        }}
-        data-testid={`track-volume-${index}`}
-      >
-        <div className="absolute inset-y-0 left-0 rounded-full" style={{
-          width: `${(track.volume || 0.8) * 100}%`,
-          background: track.muted ? 'rgba(248,250,252,0.1)' : meta.color,
-        }} />
+      <div className="w-14 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
+        style={{ background: 'rgba(248,250,252,0.05)' }}
+        onClick={e => {
+          const r = e.currentTarget.getBoundingClientRect();
+          onUpdate(index, { volume: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) });
+        }} data-testid={`track-volume-${index}`}>
+        <div className="absolute inset-y-0 left-0 rounded-full"
+          style={{ width: `${(track.volume || 0.8) * 100}%`, background: track.muted ? 'rgba(248,250,252,0.08)' : meta.color }} />
       </div>
 
-      {/* Mute */}
-      <button className="p-0.5 rounded opacity-60 hover:opacity-100 transition-opacity"
-        onClick={() => onUpdate(index, { muted: !track.muted })}
-        data-testid={`track-mute-${index}`}
-      >
-        {track.muted
-          ? <VolumeX size={11} style={{ color: 'rgba(248,250,252,0.3)' }} />
-          : <Volume2 size={11} style={{ color: meta.color }} />
-        }
+      <button className="p-0.5 rounded" onClick={() => onUpdate(index, { muted: !track.muted })} data-testid={`track-mute-${index}`}>
+        {track.muted ? <VolumeX size={10} style={{ color: 'rgba(248,250,252,0.25)' }} /> : <Volume2 size={10} style={{ color: meta.color }} />}
       </button>
 
-      {/* Solo */}
-      <button className="text-[7px] font-bold px-1 py-0.5 rounded opacity-60 hover:opacity-100 transition-opacity"
-        style={{
-          color: track.solo ? '#EAB308' : 'rgba(248,250,252,0.25)',
-          background: track.solo ? 'rgba(234,179,8,0.12)' : 'transparent',
-        }}
-        onClick={() => onUpdate(index, { solo: !track.solo })}
-        data-testid={`track-solo-${index}`}
-      >
-        S
-      </button>
+      <button className="text-[7px] font-bold px-1 py-0.5 rounded" data-testid={`track-solo-${index}`}
+        style={{ color: track.solo ? '#EAB308' : 'rgba(248,250,252,0.2)', background: track.solo ? 'rgba(234,179,8,0.1)' : 'transparent' }}
+        onClick={() => onUpdate(index, { solo: !track.solo })}>S</button>
 
-      {/* Remove */}
-      <button className="p-0.5 rounded opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity"
-        onClick={() => onRemove(index)}
-        data-testid={`track-remove-${index}`}
-      >
-        <Trash2 size={10} style={{ color: '#EF4444' }} />
+      <button className="p-0.5 rounded opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity"
+        onClick={() => onRemove(index)} data-testid={`track-remove-${index}`}>
+        <Trash2 size={9} style={{ color: '#EF4444' }} />
       </button>
     </motion.div>
   );
 }
 
-/* ━━━ Speed Bridge Upsell Modal ━━━ */
+/* ━━━ Speed Bridge Modal (4 Tiers) ━━━ */
 function SpeedBridgeModal({ currentTier, onUpgrade, onClose }) {
   const tiers = [
-    { key: 'discovery', name: 'Discovery', price: 'Free', color: '#94A3B8', features: ['3 Static Tracks', '5 AI Credits/mo', 'Basic Tones', 'Standard Stereo'] },
-    { key: 'resonance', name: 'Resonance', price: '$14.99/mo', color: '#C084FC', features: ['10 Tracks + Keyframes', '100 AI Credits/mo', '3,000+ Sound Effects', 'HD Lossless'] },
-    { key: 'sovereign', name: 'Sovereign', price: '$49.99/mo', color: '#EAB308', features: ['Unlimited + Nested', '200+ Credits + NPU', 'Full Phonic Library', 'Ultra-Lossless Spatial'] },
+    { key: 'discovery', name: 'Discovery', price: 'Free', color: '#94A3B8', cap: '3 tracks', features: ['Basic Tones', '44.1kHz Stereo', '5 AI Credits/mo', '15-30s Assembly'] },
+    { key: 'player', name: 'Player', price: '$9.99/mo', color: '#2DD4BF', cap: '8 tracks', features: ['Extended Library', '48kHz Hi-Fi', '40 AI Credits/mo', '5-8s Loading'] },
+    { key: 'ultra_player', name: 'Ultra Player', price: '$24.99/mo', color: '#C084FC', cap: '20 tracks', features: ['3,000+ Effects', '88.2kHz Lossless', '150 AI Credits/mo', '2-3s Stabilization'] },
+    { key: 'sovereign', name: 'Sovereign', price: '$49.99/mo', color: '#EAB308', cap: 'Unlimited', features: ['Full Phonic', '96kHz Spatial', '250+ Credits + NPU', 'Instant'] },
   ];
-  const tierOrder = ['discovery', 'resonance', 'sovereign'];
+  const tierOrder = ['discovery', 'player', 'ultra_player', 'sovereign'];
   const currentIdx = tierOrder.indexOf(currentTier);
 
   return (
-    <motion.div className="fixed inset-0 z-[10001] flex items-center justify-center"
+    <motion.div className="fixed inset-0 z-[10002] flex items-center justify-center"
       style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      data-testid="speed-bridge-modal"
-    >
-      <motion.div className="w-full max-w-lg mx-4 rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(10,10,18,0.95)', border: '1px solid rgba(248,250,252,0.08)' }}
-        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
-      >
-        {/* Header */}
-        <div className="p-5 text-center border-b" style={{ borderColor: 'rgba(248,250,252,0.06)' }}>
-          <p className="text-[10px] tracking-[0.2em] uppercase mb-1" style={{ color: '#EAB308' }}>
-            Speed Bridge
-          </p>
-          <p className="text-lg font-light" style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
+      data-testid="speed-bridge-modal">
+      <motion.div className="w-full max-w-2xl mx-4 rounded-2xl overflow-hidden"
+        style={{ background: 'rgba(10,10,18,0.97)', border: '1px solid rgba(248,250,252,0.06)' }}
+        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}>
+
+        <div className="p-5 text-center border-b" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-1" style={{ color: '#EAB308' }}>Speed Bridge</p>
+          <p className="text-base font-light" style={{ color: 'rgba(248,250,252,0.5)', fontFamily: 'Cormorant Garamond, serif' }}>
             Your composition has reached Divine Complexity
           </p>
-          <p className="text-[9px] mt-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
-            Upgrade to unlock more layers, faster rendering, and unlimited architecture
+          <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            Upgrade for more layers, faster rendering, and expanded libraries
           </p>
         </div>
 
-        {/* Tier comparison */}
-        <div className="p-4 grid grid-cols-3 gap-2">
+        <div className="p-4 grid grid-cols-4 gap-2">
           {tiers.map((t, i) => {
             const isCurrent = t.key === currentTier;
             const isUpgrade = i > currentIdx;
             return (
-              <div key={t.key} className="rounded-xl p-3 text-center" style={{
-                background: isCurrent ? `${t.color}08` : 'rgba(248,250,252,0.02)',
-                border: `1px solid ${isCurrent ? `${t.color}30` : 'rgba(248,250,252,0.05)'}`,
-              }} data-testid={`tier-card-${t.key}`}>
-                <p className="text-[10px] font-medium tracking-wider" style={{ color: t.color }}>
-                  {t.name}
-                </p>
-                <p className="text-[12px] font-light mt-0.5" style={{ color: 'rgba(248,250,252,0.5)' }}>
-                  {t.price}
-                </p>
-                <div className="mt-2 space-y-1">
-                  {t.features.map((f, fi) => (
-                    <p key={fi} className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{f}</p>
-                  ))}
+              <div key={t.key} className="rounded-xl p-3 text-center flex flex-col"
+                style={{ background: isCurrent ? `${t.color}06` : 'rgba(248,250,252,0.015)', border: `1px solid ${isCurrent ? `${t.color}25` : 'rgba(248,250,252,0.04)'}` }}
+                data-testid={`tier-card-${t.key}`}>
+                <p className="text-[10px] font-medium tracking-wider" style={{ color: t.color }}>{t.name}</p>
+                <p className="text-[11px] font-light mt-0.5" style={{ color: 'rgba(248,250,252,0.4)' }}>{t.price}</p>
+                <p className="text-[8px] font-mono mt-1" style={{ color: `${t.color}80` }}>{t.cap}</p>
+                <div className="mt-2 space-y-0.5 flex-1">
+                  {t.features.map((f, fi) => <p key={fi} className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{f}</p>)}
                 </div>
                 {isCurrent && (
-                  <p className="text-[7px] mt-2 px-2 py-0.5 rounded-full inline-block"
-                    style={{ background: `${t.color}15`, color: t.color }}>
-                    Current
-                  </p>
+                  <p className="text-[7px] mt-2 px-2 py-0.5 rounded-full inline-block mx-auto"
+                    style={{ background: `${t.color}12`, color: t.color }}>Current</p>
                 )}
                 {isUpgrade && (
-                  <motion.button className="mt-2 px-3 py-1 rounded-full text-[8px] font-medium cursor-pointer"
-                    style={{ background: `${t.color}20`, color: t.color, border: `1px solid ${t.color}30` }}
+                  <motion.button className="mt-2 px-3 py-1 rounded-full text-[8px] font-medium cursor-pointer mx-auto"
+                    style={{ background: `${t.color}15`, color: t.color, border: `1px solid ${t.color}25` }}
                     whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                    onClick={() => onUpgrade(t.key)}
-                    data-testid={`upgrade-to-${t.key}`}
-                  >
-                    Upgrade
+                    onClick={() => onUpgrade(t.key)} data-testid={`upgrade-to-${t.key}`}>
+                    Upgrade <ArrowUpRight size={8} className="inline ml-0.5" />
                   </motion.button>
                 )}
               </div>
@@ -304,16 +325,84 @@ function SpeedBridgeModal({ currentTier, onUpgrade, onClose }) {
           })}
         </div>
 
-        {/* Close */}
-        <div className="p-3 text-center border-t" style={{ borderColor: 'rgba(248,250,252,0.06)' }}>
-          <button className="text-[9px] px-4 py-1.5 rounded-full"
-            style={{ color: 'rgba(248,250,252,0.3)', background: 'rgba(248,250,252,0.03)' }}
-            onClick={onClose} data-testid="close-speed-bridge"
-          >
-            Continue with {currentTier.charAt(0).toUpperCase() + currentTier.slice(1)}
+        <div className="p-3 text-center border-t" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>
+          <button className="text-[8px] px-4 py-1.5 rounded-full cursor-pointer"
+            style={{ color: 'rgba(248,250,252,0.25)', background: 'rgba(248,250,252,0.02)' }}
+            onClick={onClose} data-testid="close-speed-bridge">
+            Continue with {TIER_DISPLAY[currentTier] || 'Current'}
           </button>
         </div>
       </motion.div>
+    </motion.div>
+  );
+}
+
+/* ━━━ Bonus Pack Card ━━━ */
+function BonusPackCard({ pack, onPurchase, purchasing }) {
+  const tierColor = SUB_COLORS[pack.tier_required] || '#94A3B8';
+  return (
+    <motion.div className="rounded-xl p-3 mb-2 relative overflow-hidden"
+      style={{
+        background: pack.owned ? `${pack.color}06` : 'rgba(248,250,252,0.015)',
+        border: `1px solid ${pack.owned ? `${pack.color}20` : pack.tier_locked ? 'rgba(248,250,252,0.03)' : 'rgba(248,250,252,0.06)'}`,
+        opacity: pack.tier_locked ? 0.5 : 1,
+      }}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      data-testid={`bonus-pack-${pack.id}`}>
+
+      {pack.owned && (
+        <motion.div className="absolute inset-0 rounded-xl pointer-events-none"
+          style={{ boxShadow: `inset 0 0 16px ${pack.color}10` }}
+          animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ duration: 3, repeat: Infinity }} />
+      )}
+
+      <div className="flex items-start gap-2 relative z-10">
+        <div className="p-1.5 rounded-lg" style={{ background: `${pack.color}12` }}>
+          <Package size={12} style={{ color: pack.color }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>{pack.name}</p>
+          <p className="text-[7px] mt-0.5 line-clamp-2" style={{ color: 'rgba(248,250,252,0.3)' }}>{pack.description}</p>
+          <div className="flex items-center gap-2 mt-1.5">
+            <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase tracking-wider"
+              style={{ background: `${tierColor}12`, color: tierColor, border: `1px solid ${tierColor}20` }}>
+              {(pack.tier_required || '').replace('_', ' ')}
+            </span>
+            <span className="text-[7px] font-mono" style={{ color: '#22C55E' }}>
+              {pack.bonus_wrap?.label}
+            </span>
+            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              {pack.tracks_included} tracks
+            </span>
+          </div>
+        </div>
+        <div className="flex-shrink-0">
+          {pack.tier_locked ? (
+            <div className="p-1.5 rounded-lg" style={{ background: 'rgba(248,250,252,0.02)' }}>
+              <Crown size={11} style={{ color: tierColor }} />
+            </div>
+          ) : pack.owned ? (
+            <p className="text-[7px] px-2 py-0.5 rounded-full" style={{ background: `${pack.color}12`, color: pack.color }}>Owned</p>
+          ) : (
+            <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer"
+              style={{
+                background: pack.can_afford ? `${pack.color}10` : 'rgba(248,250,252,0.02)',
+                border: `1px solid ${pack.can_afford ? `${pack.color}20` : 'rgba(248,250,252,0.04)'}`,
+                opacity: pack.can_afford ? 1 : 0.5,
+              }}
+              whileHover={pack.can_afford ? { scale: 1.05 } : {}} whileTap={pack.can_afford ? { scale: 0.95 } : {}}
+              onClick={() => pack.can_afford && onPurchase(pack.id)}
+              disabled={purchasing || !pack.can_afford}
+              data-testid={`buy-pack-${pack.id}`}>
+              {purchasing ? <Loader2 size={9} className="animate-spin" style={{ color: pack.color }} />
+                : <ShoppingCart size={9} style={{ color: pack.can_afford ? pack.color : 'rgba(248,250,252,0.2)' }} />}
+              <span className="text-[8px] font-mono" style={{ color: pack.can_afford ? pack.color : 'rgba(248,250,252,0.2)' }}>
+                {pack.price_credits}c
+              </span>
+            </motion.button>
+          )}
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -324,26 +413,27 @@ export default function SuanpanMixer() {
   const { authHeaders } = useAuth();
   const { playConfirmation, isMuted } = useSensory();
 
-  // Subscription state
   const [subTier, setSubTier] = useState('discovery');
   const [tierConfig, setTierConfig] = useState(null);
   const [aiCredits, setAiCredits] = useState(0);
+  const [speedBonus, setSpeedBonus] = useState(0);
 
-  // Track state
   const [tracks, setTracks] = useState([]);
   const [projectName, setProjectName] = useState('Untitled Session');
   const [projects, setProjects] = useState([]);
   const [saving, setSaving] = useState(false);
 
-  // UI state
   const [suanpanOpen, setSuanpanOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [packsOpen, setPacksOpen] = useState(false);
   const [sources, setSources] = useState([]);
+  const [bonusPacks, setBonusPacks] = useState([]);
+  const [purchasingPack, setPurchasingPack] = useState(null);
   const [showSpeedBridge, setShowSpeedBridge] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
+  const [showAssembly, setShowAssembly] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Audio playback
   const [isPlaying, setIsPlaying] = useState(false);
   const ctxRef = useRef(null);
   const nodesRef = useRef([]);
@@ -351,137 +441,164 @@ export default function SuanpanMixer() {
   const layerCap = tierConfig?.layer_cap || 3;
   const atCap = layerCap > 0 && tracks.length >= layerCap;
   const tierColor = SUB_COLORS[subTier] || '#94A3B8';
+  const matDelay = tierConfig?.materialization_delay || 20;
 
-  // Ghost tracks — show locked sources as translucent layers
-  const ghostTracks = sources
-    .filter(s => s.locked)
-    .slice(0, 3)
-    .map((s, i) => ({
-      type: s.type,
-      source_label: s.label,
-      volume: 0.5,
-      locked: true,
-      frequency: s.frequency,
-    }));
+  const ghostTracks = sources.filter(s => s.locked).slice(0, 3).map(s => ({
+    type: s.type, source_label: s.label, volume: 0.5, locked: true, frequency: s.frequency,
+  }));
 
-  // Load subscription + sources
+  // Load data
   useEffect(() => {
     const load = async () => {
       try {
-        const [subRes, srcRes, projRes] = await Promise.all([
+        const [subRes, srcRes, projRes, packRes] = await Promise.all([
           axios.get(`${API}/mixer/subscription`, { headers: authHeaders }),
           axios.get(`${API}/mixer/sources`, { headers: authHeaders }),
           axios.get(`${API}/mixer/projects`, { headers: authHeaders }),
+          axios.get(`${API}/mixer/bonus-packs`, { headers: authHeaders }),
         ]);
         setSubTier(subRes.data.tier);
         setTierConfig(subRes.data.tier_config);
         setAiCredits(subRes.data.ai_credits_remaining);
+        setSpeedBonus(subRes.data.speed_bonus_pct);
         setSources(srcRes.data.sources || []);
         setProjects(projRes.data.projects || []);
+        setBonusPacks(packRes.data.packs || []);
       } catch {} finally { setLoading(false); }
     };
     load();
   }, [authHeaders]);
 
-  // Add track
+  const reloadAll = useCallback(async () => {
+    try {
+      const [subRes, srcRes, projRes, packRes] = await Promise.all([
+        axios.get(`${API}/mixer/subscription`, { headers: authHeaders }),
+        axios.get(`${API}/mixer/sources`, { headers: authHeaders }),
+        axios.get(`${API}/mixer/projects`, { headers: authHeaders }),
+        axios.get(`${API}/mixer/bonus-packs`, { headers: authHeaders }),
+      ]);
+      setSubTier(subRes.data.tier);
+      setTierConfig(subRes.data.tier_config);
+      setAiCredits(subRes.data.ai_credits_remaining);
+      setSpeedBonus(subRes.data.speed_bonus_pct);
+      setSources(srcRes.data.sources || []);
+      setProjects(projRes.data.projects || []);
+      setBonusPacks(packRes.data.packs || []);
+    } catch {}
+  }, [authHeaders]);
+
   const addTrack = useCallback((source) => {
-    if (source.locked) {
-      setShowSpeedBridge(true);
+    if (source.locked) { setShowSpeedBridge(true); return; }
+    if (atCap) { setShowSpeedBridge(true); return; }
+    // Trigger Sacred Assembly for Discovery tier
+    if (matDelay > 10 && source.tier !== 'discovery') {
+      setShowAssembly(true);
+      setTimeout(() => {
+        setTracks(prev => [...prev, {
+          type: source.type || 'custom', source_id: source.id || '',
+          source_label: source.label || 'New Track', volume: 0.8,
+          muted: false, solo: false, start_time: 0, duration: 60,
+          frequency: source.frequency || null, color: source.color || '#94A3B8', locked: false,
+        }]);
+        setShowAssembly(false);
+        if (!isMuted) playConfirmation(660, 'medium');
+      }, matDelay * 1000);
       return;
     }
-    if (atCap) {
-      setShowSpeedBridge(true);
-      return;
-    }
-    const newTrack = {
-      type: source.type || 'custom',
-      source_id: source.id || '',
-      source_label: source.label || source.source_label || 'New Track',
-      volume: 0.8,
-      muted: false,
-      solo: false,
-      start_time: 0,
-      duration: 60,
-      frequency: source.frequency || null,
-      color: source.color || '#94A3B8',
-      locked: false,
-    };
-    setTracks(prev => [...prev, newTrack]);
+    setTracks(prev => [...prev, {
+      type: source.type || 'custom', source_id: source.id || '',
+      source_label: source.label || 'New Track', volume: 0.8,
+      muted: false, solo: false, start_time: 0, duration: 60,
+      frequency: source.frequency || null, color: source.color || '#94A3B8', locked: false,
+    }]);
     if (!isMuted) playConfirmation(660, 'medium');
     setSourcesOpen(false);
-  }, [atCap, isMuted, playConfirmation]);
+  }, [atCap, isMuted, playConfirmation, matDelay]);
 
-  // Add suanpan frequency as track
   const addSuanpanTrack = useCallback((hz) => {
     if (atCap) { setShowSpeedBridge(true); return; }
     setTracks(prev => [...prev, {
-      type: 'suanpan',
-      source_id: `suanpan-${hz}`,
-      source_label: `Suanpan ${hz.toFixed(1)} Hz`,
-      volume: 0.8,
-      muted: false,
-      solo: false,
-      start_time: 0,
-      duration: 60,
-      frequency: hz,
-      color: '#EAB308',
-      locked: false,
+      type: 'suanpan', source_id: `suanpan-${hz}`, source_label: `Suanpan ${hz.toFixed(1)} Hz`,
+      volume: 0.8, muted: false, solo: false, start_time: 0, duration: 60,
+      frequency: hz, color: '#EAB308', locked: false,
     }]);
     if (!isMuted) playConfirmation(hz > 500 ? 880 : 440, 'medium');
     setSuanpanOpen(false);
   }, [atCap, isMuted, playConfirmation]);
 
-  // Update track
+  const addBonusPackTracks = useCallback(async (packId) => {
+    try {
+      const owned = await axios.get(`${API}/mixer/bonus-packs/owned`, { headers: authHeaders });
+      const pack = (owned.data.owned_packs || []).find(p => p.pack_id === packId);
+      if (!pack) return;
+      const newTracks = (pack.tracks || []).map(t => ({
+        type: t.type || 'bonus_pack', source_id: packId,
+        source_label: t.source_label || 'Pack Track', volume: 0.8,
+        muted: false, solo: false, start_time: 0, duration: 60,
+        frequency: t.frequency || null, color: t.color || '#F472B6', locked: false,
+      }));
+      const remaining = layerCap > 0 ? layerCap - tracks.length : 50;
+      setTracks(prev => [...prev, ...newTracks.slice(0, remaining)]);
+      toast.success(`Added ${Math.min(newTracks.length, remaining)} tracks from pack`);
+    } catch {}
+  }, [authHeaders, tracks.length, layerCap]);
+
+  const purchasePack = useCallback(async (packId) => {
+    setPurchasingPack(packId);
+    try {
+      const res = await axios.post(`${API}/mixer/bonus-packs/purchase`, { packId }, { headers: authHeaders });
+      toast.success(`${res.data.purchased} — ${res.data.bonus_activated}`);
+      if (!isMuted) playConfirmation(1046.5, 'high');
+      reloadAll();
+      addBonusPackTracks(packId);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Purchase failed');
+    } finally { setPurchasingPack(null); }
+  }, [authHeaders, reloadAll, isMuted, playConfirmation, addBonusPackTracks]);
+
   const updateTrack = useCallback((index, updates) => {
     setTracks(prev => prev.map((t, i) => i === index ? { ...t, ...updates } : t));
   }, []);
 
-  // Remove track
   const removeTrack = useCallback((index) => {
     setTracks(prev => prev.filter((_, i) => i !== index));
   }, []);
 
-  // Save project
   const saveProject = useCallback(async () => {
     setSaving(true);
     try {
-      await axios.post(`${API}/mixer/projects`, {
-        name: projectName,
-        tracks,
-      }, { headers: authHeaders });
-      toast.success(`Project "${projectName}" saved`);
-      const projRes = await axios.get(`${API}/mixer/projects`, { headers: authHeaders });
-      setProjects(projRes.data.projects || []);
+      await axios.post(`${API}/mixer/projects`, { name: projectName, tracks }, { headers: authHeaders });
+      toast.success(`"${projectName}" saved`);
+      const r = await axios.get(`${API}/mixer/projects`, { headers: authHeaders });
+      setProjects(r.data.projects || []);
     } catch (e) {
-      const detail = e.response?.data?.detail || 'Save failed';
-      if (detail.includes('Layer cap')) setShowSpeedBridge(true);
-      toast.error(detail);
+      const d = e.response?.data?.detail || 'Save failed';
+      if (d.includes('Layer cap')) setShowSpeedBridge(true);
+      toast.error(d);
     } finally { setSaving(false); }
   }, [projectName, tracks, authHeaders]);
 
-  // Load project
-  const loadProject = useCallback(async (projectId) => {
+  const loadProject = useCallback(async (pid) => {
     try {
-      const res = await axios.get(`${API}/mixer/projects/${projectId}`, { headers: authHeaders });
-      setTracks(res.data.tracks || []);
-      setProjectName(res.data.name || 'Loaded Session');
+      const r = await axios.get(`${API}/mixer/projects/${pid}`, { headers: authHeaders });
+      setTracks(r.data.tracks || []);
+      setProjectName(r.data.name || 'Loaded Session');
       setShowProjects(false);
-      toast.success(`Loaded: ${res.data.name}`);
-    } catch { toast.error('Failed to load project'); }
+      toast.success(`Loaded: ${r.data.name}`);
+    } catch { toast.error('Load failed'); }
   }, [authHeaders]);
 
-  // Upgrade tier
   const handleUpgrade = useCallback(async (tier) => {
     try {
-      const res = await axios.post(`${API}/mixer/subscription/upgrade`, { tier }, { headers: authHeaders });
-      setSubTier(res.data.tier);
-      setTierConfig(res.data.tier_config);
+      const r = await axios.post(`${API}/mixer/subscription/upgrade`, { tier }, { headers: authHeaders });
+      setSubTier(r.data.tier);
+      setTierConfig(r.data.tier_config);
       setShowSpeedBridge(false);
-      toast.success(res.data.message);
+      toast.success(r.data.message);
+      reloadAll();
     } catch (e) { toast.error(e.response?.data?.detail || 'Upgrade failed'); }
-  }, [authHeaders]);
+  }, [authHeaders, reloadAll]);
 
-  // Play all tracks
   const togglePlayAll = useCallback(() => {
     if (isPlaying) {
       nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
@@ -494,11 +611,8 @@ export default function SuanpanMixer() {
       if (!ctxRef.current) ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
       const ctx = ctxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
-
-      const activeTracks = tracks.filter(t => !t.muted && t.frequency);
       const hasSolo = tracks.some(t => t.solo);
-      const playable = hasSolo ? activeTracks.filter(t => t.solo) : activeTracks;
-
+      const playable = tracks.filter(t => !t.muted && t.frequency && (!hasSolo || t.solo));
       playable.forEach(t => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -515,180 +629,153 @@ export default function SuanpanMixer() {
     } catch {}
   }, [isPlaying, tracks]);
 
-  useEffect(() => {
-    return () => { nodesRef.current.forEach(n => { try { n.stop(); } catch {} }); };
-  }, []);
+  useEffect(() => { return () => { nodesRef.current.forEach(n => { try { n.stop(); } catch {} }); }; }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#06060e' }}>
-        <Loader2 size={24} className="animate-spin" style={{ color: 'rgba(248,250,252,0.2)' }} />
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center" style={{ background: '#06060e' }}>
+      <Loader2 size={24} className="animate-spin" style={{ color: 'rgba(248,250,252,0.15)' }} />
+    </div>;
   }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#06060e' }} data-testid="divine-director-page">
-      {/* ━━━ HEADER BAR ━━━ */}
-      <div className="flex items-center justify-between px-4 py-3 border-b z-[10000]"
-        style={{ borderColor: 'rgba(248,250,252,0.06)', background: 'rgba(6,6,14,0.95)', backdropFilter: 'blur(12px)' }}>
+
+      {/* ━━━ HEADER ━━━ */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b z-[10000]"
+        style={{ borderColor: 'rgba(248,250,252,0.05)', background: 'rgba(6,6,14,0.96)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/hub')} className="p-1.5 rounded-lg"
-            style={{ background: 'rgba(248,250,252,0.04)' }}
-            data-testid="director-back-btn">
-            <ArrowLeft size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            style={{ background: 'rgba(248,250,252,0.03)' }} data-testid="director-back-btn">
+            <ArrowLeft size={13} style={{ color: 'rgba(248,250,252,0.35)' }} />
           </button>
           <div>
             <div className="flex items-center gap-1.5">
               <h1 className="text-sm font-light tracking-[0.15em] uppercase"
-                style={{ color: 'rgba(248,250,252,0.4)', fontFamily: 'Cormorant Garamond, serif' }}>
+                style={{ color: 'rgba(248,250,252,0.35)', fontFamily: 'Cormorant Garamond, serif' }}>
                 Divine Director
               </h1>
               <NanoGuide guideId="divine-director" position="top-right" />
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[7px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-medium"
-                style={{ background: `${tierColor}15`, color: tierColor, border: `1px solid ${tierColor}25` }}>
-                {subTier}
+              <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-medium"
+                style={{ background: `${tierColor}12`, color: tierColor, border: `1px solid ${tierColor}20` }}>
+                {TIER_DISPLAY[subTier] || subTier}
               </span>
               <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
-                {aiCredits} AI credits
+                {aiCredits} AI &middot; {speedBonus > 0 ? `+${speedBonus}% speed` : ''}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Project controls */}
-        <div className="flex items-center gap-2">
-          <input type="text" value={projectName}
-            onChange={e => setProjectName(e.target.value)}
-            className="text-[10px] px-2 py-1 rounded-lg w-36 text-right"
-            style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }}
-            data-testid="project-name-input"
-          />
-          <motion.button className="p-1.5 rounded-lg cursor-pointer"
-            style={{ background: 'rgba(248,250,252,0.04)' }}
+        <div className="flex items-center gap-1.5">
+          <input type="text" value={projectName} onChange={e => setProjectName(e.target.value)}
+            className="text-[9px] px-2 py-1 rounded-lg w-32 text-right"
+            style={{ background: 'rgba(248,250,252,0.025)', border: '1px solid rgba(248,250,252,0.05)', color: '#F8FAFC', outline: 'none' }}
+            data-testid="project-name-input" />
+          <motion.button className="p-1.5 rounded-lg cursor-pointer" style={{ background: 'rgba(248,250,252,0.03)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-            onClick={() => setShowProjects(!showProjects)}
-            data-testid="open-projects-btn"
-          >
-            <FolderOpen size={13} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            onClick={() => setShowProjects(!showProjects)} data-testid="open-projects-btn">
+            <FolderOpen size={12} style={{ color: 'rgba(248,250,252,0.35)' }} />
           </motion.button>
           <motion.button className="p-1.5 rounded-lg cursor-pointer"
-            style={{ background: saving ? `${tierColor}15` : 'rgba(248,250,252,0.04)' }}
+            style={{ background: saving ? `${tierColor}12` : 'rgba(248,250,252,0.03)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-            onClick={saveProject} disabled={saving}
-            data-testid="save-project-btn"
-          >
-            {saving ? <Loader2 size={13} className="animate-spin" style={{ color: tierColor }} />
-              : <Save size={13} style={{ color: 'rgba(248,250,252,0.4)' }} />}
+            onClick={saveProject} disabled={saving} data-testid="save-project-btn">
+            {saving ? <Loader2 size={12} className="animate-spin" style={{ color: tierColor }} />
+              : <Save size={12} style={{ color: 'rgba(248,250,252,0.35)' }} />}
           </motion.button>
-          <motion.button className="p-1.5 rounded-lg cursor-pointer"
-            style={{ background: showSpeedBridge ? `${tierColor}15` : 'rgba(248,250,252,0.04)' }}
+          <motion.button className="p-1.5 rounded-lg cursor-pointer" style={{ background: 'rgba(248,250,252,0.03)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-            onClick={() => setShowSpeedBridge(true)}
-            data-testid="tier-info-btn"
-          >
-            <Crown size={13} style={{ color: tierColor }} />
+            onClick={() => setShowSpeedBridge(true)} data-testid="tier-info-btn">
+            <Crown size={12} style={{ color: tierColor }} />
           </motion.button>
         </div>
       </div>
 
-      {/* ━━━ MAIN CONTENT ━━━ */}
+      {/* ━━━ MAIN ━━━ */}
       <div className="flex-1 flex overflow-hidden">
-        {/* ━━━ TRACK STACK (left panel) ━━━ */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Transport bar */}
-          <div className="flex items-center gap-3 px-4 py-2 border-b"
-            style={{ borderColor: 'rgba(248,250,252,0.04)' }}>
-            <motion.button className="p-2 rounded-lg cursor-pointer"
+
+          {/* Transport */}
+          <div className="flex items-center gap-2 px-4 py-2 border-b" style={{ borderColor: 'rgba(248,250,252,0.03)' }}>
+            <motion.button className="p-1.5 rounded-lg cursor-pointer"
               style={{
-                background: isPlaying ? 'rgba(239,68,68,0.12)' : `${tierColor}12`,
-                border: `1px solid ${isPlaying ? 'rgba(239,68,68,0.25)' : `${tierColor}20`}`,
+                background: isPlaying ? 'rgba(239,68,68,0.1)' : `${tierColor}08`,
+                border: `1px solid ${isPlaying ? 'rgba(239,68,68,0.2)' : `${tierColor}15`}`,
               }}
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              onClick={togglePlayAll}
-              data-testid="play-all-btn"
-            >
-              {isPlaying
-                ? <Square size={12} style={{ color: '#EF4444' }} />
-                : <Play size={12} style={{ color: tierColor }} />}
+              onClick={togglePlayAll} data-testid="play-all-btn">
+              {isPlaying ? <Square size={11} style={{ color: '#EF4444' }} /> : <Play size={11} style={{ color: tierColor }} />}
             </motion.button>
+
             <div className="flex-1 flex items-center gap-2">
-              <Layers size={11} style={{ color: 'rgba(248,250,252,0.2)' }} />
-              <p className="text-[9px] font-mono" style={{ color: 'rgba(248,250,252,0.3)' }}>
-                {tracks.length}{layerCap > 0 ? `/${layerCap}` : ''} tracks
+              <Layers size={10} style={{ color: 'rgba(248,250,252,0.15)' }} />
+              <p className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                {tracks.length}{layerCap > 0 ? `/${layerCap}` : ''} layers
               </p>
-              {atCap && (
-                <span className="text-[7px] px-1.5 py-0.5 rounded-full"
-                  style={{ background: 'rgba(239,68,68,0.12)', color: '#EF4444' }}>
-                  LAYER CAP
-                </span>
-              )}
+              {atCap && <span className="text-[6px] px-1.5 py-0.5 rounded-full"
+                style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>CAP</span>}
+              {speedBonus > 0 && <span className="text-[6px] px-1.5 py-0.5 rounded-full"
+                style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}>+{speedBonus}%</span>}
             </div>
-            {/* Add track buttons */}
-            <div className="flex items-center gap-1.5">
-              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[8px]"
-                style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                onClick={() => setSourcesOpen(!sourcesOpen)}
-                data-testid="add-source-btn"
-              >
-                <Plus size={10} /> Source
+
+            <div className="flex items-center gap-1">
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.35)' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setSourcesOpen(!sourcesOpen)} data-testid="add-source-btn">
+                <Plus size={9} /> Sources
               </motion.button>
-              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[8px]"
-                style={{ background: `${TRACK_TYPE_META.suanpan.color}08`, border: `1px solid ${TRACK_TYPE_META.suanpan.color}15`, color: TRACK_TYPE_META.suanpan.color }}
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                onClick={() => setSuanpanOpen(!suanpanOpen)}
-                data-testid="add-suanpan-btn"
-              >
-                <Sliders size={10} /> Suanpan
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.1)', color: '#EAB308' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setSuanpanOpen(!suanpanOpen)} data-testid="add-suanpan-btn">
+                <Sliders size={9} /> Suanpan
+              </motion.button>
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(244,114,182,0.06)', border: '1px solid rgba(244,114,182,0.1)', color: '#F472B6' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setPacksOpen(!packsOpen)} data-testid="open-packs-btn">
+                <Package size={9} /> Packs
               </motion.button>
             </div>
           </div>
 
-          {/* Suanpan collapsible panel */}
+          {/* Collapsible panels */}
           <AnimatePresence>
             {suanpanOpen && (
               <motion.div className="border-b overflow-hidden"
-                style={{ borderColor: 'rgba(248,250,252,0.04)', background: 'rgba(234,179,8,0.02)' }}
-                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-              >
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(234,179,8,0.015)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
                 <SuanpanSource onFrequencySet={addSuanpanTrack} color="#EAB308" />
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Source library dropdown */}
           <AnimatePresence>
             {sourcesOpen && (
               <motion.div className="border-b overflow-hidden"
-                style={{ borderColor: 'rgba(248,250,252,0.04)', background: 'rgba(248,250,252,0.01)' }}
-                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-              >
-                <div className="p-3 max-h-48 overflow-y-auto">
-                  <p className="text-[8px] tracking-wider uppercase mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
-                    Track Sources
-                  </p>
-                  <div className="grid grid-cols-2 gap-1">
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(248,250,252,0.008)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <div className="p-3 max-h-44 overflow-y-auto">
+                  <p className="text-[7px] tracking-wider uppercase mb-2" style={{ color: 'rgba(248,250,252,0.15)' }}>Track Sources</p>
+                  <div className="grid grid-cols-3 gap-1">
                     {sources.map(s => {
-                      const meta = TRACK_TYPE_META[s.type] || TRACK_TYPE_META.custom;
+                      const m = TRACK_TYPE_META[s.type] || TRACK_TYPE_META.custom;
                       return (
                         <motion.button key={s.id}
-                          className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-left cursor-pointer"
+                          className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-left cursor-pointer"
                           style={{
-                            background: s.locked ? 'rgba(248,250,252,0.01)' : `${meta.color}06`,
-                            border: `1px solid ${s.locked ? 'rgba(248,250,252,0.04)' : `${meta.color}12`}`,
-                            opacity: s.locked ? 0.5 : 1,
+                            background: s.locked ? 'rgba(248,250,252,0.008)' : `${m.color}05`,
+                            border: `1px solid ${s.locked ? 'rgba(248,250,252,0.03)' : `${m.color}10`}`,
+                            opacity: s.locked ? 0.45 : 1,
                           }}
-                          whileHover={s.locked ? {} : { scale: 1.02 }}
-                          whileTap={s.locked ? {} : { scale: 0.98 }}
-                          onClick={() => addTrack(s)}
-                          data-testid={`source-${s.id}`}
-                        >
-                          {s.locked ? <Lock size={9} style={{ color: 'rgba(248,250,252,0.2)' }} />
-                            : <meta.icon size={9} style={{ color: meta.color }} />}
-                          <span className="text-[8px] truncate" style={{ color: s.locked ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.5)' }}>
+                          whileHover={s.locked ? {} : { scale: 1.02 }} whileTap={s.locked ? {} : { scale: 0.98 }}
+                          onClick={() => addTrack(s)} data-testid={`source-${s.id}`}>
+                          {s.locked ? <Lock size={8} style={{ color: 'rgba(248,250,252,0.15)' }} />
+                            : <m.icon size={8} style={{ color: m.color }} />}
+                          <span className="text-[7px] truncate" style={{ color: s.locked ? 'rgba(248,250,252,0.15)' : 'rgba(248,250,252,0.45)' }}>
                             {s.label}
                           </span>
                         </motion.button>
@@ -700,57 +787,77 @@ export default function SuanpanMixer() {
             )}
           </AnimatePresence>
 
+          <AnimatePresence>
+            {packsOpen && (
+              <motion.div className="border-b overflow-hidden"
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(244,114,182,0.01)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <div className="p-3 max-h-60 overflow-y-auto">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[7px] tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                      Bonus Wrapped Packs
+                    </p>
+                    <p className="text-[7px] font-mono" style={{ color: '#F472B6' }}>
+                      Purchases grant permanent speed bonuses
+                    </p>
+                  </div>
+                  {bonusPacks.map(p => (
+                    <BonusPackCard key={p.id} pack={p}
+                      onPurchase={purchasePack}
+                      purchasing={purchasingPack === p.id} />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Track list */}
-          <div className="flex-1 overflow-y-auto px-4 py-3">
+          <div className="flex-1 overflow-y-auto px-4 py-2">
             <AnimatePresence>
-              {tracks.map((track, i) => (
-                <TrackRow key={`track-${i}-${track.source_label}`}
-                  track={track} index={i}
-                  onUpdate={updateTrack} onRemove={removeTrack}
-                  isGhost={false}
-                />
+              {tracks.map((t, i) => (
+                <TrackRow key={`t-${i}-${t.source_label}`} track={t} index={i}
+                  onUpdate={updateTrack} onRemove={removeTrack} isGhost={false} />
               ))}
             </AnimatePresence>
 
-            {/* Ghost/Shadow Tracks */}
             {tierConfig?.shadow_tracks && ghostTracks.length > 0 && (
               <div className="mt-3">
-                <p className="text-[7px] tracking-wider uppercase mb-1.5" style={{ color: 'rgba(248,250,252,0.12)' }}>
+                <p className="text-[6px] tracking-wider uppercase mb-1" style={{ color: 'rgba(248,250,252,0.1)' }}>
                   Unlock with upgrade
                 </p>
                 {ghostTracks.map((gt, i) => (
-                  <div key={`ghost-${i}`} className="cursor-pointer" onClick={() => setShowSpeedBridge(true)}>
-                    <TrackRow track={gt} index={tracks.length + i}
-                      onUpdate={() => {}} onRemove={() => {}} isGhost={true} />
-                  </div>
+                  <TrackRow key={`g-${i}`} track={gt} index={tracks.length + i}
+                    onUpdate={() => {}} onRemove={() => {}} isGhost={true}
+                    onGhostClick={() => setShowSpeedBridge(true)} />
                 ))}
               </div>
             )}
 
-            {/* Empty state */}
             {tracks.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <Layers size={28} style={{ color: 'rgba(248,250,252,0.08)' }} />
-                <p className="text-[11px] mt-3" style={{ color: 'rgba(248,250,252,0.2)' }}>
-                  No tracks yet
-                </p>
-                <p className="text-[9px] mt-1 max-w-xs" style={{ color: 'rgba(248,250,252,0.12)' }}>
-                  Add phonic tones, mantras, and ambience from the Source library, or dial in a custom frequency with the Suanpan abacus.
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Layers size={24} style={{ color: 'rgba(248,250,252,0.06)' }} />
+                <p className="text-[10px] mt-3" style={{ color: 'rgba(248,250,252,0.15)' }}>No tracks yet</p>
+                <p className="text-[8px] mt-1 max-w-xs" style={{ color: 'rgba(248,250,252,0.08)' }}>
+                  Add tones, mantras, and ambient layers from Sources, the Suanpan abacus, or Bonus Packs.
                 </p>
                 <div className="flex gap-2 mt-4">
-                  <motion.button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] cursor-pointer"
-                    style={{ background: `${tierColor}10`, border: `1px solid ${tierColor}20`, color: tierColor }}
+                  <motion.button className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                    style={{ background: `${tierColor}08`, border: `1px solid ${tierColor}15`, color: tierColor }}
                     whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                    onClick={() => setSourcesOpen(true)}
-                  >
-                    <Plus size={10} /> Add Source
+                    onClick={() => setSourcesOpen(true)}>
+                    <Plus size={9} /> Sources
                   </motion.button>
-                  <motion.button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] cursor-pointer"
-                    style={{ background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.15)', color: '#EAB308' }}
+                  <motion.button className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                    style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.1)', color: '#EAB308' }}
                     whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                    onClick={() => setSuanpanOpen(true)}
-                  >
-                    <Sliders size={10} /> Open Suanpan
+                    onClick={() => setSuanpanOpen(true)}>
+                    <Sliders size={9} /> Suanpan
+                  </motion.button>
+                  <motion.button className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                    style={{ background: 'rgba(244,114,182,0.05)', border: '1px solid rgba(244,114,182,0.1)', color: '#F472B6' }}
+                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    onClick={() => setPacksOpen(true)}>
+                    <Package size={9} /> Packs
                   </motion.button>
                 </div>
               </div>
@@ -759,56 +866,47 @@ export default function SuanpanMixer() {
         </div>
       </div>
 
-      {/* ━━━ Projects List Panel ━━━ */}
+      {/* Projects slide-over */}
       <AnimatePresence>
         {showProjects && (
-          <motion.div className="fixed top-0 right-0 h-full z-[10001] w-72 flex flex-col"
-            style={{ background: 'rgba(6,6,14,0.97)', backdropFilter: 'blur(24px)', borderLeft: '1px solid rgba(248,250,252,0.06)' }}
-            initial={{ x: 288 }} animate={{ x: 0 }} exit={{ x: 288 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            data-testid="projects-panel"
-          >
-            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'rgba(248,250,252,0.06)' }}>
-              <p className="text-[10px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.4)' }}>
-                Saved Projects
-              </p>
+          <motion.div className="fixed top-0 right-0 h-full z-[10001] w-64 flex flex-col"
+            style={{ background: 'rgba(6,6,14,0.97)', backdropFilter: 'blur(20px)', borderLeft: '1px solid rgba(248,250,252,0.05)' }}
+            initial={{ x: 260 }} animate={{ x: 0 }} exit={{ x: 260 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }} data-testid="projects-panel">
+            <div className="flex items-center justify-between p-3 border-b" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>
+              <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.3)' }}>Projects</p>
               <button className="p-1 rounded" onClick={() => setShowProjects(false)} data-testid="close-projects-btn">
-                <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <X size={11} style={{ color: 'rgba(248,250,252,0.25)' }} />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
+            <div className="flex-1 overflow-y-auto p-3 space-y-1">
               {projects.map(p => (
-                <motion.button key={p.id}
-                  className="w-full text-left px-3 py-2.5 rounded-lg cursor-pointer"
-                  style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.05)' }}
-                  whileHover={{ scale: 1.02, background: 'rgba(248,250,252,0.04)' }}
-                  onClick={() => loadProject(p.id)}
-                  data-testid={`project-item-${p.id}`}
-                >
-                  <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.6)' }}>{p.name}</p>
-                  <p className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <motion.button key={p.id} className="w-full text-left px-3 py-2 rounded-lg cursor-pointer"
+                  style={{ background: 'rgba(248,250,252,0.015)', border: '1px solid rgba(248,250,252,0.03)' }}
+                  whileHover={{ scale: 1.02 }} onClick={() => loadProject(p.id)} data-testid={`project-item-${p.id}`}>
+                  <p className="text-[9px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{p.name}</p>
+                  <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
                     {p.track_count} tracks &middot; {new Date(p.updated_at).toLocaleDateString()}
                   </p>
                 </motion.button>
               ))}
-              {projects.length === 0 && (
-                <p className="text-[9px] text-center py-8" style={{ color: 'rgba(248,250,252,0.15)' }}>
-                  No saved projects yet
-                </p>
-              )}
+              {projects.length === 0 && <p className="text-[8px] text-center py-6" style={{ color: 'rgba(248,250,252,0.1)' }}>No projects</p>}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ━━━ Speed Bridge Modal ━━━ */}
+      {/* Speed Bridge */}
       <AnimatePresence>
         {showSpeedBridge && (
-          <SpeedBridgeModal
-            currentTier={subTier}
-            onUpgrade={handleUpgrade}
-            onClose={() => setShowSpeedBridge(false)}
-          />
+          <SpeedBridgeModal currentTier={subTier} onUpgrade={handleUpgrade} onClose={() => setShowSpeedBridge(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Sacred Assembly */}
+      <AnimatePresence>
+        {showAssembly && (
+          <SacredAssemblyLoader delay={matDelay} onComplete={() => setShowAssembly(false)} />
         )}
       </AnimatePresence>
     </div>
