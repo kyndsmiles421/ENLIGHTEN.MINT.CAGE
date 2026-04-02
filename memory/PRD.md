@@ -19,25 +19,28 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Navigation costs dust on first visit, grants XP
 - Syncs with planetary depth system
 
-**Three Mastery Avenues:**
-- Mathematics (The Architect): 8 Sacred Geometry challenges (phi, Fibonacci, Metatron, Euler)
+**Four Mastery Avenues (The Four-Pillared Trinity):**
+- Mathematics (The Architect): 19 Sacred Geometry challenges (phi, Fibonacci, Metatron, Euler + algebra, trig, calculus, number theory)
+  - Categories: sacred_geometry, algebra, trigonometry, calculus, number_theory
   - Achievement: Mathematical Equilibrium → predict Shadow collapse points
-- Art (The Visionary): 5 visual resonance prompts (mandalas, shadow portraits, vibe capsules)
+- Art (The Visionary): 5 visual resonance prompts
   - Achievement: Vision Mode → stabilize frequencies through aesthetic symmetry
 - Thought Theory (The Philosopher): 6 Integration Quests with Jungian archetypes
   - Achievement: Total Individuation → internal/external consciousness sync
+- Biometrics (The Sentinel): 8 physical activity types (walking, cycling, running, yoga, martial arts, dance, gym, moving meditation)
+  - Kinetic Dust generation: physical effort → cosmic dust (1:1 conversion)
+  - Heart Rate bonus: 1.5x dust when BPM within target range
+  - Frequency affinity: low-intensity→surface layers, high-intensity→deep layers
+  - Achievement: Biological Equilibrium → body as instrument
 - Resonance tiers: Initiate→Apprentice→Adept→Master→Grandmaster (0-1000)
 - Combined tiers: Seeker→Wayfinder→Resonant→Harmonic→Transcendent
 
-**Quantum Handshake (Resonance → Shadow Collapse):**
-- Common: 0 resonance, Uncommon: 30, Rare: 100, Legendary: 300
+**Fractal Completion Bonus:**
+- When all L² sub-layers in a depth are explored → "Depth Mastery" badge
+- Bonus: 20 XP per sub-layer (Crust=80, Mantle=180, Core=320, Hollow=500)
+- Tracked in mastered_depths array
 
-**Master View Taste Test:**
-- Geometric Integrity: L² verified across all depths
-- Quantum Handshake: resonance threshold validation
-- Dimensional Flow: 54 sub-layers × 12 grid cells
-
-**Tests**: Iteration 184 — 100% Backend (23/23) / 100% Frontend
+**Tests**: Iteration 185 — 100% Backend (19/19) / 100% Frontend
 
 **Dimensional Space — The "Demens" Grid (12-Cell Multiverse):**
 - 2-axis navigation: Vertical Depth (4 layers) × Horizontal Frequency (3D/4D/5D)
