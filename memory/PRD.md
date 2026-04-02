@@ -12,6 +12,33 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ### Quantum Mechanics & Planetary Stratigraphy (Feb 2026) — LATEST
 
+**Fractal Sub-Layer Engine (L² Computing Model):**
+- 54 total sub-layers: Crust(2²=4) + Mantle(3²=9) + Core(4²=16) + Hollow(5²=25)
+- Each sub-layer has unique name, frequency, dust cost, XP reward
+- Local Density Rendering: only compute active sub-layer, others collapsed
+- Navigation costs dust on first visit, grants XP
+- Syncs with planetary depth system
+
+**Three Mastery Avenues:**
+- Mathematics (The Architect): 8 Sacred Geometry challenges (phi, Fibonacci, Metatron, Euler)
+  - Achievement: Mathematical Equilibrium → predict Shadow collapse points
+- Art (The Visionary): 5 visual resonance prompts (mandalas, shadow portraits, vibe capsules)
+  - Achievement: Vision Mode → stabilize frequencies through aesthetic symmetry
+- Thought Theory (The Philosopher): 6 Integration Quests with Jungian archetypes
+  - Achievement: Total Individuation → internal/external consciousness sync
+- Resonance tiers: Initiate→Apprentice→Adept→Master→Grandmaster (0-1000)
+- Combined tiers: Seeker→Wayfinder→Resonant→Harmonic→Transcendent
+
+**Quantum Handshake (Resonance → Shadow Collapse):**
+- Common: 0 resonance, Uncommon: 30, Rare: 100, Legendary: 300
+
+**Master View Taste Test:**
+- Geometric Integrity: L² verified across all depths
+- Quantum Handshake: resonance threshold validation
+- Dimensional Flow: 54 sub-layers × 12 grid cells
+
+**Tests**: Iteration 184 — 100% Backend (23/23) / 100% Frontend
+
 **Dimensional Space — The "Demens" Grid (12-Cell Multiverse):**
 - 2-axis navigation: Vertical Depth (4 layers) × Horizontal Frequency (3D/4D/5D)
 - 3D (Physical): Linear Time, standard GPS, level 1+
@@ -262,7 +289,9 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   planetary.py        # 4-layer planetary stratigraphy, psyche tracking, descent
   quantum.py          # Shadow sprites, quantum tunneling, entanglement bonds
   dimensions.py       # 3D/4D/5D dimensional grid, phase-shifting, collective shadow map
-  master_view.py      # Central nervous system audit dashboard
+  master_view.py      # Central nervous system audit with taste test
+  sublayers.py        # L² fractal sub-layer engine (54 total layers)
+  avenues.py          # 3 Mastery Avenues (Mathematics/Art/Thought)
   activity_loop.py    # Unified cross-system progress + 91-day heatmap
   gps_hotspots.py     # GPS static sites + dynamic hotspots, collection, history
   resonance.py        # Practice mini-game (5 types, streak bonuses)
@@ -299,12 +328,15 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
     TradeCircle.js (12 tabs: Browse, Gates, Broker, Forge, Content, Escrow, Genesis, God Mode, Avatar, My Listings, Offers, Karma)
     HotspotsPage.js, PlanetaryDepths.js, QuantumField.js
     DimensionalSpace.js, MasterView.js, CollectiveShadowMap.js
+    FractalEngine.js, MasteryAvenues.js
     Dashboard.js, Settings.js, RPGPage.js, CinematicIntro.js
 ```
 
 ## Key DB Collections
 - `users`: wallet, consciousness (xp, level, activity_log), founding_architect, credits
 - `planetary_depth`: user_id, current_layer, psyche_state, unlocked_layers[], descent_history[]
+- `sublayer_progress`: user_id, explored_sublayers[], current_sublayer, exploration_log[]
+- `avenue_progress`: user_id, mathematics{resonance, completed_challenges[]}, art{...}, thought{...}
 - `dimensional_state`: user_id, current_dimension, total_shifts, shift_history[]
 - `quantum_shadows`: user_id, collapsed[], total_collapsed, total_dust
 - `quantum_entanglements`: bond_id, user_a, user_b, active, resonance_score, shared_events[]
