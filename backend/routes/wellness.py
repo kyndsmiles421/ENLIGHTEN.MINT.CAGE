@@ -80,6 +80,56 @@ async def get_moods(user=Depends(get_current_user)):
     return moods
 
 
+FREQ_CULINARY = {
+    174: {"name": "Root Broth", "type": "base", "flavor": "Umami", "temp": "Low Simmer", "icon": "pot"},
+    285: {"name": "Sea Salt Crystal", "type": "mineral", "flavor": "Briny", "temp": "Room", "icon": "salt"},
+    396: {"name": "Black Pepper Grind", "type": "spice", "flavor": "Sharp", "temp": "Medium", "icon": "pepper"},
+    417: {"name": "Ginger Root", "type": "spice", "flavor": "Zingy", "temp": "Medium-High", "icon": "ginger"},
+    432: {"name": "Honey Drizzle", "type": "sweetener", "flavor": "Warm Sweet", "temp": "Low", "icon": "honey"},
+    528: {"name": "Olive Oil", "type": "fat", "flavor": "Smooth", "temp": "Cold Press", "icon": "oil"},
+    639: {"name": "Vanilla Extract", "type": "essence", "flavor": "Fragrant", "temp": "Ambient", "icon": "vanilla"},
+    741: {"name": "Citrus Zest", "type": "brightener", "flavor": "Bright", "temp": "Raw", "icon": "citrus"},
+    852: {"name": "Saffron Thread", "type": "luxury", "flavor": "Complex", "temp": "Infused", "icon": "saffron"},
+    963: {"name": "Truffle Shaving", "type": "finishing", "flavor": "Earthy-Ethereal", "temp": "Fresh", "icon": "truffle"},
+}
+
+
+@router.get("/moods/frequency-recipe")
+async def get_frequency_recipe(user=Depends(get_current_user)):
+    """Return the user's recent mood as a culinary recipe."""
+    last_mood = await db.moods.find_one(
+        {"user_id": user["id"]}, {"_id": 0}, sort=[("created_at", -1)]
+    )
+    if not last_mood:
+        return {"has_recipe": False}
+
+    freqs = last_mood.get("frequencies", [])
+    if not freqs:
+        freqs = [MOOD_FREQUENCIES.get(last_mood.get("mood", ""), 432)]
+
+    ingredients = []
+    for f in freqs:
+        ing = FREQ_CULINARY.get(f, FREQ_CULINARY[432])
+        ingredients.append({**ing, "frequency": f})
+
+    is_tesla = len(freqs) in [3, 6, 9]
+    recipe_type = "Tesla Harmony Blend" if is_tesla else (
+        "Complex Reduction" if len(freqs) > 2 else
+        "Simple Infusion" if len(freqs) == 2 else "Pure Essence"
+    )
+
+    return {
+        "has_recipe": True,
+        "recipe_name": recipe_type,
+        "ingredients": ingredients,
+        "ingredient_count": len(ingredients),
+        "moods": last_mood.get("moods", [last_mood.get("mood")]),
+        "intensity": last_mood.get("intensity", 5),
+        "resonance_type": last_mood.get("resonance_type", "pure"),
+        "is_tesla_harmony": is_tesla,
+    }
+
+
 @router.get("/moods/insights")
 async def get_mood_insights(user=Depends(get_current_user)):
     """Get mood trends, frequency breakdown, and AI-generated weekly insight."""

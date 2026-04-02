@@ -216,7 +216,9 @@ export default function CosmicMap() {
   const [harvestResult, setHarvestResult] = useState(null);
   const [decayStatus, setDecayStatus] = useState(null);
   const [harvestHistory, setHarvestHistory] = useState(null);
-  const [ripple, setRipple] = useState(null); // {lat, lng, color} for harvest ripple
+  const [ripple, setRipple] = useState(null);
+  const posHistoryRef = useRef([]); // Track position history for aura wake
+  const [auraTrail, setAuraTrail] = useState([]); // {lat, lng, color} for harvest ripple
   const [geoError, setGeoError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [layer, setLayer] = useState('ground'); // ground | celestial
@@ -313,6 +315,15 @@ export default function CosmicMap() {
       }
     });
   }, [userPos, powerSpots]);
+
+  // Aura Wake — track position history for trailing ripple
+  useEffect(() => {
+    if (!userPos) return;
+    posHistoryRef.current.push({ ...userPos, t: Date.now() });
+    // Keep last 8 positions
+    if (posHistoryRef.current.length > 8) posHistoryRef.current.shift();
+    setAuraTrail([...posHistoryRef.current]);
+  }, [userPos]);
 
   // ━━━ Coven System ━━━
   const fetchCoven = useCallback(async () => {
@@ -546,6 +557,21 @@ export default function CosmicMap() {
             <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution='&copy; CARTO' />
             <RecenterButton center={[center.lat, center.lng]} />
             <Marker position={[center.lat, center.lng]} icon={userIcon}><Popup><span style={{ color: '#FBBF24', fontSize: '11px' }}>You are here</span></Popup></Marker>
+
+            {/* Aura Wake Trail */}
+            {auraTrail.slice(0, -1).map((pos, i) => {
+              const age = (Date.now() - pos.t) / 1000;
+              const opacity = Math.max(0.02, 0.12 - age * 0.015);
+              return (
+                <Circle key={`wake-${i}`} center={[pos.lat, pos.lng]}
+                  radius={12 + i * 4}
+                  pathOptions={{
+                    color: '#FBBF24', fillColor: '#FBBF24',
+                    fillOpacity: opacity * 0.3, weight: 0.5, opacity,
+                    dashArray: '3 5',
+                  }} />
+              );
+            })}
 
             {/* Regular nodes */}
             {nodes.map(node => (

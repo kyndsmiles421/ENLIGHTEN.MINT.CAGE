@@ -74,19 +74,22 @@ export default function MoodTracker() {
   const [activeGroup, setActiveGroup] = useState('all');
   const [insights, setInsights] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
-  const [lastResult, setLastResult] = useState(null); // frequency stack from last submit
+  const [lastResult, setLastResult] = useState(null);
+  const [recipe, setRecipe] = useState(null); // frequency stack from last submit
 
   useEffect(() => {
     if (user) {
       axios.get(`${API}/moods`, { headers: authHeaders })
         .then(res => setHistory(res.data))
         .catch(() => {});
-      // Load insights
       setInsightsLoading(true);
       axios.get(`${API}/moods/insights`, { headers: authHeaders })
         .then(res => setInsights(res.data))
         .catch(() => {})
         .finally(() => setInsightsLoading(false));
+      axios.get(`${API}/moods/frequency-recipe`, { headers: authHeaders })
+        .then(res => setRecipe(res.data))
+        .catch(() => {});
     }
   }, [user, authHeaders]);
 
@@ -128,6 +131,9 @@ export default function MoodTracker() {
       setSearch('');
       setCelebrating(true);
       playCelebration();
+      // Refresh recipe
+      axios.get(`${API}/moods/frequency-recipe`, { headers: authHeaders })
+        .then(r => setRecipe(r.data)).catch(() => {});
       toast.success(
         res.data.resonance_type === 'chorded'
           ? `Chorded resonance: ${res.data.frequency_stack?.join('Hz + ')}Hz`
@@ -306,6 +312,35 @@ export default function MoodTracker() {
                     </div>
                   </div>
 
+                  {/* Tesla 3-6-9 Nodal Resonance */}
+                  {[3, 6, 9].includes(selectedMoods.length) && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative z-10 py-2.5 px-3 rounded-lg overflow-hidden"
+                      style={{ background: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.12)' }}
+                      data-testid="tesla-harmony">
+                      {[0, 1, 2].map(i => (
+                        <motion.div key={i}
+                          animate={{ opacity: [0.05, 0.2, 0.05], x: ['-10%', '110%'] }}
+                          transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity }}
+                          className="absolute top-0 h-full w-px"
+                          style={{ background: `linear-gradient(180deg, transparent, #FBBF24, transparent)` }} />
+                      ))}
+                      <div className="flex items-center gap-2">
+                        <Zap size={12} style={{ color: '#FBBF24' }} />
+                        <div>
+                          <p className="text-[9px] font-medium" style={{ color: '#FBBF24' }}>
+                            Tesla {selectedMoods.length}-Node Harmony
+                          </p>
+                          <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>
+                            "If you knew the magnificence of {selectedMoods.length}..." — 369Hz unlocked
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>
@@ -351,8 +386,45 @@ export default function MoodTracker() {
             </AnimatePresence>
           </div>
 
-          {/* Right — Insights + History + Chart */}
+          {/* Right — Recipe + Insights + History + Chart */}
           <div>
+            {/* Frequency Recipe (Culinary Mode) */}
+            {recipe?.has_recipe && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="mb-6 glass-card p-4 rounded-2xl space-y-3"
+                style={{ border: '1px solid rgba(251,191,36,0.1)' }}
+                data-testid="frequency-recipe">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[7px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Your Frequency Recipe</p>
+                    <p className="text-sm font-medium" style={{ color: '#FBBF24', fontFamily: 'Cormorant Garamond, serif' }}>
+                      {recipe.recipe_name}
+                    </p>
+                  </div>
+                  {recipe.is_tesla_harmony && (
+                    <span className="text-[7px] px-1.5 py-0.5 rounded-full"
+                      style={{ background: 'rgba(251,191,36,0.08)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.15)' }}>
+                      Tesla 3-6-9
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  {recipe.ingredients?.map((ing, i) => (
+                    <div key={i} className="flex items-center gap-2 py-1 px-2 rounded-lg"
+                      style={{ background: 'rgba(248,250,252,0.02)' }}>
+                      <span className="text-[8px] w-12 font-mono" style={{ color: '#FBBF24' }}>{ing.frequency}Hz</span>
+                      <span className="text-[9px] flex-1 font-medium" style={{ color: 'var(--text-primary)' }}>{ing.name}</span>
+                      <span className="text-[7px] px-1.5 py-0.5 rounded"
+                        style={{ background: 'rgba(248,250,252,0.04)', color: 'var(--text-muted)' }}>
+                        {ing.type}
+                      </span>
+                      <span className="text-[7px]" style={{ color: 'var(--text-muted)' }}>{ing.flavor}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* AI Insights Panel */}
             {insights?.has_data && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6 space-y-3" data-testid="mood-insights">
