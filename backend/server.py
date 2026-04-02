@@ -128,6 +128,7 @@ from routes.botany import router as botany_router
 from routes.sovereign_math import router as sovereign_math_router
 from routes.sovereign_codex import router as sovereign_codex_router
 from routes.cosmic_state import router as cosmic_state_router
+from routes.hexagram import router as hexagram_router
 from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
@@ -225,6 +226,7 @@ all_routers = [
     sovereign_math_router,
     sovereign_codex_router,
     cosmic_state_router,
+    hexagram_router,
 ]
 
 for r in all_routers:

@@ -164,7 +164,8 @@ async def _get_user_gate_progress(user_id: str) -> dict:
 
     # Get user credits for warp cost display
     credits_doc = await db.users.find_one({"id": user_id}, {"_id": 0, "credits": 1})
-    credits = (credits_doc or {}).get("credits", {}).get("balance", 0)
+    credits_val = (credits_doc or {}).get("credits", 0)
+    credits = credits_val.get("balance", 0) if isinstance(credits_val, dict) else credits_val if isinstance(credits_val, (int, float)) else 0
 
     return {
         "dust": dust,

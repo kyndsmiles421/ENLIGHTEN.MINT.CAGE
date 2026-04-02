@@ -16,6 +16,8 @@ import { GravityField } from '../components/orbital/GravityField';
 import { SatelliteInspector } from '../components/orbital/SatelliteInspector';
 import { useHubAudio } from '../hooks/useHubAudio';
 import { useGravityManager } from '../hooks/useGravityManager';
+import { CosmicSparkline } from '../components/CosmicSparkline';
+import { ResonancePulse } from '../components/ResonancePulse';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const FRICTION = 0.94;
@@ -330,6 +332,11 @@ export default function OrbitalHub() {
         )}
       </motion.div>
 
+      {/* Cosmic Sparkline — ODE heartbeat widget */}
+      <div className="absolute top-16 right-6 z-10">
+        <CosmicSparkline />
+      </div>
+
       {/* Orbital System — rotatable ring */}
       <div ref={containerRef} className="relative" style={{ width: containerSize, height: containerSize, zIndex: 2, touchAction: 'none' }}
         onPointerDown={handleRingDown}
@@ -357,18 +364,29 @@ export default function OrbitalHub() {
           const gStiffness = calculateStiffness(pos.x, pos.y);
           const isSnapped = i === snappedIdx && !isDraggingRing.current && Math.abs(angularVel.current) < 0.1;
           return (
-            <ActiveSatellite key={sat.id} sat={sat}
-              x={pos.x} y={pos.y}
-              isHovered={hoveredSat === sat.id}
-              isSnapped={isSnapped}
-              onHover={handleHover}
-              onSelect={handleSelect}
-              onDeactivate={deactivateSat}
-              onInspect={handleInspect}
-              dimmed={abyssOpen}
-              gravityDamping={gDamping}
-              gravityStiffness={gStiffness}
-            />
+            <React.Fragment key={sat.id}>
+              <ActiveSatellite sat={sat}
+                x={pos.x} y={pos.y}
+                isHovered={hoveredSat === sat.id}
+                isSnapped={isSnapped}
+                onHover={handleHover}
+                onSelect={handleSelect}
+                onDeactivate={deactivateSat}
+                onInspect={handleInspect}
+                dimmed={abyssOpen}
+                gravityDamping={gDamping}
+                gravityStiffness={gStiffness}
+              />
+              {/* Audio Breadcrumb — Resonance Pulse on audio-producing nodes */}
+              <div className="absolute pointer-events-none"
+                style={{
+                  left: center + pos.x - 24,
+                  top: center + pos.y - 24,
+                  width: 48, height: 48,
+                }}>
+                <ResonancePulse sourceId={`zone-${sat.id}`} color={sat.color} size={48} />
+              </div>
+            </React.Fragment>
           );
         })}
 

@@ -7,6 +7,8 @@ import {
   ArrowLeft, Search, BookOpen, Lock, ChevronRight, Star,
   Leaf, Compass, Calculator, Orbit, Sparkles, Loader2
 } from 'lucide-react';
+import { HexagramBadge, HexagramGlitch } from '../components/ResonancePulse';
+import { useCosmicState } from '../context/CosmicStateContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -23,6 +25,7 @@ const TIER_COLORS = {
 export default function Codex() {
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
+  const { cosmicState, fetchCosmicState } = useCosmicState();
   const [entries, setEntries] = useState([]);
   const [sections, setSections] = useState([]);
   const [tier, setTier] = useState('observer');
@@ -48,6 +51,7 @@ export default function Codex() {
   }, [authHeaders, authLoading, token, activeSection, search]);
 
   useEffect(() => { loadEntries(); }, [loadEntries]);
+  useEffect(() => { if (token) fetchCosmicState(); }, [token, fetchCosmicState]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#06060e' }}>
@@ -76,6 +80,12 @@ export default function Codex() {
               </p>
             </div>
           </div>
+          {/* Hexagram gate indicator */}
+          {cosmicState?.hexagram && (
+            <HexagramGlitch active={cosmicState.hexagram.is_transitioning} intensity="medium">
+              <HexagramBadge hexagram={cosmicState.hexagram} />
+            </HexagramGlitch>
+          )}
         </div>
 
         {/* Search + Section Filters */}

@@ -5,6 +5,10 @@ from routes.sovereign_math import (
     ELEMENTS, solve_element_ode, element_ode_rhs, rk4_step,
     solve_lorenz, GENERATION_RATE, CONTROL_RATE, NATURAL_DECAY, CIRCADIAN_AMP,
 )
+from routes.hexagram import (
+    compute_hexagram_bits, bits_to_hexagram_number,
+    compute_changing_lines, hexagram_to_trigrams, HEXAGRAM_NAMES, SOLFEGGIO,
+)
 import math
 
 router = APIRouter()
@@ -58,6 +62,48 @@ async def get_cosmic_state(user=Depends(get_current_user)):
         "stability": stability,
         "total_rate_of_change": round(total_derivative, 4),
         "garden_masses": garden_masses,
+    }
+
+    # ── Hexagram state-machine (all tiers) ──
+    # Gather conditions for hexagram computation
+    elements_in_garden = set(garden_masses.keys())
+    wheel_doc = await db.wheel_interactions.find_one({"user_id": user["id"]}, {"_id": 0})
+    explored_elements = set(elements_in_garden)
+    if wheel_doc:
+        for elem in ELEMENTS:
+            if wheel_doc.get(f"{elem.lower()}_count", 0) > 0:
+                explored_elements.add(elem)
+    elements_explored = len(explored_elements)
+    archives_count = await db.archive_progress.count_documents({"user_id": user["id"]})
+    recipes_count = await db.frequency_recipes.count_documents({"user_id": user["id"]})
+    trades_count = await db.trade_listings.count_documents({
+        "$or": [{"seller_id": user["id"]}, {"buyer_id": user["id"]}],
+        "status": "completed",
+    })
+    max_dev = max(abs(state_now[i] - mean_energy) for i in range(5))
+    equilibrium_score = max(0, 100 - max_dev * 40) if mean_energy > 0 else 0
+    hex_bits = compute_hexagram_bits(
+        garden_masses, tier_idx, elements_explored,
+        archives_count, recipes_count, trades_count, equilibrium_score,
+    )
+    hex_number = bits_to_hexagram_number(hex_bits)
+    hex_info = HEXAGRAM_NAMES.get(hex_number, ("?", "Unknown", "Mystery"))
+    changing = compute_changing_lines(
+        equilibrium_score, tier_idx, elements_explored,
+        archives_count, recipes_count, trades_count,
+    )
+
+    result["hexagram"] = {
+        "number": hex_number,
+        "chinese": hex_info[0],
+        "pinyin": hex_info[1],
+        "name": hex_info[2],
+        "bits": hex_bits,
+        "trigrams": hexagram_to_trigrams(hex_number),
+        "solfeggio_hz": SOLFEGGIO[(hex_number - 1) % 9],
+        "is_transitioning": len(changing) > 0,
+        "changing_lines_count": len(changing),
+        "equilibrium_score": round(equilibrium_score, 1),
     }
 
     # ── Synthesizer+: derivatives + deviations ──

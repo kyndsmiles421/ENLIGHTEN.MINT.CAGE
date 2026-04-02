@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -8,11 +8,18 @@ import {
   Orbit, Eye, Layers
 } from 'lucide-react';
 import { NanoGuide } from './NanoGuide';
+import { HexagramBadge, HexagramGlitch } from './ResonancePulse';
+import { useCosmicState } from '../context/CosmicStateContext';
 
 export default function MissionControl({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { level: resLevel, cycleResolution, config: resConfig } = useResolution();
+  const { cosmicState, fetchCosmicState } = useCosmicState();
+
+  useEffect(() => {
+    if (isOpen) fetchCosmicState();
+  }, [isOpen, fetchCosmicState]);
 
   const resColors = { low: '#60A5FA', medium: '#FBBF24', high: '#A78BFA' };
 
@@ -146,6 +153,18 @@ export default function MissionControl({ isOpen, onClose }) {
                 </button>
               ))}
             </div>
+
+            {/* Hexagram State — I Ching Logic Gate */}
+            {cosmicState?.hexagram && (
+              <div className="px-5 py-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+                <p className="text-[7px] uppercase tracking-[0.15em] mb-2" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                  Logic Gate
+                </p>
+                <HexagramGlitch active={cosmicState.hexagram.is_transitioning}>
+                  <HexagramBadge hexagram={cosmicState.hexagram} />
+                </HexagramGlitch>
+              </div>
+            )}
 
             {/* Cosmic Collective Link */}
             <div className="px-5 py-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
