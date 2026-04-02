@@ -8,6 +8,19 @@ import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Dynamic Docking — observe mixer state for spring repositioning
+function useMixerState() {
+  const [mixerOpen, setMixerOpen] = useState(false);
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setMixerOpen(document.body.getAttribute('data-mixer-open') === 'true');
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-mixer-open'] });
+    return () => observer.disconnect();
+  }, []);
+  return mixerOpen;
+}
+
 // ── Page Context Map — Cosmic Concierge awareness ──
 const PAGE_CONTEXT = {
   '/dashboard': { area: 'Dashboard', hint: 'their personal wellness overview with shortcuts, mood history, and daily challenges', suggest: 'Would you like a personalized practice recommendation based on your mood?' },
@@ -72,6 +85,7 @@ function MessageBubble({ msg }) {
 export default function CosmicAssistant() {
   const { authHeaders, user } = useAuth();
   const location = useLocation();
+  const mixerOpen = useMixerState();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
@@ -195,7 +209,7 @@ export default function CosmicAssistant() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button — Dynamic Docking */}
       <AnimatePresence>
         {!open && (
           <motion.button
@@ -204,8 +218,8 @@ export default function CosmicAssistant() {
             onClick={() => setOpen(true)}
             className="fixed z-[9998] flex items-center justify-center"
             style={{
-              bottom: '148px',
-              right: '20px',
+              bottom: mixerOpen ? '20px' : '148px',
+              right: mixerOpen ? '80px' : '20px',
               width: '52px',
               height: '52px',
               borderRadius: '50%',
@@ -215,6 +229,8 @@ export default function CosmicAssistant() {
               boxShadow: '0 4px 24px rgba(129,140,248,0.15), 0 0 0 1px rgba(129,140,248,0.1)',
               border: '1px solid rgba(129,140,248,0.18)',
               cursor: 'pointer',
+              transition: 'bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              willChange: 'transform, bottom, right',
             }}
             data-testid="cosmic-assistant-btn"
           >

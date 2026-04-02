@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ELEMENTS = [
@@ -32,6 +32,8 @@ function arrowPath(from, to, curvature = 0) {
 
 export function FiveElementsWheel({ activeElement, onElementClick, plants = [], gardenSummary, resonanceData }) {
   const [hoveredElement, setHoveredElement] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const svgRef = useRef(null);
   const cx = 160, cy = 160, outerR = 120, nodeR = 24;
 
   const elementMap = useMemo(() => {
@@ -68,7 +70,16 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
       </div>
 
       <div className="flex justify-center px-2">
-        <svg width={320} height={320} viewBox="0 0 320 320" data-testid="wheel-svg">
+        <svg width={320} height={320} viewBox="0 0 320 320" data-testid="wheel-svg" ref={svgRef}
+          onMouseMove={e => {
+            if (!svgRef.current) return;
+            const rect = svgRef.current.getBoundingClientRect();
+            setMousePos({
+              x: ((e.clientX - rect.left) / rect.width) * 320,
+              y: ((e.clientY - rect.top) / rect.height) * 320,
+            });
+          }}
+          onMouseLeave={() => setMousePos({ x: 0, y: 0 })}>
           <defs>
             {ELEMENTS.map(e => (
               <radialGradient key={`glow-${e.id}`} id={`glow-${e.id}`}>
@@ -118,47 +129,68 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
             );
           })}
 
-          {/* Element nodes */}
+          {/* Element nodes with Proximity Scaling */}
           {ELEMENTS.map(e => {
             const pos = getPos(e.angle, outerR, cx, cy);
             const isActive = activeOrHovered === e.id;
             const dimmed = activeOrHovered && !isActive;
             const plantCount = plantsByElement[e.id]?.length || 0;
+
+            // Proximity scaling — nodes pulse when cursor approaches
+            const dist = mousePos.x > 0 ? Math.sqrt((mousePos.x - pos.x) ** 2 + (mousePos.y - pos.y) ** 2) : 999;
+            const proximity = Math.max(0, 1 - dist / 80); // 0 at 80px, 1 at center
+            const proximityScale = 1 + proximity * 0.15; // up to 15% larger
+
             return (
               <g key={e.id}
                 onClick={() => onElementClick(activeElement === e.id ? null : e.id)}
                 onMouseEnter={() => setHoveredElement(e.id)}
                 onMouseLeave={() => setHoveredElement(null)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', transform: `scale(${proximityScale})`, transformOrigin: `${pos.x}px ${pos.y}px`, transition: 'transform 0.15s ease-out' }}
                 data-testid={`wheel-node-${e.id.toLowerCase()}`}>
+                {/* Proximity glow ring */}
+                {proximity > 0.2 && (
+                  <circle cx={pos.x} cy={pos.y} r={nodeR + 8 + proximity * 12}
+                    fill="none" stroke={e.color} strokeWidth={0.5}
+                    opacity={proximity * 0.25}
+                    style={{ transition: 'all 0.15s' }} />
+                )}
                 {/* Glow */}
-                <circle cx={pos.x} cy={pos.y} r={isActive ? 38 : 30}
+                <circle cx={pos.x} cy={pos.y} r={isActive ? 38 : 30 + proximity * 8}
                   fill={`url(#glow-${e.id})`}
-                  style={{ transition: 'r 0.3s' }} />
+                  style={{ transition: 'r 0.2s' }} />
                 {/* Outer ring */}
                 <circle cx={pos.x} cy={pos.y} r={nodeR}
                   fill={isActive ? `${e.color}20` : 'rgba(10,10,18,0.8)'}
-                  stroke={e.color} strokeWidth={isActive ? 2 : 1}
+                  stroke={e.color} strokeWidth={isActive ? 2 : 1 + proximity * 0.5}
                   opacity={dimmed ? 0.3 : 1}
-                  style={{ transition: 'all 0.3s' }} />
+                  style={{ transition: 'all 0.2s' }} />
                 {/* Inner fill */}
                 <circle cx={pos.x} cy={pos.y} r={nodeR - 4}
-                  fill={isActive ? `${e.color}35` : `${e.color}10`}
+                  fill={isActive ? `${e.color}35` : `${e.color}${proximity > 0.3 ? '18' : '10'}`}
                   opacity={dimmed ? 0.3 : 1}
-                  style={{ transition: 'all 0.3s' }} />
+                  style={{ transition: 'all 0.2s' }} />
                 {/* Element label */}
                 <text x={pos.x} y={pos.y - 3} textAnchor="middle" fill={dimmed ? 'rgba(248,250,252,0.15)' : e.color}
                   fontSize={9} fontWeight={600} fontFamily="system-ui"
-                  style={{ transition: 'fill 0.3s' }}>
+                  style={{ transition: 'fill 0.2s' }}>
                   {e.id}
                 </text>
                 {/* Plant count */}
                 <text x={pos.x} y={pos.y + 9} textAnchor="middle"
                   fill={dimmed ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.35)'}
                   fontSize={7} fontFamily="monospace"
-                  style={{ transition: 'fill 0.3s' }}>
+                  style={{ transition: 'fill 0.2s' }}>
                   {plantCount} plant{plantCount !== 1 ? 's' : ''}
                 </text>
+                {/* Proximity frequency hint */}
+                {proximity > 0.5 && !isActive && (
+                  <text x={pos.x} y={pos.y + 19} textAnchor="middle"
+                    fill={`${e.color}88`} fontSize={6} fontFamily="monospace"
+                    style={{ transition: 'opacity 0.15s' }}>
+                    {e.freq}Hz
+                  </text>
+                )}
               </g>
             );
           })}

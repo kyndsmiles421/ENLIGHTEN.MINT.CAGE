@@ -920,24 +920,41 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
         }
       });
 
-      // Journey camera animation (smooth cinematic movement)
+      // Journey camera animation — DOLLY ZOOM (zoom out → rotate → zoom in)
       const jt = journeyTargetRef.current;
       if (jt) {
-        const lerpSpeed = 0.025;
-        const dTheta = jt.theta - spherical.current.theta;
-        const dPhi = jt.phi - spherical.current.phi;
-        const dR = jt.radius - spherical.current.radius;
-        // Wrap theta for shortest path
-        let adjustedDTheta = dTheta;
-        if (adjustedDTheta > Math.PI) adjustedDTheta -= Math.PI * 2;
-        if (adjustedDTheta < -Math.PI) adjustedDTheta += Math.PI * 2;
-        spherical.current.theta += adjustedDTheta * lerpSpeed;
-        spherical.current.phi += dPhi * lerpSpeed;
-        spherical.current.radius += dR * lerpSpeed;
-        // Detect arrival
-        if (Math.abs(adjustedDTheta) < 0.02 && Math.abs(dPhi) < 0.02 && Math.abs(dR) < 0.5) {
-          if (onJourneyArrivedRef.current) onJourneyArrivedRef.current(jt.id);
-          journeyTargetRef.current = null;
+        if (!jt._phase) jt._phase = 'pullback';
+        if (!jt._startRadius) jt._startRadius = spherical.current.radius;
+        const pullbackRadius = Math.min(120, jt._startRadius * 1.8);
+
+        if (jt._phase === 'pullback') {
+          // Phase 1: Zoom out with background blur effect
+          const lerpSpeed = 0.04;
+          spherical.current.radius += (pullbackRadius - spherical.current.radius) * lerpSpeed;
+          if (Math.abs(pullbackRadius - spherical.current.radius) < 1) {
+            jt._phase = 'traverse';
+          }
+        } else if (jt._phase === 'traverse') {
+          // Phase 2: Rotate to target while zoomed out
+          const lerpSpeed = 0.035;
+          let dTheta = jt.theta - spherical.current.theta;
+          if (dTheta > Math.PI) dTheta -= Math.PI * 2;
+          if (dTheta < -Math.PI) dTheta += Math.PI * 2;
+          const dPhi = jt.phi - spherical.current.phi;
+          spherical.current.theta += dTheta * lerpSpeed;
+          spherical.current.phi += dPhi * lerpSpeed;
+          if (Math.abs(dTheta) < 0.05 && Math.abs(dPhi) < 0.05) {
+            jt._phase = 'approach';
+          }
+        } else if (jt._phase === 'approach') {
+          // Phase 3: Zoom in to target radius
+          const lerpSpeed = 0.03;
+          const dR = jt.radius - spherical.current.radius;
+          spherical.current.radius += dR * lerpSpeed;
+          if (Math.abs(dR) < 0.5) {
+            if (onJourneyArrivedRef.current) onJourneyArrivedRef.current(jt.id);
+            journeyTargetRef.current = null;
+          }
         }
       }
 

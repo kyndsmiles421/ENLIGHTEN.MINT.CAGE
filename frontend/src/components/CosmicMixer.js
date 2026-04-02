@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import {
   ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen,
@@ -209,6 +209,12 @@ export default function CosmicMixer() {
   const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  // Broadcast mixer state for Dynamic Docking
+  useEffect(() => {
+    document.body.setAttribute('data-mixer-open', open ? 'true' : 'false');
+    return () => document.body.removeAttribute('data-mixer-open');
+  }, [open]);
   const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => { if (!fullScreen) setOpen(false); }, [location.pathname, fullScreen]);
