@@ -1236,3 +1236,103 @@ async def get_gravity_weighted_listings(user=Depends(get_current_user)):
         }.get(listing.get("element", ""), "#94A3B8")
 
     return {"listings": listings}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  SUANPAN → TRADE CIRCLE BRIDGE
+#  One-click export of frequency recipes to marketplace
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLFEGGIO_MAP = [
+    (396, "Wood", "Liberation"), (528, "Fire", "Transformation"),
+    (639, "Earth", "Connection"), (741, "Metal", "Expression"),
+    (852, "Water", "Intuition"), (963, "Water", "Crown Activation"),
+    (432, "Earth", "Universal Harmony"), (174, "Earth", "Pain Reduction"),
+    (285, "Earth", "Tissue Healing"), (136.1, "Earth", "Vedic Year-Tone"),
+]
+
+
+def frequency_to_element(hz):
+    """Map a frequency to its closest Five Element and label."""
+    closest = min(SOLFEGGIO_MAP, key=lambda s: abs(s[0] - hz))
+    distance = abs(closest[0] - hz)
+    if distance < 50:
+        return closest[1], closest[2], closest[0]
+    # Fallback: derive from frequency range
+    if hz < 300:
+        return "Earth", "Grounding", hz
+    elif hz < 450:
+        return "Wood", "Growth", hz
+    elif hz < 600:
+        return "Fire", "Transformation", hz
+    elif hz < 750:
+        return "Metal", "Expression", hz
+    else:
+        return "Water", "Intuition", hz
+
+
+def frequency_to_nature(hz):
+    """Derive TCM nature from frequency — higher = cooler, lower = warmer."""
+    if hz >= 800:
+        return "Cold"
+    elif hz >= 650:
+        return "Cool"
+    elif hz >= 450:
+        return "Neutral"
+    elif hz >= 250:
+        return "Warm"
+    else:
+        return "Hot"
+
+
+@router.post("/trade-circle/suanpan-export")
+async def export_suanpan_recipe(data: dict = Body(...), user=Depends(get_current_user)):
+    """One-click export a Suanpan frequency recipe to the Trade Circle.
+    Auto-populates all TCM metadata from the frequency value."""
+    frequency = data.get("frequency", 0)
+    recipe_name = data.get("recipe_name", "").strip()
+    seeking = data.get("seeking", "Resonance exchange").strip()
+
+    if frequency <= 0 or frequency > 9999:
+        raise HTTPException(status_code=400, detail="Invalid frequency value")
+
+    if not recipe_name:
+        recipe_name = f"Frequency Recipe {frequency}Hz"
+
+    # Auto-derive all metadata from frequency
+    element, label, nearest_solfeggio = frequency_to_element(frequency)
+    nature = frequency_to_nature(frequency)
+
+    element_w = {"Wood": 10, "Fire": 15, "Earth": 12, "Metal": 8, "Water": 14}.get(element, 12)
+    nature_w = {"Hot": 15, "Warm": 10, "Neutral": 5, "Cool": 10, "Cold": 15}.get(nature, 5)
+    gravity_mass = 60 + element_w + nature_w
+
+    listing = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", "Anonymous"),
+        "title": recipe_name,
+        "description": f"Suanpan-mixed frequency recipe at {frequency}Hz. Element: {element} ({label}). Nature: {nature}. Nearest Solfeggio: {nearest_solfeggio}Hz.",
+        "category": "frequency_recipe",
+        "offering": f"Frequency Recipe: {frequency}Hz ({element} / {label})",
+        "seeking": seeking[:200],
+        "element": element,
+        "nature": nature,
+        "frequency": frequency,
+        "gravity_mass": gravity_mass,
+        "nearest_solfeggio": nearest_solfeggio,
+        "solfeggio_label": label,
+        "source": "suanpan_mixer",
+        "images": [],
+        "status": "active",
+        "offer_count": 0,
+        "requires_escrow": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.trade_listings.insert_one(listing)
+    await create_activity(user["id"], "trade_listing", f"Exported Suanpan recipe: {recipe_name}")
+    await award_karma(user["id"], "listing_created", listing["id"])
+    listing.pop("_id", None)
+    return listing

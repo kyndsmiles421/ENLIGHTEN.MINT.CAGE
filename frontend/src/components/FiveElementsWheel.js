@@ -30,7 +30,7 @@ function arrowPath(from, to, curvature = 0) {
   return `M${from.x},${from.y} Q${mx},${my} ${to.x},${to.y}`;
 }
 
-export function FiveElementsWheel({ activeElement, onElementClick, plants = [], gardenSummary }) {
+export function FiveElementsWheel({ activeElement, onElementClick, plants = [], gardenSummary, resonanceData }) {
   const [hoveredElement, setHoveredElement] = useState(null);
   const cx = 160, cy = 160, outerR = 120, nodeR = 24;
 
@@ -277,6 +277,99 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
           </div>
         </div>
       )}
+
+      {/* Resonance Compatibility — Predictive Energy Meter */}
+      <AnimatePresence>
+        {resonanceData && activeElement && (
+          <motion.div key="resonance" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="mx-3 mb-3 rounded-lg overflow-hidden" data-testid="resonance-meter"
+            style={{ border: `1px solid ${resonanceData.color}15` }}>
+
+            {/* Forecast bar */}
+            <div className="px-3 py-2 flex items-center justify-between"
+              style={{ background: `${resonanceData.color}08` }}>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{
+                  background: resonanceData.totals?.forecast === 'surge' ? '#22C55E'
+                    : resonanceData.totals?.forecast === 'favorable' ? '#2DD4BF'
+                    : resonanceData.totals?.forecast === 'strained' ? '#FB923C'
+                    : resonanceData.totals?.forecast === 'depleted' ? '#EF4444' : '#A3A3A3'
+                }} />
+                <p className="text-[8px] uppercase tracking-[0.15em] font-medium" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  Energy Forecast
+                </p>
+              </div>
+              <span className="text-[9px] font-medium capitalize" style={{
+                color: resonanceData.totals?.forecast === 'surge' ? '#22C55E'
+                  : resonanceData.totals?.forecast === 'favorable' ? '#2DD4BF'
+                  : resonanceData.totals?.forecast === 'strained' ? '#FB923C'
+                  : resonanceData.totals?.forecast === 'depleted' ? '#EF4444' : '#A3A3A3'
+              }}>
+                {resonanceData.totals?.forecast || 'balanced'}
+              </span>
+            </div>
+
+            {/* Flow meter */}
+            <div className="px-3 py-2" style={{ background: 'rgba(10,10,18,0.4)' }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[7px] font-mono" style={{ color: '#22C55E' }}>+{resonanceData.totals?.boost || 0}</span>
+                <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                  <div className="h-full rounded-full" style={{
+                    width: `${Math.min(100, Math.max(5, 50 + (resonanceData.totals?.net_flow || 0)))}%`,
+                    background: (resonanceData.totals?.net_flow || 0) >= 0
+                      ? `linear-gradient(90deg, ${resonanceData.color}40, ${resonanceData.color})`
+                      : `linear-gradient(90deg, #EF444440, #EF4444)`,
+                    transition: 'width 0.5s ease',
+                  }} />
+                </div>
+                <span className="text-[7px] font-mono" style={{ color: '#EF4444' }}>-{resonanceData.totals?.conflict || 0}</span>
+              </div>
+              <p className="text-[7px] text-center font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                Net: {(resonanceData.totals?.net_flow || 0) >= 0 ? '+' : ''}{resonanceData.totals?.net_flow || 0}
+              </p>
+            </div>
+
+            {/* Synergy list */}
+            {resonanceData.synergies?.length > 0 && (
+              <div className="px-3 py-2 space-y-1" style={{ background: 'rgba(10,10,18,0.3)' }}>
+                {resonanceData.synergies.slice(0, 6).map((s, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[7px]" style={{
+                        color: s.synergy_type === 'generating' || s.synergy_type === 'generated_by' ? '#22C55E'
+                          : s.synergy_type === 'harmony' ? resonanceData.color
+                          : s.synergy_type === 'controlled' || s.synergy_type === 'controlling' ? '#EF4444'
+                          : '#A3A3A3',
+                      }}>
+                        {s.synergy_type === 'generating' || s.synergy_type === 'generated_by' ? '↑'
+                          : s.synergy_type === 'harmony' ? '~'
+                          : s.synergy_type === 'controlled' || s.synergy_type === 'controlling' ? '↓'
+                          : '·'}
+                      </span>
+                      <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{s.plant_name}</span>
+                      <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.15)' }}>{s.stage}</span>
+                    </div>
+                    <span className="text-[8px] font-mono" style={{
+                      color: s.synergy_score > 0 ? '#22C55E' : s.synergy_score < 0 ? '#EF4444' : '#A3A3A3',
+                    }}>
+                      {s.synergy_score > 0 ? '+' : ''}{s.synergy_score}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Projection */}
+            {resonanceData.projection && (
+              <div className="px-3 py-2" style={{ background: `${resonanceData.color}05`, borderTop: `1px solid ${resonanceData.color}08` }}>
+                <p className="text-[8px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  {resonanceData.projection.recommendation}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

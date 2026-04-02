@@ -394,6 +394,8 @@ export default function Botany() {
   const [nurturing, setNurturing] = useState(null);
   const [view, setView] = useState('catalog'); // catalog | garden
   const [elementColors, setElementColors] = useState({});
+  const [resonanceData, setResonanceData] = useState(null);
+  const [balanceScore, setBalanceScore] = useState(null);
 
   const gardenIds = new Set(garden.map(g => g.plant_id));
 
@@ -456,6 +458,30 @@ export default function Botany() {
       setIdentifying(false);
     }
   }, [authHeaders]);
+
+  const handleElementClick = useCallback(async (element) => {
+    setElementFilter(element);
+    setResonanceData(null);
+    if (element) {
+      // Record interaction for mastery scoring + fetch resonance
+      try {
+        const [resonanceRes] = await Promise.all([
+          axios.get(`${API}/botany/resonance/${element}`, { headers: authHeaders }),
+          axios.post(`${API}/mastery/wheel-interaction`, { element }, { headers: authHeaders }).catch(() => {}),
+        ]);
+        setResonanceData(resonanceRes.data);
+      } catch {
+        // silently fail — resonance is an enhancement
+      }
+    }
+  }, [authHeaders]);
+
+  // Fetch balance score on load
+  useEffect(() => {
+    if (authLoading || !token) return;
+    axios.get(`${API}/mastery/balance-score`, { headers: authHeaders })
+      .then(r => setBalanceScore(r.data)).catch(() => {});
+  }, [authHeaders, authLoading, token]);
 
   const filtered = plants.filter(p => {
     if (elementFilter && p.element !== elementFilter) return false;
@@ -562,9 +588,10 @@ export default function Botany() {
             <div className="col-span-5 space-y-4">
               <FiveElementsWheel
                 activeElement={elementFilter}
-                onElementClick={setElementFilter}
+                onElementClick={handleElementClick}
                 plants={plants}
                 gardenSummary={gardenSummary}
+                resonanceData={resonanceData}
               />
               <AnimatePresence mode="wait">
                 {selected && (
@@ -574,9 +601,45 @@ export default function Botany() {
               </AnimatePresence>
             </div>
 
-            {/* Right — AI Identify + Garden Quick */}
+            {/* Right — AI Identify + Balance Score + Garden Quick */}
             <div className="col-span-3 space-y-3">
               <IdentifyPanel onIdentify={handleIdentify} identifying={identifying} result={identifyResult} />
+
+              {/* Balance Score */}
+              {balanceScore && (
+                <div className="rounded-xl p-3" data-testid="balance-score-panel"
+                  style={{ background: `${balanceScore.tier?.color || '#60A5FA'}08`, border: `1px solid ${balanceScore.tier?.color || '#60A5FA'}15` }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[8px] uppercase tracking-[0.15em]" style={{ color: balanceScore.tier?.color || '#60A5FA' }}>
+                      <Star size={9} className="inline mr-1" /> Mastery Tier
+                    </p>
+                    <span className="text-[10px] font-medium capitalize" style={{ color: balanceScore.tier?.color || '#60A5FA' }}>
+                      {balanceScore.tier?.name || 'Observer'}
+                    </span>
+                  </div>
+                  {/* Score bar */}
+                  <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                    <div className="h-full rounded-full" style={{
+                      width: `${balanceScore.balance_score || 0}%`,
+                      background: `linear-gradient(90deg, ${balanceScore.tier?.color || '#60A5FA'}60, ${balanceScore.tier?.color || '#60A5FA'})`,
+                      transition: 'width 0.5s',
+                    }} />
+                  </div>
+                  <div className="flex justify-between text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                    <span>{balanceScore.balance_score || 0}/100</span>
+                    {balanceScore.next_tier && <span>{balanceScore.points_to_next}pts to {balanceScore.next_tier.name}</span>}
+                  </div>
+                  {/* Breakdown */}
+                  <div className="mt-2 space-y-1">
+                    {balanceScore.breakdown && Object.values(balanceScore.breakdown).map(b => (
+                      <div key={b.label} className="flex items-center justify-between">
+                        <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{b.label}</span>
+                        <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.35)' }}>{b.score}/{b.max}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Quick garden view */}
               <div className="rounded-xl p-3" style={{ background: 'rgba(10,10,18,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>

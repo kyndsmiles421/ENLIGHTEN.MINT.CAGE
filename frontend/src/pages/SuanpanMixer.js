@@ -1,8 +1,12 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { ArrowLeft, Volume2, VolumeX, Send, Check, Loader2 } from 'lucide-react';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const BEAD_SIZE = 28;
 const COLUMN_WIDTH = 60;
@@ -113,6 +117,10 @@ export default function SuanpanMixer() {
   const { authHeaders } = useAuth();
   const [values, setValues] = useState([5, 2, 8, 0]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exported, setExported] = useState(false);
+  const [recipeName, setRecipeName] = useState('');
+  const [showExport, setShowExport] = useState(false);
   const oscRef = useRef(null);
   const gainRef = useRef(null);
   const ctxRef = useRef(null);
@@ -171,6 +179,24 @@ export default function SuanpanMixer() {
     }
   }, [totalHz, isPlaying]);
 
+  const handleExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      await axios.post(`${API}/trade-circle/suanpan-export`, {
+        frequency: totalHz,
+        recipe_name: recipeName.trim() || `Frequency Recipe ${totalHz}Hz`,
+      }, { headers: authHeaders });
+      setExported(true);
+      setShowExport(false);
+      toast.success(`Recipe exported to Trade Circle at ${totalHz}Hz`);
+      setTimeout(() => setExported(false), 3000);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Export failed');
+    } finally {
+      setExporting(false);
+    }
+  }, [totalHz, recipeName, authHeaders]);
+
   useEffect(() => {
     return () => { try { oscRef.current?.stop(); } catch {} };
   }, []);
@@ -221,7 +247,7 @@ export default function SuanpanMixer() {
         </div>
 
         {/* Play button */}
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center mt-6 gap-3">
           <motion.button
             className="flex items-center gap-2 px-6 py-2.5 rounded-full"
             style={{
@@ -239,7 +265,55 @@ export default function SuanpanMixer() {
               {isPlaying ? 'Stop' : 'Emit Frequency'}
             </span>
           </motion.button>
+
+          <motion.button
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full"
+            style={{
+              background: exported ? 'rgba(34,197,94,0.12)' : 'rgba(234,179,8,0.08)',
+              border: `1px solid ${exported ? 'rgba(34,197,94,0.25)' : 'rgba(234,179,8,0.15)'}`,
+            }}
+            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+            onClick={() => setShowExport(!showExport)}
+            data-testid="suanpan-export-toggle"
+          >
+            {exported ? <Check size={14} style={{ color: '#22C55E' }} /> : <Send size={14} style={{ color: '#EAB308' }} />}
+            <span className="text-[10px] font-medium tracking-wider uppercase"
+              style={{ color: exported ? '#22C55E' : '#EAB308' }}>
+              {exported ? 'Exported' : 'Trade'}
+            </span>
+          </motion.button>
         </div>
+
+        {/* Export panel */}
+        <AnimatePresence>
+          {showExport && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+              className="mt-4 rounded-lg p-3 overflow-hidden" data-testid="suanpan-export-panel"
+              style={{ background: 'rgba(234,179,8,0.05)', border: '1px solid rgba(234,179,8,0.12)' }}>
+              <p className="text-[8px] uppercase tracking-[0.15em] mb-2" style={{ color: '#EAB308' }}>
+                Export to Trade Circle
+              </p>
+              <input type="text" value={recipeName}
+                onChange={e => setRecipeName(e.target.value)}
+                placeholder={`Frequency Recipe ${totalHz}Hz`}
+                className="w-full px-3 py-1.5 rounded-lg text-[10px] mb-2"
+                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }}
+                data-testid="recipe-name-input" />
+              <div className="flex items-center justify-between">
+                <div className="text-[8px] space-y-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  <p>Frequency: <span className="font-mono" style={{ color }}>{totalHz}Hz</span></p>
+                  <p>Auto-derived: Element, Nature, Mass</p>
+                </div>
+                <button onClick={handleExport} disabled={exporting}
+                  className="px-3 py-1.5 rounded-full text-[9px] font-medium"
+                  style={{ background: 'rgba(234,179,8,0.15)', color: '#EAB308', border: '1px solid rgba(234,179,8,0.25)' }}
+                  data-testid="export-recipe-btn">
+                  {exporting ? <Loader2 size={12} className="animate-spin" /> : 'Export Now'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Presets */}
