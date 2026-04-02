@@ -63,8 +63,14 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - "Group Forge" button appears in ForgePanel only when user is in a coven during an active forge
 - Result shows lift amount, contributor count, and averaged accuracy
 
-**New Routes:** `/api/sync/covens`, `/api/sync/covens/join`, `/api/sync/covens/leave`, `/api/sync/covens/my`, `/api/sync/online-count`, `/api/sync/group-forge`, `/api/ws/sync`
-**Tests:** Iterations 191-192 — 100% Backend / 100% Frontend
+**New Routes:** `/api/sync/covens`, `/api/sync/covens/join`, `/api/sync/covens/leave`, `/api/sync/covens/my`, `/api/sync/online-count`, `/api/sync/group-forge`, `/api/sync/leaderboard`, `/api/ws/sync`
+**Tests:** Iterations 191-193 — 100% Backend / 100% Frontend
+
+**Coven Leaderboard:**
+- `GET /api/sync/leaderboard` aggregates forge scores + harvest counts across coven members
+- Combined score formula: `forge_score + (harvest_count * 2)`
+- Rankings sorted descending, with Roman numeral ranks (I, II, III) for top 3
+- Tab-based UI in coven panel (Coven | Rankings) with own-coven highlight and online indicators
 
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
