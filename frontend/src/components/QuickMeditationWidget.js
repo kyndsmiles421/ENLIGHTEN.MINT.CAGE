@@ -80,7 +80,7 @@ export default function QuickMeditationWidget() {
   }, [stop]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50" data-testid="quick-meditation-widget">
+    <div className="fixed bottom-6 right-4 z-[88]" data-testid="quick-meditation-widget">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -154,7 +154,7 @@ export default function QuickMeditationWidget() {
         onClick={() => setOpen(o => !o)}
         animate={playing ? { scale: [1, 1.05, 1] } : {}}
         transition={playing ? { duration: 2, repeat: Infinity } : {}}
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all"
+        className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all"
         style={{
           background: playing ? `${current?.color || '#D8B4FE'}20` : 'rgba(22, 24, 38, 0.9)',
           border: `1px solid ${playing ? `${current?.color || '#D8B4FE'}30` : 'rgba(255,255,255,0.08)'}`,

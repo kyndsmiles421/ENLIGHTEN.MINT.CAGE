@@ -892,3 +892,322 @@ async def purchase_item(
         "currency": currency_label,
         "message": f"Acquired: {item['name']}. -{spent} {currency_label}.",
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  EDUCATION PACKS — Avenue-Integrated Scaling Shop
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EDUCATION_PACKS = [
+    # Material Avenue (Kinetic Dust, high scaling)
+    {
+        "id": "perf_map_basic",
+        "name": "E-Bike Performance Map: Urban",
+        "avenue": "material",
+        "description": "Optimized motor mapping for city terrain. Smooths torque curve at low RPM for stop-and-go efficiency.",
+        "base_cost": 30,
+        "currency": "kinetic_dust",
+        "scaling": "high",
+        "rarity": "uncommon",
+    },
+    {
+        "id": "perf_map_mountain",
+        "name": "E-Bike Performance Map: Mountain",
+        "avenue": "material",
+        "description": "Aggressive torque profile for steep gradients. Front/rear split auto-adjusts by incline sensor data.",
+        "base_cost": 55,
+        "currency": "kinetic_dust",
+        "scaling": "high",
+        "rarity": "rare",
+    },
+    {
+        "id": "perf_map_endurance",
+        "name": "E-Bike Performance Map: Endurance",
+        "avenue": "material",
+        "description": "Maximum range configuration. Limits peak torque to 60% but extends battery life by 40%.",
+        "base_cost": 75,
+        "currency": "kinetic_dust",
+        "scaling": "high",
+        "rarity": "legendary",
+    },
+    # Living Avenue (Science Resonance, flat scaling)
+    {
+        "id": "lab_kit_basic",
+        "name": "Foundational Lab Kit: Aquafaba",
+        "avenue": "living",
+        "description": "Complete molecular analysis toolkit for chickpea foam stabilization. Includes pH calibration fluid.",
+        "base_cost": 15,
+        "currency": "science_resonance",
+        "scaling": "flat",
+        "rarity": "common",
+    },
+    {
+        "id": "lab_kit_extraction",
+        "name": "Foundational Lab Kit: Extraction",
+        "avenue": "living",
+        "description": "Refractometer and TDS meter for precise coffee extraction measurement. Grind-to-cup optimization guide.",
+        "base_cost": 25,
+        "currency": "science_resonance",
+        "scaling": "flat",
+        "rarity": "uncommon",
+    },
+    {
+        "id": "lab_kit_advanced",
+        "name": "Advanced Lab Kit: Emulsion Science",
+        "avenue": "living",
+        "description": "Full HLB (Hydrophilic-Lipophilic Balance) analysis suite. Create stable plant-milk emulsions from any nut or seed.",
+        "base_cost": 40,
+        "currency": "science_resonance",
+        "scaling": "flat",
+        "rarity": "rare",
+    },
+    # Ancestral Avenue (Science Resonance, moderate/milestone scaling)
+    {
+        "id": "alchemy_tier_1",
+        "name": "Advanced Alchemy Tier I: Calcination",
+        "avenue": "ancestral",
+        "description": "The first stage of the Magnum Opus. Learn the historical chemistry behind thermal decomposition and purification.",
+        "base_cost": 20,
+        "currency": "science_resonance",
+        "scaling": "moderate",
+        "rarity": "uncommon",
+    },
+    {
+        "id": "alchemy_tier_2",
+        "name": "Advanced Alchemy Tier II: Dissolution",
+        "avenue": "ancestral",
+        "description": "Dissolving the calcined matter. Historical acid-base chemistry and the search for the Universal Solvent.",
+        "base_cost": 35,
+        "currency": "science_resonance",
+        "scaling": "moderate",
+        "rarity": "rare",
+    },
+    {
+        "id": "sacred_site_blueprint",
+        "name": "Sacred Site Blueprint: Göbekli Tepe",
+        "avenue": "ancestral",
+        "description": "Architectural analysis of the world's oldest temple. Pillar alignments mapped to stellar coordinates.",
+        "base_cost": 50,
+        "currency": "science_resonance",
+        "scaling": "milestone",
+        "rarity": "legendary",
+    },
+]
+
+SCALING_FACTORS = {
+    "flat": lambda base, level: base,
+    "moderate": lambda base, level: round(base * (1 + level * 0.3)),
+    "high": lambda base, level: round(base * (1 + level)),
+    "milestone": lambda base, level: round(base * (1 + (level // 3))),
+}
+
+
+@router.get("/economy/education-packs")
+async def get_education_packs(
+    avenue: str = None,
+    user=Depends(get_current_user),
+):
+    """Get education packs with dynamic pricing based on user level."""
+    uid = user["id"]
+    prog = await db.avenue_progress.find_one({"user_id": uid}, {"_id": 0})
+    user_doc = await db.users.find_one({"id": uid}, {"_id": 0, "user_dust_balance": 1})
+    purchases = await db.economy_purchases.find({"user_id": uid}, {"_id": 0}).to_list(200)
+    owned_ids = {p["item_id"] for p in purchases}
+
+    sci_res = (prog or {}).get("science", {}).get("resonance", 0)
+    hist_res = (prog or {}).get("history", {}).get("resonance", 0)
+    dust_balance = (user_doc or {}).get("user_dust_balance", 0)
+
+    # Calculate user level (based on combined resonance)
+    combined = sci_res + hist_res
+    user_level = min(combined // 50, 10)  # max level 10
+
+    packs = EDUCATION_PACKS
+    if avenue:
+        packs = [p for p in packs if p["avenue"] == avenue]
+
+    items = []
+    for pack in packs:
+        scale_fn = SCALING_FACTORS.get(pack["scaling"], SCALING_FACTORS["flat"])
+        cost = scale_fn(pack["base_cost"], user_level)
+        items.append({
+            **pack,
+            "scaled_cost": cost,
+            "user_level": user_level,
+            "owned": pack["id"] in owned_ids,
+        })
+
+    return {
+        "packs": items,
+        "balances": {
+            "kinetic_dust": round(dust_balance, 1),
+            "science_resonance": sci_res + hist_res,
+        },
+        "user_level": user_level,
+    }
+
+
+@router.post("/economy/purchase-pack")
+async def purchase_education_pack(
+    pack_id: str = Body(..., embed=True),
+    user=Depends(get_current_user),
+):
+    """Purchase an education pack with dynamic pricing."""
+    uid = user["id"]
+    pack = None
+    for p in EDUCATION_PACKS:
+        if p["id"] == pack_id:
+            pack = p
+            break
+    if not pack:
+        raise HTTPException(404, "Pack not found")
+
+    existing = await db.economy_purchases.find_one({"user_id": uid, "item_id": pack_id}, {"_id": 0})
+    if existing:
+        raise HTTPException(400, "Already owned")
+
+    prog = await db.avenue_progress.find_one({"user_id": uid}, {"_id": 0})
+    sci_res = (prog or {}).get("science", {}).get("resonance", 0)
+    hist_res = (prog or {}).get("history", {}).get("resonance", 0)
+    user_level = min((sci_res + hist_res) // 50, 10)
+    scale_fn = SCALING_FACTORS.get(pack["scaling"], SCALING_FACTORS["flat"])
+    cost = scale_fn(pack["base_cost"], user_level)
+
+    if pack["currency"] == "kinetic_dust":
+        user_doc = await db.users.find_one({"id": uid}, {"_id": 0, "user_dust_balance": 1})
+        balance = (user_doc or {}).get("user_dust_balance", 0)
+        if balance < cost:
+            raise HTTPException(400, f"Insufficient Kinetic Dust. Need {cost}, have {round(balance, 1)}")
+        await db.users.update_one({"id": uid}, {"$inc": {"user_dust_balance": -cost}})
+        currency_label = "Kinetic Dust"
+    else:
+        total_res = sci_res + hist_res
+        if total_res < cost:
+            raise HTTPException(400, f"Insufficient Science Resonance. Need {cost}, have {total_res}")
+        # Deduct from science resonance first, then history
+        deduct_sci = min(sci_res, cost)
+        deduct_hist = cost - deduct_sci
+        if deduct_sci > 0:
+            await db.avenue_progress.update_one({"user_id": uid}, {"$inc": {"science.resonance": -deduct_sci}})
+        if deduct_hist > 0:
+            await db.avenue_progress.update_one({"user_id": uid}, {"$inc": {"history.resonance": -deduct_hist}})
+        currency_label = "Science Resonance"
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.economy_purchases.insert_one({
+        "user_id": uid,
+        "item_id": pack_id,
+        "item_name": pack["name"],
+        "category": f"education_pack_{pack['avenue']}",
+        "currency": pack["currency"],
+        "amount_spent": cost,
+        "purchased_at": now,
+    })
+
+    return {
+        "success": True,
+        "item": pack["name"],
+        "avenue": pack["avenue"],
+        "spent": cost,
+        "currency": currency_label,
+        "message": f"Acquired: {pack['name']}. -{cost} {currency_label}.",
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  RESONANCE BUILDS — Crafting System
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RESONANCE_BUILDS = [
+    {
+        "id": "kinetic_amplifier",
+        "name": "Kinetic Amplifier Build",
+        "description": "Combine Carbon Fork + Torque Sensor to amplify Kinetic Dust generation by 1.25x.",
+        "required_items": ["carbon_fork", "torque_sensor"],
+        "bonus_type": "dust_multiplier",
+        "bonus_value": 1.25,
+    },
+    {
+        "id": "zen_flow",
+        "name": "Zen Flow Build",
+        "description": "Combine Yoga Mat + Meditation Cushion for 1.2x Science Resonance gain on Living Avenue activities.",
+        "required_items": ["yoga_mat", "meditation_cushion"],
+        "bonus_type": "resonance_multiplier",
+        "bonus_value": 1.2,
+    },
+    {
+        "id": "chrono_alchemist",
+        "name": "Chrono-Alchemist Build",
+        "description": "Combine Alchemist Skin + Chronicler Skin to unlock 1.3x resonance on Ancestral Avenue Q&A.",
+        "required_items": ["alchemist_skin", "chronicler_skin"],
+        "bonus_type": "resonance_multiplier",
+        "bonus_value": 1.3,
+    },
+]
+
+
+@router.get("/economy/builds")
+async def get_resonance_builds(user=Depends(get_current_user)):
+    """Get available Resonance Builds and their crafting requirements."""
+    uid = user["id"]
+    purchases = await db.economy_purchases.find({"user_id": uid}, {"_id": 0}).to_list(200)
+    owned_ids = {p["item_id"] for p in purchases}
+    crafted = await db.resonance_builds.find({"user_id": uid}, {"_id": 0}).to_list(20)
+    crafted_ids = {c["build_id"] for c in crafted}
+
+    builds = []
+    for b in RESONANCE_BUILDS:
+        owned_count = sum(1 for req in b["required_items"] if req in owned_ids)
+        builds.append({
+            **b,
+            "owned_items": owned_count,
+            "total_required": len(b["required_items"]),
+            "can_craft": all(req in owned_ids for req in b["required_items"]) and b["id"] not in crafted_ids,
+            "crafted": b["id"] in crafted_ids,
+        })
+
+    return {"builds": builds, "total_crafted": len(crafted_ids)}
+
+
+@router.post("/economy/craft-build")
+async def craft_resonance_build(
+    build_id: str = Body(..., embed=True),
+    user=Depends(get_current_user),
+):
+    """Craft a Resonance Build from owned items."""
+    uid = user["id"]
+    build = None
+    for b in RESONANCE_BUILDS:
+        if b["id"] == build_id:
+            build = b
+            break
+    if not build:
+        raise HTTPException(404, "Build not found")
+
+    existing = await db.resonance_builds.find_one({"user_id": uid, "build_id": build_id}, {"_id": 0})
+    if existing:
+        raise HTTPException(400, "Already crafted")
+
+    purchases = await db.economy_purchases.find({"user_id": uid}, {"_id": 0}).to_list(200)
+    owned_ids = {p["item_id"] for p in purchases}
+    missing = [req for req in build["required_items"] if req not in owned_ids]
+    if missing:
+        raise HTTPException(400, f"Missing items: {', '.join(missing)}")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.resonance_builds.insert_one({
+        "user_id": uid,
+        "build_id": build_id,
+        "build_name": build["name"],
+        "bonus_type": build["bonus_type"],
+        "bonus_value": build["bonus_value"],
+        "crafted_at": now,
+    })
+
+    return {
+        "success": True,
+        "build": build["name"],
+        "bonus_type": build["bonus_type"],
+        "bonus_value": build["bonus_value"],
+        "message": f"Crafted: {build['name']}! {build['bonus_type'].replace('_', ' ').title()}: {build['bonus_value']}x",
+    }

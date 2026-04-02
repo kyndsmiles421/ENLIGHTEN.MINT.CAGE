@@ -77,7 +77,7 @@ export default function FloatingAssistant() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-20 right-4 z-[90] w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90"
+            className="fixed bottom-[72px] right-4 z-[90] w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90"
             style={{
               background: 'linear-gradient(135deg, rgba(192,132,252,0.9), rgba(129,140,248,0.9))',
               boxShadow: '0 4px 20px rgba(192,132,252,0.3)',
@@ -97,7 +97,7 @@ export default function FloatingAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 z-[90] w-[340px] max-w-[calc(100vw-32px)] rounded-2xl overflow-hidden"
+            className="fixed bottom-[72px] right-4 z-[90] w-[340px] max-w-[calc(100vw-32px)] rounded-2xl overflow-hidden"
             style={{
               background: 'rgba(11,12,21,0.97)',
               border: '1px solid rgba(192,132,252,0.15)',

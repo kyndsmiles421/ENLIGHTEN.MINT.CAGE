@@ -1,0 +1,70 @@
+{
+  "summary": "Iteration 187 testing complete: Three Avenues reorganization (Material/Living/Ancestral), Education Packs with dynamic pricing, Resonance Builds crafting system. All 19 backend tests passed (100%). Frontend UI verified: Three Avenues accordion panels, pillar buttons, panel components (EBikePanel, BotanicalLabPanel, HistoryPanel), Education Packs toggles, and Resonance Builds panel all working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration187_three_avenues.py",
+    "/app/test_reports/pytest/pytest_iteration187_three_avenues.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Three Avenues structure correctly implemented: Material (ebike+economy), Living (botanical+biometrics+art), Ancestral (history+math+thought)",
+    "Education Packs endpoint returns 9 packs with avenue filter working correctly",
+    "Dynamic pricing formula implemented: high scaling = base * (1 + level), flat = base, moderate = base * (1 + level * 0.3), milestone = base * (1 + level // 3)",
+    "Resonance Builds crafting system returns 3 builds with proper ownership/crafting status",
+    "Widget overlap fix verified: FloatingAssistant at bottom-[72px] and QuickMeditationWidget at bottom-6 (24px) - no overlap",
+    "All previous Science/History endpoints still working (botanical-lab, ebike/sims, history-modules, geology, economy/shop)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration187_three_avenues.py"
+  ],
+  "success_rate": {"backend": "100% (19/19)", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "None - used existing test user",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 187 Three Avenues features all working. Test user has: 314 Resonance, 203 Kinetic Dust, 62 Science Resonance, Seeker tier. The Mastery Avenues page at /mastery-avenues shows Three Avenues of Flow with Material/Living/Ancestral accordions. Each avenue expands to show pillar buttons. Education Packs are integrated within each avenue. Resonance Builds panel shows 3 builds (Kinetic Amplifier, Zen Flow, Chrono-Alchemist). Auth flow: use /auth page, dismiss trial modal with 'Continue with free plan'.",
+  "features_verified": {
+    "backend_apis": {
+      "GET /api/science-history/economy/education-packs": "Returns 9 packs with dynamic pricing",
+      "GET /api/science-history/economy/education-packs?avenue=material": "Returns 3 material packs (kinetic_dust, high scaling)",
+      "GET /api/science-history/economy/education-packs?avenue=living": "Returns 3 living packs (science_resonance, flat scaling)",
+      "GET /api/science-history/economy/education-packs?avenue=ancestral": "Returns 3 ancestral packs (science_resonance, moderate/milestone scaling)",
+      "POST /api/science-history/economy/purchase-pack": "Purchases pack with dynamic pricing",
+      "GET /api/science-history/economy/builds": "Returns 3 Resonance Builds with crafting requirements",
+      "POST /api/science-history/economy/craft-build": "Crafts build (fails if items not owned)",
+      "GET /api/avenues/overview": "Returns all 6 avenues",
+      "GET /api/science-history/botanical-lab": "Returns 5 simulations (regression)",
+      "GET /api/science-history/ebike/sims": "Returns 2 simulations (regression)",
+      "GET /api/science-history/history-modules": "Returns 4 modules (regression)",
+      "GET /api/science-history/geology": "Returns 3 modules (regression)",
+      "GET /api/science-history/economy/shop": "Returns 8 items (regression)",
+      "POST /api/science-history/heart-sync": "Heart rate sync working (regression)"
+    },
+    "frontend_pages": {
+      "mastery_avenues_page": "Present with data-testid='mastery-avenues-page'",
+      "three_avenues_header": "'Three Avenues of Flow' header visible",
+      "global_tickers": "Shows Resonance, Kinetic Dust, Sci Resonance, Tier",
+      "avenue_material": "Glassmorphism accordion panel with E-Bike + Economy pillars",
+      "avenue_living": "Glassmorphism accordion panel with Botanical + Biometrics + Art pillars",
+      "avenue_ancestral": "Glassmorphism accordion panel with History + Math + Thought pillars",
+      "education_packs_toggle": "Visible inside each expanded avenue",
+      "ebike_panel": "Loads with sliders when E-Bike pillar clicked",
+      "botanical_lab_panel": "Loads with simulations when Botanical pillar clicked",
+      "history_panel": "Loads with modules when History pillar clicked",
+      "resonance_builds_panel": "Shows 3 builds with crafting status"
+    },
+    "widget_overlap_fix": {
+      "floating_assistant": "Positioned at bottom-[72px] right-4 z-[90]",
+      "quick_meditation": "Positioned at bottom-6 right-4 z-[88]",
+      "overlap_status": "NO OVERLAP - FloatingAssistant is 72px from bottom, QuickMeditation is 24px from bottom"
+    }
+  }
+}
