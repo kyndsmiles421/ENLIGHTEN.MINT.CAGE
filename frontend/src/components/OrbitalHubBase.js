@@ -1,17 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ArrowLeft } from 'lucide-react';
 import { ResonancePulse, HexagramGlitch } from './ResonancePulse';
 import { CosmicSparkline } from './CosmicSparkline';
 import { useCosmicState } from '../context/CosmicStateContext';
 
 // ━━━ GRAVITY CONSTANTS ENGINE ━━━
-// Computes orbit radius, spacing, and speed from node count + stability
 function computeGravityLayout(nodeCount, containerSize, stability) {
   const baseRadius = Math.min(containerSize * 0.3, 120 + nodeCount * 14);
-  // Stability affects orbit speed: stable=slow, volatile=erratic
   const speedMultiplier = stability === 'stable' ? 0.3 : stability === 'shifting' ? 0.7 : 1.2;
-  // Auto-scale radius so nodes don't overlap (min ~65px apart)
   const circumference = 2 * Math.PI * baseRadius;
   const nodeSize = 64;
   const minSpacing = nodeSize + 12;
@@ -21,6 +18,24 @@ function computeGravityLayout(nodeCount, containerSize, stability) {
     : baseRadius;
   const finalRadius = Math.min(scaledRadius, containerSize * 0.42);
   return { radius: finalRadius, speedMultiplier, nodeSize };
+}
+
+// ━━━ GRAVITATIONAL PULL — compute damping from cursor proximity to nearest node ━━━
+function computeGravitationalDamping(cursorPos, positions, center, pullRadius) {
+  if (!cursorPos) return 1.0;
+  let minDist = Infinity;
+  for (const pos of positions) {
+    const nx = center + pos.x;
+    const ny = center + pos.y;
+    const dx = cursorPos.x - nx;
+    const dy = cursorPos.y - ny;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < minDist) minDist = dist;
+  }
+  if (minDist > pullRadius) return 1.0;
+  // Quadratic easing: closer = slower (0.05 at surface, 1.0 at pullRadius)
+  const t = minDist / pullRadius;
+  return 0.05 + 0.95 * t * t;
 }
 
 // ━━━ ORBITAL NODE ━━━
@@ -176,10 +191,12 @@ export function OrbitalHubBase({
 
   const [hoveredId, setHoveredId] = useState(null);
   const [orbitAngle, setOrbitAngle] = useState(0);
+  const [flyingIn, setFlyingIn] = useState(null); // deep-dive transition state
   const animRef = useRef(null);
   const isDragging = useRef(false);
   const lastDragAngle = useRef(0);
   const angularVel = useRef(0);
+  const cursorPos = useRef(null); // for gravitational pull
 
   const containerSize = 580;
   const center = containerSize / 2;
@@ -208,27 +225,29 @@ export function OrbitalHubBase({
     return { x: Math.cos(a) * layout.radius, y: Math.sin(a) * layout.radius };
   });
 
-  // Animation loop — continuous rotation based on stability
+  // Animation loop — continuous rotation with gravitational pull damping
   useEffect(() => {
     let last = performance.now();
+    const pullRadius = layout.radius * 0.6; // gravitational capture zone
     const tick = (now) => {
       const dt = (now - last) / 1000;
       last = now;
-      if (!isDragging.current) {
-        // Ambient rotation — speed mapped to stability
+      if (!isDragging.current && !flyingIn) {
+        // Compute gravitational damping from cursor proximity
+        const gravDamp = computeGravitationalDamping(cursorPos.current, positions, center, pullRadius);
         const baseSpeed = 0.08 * layout.speedMultiplier;
         if (Math.abs(angularVel.current) > 0.01) {
-          setOrbitAngle(prev => prev + angularVel.current * dt);
+          setOrbitAngle(prev => prev + angularVel.current * dt * gravDamp);
           angularVel.current *= 0.96;
         } else {
-          setOrbitAngle(prev => prev + baseSpeed * dt);
+          setOrbitAngle(prev => prev + baseSpeed * dt * gravDamp);
         }
       }
       animRef.current = requestAnimationFrame(tick);
     };
     animRef.current = requestAnimationFrame(tick);
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, [layout.speedMultiplier]);
+  }, [layout.speedMultiplier, flyingIn, positions, center, layout.radius]);
 
   // Drag handlers for orbit rotation
   const handlePointerDown = useCallback((e) => {
@@ -240,8 +259,11 @@ export function OrbitalHubBase({
   }, []);
 
   const handlePointerMove = useCallback((e) => {
-    if (!isDragging.current) return;
+    // Track cursor for gravitational pull
     const rect = e.currentTarget.getBoundingClientRect();
+    cursorPos.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+
+    if (!isDragging.current) return;
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
     const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
@@ -257,9 +279,24 @@ export function OrbitalHubBase({
     isDragging.current = false;
   }, []);
 
-  // Deep-dive: when a planet is selected, fly camera in
+  const handlePointerLeave = useCallback(() => {
+    isDragging.current = false;
+    cursorPos.current = null; // reset gravitational pull
+  }, []);
+
+  // Deep-dive: animate fly-in then hand off to parent
   const handleSelect = useCallback((planet) => {
-    if (onPlanetSelect) onPlanetSelect(planet);
+    if (!onPlanetSelect) return;
+    // If planet has subPlanets, do fly-in animation
+    if (planet.subPlanets) {
+      setFlyingIn(planet.id);
+      setTimeout(() => {
+        setFlyingIn(null);
+        onPlanetSelect(planet);
+      }, 500);
+    } else {
+      onPlanetSelect(planet);
+    }
   }, [onPlanetSelect]);
 
   return (
@@ -283,7 +320,7 @@ export function OrbitalHubBase({
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
+          onPointerLeave={handlePointerLeave}
         >
           {/* Orbit ring */}
           <div className="absolute rounded-full pointer-events-none"
@@ -309,9 +346,9 @@ export function OrbitalHubBase({
             <OrbitalNode
               key={planet.id}
               node={planet}
-              x={positions[i]?.x || 0}
-              y={positions[i]?.y || 0}
-              isActive={false}
+              x={flyingIn === planet.id ? 0 : (positions[i]?.x || 0)}
+              y={flyingIn === planet.id ? 0 : (positions[i]?.y || 0)}
+              isActive={flyingIn === planet.id}
               isLocked={lockedIds.has(planet.id)}
               onSelect={handleSelect}
               onHover={setHoveredId}
@@ -349,20 +386,37 @@ export function OrbitalHubBase({
         })()}
       </AnimatePresence>
 
-      {/* Depth indicator */}
+      {/* Depth breadcrumb trail + back navigation */}
       {depth > 0 && (
-        <motion.div className="absolute top-4 left-4 z-30 flex items-center gap-1"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {Array.from({ length: depth + 1 }).map((_, i) => (
-            <div key={i} className="w-1.5 h-1.5 rounded-full"
-              style={{
-                background: i === depth ? 'rgba(248,250,252,0.4)' : 'rgba(248,250,252,0.1)',
-              }}
-            />
-          ))}
-          <span className="text-[7px] ml-1 uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.15)' }}>
-            depth {depth}
-          </span>
+        <motion.div className="absolute top-4 left-4 z-30 flex items-center gap-2"
+          initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+          <button onClick={onBack}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
+            style={{
+              background: 'rgba(248,250,252,0.04)',
+              border: '1px solid rgba(248,250,252,0.06)',
+            }}
+            data-testid="orbital-back-btn">
+            <ArrowLeft size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <span className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              Back
+            </span>
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: depth + 1 }).map((_, i) => (
+              <div key={i} className="rounded-full transition-all"
+                style={{
+                  width: i === depth ? 6 : 4,
+                  height: i === depth ? 6 : 4,
+                  background: i === depth ? (sun?.color || '#A78BFA') : 'rgba(248,250,252,0.1)',
+                  boxShadow: i === depth ? `0 0 6px ${sun?.color || '#A78BFA'}30` : 'none',
+                }}
+              />
+            ))}
+            <span className="text-[7px] ml-1 font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
+              L{depth}
+            </span>
+          </div>
         </motion.div>
       )}
 

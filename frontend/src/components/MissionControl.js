@@ -28,9 +28,10 @@ export default function MissionControl({ isOpen, onClose }) {
     { label: 'Dashboard', icon: Layers, path: '/dashboard', color: '#22C55E' },
     { label: 'Book of Changes', icon: BookOpen, path: '/hexagram-journal', color: '#C084FC' },
     { label: 'Botany Orbital', icon: Leaf, path: '/botany-orbital', color: '#34D399' },
-    { label: 'Settings', icon: Settings, path: '/settings', color: '#94A3B8' },
+    { label: 'Trade Orbital', icon: Globe, path: '/trade-orbital', color: '#818CF8' },
+    { label: 'Codex Orbital', icon: Eye, path: '/codex-orbital', color: '#A78BFA' },
     { label: 'Mastery Tiers', icon: Award, path: '/mastery-avenues', color: '#FBBF24' },
-    { label: 'Analytics', icon: Eye, path: '/analytics', color: '#3B82F6' },
+    { label: 'Settings', icon: Settings, path: '/settings', color: '#94A3B8' },
     { label: 'Admin', icon: Shield, path: '/admin/power-spot', color: '#EF4444' },
   ];
 

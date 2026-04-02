@@ -1,0 +1,145 @@
+{
+  "summary": "Iteration 220 - Trade Circle Orbital & Codex Orbital Testing Complete. All 20 backend API tests passed (100%). Frontend UI verified: TradeCircleOrbital with center sun 'Trade Circle', 10 orbital planets (category nodes + stats/escrow/forge/genesis/karma), detail panels with listing data. CodexOrbital with center sun 'Sovereign Codex', 8 section planets, deep-dive recursion working (L1 depth indicator), tier indicator 'Archivist'. Mission Control has Trade Orbital and Codex Orbital action links. Locked nodes (Cosmic Forge, Genesis Mint) correctly show opacity 0.2 and 'locked' text.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "TradeCircleOrbital",
+        "issue": "Full Trade View button click intercepted by 'Made with Emergent' badge overlay",
+        "selector": "[data-testid=\"switch-to-full-trade\"]",
+        "priority": "LOW",
+        "workaround": "Button exists and is functional via JS click, needs z-index adjustment or badge repositioning"
+      },
+      {
+        "component": "CodexOrbital",
+        "issue": "Page shows loading spinner when navigating directly without fresh auth session",
+        "selector": ".animate-spin",
+        "priority": "LOW",
+        "workaround": "Works correctly when navigating from authenticated session"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration220_trade_codex_orbital.py",
+    "/app/test_reports/pytest/pytest_iteration220_trade_codex_orbital.xml"
+  ],
+  "action_items": [
+    "Consider adjusting z-index of 'Full Trade View' button or repositioning 'Made with Emergent' badge to prevent click interception (same issue as iteration 219)"
+  ],
+  "critical_code_review_comments": [
+    "OrbitalHubBase.js: Gravitational pull zones implemented correctly - computeGravitationalDamping uses quadratic curve (0.05 at surface, 1.0 at pullRadius)",
+    "OrbitalHubBase.js: Fly-in animation for deep-dive transitions sets flyingIn state, animates target to (0,0), calls onPlanetSelect after 500ms",
+    "OrbitalHubBase.js: Depth breadcrumbs show L0, L1 indicators during recursion with back button",
+    "OrbitalHubBase.js: Locked nodes correctly use requiredBit property to check hexagram.bits array",
+    "OrbitalHubBase.js: Pointer-events layering correct - nodes have auto, visual effects have none",
+    "TradeCircleOrbital.js: Generates category planets from actual listings data (goods, services, botanical, frequency_recipe, etc.)",
+    "TradeCircleOrbital.js: Market Stats, Escrow, Karma orbit nodes present",
+    "TradeCircleOrbital.js: Cosmic Forge (requiredBit: 4) and Genesis Mint (requiredBit: 5) correctly locked",
+    "TradeCircleOrbital.js: TradeDetailPanel shows listing items with title, mass, and visual_scale",
+    "CodexOrbital.js: Section planets generated from API sections (botany, elements, navigation, trade, mechanics, mastery, mathematics, resonance)",
+    "CodexOrbital.js: Deep-dive recursion uses diveStack array to track levels",
+    "CodexOrbital.js: CodexDetailPanel shows entries with 'Deep Dive' button for sections with subPlanets",
+    "CodexOrbital.js: Tier indicator (Archivist) shown in bottom-left",
+    "MissionControl.js: Trade Orbital and Codex Orbital action links present and functional"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration220_trade_codex_orbital.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "95%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password (Archivist tier)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 220 verified: (1) /trade-orbital route renders TradeCircleOrbital with center sun 'Trade Circle' and 10 orbiting planets (category nodes from listings + stats/escrow/forge/genesis/karma). (2) Trade Orbital category planets generated from actual listings data (frequency_recipe, botanical, phonetic_mantra, other, goods). (3) Cosmic Forge (bit 4) and Genesis Mint (bit 5) nodes correctly locked with opacity 0.2 and 'locked' text. (4) TradeDetailPanel opens on planet click showing listing items with title, mass, visual_scale. (5) /codex-orbital route renders CodexOrbital with center sun 'Sovereign Codex' and 8 section planets (botany, elements, navigation, trade, mechanics, mastery, mathematics, resonance). (6) Deep-dive recursion works - clicking section planet with subPlanets triggers fly-in animation, section becomes new sun with entries as planets. (7) Depth breadcrumbs show L0, L1 during recursion with back button. (8) Tier indicator 'Archivist' shown in bottom-left. (9) Mission Control has Trade Orbital and Codex Orbital action links. (10) CosmicSparkline overlay in top-right on all orbital pages. (11) Full View buttons link to /trade-circle and /codex (badge overlay issue persists). (12) Gravitational pull zones implemented - orbit slows when cursor near planet (quadratic damping curve). (13) HexagramGlitch wraps orbital canvas when hexagram is transitioning.",
+  "features_verified": {
+    "trade_orbital_route": {
+      "status": "PASS",
+      "details": "/trade-orbital renders TradeCircleOrbital with center sun and 10 orbiting planets"
+    },
+    "trade_orbital_center_sun": {
+      "status": "PASS",
+      "details": "Center sun labeled 'Trade Circle' with 17 listings subtitle"
+    },
+    "trade_orbital_category_planets": {
+      "status": "PASS",
+      "details": "Category planets generated from actual listings data (frequency_recipe, botanical, phonetic_mantra, other, goods)"
+    },
+    "trade_orbital_stats_escrow_karma": {
+      "status": "PASS",
+      "details": "Market Stats, Escrow, Karma orbit nodes present"
+    },
+    "trade_orbital_locked_nodes": {
+      "status": "PASS",
+      "details": "Cosmic Forge (bit 4) and Genesis Mint (bit 5) locked with opacity 0.2 and 'locked' text"
+    },
+    "trade_orbital_detail_panel": {
+      "status": "PASS",
+      "details": "TradeDetailPanel opens on planet click showing listing items with title, mass, visual_scale"
+    },
+    "codex_orbital_route": {
+      "status": "PASS",
+      "details": "/codex-orbital renders CodexOrbital with center sun and 8 section planets"
+    },
+    "codex_orbital_center_sun": {
+      "status": "PASS",
+      "details": "Center sun labeled 'Sovereign Codex' with 14 entries subtitle"
+    },
+    "codex_orbital_section_planets": {
+      "status": "PASS",
+      "details": "Section planets: botany, elements, navigation, trade, mechanics, mastery, mathematics, resonance"
+    },
+    "codex_orbital_detail_panel": {
+      "status": "PASS",
+      "details": "CodexDetailPanel shows entries with 'Deep Dive' button"
+    },
+    "codex_orbital_deep_dive": {
+      "status": "PASS",
+      "details": "Deep Dive triggers recursion - section becomes new sun with entries as planets"
+    },
+    "codex_orbital_depth_breadcrumbs": {
+      "status": "PASS",
+      "details": "Depth breadcrumbs show L0, L1 during recursion"
+    },
+    "codex_orbital_back_button": {
+      "status": "PASS",
+      "details": "Back button during recursion returns to parent level"
+    },
+    "codex_orbital_tier_indicator": {
+      "status": "PASS",
+      "details": "Tier indicator 'Archivist' shown in bottom-left"
+    },
+    "gravitational_pull_zones": {
+      "status": "PASS",
+      "details": "Orbit slows when cursor near planet (quadratic damping: 0.05 at surface, 1.0 at pullRadius)"
+    },
+    "mission_control_trade_orbital": {
+      "status": "PASS",
+      "details": "Mission Control has Trade Orbital action link"
+    },
+    "mission_control_codex_orbital": {
+      "status": "PASS",
+      "details": "Mission Control has Codex Orbital action link"
+    },
+    "cosmic_sparkline_overlay": {
+      "status": "PASS",
+      "details": "CosmicSparkline renders in top-right on all orbital pages"
+    },
+    "full_view_buttons": {
+      "status": "PARTIAL",
+      "details": "Buttons exist and work via JS click, but badge overlay intercepts normal clicks"
+    },
+    "hexagram_glitch_wrapper": {
+      "status": "PASS",
+      "details": "HexagramGlitch wraps orbital canvas, activates when hexagram is transitioning"
+    },
+    "orbital_pointer_events": {
+      "status": "PASS",
+      "details": "Orbital nodes have pointer-events: auto, visual effects have pointer-events: none"
+    }
+  }
+}

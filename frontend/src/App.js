@@ -173,6 +173,8 @@ const Botany = lazy(() => import('./pages/Botany'));
 const Codex = lazy(() => import('./pages/Codex'));
 const BotanyOrbital = lazy(() => import('./pages/BotanyOrbital'));
 const HexagramJournal = lazy(() => import('./pages/HexagramJournal'));
+const TradeCircleOrbital = lazy(() => import('./pages/TradeCircleOrbital'));
+const CodexOrbital = lazy(() => import('./pages/CodexOrbital'));
 
 function PageLoader() {
   return (
@@ -329,6 +331,8 @@ function AnimatedRoutes() {
         <Route path="/codex" element={<Codex />} />
         <Route path="/botany-orbital" element={<BotanyOrbital />} />
         <Route path="/hexagram-journal" element={<HexagramJournal />} />
+        <Route path="/trade-orbital" element={<TradeCircleOrbital />} />
+        <Route path="/codex-orbital" element={<CodexOrbital />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
