@@ -1,0 +1,71 @@
+{
+  "summary": "Iteration 186 testing complete: Science/History Avenues, E-Bike Simulator, Circular Economy. All 15 backend tests passed (100%). Fixed Body parameter issue in /api/science-history/economy/purchase endpoint. All frontend UI components verified working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration186_science_history_economy.py",
+    "/app/test_reports/pytest/pytest_iteration186_science_history_economy.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "avenues.py now has 6 avenues: mathematics, art, thought, biometrics, science, history",
+    "Science avenue (The Alchemist) includes Botanical Lab (5 sims) and E-Bike Engineering (2 sims)",
+    "History avenue (The Chronicler) includes History modules (4) and Geology modules (3)",
+    "Circular Economy marketplace has 8 items purchasable with Kinetic Dust or Science Resonance",
+    "resonance-check and equilibrium now include all 6 avenues",
+    "Heart Rate Sync challenge ties BPM to planetary depth frequencies"
+  ],
+  "updated_files": [
+    "/app/backend/routes/science_history.py",
+    "/app/backend/tests/test_iteration186_science_history_economy.py"
+  ],
+  "success_rate": {"backend": "100% (15/15)", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "None - used existing test user",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 186 Science/History/Economy features all working. Test user has: 188 Kinetic Dust, 62 Science Resonance, 289 Combined Resonance. User owns Carbon Fiber Fork Upgrade and 26x4.8 Fat Tire Set from shop. Botanical Lab simulations: aquafaba_meringue mastered. History/Geology Q&A modules working with correct answers: egyptian (365-day calendar), crust (thinnest layer). Auth flow: use /auth page, dismiss trial modal with 'Continue with free plan'.",
+  "features_verified": {
+    "backend_apis": {
+      "GET /api/avenues/overview": "Returns 6 avenues including science and history",
+      "GET /api/science-history/botanical-lab": "Returns 5 simulations with variables",
+      "POST /api/science-history/botanical-lab/simulate": "Accepts variables, returns score/feedback",
+      "GET /api/science-history/ebike/sims": "Returns 2 e-bike simulations",
+      "POST /api/science-history/ebike/simulate": "Returns score and calculated range",
+      "GET /api/science-history/history-modules": "Returns 4 history modules",
+      "GET /api/science-history/history/{module_id}/question/{index}": "Returns question text and hint",
+      "POST /api/science-history/history/answer": "Checks answer correctness, awards resonance",
+      "GET /api/science-history/geology": "Returns 3 geology modules",
+      "GET /api/science-history/geology/{module_id}/question/{index}": "Returns question text and hint",
+      "POST /api/science-history/geology/answer": "Checks answer correctness, awards resonance",
+      "GET /api/science-history/economy/shop": "Returns 8 items with user balances",
+      "POST /api/science-history/economy/purchase": "Deducts currency, records purchase",
+      "GET /api/avenues/resonance-check": "Includes all 6 avenues in totals",
+      "POST /api/science-history/heart-sync": "Heart rate sync challenge working"
+    },
+    "frontend_pages": {
+      "mastery_avenues_page": "Present with data-testid='mastery-avenues-page'",
+      "avenue_cards": "6 cards with data-testid='avenue-card-{id}' pattern",
+      "science_card": "Present with data-testid='avenue-card-science'",
+      "history_card": "Present with data-testid='avenue-card-history'",
+      "botanical_lab_panel": "Present with data-testid='botanical-lab-panel'",
+      "ebike_panel": "Present with data-testid='ebike-panel'",
+      "history_panel": "Present with data-testid='history-panel'",
+      "circular_economy_panel": "Present with data-testid='circular-economy-panel'",
+      "shop_items": "8 items with data-testid='shop-item-{id}' pattern"
+    }
+  },
+  "bug_fixed": {
+    "issue": "POST /api/science-history/economy/purchase returned 422 Unprocessable Entity",
+    "root_cause": "Body parameter item_id was not using embed=True, causing FastAPI to expect raw string instead of JSON object",
+    "fix": "Added embed=True to Body(...) parameter: item_id: str = Body(..., embed=True)",
+    "file": "/app/backend/routes/science_history.py"
+  }
+}

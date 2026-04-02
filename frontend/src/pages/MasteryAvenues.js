@@ -7,11 +7,19 @@ import {
   Compass, Palette, Brain, Sparkles, Zap, Lock,
   ChevronRight, CheckCircle, HelpCircle, Send,
   BookOpen, Eye, Atom, Star, Grid3X3, HeartPulse,
-  Footprints, Bike, Dumbbell, Flower2, Shield
+  Footprints, Bike, Dumbbell, Flower2, Shield,
+  FlaskConical, Scroll, ShoppingBag
 } from 'lucide-react';
+import BotanicalLabPanel from '../components/avenues/BotanicalLabPanel';
+import EBikePanel from '../components/avenues/EBikePanel';
+import HistoryPanel from '../components/avenues/HistoryPanel';
+import CircularEconomyPanel from '../components/avenues/CircularEconomyPanel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-const AVENUE_ICONS = { mathematics: Compass, art: Palette, thought: Brain, biometrics: HeartPulse };
+const AVENUE_ICONS = {
+  mathematics: Compass, art: Palette, thought: Brain, biometrics: HeartPulse,
+  science: FlaskConical, history: Scroll,
+};
 const TIER_COLORS = ['#94A3B8', '#2DD4BF', '#8B5CF6', '#FBBF24', '#F472B6'];
 
 function AvenueCard({ avenue, onSelect }) {
@@ -430,6 +438,7 @@ export default function MasteryAvenues() {
         setBioActivities(actRes.data.activities || []);
         setBioStats(statRes.data);
       }
+      // Science and History panels handle their own data fetching internally
     } catch (e) { console.error('Avenue load failed', e); }
   };
 
@@ -501,7 +510,7 @@ export default function MasteryAvenues() {
           Mastery Avenues
         </h1>
         <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-          Four Pillars of Dimensional Navigation
+          Six Pillars of Dimensional Navigation
         </p>
       </motion.div>
 
@@ -530,6 +539,36 @@ export default function MasteryAvenues() {
           {activeAvenue === 'thought' && <ThoughtQuestPanel quests={quests} onReflect={handleReflect} />}
           {activeAvenue === 'art' && <ArtPromptPanel prompts={artPrompts} onCreate={handleCreate} />}
           {activeAvenue === 'biometrics' && <BiometricsPanel activities={bioActivities} onLog={handleLogActivity} bioStats={bioStats} />}
+          {activeAvenue === 'science' && (
+            <div className="space-y-4">
+              <BotanicalLabPanel />
+              <EBikePanel />
+            </div>
+          )}
+          {activeAvenue === 'history' && <HistoryPanel />}
+        </>
+      )}
+
+      {/* Circular Economy */}
+      {!activeAvenue && (
+        <div className="space-y-2">
+          <button
+            onClick={() => setActiveAvenue('economy')}
+            className="w-full py-2.5 rounded-lg text-[9px] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01]"
+            style={{ background: 'rgba(139,92,246,0.06)', color: '#8B5CF6', border: '1px solid rgba(139,92,246,0.1)' }}
+            data-testid="nav-economy"
+          >
+            <ShoppingBag size={10} /> Circular Economy Marketplace
+          </button>
+        </div>
+      )}
+      {activeAvenue === 'economy' && (
+        <>
+          <button onClick={() => setActiveAvenue(null)}
+            className="text-[9px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+            ← Back to Avenues
+          </button>
+          <CircularEconomyPanel />
         </>
       )}
 

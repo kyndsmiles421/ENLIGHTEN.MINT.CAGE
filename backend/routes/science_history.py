@@ -333,6 +333,22 @@ async def get_geology_modules(user=Depends(get_current_user)):
     return {"modules": modules, "total": len(modules), "completed": len([m for m in modules if m["completed"]])}
 
 
+@router.get("/geology/{module_id}/question/{question_index}")
+async def get_geology_question(module_id: str, question_index: int, user=Depends(get_current_user)):
+    """Get a specific geology question."""
+    module = None
+    for g in GEOLOGY_SIMULATIONS:
+        if g["id"] == module_id:
+            module = g
+            break
+    if not module:
+        raise HTTPException(404, "Module not found")
+    if question_index < 0 or question_index >= len(module["questions"]):
+        raise HTTPException(400, "Invalid question index")
+    q = module["questions"][question_index]
+    return {"question": q["q"], "hint": q["hint"], "index": question_index, "total": len(module["questions"])}
+
+
 @router.post("/geology/answer")
 async def answer_geology(
     module_id: str = Body(...),
@@ -412,6 +428,22 @@ async def get_history_modules(user=Depends(get_current_user)):
             "completed": h["id"] in completed,
         })
     return {"modules": modules, "total": len(modules), "completed": len([m for m in modules if m["completed"]])}
+
+
+@router.get("/history/{module_id}/question/{question_index}")
+async def get_history_question(module_id: str, question_index: int, user=Depends(get_current_user)):
+    """Get a specific history question."""
+    module = None
+    for h in HISTORY_MODULES:
+        if h["id"] == module_id:
+            module = h
+            break
+    if not module:
+        raise HTTPException(404, "Module not found")
+    if question_index < 0 or question_index >= len(module["questions"]):
+        raise HTTPException(400, "Invalid question index")
+    q = module["questions"][question_index]
+    return {"question": q["q"], "hint": q["hint"], "index": question_index, "total": len(module["questions"])}
 
 
 @router.post("/history/answer")
@@ -668,4 +700,195 @@ async def heart_rate_sync_challenge(
         "resonance_earned": resonance,
         "dust_earned": dust,
         "message": f"Sync: {sync_level.upper()}. Your {heart_rate} BPM vs target {target} BPM ({depth_info['label']})",
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  CIRCULAR ECONOMY — Spend Kinetic Dust & Resonance
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SHOP_ITEMS = [
+    {
+        "id": "carbon_fork",
+        "name": "Carbon Fiber Fork Upgrade",
+        "category": "ebike_parts",
+        "description": "Lightweight carbon fork reduces unsprung weight by 40%. Improves handling on technical terrain.",
+        "cost_dust": 50,
+        "cost_resonance": 0,
+        "currency": "kinetic_dust",
+        "rarity": "rare",
+        "icon": "wrench",
+    },
+    {
+        "id": "fat_tire_set",
+        "name": "26x4.8 Fat Tire Set",
+        "category": "ebike_parts",
+        "description": "Maximum flotation for snow and sand. Kenda Juggernaut compound with reflective sidewalls.",
+        "cost_dust": 35,
+        "cost_resonance": 0,
+        "currency": "kinetic_dust",
+        "rarity": "uncommon",
+        "icon": "circle",
+    },
+    {
+        "id": "torque_sensor",
+        "name": "Dual-Motor Torque Sensor",
+        "category": "ebike_parts",
+        "description": "Cadence + torque hybrid sensor for seamless AWD power distribution.",
+        "cost_dust": 80,
+        "cost_resonance": 0,
+        "currency": "kinetic_dust",
+        "rarity": "legendary",
+        "icon": "gauge",
+    },
+    {
+        "id": "yoga_mat",
+        "name": "Resonance Yoga Mat",
+        "category": "yoga_equipment",
+        "description": "Cork and natural rubber mat tuned to 432Hz ground frequency. Anti-slip sacred geometry pattern.",
+        "cost_dust": 25,
+        "cost_resonance": 0,
+        "currency": "kinetic_dust",
+        "rarity": "common",
+        "icon": "flower",
+    },
+    {
+        "id": "meditation_cushion",
+        "name": "Zafu Meditation Cushion",
+        "category": "yoga_equipment",
+        "description": "Buckwheat hull filling, organic cotton cover. Elevates hips 15cm for optimal spinal alignment.",
+        "cost_dust": 20,
+        "cost_resonance": 0,
+        "currency": "kinetic_dust",
+        "rarity": "common",
+        "icon": "cloud",
+    },
+    {
+        "id": "alchemist_skin",
+        "name": "The Alchemist UI Skin",
+        "category": "ui_skin",
+        "description": "Amber and emerald interface theme. Animated transmutation particles on all interactions.",
+        "cost_dust": 0,
+        "cost_resonance": 40,
+        "currency": "science_resonance",
+        "rarity": "rare",
+        "icon": "flask",
+    },
+    {
+        "id": "chronicler_skin",
+        "name": "The Chronicler UI Skin",
+        "category": "ui_skin",
+        "description": "Parchment and ink theme with ancient star chart overlays. Timeline-styled navigation.",
+        "cost_dust": 0,
+        "cost_resonance": 40,
+        "currency": "science_resonance",
+        "rarity": "rare",
+        "icon": "scroll",
+    },
+    {
+        "id": "sentinel_skin",
+        "name": "The Sentinel UI Skin",
+        "category": "ui_skin",
+        "description": "Biometric-green HUD with real-time heart rate graph watermark. Pulse animations on every tap.",
+        "cost_dust": 0,
+        "cost_resonance": 50,
+        "currency": "science_resonance",
+        "rarity": "legendary",
+        "icon": "heart_pulse",
+    },
+]
+
+SHOP_MAP = {item["id"]: item for item in SHOP_ITEMS}
+
+
+@router.get("/economy/shop")
+async def get_shop_items(user=Depends(get_current_user)):
+    """Get all Circular Economy shop items with user balances."""
+    uid = user["id"]
+    user_doc = await db.users.find_one({"id": uid}, {"_id": 0, "user_dust_balance": 1})
+    prog = await db.avenue_progress.find_one({"user_id": uid}, {"_id": 0})
+    sci_res = (prog or {}).get("science", {}).get("resonance", 0)
+    dust_balance = (user_doc or {}).get("user_dust_balance", 0)
+
+    purchases = await db.economy_purchases.find({"user_id": uid}, {"_id": 0}).to_list(200)
+    owned_ids = {p["item_id"] for p in purchases}
+
+    items = []
+    for item in SHOP_ITEMS:
+        items.append({
+            **item,
+            "owned": item["id"] in owned_ids,
+        })
+
+    return {
+        "items": items,
+        "balances": {
+            "kinetic_dust": round(dust_balance, 1),
+            "science_resonance": sci_res,
+        },
+        "total_items": len(items),
+        "owned_count": len(owned_ids),
+    }
+
+
+@router.post("/economy/purchase")
+async def purchase_item(
+    item_id: str = Body(..., embed=True),
+    user=Depends(get_current_user),
+):
+    """Purchase a shop item using Kinetic Dust or Science Resonance."""
+    uid = user["id"]
+    item = SHOP_MAP.get(item_id)
+    if not item:
+        raise HTTPException(404, "Item not found")
+
+    # Check if already owned
+    existing = await db.economy_purchases.find_one({"user_id": uid, "item_id": item_id}, {"_id": 0})
+    if existing:
+        raise HTTPException(400, "Already owned")
+
+    # Check balance
+    if item["currency"] == "kinetic_dust":
+        user_doc = await db.users.find_one({"id": uid}, {"_id": 0, "user_dust_balance": 1})
+        balance = (user_doc or {}).get("user_dust_balance", 0)
+        if balance < item["cost_dust"]:
+            raise HTTPException(400, f"Insufficient Kinetic Dust. Need {item['cost_dust']}, have {round(balance, 1)}")
+
+        await db.users.update_one(
+            {"id": uid},
+            {"$inc": {"user_dust_balance": -item["cost_dust"]}},
+        )
+        spent = item["cost_dust"]
+        currency_label = "Kinetic Dust"
+    else:
+        prog = await db.avenue_progress.find_one({"user_id": uid}, {"_id": 0})
+        sci_res = (prog or {}).get("science", {}).get("resonance", 0)
+        if sci_res < item["cost_resonance"]:
+            raise HTTPException(400, f"Insufficient Science Resonance. Need {item['cost_resonance']}, have {sci_res}")
+
+        await db.avenue_progress.update_one(
+            {"user_id": uid},
+            {"$inc": {"science.resonance": -item["cost_resonance"]}},
+        )
+        spent = item["cost_resonance"]
+        currency_label = "Science Resonance"
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.economy_purchases.insert_one({
+        "user_id": uid,
+        "item_id": item_id,
+        "item_name": item["name"],
+        "category": item["category"],
+        "currency": item["currency"],
+        "amount_spent": spent,
+        "purchased_at": now,
+    })
+
+    return {
+        "success": True,
+        "item": item["name"],
+        "category": item["category"],
+        "spent": spent,
+        "currency": currency_label,
+        "message": f"Acquired: {item['name']}. -{spent} {currency_label}.",
     }

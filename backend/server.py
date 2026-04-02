@@ -116,6 +116,7 @@ from routes.dimensions import router as dimensions_router
 from routes.master_view import router as master_view_router
 from routes.sublayers import router as sublayers_router
 from routes.avenues import router as avenues_router
+from routes.science_history import router as science_history_router
 
 app = FastAPI()
 
@@ -199,6 +200,7 @@ all_routers = [
     master_view_router,
     sublayers_router,
     avenues_router,
+    science_history_router,
 ]
 
 for r in all_routers:
