@@ -124,6 +124,7 @@ from routes.observatory import router as observatory_router
 from routes.atmosphere import router as atmosphere_router
 from routes.gravity import router as gravity_router
 from routes.archives import router as archives_router
+from routes.botany import router as botany_router
 from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
@@ -217,6 +218,7 @@ all_routers = [
     atmosphere_router,
     gravity_router,
     archives_router,
+    botany_router,
 ]
 
 for r in all_routers:

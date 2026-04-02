@@ -21,7 +21,7 @@ const CATEGORY_LABELS = {
 
 export default function Archives() {
   const navigate = useNavigate();
-  const { authHeaders } = useAuth();
+  const { authHeaders, loading, token } = useAuth();
   const [entries, setEntries] = useState([]);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [activeLayer, setActiveLayer] = useState('origin');
@@ -35,7 +35,7 @@ export default function Archives() {
   const audioCtxRef = useRef(null);
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (loading || !token) return;
     axios.get(`${API}/archives/entries`, { headers: authHeaders })
       .then(r => {
         setEntries(r.data.entries || []);
@@ -43,7 +43,7 @@ export default function Archives() {
       }).catch(() => {});
     axios.get(`${API}/archives/linguistics`, { headers: authHeaders })
       .then(r => setLinguistics(r.data.concepts || [])).catch(() => {});
-  }, [authHeaders]);
+  }, [loading, token, authHeaders]);
 
   const loadEntry = useCallback((id) => {
     axios.get(`${API}/archives/entry/${id}`, { headers: authHeaders })

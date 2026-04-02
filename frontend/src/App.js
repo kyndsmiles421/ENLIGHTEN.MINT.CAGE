@@ -168,6 +168,7 @@ const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
 const Observatory = lazy(() => import('./pages/Observatory'));
 const Archives = lazy(() => import('./pages/Archives'));
 const SuanpanMixer = lazy(() => import('./pages/SuanpanMixer'));
+const Botany = lazy(() => import('./pages/Botany'));
 
 function PageLoader() {
   return (
@@ -320,6 +321,7 @@ function AnimatedRoutes() {
         <Route path="/observatory" element={<Observatory />} />
         <Route path="/archives" element={<Archives />} />
         <Route path="/suanpan" element={<SuanpanMixer />} />
+        <Route path="/botany" element={<Botany />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
