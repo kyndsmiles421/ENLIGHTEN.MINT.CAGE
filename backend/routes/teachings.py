@@ -366,11 +366,13 @@ async def generate_contemplation(data: dict = Body(...), user=Depends(get_curren
     if not teaching:
         raise HTTPException(status_code=404, detail="Teaching not found")
     try:
-        chat = LlmChat(api_key=EMERGENT_LLM_KEY)
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"contemplate-{uuid.uuid4().hex[:8]}",
+            system_message=f"You are a wise, compassionate spiritual guide deeply versed in the teachings of {teacher['name']} ({teacher['tradition']})."
+        )
         chat.with_model("gemini", "gemini-3-flash-preview")
-        prompt = f"""You are a wise, compassionate spiritual guide deeply versed in the teachings of {teacher['name']} ({teacher['tradition']}).
-
-Create a short, immersive guided contemplation (4-5 paragraphs) based on this teaching:
+        prompt = f"""Create a short, immersive guided contemplation (4-5 paragraphs) based on this teaching:
 
 Title: {teaching['title']}
 Content: {teaching['content']}
@@ -383,9 +385,9 @@ The contemplation should:
 5. End with an integration moment connecting the teaching to daily life
 
 Write in second person ("you"), present tense. Keep it under 300 words. Make it feel like sitting at the feet of {teacher['name']}."""
-        response = await chat.send_message_async(UserMessage(content=prompt))
+        response = await chat.send_message(UserMessage(text=prompt))
         return {"contemplation": response, "teacher": teacher["name"], "teaching": teaching["title"]}
-    except Exception as e:
+    except Exception:
         return {"contemplation": f"Close your eyes and breathe deeply. Reflect on this teaching from {teacher['name']}:\n\n{teaching['content']}\n\nLet this wisdom settle into your heart. Consider: {teaching['practice']}", "teacher": teacher["name"], "teaching": teaching["title"], "fallback": True}
 
 

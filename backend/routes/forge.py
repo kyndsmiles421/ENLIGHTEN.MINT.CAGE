@@ -97,16 +97,20 @@ async def _ai_forge_name(item_type: str, rarity: str, context: str) -> str:
     """Generate a creative name for a forged item using Gemini."""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"forge-name-{uuid.uuid4().hex[:8]}",
+            system_message="You are a cosmic artifact namer. Return only the requested text."
+        )
         llm.with_model("gemini", "gemini-3-flash-preview")
-        response = await llm.chat([
-            UserMessage(content=(
+        response = await llm.send_message(
+            UserMessage(text=(
                 f"Generate ONE creative mystical name (2-4 words, no quotes) for a {rarity} "
                 f"{item_type.replace('_', ' ')} in a cosmic wellness game. Context: {context}. "
                 f"Return ONLY the name."
             ))
-        ])
-        return response.content.strip().strip('"').strip("'")[:60]
+        )
+        return response.strip().strip('"').strip("'")[:60]
     except Exception as e:
         logger.error(f"AI forge name fallback: {e}")
         prefixes = {
@@ -125,16 +129,20 @@ async def _ai_skill_description(skill_type: str, rarity: str, context: str) -> s
     """Generate a brief skill effect description using Gemini."""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"forge-skill-{uuid.uuid4().hex[:8]}",
+            system_message="You are a cosmic game designer. Return only the requested text."
+        )
         llm.with_model("gemini", "gemini-3-flash-preview")
-        response = await llm.chat([
-            UserMessage(content=(
+        response = await llm.send_message(
+            UserMessage(text=(
                 f"Describe in ONE sentence (max 20 words) the magical effect of a {rarity} "
                 f"{skill_type.replace('_', ' ')} in a cosmic wellness RPG. Context: {context}. "
                 f"Return ONLY the description."
             ))
-        ])
-        return response.content.strip().strip('"').strip("'")[:120]
+        )
+        return response.strip().strip('"').strip("'")[:120]
     except Exception as e:
         logger.error(f"AI skill desc fallback: {e}")
         return f"A {rarity} {skill_type.replace('_', ' ')} radiating with cosmic energy."

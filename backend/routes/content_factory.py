@@ -22,12 +22,16 @@ async def _ai_mantra(context: str) -> str:
     """Generate a short mantra using Gemini. Falls back to presets."""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"mantra-{uuid.uuid4().hex[:8]}",
+            system_message="You are a cosmic wisdom generator. Return only the requested text, nothing else."
+        )
         llm.with_model("gemini", "gemini-3-flash-preview")
-        response = await llm.chat([
-            UserMessage(content=f"Generate ONE short, powerful spiritual affirmation (max 12 words) for: {context}. Return only the text.")
-        ])
-        return response.content.strip().strip('"').strip("'")
+        response = await llm.send_message(
+            UserMessage(text=f"Generate ONE short, powerful spiritual affirmation (max 12 words) for: {context}. Return only the text.")
+        )
+        return response.strip().strip('"').strip("'")
     except Exception as e:
         logger.error(f"AI mantra fallback: {e}")
         fallbacks = [

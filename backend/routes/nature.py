@@ -300,12 +300,14 @@ async def interpret_dream(data: dict = Body(...), user=Depends(get_current_user)
     if not content:
         raise HTTPException(status_code=400, detail="Dream content required")
     try:
-        chat = LlmChat(api_key=EMERGENT_LLM_KEY)
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"dream-{uuid.uuid4().hex[:8]}",
+            system_message="You are a wise dream interpreter versed in Jungian psychology, shamanic dreamwork, and spiritual symbolism."
+        )
         chat.with_model("gemini", "gemini-3-flash-preview")
         symbols_list = ", ".join(DREAM_SYMBOLS.keys())
-        prompt = f"""You are a wise dream interpreter versed in Jungian psychology, shamanic dreamwork, and spiritual symbolism.
-
-Interpret this dream:
+        prompt = f"""Interpret this dream:
 "{content}"
 
 Known dream symbols for reference: {symbols_list}
@@ -318,7 +320,7 @@ Provide:
 5. **Guidance** — a specific, actionable insight for waking life
 
 Be poetic but practical. Keep under 300 words. Write in second person."""
-        response = await chat.send_message_async(UserMessage(content=prompt))
+        response = await chat.send_message(UserMessage(text=prompt))
         return {"interpretation": response}
     except Exception:
         found = [k for k in DREAM_SYMBOLS if k in content.lower()]
