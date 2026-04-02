@@ -47,7 +47,7 @@ BOTANICAL_SIMULATIONS = [
         ],
         "science_note": "Pectin gels at pH 2.8-3.5 with >55% soluble solids. Monk fruit's mogrosides don't interfere with gelation but affect texture perception.",
         "resonance": 22,
-        "mastery_product": "Positive Energy Bar Filling Kit",
+        "mastery_product": "Cosmic Resonance Bar Kit",
     },
     {
         "id": "coconut_hemp_emulsion",

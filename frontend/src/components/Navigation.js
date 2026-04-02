@@ -152,6 +152,7 @@ const NAV_CATEGORIES = [
       { path: '/friends', label: 'Friends', icon: Users },
       { path: '/challenges', label: 'Challenges', icon: Flame },
       { path: '/create', label: 'Create', icon: PenTool },
+      { path: '/workshop', label: 'Architect\'s Workshop', icon: Compass },
     ],
   },
 ];
