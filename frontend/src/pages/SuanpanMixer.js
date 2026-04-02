@@ -593,7 +593,7 @@ function RecommendationCard({ rec, onPurchase, purchasing }) {
 /* ━━━ DIVINE DIRECTOR — Main Component ━━━ */
 export default function SuanpanMixer() {
   const navigate = useNavigate();
-  const { authHeaders, loading: authLoading } = useAuth();
+  const { authHeaders, loading: authLoading, token } = useAuth();
   const { playConfirmation, isMuted } = useSensory();
 
   const [subTier, setSubTier] = useState('discovery');
@@ -635,7 +635,7 @@ export default function SuanpanMixer() {
 
   // Load data
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || !token) return;
     const load = async () => {
       try {
         const [subRes, srcRes, projRes, packRes, recRes] = await Promise.all([
@@ -657,7 +657,7 @@ export default function SuanpanMixer() {
       } catch {} finally { setLoading(false); }
     };
     load();
-  }, [authHeaders, authLoading]);
+  }, [authHeaders, authLoading, token]);
 
   const reloadAll = useCallback(async () => {
     try {
