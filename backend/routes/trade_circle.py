@@ -997,3 +997,150 @@ async def broker_history(user=Depends(get_current_user)):
         {"user_id": user["id"]}, {"_id": 0}
     ).sort("created_at", -1).limit(20).to_list(20)
     return {"transactions": txs}
+
+
+# ━━━ Phonetic & Vocal Asset Types ━━━
+LINGUISTIC_ASSET_TYPES = {"phonetic_mantra", "vocal_signature"}
+
+@router.post("/trade-circle/escrow/linguistic/create")
+async def create_linguistic_escrow(data: dict = Body(...), user=Depends(get_current_user)):
+    """Create an escrow for a linguistic asset trade. Requires resonance verification."""
+    asset_type = data.get("asset_type", "")
+    if asset_type not in LINGUISTIC_ASSET_TYPES:
+        raise HTTPException(status_code=400, detail=f"Invalid asset type. Must be one of: {', '.join(LINGUISTIC_ASSET_TYPES)}")
+
+    listing_id = data.get("listing_id", "")
+    if not listing_id:
+        raise HTTPException(status_code=400, detail="listing_id required")
+
+    listing = await db.trade_listings.find_one({"id": listing_id, "status": "active"}, {"_id": 0})
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found or inactive")
+    if listing["user_id"] == user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot escrow your own listing")
+
+    # Check mastery tier for linguistic assets
+    buyer_mastery = await db.mastery_tiers.find_one({"user_id": user["id"]}, {"_id": 0})
+    buyer_tier = buyer_mastery.get("current_tier", 0) if buyer_mastery else 0
+    if buyer_tier < 1:
+        raise HTTPException(status_code=403, detail="Tier 1 mastery required to trade linguistic assets")
+
+    escrow = {
+        "id": str(uuid.uuid4()),
+        "listing_id": listing_id,
+        "asset_type": asset_type,
+        "seller_id": listing["user_id"],
+        "buyer_id": user["id"],
+        "status": "pending_verification",
+        "resonance_verified": False,
+        "verification_data": data.get("verification_data", {}),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.trade_escrows.insert_one(escrow)
+    escrow.pop("_id", None)
+    return escrow
+
+
+@router.post("/trade-circle/escrow/{escrow_id}/verify")
+async def verify_escrow_resonance(escrow_id: str, data: dict = Body(...), user=Depends(get_current_user)):
+    """Verify resonance match for an escrowed linguistic asset."""
+    escrow = await db.trade_escrows.find_one({"id": escrow_id}, {"_id": 0})
+    if not escrow:
+        raise HTTPException(status_code=404, detail="Escrow not found")
+    if escrow["buyer_id"] != user["id"] and escrow["seller_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not a party to this escrow")
+    if escrow["status"] != "pending_verification":
+        raise HTTPException(status_code=400, detail=f"Escrow status is {escrow['status']}, not verifiable")
+
+    frequency_match = data.get("frequency_match", 0)
+    vowel_match = data.get("vowel_match", "")
+    accuracy = data.get("accuracy", 0)
+
+    verified = accuracy >= 85
+    new_status = "verified" if verified else "verification_failed"
+
+    await db.trade_escrows.update_one(
+        {"id": escrow_id},
+        {"$set": {
+            "resonance_verified": verified,
+            "verification_accuracy": accuracy,
+            "verification_frequency": frequency_match,
+            "verification_vowel": vowel_match,
+            "status": new_status,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
+
+    if verified:
+        # Complete the trade
+        await db.trade_escrows.update_one(
+            {"id": escrow_id},
+            {"$set": {"status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        await award_karma(escrow["buyer_id"], "trade_completed", escrow_id)
+        await award_karma(escrow["seller_id"], "trade_completed", escrow_id)
+
+    return {
+        "escrow_id": escrow_id,
+        "verified": verified,
+        "accuracy": accuracy,
+        "status": new_status if not verified else "completed",
+    }
+
+
+@router.get("/trade-circle/escrows")
+async def get_user_escrows(user=Depends(get_current_user)):
+    """Get user's escrow history (as buyer or seller)."""
+    escrows = await db.trade_escrows.find(
+        {"$or": [{"buyer_id": user["id"]}, {"seller_id": user["id"]}]},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(20).to_list(20)
+    return {"escrows": escrows}
+
+
+@router.post("/trade-circle/listings/linguistic")
+async def create_linguistic_listing(data: dict = Body(...), user=Depends(get_current_user)):
+    """Create a listing specifically for linguistic assets (phonetic_mantra or vocal_signature)."""
+    asset_type = data.get("asset_type", "")
+    if asset_type not in LINGUISTIC_ASSET_TYPES:
+        raise HTTPException(status_code=400, detail=f"Invalid asset type. Must be: {', '.join(LINGUISTIC_ASSET_TYPES)}")
+
+    title = data.get("title", "").strip()
+    description = data.get("description", "").strip()
+    frequency_signature = data.get("frequency_signature", {})
+
+    if not title:
+        raise HTTPException(status_code=400, detail="Title is required")
+
+    # Verify seller has mastery
+    seller_mastery = await db.mastery_tiers.find_one({"user_id": user["id"]}, {"_id": 0})
+    seller_tier = seller_mastery.get("current_tier", 0) if seller_mastery else 0
+    if seller_tier < 1:
+        raise HTTPException(status_code=403, detail="Tier 1 mastery required to list linguistic assets")
+
+    listing = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", "Anonymous"),
+        "title": title,
+        "description": description[:500],
+        "category": asset_type,
+        "offering": f"Linguistic Asset: {asset_type.replace('_', ' ').title()}",
+        "seeking": data.get("seeking", "Resonance exchange")[:200],
+        "frequency_signature": frequency_signature,
+        "asset_type": asset_type,
+        "images": [],
+        "status": "active",
+        "offer_count": 0,
+        "requires_escrow": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.trade_listings.insert_one(listing)
+    await create_activity(user["id"], "trade_listing", f"Listed linguistic asset: {title}")
+    await award_karma(user["id"], "listing_created", listing["id"])
+    listing.pop("_id", None)
+    return listing

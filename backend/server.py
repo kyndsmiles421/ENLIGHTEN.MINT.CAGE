@@ -118,6 +118,7 @@ from routes.sublayers import router as sublayers_router
 from routes.avenues import router as avenues_router
 from routes.science_history import router as science_history_router
 from routes.cosmic_map import router as cosmic_map_router
+from routes.mastery import router as mastery_router
 from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
@@ -205,6 +206,7 @@ all_routers = [
     science_history_router,
     cosmic_map_router,
     sync_router,
+    mastery_router,
 ]
 
 for r in all_routers:
