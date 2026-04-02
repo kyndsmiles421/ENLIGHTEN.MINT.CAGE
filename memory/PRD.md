@@ -10,72 +10,74 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Iteration 201 — Brand Cleanup + Architect's Workshop (Apr 2, 2026) — LATEST
+### Iteration 202 — Orbital Hub Navigation System (Apr 2, 2026) — LATEST
 
-**Brand Cleanup:**
-- Renamed "Positive Energy Bar Filling Kit" → "Cosmic Resonance Bar Kit" in science_history.py
-- All HTML/manifest already correctly branded "The Cosmic Collective"
+**Orbital Hub (`/hub`):**
+- Central pulsing orb → tap opens Mission Control overlay
+- 12 orbiting satellites (6 inner core tools + 6 outer deeper tools) → click navigates to full-page routes
+- Inner ring (radius 160px, full speed): Mood Engine, Soundscape, Cosmic Map, Breathwork, Meditation, Conservatory
+- Outer ring (radius 245px, 0.55x speed): Workshop, Star Chart, Trade Circle, Oracle, Games, Journal
+- Cosmic dust particles (40 floating particles with random drift)
+- SVG connection lines from orb to satellites (brighten on hover)
+- requestAnimationFrame-driven smooth orbital rotation
+- Navbar hidden on hub page for full immersion
 
-**Architect's Workshop (`/workshop`):**
-- 4-tab Physics Engine: Sacred Geometry, Golden Ratio, Resonance Mechanics, Materials Library
-- **Sacred Geometry**: 5 Platonic Solids (Tetrahedron/Cube/Octahedron/Dodecahedron/Icosahedron) with SVG visualizations, element mappings, structural analysis, construction applications, Euler's formula verification
-- **Golden Ratio Calculator**: Input any dimension → get φ major/minor splits, nested divisions (φ^1 through φ^5), golden spiral SVG, real-world examples (DNA, Parthenon, Nautilus)
-- **Resonance Mechanics**: Harmonic oscillation visualizer (nodes/antinodes on vibrating string, slider for harmonics 1-8), Inverse Square Law calculator (power + distance → dB SPL with falloff curve)
-- **Materials Library**: 8 materials (Water, Sand, Glass, Steel, Oak, Concrete, Copper, Quartz Crystal) with density, speed of sound, resonance notes
-- Backend: `workshop.py` with 5 endpoints (constants, platonic-solids, materials, golden-ratio, harmonic-nodes, inverse-square)
-- Nav link under Explore category
-- Tests: 100% Backend (26/26) / 100% Frontend
+**Mission Control Overlay:**
+- Profile, Dashboard, Settings, Mastery Tiers, Analytics, Admin quick-nav actions
+- Resolution toggle (Low/Medium/High) with 3-dot indicator
+- "The Cosmic Collective Portal" link
+- Sign Out button
+- Blurred backdrop with centered panel
+
+**OrbCorner (Tether Button):**
+- Fixed bottom-left (z-45) pulsing orb on all non-hub pages
+- Click returns to /hub, right-click opens Mission Control
+- Hidden on /hub, /, /auth, /intro
+
+**Tests:** Iteration 202 — 100% Backend / 100% Frontend
+
+### Iteration 201 — Brand Cleanup + Architect's Workshop (Apr 2, 2026)
+
+- Renamed "Positive Energy Bar" → "Cosmic Resonance Bar Kit"
+- Workshop (`/workshop`): 4-tab Physics Engine — Sacred Geometry (5 Platonic Solids), Golden Ratio calculator, Resonance Mechanics (harmonics + inverse square), Materials Library (8 materials)
 
 ### Iteration 200 — Linguistic & Phonics Integration (Apr 2, 2026)
 
-- Phonics tab in Conservatory: Vowel Formant Tracker (A/E/I/O/U), FFT detection, VowelChladniCanvas, Geometric Bloom
+- Phonics tab: Vowel Formant Tracker (A/E/I/O/U), FFT detection, VowelChladniCanvas, Geometric Bloom
 - Mastery Economy: 3-tier backend (Tier 1: vowels, Tier 2: Tesla 3-6-9, Tier 3: Unified Field)
 - Trade Circle Linguistic Assets: phonetic_mantra/vocal_signature escrow with resonance verification
 
 ### Iteration 198 — Music Theory Conservatory (Apr 2, 2026)
 
 - Circle of Fifths dodecahedron, Chladni patterns, mic pitch detection, Practice Mode
-- Orchestral Audio Engine (MixerContext), ResolutionContext 3-state toggle
+- Orchestral Audio Engine, ResolutionContext 3-state toggle
 
-### Earlier Iterations (Apr 2, 2026)
+### Earlier Iterations
 
-- Power Spot Admin Dashboard + Live GPS tracking + 500m proximity
-- Synchronicity Events: WebSocket Covens, Group Forging, Leaderboard
-- Multi-State Emotion Layering: Moiré geometry, Tesla 3-6-9, Frequency Recipes
-- Aura Wake Physics on Cosmic Map avatar
-- Avatar Customization System
+- Power Spot Admin, Synchronicity Events (WebSocket Covens), Multi-State Emotion Layering, Aura Wake, Avatar Customization
 
 ## Key Routes
-- `/workshop` — Architect's Workshop (Sacred Geometry, Golden Ratio, Resonance, Materials)
-- `/theory` — Music Theory Conservatory (Circle of Fifths, Practice, Phonics, Voice)
-- `/cosmic-map` — GPS Harvesting + Coven Panel + Aura Wake
-- `/admin/power-spot` — Power Spot Admin Dashboard
+- `/hub` — Orbital Hub (central orb + satellite navigation)
+- `/workshop` — Architect's Workshop
+- `/theory` — Music Theory Conservatory
+- `/cosmic-map` — GPS Harvesting + Coven Panel
 - `/mood` — Multi-State Mood Tracker
 - `/trade-circle` — Trade Circle with Linguistic Assets
 
-## Key API Endpoints
-- `GET /api/workshop/platonic-solids` — 5 Platonic Solids with structural data
-- `GET /api/workshop/materials` — 8 materials resonance library
-- `GET /api/workshop/constants` — Universal constants (φ, g, c_s, h, f_s)
-- `POST /api/workshop/golden-ratio` — Golden Ratio calculator
-- `POST /api/workshop/harmonic-nodes` — Harmonic oscillation nodes/antinodes
-- `POST /api/workshop/inverse-square` — Inverse Square Law calculator
-- `GET /api/mastery/tier` — User mastery tier and progress
-- `POST /api/mastery/progress` — Record mastery achievements
-- `POST /api/trade-circle/escrow/linguistic/create` — Linguistic asset escrow
-
 ## Upcoming Tasks (P1)
-- Einstein Spatial Curvature (Gravitational Wells) — map GPS grid curvature
+- Einstein Spatial Curvature (Gravitational Wells) on Cosmic Map
 - Culinary Mode Mixer UI — "Spice Rack" frequency layout
 - Botany: Plant identifier and gardening section
-- Blueprint Mode: drag-and-drop layout tool using φ proportions
+- Guided Tour / Progressive Disclosure (unlock tools via mastery)
+- Focus Mode vs Utility Mode toggle (UI Density)
+- Atmospheric audio cues when hovering satellite zones
 
 ## Future/Backlog (P2)
 - AR mechanics with `react-three-fiber` / AR.js
 - Phygital Marketplace expansion
 - Tiered Subscription Matrix via Stripe
-- Cosmic Truck Blueprint template
-- Load Distribution Calculator
+- Blueprint Mode (drag-and-drop φ layout)
+- Cosmic Truck digital twin
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
