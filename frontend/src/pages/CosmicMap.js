@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-le
 import L from 'leaflet';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 import {
   MapPin, Zap, Leaf, Star, Navigation, RefreshCw,
   ChevronUp, X, Sparkles, Crown, Layers, Globe, Moon
@@ -203,6 +204,9 @@ export default function CosmicMap() {
   const [aligning, setAligning] = useState(false);
   const [celestialDecay, setCelestialDecay] = useState(null);
   const watchRef = useRef(null);
+  const notifiedSpotsRef = useRef(new Set());
+
+  const PROXIMITY_RADIUS = 500; // meters
 
   // Geolocation
   useEffect(() => {
@@ -250,6 +254,32 @@ export default function CosmicMap() {
     if (userPos) fetchGroundData();
     fetchCelestialData();
   }, [userPos, fetchGroundData, fetchCelestialData]);
+
+  // Proximity notification for Power Spots
+  useEffect(() => {
+    if (!userPos || !powerSpots.length) return;
+    powerSpots.forEach(spot => {
+      if (notifiedSpotsRef.current.has(spot.id)) return;
+      const dlat = spot.lat - userPos.lat;
+      const dlng = spot.lng - userPos.lng;
+      const dist = Math.sqrt(
+        (dlat * 111320) ** 2 + (dlng * 111320 * Math.cos(userPos.lat * Math.PI / 180)) ** 2
+      );
+      if (dist <= PROXIMITY_RADIUS) {
+        notifiedSpotsRef.current.add(spot.id);
+        toast(spot.name, {
+          description: `${spot.reward_multiplier}x Legendary Power Spot — ${Math.round(dist)}m away`,
+          icon: '👑',
+          duration: 6000,
+          style: {
+            background: 'rgba(10,10,18,0.95)',
+            border: '1px solid rgba(251,191,36,0.25)',
+            color: '#FBBF24',
+          },
+        });
+      }
+    });
+  }, [userPos, powerSpots]);
 
   // Harvest ground nodes / power spots
   const handleHarvest = async (node) => {

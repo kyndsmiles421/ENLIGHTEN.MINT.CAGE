@@ -41,6 +41,11 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 **Routes:** `/admin/power-spot` (frontend), Power Spots CRUD + Go-Live + Live Tracking + Broadcasts backend
 **Tests:** Iterations 189-190 — 100% Backend / 100% Frontend
 
+**Proximity Notification (CosmicMap):**
+- When user position enters 500m radius of a LIVE Power Spot, a styled toast fires with spot name, multiplier, and distance
+- Once-per-spot-per-session deduplication via ref (no spam)
+- Uses sonner toast with gold Power Spot styling
+
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
