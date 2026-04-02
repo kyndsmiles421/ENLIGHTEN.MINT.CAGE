@@ -10,7 +10,39 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Three Avenues Cosmic Glass Overhaul (Apr 2, 2026) — LATEST
+### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026) — LATEST
+
+**Resonance Forge Mini-Game:**
+- Waveform matching puzzle for crafting Resonance Builds
+- 3 forge patterns: Kinetic Amplifier (432Hz), Zen Flow (528Hz), Chrono-Alchemist (396Hz)
+- 13-point waveform with tolerance bands; 70%+ accuracy to forge
+- Time-limited (8-12s), time bonus for fast completion
+- Canvas-based interactive drawing with real-time point scoring
+
+**Exponential Decay Engine:**
+- Formula: y = a × 0.9^days_inactive (decay rate 0.9 per day)
+- Minimum resonance floor: 5 (never drops to zero)
+- At-risk warning when >0.5 days inactive
+- Pulse speed visualization: 0.5 + (days × 0.3), max 3.0 — more erratic as decay worsens
+- Applied on app open, visualized in Global Tickers with pulsing red warning
+
+**Cosmic Map (GPS Foundation):**
+- Full Leaflet + OpenStreetMap dark CARTO tiles map page
+- Procedurally generated nodes based on user coordinates + daily seed
+  - 4 Kinetic Nodes (amber, +8-20 Kinetic Dust)
+  - 3 Botanical Spots (teal, +5-12 Science Resonance)
+  - 3 Star Anchors (violet, +7-17 Science Resonance)
+- Proximity-based harvesting (50m radius)
+- Rarity system: common/uncommon/rare with reward multipliers
+- Node detail slide-up panel with distance, reward, and harvest button
+- HUD overlay: coordinates, node type counts, daily harvest summary
+- Top-level navigation under Explore category
+
+**Backend Routes:** `/api/cosmic-map/` (decay-status, apply-decay, forge/pattern, forge/attempt, nodes, harvest, harvest-history)
+**Frontend:** `/cosmic-map` page, ForgePanel component, decay warning in MasteryAvenues
+**Tests**: Iteration 188 — 100% Backend (13/13) / 100% Frontend
+
+### Three Avenues Cosmic Glass Overhaul (Apr 2, 2026)
 
 **UI Reorganization: Six Pillars → Three Avenues of Flow:**
 - Material Avenue (Industrial Amber): E-Bike Engineering + Circular Economy
