@@ -25,6 +25,7 @@ import { ResolutionProvider } from './context/ResolutionContext';
 import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
 import PersistentWaveform from './components/PersistentWaveform';
+import OrbCorner from './components/OrbCorner';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
@@ -163,6 +164,7 @@ const CosmicMap = lazy(() => import('./pages/CosmicMap'));
 const PowerSpotAdmin = lazy(() => import('./pages/PowerSpotAdmin'));
 const MusicTheory = lazy(() => import('./pages/MusicTheory'));
 const Workshop = lazy(() => import('./pages/Workshop'));
+const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
 
 function PageLoader() {
   return (
@@ -311,6 +313,7 @@ function AnimatedRoutes() {
         <Route path="/admin/power-spot" element={<PowerSpotAdmin />} />
         <Route path="/theory" element={<MusicTheory />} />
         <Route path="/workshop" element={<Workshop />} />
+        <Route path="/hub" element={<OrbitalHub />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -359,6 +362,7 @@ function App() {
             <CosmicToolbar />
             <CosmicAssistant />
             <PersistentWaveform />
+            <OrbCorner />
             <TrialGraduation />
             <InstallPrompt />
             <CreditNudge />
