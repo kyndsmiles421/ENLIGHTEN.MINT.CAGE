@@ -1,0 +1,103 @@
+{
+  "summary": "Iteration 222 - Generator System (Tiered Payable Bonuses) Testing Complete. All 19 backend API tests passed (100%). Frontend UI verified: SuanpanMixer Console slide-over panel works correctly with 8 generator cards displayed. Orbital pages (Botany, Trade, Codex) render correctly with z-index fix applied (bottom-20 right-14).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Orbital pages (Botany, Trade, Codex)",
+        "issues": ["The 'Full View' buttons at bottom-20 right-14 are very close to the 'Made with Emergent' badge. While they don't fully overlap, they are in close proximity. Consider moving buttons further up (bottom-24) or left (right-20) for better visual separation."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration222_generators.py",
+    "/app/test_reports/pytest/pytest_iteration222_generators.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "generators.py: GENERATOR_CATALOG has 8 generators across 3 types (sub_harmonic: 3, mantra_extension: 3, ultra_lossless: 2)",
+    "generators.py: Tier-gating correctly implemented - sovereign generators blocked for archivist users (403 response)",
+    "generators.py: Duplicate purchase prevention returns 400 with 'Generator already owned' message",
+    "generators.py: Bloom coefficients computed using hybrid deterministic+RNG logic (hexagram factor + seeded hash)",
+    "SuanpanMixer.js: Console slide-over panel opens from right side with 320px width",
+    "SuanpanMixer.js: Generator cards grouped by type (Sub-Harmonic, Mantra Extension, Ultra-Lossless)",
+    "SuanpanMixer.js: Owned generators show toggle button, non-owned show buy button with credit price",
+    "SuanpanMixer.js: Tier-locked generators show crown icon and are not purchasable",
+    "SuanpanMixer.js: Active generators show bloom glow effect (animated box-shadow)",
+    "BotanyOrbital.js: z-index fix applied - button at bottom-20 right-14 (was bottom-16 right-4)",
+    "TradeCircleOrbital.js: z-index fix applied - button at bottom-20 right-14",
+    "CodexOrbital.js: z-index fix applied - button at bottom-20 right-14"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration222_generators.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password (Archivist tier, ~39 credits)",
+  "seed_data_creation": "None - test user already owns sub-harmonic-01 generator",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 222 verified: (1) GET /api/trade-circle/generators/catalog returns 8 generators with ownership, tier-locking, affordability status. (2) POST /api/trade-circle/purchase validates tier, checks credits, deducts, unlocks asset with bloom coefficients. (3) GET /api/vault/generators returns owned generators with bloom coefficients. (4) POST /api/vault/generators/toggle toggles active state. (5) Duplicate purchase returns 400. (6) Tier-gating returns 403 for sovereign generators. (7) SuanpanMixer Console slide-over at /suanpan route shows all 8 generators grouped by type. (8) Owned generator (sub-harmonic-01) shows toggle button. (9) Orbital pages have z-index fix at bottom-20 right-14. (10) Auth uses Bearer token in Authorization header.",
+  "features_verified": {
+    "catalog_endpoint": {
+      "status": "PASS",
+      "details": "GET /api/trade-circle/generators/catalog returns 200 with 8 generators, user_tier, user_credits"
+    },
+    "catalog_tier_locking": {
+      "status": "PASS",
+      "details": "Sovereign generators (sub-harmonic-03, mantra-ext-03, lossless-02) show tier_locked: true for archivist user"
+    },
+    "catalog_ownership": {
+      "status": "PASS",
+      "details": "sub-harmonic-01 shows owned: true for test user"
+    },
+    "purchase_duplicate_prevention": {
+      "status": "PASS",
+      "details": "POST /api/trade-circle/purchase returns 400 'Generator already owned' for sub-harmonic-01"
+    },
+    "purchase_tier_gating": {
+      "status": "PASS",
+      "details": "POST /api/trade-circle/purchase returns 403 'Requires Sovereign tier' for sub-harmonic-03"
+    },
+    "vault_generators": {
+      "status": "PASS",
+      "details": "GET /api/vault/generators returns owned generators with bloom_coefficients (reverb_color_mod, decay_rate_mod, bloom_seed, hex_factor)"
+    },
+    "toggle_generator": {
+      "status": "PASS",
+      "details": "POST /api/vault/generators/toggle changes active state and persists to database"
+    },
+    "toggle_non_owned": {
+      "status": "PASS",
+      "details": "POST /api/vault/generators/toggle returns 404 'Generator not owned' for non-owned generator"
+    },
+    "suanpan_console_button": {
+      "status": "PASS",
+      "details": "Console button visible at top-right of /suanpan page with data-testid='console-toggle-btn'"
+    },
+    "suanpan_console_panel": {
+      "status": "PASS",
+      "details": "Console slide-over panel opens from right with 320px width, shows 8 generator cards"
+    },
+    "generator_card_states": {
+      "status": "PASS",
+      "details": "Cards show correct states: owned (toggle button), purchasable (buy button with price), locked (crown icon)"
+    },
+    "botany_orbital_zindex": {
+      "status": "PASS",
+      "details": "Full Botany View button at bottom-20 right-14, visible and clickable"
+    },
+    "trade_orbital_zindex": {
+      "status": "PASS",
+      "details": "Full Trade View button at bottom-20 right-14, visible and clickable"
+    },
+    "codex_orbital_zindex": {
+      "status": "PASS",
+      "details": "Full Codex View button at bottom-20 right-14, visible and clickable"
+    }
+  }
+}

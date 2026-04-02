@@ -266,7 +266,7 @@ export default function TradeCircleOrbital() {
       </div>
 
       {/* Full page link */}
-      <div className="absolute bottom-16 right-4 z-30">
+      <div className="absolute bottom-20 right-14 z-30">
         <button onClick={() => navigate('/trade-circle')}
           className="px-3 py-1.5 rounded-full text-[8px] font-medium uppercase tracking-wider"
           style={{
