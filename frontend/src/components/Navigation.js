@@ -142,6 +142,7 @@ const NAV_CATEGORIES = [
       { path: '/community', label: 'Community', icon: Users },
       { path: '/trade-circle', label: 'Trade Circle', icon: HeartHandshake },
       { path: '/hotspots', label: 'Energy Hotspots', icon: MapPin },
+      { path: '/cosmic-map', label: 'Cosmic Map', icon: Map },
       { path: '/crystals', label: 'Crystals & Stones', icon: Gem },
       { path: '/entanglement', label: 'Entanglement', icon: Link2 },
       { path: '/blessings', label: 'Send a Blessing', icon: Heart },

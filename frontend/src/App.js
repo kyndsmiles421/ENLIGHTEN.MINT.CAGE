@@ -157,6 +157,7 @@ const MasterViewPage = lazy(() => import('./pages/MasterView'));
 const CollectiveShadowMap = lazy(() => import('./pages/CollectiveShadowMap'));
 const FractalEngine = lazy(() => import('./pages/FractalEngine'));
 const MasteryAvenues = lazy(() => import('./pages/MasteryAvenues'));
+const CosmicMap = lazy(() => import('./pages/CosmicMap'));
 
 function PageLoader() {
   return (
@@ -301,6 +302,7 @@ function AnimatedRoutes() {
         <Route path="/collective-shadow-map" element={<CollectiveShadowMap />} />
         <Route path="/fractal-engine" element={<FractalEngine />} />
         <Route path="/mastery-avenues" element={<MasteryAvenues />} />
+        <Route path="/cosmic-map" element={<CosmicMap />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

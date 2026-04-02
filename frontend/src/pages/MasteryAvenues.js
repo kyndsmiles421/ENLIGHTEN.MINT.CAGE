@@ -9,12 +9,13 @@ import {
   BookOpen, Eye, Atom, Star, Grid3X3, HeartPulse,
   Footprints, Bike, Dumbbell, Flower2, Shield,
   FlaskConical, Scroll, ShoppingBag, ChevronDown,
-  Wrench, Hammer, Package
+  Wrench, Hammer, Package, MapPin
 } from 'lucide-react';
 import BotanicalLabPanel from '../components/avenues/BotanicalLabPanel';
 import EBikePanel from '../components/avenues/EBikePanel';
 import HistoryPanel from '../components/avenues/HistoryPanel';
 import CircularEconomyPanel from '../components/avenues/CircularEconomyPanel';
+import ForgePanel from '../components/avenues/ForgePanel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -207,102 +208,6 @@ function AvenueShop({ avenue, authHeaders }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
-
-// ━━━━ Resonance Builds Panel ━━━━
-function ResonanceBuildsPanel({ authHeaders }) {
-  const [builds, setBuilds] = useState([]);
-  const [crafting, setCrafting] = useState(null);
-
-  const fetchBuilds = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API}/science-history/economy/builds`, { headers: authHeaders });
-      setBuilds(res.data.builds || []);
-    } catch (e) { console.error('Builds fetch failed', e); }
-  }, [authHeaders]);
-
-  useEffect(() => { fetchBuilds(); }, [fetchBuilds]);
-
-  const handleCraft = async (buildId) => {
-    setCrafting(buildId);
-    try {
-      await axios.post(`${API}/science-history/economy/craft-build`, { build_id: buildId }, { headers: authHeaders });
-      fetchBuilds();
-    } catch (e) { alert(e.response?.data?.detail || 'Craft failed'); }
-    setCrafting(null);
-  };
-
-  if (!builds.length) return null;
-
-  return (
-    <div className="rounded-2xl p-4"
-      style={{
-        background: 'rgba(15,15,25,0.6)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        border: '1px solid rgba(251,191,36,0.08)',
-        borderLeft: '2px solid rgba(251,191,36,0.25)',
-      }}
-      data-testid="resonance-builds-panel"
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <Hammer size={11} style={{ color: '#FBBF24' }} />
-        <span className="text-[9px] uppercase tracking-widest font-bold" style={{ color: '#FBBF24' }}>
-          Resonance Builds — Crafting
-        </span>
-      </div>
-
-      <div className="space-y-2">
-        {builds.map(b => (
-          <div key={b.id} className="rounded-lg p-2.5"
-            style={{
-              background: b.crafted ? 'rgba(251,191,36,0.04)' : 'rgba(248,250,252,0.015)',
-              border: `1px solid ${b.crafted ? 'rgba(251,191,36,0.1)' : 'rgba(248,250,252,0.04)'}`,
-            }}
-            data-testid={`build-${b.id}`}
-          >
-            <div className="flex items-start gap-2">
-              <div className="flex-1">
-                <p className="text-[9px] font-medium" style={{ color: b.crafted ? '#FBBF24' : 'var(--text-primary)' }}>
-                  {b.name}
-                </p>
-                <p className="text-[7px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{b.description}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[7px] font-mono" style={{ color: '#FBBF24' }}>
-                    {b.bonus_value}x {b.bonus_type.replace('_', ' ')}
-                  </span>
-                  <span className="text-[7px]" style={{ color: 'var(--text-muted)' }}>
-                    {b.owned_items}/{b.total_required} items
-                  </span>
-                </div>
-              </div>
-              <div className="shrink-0">
-                {b.crafted ? (
-                  <span className="text-[7px] px-1.5 py-0.5 rounded flex items-center gap-0.5"
-                    style={{ background: 'rgba(251,191,36,0.1)', color: '#FBBF24' }}>
-                    <Sparkles size={7} /> Active
-                  </span>
-                ) : b.can_craft ? (
-                  <button onClick={() => handleCraft(b.id)}
-                    disabled={crafting === b.id}
-                    className="text-[7px] px-2 py-1 rounded transition-all"
-                    style={{ background: 'rgba(251,191,36,0.1)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.15)' }}
-                    data-testid={`craft-${b.id}`}
-                  >
-                    {crafting === b.id ? '...' : 'Craft'}
-                  </button>
-                ) : (
-                  <span className="text-[7px] px-1.5 py-0.5 rounded" style={{ color: 'var(--text-muted)' }}>
-                    <Lock size={7} />
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -586,18 +491,21 @@ export default function MasteryAvenues() {
   const [bioActivities, setBioActivities] = useState([]);
   const [bioStats, setBioStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [decayStatus, setDecayStatus] = useState(null);
 
   const fetchOverview = useCallback(async () => {
     try {
-      const [aRes, shopRes] = await Promise.all([
+      const [aRes, shopRes, decayRes] = await Promise.all([
         axios.get(`${API}/avenues/overview`, { headers: authHeaders }),
         axios.get(`${API}/science-history/economy/shop`, { headers: authHeaders }).catch(() => ({ data: { balances: {} } })),
+        axios.get(`${API}/cosmic-map/decay-status`, { headers: authHeaders }).catch(() => ({ data: null })),
       ]);
       setAvenues(aRes.data.avenues || []);
       setTotalResonance(aRes.data.total_resonance);
       setCombinedTier(aRes.data.combined_tier_name);
       setDustBalance(shopRes.data.balances?.kinetic_dust || 0);
       setSciRes(shopRes.data.balances?.science_resonance || 0);
+      if (decayRes.data) setDecayStatus(decayRes.data);
     } catch (e) { console.error('Avenues fetch failed', e); }
     setLoading(false);
   }, [authHeaders]);
@@ -815,6 +723,25 @@ export default function MasteryAvenues() {
         </div>
       </div>
 
+      {/* Decay Warning */}
+      {decayStatus?.at_risk && (
+        <motion.div
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: decayStatus.pulse_speed || 1.5, repeat: Infinity }}
+          className="rounded-xl px-3 py-2"
+          style={{
+            background: 'rgba(239,68,68,0.08)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(239,68,68,0.15)',
+          }}
+          data-testid="decay-warning"
+        >
+          <p className="text-[8px] text-center" style={{ color: '#EF4444' }}>
+            Resonance Decay: {decayStatus.days_inactive?.toFixed(1)} days inactive — projected loss: Sci -{decayStatus.science_resonance - decayStatus.projected_science}, Hist -{decayStatus.history_resonance - decayStatus.projected_history}
+          </p>
+        </motion.div>
+      )}
+
       {/* Three Avenue Accordions */}
       {Object.entries(AVENUE_THEMES).map(([key, theme]) => {
         const Icon = theme.icon;
@@ -885,8 +812,21 @@ export default function MasteryAvenues() {
         );
       })}
 
-      {/* Resonance Builds */}
-      <ResonanceBuildsPanel authHeaders={authHeaders} />
+      {/* Resonance Forge */}
+      <ForgePanel authHeaders={authHeaders} />
+
+      {/* Cosmic Map nav */}
+      <button onClick={() => navigate('/cosmic-map')}
+        className="w-full py-2.5 rounded-lg text-[9px] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01]"
+        style={{
+          background: 'rgba(15,15,25,0.6)',
+          backdropFilter: 'blur(8px)',
+          color: '#FBBF24',
+          border: '1px solid rgba(251,191,36,0.1)',
+        }}
+        data-testid="nav-cosmic-map">
+        <MapPin size={10} /> Cosmic Map — GPS Nodes
+      </button>
 
       {/* Quick nav */}
       <button onClick={() => navigate('/fractal-engine')}
