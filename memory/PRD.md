@@ -92,6 +92,28 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - 12 world traditions with curated content, VR Immersive Mode, AI exploration via Gemini, HD narration
 - Full route: `/encyclopedia`, backend: `/api/myths/*`
 
+### Cinematic Visual System (Apr 2, 2026) — LATEST
+
+**Persistent Audio Waveform Visualizer:**
+- Canvas element fixed at bottom of every page (`z-index: 998`)
+- Real-time frequency-reactive waveform when MixerContext audio is playing
+- Gentle breathing sine wave in idle state
+- Color changes to match the dominant active frequency (432Hz=green, 528Hz=emerald, 741Hz=violet, etc.)
+- Sacred geometry overlay — rotating hexagonal points during playback
+
+**4-Layer Depth Transition (CosmicMap):**
+- Cinematic "dive" animation when toggling Ground ↔ Celestial layers
+- 4 expanding rings (purple for ascending, gold for returning) with label text
+- 1.2-second transition with staggered ring delays
+- Smooth cross-fade to the Celestial Star Chart or back to Leaflet map
+
+**Haptic Ripple Effect:**
+- Animated expanding dashed circles on the map at harvest location
+- Device vibration pattern on successful harvest (`navigator.vibrate`)
+- Different patterns for ground harvest vs celestial alignment
+
+**Tests:** Iteration 195 — 100% Backend (10/10) / 100% Frontend
+
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
