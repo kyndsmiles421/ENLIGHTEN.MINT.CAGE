@@ -10,7 +10,31 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026) — LATEST
+### Power Spot Admin Dashboard & Celestial UI Toggle (Apr 2, 2026) — LATEST
+
+**Power Spot Admin Dashboard (`/admin/power-spot`):**
+- Leaflet map where clicking drops a GPS pin for a new Power Spot
+- Create form: name, lat/lng (6 decimal precision), description, reward multiplier, radius, active hours
+- CRUD operations: deploy, edit (lat/lng/multiplier/desc), delete Power Spots
+- "Go Live" toggle: broadcasts spot to all users, creates notification
+- Active Broadcasts panel showing recent go-live events
+- Deployed Spots list with LIVE/OFFLINE status badges
+- Navigate-to-spot button for quick map centering
+
+**Celestial Dimensional Toggle (in CosmicMap):**
+- Ground/Celestial layer toggle button in HUD
+- Celestial layer replaces Leaflet map with canvas-based Star Chart
+- 6 constellation nodes: Orion's Gate (741Hz), Sirius Nexus (852Hz), Pleiades Beacon (963Hz), Vega Alignment (741Hz), Polaris Lock (852Hz), Antares Bridge (963Hz)
+- Click-to-select nodes on star chart, alignment action (60%+ accuracy required)
+- Quadratic decay visualization (0.9^t² formula) with pulsing warning
+- Separate HUD stats for celestial mode (aligned/total count)
+
+**Backend Fix:** Resolved SyntaxError where `harvest_power_spot` function was split by `go-live` and `broadcasts` route definitions.
+
+**Routes:** `/admin/power-spot` (frontend), full Power Spots CRUD + Go-Live + Broadcasts backend
+**Tests:** Iteration 189 — 100% Backend (20/20) / 100% Frontend
+
+### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
 - Waveform matching puzzle for crafting Resonance Builds
