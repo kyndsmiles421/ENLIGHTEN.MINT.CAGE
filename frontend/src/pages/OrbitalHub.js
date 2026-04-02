@@ -198,6 +198,78 @@ function Satellite({ sat, x, y, isHovered, onHover, onSelect }) {
   );
 }
 
+// ━━━ Atmospheric Audio Cue Zones ━━━
+const ZONE_AUDIO = {
+  // Celestial zone — high, shimmering sine waves
+  'star-chart': { hz: 852, type: 'sine', gain: 0.06, zone: 'celestial' },
+  'observatory': { hz: 963, type: 'sine', gain: 0.05, zone: 'celestial' },
+  'oracle': { hz: 741, type: 'sine', gain: 0.05, zone: 'celestial' },
+  // Earth zone — lower, grounded tones
+  'workshop': { hz: 256, type: 'triangle', gain: 0.06, zone: 'earth' },
+  'trade': { hz: 324, type: 'triangle', gain: 0.05, zone: 'earth' },
+  'games': { hz: 396, type: 'triangle', gain: 0.04, zone: 'earth' },
+  // Heart zone — warm, mid frequencies
+  'mood': { hz: 528, type: 'sine', gain: 0.05, zone: 'heart' },
+  'breathing': { hz: 432, type: 'sine', gain: 0.06, zone: 'heart' },
+  'meditation': { hz: 639, type: 'sine', gain: 0.05, zone: 'heart' },
+  // Creative zone
+  'mixer': { hz: 369, type: 'sine', gain: 0.05, zone: 'creative' },
+  'theory': { hz: 417, type: 'sine', gain: 0.05, zone: 'creative' },
+  'map': { hz: 285, type: 'triangle', gain: 0.04, zone: 'earth' },
+  'journal': { hz: 396, type: 'sine', gain: 0.04, zone: 'heart' },
+};
+
+function useAtmosphericAudio() {
+  const ctxRef = useRef(null);
+  const activeOscRef = useRef(null);
+  const activeGainRef = useRef(null);
+
+  const play = useCallback((satId) => {
+    const zone = ZONE_AUDIO[satId];
+    if (!zone) return;
+
+    try {
+      if (!ctxRef.current) ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = ctxRef.current;
+
+      // Fade out previous
+      if (activeGainRef.current) {
+        activeGainRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        const oldOsc = activeOscRef.current;
+        setTimeout(() => { try { oldOsc?.stop(); } catch {} }, 400);
+      }
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = zone.type;
+      osc.frequency.value = zone.hz;
+
+      // Soft fade in
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(zone.gain, ctx.currentTime + 0.5);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+
+      activeOscRef.current = osc;
+      activeGainRef.current = gain;
+    } catch {}
+  }, []);
+
+  const stop = useCallback(() => {
+    if (activeGainRef.current && ctxRef.current) {
+      activeGainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.4);
+      const oldOsc = activeOscRef.current;
+      setTimeout(() => { try { oldOsc?.stop(); } catch {} }, 500);
+      activeOscRef.current = null;
+      activeGainRef.current = null;
+    }
+  }, []);
+
+  return { play, stop };
+}
+
 // ━━━ Main Orbital Hub ━━━
 export default function OrbitalHub() {
   const navigate = useNavigate();
@@ -207,6 +279,7 @@ export default function OrbitalHub() {
   const [hoveredSat, setHoveredSat] = useState(null);
   const [orbitAngle, setOrbitAngle] = useState(0);
   const animRef = useRef(null);
+  const { play: playAtmo, stop: stopAtmo } = useAtmosphericAudio();
 
   const pulseColor = activeFrequencies?.length > 0 ? '#A78BFA' : '#2DD4BF';
 
@@ -223,7 +296,13 @@ export default function OrbitalHub() {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
 
-  const handleSelect = useCallback((sat) => navigate(sat.path), [navigate]);
+  const handleSelect = useCallback((sat) => { stopAtmo(); navigate(sat.path); }, [navigate, stopAtmo]);
+
+  const handleHover = useCallback((satId) => {
+    setHoveredSat(satId);
+    if (satId) playAtmo(satId);
+    else stopAtmo();
+  }, [playAtmo, stopAtmo]);
 
   const innerSats = SATELLITES.filter(s => s.ring === 0);
   const outerSats = SATELLITES.filter(s => s.ring === 1);
@@ -292,7 +371,7 @@ export default function OrbitalHub() {
           <Satellite key={sat.id} sat={sat}
             x={innerPositions[i].x} y={innerPositions[i].y}
             isHovered={hoveredSat === sat.id}
-            onHover={setHoveredSat} onSelect={handleSelect}
+            onHover={handleHover} onSelect={handleSelect}
           />
         ))}
 
@@ -301,7 +380,7 @@ export default function OrbitalHub() {
           <Satellite key={sat.id} sat={sat}
             x={outerPositions[i].x} y={outerPositions[i].y}
             isHovered={hoveredSat === sat.id}
-            onHover={setHoveredSat} onSelect={handleSelect}
+            onHover={handleHover} onSelect={handleSelect}
           />
         ))}
 
@@ -322,6 +401,11 @@ export default function OrbitalHub() {
             <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
               {hoveredData.desc}
             </p>
+            {ZONE_AUDIO[hoveredData.id] && (
+              <p className="text-[8px] mt-0.5 font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                {ZONE_AUDIO[hoveredData.id].hz}Hz &middot; {ZONE_AUDIO[hoveredData.id].zone}
+              </p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -40,20 +40,22 @@ export default function MissionControl({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)' }}
+            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
           />
 
           {/* Panel */}
           <motion.div
-            className="fixed z-50 rounded-2xl overflow-hidden"
+            className="fixed z-50 rounded-2xl overflow-hidden overflow-y-auto"
             style={{
               left: '50%',
               top: '50%',
               width: 360,
               maxHeight: '80vh',
-              background: 'rgba(10,10,18,0.95)',
-              border: '1px solid rgba(248,250,252,0.06)',
-              boxShadow: '0 0 60px rgba(167,139,250,0.08), 0 24px 80px rgba(0,0,0,0.5)',
+              background: 'rgba(10,10,18,0.72)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              border: '1px solid rgba(248,250,252,0.08)',
+              boxShadow: '0 0 60px rgba(167,139,250,0.06), 0 24px 80px rgba(0,0,0,0.3)',
             }}
             initial={{ opacity: 0, scale: 0.85, x: '-50%', y: '-50%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
