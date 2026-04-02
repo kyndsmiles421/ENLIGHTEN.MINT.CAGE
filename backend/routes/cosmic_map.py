@@ -684,6 +684,58 @@ async def harvest_power_spot(
         "date": today,
         "harvested_at": now,
         "location": {"lat": user_lat, "lng": user_lng},
+
+@router.post("/power-spots/{spot_id}/go-live")
+async def toggle_go_live(
+    spot_id: str,
+    go_live: bool = Body(..., embed=True),
+    user=Depends(get_current_user),
+):
+    """Toggle Go Live status for a Power Spot. Broadcasts to nearby users."""
+    spot = await db.power_spots.find_one({"id": spot_id}, {"_id": 0})
+    if not spot:
+        raise HTTPException(404, "Power Spot not found")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.power_spots.update_one(
+        {"id": spot_id},
+        {"$set": {"active": go_live, "go_live_at": now if go_live else None, "updated_at": now}},
+    )
+
+    if go_live:
+        # Create a broadcast notification
+        await db.broadcasts.insert_one({
+            "type": "power_spot_live",
+            "spot_id": spot_id,
+            "spot_name": spot["name"],
+            "lat": spot["lat"],
+            "lng": spot["lng"],
+            "reward_multiplier": spot.get("reward_multiplier", 5.0),
+            "message": f"The {spot['name']} has anchored. {spot.get('reward_multiplier', 5)}x Kinetic Dust active.",
+            "created_at": now,
+            "created_by": user["id"],
+        })
+
+    return {
+        "success": True,
+        "spot_name": spot["name"],
+        "go_live": go_live,
+        "message": f"{spot['name']} is {'LIVE' if go_live else 'offline'}.",
+    }
+
+
+@router.get("/broadcasts/active")
+async def get_active_broadcasts(user=Depends(get_current_user)):
+    """Get active broadcast notifications (last 24h)."""
+    cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    broadcasts = await db.broadcasts.find(
+        {"created_at": {"$gte": cutoff}},
+        {"_id": 0},
+    ).sort("created_at", -1).to_list(10)
+
+    return {"broadcasts": broadcasts, "count": len(broadcasts)}
+
+
     })
     await db.user_activity_log.insert_one({
         "user_id": uid, "type": "power_spot_harvest",
