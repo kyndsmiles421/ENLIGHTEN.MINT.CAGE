@@ -46,6 +46,26 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Once-per-spot-per-session deduplication via ref (no spam)
 - Uses sonner toast with gold Power Spot styling
 
+### Synchronicity Events — Coven/Party System & Group Forging (Apr 2, 2026) — LATEST
+
+**Coven System (WebSocket-based):**
+- Create/Join/Leave covens with 8-char invite codes (max 6 members)
+- Real-time WebSocket connection at `/api/ws/sync?token=JWT` — position pings every 5s
+- Coven member markers rendered on the Leaflet map with color-coded dots
+- Join/leave/offline notifications via WebSocket broadcast + sonner toasts
+- Coven panel in CosmicMap HUD (Users icon toggle) with create/join forms, member list, invite code copy
+- Leadership transfer on leader leave; auto-disband when last member leaves
+
+**Group Forging:**
+- POST `/api/sync/group-forge` averages requesting user's accuracy with online coven members' last forge scores
+- Strong players "lift" weaker ones by raising the averaged accuracy above the 70% threshold
+- Guard rails: requires 2+ online members, validates build_id, prevents duplicate crafting
+- "Group Forge" button appears in ForgePanel only when user is in a coven during an active forge
+- Result shows lift amount, contributor count, and averaged accuracy
+
+**New Routes:** `/api/sync/covens`, `/api/sync/covens/join`, `/api/sync/covens/leave`, `/api/sync/covens/my`, `/api/sync/online-count`, `/api/sync/group-forge`, `/api/ws/sync`
+**Tests:** Iterations 191-192 — 100% Backend / 100% Frontend
+
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
