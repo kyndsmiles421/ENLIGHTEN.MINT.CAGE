@@ -10,14 +10,45 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 import random
 
+# ━━━ Mood → Frequency Mapping (Solfeggio-based) ━━━
+MOOD_FREQUENCIES = {
+    # Positive
+    'happy': 528, 'peaceful': 432, 'energized': 741, 'grateful': 639,
+    'curious': 852, 'inspired': 963, 'hopeful': 528, 'creative': 741,
+    'connected': 639, 'brave': 396,
+    # Challenged
+    'stressed': 396, 'anxious': 417, 'tired': 174, 'sad': 285,
+    'unfocused': 741, 'restless': 417, 'angry': 396, 'lonely': 639,
+    'overwhelmed': 285, 'grief': 174, 'numb': 285, 'fearful': 396,
+    'frustrated': 417, 'burnout': 174, 'disconnected': 285, 'jealous': 417,
+    'impatient': 396, 'bored': 528, 'nostalgic': 639,
+    # Spiritual
+    'awakening': 963, 'seeking': 852, 'grounding': 174, 'expansive': 963,
+}
+
+MOOD_GEOMETRIES = {
+    528: 'icosahedron', 432: 'flower_of_life', 741: 'metatrons_cube',
+    639: 'vesica_piscis', 852: 'sri_yantra', 963: 'merkaba',
+    396: 'tetrahedron', 417: 'cube', 174: 'sphere', 285: 'octahedron',
+}
+
+
 @router.post("/moods")
 async def create_mood(mood: MoodCreate, user=Depends(get_current_user)):
+    moods_list = mood.moods or [mood.mood]
+    frequencies = [MOOD_FREQUENCIES.get(m, 432) for m in moods_list]
+    geometries = list(set(MOOD_GEOMETRIES.get(f, 'sphere') for f in frequencies))
+
     doc = {
         "id": str(uuid.uuid4()),
         "user_id": user["id"],
         "mood": mood.mood,
+        "moods": moods_list,
         "intensity": mood.intensity,
         "note": mood.note,
+        "frequencies": list(set(frequencies)),
+        "geometries": geometries,
+        "is_multi": len(moods_list) > 1,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.moods.insert_one(doc)
@@ -36,7 +67,12 @@ async def create_mood(mood: MoodCreate, user=Depends(get_current_user)):
         )
     except Exception:
         pass
-    return doc
+    return {
+        **doc,
+        "frequency_stack": frequencies,
+        "geometry_stack": geometries,
+        "resonance_type": "chorded" if len(frequencies) > 1 else "pure",
+    }
 
 @router.get("/moods")
 async def get_moods(user=Depends(get_current_user)):

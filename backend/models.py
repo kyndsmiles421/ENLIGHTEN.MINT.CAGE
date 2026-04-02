@@ -15,6 +15,7 @@ class MoodCreate(BaseModel):
     mood: str
     intensity: int = Field(ge=1, le=10)
     note: Optional[str] = None
+    moods: Optional[list[str]] = None  # Multi-select: list of mood IDs
 
 class JournalCreate(BaseModel):
     title: str

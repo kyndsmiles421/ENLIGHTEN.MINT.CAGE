@@ -64,7 +64,7 @@ const GROUP_META = {
 export default function MoodTracker() {
   const { user, authHeaders } = useAuth();
   const { playCelebration } = useSensory();
-  const [selected, setSelected] = useState(null);
+  const [selectedMoods, setSelectedMoods] = useState([]);
   const [intensity, setIntensity] = useState(5);
   const [note, setNote] = useState('');
   const [history, setHistory] = useState([]);
@@ -74,6 +74,7 @@ export default function MoodTracker() {
   const [activeGroup, setActiveGroup] = useState('all');
   const [insights, setInsights] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
+  const [lastResult, setLastResult] = useState(null); // frequency stack from last submit
 
   useEffect(() => {
     if (user) {
@@ -99,24 +100,39 @@ export default function MoodTracker() {
     return list;
   }, [search, activeGroup]);
 
+  const toggleMood = (mood) => {
+    setSelectedMoods(prev => {
+      const exists = prev.find(m => m.id === mood.id);
+      if (exists) return prev.filter(m => m.id !== mood.id);
+      return [...prev, mood];
+    });
+  };
+
   const submit = async () => {
     if (!user) { toast.error('Sign in to track your mood'); return; }
-    if (!selected) { toast.error('Select a mood first'); return; }
+    if (selectedMoods.length === 0) { toast.error('Select at least one mood'); return; }
     setLoading(true);
     try {
+      const primary = selectedMoods[0];
       const res = await axios.post(`${API}/moods`, {
-        mood: selected.name,
+        mood: primary.name,
+        moods: selectedMoods.map(m => m.id),
         intensity,
         note: note || null,
       }, { headers: authHeaders });
       setHistory([res.data, ...history]);
-      setSelected(null);
+      setLastResult(res.data);
+      setSelectedMoods([]);
       setNote('');
       setIntensity(5);
       setSearch('');
       setCelebrating(true);
       playCelebration();
-      toast.success('Mood captured');
+      toast.success(
+        res.data.resonance_type === 'chorded'
+          ? `Chorded resonance: ${res.data.frequency_stack?.join('Hz + ')}Hz`
+          : 'Mood captured'
+      );
     } catch {
       toast.error('Could not save mood');
     } finally {
@@ -180,22 +196,29 @@ export default function MoodTracker() {
               ))}
             </div>
 
-            {/* Mood Grid */}
+            {/* Mood Grid — Multi-Select */}
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[380px] overflow-y-auto pr-1 overscroll-contain" style={{ scrollbarWidth: 'thin', WebkitOverflowScrolling: 'touch' }}>
               {filteredMoods.map(mood => {
                 const Icon = mood.icon;
-                const isSelected = selected?.id === mood.id;
+                const isSelected = selectedMoods.some(m => m.id === mood.id);
+                const selIndex = selectedMoods.findIndex(m => m.id === mood.id);
                 return (
                   <motion.button key={mood.id}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelected(mood)}
-                    className="glass-card p-3 flex flex-col items-center gap-1.5 transition-all hover:scale-[1.03]"
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => toggleMood(mood)}
+                    className="glass-card p-3 flex flex-col items-center gap-1.5 transition-all hover:scale-[1.03] relative overflow-hidden"
                     style={{
                       border: `1px solid ${isSelected ? `${mood.color}50` : 'rgba(255,255,255,0.06)'}`,
                       background: isSelected ? `${mood.color}10` : undefined,
                       touchAction: 'pan-y',
                     }}
                     data-testid={`mood-${mood.id}`}>
+                    {isSelected && (
+                      <span className="absolute top-1 right-1.5 text-[7px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center"
+                        style={{ background: mood.color, color: '#0A0A12' }}>
+                        {selIndex + 1}
+                      </span>
+                    )}
                     <Icon size={18} style={{ color: isSelected ? mood.color : 'rgba(248,250,252,0.5)', transition: 'color 0.2s' }} />
                     <span className="text-[9px] font-medium text-center leading-tight" style={{ color: isSelected ? mood.color : 'var(--text-primary)' }}>
                       {mood.name}
@@ -209,37 +232,97 @@ export default function MoodTracker() {
               <p className="text-center py-6 text-xs" style={{ color: 'var(--text-muted)' }}>No emotions match "{search}"</p>
             )}
 
-            {/* Intensity + Note + Submit */}
+            {/* Intensity + Frequency Stack + Submit */}
             <AnimatePresence>
-              {selected && (
+              {selectedMoods.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                  className="mt-6 space-y-4 glass-card p-5 rounded-2xl"
-                  style={{ border: `1px solid ${selected.color}20` }}>
-                  <div className="flex items-center gap-3 mb-2">
-                    {(() => { const SIcon = selected.icon; return <SIcon size={20} style={{ color: selected.color }} />; })()}
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: selected.color }}>{selected.name}</p>
-                      <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>How intense is this feeling?</p>
+                  className="mt-6 space-y-4 glass-card p-5 rounded-2xl relative overflow-hidden"
+                  style={{ border: `1px solid ${selectedMoods[0].color}20` }}>
+
+                  {/* Moiré Shimmer for multi-select */}
+                  {selectedMoods.length > 1 && (
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden" data-testid="moire-shimmer">
+                      {selectedMoods.map((m, i) => (
+                        <motion.div key={m.id}
+                          animate={{ rotate: [0, 360] }}
+                          transition={{ duration: 20 + i * 5, repeat: Infinity, ease: 'linear' }}
+                          className="absolute inset-0 flex items-center justify-center opacity-[0.04]">
+                          <div style={{
+                            width: `${120 + i * 40}px`, height: `${120 + i * 40}px`,
+                            border: `1px solid ${m.color}`,
+                            borderRadius: i % 2 === 0 ? '30% 70% 70% 30%' : '50%',
+                          }} />
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Selected mood pills */}
+                  <div className="flex flex-wrap gap-1.5 relative z-10">
+                    {selectedMoods.map(m => {
+                      const SIcon = m.icon;
+                      return (
+                        <motion.span key={m.id} layout
+                          className="flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-medium cursor-pointer"
+                          style={{ background: `${m.color}12`, border: `1px solid ${m.color}25`, color: m.color }}
+                          onClick={() => toggleMood(m)}
+                          data-testid={`selected-mood-${m.id}`}>
+                          <SIcon size={10} /> {m.name} <X size={8} />
+                        </motion.span>
+                      );
+                    })}
+                  </div>
+
+                  {/* Frequency Stack */}
+                  <div className="relative z-10 flex items-center gap-2 py-2 px-3 rounded-lg"
+                    style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}
+                    data-testid="frequency-stack">
+                    <Zap size={10} style={{ color: '#FBBF24' }} />
+                    <div className="flex-1">
+                      <p className="text-[7px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                        {selectedMoods.length > 1 ? 'Chorded Resonance' : 'Pure Resonance'}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        {selectedMoods.map((m, i) => {
+                          const FREQ_MAP = {
+                            happy: 528, peaceful: 432, energized: 741, grateful: 639,
+                            curious: 852, inspired: 963, hopeful: 528, creative: 741,
+                            connected: 639, brave: 396, stressed: 396, anxious: 417,
+                            tired: 174, sad: 285, unfocused: 741, restless: 417,
+                            angry: 396, lonely: 639, overwhelmed: 285, grief: 174,
+                            numb: 285, fearful: 396, frustrated: 417, burnout: 174,
+                            disconnected: 285, jealous: 417, impatient: 396, bored: 528,
+                            nostalgic: 639, awakening: 963, seeking: 852, grounding: 174, expansive: 963,
+                          };
+                          const hz = FREQ_MAP[m.id] || 432;
+                          return (
+                            <React.Fragment key={m.id}>
+                              {i > 0 && <span className="text-[7px]" style={{ color: 'var(--text-muted)' }}>+</span>}
+                              <span className="text-[9px] font-mono" style={{ color: m.color }}>{hz}Hz</span>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
-                  <div>
+                  <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>
                         Intensity
                       </label>
-                      <span className="text-sm font-light tabular-nums" style={{ color: selected.color, fontFamily: 'Cormorant Garamond, serif' }}>
+                      <span className="text-sm font-light tabular-nums" style={{ color: selectedMoods[0].color, fontFamily: 'Cormorant Garamond, serif' }}>
                         {intensity}/10
                       </span>
                     </div>
                     <input type="range" min="1" max="10" value={intensity}
                       onChange={(e) => setIntensity(parseInt(e.target.value))}
                       className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-                      style={{ background: `linear-gradient(to right, ${selected.color} ${(intensity / 10) * 100}%, rgba(255,255,255,0.06) ${(intensity / 10) * 100}%)` }}
+                      style={{ background: `linear-gradient(to right, ${selectedMoods[0].color} ${(intensity / 10) * 100}%, rgba(255,255,255,0.06) ${(intensity / 10) * 100}%)` }}
                       data-testid="mood-intensity-slider" />
                   </div>
 
-                  <div>
+                  <div className="relative z-10">
                     <label className="text-[10px] font-bold uppercase tracking-[0.15em] mb-2 block" style={{ color: 'var(--text-muted)' }}>
                       Note (optional)
                     </label>
@@ -251,15 +334,17 @@ export default function MoodTracker() {
                   </div>
 
                   <button onClick={submit} disabled={loading}
-                    className="w-full py-3 rounded-xl text-xs font-medium transition-all hover:scale-[1.01]"
+                    className="w-full py-3 rounded-xl text-xs font-medium transition-all hover:scale-[1.01] relative z-10"
                     style={{
-                      background: `${selected.color}15`,
-                      border: `1px solid ${selected.color}30`,
-                      color: selected.color,
+                      background: selectedMoods.length > 1
+                        ? `linear-gradient(135deg, ${selectedMoods[0].color}15, ${selectedMoods[selectedMoods.length - 1].color}15)`
+                        : `${selectedMoods[0].color}15`,
+                      border: `1px solid ${selectedMoods[0].color}30`,
+                      color: selectedMoods[0].color,
                       opacity: loading ? 0.6 : 1,
                     }}
                     data-testid="mood-submit-btn">
-                    {loading ? 'Saving...' : 'Log This Mood'}
+                    {loading ? 'Capturing...' : selectedMoods.length > 1 ? `Capture ${selectedMoods.length} Layers` : 'Capture Mood'}
                   </button>
                 </motion.div>
               )}
