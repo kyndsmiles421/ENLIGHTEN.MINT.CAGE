@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useResolution } from '../context/ResolutionContext';
 import {
   X, User, Settings, Globe, Shield, Award, ChevronRight,
-  Orbit, Eye, Layers
+  Orbit, Eye, Layers, BookOpen, Leaf
 } from 'lucide-react';
 import { NanoGuide } from './NanoGuide';
 import { HexagramBadge, HexagramGlitch } from './ResonancePulse';
@@ -26,6 +26,8 @@ export default function MissionControl({ isOpen, onClose }) {
   const actions = [
     { label: 'Profile', icon: User, path: '/profile', color: '#A78BFA' },
     { label: 'Dashboard', icon: Layers, path: '/dashboard', color: '#22C55E' },
+    { label: 'Book of Changes', icon: BookOpen, path: '/hexagram-journal', color: '#C084FC' },
+    { label: 'Botany Orbital', icon: Leaf, path: '/botany-orbital', color: '#34D399' },
     { label: 'Settings', icon: Settings, path: '/settings', color: '#94A3B8' },
     { label: 'Mastery Tiers', icon: Award, path: '/mastery-avenues', color: '#FBBF24' },
     { label: 'Analytics', icon: Eye, path: '/analytics', color: '#3B82F6' },

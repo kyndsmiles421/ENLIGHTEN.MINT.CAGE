@@ -171,6 +171,8 @@ const Archives = lazy(() => import('./pages/Archives'));
 const SuanpanMixer = lazy(() => import('./pages/SuanpanMixer'));
 const Botany = lazy(() => import('./pages/Botany'));
 const Codex = lazy(() => import('./pages/Codex'));
+const BotanyOrbital = lazy(() => import('./pages/BotanyOrbital'));
+const HexagramJournal = lazy(() => import('./pages/HexagramJournal'));
 
 function PageLoader() {
   return (
@@ -325,6 +327,8 @@ function AnimatedRoutes() {
         <Route path="/suanpan" element={<SuanpanMixer />} />
         <Route path="/botany" element={<Botany />} />
         <Route path="/codex" element={<Codex />} />
+        <Route path="/botany-orbital" element={<BotanyOrbital />} />
+        <Route path="/hexagram-journal" element={<HexagramJournal />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
