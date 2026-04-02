@@ -31,6 +31,7 @@ export default function OrbitalHub() {
   const [weather, setWeather] = useState(null);
   const [ambienceActive, setAmbienceActive] = useState(false);
   const [gravityNodes, setGravityNodes] = useState([]);
+  const [tidalPoint, setTidalPoint] = useState(null);
 
   const animRef = useRef(null);
   const longPressRef = useRef(null);
@@ -142,17 +143,42 @@ export default function OrbitalHub() {
     if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
   }, [savePrefs, audio]);
 
-  const handleSelect = useCallback((sat) => { audio.stopSatellite(); navigate(sat.path); }, [navigate, audio]);
+  const handleSelect = useCallback((sat) => { audio.stopSatellite(); audio.stopHarmonicChord(); setTidalPoint(null); navigate(sat.path); }, [navigate, audio]);
 
   const handleHover = useCallback((id) => {
     setHoveredSat(id);
     if (id) {
       audio.playSatellite(id);
       tryStartAmbience();
+      // Create tidal point at satellite position
+      const satIdx = activeSats.findIndex(s => s.id === id);
+      if (satIdx >= 0 && positions[satIdx]) {
+        setTidalPoint({ x: positions[satIdx].x, y: positions[satIdx].y, mass: 0.6 });
+        // Check proximity to gravity nodes for harmonic chord
+        const satData = ALL_SATELLITES.find(s => s.id === id);
+        const satHz = ZONE_AUDIO[id]?.hz;
+        if (satHz && gravityNodes.length > 0) {
+          const nx = (positions[satIdx].x / 310) * 5;
+          const ny = (positions[satIdx].y / 310) * 5;
+          let closestNode = null;
+          let closestDist = Infinity;
+          for (const gn of gravityNodes) {
+            const gnx = Math.cos((gravityNodes.indexOf(gn) / gravityNodes.length) * Math.PI * 2) * 4;
+            const gny = Math.sin((gravityNodes.indexOf(gn) / gravityNodes.length) * Math.PI * 2) * 4;
+            const d = Math.sqrt((nx - gnx) ** 2 + (ny - gny) ** 2);
+            if (d < closestDist) { closestDist = d; closestNode = gn; }
+          }
+          if (closestNode && closestDist < 3) {
+            audio.playHarmonicChord(satHz, closestNode.frequency);
+          }
+        }
+      }
     } else {
       audio.stopSatellite();
+      audio.stopHarmonicChord();
+      setTidalPoint(null);
     }
-  }, [audio, tryStartAmbience]);
+  }, [audio, tryStartAmbience, activeSats, positions, gravityNodes]);
 
   // ━━━ Central orb gestures ━━━
   const handleOrbDown = useCallback(() => {
@@ -189,7 +215,7 @@ export default function OrbitalHub() {
       data-testid="orbital-hub-page">
 
       {/* WebGL Gravity Field — deepest layer */}
-      <GravityField nodes={meshNodes} />
+      <GravityField nodes={meshNodes} tidalPoint={tidalPoint} />
 
       {/* Cosmic dust overlay */}
       <CosmicDust />

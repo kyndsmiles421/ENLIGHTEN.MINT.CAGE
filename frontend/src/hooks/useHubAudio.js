@@ -9,6 +9,8 @@ export function useHubAudio() {
   const ambGainRef = useRef(null);
   const ambLfoRef = useRef(null);
   const ambActiveRef = useRef(false);
+  const chordOscsRef = useRef([]);
+  const chordGainRef = useRef(null);
 
   const ensureCtx = useCallback(() => {
     if (!ctxRef.current) {
@@ -127,13 +129,51 @@ export function useHubAudio() {
 
   const isAmbienceActive = useCallback(() => ambActiveRef.current, []);
 
+  const playHarmonicChord = useCallback((hz1, hz2) => {
+    try {
+      const ctx = ensureCtx();
+      // Stop existing chord
+      if (chordGainRef.current) {
+        chordGainRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+        chordOscsRef.current.forEach(o => { setTimeout(() => { try { o.stop(); } catch {} }, 300); });
+        chordOscsRef.current = [];
+        chordGainRef.current = null;
+      }
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.5);
+      gain.connect(ctx.destination);
+      chordGainRef.current = gain;
+
+      [hz1, hz2, (hz1 + hz2) / 2].forEach(hz => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = hz;
+        osc.connect(gain);
+        osc.start(ctx.currentTime);
+        chordOscsRef.current.push(osc);
+      });
+    } catch {}
+  }, [ensureCtx]);
+
+  const stopHarmonicChord = useCallback(() => {
+    if (chordGainRef.current && ctxRef.current) {
+      chordGainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.8);
+      const oscs = chordOscsRef.current;
+      setTimeout(() => { oscs.forEach(o => { try { o.stop(); } catch {} }); }, 1000);
+      chordOscsRef.current = [];
+      chordGainRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       try { satOscRef.current?.stop(); } catch {}
       try { ambOscRef.current?.stop(); } catch {}
       try { ambLfoRef.current?.stop(); } catch {}
+      chordOscsRef.current.forEach(o => { try { o.stop(); } catch {} });
     };
   }, []);
 
-  return { playSatellite, stopSatellite, collapseSound, startAmbience, stopAmbience, isAmbienceActive };
+  return { playSatellite, stopSatellite, collapseSound, startAmbience, stopAmbience, isAmbienceActive, playHarmonicChord, stopHarmonicChord };
 }

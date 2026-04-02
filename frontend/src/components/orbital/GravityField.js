@@ -4,7 +4,7 @@ import * as THREE from 'three';
 const GRID_RES = 64;
 const GRID_SIZE = 12;
 
-export function GravityField({ nodes }) {
+export function GravityField({ nodes, tidalPoint }) {
   const canvasRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
@@ -142,6 +142,16 @@ export function GravityField({ nodes }) {
             const dz = bz - n.z;
             const dist = dx * dx + dz * dz;
             sag -= (n.mass * 1.8) / (dist + 0.6);
+          }
+
+          // Tidal force from user interaction point
+          if (tidalPoint) {
+            const tx = (tidalPoint.x / 310) * 5;
+            const tz = (tidalPoint.y / 310) * 5;
+            const tdx = bx - tx;
+            const tdz = bz - tz;
+            const tdist = tdx * tdx + tdz * tdz;
+            sag -= (tidalPoint.mass || 0.8) * 2.5 / (tdist + 0.4);
           }
 
           const wave = Math.sin(bx * 0.5 + time * 0.3) * Math.cos(bz * 0.4 + time * 0.2) * 0.03;

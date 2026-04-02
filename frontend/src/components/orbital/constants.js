@@ -1,6 +1,7 @@
 import {
   Music, Map, Triangle, Heart, Wind, Sun, GraduationCap,
-  Eye, Star, Telescope, HeartHandshake, Gamepad2, BookOpen
+  Eye, Star, Telescope, HeartHandshake, Gamepad2, BookOpen,
+  ScrollText, Calculator
 } from 'lucide-react';
 
 export const ALL_SATELLITES = [
@@ -17,6 +18,8 @@ export const ALL_SATELLITES = [
   { id: 'oracle', label: 'Oracle', icon: Eye, path: '/oracle', color: '#C084FC', desc: 'Divination & insight' },
   { id: 'games', label: 'Games', icon: Gamepad2, path: '/games', color: '#34D399', desc: 'Starseed adventures' },
   { id: 'journal', label: 'Journal', icon: BookOpen, path: '/journal', color: '#FDA4AF', desc: 'Wisdom journal' },
+  { id: 'archives', label: 'Archives', icon: ScrollText, path: '/archives', color: '#F59E0B', desc: 'Deep-dive multi-civilization texts' },
+  { id: 'suanpan', label: 'Suanpan', icon: Calculator, path: '/suanpan', color: '#EF4444', desc: 'Ancient abacus frequency mixer' },
 ];
 
 export const ZONE_AUDIO = {
@@ -33,6 +36,8 @@ export const ZONE_AUDIO = {
   'theory': { hz: 417, type: 'sine', gain: 0.05 },
   'map': { hz: 285, type: 'triangle', gain: 0.04 },
   'journal': { hz: 396, type: 'sine', gain: 0.04 },
+  'archives': { hz: 174, type: 'sine', gain: 0.05 },
+  'suanpan': { hz: 256, type: 'triangle', gain: 0.05 },
 };
 
 export const WEATHER_AUDIO_MAP = {
