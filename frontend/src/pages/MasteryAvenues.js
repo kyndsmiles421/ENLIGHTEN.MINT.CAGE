@@ -492,13 +492,15 @@ export default function MasteryAvenues() {
   const [bioStats, setBioStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [decayStatus, setDecayStatus] = useState(null);
+  const [covenData, setCovenData] = useState(null);
 
   const fetchOverview = useCallback(async () => {
     try {
-      const [aRes, shopRes, decayRes] = await Promise.all([
+      const [aRes, shopRes, decayRes, covenRes] = await Promise.all([
         axios.get(`${API}/avenues/overview`, { headers: authHeaders }),
         axios.get(`${API}/science-history/economy/shop`, { headers: authHeaders }).catch(() => ({ data: { balances: {} } })),
         axios.get(`${API}/cosmic-map/decay-status`, { headers: authHeaders }).catch(() => ({ data: null })),
+        axios.get(`${API}/sync/covens/my`, { headers: authHeaders }).catch(() => ({ data: { in_coven: false } })),
       ]);
       setAvenues(aRes.data.avenues || []);
       setTotalResonance(aRes.data.total_resonance);
@@ -506,6 +508,7 @@ export default function MasteryAvenues() {
       setDustBalance(shopRes.data.balances?.kinetic_dust || 0);
       setSciRes(shopRes.data.balances?.science_resonance || 0);
       if (decayRes.data) setDecayStatus(decayRes.data);
+      setCovenData(covenRes.data?.in_coven ? covenRes.data : null);
     } catch (e) { console.error('Avenues fetch failed', e); }
     setLoading(false);
   }, [authHeaders]);
@@ -813,7 +816,7 @@ export default function MasteryAvenues() {
       })}
 
       {/* Resonance Forge */}
-      <ForgePanel authHeaders={authHeaders} />
+      <ForgePanel authHeaders={authHeaders} covenData={covenData} />
 
       {/* Cosmic Map nav */}
       <button onClick={() => navigate('/cosmic-map')}

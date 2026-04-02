@@ -252,6 +252,137 @@ async def get_online_count(user=Depends(get_current_user)):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  GROUP FORGING — Averaged Accuracy Across Party
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class GroupForgeRequest(BaseModel):
+    build_id: str
+    user_waveform: list[float]
+    time_taken_seconds: float
+
+
+@router.post("/group-forge")
+async def group_forge(body: GroupForgeRequest, user=Depends(get_current_user)):
+    """
+    Group Forge: Average the requesting user's forge accuracy with
+    recent forge scores of online coven members. Strong players
+    'lift' weaker ones by raising the averaged accuracy.
+    """
+    uid = user["id"]
+
+    # Must be in a coven
+    membership = await db.coven_members.find_one({"user_id": uid, "active": True}, {"_id": 0})
+    if not membership:
+        raise HTTPException(400, "You must be in a coven to group forge")
+
+    coven_id = membership["coven_id"]
+
+    # Get all active coven member IDs
+    members_docs = await db.coven_members.find(
+        {"coven_id": coven_id, "active": True}, {"_id": 0}
+    ).to_list(20)
+    member_ids = [m["user_id"] for m in members_docs]
+
+    # Only count online members (connected to WebSocket)
+    online_ids = [mid for mid in member_ids if mid in manager.connections]
+    if len(online_ids) < 2:
+        raise HTTPException(400, "Need at least 2 online coven members for group forging")
+
+    # Get the requesting user's individual accuracy
+    from routes.cosmic_map import FORGE_PATTERNS
+    pattern = FORGE_PATTERNS.get(body.build_id)
+    if not pattern:
+        raise HTTPException(404, "Forge pattern not found")
+
+    target = pattern["waveform"]
+    tolerance = pattern["tolerance"]
+    if len(body.user_waveform) != len(target):
+        raise HTTPException(400, f"Waveform must have exactly {len(target)} points")
+
+    point_scores = []
+    for t, u in zip(target, body.user_waveform):
+        error = abs(t - u)
+        score = max(0, 1.0 - (error / tolerance)) if error <= tolerance else 0
+        point_scores.append(round(score, 2))
+
+    user_accuracy = sum(point_scores) / len(point_scores) * 100
+    time_ok = body.time_taken_seconds <= pattern["time_limit_seconds"]
+
+    # Gather recent forge scores from online coven members (excluding self)
+    other_online = [mid for mid in online_ids if mid != uid]
+    member_scores = [user_accuracy]
+
+    for mid in other_online:
+        last_forge = await db.resonance_builds.find_one(
+            {"user_id": mid},
+            {"_id": 0, "forge_accuracy": 1},
+            sort=[("crafted_at", -1)],
+        )
+        if last_forge and "forge_accuracy" in last_forge:
+            member_scores.append(last_forge["forge_accuracy"])
+        else:
+            # No forge history: contribute a base score of 50
+            member_scores.append(50.0)
+
+    # Average all scores
+    averaged_accuracy = sum(member_scores) / len(member_scores)
+    time_bonus = max(0, 1.0 - (body.time_taken_seconds / pattern["time_limit_seconds"])) * 10
+    total_score = round(averaged_accuracy + time_bonus, 1)
+    forged = averaged_accuracy >= 70 and time_ok
+
+    lift = round(averaged_accuracy - user_accuracy, 1)
+
+    if forged:
+        from routes.science_history import RESONANCE_BUILDS
+        build_def = None
+        for b in RESONANCE_BUILDS:
+            if b["id"] == body.build_id:
+                build_def = b
+                break
+        if build_def:
+            existing = await db.resonance_builds.find_one(
+                {"user_id": uid, "build_id": body.build_id}, {"_id": 0}
+            )
+            if not existing:
+                now = datetime.now(timezone.utc).isoformat()
+                await db.resonance_builds.insert_one({
+                    "user_id": uid,
+                    "build_id": body.build_id,
+                    "build_name": build_def["name"],
+                    "bonus_type": build_def["bonus_type"],
+                    "bonus_value": build_def["bonus_value"],
+                    "crafted_at": now,
+                    "forge_score": total_score,
+                    "forge_accuracy": round(averaged_accuracy, 1),
+                    "group_forged": True,
+                    "coven_id": coven_id,
+                })
+
+    # Notify coven
+    await manager.broadcast_to_coven(coven_id, {
+        "type": "group_forge_result",
+        "user_id": uid,
+        "name": user.get("name", "Traveler"),
+        "build_id": body.build_id,
+        "averaged_accuracy": round(averaged_accuracy, 1),
+        "forged": forged,
+    })
+
+    return {
+        "forged": forged,
+        "your_accuracy": round(user_accuracy, 1),
+        "averaged_accuracy": round(averaged_accuracy, 1),
+        "lift": lift,
+        "contributors": len(member_scores),
+        "member_scores": [round(s, 1) for s in member_scores],
+        "time_bonus": round(time_bonus, 1),
+        "total_score": total_score,
+        "time_ok": time_ok,
+        "message": f"Group Forge {'succeeded' if forged else 'failed'}! Averaged {round(averaged_accuracy, 1)}% across {len(member_scores)} members" + (f" (+{lift}% lift)" if lift > 0 else ""),
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  WEBSOCKET ENDPOINT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

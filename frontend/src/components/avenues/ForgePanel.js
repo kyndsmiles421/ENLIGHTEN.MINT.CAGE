@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import {
-  Hammer, Sparkles, Lock, CheckCircle, Zap, Clock, Target
+  Hammer, Sparkles, Lock, CheckCircle, Zap, Clock, Target, Users
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -143,7 +143,7 @@ function WaveformCanvas({ targetWave, userWave, setUserWave, active, tolerance }
   );
 }
 
-export default function ForgePanel({ authHeaders }) {
+export default function ForgePanel({ authHeaders, covenData }) {
   const [builds, setBuilds] = useState([]);
   const [activeForge, setActiveForge] = useState(null);
   const [pattern, setPattern] = useState(null);
@@ -189,6 +189,23 @@ export default function ForgePanel({ authHeaders }) {
       if (res.data.forged) fetchBuilds();
     } catch (e) {
       setResult({ forged: false, message: e.response?.data?.detail || 'Forge failed' });
+    }
+  };
+
+  const submitGroupForge = async () => {
+    if (!activeForge || !pattern) return;
+    clearInterval(timerRef.current);
+    setForging(false);
+    try {
+      const res = await axios.post(`${API}/sync/group-forge`, {
+        build_id: activeForge,
+        user_waveform: userWave,
+        time_taken_seconds: timer,
+      }, { headers: authHeaders });
+      setResult({ ...res.data, groupForge: true });
+      if (res.data.forged) fetchBuilds();
+    } catch (e) {
+      setResult({ forged: false, message: e.response?.data?.detail || 'Group forge failed', groupForge: true });
     }
   };
 
@@ -276,12 +293,22 @@ export default function ForgePanel({ authHeaders }) {
 
             <div className="flex gap-2">
               {forging ? (
-                <button onClick={submitForge}
-                  className="flex-1 py-1.5 rounded-lg text-[9px] font-medium flex items-center justify-center gap-1"
-                  style={{ background: 'rgba(251,191,36,0.12)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.2)' }}
-                  data-testid="forge-submit-btn">
-                  <Zap size={10} /> Forge Now
-                </button>
+                <>
+                  <button onClick={submitForge}
+                    className="flex-1 py-1.5 rounded-lg text-[9px] font-medium flex items-center justify-center gap-1"
+                    style={{ background: 'rgba(251,191,36,0.12)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.2)' }}
+                    data-testid="forge-submit-btn">
+                    <Zap size={10} /> Forge Solo
+                  </button>
+                  {covenData && (
+                    <button onClick={submitGroupForge}
+                      className="flex-1 py-1.5 rounded-lg text-[9px] font-medium flex items-center justify-center gap-1"
+                      style={{ background: 'rgba(45,212,191,0.08)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.15)' }}
+                      data-testid="group-forge-btn">
+                      <Users size={10} /> Group Forge
+                    </button>
+                  )}
+                </>
               ) : null}
               <button onClick={resetForge}
                 className="px-3 py-1.5 rounded-lg text-[8px]"
@@ -305,12 +332,18 @@ export default function ForgePanel({ authHeaders }) {
                   {result.forged ? <Sparkles size={12} style={{ color: '#FBBF24' }} /> : <Target size={12} style={{ color: '#EF4444' }} />}
                   <span className="text-[10px] font-medium" style={{ color: result.forged ? '#2DD4BF' : '#EF4444' }}>
                     {result.forged ? 'FORGED' : 'MISALIGNED'}
+                    {result.groupForge && ' (Group)'}
                   </span>
                   <span className="text-[9px] font-mono ml-auto" style={{ color: '#FBBF24' }}>
-                    {result.total_score}pts ({result.accuracy}% accuracy)
+                    {result.total_score}pts ({result.groupForge ? result.averaged_accuracy : result.accuracy}% accuracy)
                   </span>
                 </div>
                 <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{result.message}</p>
+                {result.groupForge && result.lift > 0 && (
+                  <p className="text-[8px] mt-0.5 flex items-center gap-1" style={{ color: '#2DD4BF' }}>
+                    <Users size={8} /> Coven lifted your accuracy by +{result.lift}% ({result.contributors} members)
+                  </p>
+                )}
                 {result.bonus && (
                   <p className="text-[8px] mt-1" style={{ color: '#FBBF24' }}>Bonus: {result.bonus}</p>
                 )}
