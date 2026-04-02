@@ -76,7 +76,9 @@ async def get_master_audit(user=Depends(get_current_user)):
     math_res = (ave_prog or {}).get("mathematics", {}).get("resonance", 0)
     art_res = (ave_prog or {}).get("art", {}).get("resonance", 0)
     thought_res = (ave_prog or {}).get("thought", {}).get("resonance", 0)
-    total_resonance = math_res + art_res + thought_res
+    bio_res = (ave_prog or {}).get("biometrics", {}).get("resonance", 0)
+    bio_dust = (ave_prog or {}).get("biometrics", {}).get("kinetic_dust_total", 0)
+    total_resonance = math_res + art_res + thought_res + bio_res
 
     # Inventory
     polished = await db.rpg_inventory.count_documents({"user_id": uid, "state": "polished"})
@@ -171,8 +173,9 @@ async def get_master_audit(user=Depends(get_current_user)):
             "mathematics": {"resonance": math_res, "tier": min(math_res // 200, 4), "status": "active" if math_res > 0 else "idle"},
             "art": {"resonance": art_res, "tier": min(art_res // 200, 4), "status": "active" if art_res > 0 else "idle"},
             "thought": {"resonance": thought_res, "tier": min(thought_res // 200, 4), "status": "active" if thought_res > 0 else "idle"},
+            "biometrics": {"resonance": bio_res, "tier": min(bio_res // 200, 4), "kinetic_dust": bio_dust, "status": "active" if bio_res > 0 else "idle"},
             "total_resonance": total_resonance,
-            "combined_tier": min(total_resonance // 600, 4),
+            "combined_tier": min(total_resonance // 800, 4),
             "status": "active" if total_resonance > 0 else "idle",
         },
         "taste_test": {

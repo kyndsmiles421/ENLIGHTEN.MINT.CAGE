@@ -6,11 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import {
   Compass, Palette, Brain, Sparkles, Zap, Lock,
   ChevronRight, CheckCircle, HelpCircle, Send,
-  BookOpen, Eye, Atom, Star, Grid3X3
+  BookOpen, Eye, Atom, Star, Grid3X3, HeartPulse,
+  Footprints, Bike, Dumbbell, Flower2, Shield
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-const AVENUE_ICONS = { mathematics: Compass, art: Palette, thought: Brain };
+const AVENUE_ICONS = { mathematics: Compass, art: Palette, thought: Brain, biometrics: HeartPulse };
 const TIER_COLORS = ['#94A3B8', '#2DD4BF', '#8B5CF6', '#FBBF24', '#F472B6'];
 
 function AvenueCard({ avenue, onSelect }) {
@@ -281,6 +282,108 @@ function ArtPromptPanel({ prompts, onCreate }) {
   );
 }
 
+
+const ACTIVITY_ICONS = {
+  walking: Footprints, cycling: Bike, running: Zap, yoga: Flower2,
+  martial_arts: Shield, dance: Sparkles, gym: Dumbbell, meditation: Brain,
+};
+
+function BiometricsPanel({ activities, onLog, bioStats }) {
+  const [activeId, setActiveId] = useState(null);
+  const [value, setValue] = useState('');
+  const [heartRate, setHeartRate] = useState('');
+  const [duration, setDuration] = useState('');
+
+  const handleSubmit = async (actId) => {
+    if (!value || parseFloat(value) <= 0) { alert('Enter a positive value'); return; }
+    const result = await onLog(actId, parseFloat(value), heartRate ? parseInt(heartRate) : null, duration ? parseInt(duration) : null);
+    if (result?.success) { setActiveId(null); setValue(''); setHeartRate(''); setDuration(''); }
+  };
+
+  return (
+    <div className="space-y-3" data-testid="biometrics-panel">
+      <div className="flex items-center gap-2 mb-1">
+        <HeartPulse size={11} style={{ color: '#10B981' }} />
+        <span className="text-[9px] uppercase tracking-widest font-bold" style={{ color: '#10B981' }}>
+          Physical Activities — The Sentinel
+        </span>
+      </div>
+
+      {/* Stats summary */}
+      {bioStats && (
+        <div className="grid grid-cols-3 gap-2 mb-2">
+          <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.08)' }}>
+            <p className="text-[10px] font-mono" style={{ color: '#10B981' }}>{bioStats.total_sessions}</p>
+            <p className="text-[6px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Sessions</p>
+          </div>
+          <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(45,212,191,0.04)', border: '1px solid rgba(45,212,191,0.08)' }}>
+            <p className="text-[10px] font-mono" style={{ color: '#2DD4BF' }}>{bioStats.kinetic_dust_total?.toFixed(1)}</p>
+            <p className="text-[6px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Kinetic Dust</p>
+          </div>
+          <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(244,114,182,0.04)', border: '1px solid rgba(244,114,182,0.08)' }}>
+            <p className="text-[10px] font-mono" style={{ color: '#F472B6' }}>{bioStats.resonance}</p>
+            <p className="text-[6px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Resonance</p>
+          </div>
+        </div>
+      )}
+
+      {/* Activity cards */}
+      {activities?.map(a => {
+        const Icon = ACTIVITY_ICONS[a.id] || HeartPulse;
+        return (
+          <div key={a.id} className="rounded-lg p-2.5"
+            style={{ background: 'rgba(248,250,252,0.015)', border: '1px solid rgba(248,250,252,0.04)' }}
+            data-testid={`activity-${a.id}`}>
+            <div className="flex items-center gap-2">
+              <Icon size={12} style={{ color: '#10B981' }} />
+              <span className="text-[10px] font-medium flex-1" style={{ color: 'var(--text-primary)' }}>{a.name}</span>
+              <span className="text-[7px] capitalize px-1 rounded" style={{ background: 'rgba(16,185,129,0.06)', color: '#10B981' }}>
+                {a.category?.replace('_', ' ')}
+              </span>
+              <span className="text-[7px]" style={{ color: 'var(--text-muted)' }}>{a.sessions_completed} sessions</span>
+            </div>
+            <p className="text-[8px] mt-0.5 ml-5" style={{ color: 'var(--text-muted)' }}>{a.description}</p>
+            <div className="flex gap-2 mt-1 ml-5">
+              <span className="text-[7px]" style={{ color: '#2DD4BF' }}>{a.kinetic_dust_per_unit} dust/{a.unit}</span>
+              <span className="text-[7px]" style={{ color: '#F472B6' }}>+{a.resonance_per_session} res/session</span>
+              <span className="text-[7px]" style={{ color: '#FBBF24' }}>BPM: {a.target_bpm?.min}-{a.target_bpm?.max}</span>
+            </div>
+
+            {activeId === a.id ? (
+              <div className="mt-2 ml-5 space-y-1.5">
+                <div className="flex gap-1.5">
+                  <input value={value} onChange={e => setValue(e.target.value)} placeholder={`${a.unit}...`} type="number"
+                    className="flex-1 px-2 py-1 rounded text-[9px] outline-none"
+                    style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}
+                    data-testid={`value-input-${a.id}`} />
+                  <input value={heartRate} onChange={e => setHeartRate(e.target.value)} placeholder="BPM" type="number"
+                    className="w-16 px-2 py-1 rounded text-[9px] outline-none"
+                    style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }} />
+                  <input value={duration} onChange={e => setDuration(e.target.value)} placeholder="mins" type="number"
+                    className="w-16 px-2 py-1 rounded text-[9px] outline-none"
+                    style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }} />
+                </div>
+                <button onClick={() => handleSubmit(a.id)}
+                  className="px-3 py-1 rounded text-[8px] flex items-center gap-1"
+                  style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}
+                  data-testid={`submit-activity-${a.id}`}>
+                  <Send size={8} /> Log Activity
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { setActiveId(a.id); setValue(''); setHeartRate(''); setDuration(''); }}
+                className="text-[8px] mt-1 ml-5" style={{ color: '#10B981' }}>
+                Log Session →
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+
 export default function MasteryAvenues() {
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
@@ -291,6 +394,8 @@ export default function MasteryAvenues() {
   const [challenges, setChallenges] = useState([]);
   const [quests, setQuests] = useState([]);
   const [artPrompts, setArtPrompts] = useState([]);
+  const [bioActivities, setBioActivities] = useState([]);
+  const [bioStats, setBioStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchOverview = useCallback(async () => {
@@ -317,6 +422,13 @@ export default function MasteryAvenues() {
       } else if (avenueId === 'art') {
         const res = await axios.get(`${API}/avenues/art/prompts`, { headers: authHeaders });
         setArtPrompts(res.data.prompts || []);
+      } else if (avenueId === 'biometrics') {
+        const [actRes, statRes] = await Promise.all([
+          axios.get(`${API}/avenues/biometrics/activities`, { headers: authHeaders }),
+          axios.get(`${API}/avenues/biometrics/stats`, { headers: authHeaders }),
+        ]);
+        setBioActivities(actRes.data.activities || []);
+        setBioStats(statRes.data);
       }
     } catch (e) { console.error('Avenue load failed', e); }
   };
@@ -353,6 +465,23 @@ export default function MasteryAvenues() {
     } catch (e) { alert(e.response?.data?.detail || 'Failed'); return null; }
   };
 
+  const handleLogActivity = async (activityId, value, heartRate, duration) => {
+    try {
+      const body = { activity_id: activityId, value };
+      if (heartRate) body.heart_rate = heartRate;
+      if (duration) body.duration_minutes = duration;
+      const res = await axios.post(`${API}/avenues/biometrics/log`, body, { headers: authHeaders });
+      fetchOverview();
+      const [actRes, statRes] = await Promise.all([
+        axios.get(`${API}/avenues/biometrics/activities`, { headers: authHeaders }),
+        axios.get(`${API}/avenues/biometrics/stats`, { headers: authHeaders }),
+      ]);
+      setBioActivities(actRes.data.activities || []);
+      setBioStats(statRes.data);
+      return res.data;
+    } catch (e) { alert(e.response?.data?.detail || 'Failed'); return null; }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -372,7 +501,7 @@ export default function MasteryAvenues() {
           Mastery Avenues
         </h1>
         <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-          Three Paths of Dimensional Navigation
+          Four Pillars of Dimensional Navigation
         </p>
       </motion.div>
 
@@ -400,6 +529,7 @@ export default function MasteryAvenues() {
           {activeAvenue === 'mathematics' && <MathChallengePanel challenges={challenges} onSolve={handleSolve} />}
           {activeAvenue === 'thought' && <ThoughtQuestPanel quests={quests} onReflect={handleReflect} />}
           {activeAvenue === 'art' && <ArtPromptPanel prompts={artPrompts} onCreate={handleCreate} />}
+          {activeAvenue === 'biometrics' && <BiometricsPanel activities={bioActivities} onLog={handleLogActivity} bioStats={bioStats} />}
         </>
       )}
 

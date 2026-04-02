@@ -66,6 +66,18 @@ AVENUES = {
         "resonance_per_challenge": 18,
         "max_resonance": 1000,
     },
+    "biometrics": {
+        "id": "biometrics",
+        "name": "The Avenue of Biometrics",
+        "title": "The Sentinel",
+        "color": "#10B981",
+        "icon": "heart_pulse",
+        "description": "Sync real-world movement — walking, cycling, yoga, martial arts, dance — to fuel Quantum Tunneling through Kinetic Dust.",
+        "achievement": "Biological Equilibrium",
+        "achievement_desc": "Physical resonance in perfect harmony with planetary frequency. Body becomes the instrument.",
+        "resonance_per_challenge": 10,
+        "max_resonance": 1000,
+    },
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -152,6 +164,131 @@ GEOMETRY_CHALLENGES = [
         "hint": "The additive identity",
         "difficulty": 2,
         "resonance": 25,
+    },
+    # ── Algebra ──
+    {
+        "id": "quadratic_discriminant",
+        "name": "The Discriminant",
+        "description": "The oracle that reveals the nature of roots.",
+        "question": "For ax² + bx + c = 0, the discriminant is b² - 4ac. If discriminant = 0, how many real roots?",
+        "answer": "1",
+        "hint": "Think 'touching' the x-axis",
+        "difficulty": 2,
+        "resonance": 18,
+        "category": "algebra",
+    },
+    {
+        "id": "imaginary_unit",
+        "name": "The Imaginary Gateway",
+        "description": "Where real numbers end, the imaginary realm begins.",
+        "question": "What is i² (where i is the imaginary unit)?",
+        "answer": "-1",
+        "hint": "i = √(-1)",
+        "difficulty": 1,
+        "resonance": 15,
+        "category": "algebra",
+    },
+    {
+        "id": "binomial_expansion",
+        "name": "Pascal's Triangle",
+        "description": "The fractal pattern hidden in binomial expansion.",
+        "question": "What is the coefficient of x² in (x + 1)⁴?",
+        "answer": "6",
+        "hint": "Row 4 of Pascal's Triangle: 1, 4, 6, 4, 1",
+        "difficulty": 2,
+        "resonance": 20,
+        "category": "algebra",
+    },
+    # ── Trigonometry ──
+    {
+        "id": "unit_circle",
+        "name": "The Unit Circle",
+        "description": "The wheel of trigonometric truth.",
+        "question": "What is sin(90°)?",
+        "answer": "1",
+        "hint": "Top of the unit circle",
+        "difficulty": 1,
+        "resonance": 12,
+        "category": "trigonometry",
+    },
+    {
+        "id": "pythagorean_identity",
+        "name": "Pythagorean Identity",
+        "description": "The fundamental trigonometric truth.",
+        "question": "Complete: sin²(θ) + cos²(θ) = ?",
+        "answer": "1",
+        "hint": "Always and forever",
+        "difficulty": 1,
+        "resonance": 15,
+        "category": "trigonometry",
+    },
+    # ── Calculus ──
+    {
+        "id": "derivative_x_squared",
+        "name": "The First Derivative",
+        "description": "The instantaneous rate of change — the pulse of the universe.",
+        "question": "What is the derivative of x³ with respect to x?",
+        "answer": "3x2",
+        "hint": "Power rule: nx^(n-1)",
+        "difficulty": 2,
+        "resonance": 22,
+        "category": "calculus",
+    },
+    {
+        "id": "integral_constant",
+        "name": "The Integral Mystery",
+        "description": "Reversing differentiation reveals a hidden constant.",
+        "question": "What letter represents the constant of integration?",
+        "answer": "c",
+        "hint": "The arbitrary constant added to every indefinite integral",
+        "difficulty": 1,
+        "resonance": 15,
+        "category": "calculus",
+    },
+    {
+        "id": "e_value",
+        "name": "Euler's Number",
+        "description": "The base of natural growth and decay.",
+        "question": "What is e (Euler's number) rounded to 2 decimal places?",
+        "answer": "2.72",
+        "hint": "The limit of (1 + 1/n)^n as n → ∞",
+        "difficulty": 2,
+        "resonance": 20,
+        "category": "calculus",
+    },
+    {
+        "id": "limit_sinx_x",
+        "name": "The Fundamental Limit",
+        "description": "Where trigonometry and calculus converge.",
+        "question": "What is lim(x→0) of sin(x)/x?",
+        "answer": "1",
+        "hint": "L'Hôpital's rule or the squeeze theorem",
+        "difficulty": 3,
+        "resonance": 30,
+        "category": "calculus",
+    },
+    # ── Number Theory ──
+    {
+        "id": "prime_infinity",
+        "name": "Euclid's Proof",
+        "description": "The ancient proof that shattered finite thinking.",
+        "question": "Are there finitely or infinitely many prime numbers?",
+        "answer": "infinitely",
+        "hint": "Euclid proved this around 300 BCE",
+        "difficulty": 1,
+        "resonance": 15,
+        "category": "number_theory",
+    },
+    {
+        "id": "perfect_number",
+        "name": "Perfect Numbers",
+        "description": "Numbers equal to the sum of their proper divisors.",
+        "question": "What is the smallest perfect number?",
+        "answer": "6",
+        "hint": "Its divisors (1, 2, 3) sum to itself",
+        "difficulty": 2,
+        "resonance": 18,
+        "category": "number_theory",
     },
 ]
 
@@ -257,6 +394,112 @@ ART_PROMPTS = [
         "category": "dreamwork",
     },
 ]
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  BIOMETRIC ACTIVITIES (The Sentinel)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACTIVITY_TYPES = [
+    {
+        "id": "walking",
+        "name": "Walking",
+        "category": "low_intensity",
+        "icon": "footprints",
+        "description": "Steady, grounding movement. Ideal for stabilizing Crust and Mantle frequencies.",
+        "unit": "steps",
+        "kinetic_dust_per_unit": 0.01,
+        "resonance_per_session": 8,
+        "frequency_affinity": ["crust", "mantle"],
+        "target_bpm": {"min": 90, "max": 120},
+    },
+    {
+        "id": "cycling",
+        "name": "Cycling",
+        "category": "high_intensity",
+        "icon": "bike",
+        "description": "High-velocity traversal. Generates dense Kinetic Dust for deep descents.",
+        "unit": "km",
+        "kinetic_dust_per_unit": 5.0,
+        "resonance_per_session": 12,
+        "frequency_affinity": ["outer_core", "hollow_earth"],
+        "target_bpm": {"min": 130, "max": 170},
+    },
+    {
+        "id": "running",
+        "name": "Running",
+        "category": "high_intensity",
+        "icon": "zap",
+        "description": "Explosive kinetic energy. Fuels rapid tunneling through sub-layers.",
+        "unit": "km",
+        "kinetic_dust_per_unit": 8.0,
+        "resonance_per_session": 15,
+        "frequency_affinity": ["outer_core", "hollow_earth"],
+        "target_bpm": {"min": 140, "max": 185},
+    },
+    {
+        "id": "yoga",
+        "name": "Yoga",
+        "category": "low_intensity",
+        "icon": "flower",
+        "description": "Slow, deliberate movement. Aligns the body's frequency to the planetary layer.",
+        "unit": "minutes",
+        "kinetic_dust_per_unit": 0.5,
+        "resonance_per_session": 12,
+        "frequency_affinity": ["crust", "mantle"],
+        "target_bpm": {"min": 60, "max": 80},
+    },
+    {
+        "id": "martial_arts",
+        "name": "Martial Arts",
+        "category": "high_intensity",
+        "icon": "shield",
+        "description": "Disciplined combat forms. Channels kinetic energy through precise geometric movement.",
+        "unit": "minutes",
+        "kinetic_dust_per_unit": 1.0,
+        "resonance_per_session": 18,
+        "frequency_affinity": ["mantle", "outer_core"],
+        "target_bpm": {"min": 120, "max": 160},
+    },
+    {
+        "id": "dance",
+        "name": "Dance",
+        "category": "medium_intensity",
+        "icon": "music",
+        "description": "Rhythmic body expression. Resonates with all layers through harmonic movement.",
+        "unit": "minutes",
+        "kinetic_dust_per_unit": 0.8,
+        "resonance_per_session": 14,
+        "frequency_affinity": ["crust", "mantle", "outer_core"],
+        "target_bpm": {"min": 100, "max": 150},
+    },
+    {
+        "id": "gym",
+        "name": "Gym / Strength",
+        "category": "high_intensity",
+        "icon": "dumbbell",
+        "description": "Resistance training. Builds structural resonance for maintaining deep-layer pressure.",
+        "unit": "minutes",
+        "kinetic_dust_per_unit": 0.6,
+        "resonance_per_session": 10,
+        "frequency_affinity": ["mantle", "outer_core"],
+        "target_bpm": {"min": 110, "max": 155},
+    },
+    {
+        "id": "meditation",
+        "name": "Moving Meditation",
+        "category": "low_intensity",
+        "icon": "brain",
+        "description": "Tai Chi, Qigong, walking meditation. The slowest path to the deepest frequencies.",
+        "unit": "minutes",
+        "kinetic_dust_per_unit": 0.3,
+        "resonance_per_session": 15,
+        "frequency_affinity": ["hollow_earth"],
+        "target_bpm": {"min": 50, "max": 70},
+    },
+]
+
+ACTIVITY_MAP = {a["id"]: a for a in ACTIVITY_TYPES}
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -585,12 +828,14 @@ async def check_resonance_threshold(user=Depends(get_current_user)):
     math_res = (prog or {}).get("mathematics", {}).get("resonance", 0)
     art_res = (prog or {}).get("art", {}).get("resonance", 0)
     thought_res = (prog or {}).get("thought", {}).get("resonance", 0)
-    total = math_res + art_res + thought_res
+    bio_res = (prog or {}).get("biometrics", {}).get("resonance", 0)
+    total = math_res + art_res + thought_res + bio_res
 
     return {
         "mathematics": math_res,
         "art": art_res,
         "thought": thought_res,
+        "biometrics": bio_res,
         "total": total,
         "thresholds": {
             "common_collapse": {"required": 0, "met": True},
@@ -602,6 +847,165 @@ async def check_resonance_threshold(user=Depends(get_current_user)):
             "mathematics": math_res >= 1000,
             "art": art_res >= 1000,
             "thought": thought_res >= 1000,
-            "total": total >= 3000,
+            "biometrics": bio_res >= 1000,
+            "total": total >= 4000,
         },
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  BIOMETRICS ENDPOINTS (The Sentinel)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/biometrics/activities")
+async def get_biometric_activities(user=Depends(get_current_user)):
+    """Get all available physical activity types."""
+    uid = user["id"]
+    prog = await db.avenue_progress.find_one({"user_id": uid}, {"_id": 0})
+    bio_data = (prog or {}).get("biometrics", {})
+    history = bio_data.get("activity_log", [])
+
+    # Count sessions per activity type
+    session_counts = {}
+    for entry in history:
+        aid = entry.get("activity_id", "")
+        session_counts[aid] = session_counts.get(aid, 0) + 1
+
+    activities = []
+    for a in ACTIVITY_TYPES:
+        activities.append({
+            **a,
+            "sessions_completed": session_counts.get(a["id"], 0),
+        })
+
+    return {
+        "activities": activities,
+        "total": len(activities),
+        "kinetic_dust_earned": bio_data.get("kinetic_dust_total", 0),
+        "total_sessions": len(history),
+    }
+
+
+@router.post("/biometrics/log")
+async def log_biometric_activity(
+    activity_id: str = Body(...),
+    value: float = Body(...),
+    heart_rate: int = Body(None),
+    duration_minutes: int = Body(None),
+    user=Depends(get_current_user),
+):
+    """
+    Log a physical activity session.
+    Generates Kinetic Dust and avenue resonance.
+    """
+    uid = user["id"]
+    activity = ACTIVITY_MAP.get(activity_id)
+    if not activity:
+        raise HTTPException(404, "Unknown activity type")
+
+    if value <= 0:
+        raise HTTPException(400, "Value must be positive")
+
+    # Calculate Kinetic Dust
+    kinetic_dust = round(value * activity["kinetic_dust_per_unit"], 1)
+    resonance = activity["resonance_per_session"]
+
+    # Heart rate bonus: if within target BPM range, +50% dust
+    hr_bonus = False
+    if heart_rate and activity["target_bpm"]:
+        if activity["target_bpm"]["min"] <= heart_rate <= activity["target_bpm"]["max"]:
+            kinetic_dust = round(kinetic_dust * 1.5, 1)
+            hr_bonus = True
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    log_entry = {
+        "id": str(uuid.uuid4())[:8],
+        "activity_id": activity_id,
+        "activity_name": activity["name"],
+        "value": value,
+        "unit": activity["unit"],
+        "kinetic_dust": kinetic_dust,
+        "heart_rate": heart_rate,
+        "duration_minutes": duration_minutes,
+        "hr_bonus": hr_bonus,
+        "timestamp": now,
+    }
+
+    await db.avenue_progress.update_one(
+        {"user_id": uid},
+        {
+            "$set": {"user_id": uid},
+            "$inc": {
+                "biometrics.resonance": resonance,
+                "biometrics.kinetic_dust_total": kinetic_dust,
+            },
+            "$push": {"biometrics.activity_log": log_entry},
+        },
+        upsert=True,
+    )
+
+    # Convert Kinetic Dust to Cosmic Dust (1:1)
+    await db.users.update_one(
+        {"id": uid},
+        {"$inc": {"user_dust_balance": kinetic_dust}},
+    )
+
+    # XP for physical activity
+    xp_reward = resonance
+    await db.users.update_one(
+        {"id": uid},
+        {
+            "$inc": {"consciousness.xp": xp_reward},
+            "$push": {
+                "consciousness.activity_log": {
+                    "type": "biometric_activity",
+                    "xp": xp_reward,
+                    "activity": activity_id,
+                    "kinetic_dust": kinetic_dust,
+                    "timestamp": now,
+                }
+            },
+        },
+    )
+
+    return {
+        "success": True,
+        "activity": activity["name"],
+        "value": value,
+        "unit": activity["unit"],
+        "kinetic_dust_earned": kinetic_dust,
+        "cosmic_dust_added": kinetic_dust,
+        "resonance_earned": resonance,
+        "xp_earned": xp_reward,
+        "hr_bonus": hr_bonus,
+        "frequency_affinity": activity["frequency_affinity"],
+        "message": f"{activity['name']} logged. +{kinetic_dust} Kinetic Dust generated.",
+    }
+
+
+@router.get("/biometrics/stats")
+async def get_biometric_stats(user=Depends(get_current_user)):
+    """Get detailed biometric statistics and history."""
+    uid = user["id"]
+    prog = await db.avenue_progress.find_one({"user_id": uid}, {"_id": 0})
+    bio = (prog or {}).get("biometrics", {})
+    history = bio.get("activity_log", [])
+
+    by_type = {}
+    for entry in history:
+        aid = entry.get("activity_id", "unknown")
+        if aid not in by_type:
+            by_type[aid] = {"sessions": 0, "total_dust": 0, "total_value": 0}
+        by_type[aid]["sessions"] += 1
+        by_type[aid]["total_dust"] += entry.get("kinetic_dust", 0)
+        by_type[aid]["total_value"] += entry.get("value", 0)
+
+    return {
+        "resonance": bio.get("resonance", 0),
+        "kinetic_dust_total": bio.get("kinetic_dust_total", 0),
+        "total_sessions": len(history),
+        "by_activity": by_type,
+        "recent_history": history[-15:],
+    }
+

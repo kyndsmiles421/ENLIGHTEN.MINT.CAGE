@@ -358,6 +358,36 @@ async def navigate_sublayer(
             upsert=True,
         )
 
+    # Check for Fractal Completion Bonus
+    depth_mastery = False
+    depth_mastery_reward = 0
+    if first_visit:
+        # Re-fetch to get updated explored list
+        updated_prog = await db.sublayer_progress.find_one({"user_id": uid}, {"_id": 0})
+        updated_explored = set((updated_prog or {}).get("explored_sublayers", []))
+        depth_sub_ids = {s["id"] for s in ALL_SUBLAYERS[target_depth]}
+        if depth_sub_ids.issubset(updated_explored):
+            depth_mastery = True
+            depth_mastery_reward = config["sub_count"] * 20  # 20 XP per sub-layer bonus
+            await db.sublayer_progress.update_one(
+                {"user_id": uid},
+                {"$addToSet": {"mastered_depths": target_depth}},
+            )
+            await db.users.update_one(
+                {"id": uid},
+                {
+                    "$inc": {"consciousness.xp": depth_mastery_reward},
+                    "$push": {
+                        "consciousness.activity_log": {
+                            "type": "depth_mastery",
+                            "xp": depth_mastery_reward,
+                            "depth": target_depth,
+                            "timestamp": now,
+                        }
+                    },
+                },
+            )
+
     return {
         "success": True,
         "sublayer": {**target_sub, "explored": True, "is_current": True},
@@ -365,7 +395,9 @@ async def navigate_sublayer(
         "dust_cost": cost if first_visit else 0,
         "xp_reward": xp_reward,
         "depth": target_depth,
-        "message": f"Entered {target_sub['name']} ({target_sub['frequency_hz']} Hz)",
+        "depth_mastery": depth_mastery,
+        "depth_mastery_reward": depth_mastery_reward,
+        "message": f"Entered {target_sub['name']} ({target_sub['frequency_hz']} Hz)" + (" — DEPTH MASTERY ACHIEVED!" if depth_mastery else ""),
     }
 
 
@@ -388,11 +420,14 @@ async def get_sublayer_progress(user=Depends(get_current_user)):
             "color": config["color"],
         }
 
+    mastered = (prog_doc or {}).get("mastered_depths", [])
+
     return {
         "total_sublayers": 54,
         "total_explored": len(explored),
         "exploration_pct": round(len(explored) / 54 * 100, 1),
         "current_sublayer": (prog_doc or {}).get("current_sublayer"),
         "by_depth": by_depth,
+        "mastered_depths": mastered,
         "exploration_log": (prog_doc or {}).get("exploration_log", [])[-15:],
     }
