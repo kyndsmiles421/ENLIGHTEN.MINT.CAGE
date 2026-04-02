@@ -10,6 +10,8 @@ import {
   TreePine, FlaskRound, Loader2, Star
 } from 'lucide-react';
 import { FiveElementsWheel } from '../components/FiveElementsWheel';
+import { NanoGuide } from '../components/NanoGuide';
+import { useCosmicState } from '../context/CosmicStateContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -396,6 +398,7 @@ export default function Botany() {
   const [elementColors, setElementColors] = useState({});
   const [resonanceData, setResonanceData] = useState(null);
   const [balanceScore, setBalanceScore] = useState(null);
+  const { cosmicState, fetchCosmicState } = useCosmicState();
 
   const gardenIds = new Set(garden.map(g => g.plant_id));
 
@@ -492,6 +495,9 @@ export default function Botany() {
       }).catch(() => {});
   }, [authHeaders, authLoading, token]);
 
+  // Fetch cosmic state for ODE energy indicators
+  useEffect(() => { if (token) fetchCosmicState(); }, [token, fetchCosmicState]);
+
   const filtered = plants.filter(p => {
     if (elementFilter && p.element !== elementFilter) return false;
     if (!search) return true;
@@ -522,9 +528,12 @@ export default function Botany() {
                 style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
                 Botanical Codex
               </h1>
-              <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
-                Five Elements &middot; TCM Energetics &middot; {plants.filter(p => !p.locked).length} Unlocked
-              </p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                  Five Elements &middot; TCM Energetics &middot; {plants.filter(p => !p.locked).length} Unlocked
+                </p>
+                <NanoGuide guideId="botany" position="top-right" />
+              </div>
             </div>
           </div>
           <div className="flex gap-1">
@@ -601,6 +610,8 @@ export default function Botany() {
                 plants={plants}
                 gardenSummary={gardenSummary}
                 resonanceData={resonanceData}
+                energies={cosmicState?.energies}
+                stability={cosmicState?.stability}
               />
               <AnimatePresence mode="wait">
                 {selected && (

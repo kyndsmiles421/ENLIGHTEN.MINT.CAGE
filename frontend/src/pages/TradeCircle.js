@@ -27,6 +27,7 @@ import GodModeDashboard from '../components/GodModeDashboard';
 import GenesisMint from '../components/GenesisMint';
 import EnergyGates from '../components/EnergyGates';
 import ResonancePractice from '../components/ResonancePractice';
+import { NanoGuide } from '../components/NanoGuide';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -150,8 +151,8 @@ export default function TradeCircle() {
               <ArrowLeft size={14} style={{ color: 'var(--text-muted)' }} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Back</span>
             </button>
-            <h1 className="text-2xl md:text-3xl font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
-              Trade Circle
+            <h1 className="text-2xl md:text-3xl font-light flex items-center gap-2" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
+              Trade Circle <NanoGuide guideId="trade-circle" position="top-right" />
             </h1>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Barter goods and services with the collective</p>
             <MantraBanner category="trade" className="mt-1" />

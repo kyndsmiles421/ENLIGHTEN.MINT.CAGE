@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCosmicAmbient, CosmicNarrator } from '../components/StarChartAudio';
 import { BirthConstellationToast, MythologyPanel, JourneyOverlay, JourneyComplete, CelestialBadgesPanel } from '../components/StarChartOverlays';
 import { AstrologyReadingPanel } from '../components/AstrologyReading';
+import { NanoGuide } from '../components/NanoGuide';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Earth: '#22C55E' };
@@ -363,7 +364,7 @@ function createMythologyTexture(constellationId, color, size = 256) {
   return tex;
 }
 
-function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCulturalConst, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled, cultureData, zoomDelta, zoomKey }) {
+function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCulturalConst, onBirthMessage, mythologyMode, journeyTarget, onJourneyArrived, gyroEnabled, cultureData, zoomDelta, zoomKey, authHeaders }) {
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
@@ -379,6 +380,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
   const mythModeRef = useRef(mythologyMode);
   const journeyTargetRef = useRef(null);
   const onJourneyArrivedRef = useRef(onJourneyArrived);
+  const matrixKeyframesRef = useRef(null);
   const gyroEnabledRef = useRef(gyroEnabled);
   const gyroOffset = useRef({ alpha: null, beta: null });
   const cultureGroupRef = useRef(null);
@@ -539,8 +541,22 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
         radius: 35,
         id: journeyTarget.id,
       };
+      matrixKeyframesRef.current = null;
+      // Fetch Rodrigues rotation keyframes for cinematic traverse
+      const srcTheta = spherical.current.theta;
+      const srcPhi = spherical.current.phi;
+      const srcRA = (srcTheta / (2 * Math.PI)) * 24;
+      const srcDec = ((srcPhi / Math.PI) * 180) - 90;
+      axios.post(`${API}/math/matrix-transform`, {
+        source_ra: srcRA, source_dec: srcDec,
+        target_ra: journeyTarget.ra, target_dec: journeyTarget.dec,
+        radius: 50, steps: 30,
+      }, { headers: typeof authHeaders === 'function' ? authHeaders() : authHeaders }).then(res => {
+        matrixKeyframesRef.current = { frames: res.data.keyframes, idx: 0 };
+      }).catch(() => {});
     } else {
       journeyTargetRef.current = null;
+      matrixKeyframesRef.current = null;
     }
   }, [journeyTarget]);
 
@@ -935,16 +951,33 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
             jt._phase = 'traverse';
           }
         } else if (jt._phase === 'traverse') {
-          // Phase 2: Rotate to target while zoomed out
-          const lerpSpeed = 0.035;
-          let dTheta = jt.theta - spherical.current.theta;
-          if (dTheta > Math.PI) dTheta -= Math.PI * 2;
-          if (dTheta < -Math.PI) dTheta += Math.PI * 2;
-          const dPhi = jt.phi - spherical.current.phi;
-          spherical.current.theta += dTheta * lerpSpeed;
-          spherical.current.phi += dPhi * lerpSpeed;
-          if (Math.abs(dTheta) < 0.05 && Math.abs(dPhi) < 0.05) {
-            jt._phase = 'approach';
+          // Phase 2: Rotate to target — use Rodrigues keyframes if available
+          const mk = matrixKeyframesRef.current;
+          if (mk && mk.frames && mk.idx < mk.frames.length) {
+            // Matrix-guided traverse using 4x4 Rodrigues rotation
+            const frame = mk.frames[mk.idx];
+            const pos = frame.position;
+            const len = Math.sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
+            if (len > 0.01) {
+              spherical.current.theta = Math.atan2(-pos[2], pos[0]);
+              spherical.current.phi = Math.acos(Math.max(-1, Math.min(1, pos[1] / len)));
+            }
+            mk.idx++;
+            if (mk.idx >= mk.frames.length) {
+              jt._phase = 'approach';
+            }
+          } else {
+            // Fallback: ad-hoc lerp
+            const lerpSpeed = 0.035;
+            let dTheta = jt.theta - spherical.current.theta;
+            if (dTheta > Math.PI) dTheta -= Math.PI * 2;
+            if (dTheta < -Math.PI) dTheta += Math.PI * 2;
+            const dPhi = jt.phi - spherical.current.phi;
+            spherical.current.theta += dTheta * lerpSpeed;
+            spherical.current.phi += dPhi * lerpSpeed;
+            if (Math.abs(dTheta) < 0.05 && Math.abs(dPhi) < 0.05) {
+              jt._phase = 'approach';
+            }
           }
         } else if (jt._phase === 'approach') {
           // Phase 3: Zoom in to target radius
@@ -1322,6 +1355,7 @@ export default function StarChart() {
             <div>
               <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>
                 <Star size={16} style={{ color: '#818CF8' }} /> Constellation Chart
+                <NanoGuide guideId="star-chart" position="top-right" />
               </h1>
               <p className="text-[10px] hidden sm:block" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll/pinch to zoom | Click constellations for stories</p>
             </div>
@@ -1812,7 +1846,7 @@ export default function StarChart() {
             </div>
           </div>
         ) : data ? (
-          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onSelectCulturalConst={(c) => setSelectedCulturalConst(c)} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} cultureData={cultureData} zoomDelta={lastZoomDelta} zoomKey={zoomCounter} />
+          <ThreeStarChart data={data} containerRef={canvasContainerRef} onSelectConstellation={handleSelect} onSelectCulturalConst={(c) => setSelectedCulturalConst(c)} onBirthMessage={handleBirthMessage} mythologyMode={mythologyMode} journeyTarget={journeyTarget} onJourneyArrived={handleJourneyArrived} gyroEnabled={gyroEnabled} cultureData={cultureData} zoomDelta={lastZoomDelta} zoomKey={zoomCounter} authHeaders={authHeaders} />
         ) : null}
       </div>
 

@@ -7,6 +7,7 @@ import {
   X, User, Settings, Globe, Shield, Award, ChevronRight,
   Orbit, Eye, Layers
 } from 'lucide-react';
+import { NanoGuide } from './NanoGuide';
 
 export default function MissionControl({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -33,17 +34,26 @@ export default function MissionControl({ isOpen, onClose }) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — pointer-events: none so 3D background stays interactive */}
+          <motion.div
+            className="fixed inset-0 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', pointerEvents: 'none' }}
+          />
+
+          {/* Click-capture layer — only covers panel area for close-on-outside-click */}
           <motion.div
             className="fixed inset-0 z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+            style={{ pointerEvents: 'auto', background: 'transparent' }}
           />
 
-          {/* Panel */}
+          {/* Panel — pointer-events: auto to capture all panel interactions */}
           <motion.div
             className="fixed z-50 rounded-2xl overflow-hidden overflow-y-auto"
             style={{
@@ -56,10 +66,12 @@ export default function MissionControl({ isOpen, onClose }) {
               WebkitBackdropFilter: 'blur(24px)',
               border: '1px solid rgba(248,250,252,0.08)',
               boxShadow: '0 0 60px rgba(167,139,250,0.06), 0 24px 80px rgba(0,0,0,0.3)',
+              pointerEvents: 'auto',
             }}
             initial={{ opacity: 0, scale: 0.85, x: '-50%', y: '-50%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
             exit={{ opacity: 0, scale: 0.85, x: '-50%', y: '-50%' }}
+            onClick={e => e.stopPropagation()}
             data-testid="mission-control-panel"
           >
             {/* Header */}
@@ -71,6 +83,7 @@ export default function MissionControl({ isOpen, onClose }) {
                   style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif', letterSpacing: '0.15em' }}>
                   Mission Control
                 </h2>
+                <NanoGuide guideId="mission-control" position="top-left" />
               </div>
               <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5 transition-colors"
                 data-testid="mission-control-close">
@@ -117,11 +130,15 @@ export default function MissionControl({ isOpen, onClose }) {
 
             {/* Quick Actions */}
             <div className="px-3 py-2">
-              {actions.map(a => (
+              {actions.map((a, idx) => (
                 <button key={a.label} onClick={() => handleNav(a.path)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all hover:bg-white/[0.03]"
                   data-testid={`mc-action-${a.label.toLowerCase().replace(/\s/g, '-')}`}>
-                  <a.icon size={14} style={{ color: a.color }} />
+                  <div className="relative">
+                    <a.icon size={14} style={{ color: a.color }} />
+                    <span className="absolute -inset-1 rounded-full animate-ping"
+                      style={{ background: a.color, opacity: 0.06, animationDuration: `${2.5 + idx * 0.4}s` }} />
+                  </div>
                   <span className="flex-1 text-[11px] font-medium" style={{ color: 'var(--text-primary)' }}>
                     {a.label}
                   </span>

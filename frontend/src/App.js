@@ -27,6 +27,7 @@ import CosmicAssistant from './components/CosmicAssistant';
 import PersistentWaveform from './components/PersistentWaveform';
 import OrbCorner from './components/OrbCorner';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
+import { CosmicStateProvider } from './context/CosmicStateContext';
 import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import TrialGraduation from './components/TrialGraduation';
@@ -169,6 +170,7 @@ const Observatory = lazy(() => import('./pages/Observatory'));
 const Archives = lazy(() => import('./pages/Archives'));
 const SuanpanMixer = lazy(() => import('./pages/SuanpanMixer'));
 const Botany = lazy(() => import('./pages/Botany'));
+const Codex = lazy(() => import('./pages/Codex'));
 
 function PageLoader() {
   return (
@@ -322,6 +324,7 @@ function AnimatedRoutes() {
         <Route path="/archives" element={<Archives />} />
         <Route path="/suanpan" element={<SuanpanMixer />} />
         <Route path="/botany" element={<Botany />} />
+        <Route path="/codex" element={<Codex />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -342,6 +345,7 @@ function App() {
       <MixerProvider>
       <ResolutionProvider>
       <SensoryProvider>
+      <CosmicStateProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
@@ -378,6 +382,7 @@ function App() {
           </SplitScreenProvider>
           </VoiceCommandProvider>
         </BrowserRouter>
+      </CosmicStateProvider>
       </SensoryProvider>
       </ResolutionProvider>
       </MixerProvider>

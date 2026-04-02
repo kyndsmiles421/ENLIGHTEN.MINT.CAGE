@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { NanoGuide } from './NanoGuide';
 
 const ELEMENTS = [
   { id: 'Wood', angle: -90, color: '#22C55E', freq: 396, label: 'Liberation', weight: 10 },
@@ -30,7 +31,7 @@ function arrowPath(from, to, curvature = 0) {
   return `M${from.x},${from.y} Q${mx},${my} ${to.x},${to.y}`;
 }
 
-export function FiveElementsWheel({ activeElement, onElementClick, plants = [], gardenSummary, resonanceData }) {
+export function FiveElementsWheel({ activeElement, onElementClick, plants = [], gardenSummary, resonanceData, energies, stability }) {
   const [hoveredElement, setHoveredElement] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const svgRef = useRef(null);
@@ -59,9 +60,12 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
       style={{ background: 'rgba(10,10,18,0.6)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(20px)' }}>
 
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <p className="text-[8px] uppercase tracking-[0.2em] font-medium" style={{ color: 'rgba(248,250,252,0.2)' }}>
-          Five Elements Wheel
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-[8px] uppercase tracking-[0.2em] font-medium" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            Five Elements Wheel
+          </p>
+          <NanoGuide guideId="five-elements-wheel" position="top-right" />
+        </div>
         {activeElement && (
           <button onClick={() => onElementClick(null)} className="text-[8px] px-2 py-0.5 rounded-full"
             style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)' }}
@@ -191,6 +195,31 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                     {e.freq}Hz
                   </text>
                 )}
+                {/* ODE energy arc — real-time decay/growth indicator */}
+                {energies && energies[e.id] != null && (() => {
+                  const energy = Math.min(3, Math.max(0, energies[e.id]));
+                  const normalized = energy / 3; // 0-1 range
+                  const arcLen = normalized * 270; // degrees of arc
+                  const r = nodeR + 3;
+                  const startAng = -135;
+                  const endAng = startAng + arcLen;
+                  const sRad = (startAng * Math.PI) / 180;
+                  const eRad = (endAng * Math.PI) / 180;
+                  const x1 = pos.x + r * Math.cos(sRad);
+                  const y1 = pos.y + r * Math.sin(sRad);
+                  const x2 = pos.x + r * Math.cos(eRad);
+                  const y2 = pos.y + r * Math.sin(eRad);
+                  const largeArc = arcLen > 180 ? 1 : 0;
+                  return (
+                    <path
+                      d={`M${x1},${y1} A${r},${r} 0 ${largeArc} 1 ${x2},${y2}`}
+                      fill="none" stroke={e.color} strokeWidth={2}
+                      opacity={dimmed ? 0.15 : 0.6}
+                      strokeLinecap="round"
+                      style={{ transition: 'all 0.5s ease-out', filter: `drop-shadow(0 0 3px ${e.color}40)` }}
+                    />
+                  );
+                })()}
               </g>
             );
           })}
@@ -208,6 +237,27 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
             fontFamily="monospace">60 + elem + nat + mer + rar</text>
         </svg>
       </div>
+
+      {/* Stability indicator from ODE engine */}
+      {stability && (
+        <div className="mx-4 mb-2 flex items-center justify-between px-3 py-1.5 rounded-lg"
+          style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+          <span className="text-[7px] uppercase tracking-[0.15em]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            Energy State
+          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full"
+              style={{
+                background: stability === 'stable' ? '#22C55E' : stability === 'shifting' ? '#FBBF24' : '#EF4444',
+                boxShadow: `0 0 4px ${stability === 'stable' ? '#22C55E' : stability === 'shifting' ? '#FBBF24' : '#EF4444'}40`,
+              }} />
+            <span className="text-[8px] font-mono capitalize"
+              style={{ color: stability === 'stable' ? '#22C55E' : stability === 'shifting' ? '#FBBF24' : '#EF4444' }}>
+              {stability}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Info panel below wheel */}
       <AnimatePresence mode="wait">

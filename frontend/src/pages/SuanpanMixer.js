@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { ArrowLeft, Volume2, VolumeX, Send, Check, Loader2 } from 'lucide-react';
+import { NanoGuide } from '../components/NanoGuide';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -215,9 +216,12 @@ export default function SuanpanMixer() {
             style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
             The Suanpan
           </h1>
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.15)' }}>
-            Ancient Abacus Frequency Mixer
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.15)' }}>
+              Ancient Abacus Frequency Mixer
+            </p>
+            <NanoGuide guideId="suanpan-mixer" position="top-right" />
+          </div>
         </div>
       </div>
 

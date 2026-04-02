@@ -127,6 +127,7 @@ from routes.archives import router as archives_router
 from routes.botany import router as botany_router
 from routes.sovereign_math import router as sovereign_math_router
 from routes.sovereign_codex import router as sovereign_codex_router
+from routes.cosmic_state import router as cosmic_state_router
 from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
@@ -223,6 +224,7 @@ all_routers = [
     botany_router,
     sovereign_math_router,
     sovereign_codex_router,
+    cosmic_state_router,
 ]
 
 for r in all_routers:
