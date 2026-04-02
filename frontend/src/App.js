@@ -161,6 +161,7 @@ const FractalEngine = lazy(() => import('./pages/FractalEngine'));
 const MasteryAvenues = lazy(() => import('./pages/MasteryAvenues'));
 const CosmicMap = lazy(() => import('./pages/CosmicMap'));
 const PowerSpotAdmin = lazy(() => import('./pages/PowerSpotAdmin'));
+const MusicTheory = lazy(() => import('./pages/MusicTheory'));
 
 function PageLoader() {
   return (
@@ -307,6 +308,7 @@ function AnimatedRoutes() {
         <Route path="/mastery-avenues" element={<MasteryAvenues />} />
         <Route path="/cosmic-map" element={<CosmicMap />} />
         <Route path="/admin/power-spot" element={<PowerSpotAdmin />} />
+        <Route path="/theory" element={<MusicTheory />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

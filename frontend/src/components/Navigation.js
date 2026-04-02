@@ -107,6 +107,7 @@ const NAV_CATEGORIES = [
       { path: '/dance-music', label: 'Dance & Music Studio', icon: Music },
       { path: '/my-creations', label: 'My Creations', icon: Music },
       { path: '/frequencies', label: 'Frequencies', icon: Radio },
+      { path: '/theory', label: 'Conservatory', icon: GraduationCap },
       { path: '/vr', label: 'VR Sanctuary', icon: Orbit },
       { path: '/journal', label: 'Journal', icon: BookOpen },
       { path: '/wisdom-journal', label: 'Wisdom Log', icon: PenTool },
@@ -357,6 +358,7 @@ export default function Navigation() {
   const isLight = prefs.theme === 'light';
   const [devConsoleOpen, setDevConsoleOpen] = useState(false);
   const handleTripleTap = useTripleTap(() => setDevConsoleOpen(prev => !prev));
+  const { level: resLevel, cycleResolution, config: resConfig } = useResolution();
 
   /* Close dropdowns on outside click */
   useEffect(() => {
@@ -677,10 +679,8 @@ export default function Navigation() {
 
                       {/* Resolution Nodule */}
                       {(() => {
-                        try {
-                          const { level, cycleResolution, config } = useResolution();
                           const levelColors = { low: '#60A5FA', medium: '#FBBF24', high: '#A78BFA' };
-                          const c = levelColors[level];
+                          const c = levelColors[resLevel];
                           return (
                             <button
                               onClick={(e) => { e.stopPropagation(); cycleResolution(); }}
@@ -689,9 +689,9 @@ export default function Navigation() {
                               <div className="relative w-3.5 h-3.5">
                                 {/* Seed of Life geometry */}
                                 <svg viewBox="0 0 24 24" width={14} height={14}>
-                                  <circle cx="12" cy="12" r="4" fill="none" stroke={c} strokeWidth="1" opacity={level === 'low' ? 0.3 : 0.6} />
-                                  {level !== 'low' && <circle cx="12" cy="8" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />}
-                                  {level === 'high' && (
+                                  <circle cx="12" cy="12" r="4" fill="none" stroke={c} strokeWidth="1" opacity={resLevel === 'low' ? 0.3 : 0.6} />
+                                  {resLevel !== 'low' && <circle cx="12" cy="8" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />}
+                                  {resLevel === 'high' && (
                                     <>
                                       <circle cx="15.5" cy="14" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />
                                       <circle cx="8.5" cy="14" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />
@@ -700,12 +700,11 @@ export default function Navigation() {
                                 </svg>
                               </div>
                               <div className="flex-1 text-left">
-                                <span style={{ color: c }}>{config.label}</span>
-                                <span className="ml-1.5 text-[9px]" style={{ color: 'var(--text-muted)' }}>{config.sublabel}</span>
+                                <span style={{ color: c }}>{resConfig.label}</span>
+                                <span className="ml-1.5 text-[9px]" style={{ color: 'var(--text-muted)' }}>{resConfig.sublabel}</span>
                               </div>
                             </button>
                           );
-                        } catch { return null; }
                       })()}
 
                       <div className="my-1 mx-3 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)' }} />
