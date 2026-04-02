@@ -252,6 +252,72 @@ async def get_online_count(user=Depends(get_current_user)):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  COVEN LEADERBOARD
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/leaderboard")
+async def get_coven_leaderboard(user=Depends(get_current_user)):
+    """Rank covens by combined forge score + harvest count."""
+    covens = await db.covens.find({}, {"_id": 0}).to_list(100)
+    if not covens:
+        return {"leaderboard": [], "total_covens": 0}
+
+    rankings = []
+    for coven in covens:
+        cid = coven["id"]
+        members = await db.coven_members.find(
+            {"coven_id": cid, "active": True}, {"_id": 0}
+        ).to_list(20)
+        member_ids = [m["user_id"] for m in members]
+        if not member_ids:
+            continue
+
+        # Aggregate forge scores
+        forges = await db.resonance_builds.find(
+            {"user_id": {"$in": member_ids}}, {"_id": 0, "forge_score": 1}
+        ).to_list(500)
+        total_forge_score = sum(f.get("forge_score", 0) for f in forges)
+        forge_count = len(forges)
+
+        # Aggregate harvest count
+        harvests = await db.user_harvest_log.count_documents(
+            {"user_id": {"$in": member_ids}}
+        )
+
+        # Combined score: forge_score + (harvests * 2)
+        combined = round(total_forge_score + (harvests * 2), 1)
+
+        # Online count
+        online = sum(1 for mid in member_ids if mid in manager.connections)
+
+        # Leader name
+        leader = await db.users.find_one(
+            {"id": coven.get("leader_id")}, {"_id": 0, "name": 1}
+        )
+
+        rankings.append({
+            "coven_id": cid,
+            "name": coven["name"],
+            "leader": leader.get("name", "Unknown") if leader else "Unknown",
+            "member_count": len(member_ids),
+            "online_count": online,
+            "forge_score": round(total_forge_score, 1),
+            "forge_count": forge_count,
+            "harvest_count": harvests,
+            "combined_score": combined,
+            "created_at": coven.get("created_at"),
+        })
+
+    rankings.sort(key=lambda r: r["combined_score"], reverse=True)
+
+    # Add rank
+    for i, r in enumerate(rankings):
+        r["rank"] = i + 1
+
+    return {"leaderboard": rankings, "total_covens": len(rankings)}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  GROUP FORGING — Averaged Accuracy Across Party
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

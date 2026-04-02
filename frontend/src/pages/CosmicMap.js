@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import {
   MapPin, Zap, Leaf, Star, Navigation, RefreshCw,
   ChevronUp, X, Sparkles, Crown, Layers, Globe, Moon,
-  Users, Copy, LogOut, Plus, Wifi
+  Users, Copy, LogOut, Plus, Wifi, Trophy
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
@@ -226,6 +226,8 @@ export default function CosmicMap() {
   const [covenName, setCovenName] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [onlineCount, setOnlineCount] = useState(0);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Geolocation
   useEffect(() => {
@@ -396,6 +398,15 @@ export default function CosmicMap() {
       toast('Invite code copied');
     }
   };
+
+  const fetchLeaderboard = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/sync/leaderboard`, { headers: authHeaders });
+      setLeaderboard(res.data.leaderboard || []);
+    } catch (e) { console.error('Leaderboard fetch failed', e); }
+  }, [authHeaders]);
+
+  useEffect(() => { if (showLeaderboard) fetchLeaderboard(); }, [showLeaderboard, fetchLeaderboard]);
 
   // Harvest ground nodes / power spots
   const handleHarvest = async (node) => {
@@ -638,16 +649,71 @@ export default function CosmicMap() {
             }}
             data-testid="coven-panel">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-medium flex items-center gap-1" style={{ color: '#2DD4BF' }}>
-                <Users size={10} /> Coven
-              </span>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowLeaderboard(false)}
+                  className="text-[9px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
+                  style={{
+                    background: !showLeaderboard ? 'rgba(45,212,191,0.1)' : 'transparent',
+                    color: !showLeaderboard ? '#2DD4BF' : 'var(--text-muted)',
+                  }}>
+                  <Users size={9} /> Coven
+                </button>
+                <button onClick={() => setShowLeaderboard(true)}
+                  className="text-[9px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
+                  style={{
+                    background: showLeaderboard ? 'rgba(251,191,36,0.1)' : 'transparent',
+                    color: showLeaderboard ? '#FBBF24' : 'var(--text-muted)',
+                  }}
+                  data-testid="leaderboard-tab">
+                  <Trophy size={9} /> Rankings
+                </button>
+              </div>
               <button onClick={() => setShowCovenPanel(false)} className="w-5 h-5 rounded-full flex items-center justify-center"
                 style={{ background: 'rgba(248,250,252,0.05)' }}>
                 <X size={8} style={{ color: 'var(--text-muted)' }} />
               </button>
             </div>
 
-            {covenData ? (
+            {showLeaderboard ? (
+              <div className="space-y-1.5" data-testid="leaderboard-list">
+                {leaderboard.length === 0 ? (
+                  <p className="text-[8px] text-center py-3" style={{ color: 'var(--text-muted)' }}>No covens yet. Be the first!</p>
+                ) : leaderboard.map((c) => {
+                  const RANK_COLORS = ['#FBBF24', '#94A3B8', '#CD7F32'];
+                  const rankColor = c.rank <= 3 ? RANK_COLORS[c.rank - 1] : 'var(--text-muted)';
+                  const isOwn = covenData?.coven_id === c.coven_id;
+                  return (
+                    <div key={c.coven_id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg"
+                      style={{
+                        background: isOwn ? 'rgba(45,212,191,0.06)' : 'rgba(248,250,252,0.02)',
+                        border: isOwn ? '1px solid rgba(45,212,191,0.12)' : '1px solid transparent',
+                      }}
+                      data-testid={`leaderboard-row-${c.rank}`}>
+                      <span className="text-[10px] font-bold w-5 text-center" style={{ color: rankColor }}>
+                        {c.rank <= 3 ? ['I', 'II', 'III'][c.rank - 1] : `#${c.rank}`}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] font-medium truncate" style={{ color: isOwn ? '#2DD4BF' : 'var(--text-primary)' }}>
+                          {c.name}
+                        </p>
+                        <p className="text-[7px]" style={{ color: 'var(--text-muted)' }}>
+                          {c.member_count} members · led by {c.leader}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[9px] font-mono" style={{ color: '#FBBF24' }}>{c.combined_score}</p>
+                        <p className="text-[6px]" style={{ color: 'var(--text-muted)' }}>
+                          {c.forge_count}F · {c.harvest_count}H
+                        </p>
+                      </div>
+                      {c.online_count > 0 && (
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#22C55E' }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : covenData ? (
               <>
                 <div className="rounded-lg p-2" style={{ background: 'rgba(45,212,191,0.04)', border: '1px solid rgba(45,212,191,0.08)' }}>
                   <p className="text-[9px] font-medium" style={{ color: '#2DD4BF' }}>{covenData.name}</p>
