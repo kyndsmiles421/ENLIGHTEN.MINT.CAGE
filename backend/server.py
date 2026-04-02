@@ -118,6 +118,7 @@ from routes.sublayers import router as sublayers_router
 from routes.avenues import router as avenues_router
 from routes.science_history import router as science_history_router
 from routes.cosmic_map import router as cosmic_map_router
+from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
 
@@ -203,10 +204,60 @@ all_routers = [
     avenues_router,
     science_history_router,
     cosmic_map_router,
+    sync_router,
 ]
 
 for r in all_routers:
     app.include_router(r, prefix="/api")
+
+
+# ━━━ WebSocket for Synchronicity / Coven System ━━━
+from fastapi import WebSocket, WebSocketDisconnect
+
+@app.websocket("/api/ws/sync")
+async def websocket_sync(ws: WebSocket, token: str = ""):
+    """Real-time position sharing for Coven members."""
+    user = await authenticate_ws(token)
+    if not user:
+        await ws.close(code=4001, reason="Unauthorized")
+        return
+
+    uid = user["id"]
+    await sync_manager.connect(uid, ws)
+
+    # Look up coven membership
+    membership = await db.coven_members.find_one({"user_id": uid, "active": True}, {"_id": 0})
+    coven_id = membership["coven_id"] if membership else None
+
+    try:
+        while True:
+            data = await ws.receive_json()
+            msg_type = data.get("type")
+
+            if msg_type == "position":
+                sync_manager.update_position(uid, {
+                    "lat": data.get("lat"),
+                    "lng": data.get("lng"),
+                    "name": user.get("name", "Traveler"),
+                    "coven_id": coven_id,
+                })
+                if coven_id:
+                    members = sync_manager.get_coven_members(coven_id, exclude_uid=uid)
+                    await ws.send_json({"type": "coven_positions", "members": members})
+
+            elif msg_type == "ping":
+                await ws.send_json({"type": "pong", "online": sync_manager.online_count})
+
+    except WebSocketDisconnect:
+        sync_manager.disconnect(uid)
+        if coven_id:
+            await sync_manager.broadcast_to_coven(coven_id, {
+                "type": "member_offline",
+                "user_id": uid,
+                "name": user.get("name", "Traveler"),
+            }, exclude_uid=uid)
+    except Exception:
+        sync_manager.disconnect(uid)
 
 
 # Stripe webhook handler (at /api/webhook/stripe)

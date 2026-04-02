@@ -7,7 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import {
   MapPin, Zap, Leaf, Star, Navigation, RefreshCw,
-  ChevronUp, X, Sparkles, Crown, Layers, Globe, Moon
+  ChevronUp, X, Sparkles, Crown, Layers, Globe, Moon,
+  Users, Copy, LogOut, Plus, Wifi
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
@@ -41,6 +42,14 @@ const userIcon = L.divIcon({
   className: '',
   iconSize: [16, 16],
   iconAnchor: [8, 8],
+});
+
+const MEMBER_COLORS = ['#2DD4BF', '#A78BFA', '#F472B6', '#60A5FA', '#FBBF24'];
+const createMemberIcon = (idx) => L.divIcon({
+  html: `<div style="width:14px;height:14px;border-radius:50%;background:${MEMBER_COLORS[idx % MEMBER_COLORS.length]};border:2px solid rgba(15,15,25,0.8);box-shadow:0 0 10px ${MEMBER_COLORS[idx % MEMBER_COLORS.length]}80"></div>`,
+  className: '',
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
 });
 
 function RecenterButton({ center }) {
@@ -205,8 +214,18 @@ export default function CosmicMap() {
   const [celestialDecay, setCelestialDecay] = useState(null);
   const watchRef = useRef(null);
   const notifiedSpotsRef = useRef(new Set());
+  const wsRef = useRef(null);
+  const posIntervalRef = useRef(null);
 
   const PROXIMITY_RADIUS = 500; // meters
+
+  // Coven state
+  const [covenData, setCovenData] = useState(null); // null = not in coven
+  const [covenMembers, setCovenMembers] = useState([]); // real-time positions
+  const [showCovenPanel, setShowCovenPanel] = useState(false);
+  const [covenName, setCovenName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [onlineCount, setOnlineCount] = useState(0);
 
   // Geolocation
   useEffect(() => {
@@ -280,6 +299,103 @@ export default function CosmicMap() {
       }
     });
   }, [userPos, powerSpots]);
+
+  // ━━━ Coven System ━━━
+  const fetchCoven = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/sync/covens/my`, { headers: authHeaders });
+      setCovenData(res.data.in_coven ? res.data : null);
+    } catch (e) { console.error('Coven fetch failed', e); }
+  }, [authHeaders]);
+
+  useEffect(() => { fetchCoven(); }, [fetchCoven]);
+
+  // WebSocket connection
+  useEffect(() => {
+    if (!authHeaders?.Authorization) return;
+    const token = authHeaders.Authorization?.replace('Bearer ', '');
+    if (!token) return;
+
+    const wsUrl = `${process.env.REACT_APP_BACKEND_URL}`.replace('https', 'wss').replace('http', 'ws');
+    const ws = new WebSocket(`${wsUrl}/api/ws/sync?token=${token}`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      // Start sending position pings every 5s
+      posIntervalRef.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN && userPos) {
+          ws.send(JSON.stringify({ type: 'position', lat: userPos.lat, lng: userPos.lng }));
+        }
+      }, 5000);
+    };
+
+    ws.onmessage = (evt) => {
+      try {
+        const data = JSON.parse(evt.data);
+        if (data.type === 'coven_positions') {
+          setCovenMembers(data.members || []);
+        } else if (data.type === 'pong') {
+          setOnlineCount(data.online || 0);
+        } else if (data.type === 'member_joined') {
+          toast(`${data.name} joined the coven`, { duration: 3000 });
+          fetchCoven();
+        } else if (data.type === 'member_left' || data.type === 'member_offline') {
+          toast(`${data.name} ${data.type === 'member_left' ? 'left' : 'went offline'}`, { duration: 3000 });
+          fetchCoven();
+        }
+      } catch (e) { /* ignore parse errors */ }
+    };
+
+    ws.onclose = () => {
+      if (posIntervalRef.current) clearInterval(posIntervalRef.current);
+    };
+
+    return () => {
+      if (posIntervalRef.current) clearInterval(posIntervalRef.current);
+      if (ws.readyState === WebSocket.OPEN) ws.close();
+    };
+  }, [authHeaders]);
+
+  // Keep WS position pings fresh with latest userPos
+  useEffect(() => {
+    // userPos is already used inside the interval closure via ref
+  }, [userPos]);
+
+  const handleCreateCoven = async () => {
+    if (!covenName.trim()) return;
+    try {
+      const res = await axios.post(`${API}/sync/covens`, { name: covenName }, { headers: authHeaders });
+      toast(res.data.message, { duration: 4000 });
+      setCovenName('');
+      fetchCoven();
+    } catch (e) { toast.error(e.response?.data?.detail || 'Failed'); }
+  };
+
+  const handleJoinCoven = async () => {
+    if (!joinCode.trim()) return;
+    try {
+      const res = await axios.post(`${API}/sync/covens/join`, { invite_code: joinCode.toUpperCase() }, { headers: authHeaders });
+      toast(res.data.message, { duration: 4000 });
+      setJoinCode('');
+      fetchCoven();
+    } catch (e) { toast.error(e.response?.data?.detail || 'Failed'); }
+  };
+
+  const handleLeaveCoven = async () => {
+    try {
+      await axios.post(`${API}/sync/covens/leave`, {}, { headers: authHeaders });
+      setCovenData(null);
+      setCovenMembers([]);
+      toast('Left the coven');
+    } catch (e) { toast.error(e.response?.data?.detail || 'Failed'); }
+  };
+
+  const copyInvite = () => {
+    if (covenData?.invite_code) {
+      navigator.clipboard.writeText(covenData.invite_code);
+      toast('Invite code copied');
+    }
+  };
 
   // Harvest ground nodes / power spots
   const handleHarvest = async (node) => {
@@ -370,6 +486,13 @@ export default function CosmicMap() {
                 <Marker position={[spot.lat, spot.lng]} icon={powerSpotIcon}
                   eventHandlers={{ click: () => { setSelectedNode(spot); setHarvestResult(null); } }} />
               </React.Fragment>
+            ))}
+
+            {/* Coven Members */}
+            {covenMembers.filter(m => m.lat && m.lng).map((m, idx) => (
+              <Marker key={m.user_id} position={[m.lat, m.lng]} icon={createMemberIcon(idx)}>
+                <Popup><span style={{ color: MEMBER_COLORS[idx % MEMBER_COLORS.length], fontSize: '11px' }}>{m.name}</span></Popup>
+              </Marker>
             ))}
           </MapContainer>
         ) : (
@@ -473,6 +596,19 @@ export default function CosmicMap() {
               data-testid="refresh-nodes-btn">
               <RefreshCw size={9} style={{ color: 'var(--text-muted)' }} />
             </button>
+
+            {/* Coven toggle */}
+            <button onClick={() => setShowCovenPanel(p => !p)}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-[7px] transition-all"
+              style={{
+                background: covenData ? 'rgba(45,212,191,0.1)' : 'rgba(248,250,252,0.04)',
+                color: covenData ? '#2DD4BF' : 'var(--text-muted)',
+                border: covenData ? '1px solid rgba(45,212,191,0.15)' : '1px solid transparent',
+              }}
+              data-testid="coven-toggle-btn">
+              <Users size={9} />
+              {covenData ? covenData.member_count : 0}
+            </button>
           </div>
 
           {/* Today's harvest summary */}
@@ -487,6 +623,118 @@ export default function CosmicMap() {
         </div>
         {geoError && <p className="text-[7px] mt-1 text-center" style={{ color: 'rgba(239,68,68,0.7)' }}>{geoError}</p>}
       </div>
+
+      {/* Coven Panel */}
+      <AnimatePresence>
+        {showCovenPanel && (
+          <motion.div
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="absolute top-28 right-3 z-[1001] w-56 rounded-xl p-3 space-y-2"
+            style={{
+              background: 'rgba(10,10,18,0.9)',
+              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(45,212,191,0.12)',
+            }}
+            data-testid="coven-panel">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium flex items-center gap-1" style={{ color: '#2DD4BF' }}>
+                <Users size={10} /> Coven
+              </span>
+              <button onClick={() => setShowCovenPanel(false)} className="w-5 h-5 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(248,250,252,0.05)' }}>
+                <X size={8} style={{ color: 'var(--text-muted)' }} />
+              </button>
+            </div>
+
+            {covenData ? (
+              <>
+                <div className="rounded-lg p-2" style={{ background: 'rgba(45,212,191,0.04)', border: '1px solid rgba(45,212,191,0.08)' }}>
+                  <p className="text-[9px] font-medium" style={{ color: '#2DD4BF' }}>{covenData.name}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.04)', color: 'var(--text-muted)' }}>
+                      {covenData.invite_code}
+                    </span>
+                    <button onClick={copyInvite} className="p-0.5" data-testid="copy-invite-btn">
+                      <Copy size={8} style={{ color: 'var(--text-muted)' }} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Members */}
+                <div className="space-y-1">
+                  <p className="text-[7px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                    Members ({covenData.member_count}/{covenData.max_members})
+                  </p>
+                  {covenData.members?.map((m, idx) => (
+                    <div key={m.user_id} className="flex items-center gap-1.5 py-0.5">
+                      <div className="w-2 h-2 rounded-full" style={{ background: m.online ? MEMBER_COLORS[idx % MEMBER_COLORS.length] : 'rgba(248,250,252,0.15)' }} />
+                      <span className="text-[8px] flex-1" style={{ color: m.online ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                        {m.name}
+                      </span>
+                      {m.role === 'leader' && <Crown size={7} style={{ color: '#FBBF24' }} />}
+                      <span className="text-[6px]" style={{ color: m.online ? '#2DD4BF' : 'var(--text-muted)' }}>
+                        {m.online ? 'ON' : 'OFF'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={handleLeaveCoven}
+                  className="w-full py-1.5 rounded-md text-[8px] flex items-center justify-center gap-1 transition-all"
+                  style={{ background: 'rgba(239,68,68,0.06)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.1)' }}
+                  data-testid="leave-coven-btn">
+                  <LogOut size={8} /> Leave Coven
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>
+                  Create or join a coven to see party members on the map in real-time.
+                </p>
+
+                {/* Create */}
+                <div className="space-y-1">
+                  <input value={covenName} onChange={e => setCovenName(e.target.value)} placeholder="Coven name..."
+                    className="w-full px-2 py-1.5 rounded text-[9px] outline-none"
+                    style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}
+                    data-testid="coven-name-input" />
+                  <button onClick={handleCreateCoven}
+                    className="w-full py-1.5 rounded-md text-[8px] flex items-center justify-center gap-1"
+                    style={{ background: 'rgba(45,212,191,0.08)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.12)' }}
+                    data-testid="create-coven-btn">
+                    <Plus size={8} /> Create Coven
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 py-1">
+                  <div className="flex-1 h-px" style={{ background: 'rgba(248,250,252,0.06)' }} />
+                  <span className="text-[7px]" style={{ color: 'var(--text-muted)' }}>or</span>
+                  <div className="flex-1 h-px" style={{ background: 'rgba(248,250,252,0.06)' }} />
+                </div>
+
+                {/* Join */}
+                <div className="space-y-1">
+                  <input value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code..."
+                    className="w-full px-2 py-1.5 rounded text-[9px] font-mono uppercase outline-none"
+                    style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}
+                    data-testid="join-code-input" />
+                  <button onClick={handleJoinCoven}
+                    className="w-full py-1.5 rounded-md text-[8px] flex items-center justify-center gap-1"
+                    style={{ background: 'rgba(248,250,252,0.04)', color: 'var(--text-muted)', border: '1px solid rgba(248,250,252,0.06)' }}
+                    data-testid="join-coven-btn">
+                    <Wifi size={8} /> Join with Code
+                  </button>
+                </div>
+
+                <p className="text-[7px] text-center" style={{ color: 'var(--text-muted)' }}>
+                  {onlineCount > 0 ? `${onlineCount} traveler${onlineCount > 1 ? 's' : ''} online` : ''}
+                </p>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Node Detail Slide-up Panel */}
       <AnimatePresence>

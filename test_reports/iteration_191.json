@@ -1,0 +1,87 @@
+{
+  "summary": "Iteration 191 testing complete: Coven/Party System (Synchronicity Events). All 14 backend tests passed (100%). Frontend verified: Coven panel UI with create/join forms, invite code display, member list, and leave functionality. WebSocket connection and ping/pong working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Cosmic Map", "issues": ["Trial graduation overlay blocks UI on first visit - user must dismiss it"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration191_coven_system.py",
+    "/app/test_reports/pytest/pytest_iteration191_coven_system.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "POST /api/sync/covens creates coven with 8-char invite code, returns success, coven_id, name, invite_code",
+    "POST /api/sync/covens/join validates invite code, returns 404 for invalid, 400 if already in coven",
+    "POST /api/sync/covens/leave properly removes user from coven, transfers leadership if leader leaves",
+    "GET /api/sync/covens/my returns in_coven=false when not in coven, full details with members list when in coven",
+    "GET /api/sync/online-count returns current WebSocket connection count",
+    "WebSocket /api/ws/sync accepts connection with valid JWT token, rejects invalid tokens",
+    "WebSocket ping returns pong with online count",
+    "WebSocket position update returns coven_positions for coven members",
+    "Frontend coven-toggle-btn (Users icon) in HUD opens coven-panel",
+    "Coven panel has coven-name-input, create-coven-btn, join-code-input, join-coven-btn",
+    "After creating coven: shows invite code with copy-invite-btn, member list, leave-coven-btn",
+    "Regression: GET /api/cosmic-map/power-spots returns 2 spots",
+    "Regression: GET /api/cosmic-map/celestial/nodes returns 6 nodes"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration191_coven_system.py"
+  ],
+  "success_rate": {"backend": "100% (14/14)", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "Test covens created and cleaned up during tests (TEST_ prefix)",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 191 Coven/Party System fully working. Navigate to /cosmic-map, click Users icon (coven-toggle-btn) to open coven panel. Create coven with name, get invite code. Join coven with invite code. Leave coven with leave-coven-btn. WebSocket at /api/ws/sync?token=JWT handles real-time position sharing for coven members. Note: Trial graduation overlay may appear on first visit - click 'Continue with free plan' to dismiss.",
+  "features_verified": {
+    "backend_apis": {
+      "POST /api/sync/covens": "Creates coven with name, returns coven_id, invite_code (8 chars), success message",
+      "POST /api/sync/covens/join": "Joins coven via invite_code, returns 404 for invalid code, 400 if already in coven",
+      "POST /api/sync/covens/leave": "Leaves current coven, returns 400 if not in coven, transfers leadership if leader",
+      "GET /api/sync/covens/my": "Returns in_coven, coven details with members list, role, invite_code",
+      "GET /api/sync/online-count": "Returns online WebSocket connection count",
+      "WebSocket /api/ws/sync": "Accepts valid JWT token, ping returns pong with online count, position update returns coven_positions"
+    },
+    "frontend_elements": {
+      "cosmic_map_page": {
+        "route": "/cosmic-map",
+        "data_testid": "cosmic-map-page",
+        "verified": true
+      },
+      "coven_toggle_btn": {
+        "data_testid": "coven-toggle-btn",
+        "location": "HUD (top right)",
+        "icon": "Users",
+        "verified": true
+      },
+      "coven_panel": {
+        "data_testid": "coven-panel",
+        "elements": ["coven-name-input", "create-coven-btn", "join-code-input", "join-coven-btn"],
+        "verified": true
+      },
+      "coven_created_state": {
+        "elements": ["copy-invite-btn", "leave-coven-btn", "member list"],
+        "verified": true
+      },
+      "map_hud": {
+        "data_testid": "map-hud",
+        "verified": true
+      },
+      "layer_toggle": {
+        "data_testid": "layer-toggle",
+        "verified": true
+      }
+    },
+    "regression_tests": {
+      "GET /api/cosmic-map/power-spots": "PASS (2 spots)",
+      "GET /api/cosmic-map/celestial/nodes": "PASS (6 nodes)"
+    }
+  }
+}
