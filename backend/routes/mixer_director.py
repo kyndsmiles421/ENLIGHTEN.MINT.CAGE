@@ -218,7 +218,7 @@ async def save_project(data: dict = Body(...), user=Depends(get_current_user)):
 
     sanitized_tracks = []
     for i, t in enumerate(tracks[:50]):
-        sanitized_tracks.append({
+        track_data = {
             "index": i,
             "type": t.get("type", "custom") if t.get("type") in TRACK_TYPES else "custom",
             "source_id": t.get("source_id", ""),
@@ -231,7 +231,19 @@ async def save_project(data: dict = Body(...), user=Depends(get_current_user)):
             "frequency": t.get("frequency"),
             "color": t.get("color", "#94A3B8"),
             "locked": bool(t.get("locked", False)),
-        })
+        }
+        # Keyframe automation (Volume + Frequency curves)
+        if t.get("keyframes_volume"):
+            track_data["keyframes_volume"] = [
+                {"time": max(0, kf.get("time", 0)), "value": max(0, min(1, kf.get("value", 0.8)))}
+                for kf in t["keyframes_volume"][:100]
+            ]
+        if t.get("keyframes_frequency"):
+            track_data["keyframes_frequency"] = [
+                {"time": max(0, kf.get("time", 0)), "value": max(0, kf.get("value", 0))}
+                for kf in t["keyframes_frequency"][:100]
+            ]
+        sanitized_tracks.append(track_data)
 
     if existing:
         await db.mixer_projects.update_one(
@@ -559,3 +571,176 @@ async def get_owned_bonus_packs(user=Depends(get_current_user)):
     ).to_list(50)
 
     return {"owned_packs": owned}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HEXAGRAM-BASED PACK RECOMMENDATIONS
+#  Lower Trigram (bits 0-2) → "Soul" (vocal/mantra packs)
+#  Upper Trigram (bits 3-5) → "Environment" (visual/ambience)
+#  Stagnation detection → active grounding suggestions
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# 8 trigrams (3 bits each)
+TRIGRAM_NAMES = {
+    0: ("坤", "Earth", "Receptive"),
+    1: ("震", "Thunder", "Arousing"),
+    2: ("坎", "Water", "Abysmal"),
+    3: ("兑", "Lake", "Joyous"),
+    4: ("艮", "Mountain", "Still"),
+    5: ("离", "Fire", "Clinging"),
+    6: ("巽", "Wind", "Gentle"),
+    7: ("乾", "Heaven", "Creative"),
+}
+
+# Lower trigram → Soul pack mapping (vocal/mantra recommendations)
+LOWER_TRIGRAM_SOUL = {
+    0: {"pack_id": "pack-vedic-vocals", "reason": "Earth/Receptive energy calls for grounding Vedic vocal tones to anchor your inner resonance."},
+    1: {"pack_id": "pack-hopi-chants", "reason": "Thunder/Arousing energy seeks rhythmic chanting to channel the dynamic power within."},
+    2: {"pack_id": "pack-vedic-vocals", "reason": "Water/Abysmal energy flows toward ancient mantric patterns for emotional depth."},
+    3: {"pack_id": "pack-hopi-chants", "reason": "Lake/Joyous energy resonates with celebratory chanting traditions."},
+    4: {"pack_id": "pack-solfeggio-master", "reason": "Mountain/Still energy benefits from precise solfeggio frequencies for meditative stillness."},
+    5: {"pack_id": "pack-solfeggio-master", "reason": "Fire/Clinging energy needs structured frequency scales to direct illumination."},
+    6: {"pack_id": "pack-vedic-vocals", "reason": "Wind/Gentle energy harmonizes with soft, flowing Vedic chant patterns."},
+    7: {"pack_id": "pack-solfeggio-master", "reason": "Heaven/Creative energy demands the full solfeggio spectrum for transcendent composition."},
+}
+
+# Upper trigram → Environment pack mapping (visual/ambience)
+UPPER_TRIGRAM_ENV = {
+    0: {"pack_id": "pack-deep-earth", "reason": "Earth/Receptive outer state draws you toward deep geological resonance and grounding textures."},
+    1: {"pack_id": "pack-sacred-geometry", "reason": "Thunder/Arousing outer state benefits from dynamic sacred geometry visuals to channel creative power."},
+    2: {"pack_id": "pack-deep-earth", "reason": "Water/Abysmal outer state seeks deep oceanic and cave resonance for immersive depth."},
+    3: {"pack_id": "pack-sacred-geometry", "reason": "Lake/Joyous outer state responds to flowing geometric patterns that mirror inner harmony."},
+    4: {"pack_id": "pack-deep-earth", "reason": "Mountain/Still outer state aligns with tectonic stability and earth-frequency grounding."},
+    5: {"pack_id": "pack-sacred-geometry", "reason": "Fire/Clinging outer state ignites with radiant sacred geometry and mandala patterns."},
+    6: {"pack_id": "pack-sacred-geometry", "reason": "Wind/Gentle outer state flows with dynamic visual overlays and soft geometry."},
+    7: {"pack_id": "pack-deep-earth", "reason": "Heaven/Creative outer state seeks cosmic resonance — deep space and magnetosphere drones."},
+}
+
+# Stagnation hexagrams — these indicate energetic blocks
+STAGNATION_HEXAGRAMS = {
+    12: "Standstill", 23: "Splitting Apart", 29: "The Abysmal",
+    36: "Darkening of the Light", 39: "Obstruction", 47: "Oppression",
+}
+
+from routes.hexagram import HEXAGRAM_NAMES, SOLFEGGIO
+
+
+@router.get("/mixer/recommendations")
+async def get_recommendations(user=Depends(get_current_user)):
+    """Hexagram-based pack recommendations with stagnation detection."""
+    user_id = user["id"]
+
+    # Get current hexagram
+    hex_doc = await db.hexagram_journal.find_one(
+        {"user_id": user_id}, {"_id": 0, "hexagram_id": 1}
+    )
+    hex_number = hex_doc.get("hexagram_id", 1) if hex_doc else 1
+
+    # Extract trigrams from hexagram number (0-indexed internally)
+    hex_idx = hex_number - 1
+    lower_trigram = hex_idx & 0b111
+    upper_trigram = (hex_idx >> 3) & 0b111
+
+    hex_name = HEXAGRAM_NAMES.get(hex_number, ("", "", "Unknown"))
+    lower_tri = TRIGRAM_NAMES.get(lower_trigram, ("", "", ""))
+    upper_tri = TRIGRAM_NAMES.get(upper_trigram, ("", "", ""))
+
+    # Check ownership
+    owned_docs = await db.user_bonus_packs.find({"user_id": user_id}, {"_id": 0}).to_list(50)
+    owned_ids = {d["pack_id"] for d in owned_docs}
+
+    # Analyze mixing history for stagnation detection
+    projects = await db.mixer_projects.find(
+        {"user_id": user_id}, {"_id": 0, "tracks": 1}
+    ).sort("updated_at", -1).to_list(5)
+
+    avg_freq = 0
+    total_freq_tracks = 0
+    for proj in projects:
+        for t in proj.get("tracks", []):
+            if t.get("frequency"):
+                avg_freq += t["frequency"]
+                total_freq_tracks += 1
+    if total_freq_tracks > 0:
+        avg_freq /= total_freq_tracks
+
+    # Stagnation detection
+    is_stagnation = hex_number in STAGNATION_HEXAGRAMS
+    high_freq_imbalance = avg_freq > 600 and is_stagnation
+
+    # Build recommendations
+    recs = []
+
+    # Soul recommendation (Lower Trigram)
+    soul = LOWER_TRIGRAM_SOUL.get(lower_trigram)
+    if soul:
+        pack = BONUS_PACK_MAP.get(soul["pack_id"])
+        if pack:
+            is_owned = soul["pack_id"] in owned_ids
+            recs.append({
+                "type": "soul",
+                "trigram": f"{lower_tri[1]} ({lower_tri[2]})",
+                "pack_id": soul["pack_id"],
+                "pack_name": pack["name"],
+                "pack_color": pack["color"],
+                "bonus_wrap": pack["bonus_wrap"],
+                "price_credits": pack["price_credits"],
+                "owned": is_owned,
+                "reason": soul["reason"],
+                "tone": "soft" if is_owned else "active",
+                "message": "You already have this in your kit — activate it for this session." if is_owned
+                    else f"Your inner {lower_tri[1]} trigram suggests this pack will deepen your resonance.",
+            })
+
+    # Environment recommendation (Upper Trigram)
+    env = UPPER_TRIGRAM_ENV.get(upper_trigram)
+    if env and (not soul or env["pack_id"] != soul["pack_id"]):
+        pack = BONUS_PACK_MAP.get(env["pack_id"])
+        if pack:
+            is_owned = env["pack_id"] in owned_ids
+            recs.append({
+                "type": "environment",
+                "trigram": f"{upper_tri[1]} ({upper_tri[2]})",
+                "pack_id": env["pack_id"],
+                "pack_name": pack["name"],
+                "pack_color": pack["color"],
+                "bonus_wrap": pack["bonus_wrap"],
+                "price_credits": pack["price_credits"],
+                "owned": is_owned,
+                "reason": env["reason"],
+                "tone": "soft" if is_owned else "active",
+                "message": "This pack is already in your arsenal — try layering it into your current mix." if is_owned
+                    else f"Your outer {upper_tri[1]} trigram reveals a need for this environmental layer.",
+            })
+
+    # Stagnation override — always recommend grounding if detected
+    if high_freq_imbalance:
+        deep_earth = BONUS_PACK_MAP.get("pack-deep-earth")
+        if deep_earth and "pack-deep-earth" not in owned_ids:
+            recs.insert(0, {
+                "type": "stagnation",
+                "trigram": "Stagnation Detected",
+                "pack_id": "pack-deep-earth",
+                "pack_name": deep_earth["name"],
+                "pack_color": deep_earth["color"],
+                "bonus_wrap": deep_earth["bonus_wrap"],
+                "price_credits": deep_earth["price_credits"],
+                "owned": False,
+                "reason": f"Your mix averages {avg_freq:.0f}Hz but your hexagram shows '{STAGNATION_HEXAGRAMS[hex_number]}.' Your energetic field needs grounding.",
+                "tone": "active",
+                "message": f"Your composition is running hot at {avg_freq:.0f}Hz with a {STAGNATION_HEXAGRAMS[hex_number]} hexagram. The Deep Earth Resonance Suite will ground your frequencies and provide +20% processing speed to break the loop.",
+            })
+
+    return {
+        "hexagram": {
+            "number": hex_number,
+            "name": hex_name[2] if len(hex_name) > 2 else "",
+            "chinese": hex_name[0] if hex_name else "",
+            "lower_trigram": {"index": lower_trigram, "name": lower_tri[1], "quality": lower_tri[2]},
+            "upper_trigram": {"index": upper_trigram, "name": upper_tri[1], "quality": upper_tri[2]},
+        },
+        "is_stagnation": is_stagnation,
+        "avg_frequency": round(avg_freq, 1),
+        "recommendations": recs,
+        "solfeggio_resonance": SOLFEGGIO[(hex_number - 1) % len(SOLFEGGIO)],
+    }

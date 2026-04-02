@@ -10,6 +10,7 @@ import {
   Sliders, Lock, Zap, Waves, Sparkles, ChevronDown, Crown,
   Layers, Music, Eye, Radio, X, Loader2, Play, Square,
   Ghost, Package, Gift, ShoppingCart, ArrowUpRight, GripVertical,
+  Compass, AlertTriangle,
 } from 'lucide-react';
 import { NanoGuide } from '../components/NanoGuide';
 
@@ -187,10 +188,92 @@ function SuanpanSource({ onFrequencySet, color }) {
   );
 }
 
-/* ━━━ Track Row ━━━ */
-function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick }) {
+/* ━━━ Keyframe Automation Lane (SVG curve) ━━━ */
+const PHI = 1.618033988749895;
+const GOLDEN_SNAPS = [0, 1/PHI/PHI, 1/PHI, 1 - 1/PHI, 1 - 1/PHI/PHI, 1];
+
+function KeyframeLane({ keyframes, onChange, color, label, maxValue, minValue }) {
+  const svgRef = useRef(null);
+  const W = 280;
+  const H = 32;
+
+  const points = keyframes || [{ time: 0, value: maxValue * 0.8 }, { time: 60, value: maxValue * 0.8 }];
+  const maxTime = Math.max(60, ...points.map(p => p.time));
+
+  const toX = (time) => (time / maxTime) * W;
+  const toY = (val) => H - ((val - minValue) / (maxValue - minValue)) * H;
+  const fromX = (x) => (x / W) * maxTime;
+  const fromY = (y) => minValue + ((H - y) / H) * (maxValue - minValue);
+
+  const pathD = points.length > 1
+    ? points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.time).toFixed(1)} ${toY(p.value).toFixed(1)}`).join(' ')
+    : `M 0 ${H / 2} L ${W} ${H / 2}`;
+
+  const handleSvgClick = useCallback((e) => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    let time = fromX(x);
+    let value = fromY(y);
+
+    // Snap to Golden Ratio intervals
+    const snapT = GOLDEN_SNAPS.map(s => s * maxTime);
+    const nearest = snapT.reduce((best, s) => Math.abs(s - time) < Math.abs(best - time) ? s : best, time);
+    if (Math.abs(nearest - time) < maxTime * 0.03) time = nearest;
+
+    value = Math.max(minValue, Math.min(maxValue, value));
+    const newPoints = [...points, { time: Math.round(time * 10) / 10, value: Math.round(value * 100) / 100 }]
+      .sort((a, b) => a.time - b.time);
+    onChange(newPoints);
+  }, [points, onChange, maxTime, minValue, maxValue]);
+
+  const removePoint = useCallback((idx) => {
+    if (points.length <= 2) return;
+    onChange(points.filter((_, i) => i !== idx));
+  }, [points, onChange]);
+
+  return (
+    <div className="mt-1" data-testid={`keyframe-lane-${label}`}>
+      <div className="flex items-center gap-1 mb-0.5">
+        <p className="text-[6px] tracking-wider uppercase" style={{ color: `${color}60` }}>{label}</p>
+        {/* Golden ratio snap lines */}
+        <div className="flex-1" />
+        <p className="text-[5px] font-mono" style={{ color: 'rgba(248,250,252,0.1)' }}>
+          {points.length} pts
+        </p>
+      </div>
+      <svg ref={svgRef} width={W} height={H} className="cursor-crosshair rounded"
+        style={{ background: 'rgba(248,250,252,0.015)', border: '1px solid rgba(248,250,252,0.03)' }}
+        onClick={handleSvgClick}>
+        {/* Golden ratio snap lines */}
+        {GOLDEN_SNAPS.slice(1, -1).map((s, i) => (
+          <line key={i} x1={s * W} y1={0} x2={s * W} y2={H}
+            stroke={`${color}10`} strokeWidth={0.5} strokeDasharray="2,2" />
+        ))}
+        {/* Curve */}
+        <path d={pathD} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+          style={{ filter: `drop-shadow(0 0 3px ${color}40)` }} />
+        {/* Fill under curve */}
+        <path d={`${pathD} L ${W} ${H} L 0 ${H} Z`} fill={`${color}08`} />
+        {/* Control points */}
+        {points.map((p, i) => (
+          <circle key={i} cx={toX(p.time)} cy={toY(p.value)} r={3}
+            fill={color} stroke="rgba(6,6,14,0.8)" strokeWidth={1}
+            className="cursor-pointer" style={{ filter: `drop-shadow(0 0 4px ${color})` }}
+            onDoubleClick={(e) => { e.stopPropagation(); removePoint(i); }} />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+/* ━━━ Track Row with Keyframe Automation ━━━ */
+function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, showKeyframes }) {
   const meta = TRACK_TYPE_META[track.type] || TRACK_TYPE_META.custom;
   const Icon = meta.icon;
+  const [expanded, setExpanded] = useState(false);
+  const svgRef = useRef(null);
 
   if (isGhost) {
     return (
@@ -205,7 +288,7 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick }) {
   }
 
   return (
-    <motion.div className="flex items-center gap-2 px-2 py-1.5 rounded-lg mb-1 group"
+    <motion.div className="rounded-lg mb-1 group"
       style={{
         background: track.muted ? 'rgba(248,250,252,0.01)' : `${meta.color}05`,
         border: `1px solid ${track.muted ? 'rgba(248,250,252,0.03)' : `${meta.color}12`}`,
@@ -213,53 +296,94 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick }) {
       layout initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }}
       data-testid={`track-row-${index}`}>
 
-      <GripVertical size={9} className="opacity-0 group-hover:opacity-30 transition-opacity cursor-grab" style={{ color: '#F8FAFC' }} />
+      {/* Main row */}
+      <div className="flex items-center gap-2 px-2 py-1.5">
+        <GripVertical size={9} className="opacity-0 group-hover:opacity-30 transition-opacity cursor-grab" style={{ color: '#F8FAFC' }} />
 
-      <div className="p-1 rounded" style={{ background: `${meta.color}10` }}>
-        <Icon size={10} style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : meta.color }} />
+        <div className="p-1 rounded" style={{ background: `${meta.color}10` }}>
+          <Icon size={10} style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : meta.color }} />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-[9px] font-medium truncate" style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.6)' }}>
+            {track.source_label}
+          </p>
+          {track.frequency && <p className="text-[7px] font-mono" style={{ color: `${meta.color}50` }}>{track.frequency} Hz</p>}
+        </div>
+
+        {/* Waveform vis */}
+        <div className="w-16 h-3 flex items-end gap-[1px] mx-1">
+          {Array.from({ length: 10 }).map((_, bi) => {
+            const h = track.muted ? 2 : Math.random() * 10 + 2;
+            return <motion.div key={bi} className="flex-1 rounded-sm"
+              style={{ background: track.muted ? 'rgba(248,250,252,0.05)' : `${meta.color}30`, height: h }}
+              animate={track.muted ? {} : { height: [h, h * 0.5, h] }}
+              transition={{ duration: 0.8 + bi * 0.1, repeat: Infinity }} />;
+          })}
+        </div>
+
+        {/* Volume */}
+        <div className="w-12 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
+          style={{ background: 'rgba(248,250,252,0.05)' }}
+          onClick={e => {
+            const r = e.currentTarget.getBoundingClientRect();
+            onUpdate(index, { volume: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) });
+          }} data-testid={`track-volume-${index}`}>
+          <div className="absolute inset-y-0 left-0 rounded-full"
+            style={{ width: `${(track.volume || 0.8) * 100}%`, background: track.muted ? 'rgba(248,250,252,0.08)' : meta.color }} />
+        </div>
+
+        <button className="p-0.5 rounded" onClick={() => onUpdate(index, { muted: !track.muted })} data-testid={`track-mute-${index}`}>
+          {track.muted ? <VolumeX size={10} style={{ color: 'rgba(248,250,252,0.25)' }} /> : <Volume2 size={10} style={{ color: meta.color }} />}
+        </button>
+
+        <button className="text-[7px] font-bold px-1 py-0.5 rounded" data-testid={`track-solo-${index}`}
+          style={{ color: track.solo ? '#EAB308' : 'rgba(248,250,252,0.2)', background: track.solo ? 'rgba(234,179,8,0.1)' : 'transparent' }}
+          onClick={() => onUpdate(index, { solo: !track.solo })}>S</button>
+
+        {/* Keyframe expand toggle */}
+        {showKeyframes && (
+          <button className="p-0.5 rounded" onClick={() => setExpanded(!expanded)}
+            data-testid={`track-keyframe-toggle-${index}`}>
+            <ChevronDown size={9} style={{
+              color: expanded ? meta.color : 'rgba(248,250,252,0.2)',
+              transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s',
+            }} />
+          </button>
+        )}
+
+        <button className="p-0.5 rounded opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity"
+          onClick={() => onRemove(index)} data-testid={`track-remove-${index}`}>
+          <Trash2 size={9} style={{ color: '#EF4444' }} />
+        </button>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <p className="text-[9px] font-medium truncate" style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.6)' }}>
-          {track.source_label}
-        </p>
-        {track.frequency && <p className="text-[7px] font-mono" style={{ color: `${meta.color}50` }}>{track.frequency} Hz</p>}
-      </div>
-
-      {/* Waveform visualization bar */}
-      <div className="w-20 h-3 flex items-end gap-[1px] mx-1">
-        {Array.from({ length: 12 }).map((_, bi) => {
-          const h = track.muted ? 2 : Math.random() * 10 + 2;
-          return <motion.div key={bi} className="flex-1 rounded-sm"
-            style={{ background: track.muted ? 'rgba(248,250,252,0.05)' : `${meta.color}30`, height: h }}
-            animate={track.muted ? {} : { height: [h, h * 0.5, h] }}
-            transition={{ duration: 0.8 + bi * 0.1, repeat: Infinity }} />;
-        })}
-      </div>
-
-      {/* Volume bar */}
-      <div className="w-14 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
-        style={{ background: 'rgba(248,250,252,0.05)' }}
-        onClick={e => {
-          const r = e.currentTarget.getBoundingClientRect();
-          onUpdate(index, { volume: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) });
-        }} data-testid={`track-volume-${index}`}>
-        <div className="absolute inset-y-0 left-0 rounded-full"
-          style={{ width: `${(track.volume || 0.8) * 100}%`, background: track.muted ? 'rgba(248,250,252,0.08)' : meta.color }} />
-      </div>
-
-      <button className="p-0.5 rounded" onClick={() => onUpdate(index, { muted: !track.muted })} data-testid={`track-mute-${index}`}>
-        {track.muted ? <VolumeX size={10} style={{ color: 'rgba(248,250,252,0.25)' }} /> : <Volume2 size={10} style={{ color: meta.color }} />}
-      </button>
-
-      <button className="text-[7px] font-bold px-1 py-0.5 rounded" data-testid={`track-solo-${index}`}
-        style={{ color: track.solo ? '#EAB308' : 'rgba(248,250,252,0.2)', background: track.solo ? 'rgba(234,179,8,0.1)' : 'transparent' }}
-        onClick={() => onUpdate(index, { solo: !track.solo })}>S</button>
-
-      <button className="p-0.5 rounded opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity"
-        onClick={() => onRemove(index)} data-testid={`track-remove-${index}`}>
-        <Trash2 size={9} style={{ color: '#EF4444' }} />
-      </button>
+      {/* Keyframe automation lanes (Volume + Frequency) */}
+      <AnimatePresence>
+        {expanded && showKeyframes && (
+          <motion.div className="px-3 pb-2 space-y-1"
+            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+            <KeyframeLane
+              keyframes={track.keyframes_volume}
+              onChange={(kf) => onUpdate(index, { keyframes_volume: kf })}
+              color={meta.color}
+              label="Volume"
+              maxValue={1}
+              minValue={0}
+            />
+            {track.frequency && (
+              <KeyframeLane
+                keyframes={track.keyframes_frequency}
+                onChange={(kf) => onUpdate(index, { keyframes_frequency: kf })}
+                color="#EAB308"
+                label="Frequency"
+                maxValue={Math.max(1200, (track.frequency || 528) * 2)}
+                minValue={0}
+              />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -407,6 +531,65 @@ function BonusPackCard({ pack, onPurchase, purchasing }) {
   );
 }
 
+/* ━━━ Hexagram Recommendation Card ━━━ */
+function RecommendationCard({ rec, onPurchase, purchasing }) {
+  const isStagnation = rec.type === 'stagnation';
+  const isActive = rec.tone === 'active';
+  const borderColor = isStagnation ? '#EF4444' : rec.pack_color || '#C084FC';
+
+  return (
+    <motion.div className="rounded-xl p-3 mb-2 relative overflow-hidden"
+      style={{
+        background: isStagnation ? 'rgba(239,68,68,0.04)' : `${rec.pack_color}04`,
+        border: `1px solid ${isStagnation ? 'rgba(239,68,68,0.15)' : `${rec.pack_color}15`}`,
+      }}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      data-testid={`rec-card-${rec.type}`}>
+
+      <div className="flex items-start gap-2">
+        <div className="p-1.5 rounded-lg" style={{ background: `${borderColor}12` }}>
+          {isStagnation ? <AlertTriangle size={12} style={{ color: '#EF4444' }} />
+            : <Compass size={12} style={{ color: borderColor }} />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <p className="text-[7px] uppercase tracking-wider font-medium"
+              style={{ color: isStagnation ? '#EF4444' : `${borderColor}80` }}>
+              {rec.trigram}
+            </p>
+            <span className="text-[6px] px-1 py-0.5 rounded-full"
+              style={{ background: isActive ? `${borderColor}15` : 'rgba(248,250,252,0.03)',
+                       color: isActive ? borderColor : 'rgba(248,250,252,0.3)' }}>
+              {isActive ? 'RECOMMENDED' : 'IN YOUR KIT'}
+            </span>
+          </div>
+          <p className="text-[10px] font-medium mt-0.5" style={{ color: '#F8FAFC' }}>{rec.pack_name}</p>
+          <p className="text-[7px] mt-0.5" style={{ color: isActive ? 'rgba(248,250,252,0.4)' : 'rgba(248,250,252,0.25)' }}>
+            {rec.message}
+          </p>
+          {rec.bonus_wrap && (
+            <span className="text-[6px] font-mono mt-1 inline-block" style={{ color: '#22C55E' }}>
+              {rec.bonus_wrap.label}
+            </span>
+          )}
+        </div>
+        {isActive && !rec.owned && (
+          <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer flex-shrink-0"
+            style={{ background: `${borderColor}12`, border: `1px solid ${borderColor}20` }}
+            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+            onClick={() => onPurchase(rec.pack_id)}
+            disabled={purchasing}
+            data-testid={`rec-buy-${rec.pack_id}`}>
+            {purchasing ? <Loader2 size={9} className="animate-spin" style={{ color: borderColor }} />
+              : <ShoppingCart size={9} style={{ color: borderColor }} />}
+            <span className="text-[7px] font-mono" style={{ color: borderColor }}>{rec.price_credits}c</span>
+          </motion.button>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 /* ━━━ DIVINE DIRECTOR — Main Component ━━━ */
 export default function SuanpanMixer() {
   const navigate = useNavigate();
@@ -429,6 +612,8 @@ export default function SuanpanMixer() {
   const [sources, setSources] = useState([]);
   const [bonusPacks, setBonusPacks] = useState([]);
   const [purchasingPack, setPurchasingPack] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [hexagramInfo, setHexagramInfo] = useState(null);
   const [showSpeedBridge, setShowSpeedBridge] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [showAssembly, setShowAssembly] = useState(false);
@@ -442,6 +627,7 @@ export default function SuanpanMixer() {
   const atCap = layerCap > 0 && tracks.length >= layerCap;
   const tierColor = SUB_COLORS[subTier] || '#94A3B8';
   const matDelay = tierConfig?.materialization_delay || 20;
+  const keyframesEnabled = tierConfig?.keyframe_automation || false;
 
   const ghostTracks = sources.filter(s => s.locked).slice(0, 3).map(s => ({
     type: s.type, source_label: s.label, volume: 0.5, locked: true, frequency: s.frequency,
@@ -452,11 +638,12 @@ export default function SuanpanMixer() {
     if (authLoading) return;
     const load = async () => {
       try {
-        const [subRes, srcRes, projRes, packRes] = await Promise.all([
+        const [subRes, srcRes, projRes, packRes, recRes] = await Promise.all([
           axios.get(`${API}/mixer/subscription`, { headers: authHeaders }),
           axios.get(`${API}/mixer/sources`, { headers: authHeaders }),
           axios.get(`${API}/mixer/projects`, { headers: authHeaders }),
           axios.get(`${API}/mixer/bonus-packs`, { headers: authHeaders }),
+          axios.get(`${API}/mixer/recommendations`, { headers: authHeaders }),
         ]);
         setSubTier(subRes.data.tier);
         setTierConfig(subRes.data.tier_config);
@@ -465,6 +652,8 @@ export default function SuanpanMixer() {
         setSources(srcRes.data.sources || []);
         setProjects(projRes.data.projects || []);
         setBonusPacks(packRes.data.packs || []);
+        setRecommendations(recRes.data.recommendations || []);
+        setHexagramInfo(recRes.data.hexagram || null);
       } catch {} finally { setLoading(false); }
     };
     load();
@@ -472,11 +661,12 @@ export default function SuanpanMixer() {
 
   const reloadAll = useCallback(async () => {
     try {
-      const [subRes, srcRes, projRes, packRes] = await Promise.all([
+      const [subRes, srcRes, projRes, packRes, recRes] = await Promise.all([
         axios.get(`${API}/mixer/subscription`, { headers: authHeaders }),
         axios.get(`${API}/mixer/sources`, { headers: authHeaders }),
         axios.get(`${API}/mixer/projects`, { headers: authHeaders }),
         axios.get(`${API}/mixer/bonus-packs`, { headers: authHeaders }),
+        axios.get(`${API}/mixer/recommendations`, { headers: authHeaders }),
       ]);
       setSubTier(subRes.data.tier);
       setTierConfig(subRes.data.tier_config);
@@ -485,6 +675,8 @@ export default function SuanpanMixer() {
       setSources(srcRes.data.sources || []);
       setProjects(projRes.data.projects || []);
       setBonusPacks(packRes.data.packs || []);
+      setRecommendations(recRes.data.recommendations || []);
+      setHexagramInfo(recRes.data.hexagram || null);
     } catch {}
   }, [authHeaders]);
 
@@ -807,6 +999,35 @@ export default function SuanpanMixer() {
                       onPurchase={purchasePack}
                       purchasing={purchasingPack === p.id} />
                   ))}
+
+                  {/* Hexagram-Based Recommendations */}
+                  {recommendations.length > 0 && (
+                    <div className="mt-3 pt-3 border-t" style={{ borderColor: 'rgba(248,250,252,0.04)' }}>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <Compass size={9} style={{ color: hexagramInfo ? '#C084FC' : 'rgba(248,250,252,0.2)' }} />
+                        <p className="text-[7px] tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                          Hexagram Recommendations
+                        </p>
+                        {hexagramInfo && (
+                          <span className="text-[6px] px-1 py-0.5 rounded-full font-mono"
+                            style={{ background: 'rgba(192,132,252,0.08)', color: '#C084FC' }}>
+                            #{hexagramInfo.number} {hexagramInfo.chinese}
+                          </span>
+                        )}
+                      </div>
+                      {hexagramInfo && (
+                        <p className="text-[7px] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                          Lower: {hexagramInfo.lower_trigram?.name} ({hexagramInfo.lower_trigram?.quality}) &middot;
+                          Upper: {hexagramInfo.upper_trigram?.name} ({hexagramInfo.upper_trigram?.quality})
+                        </p>
+                      )}
+                      {recommendations.map((rec, i) => (
+                        <RecommendationCard key={`rec-${i}`} rec={rec}
+                          onPurchase={purchasePack}
+                          purchasing={purchasingPack === rec.pack_id} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -817,7 +1038,8 @@ export default function SuanpanMixer() {
             <AnimatePresence>
               {tracks.map((t, i) => (
                 <TrackRow key={`t-${i}-${t.source_label}`} track={t} index={i}
-                  onUpdate={updateTrack} onRemove={removeTrack} isGhost={false} />
+                  onUpdate={updateTrack} onRemove={removeTrack} isGhost={false}
+                  showKeyframes={keyframesEnabled} />
               ))}
             </AnimatePresence>
 

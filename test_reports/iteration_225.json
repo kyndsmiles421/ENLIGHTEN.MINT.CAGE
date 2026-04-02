@@ -1,0 +1,122 @@
+{
+  "summary": "Iteration 225 - Hexagram-Based Pack Recommendations & Keyframe Automation Testing. Backend: 21/21 tests passed (100%). Frontend: Core UI elements working but auth timing issue persists from iteration 224 - page shows Discovery tier instead of Ultra Player when navigating directly to /suanpan.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Auth context timing on /suanpan page",
+        "issue": "Page loads with Discovery tier (0/3 layers) instead of user's actual tier (Ultra Player, 0/20 layers). API calls made before auth context fully initialized return default/unauthenticated data.",
+        "affected_selectors": ["tier badge", "layer count", "[data-testid^='source-']", "[data-testid^='bonus-pack-']", "[data-testid^='rec-card-']"],
+        "priority": "HIGH"
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration225_hexagram_recommendations_keyframes.py",
+    "/app/test_reports/pytest/pytest_iteration225_hexagram_keyframes.xml"
+  ],
+  "action_items": [
+    "Fix auth context timing issue in SuanpanMixer.js - add 'loading' from useAuth() to useEffect dependency and wait for loading=false before making API calls",
+    "The fix was identified in iteration 224 but not applied: destructure 'loading' from useAuth() and add condition 'if (authLoading) return;' at start of load function"
+  ],
+  "critical_code_review_comments": [
+    "mixer_director.py: Hexagram recommendations engine correctly implemented (lines 563+)",
+    "mixer_director.py: Lower trigram (bits 0-2) maps to soul/vocal packs, upper trigram (bits 3-5) maps to environment/visual packs",
+    "mixer_director.py: Stagnation hexagrams (12,23,29,36,39,47) with high avg freq trigger grounding recommendation",
+    "mixer_director.py: tone='soft' for owned packs, tone='active' for unowned packs - working correctly",
+    "mixer_director.py: Keyframe automation (keyframes_volume, keyframes_frequency) saved and retrieved correctly",
+    "SuanpanMixer.js: KeyframeLane component with SVG curve drawing and Golden Ratio snap lines implemented",
+    "SuanpanMixer.js: showKeyframes prop correctly gated to tierConfig.keyframe_automation (Ultra Player+)",
+    "SuanpanMixer.js: RecommendationCard component with active/soft tone styling implemented",
+    "SuanpanMixer.js: AUTH TIMING BUG - useEffect has [authHeaders, authLoading] dependency but authLoading check is at wrong position"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration225_hexagram_recommendations_keyframes.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "70%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password (tier: ultra_player, owns pack-vedic-vocals)",
+  "seed_data_creation": "Created TEST_Keyframe_Project_225 and other test projects with keyframe data",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 225 verified: (1) GET /api/mixer/recommendations returns hexagram info (number, name, chinese, trigrams), is_stagnation, avg_frequency, solfeggio_resonance, and recommendation cards with type/trigram/pack_id/tone/message. (2) Soul recommendations use lower trigram, environment recommendations use upper trigram. (3) Owned packs have tone='soft', unowned have tone='active'. (4) POST /api/mixer/projects supports keyframes_volume and keyframes_frequency arrays. (5) GET /api/mixer/projects/{id} returns tracks with keyframe data preserved. (6) Frontend Divine Director page loads at /suanpan with tier badge and transport controls. (7) Speed Bridge modal shows 4 tiers (Discovery/Player/Ultra Player/Sovereign) with upgrade buttons. (8) Suanpan panel works with bead interface and Add as Track button. (9) Track rows show waveform visualization, volume, mute, solo, remove controls. (10) Keyframe toggle correctly hidden for Discovery tier (should show for Ultra Player+). (11) AUTH TIMING BUG: Sources, Packs, and Recommendations panels show 0 items due to 401 auth errors - authHeaders empty when API calls made. (12) Test user is on ultra_player tier with pack-vedic-vocals owned.",
+  "features_verified": {
+    "hexagram_recommendations_api": {
+      "status": "PASS",
+      "details": "GET /api/mixer/recommendations returns hexagram info, trigrams, stagnation status, avg frequency, solfeggio resonance, and recommendation cards"
+    },
+    "soul_recommendation_lower_trigram": {
+      "status": "PASS",
+      "details": "Soul recommendations correctly based on lower trigram (bits 0-2), maps to vocal/mantra packs"
+    },
+    "environment_recommendation_upper_trigram": {
+      "status": "PASS",
+      "details": "Environment recommendations correctly based on upper trigram (bits 3-5), maps to visual/ambience packs"
+    },
+    "tone_soft_for_owned": {
+      "status": "PASS",
+      "details": "Owned packs have tone='soft' with 'already in your kit' message"
+    },
+    "tone_active_for_unowned": {
+      "status": "PASS",
+      "details": "Unowned packs have tone='active' with purchase recommendation"
+    },
+    "keyframe_volume_save": {
+      "status": "PASS",
+      "details": "POST /api/mixer/projects saves keyframes_volume array correctly"
+    },
+    "keyframe_frequency_save": {
+      "status": "PASS",
+      "details": "POST /api/mixer/projects saves keyframes_frequency array correctly"
+    },
+    "keyframe_retrieval": {
+      "status": "PASS",
+      "details": "GET /api/mixer/projects/{id} returns tracks with keyframe data preserved"
+    },
+    "divine_director_page": {
+      "status": "PASS",
+      "details": "Page loads at /suanpan with Divine Director title"
+    },
+    "tier_badge": {
+      "status": "PARTIAL",
+      "details": "Badge shows but displays Discovery instead of user's actual tier due to auth timing"
+    },
+    "transport_controls": {
+      "status": "PASS",
+      "details": "Play button and layer count visible"
+    },
+    "speed_bridge_modal": {
+      "status": "PASS",
+      "details": "Shows 4 tier cards (Discovery/Player/Ultra Player/Sovereign) with correct pricing and upgrade buttons"
+    },
+    "suanpan_panel": {
+      "status": "PASS",
+      "details": "Bead interface works, Add as Track button adds track correctly"
+    },
+    "track_row_controls": {
+      "status": "PASS",
+      "details": "Volume, mute, solo, remove controls all present and functional"
+    },
+    "keyframe_toggle_gating": {
+      "status": "PASS",
+      "details": "Keyframe toggle correctly hidden for Discovery tier (should show for Ultra Player+)"
+    },
+    "sources_panel": {
+      "status": "FAIL",
+      "details": "Panel opens but shows 0 sources due to 401 auth error"
+    },
+    "packs_panel": {
+      "status": "FAIL",
+      "details": "Panel opens but shows 0 packs due to 401 auth error"
+    },
+    "hexagram_recommendations_ui": {
+      "status": "FAIL",
+      "details": "Section not visible due to 401 auth error on recommendations API"
+    }
+  },
+  "rca_of_the_issue": "The SuanpanMixer.js component makes API calls in useEffect with [authHeaders, authLoading] dependency. However, the check 'if (authLoading) return;' is present but the authHeaders object is still empty when the component first renders. The issue is that authLoading becomes false before authHeaders is populated from localStorage. The fix should be to check if authHeaders has the Authorization header before making API calls, or to add a small delay after authLoading becomes false."
+}
