@@ -216,6 +216,7 @@ export default function CosmicMap() {
   const [harvestResult, setHarvestResult] = useState(null);
   const [decayStatus, setDecayStatus] = useState(null);
   const [harvestHistory, setHarvestHistory] = useState(null);
+  const [ripple, setRipple] = useState(null); // {lat, lng, color} for harvest ripple
   const [geoError, setGeoError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [layer, setLayer] = useState('ground'); // ground | celestial
@@ -238,6 +239,7 @@ export default function CosmicMap() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [covenTab, setCovenTab] = useState('coven'); // 'coven' | 'rankings' | 'avatar'
+  const [layerTransition, setLayerTransition] = useState(null); // 'diving' | 'ascending' | null
 
   // Geolocation
   useEffect(() => {
@@ -434,6 +436,12 @@ export default function CosmicMap() {
         }, { headers: authHeaders });
       }
       setHarvestResult(res.data);
+      if (res.data.success !== false) {
+        setRipple({ lat: node.lat, lng: node.lng, color: node.color || '#FBBF24' });
+        setTimeout(() => setRipple(null), 2000);
+        // Haptic feedback if available
+        if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+      }
       fetchGroundData();
     } catch (e) {
       setHarvestResult({ success: false, message: e.response?.data?.detail || 'Harvest failed' });
@@ -451,6 +459,11 @@ export default function CosmicMap() {
         node_id: node.id, alignment_accuracy: accuracy,
       }, { headers: authHeaders });
       setHarvestResult(res.data);
+      if (res.data.success !== false) {
+        setRipple({ lat: 0, lng: 0, color: '#A78BFA' });
+        setTimeout(() => setRipple(null), 2000);
+        if (navigator.vibrate) navigator.vibrate([30, 20, 60, 20, 100]);
+      }
       fetchCelestialData();
     } catch (e) {
       setHarvestResult({ success: false, message: e.response?.data?.detail || 'Alignment failed' });
@@ -481,6 +494,51 @@ export default function CosmicMap() {
 
   return (
     <div className="min-h-screen relative" data-testid="cosmic-map-page">
+      {/* ━━━ Cinematic Layer Transition Overlay ━━━ */}
+      <AnimatePresence>
+        {layerTransition && (
+          <motion.div
+            key="layer-transition"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[2000] pointer-events-none flex items-center justify-center"
+            style={{ background: layerTransition === 'diving' ? 'rgba(5,5,16,0.95)' : 'rgba(15,15,25,0.9)' }}>
+            {/* Expanding rings */}
+            {[0, 1, 2, 3].map(i => (
+              <motion.div
+                key={i}
+                initial={{ scale: 0, opacity: 0.6 }}
+                animate={{ scale: 4, opacity: 0 }}
+                transition={{ duration: 1.2, delay: i * 0.15, ease: 'easeOut' }}
+                className="absolute rounded-full"
+                style={{
+                  width: 80, height: 80,
+                  border: `1px solid ${layerTransition === 'diving' ? 'rgba(139,92,246,0.3)' : 'rgba(251,191,36,0.3)'}`,
+                }} />
+            ))}
+            {/* Center label */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.5, opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="text-center z-10">
+              <p className="text-[11px] uppercase tracking-[0.3em] font-medium"
+                style={{ color: layerTransition === 'diving' ? '#A78BFA' : '#FBBF24' }}>
+                {layerTransition === 'diving' ? 'Ascending to Celestial Realm' : 'Returning to Physical Layer'}
+              </p>
+              <motion.div
+                animate={{ width: ['0%', '100%'] }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="h-px mx-auto mt-2"
+                style={{ background: `linear-gradient(90deg, transparent, ${layerTransition === 'diving' ? '#A78BFA' : '#FBBF24'}, transparent)` }} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Map / Chart area */}
       <div className="absolute inset-0 pt-14">
         {layer === 'ground' ? (
@@ -515,6 +573,26 @@ export default function CosmicMap() {
                 <Popup><span style={{ color: m.avatar?.color || MEMBER_COLORS[idx % MEMBER_COLORS.length], fontSize: '11px' }}>{m.name}</span></Popup>
               </Marker>
             ))}
+
+            {/* Harvest Ripple Effect */}
+            {ripple && layer === 'ground' && (
+              <>
+                {[0, 1, 2, 3].map(i => (
+                  <Circle key={`ripple-${i}`}
+                    center={[ripple.lat, ripple.lng]}
+                    radius={50 + i * 80}
+                    pathOptions={{
+                      color: ripple.color,
+                      fillColor: ripple.color,
+                      fillOpacity: Math.max(0, 0.15 - i * 0.04),
+                      weight: 1,
+                      opacity: Math.max(0, 0.4 - i * 0.1),
+                      dashArray: '4 6',
+                    }}
+                  />
+                ))}
+              </>
+            )}
           </MapContainer>
         ) : (
           <div className="w-full h-full">
@@ -561,7 +639,17 @@ export default function CosmicMap() {
           data-testid="map-hud">
           <div className="flex items-center gap-3">
             {/* Layer toggle */}
-            <button onClick={() => { setLayer(l => l === 'ground' ? 'celestial' : 'ground'); setSelectedNode(null); setHarvestResult(null); }}
+            <button onClick={() => {
+              const nextLayer = layer === 'ground' ? 'celestial' : 'ground';
+              const dir = nextLayer === 'celestial' ? 'diving' : 'ascending';
+              setLayerTransition(dir);
+              setTimeout(() => {
+                setLayer(nextLayer);
+                setSelectedNode(null);
+                setHarvestResult(null);
+              }, 600);
+              setTimeout(() => setLayerTransition(null), 1200);
+            }}
               className="flex items-center gap-1 px-2 py-1 rounded-md text-[7px] uppercase tracking-widest transition-all"
               style={{
                 background: layer === 'celestial' ? 'rgba(139,92,246,0.12)' : 'rgba(245,158,11,0.08)',

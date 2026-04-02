@@ -23,6 +23,7 @@ import { MixerProvider } from './context/MixerContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
+import PersistentWaveform from './components/PersistentWaveform';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
@@ -351,6 +352,7 @@ function App() {
             <CosmicMixer />
             <CosmicToolbar />
             <CosmicAssistant />
+            <PersistentWaveform />
             <TrialGraduation />
             <InstallPrompt />
             <CreditNudge />
