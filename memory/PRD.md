@@ -10,7 +10,41 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Quantum Mechanics & Planetary Stratigraphy (Feb 2026) — LATEST
+### Science/History Avenues & Circular Economy (Apr 2, 2026) — LATEST
+
+**Avenue of Science (The Alchemist):**
+- Botanical Lab: 5 chemistry simulations with slider-based variable tuning
+  - Aquafaba Air Matrix, Monk Fruit Pectin Gelation, Coconut-Hemp Emulsion, Kona Extraction, Lychee Crumb
+  - Each sim scores proximity to optimal values (0-100%), mastery at 70%+
+  - Science notes explain real chemistry behind each simulation
+- Geology Modules: 3 Q&A modules (Earth Layers, Mohs Hardness, Rock Cycle)
+- E-Bike Engineering: 2 dual-motor torque/range simulations
+  - Torque vs Range: front/rear motor split, terrain, rider contribution
+  - Battery Physics: Wh, wattage, speed → estimated range calculation
+  - Real-time range display updates as sliders move (P = τ·ω)
+- Heart Rate Sync Challenge: match BPM to planetary depth frequency
+
+**Avenue of History (The Chronicler):**
+- 4 History modules: Ancient Star Charts, Sacred Sites & Ley Lines, Evolution of Transport, History of Alchemy
+- Question-by-question progression with hints and resonance rewards
+- Civilization and era context for each module
+
+**Circular Economy Marketplace:**
+- 8 shop items across 3 categories: E-Bike Parts, Yoga Equipment, UI Skins
+- Dual currency: Kinetic Dust (from Biometrics) and Science Resonance
+- Rarity system: Common → Uncommon → Rare → Legendary
+- Purchase tracking in economy_purchases collection
+- Balance display and category filtering
+
+**Frontend Components:**
+- `/components/avenues/BotanicalLabPanel.js` — Slider-based lab simulations
+- `/components/avenues/EBikePanel.js` — Torque/range simulator with live output
+- `/components/avenues/HistoryPanel.js` — History + Geology Q&A with progress dots
+- `/components/avenues/CircularEconomyPanel.js` — Shop with purchase flow
+
+**Tests**: Iteration 186 — 100% Backend (15/15) / 100% Frontend
+
+### Quantum Mechanics & Planetary Stratigraphy (Feb 2026)
 
 **Fractal Sub-Layer Engine (L² Computing Model):**
 - 54 total sub-layers: Crust(2²=4) + Mantle(3²=9) + Core(4²=16) + Hollow(5²=25)
@@ -19,7 +53,7 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Navigation costs dust on first visit, grants XP
 - Syncs with planetary depth system
 
-**Four Mastery Avenues (The Four-Pillared Trinity):**
+**Six Mastery Avenues (The Six-Pillared Trinity):**
 - Mathematics (The Architect): 19 Sacred Geometry challenges (phi, Fibonacci, Metatron, Euler + algebra, trig, calculus, number theory)
   - Categories: sacred_geometry, algebra, trigonometry, calculus, number_theory
   - Achievement: Mathematical Equilibrium → predict Shadow collapse points
@@ -32,6 +66,10 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
   - Heart Rate bonus: 1.5x dust when BPM within target range
   - Frequency affinity: low-intensity→surface layers, high-intensity→deep layers
   - Achievement: Biological Equilibrium → body as instrument
+- Science (The Alchemist): Botanical Lab (5 sims), Geology (3 modules), E-Bike Engineering (2 sims)
+  - Achievement: Alchemical Mastery → transform knowledge into creation
+- History (The Chronicler): 4 history modules, ancient civilizations, transport evolution
+  - Achievement: Temporal Mastery → past and present converge
 - Resonance tiers: Initiate→Apprentice→Adept→Master→Grandmaster (0-1000)
 - Combined tiers: Seeker→Wayfinder→Resonant→Harmonic→Transcendent
 
