@@ -21,18 +21,25 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Deployed Spots list with LIVE/OFFLINE status badges
 - Navigate-to-spot button for quick map centering
 
+**Optional Live GPS Tracking (Food Truck):**
+- Per-spot Track/Stop toggle button in admin dashboard
+- When ON: uses `navigator.geolocation.watchPosition` + 10s interval pings to `PUT /update-location`
+- Pulsing "GPS Tracking Active" indicator with last-updated timestamp
+- "GPS" badge on spot card header when tracking is active
+- Backend rejects location updates when tracking is disabled (guard rail)
+- Admin includes_all=true query param shows inactive spots too
+
 **Celestial Dimensional Toggle (in CosmicMap):**
 - Ground/Celestial layer toggle button in HUD
 - Celestial layer replaces Leaflet map with canvas-based Star Chart
 - 6 constellation nodes: Orion's Gate (741Hz), Sirius Nexus (852Hz), Pleiades Beacon (963Hz), Vega Alignment (741Hz), Polaris Lock (852Hz), Antares Bridge (963Hz)
 - Click-to-select nodes on star chart, alignment action (60%+ accuracy required)
 - Quadratic decay visualization (0.9^t² formula) with pulsing warning
-- Separate HUD stats for celestial mode (aligned/total count)
 
 **Backend Fix:** Resolved SyntaxError where `harvest_power_spot` function was split by `go-live` and `broadcasts` route definitions.
 
-**Routes:** `/admin/power-spot` (frontend), full Power Spots CRUD + Go-Live + Broadcasts backend
-**Tests:** Iteration 189 — 100% Backend (20/20) / 100% Frontend
+**Routes:** `/admin/power-spot` (frontend), Power Spots CRUD + Go-Live + Live Tracking + Broadcasts backend
+**Tests:** Iterations 189-190 — 100% Backend / 100% Frontend
 
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
