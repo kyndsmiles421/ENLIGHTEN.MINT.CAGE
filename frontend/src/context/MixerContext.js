@@ -186,12 +186,31 @@ export function MixerProvider({ children }) {
       oscL.start(); oscR.start(); sub.start();
       nodes = [oscL, oscR, sub, merger];
     } else {
+      // ━━━ Orchestral Synthesis — Rich layered harmonics ━━━
       const o = ctx.createOscillator(); o.type = waveform; o.frequency.value = freq.hz;
-      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
-      const lg = ctx.createGain(); lg.gain.value = 0.04;
-      lfo.connect(lg); lg.connect(channelGain.gain); o.connect(channelGain);
-      o.start(); lfo.start();
-      nodes = [o, lfo];
+      // Warm overtones (octave + fifth)
+      const h2 = ctx.createOscillator(); h2.type = 'sine'; h2.frequency.value = freq.hz * 2;
+      const h2g = ctx.createGain(); h2g.gain.value = 0.04; h2.connect(h2g); h2g.connect(channelGain);
+      const h3 = ctx.createOscillator(); h3.type = 'sine'; h3.frequency.value = freq.hz * 3;
+      const h3g = ctx.createGain(); h3g.gain.value = 0.015; h3.connect(h3g); h3g.connect(channelGain);
+      // Subtle detuned unison for warmth
+      const det = ctx.createOscillator(); det.type = waveform; det.frequency.value = freq.hz * 1.002;
+      const detG = ctx.createGain(); detG.gain.value = 0.06; det.connect(detG); detG.connect(channelGain);
+      // Gentle vibrato
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 4.5;
+      const lg = ctx.createGain(); lg.gain.value = freq.hz * 0.003;
+      lfo.connect(lg); lg.connect(o.frequency);
+      // Reverb via convolver-like delay feedback
+      const delay = ctx.createDelay(0.5); delay.delayTime.value = 0.12;
+      const fb = ctx.createGain(); fb.gain.value = 0.15;
+      const dryG = ctx.createGain(); dryG.gain.value = 0.9;
+      o.connect(dryG); dryG.connect(channelGain);
+      o.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(channelGain);
+      // ADSR envelope - gentle attack
+      channelGain.gain.setValueAtTime(0, ctx.currentTime);
+      channelGain.gain.linearRampToValueAtTime(vol * 0.15, ctx.currentTime + 0.8);
+      o.start(); h2.start(); h3.start(); det.start(); lfo.start();
+      nodes = [o, h2, h3, det, lfo, delay];
     }
     freqNodesMapRef.current[freq.hz] = nodes;
     if (!channelVols[`freq-${freq.hz}`]) setChannelVols(v => ({...v, [`freq-${freq.hz}`]: 75}));

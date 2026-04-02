@@ -17,6 +17,7 @@ import SearchCommand from './SearchCommand';
 import ShareButton from './ShareButton';
 import { SplitScreenLauncher } from './SplitScreen';
 import NotificationSettings from './NotificationSettings';
+import { useResolution } from '../context/ResolutionContext';
 import { setAmbientEnabled, getAmbientEnabled } from '../hooks/useAmbientSoundscape';
 import { ImmersionToggle } from './ImmersionToggle';
 import { useCreditsContext } from '../context/CreditContext';
@@ -672,6 +673,41 @@ export default function Navigation() {
                           </Link>
                         );
                       })}
+                      <div className="my-1 mx-3 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)' }} />
+
+                      {/* Resolution Nodule */}
+                      {(() => {
+                        try {
+                          const { level, cycleResolution, config } = useResolution();
+                          const levelColors = { low: '#60A5FA', medium: '#FBBF24', high: '#A78BFA' };
+                          const c = levelColors[level];
+                          return (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); cycleResolution(); }}
+                              className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all ${isLight ? 'hover:bg-black/[0.03]' : 'hover:bg-white/[0.04]'}`}
+                              data-testid="resolution-nodule">
+                              <div className="relative w-3.5 h-3.5">
+                                {/* Seed of Life geometry */}
+                                <svg viewBox="0 0 24 24" width={14} height={14}>
+                                  <circle cx="12" cy="12" r="4" fill="none" stroke={c} strokeWidth="1" opacity={level === 'low' ? 0.3 : 0.6} />
+                                  {level !== 'low' && <circle cx="12" cy="8" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />}
+                                  {level === 'high' && (
+                                    <>
+                                      <circle cx="15.5" cy="14" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />
+                                      <circle cx="8.5" cy="14" r="4" fill="none" stroke={c} strokeWidth="0.5" opacity="0.3" />
+                                    </>
+                                  )}
+                                </svg>
+                              </div>
+                              <div className="flex-1 text-left">
+                                <span style={{ color: c }}>{config.label}</span>
+                                <span className="ml-1.5 text-[9px]" style={{ color: 'var(--text-muted)' }}>{config.sublabel}</span>
+                              </div>
+                            </button>
+                          );
+                        } catch { return null; }
+                      })()}
+
                       <div className="my-1 mx-3 border-t" style={{ borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)' }} />
                       <button
                         onClick={() => { logout(); navigate('/'); setProfileOpen(false); playClick(); }}

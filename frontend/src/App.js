@@ -21,6 +21,7 @@ import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { MixerProvider } from './context/MixerContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
+import { ResolutionProvider } from './context/ResolutionContext';
 import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
 import PersistentWaveform from './components/PersistentWaveform';
@@ -324,6 +325,7 @@ function App() {
       <AvatarProvider>
       <TempoProvider>
       <MixerProvider>
+      <ResolutionProvider>
       <SensoryProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
@@ -361,6 +363,7 @@ function App() {
           </VoiceCommandProvider>
         </BrowserRouter>
       </SensoryProvider>
+      </ResolutionProvider>
       </MixerProvider>
       </TempoProvider>
       </AvatarProvider>
