@@ -20,6 +20,7 @@ const DEFAULT_PREFS = {
   ambientVolume: 15,
   fontSize: 'default',
   highContrast: false,
+  sovereignMute: false,  // Global master mute
 };
 
 function loadPrefs() {
@@ -32,10 +33,113 @@ function loadPrefs() {
 export function SensoryProvider({ children }) {
   const [prefs, setPrefs] = useState(loadPrefs);
   const [ambientOn, setAmbientOn] = useState(false);
+  const [audioSources, setAudioSources] = useState([]); // Active audio source registry
   const volume = prefs.ambientVolume / 100;
   const audioCtxRef = useRef(null);
   const gainRef = useRef(null);
   const nodesRef = useRef([]);
+  const externalContextsRef = useRef(new Set()); // Track external AudioContexts
+
+  // ━━━ GLOBAL AUDIO ENGINE: Sovereign Mute ━━━
+  // Broadcast mute state via body attribute for cross-component awareness
+  useEffect(() => {
+    document.body.setAttribute('data-audio-muted', prefs.sovereignMute ? 'true' : 'false');
+  }, [prefs.sovereignMute]);
+
+  // Register an external AudioContext so the master switch can suspend it
+  const registerAudioContext = useCallback((ctx) => {
+    if (ctx && ctx instanceof AudioContext) {
+      externalContextsRef.current.add(ctx);
+      // If already muted, suspend immediately
+      if (prefs.sovereignMute && ctx.state === 'running') {
+        ctx.suspend().catch(() => {});
+      }
+    }
+  }, [prefs.sovereignMute]);
+
+  const unregisterAudioContext = useCallback((ctx) => {
+    externalContextsRef.current.delete(ctx);
+  }, []);
+
+  // Register an audio source for visual breadcrumb tracking
+  const registerAudioSource = useCallback((source) => {
+    setAudioSources(prev => {
+      if (prev.find(s => s.id === source.id)) return prev;
+      return [...prev, source];
+    });
+  }, []);
+
+  const unregisterAudioSource = useCallback((sourceId) => {
+    setAudioSources(prev => prev.filter(s => s.id !== sourceId));
+  }, []);
+
+  // Logarithmic fade + context suspend
+  const sovereignMuteToggle = useCallback(() => {
+    setPrefs(prev => {
+      const newMuted = !prev.sovereignMute;
+      if (newMuted) {
+        // MUTE: Logarithmic fade out over 500ms, then suspend all contexts
+        if (gainRef.current && audioCtxRef.current && audioCtxRef.current.state === 'running') {
+          const ctx = audioCtxRef.current;
+          gainRef.current.gain.cancelScheduledValues(ctx.currentTime);
+          gainRef.current.gain.setValueAtTime(gainRef.current.gain.value, ctx.currentTime);
+          gainRef.current.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+          setTimeout(() => {
+            ctx.suspend().catch(() => {});
+          }, 550);
+        }
+        // Suspend all registered external contexts with fade
+        externalContextsRef.current.forEach(ctx => {
+          if (ctx.state === 'running') {
+            setTimeout(() => ctx.suspend().catch(() => {}), 550);
+          }
+        });
+      } else {
+        // UNMUTE: Resume all contexts, then fade in
+        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume().then(() => {
+            if (gainRef.current) {
+              gainRef.current.gain.cancelScheduledValues(audioCtxRef.current.currentTime);
+              gainRef.current.gain.setValueAtTime(0.0001, audioCtxRef.current.currentTime);
+              gainRef.current.gain.exponentialRampToValueAtTime(volume || 0.15, audioCtxRef.current.currentTime + 0.5);
+            }
+          }).catch(() => {});
+        }
+        externalContextsRef.current.forEach(ctx => {
+          if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+        });
+      }
+      return { ...prev, sovereignMute: newMuted };
+    });
+  }, [volume]);
+
+  // Hard kill — long-press action: stop ALL oscillators, clear ALL sources
+  const sovereignKillAll = useCallback(() => {
+    // Stop internal ambient
+    nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
+    nodesRef.current = [];
+    setAmbientOn(false);
+
+    // Suspend internal context
+    if (audioCtxRef.current && audioCtxRef.current.state === 'running') {
+      if (gainRef.current) gainRef.current.gain.value = 0;
+      audioCtxRef.current.suspend().catch(() => {});
+    }
+
+    // Suspend all external contexts
+    externalContextsRef.current.forEach(ctx => {
+      if (ctx.state === 'running') ctx.suspend().catch(() => {});
+    });
+
+    // Clear audio source registry
+    setAudioSources([]);
+
+    // Set sovereign mute
+    setPrefs(prev => ({ ...prev, sovereignMute: true }));
+  }, []);
+
+  // Check sovereign mute before any sound action
+  const isMuted = prefs.sovereignMute;
 
   // Persist prefs
   useEffect(() => {
@@ -104,6 +208,7 @@ export function SensoryProvider({ children }) {
   }, []);
 
   const getAudioCtx = useCallback(() => {
+    if (prefs.sovereignMute) return null; // Block if muted
     if (!audioCtxRef.current) {
       const AC = window.AudioContext || window.webkitAudioContext;
       audioCtxRef.current = new AC();
@@ -115,10 +220,12 @@ export function SensoryProvider({ children }) {
       audioCtxRef.current.resume();
     }
     return audioCtxRef.current;
-  }, []);
+  }, [prefs.sovereignMute]);
 
   const startAmbient = useCallback(() => {
+    if (prefs.sovereignMute) return; // Block if muted
     const ctx = getAudioCtx();
+    if (!ctx) return;
     // Stop any existing
     nodesRef.current.forEach(n => { try { n.stop(); } catch(e) {} try { n.disconnect(); } catch(e) {} });
     nodesRef.current = [];
@@ -190,7 +297,7 @@ export function SensoryProvider({ children }) {
   }, []);
 
   const playClick = useCallback(() => {
-    if (!prefs.soundEffects) return;
+    if (!prefs.soundEffects || prefs.sovereignMute) return;
     try {
       const ctx = getAudioCtx();
       const osc = ctx.createOscillator();
@@ -207,7 +314,7 @@ export function SensoryProvider({ children }) {
   }, [getAudioCtx]);
 
   const playChime = useCallback(() => {
-    if (!prefs.soundEffects) return;
+    if (!prefs.soundEffects || prefs.sovereignMute) return;
     try {
       const ctx = getAudioCtx();
       const freqs = [523.25, 659.25, 783.99];
@@ -229,7 +336,7 @@ export function SensoryProvider({ children }) {
   }, [getAudioCtx]);
 
   const playCelebration = useCallback(() => {
-    if (!prefs.soundEffects) return;
+    if (!prefs.soundEffects || prefs.sovereignMute) return;
     try {
       const ctx = getAudioCtx();
       // Rising arpeggio chime
@@ -300,6 +407,10 @@ export function SensoryProvider({ children }) {
       prefs, updatePref, themes: THEMES,
       immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
       showVisionMode, showFractals, animationSpeed,
+      // Global Audio Engine
+      isMuted, sovereignMuteToggle, sovereignKillAll,
+      audioSources, registerAudioSource, unregisterAudioSource,
+      registerAudioContext, unregisterAudioContext,
     }}>
       {children}
     </SensoryContext.Provider>

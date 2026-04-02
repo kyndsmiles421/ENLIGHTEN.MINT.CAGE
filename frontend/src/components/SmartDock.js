@@ -5,6 +5,7 @@ import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, G
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
+import { useSensory } from '../context/SensoryContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -45,8 +46,10 @@ export default function SmartDock() {
   const { token, authHeaders } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isMuted, sovereignMuteToggle, sovereignKillAll, audioSources } = useSensory();
   const [activePanel, setActivePanel] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const longPressRef = useRef(null);
   const [minimized, setMinimized] = useState(() => {
     try { return localStorage.getItem(DOCK_MIN_KEY) === 'true'; } catch { return false; }
   });
@@ -354,6 +357,44 @@ export default function SmartDock() {
           );
         })}
 
+        {/* ── Zen Toggle — Global Audio Master Switch ── */}
+        <DockBtn
+          testId="dock-zen-toggle"
+          onClick={(e) => { e.stopPropagation(); sovereignMuteToggle(); haptic('Medium'); }}
+          onPointerDown={(e) => {
+            // Long-press (1s) = Kill All
+            longPressRef.current = setTimeout(() => {
+              sovereignKillAll();
+              haptic('Heavy');
+              longPressRef.current = null;
+            }, 1000);
+          }}
+          onPointerUp={() => {
+            if (longPressRef.current) {
+              clearTimeout(longPressRef.current);
+              longPressRef.current = null;
+            }
+          }}
+          onPointerLeave={() => {
+            if (longPressRef.current) {
+              clearTimeout(longPressRef.current);
+              longPressRef.current = null;
+            }
+          }}
+          active={isMuted}
+          color={isMuted ? '#EF4444' : '#22C55E'}
+          expanded={expanded}
+          label={isMuted ? 'Unmute (long-press: kill all)' : 'Mute (long-press: kill all)'}
+        >
+          {isMuted
+            ? <VolumeX size={13} style={{ color: '#EF4444' }} />
+            : <Volume2 size={13} style={{ color: '#22C55E' }} />}
+          {audioSources.length > 0 && !isMuted && (
+            <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full animate-pulse"
+              style={{ background: '#22C55E' }} />
+          )}
+        </DockBtn>
+
         {/* ── Minimize — RED tinted ── */}
         <DockBtn
           testId="dock-minimize"
@@ -387,11 +428,14 @@ export default function SmartDock() {
 }
 
 /* ── Reusable dock button — always shows its identity color ── */
-function DockBtn({ children, testId, onClick, active, color, expanded, label, small }) {
+function DockBtn({ children, testId, onClick, active, color, expanded, label, small, onPointerDown, onPointerUp, onPointerLeave }) {
   const c = color || '#C084FC';
   return (
     <motion.button
       onClick={onClick}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerLeave}
       whileTap={{ scale: 0.82 }}
       data-dock-btn="true"
       className="relative flex items-center gap-1 rounded-full transition-all overflow-hidden"
