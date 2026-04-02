@@ -114,6 +114,32 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 **Tests:** Iteration 195 — 100% Backend (10/10) / 100% Frontend
 
+### Multi-State Emotion Layering System (Apr 2, 2026) — LATEST
+
+**Multi-Select Mood System:**
+- Additive toggle selection — click to add, click again to remove (no single-select limitation)
+- Numbered badges (1, 2, 3...) show selection order on each mood card
+- Selected mood pills with X buttons for quick deselection
+- Submit sends `moods: [list]` alongside backward-compatible `mood: string`
+
+**Frequency Stack & Chorded Resonance:**
+- Each of 33 moods maps to a Solfeggio frequency (174Hz-963Hz)
+- Multi-select generates "Chorded Resonance" — layered Hz values, not averaged
+- Frequency Stack panel shows Hz values for each selected mood with + separator
+- Sacred Geometry mapping: each frequency → geometry (merkaba, flower_of_life, sri_yantra, etc.)
+
+**Moiré Shimmer Visual:**
+- When 2+ moods selected, rotating geometric shapes spin as nested overlay (Moiré pattern)
+- Each shape takes the color of its corresponding mood
+- Alternating border-radius creates organic/sacred geometry overlap
+
+**Backend Enhancement:**
+- `POST /api/moods` returns `frequency_stack`, `geometry_stack`, `resonance_type` ('pure' or 'chorded')
+- `is_multi` flag for analytics
+- Full backward compatibility with single-mood check-ins
+
+**Tests:** Iteration 196 — 100% Backend (19/19) / 100% Frontend
+
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
