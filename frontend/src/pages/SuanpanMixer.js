@@ -410,7 +410,7 @@ function BonusPackCard({ pack, onPurchase, purchasing }) {
 /* ━━━ DIVINE DIRECTOR — Main Component ━━━ */
 export default function SuanpanMixer() {
   const navigate = useNavigate();
-  const { authHeaders } = useAuth();
+  const { authHeaders, loading: authLoading } = useAuth();
   const { playConfirmation, isMuted } = useSensory();
 
   const [subTier, setSubTier] = useState('discovery');
@@ -449,6 +449,7 @@ export default function SuanpanMixer() {
 
   // Load data
   useEffect(() => {
+    if (authLoading) return;
     const load = async () => {
       try {
         const [subRes, srcRes, projRes, packRes] = await Promise.all([
@@ -467,7 +468,7 @@ export default function SuanpanMixer() {
       } catch {} finally { setLoading(false); }
     };
     load();
-  }, [authHeaders]);
+  }, [authHeaders, authLoading]);
 
   const reloadAll = useCallback(async () => {
     try {

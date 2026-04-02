@@ -1,152 +1,117 @@
 # The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a highly immersive full-stack wellness platform. V3 "Divine Director" — Professional-grade multi-track spiritual composition engine with tiered subscription infrastructure, Speed Bridge commerce, and ghost-track upselling.
+Build "The Cosmic Collective", a highly immersive full-stack wellness platform. V3 "Divine Director" — Professional-grade multi-track spiritual composition engine with 4-tier subscription system, Bonus Wrapped marketplace, Sacred Assembly materialization, and Speed Bridge commerce.
 
 ## Tech Stack
 - **Frontend**: React 19, TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Three.js
 - **Backend**: FastAPI, MongoDB (Motor), httpx
 - **Integrations**: Gemini 3 Flash (Emergent LLM Key), NWS Weather API, Stripe (pending)
 
+## Two-Axis Progression System
+
+### Mastery Tiers (Earned through practice)
+Observer → Synthesizer → Archivist → Navigator → Sovereign
+
+### Mixer Subscription Tiers (Paid infrastructure — separate from mastery)
+```
+Discovery (Free, Cold Path):  3 tracks, 5 AI/mo, Basic Tones, 44.1kHz, 15-30s Sacred Assembly
+Player ($9.99/mo, Gentle):    8 tracks, 40 AI/mo, Extended (80+), 48kHz, 5-8s loading, +10% bonus
+Ultra Player ($24.99/mo):     20 tracks + keyframes, 150 AI/mo, 3K+ effects, 88.2kHz, 2-3s, +15%
+Sovereign ($49.99/mo, Hot):   Unlimited + nested, 250+ AI + NPU, Full Phonic, 96kHz Spatial, instant, +25%
+```
+
 ## Architecture
 ```
 /app/backend/routes/
-├── mixer_director.py    # NEW: Mixer subscription tiers + multi-track project CRUD + sources
-├── generators.py        # Tiered payable bonuses (8 generators, hybrid bloom logic)
-├── mantras_sovereign.py # 4-tier audio & wisdom prescriptions
-├── hexagram.py          # I Ching logic gates
-├── hexagram_journal.py  # Hexagram journal entries
-├── cosmic_state.py      # Unified math state
-├── sovereign_math.py    # ODEs & Chaos Theory math engine
-├── trade_circle.py      # Marketplace & exports
-├── botany.py            # Botanical elements
+├── mixer_director.py     # 4-tier subscription, projects CRUD, 21 sources, 5 bonus packs
+├── generators.py         # 8 tiered payable generators with hybrid bloom logic
+├── mantras_sovereign.py  # 4-tier audio & wisdom prescriptions (43 entries)
+├── hexagram.py           # I Ching logic gates (64 hexagrams)
+├── cosmic_state.py       # Unified math state (ODEs, chaos)
+├── trade_circle.py       # Marketplace & exports
 
 /app/frontend/src/pages/
-├── SuanpanMixer.js      # REWRITTEN: "Divine Director" multi-track timeline
-├── BotanyOrbital.js     # 3D botanical orbital (z-fix: bottom-24 right-20)
-├── TradeCircleOrbital.js # 3D trade orbital (z-fix applied)
-├── CodexOrbital.js      # 3D codex orbital (z-fix applied)
-├── OrbitalHub.js        # Hub page
+├── SuanpanMixer.js       # "Divine Director" — multi-track timeline with 4-tier system
 ```
 
-## Two-Axis Progression System (Separate but Coupled)
-
-### Mastery Tiers (Earned through practice)
+## API Endpoints — Mixer Director
 ```
-Observer → Synthesizer → Archivist → Navigator → Sovereign
-Controls: mantras access, hexagram depth, ODE complexity
-```
-
-### Mixer Subscription Tiers (Paid infrastructure)
-```
-Discovery (Free, Cold Path):
-  - 3 Static Tracks, 5 AI Credits/mo, Basic Tones, Standard Stereo
-  - 15-30s "Sacred Assembly" materialization delay
-  - Shadow/ghost tracks showing locked Sovereign features
-
-Resonance ($14.99/mo, Warm Path):
-  - 10 Tracks + Keyframes, 100 AI Credits/mo, 3000+ Sound Effects, HD Lossless
-  - 2-3s stabilization delay
-  - Shadow tracks still visible
-
-Sovereign ($49.99/mo, Hot Path):
-  - Unlimited layers + Nested Projects, 200+ Credits + NPU Priority
-  - Full Phonic Library, Ultra-Lossless / Atmos Spatial
-  - Instant (GPU edge), no shadow tracks
+GET  /api/mixer/subscription           — 4-tier status, config, 10-row comparison, all_tiers
+POST /api/mixer/subscription/upgrade   — atomic tier upgrade (instant latency lift)
+POST /api/mixer/projects               — save project (layer cap enforced: 3/8/20/unlimited)
+GET  /api/mixer/projects               — list projects
+GET  /api/mixer/projects/{id}          — load project with tracks
+DELETE /api/mixer/projects/{id}        — delete project
+GET  /api/mixer/sources                — 21 tier-gated track sources
+GET  /api/mixer/bonus-packs            — 5 bonus wrapped packs with ownership/gating
+POST /api/mixer/bonus-packs/purchase   — buy pack, deduct credits, apply bonus atomically
+GET  /api/mixer/bonus-packs/owned      — owned packs with track data
 ```
 
-### API Endpoints — Mixer Director
+## Bonus Wrapped Packs (5 packs)
 ```
-GET  /api/mixer/subscription       — tier status, config, comparison table, all tiers
-POST /api/mixer/subscription/upgrade — atomic tier upgrade (instant latency lift)
-POST /api/mixer/projects            — save project (layer cap enforced)
-GET  /api/mixer/projects            — list user's projects
-GET  /api/mixer/projects/{id}       — load specific project with tracks
-DELETE /api/mixer/projects/{id}     — delete project
-GET  /api/mixer/sources             — track source library (tier-gated, 17 sources)
+Vedic Vocal Suite (Player, 25c)        → +10% AI Gen Speed, 3 tracks
+Hopi Chant Collection (Player, 30c)    → +15 Monthly AI Credits, 3 tracks
+Solfeggio Master Scale (Ultra, 40c)    → +15% Render Speed, 4 tracks
+Sacred Geometry Visual Pack (Ultra, 35c) → +10% Export Speed, 3 tracks
+Deep Earth Resonance Suite (Sov, 50c)  → +20% Processing Speed, 4 tracks
 ```
 
-### API Endpoints — Generators
+## Track Source Library (21 sources across 4 tiers)
 ```
-GET  /api/trade-circle/generators/catalog — full catalog with ownership
-POST /api/trade-circle/purchase           — buy generator (tier→credits→deduct→unlock)
-GET  /api/vault/generators                — owned generators with bloom coefficients
-POST /api/vault/generators/toggle         — toggle generator on/off
-```
-
-## Multi-Track Project Data Model
-```
-mixer_projects: {
-  id, user_id, name, track_count, tier_at_save,
-  tracks: [{ index, type, source_id, source_label, volume, muted, solo,
-             start_time, duration, frequency, color, locked }],
-  created_at, updated_at
-}
-
-mixer_subscriptions: {
-  user_id, tier, ai_credits_remaining, speed_bonus_pct, created_at
-}
+Discovery (4): OM, UT, MI, Schumann
+Player (5): RE, FA, SOL, Sacred Forest, Cosmic Rain
+Ultra Player (5): LA, Temple Bells, Singing Bowl, So Ham, Om Shanti
+Sovereign (7): SI, Celestial Gate, Om Mani Padme Hum, Gayatri, Deep Space, Sacred Geometry, Living Mandala
 ```
 
-## Track Source Library (17 sources)
-```
-Discovery:  OM (136.1Hz), UT (174Hz), MI (528Hz), Schumann (7.83Hz)
-Resonance:  RE (285Hz), FA (639Hz), SOL (741Hz), LA (852Hz),
-            Sacred Forest, Temple Bells, Cosmic Rain
-Sovereign:  SI (963Hz), Celestial Gate (1074Hz), Om Mani Padme Hum,
-            Gayatri Mantra, Deep Space Resonance, Sacred Geometry Visual
-```
-
-## Speed Bridge Commerce
-When user hits layer cap or tries locked source, "Speed Bridge" modal shows:
-- 3-tier comparison (Discovery/Resonance/Sovereign)
-- Features per tier, pricing, and "Upgrade" buttons
-- "Your composition has reached Divine Complexity" messaging
+## UI Components — Divine Director
+- **Sacred Assembly Loader**: Concentric rotating rings with phase progression for Discovery tier
+- **Speed Bridge Modal**: 4-tier comparison with instant upgrade buttons
+- **Bonus Packs Panel**: Collapsible shop showing 5 packs with purchase/ownership
+- **Track Rows**: Waveform visualization bars, grip handles, volume/mute/solo/remove
+- **Ghost/Shadow Tracks**: Locked sources as translucent layers for upselling
+- **Suanpan Panel**: Collapsible bead abacus as frequency source
 
 ## Iteration History
 
-### Iteration 223 — Divine Director Multi-Track Mixer (Apr 2, 2026) — LATEST
-- **Mixer Subscription System**: 3-tier (Discovery/Resonance/Sovereign) separate from mastery
-- **Multi-Track Projects**: Full CRUD with layer cap enforcement per subscription tier
-- **Divine Director UI**: Professional DAW-style timeline with track stack, volume/mute/solo/remove
-- **Suanpan Integration**: Collapsible frequency source panel preserved within timeline
-- **Ghost/Shadow Tracks**: Locked sources shown as translucent layers for upselling
-- **Speed Bridge Modal**: 3-tier comparison with atomic upgrade flow
-- **Track Source Library**: 17 tier-gated sources (phonic tones, mantras, ambience, visuals)
-- **Transport Controls**: Play/Stop all tracks with solo isolation
-- Tests: 100% pass (Iteration 223 — 17 features verified)
+### Iteration 224 — 4-Tier System + Bonus Wrapped Packs (Apr 2, 2026) — LATEST
+- Expanded from 3 to 4 mixer tiers (Discovery/Player/Ultra Player/Sovereign)
+- 5 Bonus Wrapped packs with permanent functional bonuses (+speed, +AI credits)
+- Sacred Assembly loader animation for Discovery tier (15-30s aesthetic throttling)
+- Enhanced track UI: waveform visualization bars, grip handles
+- 21 tier-gated track sources (up from 17)
+- Fixed auth timing issue (wait for authLoading before API calls)
+- Tests: Backend 100%, Frontend fix applied for auth timing
 
-### Iteration 222 — Tiered Payable Bonuses & Generator Console (Apr 2, 2026)
-- Generator system: 8 generators, hybrid bloom logic, purchase/vault/toggle
-- Tests: 100% (14 features verified)
-
-### Earlier Iterations (217-221)
-- Orbital Architecture, 4-Tier Audio, I Ching, Mantras Library, Convolution Reverb
+### Iteration 223 — Divine Director v1 (Apr 2, 2026)
+### Iteration 222 — Tiered Payable Bonuses & Generators (Apr 2, 2026)
+### Iterations 217-221 — Orbital Architecture, Audio, I Ching, Mantras
 
 ## Upcoming Tasks (P1)
-- **Keyframe Automation**: Draw volume curves over time per track
-- **AI "Mantra DJ" Auto-Edit**: Analyze session goal, auto-join best moments with cross-fades
-- **Ripple Editing**: Shortening segment auto-shifts subsequent layers
-- **Nested Sacred Projects**: Group mantra sequences into reusable blocks (Sovereign only)
-- **Snippet "Try-On"**: 10-second high-fidelity preview of locked instruments over active mix
+- Keyframe Automation: Draw volume/frequency curves over timeline
+- AI "Mantra DJ" Auto-Edit: Goal-based auto-composition with cross-fades
+- Ripple Editing: Sync-locked layer shifting
+- Nested Sacred Projects: Group sequences into reusable blocks
+- Snippet "Try-On": 10-second locked instrument preview
+- Predictive Micro-Interactions: Surface compatible harmonics
 
 ## Future/Backlog (P2)
-- NPU Priority / GPU edge acceleration hooks
-- Haptic Guidance for tuned layers (micro-vibrations on alignment)
-- Gesture-based timeline controls (pinch-to-zoom, scrub)
-- Bonus-Wrapped Trade Circle assets (+10% speed boost mechanics)
-- Multi-Civilization Star Charts (Hopi, Egyptian, Vedic)
-- External audio asset hosting (real instrument samples)
-- Predictive Micro-Interactions (anticipate compatible chants)
-- Atomic State Management for subscription changes
+- NPU Priority / GPU edge hooks
+- Haptic Tuning (micro-vibrations on bloom alignment)
+- Gesture-based timeline (pinch-to-zoom, scrub)
+- Multi-Civilization Star Charts
+- External audio asset hosting
 
 ## Key Rules
 - MongoDB: Exclude _id | Audio: Check sovereignMute
-- Orbital: Sphere=auto, effects=none | Reverb: getConvolver()
-- Generators: Purchase through /api/trade-circle/purchase only
+- Orbital: Sphere=auto, effects=pointer-events:none
+- Generators: Purchase through /api/trade-circle/purchase
 - Mixer: Layer cap enforced on save, atomic upgrade lifts instantly
-- Subscriptions: Separate from mastery — two independent axes
+- Subscriptions: 2 axes — mastery (earned) + mixer (paid)
+- Auth: Wait for authLoading before making API calls
 
 ## Test Credentials
-- User: `grad_test_522@test.com` / `password` (Currently: Resonance tier)
+- User: `grad_test_522@test.com` / `password`
 - Auth key: `zen_token`
