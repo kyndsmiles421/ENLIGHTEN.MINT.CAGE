@@ -78,6 +78,30 @@ AVENUES = {
         "resonance_per_challenge": 10,
         "max_resonance": 1000,
     },
+    "science": {
+        "id": "science",
+        "name": "The Avenue of Science",
+        "title": "The Alchemist",
+        "color": "#F59E0B",
+        "icon": "flask",
+        "description": "Use Botanical Lab widgets and Geology Simulators to master nutritional chemistry and Earth science beneath your feet.",
+        "achievement": "Alchemical Mastery",
+        "achievement_desc": "Transform raw knowledge into practical creation. The lab becomes the universe.",
+        "resonance_per_challenge": 15,
+        "max_resonance": 1000,
+    },
+    "history": {
+        "id": "history",
+        "name": "The Avenue of History",
+        "title": "The Chronicler",
+        "color": "#EC4899",
+        "icon": "scroll",
+        "description": "Compare ancient star charts across civilizations, explore historical reconstructions of your coordinates, and chronicle humanity's journey.",
+        "achievement": "Temporal Mastery",
+        "achievement_desc": "Past and present converge. Every coordinate tells a story across all ages.",
+        "resonance_per_challenge": 15,
+        "max_resonance": 1000,
+    },
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -829,13 +853,17 @@ async def check_resonance_threshold(user=Depends(get_current_user)):
     art_res = (prog or {}).get("art", {}).get("resonance", 0)
     thought_res = (prog or {}).get("thought", {}).get("resonance", 0)
     bio_res = (prog or {}).get("biometrics", {}).get("resonance", 0)
-    total = math_res + art_res + thought_res + bio_res
+    sci_res = (prog or {}).get("science", {}).get("resonance", 0)
+    hist_res = (prog or {}).get("history", {}).get("resonance", 0)
+    total = math_res + art_res + thought_res + bio_res + sci_res + hist_res
 
     return {
         "mathematics": math_res,
         "art": art_res,
         "thought": thought_res,
         "biometrics": bio_res,
+        "science": sci_res,
+        "history": hist_res,
         "total": total,
         "thresholds": {
             "common_collapse": {"required": 0, "met": True},
@@ -848,7 +876,9 @@ async def check_resonance_threshold(user=Depends(get_current_user)):
             "art": art_res >= 1000,
             "thought": thought_res >= 1000,
             "biometrics": bio_res >= 1000,
-            "total": total >= 4000,
+            "science": sci_res >= 1000,
+            "history": hist_res >= 1000,
+            "total": total >= 6000,
         },
     }
 
