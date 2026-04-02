@@ -20,12 +20,15 @@ const ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Eart
 const ELEMENT_HEX = { Fire: 0xEF4444, Water: 0x3B82F6, Air: 0xA78BFA, Earth: 0x22C55E };
 
 function raDecToXYZ(ra, dec, radius = 50) {
-  const raRad = (ra / 24) * 2 * Math.PI;
-  const decRad = (dec / 180) * Math.PI;
+  const safeRa = isFinite(ra) ? ra : 0;
+  const safeDec = isFinite(dec) ? dec : 0;
+  const safeRadius = isFinite(radius) && radius > 0 ? radius : 50;
+  const raRad = (safeRa / 24) * 2 * Math.PI;
+  const decRad = (safeDec / 180) * Math.PI;
   return new THREE.Vector3(
-    radius * Math.cos(decRad) * Math.cos(raRad),
-    radius * Math.sin(decRad),
-    -radius * Math.cos(decRad) * Math.sin(raRad),
+    safeRadius * Math.cos(decRad) * Math.cos(raRad),
+    safeRadius * Math.sin(decRad),
+    -safeRadius * Math.cos(decRad) * Math.sin(raRad),
   );
 }
 
@@ -671,8 +674,9 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
       // Stars with enhanced glow sprites
       c.stars.forEach(s => {
         const pos = raDecToXYZ(s.ra, s.dec);
-        const brightness = Math.max(0.5, 1 - s.mag / 5);
-        const baseSize = Math.max(0.4, (5 - s.mag) / 5 * 1.1);
+        const safeMag = isFinite(s.mag) ? s.mag : 3;
+        const brightness = Math.max(0.5, 1 - safeMag / 5);
+        const baseSize = Math.max(0.4, (5 - safeMag) / 5 * 1.1);
         const starMesh = new THREE.Mesh(
           new THREE.SphereGeometry(baseSize * 0.5, 12, 12),
           new THREE.MeshBasicMaterial({ color: isAligned || isBirth ? hexColor : 0xE8E8FF, transparent: true, opacity: brightness })

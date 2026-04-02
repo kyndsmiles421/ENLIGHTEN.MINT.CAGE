@@ -204,7 +204,7 @@ export default function CosmicAssistant() {
             onClick={() => setOpen(true)}
             className="fixed z-[9998] flex items-center justify-center"
             style={{
-              bottom: '88px',
+              bottom: '148px',
               right: '20px',
               width: '52px',
               height: '52px',

@@ -476,11 +476,20 @@ export default function Botany() {
     }
   }, [authHeaders]);
 
-  // Fetch balance score on load
+  // Fetch balance score on load (with localStorage cache)
   useEffect(() => {
     if (authLoading || !token) return;
+    // Load cached score immediately for fast UI
+    try {
+      const cached = localStorage.getItem('cosmic_balance_score');
+      if (cached) setBalanceScore(JSON.parse(cached));
+    } catch {}
+    // Then refresh from backend
     axios.get(`${API}/mastery/balance-score`, { headers: authHeaders })
-      .then(r => setBalanceScore(r.data)).catch(() => {});
+      .then(r => {
+        setBalanceScore(r.data);
+        localStorage.setItem('cosmic_balance_score', JSON.stringify(r.data));
+      }).catch(() => {});
   }, [authHeaders, authLoading, token]);
 
   const filtered = plants.filter(p => {

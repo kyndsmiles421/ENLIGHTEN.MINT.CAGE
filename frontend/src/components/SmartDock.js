@@ -271,19 +271,29 @@ export default function SmartDock() {
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>
         {activePanel === 'harmonics' && (
-          <HarmonicsPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
+          <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <HarmonicsPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
+          </div>
         )}
         {activePanel === 'assistant' && (
-          <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
+          <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <AssistantPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
+          </div>
         )}
         {activePanel === 'frequency' && (
-          <FrequencyPanel onClose={() => setActivePanel(null)} />
+          <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <FrequencyPanel onClose={() => setActivePanel(null)} />
+          </div>
         )}
         {activePanel === 'mixer' && (
-          <MixerPanel onClose={() => setActivePanel(null)} navigate={navigate} />
+          <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <MixerPanel onClose={() => setActivePanel(null)} navigate={navigate} />
+          </div>
         )}
         {activePanel === 'language' && (
-          <LanguagePanel onClose={() => setActivePanel(null)} />
+          <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <LanguagePanel onClose={() => setActivePanel(null)} />
+          </div>
         )}
       </AnimatePresence>
 

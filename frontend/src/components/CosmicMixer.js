@@ -935,7 +935,7 @@ export default function CosmicMixer() {
       {!open && (
         <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }}
           onClick={() => setOpen(true)}
-          className="fixed bottom-20 right-4 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+          className="fixed bottom-20 right-4 z-[9996] w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
           style={{
             background: hasActive ? 'rgba(192,132,252,0.2)' : 'rgba(22,24,38,0.9)',
             border: `1px solid ${hasActive ? 'rgba(192,132,252,0.3)' : 'rgba(255,255,255,0.06)'}`,
