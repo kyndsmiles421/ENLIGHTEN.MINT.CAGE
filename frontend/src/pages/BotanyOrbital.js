@@ -327,7 +327,7 @@ export default function BotanyOrbital() {
       </div>
 
       {/* Switch to full page view */}
-      <div className="absolute bottom-4 right-4 z-30">
+      <div className="absolute bottom-16 right-4 z-30">
         <button onClick={() => navigate('/botany')}
           className="px-3 py-1.5 rounded-full text-[8px] font-medium uppercase tracking-wider"
           style={{
