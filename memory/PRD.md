@@ -1,96 +1,122 @@
 # The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending wellness tracking with mystical/divination systems, AI guidance, cinematic visuals, and MMORPG mechanics.
+Build "The Cosmic Collective", a highly immersive full-stack wellness platform blending wellness tracking with mystical/divination systems, AI guidance, cinematic visuals, and MMORPG mechanics. V2 "Sovereign Core" — Unified Simulation Architecture where every system feeds into every other.
 
 ## Tech Stack
-- **Frontend**: React (CRA + craco), TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API
+- **Frontend**: React 19 (CRA + craco), TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Three.js (imperative)
 - **Backend**: FastAPI, MongoDB (Motor), httpx
 - **Integrations**: Gemini 3 Flash (Emergent LLM Key), NWS Weather API (free), Stripe (pending)
+- **Note**: React Three Fiber (R3F v9) was attempted but incompatible with React 19 reconciler → switched to imperative Three.js for WebGL
 
 ## What's Been Implemented
 
-### Iteration 206 — Abyss Refactor + Atmospheric Synchrony + Drag-to-Extract (Apr 2, 2026) — LATEST
+### Iteration 207 — Einstein Spatial Curvature + GravityManager (Apr 2, 2026) — LATEST
 
-**Major Refactoring:**
-- Split `OrbitalHub.js` (582 lines) into 9 modular files:
-  - `components/orbital/constants.js` — ALL_SATELLITES, ZONE_AUDIO, WEATHER_AUDIO_MAP, WEATHER_EFFECTS
-  - `components/orbital/CosmicDust.js` — Particle effect
-  - `components/orbital/WeatherRibbon.js` — Weather display with ambience indicator
-  - `components/orbital/AbyssSatellite.js` — Drag-to-extract with surface tension
-  - `components/orbital/ActiveSatellite.js` — Orbiting satellite with dimming
-  - `components/orbital/ConnectionLines.js` — SVG lines with dimming
-  - `components/orbital/CentralOrb.js` — 70% viewport expansion + weather pulse
-  - `hooks/useHubAudio.js` — Satellite hover + weather ambience audio
-  - `pages/OrbitalHub.js` — Lean orchestrator (~180 lines)
+**Backend Gravity System:**
+- `/api/gravity/nodes` — 12 seeded gravity nodes with rich data models:
+  - Categories: vedic, hermetic, egyptian, hopi, sacred_geometry, star_chart, frequency
+  - Each node: `{ id, label, type, frequency, origin_language, star_coordinate: {ra, dec, constellation}, gravity_mass, tier_required, category, description, trinity: {origin, synthesis, frequency_hz} }`
+  - Tier-based unlocking (observer → synthesizer → archivist → navigator → sovereign)
+- `/api/gravity/field` — Field parameters for WebGL mesh
+- `/api/gravity/interact` — Records interactions, accumulates dwell_seconds, auto-progresses mastery tiers
 
-**Abyss UX (P0 — Complete):**
-- Central orb expands to 70% of viewport (min(innerWidth, innerHeight) * 0.35 radius)
-- Dormant satellites arrange in Fibonacci spiral (golden angle = PI*(3-sqrt(5)))
-- Drag-to-extract: drag a dormant satellite past the surface tension boundary to activate
-- Haptic pulse (navigator.vibrate) on satellite extraction
-- Surface tension ring visual indicator at 90% of Abyss radius
-- Active satellites dim (opacity 0.2, blur 2px) when Abyss is open
-- Active orbit radius pushes outward 35% when Abyss expands
-- Abyss backdrop (fixed overlay) click-to-close
-- Double-tap Zen Reset (two taps within 300ms) — collapses ALL satellites to dormant
+**WebGL Gravity Field:**
+- Imperative Three.js mesh deformation (64x64 subdivision wireframe plane)
+- Grid physically "sags" around gravity nodes — high-mass nodes create deeper wells
+- Point lights at well positions glow with category-specific colors
+- 200 star dust particles rotate slowly in background
+- Gentle ambient wave animation on the mesh surface
+- Error boundary protects against WebGL failures
 
-**Atmospheric Synchrony (P1 — Complete):**
-- Weather-driven ambient audio drone via useHubAudio hook
-- Weather categories map to audio: clear=528Hz/sine, fog=369Hz/sine, rain=285Hz/triangle, snow=432Hz/sine, thunderstorm=174Hz/sawtooth, wind=256Hz/triangle
-- LFO modulation per weather type (fog: slow 0.15Hz, thunderstorm: fast 4Hz)
-- Temperature modulates pitch (±0.3Hz per degree from 60°F)
-- Ambience activates on first user interaction (respects browser autoplay policy)
-- WeatherRibbon shows pulsing "synced" indicator when ambience is active
-- Central orb pulse speed adapts to weather (clear: 5s, thunderstorm: 1.5s)
+**Gravity-Responsive UI Physics:**
+- `useGravityManager` hook calculates per-satellite spring damping and stiffness
+- Satellites near high-mass nodes move slower (higher damping, lower stiffness)
+- Both backend gravity nodes and active satellites contribute to mesh deformation
 
-**Tests:** 100% Backend / 100% Frontend (Iteration 206)
+**Tests:** 100% Backend / 100% Frontend (Iteration 207)
 
-### Iteration 205 — Abyss UX + NWS Weather + Weather Ribbon (Apr 2, 2026)
-- Abyss activation/deactivation system, boolean persistence, elastic orbits
-- NWS Weather API proxy, geolocation-aware, weather-to-frequency mapping
-- Glassmorphic weather ribbon, seeing quality for stargazing
+### Iteration 206 — Abyss Refactor + Atmospheric Synchrony (Apr 2, 2026)
+- Split OrbitalHub.js (582 lines) into 9 modular files
+- Abyss 70% viewport expansion, Fibonacci spiral, drag-to-extract with haptics
+- Double-tap Zen Reset, active satellite dimming
+- Weather-driven ambient audio drone, temperature-modulated pitch
+- Weather-responsive central orb pulse speed
 
-### Iteration 203 — Observatory (Apr 2, 2026)
-- Orrery, Deep Sky (10 stars), Live Events, Data Sonification
+### Earlier Iterations (198-205)
+- MusicTheory.js, Workshop.js, Observatory.js, Atmosphere.py
+- Mastery Tiers, Linguistic Escrow, NWS Weather API
+- Orbital Hub navigation system, Mission Control, OrbCorner
 
-### Iteration 202 — Orbital Hub Navigation (Apr 2, 2026)
-- Central orb, 13 satellites, Mission Control, OrbCorner, cosmic dust
+## Architecture
+```
+/app/
+├── backend/
+│   ├── routes/
+│   │   ├── gravity.py          # 12 gravity nodes, interact, field params
+│   │   ├── atmosphere.py       # NWS Weather data API
+│   │   ├── mastery.py          # Tier tracking & unlocks
+│   │   ├── observatory.py      # Planet properties & sonification
+│   │   ├── workshop.py         # Platonic solids, Golden ratio
+│   │   ├── trade_circle.py     # Linguistic/Phonetic asset Escrow
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── orbital/
+│   │   │   │   ├── constants.js       # ALL_SATELLITES, ZONE_AUDIO, WEATHER_*
+│   │   │   │   ├── GravityField.js    # Imperative Three.js WebGL mesh
+│   │   │   │   ├── CentralOrb.js      # 70% Abyss + weather pulse
+│   │   │   │   ├── AbyssSatellite.js  # Drag-to-extract + haptics
+│   │   │   │   ├── ActiveSatellite.js # Gravity-responsive physics
+│   │   │   │   ├── ConnectionLines.js # SVG tether lines
+│   │   │   │   ├── WeatherRibbon.js   # Weather + ambience indicator
+│   │   │   │   ├── CosmicDust.js      # Particle overlay
+│   │   ├── hooks/
+│   │   │   ├── useHubAudio.js         # Satellite + weather ambience
+│   │   │   ├── useGravityManager.js   # Gravity physics calculations
+│   │   ├── pages/
+│   │   │   ├── OrbitalHub.js          # Lean orchestrator (~200 lines)
+```
 
-### Iteration 201 — Workshop + Brand Cleanup (Apr 2, 2026)
-- Sacred Geometry, Golden Ratio, Resonance Mechanics, Materials Library
+## Gravity Node Data Model
+```json
+{
+  "id": "om-vedic",
+  "label": "The Sacred Om",
+  "type": "teaching",
+  "frequency": 136.1,
+  "origin_language": "Sanskrit",
+  "star_coordinate": {"ra": 18.62, "dec": 38.78, "constellation": "Lyra"},
+  "gravity_mass": 92,
+  "tier_required": "observer",
+  "category": "vedic",
+  "trinity": {
+    "origin": "Mandukya Upanishad text...",
+    "synthesis": "136.1Hz aligns with Earth's orbital year-tone...",
+    "frequency_hz": 136.1
+  }
+}
+```
 
-### Iteration 200 — Phonics + Mastery Economy (Apr 2, 2026)
-- Vowel Formant Tracker, 3-tier mastery, linguistic asset escrow
-
-### Iteration 198 — Conservatory (Apr 2, 2026)
-- Circle of Fifths, Chladni, Orchestral Engine, ResolutionContext
-
-## Key Routes
-- `/hub` — Orbital Hub (Abyss + Weather + Satellites)
-- `/observatory` — The Observatory
-- `/workshop` — Architect's Workshop
-- `/theory` — Music Theory Conservatory
-- `/cosmic-map` — GPS Harvesting
-- `/mood` — Mood Tracker
+## Mastery Tier Progression
+- **Observer** (default): Basic hub access
+- **Synthesizer**: 120s dwell + 5 interactions
+- **Archivist**: 600s dwell + 15 interactions
+- **Navigator**: 1800s dwell + 30 interactions
+- **Sovereign**: 3600s dwell + 50 interactions
 
 ## Upcoming Tasks (P1)
-- Einstein Spatial Curvature (Gravitational Wells) on Cosmic Map — GPS grid "sags" around high-energy zones/covens
-- Culinary Mode Mixer UI — "Spice Rack" frequency layout for the Cosmic Mixer
-- Botany/Gardening Module — Plant identifier and gardening wellness section
+- **Culinary "Spice Rack" Mixer**: Refactor frequency selector into shelf/aromatic layout. Mix frequencies + contemplation intensity → botanical recipe codes. Frequency changes propagate to gravity field (interconnected systems).
+- **Deep-Dive Archives / Trinity View**: Every tradition gets three layers (Origin, Synthesis, Frequency). Progressive disclosure locked behind mastery tiers. Multi-language overlays.
+- **Botany/Gardening Module**: Camera-based plant ID (PlantNet API) + curated database. Energetic profiles. Wellness sync (plants → sound baths + teachings).
 
 ## Future/Backlog (P2)
-- Progressive Disclosure — Lock satellites behind Mastery tier requirements
-- AR mechanics with react-three-fiber / AR.js
-- Phygital Marketplace, Stripe subscriptions
-- Blueprint Mode, Cosmic Truck digital twin
-- Debug overlay for Observatory frequency values
+- Cosmic Map with Gravitational Wells (GPS sags at significant locations)
+- Multi-civilization star chart overlays (Hopi, Egyptian, Vedic)
+- Trade Circle as transactional layer with gravity-weighted marketplace listings
+- Phygital Marketplace + Stripe subscriptions
+- AR mechanics with Three.js/AR.js
+- Spice Rack recipe → real-world botanical infusion codes (Positive Energy Bar bridge)
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
-
-## Architecture Notes
-- `OrbitalHub.js` is now a lean ~180-line orchestrator
-- All orbital sub-components are isolated in `components/orbital/`
-- Audio hooks live in `hooks/useHubAudio.js`
-- Weather ambience respects browser autoplay policy (starts on first user gesture)
