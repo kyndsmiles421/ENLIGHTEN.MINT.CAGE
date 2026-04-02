@@ -10,7 +10,47 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 ## What's Been Implemented
 
-### Science/History Avenues & Circular Economy (Apr 2, 2026) — LATEST
+### Three Avenues Cosmic Glass Overhaul (Apr 2, 2026) — LATEST
+
+**UI Reorganization: Six Pillars → Three Avenues of Flow:**
+- Material Avenue (Industrial Amber): E-Bike Engineering + Circular Economy
+  - Currency: Kinetic Dust
+  - Visual: Copper-toned glass, amber accent, 60% opacity expanded
+- Living Avenue (Botanical Teal): Botanical Lab + Biometrics + Art
+  - Currency: Science Resonance (Low-Mid)
+  - Visual: Teal/Mint glass, organic borders, pulse animations
+- Ancestral Avenue (Aetheric Violet): History/Alchemy + Sacred Geometry + Thought
+  - Currency: Science Resonance (High)
+  - Visual: Violet/Gold glass, geometric lines
+
+**Cosmic Glass Design System:**
+- Glassmorphism: backdrop-filter blur(8px), rgba(15,15,25,0.6) backgrounds
+- Collapsed state: 20% opacity, 10px blur, color-coded edge glow
+- Expanded state: 60% opacity, pillar panels slide down
+- Global Pinned Tickers: Resonance, Kinetic Dust, Sci Resonance, Tier
+- Three-level Information Layering (Glance/Active/Deep-Dive)
+
+**Scaling Marketplace (Education Packs):**
+- 9 Education Packs across 3 avenues (material/living/ancestral)
+- Dynamic pricing: flat, moderate (×0.3/level), high (×1/level), milestone (×1/3levels)
+- Material: E-Bike Performance Maps (Urban/Mountain/Endurance)
+- Living: Foundational Lab Kits (Aquafaba/Extraction/Emulsion)
+- Ancestral: Alchemy Tiers (Calcination/Dissolution) + Sacred Site Blueprints
+- Integrated within each avenue accordion (not separate menu)
+
+**Resonance Builds (Crafting System):**
+- 3 builds: Kinetic Amplifier (1.25x dust), Zen Flow (1.2x res), Chrono-Alchemist (1.3x res)
+- Each requires specific shop items to be owned before crafting
+- Passive bonuses to currency generation
+
+**Widget Overlap Fix:**
+- FloatingAssistant: bottom-[72px] right-4 z-[90]
+- QuickMeditationWidget: bottom-6 right-4 z-[88]
+- Proper vertical stacking with no overlap
+
+**Tests**: Iteration 187 — 100% Backend (19/19) / 100% Frontend
+
+### Science/History Avenues & Circular Economy (Apr 2, 2026)
 
 **Avenue of Science (The Alchemist):**
 - Botanical Lab: 5 chemistry simulations with slider-based variable tuning
