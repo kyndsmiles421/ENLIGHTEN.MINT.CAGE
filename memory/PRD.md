@@ -72,6 +72,26 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 - Rankings sorted descending, with Roman numeral ranks (I, II, III) for top 3
 - Tab-based UI in coven panel (Coven | Rankings) with own-coven highlight and online indicators
 
+### Avatar Customization System (Apr 2, 2026) — LATEST
+
+**Backend (`GET/PUT /api/auth/avatar`):**
+- 12 sacred symbols: lotus, star, moon, sun, flame, leaf, crystal, feather, spiral, eye, wave, mountain
+- 10 colors with validation (invalid color/symbol defaults gracefully)
+- Display name (max 20 chars) stored in user document
+- Avatar data broadcasted via WebSocket to coven members
+
+**Frontend:**
+- Three-tab Coven panel: Coven | Ranks | Avatar
+- Avatar tab shows AvatarCustomizer with live preview, color swatches, symbol grid, display name input
+- Coven member markers on map now use personalized avatar symbols + colors
+- SVG-based symbol rendering for crisp display at all sizes
+
+**Tests:** Iteration 194 — 100% Backend (14/14) / 100% Frontend
+
+### Encyclopedia System (Previously Built)
+- 12 world traditions with curated content, VR Immersive Mode, AI exploration via Gemini, HD narration
+- Full route: `/encyclopedia`, backend: `/api/myths/*`
+
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
