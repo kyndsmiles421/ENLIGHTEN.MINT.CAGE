@@ -7,82 +7,95 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform. 
 - **Frontend**: React 19, TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Three.js (imperative WebGL)
 - **Backend**: FastAPI, MongoDB (Motor), httpx
 - **Integrations**: Gemini 3 Flash (Emergent LLM Key), NWS Weather API, Stripe (pending)
-- **LLM Pattern**: `LlmChat(api_key, session_id, system_message).with_model("gemini", "gemini-3-flash-preview")`
 
 ## Architecture
 ```
-/app/backend/routes/
-├── gravity.py, archives.py, atmosphere.py
-├── mastery.py (+balance-score algorithm, wheel-interaction tracking)
-├── trade_circle.py (+botanical-listing, gravity-weighted, suanpan-export bridge)
-├── botany.py (+resonance/{element} predictive synergy, catalog, garden, AI identify)
-├── content_factory.py, revenue.py, forge.py, nature.py, teachings.py, voice_command.py (AI)
-
 /app/frontend/src/
+├── context/
+│   ├── SensoryContext.js (GLOBAL AUDIO ENGINE: sovereignMute, fade, killAll, source registry)
+│   ├── AuthContext.js, MixerContext.js, TempoContext.js, LanguageContext.js
 ├── components/
-│   ├── FiveElementsWheel.js (SVG pentagon + proximity scaling + resonance meter)
-│   ├── SmartDock.js (event-isolated panels with stopPropagation)
-│   ├── CosmicAssistant.js (Dynamic Docking — spring physics repositioning)
-│   ├── CosmicMixer.js (broadcasts data-mixer-open via body attribute)
-│   ├── orbital/ (9 files), StrokeTracer.js, trade/
+│   ├── SmartDock.js (Zen Toggle dock button with long-press kill-all)
+│   ├── FiveElementsWheel.js (proximity scaling + resonance meter)
+│   ├── CosmicAssistant.js (Dynamic Docking via MutationObserver)
+│   ├── CosmicMixer.js (broadcasts data-mixer-open)
+│   ├── orbital/ (9 files), trade/
 ├── pages/
 │   ├── OrbitalHub.js, Archives.js, SuanpanMixer.js (+export), Botany.js
-│   ├── StarChart.js (3-phase Dolly-Zoom: pullback→traverse→approach)
-│   ├── TradeCircle.js
+│   ├── StarChart.js (3-phase Dolly-Zoom)
+│   ├── TradeCircle.js (gravity-weighted + botanical + frequency recipes)
+
+/app/backend/routes/
+├── botany.py (catalog, garden, resonance, AI identify, gravity nodes)
+├── mastery.py (balance-score algorithm, wheel-interaction tracking)
+├── trade_circle.py (botanical-listing, gravity-weighted, suanpan-export bridge)
+├── gravity.py, archives.py, atmosphere.py, observatory.py
+├── content_factory.py, revenue.py, forge.py, nature.py, teachings.py, voice_command.py (AI)
 ```
 
-## Mastery Tier Algorithm (Balance Score)
+## Global Audio Engine
+```
+SensoryContext provides:
+- sovereignMute: boolean (localStorage persisted)
+- sovereignMuteToggle(): logarithmic fade (500ms) + context.suspend()/resume()
+- sovereignKillAll(): stops all oscillators, suspends all contexts, clears source registry
+- registerAudioContext(ctx): external AudioContexts subscribe to master switch
+- registerAudioSource(source): visual breadcrumb tracking registry
+- All sound functions (playClick, playChime, playCelebration, startAmbient) gate on sovereignMute
+
+UI: Zen Toggle in SmartDock
+- Quick tap: toggle mute (logarithmic fade)
+- Long-press (1s): kill ALL audio sources (emergency brake)
+- Green icon = active, Red icon = muted
+- Active source count badge on button
+- body[data-audio-muted] for cross-component awareness
+```
+
+## Mastery Tier Algorithm
 ```
 balance_score = diversity(30%) + equilibrium(30%) + consistency(20%) + exploration(20%)
 Tiers: Observer(0-20) → Synthesizer(20.1-40) → Archivist(40.1-60) → Navigator(60.1-80) → Sovereign(80.1-100)
-Sovereign perks: Custom element nodes, Global Trade Circle, All locks removed, Hexagram keys
 ```
-
-## Cinematic UX Features
-- **Dynamic Docking**: CosmicAssistant uses MutationObserver on `data-mixer-open` body attribute. When mixer opens, assistant spring-transitions to avoid overlap (cubic-bezier(0.34, 1.56, 0.64, 1))
-- **Proximity Scaling**: Five Elements Wheel nodes scale up to 15% as cursor approaches (distance < 80px). Shows proximity glow ring + frequency hint text
-- **Dolly-Zoom**: Star Chart 3-phase camera: pullback (1.8x radius), traverse (shortest-path rotation), approach (target zoom)
-- **Event Isolation**: SmartDock panels wrapped with onClick+onPointerDown stopPropagation
 
 ## Iteration History
 
-### Iteration 215 — Cinematic UX Dynamics (Apr 2, 2026) — LATEST
-**Enhancement 1**: Dynamic Docking — CosmicAssistant observes mixer state via MutationObserver, repositions with spring physics when mixer opens (bottom:148→20, right:20→80). 72px gap verified.
-**Enhancement 2**: Star Chart Dolly-Zoom — 3-phase camera (pullback→traverse→approach) replaces linear interpolation for cinematic constellation navigation.
-**Enhancement 3**: Proximity Scaling — Wheel nodes grow up to 15% with glow ring and frequency hints as cursor approaches within 80px.
-**Enhancement 4**: SmartDock Event Isolation — Panel wrappers prevent click bubbling. Panels stay open during interaction.
-- Tests: 100% (8/8) — Iteration 215
+### Iteration 216 — Global Audio Engine (Apr 2, 2026) — LATEST
+- **Zen Toggle**: Volume2/VolumeX button in SmartDock with green/red color states
+- **Logarithmic Fade**: 500ms exponentialRampToValueAtTime on mute/unmute
+- **Sovereign Kill All**: Long-press (1s) stops all oscillators, suspends all AudioContexts
+- **Persistence**: localStorage (`cosmic_prefs.sovereignMute`) + body attribute (`data-audio-muted`)
+- **Audio Source Registry**: Components can register/unregister active audio for visual tracking
+- **Gate All Sound**: playClick, playChime, playCelebration, startAmbient check `sovereignMute`
+- Tests: 100% (Iteration 216)
 
 ### Previous Iterations
-- 214: System Triage (widget overlap, snap-shut, coordinate freeze, state persistence)
-- 213: Resonance Compatibility + Balance Score + Suanpan Bridge
+- 215: Cinematic UX (Dynamic Docking, Dolly-Zoom, Proximity Scaling)
+- 214: System Triage (widget overlap, snap-shut, coordinate freeze)
+- 213: Resonance + Balance Score + Suanpan Bridge
 - 212: Five Elements Wheel + Phygital Marketplace
-- 211: Botany Module (12 plants, TCM profiles, AI identify)
-- 210: Dimensional Rift Fix (LlmChat)
+- 211: Botany Module (12 TCM plants, AI identify)
+- 210: Dimensional Rift Fix (LlmChat signature)
 - 206-209: WebGL, Archives, Suanpan, Orbital Rotation
 
 ## Upcoming Tasks (P1)
 - **Wisdom Prescriptions**: Personalized ritual plans from journal + gravity + mastery
-- **Enhanced Trade Circle UI**: Apply visual_scale/visual_depth to physically size listing cards
-- **AI Living Synthesis**: Gemini analysis when hovering connections between traditions
+- **Audio Breadcrumb Visualizer**: Pulsing glow ring on any node/sphere currently producing sound
+- **Enhanced Trade Circle UI**: visual_scale/visual_depth to physically size listing cards
 
 ## Future/Backlog (P2)
-- **I Ching Logic Gates**: 64 hexagrams as Boolean state-machine transitions. 6 binary inputs = compound key. "Changing Lines" (Yao) with glitch animation + Solfeggio hum as threshold approaches
-- **Sovereign Tier Perks**: Custom element nodes on wheel, Global Trade Circle
-- **Light Trails**: Mission Control sphere trail renderer on drag velocity
-- **Bloom Filter**: Sphere radiance when Garden Balance hits equilibrium
+- **I Ching Logic Gates**: 64 hexagrams, Changing Lines with glitch animation + Solfeggio hum
+- **Sovereign Tier Perks**: Custom element nodes, Global Trade Circle
+- **Light Trails + Bloom**: Mission Control sphere trails on drag velocity
 - Multi-Civilization Star Charts (GPS-based)
 - Progressive Disclosure Locks
-- Orbital Constellations
 
 ## Key Technical Rules
 - **LlmChat**: Always `session_id` + `system_message`
 - **WebGL**: Imperative mutation only
 - **MongoDB**: Exclude `_id`
-- **Auth**: Check `loading` + `token` before API calls
+- **Audio**: All sound functions must check `sovereignMute` before firing
 - **Coordinates**: `isFinite()` before Three.js
 - **Events**: `stopPropagation()` on floating panels
-- **Dynamic Docking**: Use body `data-*` attributes + MutationObserver for cross-component state
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
