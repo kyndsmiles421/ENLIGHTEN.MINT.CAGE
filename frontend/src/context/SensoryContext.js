@@ -21,6 +21,21 @@ const DEFAULT_PREFS = {
   fontSize: 'default',
   highContrast: false,
   sovereignMute: false,  // Global master mute
+  audioTier: 'standard', // 'standard' | 'apprentice' | 'artisan' | 'sovereign'
+};
+
+// ━━━ 4-TIER AUDIO RESOLUTION SYSTEM ━━━
+const AUDIO_TIERS = {
+  standard:   { sampleRate: 44100, bitDepth: 16, label: 'Standard',  reverbDecay: 0.8, reverbMix: 0.1 },
+  apprentice: { sampleRate: 48000, bitDepth: 16, label: 'Hi-Fi',     reverbDecay: 1.5, reverbMix: 0.2 },
+  artisan:    { sampleRate: 88200, bitDepth: 24, label: 'Pro-Grade',  reverbDecay: 2.5, reverbMix: 0.3 },
+  sovereign:  { sampleRate: 96000, bitDepth: 24, label: 'Lossless',   reverbDecay: 4.0, reverbMix: 0.4 },
+};
+
+// Map mastery tiers to audio tiers
+const MASTERY_TO_AUDIO = {
+  observer: 'standard', synthesizer: 'apprentice', archivist: 'artisan',
+  navigator: 'sovereign', sovereign: 'sovereign',
 };
 
 function loadPrefs() {
@@ -371,6 +386,196 @@ export function SensoryProvider({ children }) {
     } catch(e) {}
   }, [getAudioCtx]);
 
+  // ━━━ CONVOLUTION REVERB ENGINE ━━━
+  // Generates synthetic impulse response for physical-space simulation
+  const convolverRef = useRef(null);
+  const reverbGainRef = useRef(null);
+
+  const getConvolver = useCallback(() => {
+    const ctx = getAudioCtx();
+    if (!ctx) return null;
+    if (convolverRef.current) return convolverRef.current;
+
+    const audioTierKey = prefs.audioTier || 'standard';
+    const tierConfig = AUDIO_TIERS[audioTierKey];
+    const decay = tierConfig.reverbDecay;
+    const sampleRate = ctx.sampleRate;
+    const length = sampleRate * decay;
+    const impulse = ctx.createBuffer(2, length, sampleRate);
+
+    // Generate temple-like impulse response with early reflections
+    for (let ch = 0; ch < 2; ch++) {
+      const data = impulse.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        const t = i / sampleRate;
+        // Exponential decay envelope
+        const envelope = Math.exp(-3.0 * t / decay);
+        // Early reflections (sharp transients in first 50ms)
+        const earlyReflection = t < 0.05 ? Math.exp(-t * 40) * 0.6 : 0;
+        // Diffuse tail (filtered noise)
+        const noise = (Math.random() * 2 - 1) * envelope;
+        // Add subtle modal resonances (temple acoustics)
+        const mode1 = Math.sin(2 * Math.PI * 62 * t) * envelope * 0.02;
+        const mode2 = Math.sin(2 * Math.PI * 125 * t) * envelope * 0.01;
+        data[i] = noise * 0.5 + earlyReflection * (Math.random() * 2 - 1) + mode1 + mode2;
+      }
+    }
+
+    const convolver = ctx.createConvolver();
+    convolver.buffer = impulse;
+    convolverRef.current = convolver;
+
+    // Reverb send gain
+    const reverbGain = ctx.createGain();
+    reverbGain.gain.value = tierConfig.reverbMix;
+    reverbGainRef.current = reverbGain;
+
+    convolver.connect(reverbGain);
+    reverbGain.connect(ctx.destination);
+
+    return convolver;
+  }, [getAudioCtx, prefs.audioTier]);
+
+  // ━━━ CONFIRMATION CHIME (universal node interaction feedback) ━━━
+  const playConfirmation = useCallback((frequency = 880, intensity = 'medium') => {
+    if (!prefs.soundEffects || prefs.sovereignMute) return;
+    try {
+      const ctx = getAudioCtx();
+      const convolver = getConvolver();
+      const audioTierKey = prefs.audioTier || 'standard';
+
+      // Primary tone
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      const g = ctx.createGain();
+      const vol = intensity === 'high' ? 0.08 : intensity === 'medium' ? 0.05 : 0.03;
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(g);
+      g.connect(ctx.destination);
+
+      // Route through convolution reverb if available (Artisan+ tier)
+      if (convolver && (audioTierKey === 'artisan' || audioTierKey === 'sovereign')) {
+        const sendGain = ctx.createGain();
+        sendGain.gain.value = 0.3;
+        osc.connect(sendGain);
+        sendGain.connect(convolver);
+      }
+
+      // Harmonic overtone (multi-sampled synthesis simulation)
+      if (audioTierKey !== 'standard') {
+        const harm = ctx.createOscillator();
+        harm.type = 'sine';
+        harm.frequency.value = frequency * 2;
+        const hg = ctx.createGain();
+        hg.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+        hg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        harm.connect(hg);
+        hg.connect(ctx.destination);
+        harm.start();
+        harm.stop(ctx.currentTime + 0.2);
+      }
+
+      // Sub-harmonic resonance (Sovereign tier — sympathetic resonance)
+      if (audioTierKey === 'sovereign') {
+        const sub = ctx.createOscillator();
+        sub.type = 'sine';
+        sub.frequency.value = frequency * 0.5;
+        const sg = ctx.createGain();
+        sg.gain.setValueAtTime(vol * 0.15, ctx.currentTime + 0.05);
+        sg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        sub.connect(sg);
+        sg.connect(ctx.destination);
+        if (convolver) {
+          const subSend = ctx.createGain();
+          subSend.gain.value = 0.2;
+          sub.connect(subSend);
+          subSend.connect(convolver);
+        }
+        sub.start(ctx.currentTime + 0.05);
+        sub.stop(ctx.currentTime + 0.5);
+      }
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+  }, [getAudioCtx, getConvolver, prefs.soundEffects, prefs.sovereignMute, prefs.audioTier]);
+
+  // ━━━ SINGING BOWL (multi-sampled synthesis for Artisan+) ━━━
+  const playSingingBowl = useCallback((frequency = 396) => {
+    if (!prefs.soundEffects || prefs.sovereignMute) return;
+    try {
+      const ctx = getAudioCtx();
+      const convolver = getConvolver();
+      const audioTierKey = prefs.audioTier || 'standard';
+      const duration = audioTierKey === 'sovereign' ? 6 : audioTierKey === 'artisan' ? 4 : 2;
+
+      // Fundamental
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.06, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(g);
+      g.connect(ctx.destination);
+
+      // Partials (singing bowl has inharmonic overtones)
+      const partials = [2.71, 4.16, 5.43];
+      partials.forEach((ratio, i) => {
+        const p = ctx.createOscillator();
+        p.type = 'sine';
+        p.frequency.value = frequency * ratio;
+        const pg = ctx.createGain();
+        pg.gain.setValueAtTime(0.02 / (i + 1), ctx.currentTime);
+        pg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration * 0.7);
+        p.connect(pg);
+        pg.connect(ctx.destination);
+        if (convolver) {
+          const ps = ctx.createGain();
+          ps.gain.value = 0.15;
+          p.connect(ps);
+          ps.connect(convolver);
+        }
+        p.start();
+        p.stop(ctx.currentTime + duration);
+      });
+
+      // Beating effect (slight detuning for realism)
+      const beat = ctx.createOscillator();
+      beat.type = 'sine';
+      beat.frequency.value = frequency + 1.5;
+      const bg = ctx.createGain();
+      bg.gain.setValueAtTime(0.02, ctx.currentTime);
+      bg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      beat.connect(bg);
+      bg.connect(ctx.destination);
+      beat.start();
+      beat.stop(ctx.currentTime + duration);
+
+      // Route fundamental through reverb
+      if (convolver) {
+        const sendG = ctx.createGain();
+        sendG.gain.value = 0.4;
+        osc.connect(sendG);
+        sendG.connect(convolver);
+      }
+
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+  }, [getAudioCtx, getConvolver, prefs.soundEffects, prefs.sovereignMute, prefs.audioTier]);
+
+  // ━━━ SET AUDIO TIER FROM MASTERY ━━━
+  const setAudioTierFromMastery = useCallback((masteryTier) => {
+    const audioTier = MASTERY_TO_AUDIO[masteryTier] || 'standard';
+    updatePref('audioTier', audioTier);
+    // Reset convolver when tier changes
+    convolverRef.current = null;
+    reverbGainRef.current = null;
+  }, [updatePref]);
+
   const toggleAmbient = useCallback(() => {
     setAmbientOn(prev => {
       if (!prev) { startAmbient(); } else { stopAmbient(); }
@@ -404,6 +609,8 @@ export function SensoryProvider({ children }) {
   return (
     <SensoryContext.Provider value={{
       ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
+      playConfirmation, playSingingBowl, setAudioTierFromMastery,
+      audioTierConfig: AUDIO_TIERS[prefs.audioTier || 'standard'],
       prefs, updatePref, themes: THEMES,
       immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
       showVisionMode, showFractals, animationSpeed,

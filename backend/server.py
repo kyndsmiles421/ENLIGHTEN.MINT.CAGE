@@ -130,6 +130,7 @@ from routes.sovereign_codex import router as sovereign_codex_router
 from routes.cosmic_state import router as cosmic_state_router
 from routes.hexagram import router as hexagram_router
 from routes.hexagram_journal import router as hexagram_journal_router
+from routes.mantras_sovereign import router as mantras_sovereign_router
 from routes.synchronicity import router as sync_router, manager as sync_manager, authenticate_ws
 
 app = FastAPI()
@@ -229,6 +230,7 @@ all_routers = [
     cosmic_state_router,
     hexagram_router,
     hexagram_journal_router,
+    mantras_sovereign_router,
 ]
 
 for r in all_routers:

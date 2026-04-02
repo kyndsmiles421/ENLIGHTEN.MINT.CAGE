@@ -4,6 +4,8 @@ import { ChevronLeft, ArrowLeft } from 'lucide-react';
 import { ResonancePulse, HexagramGlitch } from './ResonancePulse';
 import { CosmicSparkline } from './CosmicSparkline';
 import { useCosmicState } from '../context/CosmicStateContext';
+import { useSensory } from '../context/SensoryContext';
+import { OrbitalTransitionPortal } from './OrbitalTransitionPortal';
 
 // ━━━ GRAVITY CONSTANTS ENGINE ━━━
 function computeGravityLayout(nodeCount, containerSize, stability) {
@@ -39,7 +41,7 @@ function computeGravitationalDamping(cursorPos, positions, center, pullRadius) {
 }
 
 // ━━━ ORBITAL NODE ━━━
-function OrbitalNode({ node, x, y, isActive, isLocked, onSelect, onHover, hoveredId, containerCenter }) {
+function OrbitalNode({ node, x, y, isActive, isLocked, onSelect, onHover, hoveredId, containerCenter, onConfirm }) {
   const Icon = node.icon;
   const isHovered = hoveredId === node.id;
   const scale = isActive ? 1.2 : isHovered ? 1.15 : isLocked ? 0.85 : 1;
@@ -55,7 +57,7 @@ function OrbitalNode({ node, x, y, isActive, isLocked, onSelect, onHover, hovere
       }}
       animate={{ x, y, scale, opacity: isLocked ? 0.2 : 1 }}
       transition={{ type: 'spring', stiffness: 65, damping: 18 }}
-      onClick={(e) => { e.stopPropagation(); if (!isLocked) onSelect(node); }}
+      onClick={(e) => { e.stopPropagation(); if (!isLocked) { if (onConfirm) onConfirm(node); onSelect(node); } }}
       onHoverStart={() => onHover(node.id)}
       onHoverEnd={() => onHover(null)}
       data-testid={`orbital-node-${node.id}`}
@@ -187,6 +189,7 @@ export function OrbitalHubBase({
   children,          // optional overlay content (detail panels, etc.)
 }) {
   const { cosmicState } = useCosmicState();
+  const { playConfirmation } = useSensory();
   const stability = cosmicState?.stability || 'stable';
 
   const [hoveredId, setHoveredId] = useState(null);
@@ -284,6 +287,16 @@ export function OrbitalHubBase({
     cursorPos.current = null; // reset gravitational pull
   }, []);
 
+  // Confirmation chime on node interaction
+  const handleConfirm = useCallback((node) => {
+    // Map node to frequency — each node gets a unique pitch
+    const baseFreq = 440;
+    const nodeIdx = visiblePlanets.findIndex(p => p.id === node.id);
+    const semitone = nodeIdx * 2;
+    const freq = baseFreq * Math.pow(2, semitone / 12);
+    playConfirmation(freq, 'medium');
+  }, [visiblePlanets, playConfirmation]);
+
   // Deep-dive: animate fly-in then hand off to parent
   const handleSelect = useCallback((planet) => {
     if (!onPlanetSelect) return;
@@ -354,6 +367,7 @@ export function OrbitalHubBase({
               onHover={setHoveredId}
               hoveredId={hoveredId}
               containerCenter={center}
+              onConfirm={handleConfirm}
             />
           ))}
 
@@ -419,6 +433,9 @@ export function OrbitalHubBase({
           </div>
         </motion.div>
       )}
+
+      {/* Orbital Transition Portal — persistent nav between orbital pages */}
+      <OrbitalTransitionPortal />
 
       {/* Overlay children (detail panels, etc.) */}
       {children}
