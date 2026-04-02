@@ -110,3 +110,59 @@ async def set_admin(data: dict, user=Depends(get_current_user)):
 
     return {"status": "admin_granted", "user_id": user["id"]}
 
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  AVATAR SYSTEM
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AVATAR_SYMBOLS = [
+    "lotus", "star", "moon", "sun", "flame", "leaf",
+    "crystal", "feather", "spiral", "eye", "wave", "mountain",
+]
+
+AVATAR_COLORS = [
+    "#FBBF24", "#2DD4BF", "#A78BFA", "#F472B6", "#60A5FA",
+    "#34D399", "#FB923C", "#818CF8", "#F87171", "#22D3EE",
+]
+
+
+@router.get("/auth/avatar")
+async def get_avatar(user=Depends(get_current_user)):
+    """Get the user's avatar settings."""
+    found = await db.users.find_one({"id": user["id"]}, {"_id": 0, "password": 0})
+    if not found:
+        raise HTTPException(status_code=404, detail="User not found")
+    avatar = found.get("avatar", {
+        "color": "#FBBF24",
+        "symbol": "star",
+        "display_name": found.get("name", "Traveler"),
+    })
+    return {
+        "avatar": avatar,
+        "available_symbols": AVATAR_SYMBOLS,
+        "available_colors": AVATAR_COLORS,
+    }
+
+
+@router.put("/auth/avatar")
+async def update_avatar(data: dict, user=Depends(get_current_user)):
+    """Update the user's avatar settings."""
+    color = data.get("color", "#FBBF24")
+    symbol = data.get("symbol", "star")
+    display_name = data.get("display_name", "").strip()
+
+    if color not in AVATAR_COLORS:
+        color = "#FBBF24"
+    if symbol not in AVATAR_SYMBOLS:
+        symbol = "star"
+    if not display_name:
+        found = await db.users.find_one({"id": user["id"]}, {"_id": 0, "name": 1})
+        display_name = found.get("name", "Traveler") if found else "Traveler"
+
+    avatar = {"color": color, "symbol": symbol, "display_name": display_name[:20]}
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"avatar": avatar}},
+    )
+    return {"success": True, "avatar": avatar}

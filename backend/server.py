@@ -225,9 +225,13 @@ async def websocket_sync(ws: WebSocket, token: str = ""):
     uid = user["id"]
     await sync_manager.connect(uid, ws)
 
-    # Look up coven membership
+    # Look up coven membership and avatar
     membership = await db.coven_members.find_one({"user_id": uid, "active": True}, {"_id": 0})
     coven_id = membership["coven_id"] if membership else None
+
+    user_doc = await db.users.find_one({"id": uid}, {"_id": 0, "avatar": 1, "name": 1})
+    avatar = user_doc.get("avatar", {"color": "#FBBF24", "symbol": "star"}) if user_doc else {"color": "#FBBF24", "symbol": "star"}
+    display_name = avatar.get("display_name", user.get("name", "Traveler"))
 
     try:
         while True:
@@ -238,8 +242,9 @@ async def websocket_sync(ws: WebSocket, token: str = ""):
                 sync_manager.update_position(uid, {
                     "lat": data.get("lat"),
                     "lng": data.get("lng"),
-                    "name": user.get("name", "Traveler"),
+                    "name": display_name,
                     "coven_id": coven_id,
+                    "avatar": avatar,
                 })
                 if coven_id:
                     members = sync_manager.get_coven_members(coven_id, exclude_uid=uid)

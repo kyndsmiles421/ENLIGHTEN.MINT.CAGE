@@ -8,8 +8,10 @@ import { toast } from 'sonner';
 import {
   MapPin, Zap, Leaf, Star, Navigation, RefreshCw,
   ChevronUp, X, Sparkles, Crown, Layers, Globe, Moon,
-  Users, Copy, LogOut, Plus, Wifi, Trophy
+  Users, Copy, LogOut, Plus, Wifi, Trophy, User
 } from 'lucide-react';
+
+import AvatarCustomizer, { SYMBOL_PATHS } from '../components/AvatarCustomizer';
 import 'leaflet/dist/leaflet.css';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -45,12 +47,19 @@ const userIcon = L.divIcon({
 });
 
 const MEMBER_COLORS = ['#2DD4BF', '#A78BFA', '#F472B6', '#60A5FA', '#FBBF24'];
-const createMemberIcon = (idx) => L.divIcon({
-  html: `<div style="width:14px;height:14px;border-radius:50%;background:${MEMBER_COLORS[idx % MEMBER_COLORS.length]};border:2px solid rgba(15,15,25,0.8);box-shadow:0 0 10px ${MEMBER_COLORS[idx % MEMBER_COLORS.length]}80"></div>`,
-  className: '',
-  iconSize: [14, 14],
-  iconAnchor: [7, 7],
-});
+const createMemberIcon = (idx, avatar) => {
+  const color = avatar?.color || MEMBER_COLORS[idx % MEMBER_COLORS.length];
+  const symbol = avatar?.symbol || 'star';
+  const path = SYMBOL_PATHS[symbol] || SYMBOL_PATHS.star;
+  return L.divIcon({
+    html: `<div style="width:20px;height:20px;border-radius:50%;background:${color}20;border:2px solid ${color};box-shadow:0 0 10px ${color}60;display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="${color}" stroke-width="2"><path d="${path}"/></svg>
+    </div>`,
+    className: '',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+};
 
 function RecenterButton({ center }) {
   const map = useMap();
@@ -228,6 +237,7 @@ export default function CosmicMap() {
   const [onlineCount, setOnlineCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [covenTab, setCovenTab] = useState('coven'); // 'coven' | 'rankings' | 'avatar'
 
   // Geolocation
   useEffect(() => {
@@ -406,7 +416,7 @@ export default function CosmicMap() {
     } catch (e) { console.error('Leaderboard fetch failed', e); }
   }, [authHeaders]);
 
-  useEffect(() => { if (showLeaderboard) fetchLeaderboard(); }, [showLeaderboard, fetchLeaderboard]);
+  useEffect(() => { if (covenTab === 'rankings') fetchLeaderboard(); }, [covenTab, fetchLeaderboard]);
 
   // Harvest ground nodes / power spots
   const handleHarvest = async (node) => {
@@ -501,8 +511,8 @@ export default function CosmicMap() {
 
             {/* Coven Members */}
             {covenMembers.filter(m => m.lat && m.lng).map((m, idx) => (
-              <Marker key={m.user_id} position={[m.lat, m.lng]} icon={createMemberIcon(idx)}>
-                <Popup><span style={{ color: MEMBER_COLORS[idx % MEMBER_COLORS.length], fontSize: '11px' }}>{m.name}</span></Popup>
+              <Marker key={m.user_id} position={[m.lat, m.lng]} icon={createMemberIcon(idx, m.avatar)}>
+                <Popup><span style={{ color: m.avatar?.color || MEMBER_COLORS[idx % MEMBER_COLORS.length], fontSize: '11px' }}>{m.name}</span></Popup>
               </Marker>
             ))}
           </MapContainer>
@@ -649,23 +659,32 @@ export default function CosmicMap() {
             }}
             data-testid="coven-panel">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button onClick={() => setShowLeaderboard(false)}
-                  className="text-[9px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setCovenTab('coven')}
+                  className="text-[8px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
                   style={{
-                    background: !showLeaderboard ? 'rgba(45,212,191,0.1)' : 'transparent',
-                    color: !showLeaderboard ? '#2DD4BF' : 'var(--text-muted)',
+                    background: covenTab === 'coven' ? 'rgba(45,212,191,0.1)' : 'transparent',
+                    color: covenTab === 'coven' ? '#2DD4BF' : 'var(--text-muted)',
                   }}>
-                  <Users size={9} /> Coven
+                  <Users size={8} /> Coven
                 </button>
-                <button onClick={() => setShowLeaderboard(true)}
-                  className="text-[9px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
+                <button onClick={() => setCovenTab('rankings')}
+                  className="text-[8px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
                   style={{
-                    background: showLeaderboard ? 'rgba(251,191,36,0.1)' : 'transparent',
-                    color: showLeaderboard ? '#FBBF24' : 'var(--text-muted)',
+                    background: covenTab === 'rankings' ? 'rgba(251,191,36,0.1)' : 'transparent',
+                    color: covenTab === 'rankings' ? '#FBBF24' : 'var(--text-muted)',
                   }}
                   data-testid="leaderboard-tab">
-                  <Trophy size={9} /> Rankings
+                  <Trophy size={8} /> Ranks
+                </button>
+                <button onClick={() => setCovenTab('avatar')}
+                  className="text-[8px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded"
+                  style={{
+                    background: covenTab === 'avatar' ? 'rgba(167,139,250,0.1)' : 'transparent',
+                    color: covenTab === 'avatar' ? '#A78BFA' : 'var(--text-muted)',
+                  }}
+                  data-testid="avatar-tab">
+                  <User size={8} /> Avatar
                 </button>
               </div>
               <button onClick={() => setShowCovenPanel(false)} className="w-5 h-5 rounded-full flex items-center justify-center"
@@ -674,7 +693,9 @@ export default function CosmicMap() {
               </button>
             </div>
 
-            {showLeaderboard ? (
+            {covenTab === 'avatar' ? (
+              <AvatarCustomizer onSave={() => fetchCoven()} />
+            ) : covenTab === 'rankings' ? (
               <div className="space-y-1.5" data-testid="leaderboard-list">
                 {leaderboard.length === 0 ? (
                   <p className="text-[8px] text-center py-3" style={{ color: 'var(--text-muted)' }}>No covens yet. Be the first!</p>
