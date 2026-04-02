@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import {
   Crown, MapPin, Zap, Power, Trash2, Edit3, Save,
-  Navigation, Radio, ChevronDown, ChevronUp, Plus
+  Navigation, Radio, ChevronDown, ChevronUp, Plus, Locate, LocateOff
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
@@ -62,16 +62,21 @@ export default function PowerSpotAdmin() {
   const [formRadius, setFormRadius] = useState('100');
   const [formHours, setFormHours] = useState('');
 
-  // Edit form
   const [editing, setEditing] = useState(null);
   const [editLat, setEditLat] = useState('');
   const [editLng, setEditLng] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editMult, setEditMult] = useState('');
 
+  // Live tracking
+  const [trackingSpotId, setTrackingSpotId] = useState(null);
+  const watchIdRef = useRef(null);
+  const intervalRef = useRef(null);
+  const lastPosRef = useRef(null);
+
   const fetchSpots = useCallback(async () => {
     try {
-      const res = await axios.get(`${API}/cosmic-map/power-spots`, { headers: authHeaders });
+      const res = await axios.get(`${API}/cosmic-map/power-spots?include_all=true`, { headers: authHeaders });
       setSpots(res.data.power_spots || []);
     } catch (e) { console.error('Spots fetch failed', e); }
   }, [authHeaders]);
@@ -149,6 +154,57 @@ export default function PowerSpotAdmin() {
     setEditDesc(spot.description || '');
     setEditMult(spot.reward_multiplier?.toString() || '5');
   };
+
+  // ━━━ Live Tracking ━━━
+  const stopTracking = useCallback(() => {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    lastPosRef.current = null;
+  }, []);
+
+  const handleToggleTracking = async (spot) => {
+    const enabling = !spot.live_tracking;
+    try {
+      await axios.post(`${API}/cosmic-map/power-spots/${spot.id}/live-tracking`, { enabled: enabling }, { headers: authHeaders });
+
+      if (enabling) {
+        setTrackingSpotId(spot.id);
+        // Start watching GPS
+        watchIdRef.current = navigator.geolocation.watchPosition(
+          (pos) => { lastPosRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 5000 }
+        );
+        // Send pings every 10 seconds
+        intervalRef.current = setInterval(async () => {
+          if (!lastPosRef.current) return;
+          try {
+            await axios.put(
+              `${API}/cosmic-map/power-spots/${spot.id}/update-location`,
+              lastPosRef.current,
+              { headers: authHeaders }
+            );
+            fetchSpots();
+          } catch (e) { console.error('Location ping failed', e); }
+        }, 10000);
+      } else {
+        stopTracking();
+        setTrackingSpotId(null);
+      }
+      fetchSpots();
+    } catch (e) { alert(e.response?.data?.detail || 'Tracking toggle failed'); }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => stopTracking();
+  }, [stopTracking]);
 
   const defaultCenter = spots.length > 0
     ? { lat: spots[0].lat, lng: spots[0].lng }
@@ -324,6 +380,12 @@ export default function PowerSpotAdmin() {
                 }}>
                 {spot.active ? 'LIVE' : 'OFFLINE'}
               </span>
+              {spot.live_tracking && (
+                <span className="text-[7px] px-1.5 py-0.5 rounded-full"
+                  style={{ background: 'rgba(34,197,94,0.08)', color: '#22C55E' }}>
+                  GPS
+                </span>
+              )}
             </div>
 
             {editing === spot.id ? (
@@ -382,6 +444,24 @@ export default function PowerSpotAdmin() {
                   <p className="text-[7px] mb-2" style={{ color: 'var(--text-muted)' }}>{spot.description}</p>
                 )}
 
+                {/* Live tracking indicator */}
+                {spot.live_tracking && (
+                  <motion.div
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="flex items-center gap-1.5 mb-2 px-2 py-1 rounded-md"
+                    style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.12)' }}
+                    data-testid={`tracking-active-${spot.id}`}>
+                    <Locate size={8} style={{ color: '#22C55E' }} />
+                    <span className="text-[7px]" style={{ color: '#22C55E' }}>GPS Tracking Active</span>
+                    {spot.last_location_update && (
+                      <span className="text-[6px] ml-auto" style={{ color: 'rgba(34,197,94,0.6)' }}>
+                        Updated {new Date(spot.last_location_update).toLocaleTimeString()}
+                      </span>
+                    )}
+                  </motion.div>
+                )}
+
                 {/* Actions */}
                 <div className="flex gap-1.5">
                   <button onClick={() => handleGoLive(spot.id, !spot.active)}
@@ -393,6 +473,17 @@ export default function PowerSpotAdmin() {
                     }}
                     data-testid={`go-live-${spot.id}`}>
                     <Power size={9} /> {spot.active ? 'Go Offline' : 'Go Live'}
+                  </button>
+                  <button onClick={() => handleToggleTracking(spot)}
+                    className="px-3 py-1.5 rounded-md text-[8px] flex items-center gap-1 transition-all"
+                    style={{
+                      background: spot.live_tracking ? 'rgba(34,197,94,0.1)' : 'rgba(248,250,252,0.04)',
+                      color: spot.live_tracking ? '#22C55E' : 'var(--text-muted)',
+                      border: spot.live_tracking ? '1px solid rgba(34,197,94,0.2)' : '1px solid transparent',
+                    }}
+                    data-testid={`track-${spot.id}`}>
+                    {spot.live_tracking ? <LocateOff size={8} /> : <Locate size={8} />}
+                    {spot.live_tracking ? 'Stop' : 'Track'}
                   </button>
                   <button onClick={() => startEdit(spot)}
                     className="px-3 py-1.5 rounded-md text-[8px] flex items-center gap-1"

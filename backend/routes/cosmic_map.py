@@ -518,11 +518,10 @@ class PowerSpotCreate(BaseModel):
 
 
 @router.get("/power-spots")
-async def get_power_spots(user=Depends(get_current_user)):
-    """Get all active Power Spots."""
-    spots = await db.power_spots.find(
-        {"active": True}, {"_id": 0}
-    ).to_list(50)
+async def get_power_spots(user=Depends(get_current_user), include_all: bool = False):
+    """Get Power Spots. include_all=true for admin view (shows inactive too)."""
+    query = {} if include_all else {"active": True}
+    spots = await db.power_spots.find(query, {"_id": 0}).to_list(50)
 
     uid = user["id"]
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -542,6 +541,9 @@ async def get_power_spots(user=Depends(get_current_user)):
             "reward_multiplier": s.get("reward_multiplier", 5.0),
             "harvest_radius_meters": s.get("harvest_radius_meters", 100),
             "active_hours": s.get("active_hours"),
+            "active": s.get("active", True),
+            "live_tracking": s.get("live_tracking", False),
+            "last_location_update": s.get("last_location_update"),
             "color": "#FBBF24",
             "icon": "crown",
             "rarity": "legendary",
@@ -751,6 +753,70 @@ async def get_active_broadcasts(user=Depends(get_current_user)):
     ).sort("created_at", -1).to_list(10)
 
     return {"broadcasts": broadcasts, "count": len(broadcasts)}
+
+
+@router.post("/power-spots/{spot_id}/live-tracking")
+async def toggle_live_tracking(
+    spot_id: str,
+    enabled: bool = Body(..., embed=True),
+    user=Depends(get_current_user),
+):
+    """Toggle live GPS tracking on/off for a Power Spot."""
+    spot = await db.power_spots.find_one({"id": spot_id}, {"_id": 0})
+    if not spot:
+        raise HTTPException(404, "Power Spot not found")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.power_spots.update_one(
+        {"id": spot_id},
+        {"$set": {"live_tracking": enabled, "updated_at": now}},
+    )
+
+    return {
+        "success": True,
+        "spot_id": spot_id,
+        "live_tracking": enabled,
+        "message": f"Live tracking {'enabled' if enabled else 'disabled'} for {spot['name']}.",
+    }
+
+
+class LocationPing(BaseModel):
+    lat: float
+    lng: float
+
+
+@router.put("/power-spots/{spot_id}/update-location")
+async def update_spot_location(
+    spot_id: str,
+    ping: LocationPing,
+    user=Depends(get_current_user),
+):
+    """Update a Power Spot's GPS coordinates (called by live tracking)."""
+    spot = await db.power_spots.find_one({"id": spot_id}, {"_id": 0})
+    if not spot:
+        raise HTTPException(404, "Power Spot not found")
+
+    if not spot.get("live_tracking"):
+        raise HTTPException(400, "Live tracking is not enabled for this spot")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.power_spots.update_one(
+        {"id": spot_id},
+        {"$set": {
+            "lat": ping.lat,
+            "lng": ping.lng,
+            "last_location_update": now,
+            "updated_at": now,
+        }},
+    )
+
+    return {
+        "success": True,
+        "spot_id": spot_id,
+        "lat": ping.lat,
+        "lng": ping.lng,
+        "last_location_update": now,
+    }
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
