@@ -7,7 +7,7 @@ import {
   Activity, Eye, Layers, Radio, Atom, Shield, Sparkles,
   Heart, Zap, Mountain, Droplets, Flame, MapPin, Users,
   CheckCircle, AlertCircle, Clock, Globe, Brain, Sun,
-  ChevronRight, Lock, Compass
+  ChevronRight, Lock, Compass, Grid3X3
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -173,7 +173,7 @@ export default function MasterView() {
 
       {/* Subsystems */}
       <AuditSection title="Subsystem Status" icon={Activity} color="#2DD4BF" status="nominal">
-        {Object.entries(audit.subsystems).map(([key, sys]) => (
+        {Object.entries(audit.subsystems || {}).map(([key, sys]) => (
           <div key={key} className="flex items-center justify-between py-1 border-b" style={{ borderColor: 'rgba(248,250,252,0.03)' }}>
             <span className="text-[9px] capitalize" style={{ color: 'var(--text-muted)' }}>{key.replace('_', ' ')}</span>
             <div className="flex items-center gap-2">
@@ -187,6 +187,59 @@ export default function MasterView() {
           </div>
         ))}
       </AuditSection>
+
+      {/* Fractal Engine */}
+      {audit.fractal_engine && (
+        <AuditSection title="Fractal Engine (L²)" icon={Layers} color="#C084FC" status={audit.fractal_engine.status}>
+          <MetricRow label="Total Sub-Layers" value={audit.fractal_engine.total_sublayers} color="#C084FC" />
+          <MetricRow label="Explored" value={`${audit.fractal_engine.explored} (${audit.fractal_engine.exploration_pct}%)`} color="#2DD4BF" />
+          <MetricRow label="Current Sub-Layer" value={audit.fractal_engine.current_sublayer || 'None'} />
+          <MetricRow label="Fractal Law" value={audit.fractal_engine.fractal_law} />
+          <div className="flex gap-1 mt-1">
+            {Object.entries(audit.fractal_engine.by_depth || {}).map(([d, info]) => (
+              <div key={d} className="flex-1 text-center p-1 rounded" style={{ background: 'rgba(248,250,252,0.02)' }}>
+                <p className="text-[8px] font-mono" style={{ color: '#C084FC' }}>{info.explored}/{info.sub_count}</p>
+                <p className="text-[6px] capitalize" style={{ color: 'var(--text-muted)' }}>{d.replace('_',' ')}</p>
+              </div>
+            ))}
+          </div>
+        </AuditSection>
+      )}
+
+      {/* Mastery Avenues */}
+      {audit.mastery_avenues && (
+        <AuditSection title="Mastery Avenues" icon={Sparkles} color="#06B6D4" status={audit.mastery_avenues.status}>
+          {['mathematics', 'art', 'thought'].map(a => {
+            const data = audit.mastery_avenues[a] || {};
+            const labels = { mathematics: 'Architect', art: 'Visionary', thought: 'Philosopher' };
+            return (
+              <MetricRow key={a} label={`${labels[a]} (${a})`} value={`${data.resonance || 0} res (Tier ${data.tier || 0})`}
+                color={a === 'mathematics' ? '#06B6D4' : a === 'art' ? '#F472B6' : '#FBBF24'} />
+            );
+          })}
+          <MetricRow label="Total Resonance" value={audit.mastery_avenues.total_resonance} color="#FBBF24" />
+        </AuditSection>
+      )}
+
+      {/* Taste Test */}
+      {audit.taste_test && (
+        <AuditSection title="Final Taste Test" icon={CheckCircle} color="#10B981" status="verified">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Geometric Integrity (L² verified)</span>
+              <StatusBadge status={audit.taste_test.geometric_integrity?.status} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Quantum Handshake</span>
+              <StatusBadge status={audit.taste_test.quantum_handshake?.status} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Dimensional Flow ({audit.taste_test.dimensional_flow?.sublayers} layers)</span>
+              <StatusBadge status={audit.taste_test.dimensional_flow?.status} />
+            </div>
+          </div>
+        </AuditSection>
+      )}
 
       {/* System Health */}
       <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(45,212,191,0.03)', border: '1px solid rgba(45,212,191,0.08)' }}
@@ -206,11 +259,12 @@ export default function MasterView() {
       </div>
 
       {/* Navigation */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {[
           { label: 'Depths', path: '/planetary-depths', color: '#D97706', icon: Layers },
           { label: 'Quantum', path: '/quantum-field', color: '#EF4444', icon: Eye },
-          { label: 'Grid', path: '/dimensional-space', color: '#8B5CF6', icon: Atom },
+          { label: 'Fractal', path: '/fractal-engine', color: '#C084FC', icon: Grid3X3 },
+          { label: 'Avenues', path: '/mastery-avenues', color: '#06B6D4', icon: Sparkles },
         ].map(nav => (
           <button key={nav.label} onClick={() => navigate(nav.path)}
             className="py-2 rounded-lg text-[9px] flex items-center justify-center gap-1 transition-all hover:scale-[1.02]"

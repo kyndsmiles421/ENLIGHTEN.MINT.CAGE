@@ -155,6 +155,8 @@ const QuantumField = lazy(() => import('./pages/QuantumField'));
 const DimensionalSpace = lazy(() => import('./pages/DimensionalSpace'));
 const MasterViewPage = lazy(() => import('./pages/MasterView'));
 const CollectiveShadowMap = lazy(() => import('./pages/CollectiveShadowMap'));
+const FractalEngine = lazy(() => import('./pages/FractalEngine'));
+const MasteryAvenues = lazy(() => import('./pages/MasteryAvenues'));
 
 function PageLoader() {
   return (
@@ -297,6 +299,8 @@ function AnimatedRoutes() {
         <Route path="/dimensional-space" element={<DimensionalSpace />} />
         <Route path="/master-view" element={<MasterViewPage />} />
         <Route path="/collective-shadow-map" element={<CollectiveShadowMap />} />
+        <Route path="/fractal-engine" element={<FractalEngine />} />
+        <Route path="/mastery-avenues" element={<MasteryAvenues />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

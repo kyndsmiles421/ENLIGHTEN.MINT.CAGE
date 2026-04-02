@@ -114,6 +114,8 @@ from routes.planetary import router as planetary_router
 from routes.quantum import router as quantum_router
 from routes.dimensions import router as dimensions_router
 from routes.master_view import router as master_view_router
+from routes.sublayers import router as sublayers_router
+from routes.avenues import router as avenues_router
 
 app = FastAPI()
 
@@ -195,6 +197,8 @@ all_routers = [
     quantum_router,
     dimensions_router,
     master_view_router,
+    sublayers_router,
+    avenues_router,
 ]
 
 for r in all_routers:
