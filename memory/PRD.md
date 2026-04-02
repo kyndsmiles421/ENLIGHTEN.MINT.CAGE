@@ -140,6 +140,27 @@ Build "The Cosmic Collective", a highly immersive full-stack wellness platform b
 
 **Tests:** Iteration 196 — 100% Backend (19/19) / 100% Frontend
 
+### Tesla 3-6-9 Resonance, Culinary Recipe & Aura Wake (Apr 2, 2026) — LATEST
+
+**Tesla 3-6-9 Nodal Resonance (MoodTracker):**
+- When exactly 3, 6, or 9 moods are selected, a "Tesla Harmony" indicator appears
+- Animated arcing lines (electrical discharge effect) sweep across the indicator
+- Quote: "If you knew the magnificence of N..." — 369Hz unlocked
+- Integrates with both frontend display and backend `is_tesla_harmony` flag
+
+**Culinary Frequency Recipe System:**
+- `GET /api/moods/frequency-recipe` — returns last mood as a culinary recipe metaphor
+- 10 frequency-to-ingredient mappings: 174Hz=Root Broth, 285Hz=Sea Salt Crystal, 396Hz=Black Pepper, 417Hz=Ginger Root, 432Hz=Honey Drizzle, 528Hz=Olive Oil, 639Hz=Vanilla Extract, 741Hz=Citrus Zest, 852Hz=Saffron Thread, 963Hz=Truffle Shaving
+- Recipe types: Pure Essence (1), Simple Infusion (2), Complex Reduction (3+), Tesla Harmony Blend (3/6/9)
+- Recipe card in MoodTracker right column with ingredient list showing Hz, name, type, flavor
+
+**Aura-Wake Physics (CosmicMap):**
+- Avatar position history tracked (last 8 positions)
+- Trailing dashed circles behind avatar showing movement path
+- Opacity fades with age, creating a "frequency wake" visual on the map
+
+**Tests:** Iteration 197 — 100% Backend (16/16) / 100% Frontend
+
 ### Cosmic Map, Forge Mini-Game & Exponential Decay (Apr 2, 2026)
 
 **Resonance Forge Mini-Game:**
