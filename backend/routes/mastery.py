@@ -274,10 +274,10 @@ async def get_lessons(user=Depends(get_current_user)):
 
 BALANCE_TIERS = [
     {"name": "observer", "min": 0, "max": 20, "color": "#60A5FA", "perks": ["Basic catalog access", "Garden (max 6 plants)"]},
-    {"name": "synthesizer", "min": 21, "max": 40, "color": "#2DD4BF", "perks": ["Uncommon plants unlocked", "Garden (max 12)", "Frequency recipes"]},
-    {"name": "archivist", "min": 41, "max": 60, "color": "#FBBF24", "perks": ["Rare plants unlocked", "Garden (max 18)", "Archive deep layers"]},
-    {"name": "navigator", "min": 61, "max": 80, "color": "#C084FC", "perks": ["Legendary plants unlocked", "Garden (max 24)", "Star Charts access"]},
-    {"name": "sovereign", "min": 81, "max": 100, "color": "#EF4444", "perks": ["Custom element nodes", "Global Trade Circle", "All progressive locks removed", "Hexagram keys"]},
+    {"name": "synthesizer", "min": 20.1, "max": 40, "color": "#2DD4BF", "perks": ["Uncommon plants unlocked", "Garden (max 12)", "Frequency recipes"]},
+    {"name": "archivist", "min": 40.1, "max": 60, "color": "#FBBF24", "perks": ["Rare plants unlocked", "Garden (max 18)", "Archive deep layers"]},
+    {"name": "navigator", "min": 60.1, "max": 80, "color": "#C084FC", "perks": ["Legendary plants unlocked", "Garden (max 24)", "Star Charts access"]},
+    {"name": "sovereign", "min": 80.1, "max": 100, "color": "#EF4444", "perks": ["Custom element nodes", "Global Trade Circle", "All progressive locks removed", "Hexagram keys"]},
 ]
 
 ALL_ELEMENTS = ["Wood", "Fire", "Earth", "Metal", "Water"]
