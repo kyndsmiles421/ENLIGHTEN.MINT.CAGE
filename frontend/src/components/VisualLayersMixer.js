@@ -8,44 +8,78 @@ import {
 /* ─── Layer Type Definitions ─── */
 
 export const LIGHT_MODES = [
-  { id: 'sunrise', label: 'Sunrise Glow', colors: ['#FCD34D', '#FB923C', '#EF4444'], speed: 4000 },
-  { id: 'aurora', label: 'Aurora', colors: ['#22C55E', '#2DD4BF', '#3B82F6', '#8B5CF6'], speed: 3000 },
-  { id: 'calm-blue', label: 'Calm Blue', colors: ['#1E3A5F', '#3B82F6', '#06B6D4'], speed: 5000 },
-  { id: 'healing-green', label: 'Healing Green', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500 },
-  { id: 'violet-flame', label: 'Violet Flame', colors: ['#4C1D95', '#8B5CF6', '#C084FC', '#E879F9'], speed: 3500 },
-  { id: 'golden', label: 'Golden Light', colors: ['#78350F', '#F59E0B', '#FCD34D'], speed: 5000 },
+  // Discovery
+  { id: 'sunrise', label: 'Sunrise Glow', colors: ['#FCD34D', '#FB923C', '#EF4444'], speed: 4000, tier: 'discovery' },
+  { id: 'calm-blue', label: 'Calm Blue', colors: ['#1E3A5F', '#3B82F6', '#06B6D4'], speed: 5000, tier: 'discovery' },
+  { id: 'healing-green', label: 'Healing Green', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500, tier: 'discovery' },
+  // Player
+  { id: 'aurora', label: 'Aurora', colors: ['#22C55E', '#2DD4BF', '#3B82F6', '#8B5CF6'], speed: 3000, tier: 'player' },
+  { id: 'violet-flame', label: 'Violet Flame', colors: ['#4C1D95', '#8B5CF6', '#C084FC', '#E879F9'], speed: 3500, tier: 'player' },
+  { id: 'golden', label: 'Golden Light', colors: ['#78350F', '#F59E0B', '#FCD34D'], speed: 5000, tier: 'player' },
+  { id: 'moonrise', label: 'Moonrise Silver', colors: ['#1E293B', '#64748B', '#CBD5E1', '#E2E8F0'], speed: 6000, tier: 'player' },
+  // Ultra Player
+  { id: 'cosmic-pulse', label: 'Cosmic Pulse', colors: ['#1E1B4B', '#4338CA', '#7C3AED', '#A855F7'], speed: 2500, tier: 'ultra_player' },
+  { id: 'rose-quartz', label: 'Rose Quartz', colors: ['#500724', '#FB7185', '#FECDD3', '#FFF1F2'], speed: 4000, tier: 'ultra_player' },
+  { id: 'chakra-rainbow', label: 'Chakra Rainbow', colors: ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6', '#8B5CF6', '#A855F7'], speed: 7000, tier: 'ultra_player' },
+  // Sovereign
+  { id: 'quantum-flux', label: 'Quantum Flux', colors: ['#0C0A09', '#FBBF24', '#FFFBEB', '#0C0A09'], speed: 1500, tier: 'sovereign' },
+  { id: 'void-breath', label: 'Void Breath', colors: ['#000000', '#1E1B4B', '#312E81', '#000000'], speed: 8000, tier: 'sovereign' },
 ];
 
 export const VIDEO_OVERLAYS = [
-  { id: 'stars', label: 'Starfield', url: 'https://videos.pexels.com/video-files/857195/857195-hd_1920_1080_25fps.mp4', color: '#818CF8' },
-  { id: 'northern-lights', label: 'Northern Lights', url: 'https://videos.pexels.com/video-files/3214448/3214448-uhd_2560_1440_25fps.mp4', color: '#2DD4BF' },
-  { id: 'ocean-waves', label: 'Ocean', url: 'https://videos.pexels.com/video-files/1093662/1093662-hd_1920_1080_30fps.mp4', color: '#3B82F6' },
-  { id: 'forest', label: 'Forest', url: 'https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4', color: '#22C55E' },
-  { id: 'fire', label: 'Campfire', url: 'https://videos.pexels.com/video-files/855535/855535-hd_1920_1080_30fps.mp4', color: '#F59E0B' },
+  // Discovery — Free
+  { id: 'ocean-waves', label: 'Ocean Waves', url: 'https://videos.pexels.com/video-files/1093662/1093662-hd_1920_1080_30fps.mp4', color: '#3B82F6', tier: 'discovery' },
+  { id: 'forest', label: 'Sacred Forest', url: 'https://videos.pexels.com/video-files/3571264/3571264-hd_1920_1080_30fps.mp4', color: '#22C55E', tier: 'discovery' },
+  // Player
+  { id: 'northern-lights', label: 'Northern Lights', url: 'https://videos.pexels.com/video-files/3214448/3214448-uhd_2560_1440_25fps.mp4', color: '#2DD4BF', tier: 'player' },
+  { id: 'starfield', label: 'Starfield', url: 'https://videos.pexels.com/video-files/857195/857195-hd_1280_720_25fps.mp4', color: '#818CF8', tier: 'player' },
+  { id: 'rain-window', label: 'Rain on Glass', url: 'https://videos.pexels.com/video-files/2098989/2098989-hd_1920_1080_30fps.mp4', color: '#60A5FA', tier: 'player' },
+  // Ultra Player
+  { id: 'cosmos-deep', label: 'Deep Cosmos', url: 'https://videos.pexels.com/video-files/1851190/1851190-uhd_2560_1440_25fps.mp4', color: '#A78BFA', tier: 'ultra_player' },
+  { id: 'forest-uhd', label: 'Enchanted Forest 4K', url: 'https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4', color: '#34D399', tier: 'ultra_player' },
+  // Sovereign
+  { id: 'aurora-uhd', label: 'Aurora Borealis 4K', url: 'https://videos.pexels.com/video-files/3214448/3214448-uhd_2560_1440_25fps.mp4', color: '#FBBF24', tier: 'sovereign' },
 ];
 
 export const FRACTAL_TYPES = [
-  { id: 'mandelbrot', label: 'Mandelbrot', color: '#8B5CF6' },
-  { id: 'julia', label: 'Julia Set', color: '#3B82F6' },
-  { id: 'sacred-geo', label: 'Sacred Geometry', color: '#22C55E' },
-  { id: 'fibonacci', label: 'Fibonacci Spiral', color: '#FCD34D' },
-  { id: 'flower-of-life', label: 'Flower of Life', color: '#EC4899' },
-  { id: 'sri-yantra', label: 'Sri Yantra', color: '#F59E0B' },
+  // Discovery
+  { id: 'mandelbrot', label: 'Mandelbrot', color: '#8B5CF6', tier: 'discovery' },
+  { id: 'julia', label: 'Julia Set', color: '#3B82F6', tier: 'discovery' },
+  // Player
+  { id: 'sacred-geo', label: 'Sacred Geometry', color: '#22C55E', tier: 'player' },
+  { id: 'fibonacci', label: 'Fibonacci Spiral', color: '#FCD34D', tier: 'player' },
+  { id: 'flower-of-life', label: 'Flower of Life', color: '#EC4899', tier: 'player' },
+  // Ultra Player
+  { id: 'sri-yantra', label: 'Sri Yantra', color: '#F59E0B', tier: 'ultra_player' },
+  { id: 'metatron-cube', label: "Metatron's Cube", color: '#A78BFA', tier: 'ultra_player' },
+  { id: 'vesica-piscis', label: 'Vesica Piscis', color: '#2DD4BF', tier: 'ultra_player' },
+  { id: 'tree-of-life', label: 'Tree of Life', color: '#34D399', tier: 'ultra_player' },
+  // Sovereign
+  { id: 'hyperbolic', label: 'Hyperbolic Tesseract', color: '#FBBF24', tier: 'sovereign' },
+  { id: 'penrose-tiling', label: 'Penrose Tiling', color: '#818CF8', tier: 'sovereign' },
+  { id: 'lorenz-attractor', label: 'Lorenz Attractor', color: '#EF4444', tier: 'sovereign' },
 ];
 
 export const VISUAL_FILTERS = [
-  { id: 'bloom', label: 'Bloom', color: '#FBBF24', css: (i) => `brightness(${1 + i * 0.6}) contrast(${1 + i * 0.2})` },
-  { id: 'film-grain', label: 'Film Grain', color: '#A8A29E', hasCanvas: true, css: () => '' },
-  { id: 'chromatic', label: 'Chromatic', color: '#F472B6', hasCanvas: true, css: () => '' },
-  { id: 'sepia', label: 'Sepia', color: '#D97706', css: (i) => `sepia(${i * 0.9}) saturate(${0.8 + i * 0.4})` },
-  { id: 'neon-glow', label: 'Neon Glow', color: '#34D399', css: (i) => `brightness(${1 + i * 0.4}) saturate(${1 + i * 1.5})` },
-  { id: 'dream-haze', label: 'Dream Haze', color: '#C4B5FD', css: (i) => `blur(${i * 2}px) brightness(${1 + i * 0.2})` },
-  { id: 'vhs-retro', label: 'VHS Retro', color: '#FB923C', hasCanvas: true, css: (i) => `saturate(${1.4 + i * 0.8}) contrast(${1.1 + i * 0.3})` },
-  { id: 'ethereal', label: 'Ethereal', color: '#818CF8', css: (i) => `brightness(${1.1 + i * 0.3}) blur(${i * 0.8}px)` },
-  { id: 'kaleidoscope', label: 'Kaleidoscope', color: '#F43F5E', hasCanvas: true, css: (i) => `hue-rotate(${i * 180}deg) saturate(${1.5 + i})` },
-  { id: 'infrared', label: 'Infrared', color: '#EF4444', css: (i) => `hue-rotate(${-30 + i * 40}deg) saturate(${2 + i * 2})` },
-  { id: 'cyberpunk', label: 'Cyberpunk', color: '#06B6D4', css: (i) => `contrast(${1.3 + i * 0.4}) saturate(${1.5 + i * 1.5})` },
-  { id: 'vintage', label: 'Vintage', color: '#92400E', css: (i) => `sepia(${i * 0.5}) saturate(${0.6 + i * 0.3}) brightness(${0.9 + i * 0.1})` },
+  // Discovery
+  { id: 'bloom', label: 'Bloom', color: '#FBBF24', css: (i) => `brightness(${1 + i * 0.6}) contrast(${1 + i * 0.2})`, tier: 'discovery' },
+  { id: 'sepia', label: 'Sepia', color: '#D97706', css: (i) => `sepia(${i * 0.9}) saturate(${0.8 + i * 0.4})`, tier: 'discovery' },
+  { id: 'dream-haze', label: 'Dream Haze', color: '#C4B5FD', css: (i) => `blur(${i * 2}px) brightness(${1 + i * 0.2})`, tier: 'discovery' },
+  // Player
+  { id: 'film-grain', label: 'Film Grain', color: '#A8A29E', hasCanvas: true, css: () => '', tier: 'player' },
+  { id: 'neon-glow', label: 'Neon Glow', color: '#34D399', css: (i) => `brightness(${1 + i * 0.4}) saturate(${1 + i * 1.5})`, tier: 'player' },
+  { id: 'vintage', label: 'Vintage', color: '#92400E', css: (i) => `sepia(${i * 0.5}) saturate(${0.6 + i * 0.3}) brightness(${0.9 + i * 0.1})`, tier: 'player' },
+  { id: 'ethereal', label: 'Ethereal', color: '#818CF8', css: (i) => `brightness(${1.1 + i * 0.3}) blur(${i * 0.8}px)`, tier: 'player' },
+  // Ultra Player
+  { id: 'chromatic', label: 'Chromatic Aberration', color: '#F472B6', hasCanvas: true, css: () => '', tier: 'ultra_player' },
+  { id: 'vhs-retro', label: 'VHS Retro', color: '#FB923C', hasCanvas: true, css: (i) => `saturate(${1.4 + i * 0.8}) contrast(${1.1 + i * 0.3})`, tier: 'ultra_player' },
+  { id: 'infrared', label: 'Infrared', color: '#EF4444', css: (i) => `hue-rotate(${-30 + i * 40}deg) saturate(${2 + i * 2})`, tier: 'ultra_player' },
+  { id: 'cyberpunk', label: 'Cyberpunk', color: '#06B6D4', css: (i) => `contrast(${1.3 + i * 0.4}) saturate(${1.5 + i * 1.5})`, tier: 'ultra_player' },
+  { id: 'deep-purple', label: 'Deep Purple', color: '#7C3AED', css: (i) => `hue-rotate(${260 + i * 20}deg) saturate(${1.2 + i * 0.8})`, tier: 'ultra_player' },
+  // Sovereign
+  { id: 'kaleidoscope', label: 'Kaleidoscope', color: '#F43F5E', hasCanvas: true, css: (i) => `hue-rotate(${i * 180}deg) saturate(${1.5 + i})`, tier: 'sovereign' },
+  { id: 'dimensional-rift', label: 'Dimensional Rift', color: '#FBBF24', css: (i) => `contrast(${1.5 + i * 0.5}) brightness(${0.8 + i * 0.4}) hue-rotate(${i * 90}deg)`, tier: 'sovereign' },
+  { id: 'astral-projection', label: 'Astral Projection', color: '#E879F9', css: (i) => `brightness(${1.3 + i * 0.5}) saturate(${2 + i * 2}) hue-rotate(${i * 60}deg)`, tier: 'sovereign' },
 ];
 
 const TYPE_META = {
@@ -166,25 +200,37 @@ export function VisualLayersMixer({ layers, onLayersChange }) {
                     className="overflow-hidden">
                     <div className="flex flex-wrap gap-1.5 py-1.5 px-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.015)' }}
                       data-testid={`picker-${addingType}`}>
-                      {TYPE_META[addingType].items.map(item => (
-                        <button key={item.id} onClick={() => addLayer(addingType, item.id)}
-                          className="text-[9px] px-2.5 py-1.5 rounded-full transition-all hover:scale-105 flex items-center gap-1"
-                          style={{
-                            background: `${item.color || TYPE_META[addingType].accent}10`,
-                            border: `1px solid ${item.color || TYPE_META[addingType].accent}25`,
-                            color: item.color || TYPE_META[addingType].accent,
-                          }}
-                          data-testid={`pick-${addingType}-${item.id}`}>
-                          {item.colors && (
-                            <div className="flex -space-x-0.5">
-                              {item.colors.slice(0, 3).map((c, i) => (
-                                <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ background: c }} />
-                              ))}
-                            </div>
-                          )}
-                          {item.label}
-                        </button>
-                      ))}
+                      {TYPE_META[addingType].items.map(item => {
+                        const tierOrder = ['discovery', 'player', 'ultra_player', 'sovereign'];
+                        const tierLabels = { discovery: 'Free', player: 'Player', ultra_player: 'Ultra', sovereign: 'Sovereign' };
+                        const itemTier = item.tier || 'discovery';
+                        const tierColors = { discovery: '#22C55E', player: '#3B82F6', ultra_player: '#A78BFA', sovereign: '#FBBF24' };
+                        return (
+                          <button key={item.id} onClick={() => addLayer(addingType, item.id)}
+                            className="text-[9px] px-2.5 py-1.5 rounded-full transition-all hover:scale-105 flex items-center gap-1"
+                            style={{
+                              background: `${item.color || TYPE_META[addingType].accent}10`,
+                              border: `1px solid ${item.color || TYPE_META[addingType].accent}25`,
+                              color: item.color || TYPE_META[addingType].accent,
+                            }}
+                            data-testid={`pick-${addingType}-${item.id}`}>
+                            {item.colors && (
+                              <div className="flex -space-x-0.5">
+                                {item.colors.slice(0, 3).map((c, i) => (
+                                  <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ background: c }} />
+                                ))}
+                              </div>
+                            )}
+                            {item.label}
+                            {itemTier !== 'discovery' && (
+                              <span className="text-[6px] px-1 py-0.5 rounded ml-0.5" style={{
+                                background: `${tierColors[itemTier]}15`,
+                                color: tierColors[itemTier],
+                              }}>{tierLabels[itemTier]}</span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 )}
