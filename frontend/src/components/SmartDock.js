@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music, Award, Crown } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music, Award, Crown, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
@@ -10,6 +10,7 @@ import { useSensory } from '../context/SensoryContext';
 import { useTreasury } from '../context/TreasuryContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useHarmonyEngine, getHarmonyColor } from '../hooks/useHarmonyEngine';
+import SovereignConsultOverlay, { SolfeggioGlow } from './SovereignConsultOverlay';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
@@ -62,6 +63,7 @@ export default function SmartDock() {
   const [dockOrientation, setDockOrientation] = useState(() => {
     try { return localStorage.getItem('dock_orientation') || 'horizontal'; } catch { return 'horizontal'; }
   });
+  const [consultOpen, setConsultOpen] = useState(false);
   const [snappedEdge, setSnappedEdge] = useState(() => {
     try { const e = localStorage.getItem('dock_snapped'); return e && e !== 'none' ? e : null; } catch { return null; }
   });
@@ -247,6 +249,7 @@ export default function SmartDock() {
 
   const DOCK_ITEMS = [
     { id: 'harmony', icon: Activity, label: 'Harmony', color: '#A78BFA' },
+    { id: 'consult', icon: Shield, label: 'Consult', color: '#C084FC' },
     { id: 'harmonics', icon: Moon, label: 'Cosmos', color: '#818CF8' },
     { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
@@ -268,6 +271,7 @@ export default function SmartDock() {
     if (id === 'feedback') { navigate('/feedback'); setActivePanel(null); return; }
     if (id === 'help') { navigate('/help-center'); setActivePanel(null); return; }
     if (id === 'economy') { navigate('/economy'); setActivePanel(null); return; }
+    if (id === 'consult') { setConsultOpen(prev => !prev); setActivePanel(null); return; }
     setActivePanel(prev => prev === id ? null : id);
   }, [navigate, refreshCollapse]);
 
@@ -489,7 +493,7 @@ export default function SmartDock() {
 
         {sortedItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activePanel === item.id;
+          const isActive = activePanel === item.id || (item.id === 'consult' && consultOpen);
           return (
             <DockBtn
               key={item.id}
@@ -499,8 +503,10 @@ export default function SmartDock() {
               color={item.color}
               expanded={expanded}
               label={isActive ? `Close ${item.label}` : item.label}
+              pulse={item.id === 'consult'}
             >
               <Icon size={13} style={{ color: item.color }} />
+              {item.id === 'consult' && <SolfeggioGlow color={item.color} size={28} />}
             </DockBtn>
           );
         })}
@@ -654,13 +660,20 @@ export default function SmartDock() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Sovereign Consult Overlay ── */}
+      <SovereignConsultOverlay
+        isOpen={consultOpen}
+        onClose={() => setConsultOpen(false)}
+        pathname={location.pathname}
+      />
     </div>,
     document.body
   );
 }
 
 /* ── Reusable dock button — always shows its identity color, larger on mobile ── */
-function DockBtn({ children, testId, onClick, active, color, expanded, label, small, onPointerDown, onPointerUp, onPointerLeave }) {
+function DockBtn({ children, testId, onClick, active, color, expanded, label, small, onPointerDown, onPointerUp, onPointerLeave, pulse }) {
   const c = color || '#C084FC';
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const h = small ? (isMobile ? 30 : 26) : (isMobile ? 36 : 30);
@@ -679,7 +692,9 @@ function DockBtn({ children, testId, onClick, active, color, expanded, label, sm
         background: active ? `${c}18` : `${c}08`,
         border: `1px solid ${active ? `${c}35` : `${c}15`}`,
         cursor: 'pointer',
-        boxShadow: active ? `0 0 14px ${c}20, 0 0 4px ${c}12` : `0 0 3px ${c}05`,
+        boxShadow: active
+          ? `0 0 14px ${c}20, 0 0 4px ${c}12`
+          : pulse ? `0 0 8px ${c}10` : `0 0 3px ${c}05`,
         transition: 'box-shadow 0.4s, background 0.3s, padding 0.2s, border 0.3s',
       }}
       data-testid={testId}
