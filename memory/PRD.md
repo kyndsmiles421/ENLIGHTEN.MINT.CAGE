@@ -34,6 +34,17 @@ Friction:                0.985 per frame
 Frame Budget:            12ms target
 ```
 
+### Weighted Authority (Mastery Tier → Physics)
+Mastery tier multipliers applied to gravity and bloom:
+| Tier | Gravity Multiplier | Bloom Multiplier |
+|------|--------------------|------------------|
+| 1 Novice/Seeker | 1.0x | 1.0x |
+| 2 Practitioner | 1.3x | 1.4x |
+| 3 Specialist | 1.8x | 2.0x |
+| 4 Sovereign | 2.5x | 3.0x |
+
+Flow: SovereignContext → OrbitalNavigation → NebulaPlayground → NebulaSphere
+
 ### Module Mass (Rotational Inertia)
 | Module | Mass | Feel |
 |--------|------|------|
@@ -60,18 +71,24 @@ mixer      ↔ [starchart, meditation, wellness, trade]
 - Resonance glow ring when near compatible sphere
 - Snap lock pulsing ring at gravity well center
 - Mass label + priority indicator on sphere surface
+- **Double-tap activation** → triggers Bubble Burst portal expansion
+
+### Bubble Burst Portal (Multi-Screen)
+- Double-tap on NebulaSphere expands to full-screen overlay
+- clipPath circle animation from sphere origin to full viewport
+- Horizontal snap-scroll between active bubbles
+- Lazy-loads target page content inside each bubble
+- Globe-like curvature vignette overlay
+- Navigation dots + arrows + close controls
+- Keyboard support: Arrow keys to navigate, Escape to close
 
 ### Gravity Well (Mixer as "Black Hole")
 - GRAVITY_WELL_RADIUS = 180px at viewport center
 - Intensity-based visual pulsing (stronger as spheres approach)
 - Inner snap zone at 30% radius triggers magnetic lock
 - Haptic pattern: [30, 15, 50] on snap lock
-- Cross-domain injection on collision:
-  - Star Chart → frequency re-tuning (planetary alignment)
-  - Trade → +10% NPU speed boost
-  - Meditation → 8D Binaural Stellar Wash injection
-  - Wellness → AI harmonic volume synchronization
-- SupernovaPulse: outer shockwave + inner flash + primary ring + secondary ring
+- Cross-domain injection on collision
+- SupernovaPulse: outer shockwave + inner flash + rings
 - NPU Burst mode for 2s during merge
 - Auto-reattach to crossbar after 1.5s
 
@@ -80,6 +97,33 @@ mixer      ↔ [starchart, meditation, wellness, trade]
 - Expandable panel: Canvas stream visualization, stats grid, recent tasks
 - NPU Burst indicator (pulsing border)
 - 3 channels: Nexus Path (P1), Sensory Stream (P2), Background Orbit (P3)
+
+## Sovereign Mastery — 4-Tier Certification System
+
+### 4-Tier Scale
+| Tier | Name | Codename | Requirement |
+|------|------|----------|-------------|
+| 1 | Novice / Seeker | The Awakener | Complete Core Orientation |
+| 2 | Practitioner | The Forger | 10 Mixer Collisions |
+| 3 | Specialist | The Artisan | Avenue Certification |
+| 4 | Sovereign / Super-User | The Nexus | Mastery of all 12 Units |
+
+### 3 Avenues
+1. **Spotless Solutions**: Sanitation Technology & Eco-Acoustic Maintenance (5 lessons, 1100 XP)
+2. **Enlightenment Cafe**: Alternative Chemistry & Harmonic Nutrition (5 lessons, 1100 XP)
+3. **Tech/Dev Path**: Modular UI/UX & Sentient Gravity Engineering (5 lessons, 1100 XP)
+
+### Certificate Generation
+- Auto-generates on avenue completion (all 5 lessons)
+- Verification code: SVC-{uuid}
+- Publicly verifiable via /api/sovereign-mastery/certificates/{cert_id}/verify
+
+### MasteryPath Page (/mastery-path)
+- 3 tabs: Overview, Avenues, Certificates
+- TierRing SVG with animated progress
+- Weighted Authority display (Gravity x, Bloom x)
+- AvenueCards with expandable curriculum and Complete buttons
+- CertificateCards with verification codes
 
 ## Mixer (Divine Director) — Triple-Domain Architecture
 ```
@@ -110,24 +154,39 @@ NPU Burst: blocks P2/P3 during intensive processing
 /app/frontend/src/
 ├── components/
 │   ├── SovereignCrossbar.js    # Kinetic crossbar + elastic poles + tether
-│   ├── NebulaSphere.js         # Canvas 2D sphere with squared physics
+│   ├── NebulaSphere.js         # Canvas 2D sphere with squared physics + bubble activation
 │   ├── NebulaPlayground.js     # Sphere orchestration + gravity well + resonance
 │   ├── SovereignHUD.js         # Priority queue visibility + NPU meter
-│   ├── OrbitalNavigation.js    # Wrapper: Crossbar + Playground + HUD
+│   ├── OrbitalNavigation.js    # Wrapper: Crossbar + Playground + HUD + BubblePortal
+│   ├── BubblePortal.js         # Full-screen bubble expansion overlay
 │   ├── CommandMode.js          # Global Ctrl+K command interface
 ├── context/
-│   ├── SovereignContext.js     # EventBus + Priority Queue
+│   ├── SovereignContext.js     # EventBus + Priority Queue + Mastery multipliers
 ├── pages/
+│   ├── MasteryPath.js          # 4-Tier certification page
 │   ├── SuanpanPhysics.js       # Bipolar gravity engine
 │   ├── SuanpanMixer.js         # Main mixer orchestrator
 │   ├── SuanpanCore.js          # Math/constants/TrackRow
 │   ├── SuanpanSovereign.js     # Tier logic/purchasing
 │   ├── SuanpanVfx.js           # Visual effects
+
+/app/backend/routes/
+│   ├── sovereign_mastery.py    # 4-Tier Mastery & Certificates API
+│   ├── mastery.py              # Legacy/Vowel mastery
+│   ├── sovereign_arch.py       # Sovereign architecture
 ```
 
 ## Iteration History
-### Iteration 236 — Bipolar Gravity Ecosystem (Apr 3, 2026) — LATEST
-- SuanpanPhysics.js engine: inverse-square gravity, repulsion launch, perimeter buffer, orbital decay, vacuum catch (2s grace), rotational inertia, proximity resonance
+### Iteration 237 — Sovereign Mastery + Bubble Burst (Apr 3, 2026) — LATEST
+- MasteryPath.js page wired at /mastery-path (lazy loaded)
+- 4-Tier Mastery Scale with avenue certification
+- Weighted Authority: tier multipliers → SuanpanPhysics (gravity + bloom)
+- BubblePortal: full-screen clipPath expansion from NebulaSphere double-tap
+- Horizontal snap-scroll between active bubbles with lazy page loading
+- Tests: Backend 19/19 (100%), Frontend 100%
+
+### Iteration 236 — Bipolar Gravity Ecosystem (Apr 3, 2026)
+- SuanpanPhysics.js engine: inverse-square gravity, repulsion launch, perimeter buffer, orbital decay, vacuum catch, rotational inertia, proximity resonance
 - Luminous Tether + Tether Breakaway particles on Crossbar
 - NebulaSphere with full physics integration + resonance glow + snap lock
 - NebulaPlayground with resonance tethers, intensity-based gravity well, enhanced supernova
@@ -135,7 +194,6 @@ NPU Burst: blocks P2/P3 during intensive processing
 
 ### Iteration 235 — Orbital Navigation (Apr 3, 2026)
 - SovereignCrossbar, NebulaSphere, NebulaPlayground, SovereignHUD, OrbitalNavigation
-- Tests: Backend 100%, Frontend 100%
 
 ### Iteration 234 — Triple-Domain Decomposition (Apr 3, 2026)
 - SuanpanMixer decomposed → Core/Sovereign/Vfx + Priority Queue
@@ -143,11 +201,11 @@ NPU Burst: blocks P2/P3 during intensive processing
 ### Earlier: 233 (Sovereign State), 232 (Sovereign Architecture), 231-223 (Features)
 
 ## Upcoming (P1)
+- Phase 3 Polish / Generative Flourish: AI phonic resonance from movement history
 - Predictive Phonic Pre-Loading: Warm up frequencies as sphere approaches Mixer
-- Generative Flourish Bonus: AI phonic resonance from movement history
-- Multi-Civilization Star Charts: Non-Western astronomical models in SuanpanCore.js
 
 ## Future/Backlog (P2)
+- Multi-Civilization Star Charts: Hopi, Egyptian, Vedic astronomical models
 - External audio asset hosting (real instrument multi-samples)
 - Haptic API for mobile tactile feedback
 - Pan + Reverb keyframe lanes
