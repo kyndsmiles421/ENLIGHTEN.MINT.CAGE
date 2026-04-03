@@ -71,7 +71,15 @@ Behavior:
 ```
 
 ## Iteration History
-### Iteration 230 — Mixer Content Library Expansion (Apr 3, 2026) — LATEST
+### Iteration 231 — Templates, Camera, Mic, AI Gen (Apr 3, 2026) — LATEST
+- 12 Mix Templates: Morning Ritual, Quick Calm, Basic Meditation, Yoga Flow, Study Session, Evening Unwind, Lucid Dream, Chakra Journey, Creative Flow, Cosmic Immersion, Kundalini, Astral Projection
+- Tiered Video Recording: 480p SD → 720p HD → 1080p Full HD → 4K Ultra HD
+- Tiered Audio Recording: 44.1kHz Mono → 48kHz Stereo → 96kHz Studio → 192kHz Mastering
+- Tiered AI Generation: Basic (3 trks) → Advanced (6) → Pro Studio (12) → Sovereign (20 + voice clone)
+- File upload for recordings, Gemini AI mix generation with algorithmic fallback
+- Tests: Backend 100% (21/21), Frontend 100%
+
+### Iteration 230 — Mixer Content Library Expansion (Apr 3, 2026)
 - Fixed broken video URLs (Pexels 403s for Starfield & Campfire)
 - STOCK_SOURCES: 21 → 60 (12 discovery, 14 player, 16 ultra, 18 sovereign)
 - VIDEO_OVERLAYS: 5 → 8 (all working URLs, tier-gated)
