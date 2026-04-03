@@ -16,25 +16,58 @@ const ICON_MAP = {
 
 /* ── Page-to-Sovereign context mapping ── */
 const PAGE_SOVEREIGN_MAP = {
-  '/star-chart': 'astraeus',
-  '/cosmic-mixer': 'master_harmonic',
-  '/wellness': 'zenith',
-  '/meditation': 'zenith',
-  '/sanctuary': 'zenith',
-  '/garden': 'gaea',
-  '/horticulture': 'gaea',
-  '/nourish': 'vesta',
-  '/alchemy': 'vesta',
-  '/economy': 'principal_economist',
-  '/trade': 'principal_economist',
-  '/marketplace': 'chief_logistics',
-  '/logistics': 'chief_logistics',
-  '/community': 'sovereign_ethicist',
-  '/barter': 'sovereign_ethicist',
-  '/developer': 'grand_architect',
-  '/settings': 'grand_architect',
-  '/academy': 'aurelius',
-  '/code': 'aurelius',
+  // Astraeus — Navigation & Mapping
+  '/star-chart': 'astraeus', '/cosmic-map': 'astraeus', '/observatory': 'astraeus',
+  '/cosmic-calendar': 'astraeus', '/forecasts': 'astraeus', '/mayan': 'astraeus',
+  '/cosmic-profile': 'astraeus', '/cosmic-insights': 'astraeus',
+  '/hotspots': 'astraeus', '/multiverse-map': 'astraeus',
+
+  // Zenith — Meditation & Bio-Feedback
+  '/meditation': 'zenith', '/breathing': 'zenith', '/wellness': 'zenith',
+  '/sanctuary': 'zenith', '/zen-garden': 'zenith', '/meditation-history': 'zenith',
+  '/light-therapy': 'zenith', '/yoga': 'zenith', '/exercises': 'zenith',
+  '/mood': 'zenith', '/wellness-reports': 'zenith', '/reiki': 'zenith',
+  '/acupressure': 'zenith', '/mudras': 'zenith',
+
+  // Gaea — Botany & Horticulture
+  '/botany': 'gaea', '/botany-orbital': 'gaea', '/green-journal': 'gaea',
+  '/herbology': 'gaea', '/garden': 'gaea', '/horticulture': 'gaea',
+  '/nourishment': 'gaea', '/meal-planning': 'gaea', '/aromatherapy': 'gaea',
+
+  // Vesta — Alchemy & Chemistry
+  '/elixirs': 'vesta', '/alchemy': 'vesta', '/nourish': 'vesta',
+  '/crystals': 'vesta', '/evolution-lab': 'vesta', '/refinement-lab': 'vesta',
+
+  // Principal Economist — Trade & Dust
+  '/economy': 'principal_economist', '/trade-circle': 'principal_economist',
+  '/trade-orbital': 'principal_economist', '/cosmic-store': 'principal_economist',
+  '/pricing': 'principal_economist', '/cosmic-ledger': 'principal_economist',
+
+  // Chief Logistics — Market & Business
+  '/marketplace': 'chief_logistics', '/logistics': 'chief_logistics',
+  '/creator': 'chief_logistics',
+
+  // Sovereign Ethicist — Community & Barter
+  '/community': 'sovereign_ethicist', '/barter': 'sovereign_ethicist',
+  '/friends': 'sovereign_ethicist', '/challenges': 'sovereign_ethicist',
+  '/live': 'sovereign_ethicist', '/blessings': 'sovereign_ethicist',
+
+  // Grand Architect — Infrastructure
+  '/developer': 'grand_architect', '/settings': 'grand_architect',
+  '/admin-setup': 'grand_architect', '/sovereign-admin': 'grand_architect',
+  '/sovereign': 'grand_architect', '/fractal-engine': 'grand_architect',
+
+  // Aurelius — Software & Code
+  '/academy': 'aurelius', '/codex': 'aurelius', '/codex-orbital': 'aurelius',
+  '/learn': 'aurelius', '/archives': 'aurelius', '/workshop': 'aurelius',
+  '/certifications': 'aurelius', '/mastery-path': 'aurelius',
+  '/mastery-avenues': 'aurelius', '/tutorial': 'aurelius',
+
+  // Master Harmonic — Sound & Music
+  '/frequencies': 'master_harmonic', '/soundscapes': 'master_harmonic',
+  '/cosmic-mixer': 'master_harmonic', '/music-lounge': 'master_harmonic',
+  '/dance-music': 'master_harmonic', '/theory': 'master_harmonic',
+  '/mantras': 'master_harmonic', '/affirmations': 'master_harmonic',
 };
 
 function getContextSovereign(pathname) {

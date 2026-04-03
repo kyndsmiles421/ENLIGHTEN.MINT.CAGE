@@ -122,6 +122,22 @@ const CATEGORY_PILLARS = [
       { label: 'Crystals & Stones', path: '/crystals' },
     ],
   },
+  {
+    id: 'council',
+    title: 'Sovereign Council',
+    subtitle: '10 AI experts & Dust economy',
+    icon: Shield,
+    color: '#C084FC',
+    path: '/sovereigns',
+    highlights: [
+      { label: 'Council Advisors', path: '/sovereigns' },
+      { label: 'Economy & Dust', path: '/economy' },
+      { label: 'Academy', path: '/academy' },
+      { label: 'Trade Circle', path: '/trade-circle' },
+      { label: 'Cosmic Map', path: '/cosmic-map' },
+      { label: 'Archives', path: '/archives' },
+    ],
+  },
 ];
 
 const FEELINGS = [

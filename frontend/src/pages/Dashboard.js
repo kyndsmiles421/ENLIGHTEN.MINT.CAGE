@@ -93,10 +93,17 @@ const ALL_ACTIONS = [
   { icon: Swords, label: 'Cosmic RPG', path: '/rpg', color: '#EF4444', group: 'Explore' },
   { icon: Star, label: 'Nexus', path: '/nexus', color: '#A855F7', group: 'Explore' },
   { icon: Sparkles, label: 'Journey', path: '/starseed', color: '#818CF8', group: 'Explore' },
+  { icon: Crown, label: 'Council', path: '/sovereigns', color: '#C084FC', group: 'Economy' },
+  { icon: GemIcon, label: 'Economy', path: '/economy', color: '#FBBF24', group: 'Economy' },
+  { icon: GraduationCap, label: 'Academy', path: '/academy', color: '#818CF8', group: 'Economy' },
+  { icon: Map, label: 'Cosmic Map', path: '/cosmic-map', color: '#2DD4BF', group: 'Economy' },
+  { icon: Compass, label: 'Observatory', path: '/observatory', color: '#06B6D4', group: 'Economy' },
+  { icon: BookOpen, label: 'Archives', path: '/archives', color: '#F97316', group: 'Economy' },
 ];
 
 const SECTION_META = {
   stats:           { label: 'Stats Cards',      tKey: null,                          color: '#FCD34D' },
+  council_glance:  { label: 'Sovereign Council', tKey: null,                         color: '#C084FC' },
   cosmic_weather:  { label: 'Cosmic Weather',   tKey: null,                          color: '#E879F9' },
   nexus_intent:    { label: 'Nexus Drift',      tKey: null,                          color: '#A855F7' },
   pinned:          { label: 'My Shortcuts',      tKey: 'dashboard.myShortcuts',       color: '#C084FC' },
@@ -112,8 +119,74 @@ const SECTION_META = {
   streak_heatmap:  { label: 'Activity Heatmap',  tKey: null,                          color: '#FB923C' },
 };
 
-const DEFAULT_ORDER = ["stats", "mantra_day", "streak_heatmap", "cosmic_weather", "nexus_intent", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
+const DEFAULT_ORDER = ["stats", "council_glance", "mantra_day", "streak_heatmap", "cosmic_weather", "nexus_intent", "pinned", "suggestions", "scripture", "coherence", "challenge", "wisdom", "moods", "recommendations", "actions"];
 const DEFAULT_PINNED = ["/breathing", "/mood", "/journal", "/meditation", "/oracle", "/star-chart", "/blessings", "/bible"];
+
+const TIER_COLORS_MAP = { discovery: '#22C55E', resonance: '#818CF8', sovereign: '#2DD4BF', architect: '#FBBF24' };
+const TIER_NAMES_MAP = { discovery: 'Seeker', resonance: 'Artisan', sovereign: 'Alchemist', architect: 'Architect' };
+const COUNCIL_ICONS = { building: Crown, music: Music, coins: GemIcon, truck: Compass, scale: Heart, compass: Star, brain: Brain, code: BookOpen, leaf: Leaf, flask: Zap };
+
+function CouncilGlanceSection({ data, navigate }) {
+  if (!data?.council) return null;
+  const tier = data.user_tier || 'discovery';
+  const tc = TIER_COLORS_MAP[tier] || '#818CF8';
+  const advisors = data.council.filter(m => m.role_type === 'advisor').slice(0, 3);
+  const faculty = data.council.filter(m => m.role_type === 'faculty').slice(0, 3);
+  const top = [...advisors, ...faculty].slice(0, 5);
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-4" data-testid="council-glance-section">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <Crown size={12} style={{ color: '#C084FC' }} />
+          <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>Sovereign Council</span>
+        </div>
+        <button onClick={() => navigate('/sovereigns')}
+          className="text-[8px] font-medium px-2 py-0.5 rounded-full"
+          style={{ background: 'rgba(192,132,252,0.06)', color: '#C084FC', border: '1px solid rgba(192,132,252,0.12)', cursor: 'pointer' }}
+          data-testid="council-view-all-btn">
+          View All <ChevronRight size={8} className="inline" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5 mb-2">
+        <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
+          <div className="text-xs font-semibold" style={{ color: tc }}>{TIER_NAMES_MAP[tier]}</div>
+          <div className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>Tier</div>
+        </div>
+        <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
+          <div className="text-xs font-semibold" style={{ color: '#FBBF24' }}>{data.dust_balance}</div>
+          <div className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>Dust</div>
+        </div>
+        <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
+          <div className="text-xs font-semibold" style={{ color: '#2DD4BF' }}>{data.utilities_owned}/{data.utilities_total}</div>
+          <div className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>Tools</div>
+        </div>
+      </div>
+
+      <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {top.map(m => {
+          const MIcon = COUNCIL_ICONS[m.icon] || Sparkles;
+          const accessible = m.has_free_access || m.has_session;
+          return (
+            <button key={m.id} onClick={() => navigate('/sovereigns')}
+              className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg"
+              style={{
+                background: `${m.color}06`, border: `1px solid ${m.color}10`,
+                cursor: 'pointer', opacity: accessible ? 1 : 0.5,
+              }}
+              data-testid={`council-quick-${m.id}`}>
+              <MIcon size={10} style={{ color: m.color }} />
+              <span className="text-[8px] font-medium whitespace-nowrap" style={{ color: m.color }}>
+                {m.name.split(' ').slice(-1)[0]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Dashboard() {
   const { user, authHeaders, loading: authLoading } = useAuth();
@@ -272,6 +345,16 @@ export default function Dashboard() {
     window.addEventListener('pointerup', onUp);
   }, [captureItemRects]);
 
+  const [councilData, setCouncilData] = useState(null);
+
+  useEffect(() => {
+    if (user && authHeaders) {
+      axios.get(`${API}/sovereigns/list`, { headers: authHeaders })
+        .then(r => setCouncilData(r.data))
+        .catch(() => {});
+    }
+  }, [user, authHeaders]);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
@@ -285,6 +368,7 @@ export default function Dashboard() {
   const renderSection = (sectionId) => {
     switch (sectionId) {
       case 'stats': return <StatsSection key="stats" stats={stats} streak={streak} navigate={navigate} />;
+      case 'council_glance': return <CouncilGlanceSection key="council" data={councilData} navigate={navigate} />;
       case 'mantra_day': return <MantraOfTheDay key="mantra-day" />;
       case 'streak_heatmap': return <StreakHeatmap key="streak-heatmap" />;
       case 'cosmic_weather': return cosmicWeather ? <CosmicWeatherSection key="weather" weather={cosmicWeather} navigate={navigate} /> : null;
@@ -466,7 +550,7 @@ export default function Dashboard() {
                 Tap to pin or unpin shortcuts to your dashboard
               </p>
               <div className="px-4 pb-6 overflow-y-auto space-y-4" style={{ scrollbarWidth: 'thin' }}>
-                {['Today', 'Practice', 'Divination', 'Sanctuary', 'Explore'].map(group => (
+                {['Today', 'Practice', 'Divination', 'Sanctuary', 'Explore', 'Economy'].map(group => (
                   <div key={group}>
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>{group}</p>
                     <div className="grid grid-cols-4 gap-2">
