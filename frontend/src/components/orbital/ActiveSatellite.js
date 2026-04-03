@@ -3,23 +3,44 @@ import { motion } from 'framer-motion';
 
 export function ActiveSatellite({ sat, x, y, isHovered, isSnapped, onHover, onSelect, onDeactivate, onInspect, dimmed, gravityDamping = 20, gravityStiffness = 60 }) {
   const Icon = sat.icon;
-  const longPressRef = useRef(null);
+  const clickStartRef = useRef({ x: 0, y: 0, time: 0 });
+  const didMoveRef = useRef(false);
 
-  const handleDown = useCallback((e) => {
+  const handlePointerDown = useCallback((e) => {
     e.stopPropagation();
-    longPressRef.current = setTimeout(() => {
-      longPressRef.current = null;
-      if (onInspect) onInspect(sat);
-    }, 500);
-  }, [sat, onInspect]);
+    e.preventDefault();
+    clickStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() };
+    didMoveRef.current = false;
+  }, []);
 
-  const handleUp = useCallback((e) => {
-    e.stopPropagation();
-    if (longPressRef.current) {
-      clearTimeout(longPressRef.current);
-      longPressRef.current = null;
-      onSelect(sat);
+  const handlePointerMove = useCallback((e) => {
+    if (!clickStartRef.current.time) return;
+    const dx = e.clientX - clickStartRef.current.x;
+    const dy = e.clientY - clickStartRef.current.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 8) {
+      didMoveRef.current = true;
     }
+  }, []);
+
+  const handlePointerUp = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!didMoveRef.current && clickStartRef.current.time) {
+      const elapsed = Date.now() - clickStartRef.current.time;
+      if (elapsed < 500) {
+        onSelect(sat);
+      } else if (onInspect) {
+        onInspect(sat);
+      }
+    }
+    clickStartRef.current = { x: 0, y: 0, time: 0 };
+    didMoveRef.current = false;
+  }, [sat, onSelect, onInspect]);
+
+  const handleClick = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onSelect(sat);
   }, [sat, onSelect]);
 
   const scale = isHovered ? 1.25 : isSnapped ? 1.12 : dimmed ? 0.85 : 1;
@@ -30,9 +51,11 @@ export function ActiveSatellite({ sat, x, y, isHovered, isSnapped, onHover, onSe
       style={{ left: '50%', top: '50%', width: 72, height: 72, marginLeft: -36, marginTop: -36, zIndex: dimmed ? 3 : isSnapped ? 12 : 10 }}
       animate={{ x, y, scale, opacity: dimmed ? 0.2 : 1 }}
       transition={{ type: 'spring', stiffness: gravityStiffness, damping: gravityDamping }}
-      onPointerDown={handleDown}
-      onPointerUp={handleUp}
-      onPointerLeave={() => { if (longPressRef.current) { clearTimeout(longPressRef.current); longPressRef.current = null; } }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onClick={handleClick}
+      onPointerLeave={() => { clickStartRef.current = { x: 0, y: 0, time: 0 }; didMoveRef.current = false; }}
       onHoverStart={() => onHover(sat.id)}
       onHoverEnd={() => onHover(null)}
       onContextMenu={(e) => { e.preventDefault(); onDeactivate(sat.id); }}

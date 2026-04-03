@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,7 +6,7 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
   const Icon = sat.icon;
   const navigate = useNavigate();
   const [dragProgress, setDragProgress] = useState(0);
-  const [hasDragged, setHasDragged] = useState(false);
+  const didDragRef = useRef(false);
 
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
   const angle = index * goldenAngle;
@@ -16,14 +16,14 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
   const surfaceRadius = abyssRadius * 0.44;
 
   const handleDragStart = useCallback(() => {
-    setHasDragged(false);
+    didDragRef.current = false;
   }, []);
 
   const handleDrag = useCallback((_, info) => {
     const cx = homeX + info.offset.x;
     const cy = homeY + info.offset.y;
     const dist = Math.sqrt(cx * cx + cy * cy);
-    if (dist > 5) setHasDragged(true);
+    if (dist > 8) didDragRef.current = true;
     setDragProgress(Math.min(1, dist / surfaceRadius));
   }, [homeX, homeY, surfaceRadius]);
 
@@ -40,13 +40,13 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
 
   const handleClick = useCallback((e) => {
     e.stopPropagation();
-    // Only navigate if user didn't drag significantly
-    if (!hasDragged && sat.path) {
+    e.preventDefault();
+    if (!didDragRef.current && sat.path) {
       navigate(sat.path);
-    } else if (!hasDragged) {
+    } else if (!didDragRef.current) {
       onActivate(sat.id);
     }
-  }, [hasDragged, sat.path, sat.id, navigate, onActivate]);
+  }, [sat.path, sat.id, navigate, onActivate]);
 
   const broken = dragProgress > 0.85;
   const scaleBoost = 1 + dragProgress * 0.3;
@@ -54,7 +54,7 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
 
   return (
     <motion.div
-      className="absolute cursor-grab active:cursor-grabbing"
+      className="absolute cursor-pointer active:cursor-grabbing"
       style={{ left: '50%', top: '50%', width: 56, height: 56, marginLeft: -28, marginTop: -28, zIndex: 20 }}
       initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
       animate={{ scale: 1, opacity: 1, x: homeX, y: homeY }}
