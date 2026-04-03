@@ -120,6 +120,7 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 /app/frontend/src/
 ├── components/
 │   ├── SmartDock.js (+ Control Center: Harmony, NPU, Streak)
+│   ├── OrbitalMixer.js (Drag-and-Drop Mixer with orbital ring layout)
 │   ├── SovereignCrossbar.js, NebulaSphere.js, NebulaPlayground.js
 │   ├── OrbitalNavigation.js, BubblePortal.js
 │   ├── CultureLayerPanel.js
@@ -128,6 +129,8 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── usePhonicResonance.js (+ ProximityHarmonics + SonicTug + HapticSync)
 │   ├── useOrganicAudio.js (External organic instrument synthesis)
 │   ├── useHarmonyEngine.js (Consolidated harmony/streak/NPU logic)
+├── config/
+│   ├── moduleRegistry.js (Plug-and-play module manifest for all audio/engine modules)
 ├── pages/
 │   ├── MasteryPath.js, SuanpanPhysics.js, StarChart.js (+ CultureLayerPanel)
 /app/frontend/public/
@@ -140,7 +143,18 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 243 — Streamline Consolidation: Control Center (Apr 3, 2026) — LATEST
+### Iteration 244 — Module Registry & Orbital Drag-Drop Mixer (Apr 3, 2026) — LATEST
+- **Module Registry** (`/app/frontend/src/config/moduleRegistry.js`): Central plug-and-play manifest with MODULE_TYPES, MODULE_GROUPS, 21 modules across 5 rings (frequencies, sounds, instruments, logic-gates, engines)
+- **OrbitalMixer** (`/app/frontend/src/components/OrbitalMixer.js`): Orbital ring layout with DraggableBubble, PlayerHub, magnetic snap zone, haptic feedback
+- Dual interaction: **Drag-and-drop** to center hub OR **tap-to-toggle** (accessibility)
+- Active modules: glowing border, SVG tether lines, hub dot counter, pulsing ring animation
+- Locked modules (I Ching, Fractal L², Cosmic Map) show lock icon and are non-interactive
+- **Mode toggle**: Console (existing accordion) vs Playground (orbital) on CosmicMixerPage
+- Staggered entrance animation from center hub → orbital positions
+- Mobile: 52px touch targets, adjusted ring radii, 60vh container height
+- Tests: Backend 10/10 (100%), Frontend 100%
+
+### Iteration 243 — Streamline Consolidation: Control Center (Apr 3, 2026)
 - SovereignHUD merged into SmartDock as "Control Center" panel (HarmonyNPUPanel)
 - useHarmonyEngine hook: consolidated 3 separate 30s timers into single batch cycle
 - Canvas only renders when Control Center panel is open (P1 performance)
@@ -165,11 +179,12 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iterations 234-236 — Foundation
 
 ## Upcoming (P1)
+- Focus Mode: Dim non-essential UI (dock, crossbar) when a module is loaded into the player
+- I Ching Logic Gates: First operational "engine" type module plugged into the Module Registry
 - Edge Functions for phonic logic (ultra-low-latency)
 - Loading skeletons for star chart data (perceived speed)
 
 ## Future/Backlog (P2)
-- I Ching Logic Gates
 - 54-Sublayer L² Fractal Engine
 - GPS-Based Cosmic Map
 - Forge Mini-Game
