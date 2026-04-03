@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useSensory } from '../context/SensoryContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useHarmonyEngine, getHarmonyColor } from '../hooks/useHarmonyEngine';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
@@ -62,6 +63,30 @@ export default function SmartDock() {
   const dockRef = useRef(null);
   const dragStartRef = useRef(null);
   const dragMoved = useRef(false);
+  const swipeStartRef = useRef(null);
+
+  // Mobile: detect swipe-up on dock to expand panel, swipe-down to collapse
+  const handleTouchStart = useCallback((e) => {
+    if (e.target.closest('[data-drag-handle]')) return;
+    swipeStartRef.current = { y: e.touches[0].clientY, t: Date.now() };
+  }, []);
+
+  const handleTouchEnd = useCallback((e) => {
+    if (!swipeStartRef.current) return;
+    const dy = swipeStartRef.current.y - e.changedTouches[0].clientY;
+    const dt = Date.now() - swipeStartRef.current.t;
+    swipeStartRef.current = null;
+    if (dt > 400) return; // too slow
+    if (dy > 40) {
+      // Swipe up — open harmony panel
+      haptic('Light');
+      setActivePanel(prev => prev ? null : 'harmony');
+    } else if (dy < -40 && activePanel) {
+      // Swipe down — close panel
+      haptic('Light');
+      setActivePanel(null);
+    }
+  }, [activePanel]);
 
   // Bring to front on interaction
   const bringToFront = useCallback(() => {
@@ -178,7 +203,11 @@ export default function SmartDock() {
     };
   }, [isDragging, snapToEdge]);
 
+  // Harmony Engine — unified harmony/streak/NPU data
+  const harmonyEngine = useHarmonyEngine();
+
   const DOCK_ITEMS = [
+    { id: 'harmony', icon: Activity, label: 'Harmony', color: '#A78BFA' },
     { id: 'harmonics', icon: Moon, label: 'Cosmos', color: '#818CF8' },
     { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
@@ -273,6 +302,11 @@ export default function SmartDock() {
     >
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>
+        {activePanel === 'harmony' && (
+          <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <HarmonyNPUPanel onClose={() => setActivePanel(null)} engine={harmonyEngine} />
+          </div>
+        )}
         {activePanel === 'harmonics' && (
           <div onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
             <HarmonicsPanel onClose={() => setActivePanel(null)} token={token} authHeaders={authHeaders} />
@@ -307,6 +341,8 @@ export default function SmartDock() {
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className="flex items-center"
         onClick={handlePillTap}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         style={{
           padding: expanded ? '4px 6px' : '4px 5px',
           borderRadius: 22,
@@ -395,6 +431,29 @@ export default function SmartDock() {
           )}
         </DockBtn>
 
+        {/* ── Harmony score micro-badge (visible when panel closed) ── */}
+        {!expanded && harmonyEngine.harmonyScore && activePanel !== 'harmony' && (
+          <motion.div
+            className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full cursor-pointer"
+            style={{
+              background: `${getHarmonyColor(harmonyEngine.harmonyScore.score)}10`,
+              border: `1px solid ${getHarmonyColor(harmonyEngine.harmonyScore.score)}20`,
+            }}
+            onClick={(e) => { e.stopPropagation(); openPanel('harmony'); }}
+            whileTap={{ scale: 0.9 }}
+            data-testid="harmony-score-badge"
+          >
+            <span className="text-[7px] font-mono font-bold" style={{ color: getHarmonyColor(harmonyEngine.harmonyScore.score) }}>
+              {harmonyEngine.harmonyScore.score}
+            </span>
+            {harmonyEngine.streak.current_streak > 0 && (
+              <span className="text-[6px] font-mono" style={{ color: '#FBBF24' }}>
+                {harmonyEngine.streak.current_streak}x
+              </span>
+            )}
+          </motion.div>
+        )}
+
         {/* ── Minimize — RED tinted ── */}
         <DockBtn
           testId="dock-minimize"
@@ -422,14 +481,53 @@ export default function SmartDock() {
           </motion.div>
         </div>
       </motion.div>
+
+      {/* ── Golden Pulse Overlay — streak trigger ── */}
+      <AnimatePresence>
+        {harmonyEngine.goldenPulse && (
+          <motion.div
+            className="fixed inset-0 pointer-events-none z-[9998]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.35, 0.15, 0.3, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 3, ease: 'easeOut' }}
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(251,191,36,0.12) 0%, transparent 70%)',
+              border: 'none',
+            }}
+            data-testid="golden-pulse"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ── XP Flash — earned XP on streak trigger ── */}
+      <AnimatePresence>
+        {harmonyEngine.xpFlash && (
+          <motion.div
+            className="fixed top-20 left-1/2 -translate-x-1/2 pointer-events-none z-[9999]"
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 1.5 }}
+            data-testid="xp-flash"
+          >
+            <span className="text-sm font-mono font-bold px-4 py-2 rounded-full"
+              style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.3)', backdropFilter: 'blur(8px)' }}>
+              +{harmonyEngine.xpFlash} XP
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>,
     document.body
   );
 }
 
-/* ── Reusable dock button — always shows its identity color ── */
+/* ── Reusable dock button — always shows its identity color, larger on mobile ── */
 function DockBtn({ children, testId, onClick, active, color, expanded, label, small, onPointerDown, onPointerUp, onPointerLeave }) {
   const c = color || '#C084FC';
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const h = small ? (isMobile ? 30 : 26) : (isMobile ? 36 : 30);
   return (
     <motion.button
       onClick={onClick}
@@ -440,7 +538,7 @@ function DockBtn({ children, testId, onClick, active, color, expanded, label, sm
       data-dock-btn="true"
       className="relative flex items-center gap-1 rounded-full transition-all overflow-hidden"
       style={{
-        height: small ? 26 : 30,
+        height: h,
         padding: expanded ? `0 ${small ? 7 : 9}px 0 ${small ? 5 : 7}px` : `0 ${small ? 5 : 7}px`,
         background: active ? `${c}18` : `${c}08`,
         border: `1px solid ${active ? `${c}35` : `${c}15`}`,
@@ -896,6 +994,270 @@ function FrequencyPanel({ onClose }) {
           );
         })}
       </div>
+    </motion.div>
+  );
+}
+
+/* ─── Harmony + NPU Control Panel ─── */
+const CHANNEL_META = {
+  0: { label: 'Nexus', color: '#EAB308' },
+  1: { label: 'Sensory', color: '#C084FC' },
+  2: { label: 'Background', color: '#60A5FA' },
+};
+
+function HarmonyNPUPanel({ onClose, engine }) {
+  const { harmonyScore, streak, npuStats, recentTasks, tierColor } = engine;
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const dataRef = useRef({ streams: [[], [], []] });
+
+  // Canvas stream visualization — only runs while panel is mounted
+  const drawStreams = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    const centerX = w / 2;
+    const centerY = h;
+
+    [0, 1, 2].forEach(ch => {
+      const meta = CHANNEL_META[ch];
+      const stream = dataRef.current.streams[ch];
+      const startX = (ch / 2) * w;
+      ctx.beginPath();
+      ctx.moveTo(startX, 0);
+      ctx.quadraticCurveTo(startX, h * 0.6, centerX, centerY);
+      ctx.strokeStyle = `${meta.color}15`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      stream.forEach((packet) => {
+        packet.age += 0.02;
+        if (packet.age > 1) return;
+        const t = packet.age;
+        const px = startX + (centerX - startX) * t * t;
+        const py = t * centerY;
+        ctx.beginPath();
+        ctx.arc(px, py, 2 + (1 - t) * 2, 0, Math.PI * 2);
+        ctx.fillStyle = `${meta.color}${Math.round((1 - t) * 180).toString(16).padStart(2, '0')}`;
+        ctx.fill();
+      });
+      dataRef.current.streams[ch] = stream.filter(p => p.age < 1);
+    });
+
+    const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 12);
+    grad.addColorStop(0, `rgba(234,179,8,${npuStats.active > 0 ? 0.3 : 0.05})`);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(centerX - 15, centerY - 15, 30, 30);
+    animRef.current = requestAnimationFrame(drawStreams);
+  }, [npuStats.active]);
+
+  useEffect(() => {
+    drawStreams();
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+  }, [drawStreams]);
+
+  // Feed new task events into canvas streams
+  useEffect(() => {
+    recentTasks.forEach(t => {
+      const ch = t.priority ?? 2;
+      if (dataRef.current.streams[ch].length < 10) {
+        dataRef.current.streams[ch].push({ value: 1, age: 0 });
+      }
+    });
+  }, [recentTasks]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      className="mb-2 rounded-xl overflow-hidden"
+      style={{
+        background: 'rgba(6,6,14,0.97)',
+        border: '1px solid rgba(167,139,250,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        width: '260px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(167,139,250,0.06)',
+      }}
+      data-testid="harmony-npu-panel"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="flex items-center gap-2">
+          <Activity size={11} style={{ color: '#A78BFA' }} />
+          <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#A78BFACC' }}>Control Center</span>
+          {npuStats.npu_burst && (
+            <motion.span className="text-[6px] px-1.5 py-0.5 rounded-full font-bold"
+              style={{ background: 'rgba(234,179,8,0.15)', color: '#EAB308' }}
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity }}>
+              BURST
+            </motion.span>
+          )}
+        </div>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5">
+          <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
+        </button>
+      </div>
+
+      {/* Harmony Score Section */}
+      {harmonyScore && (
+        <div className="px-3 py-2.5" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }} data-testid="harmony-score-panel">
+          <div className="flex items-center gap-3">
+            {/* Score ring */}
+            <div className="relative w-12 h-12 flex-shrink-0">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(248,250,252,0.04)" strokeWidth="3" />
+                <circle cx="24" cy="24" r="20" fill="none"
+                  stroke={getHarmonyColor(harmonyScore.score)}
+                  strokeWidth="3" strokeLinecap="round"
+                  strokeDasharray={`${(harmonyScore.score / 100) * 125.6} 125.6`}
+                  transform="rotate(-90 24 24)"
+                  style={{ filter: `drop-shadow(0 0 4px ${getHarmonyColor(harmonyScore.score)}40)`, transition: 'stroke-dasharray 0.8s ease' }} />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-mono font-bold"
+                style={{ color: getHarmonyColor(harmonyScore.score) }} data-testid="harmony-score-value">
+                {harmonyScore.score}
+              </span>
+            </div>
+            {/* Breakdown bars */}
+            <div className="flex-1 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Music size={8} style={{ color: getHarmonyColor(harmonyScore.score) }} />
+                  <span className="text-[8px] font-medium" style={{ color: getHarmonyColor(harmonyScore.score) }}>
+                    {harmonyScore.grade}
+                  </span>
+                </div>
+              </div>
+              {[
+                { label: 'Alignment', value: harmonyScore.breakdown.resonance_alignment, max: 40, color: '#818CF8' },
+                { label: 'Explore', value: harmonyScore.breakdown.exploration_diversity, max: 30, color: '#34D399' },
+                { label: 'Depth', value: harmonyScore.breakdown.harmonic_depth, max: 30, color: '#F59E0B' },
+              ].map(bar => (
+                <div key={bar.label} className="flex items-center gap-1.5">
+                  <span className="text-[6px] font-mono w-10 text-right" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                    {bar.label}
+                  </span>
+                  <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                    <motion.div className="h-full rounded-full"
+                      style={{ background: bar.color }}
+                      initial={{ width: 0 }} animate={{ width: `${(bar.value / bar.max) * 100}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }} />
+                  </div>
+                  <span className="text-[6px] font-mono w-4" style={{ color: `${bar.color}80` }}>
+                    {bar.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Insight */}
+          <p className="text-[7px] mt-2 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+            {harmonyScore.insight}
+          </p>
+        </div>
+      )}
+
+      {/* Resonance Streak Section */}
+      {streak.current_streak > 0 && (
+        <div className="px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }} data-testid="streak-panel">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1.5">
+              <Zap size={9} style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.3)' }} />
+              <span className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                Resonance Streak
+              </span>
+            </div>
+            <motion.span className="text-[11px] font-mono font-bold"
+              style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.4)' }}
+              animate={streak.streak_active ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              data-testid="streak-value">
+              {streak.current_streak}x
+            </motion.span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-0.5">
+              {Array.from({ length: Math.min(9, Math.max(3, streak.current_streak)) }, (_, i) => (
+                <div key={i} className="w-2 h-2 rounded-full"
+                  style={{
+                    background: i < streak.current_streak
+                      ? (i >= 2 ? '#FBBF24' : 'rgba(251,191,36,0.4)')
+                      : 'rgba(248,250,252,0.06)',
+                    boxShadow: i < streak.current_streak && i >= 2 ? '0 0 4px rgba(251,191,36,0.3)' : 'none',
+                  }} />
+              ))}
+            </div>
+            <div className="flex-1" />
+            <div className="text-right">
+              <p className="text-[6px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                Best: {streak.best_streak}x
+              </p>
+              {streak.total_xp_earned > 0 && (
+                <p className="text-[6px] font-mono" style={{ color: 'rgba(251,191,36,0.5)' }}>
+                  +{streak.total_xp_earned} XP
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NPU Queue Stats */}
+      <div className="px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
+        <p className="text-[6px] uppercase tracking-widest mb-1.5" style={{ color: 'rgba(248,250,252,0.15)' }}>NPU Queue</p>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="text-center">
+            <p className="text-[11px] font-mono font-bold" style={{ color: '#22C55E' }}>{npuStats.completed}</p>
+            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Done</p>
+          </div>
+          <div className="text-center">
+            <p className="text-[11px] font-mono font-bold" style={{ color: '#EAB308' }}>{npuStats.pending}</p>
+            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Queue</p>
+          </div>
+          <div className="text-center">
+            <p className="text-[11px] font-mono font-bold" style={{ color: npuStats.errors > 0 ? '#EF4444' : 'rgba(248,250,252,0.2)' }}>{npuStats.errors}</p>
+            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Errors</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stream Visualization — canvas only runs while mounted */}
+      <div className="relative h-14">
+        <canvas ref={canvasRef} width={260} height={56} className="w-full h-full" />
+        <div className="absolute top-1 left-0 right-0 flex justify-between px-2">
+          {Object.entries(CHANNEL_META).map(([ch, meta]) => (
+            <span key={ch} className="text-[5px] font-mono" style={{ color: `${meta.color}50` }}>
+              {meta.label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent tasks */}
+      {recentTasks.length > 0 && (
+        <div className="px-3 py-1.5 max-h-16 overflow-y-auto" style={{ borderTop: '1px solid rgba(248,250,252,0.03)' }}>
+          {recentTasks.slice(0, 4).map((task, i) => (
+            <div key={`${task.id}-${i}`} className="flex items-center gap-1 mb-0.5">
+              <div className="w-1.5 h-1.5 rounded-full" style={{
+                background: task.type === 'complete' ? '#22C55E' : task.type === 'error' ? '#EF4444' : '#EAB308',
+              }} />
+              <span className="text-[6px] font-mono truncate flex-1" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                {task.label || task.channel}
+              </span>
+              <span className="text-[5px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                {task.type === 'complete' ? 'done' : task.type === 'error' ? 'err' : 'q'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }

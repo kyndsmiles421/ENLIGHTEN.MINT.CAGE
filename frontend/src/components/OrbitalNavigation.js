@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import SovereignCrossbar from './SovereignCrossbar';
 import NebulaPlayground from './NebulaPlayground';
-import SovereignHUD from './SovereignHUD';
 import BubblePortal from './BubblePortal';
 import { useAuth } from '../context/AuthContext';
 import { useSovereign } from '../context/SovereignContext';
@@ -114,7 +113,6 @@ export default function OrbitalNavigation() {
         onBubbleActivate={handleBubbleActivate}
         masteryTier={masteryTier}
       />
-      <SovereignHUD />
       <BubblePortal
         activeBubbles={activeBubbles}
         onCloseBubble={handleCloseBubble}

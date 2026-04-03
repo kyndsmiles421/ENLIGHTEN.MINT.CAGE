@@ -13,7 +13,7 @@ import SmartDock from './components/SmartDock';
 import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
-import { MantraOverlay, LoadingMantra } from './components/MantraSystem';
+import { MantraOverlay } from './components/MantraSystem';
 import CreditNudge from './components/CreditNudge';
 import { SplitScreenProvider } from './components/SplitScreen';
 import { CreditProvider } from './context/CreditContext';
@@ -184,11 +184,9 @@ const MasteryPath = lazy(() => import('./pages/MasteryPath'));
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-full animate-pulse-glow"
-          style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.6) 0%, rgba(124,58,237,0.2) 70%)' }} />
-        <p className="text-sm animate-fade-up" style={{ color: 'rgba(248,250,252,0.4)' }}>Loading...</p>
-        <LoadingMantra />
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full animate-pulse-glow"
+          style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.4) 0%, rgba(124,58,237,0.15) 70%)' }} />
       </div>
     </div>
   );

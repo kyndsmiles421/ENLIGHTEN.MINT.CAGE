@@ -1,12 +1,13 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, memo } from 'react';
 import { useMixer } from '../context/MixerContext';
 
 /**
  * Persistent Sacred Geometry Frequency Visualizer
  * Renders a glowing waveform bar at the bottom of every page.
  * Uses the global MixerContext analyser node for real-time audio data.
+ * Wrapped in React.memo to prevent re-renders from parent tree changes.
  */
-export default function PersistentWaveform() {
+export default memo(function PersistentWaveform() {
   const { analyserRef, isPlaying, activeFreqs, muted } = useMixer();
   const canvasRef = useRef(null);
   const animRef = useRef(null);
@@ -132,4 +133,4 @@ export default function PersistentWaveform() {
       data-testid="persistent-waveform"
     />
   );
-}
+});
