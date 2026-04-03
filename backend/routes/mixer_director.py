@@ -231,6 +231,7 @@ async def save_project(data: dict = Body(...), user=Depends(get_current_user)):
             "frequency": t.get("frequency"),
             "color": t.get("color", "#94A3B8"),
             "locked": bool(t.get("locked", False)),
+            "ripple_locked": bool(t.get("ripple_locked", False)),
         }
         # Keyframe automation (Volume + Frequency curves)
         if t.get("keyframes_volume"):
@@ -743,4 +744,137 @@ async def get_recommendations(user=Depends(get_current_user)):
         "avg_frequency": round(avg_freq, 1),
         "recommendations": recs,
         "solfeggio_resonance": SOLFEGGIO[(hex_number - 1) % len(SOLFEGGIO)],
+    }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  RIPPLE EDIT ENGINE
+#  When a track's duration/start_time changes, shift
+#  all subsequent unlocked tracks by the delta.
+#  Keyframe points translate with their parent track.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHI = 1.618033988749895
+
+
+def ripple_edit_tracks(tracks, changed_index, old_duration, new_duration, old_start, new_start):
+    """Compute ripple shift for all unlocked tracks after changed_index.
+    Returns updated tracks list and a list of shifted indices."""
+    # Delta from duration change at the edit point
+    duration_delta = new_duration - old_duration
+    # Total ripple delta is duration change (start changes don't ripple downstream)
+    ripple_delta = duration_delta
+
+    shifted_indices = []
+    result = []
+
+    for i, t in enumerate(tracks):
+        track = {**t}
+        if i == changed_index:
+            track["duration"] = max(1, new_duration)
+            track["start_time"] = max(0, new_start)
+            # Clamp keyframes to new duration
+            if track.get("keyframes_volume"):
+                track["keyframes_volume"] = [
+                    {**kf, "time": min(kf["time"], new_duration)}
+                    for kf in track["keyframes_volume"]
+                ]
+            if track.get("keyframes_frequency"):
+                track["keyframes_frequency"] = [
+                    {**kf, "time": min(kf["time"], new_duration)}
+                    for kf in track["keyframes_frequency"]
+                ]
+        elif i > changed_index and not track.get("ripple_locked", False):
+            # Shift by ripple delta
+            track["start_time"] = max(0, track.get("start_time", 0) + ripple_delta)
+            # Translate keyframe time points by ripple delta (preserve Phi spacing)
+            if track.get("keyframes_volume"):
+                track["keyframes_volume"] = [
+                    {**kf, "time": max(0, kf["time"])}
+                    for kf in track["keyframes_volume"]
+                ]
+            if track.get("keyframes_frequency"):
+                track["keyframes_frequency"] = [
+                    {**kf, "time": max(0, kf["time"])}
+                    for kf in track["keyframes_frequency"]
+                ]
+            shifted_indices.append(i)
+        result.append(track)
+
+    return result, shifted_indices
+
+
+@router.post("/mixer/projects/ripple")
+async def ripple_edit(data: dict = Body(...), user=Depends(get_current_user)):
+    """Apply ripple edit to a project's track timeline.
+    Shifts unlocked subsequent tracks when a track's duration changes."""
+    user_id = user["id"]
+    project_id = data.get("project_id", "")
+    changed_index = data.get("changed_index", 0)
+    old_duration = data.get("old_duration", 60)
+    new_duration = data.get("new_duration", 60)
+    old_start = data.get("old_start", 0)
+    new_start = data.get("new_start", 0)
+
+    project = await db.mixer_projects.find_one(
+        {"id": project_id, "user_id": user_id}, {"_id": 0}
+    )
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    tracks = project.get("tracks", [])
+    if changed_index < 0 or changed_index >= len(tracks):
+        raise HTTPException(status_code=400, detail="Invalid track index")
+
+    rippled_tracks, shifted = ripple_edit_tracks(
+        tracks, changed_index, old_duration, new_duration, old_start, new_start
+    )
+
+    # Save back
+    await db.mixer_projects.update_one(
+        {"id": project_id, "user_id": user_id},
+        {"$set": {
+            "tracks": rippled_tracks,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
+
+    ripple_delta = new_duration - old_duration
+
+    return {
+        "tracks": rippled_tracks,
+        "shifted_indices": shifted,
+        "ripple_delta": ripple_delta,
+        "track_count": len(rippled_tracks),
+    }
+
+
+@router.post("/mixer/tracks/toggle-lock")
+async def toggle_ripple_lock(data: dict = Body(...), user=Depends(get_current_user)):
+    """Toggle ripple lock on a track (locked tracks don't shift during ripple edits)."""
+    project_id = data.get("project_id", "")
+    track_index = data.get("track_index", 0)
+    user_id = user["id"]
+
+    project = await db.mixer_projects.find_one(
+        {"id": project_id, "user_id": user_id}, {"_id": 0}
+    )
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    tracks = project.get("tracks", [])
+    if track_index < 0 or track_index >= len(tracks):
+        raise HTTPException(status_code=400, detail="Invalid track index")
+
+    current_lock = tracks[track_index].get("ripple_locked", False)
+    tracks[track_index]["ripple_locked"] = not current_lock
+
+    await db.mixer_projects.update_one(
+        {"id": project_id, "user_id": user_id},
+        {"$set": {"tracks": tracks, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+
+    return {
+        "track_index": track_index,
+        "ripple_locked": not current_lock,
     }

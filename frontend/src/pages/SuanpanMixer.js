@@ -7,10 +7,10 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Plus, Trash2, Save, FolderOpen,
-  Sliders, Lock, Zap, Waves, Sparkles, ChevronDown, Crown,
+  Sliders, Lock, Unlock, Zap, Waves, Sparkles, ChevronDown, Crown,
   Layers, Music, Eye, Radio, X, Loader2, Play, Square,
   Ghost, Package, Gift, ShoppingCart, ArrowUpRight, GripVertical,
-  Compass, AlertTriangle,
+  Compass, AlertTriangle, Clock,
 } from 'lucide-react';
 import { NanoGuide } from '../components/NanoGuide';
 
@@ -268,12 +268,14 @@ function KeyframeLane({ keyframes, onChange, color, label, maxValue, minValue })
   );
 }
 
-/* ━━━ Track Row with Keyframe Automation ━━━ */
-function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, showKeyframes }) {
+/* ━━━ Track Row with Keyframe Automation + Ripple Lock ━━━ */
+function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, showKeyframes, onRipple, totalDuration, isRippling }) {
   const meta = TRACK_TYPE_META[track.type] || TRACK_TYPE_META.custom;
   const Icon = meta.icon;
   const [expanded, setExpanded] = useState(false);
-  const svgRef = useRef(null);
+  const isLocked = track.ripple_locked;
+  const startPct = totalDuration > 0 ? (track.start_time || 0) / totalDuration * 100 : 0;
+  const durPct = totalDuration > 0 ? (track.duration || 60) / totalDuration * 100 : 100;
 
   if (isGhost) {
     return (
@@ -287,8 +289,17 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, sho
     );
   }
 
+  const handleDurationChange = (newDur) => {
+    const oldDur = track.duration || 60;
+    const clamped = Math.max(1, Math.round(newDur));
+    if (clamped !== oldDur) {
+      onUpdate(index, { duration: clamped });
+      if (onRipple) onRipple(index, oldDur, clamped, track.start_time || 0, track.start_time || 0);
+    }
+  };
+
   return (
-    <motion.div className="rounded-lg mb-1 group"
+    <motion.div className="rounded-lg mb-1 group relative overflow-hidden"
       style={{
         background: track.muted ? 'rgba(248,250,252,0.01)' : `${meta.color}05`,
         border: `1px solid ${track.muted ? 'rgba(248,250,252,0.03)' : `${meta.color}12`}`,
@@ -296,8 +307,30 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, sho
       layout initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }}
       data-testid={`track-row-${index}`}>
 
+      {/* Ripple wave animation */}
+      {isRippling && (
+        <motion.div className="absolute inset-0 pointer-events-none"
+          style={{ background: `linear-gradient(90deg, transparent, ${meta.color}15, transparent)` }}
+          initial={{ x: '-100%' }} animate={{ x: '100%' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
+      )}
+
+      {/* Timeline position bar */}
+      <div className="h-[3px] w-full relative" style={{ background: 'rgba(248,250,252,0.02)' }}>
+        <motion.div className="absolute top-0 h-full rounded-full"
+          style={{
+            left: `${startPct}%`, width: `${Math.max(2, durPct)}%`,
+            background: isLocked
+              ? `repeating-linear-gradient(45deg, ${meta.color}30, ${meta.color}30 2px, transparent 2px, transparent 4px)`
+              : `${meta.color}40`,
+          }}
+          layout
+        />
+      </div>
+
       {/* Main row */}
-      <div className="flex items-center gap-2 px-2 py-1.5">
+      <div className="flex items-center gap-1.5 px-2 py-1.5">
         <GripVertical size={9} className="opacity-0 group-hover:opacity-30 transition-opacity cursor-grab" style={{ color: '#F8FAFC' }} />
 
         <div className="p-1 rounded" style={{ background: `${meta.color}10` }}>
@@ -308,22 +341,30 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, sho
           <p className="text-[9px] font-medium truncate" style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.6)' }}>
             {track.source_label}
           </p>
-          {track.frequency && <p className="text-[7px] font-mono" style={{ color: `${meta.color}50` }}>{track.frequency} Hz</p>}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {track.frequency && <span className="text-[6px] font-mono" style={{ color: `${meta.color}50` }}>{track.frequency}Hz</span>}
+            <span className="text-[6px] font-mono flex items-center gap-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <Clock size={6} /> {track.start_time || 0}s
+            </span>
+          </div>
         </div>
 
-        {/* Waveform vis */}
-        <div className="w-16 h-3 flex items-end gap-[1px] mx-1">
-          {Array.from({ length: 10 }).map((_, bi) => {
-            const h = track.muted ? 2 : Math.random() * 10 + 2;
-            return <motion.div key={bi} className="flex-1 rounded-sm"
-              style={{ background: track.muted ? 'rgba(248,250,252,0.05)' : `${meta.color}30`, height: h }}
-              animate={track.muted ? {} : { height: [h, h * 0.5, h] }}
-              transition={{ duration: 0.8 + bi * 0.1, repeat: Infinity }} />;
-          })}
+        {/* Duration control */}
+        <div className="flex items-center gap-0.5">
+          <button className="text-[7px] px-0.5 rounded hover:bg-white/5" data-testid={`dur-minus-${index}`}
+            onClick={() => handleDurationChange((track.duration || 60) - 5)}
+            style={{ color: 'rgba(248,250,252,0.3)' }}>-</button>
+          <span className="text-[7px] font-mono w-6 text-center" style={{ color: meta.color }}
+            data-testid={`track-duration-${index}`}>
+            {track.duration || 60}s
+          </span>
+          <button className="text-[7px] px-0.5 rounded hover:bg-white/5" data-testid={`dur-plus-${index}`}
+            onClick={() => handleDurationChange((track.duration || 60) + 5)}
+            style={{ color: 'rgba(248,250,252,0.3)' }}>+</button>
         </div>
 
         {/* Volume */}
-        <div className="w-12 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
+        <div className="w-10 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
           style={{ background: 'rgba(248,250,252,0.05)' }}
           onClick={e => {
             const r = e.currentTarget.getBoundingClientRect();
@@ -334,14 +375,22 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, sho
         </div>
 
         <button className="p-0.5 rounded" onClick={() => onUpdate(index, { muted: !track.muted })} data-testid={`track-mute-${index}`}>
-          {track.muted ? <VolumeX size={10} style={{ color: 'rgba(248,250,252,0.25)' }} /> : <Volume2 size={10} style={{ color: meta.color }} />}
+          {track.muted ? <VolumeX size={9} style={{ color: 'rgba(248,250,252,0.25)' }} /> : <Volume2 size={9} style={{ color: meta.color }} />}
         </button>
 
-        <button className="text-[7px] font-bold px-1 py-0.5 rounded" data-testid={`track-solo-${index}`}
+        <button className="text-[6px] font-bold px-0.5 py-0.5 rounded" data-testid={`track-solo-${index}`}
           style={{ color: track.solo ? '#EAB308' : 'rgba(248,250,252,0.2)', background: track.solo ? 'rgba(234,179,8,0.1)' : 'transparent' }}
           onClick={() => onUpdate(index, { solo: !track.solo })}>S</button>
 
-        {/* Keyframe expand toggle */}
+        {/* Ripple Lock */}
+        <button className="p-0.5 rounded" data-testid={`track-lock-${index}`}
+          onClick={() => onUpdate(index, { ripple_locked: !isLocked })}
+          title={isLocked ? 'Locked — anchored position' : 'Unlocked — shifts with ripple'}>
+          {isLocked
+            ? <Lock size={9} style={{ color: '#EAB308' }} />
+            : <Unlock size={9} style={{ color: 'rgba(248,250,252,0.15)' }} />}
+        </button>
+
         {showKeyframes && (
           <button className="p-0.5 rounded" onClick={() => setExpanded(!expanded)}
             data-testid={`track-keyframe-toggle-${index}`}>
@@ -358,7 +407,7 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, sho
         </button>
       </div>
 
-      {/* Keyframe automation lanes (Volume + Frequency) */}
+      {/* Keyframe automation lanes */}
       <AnimatePresence>
         {expanded && showKeyframes && (
           <motion.div className="px-3 pb-2 space-y-1"
@@ -366,19 +415,14 @@ function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostClick, sho
             <KeyframeLane
               keyframes={track.keyframes_volume}
               onChange={(kf) => onUpdate(index, { keyframes_volume: kf })}
-              color={meta.color}
-              label="Volume"
-              maxValue={1}
-              minValue={0}
+              color={meta.color} label="Volume" maxValue={1} minValue={0}
             />
             {track.frequency && (
               <KeyframeLane
                 keyframes={track.keyframes_frequency}
                 onChange={(kf) => onUpdate(index, { keyframes_frequency: kf })}
-                color="#EAB308"
-                label="Frequency"
-                maxValue={Math.max(1200, (track.frequency || 528) * 2)}
-                minValue={0}
+                color="#EAB308" label="Frequency"
+                maxValue={Math.max(1200, (track.frequency || 528) * 2)} minValue={0}
               />
             )}
           </motion.div>
@@ -617,6 +661,7 @@ export default function SuanpanMixer() {
   const [showSpeedBridge, setShowSpeedBridge] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [showAssembly, setShowAssembly] = useState(false);
+  const [ripplingIndices, setRipplingIndices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -691,7 +736,7 @@ export default function SuanpanMixer() {
           type: source.type || 'custom', source_id: source.id || '',
           source_label: source.label || 'New Track', volume: 0.8,
           muted: false, solo: false, start_time: 0, duration: 60,
-          frequency: source.frequency || null, color: source.color || '#94A3B8', locked: false,
+          frequency: source.frequency || null, color: source.color || '#94A3B8', locked: false, ripple_locked: false,
         }]);
         setShowAssembly(false);
         if (!isMuted) playConfirmation(660, 'medium');
@@ -702,7 +747,7 @@ export default function SuanpanMixer() {
       type: source.type || 'custom', source_id: source.id || '',
       source_label: source.label || 'New Track', volume: 0.8,
       muted: false, solo: false, start_time: 0, duration: 60,
-      frequency: source.frequency || null, color: source.color || '#94A3B8', locked: false,
+      frequency: source.frequency || null, color: source.color || '#94A3B8', locked: false, ripple_locked: false,
     }]);
     if (!isMuted) playConfirmation(660, 'medium');
     setSourcesOpen(false);
@@ -713,7 +758,7 @@ export default function SuanpanMixer() {
     setTracks(prev => [...prev, {
       type: 'suanpan', source_id: `suanpan-${hz}`, source_label: `Suanpan ${hz.toFixed(1)} Hz`,
       volume: 0.8, muted: false, solo: false, start_time: 0, duration: 60,
-      frequency: hz, color: '#EAB308', locked: false,
+      frequency: hz, color: '#EAB308', locked: false, ripple_locked: false,
     }]);
     if (!isMuted) playConfirmation(hz > 500 ? 880 : 440, 'medium');
     setSuanpanOpen(false);
@@ -728,7 +773,7 @@ export default function SuanpanMixer() {
         type: t.type || 'bonus_pack', source_id: packId,
         source_label: t.source_label || 'Pack Track', volume: 0.8,
         muted: false, solo: false, start_time: 0, duration: 60,
-        frequency: t.frequency || null, color: t.color || '#F472B6', locked: false,
+        frequency: t.frequency || null, color: t.color || '#F472B6', locked: false, ripple_locked: false,
       }));
       const remaining = layerCap > 0 ? layerCap - tracks.length : 50;
       setTracks(prev => [...prev, ...newTracks.slice(0, remaining)]);
@@ -756,6 +801,35 @@ export default function SuanpanMixer() {
   const removeTrack = useCallback((index) => {
     setTracks(prev => prev.filter((_, i) => i !== index));
   }, []);
+
+  // Total timeline duration for position bar calculation
+  const totalDuration = Math.max(60, ...tracks.map(t => (t.start_time || 0) + (t.duration || 60)));
+
+  // Ripple edit handler — shift subsequent unlocked tracks when duration changes
+  const handleRipple = useCallback((changedIdx, oldDur, newDur, oldStart, newStart) => {
+    const delta = newDur - oldDur;
+    if (delta === 0) return;
+
+    setTracks(prev => {
+      const result = prev.map((t, i) => {
+        if (i <= changedIdx) return t;
+        if (t.ripple_locked) return t;
+        // Shift start_time by delta
+        return { ...t, start_time: Math.max(0, (t.start_time || 0) + delta) };
+      });
+      return result;
+    });
+
+    // Show ripple wave animation on shifted tracks
+    const shifted = tracks
+      .map((t, i) => (i > changedIdx && !t.ripple_locked) ? i : -1)
+      .filter(i => i >= 0);
+    setRipplingIndices(shifted);
+    setTimeout(() => setRipplingIndices([]), 700);
+
+    if (!isMuted) playConfirmation(delta > 0 ? 523 : 392, 'low');
+  }, [tracks, isMuted, playConfirmation]);
+
 
   const saveProject = useCallback(async () => {
     setSaving(true);
@@ -1033,13 +1107,34 @@ export default function SuanpanMixer() {
             )}
           </AnimatePresence>
 
+          {/* Timeline ruler */}
+          {tracks.length > 0 && (
+            <div className="px-4 pt-1 pb-0">
+              <div className="flex items-center h-4 relative" style={{ background: 'rgba(248,250,252,0.01)' }}>
+                {Array.from({ length: Math.ceil(totalDuration / 15) + 1 }).map((_, i) => {
+                  const t = i * 15;
+                  const pct = totalDuration > 0 ? (t / totalDuration) * 100 : 0;
+                  return (
+                    <div key={i} className="absolute flex flex-col items-center" style={{ left: `${pct}%` }}>
+                      <div className="w-[1px] h-2" style={{ background: 'rgba(248,250,252,0.06)' }} />
+                      <span className="text-[5px] font-mono" style={{ color: 'rgba(248,250,252,0.12)' }}>
+                        {t}s
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Track list */}
           <div className="flex-1 overflow-y-auto px-4 py-2">
             <AnimatePresence>
               {tracks.map((t, i) => (
                 <TrackRow key={`t-${i}-${t.source_label}`} track={t} index={i}
                   onUpdate={updateTrack} onRemove={removeTrack} isGhost={false}
-                  showKeyframes={keyframesEnabled} />
+                  showKeyframes={keyframesEnabled} onRipple={handleRipple}
+                  totalDuration={totalDuration} isRippling={ripplingIndices.includes(i)} />
               ))}
             </AnimatePresence>
 
