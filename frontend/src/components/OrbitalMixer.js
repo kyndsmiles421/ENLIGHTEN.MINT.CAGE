@@ -1,8 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Zap, X } from 'lucide-react';
-import { MODULE_GROUPS, getActiveModules, moduleRegistry } from '../config/moduleRegistry';
+import { Lock, Zap, X, BookOpen, Eye, EyeOff } from 'lucide-react';
+import { MODULE_GROUPS, getActiveModules, moduleRegistry, checkSynergy, getSynthesisName } from '../config/moduleRegistry';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
+import { useFocus } from '../context/FocusContext';
+import ConstellationPanel from './ConstellationPanel';
 
 /* ── Haptic helper ── */
 let Haptics;
@@ -371,7 +373,9 @@ export default function OrbitalMixer() {
   const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ w: 0, h: 0 });
   const [magneticActive, setMagneticActive] = useState(false);
+  const [constellationOpen, setConstellationOpen] = useState(false);
   const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
+  const { focusMode, toggleFocus } = useFocus();
 
   // Measure container
   useEffect(() => {
@@ -456,6 +460,40 @@ export default function OrbitalMixer() {
     haptic('Light');
     handleActivate(mod); // toggle off
   }, [handleActivate]);
+
+  // Compute synergy lines between active modules
+  const synergyLines = useMemo(() => {
+    const lines = [];
+    for (let i = 0; i < activeModuleObjects.length; i++) {
+      for (let j = i + 1; j < activeModuleObjects.length; j++) {
+        const result = checkSynergy(activeModuleObjects[i], activeModuleObjects[j]);
+        if (result.synergy) {
+          lines.push({
+            a: activeModuleObjects[i],
+            b: activeModuleObjects[j],
+            score: result.score,
+            name: getSynthesisName(activeModuleObjects[i], activeModuleObjects[j]),
+          });
+        }
+      }
+    }
+    return lines;
+  }, [activeModuleObjects]);
+
+  // Load a constellation: activate its modules
+  const handleLoadConstellation = useCallback((moduleIds) => {
+    // First deactivate all current
+    activeModuleObjects.forEach(m => handleActivate(m));
+    // Then activate constellation modules
+    setTimeout(() => {
+      moduleIds.forEach(id => {
+        const mod = moduleRegistry[id];
+        if (mod && !mod.locked) handleActivate(mod);
+      });
+    }, 100);
+    setConstellationOpen(false);
+    haptic('Heavy');
+  }, [activeModuleObjects, handleActivate]);
 
   // Organize modules by ring
   const ringModules = useMemo(() => {
@@ -548,8 +586,9 @@ export default function OrbitalMixer() {
         });
       })}
 
-      {/* Active modules tethers — lines from hub to active orbital positions */}
+      {/* Active modules tethers + Synergy bonds */}
       <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+        {/* Hub-to-bubble tethers */}
         {activeModuleObjects.map(mod => {
           const ring = mod.ring ?? 0;
           const radius = ringRadii[ring] || ringRadii[0];
@@ -572,7 +611,99 @@ export default function OrbitalMixer() {
             />
           );
         })}
+        {/* Synergy bonds — liquid tethers between synergized modules */}
+        {synergyLines.map((syn, i) => {
+          const ringA = syn.a.ring ?? 0;
+          const ringB = syn.b.ring ?? 0;
+          const modsA = ringModules[ringA] || [];
+          const modsB = ringModules[ringB] || [];
+          const idxA = modsA.findIndex(m => m.id === syn.a.id);
+          const idxB = modsB.findIndex(m => m.id === syn.b.id);
+          if (idxA < 0 || idxB < 0) return null;
+          const posA = getOrbitalPosition(idxA, modsA.length, ringRadii[ringA] || ringRadii[0], centerX, centerY);
+          const posB = getOrbitalPosition(idxB, modsB.length, ringRadii[ringB] || ringRadii[0], centerX, centerY);
+          const bSize = isMobile ? BUBBLE_SIZE_MOBILE : BUBBLE_SIZE;
+          const ax = posA.x + bSize / 2, ay = posA.y + bSize / 2;
+          const bx = posB.x + bSize / 2, by = posB.y + bSize / 2;
+          const mx = (ax + bx) / 2 + (Math.random() - 0.5) * 20;
+          const my = (ay + by) / 2 + (Math.random() - 0.5) * 20;
+          return (
+            <g key={`synergy-${i}`}>
+              <path
+                d={`M ${ax} ${ay} Q ${mx} ${my} ${bx} ${by}`}
+                stroke={syn.a.color}
+                strokeWidth={1.5}
+                strokeOpacity={0.2 + syn.score * 0.3}
+                fill="none"
+                strokeDasharray="2 3"
+              />
+              <text
+                x={(ax + bx) / 2}
+                y={(ay + by) / 2 - 6}
+                textAnchor="middle"
+                fill={syn.a.color}
+                fillOpacity={0.35}
+                fontSize={7}
+                fontFamily="monospace"
+              >
+                {syn.name}
+              </text>
+            </g>
+          );
+        })}
       </svg>
+
+      {/* Action buttons: Constellation + Focus */}
+      <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
+        <motion.button
+          whileTap={{ scale: 0.85 }}
+          onClick={() => { haptic('Light'); setConstellationOpen(!constellationOpen); }}
+          className="flex items-center gap-1 px-2 py-1 rounded-full"
+          style={{
+            background: constellationOpen ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${constellationOpen ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)'}`,
+            color: constellationOpen ? '#C084FC' : 'rgba(248,250,252,0.4)',
+            fontSize: '9px',
+            cursor: 'pointer',
+          }}
+          data-testid="orbital-constellation-btn"
+        >
+          <BookOpen size={10} /> Recipes
+        </motion.button>
+
+        {activeModuleObjects.length >= 2 && (
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={() => { haptic('Light'); toggleFocus(); }}
+            className="flex items-center gap-1 px-2 py-1 rounded-full"
+            style={{
+              background: focusMode ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${focusMode ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)'}`,
+              color: focusMode ? '#C084FC' : 'rgba(248,250,252,0.4)',
+              fontSize: '9px',
+              cursor: 'pointer',
+            }}
+            data-testid="orbital-focus-toggle"
+          >
+            {focusMode ? <EyeOff size={10} /> : <Eye size={10} />}
+            {focusMode ? 'Exit Focus' : 'Focus'}
+          </motion.button>
+        )}
+      </div>
+
+      {/* Constellation Panel (slides below action buttons) */}
+      <AnimatePresence>
+        {constellationOpen && (
+          <div className="absolute top-10 right-3 z-30" style={{ width: isMobile ? 260 : 280 }}>
+            <ConstellationPanel
+              activeModuleIds={activeModuleObjects.map(m => m.id)}
+              onLoadConstellation={handleLoadConstellation}
+              isOpen={constellationOpen}
+              onClose={() => setConstellationOpen(false)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Clear all button */}
       <AnimatePresence>
@@ -616,7 +747,23 @@ export default function OrbitalMixer() {
         <div className="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
           <span className="text-[10px] px-3 py-1 rounded-full"
             style={{ background: 'rgba(10,10,18,0.6)', color: 'rgba(248,250,252,0.3)', border: '1px solid rgba(255,255,255,0.04)' }}>
-            Drag bubbles to the center to activate
+            Drag or tap bubbles to activate
+          </span>
+        </div>
+      )}
+
+      {/* Synergy counter */}
+      {synergyLines.length > 0 && (
+        <div className="absolute top-3 left-3 z-20">
+          <span className="text-[9px] px-2 py-1 rounded-full"
+            style={{
+              background: 'rgba(192,132,252,0.08)',
+              border: '1px solid rgba(192,132,252,0.12)',
+              color: 'rgba(192,132,252,0.6)',
+            }}
+            data-testid="synergy-counter"
+          >
+            {synergyLines.length} {synergyLines.length === 1 ? 'synergy' : 'synergies'}
           </span>
         </div>
       )}

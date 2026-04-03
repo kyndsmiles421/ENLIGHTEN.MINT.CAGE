@@ -20,6 +20,7 @@ import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { MixerProvider } from './context/MixerContext';
+import { FocusProvider } from './context/FocusContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import { ResolutionProvider } from './context/ResolutionContext';
 import CosmicToolbar from './components/CosmicToolbar';
@@ -356,6 +357,7 @@ function App() {
       <AvatarProvider>
       <TempoProvider>
       <MixerProvider>
+      <FocusProvider>
       <ResolutionProvider>
       <SensoryProvider>
       <CosmicStateProvider>
@@ -402,6 +404,7 @@ function App() {
       </CosmicStateProvider>
       </SensoryProvider>
       </ResolutionProvider>
+      </FocusProvider>
       </MixerProvider>
       </TempoProvider>
       </AvatarProvider>

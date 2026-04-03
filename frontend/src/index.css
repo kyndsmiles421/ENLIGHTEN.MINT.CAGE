@@ -1109,3 +1109,29 @@ body[data-theme="light"] .high-contrast {
   font-weight: 600 !important;
 }
 
+
+/* ═══ FOCUS MODE — Dissolve non-essential UI ═══ */
+body.cosmic-focus-mode [data-testid="cosmic-navigation"],
+body.cosmic-focus-mode [data-testid="sovereign-crossbar"],
+body.cosmic-focus-mode [data-testid="cosmic-toolbar"],
+body.cosmic-focus-mode [data-testid="orb-corner"],
+body.cosmic-focus-mode [data-testid="orbital-navigation"] {
+  opacity: 0.06;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+body.cosmic-focus-mode [data-testid="cosmic-navigation"]:hover,
+body.cosmic-focus-mode [data-testid="sovereign-crossbar"]:hover {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+body.cosmic-hyper-focus [data-testid="cosmic-navigation"],
+body.cosmic-hyper-focus [data-testid="sovereign-crossbar"],
+body.cosmic-hyper-focus [data-testid="cosmic-toolbar"],
+body.cosmic-hyper-focus [data-testid="orb-corner"],
+body.cosmic-hyper-focus [data-testid="orbital-navigation"] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+

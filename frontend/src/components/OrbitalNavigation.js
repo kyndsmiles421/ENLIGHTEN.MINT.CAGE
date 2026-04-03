@@ -98,7 +98,7 @@ export default function OrbitalNavigation() {
   if (!token || EXCLUDED_PATHS.includes(location.pathname)) return null;
 
   return (
-    <>
+    <div data-testid="orbital-navigation">
       <SovereignCrossbar
         onModuleDetach={handleModuleDetach}
         detachedModules={detachedModules}
@@ -122,6 +122,6 @@ export default function OrbitalNavigation() {
       />
       <PhonicResonanceProvider enabled={!!token} />
       <OrganicAudioProvider enabled={!!token} />
-    </>
+    </div>
   );
 }

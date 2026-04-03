@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
+import { useFocus } from '../context/FocusContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useSensory } from '../context/SensoryContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -48,6 +49,7 @@ export default function SmartDock() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isMuted, sovereignMuteToggle, sovereignKillAll, audioSources } = useSensory();
+  const { focusMode, hyperFocus, exitFocus } = useFocus();
   const [activePanel, setActivePanel] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const longPressRef = useRef(null);
@@ -247,6 +249,56 @@ export default function SmartDock() {
   const hasCustomPos = position.x !== null;
   const defaultPos = { bottom: 80, left: 12 };
   const baseZ = zBoost ? 9999 : 9997;
+
+  // Focus Mode: collapse dock to a resonance dot
+  if (focusMode && !minimized) {
+    const focusDotStyle = hasCustomPos
+      ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
+      : { bottom: 80, left: 12 };
+    return createPortal(
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.2 }}
+        whileTap={{ scale: 0.8 }}
+        onClick={() => { haptic('Medium'); exitFocus(); }}
+        className="fixed flex items-center justify-center"
+        style={{
+          ...focusDotStyle,
+          zIndex: baseZ,
+          width: hyperFocus ? 28 : 32,
+          height: hyperFocus ? 28 : 32,
+          borderRadius: '50%',
+          background: hyperFocus
+            ? 'radial-gradient(circle, rgba(192,132,252,0.12), rgba(6,6,14,0.9))'
+            : 'radial-gradient(circle, rgba(192,132,252,0.08), rgba(6,6,14,0.85))',
+          border: `1px solid rgba(192,132,252,${hyperFocus ? '0.25' : '0.12'})`,
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          cursor: 'pointer',
+          boxShadow: `0 0 ${hyperFocus ? 24 : 14}px rgba(192,132,252,${hyperFocus ? '0.15' : '0.08'})`,
+        }}
+        data-testid="dock-resonance-dot"
+        title="Exit Focus Mode"
+      >
+        <motion.div
+          className="rounded-full"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.5, 0.2, 0.5],
+          }}
+          transition={{ duration: hyperFocus ? 1.5 : 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            width: hyperFocus ? 8 : 6,
+            height: hyperFocus ? 8 : 6,
+            background: '#C084FC',
+            boxShadow: '0 0 8px rgba(192,132,252,0.4)',
+          }}
+        />
+      </motion.button>,
+      document.body
+    );
+  }
 
   // Minimized: tiny restore dot
   if (minimized) {

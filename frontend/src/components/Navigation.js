@@ -405,7 +405,7 @@ export default function Navigation() {
   const isSageActive = location.pathname === '/coach';
 
   return (
-    <>
+    <div data-testid="cosmic-navigation">
       {/* ═══ Desktop Nav ═══ */}
       <nav
         className="hidden lg:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-5 py-2.5"
@@ -893,7 +893,7 @@ export default function Navigation() {
 
       {/* Spacer */}
       <div className="h-14" />
-    </>
+    </div>
   );
 }
 
