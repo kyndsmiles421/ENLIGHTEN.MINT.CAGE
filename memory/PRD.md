@@ -134,6 +134,8 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── moduleRegistry.js (Plug-and-play module manifest with affinities, tiers, synergy engine)
 ├── context/
 │   ├── FocusContext.js (Auto-immersion focus mode: 3+=focus, 5+=hyper-focus)
+│   ├── ClassContext.js (Anthropology class: Shaman/Nomad/Architect/Merchant + XP)
+│   ├── TreasuryContext.js (Harmony Credits wallet + purchase flow)
 ├── pages/
 │   ├── MasteryPath.js, SuanpanPhysics.js, StarChart.js (+ CultureLayerPanel)
 /app/frontend/public/
@@ -143,10 +145,22 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── phonic.py (movement + flourish + harmonics + memory + harmony-score + streak)
 │   ├── culture_layers.py (Hopi/Egyptian/Vedic)
 │   ├── sovereign_mastery.py
+│   ├── classes.py (Anthropology class archetypes + selection + XP)
+│   ├── treasury.py (Sovereign Treasury: credits, escrow, 5% fee routing, mirror hook, dashboard)
+│   ├── constellations.py (Constellation recipes CRUD + marketplace + mirror hook)
 ```
 
 ## Iteration History
-### Iteration 245 — Universal Synthesis Interface Phase 1 (Apr 3, 2026) — LATEST
+### Iteration 246 — Phase 1 Finalization: Classes + Treasury + Synergy Discovery (Apr 3, 2026) — LATEST
+- **Anthropology Class System**: Shaman (Resonator) / Nomad (Navigator) / Architect (Builder) / Merchant (Catalyst). Each class has boosted affinities, synergy bonus, special synthesis type. XP system: 100 XP per level. Backend: `/api/classes`
+- **Sovereign Treasury & Escrow**: Credits wallet (100 initial), 5% platform fee on marketplace trades. Escrow state machine for digital goods. Mirror Hook: every constellation creation/purchase auto-copies to `sovereign_mirror` collection. Backend: `/api/treasury`
+- **Synergy Discovery Mode**: Bubbles glow when dragged near compatible partners (proximity-based affinity detection). Class-boosted modules show enhanced glow.
+- **Weight-Based Haptic Feedback**: light (freq) = sharp tick, medium (sounds) = pulse, heavy (instruments/engines) = long vibration
+- **Constellation Purchase Flow**: Marketplace items show "Buy" button with credit price. One-tap purchase deducts credits, splits fee, auto-loads modules.
+- **Class Picker UI**: Orbital playground shows archetype selector with 4 classes, icons, descriptions. Selected class badge persists.
+- Tests: Backend 17/17 (100%), Frontend 95% (balance display requires auth — expected)
+
+### Iteration 245 — Universal Synthesis Interface Phase 1 (Apr 3, 2026)
 - **Module Registry 3.0**: Affinity tags (`audio`, `spiritual`, `healing`, `nature`, `cosmic`, etc.) + tier access levels (0=Foundation, 1=Civilization, 2=Sovereignty) + weight system for haptic feedback
 - **Synergy Engine**: `checkSynergy()` detects shared affinities between modules, `getSynthesisName()` generates combo names (Sacred Resonance, Celestial Chord, etc.), visual SVG "Molecular Bond" tethers between synergized modules
 - **Constellation Recipes**: Full CRUD backend (`/api/constellations`) + save/browse/load/like/sell panel in OrbitalMixer. Tiered limits: Free=3, Pro=50, Elite=unlimited+selling rights
@@ -190,20 +204,23 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iterations 234-236 — Foundation
 
 ## Upcoming (P1)
-- **Anthropology Class System**: Shaman (Resonance) / Nomad (Navigation) / Architect (Builder) / Merchant (Catalyst) — each class modifies widget synthesis rules
-- **Synthesis Handshake**: Full combo-widget logic — Cymatic Visuals (Shaman+Fractal+Audio), Trade Trails (Nomad+GPS+Market), Blueprint UI (Architect+Forge+Merchant)
-- **Liquid Tethers**: SVG canvas sub-layer with animated data-stream connections between active synthesis widgets
-- **Haptic Phonics**: Varied vibration frequencies mapped to widget weight (heavy instruments vs light frequencies)
-- I Ching Logic Gates: First operational "engine" type module plugged into the Module Registry
+- **Synthesis Handshake**: Full combo-widget logic — Cymatic Visuals (Shaman+Audio+Fractal), Trade Trails (Nomad+GPS+Market), Blueprint Forge (Architect+Forge+Merchant)
+- **Liquid Tethers**: Animated SVG data-stream connections between synthesized widgets (gold during trade, green on completion)
+- **Haptic Phonics**: Varied vibration frequencies mapped to cross-reference success without looking at screen
+- I Ching Logic Gates: First operational "engine" module (maps 64 hexagrams to 64-bit harmonic resonances)
+- **Stripe Integration**: Real-currency option alongside Harmony Credits for premium constellation purchases
+- **Sovereign Dashboard UI**: Admin view with real-time ledger, escrow contracts, fee slider, kill-switch
 
 ## Future/Backlog (P2)
 - **Oracle Navigation Loop**: I Ching → GPS Map → Artifact discovery → Forge upgrade → Class Stats
 - **Harmony Commerce Loop**: Frequency + Fractal → Escrow Contract → Trade Circle → Social Capital
+- **Trade Circle Visualization**: Circular reciprocity UI replacing cart/checkout
 - **Gesture Ring**: Multi-touch frequency/geometry manipulation for Hyper-Focus mode
+- **Biometric Authorization**: Long-press haptic handshake for high-value trades
 - 54-Sublayer L² Fractal Engine
 - GPS-Based Cosmic Map
 - Forge Mini-Game (3D asset generation from hexagram binary)
-- Phygital Marketplace / Server-Side Escrow
+- Phygital Marketplace / Server-Side Escrow (GPS-confirmed delivery)
 - Skeleton Loading (Ghost Skeleton UI while complex logic populates)
 - Tiered Subscription Matrix: Foundation ($0) → Civilization → Sovereignty
 
