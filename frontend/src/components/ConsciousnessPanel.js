@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Mountain, Droplets, Flame, Wind, Sparkles,
-  ChevronRight, Eye, EyeOff, Settings, Check, Lock
+  ChevronRight, Eye, EyeOff, Settings, Check, Lock,
+  BookOpen, Heart, Brain, Flower2, Dumbbell, Zap
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -25,6 +27,21 @@ const ELEMENT_LABELS = {
   4: 'Air',
   5: 'Ether',
 };
+
+const LEVEL_ROUTES = {
+  1: '/breathing',
+  2: '/mood-tracker',
+  3: '/mastery-avenues',
+  4: '/suanpan',
+  5: '/master-view',
+};
+
+const QUICK_ACTIONS = [
+  { activity: 'breathing_session', label: 'Breathe', icon: Wind, path: '/breathing', color: '#2DD4BF' },
+  { activity: 'mood_log', label: 'Mood', icon: Heart, path: '/mood-tracker', color: '#F472B6' },
+  { activity: 'journal_entry', label: 'Journal', icon: BookOpen, path: '/journal', color: '#34D399' },
+  { activity: 'meditation_complete', label: 'Meditate', icon: Flower2, path: '/meditation', color: '#8B5CF6' },
+];
 
 export function ConsciousnessAura({ level, size = 40, className = '' }) {
   const levels = {
@@ -101,8 +118,10 @@ export function ConsciousnessRankBadge({ level, name, subtitle, color, compact =
 
 export default function ConsciousnessPanel({ compact = false, onNavigate }) {
   const { authHeaders } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = useCallback(async () => {
@@ -123,6 +142,18 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
     } catch {}
   };
 
+  const handleLevelClick = (lvl) => {
+    if (lvl.level <= (data?.level || 1)) {
+      const route = LEVEL_ROUTES[lvl.level] || '/mastery-avenues';
+      navigate(route);
+    } else {
+      toast(`${lvl.name} unlocks at ${lvl.xp_required} XP`, {
+        description: lvl.gate_label,
+        icon: React.createElement(Lock, { size: 14 }),
+      });
+    }
+  };
+
   if (loading || !data) {
     return (
       <div className="rounded-xl p-4 animate-pulse" style={{ background: 'rgba(255,255,255,0.02)' }}>
@@ -132,17 +163,22 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
     );
   }
 
-  const { level, level_info, xp_total, xp_into_level, xp_for_next, progress_pct, next_level, display_mode, is_max_level } = data;
+  const { level, level_info, xp_total, xp_into_level, xp_for_next, progress_pct, next_level, display_mode, is_max_level, recent_activity } = data;
   const Icon = LEVEL_ICONS[level] || Mountain;
   const showAura = display_mode === 'aura' || display_mode === 'hybrid';
   const showRank = display_mode === 'rank' || display_mode === 'hybrid';
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2" data-testid="consciousness-compact">
+      <motion.div
+        className="flex items-center gap-2 cursor-pointer"
+        data-testid="consciousness-compact"
+        onClick={() => navigate('/mastery-avenues')}
+        whileTap={{ scale: 0.95 }}
+      >
         {showAura && <ConsciousnessAura level={level} size={28} />}
         {showRank && <ConsciousnessRankBadge level={level} name={level_info.name} subtitle={level_info.subtitle} color={level_info.color} compact />}
-      </div>
+      </motion.div>
     );
   }
 
@@ -150,7 +186,7 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl overflow-hidden relative"
+      className="rounded-xl overflow-hidden relative cursor-pointer"
       style={{
         background: `linear-gradient(135deg, ${level_info.color}08, ${level_info.aura_glow.replace('0.3', '0.06')})`,
         border: `1px solid ${level_info.color}15`,
@@ -163,8 +199,12 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
       }} />
 
       <div className="relative p-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3">
+        {/* Header — clickable to navigate */}
+        <div
+          className="flex items-center justify-between mb-3"
+          onClick={() => navigate('/mastery-avenues')}
+          data-testid="consciousness-header-link"
+        >
           <div className="flex items-center gap-3">
             {showAura && <ConsciousnessAura level={level} size={36} />}
             <div>
@@ -183,13 +223,16 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
-            data-testid="consciousness-settings-btn"
-          >
-            <Settings size={13} style={{ color: 'var(--text-muted)' }} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }}
+              className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+              data-testid="consciousness-settings-btn"
+            >
+              <Settings size={13} style={{ color: 'var(--text-muted)' }} />
+            </button>
+            <ChevronRight size={13} style={{ color: level_info.color, opacity: 0.5 }} />
+          </div>
         </div>
 
         {/* XP Progress Bar */}
@@ -213,34 +256,48 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
           </div>
         </div>
 
-        {/* Next Level Preview */}
+        {/* Next Level Preview — clickable */}
         {next_level && (
-          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg mb-3" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <motion.div
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg mb-3 cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.02)' }}
+            whileHover={{ background: 'rgba(255,255,255,0.04)' }}
+            onClick={() => navigate('/mastery-avenues')}
+            data-testid="consciousness-next-level-link"
+          >
             <Lock size={10} style={{ color: next_level.color }} />
-            <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-[9px] flex-1" style={{ color: 'var(--text-muted)' }}>
               Next: <span style={{ color: next_level.color, fontWeight: 600 }}>{next_level.name}</span> — {next_level.gate_label}
             </span>
-          </div>
+            <ChevronRight size={10} style={{ color: next_level.color, opacity: 0.4 }} />
+          </motion.div>
         )}
 
-        {/* Level Map (mini) */}
-        <div className="flex items-center gap-1" data-testid="consciousness-level-map">
+        {/* Level Map — interactive nodes */}
+        <div className="flex items-center gap-1 mb-3" data-testid="consciousness-level-map">
           {(data.all_levels || []).map((lvl, i) => {
             const active = lvl.level <= level;
             const LvlIcon = LEVEL_ICONS[lvl.level] || Mountain;
             return (
               <div key={lvl.level} className="flex items-center gap-1 flex-1">
-                <motion.div
-                  className="w-6 h-6 rounded-full flex items-center justify-center"
+                <motion.button
+                  className="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer"
                   style={{
                     background: active ? `${lvl.color}20` : 'rgba(255,255,255,0.03)',
                     border: `1px solid ${active ? lvl.color + '40' : 'rgba(255,255,255,0.06)'}`,
                   }}
-                  whileHover={{ scale: 1.15 }}
-                  title={`${lvl.name} — ${lvl.subtitle}`}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleLevelClick(lvl)}
+                  title={`${lvl.name} — ${lvl.subtitle}${active ? '' : ' (Locked)'}`}
+                  data-testid={`consciousness-level-node-${lvl.level}`}
                 >
-                  <LvlIcon size={10} style={{ color: active ? lvl.color : 'var(--text-muted)' }} />
-                </motion.div>
+                  {active ? (
+                    <LvlIcon size={10} style={{ color: lvl.color }} />
+                  ) : (
+                    <Lock size={8} style={{ color: 'var(--text-muted)' }} />
+                  )}
+                </motion.button>
                 {i < 4 && (
                   <div className="flex-1 h-px" style={{
                     background: lvl.level < level
@@ -252,6 +309,60 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
             );
           })}
         </div>
+
+        {/* Quick XP Actions */}
+        <div className="grid grid-cols-4 gap-1.5" data-testid="consciousness-quick-actions">
+          {QUICK_ACTIONS.map(action => (
+            <motion.button
+              key={action.activity}
+              className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded-lg cursor-pointer"
+              style={{
+                background: `${action.color}06`,
+                border: `1px solid ${action.color}10`,
+              }}
+              whileHover={{ scale: 1.05, borderColor: `${action.color}25` }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate(action.path)}
+              data-testid={`consciousness-action-${action.activity}`}
+            >
+              {React.createElement(action.icon, { size: 12, style: { color: action.color } })}
+              <span className="text-[7px]" style={{ color: action.color }}>{action.label}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Recent XP Activity (collapsed, togglable) */}
+        {recent_activity && recent_activity.length > 0 && (
+          <motion.div className="mt-2">
+            <button
+              className="w-full flex items-center justify-between py-1 text-[8px]"
+              style={{ color: 'var(--text-muted)' }}
+              onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
+              data-testid="consciousness-toggle-activity"
+            >
+              <span>Recent XP</span>
+              <Zap size={8} style={{ color: level_info.color }} />
+            </button>
+            <AnimatePresence>
+              {showActions && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  {recent_activity.slice(-3).reverse().map((act, i) => (
+                    <div key={i} className="flex items-center justify-between py-0.5 text-[8px]"
+                      style={{ color: 'var(--text-muted)' }}>
+                      <span>{act.activity?.replace(/_/g, ' ')}</span>
+                      <span style={{ color: level_info.color, fontWeight: 600 }}>+{act.xp} XP</span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
       </div>
 
       {/* Display Settings Panel */}
@@ -269,7 +380,7 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
                 {['rank', 'aura', 'hybrid'].map(mode => (
                   <button
                     key={mode}
-                    onClick={() => setDisplayMode(mode)}
+                    onClick={(e) => { e.stopPropagation(); setDisplayMode(mode); }}
                     className="flex-1 px-2 py-1.5 rounded-lg text-[10px] capitalize transition-all"
                     style={{
                       background: display_mode === mode ? `${level_info.color}15` : 'rgba(255,255,255,0.02)',
