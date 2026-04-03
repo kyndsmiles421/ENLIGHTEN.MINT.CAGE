@@ -53,24 +53,26 @@ async def save_constellation(body: dict, user=Depends(get_current_user)):
     await db.constellations.insert_one(doc)
     doc.pop("_id", None)
 
-    # ─── Mirror Hook: Copy blueprint to Sovereign Ledger ───
-    await db.sovereign_mirror.insert_one({
-        "id": str(uuid.uuid4()),
-        "type": "constellation_created",
-        "constellation": {
-            "id": doc["id"],
-            "name": doc["name"],
-            "module_ids": doc["module_ids"],
-            "synergies": doc["synergies"],
-            "tags": doc["tags"],
-        },
-        "creator_id": user["id"],
-        "creator_name": user.get("name", ""),
-        "is_public": doc["is_public"],
-        "is_for_sale": doc["is_for_sale"],
-        "price": doc["price"],
-        "created_at": doc["created_at"],
-    })
+    # ─── Mirror Hook: Copy blueprint to Sovereign Ledger (if active) ───
+    config = await db.sovereign_config.find_one({"id": "global"}, {"_id": 0})
+    if not config or config.get("mirror_active", True):
+        await db.sovereign_mirror.insert_one({
+            "id": str(uuid.uuid4()),
+            "type": "constellation_created",
+            "constellation": {
+                "id": doc["id"],
+                "name": doc["name"],
+                "module_ids": doc["module_ids"],
+                "synergies": doc["synergies"],
+                "tags": doc["tags"],
+            },
+            "creator_id": user["id"],
+            "creator_name": user.get("name", ""),
+            "is_public": doc["is_public"],
+            "is_for_sale": doc["is_for_sale"],
+            "price": doc["price"],
+            "created_at": doc["created_at"],
+        })
 
     if doc["is_public"]:
         await create_activity(user["id"], "constellation", f"shared constellation: {doc['name']}")

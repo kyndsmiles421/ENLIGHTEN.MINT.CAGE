@@ -183,6 +183,7 @@ const HexagramJournal = lazy(() => import('./pages/HexagramJournal'));
 const TradeCircleOrbital = lazy(() => import('./pages/TradeCircleOrbital'));
 const CodexOrbital = lazy(() => import('./pages/CodexOrbital'));
 const MasteryPath = lazy(() => import('./pages/MasteryPath'));
+const SovereignDashboard = lazy(() => import('./pages/SovereignDashboard'));
 
 function PageLoader() {
   return (
@@ -341,6 +342,7 @@ function AnimatedRoutes() {
         <Route path="/trade-orbital" element={<TradeCircleOrbital />} />
         <Route path="/codex-orbital" element={<CodexOrbital />} />
         <Route path="/mastery-path" element={<MasteryPath />} />
+        <Route path="/sovereign-admin" element={<SovereignDashboard />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -1,0 +1,109 @@
+{
+  "summary": "Iteration 247 - Sovereign Dashboard & Skeleton Export Testing Complete. Backend: 13/13 tests passed (100%). Frontend: All features verified working after fixing route conflict. The SovereignDashboard was shadowed by SovereignArchitecture on the same /sovereign route - fixed by changing SovereignDashboard route to /sovereign-admin.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration247_sovereign_dashboard.py",
+    "/app/test_reports/pytest/pytest_iteration247_sovereign_dashboard.xml"
+  ],
+  "action_items": [
+    "IMPORTANT: Route conflict fixed - SovereignDashboard now accessible at /sovereign-admin instead of /sovereign (which shows SovereignArchitecture)",
+    "Consider updating Dashboard.js navigation link to point to /sovereign-admin if admin access is needed from dashboard"
+  ],
+  "critical_code_review_comments": [
+    "FIXED: App.js had duplicate /sovereign routes - line 329 (SovereignArchitecture) and line 345 (SovereignDashboard). Changed SovereignDashboard to /sovereign-admin",
+    "treasury.py: Sovereign config CRUD working correctly with fee_percent validation (0-50 range)",
+    "treasury.py line 115-116: frozen_transactions check returns 423 when transactions are frozen",
+    "treasury.py line 324-376: skeleton/export endpoint returns clean JSON with framework, module_types, affinities, tier_levels, interaction_model, class_archetypes",
+    "constellations.py line 57-75: Mirror hook respects mirror_active config toggle",
+    "SovereignDashboard.js: Well-structured with 5 tabs (Overview, Controls, Mirror, Escrow, Export), all with proper data-testid attributes"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration247_sovereign_dashboard.py",
+    "/app/frontend/src/App.js"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "Test constellations created and cleaned up during backend testing",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 247 verified: (1) Sovereign Dashboard accessible at /sovereign-admin (NOT /sovereign which shows SovereignArchitecture). (2) Backend APIs all working: GET/PATCH /api/treasury/sovereign/config, GET /api/treasury/sovereign/mirror, GET /api/treasury/sovereign/escrow, POST /api/treasury/sovereign/freeze/{id}, GET /api/treasury/skeleton/export. (3) Fee slider (0-25%) persists to backend. (4) Toggle switches for is_live, mirror_active, frozen_transactions all working. (5) Skeleton export generates JSON with framework metadata. (6) frozen_transactions=true blocks purchases with 423. (7) fee_percent validation rejects values > 50 or < 0.",
+  "features_verified": {
+    "backend_sovereign_config_get": {
+      "status": "PASS",
+      "details": "GET /api/treasury/sovereign/config returns fee_percent, is_live, mirror_active, frozen_transactions"
+    },
+    "backend_sovereign_config_patch": {
+      "status": "PASS",
+      "details": "PATCH /api/treasury/sovereign/config updates fee_percent and toggles correctly"
+    },
+    "backend_sovereign_config_validation": {
+      "status": "PASS",
+      "details": "Fee validation rejects > 50 and < 0 with 400 status"
+    },
+    "backend_sovereign_mirror": {
+      "status": "PASS",
+      "details": "GET /api/treasury/sovereign/mirror returns entries list with total count"
+    },
+    "backend_sovereign_escrow": {
+      "status": "PASS",
+      "details": "GET /api/treasury/sovereign/escrow returns escrow contracts list"
+    },
+    "backend_sovereign_freeze": {
+      "status": "PASS",
+      "details": "POST /api/treasury/sovereign/freeze/{id} returns 404 for non-existent escrow"
+    },
+    "backend_skeleton_export": {
+      "status": "PASS",
+      "details": "GET /api/treasury/skeleton/export returns framework, skeleton (module_types, affinity_tags, tier_levels, interaction_model), class_archetypes"
+    },
+    "backend_frozen_transactions": {
+      "status": "PASS",
+      "details": "POST /api/treasury/purchase respects frozen_transactions flag"
+    },
+    "backend_mirror_hook": {
+      "status": "PASS",
+      "details": "POST /api/constellations respects mirror_active config toggle"
+    },
+    "frontend_sovereign_route": {
+      "status": "PASS",
+      "details": "/sovereign-admin route loads SovereignDashboard page (fixed from /sovereign which was shadowed)"
+    },
+    "frontend_overview_tab": {
+      "status": "PASS",
+      "details": "Overview tab shows Treasury balance, Fees Collected, Wallets, Escrow stats"
+    },
+    "frontend_controls_tab": {
+      "status": "PASS",
+      "details": "Controls tab shows fee slider (0-25%) and toggle switches (System Live, Mirror Hook, Freeze All Trades)"
+    },
+    "frontend_fee_slider": {
+      "status": "PASS",
+      "details": "Fee slider changes value and persists to backend"
+    },
+    "frontend_mirror_tab": {
+      "status": "PASS",
+      "details": "Mirror tab shows sovereign mirror entries"
+    },
+    "frontend_escrow_tab": {
+      "status": "PASS",
+      "details": "Escrow tab shows escrow contracts"
+    },
+    "frontend_export_tab": {
+      "status": "PASS",
+      "details": "Export tab shows skeleton download button and JSON preview"
+    }
+  },
+  "route_fix_applied": {
+    "issue": "Duplicate /sovereign routes in App.js - SovereignArchitecture (line 329) shadowed SovereignDashboard (line 345)",
+    "fix": "Changed SovereignDashboard route from /sovereign to /sovereign-admin",
+    "file_modified": "/app/frontend/src/App.js"
+  }
+}
