@@ -97,8 +97,8 @@ export default function MissionControl({ isOpen, onClose }) {
             style={{
               left: '50%',
               top: '50%',
-              width: 360,
-              maxHeight: '80vh',
+              width: Math.min(360, window.innerWidth - 32),
+              maxHeight: 'calc(100vh - 48px)',
               background: 'rgba(10,10,18,0.72)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',

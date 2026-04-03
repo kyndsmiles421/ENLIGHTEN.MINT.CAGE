@@ -206,6 +206,7 @@ export default function CosmicAssistant() {
     : baseActions;
 
   if (!user) return null;
+  if (location.pathname === '/hub') return null;
 
   return (
     <>

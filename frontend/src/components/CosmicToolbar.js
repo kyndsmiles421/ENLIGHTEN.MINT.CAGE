@@ -9,7 +9,7 @@ import { useTempo } from '../context/TempoContext';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, SOUNDS as MIXER_SOUNDS } from '../context/MixerContext';
 
-const HIDDEN_ROUTES = ['/auth', '/', '/vr'];
+const HIDDEN_ROUTES = ['/auth', '/', '/vr', '/hub', '/intro'];
 const POS_KEY = 'cosmic_toolbar_pos';
 const TOOLBAR_MIN_KEY = 'cosmic_toolbar_minimized';
 const WIDGET_FOCUS_KEY = 'cosmic_widget_focus';

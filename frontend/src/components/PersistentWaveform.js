@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, memo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useMixer } from '../context/MixerContext';
 
 /**
@@ -12,6 +13,9 @@ export default memo(function PersistentWaveform() {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
   const hueRef = useRef(0);
+  const location = useLocation();
+
+  const hideOnHub = location.pathname === '/hub' || location.pathname === '/' || location.pathname === '/auth';
 
   // Determine dominant color from active frequencies
   const getColor = useCallback(() => {
@@ -124,6 +128,8 @@ export default memo(function PersistentWaveform() {
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
   }, [draw]);
+
+  if (hideOnHub) return null;
 
   return (
     <canvas

@@ -8,7 +8,7 @@ import { useSovereign } from '../context/SovereignContext';
 import { usePhonicResonance, usePredictiveSonicTug, ROUTE_FREQUENCIES } from '../hooks/usePhonicResonance';
 import { useOrganicAudio } from '../hooks/useOrganicAudio';
 
-const EXCLUDED_PATHS = ['/', '/auth', '/intro'];
+const EXCLUDED_PATHS = ['/', '/auth', '/intro', '/hub'];
 
 // Phonic Resonance — ambient Web Audio wrapper (renders nothing)
 function PhonicResonanceProvider({ enabled }) {

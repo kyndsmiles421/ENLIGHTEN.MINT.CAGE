@@ -64,6 +64,7 @@ export default function LearningToggle() {
   };
 
   if (!token) return null;
+  if (window.location.pathname === '/hub') return null;
 
   const advLevel = toggleStatus?.advancement?.level || 1;
   const advColor = ADVANCEMENT_COLORS[advLevel];

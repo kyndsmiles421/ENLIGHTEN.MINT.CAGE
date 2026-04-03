@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, X, CreditCard, ArrowRight } from 'lucide-react';
 import { useCreditsContext } from '../context/CreditContext';
@@ -10,9 +10,12 @@ export default function CreditNudge() {
   const { creditInfo } = useCreditsContext();
   const [dismissed, setDismissed] = useState(false);
   const [show, setShow] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (!user || !creditInfo || dismissed) { setShow(false); return; }
+    // Hide on hub, auth, landing
+    if (location.pathname === '/hub' || location.pathname === '/' || location.pathname === '/auth') { setShow(false); return; }
     // Don't show for unlimited tiers
     if (creditInfo.credits_per_month === -1 && creditInfo.subscription_active) { setShow(false); return; }
     // Show when balance <= 10
@@ -21,7 +24,7 @@ export default function CreditNudge() {
     } else {
       setShow(false);
     }
-  }, [user, creditInfo, dismissed]);
+  }, [user, creditInfo, dismissed, location.pathname]);
 
   // Reset dismiss when credits change significantly
   useEffect(() => {
