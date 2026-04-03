@@ -76,15 +76,16 @@ export function SolfeggioGlow({ color, size = 28 }) {
       />
       {/* Center circle — pulse */}
       <motion.circle
-        cx="14" cy="14" r="3"
+        cx="14" cy="14"
         fill="none"
         stroke={color}
         strokeWidth="0.5"
         animate={{
-          r: [3, 4.5, 3],
+          scale: [1, 1.4, 1],
           opacity: [0.2, 0.5, 0.2],
         }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        r="3"
       />
     </svg>
   );

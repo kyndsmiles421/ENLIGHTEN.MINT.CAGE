@@ -167,7 +167,18 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 263 — Sovereign Council: 10-Member Unified Council + Faculty Utility Tools + Tiered Knowledge (Apr 3, 2026) — LATEST
+### Iteration 264 — SmartDock "Consult" Integration + Solfeggio Pulse + Sovereign Overlay (Apr 3, 2026) — LATEST
+- **SmartDock Consult Button** with Solfeggio geometric pulse animation (hexagonal ring + inner triangle + center circle)
+- **Semi-Transparent Sovereign Overlay**: Slides from right, user stays in flow on current page
+  - Context-aware auto-selection: `/economy` → Principal Economist, `/star-chart` → Astraeus, `/wellness` → Zenith, etc.
+  - Full chat with persistent message history inside the overlay
+  - Member selector dropdown to switch between all 10 accessible council members
+  - Cross-member bridging buttons in AI responses
+  - **Utility Subsidy Nudge**: Faculty members show unpurchased tool with 10% discount inside overlay
+- **Files**: `SovereignConsultOverlay.js` (new), `SmartDock.js` (integrated Consult button + overlay render)
+- Tests: Backend 15/15 (100%), Frontend 100%
+
+### Iteration 263 — Sovereign Council: 10-Member Unified Council + Faculty Utility Tools + Tiered Knowledge (Apr 3, 2026)
 - **10-Member Sovereign Council** (5 Advisors + 5 Faculty Teachers), each with unique backstory, expertise, and domain
   - **5 Advisors**: Grand Architect, Master Harmonic, Principal Economist, Chief Logistics, Sovereign Ethicist
   - **5 Faculty Teachers**: Astraeus the Star-Mapper, Zenith the Silent, Aurelius the Professor, Gaea the Cultivator, Vesta the Chemist
@@ -456,15 +467,13 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
-## Upcoming (P0-P1) — Iteration 264+
-- **Sovereign Deep Links in SmartDock** — "Consult" buttons on linked module pages for each Council member
-- **Trade Circle Marketplace UI**: Smooth purchase flow for $1,347+ Business-in-a-Box packs, verified asset bridge
-- **Utility Tool Functional Interfaces** — Build out the actual tool UIs (Orion Engine map, Neural Gateway bio-feedback, etc.)
-- **Upgrade Nudge Logic** — When a user owns 3+ Architect utilities, prompt them with the $89/mo subscription value proposition
-- **Circularity KPI**: Tag trades/transmutations with ecosystem impact scores, Resonance Multipliers
-- **Context-Aware Predictive Modality Switching**: Auto-switch learning mode via device sensors
-- **Ecosystem Health Dashboard**: "Global Renaissance" events at peak community circularity
-- **Teacher-Student Peer Review Loop**: Master-tier users review novice submissions for Impact Points
+## Upcoming (P0-P1) — Iteration 265+
+- **Dust "Clink" Spatial Audio** — High-fidelity "star particles settling" sound on Supernova Core purchases and Dust transfers
+- **"Usage Yield" Report** — Monthly Dust Efficiency Statement from Caspian showing how much the user would have saved as an Architect
+- **Tool Stacking Visualization** — Mastery Map showing owned tools + "Missing Links" bundle upgrade prompt for Architect tier
+- **Deep Language Persona Expansion** — Cultural teaching idioms and dialect-specific resonance for AI Sovereign responses
+- **Focus Mode 4.0 Gesture Controls** — Pinch-to-scale and Swipe-to-rotate inside Focus Mode
+- **Ghost Skeleton UI Optimization** — Skeleton loaders before canvas items render
 
 ## Upcoming (P1)
 - **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation
