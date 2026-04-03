@@ -120,7 +120,8 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 /app/frontend/src/
 ├── components/
 │   ├── SmartDock.js (+ Control Center: Harmony, NPU, Streak)
-│   ├── OrbitalMixer.js (Drag-and-Drop Mixer with orbital ring layout)
+│   ├── OrbitalMixer.js (Drag-and-Drop Mixer with orbital ring layout, synergy bonds, focus toggle)
+│   ├── ConstellationPanel.js (Save/Browse/Load/Like/Sell constellation recipes)
 │   ├── SovereignCrossbar.js, NebulaSphere.js, NebulaPlayground.js
 │   ├── OrbitalNavigation.js, BubblePortal.js
 │   ├── CultureLayerPanel.js
@@ -130,7 +131,9 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── useOrganicAudio.js (External organic instrument synthesis)
 │   ├── useHarmonyEngine.js (Consolidated harmony/streak/NPU logic)
 ├── config/
-│   ├── moduleRegistry.js (Plug-and-play module manifest for all audio/engine modules)
+│   ├── moduleRegistry.js (Plug-and-play module manifest with affinities, tiers, synergy engine)
+├── context/
+│   ├── FocusContext.js (Auto-immersion focus mode: 3+=focus, 5+=hyper-focus)
 ├── pages/
 │   ├── MasteryPath.js, SuanpanPhysics.js, StarChart.js (+ CultureLayerPanel)
 /app/frontend/public/
@@ -143,7 +146,15 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 244 — Module Registry & Orbital Drag-Drop Mixer (Apr 3, 2026) — LATEST
+### Iteration 245 — Universal Synthesis Interface Phase 1 (Apr 3, 2026) — LATEST
+- **Module Registry 3.0**: Affinity tags (`audio`, `spiritual`, `healing`, `nature`, `cosmic`, etc.) + tier access levels (0=Foundation, 1=Civilization, 2=Sovereignty) + weight system for haptic feedback
+- **Synergy Engine**: `checkSynergy()` detects shared affinities between modules, `getSynthesisName()` generates combo names (Sacred Resonance, Celestial Chord, etc.), visual SVG "Molecular Bond" tethers between synergized modules
+- **Constellation Recipes**: Full CRUD backend (`/api/constellations`) + save/browse/load/like/sell panel in OrbitalMixer. Tiered limits: Free=3, Pro=50, Elite=unlimited+selling rights
+- **Focus Mode 4.0**: Auto-triggers at 3+ active modules, SmartDock collapses to pulsing "Resonance Dot", Navigation/Crossbar/Toolbar dissolve via CSS body class. Hyper-focus at 5+ modules. Manual toggle available.
+- **Synergy Counter**: Shows active synergy count in orbital playground
+- Tests: Backend 13/13 (100%), Frontend 100%
+
+### Iteration 244 — Module Registry & Orbital Drag-Drop Mixer (Apr 3, 2026)
 - **Module Registry** (`/app/frontend/src/config/moduleRegistry.js`): Central plug-and-play manifest with MODULE_TYPES, MODULE_GROUPS, 21 modules across 5 rings (frequencies, sounds, instruments, logic-gates, engines)
 - **OrbitalMixer** (`/app/frontend/src/components/OrbitalMixer.js`): Orbital ring layout with DraggableBubble, PlayerHub, magnetic snap zone, haptic feedback
 - Dual interaction: **Drag-and-drop** to center hub OR **tap-to-toggle** (accessibility)
@@ -179,18 +190,22 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iterations 234-236 — Foundation
 
 ## Upcoming (P1)
-- Focus Mode: Dim non-essential UI (dock, crossbar) when a module is loaded into the player
+- **Anthropology Class System**: Shaman (Resonance) / Nomad (Navigation) / Architect (Builder) / Merchant (Catalyst) — each class modifies widget synthesis rules
+- **Synthesis Handshake**: Full combo-widget logic — Cymatic Visuals (Shaman+Fractal+Audio), Trade Trails (Nomad+GPS+Market), Blueprint UI (Architect+Forge+Merchant)
+- **Liquid Tethers**: SVG canvas sub-layer with animated data-stream connections between active synthesis widgets
+- **Haptic Phonics**: Varied vibration frequencies mapped to widget weight (heavy instruments vs light frequencies)
 - I Ching Logic Gates: First operational "engine" type module plugged into the Module Registry
-- Edge Functions for phonic logic (ultra-low-latency)
-- Loading skeletons for star chart data (perceived speed)
 
 ## Future/Backlog (P2)
+- **Oracle Navigation Loop**: I Ching → GPS Map → Artifact discovery → Forge upgrade → Class Stats
+- **Harmony Commerce Loop**: Frequency + Fractal → Escrow Contract → Trade Circle → Social Capital
+- **Gesture Ring**: Multi-touch frequency/geometry manipulation for Hyper-Focus mode
 - 54-Sublayer L² Fractal Engine
 - GPS-Based Cosmic Map
-- Forge Mini-Game
-- Pan + Reverb keyframe lanes in Mixer
-- Deep Haptic API for mobile-first tactile navigation
+- Forge Mini-Game (3D asset generation from hexagram binary)
 - Phygital Marketplace / Server-Side Escrow
+- Skeleton Loading (Ghost Skeleton UI while complex logic populates)
+- Tiered Subscription Matrix: Foundation ($0) → Civilization → Sovereignty
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
