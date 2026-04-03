@@ -151,7 +151,13 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 248 — Universal Kinetic Dock + Sovereign Dashboard (Apr 3, 2026) — LATEST
+### Iteration 249 — Trial Lock + Analytics + Dock Presets (Apr 3, 2026) — LATEST
+- **Trial Modal Fix**: Once-per-profile lock using `sovereign_trial_complete` localStorage flag. Modal shows exactly once, then permanently dismissed. Backward-compatible with old dismiss key.
+- **Trial Analytics**: Events tracked (view/dismiss/upgrade_click) via `/api/treasury/trial-event`. Sovereign Dashboard shows conversion metrics (views vs upgrades vs dismissals). "Reset Trial for All" button clears analytics and lets all users see the modal once more.
+- **Dock Preset Persistence**: SmartDock saves `dock_orientation` and `dock_snapped` to localStorage after every drag. Restores on mount — switching between sessions preserves the user's kinetic layout.
+- Tests: Backend 12/12 (100%), Frontend 100%
+
+### Iteration 248 — Universal Kinetic Dock + Sovereign Dashboard (Apr 3, 2026)
 - **Kinetic Dock Architecture**: SmartDock upgraded to physics-based positioning system
   - Magnetic edge snapping: 20px proximity zone triggers weighted haptic snap to any screen edge
   - Vertical/Horizontal pivot: auto-rotates 90° when snapped to left/right margins, icons reflow
