@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, Download, Heart, X, Globe, Lock, ShoppingBag, ChevronDown, Loader2, Star } from 'lucide-react';
+import { Save, Download, Heart, X, Globe, Lock, ShoppingBag, ChevronDown, Loader2, Star, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTreasury } from '../context/TreasuryContext';
 import { getModuleById, checkSynergy } from '../config/moduleRegistry';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -12,6 +13,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
    ══════════════════════════════════════════════ */
 export default function ConstellationPanel({ activeModuleIds, onLoadConstellation, isOpen, onClose }) {
   const { token, authHeaders } = useAuth();
+  const { balance, purchaseConstellation } = useTreasury();
   const [tab, setTab] = useState('save'); // 'save' | 'my' | 'community' | 'marketplace'
   const [myRecipes, setMyRecipes] = useState([]);
   const [communityRecipes, setCommunityRecipes] = useState([]);
@@ -150,6 +152,14 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
     } catch {}
   };
 
+  const handlePurchase = async (recipe) => {
+    const result = await purchaseConstellation(recipe.id);
+    if (result && !result.error && result.module_ids) {
+      onLoadConstellation(result.module_ids);
+    }
+    fetchMarketplace();
+  };
+
   if (!isOpen) return null;
 
   const TABS = [
@@ -178,9 +188,16 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
         <span className="text-[10px] uppercase tracking-widest font-medium" style={{ color: 'rgba(192,132,252,0.7)' }}>
           Constellations
         </span>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5">
-          <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
-        </button>
+        <div className="flex items-center gap-2">
+          {token && (
+            <span className="text-[9px] flex items-center gap-1" style={{ color: 'rgba(251,191,36,0.6)' }} data-testid="constellation-balance">
+              <Coins size={9} /> {balance}
+            </span>
+          )}
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5">
+            <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -322,7 +339,9 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
                       onLoad={() => handleLoad(c)}
                       onLike={() => handleLike(c.id)}
                       onDelete={tab === 'my' ? () => handleDelete(c.id) : null}
+                      onPurchase={tab === 'marketplace' ? handlePurchase : null}
                       showCreator={tab !== 'my'}
+                      balance={balance}
                     />
                   ))
                 )}
@@ -335,9 +354,11 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
   );
 }
 
-function RecipeCard({ recipe, onLoad, onLike, onDelete, showCreator }) {
+function RecipeCard({ recipe, onLoad, onLike, onDelete, onPurchase, showCreator, balance }) {
   const moduleCount = recipe.module_ids?.length || 0;
   const mods = (recipe.module_ids || []).map(id => getModuleById(id)).filter(Boolean);
+  const isForSale = recipe.is_for_sale && recipe.price > 0;
+  const canAfford = balance >= (recipe.price || 0);
 
   return (
     <div
@@ -380,19 +401,37 @@ function RecipeCard({ recipe, onLoad, onLike, onDelete, showCreator }) {
 
       {/* Actions */}
       <div className="flex items-center gap-1.5">
-        <button
-          onClick={onLoad}
-          className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] transition-all"
-          style={{
-            background: 'rgba(192,132,252,0.08)',
-            border: '1px solid rgba(192,132,252,0.15)',
-            color: '#C084FC',
-            cursor: 'pointer',
-          }}
-          data-testid={`constellation-load-${recipe.id}`}
-        >
-          <Download size={9} /> Load
-        </button>
+        {isForSale && onPurchase ? (
+          <button
+            onClick={() => onPurchase(recipe)}
+            disabled={!canAfford}
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] transition-all"
+            style={{
+              background: canAfford ? 'rgba(251,191,36,0.1)' : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${canAfford ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)'}`,
+              color: canAfford ? '#FBBF24' : 'rgba(248,250,252,0.2)',
+              cursor: canAfford ? 'pointer' : 'not-allowed',
+              opacity: canAfford ? 1 : 0.5,
+            }}
+            data-testid={`constellation-buy-${recipe.id}`}
+          >
+            <Coins size={9} /> {recipe.price} cr
+          </button>
+        ) : (
+          <button
+            onClick={onLoad}
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] transition-all"
+            style={{
+              background: 'rgba(192,132,252,0.08)',
+              border: '1px solid rgba(192,132,252,0.15)',
+              color: '#C084FC',
+              cursor: 'pointer',
+            }}
+            data-testid={`constellation-load-${recipe.id}`}
+          >
+            <Download size={9} /> Load
+          </button>
+        )}
         <button
           onClick={onLike}
           className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] transition-all"

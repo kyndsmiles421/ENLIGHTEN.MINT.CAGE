@@ -1,17 +1,26 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Zap, X, BookOpen, Eye, EyeOff } from 'lucide-react';
+import { Lock, Zap, X, BookOpen, Eye, EyeOff, Flame, Compass, PenTool, Coins } from 'lucide-react';
 import { MODULE_GROUPS, getActiveModules, moduleRegistry, checkSynergy, getSynthesisName } from '../config/moduleRegistry';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
+import { useClass, CLASS_COLORS } from '../context/ClassContext';
 import ConstellationPanel from './ConstellationPanel';
 
-/* ── Haptic helper ── */
+/* ── Haptic helper with weight support ── */
 let Haptics;
 try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
 function haptic(style = 'Light') {
-  try { Haptics?.impact({ style }); } catch { navigator.vibrate?.(style === 'Heavy' ? 25 : style === 'Medium' ? 15 : 8); }
+  try { Haptics?.impact({ style }); } catch {
+    const ms = style === 'Heavy' ? 25 : style === 'Medium' ? 15 : 8;
+    navigator.vibrate?.(ms);
+  }
 }
+function hapticForWeight(weight = 'light') {
+  haptic(weight === 'heavy' ? 'Heavy' : weight === 'medium' ? 'Medium' : 'Light');
+}
+
+const CLASS_ICONS = { shaman: Flame, nomad: Compass, architect: PenTool, merchant: Coins };
 
 /* ── Constants ── */
 const MAGNETIC_RADIUS = 75;
@@ -56,7 +65,7 @@ function isModuleActive(mod, activeFreqs, activeSounds, activeDrones) {
 /* ══════════════════════════════════════════════
    DRAGGABLE BUBBLE
    ══════════════════════════════════════════════ */
-function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isLocked, delay: enterDelay = 0 }) {
+function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isLocked, delay: enterDelay = 0, classBoosted, onDragPos }) {
   const [pos, setPos] = useState(homePos);
   const [dragging, setDragging] = useState(false);
   const [inMagneticZone, setInMagneticZone] = useState(false);
@@ -96,8 +105,8 @@ function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isL
       x: (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left,
       y: (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top,
     };
-    haptic('Light');
-  }, [isLocked]);
+    hapticForWeight(mod.weight || 'light');
+  }, [isLocked, mod.weight]);
 
   useEffect(() => {
     if (!dragging) return;
@@ -116,6 +125,9 @@ function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isL
         x: cx - cr.left - dragOffset.current.x,
         y: cy - cr.top - dragOffset.current.y,
       };
+
+      // Report drag position for synergy discovery
+      if (onDragPos) onDragPos(mod.id, getBubbleCenter(newPos));
 
       const dist = getDistToPlayer(newPos);
 
@@ -156,6 +168,7 @@ function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isL
 
     const onUp = () => {
       setDragging(false);
+      if (onDragPos) onDragPos(mod.id, null); // Clear drag position
       const elapsed = Date.now() - pointerDownTime.current;
       const wasTap = !dragMoved.current || elapsed < 200;
 
@@ -197,7 +210,7 @@ function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isL
     };
   }, [dragging, pos, getDistToPlayer, playerCenter, size, mod, onActivate, homePos]);
 
-  const glowIntensity = inMagneticZone ? (snapped ? 0.5 : 0.25) : (isActive ? 0.2 : 0);
+  const glowIntensity = inMagneticZone ? (snapped ? 0.5 : 0.25) : (isActive ? 0.2 : (classBoosted ? 0.1 : 0));
 
   return (
     <motion.div
@@ -374,8 +387,11 @@ export default function OrbitalMixer() {
   const [dimensions, setDimensions] = useState({ w: 0, h: 0 });
   const [magneticActive, setMagneticActive] = useState(false);
   const [constellationOpen, setConstellationOpen] = useState(false);
+  const [classPickerOpen, setClassPickerOpen] = useState(false);
+  const [dragPositions, setDragPositions] = useState({}); // { modId: {x,y} } for synergy discovery
   const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
   const { focusMode, toggleFocus } = useFocus();
+  const { activeClass, classData, selectClass, addXP, isBoosted } = useClass();
 
   // Measure container
   useEffect(() => {
@@ -495,6 +511,53 @@ export default function OrbitalMixer() {
     haptic('Heavy');
   }, [activeModuleObjects, handleActivate]);
 
+  // Track drag positions for synergy discovery
+  const handleDragPos = useCallback((modId, center) => {
+    setDragPositions(prev => {
+      if (!center) {
+        const next = { ...prev };
+        delete next[modId];
+        return next;
+      }
+      return { ...prev, [modId]: center };
+    });
+  }, []);
+
+  // Check if a module is class-boosted (any affinity matches active class)
+  const isClassBoosted = useCallback((mod) => {
+    if (!classData?.boosted_affinities || !mod.affinities) return false;
+    return mod.affinities.some(a => classData.boosted_affinities.includes(a));
+  }, [classData]);
+
+  // Award XP when activating modules with class synergy
+  const handleActivateWithXP = useCallback((mod) => {
+    handleActivate(mod);
+    if (isClassBoosted(mod) && activeClass) {
+      addXP(5); // 5 XP for boosted activation
+    }
+  }, [handleActivate, isClassBoosted, activeClass, addXP]);
+
+  // Compute nearby synergy pairs during drag (synergy discovery glow)
+  const discoveryPairs = useMemo(() => {
+    const pairs = [];
+    const draggingIds = Object.keys(dragPositions);
+    if (draggingIds.length === 0) return pairs;
+    const allMods = [...allModules, ...lockedModules];
+    for (const dragId of draggingIds) {
+      const dragCenter = dragPositions[dragId];
+      const dragMod = moduleRegistry[dragId];
+      if (!dragMod || !dragCenter) continue;
+      for (const other of allMods) {
+        if (other.id === dragId) continue;
+        const result = checkSynergy(dragMod, other);
+        if (result.synergy && result.score > 0.2) {
+          pairs.push({ dragId, otherId: other.id, score: result.score, shared: result.shared });
+        }
+      }
+    }
+    return pairs;
+  }, [dragPositions, allModules, lockedModules]);
+
   // Organize modules by ring
   const ringModules = useMemo(() => {
     const rings = { 0: [], 1: [], 2: [], 3: [], 4: [] };
@@ -571,16 +634,21 @@ export default function OrbitalMixer() {
           const active = isModuleActive(mod, activeFreqs, activeSounds, activeDrones);
           globalIdx++;
 
+          const boosted = isClassBoosted(mod);
+          const discoveryGlow = discoveryPairs.some(p => p.otherId === mod.id);
+
           return (
             <DraggableBubble
               key={mod.id}
               mod={mod}
               homePos={homePos}
               playerCenter={playerCenter}
-              onActivate={handleActivate}
+              onActivate={handleActivateWithXP}
               isActive={active}
               isLocked={!!mod.locked}
               delay={globalIdx * 0.04}
+              classBoosted={boosted || discoveryGlow}
+              onDragPos={handleDragPos}
             />
           );
         });
@@ -732,15 +800,115 @@ export default function OrbitalMixer() {
         )}
       </AnimatePresence>
 
-      {/* Legend */}
-      <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 z-20">
-        {MODULE_GROUPS.map(g => (
-          <div key={g.id} className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full" style={{ background: g.color, opacity: 0.5 }} />
-            <span className="text-[7px]" style={{ color: `${g.color}60` }}>{g.label}</span>
-          </div>
-        ))}
+      {/* Legend + Class Indicator */}
+      <div className="absolute bottom-3 left-3 flex flex-col gap-1.5 z-20">
+        {/* Active Class Badge */}
+        {activeClass && classData && (() => {
+          const ClassIcon = CLASS_ICONS[activeClass] || Flame;
+          return (
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={() => setClassPickerOpen(!classPickerOpen)}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+              style={{
+                background: `${classData.color}10`,
+                border: `1px solid ${classData.color}25`,
+                color: classData.color,
+                fontSize: '9px',
+                cursor: 'pointer',
+              }}
+              data-testid="class-badge"
+            >
+              <ClassIcon size={10} />
+              <span>{classData.name}</span>
+            </motion.button>
+          );
+        })()}
+
+        {/* No class: show selector prompt */}
+        {!activeClass && (
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={() => setClassPickerOpen(!classPickerOpen)}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(248,250,252,0.35)',
+              fontSize: '9px',
+              cursor: 'pointer',
+            }}
+            data-testid="class-select-prompt"
+          >
+            <Flame size={10} /> Choose Class
+          </motion.button>
+        )}
+
+        {/* Module group legend */}
+        <div className="flex flex-wrap gap-2">
+          {MODULE_GROUPS.map(g => (
+            <div key={g.id} className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full" style={{ background: g.color, opacity: 0.5 }} />
+              <span className="text-[7px]" style={{ color: `${g.color}60` }}>{g.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Class Picker Panel */}
+      <AnimatePresence>
+        {classPickerOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-14 left-3 z-30 rounded-xl p-2.5 space-y-1.5"
+            style={{
+              background: 'rgba(11,12,21,0.97)',
+              border: '1px solid rgba(192,132,252,0.1)',
+              backdropFilter: 'blur(20px)',
+              width: isMobile ? 200 : 220,
+            }}
+            data-testid="class-picker"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(192,132,252,0.5)' }}>Archetype</span>
+              <button onClick={() => setClassPickerOpen(false)} className="p-0.5 rounded hover:bg-white/5">
+                <X size={9} style={{ color: 'rgba(248,250,252,0.3)' }} />
+              </button>
+            </div>
+            {['shaman', 'nomad', 'architect', 'merchant'].map(cid => {
+              const Icon = CLASS_ICONS[cid] || Flame;
+              const color = CLASS_COLORS[cid] || '#C084FC';
+              const names = { shaman: 'Shaman', nomad: 'Nomad', architect: 'Architect', merchant: 'Merchant' };
+              const titles = { shaman: 'Resonator', nomad: 'Navigator', architect: 'Builder', merchant: 'Catalyst' };
+              const isSelected = activeClass === cid;
+              return (
+                <button
+                  key={cid}
+                  onClick={() => { selectClass(cid); setClassPickerOpen(false); haptic('Medium'); }}
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all"
+                  style={{
+                    background: isSelected ? `${color}12` : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${isSelected ? `${color}25` : 'rgba(255,255,255,0.04)'}`,
+                    cursor: 'pointer',
+                  }}
+                  data-testid={`class-option-${cid}`}
+                >
+                  <Icon size={14} style={{ color }} />
+                  <div className="text-left">
+                    <div className="text-[10px] font-medium" style={{ color: isSelected ? color : '#F8FAFC' }}>{names[cid]}</div>
+                    <div className="text-[8px]" style={{ color: `${color}60` }}>{titles[cid]}</div>
+                  </div>
+                  {isSelected && (
+                    <div className="ml-auto w-2 h-2 rounded-full" style={{ background: color }} />
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Instruction overlay — show only when no modules active */}
       {activeModuleObjects.length === 0 && (

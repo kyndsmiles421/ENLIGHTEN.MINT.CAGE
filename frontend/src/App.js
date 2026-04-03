@@ -21,6 +21,8 @@ import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { MixerProvider } from './context/MixerContext';
 import { FocusProvider } from './context/FocusContext';
+import { ClassProvider } from './context/ClassContext';
+import { TreasuryProvider } from './context/TreasuryContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import { ResolutionProvider } from './context/ResolutionContext';
 import CosmicToolbar from './components/CosmicToolbar';
@@ -358,6 +360,8 @@ function App() {
       <TempoProvider>
       <MixerProvider>
       <FocusProvider>
+      <ClassProvider>
+      <TreasuryProvider>
       <ResolutionProvider>
       <SensoryProvider>
       <CosmicStateProvider>
@@ -404,6 +408,8 @@ function App() {
       </CosmicStateProvider>
       </SensoryProvider>
       </ResolutionProvider>
+      </TreasuryProvider>
+      </ClassProvider>
       </FocusProvider>
       </MixerProvider>
       </TempoProvider>
