@@ -70,8 +70,39 @@ Behavior:
 ├── routes/            # 120+ auto-discovered route modules
 ```
 
+## Sovereign Architecture (Apr 3, 2026)
+The app uses a unified 4-tier subscription model:
+
+| Tier | Codename | Price | AI Brain | Visuals | Audio |
+|------|----------|-------|----------|---------|-------|
+| Standard | The Seed | Free | Single-Node Logic | 1080p | 44.1kHz Stereo |
+| Apprentice | The Bloom | $9.99/mo | Multi-Node + Glass Box | 1440p | 48kHz Spatial |
+| Artisan | The Architect | $24.99/mo | Collaborative Agents (α/β/γ) | 2K | 96kHz Lossless |
+| Sovereign | The Super User | $49.99/mo | Autonomous Master | 4K | 192kHz 8D Binaural |
+
+### Cross-Tier Purchasing
+Lower tiers can buy individual features from higher tiers:
+- 12 purchasable units (Thinking Feed, Spatial Audio, Agent Sessions, Asset Export, etc.)
+- Purchased with credits or USD
+- Duration-based (30 days), usage-based (3 sessions), or permanent
+
+### Glass Box Thinking Feed (Apprentice+)
+- Agent Alpha (Geometer): Sacred Geometry mapping
+- Agent Beta (Harmonizer): Solfeggio Frequency alignment
+- Agent Gamma (Logistics): GPS, permits, inventory (Artisan+ only)
+- Uses Gemini AI for Master Orchestrator responses
+
 ## Iteration History
-### Iteration 231 — Templates, Camera, Mic, AI Gen (Apr 3, 2026) — LATEST
+### Iteration 232 — Sovereign Architecture (Apr 3, 2026) — LATEST
+- 4-Tier subscription model (Standard/Apprentice/Artisan/Sovereign)
+- 12 cross-tier purchasable units with credit/USD pricing
+- Glass Box Thinking Feed with Agent coordination (Alpha/Beta/Gamma)
+- Effective capabilities merging (tier + purchased units)
+- Frontend /sovereign page with 4 tabs (Overview, Tiers, Shop, Glass Box)
+- Dashboard Sovereign navigation
+- Tests: Backend 100% (26/26), Frontend 100%
+
+### Iteration 231 — Templates, Camera, Mic, AI Gen (Apr 3, 2026)
 - 12 Mix Templates: Morning Ritual, Quick Calm, Basic Meditation, Yoga Flow, Study Session, Evening Unwind, Lucid Dream, Chakra Journey, Creative Flow, Cosmic Immersion, Kundalini, Astral Projection
 - Tiered Video Recording: 480p SD → 720p HD → 1080p Full HD → 4K Ultra HD
 - Tiered Audio Recording: 44.1kHz Mono → 48kHz Stereo → 96kHz Studio → 192kHz Mastering
