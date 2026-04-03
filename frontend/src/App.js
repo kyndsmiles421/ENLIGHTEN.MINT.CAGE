@@ -39,6 +39,7 @@ import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import TrialGraduation from './components/TrialGraduation';
 import { useGateNotifications } from './hooks/useGateNotifications';
 import OrbitalNavigation from './components/OrbitalNavigation';
+import LearningToggle from './components/LearningToggle';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -398,6 +399,7 @@ function App() {
             <MantraOverlay />
             <LatencyHUD />
             <SmartDock />
+            <LearningToggle />
             <CosmicMixer />
             <CosmicToolbar />
             <CosmicAssistant />

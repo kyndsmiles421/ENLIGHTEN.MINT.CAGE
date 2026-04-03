@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Crown, Zap, Star, Check, ChevronRight, Package, BookOpen,
   Users, Shield, ArrowRight, Award, Sparkles, X, Loader2,
-  Coffee, Code, Leaf, Briefcase, Eye, Compass,
+  Coffee, Code, Leaf, Briefcase, Eye, Compass, Wand2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -186,6 +186,12 @@ export default function EconomyPage() {
   const [loading, setLoading] = useState('');
   const [polling, setPolling] = useState(false);
   const [paymentResult, setPaymentResult] = useState(null);
+  const [genField, setGenField] = useState('');
+  const [genExpertise, setGenExpertise] = useState('');
+  const [genType, setGenType] = useState('mini');
+  const [genResult, setGenResult] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [drafts, setDrafts] = useState([]);
 
   const fetchTiers = useCallback(async () => {
     if (!token) return;
@@ -311,6 +317,34 @@ export default function EconomyPage() {
     setLoading('polymath');
   };
 
+  const fetchDrafts = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/api/copilot/drafts`, { headers: authHeaders });
+      const data = await res.json();
+      setDrafts(data.drafts || []);
+    } catch {}
+  }, [token, authHeaders]);
+
+  useEffect(() => { if (activeTab === 'generator') fetchDrafts(); }, [activeTab, fetchDrafts]);
+
+  const handleGeneratePack = async () => {
+    if (!genField.trim() || !genExpertise.trim()) return;
+    setGenerating(true);
+    try {
+      const res = await fetch(`${API}/api/copilot/generate-pack`, {
+        method: 'POST', headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: genField, expertise: genExpertise, pack_type: genType }),
+      });
+      const data = await res.json();
+      if (data.outline) {
+        setGenResult(data);
+        fetchDrafts();
+      }
+    } catch {}
+    setGenerating(false);
+  };
+
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B0C15' }}>
@@ -323,6 +357,7 @@ export default function EconomyPage() {
     { id: 'subscriptions', label: 'Subscriptions', icon: Crown },
     { id: 'packs', label: 'Learning Packs', icon: Package },
     { id: 'commissions', label: 'Brokerage', icon: Users },
+    { id: 'generator', label: 'Pack Studio', icon: Wand2 },
   ];
 
   return (
@@ -594,6 +629,198 @@ export default function EconomyPage() {
                   data-testid="upgrade-for-commission">
                   View Plans
                 </button>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ═══ Synthesis Forge Tab ═══ */}
+        {activeTab === 'generator' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Step 1: Command Console */}
+            <div className="rounded-xl p-4 mb-3" style={{
+              background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)',
+            }} data-testid="pack-generator">
+              <div className="flex items-center gap-2 mb-1">
+                <Wand2 size={14} style={{ color: '#C084FC' }} />
+                <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Synthesis Forge</span>
+              </div>
+              <p className="text-[8px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                Enter your niche. The AI sweeps global standards, builds the curriculum, assessment engine, and brokerage tags.
+              </p>
+
+              <div className="space-y-2 mb-3">
+                <input type="text" value={genField} onChange={e => setGenField(e.target.value)}
+                  placeholder="Niche field (e.g., Advanced Phonics for Vocal Resonance, E-Bike Thermal Management)"
+                  className="w-full text-[10px] px-3 py-2.5 rounded-lg outline-none"
+                  style={{ background: 'rgba(255,255,255,0.03)', color: '#F8FAFC', border: '1px solid rgba(255,255,255,0.05)' }}
+                  data-testid="gen-field-input" />
+                <textarea value={genExpertise} onChange={e => setGenExpertise(e.target.value)}
+                  placeholder="Your expertise & what the pack should teach (the AI uses this as the knowledge seed)..."
+                  rows={3} className="w-full text-[10px] px-3 py-2 rounded-lg outline-none resize-none"
+                  style={{ background: 'rgba(255,255,255,0.03)', color: '#F8FAFC', border: '1px solid rgba(255,255,255,0.05)' }}
+                  data-testid="gen-expertise-input" />
+                <div className="flex gap-1.5">
+                  {['mini', 'mastery', 'business'].map(t => {
+                    const labels = { mini: 'Mini ($87–177)', mastery: 'Deep-Dive ($447–897)', business: 'Biz-in-a-Box ($1,347+)' };
+                    const colors = { mini: '#818CF8', mastery: '#22C55E', business: '#FBBF24' };
+                    return (
+                      <button key={t} onClick={() => setGenType(t)}
+                        className="flex-1 text-[8px] py-1.5 rounded-lg font-medium transition-all"
+                        style={{
+                          background: genType === t ? `${colors[t]}0A` : 'rgba(255,255,255,0.015)',
+                          color: genType === t ? colors[t] : 'rgba(248,250,252,0.3)',
+                          border: `1px solid ${genType === t ? `${colors[t]}18` : 'rgba(255,255,255,0.03)'}`,
+                          cursor: 'pointer',
+                        }} data-testid={`gen-type-${t}`}>{labels[t]}</button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button onClick={handleGeneratePack} disabled={generating || !genField.trim() || !genExpertise.trim()}
+                className="w-full py-2.5 rounded-lg text-[10px] font-medium flex items-center justify-center gap-1.5"
+                style={{
+                  background: 'rgba(192,132,252,0.1)', color: '#C084FC',
+                  border: '1px solid rgba(192,132,252,0.18)',
+                  cursor: generating ? 'wait' : 'pointer',
+                  opacity: (generating || !genField.trim() || !genExpertise.trim()) ? 0.5 : 1,
+                }} data-testid="gen-submit-btn">
+                {generating ? <><Loader2 size={12} className="animate-spin" /> Synthesizing Curriculum...</> : <><Wand2 size={12} /> Generate Pack</>}
+              </button>
+            </div>
+
+            {/* Step 2-4: Result with Financials + Publish */}
+            <AnimatePresence>
+              {genResult && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  {/* Curriculum Output */}
+                  <div className="rounded-xl p-4 mb-3" style={{
+                    background: 'rgba(192,132,252,0.03)', border: '1px solid rgba(192,132,252,0.1)',
+                  }} data-testid="gen-result">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles size={12} style={{ color: '#C084FC' }} />
+                        <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>Generated Curriculum</span>
+                      </div>
+                      <button onClick={() => setGenResult(null)} className="p-1" style={{ cursor: 'pointer' }}>
+                        <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                      </button>
+                    </div>
+                    <div className="text-[9px] leading-relaxed whitespace-pre-wrap rounded-lg p-3" style={{
+                      color: 'rgba(248,250,252,0.5)', background: 'rgba(0,0,0,0.2)', maxHeight: 300, overflowY: 'auto',
+                    }}>
+                      {genResult.outline}
+                    </div>
+                  </div>
+
+                  {/* Financials Dashboard */}
+                  {genResult.financials && (
+                    <div className="rounded-xl p-4 mb-3" style={{
+                      background: 'rgba(251,191,36,0.03)', border: '1px solid rgba(251,191,36,0.08)',
+                    }} data-testid="gen-financials">
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <Award size={12} style={{ color: '#FBBF24' }} />
+                        <span className="text-[10px] font-semibold" style={{ color: '#FBBF24' }}>Financial Projections</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {[
+                          { label: 'Retail Price', value: `$${genResult.financials.suggested_retail}`, color: '#F8FAFC' },
+                          { label: 'Your Revenue/Sale', value: `$${genResult.financials.creator_revenue_per_sale}`, color: '#22C55E' },
+                          { label: 'Monthly Projection', value: `$${genResult.financials.projected_monthly_revenue}`, color: '#FBBF24' },
+                        ].map(s => (
+                          <div key={s.label} className="rounded-lg p-2 text-center" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                            <div className="text-sm font-bold" style={{ color: s.color }}>{s.value}</div>
+                            <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{s.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="space-y-1 text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        <div className="flex justify-between"><span>Resonance subscriber price</span><span style={{ color: '#818CF8' }}>${genResult.financials.resonance_discount}</span></div>
+                        <div className="flex justify-between"><span>Sovereign subscriber price</span><span style={{ color: '#FBBF24' }}>${genResult.financials.sovereign_discount}</span></div>
+                        <div className="flex justify-between"><span>27% Master commission</span><span style={{ color: '#22C55E' }}>${genResult.financials.commission_27_pct}</span></div>
+                        <div className="flex justify-between"><span>Projected monthly sales</span><span>{genResult.financials.projected_monthly_sales} units</span></div>
+                        <div className="flex justify-between"><span>Active ecosystem users</span><span>{genResult.financials.active_users_in_ecosystem}</span></div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Publish Gate */}
+                  <div className="rounded-xl p-4 mb-3" style={{
+                    background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.08)',
+                  }} data-testid="gen-publish">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <ArrowRight size={12} style={{ color: '#22C55E' }} />
+                      <span className="text-[10px] font-semibold" style={{ color: '#22C55E' }}>Publishing Gate</span>
+                    </div>
+                    <p className="text-[8px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      One click deploys this pack to the Trade Circle Marketplace. Commission metadata (27%) is auto-tagged. Buyers can purchase a la carte without a subscription.
+                    </p>
+                    <button onClick={async () => {
+                      try {
+                        const res = await fetch(`${API}/api/copilot/publish-pack/${genResult.draft_id}`, {
+                          method: 'POST', headers: { ...authHeaders, 'Content-Type': 'application/json' },
+                        });
+                        const data = await res.json();
+                        if (data.status === 'published') {
+                          setGenResult(prev => ({ ...prev, published: true, pack_id: data.pack_id }));
+                          fetchDrafts();
+                        }
+                      } catch {}
+                    }}
+                      disabled={genResult.published}
+                      className="w-full py-2 rounded-lg text-[10px] font-medium flex items-center justify-center gap-1.5"
+                      style={{
+                        background: genResult.published ? 'rgba(34,197,94,0.06)' : 'rgba(34,197,94,0.1)',
+                        color: '#22C55E',
+                        border: '1px solid rgba(34,197,94,0.15)',
+                        cursor: genResult.published ? 'default' : 'pointer',
+                      }} data-testid="gen-publish-btn">
+                      {genResult.published ? <><Check size={12} /> Published to Trade Circle</> : <><ArrowRight size={12} /> Deploy to Marketplace</>}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Previous Drafts */}
+            {drafts.length > 0 && (
+              <div>
+                <div className="text-[8px] uppercase tracking-[2px] mb-2" style={{ color: 'rgba(248,250,252,0.18)' }}>
+                  Your Forge History
+                </div>
+                <div className="space-y-1.5">
+                  {drafts.map(d => {
+                    const statusColors = { draft: '#818CF8', published: '#22C55E' };
+                    return (
+                      <div key={d.id} className="rounded-lg px-3 py-2" style={{
+                        background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)',
+                      }} data-testid={`draft-${d.id}`}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>{d.field}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[7px] capitalize px-1.5 py-0.5 rounded" style={{
+                              background: `${statusColors[d.status] || '#818CF8'}08`,
+                              color: statusColors[d.status] || '#818CF8',
+                            }}>{d.status}</span>
+                            <span className="text-[7px] capitalize px-1.5 py-0.5 rounded" style={{
+                              background: 'rgba(192,132,252,0.06)', color: '#C084FC',
+                            }}>{d.pack_type}</span>
+                          </div>
+                        </div>
+                        {d.financials && (
+                          <div className="flex gap-3 mt-1 text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                            <span>Retail: ${d.financials.suggested_retail}</span>
+                            <span>Revenue/sale: ${d.financials.creator_revenue_per_sale}</span>
+                          </div>
+                        )}
+                        <div className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                          {new Date(d.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </motion.div>

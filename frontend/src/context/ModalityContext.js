@@ -9,10 +9,12 @@ const ModalityContext = createContext({
   intensity: 'guided',
   intensityData: null,
   autoAdvance: true,
+  learningToggle: false,
   loading: false,
   switchModality: () => {},
   switchIntensity: () => {},
   setAutoAdvance: () => {},
+  setLearningToggle: () => {},
   autoScaleCheck: null,
   dismissAutoScale: () => {},
 });
@@ -24,6 +26,7 @@ export function ModalityProvider({ children }) {
   const [intensity, setIntensity] = useState('guided');
   const [intensityData, setIntensityData] = useState(null);
   const [autoAdvance, setAutoAdvanceState] = useState(true);
+  const [learningToggle, setLearningToggleState] = useState(false);
   const [autoScaleCheck, setAutoScaleCheck] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +51,7 @@ export function ModalityProvider({ children }) {
         setIntensity(d.intensity || 'guided');
         setIntensityData(d.intensity_data || null);
         setAutoAdvanceState(d.auto_advance !== false);
+        setLearningToggleState(d.learning_toggle || false);
       })
       .catch(() => {});
   }, [token, authHeaders]);
@@ -116,11 +120,23 @@ export function ModalityProvider({ children }) {
     setAutoScaleCheck(null);
   }, []);
 
+  const setLearningToggle = useCallback(async (val) => {
+    if (!token) return;
+    setLearningToggleState(val);
+    try {
+      await fetch(`${API}/api/academy/intensity`, {
+        method: 'PATCH',
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ intensity, learning_toggle: val }),
+      });
+    } catch {}
+  }, [token, authHeaders, intensity]);
+
   return (
     <ModalityContext.Provider value={{
       modality, modalityData, intensity, intensityData, autoAdvance,
-      loading, switchModality, switchIntensity, setAutoAdvance,
-      autoScaleCheck, dismissAutoScale,
+      learningToggle, loading, switchModality, switchIntensity, setAutoAdvance,
+      setLearningToggle, autoScaleCheck, dismissAutoScale,
     }}>
       {children}
     </ModalityContext.Provider>

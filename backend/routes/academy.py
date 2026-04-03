@@ -360,37 +360,47 @@ async def get_modalities(user=Depends(get_current_user)):
 
 @router.get("/intensity")
 async def get_interaction_intensity(user=Depends(get_current_user)):
-    """Get user's current interaction intensity level."""
+    """Get user's current interaction intensity level and learning toggle."""
     pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
     level = pref.get("intensity", "guided") if pref else "guided"
     auto_advance = pref.get("auto_advance", True) if pref else True
+    learning_toggle = pref.get("learning_toggle", False) if pref else False
     return {
         "intensity": level,
         "intensity_data": INTENSITY_LEVELS.get(level, INTENSITY_LEVELS["guided"]),
         "auto_advance": auto_advance,
+        "learning_toggle": learning_toggle,
         "levels": list(INTENSITY_LEVELS.values()),
     }
 
 
 @router.patch("/intensity")
 async def set_interaction_intensity(body: dict, user=Depends(get_current_user)):
-    """Set interaction intensity level (focus/guided/immersive)."""
+    """Set interaction intensity level (focus/guided/immersive) and/or learning toggle."""
     level = body.get("intensity", "")
-    if level not in INTENSITY_LEVELS:
+    if level and level not in INTENSITY_LEVELS:
         raise HTTPException(400, f"Invalid intensity. Valid: {list(INTENSITY_LEVELS.keys())}")
+    update = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    if level:
+        update["intensity"] = level
     auto_advance = body.get("auto_advance")
-    update = {"intensity": level, "updated_at": datetime.now(timezone.utc).isoformat()}
     if auto_advance is not None:
         update["auto_advance"] = bool(auto_advance)
+    learning_toggle = body.get("learning_toggle")
+    if learning_toggle is not None:
+        update["learning_toggle"] = bool(learning_toggle)
     await db.learning_profiles.update_one(
         {"user_id": user["id"]},
         {"$set": {**update, "user_id": user["id"]}},
         upsert=True,
     )
+    pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
+    final_intensity = pref.get("intensity", "guided") if pref else level or "guided"
     return {
-        "intensity": level,
-        "intensity_data": INTENSITY_LEVELS[level],
-        "auto_advance": auto_advance if auto_advance is not None else True,
+        "intensity": final_intensity,
+        "intensity_data": INTENSITY_LEVELS.get(final_intensity, INTENSITY_LEVELS["guided"]),
+        "auto_advance": pref.get("auto_advance", True) if pref else True,
+        "learning_toggle": pref.get("learning_toggle", False) if pref else False,
     }
 
 
