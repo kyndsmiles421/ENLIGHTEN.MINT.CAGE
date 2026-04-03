@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Volume2, VolumeX, Waves, Sun, BookOpen, Vibrate, Music, Radio, ChevronDown,
   Play, Pause, Square, Loader2, X, Sparkles, Sliders, ArrowRightLeft, Save, Download, Trash2, Globe, Heart,
-  Wand2, Crown, Lock
+  Wand2, Crown, Lock, Target
 } from 'lucide-react';
+import OrbitalMixer from '../components/OrbitalMixer';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES, MANTRAS } from '../context/MixerContext';
@@ -465,6 +466,7 @@ export default function CosmicMixerPage() {
   const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   // ─── Collapsible accordion state ───
+  const [mixerMode, setMixerMode] = useState('console'); // 'console' | 'playground'
   const [openSections, setOpenSections] = useState({ freq: true, mood: false, sound: false, drone: false, mantra: false, voice: false, masterFx: false, crossfade: false, light: false, haptic: false, tempo: false, session: false, soundscapes: false, aiblend: false });
   const toggleSection = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
 
@@ -688,8 +690,42 @@ export default function CosmicMixerPage() {
         {/* Live Waveform Visualizer */}
         <WaveformVisualizer analyserRef={analyserRef} isActive={activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || !!activeMantra} />
 
-        {/* Accordion Sections */}
-        <div className="space-y-2">
+        {/* Mode Toggle: Console vs Playground */}
+        <div className="flex items-center gap-1.5 mb-4 mt-3" data-testid="mixer-mode-toggle">
+          {[
+            { id: 'console', label: 'Console', icon: Sliders },
+            { id: 'playground', label: 'Playground', icon: Target },
+          ].map(mode => {
+            const active = mixerMode === mode.id;
+            const Icon = mode.icon;
+            return (
+              <button
+                key={mode.id}
+                onClick={() => setMixerMode(mode.id)}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all"
+                style={{
+                  background: active ? 'rgba(192,132,252,0.08)' : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${active ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.04)'}`,
+                  color: active ? '#C084FC' : 'rgba(248,250,252,0.35)',
+                }}
+                data-testid={`mixer-mode-${mode.id}`}
+              >
+                <Icon size={14} />
+                <span className="text-[11px] font-medium">{mode.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Playground Mode: Orbital Mixer ── */}
+        {mixerMode === 'playground' && (
+          <div className="mb-4">
+            <OrbitalMixer />
+          </div>
+        )}
+
+        {/* Accordion Sections (Console Mode) */}
+        <div className="space-y-2" style={{ display: mixerMode === 'console' ? 'block' : 'none' }}>
           <AccordionSection title={t("mixer.sessionMode", "Session Mode")} icon={Play} color="#EC4899" open={openSections.session} onToggle={() => toggleSection('session')} badge={sessionActive ? sessionData?.label : null}>
             {sessionActive ? (
               <div className="text-center py-3">

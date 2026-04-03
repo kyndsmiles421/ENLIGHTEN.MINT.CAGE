@@ -1,0 +1,625 @@
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Zap, X } from 'lucide-react';
+import { MODULE_GROUPS, getActiveModules, moduleRegistry } from '../config/moduleRegistry';
+import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
+
+/* ── Haptic helper ── */
+let Haptics;
+try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
+function haptic(style = 'Light') {
+  try { Haptics?.impact({ style }); } catch { navigator.vibrate?.(style === 'Heavy' ? 25 : style === 'Medium' ? 15 : 8); }
+}
+
+/* ── Constants ── */
+const MAGNETIC_RADIUS = 75;
+const SNAP_RADIUS = 50;
+const PLAYER_SIZE = 100;
+const BUBBLE_SIZE = 44;
+const BUBBLE_SIZE_MOBILE = 52;
+
+/* ── Orbital position calculator ── */
+function getOrbitalPosition(index, total, radius, centerX, centerY, offsetAngle = -Math.PI / 2) {
+  const angle = offsetAngle + (index / total) * 2 * Math.PI;
+  return {
+    x: centerX + Math.cos(angle) * radius - (window.innerWidth < 768 ? BUBBLE_SIZE_MOBILE : BUBBLE_SIZE) / 2,
+    y: centerY + Math.sin(angle) * radius - (window.innerWidth < 768 ? BUBBLE_SIZE_MOBILE : BUBBLE_SIZE) / 2,
+  };
+}
+
+/* ── Map registry module to MixerContext data ── */
+function resolveModuleToMixerData(mod) {
+  switch (mod.type) {
+    case 'frequency':
+      return { kind: 'freq', data: FREQUENCIES.find(f => f.hz === mod.hz) };
+    case 'sound':
+      return { kind: 'sound', data: SOUNDS.find(s => s.id === mod.soundId) };
+    case 'instrument':
+      return { kind: 'drone', data: INSTRUMENT_DRONES.find(d => d.id === mod.droneId) };
+    default:
+      return { kind: mod.type, data: null };
+  }
+}
+
+/* ── Check if a module is currently active in the mixer ── */
+function isModuleActive(mod, activeFreqs, activeSounds, activeDrones) {
+  switch (mod.type) {
+    case 'frequency': return activeFreqs.has(mod.hz);
+    case 'sound': return activeSounds.has(mod.soundId);
+    case 'instrument': return activeDrones.has(mod.droneId);
+    default: return false;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   DRAGGABLE BUBBLE
+   ══════════════════════════════════════════════ */
+function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isLocked, delay: enterDelay = 0 }) {
+  const [pos, setPos] = useState(homePos);
+  const [dragging, setDragging] = useState(false);
+  const [inMagneticZone, setInMagneticZone] = useState(false);
+  const [snapped, setSnapped] = useState(false);
+  const hapticFired = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const dragMoved = useRef(false);
+  const pointerDownTime = useRef(0);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const size = isMobile ? BUBBLE_SIZE_MOBILE : BUBBLE_SIZE;
+
+  // Reset home position when layout changes
+  useEffect(() => {
+    if (!dragging && !isActive) setPos(homePos);
+  }, [homePos, dragging, isActive]);
+
+  const getBubbleCenter = useCallback((p) => ({
+    x: p.x + size / 2,
+    y: p.y + size / 2,
+  }), [size]);
+
+  const getDistToPlayer = useCallback((p) => {
+    const bc = getBubbleCenter(p);
+    return Math.hypot(bc.x - playerCenter.x, bc.y - playerCenter.y);
+  }, [getBubbleCenter, playerCenter]);
+
+  const onPointerDown = useCallback((e) => {
+    if (isLocked) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setDragging(true);
+    hapticFired.current = false;
+    dragMoved.current = false;
+    pointerDownTime.current = Date.now();
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragOffset.current = {
+      x: (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left,
+      y: (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top,
+    };
+    haptic('Light');
+  }, [isLocked]);
+
+  useEffect(() => {
+    if (!dragging) return;
+
+    const onMove = (e) => {
+      const cx = e.clientX ?? e.touches?.[0]?.clientX;
+      const cy = e.clientY ?? e.touches?.[0]?.clientY;
+      if (cx == null) return;
+
+      dragMoved.current = true;
+      const container = document.querySelector('[data-orbital-container]');
+      if (!container) return;
+      const cr = container.getBoundingClientRect();
+
+      const newPos = {
+        x: cx - cr.left - dragOffset.current.x,
+        y: cy - cr.top - dragOffset.current.y,
+      };
+
+      const dist = getDistToPlayer(newPos);
+
+      // Magnetic zone — pull towards center
+      if (dist < MAGNETIC_RADIUS) {
+        setInMagneticZone(true);
+        if (!hapticFired.current) {
+          haptic('Medium');
+          hapticFired.current = true;
+        }
+
+        // Snap to center if very close
+        if (dist < SNAP_RADIUS) {
+          setSnapped(true);
+          setPos({
+            x: playerCenter.x - size / 2,
+            y: playerCenter.y - size / 2,
+          });
+          return;
+        }
+
+        // Magnetic pull — lerp towards center
+        const pull = 0.35;
+        const targetX = playerCenter.x - size / 2;
+        const targetY = playerCenter.y - size / 2;
+        setPos({
+          x: newPos.x + (targetX - newPos.x) * pull,
+          y: newPos.y + (targetY - newPos.y) * pull,
+        });
+        setSnapped(false);
+      } else {
+        setInMagneticZone(false);
+        setSnapped(false);
+        hapticFired.current = false;
+        setPos(newPos);
+      }
+    };
+
+    const onUp = () => {
+      setDragging(false);
+      const elapsed = Date.now() - pointerDownTime.current;
+      const wasTap = !dragMoved.current || elapsed < 200;
+
+      if (wasTap) {
+        // Tap-to-toggle: accessibility shortcut
+        haptic('Medium');
+        onActivate(mod);
+        setInMagneticZone(false);
+        setSnapped(false);
+        setPos(homePos);
+        return;
+      }
+
+      const dist = getDistToPlayer(pos);
+
+      if (dist < MAGNETIC_RADIUS) {
+        // Successful drop — activate module
+        haptic('Heavy');
+        onActivate(mod);
+        setSnapped(false);
+        setInMagneticZone(false);
+        // Spring back to home after activation
+        setTimeout(() => setPos(homePos), 300);
+      } else {
+        // Return home
+        setInMagneticZone(false);
+        setSnapped(false);
+        setPos(homePos);
+      }
+    };
+
+    window.addEventListener('pointermove', onMove, { passive: false });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [dragging, pos, getDistToPlayer, playerCenter, size, mod, onActivate, homePos]);
+
+  const glowIntensity = inMagneticZone ? (snapped ? 0.5 : 0.25) : (isActive ? 0.2 : 0);
+
+  return (
+    <motion.div
+      className="absolute flex items-center justify-center rounded-full select-none"
+      data-testid={`orbital-bubble-${mod.id}`}
+      onPointerDown={onPointerDown}
+      initial={{ opacity: 0, scale: 0.3, left: playerCenter.x - size / 2, top: playerCenter.y - size / 2 }}
+      animate={{
+        opacity: 1,
+        left: pos.x,
+        top: pos.y,
+        scale: dragging ? 1.15 : (isActive ? 1.08 : (inMagneticZone ? 1.1 : 1)),
+      }}
+      transition={dragging
+        ? { type: 'tween', duration: 0 }
+        : { type: 'spring', stiffness: 300, damping: 25, delay: enterDelay }
+      }
+      style={{
+        width: size,
+        height: size,
+        cursor: isLocked ? 'not-allowed' : (dragging ? 'grabbing' : 'grab'),
+        touchAction: 'none',
+        zIndex: dragging ? 100 : (isActive ? 50 : 10),
+        background: isActive
+          ? `radial-gradient(circle, ${mod.color}30, ${mod.color}10)`
+          : `radial-gradient(circle, ${mod.color}18, rgba(10,10,18,0.7))`,
+        border: `1.5px solid ${isActive ? `${mod.color}60` : (inMagneticZone ? `${mod.color}50` : `${mod.color}25`)}`,
+        boxShadow: glowIntensity > 0
+          ? `0 0 ${12 + glowIntensity * 30}px ${mod.color}${Math.round(glowIntensity * 255).toString(16).padStart(2, '0')}, inset 0 0 8px ${mod.color}${Math.round(glowIntensity * 80).toString(16).padStart(2, '0')}`
+          : `0 2px 8px rgba(0,0,0,0.3)`,
+        opacity: isLocked ? 0.35 : 1,
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
+    >
+      {/* Inner content */}
+      <div className="flex flex-col items-center gap-0.5 pointer-events-none">
+        {isLocked ? (
+          <Lock size={12} style={{ color: mod.color }} />
+        ) : (
+          <span className="text-[10px] font-semibold" style={{ color: mod.color }}>
+            {mod.type === 'frequency' ? `${mod.hz}` : mod.name?.charAt(0)?.toUpperCase()}
+          </span>
+        )}
+        <span className="text-[7px] font-medium leading-tight text-center max-w-[36px] truncate"
+          style={{ color: isActive ? mod.color : `${mod.color}90` }}>
+          {mod.name}
+        </span>
+      </div>
+
+      {/* Active pulse ring */}
+      {isActive && !dragging && (
+        <motion.div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ border: `1px solid ${mod.color}40` }}
+        />
+      )}
+    </motion.div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   PLAYER HUB — Central drop target
+   ══════════════════════════════════════════════ */
+function PlayerHub({ center, activeModules, magneticActive, onDeactivate }) {
+  const activeMods = activeModules.filter(Boolean);
+  const hasActive = activeMods.length > 0;
+  const primaryColor = activeMods.length > 0 ? activeMods[0].color : '#C084FC';
+
+  return (
+    <div
+      id="player-target"
+      data-testid="orbital-player-hub"
+      className="absolute flex flex-col items-center justify-center rounded-full"
+      style={{
+        width: PLAYER_SIZE,
+        height: PLAYER_SIZE,
+        left: center.x - PLAYER_SIZE / 2,
+        top: center.y - PLAYER_SIZE / 2,
+        background: hasActive
+          ? `radial-gradient(circle, ${primaryColor}12, rgba(6,6,14,0.9))`
+          : magneticActive
+            ? 'radial-gradient(circle, rgba(192,132,252,0.08), rgba(6,6,14,0.95))'
+            : 'radial-gradient(circle, rgba(255,255,255,0.02), rgba(6,6,14,0.95))',
+        border: `1.5px solid ${hasActive ? `${primaryColor}35` : (magneticActive ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)')}`,
+        boxShadow: hasActive
+          ? `0 0 40px ${primaryColor}15, inset 0 0 20px ${primaryColor}08`
+          : magneticActive
+            ? '0 0 30px rgba(192,132,252,0.08), inset 0 0 15px rgba(192,132,252,0.04)'
+            : '0 0 20px rgba(0,0,0,0.3)',
+        transition: 'background 0.4s, border 0.4s, box-shadow 0.6s',
+        zIndex: 5,
+      }}
+    >
+      {/* Breathing animation */}
+      <motion.div
+        className="absolute inset-0 rounded-full pointer-events-none"
+        animate={{
+          scale: magneticActive ? [1, 1.08, 1] : [1, 1.03, 1],
+          opacity: magneticActive ? [0.4, 0.15, 0.4] : [0.2, 0.08, 0.2],
+        }}
+        transition={{ duration: magneticActive ? 1.2 : 3, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          border: `1px solid ${hasActive ? `${primaryColor}25` : 'rgba(192,132,252,0.1)'}`,
+        }}
+      />
+
+      {hasActive ? (
+        <div className="flex flex-col items-center gap-1 relative z-10">
+          {/* Active module dots */}
+          <div className="flex gap-1">
+            {activeMods.slice(0, 5).map(m => (
+              <motion.div key={m.id}
+                className="rounded-full cursor-pointer"
+                style={{
+                  width: 8, height: 8,
+                  background: m.color,
+                  boxShadow: `0 0 6px ${m.color}60`,
+                }}
+                whileTap={{ scale: 0.7 }}
+                onClick={() => onDeactivate(m)}
+                title={`Remove ${m.name}`}
+              />
+            ))}
+          </div>
+          <span className="text-[8px] font-mono" style={{ color: `${primaryColor}80` }}>
+            {activeMods.length} active
+          </span>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-1 relative z-10">
+          <Zap size={16} style={{ color: magneticActive ? 'rgba(192,132,252,0.5)' : 'rgba(255,255,255,0.12)' }} />
+          <span className="text-[8px]" style={{ color: magneticActive ? 'rgba(192,132,252,0.5)' : 'rgba(255,255,255,0.12)' }}>
+            Drop here
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   GROUP LABEL — Ring identifier
+   ══════════════════════════════════════════════ */
+function RingLabel({ group, center, radius }) {
+  const labelAngle = -Math.PI / 2 - 0.3;
+  const lx = center.x + Math.cos(labelAngle) * (radius + 22);
+  const ly = center.y + Math.sin(labelAngle) * (radius + 22);
+
+  return (
+    <div
+      className="absolute text-[7px] uppercase tracking-[0.15em] font-medium pointer-events-none"
+      style={{
+        left: lx,
+        top: ly,
+        color: `${group.color}50`,
+        transform: 'translate(-50%, -50%)',
+        whiteSpace: 'nowrap',
+      }}
+      data-testid={`ring-label-${group.id}`}
+    >
+      {group.label}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   ORBITAL MIXER — Main exported component
+   ══════════════════════════════════════════════ */
+export default function OrbitalMixer() {
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ w: 0, h: 0 });
+  const [magneticActive, setMagneticActive] = useState(false);
+  const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
+
+  // Measure container
+  useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        const r = containerRef.current.getBoundingClientRect();
+        setDimensions({ w: r.width, h: r.height });
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  const isMobile = dimensions.w < 500;
+  const centerX = dimensions.w / 2;
+  const centerY = dimensions.h / 2;
+  const playerCenter = useMemo(() => ({ x: centerX, y: centerY }), [centerX, centerY]);
+
+  // Ring radii — scale based on container size
+  const baseRadius = Math.min(dimensions.w, dimensions.h) * 0.32;
+  const ringRadii = useMemo(() => {
+    if (isMobile) {
+      // Mobile: fewer concentric rings, more spread
+      const base = Math.min(dimensions.w, dimensions.h) * 0.28;
+      return [
+        base * 0.55,  // Ring 0: inner frequencies
+        base * 0.80,  // Ring 1: outer frequencies
+        base * 1.10,  // Ring 2: sounds
+        base * 1.40,  // Ring 3: instruments
+        base * 1.65,  // Ring 4: engines (locked)
+      ];
+    }
+    return [
+      baseRadius * 0.65,  // Ring 0: inner frequencies
+      baseRadius * 0.90,  // Ring 1: outer frequencies
+      baseRadius * 1.15,  // Ring 2: sounds
+      baseRadius * 1.40,  // Ring 3: instruments
+      baseRadius * 1.60,  // Ring 4: engines (locked)
+    ];
+  }, [baseRadius, isMobile, dimensions]);
+
+  // Collect all modules and track active state
+  const allModules = useMemo(() => getActiveModules(), []);
+  const lockedModules = useMemo(() =>
+    Object.values(moduleRegistry).filter(m => m.locked),
+  []);
+
+  // Get currently active module objects
+  const activeModuleObjects = useMemo(() => {
+    const active = [];
+    allModules.forEach(m => {
+      if (isModuleActive(m, activeFreqs, activeSounds, activeDrones)) {
+        active.push(m);
+      }
+    });
+    return active;
+  }, [allModules, activeFreqs, activeSounds, activeDrones]);
+
+  // Handle module activation via drop
+  const handleActivate = useCallback((mod) => {
+    const resolved = resolveModuleToMixerData(mod);
+    if (!resolved.data) return;
+
+    switch (resolved.kind) {
+      case 'freq':
+        toggleFreq(resolved.data);
+        break;
+      case 'sound':
+        toggleSound(resolved.data);
+        break;
+      case 'drone':
+        toggleDrone(resolved.data);
+        break;
+      default:
+        break;
+    }
+  }, [toggleFreq, toggleSound, toggleDrone]);
+
+  // Handle deactivation from player hub
+  const handleDeactivate = useCallback((mod) => {
+    haptic('Light');
+    handleActivate(mod); // toggle off
+  }, [handleActivate]);
+
+  // Organize modules by ring
+  const ringModules = useMemo(() => {
+    const rings = { 0: [], 1: [], 2: [], 3: [], 4: [] };
+    [...allModules, ...lockedModules].forEach(m => {
+      const ring = m.ring ?? 0;
+      if (rings[ring]) rings[ring].push(m);
+    });
+    return rings;
+  }, [allModules, lockedModules]);
+
+  if (dimensions.w === 0) {
+    return (
+      <div ref={containerRef} data-orbital-container className="w-full relative" style={{ height: isMobile ? '60vh' : '60vh', minHeight: 420 }} />
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      data-orbital-container
+      data-testid="orbital-mixer"
+      className="w-full relative overflow-hidden"
+      style={{
+        height: isMobile ? '60vh' : '60vh',
+        minHeight: isMobile ? 420 : 380,
+        maxHeight: 600,
+        background: 'radial-gradient(ellipse at center, rgba(15,15,30,0.6) 0%, rgba(6,6,14,0.95) 70%)',
+        borderRadius: 16,
+        border: '1px solid rgba(255,255,255,0.04)',
+      }}
+    >
+      {/* Orbital ring guides */}
+      {Object.entries(ringRadii).map(([ring, radius]) => (
+        <div
+          key={`ring-guide-${ring}`}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: radius * 2,
+            height: radius * 2,
+            left: centerX - radius,
+            top: centerY - radius,
+            border: `1px solid rgba(255,255,255,${parseInt(ring) < 4 ? '0.025' : '0.015'})`,
+          }}
+        />
+      ))}
+
+      {/* Group labels */}
+      {MODULE_GROUPS.map(group => {
+        const ringIdx = group.modules[0]?.ring ?? 0;
+        return (
+          <RingLabel
+            key={group.id}
+            group={group}
+            center={playerCenter}
+            radius={ringRadii[ringIdx] || ringRadii[0]}
+          />
+        );
+      })}
+
+      {/* Central Player Hub */}
+      <PlayerHub
+        center={playerCenter}
+        activeModules={activeModuleObjects}
+        magneticActive={magneticActive}
+        onDeactivate={handleDeactivate}
+      />
+
+      {/* Orbital Bubbles */}
+      {Object.entries(ringModules).map(([ring, modules]) => {
+        let globalIdx = 0;
+        return modules.map((mod, i) => {
+          const radius = ringRadii[parseInt(ring)] || ringRadii[0];
+          const homePos = getOrbitalPosition(i, modules.length, radius, centerX, centerY);
+          const active = isModuleActive(mod, activeFreqs, activeSounds, activeDrones);
+          globalIdx++;
+
+          return (
+            <DraggableBubble
+              key={mod.id}
+              mod={mod}
+              homePos={homePos}
+              playerCenter={playerCenter}
+              onActivate={handleActivate}
+              isActive={active}
+              isLocked={!!mod.locked}
+              delay={globalIdx * 0.04}
+            />
+          );
+        });
+      })}
+
+      {/* Active modules tethers — lines from hub to active orbital positions */}
+      <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+        {activeModuleObjects.map(mod => {
+          const ring = mod.ring ?? 0;
+          const radius = ringRadii[ring] || ringRadii[0];
+          const mods = ringModules[ring] || [];
+          const idx = mods.findIndex(m => m.id === mod.id);
+          if (idx < 0) return null;
+          const pos = getOrbitalPosition(idx, mods.length, radius, centerX, centerY);
+          const bSize = isMobile ? BUBBLE_SIZE_MOBILE : BUBBLE_SIZE;
+          return (
+            <line
+              key={`tether-${mod.id}`}
+              x1={centerX}
+              y1={centerY}
+              x2={pos.x + bSize / 2}
+              y2={pos.y + bSize / 2}
+              stroke={mod.color}
+              strokeWidth={1}
+              strokeOpacity={0.12}
+              strokeDasharray="4 4"
+            />
+          );
+        })}
+      </svg>
+
+      {/* Clear all button */}
+      <AnimatePresence>
+        {activeModuleObjects.length > 0 && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full z-20"
+            style={{
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.2)',
+              color: '#EF4444',
+              fontSize: '10px',
+              cursor: 'pointer',
+              backdropFilter: 'blur(8px)',
+            }}
+            onClick={() => {
+              haptic('Medium');
+              activeModuleObjects.forEach(m => handleDeactivate(m));
+            }}
+            data-testid="orbital-clear-all"
+          >
+            <X size={10} /> Clear All
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Legend */}
+      <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 z-20">
+        {MODULE_GROUPS.map(g => (
+          <div key={g.id} className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full" style={{ background: g.color, opacity: 0.5 }} />
+            <span className="text-[7px]" style={{ color: `${g.color}60` }}>{g.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Instruction overlay — show only when no modules active */}
+      {activeModuleObjects.length === 0 && (
+        <div className="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
+          <span className="text-[10px] px-3 py-1 rounded-full"
+            style={{ background: 'rgba(10,10,18,0.6)', color: 'rgba(248,250,252,0.3)', border: '1px solid rgba(255,255,255,0.04)' }}>
+            Drag bubbles to the center to activate
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
