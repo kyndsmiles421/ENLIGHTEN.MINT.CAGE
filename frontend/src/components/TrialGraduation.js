@@ -10,6 +10,7 @@ import axios from 'axios';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const DISMISSED_KEY = 'trial_graduation_dismissed';
+const SOVEREIGN_TRIAL_KEY = 'sovereign_trial_complete'; // Universal once-per-profile flag
 
 const ICON_MAP = {
   sage: Heart,
@@ -60,14 +61,18 @@ export default function TrialGraduation() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if trial just expired and modal hasn't been dismissed
+  // Once-per-profile check: if sovereign_trial_complete is set, never show again
   useEffect(() => {
     if (!user || !authHeaders?.Authorization) return;
     if (!creditInfo?.trial?.expired) return;
 
-    // Check if already dismissed
-    const dismissed = localStorage.getItem(DISMISSED_KEY);
-    if (dismissed === creditInfo.trial.expired_at) return;
+    // Sovereign once-per-profile lock — permanent dismiss
+    try {
+      if (localStorage.getItem(SOVEREIGN_TRIAL_KEY) === 'true') return;
+      // Also check the old dismiss key for backward compatibility
+      const dismissed = localStorage.getItem(DISMISSED_KEY);
+      if (dismissed && dismissed !== 'false') return;
+    } catch {}
 
     // Fetch trial summary
     setLoading(true);
@@ -76,6 +81,8 @@ export default function TrialGraduation() {
         if (r.data.has_trial && r.data.trial_expired) {
           setSummary(r.data);
           setShow(true);
+          // Track view for sovereign analytics
+          axios.post(`${API}/treasury/trial-event`, { event: 'view' }, { headers: authHeaders }).catch(() => {});
         }
       })
       .catch(() => {})
@@ -84,15 +91,21 @@ export default function TrialGraduation() {
 
   const handleDismiss = useCallback(() => {
     setShow(false);
-    if (creditInfo?.trial?.expired_at) {
-      localStorage.setItem(DISMISSED_KEY, creditInfo.trial.expired_at);
-    }
-  }, [creditInfo]);
+    // Set both keys for permanent dismiss
+    try {
+      localStorage.setItem(SOVEREIGN_TRIAL_KEY, 'true');
+      localStorage.setItem(DISMISSED_KEY, 'true');
+    } catch {}
+    // Track dismiss for sovereign analytics
+    axios.post(`${API}/treasury/trial-event`, { event: 'dismiss' }, { headers: authHeaders }).catch(() => {});
+  }, [authHeaders]);
 
   const handleUpgrade = useCallback(() => {
+    // Track conversion for sovereign analytics
+    axios.post(`${API}/treasury/trial-event`, { event: 'upgrade_click' }, { headers: authHeaders }).catch(() => {});
     handleDismiss();
     navigate('/pricing?from=trial&highlight=plus');
-  }, [handleDismiss, navigate]);
+  }, [handleDismiss, navigate, authHeaders]);
 
   if (!show || !summary || loading) return null;
 

@@ -1,0 +1,115 @@
+{
+  "summary": "Iteration 249 - Trial Modal Fix & Sovereign Trial Analytics Testing Complete. Backend: 12/12 tests passed (100%). Frontend: Trial graduation modal once-per-profile lock verified - modal shows on first login with expired trial, sets sovereign_trial_complete='true' in localStorage on dismiss, and does NOT reappear after page reload. Sovereign Dashboard Controls tab shows Trial Conversion analytics card with views/dismissals/upgrades and Reset Trial button. SmartDock dock_orientation and dock_snapped persistence to localStorage verified.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration249_trial_analytics.py",
+    "/app/test_reports/pytest/pytest_iteration249.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "TrialGraduation.js line 13: SOVEREIGN_TRIAL_KEY = 'sovereign_trial_complete' - permanent once-per-profile flag",
+    "TrialGraduation.js line 71: Checks localStorage.getItem(SOVEREIGN_TRIAL_KEY) === 'true' before showing modal",
+    "TrialGraduation.js line 96: Sets localStorage.setItem(SOVEREIGN_TRIAL_KEY, 'true') on dismiss",
+    "TrialGraduation.js line 85: Tracks 'view' event via POST /api/treasury/trial-event",
+    "TrialGraduation.js line 100: Tracks 'dismiss' event via POST /api/treasury/trial-event",
+    "TrialGraduation.js line 105: Tracks 'upgrade_click' event via POST /api/treasury/trial-event",
+    "SmartDock.js line 61-66: Reads dock_orientation and dock_snapped from localStorage on mount",
+    "SmartDock.js line 190: Persists dock_orientation and dock_snapped to localStorage after drag",
+    "SovereignDashboard.js line 287-332: Trial Conversion analytics card with views, dismissals, upgrades, conversion_rate",
+    "SovereignDashboard.js line 307-320: Reset Trial button with confirmation dialog",
+    "treasury.py line 381-395: POST /api/treasury/trial-event tracks view/dismiss/upgrade_click events",
+    "treasury.py line 398-414: GET /api/treasury/sovereign/trial-analytics returns conversion metrics",
+    "treasury.py line 417-427: POST /api/treasury/sovereign/reset-trial clears all trial events"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration249_trial_analytics.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "None - used existing test user with expired trial",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 249 verified: (1) Trial modal once-per-profile lock working - sovereign_trial_complete localStorage flag prevents modal from reappearing after dismiss. (2) Trial analytics endpoints working: POST /api/treasury/trial-event tracks view/dismiss/upgrade_click, GET /api/treasury/sovereign/trial-analytics returns metrics, POST /api/treasury/sovereign/reset-trial clears events. (3) Sovereign Dashboard Controls tab shows Trial Conversion card with Views/Dismissed/Upgrades stats and Reset Trial button. (4) SmartDock persists dock_orientation and dock_snapped to localStorage after drag. (5) Orbital Mixer Playground mode working with class picker visible.",
+  "features_verified": {
+    "backend_trial_event_view": {
+      "status": "PASS",
+      "details": "POST /api/treasury/trial-event with event='view' returns {tracked: true}"
+    },
+    "backend_trial_event_dismiss": {
+      "status": "PASS",
+      "details": "POST /api/treasury/trial-event with event='dismiss' returns {tracked: true}"
+    },
+    "backend_trial_event_upgrade_click": {
+      "status": "PASS",
+      "details": "POST /api/treasury/trial-event with event='upgrade_click' returns {tracked: true}"
+    },
+    "backend_trial_event_invalid": {
+      "status": "PASS",
+      "details": "POST /api/treasury/trial-event with invalid event returns 400"
+    },
+    "backend_trial_analytics": {
+      "status": "PASS",
+      "details": "GET /api/treasury/sovereign/trial-analytics returns total_views, total_dismissals, total_upgrade_clicks, conversion_rate, dismiss_rate"
+    },
+    "backend_reset_trial": {
+      "status": "PASS",
+      "details": "POST /api/treasury/sovereign/reset-trial clears all trial events and returns events_cleared count"
+    },
+    "backend_sovereign_config_get": {
+      "status": "PASS",
+      "details": "GET /api/treasury/sovereign/config returns fee_percent, is_live, mirror_active, frozen_transactions"
+    },
+    "backend_sovereign_config_patch": {
+      "status": "PASS",
+      "details": "PATCH /api/treasury/sovereign/config updates fee_percent and persists"
+    },
+    "backend_skeleton_export": {
+      "status": "PASS",
+      "details": "GET /api/treasury/skeleton/export returns framework skeleton with module_types, affinity_tags, tier_levels, class_archetypes"
+    },
+    "backend_trial_event_anonymous": {
+      "status": "PASS",
+      "details": "POST /api/treasury/trial-event works for anonymous users (get_current_user_optional)"
+    },
+    "frontend_trial_modal_shows": {
+      "status": "PASS",
+      "details": "Trial graduation modal appears for user with expired trial when sovereign_trial_complete not set"
+    },
+    "frontend_trial_modal_dismiss_sets_flag": {
+      "status": "PASS",
+      "details": "Dismissing modal sets localStorage sovereign_trial_complete='true' and trial_graduation_dismissed='true'"
+    },
+    "frontend_trial_modal_once_per_profile": {
+      "status": "PASS",
+      "details": "Modal does NOT reappear after page reload when sovereign_trial_complete='true' in localStorage"
+    },
+    "frontend_sovereign_dashboard_trial_analytics": {
+      "status": "PASS",
+      "details": "Controls tab shows Trial Conversion card with Views (5), Dismissed (1), Upgrades (0), 0% conversion"
+    },
+    "frontend_sovereign_dashboard_reset_trial_btn": {
+      "status": "PASS",
+      "details": "Reset Trial for All Users button present in Controls tab"
+    },
+    "frontend_smartdock_orientation_persistence": {
+      "status": "PASS",
+      "details": "After dragging dock to right edge, localStorage dock_orientation='vertical' and dock_snapped='right'"
+    },
+    "frontend_smartdock_data_attributes": {
+      "status": "PASS",
+      "details": "SmartDock has data-orientation and data-snapped attributes that update on drag"
+    },
+    "frontend_orbital_mixer_playground": {
+      "status": "PASS",
+      "details": "Playground mode shows orbital ring with frequency modules and Choose Class button"
+    }
+  }
+}

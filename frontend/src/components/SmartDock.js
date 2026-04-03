@@ -58,8 +58,12 @@ export default function SmartDock() {
   });
   const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
   const [isDragging, setIsDragging] = useState(false);
-  const [dockOrientation, setDockOrientation] = useState('horizontal'); // 'horizontal' | 'vertical'
-  const [snappedEdge, setSnappedEdge] = useState(null); // 'left' | 'right' | 'top' | 'bottom' | null
+  const [dockOrientation, setDockOrientation] = useState(() => {
+    try { return localStorage.getItem('dock_orientation') || 'horizontal'; } catch { return 'horizontal'; }
+  });
+  const [snappedEdge, setSnappedEdge] = useState(() => {
+    try { const e = localStorage.getItem('dock_snapped'); return e && e !== 'none' ? e : null; } catch { return null; }
+  });
   const [zBoost, setZBoost] = useState(() => {
     try { return localStorage.getItem(WIDGET_FOCUS_KEY) === 'dock'; } catch { return false; }
   });
@@ -181,6 +185,9 @@ export default function SmartDock() {
 
     setSnappedEdge(edge);
     setDockOrientation(orient);
+
+    // Persist dock orientation for class preset restore
+    try { localStorage.setItem('dock_orientation', orient); localStorage.setItem('dock_snapped', edge || 'none'); } catch {}
 
     return { x: sx, y: sy };
   }, []);

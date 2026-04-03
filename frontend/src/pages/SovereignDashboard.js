@@ -14,6 +14,7 @@ export default function SovereignDashboard() {
   const [mirror, setMirror] = useState({ entries: [], total: 0 });
   const [escrow, setEscrow] = useState([]);
   const [skeleton, setSkeleton] = useState(null);
+  const [trialAnalytics, setTrialAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [feeSliderValue, setFeeSliderValue] = useState(5);
   const [saving, setSaving] = useState(false);
@@ -23,17 +24,19 @@ export default function SovereignDashboard() {
     if (!token) return;
     setLoading(true);
     try {
-      const [cfgRes, dashRes, mirrorRes, escrowRes] = await Promise.all([
+      const [cfgRes, dashRes, mirrorRes, escrowRes, trialRes] = await Promise.all([
         fetch(`${API}/api/treasury/sovereign/config`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/dashboard`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/mirror?limit=20`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/escrow?limit=20`, { headers: authHeaders }),
+        fetch(`${API}/api/treasury/sovereign/trial-analytics`, { headers: authHeaders }),
       ]);
-      const [cfg, dash, mir, esc] = await Promise.all([cfgRes.json(), dashRes.json(), mirrorRes.json(), escrowRes.json()]);
+      const [cfg, dash, mir, esc, trial] = await Promise.all([cfgRes.json(), dashRes.json(), mirrorRes.json(), escrowRes.json(), trialRes.json()]);
       setConfig(cfg);
       setDashboard(dash);
       setMirror(mir);
       setEscrow(esc);
+      setTrialAnalytics(trial);
       setFeeSliderValue(cfg.fee_percent || 5);
     } catch {}
     setLoading(false);
@@ -277,6 +280,54 @@ export default function SovereignDashboard() {
                   <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.12)' }}>
                     <AlertTriangle size={12} style={{ color: '#EF4444' }} />
                     <span className="text-[10px]" style={{ color: '#EF4444' }}>All marketplace transactions are frozen</span>
+                  </div>
+                )}
+
+                {/* Trial Analytics */}
+                {trialAnalytics && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>Trial Conversion</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(34,197,94,0.08)', color: '#22C55E' }} data-testid="trial-conversion-rate">
+                        {trialAnalytics.conversion_rate}% conversion
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {[
+                        { label: 'Views', value: trialAnalytics.total_views, color: '#3B82F6' },
+                        { label: 'Dismissed', value: trialAnalytics.total_dismissals, color: '#6B7280' },
+                        { label: 'Upgrades', value: trialAnalytics.total_upgrade_clicks, color: '#22C55E' },
+                      ].map(s => (
+                        <div key={s.label} className="text-center rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <div className="text-sm font-semibold" style={{ color: s.color }}>{s.value}</div>
+                          <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (!window.confirm('Reset trial flag for all users? They will see the trial modal once more.')) return;
+                        setSaving(true);
+                        try {
+                          await fetch(`${API}/api/treasury/sovereign/reset-trial`, {
+                            method: 'POST',
+                            headers: authHeaders,
+                          });
+                          fetchAll();
+                        } catch {}
+                        setSaving(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] transition-all"
+                      style={{
+                        background: 'rgba(239,68,68,0.06)',
+                        border: '1px solid rgba(239,68,68,0.12)',
+                        color: '#EF4444',
+                        cursor: 'pointer',
+                      }}
+                      data-testid="reset-trial-btn"
+                    >
+                      <AlertTriangle size={10} /> Reset Trial for All Users
+                    </button>
                   </div>
                 )}
               </div>

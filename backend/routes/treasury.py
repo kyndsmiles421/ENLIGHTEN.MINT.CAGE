@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from deps import db, get_current_user, create_activity
+from deps import db, get_current_user, get_current_user_optional, create_activity
 from datetime import datetime, timezone
 import uuid
 
@@ -373,4 +373,55 @@ async def skeleton_export():
             "PATCH /api/treasury/sovereign/config": "Update fee, toggles",
             "GET /api/treasury/skeleton/export": "This endpoint",
         },
+    }
+
+
+# ─── Trial Analytics & Control ───
+
+@router.post("/trial-event")
+async def track_trial_event(body: dict, user=Depends(get_current_user_optional)):
+    """Track trial modal events for sovereign analytics."""
+    event = body.get("event", "")
+    if event not in ("view", "dismiss", "upgrade_click"):
+        raise HTTPException(400, "Invalid event type")
+
+    user_id = user["id"] if user else "anonymous"
+    await db.trial_events.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "event": event,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"tracked": True}
+
+
+@router.get("/sovereign/trial-analytics")
+async def get_trial_analytics(user=Depends(get_current_user)):
+    """Get trial conversion metrics for sovereign dashboard."""
+    views = await db.trial_events.count_documents({"event": "view"})
+    dismissals = await db.trial_events.count_documents({"event": "dismiss"})
+    upgrades = await db.trial_events.count_documents({"event": "upgrade_click"})
+
+    conversion_rate = round((upgrades / views * 100), 1) if views > 0 else 0
+    dismiss_rate = round((dismissals / views * 100), 1) if views > 0 else 0
+
+    return {
+        "total_views": views,
+        "total_dismissals": dismissals,
+        "total_upgrade_clicks": upgrades,
+        "conversion_rate": conversion_rate,
+        "dismiss_rate": dismiss_rate,
+    }
+
+
+@router.post("/sovereign/reset-trial")
+async def reset_trial_for_all(user=Depends(get_current_user)):
+    """Reset the trial 'has seen' flag for all users. Use when trial content is updated."""
+    # Clear all trial events to restart analytics
+    result = await db.trial_events.delete_many({})
+
+    return {
+        "reset": True,
+        "events_cleared": result.deleted_count,
+        "note": "Users must also clear localStorage 'sovereign_trial_complete' on their device",
     }
