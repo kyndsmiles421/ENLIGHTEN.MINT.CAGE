@@ -5,14 +5,22 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 const TreasuryContext = createContext({
   balance: 0,
+  dust: 0,
+  gems: 0,
   loading: false,
   refreshBalance: () => {},
   purchaseConstellation: () => {},
+  refreshHubWallet: () => {},
+  earnDust: () => {},
+  transmute: () => {},
 });
 
 export function TreasuryProvider({ children }) {
   const { token, authHeaders } = useAuth();
   const [balance, setBalance] = useState(0);
+  const [dust, setDust] = useState(0);
+  const [gems, setGems] = useState(0);
+  const [hubData, setHubData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const refreshBalance = useCallback(async () => {
@@ -24,7 +32,21 @@ export function TreasuryProvider({ children }) {
     } catch {}
   }, [token, authHeaders]);
 
-  useEffect(() => { refreshBalance(); }, [refreshBalance]);
+  const refreshHubWallet = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/api/bank/wallet`, { headers: authHeaders });
+      const data = await res.json();
+      setDust(data.dust || 0);
+      setGems(data.gems || 0);
+      setHubData(data);
+    } catch {}
+  }, [token, authHeaders]);
+
+  useEffect(() => {
+    refreshBalance();
+    refreshHubWallet();
+  }, [refreshBalance, refreshHubWallet]);
 
   const purchaseConstellation = useCallback(async (constellationId) => {
     if (!token) return null;
@@ -48,8 +70,52 @@ export function TreasuryProvider({ children }) {
     }
   }, [token, authHeaders]);
 
+  const earnDust = useCallback(async (action) => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/api/bank/earn`, {
+        method: 'POST',
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDust(data.dust_balance || 0);
+        setGems(data.gems_balance || 0);
+        return data;
+      }
+    } catch {}
+  }, [token, authHeaders]);
+
+  const transmute = useCallback(async (dustAmount) => {
+    if (!token) return null;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/broker/transmute`, {
+        method: 'POST',
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dust_amount: dustAmount }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDust(data.dust_balance || 0);
+        setGems(data.gems_balance || 0);
+        return data;
+      }
+      return { error: data.detail || 'Transmutation failed' };
+    } catch {
+      return { error: 'Network error' };
+    } finally {
+      setLoading(false);
+    }
+  }, [token, authHeaders]);
+
   return (
-    <TreasuryContext.Provider value={{ balance, loading, refreshBalance, purchaseConstellation }}>
+    <TreasuryContext.Provider value={{
+      balance, dust, gems, hubData, loading,
+      refreshBalance, purchaseConstellation,
+      refreshHubWallet, earnDust, transmute,
+    }}>
       {children}
     </TreasuryContext.Provider>
   );

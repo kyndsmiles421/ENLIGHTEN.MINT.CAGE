@@ -55,17 +55,37 @@ def scan_text(text: str) -> dict:
 @router.post("/scan")
 async def scan_content(body: dict, user=Depends(get_current_user)):
     """Scan user-generated content before it enters the ecosystem.
-    Returns clean=True if safe, or blocks with violation details."""
+    Uses the Adaptive Observer to select scanning mode based on platform phase."""
     text = body.get("text", "")
     context = body.get("context", "general")
 
     # Check if user is shadow-muted
     mute = await db.sentinel_mutes.find_one({"user_id": user["id"], "active": True}, {"_id": 0})
     if mute:
-        # Shadow-muted users think their content is posted but it's silently dropped
         return {"clean": True, "shadow_blocked": True, "message": "Content accepted"}
 
+    # Adaptive Observer: detect platform phase
+    from routes.quad_hexagram import detect_phase
+    phase = await detect_phase(user["id"])
+
     result = scan_text(text)
+
+    # Phase-dependent sensitivity adjustment
+    if phase == "elemental":
+        # Defensive mode: lower threshold, stricter scanning
+        if result["risk_score"] > 0.2:
+            result["clean"] = False
+    elif phase == "fractal":
+        # High-traffic: focus on structural patterns (spam-like repetition)
+        if text and len(set(text.split())) < len(text.split()) * 0.3:
+            result["violations"].append({
+                "category": "spam",
+                "severity": "low",
+                "matched_count": 1,
+            })
+            result["clean"] = False
+            result["risk_score"] = min(1.0, result["risk_score"] + 0.3)
+    # harmonic mode uses default scan_text() behavior
 
     if not result["clean"]:
         # Log violation to sovereign ledger
@@ -99,10 +119,11 @@ async def scan_content(body: dict, user=Depends(get_current_user)):
             "clean": False,
             "blocked": True,
             "risk_score": result["risk_score"],
+            "phase_mode": phase,
             "message": "Content blocked by the Collective Sentinel",
         }
 
-    return {"clean": True, "message": "Content accepted"}
+    return {"clean": True, "phase_mode": phase, "message": "Content accepted"}
 
 
 @router.get("/log")

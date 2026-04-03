@@ -7,6 +7,7 @@ import { useMixer } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useSensory } from '../context/SensoryContext';
+import { useTreasury } from '../context/TreasuryContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useHarmonyEngine, getHarmonyColor } from '../hooks/useHarmonyEngine';
 
@@ -242,6 +243,7 @@ export default function SmartDock() {
 
   // Harmony Engine — unified harmony/streak/NPU data
   const harmonyEngine = useHarmonyEngine();
+  const { dust, gems } = useTreasury();
 
   const DOCK_ITEMS = [
     { id: 'harmony', icon: Activity, label: 'Harmony', color: '#A78BFA' },
@@ -559,6 +561,23 @@ export default function SmartDock() {
             )}
           </motion.div>
         )}
+
+        {/* ── Dust & Gems micro-wallet badge ── */}
+        {!expanded && (dust > 0 || gems > 0) && (
+          <motion.div
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded-full"
+            style={{
+              background: 'rgba(251,191,36,0.06)',
+              border: '1px solid rgba(251,191,36,0.12)',
+            }}
+            data-testid="wallet-micro-badge"
+          >
+            <span className="text-[6px] font-mono" style={{ color: '#FBBF24' }}>{dust}</span>
+            <span className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>|</span>
+            <span className="text-[6px] font-mono" style={{ color: '#818CF8' }}>{gems}</span>
+          </motion.div>
+        )}
+
 
         {/* ── Minimize — RED tinted ── */}
         <DockBtn

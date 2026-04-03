@@ -5,6 +5,7 @@ import { MODULE_GROUPS, getActiveModules, moduleRegistry, checkSynergy, getSynth
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
 import { useClass, CLASS_COLORS } from '../context/ClassContext';
+import { useAuth } from '../context/AuthContext';
 import ConstellationPanel from './ConstellationPanel';
 import CommunityPanel from './CommunityPanel';
 
@@ -390,10 +391,37 @@ export default function OrbitalMixer() {
   const [constellationOpen, setConstellationOpen] = useState(false);
   const [classPickerOpen, setClassPickerOpen] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
+  const [feedNotification, setFeedNotification] = useState(false);
   const [dragPositions, setDragPositions] = useState({}); // { modId: {x,y} } for synergy discovery
   const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
   const { focusMode, toggleFocus } = useFocus();
   const { activeClass, classData, selectClass, addXP, isBoosted } = useClass();
+  const { token, authHeaders } = useAuth();
+  const lastPostCheckRef = useRef(null);
+
+  // Poll for new feed posts (notification dot)
+  useEffect(() => {
+    if (!token || communityOpen) { setFeedNotification(false); return; }
+    const API = process.env.REACT_APP_BACKEND_URL;
+    const checkFeeds = async () => {
+      try {
+        const res = await fetch(`${API}/api/guilds/feed/feed_orbital/posts?limit=1`, {
+          headers: authHeaders,
+        });
+        const posts = await res.json();
+        if (Array.isArray(posts) && posts.length > 0) {
+          const latest = posts[0].created_at;
+          if (lastPostCheckRef.current && latest > lastPostCheckRef.current) {
+            setFeedNotification(true);
+          }
+          lastPostCheckRef.current = latest;
+        }
+      } catch {}
+    };
+    checkFeeds();
+    const interval = setInterval(checkFeeds, 30000);
+    return () => clearInterval(interval);
+  }, [token, authHeaders, communityOpen]);
 
   // Measure container
   useEffect(() => {
@@ -727,8 +755,8 @@ export default function OrbitalMixer() {
       <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
         <motion.button
           whileTap={{ scale: 0.85 }}
-          onClick={() => { haptic('Light'); setCommunityOpen(!communityOpen); }}
-          className="flex items-center gap-1 px-2 py-1 rounded-full"
+          onClick={() => { haptic('Light'); setCommunityOpen(!communityOpen); setFeedNotification(false); }}
+          className="relative flex items-center gap-1 px-2 py-1 rounded-full"
           style={{
             background: communityOpen ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${communityOpen ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.06)'}`,
@@ -739,6 +767,12 @@ export default function OrbitalMixer() {
           data-testid="orbital-community-btn"
         >
           <Users size={10} /> Community
+          {feedNotification && (
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full animate-pulse"
+              style={{ background: '#2DD4BF', boxShadow: '0 0 6px rgba(45,212,191,0.6)' }}
+              data-testid="feed-notification-dot"
+            />
+          )}
         </motion.button>
 
         <motion.button
