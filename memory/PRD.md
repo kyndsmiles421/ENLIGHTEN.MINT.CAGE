@@ -127,6 +127,7 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── OrbitalNavigation.js, BubblePortal.js
 │   ├── CultureLayerPanel.js
 │   ├── PersistentWaveform.js (React.memo)
+│   ├── LearningToggle.js (Global active education overlay switch)
 ├── hooks/
 │   ├── usePhonicResonance.js (+ ProximityHarmonics + SonicTug + HapticSync)
 │   ├── useOrganicAudio.js (External organic instrument synthesis)
@@ -137,12 +138,24 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── FocusContext.js (Auto-immersion focus mode: 3+=focus, 5+=hyper-focus)
 │   ├── ClassContext.js (Anthropology class: Shaman/Nomad/Architect/Merchant + XP)
 │   ├── TreasuryContext.js (Harmony Credits wallet + purchase flow)
+│   ├── ModalityContext.js (Quad-core learning & interaction intensity state)
+│   ├── LanguageContext.js (8-language i18n with site-wide toggle)
 ├── pages/
+│   ├── SovereignAdvisors.js (5 AI Advisor cards + chat interface + purchase flow)
+│   ├── EconomyPage.js (Subscription UI, Pack Studio / Synthesis Forge)
+│   ├── AcademyPage.js (Education Hub & Labs)
 │   ├── MasteryPath.js, SuanpanPhysics.js, StarChart.js (+ CultureLayerPanel)
 /app/frontend/public/
 │   ├── sw.js (Solfeggio + instrument cache)
 
 /app/backend/routes/
+│   ├── sovereigns.py (5 Sovereign AI Advisors: chat, history, purchase, bridging)
+│   ├── economy.py (4-Tier Subscriptions, Stripe hooks, trade logic)
+│   ├── copilot.py (Emergent LLM for AI micro-lessons & Pack Generator)
+│   ├── academy.py (Progressive Learning & Forge Labs)
+│   ├── ai_broker.py (Trade execution)
+│   ├── central_bank.py (Dual currency ledger)
+│   ├── quad_hexagram.py (H² Engine state tensor)
 │   ├── phonic.py (movement + flourish + harmonics + memory + harmony-score + streak)
 │   ├── culture_layers.py (Hopi/Egyptian/Vedic)
 │   ├── sovereign_mastery.py
@@ -151,11 +164,37 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── constellations.py (Constellation recipes CRUD + marketplace + mirror hook)
 │   ├── sentinel.py (Content Sentinel: scan, log, shadow-mute, stats)
 │   ├── guilds.py (Guild channels, identity modes, feed posting)
-│   ├── academy.py (Omni-Modality Learning: modalities, programs, lessons, forge labs, accreditation, certifications)
 ```
 
 ## Iteration History
-### Iteration 260 — Dual-Track Economy, Synthesis Forge, Learning Toggle & AI Co-Pilot (Apr 3, 2026) — LATEST
+### Iteration 262 — 5 Sovereign AI Advisors (Apr 3, 2026) — LATEST
+- **5 Domain-Specific AI Personas**, each hard-linked to a platform module:
+  1. **The Grand Architect** (Infrastructure & Deployment) — linked to Architect ($89) tier
+  2. **The Master Harmonic** (Sound & Wellness) — linked to Sovereign ($49) tier
+  3. **The Principal Economist** (Trade Circle & Dust) — linked to Resonance ($27) tier
+  4. **The Chief Logistics Officer** (Market Operations) — linked to Resonance ($27) tier
+  5. **The Sovereign Ethicist** (Community & Barter) — linked to Discovery (Free) tier
+- **Full Conversational Chat**: Persistent message history in MongoDB (`sovereign_chats` collection)
+  - `GET /api/sovereigns/list` — returns all 5 with access status based on user tier
+  - `POST /api/sovereigns/chat` — sends message, returns AI response with cross-sovereign bridges
+  - `GET /api/sovereigns/history/{id}` — retrieves chat history
+  - `DELETE /api/sovereigns/history/{id}` — clears chat history
+- **Tier-Gated Access**: Free for matching tier and above; lower tiers purchase sessions via Dust (50 Dust/session)
+  - `POST /api/sovereigns/purchase-session` — deducts Dust, creates active session
+  - 402 error on insufficient Dust, 403 when accessing locked sovereign without session
+- **Monetization Sentinel**: All Sovereigns enforce the Central Broker mandate — cash is obsolete, only Dust moves value
+- **Cross-Sovereign Bridging**: Auto-detects [BRIDGE:sovereign_id] tags in AI responses and renders navigation buttons
+- **Language-Aware**: Responses in user's selected language via LanguageContext (8 languages supported)
+- **i18n Sovereign Names**: Each has localized names (en/es/fr/zh/hi/ja/ar/pt)
+- **Frontend**: `/sovereigns` page with 5 cards, chat view, purchase modal, protocol info, data-testids
+- Tests: Backend 26/26 (100%), Frontend 100%
+
+### Iteration 261 — 4-Tier Subscription Economy Finalization (Apr 3, 2026)
+- **4-Tier Model**: Discovery (Free/$0), Resonance ($27), Sovereign ($49), Architect ($89)
+- Discount tiers: 0%, 5%, 15%, 30%. Failed Trade Charge: 30%.
+- Tests: Backend 49/49 (100%), Frontend 100%
+
+### Iteration 260 — Dual-Track Economy, Synthesis Forge, Learning Toggle & AI Co-Pilot (Apr 3, 2026)
 - **Track 1: App Utility Subscriptions** with Stripe Checkout
   - Discovery (Free) / Resonance ($44.99/mo) / Sovereign ($89.99/mo)
   - `POST /api/economy/subscribe` — creates Stripe checkout for paid tiers
@@ -396,8 +435,9 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
-## Upcoming (P0-P1) — Iteration 261+
+## Upcoming (P0-P1) — Iteration 263+
 - **Trade Circle Marketplace UI**: Smooth purchase flow for $1,347+ Business-in-a-Box packs, verified asset bridge
+- **Sovereign Advisor Deep Links**: SmartDock quick-access buttons for each Sovereign from their linked module pages
 - **Circularity KPI**: Tag trades/transmutations with ecosystem impact scores, Resonance Multipliers
 - **Context-Aware Predictive Modality Switching**: Auto-switch learning mode via device sensors
 - **Ecosystem Health Dashboard**: "Global Renaissance" events at peak community circularity
