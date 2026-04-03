@@ -80,6 +80,11 @@ async def ensure_indexes():
         await db.mixer_recordings.create_index("user_id")
         await db.mixer_recordings.create_index([("user_id", 1), ("created_at", -1)])
 
+        # ── Sovereign Architecture ──
+        await db.sovereign_subscriptions.create_index("user_id", unique=True)
+        await db.cross_tier_purchases.create_index("user_id")
+        await db.cross_tier_purchases.create_index([("user_id", 1), ("feature_key", 1)])
+
         # ── Bible / Scripture ──
         await db.bible_chapters.create_index([("last_read_at", -1)])
 

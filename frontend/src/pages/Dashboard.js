@@ -26,7 +26,7 @@ import {
   Pin, LayoutGrid, Save, ChevronDown, ScrollText, Swords,
   CloudSun, Moon as MoonIcon, Waves, Layers,
   Gem as GemIcon, Mountain as MountainIcon, Sprout as SproutIcon,
-  Grid3X3, Brain
+  Grid3X3, Brain, Crown
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 import TrialBanner from '../components/TrialBanner';
@@ -89,6 +89,7 @@ const ALL_ACTIONS = [
   { icon: Eye, label: 'Master', path: '/master-view', color: '#2DD4BF', group: 'Explore' },
   { icon: Grid3X3, label: 'Fractal', path: '/fractal-engine', color: '#C084FC', group: 'Explore' },
   { icon: Brain, label: 'Avenues', path: '/mastery-avenues', color: '#06B6D4', group: 'Explore' },
+  { icon: Crown, label: 'Sovereign', path: '/sovereign', color: '#FBBF24', group: 'Explore' },
   { icon: Swords, label: 'Cosmic RPG', path: '/rpg', color: '#EF4444', group: 'Explore' },
   { icon: Star, label: 'Nexus', path: '/nexus', color: '#A855F7', group: 'Explore' },
   { icon: Sparkles, label: 'Journey', path: '/starseed', color: '#818CF8', group: 'Explore' },

@@ -169,6 +169,7 @@ const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
 const Observatory = lazy(() => import('./pages/Observatory'));
 const Archives = lazy(() => import('./pages/Archives'));
 const SuanpanMixer = lazy(() => import('./pages/SuanpanMixer'));
+const SovereignArchitecture = lazy(() => import('./pages/SovereignArchitecture'));
 const Botany = lazy(() => import('./pages/Botany'));
 const Codex = lazy(() => import('./pages/Codex'));
 const BotanyOrbital = lazy(() => import('./pages/BotanyOrbital'));
@@ -319,6 +320,7 @@ function AnimatedRoutes() {
         <Route path="/collective-shadow-map" element={<CollectiveShadowMap />} />
         <Route path="/fractal-engine" element={<FractalEngine />} />
         <Route path="/mastery-avenues" element={<MasteryAvenues />} />
+              <Route path="/sovereign" element={<SovereignArchitecture />} />
         <Route path="/cosmic-map" element={<CosmicMap />} />
         <Route path="/admin/power-spot" element={<PowerSpotAdmin />} />
         <Route path="/theory" element={<MusicTheory />} />
