@@ -120,8 +120,9 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 /app/frontend/src/
 ├── components/
 │   ├── SmartDock.js (+ Control Center: Harmony, NPU, Streak)
-│   ├── OrbitalMixer.js (Drag-and-Drop Mixer with orbital ring layout, synergy bonds, focus toggle)
-│   ├── ConstellationPanel.js (Save/Browse/Load/Like/Sell constellation recipes)
+│   ├── OrbitalMixer.js (Drag-and-Drop Mixer with orbital ring layout, synergy bonds, focus toggle, community panel)
+│   ├── ConstellationPanel.js (Save/Browse/Load/Like/Sell constellation recipes + sentinel scan)
+│   ├── CommunityPanel.js (Guild channels, identity modes, feed posting with sentinel integration)
 │   ├── SovereignCrossbar.js, NebulaSphere.js, NebulaPlayground.js
 │   ├── OrbitalNavigation.js, BubblePortal.js
 │   ├── CultureLayerPanel.js
@@ -148,10 +149,29 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── classes.py (Anthropology class archetypes + selection + XP)
 │   ├── treasury.py (Sovereign Treasury: credits, escrow, 5% fee routing, mirror hook, dashboard)
 │   ├── constellations.py (Constellation recipes CRUD + marketplace + mirror hook)
+│   ├── sentinel.py (Content Sentinel: scan, log, shadow-mute, stats)
+│   ├── guilds.py (Guild channels, identity modes, feed posting)
 ```
 
 ## Iteration History
-### Iteration 249 — Trial Lock + Analytics + Dock Presets (Apr 3, 2026) — LATEST
+### Iteration 250 — Content Sentinel + Guild Community + Progressive Disclosure (Apr 3, 2026) — LATEST
+- **Automated Content Sentinel**: Full real-time content moderation system
+  - `/api/sentinel/scan` — scans text against prohibited patterns (hate, slurs, sexual, self-harm, violence)
+  - Zero-Tolerance Protocol: 3+ violations → automatic shadow-mute (content silently dropped)
+  - Violation logging, shadow-mute/unmute management, stats aggregation
+  - Frontend integration: Constellation save and feed posts scan text via sentinel before submission
+- **Guild & Identity System**: Community channels with privacy controls
+  - Identity modes: Full Identity, Avatar (geometric visualization), Ghost (invisible)
+  - Mic/Video toggles for Full/Avatar modes
+  - Class-based Guild channels (Resonance Circle, Wayfinder Lodge, Blueprint Sanctum, Trade Circle)
+  - Widget Feed channels (Frequency Exchange, Soundscape Commons, Synthesis Lab, Forge Workshop)
+  - Feed posting with sentinel scanning, ghost mode blocks posting (403)
+  - CommunityPanel component accessible from Orbital Mixer playground
+- **Progressive Trial Disclosure**: TrialGraduation modal now only appears after 3+ syntheses (Focus Mode triggers). Preserves once-per-profile permanent dismiss lock.
+- **Sovereign Dashboard Sentinel Tab**: 6th tab with violation stats, category breakdown, shadow-muted users with unmute, violation log
+- Tests: Backend 20/20 (100%), Frontend 100%
+
+### Iteration 249 — Trial Lock + Analytics + Dock Presets (Apr 3, 2026)
 - **Trial Modal Fix**: Once-per-profile lock using `sovereign_trial_complete` localStorage flag. Modal shows exactly once, then permanently dismissed. Backward-compatible with old dismiss key.
 - **Trial Analytics**: Events tracked (view/dismiss/upgrade_click) via `/api/treasury/trial-event`. Sovereign Dashboard shows conversion metrics (views vs upgrades vs dismissals). "Reset Trial for All" button clears analytics and lets all users see the modal once more.
 - **Dock Preset Persistence**: SmartDock saves `dock_orientation` and `dock_snapped` to localStorage after every drag. Restores on mount — switching between sessions preserves the user's kinetic layout.
@@ -238,12 +258,11 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iterations 234-236 — Foundation
 
 ## Upcoming (P1)
-- **Synthesis Handshake**: Full combo-widget logic — Cymatic Visuals (Shaman+Audio+Fractal), Trade Trails (Nomad+GPS+Market), Blueprint Forge (Architect+Forge+Merchant)
-- **Liquid Tethers**: Animated SVG data-stream connections between synthesized widgets (gold during trade, green on completion)
-- **Haptic Phonics**: Varied vibration frequencies mapped to cross-reference success without looking at screen
-- I Ching Logic Gates: First operational "engine" module (maps 64 hexagrams to 64-bit harmonic resonances)
-- **Stripe Integration**: Real-currency option alongside Harmony Credits for premium constellation purchases
-- **Sovereign Dashboard UI**: Admin view with real-time ledger, escrow contracts, fee slider, kill-switch
+- **Central Hub / P2P Cash Transactions**: All cash-based exchanges routed through Central Hub (ledger + clearinghouse) for circular economy alignment
+- **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation
+- **Ghost Skeleton UI Optimization**: Skeleton loaders before canvas items fully render
+- **Synthesis Handshake**: Full combo-widget logic — Cymatic Visuals, Trade Trails, Blueprint Forge
+- **Liquid Tethers**: Animated SVG data-stream connections between synthesized widgets
 
 ## Future/Backlog (P2)
 - **Oracle Navigation Loop**: I Ching → GPS Map → Artifact discovery → Forge upgrade → Class Stats
