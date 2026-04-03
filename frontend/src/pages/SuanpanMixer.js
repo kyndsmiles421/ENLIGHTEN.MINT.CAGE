@@ -10,7 +10,7 @@ import {
   Sliders, Lock, Unlock, Zap, Waves, Sparkles, ChevronDown, Crown,
   Layers, Music, Eye, Radio, X, Loader2, Play, Square,
   Ghost, Package, Gift, ShoppingCart, ArrowUpRight, GripVertical,
-  Compass, AlertTriangle, Clock,
+  Compass, AlertTriangle, Clock, Wand2, Moon, Sun, Heart, Brain, Anchor,
 } from 'lucide-react';
 import { NanoGuide } from '../components/NanoGuide';
 
@@ -663,6 +663,9 @@ export default function SuanpanMixer() {
   const [showAssembly, setShowAssembly] = useState(false);
   const [ripplingIndices, setRipplingIndices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [autoComposeOpen, setAutoComposeOpen] = useState(false);
+  const [composing, setComposing] = useState(false);
+  const [composeGoals, setComposeGoals] = useState([]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const ctxRef = useRef(null);
@@ -683,12 +686,13 @@ export default function SuanpanMixer() {
     if (authLoading || !token) return;
     const load = async () => {
       try {
-        const [subRes, srcRes, projRes, packRes, recRes] = await Promise.all([
+        const [subRes, srcRes, projRes, packRes, recRes, goalsRes] = await Promise.all([
           axios.get(`${API}/mixer/subscription`, { headers: authHeaders }),
           axios.get(`${API}/mixer/sources`, { headers: authHeaders }),
           axios.get(`${API}/mixer/projects`, { headers: authHeaders }),
           axios.get(`${API}/mixer/bonus-packs`, { headers: authHeaders }),
           axios.get(`${API}/mixer/recommendations`, { headers: authHeaders }),
+          axios.get(`${API}/mixer/auto-compose/goals`).catch(() => ({ data: { goals: [] } })),
         ]);
         setSubTier(subRes.data.tier);
         setTierConfig(subRes.data.tier_config);
@@ -699,6 +703,7 @@ export default function SuanpanMixer() {
         setBonusPacks(packRes.data.packs || []);
         setRecommendations(recRes.data.recommendations || []);
         setHexagramInfo(recRes.data.hexagram || null);
+        setComposeGoals(goalsRes.data.goals || []);
       } catch {} finally { setLoading(false); }
     };
     load();
@@ -829,6 +834,22 @@ export default function SuanpanMixer() {
 
     if (!isMuted) playConfirmation(delta > 0 ? 523 : 392, 'low');
   }, [tracks, isMuted, playConfirmation]);
+
+  const handleAutoCompose = useCallback(async (goalKey) => {
+    setComposing(true);
+    try {
+      const res = await axios.post(`${API}/mixer/auto-compose`, { goal: goalKey }, { headers: authHeaders });
+      const composed = res.data;
+      setTracks(composed.tracks || []);
+      setProjectName(`${composed.goal_label} Session`);
+      setAiCredits(prev => Math.max(0, prev - 1));
+      setAutoComposeOpen(false);
+      toast.success(`${composed.goal_label} — ${composed.track_count} tracks composed (${Math.round(composed.total_duration_seconds)}s)`);
+      if (!isMuted) playConfirmation(880, 'high');
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Auto-compose failed');
+    } finally { setComposing(false); }
+  }, [authHeaders, isMuted, playConfirmation]);
 
 
   const saveProject = useCallback(async () => {
@@ -1006,6 +1027,12 @@ export default function SuanpanMixer() {
                 onClick={() => setPacksOpen(!packsOpen)} data-testid="open-packs-btn">
                 <Package size={9} /> Packs
               </motion.button>
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setAutoComposeOpen(!autoComposeOpen)} data-testid="auto-compose-btn">
+                {composing ? <Loader2 size={9} className="animate-spin" /> : <Wand2 size={9} />} DJ Auto
+              </motion.button>
             </div>
           </div>
 
@@ -1107,6 +1134,72 @@ export default function SuanpanMixer() {
             )}
           </AnimatePresence>
 
+          {/* Auto-Compose DJ Panel */}
+          <AnimatePresence>
+            {autoComposeOpen && (
+              <motion.div className="border-b overflow-hidden"
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(192,132,252,0.015)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <div className="p-3" data-testid="auto-compose-panel">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Wand2 size={10} style={{ color: '#C084FC' }} />
+                      <p className="text-[8px] tracking-wider uppercase font-medium" style={{ color: '#C084FC' }}>
+                        Mantra DJ Auto-Compose
+                      </p>
+                    </div>
+                    <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                      {aiCredits} AI credits remaining
+                    </p>
+                  </div>
+                  <p className="text-[7px] mb-3" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                    Select a wellness goal. The DJ will arrange frequencies, mantras, and ambience with intelligent cross-fading.
+                  </p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {(composeGoals.length > 0 ? composeGoals : [
+                      { key: 'deep_sleep', label: 'Deep Sleep', description: 'Delta & theta waves' },
+                      { key: 'focus', label: 'Laser Focus', description: 'Alpha-beta entrainment' },
+                      { key: 'energy', label: 'Energy Surge', description: 'High-frequency activation' },
+                      { key: 'healing', label: 'Sacred Healing', description: 'Solfeggio cascade' },
+                      { key: 'meditation', label: 'Deep Meditation', description: 'Theta-alpha bridge' },
+                      { key: 'grounding', label: 'Earth Grounding', description: 'Sub-bass resonance' },
+                    ]).map(g => {
+                      const icons = { deep_sleep: Moon, focus: Brain, energy: Sun, healing: Heart, meditation: Sparkles, grounding: Anchor };
+                      const GoalIcon = icons[g.key] || Wand2;
+                      const colors = { deep_sleep: '#818CF8', focus: '#60A5FA', energy: '#EAB308', healing: '#22C55E', meditation: '#C084FC', grounding: '#FB923C' };
+                      const c = colors[g.key] || '#C084FC';
+                      return (
+                        <motion.button key={g.key}
+                          className="flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl cursor-pointer"
+                          style={{
+                            background: `${c}06`,
+                            border: `1px solid ${c}15`,
+                          }}
+                          whileHover={{ scale: 1.04, borderColor: `${c}30` }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => handleAutoCompose(g.key)}
+                          disabled={composing || aiCredits <= 0}
+                          data-testid={`compose-goal-${g.key}`}>
+                          {composing ? <Loader2 size={14} className="animate-spin" style={{ color: c }} />
+                            : <GoalIcon size={14} style={{ color: c }} />}
+                          <span className="text-[8px] font-medium" style={{ color: c }}>{g.label}</span>
+                          <span className="text-[5px] text-center leading-tight" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                            {g.description}
+                          </span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                  {aiCredits <= 0 && (
+                    <p className="text-[7px] text-center mt-2" style={{ color: '#EF4444' }}>
+                      No AI credits remaining. Upgrade your tier for more.
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Timeline ruler */}
           {tracks.length > 0 && (
             <div className="px-4 pt-1 pb-0">
@@ -1176,6 +1269,12 @@ export default function SuanpanMixer() {
                     whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                     onClick={() => setPacksOpen(true)}>
                     <Package size={9} /> Packs
+                  </motion.button>
+                  <motion.button className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                    style={{ background: 'rgba(192,132,252,0.06)', border: '1px solid rgba(192,132,252,0.12)', color: '#C084FC' }}
+                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    onClick={() => setAutoComposeOpen(true)} data-testid="empty-auto-compose-btn">
+                    <Wand2 size={9} /> DJ Auto
                   </motion.button>
                 </div>
               </div>

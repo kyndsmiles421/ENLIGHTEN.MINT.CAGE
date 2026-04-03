@@ -849,6 +849,246 @@ async def ripple_edit(data: dict = Body(...), user=Depends(get_current_user)):
     }
 
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  AI MANTRA DJ — AUTO-COMPOSE ENGINE
+#  Goal-based intelligent track arrangement with
+#  frequency science, cross-fade overlaps, and
+#  hexagram-aware resonance matching.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AUTO_COMPOSE_GOALS = {
+    "deep_sleep": {
+        "label": "Deep Sleep",
+        "description": "Delta & theta wave composition for restorative rest",
+        "frequencies": [7.83, 136.1, 174, 285],
+        "ambience": ["amb-rain", "amb-forest"],
+        "mantras": ["mantra-so-ham"],
+        "base_duration": 90,
+        "crossfade": 8,
+        "volume_curve": "descending",
+    },
+    "focus": {
+        "label": "Laser Focus",
+        "description": "Alpha-beta entrainment for deep concentration",
+        "frequencies": [528, 741, 285, 396],
+        "ambience": ["amb-temple"],
+        "mantras": [],
+        "base_duration": 60,
+        "crossfade": 4,
+        "volume_curve": "sustained",
+    },
+    "energy": {
+        "label": "Energy Surge",
+        "description": "High-frequency activation and rhythmic power",
+        "frequencies": [852, 963, 741, 528],
+        "ambience": ["amb-singing-bowl"],
+        "mantras": ["mantra-om-shanti", "mantra-gayatri"],
+        "base_duration": 45,
+        "crossfade": 3,
+        "volume_curve": "ascending",
+    },
+    "healing": {
+        "label": "Sacred Healing",
+        "description": "Full solfeggio cascade for cellular restoration",
+        "frequencies": [174, 285, 396, 417, 528, 639, 741, 852, 963],
+        "ambience": ["amb-singing-bowl", "amb-temple"],
+        "mantras": ["mantra-om-mani"],
+        "base_duration": 75,
+        "crossfade": 6,
+        "volume_curve": "wave",
+    },
+    "meditation": {
+        "label": "Deep Meditation",
+        "description": "Theta-alpha bridge with OM foundation",
+        "frequencies": [136.1, 7.83, 528, 174],
+        "ambience": ["amb-forest", "amb-rain"],
+        "mantras": ["mantra-so-ham", "mantra-om-shanti"],
+        "base_duration": 120,
+        "crossfade": 10,
+        "volume_curve": "arc",
+    },
+    "grounding": {
+        "label": "Earth Grounding",
+        "description": "Sub-bass resonance for energetic anchoring",
+        "frequencies": [7.83, 136.1, 174, 285],
+        "ambience": ["amb-forest"],
+        "mantras": [],
+        "base_duration": 60,
+        "crossfade": 5,
+        "volume_curve": "sustained",
+    },
+}
+
+VOLUME_CURVES = {
+    "descending": lambda i, n: max(0.2, 0.9 - (i / max(1, n - 1)) * 0.6),
+    "ascending": lambda i, n: min(0.95, 0.3 + (i / max(1, n - 1)) * 0.6),
+    "sustained": lambda i, n: 0.7,
+    "wave": lambda i, n: 0.5 + 0.35 * (1 if i % 2 == 0 else -1) * (0.5 + 0.5 * (i / max(1, n))),
+    "arc": lambda i, n: 0.4 + 0.5 * (1 - abs(2 * i / max(1, n) - 1)),
+}
+
+SOURCE_MAP = {s["id"]: s for s in STOCK_SOURCES}
+
+
+@router.post("/mixer/auto-compose")
+async def auto_compose(data: dict = Body(...), user=Depends(get_current_user)):
+    """AI Mantra DJ — auto-compose a track arrangement based on a wellness goal."""
+    user_id = user["id"]
+    goal_key = data.get("goal", "meditation")
+
+    if goal_key not in AUTO_COMPOSE_GOALS:
+        raise HTTPException(status_code=400, detail=f"Unknown goal. Options: {list(AUTO_COMPOSE_GOALS.keys())}")
+
+    goal = AUTO_COMPOSE_GOALS[goal_key]
+
+    # Get subscription tier for track limits
+    sub = await db.mixer_subscriptions.find_one({"user_id": user_id}, {"_id": 0})
+    tier_key = sub.get("tier", "discovery") if sub else "discovery"
+    if tier_key not in MIXER_TIERS:
+        tier_key = "discovery"
+    tier_config = MIXER_TIERS[tier_key]
+    layer_cap = tier_config["layer_cap"]
+    tier_idx = TIER_ORDER.index(tier_key)
+
+    # Get hexagram for resonance tuning
+    hex_doc = await db.hexagram_journal.find_one(
+        {"user_id": user_id}, {"_id": 0, "hexagram_id": 1}
+    )
+    hex_number = hex_doc.get("hexagram_id", 1) if hex_doc else 1
+    hex_idx = hex_number - 1
+    solf_freq = SOLFEGGIO[(hex_idx) % len(SOLFEGGIO)]
+
+    # Build track list from goal blueprint
+    composed_tracks = []
+
+    # 1. Core frequency tracks (tier-gated)
+    available_freqs = []
+    for freq in goal["frequencies"]:
+        # Find matching source
+        match = next((s for s in STOCK_SOURCES if s.get("frequency") == freq), None)
+        if match:
+            s_tier_idx = TIER_ORDER.index(match["tier"]) if match["tier"] in TIER_ORDER else 0
+            if tier_idx >= s_tier_idx:
+                available_freqs.append(match)
+        else:
+            # Create synthetic source for frequencies not in stock
+            available_freqs.append({
+                "id": f"auto-{freq}",
+                "label": f"Resonance {freq}Hz",
+                "type": "phonic_tone",
+                "frequency": freq,
+                "color": "#60A5FA",
+            })
+
+    # 2. Ambience tracks
+    available_ambience = []
+    for amb_id in goal["ambience"]:
+        src = SOURCE_MAP.get(amb_id)
+        if src:
+            s_tier_idx = TIER_ORDER.index(src["tier"]) if src["tier"] in TIER_ORDER else 0
+            if tier_idx >= s_tier_idx:
+                available_ambience.append(src)
+
+    # 3. Mantra tracks
+    available_mantras = []
+    for m_id in goal["mantras"]:
+        src = SOURCE_MAP.get(m_id)
+        if src:
+            s_tier_idx = TIER_ORDER.index(src["tier"]) if src["tier"] in TIER_ORDER else 0
+            if tier_idx >= s_tier_idx:
+                available_mantras.append(src)
+
+    # Determine max tracks based on tier
+    max_tracks = layer_cap if layer_cap > 0 else 20
+
+    # Compose arrangement: frequencies first, then ambience, then mantras
+    all_sources = available_freqs + available_ambience + available_mantras
+    all_sources = all_sources[:max_tracks]
+
+    vol_fn = VOLUME_CURVES.get(goal["volume_curve"], VOLUME_CURVES["sustained"])
+    n_tracks = len(all_sources)
+    crossfade = goal["crossfade"]
+    base_dur = goal["base_duration"]
+
+    for i, src in enumerate(all_sources):
+        # Stagger start times with cross-fade overlap
+        start_time = max(0, i * (base_dur - crossfade))
+        # Vary duration slightly for organic feel
+        duration = base_dur + (i % 3) * 5 - 5
+
+        composed_tracks.append({
+            "type": src.get("type", "phonic_tone"),
+            "source_id": src.get("id", ""),
+            "source_label": src.get("label", f"Track {i+1}"),
+            "volume": round(vol_fn(i, n_tracks), 2),
+            "muted": False,
+            "solo": False,
+            "start_time": start_time,
+            "duration": max(15, duration),
+            "frequency": src.get("frequency"),
+            "color": src.get("color", "#94A3B8"),
+            "locked": False,
+            "ripple_locked": False,
+        })
+
+    # Add hexagram resonance tone as a bonus layer if room
+    if len(composed_tracks) < max_tracks:
+        composed_tracks.append({
+            "type": "phonic_tone",
+            "source_id": f"hex-{hex_number}",
+            "source_label": f"Hexagram #{hex_number} Resonance ({solf_freq}Hz)",
+            "volume": 0.35,
+            "muted": False,
+            "solo": False,
+            "start_time": 0,
+            "duration": len(composed_tracks) * (base_dur - crossfade) + base_dur,
+            "frequency": solf_freq,
+            "color": "#C084FC",
+            "locked": False,
+            "ripple_locked": True,
+        })
+
+    # Deduct 1 AI credit
+    if sub:
+        credits = sub.get("ai_credits_remaining", 0)
+        if credits > 0:
+            await db.mixer_subscriptions.update_one(
+                {"user_id": user_id},
+                {"$inc": {"ai_credits_remaining": -1}}
+            )
+
+    total_duration = max(t["start_time"] + t["duration"] for t in composed_tracks) if composed_tracks else 0
+
+    return {
+        "goal": goal_key,
+        "goal_label": goal["label"],
+        "goal_description": goal["description"],
+        "tracks": composed_tracks,
+        "track_count": len(composed_tracks),
+        "total_duration_seconds": total_duration,
+        "crossfade_seconds": crossfade,
+        "volume_curve": goal["volume_curve"],
+        "hexagram_resonance": solf_freq,
+        "tier": tier_key,
+    }
+
+
+@router.get("/mixer/auto-compose/goals")
+async def get_auto_compose_goals():
+    """List available auto-compose goals."""
+    return {
+        "goals": [
+            {
+                "key": k,
+                "label": v["label"],
+                "description": v["description"],
+                "base_duration": v["base_duration"],
+            }
+            for k, v in AUTO_COMPOSE_GOALS.items()
+        ]
+    }
+
+
 @router.post("/mixer/tracks/toggle-lock")
 async def toggle_ripple_lock(data: dict = Body(...), user=Depends(get_current_user)):
     """Toggle ripple lock on a track (locked tracks don't shift during ripple edits)."""

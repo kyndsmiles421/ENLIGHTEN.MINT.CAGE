@@ -34,6 +34,8 @@ async def get_user_tier(user_id: str) -> dict:
         "_id": 0, "credits": 1, "fidelity_boost": 1,
     })
     credits_doc = u.get("credits", {}) if u else {}
+    if not isinstance(credits_doc, dict):
+        credits_doc = {}
     tier_id = credits_doc.get("tier", "free")
     discount = TIER_DISCOUNT.get(tier_id, 0)
     label = TIER_LABEL.get(tier_id, "Base")
