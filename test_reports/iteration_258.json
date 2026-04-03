@@ -1,0 +1,132 @@
+{
+  "summary": "Iteration 258 - Site-Wide Progressive Learning & Synthesis Engine Testing Complete. Backend: 15/15 tests passed (100%). Frontend: All UI components verified. New features: 3-Position Interaction Intensity Switch (Focus/Guided/Immersive), Segmented Academy zones (Foundation/Forge/Collective), Progressive Auto-Scale logic, Immersive mode golden overlay, Teachable moments context-aware micro-lessons.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration258_intensity_zones.py",
+    "/app/test_reports/pytest/pytest_iteration258_intensity_zones.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "academy.py: INTENSITY_LEVELS dict defines 3 levels (focus/guided/immersive) with teachable_moments, ghost_skeleton, forge_takeover flags",
+    "academy.py: PROGRAM_ZONES dict defines 3 zones (foundation/forge/collective) with colors and icons",
+    "academy.py: TEACHABLE_MOMENTS list has 6 context-aware micro-lessons with intensity_min requirements",
+    "academy.py: get_interaction_intensity() returns current level, auto_advance status, and all 3 levels",
+    "academy.py: set_interaction_intensity() validates level and persists to learning_profiles collection",
+    "academy.py: get_teachable_moments() filters by intensity level, context, completed modules, and dismissed moments",
+    "academy.py: check_auto_scale() checks resonance/modules thresholds for auto-advance (focus→guided: 200RP+2mod, guided→immersive: 1000RP+8mod)",
+    "academy.py: get_programs() now includes zone, zone_data, intensity, and zones array in response",
+    "AcademyPage.js: IntensitySwitch component renders 3-position slider with Focus/Guided/Immersive buttons",
+    "AcademyPage.js: ImmersiveOverlay component renders golden radial gradient when intensity='immersive'",
+    "AcademyPage.js: AutoScalePrompt component shows upgrade prompt with accept/dismiss buttons",
+    "AcademyPage.js: Zone tabs filter programs by zone (foundation/forge/collective)",
+    "ModalityContext.js: switchIntensity() calls PATCH /api/academy/intensity and updates state",
+    "ModalityContext.js: Auto-scale check runs every 60 seconds when autoAdvance is enabled"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration258_intensity_zones.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "None - used existing test user",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 258 verified Progressive Learning & Synthesis Engine: (1) GET /api/academy/intensity returns current intensity level (focus/guided/immersive), auto_advance status, and all 3 levels with properties (teachable_moments, ghost_skeleton, forge_takeover, color). (2) PATCH /api/academy/intensity switches intensity and optionally sets auto_advance preference. (3) GET /api/academy/teachable-moments returns filtered moments based on intensity level and context - returns empty array when intensity='focus'. (4) POST /api/academy/dismiss-moment dismisses a teachable moment. (5) GET /api/academy/auto-scale checks resonance/modules thresholds for auto-advance (focus→guided: 200RP+2mod, guided→immersive: 1000RP+8mod). (6) GET /api/academy/programs now includes zone, zone_data, intensity, and zones array. (7) Frontend: IntensitySwitch renders 3-position slider with data-testid='intensity-switch', 'intensity-focus', 'intensity-guided', 'intensity-immersive'. (8) Frontend: Zone tabs render with data-testid='zone-tabs', 'zone-all', 'zone-foundation', 'zone-forge', 'zone-collective'. (9) Frontend: ImmersiveOverlay (data-testid='immersive-overlay') shows golden gradient when intensity='immersive'. (10) Frontend: AutoScalePrompt (data-testid='auto-scale-prompt') shows upgrade prompt with accept/dismiss buttons. (11) Frontend: Modality toggle still works correctly after intensity changes. (12) Frontend: Lesson viewer opens and completes correctly. (13) Frontend: Forge Lab modal opens with matrix visualization. (14) Test user grad_test_522@test.com has 323 RP, 4/16 modules completed, Initiate tier.",
+  "features_verified": {
+    "backend_get_intensity": {
+      "status": "PASS",
+      "details": "GET /api/academy/intensity returns current intensity level, auto_advance status, and all 3 levels"
+    },
+    "backend_patch_intensity": {
+      "status": "PASS",
+      "details": "PATCH /api/academy/intensity switches intensity and returns updated data"
+    },
+    "backend_patch_intensity_auto_advance": {
+      "status": "PASS",
+      "details": "PATCH /api/academy/intensity with auto_advance field sets auto-advance preference"
+    },
+    "backend_teachable_moments_guided": {
+      "status": "PASS",
+      "details": "GET /api/academy/teachable-moments returns filtered moments based on intensity level"
+    },
+    "backend_teachable_moments_context": {
+      "status": "PASS",
+      "details": "GET /api/academy/teachable-moments?context=trade returns trade-specific teachable moments"
+    },
+    "backend_teachable_moments_focus_empty": {
+      "status": "PASS",
+      "details": "GET /api/academy/teachable-moments returns empty when intensity is 'focus'"
+    },
+    "backend_dismiss_moment": {
+      "status": "PASS",
+      "details": "POST /api/academy/dismiss-moment dismisses a teachable moment"
+    },
+    "backend_auto_scale_immersive": {
+      "status": "PASS",
+      "details": "GET /api/academy/auto-scale returns should_advance=false when already at immersive"
+    },
+    "backend_auto_scale_thresholds": {
+      "status": "PASS",
+      "details": "GET /api/academy/auto-scale checks resonance/modules thresholds correctly"
+    },
+    "backend_programs_zone_data": {
+      "status": "PASS",
+      "details": "GET /api/academy/programs includes zone and zone_data for each program"
+    },
+    "backend_programs_intensity": {
+      "status": "PASS",
+      "details": "GET /api/academy/programs includes intensity field"
+    },
+    "backend_programs_zones_array": {
+      "status": "PASS",
+      "details": "GET /api/academy/programs returns zones array with foundation/forge/collective"
+    },
+    "frontend_intensity_switch": {
+      "status": "PASS",
+      "details": "Interaction Intensity Switch renders with 3 options (Focus/Guided/Immersive)"
+    },
+    "frontend_intensity_click": {
+      "status": "PASS",
+      "details": "Clicking intensity buttons switches the active intensity"
+    },
+    "frontend_zone_tabs": {
+      "status": "PASS",
+      "details": "Zone tabs (All/Foundation/Forge/Collective) render and filter programs"
+    },
+    "frontend_zone_filter": {
+      "status": "PASS",
+      "details": "Clicking a zone tab filters programs to that zone only"
+    },
+    "frontend_immersive_overlay": {
+      "status": "PASS",
+      "details": "Immersive mode shows golden overlay"
+    },
+    "frontend_modality_toggle": {
+      "status": "PASS",
+      "details": "Modality toggle still works correctly after intensity changes"
+    },
+    "frontend_lesson_viewer": {
+      "status": "PASS",
+      "details": "Lesson viewer opens and completes correctly"
+    },
+    "frontend_forge_lab": {
+      "status": "PASS",
+      "details": "Forge Lab modal opens with matrix visualization"
+    },
+    "frontend_academy_header": {
+      "status": "PASS",
+      "details": "Academy header shows current modality and intensity mode"
+    },
+    "frontend_accreditation_stats": {
+      "status": "PASS",
+      "details": "Accreditation stats grid displays correctly"
+    }
+  }
+}

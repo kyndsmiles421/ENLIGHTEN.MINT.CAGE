@@ -7,6 +7,75 @@ import random
 
 router = APIRouter(prefix="/academy", tags=["Omni-Modality Learning & Accreditation"])
 
+# ─── Interaction Intensity Levels ───
+INTENSITY_LEVELS = {
+    "focus": {
+        "id": "focus",
+        "name": "Focus",
+        "label": "Passive",
+        "description": "Silent mode — H² tracks progress in background, UI stays clean.",
+        "teachable_moments": False,
+        "ghost_skeleton": False,
+        "forge_takeover": False,
+        "color": "#6B7280",
+    },
+    "guided": {
+        "id": "guided",
+        "name": "Guided",
+        "label": "Active",
+        "description": "Contextual micro-lessons appear as sidebar notifications.",
+        "teachable_moments": True,
+        "ghost_skeleton": True,
+        "forge_takeover": False,
+        "color": "#818CF8",
+    },
+    "immersive": {
+        "id": "immersive",
+        "name": "Immersive",
+        "label": "Catalyst",
+        "description": "Full-screen forge takeovers. Every action is a potential lab.",
+        "teachable_moments": True,
+        "ghost_skeleton": True,
+        "forge_takeover": True,
+        "color": "#FBBF24",
+    },
+}
+
+# ─── Program Zones ───
+PROGRAM_ZONES = {
+    "foundation": {"id": "foundation", "name": "The Foundation", "description": "Core H² logic, Sacred Geometry, and Platform Fundamentals.", "color": "#818CF8", "icon": "book"},
+    "forge": {"id": "forge", "name": "The Forge", "description": "Deep dives into Development, Engineering, and simulation mastery.", "color": "#22C55E", "icon": "hammer"},
+    "collective": {"id": "collective", "name": "The Collective", "description": "Broker Architecture, Linguistics, and the Circular Economy.", "color": "#FBBF24", "icon": "users"},
+}
+
+PROGRAM_ZONE_MAP = {
+    "foundations": "foundation",
+    "transmutation": "forge",
+    "sentinel_ops": "collective",
+}
+
+# ─── Teachable Moment Triggers ───
+TEACHABLE_MOMENTS = [
+    {"id": "tm_trade_basics", "trigger_context": "trade", "cluster": "finance", "module_id": "t1", "program_id": "transmutation",
+     "title": "Optimize Your Trade", "body": "You just executed a trade. Did you know timing it during a Harmony Surge saves 40% on transmutation?",
+     "intensity_min": "guided"},
+    {"id": "tm_determinant", "trigger_context": "hexagram", "cluster": "evolution", "module_id": "m4", "program_id": "foundations",
+     "title": "Reading Your Matrix", "body": "Your H² determinant just shifted. Understanding cross-cluster interference helps you keep it positive.",
+     "intensity_min": "guided"},
+    {"id": "tm_sentinel", "trigger_context": "post", "cluster": "security", "module_id": "s1", "program_id": "sentinel_ops",
+     "title": "Content Governance", "body": "The Sentinel scanned your post. Learn how phase-aware moderation adapts to platform activity.",
+     "intensity_min": "guided"},
+    {"id": "tm_constellation", "trigger_context": "constellation", "cluster": "evolution", "module_id": "m3", "program_id": "foundations",
+     "title": "Synergy Discovery", "body": "Great constellation! Achieving synergy bonds between 3+ modules unlocks advanced patterns.",
+     "intensity_min": "guided"},
+    {"id": "tm_surge", "trigger_context": "surge", "cluster": "finance", "module_id": "t3", "program_id": "transmutation",
+     "title": "Surge Detected", "body": "A Harmony Surge is active! This is the optimal window for transmutation — fees are at their lowest.",
+     "intensity_min": "guided"},
+    {"id": "tm_forge_deep", "trigger_context": "forge", "cluster": "evolution", "module_id": "t5", "program_id": "transmutation",
+     "title": "Forge Challenge", "body": "Your matrix state could be stronger. Try strengthening your weakest cluster before submitting.",
+     "intensity_min": "immersive"},
+]
+
 # ─── Learning Modalities ───
 MODALITIES = {
     "architect": {
@@ -289,6 +358,137 @@ async def get_modalities(user=Depends(get_current_user)):
     return {"modalities": list(MODALITIES.values())}
 
 
+@router.get("/intensity")
+async def get_interaction_intensity(user=Depends(get_current_user)):
+    """Get user's current interaction intensity level."""
+    pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
+    level = pref.get("intensity", "guided") if pref else "guided"
+    auto_advance = pref.get("auto_advance", True) if pref else True
+    return {
+        "intensity": level,
+        "intensity_data": INTENSITY_LEVELS.get(level, INTENSITY_LEVELS["guided"]),
+        "auto_advance": auto_advance,
+        "levels": list(INTENSITY_LEVELS.values()),
+    }
+
+
+@router.patch("/intensity")
+async def set_interaction_intensity(body: dict, user=Depends(get_current_user)):
+    """Set interaction intensity level (focus/guided/immersive)."""
+    level = body.get("intensity", "")
+    if level not in INTENSITY_LEVELS:
+        raise HTTPException(400, f"Invalid intensity. Valid: {list(INTENSITY_LEVELS.keys())}")
+    auto_advance = body.get("auto_advance")
+    update = {"intensity": level, "updated_at": datetime.now(timezone.utc).isoformat()}
+    if auto_advance is not None:
+        update["auto_advance"] = bool(auto_advance)
+    await db.learning_profiles.update_one(
+        {"user_id": user["id"]},
+        {"$set": {**update, "user_id": user["id"]}},
+        upsert=True,
+    )
+    return {
+        "intensity": level,
+        "intensity_data": INTENSITY_LEVELS[level],
+        "auto_advance": auto_advance if auto_advance is not None else True,
+    }
+
+
+@router.get("/teachable-moments")
+async def get_teachable_moments(user=Depends(get_current_user), context: str = "general"):
+    """Get contextual teachable moments based on user state and interaction intensity."""
+    pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
+    intensity = pref.get("intensity", "guided") if pref else "guided"
+    intensity_data = INTENSITY_LEVELS.get(intensity, INTENSITY_LEVELS["guided"])
+
+    if not intensity_data.get("teachable_moments"):
+        return {"moments": [], "intensity": intensity}
+
+    # Get completed modules to filter out already-learned content
+    progress = await db.learning_progress.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).to_list(200)
+    completed_ids = {p["module_id"] for p in progress if p.get("status") == "completed"}
+
+    # Get dismissed moments
+    dismissed = await db.dismissed_moments.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).to_list(100)
+    dismissed_ids = {d["moment_id"] for d in dismissed}
+
+    # Filter moments by context, intensity, and completion
+    intensity_order = ["focus", "guided", "immersive"]
+    user_level_idx = intensity_order.index(intensity)
+
+    moments = []
+    for tm in TEACHABLE_MOMENTS:
+        if tm["id"] in dismissed_ids:
+            continue
+        if tm["module_id"] in completed_ids:
+            continue
+        min_level = tm.get("intensity_min", "guided")
+        min_idx = intensity_order.index(min_level) if min_level in intensity_order else 1
+        if user_level_idx < min_idx:
+            continue
+        if context != "general" and tm.get("trigger_context") != context:
+            continue
+        moments.append(tm)
+
+    # Limit to top 2 most relevant
+    return {"moments": moments[:2], "intensity": intensity}
+
+
+@router.post("/dismiss-moment")
+async def dismiss_teachable_moment(body: dict, user=Depends(get_current_user)):
+    """Dismiss a teachable moment so it doesn't appear again."""
+    moment_id = body.get("moment_id", "")
+    await db.dismissed_moments.update_one(
+        {"user_id": user["id"], "moment_id": moment_id},
+        {"$set": {"user_id": user["id"], "moment_id": moment_id, "dismissed_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True,
+    )
+    return {"dismissed": moment_id}
+
+
+@router.get("/auto-scale")
+async def check_auto_scale(user=Depends(get_current_user)):
+    """Check if user qualifies for auto-advance to higher interaction intensity."""
+    pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
+    intensity = pref.get("intensity", "guided") if pref else "guided"
+    auto_advance = pref.get("auto_advance", True) if pref else True
+
+    if not auto_advance or intensity == "immersive":
+        return {"should_advance": False, "current": intensity}
+
+    # Check resonance score
+    score = await db.accreditation_scores.find_one({"user_id": user["id"]}, {"_id": 0})
+    resonance = score.get("total_resonance_points", 0) if score else 0
+    modules_completed = score.get("modules_completed", 0) if score else 0
+
+    # Auto-scale thresholds
+    should_advance = False
+    reason = ""
+    target = intensity
+
+    if intensity == "focus" and resonance >= 200 and modules_completed >= 2:
+        should_advance = True
+        target = "guided"
+        reason = "You've completed enough modules. Guided mode will offer contextual learning tips."
+    elif intensity == "guided" and resonance >= 1000 and modules_completed >= 8:
+        should_advance = True
+        target = "immersive"
+        reason = "Cognitive efficiency is peaking. Unlock Immersive mode for maximum growth."
+
+    return {
+        "should_advance": should_advance,
+        "current": intensity,
+        "target": target,
+        "reason": reason,
+        "resonance_score": resonance,
+        "modules_completed": modules_completed,
+    }
+
+
 @router.get("/modality")
 async def get_user_modality(user=Depends(get_current_user)):
     pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
@@ -316,6 +516,7 @@ async def get_programs(user=Depends(get_current_user)):
     pref = await db.learning_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
     modality = pref.get("modality", "architect") if pref else "architect"
     mod_data = MODALITIES.get(modality, MODALITIES["architect"])
+    intensity = pref.get("intensity", "guided") if pref else "guided"
 
     progress = await db.learning_progress.find(
         {"user_id": user["id"]}, {"_id": 0}
@@ -338,15 +539,18 @@ async def get_programs(user=Depends(get_current_user)):
             })
         total = len(modules)
         done = sum(1 for m in modules if m["completed"])
+        zone_id = PROGRAM_ZONE_MAP.get(prog["id"], "foundation")
         result.append({
             **prog,
             "modules": modules,
             "progress": round(done / max(total, 1), 4),
             "completed": done == total,
             "modality_skin": mod_data,
+            "zone": zone_id,
+            "zone_data": PROGRAM_ZONES.get(zone_id, PROGRAM_ZONES["foundation"]),
         })
 
-    return {"programs": result, "modality": modality}
+    return {"programs": result, "modality": modality, "intensity": intensity, "zones": list(PROGRAM_ZONES.values())}
 
 
 @router.get("/lesson/{module_id}")
