@@ -23,6 +23,7 @@ import { MixerProvider } from './context/MixerContext';
 import { FocusProvider } from './context/FocusContext';
 import { ClassProvider } from './context/ClassContext';
 import { TreasuryProvider } from './context/TreasuryContext';
+import { ModalityProvider } from './context/ModalityContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import { ResolutionProvider } from './context/ResolutionContext';
 import CosmicToolbar from './components/CosmicToolbar';
@@ -184,6 +185,7 @@ const TradeCircleOrbital = lazy(() => import('./pages/TradeCircleOrbital'));
 const CodexOrbital = lazy(() => import('./pages/CodexOrbital'));
 const MasteryPath = lazy(() => import('./pages/MasteryPath'));
 const SovereignDashboard = lazy(() => import('./pages/SovereignDashboard'));
+const AcademyPage = lazy(() => import('./pages/AcademyPage'));
 
 function PageLoader() {
   return (
@@ -343,6 +345,7 @@ function AnimatedRoutes() {
         <Route path="/codex-orbital" element={<CodexOrbital />} />
         <Route path="/mastery-path" element={<MasteryPath />} />
         <Route path="/sovereign-admin" element={<SovereignDashboard />} />
+        <Route path="/academy" element={<AcademyPage />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -364,6 +367,7 @@ function App() {
       <FocusProvider>
       <ClassProvider>
       <TreasuryProvider>
+      <ModalityProvider>
       <ResolutionProvider>
       <SensoryProvider>
       <CosmicStateProvider>
@@ -410,6 +414,7 @@ function App() {
       </CosmicStateProvider>
       </SensoryProvider>
       </ResolutionProvider>
+      </ModalityProvider>
       </TreasuryProvider>
       </ClassProvider>
       </FocusProvider>

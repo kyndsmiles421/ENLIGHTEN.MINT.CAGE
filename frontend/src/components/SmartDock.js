@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
@@ -251,6 +251,7 @@ export default function SmartDock() {
     { id: 'assistant', icon: Sparkles, label: 'Sage', color: '#C084FC' },
     { id: 'frequency', icon: Headphones, label: 'Tones', color: '#2DD4BF' },
     { id: 'mixer', icon: Waves, label: 'Mixer', color: '#818CF8' },
+    { id: 'academy', icon: Award, label: 'Academy', color: '#FBBF24' },
     { id: 'language', icon: Globe, label: 'Lang', color: '#F59E0B' },
     { id: 'feedback', icon: Send, label: 'Feedback', color: '#86EFAC' },
     { id: 'help', icon: BookOpen, label: 'Help', color: '#FCD34D' },
@@ -436,6 +437,7 @@ export default function SmartDock() {
             <LanguagePanel onClose={() => setActivePanel(null)} />
           </div>
         )}
+        {activePanel === 'academy' && (() => { navigate('/academy'); setActivePanel(null); return null; })()}
       </AnimatePresence>
 
       {/* ── Kinetic dock pill — adapts to horizontal/vertical orientation ── */}
