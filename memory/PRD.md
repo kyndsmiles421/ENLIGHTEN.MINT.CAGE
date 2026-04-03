@@ -151,10 +151,42 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 │   ├── constellations.py (Constellation recipes CRUD + marketplace + mirror hook)
 │   ├── sentinel.py (Content Sentinel: scan, log, shadow-mute, stats)
 │   ├── guilds.py (Guild channels, identity modes, feed posting)
+│   ├── academy.py (Omni-Modality Learning: modalities, programs, lessons, forge labs, accreditation, certifications)
 ```
 
 ## Iteration History
-### Iteration 252 — Collective Resonance Dashboard + Harmony Surge + Dynamic Fee Adjuster (Apr 3, 2026) — LATEST
+### Iteration 253 — Omni-Modality Learning System & Forge Simulation Labs (Apr 3, 2026) — LATEST
+- **Quad-Core Learning Modalities**: 4 learning frameworks (Architect/Gaming, Chef/Applied, Researcher/Analytical, Voyager/Sensory)
+  - `GET /api/academy/modalities` — returns all 4 modalities with xp_multiplier, colors, labels
+  - `GET /api/academy/modality` — user's current modality (default: architect)
+  - `PATCH /api/academy/modality` — switch modality, dynamically reskins all module labels
+- **Curriculum Programs**: 3 programs with 16 total modules across Initiate/Apprentice/Journeyman tiers
+  - `GET /api/academy/programs` — returns programs with modality-skinned labels, progress tracking
+  - Programs: Foundations of the Collective (6 modules), The Art of Transmutation (6 modules), Sentinel Operations (4 modules)
+- **Lesson Viewer**: Step-through content system with progress dots, key concepts, and modality-themed UI
+  - `GET /api/academy/lesson/{module_id}` — returns lesson content with sections and key_concepts
+  - 8 lesson modules with full educational content (Central Bank, Identity, H² Matrix, Dust Strategies, etc.)
+- **Forge Simulation Labs**: Interactive H² matrix visualization with animated cluster grid
+  - `GET /api/academy/forge/{program_id}/{module_id}` — returns 4×4 cluster matrix, cluster scores, H² state, challenge tasks
+  - Canvas-based animated ForgeMatrix component showing real-time cluster interference patterns
+  - Determinant indicator pulses based on H² state (positive=green, negative=red)
+  - 8 forge challenges with weighted task breakdowns
+  - H² determinant validation: labs/tests BLOCK completion if determinant ≤ 0
+- **Integrated Accreditation**: Unified scoring with mastery tiers and fractal certificates
+  - `GET /api/academy/accreditation` — mastery level, progress_to_next, modules_total, certifications
+  - 6 mastery tiers: Initiate → Apprentice → Journeyman → Master → Grand Master → Sovereign
+  - MasteryRing SVG component with animated progress
+  - Resonance points = weighted_focus_time × complexity × modality_xp_multiplier × 10
+  - Dust rewards = 50% of resonance points
+- **Dynamic Fractal Certificates**: Canvas-rendered fractal patterns seeded from H² binary state
+  - FractalCertificate component generates unique radial/bilateral fractals per certification
+  - Fingerprint format: hex segments from 24-bit binary (e.g., "F-3-A-2-7-1")
+  - Auto-issued when all program modules are completed
+  - Mirrored to sovereign_mirror for admin oversight
+- **Academy UI**: Full-featured page with expandable/collapsible programs, modality toggle, accreditation stats grid
+- Tests: Backend 19/19 (100%), Frontend 100%
+
+### Iteration 252 — Collective Resonance Dashboard + Harmony Surge + Dynamic Fee Adjuster (Apr 3, 2026)
 - **Global Matrix Aggregator**: Background task runs every 60s, pulls all user H² tensors, computes element-wise average across the entire platform
   - `POST /api/resonance/trigger-aggregation` — manual trigger
   - `GET /api/resonance/global` — returns global_density, cross_cluster_resonance, 4×4 cluster_heatmap, surge status
@@ -311,23 +343,25 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
+## Upcoming (P0-P1) — Iteration 254: "Life-Force" Enhancements
+- **Circularity KPI (Backend)**: Every trade/transmutation tagged with a Circularity Score measuring positive ecosystem impact. High-circularity users earn a "Resonance Multiplier" reducing their variable return tax. Integrated into AI Broker architecture.
+- **Context-Aware Engine (Predictive Modality Switching)**: Device sensor mapping → auto-switch modality based on movement/GPS (Voyager for mobile), stationary (Researcher for focus), accelerometer (Chef for active). Optional, not mandatory.
+- **Ecosystem Health Dashboard**: High-level "Pulse" view above Collective Resonance. Circularity peak triggers "Global Renaissance" event — temporarily lowers certification costs for communal learning surge.
+- **Circularity Score Visibility**: Hybrid (private by default, opt-in to public leaderboard). All features optional, not mandatory.
+
 ## Upcoming (P1)
-- **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation, sensitivity weighted by hexagram alignment
+- **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation
 - **Ghost Skeleton UI Optimization**: Skeleton loaders before canvas items render
-- **Fractal Receipt Generation**: Unique fractal pattern per trade (H² matrix state fingerprint)
-- **24-Line Hexagram Pillar UI**: Animated vertical pillar visualization during trade settlement
 
 ## Future/Backlog (P2)
-- **Oracle Navigation Loop**: I Ching → GPS Map → Artifact discovery → Forge upgrade → Class Stats
-- **Harmony Commerce Loop**: Frequency + Fractal → Escrow Contract → Trade Circle → Social Capital
-- **Trade Circle Visualization**: Circular reciprocity UI replacing cart/checkout
-- **Gesture Ring**: Multi-touch frequency/geometry manipulation for Hyper-Focus mode
-- **Biometric Authorization**: Long-press haptic handshake for high-value trades
-- 54-Sublayer L² Fractal Engine
-- GPS-Based Cosmic Map
-- Forge Mini-Game (3D asset generation from hexagram binary)
-- Phygital Marketplace / Server-Side Escrow (GPS-confirmed delivery)
-- Skeleton Loading (Ghost Skeleton UI while complex logic populates)
+- 54-Sublayer L² Fractal Engine deep integration
+- GPS-Based Cosmic Map & Phygital Marketplace foraging
+- Oracle Navigation Loop: I Ching → GPS Map → Artifact discovery → Forge upgrade
+- Harmony Commerce Loop: Frequency + Fractal → Escrow Contract → Trade Circle
+- Biometric Resonance Scaling (Haptic Feedback): Cluster-specific vibration patterns during Harmony Surge
+- AI Co-Pilot Labs: Machine Experience collaboration in Researcher labs
+- Trade Circle Visualization: Circular reciprocity UI
+- Gesture Ring: Multi-touch frequency/geometry manipulation
 - Tiered Subscription Matrix: Foundation ($0) → Civilization → Sovereignty
 
 ## Test Credentials
