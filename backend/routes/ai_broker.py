@@ -28,32 +28,78 @@ async def _get_reserve():
 
 
 async def _run_quad_scan(initiator_id, target_id):
-    """Run the 24-line Hexagram Quad-Scan through the quad_hexagram engine."""
-    from routes.quad_hexagram import detect_phase, resolve_security, resolve_finance, resolve_evolution
+    """Run the H² recursive 2-pass Quad-Scan through the matrix engine.
+    
+    Pass 1 (Proposal): Does the trade align with fundamental 24-line rules?
+    Pass 2 (Impact): How does this trade change the vibration of the other 23 lines?
+    Final Key: Determinant must be positive (trade adds value, not extracts).
+    """
+    from routes.quad_hexagram import (
+        detect_phase, resolve_security, resolve_finance, resolve_evolution,
+        resolve_location, compute_h2_matrix, compute_matrix_determinant_proxy,
+        compute_cross_cluster_resonance, compute_matrix_density,
+        compute_variable_return_tax, apply_cross_cluster_effects,
+    )
 
     phase = await detect_phase(initiator_id)
 
+    # Resolve full state vectors for both users
     i_sec = await resolve_security(initiator_id, phase)
+    i_loc = await resolve_location(initiator_id)
     i_fin = await resolve_finance(initiator_id)
     i_evo = await resolve_evolution(initiator_id)
 
     t_sec = await resolve_security(target_id, phase)
+    t_loc = await resolve_location(target_id)
     t_fin = await resolve_finance(target_id)
+    t_evo = await resolve_evolution(target_id)
 
+    i_vector = i_sec + i_loc + i_fin + i_evo
+    t_vector = t_sec + t_loc + t_fin + t_evo
+
+    # ─── Pass 1: Fundamental Rule Check ───
     sec_total = sum(i_sec) + sum(t_sec)
     fin_total = sum(i_fin) + sum(t_fin)
-
     sec_pass = sec_total >= 8
     fin_pass = fin_total >= 4
+    pass1_cleared = sec_pass and fin_pass
 
-    # Evolution check: Lines 19-24 detect "high-exit" movements
-    evo_exit_risk = sum(i_evo[4:6]) < 2  # Lines 23-24 misaligned = exit risk
+    # ─── Pass 2: Impact Analysis via H² Matrix ───
+    # Compute combined state vector (OR of both users' lines = maximum potential)
+    combined_vector = [max(i_vector[k], t_vector[k]) for k in range(24)]
+    matrix = compute_h2_matrix(combined_vector, phase)
+    determinant = compute_matrix_determinant_proxy(matrix, combined_vector)
+    density = compute_matrix_density(matrix)
+    resonance = compute_cross_cluster_resonance(matrix)
+    variable_tax = compute_variable_return_tax(matrix)
+    effects = apply_cross_cluster_effects(combined_vector, resonance)
+
+    # Determinant check: positive = adds value, negative = extracts
+    determinant_positive = determinant > 0
+    pass2_cleared = determinant_positive
+
+    # Evolution exit risk
+    evo_exit_risk = sum(i_evo[4:6]) < 2
 
     return {
-        "cleared": sec_pass and fin_pass,
+        "cleared": pass1_cleared and pass2_cleared,
         "phase": phase,
-        "security_pass": sec_pass,
-        "finance_pass": fin_pass,
+        "pass1": {
+            "cleared": pass1_cleared,
+            "security_pass": sec_pass,
+            "finance_pass": fin_pass,
+            "security_combined": sec_total,
+            "finance_combined": fin_total,
+        },
+        "pass2": {
+            "cleared": pass2_cleared,
+            "determinant": determinant,
+            "determinant_positive": determinant_positive,
+            "matrix_density": density,
+            "cross_cluster_resonance": resonance,
+        },
+        "variable_return_tax": variable_tax,
+        "cross_effects": effects,
         "exit_risk": evo_exit_risk,
         "details": {
             "security_combined": sec_total,
@@ -113,7 +159,7 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
     now = datetime.now(timezone.utc).isoformat()
     trade_id = str(uuid.uuid4())
 
-    # ─── Step 2: Escrow Hold ───
+    # ─── Step 2: Escrow Hold (with H² tensor data) ───
     escrow_doc = {
         "id": trade_id,
         "type": "broker_trade",
@@ -124,6 +170,9 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
         "gross_amount": amount,
         "phase_mode": scan["phase"],
         "quad_scan": scan["details"],
+        "h2_pass1": scan["pass1"],
+        "h2_pass2": scan["pass2"],
+        "cross_effects": scan.get("cross_effects"),
         "created_at": now,
     }
     await db.broker_escrow.insert_one(escrow_doc)
@@ -131,10 +180,11 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
     # ─── Step 3: Commerce Fee ───
     commerce_fee = max(1, int(amount * HARMONY_COMMERCE_FEE / 100))
 
-    # ─── Step 4: Evolution Exit-Risk Check ───
+    # ─── Step 4: Variable Exit Tax from H² Matrix ───
     exit_tax = 0
+    variable_tax_rate = scan.get("variable_return_tax", RETURN_TAX_PERCENT)
     if scan["exit_risk"]:
-        exit_tax = int(amount * RETURN_TAX_PERCENT / 100)
+        exit_tax = int(amount * variable_tax_rate / 100)
 
     net_to_receiver = amount - commerce_fee - exit_tax
 
@@ -176,7 +226,7 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
         ledger_entries.append({
             "id": str(uuid.uuid4()), "trade_id": trade_id, "user_id": SOVEREIGN_ADMIN_ID,
             "type": "return_tax", "currency": currency, "amount": exit_tax,
-            "description": f"{RETURN_TAX_PERCENT}% Return Tax (exit risk)", "created_at": now,
+            "description": f"{variable_tax_rate}% Return Tax (H² matrix-adjusted)", "created_at": now,
         })
     await db.hub_ledger.insert_many(ledger_entries)
 
@@ -231,8 +281,16 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
         "gross_amount": amount,
         "commerce_fee": commerce_fee,
         "exit_tax": exit_tax,
+        "exit_tax_rate": variable_tax_rate if exit_tax > 0 else 0,
         "net_to_receiver": net_to_receiver,
         "phase_mode": scan["phase"],
+        "h2_analysis": {
+            "pass1": scan["pass1"]["cleared"],
+            "pass2": scan["pass2"]["cleared"],
+            "determinant": scan["pass2"]["determinant"],
+            "matrix_density": scan["pass2"]["matrix_density"],
+            "economy_health": scan.get("cross_effects", {}).get("economy_health", "stable"),
+        },
         "sender_balance": {"dust": updated["dust"], "gems": updated["gems"]},
     }
 
@@ -327,22 +385,45 @@ async def get_broker_escrow(user=Depends(get_current_user), skip: int = 0, limit
 
 @router.get("/scan-preview")
 async def scan_preview(body: dict = None, user=Depends(get_current_user)):
-    """Preview what the Quad-Scan would return for a hypothetical trade."""
-    from routes.quad_hexagram import detect_phase, resolve_security, resolve_finance, resolve_evolution
+    """Preview the H² Quad-Scan for the current user showing trade readiness."""
+    from routes.quad_hexagram import (
+        detect_phase, resolve_security, resolve_finance, resolve_evolution,
+        resolve_location, compute_h2_matrix, compute_matrix_determinant_proxy,
+        compute_cross_cluster_resonance, compute_matrix_density,
+        compute_variable_return_tax, apply_cross_cluster_effects,
+    )
 
     phase = await detect_phase(user["id"])
     sec = await resolve_security(user["id"], phase)
+    loc = await resolve_location(user["id"])
     fin = await resolve_finance(user["id"])
     evo = await resolve_evolution(user["id"])
+
+    state_vector = sec + loc + fin + evo
+    matrix = compute_h2_matrix(state_vector, phase)
+    density = compute_matrix_density(matrix)
+    determinant = compute_matrix_determinant_proxy(matrix, state_vector)
+    resonance = compute_cross_cluster_resonance(matrix)
+    variable_tax = compute_variable_return_tax(matrix)
+    effects = apply_cross_cluster_effects(state_vector, resonance)
 
     return {
         "phase": phase,
         "security_lines": sec,
+        "location_lines": loc,
         "finance_lines": fin,
         "evolution_lines": evo,
         "security_score": sum(sec),
         "finance_score": sum(fin),
         "evolution_score": sum(evo),
         "exit_risk": sum(evo[4:6]) < 2,
-        "trade_ready": sum(sec) >= 4 and sum(fin) >= 3,
+        "trade_ready": sum(sec) >= 4 and sum(fin) >= 2,
+        "h2_analysis": {
+            "matrix_density": density,
+            "determinant": determinant,
+            "determinant_positive": determinant > 0,
+            "variable_return_tax": variable_tax,
+            "cross_cluster_resonance": resonance,
+            "cross_effects": effects,
+        },
     }

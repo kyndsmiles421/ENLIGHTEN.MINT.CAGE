@@ -8,6 +8,7 @@ import { useClass, CLASS_COLORS } from '../context/ClassContext';
 import { useAuth } from '../context/AuthContext';
 import ConstellationPanel from './ConstellationPanel';
 import CommunityPanel from './CommunityPanel';
+import HexagramGrid from './HexagramGrid';
 
 /* ── Haptic helper with weight support ── */
 let Haptics;
@@ -391,6 +392,7 @@ export default function OrbitalMixer() {
   const [constellationOpen, setConstellationOpen] = useState(false);
   const [classPickerOpen, setClassPickerOpen] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
+  const [hexGridOpen, setHexGridOpen] = useState(false);
   const [feedNotification, setFeedNotification] = useState(false);
   const [dragPositions, setDragPositions] = useState({}); // { modId: {x,y} } for synergy discovery
   const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
@@ -751,8 +753,24 @@ export default function OrbitalMixer() {
         })}
       </svg>
 
-      {/* Action buttons: Constellation + Community + Focus */}
+      {/* Action buttons: H² + Community + Constellation + Focus */}
       <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
+        <motion.button
+          whileTap={{ scale: 0.85 }}
+          onClick={() => { haptic('Light'); setHexGridOpen(!hexGridOpen); }}
+          className="flex items-center gap-1 px-2 py-1 rounded-full"
+          style={{
+            background: hexGridOpen ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${hexGridOpen ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)'}`,
+            color: hexGridOpen ? '#FBBF24' : 'rgba(248,250,252,0.4)',
+            fontSize: '9px',
+            cursor: 'pointer',
+          }}
+          data-testid="orbital-hexgrid-btn"
+        >
+          H²
+        </motion.button>
+
         <motion.button
           whileTap={{ scale: 0.85 }}
           onClick={() => { haptic('Light'); setCommunityOpen(!communityOpen); setFeedNotification(false); }}
@@ -832,6 +850,18 @@ export default function OrbitalMixer() {
             <CommunityPanel
               isOpen={communityOpen}
               onClose={() => setCommunityOpen(false)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* H² Hexagram Grid Panel */}
+      <AnimatePresence>
+        {hexGridOpen && (
+          <div className="absolute top-10 right-3 z-30" style={{ width: isMobile ? 300 : 340 }}>
+            <HexagramGrid
+              isOpen={hexGridOpen}
+              onClose={() => setHexGridOpen(false)}
             />
           </div>
         )}
