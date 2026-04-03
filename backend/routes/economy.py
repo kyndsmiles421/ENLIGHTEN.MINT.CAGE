@@ -16,48 +16,87 @@ SUBSCRIPTION_TIERS = {
     "discovery": {
         "id": "discovery",
         "name": "Discovery",
-        "label": "Base",
+        "label": "Seeker",
         "price_monthly": 0.0,
+        "education_level": "Foundation",
+        "education_desc": "Intro to Circular Economies, Basic Wellness",
+        "monetization": "Consumer Status — buy Time, Energy, or Utilities from the Broker",
         "features": [
-            "Standard UI & foundational classes",
-            "Community forums access",
-            "Standard resolution visuals",
+            "Foundation-level education",
+            "Buy & transfer Dust (no selling)",
+            "Standard Map access",
+            "Community forums",
         ],
         "marketplace_discount": 0,
         "max_project_slots": 3,
         "fidelity": "Standard",
         "forge_access": False,
-        "max_commission_tier": 2,
+        "max_commission_tier": 1,
+        "can_sell": False,
+        "beacon": False,
         "color": "#6B7280",
     },
     "resonance": {
         "id": "resonance",
         "name": "Resonance",
-        "label": "Premium",
-        "price_monthly": 44.99,
+        "label": "Artisan",
+        "price_monthly": 27.00,
+        "education_level": "Creator",
+        "education_desc": "UI/UX Design, Geometry of Sound, Modular Basics",
+        "monetization": "Trusted Trader — P2P Beacon notifications for local bartering",
         "features": [
-            "Advanced toolsets (Calculators, Repos, Calendars)",
-            "15% Marketplace discount",
-            "2K visual fidelity",
-            "Ghost Skeleton interactive UI",
+            "Creator-level education",
+            "5% member discount on all purchases",
+            "P2P Beacon notifications",
+            "Modular UI customization unlocked",
         ],
-        "marketplace_discount": 15,
-        "max_project_slots": 10,
-        "fidelity": "2K",
+        "marketplace_discount": 5,
+        "max_project_slots": 8,
+        "fidelity": "HD",
         "forge_access": False,
-        "max_commission_tier": 3,
+        "max_commission_tier": 2,
+        "can_sell": True,
+        "beacon": True,
         "color": "#818CF8",
     },
     "sovereign": {
         "id": "sovereign",
         "name": "Sovereign",
-        "label": "Elite",
-        "price_monthly": 89.99,
+        "label": "Alchemist",
+        "price_monthly": 49.00,
+        "education_level": "Specialist",
+        "education_desc": "Solfeggio Frequencies, AI Sanctuary Management, Sacred Geometry",
+        "monetization": "Value Optimizer — full AI integration and priority visibility",
         "features": [
-            "Unlimited project slots",
-            "Maximum Marketplace discounts",
-            "Synthesis Forge access",
-            "4K/8D immersive visuals",
+            "Specialist-level education",
+            "15% member discount on all Dust & Energy",
+            "Full AI integration",
+            "Vocal resonance analysis",
+            "Priority trade directory visibility",
+        ],
+        "marketplace_discount": 15,
+        "max_project_slots": 20,
+        "fidelity": "2K",
+        "forge_access": True,
+        "max_commission_tier": 3,
+        "can_sell": True,
+        "beacon": True,
+        "color": "#2DD4BF",
+    },
+    "architect": {
+        "id": "architect",
+        "name": "Architect",
+        "label": "Infrastructure Partner",
+        "price_monthly": 89.00,
+        "education_level": "Professional",
+        "education_desc": "CI/CD Pipelines, Infrastructure Architecture, Business Logistics",
+        "monetization": "Infrastructure Partner — full dev suite and priority server resources",
+        "features": [
+            "Professional-level education",
+            "30% member discount on all assets",
+            "Full Development Suite",
+            "Priority server resources",
+            "Large-scale operations (Cafe/Maintenance)",
             "Unlocks 27% Master commission",
         ],
         "marketplace_discount": 30,
@@ -65,6 +104,8 @@ SUBSCRIPTION_TIERS = {
         "fidelity": "4K/8D",
         "forge_access": True,
         "max_commission_tier": 4,
+        "can_sell": True,
+        "beacon": True,
         "color": "#FBBF24",
     },
 }
@@ -144,11 +185,14 @@ PACK_CATEGORIES = {
 
 # ─── Brokerage Commission Tiers ───
 COMMISSION_TIERS = [
-    {"level": 1, "name": "Observer", "label": "Foundational", "commission_rate": 0.0, "status": "Student/Viewer", "color": "#6B7280"},
-    {"level": 2, "name": "Practitioner", "label": "Focus", "commission_rate": 6.75, "status": "Active user utilizing standard templates", "color": "#818CF8"},
-    {"level": 3, "name": "Professional", "label": "Guided", "commission_rate": 13.5, "status": "Ghost Skeleton interactive UI & real-time coaching", "color": "#22C55E"},
-    {"level": 4, "name": "Sovereign", "label": "Mastery", "commission_rate": 27.0, "status": "Mentoring, peer-review authority, cross-domain synthesis", "color": "#FBBF24"},
+    {"level": 1, "name": "Observer", "label": "Foundational", "commission_rate": 0.0, "status": "Consumer — buy only, no selling", "color": "#6B7280"},
+    {"level": 2, "name": "Practitioner", "label": "Focus", "commission_rate": 6.75, "status": "Trusted Trader with P2P Beacon access", "color": "#818CF8"},
+    {"level": 3, "name": "Professional", "label": "Guided", "commission_rate": 13.5, "status": "Value Optimizer with full AI integration", "color": "#2DD4BF"},
+    {"level": 4, "name": "Sovereign", "label": "Mastery", "commission_rate": 27.0, "status": "Infrastructure Partner, peer-review authority", "color": "#FBBF24"},
 ]
+
+# ─── Integrated Loop: Failed Trade Charge ───
+FAILED_TRADE_CHARGE_RATE = 0.30  # 30% of escrowed value lost on failed trades
 
 # ─── Polymath All-Access Pass ───
 POLYMATH_PASS = {
@@ -156,9 +200,10 @@ POLYMATH_PASS = {
     "name": "Polymath All-Access Pass",
     "price_annual": 1797.00,
     "inclusions": [
-        "Full Sovereign Elite App Subscription ($89.99/mo value)",
+        "Full Architect-tier subscription ($89/mo value)",
         "Instant unlock of all current and future Specialized Packs",
-        "Instant Level 4 Sovereign Status (27% Commission) across every module",
+        "Instant Level 4 Sovereign Status (27% Commission) across every domain",
+        "30% member discount on all assets",
     ],
     "color": "#C084FC",
 }
@@ -491,7 +536,7 @@ async def get_checkout_status(session_id: str, user=Depends(get_current_user), r
             await db.subscriptions.update_one(
                 {"user_id": uid},
                 {"$set": {
-                    "user_id": uid, "tier": "sovereign",
+                    "user_id": uid, "tier": "architect",
                     "polymath": True, "polymath_started_at": now,
                     "started_at": now, "updated_at": now,
                 }},
@@ -538,3 +583,41 @@ async def downgrade_to_discovery(user=Depends(get_current_user)):
         upsert=True,
     )
     return {"tier": "discovery", "message": "Downgraded to Discovery"}
+
+
+@router.get("/discount-rate")
+async def get_discount_rate(user=Depends(get_current_user)):
+    """Get user's current discount rate based on subscription tier."""
+    sub = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
+    tier_id = sub.get("tier", "discovery") if sub else "discovery"
+    tier = SUBSCRIPTION_TIERS.get(tier_id, SUBSCRIPTION_TIERS["discovery"])
+    return {
+        "tier": tier_id,
+        "discount_percent": tier["marketplace_discount"],
+        "can_sell": tier.get("can_sell", False),
+        "beacon": tier.get("beacon", False),
+        "education_level": tier.get("education_level", "Foundation"),
+        "failed_trade_charge": FAILED_TRADE_CHARGE_RATE,
+    }
+
+
+@router.post("/apply-discount")
+async def apply_discount(body: dict, user=Depends(get_current_user)):
+    """Calculate discounted price for a purchase based on tier."""
+    base_price = body.get("base_price", 0)
+    if base_price <= 0:
+        raise HTTPException(400, "base_price must be positive")
+
+    sub = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
+    tier_id = sub.get("tier", "discovery") if sub else "discovery"
+    tier = SUBSCRIPTION_TIERS.get(tier_id, SUBSCRIPTION_TIERS["discovery"])
+    discount = tier["marketplace_discount"] / 100.0
+    discounted_price = round(base_price * (1 - discount), 2)
+
+    return {
+        "base_price": base_price,
+        "discount_percent": tier["marketplace_discount"],
+        "discount_amount": round(base_price - discounted_price, 2),
+        "final_price": discounted_price,
+        "tier": tier_id,
+    }

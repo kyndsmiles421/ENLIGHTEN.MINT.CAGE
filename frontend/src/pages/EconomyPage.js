@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-const TIER_ICONS = { discovery: Eye, resonance: Zap, sovereign: Crown };
+const TIER_ICONS = { discovery: Eye, resonance: Zap, sovereign: Crown, architect: Compass };
 const DOMAIN_ICONS = { culinary: Coffee, engineering: Code, horticulture: Leaf, business: Briefcase };
 const CAT_ICONS = { mini: Package, mastery: BookOpen, business: Briefcase };
 
@@ -43,11 +43,11 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
           </div>
           <div>
             <div className="text-xs font-semibold" style={{ color: tier.color }}>{tier.name}</div>
-            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{tier.label} Tier</div>
+            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{tier.label}</div>
           </div>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-2">
           {isFree ? (
             <span className="text-lg font-bold" style={{ color: '#F8FAFC' }}>Free</span>
           ) : (
@@ -58,7 +58,19 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
           )}
         </div>
 
-        <div className="space-y-1.5 mb-3">
+        {/* Education & Monetization */}
+        {tier.education_level && (
+          <div className="mb-2 px-2 py-1.5 rounded-lg" style={{ background: `${tier.color}05` }}>
+            <div className="text-[7px] uppercase tracking-wider mb-0.5" style={{ color: `${tier.color}80` }}>
+              {tier.education_level} Education
+            </div>
+            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              {tier.education_desc}
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-1.5 mb-2">
           {tier.features.map((f, i) => (
             <div key={i} className="flex items-start gap-1.5">
               <Check size={10} style={{ color: tier.color, marginTop: 2, flexShrink: 0 }} />
@@ -67,10 +79,14 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
           ))}
         </div>
 
-        <div className="flex items-center gap-3 text-[8px] mb-3" style={{ color: 'rgba(248,250,252,0.2)' }}>
-          <span>{tier.fidelity} visuals</span>
-          <span>{tier.max_project_slots === -1 ? 'Unlimited' : tier.max_project_slots} projects</span>
-          {tier.marketplace_discount > 0 && <span>{tier.marketplace_discount}% discount</span>}
+        <div className="flex items-center gap-2 flex-wrap text-[7px] mb-3" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <span>{tier.fidelity}</span>
+          <span>{tier.max_project_slots === -1 ? 'Unlimited' : tier.max_project_slots} slots</span>
+          {tier.marketplace_discount > 0 && (
+            <span className="px-1.5 py-0.5 rounded" style={{ background: `${tier.color}08`, color: tier.color }}>
+              {tier.marketplace_discount}% off
+            </span>
+          )}
         </div>
 
         {!isCurrent && (
@@ -456,7 +472,7 @@ export default function EconomyPage() {
         {/* ═══ Subscriptions Tab ═══ */}
         {activeTab === 'subscriptions' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
               {tiers.map(tier => (
                 <TierCard
                   key={tier.id}
@@ -480,7 +496,7 @@ export default function EconomyPage() {
                     <span className="ml-auto text-sm font-bold" style={{ color: '#F8FAFC' }}>$1,797<span className="text-[8px] font-normal" style={{ color: 'rgba(248,250,252,0.3)' }}>/year</span></span>
                   </div>
                   <div className="space-y-1 mb-3">
-                    {['Full Sovereign subscription included', 'All current & future Specialized Packs', 'Instant Level 4 Sovereign (27% Commission) everywhere'].map(f => (
+                    {['Full Architect subscription ($89/mo value)', 'All current & future Specialized Packs', 'Instant Level 4 Sovereign (27% Commission)', '30% member discount on all assets'].map(f => (
                       <div key={f} className="flex items-start gap-1.5">
                         <Check size={10} style={{ color: '#C084FC', marginTop: 2 }} />
                         <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.45)' }}>{f}</span>
