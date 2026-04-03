@@ -77,6 +77,8 @@ async def ensure_indexes():
 
         # ── Mixer-specific ──
         await db.mixer_projects.create_index([("user_id", 1), ("name", 1)])
+        await db.mixer_recordings.create_index("user_id")
+        await db.mixer_recordings.create_index([("user_id", 1), ("created_at", -1)])
 
         # ── Bible / Scripture ──
         await db.bible_chapters.create_index([("last_read_at", -1)])

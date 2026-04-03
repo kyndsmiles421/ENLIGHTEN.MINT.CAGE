@@ -11,6 +11,7 @@ import {
   Layers, Music, Eye, Radio, X, Loader2, Play, Square,
   Ghost, Package, Gift, ShoppingCart, ArrowUpRight, GripVertical,
   Compass, AlertTriangle, Clock, Wand2, Moon, Sun, Heart, Brain, Anchor,
+  Layout, Camera, Mic, Cpu, StopCircle, Circle,
 } from 'lucide-react';
 import { NanoGuide } from '../components/NanoGuide';
 
@@ -666,6 +667,21 @@ export default function SuanpanMixer() {
   const [autoComposeOpen, setAutoComposeOpen] = useState(false);
   const [composing, setComposing] = useState(false);
   const [composeGoals, setComposeGoals] = useState([]);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [templates, setTemplates] = useState([]);
+  const [templateCategories, setTemplateCategories] = useState([]);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [recordingConfig, setRecordingConfig] = useState(null);
+  const [aiGenOpen, setAiGenOpen] = useState(false);
+  const [aiCapabilities, setAiCapabilities] = useState(null);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiDuration, setAiDuration] = useState(10);
+  const [generating, setGenerating] = useState(false);
+  const [isRecordingVideo, setIsRecordingVideo] = useState(false);
+  const [isRecordingAudio, setIsRecordingAudio] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const recordedChunksRef = useRef([]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const ctxRef = useRef(null);
@@ -686,13 +702,16 @@ export default function SuanpanMixer() {
     if (authLoading || !token) return;
     const load = async () => {
       try {
-        const [subRes, srcRes, projRes, packRes, recRes, goalsRes] = await Promise.all([
+        const [subRes, srcRes, projRes, packRes, recRes, goalsRes, tplRes, recCfgRes, aiCapRes] = await Promise.all([
           axios.get(`${API}/mixer/subscription`, { headers: authHeaders }),
           axios.get(`${API}/mixer/sources`, { headers: authHeaders }),
           axios.get(`${API}/mixer/projects`, { headers: authHeaders }),
           axios.get(`${API}/mixer/bonus-packs`, { headers: authHeaders }),
           axios.get(`${API}/mixer/recommendations`, { headers: authHeaders }),
           axios.get(`${API}/mixer/auto-compose/goals`).catch(() => ({ data: { goals: [] } })),
+          axios.get(`${API}/mixer/templates`, { headers: authHeaders }).catch(() => ({ data: { templates: [], categories: [] } })),
+          axios.get(`${API}/mixer/recording/config`, { headers: authHeaders }).catch(() => ({ data: null })),
+          axios.get(`${API}/mixer/ai/capabilities`, { headers: authHeaders }).catch(() => ({ data: null })),
         ]);
         setSubTier(subRes.data.tier);
         setTierConfig(subRes.data.tier_config);
@@ -704,6 +723,10 @@ export default function SuanpanMixer() {
         setRecommendations(recRes.data.recommendations || []);
         setHexagramInfo(recRes.data.hexagram || null);
         setComposeGoals(goalsRes.data.goals || []);
+        setTemplates(tplRes.data.templates || []);
+        setTemplateCategories(tplRes.data.categories || []);
+        setRecordingConfig(recCfgRes.data);
+        setAiCapabilities(aiCapRes.data);
       } catch {} finally { setLoading(false); }
     };
     load();
@@ -850,6 +873,87 @@ export default function SuanpanMixer() {
       toast.error(e.response?.data?.detail || 'Auto-compose failed');
     } finally { setComposing(false); }
   }, [authHeaders, isMuted, playConfirmation]);
+
+  const handleApplyTemplate = useCallback(async (templateId) => {
+    try {
+      const res = await axios.post(`${API}/mixer/templates/apply`, { template_id: templateId }, { headers: authHeaders });
+      setTracks(res.data.tracks || []);
+      setProjectName(`${res.data.template_name}`);
+      setTemplatesOpen(false);
+      toast.success(`Template "${res.data.template_name}" applied — ${res.data.track_count} tracks`);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Template failed');
+    }
+  }, [authHeaders]);
+
+  const handleStartRecording = useCallback(async (type) => {
+    try {
+      const constraints = type === 'video'
+        ? { video: { width: { ideal: recordingConfig?.video?.max_resolution?.width || 640 }, height: { ideal: recordingConfig?.video?.max_resolution?.height || 480 }, frameRate: { ideal: recordingConfig?.video?.max_fps || 24 } }, audio: true }
+        : { audio: { sampleRate: { ideal: recordingConfig?.audio?.sample_rate || 44100 }, channelCount: recordingConfig?.audio?.channels || 1, echoCancellation: recordingConfig?.audio?.echo_cancellation || true, noiseSuppression: recordingConfig?.audio?.noise_suppression || false } };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      mediaStreamRef.current = stream;
+      recordedChunksRef.current = [];
+
+      const mimeType = type === 'video' ? 'video/webm;codecs=vp9,opus' : 'audio/webm;codecs=opus';
+      const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported(mimeType) ? mimeType : undefined });
+
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(recordedChunksRef.current, { type: type === 'video' ? 'video/webm' : 'audio/webm' });
+        const formData = new FormData();
+        formData.append('file', blob, `recording.${type === 'video' ? 'webm' : 'webm'}`);
+        try {
+          const res = await axios.post(`${API}/mixer/recording/upload`, formData, {
+            headers: { ...authHeaders, 'Content-Type': 'multipart/form-data' },
+          });
+          toast.success(`${type === 'video' ? 'Video' : 'Audio'} recorded & uploaded (${(blob.size / 1024).toFixed(0)}KB)`);
+          if (type === 'audio') {
+            setTracks(prev => [...prev, {
+              type: 'recording', source_id: res.data.id, source_label: `Recording ${res.data.id}`,
+              volume: 0.7, muted: false, solo: false, start_time: 0,
+              duration: 60, color: '#F472B6', locked: false, ripple_locked: false,
+            }]);
+          }
+        } catch (e) { toast.error('Upload failed'); }
+        setIsRecordingVideo(false);
+        setIsRecordingAudio(false);
+      };
+
+      mediaRecorderRef.current = recorder;
+      recorder.start(1000);
+      if (type === 'video') setIsRecordingVideo(true);
+      else setIsRecordingAudio(true);
+      toast.success(`${type === 'video' ? 'Camera' : 'Mic'} recording started (${recordingConfig?.[type]?.label || 'Standard'})`);
+    } catch (e) {
+      toast.error(`Permission denied or device unavailable: ${e.message}`);
+    }
+  }, [authHeaders, recordingConfig]);
+
+  const handleStopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+  }, []);
+
+  const handleAiGenerate = useCallback(async () => {
+    if (!aiPrompt.trim()) { toast.error('Enter a prompt'); return; }
+    setGenerating(true);
+    try {
+      const res = await axios.post(`${API}/mixer/ai/generate-mix`, {
+        prompt: aiPrompt, duration_minutes: aiDuration,
+      }, { headers: authHeaders });
+      setTracks(res.data.tracks || []);
+      setProjectName(`AI: ${aiPrompt.slice(0, 30)}`);
+      setAiCredits(prev => Math.max(0, prev - (res.data.credits_used || 0)));
+      setAiGenOpen(false);
+      toast.success(`AI generated ${res.data.track_count} tracks (${res.data.generated_by})`);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'AI generation failed');
+    } finally { setGenerating(false); }
+  }, [authHeaders, aiPrompt, aiDuration]);
 
 
   const saveProject = useCallback(async () => {
@@ -1033,6 +1137,24 @@ export default function SuanpanMixer() {
                 onClick={() => setAutoComposeOpen(!autoComposeOpen)} data-testid="auto-compose-btn">
                 {composing ? <Loader2 size={9} className="animate-spin" /> : <Wand2 size={9} />} DJ Auto
               </motion.button>
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.12)', color: '#FBBF24' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setTemplatesOpen(!templatesOpen)} data-testid="templates-btn">
+                <Layout size={9} /> Templates
+              </motion.button>
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.12)', color: isRecordingVideo || isRecordingAudio ? '#EF4444' : '#FB7185' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setMediaOpen(!mediaOpen)} data-testid="media-record-btn">
+                {isRecordingVideo || isRecordingAudio ? <StopCircle size={9} className="animate-pulse" /> : <Camera size={9} />} Record
+              </motion.button>
+              <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
+                style={{ background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.12)', color: '#60A5FA' }}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setAiGenOpen(!aiGenOpen)} data-testid="ai-gen-btn">
+                {generating ? <Loader2 size={9} className="animate-spin" /> : <Cpu size={9} />} AI Gen
+              </motion.button>
             </div>
           </div>
 
@@ -1195,6 +1317,233 @@ export default function SuanpanMixer() {
                       No AI credits remaining. Upgrade your tier for more.
                     </p>
                   )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Templates Panel */}
+          <AnimatePresence>
+            {templatesOpen && (
+              <motion.div className="border-b overflow-hidden"
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(251,191,36,0.01)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <div className="p-3" data-testid="templates-panel">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Layout size={10} style={{ color: '#FBBF24' }} />
+                      <p className="text-[8px] tracking-wider uppercase font-medium" style={{ color: '#FBBF24' }}>Mix Templates</p>
+                    </div>
+                    <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{templates.filter(t => !t.locked).length}/{templates.length} available</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
+                    {templates.map(tpl => {
+                      const tierColors = { discovery: '#22C55E', player: '#3B82F6', ultra_player: '#A78BFA', sovereign: '#FBBF24' };
+                      const tierLabels = { discovery: 'Free', player: 'Player', ultra_player: 'Ultra', sovereign: 'Sovereign' };
+                      return (
+                        <motion.button key={tpl.id}
+                          className="flex flex-col p-2 rounded-xl cursor-pointer text-left relative"
+                          style={{ background: `${tpl.color}08`, border: `1px solid ${tpl.color}15`, opacity: tpl.locked ? 0.4 : 1 }}
+                          whileHover={!tpl.locked ? { scale: 1.03, borderColor: `${tpl.color}30` } : {}}
+                          whileTap={!tpl.locked ? { scale: 0.97 } : {}}
+                          onClick={() => !tpl.locked ? handleApplyTemplate(tpl.id) : toast.error(`Requires ${tierLabels[tpl.tier]} tier`)}
+                          data-testid={`template-${tpl.id}`}>
+                          {tpl.locked && <Lock size={10} className="absolute top-1.5 right-1.5" style={{ color: 'var(--text-muted)' }} />}
+                          <span className="text-[8px] font-semibold mb-0.5" style={{ color: tpl.color }}>{tpl.name}</span>
+                          <span className="text-[6px] mb-1 leading-tight" style={{ color: 'rgba(248,250,252,0.2)' }}>{tpl.description}</span>
+                          <div className="flex items-center gap-1 mt-auto">
+                            <span className="text-[6px] px-1 py-0.5 rounded" style={{ background: `${tierColors[tpl.tier]}15`, color: tierColors[tpl.tier] }}>{tierLabels[tpl.tier]}</span>
+                            <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.15)' }}>{tpl.duration_minutes}m · {tpl.track_count} tracks</span>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Recording Panel */}
+          <AnimatePresence>
+            {mediaOpen && recordingConfig && (
+              <motion.div className="border-b overflow-hidden"
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(239,68,68,0.01)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <div className="p-3" data-testid="recording-panel">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Camera size={10} style={{ color: '#FB7185' }} />
+                      <p className="text-[8px] tracking-wider uppercase font-medium" style={{ color: '#FB7185' }}>Record Media</p>
+                    </div>
+                    <span className="text-[6px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.1)', color: '#FBBF24' }}>{recordingConfig.tier}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    {/* Camera */}
+                    <div className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <Camera size={11} style={{ color: '#F472B6' }} />
+                        <span className="text-[8px] font-semibold" style={{ color: '#F472B6' }}>Camera</span>
+                      </div>
+                      <div className="space-y-0.5 mb-2">
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Resolution: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.res_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>FPS: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.max_fps}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Bitrate: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.bitrate_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Max: <span style={{ color: '#F472B6' }}>{Math.round(recordingConfig.video?.max_duration_sec / 60)}min</span></p>
+                      </div>
+                      {isRecordingVideo ? (
+                        <motion.button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                          style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444' }}
+                          animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1 }}
+                          onClick={handleStopRecording} data-testid="stop-video-btn">
+                          <StopCircle size={10} /> Stop Recording
+                        </motion.button>
+                      ) : (
+                        <motion.button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                          style={{ background: 'rgba(244,114,182,0.08)', border: '1px solid rgba(244,114,182,0.15)', color: '#F472B6' }}
+                          whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                          onClick={() => handleStartRecording('video')} data-testid="start-video-btn">
+                          <Circle size={10} /> Start Camera
+                        </motion.button>
+                      )}
+                    </div>
+                    {/* Microphone */}
+                    <div className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <Mic size={11} style={{ color: '#2DD4BF' }} />
+                        <span className="text-[8px] font-semibold" style={{ color: '#2DD4BF' }}>Microphone</span>
+                      </div>
+                      <div className="space-y-0.5 mb-2">
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Quality: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.sample_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Channels: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.channel_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Depth: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.bit_depth}-bit</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Max: <span style={{ color: '#2DD4BF' }}>{Math.round(recordingConfig.audio?.max_duration_sec / 60)}min</span></p>
+                      </div>
+                      {isRecordingAudio ? (
+                        <motion.button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                          style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444' }}
+                          animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1 }}
+                          onClick={handleStopRecording} data-testid="stop-audio-btn">
+                          <StopCircle size={10} /> Stop Recording
+                        </motion.button>
+                      ) : (
+                        <motion.button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                          style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.15)', color: '#2DD4BF' }}
+                          whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                          onClick={() => handleStartRecording('audio')} data-testid="start-audio-btn">
+                          <Circle size={10} /> Start Mic
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
+                  {/* Tier comparison */}
+                  <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.015)' }}>
+                    <p className="text-[7px] mb-1.5 font-medium" style={{ color: 'rgba(248,250,252,0.3)' }}>Recording Quality by Tier</p>
+                    <div className="grid grid-cols-4 gap-1">
+                      {['discovery', 'player', 'ultra_player', 'sovereign'].map(t => {
+                        const v = recordingConfig.all_video_tiers?.[t] || {};
+                        const a = recordingConfig.all_audio_tiers?.[t] || {};
+                        const tierColors = { discovery: '#22C55E', player: '#3B82F6', ultra_player: '#A78BFA', sovereign: '#FBBF24' };
+                        const active = t === recordingConfig.tier;
+                        return (
+                          <div key={t} className="p-1.5 rounded-lg" style={{
+                            background: active ? `${tierColors[t]}10` : 'transparent',
+                            border: `1px solid ${active ? tierColors[t] + '30' : 'rgba(255,255,255,0.03)'}`,
+                          }}>
+                            <p className="text-[6px] font-bold mb-0.5" style={{ color: tierColors[t] }}>{v.label || t}</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{v.res_label} {v.max_fps}fps</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{a.sample_label} {a.channel_label}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* AI Generation Panel */}
+          <AnimatePresence>
+            {aiGenOpen && aiCapabilities && (
+              <motion.div className="border-b overflow-hidden"
+                style={{ borderColor: 'rgba(248,250,252,0.03)', background: 'rgba(96,165,250,0.01)' }}
+                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <div className="p-3" data-testid="ai-gen-panel">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Cpu size={10} style={{ color: '#60A5FA' }} />
+                      <p className="text-[8px] tracking-wider uppercase font-medium" style={{ color: '#60A5FA' }}>AI Mix Generator</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                        {aiCapabilities.credits_remaining} credits · {aiCapabilities.capabilities?.credits_per_mix}/mix
+                      </span>
+                      <span className="text-[6px] px-1 py-0.5 rounded" style={{ background: 'rgba(96,165,250,0.1)', color: '#60A5FA' }}>
+                        {aiCapabilities.capabilities?.label}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[7px] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                    {aiCapabilities.capabilities?.description}. Max {aiCapabilities.capabilities?.max_tracks_gen} tracks.
+                  </p>
+                  <div className="flex gap-1.5 mb-2">
+                    <input value={aiPrompt} onChange={e => setAiPrompt(e.target.value)}
+                      placeholder="e.g. Deep forest meditation with flowing water..."
+                      className="flex-1 px-2 py-1.5 rounded-lg text-[8px] outline-none"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: '#F8FAFC' }}
+                      data-testid="ai-prompt-input" />
+                    <select value={aiDuration} onChange={e => setAiDuration(parseInt(e.target.value))}
+                      className="px-2 py-1.5 rounded-lg text-[8px] outline-none cursor-pointer"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: '#F8FAFC' }}
+                      data-testid="ai-duration-select">
+                      <option value={5}>5 min</option>
+                      <option value={10}>10 min</option>
+                      <option value={20}>20 min</option>
+                      <option value={30}>30 min</option>
+                      <option value={45}>45 min</option>
+                      <option value={60}>60 min</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <motion.button className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-[8px] cursor-pointer"
+                      style={{ background: 'rgba(96,165,250,0.1)', border: '1px solid rgba(96,165,250,0.2)', color: '#60A5FA' }}
+                      whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                      onClick={handleAiGenerate} disabled={generating || aiCapabilities.credits_remaining < (aiCapabilities.capabilities?.credits_per_mix || 1)}
+                      data-testid="ai-generate-btn">
+                      {generating ? <Loader2 size={10} className="animate-spin" /> : <Cpu size={10} />}
+                      {generating ? 'Generating...' : 'Generate Mix'}
+                    </motion.button>
+                    {aiCapabilities.capabilities?.video_gen && (
+                      <span className="flex items-center gap-0.5 px-2 py-1 rounded-lg text-[7px]"
+                        style={{ background: 'rgba(168,139,250,0.08)', color: '#A78BFA' }}>
+                        <Camera size={8} /> Video Gen Available
+                      </span>
+                    )}
+                  </div>
+                  {/* AI Tier Comparison */}
+                  <div className="mt-2 rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.015)' }}>
+                    <p className="text-[7px] mb-1.5 font-medium" style={{ color: 'rgba(248,250,252,0.3)' }}>AI by Tier</p>
+                    <div className="grid grid-cols-4 gap-1">
+                      {['discovery', 'player', 'ultra_player', 'sovereign'].map(t => {
+                        const ai = aiCapabilities.all_tiers?.[t] || {};
+                        const tierColors = { discovery: '#22C55E', player: '#3B82F6', ultra_player: '#A78BFA', sovereign: '#FBBF24' };
+                        const active = t === aiCapabilities.tier;
+                        return (
+                          <div key={t} className="p-1.5 rounded-lg" style={{
+                            background: active ? `${tierColors[t]}10` : 'transparent',
+                            border: `1px solid ${active ? tierColors[t] + '30' : 'rgba(255,255,255,0.03)'}`,
+                          }}>
+                            <p className="text-[6px] font-bold mb-0.5" style={{ color: tierColors[t] }}>{ai.label || t}</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>Max {ai.max_tracks_gen} trks</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                              {ai.video_gen ? 'Video' : '—'} {ai.voice_clone ? '+ Voice' : ''}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
