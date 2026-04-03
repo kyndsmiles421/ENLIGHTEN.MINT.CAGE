@@ -71,7 +71,17 @@ Behavior:
 ```
 
 ## Iteration History
-### Iteration 229 — Consciousness Widget Fix (Apr 3, 2026) — LATEST
+### Iteration 230 — Mixer Content Library Expansion (Apr 3, 2026) — LATEST
+- Fixed broken video URLs (Pexels 403s for Starfield & Campfire)
+- STOCK_SOURCES: 21 → 60 (12 discovery, 14 player, 16 ultra, 18 sovereign)
+- VIDEO_OVERLAYS: 5 → 8 (all working URLs, tier-gated)
+- LIGHT_MODES: 6 → 12, FRACTAL_TYPES: 6 → 12, VISUAL_FILTERS: 12 → 15
+- TIER_COMPARISON: 10 → 14 rows (new: Sound Sources, Videos, Lights, Fractals, Filters)
+- All items now have tier tags + tier badge rendering in picker UI
+- Auto-compose goals updated with expanded source IDs
+- Tests: Backend 100% (13/13), Frontend 100%
+
+### Iteration 229 — Consciousness Widget Fix (Apr 3, 2026)
 - ConsciousnessPanel made fully interactive (was "dead" widget)
 - Header click → /mastery-avenues, level nodes → feature pages
 - Quick XP actions (Breathe, Mood, Journal, Meditate) with navigation
