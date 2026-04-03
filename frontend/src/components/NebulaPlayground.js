@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NebulaSphere from './NebulaSphere';
 import { useSovereign } from '../context/SovereignContext';
 import { detectResonance, PROXIMITY_THRESHOLD } from '../pages/SuanpanPhysics';
+import { useProximityHarmonics } from '../hooks/usePhonicResonance';
 import { toast } from 'sonner';
 
 const GRAVITY_WELL_RADIUS = 180;
@@ -108,6 +109,7 @@ function GravityWellIndicator({ position, radius, active, intensity = 0 }) {
 export default function NebulaPlayground({ detachedModules, onModuleReattach, launchVelocities = {},
   gravityMultiplier = 1.0, bloomMultiplier = 1.0, onBubbleActivate = null, masteryTier = 0 }) {
   const { publishEvent, enqueue, setNpuBurst, eventBus } = useSovereign();
+  const { startResonance, stopResonance } = useProximityHarmonics();
   const [spherePositions, setSpherePositions] = useState({});
   const [supernovae, setSupernovae] = useState([]);
   const [mergedModules, setMergedModules] = useState([]);
@@ -115,6 +117,7 @@ export default function NebulaPlayground({ detachedModules, onModuleReattach, la
   const [vacuumActive, setVacuumActive] = useState(false);
   const [wellIntensity, setWellIntensity] = useState(0);
   const resonanceTimerRef = useRef(null);
+  const prevPairsRef = useRef(new Set());
 
   // Gravity well — center of viewport
   const [gravityWell, setGravityWell] = useState(null);
@@ -149,6 +152,28 @@ export default function NebulaPlayground({ detachedModules, onModuleReattach, la
       if (activeIds.length < 2) { setResonances([]); return; }
       const detected = detectResonance(spherePositions, activeIds);
       setResonances(detected);
+
+      // Phase-Lock Proximity Harmonics — activate/deactivate audio resonance
+      const activePairs = new Set();
+      detected.forEach(res => {
+        const posA = spherePositions[res.a];
+        const posB = spherePositions[res.b];
+        if (posA && posB) {
+          const dx = posA.x - posB.x;
+          const dy = posA.y - posB.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          startResonance(res.a, res.b, dist, PROXIMITY_THRESHOLD);
+          activePairs.add([res.a, res.b].sort().join('-'));
+        }
+      });
+      // Stop resonance for pairs no longer in range
+      prevPairsRef.current.forEach(key => {
+        if (!activePairs.has(key)) {
+          const [a, b] = key.split('-');
+          stopResonance(a, b);
+        }
+      });
+      prevPairsRef.current = activePairs;
 
       // Update well intensity based on closest sphere
       let maxIntensity = 0;

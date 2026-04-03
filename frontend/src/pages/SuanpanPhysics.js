@@ -30,7 +30,7 @@ const TIER_TRAIL_LENGTH = {
 };
 const PROXIMITY_THRESHOLD = 180; // Distance for resonance glow (px)
 const CLUSTER_THRESHOLD = 80;    // Distance to form cluster (px)
-const VACUUM_CATCH_Y = 65;       // Y threshold to trigger vacuum reattach (px)
+const VACUUM_CATCH_Y = 115;      // Y threshold to trigger vacuum reattach (below nav + crossbar)
 const VACUUM_STIFFNESS = 3.0;    // How hard crossbar pulls sphere back
 
 // Module mass based on type (heavier = more inertia)

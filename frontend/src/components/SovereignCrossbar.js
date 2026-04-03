@@ -292,7 +292,7 @@ export default function SovereignCrossbar({ onModuleDetach, detachedModules = []
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 z-[200] flex items-center justify-center"
+      className="fixed top-12 left-0 right-0 z-[200] flex items-center justify-center"
       initial={{ y: -60 }}
       animate={{ y: visible ? 0 : -60 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}

@@ -6,13 +6,19 @@ import SovereignHUD from './SovereignHUD';
 import BubblePortal from './BubblePortal';
 import { useAuth } from '../context/AuthContext';
 import { useSovereign } from '../context/SovereignContext';
-import { usePhonicResonance } from '../hooks/usePhonicResonance';
+import { usePhonicResonance, usePredictiveSonicTug } from '../hooks/usePhonicResonance';
 
 const EXCLUDED_PATHS = ['/', '/auth', '/intro'];
 
 // Phonic Resonance — ambient Web Audio wrapper (renders nothing)
 function PhonicResonanceProvider({ enabled }) {
   usePhonicResonance(enabled, 0.025);
+  return null;
+}
+
+// Predictive Sonic Tug — cross-fade toward destination frequency
+function SonicTugProvider({ enabled }) {
+  usePredictiveSonicTug();
   return null;
 }
 
