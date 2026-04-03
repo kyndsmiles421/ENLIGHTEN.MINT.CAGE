@@ -75,32 +75,64 @@ Sacred Geometry Visual Pack (Ultra, 35c) → +10% Export Speed
 Deep Earth Resonance Suite (Sov, 50c)   → +20% Processing Speed
 ```
 
+## Backend Architecture (Refactored Apr 3, 2026)
+```
+/app/backend/
+├── server.py          # Auto-router discovery, GZip, CORS, WebSocket, Stripe webhook
+├── deps.py            # MongoDB client (pooled), JWT auth, helpers
+├── db_indexes.py      # 80+ indexes across 46 collections (startup)
+├── tasks.py           # Background loops (push scheduler, credit refresh)
+├── models.py          # Pydantic models
+├── routes/            # 120+ auto-discovered route modules
+│   ├── auth.py, mixer_director.py, generators.py, etc.
+```
+
+### Refactoring Completed (Iteration 227)
+- server.py: 476 → 164 lines (65% reduction) via auto-router discovery
+- Zero indexes → 80+ indexes on 46 collections (db_indexes.py)
+- GZip compression middleware (500+ byte responses)
+- MongoDB connection pool: maxPoolSize=50, minPoolSize=5
+- Background tasks extracted to tasks.py
+
 ## Iteration History
-### Iteration 225 — Intelligence Layer (Apr 2, 2026) — LATEST
-- Hexagram-based recommendation engine (trigram mapping, stagnation detection, soft/active tone)
-- Keyframe Automation UI (Volume + Frequency SVG curves with Golden Ratio snap)
-- Expandable automation lanes per track (gated to Ultra Player+)
-- Recommendation cards in Packs panel with hexagram context
-- Auth timing fix (wait for token before API calls)
-- Tests: Backend 100% (21/21), Frontend auth fix applied
+### Iteration 227 — Backend Refactoring (Apr 3, 2026) — LATEST
+- Auto-router discovery replaces 136 manual imports
+- Database indexes for all 46 heavily-queried collections
+- GZip compression middleware
+- MongoDB connection pooling optimization
+- Background task extraction
+- Tests: Backend 100% (24/24), Frontend 100%
+
+### Iteration 226 — Ripple Editing (Apr 2, 2026)
+- Ripple Edit computation (delta shifts unlocked tracks)
+- Lock Toggle UI per track
+- Keyframe clamping on duration change
+- Tests: Backend 100% (13/13), Frontend 100%
+
+### Iteration 225 — Intelligence Layer (Apr 2, 2026)
+- Hexagram-based recommendation engine
+- Keyframe Automation UI (Volume + Frequency SVG curves)
+- Auth timing fix
 
 ### Iteration 224 — 4-Tier + Bonus Packs (Apr 2, 2026)
 ### Iteration 223 — Divine Director v1 (Apr 2, 2026)
 ### Iteration 222 — Tiered Payable Bonuses (Apr 2, 2026)
 ### Iterations 217-221 — Orbital Architecture, Audio, I Ching
 
-## Upcoming (P1)
+## Upcoming (P0)
 - AI "Mantra DJ" Auto-Edit (cross-faded auto-composition)
-- Ripple Editing (sync-locked layer shifting with keyframe preservation)
-- Nested Sacred Projects (Sovereign-only collapsible blocks)
-- Snippet "Try-On" (10s locked instrument preview)
-- Predictive Micro-Interactions
+
+## Upcoming (P1)
+- Phase 3 Polish: Light trails and bloom effects
+- Generative Flourish Bonus: AI improvised phonic resonance
 
 ## Future/Backlog (P2)
+- Multi-Civilization Star Charts (Hopi, Egyptian, Vedic)
+- External audio asset hosting
+- Haptic API for mobile tactile feedback
+- Sovereign Tier Perks, Wisdom Prescriptions
 - Pan + Reverb keyframe lanes
 - NPU Priority / GPU edge hooks
-- Haptic Tuning, Gesture timeline
-- Multi-Civilization Star Charts
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
