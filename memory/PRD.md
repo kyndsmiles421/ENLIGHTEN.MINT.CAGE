@@ -486,7 +486,14 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
-## Upcoming (P0-P1) — Iteration 267+
+### Iteration 268 — Orbital Hub Complete Rebuild (April 2026)
+- Rebuilt OrbitalHub.js from scratch — removed complex physics-based pointer event system
+- All 15 satellites now displayed in a single visible ring (no more dormant/abyss hidden system)
+- Simple onClick navigation replaces unreliable pointerDown/pointerUp timer mechanism
+- Central orb click opens Mission Control
+- Tests: Frontend 100% — all 15 satellites navigate correctly, all destination pages load with content
+
+## Upcoming (P0-P1) — Iteration 269+
 - **Step 9: Multi-Widget Concurrent Dialogue** — Two Sovereign windows open simultaneously
 - **Dust "Clink" Spatial Audio** — "Star particles settling" sound on Dust transfers
 - **"Usage Yield" Report UI** — Monthly savings map from Caspian
