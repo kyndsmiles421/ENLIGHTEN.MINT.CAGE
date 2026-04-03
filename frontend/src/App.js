@@ -34,6 +34,7 @@ import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import TrialGraduation from './components/TrialGraduation';
 import { useGateNotifications } from './hooks/useGateNotifications';
+import OrbitalNavigation from './components/OrbitalNavigation';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -391,6 +392,7 @@ function App() {
             <TrialGraduation />
             <InstallPrompt />
             <CreditNudge />
+            <OrbitalNavigation />
             <CommandMode context="general" />
           </div>
           </SplitScreenProvider>

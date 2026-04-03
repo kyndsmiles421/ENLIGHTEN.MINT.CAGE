@@ -92,6 +92,45 @@ export default function SuanpanMixer() {
       if (data?.action === 'add_track' && data.source) addTrack(data.source);
       if (data?.action === 'auto_compose' && data.goal) handleAutoCompose(data.goal);
       if (data?.action === 'apply_template' && data.templateId) handleApplyTemplate(data.templateId);
+
+      // Sphere merge — cross-domain injection from NebulaPlayground
+      if (data?.action === 'sphere_merge') {
+        const injectionHandlers = {
+          starchart_injection: () => {
+            // Re-tune active frequencies to planetary alignments
+            setTracks(prev => prev.map(t => t.frequency ? {
+              ...t, frequency: Math.round(t.frequency * 1.059463 * 100) / 100,
+              source_label: `${t.source_label} [Star Aligned]`,
+            } : t));
+            toast.success('Star Chart frequencies aligned to planetary positions');
+          },
+          trade_injection: () => {
+            // Activate NPU Burst mode visual indicator
+            setSpeedBonus(prev => prev + 10);
+            toast.success('Trade injection: +10% NPU speed boost activated');
+          },
+          meditation_injection: () => {
+            // Inject 8D binaural stellar wash track
+            if (!atCap) {
+              setTracks(prev => [...prev, {
+                type: 'phonic_tone', source_id: 'stellar-wash', source_label: '8D Stellar Wash',
+                volume: 0.6, muted: false, solo: false, start_time: 0, duration: 120,
+                frequency: 432, color: '#60A5FA', locked: false, ripple_locked: false,
+              }]);
+            }
+            toast.success('Meditation layer: 8D Binaural Stellar Wash injected');
+          },
+          wellness_injection: () => {
+            // Sync AI phonic resonance
+            setTracks(prev => prev.map(t => t.frequency ? {
+              ...t, volume: Math.min(1, t.volume + 0.05),
+            } : t));
+            toast.success('Phonic resonance: AI harmonics synchronized');
+          },
+        };
+        const handler = injectionHandlers[data.injection_type];
+        if (handler) handler();
+      }
     });
     return unsub;
   }, [eventBus]);

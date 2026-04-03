@@ -1,0 +1,116 @@
+{
+  "summary": "Iteration 235 - Orbital Navigation System (Pole to Sphere) Testing Complete. Backend: 14/14 tests passed (100%). Frontend: All new Orbital Navigation features working correctly. SovereignCrossbar renders at top with 5 pole modules (mixer, trade, starchart, meditation, wellness). Crossbar correctly hidden on excluded pages (/, /auth, /intro). Pole drag past 150px threshold triggers NebulaSphere detachment with Canvas 2D rotating sphere. NebulaPlayground renders with GravityWellIndicator. SovereignHUD visible at bottom-left showing 'idle' state. Crossbar toggle works to hide/show. Command Mode (Ctrl+K) still working. Mixer page (/suanpan) and Sovereign Architecture page (/sovereign) load correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Dashboard",
+        "issues": ["Trial Graduation modal blocks interaction on first visit - user must dismiss it. This is expected behavior."]
+      },
+      {
+        "screen": "Dashboard",
+        "issues": ["Credits running low notification appears in bottom-right corner - expected behavior for test user."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration235_orbital_navigation.py",
+    "/app/test_reports/pytest/pytest_iteration235_orbital.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "OrbitalNavigation.js correctly wraps SovereignCrossbar + NebulaPlayground + SovereignHUD",
+    "OrbitalNavigation.js correctly excludes paths: /, /auth, /intro",
+    "SovereignCrossbar.js correctly implements CROSSBAR_MODULES with 5 modules (mixer, trade, starchart, meditation, wellness)",
+    "SovereignCrossbar.js correctly implements PoleModule with 150px SNAP_THRESHOLD and quadratic tension",
+    "SovereignCrossbar.js correctly implements ElasticPole SVG with quadratic curve visualization",
+    "NebulaSphere.js correctly implements Canvas 2D sphere with golden ratio vertex distribution",
+    "NebulaSphere.js correctly implements 3D to 2D projection math with rotation",
+    "NebulaPlayground.js correctly implements GRAVITY_WELL_RADIUS = 160px",
+    "NebulaPlayground.js correctly implements INJECTION_MAP for cross-domain merging (starchart, trade, meditation, wellness)",
+    "NebulaPlayground.js correctly implements SupernovaPulse collision animation",
+    "SovereignHUD.js correctly implements Priority Queue stats visualization with 3 channels (Nexus Path, Sensory Stream, Background Orbit)",
+    "SovereignHUD.js correctly subscribes to EventBus events: task_enqueued, task_complete, npu_burst, task_error",
+    "App.js correctly adds OrbitalNavigation between CommandMode and existing components"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration235_orbital_navigation.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "None - used existing test user",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 235 verified the Orbital Navigation system (Pole to Sphere kinetic navigation). Key components: (1) SovereignCrossbar at top with 5 pole modules - each can be dragged down past 150px to detach into NebulaSphere. (2) NebulaSphere uses Canvas 2D with golden ratio vertex distribution and 3D projection math. (3) NebulaPlayground orchestrates spheres with GravityWellIndicator (160px radius at viewport center). (4) SovereignHUD at bottom-left shows Priority Queue stats (idle/active), NPU burst indicator, and recent tasks feed. (5) Crossbar toggle hides/shows the crossbar. (6) Crossbar does NOT appear on /, /auth, /intro pages. Test user grad_test_522@test.com has purchased 'thinking_feed' unit. Trial Graduation modal appears on first visit - dismiss by clicking 'Continue with free plan'.",
+  "features_verified": {
+    "crossbar_renders_at_top": {
+      "status": "PASS",
+      "details": "SovereignCrossbar renders at top of page on authenticated pages with z-index 200"
+    },
+    "crossbar_5_pole_modules": {
+      "status": "PASS",
+      "details": "5 pole modules visible: mixer (Divine Director), trade (Trade Circle), starchart (Star Charts), meditation (Meditation), wellness (Wellness)"
+    },
+    "crossbar_excluded_pages": {
+      "status": "PASS",
+      "details": "Crossbar correctly hidden on /, /auth, /intro pages"
+    },
+    "pole_drag_150px_threshold": {
+      "status": "PASS",
+      "details": "Dragging pole module down past 150px triggers detachment - pole disappears from crossbar"
+    },
+    "nebula_sphere_appears": {
+      "status": "PASS",
+      "details": "NebulaSphere appears after pole detachment with Canvas 2D rotating sphere visualization"
+    },
+    "nebula_playground_gravity_well": {
+      "status": "PASS",
+      "details": "NebulaPlayground renders with GravityWellIndicator when spheres are present"
+    },
+    "sovereign_hud_visible": {
+      "status": "PASS",
+      "details": "SovereignHUD widget visible at bottom-left showing 'idle' state"
+    },
+    "crossbar_toggle_works": {
+      "status": "PASS",
+      "details": "Crossbar toggle button works to hide/show the crossbar"
+    },
+    "mixer_page_loads": {
+      "status": "PASS",
+      "details": "Mixer page (/suanpan) loads correctly with Divine Director header and all transport buttons"
+    },
+    "sovereign_page_4_tabs": {
+      "status": "PASS",
+      "details": "Sovereign Architecture page (/sovereign) loads with 4 tabs: Overview, Compare Tiers, Cross-Tier Shop, Glass Box"
+    },
+    "command_mode_ctrl_k": {
+      "status": "PASS",
+      "details": "Command Mode (Ctrl+K) opens correctly with input field, Orchestrate button, quick suggestions"
+    },
+    "backend_sovereign_status": {
+      "status": "PASS",
+      "details": "GET /api/sovereign/status returns tier, capabilities"
+    },
+    "backend_mixer_subscription": {
+      "status": "PASS",
+      "details": "GET /api/mixer/subscription returns tier config"
+    },
+    "backend_mixer_sources": {
+      "status": "PASS",
+      "details": "GET /api/mixer/sources returns sources list"
+    },
+    "backend_pubsub_events": {
+      "status": "PASS",
+      "details": "POST /api/sovereign/events/publish and GET /api/sovereign/events/recent working"
+    },
+    "backend_tier_headers": {
+      "status": "PASS",
+      "details": "X-Sovereign-Tier, X-Response-Time, X-Tier-Priority headers present on API responses"
+    }
+  }
+}
