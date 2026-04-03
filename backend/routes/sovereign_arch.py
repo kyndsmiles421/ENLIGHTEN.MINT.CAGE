@@ -705,3 +705,165 @@ async def get_agents(user=Depends(get_current_user)):
         "has_thinking_feed": tier_config["thinking_feed"],
         "has_agent_coordination": tier_config["agent_coordination"],
     }
+
+
+# ━━━ COMMAND MODE — CONTEXTUAL MASTER ORCHESTRATOR ━━━
+
+COMMAND_CONTEXTS = {
+    "mixer": {
+        "label": "Divine Director",
+        "system": """You are the Master Orchestrator for a wellness audio mixer. Coordinate:
+Agent Alpha (Geometer): Analyze track arrangement geometry, golden ratio spacing, sacred pattern alignment.
+Agent Beta (Harmonizer): Optimize frequency relationships, solfeggio tuning, binaural beat effectiveness.
+Agent Gamma (Logistics): Calculate resource usage, processing requirements, export optimization.
+Provide actionable recommendations for the current mix session. Include specific Hz frequencies.""",
+    },
+    "meditation": {
+        "label": "Meditation Guide",
+        "system": """You are the Master Orchestrator for meditation guidance. Coordinate:
+Agent Alpha (Geometer): Map the sacred geometry of the meditation space and body posture.
+Agent Beta (Harmonizer): Select optimal frequencies for the meditation goal and current state.
+Agent Gamma (Logistics): Plan timing, environment, and session structure.
+Guide the user through their meditation practice with specific techniques.""",
+    },
+    "trade": {
+        "label": "Trade Circle",
+        "system": """You are the Master Orchestrator for the Trade Circle marketplace. Coordinate:
+Agent Alpha (Geometer): Analyze market patterns and sacred geometry of exchange flows.
+Agent Beta (Harmonizer): Balance the energetic exchange value of items.
+Agent Gamma (Logistics): Calculate pricing, inventory, delivery logistics.
+Advise on marketplace strategy and circular economy optimization.""",
+    },
+    "wellness": {
+        "label": "Wellness Advisor",
+        "system": """You are the Master Orchestrator for holistic wellness. Coordinate:
+Agent Alpha (Geometer): Map body-energy geometry and chakra alignment patterns.
+Agent Beta (Harmonizer): Prescribe specific Hz frequencies for healing goals.
+Agent Gamma (Logistics): Plan daily rituals, meal timing, exercise scheduling.
+Provide a comprehensive wellness blueprint with actionable steps.""",
+    },
+    "general": {
+        "label": "General",
+        "system": """You are the Master Orchestrator for a Sovereign-level digital ecosystem. Coordinate:
+Agent Alpha (Geometer): Map UI/UX and Sacred Geometry patterns.
+Agent Beta (Harmonizer): Align Solfeggio Frequencies and resonance.
+Agent Gamma (Logistics): Calculate GPS, local data, permits, and inventory.
+Provide tiered output: Strategic Layer, Technical Layer, Execution Layer.""",
+    },
+}
+
+
+@router.post("/sovereign/command")
+async def command_mode(data: dict = Body(...), user=Depends(get_current_user)):
+    """Command Mode — context-aware Master Orchestrator invocation.
+    Any page can call this with a context and command."""
+    user_id = user["id"]
+    tier = await _get_sovereign_tier(user_id)
+    tier_config = SOVEREIGN_TIERS.get(tier, SOVEREIGN_TIERS["standard"])
+    active_units = await _get_active_units(user_id)
+
+    has_thinking = tier_config["thinking_feed"] or any(u["feature_key"] == "thinking_feed" for u in active_units)
+    has_agents = tier_config["agent_coordination"] or any(u["feature_key"] == "agent_session" for u in active_units)
+
+    if not has_thinking:
+        raise HTTPException(403, "Command Mode requires Glass Box access (Apprentice+ or purchased unit)")
+
+    command = data.get("command", "")
+    context = data.get("context", "general")
+    page_data = data.get("page_data", {})
+
+    ctx = COMMAND_CONTEXTS.get(context, COMMAND_CONTEXTS["general"])
+
+    # Build thinking chain
+    chain = []
+    chain.append({
+        "agent": "alpha", "name": "Agent Alpha", "role": "Geometer",
+        "status": "sync", "color": "#8B5CF6",
+        "thought": f"Mapping geometry for {ctx['label']}: '{command[:50]}...'",
+        "layers": [
+            {"type": "geometry", "label": "Pattern Analysis", "value": "Processing", "confidence": 0.88},
+            {"type": "sacred", "label": "Golden Ratio Alignment", "value": "φ = 1.618", "confidence": 0.92},
+        ],
+    })
+    chain.append({
+        "agent": "beta", "name": "Agent Beta", "role": "Harmonizer",
+        "status": "sync", "color": "#2DD4BF",
+        "thought": f"Aligning frequencies for resonance optimization...",
+        "layers": [
+            {"type": "frequency", "label": "Primary Resonance", "value": "528Hz (MI)", "confidence": 0.95},
+            {"type": "harmonic", "label": "Overtone Series", "value": "Active", "confidence": 0.87},
+        ],
+    })
+    if has_agents:
+        chain.append({
+            "agent": "gamma", "name": "Agent Gamma", "role": "Logistics",
+            "status": "sync", "color": "#F59E0B",
+            "thought": f"Calculating logistics for {ctx['label']}...",
+            "layers": [
+                {"type": "resource", "label": "Resource Budget", "value": "Optimized", "confidence": 0.91},
+                {"type": "temporal", "label": "Timing", "value": "Now", "confidence": 0.99},
+            ],
+        })
+
+    # AI response
+    ai_response = None
+    try:
+        from emergentintegrations.llm.gemini import GeminiChat, GeminiConfig
+        gemini_key = os.environ.get("EMERGENT_LLM_KEY", "")
+        if gemini_key and command:
+            chat = GeminiChat(config=GeminiConfig(api_key=gemini_key, model="gemini-2.5-flash"))
+            full_system = f"""{ctx['system']}
+User tier: {tier_config['name']} ({tier_config['codename']}).
+Page context: {context}. Page data: {str(page_data)[:200]}.
+Keep response under 250 words. Be specific and actionable."""
+            ai_response = await chat.send_message(command, system_prompt=full_system)
+    except Exception as e:
+        logger.error(f"Command Mode AI error: {e}")
+
+    await db.user_credits.update_one({"user_id": user_id}, {"$inc": {"balance": -1}}, upsert=True)
+
+    # Publish event
+    await db.sovereign_events.insert_one({
+        "user_id": user_id,
+        "event": "command_mode",
+        "context": context,
+        "command": command[:200],
+        "tier": tier,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {
+        "thinking_chain": chain,
+        "ai_response": ai_response,
+        "context": context,
+        "context_label": ctx["label"],
+        "tier": tier,
+        "agent_count": len(chain),
+    }
+
+
+# ━━━ PUB/SUB EVENT SYSTEM ━━━
+
+@router.post("/sovereign/events/publish")
+async def publish_event(data: dict = Body(...), user=Depends(get_current_user)):
+    """Publish an event for the Pub/Sub system."""
+    event = {
+        "user_id": user["id"],
+        "event_type": data.get("event_type", "unknown"),
+        "payload": data.get("payload", {}),
+        "source_tier": data.get("source_tier", "standard"),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.sovereign_events.insert_one(event)
+    return {"published": True, "event_type": event["event_type"]}
+
+
+@router.get("/sovereign/events/recent")
+async def recent_events(user=Depends(get_current_user)):
+    """Get recent events for the user (subscriber poll)."""
+    cursor = db.sovereign_events.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(20)
+    events = await cursor.to_list(20)
+    return {"events": events}

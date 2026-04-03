@@ -28,6 +28,8 @@ import PersistentWaveform from './components/PersistentWaveform';
 import OrbCorner from './components/OrbCorner';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { CosmicStateProvider } from './context/CosmicStateContext';
+import { SovereignProvider } from './context/SovereignContext';
+import CommandMode from './components/CommandMode';
 import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import TrialGraduation from './components/TrialGraduation';
@@ -356,6 +358,7 @@ function App() {
       <ResolutionProvider>
       <SensoryProvider>
       <CosmicStateProvider>
+      <SovereignProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
@@ -388,10 +391,12 @@ function App() {
             <TrialGraduation />
             <InstallPrompt />
             <CreditNudge />
+            <CommandMode context="general" />
           </div>
           </SplitScreenProvider>
           </VoiceCommandProvider>
         </BrowserRouter>
+      </SovereignProvider>
       </CosmicStateProvider>
       </SensoryProvider>
       </ResolutionProvider>

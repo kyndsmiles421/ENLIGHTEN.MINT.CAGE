@@ -14,6 +14,7 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
+from middleware.sovereign_tier import SovereignTierMiddleware
 
 from deps import client, db, logger
 
@@ -21,6 +22,9 @@ app = FastAPI()
 
 # ━━━ GZip Compression (min 500 bytes) ━━━
 app.add_middleware(GZipMiddleware, minimum_size=500)
+
+# ━━━ Sovereign Tier Middleware ━━━
+app.add_middleware(SovereignTierMiddleware)
 
 # ━━━ CORS ━━━
 app.add_middleware(
