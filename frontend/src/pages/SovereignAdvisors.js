@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Building2, Music, Coins, Truck, Scale, ArrowLeft, Send, Loader2, Trash2,
-  Lock, Sparkles, ChevronRight, X, ArrowRight, Globe,
+  Lock, Sparkles, ChevronRight, ArrowRight, Globe, Compass, Brain, Code,
+  Leaf, FlaskConical, ShieldCheck, Wrench, Crown, GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -11,128 +12,181 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 const ICON_MAP = {
   building: Building2, music: Music, coins: Coins, truck: Truck, scale: Scale,
+  compass: Compass, brain: Brain, code: Code, leaf: Leaf, flask: FlaskConical,
 };
 
 const TIER_LABELS = {
-  discovery: 'Seeker', resonance: 'Artisan', sovereign: 'Alchemist', architect: 'Infrastructure Partner',
+  discovery: 'Seeker', resonance: 'Artisan', sovereign: 'Alchemist', architect: 'Architect',
 };
 
-/* ── Sovereign Card ── */
-function SovereignCard({ sovereign, onSelect, userTier }) {
-  const Icon = ICON_MAP[sovereign.icon] || Sparkles;
-  const accessible = sovereign.has_free_access || sovereign.has_session;
+const TIER_COLORS = {
+  discovery: '#22C55E', resonance: '#818CF8', sovereign: '#2DD4BF', architect: '#FBBF24',
+};
 
-  return (
-    <motion.button
-      whileHover={{ y: -3, scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={() => onSelect(sovereign)}
-      className="w-full text-left rounded-xl overflow-hidden relative group"
-      style={{
-        background: `${sovereign.color}04`,
-        border: `1px solid ${sovereign.color}18`,
-      }}
-      data-testid={`sovereign-card-${sovereign.id}`}
-    >
-      <div className="p-4">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{
-            background: `${sovereign.color}0D`, border: `1px solid ${sovereign.color}20`,
-          }}>
-            <Icon size={20} style={{ color: sovereign.color }} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold" style={{ color: sovereign.color }}>
-              {sovereign.name}
-            </div>
-            <div className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
-              {sovereign.module}
-            </div>
-          </div>
-          {!accessible && (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-md" style={{
-              background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.15)',
-            }}>
-              <Lock size={9} style={{ color: '#FBBF24' }} />
-              <span className="text-[7px] font-medium" style={{ color: '#FBBF24' }}>
-                {sovereign.session_cost} Dust
-              </span>
-            </div>
-          )}
-        </div>
-
-        <p className="text-[9px] leading-relaxed mb-2" style={{ color: 'rgba(248,250,252,0.45)' }}>
-          {sovereign.expertise}
-        </p>
-
-        <div className="flex items-center gap-2 text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
-          <span className="px-1.5 py-0.5 rounded" style={{
-            background: `${sovereign.color}08`, color: sovereign.color,
-          }}>
-            {TIER_LABELS[sovereign.linked_tier] || sovereign.linked_tier}
-          </span>
-          <span>{sovereign.link_location}</span>
-        </div>
-      </div>
-
-      <div className="px-4 py-2 flex items-center justify-between" style={{
-        background: `${sovereign.color}04`, borderTop: `1px solid ${sovereign.color}08`,
-      }}>
-        <span className="text-[8px] font-medium" style={{ color: sovereign.color }}>
-          {accessible ? 'Consult' : 'Purchase Session'}
-        </span>
-        <ChevronRight size={12} style={{ color: sovereign.color, opacity: 0.6 }} />
-      </div>
-    </motion.button>
-  );
-}
-
-/* ── Chat Message Bubble ── */
-function ChatMessage({ msg, sovereignColor, sovereignName }) {
-  const isUser = msg.role === 'user';
-
-  // Parse bridge tags from assistant messages
-  const renderContent = (text) => {
-    if (isUser) return text;
-    const parts = text.split(/\[BRIDGE:(\w+)\]/g);
-    return parts.map((part, i) => {
-      if (i % 2 === 1) return null; // bridge ID — skip, handled by bridge buttons
-      return <span key={i}>{part}</span>;
-    });
-  };
+/* ── Council Member Card ── */
+function CouncilCard({ member, onSelect, onPurchaseUtility }) {
+  const Icon = ICON_MAP[member.icon] || Sparkles;
+  const accessible = member.has_free_access || member.has_session;
+  const isFaculty = member.role_type === 'faculty';
+  const util = member.utility;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl overflow-hidden"
+      style={{ background: `${member.color}03`, border: `1px solid ${member.color}10` }}
+      data-testid={`council-card-${member.id}`}
+    >
+      <button
+        onClick={() => onSelect(member)}
+        className="w-full text-left p-4"
+        style={{ cursor: 'pointer' }}
+        data-testid={`council-select-${member.id}`}
+      >
+        <div className="flex items-start gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{
+            background: `${member.color}0D`, border: `1px solid ${member.color}18`,
+          }}>
+            <Icon size={20} style={{ color: member.color }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold" style={{ color: member.color }}>{member.name}</span>
+              {isFaculty && (
+                <GraduationCap size={10} style={{ color: member.color, opacity: 0.6 }} />
+              )}
+              {!isFaculty && (
+                <Crown size={10} style={{ color: member.color, opacity: 0.6 }} />
+              )}
+            </div>
+            <div className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              {member.module}
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {!accessible && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-md" style={{
+                background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.12)',
+              }}>
+                <Lock size={8} style={{ color: '#FBBF24' }} />
+                <span className="text-[7px] font-medium" style={{ color: '#FBBF24' }}>
+                  {member.session_cost} Dust
+                </span>
+              </div>
+            )}
+            <ChevronRight size={12} style={{ color: member.color, opacity: 0.4 }} />
+          </div>
+        </div>
+
+        <p className="text-[9px] leading-relaxed mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          {member.backstory ? member.backstory.slice(0, 120) + '...' : member.expertise}
+        </p>
+
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[7px] px-1.5 py-0.5 rounded" style={{
+            background: isFaculty ? 'rgba(192,132,252,0.06)' : 'rgba(251,191,36,0.06)',
+            color: isFaculty ? '#C084FC' : '#FBBF24',
+            border: `1px solid ${isFaculty ? 'rgba(192,132,252,0.1)' : 'rgba(251,191,36,0.1)'}`,
+          }}>
+            {isFaculty ? 'Faculty' : 'Advisor'}
+          </span>
+          <span className="text-[7px] px-1.5 py-0.5 rounded" style={{
+            background: `${TIER_COLORS[member.linked_tier]}08`,
+            color: TIER_COLORS[member.linked_tier],
+          }}>
+            {TIER_LABELS[member.linked_tier]}
+          </span>
+        </div>
+      </button>
+
+      {/* Utility Tool Bar (Faculty only) */}
+      {util && (
+        <div className="px-4 py-2.5 flex items-center justify-between" style={{
+          background: `${util.color}04`, borderTop: `1px solid ${util.color}08`,
+        }}>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Wrench size={10} style={{ color: util.color }} />
+            <div className="min-w-0">
+              <div className="text-[8px] font-semibold truncate" style={{ color: util.color }}>
+                {util.name}
+              </div>
+              <div className="text-[7px] truncate" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                {util.description.slice(0, 60)}...
+              </div>
+            </div>
+          </div>
+
+          {util.owned || util.native_access ? (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md flex-shrink-0" style={{
+              background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.12)',
+            }}>
+              <ShieldCheck size={9} style={{ color: '#22C55E' }} />
+              <span className="text-[7px] font-medium" style={{ color: '#22C55E' }}>
+                {util.native_access ? 'Included' : 'Owned'}
+              </span>
+            </div>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); onPurchaseUtility(member, util); }}
+              className="flex items-center gap-1 px-2 py-1 rounded-md flex-shrink-0"
+              style={{
+                background: `${util.color}08`, border: `1px solid ${util.color}15`,
+                cursor: 'pointer',
+              }}
+              data-testid={`buy-utility-${util.id}`}
+            >
+              <span className="text-[7px] line-through" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                {util.base_price}
+              </span>
+              <span className="text-[8px] font-bold" style={{ color: util.color }}>
+                {util.discounted_price} Dust
+              </span>
+              <span className="text-[6px] px-1 rounded" style={{
+                background: 'rgba(34,197,94,0.1)', color: '#22C55E',
+              }}>-{util.discount_pct}%</span>
+            </button>
+          )}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+/* ── Chat Message ── */
+function ChatBubble({ msg, color, name }) {
+  const isUser = msg.role === 'user';
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}
       data-testid={`chat-msg-${msg.role}`}
     >
       <div className={`max-w-[85%] rounded-xl px-3 py-2 ${isUser ? 'rounded-br-sm' : 'rounded-bl-sm'}`}
         style={{
-          background: isUser ? 'rgba(248,250,252,0.06)' : `${sovereignColor}08`,
-          border: `1px solid ${isUser ? 'rgba(248,250,252,0.08)' : `${sovereignColor}12`}`,
+          background: isUser ? 'rgba(248,250,252,0.05)' : `${color}06`,
+          border: `1px solid ${isUser ? 'rgba(248,250,252,0.06)' : `${color}10`}`,
         }}
       >
         {!isUser && (
-          <div className="text-[7px] font-semibold mb-1" style={{ color: sovereignColor }}>
-            {sovereignName}
-          </div>
+          <div className="text-[7px] font-semibold mb-1" style={{ color }}>{name}</div>
         )}
         <div className="text-[10px] leading-relaxed whitespace-pre-wrap" style={{
-          color: isUser ? 'rgba(248,250,252,0.7)' : 'rgba(248,250,252,0.55)',
+          color: isUser ? 'rgba(248,250,252,0.65)' : 'rgba(248,250,252,0.5)',
         }}>
-          {renderContent(msg.content)}
+          {msg.content?.replace(/\[BRIDGE:\w+\]/g, '')}
         </div>
       </div>
     </motion.div>
   );
 }
 
-/* ── Purchase Modal ── */
-function PurchaseModal({ sovereign, dustBalance, onPurchase, onClose, loading }) {
-  const Icon = ICON_MAP[sovereign.icon] || Sparkles;
-  const canAfford = dustBalance >= sovereign.session_cost;
+/* ── Purchase Modal (Session or Utility) ── */
+function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading }) {
+  const isUtility = type === 'utility';
+  const cost = isUtility ? item.discounted_price : item.session_cost;
+  const canAfford = dustBalance >= cost;
+  const color = isUtility ? item.color : (item.member?.color || '#818CF8');
 
   return (
     <motion.div
@@ -143,63 +197,87 @@ function PurchaseModal({ sovereign, dustBalance, onPurchase, onClose, loading })
       data-testid="purchase-modal"
     >
       <motion.div
-        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
+        initial={{ scale: 0.92, y: 16 }} animate={{ scale: 1, y: 0 }}
         onClick={e => e.stopPropagation()}
         className="w-full max-w-sm rounded-2xl overflow-hidden"
-        style={{ background: '#0B0C15', border: `1px solid ${sovereign.color}20` }}
+        style={{ background: '#0B0C15', border: `1px solid ${color}18` }}
       >
         <div className="p-5 text-center">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{
-            background: `${sovereign.color}0D`, border: `1px solid ${sovereign.color}20`,
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{
+            background: `${color}0D`, border: `1px solid ${color}18`,
           }}>
-            <Icon size={28} style={{ color: sovereign.color }} />
+            {isUtility ? <Wrench size={24} style={{ color }} /> : <Sparkles size={24} style={{ color }} />}
           </div>
+
           <h3 className="text-sm font-semibold mb-1" style={{ color: '#F8FAFC' }}>
-            Consult {sovereign.name}
+            {isUtility ? item.name : `Consult ${item.member?.name}`}
           </h3>
-          <p className="text-[9px] mb-4" style={{ color: 'rgba(248,250,252,0.35)' }}>
-            {sovereign.role}
+          <p className="text-[9px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            {isUtility ? item.description : item.member?.role}
           </p>
 
-          <div className="rounded-xl p-3 mb-4" style={{
+          {isUtility && (
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <span className="text-[9px] line-through" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                {item.base_price} Dust
+              </span>
+              <span className="text-xs font-bold" style={{ color }}>
+                {item.discounted_price} Dust
+              </span>
+              <span className="text-[7px] px-1.5 py-0.5 rounded" style={{
+                background: 'rgba(34,197,94,0.08)', color: '#22C55E',
+              }}>
+                Save {item.discount_pct}%
+              </span>
+            </div>
+          )}
+
+          <div className="rounded-lg p-2.5 mb-3" style={{
             background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)',
           }}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Session Cost</span>
-              <span className="text-xs font-bold" style={{ color: sovereign.color }}>
-                {sovereign.session_cost} Dust
-              </span>
+              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>Cost</span>
+              <span className="text-xs font-bold" style={{ color }}>{cost} Dust</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Your Balance</span>
+              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>Balance</span>
               <span className="text-xs font-semibold" style={{
                 color: canAfford ? '#22C55E' : '#EF4444',
-              }}>
-                {dustBalance} Dust
-              </span>
+              }}>{dustBalance} Dust</span>
             </div>
           </div>
 
+          {isUtility && (
+            <div className="text-[7px] mb-3 px-2 py-1.5 rounded-lg" style={{
+              background: 'rgba(192,132,252,0.04)', color: 'rgba(248,250,252,0.3)',
+              border: '1px solid rgba(192,132,252,0.08)',
+            }}>
+              Lifetime license. Protected by the 30% Failure Charge refund protocol.
+            </div>
+          )}
+
           <button
-            onClick={() => onPurchase(sovereign.id)}
+            onClick={onConfirm}
             disabled={!canAfford || loading}
             className="w-full py-2.5 rounded-xl text-[10px] font-medium transition-all"
             style={{
-              background: canAfford ? `${sovereign.color}12` : 'rgba(239,68,68,0.06)',
-              color: canAfford ? sovereign.color : '#EF4444',
-              border: `1px solid ${canAfford ? `${sovereign.color}20` : 'rgba(239,68,68,0.12)'}`,
+              background: canAfford ? `${color}10` : 'rgba(239,68,68,0.05)',
+              color: canAfford ? color : '#EF4444',
+              border: `1px solid ${canAfford ? `${color}18` : 'rgba(239,68,68,0.1)'}`,
               opacity: (!canAfford || loading) ? 0.5 : 1,
               cursor: (!canAfford || loading) ? 'not-allowed' : 'pointer',
             }}
             data-testid="confirm-purchase-btn"
           >
-            {loading ? 'Processing...' : canAfford ? 'Begin Session' : 'Insufficient Dust'}
+            {loading ? 'Processing...' : canAfford
+              ? (isUtility ? 'Purchase Utility' : 'Begin Session')
+              : 'Insufficient Dust'}
           </button>
         </div>
 
         <button onClick={onClose} className="w-full py-2 text-[9px]" style={{
-          color: 'rgba(248,250,252,0.3)', background: 'rgba(255,255,255,0.015)',
-          borderTop: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer',
+          color: 'rgba(248,250,252,0.25)', background: 'rgba(255,255,255,0.01)',
+          borderTop: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer',
         }}>Cancel</button>
       </motion.div>
     </motion.div>
@@ -207,73 +285,93 @@ function PurchaseModal({ sovereign, dustBalance, onPurchase, onClose, loading })
 }
 
 /* ═══════════════════════════════════════════
-   MAIN SOVEREIGN ADVISORS PAGE
+   THE SOVEREIGN COUNCIL PAGE
    ═══════════════════════════════════════════ */
 export default function SovereignAdvisors() {
   const { token, authHeaders } = useAuth();
   const { language } = useLanguage();
-  const [sovereigns, setSovereigns] = useState([]);
+  const [council, setCouncil] = useState([]);
   const [userTier, setUserTier] = useState('discovery');
   const [dustBalance, setDustBalance] = useState(0);
-  const [selectedSovereign, setSelectedSovereign] = useState(null);
+  const [utilitiesOwned, setUtilitiesOwned] = useState(0);
+  const [utilitiesTotal, setUtilitiesTotal] = useState(5);
+  const [discountRate, setDiscountRate] = useState(10);
+
+  const [selectedMember, setSelectedMember] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [showPurchase, setShowPurchase] = useState(null);
+
+  const [purchaseModal, setPurchaseModal] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
   const chatEndRef = useRef(null);
 
-  const fetchSovereigns = useCallback(async () => {
+  const fetchCouncil = useCallback(async () => {
     if (!token) return;
     try {
       const res = await fetch(`${API}/api/sovereigns/list`, { headers: authHeaders });
       const data = await res.json();
-      setSovereigns(data.sovereigns || []);
+      setCouncil(data.council || []);
       setUserTier(data.user_tier || 'discovery');
       setDustBalance(data.dust_balance || 0);
+      setUtilitiesOwned(data.utilities_owned || 0);
+      setUtilitiesTotal(data.utilities_total || 5);
+      setDiscountRate(data.discount_rate || 10);
     } catch {}
   }, [token, authHeaders]);
 
-  useEffect(() => { fetchSovereigns(); }, [fetchSovereigns]);
+  useEffect(() => { fetchCouncil(); }, [fetchCouncil]);
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const advisors = council.filter(m => m.role_type === 'advisor');
+  const faculty = council.filter(m => m.role_type === 'faculty');
 
-  const handleSelectSovereign = async (sovereign) => {
-    const accessible = sovereign.has_free_access || sovereign.has_session;
+  const handleSelect = async (member) => {
+    const accessible = member.has_free_access || member.has_session;
     if (!accessible) {
-      setShowPurchase(sovereign);
+      setPurchaseModal({ type: 'session', item: { member, session_cost: member.session_cost } });
       return;
     }
-    setSelectedSovereign(sovereign);
+    setSelectedMember(member);
     setLoadingHistory(true);
     try {
-      const res = await fetch(`${API}/api/sovereigns/history/${sovereign.id}`, { headers: authHeaders });
+      const res = await fetch(`${API}/api/sovereigns/history/${member.id}`, { headers: authHeaders });
       const data = await res.json();
       setMessages(data.messages || []);
-    } catch {
-      setMessages([]);
-    }
+    } catch { setMessages([]); }
     setLoadingHistory(false);
   };
 
-  const handlePurchaseSession = async (sovereignId) => {
+  const handlePurchaseUtility = (member, util) => {
+    setPurchaseModal({ type: 'utility', item: util, member });
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!purchaseModal) return;
     setPurchasing(true);
     try {
-      const res = await fetch(`${API}/api/sovereigns/purchase-session`, {
-        method: 'POST',
-        headers: { ...authHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sovereign_id: sovereignId }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setShowPurchase(null);
-        await fetchSovereigns();
-        const updated = sovereigns.find(s => s.id === sovereignId);
-        if (updated) {
-          handleSelectSovereign({ ...updated, has_session: true, has_free_access: updated.has_free_access });
+      if (purchaseModal.type === 'session') {
+        const res = await fetch(`${API}/api/sovereigns/purchase-session`, {
+          method: 'POST',
+          headers: { ...authHeaders, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sovereign_id: purchaseModal.item.member.id }),
+        });
+        if (res.ok) {
+          setPurchaseModal(null);
+          await fetchCouncil();
+          const m = purchaseModal.item.member;
+          handleSelect({ ...m, has_session: true });
+        }
+      } else {
+        const res = await fetch(`${API}/api/sovereigns/purchase-utility`, {
+          method: 'POST',
+          headers: { ...authHeaders, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ utility_id: purchaseModal.item.id }),
+        });
+        if (res.ok) {
+          setPurchaseModal(null);
+          await fetchCouncil();
         }
       }
     } catch {}
@@ -281,21 +379,16 @@ export default function SovereignAdvisors() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedSovereign || sending) return;
+    if (!input.trim() || !selectedMember || sending) return;
     const msg = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: msg, created_at: new Date().toISOString() }]);
     setSending(true);
-
     try {
       const res = await fetch(`${API}/api/sovereigns/chat`, {
         method: 'POST',
         headers: { ...authHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sovereign_id: selectedSovereign.id,
-          message: msg,
-          language: language,
-        }),
+        body: JSON.stringify({ sovereign_id: selectedMember.id, message: msg, language }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -305,126 +398,156 @@ export default function SovereignAdvisors() {
         }]);
       } else {
         setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: data.detail || 'The Sovereign is currently unavailable. Please try again.',
+          role: 'assistant', content: data.detail || 'The Council member is unavailable.',
           created_at: new Date().toISOString(),
         }]);
       }
     } catch {
       setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: 'Connection to the Sovereign was interrupted.',
+        role: 'assistant', content: 'Connection interrupted.',
         created_at: new Date().toISOString(),
       }]);
     }
     setSending(false);
   };
 
-  const handleClearHistory = async () => {
-    if (!selectedSovereign) return;
+  const handleClear = async () => {
+    if (!selectedMember) return;
     try {
-      await fetch(`${API}/api/sovereigns/history/${selectedSovereign.id}`, {
+      await fetch(`${API}/api/sovereigns/history/${selectedMember.id}`, {
         method: 'DELETE', headers: authHeaders,
       });
       setMessages([]);
     } catch {}
   };
 
-  const handleBridge = (bridgeSovereignId) => {
-    const target = sovereigns.find(s => s.id === bridgeSovereignId);
+  const handleBridge = (bridgeId) => {
+    const target = council.find(m => m.id === bridgeId);
     if (target) {
-      setSelectedSovereign(null);
-      setTimeout(() => handleSelectSovereign(target), 100);
+      setSelectedMember(null);
+      setTimeout(() => handleSelect(target), 100);
     }
   };
 
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B0C15' }}>
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to consult the Sovereigns</p>
+        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.25)' }}>Sign in to consult the Sovereign Council</p>
       </div>
     );
   }
 
   /* ── Chat View ── */
-  if (selectedSovereign) {
-    const Icon = ICON_MAP[selectedSovereign.icon] || Sparkles;
+  if (selectedMember) {
+    const Icon = ICON_MAP[selectedMember.icon] || Sparkles;
+    const isFaculty = selectedMember.role_type === 'faculty';
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: '#0B0C15' }} data-testid="sovereign-chat-view">
-        {/* Chat Header */}
-        <div className="px-4 py-3 flex items-center gap-3 border-b" style={{
-          borderColor: `${selectedSovereign.color}12`,
-          background: `${selectedSovereign.color}03`,
+      <div className="min-h-screen flex flex-col" style={{ background: '#0B0C15' }} data-testid="council-chat-view">
+        {/* Header */}
+        <div className="px-4 py-3 flex items-center gap-3" style={{
+          borderBottom: `1px solid ${selectedMember.color}0C`,
+          background: `${selectedMember.color}02`,
         }}>
-          <button onClick={() => { setSelectedSovereign(null); setMessages([]); }}
-            className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.04)' }}
+          <button onClick={() => { setSelectedMember(null); setMessages([]); }}
+            className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}
             data-testid="back-to-list-btn"
           >
-            <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.5)' }} />
+            <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.45)' }} />
           </button>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
-            background: `${selectedSovereign.color}0D`,
+            background: `${selectedMember.color}0A`,
           }}>
-            <Icon size={16} style={{ color: selectedSovereign.color }} />
+            <Icon size={16} style={{ color: selectedMember.color }} />
           </div>
           <div className="flex-1">
-            <div className="text-xs font-semibold" style={{ color: selectedSovereign.color }}>
-              {selectedSovereign.name}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold" style={{ color: selectedMember.color }}>
+                {selectedMember.name}
+              </span>
+              {isFaculty ? <GraduationCap size={10} style={{ color: selectedMember.color, opacity: 0.5 }} />
+                : <Crown size={10} style={{ color: selectedMember.color, opacity: 0.5 }} />}
             </div>
-            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
-              {selectedSovereign.module}
+            <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              {selectedMember.module} — Knowledge: {TIER_LABELS[userTier]} depth
             </div>
           </div>
-          <button onClick={handleClearHistory}
-            className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.04)' }}
+          <button onClick={handleClear}
+            className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}
             data-testid="clear-history-btn"
           >
-            <Trash2 size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <Trash2 size={13} style={{ color: 'rgba(248,250,252,0.25)' }} />
           </button>
         </div>
 
-        {/* Messages Area */}
+        {/* Utility banner if faculty and user doesn't own it */}
+        {selectedMember.utility && !selectedMember.utility.owned && !selectedMember.utility.native_access && (
+          <div className="px-4 py-2 flex items-center justify-between" style={{
+            background: `${selectedMember.utility.color}04`,
+            borderBottom: `1px solid ${selectedMember.utility.color}08`,
+          }} data-testid="utility-banner">
+            <div className="flex items-center gap-2">
+              <Wrench size={11} style={{ color: selectedMember.utility.color }} />
+              <span className="text-[8px]" style={{ color: selectedMember.utility.color }}>
+                {selectedMember.utility.name} — <span className="line-through">{selectedMember.utility.base_price}</span> {selectedMember.utility.discounted_price} Dust
+              </span>
+            </div>
+            <button
+              onClick={() => handlePurchaseUtility(selectedMember, selectedMember.utility)}
+              className="text-[7px] px-2 py-1 rounded-md font-medium"
+              style={{
+                background: `${selectedMember.utility.color}0A`,
+                color: selectedMember.utility.color,
+                border: `1px solid ${selectedMember.utility.color}15`,
+                cursor: 'pointer',
+              }}
+              data-testid="chat-buy-utility-btn"
+            >
+              Purchase
+            </button>
+          </div>
+        )}
+
+        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: 80 }}>
           {loadingHistory ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 size={20} className="animate-spin" style={{ color: selectedSovereign.color }} />
+            <div className="flex justify-center py-8">
+              <Loader2 size={18} className="animate-spin" style={{ color: selectedMember.color }} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{
-                background: `${selectedSovereign.color}08`, border: `1px solid ${selectedSovereign.color}15`,
+            <div className="text-center py-10">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{
+                background: `${selectedMember.color}06`, border: `1px solid ${selectedMember.color}10`,
               }}>
-                <Icon size={32} style={{ color: selectedSovereign.color, opacity: 0.5 }} />
+                <Icon size={28} style={{ color: selectedMember.color, opacity: 0.4 }} />
               </div>
-              <p className="text-[10px] font-medium mb-1" style={{ color: selectedSovereign.color }}>
-                {selectedSovereign.name}
+              <p className="text-[10px] font-medium mb-1" style={{ color: selectedMember.color }}>
+                {selectedMember.name}
               </p>
-              <p className="text-[9px] max-w-xs mx-auto" style={{ color: 'rgba(248,250,252,0.3)' }}>
-                {selectedSovereign.role}
+              <p className="text-[8px] max-w-xs mx-auto mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                {selectedMember.backstory}
+              </p>
+              <p className="text-[7px] italic" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                Knowledge depth: {TIER_LABELS[userTier]}
               </p>
             </div>
           ) : (
             <>
               {messages.map((msg, i) => (
                 <React.Fragment key={i}>
-                  <ChatMessage
-                    msg={msg}
-                    sovereignColor={selectedSovereign.color}
-                    sovereignName={selectedSovereign.name}
-                  />
-                  {msg.bridges && msg.bridges.length > 0 && (
+                  <ChatBubble msg={msg} color={selectedMember.color} name={selectedMember.name} />
+                  {msg.bridges?.length > 0 && (
                     <div className="flex gap-1.5 mb-3 ml-2">
                       {msg.bridges.map(b => (
                         <button key={b.sovereign_id}
                           onClick={() => handleBridge(b.sovereign_id)}
-                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[8px] font-medium"
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[7px] font-medium"
                           style={{
-                            background: `${b.color}08`, color: b.color,
-                            border: `1px solid ${b.color}15`, cursor: 'pointer',
+                            background: `${b.color}06`, color: b.color,
+                            border: `1px solid ${b.color}12`, cursor: 'pointer',
                           }}
                           data-testid={`bridge-${b.sovereign_id}`}
                         >
-                          <ArrowRight size={9} /> {b.name}
+                          <ArrowRight size={8} /> {b.name}
                         </button>
                       ))}
                     </div>
@@ -434,10 +557,9 @@ export default function SovereignAdvisors() {
               {sending && (
                 <div className="flex justify-start mb-3">
                   <div className="rounded-xl px-3 py-2 rounded-bl-sm" style={{
-                    background: `${selectedSovereign.color}08`,
-                    border: `1px solid ${selectedSovereign.color}12`,
+                    background: `${selectedMember.color}06`, border: `1px solid ${selectedMember.color}10`,
                   }}>
-                    <Loader2 size={14} className="animate-spin" style={{ color: selectedSovereign.color }} />
+                    <Loader2 size={14} className="animate-spin" style={{ color: selectedMember.color }} />
                   </div>
                 </div>
               )}
@@ -446,34 +568,30 @@ export default function SovereignAdvisors() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input Bar */}
+        {/* Input */}
         <div className="fixed bottom-0 left-0 right-0 px-4 py-3" style={{
           background: 'rgba(11,12,21,0.95)', backdropFilter: 'blur(12px)',
-          borderTop: `1px solid ${selectedSovereign.color}10`,
+          borderTop: `1px solid ${selectedMember.color}08`,
         }}>
           <div className="max-w-2xl mx-auto flex items-center gap-2">
             <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
+              value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-              placeholder={`Ask ${selectedSovereign.name}...`}
+              placeholder={`Ask ${selectedMember.name}...`}
               className="flex-1 text-[10px] px-3 py-2.5 rounded-xl outline-none"
               style={{
-                background: 'rgba(255,255,255,0.03)', color: '#F8FAFC',
-                border: `1px solid ${selectedSovereign.color}10`,
+                background: 'rgba(255,255,255,0.025)', color: '#F8FAFC',
+                border: `1px solid ${selectedMember.color}08`,
               }}
               data-testid="chat-input"
             />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || sending}
-              className="p-2.5 rounded-xl transition-all"
+            <button onClick={handleSend} disabled={!input.trim() || sending}
+              className="p-2.5 rounded-xl" data-testid="send-btn"
               style={{
-                background: input.trim() ? `${selectedSovereign.color}15` : 'rgba(255,255,255,0.02)',
-                color: input.trim() ? selectedSovereign.color : 'rgba(248,250,252,0.2)',
+                background: input.trim() ? `${selectedMember.color}12` : 'rgba(255,255,255,0.02)',
+                color: input.trim() ? selectedMember.color : 'rgba(248,250,252,0.15)',
                 cursor: input.trim() ? 'pointer' : 'default',
               }}
-              data-testid="send-btn"
             >
               <Send size={16} />
             </button>
@@ -483,86 +601,112 @@ export default function SovereignAdvisors() {
     );
   }
 
-  /* ── Sovereign List View ── */
+  /* ── Council List View ── */
   return (
-    <div className="min-h-screen pb-32" style={{ background: '#0B0C15' }} data-testid="sovereign-advisors-page">
+    <div className="min-h-screen pb-32" style={{ background: '#0B0C15' }} data-testid="sovereign-council-page">
       <div className="px-4 py-6 max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-5">
           <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#F8FAFC' }}
-            data-testid="sovereigns-title">
-            Sovereign Advisors
+            data-testid="council-title">
+            The Sovereign Council
           </h1>
-          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
-            5 Domain-Specific AI Authorities — Hard-Linked to Platform Modules
+          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            10 Domain Authorities — Advisors & Faculty — Tiered Knowledge
           </p>
         </div>
 
-        {/* User Status Bar */}
-        <div className="grid grid-cols-3 gap-1.5 mb-5" data-testid="sovereign-stats">
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-1.5 mb-5" data-testid="council-stats">
           {[
-            { label: 'Your Tier', value: userTier.charAt(0).toUpperCase() + userTier.slice(1), color: '#818CF8' },
-            { label: 'Dust Balance', value: dustBalance.toString(), color: '#FBBF24' },
-            { label: 'Session Cost', value: `${sovereigns[0]?.session_cost || 50} Dust`, color: '#2DD4BF' },
+            { label: 'Tier', value: TIER_LABELS[userTier] || userTier, color: TIER_COLORS[userTier] || '#818CF8' },
+            { label: 'Dust', value: dustBalance.toString(), color: '#FBBF24' },
+            { label: 'Utilities', value: `${utilitiesOwned}/${utilitiesTotal}`, color: '#2DD4BF' },
+            { label: 'Subsidy', value: `${discountRate}%`, color: '#22C55E' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-2 text-center" style={{
-              background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)',
+              background: 'rgba(255,255,255,0.012)', border: '1px solid rgba(255,255,255,0.025)',
             }}>
               <div className="text-xs font-semibold" style={{ color: s.color }}>{s.value}</div>
-              <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{s.label}</div>
+              <div className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.18)' }}>{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Language Indicator */}
-        <div className="flex items-center gap-1.5 mb-4 px-2 py-1.5 rounded-lg w-fit" style={{
-          background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)',
+        {/* Language */}
+        <div className="flex items-center gap-1.5 mb-5 px-2 py-1.5 rounded-lg w-fit" style={{
+          background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)',
         }} data-testid="language-indicator">
-          <Globe size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
-          <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
-            Sovereigns respond in your selected language: <span style={{ color: '#818CF8' }}>{language.toUpperCase()}</span>
+          <Globe size={9} style={{ color: 'rgba(248,250,252,0.25)' }} />
+          <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            Council responds in: <span style={{ color: '#818CF8' }}>{language.toUpperCase()}</span>
           </span>
         </div>
 
-        {/* Sovereign Cards */}
-        <div className="space-y-2">
-          {sovereigns.map(sovereign => (
-            <SovereignCard
-              key={sovereign.id}
-              sovereign={sovereign}
-              onSelect={handleSelectSovereign}
-              userTier={userTier}
-            />
-          ))}
-        </div>
-
-        {/* Protocol Info */}
-        <div className="mt-6 rounded-xl p-4" style={{
-          background: 'rgba(192,132,252,0.03)', border: '1px solid rgba(192,132,252,0.08)',
-        }} data-testid="protocol-info">
+        {/* Sovereign Advisors Section */}
+        <div className="mb-5">
           <div className="flex items-center gap-1.5 mb-2">
-            <Sparkles size={12} style={{ color: '#C084FC' }} />
-            <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>
-              Universal DNA-Level Protocol
+            <Crown size={11} style={{ color: '#FBBF24' }} />
+            <span className="text-[10px] font-semibold" style={{ color: '#FBBF24' }}>
+              Sovereign Advisors
+            </span>
+            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              Strategic Guidance
             </span>
           </div>
-          <div className="space-y-1.5 text-[8px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
-            <p>Each Sovereign is hard-linked to their module. Consultations initialize with the specific technical history of your current context.</p>
-            <p>The Language Toggle is site-wide — switching language transforms all Sovereign names and responses into master-level terminology.</p>
-            <p>All Sovereigns enforce the Central Broker mandate: cash is obsolete. Only Dust moves value.</p>
-            <p>Sovereigns bridge you to each other when your question crosses domains.</p>
+          <div className="space-y-2">
+            {advisors.map(m => (
+              <CouncilCard key={m.id} member={m} onSelect={handleSelect} onPurchaseUtility={handlePurchaseUtility} />
+            ))}
+          </div>
+        </div>
+
+        {/* Faculty Teachers Section */}
+        <div className="mb-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <GraduationCap size={11} style={{ color: '#C084FC' }} />
+            <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>
+              Faculty Teachers
+            </span>
+            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              Utility Tools & Education
+            </span>
+          </div>
+          <div className="space-y-2">
+            {faculty.map(m => (
+              <CouncilCard key={m.id} member={m} onSelect={handleSelect} onPurchaseUtility={handlePurchaseUtility} />
+            ))}
+          </div>
+        </div>
+
+        {/* Protocol */}
+        <div className="rounded-xl p-4" style={{
+          background: 'rgba(192,132,252,0.025)', border: '1px solid rgba(192,132,252,0.06)',
+        }} data-testid="protocol-info">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Sparkles size={11} style={{ color: '#C084FC' }} />
+            <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>
+              Council Protocol
+            </span>
+          </div>
+          <div className="space-y-1.5 text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p>Knowledge depth scales with your tier. Seekers receive foundational guidance; Architects access unrestricted intelligence.</p>
+            <p>Lower-tier users can purchase utility tools at a {discountRate}% Universal Subsidy. Own 3+ Architect tools and the $89/mo subscription becomes the logical upgrade.</p>
+            <p>Every purchase is protected by the 30% Failure Charge refund protocol via The Principal Economist.</p>
+            <p>Council members bridge you to each other when your question crosses domains. Language toggle transforms all responses instantly.</p>
           </div>
         </div>
       </div>
 
       {/* Purchase Modal */}
       <AnimatePresence>
-        {showPurchase && (
+        {purchaseModal && (
           <PurchaseModal
-            sovereign={showPurchase}
+            type={purchaseModal.type}
+            item={purchaseModal.type === 'utility' ? purchaseModal.item : purchaseModal.item}
             dustBalance={dustBalance}
-            onPurchase={handlePurchaseSession}
-            onClose={() => setShowPurchase(null)}
+            onConfirm={handleConfirmPurchase}
+            onClose={() => setPurchaseModal(null)}
             loading={purchasing}
           />
         )}
