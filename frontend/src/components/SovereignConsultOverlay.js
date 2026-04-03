@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Building2, Music, Coins, Truck, Scale, Compass, Brain, Code, Leaf, FlaskConical,
   Send, Loader2, X, ChevronDown, Wrench, Sparkles, Lock, ArrowRight,
+  Volume2, VolumeX,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -137,7 +138,11 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [fadeMessages, setFadeMessages] = useState({});
   const chatEndRef = useRef(null);
+  const audioRef = useRef(null);
 
   // Load council data
   useEffect(() => {
@@ -174,6 +179,39 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Stop audio on close or member switch
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPlaying(false);
+    }
+  }, []);
+
+  // Play TTS audio from base64
+  const playAudio = useCallback((base64Audio) => {
+    stopAudio();
+    try {
+      const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+      audioRef.current = audio;
+      setIsPlaying(true);
+      audio.onended = () => setIsPlaying(false);
+      audio.play().catch(() => setIsPlaying(false));
+    } catch {
+      setIsPlaying(false);
+    }
+  }, [stopAudio]);
+
+  // Void button — kill audio
+  const toggleVoid = useCallback(() => {
+    if (voiceEnabled) {
+      stopAudio();
+      setVoiceEnabled(false);
+    } else {
+      setVoiceEnabled(true);
+    }
+  }, [voiceEnabled, stopAudio]);
+
   const handleSend = useCallback(async () => {
     if (!input.trim() || !selectedMember || sending || !token) return;
     const msg = input.trim();
@@ -184,11 +222,28 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
       const res = await fetch(`${API}/api/sovereigns/chat`, {
         method: 'POST',
         headers: { ...authHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sovereign_id: selectedMember.id, message: msg, language }),
+        body: JSON.stringify({
+          sovereign_id: selectedMember.id,
+          message: msg,
+          language,
+          voice_enabled: voiceEnabled,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response, bridges: data.bridges }]);
+        const msgIdx = Date.now();
+        setMessages(prev => [...prev, {
+          role: 'assistant', content: data.response, bridges: data.bridges, id: msgIdx,
+        }]);
+        // Play TTS audio if available
+        if (data.audio_base64 && voiceEnabled) {
+          playAudio(data.audio_base64);
+        }
+        // Step 10: 3-second fade timer
+        setFadeMessages(prev => ({ ...prev, [msgIdx]: false }));
+        setTimeout(() => {
+          setFadeMessages(prev => ({ ...prev, [msgIdx]: true }));
+        }, 3000);
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: data.detail || 'Unable to connect.' }]);
       }
@@ -196,7 +251,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Connection interrupted.' }]);
     }
     setSending(false);
-  }, [input, selectedMember, sending, token, authHeaders, language]);
+  }, [input, selectedMember, sending, token, authHeaders, language, voiceEnabled, playAudio]);
 
   const handleBridge = (bridgeId) => {
     const target = council.find(m => m.id === bridgeId);
@@ -258,6 +313,21 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
               {selectedMember?.module || 'Select a Sovereign'}
             </div>
           </div>
+          <button onClick={toggleVoid}
+            className="p-1.5 rounded-lg"
+            style={{
+              cursor: 'pointer',
+              background: voiceEnabled ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.03)',
+              border: voiceEnabled ? '1px solid rgba(139,92,246,0.25)' : '1px solid transparent',
+            }}
+            data-testid="consult-void-btn"
+            title={voiceEnabled ? 'Voice ON — tap to silence (Void)' : 'Voice OFF — tap to enable'}
+          >
+            {voiceEnabled
+              ? <Volume2 size={13} style={{ color: '#8B5CF6' }} />
+              : <VolumeX size={13} style={{ color: 'rgba(248,250,252,0.25)' }} />
+            }
+          </button>
           <button onClick={onClose} className="p-1.5 rounded-lg" style={{
             cursor: 'pointer', background: 'rgba(255,255,255,0.03)',
           }} data-testid="consult-close-btn">
@@ -364,13 +434,21 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
             <>
               {messages.map((msg, i) => {
                 const isUser = msg.role === 'user';
+                const isFaded = msg.id && fadeMessages[msg.id];
                 return (
                   <React.Fragment key={i}>
-                    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-2`}>
+                    <motion.div
+                      className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-2`}
+                      animate={{ opacity: isFaded ? 0.35 : 1 }}
+                      transition={{ duration: 1.5 }}
+                      onHoverStart={() => isFaded && setFadeMessages(prev => ({ ...prev, [msg.id]: false }))}
+                      onHoverEnd={() => msg.id && setFadeMessages(prev => ({ ...prev, [msg.id]: true }))}
+                    >
                       <div className={`max-w-[88%] rounded-xl px-2.5 py-1.5 ${isUser ? 'rounded-br-sm' : 'rounded-bl-sm'}`}
                         style={{
                           background: isUser ? 'rgba(248,250,252,0.04)' : `${color}05`,
                           border: `1px solid ${isUser ? 'rgba(248,250,252,0.05)' : `${color}08`}`,
+                          boxShadow: !isUser ? `0 0 12px ${color}06` : 'none',
                         }}
                       >
                         {!isUser && (
@@ -382,7 +460,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
                           {msg.content?.replace(/\[BRIDGE:\w+\]/g, '')}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                     {msg.bridges?.length > 0 && (
                       <div className="flex gap-1 mb-2 ml-1">
                         {msg.bridges.map(b => (

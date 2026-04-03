@@ -4,6 +4,7 @@ import {
   Building2, Music, Coins, Truck, Scale, ArrowLeft, Send, Loader2, Trash2,
   Lock, Sparkles, ChevronRight, ArrowRight, Globe, Compass, Brain, Code,
   Leaf, FlaskConical, ShieldCheck, Wrench, Crown, GraduationCap,
+  Volume2, VolumeX,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -305,7 +306,10 @@ export default function SovereignAdvisors() {
 
   const [purchaseModal, setPurchaseModal] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const chatEndRef = useRef(null);
+  const audioRef = useRef(null);
 
   const fetchCouncil = useCallback(async () => {
     if (!token) return;
@@ -378,6 +382,10 @@ export default function SovereignAdvisors() {
     setPurchasing(false);
   };
 
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; setIsPlaying(false); }
+  }, []);
+
   const handleSend = async () => {
     if (!input.trim() || !selectedMember || sending) return;
     const msg = input.trim();
@@ -388,7 +396,10 @@ export default function SovereignAdvisors() {
       const res = await fetch(`${API}/api/sovereigns/chat`, {
         method: 'POST',
         headers: { ...authHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sovereign_id: selectedMember.id, message: msg, language }),
+        body: JSON.stringify({
+          sovereign_id: selectedMember.id, message: msg, language,
+          voice_enabled: voiceEnabled,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -396,6 +407,17 @@ export default function SovereignAdvisors() {
           role: 'assistant', content: data.response,
           created_at: new Date().toISOString(), bridges: data.bridges,
         }]);
+        // Play TTS
+        if (data.audio_base64 && voiceEnabled) {
+          stopAudio();
+          try {
+            const audio = new Audio(`data:audio/mp3;base64,${data.audio_base64}`);
+            audioRef.current = audio;
+            setIsPlaying(true);
+            audio.onended = () => setIsPlaying(false);
+            audio.play().catch(() => setIsPlaying(false));
+          } catch { setIsPlaying(false); }
+        }
       } else {
         setMessages(prev => [...prev, {
           role: 'assistant', content: data.detail || 'The Council member is unavailable.',
@@ -471,6 +493,16 @@ export default function SovereignAdvisors() {
               {selectedMember.module} — Knowledge: {TIER_LABELS[userTier]} depth
             </div>
           </div>
+          <button onClick={() => { if (voiceEnabled) { stopAudio(); setVoiceEnabled(false); } else setVoiceEnabled(true); }}
+            className="p-1.5 rounded-lg" style={{
+              cursor: 'pointer',
+              background: voiceEnabled ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.03)',
+              border: voiceEnabled ? '1px solid rgba(139,92,246,0.25)' : '1px solid transparent',
+            }}
+            data-testid="voice-toggle-btn"
+          >
+            {voiceEnabled ? <Volume2 size={13} style={{ color: '#8B5CF6' }} /> : <VolumeX size={13} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+          </button>
           <button onClick={handleClear}
             className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}
             data-testid="clear-history-btn"
