@@ -12,6 +12,23 @@ RETURN_TAX_PERCENT = 30
 SOVEREIGN_ADMIN_ID = "sovereign_master"
 
 
+async def _get_surge_status():
+    """Check if Harmony Surge is active, returns fee/transmute overrides."""
+    config = await db.sovereign_config.find_one({"id": "global"}, {"_id": 0})
+    if not config:
+        return {"active": False, "commerce_fee": HARMONY_COMMERCE_FEE, "transmute_ratio": DUST_TO_GEM_RATIO}
+
+    surge = config.get("harmony_surge_data", {})
+    if surge.get("active"):
+        effects = surge.get("effects", {})
+        return {
+            "active": True,
+            "commerce_fee": effects.get("commerce_fee_override", HARMONY_COMMERCE_FEE),
+            "transmute_ratio": int(DUST_TO_GEM_RATIO * effects.get("transmute_discount", 1.0)),
+        }
+    return {"active": False, "commerce_fee": HARMONY_COMMERCE_FEE, "transmute_ratio": DUST_TO_GEM_RATIO}
+
+
 async def _get_wallet(user_id):
     """Retrieve a user's vault wallet (created by Central Bank)."""
     wallet = await db.hub_wallets.find_one({"user_id": user_id}, {"_id": 0})
@@ -177,8 +194,10 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
     }
     await db.broker_escrow.insert_one(escrow_doc)
 
-    # ─── Step 3: Commerce Fee ───
-    commerce_fee = max(1, int(amount * HARMONY_COMMERCE_FEE / 100))
+    # ─── Step 3: Commerce Fee (Surge-aware) ───
+    surge = await _get_surge_status()
+    effective_fee_rate = surge["commerce_fee"]
+    commerce_fee = max(1, int(amount * effective_fee_rate / 100))
 
     # ─── Step 4: Variable Exit Tax from H² Matrix ───
     exit_tax = 0
@@ -280,10 +299,12 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
         "currency": currency,
         "gross_amount": amount,
         "commerce_fee": commerce_fee,
+        "commerce_fee_rate": effective_fee_rate,
         "exit_tax": exit_tax,
         "exit_tax_rate": variable_tax_rate if exit_tax > 0 else 0,
         "net_to_receiver": net_to_receiver,
         "phase_mode": scan["phase"],
+        "harmony_surge_active": surge["active"],
         "h2_analysis": {
             "pass1": scan["pass1"]["cleared"],
             "pass2": scan["pass2"]["cleared"],
@@ -298,15 +319,19 @@ async def execute_trade(body: dict, user=Depends(get_current_user)):
 @router.post("/transmute")
 async def transmute_dust_to_gems(body: dict, user=Depends(get_current_user)):
     """Broker-mediated transmutation: Convert Cosmic Dust to Celestial Gems.
-    Gated by hexagram alignment — user must meet evolutionary requirements."""
+    Gated by hexagram alignment. During Harmony Surge, costs are reduced."""
     dust_amount = body.get("dust_amount", 0)
 
-    if not isinstance(dust_amount, (int, float)) or dust_amount < DUST_TO_GEM_RATIO:
-        raise HTTPException(400, f"Minimum {DUST_TO_GEM_RATIO} Dust required")
+    # Surge-aware transmutation ratio
+    surge = await _get_surge_status()
+    effective_ratio = surge["transmute_ratio"]
+
+    if not isinstance(dust_amount, (int, float)) or dust_amount < effective_ratio:
+        raise HTTPException(400, f"Minimum {effective_ratio} Dust required (Surge: {'active' if surge['active'] else 'inactive'})")
 
     dust_amount = int(dust_amount)
-    gems_to_create = dust_amount // DUST_TO_GEM_RATIO
-    dust_to_consume = gems_to_create * DUST_TO_GEM_RATIO
+    gems_to_create = dust_amount // effective_ratio
+    dust_to_consume = gems_to_create * effective_ratio
 
     wallet = await _get_wallet(user["id"])
     if wallet["dust"] < dust_to_consume:
@@ -368,6 +393,8 @@ async def transmute_dust_to_gems(body: dict, user=Depends(get_current_user)):
         "transmuted": True,
         "dust_consumed": dust_to_consume,
         "gems_created": gems_to_create,
+        "effective_ratio": effective_ratio,
+        "harmony_surge_active": surge["active"],
         "dust_balance": updated["dust"],
         "gems_balance": updated["gems"],
     }

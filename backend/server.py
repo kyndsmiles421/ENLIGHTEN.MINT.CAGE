@@ -155,11 +155,13 @@ async def startup_tasks():
     from db_indexes import ensure_indexes
     from tasks import push_scheduler_loop, credit_refresh_loop
     from routes.plants import reset_plant_watering
+    from routes.collective_resonance import resonance_aggregation_loop
 
     await ensure_indexes()
     await reset_plant_watering()
     asyncio.create_task(push_scheduler_loop())
     asyncio.create_task(credit_refresh_loop())
+    asyncio.create_task(resonance_aggregation_loop())
     logger.info("Indexes verified, schedulers started")
 
 

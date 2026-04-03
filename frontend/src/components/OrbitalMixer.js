@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Zap, X, BookOpen, Eye, EyeOff, Flame, Compass, PenTool, Coins, Users } from 'lucide-react';
+import { Lock, Zap, X, BookOpen, Eye, EyeOff, Flame, Compass, PenTool, Coins, Users, Radio } from 'lucide-react';
 import { MODULE_GROUPS, getActiveModules, moduleRegistry, checkSynergy, getSynthesisName } from '../config/moduleRegistry';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import ConstellationPanel from './ConstellationPanel';
 import CommunityPanel from './CommunityPanel';
 import HexagramGrid from './HexagramGrid';
+import CollectiveResonance from './CollectiveResonance';
 
 /* ── Haptic helper with weight support ── */
 let Haptics;
@@ -393,6 +394,7 @@ export default function OrbitalMixer() {
   const [classPickerOpen, setClassPickerOpen] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
   const [hexGridOpen, setHexGridOpen] = useState(false);
+  const [resonanceOpen, setResonanceOpen] = useState(false);
   const [feedNotification, setFeedNotification] = useState(false);
   const [dragPositions, setDragPositions] = useState({}); // { modId: {x,y} } for synergy discovery
   const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
@@ -753,8 +755,24 @@ export default function OrbitalMixer() {
         })}
       </svg>
 
-      {/* Action buttons: H² + Community + Constellation + Focus */}
+      {/* Action buttons: Resonance + H² + Community + Constellation + Focus */}
       <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
+        <motion.button
+          whileTap={{ scale: 0.85 }}
+          onClick={() => { haptic('Light'); setResonanceOpen(!resonanceOpen); }}
+          className="flex items-center gap-1 px-2 py-1 rounded-full"
+          style={{
+            background: resonanceOpen ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${resonanceOpen ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)'}`,
+            color: resonanceOpen ? '#FBBF24' : 'rgba(248,250,252,0.4)',
+            fontSize: '9px',
+            cursor: 'pointer',
+          }}
+          data-testid="orbital-resonance-btn"
+        >
+          <Radio size={10} /> Live
+        </motion.button>
+
         <motion.button
           whileTap={{ scale: 0.85 }}
           onClick={() => { haptic('Light'); setHexGridOpen(!hexGridOpen); }}
@@ -862,6 +880,18 @@ export default function OrbitalMixer() {
             <HexagramGrid
               isOpen={hexGridOpen}
               onClose={() => setHexGridOpen(false)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Collective Resonance Panel */}
+      <AnimatePresence>
+        {resonanceOpen && (
+          <div className="absolute top-10 right-3 z-30" style={{ width: isMobile ? 300 : 340 }}>
+            <CollectiveResonance
+              isOpen={resonanceOpen}
+              onClose={() => setResonanceOpen(false)}
             />
           </div>
         )}
