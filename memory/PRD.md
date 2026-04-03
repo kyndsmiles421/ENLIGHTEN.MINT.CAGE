@@ -154,7 +154,37 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 250 — Content Sentinel + Guild Community + Progressive Disclosure (Apr 3, 2026) — LATEST
+### Iteration 251 — H² Hexagram-Squared Engine + Central Bank/Broker Architecture (Apr 3, 2026) — LATEST
+- **H² Engine (24×24 State Matrix)**: Evolved from linear 24-bit vector to 576-intersection State Tensor
+  - `POST /api/quad-hex/resolve-h2` — generates full 24×24 matrix with cross-cluster resonance, density, determinant proxy
+  - `compute_h2_matrix()` — phase-weighted interference calculation with cross-cluster resonance bonus (+0.25)
+  - `compute_matrix_determinant_proxy()` — positive = additive (trade allowed), negative = extractive (trade blocked)
+  - `compute_variable_return_tax()` — 15-45% dynamic tax based on matrix density (replaces flat 30%)
+  - `apply_cross_cluster_effects()` — Security×Finance restricts transmutation, Location×Evolution reduces tax, Security×Evolution triggers sentinel escalation
+  - `GET /api/quad-hex/tensor` — cached full tensor retrieval
+- **Central Bank (Vault/Policy)**: Separated from Broker — manages total supply, monetary policy, reserve vault
+  - `POST /api/bank/earn` — Cosmic Dust awarded for platform actions (sweat equity)
+  - `GET /api/bank/policy` — circulating supply, reserves, transmutation rates, exit tax stats
+  - `POST /api/bank/return-tax` — 30% re-circulated to reserve vault (variable via H² matrix)
+- **AI Broker (Trade Circle Gatekeeper)**: Recursive 2-pass verification
+  - Pass 1: Fundamental 24-line rule check (security ≥ 8/12, finance ≥ 4/12)
+  - Pass 2: H² determinant must be positive (trade adds value to Collective)
+  - `POST /api/broker/trade` — returns h2_analysis with pass1/pass2/determinant/density/economy_health
+  - `POST /api/broker/transmute` — Dust→Gems gated by hexagram alignment ≥ 25%
+  - 2% Harmony Commerce Fee, escrow hold during validation
+- **Sacred Geometry Grid (Frontend)**: `HexagramGrid.js` component
+  - Phase, alignment, density, determinant summary cards
+  - 4 cluster score indicators with line-level visualization
+  - Expandable 576-cell interference grid (color-coded by intensity)
+  - Cross-cluster resonance bars + interference effects panel
+  - Accessible via H² button in Orbital Mixer playground
+- **Dual Currency System**: Cosmic Dust (earned) + Celestial Gems (premium)
+  - SmartDock shows dust|gems micro-wallet badge
+  - TreasuryContext updated with bank/broker API integration
+- **Real-Time Feed Notifications**: Polling-based new post indicator on Community button
+- Tests: Backend 15/15 (100%), Frontend 100%
+
+### Iteration 250 — Content Sentinel + Guild Community + Progressive Disclosure (Apr 3, 2026)
 - **Automated Content Sentinel**: Full real-time content moderation system
   - `/api/sentinel/scan` — scans text against prohibited patterns (hate, slurs, sexual, self-harm, violence)
   - Zero-Tolerance Protocol: 3+ violations → automatic shadow-mute (content silently dropped)
@@ -258,11 +288,10 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iterations 234-236 — Foundation
 
 ## Upcoming (P1)
-- **Central Hub / P2P Cash Transactions**: All cash-based exchanges routed through Central Hub (ledger + clearinghouse) for circular economy alignment
-- **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation
-- **Ghost Skeleton UI Optimization**: Skeleton loaders before canvas items fully render
-- **Synthesis Handshake**: Full combo-widget logic — Cymatic Visuals, Trade Trails, Blueprint Forge
-- **Liquid Tethers**: Animated SVG data-stream connections between synthesized widgets
+- **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation, sensitivity weighted by hexagram alignment
+- **Ghost Skeleton UI Optimization**: Skeleton loaders before canvas items render
+- **Fractal Receipt Generation**: Unique fractal pattern per trade (H² matrix state fingerprint)
+- **24-Line Hexagram Pillar UI**: Animated vertical pillar visualization during trade settlement
 
 ## Future/Backlog (P2)
 - **Oracle Navigation Loop**: I Ching → GPS Map → Artifact discovery → Forge upgrade → Class Stats
