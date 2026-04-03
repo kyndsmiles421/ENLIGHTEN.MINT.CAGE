@@ -8956,5 +8956,158 @@
         ]
       }
     ]
+  },
+  "hopi": {
+    "name": "Hopi Star Knowledge",
+    "color": "#D97706",
+    "icon": "sun",
+    "description": "The Hopi see the stars as the homes of the Kachina spirits. Their three mesas align with Orion's Belt, reflecting the 'As Above, So Below' principle.",
+    "constellations": [
+      {
+        "id": "hotomkam",
+        "name": "Hotomkam",
+        "element": "Fire",
+        "stars": [
+          {
+            "name": "Alnitak",
+            "ra": 85.19,
+            "dec": -1.94,
+            "magnitude": 1.74
+          },
+          {
+            "name": "Alnilam",
+            "ra": 84.05,
+            "dec": -1.2,
+            "magnitude": 1.69
+          },
+          {
+            "name": "Mintaka",
+            "ra": 83.0,
+            "dec": -0.3,
+            "magnitude": 2.23
+          }
+        ],
+        "lines": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        "mythology": {
+          "figure": "The Three Mesas",
+          "origin": "Hopi (Arizona)",
+          "deity": "Sotuknang",
+          "story": "The three Hopi mesas \u2014 First Mesa, Second Mesa, and Third Mesa \u2014 were placed by Sotuknang to mirror the three stars of Orion's Belt. When a Hopi elder looks up at Hotomkam, they see their own homeland reflected back in starlight. This is not metaphor \u2014 it is sacred geography.",
+          "lesson": "As Above, So Below. The pattern of the stars is the pattern of the earth. You are already standing on a star."
+        }
+      },
+      {
+        "id": "tsootsma",
+        "name": "Tsootsma",
+        "element": "Air",
+        "stars": [
+          {
+            "name": "Alcyone",
+            "ra": 56.87,
+            "dec": 24.11,
+            "magnitude": 2.87
+          },
+          {
+            "name": "Maia",
+            "ra": 56.57,
+            "dec": 24.37,
+            "magnitude": 3.87
+          },
+          {
+            "name": "Electra",
+            "ra": 56.24,
+            "dec": 24.11,
+            "magnitude": 3.7
+          },
+          {
+            "name": "Taygeta",
+            "ra": 56.42,
+            "dec": 24.47,
+            "magnitude": 4.29
+          },
+          {
+            "name": "Merope",
+            "ra": 56.58,
+            "dec": 23.95,
+            "magnitude": 4.18
+          },
+          {
+            "name": "Celaeno",
+            "ra": 56.16,
+            "dec": 24.29,
+            "magnitude": 5.45
+          },
+          {
+            "name": "Atlas",
+            "ra": 57.29,
+            "dec": 24.05,
+            "magnitude": 3.62
+          }
+        ],
+        "lines": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "mythology": {
+          "figure": "The Harmonious Ones (Pleiades)",
+          "origin": "Hopi (Arizona)",
+          "deity": "Kachina Spirits",
+          "story": "Tsootsma \u2014 the Pleiades \u2014 mark the time of the Wuwuchim ceremony, the most sacred Hopi rite of spiritual rebirth. When these seven stars appear above the eastern horizon in November, the young men of the villages enter the kivas for initiation. The stars are not distant suns \u2014 they are the spirits of the ancestors watching over the ceremony.",
+          "lesson": "Rebirth is not an event \u2014 it is a season. When the stars call, the soul answers."
+        }
+      },
+      {
+        "id": "saquasohuh",
+        "name": "Saquasohuh",
+        "element": "Water",
+        "stars": [
+          {
+            "name": "Sirius",
+            "ra": 101.29,
+            "dec": -16.72,
+            "magnitude": -1.46
+          }
+        ],
+        "lines": [],
+        "mythology": {
+          "figure": "Blue Star Kachina",
+          "origin": "Hopi (Arizona)",
+          "deity": "Saquasohuh (Blue Star Spirit)",
+          "story": "The Hopi prophecy speaks of the Blue Star Kachina \u2014 Saquasohuh \u2014 who will remove his mask in the plaza and dance during the day. When this happens, the Fifth World will begin. Sirius, the brightest star in the sky, is the physical anchor of this prophecy. It burns blue-white across 8.6 light-years of space, waiting.",
+          "lesson": "The great purification is not destruction \u2014 it is revelation. What was hidden will be seen."
+        }
+      }
+    ]
   }
 }

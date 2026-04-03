@@ -214,3 +214,72 @@ async def get_movement_summary(user=Depends(get_current_user)):
         "routes_visited": list(route_set),
         "total_duration_ms": total_dur,
     }
+
+
+
+class HarmonicBookmark(BaseModel):
+    module_a: str
+    module_b: str
+    intensity: float = 0.0
+    interval: str = "third"
+
+
+@router.post("/record-harmonic")
+async def record_harmonic(data: HarmonicBookmark, user=Depends(get_current_user)):
+    """Bookmark a high-resonance sphere pairing for Harmonic Memory."""
+    pair_key = "-".join(sorted([data.module_a, data.module_b]))
+    existing = await db.harmonic_memory.find_one(
+        {"user_id": user["id"], "pair_key": pair_key},
+        {"_id": 0}
+    )
+    if existing:
+        await db.harmonic_memory.update_one(
+            {"user_id": user["id"], "pair_key": pair_key},
+            {"$inc": {"count": 1, "total_intensity": data.intensity},
+             "$set": {"last_interval": data.interval, "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+    else:
+        await db.harmonic_memory.insert_one({
+            "user_id": user["id"],
+            "pair_key": pair_key,
+            "module_a": data.module_a,
+            "module_b": data.module_b,
+            "count": 1,
+            "total_intensity": data.intensity,
+            "last_interval": data.interval,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        })
+    return {"success": True, "pair_key": pair_key}
+
+
+@router.get("/harmonic-memory")
+async def get_harmonic_memory(user=Depends(get_current_user)):
+    """Return preferred sphere pairings with suggested starting positions."""
+    cursor = db.harmonic_memory.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "pair_key": 1, "module_a": 1, "module_b": 1, "count": 1,
+         "total_intensity": 1, "last_interval": 1}
+    ).sort("count", -1).limit(10)
+    memories = await cursor.to_list(length=10)
+
+    # Generate position suggestions — favorite pairs placed closer together
+    suggestions = []
+    import math
+    for i, mem in enumerate(memories):
+        avg_intensity = mem.get("total_intensity", 0) / max(1, mem.get("count", 1))
+        # Higher interaction count = closer starting distance
+        closeness = min(0.8, mem.get("count", 0) * 0.05)
+        base_angle = (i / max(1, len(memories))) * 2 * math.pi
+        suggestions.append({
+            "pair_key": mem["pair_key"],
+            "module_a": mem["module_a"],
+            "module_b": mem["module_b"],
+            "interaction_count": mem.get("count", 0),
+            "avg_intensity": round(avg_intensity, 3),
+            "closeness_factor": round(closeness, 3),
+            "suggested_angle_offset": round(base_angle, 3),
+            "last_interval": mem.get("last_interval", "third"),
+        })
+
+    return {"memories": suggestions, "total_bookmarks": len(memories)}

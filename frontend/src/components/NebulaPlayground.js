@@ -1,11 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import NebulaSphere from './NebulaSphere';
 import { useSovereign } from '../context/SovereignContext';
+import { useAuth } from '../context/AuthContext';
 import { detectResonance, PROXIMITY_THRESHOLD } from '../pages/SuanpanPhysics';
 import { useProximityHarmonics } from '../hooks/usePhonicResonance';
 import { toast } from 'sonner';
 
+const API = process.env.REACT_APP_BACKEND_URL;
 const GRAVITY_WELL_RADIUS = 180;
 
 // Cross-domain injection map
@@ -109,6 +112,7 @@ function GravityWellIndicator({ position, radius, active, intensity = 0 }) {
 export default function NebulaPlayground({ detachedModules, onModuleReattach, launchVelocities = {},
   gravityMultiplier = 1.0, bloomMultiplier = 1.0, onBubbleActivate = null, masteryTier = 0 }) {
   const { publishEvent, enqueue, setNpuBurst, eventBus } = useSovereign();
+  const { authHeaders } = useAuth();
   const { startResonance, stopResonance } = useProximityHarmonics();
   const [spherePositions, setSpherePositions] = useState({});
   const [supernovae, setSupernovae] = useState([]);
@@ -118,6 +122,8 @@ export default function NebulaPlayground({ detachedModules, onModuleReattach, la
   const [wellIntensity, setWellIntensity] = useState(0);
   const resonanceTimerRef = useRef(null);
   const prevPairsRef = useRef(new Set());
+  const harmonicMemoryRef = useRef([]);
+  const harmBookmarkTimerRef = useRef({});
 
   // Gravity well — center of viewport
   const [gravityWell, setGravityWell] = useState(null);
@@ -128,12 +134,31 @@ export default function NebulaPlayground({ detachedModules, onModuleReattach, la
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // Set initial positions — scattered below crossbar, away from vacuum zone
+  // Fetch Harmonic Memory — preferred pairings for position pre-adjustment
+  useEffect(() => {
+    if (!authHeaders?.Authorization) return;
+    axios.get(`${API}/api/phonic/harmonic-memory`, { headers: authHeaders })
+      .then(res => { harmonicMemoryRef.current = res.data?.memories || []; })
+      .catch(() => {});
+  }, [authHeaders]);
+
+  // Set initial positions — apply Harmonic Memory closeness factor
   useEffect(() => {
     detachedModules.forEach((mod, i) => {
       if (!spherePositions[mod.id]) {
-        const angle = (i / Math.max(1, detachedModules.length)) * Math.PI * 1.5 + Math.PI * 0.25;
-        const r = 180 + Math.random() * 80;
+        let angle = (i / Math.max(1, detachedModules.length)) * Math.PI * 1.5 + Math.PI * 0.25;
+        let r = 180 + Math.random() * 80;
+
+        // Harmonic Memory: adjust angle to place preferred pairs closer
+        const memory = harmonicMemoryRef.current.find(
+          m => m.module_a === mod.id || m.module_b === mod.id
+        );
+        if (memory) {
+          // Pull closer by closeness_factor (0→0.8 maps to 100%→20% radius)
+          r = r * (1 - memory.closeness_factor * 0.6);
+          angle += memory.suggested_angle_offset * 0.3;
+        }
+
         setSpherePositions(prev => ({
           ...prev,
           [mod.id]: {
@@ -162,8 +187,29 @@ export default function NebulaPlayground({ detachedModules, onModuleReattach, la
           const dx = posA.x - posB.x;
           const dy = posA.y - posB.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          startResonance(res.a, res.b, dist, PROXIMITY_THRESHOLD);
+          const intensity = startResonance(res.a, res.b, dist, PROXIMITY_THRESHOLD);
           activePairs.add([res.a, res.b].sort().join('-'));
+
+          // Harmonic Memory bookmark — record high-resonance interactions (>0.6 for 3s)
+          const pairKey = [res.a, res.b].sort().join('-');
+          if (intensity > 0.6) {
+            if (!harmBookmarkTimerRef.current[pairKey]) {
+              harmBookmarkTimerRef.current[pairKey] = setTimeout(() => {
+                if (authHeaders?.Authorization) {
+                  axios.post(`${API}/api/phonic/record-harmonic`, {
+                    module_a: res.a, module_b: res.b, intensity,
+                    interval: intensity > 0.8 ? 'octave' : intensity > 0.6 ? 'fifth' : 'third',
+                  }, { headers: authHeaders }).catch(() => {});
+                }
+                delete harmBookmarkTimerRef.current[pairKey];
+              }, 3000);
+            }
+          } else {
+            if (harmBookmarkTimerRef.current[pairKey]) {
+              clearTimeout(harmBookmarkTimerRef.current[pairKey]);
+              delete harmBookmarkTimerRef.current[pairKey];
+            }
+          }
         }
       });
       // Stop resonance for pairs no longer in range

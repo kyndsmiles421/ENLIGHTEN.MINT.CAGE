@@ -1,18 +1,128 @@
-// Cosmic Collective Service Worker — Push Notifications + Cache Management
+// ━━━ Cosmic Collective Service Worker ━━━
+// Push Notifications + Offline Solfeggio Oscillator Cache + App Shell
 
-// Install: activate immediately
-self.addEventListener('install', () => self.skipWaiting());
+const CACHE_VERSION = 'cosmic-v3';
+const SOLFEGGIO_CACHE = 'solfeggio-wavetables-v1';
 
-// Activate: clear old caches, claim clients
-self.addEventListener('activate', (event) => {
+// Core Solfeggio frequencies to pre-cache as wave table data
+const SOLFEGGIO_FREQUENCIES = [396, 432, 528, 639, 741, 852, 963];
+
+// App shell resources to cache for offline
+const APP_SHELL = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/logo192.png',
+  '/logo512.png',
+  '/favicon.ico',
+];
+
+// Generate a simple wave table for a frequency (sine wave samples)
+function generateWaveTable(frequency, sampleRate = 44100, duration = 2) {
+  const numSamples = sampleRate * duration;
+  const table = new Float32Array(numSamples);
+  for (let i = 0; i < numSamples; i++) {
+    table[i] = Math.sin(2 * Math.PI * frequency * i / sampleRate);
+  }
+  return table;
+}
+
+// Install: cache app shell + pre-generate Solfeggio wave tables
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then((names) => Promise.all(names.map((n) => caches.delete(n))))
-      .then(() => self.clients.claim())
+    Promise.all([
+      // Cache app shell
+      caches.open(CACHE_VERSION).then((cache) => {
+        return cache.addAll(APP_SHELL).catch(() => {
+          // Individual fallback — some assets may fail in preview
+          return Promise.allSettled(APP_SHELL.map(url => cache.add(url)));
+        });
+      }),
+      // Pre-generate Solfeggio wave table data
+      caches.open(SOLFEGGIO_CACHE).then((cache) => {
+        const promises = SOLFEGGIO_FREQUENCIES.map((freq) => {
+          const table = generateWaveTable(freq);
+          const blob = new Blob([table.buffer], { type: 'application/octet-stream' });
+          const response = new Response(blob, {
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'X-Solfeggio-Freq': freq.toString(),
+              'X-Sample-Rate': '44100',
+              'X-Duration': '2',
+            },
+          });
+          return cache.put(`/solfeggio/${freq}`, response);
+        });
+        return Promise.all(promises);
+      }),
+    ]).then(() => self.skipWaiting())
   );
 });
 
-// Push: display notification from server payload
+// Activate: clean old caches, claim clients
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((names) =>
+      Promise.all(
+        names
+          .filter((n) => n !== CACHE_VERSION && n !== SOLFEGGIO_CACHE)
+          .map((n) => caches.delete(n))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+// Fetch: serve from cache first for app shell + solfeggio, network-first for API
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Solfeggio wave tables — always from cache
+  if (url.pathname.startsWith('/solfeggio/')) {
+    event.respondWith(
+      caches.open(SOLFEGGIO_CACHE).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          // Regenerate if missing
+          const freq = parseInt(url.pathname.split('/').pop());
+          if (freq && SOLFEGGIO_FREQUENCIES.includes(freq)) {
+            const table = generateWaveTable(freq);
+            const blob = new Blob([table.buffer], { type: 'application/octet-stream' });
+            const response = new Response(blob, {
+              headers: { 'Content-Type': 'application/octet-stream', 'X-Solfeggio-Freq': freq.toString() },
+            });
+            cache.put(event.request, response.clone());
+            return response;
+          }
+          return new Response('Not found', { status: 404 });
+        })
+      )
+    );
+    return;
+  }
+
+  // API calls — network only (don't cache dynamic data)
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // App shell — cache-first, network fallback
+  if (event.request.mode === 'navigate' || APP_SHELL.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        return cached || fetch(event.request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        }).catch(() => caches.match('/'));
+      })
+    );
+    return;
+  }
+});
+
+// Push: display notification
 self.addEventListener('push', (event) => {
   let data = {
     title: 'Cosmic Collective',
@@ -24,61 +134,45 @@ self.addEventListener('push', (event) => {
   };
 
   try {
-    if (event.data) {
-      data = { ...data, ...event.data.json() };
-    }
+    if (event.data) data = { ...data, ...event.data.json() };
   } catch (e) {
-    // If payload isn't JSON, use the text as body
-    if (event.data) {
-      data.body = event.data.text();
-    }
+    if (event.data) data.body = event.data.text();
   }
 
-  const options = {
-    body: data.body,
-    icon: data.icon || '/logo192.png',
-    badge: data.badge || '/logo192.png',
-    tag: data.tag || 'cosmic',
-    data: { url: data.url || '/' },
-    vibrate: [120, 60, 120, 60, 200],
-    actions: [
-      { action: 'open', title: 'Open' },
-      { action: 'dismiss', title: 'Later' },
-    ],
-    requireInteraction: false,
-    renotify: true,
-  };
-
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon || '/logo192.png',
+      badge: data.badge || '/logo192.png',
+      tag: data.tag || 'cosmic',
+      data: { url: data.url || '/' },
+      vibrate: [120, 60, 120, 60, 200],
+      actions: [
+        { action: 'open', title: 'Open' },
+        { action: 'dismiss', title: 'Later' },
+      ],
+      requireInteraction: false,
+      renotify: true,
+    })
   );
 });
 
-// Notification click: open the app to the specified URL
+// Notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-
   if (event.action === 'dismiss') return;
-
   const targetUrl = event.notification.data?.url || '/';
-
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
-        // Focus existing window if available
-        for (const client of clients) {
-          if (client.url.includes(self.location.origin)) {
-            client.navigate(targetUrl);
-            return client.focus();
-          }
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if (client.url.includes(self.location.origin)) {
+          client.navigate(targetUrl);
+          return client.focus();
         }
-        // Otherwise open a new window
-        return self.clients.openWindow(targetUrl);
-      })
+      }
+      return self.clients.openWindow(targetUrl);
+    })
   );
 });
 
-// Notification close: track dismissals (optional analytics)
-self.addEventListener('notificationclose', (event) => {
-  // Could send analytics here
-});
+self.addEventListener('notificationclose', () => {});

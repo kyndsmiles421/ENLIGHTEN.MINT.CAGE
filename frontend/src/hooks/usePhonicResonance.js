@@ -247,11 +247,31 @@ export function usePhonicResonance(enabled = true, volume = 0.025) {
   return { frequency: currentFreqRef.current, sonicProfile };
 }
 
+// ━━━ Haptic Transient Patterns — interval-specific vibration ━━━
+const HAPTIC_PATTERNS = {
+  unison:  [5],                    // Minimal
+  second:  [8, 15, 8],             // Light flutter
+  third:   [10, 20, 10, 20, 10],   // Soft rhythmic hum
+  fourth:  [15, 15, 15],           // Medium pulse
+  fifth:   [20, 10, 20, 10, 20],   // Strong rhythmic
+  octave:  [30, 5, 30, 5, 40],     // Sharp, decisive
+};
+
+function getIntervalType(ratio) {
+  if (ratio < 1.05) return 'unison';
+  if (ratio < 1.2) return 'second';
+  if (ratio < 1.35) return 'third';
+  if (ratio < 1.55) return 'fifth';
+  if (ratio < 1.8) return 'fourth';
+  return 'octave';
+}
+
 // ━━━ Proximity Harmonics Hook — Phase-locks compatible spheres ━━━
 export function useProximityHarmonics() {
   const ctxRef = useRef(null);
   const oscillatorsRef = useRef({});
   const gainRef = useRef(null);
+  const lastHapticRef = useRef({});
 
   // Initialize shared audio context
   const getCtx = useCallback(() => {
@@ -316,6 +336,16 @@ export function useProximityHarmonics() {
       pair.oscB.frequency.linearRampToValueAtTime(
         freqA * nearestHarmonic, ctx.currentTime + 0.5
       );
+
+      // Haptic Sync — interval-specific vibration pattern
+      const now = Date.now();
+      const lastHaptic = lastHapticRef.current[pairKey] || 0;
+      if (now - lastHaptic > 400 && navigator.vibrate) {
+        const interval = getIntervalType(Math.max(ratio, 1 / ratio));
+        const pattern = HAPTIC_PATTERNS[interval] || HAPTIC_PATTERNS.third;
+        navigator.vibrate(pattern);
+        lastHapticRef.current[pairKey] = now;
+      }
     }
 
     return intensity;
@@ -411,4 +441,4 @@ export function usePredictiveSonicTug() {
   return { engage, disengage };
 }
 
-export { ROUTE_FREQUENCIES, MODULE_FREQUENCIES };
+export { ROUTE_FREQUENCIES, MODULE_FREQUENCIES, HAPTIC_PATTERNS };
