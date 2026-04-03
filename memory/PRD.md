@@ -7,7 +7,7 @@ Build "The Cosmic Collective", a full-stack wellness platform with orbital navig
 - **Frontend**: React 19, TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Canvas 2D, Three.js
 - **Backend**: FastAPI, MongoDB (Motor), httpx
 - **Integrations**: Gemini 3 Flash (Emergent LLM Key), NWS Weather API
-- **PWA**: Service Worker with Solfeggio wave table caching
+- **PWA**: Service Worker with Solfeggio wave table + instrument caching
 
 ## Core System — Bipolar Gravity Ecosystem
 
@@ -56,11 +56,33 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Session Harmony Score
 - 0-100 score with 6 grades: Dormant → Seeking → Awakening → Resonant → Harmonious → Transcendent
 - Breakdown: resonance_alignment (40pts), exploration_diversity (30pts), harmonic_depth (30pts)
-- SVG ring visualization in SovereignHUD, fetches every 30s
-- Collapsed HUD pill shows score badge
+- SVG ring in Control Center (SmartDock HarmonyNPU panel), fetches every 30s (batched)
+- Compact badge on dock pill when panel is closed
+
+### Resonance Streak / Golden Pulse
+- 3+ consecutive sessions with score ≥ 75 triggers golden pulse + XP award
+- XP: 50 base + ((streak // 3) - 1) * 25 per cycle
+- Streak dots, best streak, total XP in Control Center panel
+- Global golden pulse overlay + XP flash animation
+
+### Organic Audio Engine
+- Route-based instrument synthesis: singing_bowl (meditation), flute (star-chart), tabla (elixirs), crystal_bowl (frequencies)
+- 2.5s delay after route change for layered organic texture
+- Service Worker INSTRUMENT_CACHE for offline support
+
+## Control Center (SmartDock Unified Hub)
+- **Architecture**: SovereignHUD data merged into SmartDock as "Control Center" panel
+- **Harmony Score**: SVG ring + breakdown bars (Alignment/Explore/Depth)
+- **Resonance Streak**: Streak dots + counter + best/XP stats
+- **NPU Queue**: Done/Queue/Errors stats + stream visualization canvas
+- **Performance**: Canvas only renders when panel is visible (not continuous rAF)
+- **Batch Timer**: Single 30s cycle for harmony-score + streak-check (consolidated from 3 timers)
+- **Mobile**: Larger touch targets (36px mobile vs 30px desktop), swipe-up gesture to open panel
+- **Golden Pulse/XP Flash**: Global overlays via SmartDock portal
 
 ## PWA Offline Resilience
 - Service Worker caches 7 Solfeggio wave tables (44.1kHz, 2s sine samples)
+- Instrument profiles cached for offline support
 - App shell caching, /solfeggio/{freq} paths
 
 ## Multi-Civilization Star Charts
@@ -85,6 +107,7 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Phonic: /api/phonic/
 - POST record-movement, POST generate-flourish, GET harmonic-pairs, GET movement-summary
 - POST record-harmonic, GET harmonic-memory, POST harmony-score
+- POST streak-check, GET streak-status
 
 ### Culture: /api/culture-layers/
 - GET / (list), GET /{layer_id} (full data)
@@ -96,29 +119,45 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 /app/frontend/src/
 ├── components/
+│   ├── SmartDock.js (+ Control Center: Harmony, NPU, Streak)
 │   ├── SovereignCrossbar.js, NebulaSphere.js, NebulaPlayground.js
-│   ├── SovereignHUD.js (+ Session Harmony Score)
 │   ├── OrbitalNavigation.js, BubblePortal.js
 │   ├── CultureLayerPanel.js
+│   ├── PersistentWaveform.js (React.memo)
 ├── hooks/
 │   ├── usePhonicResonance.js (+ ProximityHarmonics + SonicTug + HapticSync)
+│   ├── useOrganicAudio.js (External organic instrument synthesis)
+│   ├── useHarmonyEngine.js (Consolidated harmony/streak/NPU logic)
 ├── pages/
 │   ├── MasteryPath.js, SuanpanPhysics.js, StarChart.js (+ CultureLayerPanel)
 /app/frontend/public/
-│   ├── sw.js (Solfeggio cache)
+│   ├── sw.js (Solfeggio + instrument cache)
 
 /app/backend/routes/
-│   ├── phonic.py (movement + flourish + harmonics + memory + harmony-score)
+│   ├── phonic.py (movement + flourish + harmonics + memory + harmony-score + streak)
 │   ├── culture_layers.py (Hopi/Egyptian/Vedic)
 │   ├── sovereign_mastery.py
 ```
 
 ## Iteration History
-### Iteration 241 — Session Harmony Score + CultureLayer Integration (Apr 3, 2026) — LATEST
-- Session Harmony Score: POST /api/phonic/harmony-score, SVG ring in SovereignHUD, 6 grades, 3 breakdown bars
-- CultureLayerPanel injected into StarChart page (top-28 left-4)
-- Tests: Backend 8/8 (100%), Frontend 100%
+### Iteration 243 — Streamline Consolidation: Control Center (Apr 3, 2026) — LATEST
+- SovereignHUD merged into SmartDock as "Control Center" panel (HarmonyNPUPanel)
+- useHarmonyEngine hook: consolidated 3 separate 30s timers into single batch cycle
+- Canvas only renders when Control Center panel is open (P1 performance)
+- PersistentWaveform wrapped in React.memo (P1 performance)
+- Mobile dock: larger touch targets (36px vs 30px), swipe-up gesture
+- Leaner PageLoader (removed LoadingMantra spinner)
+- Golden Pulse + XP Flash overlays moved to global SmartDock portal
+- Tests: Backend 5/5 (100%), Frontend 100%
 
+### Iteration 242 — Resonance Streak + Organic Audio Engine
+- Streak-check and streak-status endpoints
+- Golden Pulse overlay, XP Flash, streak dots in HUD
+- useOrganicAudio hook (singing_bowl, flute, tabla, crystal_bowl synthesis)
+- Service Worker INSTRUMENT_CACHE
+- Tests: Backend 6/6 (100%), Frontend 100%
+
+### Iteration 241 — Session Harmony Score + CultureLayer Integration
 ### Iteration 240 — Haptic Sync + PWA + Culture Layers + Harmonic Memory
 ### Iteration 239 — Phonic Architecture + UI Fix
 ### Iteration 238 — Sentient Streamline Enhancement
@@ -126,13 +165,17 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iterations 234-236 — Foundation
 
 ## Upcoming (P1)
-- External audio asset hosting (real instrument multi-samples for richer textures)
 - Edge Functions for phonic logic (ultra-low-latency)
+- Loading skeletons for star chart data (perceived speed)
 
 ## Future/Backlog (P2)
+- I Ching Logic Gates
+- 54-Sublayer L² Fractal Engine
+- GPS-Based Cosmic Map
+- Forge Mini-Game
 - Pan + Reverb keyframe lanes in Mixer
 - Deep Haptic API for mobile-first tactile navigation
-- GPS-based Cosmic Map
+- Phygital Marketplace / Server-Side Escrow
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
