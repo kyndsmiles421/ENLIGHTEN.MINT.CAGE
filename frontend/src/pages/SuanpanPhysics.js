@@ -8,7 +8,26 @@ const PERIMETER_BUFFER = 60;     // Elastic wall margin (px)
 const PERIMETER_STIFFNESS = 0.4; // Wall bounce force
 const ORBITAL_DECAY = 0.002;     // Centering force per frame
 const REST_HEIGHT_RATIO = 0.33;  // Spheres settle to top-third
-const FRICTION = 0.985;          // Per-frame velocity damping
+const FRICTION = 0.985;          // Per-frame velocity damping (base — overridden by tier)
+
+// ━━━ Tiered Variable Inertia ━━━
+// Higher tiers = lower friction = longer momentum carry = "heavier" feel
+const TIER_FRICTION = {
+  0: 0.970,  // Unranked — high friction, very snappy
+  1: 0.980,  // Novice/Seeker — standard
+  2: 0.988,  // Practitioner — smoother
+  3: 0.993,  // Specialist — cinematic weight
+  4: 0.997,  // Sovereign — glacial momentum, planetary feel
+};
+
+// Tiered trail length (frames of position history to render)
+const TIER_TRAIL_LENGTH = {
+  0: 4,
+  1: 6,
+  2: 10,
+  3: 16,
+  4: 24,
+};
 const PROXIMITY_THRESHOLD = 180; // Distance for resonance glow (px)
 const CLUSTER_THRESHOLD = 80;    // Distance to form cluster (px)
 const VACUUM_CATCH_Y = 65;       // Y threshold to trigger vacuum reattach (px)
@@ -225,9 +244,42 @@ export function physicsTick(sphere, gravityWell, viewW, viewH) {
   return { x, y, vx, vy };
 }
 
+// ━━━ Tiered Friction Lookup ━━━
+// Returns friction coefficient for a given mastery tier
+export function getTieredFriction(masteryTier = 0) {
+  return TIER_FRICTION[Math.min(4, Math.max(0, masteryTier))] || FRICTION;
+}
+
+// ━━━ Tiered Trail Length ━━━
+// How many frames of position history to render as luminous trail
+export function getTieredTrailLength(masteryTier = 0) {
+  return TIER_TRAIL_LENGTH[Math.min(4, Math.max(0, masteryTier))] || 6;
+}
+
+// ━━━ Predictive Snap Distance ━━━
+// Returns normalized proximity intensity (0-1) for haptic pre-pulse
+export function calcPredictiveSnap(spherePos, wellPos, wellRadius) {
+  const dx = wellPos.x - spherePos.x;
+  const dy = wellPos.y - spherePos.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > wellRadius * 1.2) return { intensity: 0, engaged: false };
+  const intensity = Math.max(0, 1 - dist / (wellRadius * 1.2));
+  // Engaged when inside 60% of well radius — strong pull zone
+  const engaged = dist < wellRadius * 0.6;
+  return { intensity, engaged, distance: dist };
+}
+
+// ━━━ Tiered Bubble Expansion Duration ━━━
+// Returns duration in ms for Bubble Portal clip-path animation
+export function getBubbleExpandDuration(masteryTier = 0) {
+  // Tier 0/1: 300ms snap-open → Tier 4: 850ms cinematic
+  const t = Math.min(4, Math.max(0, masteryTier)) / 4;
+  return Math.round(300 + t * 550);
+}
+
 export {
   G_CONSTANT, REPULSION_FORCE, PERIMETER_BUFFER,
   ORBITAL_DECAY, FRICTION, PROXIMITY_THRESHOLD,
   CLUSTER_THRESHOLD, VACUUM_CATCH_Y, MODULE_MASS,
-  RESONANCE_PAIRS,
+  RESONANCE_PAIRS, TIER_FRICTION, TIER_TRAIL_LENGTH,
 };

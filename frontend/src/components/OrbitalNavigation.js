@@ -6,13 +6,20 @@ import SovereignHUD from './SovereignHUD';
 import BubblePortal from './BubblePortal';
 import { useAuth } from '../context/AuthContext';
 import { useSovereign } from '../context/SovereignContext';
+import { usePhonicResonance } from '../hooks/usePhonicResonance';
 
 const EXCLUDED_PATHS = ['/', '/auth', '/intro'];
 
-// ━━━ Orbital Navigation System — Crossbar + Spheres + HUD + Bubble Portal ━━━
+// Phonic Resonance — ambient Web Audio wrapper (renders nothing)
+function PhonicResonanceProvider({ enabled }) {
+  usePhonicResonance(enabled, 0.025);
+  return null;
+}
+
+// ━━━ Orbital Navigation System — Crossbar + Spheres + HUD + Bubble Portal + Phonic Resonance ━━━
 export default function OrbitalNavigation() {
   const { token } = useAuth();
-  const { gravityMultiplier, bloomMultiplier } = useSovereign();
+  const { gravityMultiplier, bloomMultiplier, masteryTier } = useSovereign();
   const location = useLocation();
   const [detachedModules, setDetachedModules] = useState([]);
   const [launchVelocities, setLaunchVelocities] = useState({});
@@ -71,6 +78,7 @@ export default function OrbitalNavigation() {
         gravityMultiplier={gravityMultiplier}
         bloomMultiplier={bloomMultiplier}
         onBubbleActivate={handleBubbleActivate}
+        masteryTier={masteryTier}
       />
       <SovereignHUD />
       <BubblePortal
@@ -78,7 +86,9 @@ export default function OrbitalNavigation() {
         onCloseBubble={handleCloseBubble}
         onCloseAll={handleCloseAll}
         originPosition={bubbleOrigin}
+        masteryTier={masteryTier}
       />
+      <PhonicResonanceProvider enabled={!!token} />
     </>
   );
 }

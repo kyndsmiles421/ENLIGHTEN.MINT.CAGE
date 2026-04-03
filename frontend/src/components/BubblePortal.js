@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, ChevronLeft, ChevronRight, Minimize2 } from 'lucide-react';
+import { getBubbleExpandDuration } from '../pages/SuanpanPhysics';
 
 // Lazy-load target pages for each module
 const PAGE_MAP = {
@@ -10,6 +11,65 @@ const PAGE_MAP = {
   meditation: lazy(() => import('../pages/Meditation')),
   wellness: lazy(() => import('../pages/Frequencies')),
 };
+
+// ━━━ Web Audio Expansion Tone ━━━
+// Tier 1: Quick high-pitch chime (2000Hz, 200ms)
+// Tier 4: Deep bass rumble (60Hz, 600ms, oscillating)
+function playExpansionTone(masteryTier = 0) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const t = Math.min(4, Math.max(0, masteryTier)) / 4; // 0→1
+
+    // Frequency: 2000Hz (tier 0) → 60Hz (tier 4)
+    const baseFreq = 2000 - t * 1940;
+    // Duration: 200ms (tier 0) → 600ms (tier 4)
+    const duration = 0.2 + t * 0.4;
+    // Gain: lighter at tier 0, fuller at tier 4
+    const maxGain = 0.08 + t * 0.12;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Tier 0-1: sine (clean chime), Tier 3-4: triangle (warmer rumble)
+    osc.type = t < 0.5 ? 'sine' : 'triangle';
+    osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+
+    // Higher tiers: frequency sweep downward for bass rumble effect
+    if (t > 0.3) {
+      osc.frequency.exponentialRampToValueAtTime(
+        Math.max(30, baseFreq * 0.4), ctx.currentTime + duration * 0.8
+      );
+    }
+
+    // Envelope
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(maxGain, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration + 0.05);
+
+    // Higher tiers: add sub-bass harmonic
+    if (t > 0.5) {
+      const sub = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      sub.connect(subGain);
+      subGain.connect(ctx.destination);
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(baseFreq * 0.5, ctx.currentTime);
+      sub.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + duration);
+      subGain.gain.setValueAtTime(0, ctx.currentTime);
+      subGain.gain.linearRampToValueAtTime(maxGain * 0.6, ctx.currentTime + 0.05);
+      subGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      sub.start(ctx.currentTime);
+      sub.stop(ctx.currentTime + duration + 0.05);
+    }
+
+    setTimeout(() => ctx.close(), (duration + 0.2) * 1000);
+  } catch {}
+}
 
 function BubbleLoader({ color }) {
   return (
@@ -32,7 +92,7 @@ function BubbleView({ module, isActive, onClose }) {
       style={{ scrollSnapAlign: 'center' }}
       data-testid={`bubble-view-${module.id}`}
     >
-      {/* Curved edge vignette */}
+      {/* Curved edge vignette — spherical distortion reminder */}
       <div className="absolute inset-0 pointer-events-none z-10"
         style={{
           boxShadow: `inset 0 0 80px 20px rgba(0,0,0,0.6), inset 0 0 200px 60px ${module.color}08`,
@@ -71,13 +131,28 @@ function BubbleView({ module, isActive, onClose }) {
   );
 }
 
-// ━━━ BUBBLE PORTAL — Multi-screen horizontal rolling overlay ━━━
-export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll, originPosition }) {
+// ━━━ BUBBLE PORTAL — Tiered Multi-screen expansion overlay ━━━
+export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll, originPosition, masteryTier = 0 }) {
   const scrollRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const soundPlayedRef = useRef(false);
 
-  // Track scroll position for globe-like curvature
+  // Tiered expansion duration
+  const expandDuration = getBubbleExpandDuration(masteryTier) / 1000; // seconds
+
+  // Play expansion tone on mount
+  useEffect(() => {
+    if (activeBubbles.length > 0 && !soundPlayedRef.current) {
+      playExpansionTone(masteryTier);
+      soundPlayedRef.current = true;
+      // Tiered haptic: short snap (T1) vs deep rumble (T4)
+      const hapticDuration = 20 + masteryTier * 15;
+      if (navigator.vibrate) navigator.vibrate([hapticDuration, 10, hapticDuration * 0.5]);
+    }
+    if (activeBubbles.length === 0) soundPlayedRef.current = false;
+  }, [activeBubbles.length, masteryTier]);
+
+  // Track scroll position
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const { scrollLeft, clientWidth } = scrollRef.current;
@@ -93,6 +168,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
 
   // Keyboard navigation
   useEffect(() => {
+    if (activeBubbles.length === 0) return;
     const handleKey = (e) => {
       if (e.key === 'Escape') { onCloseAll(); return; }
       if (e.key === 'ArrowRight') scrollTo(Math.min(currentIndex + 1, activeBubbles.length - 1));
@@ -103,6 +179,12 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
   }, [currentIndex, activeBubbles.length, onCloseAll, scrollTo]);
 
   if (activeBubbles.length === 0) return null;
+
+  // Tiered easing: T1 = snappy, T4 = cinematic
+  const tierT = Math.min(4, Math.max(0, masteryTier)) / 4;
+  const easing = tierT < 0.3
+    ? [0.25, 1, 0.5, 1]       // Snappy ease-out
+    : [0.16, 1, 0.3, 1];      // Cinematic ease-out
 
   return (
     <AnimatePresence>
@@ -125,7 +207,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
             : 'circle(0% at 50% 50%)',
           opacity: 0,
         }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: expandDuration, ease: easing }}
         data-testid="bubble-portal"
       >
         {/* Horizontal scroll container with snap */}
@@ -154,7 +236,6 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
         {/* Navigation dots + controls */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30"
           data-testid="bubble-nav-dots">
-          {/* Left arrow */}
           {activeBubbles.length > 1 && currentIndex > 0 && (
             <motion.button onClick={() => scrollTo(currentIndex - 1)}
               className="p-1.5 rounded-full cursor-pointer"
@@ -165,7 +246,6 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
             </motion.button>
           )}
 
-          {/* Dots */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
             style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)' }}>
             {activeBubbles.map((mod, i) => (
@@ -185,7 +265,6 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
             ))}
           </div>
 
-          {/* Right arrow */}
           {activeBubbles.length > 1 && currentIndex < activeBubbles.length - 1 && (
             <motion.button onClick={() => scrollTo(currentIndex + 1)}
               className="p-1.5 rounded-full cursor-pointer"
@@ -196,7 +275,6 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
             </motion.button>
           )}
 
-          {/* Close all */}
           <motion.button onClick={onCloseAll}
             className="p-1.5 rounded-full cursor-pointer ml-2"
             style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}
@@ -206,7 +284,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
           </motion.button>
         </div>
 
-        {/* Globe curvature overlay — subtle perspective effect */}
+        {/* Globe curvature vignette overlay */}
         <div className="absolute inset-0 pointer-events-none z-20"
           style={{
             background: 'radial-gradient(ellipse 120% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.4) 100%)',

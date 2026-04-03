@@ -3,6 +3,7 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import {
   calcGravityPull, calcPerimeterForce, calcOrbitalDecay,
   calcRotationalMomentum, checkVacuumCatch, MODULE_MASS, FRICTION,
+  getTieredFriction, getTieredTrailLength, calcPredictiveSnap,
 } from '../pages/SuanpanPhysics';
 
 const TWO_PI = Math.PI * 2;
@@ -47,6 +48,7 @@ export default function NebulaSphere({
   resonatingWith = null, launchVelocity = null,
   gravityMultiplier = 1.0, bloomMultiplier = 1.0,
   onBubbleActivate = null,
+  masteryTier = 0,
 }) {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
@@ -61,6 +63,14 @@ export default function NebulaSphere({
   const [snapLocked, setSnapLocked] = useState(false);
   const snapTriggered = useRef(false);
   const lastTapRef = useRef(0);
+
+  // Luminous Trail — position history buffer
+  const trailRef = useRef([]);
+  const trailLength = getTieredTrailLength(masteryTier);
+  const tieredFriction = getTieredFriction(masteryTier);
+
+  // Predictive snap haptic tracking
+  const lastHapticRef = useRef(0);
 
   const motionX = useMotionValue(position.x);
   const motionY = useMotionValue(position.y);
@@ -119,13 +129,27 @@ export default function NebulaSphere({
       velRef.current.x += decay.fx;
       velRef.current.y += decay.fy;
 
-      // Friction
-      velRef.current.x *= FRICTION;
-      velRef.current.y *= FRICTION;
+      // Friction — tiered: higher mastery = lower friction = more momentum
+      velRef.current.x *= tieredFriction;
+      velRef.current.y *= tieredFriction;
 
       // Integrate
       posRef.current.x += velRef.current.x;
       posRef.current.y += velRef.current.y;
+
+      // Record position into luminous trail buffer
+      trailRef.current.push({ x: posRef.current.x + size / 2, y: posRef.current.y + size / 2 });
+      if (trailRef.current.length > trailLength) trailRef.current.shift();
+
+      // Predictive snap haptics — low-frequency pulse as sphere approaches well
+      if (gravityWell) {
+        const snap = calcPredictiveSnap(posRef.current, gravityWell, gravityWell.radius);
+        if (snap.engaged && Date.now() - lastHapticRef.current > 150) {
+          const pulseIntensity = Math.round(10 + snap.intensity * 40);
+          if (navigator.vibrate) navigator.vibrate(pulseIntensity);
+          lastHapticRef.current = Date.now();
+        }
+      }
 
       // Hard clamp
       posRef.current.x = Math.max(10, Math.min(viewW - size - 10, posRef.current.x));
@@ -149,6 +173,23 @@ export default function NebulaSphere({
     const rm = rotMomentum.current;
     rotRef.current.y += rm.rotSpeed + velRef.current.x * (0.003 / mass);
     rotRef.current.x += velRef.current.y * (0.002 / mass);
+
+    // ━ Luminous Trail — position ghost trail, longer for higher tiers ━
+    const trail = trailRef.current;
+    if (trail.length > 1) {
+      for (let i = 1; i < trail.length; i++) {
+        const t = i / trail.length; // 0→1 oldest→newest
+        const alpha = t * 0.3 * bloomMultiplier;
+        const trailR = (1 + t * 2) * bloomMultiplier;
+        // Convert world coords to local canvas coords
+        const localX = trail[i].x - posRef.current.x - size / 2 + cx;
+        const localY = trail[i].y - posRef.current.y - size / 2 + cy;
+        ctx.beginPath();
+        ctx.arc(localX, localY, trailR, 0, TWO_PI);
+        ctx.fillStyle = `${color}${Math.round(alpha * 255).toString(16).padStart(2, '0')}`;
+        ctx.fill();
+      }
+    }
 
     // ━ Draw bloom glow — intensifies near gravity well + mastery bloom ━
     const activeBloom = (bloomIntensity + gravIntensity * 0.4) * bloomMultiplier;
@@ -246,7 +287,7 @@ export default function NebulaSphere({
     animRef.current = requestAnimationFrame(draw);
   }, [size, color, bloomIntensity, module, priority, nearGravity, gravIntensity, snapLocked,
       gravityWell, mass, onDrop, onPositionChange, onVacuumCatch, resonatingWith, motionX, motionY,
-      gravityMultiplier, bloomMultiplier]);
+      gravityMultiplier, bloomMultiplier, tieredFriction, trailLength, masteryTier]);
 
   useEffect(() => {
     posRef.current = { x: position.x, y: position.y };
