@@ -1,9 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
   const Icon = sat.icon;
+  const navigate = useNavigate();
   const [dragProgress, setDragProgress] = useState(0);
+  const [hasDragged, setHasDragged] = useState(false);
 
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
   const angle = index * goldenAngle;
@@ -12,10 +15,15 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
   const homeY = Math.sin(angle) * r;
   const surfaceRadius = abyssRadius * 0.44;
 
+  const handleDragStart = useCallback(() => {
+    setHasDragged(false);
+  }, []);
+
   const handleDrag = useCallback((_, info) => {
     const cx = homeX + info.offset.x;
     const cy = homeY + info.offset.y;
     const dist = Math.sqrt(cx * cx + cy * cy);
+    if (dist > 5) setHasDragged(true);
     setDragProgress(Math.min(1, dist / surfaceRadius));
   }, [homeX, homeY, surfaceRadius]);
 
@@ -29,6 +37,16 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
     }
     setDragProgress(0);
   }, [homeX, homeY, surfaceRadius, onActivate, sat.id]);
+
+  const handleClick = useCallback((e) => {
+    e.stopPropagation();
+    // Only navigate if user didn't drag significantly
+    if (!hasDragged && sat.path) {
+      navigate(sat.path);
+    } else if (!hasDragged) {
+      onActivate(sat.id);
+    }
+  }, [hasDragged, sat.path, sat.id, navigate, onActivate]);
 
   const broken = dragProgress > 0.85;
   const scaleBoost = 1 + dragProgress * 0.3;
@@ -45,9 +63,10 @@ export function AbyssSatellite({ sat, index, total, onActivate, abyssRadius }) {
       drag
       dragMomentum={false}
       dragSnapToOrigin
+      onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      onClick={(e) => { e.stopPropagation(); onActivate(sat.id); }}
+      onClick={handleClick}
       data-testid={`dormant-${sat.id}`}
     >
       <motion.div

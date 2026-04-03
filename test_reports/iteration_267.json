@@ -1,0 +1,118 @@
+{
+  "summary": "Iteration 267 - Orbital Hub Widget Navigation Testing Complete. All satellite navigation and Mission Control functionality verified working. User reported 'widgets do not function' - RESOLVED. Testing confirmed: (1) All 6 active satellites navigate correctly on tap (meditation, breathing, mixer, map, mood, theory), (2) Mission Control opens via central orb tap, (3) Mission Control contains all 14 nodes in 2-column grid, 5 Economy & Council items, 4 System items, (4) Navigation from Mission Control to pages works, (5) Dormant satellites visible in Abyss (9 found), (6) All destination pages load with actual content.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "Various API endpoints",
+        "issue": "401 errors when session expires - expected behavior for auth-protected endpoints"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_267.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "100% - All satellite navigation and Mission Control features working"
+  },
+  "test_credentials": {
+    "email": "grad_test_522@test.com",
+    "password": "password",
+    "note": "Session may expire - pages requiring auth show 'Sign in' prompts"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 267 verified all orbital hub widget navigation. Active satellites (mood, mixer, map, breathing, meditation, theory) all navigate on tap via handleSelect -> navigate(sat.path). Dormant satellites in Abyss navigate on tap via AbyssSatellite handleClick -> navigate(sat.path). Mission Control opens via central orb tap, contains Dashboard/Profile quick actions, 14 satellite nodes in 2-column grid, Economy & Council section (Sovereign Council, Economy & Dust, Academy, Trade Circle, Alchemy Lab), and System section. All pages load with substantial content.",
+  "features_tested": {
+    "active_satellite_meditation": {
+      "status": "PASS",
+      "details": "Clicking satellite-meditation navigates to /meditation - 'Stillness Within' page with guided meditations"
+    },
+    "active_satellite_breathing": {
+      "status": "PASS",
+      "details": "Clicking satellite-breathing navigates to /breathing - 'Conscious Breathing' page with breathing patterns"
+    },
+    "active_satellite_mixer": {
+      "status": "PASS",
+      "details": "Clicking satellite-mixer navigates to /cosmic-mixer"
+    },
+    "active_satellite_map": {
+      "status": "PASS",
+      "details": "Clicking satellite-map navigates to /cosmic-map - Full map view with coordinates"
+    },
+    "active_satellite_mood": {
+      "status": "PASS",
+      "details": "Clicking satellite-mood navigates to /mood - 'Emotional Landscape' with mood tracking grid"
+    },
+    "active_satellite_theory": {
+      "status": "PASS",
+      "details": "Clicking satellite-theory navigates to /theory - 'The Conservatory' with Circle of Fifths"
+    },
+    "mission_control_opens": {
+      "status": "PASS",
+      "details": "Central orb tap opens Mission Control panel with data-testid='mission-control-panel'"
+    },
+    "mission_control_quick_actions": {
+      "status": "PASS",
+      "details": "Dashboard and Profile quick actions present and functional"
+    },
+    "mission_control_nodes_section": {
+      "status": "PASS",
+      "details": "All 14 satellite nodes found in 2-column grid: meditation, breathing, soundscape, cosmic-map, mood-engine, conservatory, star-chart, observatory, oracle, journal, games, workshop, zen-garden, botany"
+    },
+    "mission_control_economy_section": {
+      "status": "PASS",
+      "details": "All 5 Economy & Council items found: Sovereign Council, Economy & Dust, Academy, Trade Circle, Alchemy Lab"
+    },
+    "mission_control_system_section": {
+      "status": "PASS",
+      "details": "All 4 System items found: Book of Changes, Mastery Tiers, Settings, Admin"
+    },
+    "mission_control_navigation": {
+      "status": "PASS",
+      "details": "Clicking Meditation in MC navigates to /meditation, clicking Sovereign Council navigates to /sovereigns"
+    },
+    "dormant_satellites_abyss": {
+      "status": "PASS",
+      "details": "Long-press on central orb opens Abyss with 9 dormant satellites: star-chart, observatory, oracle, workshop, trade, games, journal, archives, suanpan"
+    },
+    "page_content_breathing": {
+      "status": "PASS",
+      "details": "/breathing loads with 'Conscious Breathing' title, breathing patterns (Box Breathing, 4-7-8, etc.)"
+    },
+    "page_content_theory": {
+      "status": "PASS",
+      "details": "/theory loads with 'The Conservatory' and Circle of Fifths content"
+    },
+    "page_content_cosmic_map": {
+      "status": "PASS",
+      "details": "/cosmic-map loads with full map view and coordinates"
+    },
+    "page_content_observatory": {
+      "status": "PASS",
+      "details": "/observatory loads with 'The Observatory' - Orrery, Deep Sky, Live Events tabs"
+    },
+    "page_content_oracle": {
+      "status": "PASS",
+      "details": "/oracle loads with 'Seek the Oracle' - Tarot, Astrology, I Ching, Sacred Geometry options"
+    },
+    "page_content_mood": {
+      "status": "PASS",
+      "details": "/mood loads with 'Emotional Landscape' - full mood tracking grid with 20+ emotions"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": false,
+    "mocked_apis_list": []
+  }
+}

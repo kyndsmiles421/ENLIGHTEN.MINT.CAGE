@@ -5,7 +5,10 @@ import { useAuth } from '../context/AuthContext';
 import { useResolution } from '../context/ResolutionContext';
 import {
   X, User, Settings, Globe, Shield, Award, ChevronRight,
-  Orbit, Eye, Layers, BookOpen, Leaf
+  Orbit, Eye, Layers, BookOpen, Leaf,
+  Heart, Music, Map, Wind, Sun, GraduationCap, Star, Telescope,
+  HeartHandshake, Gamepad2, ScrollText, Calculator, Crown,
+  Coins, FlaskConical,
 } from 'lucide-react';
 import { NanoGuide } from './NanoGuide';
 import { HexagramBadge, HexagramGlitch } from './ResonancePulse';
@@ -24,12 +27,37 @@ export default function MissionControl({ isOpen, onClose }) {
   const resColors = { low: '#60A5FA', medium: '#FBBF24', high: '#A78BFA' };
 
   const actions = [
-    { label: 'Profile', icon: User, path: '/profile', color: '#A78BFA' },
     { label: 'Dashboard', icon: Layers, path: '/dashboard', color: '#22C55E' },
+    { label: 'Profile', icon: User, path: '/profile', color: '#A78BFA' },
+  ];
+
+  const satellites = [
+    { label: 'Meditation', icon: Sun, path: '/meditation', color: '#FBBF24' },
+    { label: 'Breathing', icon: Wind, path: '/breathing', color: '#2DD4BF' },
+    { label: 'Soundscape', icon: Music, path: '/cosmic-mixer', color: '#818CF8' },
+    { label: 'Cosmic Map', icon: Map, path: '/cosmic-map', color: '#22C55E' },
+    { label: 'Mood Engine', icon: Heart, path: '/mood', color: '#F472B6' },
+    { label: 'Conservatory', icon: Music, path: '/theory', color: '#A78BFA' },
+    { label: 'Star Chart', icon: Star, path: '/star-chart', color: '#FBBF24' },
+    { label: 'Observatory', icon: Telescope, path: '/observatory', color: '#06B6D4' },
+    { label: 'Oracle', icon: Eye, path: '/oracle', color: '#C084FC' },
+    { label: 'Journal', icon: ScrollText, path: '/journal', color: '#86EFAC' },
+    { label: 'Games', icon: Gamepad2, path: '/games', color: '#F97316' },
+    { label: 'Workshop', icon: Calculator, path: '/workshop', color: '#818CF8' },
+    { label: 'Zen Garden', icon: Leaf, path: '/zen-garden', color: '#34D399' },
+    { label: 'Botany', icon: Leaf, path: '/botany-orbital', color: '#86EFAC' },
+  ];
+
+  const economy = [
+    { label: 'Sovereign Council', icon: Crown, path: '/sovereigns', color: '#C084FC' },
+    { label: 'Economy & Dust', icon: Coins, path: '/economy', color: '#FBBF24' },
+    { label: 'Academy', icon: GraduationCap, path: '/academy', color: '#818CF8' },
+    { label: 'Trade Circle', icon: HeartHandshake, path: '/trade-circle', color: '#2DD4BF' },
+    { label: 'Alchemy Lab', icon: FlaskConical, path: '/elixirs', color: '#FB923C' },
+  ];
+
+  const system = [
     { label: 'Book of Changes', icon: BookOpen, path: '/hexagram-journal', color: '#C084FC' },
-    { label: 'Botany Orbital', icon: Leaf, path: '/botany-orbital', color: '#34D399' },
-    { label: 'Trade Orbital', icon: Globe, path: '/trade-orbital', color: '#818CF8' },
-    { label: 'Codex Orbital', icon: Eye, path: '/codex-orbital', color: '#A78BFA' },
     { label: 'Mastery Tiers', icon: Award, path: '/mastery-avenues', color: '#FBBF24' },
     { label: 'Settings', icon: Settings, path: '/settings', color: '#94A3B8' },
     { label: 'Admin', icon: Shield, path: '/admin/power-spot', color: '#EF4444' },
@@ -144,15 +172,58 @@ export default function MissionControl({ isOpen, onClose }) {
                 <button key={a.label} onClick={() => handleNav(a.path)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all hover:bg-white/[0.03]"
                   data-testid={`mc-action-${a.label.toLowerCase().replace(/\s/g, '-')}`}>
-                  <div className="relative">
-                    <a.icon size={14} style={{ color: a.color }} />
-                    <span className="absolute -inset-1 rounded-full animate-ping"
-                      style={{ background: a.color, opacity: 0.06, animationDuration: `${2.5 + idx * 0.4}s` }} />
-                  </div>
-                  <span className="flex-1 text-[11px] font-medium" style={{ color: 'var(--text-primary)' }}>
-                    {a.label}
-                  </span>
+                  <a.icon size={14} style={{ color: a.color }} />
+                  <span className="flex-1 text-[11px] font-medium" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
                   <ChevronRight size={10} style={{ color: 'var(--text-muted)' }} />
+                </button>
+              ))}
+            </div>
+
+            {/* Satellites — All Nodes */}
+            <div className="px-3 py-1" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+              <p className="text-[7px] uppercase tracking-[0.15em] px-3 pt-2 pb-1" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                Nodes
+              </p>
+              <div className="grid grid-cols-2 gap-0.5">
+                {satellites.map(s => (
+                  <button key={s.label} onClick={() => handleNav(s.path)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all hover:bg-white/[0.03]"
+                    data-testid={`mc-sat-${s.label.toLowerCase().replace(/\s/g, '-')}`}>
+                    <s.icon size={12} style={{ color: s.color }} />
+                    <span className="text-[10px] font-medium" style={{ color: 'var(--text-primary)' }}>{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Economy & Council */}
+            <div className="px-3 py-1" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+              <p className="text-[7px] uppercase tracking-[0.15em] px-3 pt-2 pb-1" style={{ color: 'rgba(192,132,252,0.3)' }}>
+                Economy & Council
+              </p>
+              {economy.map(e => (
+                <button key={e.label} onClick={() => handleNav(e.path)}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all hover:bg-white/[0.03]"
+                  data-testid={`mc-econ-${e.label.toLowerCase().replace(/\s/g, '-')}`}>
+                  <e.icon size={12} style={{ color: e.color }} />
+                  <span className="flex-1 text-[10px] font-medium" style={{ color: 'var(--text-primary)' }}>{e.label}</span>
+                  <ChevronRight size={9} style={{ color: 'var(--text-muted)' }} />
+                </button>
+              ))}
+            </div>
+
+            {/* System */}
+            <div className="px-3 py-1" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
+              <p className="text-[7px] uppercase tracking-[0.15em] px-3 pt-2 pb-1" style={{ color: 'rgba(248,250,252,0.1)' }}>
+                System
+              </p>
+              {system.map(s => (
+                <button key={s.label} onClick={() => handleNav(s.path)}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all hover:bg-white/[0.03]"
+                  data-testid={`mc-sys-${s.label.toLowerCase().replace(/\s/g, '-')}`}>
+                  <s.icon size={12} style={{ color: s.color }} />
+                  <span className="flex-1 text-[10px] font-medium" style={{ color: 'var(--text-primary)' }}>{s.label}</span>
+                  <ChevronRight size={9} style={{ color: 'var(--text-muted)' }} />
                 </button>
               ))}
             </div>
