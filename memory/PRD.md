@@ -151,7 +151,19 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 246 — Phase 1 Finalization: Classes + Treasury + Synergy Discovery (Apr 3, 2026) — LATEST
+### Iteration 247 — Sovereign Dashboard + Skeleton Export (Apr 3, 2026) — LATEST
+- **Sovereign Dashboard** (`/sovereign-admin`): 5-tab admin panel (Overview, Controls, Mirror, Escrow, Export)
+  - **Overview**: Stats grid (Treasury balance, Total fees, Wallets, Escrow count), platform status, recent fee ledger
+  - **Controls**: Fee slider (0-25%, default 5%), toggle switches (System Live, Mirror Hook, Freeze All Trades kill-switch)
+  - **Mirror**: Real-time sovereign mirror ledger — all user-created constellations auto-copied
+  - **Escrow**: All active/completed/frozen escrow contracts with status badges
+  - **Export**: Skeleton Export tool — generates clean white-label JSON (`usi-skeleton-v1.json`) with downloadable file
+- **Dynamic Fee Config**: Stored in DB (`sovereign_config` collection), PATCH endpoint for real-time updates
+- **Kill-Switch**: `frozen_transactions` blocks all marketplace purchases with HTTP 423
+- **Mirror Toggle**: Constellation creation mirror hook respects `mirror_active` config
+- Tests: Backend 13/13 (100%), Frontend 100%
+
+### Iteration 246 — Phase 1 Finalization: Classes + Treasury + Synergy Discovery (Apr 3, 2026)
 - **Anthropology Class System**: Shaman (Resonator) / Nomad (Navigator) / Architect (Builder) / Merchant (Catalyst). Each class has boosted affinities, synergy bonus, special synthesis type. XP system: 100 XP per level. Backend: `/api/classes`
 - **Sovereign Treasury & Escrow**: Credits wallet (100 initial), 5% platform fee on marketplace trades. Escrow state machine for digital goods. Mirror Hook: every constellation creation/purchase auto-copies to `sovereign_mirror` collection. Backend: `/api/treasury`
 - **Synergy Discovery Mode**: Bubbles glow when dragged near compatible partners (proximity-based affinity detection). Class-boosted modules show enhanced glow.
