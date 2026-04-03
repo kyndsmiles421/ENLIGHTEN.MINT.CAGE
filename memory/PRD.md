@@ -155,7 +155,31 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 253 — Omni-Modality Learning System & Forge Simulation Labs (Apr 3, 2026) — LATEST
+### Iteration 258 — Site-Wide Progressive Learning & Synthesis Engine (Apr 3, 2026) — LATEST
+- **3-Position Interaction Intensity Switch**: Focus (Passive) / Guided (Active) / Immersive (Catalyst)
+  - `GET /api/academy/intensity` — returns current level, auto_advance, all 3 levels with properties
+  - `PATCH /api/academy/intensity` — switches intensity and optionally sets auto_advance
+  - Focus: Silent mode, H² tracks in background, UI stays clean
+  - Guided: Contextual micro-lessons as sidebar notifications (default)
+  - Immersive: Full-screen forge takeovers, every action is a potential lab, golden visual overlay
+- **Segmented Learning Zones**: Academy restructured into 3 functional sections
+  - The Foundation (Core): H² logic, Sacred Geometry, Platform Fundamentals (purple indicator)
+  - The Forge (Technical): Development, Engineering, simulation mastery (green indicator)
+  - The Collective (Synthesis): Broker Architecture, Circular Economy (gold indicator)
+  - Zone tabs filter programs by section, programs tagged with zone metadata
+- **Teachable Moments Engine**: Context-aware micro-lessons based on user actions
+  - `GET /api/academy/teachable-moments?context=trade` — returns trade-specific micro-lessons
+  - `POST /api/academy/dismiss-moment` — permanently dismiss a moment
+  - Filtered by intensity level (focus blocks all, immersive enables deep challenges)
+  - 6 teachable moment triggers across trade, hexagram, post, constellation, surge, and forge contexts
+- **Progressive Auto-Scale Logic**: Detects cognitive efficiency and prompts intensity upgrade
+  - `GET /api/academy/auto-scale` — checks thresholds (focus→guided: 200RP+2 modules, guided→immersive: 1000RP+8 modules)
+  - Auto-advance is optional (user-toggleable), prompts with accept/dismiss
+- **Immersive Mode Visual Overlay**: Golden radial gradient shimmer signifying high-growth state
+- **All features optional, not mandatory** — user controls everything via the intensity switch
+- Tests: Backend 15/15 (100%), Frontend 100%
+
+### Iteration 253 — Omni-Modality Learning System & Forge Simulation Labs (Apr 3, 2026)
 - **Quad-Core Learning Modalities**: 4 learning frameworks (Architect/Gaming, Chef/Applied, Researcher/Analytical, Voyager/Sensory)
   - `GET /api/academy/modalities` — returns all 4 modalities with xp_multiplier, colors, labels
   - `GET /api/academy/modality` — user's current modality (default: architect)
@@ -343,11 +367,12 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
-## Upcoming (P0-P1) — Iteration 254: "Life-Force" Enhancements
-- **Circularity KPI (Backend)**: Every trade/transmutation tagged with a Circularity Score measuring positive ecosystem impact. High-circularity users earn a "Resonance Multiplier" reducing their variable return tax. Integrated into AI Broker architecture.
-- **Context-Aware Engine (Predictive Modality Switching)**: Device sensor mapping → auto-switch modality based on movement/GPS (Voyager for mobile), stationary (Researcher for focus), accelerometer (Chef for active). Optional, not mandatory.
-- **Ecosystem Health Dashboard**: High-level "Pulse" view above Collective Resonance. Circularity peak triggers "Global Renaissance" event — temporarily lowers certification costs for communal learning surge.
-- **Circularity Score Visibility**: Hybrid (private by default, opt-in to public leaderboard). All features optional, not mandatory.
+## Upcoming (P0-P1) — Iteration 259+: Life-Force Enhancements
+- **Circularity KPI**: Tag trades/transmutations with ecosystem impact scores, reward high-circularity users with Resonance Multipliers
+- **Context-Aware Predictive Modality Switching**: Auto-switch learning mode based on device sensors (GPS→Voyager, stationary→Researcher, active→Chef)
+- **Ecosystem Health Dashboard**: "Global Renaissance" events triggered by peak community circularity
+- **Teacher-Student Loop / Peer Review**: Master-tier users review novice submissions, earning Impact Points + Circularity Gems
+- **Circularity Score Visibility**: Hybrid (private by default, opt-in public leaderboard)
 
 ## Upcoming (P1)
 - **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation
