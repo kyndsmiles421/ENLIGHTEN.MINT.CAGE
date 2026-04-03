@@ -45,6 +45,8 @@ export default function NebulaSphere({
   priority = 1, onDrop, gravityWell = null,
   onPositionChange, onVacuumCatch,
   resonatingWith = null, launchVelocity = null,
+  gravityMultiplier = 1.0, bloomMultiplier = 1.0,
+  onBubbleActivate = null,
 }) {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
@@ -58,6 +60,7 @@ export default function NebulaSphere({
   const [gravIntensity, setGravIntensity] = useState(0);
   const [snapLocked, setSnapLocked] = useState(false);
   const snapTriggered = useRef(false);
+  const lastTapRef = useRef(0);
 
   const motionX = useMotionValue(position.x);
   const motionY = useMotionValue(position.y);
@@ -89,11 +92,11 @@ export default function NebulaSphere({
       const viewW = window.innerWidth;
       const viewH = window.innerHeight;
 
-      // Gravity pull
+      // Gravity pull — amplified by mastery tier
       if (gravityWell) {
         const grav = calcGravityPull(posRef.current, gravityWell, gravityWell.radius, mass);
-        velRef.current.x += grav.fx / mass;
-        velRef.current.y += grav.fy / mass;
+        velRef.current.x += (grav.fx / mass) * gravityMultiplier;
+        velRef.current.y += (grav.fy / mass) * gravityMultiplier;
         setNearGravity(grav.inRange);
         setGravIntensity(grav.intensity || 0);
 
@@ -147,8 +150,8 @@ export default function NebulaSphere({
     rotRef.current.y += rm.rotSpeed + velRef.current.x * (0.003 / mass);
     rotRef.current.x += velRef.current.y * (0.002 / mass);
 
-    // ━ Draw bloom glow — intensifies near gravity well ━
-    const activeBloom = bloomIntensity + gravIntensity * 0.4;
+    // ━ Draw bloom glow — intensifies near gravity well + mastery bloom ━
+    const activeBloom = (bloomIntensity + gravIntensity * 0.4) * bloomMultiplier;
     const grad = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * (1.8 + gravIntensity * 0.5));
     grad.addColorStop(0, `${color}${Math.round(activeBloom * 25).toString(16).padStart(2, '0')}`);
     grad.addColorStop(0.5, `${color}${Math.round(activeBloom * 10).toString(16).padStart(2, '0')}`);
@@ -242,7 +245,8 @@ export default function NebulaSphere({
 
     animRef.current = requestAnimationFrame(draw);
   }, [size, color, bloomIntensity, module, priority, nearGravity, gravIntensity, snapLocked,
-      gravityWell, mass, onDrop, onPositionChange, onVacuumCatch, resonatingWith, motionX, motionY]);
+      gravityWell, mass, onDrop, onPositionChange, onVacuumCatch, resonatingWith, motionX, motionY,
+      gravityMultiplier, bloomMultiplier]);
 
   useEffect(() => {
     posRef.current = { x: position.x, y: position.y };
@@ -272,10 +276,15 @@ export default function NebulaSphere({
       }}
       onDragEnd={(_, info) => {
         isDragging.current = false;
-        // Transfer drag velocity to physics engine
         velRef.current = { x: info.velocity.x * 0.08, y: info.velocity.y * 0.08 };
-        // Apply spin from flick
         rotMomentum.current = calcRotationalMomentum(module.id, 0.008 + Math.abs(info.velocity.x) * 0.00005);
+      }}
+      onTap={() => {
+        const now = Date.now();
+        if (now - lastTapRef.current < 300 && onBubbleActivate) {
+          onBubbleActivate(module, { x: posRef.current.x + size / 2, y: posRef.current.y + size / 2 });
+        }
+        lastTapRef.current = now;
       }}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: snapLocked ? 0.5 : 1, opacity: snapLocked ? 0.6 : 1 }}

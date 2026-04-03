@@ -43,6 +43,11 @@ export function SovereignProvider({ children }) {
   const [credits, setCredits] = useState(0);
   const [loaded, setLoaded] = useState(false);
 
+  // Mastery multipliers — fed into physics engine
+  const [masteryTier, setMasteryTier] = useState(0);
+  const [gravityMultiplier, setGravityMultiplier] = useState(1.0);
+  const [bloomMultiplier, setBloomMultiplier] = useState(1.0);
+
   // Priority Queue state
   const queueRef = useRef([]);           // sorted task array
   const activeCountRef = useRef({ 0: 0, 1: 0, 2: 0 }); // concurrency per priority
@@ -63,6 +68,17 @@ export function SovereignProvider({ children }) {
       setExperience(d.experience || {});
       setPerks(d.perks || []);
       eventBus.publish('tier_updated', { tier: d.tier, capabilities: d.effective_capabilities });
+    } catch {}
+    // Fetch mastery multipliers (non-blocking)
+    try {
+      const mRes = await axios.get(`${API}/sovereign-mastery/status`, { headers: authHeaders });
+      const m = mRes.data;
+      setMasteryTier(m.current_tier || 0);
+      setGravityMultiplier(m.gravity_multiplier || 1.0);
+      setBloomMultiplier(m.bloom_multiplier || 1.0);
+      eventBus.publish('mastery_updated', {
+        tier: m.current_tier, gravity: m.gravity_multiplier, bloom: m.bloom_multiplier,
+      });
     } catch {}
     setLoaded(true);
   }, [authHeaders, authLoading, token]);
@@ -206,6 +222,7 @@ export function SovereignProvider({ children }) {
     hasCapability, isTierAtLeast, refresh,
     executeCommand, enqueue, setNpuBurst, getQueueStats,
     publishEvent, eventBus,
+    masteryTier, gravityMultiplier, bloomMultiplier,
   };
 
   return (

@@ -105,7 +105,8 @@ function GravityWellIndicator({ position, radius, active, intensity = 0 }) {
 }
 
 // ━━━ NEBULA PLAYGROUND — Sphere Orchestration Layer ━━━
-export default function NebulaPlayground({ detachedModules, onModuleReattach, launchVelocities = {} }) {
+export default function NebulaPlayground({ detachedModules, onModuleReattach, launchVelocities = {},
+  gravityMultiplier = 1.0, bloomMultiplier = 1.0, onBubbleActivate = null }) {
   const { publishEvent, enqueue, setNpuBurst, eventBus } = useSovereign();
   const [spherePositions, setSpherePositions] = useState({});
   const [supernovae, setSupernovae] = useState([]);
@@ -259,7 +260,10 @@ export default function NebulaPlayground({ detachedModules, onModuleReattach, la
               onPositionChange={(x, y) => handlePositionChange(mod.id, x, y)}
               onVacuumCatch={handleVacuumCatch}
               resonatingWith={resonatingWith}
-              launchVelocity={launchVelocities[mod.id]} />
+              launchVelocity={launchVelocities[mod.id]}
+              gravityMultiplier={gravityMultiplier}
+              bloomMultiplier={bloomMultiplier}
+              onBubbleActivate={onBubbleActivate} />
           );
         })}
       </AnimatePresence>
