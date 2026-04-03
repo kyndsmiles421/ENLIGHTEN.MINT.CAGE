@@ -188,6 +188,7 @@ const MasteryPath = lazy(() => import('./pages/MasteryPath'));
 const SovereignDashboard = lazy(() => import('./pages/SovereignDashboard'));
 const AcademyPage = lazy(() => import('./pages/AcademyPage'));
 const EconomyPage = lazy(() => import('./pages/EconomyPage'));
+const SovereignAdvisors = lazy(() => import('./pages/SovereignAdvisors'));
 
 function PageLoader() {
   return (
@@ -349,6 +350,7 @@ function AnimatedRoutes() {
         <Route path="/sovereign-admin" element={<SovereignDashboard />} />
         <Route path="/academy" element={<AcademyPage />} />
         <Route path="/economy" element={<EconomyPage />} />
+        <Route path="/sovereigns" element={<SovereignAdvisors />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
