@@ -154,7 +154,31 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 251 — H² Hexagram-Squared Engine + Central Bank/Broker Architecture (Apr 3, 2026) — LATEST
+### Iteration 252 — Collective Resonance Dashboard + Harmony Surge + Dynamic Fee Adjuster (Apr 3, 2026) — LATEST
+- **Global Matrix Aggregator**: Background task runs every 60s, pulls all user H² tensors, computes element-wise average across the entire platform
+  - `POST /api/resonance/trigger-aggregation` — manual trigger
+  - `GET /api/resonance/global` — returns global_density, cross_cluster_resonance, 4×4 cluster_heatmap, surge status
+  - `GET /api/resonance/matrix` — full global 24×24 matrix (auth required)
+  - `GET /api/resonance/heatmap` — condensed 4×4 heatmap for shader rendering
+- **Harmony Surge Detection**: Auto-triggers when global density ≥ 85% or any cross-cluster pair ≥ 85%
+  - `GET /api/resonance/surge` — current surge status with triggers and effects
+  - Surge effects: commerce fee drops to 0.5% (from 2%), transmutation cost -40% (60:1 instead of 100:1)
+  - Platform-wide state stored in sovereign_config for all services to query
+- **Dynamic Fee Adjuster (AI Broker)**: `_get_surge_status()` checks for active surge before every trade/transmutation
+  - Trade commerce fee: 0.5% during surge (normal 2%)
+  - Transmutation ratio: 60 Dust per Gem during surge (normal 100)
+  - Surge status included in trade response: `harmony_surge_active`, `commerce_fee_rate`
+- **WebGL Heatmap Shader (Frontend)**: `CollectiveResonance.js` with custom GLSL fragment shader
+  - Deep indigo → violet → gold → emerald color ramp
+  - Cells pulse based on intensity, golden shimmer overlay during surge
+  - Grid lines at cluster boundaries
+  - 4×4 cluster resonance map with animated resonance bars
+  - Cross-cluster resonance bars with threshold indicators
+  - Auto-refresh every 30s when panel is open
+  - Accessible via "Live" button in Orbital Mixer
+- Tests: Backend 23/23 (100%), Frontend 100%
+
+### Iteration 251 — H² Hexagram-Squared Engine + Central Bank/Broker Architecture (Apr 3, 2026)
 - **H² Engine (24×24 State Matrix)**: Evolved from linear 24-bit vector to 576-intersection State Tensor
   - `POST /api/quad-hex/resolve-h2` — generates full 24×24 matrix with cross-cluster resonance, density, determinant proxy
   - `compute_h2_matrix()` — phase-weighted interference calculation with cross-cluster resonance bonus (+0.25)
