@@ -58,6 +58,8 @@ export default function SmartDock() {
   });
   const [position, setPosition] = useState(() => getSavedPos() || { x: null, y: null });
   const [isDragging, setIsDragging] = useState(false);
+  const [dockOrientation, setDockOrientation] = useState('horizontal'); // 'horizontal' | 'vertical'
+  const [snappedEdge, setSnappedEdge] = useState(null); // 'left' | 'right' | 'top' | 'bottom' | null
   const [zBoost, setZBoost] = useState(() => {
     try { return localStorage.getItem(WIDGET_FOCUS_KEY) === 'dock'; } catch { return false; }
   });
@@ -66,6 +68,7 @@ export default function SmartDock() {
   const dragStartRef = useRef(null);
   const dragMoved = useRef(false);
   const swipeStartRef = useRef(null);
+  const doubleTapRef = useRef(0);
 
   // Mobile: detect swipe-up on dock to expand panel, swipe-down to collapse
   const handleTouchStart = useCallback((e) => {
@@ -131,30 +134,55 @@ export default function SmartDock() {
     collapseRef.current = setTimeout(() => setExpanded(false), 5000);
   }, []);
 
-  /* ── Drag handlers ── */
+  /* ── Drag handlers — Kinetic Architecture ── */
+  const MAGNETIC_ZONE = 20; // 20px edge proximity for magnetic snap
   const snapToEdge = useCallback((x, y) => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const el = dockRef.current;
     const w = el?.offsetWidth || 200;
     const h = el?.offsetHeight || 36;
-    const SNAP = 50;
     let sx = x, sy = y;
+    let edge = null;
+    let orient = 'horizontal';
 
-    const midX = x + w / 2;
-    if (midX < vw / 2) {
-      sx = x < SNAP ? 8 : x;
+    // Edge detection with magnetic zone
+    const distLeft = x;
+    const distRight = vw - x - w;
+    const distTop = y;
+    const distBottom = vh - y - h;
+
+    // Find closest edge within magnetic zone
+    const edges = [
+      { name: 'left', dist: distLeft, snap: () => { sx = 6; orient = 'vertical'; } },
+      { name: 'right', dist: distRight, snap: () => { sx = vw - w - 6; orient = 'vertical'; } },
+      { name: 'top', dist: distTop, snap: () => { sy = 6; orient = 'horizontal'; } },
+      { name: 'bottom', dist: distBottom, snap: () => { sy = vh - h - 6; orient = 'horizontal'; } },
+    ];
+
+    const closest = edges.reduce((a, b) => a.dist < b.dist ? a : b);
+    if (closest.dist < MAGNETIC_ZONE) {
+      closest.snap();
+      edge = closest.name;
+      // Weighted haptic pulse on magnetic snap
+      haptic('Heavy');
     } else {
-      sx = (vw - x - w) < SNAP ? vw - w - 8 : x;
+      // Soft snap to nearest edge within 50px
+      const softSnap = edges.reduce((a, b) => a.dist < b.dist ? a : b);
+      if (softSnap.dist < 50) {
+        softSnap.snap();
+        edge = softSnap.name;
+        haptic('Light');
+      }
     }
 
-    if (y < SNAP) {
-      sy = 12;
-    } else if ((vh - y - h) < SNAP) {
-      sy = vh - h - 12;
-    }
+    sx = Math.max(4, Math.min(vw - w - 4, sx));
+    sy = Math.max(4, Math.min(vh - h - 4, sy));
 
-    return { x: Math.max(4, Math.min(vw - w - 4, sx)), y: Math.max(4, Math.min(vh - h - 4, sy)) };
+    setSnappedEdge(edge);
+    setDockOrientation(orient);
+
+    return { x: sx, y: sy };
   }, []);
 
   const onDragStart = useCallback((e) => {
@@ -239,9 +267,22 @@ export default function SmartDock() {
   const handlePillTap = useCallback((e) => {
     if (e.target.closest('button') || e.target.closest('[data-dock-btn]') || e.target.closest('[data-drag-handle]')) return;
     if (dragMoved.current) return;
+
+    // Double-tap detection → collapse to resonance dot
+    const now = Date.now();
+    if (now - doubleTapRef.current < 350) {
+      // Double-tap: minimize dock
+      haptic('Medium');
+      setMinimized(true);
+      setActivePanel(null);
+      doubleTapRef.current = 0;
+      return;
+    }
+    doubleTapRef.current = now;
+
     bringToFront();
     toggleExpand();
-  }, [toggleExpand, bringToFront]);
+  }, [toggleExpand, bringToFront, setMinimized, setActivePanel]);
 
   if (hidden) return null;
 
@@ -351,6 +392,8 @@ export default function SmartDock() {
         transition: isDragging ? 'none' : 'left 0.3s ease, top 0.3s ease, bottom 0.3s ease, right 0.3s ease',
       }}
       data-testid="smart-dock"
+      data-orientation={dockOrientation}
+      data-snapped={snappedEdge || 'none'}
     >
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>
@@ -386,45 +429,49 @@ export default function SmartDock() {
         )}
       </AnimatePresence>
 
-      {/* ── Horizontal pill dock ── */}
+      {/* ── Kinetic dock pill — adapts to horizontal/vertical orientation ── */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="flex items-center"
+        className={dockOrientation === 'vertical' ? 'flex flex-col items-center' : 'flex items-center'}
         onClick={handlePillTap}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         style={{
-          padding: expanded ? '4px 6px' : '4px 5px',
-          borderRadius: 22,
-          background: activePanel ? 'rgba(10,10,18,0.55)' : 'rgba(10,10,18,0.35)',
-          border: `1px solid ${activePanel ? 'rgba(192,132,252,0.1)' : 'rgba(255,255,255,0.05)'}`,
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
-          transition: 'background 0.4s, border 0.4s, padding 0.3s',
+          padding: expanded ? '6px' : '4px 5px',
+          borderRadius: dockOrientation === 'vertical' ? 16 : 22,
+          background: activePanel ? 'rgba(10,10,18,0.92)' : 'rgba(10,10,18,0.88)',
+          border: `1px solid ${activePanel ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.06)'}`,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.02)',
+          transition: 'background 0.4s, border 0.4s, padding 0.3s, border-radius 0.3s',
           cursor: isDragging ? 'grabbing' : 'pointer',
-          marginTop: 8,
+          marginTop: dockOrientation === 'vertical' ? 0 : 8,
+          gap: dockOrientation === 'vertical' ? 2 : 0,
         }}
         data-testid="smart-dock-pill"
       >
-        {/* ── Drag handle ── */}
+        {/* ── Drag handle — pivots with orientation ── */}
         <div
           data-drag-handle="true"
           onPointerDown={onDragStart}
-          className="flex items-center justify-center rounded-full mr-0.5"
+          className="flex items-center justify-center rounded-full"
           style={{
-            width: 16,
-            height: 22,
+            width: dockOrientation === 'vertical' ? 22 : 16,
+            height: dockOrientation === 'vertical' ? 16 : 22,
             cursor: isDragging ? 'grabbing' : 'grab',
             flexShrink: 0,
             touchAction: 'none',
+            marginRight: dockOrientation === 'vertical' ? 0 : 2,
+            marginBottom: dockOrientation === 'vertical' ? 2 : 0,
           }}
           data-testid="dock-drag-handle"
-          title="Drag to reposition"
+          title="Drag to reposition (double-tap to collapse)"
         >
-          <GripHorizontal size={9} style={{ color: 'rgba(192,132,252,0.25)' }} />
+          <GripHorizontal size={9} style={{
+            color: 'rgba(192,132,252,0.3)',
+            transform: dockOrientation === 'vertical' ? 'rotate(90deg)' : 'none',
+          }} />
         </div>
 
         {sortedItems.map((item) => {
@@ -518,10 +565,17 @@ export default function SmartDock() {
           <X size={10} style={{ color: '#F87171' }} />
         </DockBtn>
 
-        {/* ── Expand indicator ── */}
+        {/* ── Expand indicator — rotates with orientation ── */}
         <div
-          className="flex items-center justify-center ml-0.5"
-          style={{ width: 14, height: 18, flexShrink: 0, pointerEvents: 'none' }}
+          className="flex items-center justify-center"
+          style={{
+            width: dockOrientation === 'vertical' ? 18 : 14,
+            height: dockOrientation === 'vertical' ? 14 : 18,
+            flexShrink: 0,
+            pointerEvents: 'none',
+            marginLeft: dockOrientation === 'vertical' ? 0 : 2,
+            marginTop: dockOrientation === 'vertical' ? 2 : 0,
+          }}
         >
           <motion.div
             animate={{ rotate: expanded ? 90 : 0 }}
