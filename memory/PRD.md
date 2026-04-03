@@ -167,7 +167,14 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 264 — SmartDock "Consult" Integration + Solfeggio Pulse + Sovereign Overlay (Apr 3, 2026) — LATEST
+### Iteration 265 — Full App Consolidation (Apr 3, 2026) — LATEST
+- **Dashboard Council Glance Widget**: Shows user tier, Dust balance, tools owned (0/5), and quick-access pills to top council members with "View All" link
+- **Dashboard Economy Action Group**: 6 new shortcuts — Council, Economy, Academy, Cosmic Map, Observatory, Archives — available in Explore & Add Shortcuts
+- **Landing Page 7th Pillar**: "Sovereign Council" pillar with 6 highlights linking to Council, Economy, Academy, Trade Circle, Cosmic Map, Archives
+- **Expanded Consult Overlay Routing**: PAGE_SOVEREIGN_MAP now covers 70+ routes, mapping every page to its relevant Sovereign (e.g., /meditation→Zenith, /botany→Gaea, /frequencies→Master Harmonic)
+- Tests: Backend 17/17 (100%), Frontend 100%
+
+### Iteration 264 — SmartDock "Consult" Integration + Solfeggio Pulse + Sovereign Overlay (Apr 3, 2026)
 - **SmartDock Consult Button** with Solfeggio geometric pulse animation (hexagonal ring + inner triangle + center circle)
 - **Semi-Transparent Sovereign Overlay**: Slides from right, user stays in flow on current page
   - Context-aware auto-selection: `/economy` → Principal Economist, `/star-chart` → Astraeus, `/wellness` → Zenith, etc.
