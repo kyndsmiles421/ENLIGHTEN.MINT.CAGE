@@ -416,8 +416,8 @@ export default function Breathing() {
               <div className="glass-card p-4 mt-6">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Rhythm</p>
                 <div className="flex gap-3 text-center">
-                  {[{ l: 'In', v: pattern.inhale }, { l: 'Hold', v: pattern.hold1 }, { l: 'Out', v: pattern.exhale }, { l: 'Hold', v: pattern.hold2 }].map(s => (
-                    <div key={s.l + s.v} className="flex-1">
+                  {[{ l: 'In', v: pattern.inhale }, { l: 'Hold', v: pattern.hold1 }, { l: 'Out', v: pattern.exhale }, { l: 'Hold', v: pattern.hold2 }].map((s, i) => (
+                    <div key={`${s.l}-${i}`} className="flex-1">
                       <p className="text-2xl font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>{s.v}s</p>
                       <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{s.l}</p>
                     </div>
