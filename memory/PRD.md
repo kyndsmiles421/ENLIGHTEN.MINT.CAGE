@@ -30,6 +30,10 @@ Mixer Director:
   GET  /api/mixer/bonus-packs, POST /api/mixer/bonus-packs/purchase
   GET  /api/mixer/bonus-packs/owned
   GET  /api/mixer/recommendations (Hexagram-based)
+  POST /api/mixer/projects/ripple (Ripple editing)
+  POST /api/mixer/tracks/toggle-lock (Lock toggle)
+  POST /api/mixer/auto-compose (AI Mantra DJ)
+  GET  /api/mixer/auto-compose/goals (Goal catalog)
 
 Generators:
   GET  /api/trade-circle/generators/catalog
@@ -37,100 +41,63 @@ Generators:
   GET  /api/vault/generators, POST /api/vault/generators/toggle
 ```
 
-## Hexagram Recommendation Engine
+## AI Mantra DJ Auto-Compose
 ```
-Lower Trigram (bits 0-2) → Soul/Vocal pack mapping:
-  Earth→Vedic, Thunder→Hopi, Water→Vedic, Lake→Hopi
-  Mountain→Solfeggio, Fire→Solfeggio, Wind→Vedic, Heaven→Solfeggio
+6 Wellness Goals:
+  Deep Sleep:     Delta/theta waves, descending volume, 90s base, 8s crossfade
+  Laser Focus:    Alpha-beta entrainment, sustained volume, 60s base, 4s crossfade
+  Energy Surge:   High-frequency activation, ascending volume, 45s base, 3s crossfade
+  Sacred Healing: Solfeggio cascade, wave volume, 75s base, 6s crossfade
+  Deep Meditation: Theta-alpha bridge, arc volume, 120s base, 10s crossfade
+  Earth Grounding: Sub-bass resonance, sustained volume, 60s base, 5s crossfade
 
-Upper Trigram (bits 3-5) → Environment/Visual pack mapping:
-  Earth→DeepEarth, Thunder→SacredGeometry, Water→DeepEarth, Lake→SacredGeometry
-  Mountain→DeepEarth, Fire→SacredGeometry, Wind→SacredGeometry, Heaven→DeepEarth
-
-Stagnation Detection:
-  Hexagrams 12,23,29,36,39,47 + avg_freq > 600Hz → grounding override
-  Inserts Deep Earth Resonance as priority recommendation
-
-Tone Logic:
-  Owned packs → "soft" (gentle reminder to activate)
-  Unowned packs → "active" (explains energetic need + purchase conversion)
-```
-
-## Keyframe Automation (Ultra Player+)
-```
-Per-track automation lanes: Volume (0-1) + Frequency (0-maxHz)
-SVG-based curve drawing: click to add control points
-Golden Ratio snap lines: Phi intervals for harmonic alignment
-Stored as: keyframes_volume/keyframes_frequency arrays in track data
-Saved/loaded with project CRUD
-Double-click control point to remove
-```
-
-## Bonus Wrapped Packs (5 packs)
-```
-Vedic Vocal Suite (Player, 25c)         → +10% AI Gen Speed
-Hopi Chant Collection (Player, 30c)     → +15 AI Credits
-Solfeggio Master Scale (Ultra, 40c)     → +15% Render Speed
-Sacred Geometry Visual Pack (Ultra, 35c) → +10% Export Speed
-Deep Earth Resonance Suite (Sov, 50c)   → +20% Processing Speed
+Behavior:
+  - Selects tier-gated sources matching goal frequencies
+  - Staggers tracks with cross-fade overlap
+  - Adds hexagram resonance tone as sustain layer
+  - Deducts 1 AI credit per composition
+  - Returns ready-to-use track arrangement
 ```
 
 ## Backend Architecture (Refactored Apr 3, 2026)
 ```
 /app/backend/
-├── server.py          # Auto-router discovery, GZip, CORS, WebSocket, Stripe webhook
+├── server.py          # Auto-router discovery, GZip, CORS, WebSocket, Stripe
 ├── deps.py            # MongoDB client (pooled), JWT auth, helpers
 ├── db_indexes.py      # 80+ indexes across 46 collections (startup)
 ├── tasks.py           # Background loops (push scheduler, credit refresh)
 ├── models.py          # Pydantic models
 ├── routes/            # 120+ auto-discovered route modules
-│   ├── auth.py, mixer_director.py, generators.py, etc.
 ```
 
-### Refactoring Completed (Iteration 227)
-- server.py: 476 → 164 lines (65% reduction) via auto-router discovery
-- Zero indexes → 80+ indexes on 46 collections (db_indexes.py)
-- GZip compression middleware (500+ byte responses)
-- MongoDB connection pool: maxPoolSize=50, minPoolSize=5
-- Background tasks extracted to tasks.py
-
 ## Iteration History
-### Iteration 227 — Backend Refactoring (Apr 3, 2026) — LATEST
-- Auto-router discovery replaces 136 manual imports
-- Database indexes for all 46 heavily-queried collections
-- GZip compression middleware
-- MongoDB connection pooling optimization
-- Background task extraction
+### Iteration 228 — AI Mantra DJ (Apr 3, 2026) — LATEST
+- 6 wellness goal auto-composition engine
+- Cross-fade overlap + volume curves (5 types)
+- Hexagram resonance integration
+- Frontend DJ Auto button + goal card panel
+- revenue.py fidelity_status bug fix
+- Tests: Backend 100% (20/20), Frontend 100%
+
+### Iteration 227 — Backend Refactoring (Apr 3, 2026)
+- Auto-router discovery (136 imports → auto)
+- 80+ DB indexes, GZip compression, pool tuning
 - Tests: Backend 100% (24/24), Frontend 100%
 
 ### Iteration 226 — Ripple Editing (Apr 2, 2026)
-- Ripple Edit computation (delta shifts unlocked tracks)
-- Lock Toggle UI per track
-- Keyframe clamping on duration change
-- Tests: Backend 100% (13/13), Frontend 100%
-
 ### Iteration 225 — Intelligence Layer (Apr 2, 2026)
-- Hexagram-based recommendation engine
-- Keyframe Automation UI (Volume + Frequency SVG curves)
-- Auth timing fix
-
 ### Iteration 224 — 4-Tier + Bonus Packs (Apr 2, 2026)
 ### Iteration 223 — Divine Director v1 (Apr 2, 2026)
-### Iteration 222 — Tiered Payable Bonuses (Apr 2, 2026)
-### Iterations 217-221 — Orbital Architecture, Audio, I Ching
-
-## Upcoming (P0)
-- AI "Mantra DJ" Auto-Edit (cross-faded auto-composition)
 
 ## Upcoming (P1)
 - Phase 3 Polish: Light trails and bloom effects
-- Generative Flourish Bonus: AI improvised phonic resonance
+- Generative Flourish Bonus: AI phonic resonance
+- SuanpanMixer.js decomposition (1200+ lines)
 
 ## Future/Backlog (P2)
 - Multi-Civilization Star Charts (Hopi, Egyptian, Vedic)
 - External audio asset hosting
 - Haptic API for mobile tactile feedback
-- Sovereign Tier Perks, Wisdom Prescriptions
 - Pan + Reverb keyframe lanes
 - NPU Priority / GPU edge hooks
 
