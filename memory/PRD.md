@@ -155,7 +155,36 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 258 — Site-Wide Progressive Learning & Synthesis Engine (Apr 3, 2026) — LATEST
+### Iteration 260 — Dual-Track Economy, Synthesis Forge, Learning Toggle & AI Co-Pilot (Apr 3, 2026) — LATEST
+- **Track 1: App Utility Subscriptions** with Stripe Checkout
+  - Discovery (Free) / Resonance ($44.99/mo) / Sovereign ($89.99/mo)
+  - `POST /api/economy/subscribe` — creates Stripe checkout for paid tiers
+  - `POST /api/economy/downgrade` — switches to free Discovery tier
+  - Polymath All-Access Pass ($1,797/yr) — unlocks everything + all packs + Level 4 everywhere
+- **Track 2: Learning Packs Marketplace** — 7 one-time purchase packs
+  - Mini-Packs ($87–177), Mastery Deep-Dives ($447–897), Business-in-a-Box ($1,347+)
+  - `POST /api/economy/purchase-pack` — Stripe checkout for pack purchase
+- **4-Level Brokerage Commissions**: Observer (0%) → Practitioner (6.75%) → Professional (13.5%) → Sovereign (27%)
+  - Per-domain mastery (can be L4 Culinary and L1 Engineering)
+  - Sovereign subscription unlocks Master 27% commission
+- **Synthesis Forge** (AI Pack Generator):
+  - Command Console: niche field + expertise input + pack type selector
+  - `POST /api/copilot/generate-pack` — AI generates full curriculum (24 lessons), assessment challenges, brokerage tags
+  - Financial Projections Dashboard: retail price, creator revenue, monthly projection, subscriber discounts, commission rates
+  - One-Click Publish Gate: `POST /api/copilot/publish-pack/{draft_id}` deploys to Trade Circle Marketplace
+  - `GET /api/copilot/marketplace` — browse active marketplace packs
+- **Learning Toggle** (Site-Wide):
+  - Floating button renders on all pages, toggles Active Education Mode
+  - Toggle ON: "Why" tooltips + AI Co-Pilot active; OFF: clean professional UI
+  - `GET /api/copilot/toggle-status` — advancement level, modules completed, subscription tier
+  - Progressive Advancement: Observer→Practitioner→Professional→Sovereign based on modules completed
+- **AI Co-Pilot** (Gemini 3 Flash):
+  - `POST /api/copilot/micro-lesson` — generates personalized micro-lessons based on context + struggle point
+  - `GET /api/copilot/hint/{context}` — static context hints for trade/hexagram/wallet/forge/sentinel/subscription/commission
+  - 5 quick-context buttons (trade/hexagram/wallet/forge/sentinel) + custom question input
+- Tests: Backend 26/26 (100%), Frontend 100%
+
+### Iteration 258 — Site-Wide Progressive Learning & Synthesis Engine (Apr 3, 2026)
 - **3-Position Interaction Intensity Switch**: Focus (Passive) / Guided (Active) / Immersive (Catalyst)
   - `GET /api/academy/intensity` — returns current level, auto_advance, all 3 levels with properties
   - `PATCH /api/academy/intensity` — switches intensity and optionally sets auto_advance
@@ -367,12 +396,12 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
-## Upcoming (P0-P1) — Iteration 259+: Life-Force Enhancements
-- **Circularity KPI**: Tag trades/transmutations with ecosystem impact scores, reward high-circularity users with Resonance Multipliers
-- **Context-Aware Predictive Modality Switching**: Auto-switch learning mode based on device sensors (GPS→Voyager, stationary→Researcher, active→Chef)
-- **Ecosystem Health Dashboard**: "Global Renaissance" events triggered by peak community circularity
-- **Teacher-Student Loop / Peer Review**: Master-tier users review novice submissions, earning Impact Points + Circularity Gems
-- **Circularity Score Visibility**: Hybrid (private by default, opt-in public leaderboard)
+## Upcoming (P0-P1) — Iteration 261+
+- **Trade Circle Marketplace UI**: Smooth purchase flow for $1,347+ Business-in-a-Box packs, verified asset bridge
+- **Circularity KPI**: Tag trades/transmutations with ecosystem impact scores, Resonance Multipliers
+- **Context-Aware Predictive Modality Switching**: Auto-switch learning mode via device sensors
+- **Ecosystem Health Dashboard**: "Global Renaissance" events at peak community circularity
+- **Teacher-Student Peer Review Loop**: Master-tier users review novice submissions for Impact Points
 
 ## Upcoming (P1)
 - **Focus Mode 4.0 Gesture Controls**: Pinch-to-scale and Swipe-to-rotate for immersive navigation
