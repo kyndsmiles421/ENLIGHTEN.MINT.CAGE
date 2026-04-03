@@ -151,7 +151,23 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 247 — Sovereign Dashboard + Skeleton Export (Apr 3, 2026) — LATEST
+### Iteration 248 — Universal Kinetic Dock + Sovereign Dashboard (Apr 3, 2026) — LATEST
+- **Kinetic Dock Architecture**: SmartDock upgraded to physics-based positioning system
+  - Magnetic edge snapping: 20px proximity zone triggers weighted haptic snap to any screen edge
+  - Vertical/Horizontal pivot: auto-rotates 90° when snapped to left/right margins, icons reflow
+  - Double-tap collapse: 350ms detection → minimizes to resonance dot
+  - High-density opaque background: `rgba(10,10,18,0.88)` solid — no backdrop-filter, works over any paint/fractal
+  - Data attributes: `data-orientation`, `data-snapped` for CSS targeting
+- **Sovereign Dashboard** (`/sovereign-admin`): 5-tab admin panel
+  - Overview: Stats grid (Treasury balance, Fees, Wallets, Escrow count), platform status
+  - Controls: Fee slider (0-25%), System Live toggle, Mirror Hook toggle, Freeze Trades kill-switch
+  - Mirror: Real-time sovereign mirror ledger
+  - Escrow: All contracts with freeze capability
+  - Export: Skeleton download tool (`usi-skeleton-v1.json`)
+- **Dynamic Sovereign Config**: DB-backed fee %, PATCH API, kill-switch (HTTP 423)
+- Tests: Backend 12/12 (100%), Frontend 100%
+
+### Iteration 247 — Sovereign Dashboard + Skeleton Export (Apr 3, 2026)
 - **Sovereign Dashboard** (`/sovereign-admin`): 5-tab admin panel (Overview, Controls, Mirror, Escrow, Export)
   - **Overview**: Stats grid (Treasury balance, Total fees, Wallets, Escrow count), platform status, recent fee ledger
   - **Controls**: Fee slider (0-25%, default 5%), toggle switches (System Live, Mirror Hook, Freeze All Trades kill-switch)
