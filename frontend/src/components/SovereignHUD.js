@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSovereign } from '../context/SovereignContext';
-import { Zap, Activity, Cpu, Radio } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Zap, Activity, Cpu, Radio, Music } from 'lucide-react';
+import axios from 'axios';
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const CHANNEL_META = {
   0: { label: 'Nexus Path', color: '#EAB308', icon: Zap },
@@ -10,8 +14,19 @@ const CHANNEL_META = {
 };
 
 // ━━━ Sovereign NPU HUD — Priority Queue Visibility ━━━
+// Color based on harmony score
+function getHarmonyColor(score) {
+  if (score >= 90) return '#A78BFA'; // Purple — transcendent
+  if (score >= 75) return '#34D399'; // Emerald — harmonious
+  if (score >= 60) return '#60A5FA'; // Blue — resonant
+  if (score >= 40) return '#FBBF24'; // Amber — awakening
+  if (score >= 20) return '#F97316'; // Orange — seeking
+  return 'rgba(248,250,252,0.3)';    // Gray — dormant
+}
+
 export default function SovereignHUD() {
   const { getQueueStats, eventBus, tier } = useSovereign();
+  const { authHeaders } = useAuth();
   const [stats, setStats] = useState({ enqueued: 0, completed: 0, errors: 0, pending: 0, active: 0, npu_burst: false });
   const [recentTasks, setRecentTasks] = useState([]);
   const [expanded, setExpanded] = useState(false);
@@ -19,6 +34,11 @@ export default function SovereignHUD() {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
   const dataRef = useRef({ streams: [[], [], []] });
+
+  // Session Harmony Score
+  const [harmonyScore, setHarmonyScore] = useState(null);
+  const harmonyTimerRef = useRef(null);
+  const resonanceTrackRef = useRef({ activePairs: [], totalResonances: 0, strongestInterval: 'none', startTime: Date.now() });
 
   // Subscribe to queue events
   useEffect(() => {
@@ -50,6 +70,43 @@ export default function SovereignHUD() {
 
     return () => { clearInterval(interval); unsub1(); unsub2(); unsub3(); unsub4(); };
   }, [eventBus, getQueueStats]);
+
+  // Track resonance events and periodically calculate harmony score
+  useEffect(() => {
+    const unsubRes = eventBus.subscribe('sphere_resonance', (data) => {
+      if (data?.pairKey) {
+        resonanceTrackRef.current.totalResonances++;
+        if (!resonanceTrackRef.current.activePairs.includes(data.pairKey)) {
+          resonanceTrackRef.current.activePairs.push(data.pairKey);
+        }
+        if (data.interval) resonanceTrackRef.current.strongestInterval = data.interval;
+      }
+    });
+
+    // Fetch harmony score every 30 seconds
+    const fetchScore = async () => {
+      if (!authHeaders?.Authorization) return;
+      try {
+        const track = resonanceTrackRef.current;
+        const res = await axios.post(`${API}/api/phonic/harmony-score`, {
+          active_pairs: track.activePairs,
+          total_resonances: track.totalResonances,
+          strongest_interval: track.strongestInterval,
+          session_duration_ms: Date.now() - track.startTime,
+        }, { headers: authHeaders });
+        setHarmonyScore(res.data);
+      } catch {}
+    };
+
+    const initTimer = setTimeout(fetchScore, 3000);
+    harmonyTimerRef.current = setInterval(fetchScore, 30000);
+
+    return () => {
+      unsubRes();
+      clearTimeout(initTimer);
+      if (harmonyTimerRef.current) clearInterval(harmonyTimerRef.current);
+    };
+  }, [eventBus, authHeaders]);
 
   // Canvas data stream visualization
   const drawStreams = useCallback(() => {
@@ -163,6 +220,14 @@ export default function SovereignHUD() {
             +{stats.pending}
           </span>
         )}
+        {/* Compact harmony score badge */}
+        {harmonyScore && (
+          <span className="text-[6px] px-1 py-0.5 rounded-full font-mono"
+            style={{ background: `${getHarmonyColor(harmonyScore.score)}12`, color: getHarmonyColor(harmonyScore.score) }}
+            data-testid="harmony-score-badge">
+            {harmonyScore.score}
+          </span>
+        )}
       </motion.button>
 
       {/* Expanded panel */}
@@ -239,6 +304,72 @@ export default function SovereignHUD() {
                 <p className="text-[5px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.15)' }}>Errors</p>
               </div>
             </div>
+
+            {/* Session Harmony Score */}
+            {harmonyScore && (
+              <div className="px-3 py-2 border-t" style={{ borderColor: 'rgba(248,250,252,0.03)' }} data-testid="harmony-score-panel">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1">
+                    <Music size={8} style={{ color: getHarmonyColor(harmonyScore.score) }} />
+                    <span className="text-[6px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      Harmony
+                    </span>
+                  </div>
+                  <span className="text-[8px] font-mono" style={{ color: getHarmonyColor(harmonyScore.score) }}>
+                    {harmonyScore.grade}
+                  </span>
+                </div>
+
+                {/* Score ring */}
+                <div className="flex items-center gap-2">
+                  <div className="relative w-10 h-10 flex-shrink-0">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                      {/* Background ring */}
+                      <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(248,250,252,0.04)" strokeWidth="3" />
+                      {/* Score arc */}
+                      <circle cx="20" cy="20" r="16" fill="none"
+                        stroke={getHarmonyColor(harmonyScore.score)}
+                        strokeWidth="3" strokeLinecap="round"
+                        strokeDasharray={`${(harmonyScore.score / 100) * 100.5} 100.5`}
+                        transform="rotate(-90 20 20)"
+                        style={{ filter: `drop-shadow(0 0 3px ${getHarmonyColor(harmonyScore.score)}40)` }} />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-mono font-bold"
+                      style={{ color: getHarmonyColor(harmonyScore.score) }} data-testid="harmony-score-value">
+                      {harmonyScore.score}
+                    </span>
+                  </div>
+                  {/* Breakdown bars */}
+                  <div className="flex-1 space-y-1">
+                    {[
+                      { label: 'Align', value: harmonyScore.breakdown.resonance_alignment, max: 40, color: '#818CF8' },
+                      { label: 'Explore', value: harmonyScore.breakdown.exploration_diversity, max: 30, color: '#34D399' },
+                      { label: 'Depth', value: harmonyScore.breakdown.harmonic_depth, max: 30, color: '#F59E0B' },
+                    ].map(bar => (
+                      <div key={bar.label} className="flex items-center gap-1">
+                        <span className="text-[5px] font-mono w-7 text-right" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                          {bar.label}
+                        </span>
+                        <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
+                          <motion.div className="h-full rounded-full"
+                            style={{ background: bar.color, width: `${(bar.value / bar.max) * 100}%` }}
+                            initial={{ width: 0 }} animate={{ width: `${(bar.value / bar.max) * 100}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut' }} />
+                        </div>
+                        <span className="text-[5px] font-mono w-4" style={{ color: `${bar.color}80` }}>
+                          {bar.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Insight */}
+                <p className="text-[6px] mt-1.5 leading-relaxed" style={{ color: 'rgba(248,250,252,0.25)', fontFamily: 'Cormorant Garamond, serif' }}>
+                  {harmonyScore.insight}
+                </p>
+              </div>
+            )}
 
             {/* Recent tasks feed */}
             {recentTasks.length > 0 && (

@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import CultureLayerPanel from '../components/CultureLayerPanel';
 import { useNavigate } from 'react-router-dom';
 import { useCosmicAmbient, CosmicNarrator } from '../components/StarChartAudio';
 import { BirthConstellationToast, MythologyPanel, JourneyOverlay, JourneyComplete, CelestialBadgesPanel } from '../components/StarChartOverlays';
@@ -1648,6 +1649,14 @@ export default function StarChart() {
       <AnimatePresence>
         {showBadges && <CelestialBadgesPanel onClose={() => setShowBadges(false)} token={token} authHeaders={authHeaders} />}
       </AnimatePresence>
+
+      {/* Civilization Culture Layers — Hopi/Egyptian/Vedic teachings */}
+      <div className="absolute top-28 left-4 z-10 w-52">
+        <CultureLayerPanel onLayerData={(layerId, data) => {
+          if (data) { selectCulture(layerId); }
+          else { setActiveCulture(null); setCultureData(null); }
+        }} />
+      </div>
 
       {/* Detail Panel (with Mythology) */}
       <AnimatePresence>

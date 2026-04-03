@@ -283,3 +283,99 @@ async def get_harmonic_memory(user=Depends(get_current_user)):
         })
 
     return {"memories": suggestions, "total_bookmarks": len(memories)}
+
+
+
+class SessionResonanceData(BaseModel):
+    active_pairs: list = []
+    total_resonances: int = 0
+    strongest_interval: str = "none"
+    session_duration_ms: int = 0
+
+
+@router.post("/harmony-score")
+async def calculate_harmony_score(data: SessionResonanceData, user=Depends(get_current_user)):
+    """Calculate a Session Harmony Score (0-100) comparing current session to historical patterns."""
+    import math
+
+    # Fetch historical harmonic memory
+    cursor = db.harmonic_memory.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "pair_key": 1, "count": 1, "total_intensity": 1, "last_interval": 1}
+    ).sort("count", -1).limit(20)
+    memories = await cursor.to_list(length=20)
+
+    # Fetch recent movement diversity
+    mv_cursor = db.movement_history.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "route_key": 1, "frequency": 1}
+    ).sort("timestamp", -1).limit(30)
+    movements = await mv_cursor.to_list(length=30)
+
+    if not memories and not movements:
+        return {
+            "score": 50,
+            "grade": "Neutral",
+            "breakdown": {
+                "resonance_alignment": 50,
+                "exploration_diversity": 50,
+                "harmonic_depth": 50,
+            },
+            "insight": "Begin exploring sphere combinations to build your harmonic profile.",
+            "historical_pairs": 0,
+        }
+
+    # 1. Resonance Alignment (40 pts) — how well current pairs match historical favorites
+    alignment_score = 0
+    historical_pairs = {m["pair_key"]: m for m in memories}
+    if data.active_pairs and historical_pairs:
+        matches = sum(1 for p in data.active_pairs if p in historical_pairs)
+        alignment_score = min(40, (matches / max(1, len(data.active_pairs))) * 40)
+    elif data.total_resonances > 0:
+        alignment_score = min(20, data.total_resonances * 4)
+
+    # 2. Exploration Diversity (30 pts) — how many unique routes/frequencies visited
+    route_diversity = len(set(m.get("route_key", "") for m in movements))
+    freq_diversity = len(set(m.get("frequency", 0) for m in movements))
+    diversity_score = min(30, (route_diversity * 3 + freq_diversity * 4))
+
+    # 3. Harmonic Depth (30 pts) — quality of resonance interactions
+    interval_weights = {"octave": 10, "fifth": 8, "fourth": 6, "third": 4, "second": 2, "unison": 1}
+    depth_score = 0
+    if data.strongest_interval and data.strongest_interval != "none":
+        depth_score += interval_weights.get(data.strongest_interval, 2) * 2
+    total_intensity = sum(m.get("total_intensity", 0) for m in memories)
+    depth_score += min(10, total_intensity * 2)
+    depth_score = min(30, depth_score)
+
+    total_score = min(100, round(alignment_score + diversity_score + depth_score))
+
+    # Grade
+    if total_score >= 90: grade = "Transcendent"
+    elif total_score >= 75: grade = "Harmonious"
+    elif total_score >= 60: grade = "Resonant"
+    elif total_score >= 40: grade = "Awakening"
+    elif total_score >= 20: grade = "Seeking"
+    else: grade = "Dormant"
+
+    # Insight
+    insights = {
+        "Transcendent": "Your session is perfectly aligned with your cosmic resonance pattern.",
+        "Harmonious": "Strong harmonic coherence. Your sphere interactions reflect deep familiarity.",
+        "Resonant": "Good alignment. Try holding compatible spheres closer for deeper phase-lock.",
+        "Awakening": "Your harmonic profile is building. Explore new sphere combinations.",
+        "Seeking": "Keep exploring — each interaction adds to your resonance memory.",
+        "Dormant": "Pull modules from the crossbar to begin building resonance.",
+    }
+
+    return {
+        "score": total_score,
+        "grade": grade,
+        "breakdown": {
+            "resonance_alignment": round(alignment_score),
+            "exploration_diversity": round(diversity_score),
+            "harmonic_depth": round(depth_score),
+        },
+        "insight": insights.get(grade, ""),
+        "historical_pairs": len(memories),
+    }
