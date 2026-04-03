@@ -379,3 +379,80 @@ async def calculate_harmony_score(data: SessionResonanceData, user=Depends(get_c
         "insight": insights.get(grade, ""),
         "historical_pairs": len(memories),
     }
+
+
+@router.post("/streak-check")
+async def check_resonance_streak(data: SessionResonanceData, user=Depends(get_current_user)):
+    """Check and update Resonance Streak. Awards XP when streak hits 3+ consecutive Harmonious scores."""
+    # Get or create streak record
+    streak = await db.resonance_streaks.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not streak:
+        streak = {"user_id": user["id"], "current_streak": 0, "best_streak": 0,
+                  "total_xp_earned": 0, "last_score": 0, "streak_active": False}
+        await db.resonance_streaks.insert_one({**streak})
+
+    # Calculate current score (lightweight inline)
+    score = data.total_resonances * 4 + len(data.active_pairs) * 8
+    interval_bonus = {"octave": 15, "fifth": 10, "fourth": 8, "third": 5}.get(data.strongest_interval, 0)
+    score = min(100, score + interval_bonus)
+
+    # Streak logic: score >= 75 increments, < 75 resets
+    new_streak = streak.get("current_streak", 0)
+    streak_triggered = False
+    xp_awarded = 0
+
+    if score >= 75:
+        new_streak += 1
+        if new_streak >= 3 and new_streak % 3 == 0:
+            # Award XP: 50 base + 25 per additional 3-streak cycle
+            xp_awarded = 50 + ((new_streak // 3) - 1) * 25
+            streak_triggered = True
+            # Record XP in mastery system
+            try:
+                mastery = await db.sovereign_mastery.find_one({"user_id": user["id"]})
+                if mastery:
+                    await db.sovereign_mastery.update_one(
+                        {"user_id": user["id"]},
+                        {"$inc": {"total_xp": xp_awarded}}
+                    )
+            except Exception:
+                pass
+    else:
+        new_streak = 0
+
+    best_streak = max(streak.get("best_streak", 0), new_streak)
+    total_xp = streak.get("total_xp_earned", 0) + xp_awarded
+
+    await db.resonance_streaks.update_one(
+        {"user_id": user["id"]},
+        {"$set": {
+            "current_streak": new_streak,
+            "best_streak": best_streak,
+            "total_xp_earned": total_xp,
+            "last_score": score,
+            "streak_active": new_streak >= 3,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }},
+        upsert=True,
+    )
+
+    return {
+        "current_streak": new_streak,
+        "best_streak": best_streak,
+        "streak_active": new_streak >= 3,
+        "streak_triggered": streak_triggered,
+        "xp_awarded": xp_awarded,
+        "total_xp_earned": total_xp,
+        "score_used": score,
+    }
+
+
+@router.get("/streak-status")
+async def get_streak_status(user=Depends(get_current_user)):
+    """Get current Resonance Streak status."""
+    streak = await db.resonance_streaks.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not streak:
+        return {"current_streak": 0, "best_streak": 0, "streak_active": False,
+                "total_xp_earned": 0, "last_score": 0}
+    streak.pop("user_id", None)
+    return streak

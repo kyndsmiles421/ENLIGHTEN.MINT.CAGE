@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import SovereignCrossbar from './SovereignCrossbar';
 import NebulaPlayground from './NebulaPlayground';
@@ -6,13 +6,41 @@ import SovereignHUD from './SovereignHUD';
 import BubblePortal from './BubblePortal';
 import { useAuth } from '../context/AuthContext';
 import { useSovereign } from '../context/SovereignContext';
-import { usePhonicResonance, usePredictiveSonicTug } from '../hooks/usePhonicResonance';
+import { usePhonicResonance, usePredictiveSonicTug, ROUTE_FREQUENCIES } from '../hooks/usePhonicResonance';
+import { useOrganicAudio } from '../hooks/useOrganicAudio';
 
 const EXCLUDED_PATHS = ['/', '/auth', '/intro'];
 
 // Phonic Resonance — ambient Web Audio wrapper (renders nothing)
 function PhonicResonanceProvider({ enabled }) {
   usePhonicResonance(enabled, 0.025);
+  return null;
+}
+
+// Organic Audio — route-based instrument textures (renders nothing)
+function OrganicAudioProvider({ enabled }) {
+  const location = useLocation();
+  const { playAmbientForRoute, getInstrument } = useOrganicAudio(enabled);
+  const lastRouteRef = React.useRef('');
+
+  useEffect(() => {
+    if (!enabled) return;
+    const routeKey = location.pathname.replace('/', '').split('/')[0] || 'hub';
+    if (routeKey === lastRouteRef.current) return;
+    lastRouteRef.current = routeKey;
+
+    const instrument = getInstrument(routeKey);
+    if (instrument === 'synth') return; // Handled by PhonicResonance
+
+    // Delay organic voice to layer after Solfeggio crossfade
+    const timer = setTimeout(() => {
+      const freq = ROUTE_FREQUENCIES[`/${routeKey}`] || ROUTE_FREQUENCIES.default || 432;
+      playAmbientForRoute(routeKey, freq);
+    }, 2500); // 2.5s after route change (after Solfeggio settles)
+
+    return () => clearTimeout(timer);
+  }, [location.pathname, enabled, playAmbientForRoute, getInstrument]);
+
   return null;
 }
 
@@ -95,6 +123,7 @@ export default function OrbitalNavigation() {
         masteryTier={masteryTier}
       />
       <PhonicResonanceProvider enabled={!!token} />
+      <OrganicAudioProvider enabled={!!token} />
     </>
   );
 }

@@ -40,6 +40,11 @@ export default function SovereignHUD() {
   const harmonyTimerRef = useRef(null);
   const resonanceTrackRef = useRef({ activePairs: [], totalResonances: 0, strongestInterval: 'none', startTime: Date.now() });
 
+  // Resonance Streak
+  const [streak, setStreak] = useState({ current_streak: 0, best_streak: 0, streak_active: false, total_xp_earned: 0 });
+  const [goldenPulse, setGoldenPulse] = useState(false);
+  const [xpFlash, setXpFlash] = useState(null);
+
   // Subscribe to queue events
   useEffect(() => {
     const refresh = () => setStats(getQueueStats());
@@ -88,13 +93,31 @@ export default function SovereignHUD() {
       if (!authHeaders?.Authorization) return;
       try {
         const track = resonanceTrackRef.current;
-        const res = await axios.post(`${API}/api/phonic/harmony-score`, {
+        const payload = {
           active_pairs: track.activePairs,
           total_resonances: track.totalResonances,
           strongest_interval: track.strongestInterval,
           session_duration_ms: Date.now() - track.startTime,
-        }, { headers: authHeaders });
+        };
+        const res = await axios.post(`${API}/api/phonic/harmony-score`, payload, { headers: authHeaders });
         setHarmonyScore(res.data);
+
+        // Streak check (low-priority background task)
+        requestIdleCallback(async () => {
+          try {
+            const streakRes = await axios.post(`${API}/api/phonic/streak-check`, payload, { headers: authHeaders });
+            const s = streakRes.data;
+            setStreak(s);
+            if (s.streak_triggered) {
+              // Golden Pulse!
+              setGoldenPulse(true);
+              setXpFlash(s.xp_awarded);
+              if (navigator.vibrate) navigator.vibrate([50, 30, 80, 30, 120]);
+              setTimeout(() => setGoldenPulse(false), 3000);
+              setTimeout(() => setXpFlash(null), 4000);
+            }
+          } catch {}
+        }, { timeout: 5000 });
       } catch {}
     };
 
@@ -186,6 +209,44 @@ export default function SovereignHUD() {
       transition={{ delay: 1, duration: 0.5 }}
       data-testid="sovereign-hud"
     >
+      {/* Golden Pulse Overlay — triggers on 3+ streak */}
+      <AnimatePresence>
+        {goldenPulse && (
+          <motion.div
+            className="absolute inset-[-12px] rounded-2xl pointer-events-none z-10"
+            style={{
+              background: 'transparent',
+              boxShadow: '0 0 30px rgba(251,191,36,0.4), inset 0 0 20px rgba(251,191,36,0.1)',
+              border: '2px solid rgba(251,191,36,0.6)',
+            }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: [0, 1, 0.6, 1, 0], scale: [0.9, 1.05, 1, 1.02, 0.95] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 3, ease: 'easeOut' }}
+            data-testid="golden-pulse"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* XP Flash — shows earned XP on streak trigger */}
+      <AnimatePresence>
+        {xpFlash && (
+          <motion.div
+            className="absolute -top-8 left-1/2 -translate-x-1/2 pointer-events-none z-20"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: -20 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 1.5 }}
+            data-testid="xp-flash"
+          >
+            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full"
+              style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.3)' }}>
+              +{xpFlash} XP
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Compact widget */}
       <motion.button
         className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl cursor-pointer"
@@ -226,6 +287,18 @@ export default function SovereignHUD() {
             style={{ background: `${getHarmonyColor(harmonyScore.score)}12`, color: getHarmonyColor(harmonyScore.score) }}
             data-testid="harmony-score-badge">
             {harmonyScore.score}
+          </span>
+        )}
+        {/* Streak counter */}
+        {streak.current_streak > 0 && (
+          <span className="text-[6px] px-1 py-0.5 rounded-full font-mono"
+            style={{
+              background: streak.streak_active ? 'rgba(251,191,36,0.15)' : 'rgba(248,250,252,0.04)',
+              color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.3)',
+              border: streak.streak_active ? '1px solid rgba(251,191,36,0.2)' : 'none',
+            }}
+            data-testid="streak-counter">
+            {streak.current_streak}x
           </span>
         )}
       </motion.button>
@@ -368,6 +441,52 @@ export default function SovereignHUD() {
                 <p className="text-[6px] mt-1.5 leading-relaxed" style={{ color: 'rgba(248,250,252,0.25)', fontFamily: 'Cormorant Garamond, serif' }}>
                   {harmonyScore.insight}
                 </p>
+              </div>
+            )}
+
+            {/* Resonance Streak */}
+            {streak.current_streak > 0 && (
+              <div className="px-3 py-2 border-t" style={{ borderColor: 'rgba(248,250,252,0.03)' }} data-testid="streak-panel">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1">
+                    <Zap size={8} style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.3)' }} />
+                    <span className="text-[6px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      Streak
+                    </span>
+                  </div>
+                  <motion.span className="text-[10px] font-mono font-bold"
+                    style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.4)' }}
+                    animate={streak.streak_active ? { scale: [1, 1.1, 1] } : {}}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    data-testid="streak-value">
+                    {streak.current_streak}x
+                  </motion.span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Streak dots */}
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: Math.min(9, Math.max(3, streak.current_streak)) }, (_, i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full"
+                        style={{
+                          background: i < streak.current_streak
+                            ? (i >= 2 ? '#FBBF24' : 'rgba(251,191,36,0.4)')
+                            : 'rgba(248,250,252,0.06)',
+                          boxShadow: i < streak.current_streak && i >= 2 ? '0 0 4px rgba(251,191,36,0.3)' : 'none',
+                        }} />
+                    ))}
+                  </div>
+                  <div className="flex-1" />
+                  <div className="text-right">
+                    <p className="text-[5px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
+                      Best: {streak.best_streak}x
+                    </p>
+                    {streak.total_xp_earned > 0 && (
+                      <p className="text-[5px] font-mono" style={{ color: 'rgba(251,191,36,0.4)' }}>
+                        +{streak.total_xp_earned} XP
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

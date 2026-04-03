@@ -3,9 +3,18 @@
 
 const CACHE_VERSION = 'cosmic-v3';
 const SOLFEGGIO_CACHE = 'solfeggio-wavetables-v1';
+const INSTRUMENT_CACHE = 'organic-instruments-v1';
 
 // Core Solfeggio frequencies to pre-cache as wave table data
 const SOLFEGGIO_FREQUENCIES = [396, 432, 528, 639, 741, 852, 963];
+
+// Organic instrument profiles — pre-generated AudioBuffer-compatible data
+const INSTRUMENT_PROFILES = {
+  singing_bowl: { harmonics: [1, 2.02, 3.01, 4.98], amps: [1, 0.5, 0.3, 0.15], type: 'sine', duration: 6 },
+  flute: { harmonics: [1, 2.0, 3.0], amps: [1, 0.2, 0.05], type: 'triangle', duration: 4 },
+  tabla: { harmonics: [1, 1.5], amps: [1, 0.6], type: 'sine', duration: 1.2 },
+  crystal_bowl: { harmonics: [1, 2.0, 3.0, 5.0], amps: [1, 0.3, 0.15, 0.08], type: 'sine', duration: 8 },
+};
 
 // App shell resources to cache for offline
 const APP_SHELL = [
@@ -55,6 +64,14 @@ self.addEventListener('install', (event) => {
         });
         return Promise.all(promises);
       }),
+      // Pre-cache instrument profiles as JSON
+      caches.open(INSTRUMENT_CACHE).then((cache) => {
+        const profileData = JSON.stringify(INSTRUMENT_PROFILES);
+        const response = new Response(profileData, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        return cache.put('/instruments/profiles', response);
+      }),
     ]).then(() => self.skipWaiting())
   );
 });
@@ -65,7 +82,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((names) =>
       Promise.all(
         names
-          .filter((n) => n !== CACHE_VERSION && n !== SOLFEGGIO_CACHE)
+          .filter((n) => n !== CACHE_VERSION && n !== SOLFEGGIO_CACHE && n !== INSTRUMENT_CACHE)
           .map((n) => caches.delete(n))
       )
     ).then(() => self.clients.claim())
@@ -75,6 +92,16 @@ self.addEventListener('activate', (event) => {
 // Fetch: serve from cache first for app shell + solfeggio, network-first for API
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // Instrument profiles — always from cache
+  if (url.pathname.startsWith('/instruments/')) {
+    event.respondWith(
+      caches.open(INSTRUMENT_CACHE).then((cache) =>
+        cache.match(event.request).then((cached) => cached || new Response('{}', { status: 200 }))
+      )
+    );
+    return;
+  }
 
   // Solfeggio wave tables — always from cache
   if (url.pathname.startsWith('/solfeggio/')) {
