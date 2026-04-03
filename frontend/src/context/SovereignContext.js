@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 const SovereignContext = createContext(null);
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// ━━━ Pub/Sub Event Bus ━━━
+// ━━━ Pub/Sub Event Bus with Priority Channels ━━━
 class EventBus {
   constructor() { this.listeners = {}; }
   subscribe(event, cb) {
@@ -21,8 +21,14 @@ class EventBus {
 
 const eventBus = new EventBus();
 
-// ━━━ Priority Queue ━━━
-const PRIORITY_LEVELS = { critical: 0, experience: 1, background: 2 };
+// ━━━ Priority Levels — The Nexus Path ━━━
+// Priority 1 (critical)  : Master Orchestrator, UI thread responses — zero latency
+// Priority 2 (experience): Audio/Binaural processing, AI generation — high fidelity
+// Priority 3 (background): Asset export (PDF/WAV), GPS, project saves — throttled
+const PRIORITY = { critical: 0, experience: 1, background: 2 };
+const PRIORITY_LABELS = { 0: 'Nexus Path', 1: 'Sensory Stream', 2: 'Background Orbit' };
+const CONCURRENCY_LIMITS = { 0: 3, 1: 2, 2: 1 };
+const FRAME_BUDGET_MS = 12; // stay under 16ms frame budget
 
 export function SovereignProvider({ children }) {
   const { authHeaders, token, authLoading, user } = useAuth();
@@ -36,8 +42,12 @@ export function SovereignProvider({ children }) {
   const [perks, setPerks] = useState([]);
   const [credits, setCredits] = useState(0);
   const [loaded, setLoaded] = useState(false);
-  const priorityQueueRef = useRef([]);
-  const processingRef = useRef(false);
+
+  // Priority Queue state
+  const queueRef = useRef([]);           // sorted task array
+  const activeCountRef = useRef({ 0: 0, 1: 0, 2: 0 }); // concurrency per priority
+  const npuBurstRef = useRef(false);     // backpressure flag
+  const queueStatsRef = useRef({ enqueued: 0, completed: 0, errors: 0 });
 
   const refresh = useCallback(async () => {
     if (authLoading || !token) return;
@@ -59,7 +69,6 @@ export function SovereignProvider({ children }) {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  // Listen for tier-changing events
   useEffect(() => {
     const unsub1 = eventBus.subscribe('purchase_complete', () => refresh());
     const unsub2 = eventBus.subscribe('subscription_upgraded', () => refresh());
@@ -75,7 +84,7 @@ export function SovereignProvider({ children }) {
     return order.indexOf(tier) >= order.indexOf(requiredTier);
   }, [tier]);
 
-  // Command Mode — context-aware Master Orchestrator
+  // Command Mode — context-aware Master Orchestrator (Priority 1)
   const executeCommand = useCallback(async (command, context = 'general', pageData = {}) => {
     if (!hasCapability('thinking_feed')) {
       return { error: 'Command Mode requires Glass Box access' };
@@ -91,28 +100,97 @@ export function SovereignProvider({ children }) {
     }
   }, [authHeaders, hasCapability]);
 
-  // Priority Queue Processing
-  const enqueue = useCallback((task, priority = 'background') => {
-    priorityQueueRef.current.push({ ...task, priority: PRIORITY_LEVELS[priority] || 2, id: Date.now() });
-    priorityQueueRef.current.sort((a, b) => a.priority - b.priority);
-    processQueue();
-  }, []);
+  // ━━━ Priority Queue with Backpressure ━━━
+  const processQueue = useCallback(() => {
+    if (queueRef.current.length === 0) return;
 
-  const processQueue = useCallback(async () => {
-    if (processingRef.current || priorityQueueRef.current.length === 0) return;
-    processingRef.current = true;
-    const task = priorityQueueRef.current.shift();
-    try {
-      if (task.execute) await task.execute();
-      eventBus.publish('task_complete', { id: task.id, priority: task.priority });
-    } catch (e) {
-      eventBus.publish('task_error', { id: task.id, error: e.message });
+    // During NPU burst, only process critical tasks
+    const allowedPriority = npuBurstRef.current ? 0 : 2;
+
+    for (let p = 0; p <= allowedPriority; p++) {
+      const limit = CONCURRENCY_LIMITS[p];
+      const active = activeCountRef.current[p];
+      if (active >= limit) continue;
+
+      const idx = queueRef.current.findIndex(t => t.priority === p);
+      if (idx === -1) continue;
+
+      const task = queueRef.current.splice(idx, 1)[0];
+      activeCountRef.current[p]++;
+
+      const run = async () => {
+        try {
+          if (task.execute) await task.execute();
+          queueStatsRef.current.completed++;
+          eventBus.publish('task_complete', {
+            id: task.id, priority: task.priority, label: task.label,
+            channel: PRIORITY_LABELS[task.priority],
+          });
+        } catch (e) {
+          queueStatsRef.current.errors++;
+          eventBus.publish('task_error', { id: task.id, error: e.message, label: task.label });
+        } finally {
+          activeCountRef.current[task.priority]--;
+          // Schedule next processing in idle time
+          if (typeof requestIdleCallback !== 'undefined') {
+            requestIdleCallback(() => processQueue(), { timeout: 100 });
+          } else {
+            setTimeout(processQueue, 50);
+          }
+        }
+      };
+
+      // Critical tasks run immediately, others yield to frame budget
+      if (p === 0) {
+        run();
+      } else {
+        if (typeof requestIdleCallback !== 'undefined') {
+          requestIdleCallback((deadline) => {
+            if (deadline.timeRemaining() > FRAME_BUDGET_MS) run();
+            else setTimeout(run, 16); // yield one frame
+          }, { timeout: p === 1 ? 200 : 1000 });
+        } else {
+          setTimeout(run, p === 1 ? 16 : 100);
+        }
+      }
     }
-    processingRef.current = false;
-    if (priorityQueueRef.current.length > 0) setTimeout(processQueue, 50);
   }, []);
 
-  // Publish event to backend
+  const enqueue = useCallback((task, priority = 'background') => {
+    const p = PRIORITY[priority] ?? 2;
+    const entry = {
+      ...task,
+      priority: p,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      enqueued_at: Date.now(),
+    };
+    queueRef.current.push(entry);
+    queueRef.current.sort((a, b) => a.priority - b.priority || a.enqueued_at - b.enqueued_at);
+    queueStatsRef.current.enqueued++;
+    eventBus.publish('task_enqueued', {
+      id: entry.id, priority: p, label: task.label,
+      channel: PRIORITY_LABELS[p],
+      queue_depth: queueRef.current.length,
+    });
+    processQueue();
+    return entry.id;
+  }, [processQueue]);
+
+  // NPU Burst mode — throttle background tasks during intensive processing
+  const setNpuBurst = useCallback((active) => {
+    npuBurstRef.current = active;
+    eventBus.publish('npu_burst', { active, timestamp: Date.now() });
+    if (!active) processQueue(); // resume background tasks
+  }, [processQueue]);
+
+  const getQueueStats = useCallback(() => ({
+    ...queueStatsRef.current,
+    pending: queueRef.current.length,
+    active: Object.values(activeCountRef.current).reduce((a, b) => a + b, 0),
+    npu_burst: npuBurstRef.current,
+  }), []);
+
+  // Publish event to backend (Priority 3 — background)
   const publishEvent = useCallback(async (eventType, payload = {}) => {
     eventBus.publish(eventType, payload);
     try {
@@ -126,7 +204,8 @@ export function SovereignProvider({ children }) {
     tier, tierName, codename, capabilities, activeUnits,
     aiBrain, experience, perks, credits, loaded,
     hasCapability, isTierAtLeast, refresh,
-    executeCommand, enqueue, publishEvent, eventBus,
+    executeCommand, enqueue, setNpuBurst, getQueueStats,
+    publishEvent, eventBus,
   };
 
   return (
