@@ -186,6 +186,7 @@ const CodexOrbital = lazy(() => import('./pages/CodexOrbital'));
 const MasteryPath = lazy(() => import('./pages/MasteryPath'));
 const SovereignDashboard = lazy(() => import('./pages/SovereignDashboard'));
 const AcademyPage = lazy(() => import('./pages/AcademyPage'));
+const EconomyPage = lazy(() => import('./pages/EconomyPage'));
 
 function PageLoader() {
   return (
@@ -346,6 +347,7 @@ function AnimatedRoutes() {
         <Route path="/mastery-path" element={<MasteryPath />} />
         <Route path="/sovereign-admin" element={<SovereignDashboard />} />
         <Route path="/academy" element={<AcademyPage />} />
+        <Route path="/economy" element={<EconomyPage />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
