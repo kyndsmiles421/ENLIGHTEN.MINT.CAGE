@@ -35,112 +35,83 @@ Mixer Director:
   POST /api/mixer/auto-compose (AI Mantra DJ)
   GET  /api/mixer/auto-compose/goals (Goal catalog)
 
-Generators:
-  GET  /api/trade-circle/generators/catalog
-  POST /api/trade-circle/purchase
-  GET  /api/vault/generators, POST /api/vault/generators/toggle
+Sovereign:
+  GET  /api/sovereign/status
+  GET  /api/sovereign/tiers
+  GET  /api/sovereign/units
+  POST /api/sovereign/command (Command Mode)
+  POST /api/sovereign/events/publish (Pub/Sub)
+  GET  /api/sovereign/events/recent
 ```
 
-## AI Mantra DJ Auto-Compose
-```
-6 Wellness Goals:
-  Deep Sleep:     Delta/theta waves, descending volume, 90s base, 8s crossfade
-  Laser Focus:    Alpha-beta entrainment, sustained volume, 60s base, 4s crossfade
-  Energy Surge:   High-frequency activation, ascending volume, 45s base, 3s crossfade
-  Sacred Healing: Solfeggio cascade, wave volume, 75s base, 6s crossfade
-  Deep Meditation: Theta-alpha bridge, arc volume, 120s base, 10s crossfade
-  Earth Grounding: Sub-bass resonance, sustained volume, 60s base, 5s crossfade
-
-Behavior:
-  - Selects tier-gated sources matching goal frequencies
-  - Staggers tracks with cross-fade overlap
-  - Adds hexagram resonance tone as sustain layer
-  - Deducts 1 AI credit per composition
-  - Returns ready-to-use track arrangement
-```
-
-## Backend Architecture (Refactored Apr 3, 2026)
-```
-/app/backend/
-├── server.py          # Auto-router discovery, GZip, CORS, WebSocket, Stripe
-├── deps.py            # MongoDB client (pooled), JWT auth, helpers
-├── db_indexes.py      # 80+ indexes across 46 collections (startup)
-├── tasks.py           # Background loops (push scheduler, credit refresh)
-├── models.py          # Pydantic models
-├── routes/            # 120+ auto-discovered route modules
-```
-
-## Sovereign Architecture (Apr 3, 2026)
-The app uses a unified 4-tier subscription model:
-
+## Sovereign Architecture (4-Tier Model)
 | Tier | Codename | Price | AI Brain | Visuals | Audio |
 |------|----------|-------|----------|---------|-------|
 | Standard | The Seed | Free | Single-Node Logic | 1080p | 44.1kHz Stereo |
 | Apprentice | The Bloom | $9.99/mo | Multi-Node + Glass Box | 1440p | 48kHz Spatial |
-| Artisan | The Architect | $24.99/mo | Collaborative Agents (α/β/γ) | 2K | 96kHz Lossless |
+| Artisan | The Architect | $24.99/mo | Collaborative Agents | 2K | 96kHz Lossless |
 | Sovereign | The Super User | $49.99/mo | Autonomous Master | 4K | 192kHz 8D Binaural |
 
 ### Cross-Tier Purchasing
-Lower tiers can buy individual features from higher tiers:
-- 12 purchasable units (Thinking Feed, Spatial Audio, Agent Sessions, Asset Export, etc.)
-- Purchased with credits or USD
-- Duration-based (30 days), usage-based (3 sessions), or permanent
+12 purchasable units (Thinking Feed, Spatial Audio, Agent Sessions, Asset Export, etc.)
 
 ### Glass Box Thinking Feed (Apprentice+)
 - Agent Alpha (Geometer): Sacred Geometry mapping
 - Agent Beta (Harmonizer): Solfeggio Frequency alignment
-- Agent Gamma (Logistics): GPS, permits, inventory (Artisan+ only)
-- Uses Gemini AI for Master Orchestrator responses
+- Agent Gamma (Logistics): GPS, permits, inventory (Artisan+)
+
+## Frontend Architecture — Triple-Domain Decomposition (Apr 3, 2026)
+```
+/app/frontend/src/pages/
+├── SuanpanMixer.js      # Main orchestrator (imports from 3 domains)
+├── SuanpanCore.js        # Foundation math, constants, TrackRow, KeyframeLane, SuanpanSource
+├── SuanpanSovereign.js   # Tier logic: SpeedBridgeModal, BonusPackCard, RecommendationCard
+├── SuanpanVfx.js         # Visual effects: SacredAssemblyLoader, LightTrailCanvas, BloomGlow
+
+/app/frontend/src/context/
+├── SovereignContext.js   # EventBus + Priority Queue (critical/experience/background)
+
+/app/frontend/src/components/
+├── CommandMode.js        # Global Ctrl+K command interface
+```
+
+## Priority Queue / Backpressure System (Apr 3, 2026)
+```
+Priority 1 (Nexus Path):      UI thread, Master Orchestrator — zero latency, 3 concurrent
+Priority 2 (Sensory Stream):  Audio/Binaural, AI generation — high fidelity, 2 concurrent
+Priority 3 (Background Orbit): Asset export, GPS, saves — throttled, 1 concurrent
+
+Features:
+- requestIdleCallback scheduling for non-critical tasks
+- NPU Burst mode: blocks background tasks during intensive processing
+- Frame budget: 12ms target (under 16ms browser threshold)
+- Queue stats: enqueued/completed/errors/pending/active counters
+```
 
 ## Iteration History
-### Iteration 232 — Sovereign Architecture (Apr 3, 2026) — LATEST
-- 4-Tier subscription model (Standard/Apprentice/Artisan/Sovereign)
-- 12 cross-tier purchasable units with credit/USD pricing
-- Glass Box Thinking Feed with Agent coordination (Alpha/Beta/Gamma)
-- Effective capabilities merging (tier + purchased units)
-- Frontend /sovereign page with 4 tabs (Overview, Tiers, Shop, Glass Box)
-- Dashboard Sovereign navigation
+### Iteration 234 — Decomposition + Priority Queue (Apr 3, 2026) — LATEST
+- SuanpanMixer.js (1681→~900 lines) decomposed into SuanpanCore/Sovereign/Vfx
+- Priority Queue with 3 levels, backpressure, NPU burst mode
+- Auto-compose/AI gen routed through experience priority
+- Save/upload routed through background priority
+- EventBus integration for cross-component commands
+- Tests: Backend 100% (18/18), Frontend 100%
+
+### Iteration 233 — Sovereign Centralized State (Apr 3, 2026)
+- SovereignContext.js with EventBus Pub/Sub
+- CommandMode.js with Ctrl+K shortcut
+- Sovereign Tier Middleware (X-Sovereign-Tier headers)
+- Tests: Backend 100% (18/18), Frontend 100%
+
+### Iteration 232 — Sovereign Architecture (Apr 3, 2026)
+- 4-Tier model, Cross-tier shop, Glass Box Thinking Feed
 - Tests: Backend 100% (26/26), Frontend 100%
 
 ### Iteration 231 — Templates, Camera, Mic, AI Gen (Apr 3, 2026)
-- 12 Mix Templates: Morning Ritual, Quick Calm, Basic Meditation, Yoga Flow, Study Session, Evening Unwind, Lucid Dream, Chakra Journey, Creative Flow, Cosmic Immersion, Kundalini, Astral Projection
-- Tiered Video Recording: 480p SD → 720p HD → 1080p Full HD → 4K Ultra HD
-- Tiered Audio Recording: 44.1kHz Mono → 48kHz Stereo → 96kHz Studio → 192kHz Mastering
-- Tiered AI Generation: Basic (3 trks) → Advanced (6) → Pro Studio (12) → Sovereign (20 + voice clone)
-- File upload for recordings, Gemini AI mix generation with algorithmic fallback
-- Tests: Backend 100% (21/21), Frontend 100%
-
 ### Iteration 230 — Mixer Content Library Expansion (Apr 3, 2026)
-- Fixed broken video URLs (Pexels 403s for Starfield & Campfire)
-- STOCK_SOURCES: 21 → 60 (12 discovery, 14 player, 16 ultra, 18 sovereign)
-- VIDEO_OVERLAYS: 5 → 8 (all working URLs, tier-gated)
-- LIGHT_MODES: 6 → 12, FRACTAL_TYPES: 6 → 12, VISUAL_FILTERS: 12 → 15
-- TIER_COMPARISON: 10 → 14 rows (new: Sound Sources, Videos, Lights, Fractals, Filters)
-- All items now have tier tags + tier badge rendering in picker UI
-- Auto-compose goals updated with expanded source IDs
-- Tests: Backend 100% (13/13), Frontend 100%
-
 ### Iteration 229 — Consciousness Widget Fix (Apr 3, 2026)
-- ConsciousnessPanel made fully interactive (was "dead" widget)
-- Header click → /mastery-avenues, level nodes → feature pages
-- Quick XP actions (Breathe, Mood, Journal, Meditate) with navigation
-- Recent XP activity toggle, locked level toast notifications
-- Breathing.js duplicate key fix
-- Tests: Backend 100% (15/15), Frontend 100% (12/12)
-
 ### Iteration 228 — AI Mantra DJ (Apr 3, 2026)
-- 6 wellness goal auto-composition engine
-- Cross-fade overlap + volume curves (5 types)
-- Hexagram resonance integration
-- Frontend DJ Auto button + goal card panel
-- revenue.py fidelity_status bug fix
-- Tests: Backend 100% (20/20), Frontend 100%
-
 ### Iteration 227 — Backend Refactoring (Apr 3, 2026)
-- Auto-router discovery (136 imports → auto)
-- 80+ DB indexes, GZip compression, pool tuning
-- Tests: Backend 100% (24/24), Frontend 100%
-
 ### Iteration 226 — Ripple Editing (Apr 2, 2026)
 ### Iteration 225 — Intelligence Layer (Apr 2, 2026)
 ### Iteration 224 — 4-Tier + Bonus Packs (Apr 2, 2026)
@@ -148,12 +119,12 @@ Lower tiers can buy individual features from higher tiers:
 
 ## Upcoming (P1)
 - Phase 3 Polish: Light trails and bloom effects
-- Generative Flourish Bonus: AI phonic resonance
-- SuanpanMixer.js decomposition (1200+ lines)
+- Generative Flourish Bonus: AI phonic resonance based on movement history
+- SuanpanCore.js flexibility for non-Western astronomical models
 
 ## Future/Backlog (P2)
 - Multi-Civilization Star Charts (Hopi, Egyptian, Vedic)
-- External audio asset hosting
+- External audio asset hosting (real instrument multi-samples)
 - Haptic API for mobile tactile feedback
 - Pan + Reverb keyframe lanes
 - NPU Priority / GPU edge hooks
