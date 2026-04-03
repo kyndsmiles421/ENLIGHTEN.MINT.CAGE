@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Zap, X, BookOpen, Eye, EyeOff, Flame, Compass, PenTool, Coins } from 'lucide-react';
+import { Lock, Zap, X, BookOpen, Eye, EyeOff, Flame, Compass, PenTool, Coins, Users } from 'lucide-react';
 import { MODULE_GROUPS, getActiveModules, moduleRegistry, checkSynergy, getSynthesisName } from '../config/moduleRegistry';
 import { useMixer, FREQUENCIES, SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
 import { useClass, CLASS_COLORS } from '../context/ClassContext';
 import ConstellationPanel from './ConstellationPanel';
+import CommunityPanel from './CommunityPanel';
 
 /* ── Haptic helper with weight support ── */
 let Haptics;
@@ -388,6 +389,7 @@ export default function OrbitalMixer() {
   const [magneticActive, setMagneticActive] = useState(false);
   const [constellationOpen, setConstellationOpen] = useState(false);
   const [classPickerOpen, setClassPickerOpen] = useState(false);
+  const [communityOpen, setCommunityOpen] = useState(false);
   const [dragPositions, setDragPositions] = useState({}); // { modId: {x,y} } for synergy discovery
   const { activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone } = useMixer();
   const { focusMode, toggleFocus } = useFocus();
@@ -721,8 +723,24 @@ export default function OrbitalMixer() {
         })}
       </svg>
 
-      {/* Action buttons: Constellation + Focus */}
+      {/* Action buttons: Constellation + Community + Focus */}
       <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
+        <motion.button
+          whileTap={{ scale: 0.85 }}
+          onClick={() => { haptic('Light'); setCommunityOpen(!communityOpen); }}
+          className="flex items-center gap-1 px-2 py-1 rounded-full"
+          style={{
+            background: communityOpen ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${communityOpen ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.06)'}`,
+            color: communityOpen ? '#2DD4BF' : 'rgba(248,250,252,0.4)',
+            fontSize: '9px',
+            cursor: 'pointer',
+          }}
+          data-testid="orbital-community-btn"
+        >
+          <Users size={10} /> Community
+        </motion.button>
+
         <motion.button
           whileTap={{ scale: 0.85 }}
           onClick={() => { haptic('Light'); setConstellationOpen(!constellationOpen); }}
@@ -768,6 +786,18 @@ export default function OrbitalMixer() {
               onLoadConstellation={handleLoadConstellation}
               isOpen={constellationOpen}
               onClose={() => setConstellationOpen(false)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Community Panel */}
+      <AnimatePresence>
+        {communityOpen && (
+          <div className="absolute top-10 right-3 z-30" style={{ width: isMobile ? 280 : 300 }}>
+            <CommunityPanel
+              isOpen={communityOpen}
+              onClose={() => setCommunityOpen(false)}
             />
           </div>
         )}

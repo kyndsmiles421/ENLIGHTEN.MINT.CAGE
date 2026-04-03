@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useMixer } from './MixerContext';
+import { recordSynthesis } from '../utils/sentinel';
 
 const FocusContext = createContext({
   focusMode: false,
   hyperFocus: false,
+  synthesisCount: 0,
   enterFocus: () => {},
   exitFocus: () => {},
   toggleFocus: () => {},
@@ -12,6 +14,9 @@ const FocusContext = createContext({
 export function FocusProvider({ children }) {
   const [focusMode, setFocusMode] = useState(false);
   const [hyperFocus, setHyperFocus] = useState(false);
+  const [synthesisCount, setSynthesisCount] = useState(() => {
+    try { return parseInt(localStorage.getItem('cosmic_synthesis_count') || '0', 10); } catch { return 0; }
+  });
   const { activeFreqs, activeSounds, activeDrones } = useMixer();
   const autoTriggered = useRef(false);
 
@@ -23,6 +28,9 @@ export function FocusProvider({ children }) {
     if (totalActive >= 3 && !focusMode && !autoTriggered.current) {
       autoTriggered.current = true;
       setFocusMode(true);
+      // Record a synthesis event for progressive disclosure
+      const count = recordSynthesis();
+      setSynthesisCount(count);
     }
     if (totalActive >= 5) {
       setHyperFocus(true);
@@ -64,7 +72,7 @@ export function FocusProvider({ children }) {
   }, []);
 
   return (
-    <FocusContext.Provider value={{ focusMode, hyperFocus, enterFocus, exitFocus, toggleFocus }}>
+    <FocusContext.Provider value={{ focusMode, hyperFocus, synthesisCount, enterFocus, exitFocus, toggleFocus }}>
       {children}
     </FocusContext.Provider>
   );

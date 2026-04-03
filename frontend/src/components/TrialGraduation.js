@@ -5,12 +5,15 @@ import { Sparkles, ArrowRight, X, Heart, MessageCircle, Music, BookOpen, Smile, 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCreditsContext } from '../context/CreditContext';
+import { useFocus } from '../context/FocusContext';
+import { getSynthesisCount } from '../utils/sentinel';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const DISMISSED_KEY = 'trial_graduation_dismissed';
 const SOVEREIGN_TRIAL_KEY = 'sovereign_trial_complete'; // Universal once-per-profile flag
+const MIN_SYNTHESES = 3; // Progressive disclosure: show only after 3 syntheses
 
 const ICON_MAP = {
   sage: Heart,
@@ -56,12 +59,13 @@ function HighlightCard({ highlight, index }) {
 export default function TrialGraduation() {
   const { authHeaders, user } = useAuth();
   const { creditInfo } = useCreditsContext();
+  const { synthesisCount } = useFocus();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Once-per-profile check: if sovereign_trial_complete is set, never show again
+  // Progressive disclosure + Once-per-profile check
   useEffect(() => {
     if (!user || !authHeaders?.Authorization) return;
     if (!creditInfo?.trial?.expired) return;
@@ -69,10 +73,13 @@ export default function TrialGraduation() {
     // Sovereign once-per-profile lock — permanent dismiss
     try {
       if (localStorage.getItem(SOVEREIGN_TRIAL_KEY) === 'true') return;
-      // Also check the old dismiss key for backward compatibility
       const dismissed = localStorage.getItem(DISMISSED_KEY);
       if (dismissed && dismissed !== 'false') return;
     } catch {}
+
+    // Progressive disclosure: wait for MIN_SYNTHESES before showing
+    const count = getSynthesisCount();
+    if (count < MIN_SYNTHESES && synthesisCount < MIN_SYNTHESES) return;
 
     // Fetch trial summary
     setLoading(true);
@@ -87,7 +94,7 @@ export default function TrialGraduation() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user, authHeaders, creditInfo]);
+  }, [user, authHeaders, creditInfo, synthesisCount]);
 
   const handleDismiss = useCallback(() => {
     setShow(false);

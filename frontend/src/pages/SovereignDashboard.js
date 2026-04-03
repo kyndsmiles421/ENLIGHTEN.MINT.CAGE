@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Coins, Lock, Unlock, Eye, EyeOff, Download, AlertTriangle, TrendingUp, Users, FileText, Snowflake } from 'lucide-react';
+import { ArrowLeft, Shield, Coins, Lock, Unlock, Eye, EyeOff, Download, AlertTriangle, TrendingUp, Users, FileText, Snowflake, ShieldAlert, Volume2, VolumeX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,6 +15,9 @@ export default function SovereignDashboard() {
   const [escrow, setEscrow] = useState([]);
   const [skeleton, setSkeleton] = useState(null);
   const [trialAnalytics, setTrialAnalytics] = useState(null);
+  const [sentinelStats, setSentinelStats] = useState(null);
+  const [sentinelLog, setSentinelLog] = useState({ entries: [], total: 0 });
+  const [sentinelMutes, setSentinelMutes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [feeSliderValue, setFeeSliderValue] = useState(5);
   const [saving, setSaving] = useState(false);
@@ -24,19 +27,30 @@ export default function SovereignDashboard() {
     if (!token) return;
     setLoading(true);
     try {
-      const [cfgRes, dashRes, mirrorRes, escrowRes, trialRes] = await Promise.all([
+      const [cfgRes, dashRes, mirrorRes, escrowRes, trialRes, sentStatsRes, sentLogRes, sentMutesRes] = await Promise.all([
         fetch(`${API}/api/treasury/sovereign/config`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/dashboard`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/mirror?limit=20`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/escrow?limit=20`, { headers: authHeaders }),
         fetch(`${API}/api/treasury/sovereign/trial-analytics`, { headers: authHeaders }),
+        fetch(`${API}/api/sentinel/stats`, { headers: authHeaders }),
+        fetch(`${API}/api/sentinel/log?limit=20`, { headers: authHeaders }),
+        fetch(`${API}/api/sentinel/mutes`, { headers: authHeaders }),
       ]);
-      const [cfg, dash, mir, esc, trial] = await Promise.all([cfgRes.json(), dashRes.json(), mirrorRes.json(), escrowRes.json(), trialRes.json()]);
+      const [cfg, dash, mir, esc, trial, sStats, sLog, sMutes] = await Promise.all([
+        cfgRes.json(), dashRes.json(), mirrorRes.json(), escrowRes.json(), trialRes.json(),
+        sentStatsRes.ok ? sentStatsRes.json() : null,
+        sentLogRes.ok ? sentLogRes.json() : { entries: [], total: 0 },
+        sentMutesRes.ok ? sentMutesRes.json() : [],
+      ]);
       setConfig(cfg);
       setDashboard(dash);
       setMirror(mir);
       setEscrow(esc);
       setTrialAnalytics(trial);
+      setSentinelStats(sStats);
+      setSentinelLog(sLog);
+      setSentinelMutes(Array.isArray(sMutes) ? sMutes : []);
       setFeeSliderValue(cfg.fee_percent || 5);
     } catch {}
     setLoading(false);
@@ -89,6 +103,7 @@ export default function SovereignDashboard() {
   const TABS = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
     { id: 'controls', label: 'Controls', icon: Shield },
+    { id: 'sentinel', label: 'Sentinel', icon: ShieldAlert },
     { id: 'mirror', label: 'Mirror', icon: Eye },
     { id: 'escrow', label: 'Escrow', icon: Lock },
     { id: 'skeleton', label: 'Export', icon: Download },
@@ -330,6 +345,117 @@ export default function SovereignDashboard() {
                     </button>
                   </div>
                 )}
+              </div>
+            )}
+
+
+            {/* ═══ SENTINEL ═══ */}
+            {activeTab === 'sentinel' && (
+              <div className="space-y-4" data-testid="sovereign-sentinel">
+                {/* Sentinel Stats */}
+                {sentinelStats && (
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { label: 'Intercepted', value: sentinelStats.total_intercepted, color: '#FBBF24' },
+                      { label: 'Blocked', value: sentinelStats.total_blocked, color: '#EF4444' },
+                      { label: 'Shadow Mutes', value: sentinelStats.active_shadow_mutes, color: '#6B7280' },
+                    ].map(s => (
+                      <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                        <div className="text-lg font-semibold" style={{ color: s.color }}>{s.value}</div>
+                        <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Category Breakdown */}
+                {sentinelStats?.categories && Object.keys(sentinelStats.categories).length > 0 && (
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Violation Categories</h3>
+                    <div className="space-y-1.5">
+                      {Object.entries(sentinelStats.categories).map(([cat, count]) => (
+                        <div key={cat} className="flex items-center justify-between px-2 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <span className="text-[10px] capitalize" style={{ color: 'rgba(248,250,252,0.5)' }}>{cat.replace('_', ' ')}</span>
+                          <span className="text-[10px] font-semibold" style={{ color: '#EF4444' }}>{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Shadow-Muted Users */}
+                <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Shadow-Muted Users ({sentinelMutes.length})</h3>
+                  {sentinelMutes.length === 0 ? (
+                    <p className="text-[10px] text-center py-3" style={{ color: 'rgba(248,250,252,0.2)' }}>No muted users</p>
+                  ) : (
+                    <div className="space-y-1.5 max-h-32 overflow-y-auto">
+                      {sentinelMutes.map((m, i) => (
+                        <div key={i} className="flex items-center justify-between px-2 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <div>
+                            <div className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{m.user_id}</div>
+                            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{m.reason}</div>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await fetch(`${API}/api/sentinel/unmute/${m.user_id}`, {
+                                  method: 'POST',
+                                  headers: authHeaders,
+                                });
+                                fetchAll();
+                              } catch {}
+                            }}
+                            className="px-2 py-1 rounded text-[8px]"
+                            style={{ background: 'rgba(34,197,94,0.08)', color: '#22C55E', cursor: 'pointer', border: '1px solid rgba(34,197,94,0.15)' }}
+                            data-testid={`unmute-${m.user_id}`}
+                          >
+                            Unmute
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Violation Log */}
+                <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                    Violation Log ({sentinelLog.total} total)
+                  </h3>
+                  {sentinelLog.entries?.length === 0 ? (
+                    <p className="text-[10px] text-center py-3" style={{ color: 'rgba(248,250,252,0.2)' }}>No violations logged</p>
+                  ) : (
+                    <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                      {sentinelLog.entries?.map((entry, i) => (
+                        <div key={i} className="rounded-lg px-2 py-2" style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.06)' }}>
+                          <div className="flex items-center justify-between mb-0.5">
+                            <span className="text-[9px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{entry.user_name || entry.user_id}</span>
+                            <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{
+                              background: entry.risk_score > 0.7 ? 'rgba(239,68,68,0.1)' : 'rgba(251,191,36,0.1)',
+                              color: entry.risk_score > 0.7 ? '#EF4444' : '#FBBF24',
+                            }}>
+                              Risk: {(entry.risk_score * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <p className="text-[9px] truncate" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                            "{entry.content_preview}"
+                          </p>
+                          <div className="flex gap-1 mt-1">
+                            {entry.violations?.map((v, vi) => (
+                              <span key={vi} className="text-[7px] px-1 py-0.5 rounded" style={{
+                                background: v.severity === 'critical' ? 'rgba(239,68,68,0.08)' : 'rgba(251,191,36,0.08)',
+                                color: v.severity === 'critical' ? '#EF4444' : '#FBBF24',
+                              }}>
+                                {v.category}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

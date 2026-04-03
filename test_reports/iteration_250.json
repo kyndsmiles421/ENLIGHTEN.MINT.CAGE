@@ -1,0 +1,158 @@
+{
+  "summary": "Iteration 250 - Sentinel Content Moderation & Guilds/Community System Testing Complete. Backend: 20/20 tests passed (100%). Frontend: Community Panel in Orbital Mixer verified with identity modes (full/avatar/ghost), mic/video toggles, guild channels, and widget feeds. Sovereign Dashboard Sentinel tab verified with stats (Intercepted/Blocked/Shadow Mutes), violation categories, shadow-muted users list with unmute button, and violation log.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration250_sentinel_guilds.py",
+    "/app/test_reports/pytest/pytest_iteration250.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "sentinel.py: PROHIBITED_PATTERNS regex array covers hate_speech, slurs, sexual, self_harm, violence categories",
+    "sentinel.py: scan_text() returns clean=true/false with violations array and risk_score",
+    "sentinel.py: Shadow-muted users get clean=true with shadow_blocked=true (content silently dropped)",
+    "sentinel.py: Auto-escalation after 3 violations triggers automatic shadow-mute",
+    "guilds.py: IDENTITY_MODES supports full/avatar/ghost with visibility and avatar flags",
+    "guilds.py: CLASS_GUILDS maps shaman/nomad/architect/merchant to guild channels",
+    "guilds.py: WIDGET_FEEDS provides solfeggio/ambient/orbital/forge feed channels",
+    "guilds.py: Ghost mode users blocked from posting (403 response)",
+    "guilds.py: Ghost user posts shown as 'Anonymous Entity' in feed",
+    "CommunityPanel.js: Identity mode selector with full/avatar/ghost buttons",
+    "CommunityPanel.js: Mic/video toggles only shown for non-ghost modes",
+    "CommunityPanel.js: Sentinel scan integration before posting to feeds",
+    "ConstellationPanel.js: Sentinel scan on constellation save (name + description)",
+    "SovereignDashboard.js: Sentinel tab (6th tab) with stats, categories, muted users, violation log",
+    "FocusContext.js: synthesisCount tracking with recordSynthesis() for progressive disclosure",
+    "TrialGraduation.js: MIN_SYNTHESES=3 check before showing modal (progressive disclosure)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration250_sentinel_guilds.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "email: grad_test_522@test.com, password: password",
+  "seed_data_creation": "None - used existing test user",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 250 verified: (1) Sentinel content moderation system fully working - POST /api/sentinel/scan returns clean=true for safe content, clean=false+blocked=true for prohibited content, or clean=true+shadow_blocked=true for shadow-muted users. (2) Sentinel stats/log/mutes endpoints working. (3) Guilds identity system working - GET/PATCH /api/guilds/identity supports full/avatar/ghost modes. (4) Guild channels and widget feeds accessible via GET /api/guilds/channels. (5) Feed posting works with ghost mode blocking (403). (6) Frontend CommunityPanel accessible via Community button in Orbital Mixer Playground mode at /cosmic-mixer. (7) Sovereign Dashboard Sentinel tab at /sovereign-admin shows all sentinel data. (8) Test user is currently shadow-muted due to test violations.",
+  "features_verified": {
+    "backend_sentinel_scan_clean": {
+      "status": "PASS",
+      "details": "POST /api/sentinel/scan returns clean=true for safe content"
+    },
+    "backend_sentinel_scan_prohibited": {
+      "status": "PASS",
+      "details": "POST /api/sentinel/scan returns clean=false, blocked=true for prohibited content (or shadow_blocked if user muted)"
+    },
+    "backend_sentinel_scan_empty": {
+      "status": "PASS",
+      "details": "POST /api/sentinel/scan returns clean=true for empty content"
+    },
+    "backend_sentinel_stats": {
+      "status": "PASS",
+      "details": "GET /api/sentinel/stats returns total_intercepted, total_blocked, active_shadow_mutes"
+    },
+    "backend_sentinel_log": {
+      "status": "PASS",
+      "details": "GET /api/sentinel/log returns entries array with violation details"
+    },
+    "backend_sentinel_mutes_list": {
+      "status": "PASS",
+      "details": "GET /api/sentinel/mutes returns list of shadow-muted users"
+    },
+    "backend_sentinel_mute_unmute": {
+      "status": "PASS",
+      "details": "POST /api/sentinel/mute/{user_id} and /unmute/{user_id} work correctly"
+    },
+    "backend_guilds_identity_get": {
+      "status": "PASS",
+      "details": "GET /api/guilds/identity returns mode and mode_data"
+    },
+    "backend_guilds_identity_update_full": {
+      "status": "PASS",
+      "details": "PATCH /api/guilds/identity with mode=full works"
+    },
+    "backend_guilds_identity_update_avatar": {
+      "status": "PASS",
+      "details": "PATCH /api/guilds/identity with mode=avatar works"
+    },
+    "backend_guilds_identity_update_ghost": {
+      "status": "PASS",
+      "details": "PATCH /api/guilds/identity with mode=ghost works"
+    },
+    "backend_guilds_identity_invalid_mode": {
+      "status": "PASS",
+      "details": "PATCH /api/guilds/identity with invalid mode returns 400"
+    },
+    "backend_guilds_identity_mic_video": {
+      "status": "PASS",
+      "details": "PATCH /api/guilds/identity with mic_enabled/video_enabled works"
+    },
+    "backend_guilds_channels": {
+      "status": "PASS",
+      "details": "GET /api/guilds/channels returns guilds and feeds arrays"
+    },
+    "backend_guilds_join_feed": {
+      "status": "PASS",
+      "details": "POST /api/guilds/feed/{feed_id}/join returns joined=true"
+    },
+    "backend_guilds_post_to_feed": {
+      "status": "PASS",
+      "details": "POST /api/guilds/feed/{feed_id}/post creates post successfully"
+    },
+    "backend_guilds_ghost_post_blocked": {
+      "status": "PASS",
+      "details": "POST /api/guilds/feed/{feed_id}/post returns 403 for ghost mode users"
+    },
+    "backend_guilds_get_feed_posts": {
+      "status": "PASS",
+      "details": "GET /api/guilds/feed/{feed_id}/posts returns posts array"
+    },
+    "backend_guilds_avatar_mode_preserved": {
+      "status": "PASS",
+      "details": "Posts preserve identity_mode in response"
+    },
+    "backend_sentinel_feed_integration": {
+      "status": "PASS",
+      "details": "Sentinel scan works for feed context"
+    },
+    "frontend_community_button": {
+      "status": "PASS",
+      "details": "Community button visible in Orbital Mixer Playground mode at /cosmic-mixer"
+    },
+    "frontend_community_panel": {
+      "status": "PASS",
+      "details": "CommunityPanel opens with identity mode selector, mic/video toggles"
+    },
+    "frontend_identity_modes": {
+      "status": "PASS",
+      "details": "Full, Avatar, Ghost identity mode buttons present"
+    },
+    "frontend_mic_video_toggles": {
+      "status": "PASS",
+      "details": "Mic and Video toggle buttons present in CommunityPanel"
+    },
+    "frontend_sovereign_sentinel_tab": {
+      "status": "PASS",
+      "details": "Sentinel tab visible in Sovereign Dashboard at /sovereign-admin"
+    },
+    "frontend_sentinel_stats_display": {
+      "status": "PASS",
+      "details": "Intercepted, Blocked, Shadow Mutes stats displayed"
+    },
+    "frontend_sentinel_violation_log": {
+      "status": "PASS",
+      "details": "Violation Log section with entries displayed"
+    },
+    "frontend_sentinel_muted_users": {
+      "status": "PASS",
+      "details": "Shadow-Muted Users section with Unmute buttons displayed"
+    }
+  }
+}

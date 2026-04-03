@@ -4,6 +4,7 @@ import { Save, Download, Heart, X, Globe, Lock, ShoppingBag, ChevronDown, Loader
 import { useAuth } from '../context/AuthContext';
 import { useTreasury } from '../context/TreasuryContext';
 import { getModuleById, checkSynergy } from '../config/moduleRegistry';
+import { scanContent } from '../utils/sentinel';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -28,6 +29,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
   const [price, setPrice] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [scanError, setScanError] = useState(null);
 
   // Compute synergies from active modules
   const computeSynergies = useCallback(() => {
@@ -90,7 +92,17 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
   const handleSave = async () => {
     if (!token || !name.trim() || activeModuleIds.length === 0) return;
     setSaving(true);
+    setScanError(null);
     try {
+      // Sentinel scan: check name + description before saving
+      const textToScan = `${name.trim()} ${description.trim()}`;
+      const scanResult = await scanContent(textToScan, 'constellation', authHeaders);
+      if (!scanResult.clean && scanResult.blocked) {
+        setScanError(scanResult.message || 'Content blocked by the Collective Sentinel');
+        setSaving(false);
+        return;
+      }
+
       const synergies = computeSynergies();
       const res = await fetch(`${API}/api/constellations`, {
         method: 'POST',
@@ -299,9 +311,9 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
                   disabled={saving || !name.trim() || !token}
                   className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-medium transition-all"
                   style={{
-                    background: saveSuccess ? 'rgba(34,197,94,0.1)' : 'rgba(192,132,252,0.1)',
-                    border: `1px solid ${saveSuccess ? 'rgba(34,197,94,0.2)' : 'rgba(192,132,252,0.2)'}`,
-                    color: saveSuccess ? '#22C55E' : '#C084FC',
+                    background: saveSuccess ? 'rgba(34,197,94,0.1)' : scanError ? 'rgba(239,68,68,0.1)' : 'rgba(192,132,252,0.1)',
+                    border: `1px solid ${saveSuccess ? 'rgba(34,197,94,0.2)' : scanError ? 'rgba(239,68,68,0.2)' : 'rgba(192,132,252,0.2)'}`,
+                    color: saveSuccess ? '#22C55E' : scanError ? '#EF4444' : '#C084FC',
                     opacity: (saving || !name.trim() || !token) ? 0.4 : 1,
                     cursor: (saving || !name.trim() || !token) ? 'not-allowed' : 'pointer',
                   }}
@@ -309,6 +321,12 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
                 >
                   {saving ? <Loader2 size={10} className="animate-spin" /> : saveSuccess ? <>Saved!</> : <><Save size={10} /> Save Constellation</>}
                 </button>
+
+                {scanError && (
+                  <p className="text-[9px] text-center mt-1" style={{ color: '#EF4444' }} data-testid="sentinel-scan-error">
+                    {scanError}
+                  </p>
+                )}
 
                 {!token && (
                   <p className="text-[9px] text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Sign in to save</p>
