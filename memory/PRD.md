@@ -167,7 +167,28 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 262 — 5 Sovereign AI Advisors (Apr 3, 2026) — LATEST
+### Iteration 263 — Sovereign Council: 10-Member Unified Council + Faculty Utility Tools + Tiered Knowledge (Apr 3, 2026) — LATEST
+- **10-Member Sovereign Council** (5 Advisors + 5 Faculty Teachers), each with unique backstory, expertise, and domain
+  - **5 Advisors**: Grand Architect, Master Harmonic, Principal Economist, Chief Logistics, Sovereign Ethicist
+  - **5 Faculty Teachers**: Astraeus the Star-Mapper, Zenith the Silent, Aurelius the Professor, Gaea the Cultivator, Vesta the Chemist
+- **5 Utility Tools** (Faculty-linked, purchasable via Dust with 10% Universal Subsidy):
+  - The Orion Engine (1000→900 Dust, Architect tier)
+  - The Neural Gateway (500→450 Dust, Sovereign tier)
+  - The Iteration Vault (2000→1800 Dust, Architect tier)
+  - The Terpene Analyzer (300→270 Dust, Resonance tier)
+  - The Molecular Substitute Matrix (800→720 Dust, Sovereign tier)
+- **Tier-Based Knowledge Depth**: Discovery=foundational, Resonance=intermediate, Sovereign=advanced, Architect=unrestricted
+- **Endpoints**:
+  - `GET /api/sovereigns/list` — all 10 members with access status + utility tool pricing
+  - `POST /api/sovereigns/purchase-utility` — buy lifetime utility license via Dust
+  - `GET /api/sovereigns/utilities` — user's tool inventory
+  - `POST /api/sovereigns/chat` — AI chat with tiered knowledge depth
+  - `POST /api/sovereigns/purchase-session` — chat session for locked members
+- **30% Failure Charge Refund Protocol** on malfunctioning utilities
+- **Cross-Council Bridging** between all 10 members
+- Tests: Backend 27/28 (96%, 1 skipped), Frontend 100%
+
+### Iteration 262 — 5 Sovereign AI Advisors (Apr 3, 2026)
 - **5 Domain-Specific AI Personas**, each hard-linked to a platform module:
   1. **The Grand Architect** (Infrastructure & Deployment) — linked to Architect ($89) tier
   2. **The Master Harmonic** (Sound & Wellness) — linked to Sovereign ($49) tier
@@ -435,9 +456,11 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ### Iteration 237 — Sovereign Mastery + Bubble Burst
 ### Iterations 234-236 — Foundation
 
-## Upcoming (P0-P1) — Iteration 263+
+## Upcoming (P0-P1) — Iteration 264+
+- **Sovereign Deep Links in SmartDock** — "Consult" buttons on linked module pages for each Council member
 - **Trade Circle Marketplace UI**: Smooth purchase flow for $1,347+ Business-in-a-Box packs, verified asset bridge
-- **Sovereign Advisor Deep Links**: SmartDock quick-access buttons for each Sovereign from their linked module pages
+- **Utility Tool Functional Interfaces** — Build out the actual tool UIs (Orion Engine map, Neural Gateway bio-feedback, etc.)
+- **Upgrade Nudge Logic** — When a user owns 3+ Architect utilities, prompt them with the $89/mo subscription value proposition
 - **Circularity KPI**: Tag trades/transmutations with ecosystem impact scores, Resonance Multipliers
 - **Context-Aware Predictive Modality Switching**: Auto-switch learning mode via device sensors
 - **Ecosystem Health Dashboard**: "Global Renaissance" events at peak community circularity
