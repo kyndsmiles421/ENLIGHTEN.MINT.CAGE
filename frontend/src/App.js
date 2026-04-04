@@ -62,6 +62,9 @@ import { SageProvider } from './context/SageContext';
 import SageAvatar from './components/SageAvatar';
 import SageAudience from './components/SageAudience';
 import QuestHUD from './components/QuestHUD';
+import HexagramGhostLayer from './components/HexagramGhostLayer';
+import { useZeroPointFlicker } from './hooks/useZeroPointFlicker';
+import ZeroPointExperience from './components/ZeroPointExperience';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -281,6 +284,7 @@ function CafeApp() {
         <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
         <EmergencyShutOff />
         <TieredNavigation />
+        <ZeroPointExperience />
         <GlowPortal />
         <UniversalCommand />
         <PulseEchoVisualizer />
