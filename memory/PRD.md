@@ -674,7 +674,40 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Files**: `MeshNetworkContext.js` (new), `UniversalCommand.js` (new), `GlowPortal.js` (new), `ConstellationMap.js` (new), updated `App.js`
 - Tests: Screenshot verification — Cmd+K opens command palette, search filters work, quick actions display correctly
 
-## Upcoming (P0-P1) — Iteration 281+
+### Iteration 281 — Node Sympathy Engine & Pulse Echo (April 2026)
+- **Node Sympathy Engine (Weight Matrix)**: Learning system that tracks navigation patterns
+  - **Weighted Transitions**: Each navigation from Node A → Node B gains +0.15 weight
+  - **Bidirectional Learning**: Reverse paths gain +0.045 weight (30% of forward)
+  - **Decay System**: Weights decay 0.02 daily if unused (keeps system fresh)
+  - **Sympathy Threshold (1.0)**: Connections above this auto-trigger Glow Portals
+  - **Strong Sympathy (2.0)**: Extra-bright glow with outer ring animation
+  - **Max Weight Cap (5.0)**: Prevents runaway weights
+  - **Persistence**: sympathyMap stored in localStorage for cross-session learning
+- **Bridge Connections**: Automatic detection of unrelated module pairs used together
+  - Creates temporary "ghost connections" between modules not officially linked
+  - Bridges strengthen with repeated use, max 10 active bridges
+- **Pulse Echo Visualization**: Visual ripples traveling through mesh on task completion
+  - **BFS Propagation**: Echoes travel through connections with distance decay
+  - **Sympathy Boost**: Learned connections carry echoes further/brighter
+  - **Intensity Calculation**: Base 0.8, decays 0.15 per hop, boosted by sympathy weight
+  - **Staggered Animation**: 150ms delay per hop for visual "wave" effect
+- **Enhanced Glow Portal**: Now shows sympathy strength
+  - Sympathy indicator icon (link) on learned connections
+  - Weight percentage shown on hover (e.g., "•150%")
+  - Stronger connections pulse faster and brighter
+  - Outer glow ring for strong sympathy connections
+- **useGlowTrigger Hook**: Enhanced to automatically send pulse echoes
+  - `onSessionComplete()` — triggers glow + echo with 0.9 intensity
+  - `onInsightGenerated()` — triggers glow + echo with 0.7 intensity
+  - `onMoodChanged()` — triggers glow + echo with 0.6 intensity
+- **Files**: Updated `MeshNetworkContext.js` (sympathy engine, pulse echo), `GlowPortal.js` (sympathy visuals), `PulseEchoVisualizer.js` (new)
+- Tests: Screenshot verification — navigation between modules builds sympathy weights, stored in localStorage
+
+## Upcoming (P0-P1) — Iteration 282+
+- **Tiered Render Delegate**: Essential (SVG/Canvas "Paper & Ink") vs Premium (Three.js "Aetheric" view with volumetric fog)
+- **Ghost Nodes**: Temporary celestial event nodes (Full Moon, Mercury Retrograde, Eclipses)
+- **Advisor Node**: Hidden node monitoring mesh health, pulses if Sanctuary modules unused for 3+ days
+- **Constellation Map Toggle**: Button in Navigation to open the visual mesh
 - **Step 9: Multi-Widget Concurrent Dialogue** — Two Sovereign windows open simultaneously
 - **Dust "Clink" Spatial Audio** — "Star particles settling" sound on Dust transfers
 - **"Usage Yield" Report UI** — Monthly savings map from Caspian

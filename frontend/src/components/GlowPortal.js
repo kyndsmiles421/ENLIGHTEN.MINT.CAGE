@@ -5,7 +5,7 @@ import { useMeshNetwork } from '../context/MeshNetworkContext';
 import { 
   Wind, Timer, Flame, Hand, Music, Sun, Sparkles, Star, Moon, Eye,
   BookOpen, Heart, Headphones, Radio, Leaf, MessageCircle, Users, Zap,
-  Calendar, Compass, Globe, Brain, Crown, ChevronRight, X,
+  Calendar, Compass, Globe, Brain, Crown, ChevronRight, X, Link,
 } from 'lucide-react';
 
 // Icon mapping for nodes
@@ -26,10 +26,15 @@ const NODE_ICONS = {
  * When a trigger fires (e.g., session_complete), related modules "glow" at 
  * the edge of the screen, offering instant lateral movement without returning
  * to a central hub.
+ * 
+ * Enhanced with Node Sympathy:
+ * - Learned connections glow brighter
+ * - Sympathy weight shown as intensity
+ * - Strong connections have thicker pulse rings
  */
 export default function GlowPortal() {
   const navigate = useNavigate();
-  const { glowPortals, dismissGlow, currentNode } = useMeshNetwork();
+  const { glowPortals, dismissGlow, currentNode, getSymPathyWeight, SYMPATHY_CONFIG } = useMeshNetwork();
   const [hoveredPortal, setHoveredPortal] = useState(null);
 
   if (!glowPortals || glowPortals.length === 0) return null;
@@ -48,13 +53,22 @@ export default function GlowPortal() {
           const Icon = NODE_ICONS[portal.id] || Sparkles;
           const yPosition = getPortalPosition(index, glowPortals.length);
           const isHovered = hoveredPortal === portal.id;
+          
+          // Calculate sympathy-enhanced intensity
+          const sympathyWeight = portal.sympathyWeight || 
+            (currentNode ? getSymPathyWeight?.(currentNode, portal.id) : 0) || 0;
+          const isSympathetic = portal.trigger === 'sympathy' || sympathyWeight >= (SYMPATHY_CONFIG?.SYMPATHY_THRESHOLD || 1.0);
+          const isStrongSympathy = sympathyWeight >= (SYMPATHY_CONFIG?.STRONG_SYMPATHY_THRESHOLD || 2.0);
+          
+          // Intensity based on sympathy (0.4 base, up to 1.0 for strong sympathy)
+          const glowIntensity = Math.min(1, 0.4 + (sympathyWeight * 0.15));
 
           return (
             <motion.div
               key={portal.id}
               initial={{ x: 100, opacity: 0, scale: 0.8 }}
               animate={{ 
-                x: isHovered ? 0 : 12, 
+                x: isHovered ? 0 : isSympathetic ? 8 : 12, 
                 opacity: 1, 
                 scale: isHovered ? 1.05 : 1,
               }}
@@ -66,18 +80,38 @@ export default function GlowPortal() {
               onMouseLeave={() => setHoveredPortal(null)}
               data-testid={`glow-portal-${portal.id}`}
             >
+              {/* Outer Sympathy Ring (for strong connections) */}
+              {isStrongSympathy && (
+                <motion.div
+                  className="absolute -inset-2 rounded-l-3xl"
+                  style={{
+                    background: `radial-gradient(ellipse at right, ${portal.color}30 0%, transparent 60%)`,
+                    filter: 'blur(12px)',
+                  }}
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                />
+              )}
+
               {/* Glow Effect */}
               <motion.div
                 className="absolute inset-0 rounded-l-2xl"
                 style={{
-                  background: `radial-gradient(ellipse at right, ${portal.color}40 0%, transparent 70%)`,
+                  background: `radial-gradient(ellipse at right, ${portal.color}${Math.round(glowIntensity * 60).toString(16).padStart(2, '0')} 0%, transparent 70%)`,
                   filter: 'blur(20px)',
                 }}
                 animate={{
-                  opacity: [0.4, 0.7, 0.4],
+                  opacity: [glowIntensity * 0.4, glowIntensity * 0.7, glowIntensity * 0.4],
                 }}
                 transition={{
-                  duration: 2,
+                  duration: isSympathetic ? 1.5 : 2,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
@@ -91,22 +125,37 @@ export default function GlowPortal() {
                 }}
                 className="relative flex items-center gap-2 pl-4 pr-3 py-3 rounded-l-2xl backdrop-blur-xl"
                 style={{
-                  background: `linear-gradient(135deg, ${portal.color}15 0%, ${portal.color}08 100%)`,
-                  border: `1px solid ${portal.color}30`,
+                  background: `linear-gradient(135deg, ${portal.color}${isSympathetic ? '20' : '15'} 0%, ${portal.color}08 100%)`,
+                  border: `1px solid ${portal.color}${isSympathetic ? '40' : '30'}`,
                   borderRight: 'none',
-                  boxShadow: `0 4px 24px ${portal.color}20, inset 0 1px 0 ${portal.color}10`,
+                  boxShadow: `0 4px 24px ${portal.color}${Math.round(glowIntensity * 40).toString(16).padStart(2, '0')}, inset 0 1px 0 ${portal.color}10`,
                 }}
                 whileHover={{ x: -8 }}
                 whileTap={{ scale: 0.98 }}
               >
+                {/* Sympathy Indicator */}
+                {isSympathetic && (
+                  <motion.div
+                    className="absolute -top-1 -left-1 w-3 h-3 rounded-full flex items-center justify-center"
+                    style={{ 
+                      background: isStrongSympathy ? portal.color : `${portal.color}80`,
+                      boxShadow: `0 0 8px ${portal.color}`,
+                    }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    <Link size={6} color="#fff" />
+                  </motion.div>
+                )}
+
                 {/* Pulsing Icon */}
                 <motion.div
                   className="relative"
                   animate={{
-                    scale: [1, 1.15, 1],
+                    scale: isSympathetic ? [1, 1.2, 1] : [1, 1.15, 1],
                   }}
                   transition={{
-                    duration: 1.5,
+                    duration: isSympathetic ? 1.2 : 1.5,
                     repeat: Infinity,
                     ease: 'easeInOut',
                   }}
@@ -115,7 +164,7 @@ export default function GlowPortal() {
                   <motion.div
                     className="absolute inset-0 rounded-full"
                     style={{ background: portal.color }}
-                    animate={{ scale: [1, 2, 1], opacity: [0.4, 0, 0.4] }}
+                    animate={{ scale: [1, 2, 1], opacity: [glowIntensity * 0.5, 0, glowIntensity * 0.5] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   />
                 </motion.div>
@@ -132,6 +181,11 @@ export default function GlowPortal() {
                       <span className="text-[11px] font-medium" style={{ color: portal.color }}>
                         {portal.label}
                       </span>
+                      {isSympathetic && (
+                        <span className="text-[9px] ml-1 opacity-60" style={{ color: portal.color }}>
+                          •{Math.round(sympathyWeight * 100)}%
+                        </span>
+                      )}
                       <ChevronRight size={12} style={{ color: portal.color }} className="inline ml-1" />
                     </motion.div>
                   )}
@@ -150,7 +204,7 @@ export default function GlowPortal() {
                   }}
                   whileHover={{ scale: 1.2 }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: isHovered ? 1 : 0 }}
+                  animate={{ opacity: isHovered && !isSympathetic ? 1 : 0 }}
                 >
                   <X size={8} style={{ color: 'rgba(255,255,255,0.7)' }} />
                 </motion.button>
@@ -160,8 +214,8 @@ export default function GlowPortal() {
               <motion.div
                 className="absolute right-full top-1/2 h-px"
                 style={{ 
-                  background: `linear-gradient(to left, ${portal.color}40, transparent)`,
-                  width: isHovered ? '60px' : '30px',
+                  background: `linear-gradient(to left, ${portal.color}${isSympathetic ? '60' : '40'}, transparent)`,
+                  width: isHovered ? '60px' : isSympathetic ? '45px' : '30px',
                 }}
                 animate={{ opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -192,16 +246,23 @@ export default function GlowPortal() {
  * GlowTrigger — Hook to trigger glow portals from within modules
  */
 export function useGlowTrigger() {
-  const { triggerGlow, sendPulse, PULSE_TYPES } = useMeshNetwork();
+  const { triggerGlow, sendPulse, sendPulseEcho, PULSE_TYPES, currentNode } = useMeshNetwork();
 
   const onSessionComplete = (sessionType) => {
     triggerGlow('session_complete');
     sendPulse(PULSE_TYPES.SESSION_COMPLETE, { sessionType, completedAt: Date.now() });
+    // Send pulse echo to visualize the ripple
+    if (currentNode) {
+      sendPulseEcho(currentNode, { sessionType, intensity: 0.9 });
+    }
   };
 
   const onInsightGenerated = (insight) => {
     triggerGlow('insight_generated');
     sendPulse(PULSE_TYPES.INSIGHT_GENERATED, { insight });
+    if (currentNode) {
+      sendPulseEcho(currentNode, { type: 'insight', intensity: 0.7 });
+    }
   };
 
   const onMoodChanged = (mood) => {
@@ -209,6 +270,9 @@ export function useGlowTrigger() {
       triggerGlow('mood_low');
     }
     sendPulse(PULSE_TYPES.MOOD_CHANGED, { mood });
+    if (currentNode) {
+      sendPulseEcho(currentNode, { mood, intensity: 0.6 });
+    }
   };
 
   const onQuestionAsked = (question) => {
@@ -232,5 +296,6 @@ export function useGlowTrigger() {
     onMorningRoutine,
     onStressDetected,
     triggerGlow,
+    sendPulseEcho,
   };
 }

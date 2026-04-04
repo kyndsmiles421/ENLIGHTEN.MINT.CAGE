@@ -182,11 +182,33 @@ export const PULSE_TYPES = {
   NAVIGATE_SUGGEST: 'navigate_suggest',
   STATE_SYNC: 'state_sync',
   HANDSHAKE: 'handshake',
+  PULSE_ECHO: 'pulse_echo',
+  SYMPATHY_THRESHOLD: 'sympathy_threshold',
+};
+
+// ─── Sympathy Engine Constants ───
+const SYMPATHY_CONFIG = {
+  WEIGHT_INCREMENT: 0.15,        // Weight gained per transition
+  DECAY_RATE: 0.02,              // Daily decay rate
+  SYMPATHY_THRESHOLD: 1.0,       // Weight needed for automatic Glow
+  STRONG_SYMPATHY_THRESHOLD: 2.0, // Weight for "strong" connection
+  BRIDGE_THRESHOLD: 0.5,         // Weight needed to form a "bridge" connection
+  MAX_WEIGHT: 5.0,               // Maximum weight cap
+  DECAY_INTERVAL_MS: 24 * 60 * 60 * 1000, // 24 hours
+};
+
+// ─── Pulse Echo Constants ───
+const PULSE_ECHO_CONFIG = {
+  BASE_INTENSITY: 0.8,
+  DISTANCE_DECAY: 0.15,          // Intensity drops per connection hop
+  ECHO_DURATION_MS: 2000,        // How long the echo animation lasts
+  COOLDOWN_MS: 500,              // Prevent echo spam
 };
 
 export function MeshNetworkProvider({ children }) {
   // Current location in the constellation
   const [currentNode, setCurrentNode] = useState(null);
+  const previousNodeRef = useRef(null);
   
   // Active glow portals (contextual navigation suggestions)
   const [glowPortals, setGlowPortals] = useState([]);
@@ -203,19 +225,292 @@ export function MeshNetworkProvider({ children }) {
   // Universal command overlay visibility
   const [commandOverlayOpen, setCommandOverlayOpen] = useState(false);
   
+  // Active pulse echoes (for visualization)
+  const [activeEchoes, setActiveEchoes] = useState([]);
+  
+  // Sympathy map (weighted connections learned from behavior)
+  const [sympathyMap, setSympathyMap] = useState({});
+  
+  // Bridge connections (temporary connections between unrelated modules)
+  const [bridgeConnections, setBridgeConnections] = useState([]);
+  
   // Pulse listeners (modules subscribe to receive pulses)
   const pulseListenersRef = useRef({});
+  const lastEchoTimeRef = useRef(0);
+
+  // ─── Load Sympathy Data on Mount ───
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('mesh_sympathy') || '{}');
+      setSympathyMap(stored.weights || {});
+      setBridgeConnections(stored.bridges || []);
+      
+      // Apply decay for time elapsed
+      const lastDecay = stored.lastDecay || Date.now();
+      const daysSinceDecay = (Date.now() - lastDecay) / SYMPATHY_CONFIG.DECAY_INTERVAL_MS;
+      
+      if (daysSinceDecay >= 1) {
+        applySymathyDecay(Math.floor(daysSinceDecay));
+      }
+    } catch (e) {
+      console.warn('Failed to load sympathy data:', e);
+    }
+  }, []);
+
+  // ─── Apply Sympathy Decay ───
+  const applySymathyDecay = useCallback((days = 1) => {
+    setSympathyMap(prev => {
+      const decayed = {};
+      Object.entries(prev).forEach(([key, weight]) => {
+        const newWeight = weight - (SYMPATHY_CONFIG.DECAY_RATE * days);
+        if (newWeight > 0.05) { // Remove negligible weights
+          decayed[key] = Math.max(0, newWeight);
+        }
+      });
+      
+      // Persist
+      try {
+        const stored = JSON.parse(localStorage.getItem('mesh_sympathy') || '{}');
+        stored.weights = decayed;
+        stored.lastDecay = Date.now();
+        localStorage.setItem('mesh_sympathy', JSON.stringify(stored));
+      } catch (e) {}
+      
+      return decayed;
+    });
+  }, []);
+
+  // ─── Record Transition (Sympathy Learning) ───
+  const recordTransition = useCallback((fromId, toId) => {
+    if (!fromId || !toId || fromId === toId) return;
+    
+    const pathKey = `${fromId}->${toId}`;
+    const reverseKey = `${toId}->${fromId}`;
+    
+    setSympathyMap(prev => {
+      const newMap = { ...prev };
+      
+      // Increment forward path
+      newMap[pathKey] = Math.min(
+        SYMPATHY_CONFIG.MAX_WEIGHT,
+        (newMap[pathKey] || 0) + SYMPATHY_CONFIG.WEIGHT_INCREMENT
+      );
+      
+      // Slightly reinforce reverse path (bidirectional learning)
+      newMap[reverseKey] = Math.min(
+        SYMPATHY_CONFIG.MAX_WEIGHT,
+        (newMap[reverseKey] || 0) + (SYMPATHY_CONFIG.WEIGHT_INCREMENT * 0.3)
+      );
+      
+      // Persist
+      try {
+        const stored = JSON.parse(localStorage.getItem('mesh_sympathy') || '{}');
+        stored.weights = newMap;
+        localStorage.setItem('mesh_sympathy', JSON.stringify(stored));
+      } catch (e) {}
+      
+      return newMap;
+    });
+    
+    // Check for bridge connection opportunity
+    const fromNode = CONSTELLATION_NODES[fromId];
+    const toNode = CONSTELLATION_NODES[toId];
+    if (fromNode && toNode && !fromNode.connections.includes(toId)) {
+      // These nodes aren't officially connected — potential bridge
+      createBridgeConnection(fromId, toId);
+    }
+  }, []);
+
+  // ─── Create Bridge Connection ───
+  const createBridgeConnection = useCallback((fromId, toId) => {
+    setBridgeConnections(prev => {
+      const existing = prev.find(b => 
+        (b.from === fromId && b.to === toId) || 
+        (b.from === toId && b.to === fromId)
+      );
+      
+      if (existing) {
+        // Reinforce existing bridge
+        const updated = prev.map(b => 
+          b === existing 
+            ? { ...b, strength: Math.min(1.0, b.strength + 0.1), lastUsed: Date.now() }
+            : b
+        );
+        persistBridges(updated);
+        return updated;
+      }
+      
+      // Create new bridge
+      const newBridge = {
+        id: `bridge-${fromId}-${toId}`,
+        from: fromId,
+        to: toId,
+        strength: 0.1,
+        created: Date.now(),
+        lastUsed: Date.now(),
+      };
+      
+      const updated = [...prev, newBridge].slice(-10); // Max 10 bridges
+      persistBridges(updated);
+      return updated;
+    });
+  }, []);
+
+  const persistBridges = (bridges) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('mesh_sympathy') || '{}');
+      stored.bridges = bridges;
+      localStorage.setItem('mesh_sympathy', JSON.stringify(stored));
+    } catch (e) {}
+  };
+
+  // ─── Get Sympathy Weight ───
+  const getSymPathyWeight = useCallback((fromId, toId) => {
+    const pathKey = `${fromId}->${toId}`;
+    return sympathyMap[pathKey] || 0;
+  }, [sympathyMap]);
+
+  // ─── Get Sympathetic Nodes (above threshold) ───
+  const getSympatheticNodes = useCallback((nodeId) => {
+    const sympathetic = [];
+    Object.entries(sympathyMap).forEach(([key, weight]) => {
+      if (weight >= SYMPATHY_CONFIG.SYMPATHY_THRESHOLD) {
+        const [from, to] = key.split('->');
+        if (from === nodeId && CONSTELLATION_NODES[to]) {
+          sympathetic.push({
+            nodeId: to,
+            weight,
+            isStrong: weight >= SYMPATHY_CONFIG.STRONG_SYMPATHY_THRESHOLD,
+            node: CONSTELLATION_NODES[to],
+          });
+        }
+      }
+    });
+    return sympathetic.sort((a, b) => b.weight - a.weight);
+  }, [sympathyMap]);
+
+  // ─── Calculate Pulse Echo ───
+  const calculatePulseEcho = useCallback((sourceId, intensity = PULSE_ECHO_CONFIG.BASE_INTENSITY) => {
+    const source = CONSTELLATION_NODES[sourceId];
+    if (!source) return [];
+    
+    const echoes = [];
+    const visited = new Set([sourceId]);
+    let currentWave = [{ id: sourceId, intensity, hop: 0 }];
+    
+    // BFS to propagate echo through connections
+    while (currentWave.length > 0 && currentWave[0].intensity > 0.1) {
+      const nextWave = [];
+      
+      currentWave.forEach(({ id, intensity: currentIntensity, hop }) => {
+        const node = CONSTELLATION_NODES[id];
+        if (!node) return;
+        
+        node.connections.forEach(connId => {
+          if (visited.has(connId)) return;
+          visited.add(connId);
+          
+          // Calculate echo intensity with sympathy boost
+          const sympathyBoost = getSymPathyWeight(id, connId) * 0.1;
+          const echoIntensity = (currentIntensity - PULSE_ECHO_CONFIG.DISTANCE_DECAY) + sympathyBoost;
+          
+          if (echoIntensity > 0.1) {
+            const connNode = CONSTELLATION_NODES[connId];
+            echoes.push({
+              id: `echo-${sourceId}-${connId}-${Date.now()}`,
+              sourceId,
+              targetId: connId,
+              sourceColor: source.color,
+              targetColor: connNode?.color || '#818CF8',
+              intensity: echoIntensity,
+              hop: hop + 1,
+              delay: (hop + 1) * 150, // Staggered animation
+            });
+            
+            nextWave.push({ id: connId, intensity: echoIntensity, hop: hop + 1 });
+          }
+        });
+      });
+      
+      currentWave = nextWave;
+    }
+    
+    return echoes;
+  }, [getSymPathyWeight]);
+
+  // ─── Send Pulse Echo ───
+  const sendPulseEcho = useCallback((sourceId, payload = {}) => {
+    const now = Date.now();
+    if (now - lastEchoTimeRef.current < PULSE_ECHO_CONFIG.COOLDOWN_MS) {
+      return; // Prevent spam
+    }
+    lastEchoTimeRef.current = now;
+    
+    const echoes = calculatePulseEcho(sourceId, payload.intensity || PULSE_ECHO_CONFIG.BASE_INTENSITY);
+    
+    setActiveEchoes(prev => [...prev, ...echoes]);
+    
+    // Clear echoes after animation
+    setTimeout(() => {
+      setActiveEchoes(prev => prev.filter(e => !echoes.find(ne => ne.id === e.id)));
+    }, PULSE_ECHO_CONFIG.ECHO_DURATION_MS + (echoes.length * 150));
+    
+    // Notify listeners about the echo
+    echoes.forEach(echo => {
+      const listeners = pulseListenersRef.current[echo.targetId] || [];
+      listeners.forEach(listener => listener({
+        type: PULSE_TYPES.PULSE_ECHO,
+        from: sourceId,
+        to: echo.targetId,
+        intensity: echo.intensity,
+        color: echo.sourceColor,
+        payload,
+      }));
+    });
+    
+    return echoes;
+  }, [calculatePulseEcho]);
 
   // ─── Register current node based on route ───
   const registerNode = useCallback((nodeId) => {
     if (CONSTELLATION_NODES[nodeId]) {
+      // Record transition for sympathy learning
+      if (previousNodeRef.current && previousNodeRef.current !== nodeId) {
+        recordTransition(previousNodeRef.current, nodeId);
+      }
+      
+      previousNodeRef.current = currentNode;
       setCurrentNode(nodeId);
       setMeshHistory(prev => {
         const newHistory = [...prev, nodeId].slice(-20); // Keep last 20
         return newHistory;
       });
+      
+      // Check for sympathetic nodes and trigger auto-glow
+      const sympathetic = getSympatheticNodes(nodeId);
+      if (sympathetic.length > 0) {
+        // Auto-trigger glow for strong sympathetic connections
+        const strongConnections = sympathetic.filter(s => s.isStrong).slice(0, 2);
+        if (strongConnections.length > 0) {
+          setGlowPortals(prev => {
+            const existing = new Set(prev.map(p => p.id));
+            const newPortals = strongConnections
+              .filter(s => !existing.has(s.nodeId))
+              .map(s => ({
+                id: s.nodeId,
+                label: s.node.label,
+                color: s.node.color,
+                path: s.node.path,
+                trigger: 'sympathy',
+                sympathyWeight: s.weight,
+                timestamp: Date.now(),
+              }));
+            return [...prev, ...newPortals].slice(-4);
+          });
+        }
+      }
     }
-  }, []);
+  }, [currentNode, recordTransition, getSympatheticNodes]);
 
   // ─── Send a pulse to connected nodes ───
   const sendPulse = useCallback((type, payload, targetNodes = null) => {
@@ -360,6 +655,9 @@ export function MeshNetworkProvider({ children }) {
     edgeStates,
     meshHistory,
     commandOverlayOpen,
+    activeEchoes,
+    sympathyMap,
+    bridgeConnections,
     
     // Actions
     registerNode,
@@ -373,10 +671,20 @@ export function MeshNetworkProvider({ children }) {
     getEdgeState,
     setCommandOverlayOpen,
     
+    // Sympathy Engine
+    recordTransition,
+    getSymPathyWeight,
+    getSympatheticNodes,
+    
+    // Pulse Echo
+    sendPulseEcho,
+    calculatePulseEcho,
+    
     // Constants
     CONSTELLATION_NODES,
     CATEGORY_COLORS,
     PULSE_TYPES,
+    SYMPATHY_CONFIG,
   };
 
   return (

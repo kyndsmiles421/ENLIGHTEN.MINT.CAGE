@@ -47,6 +47,7 @@ import MissionControlRing from './components/MissionControlRing';
 import { MeshNetworkProvider } from './context/MeshNetworkContext';
 import GlowPortal from './components/GlowPortal';
 import UniversalCommand from './components/UniversalCommand';
+import PulseEchoVisualizer from './components/PulseEchoVisualizer';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -426,6 +427,7 @@ function App() {
             <EmergencyShutOff />
             <GlowPortal />
             <UniversalCommand />
+            <PulseEchoVisualizer />
           </div>
           </SplitScreenProvider>
           </VoiceCommandProvider>
