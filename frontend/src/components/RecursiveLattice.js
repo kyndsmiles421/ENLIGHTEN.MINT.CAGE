@@ -333,6 +333,7 @@ const DepthHUD = React.memo(({
   totalStates,
   hapticFrequency,
   onSurface,
+  onEmergencySurface,
   onMintSeed,
 }) => {
   const style = getDepthStyle(depth);
@@ -417,6 +418,23 @@ const DepthHUD = React.memo(({
           </button>
         )}
         
+        {/* Emergency Surface - appears at L3+ for instant escape */}
+        {depth >= 3 && onEmergencySurface && (
+          <button
+            onClick={onEmergencySurface}
+            data-testid="rdive-emergency-surface-button"
+            className="flex items-center justify-center gap-1 py-2 px-3 rounded-lg text-[10px] uppercase tracking-wider transition-all animate-pulse"
+            style={{
+              background: 'rgba(255, 80, 80, 0.2)',
+              color: '#FF6B6B',
+              border: '1px solid rgba(255, 80, 80, 0.4)',
+            }}
+          >
+            <AlertCircle size={12} />
+            VOID ESCAPE
+          </button>
+        )}
+        
         {depth > 0 && (
           <button
             onClick={onMintSeed}
@@ -461,6 +479,7 @@ export default function RecursiveLattice({
     totalStates,
     dive,
     surface,
+    emergencySurface,
     selectGridCell,
     mintSeed,
     MAX_DEPTH,
@@ -720,6 +739,7 @@ export default function RecursiveLattice({
             totalStates={totalStates}
             hapticFrequency={hapticFrequency}
             onSurface={surface}
+            onEmergencySurface={emergencySurface}
             onMintSeed={handleMintSeed}
           />
         </div>

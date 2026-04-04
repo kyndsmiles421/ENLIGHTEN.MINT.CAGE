@@ -215,6 +215,7 @@ const AcademyPage = lazy(() => import('./pages/AcademyPage'));
 const EconomyPage = lazy(() => import('./pages/EconomyPage'));
 const SovereignAdvisors = lazy(() => import('./pages/SovereignAdvisors'));
 const RecursiveDivePage = lazy(() => import('./pages/RecursiveDivePage'));
+const SeedGalleryPage = lazy(() => import('./pages/SeedGalleryPage'));
 
 function PageLoader() {
   return (
@@ -463,6 +464,7 @@ function AnimatedRoutes() {
         <Route path="/economy" element={<EconomyPage />} />
         <Route path="/sovereigns" element={<SovereignAdvisors />} />
         <Route path="/recursive-dive" element={<RecursiveDivePage />} />
+        <Route path="/seed-gallery" element={<SeedGalleryPage />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

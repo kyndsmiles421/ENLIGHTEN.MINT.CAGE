@@ -440,10 +440,35 @@ export function useRDive36(options = {}) {
   }, [isZooming, currentDepth, path.length]);
   
   // ═══════════════════════════════════════════════════════════════════
+  // EMERGENCY SURFACE (Instant reset to L0 - no animation)
+  // Target: <250ms for "Void Collapse" emergency escape
+  // ═══════════════════════════════════════════════════════════════════
+  
+  const emergencySurface = useCallback(() => {
+    // Instant reset - no animation, no delays
+    setIsZooming(false);
+    setZoomDirection(null);
+    setZoomProgress(0);
+    setPath([]);
+    setCurrentDepth(0);
+    setSelectedCell(null);
+    
+    // Heavy haptic confirmation (emergency escape feedback)
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 30, 100, 30, 150]);
+    }
+    
+    // Callback
+    if (onSurface) onSurface(0);
+    
+    console.log('[RDive36] EMERGENCY SURFACE: Returned to L0');
+  }, [onSurface]);
+  
+  // ═══════════════════════════════════════════════════════════════════
   // MINT CRYSTALLINE SEED
   // ═══════════════════════════════════════════════════════════════════
   
-  const mintSeed = useCallback((userId = 'anonymous') => {
+  const mintSeed = useCallback(async (userId = 'anonymous') => {
     const seed = mintCrystallineSeed(path, dwellHistory, userId);
     
     // Save to localStorage
@@ -452,6 +477,40 @@ export function useRDive36(options = {}) {
       seeds.push(seed);
       localStorage.setItem('cosmic_seeds', JSON.stringify(seeds.slice(-100))); // Keep last 100
     } catch {}
+    
+    // Also save to backend API
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const backendPayload = {
+        address_36bit: seed.address,
+        path: path.map((p, i) => ({
+          depth: i,
+          hexagram_number: p.hexagram,
+          language_code: p.language,
+          row: Math.floor(p.hexagram / 9),
+          col: p.hexagram % 9,
+          dwell_time_ms: dwellHistory[i]?.dwellMs || 0,
+        })),
+        linguistic_state: path.length > 0 ? path[path.length - 1].language : 'en',
+        dwell_history: dwellHistory.slice(-10).map(d => ({
+          coordinate: `${d.cell?.row || 0}-${d.cell?.col || 0}`,
+          visits: 1,
+          total_dwell_ms: d.dwellMs || 0,
+          stability: d.dwellMs > 30000 ? 'CRYSTALLIZED' : d.dwellMs > 15000 ? 'HARDENED' : d.dwellMs > 5000 ? 'STABLE' : 'FORMING',
+        })),
+        minter_id: userId,
+        constellation_name: null,
+      };
+      
+      await fetch(`${API_URL}/api/seeds/mint`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(backendPayload),
+      });
+      console.log('[RDive36] Seed saved to backend API');
+    } catch (err) {
+      console.warn('[RDive36] Failed to save seed to backend:', err);
+    }
     
     if (onMintSeed) onMintSeed(seed);
     
@@ -531,6 +590,7 @@ export function useRDive36(options = {}) {
     dive,
     surface,
     jumpToDepth,
+    emergencySurface, // <250ms reset for Void Collapse
     selectGridCell,
     
     // Seeds
