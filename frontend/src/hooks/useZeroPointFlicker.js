@@ -227,13 +227,26 @@ export function useZeroPointFlicker(options = {}) {
   // FLICKER TICK (Core animation frame - follows Hexagram sequence)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   
+  // Store latest values in refs to avoid dependency issues
+  const flickerRotationRef = useRef(flickerRotation);
+  const glitchIntensityRef = useRef(glitchIntensity);
+  const isSourceStateRef = useRef(isSourceState);
+  const currentIntervalRef = useRef(currentInterval);
+  
+  useEffect(() => {
+    flickerRotationRef.current = flickerRotation;
+    glitchIntensityRef.current = glitchIntensity;
+    isSourceStateRef.current = isSourceState;
+    currentIntervalRef.current = currentInterval;
+  }, [flickerRotation, glitchIntensity, isSourceState, currentInterval]);
+  
   const flickerTick = useCallback(() => {
-    if (flickerRotation.length === 0 || isSourceState) return;
+    if (flickerRotationRef.current.length === 0 || isSourceStateRef.current) return;
     
     // Advance language and hexagram in sync
     setFlickerIndex(prev => {
-      const next = (prev + 1) % flickerRotation.length;
-      const nextLang = flickerRotation[next];
+      const next = (prev + 1) % flickerRotationRef.current.length;
+      const nextLang = flickerRotationRef.current[next];
       
       // Get paired hexagram for this language
       const hexNumber = LANGUAGE_HEXAGRAM_MAP[nextLang.code];
@@ -249,7 +262,7 @@ export function useZeroPointFlicker(options = {}) {
       }
       
       // Calculate and apply glitch style
-      setGlitchStyle(calculateGlitchStyle(nextLang, glitchIntensity));
+      setGlitchStyle(calculateGlitchStyle(nextLang, glitchIntensityRef.current));
       
       // Trigger haptic burst (synced to visual, using hexagram pattern)
       triggerHapticBurst(nextLang, hex);
@@ -267,7 +280,7 @@ export function useZeroPointFlicker(options = {}) {
       
       return next;
     });
-  }, [flickerRotation, glitchIntensity, calculateGlitchStyle, triggerHapticBurst, audioEnabled, phonetic, isSourceState]);
+  }, [calculateGlitchStyle, triggerHapticBurst, audioEnabled, phonetic]);
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // FLICKER LOOP (Variable-rate using setTimeout)
@@ -296,8 +309,8 @@ export function useZeroPointFlicker(options = {}) {
     const runFlickerLoop = () => {
       flickerTick();
       
-      // Schedule next tick with current gravity-reactive interval
-      flickerIntervalRef.current = setTimeout(runFlickerLoop, currentInterval);
+      // Schedule next tick with current gravity-reactive interval from ref
+      flickerIntervalRef.current = setTimeout(runFlickerLoop, currentIntervalRef.current);
     };
     
     // Initial tick
@@ -309,17 +322,18 @@ export function useZeroPointFlicker(options = {}) {
         flickerIntervalRef.current = null;
       }
     };
-  }, [enabled, isVoid, isAtZeroPoint, isSourceState, currentInterval, flickerTick]);
+  // flickerTick is now stable thanks to refs, so we can safely include it
+  }, [enabled, isVoid, isAtZeroPoint, isSourceState, flickerTick]);
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // MANUAL CONTROLS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   
   const forceFlickerStart = useCallback(() => {
-    if (flickerRotation.length === 0 || isSourceState) return;
+    if (flickerRotationRef.current.length === 0 || isSourceStateRef.current) return;
     setIsFlickering(true);
     flickerTick();
-  }, [flickerRotation, flickerTick, isSourceState]);
+  }, [flickerTick]);
   
   const forceFlickerStop = useCallback(() => {
     if (flickerIntervalRef.current) {

@@ -37,6 +37,9 @@ const DIVE_GRAVITY_THRESHOLD = 0.95; // Gravity > 0.95 triggers dive
 const SURFACE_GRAVITY_THRESHOLD = 0.05; // Gravity < 0.05 triggers surface
 const GHOST_OPACITY_PERSISTENT = 0.12; // 10-15% opacity for ghost persistence
 
+// Static language array for 9-column mapping
+const LATTICE_LANGUAGES = ['en', 'es', 'ja', 'zh-cmn', 'zh-yue', 'sa', 'hi', 'lkt', 'dak'];
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // DEPTH-BASED VISUAL STYLES
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -251,7 +254,6 @@ const LatticeGrid = React.memo(({
   zoomProgress,
 }) => {
   const style = getDepthStyle(depth);
-  const languages = ['en', 'es', 'ja', 'zh-cmn', 'zh-yue', 'sa', 'hi', 'lkt', 'dak'];
   
   // Generate 9×9 grid data
   const gridData = useMemo(() => {
@@ -263,7 +265,7 @@ const LatticeGrid = React.memo(({
           row,
           col,
           hexagram: (row * 9 + col) % 64, // Map to hexagram number
-          language: languages[col],
+          language: LATTICE_LANGUAGES[col],
         });
       }
       grid.push(rowData);
@@ -499,8 +501,7 @@ export default function RecursiveLattice({
       
       // Get hexagram from selected cell
       const hexNum = (selectedCell.row * 9 + selectedCell.col) % 64;
-      const languages = ['en', 'es', 'ja', 'zh-cmn', 'zh-yue', 'sa', 'hi', 'lkt', 'dak'];
-      const lang = languages[selectedCell.col % 9];
+      const lang = LATTICE_LANGUAGES[selectedCell.col % 9];
       
       // Execute the implosion dive
       dive(hexNum, lang);

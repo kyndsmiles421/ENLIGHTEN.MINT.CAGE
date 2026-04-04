@@ -11,9 +11,69 @@ Build "The Cosmic Collective", a full-stack wellness platform with orbital navig
 
 ---
 
-## Latest Implementation: Rule of Nines & Sentient Ecosystem (December 2025)
+## Latest Implementation: RDive-36 Recursive Navigation (April 2026)
 
-### Rule of Nines Architecture
+### RDive-36 (Recursive Dive 36-Bit Address System)
+**"Proof of Infinite Scalability"**
+
+The RDive-36 system enables infinite depth navigation through a nested 9×9 lattice grid, tracking the user's journey as a 36-bit binary address.
+
+**Route:** `/recursive-dive`
+
+**Core Components:**
+| File | Purpose |
+|------|---------|
+| `RecursiveDivePage.js` | Page container with header, info panel, seeds panel |
+| `RecursiveLattice.js` | 9×9 grid visualization with Zoom-Snatch animations |
+| `useRDive36.js` | Hook managing 36-bit address, dive/surface, haptics |
+
+**36-Bit Address Format:**
+```
+| L0 Hex (6-bit) | L0 Lang (4-bit) | L1 Hex (6-bit) | L1 Lang (4-bit) | ... |
+Example: "101010|0011|001100|0101|111000|1000"
+```
+
+**Zoom-Snatch Protocol:**
+| Trigger | Condition | Animation |
+|---------|-----------|-----------|
+| DIVE | Gravity ≥ 0.95 OR double-tap | Grid implodes to center, sub-grid expands |
+| SURFACE | Gravity ≤ 0.05 OR surface button | Grid collapses outward, parent materializes |
+| Duration | 800ms | Framer Motion with radial lines |
+
+**Depth-Based Visual Styles:**
+| Depth | Label | Background Color | Active Border | Haptic (Hz) |
+|-------|-------|------------------|---------------|-------------|
+| 0 | SURFACE | Sienna (#8B4513) | Gold (#C9A962) | 60Hz |
+| 1 | DEPTH 1 | Royal Blue (#4169E1) | Blue (#4169E1) | 51Hz |
+| 2 | DEPTH 2 | Teal (#20B2AA) | Teal (#20B2AA) | 42Hz |
+| 3 | DEPTH 3 | Gold (#FFD700) | Gold (#FFD700) | 33Hz |
+| 4 | DEPTH 4 | Tomato (#FF6347) | Red (#FF6347) | 24Hz |
+| 5 | CORE | Lavender (#E6E6FA) | White (#E6E6FA) | 15Hz |
+
+**Ghost Layer Persistence:**
+- Parent hexagrams persist at 10-15% opacity during dive
+- Maximum 3 ghost layers visible
+- Parallax shift during zoom animations
+
+**Crystalline Seed Minting:**
+- Captures 36-bit address + dwell history as digital artifact
+- Stored in localStorage (`cosmic_seeds`)
+- Unique seed ID generated from address hash + timestamp
+
+**Features Tested:**
+- ✅ Page renders at `/recursive-dive`
+- ✅ 9×9 lattice grid (81 cells) with hexagram symbols
+- ✅ Cell selection with highlight
+- ✅ Double-tap DIVE (L0→L1→L2 tested)
+- ✅ Surface button returns depth
+- ✅ Ghost layers persist at 10-15% opacity
+- ✅ Haptic frequency scaling (60→51→42Hz)
+- ✅ Mint Seed button stores seeds
+- ✅ 36-bit address display in DepthHUD
+
+---
+
+## Rule of Nines Architecture
 **9 Languages × 9 Hexagrams × 9 Depth Tiers**
 
 **Languages (languageRegistry.js):**
