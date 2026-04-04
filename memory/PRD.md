@@ -167,7 +167,31 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 275 — Structural Hardening: State Sentinel + Theme Engine + Sovereign UI (April 2026) — LATEST
+### Iteration 276 — 3D Depth System with Z-Axis Layering (April 2026) — LATEST
+- **useDepth Hook** (`/hooks/useDepth.js`):
+  - Z-Layer constants: FRONT (+200), MID_FRONT (+50), CENTER (0), MID_BACK (-100), DEEP_BACK (-500)
+  - Depth-based blur: `filter: blur(calc(abs(z) / 50 * 1px))`
+  - Depth-based opacity: Linear interpolation from 1.0 (front) to 0.3 (back)
+  - Haptic intensity scaling based on Z position
+  - GPU-accelerated `translate3d()` transforms
+  - `getContainerStyle()` with `preserve-3d` and perspective
+  - `getRimLight()` for orbs passing in front of hub
+- **Device Capability Detection**:
+  - CSS 3D support check (`transform-style: preserve-3d`)
+  - Performance monitoring (FPS-based fallback to 2.5D if <30fps)
+  - Gyroscope availability detection
+- **Optional Gyroscope Tilt**:
+  - Default: OFF (automatic orbital motion)
+  - Toggle: `zen_gyro_enabled` localStorage flag
+  - DeviceOrientation API with iOS 13+ permission request
+  - Clamped ±15° rotation for subtle effect
+- **Orbital Hub 3D Integration**:
+  - Bloomed orbs at Z=-100 (Mid-Back) with blur
+  - Extracted orbs at Z=+50 (Mid-Front) sharp, with rim light
+  - Container with `preserve-3d` and 1200px perspective
+- Tests: Mobile viewport — Bloom shows depth-blurred orbs, extraction brings to front
+
+### Iteration 275 — Structural Hardening: State Sentinel + Theme Engine + Sovereign UI (April 2026)
 - **State Sentinel** (`OrbitalSentinelContext.js`):
   - Finite State Machine: IDLE → BLOOMED → EXTRACTED → NAVIGATING
   - Blocks illegal transitions (double-tap, glitchy drag)

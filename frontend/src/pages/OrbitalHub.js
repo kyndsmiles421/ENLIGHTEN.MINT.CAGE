@@ -6,32 +6,33 @@ import { ALL_SATELLITES, ZONE_AUDIO } from '../components/orbital/constants';
 import { CosmicDust } from '../components/orbital/CosmicDust';
 import { useHubAudio } from '../hooks/useHubAudio';
 import { useSensoryResonance } from '../hooks/useSensoryResonance';
+import { useDepth, Z_LAYERS } from '../hooks/useDepth';
 import MissionControl from '../components/MissionControl';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * ZERO-SCALE PARENTAGE ORBITAL HUB
+ * ZERO-SCALE PARENTAGE ORBITAL HUB — 3D DEPTH-ENHANCED
  * ═══════════════════════════════════════════════════════════════════════════════
  * 
- * MATHEMATICAL PHYSICS MODEL (User's Exact Specification):
+ * Now with Z-axis depth layering:
+ * - Front (+200px): Active modal, "Tap to Enter" prompts
+ * - Mid-Front (+50px): Extracted orbs (selected)
+ * - Center (0px): Mission Control Hub with Color 2 radiance
+ * - Mid-Back (-100px): Orbiting sub-orbs with subtle blur
+ * - Deep-Back (-500px): Cosmic dust background
  * 
- * 1. LATENT STATE (Default):
- *    - Core (Parent): Scale = 1.0
- *    - Sub-Orbs (Children): Position = (0, 0, 0) local coords
- *                           Scale = 0
- *                           Opacity = 0
- *    - Sub-orbs are mathematically zeroed inside the Core
+ * Features:
+ * - CSS preserve-3d for true 3D transforms
+ * - GPU-accelerated translate3d() movements
+ * - Depth-based blur and opacity
+ * - Optional gyroscope tilt (DeviceOrientation API)
+ * - Device capability detection (progressive enhancement)
  * 
- * 2. ACCESS TRIGGER / PULSE (Tap/Hold Core):
- *    - "Bloom" Effect: Sub-orbs animate outward to 2.5x Core radius
- *    - Scale during bloom: 0.3
- *    - Opacity: lerps from 0 to 1
- * 
- * 3. TAP AND PULL EXTRACTION (Drag beyond threshold):
- *    - When sub-orb is dragged beyond 3.0x Core radius:
- *      - Extracted orb: Scale = 1.0, breaks parent constraint
- *      - All OTHER orbs: lerp back to (0, 0, 0) with Scale = 0
- *    - Click extracted orb → Navigate to its destination
+ * MATHEMATICAL PHYSICS MODEL:
+ * - Core: Scale 1.0, Z = 0 (focal plane)
+ * - Latent Sub-Orbs: Position (0,0,0), Scale 0, Opacity 0
+ * - Bloomed Sub-Orbs: 2.5x radius, Scale 0.3, Z = -100
+ * - Extracted Orb: 3.0x radius, Scale 1.0, Z = +50
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
@@ -62,6 +63,7 @@ export default function OrbitalHub() {
   const { user } = useAuth();
   const audio = useHubAudio();
   const { orbitalResonance, haptic } = useSensoryResonance();
+  const depth = useDepth({ enableGyro: false, focalPlaneZ: 0 });
 
   // ═══ STATE ═══
   const [hubState, setHubState] = useState('latent'); // 'latent' | 'bloom' | 'extracted'
@@ -101,15 +103,17 @@ export default function OrbitalHub() {
   const subOrbPositions = useRef({});
   const subOrbScales = useRef({});
   const subOrbOpacities = useRef({});
+  const subOrbZPositions = useRef({}); // Z-axis depth
   const orbitalAngle = useRef(0);
 
-  // Initialize sub-orb states at (0,0) with scale 0
+  // Initialize sub-orb states at (0,0,0) with scale 0
   useEffect(() => {
     ALL_SATELLITES.forEach(sat => {
       if (!subOrbPositions.current[sat.id]) {
         subOrbPositions.current[sat.id] = { x: 0, y: 0 };
         subOrbScales.current[sat.id] = SUB_ORB_LATENT_SCALE;
         subOrbOpacities.current[sat.id] = 0;
+        subOrbZPositions.current[sat.id] = 0; // Start at focal plane
       }
     });
   }, []);
@@ -131,6 +135,7 @@ export default function OrbitalHub() {
         // Calculate target position based on state
         let targetX = 0;
         let targetY = 0;
+        let targetZ = 0; // Z-depth target
         let targetScale = SUB_ORB_LATENT_SCALE;
         let targetOpacity = 0;
 
@@ -138,27 +143,31 @@ export default function OrbitalHub() {
           // All orbs at (0,0,0) with scale 0, opacity 0
           targetX = 0;
           targetY = 0;
+          targetZ = 0;
           targetScale = SUB_ORB_LATENT_SCALE;
           targetOpacity = 0;
         } else if (hubState === 'bloom') {
-          // Bloom: orbs at 2.5x radius with scale 0.3
+          // Bloom: orbs at 2.5x radius with scale 0.3, Z = -100 (behind hub)
           const angle = (idx / total) * Math.PI * 2 + orbitalAngle.current - Math.PI / 2;
           targetX = Math.cos(angle) * bloomRadius;
           targetY = Math.sin(angle) * bloomRadius;
+          targetZ = Z_LAYERS.MID_BACK; // -100px depth
           targetScale = SUB_ORB_BLOOM_SCALE;
           targetOpacity = 1;
         } else if (hubState === 'extracted') {
           if (sat.id === extractedId) {
-            // Extracted orb: stays at extraction position with scale 1.0
+            // Extracted orb: in front at Z = +50, scale 1.0
             const angle = (idx / total) * Math.PI * 2 + orbitalAngle.current - Math.PI / 2;
             targetX = Math.cos(angle) * extractionRadius;
             targetY = Math.sin(angle) * extractionRadius;
+            targetZ = Z_LAYERS.MID_FRONT; // +50px (in front)
             targetScale = SUB_ORB_EXTRACTED_SCALE;
             targetOpacity = 1;
           } else {
             // All other orbs: lerp back to (0,0,0) with scale 0
             targetX = 0;
             targetY = 0;
+            targetZ = 0;
             targetScale = SUB_ORB_LATENT_SCALE;
             targetOpacity = 0;
           }
@@ -168,6 +177,7 @@ export default function OrbitalHub() {
         if (dragTarget === sat.id) {
           targetX = dragOffset.x;
           targetY = dragOffset.y;
+          targetZ = Z_LAYERS.MID_FRONT; // Bring to front while dragging
           targetScale = Math.max(SUB_ORB_BLOOM_SCALE, targetScale);
           targetOpacity = 1;
         }
@@ -177,6 +187,11 @@ export default function OrbitalHub() {
           x: lerp(subOrbPositions.current[sat.id]?.x || 0, targetX, LERP_SPEED),
           y: lerp(subOrbPositions.current[sat.id]?.y || 0, targetY, LERP_SPEED),
         };
+        subOrbZPositions.current[sat.id] = lerp(
+          subOrbZPositions.current[sat.id] || 0,
+          targetZ,
+          LERP_SPEED
+        );
         subOrbScales.current[sat.id] = lerp(
           subOrbScales.current[sat.id] || 0,
           targetScale,
@@ -384,7 +399,7 @@ export default function OrbitalHub() {
         </span>
       </motion.div>
 
-      {/* ═══ ORBITAL SYSTEM CONTAINER ═══ */}
+      {/* ═══ ORBITAL SYSTEM CONTAINER — 3D Stage ═══ */}
       <div 
         className="relative" 
         style={{
@@ -393,6 +408,7 @@ export default function OrbitalHub() {
           zIndex: 2,
           maxWidth: '100vw', 
           maxHeight: 'calc(100vh - 100px)',
+          ...depth.getContainerStyle(1200), // 3D perspective + optional gyro
         }}
         data-container
       >
@@ -452,10 +468,11 @@ export default function OrbitalHub() {
           })}
         </svg>
 
-        {/* ═══ SUB-ORBS ═══ */}
+        {/* ═══ SUB-ORBS — 3D Depth-Aware ═══ */}
         {ALL_SATELLITES.map((sat, idx) => {
           const Icon = sat.icon;
           const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
+          const z = subOrbZPositions.current[sat.id] || 0;
           const scale = subOrbScales.current[sat.id] || 0;
           const opacity = subOrbOpacities.current[sat.id] || 0;
           
@@ -465,21 +482,32 @@ export default function OrbitalHub() {
           const isExtracted = hubState === 'extracted' && sat.id === extractedId;
           const isHovered = hoveredSat === sat.id;
           const size = isExtracted ? subOrbSizeExtracted : subOrbSizeBloom;
+          
+          // Get depth-based visual effects
+          const depthStyle = depth.getDepthStyle(z);
+          const rimLight = depth.getRimLight(z, sat.color);
+          
+          // Calculate haptic intensity based on depth
+          const hapticIntensity = depth.calculateHapticIntensity(z);
 
           return (
             <motion.div
               key={sat.id}
               className="absolute cursor-pointer select-none"
               style={{
-                left: center + pos.x - size / 2,
-                top: center + pos.y - size / 2,
+                // GPU-accelerated 3D transform
+                ...depth.getTransform3D(
+                  center + pos.x - size / 2,
+                  center + pos.y - size / 2,
+                  z
+                ),
                 width: size,
                 height: size,
-                opacity: opacity,
-                transform: `scale(${scale / (isExtracted ? SUB_ORB_EXTRACTED_SCALE : SUB_ORB_BLOOM_SCALE)})`,
+                opacity: opacity * depthStyle.opacity,
+                filter: depthStyle.filter,
                 zIndex: isExtracted ? 30 : (isHovered ? 25 : 20),
-                transition: dragTarget === sat.id ? 'none' : 'transform 0.1s ease-out',
-                touchAction: isExtracted ? 'auto' : 'none', // Allow touch on extracted orbs
+                touchAction: isExtracted ? 'auto' : 'none',
+                willChange: 'transform, opacity, filter',
               }}
               onPointerDown={(e) => !isExtracted && handleSubOrbPointerDown(e, sat.id)}
               onClick={(e) => handleSubOrbClick(e, sat)}
@@ -502,11 +530,13 @@ export default function OrbitalHub() {
                     : 'rgba(10,10,18,0.6)',
                   border: `1.5px solid ${isHovered || isExtracted ? sat.color + '55' : sat.color + '20'}`,
                   boxShadow: isExtracted
-                    ? `0 0 ${R * 0.2}px ${sat.color}40, inset 0 0 ${R * 0.1}px ${sat.color}15`
+                    ? `${depthStyle.boxShadow}, 0 0 ${R * 0.2}px ${sat.color}40, inset 0 0 ${R * 0.1}px ${sat.color}15`
                     : isHovered
-                    ? `0 0 ${R * 0.15}px ${sat.color}30`
-                    : `0 0 ${R * 0.05}px ${sat.color}10`,
+                    ? `${depthStyle.boxShadow}, 0 0 ${R * 0.15}px ${sat.color}30`
+                    : depthStyle.boxShadow,
+                  ...rimLight, // Add rim light when in front
                   backdropFilter: 'blur(8px)',
+                  transform: `scale(${scale / (isExtracted ? SUB_ORB_EXTRACTED_SCALE : SUB_ORB_BLOOM_SCALE)})`,
                 }}
               >
                 <Icon 
