@@ -211,11 +211,14 @@ const getTranslucencyColors = (translucency, gravity) => {
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SUPERNOVA DETECTION
+// SUPERNOVA DETECTION — Velocity-Reactive
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const SUPERNOVA_THRESHOLD = 0.5;
-const SUPERNOVA_DURATION = 2500; // ms for full expansion cycle
+const SUPERNOVA_BASE_DURATION = 2500; // ms for full expansion cycle
+const SUPERNOVA_MIN_DURATION = 1500; // Faster transitions = shorter burst
+const SUPERNOVA_MAX_INTENSITY = 5.0; // 500% max scale
+const SUPERNOVA_MIN_INTENSITY = 1.5; // 150% min scale (gentle threshold crossing)
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CONTEXT
@@ -232,10 +235,14 @@ export function PolarityProvider({ children }) {
   // 6-Bit Hexagram State (The Core Bitmask)
   const [hexagram, setHexagram] = useState(0b000111); // Start at Peace (7)
   
-  // Supernova State
+  // Supernova State — Velocity-Reactive
   const [supernovaActive, setSupernovaActive] = useState(false);
   const [supernovaPhase, setSupernovaPhase] = useState('idle'); // idle, expanding, peak, contracting
+  const [supernovaIntensity, setSupernovaIntensity] = useState(1); // Scale multiplier (1.0 to 5.0)
+  const [supernovaVelocity, setSupernovaVelocity] = useState(0); // How fast the threshold was crossed
   const supernovaTimeoutRef = useRef(null);
+  const lastGravityRef = useRef(0.5); // Track previous gravity for velocity calculation
+  const lastGravityTimeRef = useRef(Date.now());
   
   // Emergency Void State (STOP button override)
   const [isVoid, setIsVoid] = useState(false);
@@ -245,24 +252,45 @@ export function PolarityProvider({ children }) {
   const [compassVelocity, setCompassVelocity] = useState(0);
   const [compassFrozen, setCompassFrozen] = useState(false);
   
-  // Calculate current layer from route
+  // Calculate current layer from route — with velocity tracking
   useEffect(() => {
     const layer = getLayerFromPath(location.pathname);
+    const now = Date.now();
     
     if (currentLayer && layer.name !== currentLayer.name) {
       // Layer transition detected
       setPreviousLayer(currentLayer);
       setIsTransitioning(true);
       
-      // Check for Supernova trigger (crossing the threshold)
+      // Calculate gravity values
       const prevGravity = calculateGravity(currentLayer.depth);
       const newGravity = calculateGravity(layer.depth);
+      const gravityDelta = Math.abs(newGravity - prevGravity);
+      
+      // Calculate velocity (gravity change per second)
+      const timeDelta = Math.max(now - lastGravityTimeRef.current, 100); // At least 100ms
+      const velocity = (gravityDelta / timeDelta) * 1000; // Normalized to per-second
+      
+      // Check for Supernova trigger (crossing the threshold)
       const crossedThreshold = 
         (prevGravity < SUPERNOVA_THRESHOLD && newGravity >= SUPERNOVA_THRESHOLD) ||
         (prevGravity >= SUPERNOVA_THRESHOLD && newGravity < SUPERNOVA_THRESHOLD);
       
       if (crossedThreshold && !isVoid) {
-        triggerSupernova(prevGravity < newGravity ? 'ascending' : 'descending');
+        // Calculate intensity based on velocity AND distance traveled
+        // Fast transition (velocity > 1.0) + large distance = MAX intensity
+        // Slow transition (velocity < 0.3) + small distance = MIN intensity
+        const velocityFactor = Math.min(velocity / 0.8, 1); // Normalize velocity (0.8 = "fast")
+        const distanceFactor = Math.min(gravityDelta / 0.7, 1); // Normalize distance (0.7 = max travel)
+        const combinedFactor = (velocityFactor * 0.6 + distanceFactor * 0.4); // Weight velocity more
+        const intensity = SUPERNOVA_MIN_INTENSITY + 
+          (SUPERNOVA_MAX_INTENSITY - SUPERNOVA_MIN_INTENSITY) * combinedFactor;
+        
+        triggerSupernova(
+          prevGravity < newGravity ? 'ascending' : 'descending',
+          intensity,
+          velocity
+        );
       }
       
       // Transition duration based on layer distance
@@ -272,28 +300,53 @@ export function PolarityProvider({ children }) {
       setTimeout(() => setIsTransitioning(false), duration);
     }
     
+    // Update tracking refs
+    if (currentLayer) {
+      lastGravityRef.current = calculateGravity(currentLayer.depth);
+    }
+    lastGravityTimeRef.current = now;
+    
     setCurrentLayer(layer);
   }, [location.pathname]);
   
-  // Trigger Supernova expansion
-  const triggerSupernova = useCallback((direction) => {
+  // Trigger Supernova expansion — Velocity-Reactive
+  const triggerSupernova = useCallback((direction, intensity = 3, velocity = 0.5) => {
     if (supernovaActive) return;
     
+    // Store intensity and velocity
+    setSupernovaIntensity(intensity);
+    setSupernovaVelocity(velocity);
     setSupernovaActive(true);
     setSupernovaPhase('expanding');
     
-    // Haptic burst at start
+    // Calculate duration based on intensity (more intense = longer display)
+    const duration = SUPERNOVA_MIN_DURATION + 
+      (SUPERNOVA_BASE_DURATION - SUPERNOVA_MIN_DURATION) * (intensity / SUPERNOVA_MAX_INTENSITY);
+    
+    // Haptic burst scales with intensity
     if (navigator.vibrate) {
-      navigator.vibrate([50, 30, 50, 30, 100]);
+      // Low intensity = gentle pulse, high intensity = violent rumble
+      if (intensity > 4) {
+        // Max intensity: Heavy rumble
+        navigator.vibrate([80, 30, 80, 30, 80, 30, 150]);
+      } else if (intensity > 2.5) {
+        // Medium intensity: Strong pulse
+        navigator.vibrate([50, 30, 50, 30, 100]);
+      } else {
+        // Low intensity: Gentle tap
+        navigator.vibrate([30, 20, 30]);
+      }
     }
     
-    // Phase timing
-    setTimeout(() => setSupernovaPhase('peak'), SUPERNOVA_DURATION * 0.4);
-    setTimeout(() => setSupernovaPhase('contracting'), SUPERNOVA_DURATION * 0.6);
+    // Phase timing scaled to duration
+    setTimeout(() => setSupernovaPhase('peak'), duration * 0.35);
+    setTimeout(() => setSupernovaPhase('contracting'), duration * 0.6);
     setTimeout(() => {
       setSupernovaPhase('idle');
       setSupernovaActive(false);
-    }, SUPERNOVA_DURATION);
+      setSupernovaIntensity(1);
+      setSupernovaVelocity(0);
+    }, duration);
     
   }, [supernovaActive]);
   
@@ -469,11 +522,13 @@ export function PolarityProvider({ children }) {
     unfreezeCompass,
     rotationDirection,
     
-    // Supernova
+    // Supernova — Velocity-Reactive
     supernovaActive,
     supernovaPhase,
+    supernovaIntensity,
+    supernovaVelocity,
     triggerSupernova,
-    SUPERNOVA_DURATION,
+    SUPERNOVA_MAX_INTENSITY,
     
     // Void / Emergency
     isVoid,
@@ -515,6 +570,8 @@ export function usePolarity() {
       rotationDirection: 0,
       supernovaActive: false,
       supernovaPhase: 'idle',
+      supernovaIntensity: 1,
+      supernovaVelocity: 0,
       isVoid: false,
       toggleHexagramLine: () => {},
       setHexagramValue: () => {},
