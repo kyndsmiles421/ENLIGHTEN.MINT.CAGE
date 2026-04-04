@@ -303,7 +303,7 @@ export default function TesseractExperience() {
       }}
       data-testid="tesseract-experience"
     >
-      {/* Kinetic HUD Overlay */}
+      {/* Kinetic HUD Overlay - z-30 (BELOW lattice at z-999) */}
       <KineticHUD
         gravity={core.gravity}
         inverseGravity={core.inverseGravity}
@@ -351,8 +351,8 @@ export default function TesseractExperience() {
         </button>
       </div>
       
-      {/* Main Lattice */}
-      <div className="relative z-10 flex items-center justify-center mt-8">
+      {/* Main Lattice - Z-INDEX 999: Always top interactive layer */}
+      <div className="relative flex items-center justify-center mt-8" style={{ zIndex: 999 }}>
         <TesseractLattice
           depth={core.depth}
           selectedCell={core.selectedCell}

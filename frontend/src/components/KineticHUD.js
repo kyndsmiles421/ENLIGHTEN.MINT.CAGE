@@ -85,15 +85,18 @@ const RegistryStatusWidget = React.memo(({
       style={{
         top: HUD_CONFIG.SPACER,
         right: HUD_CONFIG.SPACER,
-        background: 'rgba(0,0,0,0.6)',
-        border: `1px solid ${statusColor}40`,
-        boxShadow: `0 0 20px ${statusColor}30`,
+        // CLEAN SWEEP: Smart Glass effect instead of solid bg
+        background: `rgba(0,0,0,0.3)`,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        border: `1px solid rgba(255,255,255,0.1)`,
+        boxShadow: `0 0 20px ${statusColor}20`,
         opacity,
       }}
       animate={{ 
         boxShadow: tesseractGateOpen 
           ? [`0 0 20px ${statusColor}30`, `0 0 40px ${statusColor}60`, `0 0 20px ${statusColor}30`]
-          : `0 0 20px ${statusColor}30`,
+          : `0 0 20px ${statusColor}20`,
       }}
       transition={{ duration: 2, repeat: tesseractGateOpen ? Infinity : 0 }}
       data-testid="hud-registry-status"
@@ -132,8 +135,11 @@ const DustWalletWidget = React.memo(({
       style={{
         bottom: HUD_CONFIG.SPACER,
         right: HUD_CONFIG.SPACER,
-        background: 'rgba(0,0,0,0.6)',
-        border: '1px solid rgba(255,215,0,0.3)',
+        // CLEAN SWEEP: Smart Glass effect
+        background: 'rgba(0,0,0,0.3)',
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.1)',
         opacity,
       }}
       data-testid="hud-dust-wallet"
@@ -193,8 +199,11 @@ const GravityIndicatorWidget = React.memo(({
       style={{
         top: HUD_CONFIG.SPACER,
         left: HUD_CONFIG.SPACER,
-        background: 'rgba(0,0,0,0.6)',
-        border: `1px solid ${barColor}40`,
+        // CLEAN SWEEP: Smart Glass effect
+        background: 'rgba(0,0,0,0.3)',
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.1)',
         minWidth: 140,
         opacity,
       }}
@@ -273,8 +282,11 @@ const StabilityIndicatorWidget = React.memo(({
       style={{
         bottom: HUD_CONFIG.SPACER,
         left: HUD_CONFIG.SPACER,
-        background: 'rgba(0,0,0,0.6)',
-        border: `1px solid ${stabilityColor}40`,
+        // CLEAN SWEEP: Smart Glass effect
+        background: 'rgba(0,0,0,0.3)',
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.1)',
         opacity,
       }}
       data-testid="hud-stability-indicator"
@@ -486,53 +498,64 @@ export default function KineticHUD({
 }) {
   return (
     <div 
-      className="fixed inset-0 pointer-events-none z-40"
+      className="fixed inset-0"
+      style={{ pointerEvents: 'none', zIndex: 30 }}  // z-30: Below lattice (z-999)
       data-testid="kinetic-hud"
     >
-      {/* Registry Status (Top-Right) */}
-      <RegistryStatusWidget
-        dominantLattice={dominantLattice}
-        isVoidMode={isVoidMode}
-        tesseractGateOpen={tesseractGateOpen}
-        opacity={hudOpacity}
-      />
+      {/* Registry Status (Top-Right) - Display Only */}
+      <div style={{ pointerEvents: 'none' }}>
+        <RegistryStatusWidget
+          dominantLattice={dominantLattice}
+          isVoidMode={isVoidMode}
+          tesseractGateOpen={tesseractGateOpen}
+          opacity={hudOpacity}
+        />
+      </div>
       
-      {/* Gravity Indicator (Top-Left) */}
-      <GravityIndicatorWidget
-        gravity={gravity}
-        inverseGravity={inverseGravity}
-        nearSnapPoint={nearSnapPoint}
-        atSourceState={atSourceState}
-        opacity={hudOpacity}
-      />
+      {/* Gravity Indicator (Top-Left) - Display Only */}
+      <div style={{ pointerEvents: 'none' }}>
+        <GravityIndicatorWidget
+          gravity={gravity}
+          inverseGravity={inverseGravity}
+          nearSnapPoint={nearSnapPoint}
+          atSourceState={atSourceState}
+          opacity={hudOpacity}
+        />
+      </div>
       
-      {/* Dust Wallet (Bottom-Right) */}
-      <DustWalletWidget
-        seedCount={seeds?.length || 0}
-        totalStates={totalStates}
-        depth={depth}
-        opacity={hudOpacity}
-      />
+      {/* Dust Wallet (Bottom-Right) - Display Only */}
+      <div style={{ pointerEvents: 'none' }}>
+        <DustWalletWidget
+          seedCount={seeds?.length || 0}
+          totalStates={totalStates}
+          depth={depth}
+          opacity={hudOpacity}
+        />
+      </div>
       
-      {/* Stability Indicator (Bottom-Left) */}
-      <StabilityIndicatorWidget
-        stability={currentStability}
-        selectedCell={selectedCell}
-        opacity={hudOpacity}
-      />
+      {/* Stability Indicator (Bottom-Left) - Display Only */}
+      <div style={{ pointerEvents: 'none' }}>
+        <StabilityIndicatorWidget
+          stability={currentStability}
+          selectedCell={selectedCell}
+          opacity={hudOpacity}
+        />
+      </div>
       
-      {/* Center Hexagram Ring */}
-      <HexagramTrackerRing
-        gravity={gravity}
-        depth={depth}
-        colors={colors}
-        nearSnapPoint={nearSnapPoint}
-        isZooming={isZooming}
-        opacity={hudOpacity}
-      />
+      {/* Center Hexagram Ring - Display Only (behind lattice) */}
+      <div style={{ pointerEvents: 'none' }}>
+        <HexagramTrackerRing
+          gravity={gravity}
+          depth={depth}
+          colors={colors}
+          nearSnapPoint={nearSnapPoint}
+          isZooming={isZooming}
+          opacity={hudOpacity}
+        />
+      </div>
       
-      {/* Void Mode Toggle (pointer-events enabled) */}
-      <div className="pointer-events-auto">
+      {/* Void Mode Toggle - INTERACTIVE (pointer-events: auto) */}
+      <div style={{ pointerEvents: 'auto' }}>
         <VoidModeToggle
           isVoidMode={isVoidMode}
           onToggle={onToggleVoidMode}

@@ -286,6 +286,7 @@ export function usePhoneticSynthesizer(options = {}) {
   }, []);
   
   // Play a phonetic burst for a language
+  // P0 FIX: Added 50ms Linear Attack Envelope to prevent "pop"
   const playPhoneticBurst = useCallback((langCode) => {
     if (!isReady || !ctxRef.current || !gainRef.current) return;
     
@@ -302,7 +303,15 @@ export function usePhoneticSynthesizer(options = {}) {
     // Create source
     const source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.connect(gainRef.current);
+    
+    // P0 FIX: Create envelope gain node for smooth fade-in (50ms attack)
+    const envelopeGain = ctx.createGain();
+    envelopeGain.gain.setValueAtTime(0, ctx.currentTime);
+    envelopeGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.05); // 50ms attack
+    
+    // Connect: source -> envelope -> master gain
+    source.connect(envelopeGain);
+    envelopeGain.connect(gainRef.current);
     source.start();
     
     setIsPlaying(true);
@@ -324,6 +333,7 @@ export function usePhoneticSynthesizer(options = {}) {
   }, [isReady, generateBuffer]);
   
   // Play the Source State resonant hum (Hexagram 63)
+  // P0 FIX: Added fade-in envelope for smooth entry
   const playResonantHum = useCallback(() => {
     if (!isReady || !ctxRef.current || !gainRef.current) return;
     
@@ -333,10 +343,17 @@ export function usePhoneticSynthesizer(options = {}) {
       ctx.resume();
     }
     
-    // Stop any existing hum
+    // Stop any existing hum with fade-out
     if (resonantHumRef.current) {
       try {
-        resonantHumRef.current.stop();
+        const oldSource = resonantHumRef.current;
+        // Fade out over 50ms before stopping
+        const fadeOutGain = ctx.createGain();
+        fadeOutGain.gain.setValueAtTime(gainRef.current.gain.value, ctx.currentTime);
+        fadeOutGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+        setTimeout(() => {
+          try { oldSource.stop(); } catch (e) {}
+        }, 60);
       } catch (e) {}
     }
     
@@ -344,7 +361,14 @@ export function usePhoneticSynthesizer(options = {}) {
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.loop = true; // Continuous hum
-    source.connect(gainRef.current);
+    
+    // P0 FIX: Create envelope for smooth fade-in (200ms for resonant hum)
+    const envelopeGain = ctx.createGain();
+    envelopeGain.gain.setValueAtTime(0, ctx.currentTime);
+    envelopeGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.2); // 200ms bloom
+    
+    source.connect(envelopeGain);
+    envelopeGain.connect(gainRef.current);
     source.start();
     
     resonantHumRef.current = source;
