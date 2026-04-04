@@ -167,7 +167,21 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 273 — Orbital Hub Touch Navigation Fix (April 2026) — LATEST
+### Iteration 274 — Haptic & Sensory Resonance System (April 2026) — LATEST
+- **New Hook**: `useSensoryResonance.js` — Unified haptic + visual + audio feedback
+- **Haptic Patterns**: 
+  - `orbExtract: [10, 30, 10]` — Crisp click for extraction
+  - `orbBloom: [15, 10, 25]` — Bloom expansion feel
+  - `orbNavigate: [30, 15, 50]` — Strong navigation confirmation
+  - `orbTap: [8]`, `orbCollapse: [5, 10, 5]`
+- **Audio Resonance**: Low-frequency sine waves (C2=65Hz to E4=330Hz) with ADSR envelope
+- **Sensory Bloom**: CSS filter transitions (brightness 1.0-1.3, blur 0-4px)
+- **State Sync**: Respects Emergency Shut-Off state, global mute, localStorage `zen_haptics_enabled`
+- **Battery Conservation**: `navigator.getBattery()` check — reduces intensity when <20% and not charging
+- **Orbital Hub Integration**: All interactions (core tap, bloom, extract, collapse, navigate) now trigger synchronized resonance
+- Tests: Mobile navigation with resonance working — extracted Mood orb → navigated to `/mood`
+
+### Iteration 273 — Orbital Hub Touch Navigation Fix (April 2026)
 - **Fixed**: Extracted orbs were inaccessible on mobile after being "pulled down"
 - **Root cause**: `touch-none` CSS blocked touch events; `onPointerDown` consumed touches before `onClick`
 - **Solution**:

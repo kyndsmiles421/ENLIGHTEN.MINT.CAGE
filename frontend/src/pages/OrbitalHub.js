@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { ALL_SATELLITES, ZONE_AUDIO } from '../components/orbital/constants';
 import { CosmicDust } from '../components/orbital/CosmicDust';
 import { useHubAudio } from '../hooks/useHubAudio';
+import { useSensoryResonance } from '../hooks/useSensoryResonance';
 import MissionControl from '../components/MissionControl';
 
 /**
@@ -60,6 +61,7 @@ export default function OrbitalHub() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const audio = useHubAudio();
+  const { orbitalResonance, haptic } = useSensoryResonance();
 
   // ═══ STATE ═══
   const [hubState, setHubState] = useState('latent'); // 'latent' | 'bloom' | 'extracted'
@@ -206,37 +208,41 @@ export default function OrbitalHub() {
   // ═══ CORE INTERACTION: Tap/Hold to Bloom ═══
   const handleCoreClick = useCallback(() => {
     if (hubState === 'latent') {
-      // Trigger Bloom
+      // Trigger Bloom with full sensory feedback
       setHubState('bloom');
-      if (navigator.vibrate) navigator.vibrate([15, 10, 25]);
+      orbitalResonance.bloom(); // Haptic + Audio + Visual bloom
       try { audio.playSatellite('bloom'); } catch {}
     } else if (hubState === 'bloom') {
       // Collapse back to latent
       setHubState('latent');
       setExtractedId(null);
+      orbitalResonance.collapse();
       try { audio.collapseSound(); } catch {}
     } else if (hubState === 'extracted') {
       // Open Mission Control when extracted
+      haptic('orbTap');
       setMissionControlOpen(true);
     }
-  }, [hubState, audio]);
+  }, [hubState, audio, orbitalResonance, haptic]);
 
   // ═══ SUB-ORB CLICK (simple tap to extract in bloom state) ═══
   const handleSubOrbClick = useCallback((e, sat) => {
     e.stopPropagation();
     
     if (hubState === 'bloom') {
-      // Simple tap extracts the orb
+      // Simple tap extracts the orb with extraction resonance
       setHubState('extracted');
       setExtractedId(sat.id);
-      if (navigator.vibrate) navigator.vibrate([30, 15, 50]);
+      orbitalResonance.extract(e.currentTarget); // Full sensory extraction feedback
       try { audio.playSatellite(sat.id); } catch {}
     } else if (hubState === 'extracted' && sat.id === extractedId) {
-      // Tap extracted orb to navigate
+      // Tap extracted orb to navigate with navigation resonance
+      orbitalResonance.navigate(e.currentTarget);
       try { audio.stopSatellite(); } catch {}
-      navigate(sat.path);
+      // Small delay to let resonance play before navigation
+      setTimeout(() => navigate(sat.path), 150);
     }
-  }, [hubState, extractedId, audio, navigate]);
+  }, [hubState, extractedId, audio, navigate, orbitalResonance]);
 
   // ═══ SUB-ORB DRAG START ═══
   const handleSubOrbPointerDown = useCallback((e, satId) => {
@@ -260,8 +266,8 @@ export default function OrbitalHub() {
       y: (clientY - rect.top - center),
     });
     
-    if (navigator.vibrate) navigator.vibrate(10);
-  }, [hubState, center]);
+    haptic('orbTap'); // Subtle haptic for drag initiation
+  }, [hubState, center, haptic]);
 
   // ═══ SUB-ORB DRAG MOVE ═══
   useEffect(() => {
@@ -294,7 +300,7 @@ export default function OrbitalHub() {
         // EXTRACTION: Orb breaks free, all others collapse
         setHubState('extracted');
         setExtractedId(dragTarget);
-        if (navigator.vibrate) navigator.vibrate([30, 15, 50]);
+        orbitalResonance.extract(); // Full sensory extraction feedback
         try { audio.playSatellite(dragTarget); } catch {}
       }
       
@@ -318,18 +324,19 @@ export default function OrbitalHub() {
   const handleExtractedClick = useCallback((sat) => {
     if (hubState !== 'extracted' || sat.id !== extractedId) return;
     
+    orbitalResonance.navigate();
     try { audio.stopSatellite(); } catch {}
-    navigate(sat.path);
-  }, [hubState, extractedId, navigate, audio]);
+    setTimeout(() => navigate(sat.path), 150);
+  }, [hubState, extractedId, navigate, audio, orbitalResonance]);
 
   // ═══ COLLAPSE BACK (X button on extracted orb) ═══
   const handleCollapse = useCallback((e) => {
     e.stopPropagation();
     setHubState('bloom');
     setExtractedId(null);
+    orbitalResonance.collapse();
     try { audio.collapseSound(); } catch {}
-    if (navigator.vibrate) navigator.vibrate([15, 10, 20]);
-  }, [audio]);
+  }, [audio, orbitalResonance]);
 
   // Get current hovered satellite data
   const hoveredData = ALL_SATELLITES.find(s => s.id === hoveredSat);
