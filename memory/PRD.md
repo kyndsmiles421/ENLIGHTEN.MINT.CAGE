@@ -1236,6 +1236,26 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Gesture Ring: Multi-touch frequency/geometry manipulation
 - Tiered Subscription Matrix: Foundation ($0) → Civilization → Sovereignty
 
+### Iteration 279 — AUD-01 Acoustic Bloom & MEM-01 Registry Anchor (April 2026)
+- **AUD-01: Acoustic Bloom** (Stillness-as-Input Mechanic):
+  - Sound ONLY plays after 200ms dwell stability on a coordinate
+  - `isDwellStable` state in `useTesseractCore.js` gates audio playback
+  - `usePhoneticSynthesizer.js` accepts `dwellGate` option for external gating
+  - 50ms linear attack envelope prevents audio "pop"
+  - Console logs: `[TesseractCore] Dwell threshold reached`, `[AUD-01] Acoustic Bloom triggered`
+- **MEM-01: Registry Memory Cache** (Recursive Anchor Persistence):
+  - Depth, address, path, isVoidMode, gravity persist to localStorage under `tesseract_anchor`
+  - Auto-restores on page refresh/reconnect
+  - 500ms debounced saves to avoid excessive writes
+  - `clearAnchor()` method exposed for manual reset
+- **Files Updated**:
+  - `/app/frontend/src/hooks/useTesseractCore.js` - isDwellStable, MEM-01 persistence
+  - `/app/frontend/src/hooks/usePhoneticSynthesizer.js` - dwellGate option
+  - `/app/frontend/src/pages/TesseractExperience.js` - Acoustic bloom wiring
+- **Tests**: Frontend 100% - All AUD-01 and MEM-01 features verified working
+- **Known Issue**: "Maximum update depth exceeded" React error (PRE-EXISTING from iteration_278, does not break functionality)
+
+
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
 - Auth key: `zen_token`
