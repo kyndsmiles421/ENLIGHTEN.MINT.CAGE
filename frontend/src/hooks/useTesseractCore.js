@@ -105,6 +105,7 @@ export function useTesseractCore(options = {}) {
     enableHaptics = true,
     enableSnapPoints = true,
     enableAutoVoid = true,
+    enablePersistence = true,  // MEM-01: Enable localStorage persistence
     onDepthChange = null,
     onModeChange = null,
     onSeedMinted = null,
@@ -120,6 +121,7 @@ export function useTesseractCore(options = {}) {
   const dwellMapRef = useRef(new Map());  // coordinate -> { visits, totalMs, lastVisit }
   const lastActivityRef = useRef(Date.now());
   const animationFrameRef = useRef(null);
+  const persistenceInitRef = useRef(false);  // MEM-01: Track init to avoid double-restore
   
   // ─────────────────────────────────────────────────────────────────────────
   // STATE (Minimal, only what triggers re-renders)
@@ -136,6 +138,94 @@ export function useTesseractCore(options = {}) {
   const [nearSnapPoint, setNearSnapPoint] = useState(null);
   const [seeds, setSeeds] = useState([]);
   const [isDwellStable, setIsDwellStable] = useState(false);  // Acoustic Bloom gate
+  
+  // ─────────────────────────────────────────────────────────────────────────
+  // MEM-01: PERSISTENCE KEY
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  const PERSISTENCE_KEY = 'tesseract_anchor';
+  const isRestoringRef = useRef(false);  // Block save during restore
+  
+  // ─────────────────────────────────────────────────────────────────────────
+  // MEM-01: RESTORE FROM LOCALSTORAGE ON MOUNT
+  // The "Recursive Anchor" - User returns to their exact place in the Void
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  useEffect(() => {
+    if (!enablePersistence || persistenceInitRef.current) return;
+    persistenceInitRef.current = true;
+    isRestoringRef.current = true;  // Block saves during restore
+    
+    try {
+      const saved = localStorage.getItem(PERSISTENCE_KEY);
+      if (saved) {
+        const state = JSON.parse(saved);
+        console.log('[MEM-01] Restoring Tesseract Anchor:', state);
+        
+        // Restore all navigation state
+        if (state.depth !== undefined && state.depth > 0) {
+          setDepth(state.depth);
+          depthRef.current = state.depth;
+        }
+        if (state.address) {
+          setAddress(state.address);
+        }
+        if (state.path && Array.isArray(state.path)) {
+          pathRef.current = state.path;
+        }
+        if (state.isVoidMode) {
+          setIsVoidMode(state.isVoidMode);
+        }
+        if (state.gravity !== undefined && state.gravity !== 0.5) {
+          setGravity(state.gravity);
+          gravityRef.current = state.gravity;
+        }
+        if (state.dwellMap && Array.isArray(state.dwellMap)) {
+          dwellMapRef.current = new Map(state.dwellMap);
+        }
+      }
+    } catch (err) {
+      console.warn('[MEM-01] Failed to restore Tesseract Anchor:', err);
+    }
+    
+    // Unblock saves after a short delay (let initial renders complete)
+    setTimeout(() => {
+      isRestoringRef.current = false;
+      console.log('[MEM-01] Restore complete, saves enabled');
+    }, 100);
+  }, [enablePersistence]);
+  
+  // ─────────────────────────────────────────────────────────────────────────
+  // MEM-01: SAVE TO LOCALSTORAGE ON STATE CHANGE
+  // Catches the user if they refresh or lose connection
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  useEffect(() => {
+    // Skip if persistence disabled, not initialized, or currently restoring
+    if (!enablePersistence || !persistenceInitRef.current || isRestoringRef.current) return;
+    
+    // Debounce saves to avoid excessive writes
+    const timeoutId = setTimeout(() => {
+      const state = {
+        depth,
+        address,
+        path: pathRef.current,
+        isVoidMode,
+        gravity,
+        dwellMap: Array.from(dwellMapRef.current.entries()),
+        savedAt: new Date().toISOString(),
+      };
+      
+      try {
+        localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
+        console.log('[MEM-01] Tesseract Anchor saved at depth:', depth);
+      } catch (err) {
+        console.warn('[MEM-01] Failed to save Tesseract Anchor:', err);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timeoutId);
+  }, [enablePersistence, depth, address, isVoidMode, gravity]);
   
   // ─────────────────────────────────────────────────────────────────────────
   // DERIVED VALUES (Memoized)
@@ -572,6 +662,19 @@ export function useTesseractCore(options = {}) {
   }, [gravity, depth, selectedCell, isVoidMode]);
   
   // ─────────────────────────────────────────────────────────────────────────
+  // MEM-01: CLEAR ANCHOR (Reset persistence)
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  const clearAnchor = useCallback(() => {
+    try {
+      localStorage.removeItem(PERSISTENCE_KEY);
+      console.log('[MEM-01] Tesseract Anchor cleared');
+    } catch (err) {
+      console.warn('[MEM-01] Failed to clear Tesseract Anchor:', err);
+    }
+  }, []);
+  
+  // ─────────────────────────────────────────────────────────────────────────
   // RETURN VALUE
   // ─────────────────────────────────────────────────────────────────────────
   
@@ -632,6 +735,9 @@ export function useTesseractCore(options = {}) {
     
     // Actions - Seeds
     mintSeed,
+    
+    // MEM-01: Persistence
+    clearAnchor,
     
     // Config
     config: TESSERACT_CONFIG,

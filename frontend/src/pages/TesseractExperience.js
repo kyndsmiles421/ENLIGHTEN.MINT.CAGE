@@ -10,16 +10,22 @@
  * - Gravity control (with snap points)
  * - Void/Matter mode toggle
  * 
+ * AUD-01: ACOUSTIC BLOOM INTEGRATION
+ * Sound ONLY plays after 200ms dwell stability ("Stillness-as-Input")
+ * 
  * All powered by the unified useTesseractCore hook.
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Compass, Gem, Target } from 'lucide-react';
 
 // Consolidated hook
 import { useTesseractCore } from '../hooks/useTesseractCore';
+
+// AUD-01: Acoustic Bloom - Phonetic audio engine
+import { usePhoneticSynthesizer } from '../hooks/usePhoneticSynthesizer';
 
 // Components
 import KineticHUD from '../components/KineticHUD';
@@ -296,6 +302,45 @@ export default function TesseractExperience() {
     enableSnapPoints: true,
     enableAutoVoid: true,
   });
+  
+  // AUD-01: Acoustic Bloom - Dwell gate function
+  // Returns true ONLY when user has been still for 200ms
+  const isDwellStableRef = useRef(false);
+  useEffect(() => {
+    isDwellStableRef.current = core.isDwellStable;
+  }, [core.isDwellStable]);
+  
+  const dwellGateFunction = useCallback(() => {
+    return isDwellStableRef.current;
+  }, []);
+  
+  // AUD-01: Phonetic synthesizer with dwell gate wired in
+  // Sound will ONLY play after 200ms stillness on a coordinate
+  const phonetic = usePhoneticSynthesizer({
+    enabled: true,
+    masterVolume: 0.15,
+    dwellGate: dwellGateFunction,
+  });
+  
+  // AUD-01: Effect to trigger audio bloom ONLY when dwell becomes stable
+  const prevDwellStableRef = useRef(false);
+  useEffect(() => {
+    // Trigger audio bloom when transitioning from unstable -> stable
+    if (core.isDwellStable && !prevDwellStableRef.current && core.selectedCell) {
+      // Calculate language and hexagram from cell position
+      const { row, col } = core.selectedCell;
+      const hexNum = (row * 9 + col) % 64;
+      const languages = ['en', 'es', 'ja', 'zh-cmn', 'zh-yue', 'sa', 'hi', 'lkt', 'dak'];
+      const langCode = languages[col % 9];
+      
+      console.log('[AUD-01] Acoustic Bloom triggered - stillness achieved');
+      
+      // Play the phonetic burst + hexagram signature (with bypass since we know it's stable)
+      phonetic.playPhoneticBurst(langCode, { bypassDwellGate: true });
+      phonetic.playHexagramSignature(hexNum, { bypassDwellGate: true });
+    }
+    prevDwellStableRef.current = core.isDwellStable;
+  }, [core.isDwellStable, core.selectedCell, phonetic]);
   
   const handleMintSeed = useCallback(async () => {
     const seed = await core.mintSeed();

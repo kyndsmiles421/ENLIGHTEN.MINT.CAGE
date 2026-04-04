@@ -213,7 +213,13 @@ function createResonantHum(ctx, duration = 2.0) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function usePhoneticSynthesizer(options = {}) {
-  const { enabled = true, masterVolume = 0.15 } = options;
+  const { 
+    enabled = true, 
+    masterVolume = 0.15,
+    // AUD-01: Acoustic Bloom - External dwell gate function
+    // When provided, audio will ONLY play if this function returns true
+    dwellGate = null,
+  } = options;
   
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -287,8 +293,20 @@ export function usePhoneticSynthesizer(options = {}) {
   
   // Play a phonetic burst for a language
   // P0 FIX: Added 50ms Linear Attack Envelope to prevent "pop"
-  const playPhoneticBurst = useCallback((langCode) => {
+  // AUD-01 FIX: Acoustic Bloom - Audio ONLY plays after dwell stability
+  const playPhoneticBurst = useCallback((langCode, options = {}) => {
     if (!isReady || !ctxRef.current || !gainRef.current) return;
+    
+    // AUD-01: Check external dwell gate if provided
+    // The "Stillness-as-Input" mechanic - sound only blooms when user is still
+    const { bypassDwellGate = false } = options;
+    if (!bypassDwellGate && dwellGate && typeof dwellGate === 'function') {
+      const isDwellStable = dwellGate();
+      if (!isDwellStable) {
+        // Deep silence during movement - audio is gated
+        return;
+      }
+    }
     
     const ctx = ctxRef.current;
     
@@ -330,7 +348,7 @@ export function usePhoneticSynthesizer(options = {}) {
         setIsPlaying(false);
       }
     };
-  }, [isReady, generateBuffer]);
+  }, [isReady, generateBuffer, dwellGate]);
   
   // Play the Source State resonant hum (Hexagram 63)
   // P0 FIX: Added fade-in envelope for smooth entry
@@ -412,8 +430,16 @@ export function usePhoneticSynthesizer(options = {}) {
   }, []);
   
   // Play hexagram signature (based on frequency)
-  const playHexagramSignature = useCallback((hexNumber) => {
+  // AUD-01: Also respects dwell gate for acoustic bloom
+  const playHexagramSignature = useCallback((hexNumber, options = {}) => {
     if (!isReady || !ctxRef.current || !gainRef.current) return;
+    
+    // AUD-01: Check dwell gate
+    const { bypassDwellGate = false } = options;
+    if (!bypassDwellGate && dwellGate && typeof dwellGate === 'function') {
+      const isDwellStable = dwellGate();
+      if (!isDwellStable) return;
+    }
     
     const hex = HEXAGRAM_REGISTRY[hexNumber];
     if (!hex) return;
@@ -441,7 +467,7 @@ export function usePhoneticSynthesizer(options = {}) {
     osc.start();
     osc.stop(ctx.currentTime + 0.35);
     
-  }, [isReady]);
+  }, [isReady, dwellGate]);
   
   return {
     isReady,
