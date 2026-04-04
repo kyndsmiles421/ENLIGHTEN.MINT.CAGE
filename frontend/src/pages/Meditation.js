@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star, Image, Headphones } from 'lucide-react';
+import { Play, Pause, RotateCcw, ChevronRight, ArrowLeft, Sparkles, Moon, Sun, Heart, Zap, Wind, Waves, Brain, Eye, Flame, PenTool, Loader2, Trash2, Save, Wand2, Star, Image, Headphones, Volume2, VolumeX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
 import { useSearchParams } from 'react-router-dom';
@@ -216,24 +216,44 @@ function GuidedSession({ meditation, onEnd }) {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [celebrating, setCelebrating] = useState(false);
   const [aiAmbient, setAiAmbient] = useState(null);
+  const [soundOn, setSoundOn] = useState(false); // Sound OFF by default
   const intervalRef = useRef(null);
   const audioCtxRef = useRef(null);
   const nodesRef = useRef([]);
   const { playCelebration } = useSensory();
   const totalDuration = meditation.duration * 60;
 
-  useEffect(() => {
-    if (meditation.sound !== 'silence') {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        audioCtxRef.current = ctx;
-        nodesRef.current = startAmbientSound(ctx, meditation.sound);
-      } catch {}
+  // Manual sound toggle function
+  const toggleSound = useCallback(() => {
+    if (soundOn) {
+      // Stop sound
+      nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
+      nodesRef.current = [];
+      if (audioCtxRef.current) { 
+        try { audioCtxRef.current.close(); } catch {} 
+      }
+      audioCtxRef.current = null;
+      setSoundOn(false);
+    } else {
+      // Start sound
+      if (meditation.sound !== 'silence') {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          audioCtxRef.current = ctx;
+          nodesRef.current = startAmbientSound(ctx, meditation.sound);
+          setSoundOn(true);
+        } catch {}
+      }
     }
-    // Try to generate AI ambient visual
+  }, [soundOn, meditation.sound]);
+
+  useEffect(() => {
+    // AUDIO OFF BY DEFAULT - User must manually start sound
+    // No auto-play on room entry (User-Centric Control policy)
+    
+    // Try to generate AI ambient visual only (no audio)
     const genAmbient = async () => {
       try {
-        const { authHeaders } = JSON.parse(localStorage.getItem('auth_headers') || '{}');
         const token = localStorage.getItem('token');
         if (token) {
           const r = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ai-visuals/meditation`, {
@@ -244,11 +264,13 @@ function GuidedSession({ meditation, onEnd }) {
       } catch {}
     };
     genAmbient();
+    
+    // Cleanup on unmount - kill any audio that might be playing
     return () => {
       nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
       try { audioCtxRef.current?.close(); } catch {}
     };
-  }, [meditation.sound, meditation.name, meditation.category]);
+  }, [meditation.name, meditation.category]);
 
   useEffect(() => {
     if (paused) return;
@@ -408,6 +430,22 @@ function GuidedSession({ meditation, onEnd }) {
 
       {/* Controls */}
       <div className="flex items-center gap-4 mt-6 relative z-10">
+        {/* Sound Toggle - Manual control */}
+        {meditation.sound !== 'silence' && (
+          <button 
+            onClick={toggleSound} 
+            className="p-3 rounded-full transition-all" 
+            style={{ 
+              background: soundOn ? 'rgba(45,212,191,0.15)' : 'rgba(255,255,255,0.06)', 
+              color: soundOn ? '#2DD4BF' : '#fff',
+              border: soundOn ? '1px solid rgba(45,212,191,0.3)' : '1px solid transparent',
+            }} 
+            data-testid="guided-sound-toggle"
+            title={soundOn ? 'Sound On (tap to mute)' : 'Sound Off (tap to play)'}
+          >
+            {soundOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          </button>
+        )}
         <button onClick={() => setPaused(!paused)} className="p-3 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: '#fff' }} data-testid="guided-pause">
           {paused ? <Play size={20} /> : <Pause size={20} />}
         </button>

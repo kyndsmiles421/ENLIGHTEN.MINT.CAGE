@@ -53,6 +53,7 @@ import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettings
 import VellumOverlay from './components/VellumOverlay';
 import { Scene as NebulaScene } from './components/nebula';
 import { NebulaViewToggle } from './components/nebula';
+import UtilityDock from './components/UtilityDock';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -214,10 +215,18 @@ function PageLoader() {
   );
 }
 
+import { useRouteAudioCleanup } from './hooks/useRouteAudioCleanup';
+
 // CafeApp — Main app wrapper with Enlightenment Cafe settings
 function CafeApp() {
   const [cafeSettingsOpen, setCafeSettingsOpen] = React.useState(false);
   const [activeIsland, setActiveIsland] = React.useState(null);
+  const [assistantOpen, setAssistantOpen] = React.useState(false);
+  const [mixerOpen, setMixerOpen] = React.useState(false);
+  const [commandOpen, setCommandOpen] = React.useState(false);
+  
+  // Route-based audio cleanup — kills audio when exiting rooms
+  useRouteAudioCleanup();
   
   const handleIslandClick = React.useCallback((islandId) => {
     setActiveIsland(islandId);
@@ -251,9 +260,9 @@ function CafeApp() {
         <LatencyHUD />
         <SmartDock />
         <LearningToggle />
-        <CosmicMixer />
+        <CosmicMixer isOpen={mixerOpen} onToggle={() => setMixerOpen(!mixerOpen)} />
         <CosmicToolbar />
-        <CosmicAssistant />
+        <CosmicAssistant isOpen={assistantOpen} onToggle={() => setAssistantOpen(!assistantOpen)} hideTrigger />
         <PersistentWaveform />
         <OrbCorner />
         <TrialGraduation />
@@ -261,12 +270,20 @@ function CafeApp() {
         <CreditNudge />
         <MissionControlRing />
         <OrbitalNavigation />
-        <CommandMode context="general" />
+        <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
         <EmergencyShutOff />
         <GlowPortal />
         <UniversalCommand />
         <PulseEchoVisualizer />
         <CafeSettingsToggle onClick={() => setCafeSettingsOpen(true)} />
+        {/* Unified Utility Dock — replaces cluttered bottom-right widgets */}
+        <UtilityDock
+          onOpenAssistant={() => setAssistantOpen(true)}
+          onOpenMixer={() => setMixerOpen(true)}
+          onOpenCommand={() => setCommandOpen(true)}
+          assistantOpen={assistantOpen}
+          mixerOpen={mixerOpen}
+        />
         {/* Quick Nebula Toggle in bottom-left (compact) */}
         <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
           <NebulaViewToggle compact />

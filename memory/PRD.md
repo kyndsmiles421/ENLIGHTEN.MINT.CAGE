@@ -787,7 +787,34 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Files**: `Scene.js`, `Islands.js`, `NebulaViewToggle.js`, `index.js` (nebula folder)
 - Tests: Screenshot verification — Settings panel displays correctly without runtime errors
 
-## Upcoming (P0-P1) — Iteration 286+
+### Iteration 286 — Audio Kill-Switch & UI Declutter (April 2026)
+**THE ENLIGHTENMENT CAFE — No-Nonsense Reprint**
+- **Audio Stop-Gap (Critical Fix)**:
+  - Problem: Biometric frequencies auto-started on room entry
+  - Fix: All sounds now OFF by default — user must manually toggle
+  - Hard Kill-Switch: STOP button executes complete audio termination
+    - Clears all AudioContext buffers
+    - Nulls audio object references
+    - Closes all WebAudio contexts
+    - Stops all HTML5 audio/video elements
+  - Route-based cleanup: Exiting a room automatically kills all audio streams
+  - Files: `EmergencyShutOff.js`, `useRouteAudioCleanup.js` (new), `Meditation.js`
+- **UI Declutter (Bottom-Right Widget Fix)**:
+  - Problem: Chat, Mixer, and Quick Actions buttons overlapping on mobile
+  - Fix: Unified `UtilityDock.js` — collapsible vertical toolbar
+    - Contains: AI Assistant, Sound Mixer, Quick Actions
+    - Position: Right side, 160px from bottom (above SmartDock)
+    - Draggable to reposition
+    - Collapses to compact dot pattern button
+  - Hidden individual floating buttons from CosmicAssistant and CosmicMixer
+  - Files: `UtilityDock.js` (new), `App.js`, `CosmicAssistant.js`, `CosmicMixer.js`
+- **Meditation Page Audio Fix**:
+  - Sound toggle button added (manual control only)
+  - No auto-play on guided session start
+  - Visual feedback: green border when sound is ON
+- Tests: Screenshot verification — Clean mobile UI with separated widgets
+
+## Upcoming (P0-P1) — Iteration 287+
 - **Nebula View Fix**: Resolve R3F v9 / Three.js 0.183 incompatibility
   - Options: Downgrade libraries, switch to vanilla Three.js, or await library updates
 - **Gold Thread Mesh**: THREE.LineBasicMaterial connecting crystal islands

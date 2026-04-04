@@ -204,12 +204,19 @@ const INSTRUMENT_DRONES = [
   { id: 'bagpipe-drone', label: 'Bagpipe', color: '#4338CA', wave: 'sawtooth', freq: 146.83, filterFreq: 500, filterQ: 3, vibratoRate: 1, vibratoDepth: 2 },
 ];
 
-export default function CosmicMixer() {
+export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
   const { user } = useAuth();
   const location = useLocation();
   const { bpm, setBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains, TEMPO_PRESETS } = useTempo();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  // Handle external open state from UtilityDock
+  useEffect(() => {
+    if (externalOpen !== undefined) {
+      setOpen(externalOpen);
+    }
+  }, [externalOpen]);
 
   // Broadcast mixer state for Dynamic Docking
   useEffect(() => {
@@ -981,8 +988,8 @@ export default function CosmicMixer() {
         return null;
       })}
 
-      {/* Floating Mixer Button */}
-      {!open && (
+      {/* Floating Mixer Button — hidden when UtilityDock controls it */}
+      {!open && !externalOpen && (
         <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }}
           onClick={() => setOpen(true)}
           className="fixed bottom-20 right-4 z-[9996] w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
@@ -991,6 +998,7 @@ export default function CosmicMixer() {
             border: `1px solid ${hasActive ? 'rgba(192,132,252,0.3)' : 'rgba(255,255,255,0.06)'}`,
             backdropFilter: 'blur(16px)',
             boxShadow: hasActive ? '0 0 20px rgba(192,132,252,0.15)' : '0 4px 20px rgba(0,0,0,0.3)',
+            display: 'none', // Hidden by default - UtilityDock handles this
           }}
           data-testid="mixer-toggle">
           <Sliders size={18} style={{ color: hasActive ? '#C084FC' : 'var(--text-muted)' }} />

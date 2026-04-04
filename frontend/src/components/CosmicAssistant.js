@@ -82,7 +82,7 @@ function MessageBubble({ msg }) {
   );
 }
 
-export default function CosmicAssistant({ externalOpen, onExternalClose }) {
+export default function CosmicAssistant({ externalOpen, onExternalClose, isOpen, onToggle, hideTrigger }) {
   const { authHeaders, user } = useAuth();
   const location = useLocation();
   const mixerOpen = useMixerState();
@@ -96,20 +96,23 @@ export default function CosmicAssistant({ externalOpen, onExternalClose }) {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Handle external open/close
+  // Handle external open/close via props
   useEffect(() => {
-    if (externalOpen !== undefined) {
+    if (isOpen !== undefined) {
+      setOpen(isOpen);
+    } else if (externalOpen !== undefined) {
       setOpen(externalOpen);
     }
-  }, [externalOpen]);
+  }, [isOpen, externalOpen]);
 
   const handleClose = useCallback(() => {
     setOpen(false);
+    onToggle?.();
     onExternalClose?.();
-  }, [onExternalClose]);
+  }, [onToggle, onExternalClose]);
 
-  // Hide standalone button on dashboard (MissionControlRing handles it there)
-  const hideTriggerButton = location.pathname === '/dashboard';
+  // Hide standalone button if hideTrigger prop is true or on dashboard (MissionControlRing handles it there)
+  const hideTriggerButton = hideTrigger || location.pathname === '/dashboard';
 
   // Get current page context
   const currentPath = location.pathname;

@@ -16,6 +16,8 @@ export default function EmergencyShutOff() {
   const { stopAll: stopMixer, isPlaying } = useMixer();
 
   const handleEmergencyStop = useCallback(() => {
+    console.log('[EmergencyShutOff] HARD KILL INITIATED');
+    
     // 1. Kill all sensory audio (SensoryContext)
     try {
       sovereignKillAll();
@@ -48,61 +50,68 @@ export default function EmergencyShutOff() {
       console.warn('Ambient soundscape stop failed:', e);
     }
 
-    // 5. Stop any Web Audio API contexts globally - AGGRESSIVE APPROACH
+    // 5. HARD KILL: Close ALL AudioContexts (not just suspend)
     try {
-      // First, check the registered contexts and CLOSE them (not just suspend)
       const contexts = window.__cosmicAudioContexts || [];
-      console.log(`[EmergencyShutOff] Found ${contexts.length} registered AudioContexts`);
+      console.log(`[EmergencyShutOff] Closing ${contexts.length} registered AudioContexts`);
       
       contexts.forEach((ctx, i) => {
         if (ctx && ctx.state !== 'closed') {
           try { 
-            // First suspend to stop playback
-            ctx.suspend();
-            // Then close to release resources
-            ctx.close();
-            console.log(`[EmergencyShutOff] Closed AudioContext ${i}`);
+            // Disconnect all nodes first
+            if (ctx.destination) {
+              ctx.destination.disconnect?.();
+            }
+            // Force close the context
+            ctx.close().then(() => {
+              console.log(`[EmergencyShutOff] Closed context ${i}`);
+            }).catch(() => {});
           } catch (e) {
             console.warn(`[EmergencyShutOff] Failed to close context ${i}:`, e);
           }
         }
       });
       
-      // Clear the array
+      // Clear and null the array
       window.__cosmicAudioContexts = [];
     } catch (e) {
-      console.warn('Global audio context suspend failed:', e);
+      console.warn('Global audio context close failed:', e);
     }
 
-    // 6. NUCLEAR OPTION: Find and stop all oscillators by searching the DOM
+    // 6. NUCLEAR: Kill any orphaned AudioContexts via React refs
     try {
-      // Close and clear any stored context references
-      ['audioCtxRef', 'ctxRef', 'audioRef'].forEach(refName => {
+      ['audioCtxRef', 'ctxRef', 'audioRef', 'oscillatorRef', 'gainRef', 'nodeRef'].forEach(refName => {
         if (window[refName]?.current) {
+          const ref = window[refName].current;
           try { 
-            window[refName].current.suspend(); 
-            window[refName].current.close();
+            if (ref.stop) ref.stop();
+            if (ref.disconnect) ref.disconnect();
+            if (ref.close) ref.close();
           } catch {}
+          window[refName].current = null; // NULL the reference
         }
       });
     } catch (e) {
       console.warn('Reference cleanup failed:', e);
     }
 
-    // Set emergency flag so contexts don't auto-restart
+    // 7. Set emergency flag to prevent auto-restart
     localStorage.setItem('zen_emergency_active', 'true');
+    localStorage.setItem('zen_audio_muted', 'true');
 
-    // 6. Stop all HTML5 audio/video elements
+    // 8. Stop ALL HTML5 audio/video elements and clear sources
     try {
       document.querySelectorAll('audio, video').forEach(el => {
         el.pause();
         el.currentTime = 0;
+        el.src = ''; // Clear the source
+        el.load(); // Reset the element
       });
     } catch (e) {
       console.warn('HTML5 media stop failed:', e);
     }
 
-    // 7. Cancel any running animations
+    // 9. Cancel any running CSS animations
     try {
       const animations = document.getAnimations?.() || [];
       animations.forEach(anim => anim.cancel());
@@ -110,12 +119,12 @@ export default function EmergencyShutOff() {
       // getAnimations not supported in all browsers
     }
 
-    // Haptic feedback
+    // 10. Haptic feedback to confirm kill
     if (navigator.vibrate) {
-      navigator.vibrate([50, 30, 50]);
+      navigator.vibrate([100, 50, 100]); // Double pulse = confirmed
     }
 
-    console.log('[EmergencyShutOff] All audio/visual stopped');
+    console.log('[EmergencyShutOff] HARD KILL COMPLETE - All audio/visual terminated');
   }, [sovereignKillAll, stopMixer, isMuted, sovereignMuteToggle]);
 
   // Expose globally for debugging/console access
