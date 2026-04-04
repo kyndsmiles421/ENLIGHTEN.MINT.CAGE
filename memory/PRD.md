@@ -11,6 +11,57 @@ Build "The Cosmic Collective", a full-stack wellness platform with orbital navig
 
 ---
 
+## Unified Spatial Engine Architecture (April 2026)
+
+### useTesseractCore — The ONE Hook
+**"Zero-Latency Spatial OS"**
+
+Consolidated hook merging:
+- `useSentientRegistryV2` (Behavioral Memory)
+- `useRDive36` (36-bit Navigation)
+- `useInverseLattice` (Void/Matter Duality)
+
+**Key Features:**
+| Feature | Implementation |
+|---------|----------------|
+| Snap-Point Gravity | Auto-snaps within 5% of Sacred Hexagrams |
+| Warp-Drive Navigation | Paste 36-bit address to instant-implode |
+| HUD Fade-Away | 9s stillness → 10% opacity |
+| Unified Haptics | Single pattern registry for all feedback |
+
+**Sacred Gravity Snap Points:**
+| Gravity | Hexagram | Name |
+|---------|----------|------|
+| 0.000 | 2 | Kūn (Receptive) |
+| 0.333 | 11 | Tài (Peace) |
+| 0.500 | 63 | Jì Jì (SOURCE STATE) |
+| 0.667 | 64 | Wèi Jì (Potential) |
+| 1.000 | 1 | Qián (Creative) |
+
+### KineticHUD — The Command Mantle
+**"The Cockpit of the Spatial OS"**
+
+| Widget | Position | Purpose |
+|--------|----------|---------|
+| RegistryStatus | Top-Right | VOID/MATTER/EQUILIBRIUM mode |
+| GravityIndicator | Top-Left | Gravity bar + snap point indicator |
+| DustWallet | Bottom-Right | Seed count + state count + depth dots |
+| StabilityIndicator | Bottom-Left | WILD→CRYSTALLIZED + cell coords |
+| HexagramRing | Center | Gravity arc + depth indicator |
+| VoidToggle | Below Registry | Enter/Exit Void button |
+
+### TesseractExperience — The Unified Page
+**Route:** `/tesseract`
+
+Integrates:
+- 9×9 Lattice Grid (cell click/double-click)
+- Gravity Slider (VOID ← SOURCE → MATTER)
+- KineticHUD overlay
+- SeedHuntWidget sidebar
+- Action buttons (Surface, VOID ESCAPE, Mint Seed)
+
+---
+
 ## Latest Implementation: Square Inverse Protocol (April 2026)
 
 ### The Symmetrical Universe Architecture
