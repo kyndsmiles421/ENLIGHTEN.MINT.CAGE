@@ -26,8 +26,11 @@ export default function NebulaViewToggle({ className = '', compact = false }) {
   
   const [showTooltip, setShowTooltip] = useState(false);
   
+  // TEMPORARY: Nebula view is disabled due to R3F compatibility issues
+  const nebulaTemporarilyDisabled = true;
+  
   const isNebula = viewTier === 'nebula';
-  const canAscend = isNebulaAvailable && !batterySaverActive;
+  const canAscend = isNebulaAvailable && !batterySaverActive && !nebulaTemporarilyDisabled;
   
   const handleToggle = () => {
     if (isNebula) {

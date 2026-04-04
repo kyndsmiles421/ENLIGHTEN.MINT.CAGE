@@ -11,20 +11,69 @@
  * This preserves battery life and ensures graceful degradation.
  */
 
-import React, { Suspense, useRef, useEffect, useState } from 'react';
+import React, { Suspense, useRef, useEffect, useState, Component } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { 
   OrbitControls, 
-  Environment, 
   Stars, 
   Float,
-  MeshDistortMaterial,
-  GradientTexture,
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { useRenderTier } from '../../hooks/useRenderTier';
 import { useEnlightenmentCafe } from '../../context/EnlightenmentCafeContext';
 import Islands from './Islands';
+
+// ─── Error Boundary for WebGL Crashes ───
+class WebGLErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[NebulaScene] WebGL Error:', error, errorInfo);
+    // Optionally report to analytics
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(10, 10, 18, 0.9)',
+            color: '#c9a962',
+            fontFamily: "'Cormorant Garamond', serif",
+            textAlign: 'center',
+            padding: '2rem',
+            zIndex: 0,
+          }}
+        >
+          <div>
+            <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+              Unable to render 3D view
+            </p>
+            <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+              Your device may not support WebGL. Returning to Parchment mode.
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // ─── Volumetric Fog Effect (Premium Tier Only) ───
 function VolumetricFog({ features }) {
@@ -111,14 +160,12 @@ function CentralNexus() {
     <Float speed={1} rotationIntensity={0.2} floatIntensity={0.3}>
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <icosahedronGeometry args={[0.3, 2]} />
-        <MeshDistortMaterial
+        <meshStandardMaterial
           color="#c9a962"
           emissive="#c9a962"
           emissiveIntensity={0.3}
           roughness={0.2}
           metalness={0.8}
-          distort={0.2}
-          speed={2}
         />
       </mesh>
     </Float>
@@ -224,99 +271,49 @@ function LoadingFallback() {
 }
 
 // ─── Main Scene Component ───
+// NOTE: Disabled due to R3F v9 / Three.js 0.183 compatibility issues
+// Error: "Cannot set x-line-number" in applyProps
+// This will be re-enabled after library updates
 export function NebulaScene({ onIslandClick, activeIsland }) {
-  const { viewTier } = useEnlightenmentCafe();
-  const { features, webglEnabled, isLoading } = useRenderTier(viewTier);
-  const canvasRef = useRef();
-  
-  // Don't render if WebGL is disabled or still loading
-  if (isLoading || !webglEnabled) {
-    return null;
-  }
-  
-  return (
-    <div 
-      className="nebula-scene-container"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 0,
-        pointerEvents: 'auto',
-      }}
-      data-testid="nebula-scene"
-    >
-      <Canvas
-        ref={canvasRef}
-        dpr={[1, features?.textureQuality === 'high' ? 2 : 1.5]}
-        gl={{
-          antialias: features?.textureQuality !== 'low',
-          alpha: false,
-          powerPreference: 'high-performance',
-          stencil: false,
-          depth: true,
-        }}
-        camera={{
-          fov: 50,
-          near: 0.1,
-          far: 200,
-        }}
-        shadows={features?.shadowMaps}
-        style={{ background: '#0a0a12' }}
-      >
-        <Suspense fallback={<LoadingFallback />}>
-          {/* Environment */}
-          <NebulaBackground features={features} />
-          <VolumetricFog features={features} />
-          
-          {/* Lighting */}
-          <SceneLighting features={features} />
-          
-          {/* Central hub */}
-          <CentralNexus />
-          
-          {/* Pentagon Islands */}
-          <Islands 
-            onIslandClick={onIslandClick} 
-            activeIsland={activeIsland}
-            features={features}
-          />
-          
-          {/* Ambient particles */}
-          <AmbientParticles 
-            count={features?.maxParticles || 100} 
-            features={features} 
-          />
-          
-          {/* Camera controls */}
-          <CameraController />
-        </Suspense>
-      </Canvas>
-    </div>
-  );
+  // Return null for now - Nebula view will show "coming soon" state
+  return null;
 }
 
 // ─── Wrapper with Unmount Logic ───
 export default function Scene({ onIslandClick, activeIsland }) {
-  const { viewTier } = useEnlightenmentCafe();
+  const { viewTier, setViewTier } = useEnlightenmentCafe();
   const { webglEnabled, isLoading, batterySaverActive } = useRenderTier(viewTier);
   const [mounted, setMounted] = useState(false);
+  const [renderError, setRenderError] = useState(false);
   
   useEffect(() => {
-    // Only mount if conditions are right
-    if (!isLoading && webglEnabled && viewTier === 'nebula' && !batterySaverActive) {
+    // Only mount if conditions are right and no previous error
+    if (!isLoading && webglEnabled && viewTier === 'nebula' && !batterySaverActive && !renderError) {
       setMounted(true);
     } else {
       setMounted(false);
     }
-  }, [isLoading, webglEnabled, viewTier, batterySaverActive]);
+  }, [isLoading, webglEnabled, viewTier, batterySaverActive, renderError]);
+  
+  // Handle WebGL initialization errors
+  const handleWebGLError = () => {
+    console.warn('[Scene] WebGL error detected, falling back to Parchment');
+    setRenderError(true);
+    setMounted(false);
+    // Automatically fall back to Parchment
+    if (setViewTier) {
+      setViewTier('parchment');
+    }
+  };
   
   // Clean unmount when switching to Parchment
   if (!mounted) {
     return null;
   }
   
-  return <NebulaScene onIslandClick={onIslandClick} activeIsland={activeIsland} />;
+  return (
+    <WebGLErrorBoundary>
+      <NebulaScene onIslandClick={onIslandClick} activeIsland={activeIsland} />
+    </WebGLErrorBoundary>
+  );
 }

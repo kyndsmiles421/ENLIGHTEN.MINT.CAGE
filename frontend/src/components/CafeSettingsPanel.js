@@ -134,20 +134,20 @@ export default function CafeSettingsPanel({ isOpen, onClose }) {
                   </span>
                 </button>
                 <button
-                  onClick={() => toggleViewTier()}
-                  className={`p-3 rounded-xl text-left transition-all ${viewTier === 'nebula' ? 'ring-2' : ''}`}
+                  disabled={true}
+                  className={`p-3 rounded-xl text-left transition-all opacity-60 cursor-not-allowed relative`}
                   style={{
-                    background: viewTier === 'nebula' 
-                      ? 'rgba(129, 140, 248, 0.15)' 
-                      : (colorMode === 'light' ? '#F5F2ED' : '#2A2A2E'),
-                    border: `1px solid ${viewTier === 'nebula' ? 'rgba(129, 140, 248, 0.4)' : 'transparent'}`,
-                    ringColor: '#818CF8',
+                    background: colorMode === 'light' ? '#F5F2ED' : '#2A2A2E',
+                    border: '1px solid transparent',
                   }}
                   data-testid="tier-nebula"
                 >
-                  <Sparkles size={16} style={{ color: viewTier === 'nebula' ? '#818CF8' : palette.inkMuted }} />
+                  <div className="absolute top-1 right-1 text-[8px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400">
+                    Soon
+                  </div>
+                  <Sparkles size={16} style={{ color: palette.inkMuted }} />
                   <span className="text-xs font-medium block mt-1.5" 
-                    style={{ color: viewTier === 'nebula' ? '#818CF8' : palette.ink }}>
+                    style={{ color: palette.ink }}>
                     Nebula
                   </span>
                   <span className="text-[9px] block" style={{ color: palette.inkMuted }}>

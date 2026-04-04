@@ -12,9 +12,9 @@
  * arranged in a perfect pentagon formation around the central nexus.
  */
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Float, Html, MeshTransmissionMaterial, Line } from '@react-three/drei';
+import { Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
 
@@ -155,30 +155,16 @@ function CrystalIsland({
           {/* Faceted crystal geometry */}
           <icosahedronGeometry args={[0.6, detail]} />
           
-          {features?.complexShaders ? (
-            <MeshTransmissionMaterial
-              color={config.color}
-              transmission={0.6}
-              thickness={0.5}
-              roughness={0.1}
-              metalness={0.2}
-              chromaticAberration={0.02}
-              anisotropicBlur={0.1}
-              distortion={0.1}
-              distortionScale={0.2}
-              temporalDistortion={0.1}
-            />
-          ) : (
-            <meshStandardMaterial
-              color={config.color}
-              emissive={config.emissive}
-              emissiveIntensity={isActive ? 0.5 : 0.2}
-              roughness={0.2}
-              metalness={0.6}
-              transparent
-              opacity={0.9}
-            />
-          )}
+          {/* Using standard material for compatibility */}
+          <meshStandardMaterial
+            color={config.color}
+            emissive={config.emissive}
+            emissiveIntensity={isActive ? 0.5 : 0.2}
+            roughness={0.2}
+            metalness={0.6}
+            transparent
+            opacity={0.9}
+          />
         </mesh>
         
         {/* Outer glow ring (active state) */}
@@ -205,97 +191,84 @@ function CrystalIsland({
             opacity={0.3}
           />
         </mesh>
-        
-        {/* Label (HTML overlay) */}
-        <Html
-          position={[0, -0.9, 0]}
-          center
-          distanceFactor={8}
-          style={{
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
-        >
-          <div
-            style={{
-              background: 'rgba(10, 10, 18, 0.8)',
-              backdropFilter: 'blur(8px)',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              border: `1px solid ${config.color}40`,
-              color: config.color,
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '12px',
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-              textAlign: 'center',
-              boxShadow: `0 0 20px ${config.color}20`,
-            }}
-          >
-            {config.label}
-            <div style={{ 
-              fontSize: '9px', 
-              opacity: 0.7, 
-              fontWeight: 400,
-              marginTop: '2px',
-              letterSpacing: '0.3px',
-            }}>
-              {config.description}
-            </div>
-          </div>
-        </Html>
       </group>
     </Float>
   );
 }
 
 // ─── Gold Thread Connections ───
+// Using native three.js Line2 to avoid @react-three/drei Line JSX namespace conflicts
 function GoldThreadMesh({ features }) {
-  // Generate line points for connections
+  const groupRef = useRef();
+  
+  // Create lines imperatively to avoid JSX namespace issues
   const lines = useMemo(() => {
+    if (!features?.webgl) return [];
+    
     const result = [];
-    const center = [0, 0, 0];
+    const center = new THREE.Vector3(0, 0, 0);
     
     // Connect each island to center
-    ISLAND_CONFIG.forEach((island) => {
+    ISLAND_CONFIG.forEach((island, idx) => {
       const pos = getPentagonPosition(island.position);
-      result.push({
-        points: [center, pos],
-        key: `center-${island.id}`,
+      const posVec = new THREE.Vector3(...pos);
+      
+      const geometry = new THREE.BufferGeometry().setFromPoints([center, posVec]);
+      const material = new THREE.LineBasicMaterial({
+        color: '#c9a962',
+        transparent: true,
+        opacity: 0.2,
       });
+      const line = new THREE.Line(geometry, material);
+      result.push({ line, key: `center-${idx}` });
     });
     
     // Connect adjacent islands (pentagon edges)
     for (let i = 0; i < 5; i++) {
       const pos1 = getPentagonPosition(i);
       const pos2 = getPentagonPosition((i + 1) % 5);
-      result.push({
-        points: [pos1, pos2],
-        key: `edge-${i}`,
+      const p1 = new THREE.Vector3(...pos1);
+      const p2 = new THREE.Vector3(...pos2);
+      
+      const geometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+      const material = new THREE.LineBasicMaterial({
+        color: '#c9a962',
+        transparent: true,
+        opacity: 0.2,
       });
+      const line = new THREE.Line(geometry, material);
+      result.push({ line, key: `edge-${i}` });
     }
     
     return result;
-  }, []);
+  }, [features?.webgl]);
+  
+  // Add lines to group imperatively
+  useEffect(() => {
+    if (!groupRef.current) return;
+    
+    // Clear existing children
+    while (groupRef.current.children.length > 0) {
+      groupRef.current.remove(groupRef.current.children[0]);
+    }
+    
+    // Add new lines
+    lines.forEach(({ line }) => {
+      groupRef.current.add(line);
+    });
+    
+    return () => {
+      // Cleanup geometries and materials
+      lines.forEach(({ line }) => {
+        line.geometry.dispose();
+        line.material.dispose();
+      });
+    };
+  }, [lines]);
   
   if (!features?.webgl) return null;
   
-  return (
-    <group>
-      {lines.map(({ points, key }) => (
-        <Line
-          key={key}
-          points={points}
-          color="#c9a962"
-          lineWidth={1}
-          transparent
-          opacity={0.2}
-        />
-      ))}
-    </group>
-  );
+  return <group ref={groupRef} />;
 }
 
 // ─── Main Islands Component ───

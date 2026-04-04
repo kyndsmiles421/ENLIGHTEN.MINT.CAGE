@@ -765,11 +765,34 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Files**: `useCelestialEvents.js` (new), `TodaysRitualWidget.js` (new), updated `Dashboard.js`
 - Tests: Screenshot — Widget shows Full Moon in Aries, 87% illuminated, ritual suggestion
 
-## Upcoming (P0-P1) — Iteration 285+
-- **Tiered Render Delegate**: Essential (SVG/Canvas "Paper & Ink") vs Premium (Three.js "Aetheric" view with volumetric fog)
-- **Ghost Nodes**: Temporary celestial event nodes (Full Moon, Mercury Retrograde, Eclipses)
+### Iteration 285 — Nebula View Architecture (Sprint 2) (April 2026)
+- **Tiered Render Delegate**: Hardware capability checking for Parchment vs Nebula
+  - `renderDelegate.js`: Device tier detection (Essential/Standard/Premium)
+  - `useRenderTier.js`: Hook integrating device capability with user preference
+  - Battery saver detection and WebGL availability checking
+- **Nebula View Components** (Architecture Complete, Rendering Blocked):
+  - `Scene.js`: Three.js Canvas wrapper with error boundary
+  - `Islands.js`: Pentagon formation with 5 crystal wellness modules
+    - Oracle (top/north), Journal (upper-right), Breathing (lower-right)
+    - Harmonics (lower-left), Dashboard (upper-left)
+  - Gold thread connections using native THREE.Line
+  - `NebulaViewToggle.js`: "Ascend to Nebula" compact toggle
+- **Known Issue**: R3F v9 + Three.js 0.183.2 incompatibility
+  - Error: `R3F: Cannot set "x-line-number"` in applyProps
+  - Nebula view marked as "Coming Soon" in UI
+  - Parchment (Essential) view fully functional
+- **UI Updates**:
+  - CafeSettingsPanel: Nebula option shows "Soon" badge, disabled
+  - NebulaViewToggle: Compact toggle shows Parchment only
+- **Files**: `Scene.js`, `Islands.js`, `NebulaViewToggle.js`, `index.js` (nebula folder)
+- Tests: Screenshot verification — Settings panel displays correctly without runtime errors
+
+## Upcoming (P0-P1) — Iteration 286+
+- **Nebula View Fix**: Resolve R3F v9 / Three.js 0.183 incompatibility
+  - Options: Downgrade libraries, switch to vanilla Three.js, or await library updates
+- **Gold Thread Mesh**: THREE.LineBasicMaterial connecting crystal islands
+- **Constellation Map Toggle**: Button to open the visual mesh
 - **Advisor Node**: Hidden node monitoring mesh health, pulses if Sanctuary modules unused for 3+ days
-- **Constellation Map Toggle**: Button in Navigation to open the visual mesh
 - **Step 9: Multi-Widget Concurrent Dialogue** — Two Sovereign windows open simultaneously
 - **Dust "Clink" Spatial Audio** — "Star particles settling" sound on Dust transfers
 - **"Usage Yield" Report UI** — Monthly savings map from Caspian
