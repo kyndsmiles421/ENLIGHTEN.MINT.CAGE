@@ -58,6 +58,15 @@ const initialTheme = {
   surface: 'glass',
   glowIntensity: 0.35,
   radianceEnabled: true,
+  powerSaveMode: false, // Battery-aware dimming
+};
+
+// ═══ POWER SAVE MULTIPLIERS ═══
+const POWER_SAVE_CONFIG = {
+  glowMultiplier: 0.3,      // Reduce glow to 30% in power save
+  blurMultiplier: 0.5,      // Reduce backdrop blur
+  animationScale: 0.5,      // Slow down animations
+  batteryThreshold: 0.2,    // Trigger at 20% battery
 };
 
 // ═══ CONTEXT ═══
@@ -85,10 +94,55 @@ export function CosmicThemeProvider({ children }) {
     return initialTheme;
   });
 
+  const [batteryLevel, setBatteryLevel] = useState(1);
+  const [isCharging, setIsCharging] = useState(true);
+
+  // ═══ BATTERY MONITORING ═══
+  useEffect(() => {
+    if (!('getBattery' in navigator)) return;
+
+    let battery = null;
+
+    const updateBattery = () => {
+      if (!battery) return;
+      setBatteryLevel(battery.level);
+      setIsCharging(battery.charging);
+
+      // Auto-enable power save when battery < 20% and not charging
+      const shouldPowerSave = battery.level < POWER_SAVE_CONFIG.batteryThreshold && !battery.charging;
+      setTheme(prev => {
+        if (prev.powerSaveMode !== shouldPowerSave) {
+          console.log(`[CosmicTheme] Power save ${shouldPowerSave ? 'ENABLED' : 'DISABLED'} (battery: ${Math.round(battery.level * 100)}%)`);
+          return { ...prev, powerSaveMode: shouldPowerSave };
+        }
+        return prev;
+      });
+    };
+
+    navigator.getBattery().then(b => {
+      battery = b;
+      updateBattery();
+      battery.addEventListener('levelchange', updateBattery);
+      battery.addEventListener('chargingchange', updateBattery);
+    }).catch(() => {});
+
+    return () => {
+      if (battery) {
+        battery.removeEventListener('levelchange', updateBattery);
+        battery.removeEventListener('chargingchange', updateBattery);
+      }
+    };
+  }, []);
+
   // ═══ UPDATE CSS VARIABLES ═══
   useEffect(() => {
     const root = document.documentElement;
-    const { palette, surface, glowIntensity, radianceEnabled } = theme;
+    const { palette, surface, glowIntensity, radianceEnabled, powerSaveMode } = theme;
+
+    // Calculate effective glow (dimmed in power save)
+    const effectiveGlow = powerSaveMode 
+      ? glowIntensity * POWER_SAVE_CONFIG.glowMultiplier 
+      : glowIntensity;
 
     // Primary colors
     root.style.setProperty('--resonance-primary', palette.primary);
@@ -98,23 +152,35 @@ export function CosmicThemeProvider({ children }) {
     root.style.setProperty('--resonance-secondary', palette.secondary);
     root.style.setProperty('--resonance-secondary-rgb', hexToRgb(palette.secondary));
     
-    // Glow intensity
-    root.style.setProperty('--resonance-glow-intensity', String(radianceEnabled ? glowIntensity : 0));
-    root.style.setProperty('--resonance-glow', radianceEnabled ? palette.glow : 0);
+    // Glow intensity (power-save aware)
+    root.style.setProperty('--resonance-glow-intensity', String(radianceEnabled ? effectiveGlow : 0));
+    root.style.setProperty('--resonance-glow', radianceEnabled ? effectiveGlow : 0);
     
     // Surface
     root.style.setProperty('--resonance-surface', SURFACE_PRESETS[surface] || SURFACE_PRESETS.glass);
     
-    // Computed styles
+    // Power save indicator
+    root.style.setProperty('--resonance-power-save', powerSaveMode ? '1' : '0');
+    root.style.setProperty('--resonance-animation-scale', powerSaveMode 
+      ? String(POWER_SAVE_CONFIG.animationScale) 
+      : '1');
+    
+    // Computed styles (power-save aware)
     root.style.setProperty('--resonance-border', `rgba(255, 255, 255, 0.1)`);
-    root.style.setProperty('--resonance-tint', `rgba(${hexToRgb(palette.secondary)}, 0.15)`);
+    root.style.setProperty('--resonance-tint', `rgba(${hexToRgb(palette.secondary)}, ${powerSaveMode ? 0.08 : 0.15})`);
     root.style.setProperty('--resonance-radiance', 
-      `radial-gradient(circle, rgba(${hexToRgb(palette.secondary)}, ${glowIntensity}) 0%, transparent 70%)`
+      `radial-gradient(circle, rgba(${hexToRgb(palette.secondary)}, ${effectiveGlow}) 0%, transparent 70%)`
     );
     
     // Text masking layer (prevents glow bleeding into text)
-    root.style.setProperty('--resonance-text-shadow', `0 0 20px rgba(${hexToRgb(palette.secondary)}, 0.3)`);
-    root.style.setProperty('--resonance-text-glow', `0 0 8px rgba(${hexToRgb(palette.primary)}, 0.4)`);
+    const textGlowMultiplier = powerSaveMode ? 0.5 : 1;
+    root.style.setProperty('--resonance-text-shadow', `0 0 ${20 * textGlowMultiplier}px rgba(${hexToRgb(palette.secondary)}, ${0.3 * textGlowMultiplier})`);
+    root.style.setProperty('--resonance-text-glow', `0 0 ${8 * textGlowMultiplier}px rgba(${hexToRgb(palette.primary)}, ${0.4 * textGlowMultiplier})`);
+
+    // Log power save state change
+    if (powerSaveMode) {
+      console.log('[CosmicTheme] Radiance dimmed to', Math.round(effectiveGlow * 100) + '%');
+    }
 
   }, [theme]);
 
@@ -142,6 +208,14 @@ export function CosmicThemeProvider({ children }) {
 
   const toggleRadiance = useCallback(() => {
     setTheme(prev => ({ ...prev, radianceEnabled: !prev.radianceEnabled }));
+  }, []);
+
+  const togglePowerSave = useCallback(() => {
+    setTheme(prev => ({ ...prev, powerSaveMode: !prev.powerSaveMode }));
+  }, []);
+
+  const setPowerSave = useCallback((enabled) => {
+    setTheme(prev => ({ ...prev, powerSaveMode: enabled }));
   }, []);
 
   const resetTheme = useCallback(() => {
@@ -183,12 +257,19 @@ export function CosmicThemeProvider({ children }) {
     surface: theme.surface,
     glowIntensity: theme.glowIntensity,
     radianceEnabled: theme.radianceEnabled,
+    powerSaveMode: theme.powerSaveMode,
+    
+    // Battery state
+    batteryLevel,
+    isCharging,
     
     // Actions
     setMood,
     setGlowIntensity,
     setSurface,
     toggleRadiance,
+    togglePowerSave,
+    setPowerSave,
     resetTheme,
     
     // Pre-computed styles
@@ -197,7 +278,10 @@ export function CosmicThemeProvider({ children }) {
     // Color helpers
     getPrimaryRgb: () => hexToRgb(theme.palette.primary),
     getSecondaryRgb: () => hexToRgb(theme.palette.secondary),
-  }), [theme, setMood, setGlowIntensity, setSurface, toggleRadiance, resetTheme, styles]);
+    
+    // Power save config (for external use)
+    powerSaveConfig: POWER_SAVE_CONFIG,
+  }), [theme, batteryLevel, isCharging, setMood, setGlowIntensity, setSurface, toggleRadiance, togglePowerSave, setPowerSave, resetTheme, styles]);
 
   return (
     <CosmicThemeContext.Provider value={value}>

@@ -167,7 +167,27 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 276 — 3D Depth System with Z-Axis Layering (April 2026) — LATEST
+### Iteration 277 — Power-Aware Radiance Dimming (April 2026) — LATEST
+- **Battery Monitoring** (`CosmicThemeContext.js`):
+  - Navigator Battery API integration
+  - Auto-enables power save at <20% battery (not charging)
+  - Exposes `batteryLevel`, `isCharging`, `powerSaveMode` state
+- **Radiance Dimming**:
+  - Glow intensity reduced to 30% (`POWER_SAVE_CONFIG.glowMultiplier`)
+  - Animation scale reduced to 50%
+  - Text glow reduced proportionally
+  - Tint opacity reduced from 0.15 to 0.08
+- **CSS Variables for Power Save**:
+  - `--resonance-power-save`: 0/1 flag
+  - `--resonance-animation-scale`: 0.5 in power save
+- **3D Depth Hook Updates** (`useDepth.js`):
+  - Accepts `powerSaveMode` option
+  - Disables full 3D transforms when power save active
+  - Skips FPS monitoring in power save (already low-power)
+- **Controls**: `togglePowerSave()`, `setPowerSave(bool)` actions
+- Tests: Hub functional with both states
+
+### Iteration 276 — 3D Depth System with Z-Axis Layering (April 2026)
 - **useDepth Hook** (`/hooks/useDepth.js`):
   - Z-Layer constants: FRONT (+200), MID_FRONT (+50), CENTER (0), MID_BACK (-100), DEEP_BACK (-500)
   - Depth-based blur: `filter: blur(calc(abs(z) / 50 * 1px))`

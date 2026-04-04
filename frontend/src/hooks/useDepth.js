@@ -73,6 +73,7 @@ export function useDepth(options = {}) {
     focalPlaneZ = 0,
     maxBlur = 8,
     hapticMultiplier = 1,
+    powerSaveMode = false, // External power save state
   } = options;
 
   // ═══ STATE ═══
@@ -92,14 +93,22 @@ export function useDepth(options = {}) {
     const caps = detectCapabilities();
     setCapabilities(caps);
     
-    // Enable 3D if device supports it and has stable performance
-    if (caps.supports3D && caps.isHighPerformance) {
+    // Enable 3D if device supports it, has stable performance, and not in power save
+    if (caps.supports3D && caps.isHighPerformance && !powerSaveMode) {
       setUse3D(true);
+    } else if (powerSaveMode) {
+      // Disable 3D in power save mode
+      setUse3D(false);
     }
 
-    // Frame rate monitoring for adaptive quality
+    // Frame rate monitoring for adaptive quality (skip if power save)
     let rafId;
     const measureFrameRate = () => {
+      if (powerSaveMode) {
+        // Skip FPS monitoring in power save - already in low-power mode
+        return;
+      }
+      
       const now = performance.now();
       const delta = now - lastFrameRef.current;
       lastFrameRef.current = now;
@@ -121,9 +130,11 @@ export function useDepth(options = {}) {
       rafId = requestAnimationFrame(measureFrameRate);
     };
     
-    rafId = requestAnimationFrame(measureFrameRate);
+    if (!powerSaveMode) {
+      rafId = requestAnimationFrame(measureFrameRate);
+    }
     return () => cancelAnimationFrame(rafId);
-  }, [use3D]);
+  }, [use3D, powerSaveMode]);
 
   // ═══ GYROSCOPE HANDLER ═══
   useEffect(() => {
