@@ -679,7 +679,7 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - **Weighted Transitions**: Each navigation from Node A → Node B gains +0.15 weight
   - **Bidirectional Learning**: Reverse paths gain +0.045 weight (30% of forward)
   - **Decay System**: Weights decay 0.02 daily if unused (keeps system fresh)
-  - **Sympathy Threshold (1.0)**: Connections above this auto-trigger Glow Portals
+  - **Sympathy Threshold (1.0)**: Triggers Glow Portals ONLY when user explicitly requests
   - **Strong Sympathy (2.0)**: Extra-bright glow with outer ring animation
   - **Max Weight Cap (5.0)**: Prevents runaway weights
   - **Persistence**: sympathyMap stored in localStorage for cross-session learning
@@ -691,19 +691,36 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - **Sympathy Boost**: Learned connections carry echoes further/brighter
   - **Intensity Calculation**: Base 0.8, decays 0.15 per hop, boosted by sympathy weight
   - **Staggered Animation**: 150ms delay per hop for visual "wave" effect
-- **Enhanced Glow Portal**: Now shows sympathy strength
-  - Sympathy indicator icon (link) on learned connections
-  - Weight percentage shown on hover (e.g., "•150%")
-  - Stronger connections pulse faster and brighter
-  - Outer glow ring for strong sympathy connections
-- **useGlowTrigger Hook**: Enhanced to automatically send pulse echoes
-  - `onSessionComplete()` — triggers glow + echo with 0.9 intensity
-  - `onInsightGenerated()` — triggers glow + echo with 0.7 intensity
-  - `onMoodChanged()` — triggers glow + echo with 0.6 intensity
-- **Files**: Updated `MeshNetworkContext.js` (sympathy engine, pulse echo), `GlowPortal.js` (sympathy visuals), `PulseEchoVisualizer.js` (new)
-- Tests: Screenshot verification — navigation between modules builds sympathy weights, stored in localStorage
+- **USER CHOICE ENFORCEMENT**: Removed all automatic behaviors
+  - NO auto-glow portals — user must click "Show Suggested Paths"
+  - `showSuggestedPaths()` — explicit user-triggered function
+- **Files**: Updated `MeshNetworkContext.js` (sympathy engine, user-choice enforcement), `GlowPortal.js`, `PulseEchoVisualizer.js`
+- Tests: Screenshot verification — navigation between modules builds sympathy weights, NO automatic glows
 
-## Upcoming (P0-P1) — Iteration 282+
+### Iteration 282 — Enlightenment Cafe Digital Sanctuary (April 2026)
+- **EnlightenmentCafeContext**: Complete theming engine for the Digital Sanctuary
+  - **Two Visualization Tiers**:
+    - **Parchment (Essential)**: High-performance SVG, minimalist, cream/vellum + charcoal ink
+    - **Nebula (Premium)**: WebGL-powered 3D with cosmic effects
+  - **Color Modes**: Light (Cream & Ink) vs Dark (Charcoal & Gold)
+  - **Palette System**: Full CSS variable integration for dynamic theming
+- **Cafe Settings Panel**: User-controlled visualization settings
+  - Tier selection: Parchment vs Nebula
+  - Color mode toggle
+  - Atmosphere controls: Cafe Ambiance, Particle Effects, Depth Focus, Warm Glow
+  - "Show Suggested Paths" button (user-triggered navigation suggestions)
+  - Zone focus controls
+  - Footer: "enlightenment.cafe • Your choices, your flow"
+- **Five Cafe Zones** defined:
+  - The Practice Room (breathing, meditation, yoga, etc.)
+  - The Oracle Chamber (oracle, star-chart, numerology, dreams)
+  - The Sanctuary (journal, mood, soundscapes, zen-garden)
+  - The Explorer's Lounge (coach, sovereigns, community)
+  - Today's Ritual (daily-briefing, daily-ritual, calendar)
+- **Files**: `EnlightenmentCafeContext.js` (new), `CafeSettingsPanel.js` (new), updated `App.js`
+- Tests: Screenshot verification — Cafe toggle visible, settings panel opens with all user-controlled options
+
+## Upcoming (P0-P1) — Iteration 283+
 - **Tiered Render Delegate**: Essential (SVG/Canvas "Paper & Ink") vs Premium (Three.js "Aetheric" view with volumetric fog)
 - **Ghost Nodes**: Temporary celestial event nodes (Full Moon, Mercury Retrograde, Eclipses)
 - **Advisor Node**: Hidden node monitoring mesh health, pulses if Sanctuary modules unused for 3+ days

@@ -48,6 +48,8 @@ import { MeshNetworkProvider } from './context/MeshNetworkContext';
 import GlowPortal from './components/GlowPortal';
 import UniversalCommand from './components/UniversalCommand';
 import PulseEchoVisualizer from './components/PulseEchoVisualizer';
+import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
+import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettingsPanel';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -206,6 +208,54 @@ function PageLoader() {
           style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.4) 0%, rgba(124,58,237,0.15) 70%)' }} />
       </div>
     </div>
+  );
+}
+
+// CafeApp — Main app wrapper with Enlightenment Cafe settings
+function CafeApp() {
+  const [cafeSettingsOpen, setCafeSettingsOpen] = React.useState(false);
+  
+  return (
+    <>
+      <div style={{ minHeight: '100vh', position: 'relative' }}>
+        <Navigation />
+        <ScrollToTop />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'rgba(10, 10, 18, 0.92)',
+              border: '1px solid rgba(192,132,252,0.18)',
+              color: '#F8FAFC',
+              backdropFilter: 'blur(28px)',
+              boxShadow: '0 0 30px rgba(192,132,252,0.1), 0 8px 32px rgba(0,0,0,0.4)',
+            },
+          }}
+        />
+        <AnimatedRoutes />
+        <MantraOverlay />
+        <LatencyHUD />
+        <SmartDock />
+        <LearningToggle />
+        <CosmicMixer />
+        <CosmicToolbar />
+        <CosmicAssistant />
+        <PersistentWaveform />
+        <OrbCorner />
+        <TrialGraduation />
+        <InstallPrompt />
+        <CreditNudge />
+        <MissionControlRing />
+        <OrbitalNavigation />
+        <CommandMode context="general" />
+        <EmergencyShutOff />
+        <GlowPortal />
+        <UniversalCommand />
+        <PulseEchoVisualizer />
+        <CafeSettingsToggle onClick={() => setCafeSettingsOpen(true)} />
+      </div>
+      <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
+    </>
   );
 }
 
@@ -388,50 +438,17 @@ function App() {
       <OrbitalSentinelProvider>
       <SovereignProvider>
       <MeshNetworkProvider>
+      <EnlightenmentCafeProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
           <CosmicBackground />
           <SplitScreenProvider>
-          <div style={{ minHeight: '100vh', position: 'relative' }}>
-            <Navigation />
-            <ScrollToTop />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                style: {
-                  background: 'rgba(10, 10, 18, 0.92)',
-                  border: '1px solid rgba(192,132,252,0.18)',
-                  color: '#F8FAFC',
-                  backdropFilter: 'blur(28px)',
-                  boxShadow: '0 0 30px rgba(192,132,252,0.1), 0 8px 32px rgba(0,0,0,0.4)',
-                },
-              }}
-            />
-            <AnimatedRoutes />
-            <MantraOverlay />
-            <LatencyHUD />
-            <SmartDock />
-            <LearningToggle />
-            <CosmicMixer />
-            <CosmicToolbar />
-            <CosmicAssistant />
-            <PersistentWaveform />
-            <OrbCorner />
-            <TrialGraduation />
-            <InstallPrompt />
-            <CreditNudge />
-            <MissionControlRing />
-            <OrbitalNavigation />
-            <CommandMode context="general" />
-            <EmergencyShutOff />
-            <GlowPortal />
-            <UniversalCommand />
-            <PulseEchoVisualizer />
-          </div>
+          <CafeApp />
           </SplitScreenProvider>
           </VoiceCommandProvider>
         </BrowserRouter>
+      </EnlightenmentCafeProvider>
       </MeshNetworkProvider>
       </SovereignProvider>
       </OrbitalSentinelProvider>

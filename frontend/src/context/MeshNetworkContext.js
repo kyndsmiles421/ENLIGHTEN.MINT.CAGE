@@ -472,9 +472,10 @@ export function MeshNetworkProvider({ children }) {
   }, [calculatePulseEcho]);
 
   // ─── Register current node based on route ───
+  // NOTE: Sympathy is LEARNED but never auto-triggered. User must explicitly request suggestions.
   const registerNode = useCallback((nodeId) => {
     if (CONSTELLATION_NODES[nodeId]) {
-      // Record transition for sympathy learning
+      // Record transition for sympathy learning (silent, non-intrusive)
       if (previousNodeRef.current && previousNodeRef.current !== nodeId) {
         recordTransition(previousNodeRef.current, nodeId);
       }
@@ -486,31 +487,39 @@ export function MeshNetworkProvider({ children }) {
         return newHistory;
       });
       
-      // Check for sympathetic nodes and trigger auto-glow
-      const sympathetic = getSympatheticNodes(nodeId);
-      if (sympathetic.length > 0) {
-        // Auto-trigger glow for strong sympathetic connections
-        const strongConnections = sympathetic.filter(s => s.isStrong).slice(0, 2);
-        if (strongConnections.length > 0) {
-          setGlowPortals(prev => {
-            const existing = new Set(prev.map(p => p.id));
-            const newPortals = strongConnections
-              .filter(s => !existing.has(s.nodeId))
-              .map(s => ({
-                id: s.nodeId,
-                label: s.node.label,
-                color: s.node.color,
-                path: s.node.path,
-                trigger: 'sympathy',
-                sympathyWeight: s.weight,
-                timestamp: Date.now(),
-              }));
-            return [...prev, ...newPortals].slice(-4);
-          });
-        }
-      }
+      // NO AUTO-GLOW: Sympathy data is tracked but never interrupts user flow.
+      // User can explicitly call `showSuggestedPaths()` to see learned connections.
     }
-  }, [currentNode, recordTransition, getSympatheticNodes]);
+  }, [currentNode, recordTransition]);
+  
+  // ─── Show Suggested Paths (User-Triggered Only) ───
+  const showSuggestedPaths = useCallback((sourceNode = currentNode) => {
+    if (!sourceNode) return [];
+    
+    const sympathetic = getSympatheticNodes(sourceNode);
+    if (sympathetic.length > 0) {
+      const suggestions = sympathetic.slice(0, 3).map(s => ({
+        id: s.nodeId,
+        label: s.node.label,
+        color: s.node.color,
+        path: s.node.path,
+        trigger: 'user_requested',
+        sympathyWeight: s.weight,
+        isStrong: s.isStrong,
+        timestamp: Date.now(),
+      }));
+      
+      setGlowPortals(suggestions);
+      
+      // Auto-dismiss after 12 seconds (user-triggered lasts longer)
+      setTimeout(() => {
+        setGlowPortals(prev => prev.filter(p => Date.now() - p.timestamp < 12000));
+      }, 12000);
+      
+      return suggestions;
+    }
+    return [];
+  }, [currentNode, getSympatheticNodes]);
 
   // ─── Send a pulse to connected nodes ───
   const sendPulse = useCallback((type, payload, targetNodes = null) => {
@@ -671,10 +680,11 @@ export function MeshNetworkProvider({ children }) {
     getEdgeState,
     setCommandOverlayOpen,
     
-    // Sympathy Engine
+    // Sympathy Engine (User-Triggered Only)
     recordTransition,
     getSymPathyWeight,
     getSympatheticNodes,
+    showSuggestedPaths,  // User must explicitly call this
     
     // Pulse Echo
     sendPulseEcho,
