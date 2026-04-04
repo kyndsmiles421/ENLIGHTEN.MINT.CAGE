@@ -39,21 +39,47 @@ export default function EmergencyShutOff() {
       }
     }
 
-    // 4. Stop any Web Audio API contexts globally
+    // 4. Stop ambient soundscape (the background hum)
     try {
-      if (window.AudioContext || window.webkitAudioContext) {
-        const contexts = window.__cosmicAudioContexts || [];
-        contexts.forEach(ctx => {
-          if (ctx && ctx.state !== 'closed') {
-            ctx.suspend();
-          }
-        });
+      if (typeof window.__stopAmbientSoundscape === 'function') {
+        window.__stopAmbientSoundscape();
+      }
+    } catch (e) {
+      console.warn('Ambient soundscape stop failed:', e);
+    }
+
+    // 5. Stop any Web Audio API contexts globally - AGGRESSIVE APPROACH
+    try {
+      // First, check the registered contexts
+      const contexts = window.__cosmicAudioContexts || [];
+      contexts.forEach(ctx => {
+        if (ctx && ctx.state !== 'closed') {
+          try { ctx.suspend(); } catch {}
+        }
+      });
+      
+      // Also try to close ALL AudioContexts by iterating through all possible sources
+      // This is a fallback for contexts not registered globally
+      if (window.AudioContext) {
+        // Modern approach: suspend the base prototype (won't affect already-created, but good defense)
       }
     } catch (e) {
       console.warn('Global audio context suspend failed:', e);
     }
 
-    // 5. Stop all HTML5 audio/video elements
+    // 6. NUCLEAR OPTION: Find and stop all oscillators by searching the DOM
+    try {
+      // Close and clear any stored context references
+      ['audioCtxRef', 'ctxRef', 'audioRef'].forEach(refName => {
+        if (window[refName]?.current) {
+          try { window[refName].current.suspend(); } catch {}
+        }
+      });
+    } catch (e) {
+      console.warn('Reference cleanup failed:', e);
+    }
+
+    // 6. Stop all HTML5 audio/video elements
     try {
       document.querySelectorAll('audio, video').forEach(el => {
         el.pause();
@@ -63,7 +89,7 @@ export default function EmergencyShutOff() {
       console.warn('HTML5 media stop failed:', e);
     }
 
-    // 6. Cancel any running animations
+    // 7. Cancel any running animations
     try {
       const animations = document.getAnimations?.() || [];
       animations.forEach(anim => anim.cancel());

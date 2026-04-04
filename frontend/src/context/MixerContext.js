@@ -126,6 +126,11 @@ export function MixerProvider({ children }) {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       ctxRef.current = ctx;
+      
+      // Register globally for EmergencyShutOff
+      if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+      window.__cosmicAudioContexts.push(ctx);
+      
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = 0.8;

@@ -42,6 +42,10 @@ export default function QuickMeditationWidget() {
     stop();
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     audioCtxRef.current = ctx;
+    
+    // Register globally for EmergencyShutOff
+    if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+    window.__cosmicAudioContexts.push(ctx);
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0, ctx.currentTime);

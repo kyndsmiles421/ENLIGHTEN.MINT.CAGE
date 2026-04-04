@@ -19,6 +19,10 @@ function getCtx() {
     masterGain = audioCtx.createGain();
     masterGain.gain.value = 0.06;
     masterGain.connect(audioCtx.destination);
+    
+    // Register globally so EmergencyShutOff can find it
+    if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+    window.__cosmicAudioContexts.push(audioCtx);
   }
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return { ctx: audioCtx, master: masterGain };
@@ -31,7 +35,17 @@ function stopAll() {
   });
   activeSources = [];
   currentScape = null;
+  isEnabled = false;
+  localStorage.setItem('zen_ambient_soundscape', 'off');
+  
+  // Also suspend the context
+  if (audioCtx && audioCtx.state !== 'closed') {
+    try { audioCtx.suspend(); } catch {}
+  }
 }
+
+// Expose globally for EmergencyShutOff
+window.__stopAmbientSoundscape = stopAll;
 
 // ── Soundscape Generators ──
 
