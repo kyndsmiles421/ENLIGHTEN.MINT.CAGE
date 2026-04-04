@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSovereign } from '../context/SovereignContext';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Compass, Music, MapPin, Brain, X, Loader2,
@@ -13,13 +14,29 @@ const CONTEXT_LABELS = {
   wellness: 'Wellness', general: 'General',
 };
 
-export default function CommandMode({ context = 'general', pageData = {}, trigger }) {
+export default function CommandMode({ context = 'general', pageData = {}, trigger, externalOpen, onExternalClose }) {
   const { executeCommand, hasCapability, tier, tierName } = useSovereign();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [command, setCommand] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
+
+  // Handle external open/close
+  useEffect(() => {
+    if (externalOpen !== undefined) {
+      setOpen(externalOpen);
+    }
+  }, [externalOpen]);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    onExternalClose?.();
+  }, [onExternalClose]);
+
+  // Hide standalone button on dashboard (MissionControlRing handles it there)
+  const hideTriggerButton = location.pathname === '/dashboard';
 
   // Keyboard shortcut: Ctrl+K or Cmd+K
   useEffect(() => {
@@ -55,8 +72,8 @@ export default function CommandMode({ context = 'general', pageData = {}, trigge
 
   return (
     <>
-      {/* Trigger Button */}
-      {trigger || (
+      {/* Trigger Button (hidden on dashboard - MissionControlRing handles it) */}
+      {trigger || (!hideTriggerButton && (
         <motion.button
           className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer shadow-2xl"
           style={{
@@ -70,7 +87,7 @@ export default function CommandMode({ context = 'general', pageData = {}, trigge
         >
           <Zap size={20} style={{ color: '#FFF' }} />
         </motion.button>
-      )}
+      ))}
 
       {/* Command Modal */}
       <AnimatePresence>
@@ -78,7 +95,7 @@ export default function CommandMode({ context = 'general', pageData = {}, trigge
           <motion.div
             className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
           >
             {/* Backdrop */}
             <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }} />
@@ -110,7 +127,7 @@ export default function CommandMode({ context = 'general', pageData = {}, trigge
                   <span className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
                     Ctrl+K
                   </span>
-                  <button onClick={() => setOpen(false)} className="p-1 hover:bg-white/5 rounded-lg" data-testid="command-mode-close">
+                  <button onClick={handleClose} className="p-1 hover:bg-white/5 rounded-lg" data-testid="command-mode-close">
                     <X size={14} style={{ color: 'var(--text-muted)' }} />
                   </button>
                 </div>

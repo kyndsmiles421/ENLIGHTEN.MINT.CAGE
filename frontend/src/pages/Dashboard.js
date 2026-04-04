@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import Walkthrough from '../components/Walkthrough';
 import TrialBanner from '../components/TrialBanner';
+import MissionControlRing from '../components/MissionControlRing';
 
 // Extracted section components
 import {

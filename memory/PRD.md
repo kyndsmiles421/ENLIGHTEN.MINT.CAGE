@@ -493,6 +493,18 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Central orb click opens Mission Control
 - Tests: Frontend 100% — all 15 satellites navigate correctly, all destination pages load with content
 
+### Iteration 271 — Dashboard MissionControlRing (April 2026) — LATEST
+- **MissionControlRing Component**: Replaces cluttered bottom-right floating buttons on Dashboard
+  - Expandable radial menu with 6 action buttons arranged in circle
+  - Actions: AI Assistant, Command Mode, Frequency, Journal, Mood, Mixer
+  - z-index 102 (above CreditNudge z-100) so always clickable
+  - Shows only on `/dashboard` route
+  - Smooth spring animations on expand/collapse
+  - Tooltip on hover showing action name and description
+- **Hidden individual floaters**: CosmicAssistant, CommandMode, QuickMeditationWidget buttons now hidden on dashboard
+- **Files**: `MissionControlRing.js` (new), updated `CosmicAssistant.js`, `CommandMode.js`, `QuickMeditationWidget.js`
+- Tests: Manual verification — Hub at y=590 in viewport, ring expands correctly
+
 ### Iteration 270 — Zero-Scale Parentage Physics & Emergency Shut-Off (April 2026) — LATEST
 - **Emergency Shut-Off Button**: Fixed top-left corner (8px, 8px), z-index 99999, always accessible
   - Kills all audio (SensoryContext, MixerContext, Web Audio API, HTML5 media)

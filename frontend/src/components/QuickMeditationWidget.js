@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Headphones, X, Pause, Play } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const FREQUENCIES = [
   { name: '432Hz Calm', freq: 432, color: '#D8B4FE' },
@@ -10,6 +11,7 @@ const FREQUENCIES = [
 ];
 
 export default function QuickMeditationWidget() {
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(null);
@@ -17,6 +19,9 @@ export default function QuickMeditationWidget() {
   const audioCtxRef = useRef(null);
   const nodesRef = useRef(null);
   const timerRef = useRef(null);
+
+  // Hide standalone button on dashboard (MissionControlRing handles it there)
+  const hideTriggerButton = location.pathname === '/dashboard';
 
   const stop = useCallback(() => {
     if (nodesRef.current) {
@@ -80,7 +85,7 @@ export default function QuickMeditationWidget() {
   }, [stop]);
 
   return (
-    <div className="fixed bottom-6 right-4 z-[88]" data-testid="quick-meditation-widget">
+    <div className="fixed bottom-6 right-4 z-[88]" data-testid="quick-meditation-widget" style={{ display: hideTriggerButton && !open ? 'none' : 'block' }}>
       <AnimatePresence>
         {open && (
           <motion.div

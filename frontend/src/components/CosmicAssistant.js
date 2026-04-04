@@ -82,7 +82,7 @@ function MessageBubble({ msg }) {
   );
 }
 
-export default function CosmicAssistant() {
+export default function CosmicAssistant({ externalOpen, onExternalClose }) {
   const { authHeaders, user } = useAuth();
   const location = useLocation();
   const mixerOpen = useMixerState();
@@ -95,6 +95,21 @@ export default function CosmicAssistant() {
   const [showSessions, setShowSessions] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Handle external open/close
+  useEffect(() => {
+    if (externalOpen !== undefined) {
+      setOpen(externalOpen);
+    }
+  }, [externalOpen]);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    onExternalClose?.();
+  }, [onExternalClose]);
+
+  // Hide standalone button on dashboard (MissionControlRing handles it there)
+  const hideTriggerButton = location.pathname === '/dashboard';
 
   // Get current page context
   const currentPath = location.pathname;
@@ -210,9 +225,9 @@ export default function CosmicAssistant() {
 
   return (
     <>
-      {/* Floating Button — Dynamic Docking */}
+      {/* Floating Button — Dynamic Docking (hidden on dashboard - MissionControlRing handles it) */}
       <AnimatePresence>
-        {!open && (
+        {!open && !hideTriggerButton && (
           <motion.button
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}
@@ -283,7 +298,7 @@ export default function CosmicAssistant() {
                 <button onClick={startNewChat} className="p-1.5 rounded-lg hover:bg-white/5 transition-all" data-testid="new-chat-btn">
                   <Plus size={14} style={{ color: 'var(--text-muted)' }} />
                 </button>
-                <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg hover:bg-white/5 transition-all" data-testid="close-assistant">
+                <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-white/5 transition-all" data-testid="close-assistant">
                   <X size={14} style={{ color: 'var(--text-muted)' }} />
                 </button>
               </div>

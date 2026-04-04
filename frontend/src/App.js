@@ -41,6 +41,7 @@ import { useGateNotifications } from './hooks/useGateNotifications';
 import OrbitalNavigation from './components/OrbitalNavigation';
 import LearningToggle from './components/LearningToggle';
 import EmergencyShutOff from './components/EmergencyShutOff';
+import MissionControlRing from './components/MissionControlRing';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -411,6 +412,7 @@ function App() {
             <TrialGraduation />
             <InstallPrompt />
             <CreditNudge />
+            <MissionControlRing />
             <OrbitalNavigation />
             <CommandMode context="general" />
             <EmergencyShutOff />
