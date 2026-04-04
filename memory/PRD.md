@@ -1304,3 +1304,28 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
 - Auth key: `zen_token`
+
+### Iteration 282 — VOID-01 Jade Opacity Lock & HUD-01 Dynamic Widget Breathing (April 2026)
+- **VOID-01 (Jade Opacity Lock)**:
+  - Global bloom state persists across depth transitions via `RecursiveRegistryStore.bloomState`
+  - Tracks: `isActive`, `opacity` (0-1), `color` (jade/void), `exitVelocity`, `depthAtActivation`
+  - `setBloomState()` atomically updates bloom state during dwell and dive transitions
+  - Console logs: `[VOID-01] Bloom state: ACTIVE/INACTIVE opacity: X.XX`
+  - Result: Visual "persistence of memory" - jade bloom doesn't reset on depth change
+- **HUD-01 (Dynamic Widget Breathing)**:
+  - Widgets "inhale" (shrink) as lattice "exhales" (expands with depth)
+  - Scale formula: `widgetScale = 1 - (min(depth/3, 1) * 0.15)`
+  - L0: 1.0x | L1: 0.95x | L2: 0.91x | L3+: 0.85x
+  - `KineticHUD.js`: `breathingStyle` applies `transform: scale(widgetScale)` with 0.3s ease-out
+  - `SeedHuntWidget`: framer-motion `animate={{ scale: widgetScale }}`
+  - Console logs: `[HUD-01] Lattice scale: X.XX Widget scale: X.XX`
+  - Result: Creates "breathing room" - UI declutters as user dives deeper
+- **RecursiveRegistryStore.js Updates**:
+  - Added `bloomState` object for VOID-01
+  - Added `latticeScale` and `widgetScale` for HUD-01
+  - Added `setBloomState()` and `setLatticeScale()` methods
+- **Files Updated**:
+  - `/app/frontend/src/stores/RecursiveRegistryStore.js`
+  - `/app/frontend/src/pages/TesseractExperience.js`
+  - `/app/frontend/src/components/KineticHUD.js`
+- **Tests**: Frontend 100% - All VOID-01 and HUD-01 features verified working
