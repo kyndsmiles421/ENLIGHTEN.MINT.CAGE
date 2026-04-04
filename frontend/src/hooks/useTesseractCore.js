@@ -80,6 +80,9 @@ const TESSERACT_CONFIG = {
   HUD_FADE_DWELL: 9000,  // 9 seconds of stillness
   HUD_FADE_OPACITY: 0.1,
   
+  // Acoustic bloom threshold
+  ACOUSTIC_BLOOM_MS: 200,  // Sound blooms after 200ms dwell
+  
   // Haptic patterns
   HAPTIC_PATTERNS: {
     dive: [50, 30, 100],
@@ -132,6 +135,7 @@ export function useTesseractCore(options = {}) {
   const [hudOpacity, setHudOpacity] = useState(1);
   const [nearSnapPoint, setNearSnapPoint] = useState(null);
   const [seeds, setSeeds] = useState([]);
+  const [isDwellStable, setIsDwellStable] = useState(false);  // Acoustic Bloom gate
   
   // ─────────────────────────────────────────────────────────────────────────
   // DERIVED VALUES (Memoized)
@@ -415,27 +419,63 @@ export function useTesseractCore(options = {}) {
   }, [enableHaptics, onDepthChange]);
   
   // ─────────────────────────────────────────────────────────────────────────
-  // CELL SELECTION + DWELL TRACKING
+  // CELL SELECTION + DWELL TRACKING (with 200ms Acoustic Bloom)
   // ─────────────────────────────────────────────────────────────────────────
   
+  // Dwell timer ref for acoustic bloom
+  const dwellTimerRef = useRef(null);
+  const currentDwellCellRef = useRef(null);
+  
   const selectCell = useCallback((row, col) => {
+    const cellKey = `${row}-${col}`;
+    
+    // Clear any existing dwell timer
+    if (dwellTimerRef.current) {
+      clearTimeout(dwellTimerRef.current);
+      dwellTimerRef.current = null;
+    }
+    
+    // Reset dwell stable state on new selection
+    setIsDwellStable(false);
+    
     setSelectedCell({ row, col });
     lastActivityRef.current = Date.now();
+    currentDwellCellRef.current = cellKey;
     
     // Update dwell map
-    const key = `${row}-${col}`;
-    const existing = dwellMapRef.current.get(key) || { visits: 0, totalMs: 0, lastVisit: null };
-    dwellMapRef.current.set(key, {
+    const existing = dwellMapRef.current.get(cellKey) || { visits: 0, totalMs: 0, lastVisit: null };
+    dwellMapRef.current.set(cellKey, {
       ...existing,
       visits: existing.visits + 1,
       lastVisit: Date.now(),
     });
     
-    // Light haptic
+    // Light haptic on selection (immediate)
     if (enableHaptics && navigator.vibrate) {
       navigator.vibrate([10]);
     }
+    
+    // ACOUSTIC BLOOM: Start 200ms dwell timer
+    // Sound will only "bloom" if coordinate is held for 200ms
+    dwellTimerRef.current = setTimeout(() => {
+      // Only trigger if still on same cell
+      if (currentDwellCellRef.current === cellKey) {
+        // Coordinate is stable - audio can bloom
+        setIsDwellStable(true);
+        console.log('[TesseractCore] Dwell threshold reached - audio bloom permitted');
+      }
+    }, TESSERACT_CONFIG.ACOUSTIC_BLOOM_MS);
+    
   }, [enableHaptics]);
+  
+  // Cleanup dwell timer on unmount
+  useEffect(() => {
+    return () => {
+      if (dwellTimerRef.current) {
+        clearTimeout(dwellTimerRef.current);
+      }
+    };
+  }, []);
   
   // ─────────────────────────────────────────────────────────────────────────
   // SEED MINTING (Unified)
@@ -566,6 +606,9 @@ export function useTesseractCore(options = {}) {
     hapticFrequency,
     currentStability,
     gravityTension,
+    
+    // Acoustic Bloom
+    isDwellStable,  // True after 200ms dwell - audio permitted
     
     // Path & seeds
     path: pathRef.current,

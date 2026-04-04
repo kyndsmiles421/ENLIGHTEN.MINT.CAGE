@@ -126,20 +126,28 @@ const TesseractLattice = React.memo(({
       style={{ 
         width: 'min(90vw, 400px)',
         aspectRatio: '1',
+        // Z-INDEX 9999: SOVEREIGN - Matrix Lattice is TOP interactive layer
+        zIndex: 9999,
+        position: 'relative',
       }}
     >
-      {/* Grid background */}
+      {/* Grid background - NO backdrop-filter, pure translucent */}
       <div 
         className="absolute inset-0 rounded-2xl transition-all duration-500"
         style={{
-          background: `radial-gradient(circle at center, ${colors.primary}20, transparent 70%)`,
-          border: `2px solid ${colors.primary}40`,
-          boxShadow: `0 0 40px ${colors.primary}20`,
+          // SOVEREIGN: No backdrop-filter on core lattice
+          background: `radial-gradient(circle at center, ${colors.primary}15, transparent 70%)`,
+          border: `2px solid ${colors.primary}30`,
+          boxShadow: `0 0 40px ${colors.primary}15`,
+          pointerEvents: 'none',  // Background is decorative only
         }}
       />
       
-      {/* 9×9 Grid */}
-      <div className="absolute inset-4 grid grid-cols-9 gap-1">
+      {/* 9×9 Grid - ALL pointer events enabled */}
+      <div 
+        className="absolute inset-4 grid grid-cols-9 gap-1"
+        style={{ pointerEvents: 'auto' }}  // Grid is fully interactive
+      >
         {[...Array(81)].map((_, i) => {
           const row = Math.floor(i / 9);
           const col = i % 9;
@@ -149,7 +157,7 @@ const TesseractLattice = React.memo(({
           return (
             <motion.button
               key={i}
-              className="relative rounded-md transition-all"
+              className="relative rounded-md transition-all cursor-pointer"
               style={{
                 background: isSelected 
                   ? `${colors.primary}60`
@@ -160,6 +168,8 @@ const TesseractLattice = React.memo(({
                   ? `2px solid ${colors.primary}` 
                   : '1px solid rgba(255,255,255,0.1)',
                 boxShadow: isSelected ? `0 0 15px ${colors.primary}50` : 'none',
+                // Ensure each cell is clickable
+                pointerEvents: isZooming ? 'none' : 'auto',
               }}
               whileHover={{ scale: 1.1, zIndex: 10 }}
               whileTap={{ scale: 0.95 }}
@@ -173,6 +183,7 @@ const TesseractLattice = React.memo(({
                 className="absolute inset-0 flex items-center justify-center text-[8px] font-mono"
                 style={{ 
                   color: isSelected ? colors.primary : 'rgba(255,255,255,0.3)',
+                  pointerEvents: 'none',  // Text is decorative
                 }}
               >
                 {hexNum}
@@ -182,9 +193,10 @@ const TesseractLattice = React.memo(({
         })}
       </div>
       
-      {/* Center depth indicator */}
+      {/* Center depth indicator - decorative only */}
       <div 
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ pointerEvents: 'none' }}
       >
         <motion.div
           className="text-4xl font-light"
@@ -199,11 +211,14 @@ const TesseractLattice = React.memo(({
         </motion.div>
       </div>
       
-      {/* Zooming overlay */}
+      {/* Zooming overlay - decorative only */}
       {isZooming && (
         <motion.div
           className="absolute inset-0 rounded-2xl"
-          style={{ background: `${colors.primary}30` }}
+          style={{ 
+            background: `${colors.primary}30`,
+            pointerEvents: 'none',
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: [0, 0.5, 0] }}
           transition={{ duration: 0.8 }}
