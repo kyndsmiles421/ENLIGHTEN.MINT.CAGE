@@ -45,7 +45,9 @@ import LearningToggle from './components/LearningToggle';
 import EmergencyShutOff from './components/EmergencyShutOff';
 import MissionControlRing from './components/MissionControlRing';
 import TieredNavigation from './components/TieredNavigation';
+import RecursivePortal from './components/RecursivePortal';
 import { MeshNetworkProvider } from './context/MeshNetworkContext';
+import { DepthProvider } from './context/DepthContext';
 import GlowPortal from './components/GlowPortal';
 import UniversalCommand from './components/UniversalCommand';
 import PulseEchoVisualizer from './components/PulseEchoVisualizer';
@@ -487,15 +489,19 @@ function App() {
       <EnlightenmentCafeProvider>
         <BrowserRouter>
           <PolarityProvider>
+          <DepthProvider>
           <SageProvider>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
           <CosmicBackground />
           <SplitScreenProvider>
+          <RecursivePortal>
           <CafeApp />
+          </RecursivePortal>
           </SplitScreenProvider>
           </VoiceCommandProvider>
           </SageProvider>
+          </DepthProvider>
           </PolarityProvider>
         </BrowserRouter>
       </EnlightenmentCafeProvider>

@@ -22,6 +22,7 @@
 import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePolarity } from '../context/PolarityContext';
+import { useDepth, LINE_FLAVORS } from '../context/DepthContext';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COMPASS CONSTANTS
@@ -68,68 +69,144 @@ const HAPTIC_PATTERNS = {
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// HEXAGRAM LINE COMPONENT
+// HEXAGRAM LINE COMPONENT (Now tappable for recursive dive)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const HexagramLine = React.memo(({ isYang, index, colors, opacity = 1, glowMultiplier = 1 }) => {
+const HexagramLine = React.memo(({ 
+  isYang, 
+  index, 
+  colors, 
+  opacity = 1, 
+  glowMultiplier = 1,
+  isSelected = false,
+  onSelect,
+  selectionColor,
+}) => {
   const y = index * (LINE_HEIGHT + LINE_GAP);
   const glowSize = 4 * glowMultiplier;
+  const selectedGlow = isSelected ? 8 : 0;
+  const lineColor = isSelected ? (selectionColor || colors.lineColor) : colors.lineColor;
+  const lineOpacity = isSelected ? 1 : opacity;
+  
+  // Tappable hit area (larger than visual)
+  const hitAreaPadding = 4;
   
   if (isYang) {
     return (
-      <g transform={`translate(0, ${y})`}>
+      <g 
+        transform={`translate(0, ${y})`}
+        onClick={() => onSelect?.(index)}
+        style={{ cursor: onSelect ? 'pointer' : 'default' }}
+        data-testid={`hexagram-line-${index}`}
+      >
+        {/* Hit area (invisible, larger) */}
+        <rect
+          x={-hitAreaPadding}
+          y={-hitAreaPadding}
+          width={LINE_WIDTH + hitAreaPadding * 2}
+          height={LINE_HEIGHT + hitAreaPadding * 2}
+          fill="transparent"
+        />
+        {/* Visual line */}
         <rect
           x={0}
           y={0}
           width={LINE_WIDTH}
           height={LINE_HEIGHT}
           rx={2}
-          fill={colors.lineColor}
-          opacity={opacity}
+          fill={lineColor}
+          opacity={lineOpacity}
           style={{
-            filter: `drop-shadow(0 0 ${glowSize}px ${colors.lineEmissive})`,
+            filter: `drop-shadow(0 0 ${glowSize + selectedGlow}px ${isSelected ? selectionColor : colors.lineEmissive})`,
+            transition: 'filter 0.2s, fill 0.2s',
           }}
         />
+        {/* Glow overlay */}
         <rect
           x={0}
           y={0}
           width={LINE_WIDTH}
           height={LINE_HEIGHT}
           rx={2}
-          fill={colors.lineEmissive}
-          opacity={opacity * 0.3 * glowMultiplier}
+          fill={isSelected ? selectionColor : colors.lineEmissive}
+          opacity={(lineOpacity * 0.3 * glowMultiplier) + (isSelected ? 0.3 : 0)}
         />
+        {/* Selection indicator */}
+        {isSelected && (
+          <rect
+            x={-2}
+            y={-2}
+            width={LINE_WIDTH + 4}
+            height={LINE_HEIGHT + 4}
+            rx={3}
+            fill="none"
+            stroke={selectionColor}
+            strokeWidth={1}
+            opacity={0.8}
+          />
+        )}
       </g>
     );
   }
   
   const segmentWidth = (LINE_WIDTH - YIN_GAP) / 2;
   return (
-    <g transform={`translate(0, ${y})`}>
+    <g 
+      transform={`translate(0, ${y})`}
+      onClick={() => onSelect?.(index)}
+      style={{ cursor: onSelect ? 'pointer' : 'default' }}
+      data-testid={`hexagram-line-${index}`}
+    >
+      {/* Hit area */}
+      <rect
+        x={-hitAreaPadding}
+        y={-hitAreaPadding}
+        width={LINE_WIDTH + hitAreaPadding * 2}
+        height={LINE_HEIGHT + hitAreaPadding * 2}
+        fill="transparent"
+      />
+      {/* Left segment */}
       <rect
         x={0}
         y={0}
         width={segmentWidth}
         height={LINE_HEIGHT}
         rx={2}
-        fill={colors.lineColor}
-        opacity={opacity * 0.7}
+        fill={lineColor}
+        opacity={lineOpacity * 0.7}
         style={{
-          filter: `drop-shadow(0 0 ${glowSize * 0.75}px ${colors.lineEmissive})`,
+          filter: `drop-shadow(0 0 ${(glowSize + selectedGlow) * 0.75}px ${isSelected ? selectionColor : colors.lineEmissive})`,
+          transition: 'filter 0.2s, fill 0.2s',
         }}
       />
+      {/* Right segment */}
       <rect
         x={segmentWidth + YIN_GAP}
         y={0}
         width={segmentWidth}
         height={LINE_HEIGHT}
         rx={2}
-        fill={colors.lineColor}
-        opacity={opacity * 0.7}
+        fill={lineColor}
+        opacity={lineOpacity * 0.7}
         style={{
-          filter: `drop-shadow(0 0 ${glowSize * 0.75}px ${colors.lineEmissive})`,
+          filter: `drop-shadow(0 0 ${(glowSize + selectedGlow) * 0.75}px ${isSelected ? selectionColor : colors.lineEmissive})`,
+          transition: 'filter 0.2s, fill 0.2s',
         }}
       />
+      {/* Selection indicator */}
+      {isSelected && (
+        <rect
+          x={-2}
+          y={-2}
+          width={LINE_WIDTH + 4}
+          height={LINE_HEIGHT + 4}
+          rx={3}
+          fill="none"
+          stroke={selectionColor}
+          strokeWidth={1}
+          opacity={0.8}
+        />
+      )}
     </g>
   );
 });
@@ -169,6 +246,15 @@ export default function HexagramCompass({
     audioFlavor,
     transitionDirection,
   } = usePolarity();
+  
+  // Depth context for recursive dive
+  const { 
+    selectedLine, 
+    selectLine, 
+    canDive, 
+    depth,
+    currentLineFlavor,
+  } = useDepth();
   
   const containerRef = useRef(null);
   const animationRef = useRef(null);
