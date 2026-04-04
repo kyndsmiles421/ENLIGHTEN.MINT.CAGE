@@ -493,7 +493,16 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Central orb click opens Mission Control
 - Tests: Frontend 100% — all 15 satellites navigate correctly, all destination pages load with content
 
-## Upcoming (P0-P1) — Iteration 269+
+### Iteration 269 — Sphere Containment Orbital System (April 2026)
+- Rebuilt Orbital Hub per user spec: central Mission Control sphere with dormant modules as sub-objects
+- Modules eject from sphere to orbit via click → physics-based spring animation
+- Fixed orbital planes using simple sin/cos rotation (no complex physics)
+- Click orbiting satellite → navigates to its page. Snap-back X button returns it to sphere.
+- All chrome hidden on /hub: CosmicToolbar, SmartDock, CreditNudge, PersistentWaveform, OrbitalNavigation, LearningToggle, CosmicAssistant
+- Viewport containment: no overflow on desktop or mobile (390x844)
+- Tests: Frontend 100% — all 15 ejections, all 15 navigations, Mission Control, mobile viewport all pass
+
+## Upcoming (P0-P1) — Iteration 270+
 - **Step 9: Multi-Widget Concurrent Dialogue** — Two Sovereign windows open simultaneously
 - **Dust "Clink" Spatial Audio** — "Star particles settling" sound on Dust transfers
 - **"Usage Yield" Report UI** — Monthly savings map from Caspian
