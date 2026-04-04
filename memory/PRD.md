@@ -167,7 +167,28 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 274 — Haptic & Sensory Resonance System (April 2026) — LATEST
+### Iteration 275 — Structural Hardening: State Sentinel + Theme Engine + Sovereign UI (April 2026) — LATEST
+- **State Sentinel** (`OrbitalSentinelContext.js`):
+  - Finite State Machine: IDLE → BLOOMED → EXTRACTED → NAVIGATING
+  - Blocks illegal transitions (double-tap, glitchy drag)
+  - 100ms debounce prevents rapid-fire events
+  - Transition history for debugging
+- **Cosmic Theme Engine** (`CosmicThemeContext.js`):
+  - Global CSS custom properties: `--resonance-primary`, `--resonance-secondary`, `--resonance-glow-intensity`
+  - 18 mood palettes (happy, peaceful, energized, etc.)
+  - Surface presets: glass, frosted, solid, translucent
+  - Persists to localStorage
+- **Sovereign UI Library** (`SovereignUI.js`):
+  - `ResonanceButton`, `ResonanceCard`, `ResonanceOrb`, `ResonanceSurface`, `ResonanceText`
+  - HOC components auto-inherit haptic + radiance + glass-morphism
+- **Ghost Layer Cleanup**:
+  - `useSensoryResonance` tracks active audio nodes in ref
+  - Proper `disconnect()` and nullification on unmount
+  - Removes from `window.__cosmicAudioContexts` on cleanup
+- **Auto-Resume Logic**: Listens for `zen-unmute` event to resume audio context
+- Tests: Rapid tap test passed — no glitches, UI remains stable
+
+### Iteration 274 — Haptic & Sensory Resonance System (April 2026)
 - **New Hook**: `useSensoryResonance.js` — Unified haptic + visual + audio feedback
 - **Haptic Patterns**: 
   - `orbExtract: [10, 30, 10]` — Crisp click for extraction

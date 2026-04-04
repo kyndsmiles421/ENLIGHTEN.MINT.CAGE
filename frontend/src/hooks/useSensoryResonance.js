@@ -226,19 +226,73 @@ export function useSensoryResonance() {
     },
   };
 
+  // ═══ GHOST LAYER CLEANUP — Track active audio nodes for proper GC ═══
+  const activeNodesRef = useRef([]);
+  
+  const cleanupAudioNode = useCallback((osc, gain) => {
+    // Disconnect and nullify to help GC
+    try {
+      osc.disconnect();
+      gain.disconnect();
+    } catch {}
+    
+    // Remove from active nodes
+    activeNodesRef.current = activeNodesRef.current.filter(
+      n => n.osc !== osc && n.gain !== gain
+    );
+  }, []);
+
   // ═══ SETTINGS ═══
   const setHapticsPreference = useCallback((enabled) => {
     setHapticsEnabled(enabled);
     localStorage.setItem('zen_haptics_enabled', enabled ? 'true' : 'false');
   }, []);
 
+  // ═══ AUTO-RESUME after unmute ═══
+  const resumeAudio = useCallback(() => {
+    if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume().catch(() => {});
+    }
+  }, []);
+
+  // Listen for unmute events
+  useEffect(() => {
+    const handleUnmute = () => {
+      // Clear emergency flag if it was set
+      localStorage.removeItem('zen_emergency_active');
+      resumeAudio();
+    };
+    
+    window.addEventListener('zen-unmute', handleUnmute);
+    return () => window.removeEventListener('zen-unmute', handleUnmute);
+  }, [resumeAudio]);
+
   // ═══ CLEANUP ═══
   useEffect(() => {
     return () => {
+      // Clear bloom timeout
       if (bloomRef.current) clearTimeout(bloomRef.current);
+      
+      // Disconnect all active audio nodes (Ghost Layer cleanup)
+      activeNodesRef.current.forEach(({ osc, gain }) => {
+        try { osc.stop(); osc.disconnect(); } catch {}
+        try { gain.disconnect(); } catch {}
+      });
+      activeNodesRef.current = [];
+      
+      // Close audio context
       if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
         try { audioCtxRef.current.close(); } catch {}
       }
+      
+      // Remove from global registry
+      if (window.__cosmicAudioContexts && audioCtxRef.current) {
+        window.__cosmicAudioContexts = window.__cosmicAudioContexts.filter(
+          ctx => ctx !== audioCtxRef.current
+        );
+      }
+      
+      audioCtxRef.current = null;
     };
   }, []);
 
@@ -261,6 +315,12 @@ export function useSensoryResonance() {
     
     // Settings
     setHapticsPreference,
+    
+    // Control
+    resumeAudio,
+    
+    // Cleanup helper (for manual use)
+    cleanupAudioNode,
   };
 }
 

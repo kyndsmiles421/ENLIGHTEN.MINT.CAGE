@@ -33,6 +33,8 @@ import OrbCorner from './components/OrbCorner';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { CosmicStateProvider } from './context/CosmicStateContext';
 import { SovereignProvider } from './context/SovereignContext';
+import { CosmicThemeProvider } from './context/CosmicThemeContext';
+import { OrbitalSentinelProvider } from './context/OrbitalSentinelContext';
 import CommandMode from './components/CommandMode';
 import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
@@ -378,6 +380,8 @@ function App() {
       <ResolutionProvider>
       <SensoryProvider>
       <CosmicStateProvider>
+      <CosmicThemeProvider>
+      <OrbitalSentinelProvider>
       <SovereignProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
@@ -421,6 +425,8 @@ function App() {
           </VoiceCommandProvider>
         </BrowserRouter>
       </SovereignProvider>
+      </OrbitalSentinelProvider>
+      </CosmicThemeProvider>
       </CosmicStateProvider>
       </SensoryProvider>
       </ResolutionProvider>
