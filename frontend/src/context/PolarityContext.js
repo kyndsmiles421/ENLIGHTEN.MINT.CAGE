@@ -254,6 +254,10 @@ export function PolarityProvider({ children }) {
   // Emergency Void State (STOP button override)
   const [isVoid, setIsVoid] = useState(false);
   
+  // Manual Gravity Override (for Zero Point access)
+  const [manualGravityEnabled, setManualGravityEnabled] = useState(false);
+  const [manualGravityValue, setManualGravityValue] = useState(0.5);
+  
   // Compass rotation state (for inertial physics)
   const [compassRotation, setCompassRotation] = useState(0);
   const [compassVelocity, setCompassVelocity] = useState(0);
@@ -424,9 +428,52 @@ export function PolarityProvider({ children }) {
   // Calculate gravity and physics
   const gravity = useMemo(() => {
     if (isVoid) return 0;
+    // Manual override takes precedence
+    if (manualGravityEnabled) return manualGravityValue;
     if (!currentLayer) return 0.5;
     return calculateGravity(currentLayer.depth);
-  }, [currentLayer, isVoid]);
+  }, [currentLayer, isVoid, manualGravityEnabled, manualGravityValue]);
+  
+  // Check if at Zero Point (0.48 - 0.52 gravity range)
+  const isAtZeroPoint = useMemo(() => {
+    return gravity >= ZERO_POINT_LOW && gravity <= ZERO_POINT_HIGH;
+  }, [gravity]);
+  
+  // Enable/disable manual gravity mode
+  const enableManualGravity = useCallback((enabled) => {
+    setManualGravityEnabled(enabled);
+    if (!enabled) {
+      // Reset hexagram to route-based when disabling
+      const routeGravity = currentLayer ? calculateGravity(currentLayer.depth) : 0.5;
+      setHexagram(hexagramFromGravity(routeGravity));
+    }
+  }, [currentLayer]);
+  
+  // Set manual gravity value (0-1)
+  const setManualGravity = useCallback((value) => {
+    const clamped = Math.max(0, Math.min(1, value));
+    setManualGravityValue(clamped);
+    // Update hexagram to match manual gravity
+    if (!isVoid) {
+      setHexagram(hexagramFromGravity(clamped));
+    }
+  }, [isVoid]);
+  
+  // Toggle Zero Point Mode (quick shortcut to enable manual gravity at 0.50)
+  const toggleZeroPointMode = useCallback(() => {
+    if (manualGravityEnabled && Math.abs(manualGravityValue - 0.5) < 0.05) {
+      // Already in Zero Point mode, disable
+      enableManualGravity(false);
+    } else {
+      // Enable Zero Point mode
+      setManualGravityValue(0.5);
+      setManualGravityEnabled(true);
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([20, 10, 20, 10, 50]);
+      }
+    }
+  }, [manualGravityEnabled, manualGravityValue, enableManualGravity]);
   
   const physics = useMemo(() => calculatePhysics(gravity), [gravity]);
   
@@ -469,9 +516,6 @@ export function PolarityProvider({ children }) {
   const isInCore = gravity >= 0.35 && gravity < 0.65;
   const isInMatrix = gravity >= 0.65;
   
-  // ZERO-POINT NULL STATE — The Weightless Moment (0.48-0.52)
-  const isAtZeroPoint = gravity >= ZERO_POINT_LOW && gravity <= ZERO_POINT_HIGH;
-  
   // Rotation direction based on layer (ZERO at Zero-Point)
   const rotationDirection = useMemo(() => {
     if (isVoid || compassFrozen || isAtZeroPoint) return 0; // Frozen at Zero-Point
@@ -489,6 +533,13 @@ export function PolarityProvider({ children }) {
     // Gravity system
     gravity,
     depth: currentLayer?.depth || 0.5,
+    
+    // Manual Gravity Control (for Zero Point access)
+    manualGravityEnabled,
+    manualGravityValue,
+    enableManualGravity,
+    setManualGravity,
+    toggleZeroPointMode,
     
     // 6-Bit Hexagram System
     hexagram,

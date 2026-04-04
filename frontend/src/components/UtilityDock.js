@@ -55,6 +55,12 @@ export default function UtilityDock({
     layerName,
     isInHollow,
     isInMatrix,
+    isAtZeroPoint,
+    manualGravityEnabled,
+    manualGravityValue,
+    enableManualGravity,
+    setManualGravity,
+    toggleZeroPointMode,
   } = usePolarity();
 
   // Hide on certain pages (hub, fullscreen experiences)
@@ -229,11 +235,116 @@ export default function UtilityDock({
                   className="absolute -left-2 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded text-[8px] font-bold tracking-wider uppercase"
                   style={{
                     background: colors.background,
-                    color: colors.accent,
+                    color: isAtZeroPoint ? '#888888' : colors.accent,
                     border: `1px solid ${borderColor}`,
                   }}
                 >
-                  {layerName}
+                  {isAtZeroPoint ? 'ZERO' : layerName}
+                </div>
+              </motion.div>
+              
+              {/* Gravity Slider — Manual Zero Point Control */}
+              <motion.div
+                className="relative w-full"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ delay: 0.15 }}
+              >
+                <div
+                  className="p-3 rounded-xl"
+                  style={{
+                    background: colors.background,
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${isAtZeroPoint ? 'rgba(255,255,255,0.3)' : borderColor}`,
+                    boxShadow: isAtZeroPoint 
+                      ? '0 0 20px rgba(255,255,255,0.2)' 
+                      : `0 4px 20px rgba(0,0,0,0.4)`,
+                  }}
+                >
+                  {/* Zero Point Toggle */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span 
+                      className="text-[9px] uppercase tracking-wider"
+                      style={{ color: manualGravityEnabled ? '#FFFFFF' : 'rgba(255,255,255,0.4)' }}
+                    >
+                      Manual Gravity
+                    </span>
+                    <button
+                      onClick={toggleZeroPointMode}
+                      className="px-2 py-0.5 rounded text-[8px] uppercase tracking-wider transition-all"
+                      style={{
+                        background: isAtZeroPoint ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
+                        color: isAtZeroPoint ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                        border: `1px solid ${isAtZeroPoint ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                      }}
+                      data-testid="zero-point-toggle"
+                    >
+                      {isAtZeroPoint ? 'ZERO POINT' : 'GO TO 0.50'}
+                    </button>
+                  </div>
+                  
+                  {/* Gravity Slider */}
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={manualGravityEnabled ? manualGravityValue * 100 : gravity * 100}
+                      onChange={(e) => {
+                        enableManualGravity(true);
+                        setManualGravity(parseFloat(e.target.value) / 100);
+                      }}
+                      className="w-full h-2 appearance-none cursor-pointer rounded-full"
+                      style={{
+                        background: `linear-gradient(to right, 
+                          #8B4513 0%, 
+                          #C9A962 48%, 
+                          ${isAtZeroPoint ? '#FFFFFF' : '#888888'} 50%, 
+                          #C9A962 52%, 
+                          #FFD700 100%)`,
+                        accentColor: isAtZeroPoint ? '#FFFFFF' : colors.accent,
+                      }}
+                      data-testid="gravity-slider"
+                    />
+                    
+                    {/* Zero Point marker */}
+                    <div 
+                      className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 pointer-events-none"
+                      style={{
+                        left: '50%',
+                        background: isAtZeroPoint ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                        boxShadow: isAtZeroPoint ? '0 0 8px rgba(255,255,255,0.5)' : 'none',
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Gravity Value Display */}
+                  <div className="flex justify-between mt-1 text-[8px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    <span>Hollow</span>
+                    <span style={{ 
+                      color: isAtZeroPoint ? '#FFFFFF' : 'rgba(255,255,255,0.6)',
+                      fontWeight: isAtZeroPoint ? 'bold' : 'normal',
+                    }}>
+                      {(gravity * 100).toFixed(1)}%
+                    </span>
+                    <span>Matrix</span>
+                  </div>
+                  
+                  {/* Reset to Route button */}
+                  {manualGravityEnabled && (
+                    <button
+                      onClick={() => enableManualGravity(false)}
+                      className="w-full mt-2 py-1 rounded text-[8px] uppercase tracking-wider transition-all hover:bg-opacity-20"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        color: 'rgba(255,255,255,0.5)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                      }}
+                      data-testid="reset-gravity"
+                    >
+                      Reset to Route Gravity
+                    </button>
+                  )}
                 </div>
               </motion.div>
             </motion.div>
