@@ -16,7 +16,7 @@
  * All powered by the unified useTesseractCore hook.
  */
 
-import React, { useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Compass, Gem, Target } from 'lucide-react';
@@ -27,7 +27,7 @@ import { useTesseractCore } from '../hooks/useTesseractCore';
 // AUD-01: Acoustic Bloom - Phonetic audio engine
 import { usePhoneticSynthesizer } from '../hooks/usePhoneticSynthesizer';
 
-// VOID-01 & HUD-01: Global state for bloom persistence and widget breathing
+// VOID-01: Global state for bloom persistence
 import { useRecursiveRegistry } from '../stores/RecursiveRegistryStore';
 
 // Components
@@ -319,48 +319,91 @@ export default function TesseractExperience() {
     enableAutoVoid: true,
   });
   
-  // VOID-01 & HUD-01: Global state for bloom persistence and widget breathing
+  // VOID-01: Global state for bloom persistence (kept in registry for cross-component access)
   const registry = useRecursiveRegistry();
   
-  // HUD-01: Calculate widget scale based on depth (deeper = smaller widgets)
-  // Creates "breathing room" - widgets "inhale" as user dives deeper
-  const widgetScale = useMemo(() => {
-    // At L0: widgets at 1.0 scale
-    // At L3+: widgets at 0.85 scale (15% smaller)
-    const depthFactor = Math.min(core.depth / 3, 1);
-    const scale = 1 - (depthFactor * 0.15);
-    return scale;
-  }, [core.depth]);
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOOP-FIX: CSS Variable Injection (The "Muzzle")
+  // Moves HUD scaling OUT of React state → into hardware-accelerated CSS
+  // Result: Zero re-renders. HUD and Lattice stop "shouting at each other."
+  // ═══════════════════════════════════════════════════════════════════════════
   
-  // HUD-01: Update registry with current lattice scale on depth change
-  // Note: registry setter functions are stable (memoized), safe to exclude from deps
+  const rafRef = useRef(null);
+  const lastDepthRef = useRef(0);
+  
   useEffect(() => {
-    // Lattice "exhales" (expands) as user dives deeper
-    const latticeScale = 1 + (core.depth * 0.1); // 10% larger per depth level
-    registry.setLatticeScale(latticeScale);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only update CSS variable if depth actually changed
+    if (lastDepthRef.current === core.depth) return;
+    lastDepthRef.current = core.depth;
+    
+    // Cancel any pending RAF to prevent stacking
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+    
+    // Inject CSS variable in next animation frame (hardware-accelerated)
+    rafRef.current = requestAnimationFrame(() => {
+      // Calculate lattice zoom factor (0 at L0, 0.33 at L1, 0.67 at L2, 1.0 at L3+)
+      const zoomFactor = Math.min(core.depth / 3, 1);
+      
+      // Inject into document root for global CSS access
+      document.documentElement.style.setProperty('--lattice-zoom', zoomFactor.toString());
+      document.documentElement.style.setProperty('--lattice-depth', core.depth.toString());
+      
+      console.log(`[LOOP-FIX] CSS Variable injected: --lattice-zoom=${zoomFactor.toFixed(2)}, depth=${core.depth}`);
+    });
+    
+    // Cleanup on unmount
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
   }, [core.depth]);
   
-  // VOID-01: Persist bloom state during dive transitions
+  // Initialize CSS variables on mount
+  useEffect(() => {
+    document.documentElement.style.setProperty('--lattice-zoom', '0');
+    document.documentElement.style.setProperty('--lattice-depth', '0');
+    
+    return () => {
+      // Clean up CSS variables on unmount
+      document.documentElement.style.removeProperty('--lattice-zoom');
+      document.documentElement.style.removeProperty('--lattice-depth');
+    };
+  }, []);
+  
+  // VOID-01: Persist bloom state during dive transitions (kept minimal)
   useEffect(() => {
     if (core.isZooming) {
-      // Capture current bloom state with exit velocity
-      const exitVelocity = core.dwellProgress;
       registry.setBloomState({
-        exitVelocity,
+        exitVelocity: core.dwellProgress,
         depthAtActivation: core.depth,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [core.isZooming, core.dwellProgress, core.depth]);
+  }, [core.isZooming]);
   
-  // VOID-01: Update bloom opacity based on dwell progress
+  // VOID-01: Update bloom state on significant changes (not every frame)
+  // Throttle: Only update when isActive or isVoidMode changes, or on completion
+  const prevBloomRef = useRef({ isActive: false, opacity: 0 });
   useEffect(() => {
-    registry.setBloomState({
-      isActive: core.selectedCell !== null,
-      opacity: core.dwellProgress,
-      color: core.isVoidMode ? 'void' : 'jade',
-    });
+    const isActive = core.selectedCell !== null;
+    const isComplete = core.dwellProgress >= 1;
+    
+    // Only update if: activation changed, mode changed, or just completed
+    const shouldUpdate = 
+      isActive !== prevBloomRef.current.isActive ||
+      isComplete && prevBloomRef.current.opacity < 1;
+    
+    if (shouldUpdate) {
+      registry.setBloomState({
+        isActive,
+        opacity: core.dwellProgress,
+        color: core.isVoidMode ? 'void' : 'jade',
+      });
+      prevBloomRef.current = { isActive, opacity: core.dwellProgress };
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [core.selectedCell, core.dwellProgress, core.isVoidMode]);
   
@@ -443,7 +486,6 @@ export default function TesseractExperience() {
         currentStability={core.currentStability}
         seeds={core.seeds}
         onToggleVoidMode={core.toggleVoidMode}
-        widgetScale={widgetScale}
       />
       
       {/* Header */}
@@ -507,21 +549,21 @@ export default function TesseractExperience() {
         canMint={core.depth >= 1 && core.address}
       />
       
-      {/* Seed Hunt Widget (sidebar) - HUD-01: Dynamic breathing */}
-      <motion.div 
-        className="fixed right-4 top-1/2 -translate-y-1/2 w-64 z-30 origin-right"
-        animate={{
-          scale: widgetScale,
-          opacity: 0.7 + (widgetScale * 0.3),  // Fade slightly as widgets shrink
+      {/* Seed Hunt Widget (sidebar) - LOOP-FIX: CSS Variable breathing */}
+      <div 
+        className="fixed right-4 top-1/2 -translate-y-1/2 w-64 z-30 origin-right hud-widget-breathing"
+        style={{
+          transform: 'scale(calc(1 - (var(--lattice-zoom, 0) * 0.15)))',
+          opacity: 'calc(1 - (var(--lattice-zoom, 0) * 0.2))',
+          transition: 'transform 0.3s ease-out, opacity 0.3s ease-out',
         }}
-        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
       >
         <SeedHuntWidget
           currentAddress={core.address}
           onNavigateToHunt={handleNavigateToHunt}
           compact={true}
         />
-      </motion.div>
+      </div>
       
       {/* Address display */}
       {core.address && (

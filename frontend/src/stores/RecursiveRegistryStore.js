@@ -62,9 +62,36 @@ let registryState = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const subscribers = new Set();
+let notifyScheduled = false;
+let notifyCount = 0;
+const MAX_NOTIFY_PER_FRAME = 10;  // LOOP-FIX: Prevent infinite notify loops
 
 function notifySubscribers() {
+  // LOOP-FIX: Guard against infinite loops
+  if (notifyScheduled) return;
+  
+  notifyCount++;
+  if (notifyCount > MAX_NOTIFY_PER_FRAME) {
+    console.warn('[LOOP-FIX] Max notifications exceeded, throttling');
+    notifyScheduled = true;
+    requestAnimationFrame(() => {
+      notifyScheduled = false;
+      notifyCount = 0;
+      subscribers.forEach(callback => callback());
+    });
+    return;
+  }
+  
   subscribers.forEach(callback => callback());
+  
+  // Reset count after frame
+  if (!notifyScheduled) {
+    notifyScheduled = true;
+    requestAnimationFrame(() => {
+      notifyScheduled = false;
+      notifyCount = 0;
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

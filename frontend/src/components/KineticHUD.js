@@ -493,16 +493,20 @@ export default function KineticHUD({
   currentStability,
   seeds,
   
-  // HUD-01: Dynamic widget scaling for "breathing" effect
-  widgetScale = 1.0,
-  
   // Callbacks
   onToggleVoidMode,
 }) {
-  // HUD-01: Calculate breathing transforms
-  // Widgets "inhale" (shrink) as lattice "exhales" (expands with depth)
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOOP-FIX: CSS Variable-based breathing (no React state, no re-renders)
+  // The --lattice-zoom variable is injected by TesseractExperience via RAF
+  // Widgets use CSS calc() for hardware-accelerated transforms
+  // ═══════════════════════════════════════════════════════════════════════════
+  
   const breathingStyle = {
-    transform: `scale(${widgetScale})`,
+    // LOOP-FIX: Use CSS variable instead of React prop
+    // calc(1 - (var(--lattice-zoom) * 0.15)) gives: L0=1.0, L3+=0.85
+    transform: 'scale(calc(1 - (var(--lattice-zoom, 0) * 0.15)))',
+    opacity: 'calc(1 - (var(--lattice-zoom, 0) * 0.2))',  // Subtle fade at depth
     transition: 'transform 0.3s ease-out, opacity 0.3s ease-out',
   };
   
@@ -512,7 +516,7 @@ export default function KineticHUD({
       style={{ pointerEvents: 'none', zIndex: 30 }}  // z-30: Below lattice (z-999)
       data-testid="kinetic-hud"
     >
-      {/* Registry Status (Top-Right) - Display Only - HUD-01: Breathing */}
+      {/* Registry Status (Top-Right) - LOOP-FIX: CSS breathing */}
       <div style={{ ...breathingStyle, transformOrigin: 'top right', pointerEvents: 'none' }}>
         <RegistryStatusWidget
           dominantLattice={dominantLattice}
@@ -522,7 +526,7 @@ export default function KineticHUD({
         />
       </div>
       
-      {/* Gravity Indicator (Top-Left) - Display Only - HUD-01: Breathing */}
+      {/* Gravity Indicator (Top-Left) - LOOP-FIX: CSS breathing */}
       <div style={{ ...breathingStyle, transformOrigin: 'top left', pointerEvents: 'none' }}>
         <GravityIndicatorWidget
           gravity={gravity}
@@ -533,7 +537,7 @@ export default function KineticHUD({
         />
       </div>
       
-      {/* Dust Wallet (Bottom-Right) - Display Only - HUD-01: Breathing */}
+      {/* Dust Wallet (Bottom-Right) - LOOP-FIX: CSS breathing */}
       <div style={{ ...breathingStyle, transformOrigin: 'bottom right', pointerEvents: 'none' }}>
         <DustWalletWidget
           seedCount={seeds?.length || 0}
@@ -543,7 +547,7 @@ export default function KineticHUD({
         />
       </div>
       
-      {/* Stability Indicator (Bottom-Left) - Display Only - HUD-01: Breathing */}
+      {/* Stability Indicator (Bottom-Left) - LOOP-FIX: CSS breathing */}
       <div style={{ ...breathingStyle, transformOrigin: 'bottom left', pointerEvents: 'none' }}>
         <StabilityIndicatorWidget
           stability={currentStability}
