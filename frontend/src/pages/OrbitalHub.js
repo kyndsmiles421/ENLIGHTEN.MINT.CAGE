@@ -1,89 +1,92 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ALL_SATELLITES, ZONE_AUDIO } from '../components/orbital/constants';
 import { CosmicDust } from '../components/orbital/CosmicDust';
 import { useHubAudio } from '../hooks/useHubAudio';
-import { X } from 'lucide-react';
 import MissionControl from '../components/MissionControl';
+
+// ═══ STRICT DIMENSIONAL CONSTRAINTS ═══
+// Everything is a ratio of ORB_RADIUS (R)
+const FIXTURE_SCALE_HIDDEN = 0.15;   // Absorbed inside orb
+const FIXTURE_SCALE_ACTIVE = 0.4;    // Extracted and visible
+const ORBIT_DISTANCE = 1.6;          // Center-to-center distance from orb
+const EXTRACTION_THRESHOLD = 1.2;    // Drag distance to "break free" (interaction buffer)
+const ROTATION_SPEED = 0.1;          // Radians per second
+
+function lerp(a, b, t) { return a + (b - a) * t; }
 
 export default function OrbitalHub() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const audio = useHubAudio();
 
-  // Which satellites are currently "ejected" (active in orbit)
-  const [activeSatIds, setActiveSatIds] = useState([]);
+  const [extractedIds, setExtractedIds] = useState([]);
+  const [draggingId, setDraggingId] = useState(null);
+  const [dragProgress, setDragProgress] = useState(0); // 0-1 pull progress
   const [hoveredSat, setHoveredSat] = useState(null);
-  const [frozenSat, setFrozenSat] = useState(null);
   const [missionControlOpen, setMissionControlOpen] = useState(false);
   const [orbAngle, setOrbAngle] = useState(0);
-
   const animRef = useRef(null);
-  const containerRef = useRef(null);
+  const orbRef = useRef(null);
 
-  // Responsive sizing
-  const [dims, setDims] = useState({ w: 800, h: 600 });
+  // Responsive: R is the orb radius in pixels
+  const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
   useEffect(() => {
     const update = () => setDims({ w: window.innerWidth, h: window.innerHeight });
-    update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
 
   const isMobile = dims.w < 640;
-  const containerSize = Math.min(dims.w - 32, dims.h - 80, 680);
+  // R = orb radius — fills a good portion of the screen
+  const R = Math.min(dims.w * 0.35, dims.h * 0.28, 240);
+  const orbDiameter = R * 2;
+  const orbitDistancePx = R * ORBIT_DISTANCE;
+  const fixtureActiveSize = R * FIXTURE_SCALE_ACTIVE * 2; // diameter
+  const fixtureHiddenSize = R * FIXTURE_SCALE_HIDDEN * 2;
+  // Container must hold orb + orbit ring + fixture
+  const containerSize = (orbitDistancePx + fixtureActiveSize / 2 + 4) * 2;
   const center = containerSize / 2;
-  const orbRadius = containerSize * 0.38;
-  const orbSize = isMobile ? 120 : 160;
 
-  // Derived
-  const activeSats = ALL_SATELLITES.filter(s => activeSatIds.includes(s.id));
-  const dormantSats = ALL_SATELLITES.filter(s => !activeSatIds.includes(s.id));
+  const extractedSats = ALL_SATELLITES.filter(s => extractedIds.includes(s.id));
+  const absorbedSats = ALL_SATELLITES.filter(s => !extractedIds.includes(s.id));
 
-  // Simple sin/cos orbital rotation
+  // Orbital rotation
   useEffect(() => {
-    const SPEED = 0.15; // radians per second
     let last = performance.now();
     const tick = (now) => {
       const dt = (now - last) / 1000;
       last = now;
-      setOrbAngle(prev => prev + SPEED * dt);
+      setOrbAngle(prev => prev + ROTATION_SPEED * dt);
       animRef.current = requestAnimationFrame(tick);
     };
     animRef.current = requestAnimationFrame(tick);
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
 
-  // Eject satellite from central sphere to orbit
-  const ejectSatellite = useCallback((id) => {
-    setActiveSatIds(prev => {
-      if (prev.includes(id)) return prev;
-      return [...prev, id];
-    });
+  // ═══ EXTRACTION: Pull fixture out of orb ═══
+  const extractFixture = useCallback((id) => {
+    setExtractedIds(prev => prev.includes(id) ? prev : [...prev, id]);
+    setDraggingId(null);
+    setDragProgress(0);
     if (navigator.vibrate) navigator.vibrate([20, 10, 30]);
     try { audio.playSatellite(id); } catch {}
   }, [audio]);
 
-  // Snap satellite back into central sphere
-  const snapBack = useCallback((id) => {
-    setActiveSatIds(prev => prev.filter(s => s !== id));
-    if (frozenSat === id) setFrozenSat(null);
+  // ═══ ABSORPTION: Snap fixture back to (0,0,0) inside orb ═══
+  const absorbFixture = useCallback((id) => {
+    setExtractedIds(prev => prev.filter(s => s !== id));
     try { audio.collapseSound(); } catch {}
     if (navigator.vibrate) navigator.vibrate([15, 8, 25]);
-  }, [frozenSat, audio]);
+  }, [audio]);
 
-  // Navigate to the satellite's page
+  // Navigate to module page
   const goToModule = useCallback((sat) => {
     try { audio.stopSatellite(); } catch {}
     navigate(sat.path);
   }, [navigate, audio]);
-
-  // Freeze/unfreeze orbital velocity for a satellite
-  const toggleFreeze = useCallback((id) => {
-    setFrozenSat(prev => prev === id ? null : id);
-  }, []);
 
   const handleHover = useCallback((id) => {
     setHoveredSat(id);
@@ -91,306 +94,368 @@ export default function OrbitalHub() {
     else { try { audio.stopSatellite(); } catch {} }
   }, [audio]);
 
-  // Calculate position for each active satellite on its fixed orbital plane
-  const getSatPosition = useCallback((satId, idx, total) => {
+  // Get orbital position for extracted fixture
+  const getOrbitPosition = useCallback((idx, total) => {
     const baseAngle = (idx / Math.max(total, 1)) * Math.PI * 2;
-    const isFrozen = frozenSat === satId;
-    const angle = baseAngle + (isFrozen ? 0 : orbAngle) - Math.PI / 2;
-    const x = Math.cos(angle) * orbRadius;
-    const y = Math.sin(angle) * orbRadius;
-    return { x, y };
-  }, [orbAngle, orbRadius, frozenSat]);
+    const angle = baseAngle + orbAngle - Math.PI / 2;
+    return {
+      x: Math.cos(angle) * orbitDistancePx,
+      y: Math.sin(angle) * orbitDistancePx,
+    };
+  }, [orbAngle, orbitDistancePx]);
 
   const hoveredData = ALL_SATELLITES.find(s => s.id === hoveredSat);
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center overflow-hidden"
+      className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
       style={{ background: '#06060e', position: 'relative' }}
       data-testid="orbital-hub-page"
     >
       <CosmicDust />
 
       {/* Title */}
-      <motion.div className="absolute top-6 left-0 right-0 text-center z-10 pointer-events-none"
+      <motion.div className="absolute top-4 sm:top-6 left-0 right-0 text-center z-10 pointer-events-none"
         initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <h1 className="text-base sm:text-lg font-light tracking-[0.25em] uppercase"
+        <h1 className="text-sm sm:text-lg font-light tracking-[0.25em] uppercase"
           style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}>
           The Cosmic Collective
         </h1>
-        {user && (
-          <p className="text-[9px] mt-1" style={{ color: 'rgba(248,250,252,0.12)' }}>
-            {user.name || 'Traveler'}
-          </p>
-        )}
       </motion.div>
 
-      {/* Orbital Container — fully contained */}
-      <div
-        ref={containerRef}
-        className="relative"
-        style={{ width: containerSize, height: containerSize, zIndex: 2 }}
-      >
-        {/* Orbit ring guide */}
-        <div className="absolute rounded-full pointer-events-none"
-          style={{
-            left: center - orbRadius, top: center - orbRadius,
-            width: orbRadius * 2, height: orbRadius * 2,
-            border: activeSats.length > 0 ? '1px solid rgba(248,250,252,0.04)' : 'none',
-            transition: 'border-color 0.5s',
-          }}
-        />
+      {/* ═══ ORBITAL SYSTEM ═══ */}
+      <div className="relative" style={{
+        width: containerSize, height: containerSize, zIndex: 2,
+        maxWidth: '100vw', maxHeight: 'calc(100vh - 40px)',
+      }}>
 
-        {/* Active Satellites — orbiting on fixed planes */}
-        {activeSats.map((sat, i) => {
-          const pos = getSatPosition(sat.id, i, activeSats.length);
+        {/* Orbit ring guide */}
+        {extractedSats.length > 0 && (
+          <div className="absolute rounded-full pointer-events-none"
+            style={{
+              left: center - orbitDistancePx, top: center - orbitDistancePx,
+              width: orbitDistancePx * 2, height: orbitDistancePx * 2,
+              border: '1px solid rgba(248,250,252,0.035)',
+            }}
+          />
+        )}
+
+        {/* ═══ EXTRACTED FIXTURES — orbiting at 1.6R ═══ */}
+        {extractedSats.map((sat, i) => {
+          const pos = getOrbitPosition(i, extractedSats.length);
           const isHovered = hoveredSat === sat.id;
-          const isFrozen = frozenSat === sat.id;
           const Icon = sat.icon;
-          const satSize = isMobile ? 56 : 68;
+          const size = fixtureActiveSize;
 
           return (
             <motion.div
               key={sat.id}
-              className="absolute"
+              className="absolute cursor-pointer"
               style={{
-                left: center - satSize / 2,
-                top: center - satSize / 2,
-                width: satSize,
-                height: satSize,
-                zIndex: isHovered ? 25 : isFrozen ? 22 : 10,
+                left: center - size / 2,
+                top: center - size / 2,
+                width: size, height: size,
+                zIndex: isHovered ? 30 : 20,
               }}
-              initial={{ x: 0, y: 0, scale: 0.2, opacity: 0 }}
+              initial={{ x: 0, y: 0, scale: FIXTURE_SCALE_HIDDEN / FIXTURE_SCALE_ACTIVE, opacity: 0 }}
               animate={{
-                x: pos.x,
-                y: pos.y,
-                scale: isHovered ? 1.2 : 1,
+                x: pos.x, y: pos.y,
+                scale: isHovered ? 1.12 : 1,
                 opacity: 1,
               }}
               transition={{
-                x: { type: 'spring', stiffness: 80, damping: 18 },
-                y: { type: 'spring', stiffness: 80, damping: 18 },
-                scale: { duration: 0.2 },
-                opacity: { duration: 0.4 },
+                x: { type: 'spring', stiffness: 70, damping: 16 },
+                y: { type: 'spring', stiffness: 70, damping: 16 },
+                scale: { duration: 0.2 }, opacity: { duration: 0.4 },
               }}
               onHoverStart={() => handleHover(sat.id)}
               onHoverEnd={() => handleHover(null)}
+              onClick={(e) => { e.stopPropagation(); goToModule(sat); }}
               data-testid={`satellite-${sat.id}`}
             >
-              {/* Satellite body */}
               <div
-                className="w-full h-full rounded-full flex flex-col items-center justify-center cursor-pointer relative"
+                className="w-full h-full rounded-full flex flex-col items-center justify-center relative"
                 style={{
-                  background: isHovered ? `${sat.color}18` : isFrozen ? `${sat.color}12` : 'rgba(10,10,18,0.6)',
-                  border: `1px solid ${isHovered ? sat.color + '55' : isFrozen ? sat.color + '30' : sat.color + '18'}`,
+                  background: isHovered ? `${sat.color}1A` : 'rgba(10,10,18,0.6)',
+                  border: `1.5px solid ${isHovered ? sat.color + '55' : sat.color + '20'}`,
                   boxShadow: isHovered
-                    ? `0 0 30px ${sat.color}25, inset 0 0 14px ${sat.color}0A`
-                    : isFrozen
-                    ? `0 0 20px ${sat.color}15`
-                    : `0 0 10px ${sat.color}08`,
+                    ? `0 0 ${R * 0.15}px ${sat.color}30, inset 0 0 ${R * 0.08}px ${sat.color}10`
+                    : `0 0 ${R * 0.06}px ${sat.color}10`,
                   backdropFilter: 'blur(8px)',
-                  transition: 'background 0.3s, border-color 0.3s, box-shadow 0.3s',
                 }}
-                onClick={(e) => { e.stopPropagation(); goToModule(sat); }}
               >
-                <Icon size={isMobile ? 16 : 18} style={{ color: sat.color }} />
-                <p className="text-[6px] sm:text-[7px] mt-0.5 font-medium"
-                  style={{ color: isHovered || isFrozen ? sat.color : 'rgba(248,250,252,0.35)' }}>
+                <Icon size={size * 0.3} style={{ color: sat.color }} />
+                <p className="text-center mt-0.5 font-medium leading-tight px-1"
+                  style={{
+                    fontSize: Math.max(7, size * 0.12),
+                    color: isHovered ? sat.color : 'rgba(248,250,252,0.45)',
+                  }}>
                   {sat.label}
                 </p>
-                {isFrozen && (
-                  <p className="text-[4px] font-mono tracking-wider uppercase"
-                    style={{ color: `${sat.color}60` }}>held</p>
-                )}
               </div>
-
-              {/* Snap-back button — visible on hover */}
+              {/* Absorb button (snap back) */}
               <AnimatePresence>
                 {isHovered && (
                   <motion.button
-                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
+                    className="absolute -top-1 -right-1 rounded-full flex items-center justify-center"
                     style={{
+                      width: size * 0.22, height: size * 0.22,
                       background: 'rgba(10,10,18,0.9)',
-                      border: '1px solid rgba(248,250,252,0.15)',
-                      zIndex: 30,
+                      border: '1px solid rgba(248,250,252,0.2)', zIndex: 35,
+                      fontSize: size * 0.12,
+                      color: 'rgba(248,250,252,0.6)',
                     }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    onClick={(e) => { e.stopPropagation(); snapBack(sat.id); }}
+                    initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+                    onClick={(e) => { e.stopPropagation(); absorbFixture(sat.id); }}
                     data-testid={`snapback-${sat.id}`}
                   >
-                    <X size={8} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                    &times;
                   </motion.button>
                 )}
               </AnimatePresence>
-
-              {/* Freeze toggle on right-click */}
-              <div
-                className="absolute inset-0"
-                onContextMenu={(e) => { e.preventDefault(); toggleFreeze(sat.id); }}
-                style={{ pointerEvents: 'none' }}
-              />
             </motion.div>
           );
         })}
 
-        {/* Connection lines from center to active satellites */}
+        {/* Connection lines */}
         <svg className="absolute inset-0 pointer-events-none" width={containerSize} height={containerSize} style={{ zIndex: 5 }}>
-          {activeSats.map((sat, i) => {
-            const pos = getSatPosition(sat.id, i, activeSats.length);
-            const isHov = hoveredSat === sat.id;
+          {extractedSats.map((sat, i) => {
+            const pos = getOrbitPosition(i, extractedSats.length);
             return (
               <line key={sat.id}
-                x1={center} y1={center}
-                x2={center + pos.x} y2={center + pos.y}
-                stroke={sat.color}
-                strokeWidth={isHov ? 1.5 : 0.5}
-                strokeOpacity={isHov ? 0.3 : 0.08}
-                strokeDasharray={isHov ? 'none' : '4 4'}
+                x1={center} y1={center} x2={center + pos.x} y2={center + pos.y}
+                stroke={sat.color} strokeWidth={hoveredSat === sat.id ? 1.5 : 0.5}
+                strokeOpacity={hoveredSat === sat.id ? 0.25 : 0.06} strokeDasharray="4 4"
               />
             );
           })}
         </svg>
 
-        {/* ═══ CENTRAL MISSION CONTROL SPHERE ═══ */}
+        {/* ═══ THE CORE ORB (Parent) ═══ */}
         <div
           className="absolute"
           style={{
-            left: center - orbSize / 2,
-            top: center - orbSize / 2,
-            width: orbSize,
-            height: orbSize,
+            left: center - R, top: center - R,
+            width: orbDiameter, height: orbDiameter,
             zIndex: 15,
           }}
+          ref={orbRef}
         >
           <motion.div
-            className="w-full h-full rounded-full relative cursor-pointer overflow-hidden"
+            className="w-full h-full rounded-full relative overflow-hidden"
             style={{
-              background: `radial-gradient(circle at 38% 32%, rgba(167,139,250,0.3), rgba(167,139,250,0.08) 55%, rgba(10,10,18,0.92) 85%)`,
-              border: '1.5px solid rgba(167,139,250,0.2)',
+              background: `radial-gradient(circle at 38% 32%, rgba(167,139,250,0.22), rgba(167,139,250,0.06) 55%, rgba(10,10,18,0.95) 85%)`,
+              border: '1.5px solid rgba(167,139,250,0.15)',
             }}
             animate={{
               boxShadow: [
-                '0 0 40px rgba(167,139,250,0.12)',
-                '0 0 60px rgba(167,139,250,0.2)',
-                '0 0 40px rgba(167,139,250,0.12)',
+                `0 0 ${R * 0.3}px rgba(167,139,250,0.1)`,
+                `0 0 ${R * 0.5}px rgba(167,139,250,0.18)`,
+                `0 0 ${R * 0.3}px rgba(167,139,250,0.1)`,
               ],
             }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            onClick={() => setMissionControlOpen(true)}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             data-testid="central-orb"
           >
             {/* Inner ring animations */}
-            <motion.div className="absolute rounded-full"
-              style={{ inset: 6, border: '1px solid rgba(167,139,250,0.15)' }}
+            <motion.div className="absolute rounded-full pointer-events-none"
+              style={{ inset: R * 0.04, border: '1px solid rgba(167,139,250,0.1)' }}
               animate={{ rotate: 360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+              transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
             />
-            <motion.div className="absolute rounded-full"
-              style={{ inset: 14, border: '1px dashed rgba(167,139,250,0.08)' }}
+            <motion.div className="absolute rounded-full pointer-events-none"
+              style={{ inset: R * 0.1, border: '1px dashed rgba(167,139,250,0.05)' }}
               animate={{ rotate: -360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+              transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
             />
 
-            {/* Dormant satellites inside the sphere — sub-objects */}
-            {dormantSats.map((sat, i) => {
+            {/* ═══ ABSORBED FIXTURES — at (0,0) center, scale 0.15R, alpha lerps on drag ═══ */}
+            {absorbedSats.map((sat, i) => {
               const Icon = sat.icon;
-              const angle = (i / Math.max(dormantSats.length, 1)) * Math.PI * 2;
-              const innerR = (orbSize / 2) * 0.55;
-              const dx = Math.cos(angle) * innerR;
-              const dy = Math.sin(angle) * innerR;
+              const hiddenDiam = fixtureHiddenSize;
+              const isDragging = draggingId === sat.id;
+              // Arrange in concentric rings
+              const total = absorbedSats.length;
+              const ring1 = Math.min(8, total);
+              const ring2 = total - ring1;
+              let posX = 0, posY = 0;
+              if (i < ring1) {
+                const angle = (i / ring1) * Math.PI * 2 - Math.PI / 2;
+                const innerR = R * 0.55;
+                posX = Math.cos(angle) * innerR;
+                posY = Math.sin(angle) * innerR;
+              } else {
+                const i2 = i - ring1;
+                const angle = (i2 / Math.max(ring2, 1)) * Math.PI * 2 - Math.PI / 2;
+                const innerR = R * 0.25;
+                posX = Math.cos(angle) * innerR;
+                posY = Math.sin(angle) * innerR;
+              }
 
               return (
-                <motion.div
+                <AbsorbedFixture
                   key={sat.id}
-                  className="absolute rounded-full flex items-center justify-center cursor-pointer"
-                  style={{
-                    left: '50%',
-                    top: '50%',
-                    width: isMobile ? 24 : 28,
-                    height: isMobile ? 24 : 28,
-                    marginLeft: isMobile ? -12 : -14,
-                    marginTop: isMobile ? -12 : -14,
-                    zIndex: 20,
-                  }}
-                  initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
-                  animate={{
-                    scale: 1,
-                    opacity: 0.7,
-                    x: dx,
-                    y: dy,
-                  }}
-                  whileHover={{ scale: 1.5, opacity: 1 }}
-                  whileTap={{ scale: 0.8 }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 12, delay: i * 0.03 }}
-                  onClick={(e) => { e.stopPropagation(); ejectSatellite(sat.id); }}
-                  data-testid={`dormant-${sat.id}`}
-                >
-                  <Icon size={isMobile ? 10 : 13} style={{ color: sat.color }} />
-                </motion.div>
+                  sat={sat}
+                  posX={posX}
+                  posY={posY}
+                  index={i}
+                  R={R}
+                  hiddenDiam={hiddenDiam}
+                  isMobile={isMobile}
+                  onExtract={extractFixture}
+                  onDragStart={() => setDraggingId(sat.id)}
+                  onDragEnd={() => { setDraggingId(null); setDragProgress(0); }}
+                  onDragProgress={(p) => setDragProgress(p)}
+                />
               );
             })}
 
-            {/* Center label */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              {dormantSats.length > 0 && (
-                <>
-                  <p className="text-[6px] sm:text-[7px] font-medium tracking-[0.15em] uppercase"
-                    style={{ color: 'rgba(167,139,250,0.45)' }}>
-                    {dormantSats.length} modules
-                  </p>
-                  <p className="text-[5px] mt-0.5"
-                    style={{ color: 'rgba(248,250,252,0.15)' }}>
-                    click to eject
-                  </p>
-                </>
-              )}
-              {dormantSats.length === 0 && (
-                <p className="text-[7px] font-medium tracking-[0.15em] uppercase"
-                  style={{ color: 'rgba(167,139,250,0.4)' }}>
-                  control
+            {/* Center label — tap opens Mission Control */}
+            <div
+              className="absolute flex flex-col items-center justify-center cursor-pointer rounded-full"
+              style={{
+                left: '50%', top: '50%',
+                width: R * 0.4, height: R * 0.4,
+                marginLeft: -R * 0.2, marginTop: -R * 0.2,
+                zIndex: 25,
+              }}
+              onClick={() => setMissionControlOpen(true)}
+              data-testid="mission-control-btn"
+            >
+              {absorbedSats.length > 0 && (
+                <p className="font-medium tracking-[0.1em] uppercase"
+                  style={{ fontSize: Math.max(7, R * 0.06), color: 'rgba(167,139,250,0.4)' }}>
+                  {absorbedSats.length}
                 </p>
               )}
             </div>
           </motion.div>
 
-          {/* Label below orb */}
-          <p className="text-center text-[7px] sm:text-[8px] font-medium tracking-[0.15em] uppercase mt-1.5"
-            style={{ color: 'rgba(167,139,250,0.35)' }}>
+          <p className="text-center font-medium tracking-[0.12em] uppercase mt-1.5 cursor-pointer"
+            style={{ fontSize: Math.max(7, R * 0.05), color: 'rgba(167,139,250,0.28)' }}
+            onClick={() => setMissionControlOpen(true)}
+            data-testid="mission-control-label"
+          >
             Mission Control
           </p>
         </div>
       </div>
 
-      {/* Hover tooltip — contained at bottom */}
+      {/* Hover tooltip */}
       <AnimatePresence>
         {hoveredData && (
-          <motion.div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none z-30 px-4"
+          <motion.div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none z-30 px-4"
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>
             <p className="text-sm font-medium" style={{ color: hoveredData.color, fontFamily: 'Cormorant Garamond, serif' }}>
               {hoveredData.label}
             </p>
             <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{hoveredData.desc}</p>
-            {ZONE_AUDIO[hoveredData.id] && (
-              <p className="text-[7px] mt-0.5 font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
-                {ZONE_AUDIO[hoveredData.id].hz}Hz &middot; click to enter &middot; hover X to snap back
-              </p>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Bottom hint */}
       {!hoveredData && (
-        <motion.p className="absolute bottom-4 left-0 right-0 text-center text-[7px] sm:text-[8px] tracking-[0.12em] uppercase z-10 pointer-events-none px-4"
-          style={{ color: 'rgba(248,250,252,0.1)' }}
+        <motion.p className="absolute bottom-3 text-center z-10 pointer-events-none px-4"
+          style={{ fontSize: Math.max(6, R * 0.035), color: 'rgba(248,250,252,0.08)' }}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}>
-          Click modules in the sphere to pull them into orbit &middot; Click an orbiting module to enter
+          tap a module to pull it out &middot; tap orbiting module to enter
         </motion.p>
       )}
 
       <MissionControl isOpen={missionControlOpen} onClose={() => setMissionControlOpen(false)} />
     </div>
+  );
+}
+
+// ═══ ABSORBED FIXTURE — sits at (0,0) inside orb, pull to extract ═══
+function AbsorbedFixture({ sat, posX, posY, index, R, hiddenDiam, isMobile, onExtract, onDragStart, onDragEnd, onDragProgress }) {
+  const Icon = sat.icon;
+  const [pullT, setPullT] = useState(0); // 0 = fully absorbed, 1 = breaking free
+  const dragStartRef = useRef(null);
+  const thresholdPx = R * EXTRACTION_THRESHOLD;
+
+  // Visual interpolation based on pull progress
+  const currentScale = lerp(1, FIXTURE_SCALE_ACTIVE / FIXTURE_SCALE_HIDDEN, pullT);
+  const currentAlpha = lerp(0.5, 1, pullT);
+  const currentSize = hiddenDiam * currentScale;
+  const glowIntensity = pullT * 0.3;
+
+  const handlePointerDown = useCallback((e) => {
+    e.stopPropagation();
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    onDragStart();
+  }, [onDragStart]);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!dragStartRef.current) return;
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const t = Math.min(dist / thresholdPx, 1.0);
+    setPullT(t);
+    onDragProgress(t);
+  }, [thresholdPx, onDragProgress]);
+
+  const handlePointerUp = useCallback((e) => {
+    e.stopPropagation();
+    if (!dragStartRef.current) return;
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > thresholdPx) {
+      // Extracted! Break free
+      onExtract(sat.id);
+    } else if (dist < 8) {
+      // Simple tap — also extract
+      onExtract(sat.id);
+    }
+    dragStartRef.current = null;
+    setPullT(0);
+    onDragEnd();
+  }, [thresholdPx, sat.id, onExtract, onDragEnd]);
+
+  const handlePointerLeave = useCallback(() => {
+    if (dragStartRef.current) {
+      dragStartRef.current = null;
+      setPullT(0);
+      onDragEnd();
+    }
+  }, [onDragEnd]);
+
+  return (
+    <motion.div
+      className="absolute rounded-full flex flex-col items-center justify-center cursor-pointer select-none touch-none"
+      style={{
+        left: '50%', top: '50%',
+        width: currentSize, height: currentSize,
+        marginLeft: -currentSize / 2,
+        marginTop: -currentSize / 2,
+        zIndex: 20 + (pullT > 0 ? 5 : 0),
+        opacity: currentAlpha,
+        background: pullT > 0.5 ? `${sat.color}18` : `${sat.color}08`,
+        border: `1px solid ${sat.color}${pullT > 0.5 ? '40' : '20'}`,
+        boxShadow: glowIntensity > 0.05 ? `0 0 ${R * glowIntensity}px ${sat.color}30` : 'none',
+        transition: 'background 0.15s, border-color 0.15s',
+      }}
+      initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
+      animate={{ scale: 1, opacity: currentAlpha, x: posX, y: posY }}
+      transition={{ type: 'spring', stiffness: 100, damping: 12, delay: index * 0.025 }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerLeave}
+      data-testid={`dormant-${sat.id}`}
+    >
+      <Icon size={Math.max(10, currentSize * 0.32)} style={{ color: sat.color }} />
+      <p className="text-center leading-tight mt-0.5 px-0.5 font-medium"
+        style={{
+          fontSize: Math.max(5, currentSize * 0.14),
+          color: `${sat.color}${pullT > 0.3 ? 'DD' : '99'}`,
+        }}>
+        {sat.label}
+      </p>
+    </motion.div>
   );
 }

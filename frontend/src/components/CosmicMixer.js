@@ -883,6 +883,7 @@ export default function CosmicMixer() {
   }, [toggleFreq, toggleSound, toggleDrone, toggleMantra, stopAll]);
 
   if (!user) return null;
+  if (location.pathname === '/hub') return null;
 
   const panelMaxH = fullScreen ? '85vh' : expanded ? '70vh' : '380px';
 

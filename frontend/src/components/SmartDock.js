@@ -405,6 +405,8 @@ export default function SmartDock() {
         ...posStyle,
         zIndex: baseZ,
         touchAction: 'none',
+        maxHeight: 'calc(100vh - 40px)',
+        overflowY: 'auto',
         transition: isDragging ? 'none' : 'left 0.3s ease, top 0.3s ease, bottom 0.3s ease, right 0.3s ease',
       }}
       data-testid="smart-dock"
@@ -465,6 +467,8 @@ export default function SmartDock() {
           cursor: isDragging ? 'grabbing' : 'pointer',
           marginTop: dockOrientation === 'vertical' ? 0 : 8,
           gap: dockOrientation === 'vertical' ? 2 : 0,
+          maxHeight: dockOrientation === 'vertical' ? 'calc(100vh - 80px)' : 'auto',
+          overflowY: dockOrientation === 'vertical' ? 'auto' : 'visible',
         }}
         data-testid="smart-dock-pill"
       >
@@ -771,6 +775,8 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         width: '260px',
+        maxHeight: 'calc(100vh - 120px)',
+        overflowY: 'auto',
         boxShadow: `0 0 24px ${data?.atmosphere?.accent || '#818CF8'}08, 0 8px 32px rgba(0,0,0,0.4)`,
       }}
       data-testid="harmonics-panel"
