@@ -742,10 +742,30 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Warm Glow Atmosphere Effect**: Subtle golden overlay via ::after pseudo-element
 - **Scrollbar Styling**: Custom scrollbars for both light/dark Parchment modes
 - **Nebula Volumetric Fog**: CSS animation for cosmic drift effect
-- **Files**: Updated `index.css` (Enlightenment Cafe theming), `EnlightenmentCafeContext.js` (body styling)
+- **VellumOverlay Component**: SVG grain texture at 2-3% opacity
+  - Sepia-tinted grain for Light mode, cool charcoal grain for Dark mode
+  - Vignette edge effect, Paper edge highlight
+- **Google Fonts**: Added Playfair Display, JetBrains Mono, Manrope
+- **Files**: Updated `index.css`, `EnlightenmentCafeContext.js`, `VellumOverlay.js` (new), `index.html`
 - Tests: Screenshot verification — Light mode shows cream background, settings panel themed correctly
 
-## Upcoming (P0-P1) — Iteration 284+
+### Iteration 284 — Celestial Ghost Layer Complete (April 2026)
+- **useCelestialEvents Hook**: Local astronomical calculations (no API required)
+  - Moon Phase (8 phases), Moon Age (0-29.53 days), Moon Sign, Sun Sign
+  - Moon Illumination percentage, Mercury Retrograde detection (2024-2026)
+- **useGhostNodes Hook**: Temporary celestial event nodes for the mesh
+  - Full Moon / New Moon / Mercury Retrograde Ghost Nodes
+  - Auto-connects to relevant modules (meditation, journal, oracle)
+- **Ritual Suggestions Engine**: Element-based practice recommendations
+  - Fire/Earth/Air/Water-specific rituals
+  - Duration varies by phase (10 min Full/New, 5 min others)
+- **TodaysRitualWidget Component**: Dashboard celestial display
+  - Moon Phase + Sign grid, Suggested Practice, Active Events, Quick Actions
+  - Adapts to Parchment/Nebula themes
+- **Files**: `useCelestialEvents.js` (new), `TodaysRitualWidget.js` (new), updated `Dashboard.js`
+- Tests: Screenshot — Widget shows Full Moon in Aries, 87% illuminated, ritual suggestion
+
+## Upcoming (P0-P1) — Iteration 285+
 - **Tiered Render Delegate**: Essential (SVG/Canvas "Paper & Ink") vs Premium (Three.js "Aetheric" view with volumetric fog)
 - **Ghost Nodes**: Temporary celestial event nodes (Full Moon, Mercury Retrograde, Eclipses)
 - **Advisor Node**: Hidden node monitoring mesh health, pulses if Sanctuary modules unused for 3+ days

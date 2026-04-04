@@ -31,6 +31,7 @@ import {
 import Walkthrough from '../components/Walkthrough';
 import TrialBanner from '../components/TrialBanner';
 import MissionControlRing from '../components/MissionControlRing';
+import TodaysRitualWidget from '../components/TodaysRitualWidget';
 
 // Extracted section components
 import {
@@ -445,6 +446,9 @@ export default function Dashboard() {
 
         {/* Consciousness Level */}
         <div className="mb-4"><ConsciousnessPanel /></div>
+
+        {/* Today's Ritual (Celestial) */}
+        <div className="mb-4"><TodaysRitualWidget /></div>
 
         {/* Edit Mode Banner */}
         <AnimatePresence>

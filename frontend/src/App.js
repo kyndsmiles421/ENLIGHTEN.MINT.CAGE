@@ -50,6 +50,7 @@ import UniversalCommand from './components/UniversalCommand';
 import PulseEchoVisualizer from './components/PulseEchoVisualizer';
 import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
 import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettingsPanel';
+import VellumOverlay from './components/VellumOverlay';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -217,6 +218,7 @@ function CafeApp() {
   
   return (
     <>
+      <VellumOverlay />
       <div style={{ minHeight: '100vh', position: 'relative' }}>
         <Navigation />
         <ScrollToTop />

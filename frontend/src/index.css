@@ -1144,8 +1144,8 @@ body.cosmic-hyper-focus [data-testid="orbital-navigation"] {
 
 /* ── Parchment View (Essential Tier) ── */
 :root.cafe-parchment {
-  --cafe-font-heading: 'Cormorant Garamond', 'Georgia', serif;
-  --cafe-font-body: 'Manrope', 'Helvetica Neue', sans-serif;
+  --cafe-font-heading: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --cafe-font-body: 'Manrope', 'Inter', 'Helvetica Neue', sans-serif;
   --cafe-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
