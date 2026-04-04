@@ -1280,6 +1280,26 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - `/app/frontend/src/pages/TesseractExperience.js` - Visual Bloom integration
 - **Tests**: Frontend 100% - All SYNC-01, Visual Bloom, AUD-01, MEM-01 features verified working
 
+### Iteration 281 — Haptic Crescendo & GEO-01 Sacred Snap (April 2026)
+- **Haptic Crescendo** (Tactile "String Being Pulled Taut"):
+  - Progressive vibration pulses during 200ms dwell threshold
+  - 5ms at 25%, 10ms at 50%, 15ms at 75% progress
+  - Final 25ms "thunk" at isDwellStable=true
+  - User *feels* the bloom building before they *hear* it
+  - Console logs: `[HAPTIC] Crescendo pulse: 5ms at 25%`, etc.
+- **GEO-01: Sacred Geometry Snap Enhancement**:
+  - Weighted Euclidean distance formula for magnetic snap points
+  - Qiān (Modesty, Hexagram 15) gets +15% magnetic pull (weight: 1.15)
+  - Effective threshold for Qiān: 0.05 * 1.15 = 0.0575
+  - Finding Modesty feels "magnetic" rather than accidental
+  - Console logs: `[GEO-01] Qiān (Modesty) magnetic pull activated - 15% enhanced threshold`
+- **Config Updates**:
+  - `TESSERACT_CONFIG.HAPTIC_CRESCENDO` with pulse definitions
+  - `TESSERACT_CONFIG.SACRED_GRAVITY_POINTS` with weight property
+- **Files Updated**:
+  - `/app/frontend/src/hooks/useTesseractCore.js` - Haptic crescendo in selectCell, weighted snap in findNearestSnapPoint
+- **Tests**: Frontend 100% - All Haptic Crescendo and GEO-01 features verified working
+
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
