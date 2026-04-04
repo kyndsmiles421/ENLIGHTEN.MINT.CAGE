@@ -16,9 +16,9 @@
  * All powered by the unified useTesseractCore hook.
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Compass, Gem, Target } from 'lucide-react';
 
 // Consolidated hook
@@ -457,6 +457,86 @@ export default function TesseractExperience() {
     navigate('/seed-gallery');  // Or a dedicated hunt page
   }, [navigate]);
   
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SEAL-01: LONG-PRESS ESCAPE (Emergency Surface)
+  // Hold center of screen for 1.5s → Instant snap to L0
+  // The psychological "come up for air" mechanism for deep dives
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  const [escapeProgress, setEscapeProgress] = useState(0);
+  const [isEscaping, setIsEscaping] = useState(false);
+  const escapeTimerRef = useRef(null);
+  const escapeStartRef = useRef(null);
+  const escapeRafRef = useRef(null);
+  
+  const ESCAPE_DURATION = 1500; // 1.5 seconds to trigger escape
+  
+  const startEscapeSequence = useCallback(() => {
+    if (core.depth === 0) return; // No need to escape at surface
+    
+    setIsEscaping(true);
+    escapeStartRef.current = Date.now();
+    
+    // Start progress animation
+    const updateProgress = () => {
+      const elapsed = Date.now() - escapeStartRef.current;
+      const progress = Math.min(1, elapsed / ESCAPE_DURATION);
+      setEscapeProgress(progress);
+      
+      if (progress < 1) {
+        escapeRafRef.current = requestAnimationFrame(updateProgress);
+      }
+    };
+    escapeRafRef.current = requestAnimationFrame(updateProgress);
+    
+    // Set completion timer
+    escapeTimerRef.current = setTimeout(() => {
+      // Trigger emergency surface
+      console.log('[SEAL-01] Long-Press Escape triggered - surfacing to L0');
+      
+      // Haptic "deep thunk" feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 100, 30, 150]);
+      }
+      
+      // Flash effect (inverse bloom)
+      setEscapeProgress(1);
+      
+      // Emergency surface
+      core.emergencySurface();
+      
+      // Reset CSS variable immediately
+      document.documentElement.style.setProperty('--lattice-zoom', '0');
+      document.documentElement.style.setProperty('--lattice-depth', '0');
+      
+      // Cleanup
+      setIsEscaping(false);
+      setEscapeProgress(0);
+    }, ESCAPE_DURATION);
+  }, [core]);
+  
+  const cancelEscapeSequence = useCallback(() => {
+    if (escapeTimerRef.current) {
+      clearTimeout(escapeTimerRef.current);
+      escapeTimerRef.current = null;
+    }
+    if (escapeRafRef.current) {
+      cancelAnimationFrame(escapeRafRef.current);
+      escapeRafRef.current = null;
+    }
+    setIsEscaping(false);
+    setEscapeProgress(0);
+    escapeStartRef.current = null;
+  }, []);
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (escapeTimerRef.current) clearTimeout(escapeTimerRef.current);
+      if (escapeRafRef.current) cancelAnimationFrame(escapeRafRef.current);
+    };
+  }, []);
+  
   return (
     <div 
       className="relative min-h-screen overflow-hidden"
@@ -529,6 +609,88 @@ export default function TesseractExperience() {
           isDwellStable={core.isDwellStable}
           dwellProgress={core.dwellProgress}
         />
+        
+        {/* SEAL-01: Long-Press Escape Zone (Center) - Only visible at depth > 0 */}
+        {core.depth > 0 && (
+          <div 
+            className="absolute flex items-center justify-center"
+            style={{ 
+              zIndex: 1001,  // Above lattice
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            {/* Escape trigger zone - centered button */}
+            <button
+              className="w-20 h-20 rounded-full flex items-center justify-center transition-all"
+              style={{
+                background: isEscaping 
+                  ? `radial-gradient(circle, rgba(255,255,255,${escapeProgress * 0.6}) 0%, rgba(0,168,107,${escapeProgress * 0.3}) 50%, transparent 70%)`
+                  : 'rgba(0,0,0,0.3)',
+                border: isEscaping 
+                  ? `2px solid rgba(255,255,255,${escapeProgress})` 
+                  : '2px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(4px)',
+              }}
+              onMouseDown={startEscapeSequence}
+              onMouseUp={cancelEscapeSequence}
+              onMouseLeave={cancelEscapeSequence}
+              onTouchStart={startEscapeSequence}
+              onTouchEnd={cancelEscapeSequence}
+              onTouchCancel={cancelEscapeSequence}
+              data-testid="escape-zone"
+            >
+              {/* Escape progress ring */}
+              <AnimatePresence>
+                {isEscaping ? (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 1.3, opacity: 0 }}
+                    className="absolute"
+                  >
+                    <svg width="80" height="80" className="transform -rotate-90">
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="35"
+                        stroke="rgba(255,255,255,0.2)"
+                        strokeWidth="3"
+                        fill="none"
+                      />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="35"
+                        stroke={escapeProgress >= 1 ? '#fff' : core.isVoidMode ? '#a855f7' : '#00ff9f'}
+                        strokeWidth="3"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 35}`}
+                        strokeDashoffset={`${2 * Math.PI * 35 * (1 - escapeProgress)}`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    
+                    {/* Escape text */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                      <span className="text-[8px] uppercase tracking-wider opacity-70">
+                        {escapeProgress >= 1 ? 'SURFACING' : 'HOLD'}
+                      </span>
+                      <span className="text-xs font-bold">
+                        {Math.round(escapeProgress * 100)}%
+                      </span>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-white/50">
+                    <span className="text-xs font-light">L{core.depth}</span>
+                  </div>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
+        )}
       </div>
       
       {/* Gravity Slider */}
