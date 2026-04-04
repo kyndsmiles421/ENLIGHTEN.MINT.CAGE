@@ -54,6 +54,10 @@ import VellumOverlay from './components/VellumOverlay';
 import { Scene as NebulaScene } from './components/nebula';
 import { NebulaViewToggle } from './components/nebula';
 import UtilityDock from './components/UtilityDock';
+import { SageProvider } from './context/SageContext';
+import SageAvatar from './components/SageAvatar';
+import SageAudience from './components/SageAudience';
+import QuestHUD from './components/QuestHUD';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -288,6 +292,10 @@ function CafeApp() {
         <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
           <NebulaViewToggle compact />
         </div>
+        {/* Sage System — Expert Advisors */}
+        <QuestHUD />
+        <SageAvatar />
+        <SageAudience />
       </div>
       <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
     </>
@@ -474,6 +482,7 @@ function App() {
       <SovereignProvider>
       <MeshNetworkProvider>
       <EnlightenmentCafeProvider>
+      <SageProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
@@ -483,6 +492,7 @@ function App() {
           </SplitScreenProvider>
           </VoiceCommandProvider>
         </BrowserRouter>
+      </SageProvider>
       </EnlightenmentCafeProvider>
       </MeshNetworkProvider>
       </SovereignProvider>
