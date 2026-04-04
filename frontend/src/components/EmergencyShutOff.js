@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Square } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
@@ -50,19 +50,26 @@ export default function EmergencyShutOff() {
 
     // 5. Stop any Web Audio API contexts globally - AGGRESSIVE APPROACH
     try {
-      // First, check the registered contexts
+      // First, check the registered contexts and CLOSE them (not just suspend)
       const contexts = window.__cosmicAudioContexts || [];
-      contexts.forEach(ctx => {
+      console.log(`[EmergencyShutOff] Found ${contexts.length} registered AudioContexts`);
+      
+      contexts.forEach((ctx, i) => {
         if (ctx && ctx.state !== 'closed') {
-          try { ctx.suspend(); } catch {}
+          try { 
+            // First suspend to stop playback
+            ctx.suspend();
+            // Then close to release resources
+            ctx.close();
+            console.log(`[EmergencyShutOff] Closed AudioContext ${i}`);
+          } catch (e) {
+            console.warn(`[EmergencyShutOff] Failed to close context ${i}:`, e);
+          }
         }
       });
       
-      // Also try to close ALL AudioContexts by iterating through all possible sources
-      // This is a fallback for contexts not registered globally
-      if (window.AudioContext) {
-        // Modern approach: suspend the base prototype (won't affect already-created, but good defense)
-      }
+      // Clear the array
+      window.__cosmicAudioContexts = [];
     } catch (e) {
       console.warn('Global audio context suspend failed:', e);
     }
@@ -72,12 +79,18 @@ export default function EmergencyShutOff() {
       // Close and clear any stored context references
       ['audioCtxRef', 'ctxRef', 'audioRef'].forEach(refName => {
         if (window[refName]?.current) {
-          try { window[refName].current.suspend(); } catch {}
+          try { 
+            window[refName].current.suspend(); 
+            window[refName].current.close();
+          } catch {}
         }
       });
     } catch (e) {
       console.warn('Reference cleanup failed:', e);
     }
+
+    // Set emergency flag so contexts don't auto-restart
+    localStorage.setItem('zen_emergency_active', 'true');
 
     // 6. Stop all HTML5 audio/video elements
     try {
@@ -104,6 +117,12 @@ export default function EmergencyShutOff() {
 
     console.log('[EmergencyShutOff] All audio/visual stopped');
   }, [sovereignKillAll, stopMixer, isMuted, sovereignMuteToggle]);
+
+  // Expose globally for debugging/console access
+  useEffect(() => {
+    window.__emergencyStop = handleEmergencyStop;
+    return () => { delete window.__emergencyStop; };
+  }, [handleEmergencyStop]);
 
   return (
     <motion.button

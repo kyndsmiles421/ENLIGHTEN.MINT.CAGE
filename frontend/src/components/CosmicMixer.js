@@ -375,6 +375,11 @@ export default function CosmicMixer() {
   const getCtx = useCallback(async () => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
       ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Register globally for EmergencyShutOff
+      if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+      window.__cosmicAudioContexts.push(ctxRef.current);
+      
       masterGainRef.current = ctxRef.current.createGain();
       masterGainRef.current.connect(ctxRef.current.destination);
       // Per-channel gain nodes

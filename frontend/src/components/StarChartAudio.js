@@ -18,6 +18,11 @@ export function useCosmicAmbient() {
     activeRef.current = true;
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     ctxRef.current = ctx;
+    
+    // Register globally for EmergencyShutOff
+    if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+    window.__cosmicAudioContexts.push(ctx);
+    
     const master = ctx.createGain();
     master.gain.setValueAtTime(0, ctx.currentTime);
     master.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 2);
@@ -113,6 +118,11 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
       audioRef.current = audio;
 
       const actx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Register globally for EmergencyShutOff
+      if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+      window.__cosmicAudioContexts.push(actx);
+      
       const source = actx.createMediaElementSource(audio);
       const analyser = actx.createAnalyser();
       analyser.fftSize = 64;

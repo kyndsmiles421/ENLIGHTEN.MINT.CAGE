@@ -27,7 +27,12 @@ export function SatelliteInspector({ sat, onClose, authHeaders }) {
 
   const playHz = useCallback((hz) => {
     try {
-      if (!audioRef.current) audioRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      if (!audioRef.current) {
+        audioRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        // Register globally for EmergencyShutOff
+        if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
+        window.__cosmicAudioContexts.push(audioRef.current);
+      }
       const ctx = audioRef.current;
       if (ctx.state === 'suspended') ctx.resume();
       const osc = ctx.createOscillator();
