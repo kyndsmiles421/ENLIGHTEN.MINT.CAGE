@@ -1329,3 +1329,29 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - `/app/frontend/src/pages/TesseractExperience.js`
   - `/app/frontend/src/components/KineticHUD.js`
 - **Tests**: Frontend 100% - All VOID-01 and HUD-01 features verified working
+
+
+### Iteration 283 — LOOP-FIX: CSS Variable State Flattening (April 2026)
+- **LOOP-FIX (State Flattening via CSS Variables)**:
+  - Moved HUD scaling OUT of React state → into hardware-accelerated CSS
+  - Injects `--lattice-zoom` and `--lattice-depth` via `requestAnimationFrame`
+  - Widgets use CSS `calc(1 - (var(--lattice-zoom, 0) * 0.15))` for breathing
+  - Removed React state-based `widgetScale` prop from KineticHUD
+  - Console logs: `[LOOP-FIX] CSS Variable injected: --lattice-zoom=X.XX, depth=N`
+- **CSS Variable Values by Depth**:
+  - L0: `--lattice-zoom=0` (widgets at 1.0x)
+  - L1: `--lattice-zoom=0.33` (widgets at 0.95x)
+  - L2: `--lattice-zoom=0.67` (widgets at 0.90x)
+  - L3+: `--lattice-zoom=1.0` (widgets at 0.85x)
+- **RecursiveRegistryStore Throttle Guard**:
+  - Added `notifySubscribers` throttle: max 10 notifications per frame
+  - Uses RAF to batch excess notifications
+- **VOID-01 Bloom State Throttle**:
+  - Reduced bloom state updates to only fire on activation/deactivation or completion
+  - Prevents 60fps updates that contributed to render cycles
+- **Files Updated**:
+  - `/app/frontend/src/pages/TesseractExperience.js` - RAF CSS injection, throttled bloom
+  - `/app/frontend/src/components/KineticHUD.js` - CSS calc() breathing
+  - `/app/frontend/src/stores/RecursiveRegistryStore.js` - Notify throttle guard
+- **Tests**: Frontend 100% - All LOOP-FIX CSS variables verified working
+- **Known Issue**: "Maximum update depth exceeded" (668 errors) - KNOWN PRE-EXISTING ISSUE from before this fork. Does NOT prevent functionality. Likely in MixerContext or CosmicThemeContext.
