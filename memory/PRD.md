@@ -1255,6 +1255,31 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Tests**: Frontend 100% - All AUD-01 and MEM-01 features verified working
 - **Known Issue**: "Maximum update depth exceeded" React error (PRE-EXISTING from iteration_278, does not break functionality)
 
+### Iteration 280 — SYNC-01 Global Registry Singleton & Visual Bloom (April 2026)
+- **SYNC-01: RecursiveRegistryStore** (Atomic State Broadcasts):
+  - New `/app/frontend/src/stores/RecursiveRegistryStore.js` using React 18's `useSyncExternalStore`
+  - Atomic updates for language, depth, hexagram, gravity, isVoidMode across ALL 6 recursive layers
+  - `batchUpdate()` method for multi-value atomic changes
+  - Version counter forces synchronous re-render on all subscribers
+  - Console logs: `[SYNC-01] Depth broadcast: 1`, `[SYNC-01] VoidMode broadcast: true`
+- **Visual Bloom Indicator** (Focus-to-Bloom Loop):
+  - New `/app/frontend/src/components/DwellBloomIndicator.js`
+  - Jade-colored radial gradient (`rgba(0, 168, 107)`) grows during 200ms dwell
+  - At threshold: bloom reaches 100% opacity + "pop" scale animation
+  - Teaches users visually that "stillness is the key" to unlocking audio
+  - `DwellBloomIndicatorSimple` for performance-critical rendering
+- **Enhanced useTesseractCore.js**:
+  - `dwellProgress` state (0-1) tracks dwell threshold progress
+  - SYNC-01 broadcasts on dive/surface/emergencySurface/enterVoidMode/exitVoidMode/updateGravity
+  - Progress interval with 16ms (~60fps) updates for smooth Visual Bloom animation
+- **Files Created**:
+  - `/app/frontend/src/stores/RecursiveRegistryStore.js`
+  - `/app/frontend/src/components/DwellBloomIndicator.js`
+- **Files Updated**:
+  - `/app/frontend/src/hooks/useTesseractCore.js` - dwellProgress, SYNC-01 broadcasts
+  - `/app/frontend/src/pages/TesseractExperience.js` - Visual Bloom integration
+- **Tests**: Frontend 100% - All SYNC-01, Visual Bloom, AUD-01, MEM-01 features verified working
+
 
 ## Test Credentials
 - User: `grad_test_522@test.com` / `password`
