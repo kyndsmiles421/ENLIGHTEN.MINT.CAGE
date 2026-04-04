@@ -493,6 +493,22 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Central orb click opens Mission Control
 - Tests: Frontend 100% — all 15 satellites navigate correctly, all destination pages load with content
 
+### Iteration 270 — Zero-Scale Parentage Physics & Emergency Shut-Off (April 2026) — LATEST
+- **Emergency Shut-Off Button**: Fixed top-left corner (8px, 8px), z-index 99999, always accessible
+  - Kills all audio (SensoryContext, MixerContext, Web Audio API, HTML5 media)
+  - Stops all visual animations
+  - Haptic feedback on activation
+  - Red design with "STOP" label for high visibility
+- **Zero-Scale Parentage Orbital Hub Physics**: Rebuilt per user's exact mathematical specification:
+  - **Latent State**: Core = Scale 1.0, Sub-orbs = Position (0,0,0), Scale 0, Opacity 0 (invisible inside core)
+  - **Bloom State**: Tap Core → Sub-orbs animate to 2.5x core radius at Scale 0.3
+  - **Extracted State**: Tap sub-orb → Extracts to 3.0x radius at Scale 1.0, all other orbs lerp back to (0,0,0) Scale 0
+  - **Navigation**: Tap extracted orb → Navigates to destination page
+  - Smooth 60fps lerping animation for all state transitions
+  - Snap-back X button returns extracted orb to bloom state
+- **Files**: `EmergencyShutOff.js` (new), `OrbitalHub.js` (complete rewrite)
+- Tests: Frontend 100% — All physics states verified, all 15 navigations working
+
 ### Iteration 269 — Sphere Containment Orbital System (April 2026)
 - Rebuilt Orbital Hub per user spec: central Mission Control sphere with dormant modules as sub-objects
 - Modules eject from sphere to orbit via click → physics-based spring animation
