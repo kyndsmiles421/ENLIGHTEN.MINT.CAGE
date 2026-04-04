@@ -869,13 +869,26 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - Hollow: Heavy thud `[40, 20, 40]`
   - Matrix: Light shimmer `[10, 5, 10, 5, 10]`
   - Supernova: Scales with intensity `[80, 30, 80, 30, 150]` at max
+- **Zero-Point Null State** (0.48-0.52):
+  - Monochrome UI, silent, hexagram frozen
+  - "Weightless" moment before Supernova release
+- **Kinetic Memory Haptic Profiles** (LanguageContext.js):
+  - Japanese: Sharp, intricate `[25]` tap, `[30, 5, 30]` flick
+  - Spanish: Fluid, rhythmic `[12, 8]` tap, `[15, 10, 15, 10, 15]` flick
+  - English: Balanced `[15]` tap, `[20, 10, 20]` flick
+  - RECODE_UI event broadcasts language changes system-wide
+- **Gravitational Collapse** (EmergencyShutOff.js):
+  - STOP button = total authority over ecosystem (Iron Law)
+  - Implosion animation with VOID text overlay
+  - Hexagram implodes to 000000, all audio killed, Sages frozen
+  - Button label changes STOP → VOID when active
 - **Tiered Visual Navigation** (TieredNavigation.js):
   - Vertical column replacing flat horizontal nav
   - Three expandable sections: Matrix (top), Core (middle), Hollow (bottom)
   - Proximity glow bar indicating current tier
   - Gravity meter with animated position marker
-- **Files**: `PolarityContext.js`, `HexagramCompass.js`, `TieredNavigation.js`, `UtilityDock.js`, `sages.py`
-- Tests: 100% backend (16/16), 100% frontend — Hexagram Compass, Dual-Persona Sages working
+- **Files**: `PolarityContext.js`, `HexagramCompass.js`, `TieredNavigation.js`, `UtilityDock.js`, `LanguageContext.js`, `EmergencyShutOff.js`, `sages.py`
+- Tests: 100% backend (16/16), 100% frontend — All systems verified including Gravitational Collapse
 
 ## Upcoming (P1) — Iteration 289+
 - **Nebula View Fix**: Resolve R3F v9 / Three.js 0.183 incompatibility

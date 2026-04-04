@@ -1,28 +1,38 @@
-import React, { useCallback, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useCallback, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Square } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useMixer } from '../context/MixerContext';
 import { usePolarity } from '../context/PolarityContext';
+import { useLanguage } from '../context/LanguageContext';
 
 /**
- * Emergency Shut-Off Button
+ * Emergency Shut-Off Button — GRAVITATIONAL COLLAPSE
+ * 
+ * The Iron Law in its purest form — total authority over the ecosystem.
+ * 
  * - Fixed position: absolute top-left corner
  * - Maximum z-index: 99999
- * - Stops ALL audio, music, and visual loops instantly
- * - Freezes the Hexagram Compass rotation
- * - Activates VOID state (000000 bitmask)
+ * - GRAVITATIONAL COLLAPSE: Hexagram implodes to 000000
+ * - Cuts ALL audio, freezes ALL Sages, stops ALL visual loops
  * - Always visible, never covered by any other element
  */
 export default function EmergencyShutOff() {
   const { sovereignKillAll, isMuted, sovereignMuteToggle } = useSensory();
   const { stopAll: stopMixer, isPlaying } = useMixer();
-  const { activateVoid, isVoid, audioFlavor, freezeCompass } = usePolarity();
+  const { activateVoid, isVoid, audioFlavor, freezeCompass, isAtZeroPoint } = usePolarity();
+  const { vibrate, t } = useLanguage();
+  
+  // Collapse animation state
+  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const handleEmergencyStop = useCallback(() => {
-    console.log('[EmergencyShutOff] HARD KILL INITIATED');
+    console.log('[EmergencyShutOff] GRAVITATIONAL COLLAPSE INITIATED');
     
-    // 0. ACTIVATE VOID STATE - Freeze compass, reset hexagram to 000000
+    // Start collapse animation
+    setIsCollapsing(true);
+    
+    // 0. ACTIVATE VOID STATE - Implode hexagram to 000000
     try {
       activateVoid();
       freezeCompass();
@@ -131,19 +141,14 @@ export default function EmergencyShutOff() {
       // getAnimations not supported in all browsers
     }
 
-    // 10. Haptic feedback to confirm kill (Polarity-aware)
-    if (navigator.vibrate) {
-      // Heavy thud for Hollow, sharp shimmer for Matrix
-      const pattern = audioFlavor === 'thud' 
-        ? [100, 50, 100] // Heavy double pulse
-        : audioFlavor === 'shimmer'
-          ? [30, 20, 30, 20, 50] // Light shimmer pattern
-          : [100, 50, 100]; // Default
-      navigator.vibrate(pattern);
-    }
+    // 10. GRAVITATIONAL COLLAPSE HAPTIC — Language-aware
+    vibrate('collapse');
+    
+    // End collapse animation
+    setTimeout(() => setIsCollapsing(false), 800);
 
-    console.log('[EmergencyShutOff] HARD KILL COMPLETE - All audio/visual terminated, VOID state active');
-  }, [sovereignKillAll, stopMixer, isMuted, sovereignMuteToggle, activateVoid, freezeCompass, audioFlavor]);
+    console.log('[EmergencyShutOff] GRAVITATIONAL COLLAPSE COMPLETE - All systems zeroed');
+  }, [sovereignKillAll, stopMixer, isMuted, sovereignMuteToggle, activateVoid, freezeCompass, vibrate]);
 
   // Expose globally for debugging/console access
   useEffect(() => {
@@ -152,45 +157,105 @@ export default function EmergencyShutOff() {
   }, [handleEmergencyStop]);
 
   return (
-    <motion.button
-      onClick={handleEmergencyStop}
-      className="fixed flex items-center justify-center gap-1.5"
-      style={{
-        top: 8,
-        left: 8,
-        zIndex: 99999, // Maximum z-index - above everything
-        width: 'auto',
-        minWidth: 36,
-        height: 36,
-        padding: '0 12px',
-        borderRadius: 8,
-        background: 'rgba(239, 68, 68, 0.15)',
-        border: '1.5px solid rgba(239, 68, 68, 0.4)',
-        color: '#EF4444',
-        cursor: 'pointer',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        boxShadow: '0 2px 12px rgba(239, 68, 68, 0.2)',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        fontSize: 11,
-        fontWeight: 600,
-        letterSpacing: '0.05em',
-        textTransform: 'uppercase',
-      }}
-      whileHover={{
-        scale: 1.05,
-        background: 'rgba(239, 68, 68, 0.25)',
-        boxShadow: '0 4px 20px rgba(239, 68, 68, 0.35)',
-      }}
-      whileTap={{ scale: 0.92 }}
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
-      data-testid="emergency-shutoff"
-      title="Emergency Stop - Kills all audio and visual loops"
-    >
-      <Square size={14} fill="currentColor" />
-      <span>STOP</span>
-    </motion.button>
+    <>
+      {/* Gravitational Collapse Overlay */}
+      <AnimatePresence>
+        {isCollapsing && (
+          <motion.div
+            className="fixed inset-0 pointer-events-none"
+            style={{ zIndex: 99998 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Implosion effect - edges pulling toward center */}
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                background: 'radial-gradient(circle at center, transparent 0%, rgba(239, 68, 68, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%)',
+              }}
+              animate={{
+                background: [
+                  'radial-gradient(circle at center, transparent 0%, rgba(239, 68, 68, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%)',
+                  'radial-gradient(circle at center, rgba(239, 68, 68, 0.5) 0%, transparent 30%, rgba(0, 0, 0, 0.9) 60%)',
+                  'radial-gradient(circle at center, transparent 0%, transparent 10%, rgba(0, 0, 0, 0.95) 30%)',
+                ],
+              }}
+              transition={{ duration: 0.6, ease: 'easeIn' }}
+            />
+            
+            {/* VOID text */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ scale: 3, opacity: 0 }}
+              animate={{ scale: 1, opacity: [0, 1, 0] }}
+              transition={{ duration: 0.8 }}
+            >
+              <span
+                className="text-4xl font-bold tracking-[0.5em]"
+                style={{ color: '#EF4444', textShadow: '0 0 30px rgba(239, 68, 68, 0.8)' }}
+              >
+                VOID
+              </span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* STOP Button */}
+      <motion.button
+        onClick={handleEmergencyStop}
+        className="fixed flex items-center justify-center gap-1.5"
+        style={{
+          top: 8,
+          left: 8,
+          zIndex: 99999, // Maximum z-index - above everything
+          width: 'auto',
+          minWidth: 36,
+          height: 36,
+          padding: '0 12px',
+          borderRadius: 8,
+          background: isVoid 
+            ? 'rgba(239, 68, 68, 0.4)' 
+            : isAtZeroPoint 
+              ? 'rgba(100, 100, 100, 0.3)' // Monochrome at Zero-Point
+              : 'rgba(239, 68, 68, 0.15)',
+          border: isVoid
+            ? '2px solid rgba(239, 68, 68, 0.8)'
+            : '1.5px solid rgba(239, 68, 68, 0.4)',
+          color: isAtZeroPoint ? '#888888' : '#EF4444',
+          cursor: 'pointer',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: isVoid
+            ? '0 0 20px rgba(239, 68, 68, 0.5)'
+            : '0 2px 12px rgba(239, 68, 68, 0.2)',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase',
+          transition: 'background 0.3s, border 0.3s, box-shadow 0.3s',
+        }}
+        whileHover={{
+          scale: 1.05,
+          background: 'rgba(239, 68, 68, 0.25)',
+          boxShadow: '0 4px 20px rgba(239, 68, 68, 0.35)',
+        }}
+        whileTap={{ scale: 0.92 }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ 
+          opacity: 1, 
+          x: 0,
+          scale: isCollapsing ? [1, 1.2, 0.9, 1] : 1,
+        }}
+        transition={{ duration: 0.3 }}
+        data-testid="emergency-shutoff"
+        title="Emergency Stop - Gravitational Collapse"
+      >
+        <Square size={14} fill="currentColor" />
+        <span>{isVoid ? 'VOID' : 'STOP'}</span>
+      </motion.button>
+    </>
   );
 }

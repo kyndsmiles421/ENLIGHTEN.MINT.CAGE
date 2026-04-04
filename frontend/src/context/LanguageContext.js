@@ -1,16 +1,121 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 
 const LanguageContext = createContext(null);
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// KINETIC HAPTIC PROFILES — Language-aware haptics
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const KINETIC_PROFILES = {
+  en: {
+    characterDensity: 1.0,
+    kineticFeel: 'balanced',
+    haptics: {
+      tap: [15],
+      flick: [20, 10, 20],
+      supernova: [50, 30, 50, 30, 100],
+      collapse: [100, 50, 100],
+      lineToggle: [10],
+    },
+  },
+  es: {
+    characterDensity: 1.15,
+    kineticFeel: 'fluid',
+    haptics: {
+      tap: [12, 8],
+      flick: [15, 10, 15, 10, 15], // Fluid, rhythmic
+      supernova: [40, 25, 40, 25, 40, 25, 80],
+      collapse: [80, 40, 80, 40],
+      lineToggle: [8, 5, 8],
+    },
+  },
+  ja: {
+    characterDensity: 0.6,
+    kineticFeel: 'sharp',
+    haptics: {
+      tap: [25], // Sharp, decisive
+      flick: [30, 5, 30], // Precise
+      supernova: [60, 10, 60, 10, 60, 10, 150],
+      collapse: [150, 20, 150],
+      lineToggle: [20, 5],
+    },
+  },
+  zh: {
+    characterDensity: 0.55,
+    kineticFeel: 'heavy',
+    haptics: {
+      tap: [30], // Heavy, grounded
+      flick: [35, 8, 35],
+      supernova: [70, 15, 70, 15, 70, 15, 180],
+      collapse: [180, 30, 180],
+      lineToggle: [25, 8],
+    },
+  },
+  fr: {
+    characterDensity: 1.1,
+    kineticFeel: 'elegant',
+    haptics: {
+      tap: [12],
+      flick: [18, 8, 18],
+      supernova: [45, 25, 45, 25, 90],
+      collapse: [90, 40, 90],
+      lineToggle: [10, 5],
+    },
+  },
+  hi: {
+    characterDensity: 0.9,
+    kineticFeel: 'resonant',
+    haptics: {
+      tap: [20],
+      flick: [25, 12, 25],
+      supernova: [55, 30, 55, 30, 110],
+      collapse: [110, 45, 110],
+      lineToggle: [15, 8],
+    },
+  },
+  ar: {
+    characterDensity: 0.85,
+    kineticFeel: 'flowing',
+    haptics: {
+      tap: [18],
+      flick: [22, 10, 22, 10],
+      supernova: [50, 28, 50, 28, 100],
+      collapse: [100, 42, 100],
+      lineToggle: [12, 6],
+    },
+  },
+  pt: {
+    characterDensity: 1.12,
+    kineticFeel: 'warm',
+    haptics: {
+      tap: [14],
+      flick: [18, 10, 18],
+      supernova: [48, 26, 48, 26, 95],
+      collapse: [95, 42, 95],
+      lineToggle: [10, 5],
+    },
+  },
+};
+
+// RECODE_UI Event for system-wide language sync
+const RECODE_UI_EVENT = 'RECODE_UI';
+
+const dispatchRecodeUI = (fromLang, toLang) => {
+  const event = new CustomEvent(RECODE_UI_EVENT, {
+    detail: { from: fromLang, to: toLang, timestamp: Date.now() },
+  });
+  window.dispatchEvent(event);
+};
+
 export const LANGUAGES = [
   { code: 'en', label: 'English', flag: 'EN', native: 'English' },
-  { code: 'zh', label: 'Chinese', flag: 'ZH', native: '\u4e2d\u6587' },
-  { code: 'es', label: 'Spanish', flag: 'ES', native: 'Espanol' },
-  { code: 'fr', label: 'French', flag: 'FR', native: 'Francais' },
-  { code: 'hi', label: 'Hindi', flag: 'HI', native: 'Hindi' },
-  { code: 'ja', label: 'Japanese', flag: 'JA', native: 'Nihongo' },
-  { code: 'ar', label: 'Arabic', flag: 'AR', native: 'Al-Arabiyya' },
-  { code: 'pt', label: 'Portuguese', flag: 'PT', native: 'Portugues' },
+  { code: 'zh', label: 'Chinese', flag: 'ZH', native: '中文' },
+  { code: 'es', label: 'Spanish', flag: 'ES', native: 'Español' },
+  { code: 'fr', label: 'French', flag: 'FR', native: 'Français' },
+  { code: 'hi', label: 'Hindi', flag: 'HI', native: 'हिंदी' },
+  { code: 'ja', label: 'Japanese', flag: 'JA', native: '日本語' },
+  { code: 'ar', label: 'Arabic', flag: 'AR', native: 'العربية' },
+  { code: 'pt', label: 'Portuguese', flag: 'PT', native: 'Português' },
 ];
 
 // Static translations for core UI
@@ -190,28 +295,107 @@ const translations = {
 };
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem('cosmic_lang') || 'en');
+  const [language, setLanguageState] = useState(() => localStorage.getItem('cosmic_lang') || 'en');
+  const [previousLanguage, setPreviousLanguage] = useState(language);
+  const [isRecoding, setIsRecoding] = useState(false);
+  
+  // Kinetic profile for current language
+  const kineticProfile = useMemo(() => {
+    return KINETIC_PROFILES[language] || KINETIC_PROFILES.en;
+  }, [language]);
 
   useEffect(() => {
     localStorage.setItem('cosmic_lang', language);
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
+  
+  // Enhanced setLanguage with RECODE_UI broadcast and haptics
+  const setLanguage = useCallback((newLang) => {
+    if (newLang === language) return;
+    
+    setPreviousLanguage(language);
+    setIsRecoding(true);
+    
+    // Dispatch RECODE_UI event for system-wide sync
+    dispatchRecodeUI(language, newLang);
+    
+    // Kinetic haptic for the new language
+    if (navigator.vibrate) {
+      const newProfile = KINETIC_PROFILES[newLang] || KINETIC_PROFILES.en;
+      navigator.vibrate(newProfile.haptics.tap);
+    }
+    
+    // Short delay for visual effect
+    setTimeout(() => {
+      setLanguageState(newLang);
+      setTimeout(() => setIsRecoding(false), 500);
+    }, 100);
+  }, [language]);
+  
+  // Get haptic pattern for current language
+  const getHaptic = useCallback((type) => {
+    return kineticProfile.haptics[type] || KINETIC_PROFILES.en.haptics[type] || [15];
+  }, [kineticProfile]);
+  
+  // Trigger haptic feedback
+  const vibrate = useCallback((type) => {
+    if (!navigator.vibrate) return;
+    navigator.vibrate(getHaptic(type));
+  }, [getHaptic]);
 
   const t = useCallback((key, fallback) => {
     const dict = translations[language] || translations.en;
     return dict[key] || translations.en[key] || fallback || key;
   }, [language]);
 
+  const value = useMemo(() => ({
+    language,
+    previousLanguage,
+    isRecoding,
+    setLanguage,
+    t,
+    languages: LANGUAGES,
+    // Kinetic properties
+    kineticProfile,
+    characterDensity: kineticProfile.characterDensity,
+    kineticFeel: kineticProfile.kineticFeel,
+    getHaptic,
+    vibrate,
+  }), [language, previousLanguage, isRecoding, setLanguage, t, kineticProfile, getHaptic, vibrate]);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, languages: LANGUAGES }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
 }
 
+// Hook to listen for RECODE_UI events
+export function useRecodeUI(callback) {
+  useEffect(() => {
+    const handler = (e) => callback(e.detail);
+    window.addEventListener(RECODE_UI_EVENT, handler);
+    return () => window.removeEventListener(RECODE_UI_EVENT, handler);
+  }, [callback]);
+}
+
 export function useLanguage() {
   const ctx = useContext(LanguageContext);
-  if (!ctx) throw new Error('useLanguage must be inside LanguageProvider');
+  if (!ctx) {
+    // Safe fallback
+    return {
+      language: 'en',
+      t: (key) => key,
+      setLanguage: () => {},
+      languages: LANGUAGES,
+      kineticProfile: KINETIC_PROFILES.en,
+      characterDensity: 1.0,
+      kineticFeel: 'balanced',
+      getHaptic: () => [15],
+      vibrate: () => {},
+      isRecoding: false,
+    };
+  }
   return ctx;
 }

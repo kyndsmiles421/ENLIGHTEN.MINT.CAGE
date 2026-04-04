@@ -211,6 +211,13 @@ const getTranslucencyColors = (translucency, gravity) => {
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ZERO-POINT NULL STATE (0.48 - 0.52)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const ZERO_POINT_LOW = 0.48;
+const ZERO_POINT_HIGH = 0.52;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // SUPERNOVA DETECTION — Velocity-Reactive
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -462,13 +469,16 @@ export function PolarityProvider({ children }) {
   const isInCore = gravity >= 0.35 && gravity < 0.65;
   const isInMatrix = gravity >= 0.65;
   
-  // Rotation direction based on layer
+  // ZERO-POINT NULL STATE — The Weightless Moment (0.48-0.52)
+  const isAtZeroPoint = gravity >= ZERO_POINT_LOW && gravity <= ZERO_POINT_HIGH;
+  
+  // Rotation direction based on layer (ZERO at Zero-Point)
   const rotationDirection = useMemo(() => {
-    if (isVoid || compassFrozen) return 0;
+    if (isVoid || compassFrozen || isAtZeroPoint) return 0; // Frozen at Zero-Point
     if (isInHollow) return 1;  // Clockwise
     if (isInMatrix) return -1; // Counter-clockwise
     return 0; // Still at core
-  }, [isVoid, compassFrozen, isInHollow, isInMatrix]);
+  }, [isVoid, compassFrozen, isInHollow, isInMatrix, isAtZeroPoint]);
   
   const value = {
     // Layer info
@@ -510,6 +520,7 @@ export function PolarityProvider({ children }) {
     isInHollow,
     isInCore,
     isInMatrix,
+    isAtZeroPoint, // The Weightless Moment (0.48-0.52)
     
     // Compass state
     compassRotation,
@@ -559,6 +570,7 @@ export function usePolarity() {
       isInHollow: false,
       isInCore: true,
       isInMatrix: false,
+      isAtZeroPoint: false, // Zero-Point Null State
       hexagram: 0b000111,
       hexagramBinary: '000111',
       lineStates: [true, true, true, false, false, false],
