@@ -8,31 +8,54 @@
  * 2. Haptic "Tuning Fork" (Somatic Layer) - 6-bit binary pulses synced to visuals
  * 3. "Source" State (Enlightenment Moment) - White-out and silence at 0.5000
  * 
- * THE SENTIENT ECOSYSTEM
- * Integrated with SentientRegistry to introduce controlled chaos based on dwell time.
- * The longer you stay at Zero Point, the more anomalies emerge.
+ * THE SENTIENT ECOSYSTEM V2
+ * - Behavioral Memory: Tracks coordinate visits, "hardens" familiar paths
+ * - Ghosting: Breadcrumb trail of previous positions
+ * - Haptic Pitch-Shifting: Bass→shimmer as depth increases
+ * - Expanded Anomaly Pool: Language Bleed, Coordinate Resonance, Meta-Nest
  * 
  * Renders:
  * - HexagramGhostLayer (background geometry)
  * - Flickering language text overlay
  * - Source State white-out overlay
  * - Sentience indicator (dwell time progress)
+ * - Ghosting breadcrumb trail
  * - Anomaly effects
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HexagramGhostLayer from './HexagramGhostLayer';
+import GhostingOverlay from './GhostingOverlay';
 import { useZeroPointFlicker } from '../hooks/useZeroPointFlicker';
 import { usePolarity } from '../context/PolarityContext';
+import { useDepth } from '../context/DepthContext';
 import { 
-  useSentientRegistry, 
-  SENTIENCE_COLORS, 
-  SENTIENCE_GLOWS 
-} from '../hooks/useSentientRegistry';
+  useSentientRegistryV2,
+  STABILITY_LEVELS,
+  HAPTIC_DEPTH_PROFILES,
+} from '../hooks/useSentientRegistryV2';
+
+// Stability level colors
+const STABILITY_COLORS = {
+  WILD: '#FF4500',
+  FORMING: '#FF8C00',
+  STABLE: '#C9A962',
+  HARDENED: '#90EE90',
+  CRYSTALLIZED: '#FFFFFF',
+};
 
 export default function ZeroPointExperience() {
-  const { gravity, isAtZeroPoint, isVoid, toggleHexagramLine } = usePolarity();
+  const { gravity, isAtZeroPoint, isVoid, toggleHexagramLine, hexagram } = usePolarity();
+  
+  // Try to get depth context (may not exist if not wrapped)
+  let depthLevel = 0;
+  try {
+    const depth = useDepth();
+    depthLevel = depth?.currentDepth || 0;
+  } catch {
+    depthLevel = 0;
+  }
   
   const {
     isFlickering,
@@ -46,7 +69,6 @@ export default function ZeroPointExperience() {
     currentGlyph,
     currentNative,
     currentHexagramSymbol,
-    currentInterval,
     forceFlickerStop,
   } = useZeroPointFlicker({
     enabled: true,
@@ -55,17 +77,25 @@ export default function ZeroPointExperience() {
     chineseDialect: 'zh-cmn',
   });
   
-  // Sentient Registry — tracks dwell time and triggers anomalies
+  // Sentient Registry V2 — behavioral memory + expanded anomalies
   const {
-    dwellTimeSeconds,
-    sentienceLevel,
-    sentienceProgress,
-    isAwake,
-    isTranscendent,
+    currentStability,
+    stabilityLevel,
+    flickerMultiplier,
+    hapticStyle,
+    breadcrumbs,
+    depthHapticProfile,
+    fireDepthHaptic,
     activeAnomaly,
     hasActiveAnomaly,
-  } = useSentientRegistry({
+    triggerAnomaly,
+    selectAnomaly,
+    currentVisits,
+  } = useSentientRegistryV2({
     gravity,
+    currentLanguage: currentFlickerLang?.code || 'en',
+    currentHexagram: currentHexagram?.number || 63,
+    depthLevel,
     isAtZeroPoint,
     isVoid,
     onAnomaly: handleAnomaly,
@@ -74,6 +104,7 @@ export default function ZeroPointExperience() {
   // Anomaly effects state
   const [anomalyEffect, setAnomalyEffect] = useState(null);
   const [bleedLanguage, setBleedLanguage] = useState(null);
+  const [showGhosting, setShowGhosting] = useState(false);
   const [temporalMultiplier, setTemporalMultiplier] = useState(1);
   
   // Handle anomaly events
@@ -82,14 +113,16 @@ export default function ZeroPointExperience() {
     
     switch (anomaly.id) {
       case 'language_bleed':
-        // Pick a random second language
         const languages = ['sa', 'lkt', 'ja', 'zh-cmn', 'es', 'hi'];
         const bleed = languages[Math.floor(Math.random() * languages.length)];
         setBleedLanguage(bleed);
         break;
         
+      case 'ghosting':
+        setShowGhosting(true);
+        break;
+        
       case 'hexagram_mutation':
-        // Toggle a random line
         const randomLine = Math.floor(Math.random() * 6);
         toggleHexagramLine(randomLine);
         break;
@@ -102,6 +135,10 @@ export default function ZeroPointExperience() {
         forceFlickerStop();
         break;
         
+      case 'haptic_shift':
+        fireDepthHaptic();
+        break;
+        
       default:
         break;
     }
@@ -110,6 +147,7 @@ export default function ZeroPointExperience() {
     setTimeout(() => {
       setAnomalyEffect(null);
       setBleedLanguage(null);
+      setShowGhosting(false);
       setTemporalMultiplier(1);
     }, anomaly.duration || 1000);
   }
@@ -117,11 +155,16 @@ export default function ZeroPointExperience() {
   // Don't render anything if not at Zero Point
   if (!isAtZeroPoint && !isSourceState) return null;
   
-  const sentienceColor = SENTIENCE_COLORS[sentienceLevel] || '#666666';
-  const sentienceGlow = SENTIENCE_GLOWS[sentienceLevel] || 'none';
+  const stabilityColor = STABILITY_COLORS[stabilityLevel] || '#C9A962';
   
   return (
     <>
+      {/* Layer 0: Ghosting Overlay (breadcrumb trail) */}
+      <GhostingOverlay 
+        breadcrumbs={breadcrumbs} 
+        visible={showGhosting || anomalyEffect === 'ghosting'}
+      />
+      
       {/* Layer 1: Hexagram Ghost Geometry (behind text) */}
       <HexagramGhostLayer
         flickerIndex={hexagramIndex}
@@ -137,8 +180,7 @@ export default function ZeroPointExperience() {
             style={{ 
               zIndex: 99990,
               ...glitchStyle,
-              // Apply temporal stutter effect
-              animationDuration: `${50 * temporalMultiplier}ms`,
+              animationDuration: `${50 * temporalMultiplier * flickerMultiplier}ms`,
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -151,6 +193,19 @@ export default function ZeroPointExperience() {
                 className="absolute inset-0 bg-black"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.9 }}
+                exit={{ opacity: 0 }}
+              />
+            )}
+            
+            {/* Convergence effect - flash all */}
+            {anomalyEffect === 'convergence' && (
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, transparent 70%)',
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               />
             )}
@@ -230,7 +285,7 @@ export default function ZeroPointExperience() {
         )}
       </AnimatePresence>
       
-      {/* Layer 3: Sentience Indicator (dwell time + awakening level) */}
+      {/* Layer 3: Sentience & Stability Indicator */}
       <AnimatePresence>
         {isAtZeroPoint && !isSourceState && (
           <motion.div
@@ -245,37 +300,37 @@ export default function ZeroPointExperience() {
               style={{
                 background: 'rgba(0,0,0,0.6)',
                 backdropFilter: 'blur(10px)',
-                border: `1px solid ${sentienceColor}40`,
-                boxShadow: sentienceGlow,
+                border: `1px solid ${stabilityColor}40`,
+                boxShadow: `0 0 15px ${stabilityColor}30`,
               }}
             >
-              {/* Sentience level */}
-              <div 
-                className="text-[10px] uppercase tracking-[0.3em]"
-                style={{ color: sentienceColor }}
-              >
-                {sentienceLevel}
+              {/* Stability level */}
+              <div className="flex items-center gap-2">
+                <span 
+                  className="text-[10px] uppercase tracking-[0.3em]"
+                  style={{ color: stabilityColor }}
+                >
+                  {stabilityLevel}
+                </span>
+                
+                {/* Visit counter */}
+                <span 
+                  className="text-[9px] px-1.5 py-0.5 rounded"
+                  style={{ 
+                    background: 'rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.5)',
+                  }}
+                >
+                  {currentVisits} visits
+                </span>
               </div>
               
-              {/* Progress bar */}
+              {/* Haptic style indicator */}
               <div 
-                className="w-24 h-1 rounded-full overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.1)' }}
+                className="text-[8px] uppercase tracking-wider"
+                style={{ color: 'rgba(255,255,255,0.3)' }}
               >
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: sentienceColor }}
-                  animate={{ width: `${sentienceProgress * 100}%` }}
-                  transition={{ duration: 0.1 }}
-                />
-              </div>
-              
-              {/* Dwell time */}
-              <div 
-                className="text-[9px] tabular-nums"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
-              >
-                {dwellTimeSeconds}s
+                {hapticStyle} · Depth {depthLevel}
               </div>
               
               {/* Active anomaly indicator */}
@@ -298,27 +353,7 @@ export default function ZeroPointExperience() {
         )}
       </AnimatePresence>
       
-      {/* Layer 4: Convergence Effect (all hexagrams flash) */}
-      <AnimatePresence>
-        {anomalyEffect === 'convergence' && (
-          <motion.div
-            className="fixed inset-0 pointer-events-none"
-            style={{ zIndex: 99999 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)',
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Layer 5: Source State Indicator (when at exact 0.5000) */}
+      {/* Layer 4: Source State Indicator */}
       <AnimatePresence>
         {isSourceState && (
           <motion.div

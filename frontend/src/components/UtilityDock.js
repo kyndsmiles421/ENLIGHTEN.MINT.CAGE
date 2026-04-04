@@ -19,11 +19,14 @@ import {
   Sliders, 
   GripVertical,
   X,
-  Compass
+  Compass,
+  RotateCcw
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import HexagramCompass, { HexagramIndicator, SupernovaOverlay } from './HexagramCompass';
 import { usePolarity } from '../context/PolarityContext';
+import RitualCycleControl from './RitualCycleControl';
+import { useSentientRegistryV2 } from '../hooks/useSentientRegistryV2';
 
 const DOCK_ITEMS = [
   { id: 'assistant', icon: MessageCircle, label: 'AI Assistant', color: '#818CF8' },
@@ -62,6 +65,30 @@ export default function UtilityDock({
     setManualGravity,
     toggleZeroPointMode,
   } = usePolarity();
+
+  // Ritual Cycle from Sentient Registry V2
+  const {
+    ritualActive,
+    ritualIndex,
+    ritualPaused,
+    currentRitualHexagram,
+    ritualProgress,
+    startRitualCycle,
+    stopRitualCycle,
+  } = useSentientRegistryV2({
+    gravity,
+    isAtZeroPoint,
+    isVoid,
+  });
+  
+  // Toggle ritual pause
+  const toggleRitualPause = useCallback(() => {
+    // This would need to be implemented in the registry
+    // For now, stop acts as toggle when active
+    if (ritualActive) {
+      stopRitualCycle();
+    }
+  }, [ritualActive, stopRitualCycle]);
 
   // Hide on certain pages (hub, fullscreen experiences)
   const hiddenPaths = ['/hub', '/vr', '/cinematic-intro', '/intro'];
@@ -347,6 +374,26 @@ export default function UtilityDock({
                     </button>
                   )}
                 </div>
+              </motion.div>
+              
+              {/* Ritual Cycle Control — Digital Prayer Wheel */}
+              <motion.div
+                className="relative w-full"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ delay: 0.2 }}
+              >
+                <RitualCycleControl
+                  active={ritualActive}
+                  paused={ritualPaused}
+                  currentIndex={ritualIndex}
+                  currentHexagram={currentRitualHexagram}
+                  progress={ritualProgress}
+                  onStart={startRitualCycle}
+                  onStop={stopRitualCycle}
+                  onTogglePause={toggleRitualPause}
+                  compact={false}
+                />
               </motion.div>
             </motion.div>
           )}

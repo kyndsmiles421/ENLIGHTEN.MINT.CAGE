@@ -47,23 +47,39 @@ Build "The Cosmic Collective", a full-stack wellness platform with orbital navig
 - Center (0.50): 35ms interval (rapid, intense)
 - Precision 0.500: Source State (all stops, resonant hum)
 
-### Sentient Ecosystem (useSentientRegistry.js)
-**Dwell Time → Anomaly System:**
-| Level | Dwell Time | Anomaly Chance | 
-|-------|------------|----------------|
-| Dormant | 0-5s | 0% |
-| Awakening | 5-15s | 10% |
-| Stirring | 15-30s | 30% |
-| Sentient | 30-60s | 60% |
-| Transcendent | 60s+ | 90% |
+### Sentient Ecosystem V2 (useSentientRegistryV2.js)
 
-**Anomaly Types:**
-- Language Bleed: Two languages flicker simultaneously
-- Hexagram Mutation: Random line toggles
-- Gravity Drift: ±2% oscillation
-- Temporal Stutter: Speed multiplier shift
-- Void Whisper: Moment of silence/darkness
-- Convergence: All 9 hexagrams flash (Transcendent only)
+**Behavioral Memory — Personalized Topography:**
+| Stability Level | Visits | Flicker Multiplier | Haptic Style |
+|-----------------|--------|-------------------|--------------|
+| WILD | 0-2 | 1.5x (chaotic) | chaotic |
+| FORMING | 3-5 | 1.2x | rhythmic |
+| STABLE | 6-10 | 1.0x | smooth |
+| HARDENED | 11-15 | 0.8x (melodic) | melodic |
+| CRYSTALLIZED | 16+ | 0.6x (harmonic) | harmonic |
+
+**Expanded Anomaly Pool:**
+- Language Bleed, Ghosting (breadcrumb trail)
+- Haptic Pitch-Shift, Coordinate Resonance
+- Hexagram Mutation, Temporal Stutter
+- Void Whisper, Convergence, Meta-Nest, Path Echo
+
+**Haptic Depth Profiles (bass→shimmer):**
+| Depth | Name | Base (ms) | Character |
+|-------|------|-----------|-----------|
+| 0 | Foundation | 50 | bass_thrum |
+| 1 | Earth | 40 | deep_pulse |
+| 2 | Stone | 30 | mid_rumble |
+| 3 | Water | 20 | flowing |
+| 4 | Air | 12 | light_tap |
+| 5 | Light | 6 | shimmer |
+
+**Ritual Cycle (Digital Prayer Wheel):**
+- Auto-animated descent-and-return through all 9 hexagrams
+- 3s per state, 500ms transitions
+- Auto-pause at Source State (Hexagram 63) for 6s
+- Haptic pulse at each transition
+- Progress indicator with hexagram dots
 
 ### Manual Gravity Control (UtilityDock)
 - **Gravity Slider**: 0-100% with 0.5% step precision
