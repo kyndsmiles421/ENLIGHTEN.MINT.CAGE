@@ -814,7 +814,30 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - Visual feedback: green border when sound is ON
 - Tests: Screenshot verification — Clean mobile UI with separated widgets
 
-## Upcoming (P0-P1) — Iteration 287+
+### Iteration 287 — Expert Advisor System "The Five Sages" (April 2026)
+**THE ENLIGHTENMENT CAFE — Phygital RPG Layer**
+- **The Five Sages**: AI-powered NPCs governing each domain
+  - **Kaelen the Smith** (Practice Room) — Disciplined & Direct, skill-building/habit loops
+  - **Sora the Seer** (Oracle Chamber) — Cryptic & Enigmatic, deep insights/future-casting
+  - **Elara the Harmonist** (Sanctuary) — Nurturing & Ethereal, meditation/bio-resonance
+  - **Finn the Voyager** (Explorer's Lounge) — Playful & Curious, navigation/community
+  - **Vesper the Ancient** (Ritual) — Stoic & Ceremonial, milestones/legacy
+- **Mastery Path Quest System**:
+  - Daily Ritual quests (24h reset) + Hero's Journey (long-term progression)
+  - Rewards: Lumens (XP, 100 per level), Stardust (currency), Artifacts (badges)
+  - Dynamic quest generation via GPT-5.2 based on user progress
+- **Holographic Presence UI**:
+  - `SageAvatar.js`: Pulsing crystalline form appears on zone entry
+  - `SageAudience.js`: Full conversational modal with blurred background
+  - `QuestHUD.js`: Active quests pinned at top-left with progress tracking
+- **AI Integration**:
+  - Unique system prompts per Sage defining personality/vocabulary
+  - Persistent conversation memory (MongoDB)
+  - Context-aware greetings based on visit history and progress
+- **Files**: `routes/sages.py` (backend), `SageContext.js`, `SageAvatar.js`, `SageAudience.js`, `QuestHUD.js`
+- Tests: 100% backend (23/23), 100% frontend — All 5 Sages working with AI responses
+
+## Upcoming (P0-P1) — Iteration 288+
 - **Nebula View Fix**: Resolve R3F v9 / Three.js 0.183 incompatibility
   - Options: Downgrade libraries, switch to vanilla Three.js, or await library updates
 - **Gold Thread Mesh**: THREE.LineBasicMaterial connecting crystal islands
