@@ -44,6 +44,9 @@ import OrbitalNavigation from './components/OrbitalNavigation';
 import LearningToggle from './components/LearningToggle';
 import EmergencyShutOff from './components/EmergencyShutOff';
 import MissionControlRing from './components/MissionControlRing';
+import { MeshNetworkProvider } from './context/MeshNetworkContext';
+import GlowPortal from './components/GlowPortal';
+import UniversalCommand from './components/UniversalCommand';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -383,6 +386,7 @@ function App() {
       <CosmicThemeProvider>
       <OrbitalSentinelProvider>
       <SovereignProvider>
+      <MeshNetworkProvider>
         <BrowserRouter>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
@@ -420,10 +424,13 @@ function App() {
             <OrbitalNavigation />
             <CommandMode context="general" />
             <EmergencyShutOff />
+            <GlowPortal />
+            <UniversalCommand />
           </div>
           </SplitScreenProvider>
           </VoiceCommandProvider>
         </BrowserRouter>
+      </MeshNetworkProvider>
       </SovereignProvider>
       </OrbitalSentinelProvider>
       </CosmicThemeProvider>

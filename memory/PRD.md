@@ -648,7 +648,33 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Files**: `DirectorStudio.js` (new), updated `CosmicMixer.js`
 - Tests: Frontend verification — video library displays all 14 videos, layers stack correctly, cross-ref panel opens
 
-## Upcoming (P0-P1) — Iteration 280+
+### Iteration 280 — Decentralized Mesh Network Architecture (April 2026)
+- **MeshNetworkContext**: Core decentralized navigation and state architecture
+  - **Constellation Nodes**: 30+ modules defined as autonomous "edge nodes" with category clustering (Practice, Divination, Sanctuary, Explore, Today)
+  - **Node Connections**: Mesh topology defining which modules relate to each other
+  - **Pulse System**: P2P direct communication between modules (session_complete, insight_generated, mood_changed, etc.)
+  - **Edge State**: Local-first state management with IndexedDB persistence for offline support
+  - **Glow Triggers**: Contextual events that activate lateral navigation portals
+- **Universal Command (Cmd+K)**: Spotlight-style instant navigation
+  - Fuzzy search across all constellation nodes
+  - Quick Actions: Start Breathing, Log Mood, Write Journal, Ask Oracle, Start Meditation
+  - Recent navigation history tracking
+  - Keyboard navigation (↑↓ Navigate, ↵ Open, esc Close)
+  - "Mesh Network v1" branding
+- **Glow Portal**: Contextual lateral navigation at screen edges
+  - Pulsing glow effects for suggested destinations
+  - Auto-dismiss after 8 seconds
+  - Connection lines showing paths
+  - Hover to reveal destination labels
+- **Constellation Map**: Equal-weight node visualization (prepared for next iteration)
+  - Category clusters in pentagon formation
+  - Mesh connection lines between related nodes
+  - Current position highlighting
+  - Navigation history indicators
+- **Files**: `MeshNetworkContext.js` (new), `UniversalCommand.js` (new), `GlowPortal.js` (new), `ConstellationMap.js` (new), updated `App.js`
+- Tests: Screenshot verification — Cmd+K opens command palette, search filters work, quick actions display correctly
+
+## Upcoming (P0-P1) — Iteration 281+
 - **Step 9: Multi-Widget Concurrent Dialogue** — Two Sovereign windows open simultaneously
 - **Dust "Clink" Spatial Audio** — "Star particles settling" sound on Dust transfers
 - **"Usage Yield" Report UI** — Monthly savings map from Caspian
