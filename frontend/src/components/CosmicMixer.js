@@ -4,13 +4,14 @@ import { useLocation } from 'react-router-dom';
 import {
   ChevronUp, ChevronDown, X, Volume2, VolumeX, Waves, Sun, BookOpen,
   Vibrate, Play, Pause, Square, Loader2, Music, Film, Sliders, Maximize2, Minimize2,
-  Save, Heart, Globe, Lock, Trash2, Star, Users, Hexagon, Circle, Radio, Library,
+  Save, Heart, Globe, Lock, Trash2, Star, Users, Hexagon, Circle, Radio, Library, Clapperboard,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTempo } from '../context/TempoContext';
 import axios from 'axios';
 import FractalVisualizer from './FractalVisualizer';
 import { VisualLayersMixer, LIGHT_MODES, VIDEO_OVERLAYS, FRACTAL_TYPES, VISUAL_FILTERS } from './VisualLayersMixer';
+import DirectorStudio, { DIRECTOR_VIDEO_LIBRARY } from './DirectorStudio';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -234,6 +235,12 @@ export default function CosmicMixer() {
   const [visualLayers, setVisualLayers] = useState([]);
   const analyserRef = useRef(null);
   const analyserDataRef = useRef(new Uint8Array(64));
+
+  // Director's Cut Studio state
+  const [directorVideoLayers, setDirectorVideoLayers] = useState([]);
+  const [directorCrossRefs, setDirectorCrossRefs] = useState([]);
+  const [showDirectorStudio, setShowDirectorStudio] = useState(false);
+  const [directorExpanded, setDirectorExpanded] = useState(false);
 
   // Per-channel volumes (0-100)
   const [freqVol, setFreqVol] = useState(50);
@@ -894,6 +901,37 @@ export default function CosmicMixer() {
 
   return (
     <>
+      {/* Director's Cut Studio Video Overlays */}
+      {directorVideoLayers.filter(l => l.visible).map((layer, i) => {
+        const video = layer.videoData;
+        if (!video) return null;
+        const cssFilter = `brightness(${layer.effects?.brightness || 100}%) contrast(${layer.effects?.contrast || 100}%) saturate(${layer.effects?.saturation || 100}%) blur(${layer.effects?.blur || 0}px)`;
+        return (
+          <div 
+            key={layer.uid} 
+            className="fixed inset-0 pointer-events-none overflow-hidden" 
+            style={{ 
+              zIndex: 25 + i, 
+              opacity: layer.opacity / 100,
+            }} 
+            data-testid={`director-overlay-${layer.uid}`}>
+            <video 
+              src={video.url} 
+              autoPlay 
+              loop 
+              muted={layer.muted !== false}
+              playsInline 
+              className="w-full h-full object-cover" 
+              style={{ 
+                mixBlendMode: layer.blendMode || 'screen',
+                filter: cssFilter,
+                transform: `scale(${layer.transform?.scale || 1}) translateX(${layer.transform?.x || 0}px) translateY(${layer.transform?.y || 0}px) rotate(${layer.transform?.rotation || 0}deg)`,
+              }} 
+            />
+          </div>
+        );
+      })}
+
       {/* Multi-Layer Visual Overlays */}
       {visualLayers.filter(l => l.visible).map((layer, i) => {
         if (layer.type === 'light') {
@@ -1344,6 +1382,47 @@ export default function CosmicMixer() {
                   </div>
                   {activeMantra && <p className="text-[9px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>{activeMantra.tradition} tradition</p>}
                 </ChannelStrip>
+
+                {/* ── Director's Cut Studio Toggle ── */}
+                <div className="rounded-xl overflow-hidden mb-2" style={{ background: 'rgba(129,140,248,0.02)', border: '1px solid rgba(129,140,248,0.08)' }}>
+                  <button
+                    onClick={() => setShowDirectorStudio(!showDirectorStudio)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 transition-all hover:bg-white/[0.02]"
+                    data-testid="director-studio-toggle">
+                    <div className="flex items-center gap-2">
+                      <Clapperboard size={12} style={{ color: showDirectorStudio ? '#818CF8' : 'var(--text-muted)' }} />
+                      <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: showDirectorStudio ? '#818CF8' : 'var(--text-muted)' }}>
+                        Director's Cut Studio
+                      </span>
+                      {directorVideoLayers.length > 0 && (
+                        <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }}>
+                          {directorVideoLayers.length} video{directorVideoLayers.length !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.08)', color: '#F59E0B' }}>
+                        Pro
+                      </span>
+                      {showDirectorStudio ? <ChevronUp size={12} style={{ color: 'var(--text-muted)' }} /> : <ChevronDown size={12} style={{ color: 'var(--text-muted)' }} />}
+                    </div>
+                  </button>
+                  
+                  <AnimatePresence>
+                    {showDirectorStudio && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                        <DirectorStudio
+                          activeVideoLayers={directorVideoLayers}
+                          onLayersChange={setDirectorVideoLayers}
+                          crossReferences={directorCrossRefs}
+                          onCrossReferencesChange={setDirectorCrossRefs}
+                          isExpanded={directorExpanded}
+                          onExpandChange={setDirectorExpanded}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* ── Visual Layers Mixing Board ── */}
                 <VisualLayersMixer layers={visualLayers} onLayersChange={setVisualLayers} />

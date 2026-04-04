@@ -5,17 +5,69 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
  * COSMIC THEME ENGINE — Global Mood-Reactive Color System
  * ═══════════════════════════════════════════════════════════════════════════════
  * 
+ * Now supports TWO aesthetic modes:
+ * 
+ * 1. COSMIC MODE (Default): Deep blacks, neon glows, space atmosphere
+ *    - For: Hub, Mixer, Orbital navigation
+ *    - Feel: "Cockpit" - operational, immersive
+ * 
+ * 2. CAFÉ MODE (Enlightenment Athenaeum): Warm intellectual study aesthetic
+ *    - For: Research, Study pages, Angels & Aliens content
+ *    - Feel: "Library" - invites lingering and learning
+ *    - Palette: Vellum, Charcoal, Aged Gold
+ * 
  * Manages CSS Custom Properties for:
  * - --resonance-primary: Main accent color
  * - --resonance-secondary: Radiance/glow color (Color 2)
  * - --resonance-glow-intensity: Dynamic glow strength
  * - --resonance-surface: Frosted glass background
  * - --resonance-border: Translucent borders
+ * - --cafe-*: Café mode specific variables
  * 
- * Updates :root CSS variables so the entire app reacts to mood changes.
+ * Updates :root CSS variables so the entire app reacts to mode/mood changes.
  */
 
-// ═══ COLOR PALETTES ═══
+// ═══ THEME MODES ═══
+export const THEME_MODES = {
+  COSMIC: 'cosmic',
+  CAFE: 'cafe',
+};
+
+// ═══ CAFÉ PALETTE (Enlightenment Athenaeum) ═══
+export const CAFE_PALETTE = {
+  // Core colors
+  vellum: '#F5F0E6',           // Aged paper background
+  charcoal: '#2C2C2C',         // Deep readable text
+  agedGold: '#C4A35A',         // Accent highlights
+  espresso: '#3D2B1F',         // Dark accents
+  cream: '#FDF8F0',            // Light surfaces
+  inkBlack: '#1A1A1A',         // Headers, strong text
+  
+  // Semantic colors
+  primary: '#C4A35A',          // Aged Gold - primary accent
+  secondary: '#8B7355',        // Warm brown - secondary
+  background: '#F5F0E6',       // Vellum
+  surface: '#FDFBF7',          // Slightly lighter paper
+  text: '#2C2C2C',             // Charcoal
+  textMuted: '#6B5B4F',        // Softer brown-gray
+  border: '#E5DED3',           // Subtle warm border
+  
+  // Reading-optimized
+  paperWhite: '#FFFEF9',       // Pure reading surface
+  marginalia: '#9B8B7A',       // Notes, secondary info
+  highlight: '#F7E8C4',        // Highlighted passages
+  link: '#6B4423',             // Hyperlink brown
+};
+
+// ═══ CAFÉ SURFACE PRESETS ═══
+const CAFE_SURFACES = {
+  paper: 'rgba(245, 240, 230, 0.98)',      // Main reading surface
+  parchment: 'rgba(253, 248, 240, 0.95)',  // Elevated cards
+  sidebar: 'rgba(60, 50, 40, 0.95)',       // Dark sidebar (glossary)
+  overlay: 'rgba(44, 44, 44, 0.85)',       // Modal overlays
+};
+
+// ═══ COLOR PALETTES (Cosmic Mode) ═══
 export const MOOD_PALETTES = {
   // Positive moods
   happy: { primary: '#86EFAC', secondary: '#22C55E', glow: 0.4 },
@@ -53,20 +105,21 @@ const SURFACE_PRESETS = {
 
 // ═══ INITIAL THEME ═══
 const initialTheme = {
+  mode: THEME_MODES.COSMIC,   // 'cosmic' | 'cafe'
   mood: 'cosmic',
   palette: MOOD_PALETTES.cosmic,
   surface: 'glass',
   glowIntensity: 0.35,
   radianceEnabled: true,
-  powerSaveMode: false, // Battery-aware dimming
+  powerSaveMode: false,
 };
 
 // ═══ POWER SAVE MULTIPLIERS ═══
 const POWER_SAVE_CONFIG = {
-  glowMultiplier: 0.3,      // Reduce glow to 30% in power save
-  blurMultiplier: 0.5,      // Reduce backdrop blur
-  animationScale: 0.5,      // Slow down animations
-  batteryThreshold: 0.2,    // Trigger at 20% battery
+  glowMultiplier: 0.3,
+  blurMultiplier: 0.5,
+  animationScale: 0.5,
+  batteryThreshold: 0.2,
 };
 
 // ═══ CONTEXT ═══
@@ -77,13 +130,12 @@ function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-    : '192, 132, 252'; // fallback purple
+    : '192, 132, 252';
 }
 
 // ═══ PROVIDER ═══
 export function CosmicThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    // Load from localStorage if available
     const saved = localStorage.getItem('zen_cosmic_theme');
     if (saved) {
       try {
@@ -137,50 +189,87 @@ export function CosmicThemeProvider({ children }) {
   // ═══ UPDATE CSS VARIABLES ═══
   useEffect(() => {
     const root = document.documentElement;
-    const { palette, surface, glowIntensity, radianceEnabled, powerSaveMode } = theme;
+    const { mode, palette, surface, glowIntensity, radianceEnabled, powerSaveMode } = theme;
+    const isCafeMode = mode === THEME_MODES.CAFE;
 
     // Calculate effective glow (dimmed in power save)
     const effectiveGlow = powerSaveMode 
       ? glowIntensity * POWER_SAVE_CONFIG.glowMultiplier 
       : glowIntensity;
 
-    // Primary colors
-    root.style.setProperty('--resonance-primary', palette.primary);
-    root.style.setProperty('--resonance-primary-rgb', hexToRgb(palette.primary));
-    
-    // Secondary (Color 2 - Radiance)
-    root.style.setProperty('--resonance-secondary', palette.secondary);
-    root.style.setProperty('--resonance-secondary-rgb', hexToRgb(palette.secondary));
-    
-    // Glow intensity (power-save aware)
-    root.style.setProperty('--resonance-glow-intensity', String(radianceEnabled ? effectiveGlow : 0));
-    root.style.setProperty('--resonance-glow', radianceEnabled ? effectiveGlow : 0);
-    
-    // Surface
-    root.style.setProperty('--resonance-surface', SURFACE_PRESETS[surface] || SURFACE_PRESETS.glass);
-    
-    // Power save indicator
+    // ═══ MODE INDICATOR ═══
+    root.style.setProperty('--theme-mode', mode);
+    root.setAttribute('data-theme-mode', mode);
+
+    if (isCafeMode) {
+      // ═══ CAFÉ MODE (Enlightenment Athenaeum) ═══
+      root.style.setProperty('--resonance-primary', CAFE_PALETTE.primary);
+      root.style.setProperty('--resonance-primary-rgb', hexToRgb(CAFE_PALETTE.primary));
+      root.style.setProperty('--resonance-secondary', CAFE_PALETTE.secondary);
+      root.style.setProperty('--resonance-secondary-rgb', hexToRgb(CAFE_PALETTE.secondary));
+      
+      // Café surfaces
+      root.style.setProperty('--resonance-surface', CAFE_SURFACES.paper);
+      root.style.setProperty('--resonance-border', CAFE_PALETTE.border);
+      
+      // Café-specific variables
+      root.style.setProperty('--cafe-background', CAFE_PALETTE.background);
+      root.style.setProperty('--cafe-surface', CAFE_PALETTE.surface);
+      root.style.setProperty('--cafe-text', CAFE_PALETTE.text);
+      root.style.setProperty('--cafe-text-muted', CAFE_PALETTE.textMuted);
+      root.style.setProperty('--cafe-vellum', CAFE_PALETTE.vellum);
+      root.style.setProperty('--cafe-charcoal', CAFE_PALETTE.charcoal);
+      root.style.setProperty('--cafe-gold', CAFE_PALETTE.agedGold);
+      root.style.setProperty('--cafe-espresso', CAFE_PALETTE.espresso);
+      root.style.setProperty('--cafe-cream', CAFE_PALETTE.cream);
+      root.style.setProperty('--cafe-paper-white', CAFE_PALETTE.paperWhite);
+      root.style.setProperty('--cafe-marginalia', CAFE_PALETTE.marginalia);
+      root.style.setProperty('--cafe-highlight', CAFE_PALETTE.highlight);
+      root.style.setProperty('--cafe-link', CAFE_PALETTE.link);
+      root.style.setProperty('--cafe-sidebar', CAFE_SURFACES.sidebar);
+      
+      // Disable cosmic glow effects in café mode
+      root.style.setProperty('--resonance-glow-intensity', '0');
+      root.style.setProperty('--resonance-glow', '0');
+      root.style.setProperty('--resonance-radiance', 'none');
+      root.style.setProperty('--resonance-tint', CAFE_PALETTE.highlight);
+      root.style.setProperty('--resonance-text-shadow', 'none');
+      root.style.setProperty('--resonance-text-glow', 'none');
+      
+    } else {
+      // ═══ COSMIC MODE (Original) ═══
+      root.style.setProperty('--resonance-primary', palette.primary);
+      root.style.setProperty('--resonance-primary-rgb', hexToRgb(palette.primary));
+      root.style.setProperty('--resonance-secondary', palette.secondary);
+      root.style.setProperty('--resonance-secondary-rgb', hexToRgb(palette.secondary));
+      
+      // Glow intensity (power-save aware)
+      root.style.setProperty('--resonance-glow-intensity', String(radianceEnabled ? effectiveGlow : 0));
+      root.style.setProperty('--resonance-glow', radianceEnabled ? effectiveGlow : 0);
+      
+      // Surface
+      root.style.setProperty('--resonance-surface', SURFACE_PRESETS[surface] || SURFACE_PRESETS.glass);
+      root.style.setProperty('--resonance-border', 'rgba(255, 255, 255, 0.1)');
+      
+      // Computed styles (power-save aware)
+      root.style.setProperty('--resonance-tint', `rgba(${hexToRgb(palette.secondary)}, ${powerSaveMode ? 0.08 : 0.15})`);
+      root.style.setProperty('--resonance-radiance', 
+        `radial-gradient(circle, rgba(${hexToRgb(palette.secondary)}, ${effectiveGlow}) 0%, transparent 70%)`
+      );
+      
+      // Text effects
+      const textGlowMultiplier = powerSaveMode ? 0.5 : 1;
+      root.style.setProperty('--resonance-text-shadow', `0 0 ${20 * textGlowMultiplier}px rgba(${hexToRgb(palette.secondary)}, ${0.3 * textGlowMultiplier})`);
+      root.style.setProperty('--resonance-text-glow', `0 0 ${8 * textGlowMultiplier}px rgba(${hexToRgb(palette.primary)}, ${0.4 * textGlowMultiplier})`);
+    }
+
+    // Power save indicator (both modes)
     root.style.setProperty('--resonance-power-save', powerSaveMode ? '1' : '0');
     root.style.setProperty('--resonance-animation-scale', powerSaveMode 
       ? String(POWER_SAVE_CONFIG.animationScale) 
       : '1');
-    
-    // Computed styles (power-save aware)
-    root.style.setProperty('--resonance-border', `rgba(255, 255, 255, 0.1)`);
-    root.style.setProperty('--resonance-tint', `rgba(${hexToRgb(palette.secondary)}, ${powerSaveMode ? 0.08 : 0.15})`);
-    root.style.setProperty('--resonance-radiance', 
-      `radial-gradient(circle, rgba(${hexToRgb(palette.secondary)}, ${effectiveGlow}) 0%, transparent 70%)`
-    );
-    
-    // Text masking layer (prevents glow bleeding into text)
-    const textGlowMultiplier = powerSaveMode ? 0.5 : 1;
-    root.style.setProperty('--resonance-text-shadow', `0 0 ${20 * textGlowMultiplier}px rgba(${hexToRgb(palette.secondary)}, ${0.3 * textGlowMultiplier})`);
-    root.style.setProperty('--resonance-text-glow', `0 0 ${8 * textGlowMultiplier}px rgba(${hexToRgb(palette.primary)}, ${0.4 * textGlowMultiplier})`);
 
-    // Log power save state change
-    if (powerSaveMode) {
-      console.log('[CosmicTheme] Radiance dimmed to', Math.round(effectiveGlow * 100) + '%');
-    }
+    console.log(`[CosmicTheme] Mode: ${mode.toUpperCase()}${powerSaveMode ? ' (Power Save)' : ''}`);
 
   }, [theme]);
 
@@ -222,10 +311,31 @@ export function CosmicThemeProvider({ children }) {
     setTheme(initialTheme);
   }, []);
 
+  // ═══ MODE SWITCHING ═══
+  const setMode = useCallback((mode) => {
+    if (mode === THEME_MODES.COSMIC || mode === THEME_MODES.CAFE) {
+      setTheme(prev => ({ ...prev, mode }));
+    }
+  }, []);
+
+  const toggleMode = useCallback(() => {
+    setTheme(prev => ({
+      ...prev,
+      mode: prev.mode === THEME_MODES.COSMIC ? THEME_MODES.CAFE : THEME_MODES.COSMIC,
+    }));
+  }, []);
+
+  const isCafeMode = theme.mode === THEME_MODES.CAFE;
+  const isCosmicMode = theme.mode === THEME_MODES.COSMIC;
+
   // ═══ COMPUTED STYLES ═══
   const styles = useMemo(() => ({
-    // Frosted glass surface
-    glassSurface: {
+    // Frosted glass surface (adapts to mode)
+    glassSurface: isCafeMode ? {
+      background: CAFE_SURFACES.parchment,
+      border: `1px solid ${CAFE_PALETTE.border}`,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    } : {
       background: 'var(--resonance-surface)',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
@@ -239,16 +349,50 @@ export function CosmicThemeProvider({ children }) {
     tint: {
       background: 'var(--resonance-tint)',
     },
-    // Glowing border
-    glowBorder: {
+    // Glowing border (cosmic only)
+    glowBorder: isCafeMode ? {
+      border: `1px solid ${CAFE_PALETTE.border}`,
+      boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+    } : {
       border: `1px solid rgba(var(--resonance-secondary-rgb), 0.3)`,
       boxShadow: `0 0 20px rgba(var(--resonance-secondary-rgb), var(--resonance-glow-intensity))`,
     },
-    // Text with glow (use sparingly)
+    // Text with glow (cosmic only)
     glowText: {
       textShadow: 'var(--resonance-text-glow)',
     },
-  }), []);
+    // ═══ CAFÉ-SPECIFIC STYLES ═══
+    cafeCard: {
+      background: CAFE_PALETTE.paperWhite,
+      border: `1px solid ${CAFE_PALETTE.border}`,
+      borderRadius: 8,
+      boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+    },
+    cafeSidebar: {
+      background: CAFE_SURFACES.sidebar,
+      color: CAFE_PALETTE.cream,
+      borderLeft: `1px solid ${CAFE_PALETTE.espresso}`,
+    },
+    cafeText: {
+      color: CAFE_PALETTE.text,
+      fontFamily: "'Georgia', 'Times New Roman', serif",
+    },
+    cafeHeading: {
+      color: CAFE_PALETTE.inkBlack,
+      fontFamily: "'Georgia', 'Times New Roman', serif",
+      fontWeight: 600,
+    },
+    cafeLink: {
+      color: CAFE_PALETTE.link,
+      textDecoration: 'underline',
+      textDecorationColor: CAFE_PALETTE.agedGold,
+    },
+    cafeHighlight: {
+      background: CAFE_PALETTE.highlight,
+      padding: '2px 4px',
+      borderRadius: 2,
+    },
+  }), [isCafeMode]);
 
   const value = useMemo(() => ({
     // State
