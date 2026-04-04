@@ -37,11 +37,11 @@ seeds_collection = db["crystalline_seeds"]
 
 class PathNode(BaseModel):
     """Single node in the 36-bit path"""
-    depth: int = Field(..., ge=0, le=5)
+    depth: int = Field(..., ge=0, le=6)  # Extended to L6 for Tesseract
     hexagram_number: int = Field(..., ge=0, le=63)
     language_code: str
-    row: int = Field(..., ge=0, le=8)
-    col: int = Field(..., ge=0, le=8)
+    row: int = Field(..., ge=-8, le=8)  # INV-01: Allow negative for inverse lattice
+    col: int = Field(..., ge=-8, le=8)  # INV-01: Allow negative for inverse lattice
     dwell_time_ms: Optional[int] = 0
 
 class DwellEntry(BaseModel):
@@ -59,6 +59,11 @@ class MintSeedRequest(BaseModel):
     dwell_history: Optional[List[DwellEntry]] = Field(default=[], description="Behavioral memory from Sentient Registry")
     minter_id: Optional[str] = Field(default="anonymous", description="User ID or anonymous")
     constellation_name: Optional[str] = Field(default=None, description="Optional custom name for the seed")
+    # INV-07: Tesseract Metadata
+    is_inverse: Optional[bool] = Field(default=False, description="True if minted in the Void lattice")
+    anti_address: Optional[str] = Field(default=None, description="The bitwise NOT of the 36-bit address")
+    gravity_at_mint: Optional[float] = Field(default=None, description="Gravity value when seed was minted")
+    is_tesseract_seed: Optional[bool] = Field(default=False, description="True if minted at Tesseract intersection")
 
 class SeedResponse(BaseModel):
     """Response model for a Crystalline Seed"""
@@ -74,6 +79,11 @@ class SeedResponse(BaseModel):
     depth: int
     timestamp: str
     is_public: bool
+    # INV-07: Tesseract Metadata
+    is_inverse: Optional[bool] = False
+    anti_address: Optional[str] = None
+    gravity_at_mint: Optional[float] = None
+    is_tesseract_seed: Optional[bool] = False
     
 class GalleryResponse(BaseModel):
     """Response model for gallery listing"""
@@ -100,6 +110,7 @@ def calculate_rarity_score(seed_data: dict) -> tuple[float, str]:
     - Linguistic state (sacred languages = rarer)
     - Path contains sacred hexagrams
     - Dwell time (longer meditation = rarer)
+    - INV-07: Void Seeds and Tesseract Seeds get massive bonuses
     
     Returns: (score, tier)
     Tiers: COMMON (0-20), UNCOMMON (21-40), RARE (41-60), EPIC (61-80), LEGENDARY (81-100)
@@ -151,6 +162,34 @@ def calculate_rarity_score(seed_data: dict) -> tuple[float, str]:
                     address.replace('|', '') == '1' * len(address.replace('|', ''))):
         score += 15
     
+    # ═══════════════════════════════════════════════════════════════════════
+    # INV-07: VOID SEED AND TESSERACT BONUSES
+    # ═══════════════════════════════════════════════════════════════════════
+    
+    # 6. Void Seed bonus (minted in inverse lattice) - max 15 points
+    if seed_data.get('is_inverse'):
+        score += 15
+        # Extra bonus if anti_address is a palindrome
+        anti_address = seed_data.get('anti_address', '')
+        if anti_address and anti_address.replace('|', '') == anti_address.replace('|', '')[::-1]:
+            score += 5
+    
+    # 7. Tesseract Seed bonus (minted at Source State intersection) - max 25 points
+    if seed_data.get('is_tesseract_seed'):
+        score += 25  # Massive bonus for Tesseract seeds
+    
+    # 8. Gravity proximity bonus (max 10 points)
+    # Closer to Source State (0.500) = rarer
+    gravity = seed_data.get('gravity_at_mint')
+    if gravity is not None:
+        distance_from_source = abs(gravity - 0.500)
+        if distance_from_source < 0.005:  # Within epsilon of Source State
+            score += 10
+        elif distance_from_source < 0.05:
+            score += 5
+        elif distance_from_source < 0.1:
+            score += 2
+    
     # Cap at 100
     score = min(score, 100)
     
@@ -184,6 +223,9 @@ async def mint_seed(request: MintSeedRequest):
     
     Packages the 36-bit address + dwell history + linguistic state into a
     permanent digital artifact with calculated rarity.
+    
+    INV-07: Now supports Void Seeds (is_inverse=True) and Tesseract Seeds
+    (is_tesseract_seed=True) with enhanced rarity bonuses.
     """
     try:
         timestamp = datetime.now(timezone.utc).isoformat()
@@ -194,6 +236,14 @@ async def mint_seed(request: MintSeedRequest):
         # Generate unique seed ID
         seed_id = generate_seed_id(request.address_36bit, timestamp)
         
+        # INV-03: Generate anti-address if not provided
+        anti_address = request.anti_address
+        if not anti_address and request.address_36bit:
+            anti_address = ''.join(
+                '1' if c == '0' else ('0' if c == '1' else c)
+                for c in request.address_36bit
+            )
+        
         # Prepare seed data
         seed_data = {
             "address_36bit": request.address_36bit,
@@ -202,9 +252,14 @@ async def mint_seed(request: MintSeedRequest):
             "dwell_history": [d.model_dump() for d in request.dwell_history] if request.dwell_history else [],
             "minter_id": request.minter_id or "anonymous",
             "depth": depth,
+            # INV-07: Tesseract metadata
+            "is_inverse": request.is_inverse or False,
+            "anti_address": anti_address,
+            "gravity_at_mint": request.gravity_at_mint,
+            "is_tesseract_seed": request.is_tesseract_seed or False,
         }
         
-        # Calculate rarity
+        # Calculate rarity (now includes Void/Tesseract bonuses)
         rarity_score, rarity_tier = calculate_rarity_score(seed_data)
         
         # Complete seed document

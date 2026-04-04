@@ -11,7 +11,79 @@ Build "The Cosmic Collective", a full-stack wellness platform with orbital navig
 
 ---
 
-## Latest Implementation: RDive-36 Recursive Navigation (April 2026)
+## Latest Implementation: Square Inverse Protocol (April 2026)
+
+### The Symmetrical Universe Architecture
+**"Matter and Void — The Spatial Origami"**
+
+The Square Inverse Protocol creates a "Negative Space" (Anti-Lattice) that mirrors the 81 primary coordinates. This enables:
+- **Tesseract Folding** at the 9^4 intersection (6561 states)
+- **Void Seeds** minted in the inverse lattice
+- **Chromatic Inversion** at deep depths
+- **Mirror-Haptic Resonance** creating sensory vacuum
+
+**New Files:**
+| File | Purpose | INV# |
+|------|---------|------|
+| `InverseRegistry.js` | Shadow lattice math & config | INV-01 |
+| `useInverseLattice.js` | Hook for inverse navigation | INV-02,05,06,09,10 |
+| `seed_hunting.py` | Daily coordinate hunt API | Enhancement |
+
+### INV-01: Shadow Registry
+- Standard Grid: (0,0) to (8,8) = 81 states
+- Inverse Grid: (-8,-8) to (0,0) = 81 anti-states
+- Singularity: (0,0) exists in both spaces
+
+### INV-02: Reciprocal Gravity
+```
+G_inverse = 1 - G_standard
+At Source State (0.500): G_inverse = 0.500 (PERFECT SYMMETRY)
+```
+
+### INV-03: Parity Bit / Anti-Address
+```
+Address:      101010|0011|001100|0101
+Anti-Address: 010101|1100|110011|1010
+```
+
+### INV-07: Tesseract Metadata (seeds.py)
+| Field | Type | Description |
+|-------|------|-------------|
+| is_inverse | bool | True if minted in Void lattice |
+| anti_address | str | Bitwise NOT of 36-bit address |
+| gravity_at_mint | float | Gravity value at minting time |
+| is_tesseract_seed | bool | True if minted at Tesseract intersection |
+
+### Updated Rarity Algorithm (max 100 pts)
+| Factor | Max Pts | Bonus |
+|--------|---------|-------|
+| Depth | 30 | L5=30 |
+| Language | 20 | Sacred=20 |
+| Hexagrams | 20 | 5 per sacred |
+| Dwell History | 15 | CRYSTALLIZED=5 |
+| Patterns | 15 | Palindrome=10 |
+| **Void Seed** | 15 | +5 if anti-palindrome |
+| **Tesseract** | 25 | Massive bonus |
+| **Source State** | 10 | Gravity ±0.005 of 0.500 |
+
+### Seed Hunting (Daily Challenges)
+**API Routes:**
+- `GET /api/seed-hunt/current` - Get active hunt
+- `POST /api/seed-hunt/submit` - Submit seed entry
+- `GET /api/seed-hunt/leaderboard` - Hunt rankings
+- `GET /api/seed-hunt/history` - Past hunts
+- `GET /api/seed-hunt/user/{id}/stats` - Hunter stats
+
+**Hunt Types:**
+| Type | Name | Difficulty |
+|------|------|------------|
+| EXACT | Coordinate Lock | LEGENDARY |
+| PATTERN | Pattern Seeker | EPIC |
+| DEPTH | Deep Diver | RARE |
+| LANGUAGE | Cultural Quest | UNCOMMON |
+| HEXAGRAM | Hexagram Hunter | RARE |
+
+---
 
 ### RDive-36 (Recursive Dive 36-Bit Address System)
 **"Proof of Infinite Scalability"**
