@@ -51,6 +51,8 @@ import PulseEchoVisualizer from './components/PulseEchoVisualizer';
 import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
 import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettingsPanel';
 import VellumOverlay from './components/VellumOverlay';
+import { Scene as NebulaScene } from './components/nebula';
+import { NebulaViewToggle } from './components/nebula';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -215,11 +217,21 @@ function PageLoader() {
 // CafeApp — Main app wrapper with Enlightenment Cafe settings
 function CafeApp() {
   const [cafeSettingsOpen, setCafeSettingsOpen] = React.useState(false);
+  const [activeIsland, setActiveIsland] = React.useState(null);
+  
+  const handleIslandClick = React.useCallback((islandId) => {
+    setActiveIsland(islandId);
+  }, []);
   
   return (
     <>
+      {/* Nebula 3D Scene - Renders behind everything when active */}
+      <NebulaScene 
+        onIslandClick={handleIslandClick}
+        activeIsland={activeIsland}
+      />
       <VellumOverlay />
-      <div style={{ minHeight: '100vh', position: 'relative' }}>
+      <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
         <Navigation />
         <ScrollToTop />
         <Toaster
@@ -255,6 +267,10 @@ function CafeApp() {
         <UniversalCommand />
         <PulseEchoVisualizer />
         <CafeSettingsToggle onClick={() => setCafeSettingsOpen(true)} />
+        {/* Quick Nebula Toggle in bottom-left (compact) */}
+        <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
+          <NebulaViewToggle compact />
+        </div>
       </div>
       <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
     </>
