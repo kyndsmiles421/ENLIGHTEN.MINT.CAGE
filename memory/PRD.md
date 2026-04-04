@@ -838,6 +838,46 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Tests: 100% backend (23/23), 100% frontend — All 5 Sages working with AI responses
 
 ## Upcoming (P0-P1) — Iteration 288+
+
+### Iteration 288 — Vertical Torus & 6-Line Hexagram Architecture (April 2026)
+**THE HEXAGRAM SQUARED (H²) — 64-Gate Navigation System**
+- **6-Bit Hexagram Bitmask**: State machine from `000000` (0 = Pure Yin) to `111111` (63 = Pure Yang)
+  - Each bit = one line (Line 1/LSB = Root/Earth, Line 6/MSB = Crown/Heaven)
+  - Default: Hexagram #7 "Peace" (`000111`)
+  - VOID state: `000000` (all lines broken)
+- **Vertical Torus Architecture**: Three-tier gravity system
+  - **Hollow Earth** (0.0-0.3): Dense, foundational, grounded. Routes: /meditation, /breathing, /frequencies
+  - **Core** (0.4-0.6): Balanced, centered. Routes: /dashboard, /journal, /settings
+  - **Matrix** (0.7-1.0): Expansive, celestial, floating. Routes: /oracle, /tarot, /iching
+- **360° Gyroscopic Hexagram Compass** (HexagramCompass.js):
+  - 6 gold lines (Yang = solid, Yin = broken with gap)
+  - Rotation: Clockwise in Hollow Earth, Counter-clockwise in Matrix, Still at Core
+  - Inertial flick-to-spin with gravity-reactive friction
+  - Integrated into UtilityDock (bottom-right)
+- **Velocity-Reactive Supernova Expansion**:
+  - Triggers when crossing 0.5 gravity threshold
+  - Scale = 150% (gentle) to 500% (violent) based on transition velocity
+  - Full-screen golden cage effect with hexagram lines wrapping viewport
+  - Direction indicator: "ASCENDING TO MATRIX" or "DESCENDING TO HOLLOW"
+- **Dual-Persona Sage System**:
+  - Each Sage has `hollow_prompt` and `matrix_prompt` in addition to default
+  - Persona swaps based on `layer_mode` passed from frontend
+  - Hollow = grounded/mechanical (Kaelen = "The Smith")
+  - Matrix = celestial/visionary (Sora = "The Stargazer")
+  - VOID mode = silent `...` response
+- **Haptic Resonance Patterns**:
+  - Hollow: Heavy thud `[40, 20, 40]`
+  - Matrix: Light shimmer `[10, 5, 10, 5, 10]`
+  - Supernova: Scales with intensity `[80, 30, 80, 30, 150]` at max
+- **Tiered Visual Navigation** (TieredNavigation.js):
+  - Vertical column replacing flat horizontal nav
+  - Three expandable sections: Matrix (top), Core (middle), Hollow (bottom)
+  - Proximity glow bar indicating current tier
+  - Gravity meter with animated position marker
+- **Files**: `PolarityContext.js`, `HexagramCompass.js`, `TieredNavigation.js`, `UtilityDock.js`, `sages.py`
+- Tests: 100% backend (16/16), 100% frontend — Hexagram Compass, Dual-Persona Sages working
+
+## Upcoming (P1) — Iteration 289+
 - **Nebula View Fix**: Resolve R3F v9 / Three.js 0.183 incompatibility
   - Options: Downgrade libraries, switch to vanilla Three.js, or await library updates
 - **Gold Thread Mesh**: THREE.LineBasicMaterial connecting crystal islands
