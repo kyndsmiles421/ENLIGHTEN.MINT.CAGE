@@ -1,6 +1,9 @@
 /**
  * SageAvatar.js — The "Holographic Presence" Floating Sage Avatar
  * 
+ * ORBITAL POSITIONING: Uses the OrbitalWidgetSystem for non-overlapping placement.
+ * Positioned at BOTTOM_RIGHT orbit to avoid collision with navigation and tooltips.
+ * 
  * A pulsing crystalline form that appears in the UtilityDock area
  * when entering a Sage's zone. Clicking opens the Audience modal.
  * 
@@ -66,8 +69,8 @@ export default function SageAvatar() {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed z-[9985] flex items-end gap-3"
-        style={{ bottom: 240, right: 16 }}
+        className="fixed z-[100] flex items-end gap-3"
+        style={{ bottom: 100, right: 16 }}
         initial={{ opacity: 0, x: 50, scale: 0.8 }}
         animate={{ opacity: 1, x: 0, scale: 1 }}
         exit={{ opacity: 0, x: 50, scale: 0.8 }}
@@ -77,12 +80,12 @@ export default function SageAvatar() {
         {/* Greeting Bubble */}
         {sageGreeting && (
           <motion.div
-            className="max-w-[260px] p-4 rounded-2xl relative"
+            className="max-w-[220px] p-3 rounded-xl relative"
             style={{
-              background: 'rgba(10, 10, 18, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: `1px solid ${currentSage.color}30`,
-              boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 60px ${currentSage.color}15`,
+              background: 'rgba(40, 40, 50, 0.9)',
+              backdropFilter: 'blur(12px)',
+              border: `1px solid ${currentSage.color}40`,
+              boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
             }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -131,11 +134,11 @@ export default function SageAvatar() {
             
             {/* Speech bubble tail */}
             <div
-              className="absolute -right-2 bottom-6 w-4 h-4"
+              className="absolute -right-2 bottom-6 w-3 h-3"
               style={{
-                background: 'rgba(10, 10, 18, 0.95)',
-                borderRight: `1px solid ${currentSage.color}30`,
-                borderBottom: `1px solid ${currentSage.color}30`,
+                background: 'rgba(40, 40, 50, 0.9)',
+                borderRight: `1px solid ${currentSage.color}40`,
+                borderBottom: `1px solid ${currentSage.color}40`,
                 transform: 'rotate(-45deg)',
               }}
             />

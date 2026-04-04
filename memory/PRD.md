@@ -1393,3 +1393,25 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 **Architecture Health**: The Tesseract OS now "breathes" via CSS variables, not React state. HUD and Lattice are synchronized performers. The escape mechanism provides psychological safety for deep dives.
 
 **Known Debt**: "Maximum update depth exceeded" (668 errors) - pre-existing from MixerContext/CosmicThemeContext. Does NOT break functionality.
+
+
+### Iteration 285 — Z-Index Hierarchy Cleanup & UI Declutter (April 2026)
+- **Z-Index Hierarchy Overhaul**:
+  - Created `/app/frontend/src/config/zIndexHierarchy.js` defining proper layer system
+  - BACKGROUND (0-9) → CONTENT (10-49) → NAV (50-99) → WIDGET (100-199) → OVERLAY (200-299) → MODAL (300-499) → ALERT (500-699) → EMERGENCY (700-999)
+- **Fixed Overlapping Components**:
+  - VellumOverlay: z-9997 → z-2-5 (background layer where it belongs)
+  - SmartDock baseZ: z-9997 → z-60-80 (navigation layer)
+  - GuidedTour: z-9999 → z-350 (modal layer)
+  - RecursivePortal depth HUD: z-9972 → z-200 (overlay layer)
+  - SageAvatar: z-9985 → z-100 (widget layer)
+- **Conditional Portal HUD**:
+  - Depth hints only show on portal-related pages (/recursive, /portal, /tesseract, /dive) or when depth > 0
+  - Eliminates tooltip clutter on dashboard/home page
+- **Background Colors Lightened**:
+  - SmartDock panels: rgba(10,10,18) → rgba(25,27,38) - less oppressively dark
+  - SageAvatar bubble: rgba(10,10,18) → rgba(40,40,50) - more visible
+- **Orbital Widget System Created** (for future use):
+  - `/app/frontend/src/systems/OrbitalWidgetSystem.js` - collision-avoidance positioning
+  - Widgets assigned to orbital paths (INNER/MIDDLE/OUTER) with angular separation
+- **Result**: Mobile view now CLEAN - main content visible, no overlapping elements, proper layer separation

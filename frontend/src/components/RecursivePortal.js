@@ -19,6 +19,7 @@
 
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { useDepth, LINE_FLAVORS, MAX_DEPTH } from '../context/DepthContext';
 import { usePolarity } from '../context/PolarityContext';
 import { ChevronUp, ChevronDown, Home, Layers } from 'lucide-react';
@@ -165,6 +166,11 @@ export default function RecursivePortal({ children }) {
   } = useDepth();
   
   const { isVoid, supernovaActive } = usePolarity();
+  const location = useLocation();
+  
+  // Only show portal controls on relevant pages (not on dashboard/home)
+  const portalPages = ['/recursive', '/portal', '/tesseract', '/dive'];
+  const isPortalPage = portalPages.some(p => location.pathname.startsWith(p)) || depth > 0;
   
   const containerRef = useRef(null);
   const touchesRef = useRef([]);
@@ -311,12 +317,12 @@ export default function RecursivePortal({ children }) {
         )}
       </AnimatePresence>
       
-      {/* Breadcrumb & Controls HUD */}
-      {showControls && !isVoid && !supernovaActive && (
+      {/* Breadcrumb & Controls HUD - Only show on portal pages or when at depth */}
+      {showControls && isPortalPage && !isVoid && !supernovaActive && (
         <motion.div
-          className="fixed top-12 left-1/2 -translate-x-1/2 z-[9972] px-4 py-2 rounded-xl"
+          className="fixed top-12 left-1/2 -translate-x-1/2 z-[200] px-4 py-2 rounded-xl"
           style={{
-            background: 'rgba(8, 8, 15, 0.85)',
+            background: 'rgba(20, 20, 30, 0.9)',
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.08)',
           }}
@@ -369,7 +375,7 @@ export default function RecursivePortal({ children }) {
         {depth > 0 && !isVoid && (
           <motion.button
             onClick={surfaceToMacro}
-            className="fixed bottom-40 left-4 z-[9972] flex items-center gap-2 px-3 py-2 rounded-full"
+            className="fixed bottom-40 left-4 z-[80] flex items-center gap-2 px-3 py-2 rounded-full"
             style={{
               background: 'rgba(8, 8, 15, 0.9)',
               backdropFilter: 'blur(12px)',

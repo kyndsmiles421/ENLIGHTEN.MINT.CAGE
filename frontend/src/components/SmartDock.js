@@ -305,7 +305,8 @@ export default function SmartDock() {
   // Position logic
   const hasCustomPos = position.x !== null;
   const defaultPos = { bottom: 80, left: 12 };
-  const baseZ = zBoost ? 9999 : 9997;
+  // Z-INDEX: Using proper layer hierarchy instead of 9999
+  const baseZ = zBoost ? 80 : 60;  // NAV_BUTTONS : NAV_DOCK
 
   // Focus Mode: collapse dock to a resonance dot
   if (focusMode && !minimized) {
@@ -460,7 +461,7 @@ export default function SmartDock() {
         style={{
           padding: expanded ? '6px' : '4px 5px',
           borderRadius: dockOrientation === 'vertical' ? 16 : 22,
-          background: activePanel ? 'rgba(10,10,18,0.92)' : 'rgba(10,10,18,0.88)',
+          background: activePanel ? 'rgba(30,32,45,0.92)' : 'rgba(25,27,38,0.88)',
           border: `1px solid ${activePanel ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.06)'}`,
           boxShadow: '0 4px 20px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.02)',
           transition: 'background 0.4s, border 0.4s, padding 0.3s, border-radius 0.3s',
@@ -632,7 +633,7 @@ export default function SmartDock() {
       <AnimatePresence>
         {harmonyEngine.goldenPulse && (
           <motion.div
-            className="fixed inset-0 pointer-events-none z-[9998]"
+            className="fixed inset-0 pointer-events-none z-[5]"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.35, 0.15, 0.3, 0] }}
             exit={{ opacity: 0 }}
@@ -650,7 +651,7 @@ export default function SmartDock() {
       <AnimatePresence>
         {harmonyEngine.xpFlash && (
           <motion.div
-            className="fixed top-20 left-1/2 -translate-x-1/2 pointer-events-none z-[9999]"
+            className="fixed top-20 left-1/2 -translate-x-1/2 pointer-events-none z-[650]"
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30 }}
@@ -770,7 +771,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       className="mb-2 rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(11,12,21,0.97)',
+        background: 'rgba(25,27,38,0.95)',
         border: `1px solid ${data?.atmosphere?.accent || '#818CF8'}18`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -1029,7 +1030,7 @@ function AssistantPanel({ onClose, token, authHeaders }) {
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       className="mb-2 rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(11,12,21,0.97)',
+        background: 'rgba(25,27,38,0.95)',
         border: '1px solid rgba(192,132,252,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -1116,7 +1117,7 @@ function FrequencyPanel({ onClose }) {
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       className="mb-2 rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(11,12,21,0.97)',
+        background: 'rgba(25,27,38,0.95)',
         border: '1px solid rgba(45,212,191,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -1234,7 +1235,7 @@ function HarmonyNPUPanel({ onClose, engine }) {
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       className="mb-2 rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(6,6,14,0.97)',
+        background: 'rgba(20,22,32,0.95)',
         border: '1px solid rgba(167,139,250,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -1428,7 +1429,7 @@ function LanguagePanel({ onClose }) {
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       className="mb-2 rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(11,12,21,0.97)',
+        background: 'rgba(25,27,38,0.95)',
         border: '1px solid rgba(245,158,11,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',

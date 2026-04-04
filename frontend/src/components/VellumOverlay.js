@@ -41,7 +41,7 @@ export default function VellumOverlay() {
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          zIndex: 9997,
+          zIndex: 2,  // BACKGROUND layer
           opacity: grainConfig.opacity,
           mixBlendMode: grainConfig.blendMode,
         }}
@@ -86,7 +86,7 @@ export default function VellumOverlay() {
         <div
           className="fixed inset-0 pointer-events-none"
           style={{
-            zIndex: 9996,
+            zIndex: 3,  // BACKGROUND layer
             background: `radial-gradient(ellipse at center, transparent 50%, rgba(112, 66, 20, 0.03) 100%)`,
           }}
           data-testid="vellum-vignette"
@@ -98,7 +98,7 @@ export default function VellumOverlay() {
         <div
           className="fixed inset-0 pointer-events-none"
           style={{
-            zIndex: 9995,
+            zIndex: 4,  // BACKGROUND layer
             background: `linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%)`,
           }}
           data-testid="vellum-highlight"
@@ -110,7 +110,7 @@ export default function VellumOverlay() {
         <div
           className="fixed inset-0 pointer-events-none"
           style={{
-            zIndex: 9994,
+            zIndex: 5,  // BACKGROUND layer
             background: colorMode === 'light'
               ? `radial-gradient(ellipse at 50% 0%, rgba(201, 169, 98, 0.04) 0%, transparent 60%)`
               : `radial-gradient(ellipse at 50% 0%, rgba(201, 169, 98, 0.02) 0%, transparent 60%)`,
