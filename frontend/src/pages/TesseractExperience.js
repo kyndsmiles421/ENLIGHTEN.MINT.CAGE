@@ -30,6 +30,7 @@ import { usePhoneticSynthesizer } from '../hooks/usePhoneticSynthesizer';
 // Components
 import KineticHUD from '../components/KineticHUD';
 import SeedHuntWidget from '../components/SeedHuntWidget';
+import { DwellBloomIndicatorSimple } from '../components/DwellBloomIndicator';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GRAVITY SLIDER WITH SNAP POINTS
@@ -114,6 +115,8 @@ const TesseractLattice = React.memo(({
   isZooming,
   colors,
   isVoidMode,
+  isDwellStable,
+  dwellProgress,
 }) => {
   const handleCellClick = useCallback((row, col) => {
     onSelectCell(row, col);
@@ -184,6 +187,16 @@ const TesseractLattice = React.memo(({
               disabled={isZooming}
               data-testid={`tesseract-cell-${row}-${col}`}
             >
+              {/* Visual Bloom Indicator - shows dwell progress */}
+              {isSelected && (
+                <DwellBloomIndicatorSimple
+                  isActive={isSelected}
+                  isDwellStable={isDwellStable}
+                  dwellProgress={dwellProgress}
+                  isVoidMode={isVoidMode}
+                />
+              )}
+              
               {/* Hexagram number (tiny) */}
               <span 
                 className="absolute inset-0 flex items-center justify-center text-[8px] font-mono"
@@ -421,6 +434,8 @@ export default function TesseractExperience() {
           isZooming={core.isZooming}
           colors={core.colors}
           isVoidMode={core.isVoidMode}
+          isDwellStable={core.isDwellStable}
+          dwellProgress={core.dwellProgress}
         />
       </div>
       

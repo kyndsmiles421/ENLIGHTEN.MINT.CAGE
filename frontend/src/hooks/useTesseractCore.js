@@ -11,11 +11,15 @@
  * Into a single, zero-latency hook that serves as the
  * ONE SOURCE OF TRUTH for the entire Spatial OS.
  * 
+ * SYNC-01: Now integrates with RecursiveRegistryStore for
+ * ATOMIC state broadcasts across all 6 recursive layers.
+ * 
  * BENEFITS:
  * - Eliminates React infinite loop (refs instead of state deps)
  * - Single render cycle for all gravity/depth/address changes
  * - Unified haptic/visual/audio orchestration
  * - Snap-point gravity for Sacred Hexagrams
+ * - ATOMIC language/depth sync via useSyncExternalStore
  * 
  * USAGE:
  * const core = useTesseractCore();
@@ -39,6 +43,9 @@ import {
 } from '../config/InverseRegistry';
 import { HEXAGRAM_REGISTRY, getHexagram, HEXAGRAM_SEQUENCE } from '../config/hexagramRegistry';
 import { LANGUAGE_REGISTRY } from '../config/languageRegistry';
+
+// SYNC-01: Atomic state broadcast store
+import { RecursiveRegistryStore } from '../stores/RecursiveRegistryStore';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURATION
@@ -122,6 +129,9 @@ export function useTesseractCore(options = {}) {
   const lastActivityRef = useRef(Date.now());
   const animationFrameRef = useRef(null);
   const persistenceInitRef = useRef(false);  // MEM-01: Track init to avoid double-restore
+  const dwellTimerRef = useRef(null);  // For Acoustic Bloom 200ms delay
+  const dwellProgressIntervalRef = useRef(null);  // For Visual Bloom progress tracking
+  const currentDwellCellRef = useRef(null);  // Track which cell is being dwelled
   
   // ─────────────────────────────────────────────────────────────────────────
   // STATE (Minimal, only what triggers re-renders)
@@ -138,6 +148,7 @@ export function useTesseractCore(options = {}) {
   const [nearSnapPoint, setNearSnapPoint] = useState(null);
   const [seeds, setSeeds] = useState([]);
   const [isDwellStable, setIsDwellStable] = useState(false);  // Acoustic Bloom gate
+  const [dwellProgress, setDwellProgress] = useState(0);  // 0-1 progress for Visual Bloom
   
   // ─────────────────────────────────────────────────────────────────────────
   // MEM-01: PERSISTENCE KEY
@@ -291,6 +302,9 @@ export function useTesseractCore(options = {}) {
     gravityRef.current = point.gravity;
     setNearSnapPoint(point);
     
+    // SYNC-01: Atomic broadcast to all layers
+    RecursiveRegistryStore.setGravity(point.gravity);
+    
     // Haptic feedback for snap
     if (enableHaptics && navigator.vibrate) {
       navigator.vibrate(TESSERACT_CONFIG.HAPTIC_PATTERNS.snap);
@@ -317,6 +331,9 @@ export function useTesseractCore(options = {}) {
     setGravity(clamped);
     gravityRef.current = clamped;
     
+    // SYNC-01: Atomic broadcast to all layers (debounced in store)
+    RecursiveRegistryStore.setGravity(clamped);
+    
     // Auto-void mode based on gravity
     if (enableAutoVoid) {
       if (clamped < 0.1 && !isVoidMode) {
@@ -338,6 +355,9 @@ export function useTesseractCore(options = {}) {
     setIsVoidMode(true);
     onModeChange?.('VOID');
     
+    // SYNC-01: Atomic broadcast to all layers
+    RecursiveRegistryStore.setVoidMode(true);
+    
     if (enableHaptics && navigator.vibrate) {
       navigator.vibrate(TESSERACT_CONFIG.HAPTIC_PATTERNS.void_enter);
     }
@@ -346,6 +366,9 @@ export function useTesseractCore(options = {}) {
   const exitVoidMode = useCallback(() => {
     setIsVoidMode(false);
     onModeChange?.('MATTER');
+    
+    // SYNC-01: Atomic broadcast to all layers
+    RecursiveRegistryStore.setVoidMode(false);
     
     if (enableHaptics && navigator.vibrate) {
       navigator.vibrate(TESSERACT_CONFIG.HAPTIC_PATTERNS.void_exit);
@@ -407,6 +430,9 @@ export function useTesseractCore(options = {}) {
       setIsZooming(false);
       setZoomDirection(null);
       onDepthChange?.(newDepth);
+      
+      // SYNC-01: Atomic broadcast to all layers
+      RecursiveRegistryStore.setDepth(newDepth);
     }, TESSERACT_CONFIG.SNATCH_DURATION);
     
     return true;
@@ -439,6 +465,9 @@ export function useTesseractCore(options = {}) {
       setIsZooming(false);
       setZoomDirection(null);
       onDepthChange?.(newDepth);
+      
+      // SYNC-01: Atomic broadcast to all layers
+      RecursiveRegistryStore.setDepth(newDepth);
     }, TESSERACT_CONFIG.SNATCH_DURATION);
     
     return true;
@@ -459,6 +488,9 @@ export function useTesseractCore(options = {}) {
     }
     
     onDepthChange?.(0);
+    
+    // SYNC-01: Atomic broadcast to all layers
+    RecursiveRegistryStore.setDepth(0);
   }, [enableHaptics, onDepthChange]);
   
   // ─────────────────────────────────────────────────────────────────────────
@@ -512,10 +544,6 @@ export function useTesseractCore(options = {}) {
   // CELL SELECTION + DWELL TRACKING (with 200ms Acoustic Bloom)
   // ─────────────────────────────────────────────────────────────────────────
   
-  // Dwell timer ref for acoustic bloom
-  const dwellTimerRef = useRef(null);
-  const currentDwellCellRef = useRef(null);
-  
   const selectCell = useCallback((row, col) => {
     const cellKey = `${row}-${col}`;
     
@@ -525,12 +553,34 @@ export function useTesseractCore(options = {}) {
       dwellTimerRef.current = null;
     }
     
+    // Clear any existing progress interval
+    if (dwellProgressIntervalRef.current) {
+      clearInterval(dwellProgressIntervalRef.current);
+      dwellProgressIntervalRef.current = null;
+    }
+    
     // Reset dwell stable state on new selection
     setIsDwellStable(false);
+    setDwellProgress(0);
     
     setSelectedCell({ row, col });
     lastActivityRef.current = Date.now();
     currentDwellCellRef.current = cellKey;
+    
+    // Start dwell progress tracking for Visual Bloom
+    const startTime = Date.now();
+    const progressInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(1, elapsed / TESSERACT_CONFIG.ACOUSTIC_BLOOM_MS);
+      setDwellProgress(progress);
+      
+      if (progress >= 1) {
+        clearInterval(progressInterval);
+      }
+    }, 16); // ~60fps
+    
+    // Store interval for cleanup
+    dwellProgressIntervalRef.current = progressInterval;
     
     // Update dwell map
     const existing = dwellMapRef.current.get(cellKey) || { visits: 0, totalMs: 0, lastVisit: null };
@@ -563,6 +613,9 @@ export function useTesseractCore(options = {}) {
     return () => {
       if (dwellTimerRef.current) {
         clearTimeout(dwellTimerRef.current);
+      }
+      if (dwellProgressIntervalRef.current) {
+        clearInterval(dwellProgressIntervalRef.current);
       }
     };
   }, []);
@@ -712,6 +765,7 @@ export function useTesseractCore(options = {}) {
     
     // Acoustic Bloom
     isDwellStable,  // True after 200ms dwell - audio permitted
+    dwellProgress,  // 0-1 progress for Visual Bloom indicator
     
     // Path & seeds
     path: pathRef.current,
