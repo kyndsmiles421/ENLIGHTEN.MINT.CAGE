@@ -18,7 +18,9 @@ Build "The Cosmic Collective", a full-stack wellness platform with orbital navig
 
 The RDive-36 system enables infinite depth navigation through a nested 9×9 lattice grid, tracking the user's journey as a 36-bit binary address.
 
-**Route:** `/recursive-dive`
+**Routes:**
+- `/recursive-dive` - The Recursive Lattice Interface
+- `/seed-gallery` - The Lattice Exchange (Crystalline Seed Gallery)
 
 **Core Components:**
 | File | Purpose |
@@ -26,6 +28,57 @@ The RDive-36 system enables infinite depth navigation through a nested 9×9 latt
 | `RecursiveDivePage.js` | Page container with header, info panel, seeds panel |
 | `RecursiveLattice.js` | 9×9 grid visualization with Zoom-Snatch animations |
 | `useRDive36.js` | Hook managing 36-bit address, dive/surface, haptics |
+| `SeedGalleryPage.js` | Gallery page with constellation visualizations |
+| `seeds.py` | Backend API for minting and gallery |
+
+### The Lattice Exchange (Crystalline Seed Economy)
+**"Selling Coordinates to the Truth"**
+
+Seeds are digital artifacts capturing:
+- 36-bit address (coordinate in infinite space)
+- Journey path (hexagrams and languages at each depth)
+- Dwell history (behavioral memory from Sentient Registry)
+- Linguistic state (current language culture)
+
+**Backend API:**
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/seeds/mint` | POST | Mint new Crystalline Seed |
+| `/api/seeds/gallery` | GET | List seeds with filters (rarity, depth, language) |
+| `/api/seeds/{seed_id}` | GET | Get specific seed details |
+| `/api/seeds/user/{user_id}` | GET | Get seeds by minter |
+| `/api/seeds/{seed_id}/visibility` | PUT | Toggle public/private |
+| `/api/seeds/stats/overview` | GET | Exchange statistics |
+
+**Rarity Algorithm (0-100 score):**
+| Factor | Max Points | Criteria |
+|--------|------------|----------|
+| Depth | 30 | L0=0, L1=5, L2=10, L3=15, L4=22, L5=30 |
+| Linguistic State | 20 | Ancient (sa/lkt/dak)=20, Technical (ja/zh)=15, Balanced=10, Modern=5 |
+| Sacred Hexagrams | 20 | 5 pts per sacred hex (1, 2, 11, 12, 63, 64, 29, 30, 15) |
+| Dwell History | 15 | CRYSTALLIZED=5, HARDENED=2 per entry |
+| Address Patterns | 15 | Palindrome=10, Alternating (010101)=5, All same bits=15 |
+
+**Rarity Tiers:**
+| Tier | Score Range | Visual Style |
+|------|-------------|--------------|
+| COMMON | 0-20 | Gray |
+| UNCOMMON | 21-40 | Green |
+| RARE | 41-60 | Blue |
+| EPIC | 61-80 | Purple |
+| LEGENDARY | 81-100 | Gold/Amber |
+
+**Constellation Visualizer:**
+SVG-based visualization mapping 36-bit address to star positions. Bright stars (1-bits) at outer radius, dim stars (0-bits) at inner radius, with constellation lines connecting bright stars.
+
+**Gallery Features:**
+- Stats panel (total seeds, legendary count, epic count, deep dives)
+- Filter bar (rarity, depth, language, sort)
+- Seed cards with constellation preview
+- Detail modal with full journey path
+
+### VOID ESCAPE (Emergency Surface)
+At depth L3+, a "VOID ESCAPE" button appears for instant reset to L0 without animation. Target: <250ms response time.
 
 **36-Bit Address Format:**
 ```
