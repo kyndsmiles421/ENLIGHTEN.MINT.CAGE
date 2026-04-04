@@ -1135,3 +1135,327 @@ body.cosmic-hyper-focus [data-testid="orbital-navigation"] {
   transition: opacity 0.4s ease;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   ENLIGHTENMENT CAFE — Digital Sanctuary Theming
+   Domain: enlightenment.cafe
+   Philosophy: "Your choices, your flow"
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Parchment View (Essential Tier) ── */
+:root.cafe-parchment {
+  --cafe-font-heading: 'Cormorant Garamond', 'Georgia', serif;
+  --cafe-font-body: 'Manrope', 'Helvetica Neue', sans-serif;
+  --cafe-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Parchment Light Mode (Cream & Ink) */
+:root.cafe-parchment.cafe-light {
+  --cafe-background: #FAF8F5;
+  --cafe-backgroundAlt: #F5F2ED;
+  --cafe-surface: #FFFFFF;
+  --cafe-surfaceElevated: #FFFFFE;
+  --cafe-ink: #2A2A2A;
+  --cafe-inkMuted: #5A5A5A;
+  --cafe-inkFaint: #8A8A8A;
+  --cafe-gold: #C9A962;
+  --cafe-goldMuted: #D4BC7D;
+  --cafe-copper: #B87333;
+  --cafe-sepia: #704214;
+  --cafe-border: #E8E4DC;
+  --cafe-borderStrong: #D4CFC4;
+  --cafe-shadow: rgba(42, 42, 42, 0.08);
+  /* Zone colors (muted ink) */
+  --cafe-practice: #2D5A4A;
+  --cafe-divination: #5A3D6A;
+  --cafe-sanctuary: #4A5A2D;
+  --cafe-explore: #2D4A5A;
+  --cafe-today: #6A5A2D;
+}
+
+/* Parchment Dark Mode (Charcoal & Gold) */
+:root.cafe-parchment.cafe-dark {
+  --cafe-background: #1A1A1D;
+  --cafe-backgroundAlt: #222225;
+  --cafe-surface: #2A2A2E;
+  --cafe-surfaceElevated: #323236;
+  --cafe-ink: #F5F2ED;
+  --cafe-inkMuted: #C4C0B8;
+  --cafe-inkFaint: #8A8680;
+  --cafe-gold: #C9A962;
+  --cafe-goldMuted: #A08A4A;
+  --cafe-copper: #CD853F;
+  --cafe-sepia: #DEB887;
+  --cafe-border: #3A3A3E;
+  --cafe-borderStrong: #4A4A4E;
+  --cafe-shadow: rgba(0, 0, 0, 0.3);
+  /* Zone colors (luminous) */
+  --cafe-practice: #5AEBC2;
+  --cafe-divination: #D8A4F9;
+  --cafe-sanctuary: #A4E95A;
+  --cafe-explore: #5AC2EB;
+  --cafe-today: #EBC25A;
+}
+
+/* ── Nebula View (Premium Tier) ── */
+:root.cafe-nebula {
+  --cafe-font-heading: 'Space Grotesk', 'Manrope', sans-serif;
+  --cafe-font-body: 'Manrope', 'Helvetica Neue', sans-serif;
+  --cafe-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --cafe-background: #0A0A12;
+  --cafe-backgroundAlt: #12121A;
+  --cafe-surface: rgba(20, 20, 30, 0.8);
+  --cafe-surfaceElevated: rgba(30, 30, 45, 0.9);
+  --cafe-ink: #F5F2ED;
+  --cafe-inkMuted: #A0A0B0;
+  --cafe-inkFaint: #606070;
+  --cafe-gold: #C9A962;
+  --cafe-goldMuted: #A08A4A;
+  --cafe-copper: #CD853F;
+  --cafe-sepia: #DEB887;
+  --cafe-border: rgba(129, 140, 248, 0.15);
+  --cafe-borderStrong: rgba(129, 140, 248, 0.25);
+  --cafe-shadow: rgba(0, 0, 0, 0.4);
+  /* Zone colors (cosmic) */
+  --cafe-practice: #2DD4BF;
+  --cafe-divination: #E879F9;
+  --cafe-sanctuary: #86EFAC;
+  --cafe-explore: #38BDF8;
+  --cafe-today: #FCD34D;
+  /* Nebula glow effects */
+  --cafe-glow-primary: #818CF8;
+  --cafe-glow-secondary: #C084FC;
+  --cafe-glow-tertiary: #2DD4BF;
+}
+
+/* ── Global Cafe Overrides (when Parchment Light is active) ── */
+:root.cafe-parchment.cafe-light body {
+  background: var(--cafe-background) !important;
+  color: var(--cafe-ink) !important;
+}
+
+:root.cafe-parchment.cafe-light .cosmic-mesh,
+:root.cafe-parchment.cafe-light .cosmic-mesh-inner,
+:root.cafe-parchment.cafe-light [class*="cosmic-mesh"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide cosmic background in parchment light */
+:root.cafe-parchment.cafe-light .fixed.inset-0[style*="z-index: 0"],
+:root.cafe-parchment.cafe-light [data-testid="cosmic-background"] {
+  display: none !important;
+}
+
+/* Main content area background */
+:root.cafe-parchment.cafe-light > body > div,
+:root.cafe-parchment.cafe-light #root {
+  background: var(--cafe-background) !important;
+}
+
+/* Body-level overrides for Parchment Light */
+body.cafe-parchment.cafe-light {
+  background: #FAF8F5 !important;
+  color: #2A2A2A !important;
+}
+
+body.cafe-parchment.cafe-light * {
+  --text-primary: #2A2A2A;
+  --text-secondary: #5A5A5A;
+  --text-muted: #8A8A8A;
+  --bg-default: #FAF8F5;
+  --bg-deep: #F5F2ED;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --primary: #C9A962;
+  --primary-glow: #D4BC7D;
+}
+
+/* Hide all cosmic/mesh backgrounds in parchment light */
+body.cafe-parchment.cafe-light .cosmic-mesh,
+body.cafe-parchment.cafe-light .cosmic-mesh-inner,
+body.cafe-parchment.cafe-light [class*="cosmic-mesh"],
+body.cafe-parchment.cafe-light .fixed.inset-0.pointer-events-none.overflow-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Cards and surfaces in Parchment Light */
+body.cafe-parchment.cafe-light .glass-card,
+body.cafe-parchment.cafe-light [class*="backdrop-blur"],
+body.cafe-parchment.cafe-light [class*="bg-black"],
+body.cafe-parchment.cafe-light [class*="bg-slate"],
+body.cafe-parchment.cafe-light [class*="bg-gray"],
+body.cafe-parchment.cafe-light [class*="bg-zinc"] {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: #E8E4DC !important;
+}
+
+/* Text colors in Parchment Light */
+body.cafe-parchment.cafe-light h1,
+body.cafe-parchment.cafe-light h2,
+body.cafe-parchment.cafe-light h3,
+body.cafe-parchment.cafe-light h4,
+body.cafe-parchment.cafe-light h5,
+body.cafe-parchment.cafe-light h6 {
+  color: #2A2A2A !important;
+  font-family: var(--cafe-font-heading) !important;
+}
+
+body.cafe-parchment.cafe-light p,
+body.cafe-parchment.cafe-light span:not([class*="text-"]),
+body.cafe-parchment.cafe-light label,
+body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
+  color: inherit;
+}
+
+:root.cafe-parchment.cafe-light [data-testid="cosmic-navigation"] {
+  background: rgba(250, 248, 245, 0.95) !important;
+  border-color: var(--cafe-border) !important;
+  backdrop-filter: blur(12px);
+}
+
+:root.cafe-parchment.cafe-light [data-testid="cosmic-navigation"] a,
+:root.cafe-parchment.cafe-light [data-testid="cosmic-navigation"] button,
+:root.cafe-parchment.cafe-light [data-testid="cosmic-navigation"] span {
+  color: var(--cafe-ink) !important;
+}
+
+:root.cafe-parchment.cafe-light [data-testid="cosmic-navigation"] a:hover,
+:root.cafe-parchment.cafe-light [data-testid="cosmic-navigation"] button:hover {
+  color: var(--cafe-gold) !important;
+  background: rgba(201, 169, 98, 0.08) !important;
+}
+
+/* Cards in Parchment Light */
+:root.cafe-parchment.cafe-light .glass-card,
+:root.cafe-parchment.cafe-light [class*="rounded"][class*="bg-"] {
+  background: var(--cafe-surface) !important;
+  border-color: var(--cafe-border) !important;
+  box-shadow: 0 2px 8px var(--cafe-shadow) !important;
+}
+
+/* Text overrides for Parchment Light */
+:root.cafe-parchment.cafe-light h1,
+:root.cafe-parchment.cafe-light h2,
+:root.cafe-parchment.cafe-light h3 {
+  font-family: var(--cafe-font-heading);
+  color: var(--cafe-ink);
+}
+
+:root.cafe-parchment.cafe-light p,
+:root.cafe-parchment.cafe-light span,
+:root.cafe-parchment.cafe-light label {
+  color: var(--cafe-ink);
+}
+
+/* Buttons in Parchment Light */
+:root.cafe-parchment.cafe-light button[class*="bg-purple"],
+:root.cafe-parchment.cafe-light button[class*="bg-violet"] {
+  background: var(--cafe-gold) !important;
+  color: #1A1A1D !important;
+}
+
+:root.cafe-parchment.cafe-light button[class*="bg-purple"]:hover,
+:root.cafe-parchment.cafe-light button[class*="bg-violet"]:hover {
+  background: var(--cafe-copper) !important;
+}
+
+/* ── Warm Glow Atmosphere Effect ── */
+:root[data-cafe-warmglow="true"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201, 169, 98, 0.03) 0%, transparent 60%);
+  mix-blend-mode: overlay;
+}
+
+/* ── Typography Refinements ── */
+:root.cafe-parchment h1 {
+  font-family: var(--cafe-font-heading);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+:root.cafe-parchment h2,
+:root.cafe-parchment h3 {
+  font-family: var(--cafe-font-heading);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+:root.cafe-parchment .uppercase {
+  letter-spacing: 0.15em;
+}
+
+/* ── Zone Color Classes ── */
+.cafe-zone-practice { color: var(--cafe-practice); }
+.cafe-zone-divination { color: var(--cafe-divination); }
+.cafe-zone-sanctuary { color: var(--cafe-sanctuary); }
+.cafe-zone-explore { color: var(--cafe-explore); }
+.cafe-zone-today { color: var(--cafe-today); }
+
+.cafe-zone-practice-bg { background: var(--cafe-practice); }
+.cafe-zone-divination-bg { background: var(--cafe-divination); }
+.cafe-zone-sanctuary-bg { background: var(--cafe-sanctuary); }
+.cafe-zone-explore-bg { background: var(--cafe-explore); }
+.cafe-zone-today-bg { background: var(--cafe-today); }
+
+/* ── Parchment Texture Overlay (subtle) ── */
+:root.cafe-parchment.cafe-light::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ── Nebula Volumetric Fog Effect ── */
+:root.cafe-nebula .cosmic-mesh::before {
+  background: radial-gradient(circle at 30% 20%, rgba(129, 140, 248, 0.12) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(192, 132, 252, 0.08) 0%, transparent 50%);
+  animation: nebula-drift 30s ease-in-out infinite alternate;
+}
+
+@keyframes nebula-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5%, -3%) scale(1.05); }
+  100% { transform: translate(-3%, 5%) scale(0.98); }
+}
+
+/* ── Cafe Scrollbar Styling ── */
+:root.cafe-parchment.cafe-light ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+:root.cafe-parchment.cafe-light ::-webkit-scrollbar-track {
+  background: var(--cafe-backgroundAlt);
+}
+:root.cafe-parchment.cafe-light ::-webkit-scrollbar-thumb {
+  background: var(--cafe-border);
+  border-radius: 4px;
+}
+:root.cafe-parchment.cafe-light ::-webkit-scrollbar-thumb:hover {
+  background: var(--cafe-gold);
+}
+
+:root.cafe-parchment.cafe-dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+:root.cafe-parchment.cafe-dark ::-webkit-scrollbar-track {
+  background: var(--cafe-backgroundAlt);
+}
+:root.cafe-parchment.cafe-dark ::-webkit-scrollbar-thumb {
+  background: var(--cafe-border);
+  border-radius: 4px;
+}
+:root.cafe-parchment.cafe-dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--cafe-gold);
+}
+

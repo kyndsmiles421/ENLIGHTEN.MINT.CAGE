@@ -720,7 +720,32 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - **Files**: `EnlightenmentCafeContext.js` (new), `CafeSettingsPanel.js` (new), updated `App.js`
 - Tests: Screenshot verification — Cafe toggle visible, settings panel opens with all user-controlled options
 
-## Upcoming (P0-P1) — Iteration 283+
+### Iteration 283 — Parchment CSS & Theming Complete (April 2026)
+- **Parchment Light Mode CSS**: Complete visual transformation
+  - Cream/vellum background (#FAF8F5) with charcoal ink (#2A2A2A)
+  - Aged gold accents (#C9A962) for interactive elements
+  - Hidden cosmic mesh/background when in Light mode
+  - Navigation bar adapts to cream background with gold hover states
+  - Cards and surfaces use white backgrounds with soft borders
+  - Serif headings (Cormorant Garamond) for elegant typography
+  - Parchment texture overlay for subtle paper feel
+- **Parchment Dark Mode CSS**: Charcoal & Gold aesthetic
+  - Deep charcoal background (#1A1A1D) with cream text
+  - Gold accents remain consistent across modes
+  - Luminous zone colors for better visibility
+- **CSS Variables System**: Dynamic theming via --cafe-* variables
+  - Zone colors: practice, divination, sanctuary, explore, today
+  - Typography: heading, body, mono font stacks
+  - Surfaces: background, backgroundAlt, surface, surfaceElevated
+  - Inks: ink, inkMuted, inkFaint
+  - Borders and shadows adapt per mode
+- **Warm Glow Atmosphere Effect**: Subtle golden overlay via ::after pseudo-element
+- **Scrollbar Styling**: Custom scrollbars for both light/dark Parchment modes
+- **Nebula Volumetric Fog**: CSS animation for cosmic drift effect
+- **Files**: Updated `index.css` (Enlightenment Cafe theming), `EnlightenmentCafeContext.js` (body styling)
+- Tests: Screenshot verification — Light mode shows cream background, settings panel themed correctly
+
+## Upcoming (P0-P1) — Iteration 284+
 - **Tiered Render Delegate**: Essential (SVG/Canvas "Paper & Ink") vs Premium (Three.js "Aetheric" view with volumetric fog)
 - **Ghost Nodes**: Temporary celestial event nodes (Full Moon, Mercury Retrograde, Eclipses)
 - **Advisor Node**: Hidden node monitoring mesh health, pulses if Sanctuary modules unused for 3+ days

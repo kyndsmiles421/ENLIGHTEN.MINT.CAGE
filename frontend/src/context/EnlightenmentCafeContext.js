@@ -224,6 +224,7 @@ export function EnlightenmentCafeProvider({ children }) {
     const palette = getPalette();
     const typography = getTypography();
     const root = document.documentElement;
+    const body = document.body;
     
     // Apply palette
     Object.entries(palette).forEach(([key, value]) => {
@@ -240,13 +241,36 @@ export function EnlightenmentCafeProvider({ children }) {
     // Apply tier class
     root.classList.remove('cafe-parchment', 'cafe-nebula');
     root.classList.add(`cafe-${viewTier}`);
+    body.classList.remove('cafe-parchment', 'cafe-nebula');
+    body.classList.add(`cafe-${viewTier}`);
     
     // Apply color mode class (parchment only)
     root.classList.remove('cafe-light', 'cafe-dark');
+    body.classList.remove('cafe-light', 'cafe-dark');
     if (viewTier === 'parchment') {
       root.classList.add(`cafe-${colorMode}`);
+      body.classList.add(`cafe-${colorMode}`);
     }
-  }, [viewTier, colorMode, getPalette, getTypography]);
+    
+    // Apply body background directly for parchment light
+    if (viewTier === 'parchment' && colorMode === 'light') {
+      body.style.background = '#FAF8F5';
+      body.style.color = '#2A2A2A';
+    } else if (viewTier === 'parchment' && colorMode === 'dark') {
+      body.style.background = '#1A1A1D';
+      body.style.color = '#F5F2ED';
+    } else {
+      body.style.background = '';
+      body.style.color = '';
+    }
+    
+    // Apply atmosphere effects
+    if (atmosphere.warmGlow) {
+      root.setAttribute('data-cafe-warmglow', 'true');
+    } else {
+      root.removeAttribute('data-cafe-warmglow');
+    }
+  }, [viewTier, colorMode, atmosphere.warmGlow, getPalette, getTypography]);
 
   const value = {
     // State
