@@ -459,14 +459,16 @@ export function PolarityProvider({ children }) {
     }
   }, [isVoid]);
   
-  // Toggle Zero Point Mode (quick shortcut to enable manual gravity at 0.50)
+  // Toggle Zero Point Mode (quick shortcut to enable manual gravity near center)
+  // Sets to 0.485 to show flicker first - user can fine-tune to 0.50 for Source State
   const toggleZeroPointMode = useCallback(() => {
     if (manualGravityEnabled && Math.abs(manualGravityValue - 0.5) < 0.05) {
       // Already in Zero Point mode, disable
       enableManualGravity(false);
     } else {
-      // Enable Zero Point mode
-      setManualGravityValue(0.5);
+      // Enable Zero Point mode at 0.485 (shows flicker, not Source State)
+      // This keeps us in Zero Point range (0.48-0.52) but away from Source (0.499-0.501)
+      setManualGravityValue(0.485);
       setManualGravityEnabled(true);
       // Haptic feedback
       if (navigator.vibrate) {

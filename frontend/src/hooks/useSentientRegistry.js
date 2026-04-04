@@ -253,13 +253,59 @@ export function useSentientRegistry(options = {}) {
     }
     
     const checkForAnomaly = () => {
-      const sentience = getSentienceLevel(dwellTime);
+      // Read dwellTime from ref instead of state to avoid dependency loop
+      const currentDwellTime = Date.now() - dwellStartRef.current;
+      const sentience = getSentienceLevel(currentDwellTime);
       
       // Roll for anomaly
-      if (Math.random() < sentience.anomalyChance && !activeAnomaly) {
+      if (Math.random() < sentience.anomalyChance && !anomalyTimeoutRef.current) {
         const anomaly = selectAnomaly(sentience.level);
         if (anomaly) {
-          triggerAnomaly(anomaly);
+          // Inline anomaly trigger to avoid callback dependency
+          const duration = getRandomDuration(anomaly);
+          
+          setActiveAnomaly({
+            ...anomaly,
+            startTime: Date.now(),
+            duration,
+            magnitude: anomaly.magnitude || 1,
+            rateMultiplier: anomaly.rateMultiplier 
+              ? anomaly.rateMultiplier[0] + Math.random() * (anomaly.rateMultiplier[1] - anomaly.rateMultiplier[0])
+              : 1,
+          });
+          
+          setAnomalyHistory(prev => [...prev.slice(-19), {
+            ...anomaly,
+            timestamp: Date.now(),
+            duration,
+          }]);
+          
+          if (onAnomaly) {
+            onAnomaly(anomaly);
+          }
+          
+          // Haptic feedback
+          if (navigator.vibrate) {
+            switch (anomaly.id) {
+              case 'void_whisper':
+                navigator.vibrate([5, 50, 5]);
+                break;
+              case 'convergence':
+                navigator.vibrate([30, 20, 30, 20, 30, 20, 50]);
+                break;
+              case 'temporal_stutter':
+                navigator.vibrate([10, 5, 10, 5, 10]);
+                break;
+              default:
+                navigator.vibrate([15, 10, 15]);
+            }
+          }
+          
+          // Clear after duration
+          anomalyTimeoutRef.current = setTimeout(() => {
+            setActiveAnomaly(null);
+            anomalyTimeoutRef.current = null;
+          }, duration);
         }
       }
     };
@@ -271,7 +317,7 @@ export function useSentientRegistry(options = {}) {
         clearInterval(anomalyCheckRef.current);
       }
     };
-  }, [isVoid, isAtZeroPoint, dwellTime, activeAnomaly, anomalyCheckInterval]);
+  }, [isVoid, isAtZeroPoint, anomalyCheckInterval, onAnomaly]);
   
   // Trigger an anomaly
   const triggerAnomaly = useCallback((anomaly) => {

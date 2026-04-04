@@ -41,9 +41,11 @@ import {
 } from '../config/hexagramRegistry';
 import { usePhoneticSynthesizer } from './usePhoneticSynthesizer';
 
-// Source State precision threshold (4 decimal places)
-const SOURCE_PRECISION = 0.0001;
-const SOURCE_GRAVITY = 0.5000;
+// Source State precision threshold (requires more precision to trigger)
+// At 0.001 precision, only values between 0.4995 and 0.5005 trigger Source State
+// This allows flicker to show at 0.49, 0.50, 0.51 while Source only triggers at exact 0.500
+const SOURCE_PRECISION = 0.001;
+const SOURCE_GRAVITY = 0.500;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ZERO-POINT FLICKER HOOK
@@ -56,9 +58,10 @@ export function useZeroPointFlicker(options = {}) {
     audioEnabled = true,
     excludeCategories = [],
     chineseDialect = 'zh-cmn', // User's selected Chinese dialect
+    requireManualGravity = true, // Only trigger Source State when manual gravity is active
   } = options;
   
-  const { gravity, isAtZeroPoint, isVoid } = usePolarity();
+  const { gravity, isAtZeroPoint, isVoid, manualGravityEnabled } = usePolarity();
   const phonetic = usePhoneticSynthesizer({ enabled: audioEnabled });
   
   // Flicker state
@@ -122,7 +125,15 @@ export function useZeroPointFlicker(options = {}) {
     // Check for precision match to Source gravity
     const isAtSource = Math.abs(gravity - SOURCE_GRAVITY) < SOURCE_PRECISION;
     
-    if (isAtSource && isAtZeroPoint && !isVoid && !sourceStateActive) {
+    // Only trigger Source State if:
+    // 1. Gravity is at precise 0.500
+    // 2. We're in Zero Point range
+    // 3. Not in Void state
+    // 4. Source isn't already active
+    // 5. Either manual gravity is enabled OR requireManualGravity is false
+    const canTriggerSource = !requireManualGravity || manualGravityEnabled;
+    
+    if (isAtSource && isAtZeroPoint && !isVoid && !sourceStateActive && canTriggerSource) {
       // ENGAGE SOURCE STATE
       setIsSourceState(true);
       setSourceStateActive(true);
@@ -160,7 +171,7 @@ export function useZeroPointFlicker(options = {}) {
         phonetic.stopResonantHum();
       }, 500);
     }
-  }, [gravity, isAtZeroPoint, isVoid, sourceStateActive, audioEnabled, hapticEnabled, phonetic]);
+  }, [gravity, isAtZeroPoint, isVoid, sourceStateActive, audioEnabled, hapticEnabled, phonetic, manualGravityEnabled, requireManualGravity]);
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // GLITCH STYLE CALCULATOR

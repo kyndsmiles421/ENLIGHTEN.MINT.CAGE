@@ -289,6 +289,7 @@ export default function UtilityDock({
                       type="range"
                       min="0"
                       max="100"
+                      step="0.5"
                       value={manualGravityEnabled ? manualGravityValue * 100 : gravity * 100}
                       onChange={(e) => {
                         enableManualGravity(true);

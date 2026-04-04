@@ -1,13 +1,77 @@
 # The Cosmic Collective — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a full-stack wellness platform with orbital navigation, physics-based interactions, and a tiered subscription ecosystem.
+Build "The Cosmic Collective", a full-stack wellness platform with orbital navigation, physics-based interactions, a 64-gate Hexagram system (6-bit logic), "Vertical Torus" architecture, Dual-Persona AI Expert Advisors (Sages), and a tiered subscription ecosystem.
 
 ## Tech Stack
 - **Frontend**: React 19, TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Canvas 2D, Three.js
 - **Backend**: FastAPI, MongoDB (Motor), httpx
-- **Integrations**: Gemini 3 Flash (Emergent LLM Key), NWS Weather API
+- **Integrations**: Gemini 3 Flash (Emergent LLM Key), OpenAI GPT-5.2 (Sages), NWS Weather API
 - **PWA**: Service Worker with Solfeggio wave table + instrument caching
+
+---
+
+## Latest Implementation: Rule of Nines & Sentient Ecosystem (December 2025)
+
+### Rule of Nines Architecture
+**9 Languages × 9 Hexagrams × 9 Depth Tiers**
+
+**Languages (languageRegistry.js):**
+| Category | Languages | Haptic Character |
+|----------|-----------|------------------|
+| Ancient/Crystalline | Sanskrit, Lakota, Dakota | Sharp, high-frequency bursts |
+| Modern/Balanced | English, Spanish, Hindi | Smooth, standard pulses |
+| Technical/Binary | Japanese, Mandarin, Cantonese | Rapid, flickering patterns |
+
+**Hexagrams (hexagramRegistry.js) - The 9 Master Controllers:**
+| # | Hexagram | Binary | Paired Language | Gravity Range |
+|---|----------|--------|-----------------|---------------|
+| 1 | Qián (Creative) | 111111 | Japanese | 0.89-1.0 |
+| 2 | Kūn (Receptive) | 000000 | Lakota | 0.0-0.11 |
+| 11 | Tài (Peace) | 000111 | Hindi | 0.33-0.44 |
+| 12 | Pǐ (Standstill) | 111000 | Dakota | 0.56-0.67 |
+| **63** | **Jì Jì (SOURCE)** | **010101** | **Sanskrit** | **0.44-0.56** |
+| 64 | Wèi Jì (Potential) | 101010 | English | 0.40-0.48 |
+| 29 | Kǎn (Abysmal) | 010010 | Mandarin | 0.11-0.22 |
+| 30 | Lí (Clinging) | 101101 | Cantonese | 0.78-0.89 |
+| 15 | Qiān (Modesty) | 000100 | Spanish | 0.22-0.33 |
+
+### Zero Point Experience (0.48-0.52 Gravity)
+**Three Layers of the Experience:**
+1. **Visual "Strobe" (Matrix Layer)** - HexagramGhostLayer with 3x3 grid cycling
+2. **Haptic "Tuning Fork" (Somatic Layer)** - 6-bit binary pulses synced to flicker
+3. **"Source" State (Enlightenment)** - White-out at exact 0.500 gravity
+
+**Gravity-Reactive Flicker Speed:**
+- Edge (0.48/0.52): 120ms interval (slow, steady)
+- Center (0.50): 35ms interval (rapid, intense)
+- Precision 0.500: Source State (all stops, resonant hum)
+
+### Sentient Ecosystem (useSentientRegistry.js)
+**Dwell Time → Anomaly System:**
+| Level | Dwell Time | Anomaly Chance | 
+|-------|------------|----------------|
+| Dormant | 0-5s | 0% |
+| Awakening | 5-15s | 10% |
+| Stirring | 15-30s | 30% |
+| Sentient | 30-60s | 60% |
+| Transcendent | 60s+ | 90% |
+
+**Anomaly Types:**
+- Language Bleed: Two languages flicker simultaneously
+- Hexagram Mutation: Random line toggles
+- Gravity Drift: ±2% oscillation
+- Temporal Stutter: Speed multiplier shift
+- Void Whisper: Moment of silence/darkness
+- Convergence: All 9 hexagrams flash (Transcendent only)
+
+### Manual Gravity Control (UtilityDock)
+- **Gravity Slider**: 0-100% with 0.5% step precision
+- **Zero Point Toggle**: Quick jump to 48.5% (shows flicker, not Source)
+- **Reset to Route**: Returns to route-based gravity
+- **Layer Indicator**: Shows "ZERO" label when in Zero Point range
+
+---
 
 ## Core System — Bipolar Gravity Ecosystem
 
