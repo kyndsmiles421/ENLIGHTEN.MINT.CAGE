@@ -227,7 +227,7 @@ class TestSubscriptionCheckout:
         response = requests.post(
             f"{BASE_URL}/api/subscriptions/checkout",
             headers={"Authorization": f"Bearer {auth_token}"},
-            json={"tier_id": "starter", "origin_url": "https://zen-energy-bar.preview.emergentagent.com"}
+            json={"tier_id": "starter", "origin_url": "https://zero-scale-physics.preview.emergentagent.com"}
         )
         assert response.status_code == 200
         
@@ -284,7 +284,7 @@ class TestCreditsCheckout:
         response = requests.post(
             f"{BASE_URL}/api/subscriptions/checkout-credits",
             headers={"Authorization": f"Bearer {auth_token}"},
-            json={"pack_id": "pack_100", "origin_url": "https://zen-energy-bar.preview.emergentagent.com"}
+            json={"pack_id": "pack_100", "origin_url": "https://zero-scale-physics.preview.emergentagent.com"}
         )
         assert response.status_code == 200
         

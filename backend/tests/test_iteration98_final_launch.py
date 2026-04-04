@@ -136,7 +136,7 @@ class TestSubscriptionEndpoints:
             headers={"Authorization": f"Bearer {auth_token}"},
             json={
                 "tier_id": "starter",
-                "origin_url": "https://zen-energy-bar.preview.emergentagent.com/pricing"
+                "origin_url": "https://zero-scale-physics.preview.emergentagent.com/pricing"
             }
         )
         assert response.status_code == 200

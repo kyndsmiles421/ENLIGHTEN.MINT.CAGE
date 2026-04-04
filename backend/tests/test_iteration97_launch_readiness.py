@@ -232,7 +232,7 @@ class TestAuthenticatedAPIs:
         """POST /api/subscriptions/checkout returns Stripe checkout URL"""
         checkout_data = {
             "tier_id": "starter",
-            "origin_url": "https://zen-energy-bar.preview.emergentagent.com"
+            "origin_url": "https://zero-scale-physics.preview.emergentagent.com"
         }
         
         response = requests.post(

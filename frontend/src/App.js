@@ -40,6 +40,7 @@ import TrialGraduation from './components/TrialGraduation';
 import { useGateNotifications } from './hooks/useGateNotifications';
 import OrbitalNavigation from './components/OrbitalNavigation';
 import LearningToggle from './components/LearningToggle';
+import EmergencyShutOff from './components/EmergencyShutOff';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -412,6 +413,7 @@ function App() {
             <CreditNudge />
             <OrbitalNavigation />
             <CommandMode context="general" />
+            <EmergencyShutOff />
           </div>
           </SplitScreenProvider>
           </VoiceCommandProvider>

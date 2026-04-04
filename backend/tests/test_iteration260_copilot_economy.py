@@ -108,7 +108,7 @@ class TestEconomyEndpoints(TestAuth):
         """POST /api/economy/subscribe creates Stripe checkout session for paid tier"""
         response = requests.post(f"{BASE_URL}/api/economy/subscribe", headers=auth_headers, json={
             "tier_id": "resonance",
-            "origin_url": "https://zen-energy-bar.preview.emergentagent.com"
+            "origin_url": "https://zero-scale-physics.preview.emergentagent.com"
         })
         assert response.status_code == 200
         data = response.json()
@@ -132,7 +132,7 @@ class TestEconomyEndpoints(TestAuth):
         """POST /api/economy/purchase-pack creates Stripe checkout for pack"""
         response = requests.post(f"{BASE_URL}/api/economy/purchase-pack", headers=auth_headers, json={
             "pack_id": "coffee_chemistry",
-            "origin_url": "https://zen-energy-bar.preview.emergentagent.com"
+            "origin_url": "https://zero-scale-physics.preview.emergentagent.com"
         })
         # May return 200 with URL or 400 if already purchased
         if response.status_code == 200:

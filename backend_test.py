@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 class ZenEnergyAPITester:
-    def __init__(self, base_url="https://zen-energy-bar.preview.emergentagent.com"):
+    def __init__(self, base_url="https://zero-scale-physics.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None

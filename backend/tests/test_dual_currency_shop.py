@@ -405,7 +405,7 @@ class TestDualCurrencyShop:
         """POST /api/rpg/shop/purchase-gems creates Stripe checkout session with correct metadata"""
         purchase_resp = self.session.post(f"{BASE_URL}/api/rpg/shop/purchase-gems", json={
             "pack_id": "gems_100",
-            "origin_url": "https://zen-energy-bar.preview.emergentagent.com"
+            "origin_url": "https://zero-scale-physics.preview.emergentagent.com"
         })
         assert purchase_resp.status_code == 200, f"Expected 200, got {purchase_resp.status_code}: {purchase_resp.text}"
         
