@@ -3,20 +3,32 @@ import { motion } from 'framer-motion';
 import { Square } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useMixer } from '../context/MixerContext';
+import { usePolarity } from '../context/PolarityContext';
 
 /**
  * Emergency Shut-Off Button
  * - Fixed position: absolute top-left corner
  * - Maximum z-index: 99999
  * - Stops ALL audio, music, and visual loops instantly
+ * - Freezes the Hexagram Compass rotation
+ * - Activates VOID state (000000 bitmask)
  * - Always visible, never covered by any other element
  */
 export default function EmergencyShutOff() {
   const { sovereignKillAll, isMuted, sovereignMuteToggle } = useSensory();
   const { stopAll: stopMixer, isPlaying } = useMixer();
+  const { activateVoid, isVoid, audioFlavor, freezeCompass } = usePolarity();
 
   const handleEmergencyStop = useCallback(() => {
     console.log('[EmergencyShutOff] HARD KILL INITIATED');
+    
+    // 0. ACTIVATE VOID STATE - Freeze compass, reset hexagram to 000000
+    try {
+      activateVoid();
+      freezeCompass();
+    } catch (e) {
+      console.warn('Polarity void activation failed:', e);
+    }
     
     // 1. Kill all sensory audio (SensoryContext)
     try {
@@ -119,13 +131,19 @@ export default function EmergencyShutOff() {
       // getAnimations not supported in all browsers
     }
 
-    // 10. Haptic feedback to confirm kill
+    // 10. Haptic feedback to confirm kill (Polarity-aware)
     if (navigator.vibrate) {
-      navigator.vibrate([100, 50, 100]); // Double pulse = confirmed
+      // Heavy thud for Hollow, sharp shimmer for Matrix
+      const pattern = audioFlavor === 'thud' 
+        ? [100, 50, 100] // Heavy double pulse
+        : audioFlavor === 'shimmer'
+          ? [30, 20, 30, 20, 50] // Light shimmer pattern
+          : [100, 50, 100]; // Default
+      navigator.vibrate(pattern);
     }
 
-    console.log('[EmergencyShutOff] HARD KILL COMPLETE - All audio/visual terminated');
-  }, [sovereignKillAll, stopMixer, isMuted, sovereignMuteToggle]);
+    console.log('[EmergencyShutOff] HARD KILL COMPLETE - All audio/visual terminated, VOID state active');
+  }, [sovereignKillAll, stopMixer, isMuted, sovereignMuteToggle, activateVoid, freezeCompass, audioFlavor]);
 
   // Expose globally for debugging/console access
   useEffect(() => {

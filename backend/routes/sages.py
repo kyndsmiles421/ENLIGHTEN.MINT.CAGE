@@ -412,6 +412,11 @@ class SageMessage(BaseModel):
     sage_id: str
     message: str
     context: Optional[dict] = None  # User progress, current zone, etc.
+    # DUAL-PERSONA: Layer mode determines which persona to use
+    layer_mode: Optional[str] = "core"  # 'hollow' | 'core' | 'matrix' | 'void'
+    gravity: Optional[float] = 0.5  # 0.0 (Hollow) to 1.0 (Matrix)
+    hexagram: Optional[int] = 7  # Current 6-bit hexagram (0-63)
+    layer_name: Optional[str] = "core"  # Human-readable layer name
 
 class QuestCreate(BaseModel):
     sage_id: str
@@ -574,28 +579,69 @@ async def get_sage(sage_id: str):
 
 @router.post("/chat")
 async def chat_with_sage(request: SageMessage, user: dict = Depends(get_current_user)):
-    """Have a conversation with a Sage."""
+    """Have a conversation with a Sage.
+    
+    DUAL-PERSONA SYSTEM:
+    - If layer_mode is 'hollow', use the sage's hollow_prompt (grounded, foundational)
+    - If layer_mode is 'matrix', use the sage's matrix_prompt (expansive, celestial)
+    - If layer_mode is 'core' or 'void', use the default system_prompt
+    """
     sage_id = request.sage_id
     if sage_id not in SAGES:
         raise HTTPException(status_code=404, detail="Sage not found")
     
     sage = SAGES[sage_id]
     user_id = user["id"]
+    layer_mode = request.layer_mode or "core"
+    
+    # VOID state blocks all Sage communication
+    if layer_mode == "void":
+        return {
+            "sage": sage["name"],
+            "response": "...",  # The void consumes words
+            "sage_id": sage_id,
+            "layer_mode": "void",
+        }
     
     try:
         # Get context for personalized response
         context = await generate_sage_context(user_id, sage_id)
         
+        # SELECT PERSONA based on layer_mode
+        if layer_mode == "hollow" and "hollow_prompt" in sage:
+            base_prompt = sage["hollow_prompt"]
+            persona_name = sage.get("hollow_title", sage["name"])
+            mode_context = f"""
+LAYER STATE: HOLLOW EARTH (Gravity: {request.gravity:.2f})
+HEXAGRAM: {request.hexagram} ({bin(request.hexagram or 0)[2:].zfill(6)})
+Feel: Dense, grounded, foundational. Focus on mechanics, practice, building."""
+        elif layer_mode == "matrix" and "matrix_prompt" in sage:
+            base_prompt = sage["matrix_prompt"]
+            persona_name = sage.get("matrix_title", sage["name"])
+            mode_context = f"""
+LAYER STATE: THE MATRIX (Gravity: {request.gravity:.2f})
+HEXAGRAM: {request.hexagram} ({bin(request.hexagram or 0)[2:].zfill(6)})
+Feel: Expansive, celestial, visionary. Focus on legacy, creation, infinite possibility."""
+        else:
+            base_prompt = sage["system_prompt"]
+            persona_name = sage["name"]
+            mode_context = f"""
+LAYER STATE: CORE (Gravity: {request.gravity:.2f})
+HEXAGRAM: {request.hexagram} ({bin(request.hexagram or 0)[2:].zfill(6)})
+Feel: Balanced, centered. Neutral zone between Hollow Earth and Matrix."""
+        
         # Build the full system prompt with context
-        full_system = f"""{sage['system_prompt']}
+        full_system = f"""{base_prompt}
+
+{mode_context}
 
 CURRENT USER CONTEXT:
 {context}
 
-Remember: Respond in character as {sage['name']}. Be concise but meaningful."""
+Remember: Respond in character as {persona_name}. Be concise but meaningful."""
         
-        # Create unique session for this user + sage combination
-        session_id = f"sage_{sage_id}_{user_id}"
+        # Create unique session for this user + sage + mode combination
+        session_id = f"sage_{sage_id}_{user_id}_{layer_mode}"
         
         # Initialize LLM chat
         api_key = os.environ.get("EMERGENT_LLM_KEY")
@@ -632,9 +678,12 @@ Remember: Respond in character as {sage['name']}. Be concise but meaningful."""
         )
         
         return {
-            "sage": sage["name"],
+            "sage": persona_name,
             "response": response,
             "sage_id": sage_id,
+            "layer_mode": layer_mode,
+            "gravity": request.gravity,
+            "hexagram": request.hexagram,
         }
         
     except Exception as e:

@@ -49,6 +49,7 @@ import GlowPortal from './components/GlowPortal';
 import UniversalCommand from './components/UniversalCommand';
 import PulseEchoVisualizer from './components/PulseEchoVisualizer';
 import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
+import { PolarityProvider } from './context/PolarityContext';
 import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettingsPanel';
 import VellumOverlay from './components/VellumOverlay';
 import { Scene as NebulaScene } from './components/nebula';
@@ -482,8 +483,9 @@ function App() {
       <SovereignProvider>
       <MeshNetworkProvider>
       <EnlightenmentCafeProvider>
-      <SageProvider>
         <BrowserRouter>
+          <PolarityProvider>
+          <SageProvider>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
           <CosmicBackground />
@@ -491,8 +493,9 @@ function App() {
           <CafeApp />
           </SplitScreenProvider>
           </VoiceCommandProvider>
+          </SageProvider>
+          </PolarityProvider>
         </BrowserRouter>
-      </SageProvider>
       </EnlightenmentCafeProvider>
       </MeshNetworkProvider>
       </SovereignProvider>

@@ -3,11 +3,17 @@
  * 
  * Manages Sage interactions, active quests, and user progress
  * for The Enlightenment Cafe's Expert Advisor System.
+ * 
+ * DUAL-PERSONA SYSTEM:
+ * - Each Sage has Hollow Earth and Matrix personas
+ * - Persona switches based on gravity from PolarityContext
+ * - Hollow = grounded, foundational | Matrix = expansive, celestial
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import { usePolarity } from './PolarityContext';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -79,6 +85,8 @@ const SageContext = createContext(null);
 
 export function SageProvider({ children }) {
   const { token } = useAuth();
+  const { sageMode, gravity, isVoid, hexagram, layerName } = usePolarity();
+  
   const [progress, setProgress] = useState({
     lumens: 0,
     level: 1,
@@ -144,9 +152,14 @@ export function SageProvider({ children }) {
     }
   }, [token]);
 
-  // Chat with Sage
+  // Chat with Sage (passes layer_mode for Dual-Persona system)
   const chatWithSage = useCallback(async (message) => {
     if (!token || !currentSage) return null;
+    
+    // In VOID state, Sages cannot respond
+    if (isVoid) {
+      return "The void consumes all words. Deactivate emergency state to continue.";
+    }
     
     setIsLoading(true);
     
@@ -156,7 +169,15 @@ export function SageProvider({ children }) {
     try {
       const res = await axios.post(
         `${API}/api/sages/chat`,
-        { sage_id: currentSage.id, message },
+        { 
+          sage_id: currentSage.id, 
+          message,
+          // DUAL-PERSONA: Pass layer mode to backend for persona selection
+          layer_mode: sageMode, // 'hollow' | 'core' | 'matrix' | 'void'
+          gravity: gravity,
+          hexagram: hexagram,
+          layer_name: layerName,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -170,7 +191,7 @@ export function SageProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  }, [token, currentSage]);
+  }, [token, currentSage, sageMode, gravity, hexagram, layerName, isVoid]);
 
   // Request a quest from Sage
   const requestQuest = useCallback(async (sageId) => {
@@ -257,6 +278,11 @@ export function SageProvider({ children }) {
     isAudienceOpen,
     conversationHistory,
     isLoading,
+    
+    // Polarity state for UI
+    sageMode,
+    gravity,
+    isVoid,
     
     // Actions
     summonSage,
