@@ -240,10 +240,13 @@ export default function OrbitalHub() {
 
   // ═══ SUB-ORB DRAG START ═══
   const handleSubOrbPointerDown = useCallback((e, satId) => {
+    // Don't start drag if in extracted state - let click handler take over
+    if (hubState === 'extracted') return;
+    
     e.stopPropagation();
     e.preventDefault();
     
-    if (hubState !== 'bloom' && hubState !== 'extracted') return;
+    if (hubState !== 'bloom') return;
     
     const rect = e.currentTarget.closest('[data-container]')?.getBoundingClientRect();
     if (!rect) return;
@@ -459,7 +462,7 @@ export default function OrbitalHub() {
           return (
             <motion.div
               key={sat.id}
-              className="absolute cursor-pointer select-none touch-none"
+              className="absolute cursor-pointer select-none"
               style={{
                 left: center + pos.x - size / 2,
                 top: center + pos.y - size / 2,
@@ -469,9 +472,17 @@ export default function OrbitalHub() {
                 transform: `scale(${scale / (isExtracted ? SUB_ORB_EXTRACTED_SCALE : SUB_ORB_BLOOM_SCALE)})`,
                 zIndex: isExtracted ? 30 : (isHovered ? 25 : 20),
                 transition: dragTarget === sat.id ? 'none' : 'transform 0.1s ease-out',
+                touchAction: isExtracted ? 'auto' : 'none', // Allow touch on extracted orbs
               }}
-              onPointerDown={(e) => handleSubOrbPointerDown(e, sat.id)}
+              onPointerDown={(e) => !isExtracted && handleSubOrbPointerDown(e, sat.id)}
               onClick={(e) => handleSubOrbClick(e, sat)}
+              onTouchEnd={(e) => {
+                // Ensure touch taps work on extracted orbs
+                if (isExtracted) {
+                  e.stopPropagation();
+                  handleSubOrbClick(e, sat);
+                }
+              }}
               onMouseEnter={() => setHoveredSat(sat.id)}
               onMouseLeave={() => setHoveredSat(null)}
               data-testid={isExtracted ? `satellite-${sat.id}` : `dormant-${sat.id}`}
@@ -508,24 +519,42 @@ export default function OrbitalHub() {
 
               {/* Collapse button on extracted orb */}
               {isExtracted && (
-                <motion.button
-                  className="absolute -top-1 -right-1 rounded-full flex items-center justify-center"
-                  style={{
-                    width: size * 0.2,
-                    height: size * 0.2,
-                    background: 'rgba(10,10,18,0.9)',
-                    border: '1px solid rgba(248,250,252,0.2)',
-                    zIndex: 35,
-                    fontSize: size * 0.1,
-                    color: 'rgba(248,250,252,0.6)',
-                  }}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  onClick={handleCollapse}
-                  data-testid={`snapback-${sat.id}`}
-                >
-                  ×
-                </motion.button>
+                <>
+                  <motion.button
+                    className="absolute -top-1 -right-1 rounded-full flex items-center justify-center"
+                    style={{
+                      width: size * 0.2,
+                      height: size * 0.2,
+                      background: 'rgba(10,10,18,0.9)',
+                      border: '1px solid rgba(248,250,252,0.2)',
+                      zIndex: 35,
+                      fontSize: size * 0.1,
+                      color: 'rgba(248,250,252,0.6)',
+                    }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    onClick={handleCollapse}
+                    data-testid={`snapback-${sat.id}`}
+                  >
+                    ×
+                  </motion.button>
+                  {/* Tap to Enter hint */}
+                  <motion.p
+                    className="absolute -bottom-5 left-0 right-0 text-center pointer-events-none"
+                    style={{
+                      fontSize: 9,
+                      color: sat.color,
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      textShadow: `0 0 8px ${sat.color}50`,
+                    }}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: [0.6, 1, 0.6], y: 0 }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    TAP TO ENTER
+                  </motion.p>
+                </>
               )}
             </motion.div>
           );

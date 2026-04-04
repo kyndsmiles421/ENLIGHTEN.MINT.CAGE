@@ -167,7 +167,31 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 ```
 
 ## Iteration History
-### Iteration 266 — Sovereign LLM Intelligence Engine (9 Steps) (Apr 3, 2026) — LATEST
+### Iteration 273 — Orbital Hub Touch Navigation Fix (April 2026) — LATEST
+- **Fixed**: Extracted orbs were inaccessible on mobile after being "pulled down"
+- **Root cause**: `touch-none` CSS blocked touch events; `onPointerDown` consumed touches before `onClick`
+- **Solution**:
+  - Removed `touch-none` from sub-orb elements
+  - Added conditional `touchAction: 'auto'` for extracted orbs
+  - Added `onTouchEnd` handler as fallback for mobile taps
+  - Made drag handler skip init when in extracted state
+  - Added pulsing "TAP TO ENTER" hint on extracted orbs
+- Tests: Mobile navigation working — tapped Journal orb → navigated to `/journal`
+
+### Iteration 272 — Audio System Global Registration (April 2026)
+- **AudioContext Registration**: Ambient Soundscape, MixerContext, QuickMeditationWidget register with `window.__cosmicAudioContexts`
+- **Emergency Shut-Off Enhanced**: Now calls `window.__stopAmbientSoundscape()` directly, sets `zen_ambient_soundscape: off`
+- **P1 Issues Verified**: SmartDock Harmonics Play/Generate buttons WORKING, Dashboard routing CTAs WORKING
+
+### Iteration 271 — Dashboard MissionControlRing (April 2026)
+- **MissionControlRing**: Expandable radial menu replacing cluttered bottom-right buttons (6 actions in orbital ring)
+- **Hidden floaters**: CosmicAssistant, CommandMode, QuickMeditationWidget hidden on dashboard (z-index 102)
+
+### Iteration 270 — Zero-Scale Parentage Physics & Emergency Shut-Off (April 2026)
+- **Emergency Shut-Off**: Top-left (8px, 8px), z-index 99999, kills all audio/visuals
+- **Zero-Scale Parentage Model**: Core=1.0, Sub-orbs(0,0,0 Scale 0) → Bloom(2.5x at 0.3) → Extract(3.0x at 1.0)
+
+### Iteration 266 — Sovereign LLM Intelligence Engine (9 Steps) (Apr 3, 2026)
 - **Step 1: Expert-Domain Fine-Tuning**: Each Sovereign has a high-weight knowledge vector with domain-specific data (rosin temps, molecular weights, Solfeggio Hz, CI/CD patterns, GPS datums, HRV metrics)
 - **Step 2: 8-Language Cultural DNA**: Language-specific idioms and teaching styles (not post-processing translation) — e.g., Spanish uses "desplegar" for deploy, Japanese uses katakana technical terms
 - **Step 3: Cross-Sovereign Memory**: Unified user state — when you talk to Gaea about harvest, Solis knows you're prepping transport. All 10 Sovereigns share context via `get_unified_state()`
