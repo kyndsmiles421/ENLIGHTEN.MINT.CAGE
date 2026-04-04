@@ -55,19 +55,21 @@ const TESSERACT_CONFIG = {
   // Depth limits
   MAX_DEPTH: 6,  // Level 6 = True Core (Tesseract)
   
-  // Gravity snap points (Sacred Hexagrams)
-  SNAP_THRESHOLD: 0.05,  // Snap within 5%
+  // GEO-01: Gravity snap points (Sacred Hexagrams) with weighted thresholds
+  // Default SNAP_THRESHOLD: 0.05 (5%)
+  // Qiān (Modesty) gets +15% magnetic pull = 0.0575
+  SNAP_THRESHOLD: 0.05,
   SACRED_GRAVITY_POINTS: [
-    { gravity: 0.000, hexagram: 2, name: 'Kūn (Receptive)' },
-    { gravity: 0.111, hexagram: 29, name: 'Kǎn (Abysmal)' },
-    { gravity: 0.222, hexagram: 15, name: 'Qiān (Modesty)' },
-    { gravity: 0.333, hexagram: 11, name: 'Tài (Peace)' },
-    { gravity: 0.500, hexagram: 63, name: 'Jì Jì (SOURCE STATE)' },
-    { gravity: 0.556, hexagram: 12, name: 'Pǐ (Standstill)' },
-    { gravity: 0.667, hexagram: 64, name: 'Wèi Jì (Potential)' },
-    { gravity: 0.778, hexagram: 30, name: 'Lí (Clinging)' },
-    { gravity: 0.889, hexagram: 1, name: 'Qián (Creative)' },
-    { gravity: 1.000, hexagram: 1, name: 'Qián (Creative)' },
+    { gravity: 0.000, hexagram: 2, name: 'Kūn (Receptive)', weight: 1.0 },
+    { gravity: 0.111, hexagram: 29, name: 'Kǎn (Abysmal)', weight: 1.0 },
+    { gravity: 0.222, hexagram: 15, name: 'Qiān (Modesty)', weight: 1.15 },  // GEO-01: +15% magnetic pull
+    { gravity: 0.333, hexagram: 11, name: 'Tài (Peace)', weight: 1.0 },
+    { gravity: 0.500, hexagram: 63, name: 'Jì Jì (SOURCE STATE)', weight: 1.1 },  // SOURCE gets slight boost
+    { gravity: 0.556, hexagram: 12, name: 'Pǐ (Standstill)', weight: 1.0 },
+    { gravity: 0.667, hexagram: 64, name: 'Wèi Jì (Potential)', weight: 1.0 },
+    { gravity: 0.778, hexagram: 30, name: 'Lí (Clinging)', weight: 1.0 },
+    { gravity: 0.889, hexagram: 1, name: 'Qián (Creative)', weight: 1.0 },
+    { gravity: 1.000, hexagram: 1, name: 'Qián (Creative)', weight: 1.0 },
   ],
   
   // Animation durations
@@ -90,6 +92,18 @@ const TESSERACT_CONFIG = {
   // Acoustic bloom threshold
   ACOUSTIC_BLOOM_MS: 200,  // Sound blooms after 200ms dwell
   
+  // Haptic Crescendo: Progressive pulses during dwell (0→200ms)
+  // Creates tactile "string being pulled taut" sensation
+  HAPTIC_CRESCENDO: {
+    enabled: true,
+    pulses: [
+      { progress: 0.25, duration: 5 },   // Light touch at 25%
+      { progress: 0.50, duration: 10 },  // Medium pulse at 50%
+      { progress: 0.75, duration: 15 },  // Strong pulse at 75%
+    ],
+    thunk: 25,  // Final "thunk" at threshold (isDwellStable=true)
+  },
+  
   // Haptic patterns
   HAPTIC_PATTERNS: {
     dive: [50, 30, 100],
@@ -99,6 +113,7 @@ const TESSERACT_CONFIG = {
     void_exit: [300, 20, 100, 20, 20],
     tesseract: [100, 50, 100, 50, 200, 100, 200],
     legendary: [50, 25, 50, 25, 50, 25, 150, 50, 150],
+    bloom_thunk: [25],  // The satisfying "click" when bloom completes
   },
 };
 
@@ -281,18 +296,42 @@ export function useTesseractCore(options = {}) {
   }, [selectedCell]);
   
   // ─────────────────────────────────────────────────────────────────────────
-  // SNAP-POINT GRAVITY (INT-04: Magnetic Snap)
+  // GEO-01: SNAP-POINT GRAVITY (Weighted Euclidean Distance)
+  // Sacred Geometry Enhancement: +15% magnetic pull for Qiān (Modesty)
+  // Formula: d(p,q) = √Σ wᵢ(pᵢ - qᵢ)² → simplified to weighted threshold
   // ─────────────────────────────────────────────────────────────────────────
   
   const findNearestSnapPoint = useCallback((g) => {
     if (!enableSnapPoints) return null;
     
+    let nearestPoint = null;
+    let nearestWeightedDistance = Infinity;
+    
     for (const point of TESSERACT_CONFIG.SACRED_GRAVITY_POINTS) {
-      if (Math.abs(g - point.gravity) <= TESSERACT_CONFIG.SNAP_THRESHOLD) {
-        return point;
+      // GEO-01: Apply weighted Euclidean distance
+      // weight > 1.0 = stronger magnetic pull (larger effective threshold)
+      const weight = point.weight || 1.0;
+      const weightedThreshold = TESSERACT_CONFIG.SNAP_THRESHOLD * weight;
+      const distance = Math.abs(g - point.gravity);
+      
+      // Check if within weighted snap range
+      if (distance <= weightedThreshold) {
+        // Calculate weighted distance for comparison (lower = closer/stronger)
+        const weightedDistance = distance / weight;
+        
+        if (weightedDistance < nearestWeightedDistance) {
+          nearestWeightedDistance = weightedDistance;
+          nearestPoint = point;
+        }
       }
     }
-    return null;
+    
+    // Log when Qiān's enhanced pull activates
+    if (nearestPoint && nearestPoint.hexagram === 15) {
+      console.log('[GEO-01] Qiān (Modesty) magnetic pull activated - 15% enhanced threshold');
+    }
+    
+    return nearestPoint;
   }, [enableSnapPoints]);
   
   const snapToPoint = useCallback((point) => {
@@ -567,12 +606,27 @@ export function useTesseractCore(options = {}) {
     lastActivityRef.current = Date.now();
     currentDwellCellRef.current = cellKey;
     
-    // Start dwell progress tracking for Visual Bloom
+    // Track which haptic crescendo pulses have fired
+    const firedPulses = new Set();
+    
+    // Start dwell progress tracking for Visual Bloom + Haptic Crescendo
     const startTime = Date.now();
     const progressInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(1, elapsed / TESSERACT_CONFIG.ACOUSTIC_BLOOM_MS);
       setDwellProgress(progress);
+      
+      // HAPTIC CRESCENDO: Fire progressive pulses at threshold points
+      // Creates tactile "string being pulled taut" sensation
+      if (enableHaptics && navigator.vibrate && TESSERACT_CONFIG.HAPTIC_CRESCENDO.enabled) {
+        for (const pulse of TESSERACT_CONFIG.HAPTIC_CRESCENDO.pulses) {
+          if (progress >= pulse.progress && !firedPulses.has(pulse.progress)) {
+            firedPulses.add(pulse.progress);
+            navigator.vibrate([pulse.duration]);
+            console.log(`[HAPTIC] Crescendo pulse: ${pulse.duration}ms at ${Math.round(pulse.progress * 100)}%`);
+          }
+        }
+      }
       
       if (progress >= 1) {
         clearInterval(progressInterval);
@@ -603,6 +657,12 @@ export function useTesseractCore(options = {}) {
         // Coordinate is stable - audio can bloom
         setIsDwellStable(true);
         console.log('[TesseractCore] Dwell threshold reached - audio bloom permitted');
+        
+        // HAPTIC CRESCENDO: Final "thunk" - the satisfying click
+        if (enableHaptics && navigator.vibrate && TESSERACT_CONFIG.HAPTIC_CRESCENDO.enabled) {
+          navigator.vibrate([TESSERACT_CONFIG.HAPTIC_CRESCENDO.thunk]);
+          console.log('[HAPTIC] Bloom thunk: 25ms - threshold reached');
+        }
       }
     }, TESSERACT_CONFIG.ACOUSTIC_BLOOM_MS);
     
