@@ -44,6 +44,7 @@ import OrbitalNavigation from './components/OrbitalNavigation';
 import LearningToggle from './components/LearningToggle';
 import EmergencyShutOff from './components/EmergencyShutOff';
 import MissionControlRing from './components/MissionControlRing';
+import TieredNavigation from './components/TieredNavigation';
 import { MeshNetworkProvider } from './context/MeshNetworkContext';
 import GlowPortal from './components/GlowPortal';
 import UniversalCommand from './components/UniversalCommand';
@@ -277,6 +278,7 @@ function CafeApp() {
         <OrbitalNavigation />
         <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
         <EmergencyShutOff />
+        <TieredNavigation />
         <GlowPortal />
         <UniversalCommand />
         <PulseEchoVisualizer />
