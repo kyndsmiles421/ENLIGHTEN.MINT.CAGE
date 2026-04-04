@@ -493,17 +493,27 @@ export default function KineticHUD({
   currentStability,
   seeds,
   
+  // HUD-01: Dynamic widget scaling for "breathing" effect
+  widgetScale = 1.0,
+  
   // Callbacks
   onToggleVoidMode,
 }) {
+  // HUD-01: Calculate breathing transforms
+  // Widgets "inhale" (shrink) as lattice "exhales" (expands with depth)
+  const breathingStyle = {
+    transform: `scale(${widgetScale})`,
+    transition: 'transform 0.3s ease-out, opacity 0.3s ease-out',
+  };
+  
   return (
     <div 
       className="fixed inset-0"
       style={{ pointerEvents: 'none', zIndex: 30 }}  // z-30: Below lattice (z-999)
       data-testid="kinetic-hud"
     >
-      {/* Registry Status (Top-Right) - Display Only */}
-      <div style={{ pointerEvents: 'none' }}>
+      {/* Registry Status (Top-Right) - Display Only - HUD-01: Breathing */}
+      <div style={{ ...breathingStyle, transformOrigin: 'top right', pointerEvents: 'none' }}>
         <RegistryStatusWidget
           dominantLattice={dominantLattice}
           isVoidMode={isVoidMode}
@@ -512,8 +522,8 @@ export default function KineticHUD({
         />
       </div>
       
-      {/* Gravity Indicator (Top-Left) - Display Only */}
-      <div style={{ pointerEvents: 'none' }}>
+      {/* Gravity Indicator (Top-Left) - Display Only - HUD-01: Breathing */}
+      <div style={{ ...breathingStyle, transformOrigin: 'top left', pointerEvents: 'none' }}>
         <GravityIndicatorWidget
           gravity={gravity}
           inverseGravity={inverseGravity}
@@ -523,8 +533,8 @@ export default function KineticHUD({
         />
       </div>
       
-      {/* Dust Wallet (Bottom-Right) - Display Only */}
-      <div style={{ pointerEvents: 'none' }}>
+      {/* Dust Wallet (Bottom-Right) - Display Only - HUD-01: Breathing */}
+      <div style={{ ...breathingStyle, transformOrigin: 'bottom right', pointerEvents: 'none' }}>
         <DustWalletWidget
           seedCount={seeds?.length || 0}
           totalStates={totalStates}
@@ -533,8 +543,8 @@ export default function KineticHUD({
         />
       </div>
       
-      {/* Stability Indicator (Bottom-Left) - Display Only */}
-      <div style={{ pointerEvents: 'none' }}>
+      {/* Stability Indicator (Bottom-Left) - Display Only - HUD-01: Breathing */}
+      <div style={{ ...breathingStyle, transformOrigin: 'bottom left', pointerEvents: 'none' }}>
         <StabilityIndicatorWidget
           stability={currentStability}
           selectedCell={selectedCell}

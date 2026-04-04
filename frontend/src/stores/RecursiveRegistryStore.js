@@ -40,6 +40,19 @@ let registryState = {
   gravity: 0.5,
   isVoidMode: false,
   
+  // VOID-01: Global Bloom State (persists across depth transitions)
+  bloomState: {
+    isActive: false,
+    opacity: 0,
+    color: 'jade',  // 'jade' | 'void' (purple)
+    exitVelocity: 0,  // Used to carry momentum across transitions
+    depthAtActivation: 0,
+  },
+  
+  // HUD-01: Lattice expansion state for widget breathing
+  latticeScale: 1.0,  // 1.0 = normal, >1 = expanded
+  widgetScale: 1.0,   // Inverse of lattice scale for "breathing"
+  
   // Version counter for atomic updates
   version: 0,
 };
@@ -173,14 +186,71 @@ export const RecursiveRegistryStore = {
   setVoidMode(isVoid) {
     if (isVoid === registryState.isVoidMode) return;
     
+    // VOID-01: Update bloom color based on mode
+    const newBloomState = {
+      ...registryState.bloomState,
+      color: isVoid ? 'void' : 'jade',
+    };
+    
     registryState = {
       ...registryState,
       isVoidMode: isVoid,
+      bloomState: newBloomState,
       version: registryState.version + 1,
     };
     
     notifySubscribers();
     console.log('[SYNC-01] VoidMode broadcast:', isVoid);
+  },
+  
+  /**
+   * VOID-01: Set bloom state ATOMICALLY
+   * Persists jade/void opacity across depth transitions
+   * @param {Object} bloom - Bloom state updates
+   */
+  setBloomState(bloom) {
+    const newBloomState = {
+      ...registryState.bloomState,
+      ...bloom,
+    };
+    
+    registryState = {
+      ...registryState,
+      bloomState: newBloomState,
+      version: registryState.version + 1,
+    };
+    
+    notifySubscribers();
+    
+    if (bloom.isActive !== undefined) {
+      console.log('[VOID-01] Bloom state:', bloom.isActive ? 'ACTIVE' : 'INACTIVE', 
+        'opacity:', newBloomState.opacity.toFixed(2));
+    }
+  },
+  
+  /**
+   * HUD-01: Set lattice scale and auto-calculate widget scale
+   * Widgets "inhale" as lattice "exhales"
+   * @param {number} scale - Lattice scale (1.0 = normal)
+   */
+  setLatticeScale(scale) {
+    const clampedScale = Math.max(0.5, Math.min(2.0, scale));
+    if (Math.abs(clampedScale - registryState.latticeScale) < 0.01) return;
+    
+    // HUD-01: Calculate inverse widget scale for "breathing" effect
+    // When lattice is 1.2x, widgets should be ~0.85x (inverse relationship)
+    const widgetScale = Math.max(0.7, Math.min(1.0, 1 / Math.pow(clampedScale, 0.5)));
+    
+    registryState = {
+      ...registryState,
+      latticeScale: clampedScale,
+      widgetScale: widgetScale,
+      version: registryState.version + 1,
+    };
+    
+    notifySubscribers();
+    console.log('[HUD-01] Lattice scale:', clampedScale.toFixed(2), 
+      'Widget scale:', widgetScale.toFixed(2));
   },
   
   /**
@@ -288,6 +358,8 @@ export function useRecursiveRegistry() {
   const setHexagram = useCallback((hex) => RecursiveRegistryStore.setHexagram(hex), []);
   const setGravity = useCallback((g) => RecursiveRegistryStore.setGravity(g), []);
   const setVoidMode = useCallback((v) => RecursiveRegistryStore.setVoidMode(v), []);
+  const setBloomState = useCallback((bloom) => RecursiveRegistryStore.setBloomState(bloom), []);
+  const setLatticeScale = useCallback((scale) => RecursiveRegistryStore.setLatticeScale(scale), []);
   const batchUpdate = useCallback((updates) => RecursiveRegistryStore.batchUpdate(updates), []);
   const reset = useCallback(() => RecursiveRegistryStore.reset(), []);
   
@@ -303,12 +375,21 @@ export function useRecursiveRegistry() {
     isVoidMode: state.isVoidMode,
     version: state.version,
     
+    // VOID-01: Bloom state
+    bloomState: state.bloomState,
+    
+    // HUD-01: Lattice/widget scales for breathing effect
+    latticeScale: state.latticeScale,
+    widgetScale: state.widgetScale,
+    
     // Setters
     setLanguage,
     setDepth,
     setHexagram,
     setGravity,
     setVoidMode,
+    setBloomState,
+    setLatticeScale,
     batchUpdate,
     reset,
   };

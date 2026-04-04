@@ -16,7 +16,7 @@
  * All powered by the unified useTesseractCore hook.
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Compass, Gem, Target } from 'lucide-react';
@@ -26,6 +26,9 @@ import { useTesseractCore } from '../hooks/useTesseractCore';
 
 // AUD-01: Acoustic Bloom - Phonetic audio engine
 import { usePhoneticSynthesizer } from '../hooks/usePhoneticSynthesizer';
+
+// VOID-01 & HUD-01: Global state for bloom persistence and widget breathing
+import { useRecursiveRegistry } from '../stores/RecursiveRegistryStore';
 
 // Components
 import KineticHUD from '../components/KineticHUD';
@@ -316,6 +319,51 @@ export default function TesseractExperience() {
     enableAutoVoid: true,
   });
   
+  // VOID-01 & HUD-01: Global state for bloom persistence and widget breathing
+  const registry = useRecursiveRegistry();
+  
+  // HUD-01: Calculate widget scale based on depth (deeper = smaller widgets)
+  // Creates "breathing room" - widgets "inhale" as user dives deeper
+  const widgetScale = useMemo(() => {
+    // At L0: widgets at 1.0 scale
+    // At L3+: widgets at 0.85 scale (15% smaller)
+    const depthFactor = Math.min(core.depth / 3, 1);
+    const scale = 1 - (depthFactor * 0.15);
+    return scale;
+  }, [core.depth]);
+  
+  // HUD-01: Update registry with current lattice scale on depth change
+  // Note: registry setter functions are stable (memoized), safe to exclude from deps
+  useEffect(() => {
+    // Lattice "exhales" (expands) as user dives deeper
+    const latticeScale = 1 + (core.depth * 0.1); // 10% larger per depth level
+    registry.setLatticeScale(latticeScale);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [core.depth]);
+  
+  // VOID-01: Persist bloom state during dive transitions
+  useEffect(() => {
+    if (core.isZooming) {
+      // Capture current bloom state with exit velocity
+      const exitVelocity = core.dwellProgress;
+      registry.setBloomState({
+        exitVelocity,
+        depthAtActivation: core.depth,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [core.isZooming, core.dwellProgress, core.depth]);
+  
+  // VOID-01: Update bloom opacity based on dwell progress
+  useEffect(() => {
+    registry.setBloomState({
+      isActive: core.selectedCell !== null,
+      opacity: core.dwellProgress,
+      color: core.isVoidMode ? 'void' : 'jade',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [core.selectedCell, core.dwellProgress, core.isVoidMode]);
+  
   // AUD-01: Acoustic Bloom - Dwell gate function
   // Returns true ONLY when user has been still for 200ms
   const isDwellStableRef = useRef(false);
@@ -377,6 +425,7 @@ export default function TesseractExperience() {
       data-testid="tesseract-experience"
     >
       {/* Kinetic HUD Overlay - z-30 (BELOW lattice at z-999) */}
+      {/* HUD-01: Pass widget scale for "breathing" effect */}
       <KineticHUD
         gravity={core.gravity}
         inverseGravity={core.inverseGravity}
@@ -394,6 +443,7 @@ export default function TesseractExperience() {
         currentStability={core.currentStability}
         seeds={core.seeds}
         onToggleVoidMode={core.toggleVoidMode}
+        widgetScale={widgetScale}
       />
       
       {/* Header */}
@@ -457,14 +507,21 @@ export default function TesseractExperience() {
         canMint={core.depth >= 1 && core.address}
       />
       
-      {/* Seed Hunt Widget (sidebar) */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2 w-64 z-30">
+      {/* Seed Hunt Widget (sidebar) - HUD-01: Dynamic breathing */}
+      <motion.div 
+        className="fixed right-4 top-1/2 -translate-y-1/2 w-64 z-30 origin-right"
+        animate={{
+          scale: widgetScale,
+          opacity: 0.7 + (widgetScale * 0.3),  // Fade slightly as widgets shrink
+        }}
+        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      >
         <SeedHuntWidget
           currentAddress={core.address}
           onNavigateToHunt={handleNavigateToHunt}
           compact={true}
         />
-      </div>
+      </motion.div>
       
       {/* Address display */}
       {core.address && (
