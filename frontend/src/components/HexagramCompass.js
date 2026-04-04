@@ -22,7 +22,7 @@
 import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePolarity } from '../context/PolarityContext';
-import { useDepth, LINE_FLAVORS } from '../context/DepthContext';
+import { useDepth, LINE_FLAVORS, MAX_DEPTH } from '../context/DepthContext';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COMPASS CONSTANTS
@@ -553,16 +553,25 @@ export default function HexagramCompass({
           }}
         >
           <g transform={`translate(${(svgWidth - LINE_WIDTH) / 2}, ${(svgHeight - totalHeight) / 2})`}>
-            {lineStates.map((isYang, index) => (
-              <HexagramLine
-                key={index}
-                isYang={isYang}
-                index={5 - index}
-                colors={colors}
-                opacity={compassOpacity}
-                glowMultiplier={gravityGlow + glowIntensity}
-              />
-            ))}
+            {lineStates.map((isYang, index) => {
+              const actualLineIndex = 5 - index; // Convert visual to logical index
+              const isLineSelected = selectedLine === actualLineIndex;
+              const lineFlavor = currentLineFlavor && isLineSelected ? currentLineFlavor : null;
+              
+              return (
+                <HexagramLine
+                  key={index}
+                  isYang={isYang}
+                  index={actualLineIndex}
+                  colors={colors}
+                  opacity={compassOpacity}
+                  glowMultiplier={gravityGlow + glowIntensity}
+                  isSelected={isLineSelected}
+                  onSelect={interactive && depth < MAX_DEPTH && !isVoid ? selectLine : undefined}
+                  selectionColor={lineFlavor?.color || LINE_FLAVORS[actualLineIndex]?.color}
+                />
+              );
+            })}
           </g>
         </svg>
         
