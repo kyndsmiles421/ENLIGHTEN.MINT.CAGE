@@ -615,7 +615,7 @@ export default function TesseractExperience() {
           <div 
             className="absolute flex items-center justify-center"
             style={{ 
-              zIndex: 1001,  // Above lattice
+              zIndex: 10000,  // CRITICAL: Must be ABOVE lattice (z-9999)
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',

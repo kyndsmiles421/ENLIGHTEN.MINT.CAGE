@@ -1355,3 +1355,41 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - `/app/frontend/src/stores/RecursiveRegistryStore.js` - Notify throttle guard
 - **Tests**: Frontend 100% - All LOOP-FIX CSS variables verified working
 - **Known Issue**: "Maximum update depth exceeded" (668 errors) - KNOWN PRE-EXISTING ISSUE from before this fork. Does NOT prevent functionality. Likely in MixerContext or CosmicThemeContext.
+
+
+### Iteration 284 — SEAL-01 Long-Press Escape & Z-Index Fix (April 2026)
+- **SEAL-01 (Emergency Surface) Implemented**:
+  - Long-press center button for 1.5s → Instant snap to L0
+  - Progress ring shows during hold (jade/purple based on void mode)
+  - Haptic feedback pattern: [50, 30, 100, 30, 150] on completion
+  - Console logs: `[SEAL-01] Long-Press Escape triggered - surfacing to L0`
+  - CSS variables reset to 0 immediately on escape
+- **Critical Z-Index Fix**:
+  - Escape zone z-index changed from 1001 → 10000 (above lattice at z-9999)
+  - Fixes pointer event interception by lattice grid cells
+- **Escape Zone UI**:
+  - 80x80px centered button, only visible at depth > 0
+  - Shows "L{depth}" when idle, progress % when holding
+  - Backdrop blur + radial gradient during escape sequence
+- **Files Updated**:
+  - `/app/frontend/src/pages/TesseractExperience.js` - SEAL-01 implementation
+
+---
+
+## Session Summary — The Enlightenment Cafe "Restoration" Sprint
+
+**What Was Accomplished:**
+1. **AUD-01**: Acoustic Bloom (200ms dwell gates audio)
+2. **MEM-01**: Registry Memory Cache (localStorage persistence)
+3. **SYNC-01**: Global Registry Singleton (atomic state broadcasts)
+4. **Visual Bloom**: Jade radial gradient during dwell
+5. **Haptic Crescendo**: 5ms→10ms→15ms→25ms tactile pulses
+6. **GEO-01**: +15% magnetic pull for Qiān (Modesty)
+7. **VOID-01**: Bloom state persistence across depth
+8. **HUD-01**: Dynamic widget breathing (CSS calc)
+9. **LOOP-FIX**: CSS Variable state flattening (zero re-renders)
+10. **SEAL-01**: Long-Press Escape (1.5s hold → L0)
+
+**Architecture Health**: The Tesseract OS now "breathes" via CSS variables, not React state. HUD and Lattice are synchronized performers. The escape mechanism provides psychological safety for deep dives.
+
+**Known Debt**: "Maximum update depth exceeded" (668 errors) - pre-existing from MixerContext/CosmicThemeContext. Does NOT break functionality.
