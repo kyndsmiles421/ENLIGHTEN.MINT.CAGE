@@ -29,6 +29,7 @@ from engines.xr_spatial import (
     get_xr_engine,
 )
 from engines.central_crystal import get_crystal
+from deps import db
 
 logger = logging.getLogger(__name__)
 
@@ -444,7 +445,11 @@ async def harvest_seed(request: HarvestRequest):
       - Radiant (700-900 Hz): 5x
       - Luminous (400-700 Hz): 2x
       - Dim (0-400 Hz): 1x
+      
+    On success, resonance is automatically deposited to the user's vault.
     """
+    from engines.resonance_vault import get_vault_manager
+    
     engine = get_xr_engine()
     result = engine.harvest_seed(
         user_id=request.user_id,
@@ -452,6 +457,30 @@ async def harvest_seed(request: HarvestRequest):
         user_lon=request.lon,
         node_id=request.node_id,
     )
+    
+    # If harvest successful, deposit to user's vault
+    if result.get("success"):
+        vault_manager = get_vault_manager()
+        vault_manager.set_db(db)
+        
+        vault = await vault_manager.get_vault(request.user_id)
+        vault_result = vault.add_harvest(
+            amount=result["harvest_bonus"],
+            seed_id=result["seed_id"],
+            node_id=result["node_id"],
+            base_resonance=result["base_resonance"],
+            multiplier=result["multiplier"],
+            radiance=result["radiance"],
+            source_module=result.get("visual_manifest", "Unknown"),
+            coordinates={"lat": request.lat, "lon": request.lon},
+        )
+        
+        # Save vault to DB
+        await vault_manager.save_vault(vault)
+        
+        # Add vault info to response
+        result["vault_balance"] = vault.total_resonance
+        result["total_seeds_owned"] = len(vault.seeds_collected)
     
     return HarvestResponse(
         success=result.get("success", False),
