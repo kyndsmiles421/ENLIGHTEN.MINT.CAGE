@@ -35,12 +35,13 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen immersive-page flex items-center justify-center px-6" style={{ background: 'transparent' }}>
+    <div className="min-h-screen immersive-page flex items-center justify-center px-6" style={{ background: 'transparent', position: 'relative', zIndex: 100 }}>
       <motion.div
         initial={{ opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-md"
+        style={{ position: 'relative', zIndex: 101 }}
       >
         <button
           onClick={() => navigate('/')}
@@ -79,10 +80,22 @@ export default function Auth() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input-glass w-full"
+              className="w-full"
               placeholder="your@email.com"
               required
               data-testid="auth-email-input"
+              style={{ 
+                position: 'relative', 
+                zIndex: 102, 
+                pointerEvents: 'auto',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '0.75rem',
+                padding: '0.75rem 1rem',
+                color: '#fff',
+                width: '100%',
+                fontSize: '16px'
+              }}
             />
           </div>
           <div>
@@ -92,10 +105,23 @@ export default function Auth() {
                 type={showPw ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-glass w-full pr-10"
+                className="w-full"
                 placeholder="Your password"
                 required
                 data-testid="auth-password-input"
+                style={{ 
+                  position: 'relative', 
+                  zIndex: 102, 
+                  pointerEvents: 'auto',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  paddingRight: '2.5rem',
+                  color: '#fff',
+                  width: '100%',
+                  fontSize: '16px'
+                }}
               />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
                 {showPw ? <EyeOff size={18} /> : <Eye size={18} />}

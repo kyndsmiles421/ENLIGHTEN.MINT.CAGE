@@ -83,20 +83,9 @@ const SilenceShield = (() => {
         display: grid !important;
       }
       
-      /* Silence Shield indicator - CENTERED */
+      /* Silence Shield indicator - HIDDEN on auth pages */
       .silence-shield-indicator {
-        position: fixed;
-        bottom: 300px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #00FFC2;
-        box-shadow: 0 0 8px #00FFC2;
-        z-index: 99999;
-        pointer-events: none;
-        animation: shield-pulse 2s ease-in-out infinite;
+        display: none !important;
       }
       
       @keyframes shield-pulse {
