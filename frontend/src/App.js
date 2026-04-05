@@ -1,9 +1,10 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
-// SOVEREIGN OS: Must be imported FIRST to activate all protocols
+// SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/SilenceShield';
 import './utils/SovereignOS';
+import './utils/SovereignStreamline';
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
