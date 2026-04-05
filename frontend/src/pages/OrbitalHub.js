@@ -8,6 +8,7 @@ import { useHubAudio } from '../hooks/useHubAudio';
 import { useSensoryResonance } from '../hooks/useSensoryResonance';
 import { useDepth, Z_LAYERS } from '../hooks/useDepth';
 import MissionControl from '../components/MissionControl';
+import { useHarmonicResonance, SOLFEGGIO_FREQUENCIES } from '../utils/HarmonicResonance';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -85,6 +86,9 @@ export default function OrbitalHub() {
   const isMobile = dims.w < 640;
   const R = Math.min(dims.w * 0.18, dims.h * 0.22, 140);
   const coreDiameter = R * 2;
+  
+  // Harmonic Resonance System
+  const { resonance, frequencyData, setFrequency, cycle } = useHarmonicResonance();
   
   // Derived radii
   const bloomRadius = R * BLOOM_RADIUS_MULTIPLIER;
@@ -758,6 +762,26 @@ export default function OrbitalHub() {
         >
           tap the core to reveal modules
         </motion.p>
+      )}
+
+      {/* Harmonic Resonance Indicator */}
+      {resonance && frequencyData && (
+        <motion.div
+          className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full backdrop-blur-md cursor-pointer"
+          style={{
+            background: 'rgba(10,10,18,0.7)',
+            border: `1px solid ${frequencyData.color}`,
+            boxShadow: `0 0 15px ${frequencyData.color}40`,
+          }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          onClick={() => cycle('up')}
+          data-testid="resonance-indicator"
+        >
+          <p className="text-[10px] font-semibold tracking-wider" style={{ color: frequencyData.color }}>
+            {resonance}Hz · {frequencyData.name}
+          </p>
+        </motion.div>
       )}
 
       <MissionControl 

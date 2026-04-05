@@ -1978,8 +1978,45 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
     mix-blend-mode: screen; /* Interlocks the colors when they overlap */
     pointer-events: none; /* Allows clicks to pass through to the icon */
     z-index: -1;
-    /* CSS Variable for customizable pulse speed per nodule */
-    animation: pulse-vibration var(--pulse-speed, 4s) ease-in-out infinite alternate;
+    /* 
+     * HARMONIC RESONANCE SYSTEM
+     * Each nodule has its own --pulse-speed but "swings" with the --master-pulse
+     * Blend: 80% individual + 20% master = unique yet synchronized
+     */
+    --master-pulse: 4s; /* Default master tempo */
+    --blend-speed: calc(var(--pulse-speed, 4s) * 0.8);
+    animation: pulse-vibration var(--blend-speed, 4s) ease-in-out infinite alternate;
+}
+
+/* When master resonance is active, add harmonic overlay */
+:root[data-resonance="432"] .nodule-vibration {
+    --master-pulse: 4s;
+    filter: blur(8px) hue-rotate(-10deg); /* Warm earth tone */
+}
+
+:root[data-resonance="528"] .nodule-vibration {
+    --master-pulse: 2.5s;
+    filter: blur(10px) hue-rotate(15deg); /* Love/DNA repair - green shift */
+}
+
+:root[data-resonance="639"] .nodule-vibration {
+    --master-pulse: 3s;
+    filter: blur(9px) hue-rotate(30deg); /* Connection - blue shift */
+}
+
+:root[data-resonance="741"] .nodule-vibration {
+    --master-pulse: 2s;
+    filter: blur(11px) hue-rotate(-20deg); /* Awakening - violet shift */
+}
+
+:root[data-resonance="852"] .nodule-vibration {
+    --master-pulse: 1.5s;
+    filter: blur(12px) hue-rotate(45deg); /* Intuition - indigo */
+}
+
+:root[data-resonance="963"] .nodule-vibration {
+    --master-pulse: 1.2s;
+    filter: blur(14px) brightness(1.2); /* Pineal activation - white light */
 }
 
 /* Interlocking animation for the color shifting */
