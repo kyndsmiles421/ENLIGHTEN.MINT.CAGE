@@ -7,10 +7,10 @@
  * Route: /mint
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SeedVisualizer, SeedVisualizerMini, useAnimatedLayerCount } from '../components/SeedVisualizer';
-import SovereignStreamline from '../utils/SovereignStreamlineV4';
+import SovereignStreamline, { useSovereignV7 } from '../utils/SovereignStreamlineV7';
 
 export default function MintingCeremony() {
   const navigate = useNavigate();
@@ -19,15 +19,34 @@ export default function MintingCeremony() {
   const [mintResult, setMintResult] = useState(null);
   const [seedInput, setSeedInput] = useState('');
   const [audioEnabled, setAudioEnabled] = useState(true);
+  
+  // Use the V7 hook for state management
+  const { geoLock, ledger, startBinaural, stopBinaural, vectorState } = useSovereignV7();
 
   // Animated layer count for smooth visualization
   const displayLayer = useAnimatedLayerCount(currentLayer, 500);
+  
+  // Initialize touch points on mount (for Omni-Point interaction)
+  useEffect(() => {
+    // Check GPS geolock status
+    SovereignStreamline.checkGeoLock();
+    
+    return () => {
+      // Cleanup touch points on unmount
+      SovereignStreamline.removeTouchPoints?.();
+    };
+  }, []);
 
   const toggleAudio = useCallback(() => {
     const newState = !audioEnabled;
     setAudioEnabled(newState);
-    SovereignStreamline.setAudioEnabled(newState);
-  }, [audioEnabled]);
+    // V7: Use binaural start/stop instead of setAudioEnabled
+    if (newState) {
+      startBinaural();
+    } else {
+      stopBinaural();
+    }
+  }, [audioEnabled, startBinaural, stopBinaural]);
 
   const startMinting = useCallback(async () => {
     if (!seedInput.trim()) return;
@@ -36,14 +55,17 @@ export default function MintingCeremony() {
     setCurrentLayer(0);
     setMintResult(null);
 
-    // Subscribe to progress updates (includes audio tones)
-    const unsubProgress = SovereignStreamline.on('mint-progress', (progress) => {
+    // Subscribe to progress updates
+    const unsubProgress = SovereignStreamline.on('ceremony-progress', (progress) => {
       setCurrentLayer(progress.layer);
     });
 
     try {
-      // Use v4 mintSeed with spatial audio
-      const result = await SovereignStreamline.mintSeed(seedInput, 54);
+      // Use V7 startCeremony with binaural entrainment
+      const result = await SovereignStreamline.startCeremony(seedInput, { 
+        binaural: audioEnabled,
+        depth: 54 
+      });
       
       setMintResult(result);
       setCurrentLayer(54);
@@ -53,7 +75,7 @@ export default function MintingCeremony() {
       setIsMinting(false);
       unsubProgress();
     }
-  }, [seedInput]);
+  }, [seedInput, audioEnabled]);
 
   const resetCeremony = useCallback(() => {
     setCurrentLayer(0);
@@ -113,6 +135,12 @@ export default function MintingCeremony() {
         {mintResult && (
           <div className="result-section">
             <div className="result-badge">✓ SEED MINTED</div>
+            {/* Show GeoLock status */}
+            {geoLock && geoLock !== 'UNKNOWN' && (
+              <div className={`geolock-badge ${geoLock === 'GOLDEN_LOCK_ACTIVE' ? 'golden' : ''}`}>
+                {geoLock === 'GOLDEN_LOCK_ACTIVE' ? '🏔️ BLACK HILLS CALIBRATED' : '🌍 STANDARD PHASE'}
+              </div>
+            )}
             <div className="result-hash">
               <label>FRACTAL HASH</label>
               <code>{mintResult.hash}</code>
@@ -123,18 +151,18 @@ export default function MintingCeremony() {
                 <span className="metric-label">LAYERS</span>
               </div>
               <div className="metric">
-                <span className="metric-value">{mintResult.metrics?.computeTime || 0}ms</span>
+                <span className="metric-value">{mintResult.metrics?.computeTime || mintResult.metrics?.computeTimeMs || 0}ms</span>
                 <span className="metric-label">COMPUTE</span>
               </div>
               <div className="metric">
-                <span className="metric-value">{mintResult.metrics?.entropyScore || 0}</span>
+                <span className="metric-value">{mintResult.metrics?.entropyScore || mintResult.metrics?.entropy || 0}</span>
                 <span className="metric-label">ENTROPY</span>
               </div>
             </div>
             <div className="result-actions">
               <button className="action-btn attest" onClick={() => {
-                SovereignStreamline.trigger('ATTEST', 'SEED-MINT', {
-                  description: `Minted seed: ${seedInput}`,
+                SovereignStreamline.dispatch('center', 'WITNESS', {
+                  intention: `Minted seed: ${seedInput}`,
                   hash: mintResult.hash
                 });
               }}>
@@ -148,15 +176,15 @@ export default function MintingCeremony() {
         )}
       </div>
 
-      {/* Mini visualizers showing history */}
-      {SovereignStreamline.getMintedSeeds().length > 0 && (
+      {/* Mini visualizers showing history from V7 ledger */}
+      {ledger && ledger.length > 0 && (
         <div className="history-section">
-          <h3>PREVIOUS SEEDS</h3>
+          <h3>SOVEREIGN LEDGER</h3>
           <div className="history-list">
-            {SovereignStreamline.getMintedSeeds().slice(-5).map((seed, i) => (
+            {ledger.slice(0, 5).map((entry, i) => (
               <div key={i} className="history-item">
                 <SeedVisualizerMini layerCount={54} total={54} size={40} />
-                <span className="history-hash">{seed.hash?.slice(0, 16)}...</span>
+                <span className="history-hash">{entry.hash?.slice(0, 16)}...</span>
               </div>
             ))}
           </div>
@@ -322,7 +350,25 @@ export default function MintingCeremony() {
           color: #00FFC2;
           font-size: 12px;
           letter-spacing: 0.2em;
+          margin-bottom: 10px;
+        }
+
+        .geolock-badge {
+          display: inline-block;
+          padding: 6px 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 10px;
+          letter-spacing: 0.15em;
           margin-bottom: 20px;
+        }
+
+        .geolock-badge.golden {
+          background: rgba(255, 215, 0, 0.15);
+          border-color: #FFD700;
+          color: #FFD700;
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         }
 
         .result-hash {

@@ -662,6 +662,183 @@ const SovereignStreamline = {
     } catch (e) {
       return { mode: 'INLINE', supported: false };
     }
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 11. MATRIX LIBERATION (v7.1 — Fixes "Box" issue)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Get Matrix-decoupled style for fixed positioning
+   * Uses Vector Offsets synced with Tetrahedron "breath"
+   */
+  getMatrixStyle() {
+    const time = Date.now() * 0.001;
+    const split = Math.sin(time) * 15; // Syncs with Tetrahedron "breath"
+    return {
+      position: 'fixed',
+      top: '20%',
+      left: `calc(10% + ${split}px)`,
+      zIndex: 9999,
+      transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+      border: 'none',
+      background: 'rgba(0,0,0,0.4)',
+      backdropFilter: 'blur(10px)'
+    };
+  },
+
+  /**
+   * Apply Matrix Fluidity to container element
+   * Forces fixed coordinate system to decouple from DOM box model
+   */
+  applyMatrixFluidity(selector = '.matrix-container') {
+    const matrix = document.querySelector(selector);
+    if (matrix) {
+      matrix.style.position = 'fixed';
+      matrix.style.zIndex = '9999';
+      matrix.style.border = 'none';
+      matrix.style.background = 'transparent';
+      // Syncs with the Metatron "Breath" (Splitting Tetrahedron)
+      matrix.style.transform = `translateY(${Math.sin(Date.now() / 1000) * 10}px)`;
+    }
+    return this;
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 12. OMNI-POINT TOUCH-PRINTING (v7.1 — Splitting Tetrahedron Vertices)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Initialize DOM touch points for the Splitting Tetrahedron
+   * Maps interaction nodes to vertices with auto-resonance on touch
+   */
+  initTouchPoints(container = document.body) {
+    const vertices = [
+      { x: 0, y: -200, label: 'Apex' },
+      { x: -150, y: 150, label: 'Base-Left' },
+      { x: 150, y: 150, label: 'Base-Right' }
+    ];
+    
+    vertices.forEach((v, i) => {
+      const node = document.createElement('div');
+      node.className = 'omni-point-vertex';
+      node.setAttribute('data-vertex', v.label);
+      node.setAttribute('data-testid', `omni-vertex-${i}`);
+      node.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(168,85,247,0.8) 0%, rgba(168,85,247,0.2) 100%);
+        transform: translate(${v.x}px, ${v.y}px);
+        cursor: pointer;
+        z-index: 9998;
+        box-shadow: 0 0 20px rgba(168,85,247,0.5);
+        transition: all 0.3s ease;
+      `;
+      
+      node.onclick = () => {
+        // Start resonance on touch
+        this.startBinaural();
+        this.playLayerTone(i * 18); // Spread across frequency range
+        node.style.transform = `translate(${v.x}px, ${v.y}px) scale(1.5)`;
+        setTimeout(() => {
+          node.style.transform = `translate(${v.x}px, ${v.y}px) scale(1)`;
+        }, 300);
+      };
+      
+      container.appendChild(node);
+    });
+    
+    console.log('[SovereignStreamline] Omni-Point vertices initialized');
+    return this;
+  },
+
+  /**
+   * Remove DOM touch points
+   */
+  removeTouchPoints() {
+    document.querySelectorAll('.omni-point-vertex').forEach(el => el.remove());
+    return this;
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 13. EMERGENCY RESET (v7.1 — Shield Bypass)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Hard emergency reset - bypasses SilenceShield
+   * Dispatches SHIELD_DEACTIVATE event before reload
+   */
+  emergencyReset() {
+    console.log('[SovereignStreamline] Emergency Reset Triggered');
+    
+    // Deactivate silence shield
+    window.dispatchEvent(new CustomEvent('SHIELD_DEACTIVATE'));
+    
+    // Stop all audio
+    this.stopBinaural();
+    if (this.ctx && this.ctx.state !== 'closed') {
+      this.ctx.close().catch(() => {});
+    }
+    
+    // Clear local state
+    this.isRitualActive = false;
+    this.binauralNodes = { active: false };
+    
+    // Hard reload after brief delay
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  },
+
+  /**
+   * Render physical emergency reset button (v7.1)
+   * Absolute top-left, bypassing all DOM clipping
+   */
+  renderEmergencyResetButton() {
+    // Check if already exists
+    if (document.getElementById('sovereign-emergency-reset')) return;
+    
+    const btn = document.createElement('button');
+    btn.id = 'sovereign-emergency-reset';
+    btn.innerHTML = '🛑 STOP';
+    btn.setAttribute('data-testid', 'sovereign-emergency-reset');
+    btn.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100000;
+      background: rgba(220, 38, 38, 0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid white;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: system-ui, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4);
+      transition: all 0.2s ease;
+    `;
+    
+    btn.onmouseenter = () => {
+      btn.style.background = 'rgba(220, 38, 38, 1)';
+      btn.style.transform = 'scale(1.05)';
+    };
+    btn.onmouseleave = () => {
+      btn.style.background = 'rgba(220, 38, 38, 0.8)';
+      btn.style.transform = 'scale(1)';
+    };
+    
+    btn.onclick = () => this.emergencyReset();
+    
+    document.body.appendChild(btn);
+    console.log('[SovereignStreamline] Emergency Reset button rendered');
+    return btn;
   }
 };
 
