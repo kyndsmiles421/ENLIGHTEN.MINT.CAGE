@@ -29,6 +29,7 @@ import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import SmartDock from './components/SmartDock';
 import ShambhalaToolbar from './components/ShambhalaToolbar';
+import ShambhalaCrystalSystem from './components/ShambhalaCrystalSystem';
 import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
@@ -309,7 +310,10 @@ function CafeApp() {
         <AnimatedRoutes />
         {!isSovereignRoute && (
           <>
-            {/* CLEAN SHAMBHALA BOTTOM TOOLBAR — replaces all cluttered UI */}
+            {/* SHAMBHALA CRYSTAL SYSTEM - Rainbow Encryption */}
+            <ShambhalaCrystalSystem />
+            
+            {/* CLEAN SHAMBHALA BOTTOM TOOLBAR */}
             <ShambhalaToolbar />
             
             {/* Keep only essential overlays */}
