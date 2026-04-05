@@ -19,7 +19,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Compass, Gem, Target } from 'lucide-react';
+import { ArrowLeft, Compass, Gem, Target, Grid3X3, X } from 'lucide-react';
 
 // Consolidated hook
 import { useTesseractCore } from '../hooks/useTesseractCore';
@@ -108,6 +108,7 @@ GravitySlider.displayName = 'GravitySlider';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TESSERACT LATTICE (Simplified 9×9 Grid)
+// Dimmed by default + Collapsible on user request
 // ═══════════════════════════════════════════════════════════════════════════
 
 const TesseractLattice = React.memo(({
@@ -120,6 +121,8 @@ const TesseractLattice = React.memo(({
   isVoidMode,
   isDwellStable,
   dwellProgress,
+  isCollapsed,
+  matrixOpacity,
 }) => {
   const handleCellClick = useCallback((row, col) => {
     onSelectCell(row, col);
@@ -133,7 +136,7 @@ const TesseractLattice = React.memo(({
   }, [onDive]);
   
   return (
-    <div 
+    <motion.div 
       className="relative mx-auto"
       style={{ 
         width: 'min(90vw, 400px)',
@@ -142,23 +145,35 @@ const TesseractLattice = React.memo(({
         zIndex: 9999,
         position: 'relative',
       }}
+      initial={false}
+      animate={{
+        scale: isCollapsed ? 0.15 : 1,
+        opacity: isCollapsed ? 0.3 : matrixOpacity,
+        y: isCollapsed ? -180 : 0,
+        x: isCollapsed ? 120 : 0,
+      }}
+      transition={{ 
+        type: 'spring', 
+        stiffness: 200, 
+        damping: 25,
+        mass: 0.8,
+      }}
     >
-      {/* Grid background - NO backdrop-filter, pure translucent */}
+      {/* Grid background - Translucent with radiating light */}
       <div 
         className="absolute inset-0 rounded-2xl transition-all duration-500"
         style={{
-          // SOVEREIGN: No backdrop-filter on core lattice
-          background: `radial-gradient(circle at center, ${colors.primary}15, transparent 70%)`,
-          border: `2px solid ${colors.primary}30`,
-          boxShadow: `0 0 40px ${colors.primary}15`,
-          pointerEvents: 'none',  // Background is decorative only
+          background: `radial-gradient(circle at center, ${colors.primary}08, transparent 70%)`,
+          border: `1px solid ${colors.primary}15`,
+          boxShadow: `0 0 60px ${colors.primary}10, inset 0 0 40px ${colors.primary}05`,
+          pointerEvents: 'none',
         }}
       />
       
-      {/* 9×9 Grid - ALL pointer events enabled */}
+      {/* 9×9 Grid - Translucent cells with light radiation */}
       <div 
         className="absolute inset-4 grid grid-cols-9 gap-1"
-        style={{ pointerEvents: 'auto' }}  // Grid is fully interactive
+        style={{ pointerEvents: isCollapsed ? 'none' : 'auto' }}
       >
         {[...Array(81)].map((_, i) => {
           const row = Math.floor(i / 9);
@@ -172,22 +187,25 @@ const TesseractLattice = React.memo(({
               className="relative rounded-md transition-all cursor-pointer"
               style={{
                 background: isSelected 
-                  ? `${colors.primary}60`
-                  : isVoidMode 
-                    ? 'rgba(139,92,246,0.1)' 
-                    : 'rgba(59,130,246,0.1)',
+                  ? `${colors.primary}25`
+                  : 'transparent',
                 border: isSelected 
-                  ? `2px solid ${colors.primary}` 
-                  : '1px solid rgba(255,255,255,0.1)',
-                boxShadow: isSelected ? `0 0 15px ${colors.primary}50` : 'none',
-                // Ensure each cell is clickable
-                pointerEvents: isZooming ? 'none' : 'auto',
+                  ? `1px solid ${colors.primary}40` 
+                  : '1px solid rgba(255,255,255,0.03)',
+                boxShadow: isSelected 
+                  ? `0 0 20px ${colors.primary}30, inset 0 0 10px ${colors.primary}15` 
+                  : 'none',
+                pointerEvents: (isZooming || isCollapsed) ? 'none' : 'auto',
               }}
-              whileHover={{ scale: 1.1, zIndex: 10 }}
+              whileHover={{ 
+                scale: 1.1, 
+                zIndex: 10,
+                boxShadow: `0 0 15px ${colors.primary}20`,
+              }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleCellClick(row, col)}
               onDoubleClick={() => handleCellDoubleClick(row, col)}
-              disabled={isZooming}
+              disabled={isZooming || isCollapsed}
               data-testid={`tesseract-cell-${row}-${col}`}
             >
               {/* Visual Bloom Indicator - shows dwell progress */}
@@ -200,12 +218,12 @@ const TesseractLattice = React.memo(({
                 />
               )}
               
-              {/* Hexagram number (tiny) */}
+              {/* Hexagram number (tiny) - very subtle */}
               <span 
                 className="absolute inset-0 flex items-center justify-center text-[8px] font-mono"
                 style={{ 
-                  color: isSelected ? colors.primary : 'rgba(255,255,255,0.3)',
-                  pointerEvents: 'none',  // Text is decorative
+                  color: isSelected ? `${colors.primary}90` : 'rgba(255,255,255,0.15)',
+                  pointerEvents: 'none',
                 }}
               >
                 {hexNum}
@@ -246,7 +264,7 @@ const TesseractLattice = React.memo(({
           transition={{ duration: 0.8 }}
         />
       )}
-    </div>
+    </motion.div>
   );
 });
 
@@ -458,6 +476,12 @@ export default function TesseractExperience() {
   }, [navigate]);
   
   // ═══════════════════════════════════════════════════════════════════════════
+  // MATRIX COLLAPSE STATE
+  // ═══════════════════════════════════════════════════════════════════════════
+  const [isMatrixCollapsed, setIsMatrixCollapsed] = useState(false);
+  const MATRIX_OPACITY = 0.6; // Dimmed but visible - translucent like everything else
+  
+  // ═══════════════════════════════════════════════════════════════════════════
   // SEAL-01: LONG-PRESS ESCAPE (Emergency Surface)
   // Hold center of screen for 1.5s → Instant snap to L0
   // The psychological "come up for air" mechanism for deep dives
@@ -598,6 +622,25 @@ export default function TesseractExperience() {
       
       {/* Main Lattice - Z-INDEX 999: Always top interactive layer */}
       <div className="relative flex items-center justify-center mt-8" style={{ zIndex: 999 }}>
+        {/* Matrix Collapse Toggle */}
+        <button
+          onClick={() => setIsMatrixCollapsed(!isMatrixCollapsed)}
+          className="absolute -top-2 right-4 p-2 rounded-full transition-all"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: `0 0 20px ${core.colors.primary}10`,
+            zIndex: 10000,
+          }}
+          data-testid="matrix-collapse-toggle"
+        >
+          {isMatrixCollapsed ? (
+            <Grid3X3 size={18} className="text-white/60" />
+          ) : (
+            <X size={18} className="text-white/40" />
+          )}
+        </button>
+        
         <TesseractLattice
           depth={core.depth}
           selectedCell={core.selectedCell}
@@ -608,6 +651,8 @@ export default function TesseractExperience() {
           isVoidMode={core.isVoidMode}
           isDwellStable={core.isDwellStable}
           dwellProgress={core.dwellProgress}
+          isCollapsed={isMatrixCollapsed}
+          matrixOpacity={MATRIX_OPACITY}
         />
         
         {/* SEAL-01: Long-Press Escape Zone (Center) - Only visible at depth > 0 */}
