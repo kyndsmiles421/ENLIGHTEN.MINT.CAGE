@@ -200,6 +200,8 @@ const PowerSpotAdmin = lazy(() => import('./pages/PowerSpotAdmin'));
 const MusicTheory = lazy(() => import('./pages/MusicTheory'));
 const Workshop = lazy(() => import('./pages/Workshop'));
 const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
+const EnlightenMintHub = lazy(() => import('./pages/EnlightenMintHub'));
+const CelestialDome = lazy(() => import('./pages/CelestialDome'));
 const Observatory = lazy(() => import('./pages/Observatory'));
 const Archives = lazy(() => import('./pages/Archives'));
 const SuanpanMixer = lazy(() => import('./pages/SuanpanMixer'));
@@ -455,6 +457,8 @@ function AnimatedRoutes() {
         <Route path="/theory" element={<MusicTheory />} />
         <Route path="/workshop" element={<Workshop />} />
         <Route path="/hub" element={<OrbitalHub />} />
+        <Route path="/ether-hub" element={<EnlightenMintHub />} />
+        <Route path="/vr/celestial-dome" element={<CelestialDome />} />
         <Route path="/observatory" element={<Observatory />} />
         <Route path="/archives" element={<Archives />} />
         <Route path="/suanpan" element={<SuanpanMixer />} />

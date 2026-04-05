@@ -1638,3 +1638,29 @@ Fixed button/interaction glitches:
 - `/app/frontend/src/components/PersistentWaveform.js` - Ref-based animation
 - `/app/frontend/src/utils/HarmonicResonance.js` - Added useGearSystem hook
 - `/app/frontend/src/index.css` - Pointer-events CSS fix
+
+### New Files Created (April 5, 2026)
+
+#### EnlightenMintHub.js — Streamlined Alternative Hub
+Route: `/ether-hub`
+
+A cleaner, zero-re-render implementation featuring:
+- **Bio-Sync Animation**: 5.5s breath cycle driving all motion
+- **Webbed Gears**: CW/CCW rotation with Golden Ratio (φ = 1.618)
+- **Critical Mass System**: Extract 15 nodules to unlock Action Overlay
+- **Action Overlay**: Modal with Sanctuary/Stripe/VR integration buttons
+
+#### CelestialDome.js — VR Entry Point
+Route: `/vr/celestial-dome`
+
+VR sanctuary destination for Sovereign Key holders:
+- WebXR detection and support
+- Animated starfield background
+- Karma display integration
+- Feature roadmap cards (Spatial Meditation, Sovereign Council, Seed Garden, Cosmic Observatory)
+
+#### EtherNode.js — Gear-Driven Node Component
+Reusable nodule component with:
+- CW/CCW gear rotation subscription
+- Base/Ether layer extraction mechanic
+- Haptic feedback on extraction
