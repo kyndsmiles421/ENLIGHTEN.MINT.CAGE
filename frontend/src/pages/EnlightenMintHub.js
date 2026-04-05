@@ -2,493 +2,472 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * EnlightenMintHub.js — Streamlined Orbital Hub with Zero-Re-render Physics
+ * EnlightenMintHub.js — Quantum Loom Interface
  * 
  * THE ARCHITECTURE:
- * 1. Bio-Sync: 5.5s breath cycle drives all animations
- * 2. Webbed Gears: CW/CCW rotation at Golden Ratio (φ = 1.618)
- * 3. Ether Extraction: 15 nodules to unlock Critical Mass
- * 4. Action Portal: Sanctuary Deeds, Aether Fund, VR Entry
+ * 1. Matrix Substrate: 60fps mechanical drift
+ * 2. Crystalline Web: Canvas lines connecting nodules to toolbars
+ * 3. Nodule Extraction: 15 pulls = Critical Mass (Infinity Resonance)
+ * 4. Stripe Integration: Architect/Seeker subscription tiers
  * 
- * P0 FIX: All 60fps animations use refs, not setState
- * P1 FIX: pointer-events properly layered
+ * Route: /ether-hub
  */
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-/**
- * 1. UNIFIED ACTION & API LAYER (Sanctuary, Aether, VR)
- */
-const ActionOverlay = ({ active, noduleCount, onReset }) => {
-  const [status, setStatus] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  
-  if (!active) return null;
-
-  const handleDeed = async () => {
-    setLoading(true);
-    setStatus("Sealing Restoration Deed...");
-    try {
-      const res = await fetch(`${API}/api/sanctuary/deed`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          deed_type: 'MINT-01',
-          description: 'Restoration Commemorative Seed',
-          karma_value: 100
-        })
-      });
-      if (res.ok) {
-        setStatus("MINT-01 Seed Witnessed in the Matrix.");
-        if (navigator.vibrate) navigator.vibrate([50, 30, 100]);
-      } else {
-        setStatus("Deed alignment requires authentication.");
-      }
-    } catch (e) {
-      setStatus("Connection to Sanctuary lost.");
-    }
-    setLoading(false);
-  };
-
-  const handleAether = async () => {
-    setLoading(true);
-    setStatus("Connecting to Aether Fund...");
-    try {
-      const res = await fetch(`${API}/api/aether/donate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 1100 }) // $11.00 in cents
-      });
-      const data = await res.json();
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
-      } else {
-        setStatus("Aether contribution aligned. Global Grace +1.");
-        if (navigator.vibrate) navigator.vibrate([30, 50, 30, 50, 100]);
-      }
-    } catch (e) {
-      setStatus("Aether Fund requires Stripe integration.");
-    }
-    setLoading(false);
-  };
-
-  const handleVR = () => {
-    setStatus("Initializing Celestial Dome...");
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
-    setTimeout(() => navigate('/vr/celestial-dome'), 800);
-  };
-
-  return (
-    <div className="action-portal" data-testid="action-overlay">
-      <style>{`
-        .action-portal {
-          position: fixed; inset: 0; z-index: 10000; display: flex;
-          align-items: center; justify-content: center; 
-          background: rgba(10,10,10,0.95);
-          backdrop-filter: blur(20px) saturate(1.5);
-          animation: portal-bloom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        @keyframes portal-bloom {
-          from { opacity: 0; transform: scale(0.9); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .action-card { 
-          padding: 50px; border: 1px solid var(--cafe-gold, #FFD700); 
-          border-radius: 30px; text-align: center; 
-          background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(20,20,30,0.9));
-          box-shadow: 0 0 60px rgba(168,85,247,0.3), 0 0 120px rgba(0,255,194,0.1);
-          max-width: 400px;
-        }
-        .action-title { 
-          color: var(--cafe-gold, #FFD700); font-size: 1.5rem; 
-          letter-spacing: 0.15em; margin-bottom: 10px;
-        }
-        .action-subtitle { 
-          color: var(--mint-primary, #00FFC2); font-size: 0.8rem; 
-          opacity: 0.7; margin-bottom: 30px;
-        }
-        .eth-btn { 
-          display: block; width: 100%; margin: 12px 0; padding: 16px 20px;
-          background: transparent; border: 1px solid var(--mint-primary, #00FFC2); 
-          color: var(--mint-primary, #00FFC2);
-          cursor: pointer; font-weight: 600; font-size: 0.85rem;
-          letter-spacing: 0.1em; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          border-radius: 8px;
-        }
-        .eth-btn:hover:not(:disabled) { 
-          background: var(--mint-primary, #00FFC2); color: #000; 
-          box-shadow: 0 0 30px rgba(0,255,194,0.5);
-          transform: translateY(-2px);
-        }
-        .eth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .eth-btn.gold { border-color: var(--cafe-gold, #FFD700); color: var(--cafe-gold, #FFD700); }
-        .eth-btn.gold:hover:not(:disabled) { background: var(--cafe-gold, #FFD700); }
-        .eth-btn.purple { border-color: #A855F7; color: #A855F7; }
-        .eth-btn.purple:hover:not(:disabled) { background: #A855F7; }
-        .status-text { 
-          color: #A855F7; margin-top: 25px; font-size: 0.8rem; 
-          min-height: 20px; letter-spacing: 0.05em;
-        }
-        .collapse-btn { 
-          color: rgba(255,255,255,0.3); background: none; border: none; 
-          cursor: pointer; margin-top: 15px; font-size: 0.7rem;
-          letter-spacing: 0.1em; transition: color 0.3s;
-        }
-        .collapse-btn:hover { color: rgba(255,255,255,0.6); }
-      `}</style>
-      
-      <div className="action-card">
-        <h2 className="action-title">RESONANCE COMPLETE</h2>
-        <p className="action-subtitle">15 Nodules Extracted — Critical Mass Achieved</p>
-        
-        <button 
-          className="eth-btn gold" 
-          onClick={handleDeed}
-          disabled={loading}
-          data-testid="seal-deed-btn"
-        >
-          SEAL RESTORATION DEED (MINT-01)
-        </button>
-        
-        <button 
-          className="eth-btn" 
-          onClick={handleAether}
-          disabled={loading}
-          data-testid="aether-fund-btn"
-        >
-          CONTRIBUTE TO AETHER FUND ($11)
-        </button>
-        
-        <button 
-          className="eth-btn purple" 
-          onClick={handleVR}
-          disabled={loading}
-          data-testid="vr-entry-btn"
-        >
-          ENTER CELESTIAL DOME (VR)
-        </button>
-
-        <button 
-          className="eth-btn" 
-          onClick={() => navigate('/membership')}
-          disabled={loading}
-          data-testid="membership-btn"
-          style={{ borderColor: '#FF6B6B', color: '#FF6B6B' }}
-        >
-          UNLOCK REFRACTAL MEMBERSHIP
-        </button>
-        
-        <p className="status-text">{status}</p>
-        
-        <button 
-          className="collapse-btn" 
-          onClick={onReset}
-          data-testid="collapse-btn"
-        >
-          COLLAPSE ETHER
-        </button>
-      </div>
-    </div>
-  );
-};
-
-/**
- * 2. MASTER ENLIGHTEN.MINT HUB
- */
 export default function EnlightenMintHub() {
-  const [nodules, setNodules] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
   const navigate = useNavigate();
-  
-  // REFS: P0 Physics & Gear Logic (Zero-re-render loop)
-  const gearRef = useRef(null);
-  const coreRef = useRef(null);
-  const breathRef = useRef(1);
-  const nodulesRef = useRef(0); // Track nodules without re-render
+  const [nodules, setNodules] = useState(0);
+  const [isResonating, setIsResonating] = useState(false);
+  const [showActionOverlay, setShowActionOverlay] = useState(false);
+  const matrixRef = useRef(null);
+  const canvasRef = useRef(null);
+  const frameIdRef = useRef(null);
 
-  // BIO-SYNC & GEAR ANIMATION (60FPS Substrate)
+  // 🌀 THE SUBSTRATE: 60FPS Mechanical Gears & Crystalline Web
   useEffect(() => {
-    let frameId;
-    const phi = 1.618033988749895; // Golden Ratio for Webbed Gears
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
+    const ctx = canvas.getContext('2d');
+    
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     const animate = () => {
       const time = Date.now();
       
-      // Breath Sync (5.5s Cycle) — drives all organic motion
-      const breath = (Math.sin(time / 875) + 1) / 2; 
-      breathRef.current = 0.8 + (breath * 0.4);
-
-      if (gearRef.current) {
-        // CW/CCW Rotational Logic with Golden Ratio
-        const rotationCW = (time * 0.001 * breathRef.current) % (Math.PI * 2);
-        const rotationCCW = (time * 0.001 * phi * -1) % (Math.PI * 2);
-        gearRef.current.style.setProperty('--cw', `${rotationCW}rad`);
-        gearRef.current.style.setProperty('--ccw', `${rotationCCW}rad`);
+      // Matrix Drift (Base Layer)
+      if (matrixRef.current) {
+        matrixRef.current.style.transform = `scale(${1 + Math.sin(time / 1000) * 0.02})`;
       }
 
-      if (coreRef.current) {
-        // Core pulse synced to breath
-        const pulse = 1 + (Math.sin(time / 500) * 0.05 * breathRef.current);
-        coreRef.current.style.transform = `scale(${pulse})`;
+      // 🕸️ Crystalline Web Rendering
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = isResonating ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 255, 194, 0.2)';
+      ctx.lineWidth = 0.5;
+
+      for (let i = 0; i < nodules; i++) {
+        const angle = (i / 15) * Math.PI * 2 + (time * 0.0005);
+        const x = canvas.width / 2 + Math.cos(angle) * 180;
+        const y = canvas.height / 2 + Math.sin(angle) * 180;
+
+        // Entangle to Toolbars
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(canvas.width / 2, 60);
+        ctx.stroke();
         
-        // Update glow based on nodule count
-        const glowIntensity = 20 + (nodulesRef.current * 3);
-        coreRef.current.style.filter = `drop-shadow(0 0 ${glowIntensity}px var(--mint-primary, #00FFC2))`;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(canvas.width / 2, canvas.height - 60);
+        ctx.stroke();
+        
+        // Draw nodule point
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = isResonating ? '#FFD700' : '#00FFC2';
+        ctx.fill();
       }
-
-      frameId = requestAnimationFrame(animate);
+      
+      frameIdRef.current = requestAnimationFrame(animate);
     };
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(frameIdRef.current);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [nodules, isResonating]);
 
-    frameId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frameId);
-  }, []);
-
-  const extractNodule = useCallback(() => {
+  const triggerExtraction = useCallback(() => {
     if (nodules < 15) {
-      const next = nodules + 1;
-      setNodules(next);
-      nodulesRef.current = next;
-      
-      // Haptic feedback: escalating intensity
-      if (navigator.vibrate) {
-        const intensity = 30 + (next * 5);
-        navigator.vibrate([intensity, 20, intensity / 2]);
-      }
-      
-      // Critical Mass achieved
-      if (next === 15) {
-        setIsComplete(true);
-        if (navigator.vibrate) {
-          navigator.vibrate([100, 50, 100, 50, 100, 50, 200]);
-        }
+      setNodules(n => n + 1);
+      if (navigator.vibrate) navigator.vibrate([10, 30]);
+      if (nodules === 14) {
+        setIsResonating(true);
+        setShowActionOverlay(true);
+        if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
       }
     }
   }, [nodules]);
 
+  const handleStripeCheckout = async (tier) => {
+    try {
+      // Call backend to create checkout session
+      const res = await fetch(`${API}/api/subscriptions/checkout-subscription`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('zen_token')}`
+        },
+        body: JSON.stringify({ 
+          tier,
+          success_url: `${window.location.origin}/vr/celestial-dome?welcome=true`,
+          cancel_url: window.location.href
+        })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        }
+      } else {
+        console.error('Failed to create checkout session');
+        // Navigate to membership page as fallback
+        navigate('/membership');
+      }
+    } catch (err) {
+      console.error('Stripe checkout error:', err);
+      navigate('/membership');
+    }
+  };
+
+  const handleTopToolbarClick = () => {
+    if (isResonating) {
+      handleStripeCheckout('architect');
+    } else {
+      // Hint to user
+      if (navigator.vibrate) navigator.vibrate([5]);
+    }
+  };
+
+  const handleBottomToolbarClick = () => {
+    if (isResonating) {
+      handleStripeCheckout('seeker');
+    } else {
+      // Navigate to oracle as preview
+      navigate('/oracle');
+    }
+  };
+
   const resetHub = useCallback(() => {
     setNodules(0);
-    nodulesRef.current = 0;
-    setIsComplete(false);
-    if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+    setIsResonating(false);
+    setShowActionOverlay(false);
   }, []);
 
-  const handleNavigation = useCallback((path) => {
-    if (navigator.vibrate) navigator.vibrate([15, 10, 30]);
-    navigate(path);
-  }, [navigate]);
-
-  // Navigation items with paths
-  const navItems = [
-    { label: 'Matrix', path: '/matrix' },
-    { label: 'Oracle', path: '/oracle' },
-    { label: 'Tarot', path: '/tarot' },
-    { label: 'I Ching', path: '/iching' },
-    { label: 'Stars', path: '/stars' },
-    { label: 'Legacy', path: '/legacy' },
-  ];
-
   return (
-    <div className="ether-container" data-testid="enlighten-mint-hub">
+    <div className="quantum-loom" data-testid="enlighten-mint-hub">
+      {/* TOOLBARS: Top (System) & Bottom (Interaction) */}
+      <nav 
+        className={`toolbar top ${isResonating ? 'active' : ''}`}
+        onClick={handleTopToolbarClick}
+        data-testid="toolbar-top"
+      >
+        <span className="toolbar-text">
+          CELESTIAL DOME : SANCTUARY : ARCHITECT ACCESS
+        </span>
+        {isResonating && <span className="toolbar-hint">CLICK TO ASCEND</span>}
+      </nav>
+
+      <div className="matrix-bg" ref={matrixRef} />
+      <canvas 
+        ref={canvasRef} 
+        className="crystalline-canvas"
+        aria-hidden="true"
+      />
+
+      <div 
+        className="hub-core" 
+        onClick={triggerExtraction}
+        data-testid="hub-core"
+      >
+        <div 
+          className="nodule-text" 
+          style={{ filter: isResonating ? 'hue-rotate(270deg)' : 'none' }}
+        >
+          {nodules}
+        </div>
+        <div className="nodule-label">
+          {isResonating ? "INFINITY RESONANCE" : "PULL FROM BASE"}
+        </div>
+        <div className="nodule-progress">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <span 
+              key={i} 
+              className={`progress-dot ${i < nodules ? 'filled' : ''}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Action Overlay when Critical Mass reached */}
+      {showActionOverlay && (
+        <div className="action-overlay" data-testid="action-overlay">
+          <div className="action-panel">
+            <h2>CRITICAL MASS ACHIEVED</h2>
+            <p>15 Nodules Extracted — The Matrix Resonates</p>
+            <div className="action-buttons">
+              <button onClick={() => navigate('/sanctuary')} className="action-btn sanctuary">
+                SANCTUARY
+              </button>
+              <button onClick={() => navigate('/vr/celestial-dome')} className="action-btn vr">
+                ENTER VR DOME
+              </button>
+              <button onClick={() => handleStripeCheckout('architect')} className="action-btn stripe">
+                ARCHITECT KEY
+              </button>
+              <button onClick={resetHub} className="action-btn reset">
+                RESET HUB
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <nav 
+        className={`toolbar bottom ${isResonating ? 'active' : ''}`}
+        onClick={handleBottomToolbarClick}
+        data-testid="toolbar-bottom"
+      >
+        <span className="toolbar-text">
+          ORACLE : TAROT : SEEKER ENTRANCE
+        </span>
+        {!isResonating && <span className="toolbar-hint">PREVIEW ORACLE</span>}
+      </nav>
+
       <style>{`
-        .ether-container { 
-          position: relative; width: 100vw; height: 100vh; overflow: hidden;
-          background: var(--bg-dark-roast, #0a0a0f); 
-          color: var(--mint-primary, #00FFC2); 
-          font-family: 'Inter', -apple-system, sans-serif;
-          perspective: 1200px;
+        .quantum-loom {
+          position: fixed;
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          background: #000;
+          overflow: hidden;
+          font-family: 'Inter', system-ui, sans-serif;
         }
         
-        /* THE SUBSTRATE: Webbed Gears */
-        .gear-substrate { 
-          position: absolute; inset: 0; pointer-events: none; 
-          display: flex; align-items: center; justify-content: center;
-          opacity: 0.2;
-        }
-        .gear { 
+        .matrix-bg {
           position: absolute;
-          border: 2px dashed;
-          border-radius: 50%; 
-          transition: border-color 0.5s;
+          inset: 0;
+          pointer-events: none;
+          z-index: 1;
+          opacity: 0.4;
+          background: 
+            linear-gradient(rgba(0,255,194,0.1) 1px, transparent 1px), 
+            linear-gradient(90deg, rgba(0,255,194,0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
+          transition: transform 0.1s ease-out;
         }
-        .gear-cw { 
-          width: 600px; height: 600px; 
-          border-color: var(--enlighten-purple, #A855F7);
-          transform: rotate(var(--cw, 0rad));
+        
+        .crystalline-canvas {
+          position: absolute;
+          inset: 0;
+          z-index: 100;
+          pointer-events: none;
         }
-        .gear-ccw { 
-          width: 400px; height: 400px; 
-          border-color: var(--mint-primary, #00FFC2);
-          transform: rotate(var(--ccw, 0rad));
+        
+        .toolbar {
+          position: fixed;
+          left: 0;
+          right: 0;
+          height: 60px;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: rgba(10, 10, 10, 0.8);
+          backdrop-filter: blur(10px);
+          color: #FFD700;
+          letter-spacing: 3px;
+          font-size: 0.7rem;
+          transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+          cursor: pointer;
         }
-        .gear-inner {
-          width: 200px; height: 200px;
-          border-color: var(--cafe-gold, #FFD700);
-          transform: rotate(var(--cw, 0rad));
+        
+        .toolbar-text {
+          transition: opacity 0.3s;
+        }
+        
+        .toolbar-hint {
+          font-size: 0.55rem;
+          color: #00FFC2;
+          margin-top: 2px;
+          opacity: 0.7;
+        }
+        
+        .top {
+          top: 0;
+          border-bottom: 1px solid #A855F7;
+          transform: translateY(-10px);
+        }
+        
+        .top:hover, .top.active {
+          transform: translateY(0);
+          background: rgba(168, 85, 247, 0.2);
+        }
+        
+        .bottom {
+          bottom: 0;
+          border-top: 1px solid #00FFC2;
+          transform: translateY(10px);
+        }
+        
+        .bottom:hover, .bottom.active {
+          transform: translateY(0);
+          background: rgba(0, 255, 194, 0.1);
+        }
+        
+        .hub-core {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 500;
+          text-align: center;
+          cursor: pointer;
+          user-select: none;
+        }
+        
+        .hub-core:active .nodule-text {
+          transform: scale(0.95);
+        }
+        
+        .nodule-text {
+          font-size: 10rem;
+          font-weight: 900;
+          color: #FFF;
+          text-shadow: 0 0 30px #00FFC2, 0 0 60px rgba(0, 255, 194, 0.5);
+          line-height: 1;
+          transition: filter 0.5s, transform 0.1s;
+        }
+        
+        .nodule-label {
+          color: #A855F7;
+          margin-top: -20px;
+          font-size: 0.8rem;
+          letter-spacing: 0.2em;
+        }
+        
+        .nodule-progress {
+          display: flex;
+          gap: 6px;
+          justify-content: center;
+          margin-top: 20px;
+        }
+        
+        .progress-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.2);
+          transition: all 0.3s;
+        }
+        
+        .progress-dot.filled {
+          background: #00FFC2;
+          box-shadow: 0 0 8px #00FFC2;
+        }
+        
+        /* Action Overlay */
+        .action-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 2000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.9);
+          animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        .action-panel {
+          text-align: center;
+          padding: 40px;
+          border: 1px solid #A855F7;
+          background: rgba(10, 10, 20, 0.95);
+          max-width: 400px;
+        }
+        
+        .action-panel h2 {
+          color: #FFD700;
+          font-size: 1.2rem;
+          letter-spacing: 0.3em;
+          margin-bottom: 10px;
+        }
+        
+        .action-panel p {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 0.75rem;
+          margin-bottom: 30px;
+        }
+        
+        .action-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        
+        .action-btn {
+          padding: 12px 24px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: transparent;
+          color: white;
+          font-size: 0.7rem;
+          letter-spacing: 0.2em;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-btn.sanctuary:hover {
+          border-color: #00FFC2;
+          color: #00FFC2;
+        }
+        
+        .action-btn.vr:hover {
+          border-color: #A855F7;
+          color: #A855F7;
+        }
+        
+        .action-btn.stripe:hover {
+          border-color: #FFD700;
+          color: #FFD700;
+        }
+        
+        .action-btn.reset {
+          margin-top: 10px;
           opacity: 0.5;
         }
         
-        /* P1 FIX: Pointer interception */
-        .aura-visuals, .gear-substrate, .cosmic-bg { 
-          pointer-events: none !important; 
-          z-index: 1; 
+        .action-btn.reset:hover {
+          opacity: 1;
+          border-color: #EF4444;
+          color: #EF4444;
         }
         
-        /* Central Core */
-        .central-core {
-          position: absolute; top: 50%; left: 50%; 
-          transform: translate(-50%, -50%);
-          z-index: 100; cursor: pointer; text-align: center;
-          pointer-events: auto;
-        }
-        .nodule-count { 
-          font-size: clamp(4rem, 15vw, 10rem); 
-          font-weight: 900; 
-          background: linear-gradient(135deg, var(--mint-primary, #00FFC2), var(--enlighten-purple, #A855F7));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          line-height: 1;
-        }
-        .brand-name { 
-          color: var(--cafe-gold, #FFD700); 
-          letter-spacing: 0.3em; 
-          font-size: clamp(0.6rem, 2vw, 1rem);
-          font-weight: 600;
-          margin-top: 10px;
-        }
-        .hint-text { 
-          font-size: 0.65rem; 
-          opacity: 0.5; 
-          margin-top: 15px;
-          letter-spacing: 0.1em;
-        }
-        
-        /* SmartDock Navigation */
-        .smart-dock {
-          position: absolute; left: 30px; top: 50%; transform: translateY(-50%);
-          display: flex; flex-direction: column; gap: 12px; z-index: 500;
-          pointer-events: auto;
-        }
-        .nav-link { 
-          background: rgba(0,255,194,0.03); 
-          border: 1px solid rgba(0,255,194,0.2);
-          padding: 12px 24px; cursor: pointer; 
-          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          font-size: 0.75rem;
-          letter-spacing: 0.15em;
-          font-weight: 500;
-          border-radius: 4px;
-        }
-        .nav-link:hover { 
-          background: var(--mint-primary, #00FFC2); 
-          color: #000; 
-          transform: translateX(8px);
-          box-shadow: 0 0 20px rgba(0,255,194,0.4);
-        }
-        
-        /* Emergency Stop */
-        .emergency-stop {
-          position: absolute; top: 20px; left: 20px; z-index: 10001;
-          background: rgba(255,0,0,0.1); border: 1px solid #ff4444; 
-          color: #ff4444; cursor: pointer; padding: 8px 16px;
-          font-size: 0.7rem; letter-spacing: 0.1em; font-weight: 600;
-          transition: all 0.3s;
-          border-radius: 4px;
-          pointer-events: auto;
-        }
-        .emergency-stop:hover {
-          background: #ff4444; color: #000;
-        }
-        
-        /* Progress Ring */
-        .progress-ring {
-          position: absolute; top: 20px; right: 20px;
-          width: 60px; height: 60px; z-index: 500;
-        }
-        .progress-text {
-          position: absolute; inset: 0;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 0.8rem; font-weight: 600;
-          color: var(--mint-primary, #00FFC2);
+        /* Mobile adjustments */
+        @media (max-width: 640px) {
+          .nodule-text {
+            font-size: 6rem;
+          }
+          
+          .toolbar {
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+          }
+          
+          .action-panel {
+            margin: 20px;
+            padding: 30px 20px;
+          }
         }
       `}</style>
-
-      {/* BASE LAYER: Webbed Gears */}
-      <div className="gear-substrate" ref={gearRef} aria-hidden="true">
-        <div className="gear gear-cw" />
-        <div className="gear gear-ccw" />
-        <div className="gear gear-inner" />
-      </div>
-
-      {/* ETHER: Central Core */}
-      <div 
-        className="central-core" 
-        ref={coreRef} 
-        onClick={extractNodule}
-        data-testid="central-core"
-      >
-        <div className="nodule-count">{nodules}</div>
-        <div className="brand-name">ENLIGHTEN.MINT.CAFE</div>
-        <p className="hint-text">
-          {nodules === 0 && 'TAP TO EXTRACT FROM BASE LAYER'}
-          {nodules > 0 && nodules < 15 && `${15 - nodules} NODULES REMAINING`}
-          {nodules === 15 && 'CRITICAL MASS ACHIEVED'}
-        </p>
-      </div>
-
-      {/* INTERFACE: SmartDock */}
-      <nav className="smart-dock" data-testid="smart-dock">
-        {navItems.map(item => (
-          <div 
-            key={item.label} 
-            className="nav-link"
-            onClick={() => handleNavigation(item.path)}
-            data-testid={`nav-${item.label.toLowerCase()}`}
-          >
-            {item.label.toUpperCase()}
-          </div>
-        ))}
-      </nav>
-
-      {/* Progress Ring */}
-      <div className="progress-ring" data-testid="progress-ring">
-        <svg viewBox="0 0 60 60">
-          <circle
-            cx="30" cy="30" r="26"
-            fill="none"
-            stroke="rgba(0,255,194,0.1)"
-            strokeWidth="4"
-          />
-          <circle
-            cx="30" cy="30" r="26"
-            fill="none"
-            stroke="var(--mint-primary, #00FFC2)"
-            strokeWidth="4"
-            strokeDasharray={`${(nodules / 15) * 163.36} 163.36`}
-            strokeLinecap="round"
-            transform="rotate(-90 30 30)"
-            style={{ transition: 'stroke-dasharray 0.5s ease' }}
-          />
-        </svg>
-        <div className="progress-text">{nodules}/15</div>
-      </div>
-
-      {/* ACTION OVERLAY */}
-      <ActionOverlay 
-        active={isComplete} 
-        noduleCount={nodules} 
-        onReset={resetHub} 
-      />
-
-      {/* EMERGENCY STOP */}
-      <button 
-        className="emergency-stop"
-        onClick={resetHub}
-        data-testid="emergency-stop"
-      >
-        STOP
-      </button>
     </div>
   );
 }

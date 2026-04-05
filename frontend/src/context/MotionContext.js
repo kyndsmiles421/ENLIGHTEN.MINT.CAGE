@@ -457,11 +457,10 @@ export function MotionProvider({ children }) {
 
 export function useMotionContext() {
   const ctx = useContext(MotionContext);
-  if (!ctx) {
-    // Fallback to direct store access if outside provider
-    return useMotion();
-  }
-  return ctx;
+  const motionStore = useMotion();
+  
+  // Return context if available, otherwise fallback to direct store
+  return ctx || motionStore;
 }
 
 export default MotionStore;
