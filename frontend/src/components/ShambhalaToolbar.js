@@ -1,233 +1,137 @@
 /**
- * SHAMBHALA MASTER MIXER TOOLBAR
- * Logic: Global Physics Override
- * Location: Top of SovereignLab / Floating control panel
+ * SHAMBHALA BOTTOM TOOLBAR
+ * A clean horizontal toolbar at the bottom
+ * Pull-up panels for navigation and mixer
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Eye, Moon, Hexagon, Star, Award, Music, Settings, Home, Compass, Menu, X, ChevronUp } from 'lucide-react';
 
-const ShambhalaToolbar = ({ onSettingsChange, isActive = false }) => {
-  const [settings, setSettings] = useState({
-    goldViscosity: 0.05,
-    silverTension: 0.005,
-    copperConduction: 0.08,
-    rainbowFlow: true,
-    silverWebVisible: true
-  });
+const ShambhalaToolbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [navOpen, setNavOpen] = useState(false);
+  const [mixerOpen, setMixerOpen] = useState(false);
 
-  const [status, setStatus] = useState('SHAMBHALA_FLOW_ACTIVE');
+  const navItems = [
+    { id: 'home', path: '/', icon: Home, label: 'Home' },
+    { id: 'oracle', path: '/oracle', icon: Eye, label: 'Oracle' },
+    { id: 'tarot', path: '/tarot', icon: Moon, label: 'Tarot' },
+    { id: 'iching', path: '/iching', icon: Hexagon, label: 'I Ching' },
+    { id: 'stars', path: '/star-chart', icon: Star, label: 'Stars' },
+    { id: 'legacy', path: '/achievements', icon: Award, label: 'Legacy' },
+  ];
 
-  // Propagate settings to parent/global
-  useEffect(() => {
-    if (onSettingsChange) {
-      onSettingsChange(settings);
-    }
-    // Update global SovereignCore if available
-    if (window.SovereignCore?.CONFIG) {
-      window.SovereignCore.CONFIG.VISCOSITY = settings.goldViscosity;
-      window.SovereignCore.CONFIG.TENSION = settings.copperConduction;
-    }
-  }, [settings, onSettingsChange]);
-
-  const updateGold = useCallback((value) => {
-    const val = parseFloat(value);
-    setSettings(prev => ({ ...prev, goldViscosity: val }));
-    setStatus(`GOLD_VISCOSITY → ${val.toFixed(3)}`);
-  }, []);
-
-  const toggleSilver = useCallback(() => {
-    setSettings(prev => {
-      const newVal = !prev.silverWebVisible;
-      setStatus(newVal ? 'SILVER_WEB_ENABLED' : 'SILVER_WEB_DISABLED');
-      return { ...prev, silverWebVisible: newVal };
-    });
-  }, []);
-
-  const updateCopper = useCallback((value) => {
-    const val = parseFloat(value);
-    setSettings(prev => ({ ...prev, copperConduction: val }));
-    setStatus(`COPPER_CONDUCTION → ${val.toFixed(3)}`);
-  }, []);
-
-  const igniteCopper = useCallback(() => {
-    // Reset conduits - burst particles from center
-    if (window.SovereignCore) {
-      window.SovereignCore.clear?.();
-      window.SovereignCore.burst?.(7);
-      setStatus('CONDUITS_RESET → 7 PARTICLES');
-    }
-  }, []);
-
-  const toggleRainbow = useCallback(() => {
-    setSettings(prev => {
-      const newVal = !prev.rainbowFlow;
-      setStatus(newVal ? 'RAINBOW_FLOW_ACTIVE' : 'RAINBOW_FLOW_PAUSED');
-      return { ...prev, rainbowFlow: newVal };
-    });
-  }, []);
-
-  if (!isActive) return null;
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div id="shambhala-toolbar" data-testid="shambhala-toolbar" style={styles.toolbar}>
-      {/* Gold Control */}
-      <div style={styles.controlGroup}>
-        <label style={styles.label}>
-          <span style={{ color: '#fbc02d' }}>◆</span> GOLD (Boundary)
-        </label>
-        <input
-          type="range"
-          min="0"
-          max="0.5"
-          step="0.01"
-          value={settings.goldViscosity}
-          onChange={(e) => updateGold(e.target.value)}
-          style={styles.slider}
-          data-testid="gold-slider"
-        />
-        <span style={styles.value}>{settings.goldViscosity.toFixed(2)}</span>
-      </div>
+    <>
+      {/* PULL-UP NAVIGATION PANEL */}
+      {navOpen && (
+        <div 
+          className="fixed inset-0 z-[99998]"
+          onClick={() => setNavOpen(false)}
+        >
+          <div 
+            className="absolute bottom-16 left-0 right-0 bg-black/95 border-t border-gold-500/20 p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center gap-4 flex-wrap max-w-md mx-auto">
+              {navItems.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    navigate(item.path);
+                    setNavOpen(false);
+                  }}
+                  className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                    isActive(item.path)
+                      ? 'bg-gold-500/20 text-gold-400'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon size={24} />
+                  <span className="text-xs">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Silver Control */}
-      <div style={styles.controlGroup}>
-        <label style={styles.label}>
-          <span style={{ color: '#C0C0C0' }}>◇</span> SILVER (Web)
-        </label>
+      {/* PULL-UP MIXER PANEL */}
+      {mixerOpen && (
+        <div 
+          className="fixed inset-0 z-[99998]"
+          onClick={() => setMixerOpen(false)}
+        >
+          <div 
+            className="absolute bottom-16 left-0 right-0 bg-black/95 border-t border-teal-500/20 p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="max-w-md mx-auto">
+              <h3 className="text-teal-400 text-sm font-mono mb-3 text-center">SHAMBHALA MIXER</h3>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="flex flex-col items-center">
+                  <label className="text-xs text-white/50 mb-1">GOLD</label>
+                  <input type="range" className="w-full" min="0" max="100" defaultValue="71" />
+                </div>
+                <div className="flex flex-col items-center">
+                  <label className="text-xs text-white/50 mb-1">COPPER</label>
+                  <input type="range" className="w-full" min="0" max="100" defaultValue="50" />
+                </div>
+                <div className="flex flex-col items-center">
+                  <label className="text-xs text-white/50 mb-1">TEAL</label>
+                  <input type="range" className="w-full" min="0" max="100" defaultValue="80" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MAIN BOTTOM TOOLBAR */}
+      <div 
+        className="fixed bottom-0 left-0 right-0 h-14 bg-black/90 border-t border-gold-500/30 flex items-center justify-between px-4 z-[99999]"
+        style={{ backdropFilter: 'blur(10px)' }}
+      >
+        {/* Left: Navigation Toggle */}
         <button
-          onClick={toggleSilver}
-          style={{
-            ...styles.toggleBtn,
-            background: settings.silverWebVisible ? 'rgba(192,192,192,0.3)' : 'transparent'
+          onClick={() => {
+            setNavOpen(!navOpen);
+            setMixerOpen(false);
           }}
-          data-testid="silver-toggle"
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+            navOpen ? 'bg-gold-500/20 text-gold-400' : 'text-white/60 hover:text-white'
+          }`}
         >
-          {settings.silverWebVisible ? 'ON' : 'OFF'}
+          {navOpen ? <X size={20} /> : <Menu size={20} />}
+          <span className="text-xs font-mono hidden sm:inline">NAV</span>
         </button>
-      </div>
 
-      {/* Copper Control */}
-      <div style={styles.controlGroup}>
-        <label style={styles.label}>
-          <span style={{ color: '#B87333' }}>●</span> COPPER (Ground)
-        </label>
-        <input
-          type="range"
-          min="0"
-          max="0.2"
-          step="0.005"
-          value={settings.copperConduction}
-          onChange={(e) => updateCopper(e.target.value)}
-          style={styles.slider}
-          data-testid="copper-slider"
-        />
-        <span style={styles.value}>{settings.copperConduction.toFixed(3)}</span>
-        <button
-          onClick={igniteCopper}
-          style={styles.resetBtn}
-          data-testid="reset-conduits"
-        >
-          RESET
-        </button>
-      </div>
+        {/* Center: App Title */}
+        <div className="flex items-center gap-2">
+          <Compass size={18} className="text-gold-400" />
+          <span className="text-gold-400 font-serif text-sm tracking-wider">SHAMBHALA</span>
+        </div>
 
-      {/* Rainbow Flow */}
-      <div style={styles.controlGroup}>
-        <label style={styles.label}>
-          <span style={{ color: '#ff6b6b' }}>⬡</span> RAINBOW
-        </label>
+        {/* Right: Mixer Toggle */}
         <button
-          onClick={toggleRainbow}
-          style={{
-            ...styles.toggleBtn,
-            background: settings.rainbowFlow 
-              ? 'linear-gradient(90deg, #ff6b6b, #fbc02d, #00ff88, #00ffcc, #6b6bff)' 
-              : 'transparent'
+          onClick={() => {
+            setMixerOpen(!mixerOpen);
+            setNavOpen(false);
           }}
-          data-testid="rainbow-toggle"
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+            mixerOpen ? 'bg-teal-500/20 text-teal-400' : 'text-white/60 hover:text-white'
+          }`}
         >
-          {settings.rainbowFlow ? 'FLOW' : 'PAUSE'}
+          <Music size={20} />
+          <span className="text-xs font-mono hidden sm:inline">MIXER</span>
         </button>
       </div>
-
-      {/* Status Display */}
-      <div style={styles.statusDisplay} data-testid="shambhala-status">
-        STATUS: {status}
-      </div>
-    </div>
+    </>
   );
-};
-
-const styles = {
-  toolbar: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '50px',
-    borderBottom: '3px solid #fbc02d',
-    background: 'rgba(0, 0, 0, 0.95)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 20px',
-    zIndex: 9999,
-    fontFamily: "'SF Mono', monospace",
-    fontSize: '11px',
-    backdropFilter: 'blur(10px)'
-  },
-  controlGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  label: {
-    color: 'rgba(255,255,255,0.7)',
-    letterSpacing: '0.05em',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px'
-  },
-  slider: {
-    width: '80px',
-    height: '4px',
-    appearance: 'none',
-    background: 'rgba(255,255,255,0.2)',
-    borderRadius: '2px',
-    cursor: 'pointer'
-  },
-  value: {
-    color: '#00FFCC',
-    minWidth: '45px',
-    textAlign: 'right'
-  },
-  toggleBtn: {
-    padding: '4px 12px',
-    border: '1px solid rgba(255,255,255,0.3)',
-    borderRadius: '4px',
-    color: 'white',
-    cursor: 'pointer',
-    fontSize: '10px',
-    letterSpacing: '0.1em',
-    transition: 'all 0.2s'
-  },
-  resetBtn: {
-    padding: '4px 10px',
-    border: '1px solid #B87333',
-    borderRadius: '4px',
-    background: 'rgba(184,115,51,0.2)',
-    color: '#B87333',
-    cursor: 'pointer',
-    fontSize: '10px',
-    letterSpacing: '0.05em'
-  },
-  statusDisplay: {
-    color: '#00FFCC',
-    letterSpacing: '0.1em',
-    padding: '6px 12px',
-    border: '1px solid rgba(0,255,204,0.3)',
-    borderRadius: '4px',
-    background: 'rgba(0,255,204,0.05)'
-  }
 };
 
 export default ShambhalaToolbar;

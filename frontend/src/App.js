@@ -27,6 +27,7 @@ import { Toaster } from 'sonner';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import SmartDock from './components/SmartDock';
+import ShambhalaToolbar from './components/ShambhalaToolbar';
 import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
@@ -307,52 +308,12 @@ function CafeApp() {
         <AnimatedRoutes />
         {!isSovereignRoute && (
           <>
-            <MantraOverlay />
-            <LatencyHUD />
-            <SmartDock />
-            <LearningToggle />
-            <CosmicMixer isOpen={mixerOpen} onToggle={() => setMixerOpen(!mixerOpen)} />
-            <CosmicToolbar />
-            <CosmicAssistant isOpen={assistantOpen} onToggle={() => setAssistantOpen(!assistantOpen)} hideTrigger />
-            <PersistentWaveform />
-            <OrbCorner />
-            <TrialGraduation />
-            <InstallPrompt />
-            <CreditNudge />
-            <MissionControlRing />
-            <OrbitalNavigation />
-            <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
+            {/* CLEAN SHAMBHALA BOTTOM TOOLBAR — replaces all cluttered UI */}
+            <ShambhalaToolbar />
+            
+            {/* Keep only essential overlays */}
             <EmergencyShutOff />
-            <TieredNavigation />
-            <ZeroPointExperience />
-            <GlowPortal />
-            <UniversalCommand />
-            <PulseEchoVisualizer />
-            <CafeSettingsToggle onClick={() => setCafeSettingsOpen(true)} />
-            {/* Unified Utility Dock — replaces cluttered bottom-right widgets */}
-            <UtilityDock
-              onOpenAssistant={() => setAssistantOpen(true)}
-              onOpenMixer={() => setMixerOpen(true)}
-              onOpenCommand={() => setCommandOpen(true)}
-              assistantOpen={assistantOpen}
-              mixerOpen={mixerOpen}
-            />
-          </>
-        )}
-        {!isSovereignRoute && (
-          <>
-            {/* Quick Nebula Toggle in bottom-left (compact) */}
-            <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
-              <NebulaViewToggle compact />
-            </div>
-            {/* Crystal Resonance Badge — shows current frequency */}
-            <div className="fixed bottom-4 left-40 z-[9980]" data-testid="crystal-resonance-badge">
-              <CrystalBadge />
-            </div>
-            {/* Sage System — Expert Advisors */}
-            <QuestHUD />
-            <SageAvatar />
-            <SageAudience />
+            <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
           </>
         )}
       </div>
