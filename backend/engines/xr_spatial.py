@@ -36,6 +36,7 @@ VISUAL MANIFESTS:
 import math
 import time
 import hashlib
+import uuid
 import logging
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
@@ -91,17 +92,30 @@ class ARNode:
     
     The seed's 72-bit hash becomes a unique identifier for this location,
     creating a permanent link between the digital realm and physical space.
+    
+    RPG MECHANICS:
+    - Seeds can be HARVESTED when user is within ~11 meters (0.0001 degrees)
+    - Harvesting grants resonance points based on frequency
+    - Once harvested, the node remains but is marked as collected
     """
     id: str  # 72-bit seed hash
+    node_id: str  # Short UUID for quick reference
     coordinates: Dict[str, float]  # {"lat": float, "lon": float}
     visual_manifest: str
     resonance: float
     white_light_multiplier: float
+    radiance: str = "Infinite"  # RPG radiance state
     
     # Metadata
     created_at: float = field(default_factory=time.time)
     created_by: Optional[str] = None
     source_module: str = "Unknown"
+    
+    # RPG Harvest State
+    is_harvested: bool = False
+    harvested_by: Optional[str] = None
+    harvested_at: Optional[float] = None
+    harvest_bonus: float = 0.0
     
     # Interaction stats
     total_approaches: int = 0
@@ -111,13 +125,19 @@ class ARNode:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
+            "node_id": self.node_id,
             "coordinates": self.coordinates,
             "visual_manifest": self.visual_manifest,
             "resonance": self.resonance,
             "white_light_multiplier": self.white_light_multiplier,
+            "radiance": self.radiance,
             "created_at": self.created_at,
             "created_by": self.created_by,
             "source_module": self.source_module,
+            "is_harvested": self.is_harvested,
+            "harvested_by": self.harvested_by,
+            "harvested_at": self.harvested_at,
+            "harvest_bonus": self.harvest_bonus,
             "total_approaches": self.total_approaches,
             "total_resonance_captured": self.total_resonance_captured,
             "last_visited": self.last_visited,
@@ -155,14 +175,20 @@ class XRSpatialEngine:
     def __init__(self):
         # Tracking AR anchor points in the real world
         self.active_ar_nodes: List[ARNode] = []
+        self.world_nodes: Dict[str, ARNode] = {}  # Quick lookup by node_id
         self.vr_environment_state: VREnvironment = VREnvironment.SANCTUARY_STANDARD
         
         # User tracking (for VR proximity)
         self.user_positions: Dict[str, Tuple[float, float]] = {}
         
-        # Statistics
+        # RPG Stats
         self.total_anchors_minted = 0
         self.total_proximity_calculations = 0
+        self.total_harvests = 0
+        self.total_resonance_harvested = 0.0
+        
+        # Harvest threshold: ~11 meters (0.0001 degrees latitude)
+        self.HARVEST_THRESHOLD = 0.0001
         
         logger.info("🌐 [XRSpatialEngine] Initialized - Phygital Bridge Active")
     
@@ -180,9 +206,10 @@ class XRSpatialEngine:
         user_id: Optional[str] = None,
     ) -> ARNode:
         """
-        Mints a Physical Anchor.
+        Mints a Physical Anchor (drops a seed at GPS coordinates).
         
         The 72-bit Seed becomes a visible 3D object in AR at these coordinates.
+        Seeds can be HARVESTED when users walk within ~11 meters.
         
         Args:
             seed_hash: 72-bit seed from Crystal transition
@@ -195,6 +222,9 @@ class XRSpatialEngine:
         Returns:
             ARNode with full anchor data
         """
+        # Generate short node_id for quick reference
+        node_id = str(uuid.uuid4())[:8]
+        
         # Determine visual manifest based on resonance
         manifest = get_manifest_for_frequency(resonance)
         
@@ -208,23 +238,36 @@ class XRSpatialEngine:
         else:
             white_light = 1.0
         
+        # Determine radiance tier
+        if resonance >= 900:
+            radiance = "Infinite"
+        elif resonance >= 700:
+            radiance = "Radiant"
+        elif resonance >= 400:
+            radiance = "Luminous"
+        else:
+            radiance = "Dim"
+        
         # Create anchor
         anchor = ARNode(
             id=seed_hash,
+            node_id=node_id,
             coordinates={"lat": lat, "lon": lon},
             visual_manifest=manifest.value,
             resonance=resonance,
             white_light_multiplier=white_light,
+            radiance=radiance,
             created_by=user_id,
             source_module=source_module,
         )
         
         self.active_ar_nodes.append(anchor)
+        self.world_nodes[node_id] = anchor  # Quick lookup by node_id
         self.total_anchors_minted += 1
         
         logger.info(
             f"📍 [AR] Seed {seed_hash[:12]}... anchored at ({lat:.4f}, {lon:.4f}) "
-            f"| {manifest.value} @ {resonance}Hz"
+            f"| {manifest.value} @ {resonance}Hz | Node: {node_id}"
         )
         
         return anchor
@@ -379,6 +422,192 @@ class XRSpatialEngine:
         }
     
     # ─────────────────────────────────────────────────────────────────────────
+    # RPG HARVESTING: Collect Seeds by Walking Close
+    # ─────────────────────────────────────────────────────────────────────────
+    
+    def calculate_proximity_bonus(
+        self, 
+        user_lat: float, 
+        user_lon: float, 
+        node_id: str
+    ) -> Dict[str, Any]:
+        """
+        Calculate proximity bonus for a specific node.
+        
+        As you walk toward a node, the 'Spiral Torque' increases.
+        If you're within 0.0001 degrees (~11 meters), you can HARVEST.
+        
+        Returns:
+            Dict with torque, distance, and can_harvest flag
+        """
+        node = self.world_nodes.get(node_id)
+        if not node:
+            return {"error": "Node not found", "torque": 0, "can_harvest": False}
+        
+        # Calculate simple Euclidean distance in degrees
+        dist = math.sqrt(
+            (user_lat - node.coordinates['lat']) ** 2 + 
+            (user_lon - node.coordinates['lon']) ** 2
+        )
+        
+        # The 'Pull': Gravitational torque
+        torque = 1.0 / (dist + 0.00001)
+        
+        # Can harvest if within threshold (~11 meters)
+        can_harvest = dist <= self.HARVEST_THRESHOLD and not node.is_harvested
+        
+        # Approximate distance in meters (rough: 1 degree ≈ 111km at equator)
+        distance_meters = dist * 111000
+        
+        return {
+            "node_id": node_id,
+            "seed_id": node.id,
+            "torque": torque,
+            "distance_degrees": dist,
+            "distance_meters": distance_meters,
+            "can_harvest": can_harvest,
+            "is_harvested": node.is_harvested,
+            "resonance": node.resonance,
+            "visual_manifest": node.visual_manifest,
+        }
+    
+    def harvest_seed(
+        self,
+        user_id: str,
+        user_lat: float,
+        user_lon: float,
+        node_id: str
+    ) -> Dict[str, Any]:
+        """
+        HARVEST A SEED: Collect resonance points by walking to it.
+        
+        Requirements:
+        - Must be within ~11 meters (0.0001 degrees)
+        - Seed must not already be harvested
+        
+        Rewards:
+        - Resonance points based on frequency
+        - Bonus multiplier based on radiance tier
+        
+        Returns:
+            Dict with harvest result, rewards, and updated node state
+        """
+        node = self.world_nodes.get(node_id)
+        if not node:
+            return {"success": False, "error": "Node not found"}
+        
+        if node.is_harvested:
+            return {
+                "success": False, 
+                "error": "Already harvested",
+                "harvested_by": node.harvested_by,
+                "harvested_at": node.harvested_at,
+            }
+        
+        # Check proximity
+        dist = math.sqrt(
+            (user_lat - node.coordinates['lat']) ** 2 + 
+            (user_lon - node.coordinates['lon']) ** 2
+        )
+        
+        if dist > self.HARVEST_THRESHOLD:
+            distance_meters = dist * 111000
+            return {
+                "success": False,
+                "error": f"Too far away ({distance_meters:.1f}m). Walk closer!",
+                "distance_meters": distance_meters,
+                "threshold_meters": self.HARVEST_THRESHOLD * 111000,
+            }
+        
+        # Calculate harvest rewards
+        base_resonance = node.resonance
+        
+        # Radiance multiplier
+        radiance_multipliers = {
+            "Infinite": 10.0,
+            "Radiant": 5.0,
+            "Luminous": 2.0,
+            "Dim": 1.0,
+        }
+        multiplier = radiance_multipliers.get(node.radiance, 1.0)
+        
+        # Final harvest bonus
+        harvest_bonus = base_resonance * multiplier
+        
+        # Mark as harvested
+        node.is_harvested = True
+        node.harvested_by = user_id
+        node.harvested_at = time.time()
+        node.harvest_bonus = harvest_bonus
+        node.total_resonance_captured += harvest_bonus
+        
+        # Update global stats
+        self.total_harvests += 1
+        self.total_resonance_harvested += harvest_bonus
+        
+        logger.info(
+            f"🌾 [HARVEST] User {user_id} collected {node_id} | "
+            f"+{harvest_bonus:.0f} resonance ({node.radiance})"
+        )
+        
+        return {
+            "success": True,
+            "message": f"Seed harvested! +{harvest_bonus:.0f} resonance",
+            "node_id": node_id,
+            "seed_id": node.id,
+            "harvest_bonus": harvest_bonus,
+            "base_resonance": base_resonance,
+            "radiance": node.radiance,
+            "multiplier": multiplier,
+            "visual_manifest": node.visual_manifest,
+            "harvested_at": node.harvested_at,
+        }
+    
+    def get_harvestable_nodes(
+        self,
+        user_lat: float,
+        user_lon: float,
+        radius_degrees: float = 0.01  # ~1.1 km default
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all nodes within range that can be harvested.
+        
+        Returns list of nodes with their proximity data.
+        """
+        harvestable = []
+        
+        for node_id, node in self.world_nodes.items():
+            if node.is_harvested:
+                continue
+                
+            dist = math.sqrt(
+                (user_lat - node.coordinates['lat']) ** 2 + 
+                (user_lon - node.coordinates['lon']) ** 2
+            )
+            
+            if dist <= radius_degrees:
+                torque = 1.0 / (dist + 0.00001)
+                can_harvest = dist <= self.HARVEST_THRESHOLD
+                
+                harvestable.append({
+                    "node_id": node_id,
+                    "seed_id": node.id,
+                    "coordinates": node.coordinates,
+                    "distance_degrees": dist,
+                    "distance_meters": dist * 111000,
+                    "torque": torque,
+                    "can_harvest": can_harvest,
+                    "resonance": node.resonance,
+                    "radiance": node.radiance,
+                    "visual_manifest": node.visual_manifest,
+                })
+        
+        # Sort by distance (closest first)
+        harvestable.sort(key=lambda x: x["distance_degrees"])
+        
+        return harvestable
+    
+    # ─────────────────────────────────────────────────────────────────────────
     # VR ENVIRONMENT MANAGEMENT
     # ─────────────────────────────────────────────────────────────────────────
     
@@ -440,7 +669,10 @@ class XRSpatialEngine:
     # ─────────────────────────────────────────────────────────────────────────
     
     def get_stats(self) -> Dict[str, Any]:
-        """Get engine statistics."""
+        """Get engine statistics including RPG harvesting data."""
+        harvested_count = sum(1 for n in self.active_ar_nodes if n.is_harvested)
+        unharvested_count = len(self.active_ar_nodes) - harvested_count
+        
         return {
             "total_anchors": len(self.active_ar_nodes),
             "total_minted": self.total_anchors_minted,
@@ -448,6 +680,14 @@ class XRSpatialEngine:
             "active_users": len(self.user_positions),
             "vr_environment": self.vr_environment_state.value,
             "manifests_distribution": self._get_manifest_distribution(),
+            # RPG Stats
+            "rpg": {
+                "total_harvests": self.total_harvests,
+                "total_resonance_harvested": self.total_resonance_harvested,
+                "harvested_nodes": harvested_count,
+                "unharvested_nodes": unharvested_count,
+                "harvest_threshold_meters": self.HARVEST_THRESHOLD * 111000,
+            }
         }
     
     def _get_manifest_distribution(self) -> Dict[str, int]:

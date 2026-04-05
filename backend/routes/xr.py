@@ -1,6 +1,6 @@
 """
-XR SPATIAL API: AR Anchoring & VR Proximity Routes
-====================================================
+XR SPATIAL API: AR Anchoring, VR Proximity & RPG Harvesting
+============================================================
 
 Exposes the XR Spatial Engine for phygital experiences.
 
@@ -12,6 +12,9 @@ Endpoints:
 - GET /api/xr/environment - Get current VR environment
 - POST /api/xr/environment - Set VR environment
 - GET /api/xr/stats - Get engine statistics
+- GET /api/xr/rpg/proximity - Calculate proximity bonus for harvesting
+- POST /api/xr/rpg/harvest - Harvest a seed (collect resonance)
+- GET /api/xr/rpg/harvestable - Get all harvestable nodes nearby
 """
 
 from fastapi import APIRouter, HTTPException, Query
@@ -48,13 +51,16 @@ class MintAnchorRequest(BaseModel):
 class AnchorResponse(BaseModel):
     """Response containing AR anchor data."""
     id: str
+    node_id: Optional[str] = None
     coordinates: Dict[str, float]
     visual_manifest: str
     resonance: float
     white_light_multiplier: float
+    radiance: str = "Infinite"
     created_at: float
     source_module: str
     total_approaches: int
+    is_harvested: bool = False
 
 
 class PositionUpdateRequest(BaseModel):
@@ -135,13 +141,16 @@ async def mint_ar_anchor(request: MintAnchorRequest):
     
     return AnchorResponse(
         id=anchor.id,
+        node_id=anchor.node_id,
         coordinates=anchor.coordinates,
         visual_manifest=anchor.visual_manifest,
         resonance=anchor.resonance,
         white_light_multiplier=anchor.white_light_multiplier,
+        radiance=anchor.radiance,
         created_at=anchor.created_at,
         source_module=anchor.source_module,
         total_approaches=anchor.total_approaches,
+        is_harvested=anchor.is_harvested,
     )
 
 
@@ -355,3 +364,169 @@ async def get_stats():
     """Get XR engine statistics."""
     engine = get_xr_engine()
     return engine.get_stats()
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RPG HARVESTING ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class HarvestRequest(BaseModel):
+    """Request to harvest a seed."""
+    user_id: str = Field(..., description="User identifier")
+    node_id: str = Field(..., description="Node ID to harvest")
+    lat: float = Field(..., ge=-90, le=90, description="User latitude")
+    lon: float = Field(..., ge=-180, le=180, description="User longitude")
+
+
+class ProximityBonusResponse(BaseModel):
+    """Response for proximity bonus calculation."""
+    node_id: str
+    seed_id: str
+    torque: float
+    distance_degrees: float
+    distance_meters: float
+    can_harvest: bool
+    is_harvested: bool
+    resonance: float
+    visual_manifest: str
+
+
+class HarvestResponse(BaseModel):
+    """Response from harvesting a seed."""
+    success: bool
+    message: str
+    node_id: Optional[str] = None
+    seed_id: Optional[str] = None
+    harvest_bonus: Optional[float] = None
+    base_resonance: Optional[float] = None
+    radiance: Optional[str] = None
+    multiplier: Optional[float] = None
+    error: Optional[str] = None
+
+
+@router.get("/rpg/proximity", response_model=ProximityBonusResponse)
+async def get_proximity_bonus(
+    node_id: str = Query(..., description="Node ID"),
+    lat: float = Query(..., ge=-90, le=90),
+    lon: float = Query(..., ge=-180, le=180),
+):
+    """
+    CALCULATE PROXIMITY BONUS for a specific node.
+    
+    As you walk toward a node, the Spiral Torque increases.
+    If within ~11 meters (0.0001 degrees), you can HARVEST.
+    
+    Use this to show proximity indicators in the AR UI.
+    """
+    engine = get_xr_engine()
+    result = engine.calculate_proximity_bonus(lat, lon, node_id)
+    
+    if "error" in result:
+        raise HTTPException(status_code=404, detail=result["error"])
+    
+    return ProximityBonusResponse(**result)
+
+
+@router.post("/rpg/harvest", response_model=HarvestResponse)
+async def harvest_seed(request: HarvestRequest):
+    """
+    HARVEST A SEED: Walk to it and collect resonance points!
+    
+    Requirements:
+    - Must be within ~11 meters of the node
+    - Seed must not already be harvested
+    
+    Rewards are based on:
+    - Base resonance (frequency in Hz)
+    - Radiance tier multiplier:
+      - Infinite (900+ Hz): 10x
+      - Radiant (700-900 Hz): 5x
+      - Luminous (400-700 Hz): 2x
+      - Dim (0-400 Hz): 1x
+    """
+    engine = get_xr_engine()
+    result = engine.harvest_seed(
+        user_id=request.user_id,
+        user_lat=request.lat,
+        user_lon=request.lon,
+        node_id=request.node_id,
+    )
+    
+    return HarvestResponse(
+        success=result.get("success", False),
+        message=result.get("message", result.get("error", "Unknown error")),
+        node_id=result.get("node_id"),
+        seed_id=result.get("seed_id"),
+        harvest_bonus=result.get("harvest_bonus"),
+        base_resonance=result.get("base_resonance"),
+        radiance=result.get("radiance"),
+        multiplier=result.get("multiplier"),
+        error=result.get("error"),
+    )
+
+
+@router.get("/rpg/harvestable")
+async def get_harvestable_nodes(
+    lat: float = Query(..., ge=-90, le=90),
+    lon: float = Query(..., ge=-180, le=180),
+    radius_km: float = Query(default=1.0, ge=0.1, le=50),
+):
+    """
+    Get all harvestable nodes near the user's position.
+    
+    Returns nodes sorted by distance (closest first),
+    with proximity torque and harvest eligibility.
+    
+    Perfect for building a "nearby seeds" radar UI.
+    """
+    engine = get_xr_engine()
+    
+    # Convert km to degrees (rough: 1 km ≈ 0.009 degrees)
+    radius_degrees = radius_km * 0.009
+    
+    harvestable = engine.get_harvestable_nodes(lat, lon, radius_degrees)
+    
+    return {
+        "user_position": {"lat": lat, "lon": lon},
+        "radius_km": radius_km,
+        "nodes": harvestable,
+        "total_harvestable": len(harvestable),
+        "harvest_threshold_meters": engine.HARVEST_THRESHOLD * 111000,
+    }
+
+
+@router.get("/rpg/leaderboard")
+async def get_harvest_leaderboard(limit: int = Query(default=10, ge=1, le=100)):
+    """
+    Get the top harvesters by total resonance collected.
+    
+    (Note: This is a placeholder - would need user tracking DB integration)
+    """
+    engine = get_xr_engine()
+    
+    # Aggregate by harvested_by
+    harvester_totals: Dict[str, float] = {}
+    for node in engine.active_ar_nodes:
+        if node.is_harvested and node.harvested_by:
+            harvester_totals[node.harvested_by] = (
+                harvester_totals.get(node.harvested_by, 0) + node.harvest_bonus
+            )
+    
+    # Sort by total
+    sorted_harvesters = sorted(
+        harvester_totals.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:limit]
+    
+    return {
+        "leaderboard": [
+            {"user_id": user_id, "total_resonance": total}
+            for user_id, total in sorted_harvesters
+        ],
+        "global_stats": {
+            "total_harvests": engine.total_harvests,
+            "total_resonance_harvested": engine.total_resonance_harvested,
+        }
+    }
