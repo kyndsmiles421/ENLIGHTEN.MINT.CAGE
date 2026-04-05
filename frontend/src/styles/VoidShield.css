@@ -276,6 +276,26 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   SHAMBHALA MISSION CIRCLE (66px White Vessel)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#shambhala-mission-control button,
+#shambhala-mission-circle {
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+#shambhala-mission-control button:active,
+#shambhala-mission-circle:active {
+  transform: scale(0.92);
+  transition: transform 0.1s ease-out;
+}
+
+#shambhala-mission-control button:hover,
+#shambhala-mission-circle:hover {
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SHAMBHALA MIXER POINTER EVENTS
    ═══════════════════════════════════════════════════════════════════════════ */
 
