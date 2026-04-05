@@ -3066,3 +3066,45 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
 [id*="Matrix"]:not([id*="friction"]) {
   display: none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NUCLEAR OPTION: REMOVE ALL BOTTOM-LEFT CLUTTER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Kill EVERYTHING in bottom-left corner */
+.fixed.bottom-0.left-0,
+.fixed.bottom-1.left-0,
+.fixed.bottom-2.left-0,
+.fixed.bottom-3.left-0,
+.fixed.bottom-4.left-0,
+.fixed.bottom-4.left-4,
+.fixed.bottom-5.left-0,
+.fixed.bottom-5.left-5,
+.fixed.bottom-6.left-0,
+.fixed.bottom-8.left-0,
+[style*="bottom"][style*="left"]:not(.shambhala-toolbar):not([class*="ShambhalaToolbar"]),
+.green-dot,
+[class*="nebula-toggle"],
+[class*="crystal-badge"],
+[class*="quest-hud"],
+[class*="version-badge"],
+[data-testid*="nebula"],
+[data-testid*="crystal"],
+[data-testid*="quest"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  bottom: -9999px !important;
+}
+
+/* Ensure SHAMBHALA toolbar is ABOVE the Emergent badge */
+[class*="ShambhalaToolbar"],
+.shambhala-toolbar {
+  bottom: 50px !important;
+  z-index: 999999 !important;
+}
