@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 
 const TempoContext = createContext(null);
 
@@ -128,12 +128,14 @@ export function TempoProvider({ children }) {
     setTapTimes([]);
   }, []);
 
+  const contextValue = useMemo(() => ({
+    bpm, setBpm: setTempoBpm, activePreset, setTempoFromPreset,
+    tapTempo, stopTempo, beatPulse, connectToGains,
+    TEMPO_PRESETS,
+  }), [bpm, setTempoBpm, activePreset, setTempoFromPreset, tapTempo, stopTempo, beatPulse, connectToGains]);
+
   return (
-    <TempoContext.Provider value={{
-      bpm, setBpm: setTempoBpm, activePreset, setTempoFromPreset,
-      tapTempo, stopTempo, beatPulse, connectToGains,
-      TEMPO_PRESETS,
-    }}>
+    <TempoContext.Provider value={contextValue}>
       {children}
     </TempoContext.Provider>
   );

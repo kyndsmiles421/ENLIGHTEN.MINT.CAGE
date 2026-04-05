@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
@@ -30,8 +30,12 @@ export function CosmicStateProvider({ children }) {
     }
   }, [token, authHeaders, cosmicState]);
 
+  const contextValue = useMemo(() => ({
+    cosmicState, loading, fetchCosmicState
+  }), [cosmicState, loading, fetchCosmicState]);
+
   return (
-    <CosmicStateContext.Provider value={{ cosmicState, loading, fetchCosmicState }}>
+    <CosmicStateContext.Provider value={contextValue}>
       {children}
     </CosmicStateContext.Provider>
   );

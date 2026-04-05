@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -110,12 +110,14 @@ export function TreasuryProvider({ children }) {
     }
   }, [token, authHeaders]);
 
+  const contextValue = useMemo(() => ({
+    balance, dust, gems, hubData, loading,
+    refreshBalance, purchaseConstellation,
+    refreshHubWallet, earnDust, transmute,
+  }), [balance, dust, gems, hubData, loading, refreshBalance, purchaseConstellation, refreshHubWallet, earnDust, transmute]);
+
   return (
-    <TreasuryContext.Provider value={{
-      balance, dust, gems, hubData, loading,
-      refreshBalance, purchaseConstellation,
-      refreshHubWallet, earnDust, transmute,
-    }}>
+    <TreasuryContext.Provider value={contextValue}>
       {children}
     </TreasuryContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 
 /**
  * EnlightenmentCafeContext — The Digital Sanctuary Theme Engine
@@ -273,7 +273,7 @@ export function EnlightenmentCafeProvider({ children }) {
     }
   }, [viewTier, colorMode, atmosphere.warmGlow, getPalette, getTypography]);
 
-  const value = {
+  const value = useMemo(() => ({
     // State
     viewTier,
     colorMode,
@@ -298,7 +298,10 @@ export function EnlightenmentCafeProvider({ children }) {
     NEBULA_PALETTE,
     CAFE_TYPOGRAPHY,
     CAFE_ZONES,
-  };
+  }), [
+    viewTier, colorMode, activeZone, atmosphere, getPalette, getTypography,
+    toggleViewTier, toggleColorMode, updateAtmosphere, focusZone, clearZoneFocus
+  ]);
 
   return (
     <EnlightenmentCafeContext.Provider value={value}>

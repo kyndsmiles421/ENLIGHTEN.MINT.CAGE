@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 
 /**
  * MeshNetworkContext — Decentralized Navigation & State Architecture
@@ -656,7 +656,8 @@ export function MeshNetworkProvider({ children }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [commandOverlayOpen]);
 
-  const value = {
+  // Memoize context value to prevent infinite re-renders
+  const value = useMemo(() => ({
     // State
     currentNode,
     glowPortals,
@@ -695,7 +696,13 @@ export function MeshNetworkProvider({ children }) {
     CATEGORY_COLORS,
     PULSE_TYPES,
     SYMPATHY_CONFIG,
-  };
+  }), [
+    currentNode, glowPortals, pulseQueue, edgeStates, meshHistory, commandOverlayOpen,
+    activeEchoes, sympathyMap, bridgeConnections, registerNode, sendPulse, subscribeToPulses,
+    triggerGlow, dismissGlow, getConnections, getCluster, setEdgeState, getEdgeState,
+    recordTransition, getSymPathyWeight, getSympatheticNodes, showSuggestedPaths,
+    sendPulseEcho, calculatePulseEcho
+  ]);
 
   return (
     <MeshNetworkContext.Provider value={value}>

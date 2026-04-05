@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -132,12 +132,18 @@ export function ModalityProvider({ children }) {
     } catch {}
   }, [token, authHeaders, intensity]);
 
+  const contextValue = useMemo(() => ({
+    modality, modalityData, intensity, intensityData, autoAdvance,
+    learningToggle, loading, switchModality, switchIntensity, setAutoAdvance,
+    setLearningToggle, autoScaleCheck, dismissAutoScale,
+  }), [
+    modality, modalityData, intensity, intensityData, autoAdvance,
+    learningToggle, loading, switchModality, switchIntensity, setAutoAdvance,
+    setLearningToggle, autoScaleCheck, dismissAutoScale
+  ]);
+
   return (
-    <ModalityContext.Provider value={{
-      modality, modalityData, intensity, intensityData, autoAdvance,
-      learningToggle, loading, switchModality, switchIntensity, setAutoAdvance,
-      setLearningToggle, autoScaleCheck, dismissAutoScale,
-    }}>
+    <ModalityContext.Provider value={contextValue}>
       {children}
     </ModalityContext.Provider>
   );

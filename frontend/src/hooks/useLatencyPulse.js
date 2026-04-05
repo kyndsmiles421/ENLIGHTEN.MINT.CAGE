@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LatencyContext = createContext(null);
@@ -65,8 +65,12 @@ export function LatencyProvider({ children }) {
     };
   }, [startPulse, endPulse]);
 
+  const contextValue = useMemo(() => ({
+    pulses, startPulse, endPulse, tracked
+  }), [pulses, startPulse, endPulse, tracked]);
+
   return (
-    <LatencyContext.Provider value={{ pulses, startPulse, endPulse, tracked }}>
+    <LatencyContext.Provider value={contextValue}>
       {children}
     </LatencyContext.Provider>
   );

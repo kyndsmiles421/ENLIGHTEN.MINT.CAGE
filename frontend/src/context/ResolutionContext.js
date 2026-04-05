@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 const RESOLUTION_LEVELS = {
   low: {
@@ -51,8 +51,12 @@ export function ResolutionProvider({ children }) {
     });
   }, []);
 
+  const contextValue = useMemo(() => ({
+    level, setLevel, config, cycleResolution, RESOLUTION_LEVELS
+  }), [level, config, cycleResolution]);
+
   return (
-    <ResolutionContext.Provider value={{ level, setLevel, config, cycleResolution, RESOLUTION_LEVELS }}>
+    <ResolutionContext.Provider value={contextValue}>
       {children}
     </ResolutionContext.Provider>
   );

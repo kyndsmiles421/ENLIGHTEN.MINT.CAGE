@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 
 const SensoryContext = createContext(null);
 
@@ -606,19 +606,29 @@ export function SensoryProvider({ children }) {
   const showFractals = immersion === 'full' && !prefs.reduceParticles;
   const animationSpeed = immersion === 'calm' ? 0 : immersion === 'standard' ? 0.5 : 1;
 
+  // Memoize context value to prevent infinite re-renders
+  const contextValue = useMemo(() => ({
+    ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
+    playConfirmation, playSingingBowl, setAudioTierFromMastery,
+    audioTierConfig: AUDIO_TIERS[prefs.audioTier || 'standard'],
+    prefs, updatePref, themes: THEMES,
+    immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
+    showVisionMode, showFractals, animationSpeed,
+    // Global Audio Engine
+    isMuted, sovereignMuteToggle, sovereignKillAll,
+    audioSources, registerAudioSource, unregisterAudioSource,
+    registerAudioContext, unregisterAudioContext,
+  }), [
+    ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
+    playConfirmation, playSingingBowl, setAudioTierFromMastery, prefs, updatePref,
+    immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
+    showVisionMode, showFractals, animationSpeed, isMuted, sovereignMuteToggle, 
+    sovereignKillAll, audioSources, registerAudioSource, unregisterAudioSource,
+    registerAudioContext, unregisterAudioContext
+  ]);
+
   return (
-    <SensoryContext.Provider value={{
-      ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
-      playConfirmation, playSingingBowl, setAudioTierFromMastery,
-      audioTierConfig: AUDIO_TIERS[prefs.audioTier || 'standard'],
-      prefs, updatePref, themes: THEMES,
-      immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
-      showVisionMode, showFractals, animationSpeed,
-      // Global Audio Engine
-      isMuted, sovereignMuteToggle, sovereignKillAll,
-      audioSources, registerAudioSource, unregisterAudioSource,
-      registerAudioContext, unregisterAudioContext,
-    }}>
+    <SensoryContext.Provider value={contextValue}>
       {children}
     </SensoryContext.Provider>
   );

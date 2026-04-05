@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
@@ -178,13 +178,18 @@ export function VoiceCommandProvider({ children }) {
     };
   }, []);
 
+  const contextValue = useMemo(() => ({
+    isListening, isRecording, isProcessing,
+    wakeWordEnabled, toggleWakeWord,
+    startRecording, stopRecording,
+    lastCommand, lastResponse, commandHistory,
+  }), [
+    isListening, isRecording, isProcessing, wakeWordEnabled, toggleWakeWord,
+    startRecording, stopRecording, lastCommand, lastResponse, commandHistory
+  ]);
+
   return (
-    <VoiceCommandContext.Provider value={{
-      isListening, isRecording, isProcessing,
-      wakeWordEnabled, toggleWakeWord,
-      startRecording, stopRecording,
-      lastCommand, lastResponse, commandHistory,
-    }}>
+    <VoiceCommandContext.Provider value={contextValue}>
       {children}
     </VoiceCommandContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -78,8 +78,12 @@ export function ClassProvider({ children }) {
     return classData.boosted_affinities.includes(affinity);
   }, [classData]);
 
+  const contextValue = useMemo(() => ({
+    activeClass, classData, xp, level, loading, selectClass, addXP, isBoosted
+  }), [activeClass, classData, xp, level, loading, selectClass, addXP, isBoosted]);
+
   return (
-    <ClassContext.Provider value={{ activeClass, classData, xp, level, loading, selectClass, addXP, isBoosted }}>
+    <ClassContext.Provider value={contextValue}>
       {children}
     </ClassContext.Provider>
   );
