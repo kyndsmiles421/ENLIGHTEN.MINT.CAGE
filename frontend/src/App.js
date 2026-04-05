@@ -11,6 +11,7 @@ import './utils/SovereignRefractor';      // Front-end visual layer (Vortex + Pa
 import './utils/SovereignStabilizer';     // Physics: Inverse Attraction + Edge Repulsion
 import './utils/StabilizerCanvas';        // Canvas physics visualizer
 import './utils/RefractionEngine';        // White Light → Rainbow Split → Infinity
+import './utils/SovereignCore';           // V2.88 Unified Core (Refraction + Stabilization + Encryption)
 import './utils/RainbowKeyGenerator';     // Back-end key encryption
 import './utils/SovereignHandshake';      // Bi-directional handshake orchestrator
 
