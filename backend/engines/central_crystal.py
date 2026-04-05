@@ -32,6 +32,8 @@ Higher resistance = more steps = slower transition = deeper contemplation
 
 import asyncio
 import time
+import math
+import hashlib
 from typing import Dict, Tuple, Optional, Callable, List, Any
 from dataclasses import dataclass, field
 from enum import Enum
@@ -73,6 +75,7 @@ class CrystalSource:
     name: str
     frequency: float
     resistance: float  # Keith Wright's 'weight' — higher = slower transition
+    source_type: str = "Balanced"  # Kinetic, Balanced, Nourish, Theological
     description: str = ""
     emoji: str = "🔮"
     color: str = "#10B981"  # Default jade
@@ -80,12 +83,12 @@ class CrystalSource:
     @property
     def transition_steps(self) -> int:
         """Calculate number of transition steps based on resistance."""
-        return int(self.resistance * 10) + 1
+        return int(self.resistance * 20) + 5  # Enhanced spiral steps
     
     @property
     def step_duration(self) -> float:
         """Duration of each transition step in seconds."""
-        return self.resistance / self.transition_steps
+        return 0.05 * (1 + self.resistance)  # Physical resistance factor
 
 
 # Default sources for the Sovereign Interface
@@ -94,54 +97,52 @@ DEFAULT_SOURCES: Dict[str, CrystalSource] = {
         name="Void",
         frequency=0.0,
         resistance=0.1,
+        source_type="Kinetic",
         description="The empty state, the beginning",
         emoji="🌑",
         color="#1a1a2e"
-    ),
-    "Divination": CrystalSource(
-        name="Divination",
-        frequency=888.0,
-        resistance=2.5,
-        description="Oracle wisdom, deep insight",
-        emoji="🔮",
-        color="#8B5CF6"
-    ),
-    "Sanctuary": CrystalSource(
-        name="Sanctuary",
-        frequency=432.0,
-        resistance=1.2,
-        description="Safe space, harmonic balance",
-        emoji="🏛️",
-        color="#10B981"
     ),
     "Breathing": CrystalSource(
         name="Breathing",
         frequency=111.0,
         resistance=0.2,
+        source_type="Kinetic",
         description="Quick centering, kinetic calm",
         emoji="🌬️",
         color="#3B82F6"
     ),
-    "Star_Chart": CrystalSource(
-        name="Star Chart",
-        frequency=777.0,
-        resistance=1.8,
-        description="Celestial navigation, cosmic alignment",
-        emoji="⭐",
-        color="#F59E0B"
+    "Sanctuary": CrystalSource(
+        name="Sanctuary",
+        frequency=432.0,
+        resistance=0.5,
+        source_type="Balanced",
+        description="Safe space, harmonic balance",
+        emoji="🏛️",
+        color="#10B981"
     ),
-    "Oracle": CrystalSource(
-        name="Oracle",
-        frequency=852.0,
-        resistance=2.2,
-        description="Intuitive guidance, inner knowing",
-        emoji="👁️",
-        color="#EC4899"
+    "Herbology": CrystalSource(
+        name="Herbology",
+        frequency=528.0,
+        resistance=0.6,
+        source_type="Nourish",
+        description="Plant wisdom, natural healing",
+        emoji="🌿",
+        color="#22C55E"
+    ),
+    "Mixer": CrystalSource(
+        name="Mixer",
+        frequency=528.0,
+        resistance=0.8,
+        source_type="Balanced",
+        description="Sound synthesis, frequency blending",
+        emoji="🎛️",
+        color="#A855F7"
     ),
     "I_Ching": CrystalSource(
         name="I Ching",
         frequency=639.0,
         resistance=1.5,
+        source_type="Balanced",
         description="Ancient wisdom, hexagram meditation",
         emoji="☯️",
         color="#6366F1"
@@ -150,25 +151,46 @@ DEFAULT_SOURCES: Dict[str, CrystalSource] = {
         name="Tarot",
         frequency=741.0,
         resistance=1.8,
+        source_type="Balanced",
         description="Archetypal journey, symbolic insight",
         emoji="🎴",
         color="#F472B6"
+    ),
+    "Star_Chart": CrystalSource(
+        name="Star Chart",
+        frequency=777.0,
+        resistance=1.8,
+        source_type="Balanced",
+        description="Celestial navigation, cosmic alignment",
+        emoji="⭐",
+        color="#F59E0B"
+    ),
+    "Oracle": CrystalSource(
+        name="Oracle",
+        frequency=852.0,
+        resistance=2.2,
+        source_type="Theological",
+        description="Intuitive guidance, inner knowing",
+        emoji="👁️",
+        color="#EC4899"
+    ),
+    "Divination": CrystalSource(
+        name="Divination",
+        frequency=888.0,
+        resistance=2.5,
+        source_type="Theological",
+        description="Oracle wisdom, deep insight",
+        emoji="🔮",
+        color="#8B5CF6"
     ),
     "Tesseract": CrystalSource(
         name="Tesseract",
         frequency=963.0,
         resistance=2.8,
+        source_type="Theological",
         description="4D navigation, recursive depth",
         emoji="💠",
         color="#22D3EE"
-    ),
-    "Mixer": CrystalSource(
-        name="Mixer",
-        frequency=528.0,
-        resistance=0.8,
-        description="Sound synthesis, frequency blending",
-        emoji="🎛️",
-        color="#A855F7"
     ),
 }
 
@@ -190,6 +212,8 @@ class TransitionState:
     total_steps: int
     started_at: float
     estimated_completion: float
+    torque: float = 0.0  # Spiral gravitation force
+    seed: Optional[str] = None  # 72-bit commemorative seed
     is_complete: bool = False
 
 
@@ -201,6 +225,11 @@ class CentralCrystal:
     """
     The heart of the Enlightenment Cafe.
     Maintains the 'Equilibrium' of the entire system.
+    
+    TORQUE MECHANICS:
+    - Heavier (theological) data creates tighter spirals
+    - Torque = sin(progress * π) * (resistance * 100)
+    - This drives the 3D Lattice rotation on the frontend
     """
     
     def __init__(self, sources: Optional[Dict[str, CrystalSource]] = None):
@@ -208,11 +237,46 @@ class CentralCrystal:
         self.current_frequency = 0.0
         self.active_module = "Void"
         self.is_transitioning = False
+        self.torque = 0.0  # Current spiral gravitation force
         self.transition_state: Optional[TransitionState] = None
         self._subscribers: List[Callable] = []
         self._history: List[Dict[str, Any]] = []
         
         logger.info("💎 [CentralCrystal] Initialized in Void state")
+    
+    # ─────────────────────────────────────────────────────────────────────────
+    # 72-BIT SEED GENERATION (Commemorative Mapping)
+    # ─────────────────────────────────────────────────────────────────────────
+    
+    def _generate_seed(self, module_name: str) -> str:
+        """
+        Generate a 72-bit commemorative seed for this transition.
+        
+        The seed captures:
+        - Module name
+        - Timestamp
+        - Final frequency
+        
+        Returns 18-character hex string (72 bits).
+        """
+        seed_source = f"{module_name}-{time.time()}-{self.current_frequency}"
+        seed_hash = hashlib.sha256(seed_source.encode()).hexdigest()[:18]
+        return seed_hash
+    
+    # ─────────────────────────────────────────────────────────────────────────
+    # TORQUE CALCULATION (Spiral Gravitation)
+    # ─────────────────────────────────────────────────────────────────────────
+    
+    def _calculate_torque(self, progress: float, resistance: float) -> float:
+        """
+        Calculate spiral gravitation force.
+        
+        Heavier (theological) data creates tighter spirals:
+        Torque = sin(progress * π) * (resistance * 100)
+        
+        This drives the 3D Lattice rotation on the frontend.
+        """
+        return math.sin(progress * math.pi) * (resistance * 100)
     
     # ─────────────────────────────────────────────────────────────────────────
     # CORE: Harmonic Pulse
@@ -274,9 +338,9 @@ class CentralCrystal:
         logger.info(f"   Frequency: {from_freq:.2f} Hz -> {target_freq:.2f} Hz")
         logger.info(f"   Resistance: {resistance} (slower = deeper)")
         
-        # Calculate steps (Keith Wright's principle)
-        steps = int(resistance * 10) + 1
-        step_duration = resistance / steps
+        # Calculate steps (Enhanced spiral steps: weight * 20 + 5)
+        steps = int(resistance * 20) + 5
+        step_duration = 0.05 * (1 + resistance)  # Physical resistance factor
         
         # Initialize transition state
         self.transition_state = TransitionState(
@@ -289,45 +353,57 @@ class CentralCrystal:
             step=0,
             total_steps=steps,
             started_at=start_time,
-            estimated_completion=start_time + resistance
+            estimated_completion=start_time + (steps * step_duration),
+            torque=0.0,
         )
         
-        # Gradual frequency shift
-        for i in range(steps):
-            # Calculate interpolation
-            remaining = steps - i
-            delta = (target_freq - self.current_frequency) / remaining
-            self.current_frequency += delta
+        # Gradual frequency shift with SPIRAL GRAVITATION
+        for i in range(steps + 1):
+            progress = i / steps
+            
+            # Calculate TORQUE: Tighter spiral for heavier (theological) data
+            self.torque = self._calculate_torque(progress, resistance)
+            self.transition_state.torque = self.torque
+            
+            # Linear interpolation of frequency
+            self.current_frequency = from_freq + (target_freq - from_freq) * progress
             
             # Update transition state
             self.transition_state.current_frequency = self.current_frequency
             self.transition_state.step = i + 1
-            self.transition_state.progress = (i + 1) / steps
+            self.transition_state.progress = progress
             
-            logger.info(f"✨ [Resonance] Step {i+1}/{steps}: {self.current_frequency:.2f} Hz")
+            logger.info(f"✨ [Resonance] Step {i+1}/{steps}: {self.current_frequency:.2f} Hz | Torque: {self.torque:.1f}°")
             
-            # Emit progress event
+            # Emit progress event with torque
             if emit_events:
                 await self._emit_event("transition_progress", {
                     "step": i + 1,
                     "total_steps": steps,
                     "frequency": self.current_frequency,
-                    "progress": self.transition_state.progress,
+                    "progress": progress,
+                    "torque": self.torque,
                     "target": target_name
                 })
             
-            # Apply resistance delay
+            # Apply physical resistance delay
             await asyncio.sleep(step_duration)
+        
+        # Generate 72-bit commemorative seed
+        seed = self._generate_seed(target_name)
+        self.transition_state.seed = seed
         
         # Complete transition
         self.current_frequency = target_freq
         self.active_module = target_name
         self.is_transitioning = False
+        self.torque = 0.0  # Reset torque
         self.transition_state.is_complete = True
         self.transition_state.current_frequency = target_freq
         self.transition_state.progress = 1.0
+        self.transition_state.torque = 0.0
         
-        # Record in history
+        # Record in history with seed
         self._history.append({
             "from": from_module,
             "to": target_name,
@@ -335,6 +411,7 @@ class CentralCrystal:
             "to_freq": target_freq,
             "resistance": resistance,
             "duration": time.time() - start_time,
+            "seed": seed,
             "timestamp": time.time()
         })
         
@@ -375,17 +452,19 @@ class CentralCrystal:
     # ─────────────────────────────────────────────────────────────────────────
     
     def get_state(self) -> Dict[str, Any]:
-        """Get current crystal state."""
+        """Get current crystal state including torque for 3D lattice."""
         source = self.sources.get(self.active_module)
         return {
             "frequency": self.current_frequency,
             "active_module": self.active_module,
             "is_transitioning": self.is_transitioning,
+            "torque": self.torque,  # Spiral gravitation for 3D lattice
             "source_info": {
                 "name": source.name if source else self.active_module,
                 "emoji": source.emoji if source else "🔮",
                 "color": source.color if source else "#10B981",
                 "description": source.description if source else "",
+                "source_type": source.source_type if source else "Balanced",
             } if source else None,
             "transition": {
                 "from": self.transition_state.from_source,
@@ -393,6 +472,8 @@ class CentralCrystal:
                 "progress": self.transition_state.progress,
                 "step": self.transition_state.step,
                 "total_steps": self.transition_state.total_steps,
+                "torque": self.transition_state.torque,
+                "seed": self.transition_state.seed,
             } if self.transition_state and self.is_transitioning else None
         }
     

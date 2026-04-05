@@ -84,6 +84,7 @@ class CrystalState(BaseModel):
     frequency: float
     active_module: str
     is_transitioning: bool
+    torque: float = 0.0  # Spiral gravitation for 3D lattice
     source_info: Optional[Dict[str, Any]] = None
     transition: Optional[Dict[str, Any]] = None
 
@@ -104,6 +105,7 @@ class PulseRequest(BaseModel):
 class PulseResponse(BaseModel):
     """Response from a pulse operation."""
     success: bool
+    status: str = "ALIGNED"  # GROUNDED, ALIGNED, ELEVATED
     message: str
     from_source: str
     to_source: str
@@ -111,6 +113,8 @@ class PulseResponse(BaseModel):
     to_frequency: float
     steps: int
     duration_seconds: float
+    seed: Optional[str] = None  # 72-bit commemorative seed
+    max_torque: float = 0.0  # Peak spiral gravitation
     guardrail_result: Optional[Dict[str, Any]] = None
 
 
@@ -208,6 +212,7 @@ async def pulse_to_target(request: PulseRequest, background_tasks: BackgroundTas
             )
             return PulseResponse(
                 success=False,
+                status="GROUNDED",
                 message=gr.message,
                 from_source=crystal.active_module,
                 to_source=request.target,
@@ -215,13 +220,26 @@ async def pulse_to_target(request: PulseRequest, background_tasks: BackgroundTas
                 to_frequency=0.0,
                 steps=0,
                 duration_seconds=0.0,
+                seed=None,
+                max_torque=0.0,
                 guardrail_result=guardrail_result,
             )
+    
+    # Determine status based on guardrail resonance
+    status = "ALIGNED"
+    if guardrail_result:
+        if guardrail_result.get("resonance", 0.5) >= 0.8:
+            status = "ELEVATED"
     
     # Step 2: Execute the pulse
     start_time = time.time()
     from_source = crystal.active_module
     from_freq = crystal.current_frequency
+    
+    # Calculate max torque for this resistance
+    source = crystal.sources.get(request.target)
+    resistance = request.resistance or (source.resistance if source else 1.0)
+    max_torque = resistance * 100  # Peak torque at progress=0.5 (sin(π/2)=1)
     
     try:
         transition = await crystal.pulse_to_target(
@@ -235,6 +253,7 @@ async def pulse_to_target(request: PulseRequest, background_tasks: BackgroundTas
         
         return PulseResponse(
             success=True,
+            status=status,
             message=f"Crystal locked into {request.target} Source",
             from_source=from_source,
             to_source=transition.to_source,
@@ -242,6 +261,8 @@ async def pulse_to_target(request: PulseRequest, background_tasks: BackgroundTas
             to_frequency=transition.to_frequency,
             steps=transition.total_steps,
             duration_seconds=duration,
+            seed=transition.seed,
+            max_torque=max_torque,
             guardrail_result=guardrail_result,
         )
         

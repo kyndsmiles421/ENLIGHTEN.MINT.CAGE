@@ -3,32 +3,32 @@
  * ======================
  * 
  * Real-time connection to the Central Crystal backend.
- * Provides frequency state, transition status, and pulse control.
+ * Provides frequency state, torque-based 3D transforms, and pulse control.
  * 
  * ARCHITECTURE:
- * ┌─────────────────────────────────────────────────────────┐
- * │                    Frontend Component                    │
- * │                           │                              │
- * │                    useCrystalResonance()                 │
- * │                      │           │                       │
- * │              poll (150ms)    pulse(intent)               │
- * │                      │           │                       │
- * │                      ▼           ▼                       │
- * │              /api/crystal/state  /api/crystal/pulse      │
- * │                      │           │                       │
- * │                      ▼           ▼                       │
- * │              ┌───────────────────────────┐               │
- * │              │     Central Crystal       │               │
- * │              │   (Backend State Engine)  │               │
- * │              └───────────────────────────┘               │
- * └─────────────────────────────────────────────────────────┘
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │                        Frontend Component                               │
+ * │                              │                                          │
+ * │                    useCrystalResonance()                                │
+ * │                      │           │           │                          │
+ * │              poll (150ms)    pulse()    latticeStyle                   │
+ * │                      │           │           │                          │
+ * │                      ▼           ▼           ▼                          │
+ * │              /api/crystal/*    Backend    CSS Transform                │
+ * │                                                                         │
+ * │   TORQUE MECHANICS:                                                     │
+ * │   - Heavier (theological) data creates tighter spirals                  │
+ * │   - Torque drives 3D Lattice rotation: rotateY(torque°)                │
+ * │   - Scale contracts during transition: scale(1 - torque/500)           │
+ * │   - Blur applied during harmonizing: blur(2px)                         │
+ * └─────────────────────────────────────────────────────────────────────────┘
  * 
  * KEITH WRIGHT'S PRINCIPLE:
  * The hook creates a real-time "resonance link" between the UI
  * and the Crystal's frequency. Changes propagate as harmonic waves.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -40,6 +40,7 @@ const DEFAULT_STATE = {
   torque: 0,
   sourceInfo: null,
   transition: null,
+  seed: null,
 };
 
 /**
@@ -48,7 +49,7 @@ const DEFAULT_STATE = {
  * @param {Object} options Configuration options
  * @param {number} options.pollInterval Polling interval in ms (default: 150ms for smooth 3D)
  * @param {boolean} options.autoConnect Start polling immediately (default: true)
- * @returns {Object} Crystal state and control functions
+ * @returns {Object} Crystal state, control functions, and latticeStyle for 3D transforms
  */
 export const useCrystalResonance = (options = {}) => {
   const { 
@@ -60,9 +61,31 @@ export const useCrystalResonance = (options = {}) => {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState(null);
   const [guardrailResult, setGuardrailResult] = useState(null);
+  const [lastSeed, setLastSeed] = useState(null);
   
   const pollRef = useRef(null);
   const mountedRef = useRef(true);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LATTICE STYLE: 3D Transform based on Torque (for Spherical Codex)
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  const latticeStyle = useMemo(() => ({
+    transform: `rotateY(${resonance.torque}deg) scale(${1 - (resonance.torque / 500)})`,
+    filter: `blur(${resonance.isTransitioning ? '2px' : '0px'})`,
+    transition: 'transform 0.1s ease-out, filter 0.3s ease',
+  }), [resonance.torque, resonance.isTransitioning]);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // VISUAL GROUNDING: Effect when signal is blocked
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  const triggerVisualLeadShed = useCallback(() => {
+    // Dispatch custom event for visual feedback components to listen
+    window.dispatchEvent(new CustomEvent('crystal-grounded', {
+      detail: { guardrailResult }
+    }));
+  }, [guardrailResult]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // PULSE: Send intent to crystal (triggers harmonic transition)
@@ -97,10 +120,21 @@ export const useCrystalResonance = (options = {}) => {
         // Signal was grounded by guardrail
         console.warn('[CrystalResonance] Pulse blocked:', data.message);
         setError({ type: 'grounded', message: data.message, guardrail: data.guardrail_result });
-        return { success: false, ...data };
+        triggerVisualLeadShed();
+        return { success: false, status: 'GROUNDED', ...data };
       }
 
-      console.log(`[CrystalResonance] Pulsed to ${target}:`, data);
+      // Store seed from successful transition
+      if (data.seed) {
+        setLastSeed(data.seed);
+      }
+
+      console.log(`[CrystalResonance] ${data.status}: Pulsed to ${target}`, {
+        seed: data.seed,
+        torque: data.max_torque,
+        duration: data.duration_seconds
+      });
+      
       return { success: true, ...data };
       
     } catch (err) {
@@ -108,7 +142,7 @@ export const useCrystalResonance = (options = {}) => {
       setError({ type: 'network', message: err.message });
       return { success: false, error: err.message };
     }
-  }, []);
+  }, [triggerVisualLeadShed]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // INSTANT: Immediate shift without transition animation
@@ -209,6 +243,7 @@ export const useCrystalResonance = (options = {}) => {
           torque: data.torque || 0,
           sourceInfo: data.source_info,
           transition: data.transition,
+          seed: data.transition?.seed || null,
         });
         setIsConnected(true);
         setError(null);
@@ -275,6 +310,10 @@ export const useCrystalResonance = (options = {}) => {
     error,
     guardrailResult,
     transitionProgress,
+    lastSeed,
+    
+    // 3D Lattice Transform (for Spherical Codex)
+    latticeStyle,
     
     // Actions
     pulse,
@@ -282,6 +321,7 @@ export const useCrystalResonance = (options = {}) => {
     reset,
     analyzeIntent,
     fetchSources,
+    triggerVisualLeadShed,
     
     // Connection control
     startPolling,
