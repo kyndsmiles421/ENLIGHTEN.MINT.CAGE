@@ -276,6 +276,21 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   SHAMBHALA MIXER POINTER EVENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.shambhala-mixer-container {
+  pointer-events: none; /* Let clicks pass through the background */
+}
+
+.shambhala-mixer-container .slider-input, 
+.shambhala-mixer-container button,
+.shambhala-mixer-container input[type="range"],
+.shambhala-mixer-container [role="slider"] {
+  pointer-events: auto; /* Re-enable clicks for the actual controls */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    VERSION BADGE
    ═══════════════════════════════════════════════════════════════════════════ */
 
