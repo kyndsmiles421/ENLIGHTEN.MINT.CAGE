@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
 import './utils/SpectralShield';         // Ghostbuster Purge & Spectral Shield
 import './utils/SanctuaryEngine';        // Pure Light Resonance (ghosts Emergent badge)
+import './utils/EnlightenmentKey';       // Back-Side Pass Key (unlocks layers on ASCEND)
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
