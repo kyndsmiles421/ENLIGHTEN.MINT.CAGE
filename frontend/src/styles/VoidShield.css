@@ -279,8 +279,42 @@ header:not(.sovereign-header),
    SHAMBHALA MISSION CIRCLE (66px White Vessel)
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* THE NUCLEAR PURGE - KILL THE BOTTOM BAR PERMANENTLY */
+[class*="shambhala-toolbar"], 
+[id*="shambhala-toolbar"],
+[class*="crossbar"],
+.shambhala-mixer-container,
+.nav-footer {
+  display: none !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  top: -9999px !important; /* Throw it off the screen entirely */
+}
+
+/* Force the Mission Circle to the front of the line */
+#mission-circle {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 2147483646 !important;
+  pointer-events: auto !important;
+  position: fixed !important;
+  bottom: 100px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  right: auto !important;
+}
+
 #shambhala-mission-control button,
-#shambhala-mission-circle {
+#mission-circle {
   transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 

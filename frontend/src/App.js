@@ -10,6 +10,7 @@ import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (r
 import './utils/SovereignCleanup';       // V2.88 Final - Legacy purge, memory optimization, PWA hooks
 import './utils/WebXRPortal';            // WebXR Portal Engine - Spiral zoom → Immersive Dome
 import './utils/PortalAudioEngine';      // Spatial Audio - Shepard Tone + Solfeggio frequencies
+import './utils/SanctuaryMaster';        // v2.89 Master Engine - Consolidated Layer 0 + Mission Circle
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
@@ -327,12 +328,7 @@ function CafeApp() {
         <AnimatedRoutes />
         {!isSovereignRoute && (
           <>
-            {/* SHAMBHALA FRONT SIDE - The Mission Circle */}
-            <ShambhalaFrontSide />
-            
-            {/* CLEAN SHAMBHALA BOTTOM TOOLBAR */}
-            <ShambhalaToolbar />
-            
+            {/* SanctuaryMaster v2.89 handles Mission Circle via vanilla JS */}
             {/* Keep only essential overlays */}
             <EmergencyShutOff />
             <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
