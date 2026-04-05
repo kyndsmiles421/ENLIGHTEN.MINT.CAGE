@@ -205,6 +205,7 @@ const QuantumLoom = lazy(() => import('./pages/QuantumLoom'));
 const MembershipLoom = lazy(() => import('./pages/MembershipLoom'));
 const Sanctuary = lazy(() => import('./pages/Sanctuary'));
 const CelestialDome = lazy(() => import('./pages/CelestialDome'));
+const SilentSanctuary = lazy(() => import('./pages/SilentSanctuary'));
 const Observatory = lazy(() => import('./pages/Observatory'));
 const Archives = lazy(() => import('./pages/Archives'));
 const SuanpanMixer = lazy(() => import('./pages/SuanpanMixer'));
@@ -465,6 +466,8 @@ function AnimatedRoutes() {
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
         <Route path="/sanctuary" element={<Sanctuary />} />
+        <Route path="/silent-sanctuary" element={<SilentSanctuary />} />
+        <Route path="/void" element={<SilentSanctuary />} />
         <Route path="/vr/celestial-dome" element={<CelestialDome />} />
         <Route path="/observatory" element={<Observatory />} />
         <Route path="/archives" element={<Archives />} />
