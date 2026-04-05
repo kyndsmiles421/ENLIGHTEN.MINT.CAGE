@@ -1,6 +1,7 @@
 /**
  * SOVEREIGN CORE V2.88 - AETHER EDITION (Mirrorless)
  * Logic: Copper Conduit + Perimeter Magnetics + Direct Emission + Total Internal Conduction
+ * + SHAMBHALA GRAVITY (G=0.15)
  * Location: Rapid City / Black Hills Calibration
  */
 
@@ -26,8 +27,48 @@ const SovereignCore = (() => {
     REVERSE_STRENGTH: 1.2,   // Perimeter Magnetics bounce factor
     PERIMETER_THRESHOLD: 0.8, // 80% of R_LIMIT triggers repulsion
     NO_GLASS: true,          // Removes refractive lag (Aether mode)
-    CONDUCTION_GAIN: 1.2     // Energy gain from non-glass surface
+    CONDUCTION_GAIN: 1.2,    // Energy gain from non-glass surface
+    SHAMBHALA_G: 0.15        // Shambhala Gravitational Constant
   };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHAMBHALA CORE (ROOT LEVEL - Replacing Matrix Logic)
+  // Logic: Central Gravity (G=0.15) + Auto-Focus Opacity/Scale
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ❌ ERASED: old Matrix/Grid logic (const grid = new MatrixGrid(47.94))
+  // ✅ INITIALIZED: Shambhala Gravity & Central Pull
+
+  const ShambhalaCore = (() => {
+    const G = 0.15; // Gravity strength
+    const RADIUS_LIMIT = 47.94; // Golden Border
+
+    return {
+      applyGravity: (module) => {
+        // Distance from Black Hills Center (0,0)
+        const dx = 0 - module.x;
+        const dy = 0 - module.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // The 'Squeeze': Gravity pulls in, but Reverse Front Screen pushes out
+        const pull = G * (dist / RADIUS_LIMIT);
+        
+        module.vx += dx * pull;
+        module.vy += dy * pull;
+
+        // AUTO-FOCUS: Modules become 100% opaque and scale up as they hit the center
+        module.opacity = Math.max(0.3, 1 - (dist / RADIUS_LIMIT));
+        module.scale = 1.5 - (dist / RADIUS_LIMIT);
+        
+        return module;
+      },
+      
+      // Legacy compatibility wrapper
+      applyToParticle(particle) {
+        return this.applyGravity(particle);
+      }
+    };
+  })();
 
   // ═══════════════════════════════════════════════════════════════════════════
   // AETHER PHYSICS (Mirrorless - Direct Emission + Total Internal Conduction)
@@ -134,12 +175,17 @@ const SovereignCore = (() => {
       this.vy = 0;
       this.color = CONFIG.TEAL;
       this.depth = depth;
+      this.opacity = 1;    // AUTO-FOCUS opacity
+      this.scale = 1;      // AUTO-FOCUS scale
     }
 
     update(mouseTarget) {
       const dx = mouseTarget.x - this.x;
       const dy = mouseTarget.y - this.y;
       const distFromCenter = Math.sqrt(this.x * this.x + this.y * this.y);
+
+      // 0. SHAMBHALA CORE (Central Gravity + Auto-Focus)
+      ShambhalaCore.applyGravity(this);
 
       // 1. COPPER TENSION (Thermal Grounding to Widgets)
       widgets.forEach(w => {
@@ -190,10 +236,14 @@ const SovereignCore = (() => {
     }
 
     draw(ctx, offsetX, offsetY) {
+      // AUTO-FOCUS: Apply opacity and scale from ShambhalaCore
+      ctx.globalAlpha = this.opacity;
       ctx.beginPath();
-      ctx.arc(this.x + offsetX, this.y + offsetY, 4, 0, Math.PI * 2);
+      const radius = 4 * Math.max(0.5, this.scale); // Scale affects size
+      ctx.arc(this.x + offsetX, this.y + offsetY, radius, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
+      ctx.globalAlpha = 1.0; // Reset
     }
   }
 
@@ -332,7 +382,7 @@ const SovereignCore = (() => {
         ctx.fillText(`WIDGETS: ${stats.widgets}`, 10, 35);
         ctx.fillText(`IN GOLD: ${stats.inGold}`, 10, 50);
         ctx.fillText(`R_LIMIT: ${CONFIG.R_LIMIT}`, 10, 65);
-        ctx.fillText(`TENSION: ${CONFIG.TENSION}`, 10, 80);
+        ctx.fillText(`SHAMBHALA_G: ${CONFIG.SHAMBHALA_G}`, 10, 80);
 
         animationId = requestAnimationFrame(loop);
       };
@@ -384,7 +434,10 @@ const SovereignCore = (() => {
       const key = `SOV-${value}-${hash.toUpperCase()}`;
       console.log('[SovereignCore] ATTESTED:', key);
       return key;
-    }
+    },
+
+    // Expose ShambhalaCore for external module control
+    ShambhalaCore
   };
 
   return core;
