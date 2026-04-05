@@ -7,6 +7,7 @@ import './utils/SpectralShield';         // Ghostbuster Purge & Spectral Shield
 import './utils/SanctuaryEngine';        // Pure Light Resonance (ghosts Emergent badge)
 import './utils/EnlightenmentKey';       // Back-Side Pass Key (unlocks layers on ASCEND)
 import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (responds to ASCEND)
+import './utils/SovereignCleanup';       // V2.88 Final - Legacy purge, memory optimization, PWA hooks
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
