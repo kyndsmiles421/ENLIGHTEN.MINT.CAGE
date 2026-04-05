@@ -3003,3 +3003,66 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
   color: rgba(255, 215, 0, 0.7);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FORCE HIDE ALL CLUTTERED UI ELEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Hide TieredNavigation completely */
+[class*="TieredNav"],
+[class*="tiered-nav"],
+[data-testid*="tiered"],
+.tiered-navigation {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Hide UtilityDock completely */
+[class*="UtilityDock"],
+[class*="utility-dock"],
+[data-testid*="utility-dock"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Hide all bottom-left clutter */
+.fixed.bottom-4.left-4,
+.fixed.bottom-4.left-20,
+.fixed.bottom-4.left-40,
+[class*="CrystalBadge"],
+[class*="NebulaViewToggle"],
+[class*="QuestHUD"],
+[class*="SageAvatar"],
+[class*="SageAudience"],
+[class*="OrbCorner"],
+[class*="PersistentWaveform"],
+[class*="MissionControl"],
+[class*="GlowPortal"],
+[class*="PulseEcho"],
+[class*="CreditNudge"],
+[class*="LearningToggle"],
+[class*="InstallPrompt"],
+[class*="SmartDock"]:not(.shambhala-toolbar *),
+[class*="CosmicToolbar"],
+[class*="CosmicMixer"],
+[class*="MantraOverlay"],
+[class*="LatencyHUD"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Force Matrix text to Shambhala */
+[class*="Matrix"]:not([class*="FRICTION"]),
+[id*="Matrix"]:not([id*="friction"]) {
+  display: none !important;
+}
