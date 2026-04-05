@@ -25,12 +25,16 @@ const SovereignRefractor = {
 
   // ═══════════════════════════════════════════════════════════════════════════
   // THE HEXAGONAL BORDER CONSTRAINT
-  // Defines the "Edge of System" — keeps nodes within perfect hexagon
+  // 1cm buffer around edge of system at 360°
   // ═══════════════════════════════════════════════════════════════════════════
   
+  EDGE_BUFFER: 1, // 1cm around edge
+  
   getHexBoundary: (angle) => {
-    // Math to constrain radius within a perfect hexagon
-    return 1 / (Math.cos(angle % (Math.PI / 3) - Math.PI / 6));
+    // Hexagonal constraint with 1cm edge buffer at 360°
+    const hexFactor = 1 / (Math.cos(angle % (Math.PI / 3) - Math.PI / 6));
+    const edgeBuffer = SovereignRefractor.EDGE_BUFFER;
+    return hexFactor - (edgeBuffer / 100); // Subtract 1cm from max radius
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
