@@ -25,6 +25,38 @@ header,
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   ERASE LEGACY FRAGMENTS (Deep Purge)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.nav-bar, 
+header, 
+[data-testid="legacy-header"],
+[data-testid*="nav"],
+[class*="nav-bar"],
+[class*="NavBar"],
+[class*="legacy"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  transform: translateY(-100%) !important; /* Pushes it out of the physical stack */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOCK SOVEREIGN TO THE PINNACLE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sovereign-toolbar, 
+.enlightenment-cafe-header,
+.shambhala-toolbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 99999 !important; /* Total Authority */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    ROOT VARIABLES (ENFORCED)
    ═══════════════════════════════════════════════════════════════════════════ */
 
