@@ -10,11 +10,13 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ShambhalaToolbar from '../components/ShambhalaToolbar';
 
 export default function SovereignLab() {
   const navigate = useNavigate();
   const [activeEngine, setActiveEngine] = useState(null);
   const [stats, setStats] = useState({ particles: 0, depth: 0 });
+  const [shambhalaSettings, setShambhalaSettings] = useState(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -76,8 +78,14 @@ export default function SovereignLab() {
 
   return (
     <div className="sovereign-lab" data-testid="sovereign-lab">
+      {/* Shambhala Master Mixer Toolbar */}
+      <ShambhalaToolbar 
+        isActive={activeEngine === 'core'} 
+        onSettingsChange={setShambhalaSettings}
+      />
+
       {/* Header */}
-      <header className="lab-header">
+      <header className="lab-header" style={{ marginTop: activeEngine === 'core' ? '60px' : '0' }}>
         <button className="back-btn" onClick={() => navigate(-1)}>← BACK</button>
         <h1>SOVEREIGN PHYSICS LAB</h1>
         <span className="version">V2.88</span>
