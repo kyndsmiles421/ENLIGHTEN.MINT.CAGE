@@ -15,7 +15,7 @@ const SovereignStabilizer = {
   // ═══════════════════════════════════════════════════════════════════════════
   
   K_INVERSE: 0.15,        // Inverse attraction coefficient
-  R_LIMIT: 86.6 - 1.0,    // Hex radius - 1cm buffer = 85.6
+  R_LIMIT: 47.94,         // (86.6 - 1cm) * 0.56 = 44% reduction
   F_REPULSE: 400,         // Repulsion force multiplier
   DAMPING: 0.82,          // Velocity damping factor
 
