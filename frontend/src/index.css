@@ -3162,3 +3162,21 @@ body {
   align-items: center; /* Centers horizontally */
   gap: 20px;           /* Creates consistent vertical space */
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FORCE SHAMBHALA TOOLBAR ABOVE EMERGENT BADGE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Maximum z-index to be on top of everything including Emergent badge */
+[class*="ShambhalaToolbar"] > div,
+.shambhala-toolbar,
+.fixed.h-14[style*="bottom"] {
+  z-index: 2147483647 !important;
+  bottom: 60px !important;
+}
+
+/* Hide the green dot in bottom left */
+.fixed.bottom-4.left-4,
+div[style*="bottom: 16px"][style*="left: 16px"] {
+  display: none !important;
+}

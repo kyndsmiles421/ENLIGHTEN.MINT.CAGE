@@ -91,10 +91,14 @@ const ShambhalaToolbar = () => {
         </div>
       )}
 
-      {/* MAIN BOTTOM TOOLBAR - Pushed up to avoid Emergent badge */}
+      {/* MAIN BOTTOM TOOLBAR - Pushed up above Emergent badge */}
       <div 
-        className="fixed bottom-12 left-0 right-0 h-14 bg-black/90 border-t border-gold-500/30 flex items-center justify-between px-4 z-[99999]"
-        style={{ backdropFilter: 'blur(10px)' }}
+        className="fixed left-0 right-0 h-14 bg-black/90 border-t border-gold-500/30 flex items-center justify-between px-4"
+        style={{ 
+          backdropFilter: 'blur(10px)',
+          bottom: '60px',
+          zIndex: 2147483647
+        }}
       >
         {/* Left: Navigation Toggle */}
         <button
