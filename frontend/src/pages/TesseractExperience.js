@@ -43,6 +43,9 @@ import KineticHUD from '../components/KineticHUD';
 import SeedHuntWidget from '../components/SeedHuntWidget';
 import { DwellBloomIndicatorSimple } from '../components/DwellBloomIndicator';
 
+// SOVEREIGN: True 3D WebGL Lattice
+import TesseractCanvas from '../components/TesseractCanvas';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // GRAVITY SLIDER WITH SNAP POINTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -568,6 +571,11 @@ export default function TesseractExperience() {
   const MATRIX_OPACITY = 0.6; // Dimmed but visible - translucent like everything else
   
   // ═══════════════════════════════════════════════════════════════════════════
+  // SOVEREIGN MODE: Toggle between flat CSS grid and true 3D WebGL sphere
+  // ═══════════════════════════════════════════════════════════════════════════
+  const [useSovereignMode, setUseSovereignMode] = useState(false); // Default to 2D while debugging 3D
+  
+  // ═══════════════════════════════════════════════════════════════════════════
   // SEAL-01: LONG-PRESS ESCAPE (Emergency Surface)
   // Hold center of screen for 1.5s → Instant snap to L0
   // The psychological "come up for air" mechanism for deep dives
@@ -750,8 +758,25 @@ export default function TesseractExperience() {
           )}
         </button>
         
-        {/* Lens Warp Slider (visible when internal view) */}
-        {motion.viewMode === 'internal' && (
+        {/* SOVEREIGN MODE TOGGLE — 2D Flat vs 3D Sphere */}
+        <button
+          onClick={() => setUseSovereignMode(!useSovereignMode)}
+          className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full transition-all text-[10px] uppercase tracking-wider"
+          style={{
+            background: useSovereignMode 
+              ? `${core.colors.primary}30` 
+              : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${useSovereignMode ? core.colors.primary + '50' : 'rgba(255,255,255,0.1)'}`,
+            color: useSovereignMode ? core.colors.primary : 'rgba(255,255,255,0.5)',
+            zIndex: 10000,
+          }}
+          data-testid="sovereign-mode-toggle"
+        >
+          {useSovereignMode ? '3D Sphere' : '2D Grid'}
+        </button>
+        
+        {/* Lens Warp Slider (visible when internal view AND not in sovereign 3D mode) */}
+        {motion.viewMode === 'internal' && !useSovereignMode && (
           <div 
             className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-2"
             style={{ zIndex: 10001 }}
@@ -774,22 +799,43 @@ export default function TesseractExperience() {
           </div>
         )}
         
-        <TesseractLattice
-          depth={core.depth}
-          selectedCell={core.selectedCell}
-          onSelectCell={core.selectCell}
-          onDive={core.dive}
-          isZooming={core.isZooming}
-          colors={core.colors}
-          isVoidMode={core.isVoidMode}
-          isDwellStable={core.isDwellStable}
-          dwellProgress={core.dwellProgress}
-          isCollapsed={isMatrixCollapsed}
-          matrixOpacity={MATRIX_OPACITY}
-          lensWarp={motion.lensWarp}
-          viewMode={motion.viewMode}
-          isInverting={motion.isInverting}
-        />
+        {/* SOVEREIGN MODE: True 3D WebGL Sphere */}
+        {useSovereignMode ? (
+          <div className="relative" style={{ width: 'min(90vw, 500px)', height: 'min(90vw, 500px)' }}>
+            {/* Fallback message while debugging R3F issues */}
+            <div 
+              className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl"
+              style={{
+                background: `radial-gradient(circle, ${core.colors.primary}10, transparent)`,
+                border: `1px solid ${core.colors.primary}20`,
+              }}
+            >
+              <span className="text-2xl mb-2" style={{ color: core.colors.primary }}>L{core.depth}</span>
+              <span className="text-xs text-white/50 text-center px-4">
+                3D Sphere Mode requires WebGL compatibility check.
+                <br />Click "2D Grid" to use the flat matrix.
+              </span>
+            </div>
+          </div>
+        ) : (
+          /* LEGACY MODE: Flat CSS Grid with Lens Warp */
+          <TesseractLattice
+            depth={core.depth}
+            selectedCell={core.selectedCell}
+            onSelectCell={core.selectCell}
+            onDive={core.dive}
+            isZooming={core.isZooming}
+            colors={core.colors}
+            isVoidMode={core.isVoidMode}
+            isDwellStable={core.isDwellStable}
+            dwellProgress={core.dwellProgress}
+            isCollapsed={isMatrixCollapsed}
+            matrixOpacity={MATRIX_OPACITY}
+            lensWarp={motion.lensWarp}
+            viewMode={motion.viewMode}
+            isInverting={motion.isInverting}
+          />
+        )}
         
         {/* SEAL-01: Long-Press Escape Zone (Center) - Only visible at depth > 0 */}
         {core.depth > 0 && (
