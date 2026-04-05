@@ -9,6 +9,7 @@ import './utils/SovereignV9';             // v9.0 Crystalline Skeleton + Quadrup
 import './utils/SovereignEngine';         // Core engine (Solar + 13-Node Harmonic)
 import './utils/SovereignRefractor';      // Front-end visual layer (Vortex + Payload)
 import './utils/SovereignStabilizer';     // Physics: Inverse Attraction + Edge Repulsion
+import './utils/StabilizerCanvas';        // Canvas physics visualizer
 import './utils/RainbowKeyGenerator';     // Back-end key encryption
 import './utils/SovereignHandshake';      // Bi-directional handshake orchestrator
 
