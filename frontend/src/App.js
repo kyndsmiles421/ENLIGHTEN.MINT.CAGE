@@ -244,6 +244,7 @@ const SeedGalleryPage = lazy(() => import('./pages/SeedGalleryPage'));
 const TesseractExperience = lazy(() => import('./pages/TesseractExperience'));
 const EnlightenmentOS = lazy(() => import('./pages/EnlightenmentOS'));
 const SovereignLab = lazy(() => import('./pages/SovereignLab'));
+const SovereignCanvasPage = lazy(() => import('./pages/SovereignCanvasPage'));
 
 function PageLoader() {
   return (
@@ -511,6 +512,8 @@ function AnimatedRoutes() {
         <Route path="/enlightenment-os" element={<EnlightenmentOS />} />
         <Route path="/lab" element={<SovereignLab />} />
         <Route path="/physics-lab" element={<SovereignLab />} />
+        <Route path="/sovereign-canvas" element={<SovereignCanvasPage />} />
+        <Route path="/replant" element={<SovereignCanvasPage />} />
         <Route path="/smartdock" element={<SmartDockPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
