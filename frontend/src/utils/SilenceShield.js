@@ -83,11 +83,12 @@ const SilenceShield = (() => {
         display: grid !important;
       }
       
-      /* Silence Shield indicator */
+      /* Silence Shield indicator - CENTERED */
       .silence-shield-indicator {
         position: fixed;
-        bottom: 10px;
-        left: 10px;
+        bottom: 300px;
+        left: 50%;
+        transform: translateX(-50%);
         width: 8px;
         height: 8px;
         border-radius: 50%;

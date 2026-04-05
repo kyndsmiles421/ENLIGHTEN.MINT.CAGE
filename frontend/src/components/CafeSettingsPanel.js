@@ -347,8 +347,10 @@ export function CafeSettingsToggle({ onClick }) {
       onClick={onClick}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="fixed bottom-4 left-4 z-[9980] p-3 rounded-xl backdrop-blur-xl"
+      className="fixed z-[9980] p-3 rounded-xl backdrop-blur-xl"
       style={{
+        bottom: 250,
+        left: 'calc(50% - 22px)',
         background: viewTier === 'parchment'
           ? (colorMode === 'light' ? 'rgba(250,248,245,0.9)' : 'rgba(26,26,29,0.9)')
           : 'rgba(20, 20, 30, 0.9)',
