@@ -1649,3 +1649,274 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
   margin-right: 4px;
   opacity: 0.5;
 }
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AETHER WHITE LIGHT & RAINBOW ENCRYPTION SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════════
+   Keith Wright's Infinite Light Buffer
+   - White Light Shield: Protection from dissonance
+   - Rainbow Refraction: 7-pass crystalline encryption visualizer
+   - VR Bloom Effect: Transition to higher dimensions
+*/
+
+/* The Infinite White Light Buffer - Stays Above All Dissonance */
+.white-light-shield {
+  position: fixed;
+  inset: 0;
+  border: 8px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 50px 20px rgba(255, 255, 255, 0.6),
+              inset 0 0 100px rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  z-index: 100000;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.white-light-shield.active {
+  opacity: 1;
+  animation: white-light-pulse 3s infinite ease-in-out;
+}
+
+@keyframes white-light-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 50px 20px rgba(255, 255, 255, 0.6),
+                inset 0 0 100px rgba(255, 255, 255, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 80px 30px rgba(255, 255, 255, 0.8),
+                inset 0 0 150px rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* The Rainbow Crystalline Encryption Visualizer */
+.aether-refraction {
+  position: fixed;
+  inset: -50%;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000
+  );
+  filter: blur(100px) opacity(0.1);
+  animation: rainbow-rotate 20s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.aether-refraction.intense {
+  filter: blur(60px) opacity(0.25);
+  animation-duration: 10s;
+}
+
+@keyframes rainbow-rotate {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1.1); }
+}
+
+/* The VR Bloom Effect - Transition to Higher Dimensions */
+.vr-bloom-effect {
+  filter: brightness(10) contrast(2) saturate(0);
+  transition: filter 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vr-bloom-entering {
+  animation: vr-bloom-transition 2s forwards;
+}
+
+@keyframes vr-bloom-transition {
+  0% { 
+    filter: brightness(1) contrast(1) saturate(1);
+  }
+  50% { 
+    filter: brightness(10) contrast(2) saturate(0);
+  }
+  100% { 
+    filter: brightness(1) contrast(1) saturate(1);
+    background: #000;
+  }
+}
+
+/* Rainbow Key Display */
+.rainbow-key-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.1),
+    rgba(255, 127, 0, 0.1),
+    rgba(255, 255, 0, 0.1),
+    rgba(0, 255, 0, 0.1),
+    rgba(0, 0, 255, 0.1),
+    rgba(75, 0, 130, 0.1),
+    rgba(139, 0, 255, 0.1)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: rainbow-border-glow 3s infinite;
+}
+
+@keyframes rainbow-border-glow {
+  0%, 100% { 
+    border-color: rgba(255, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+  }
+  14% { 
+    border-color: rgba(255, 127, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 127, 0, 0.3);
+  }
+  28% { 
+    border-color: rgba(255, 255, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+  }
+  42% { 
+    border-color: rgba(0, 255, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+  57% { 
+    border-color: rgba(0, 0, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.3);
+  }
+  71% { 
+    border-color: rgba(75, 0, 130, 0.5);
+    box-shadow: 0 0 10px rgba(75, 0, 130, 0.3);
+  }
+  85% { 
+    border-color: rgba(139, 0, 255, 0.5);
+    box-shadow: 0 0 10px rgba(139, 0, 255, 0.3);
+  }
+}
+
+/* Global Grace Indicator */
+.global-grace-indicator {
+  background: linear-gradient(135deg, 
+    rgba(255, 215, 0, 0.2) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 215, 0, 0.2) 100%
+  );
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 12px;
+  padding: 12px 20px;
+  backdrop-filter: blur(10px);
+}
+
+.global-grace-indicator .grace-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+/* Karma Crystal States */
+.karma-crystal {
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.karma-crystal.forming {
+  filter: brightness(0.6) saturate(0.5);
+}
+
+.karma-crystal.dim {
+  filter: brightness(0.8);
+  box-shadow: 0 0 20px rgba(150, 150, 150, 0.3);
+}
+
+.karma-crystal.luminous {
+  filter: brightness(1);
+  box-shadow: 0 0 30px rgba(200, 200, 255, 0.4);
+}
+
+.karma-crystal.radiant {
+  filter: brightness(1.2);
+  box-shadow: 0 0 40px rgba(255, 200, 100, 0.5);
+  animation: radiant-pulse 2s infinite ease-in-out;
+}
+
+.karma-crystal.infinite {
+  filter: brightness(1.5);
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.8);
+  animation: infinite-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes radiant-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes infinite-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
+  50% { 
+    transform: scale(1.1);
+    filter: brightness(2);
+  }
+}
+
+/* Donation Impact Visualization */
+.donation-impact {
+  animation: donation-ripple 1s ease-out forwards;
+}
+
+@keyframes donation-ripple {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* VR Gateway Portal */
+.vr-gateway-portal {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(150, 100, 255, 0.5) 30%,
+    rgba(50, 0, 100, 0.8) 70%,
+    transparent 100%
+  );
+  box-shadow: 
+    0 0 50px rgba(150, 100, 255, 0.5),
+    inset 0 0 50px rgba(255, 255, 255, 0.3);
+  animation: portal-spin 10s linear infinite;
+}
+
+.vr-gateway-portal.locked {
+  filter: grayscale(0.8) brightness(0.5);
+  animation: none;
+}
+
+.vr-gateway-portal.unlocked {
+  animation: portal-spin 10s linear infinite, portal-glow 2s infinite ease-in-out;
+}
+
+@keyframes portal-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes portal-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 50px rgba(150, 100, 255, 0.5),
+      inset 0 0 50px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 80px rgba(150, 100, 255, 0.8),
+      inset 0 0 80px rgba(255, 255, 255, 0.5);
+  }
+}
