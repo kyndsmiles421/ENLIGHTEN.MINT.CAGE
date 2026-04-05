@@ -30,8 +30,9 @@ export default function SovereignLab() {
     window.StabilizerCanvas?.destroy?.();
     window.RefractionEngine?.destroy?.();
     
-    // Launch SovereignCore
-    window.SovereignCore?.initCeremony?.();
+    // Launch SovereignCore and auto-ignite
+    window.SovereignCore?.init?.();
+    window.SovereignCore?.burst?.(0, 0, 7); // Auto-burst on launch
     setActiveEngine('core');
   }, []);
 
@@ -80,6 +81,25 @@ export default function SovereignLab() {
         <button className="back-btn" onClick={() => navigate(-1)}>← BACK</button>
         <h1>SOVEREIGN PHYSICS LAB</h1>
         <span className="version">V2.88</span>
+        <button 
+          className="download-btn" 
+          onClick={() => {
+            const canvas = document.getElementById('sovereignCanvas') || 
+                          document.getElementById('coreCanvas') ||
+                          document.getElementById('refractionCanvas');
+            if (canvas) {
+              const link = document.createElement('a');
+              link.download = `sovereign-physics-${Date.now()}.png`;
+              link.href = canvas.toDataURL('image/png');
+              link.click();
+            } else {
+              alert('Launch an engine first to capture');
+            }
+          }}
+          data-testid="download-btn"
+        >
+          ↓ DOWNLOAD
+        </button>
       </header>
 
       {/* Engine Selector */}
@@ -185,6 +205,25 @@ export default function SovereignLab() {
         .version {
           font-size: 12px;
           color: rgba(255,255,255,0.4);
+          flex: 1;
+        }
+
+        .download-btn {
+          background: rgba(0, 255, 204, 0.1);
+          border: 1px solid #00FFCC;
+          color: #00FFCC;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 12px;
+          letter-spacing: 0.1em;
+          transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+          background: rgba(0, 255, 204, 0.2);
+          transform: scale(1.05);
         }
 
         .back-btn {
