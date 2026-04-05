@@ -3339,3 +3339,16 @@ div:has(> a[href*="emergentagent"]) {
   pointer-events: none !important;
   z-index: 0 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUADRUPLE HELIX - EMERGENT LAYER TRANSITIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.emergent-layer {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emergent-layer.refracted-state {
+  transform: scale(1.02);
+  filter: brightness(1.1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+}
