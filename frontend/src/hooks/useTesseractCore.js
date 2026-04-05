@@ -47,6 +47,9 @@ import { LANGUAGE_REGISTRY } from '../config/languageRegistry';
 // SYNC-01: Atomic state broadcast store
 import { RecursiveRegistryStore } from '../stores/RecursiveRegistryStore';
 
+// APEX: The Sovereign Apex — Unified controller (Hourglass + Crystalline)
+import { SovereignApex } from '../engines/SovereignApex';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════
@@ -472,6 +475,20 @@ export function useTesseractCore(options = {}) {
       
       // SYNC-01: Atomic broadcast to all layers
       RecursiveRegistryStore.setDepth(newDepth);
+      
+      // APEX: Execute Sovereign cycle on dive (Hourglass + Crystalline unified)
+      if (apexRef.current) {
+        apexRef.current.execute({
+          userMood: isVoidMode ? 'transcendent' : 'focused',
+          vibrationalFrequency: gravity * 10,
+          gameStats: { depth: newDepth, hexagram: hexagramNumber },
+          wellnessData: { energy: gravity },
+          depthLevel: newDepth,
+          hexagramAddress: newAddress,
+          isVoidMode,
+          userSeed: hexagramNumber * 0.618, // Golden ratio factor
+        });
+      }
     }, TESSERACT_CONFIG.SNATCH_DURATION);
     
     return true;
@@ -805,6 +822,52 @@ export function useTesseractCore(options = {}) {
   }, []);
   
   // ─────────────────────────────────────────────────────────────────────────
+  // SOVEREIGN APEX: Unified Controller (Hourglass + Crystalline)
+  // The singular point of truth for all vibrational calculations
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  const apexRef = useRef(null);
+  const [sovereignOutput, setSovereignOutput] = useState(null);
+  
+  // Initialize Sovereign Apex on mount
+  useEffect(() => {
+    try {
+      apexRef.current = SovereignApex.getInstance();
+      console.log('[useTesseractCore] Sovereign Apex connected (Hourglass + Crystalline unified)');
+    } catch (e) {
+      console.warn('[useTesseractCore] Sovereign Apex not available:', e);
+    }
+  }, []);
+  
+  // Execute Sovereign Apex cycle (called on dive/significant state change)
+  const executeSovereignCycle = useCallback((overrides = {}) => {
+    if (!apexRef.current) return null;
+    
+    const input = {
+      userMood: isVoidMode ? 'meditative' : 'focused',
+      vibrationalFrequency: gravity * 10,
+      gameStats: {
+        depth: depth,
+        stability: currentStability,
+        tension: gravityTension,
+      },
+      wellnessData: {
+        score: currentStability,
+        energy: gravity,
+      },
+      depthLevel: depth,
+      hexagramAddress: address,
+      isVoidMode: isVoidMode,
+      userSeed: gravity * 7.83, // Schumann resonance factor
+      ...overrides,
+    };
+    
+    const output = apexRef.current.execute(input);
+    setSovereignOutput(output);
+    return output;
+  }, [gravity, depth, isVoidMode, address, currentStability, gravityTension]);
+  
+  // ─────────────────────────────────────────────────────────────────────────
   // RETURN VALUE
   // ─────────────────────────────────────────────────────────────────────────
   
@@ -869,6 +932,11 @@ export function useTesseractCore(options = {}) {
     
     // MEM-01: Persistence
     clearAnchor,
+    
+    // APEX: Sovereign Apex integration (Hourglass + Crystalline unified)
+    sovereignOutput,
+    executeSovereignCycle,
+    sovereignApex: apexRef.current,
     
     // Config
     config: TESSERACT_CONFIG,
