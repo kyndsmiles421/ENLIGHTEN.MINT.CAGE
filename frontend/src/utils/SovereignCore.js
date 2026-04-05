@@ -1,6 +1,6 @@
 /**
- * SOVEREIGN CORE V2.88 - COPPER CONDUIT EDITION
- * Logic: Hooke's Law Tension (#B87333) + Gold Viscosity (#fbc02d)
+ * SOVEREIGN CORE V2.88 - COPPER CONDUIT + PERIMETER MAGNETICS
+ * Logic: Hooke's Law Tension (#B87333) + Gold Viscosity (#fbc02d) + Quad-Pole Repulsion
  * Location: Rapid City / Black Hills Calibration
  */
 
@@ -18,10 +18,36 @@ const SovereignCore = (() => {
     COPPER: '#B87333',
     GOLD_HONEY: '#fbc02d',
     TEAL: '#00FFCC',
-    TENSION: 0.08,      // Copper Spring Constant
-    VISCOSITY: 0.05,    // Gold Induction
+    TENSION: 0.08,           // Copper Spring Constant
+    VISCOSITY: 0.05,         // Gold Induction
     DAMPING: 0.82,
-    MAX_PARTICLES: 500
+    MAX_PARTICLES: 500,
+    REVERSE_STRENGTH: 1.2,   // Perimeter Magnetics bounce factor
+    PERIMETER_THRESHOLD: 0.8 // 80% of R_LIMIT triggers repulsion
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PERIMETER MAGNETICS (Quad-Pole Repulsion)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const PerimeterMagnetics = {
+    applyBounds(p) {
+      const threshold = CONFIG.R_LIMIT * CONFIG.PERIMETER_THRESHOLD;
+
+      // X-Dimension Repulsion (East/West)
+      if (Math.abs(p.x) > threshold) {
+        const forceX = (Math.abs(p.x) - threshold) * CONFIG.REVERSE_STRENGTH;
+        p.vx -= Math.sign(p.x) * forceX;
+        p.color = CONFIG.GOLD_HONEY; // Shift to Gold on approach
+      }
+
+      // Y-Dimension Repulsion (North/South)
+      if (Math.abs(p.y) > threshold) {
+        const forceY = (Math.abs(p.y) - threshold) * CONFIG.REVERSE_STRENGTH;
+        p.vy -= Math.sign(p.y) * forceY;
+        p.color = CONFIG.GOLD_HONEY;
+      }
+    }
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -67,7 +93,10 @@ const SovereignCore = (() => {
         this.vy += wdy * CONFIG.TENSION;
       });
 
-      // 2. GOLD BOUNDARY (Induction)
+      // 2. PERIMETER MAGNETICS (Quad-Pole Repulsion)
+      PerimeterMagnetics.applyBounds(this);
+
+      // 3. GOLD BOUNDARY (Radial Induction)
       if (distFromCenter > CONFIG.R_LIMIT) {
         this.color = CONFIG.GOLD_HONEY;
         this.vx *= CONFIG.VISCOSITY;
@@ -75,10 +104,17 @@ const SovereignCore = (() => {
         // Gentle push back
         this.vx -= (this.x / distFromCenter) * 2;
         this.vy -= (this.y / distFromCenter) * 2;
-      } else {
+      } else if (this.color !== CONFIG.GOLD_HONEY) {
+        // Only reset to teal if not already triggered by perimeter
         this.color = CONFIG.TEAL;
         this.vx += dx * 0.15; // Attraction to Mouse
         this.vy += dy * 0.15;
+        this.vx *= CONFIG.DAMPING;
+        this.vy *= CONFIG.DAMPING;
+      } else {
+        // In perimeter zone but not past radial limit
+        this.vx += dx * 0.1;
+        this.vy += dy * 0.1;
         this.vx *= CONFIG.DAMPING;
         this.vy *= CONFIG.DAMPING;
       }
