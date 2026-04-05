@@ -1,7 +1,7 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.88_SHAMBHALA | AETHER_MIRRORLESS
-## Last Updated: 2025-12-05
+## Version: 2.88_SHAMBHALA | AETHER_MIRRORLESS | GOLDEN_SPIRAL
+## Last Updated: 2026-04-05
 
 ---
 
@@ -11,19 +11,24 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 ## Core Identity
 - **Owner:** Steven Michael (kyndsmiles@gmail.com)
 - **Origin:** Rapid City Hub / Black Hills Calibration
-- **Physics Engine:** SovereignCore V2.88 - Aether/Mirrorless
+- **Physics Engine:** SovereignCore V2.88 - Aether/Mirrorless + Golden Ratio Phyllotaxis
 
 ---
 
 ## Architecture Implemented
 
 ### Frontend Systems
-1. **ShambhalaFrontSide** - 66px White Vessel with Rainbow Refraction
-2. **EnlightenmentKey** - Back-Side Pass Key (unlocks layers on ASCEND)
-3. **ShambhalaToolbar** - Bottom navigation (NAV / RESONANCE / MIX)
-4. **SanctuaryEngine** - Pure Light Resonance mode
-5. **RefractionEngine** - Crystal HUD elements
-6. **SovereignCore** - Canvas physics (G=0.15, R_LIMIT=47.94)
+1. **GoldenSpiralEngine** - Three.js 600-particle Phyllotaxis spiral (NEW)
+   - PHI = 1.618034 (Golden Ratio)
+   - GOLDEN_ANGLE = 137.51° (Fibonacci sequence angle)
+   - Responds to SHAMBHALA_ASCEND (rainbow refraction)
+   - Responds to SHAMBHALA_STASIS (white light return)
+2. **ShambhalaFrontSide** - 66px White Vessel with Rainbow Refraction
+3. **EnlightenmentKey** - Back-Side Pass Key (unlocks layers on ASCEND)
+4. **ShambhalaToolbar** - Bottom navigation (NAV / RESONANCE / MIX)
+5. **SanctuaryEngine** - Pure Light Resonance mode
+6. **RefractionEngine** - Crystal HUD elements
+7. **SovereignCore** - Canvas physics (G=0.15, R_LIMIT=47.94)
 
 ### Backend Systems
 1. **Security Vault** - AES-256-CBC encryption (`/api/vault/`)
@@ -31,14 +36,36 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 3. **MongoDB** - User data, wallets, achievements
 
 ### Event System (Quadruple Helix)
-- `SHAMBHALA_ASCEND` → Unlocks emergent layers
-- `SHAMBHALA_STASIS` → Re-locks layers
+- `SHAMBHALA_ASCEND` → Unlocks emergent layers + Rainbow Spiral (1.5x scale)
+- `SHAMBHALA_STASIS` → Re-locks layers + White Light Spiral (1.0x scale)
 - Payload: `{ frequency, refraction, origin }`
 
 ---
 
+## Golden Ratio Spiral Implementation
+
+### Mathematical Foundation
+```javascript
+const PHI = (1 + Math.sqrt(5)) / 2;  // 1.618034 (Golden Ratio)
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));  // ~137.5 degrees
+
+// Phyllotaxis spiral placement
+for (let i = 0; i < 600; i++) {
+  const r = 0.5 * Math.sqrt(i);  // Zero-scale physics expansion
+  const theta = i * GOLDEN_ANGLE;
+  // x = r * cos(theta), y = r * sin(theta)
+}
+```
+
+### Behavior
+- **White Light Stasis:** 600 white particles, opacity 0.8, scale 1.0
+- **Rainbow Ascension:** HSL rainbow colors, opacity 1.0, scale 1.5
+- **Animation:** Slow meditative rotation (0.002 rad/frame) + breathing Y oscillation
+
+---
+
 ## CSS Architecture
-- `.emergent-layer` - 0.6s cubic-bezier transitions
+- `.emergent-layer` - Container for Golden Spiral canvas (z-index: 1)
 - `.resonance-node` - Crystal white light rainbow refraction
 - `.hud-element` - Angled glass cuts with prism hover
 - `#refractive-grid` - 60px copper conduit lattice
@@ -70,6 +97,7 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 - [x] AES-256-CBC security vault
 - [x] Quadruple Helix event system
 - [x] Emergent badge ghosting (10% opacity)
+- [x] **Three.js Golden Ratio Spiral (Phyllotaxis)** ✅
 
 ---
 
@@ -77,7 +105,6 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 - [ ] Custom domain (ENLIGHTEN.MINT.CAFE)
 - [ ] App Store deployment (PWA/Capacitor)
 - [ ] WebXR Dome Session
-- [ ] Three.js Golden Ratio Spiral
 - [ ] Spatial Audio Panning
 - [ ] GPS-based Cosmic Map
 
@@ -85,10 +112,12 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 
 ## Technical Notes
 - Z-index max: 2147483647
+- Golden Spiral z-index: 1 (above cosmic bg, below UI)
 - Transition timing: 0.6s (can reduce to 0.3s for snappy feel)
 - Pass-through layers: `pointerEvents: 'none'`
 - Re-enable touch: `pointerEvents: 'auto'`
+- Three.js: v0.183.2 with AdditiveBlending for screen-like effect
 
 ---
 
-*Built with Emergent | Rapid City Hub | Crystal White Light Frequency*
+*Built with Emergent | Rapid City Hub | Crystal White Light Frequency | Golden Ratio Sanctuary*

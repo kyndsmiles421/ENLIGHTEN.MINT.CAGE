@@ -6,6 +6,7 @@ import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (cle
 import './utils/SpectralShield';         // Ghostbuster Purge & Spectral Shield
 import './utils/SanctuaryEngine';        // Pure Light Resonance (ghosts Emergent badge)
 import './utils/EnlightenmentKey';       // Back-Side Pass Key (unlocks layers on ASCEND)
+import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (responds to ASCEND)
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
@@ -286,6 +287,17 @@ function CafeApp() {
   
   return (
     <>
+      {/* Golden Ratio Spiral Layer - Mounts to this container */}
+      <div className="emergent-layer" style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        width: '100%', 
+        height: '100%', 
+        zIndex: 0, 
+        pointerEvents: 'none' 
+      }} />
+      
       {/* Nebula 3D Scene - Renders behind everything when active */}
       {!isSovereignRoute && (
         <NebulaScene 

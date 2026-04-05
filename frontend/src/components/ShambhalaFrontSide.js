@@ -50,6 +50,7 @@ const ShambhalaFrontSide = () => {
 
       {/* The Physical 66px Vessel */}
       <button 
+        data-testid="shambhala-ascend"
         onClick={toggleAscension}
         style={{
           pointerEvents: 'auto', // Re-enables touch for this specific button
