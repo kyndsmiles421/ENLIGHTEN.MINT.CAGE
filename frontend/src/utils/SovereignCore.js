@@ -152,23 +152,33 @@ const SovereignCore = (() => {
       // 2. PERIMETER MAGNETICS (Quad-Pole Repulsion)
       PerimeterMagnetics.applyBounds(this);
 
-      // 3. GOLD BOUNDARY (Radial Induction)
+      // 3. AETHER / MIRRORLESS BOUNDARY (Erase Mirrors - Direct Conduction)
       if (distFromCenter > CONFIG.R_LIMIT) {
-        this.color = CONFIG.GOLD_HONEY;
-        this.vx *= CONFIG.VISCOSITY;
-        this.vy *= CONFIG.VISCOSITY;
-        // Gentle push back
-        this.vx -= (this.x / distFromCenter) * 2;
-        this.vy -= (this.y / distFromCenter) * 2;
+        // ERASE MIRRORS: Honey Viscosity Brake (not a mirror bounce)
+        this.vx *= -CONFIG.VISCOSITY;  // -0.05 honey brake
+        this.vy *= -CONFIG.VISCOSITY;
+        
+        // Gentle pull to center (not a hard reflect)
+        this.vx += (0 - this.x) * 0.1;
+        this.vy += (0 - this.y) * 0.1;
+        
+        // Conductive boost: +1.2 velocity gain (Aether mode)
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 0) {
+          this.vx *= CONFIG.CONDUCTION_GAIN;
+          this.vy *= CONFIG.CONDUCTION_GAIN;
+        }
+        
+        this.color = CONFIG.COPPER; // Thermal grounding visual
       } else if (this.color !== CONFIG.GOLD_HONEY) {
-        // Only reset to teal if not already triggered by perimeter
+        // Inside boundary — standard attraction to mouse
         this.color = CONFIG.TEAL;
-        this.vx += dx * 0.15; // Attraction to Mouse
+        this.vx += dx * 0.15; // K_INVERSE attraction
         this.vy += dy * 0.15;
         this.vx *= CONFIG.DAMPING;
         this.vy *= CONFIG.DAMPING;
       } else {
-        // In perimeter zone but not past radial limit
+        // In perimeter zone (gold warning) but not past limit
         this.vx += dx * 0.1;
         this.vy += dy * 0.1;
         this.vx *= CONFIG.DAMPING;
@@ -294,14 +304,13 @@ const SovereignCore = (() => {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw gold boundary
+        // Draw gold boundary — SOLID METALLIC BOND (Aether/Mirrorless)
         ctx.beginPath();
         ctx.arc(centerX, centerY, CONFIG.R_LIMIT, 0, Math.PI * 2);
         ctx.strokeStyle = CONFIG.GOLD_HONEY;
         ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
+        ctx.setLineDash([]); // Solid metallic bond — no glass/dashes
         ctx.stroke();
-        ctx.setLineDash([]);
 
         // Physics tick
         this.tick(mouse);
