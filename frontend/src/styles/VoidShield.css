@@ -276,6 +276,38 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   AUTH PAGE - FORCE INPUT VISIBILITY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-testid="auth-email-input"],
+[data-testid="auth-password-input"],
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  color: #fff !important;
+  width: 100% !important;
+  font-size: 16px !important;
+  min-height: 50px !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+[data-testid="auth-email-input"]::placeholder,
+[data-testid="auth-password-input"]::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LAYOUT FIXES - Keep UI accessible
    ═══════════════════════════════════════════════════════════════════════════ */
 
