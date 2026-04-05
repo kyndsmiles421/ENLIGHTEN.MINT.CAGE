@@ -1532,3 +1532,36 @@ The Orbital Hub now implements the user's specified mathematical physics model:
 - `.manual-gravity-container` — Matrix Slider containment with white light buffer
 - `.hexagram-generator-core` — 9x9 grid with rainbow border
 - Tour overlay disabled via `.tour-overlay, .auto-prompt { display: none !important; }`
+
+---
+
+## Harmonic Resonance System (April 2026)
+
+### Solfeggio Frequency Integration
+**"Master Tempo Synchronization"**
+
+All nodule vibrations can now sync to healing frequencies:
+
+| Frequency | Name | Pulse Speed | Effect |
+|-----------|------|-------------|--------|
+| 174Hz | Foundation | 5s | Pain relief |
+| 285Hz | Quantum | 4.5s | Tissue regeneration |
+| 396Hz | Liberation | 4.2s | Release fear |
+| 417Hz | Change | 4s | Facilitate change |
+| 432Hz | Earth | 4s | Universal harmony |
+| 528Hz | Love | 2.5s | DNA repair |
+| 639Hz | Connection | 3s | Relationships |
+| 741Hz | Awakening | 2s | Problem solving |
+| 852Hz | Intuition | 1.5s | Spiritual order |
+| 963Hz | Divine | 1.2s | Pineal activation |
+
+**Blending Formula:**
+```css
+animation-duration: calc(var(--pulse-speed) * 0.8 + var(--master-pulse) * 0.2);
+```
+80% individual character + 20% master sync = Unity in Diversity
+
+**New Utilities:**
+- `/utils/HarmonicResonance.js` — setGlobalResonance(), useHarmonicResonance hook
+- `/utils/NoduleGenerator.js` — Spherical Fibonacci positioning
+- `/components/SphericalNoduleCloud.js` — Reusable 3D nodule renderer
