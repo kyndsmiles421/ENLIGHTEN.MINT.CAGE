@@ -275,16 +275,22 @@ function CafeApp() {
     setActiveIsland(islandId);
   }, []);
   
+  // Check if current route is sovereign mode (hide all chrome)
+  const isSovereignRoute = window.location.pathname === '/sovereign-canvas' || 
+                           window.location.pathname === '/replant';
+  
   return (
     <>
       {/* Nebula 3D Scene - Renders behind everything when active */}
-      <NebulaScene 
-        onIslandClick={handleIslandClick}
-        activeIsland={activeIsland}
-      />
-      <VellumOverlay />
+      {!isSovereignRoute && (
+        <NebulaScene 
+          onIslandClick={handleIslandClick}
+          activeIsland={activeIsland}
+        />
+      )}
+      {!isSovereignRoute && <VellumOverlay />}
       <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
-        <Navigation />
+        {!isSovereignRoute && <Navigation />}
         <ScrollToTop />
         <Toaster
           position="top-right"
@@ -299,50 +305,58 @@ function CafeApp() {
           }}
         />
         <AnimatedRoutes />
-        <MantraOverlay />
-        <LatencyHUD />
-        <SmartDock />
-        <LearningToggle />
-        <CosmicMixer isOpen={mixerOpen} onToggle={() => setMixerOpen(!mixerOpen)} />
-        <CosmicToolbar />
-        <CosmicAssistant isOpen={assistantOpen} onToggle={() => setAssistantOpen(!assistantOpen)} hideTrigger />
-        <PersistentWaveform />
-        <OrbCorner />
-        <TrialGraduation />
-        <InstallPrompt />
-        <CreditNudge />
-        <MissionControlRing />
-        <OrbitalNavigation />
-        <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
-        <EmergencyShutOff />
-        <TieredNavigation />
-        <ZeroPointExperience />
-        <GlowPortal />
-        <UniversalCommand />
-        <PulseEchoVisualizer />
-        <CafeSettingsToggle onClick={() => setCafeSettingsOpen(true)} />
-        {/* Unified Utility Dock — replaces cluttered bottom-right widgets */}
-        <UtilityDock
-          onOpenAssistant={() => setAssistantOpen(true)}
-          onOpenMixer={() => setMixerOpen(true)}
-          onOpenCommand={() => setCommandOpen(true)}
-          assistantOpen={assistantOpen}
-          mixerOpen={mixerOpen}
-        />
-        {/* Quick Nebula Toggle in bottom-left (compact) */}
-        <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
-          <NebulaViewToggle compact />
-        </div>
-        {/* Crystal Resonance Badge — shows current frequency */}
-        <div className="fixed bottom-4 left-40 z-[9980]" data-testid="crystal-resonance-badge">
-          <CrystalBadge />
-        </div>
-        {/* Sage System — Expert Advisors */}
-        <QuestHUD />
-        <SageAvatar />
-        <SageAudience />
+        {!isSovereignRoute && (
+          <>
+            <MantraOverlay />
+            <LatencyHUD />
+            <SmartDock />
+            <LearningToggle />
+            <CosmicMixer isOpen={mixerOpen} onToggle={() => setMixerOpen(!mixerOpen)} />
+            <CosmicToolbar />
+            <CosmicAssistant isOpen={assistantOpen} onToggle={() => setAssistantOpen(!assistantOpen)} hideTrigger />
+            <PersistentWaveform />
+            <OrbCorner />
+            <TrialGraduation />
+            <InstallPrompt />
+            <CreditNudge />
+            <MissionControlRing />
+            <OrbitalNavigation />
+            <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
+            <EmergencyShutOff />
+            <TieredNavigation />
+            <ZeroPointExperience />
+            <GlowPortal />
+            <UniversalCommand />
+            <PulseEchoVisualizer />
+            <CafeSettingsToggle onClick={() => setCafeSettingsOpen(true)} />
+            {/* Unified Utility Dock — replaces cluttered bottom-right widgets */}
+            <UtilityDock
+              onOpenAssistant={() => setAssistantOpen(true)}
+              onOpenMixer={() => setMixerOpen(true)}
+              onOpenCommand={() => setCommandOpen(true)}
+              assistantOpen={assistantOpen}
+              mixerOpen={mixerOpen}
+            />
+          </>
+        )}
+        {!isSovereignRoute && (
+          <>
+            {/* Quick Nebula Toggle in bottom-left (compact) */}
+            <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
+              <NebulaViewToggle compact />
+            </div>
+            {/* Crystal Resonance Badge — shows current frequency */}
+            <div className="fixed bottom-4 left-40 z-[9980]" data-testid="crystal-resonance-badge">
+              <CrystalBadge />
+            </div>
+            {/* Sage System — Expert Advisors */}
+            <QuestHUD />
+            <SageAvatar />
+            <SageAudience />
+          </>
+        )}
       </div>
-      <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
+      {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
     </>
   );
 }

@@ -35,10 +35,25 @@ const SovereignCanvas = () => {
     document.body.style.overflow = "hidden";
     document.title = "The Enlightenment Cafe | Sovereign Mode";
     
+    // FINAL LEGACY PURGE - Hide all old navigation
+    const legacyElements = document.querySelectorAll(
+      'header, #navbar, .old-navigation, [role="navigation"]:not(.sidebar-nav), ' +
+      '.cosmic-mesh, [class*="Navigation"]:not(.sidebar-nav), [class*="TopBar"], ' +
+      '[class*="TieredNav"], [class*="SmartDock"], [class*="UtilityDock"]'
+    );
+    legacyElements.forEach(el => {
+      if (!el.closest('.sanctuary-root') && !el.closest('.sidebar-nav')) {
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+        el.style.setProperty('height', '0px', 'important');
+        el.style.setProperty('opacity', '0', 'important');
+      }
+    });
+    
     const ghosts = document.querySelectorAll('.matrix-layer, .finn-popup, .glass-molecule');
     ghosts.forEach(g => g.remove());
     
-    console.log("[SOVEREIGN] Void Shield Active — Matrix Ghost Tank sealed.");
+    console.log("[SOVEREIGN] Void Shield Active — Legacy Navigation Purged.");
   }, []);
 
   // Gravity Logic
@@ -208,7 +223,22 @@ const SovereignCanvas = () => {
   };
 
   return (
-    <div className="sanctuary-root">
+    <div className="sanctuary-root" style={{ position: 'fixed', inset: 0, zIndex: 999999 }}>
+      {/* Inject style to force-hide legacy navigation */}
+      <style>{`
+        header, #navbar, .old-navigation, [role="navigation"]:not(.sidebar-nav),
+        .cosmic-mesh, [class*="Navigation"]:not(.sidebar-nav):not(.sanctuary-root *),
+        [class*="TopBar"], [class*="TieredNav"], [class*="SmartDock"]:not(.sanctuary-root *),
+        [class*="UtilityDock"]:not(.sanctuary-root *), [class*="cosmic-"]:not(.sanctuary-root *) {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0px !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+        .sanctuary-root { z-index: 999999 !important; }
+      `}</style>
+      
       {/* SOVEREIGN UI LAYER */}
       <div className="sovereign-ui-layer">
         
