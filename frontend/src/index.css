@@ -21,6 +21,11 @@
   --text-secondary: #A0AEC0;
   --text-muted: #5A6478;
 
+  /* ── Tesseract Crystal Variables ── */
+  --tesseract-intensity: 1.5;
+  --crystal-torque: 0deg;
+  --crystal-frequency: 0;
+
   /* ── Elemental Style Guide ── */
   --el-wood: #22C55E;
   --el-wood-glow: rgba(34,197,94,0.15);
@@ -1459,3 +1464,188 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
   background: var(--cafe-gold);
 }
 
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TESSERACT CRYSTAL RADIANCE SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════════
+   Keith Wright's Infinite Radiance Buffer
+   - Multiplied expansion effect for Crystal visualization
+   - Torque-driven rotation for 3D Lattice integration
+   - Frequency-responsive intensity scaling
+*/
+
+.tesseract-glow {
+  /* Infinite Radiance Buffer */
+  box-shadow: 0 0 50px 20px rgba(255, 255, 255, 0.8),
+              inset 0 0 30px 10px rgba(0, 255, 255, 0.5);
+  mix-blend-mode: screen;
+  filter: brightness(var(--tesseract-intensity, 1.5));
+  /* Multiplied Infinite Expansion */
+  animation: radiance-pulse 4s infinite ease-in-out;
+}
+
+@keyframes radiance-pulse {
+  0% { transform: scale(1); filter: contrast(1.2) brightness(1.5); }
+  50% { transform: scale(1.1); filter: contrast(2) brightness(3); }
+  100% { transform: scale(1); filter: contrast(1.2) brightness(1.5); }
+}
+
+/* Crystal Core - Central Point */
+.crystal-core {
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(180, 200, 255, 0.7) 20%,
+    rgba(100, 150, 255, 0.4) 50%,
+    rgba(50, 100, 200, 0.2) 80%,
+    transparent 100%
+  );
+  box-shadow: 
+    0 0 20px 8px rgba(150, 200, 255, 0.6),
+    0 0 40px 16px rgba(100, 150, 255, 0.4),
+    0 0 60px 24px rgba(50, 100, 255, 0.2),
+    inset 0 0 15px rgba(255, 255, 255, 0.8);
+  animation: crystal-breathe 3s infinite ease-in-out;
+}
+
+@keyframes crystal-breathe {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 
+      0 0 20px 8px rgba(150, 200, 255, 0.6),
+      0 0 40px 16px rgba(100, 150, 255, 0.4),
+      0 0 60px 24px rgba(50, 100, 255, 0.2);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 
+      0 0 30px 12px rgba(150, 200, 255, 0.8),
+      0 0 50px 20px rgba(100, 150, 255, 0.5),
+      0 0 70px 28px rgba(50, 100, 255, 0.3);
+  }
+}
+
+/* Torque-Driven Lattice Wrapper */
+.lattice-torque-wrapper {
+  transform: rotateY(var(--crystal-torque, 0deg)) scale(calc(1 - var(--crystal-torque, 0) / 500));
+  transition: transform 0.1s ease-out;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Transitioning State */
+.lattice-transitioning {
+  filter: blur(2px);
+  animation: lattice-shimmer 0.5s infinite;
+}
+
+@keyframes lattice-shimmer {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+/* Grounded State - Visual Lead Shed Effect */
+.crystal-grounded {
+  animation: lead-shed 0.8s ease-out;
+}
+
+@keyframes lead-shed {
+  0% { 
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+  25% { 
+    filter: brightness(0.3) saturate(0) hue-rotate(180deg);
+    transform: scale(0.95);
+  }
+  50% { 
+    filter: brightness(0.5) saturate(0.5);
+    transform: scale(1.02);
+  }
+  100% { 
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+}
+
+/* Elevated State - High Resonance Glow */
+.crystal-elevated {
+  animation: elevated-radiance 2s infinite ease-in-out;
+}
+
+@keyframes elevated-radiance {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(139, 92, 246, 0.5),
+      0 0 60px rgba(139, 92, 246, 0.3),
+      0 0 90px rgba(139, 92, 246, 0.1);
+    filter: brightness(1.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 50px rgba(139, 92, 246, 0.7),
+      0 0 100px rgba(139, 92, 246, 0.5),
+      0 0 150px rgba(139, 92, 246, 0.3);
+    filter: brightness(1.5);
+  }
+}
+
+/* Source-Specific Frequencies */
+.crystal-source-void { --source-color: #1a1a2e; }
+.crystal-source-breathing { --source-color: #3B82F6; }
+.crystal-source-sanctuary { --source-color: #10B981; }
+.crystal-source-herbology { --source-color: #22C55E; }
+.crystal-source-mixer { --source-color: #A855F7; }
+.crystal-source-i_ching { --source-color: #6366F1; }
+.crystal-source-tarot { --source-color: #F472B6; }
+.crystal-source-star_chart { --source-color: #F59E0B; }
+.crystal-source-oracle { --source-color: #EC4899; }
+.crystal-source-divination { --source-color: #8B5CF6; }
+.crystal-source-tesseract { --source-color: #22D3EE; }
+
+/* Frequency Ring - Outer Halo */
+.frequency-ring {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  border: 2px solid var(--source-color, rgba(150, 200, 255, 0.3));
+  animation: ring-pulse 2s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes ring-pulse {
+  0% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Multiple Rings for Ripple Effect */
+.frequency-ring:nth-child(2) { animation-delay: 0.5s; }
+.frequency-ring:nth-child(3) { animation-delay: 1s; }
+.frequency-ring:nth-child(4) { animation-delay: 1.5s; }
+
+/* Seed Display */
+.seed-display {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seed-display::before {
+  content: '72b:';
+  margin-right: 4px;
+  opacity: 0.5;
+}
