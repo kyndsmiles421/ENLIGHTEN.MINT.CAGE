@@ -1,5 +1,5 @@
 {
-  "summary": "Comprehensive testing of Cosmic Collective wellness app - ALL FEATURES WORKING. Backend: 25/25 tests passed. Frontend: All practice pages load with real content, videos play, classes have full lesson content with video+text+narration.",
+  "summary": "Comprehensive testing of ENLIGHTEN.MINT.CAFE wellness app - ALL FEATURES WORKING. Backend: 25/25 tests passed. Frontend: All practice pages load with real content, videos play, classes have full lesson content with video+text+narration.",
   "backend_issues": {
     "critical": [],
     "minor": []

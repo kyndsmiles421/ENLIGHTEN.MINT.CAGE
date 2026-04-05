@@ -1,4 +1,4 @@
-// ━━━ Cosmic Collective Service Worker ━━━
+// ━━━ ENLIGHTEN.MINT.CAFE Service Worker ━━━
 // Push Notifications + Offline Solfeggio Oscillator Cache + App Shell
 
 const CACHE_VERSION = 'cosmic-v3';
@@ -152,7 +152,7 @@ self.addEventListener('fetch', (event) => {
 // Push: display notification
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'Cosmic Collective',
+    title: 'ENLIGHTEN.MINT.CAFE',
     body: 'Your quantum field is calling.',
     url: '/',
     tag: 'cosmic',

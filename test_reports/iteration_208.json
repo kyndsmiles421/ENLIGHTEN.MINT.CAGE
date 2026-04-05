@@ -94,7 +94,7 @@
     "frontend_hub_page": {
       "page_loads": "data-testid='orbital-hub-page' present - PASS",
       "gravity_field": "WebGL canvas rendering - PASS",
-      "central_orb": "Mission Control orb - PASS",
+      "central_orb": "ENLIGHTEN.MINT.CAFE orb - PASS",
       "weather_ribbon": "Weather display at top - PASS",
       "active_satellites": "Orbiting satellites visible - PASS"
     },

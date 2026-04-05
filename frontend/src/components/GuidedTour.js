@@ -13,7 +13,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 const TOUR_STEPS = [
   {
-    id: 'welcome', title: 'Welcome to The Cosmic Collective',
+    id: 'welcome', title: 'Welcome to The ENLIGHTEN.MINT.CAFE',
     desc: 'Your immersive portal to spiritual wellness, ancient wisdom, and cosmic discovery. Let us show you everything this platform has to offer.',
     icon: Sparkles, color: '#D8B4FE', category: 'Introduction',
     bg: 'radial-gradient(ellipse at 30% 40%, rgba(216,180,254,0.15) 0%, transparent 60%)',
@@ -86,7 +86,7 @@ const TOUR_STEPS = [
   },
   {
     id: 'finish', title: 'Your Journey Begins Now',
-    desc: 'The Cosmic Collective evolves with you. Explore at your own pace — there\'s always something new to discover.',
+    desc: 'The ENLIGHTEN.MINT.CAFE evolves with you. Explore at your own pace — there\'s always something new to discover.',
     icon: Sparkles, color: '#D8B4FE', category: 'Begin',
     bg: 'radial-gradient(ellipse at 50% 50%, rgba(216,180,254,0.18) 0%, rgba(129,140,248,0.06) 50%, transparent 80%)',
   },

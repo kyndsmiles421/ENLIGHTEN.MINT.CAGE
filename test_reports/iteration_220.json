@@ -1,5 +1,5 @@
 {
-  "summary": "Iteration 220 - Trade Circle Orbital & Codex Orbital Testing Complete. All 20 backend API tests passed (100%). Frontend UI verified: TradeCircleOrbital with center sun 'Trade Circle', 10 orbital planets (category nodes + stats/escrow/forge/genesis/karma), detail panels with listing data. CodexOrbital with center sun 'Sovereign Codex', 8 section planets, deep-dive recursion working (L1 depth indicator), tier indicator 'Archivist'. Mission Control has Trade Orbital and Codex Orbital action links. Locked nodes (Cosmic Forge, Genesis Mint) correctly show opacity 0.2 and 'locked' text.",
+  "summary": "Iteration 220 - Trade Circle Orbital & Codex Orbital Testing Complete. All 20 backend API tests passed (100%). Frontend UI verified: TradeCircleOrbital with center sun 'Trade Circle', 10 orbital planets (category nodes + stats/escrow/forge/genesis/karma), detail panels with listing data. CodexOrbital with center sun 'Sovereign Codex', 8 section planets, deep-dive recursion working (L1 depth indicator), tier indicator 'Archivist'. ENLIGHTEN.MINT.CAFE has Trade Orbital and Codex Orbital action links. Locked nodes (Cosmic Forge, Genesis Mint) correctly show opacity 0.2 and 'locked' text.",
   "backend_issues": {
     "critical": [],
     "minor": []
@@ -55,7 +55,7 @@
   "seed_data_creation": "None",
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "Iteration 220 verified: (1) /trade-orbital route renders TradeCircleOrbital with center sun 'Trade Circle' and 10 orbiting planets (category nodes from listings + stats/escrow/forge/genesis/karma). (2) Trade Orbital category planets generated from actual listings data (frequency_recipe, botanical, phonetic_mantra, other, goods). (3) Cosmic Forge (bit 4) and Genesis Mint (bit 5) nodes correctly locked with opacity 0.2 and 'locked' text. (4) TradeDetailPanel opens on planet click showing listing items with title, mass, visual_scale. (5) /codex-orbital route renders CodexOrbital with center sun 'Sovereign Codex' and 8 section planets (botany, elements, navigation, trade, mechanics, mastery, mathematics, resonance). (6) Deep-dive recursion works - clicking section planet with subPlanets triggers fly-in animation, section becomes new sun with entries as planets. (7) Depth breadcrumbs show L0, L1 during recursion with back button. (8) Tier indicator 'Archivist' shown in bottom-left. (9) Mission Control has Trade Orbital and Codex Orbital action links. (10) CosmicSparkline overlay in top-right on all orbital pages. (11) Full View buttons link to /trade-circle and /codex (badge overlay issue persists). (12) Gravitational pull zones implemented - orbit slows when cursor near planet (quadratic damping curve). (13) HexagramGlitch wraps orbital canvas when hexagram is transitioning.",
+  "context_for_next_testing_agent": "Iteration 220 verified: (1) /trade-orbital route renders TradeCircleOrbital with center sun 'Trade Circle' and 10 orbiting planets (category nodes from listings + stats/escrow/forge/genesis/karma). (2) Trade Orbital category planets generated from actual listings data (frequency_recipe, botanical, phonetic_mantra, other, goods). (3) Cosmic Forge (bit 4) and Genesis Mint (bit 5) nodes correctly locked with opacity 0.2 and 'locked' text. (4) TradeDetailPanel opens on planet click showing listing items with title, mass, visual_scale. (5) /codex-orbital route renders CodexOrbital with center sun 'Sovereign Codex' and 8 section planets (botany, elements, navigation, trade, mechanics, mastery, mathematics, resonance). (6) Deep-dive recursion works - clicking section planet with subPlanets triggers fly-in animation, section becomes new sun with entries as planets. (7) Depth breadcrumbs show L0, L1 during recursion with back button. (8) Tier indicator 'Archivist' shown in bottom-left. (9) ENLIGHTEN.MINT.CAFE has Trade Orbital and Codex Orbital action links. (10) CosmicSparkline overlay in top-right on all orbital pages. (11) Full View buttons link to /trade-circle and /codex (badge overlay issue persists). (12) Gravitational pull zones implemented - orbit slows when cursor near planet (quadratic damping curve). (13) HexagramGlitch wraps orbital canvas when hexagram is transitioning.",
   "features_verified": {
     "trade_orbital_route": {
       "status": "PASS",
@@ -119,11 +119,11 @@
     },
     "mission_control_trade_orbital": {
       "status": "PASS",
-      "details": "Mission Control has Trade Orbital action link"
+      "details": "ENLIGHTEN.MINT.CAFE has Trade Orbital action link"
     },
     "mission_control_codex_orbital": {
       "status": "PASS",
-      "details": "Mission Control has Codex Orbital action link"
+      "details": "ENLIGHTEN.MINT.CAFE has Codex Orbital action link"
     },
     "cosmic_sparkline_overlay": {
       "status": "PASS",

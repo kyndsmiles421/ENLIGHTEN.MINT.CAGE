@@ -1,5 +1,5 @@
 {
-  "summary": "Iteration 205 testing complete. All 13 backend tests passed (100%). All 11 frontend features verified. Abyss UX system working - hub shows only 6 active satellites (mood, mixer, map, breathing, meditation, theory) with 7 dormant. Long-press on central orb reveals dormant satellites as glimmering dots inside orb. Weather Ribbon displays live NWS weather data (Freezing Fog 30.2°F 100% humidity, fair seeing). Mission Control opens on short orb click. Satellite clicks navigate correctly.",
+  "summary": "Iteration 205 testing complete. All 13 backend tests passed (100%). All 11 frontend features verified. Abyss UX system working - hub shows only 6 active satellites (mood, mixer, map, breathing, meditation, theory) with 7 dormant. Long-press on central orb reveals dormant satellites as glimmering dots inside orb. Weather Ribbon displays live NWS weather data (Freezing Fog 30.2°F 100% humidity, fair seeing). ENLIGHTEN.MINT.CAFE opens on short orb click. Satellite clicks navigate correctly.",
   "backend_issues": {
     "critical": [],
     "minor": []
@@ -23,7 +23,7 @@
     "OrbitalHub.js: Only active satellites rendered (6 by default, not all 13) - PASS",
     "OrbitalHub.js: Central orb shows dormant count ('7 dormant') - PASS",
     "OrbitalHub.js: Long-press (>500ms) on orb reveals Abyss with dormant dots - PASS",
-    "OrbitalHub.js: Short click on orb opens Mission Control - PASS",
+    "OrbitalHub.js: Short click on orb opens ENLIGHTEN.MINT.CAFE - PASS",
     "OrbitalHub.js: WeatherRibbon component displays weather data with glassmorphic styling - PASS",
     "OrbitalHub.js: Satellite click navigates to correct route (satellite-mood → /mood) - PASS",
     "OrbitalHub.js: DormantDot components render inside orb with glimmering animation - PASS"
@@ -36,7 +36,7 @@
   "seed_data_creation": "None",
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "Iteration 205 Abyss UX, NWS Weather, and Weather Ribbon features fully working. (1) Backend: GET /api/hub/preferences returns active_satellites list (defaults: mood, mixer, map, breathing, meditation, theory). POST /api/hub/preferences updates list. GET /api/weather/current returns weather with temperature_f, description, category, frequency (base_hz, type, reverb, character), seeing_quality. Weather uses NWS API (api.weather.gov) with fallback. (2) Frontend: /hub shows only active satellites (6 by default). Central orb shows 'X dormant' count. Long-press (>500ms) on orb opens Abyss showing dormant satellites as glimmering dots inside orb. Short click opens Mission Control. WeatherRibbon (data-testid='weather-ribbon') shows temp, description, humidity, seeing quality at top of hub. Satellite clicks navigate correctly. (3) Backend regression: GET /api/observatory/planets, GET /api/mastery/tier, GET /api/workshop/platonic-solids all pass.",
+  "context_for_next_testing_agent": "Iteration 205 Abyss UX, NWS Weather, and Weather Ribbon features fully working. (1) Backend: GET /api/hub/preferences returns active_satellites list (defaults: mood, mixer, map, breathing, meditation, theory). POST /api/hub/preferences updates list. GET /api/weather/current returns weather with temperature_f, description, category, frequency (base_hz, type, reverb, character), seeing_quality. Weather uses NWS API (api.weather.gov) with fallback. (2) Frontend: /hub shows only active satellites (6 by default). Central orb shows 'X dormant' count. Long-press (>500ms) on orb opens Abyss showing dormant satellites as glimmering dots inside orb. Short click opens ENLIGHTEN.MINT.CAFE. WeatherRibbon (data-testid='weather-ribbon') shows temp, description, humidity, seeing quality at top of hub. Satellite clicks navigate correctly. (3) Backend regression: GET /api/observatory/planets, GET /api/mastery/tier, GET /api/workshop/platonic-solids all pass.",
   "features_verified": {
     "backend_hub_preferences": {
       "GET /api/hub/preferences": "Returns active_satellites list with defaults - PASS",
@@ -55,7 +55,7 @@
       "dormant_count": "Central orb shows '7 dormant' - PASS",
       "long_press_abyss": "Long-press reveals dormant dots inside orb - PASS",
       "dormant_dots": "7 dormant satellites appear as glimmering dots - PASS",
-      "short_click_mission_control": "Short click opens Mission Control - PASS"
+      "short_click_mission_control": "Short click opens ENLIGHTEN.MINT.CAFE - PASS"
     },
     "frontend_weather_ribbon": {
       "visibility": "data-testid='weather-ribbon' visible at top of hub - PASS",

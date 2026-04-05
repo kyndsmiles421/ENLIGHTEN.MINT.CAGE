@@ -1755,7 +1755,7 @@ function PresetCard({ preset, userId, onLoad, onLike, onDelete }) {
           )}
         </div>
       </div>
-      {preset.creator_name && preset.creator_name !== 'Cosmic Collective' && (
+      {preset.creator_name && preset.creator_name !== 'ENLIGHTEN.MINT.CAFE' && (
         <p className="text-[7px] mt-1.5" style={{ color: 'rgba(255,255,255,0.15)' }}>by {preset.creator_name}</p>
       )}
     </div>
@@ -1811,7 +1811,7 @@ function PlaylistCard({ playlist, userId, isPlaying, onStart, onStop }) {
         data-testid={`playlist-${isPlaying ? 'stop' : 'start'}-${playlist.id}`}>
         {isPlaying ? <><Square size={8} /> Stop Journey</> : <><Play size={8} /> Begin Journey</>}
       </button>
-      {playlist.creator_name && playlist.creator_name !== 'Cosmic Collective' && (
+      {playlist.creator_name && playlist.creator_name !== 'ENLIGHTEN.MINT.CAFE' && (
         <p className="text-[7px] mt-1.5" style={{ color: 'rgba(255,255,255,0.15)' }}>by {playlist.creator_name}</p>
       )}
     </div>

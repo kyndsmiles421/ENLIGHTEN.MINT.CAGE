@@ -6,4 +6,4 @@
 - **Auth Key**: `zen_token` (stored in localStorage)
 
 ## Usage
-Use these credentials for testing any authentication-required flows in the Cosmic Collective app.
+Use these credentials for testing any authentication-required flows in the ENLIGHTEN.MINT.CAFE app.

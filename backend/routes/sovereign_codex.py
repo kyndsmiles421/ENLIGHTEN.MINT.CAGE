@@ -139,7 +139,7 @@ NANO_GUIDES = {
         ],
     },
     "mission-control": {
-        "title": "Mission Control",
+        "title": "ENLIGHTEN.MINT.CAFE",
         "tips": [
             "Access Profile, Dashboard, Mastery Tiers, and Analytics",
             "Your mastery tier determines what content and math tools unlock",

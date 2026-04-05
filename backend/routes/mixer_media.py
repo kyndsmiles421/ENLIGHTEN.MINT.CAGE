@@ -1,5 +1,5 @@
 """
-Mixer Media & Templates — The Cosmic Collective
+Mixer Media & Templates — The ENLIGHTEN.MINT.CAFE
 Tiered video/audio recording configs, mix templates,
 and AI-powered generation endpoints.
 """

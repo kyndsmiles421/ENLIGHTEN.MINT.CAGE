@@ -1,5 +1,5 @@
 """
-Test suite for Cosmic Collective new features:
+Test suite for ENLIGHTEN.MINT.CAFE new features:
 - Light Therapy page (frontend only - no backend endpoints)
 - Zen Garden endpoints (plants CRUD with auth)
 - CelebrationBurst (frontend only - triggered on mood/journal save)

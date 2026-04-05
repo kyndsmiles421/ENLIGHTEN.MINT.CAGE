@@ -119,7 +119,7 @@ export default function MissionControl({ isOpen, onClose }) {
                 <Orbit size={16} style={{ color: '#A78BFA' }} />
                 <h2 className="text-sm font-medium tracking-wider uppercase"
                   style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif', letterSpacing: '0.15em' }}>
-                  Mission Control
+                  ENLIGHTEN.MINT.CAFE
                 </h2>
                 <NanoGuide guideId="mission-control" position="top-left" />
               </div>
@@ -240,7 +240,7 @@ export default function MissionControl({ isOpen, onClose }) {
               </div>
             )}
 
-            {/* Cosmic Collective Link */}
+            {/* ENLIGHTEN.MINT.CAFE Link */}
             <div className="px-5 py-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
               <button onClick={() => handleNav('/')}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-medium transition-all"
@@ -251,7 +251,7 @@ export default function MissionControl({ isOpen, onClose }) {
                 }}
                 data-testid="mc-collective-link">
                 <Globe size={12} />
-                The Cosmic Collective Portal
+                The ENLIGHTEN.MINT.CAFE Portal
               </button>
             </div>
 

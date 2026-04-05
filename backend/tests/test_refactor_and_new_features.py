@@ -1,5 +1,5 @@
 """
-Backend API Tests for Cosmic Collective
+Backend API Tests for ENLIGHTEN.MINT.CAFE
 - Regression tests for existing endpoints after refactoring
 - Tests for 4 new feature modules: Aromatherapy, Herbology, Elixirs, Meals
 """

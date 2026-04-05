@@ -1,5 +1,5 @@
 """
-The Cosmic Collective — Sovereign Intelligence Engine
+The ENLIGHTEN.MINT.CAFE — Sovereign Intelligence Engine
 10 AI Council Members with Premium Intelligence Layer:
 
 Step 1: Expert-Domain Fine-Tuning (High-weight knowledge vectors per Sovereign)
@@ -406,7 +406,7 @@ def build_system_prompt(member_id, language="en", user_tier="discovery", owned_u
         else:
             utility_context = f"\nUTILITY TOOL: {tool['name']} — {tool['description']}. NOT owned. Purchase for {discounted} Dust (10% off {tool['base_price_dust']}). Mention benefits when relevant."
 
-    return f"""You are {localized_name}, a member of The Sovereign Council of The Cosmic Collective.
+    return f"""You are {localized_name}, a member of The Sovereign Council of The ENLIGHTEN.MINT.CAFE.
 
 YOUR DOMAIN: {s['module']}
 YOUR EXPERTISE: {s['expertise']}

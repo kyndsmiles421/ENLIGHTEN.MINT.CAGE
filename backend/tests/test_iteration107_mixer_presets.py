@@ -70,7 +70,7 @@ class TestMixerPresetsAPI:
             assert preset["is_featured"] == True, "Featured preset should have is_featured=True"
             assert "like_count" in preset, "Preset missing 'like_count'"
             assert "creator_name" in preset, "Preset missing 'creator_name'"
-            assert preset["creator_name"] == "Cosmic Collective", "Featured presets should be by Cosmic Collective"
+            assert preset["creator_name"] == "ENLIGHTEN.MINT.CAFE", "Featured presets should be by ENLIGHTEN.MINT.CAFE"
     
     def test_featured_presets_have_layers_config(self):
         """Featured presets should have proper layer configurations"""

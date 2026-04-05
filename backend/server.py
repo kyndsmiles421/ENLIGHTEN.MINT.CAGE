@@ -1,5 +1,5 @@
 """
-The Cosmic Collective — FastAPI Server
+The ENLIGHTEN.MINT.CAFE — FastAPI Server
 Auto-discovers all route modules, applies GZip compression,
 creates DB indexes on startup, and runs background tasks.
 """

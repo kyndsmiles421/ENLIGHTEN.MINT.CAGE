@@ -34,7 +34,7 @@ const STAGES = [
         id: 's0-welcome', title: 'Welcome to Your Journey',
         desc: 'Understand what holistic wellness means and how this path will transform your daily life.',
         visual: 'intention',
-        narration: 'Welcome to The Cosmic Collective. This journey will guide you through ancient and modern wellness practices — from breathwork to meditation, sound healing to sacred rituals. Each stage builds upon the last, creating a comprehensive foundation for your well-being. There is no rush. Move at your own pace. The most important thing is to show up with an open heart and a curious mind. Let us begin.',
+        narration: 'Welcome to The ENLIGHTEN.MINT.CAFE. This journey will guide you through ancient and modern wellness practices — from breathwork to meditation, sound healing to sacred rituals. Each stage builds upon the last, creating a comprehensive foundation for your well-being. There is no rush. Move at your own pace. The most important thing is to show up with an open heart and a curious mind. Let us begin.',
         content: [
           { type: 'text', value: 'Holistic wellness is the understanding that your well-being is not just physical — it encompasses your mind, emotions, energy, and spirit. When these are in harmony, you experience vitality, clarity, and deep inner peace.' },
           { type: 'text', value: 'In this journey, you will explore practices from traditions spanning thousands of years — yogic breathing, Buddhist meditation, Hawaiian forgiveness, sound healing, sacred geometry, and more.' },
@@ -810,7 +810,7 @@ export default function Journey() {
             Your Path to Wellness
           </h1>
           <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-            A guided journey through the practices of The Cosmic Collective. Complete each stage to unlock the next.
+            A guided journey through the practices of The ENLIGHTEN.MINT.CAFE. Complete each stage to unlock the next.
           </p>
 
           {/* Overall progress */}

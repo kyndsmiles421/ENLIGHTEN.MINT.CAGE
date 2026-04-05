@@ -1,5 +1,5 @@
 """
-Test Dual Currency Economy & Shop System for The Cosmic Collective RPG
+Test Dual Currency Economy & Shop System for The ENLIGHTEN.MINT.CAFE RPG
 Tests: Gem packs, Dust shop, Gem shop, Currency conversion, Slot unlocks, Stripe checkout
 """
 import pytest

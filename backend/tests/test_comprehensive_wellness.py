@@ -1,5 +1,5 @@
 """
-Comprehensive API tests for Cosmic Collective Wellness App
+Comprehensive API tests for ENLIGHTEN.MINT.CAFE Wellness App
 Tests all static endpoints, auth, classes, videos, exercises, and practice pages
 """
 import pytest

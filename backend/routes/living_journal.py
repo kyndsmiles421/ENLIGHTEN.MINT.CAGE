@@ -21,7 +21,7 @@ async def _generate_discovery_narrative(specimen: dict, meta: dict, context: dic
         llm = LlmChat(
             api_key=os.environ.get("EMERGENT_LLM_KEY", ""),
             session_id=f"journal_{specimen.get('name', 'unknown')}",
-            system_message="You are the Living Journal of The Cosmic Collective — a mystical geology-based wellness platform. Write brief, evocative, poetic journal entries.",
+            system_message="You are the Living Journal of The ENLIGHTEN.MINT.CAFE — a mystical geology-based wellness platform. Write brief, evocative, poetic journal entries.",
         ).with_model("gemini", "gemini-3-flash-preview")
 
         from routes.evolution import _get_current_season

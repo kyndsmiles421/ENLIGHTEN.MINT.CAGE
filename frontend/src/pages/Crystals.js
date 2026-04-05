@@ -891,7 +891,7 @@ function SharePairingButton({ result }) {
   const handleShare = async () => {
     if (!result) return;
     const crystalNames = (result.crystals || []).map(c => c.name).join(', ');
-    const text = `My Crystal Pairing from The Cosmic Collective:\n${crystalNames}\n\n"${result.explanation?.substring(0, 150)}..."\n\nDiscover your cosmic crystals at ${window.location.origin}/crystals`;
+    const text = `My Crystal Pairing from The ENLIGHTEN.MINT.CAFE:\n${crystalNames}\n\n"${result.explanation?.substring(0, 150)}..."\n\nDiscover your cosmic crystals at ${window.location.origin}/crystals`;
 
     if (navigator.share) {
       try {

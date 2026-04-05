@@ -112,7 +112,7 @@ export default function Tutorial() {
             <Compass size={14} className="inline mr-2" />Guide
           </p>
           <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            How to Use The Cosmic Collective
+            How to Use The ENLIGHTEN.MINT.CAFE
           </h1>
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
             Everything you need to know — from first steps to mastering every tool.

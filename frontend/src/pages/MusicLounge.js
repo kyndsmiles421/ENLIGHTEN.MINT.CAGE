@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const TRACKS = [
-  { id: 'gentle-dawn', name: 'Gentle Dawn', artist: 'Cosmic Collective', category: 'ambient', color: '#2DD4BF', duration: '∞', mood: 'Calm & Grounding',
+  { id: 'gentle-dawn', name: 'Gentle Dawn', artist: 'ENLIGHTEN.MINT.CAFE', category: 'ambient', color: '#2DD4BF', duration: '∞', mood: 'Calm & Grounding',
     synth: (ctx, g) => {
       const nodes = [];
       [220, 277.18, 329.63].forEach((f, i) => {
@@ -29,7 +29,7 @@ const TRACKS = [
       });
       return nodes;
     }},
-  { id: 'moonlit-keys', name: 'Moonlit Keys', artist: 'Cosmic Collective', category: 'piano', color: '#3B82F6', duration: '∞', mood: 'Reflective',
+  { id: 'moonlit-keys', name: 'Moonlit Keys', artist: 'ENLIGHTEN.MINT.CAFE', category: 'piano', color: '#3B82F6', duration: '∞', mood: 'Reflective',
     synth: (ctx, g) => {
       const nodes = [];
       const notes = [261.63, 329.63, 392, 523.25, 392, 329.63];
@@ -46,7 +46,7 @@ const TRACKS = [
       nodes._interval = iv;
       return nodes;
     }},
-  { id: 'forest-rain', name: 'Forest After Rain', artist: 'Cosmic Collective', category: 'nature', color: '#22C55E', duration: '∞', mood: 'Refreshing',
+  { id: 'forest-rain', name: 'Forest After Rain', artist: 'ENLIGHTEN.MINT.CAFE', category: 'nature', color: '#22C55E', duration: '∞', mood: 'Refreshing',
     synth: (ctx, g) => {
       const nodes = [];
       const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
@@ -66,7 +66,7 @@ const TRACKS = [
       b.connect(bg); bg.connect(g); b.start(); blfo.start(); nodes.push(b, blfo);
       return nodes;
     }},
-  { id: 'stellar-drift', name: 'Stellar Drift', artist: 'Cosmic Collective', category: 'cosmic', color: '#8B5CF6', duration: '∞', mood: 'Expansive',
+  { id: 'stellar-drift', name: 'Stellar Drift', artist: 'ENLIGHTEN.MINT.CAFE', category: 'cosmic', color: '#8B5CF6', duration: '∞', mood: 'Expansive',
     synth: (ctx, g) => {
       const nodes = [];
       [136.1, 172.06, 204.26].forEach((f, i) => {
@@ -83,7 +83,7 @@ const TRACKS = [
       });
       return nodes;
     }},
-  { id: 'sunrise-hope', name: 'Sunrise Hope', artist: 'Cosmic Collective', category: 'uplifting', color: '#FCD34D', duration: '∞', mood: 'Joyful',
+  { id: 'sunrise-hope', name: 'Sunrise Hope', artist: 'ENLIGHTEN.MINT.CAFE', category: 'uplifting', color: '#FCD34D', duration: '∞', mood: 'Joyful',
     synth: (ctx, g) => {
       const nodes = [];
       [392, 493.88, 587.33, 659.25].forEach((f, i) => {
@@ -97,7 +97,7 @@ const TRACKS = [
       });
       return nodes;
     }},
-  { id: 'deep-ocean', name: 'Deep Ocean Floor', artist: 'Cosmic Collective', category: 'ambient', color: '#06B6D4', duration: '∞', mood: 'Immersive',
+  { id: 'deep-ocean', name: 'Deep Ocean Floor', artist: 'ENLIGHTEN.MINT.CAFE', category: 'ambient', color: '#06B6D4', duration: '∞', mood: 'Immersive',
     synth: (ctx, g) => {
       const nodes = [];
       const buf = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
@@ -116,7 +116,7 @@ const TRACKS = [
       hum.connect(hg); hg.connect(g); hum.start(); nodes.push(hum);
       return nodes;
     }},
-  { id: 'crystal-bells', name: 'Crystal Bells', artist: 'Cosmic Collective', category: 'piano', color: '#E879F9', duration: '∞', mood: 'Ethereal',
+  { id: 'crystal-bells', name: 'Crystal Bells', artist: 'ENLIGHTEN.MINT.CAFE', category: 'piano', color: '#E879F9', duration: '∞', mood: 'Ethereal',
     synth: (ctx, g) => {
       const nodes = [];
       const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 659.25, 523.25, 392];
@@ -133,7 +133,7 @@ const TRACKS = [
       nodes._interval = iv;
       return nodes;
     }},
-  { id: 'earth-pulse', name: 'Earth Pulse', artist: 'Cosmic Collective', category: 'nature', color: '#78716C', duration: '∞', mood: 'Grounding',
+  { id: 'earth-pulse', name: 'Earth Pulse', artist: 'ENLIGHTEN.MINT.CAFE', category: 'nature', color: '#78716C', duration: '∞', mood: 'Grounding',
     synth: (ctx, g) => {
       const nodes = [];
       // Binaural Schumann resonance: 200 Hz left, 207.83 Hz right
@@ -165,7 +165,7 @@ const TRACKS = [
       src.start(); nodes.push(src);
       return nodes;
     }},
-  { id: 'nebula-waltz', name: 'Nebula Waltz', artist: 'Cosmic Collective', category: 'cosmic', color: '#C084FC', duration: '∞', mood: 'Dreamy',
+  { id: 'nebula-waltz', name: 'Nebula Waltz', artist: 'ENLIGHTEN.MINT.CAFE', category: 'cosmic', color: '#C084FC', duration: '∞', mood: 'Dreamy',
     synth: (ctx, g) => {
       const nodes = [];
       [174.61, 220, 261.63, 349.23].forEach((f, i) => {
@@ -179,7 +179,7 @@ const TRACKS = [
       });
       return nodes;
     }},
-  { id: 'golden-hour', name: 'Golden Hour', artist: 'Cosmic Collective', category: 'uplifting', color: '#FB923C', duration: '∞', mood: 'Warm',
+  { id: 'golden-hour', name: 'Golden Hour', artist: 'ENLIGHTEN.MINT.CAFE', category: 'uplifting', color: '#FB923C', duration: '∞', mood: 'Warm',
     synth: (ctx, g) => {
       const nodes = [];
       [329.63, 415.3, 493.88, 622.25].forEach((f, i) => {

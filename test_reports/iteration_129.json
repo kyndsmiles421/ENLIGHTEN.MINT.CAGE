@@ -33,7 +33,7 @@
     "capacitor_native_scaffolding": {
       "capacitor_config_exists": "PASS - /frontend/capacitor.config.ts exists with valid config",
       "app_id": "PASS - com.cosmiccollective.app",
-      "app_name": "PASS - The Cosmic Collective",
+      "app_name": "PASS - The ENLIGHTEN.MINT.CAFE",
       "splash_screen_config": "PASS - 2.5s duration, #0B0C15 background, immersive mode",
       "icon_asset": "PASS - /frontend/resources/icon.png exists (816KB)",
       "splash_asset": "PASS - /frontend/resources/splash.png exists (703KB)",

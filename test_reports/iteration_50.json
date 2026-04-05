@@ -40,7 +40,7 @@
     "tutorial_page_features": {
       "Tutorial page loads at /tutorial": "PASS",
       "data-testid='tutorial-page' present": "PASS",
-      "Header 'How to Use The Cosmic Collective' present": "PASS",
+      "Header 'How to Use The ENLIGHTEN.MINT.CAFE' present": "PASS",
       "Replay Walkthrough button (start-walkthrough-btn) present": "PASS",
       "8 sections present (Getting Started, Meditation & Breathwork, The Cosmos, Divination & Prophecy, Body & Energy, Mind & Spirit, Nature & Healing, Your Avatar & Growth)": "PASS",
       "38 tutorial cards found": "PASS",

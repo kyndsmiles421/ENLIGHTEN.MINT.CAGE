@@ -1,5 +1,5 @@
 {
-  "summary": "Comprehensive testing of Cosmic Collective new features - ALL FEATURES WORKING. Tested: Light Therapy page with 7 chromotherapy colors and immersive sessions, Zen Garden with 5 interactive tabs (Plant Garden, Koi Pond, Sand Drawing, Lantern Release, Rain Scene), CelebrationBurst particle effects on mood logging and journal saving, and all zen-garden plant CRUD endpoints.",
+  "summary": "Comprehensive testing of ENLIGHTEN.MINT.CAFE new features - ALL FEATURES WORKING. Tested: Light Therapy page with 7 chromotherapy colors and immersive sessions, Zen Garden with 5 interactive tabs (Plant Garden, Koi Pond, Sand Drawing, Lantern Release, Rain Scene), CelebrationBurst particle effects on mood logging and journal saving, and all zen-garden plant CRUD endpoints.",
   "backend_issues": {
     "critical": [],
     "minor": []

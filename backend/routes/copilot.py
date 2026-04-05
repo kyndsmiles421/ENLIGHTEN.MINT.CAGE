@@ -1,5 +1,5 @@
 """
-The Cosmic Collective — AI Co-Pilot & Pack Generator
+The ENLIGHTEN.MINT.CAFE — AI Co-Pilot & Pack Generator
 Provides:
   - Just-in-time micro-lessons when Learning Toggle is ON
   - Automated pack synthesis from user expertise
@@ -108,7 +108,7 @@ async def generate_micro_lesson(body: dict, user=Depends(get_current_user)):
 
     from emergentintegrations.llm.chat import LlmChat, UserMessage
 
-    system_msg = f"""You are the Cosmic Collective AI Co-Pilot. Generate a concise, actionable micro-lesson.
+    system_msg = f"""You are the ENLIGHTEN.MINT.CAFE AI Co-Pilot. Generate a concise, actionable micro-lesson.
 
 Context: The user is in the '{context}' area of the platform.
 User state: modality={modality}, resonance={resonance}RP, tier={tier}
@@ -183,7 +183,7 @@ async def generate_pack_outline(body: dict, user=Depends(get_current_user)):
 
     from emergentintegrations.llm.chat import LlmChat, UserMessage
 
-    system_msg = f"""You are the Cosmic Collective Synthesis Forge. Generate a complete learning pack.
+    system_msg = f"""You are the ENLIGHTEN.MINT.CAFE Synthesis Forge. Generate a complete learning pack.
 
 Pack type: {pack_type} ({config['depth']})
 Price range: {config['price_range']}

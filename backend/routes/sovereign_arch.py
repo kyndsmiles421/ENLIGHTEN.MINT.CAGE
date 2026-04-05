@@ -1,5 +1,5 @@
 """
-SOVEREIGN ARCHITECTURE — The Cosmic Collective
+SOVEREIGN ARCHITECTURE — The ENLIGHTEN.MINT.CAFE
 Master 4-Tier Subscription Model with Cross-Tier Purchasing,
 Glass Box Thinking Feed, Agent Coordination, and Tool Gating.
 

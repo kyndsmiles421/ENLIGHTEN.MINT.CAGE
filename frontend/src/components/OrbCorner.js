@@ -45,7 +45,7 @@ export default function OrbCorner() {
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.92 }}
         data-testid="orb-corner"
-        title="Return to Hub (right-click for Mission Control)"
+        title="Return to Hub (right-click for ENLIGHTEN.MINT.CAFE)"
       >
         <Orbit size={18} style={{ color: pulseColor, opacity: 0.8 }} />
       </motion.button>

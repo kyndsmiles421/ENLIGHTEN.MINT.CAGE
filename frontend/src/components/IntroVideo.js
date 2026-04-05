@@ -179,7 +179,7 @@ export default function IntroVideo() {
                   <div className="absolute bottom-0 left-0 right-0 p-6"
                     style={{ background: 'linear-gradient(transparent, rgba(3,4,10,0.8))', pointerEvents: 'none' }}>
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#D8B4FE' }}>
-                      The Cosmic Collective
+                      The ENLIGHTEN.MINT.CAFE
                     </p>
                     <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
                       A cinematic vision powered by Sora 2 AI

@@ -1,5 +1,5 @@
 """
-Database Index Definitions — The Cosmic Collective
+Database Index Definitions — The ENLIGHTEN.MINT.CAFE
 Creates indexes on startup for all heavily-queried collections.
 Eliminates full collection scans, dramatically reducing response latency.
 """

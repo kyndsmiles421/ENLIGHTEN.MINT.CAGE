@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-The Cosmic Collective uses a **plug-and-play game architecture** where individual game modules connect to a central "Universal Game Core" via a standardized bridge pattern. This document is the recipe for adding new game modules.
+The ENLIGHTEN.MINT.CAFE uses a **plug-and-play game architecture** where individual game modules connect to a central "Universal Game Core" via a standardized bridge pattern. This document is the recipe for adding new game modules.
 
 ```
 ┌─────────────────────────────────────────────────────┐

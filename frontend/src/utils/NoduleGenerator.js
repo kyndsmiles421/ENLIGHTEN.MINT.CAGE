@@ -98,7 +98,7 @@ export class NoduleGenerator {
   }
 
   handleInteraction(data) {
-    console.log(`Mission Control: Initiating ${data.label} sequence...`);
+    console.log(`ENLIGHTEN.MINT.CAFE: Initiating ${data.label} sequence...`);
     // Dispatch custom event for React to catch
     window.dispatchEvent(new CustomEvent('nodule-interaction', { detail: data }));
   }
@@ -119,7 +119,7 @@ export const useSphericalNodules = (nodules, radius = 150) => {
 };
 
 /**
- * Default nodule configurations for The Cosmic Collective
+ * Default nodule configurations for The ENLIGHTEN.MINT.CAFE
  */
 export const COSMIC_NODULES = [
   { id: 'oracle', label: 'ORACLE', icon: '👁️', color: 'rgba(255, 215, 0, 0.6)', path: '/oracle' },

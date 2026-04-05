@@ -258,7 +258,7 @@ async def generate_bible_chapter(book_id: str, chapter_num: int, user=Depends(ge
     elif is_quran:
         tradition_note = "This is a Surah from the Holy Quran. Present with deep reverence for Islamic scripture. Use 'peace be upon him' after prophets' names. Include the Arabic transliteration of key phrases where meaningful."
 
-    system_msg = f"""You are a scholar of world sacred texts and spiritual narrator for The Cosmic Collective, a spiritual wellness platform.
+    system_msg = f"""You are a scholar of world sacred texts and spiritual narrator for The ENLIGHTEN.MINT.CAFE, a spiritual wellness platform.
 
 You are generating content for Chapter/Section {chapter_num} of {book['title']}.
 {tradition_note}
@@ -392,7 +392,7 @@ async def bible_ai_question(data: dict = Body(...), user=Depends(get_current_use
         raise HTTPException(status_code=400, detail="Question is required")
 
     system_msg = (
-        "You are a wise scholar of world sacred texts, theologian, and spiritual guide in The Cosmic Collective. "
+        "You are a wise scholar of world sacred texts, theologian, and spiritual guide in The ENLIGHTEN.MINT.CAFE. "
         "You have deep knowledge of the Bible (all canons), Torah, Talmud, Midrash, Kabbalah, and the Quran. "
         "Answer questions with depth, scholarship, and compassion. Reference specific verses and historical context. "
         "Be interfaith-respectful and deeply knowledgeable about all Abrahamic traditions. "

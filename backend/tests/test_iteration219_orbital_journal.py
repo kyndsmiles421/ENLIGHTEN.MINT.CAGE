@@ -249,7 +249,7 @@ class TestCosmicStateForOrbital:
 
 
 class TestMissionControlLinks:
-    """Mission Control action items for new pages"""
+    """ENLIGHTEN.MINT.CAFE action items for new pages"""
     
     @pytest.fixture(autouse=True)
     def setup(self):

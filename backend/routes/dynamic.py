@@ -795,7 +795,7 @@ JOURNAL ENTRIES: {len(journal_entries)}
 AKASHIC SESSIONS: {len(akashic_sessions)}{' (Topics: ' + ', '.join(set(s.get('prompt_id', '') for s in akashic_sessions)) + ')' if akashic_sessions else ''}
 """
 
-    system = f"""You are the Soul Archivist of The Cosmic Collective — a wise, compassionate presence who reads the patterns of a seeker's spiritual journey and reflects them back with clarity, beauty, and encouragement.
+    system = f"""You are the Soul Archivist of The ENLIGHTEN.MINT.CAFE — a wise, compassionate presence who reads the patterns of a seeker's spiritual journey and reflects them back with clarity, beauty, and encouragement.
 
 You are writing a Monthly Soul Report for {month_name}. Based on the data provided, create a deeply personal, insightful report.
 

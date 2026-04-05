@@ -1,5 +1,5 @@
 """
-Background Tasks — The Cosmic Collective
+Background Tasks — The ENLIGHTEN.MINT.CAFE
 Extracted from server.py for cleaner separation of concerns.
 """
 import asyncio

@@ -188,7 +188,7 @@ function FindTab({ authHeaders, onMessage }) {
           )}
           {suggested.length === 0 && discover.length === 0 && (
             <p className="text-sm text-center py-8" style={{ color: 'var(--text-muted)' }}>
-              Invite friends to join The Cosmic Collective!
+              Invite friends to join The ENLIGHTEN.MINT.CAFE!
             </p>
           )}
         </>

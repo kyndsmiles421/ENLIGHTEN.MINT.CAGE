@@ -207,8 +207,8 @@ export default function ProfilePage() {
                 {isOwnProfile && (
                   <button onClick={async () => {
                     const shareData = {
-                      title: `${p.display_name || user?.name}'s Sanctuary — The Cosmic Collective`,
-                      text: `Check out my cosmic sanctuary on The Cosmic Collective! ${p.bio || ''}`.trim(),
+                      title: `${p.display_name || user?.name}'s Sanctuary — The ENLIGHTEN.MINT.CAFE`,
+                      text: `Check out my cosmic sanctuary on The ENLIGHTEN.MINT.CAFE! ${p.bio || ''}`.trim(),
                       url: `${window.location.origin}/profile/${user?.id}`,
                     };
                     if (navigator.share) {

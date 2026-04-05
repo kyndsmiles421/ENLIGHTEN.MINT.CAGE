@@ -6,7 +6,7 @@ Tests for:
 - /api/codex/entries - Codex entries with sections and tier
 - Gravitational pull zones in OrbitalHubBase
 - Deep-dive recursion in CodexOrbital
-- Mission Control links to orbital pages
+- ENLIGHTEN.MINT.CAFE links to orbital pages
 """
 
 import pytest

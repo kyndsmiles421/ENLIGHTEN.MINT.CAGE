@@ -169,7 +169,7 @@ export default function CreatorDashboard() {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#EAB308' }}>Creator Dashboard</p>
-                <h1 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>The Cosmic Collective</h1>
+                <h1 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>The ENLIGHTEN.MINT.CAFE</h1>
               </div>
             </div>
             {/* Quick Actions */}

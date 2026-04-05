@@ -1,5 +1,5 @@
 {
-  "summary": "Tested Celestial Badges feature for Cosmic Collective wellness platform. Backend: 14/14 tests passed (100%). Frontend: All UI elements verified. 12 constellation-themed badges with progress tracking working correctly. Badges auto-award when criteria met (First Light, Stargazer, Cosmic Voyager earned from previous activity).",
+  "summary": "Tested Celestial Badges feature for ENLIGHTEN.MINT.CAFE wellness platform. Backend: 14/14 tests passed (100%). Frontend: All UI elements verified. 12 constellation-themed badges with progress tracking working correctly. Badges auto-award when criteria met (First Light, Stargazer, Cosmic Voyager earned from previous activity).",
   "backend_issues": {
     "critical": [],
     "minor": []

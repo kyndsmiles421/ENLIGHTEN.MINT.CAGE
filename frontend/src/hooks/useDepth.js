@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
  * Z-Layer Hierarchy:
  * +200px — Front (Active Modal, "Tap to Enter")
  * +50px  — Mid-Front (Extracted Orbs)
- * 0px    — Center (Mission Control Hub)
+ * 0px    — Center (ENLIGHTEN.MINT.CAFE Hub)
  * -100px — Mid-Back (Orbiting Sub-Orbs)
  * -500px — Deep Back (Cosmic Map / Background)
  */
@@ -24,7 +24,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 export const Z_LAYERS = {
   FRONT: 200,         // Active modal, tap prompts
   MID_FRONT: 50,      // Extracted orbs (selected)
-  CENTER: 0,          // Mission Control Hub
+  CENTER: 0,          // ENLIGHTEN.MINT.CAFE Hub
   MID_BACK: -100,     // Idle orbiting sub-orbs
   DEEP_BACK: -500,    // Background, cosmic map
 };

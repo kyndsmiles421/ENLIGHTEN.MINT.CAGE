@@ -1,5 +1,5 @@
 """
-Quantum Mechanics Framework for The Cosmic Collective.
+Quantum Mechanics Framework for The ENLIGHTEN.MINT.CAFE.
 
 A modular, extensible quantum context system that infuses quantum physics
 concepts into spiritual and wellness experiences. Designed for easy adaptation

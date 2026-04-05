@@ -1,7 +1,7 @@
-# The Cosmic Collective — Product Requirements Document
+# The ENLIGHTEN.MINT.CAFE — Product Requirements Document
 
 ## Original Problem Statement
-Build "The Cosmic Collective", a full-stack wellness platform with orbital navigation, physics-based interactions, a 64-gate Hexagram system (6-bit logic), "Vertical Torus" architecture, Dual-Persona AI Expert Advisors (Sages), and a tiered subscription ecosystem.
+Build "The ENLIGHTEN.MINT.CAFE", a full-stack wellness platform with orbital navigation, physics-based interactions, a 64-gate Hexagram system (6-bit logic), "Vertical Torus" architecture, Dual-Persona AI Expert Advisors (Sages), and a tiered subscription ecosystem.
 
 ## Tech Stack
 - **Frontend**: React 19, TailwindCSS, Framer Motion, Shadcn/UI, Web Audio API, Canvas 2D, Three.js
@@ -909,7 +909,7 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Rebuilt OrbitalHub.js from scratch — removed complex physics-based pointer event system
 - All 15 satellites now displayed in a single visible ring (no more dormant/abyss hidden system)
 - Simple onClick navigation replaces unreliable pointerDown/pointerUp timer mechanism
-- Central orb click opens Mission Control
+- Central orb click opens ENLIGHTEN.MINT.CAFE
 - Tests: Frontend 100% — all 15 satellites navigate correctly, all destination pages load with content
 
 ### Iteration 271 — Dashboard MissionControlRing (April 2026) — LATEST
@@ -941,13 +941,13 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
 - Tests: Frontend 100% — All physics states verified, all 15 navigations working
 
 ### Iteration 269 — Sphere Containment Orbital System (April 2026)
-- Rebuilt Orbital Hub per user spec: central Mission Control sphere with dormant modules as sub-objects
+- Rebuilt Orbital Hub per user spec: central ENLIGHTEN.MINT.CAFE sphere with dormant modules as sub-objects
 - Modules eject from sphere to orbit via click → physics-based spring animation
 - Fixed orbital planes using simple sin/cos rotation (no complex physics)
 - Click orbiting satellite → navigates to its page. Snap-back X button returns it to sphere.
 - All chrome hidden on /hub: CosmicToolbar, SmartDock, CreditNudge, PersistentWaveform, OrbitalNavigation, LearningToggle, CosmicAssistant
 - Viewport containment: no overflow on desktop or mobile (390x844)
-- Tests: Frontend 100% — all 15 ejections, all 15 navigations, Mission Control, mobile viewport all pass
+- Tests: Frontend 100% — all 15 ejections, all 15 navigations, ENLIGHTEN.MINT.CAFE, mobile viewport all pass
 
 ### Iteration 279 — Director's Cut Studio (April 2026)
 - **Director's Cut Studio Component**: Full production studio experience in the mixer

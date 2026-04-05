@@ -1,4 +1,4 @@
-# The Cosmic Collective — Native Build Guide
+# The ENLIGHTEN.MINT.CAFE — Native Build Guide
 
 ## Prerequisites
 - Node.js >= 22.0.0
@@ -56,7 +56,7 @@ npx cap run ios
 ## Configuration
 All native config is in `capacitor.config.ts`:
 - **App ID:** `com.cosmiccollective.app`
-- **App Name:** `The Cosmic Collective`
+- **App Name:** `The ENLIGHTEN.MINT.CAFE`
 - **Background:** `#0B0C15` (matching dark theme)
 - **Splash:** 2.5s auto-hide, immersive, dark bg
 - **StatusBar:** Dark style, #0B0C15 bg

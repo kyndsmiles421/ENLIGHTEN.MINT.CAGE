@@ -1,5 +1,5 @@
 {
-  "summary": "Tested P0-P3 enhancements for Cosmic Collective wellness platform. Backend: 14/14 tests passed (100%). Frontend: All UI elements verified. XP rewards system working correctly (10 XP for constellation_explored, 25 XP for story_listened, 100 XP for journey_completed). Social sharing to community working. Community page displays shared_constellation and shared_journey post types with correct labels.",
+  "summary": "Tested P0-P3 enhancements for ENLIGHTEN.MINT.CAFE wellness platform. Backend: 14/14 tests passed (100%). Frontend: All UI elements verified. XP rewards system working correctly (10 XP for constellation_explored, 25 XP for story_listened, 100 XP for journey_completed). Social sharing to community working. Community page displays shared_constellation and shared_journey post types with correct labels.",
   "backend_issues": {
     "critical": [],
     "minor": []

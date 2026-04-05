@@ -27,7 +27,7 @@
   "features_tested": {
     "frontend": {
       "homepage": {
-        "route": "PASS - Homepage loads correctly with 'The Cosmic Collective' title and navigation"
+        "route": "PASS - Homepage loads correctly with 'The ENLIGHTEN.MINT.CAFE' title and navigation"
       },
       "cosmic_mixer_page": {
         "route": "PASS - /cosmic-mixer loads correctly with data-testid='cosmic-mixer-page'",

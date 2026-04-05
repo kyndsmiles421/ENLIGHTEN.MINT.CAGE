@@ -1,6 +1,6 @@
 """
 Test Suite: Universal Game Core + Rock Hounding Module
-Tests the Soul-to-Game Bridge architecture for The Cosmic Collective wellness RPG.
+Tests the Soul-to-Game Bridge architecture for The ENLIGHTEN.MINT.CAFE wellness RPG.
 
 Endpoints tested:
 - GET /api/game-core/stats - User's global game stats, level, currencies

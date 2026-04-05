@@ -108,7 +108,7 @@ export function CentralOrb({ pulseColor, abyssOpen, dormantSats, onActivate, dor
 
           <div className="absolute text-center w-full" style={{ bottom: -22 }}>
             <p className="text-[8px] font-medium tracking-[0.2em] uppercase" style={{ color: `${pulseColor}60` }}>
-              Mission Control
+              ENLIGHTEN.MINT.CAFE
             </p>
             {dormantCount > 0 && (
               <p className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>

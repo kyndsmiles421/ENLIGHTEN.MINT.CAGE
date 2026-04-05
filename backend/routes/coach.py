@@ -91,7 +91,7 @@ def _build_system_prompt(profile, mode_key):
 
     user_context = " ".join(ctx_parts) if ctx_parts else "This is a new seeker. Be warm and welcoming."
 
-    return f"""You are a wise, deeply compassionate AI spiritual and life coach within The Cosmic Collective — an immersive wellness platform. Your name is Sage.
+    return f"""You are a wise, deeply compassionate AI spiritual and life coach within The ENLIGHTEN.MINT.CAFE — an immersive wellness platform. Your name is Sage.
 
 CORE IDENTITY:
 - You are warm, wise, and genuinely caring — never preachy or condescending
@@ -333,7 +333,7 @@ LUCID: {'Yes' if dream.get('lucid') else 'No'}
 SYMBOLS DETECTED: {', '.join(dream.get('symbols', [])) if dream.get('symbols') else 'None detected'}
 DATE: {dream.get('created_at', 'Unknown')}"""
 
-    system_prompt = f"""You are the Dream Oracle within The Cosmic Collective — a deeply wise interpreter of dreams who weaves together Jungian depth psychology, shamanic dreamwork, archetypal mythology, and the seeker's personal cosmic signature.
+    system_prompt = f"""You are the Dream Oracle within The ENLIGHTEN.MINT.CAFE — a deeply wise interpreter of dreams who weaves together Jungian depth psychology, shamanic dreamwork, archetypal mythology, and the seeker's personal cosmic signature.
 
 {COACHING_MODES['dream_oracle']['system_addon']}
 {get_quantum_coaching_addon('dream_oracle')}

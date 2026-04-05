@@ -816,7 +816,7 @@ async def _generate_narrative(biome: dict, difficulty: dict, cosmic_element: str
             api_key=EMERGENT_LLM_KEY,
             session_id=f"dream-{uuid.uuid4().hex[:8]}",
             system_message=(
-                "You are the Dream Weaver for The Cosmic Collective. "
+                "You are the Dream Weaver for The ENLIGHTEN.MINT.CAFE. "
                 "Generate immersive, brief realm descriptions for procedurally-generated Dream Realms. "
                 "Write in second person, present tense. Be mystical but concise (3-4 sentences max). "
                 "Include sensory details matching the atmosphere."

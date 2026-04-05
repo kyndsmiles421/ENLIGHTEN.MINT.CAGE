@@ -112,7 +112,7 @@ async def get_cosmic_weather(user=Depends(get_current_user)):
                 api_key=EMERGENT_LLM_KEY,
                 session_id=f"weather-{today}-{_uuid.uuid4().hex[:6]}",
                 system_message=(
-                    f"You are the Cosmic Oracle for The Cosmic Collective wellness app. "
+                    f"You are the Cosmic Oracle for The ENLIGHTEN.MINT.CAFE wellness app. "
                     f"Today the Sun is in {zodiac['sign']} ({element} element) and the Moon is in its {lunar['phase']} phase. "
                     f"Write a brief, mystical yet practical daily cosmic weather report in 3-4 sentences. "
                     f"Include: 1) The overall energy theme, 2) A specific wellness recommendation, "

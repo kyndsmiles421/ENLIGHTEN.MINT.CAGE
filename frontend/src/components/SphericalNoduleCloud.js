@@ -2,7 +2,7 @@
  * SphericalNoduleCloud — React Component
  * 
  * Renders a 3D sphere of vibrating nodules using the NoduleGenerator utilities.
- * Integrates with the Cosmic Collective's orbital navigation system.
+ * Integrates with the ENLIGHTEN.MINT.CAFE's orbital navigation system.
  */
 
 import React, { useMemo, useCallback } from 'react';

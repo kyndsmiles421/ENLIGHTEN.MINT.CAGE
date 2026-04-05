@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.cosmiccollective.app',
-  appName: 'The Cosmic Collective',
+  appName: 'The ENLIGHTEN.MINT.CAFE',
   webDir: 'build',
   server: {
     androidScheme: 'https',

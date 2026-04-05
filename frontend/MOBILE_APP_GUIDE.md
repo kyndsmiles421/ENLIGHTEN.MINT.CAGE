@@ -1,4 +1,4 @@
-# The Cosmic Collective — Mobile App Store Guide
+# The ENLIGHTEN.MINT.CAFE — Mobile App Store Guide
 
 ## Overview
 Your app is fully configured with **Capacitor** to be wrapped as a native iOS and Android app. Your existing React code, styles, backend connection, and all features remain 100% intact.
@@ -69,7 +69,7 @@ npx cap open ios
 2. **Bundle ID**: Verify it shows `com.cosmiccollective.app`
 3. **App Icons**: Replace the icons in `ios/App/App/Assets.xcassets/AppIcon.appiconset/` with your cosmic branding (1024x1024 master icon needed)
 4. **Splash Screen**: Replace `ios/App/App/Assets.xcassets/Splash.imageset/` with your splash image
-5. **Display Name**: Already set to "The Cosmic Collective"
+5. **Display Name**: Already set to "The ENLIGHTEN.MINT.CAFE"
 
 ### Build & Submit
 1. Select a physical device or "Any iOS Device" as build target

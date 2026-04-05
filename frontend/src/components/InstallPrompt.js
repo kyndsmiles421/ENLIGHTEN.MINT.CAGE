@@ -89,7 +89,7 @@ export default function InstallPrompt() {
             <Smartphone size={18} style={{ color: '#C084FC' }} />
           </div>
           <div>
-            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Install Cosmic Collective</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Install ENLIGHTEN.MINT.CAFE</p>
             <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Add to your home screen</p>
           </div>
         </div>

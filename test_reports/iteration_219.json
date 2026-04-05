@@ -1,5 +1,5 @@
 {
-  "summary": "Iteration 219 - OrbitalHubBase, BotanyOrbital, HexagramJournal Testing Complete. All 9 backend API tests passed (100%). Frontend UI verified: BotanyOrbital page with center sun, 9 orbital planets, detail panels, Five Elements Wheel overlay, CosmicSparkline. HexagramJournal page with Book of Changes title, journal entries, Record Now button, expandable entries. Mission Control has Book of Changes and Botany Orbital action items.",
+  "summary": "Iteration 219 - OrbitalHubBase, BotanyOrbital, HexagramJournal Testing Complete. All 9 backend API tests passed (100%). Frontend UI verified: BotanyOrbital page with center sun, 9 orbital planets, detail panels, Five Elements Wheel overlay, CosmicSparkline. HexagramJournal page with Book of Changes title, journal entries, Record Now button, expandable entries. ENLIGHTEN.MINT.CAFE has Book of Changes and Botany Orbital action items.",
   "backend_issues": {
     "critical": [],
     "minor": []
@@ -45,7 +45,7 @@
   "seed_data_creation": "None",
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "Iteration 219 verified: (1) POST /api/hexagram/journal/record records hexagram transition if changed, returns recorded:false with reason:no_change if same. (2) GET /api/hexagram/journal returns entries sorted by timestamp desc, supports limit param. (3) /botany-orbital route renders OrbitalHubBase with center sun 'Botanical Codex', 9 orbiting planets (Wood, Fire, Earth, Metal, Water, Garden, Resonance, Identify, Alchemy). (4) Alchemy node locked behind hexagram bit 2 (opacity 0.2, shows 'locked'). (5) Detail panel opens on planet click showing plant list for elements, garden list for garden node. (6) Five Elements Wheel overlay in bottom-left, CosmicSparkline in top-right. (7) /hexagram-journal route renders Book of Changes page with journal entries, Record Now button, expandable entries showing trigrams/energies/equilibrium. (8) Mission Control has 'Book of Changes' and 'Botany Orbital' action items. (9) SVG connection lines render between center and planets (26 lines found). (10) Orbital drag rotation works. (11) Back button navigates to /hub. Current hexagram: #3 屯 Zhun (Difficulty at the Beginning), stability: volatile.",
+  "context_for_next_testing_agent": "Iteration 219 verified: (1) POST /api/hexagram/journal/record records hexagram transition if changed, returns recorded:false with reason:no_change if same. (2) GET /api/hexagram/journal returns entries sorted by timestamp desc, supports limit param. (3) /botany-orbital route renders OrbitalHubBase with center sun 'Botanical Codex', 9 orbiting planets (Wood, Fire, Earth, Metal, Water, Garden, Resonance, Identify, Alchemy). (4) Alchemy node locked behind hexagram bit 2 (opacity 0.2, shows 'locked'). (5) Detail panel opens on planet click showing plant list for elements, garden list for garden node. (6) Five Elements Wheel overlay in bottom-left, CosmicSparkline in top-right. (7) /hexagram-journal route renders Book of Changes page with journal entries, Record Now button, expandable entries showing trigrams/energies/equilibrium. (8) ENLIGHTEN.MINT.CAFE has 'Book of Changes' and 'Botany Orbital' action items. (9) SVG connection lines render between center and planets (26 lines found). (10) Orbital drag rotation works. (11) Back button navigates to /hub. Current hexagram: #3 屯 Zhun (Difficulty at the Beginning), stability: volatile.",
   "features_verified": {
     "hexagram_journal_record_endpoint": {
       "status": "PASS",
@@ -125,11 +125,11 @@
     },
     "mission_control_book_of_changes": {
       "status": "PASS",
-      "details": "Mission Control has 'Book of Changes' action item linking to /hexagram-journal"
+      "details": "ENLIGHTEN.MINT.CAFE has 'Book of Changes' action item linking to /hexagram-journal"
     },
     "mission_control_botany_orbital": {
       "status": "PASS",
-      "details": "Mission Control has 'Botany Orbital' action item linking to /botany-orbital"
+      "details": "ENLIGHTEN.MINT.CAFE has 'Botany Orbital' action item linking to /botany-orbital"
     },
     "svg_connection_lines": {
       "status": "PASS",

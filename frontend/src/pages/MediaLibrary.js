@@ -74,7 +74,7 @@ export default function MediaLibrary() {
     const url = `${window.location.origin}/media-library/${item.id}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: item.title, text: item.description || 'Check out this creation on Cosmic Collective!', url });
+        await navigator.share({ title: item.title, text: item.description || 'Check out this creation on ENLIGHTEN.MINT.CAFE!', url });
       } else {
         await navigator.clipboard.writeText(url);
       }

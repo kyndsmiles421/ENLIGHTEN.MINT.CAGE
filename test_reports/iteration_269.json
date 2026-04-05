@@ -115,7 +115,7 @@
     },
     "central_orb_opens_mission_control": {
       "status": "PASS",
-      "details": "Clicking central-orb opens Mission Control panel with data-testid='mission-control-panel'"
+      "details": "Clicking central-orb opens ENLIGHTEN.MINT.CAFE panel with data-testid='mission-control-panel'"
     },
     "mission_control_within_viewport": {
       "status": "PASS",

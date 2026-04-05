@@ -425,7 +425,7 @@ export default function Navigation() {
             <div className="absolute inset-0 rounded-full animate-pulse-glow" style={{ opacity: 0.4 }} />
           </div>
           <span className="group-hover:animate-text-shimmer transition-all text-sm" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-            Cosmic Collective
+            ENLIGHTEN.MINT.CAFE
           </span>
         </Link>
 
@@ -747,7 +747,7 @@ export default function Navigation() {
       >
         <Link to="/" className="flex items-center gap-2" data-testid="nav-logo-mobile" onClick={playClick}>
           <div className="w-7 h-7 rounded-full animate-orbit-glow" style={{ background: 'radial-gradient(circle, #C084FC 0%, #7C3AED 100%)' }} />
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', color: 'var(--text-primary)' }}>Cosmic Collective</span>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', color: 'var(--text-primary)' }}>ENLIGHTEN.MINT.CAFE</span>
         </Link>
         <div className="flex items-center gap-2">
           <button onClick={() => { setSearchOpen(true); playClick(); }} className="p-2 rounded-full" style={{ color: 'var(--text-muted)' }} data-testid="nav-search-btn-mobile">

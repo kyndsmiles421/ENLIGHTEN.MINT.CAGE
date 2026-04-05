@@ -120,7 +120,7 @@ export default function GrowthTimeline() {
 
   const handleShare = async () => {
     if (!data) return;
-    const text = `My Cosmic Collective Journey:\n${data.stats.days_active} days active | ${data.milestones_earned} milestones earned | ${data.stats.unique_features} features explored | ${data.stats.ai_sessions} AI sessions\n\nJoin the collective!`;
+    const text = `My ENLIGHTEN.MINT.CAFE Journey:\n${data.stats.days_active} days active | ${data.milestones_earned} milestones earned | ${data.stats.unique_features} features explored | ${data.stats.ai_sessions} AI sessions\n\nJoin the collective!`;
     if (navigator.share) {
       try { await navigator.share({ title: 'My Spiritual Growth', text }); } catch {}
     } else {

@@ -18,7 +18,7 @@ import { useHarmonicResonance, SOLFEGGIO_FREQUENCIES } from '../utils/HarmonicRe
  * Now with Z-axis depth layering:
  * - Front (+200px): Active modal, "Tap to Enter" prompts
  * - Mid-Front (+50px): Extracted orbs (selected)
- * - Center (0px): Mission Control Hub with Color 2 radiance
+ * - Center (0px): ENLIGHTEN.MINT.CAFE Hub with Color 2 radiance
  * - Mid-Back (-100px): Orbiting sub-orbs with subtle blur
  * - Deep-Back (-500px): Cosmic dust background
  * 
@@ -238,7 +238,7 @@ export default function OrbitalHub() {
       orbitalResonance.collapse();
       try { audio.collapseSound(); } catch {}
     } else if (hubState === 'extracted') {
-      // Open Mission Control when extracted
+      // Open ENLIGHTEN.MINT.CAFE when extracted
       haptic('orbTap');
       setMissionControlOpen(true);
     }
@@ -391,7 +391,7 @@ export default function OrbitalHub() {
           className="text-sm sm:text-lg font-light tracking-[0.25em] uppercase"
           style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}
         >
-          The Cosmic Collective
+          The ENLIGHTEN.MINT.CAFE
         </h1>
       </motion.div>
 
@@ -721,7 +721,7 @@ export default function OrbitalHub() {
             }}
             data-testid="mission-control-label"
           >
-            Mission Control
+            ENLIGHTEN.MINT.CAFE
           </p>
         </div>
       </div>

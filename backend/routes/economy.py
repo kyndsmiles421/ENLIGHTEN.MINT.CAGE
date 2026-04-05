@@ -1,5 +1,5 @@
 """
-The Cosmic Collective — Dual-Track Economy
+The ENLIGHTEN.MINT.CAFE — Dual-Track Economy
 Track 1: App Utility Subscriptions (Discovery / Resonance / Sovereign)
 Track 2: Learning Packs + Brokerage Commissions
 """

@@ -23,7 +23,7 @@
   "seed_data_creation": "None",
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "Iteration 81 confirms CSS bug fix: The conflicting .page-enter CSS definitions (one setting opacity:0 as base, another with animation) have been resolved by removing the first definition. App now renders correctly. All features verified: 1) Landing page with 'The Cosmic Collective' hero visible, 2) Navigation bar with 6 pillars (Today, Practice, Divination, Sanctuary, Nourish, Explore), 3) Split View button opens dropdown and creates side-by-side iframe panel, 4) Login with test@test.com/password works, 5) Dashboard shows Cosmic Mood Ring and daily wisdom, 6) Breathing page with patterns and enhanced circle, 7) Meditation page with categories and guided sessions, 8) Star Chart with 3D WebGL canvas and controls (World Skies, Stargazing Journey, Mythology, Badges), 9) Coach/Sage page with conversation interface, 10) Sora 2 Intro Video button opens video modal. Set localStorage 'zen_tour_seen' to 'true' to skip guided tour.",
+  "context_for_next_testing_agent": "Iteration 81 confirms CSS bug fix: The conflicting .page-enter CSS definitions (one setting opacity:0 as base, another with animation) have been resolved by removing the first definition. App now renders correctly. All features verified: 1) Landing page with 'The ENLIGHTEN.MINT.CAFE' hero visible, 2) Navigation bar with 6 pillars (Today, Practice, Divination, Sanctuary, Nourish, Explore), 3) Split View button opens dropdown and creates side-by-side iframe panel, 4) Login with test@test.com/password works, 5) Dashboard shows Cosmic Mood Ring and daily wisdom, 6) Breathing page with patterns and enhanced circle, 7) Meditation page with categories and guided sessions, 8) Star Chart with 3D WebGL canvas and controls (World Skies, Stargazing Journey, Mythology, Badges), 9) Coach/Sage page with conversation interface, 10) Sora 2 Intro Video button opens video modal. Set localStorage 'zen_tour_seen' to 'true' to skip guided tour.",
   "features_tested": {
     "backend_apis": [
       "GET /api/health - returns {status: ok}",
@@ -32,7 +32,7 @@
     ],
     "frontend_ui": [
       "CRITICAL CSS FIX VERIFIED: Landing page renders correctly (not blank/black)",
-      "Hero section with 'The Cosmic Collective' title visible",
+      "Hero section with 'The ENLIGHTEN.MINT.CAFE' title visible",
       "Navigation bar with 6 pillars (Practice, Divination, Sanctuary, Nourish, Explore, Sage)",
       "Split View button visible in navigation",
       "Split View dropdown opens with page options",

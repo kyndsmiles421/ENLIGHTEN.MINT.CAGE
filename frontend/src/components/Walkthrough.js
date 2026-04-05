@@ -4,7 +4,7 @@ import { ChevronRight, ChevronLeft, X, Star, Wind, Timer, Sparkles, Eye, Sprout,
 
 const WALKTHROUGH_STEPS = [
   {
-    title: 'Welcome to The Cosmic Collective',
+    title: 'Welcome to The ENLIGHTEN.MINT.CAFE',
     description: 'Your immersive spiritual and wellness companion. Let me show you around — this will only take a moment.',
     icon: Star,
     color: '#C084FC',

@@ -232,8 +232,8 @@ async def generate_narration(req: NarrationRequest):
 # --- Health ---
 @router.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "Cosmic Collective API"}
+    return {"status": "ok", "service": "ENLIGHTEN.MINT.CAFE API"}
 
 @router.get("/")
 async def root():
-    return {"message": "Cosmic Collective API is alive"}
+    return {"message": "ENLIGHTEN.MINT.CAFE API is alive"}

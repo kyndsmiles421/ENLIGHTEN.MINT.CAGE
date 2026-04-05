@@ -50,7 +50,7 @@
       "GET /api/breathing": "✓ Endpoint accessible"
     },
     "frontend_ui": {
-      "homepage_loads": "✓ Title: The Cosmic Collective",
+      "homepage_loads": "✓ Title: The ENLIGHTEN.MINT.CAFE",
       "login_works": "✓ Redirects to /dashboard after login",
       "nav_credits_badge": "✓ Shows 'Creator' for admin user",
       "pricing_page": "✓ Shows 'Creator / Admin' badge, 5 tier cards",

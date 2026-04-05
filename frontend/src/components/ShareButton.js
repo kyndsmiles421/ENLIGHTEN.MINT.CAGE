@@ -8,8 +8,8 @@ export default function ShareButton() {
   const handleShare = async () => {
     const url = window.location.origin;
     const shareData = {
-      title: 'The Cosmic Collective',
-      text: 'Your sanctuary for breathwork, meditation, and spiritual growth. Join The Cosmic Collective.',
+      title: 'The ENLIGHTEN.MINT.CAFE',
+      text: 'Your sanctuary for breathwork, meditation, and spiritual growth. Join The ENLIGHTEN.MINT.CAFE.',
       url,
     };
 

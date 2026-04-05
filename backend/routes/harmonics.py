@@ -226,7 +226,7 @@ async def get_personalized_affirmation(user=Depends(get_current_user)):
             api_key=EMERGENT_LLM_KEY,
             session_id=f"affirmation-{uuid.uuid4()}",
             system_message=(
-                "You are a celestial wisdom guide for The Cosmic Collective. "
+                "You are a celestial wisdom guide for The ENLIGHTEN.MINT.CAFE. "
                 "Generate a deeply personal, spiritually resonant affirmation (2-3 sentences). "
                 "Weave together the person's emotional patterns, the current moon phase, and zodiac transit. "
                 "Be warm, specific, and empowering. Do NOT use generic platitudes. "
