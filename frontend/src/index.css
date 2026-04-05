@@ -208,6 +208,75 @@
 }
 
   --el-wood-glow: rgba(34,197,94,0.15);
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESONANCE ENGINE — Fluid Dynamics Layer
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.fluid-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  mix-blend-mode: screen;
+}
+
+/* Karma particle glow effect */
+.karma-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: karma-float 2s ease-out forwards;
+}
+
+@keyframes karma-float {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* Resonance ripple effect */
+.resonance-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--mint-primary);
+  pointer-events: none;
+  animation: ripple-expand 1.5s ease-out forwards;
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* Solfeggio activation glow */
+.solfeggio-active {
+  animation: solfeggio-pulse 1s ease-in-out;
+}
+
+@keyframes solfeggio-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--mint-glow);
+  }
+  50% {
+    box-shadow: 0 0 60px var(--mint-primary), 0 0 100px var(--mint-glow);
+  }
+}
+
   --el-wood-bg: rgba(34,197,94,0.04);
   --el-fire: #EF4444;
   --el-fire-glow: rgba(239,68,68,0.15);
