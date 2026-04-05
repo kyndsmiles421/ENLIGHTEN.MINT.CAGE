@@ -3,6 +3,20 @@ import React, { useState } from 'react';
 const ShambhalaCrystalSystem = () => {
   const [isActive, setIsActive] = useState(false);
 
+  // THE KEY ACTION: Broadcast custom events for layer communication
+  const handleAscend = () => {
+    setIsActive(!isActive);
+    
+    // If moving to 'ASCEND', broadcast a custom event that 
+    // the 'Emergent' layers are listening for.
+    const eventName = !isActive ? 'SHAMBHALA_ASCEND' : 'SHAMBHALA_STASIS';
+    window.dispatchEvent(new CustomEvent(eventName, { 
+      detail: { frequency: 'Crystal White Light' } 
+    }));
+    
+    console.log(`[CrystalSystem] ${eventName} dispatched`);
+  };
+
   // --- SCRIPT KEY: THE BACK SIDE (Layer 0: Rainbow Encryption & Pass-Through) ---
   const backSideKeyStyle = {
     position: 'fixed',
@@ -75,7 +89,7 @@ const ShambhalaCrystalSystem = () => {
       }}>
         <div 
           style={frontButtonStyle} 
-          onClick={() => setIsActive(!isActive)}
+          onClick={handleAscend}
         >
           <div style={rainbowTextStyle}>
             {isActive ? "ASCEND" : "SHAMBHALA"}
