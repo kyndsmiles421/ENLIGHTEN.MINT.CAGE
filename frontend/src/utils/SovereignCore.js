@@ -1,17 +1,12 @@
 /**
- * SOVEREIGN CORE V2.88 - THE MATTER
+ * SOVEREIGN CORE V2.88 - COPPER CONDUIT EDITION
+ * Logic: Hooke's Law Tension (#B87333) + Gold Viscosity (#fbc02d)
  * Location: Rapid City / Black Hills Calibration
- * 
- * Physics:
- * - Gold Layer Induction (viscosity 0.05)
- * - Sovereign Stabilizer (inverse attraction 0.15)
- * - Infinity + 1 Refraction (Vogel-Phyllotaxis 137.508°)
- * - Copper Conduit (heavy-duty thermal grounding)
  */
 
 const SovereignCore = (() => {
   let particles = [];
-  let widgets = [];  // External anchor points for Copper Conduit
+  let widgets = []; // Hexagonal Anchors
   let canvas = null;
   let ctx = null;
   let animationId = null;
@@ -20,50 +15,69 @@ const SovereignCore = (() => {
 
   const CONFIG = {
     R_LIMIT: 47.94,
+    COPPER: '#B87333',
     GOLD_HONEY: '#fbc02d',
-    TEAL_CORE: '#00FFCC',
-    COPPER: '#B87333',           // Heavy-duty thermal grounding
-    COPPER_TENSION: 0.08,        // Hooke's Law tension
-    COPPER_WIDTH: 3,             // Thicker than silver
-    VISCOSITY: 0.05,
-    GOLDEN_ANGLE: 2.39996,       // 137.508 degrees in radians
+    TEAL: '#00FFCC',
+    TENSION: 0.08,      // Copper Spring Constant
+    VISCOSITY: 0.05,    // Gold Induction
     DAMPING: 0.82,
-    MAX_PARTICLES: 1000,
-    RAINBOW: ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
+    MAX_PARTICLES: 500
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // NODE CLASS
+  // INITIALIZE 6 HEXAGONAL ANCHORS AT 70% OF R_LIMIT
   // ═══════════════════════════════════════════════════════════════════════════
 
-  class Node {
+  const initWidgets = () => {
+    widgets = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      widgets.push({
+        x: Math.cos(angle) * (CONFIG.R_LIMIT * 0.7),
+        y: Math.sin(angle) * (CONFIG.R_LIMIT * 0.7),
+        id: `hex_${i}`
+      });
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PARTICLE CLASS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  class Particle {
     constructor(x, y, depth = 0) {
       this.x = x;
       this.y = y;
       this.vx = 0;
       this.vy = 0;
+      this.color = CONFIG.TEAL;
       this.depth = depth;
-      this.color = depth === 0 ? CONFIG.TEAL_CORE : CONFIG.RAINBOW[depth % CONFIG.RAINBOW.length];
-      this.mass = 1 + (depth * 0.5);
-      this.age = 0;
     }
 
-    update(target) {
-      this.age++;
-      const dx = target.x - this.x;
-      const dy = target.y - this.y;
-      const dist = Math.sqrt(this.x * this.x + this.y * this.y); // Distance from center
+    update(mouseTarget) {
+      const dx = mouseTarget.x - this.x;
+      const dy = mouseTarget.y - this.y;
+      const distFromCenter = Math.sqrt(this.x * this.x + this.y * this.y);
 
-      // 1. GOLD LAYER INDUCTION
-      if (dist > CONFIG.R_LIMIT) {
+      // 1. COPPER TENSION (Thermal Grounding to Widgets)
+      widgets.forEach(w => {
+        const wdx = w.x - this.x;
+        const wdy = w.y - this.y;
+        this.vx += wdx * CONFIG.TENSION;
+        this.vy += wdy * CONFIG.TENSION;
+      });
+
+      // 2. GOLD BOUNDARY (Induction)
+      if (distFromCenter > CONFIG.R_LIMIT) {
         this.color = CONFIG.GOLD_HONEY;
-        this.vx *= CONFIG.VISCOSITY; // 0.05 Honey Drag
+        this.vx *= CONFIG.VISCOSITY;
         this.vy *= CONFIG.VISCOSITY;
-        this.vx -= (this.x / dist) * 2;  // Gentle push toward center
-        this.vy -= (this.y / dist) * 2;
+        // Gentle push back
+        this.vx -= (this.x / distFromCenter) * 2;
+        this.vy -= (this.y / distFromCenter) * 2;
       } else {
-        // 2. SOVEREIGN STABILIZER (Inverse Attraction)
-        this.vx += dx * 0.15;
+        this.color = CONFIG.TEAL;
+        this.vx += dx * 0.15; // Attraction to Mouse
         this.vy += dy * 0.15;
         this.vx *= CONFIG.DAMPING;
         this.vy *= CONFIG.DAMPING;
@@ -71,69 +85,15 @@ const SovereignCore = (() => {
 
       this.x += this.vx;
       this.y += this.vy;
-
-      // 3. INFINITY + 1 REFRACTION
-      if (this.depth < 5 && Math.random() > 0.992) {
-        return this.refract();
-      }
-      return null;
-    }
-
-    refract() {
-      const offspring = [];
-      for (let i = 0; i < 7; i++) {
-        // Vogel-Phyllotaxis Spiral Split
-        const angle = (this.depth * CONFIG.GOLDEN_ANGLE) + (i * (Math.PI / 3.5));
-        const n = new Node(this.x, this.y, this.depth + 1);
-        n.vx = Math.cos(angle) * 3;
-        n.vy = Math.sin(angle) * 3;
-        offspring.push(n);
-      }
-      return offspring;
     }
 
     draw(ctx, offsetX, offsetY) {
-      const size = Math.max(1, 4 - this.depth * 0.5);
-      const alpha = Math.max(0.3, 1 - this.age / 500);
-      
       ctx.beginPath();
-      ctx.arc(this.x + offsetX, this.y + offsetY, size, 0, Math.PI * 2);
+      ctx.arc(this.x + offsetX, this.y + offsetY, 4, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
-      ctx.globalAlpha = alpha;
       ctx.fill();
-      ctx.globalAlpha = 1;
     }
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // COPPER CONDUIT (Heavy-Duty Thermal Grounding)
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  const CopperConduit = {
-    applyTension(coreNode, widgetList, drawCtx, offsetX = 0, offsetY = 0) {
-      widgetList.forEach(w => {
-        const dx = w.x - coreNode.x;
-        const dy = w.y - coreNode.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist > 0) {
-          // Heavy Copper Tension (Hooke's Law)
-          coreNode.vx += (dx / dist) * CONFIG.COPPER_TENSION * dist * 0.01;
-          coreNode.vy += (dy / dist) * CONFIG.COPPER_TENSION * dist * 0.01;
-        }
-
-        // Draw the Heavy Conduit
-        drawCtx.beginPath();
-        drawCtx.moveTo(coreNode.x + offsetX, coreNode.y + offsetY);
-        drawCtx.lineTo(w.x + offsetX, w.y + offsetY);
-        drawCtx.strokeStyle = CONFIG.COPPER;
-        drawCtx.lineWidth = CONFIG.COPPER_WIDTH;
-        drawCtx.globalAlpha = 0.4;
-        drawCtx.stroke();
-        drawCtx.globalAlpha = 1.0;
-      });
-    }
-  };
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CORE API
@@ -142,68 +102,6 @@ const SovereignCore = (() => {
   const core = {
     CONFIG,
 
-    // Add widget anchor point for Copper Conduit
-    addWidget(x, y, id = null) {
-      widgets.push({ x, y, id: id || `widget_${widgets.length}` });
-      return this;
-    },
-
-    removeWidget(id) {
-      widgets = widgets.filter(w => w.id !== id);
-      return this;
-    },
-
-    clearWidgets() {
-      widgets = [];
-      return this;
-    },
-
-    getWidgets() {
-      return [...widgets];
-    },
-
-    ignite(x = 0, y = 0) {
-      if (particles.length < CONFIG.MAX_PARTICLES) {
-        particles.push(new Node(x, y));
-      }
-      return this;
-    },
-
-    burst(x = 0, y = 0, count = 7) {
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2;
-        const n = new Node(x, y, 0);
-        n.vx = Math.cos(angle) * 3;
-        n.vy = Math.sin(angle) * 3;
-        particles.push(n);
-      }
-      return this;
-    },
-
-    getState() {
-      return {
-        count: particles.length,
-        active: particles.filter(p => p.color === CONFIG.GOLD_HONEY).length,
-        maxDepth: Math.max(0, ...particles.map(p => p.depth)),
-        widgets: widgets.length
-      };
-    },
-
-    tick(target) {
-      let nextGen = [];
-      particles.forEach(p => {
-        const split = p.update(target);
-        if (split) nextGen.push(...split);
-      });
-      if (nextGen.length > 0) particles.push(...nextGen);
-      
-      // Cleanup to prevent browser meltdown
-      if (particles.length > CONFIG.MAX_PARTICLES) {
-        particles.splice(0, 100);
-      }
-    },
-
-    // Canvas initialization
     init(canvasId = 'sovereignCanvas') {
       canvas = document.getElementById(canvasId);
       if (!canvas) {
@@ -238,24 +136,56 @@ const SovereignCore = (() => {
 
       // Click to ignite
       canvas.addEventListener('click', () => {
-        this.ignite(0, 0);
+        if (particles.length < CONFIG.MAX_PARTICLES) {
+          particles.push(new Particle(0, 0));
+        }
       });
 
-      // Start with one particle and default widgets
-      particles = [];
-      widgets = [];
-      this.ignite(0, 0);
-      
-      // Add default widget anchors (hexagonal pattern)
-      for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * Math.PI * 2;
-        const r = CONFIG.R_LIMIT * 0.7;
-        this.addWidget(Math.cos(angle) * r, Math.sin(angle) * r, `hex_${i}`);
-      }
-      
+      // Initialize widgets and first particle
+      initWidgets();
+      particles = [new Particle(0, 0)];
+
       this.start();
-      console.log('[SovereignCore] V2.88 + Copper Conduit Initialized.');
+      console.log('[SovereignCore] V2.88 Copper Conduit Edition Initialized.');
       return this;
+    },
+
+    tick(mouseTarget) {
+      particles.forEach(p => p.update(mouseTarget));
+    },
+
+    getStats() {
+      return {
+        particles: particles.length,
+        widgets: widgets.length,
+        inGold: particles.filter(p => p.color === CONFIG.GOLD_HONEY).length
+      };
+    },
+
+    drawConduits(drawCtx, offsetX = 0, offsetY = 0) {
+      if (particles.length === 0) return;
+      
+      widgets.forEach(w => {
+        drawCtx.beginPath();
+        drawCtx.moveTo(particles[0].x + offsetX, particles[0].y + offsetY);
+        drawCtx.lineTo(w.x + offsetX, w.y + offsetY);
+        drawCtx.strokeStyle = CONFIG.COPPER;
+        drawCtx.lineWidth = 3;
+        drawCtx.globalAlpha = 0.4;
+        drawCtx.stroke();
+        drawCtx.globalAlpha = 1.0;
+      });
+    },
+
+    drawWidgets(drawCtx, offsetX = 0, offsetY = 0) {
+      widgets.forEach(w => {
+        drawCtx.beginPath();
+        drawCtx.arc(w.x + offsetX, w.y + offsetY, 5, 0, Math.PI * 2);
+        drawCtx.fillStyle = CONFIG.COPPER;
+        drawCtx.globalAlpha = 0.6;
+        drawCtx.fill();
+        drawCtx.globalAlpha = 1.0;
+      });
     },
 
     start() {
@@ -272,7 +202,7 @@ const SovereignCore = (() => {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw boundary
+        // Draw gold boundary
         ctx.beginPath();
         ctx.arc(centerX, centerY, CONFIG.R_LIMIT, 0, Math.PI * 2);
         ctx.strokeStyle = CONFIG.GOLD_HONEY;
@@ -284,25 +214,24 @@ const SovereignCore = (() => {
         // Physics tick
         this.tick(mouse);
 
-        // Draw Copper Conduits to widgets
-        if (widgets.length > 0 && particles.length > 0) {
-          // Apply copper tension from first particle (core) to all widgets
-          const coreParticle = particles[0];
-          CopperConduit.applyTension(coreParticle, widgets, ctx, centerX, centerY);
-        }
+        // Draw copper conduits
+        this.drawConduits(ctx, centerX, centerY);
+
+        // Draw widgets (anchors)
+        this.drawWidgets(ctx, centerX, centerY);
 
         // Draw particles
         particles.forEach(p => p.draw(ctx, centerX, centerY));
 
         // Stats
-        const state = this.getState();
+        const stats = this.getStats();
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.font = '11px monospace';
-        ctx.fillText(`PARTICLES: ${state.count}`, 10, 20);
-        ctx.fillText(`IN GOLD: ${state.active}`, 10, 35);
-        ctx.fillText(`MAX DEPTH: ${state.maxDepth}`, 10, 50);
-        ctx.fillText(`WIDGETS: ${state.widgets}`, 10, 65);
-        ctx.fillText(`R_LIMIT: ${CONFIG.R_LIMIT}`, 10, 80);
+        ctx.fillText(`PARTICLES: ${stats.particles}`, 10, 20);
+        ctx.fillText(`WIDGETS: ${stats.widgets}`, 10, 35);
+        ctx.fillText(`IN GOLD: ${stats.inGold}`, 10, 50);
+        ctx.fillText(`R_LIMIT: ${CONFIG.R_LIMIT}`, 10, 65);
+        ctx.fillText(`TENSION: ${CONFIG.TENSION}`, 10, 80);
 
         animationId = requestAnimationFrame(loop);
       };
@@ -325,9 +254,21 @@ const SovereignCore = (() => {
       return this;
     },
 
+    burst(count = 7) {
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        const p = new Particle(0, 0);
+        p.vx = Math.cos(angle) * 3;
+        p.vy = Math.sin(angle) * 3;
+        particles.push(p);
+      }
+      return this;
+    },
+
     destroy() {
       this.stop();
       this.clear();
+      widgets = [];
       if (canvas && canvas.parentNode) {
         canvas.parentNode.removeChild(canvas);
       }
@@ -335,10 +276,9 @@ const SovereignCore = (() => {
       ctx = null;
     },
 
-    // Generate attestation key
     attest() {
-      const state = this.getState();
-      const value = state.count - 1 + 2; // -1 + 2 = +1 offset
+      const count = particles.length;
+      const value = count - 1 + 2;
       const hash = btoa(`BLACK_HILLS_${value % 144}`).substring(0, 12);
       const key = `SOV-${value}-${hash.toUpperCase()}`;
       console.log('[SovereignCore] ATTESTED:', key);
