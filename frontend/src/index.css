@@ -65,7 +65,9 @@
   font-size: 1.2rem;
   font-weight: 900;
   letter-spacing: 0.2em;
-  background: linear-gradient(135deg, var(--mint-primary), var(--cafe-gold));
+  background: linear-gradient(-45deg, var(--mint-primary), var(--cafe-gold), var(--enlighten-purple), var(--mint-primary));
+  background-size: 400% 400%;
+  animation: identity-flow 15s ease infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -136,7 +138,18 @@
 
 /* Brand Gradient Backgrounds */
 .bg-mint-gradient {
-  background: linear-gradient(135deg, var(--bg-dark-roast) 0%, rgba(0, 255, 195, 0.05) 100%);
+  background: linear-gradient(-45deg, var(--mint-primary), var(--cafe-gold), var(--enlighten-purple), var(--mint-primary));
+  background-size: 400% 400%;
+  animation: identity-flow 15s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes identity-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .bg-cafe-gradient {
@@ -181,15 +194,17 @@
 /* Brand Card Style */
 .card-enlighten {
   background: rgba(10, 10, 15, 0.8);
-  border: 1px solid rgba(0, 255, 195, 0.15);
-  border-radius: 16px;
+  border: 1px solid var(--mint-glow);
   backdrop-filter: blur(12px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 255, 195, 0.2);
   transition: all 0.3s ease;
 }
 
 .card-enlighten:hover {
-  border-color: rgba(0, 255, 195, 0.4);
-  box-shadow: 0 0 30px rgba(0, 255, 195, 0.1);
+  border-color: var(--mint-primary);
+  box-shadow: 0 12px 48px 0 rgba(0, 255, 195, 0.3);
+  transform: translateY(-2px);
 }
 
   --el-wood-glow: rgba(34,197,94,0.15);
