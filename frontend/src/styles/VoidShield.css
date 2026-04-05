@@ -336,26 +336,29 @@ header,
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LIGHT RESONANCE BALL PROPERTIES
+   LIGHT RESONANCE BALLS (Infinite Light Multiply Glow)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .resonance-ball {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
   position: absolute;
-  /* Rainbow Refraction Glow */
-  background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.8), rgba(0, 0, 0, 0));
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.2);
-  /* The "Gravity" Lens Effect */
-  backdrop-filter: blur(4px) contrast(1.2); 
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  /* Infinite Light Multiply Glow */
+  background: radial-gradient(circle at 35% 35%, rgba(212, 175, 55, 0.9), transparent);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
+  /* The Refraction Lens */
+  backdrop-filter: blur(8px) brightness(1.1) contrast(1.3);
   mix-blend-mode: screen;
+  z-index: 500;
+  pointer-events: auto;
+  cursor: pointer;
   transition: transform 0.1s linear;
 }
 
 .resonance-ball:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
 .resonance-ball.active {
@@ -364,69 +367,75 @@ header,
 
 @keyframes resonance-pulse {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.4);
-    transform: scale(1.05);
+    box-shadow: 0 0 50px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.4);
+    transform: scale(1.08);
   }
 }
 
 /* Resonance Ball Variants */
 .resonance-ball.copper {
-  background: radial-gradient(circle at 30% 30%, rgba(184, 115, 51, 0.8), rgba(0, 0, 0, 0));
-  box-shadow: 0 0 20px rgba(184, 115, 51, 0.4), inset 0 0 15px rgba(255, 200, 150, 0.2);
+  background: radial-gradient(circle at 35% 35%, rgba(184, 115, 51, 0.9), transparent);
+  box-shadow: 0 0 30px rgba(184, 115, 51, 0.3), inset 0 0 10px rgba(255, 200, 150, 0.2);
 }
 
 .resonance-ball.teal {
-  background: radial-gradient(circle at 30% 30%, rgba(0, 255, 204, 0.8), rgba(0, 0, 0, 0));
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  background: radial-gradient(circle at 35% 35%, rgba(0, 255, 204, 0.9), transparent);
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .resonance-ball.silver {
-  background: radial-gradient(circle at 30% 30%, rgba(192, 192, 192, 0.8), rgba(0, 0, 0, 0));
-  box-shadow: 0 0 20px rgba(192, 192, 192, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.3);
+  background: radial-gradient(circle at 35% 35%, rgba(192, 192, 192, 0.9), transparent);
+  box-shadow: 0 0 30px rgba(192, 192, 192, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   GRID REFRACTION BEND
+   THE COPPER CONDUIT GRID
    ═══════════════════════════════════════════════════════════════════════════ */
+
+#shambhala-grid {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(184, 115, 51, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 115, 51, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Grid Variants */
+#shambhala-grid.gold {
+  background-image: 
+    linear-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.08) 1px, transparent 1px);
+}
+
+#shambhala-grid.teal {
+  background-image: 
+    linear-gradient(rgba(0, 255, 204, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 204, 0.06) 1px, transparent 1px);
+}
+
+#shambhala-grid.dense {
+  background-size: 25px 25px;
+}
 
 .grid-system {
   background-image: 
     linear-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
-  /* This grid will "warp" under the resonance balls */
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-.grid-system.dense {
-  background-size: 20px 20px;
 }
 
 .grid-system.copper {
   background-image: 
     linear-gradient(rgba(184, 115, 51, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(184, 115, 51, 0.08) 1px, transparent 1px);
-}
-
-.grid-system.teal {
-  background-image: 
-    linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
-}
-
-/* Grid warp effect zone around resonance balls */
-.grid-warp-zone {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: transparent;
-  filter: url(#warp-filter);
-  pointer-events: none;
 }

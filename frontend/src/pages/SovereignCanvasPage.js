@@ -239,6 +239,9 @@ const SovereignCanvas = () => {
         .sanctuary-root { z-index: 999999 !important; }
       `}</style>
       
+      {/* THE COPPER CONDUIT GRID */}
+      <div id="shambhala-grid" />
+      
       {/* SOVEREIGN UI LAYER */}
       <div className="sovereign-ui-layer">
         
