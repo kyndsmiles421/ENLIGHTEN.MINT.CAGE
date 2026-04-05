@@ -18,6 +18,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import logging
+import time
 
 from engines.enlighten_mint_cafe import (
     EnlightenMintCafe,
@@ -346,3 +347,118 @@ async def validate_rainbow_key(key: str = Query(...)):
         "valid": sanctuary.validate_rainbow_key(key),
         "format": "RAINBOW-{18 uppercase hex}",
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SIMPLIFIED ENDPOINTS FOR FRONTEND
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/karma")
+async def get_user_karma(user_id: str = Query(None)):
+    """
+    Get user's karma. Uses authenticated user or query param.
+    Returns simplified karma data for frontend display.
+    """
+    if not user_id:
+        user_id = "anonymous"
+    
+    sanctuary = get_sanctuary()
+    status = sanctuary.get_user_status(user_id)
+    
+    return {
+        "karma": status.get("karma", 0),
+        "is_solidified": status.get("is_solidified", False),
+        "vr_eligible": status.get("vr_eligible", False),
+        "threshold": status.get("threshold", 100),
+        "progress_percent": min(100, (status.get("karma", 0) / status.get("threshold", 100)) * 100),
+    }
+
+
+@router.get("/deeds")
+async def get_user_deeds(user_id: str = Query(None), limit: int = Query(10, ge=1, le=50)):
+    """
+    Get user's recent deeds.
+    Returns list of deeds for display in the frontend.
+    """
+    if not user_id:
+        user_id = "anonymous"
+    
+    sanctuary = get_sanctuary()
+    user_sanctuary = sanctuary.get_sanctuary(user_id)
+    
+    # Get deeds from user sanctuary
+    deeds = user_sanctuary.deed_history[-limit:] if user_sanctuary.deed_history else []
+    
+    return {
+        "deeds": deeds[::-1],  # Most recent first
+        "total_karma": user_sanctuary.karma,
+        "deed_count": len(user_sanctuary.deed_history),
+    }
+
+
+class SimpleDeedRequest(BaseModel):
+    """Simplified deed request from frontend."""
+    deed_type: str = Field(..., description="Type of deed")
+    description: str = Field(..., max_length=500)
+    karma_value: int = Field(default=10, ge=1, le=100)
+    date: str = Field(default="", description="Date of deed (ISO format)")
+
+
+@router.post("/deed-simple")
+async def log_deed_simple(request: SimpleDeedRequest, user_id: str = Query(None)):
+    """
+    Simplified deed logging for frontend.
+    Automatically calculates karma based on deed type.
+    """
+    if not user_id:
+        user_id = "anonymous"
+    
+    sanctuary = get_sanctuary()
+    user_sanctuary = sanctuary.get_sanctuary(user_id)
+    
+    # Map frontend deed types to karma multipliers
+    deed_weights = {
+        "service": 1.0,
+        "creation": 1.5,
+        "teaching": 2.0,
+        "environmental": 1.2,
+        "healing": 2.5,
+        "restoration": 3.0,
+    }
+    
+    weight = deed_weights.get(request.deed_type, 1.0)
+    base_karma = request.karma_value * weight
+    grace_karma = base_karma * sanctuary.grace_multiplier
+    karma_earned = int(grace_karma)
+    
+    # Store the deed
+    deed_record = {
+        "deed_type": request.deed_type,
+        "description": request.description,
+        "karma_value": karma_earned,
+        "date": request.date or "today",
+        "sealed": True,
+        "timestamp": time.time(),
+    }
+    user_sanctuary.deed_history.append(deed_record)
+    user_sanctuary.karma += karma_earned
+    user_sanctuary.last_deed_at = time.time()
+    
+    # Check solidification
+    if user_sanctuary.karma >= SOLIDIFICATION_THRESHOLD and not user_sanctuary.is_solidified:
+        user_sanctuary.is_solidified = True
+        sanctuary.total_solidifications += 1
+    
+    # Update global stats
+    sanctuary.total_karma_generated += karma_earned
+    
+    return {
+        "success": True,
+        "deed": deed_record,
+        "karma_earned": karma_earned,
+        "new_total_karma": user_sanctuary.karma,
+        "is_solidified": user_sanctuary.is_solidified,
+        "grace_multiplier": sanctuary.grace_multiplier,
+        "message": f"Deed sealed! +{karma_earned} Karma",
+    }
+
