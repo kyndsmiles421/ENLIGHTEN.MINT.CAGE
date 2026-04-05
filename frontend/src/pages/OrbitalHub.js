@@ -545,8 +545,24 @@ export default function OrbitalHub() {
               onMouseLeave={() => setHoveredSat(null)}
               data-testid={isExtracted ? `satellite-${sat.id}` : `dormant-${sat.id}`}
             >
+              {/* Nodule Vibration Glow Layer - behind content */}
+              {(isHovered || isExtracted || hubState === 'bloom') && (
+                <div 
+                  className="nodule-vibration"
+                  style={{
+                    width: size * 1.6,
+                    height: size * 1.6,
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    background: `radial-gradient(circle, ${sat.color}40 0%, ${sat.color}10 70%, transparent 100%)`,
+                    animationDelay: `${idx * 0.2}s`, // Stagger the animations
+                  }}
+                />
+              )}
+              
               <div
-                className="w-full h-full rounded-full flex flex-col items-center justify-center relative"
+                className="w-full h-full rounded-full flex flex-col items-center justify-center relative rotation-point"
                 style={{
                   pointerEvents: 'none', // Let events bubble to parent motion.div
                   background: isHovered || isExtracted 
