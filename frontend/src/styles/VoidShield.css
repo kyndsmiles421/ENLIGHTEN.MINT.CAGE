@@ -334,3 +334,99 @@ header,
   opacity: 0.7;
   z-index: 10001;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT RESONANCE BALL PROPERTIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.resonance-ball {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  position: absolute;
+  /* Rainbow Refraction Glow */
+  background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.8), rgba(0, 0, 0, 0));
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  /* The "Gravity" Lens Effect */
+  backdrop-filter: blur(4px) contrast(1.2); 
+  mix-blend-mode: screen;
+  transition: transform 0.1s linear;
+}
+
+.resonance-ball:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.resonance-ball.active {
+  animation: resonance-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes resonance-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+  }
+}
+
+/* Resonance Ball Variants */
+.resonance-ball.copper {
+  background: radial-gradient(circle at 30% 30%, rgba(184, 115, 51, 0.8), rgba(0, 0, 0, 0));
+  box-shadow: 0 0 20px rgba(184, 115, 51, 0.4), inset 0 0 15px rgba(255, 200, 150, 0.2);
+}
+
+.resonance-ball.teal {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 255, 204, 0.8), rgba(0, 0, 0, 0));
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.resonance-ball.silver {
+  background: radial-gradient(circle at 30% 30%, rgba(192, 192, 192, 0.8), rgba(0, 0, 0, 0));
+  box-shadow: 0 0 20px rgba(192, 192, 192, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GRID REFRACTION BEND
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.grid-system {
+  background-image: 
+    linear-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  /* This grid will "warp" under the resonance balls */
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.grid-system.dense {
+  background-size: 20px 20px;
+}
+
+.grid-system.copper {
+  background-image: 
+    linear-gradient(rgba(184, 115, 51, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 115, 51, 0.08) 1px, transparent 1px);
+}
+
+.grid-system.teal {
+  background-image: 
+    linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
+}
+
+/* Grid warp effect zone around resonance balls */
+.grid-warp-zone {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: transparent;
+  filter: url(#warp-filter);
+  pointer-events: none;
+}

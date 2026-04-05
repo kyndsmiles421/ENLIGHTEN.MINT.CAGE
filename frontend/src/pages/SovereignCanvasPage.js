@@ -257,6 +257,9 @@ const SovereignCanvas = () => {
         
         {/* Main Content */}
         <main className="sanctuary-main">
+          {/* Grid Refraction System */}
+          <div className="grid-system" />
+          
           <canvas 
             ref={canvasRef}
             className="sovereign-canvas"
