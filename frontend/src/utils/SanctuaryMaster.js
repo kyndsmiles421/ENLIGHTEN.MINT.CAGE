@@ -119,7 +119,7 @@ const SanctuaryMaster = {
     circle.setAttribute('role', 'button');
     circle.setAttribute('aria-label', 'Ascend to Celestial Dome');
     
-    // Inner vessel core with label
+    // Inner vessel core - smaller text
     circle.innerHTML = `
       <div class="vessel-core" style="
         width: 100%;
@@ -127,27 +127,28 @@ const SanctuaryMaster = {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 8px;
+        font-size: 6px;
         font-weight: 900;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         color: #000;
         text-transform: uppercase;
-      ">SHAMBHALA</div>
+      ">GO</div>
     `;
     
-    // Applying the styles directly to ensure zero interference
+    // Applying the styles - CORNER POSITION to not block content
     Object.assign(circle.style, {
       position: 'fixed',
-      bottom: '100px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: '66px',
-      height: '66px',
+      bottom: '80px',
+      right: '20px',
+      left: 'auto',
+      transform: 'none',
+      width: '50px',
+      height: '50px',
       borderRadius: '50%',
       backgroundColor: 'white',
-      boxShadow: '0 0 20px rgba(255,255,255,0.5)',
+      boxShadow: '0 0 15px rgba(255,255,255,0.5)',
       cursor: 'pointer',
-      zIndex: '2147483646', // Just below max
+      zIndex: '2147483646',
       transition: 'all 0.15s ease-out',
       display: 'flex',
       alignItems: 'center',
@@ -158,13 +159,13 @@ const SanctuaryMaster = {
       WebkitTapHighlightColor: 'transparent'
     });
 
-    // Force important styles to prevent override
+    // Force important styles
     circle.style.setProperty('position', 'fixed', 'important');
-    circle.style.setProperty('bottom', '100px', 'important');
-    circle.style.setProperty('left', '50%', 'important');
-    circle.style.setProperty('transform', 'translateX(-50%)', 'important');
+    circle.style.setProperty('bottom', '80px', 'important');
+    circle.style.setProperty('right', '20px', 'important');
+    circle.style.setProperty('left', 'auto', 'important');
+    circle.style.setProperty('transform', 'none', 'important');
     circle.style.setProperty('top', 'auto', 'important');
-    circle.style.setProperty('right', 'auto', 'important');
 
     document.body.appendChild(circle);
     

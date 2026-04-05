@@ -327,7 +327,7 @@ body::after {
   top: -9999px !important; /* Throw it off the screen entirely */
 }
 
-/* Force the Mission Circle to the front of the line */
+/* Force the Mission Circle to bottom-right corner, not blocking content */
 #mission-circle {
   display: flex !important;
   visibility: visible !important;
@@ -335,11 +335,13 @@ body::after {
   z-index: 2147483646 !important;
   pointer-events: auto !important;
   position: fixed !important;
-  bottom: 100px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  bottom: 80px !important;
+  right: 20px !important;
+  left: auto !important;
+  transform: none !important;
   top: auto !important;
-  right: auto !important;
+  width: 50px !important;
+  height: 50px !important;
 }
 
 #shambhala-mission-control button,
