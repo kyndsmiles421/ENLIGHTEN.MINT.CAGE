@@ -11,11 +11,12 @@
  * 
  * THE SOVEREIGN RESULT:
  * The matrix can NEVER be "behind" anything — it exists in true 3D space.
+ * 
+ * NOTE: Uses minimal R3F setup to avoid "x-line-number" attribute injection issues
  */
 
-import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import React, { useRef, useState, useCallback, useMemo, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -280,6 +281,47 @@ const AmbientScene = ({ isVoidMode }) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ERROR BOUNDARY for WebGL
+// ═══════════════════════════════════════════════════════════════════════════
+
+class R3FErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[TesseractCanvas] R3F Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div 
+          className="flex flex-col items-center justify-center rounded-2xl p-8"
+          style={{
+            width: 'min(90vw, 500px)',
+            height: 'min(90vw, 500px)',
+            background: 'rgba(139, 92, 246, 0.1)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+          }}
+        >
+          <span className="text-lg text-purple-400 mb-2">WebGL Error</span>
+          <span className="text-xs text-white/50 text-center">
+            3D rendering unavailable. Using 2D mode.
+          </span>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // MAIN CANVAS COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -351,73 +393,75 @@ export default function TesseractCanvas({
   }
   
   return (
-    <div 
-      className="relative"
-      style={{ 
-        width: 'min(90vw, 500px)',
-        height: 'min(90vw, 500px)',
-        cursor: isDragging.current ? 'grabbing' : 'grab',
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-      data-testid="tesseract-canvas"
-    >
-      <Canvas
-        camera={{ position: [0, 0, 7], fov: 50 }}
-        style={{ background: 'transparent' }}
-        gl={{ alpha: true, antialias: true }}
-      >
-        <AmbientScene isVoidMode={isVoidMode} />
-        
-        <SphereContainer
-          selectedCell={selectedCell}
-          onSelectCell={handleSelectCell}
-          onDive={handleDive}
-          isVoidMode={isVoidMode}
-          dwellProgress={dwellProgress}
-          rotationVelocity={rotationVelocity}
-          depth={depth}
-        />
-        
-        {/* Subtle orbit controls for zoom only */}
-        <OrbitControls
-          enableRotate={false}
-          enablePan={false}
-          enableZoom={true}
-          minDistance={4}
-          maxDistance={12}
-        />
-      </Canvas>
-      
-      {/* Depth indicator overlay */}
+    <R3FErrorBoundary>
       <div 
-        className="absolute top-4 left-1/2 -translate-x-1/2 text-center pointer-events-none"
-        style={{ zIndex: 10 }}
+        className="relative"
+        style={{ 
+          width: 'min(90vw, 500px)',
+          height: 'min(90vw, 500px)',
+          cursor: isDragging.current ? 'grabbing' : 'grab',
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        data-testid="tesseract-canvas"
       >
-        <span 
-          className="text-3xl font-light"
-          style={{ 
-            color: colors?.primary || '#10B981',
-            textShadow: `0 0 20px ${colors?.primary || '#10B981'}`,
+        <Canvas
+          camera={{ position: [0, 0, 7], fov: 50 }}
+          style={{ background: 'transparent' }}
+          gl={{ 
+            alpha: true, 
+            antialias: true,
+            powerPreference: 'high-performance',
+          }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
           }}
         >
-          L{depth}
-        </span>
-      </div>
-      
-      {/* Zooming overlay */}
-      {isZooming && (
+          <Suspense fallback={null}>
+            <AmbientScene isVoidMode={isVoidMode} />
+            
+            <SphereContainer
+              selectedCell={selectedCell}
+              onSelectCell={handleSelectCell}
+              onDive={handleDive}
+              isVoidMode={isVoidMode}
+              dwellProgress={dwellProgress}
+              rotationVelocity={rotationVelocity}
+              depth={depth}
+            />
+          </Suspense>
+        </Canvas>
+        
+        {/* Depth indicator overlay */}
         <div 
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{ 
-            background: `radial-gradient(circle, ${colors?.primary || '#10B981'}30, transparent)`,
-          }}
+          className="absolute top-4 left-1/2 -translate-x-1/2 text-center pointer-events-none"
+          style={{ zIndex: 10 }}
         >
-          <span className="text-white text-sm animate-pulse">Diving...</span>
+          <span 
+            className="text-3xl font-light"
+            style={{ 
+              color: colors?.primary || '#10B981',
+              textShadow: `0 0 20px ${colors?.primary || '#10B981'}`,
+            }}
+          >
+            L{depth}
+          </span>
         </div>
-      )}
-    </div>
+        
+        {/* Zooming overlay */}
+        {isZooming && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ 
+              background: `radial-gradient(circle, ${colors?.primary || '#10B981'}30, transparent)`,
+            }}
+          >
+            <span className="text-white text-sm animate-pulse">Diving...</span>
+          </div>
+        )}
+      </div>
+    </R3FErrorBoundary>
   );
 }

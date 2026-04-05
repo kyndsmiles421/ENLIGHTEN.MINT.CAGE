@@ -603,8 +603,10 @@ export default function TesseractExperience() {
   
   // ═══════════════════════════════════════════════════════════════════════════
   // SOVEREIGN MODE: Toggle between flat CSS grid and true 3D WebGL sphere
+  // NOTE: R3F has compatibility issues with Emergent platform overlay
+  // Using CSS 3D transforms for spherical effect instead
   // ═══════════════════════════════════════════════════════════════════════════
-  const [useSovereignMode, setUseSovereignMode] = useState(false); // Default to 2D while debugging 3D
+  const [useSovereignMode, setUseSovereignMode] = useState(false); // Keep 2D as default - R3F has issues
   
   // ═══════════════════════════════════════════════════════════════════════════
   // SEAL-01: LONG-PRESS ESCAPE (Emergency Surface)
@@ -838,22 +840,18 @@ export default function TesseractExperience() {
         
         {/* SOVEREIGN MODE: True 3D WebGL Sphere */}
         {useSovereignMode ? (
-          <div className="relative" style={{ width: 'min(90vw, 500px)', height: 'min(90vw, 500px)' }}>
-            {/* Fallback message while debugging R3F issues */}
-            <div 
-              className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl"
-              style={{
-                background: `radial-gradient(circle, ${core.colors.primary}10, transparent)`,
-                border: `1px solid ${core.colors.primary}20`,
-              }}
-            >
-              <span className="text-2xl mb-2" style={{ color: core.colors.primary }}>L{core.depth}</span>
-              <span className="text-xs text-white/50 text-center px-4">
-                3D Sphere Mode requires WebGL compatibility check.
-                <br />Click "2D Grid" to use the flat matrix.
-              </span>
-            </div>
-          </div>
+          <TesseractCanvas
+            depth={core.depth}
+            selectedCell={core.selectedCell}
+            onSelectCell={core.selectCell}
+            onDive={core.dive}
+            isZooming={core.isZooming}
+            colors={core.colors}
+            isVoidMode={core.isVoidMode}
+            isDwellStable={core.isDwellStable}
+            dwellProgress={core.dwellProgress}
+            isCollapsed={isMatrixCollapsed}
+          />
         ) : (
           /* LEGACY MODE: Flat CSS Grid with Lens Warp */
           <TesseractLattice
