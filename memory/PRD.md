@@ -1565,3 +1565,76 @@ animation-duration: calc(var(--pulse-speed) * 0.8 + var(--master-pulse) * 0.2);
 - `/utils/HarmonicResonance.js` — setGlobalResonance(), useHarmonicResonance hook
 - `/utils/NoduleGenerator.js` — Spherical Fibonacci positioning
 - `/components/SphericalNoduleCloud.js` — Reusable 3D nodule renderer
+
+
+
+---
+
+## Update: April 5, 2026 - Orbital Hub P0 Fixes Complete
+
+### Completed Fixes
+
+#### 1. Zero-Scale Parentage Physics (P0) ✅
+The Orbital Hub now correctly implements the mathematical physics:
+- **Core**: Scale 1.0 (always visible)
+- **Bloom State**: Sub-orbs at 2.5x radius with 0.3 scale
+- **Extract State**: Selected orb at 3.0x radius with 1.0 scale
+- **Latent State**: Sub-orbs at (0,0,0) with 0.1 scale (crystalline seed floor)
+
+**Key Fix**: Replaced `setInterval` forceUpdate pattern with `requestAnimationFrame` + refs for 60fps animations without triggering React re-renders.
+
+#### 2. Pointer-Events Fix (P1) ✅
+Fixed button/interaction glitches:
+- Added `pointer-events: none` to container div
+- Added `pointer-events: auto` to core and sub-orbs
+- CSS global fix for decorative layers (`.aura-layer`, `.svg-tethers`, etc.)
+
+#### 3. Emergency STOP Button (P0) ✅
+- Positioned in absolute top-left corner
+- Maximum z-index (99999)
+- Shows VOID/STOP text
+- Verified clickable and accessible
+
+#### 4. Grand Finale Coordinator Integration (P1) ✅
+- `GrandFinaleCoordinator.js` integrated into OrbitalHub
+- Tracks `extractedCount` for Critical Mass event trigger
+
+### New Components Created
+
+1. **`EtherNode.js`** — Gear-driven rotational nodule system
+   - Uses CW/CCW gear rotation from HarmonicResonance
+   - Dual-layer architecture (Base → Ether extraction)
+   - Haptic click feedback on extraction
+
+2. **`useGearSystem`** hook in HarmonicResonance.js
+   - Golden Ratio (φ = 1.618) driven rotation
+   - Ref-based animation (no React re-renders)
+   - Subscribe pattern for DOM updates
+
+### Known Issues (Deferred)
+
+- **React Context Loop**: "Maximum update depth exceeded" errors persist in console
+  - Multiple context providers have callback functions in useEffect dependencies
+  - Does NOT prevent functionality (UI works correctly)
+  - Requires extensive refactoring of 10+ context files to fully resolve
+
+### Testing Status
+- **Test Report**: `/app/test_reports/iteration_284.json`
+- **Success Rate**: 100% for all requested features
+- All Zero-Scale Parentage physics verified working
+- Emergency STOP button verified in top-left
+- Hub interaction flow: latent → bloom → extract → navigate ✅
+
+### Files Modified
+- `/app/frontend/src/pages/OrbitalHub.js` - Main hub with physics fixes
+- `/app/frontend/src/context/EnlightenmentCafeContext.js` - Fixed useEffect deps
+- `/app/frontend/src/context/AvatarContext.js` - Fixed useEffect deps
+- `/app/frontend/src/context/CreditContext.js` - Fixed useEffect deps
+- `/app/frontend/src/context/SovereignContext.js` - Fixed useEffect deps
+- `/app/frontend/src/hooks/useCrystalResonance.js` - Fixed useEffect deps
+- `/app/frontend/src/hooks/useDepth.js` - Added FPS debounce
+- `/app/frontend/src/hooks/useZeroPointFlicker.js` - Tolerance-based detection
+- `/app/frontend/src/hooks/useGameController.js` - Fixed useEffect deps
+- `/app/frontend/src/components/PersistentWaveform.js` - Ref-based animation
+- `/app/frontend/src/utils/HarmonicResonance.js` - Added useGearSystem hook
+- `/app/frontend/src/index.css` - Pointer-events CSS fix
