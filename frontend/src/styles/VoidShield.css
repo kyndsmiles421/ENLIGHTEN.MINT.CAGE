@@ -1,0 +1,224 @@
+/**
+ * THE VOID SHIELD CSS (Protective Layer)
+ * Location: /src/styles/VoidShield.css
+ * Action: Sanctuary Root + Matrix Basement Burial
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE VOID SHIELD (Protective Layer)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sanctuary-root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #000000; /* Absolute Opaque Floor */
+  display: flex;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE ACTIVE UI (Cleaned & Un-Bunched)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.active-ui-layer {
+  z-index: 999; 
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Refined Sidebar Spacing
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3rem; /* Forces icons to spread out */
+  padding: 0 30px;
+  border-right: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: #fbc02d;
+}
+
+.sidebar-nav-item.active {
+  background: rgba(0, 255, 204, 0.1);
+  border-color: #00FFCC;
+  color: #00FFCC;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE BASEMENT (The Encrypted Burial)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#matrix-void-basement {
+  position: absolute;
+  bottom: -5000px; /* Dropped into the deep basement */
+  z-index: -1;
+  pointer-events: none;
+  /* Rainbow Refraction Suppression */
+  filter: brightness(0) contrast(0) blur(20px); 
+  mix-blend-mode: multiply;
+}
+
+#matrix-core-base {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Kill the glass covers and reflections
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.glass-cover, 
+.reflection-layer,
+[class*="glass-"],
+[class*="Glass"] {
+  backdrop-filter: none !important;
+  background: transparent !important;
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Main Content Area
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sanctuary-main {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Shambhala Toolbar Override
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.shambhala-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  border-bottom: 3px solid #fbc02d;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10000;
+  font-family: 'SF Mono', monospace;
+}
+
+.shambhala-toolbar .gold-text {
+  color: #fbc02d;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+.shambhala-toolbar .teal-text {
+  color: #00FFCC;
+  font-size: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Canvas Styling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sovereign-canvas {
+  display: block;
+  cursor: crosshair;
+  background: #000;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Module Orbs
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.module-orb {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  border: 2px solid #fbc02d;
+}
+
+.module-orb:hover {
+  transform: scale(1.1);
+}
+
+.module-orb-label {
+  color: white;
+  font-size: 10px;
+  font-family: monospace;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Download Button
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.download-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: 2px solid #00FFCC;
+  background: rgba(0, 255, 204, 0.1);
+  color: #00FFCC;
+  padding: 12px 24px;
+  border-radius: 47.94px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 12px;
+  z-index: 10001;
+  transition: all 0.2s;
+}
+
+.download-btn:hover {
+  background: rgba(0, 255, 204, 0.2);
+  transform: scale(1.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Version Badge
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.version-badge {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  color: #00FFCC;
+  font-size: 10px;
+  font-family: monospace;
+  opacity: 0.7;
+  z-index: 10001;
+}
