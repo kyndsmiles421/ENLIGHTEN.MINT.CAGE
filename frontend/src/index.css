@@ -3302,3 +3302,40 @@ body {
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
   text-shadow: 0 0 8px #fff;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CRYSTAL WHITE LIGHT RAINBOW REFRACTION
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.resonance-node, .hud-text {
+  background: linear-gradient(
+    90deg, 
+    rgba(255, 0, 0, 0.05), 
+    rgba(255, 255, 255, 0.9), 
+    rgba(0, 0, 255, 0.05)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+  position: relative;
+}
+
+/* The "Key" script interaction: Prismatic Shift on hover */
+.resonance-node:hover {
+  filter: drop-shadow(0 0 8px #ffffff) hue-rotate(90deg);
+  transform: translateZ(50px); /* Brings it forward in the sphere */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GHOST THE EMERGENT BADGE - 10% opacity starfield blend
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[class*="emergent"],
+[id*="emergent"],
+a[href*="emergentagent"],
+div:has(> a[href*="emergentagent"]) {
+  mix-blend-mode: screen !important;
+  opacity: 0.1 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
