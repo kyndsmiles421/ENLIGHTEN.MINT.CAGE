@@ -3260,3 +3260,45 @@ a[href*="emergentagent"] {
   top: 10%;
   right: 5%;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SANCTUARY ENGINE - Pure Light Resonance (Shambhala Purged)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Kill all legacy bars and blocks */
+.shambhala-bar, 
+.bottom-nav, 
+.footer-tray,
+[class*="shambhala-toolbar"],
+[class*="ShambhalaToolbar"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Transition to 100% Spherical Flow */
+body {
+  background: radial-gradient(circle at center, #0a0a1a 0%, #000000 100%) !important;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+/* Refractive Light Nodes (Replaces Buttons) */
+.resonance-node {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 15px 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+}
+
+.resonance-node:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 8px #fff;
+}
