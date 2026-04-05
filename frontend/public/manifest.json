@@ -1,7 +1,8 @@
 {
-  "short_name": "Cosmic",
-  "name": "The ENLIGHTEN.MINT.CAFE",
-  "description": "AI-powered wellness: meditation, breathwork, sound healing, divination, and cosmic guidance.",
+  "short_name": "Enlightenment",
+  "name": "The Enlightenment Cafe",
+  "version": "2.88_SHAMBHALA",
+  "description": "The Enlightenment Cafe — AI-powered wellness with AETHER_MIRRORLESS physics: meditation, breathwork, sound healing, divination, and Shambhala guidance.",
   "icons": [
     {
       "src": "favicon.ico",

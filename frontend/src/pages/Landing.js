@@ -767,7 +767,7 @@ function WaitlistSection() {
             Bringing <span style={{ color: '#2DD4BF' }}>Positive Energy</span> to Your City
           </h2>
           <p className="text-sm md:text-base mb-2 max-w-lg mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            The ENLIGHTEN.MINT.CAFE Enlightenment Cafe — a physical sanctuary where frequencies, nourishment, and community converge. Opening Late 2026.
+            The Enlightenment Cafe Enlightenment Cafe — a physical sanctuary where frequencies, nourishment, and community converge. Opening Late 2026.
           </p>
           <p className="text-xs mb-8" style={{ color: 'var(--text-muted)' }}>
             Join the Founding 100 for exclusive updates, early access events, and mobile unit schedules.
@@ -818,7 +818,7 @@ function Footer() {
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full" style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.6), rgba(124,58,237,0.2))' }} />
             <span className="text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
-              The ENLIGHTEN.MINT.CAFE &copy; {new Date().getFullYear()}
+              The Enlightenment Cafe &copy; {new Date().getFullYear()}
             </span>
           </div>
           <div className="flex items-center gap-6">
@@ -866,7 +866,7 @@ function Footer() {
               <Heart size={24} style={{ color: '#FDA4AF', marginBottom: 12 }} />
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Digital Wellness Disclaimer</h2>
               <div className="space-y-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <p><strong style={{ color: 'var(--text-primary)' }}>For Wellness & Relaxation Only.</strong> The ENLIGHTEN.MINT.CAFE provides tools for personal wellness, stress relief, and relaxation. These tools are not medical devices and are not intended to diagnose, treat, cure, or prevent any disease or medical condition.</p>
+                <p><strong style={{ color: 'var(--text-primary)' }}>For Wellness & Relaxation Only.</strong> The Enlightenment Cafe provides tools for personal wellness, stress relief, and relaxation. These tools are not medical devices and are not intended to diagnose, treat, cure, or prevent any disease or medical condition.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Not a Substitute for Professional Care.</strong> If you are experiencing a mental health crisis, severe anxiety, depression, or any medical condition, please seek professional help immediately. Our tools complement — but never replace — professional medical or psychological care.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Frequency & Light Therapy:</strong> Some users may be sensitive to certain frequencies or light patterns. If you experience discomfort, dizziness, or any adverse effects, discontinue use immediately. Those with photosensitive epilepsy should consult a healthcare provider before using light therapy features.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Nourishment Information:</strong> Recipe and nutritional information is provided for educational purposes. Individual dietary needs vary. Consult a healthcare provider or registered dietitian for personalized nutrition advice, especially if you have food allergies or medical conditions.</p>
@@ -951,9 +951,9 @@ export default function Landing() {
               Ancient Wisdom, Modern Practice
             </motion.p>
             <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>The Cosmic</motion.span>
+              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>The Enlightenment</motion.span>
               <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Collective</motion.span>
+                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Cafe</motion.span>
             </h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
               className="text-base md:text-lg leading-relaxed max-w-md mb-6" style={{ color: '#C8C5D0', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
@@ -1144,7 +1144,7 @@ export default function Landing() {
               High-Frequency Wellness, Delivered to You
             </h2>
             <p className="text-sm max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              The ENLIGHTEN.MINT.CAFE is a mobile wellness experience that brings healing frequencies, guided meditations, and ancient wisdom directly to you — wherever you are, whenever you need it.
+              The Enlightenment Cafe is a mobile wellness experience that brings healing frequencies, guided meditations, and ancient wisdom directly to you — wherever you are, whenever you need it.
             </p>
           </motion.div>
 
@@ -1190,7 +1190,7 @@ export default function Landing() {
               We Come to You
             </h3>
             <p className="text-sm max-w-lg mx-auto mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Experience The ENLIGHTEN.MINT.CAFE in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location.
+              Experience The Enlightenment Cafe in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <button onClick={() => navigate('/auth')}

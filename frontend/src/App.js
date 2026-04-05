@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
+import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
