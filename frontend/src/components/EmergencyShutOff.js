@@ -202,13 +202,13 @@ export default function EmergencyShutOff() {
         )}
       </AnimatePresence>
       
-      {/* STOP Button - MOVED TO BOTTOM RIGHT */}
+      {/* STOP Button - BOTTOM LEFT corner */}
       <motion.button
         onClick={handleEmergencyStop}
         className="fixed flex items-center justify-center gap-1.5"
         style={{
-          bottom: 140,
-          right: 8,
+          bottom: 20,
+          left: 20,
           zIndex: 99999,
           width: 'auto',
           minWidth: 36,

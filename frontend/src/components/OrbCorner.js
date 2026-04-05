@@ -22,8 +22,9 @@ export default function OrbCorner() {
       <motion.button
         className="fixed z-[45] rounded-full flex items-center justify-center"
         style={{
-          bottom: 160,
-          left: 80,
+          bottom: 200,
+          left: '50%',
+          transform: 'translateX(-50%)',
           width: 44,
           height: 44,
           background: `radial-gradient(circle at 40% 35%, ${pulseColor}25, rgba(10,10,18,0.85) 70%)`,
