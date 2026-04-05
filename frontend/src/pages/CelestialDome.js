@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSpatialAudio, SOLFEGGIO_FREQUENCIES } from '../engines/SpatialAudioEngine';
 
 /**
  * CelestialDome.js — Refractal VR Entry Point
@@ -9,6 +10,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
  * - Nested inner rings for depth perception
  * - Bio-sync particle atmosphere
  * - Orbital light rings
+ * 
+ * SPATIAL AUDIO:
+ * - HRTF positional audio
+ * - Solfeggio frequency field
+ * - Bio-sync modulation
  * 
  * VR FEATURES:
  * - WebXR detection and session management
@@ -24,13 +30,18 @@ export default function CelestialDome() {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const frameIdRef = useRef(null);
+  const audioInitializedRef = useRef(false);
   
   const [isLoading, setIsLoading] = useState(true);
   const [vrSupported, setVrSupported] = useState(false);
   const [userKarma, setUserKarma] = useState(0);
   const [showWelcome, setShowWelcome] = useState(false);
   const [is3DActive, setIs3DActive] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [error, setError] = useState('');
+  
+  // Spatial Audio hook
+  const spatialAudio = useSpatialAudio();
 
   // Check for welcome redirect from payment
   useEffect(() => {
@@ -267,6 +278,12 @@ export default function CelestialDome() {
         outerMaterial.opacity = 0.05 + breath * 0.1;
         edgesMaterial.opacity = 0.15 + breath * 0.15;
 
+        // Update spatial audio listener position
+        if (audioInitializedRef.current) {
+          spatialAudio.updateListener(camera);
+          spatialAudio.applyBioSync(breath);
+        }
+
         // Update controls
         controls.update();
 
@@ -290,6 +307,7 @@ export default function CelestialDome() {
         window.removeEventListener('resize', handleResize);
         controls.dispose();
         renderer.dispose();
+        spatialAudio.stopAll();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
         }
@@ -300,7 +318,7 @@ export default function CelestialDome() {
       setError('Failed to load 3D experience. Showing 2D fallback.');
       setIs3DActive(false);
     }
-  }, [is3DActive]);
+  }, [is3DActive, spatialAudio]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -328,12 +346,58 @@ export default function CelestialDome() {
     }
   };
 
+  // Initialize spatial audio (requires user gesture)
+  const initSpatialAudio = useCallback(async () => {
+    if (audioInitializedRef.current) return;
+    
+    try {
+      const success = await spatialAudio.initAudio();
+      if (success) {
+        audioInitializedRef.current = true;
+        setAudioEnabled(true);
+        
+        // Create Solfeggio frequency field around the dome
+        spatialAudio.createSolfeggioField(10);
+        
+        // Start all Solfeggio tones
+        Object.keys(SOLFEGGIO_FREQUENCIES).forEach((name) => {
+          spatialAudio.play(`solfeggio-${name}`);
+        });
+        
+        console.log('[CelestialDome] Spatial audio initialized');
+        triggerHaptic([30, 20, 50]);
+      }
+    } catch (err) {
+      console.error('Failed to initialize audio:', err);
+    }
+  }, [spatialAudio]);
+
+  // Toggle spatial audio
+  const toggleAudio = useCallback(() => {
+    if (!audioInitializedRef.current) {
+      initSpatialAudio();
+    } else {
+      const muted = spatialAudio.toggleMute();
+      setAudioEnabled(!muted);
+      triggerHaptic([15]);
+    }
+  }, [spatialAudio, initSpatialAudio]);
+
   // Haptic feedback
   const triggerHaptic = (pattern) => {
     if (navigator.vibrate) {
       navigator.vibrate(pattern);
     }
   };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioInitializedRef.current) {
+        spatialAudio.dispose();
+      }
+    };
+  }, [spatialAudio]);
 
   if (isLoading) {
     return (
