@@ -18,10 +18,54 @@
   // 2. FORCE BRAND ALIGNMENT
   document.title = "The Enlightenment Cafe";
   
-  // 3. PHYSICAL MATRIX ERASURE
-  // This finds any element with 'matrix' in the ID or Class and deletes it
-  const matrixGhosts = document.querySelectorAll('[class*="matrix"], [id*="matrix"]');
-  matrixGhosts.forEach(ghost => ghost.remove());
+  // 3. PHYSICAL MATRIX ERASURE - CLEAN SLATE SCRIPT
+  const cleanSlate = () => {
+    // Find and hide any element with 'matrix' or 'Matrix' in ID, class, or text
+    const matrixGhosts = document.querySelectorAll(
+      '[class*="matrix"], [id*="matrix"], [class*="Matrix"], [id*="Matrix"]'
+    );
+    matrixGhosts.forEach(ghost => {
+      ghost.style.setProperty('display', 'none', 'important');
+      ghost.style.setProperty('visibility', 'hidden', 'important');
+      ghost.style.setProperty('opacity', '0', 'important');
+      ghost.style.setProperty('pointer-events', 'none', 'important');
+    });
+    
+    // Force rename any text content containing "Matrix"
+    document.querySelectorAll('*').forEach(el => {
+      if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+        const text = el.textContent;
+        if (text.includes('Matrix') && !text.includes('FRICTION')) {
+          el.textContent = text.replace(/Matrix/gi, 'Shambhala');
+        }
+        if (text.includes('MATRIX') && !text.includes('FRICTION')) {
+          el.textContent = text.replace(/MATRIX/g, 'SHAMBHALA');
+        }
+        if (text.includes('Cosmic Collective')) {
+          el.textContent = text.replace(/Cosmic Collective/g, 'Enlightenment Cafe');
+        }
+      }
+    });
+  };
+  
+  // Run immediately
+  cleanSlate();
+  
+  // Run again after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', cleanSlate);
+  }
+  
+  // Run again after full load
+  window.addEventListener('load', cleanSlate);
+  
+  // Continuous cleaning every 2 seconds for first 10 seconds
+  let cleanCount = 0;
+  const cleanInterval = setInterval(() => {
+    cleanSlate();
+    cleanCount++;
+    if (cleanCount >= 5) clearInterval(cleanInterval);
+  }, 2000);
   
   console.log("SYSTEM: Matrix Erased. Cosmic Collective Purged. Shambhala Active.");
 })();

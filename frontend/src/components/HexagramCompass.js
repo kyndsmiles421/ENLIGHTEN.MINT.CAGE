@@ -42,7 +42,7 @@ const FLICK_MULTIPLIER = 0.2;
 // Hollow Earth (0.0) = 0.92 (heavy, slow decay)
 // Shambhala (1.0) = 0.98 (light, long spin)
 const FRICTION_HOLLOW = 0.92;
-const FRICTION_MATRIX = 0.985;
+const FRICTION_SHAMBHALA = 0.985;
 
 // Supernova - GRAVITY-REACTIVE
 const SUPERNOVA_BASE_SCALE = 1;
@@ -270,7 +270,7 @@ export default function HexagramCompass({
   
   // Calculate gravity-reactive friction
   const friction = useMemo(() => {
-    return FRICTION_HOLLOW + (FRICTION_MATRIX - FRICTION_HOLLOW) * gravity;
+    return FRICTION_HOLLOW + (FRICTION_SHAMBHALA - FRICTION_HOLLOW) * gravity;
   }, [gravity]);
   
   // Calculate glow based on distance from center (0.5)
@@ -817,7 +817,7 @@ export function SupernovaOverlay() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {isAscending ? '↑ ASCENDING TO MATRIX ↑' : '↓ DESCENDING TO HOLLOW ↓'}
+        {isAscending ? '↑ ASCENDING TO SHAMBHALA ↑' : '↓ DESCENDING TO HOLLOW ↓'}
       </motion.div>
       
       {/* Layer destination badge */}

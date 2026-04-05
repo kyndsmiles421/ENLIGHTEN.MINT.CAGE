@@ -4,6 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL MATRIX PURGE — Clean Slate CSS
+   ═══════════════════════════════════════════════════════════════════════════ */
+[class*="matrix"]:not([class*="FRICTION"]),
+[id*="matrix"]:not([id*="friction"]),
+[class*="Matrix"]:not([class*="Friction"]),
+[id*="Matrix"]:not([id*="Friction"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+
 :root {
   /* ═══════════════════════════════════════════════════════════════════════════
      ENLIGHTEN.MINT.CAFE — Signature Brand Palette
