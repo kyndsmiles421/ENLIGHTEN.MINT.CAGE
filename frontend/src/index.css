@@ -3224,3 +3224,39 @@ div[style*="bottom: 16px"][style*="left: 16px"] {
 .hud-element.hex-cut {
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESONANCE SPECTRUM UI - Mission Control
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.spectrum-node {
+  background: none !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 
+               2px 0 5px rgba(255, 0, 0, 0.2), 
+               -2px 0 5px rgba(0, 255, 255, 0.2); /* Rainbow Refraction */
+}
+
+/* Remove the 'Made with Emergent' block - turn it into a light-stamp */
+.emergent-badge,
+[class*="emergent"],
+[id*="emergent"],
+a[href*="emergentagent"] {
+  position: absolute !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  opacity: 0.3 !important;
+  mix-blend-mode: screen !important; /* Blends into the starfield */
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.shambhala-mixer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 10%;
+  right: 5%;
+}
