@@ -2173,6 +2173,162 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
   border: 1px solid rgba(248, 250, 252, 0.1);
   border-radius: 8px;
   font-size: 12px;
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FIBONACCI WEB — Golden Spiral Mission Control
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.web-container {
+    position: relative;
+    width: 1000px;
+    height: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1500px;
+    background: radial-gradient(circle at center, rgba(10,10,18,0.8) 0%, transparent 70%);
+}
+
+.web-tethers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.spiral-path {
+    fill: none;
+    stroke: rgba(251, 192, 45, 0.2);
+    stroke-width: 1.5;
+    stroke-dasharray: 5, 15;
+    animation: flowWeb 10s linear infinite;
+    mix-blend-mode: screen;
+}
+
+@keyframes flowWeb {
+    to { stroke-dashoffset: -100; }
+}
+
+.tether-line {
+    animation: tetherPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes tetherPulse {
+    from { opacity: 0.3; }
+    to { opacity: 0.8; }
+}
+
+.web-nodule {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.web-nodule .nodule-core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(10, 10, 18, 0.8);
+    border: 1px solid var(--nodule-color, rgba(248, 250, 252, 0.2));
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.web-nodule:hover .nodule-core {
+    background: rgba(20, 20, 30, 0.95);
+    border-color: var(--nodule-color, rgba(248, 250, 252, 0.5));
+    box-shadow: 0 0 20px var(--nodule-color, rgba(248, 250, 252, 0.3));
+}
+
+.web-nodule .icon {
+    font-size: 20px;
+}
+
+.web-nodule .label {
+    font-size: 7px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: rgba(248, 250, 252, 0.6);
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Web Core (Center) */
+.web-core {
+    z-index: 100;
+}
+
+.web-core .core-aura {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: coreBreath 4s ease-in-out infinite alternate;
+}
+
+.web-core .core-display {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(10, 10, 18, 0.95);
+    border: 2px solid rgba(167, 139, 250, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.web-core .core-display:hover {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+}
+
+.web-core .hz-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: rgba(248, 250, 252, 0.9);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.web-core .hz-name {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: rgba(167, 139, 250, 0.7);
+    text-transform: uppercase;
+}
+
+.web-tooltip {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    background: rgba(10, 10, 18, 0.95);
+    border: 1px solid rgba(248, 250, 252, 0.1);
+    border-radius: 8px;
+    font-size: 12px;
+    color: rgba(248, 250, 252, 0.8);
+    backdrop-filter: blur(12px);
+    white-space: nowrap;
+    z-index: 200;
+}
+
   color: rgba(248, 250, 252, 0.8);
   backdrop-filter: blur(8px);
   white-space: nowrap;
