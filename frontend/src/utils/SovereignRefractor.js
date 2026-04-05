@@ -35,11 +35,16 @@ const SovereignRefractor = {
   },
 
   // 3. INFINITE LIGHT VORTEX (Visual Refraction)
-  // Calculates the rainbow spectrum without the back-end key
-  calculateVortex: (strands) => {
-    return strands.map(s => {
+  // Calculates the rainbow spectrum — opacity derived from skeleton Z coordinate
+  calculateVortex: (strands, skeleton = null) => {
+    const nodes = skeleton || SovereignRefractor.renderSkeleton();
+    
+    return strands.map((s, i) => {
       const hue = (s.factor * 100) % 360;
-      return `hsla(${hue}, 100%, 60%, 0.8)`;
+      // Map Z coordinate (-2 to +2) to opacity (0.3 to 1.0)
+      const zValue = nodes[i % nodes.length]?.z || 0;
+      const opacity = 0.3 + ((zValue + 2) / 4) * 0.7; // Normalize -2..+2 to 0.3..1.0
+      return `hsla(${hue}, 100%, 60%, ${opacity.toFixed(2)})`;
     });
   },
 
