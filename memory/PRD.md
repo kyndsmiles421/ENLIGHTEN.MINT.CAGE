@@ -1664,3 +1664,63 @@ Reusable nodule component with:
 - CW/CCW gear rotation subscription
 - Base/Ether layer extraction mechanic
 - Haptic feedback on extraction
+
+
+
+---
+
+## April 5, 2026 Update: EnlightenmentOS Sovereign System Core
+
+### EnlightenmentOS.js — Full-Bleed Sovereign Interface
+Route: `/sovereignty` and `/enlightenment-os`
+
+New unified Sovereign System Core component featuring:
+
+#### Visual Architecture
+- **Full-Bleed Three.js Canvas**: Crystalline icosahedron wireframe with particle field (1000 particles, mint/purple/gold colors)
+- **Dual Nested Domes**: Outer dome (scale 20) + inner dome (scale 15) with additive blending
+- **Bio-Sync Breathing**: Opacity pulsation following breath timing (875ms cycle)
+
+#### UI Components
+| Component | Position | Purpose |
+|-----------|----------|---------|
+| Top Strip (Sky Anchor) | Top edge | VOID status, SOVEREIGN_DIRECTOR title, KARMA balance |
+| Central Portal | Center | COSMOS_AI_ACTIVE with 3 pulse ring animations |
+| Quick Actions Grid | Center-below portal | 4 buttons: SANCTUARY, MEMBERSHIP, ORACLE, JOURNAL |
+| Rubber Band Utility | Bottom edge | Kinetic snap-back nav (HUB, ETHER, LOOM, DOME, EXIT) |
+| HRTF Audio Indicator | Top-right | Shows when spatial audio is initialized |
+
+#### Navigation Routes
+| Button | Destination |
+|--------|-------------|
+| SANCTUARY | /sanctuary |
+| MEMBERSHIP | /membership |
+| ORACLE | /oracle |
+| JOURNAL | /journal |
+| HUB | /ether-hub |
+| ETHER | /hub |
+| LOOM | /quantum-loom |
+| DOME | /vr/celestial-dome |
+| EXIT | /dashboard |
+
+#### Technical Features
+- Audio context initialization on user click (browser autoplay policy compliance)
+- Haptic feedback on navigation (vibrate pattern: [15, 10, 30])
+- Proper Three.js cleanup on unmount (geometry, material, renderer disposal)
+- CSS custom properties for theming (--mint: #00FFC0, --void: #05000a, --purple: #A855F7)
+
+### Context Memoization Fixes (April 5, 2026)
+Fixed "Maximum update depth exceeded" issues in multiple context providers by adding `useMemo` wrapping:
+- SensoryContext.js
+- MeshNetworkContext.js
+- CosmicStateContext.js
+- TempoContext.js
+- ClassContext.js
+- ModalityContext.js
+- TreasuryContext.js
+- ResolutionContext.js
+- VoiceCommandContext.js
+- EnlightenmentCafeContext.js
+- useLatencyPulse.js
+
+**Status**: Errors reduced but not fully eliminated (complex context chain still triggers occasional loops)
