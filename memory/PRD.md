@@ -103,15 +103,41 @@ for (let i = 0; i < 600; i++) {
   - Three.js visibility optimization (battery saving)
   - PWA Service Worker hooks
   - Periodic memory cleanup
+- [x] **WebXR Portal Engine** ✅
+  - Spiral zoom transition (25x scale + 720° rotation)
+  - SHAMBHALA_ASCEND integration for rainbow effect
+  - Fullscreen fallback for non-VR devices
+  - Keyboard shortcut: Ctrl+V
 
 ---
 
 ## Future Roadmap
 - [ ] Custom domain (ENLIGHTEN.MINT.CAFE)
 - [ ] App Store deployment (PWA/Capacitor)
-- [ ] WebXR Dome Session
 - [ ] Spatial Audio Panning
 - [ ] GPS-based Cosmic Map
+
+---
+
+## WebXR Portal System
+
+### Activation Methods
+1. **Event Dispatch**: `window.dispatchEvent(new CustomEvent('INITIATE_PORTAL'))`
+2. **Keyboard Shortcut**: `Ctrl+V`
+3. **Global Function**: `window.WebXRPortal.initiatePortal()`
+
+### Transition Sequence
+```
+1. SHAMBHALA_ASCEND (rainbow spiral)
+2. Portal loading pulse (0.3s)
+3. Spiral zoom (1.5s): scale(25) + rotate(720deg) + brightness(2)
+4. WebXR session start (or fullscreen fallback)
+5. Navigate to /vr/celestial-dome
+```
+
+### CSS Classes
+- `.portal-loading` - Pulsing hue-rotate animation
+- `.spiral-zoom-active` - Intense zoom + spin + brightness
 
 ---
 
