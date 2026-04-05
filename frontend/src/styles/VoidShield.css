@@ -1,44 +1,62 @@
 /**
- * THE VOID SHIELD CSS (Protective Layer)
+ * THE VOID SHIELD CSS V2.0 (Sovereign Interface)
  * Location: /src/styles/VoidShield.css
- * Action: Sanctuary Root + Matrix Basement Burial
+ * Action: Sanctuary Root + Matrix Ghost Tank Burial
  */
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE VOID SHIELD (Protective Layer)
+   ROOT VARIABLES (ENFORCED)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --matrix-space: 0px; /* ENFORCED: No physical footprint for the Matrix */
+  --gold-accent: #d4af37;
+  --copper-accent: #B87333;
+  --teal-accent: #00FFCC;
+  --void-bg: #000000;
+  --glass-blur: 0px;
+  --reflection-opacity: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE SANCTUARY ROOT (Protective Layer)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sanctuary-root {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
-  background: #000000; /* Absolute Opaque Floor */
+  background: var(--void-bg);
   display: flex;
   overflow: hidden;
+  z-index: 1;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE ACTIVE UI (Cleaned & Un-Bunched)
+   SOVEREIGN UI LAYER (Un-Bunched & Responsive)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.active-ui-layer {
-  z-index: 999; 
+.sovereign-ui-layer {
+  position: relative;
+  z-index: 1000; /* High Ground */
   display: flex;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
+  background: radial-gradient(circle at 20% 50%, #0a0a0a 0%, #000000 100%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Refined Sidebar Spacing
+   Refined Sidebar Spacing (3.5rem Gap)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3rem; /* Forces icons to spread out */
-  padding: 0 30px;
+  gap: 3.5rem; /* Forces space between icons */
+  padding: 0 40px;
   border-right: 1px solid rgba(212, 175, 55, 0.1);
 }
 
@@ -59,45 +77,84 @@
 .sidebar-nav-item:hover {
   background: rgba(212, 175, 55, 0.1);
   border-color: rgba(212, 175, 55, 0.3);
-  color: #fbc02d;
+  color: var(--gold-accent);
 }
 
 .sidebar-nav-item.active {
   background: rgba(0, 255, 204, 0.1);
-  border-color: #00FFCC;
-  color: #00FFCC;
+  border-color: var(--teal-accent);
+  color: var(--teal-accent);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE BASEMENT (The Encrypted Burial)
+   THE SOVEREIGN BUTTON (No Glass, No Glitch)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-#matrix-void-basement {
-  position: absolute;
-  bottom: -5000px; /* Dropped into the deep basement */
-  z-index: -1;
-  pointer-events: none;
-  /* Rainbow Refraction Suppression */
-  filter: brightness(0) contrast(0) blur(20px); 
-  mix-blend-mode: multiply;
+.sovereign-action {
+  padding: 12px 24px;
+  background: transparent;
+  border: 1px solid var(--gold-accent);
+  color: var(--gold-accent);
+  font-family: 'Georgia', serif;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
 }
 
-#matrix-core-base {
-  width: 0;
-  height: 0;
-  opacity: 0;
-  visibility: hidden;
+.sovereign-action:hover {
+  background: var(--gold-accent);
+  color: #000;
+}
+
+.sovereign-action:active {
+  transform: scale(0.98);
+}
+
+/* Secondary variant */
+.sovereign-action.secondary {
+  border-color: var(--teal-accent);
+  color: var(--teal-accent);
+}
+
+.sovereign-action.secondary:hover {
+  background: var(--teal-accent);
+  color: #000;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Kill the glass covers and reflections
+   THE BURIAL CHAMBER (Matrix Ghost Tank)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#matrix-ghost-tank {
+  display: none !important;
+  position: absolute;
+  bottom: -9999px;
+  z-index: -1;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+#hardwired-matrix-core,
+.glass-molecule {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLASS/MATRIX PURGE (Force Remove All Traces)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .glass-cover, 
 .reflection-layer,
 [class*="glass-"],
-[class*="Glass"] {
+[class*="Glass"],
+[class*="matrix-"],
+[class*="Matrix"]:not(.sanctuary-root *) {
   backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   background: transparent !important;
   display: none !important;
 }
@@ -109,13 +166,14 @@
 .sanctuary-main {
   flex-grow: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Shambhala Toolbar Override
+   Shambhala Toolbar
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .shambhala-toolbar {
@@ -124,7 +182,7 @@
   left: 0;
   right: 0;
   height: 50px;
-  border-bottom: 3px solid #fbc02d;
+  border-bottom: 3px solid var(--gold-accent);
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   align-items: center;
@@ -135,14 +193,14 @@
 }
 
 .shambhala-toolbar .gold-text {
-  color: #fbc02d;
+  color: var(--gold-accent);
   font-weight: bold;
   font-size: 14px;
   letter-spacing: 0.05em;
 }
 
 .shambhala-toolbar .teal-text {
-  color: #00FFCC;
+  color: var(--teal-accent);
   font-size: 12px;
 }
 
@@ -153,7 +211,7 @@
 .sovereign-canvas {
   display: block;
   cursor: crosshair;
-  background: #000;
+  background: var(--void-bg);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -168,7 +226,7 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.1s ease;
-  border: 2px solid #fbc02d;
+  border: 2px solid var(--gold-accent);
 }
 
 .module-orb:hover {
@@ -191,9 +249,9 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  border: 2px solid #00FFCC;
+  border: 2px solid var(--teal-accent);
   background: rgba(0, 255, 204, 0.1);
-  color: #00FFCC;
+  color: var(--teal-accent);
   padding: 12px 24px;
   border-radius: 47.94px;
   cursor: pointer;
@@ -216,7 +274,7 @@
   position: fixed;
   bottom: 20px;
   left: 20px;
-  color: #00FFCC;
+  color: var(--teal-accent);
   font-size: 10px;
   font-family: monospace;
   opacity: 0.7;

@@ -1,7 +1,7 @@
 /**
- * SOVEREIGN CANVAS PAGE V1.1 - VOID SHIELD EDITION
+ * SOVEREIGN CANVAS PAGE V2.0 - VOID SHIELD EDITION
  * Location: /sovereign-canvas, /replant
- * Structure: Sanctuary Root + Matrix Basement Burial
+ * Structure: Sanctuary Root + Matrix Ghost Tank Burial
  * Identity: STEVEN_MICHAEL
  */
 
@@ -19,7 +19,7 @@ const SovereignCanvas = () => {
   ]);
   const animationRef = useRef(null);
 
-  // Sidebar navigation items
+  // Sidebar icons
   const sidebarItems = [
     { id: 'oracle', icon: '◎', label: 'Oracle' },
     { id: 'tarot', icon: '⚝', label: 'Tarot' },
@@ -29,20 +29,19 @@ const SovereignCanvas = () => {
     { id: 'numerology', icon: '∞', label: 'Numerology' }
   ];
 
-  // Initialize Shambhala Aether
+  // Initialize Aether
   const initAether = useCallback(() => {
     document.body.style.background = "#000";
     document.body.style.overflow = "hidden";
     document.title = "The Enlightenment Cafe | Sovereign Mode";
     
-    // Clear Matrix ghosts
-    const ghosts = document.querySelectorAll('.matrix-layer, .finn-popup');
+    const ghosts = document.querySelectorAll('.matrix-layer, .finn-popup, .glass-molecule');
     ghosts.forEach(g => g.remove());
     
-    console.log("[SOVEREIGN] Void Shield Active — Matrix Buried.");
+    console.log("[SOVEREIGN] Void Shield Active — Matrix Ghost Tank sealed.");
   }, []);
 
-  // Gravitational Pull Logic
+  // Gravity Logic
   const applyGravity = useCallback((module) => {
     const G = 0.15;
     const RADIUS_LIMIT = 47.94;
@@ -73,20 +72,19 @@ const SovereignCanvas = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth - 100; // Account for sidebar
+    canvas.width = window.innerWidth - 124;
     canvas.height = window.innerHeight - 53;
     
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     
     const CONFIG = {
-      GOLD: '#fbc02d',
+      GOLD: '#d4af37',
       COPPER: '#B87333',
       TEAL: '#00FFCC',
       R_LIMIT: 200
     };
     
-    // Hexagonal anchors
     const anchors = [];
     for (let i = 0; i < 6; i++) {
       const angle = (Math.PI / 3) * i;
@@ -183,7 +181,7 @@ const SovereignCanvas = () => {
     loop();
     
     const handleResize = () => {
-      canvas.width = window.innerWidth - 100;
+      canvas.width = window.innerWidth - 124;
       canvas.height = window.innerHeight - 53;
     };
     window.addEventListener('resize', handleResize);
@@ -205,12 +203,16 @@ const SovereignCanvas = () => {
     }
   };
 
+  const handleBeginJourney = () => {
+    window.location.href = '/dashboard';
+  };
+
   return (
     <div className="sanctuary-root">
-      {/* THE ACTIVE UI LAYER */}
-      <div className="active-ui-layer">
+      {/* SOVEREIGN UI LAYER */}
+      <div className="sovereign-ui-layer">
         
-        {/* Refined Sidebar */}
+        {/* Refined Sidebar (3.5rem gap) */}
         <nav className="sidebar-nav">
           {sidebarItems.map(item => (
             <div 
@@ -223,18 +225,28 @@ const SovereignCanvas = () => {
           ))}
         </nav>
         
-        {/* Main Canvas Area */}
+        {/* Main Content */}
         <main className="sanctuary-main">
           <canvas 
             ref={canvasRef}
             className="sovereign-canvas"
           />
+          
+          {/* Sovereign Action Button */}
+          <button 
+            className="sovereign-action"
+            onClick={handleBeginJourney}
+            style={{ marginTop: '30px' }}
+          >
+            Begin Shambhala Journey
+          </button>
         </main>
       </div>
       
-      {/* THE BASEMENT (Matrix Burial) */}
-      <div id="matrix-void-basement">
-        <div id="matrix-core-base"></div>
+      {/* THE BURIAL CHAMBER (Matrix Ghost Tank) */}
+      <div id="matrix-ghost-tank">
+        <div id="hardwired-matrix-core"></div>
+        <div className="glass-molecule"></div>
       </div>
       
       {/* Shambhala Toolbar */}
