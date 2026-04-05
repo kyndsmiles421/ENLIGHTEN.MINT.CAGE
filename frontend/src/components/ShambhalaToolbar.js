@@ -34,7 +34,7 @@ const ShambhalaToolbar = () => {
           onClick={() => setNavOpen(false)}
         >
           <div 
-            className="absolute bottom-16 left-0 right-0 bg-black/95 border-t border-gold-500/20 p-4"
+            className="absolute bottom-28 left-0 right-0 bg-black/95 border-t border-gold-500/20 p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center gap-4 flex-wrap max-w-md mx-auto">
@@ -67,7 +67,7 @@ const ShambhalaToolbar = () => {
           onClick={() => setMixerOpen(false)}
         >
           <div 
-            className="absolute bottom-16 left-0 right-0 bg-black/95 border-t border-teal-500/20 p-4"
+            className="absolute bottom-28 left-0 right-0 bg-black/95 border-t border-teal-500/20 p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="max-w-md mx-auto">
@@ -91,9 +91,9 @@ const ShambhalaToolbar = () => {
         </div>
       )}
 
-      {/* MAIN BOTTOM TOOLBAR */}
+      {/* MAIN BOTTOM TOOLBAR - Pushed up to avoid Emergent badge */}
       <div 
-        className="fixed bottom-0 left-0 right-0 h-14 bg-black/90 border-t border-gold-500/30 flex items-center justify-between px-4 z-[99999]"
+        className="fixed bottom-12 left-0 right-0 h-14 bg-black/90 border-t border-gold-500/30 flex items-center justify-between px-4 z-[99999]"
         style={{ backdropFilter: 'blur(10px)' }}
       >
         {/* Left: Navigation Toggle */}
