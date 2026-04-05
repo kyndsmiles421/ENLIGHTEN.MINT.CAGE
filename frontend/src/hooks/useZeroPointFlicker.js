@@ -41,10 +41,10 @@ import {
 } from '../config/hexagramRegistry';
 import { usePhoneticSynthesizer } from './usePhoneticSynthesizer';
 
-// Source State precision threshold (requires more precision to trigger)
-// At 0.001 precision, only values between 0.4995 and 0.5005 trigger Source State
-// This allows flicker to show at 0.49, 0.50, 0.51 while Source only triggers at exact 0.500
-const SOURCE_PRECISION = 0.001;
+// Source State precision threshold — "Soft Landing" approach
+// Using tolerance-based detection instead of exact matching
+// At 0.01 tolerance, values between 0.49 and 0.51 trigger Source State
+const SOURCE_TOLERANCE = 0.01;
 const SOURCE_GRAVITY = 0.500;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -118,22 +118,27 @@ export function useZeroPointFlicker(options = {}) {
   }, [gravity, isAtZeroPoint, isSourceState]);
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // SOURCE STATE DETECTION (Precision Trigger at 0.5000)
+  // SOURCE STATE DETECTION — "Soft Landing" with Tolerance
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   
   useEffect(() => {
-    // Check for precision match to Source gravity
-    const isAtSource = Math.abs(gravity - SOURCE_GRAVITY) < SOURCE_PRECISION;
+    // NEW: "Soft Landing" - Trigger if within tolerance of the target
+    const isAtSource = Math.abs(gravity - SOURCE_GRAVITY) < SOURCE_TOLERANCE;
     
-    // Only trigger Source State if:
-    // 1. Gravity is at precise 0.500
+    // 5-Point Validation Check:
+    // 1. Gravity is within tolerance of 0.500
     // 2. We're in Zero Point range
     // 3. Not in Void state
     // 4. Source isn't already active
     // 5. Either manual gravity is enabled OR requireManualGravity is false
-    const canTriggerSource = !requireManualGravity || manualGravityEnabled;
+    const canTriggerSource = 
+      isAtSource &&
+      isAtZeroPoint &&
+      !isVoid &&
+      !sourceStateActive &&
+      (!requireManualGravity || manualGravityEnabled);
     
-    if (isAtSource && isAtZeroPoint && !isVoid && !sourceStateActive && canTriggerSource) {
+    if (canTriggerSource) {
       // ENGAGE SOURCE STATE
       setIsSourceState(true);
       setSourceStateActive(true);
@@ -157,7 +162,7 @@ export function useZeroPointFlicker(options = {}) {
       console.log('[ZeroPoint] SOURCE STATE ENGAGED at gravity:', gravity);
       
     } else if (!isAtSource && sourceStateActive) {
-      // EXIT SOURCE STATE (user moved)
+      // EXIT SOURCE STATE (user moved out of tolerance)
       
       // Clear any pending timeout
       if (sourceStateTimeoutRef.current) {

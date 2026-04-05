@@ -89,12 +89,15 @@ export function useDepth(options = {}) {
   const lastFrameRef = useRef(performance.now());
 
   // ═══ CAPABILITY CHECK ON MOUNT ═══
+  // Ref to track if 3D has been disabled due to low FPS (prevent toggling)
+  const fpsDisabled3DRef = useRef(false);
+  
   useEffect(() => {
     const caps = detectCapabilities();
     setCapabilities(caps);
     
     // Enable 3D if device supports it, has stable performance, and not in power save
-    if (caps.supports3D && caps.isHighPerformance && !powerSaveMode) {
+    if (caps.supports3D && caps.isHighPerformance && !powerSaveMode && !fpsDisabled3DRef.current) {
       setUse3D(true);
     } else if (powerSaveMode) {
       // Disable 3D in power save mode
@@ -118,10 +121,11 @@ export function useDepth(options = {}) {
         frameRateRef.current.shift();
       }
       
-      // If average FPS drops below 30, disable 3D
-      if (frameRateRef.current.length >= 30) {
+      // If average FPS drops below 30, disable 3D (one-way transition to prevent loops)
+      if (frameRateRef.current.length >= 30 && !fpsDisabled3DRef.current) {
         const avgFps = frameRateRef.current.reduce((a, b) => a + b, 0) / frameRateRef.current.length;
         if (avgFps < 30 && use3D) {
+          fpsDisabled3DRef.current = true; // Prevent re-enabling
           setUse3D(false);
           console.warn('[useDepth] FPS drop detected, falling back to 2.5D');
         }

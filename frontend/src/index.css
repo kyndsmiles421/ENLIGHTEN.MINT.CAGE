@@ -128,6 +128,48 @@
 
 .central-resonance-core.brand-active .hz-value,
 .central-resonance-core.brand-active .hertz-value {
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   POINTER-EVENTS FIX — Ensures buttons are clickable over decorative layers
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Visual/decorative layers that should NOT block clicks */
+.aura-layer, 
+.svg-tethers, 
+.canvas-particles,
+.cosmic-dust-layer,
+.nodule-vibration,
+.glow-layer,
+.pulse-overlay,
+.vellum-overlay,
+.cosmic-mesh,
+.nebula-background {
+  pointer-events: none !important;
+}
+
+/* Interactive elements that MUST be clickable */
+.nav-item, 
+.central-nodule, 
+.glass-btn,
+.smart-dock-btn,
+.dock-item,
+button,
+[role="button"],
+a[href],
+input,
+select,
+textarea,
+[data-clickable="true"] {
+  pointer-events: auto !important;
+}
+
+/* Ensure buttons inside decorative containers remain clickable */
+.decorative-container > button,
+.visual-layer > button {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
+}
   color: var(--bg-dark-roast);
 }
 

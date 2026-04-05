@@ -9,6 +9,7 @@ import { useSensoryResonance } from '../hooks/useSensoryResonance';
 import { useDepth, Z_LAYERS } from '../hooks/useDepth';
 import MissionControl from '../components/MissionControl';
 import { useHarmonicResonance, SOLFEGGIO_FREQUENCIES } from '../utils/HarmonicResonance';
+import GrandFinaleCoordinator from '../components/GrandFinaleCoordinator';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -73,6 +74,7 @@ export default function OrbitalHub() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [missionControlOpen, setMissionControlOpen] = useState(false);
   const [hoveredSat, setHoveredSat] = useState(null);
+  const [extractedCount, setExtractedCount] = useState(0); // Track extracted nodules for Grand Finale
   
   // Responsive sizing
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
@@ -217,12 +219,49 @@ export default function OrbitalHub() {
     };
   }, [hubState, extractedId, dragTarget, dragOffset, bloomRadius, extractionRadius]);
 
-  // Force re-render for animation
-  const [, forceUpdate] = useState(0);
+  // P0 FIX: Use requestAnimationFrame with DOM manipulation instead of React state
+  // This prevents triggering render cascades through the context providers
+  const orbContainerRef = useRef(null);
+  
   useEffect(() => {
-    const interval = setInterval(() => forceUpdate(n => n + 1), 16);
-    return () => clearInterval(interval);
-  }, []);
+    let frameId;
+    
+    const updateOrbVisuals = () => {
+      if (!orbContainerRef.current) {
+        frameId = requestAnimationFrame(updateOrbVisuals);
+        return;
+      }
+      
+      // Direct DOM manipulation for sub-orb positions (no React re-renders)
+      ALL_SATELLITES.forEach((sat) => {
+        const el = orbContainerRef.current.querySelector(`[data-orb-id="${sat.id}"]`);
+        if (!el) return;
+        
+        const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
+        const z = subOrbZPositions.current[sat.id] || 0;
+        const scale = subOrbScales.current[sat.id] || 0;
+        const opacity = subOrbOpacities.current[sat.id] || 0;
+        
+        // Apply transforms directly to DOM
+        el.style.transform = `translate3d(${center + pos.x - (hubState === 'extracted' && sat.id === extractedId ? subOrbSizeExtracted : subOrbSizeBloom) / 2}px, ${center + pos.y - (hubState === 'extracted' && sat.id === extractedId ? subOrbSizeExtracted : subOrbSizeBloom) / 2}px, ${z}px)`;
+        el.style.opacity = opacity;
+        
+        // Update inner content scale
+        const innerEl = el.querySelector('.orb-inner');
+        if (innerEl) {
+          const targetScale = hubState === 'extracted' && sat.id === extractedId 
+            ? SUB_ORB_EXTRACTED_SCALE 
+            : SUB_ORB_BLOOM_SCALE;
+          innerEl.style.transform = `scale(${scale / (targetScale || 1)})`;
+        }
+      });
+      
+      frameId = requestAnimationFrame(updateOrbVisuals);
+    };
+    
+    frameId = requestAnimationFrame(updateOrbVisuals);
+    return () => cancelAnimationFrame(frameId);
+  }, [hubState, extractedId, center, subOrbSizeBloom, subOrbSizeExtracted]);
 
   // ═══ CORE INTERACTION: Tap/Hold to Bloom ═══
   const handleCoreClick = useCallback(() => {
@@ -252,6 +291,7 @@ export default function OrbitalHub() {
       // Simple tap extracts the orb with extraction resonance
       setHubState('extracted');
       setExtractedId(sat.id);
+      setExtractedCount(prev => prev + 1); // Track for Grand Finale
       try { orbitalResonance.extract(e.currentTarget); } catch {}
       try { audio.playSatellite(sat.id); } catch {}
     } else if (hubState === 'extracted' && sat.id === extractedId) {
@@ -420,6 +460,7 @@ export default function OrbitalHub() {
 
       {/* ═══ ORBITAL SYSTEM CONTAINER — 3D Stage ═══ */}
       <div 
+        ref={orbContainerRef}
         className="relative" 
         style={{
           width: containerSize, 
@@ -521,6 +562,7 @@ export default function OrbitalHub() {
           return (
             <motion.div
               key={sat.id}
+              data-orb-id={sat.id}
               className="absolute cursor-pointer select-none"
               style={{
                 // GPU-accelerated 3D transform
@@ -570,7 +612,7 @@ export default function OrbitalHub() {
               )}
               
               <div
-                className="w-full h-full rounded-full flex flex-col items-center justify-center relative rotation-point"
+                className="orb-inner w-full h-full rounded-full flex flex-col items-center justify-center relative rotation-point"
                 style={{
                   pointerEvents: 'none', // Let events bubble to parent motion.div
                   background: isHovered || isExtracted 
@@ -786,6 +828,16 @@ export default function OrbitalHub() {
           </p>
         </motion.div>
       )}
+
+      {/* Grand Finale Coordinator — Triggers when all nodules extracted */}
+      <GrandFinaleCoordinator 
+        noduleCount={extractedCount}
+        totalNodules={ALL_SATELLITES.length}
+        onAlignmentComplete={() => {
+          console.log('🌌 Universal Alignment Complete!');
+          // Could trigger special navigation or unlock here
+        }}
+      />
 
       <MissionControl 
         isOpen={missionControlOpen} 
