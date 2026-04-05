@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 
 const CreditContext = createContext(null);
@@ -64,8 +64,13 @@ export function CreditProvider({ children }) {
     }
   }, [creditInfo, fetchCredits]);
 
+  // GATEKEEPER: Memoize context value
+  const value = useMemo(() => ({
+    creditInfo, fetchCredits, useCredits
+  }), [creditInfo, fetchCredits, useCredits]);
+
   return (
-    <CreditContext.Provider value={{ creditInfo, fetchCredits, useCredits }}>
+    <CreditContext.Provider value={value}>
       {children}
     </CreditContext.Provider>
   );

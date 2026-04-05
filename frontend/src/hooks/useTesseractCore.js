@@ -608,13 +608,20 @@ export function useTesseractCore(options = {}) {
     
     // Track which haptic crescendo pulses have fired
     const firedPulses = new Set();
+    let lastReportedProgress = 0;  // LOOP-FIX: Throttle state updates
     
     // Start dwell progress tracking for Visual Bloom + Haptic Crescendo
     const startTime = Date.now();
     const progressInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(1, elapsed / TESSERACT_CONFIG.ACOUSTIC_BLOOM_MS);
-      setDwellProgress(progress);
+      
+      // LOOP-FIX: Only update state on 10% increments to prevent 60fps state thrashing
+      const progressBucket = Math.floor(progress * 10) / 10;
+      if (progressBucket > lastReportedProgress) {
+        setDwellProgress(progressBucket);
+        lastReportedProgress = progressBucket;
+      }
       
       // HAPTIC CRESCENDO: Fire progressive pulses at threshold points
       // Creates tactile "string being pulled taut" sensation
@@ -769,10 +776,20 @@ export function useTesseractCore(options = {}) {
   }, []);
   
   // Wake HUD on any state change
+  // LOOP-FIX: Throttle HUD wake to integer depth changes only
+  const lastHudWakeRef = useRef({ depth: 0, isVoidMode: false });
+  
   useEffect(() => {
-    lastActivityRef.current = Date.now();
-    setHudOpacity(1);
-  }, [gravity, depth, selectedCell, isVoidMode]);
+    // Only wake on significant changes: depth integer change or mode toggle
+    const depthChanged = Math.floor(depth) !== Math.floor(lastHudWakeRef.current.depth);
+    const modeChanged = isVoidMode !== lastHudWakeRef.current.isVoidMode;
+    
+    if (depthChanged || modeChanged || selectedCell !== null) {
+      lastHudWakeRef.current = { depth, isVoidMode };
+      lastActivityRef.current = Date.now();
+      setHudOpacity(1);
+    }
+  }, [depth, selectedCell, isVoidMode]);
   
   // ─────────────────────────────────────────────────────────────────────────
   // MEM-01: CLEAR ANCHOR (Reset persistence)

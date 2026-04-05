@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -187,9 +187,25 @@ export function CosmicThemeProvider({ children }) {
   }, []);
 
   // ═══ UPDATE CSS VARIABLES ═══
+  // LOOP-FIX: Throttle CSS updates to prevent rapid re-renders
+  // Only update when mode, mood, surface, or power-save changes — NOT on every decimal glow tweak
+  const lastCssUpdateRef = useRef({});
+  
   useEffect(() => {
     const root = document.documentElement;
-    const { mode, palette, surface, glowIntensity, radianceEnabled, powerSaveMode } = theme;
+    const { mode, palette, surface, glowIntensity, radianceEnabled, powerSaveMode, mood } = theme;
+    
+    // LOOP-FIX: Create a signature of values that actually matter for CSS
+    // Round glowIntensity to 2 decimal places to prevent micro-updates
+    const roundedGlow = Math.round(glowIntensity * 100) / 100;
+    const signature = `${mode}-${mood}-${surface}-${roundedGlow}-${radianceEnabled}-${powerSaveMode}`;
+    
+    // Skip update if signature hasn't changed
+    if (lastCssUpdateRef.current.signature === signature) {
+      return;
+    }
+    lastCssUpdateRef.current.signature = signature;
+    
     const isCafeMode = mode === THEME_MODES.CAFE;
 
     // Calculate effective glow (dimmed in power save)
@@ -271,13 +287,24 @@ export function CosmicThemeProvider({ children }) {
 
     console.log(`[CosmicTheme] Mode: ${mode.toUpperCase()}${powerSaveMode ? ' (Power Save)' : ''}`);
 
-  }, [theme]);
+  }, [theme.mode, theme.mood, theme.surface, theme.powerSaveMode, theme.radianceEnabled]);
+  // Note: theme.glowIntensity intentionally excluded - handled by signature throttle
 
   // ═══ PERSIST TO LOCALSTORAGE ═══
+  // GATEKEEPER: Only persist when discrete values change, not on every glow micro-adjustment
+  const lastPersistedRef = useRef('');
+  
   useEffect(() => {
     const { mood, surface, glowIntensity, radianceEnabled } = theme;
-    localStorage.setItem('zen_cosmic_theme', JSON.stringify({ mood, surface, glowIntensity, radianceEnabled }));
-  }, [theme]);
+    // Round glow to 1 decimal for persistence throttle
+    const roundedGlow = Math.round(glowIntensity * 10) / 10;
+    const persistKey = `${mood}-${surface}-${roundedGlow}-${radianceEnabled}`;
+    
+    if (lastPersistedRef.current === persistKey) return;
+    lastPersistedRef.current = persistKey;
+    
+    localStorage.setItem('zen_cosmic_theme', JSON.stringify({ mood, surface, glowIntensity: roundedGlow, radianceEnabled }));
+  }, [theme.mood, theme.surface, theme.glowIntensity, theme.radianceEnabled]);
 
   // ═══ ACTIONS ═══
   const setMood = useCallback((mood) => {

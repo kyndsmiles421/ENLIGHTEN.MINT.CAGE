@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
@@ -29,8 +29,13 @@ export function AvatarProvider({ children }) {
 
   useEffect(() => { refreshAvatar(); }, [refreshAvatar]);
 
+  // GATEKEEPER: Memoize context value
+  const value = useMemo(() => ({
+    avatarB64, avatarStyle, refreshAvatar
+  }), [avatarB64, avatarStyle, refreshAvatar]);
+
   return (
-    <AvatarContext.Provider value={{ avatarB64, avatarStyle, refreshAvatar }}>
+    <AvatarContext.Provider value={value}>
       {children}
     </AvatarContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -117,10 +117,31 @@ export function MixerProvider({ children }) {
   const mantraSourceRef = useRef(null);
   const voiceChainRef = useRef(null);
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GATEKEEPER: Golden Ratio Throttle (φ = 1.618)
+  // Prevents the "Box Logic vs Spherical Logic" fight by only updating state
+  // when changes exceed the 1.618% threshold
+  // ═══════════════════════════════════════════════════════════════════════════
+  const PHI_THRESHOLD = 0.01618; // 1.618% change required
+  
   // Track active count for isPlaying indicator
+  // LOOP-FIX: Completely remove isPlaying from dependencies - use ref comparison only
+  const prevActiveCountRef = useRef(0);
+  const isPlayingRef = useRef(false);
+  
   useEffect(() => {
-    setIsPlaying(activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || !!activeMantra);
-  }, [activeFreqs, activeSounds, activeDrones, activeMantra]);
+    const currentCount = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0);
+    const shouldBePlaying = currentCount > 0;
+    
+    // GATEKEEPER: Only update if the discrete state actually changed
+    if (shouldBePlaying !== isPlayingRef.current) {
+      isPlayingRef.current = shouldBePlaying;
+      setIsPlaying(shouldBePlaying);
+    }
+    prevActiveCountRef.current = currentCount;
+    // Note: isPlaying is intentionally NOT in dependencies - the ref tracks it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFreqs.size, activeSounds.size, activeDrones.size, activeMantra]);
 
   const getCtx = useCallback(async () => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
@@ -474,7 +495,9 @@ export function MixerProvider({ children }) {
 
   const totalActive = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0);
 
-  const value = {
+  // GATEKEEPER: Memoize the context value to prevent cascading re-renders
+  // This is critical - without this, every consumer re-renders on every tick
+  const value = useMemo(() => ({
     masterVol, setMasterVol, muted, setMuted,
     activeFreqs, activeSounds, activeDrones, activeMantra,
     channelVols, setChannelVols, setChannelVolume,
@@ -488,7 +511,12 @@ export function MixerProvider({ children }) {
     droneNodesMapRef, droneGainMapRef, droneFilterMapRef,
     mantraAudioRef, mantraSourceRef, voiceChainRef,
     setActiveMantra, setActiveFreqs, setActiveSounds, setActiveDrones,
-  };
+  }), [
+    masterVol, muted, activeFreqs, activeSounds, activeDrones, activeMantra,
+    channelVols, isPlaying, totalActive, mantraLoading, voiceMorph,
+    getCtx, toggleFreq, toggleSound, toggleDrone, toggleMantra,
+    stopAll, getSnapshot, restoreSnapshot, setChannelVolume,
+  ]);
 
   return <MixerContext.Provider value={value}>{children}</MixerContext.Provider>;
 }

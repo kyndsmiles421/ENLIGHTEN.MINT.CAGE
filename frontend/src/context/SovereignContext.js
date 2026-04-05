@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
@@ -216,14 +216,21 @@ export function SovereignProvider({ children }) {
     } catch {}
   }, [authHeaders, tier]);
 
-  const value = {
+  // GATEKEEPER: Memoize context value
+  const value = useMemo(() => ({
     tier, tierName, codename, capabilities, activeUnits,
     aiBrain, experience, perks, credits, loaded,
     hasCapability, isTierAtLeast, refresh,
     executeCommand, enqueue, setNpuBurst, getQueueStats,
     publishEvent, eventBus,
     masteryTier, gravityMultiplier, bloomMultiplier,
-  };
+  }), [
+    tier, tierName, codename, capabilities, activeUnits,
+    aiBrain, experience, perks, credits, loaded,
+    hasCapability, isTierAtLeast, refresh,
+    executeCommand, enqueue, setNpuBurst, getQueueStats,
+    publishEvent, masteryTier, gravityMultiplier, bloomMultiplier,
+  ]);
 
   return (
     <SovereignContext.Provider value={value}>

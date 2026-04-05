@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useMixer } from './MixerContext';
 import { recordSynthesis } from '../utils/sentinel';
 
@@ -24,8 +24,9 @@ export function FocusProvider({ children }) {
 
   // Auto-trigger: 3+ active modules → suggest/enter focus
   // Hyper-focus: 5+ modules = triple synthesis territory
+  // LOOP-FIX: Remove focusMode from dependencies to prevent infinite loop
   useEffect(() => {
-    if (totalActive >= 3 && !focusMode && !autoTriggered.current) {
+    if (totalActive >= 3 && !autoTriggered.current) {
       autoTriggered.current = true;
       setFocusMode(true);
       // Record a synthesis event for progressive disclosure
@@ -42,7 +43,7 @@ export function FocusProvider({ children }) {
       setHyperFocus(false);
       autoTriggered.current = false;
     }
-  }, [totalActive, focusMode]);
+  }, [totalActive]); // Removed focusMode - it's already controlled by the effect
 
   // Sync body class for CSS-based focus hiding
   useEffect(() => {
@@ -71,8 +72,13 @@ export function FocusProvider({ children }) {
     });
   }, []);
 
+  // GATEKEEPER: Memoize context value
+  const value = useMemo(() => ({
+    focusMode, hyperFocus, synthesisCount, enterFocus, exitFocus, toggleFocus
+  }), [focusMode, hyperFocus, synthesisCount, enterFocus, exitFocus, toggleFocus]);
+
   return (
-    <FocusContext.Provider value={{ focusMode, hyperFocus, synthesisCount, enterFocus, exitFocus, toggleFocus }}>
+    <FocusContext.Provider value={value}>
       {children}
     </FocusContext.Provider>
   );

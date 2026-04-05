@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
@@ -42,10 +42,20 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
-  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+  // GATEKEEPER: Memoize authHeaders to prevent object recreation on every render
+  // This is THE ROOT CAUSE of the "Maximum update depth exceeded" cascade
+  const authHeaders = useMemo(() => 
+    token ? { Authorization: `Bearer ${token}` } : {},
+    [token]
+  );
+
+  // GATEKEEPER: Memoize the entire context value
+  const value = useMemo(() => ({
+    user, token, loading, login, register, logout, authHeaders
+  }), [user, token, loading, login, register, logout, authHeaders]);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, authHeaders }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

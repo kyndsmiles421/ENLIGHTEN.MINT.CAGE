@@ -13,13 +13,18 @@
  * AUD-01: ACOUSTIC BLOOM INTEGRATION
  * Sound ONLY plays after 200ms dwell stability ("Stillness-as-Input")
  * 
+ * SPHERICAL CODEX MECHANICS:
+ * - Nadir/Zenith View Toggle (External orbit vs Internal sky)
+ * - Lens Warp distortion for spherical illusion
+ * - Golden Ratio throttled physics via MotionContext
+ * 
  * All powered by the unified useTesseractCore hook.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Compass, Gem, Target, Grid3X3, X } from 'lucide-react';
+import { ArrowLeft, Compass, Gem, Target, Grid3X3, X, Globe, Eye } from 'lucide-react';
 
 // Consolidated hook
 import { useTesseractCore } from '../hooks/useTesseractCore';
@@ -29,6 +34,9 @@ import { usePhoneticSynthesizer } from '../hooks/usePhoneticSynthesizer';
 
 // VOID-01: Global state for bloom persistence
 import { useRecursiveRegistry } from '../stores/RecursiveRegistryStore';
+
+// SPHERICAL MECHANICS: Motion physics layer
+import { useMotion, MotionStore } from '../context/MotionContext';
 
 // Components
 import KineticHUD from '../components/KineticHUD';
@@ -109,6 +117,7 @@ GravitySlider.displayName = 'GravitySlider';
 // ═══════════════════════════════════════════════════════════════════════════
 // TESSERACT LATTICE (Simplified 9×9 Grid)
 // Dimmed by default + Collapsible on user request
+// SPHERICAL MECHANICS: Lens Warp + Nadir/Zenith View
 // ═══════════════════════════════════════════════════════════════════════════
 
 const TesseractLattice = React.memo(({
@@ -123,6 +132,9 @@ const TesseractLattice = React.memo(({
   dwellProgress,
   isCollapsed,
   matrixOpacity,
+  lensWarp = 0,
+  viewMode = 'external',
+  isInverting = false,
 }) => {
   const handleCellClick = useCallback((row, col) => {
     onSelectCell(row, col);
@@ -135,22 +147,36 @@ const TesseractLattice = React.memo(({
     onDive(hexNum, languages[col]);
   }, [onDive]);
   
+  // Calculate lens distortion for spherical effect
+  const lensStyle = {
+    // Barrel distortion simulation via border-radius and transform
+    borderRadius: `${50 * lensWarp}%`,
+    transform: viewMode === 'internal' 
+      ? `perspective(800px) rotateX(${15 * lensWarp}deg) scale(${1 + lensWarp * 0.2})`
+      : `perspective(800px) rotateX(${-5 * lensWarp}deg)`,
+    // Fisheye-like edge darkening
+    boxShadow: lensWarp > 0 
+      ? `inset 0 0 ${100 * lensWarp}px rgba(0,0,0,${0.3 * lensWarp}), 0 0 60px ${colors.primary}10`
+      : `0 0 60px ${colors.primary}10, inset 0 0 40px ${colors.primary}05`,
+  };
+  
   return (
     <motion.div 
       className="relative mx-auto"
       style={{ 
         width: 'min(90vw, 400px)',
         aspectRatio: '1',
-        // Z-INDEX 9999: SOVEREIGN - Matrix Lattice is TOP interactive layer
         zIndex: 9999,
         position: 'relative',
+        transformStyle: 'preserve-3d',
       }}
       initial={false}
       animate={{
-        scale: isCollapsed ? 0.15 : 1,
+        scale: isCollapsed ? 0.15 : (isInverting ? 0.8 : 1),
         opacity: isCollapsed ? 0.3 : matrixOpacity,
         y: isCollapsed ? -180 : 0,
         x: isCollapsed ? 120 : 0,
+        rotateY: isInverting ? 180 : 0,
       }}
       transition={{ 
         type: 'spring', 
@@ -159,27 +185,48 @@ const TesseractLattice = React.memo(({
         mass: 0.8,
       }}
     >
-      {/* Grid background - Translucent with radiating light */}
+      {/* Grid background - Translucent with radiating light + LENS WARP */}
       <div 
-        className="absolute inset-0 rounded-2xl transition-all duration-500"
+        className="absolute inset-0 transition-all duration-500"
         style={{
-          background: `radial-gradient(circle at center, ${colors.primary}08, transparent 70%)`,
+          background: viewMode === 'internal'
+            ? `radial-gradient(circle at center, transparent 20%, ${colors.primary}15 100%)`
+            : `radial-gradient(circle at center, ${colors.primary}08, transparent 70%)`,
           border: `1px solid ${colors.primary}15`,
-          boxShadow: `0 0 60px ${colors.primary}10, inset 0 0 40px ${colors.primary}05`,
+          ...lensStyle,
           pointerEvents: 'none',
         }}
       />
       
-      {/* 9×9 Grid - Translucent cells with light radiation */}
+      {/* 9×9 Grid - Translucent cells with light radiation + SPHERICAL DISTORTION */}
       <div 
         className="absolute inset-4 grid grid-cols-9 gap-1"
-        style={{ pointerEvents: isCollapsed ? 'none' : 'auto' }}
+        style={{ 
+          pointerEvents: isCollapsed ? 'none' : 'auto',
+          // Apply lens distortion to the grid container too
+          borderRadius: `${30 * lensWarp}%`,
+          overflow: lensWarp > 0.5 ? 'hidden' : 'visible',
+        }}
       >
         {[...Array(81)].map((_, i) => {
           const row = Math.floor(i / 9);
           const col = i % 9;
           const isSelected = selectedCell?.row === row && selectedCell?.col === col;
           const hexNum = (row * 9 + col) % 64;
+          
+          // SPHERICAL DISTORTION: Cells at edges warp more in internal view
+          const centerRow = 4, centerCol = 4;
+          const distFromCenter = Math.sqrt(Math.pow(row - centerRow, 2) + Math.pow(col - centerCol, 2));
+          const maxDist = Math.sqrt(32); // Corner distance
+          const normalizedDist = distFromCenter / maxDist;
+          
+          // In internal view, edge cells recede (smaller, more transparent)
+          const sphereScale = viewMode === 'internal' && lensWarp > 0
+            ? 1 - (normalizedDist * 0.3 * lensWarp)
+            : 1;
+          const sphereOpacity = viewMode === 'internal' && lensWarp > 0
+            ? 1 - (normalizedDist * 0.4 * lensWarp)
+            : 1;
           
           return (
             <motion.button
@@ -196,13 +243,17 @@ const TesseractLattice = React.memo(({
                   ? `0 0 20px ${colors.primary}30, inset 0 0 10px ${colors.primary}15` 
                   : 'none',
                 pointerEvents: (isZooming || isCollapsed) ? 'none' : 'auto',
+                // Spherical distortion transforms
+                transform: `scale(${sphereScale})`,
+                opacity: sphereOpacity,
+                transition: 'transform 0.3s ease, opacity 0.3s ease',
               }}
               whileHover={{ 
-                scale: 1.1, 
+                scale: sphereScale * 1.1, 
                 zIndex: 10,
                 boxShadow: `0 0 15px ${colors.primary}20`,
               }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: sphereScale * 0.95 }}
               onClick={() => handleCellClick(row, col)}
               onDoubleClick={() => handleCellDoubleClick(row, col)}
               disabled={isZooming || isCollapsed}
@@ -340,6 +391,38 @@ export default function TesseractExperience() {
   // VOID-01: Global state for bloom persistence (kept in registry for cross-component access)
   const registry = useRecursiveRegistry();
   
+  // SPHERICAL MECHANICS: Physics layer with Golden Ratio throttle
+  const motion = useMotion();
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PHYSICS TICK LOOP (Separated from React state)
+  // Runs at 60fps but only triggers React updates when values change > 1.618%
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  const physicsRafRef = useRef(null);
+  const lastPhysicsTimeRef = useRef(performance.now());
+  
+  useEffect(() => {
+    const tickPhysics = () => {
+      const now = performance.now();
+      const deltaTime = (now - lastPhysicsTimeRef.current) / 1000;
+      lastPhysicsTimeRef.current = now;
+      
+      // Update physics (Golden Ratio throttled internally)
+      MotionStore.tick(deltaTime);
+      
+      physicsRafRef.current = requestAnimationFrame(tickPhysics);
+    };
+    
+    physicsRafRef.current = requestAnimationFrame(tickPhysics);
+    
+    return () => {
+      if (physicsRafRef.current) {
+        cancelAnimationFrame(physicsRafRef.current);
+      }
+    };
+  }, []);
+  
   // ═══════════════════════════════════════════════════════════════════════════
   // LOOP-FIX: CSS Variable Injection (The "Muzzle")
   // Moves HUD scaling OUT of React state → into hardware-accelerated CSS
@@ -392,38 +475,41 @@ export default function TesseractExperience() {
   }, []);
   
   // VOID-01: Persist bloom state during dive transitions (kept minimal)
+  // LOOP-FIX: Only call setBloomState when isZooming transitions from false -> true
+  const wasZoomingRef = useRef(false);
   useEffect(() => {
-    if (core.isZooming) {
+    if (core.isZooming && !wasZoomingRef.current) {
       registry.setBloomState({
         exitVelocity: core.dwellProgress,
         depthAtActivation: core.depth,
       });
     }
+    wasZoomingRef.current = core.isZooming;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [core.isZooming]);
   
   // VOID-01: Update bloom state on significant changes (not every frame)
-  // Throttle: Only update when isActive or isVoidMode changes, or on completion
-  const prevBloomRef = useRef({ isActive: false, opacity: 0 });
+  // LOOP-FIX: Debounce to only fire when isActive truly changes or completes
+  const prevBloomRef = useRef({ isActive: false, isComplete: false, isVoidMode: false });
   useEffect(() => {
     const isActive = core.selectedCell !== null;
     const isComplete = core.dwellProgress >= 1;
     
-    // Only update if: activation changed, mode changed, or just completed
-    const shouldUpdate = 
-      isActive !== prevBloomRef.current.isActive ||
-      isComplete && prevBloomRef.current.opacity < 1;
+    // Only update if discrete state changed (not progress increments)
+    const activationChanged = isActive !== prevBloomRef.current.isActive;
+    const completionChanged = isComplete && !prevBloomRef.current.isComplete;
+    const modeChanged = core.isVoidMode !== prevBloomRef.current.isVoidMode;
     
-    if (shouldUpdate) {
+    if (activationChanged || completionChanged || modeChanged) {
       registry.setBloomState({
         isActive,
-        opacity: core.dwellProgress,
+        opacity: isComplete ? 1 : (isActive ? 0.5 : 0),
         color: core.isVoidMode ? 'void' : 'jade',
       });
-      prevBloomRef.current = { isActive, opacity: core.dwellProgress };
+      prevBloomRef.current = { isActive, isComplete, isVoidMode: core.isVoidMode };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [core.selectedCell, core.dwellProgress, core.isVoidMode]);
+  }, [core.selectedCell !== null, core.dwellProgress >= 1, core.isVoidMode]);
   
   // AUD-01: Acoustic Bloom - Dwell gate function
   // Returns true ONLY when user has been still for 200ms
@@ -641,6 +727,53 @@ export default function TesseractExperience() {
           )}
         </button>
         
+        {/* NADIR/ZENITH VIEW TOGGLE — External Orbit vs Internal Sky */}
+        <button
+          onClick={() => motion.toggleViewMode()}
+          className="absolute -top-2 left-4 p-2 rounded-full transition-all group"
+          style={{
+            background: motion.viewMode === 'internal' 
+              ? `${core.colors.primary}20` 
+              : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${motion.viewMode === 'internal' ? core.colors.primary + '40' : 'rgba(255,255,255,0.1)'}`,
+            boxShadow: motion.viewMode === 'internal' 
+              ? `0 0 20px ${core.colors.primary}30, inset 0 0 10px ${core.colors.primary}20` 
+              : `0 0 20px ${core.colors.primary}10`,
+            zIndex: 10000,
+          }}
+          data-testid="nadir-zenith-toggle"
+        >
+          {motion.viewMode === 'internal' ? (
+            <Eye size={18} className="text-white/80" />
+          ) : (
+            <Globe size={18} className="text-white/50 group-hover:text-white/70" />
+          )}
+        </button>
+        
+        {/* Lens Warp Slider (visible when internal view) */}
+        {motion.viewMode === 'internal' && (
+          <div 
+            className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-2"
+            style={{ zIndex: 10001 }}
+          >
+            <span className="text-[10px] text-white/40 uppercase">Lens</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={motion.lensWarp}
+              onChange={(e) => motion.setLensWarp(parseFloat(e.target.value))}
+              className="w-24 h-1 rounded-full appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(90deg, rgba(255,255,255,0.1) 0%, ${core.colors.primary}40 100%)`,
+              }}
+              data-testid="lens-warp-slider"
+            />
+            <span className="text-[10px] text-white/60 w-8">{Math.round(motion.lensWarp * 100)}%</span>
+          </div>
+        )}
+        
         <TesseractLattice
           depth={core.depth}
           selectedCell={core.selectedCell}
@@ -653,6 +786,9 @@ export default function TesseractExperience() {
           dwellProgress={core.dwellProgress}
           isCollapsed={isMatrixCollapsed}
           matrixOpacity={MATRIX_OPACITY}
+          lensWarp={motion.lensWarp}
+          viewMode={motion.viewMode}
+          isInverting={motion.isInverting}
         />
         
         {/* SEAL-01: Long-Press Escape Zone (Center) - Only visible at depth > 0 */}
