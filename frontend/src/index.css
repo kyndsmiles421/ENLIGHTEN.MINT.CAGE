@@ -1920,3 +1920,45 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
       inset 0 0 80px rgba(255, 255, 255, 0.5);
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MATRIX SLIDER & HEXAGRAM GENERATOR — User-Requested Fixes
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Ensure the Matrix Slider doesn't bleed into the Hexagram Generator */
+.manual-gravity-container {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 2rem;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    /* Surrounded in White Light Buffer */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 2. Fix the Matrix vs Hollow overlap seen in the video */
+.matrix-slider-track {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: all !important; /* Ensure user-choice is prioritized */
+}
+
+/* 3. Disable the 'Glow Portal' automated prompts from the Tour */
+.tour-overlay, .auto-prompt {
+    display: none !important;
+    visibility: hidden;
+}
+
+/* 4. The 9x9 Hexagram Generator Container */
+.hexagram-generator-core {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+    padding: 20px;
+    /* Crystalline Rainbow Border */
+    border: 2px solid;
+    border-image: linear-gradient(to right, #ff0000, #00ff00, #0000ff) 1;
+}

@@ -1487,3 +1487,48 @@ Three processing lanes based on content weight:
 
 **Keith Wright's Principle:**
 Higher resistance = more steps = slower transition = deeper contemplation
+
+
+
+---
+
+## Latest Implementation: Zero-Scale Parentage Orbital Hub (April 2026)
+
+### The Orbital Physics Model
+**"Sovereign Crystalline Navigation"**
+
+The Orbital Hub now implements the user's specified mathematical physics model:
+
+**Three States:**
+1. **Latent State** — Core visible (Scale 1.0), all satellites at local (0,0,0) with Scale 0, Opacity 0.1 (resonance floor)
+2. **Bloom State** — Tap Core triggers satellites to deploy to 2.5x radius at Scale 0.3, Opacity 1.0
+3. **Extracted State** — Tap satellite extracts it to Scale 1.0, others collapse back to (0,0,0) at Scale 0
+
+**Mathematical Constants:**
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| SUB_ORB_LATENT_SCALE | 0.0 | Hidden state |
+| SUB_ORB_BLOOM_SCALE | 0.3 | Visible but small |
+| SUB_ORB_EXTRACTED_SCALE | 1.0 | Full size navigation |
+| BLOOM_RADIUS_MULTIPLIER | 2.5 | Orbit distance |
+| EXTRACTION_RADIUS_MULTIPLIER | 3.0 | Breakaway threshold |
+| TAP_THRESHOLD_MS | 300 | Tap vs drag differentiation |
+| LERP_SPEED | 0.08 | Animation smoothness |
+
+**Key Technical Fixes:**
+- Resonance Floor (0.1) prevents satellites from disappearing completely
+- `pointer-events: none` on inner content allows events to bubble to parent
+- `isAtResonanceFloor` check disables pointer events when satellites are collapsed to prevent blocking the core
+
+**Sanctuary/EnlightenMintCafe Integration:**
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/sanctuary/status` | GET | Get sanctuary state |
+| `/api/sanctuary/deed` | POST | Log karma-generating deeds |
+| `/api/sanctuary/recycle` | POST | Donate to Global Grace |
+| `/api/sanctuary/vr-access/{user_id}` | GET | Check VR unlock status |
+
+**CSS Additions:**
+- `.manual-gravity-container` — Matrix Slider containment with white light buffer
+- `.hexagram-generator-core` — 9x9 grid with rainbow border
+- Tour overlay disabled via `.tour-overlay, .auto-prompt { display: none !important; }`

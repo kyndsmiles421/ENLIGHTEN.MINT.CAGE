@@ -248,26 +248,32 @@ export default function OrbitalHub() {
       // Simple tap extracts the orb with extraction resonance
       setHubState('extracted');
       setExtractedId(sat.id);
-      orbitalResonance.extract(e.currentTarget); // Full sensory extraction feedback
+      try { orbitalResonance.extract(e.currentTarget); } catch {}
       try { audio.playSatellite(sat.id); } catch {}
     } else if (hubState === 'extracted' && sat.id === extractedId) {
       // Tap extracted orb to navigate with navigation resonance
-      orbitalResonance.navigate(e.currentTarget);
+      try { orbitalResonance.navigate(e.currentTarget); } catch {}
       try { audio.stopSatellite(); } catch {}
       // Small delay to let resonance play before navigation
       setTimeout(() => navigate(sat.path), 150);
     }
   }, [hubState, extractedId, audio, navigate, orbitalResonance]);
 
-  // ═══ SUB-ORB DRAG START ═══
+  // Tap/drag differentiation: track pointer down time
+  const pointerDownTimeRef = useRef(0);
+  const TAP_THRESHOLD_MS = 300; // Under 300ms = tap (increased from 200ms for reliability)
+  
+  // ═══ SUB-ORB POINTER DOWN ═══
   const handleSubOrbPointerDown = useCallback((e, satId) => {
     // Don't start drag if in extracted state - let click handler take over
     if (hubState === 'extracted') return;
     
     e.stopPropagation();
-    e.preventDefault();
     
     if (hubState !== 'bloom') return;
+    
+    // Record pointer down time for tap detection
+    pointerDownTimeRef.current = Date.now();
     
     const rect = e.currentTarget.closest('[data-container]')?.getBoundingClientRect();
     if (!rect) return;
@@ -307,16 +313,22 @@ export default function OrbitalHub() {
     const handleUp = () => {
       if (!dragTarget) return;
       
-      // Check if drag exceeded extraction threshold
-      const currentPos = subOrbPositions.current[dragTarget];
+      const currentTargetId = dragTarget;
+      const pointerDownDuration = Date.now() - pointerDownTimeRef.current;
+      
+      // Quick tap detection (under 300ms = tap to extract)
+      const isTap = pointerDownDuration < TAP_THRESHOLD_MS;
+      
+      // Get current distance from center
+      const currentPos = subOrbPositions.current[currentTargetId];
       const distFromCenter = dist(0, 0, currentPos?.x || 0, currentPos?.y || 0);
       
-      if (distFromCenter > extractionRadius * 0.8) {
-        // EXTRACTION: Orb breaks free, all others collapse
+      if (isTap || distFromCenter > extractionRadius * 0.8) {
+        // EXTRACTION: Either quick tap OR drag past threshold
         setHubState('extracted');
-        setExtractedId(dragTarget);
-        orbitalResonance.extract(); // Full sensory extraction feedback
-        try { audio.playSatellite(dragTarget); } catch {}
+        setExtractedId(currentTargetId);
+        try { orbitalResonance.extract(); } catch {}
+        try { audio.playSatellite(currentTargetId); } catch {}
       }
       
       setDragTarget(null);
@@ -333,7 +345,7 @@ export default function OrbitalHub() {
       window.removeEventListener('touchmove', handleMove);
       window.removeEventListener('touchend', handleUp);
     };
-  }, [dragTarget, center, extractionRadius, audio]);
+  }, [dragTarget, center, extractionRadius, audio, orbitalResonance]);
 
   // ═══ EXTRACTED ORB CLICK → NAVIGATE ═══
   const handleExtractedClick = useCallback((sat) => {
@@ -473,11 +485,16 @@ export default function OrbitalHub() {
           const Icon = sat.icon;
           const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
           const z = subOrbZPositions.current[sat.id] || 0;
-          const scale = subOrbScales.current[sat.id] || 0;
-          const opacity = subOrbOpacities.current[sat.id] || 0;
+          const rawScale = subOrbScales.current[sat.id] || 0;
+          const rawOpacity = subOrbOpacities.current[sat.id] || 0;
           
-          // Don't render if invisible
-          if (opacity < 0.01 && scale < 0.01) return null;
+          // --- SOVEREIGN CRYSTALLINE SEED STATE ---
+          // We never return null. Maintain a resonance floor (0.1) so the 
+          // satellite is always ready to bloom and receive pointer events.
+          // This prevents the 'flicker' or 'extraction' glitch seen in the tour.
+          const resonanceFloor = 0.1;
+          const scale = Math.max(rawScale, resonanceFloor);
+          const opacity = Math.max(rawOpacity, resonanceFloor);
           
           const isExtracted = hubState === 'extracted' && sat.id === extractedId;
           const isHovered = hoveredSat === sat.id;
@@ -490,6 +507,10 @@ export default function OrbitalHub() {
           // Calculate haptic intensity based on depth
           const hapticIntensity = depth.calculateHapticIntensity(z);
 
+          // Determine if satellite is effectively in latent state (at resonance floor)
+          // In bloom state: rawOpacity→1.0, rawScale→0.3, so both > 0.15
+          const isAtResonanceFloor = rawOpacity < 0.15 && rawScale < 0.15;
+          
           return (
             <motion.div
               key={sat.id}
@@ -508,6 +529,8 @@ export default function OrbitalHub() {
                 zIndex: isExtracted ? 30 : (isHovered ? 25 : 20),
                 touchAction: isExtracted ? 'auto' : 'none',
                 willChange: 'transform, opacity, filter',
+                // Disable pointer events when at resonance floor to prevent blocking core
+                pointerEvents: isAtResonanceFloor ? 'none' : 'auto',
               }}
               onPointerDown={(e) => !isExtracted && handleSubOrbPointerDown(e, sat.id)}
               onClick={(e) => handleSubOrbClick(e, sat)}
@@ -525,6 +548,7 @@ export default function OrbitalHub() {
               <div
                 className="w-full h-full rounded-full flex flex-col items-center justify-center relative"
                 style={{
+                  pointerEvents: 'none', // Let events bubble to parent motion.div
                   background: isHovered || isExtracted 
                     ? `${sat.color}1A` 
                     : 'rgba(10,10,18,0.6)',
