@@ -1,13 +1,36 @@
 /**
  * SANCTUARY ENGINE - Pure Light Resonance
- * Mission Control: Shambhala Purged, Running on Pure Resonance
+ * Mission Control: Legacy Matrix Purged, Shambhala UI Preserved
  */
 
 const SanctuaryEngine = {
-  // Purge all legacy Shambhala elements
+  // Purge legacy elements but PRESERVE active Shambhala UI
   purgeLegacy() {
-    document.querySelectorAll('[id*="shambhala"], [class*="shambhala"], [class*="Shambhala"]').forEach(el => el.remove());
-    console.log("[SanctuaryEngine] Shambhala signature deleted. System running on Pure Resonance.");
+    // Only purge legacy elements, not active UI components
+    const legacySelectors = [
+      '[class*="matrix"]',
+      '[class*="Matrix"]',
+      '[id*="matrix"]',
+      '[data-legacy="true"]',
+      '.old-cosmic-collective'
+    ];
+    
+    let purged = 0;
+    legacySelectors.forEach(selector => {
+      try {
+        document.querySelectorAll(selector).forEach(el => {
+          // Don't remove if it's an active UI component
+          if (!el.closest('#shambhala-mission-control') && 
+              !el.closest('.shambhala-toolbar') &&
+              !el.closest('[data-sovereign="true"]')) {
+            el.remove();
+            purged++;
+          }
+        });
+      } catch (e) { /* Skip invalid selectors */ }
+    });
+    
+    console.log(`[SanctuaryEngine] Purged ${purged} legacy elements. Shambhala UI preserved.`);
   },
 
   // Initialize sanctuary mode

@@ -230,6 +230,23 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   EMERGENT LAYER (Golden Ratio Spiral Container)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.emergent-layer {
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emergent-layer.refracted-state {
+  opacity: 1 !important;
+}
+
+.emergent-layer.refracted-state canvas {
+  transform: scale(1.1);
+  filter: brightness(1.2) contrast(1.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    VERSION BADGE
    ═══════════════════════════════════════════════════════════════════════════ */
 

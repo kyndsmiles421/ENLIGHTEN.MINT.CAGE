@@ -1,56 +1,37 @@
 /**
- * SCRIPT 2: THE BACK-SIDE PASS KEY
- * Connects the 'Rapid City Hub' origin to the Emergent logic.
+ * THE ENLIGHTENMENT PASS KEY (Layer 0)
+ * RUN ONCE AT STARTUP
+ * Connects the Shambhala event system to the Golden Ratio Spiral
  */
-
 const EnlightenmentKey = (() => {
   const init = () => {
-    // Listening for the Front-Side Quadruple Helix frequency
+    // Listener for UNLOCK
     window.addEventListener('SHAMBHALA_ASCEND', (e) => {
-      const { frequency, refraction, origin } = e.detail;
-      
-      console.log(`%c [KEY UNLOCKED]: ${origin} at ${frequency}`, 
-                  "color: #fff; background: linear-gradient(to right, violet, indigo, blue, green, yellow, orange, red); padding: 8px; border-radius: 4px;");
-
-      // THE PASS-KEY ACTION: 
-      // Unlock all "Emergent" modules by removing 'pointer-events: none'
       document.querySelectorAll('.emergent-layer').forEach(layer => {
-        layer.style.pointerEvents = 'auto';
+        layer.style.pointerEvents = 'auto'; // Re-enable interaction
         layer.style.opacity = '1';
-        layer.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.5))';
+        layer.classList.add('refracted-state'); // Triggers Golden Ratio expansion
       });
-      
-      // Also unlock resonance nodes
-      document.querySelectorAll('.resonance-node').forEach(node => {
-        node.style.pointerEvents = 'auto';
-        node.style.transform = 'scale(1.05)';
-      });
+      console.log(`%c [UNLOCKED]: ${e.detail?.origin || 'Unknown'} via ${e.detail?.frequency || 'Crystal Light'}`, "color: cyan; font-weight: bold;");
     });
 
+    // Listener for LOCK
     window.addEventListener('SHAMBHALA_STASIS', () => {
-      console.log('%c [KEY LOCKED]: Returning to Stasis', 
-                  "color: #888; background: #111; padding: 8px; border-radius: 4px;");
-      
-      // Re-lock the layers to prevent accidental clicks when not in ASCEND mode
       document.querySelectorAll('.emergent-layer').forEach(layer => {
-        layer.style.pointerEvents = 'none';
+        layer.style.pointerEvents = 'none'; // Prevent background clicks
         layer.style.opacity = '0.7';
-        layer.style.filter = 'none';
+        layer.classList.remove('refracted-state');
       });
-      
-      // Reset resonance nodes
-      document.querySelectorAll('.resonance-node').forEach(node => {
-        node.style.transform = 'scale(1)';
-      });
+      console.log("%c [LOCKED]: Returning to Stasis", "color: red;");
     });
     
-    console.log('[EnlightenmentKey] Back-Side Pass Key activated. Listening for Rapid City Hub.');
+    console.log('[EnlightenmentKey] Layer 0 Pass Key activated. Listening for Rapid City Hub.');
   };
 
   return { activate: init };
 })();
 
-// Initialize the Key immediately
+// Call this to turn the key on
 EnlightenmentKey.activate();
 
 // Expose globally
