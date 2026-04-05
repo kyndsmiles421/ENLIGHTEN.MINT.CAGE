@@ -6,6 +6,7 @@ import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
 import './utils/SovereignV9';             // v9.0 Crystalline Skeleton + Quadruple Helix
+import './utils/SovereignRefractor';      // Front-end visual layer (Vortex + Payload)
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
