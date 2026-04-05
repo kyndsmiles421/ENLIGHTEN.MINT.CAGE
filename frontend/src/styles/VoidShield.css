@@ -327,7 +327,7 @@ body::after {
   top: -9999px !important; /* Throw it off the screen entirely */
 }
 
-/* Force the Mission Circle to bottom-right corner, not blocking content */
+/* Force the Mission Circle to TOP-RIGHT corner */
 #mission-circle {
   display: flex !important;
   visibility: visible !important;
@@ -335,13 +335,27 @@ body::after {
   z-index: 2147483646 !important;
   pointer-events: auto !important;
   position: fixed !important;
-  bottom: 80px !important;
+  top: 80px !important;
   right: 20px !important;
+  bottom: auto !important;
   left: auto !important;
   transform: none !important;
-  top: auto !important;
   width: 50px !important;
   height: 50px !important;
+}
+
+/* KILL the green button and bottom-left elements */
+[style*="background: green"],
+[style*="background-color: green"],
+[style*="background:#0f0"],
+[style*="background-color:#0f0"],
+.green-button,
+[data-testid*="green"],
+.fixed.bottom-4.left-4,
+[class*="bottom-4"][class*="left-4"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 #shambhala-mission-control button,

@@ -135,11 +135,12 @@ const SanctuaryMaster = {
       ">GO</div>
     `;
     
-    // Applying the styles - CORNER POSITION to not block content
+    // Applying the styles - TOP-RIGHT POSITION
     Object.assign(circle.style, {
       position: 'fixed',
-      bottom: '80px',
+      top: '80px',
       right: '20px',
+      bottom: 'auto',
       left: 'auto',
       transform: 'none',
       width: '50px',
@@ -161,11 +162,11 @@ const SanctuaryMaster = {
 
     // Force important styles
     circle.style.setProperty('position', 'fixed', 'important');
-    circle.style.setProperty('bottom', '80px', 'important');
+    circle.style.setProperty('top', '80px', 'important');
     circle.style.setProperty('right', '20px', 'important');
+    circle.style.setProperty('bottom', 'auto', 'important');
     circle.style.setProperty('left', 'auto', 'important');
     circle.style.setProperty('transform', 'none', 'important');
-    circle.style.setProperty('top', 'auto', 'important');
 
     document.body.appendChild(circle);
     
