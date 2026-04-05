@@ -46,6 +46,9 @@ import { DwellBloomIndicatorSimple } from '../components/DwellBloomIndicator';
 // SOVEREIGN: True 3D WebGL Lattice
 import TesseractCanvas from '../components/TesseractCanvas';
 
+// MOB-01: Touch Normalization for mobile
+import { useTouchNormalization, normalizeTouch } from '../hooks/useTouchNormalization';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // GRAVITY SLIDER WITH SNAP POINTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -427,6 +430,34 @@ export default function TesseractExperience() {
   }, []);
   
   // ═══════════════════════════════════════════════════════════════════════════
+  // MOB-01: TOUCH NORMALIZATION
+  // Maps screen coordinates to 3D Matrix space (-1 to 1)
+  // Formula: (val / max) * 2 - 1
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  const matrixContainerRef = useRef(null);
+  
+  const {
+    normalizedPosition,
+    isActive: isTouchActive,
+    isVelocityGated,
+  } = useTouchNormalization(matrixContainerRef, {
+    enableHaptics: true,
+    onTouchStart: ({ normalized }) => {
+      console.log(`[MOB-01] Touch start: (${normalized.x.toFixed(2)}, ${normalized.y.toFixed(2)})`);
+    },
+    onTouchMove: ({ normalized, velocity, isVelocityGated }) => {
+      // Apply torque to the MotionStore based on normalized touch
+      if (!isVelocityGated) {
+        MotionStore.applyTorque(normalized.y * 0.1, normalized.x * 0.1);
+      }
+    },
+    onTouchEnd: ({ momentum, duration }) => {
+      console.log(`[MOB-01] Touch end: momentum=(${momentum.x.toFixed(2)}, ${momentum.y.toFixed(2)}), duration=${duration.toFixed(0)}ms`);
+    },
+  });
+  
+  // ═══════════════════════════════════════════════════════════════════════════
   // LOOP-FIX: CSS Variable Injection (The "Muzzle")
   // Moves HUD scaling OUT of React state → into hardware-accelerated CSS
   // Result: Zero re-renders. HUD and Lattice stop "shouting at each other."
@@ -715,7 +746,13 @@ export default function TesseractExperience() {
       </div>
       
       {/* Main Lattice - Z-INDEX 999: Always top interactive layer */}
-      <div className="relative flex items-center justify-center mt-8" style={{ zIndex: 999 }}>
+      {/* MOB-01: Touch container for normalized input */}
+      <div 
+        ref={matrixContainerRef}
+        className="relative flex items-center justify-center mt-8" 
+        style={{ zIndex: 999 }}
+        data-testid="matrix-touch-container"
+      >
         {/* Matrix Collapse Toggle */}
         <button
           onClick={() => setIsMatrixCollapsed(!isMatrixCollapsed)}
