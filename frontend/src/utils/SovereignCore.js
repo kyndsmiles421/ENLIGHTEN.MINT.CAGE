@@ -1,6 +1,6 @@
 /**
- * SOVEREIGN CORE V2.88 - COPPER CONDUIT + PERIMETER MAGNETICS
- * Logic: Hooke's Law Tension (#B87333) + Gold Viscosity (#fbc02d) + Quad-Pole Repulsion
+ * SOVEREIGN CORE V2.88 - AETHER EDITION (Mirrorless)
+ * Logic: Copper Conduit + Perimeter Magnetics + Direct Emission + Total Internal Conduction
  * Location: Rapid City / Black Hills Calibration
  */
 
@@ -17,13 +17,69 @@ const SovereignCore = (() => {
     R_LIMIT: 47.94,
     COPPER: '#B87333',
     GOLD_HONEY: '#fbc02d',
+    SILVER_WEB: '#C0C0C0',
     TEAL: '#00FFCC',
     TENSION: 0.08,           // Copper Spring Constant
     VISCOSITY: 0.05,         // Gold Induction
     DAMPING: 0.82,
     MAX_PARTICLES: 500,
     REVERSE_STRENGTH: 1.2,   // Perimeter Magnetics bounce factor
-    PERIMETER_THRESHOLD: 0.8 // 80% of R_LIMIT triggers repulsion
+    PERIMETER_THRESHOLD: 0.8, // 80% of R_LIMIT triggers repulsion
+    NO_GLASS: true,          // Removes refractive lag (Aether mode)
+    CONDUCTION_GAIN: 1.2     // Energy gain from non-glass surface
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AETHER PHYSICS (Mirrorless - Direct Emission + Total Internal Conduction)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const SovereignAether = {
+    applyAetherPhysics(particle, distFromCenter) {
+      // Check if colliding with boundary
+      const isCollidingWithBoundary = distFromCenter > CONFIG.R_LIMIT * 0.95;
+      
+      if (isCollidingWithBoundary && CONFIG.NO_GLASS) {
+        // Instead of bouncing off a 'mirror', the particle 
+        // 'tunnels' through the silver web into the copper ground.
+        
+        // Erase 'Reflection' (Glass logic) - reverse velocity
+        particle.vx *= -0.8;
+        particle.vy *= -0.8;
+        
+        // Add 'Conduction' (Sovereign logic)
+        particle.color = CONFIG.COPPER;
+        
+        // Energy gain from non-glass surface
+        const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+        if (speed < 5) {
+          particle.vx *= CONFIG.CONDUCTION_GAIN;
+          particle.vy *= CONFIG.CONDUCTION_GAIN;
+        }
+        
+        particle.isConducting = true;
+      } else if (distFromCenter < CONFIG.R_LIMIT * 0.7) {
+        particle.isConducting = false;
+      }
+    },
+
+    drawSurface(drawCtx, centerX, centerY, radius) {
+      // No glass sheen/gradient. Pure metallic hexagonal flux.
+      drawCtx.beginPath();
+      drawCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      drawCtx.strokeStyle = CONFIG.GOLD_HONEY;
+      drawCtx.lineWidth = 2;
+      drawCtx.setLineDash([]); // Solid metallic bond (no dashes)
+      drawCtx.stroke();
+      
+      // Inner silver web
+      drawCtx.beginPath();
+      drawCtx.arc(centerX, centerY, radius * 0.95, 0, Math.PI * 2);
+      drawCtx.strokeStyle = CONFIG.SILVER_WEB;
+      drawCtx.lineWidth = 1;
+      drawCtx.globalAlpha = 0.3;
+      drawCtx.stroke();
+      drawCtx.globalAlpha = 1.0;
+    }
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
