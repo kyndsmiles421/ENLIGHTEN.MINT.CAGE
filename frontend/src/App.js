@@ -1,8 +1,9 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
-// SILENCE SHIELD: Must be imported FIRST to activate No-AIS protocol
+// SOVEREIGN OS: Must be imported FIRST to activate all protocols
 import './utils/SilenceShield';
+import './utils/SovereignOS';
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
