@@ -276,6 +276,35 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   THE SCORCHED EARTH - OVERRIDE EVERYTHING AT THE BOTTOM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html, body {
+  overflow-x: hidden !important;
+  height: 100vh !important;
+  position: relative !important;
+}
+
+/* Create a "Dead Zone" where the bar lives */
+body::after {
+  content: "";
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px; /* Height of Emergent badge area */
+  background: transparent !important; /* Invisible but blocks the bar */
+  z-index: 999998; /* Just below the Mission Circle */
+  pointer-events: none; /* Let clicks through to the spiral */
+}
+
+/* Force the Spiral to be the only thing interactive at Layer 0 */
+.golden-spiral,
+#golden-spiral-canvas {
+  z-index: 1 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SHAMBHALA MISSION CIRCLE (66px White Vessel)
    ═══════════════════════════════════════════════════════════════════════════ */
 
