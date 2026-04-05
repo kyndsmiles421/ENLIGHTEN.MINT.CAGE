@@ -105,82 +105,11 @@ const SanctuaryMaster = {
     console.log(`[SanctuaryMaster] Purge complete. ${purgeCount} legacy elements removed.`);
   },
 
-  // 2. THE VESSEL: Mounts the 66px Mission Circle
+  // 2. THE VESSEL: Disabled - let native UI work
   mountMissionCircle() {
-    // Don't duplicate
-    if (document.getElementById('mission-circle')) {
-      console.log("[SanctuaryMaster] Mission Circle already exists.");
-      return;
-    }
-
-    const circle = document.createElement('div');
-    circle.id = 'mission-circle';
-    circle.setAttribute('data-testid', 'mission-circle-vessel');
-    circle.setAttribute('role', 'button');
-    circle.setAttribute('aria-label', 'Ascend to Celestial Dome');
-    
-    // Inner vessel core - smaller text
-    circle.innerHTML = `
-      <div class="vessel-core" style="
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 6px;
-        font-weight: 900;
-        letter-spacing: 0.5px;
-        color: #000;
-        text-transform: uppercase;
-      ">GO</div>
-    `;
-    
-    // Applying the styles - TOP-RIGHT POSITION
-    Object.assign(circle.style, {
-      position: 'fixed',
-      top: '80px',
-      right: '20px',
-      bottom: 'auto',
-      left: 'auto',
-      transform: 'none',
-      width: '50px',
-      height: '50px',
-      borderRadius: '50%',
-      backgroundColor: 'white',
-      boxShadow: '0 0 15px rgba(255,255,255,0.5)',
-      cursor: 'pointer',
-      zIndex: '2147483646',
-      transition: 'all 0.15s ease-out',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      border: 'none',
-      outline: 'none',
-      userSelect: 'none',
-      WebkitTapHighlightColor: 'transparent'
-    });
-
-    // Force important styles
-    circle.style.setProperty('position', 'fixed', 'important');
-    circle.style.setProperty('top', '80px', 'important');
-    circle.style.setProperty('right', '20px', 'important');
-    circle.style.setProperty('bottom', 'auto', 'important');
-    circle.style.setProperty('left', 'auto', 'important');
-    circle.style.setProperty('transform', 'none', 'important');
-
-    document.body.appendChild(circle);
-    
-    // Ensure visibility - protect from other scripts
-    requestAnimationFrame(() => {
-      const c = document.getElementById('mission-circle');
-      if (c) {
-        c.style.setProperty('display', 'flex', 'important');
-        c.style.setProperty('visibility', 'visible', 'important');
-        c.style.setProperty('opacity', '1', 'important');
-      }
-    });
-    
-    console.log("[SanctuaryMaster] Mission Circle mounted at bottom: 100px");
+    // Disabled - user prefers native green orb and toolbar
+    console.log("[SanctuaryMaster] Mission Circle disabled - using native UI");
+    return;
   },
 
   // 3. THE FREQUENCY: Links the tap to the Vortex Handshake

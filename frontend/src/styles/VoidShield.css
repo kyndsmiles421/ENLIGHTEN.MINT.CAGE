@@ -276,86 +276,12 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE SCORCHED EARTH - OVERRIDE EVERYTHING AT THE BOTTOM
+   LAYOUT FIXES - Keep UI accessible
    ═══════════════════════════════════════════════════════════════════════════ */
 
-html, body {
-  overflow-x: hidden !important;
-  height: 100vh !important;
-  position: relative !important;
-}
-
-/* Create a "Dead Zone" where the bar lives */
-body::after {
-  content: "";
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 70px; /* Height of Emergent badge area */
-  background: transparent !important; /* Invisible but blocks the bar */
-  z-index: 999998; /* Just below the Mission Circle */
-  pointer-events: none; /* Let clicks through to the spiral */
-}
-
-/* Force the Spiral to be the only thing interactive at Layer 0 */
-.golden-spiral,
-#golden-spiral-canvas {
-  z-index: 1 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SHAMBHALA MISSION CIRCLE (66px White Vessel)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* THE NUCLEAR PURGE - KILL THE BOTTOM BAR PERMANENTLY */
-[class*="shambhala-toolbar"], 
-[id*="shambhala-toolbar"],
-[class*="crossbar"],
-.shambhala-mixer-container,
-.nav-footer {
-  display: none !important;
-  height: 0 !important;
-  max-height: 0 !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-  position: absolute !important;
-  top: -9999px !important; /* Throw it off the screen entirely */
-}
-
-/* Force the Mission Circle to TOP-RIGHT corner */
+/* Hide the custom mission circle - using native UI */
 #mission-circle {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 2147483646 !important;
-  pointer-events: auto !important;
-  position: fixed !important;
-  top: 80px !important;
-  right: 20px !important;
-  bottom: auto !important;
-  left: auto !important;
-  transform: none !important;
-  width: 50px !important;
-  height: 50px !important;
-}
-
-/* KILL the green button and bottom-left elements */
-[style*="background: green"],
-[style*="background-color: green"],
-[style*="background:#0f0"],
-[style*="background-color:#0f0"],
-.green-button,
-[data-testid*="green"],
-.fixed.bottom-4.left-4,
-[class*="bottom-4"][class*="left-4"] {
   display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
 }
 
 #shambhala-mission-control button,

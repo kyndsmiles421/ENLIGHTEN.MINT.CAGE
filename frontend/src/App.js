@@ -34,11 +34,9 @@ import { Toaster } from 'sonner';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import SmartDock from './components/SmartDock';
-// NUCLEAR PURGE: ShambhalaToolbar removed - SanctuaryMaster v2.89 handles UI
-// import ShambhalaToolbar from './components/ShambhalaToolbar';
+import ShambhalaToolbar from './components/ShambhalaToolbar';
 import ShambhalaCrystalSystem from './components/ShambhalaCrystalSystem';
-// NUCLEAR PURGE: ShambhalaFrontSide removed - SanctuaryMaster v2.89 mounts Mission Circle
-// import ShambhalaFrontSide from './components/ShambhalaFrontSide';
+import ShambhalaFrontSide from './components/ShambhalaFrontSide';
 import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
@@ -55,8 +53,7 @@ import { TreasuryProvider } from './context/TreasuryContext';
 import { ModalityProvider } from './context/ModalityContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import { ResolutionProvider } from './context/ResolutionContext';
-// NUCLEAR PURGE: CosmicToolbar commented out - SanctuaryMaster handles navigation
-// import CosmicToolbar from './components/CosmicToolbar';
+import CosmicToolbar from './components/CosmicToolbar';
 import CosmicAssistant from './components/CosmicAssistant';
 import PersistentWaveform from './components/PersistentWaveform';
 import OrbCorner from './components/OrbCorner';
@@ -331,8 +328,8 @@ function CafeApp() {
         <AnimatedRoutes />
         {!isSovereignRoute && (
           <>
-            {/* SanctuaryMaster v2.89 handles Mission Circle via vanilla JS */}
-            {/* Keep only essential overlays */}
+            <ShambhalaFrontSide />
+            <ShambhalaToolbar />
             <EmergencyShutOff />
             <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
           </>

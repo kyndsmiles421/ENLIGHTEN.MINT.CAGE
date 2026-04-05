@@ -202,23 +202,23 @@ export default function EmergencyShutOff() {
         )}
       </AnimatePresence>
       
-      {/* STOP Button */}
+      {/* STOP Button - MOVED TO BOTTOM RIGHT */}
       <motion.button
         onClick={handleEmergencyStop}
         className="fixed flex items-center justify-center gap-1.5"
         style={{
-          top: 8,
-          left: 8,
-          zIndex: 99999, // Maximum z-index - above everything
+          bottom: 140,
+          right: 8,
+          zIndex: 99999,
           width: 'auto',
           minWidth: 36,
-          height: 36,
-          padding: '0 12px',
+          height: 32,
+          padding: '0 10px',
           borderRadius: 8,
           background: isVoid 
             ? 'rgba(239, 68, 68, 0.4)' 
             : isAtZeroPoint 
-              ? 'rgba(100, 100, 100, 0.3)' // Monochrome at Zero-Point
+              ? 'rgba(100, 100, 100, 0.3)'
               : 'rgba(239, 68, 68, 0.15)',
           border: isVoid
             ? '2px solid rgba(239, 68, 68, 0.8)'
@@ -231,7 +231,7 @@ export default function EmergencyShutOff() {
             ? '0 0 20px rgba(239, 68, 68, 0.5)'
             : '0 2px 12px rgba(239, 68, 68, 0.2)',
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: 600,
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
