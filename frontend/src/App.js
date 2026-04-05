@@ -52,6 +52,7 @@ import GlowPortal from './components/GlowPortal';
 import UniversalCommand from './components/UniversalCommand';
 import PulseEchoVisualizer from './components/PulseEchoVisualizer';
 import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
+import { EnlightenmentProvider } from './context/EnlightenmentContext';
 import { PolarityProvider } from './context/PolarityContext';
 import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettingsPanel';
 import VellumOverlay from './components/VellumOverlay';
@@ -518,6 +519,7 @@ function App() {
       <SovereignProvider>
       <MeshNetworkProvider>
       <EnlightenmentCafeProvider>
+      <EnlightenmentProvider>
         <BrowserRouter>
           <PolarityProvider>
           <DepthProvider>
@@ -535,6 +537,7 @@ function App() {
           </DepthProvider>
           </PolarityProvider>
         </BrowserRouter>
+      </EnlightenmentProvider>
       </EnlightenmentCafeProvider>
       </MeshNetworkProvider>
       </SovereignProvider>

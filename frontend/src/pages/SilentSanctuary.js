@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSanctuary } from '../context/EnlightenmentContext';
 
 /**
  * SilentSanctuary.js — The Void Interface
@@ -8,15 +9,24 @@ import { useNavigate } from 'react-router-dom';
  * - NO pop-ups, NO auto-play audio, NO intrusive elements
  * - User-triggered experience ONLY
  * - Pure resonance through intentional interaction
+ * - Uses EnlightenmentContext for state management
  * 
  * Route: /silent-sanctuary
  */
 
 export default function SilentSanctuary() {
   const navigate = useNavigate();
-  const [isPulling, setIsPulling] = useState(false);
-  const [nodules, setNodules] = useState(0);
-  const [isResonating, setIsResonating] = useState(false);
+  const { 
+    nodules, 
+    resonance, 
+    extract, 
+    seal, 
+    reset,
+    isMeditationActive,
+    toggleMeditation 
+  } = useSanctuary();
+  
+  const [isPulling, setIsPulling] = React.useState(false);
   const canvasRef = useRef(null);
   const frameIdRef = useRef(null);
 
@@ -40,7 +50,7 @@ export default function SilentSanctuary() {
       
       // Only draw if nodules exist
       if (nodules > 0) {
-        ctx.strokeStyle = isResonating 
+        ctx.strokeStyle = resonance 
           ? 'rgba(255, 215, 0, 0.3)' 
           : 'rgba(0, 255, 194, 0.15)';
         ctx.lineWidth = 0.5;
@@ -63,7 +73,7 @@ export default function SilentSanctuary() {
           // Draw nodule point
           ctx.beginPath();
           ctx.arc(x, y, 3, 0, Math.PI * 2);
-          ctx.fillStyle = isResonating ? '#FFD700' : '#00FFC2';
+          ctx.fillStyle = resonance ? '#FFD700' : '#00FFC2';
           ctx.fill();
         }
 
@@ -83,22 +93,23 @@ export default function SilentSanctuary() {
       cancelAnimationFrame(frameIdRef.current);
       window.removeEventListener('resize', handleResize);
     };
-  }, [nodules, isResonating]);
+  }, [nodules, resonance]);
 
-  // Handle bar click - extract nodule
+  // Handle bar click - extract nodule via context
   const handleBarClick = useCallback(() => {
     setIsPulling(prev => !prev);
     
     if (nodules < 15) {
-      setNodules(n => n + 1);
+      extract(); // Use context action
       if (navigator.vibrate) navigator.vibrate([5, 10]);
       
       if (nodules === 14) {
-        setIsResonating(true);
+        // Seal the deed when resonance achieved
+        seal('VOID-RESONANCE', 'Silent Sanctuary Completion');
         if (navigator.vibrate) navigator.vibrate([30, 20, 30, 20, 50]);
       }
     }
-  }, [nodules]);
+  }, [nodules, extract, seal]);
 
   // Handle void click - collapse panel
   const handleVoidClick = useCallback(() => {
@@ -107,12 +118,11 @@ export default function SilentSanctuary() {
     }
   }, [isPulling]);
 
-  // Reset function
+  // Reset function - uses context
   const handleReset = useCallback(() => {
-    setNodules(0);
-    setIsResonating(false);
+    reset();
     setIsPulling(false);
-  }, []);
+  }, [reset]);
 
   return (
     <div 
@@ -135,9 +145,9 @@ export default function SilentSanctuary() {
         {/* Central Status (Only visible when nodules exist) */}
         {nodules > 0 && (
           <div className="void-status">
-            <div className="void-counter">{nodules}</div>
-            <div className="void-label">
-              {isResonating ? 'RESONANCE ACHIEVED' : 'EXTRACTING'}
+            <div className={`void-counter ${resonance ? 'resonating' : ''}`}>{nodules}</div>
+            <div className={`void-label ${resonance ? 'resonating' : ''}`}>
+              {resonance ? 'RESONANCE ACHIEVED' : 'EXTRACTING'}
             </div>
           </div>
         )}
@@ -156,7 +166,7 @@ export default function SilentSanctuary() {
         <h2 className="experience-node">ENLIGHTEN.MINT</h2>
         <div className="nodule-counter">{nodules}/15 NODULES EXTRACTED</div>
         
-        {isResonating && (
+        {resonance && (
           <div className="resonance-actions">
             <button 
               className="action-btn"
@@ -224,16 +234,24 @@ export default function SilentSanctuary() {
         .void-counter {
           font-size: 8rem;
           font-weight: 100;
-          color: ${isResonating ? '#FFD700' : 'rgba(255,255,255,0.1)'};
+          color: rgba(255,255,255,0.1);
           line-height: 1;
           transition: color 0.5s;
+        }
+        
+        .void-counter.resonating {
+          color: #FFD700;
         }
 
         .void-label {
           font-size: 0.6rem;
           letter-spacing: 0.3em;
-          color: ${isResonating ? '#FFD700' : 'rgba(255,255,255,0.3)'};
+          color: rgba(255,255,255,0.3);
           margin-top: 10px;
+        }
+        
+        .void-label.resonating {
+          color: #FFD700;
         }
 
         .nav-hint {
