@@ -3151,3 +3151,14 @@ div[style*="#0f0"],
 body {
   padding-bottom: 60px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOGIN CONTAINER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers horizontally */
+  gap: 20px;           /* Creates consistent vertical space */
+}
