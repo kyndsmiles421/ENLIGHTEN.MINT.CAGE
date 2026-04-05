@@ -239,7 +239,7 @@ export default function DimensionalSpace() {
         <div className="flex items-center gap-2 mb-2">
           <Grid3X3 size={11} style={{ color: '#8B5CF6' }} />
           <span className="text-[9px] uppercase tracking-widest font-bold" style={{ color: 'var(--text-muted)' }}>
-            Multiverse Matrix (4×3)
+            Multiverse Grid (4×3)
           </span>
         </div>
 

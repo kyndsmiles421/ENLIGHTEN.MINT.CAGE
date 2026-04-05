@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
  * EnlightenMintHub.js — Quantum Loom Interface
  * 
  * THE ARCHITECTURE:
- * 1. Matrix Substrate: 60fps mechanical drift
+ * 1. Shambhala Substrate: 60fps mechanical drift
  * 2. Crystalline Web: Canvas lines connecting nodules to toolbars
  * 3. Nodule Extraction: 15 pulls = Critical Mass (Infinity Resonance)
  * 4. Stripe Integration: Architect/Seeker subscription tiers
@@ -41,7 +41,7 @@ export default function EnlightenMintHub() {
     const animate = () => {
       const time = Date.now();
       
-      // Matrix Drift (Base Layer)
+      // Shambhala Drift (Base Layer)
       if (matrixRef.current) {
         matrixRef.current.style.transform = `scale(${1 + Math.sin(time / 1000) * 0.02})`;
       }
@@ -202,7 +202,7 @@ export default function EnlightenMintHub() {
         <div className="action-overlay" data-testid="action-overlay">
           <div className="action-panel">
             <h2>CRITICAL MASS ACHIEVED</h2>
-            <p>15 Nodules Extracted — The Matrix Resonates</p>
+            <p>15 Nodules Extracted — Shambhala Resonates</p>
             <div className="action-buttons">
               <button onClick={() => navigate('/sanctuary')} className="action-btn sanctuary">
                 SANCTUARY

@@ -2,7 +2,7 @@
  * HexagramCompass.js — The 360° Gyroscopic Navigation Compass
  * 
  * A physics-based rotating compass with 6 hexagram lines that:
- * - Rotates clockwise in Hollow Earth, counter-clockwise in Matrix
+ * - Rotates clockwise in Hollow Earth, counter-clockwise in Shambhala
  * - Has inertial "flick" physics with variable friction based on gravity
  * - Triggers Supernova expansion when crossing the 0.5 threshold
  * - The Supernova BREATHES based on gravity intensity (not static scale)
@@ -40,7 +40,7 @@ const FLICK_MULTIPLIER = 0.2;
 
 // Gravity-reactive friction:
 // Hollow Earth (0.0) = 0.92 (heavy, slow decay)
-// Matrix (1.0) = 0.98 (light, long spin)
+// Shambhala (1.0) = 0.98 (light, long spin)
 const FRICTION_HOLLOW = 0.92;
 const FRICTION_MATRIX = 0.985;
 
@@ -242,7 +242,7 @@ export default function HexagramCompass({
     isVoid,
     isInHollow,
     isInCore,
-    isInMatrix,
+    isInShambhala,
     audioFlavor,
     transitionDirection,
   } = usePolarity();
@@ -282,9 +282,9 @@ export default function HexagramCompass({
   // Get haptic pattern for current layer
   const hapticPattern = useMemo(() => {
     if (isInHollow) return HAPTIC_PATTERNS.hollow;
-    if (isInMatrix) return HAPTIC_PATTERNS.matrix;
+    if (isInShambhala) return HAPTIC_PATTERNS.matrix;
     return HAPTIC_PATTERNS.core;
-  }, [isInHollow, isInMatrix]);
+  }, [isInHollow, isInShambhala]);
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ANIMATION LOOP — 360° Rotation with Variable Physics
@@ -448,9 +448,9 @@ export default function HexagramCompass({
     if (isVoid) return 'rgba(100, 100, 100, 0.2)';
     if (supernovaActive) return `rgba(255, 215, 0, ${0.4 + glowIntensity * 0.6})`;
     if (isInHollow) return `rgba(74, 74, 106, ${0.3 + gravityGlow * 0.2})`;
-    if (isInMatrix) return `rgba(255, 215, 0, ${0.3 + gravityGlow * 0.3})`;
+    if (isInShambhala) return `rgba(255, 215, 0, ${0.3 + gravityGlow * 0.3})`;
     return `rgba(201, 169, 98, ${0.2 + gravityGlow * 0.15})`;
-  }, [isVoid, supernovaActive, isInHollow, isInMatrix, glowIntensity, gravityGlow]);
+  }, [isVoid, supernovaActive, isInHollow, isInShambhala, glowIntensity, gravityGlow]);
   
   const compassOpacity = isVoid ? 0.3 : 1;
   
@@ -670,7 +670,7 @@ export function SupernovaOverlay() {
     gravity,
     transitionDirection,
     isInHollow,
-    isInMatrix,
+    isInShambhala,
   } = usePolarity();
   
   const [visible, setVisible] = useState(false);

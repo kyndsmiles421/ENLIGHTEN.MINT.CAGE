@@ -598,7 +598,7 @@ export default function TesseractExperience() {
   // ═══════════════════════════════════════════════════════════════════════════
   // MATRIX COLLAPSE STATE
   // ═══════════════════════════════════════════════════════════════════════════
-  const [isMatrixCollapsed, setIsMatrixCollapsed] = useState(false);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
   const MATRIX_OPACITY = 0.6; // Dimmed but visible - translucent like everything else
   
   // ═══════════════════════════════════════════════════════════════════════════
@@ -755,9 +755,9 @@ export default function TesseractExperience() {
         style={{ zIndex: 999 }}
         data-testid="matrix-touch-container"
       >
-        {/* Matrix Collapse Toggle */}
+        {/* Panel Collapse Toggle */}
         <button
-          onClick={() => setIsMatrixCollapsed(!isMatrixCollapsed)}
+          onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
           className="absolute -top-2 right-4 p-2 rounded-full transition-all"
           style={{
             background: 'rgba(255,255,255,0.05)',
@@ -767,7 +767,7 @@ export default function TesseractExperience() {
           }}
           data-testid="matrix-collapse-toggle"
         >
-          {isMatrixCollapsed ? (
+          {isPanelCollapsed ? (
             <Grid3X3 size={18} className="text-white/60" />
           ) : (
             <X size={18} className="text-white/40" />
@@ -850,7 +850,7 @@ export default function TesseractExperience() {
             isVoidMode={core.isVoidMode}
             isDwellStable={core.isDwellStable}
             dwellProgress={core.dwellProgress}
-            isCollapsed={isMatrixCollapsed}
+            isCollapsed={isPanelCollapsed}
           />
         ) : (
           /* LEGACY MODE: Flat CSS Grid with Lens Warp */
@@ -864,7 +864,7 @@ export default function TesseractExperience() {
             isVoidMode={core.isVoidMode}
             isDwellStable={core.isDwellStable}
             dwellProgress={core.dwellProgress}
-            isCollapsed={isMatrixCollapsed}
+            isCollapsed={isPanelCollapsed}
             matrixOpacity={MATRIX_OPACITY}
             lensWarp={motion.lensWarp}
             viewMode={motion.viewMode}

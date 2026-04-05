@@ -49,9 +49,9 @@ import {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const TIERS = {
-  matrix: {
-    id: 'matrix',
-    name: 'Matrix',
+  shambhala: {
+    id: 'shambhala',
+    name: 'Shambhala',
     subtitle: 'Integration',
     icon: Sparkles,
     gravityRange: [0.65, 1.0],
@@ -109,7 +109,7 @@ const TIERS = {
   },
 };
 
-const TIER_ORDER = ['matrix', 'core', 'hollow']; // Top to bottom (ascending order reversed)
+const TIER_ORDER = ['shambhala', 'core', 'hollow']; // Top to bottom (ascending order reversed)
 
 // Lexicon flicker languages for Zero-Point
 const FLICKER_LANGS = ['en', 'es', 'ja', 'zh'];
@@ -288,7 +288,7 @@ export default function TieredNavigation({ className = '' }) {
   
   // Determine current tier
   const currentTierKey = useMemo(() => {
-    if (gravity >= 0.65) return 'matrix';
+    if (gravity >= 0.65) return 'shambhala';
     if (gravity >= 0.35) return 'core';
     return 'hollow';
   }, [gravity]);
@@ -414,7 +414,7 @@ export default function TieredNavigation({ className = '' }) {
               : `linear-gradient(90deg, 
                   ${TIERS.hollow.colors.active} 0%, 
                   ${TIERS.core.colors.active} 50%, 
-                  ${TIERS.matrix.colors.active} 100%
+                  ${TIERS.shambhala.colors.active} 100%
                 )`,
           }}
           animate={{ width: `${gravityPercent}%` }}

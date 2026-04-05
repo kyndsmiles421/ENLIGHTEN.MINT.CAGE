@@ -57,7 +57,7 @@ export default function UtilityDock({
     supernovaActive,
     layerName,
     isInHollow,
-    isInMatrix,
+    isInShambhala,
     isAtZeroPoint,
     manualGravityEnabled,
     manualGravityValue,
@@ -166,7 +166,7 @@ export default function UtilityDock({
     ? 'rgba(239, 68, 68, 0.3)' 
     : isInHollow 
       ? 'rgba(74, 74, 106, 0.4)' 
-      : isInMatrix 
+      : isInShambhala 
         ? 'rgba(255, 215, 0, 0.3)' 
         : 'rgba(201, 169, 98, 0.25)';
 
@@ -355,7 +355,7 @@ export default function UtilityDock({
                     }}>
                       {(gravity * 100).toFixed(1)}%
                     </span>
-                    <span>Matrix</span>
+                    <span>Shambhala</span>
                   </div>
                   
                   {/* Reset to Route button */}
