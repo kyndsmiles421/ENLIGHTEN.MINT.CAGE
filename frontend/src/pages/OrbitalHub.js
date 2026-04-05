@@ -388,10 +388,13 @@ export default function OrbitalHub() {
         transition={{ delay: 0.3 }}
       >
         <h1 
-          className="text-sm sm:text-lg font-light tracking-[0.25em] uppercase"
-          style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}
+          className="brand-logo-large"
+          style={{ 
+            fontFamily: 'Inter, sans-serif',
+            letterSpacing: '0.2em',
+          }}
         >
-          The ENLIGHTEN.MINT.CAFE
+          ENLIGHTEN.MINT.CAFE
         </h1>
       </motion.div>
 
@@ -404,9 +407,9 @@ export default function OrbitalHub() {
         <span 
           className="text-[10px] uppercase tracking-widest px-3 py-1 rounded-full"
           style={{ 
-            background: hubState === 'extracted' ? 'rgba(167,139,250,0.15)' : 'rgba(248,250,252,0.05)',
-            color: hubState === 'extracted' ? '#A78BFA' : 'rgba(248,250,252,0.25)',
-            border: `1px solid ${hubState === 'extracted' ? 'rgba(167,139,250,0.2)' : 'rgba(248,250,252,0.05)'}`,
+            background: hubState === 'extracted' ? 'rgba(0,255,195,0.15)' : 'rgba(248,250,252,0.05)',
+            color: hubState === 'extracted' ? 'var(--mint-primary)' : 'rgba(248,250,252,0.25)',
+            border: `1px solid ${hubState === 'extracted' ? 'rgba(0,255,195,0.3)' : 'rgba(248,250,252,0.05)'}`,
           }}
         >
           {hubState === 'latent' && 'Tap Core to Bloom'}

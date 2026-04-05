@@ -1,10 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@400;500;700&family=Cinzel:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@400;500;700&family=Cinzel:wght@400;600&family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ENLIGHTEN.MINT.CAFE — Signature Brand Palette
+     ═══════════════════════════════════════════════════════════════════════════ */
+  --mint-primary: #00ffc3;           /* Crisp, high-frequency mint */
+  --mint-glow: rgba(0, 255, 195, 0.4);
+  --mint-soft: rgba(0, 255, 195, 0.15);
+  --cafe-gold: #fbc02d;              /* Warm, roasted honey gold */
+  --cafe-gold-glow: rgba(251, 192, 45, 0.4);
+  --enlighten-purple: #9c27b0;       /* Deep spiritual violet */
+  --enlighten-purple-glow: rgba(156, 39, 176, 0.4);
+  --bg-dark-roast: #0a0a0f;          /* The "Coffee" base layer */
+  --bg-espresso: #050508;            /* Deepest dark */
+  --cream-foam: #f8f5f0;             /* Light cream accent */
+  
+  /* Legacy variables (for compatibility) */
   --bg-default: #0B0C15;
   --bg-deep: #050508;
   --bg-surface: #161826;
@@ -28,6 +43,155 @@
 
   /* ── Elemental Style Guide ── */
   --el-wood: #22C55E;
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ENLIGHTEN.MINT.CAFE — Brand Component Styles
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Brand Logo Typography */
+.brand-logo {
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  opacity: 0.9;
+  color: var(--mint-primary);
+}
+
+.brand-logo-large {
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  background: linear-gradient(135deg, var(--mint-primary), var(--cafe-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mint Glow Effects */
+.mint-glow {
+  box-shadow: 0 0 20px var(--mint-glow), 0 0 40px rgba(0, 255, 195, 0.1);
+}
+
+.mint-glow-intense {
+  box-shadow: 0 0 40px var(--mint-glow), 0 0 80px rgba(0, 255, 195, 0.2), 0 0 120px rgba(0, 255, 195, 0.1);
+}
+
+.mint-border {
+  border: 1px solid var(--mint-primary);
+  border-color: rgba(0, 255, 195, 0.3);
+}
+
+.mint-border:hover {
+  border-color: var(--mint-primary);
+  box-shadow: 0 0 20px var(--mint-glow);
+}
+
+/* Cafe Gold Accents */
+.cafe-gold-text {
+  color: var(--cafe-gold);
+}
+
+.cafe-gold-glow {
+  box-shadow: 0 0 20px var(--cafe-gold-glow), 0 0 40px rgba(251, 192, 45, 0.1);
+}
+
+/* Enlighten Purple */
+.enlighten-purple-text {
+  color: var(--enlighten-purple);
+}
+
+.enlighten-purple-glow {
+  box-shadow: 0 0 20px var(--enlighten-purple-glow);
+}
+
+/* Central Resonance Core - ENLIGHTEN.MINT.CAFE Brand */
+.central-resonance-core.brand-active {
+  background: var(--mint-primary);
+  box-shadow: 0 0 40px var(--mint-glow), 0 0 80px rgba(0, 255, 195, 0.1);
+  color: var(--bg-dark-roast);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-shadow: none;
+}
+
+.central-resonance-core.brand-active .hertz-display,
+.central-resonance-core.brand-active .core-display {
+  background: var(--mint-primary);
+  border-color: rgba(0, 255, 195, 0.8);
+}
+
+.central-resonance-core.brand-active .hz-value,
+.central-resonance-core.brand-active .hertz-value {
+  color: var(--bg-dark-roast);
+}
+
+.central-resonance-core.brand-active .hz-label,
+.central-resonance-core.brand-active .hertz-label {
+  color: rgba(10, 10, 15, 0.7);
+}
+
+/* Brand Gradient Backgrounds */
+.bg-mint-gradient {
+  background: linear-gradient(135deg, var(--bg-dark-roast) 0%, rgba(0, 255, 195, 0.05) 100%);
+}
+
+.bg-cafe-gradient {
+  background: linear-gradient(135deg, var(--bg-dark-roast) 0%, rgba(251, 192, 45, 0.05) 100%);
+}
+
+.bg-enlighten-gradient {
+  background: linear-gradient(135deg, rgba(0, 255, 195, 0.1) 0%, rgba(156, 39, 176, 0.1) 50%, rgba(251, 192, 45, 0.1) 100%);
+}
+
+/* Brand Button Styles */
+.btn-mint {
+  background: var(--mint-primary);
+  color: var(--bg-dark-roast);
+  font-weight: 700;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-mint:hover {
+  box-shadow: 0 0 30px var(--mint-glow);
+  transform: translateY(-2px);
+}
+
+.btn-cafe {
+  background: var(--cafe-gold);
+  color: var(--bg-dark-roast);
+  font-weight: 700;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-cafe:hover {
+  box-shadow: 0 0 30px var(--cafe-gold-glow);
+  transform: translateY(-2px);
+}
+
+/* Brand Card Style */
+.card-enlighten {
+  background: rgba(10, 10, 15, 0.8);
+  border: 1px solid rgba(0, 255, 195, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+.card-enlighten:hover {
+  border-color: rgba(0, 255, 195, 0.4);
+  box-shadow: 0 0 30px rgba(0, 255, 195, 0.1);
+}
+
   --el-wood-glow: rgba(34,197,94,0.15);
   --el-wood-bg: rgba(34,197,94,0.04);
   --el-fire: #EF4444;
