@@ -1,13 +1,14 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSanctuary } from '../context/EnlightenmentContext';
+import { useEnlightenmentUI, ManualModeIndicator } from '../utils/EnlightenmentUI';
 
 /**
  * SilentSanctuary.js — The Void Interface
  * 
  * PHILOSOPHY:
  * - NO pop-ups, NO auto-play audio, NO intrusive elements
- * - User-triggered experience ONLY
+ * - User-triggered experience ONLY (enforced by EnlightenmentUI)
  * - Pure resonance through intentional interaction
  * - Uses EnlightenmentContext for state management
  * 
@@ -16,6 +17,7 @@ import { useSanctuary } from '../context/EnlightenmentContext';
 
 export default function SilentSanctuary() {
   const navigate = useNavigate();
+  const { handleAction, isManualMode } = useEnlightenmentUI();
   const { 
     nodules, 
     resonance, 
@@ -156,6 +158,11 @@ export default function SilentSanctuary() {
         <div className="nav-hint" onClick={() => navigate('/ether-hub')}>
           ETHER HUB
         </div>
+        
+        {/* Manual Mode Indicator */}
+        <div className="mode-indicator">
+          <ManualModeIndicator compact />
+        </div>
       </div>
 
       {/* THE PULL-UP INTERFACE */}
@@ -268,6 +275,13 @@ export default function SilentSanctuary() {
 
         .nav-hint:hover {
           color: #00FFC2;
+        }
+
+        .mode-indicator {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          z-index: 100;
         }
 
         /* 📏 THE HORIZONTAL BASE BAR (Left to Right) */
