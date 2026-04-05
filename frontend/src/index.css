@@ -1978,7 +1978,8 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
     mix-blend-mode: screen; /* Interlocks the colors when they overlap */
     pointer-events: none; /* Allows clicks to pass through to the icon */
     z-index: -1;
-    animation: pulse-vibration 4s ease-in-out infinite alternate;
+    /* CSS Variable for customizable pulse speed per nodule */
+    animation: pulse-vibration var(--pulse-speed, 4s) ease-in-out infinite alternate;
 }
 
 /* Interlocking animation for the color shifting */

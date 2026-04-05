@@ -556,7 +556,8 @@ export default function OrbitalHub() {
                     top: '50%',
                     transform: 'translate(-50%, -50%)',
                     background: `radial-gradient(circle, ${sat.color}40 0%, ${sat.color}10 70%, transparent 100%)`,
-                    animationDelay: `${idx * 0.2}s`, // Stagger the animations
+                    animationDelay: `${idx * 0.2}s`,
+                    '--pulse-speed': `${3 + (idx % 3)}s`, // Varied pulse speeds: 3s, 4s, 5s
                   }}
                 />
               )}

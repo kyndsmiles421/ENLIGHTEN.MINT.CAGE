@@ -91,6 +91,7 @@ const SphericalNoduleCloud = ({
             style={{
               background: `radial-gradient(circle, ${nodule.color || 'rgba(255,255,255,0.4)'} 0%, transparent 75%)`,
               animationDelay: `${idx * 0.15}s`,
+              '--pulse-speed': `${3 + (idx % 4)}s`, // Varied: 3s, 4s, 5s, 6s
             }}
           />
           
