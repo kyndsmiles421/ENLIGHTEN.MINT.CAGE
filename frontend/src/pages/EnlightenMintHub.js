@@ -168,6 +168,16 @@ const ActionOverlay = ({ active, noduleCount, onReset }) => {
         >
           ENTER CELESTIAL DOME (VR)
         </button>
+
+        <button 
+          className="eth-btn" 
+          onClick={() => navigate('/membership')}
+          disabled={loading}
+          data-testid="membership-btn"
+          style={{ borderColor: '#FF6B6B', color: '#FF6B6B' }}
+        >
+          UNLOCK REFRACTAL MEMBERSHIP
+        </button>
         
         <p className="status-text">{status}</p>
         
