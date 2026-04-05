@@ -65,6 +65,7 @@ import QuestHUD from './components/QuestHUD';
 import HexagramGhostLayer from './components/HexagramGhostLayer';
 import { useZeroPointFlicker } from './hooks/useZeroPointFlicker';
 import ZeroPointExperience from './components/ZeroPointExperience';
+import { CrystalBadge } from './components/CrystalResonancePanel';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -303,6 +304,10 @@ function CafeApp() {
         {/* Quick Nebula Toggle in bottom-left (compact) */}
         <div className="fixed bottom-4 left-20 z-[9980]" data-testid="nebula-quick-toggle">
           <NebulaViewToggle compact />
+        </div>
+        {/* Crystal Resonance Badge — shows current frequency */}
+        <div className="fixed bottom-4 left-40 z-[9980]" data-testid="crystal-resonance-badge">
+          <CrystalBadge />
         </div>
         {/* Sage System — Expert Advisors */}
         <QuestHUD />
