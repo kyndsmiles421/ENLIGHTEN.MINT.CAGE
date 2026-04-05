@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
+import './utils/SovereignV9';             // v9.0 Crystalline Skeleton + Quadruple Helix
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';

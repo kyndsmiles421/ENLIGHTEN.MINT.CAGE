@@ -3,6 +3,7 @@
  * 
  * Full visualization of the 54-layer L² Fractal Engine minting process.
  * Shows the SeedVisualizer growing as each layer computes.
+ * Integrates V9 Quadruple Helix Rainbow Key encryption.
  * 
  * Route: /mint
  */
@@ -11,6 +12,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SeedVisualizer, SeedVisualizerMini, useAnimatedLayerCount } from '../components/SeedVisualizer';
 import SovereignStreamline, { useSovereignV7 } from '../utils/SovereignStreamlineV7';
+import SovereignV9, { useSovereignV9 } from '../utils/SovereignV9';
 
 export default function MintingCeremony() {
   const navigate = useNavigate();
@@ -19,9 +21,20 @@ export default function MintingCeremony() {
   const [mintResult, setMintResult] = useState(null);
   const [seedInput, setSeedInput] = useState('');
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [useV9Mode, setUseV9Mode] = useState(true); // Enable V9 Crystalline mode by default
   
-  // Use the V7 hook for state management
+  // Use the V7 hook for base state management
   const { geoLock, ledger, startBinaural, stopBinaural, vectorState } = useSovereignV7();
+  
+  // Use V9 hook for Crystalline features
+  const { 
+    isLocked: isGoldenLocked, 
+    masterProgress, 
+    helixStrands,
+    triggerCeremony: triggerV9Ceremony,
+    renderSkeleton,
+    removeSkeleton
+  } = useSovereignV9();
 
   // Animated layer count for smooth visualization
   const displayLayer = useAnimatedLayerCount(currentLayer, 500);
@@ -31,11 +44,17 @@ export default function MintingCeremony() {
     // Check GPS geolock status
     SovereignStreamline.checkGeoLock();
     
+    // Render crystalline skeleton if V9 mode
+    if (useV9Mode) {
+      renderSkeleton();
+    }
+    
     return () => {
-      // Cleanup touch points on unmount
+      // Cleanup
       SovereignStreamline.removeTouchPoints?.();
+      removeSkeleton();
     };
-  }, []);
+  }, [useV9Mode, renderSkeleton, removeSkeleton]);
 
   const toggleAudio = useCallback(() => {
     const newState = !audioEnabled;
@@ -55,17 +74,41 @@ export default function MintingCeremony() {
     setCurrentLayer(0);
     setMintResult(null);
 
-    // Subscribe to progress updates
+    // Subscribe to progress updates (V7)
     const unsubProgress = SovereignStreamline.on('ceremony-progress', (progress) => {
       setCurrentLayer(progress.layer);
     });
 
     try {
-      // Use V7 startCeremony with binaural entrainment
-      const result = await SovereignStreamline.startCeremony(seedInput, { 
-        binaural: audioEnabled,
-        depth: 54 
-      });
+      let result;
+      
+      if (useV9Mode) {
+        // V9 CRYSTALLINE MODE: Rainbow Key + Quadruple Helix
+        console.log('[MintingCeremony] Using V9 Crystalline Mode');
+        
+        // First, run V7 ceremony for the 54-layer fractal
+        const v7Result = await SovereignStreamline.startCeremony(seedInput, { 
+          binaural: audioEnabled,
+          depth: 54 
+        });
+        
+        // Then, apply V9 Rainbow Key encryption
+        const rainbowKey = await SovereignV9.generateRainbowKey(v7Result.hash);
+        
+        result = {
+          ...v7Result,
+          rainbowKey,
+          encryption: 'QUAD_HELIX_REFRACTIVE',
+          goldenLock: isGoldenLocked,
+          masterProgress
+        };
+      } else {
+        // Standard V7 ceremony
+        result = await SovereignStreamline.startCeremony(seedInput, { 
+          binaural: audioEnabled,
+          depth: 54 
+        });
+      }
       
       setMintResult(result);
       setCurrentLayer(54);
@@ -75,7 +118,7 @@ export default function MintingCeremony() {
       setIsMinting(false);
       unsubProgress();
     }
-  }, [seedInput, audioEnabled]);
+  }, [seedInput, audioEnabled, useV9Mode, isGoldenLocked, masterProgress]);
 
   const resetCeremony = useCallback(() => {
     setCurrentLayer(0);
@@ -134,13 +177,45 @@ export default function MintingCeremony() {
         {/* Result Section */}
         {mintResult && (
           <div className="result-section">
-            <div className="result-badge">✓ SEED MINTED</div>
-            {/* Show GeoLock status */}
-            {geoLock && geoLock !== 'UNKNOWN' && (
+            <div className="result-badge">
+              {mintResult.encryption === 'QUAD_HELIX_REFRACTIVE' ? '✧ CRYSTALLIZED' : '✓ SEED MINTED'}
+            </div>
+            
+            {/* Show Golden Lock status (V9) */}
+            {mintResult.goldenLock && (
+              <div className="geolock-badge golden">
+                🏔️ BLACK HILLS GOLDEN LOCK ACTIVE
+              </div>
+            )}
+            
+            {/* Show GeoLock status (V7) */}
+            {!mintResult.goldenLock && geoLock && geoLock !== 'UNKNOWN' && (
               <div className={`geolock-badge ${geoLock === 'GOLDEN_LOCK_ACTIVE' ? 'golden' : ''}`}>
                 {geoLock === 'GOLDEN_LOCK_ACTIVE' ? '🏔️ BLACK HILLS CALIBRATED' : '🌍 STANDARD PHASE'}
               </div>
             )}
+            
+            {/* Rainbow Key (V9 Crystalline) */}
+            {mintResult.rainbowKey && (
+              <div className="result-rainbow">
+                <label>RAINBOW KEY</label>
+                <code className="rainbow-key">{mintResult.rainbowKey}</code>
+                <div className="helix-indicator">
+                  {helixStrands.map((strand, i) => (
+                    <div 
+                      key={strand.id} 
+                      className="helix-strand" 
+                      style={{ 
+                        background: strand.color,
+                        transform: `rotate(${strand.rotation}deg)`,
+                        opacity: 0.5 + strand.refractiveIndex * 0.3
+                      }} 
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            
             <div className="result-hash">
               <label>FRACTAL HASH</label>
               <code>{mintResult.hash}</code>
@@ -159,6 +234,24 @@ export default function MintingCeremony() {
                 <span className="metric-label">ENTROPY</span>
               </div>
             </div>
+            
+            {/* Master Architect Progress */}
+            {masterProgress && (
+              <div className="master-progress">
+                <div className="progress-label">
+                  MASTER ARCHITECT: {masterProgress.current}/{masterProgress.required}
+                </div>
+                <div className="progress-bar">
+                  <div 
+                    className="progress-fill" 
+                    style={{ width: `${masterProgress.percentage}%` }}
+                  />
+                </div>
+                {masterProgress.isMaster && (
+                  <div className="master-badge">✧ TIER UNLOCKED</div>
+                )}
+              </div>
+            )}
             <div className="result-actions">
               <button className="action-btn attest" onClick={() => {
                 SovereignStreamline.dispatch('center', 'WITNESS', {
@@ -477,6 +570,82 @@ export default function MintingCeremony() {
           font-size: 10px;
           color: rgba(255,255,255,0.5);
           font-family: monospace;
+        }
+
+        /* V9 Crystalline Styles */
+        .result-rainbow {
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .result-rainbow label {
+          display: block;
+          font-size: 9px;
+          letter-spacing: 0.2em;
+          color: rgba(255,215,0,0.6);
+          margin-bottom: 8px;
+        }
+
+        .rainbow-key {
+          display: block;
+          font-size: 12px;
+          color: #FFD700;
+          background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(168,85,247,0.15) 50%, rgba(0,255,194,0.15) 100%);
+          padding: 12px;
+          word-break: break-all;
+          font-family: monospace;
+          border: 1px solid rgba(255,215,0,0.3);
+          border-radius: 4px;
+          letter-spacing: 0.05em;
+        }
+
+        .helix-indicator {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 10px;
+        }
+
+        .helix-strand {
+          width: 6px;
+          height: 24px;
+          border-radius: 3px;
+          transition: all 0.3s ease;
+        }
+
+        .master-progress {
+          margin-top: 20px;
+          text-align: center;
+        }
+
+        .progress-label {
+          font-size: 9px;
+          letter-spacing: 0.15em;
+          color: rgba(255,255,255,0.5);
+          margin-bottom: 8px;
+        }
+
+        .progress-bar {
+          width: 200px;
+          height: 4px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 2px;
+          overflow: hidden;
+          margin: 0 auto;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #A855F7, #FFD700);
+          transition: width 0.5s ease;
+        }
+
+        .master-badge {
+          margin-top: 8px;
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          color: #FFD700;
+          text-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
       `}</style>
     </div>
