@@ -13,10 +13,15 @@ const StabilizerCanvas = {
     R_LIMIT: 47.94,     // Tightened boundary (44% reduction)
     F_REPULSE: 400,     // Edge push force
     DAMPING: 0.82,      // Velocity decay
-    BUFFER: 10          // 1cm equivalent (approximate)
+    BUFFER: 10,         // 1cm equivalent (approximate)
+    
+    // GOLD LAYER
+    GOLD_HONEY: '#fbc02d',      // Roasted Honey Gold
+    GOLD_VISCOSITY: 0.05,       // High viscosity at boundary
+    GOLD_PUSH: 2                // Gentle repulsion force
   },
 
-  core: { x: 0, y: 0, vx: 0, vy: 0 },
+  core: { x: 0, y: 0, vx: 0, vy: 0, color: '#00FFCC', inGoldLayer: false },
   target: { x: 0, y: 0 },
   center: { x: 0, y: 0 },
 
@@ -79,20 +84,31 @@ const StabilizerCanvas = {
       (this.core.y - this.center.y) ** 2
     );
     
+    // 3. GOLD LAYER ENHANCEMENT
     if (distFromCenter > this.config.R_LIMIT) {
-      // Normalize vector back to center
+      this.core.inGoldLayer = true;
+      
+      // A. CONDUCTIVITY: High viscosity slowdown
+      this.core.vx *= this.config.GOLD_VISCOSITY;
+      this.core.vy *= this.config.GOLD_VISCOSITY;
+      
+      // B. REFRACTION: Change color to Gold
+      this.core.color = this.config.GOLD_HONEY;
+      
+      // C. GENTLE PUSH: Soft repulsion back to center
       const nx = (this.center.x - this.core.x) / distFromCenter;
       const ny = (this.center.y - this.core.y) / distFromCenter;
+      this.core.vx += nx * this.config.GOLD_PUSH;
+      this.core.vy += ny * this.config.GOLD_PUSH;
+    } else {
+      // Return to normal state when inside boundary
+      this.core.inGoldLayer = false;
+      this.core.color = '#00FFCC'; // Sanctuary Teal
       
-      // Apply massive kick back toward center
-      const overshoot = distFromCenter - this.config.R_LIMIT;
-      this.core.vx += nx * overshoot * (this.config.F_REPULSE / 100);
-      this.core.vy += ny * overshoot * (this.config.F_REPULSE / 100);
+      // Normal damping
+      this.core.vx *= this.config.DAMPING;
+      this.core.vy *= this.config.DAMPING;
     }
-
-    // 3. APPLY DAMPING & INTEGRATION
-    this.core.vx *= this.config.DAMPING;
-    this.core.vy *= this.config.DAMPING;
     
     this.core.x += this.core.vx;
     this.core.y += this.core.vy;
@@ -120,11 +136,15 @@ const StabilizerCanvas = {
       ctx.stroke();
     }
     
-    // Draw Boundary Circle (The Tightened Hexagon approximation)
+    // Draw Gold Layer Zone
     ctx.beginPath();
     ctx.arc(this.center.x, this.center.y, this.config.R_LIMIT, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
-    ctx.lineWidth = 2;
+    if (this.core.inGoldLayer) {
+      ctx.fillStyle = 'rgba(251, 192, 45, 0.1)'; // Gold glow when active
+      ctx.fill();
+    }
+    ctx.strokeStyle = this.core.inGoldLayer ? this.config.GOLD_HONEY : 'rgba(255, 215, 0, 0.3)';
+    ctx.lineWidth = this.core.inGoldLayer ? 3 : 2;
     ctx.stroke();
     
     // Draw Hexagonal Boundary
@@ -170,8 +190,8 @@ const StabilizerCanvas = {
       this.core.x, this.core.y, 0,
       this.core.x, this.core.y, 12
     );
-    gradient.addColorStop(0, '#00FFCC');
-    gradient.addColorStop(1, 'rgba(0, 255, 204, 0)');
+    gradient.addColorStop(0, this.core.color);
+    gradient.addColorStop(1, this.core.color.replace(')', ', 0)').replace('rgb', 'rgba'));
     
     ctx.beginPath();
     ctx.arc(this.core.x, this.core.y, 12, 0, Math.PI * 2);
@@ -180,7 +200,7 @@ const StabilizerCanvas = {
     
     ctx.beginPath();
     ctx.arc(this.core.x, this.core.y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = '#00FFCC';
+    ctx.fillStyle = this.core.color;
     ctx.fill();
     
     // Draw Stats
@@ -189,6 +209,7 @@ const StabilizerCanvas = {
     ctx.fillText(`VEL: ${Math.sqrt(this.core.vx**2 + this.core.vy**2).toFixed(2)}`, 10, 20);
     ctx.fillText(`DIST: ${Math.sqrt((this.core.x - this.center.x)**2 + (this.core.y - this.center.y)**2).toFixed(2)}`, 10, 35);
     ctx.fillText(`LIMIT: ${this.config.R_LIMIT}`, 10, 50);
+    ctx.fillText(`GOLD: ${this.core.inGoldLayer ? 'ACTIVE' : 'OFF'}`, 10, 65);
   },
 
   // ═══════════════════════════════════════════════════════════════════════════

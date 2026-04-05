@@ -18,6 +18,11 @@ const SovereignStabilizer = {
   R_LIMIT: 47.94,         // (86.6 - 1cm) * 0.56 = 44% reduction
   F_REPULSE: 400,         // Repulsion force multiplier
   DAMPING: 0.82,          // Velocity damping factor
+  
+  // GOLD LAYER
+  GOLD_HONEY: '#fbc02d',  // Roasted Honey Gold
+  GOLD_VISCOSITY: 0.05,   // High viscosity at boundary
+  GOLD_PUSH: 2,           // Gentle repulsion force
 
   // ═══════════════════════════════════════════════════════════════════════════
   // STABILIZE (Core physics tick)
@@ -27,25 +32,40 @@ const SovereignStabilizer = {
     // Initialize velocity if not present
     if (!module.v) module.v = { x: 0, y: 0 };
     if (!module.p) module.p = { x: module.x || 0, y: module.y || 0 };
+    if (!module.color) module.color = '#00FFCC';
 
     // A. INVERSE ATTRACTION: Pull toward target coords
     module.v.x += (target.x - module.p.x) * this.K_INVERSE;
     module.v.y += (target.y - module.p.y) * this.K_INVERSE;
 
-    // B. OPPOSITE REPULSION: Push away from 1cm buffered edge
+    // B. BOUNDARY CHECK
     const d = Math.sqrt(module.p.x ** 2 + module.p.y ** 2);
     
     if (d > this.R_LIMIT) {
-      const f_opp = (d - this.R_LIMIT) * this.F_REPULSE;
-      module.v.x -= (module.p.x / d) * f_opp;
-      module.v.y -= (module.p.y / d) * f_opp;
+      // GOLD LAYER ENHANCEMENT
+      module.inGoldLayer = true;
+      
+      // 1. CONDUCTIVITY: High viscosity slowdown
+      module.v.x *= this.GOLD_VISCOSITY;
+      module.v.y *= this.GOLD_VISCOSITY;
+      
+      // 2. REFRACTION: Change color to Gold
+      module.color = this.GOLD_HONEY;
+      
+      // 3. GENTLE PUSH: Soft repulsion back to center
+      module.v.x -= (module.p.x / d) * this.GOLD_PUSH;
+      module.v.y -= (module.p.y / d) * this.GOLD_PUSH;
+    } else {
+      // Normal state inside boundary
+      module.inGoldLayer = false;
+      module.color = '#00FFCC';
+      
+      // Normal damping
+      module.v.x *= this.DAMPING;
+      module.v.y *= this.DAMPING;
     }
 
-    // C. VELOCITY DAMPING: Smooth stabilization
-    module.v.x *= this.DAMPING;
-    module.v.y *= this.DAMPING;
-
-    // D. APPLY VELOCITY TO POSITION
+    // C. APPLY VELOCITY TO POSITION
     module.p.x += module.v.x;
     module.p.y += module.v.y;
 
