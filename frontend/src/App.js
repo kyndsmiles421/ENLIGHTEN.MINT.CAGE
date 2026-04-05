@@ -9,6 +9,7 @@ import './utils/EnlightenmentKey';       // Back-Side Pass Key (unlocks layers o
 import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (responds to ASCEND)
 import './utils/SovereignCleanup';       // V2.88 Final - Legacy purge, memory optimization, PWA hooks
 import './utils/WebXRPortal';            // WebXR Portal Engine - Spiral zoom → Immersive Dome
+import './utils/PortalAudioEngine';      // Spatial Audio - Shepard Tone + Solfeggio frequencies
 import './utils/SilenceShield';
 import './utils/SovereignOS';
 import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point

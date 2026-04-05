@@ -39,6 +39,13 @@
   "prefer_related_applications": false,
   "shortcuts": [
     {
+      "name": "Portal to Dome",
+      "short_name": "Portal",
+      "url": "/vr/celestial-dome",
+      "description": "Enter the Celestial Dome via Golden Spiral Portal",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
       "name": "Breathwork",
       "short_name": "Breathe",
       "url": "/breathing",

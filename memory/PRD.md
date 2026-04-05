@@ -108,6 +108,15 @@ for (let i = 0; i < 600; i++) {
   - SHAMBHALA_ASCEND integration for rainbow effect
   - Fullscreen fallback for non-VR devices
   - Keyboard shortcut: Ctrl+V
+- [x] **Portal Audio Engine** ✅
+  - 174Hz press hum (grounding)
+  - 6-voice Shepard Tone with circular panning
+  - 528Hz + 963Hz dome bloom with reverb
+  - Synced to 1.5s portal transition
+- [x] **PWA Manifest** ✅
+  - 192x192 and 512x512 icons configured
+  - Portal shortcut added to app shortcuts
+  - Standalone display mode enabled
 
 ---
 
