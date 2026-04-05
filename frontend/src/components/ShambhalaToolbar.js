@@ -1,12 +1,12 @@
 /**
- * SHAMBHALA BOTTOM TOOLBAR
- * A clean horizontal toolbar at the bottom
- * Pull-up panels for navigation and mixer
+ * SHAMBHALA BOTTOM TOOLBAR - AUDITED & FIXED
+ * Framework: React with useState for pull-up menu state
+ * Fixes: 44x44px touch targets, fixed positioning, no overflow clipping
  */
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Moon, Hexagon, Star, Award, Music, Settings, Home, Compass, Menu, X, ChevronUp } from 'lucide-react';
+import { Eye, Moon, Hexagon, Star, Award, Music, Home, Menu, X } from 'lucide-react';
 
 const ShambhalaToolbar = () => {
   const navigate = useNavigate();
@@ -27,17 +27,41 @@ const ShambhalaToolbar = () => {
 
   return (
     <>
-      {/* PULL-UP NAVIGATION PANEL */}
+      {/* PULL-UP NAVIGATION PANEL - Fixed to viewport, not nested */}
       {navOpen && (
         <div 
-          className="fixed inset-0 z-[99998]"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2147483645,
+            background: 'transparent'
+          }}
           onClick={() => setNavOpen(false)}
         >
           <div 
-            className="absolute bottom-28 left-0 right-0 bg-black/95 border-t border-gold-500/20 p-4"
+            style={{
+              position: 'fixed',
+              bottom: '80px',
+              left: 0,
+              right: 0,
+              background: 'rgba(0, 0, 0, 0.95)',
+              borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+              padding: '16px',
+              zIndex: 2147483646
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-center gap-4 flex-wrap max-w-md mx-auto">
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: '8px', 
+              flexWrap: 'wrap',
+              maxWidth: '400px',
+              margin: '0 auto'
+            }}>
               {navItems.map(item => (
                 <button
                   key={item.id}
@@ -45,14 +69,25 @@ const ShambhalaToolbar = () => {
                     navigate(item.path);
                     setNavOpen(false);
                   }}
-                  className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
-                    isActive(item.path)
-                      ? 'bg-gold-500/20 text-gold-400'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
-                  }`}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    minWidth: '56px',      /* 44px minimum + padding */
+                    minHeight: '56px',     /* 44px minimum + padding */
+                    padding: '8px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: isActive(item.path) ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    color: isActive(item.path) ? '#d4af37' : 'rgba(255,255,255,0.7)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
                 >
                   <item.icon size={24} />
-                  <span className="text-xs">{item.label}</span>
+                  <span style={{ fontSize: '10px' }}>{item.label}</span>
                 </button>
               ))}
             </div>
@@ -60,30 +95,53 @@ const ShambhalaToolbar = () => {
         </div>
       )}
 
-      {/* PULL-UP MIXER PANEL */}
+      {/* PULL-UP MIXER PANEL - Fixed to viewport */}
       {mixerOpen && (
         <div 
-          className="fixed inset-0 z-[99998]"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2147483645,
+            background: 'transparent'
+          }}
           onClick={() => setMixerOpen(false)}
         >
           <div 
-            className="absolute bottom-28 left-0 right-0 bg-black/95 border-t border-teal-500/20 p-4"
+            style={{
+              position: 'fixed',
+              bottom: '80px',
+              left: 0,
+              right: 0,
+              background: 'rgba(0, 0, 0, 0.95)',
+              borderTop: '1px solid rgba(0, 128, 128, 0.3)',
+              padding: '16px',
+              zIndex: 2147483646
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="max-w-md mx-auto">
-              <h3 className="text-teal-400 text-sm font-mono mb-3 text-center">SHAMBHALA MIXER</h3>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="flex flex-col items-center">
-                  <label className="text-xs text-white/50 mb-1">GOLD</label>
-                  <input type="range" className="w-full" min="0" max="100" defaultValue="71" />
+            <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+              <h3 style={{ 
+                color: '#008080', 
+                fontSize: '12px', 
+                fontFamily: 'monospace',
+                marginBottom: '12px',
+                textAlign: 'center'
+              }}>RESONANCE MIXER</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>GOLD</label>
+                  <input type="range" style={{ width: '100%' }} min="0" max="100" defaultValue="71" />
                 </div>
-                <div className="flex flex-col items-center">
-                  <label className="text-xs text-white/50 mb-1">COPPER</label>
-                  <input type="range" className="w-full" min="0" max="100" defaultValue="50" />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>COPPER</label>
+                  <input type="range" style={{ width: '100%' }} min="0" max="100" defaultValue="50" />
                 </div>
-                <div className="flex flex-col items-center">
-                  <label className="text-xs text-white/50 mb-1">TEAL</label>
-                  <input type="range" className="w-full" min="0" max="100" defaultValue="80" />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>TEAL</label>
+                  <input type="range" style={{ width: '100%' }} min="0" max="100" defaultValue="80" />
                 </div>
               </div>
             </div>
@@ -91,47 +149,82 @@ const ShambhalaToolbar = () => {
         </div>
       )}
 
-      {/* MAIN BOTTOM TOOLBAR - Pushed up above Emergent badge */}
+      {/* MAIN BOTTOM TOOLBAR - Fixed to viewport, above Emergent badge */}
       <div 
-        className="fixed left-0 right-0 h-14 bg-black/90 border-t border-gold-500/30 flex items-center justify-between px-4"
-        style={{ 
-          backdropFilter: 'blur(10px)',
-          bottom: '60px',
-          zIndex: 2147483647
+        style={{
+          position: 'fixed',
+          bottom: '70px',
+          left: 0,
+          right: 0,
+          height: '56px',
+          background: 'rgba(0, 0, 0, 0.9)',
+          borderTop: '1px solid rgba(212, 175, 55, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          zIndex: 2147483647,
+          backdropFilter: 'blur(10px)'
         }}
       >
-        {/* Left: Navigation Toggle */}
+        {/* Left: Navigation Toggle - 44x44px touch target */}
         <button
           onClick={() => {
             setNavOpen(!navOpen);
             setMixerOpen(false);
           }}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-            navOpen ? 'bg-gold-500/20 text-gold-400' : 'text-white/60 hover:text-white'
-          }`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            minWidth: '44px',
+            minHeight: '44px',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            border: 'none',
+            background: navOpen ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+            color: navOpen ? '#d4af37' : 'rgba(255,255,255,0.6)',
+            cursor: 'pointer'
+          }}
         >
           {navOpen ? <X size={20} /> : <Menu size={20} />}
-          <span className="text-xs font-mono hidden sm:inline">NAV</span>
+          <span style={{ fontSize: '11px', fontFamily: 'monospace' }}>NAV</span>
         </button>
 
-        {/* Center: App Title */}
-        <div className="flex items-center gap-2">
-          <Compass size={18} className="text-gold-400" />
-          <span className="text-gold-400 font-serif text-sm tracking-wider">SHAMBHALA</span>
+        {/* Center: Title */}
+        <div style={{ 
+          color: '#d4af37', 
+          fontFamily: 'Georgia, serif', 
+          fontSize: '14px',
+          letterSpacing: '2px'
+        }}>
+          RESONANCE
         </div>
 
-        {/* Right: Mixer Toggle */}
+        {/* Right: Mixer Toggle - 44x44px touch target */}
         <button
           onClick={() => {
             setMixerOpen(!mixerOpen);
             setNavOpen(false);
           }}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-            mixerOpen ? 'bg-teal-500/20 text-teal-400' : 'text-white/60 hover:text-white'
-          }`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            minWidth: '44px',
+            minHeight: '44px',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            border: 'none',
+            background: mixerOpen ? 'rgba(0, 128, 128, 0.2)' : 'transparent',
+            color: mixerOpen ? '#008080' : 'rgba(255,255,255,0.6)',
+            cursor: 'pointer'
+          }}
         >
           <Music size={20} />
-          <span className="text-xs font-mono hidden sm:inline">MIXER</span>
+          <span style={{ fontSize: '11px', fontFamily: 'monospace' }}>MIX</span>
         </button>
       </div>
     </>
