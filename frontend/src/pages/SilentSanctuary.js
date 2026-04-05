@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSanctuary } from '../context/EnlightenmentContext';
 import { useEnlightenmentUI, ManualModeIndicator } from '../utils/EnlightenmentUI';
+import { ShieldStatus } from '../utils/SilenceShield';
 
 /**
  * SilentSanctuary.js — The Void Interface
@@ -163,6 +164,11 @@ export default function SilentSanctuary() {
         <div className="mode-indicator">
           <ManualModeIndicator compact />
         </div>
+        
+        {/* Shield Status */}
+        <div className="shield-indicator">
+          <ShieldStatus minimal />
+        </div>
       </div>
 
       {/* THE PULL-UP INTERFACE */}
@@ -281,6 +287,13 @@ export default function SilentSanctuary() {
           position: absolute;
           top: 20px;
           left: 20px;
+          z-index: 100;
+        }
+
+        .shield-indicator {
+          position: absolute;
+          top: 20px;
+          left: 50px;
           z-index: 100;
         }
 
