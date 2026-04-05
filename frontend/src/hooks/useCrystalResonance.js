@@ -291,7 +291,8 @@ export const useCrystalResonance = (options = {}) => {
       mountedRef.current = false;
       stopPolling();
     };
-  }, [autoConnect, startPolling, stopPolling]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoConnect]); // Remove startPolling/stopPolling - they use refs internally
 
   // ─────────────────────────────────────────────────────────────────────────
   // COMPUTED VALUES

@@ -51,7 +51,9 @@ export default function useGameController(moduleId) {
     setLoading(false);
   }, [headers]);
 
-  useEffect(() => { fetchState(true); }, [fetchState]);
+  useEffect(() => { fetchState(true); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headers]);
 
   // CSS variables for element-aware theming
   const elementCSS = useMemo(() => buildElementCSS(nexusState), [nexusState]);

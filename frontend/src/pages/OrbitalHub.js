@@ -468,6 +468,7 @@ export default function OrbitalHub() {
           zIndex: 2,
           maxWidth: '100vw', 
           maxHeight: 'calc(100vh - 100px)',
+          pointerEvents: 'none', // Let events pass through to children
           ...depth.getContainerStyle(1200), // 3D perspective + optional gyro
         }}
         data-container
@@ -565,6 +566,7 @@ export default function OrbitalHub() {
               data-orb-id={sat.id}
               className="absolute cursor-pointer select-none"
               style={{
+                pointerEvents: 'auto', // Enable clicks on sub-orbs
                 // GPU-accelerated 3D transform
                 ...depth.getTransform3D(
                   center + pos.x - size / 2,
@@ -696,6 +698,7 @@ export default function OrbitalHub() {
             width: coreDiameter,
             height: coreDiameter,
             zIndex: 15,
+            pointerEvents: 'auto', // Explicitly enable pointer events for the core
           }}
           onClick={handleCoreClick}
           data-testid="central-orb"

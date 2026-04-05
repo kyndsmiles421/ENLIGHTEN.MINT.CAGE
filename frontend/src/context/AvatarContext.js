@@ -27,7 +27,9 @@ export function AvatarProvider({ children }) {
     }
   }, [user, authHeaders]);
 
-  useEffect(() => { refreshAvatar(); }, [refreshAvatar]);
+  useEffect(() => { refreshAvatar(); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // GATEKEEPER: Memoize context value
   const value = useMemo(() => ({

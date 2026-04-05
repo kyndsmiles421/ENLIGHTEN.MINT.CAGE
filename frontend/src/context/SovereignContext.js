@@ -83,13 +83,16 @@ export function SovereignProvider({ children }) {
     setLoaded(true);
   }, [authHeaders, authLoading, token]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => { refresh(); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, token]);
 
   useEffect(() => {
     const unsub1 = eventBus.subscribe('purchase_complete', () => refresh());
     const unsub2 = eventBus.subscribe('subscription_upgraded', () => refresh());
     return () => { unsub1(); unsub2(); };
-  }, [refresh]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const hasCapability = useCallback((key) => {
     return capabilities[key] === true || (typeof capabilities[key] === 'number' && capabilities[key] > 0);

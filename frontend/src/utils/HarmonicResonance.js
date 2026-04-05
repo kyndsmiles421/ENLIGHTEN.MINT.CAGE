@@ -5,6 +5,8 @@
  * Each frequency has unique healing/spiritual properties.
  */
 
+import { useState, useCallback, useEffect, useRef } from 'react';
+
 // Solfeggio Frequency Map with properties
 export const SOLFEGGIO_FREQUENCIES = {
   174: { name: 'Foundation', pulse: '5s', color: 'rgba(139, 69, 19, 0.6)', description: 'Pain relief, security' },
@@ -86,7 +88,6 @@ export const cycleResonance = (direction = 'up') => {
 /**
  * React Hook for harmonic resonance
  */
-import { useState, useEffect, useCallback } from 'react';
 
 export const useHarmonicResonance = () => {
   const [resonance, setResonance] = useState(getCurrentResonance());
@@ -144,6 +145,70 @@ export const useHarmonicResonance = () => {
   };
 };
 
+/**
+ * GOLDEN RATIO GEAR SYSTEM
+ * 
+ * Deterministic rotation system using Phi (φ = 1.618) for the "webbed" interlocking effect.
+ * Uses refs to avoid triggering React re-renders on every frame.
+ * 
+ * @param {number} initialSpeed - Base rotation speed in radians per frame
+ * @returns {Object} - { getRotation, startGears, stopGears }
+ */
+export const useGearSystem = (initialSpeed = 0.01) => {
+  const rotationRef = useRef({ cw: 0, ccw: 0 });
+  const frameIdRef = useRef(null);
+  const callbacksRef = useRef(new Set());
+  const PHI = 1.618033988749895; // Golden Ratio
+  
+  const startGears = useCallback(() => {
+    if (frameIdRef.current) return; // Already running
+    
+    const tick = () => {
+      // Update rotation values (no React state = no re-renders)
+      rotationRef.current = {
+        cw: (rotationRef.current.cw + initialSpeed) % (Math.PI * 2),
+        ccw: (rotationRef.current.ccw - (initialSpeed * PHI)) % (Math.PI * 2)
+      };
+      
+      // Notify subscribers (for DOM updates)
+      callbacksRef.current.forEach(cb => cb(rotationRef.current));
+      
+      frameIdRef.current = requestAnimationFrame(tick);
+    };
+    
+    frameIdRef.current = requestAnimationFrame(tick);
+  }, [initialSpeed]);
+  
+  const stopGears = useCallback(() => {
+    if (frameIdRef.current) {
+      cancelAnimationFrame(frameIdRef.current);
+      frameIdRef.current = null;
+    }
+  }, []);
+  
+  // Subscribe to rotation updates for DOM manipulation
+  const subscribeToGears = useCallback((callback) => {
+    callbacksRef.current.add(callback);
+    return () => callbacksRef.current.delete(callback);
+  }, []);
+  
+  // Get current rotation (for one-off reads)
+  const getRotation = useCallback(() => rotationRef.current, []);
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => stopGears();
+  }, [stopGears]);
+  
+  return {
+    getRotation,
+    startGears,
+    stopGears,
+    subscribeToGears,
+    PHI,
+  };
+};
+
 export default {
   SOLFEGGIO_FREQUENCIES,
   setGlobalResonance,
@@ -151,4 +216,5 @@ export default {
   clearResonance,
   cycleResonance,
   useHarmonicResonance,
+  useGearSystem,
 };

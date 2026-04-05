@@ -113,6 +113,10 @@ export default memo(function PersistentWaveform() {
     animRef.current = requestAnimationFrame(draw);
   }, [analyserRef, isPlaying, muted, getColor]);
 
+  // Store draw function ref to avoid effect recreation
+  const drawRef = useRef(draw);
+  drawRef.current = draw;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -122,12 +126,18 @@ export default memo(function PersistentWaveform() {
     };
     resize();
     window.addEventListener('resize', resize);
-    animRef.current = requestAnimationFrame(draw);
+    
+    // Use ref to call latest draw without effect recreation
+    const tick = () => {
+      drawRef.current();
+    };
+    animRef.current = requestAnimationFrame(tick);
+    
     return () => {
       window.removeEventListener('resize', resize);
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
-  }, [draw]);
+  }, []); // Empty deps - only runs once on mount
 
   if (hideOnHub) return null;
 

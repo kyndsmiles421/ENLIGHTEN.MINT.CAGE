@@ -23,7 +23,9 @@ export function CreditProvider({ children }) {
     } catch {}
   }, [user]);
 
-  useEffect(() => { fetchCredits(); }, [fetchCredits]);
+  useEffect(() => { fetchCredits(); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const useCredits = useCallback(async (action) => {
     const token = localStorage.getItem('zen_token');

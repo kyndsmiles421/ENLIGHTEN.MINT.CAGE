@@ -179,7 +179,8 @@ export function EnlightenmentCafeProvider({ children }) {
 
   useEffect(() => {
     savePreferences();
-  }, [viewTier, colorMode, atmosphere, savePreferences]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewTier, colorMode, atmosphere]); // Remove savePreferences to prevent infinite loop
 
   // Get current palette
   const getPalette = useCallback(() => {
