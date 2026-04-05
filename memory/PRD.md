@@ -1415,3 +1415,75 @@ Spotless=432Hz, Cafe=528Hz, Tech=741Hz, Meditation=396Hz, Stars=852Hz, Wellness=
   - `/app/frontend/src/systems/OrbitalWidgetSystem.js` - collision-avoidance positioning
   - Widgets assigned to orbital paths (INNER/MIDDLE/OUTER) with angular separation
 - **Result**: Mobile view now CLEAN - main content visible, no overlapping elements, proper layer separation
+
+---
+
+## Central Crystal & Harmonic Resistance Architecture (April 2026)
+
+### Central Crystal — The Heart of Equilibrium
+**"The Singular Resonance Point"**
+
+The Central Crystal maintains the 'Equilibrium' of the entire system. It acts as the state manager that all modules pulse toward.
+
+**Files:**
+| File | Purpose |
+|------|---------|
+| `/app/backend/engines/central_crystal.py` | Core crystal state management |
+| `/app/backend/engines/harmonic_guardrail.py` | Intent filtering (blocks dissonance) |
+| `/app/backend/engines/enlightenment_router.py` | Temporal resistance routing |
+| `/app/backend/routes/crystal.py` | API endpoints for frontend |
+
+**Source Frequencies:**
+| Source | Frequency | Resistance | Description |
+|--------|-----------|------------|-------------|
+| Void | 0.0 Hz | 0.1 | The empty state, the beginning |
+| Breathing | 111.0 Hz | 0.2 | Quick centering, kinetic calm |
+| Mixer | 528.0 Hz | 0.8 | Sound synthesis, frequency blending |
+| Sanctuary | 432.0 Hz | 1.2 | Safe space, harmonic balance |
+| I Ching | 639.0 Hz | 1.5 | Ancient wisdom, hexagram meditation |
+| Star Chart | 777.0 Hz | 1.8 | Celestial navigation, cosmic alignment |
+| Tarot | 741.0 Hz | 1.8 | Archetypal journey, symbolic insight |
+| Oracle | 852.0 Hz | 2.2 | Intuitive guidance, inner knowing |
+| Divination | 888.0 Hz | 2.5 | Oracle wisdom, deep insight |
+| Tesseract | 963.0 Hz | 2.8 | 4D navigation, recursive depth |
+
+### Harmonic Guardrail — Intent Filtration
+**"Protecting the Crystal from Dissonance"**
+
+Every input to the system carries an 'intent frequency'. The Guardrail analyzes signals and:
+- **GROUNDS** (blocks) dissonant signals (resonance < 0.3)
+- **ALIGNS** (allows) neutral signals (0.3 ≤ resonance < 0.8)
+- **ELEVATES** (boosts) highly harmonious signals (resonance ≥ 0.8)
+
+**Resonance Calculation:**
+- Base: 0.5 (neutral)
+- Harmony keywords (+0.1 each): learn, grow, wisdom, sacred, meditation, etc.
+- Dissonance keywords (-0.2 each): destroy, delete everything, hate, worthless, etc.
+- Excessive caps/punctuation: -0.1 to -0.15
+
+### Enlightenment Router — Temporal Resistance
+**"Slowed Momentum for Deep Content"**
+
+Three processing lanes based on content weight:
+| Lane | Weight | Delay | Description |
+|------|--------|-------|-------------|
+| ⚡ Kinetic | ≤ 0.4 | 0.01s | UI interactions, quick responses |
+| ⚖️ Balanced | > 0.4, ≤ 0.8 | 0.5s | Standard content flow |
+| 🧘 Theological | > 0.8 | 2.5s | Deep wisdom, contemplative content |
+
+**API Endpoints:**
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/crystal/state` | GET | Current crystal state |
+| `/api/crystal/sources` | GET | Available source buttons |
+| `/api/crystal/pulse` | POST | Harmonic pull to new target |
+| `/api/crystal/instant` | POST | Instant shift (no delay) |
+| `/api/crystal/history` | GET | Transition history |
+| `/api/crystal/reset` | POST | Reset to Void |
+| `/api/crystal/guardrail/analyze` | POST | Test intent analysis |
+| `/api/crystal/interface` | GET | Full interface state |
+| `/api/harmonic/process` | POST | Process content through router |
+| `/api/harmonic/lanes` | GET | Available processing lanes |
+
+**Keith Wright's Principle:**
+Higher resistance = more steps = slower transition = deeper contemplation
