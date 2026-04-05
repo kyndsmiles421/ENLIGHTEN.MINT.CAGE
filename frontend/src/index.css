@@ -3108,3 +3108,46 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
   bottom: 50px !important;
   z-index: 999999 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PUSH EMERGENT BADGE TO BACK
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Target the Emergent badge and push it behind everything */
+#emergent-badge,
+[id*="emergent"],
+[class*="emergent-badge"],
+a[href*="emergentagent.com"],
+div[style*="Made with Emergent"],
+iframe[src*="emergent"] {
+  z-index: 1 !important;
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+}
+
+/* Hide the green dot completely */
+.green-dot,
+div[style*="background-color: green"],
+div[style*="background: green"],
+div[style*="rgb(0, 128, 0)"],
+div[style*="#00ff00"],
+div[style*="#0f0"],
+[style*="width: 10px"][style*="height: 10px"][style*="border-radius"],
+[style*="width: 8px"][style*="height: 8px"][style*="border-radius"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Ensure our UI is always on top */
+#shambhala-root,
+.sanctuary-root,
+.sovereign-header,
+.sovereign-ui-layer {
+  z-index: 999999 !important;
+}
+
+/* Add bottom padding to account for badge */
+body {
+  padding-bottom: 60px !important;
+}
