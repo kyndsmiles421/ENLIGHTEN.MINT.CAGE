@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/SilenceShield';
 import './utils/SovereignOS';
-import './utils/SovereignStreamlineClean';  // v3.1 Clean Edition
+import './utils/SovereignStreamlineV4';  // v4.0 with Spatial Audio
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';

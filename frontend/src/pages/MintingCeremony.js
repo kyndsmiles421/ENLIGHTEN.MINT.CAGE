@@ -10,7 +10,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SeedVisualizer, SeedVisualizerMini, useAnimatedLayerCount } from '../components/SeedVisualizer';
-import SovereignStreamline from '../utils/SovereignStreamlineClean';
+import SovereignStreamline from '../utils/SovereignStreamlineV4';
 
 export default function MintingCeremony() {
   const navigate = useNavigate();
@@ -18,9 +18,16 @@ export default function MintingCeremony() {
   const [currentLayer, setCurrentLayer] = useState(0);
   const [mintResult, setMintResult] = useState(null);
   const [seedInput, setSeedInput] = useState('');
+  const [audioEnabled, setAudioEnabled] = useState(true);
 
   // Animated layer count for smooth visualization
   const displayLayer = useAnimatedLayerCount(currentLayer, 500);
+
+  const toggleAudio = useCallback(() => {
+    const newState = !audioEnabled;
+    setAudioEnabled(newState);
+    SovereignStreamline.setAudioEnabled(newState);
+  }, [audioEnabled]);
 
   const startMinting = useCallback(async () => {
     if (!seedInput.trim()) return;
@@ -29,16 +36,14 @@ export default function MintingCeremony() {
     setCurrentLayer(0);
     setMintResult(null);
 
-    // Subscribe to progress updates
+    // Subscribe to progress updates (includes audio tones)
     const unsubProgress = SovereignStreamline.on('mint-progress', (progress) => {
       setCurrentLayer(progress.layer);
     });
 
     try {
-      const result = await SovereignStreamline.trigger('MINT', null, {
-        seed: seedInput,
-        depth: 54
-      });
+      // Use v4 mintSeed with spatial audio
+      const result = await SovereignStreamline.mintSeed(seedInput, 54);
       
       setMintResult(result);
       setCurrentLayer(54);
@@ -62,6 +67,13 @@ export default function MintingCeremony() {
         <button className="back-btn" onClick={() => navigate(-1)}>← BACK</button>
         <h1>SEED MINTING CEREMONY</h1>
         <div className="header-subtitle">L² FRACTAL ENGINE • 54 SUBLAYERS</div>
+        <button 
+          className={`audio-toggle ${audioEnabled ? 'enabled' : 'disabled'}`}
+          onClick={toggleAudio}
+          title={audioEnabled ? 'Mute ritual audio' : 'Enable ritual audio'}
+        >
+          {audioEnabled ? '🔊' : '🔇'}
+        </button>
       </div>
 
       <div className="ceremony-main">
@@ -181,6 +193,31 @@ export default function MintingCeremony() {
         .back-btn:hover {
           border-color: #00FFC2;
           color: #00FFC2;
+        }
+
+        .audio-toggle {
+          position: absolute;
+          right: 20px;
+          top: 20px;
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.2);
+          padding: 8px 12px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .audio-toggle.enabled {
+          border-color: #00FFC2;
+        }
+
+        .audio-toggle.disabled {
+          border-color: rgba(255,255,255,0.1);
+          opacity: 0.5;
+        }
+
+        .audio-toggle:hover {
+          border-color: #A855F7;
         }
 
         .ceremony-header h1 {
