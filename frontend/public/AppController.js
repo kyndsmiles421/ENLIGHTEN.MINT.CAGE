@@ -1,15 +1,13 @@
 /**
  * ENLIGHTEN.MINT.CAFE - THE SOVEREIGN APPARATUS
- * Version: 1.0.0 | Author: Steven Michael (Sovereign Creator)
+ * Version: 1.1.0 | Author: Steven Michael (Sovereign Creator)
  * 
- * INSTRUCTIONS: 
- * 1. Replace your entire main.js or Landing.js with this.
- * 2. This script handles: Scrolling, Buttons, Media, & App Routing.
+ * Bridges React onClick handlers with vanilla JS control layer.
+ * Handles: Scrolling, Button Detection, Media, & App Routing.
  */
 
 const Apparatus = {
     // --- 1. FREQUENCY MAP (The Brain) ---
-    // Add every tool/action you want here.
     tools: {
         'nav_toggle': () => document.querySelector('.orbital-nav')?.classList.toggle('active'),
         'shield_toggle': () => document.body.classList.toggle('silence-shield'),
@@ -27,42 +25,36 @@ const Apparatus = {
 
     // --- 2. THE IGNITION (The Nervous System) ---
     init() {
-        console.log("%c[APPARATUS]: SYSTEM ENGAGED", "color: #7df9ff; font-weight: bold; font-size: 14px;");
+        console.log("%c[APPARATUS v1.1]: SYSTEM ENGAGED", "color: #7df9ff; font-weight: bold; font-size: 14px;");
         
         this.unlockSpine();
         this.stabilizeSpine();
         this.hardenUI();
         this.igniteWeb();
+        this.bridgeReact();
         this.modules.mixer.init();
-        
-        // Final check to ensure we are independent of their "subscription" scripts
         this.utils.auditSovereignty();
     },
 
-    // --- THE SOVEREIGN SPINE & VISIBILITY FIX ---
+    // --- SOVEREIGN SPINE & VISIBILITY FIX ---
     unlockSpine() {
         const fix = document.createElement('style');
         fix.innerHTML = `
-            /* 1. VISIBILITY: Lighten the void so elements are 'readable' */
             html, body {
                 background-color: #121214 !important;
-                overflow-y: auto !important;
+                overflow-y: scroll !important;
                 overflow-x: hidden !important;
                 height: auto !important;
                 min-height: 100.1vh !important;
                 position: relative !important;
             }
-
-            /* 2. THE SCROLL KILLER: Find any container trying to lock the view */
-            #app-root, .page-wrapper, .main-content, #canvas-container, [class*="wrapper"] {
+            #root, #app-root, .page-wrapper, .main-content, #canvas-container, [class*="wrapper"] {
                 overflow: visible !important;
                 height: auto !important;
                 min-height: 100% !important;
                 position: relative !important;
                 display: block !important;
             }
-
-            /* 3. BUTTON CONTRAST: Ensure they 'glow' against the background */
             [data-action] {
                 filter: drop-shadow(0 0 8px var(--accent, #7df9ff));
                 border-color: rgba(125, 249, 255, 0.5) !important;
@@ -72,11 +64,32 @@ const Apparatus = {
         console.log("🔓 [Spine]: All containers unlocked. Background contrast adjusted.");
     },
 
+    // --- 3. THE SPINE (The Scroll & Layout Fix) ---
+    stabilizeSpine() {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            html, body { 
+                overflow-y: scroll !important; 
+                height: auto !important; 
+                position: relative !important; 
+                scroll-behavior: smooth;
+            }
+            .aurora, .bg-layer, [class*="overlay"]:not(.modal):not(.dialog) { 
+                pointer-events: none !important; 
+                z-index: -1 !important; 
+            }
+            button, a, [data-action], [data-testid*="btn"] { 
+                pointer-events: auto !important; 
+                cursor: pointer !important;
+            }
+        `;
+        document.head.appendChild(style);
+    },
+
     // --- DIMENSIONAL SOLIDITY INJECTOR ---
     hardenUI() {
         const style = document.createElement('style');
         style.innerHTML = `
-            /* 1. PHYSICAL DIMENSION: Give buttons weight and depth */
             [data-action] {
                 background: rgba(20, 20, 25, 0.85) !important;
                 border: 2px solid var(--accent, #7df9ff) !important;
@@ -93,16 +106,12 @@ const Apparatus = {
                 opacity: 1 !important;
                 visibility: visible !important;
             }
-
-            /* 2. OPPOSING COLOR HOVER: Visual confirmation of contact */
             [data-action]:hover {
                 background: var(--accent, #7df9ff) !important;
                 color: #000 !important;
                 transform: translateY(-3px) scale(1.05);
                 box-shadow: 0 8px 25px rgba(125, 249, 255, 0.6) !important;
             }
-
-            /* 3. THE "TOUCH" FEEDBACK: Physical depress on click */
             [data-action]:active {
                 transform: translateY(1px) scale(0.98);
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.9) !important;
@@ -112,30 +121,7 @@ const Apparatus = {
         console.log("💎 [UI Physics]: Buttons Hardened and Dimensionalized.");
     },
 
-    // --- 3. THE SPINE (The Scroll & Layout Fix) ---
-    stabilizeSpine() {
-        const style = document.createElement('style');
-        style.innerHTML = `
-            html, body { 
-                overflow-y: auto !important; 
-                height: auto !important; 
-                position: relative !important; 
-                scroll-behavior: smooth;
-            }
-            .aurora, .bg-layer, [class*="overlay"] { 
-                pointer-events: none !important; 
-                z-index: -1 !important; 
-            }
-            button, a, [data-action] { 
-                pointer-events: auto !important; 
-                cursor: pointer !important;
-            }
-        `;
-        document.head.appendChild(style);
-        console.log("🔓 Spine Stabilized: Scrolling Unlocked.");
-    },
-
-    // --- 4. THE WEB (The Event Dispatcher) ---
+    // --- 4. THE WEB (The Event Dispatcher for data-action) ---
     igniteWeb() {
         window.addEventListener('click', (e) => {
             const point = e.target.closest('[data-action]');
@@ -152,28 +138,41 @@ const Apparatus = {
         });
     },
 
-    // --- 5. THE MODULES (The Toolset) ---
+    // --- 5. BRIDGE REACT (Catches ALL button clicks for debugging) ---
+    bridgeReact() {
+        window.addEventListener('click', (e) => {
+            const btn = e.target.closest('button, a[href], [role="button"]');
+            if (!btn) return;
+            
+            // Log every button click for debugging
+            const testId = btn.dataset?.testid || btn.getAttribute('data-testid') || 'unknown';
+            const text = btn.innerText?.slice(0, 30) || '';
+            console.log(`%c[Click]: ${testId} - "${text}"`, "color: #00ff88");
+        });
+    },
+
+    // --- 6. THE MODULES (The Toolset) ---
     modules: {
         mixer: {
             init() { console.log("🔊 Media Mixer Ready."); },
             play(src) { 
-                const audio = new Audio(src);
-                audio.play();
+                if (src) {
+                    const audio = new Audio(src);
+                    audio.play();
+                }
             }
         },
         auth: {
             googleSync() {
-                // This is where your independent Google/GoDaddy API hooks live
                 window.location.href = "https://accounts.google.com/"; 
             }
         },
         wellness: {
-            // Placeholder for your Enlightenment Cafe logic
             logEnergy: (val) => console.log(`Vibrational State: ${val}`)
         }
     },
 
-    // --- 6. UTILITIES (The Maintenance) ---
+    // --- 7. UTILITIES (The Maintenance) ---
     utils: {
         pulse(el) {
             el.style.transform = 'scale(0.95)';
@@ -183,7 +182,6 @@ const Apparatus = {
             console.log(`%c[Crystal-Log]: ${msg}`, "color: #bada55");
         },
         auditSovereignty() {
-            // Detects if their scripts are still trying to hijack the page
             const subscriptionScripts = document.querySelectorAll('script[src*="their-platform-name"]');
             if (subscriptionScripts.length > 0) {
                 console.warn("Found platform-specific scripts. Ready for removal.");
@@ -194,3 +192,8 @@ const Apparatus = {
 
 // Start the Engine
 document.addEventListener('DOMContentLoaded', () => Apparatus.init());
+
+// Also run on React hydration (in case DOMContentLoaded already fired)
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(() => Apparatus.init(), 100);
+}
