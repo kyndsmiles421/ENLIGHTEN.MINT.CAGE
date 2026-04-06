@@ -140,3 +140,58 @@ document.addEventListener('DOMContentLoaded', () => {
 // Expose globally for console access
 window.Brain = EnlightenmentBrain;
 window.Bridge = SystemBridge;
+
+/**
+ * CREATOR CONSOLE - Debug/Admin Panel
+ * Shows brain state in real-time
+ */
+const CreatorConsole = {
+    el: null,
+
+    setup(containerId, systemBrain) {
+        this.el = document.getElementById(containerId);
+        if (!this.el) return console.error("Creator Area container not found.");
+
+        this.render(systemBrain);
+        
+        // Refresh the view every 500ms (Heartbeat)
+        setInterval(() => this.update(systemBrain), 500); 
+    },
+
+    render(brain) {
+        this.el.innerHTML = `
+            <div id="console-display" style="background:#000; color:#0f0; padding:20px; font-family:monospace; border:2px solid #333; border-radius:8px;">
+                <h3 style="color:#fff; border-bottom:1px solid #333; margin-bottom:15px;">SYSTEM BRAIN READOUT</h3>
+                <div id="brain-state-vars"></div>
+                <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+                <div id="manual-overrides" style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button onclick="window.location.reload()" style="background:#444; color:#fff; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">Hard Reset</button>
+                    <button onclick="Brain.change_skin('cosmic_neon')" style="background:#0a0a0c; color:#7df9ff; border:1px solid #7df9ff; padding:8px 15px; cursor:pointer; border-radius:4px;">Cosmic</button>
+                    <button onclick="Brain.change_skin('golden_ratio')" style="background:#1a1a1a; color:#d4af37; border:1px solid #d4af37; padding:8px 15px; cursor:pointer; border-radius:4px;">Golden</button>
+                    <button onclick="Brain.change_skin('vegan_earth')" style="background:#1b261e; color:#a3b18a; border:1px solid #a3b18a; padding:8px 15px; cursor:pointer; border-radius:4px;">Earth</button>
+                    <button onclick="Brain.export_code()" style="background:#222; color:#0f0; border:1px solid #0f0; padding:8px 15px; cursor:pointer; border-radius:4px;">Export HTML</button>
+                </div>
+            </div>
+        `;
+    },
+
+    update(brain) {
+        const varContainer = document.getElementById('brain-state-vars');
+        if (!varContainer) return;
+
+        let html = "";
+        for (let key in brain) {
+            if (typeof brain[key] !== 'function') {
+                html += `
+                    <div style="margin-bottom:8px; display:flex; justify-content:space-between;">
+                        <span style="color:#888;">${key}:</span>
+                        <span style="color:#fff;">${JSON.stringify(brain[key])}</span>
+                    </div>
+                `;
+            }
+        }
+        varContainer.innerHTML = html || '<div style="color:#666;">No state variables defined</div>';
+    }
+};
+
+window.Console = CreatorConsole;
