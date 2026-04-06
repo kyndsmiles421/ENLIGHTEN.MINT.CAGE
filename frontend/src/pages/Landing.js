@@ -924,6 +924,29 @@ export default function Landing() {
         <ShareButton />
       </div>
 
+      {/* SIGN IN LINK - Top Left - Always Visible */}
+      {!user && (
+        <div className="fixed top-4 left-4 z-50">
+          <button 
+            onClick={() => navigate('/auth')}
+            style={{
+              background: 'rgba(255,255,255,0.15)',
+              border: '2px solid rgba(255,255,255,0.5)',
+              borderRadius: '25px',
+              padding: '10px 24px',
+              color: '#fff',
+              fontWeight: '600',
+              fontSize: '14px',
+              cursor: 'pointer',
+              backdropFilter: 'blur(12px)',
+            }}
+            data-testid="header-sign-in-btn"
+          >
+            Sign In
+          </button>
+        </div>
+      )}
+
       {/* Aurora overlays — immersive portal layers */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         <div className="absolute top-0 left-1/4 w-[700px] h-[700px] rounded-full animate-aurora"
@@ -1001,6 +1024,23 @@ export default function Landing() {
                   {user ? 'Continue Journey' : 'Begin Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
+              
+              {/* SIGN IN BUTTON - Always visible */}
+              {!user && (
+                <button onClick={() => navigate('/auth')}
+                  className="group py-3 px-8 rounded-full cursor-pointer"
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    border: '2px solid rgba(255,255,255,0.4)',
+                    backdropFilter: 'blur(12px)',
+                  }}
+                  data-testid="sign-in-btn">
+                  <span className="flex items-center gap-2 text-white font-semibold">
+                    Sign In / Register
+                  </span>
+                </button>
+              )}
+              
               <button onClick={() => setShowTour(true)}
                 onTouchEnd={(e) => { e.preventDefault(); setShowTour(true); }}
                 className="group py-3 px-6 rounded-full cursor-pointer"
