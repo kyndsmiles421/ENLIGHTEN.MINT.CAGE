@@ -884,13 +884,15 @@ function Footer() {
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // ═══ TIERED ACCESS LOGIC ═══
+  // Clean separation: Guest vs Sovereign
+  const isGuest = !user || user.id === 'guest';
+  
   const [breathScale, setBreathScale] = useState(1);
   const [showQuickReset, setShowQuickReset] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const animRef = useRef(null);
-
-  // Tour only opens when user clicks "Take the Tour" button
-  // No auto-launch — first-time visitors should be able to navigate freely
 
   const handleTourFinish = () => {
     localStorage.setItem('zen_tour_seen', 'true');
@@ -916,16 +918,22 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen immersive-page relative" style={{ background: 'transparent' }}>
+      {/* ═══════════════════════════════════════════════════════════════════
+          LAYER 1: THE CORE IMMERSIVE SOUL (Always Visible)
+          - Breathing Orb animation
+          - Aurora overlays (VoidShield aesthetic)
+          - Modals and overlays
+          ═══════════════════════════════════════════════════════════════════ */}
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
       <GuidedTour isOpen={showTour} onClose={() => { setShowTour(false); handleTourFinish(); }} onFinish={handleTourFinish} />
 
-      {/* Share Button */}
+      {/* Share Button - Always visible */}
       <div className="fixed top-4 right-4 z-50">
         <ShareButton />
       </div>
 
-      {/* SIGN IN LINK - Top Left - Always Visible for guests */}
-      {(!user || user.id === 'guest') && (
+      {/* SIGN IN - Top Left (Guest Entry Point) */}
+      {isGuest && (
         <div className="fixed top-4 left-4 z-50">
           <button 
             onClick={() => navigate('/auth')}
@@ -947,7 +955,7 @@ export default function Landing() {
         </div>
       )}
 
-      {/* Aurora overlays — immersive portal layers */}
+      {/* Aurora overlays — immersive portal layers (VoidShield Layer 1) */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         <div className="absolute top-0 left-1/4 w-[700px] h-[700px] rounded-full animate-aurora"
           style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, rgba(217,70,239,0.04) 40%, transparent 70%)', filter: 'blur(80px)' }} />
@@ -959,13 +967,17 @@ export default function Landing() {
           style={{ background: 'radial-gradient(ellipse, rgba(253,164,175,0.06) 0%, transparent 60%)', filter: 'blur(90px)', animation: 'aurora 20s ease-in-out infinite reverse' }} />
       </div>
 
-      {/* ═══ Personalized Dashboard for returning users ═══ */}
-      {user && user.id !== 'guest' && (
+      {/* ═══════════════════════════════════════════════════════════════════
+          LAYER 2: TIERED INTERACTION WINDOW
+          - TIER A (Guest): Hero + Entry Pillars + Sign-In focus
+          - TIER B (Sovereign): Personalized Dashboard
+          ═══════════════════════════════════════════════════════════════════ */}
+      {!isGuest && (
         <PersonalizedDashboard user={user} onQuickReset={() => setShowQuickReset(true)} />
       )}
 
-      {/* ═══ Hero (shown for everyone, adjusted padding for logged-in) ═══ */}
-      <div className={`relative z-10 px-6 md:px-12 lg:px-24 ${(user && user.id !== 'guest') ? 'pt-8 pb-12' : 'pt-28 pb-20'}`}>
+      {/* ═══ Hero (shown for everyone, adjusted padding for tier) ═══ */}
+      <div className={`relative z-10 px-6 md:px-12 lg:px-24 ${!isGuest ? 'pt-8 pb-12' : 'pt-28 pb-20'}`}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -1016,17 +1028,17 @@ export default function Landing() {
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
-              <button onClick={() => navigate((user && user.id !== 'guest') ? '/dashboard' : '/auth')}
+              <button onClick={() => navigate(isGuest ? '/auth' : '/dashboard')}
                 className="btn-glass group"
                 style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
                 data-testid="begin-journey-btn">
                 <span className="flex items-center gap-2" style={{ color: '#2DD4BF' }}>
-                  {(user && user.id !== 'guest') ? 'Continue Journey' : 'Begin Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  {isGuest ? 'Begin Journey' : 'Continue Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
               
-              {/* SIGN IN BUTTON - Visible for guests */}
-              {(!user || user.id === 'guest') && (
+              {/* SIGN IN BUTTON - Visible for guests (TIER A Entry) */}
+              {isGuest && (
                 <button onClick={() => navigate('/auth')}
                   className="group py-3 px-8 rounded-full cursor-pointer"
                   style={{
