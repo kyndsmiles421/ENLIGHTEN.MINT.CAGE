@@ -86,9 +86,6 @@
         
         <div id="root" style="overflow: visible !important; height: auto !important;"></div>
         
-        <!-- Creator Console (Debug Panel) -->
-        <div id="creator-area" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; max-width: 400px; opacity: 0.95;"></div>
-        
         <!-- Service Worker Registration -->
         <script>
           // Hide app shell once React mounts
@@ -100,16 +97,6 @@
                 if (shell && shell.parentNode) shell.parentNode.removeChild(shell);
               }, 500);
             }, 100);
-          });
-          
-          // Initialize Creator Console after scripts load
-          window.addEventListener('load', function() {
-            setTimeout(function() {
-              if (window.Console && window.Brain) {
-                Console.setup('creator-area', Brain);
-                console.log('%c[Creator Console]: Active', 'color: #00ff00; font-weight: bold');
-              }
-            }, 1000);
           });
           
           // Register Service Worker for PWA
