@@ -924,8 +924,8 @@ export default function Landing() {
         <ShareButton />
       </div>
 
-      {/* SIGN IN LINK - Top Left - Always Visible */}
-      {!user && (
+      {/* SIGN IN LINK - Top Left - Always Visible for guests */}
+      {(!user || user.id === 'guest') && (
         <div className="fixed top-4 left-4 z-50">
           <button 
             onClick={() => navigate('/auth')}
@@ -960,12 +960,12 @@ export default function Landing() {
       </div>
 
       {/* ═══ Personalized Dashboard for returning users ═══ */}
-      {user && (
+      {user && user.id !== 'guest' && (
         <PersonalizedDashboard user={user} onQuickReset={() => setShowQuickReset(true)} />
       )}
 
       {/* ═══ Hero (shown for everyone, adjusted padding for logged-in) ═══ */}
-      <div className={`relative z-10 px-6 md:px-12 lg:px-24 ${user ? 'pt-8 pb-12' : 'pt-28 pb-20'}`}>
+      <div className={`relative z-10 px-6 md:px-12 lg:px-24 ${(user && user.id !== 'guest') ? 'pt-8 pb-12' : 'pt-28 pb-20'}`}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -1016,17 +1016,17 @@ export default function Landing() {
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
-              <button onClick={() => navigate(user ? '/dashboard' : '/auth')}
+              <button onClick={() => navigate((user && user.id !== 'guest') ? '/dashboard' : '/auth')}
                 className="btn-glass group"
                 style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
                 data-testid="begin-journey-btn">
                 <span className="flex items-center gap-2" style={{ color: '#2DD4BF' }}>
-                  {user ? 'Continue Journey' : 'Begin Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  {(user && user.id !== 'guest') ? 'Continue Journey' : 'Begin Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
               
-              {/* SIGN IN BUTTON - Always visible */}
-              {!user && (
+              {/* SIGN IN BUTTON - Visible for guests */}
+              {(!user || user.id === 'guest') && (
                 <button onClick={() => navigate('/auth')}
                   className="group py-3 px-8 rounded-full cursor-pointer"
                   style={{
