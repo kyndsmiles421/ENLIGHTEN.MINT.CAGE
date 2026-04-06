@@ -4,114 +4,31 @@
  * 
  * Usage:
  *   import { Sensories } from '../utils/Sensories';
- *   onClick={() => { Sensories.tap(); doSomething(); }}
+ *   <button onClick={Sensories.tap}>Pillar</button>
+ *   <Link onClick={Sensories.confirm}>Enter Sanctuary</Link>
  */
 
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 export const Sensories = {
-  /**
-   * Light: Subtle UI interactions
-   * Use for: Pillar hover/tap, toggles, minor selections
-   */
+  // UI Interactions (Pillars, Toggles, Hover)
   tap: async () => {
-    try { 
-      await Haptics.impact({ style: ImpactStyle.Light }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
+    try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (e) {}
   },
-  
-  /**
-   * Medium: Navigation & Selections
-   * Use for: Mood Ring change, category selection, route navigation
-   */
+
+  // Navigation & State Changes (Mood Ring, Watch Journey)
   select: async () => {
-    try { 
-      await Haptics.impact({ style: ImpactStyle.Medium }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
+    try { await Haptics.impact({ style: ImpactStyle.Medium }); } catch (e) {}
   },
-  
-  /**
-   * Heavy: Critical Actions
-   * Use for: Sign In, Submit, Finalize, Purchase
-   */
+
+  // High-Stakes Actions (Sign In, Enter Sanctuary)
   confirm: async () => {
-    try { 
-      await Haptics.impact({ style: ImpactStyle.Heavy }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
+    try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) {}
   },
 
-  /**
-   * Success: Achievement/Goal Met
-   * Use for: Master Sovereign Cert, Streak completion, Level up
-   */
+  // Success/Milestones (Certification, Level Up)
   success: async () => {
-    try { 
-      await Haptics.notification({ type: NotificationType.Success }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
-  },
-
-  /**
-   * Warning: Attention needed
-   * Use for: Low credits, session ending, streak at risk
-   */
-  warning: async () => {
-    try { 
-      await Haptics.notification({ type: NotificationType.Warning }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
-  },
-
-  /**
-   * Error: Something went wrong
-   * Use for: Failed submission, network error, validation failure
-   */
-  error: async () => {
-    try { 
-      await Haptics.notification({ type: NotificationType.Error }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
-  },
-
-  /**
-   * Vibrate: Custom duration (ms)
-   * Use for: Breathing exercises, meditation pulses
-   */
-  vibrate: async (duration = 100) => {
-    try { 
-      await Haptics.vibrate({ duration }); 
-    } catch (e) {
-      // Web fallback - no-op
-    }
-  },
-
-  /**
-   * Breathing Pulse: Rhythmic vibration for meditation
-   * Creates a gentle in-out pattern
-   */
-  breathingPulse: async () => {
-    try {
-      // Inhale pulse
-      await Haptics.impact({ style: ImpactStyle.Light });
-      await new Promise(r => setTimeout(r, 300));
-      await Haptics.impact({ style: ImpactStyle.Medium });
-      await new Promise(r => setTimeout(r, 300));
-      // Exhale pulse
-      await Haptics.impact({ style: ImpactStyle.Medium });
-      await new Promise(r => setTimeout(r, 300));
-      await Haptics.impact({ style: ImpactStyle.Light });
-    } catch (e) {
-      // Web fallback - no-op
-    }
+    try { await Haptics.notification({ type: NotificationType.Success }); } catch (e) {}
   }
 };
 
