@@ -1,127 +1,75 @@
 /**
- * ENLIGHTEN.MINT.CAFE - Master Controller
- * Consolidates: Dispatcher, Logic, and Debugger
+ * THE CRYSTALLINE WEB - ENLIGHTEN.MINT.CAFE CORE
+ * A self-healing, resonance-based architecture.
  */
 
-const AppController = {
-    // 1. INITIALIZE SYSTEM
-    init() {
-        console.log("%c[Sovereign OS]: System Initialized", "color: #00e5ff; font-weight: bold;");
-        this.bindEvents();
-        this.applySanctuaryFixes();
+const ResonanceEngine = {
+    // 1. THE SOURCE: Define your "Frequencies" (Actions) here once.
+    frequencies: {
+        'nav_toggle': () => document.querySelector('.orbital-nav')?.classList.toggle('active'),
+        'shield_active': () => document.body.classList.toggle('silence-shield'),
+        'seed_harvest': (el) => {
+            el.classList.add('harvested');
+            console.log("✨ Resonance Harvested at Point:", el.dataset.pointId || 'Unknown');
+        },
+        'wellness_sync': () => console.log("🌱 Wellness Hub Synchronized."),
+        'quick_reset': () => window.dispatchEvent(new CustomEvent('QUICK_RESET')),
+        'start_meditation': () => window.dispatchEvent(new CustomEvent('START_MEDITATION')),
+        'open_oracle': () => window.dispatchEvent(new CustomEvent('OPEN_ORACLE')),
+        'sign_in': () => window.location.href = '/auth',
+        'begin_journey': () => window.location.href = '/auth',
+        'watch_intro': () => window.location.href = '/intro',
+        'default': (action) => console.warn(`⚠️ Frequency "${action}" not tuned in the Web yet.`)
     },
 
-    // 2. CENTRAL EVENT DISPATCHER (Handles all button clicks)
-    bindEvents() {
+    // 2. THE WEB: The automatic listener that feels every "touch"
+    ignite() {
+        console.log("%c[Crystalline Web]: Online & Resonating", "color: #7df9ff; font-weight: bold;");
+        
+        // Fix background interference immediately
+        this.stabilizeAtmosphere();
+
         window.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
+            // Find the closest "Point" in the web
+            const point = e.target.closest('[data-action]');
+            if (!point) return;
 
-            const action = btn.dataset.action;
+            const action = point.dataset.action;
             
-            // Visual Feedback (The Debugger)
-            this.debugFlash(btn);
+            // Visual Resonance (Feedback)
+            this.pulse(point);
 
-            if (!action) {
-                console.warn("Button clicked, but no data-action defined:", btn);
-                return;
+            // Execute the frequency
+            if (this.frequencies[action]) {
+                this.frequencies[action](point);
+            } else {
+                this.frequencies['default'](action);
             }
-
-            // Route to the appropriate module
-            this.router(action, btn);
         });
     },
 
-    // 3. ACTION ROUTER
-    router(action, element) {
-        console.log(`%c[Trigger]: ${action}`, "color: #00ff00");
-
-        switch (action) {
-            case 'nav_menu':
-                this.modules.ui.toggleMenu();
-                break;
-            case 'harvest_resonance':
-                this.modules.rpg.harvest(element);
-                break;
-            case 'toggle_shield':
-                this.modules.ui.toggleShield();
-                break;
-            case 'submit_wellness':
-                this.modules.wellness.submit();
-                break;
-            case 'quick_reset':
-                this.modules.wellness.quickReset();
-                break;
-            case 'start_meditation':
-                this.modules.wellness.startMeditation();
-                break;
-            case 'open_oracle':
-                this.modules.divination.openOracle();
-                break;
-            default:
-                console.error(`Handler for "${action}" not yet implemented.`);
-        }
+    // 3. ATMOSPHERE: Automatically ensures background layers don't block buttons
+    stabilizeAtmosphere() {
+        const layers = ['.aurora', '.background-layer', '#bg-canvas', '.glass-overlay', '.aurora-bg', '.breathing-orb-container'];
+        layers.forEach(selector => {
+            const el = document.querySelector(selector);
+            if (el) el.style.pointerEvents = 'none';
+        });
+        console.log("%c[Atmosphere]: Stabilized", "color: #00ffcc");
     },
 
-    // 4. FUNCTIONAL MODULES
-    modules: {
-        ui: {
-            toggleMenu() {
-                const nav = document.querySelector('.orbital-nav');
-                if (nav) nav.classList.toggle('active');
-            },
-            toggleShield() {
-                document.body.classList.toggle('shield-active');
-                console.log("Silence Shield: Status Updated");
-            }
-        },
-        rpg: {
-            harvest(el) {
-                // Logic for Starseed resonance harvesting
-                el.classList.add('harvested');
-                console.log("Resonance Seed Collected");
-            }
-        },
-        wellness: {
-            submit() {
-                console.log("Wellness data synced to hub.");
-            },
-            quickReset() {
-                window.dispatchEvent(new CustomEvent('QUICK_RESET'));
-                console.log("Quick Reset triggered");
-            },
-            startMeditation() {
-                window.dispatchEvent(new CustomEvent('START_MEDITATION'));
-                console.log("Meditation session starting");
-            }
-        },
-        divination: {
-            openOracle() {
-                window.dispatchEvent(new CustomEvent('OPEN_ORACLE'));
-                console.log("Oracle portal opened");
-            }
-        }
-    },
-
-    // 5. UTILITIES & DEBUGGING
-    debugFlash(el) {
-        const originalOutline = el.style.outline;
-        el.style.outline = '2px solid #00ff00';
-        setTimeout(() => el.style.outline = originalOutline, 250);
-    },
-
-    applySanctuaryFixes() {
-        // Force-apply pointer-events fix to background layers
-        const auroras = document.querySelectorAll('.aurora, .background-layer, .aurora-bg, .breathing-orb-container');
-        auroras.forEach(el => el.style.pointerEvents = 'none');
-        console.log("%c[Sanctuary]: Pointer-events fix applied", "color: #00ffcc");
+    // 4. PULSE: Visual confirmation that the web is alive
+    pulse(el) {
+        el.style.transition = 'all 0.2s ease';
+        el.style.filter = 'brightness(1.5) drop-shadow(0 0 10px #7df9ff)';
+        setTimeout(() => el.style.filter = '', 200);
     }
 };
 
-// Start the engine
-document.addEventListener('DOMContentLoaded', () => AppController.init());
+// Ignite the Web when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => ResonanceEngine.ignite());
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = AppController;
+    module.exports = ResonanceEngine;
 }
