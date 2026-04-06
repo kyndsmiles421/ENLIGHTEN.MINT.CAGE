@@ -1141,128 +1141,143 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* ═══ Testimonials ═══ */}
-      <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="testimonials-section">
-        <div className="max-w-7xl mx-auto">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-12">
-            <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
-              <Quote size={12} className="inline mr-2" /> What Our Community Says
-            </p>
-            <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              Real Results from Real Practitioners
-            </h2>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {TESTIMONIALS.map((item, i) => (
-              <motion.div key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{ delay: i * 0.06 }}
-                className="glass-card glass-card-hover p-6 relative"
-                style={{ borderColor: `${item.color}0a` }}
-              >
-                {/* Top accent line */}
-                <div className="absolute top-0 left-6 right-6 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${item.color}25, transparent)` }} />
-                <div className="absolute top-4 right-4 opacity-[0.08]">
-                  <Quote size={28} style={{ color: item.color }} />
-                </div>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  "{item.text}"
+      {/* ═══════════════════════════════════════════════════════════════════
+          LAYER 3: SOCIAL PROOF (Guest Discovery Only)
+          - Testimonials & "How it Works" - The "Why" for newcomers
+          - Hidden for authenticated users (cleaner UI, less scrolling)
+          ═══════════════════════════════════════════════════════════════════ */}
+      {isGuest && (
+        <>
+          {/* ═══ Testimonials ═══ */}
+          <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="testimonials-section">
+            <div className="max-w-7xl mx-auto">
+              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-12">
+                <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
+                  <Quote size={12} className="inline mr-2" /> What Our Community Says
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: `${item.color}15`, color: item.color, boxShadow: `0 0 12px ${item.color}10` }}>
-                    {item.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
-                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{item.role}</p>
-                  </div>
-                </div>
+                <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  Real Results from Real Practitioners
+                </h2>
               </motion.div>
-            ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {TESTIMONIALS.map((item, i) => (
+                  <motion.div key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-30px' }}
+                    transition={{ delay: i * 0.06 }}
+                    className="glass-card glass-card-hover p-6 relative"
+                    style={{ borderColor: `${item.color}0a` }}
+                  >
+                    {/* Top accent line */}
+                    <div className="absolute top-0 left-6 right-6 h-px"
+                      style={{ background: `linear-gradient(90deg, transparent, ${item.color}25, transparent)` }} />
+                    <div className="absolute top-4 right-4 opacity-[0.08]">
+                      <Quote size={28} style={{ color: item.color }} />
+                    </div>
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+                      "{item.text}"
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                        style={{ background: `${item.color}15`, color: item.color, boxShadow: `0 0 12px ${item.color}10` }}>
+                        {item.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+                        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{item.role}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* ═══ How it Works ═══ */}
-      <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="how-it-works-section">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: '#2DD4BF' }}>Our Story</p>
-            <h2 className="text-2xl md:text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              High-Frequency Wellness, Delivered to You
-            </h2>
-            <p className="text-sm max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              The Enlightenment Cafe is a mobile wellness experience that brings healing frequencies, guided meditations, and ancient wisdom directly to you — wherever you are, whenever you need it.
-            </p>
-          </motion.div>
+          {/* ═══ How it Works ═══ */}
+          <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="how-it-works-section">
+            <div className="max-w-5xl mx-auto">
+              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-14">
+                <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: '#2DD4BF' }}>Our Story</p>
+                <h2 className="text-2xl md:text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  High-Frequency Wellness, Delivered to You
+                </h2>
+                <p className="text-sm max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  The Enlightenment Cafe is a mobile wellness experience that brings healing frequencies, guided meditations, and ancient wisdom directly to you — wherever you are, whenever you need it.
+                </p>
+              </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
-            {[
-              { step: '01', title: 'Choose Your Frequency', desc: 'Select from healing soundscapes, guided meditations, breathwork, or sacred practices tailored to your current state.', color: '#D8B4FE' },
-              { step: '02', title: 'Immerse & Transform', desc: 'Our 3D holographic guided experiences use AI narration, binaural frequencies, and ancient techniques to shift your energy in minutes.', color: '#2DD4BF' },
-              { step: '03', title: 'Track Your Evolution', desc: 'Daily challenges, streaks, and your personal wellness journey build momentum. Watch yourself grow with every session.', color: '#FCD34D' },
-            ].map((item, i) => (
-              <motion.div key={i}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
+                {[
+                  { step: '01', title: 'Choose Your Frequency', desc: 'Select from healing soundscapes, guided meditations, breathwork, or sacred practices tailored to your current state.', color: '#D8B4FE' },
+                  { step: '02', title: 'Immerse & Transform', desc: 'Our 3D holographic guided experiences use AI narration, binaural frequencies, and ancient techniques to shift your energy in minutes.', color: '#2DD4BF' },
+                  { step: '03', title: 'Track Your Evolution', desc: 'Daily challenges, streaks, and your personal wellness journey build momentum. Watch yourself grow with every session.', color: '#FCD34D' },
+                ].map((item, i) => (
+                  <motion.div key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="glass-card glass-card-hover p-8 text-center relative overflow-hidden"
+                    style={{ borderColor: `${item.color}08` }}
+                  >
+                    {/* Glow accent */}
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full opacity-[0.06]"
+                      style={{ background: item.color, filter: 'blur(30px)' }} />
+                    <p className="text-4xl font-light mb-4 relative" style={{ fontFamily: 'Cormorant Garamond, serif', color: item.color, opacity: 0.4 }}>{item.step}</p>
+                    <h3 className="text-base font-medium mb-3" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+                    {/* Bottom accent */}
+                    <div className="absolute bottom-0 left-6 right-6 h-px"
+                      style={{ background: `linear-gradient(90deg, transparent, ${item.color}20, transparent)` }} />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Mobile Unit CTA */}
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card glass-card-hover p-8 text-center relative overflow-hidden"
-                style={{ borderColor: `${item.color}08` }}
+                className="glass-card p-8 md:p-10 text-center relative overflow-hidden"
+                style={{ borderColor: 'rgba(45,212,191,0.12)' }}
               >
-                {/* Glow accent */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full opacity-[0.06]"
-                  style={{ background: item.color, filter: 'blur(30px)' }} />
-                <p className="text-4xl font-light mb-4 relative" style={{ fontFamily: 'Cormorant Garamond, serif', color: item.color, opacity: 0.4 }}>{item.step}</p>
-                <h3 className="text-base font-medium mb-3" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
-                {/* Bottom accent */}
-                <div className="absolute bottom-0 left-6 right-6 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${item.color}20, transparent)` }} />
+                <div className="absolute top-0 right-0 w-60 h-60 rounded-full opacity-[0.03]"
+                  style={{ background: '#2DD4BF', filter: 'blur(60px)', transform: 'translate(30%, -40%)' }} />
+                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#2DD4BF' }}>Mobile Wellness Unit</p>
+                <h3 className="text-xl md:text-2xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  We Come to You
+                </h3>
+                <p className="text-sm max-w-lg mx-auto mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  Experience The Enlightenment Cafe in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location.
+                </p>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <button onClick={() => navigate('/auth')}
+                    className="px-8 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-[1.02]"
+                    style={{ background: 'rgba(45,212,191,0.12)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.2)' }}
+                    data-testid="book-session-btn">
+                    Book a Session <ArrowRight size={14} />
+                  </button>
+                  <button onClick={() => navigate('/auth')}
+                    className="px-8 py-3 rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:scale-[1.02]"
+                    style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)' }}
+                    data-testid="find-mobile-unit-btn">
+                    Find the Mobile Unit
+                  </button>
+                </div>
               </motion.div>
-            ))}
-          </div>
-
-          {/* Mobile Unit CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-8 md:p-10 text-center relative overflow-hidden"
-            style={{ borderColor: 'rgba(45,212,191,0.12)' }}
-          >
-            <div className="absolute top-0 right-0 w-60 h-60 rounded-full opacity-[0.03]"
-              style={{ background: '#2DD4BF', filter: 'blur(60px)', transform: 'translate(30%, -40%)' }} />
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#2DD4BF' }}>Mobile Wellness Unit</p>
-            <h3 className="text-xl md:text-2xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              We Come to You
-            </h3>
-            <p className="text-sm max-w-lg mx-auto mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Experience The Enlightenment Cafe in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location.
-            </p>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <button onClick={() => navigate('/auth')}
-                className="px-8 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-[1.02]"
-                style={{ background: 'rgba(45,212,191,0.12)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.2)' }}
-                data-testid="book-session-btn">
-                Book a Session <ArrowRight size={14} />
-              </button>
-              <button onClick={() => navigate('/auth')}
-                className="px-8 py-3 rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:scale-[1.02]"
-                style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)' }}
-                data-testid="find-mobile-unit-btn">
-                Find the Mobile Unit
-              </button>
             </div>
-          </motion.div>
-        </div>
-      </div>
+          </div>
+        </>
+      )}
 
-      <WaitlistSection />
+      {/* ═══════════════════════════════════════════════════════════════════
+          LAYER 4: CONVERSION / SOVEREIGN ACTIONS
+          - Guest: Waitlist & Lead Gen
+          - Sovereign: Clean exit (Footer only, already has Dashboard above)
+          ═══════════════════════════════════════════════════════════════════ */}
+      {isGuest && <WaitlistSection />}
+      
       <Footer />
     </div>
   );
