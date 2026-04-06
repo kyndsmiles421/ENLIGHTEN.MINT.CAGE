@@ -3377,3 +3377,59 @@ body * .button {
   display: none !important;
 }
 
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOVEREIGN SPINE - NUCLEAR SCROLL OVERRIDE
+   This MUST be at the bottom to override everything else
+   ═══════════════════════════════════════════════════════════════════════════ */
+html, body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  position: relative !important;
+}
+
+#root, 
+.sanctuary-root, 
+.app-root, 
+.immersive-page,
+main, 
+#main-container {
+  min-height: 100.1vh !important;
+  height: auto !important;
+  display: block !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  position: relative !important;
+}
+
+/* GHOST LAYER BYPASS - Push ALL backgrounds to z-index -1 */
+.aurora-bg,
+.breathing-orb-container,
+.background-layer,
+.aurora,
+#bg-canvas,
+.glass-overlay,
+[class*="overlay"]:not(.modal-overlay):not(.dialog-overlay) {
+  pointer-events: none !important;
+  z-index: -1 !important;
+  position: fixed !important;
+}
+
+/* ENSURE BUTTONS ARE ALWAYS CLICKABLE */
+button,
+a,
+[role="button"],
+[data-action],
+[data-testid*="btn"],
+.btn-glass,
+.pillar-card,
+.receptive-button {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+  cursor: pointer !important;
+}

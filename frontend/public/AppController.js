@@ -26,20 +26,16 @@ const ResonanceEngine = {
     ignite() {
         console.log("%c[Crystalline Web]: Online & Resonating", "color: #7df9ff; font-weight: bold;");
         
-        // Fix background interference immediately
+        // Fix background interference AND scrolling immediately
         this.stabilizeAtmosphere();
 
         window.addEventListener('click', (e) => {
-            // Find the closest "Point" in the web
             const point = e.target.closest('[data-action]');
             if (!point) return;
 
             const action = point.dataset.action;
-            
-            // Visual Resonance (Feedback)
             this.pulse(point);
 
-            // Execute the frequency
             if (this.frequencies[action]) {
                 this.frequencies[action](point);
             } else {
@@ -48,14 +44,36 @@ const ResonanceEngine = {
         });
     },
 
-    // 3. ATMOSPHERE: Automatically ensures background layers don't block buttons
+    // 3. ATMOSPHERE: THE SOVEREIGN SPINE - Forces scroll to work
     stabilizeAtmosphere() {
-        const layers = ['.aurora', '.background-layer', '#bg-canvas', '.glass-overlay', '.aurora-bg', '.breathing-orb-container'];
-        layers.forEach(selector => {
-            const el = document.querySelector(selector);
-            if (el) el.style.pointerEvents = 'none';
+        // 1. FORCE SCROLL: Unlock the body and html layers
+        document.documentElement.style.overflow = 'auto'; 
+        document.documentElement.style.height = 'auto';
+        document.body.style.overflow = 'auto';
+        document.body.style.height = 'auto';
+        document.body.style.position = 'relative';
+
+        // 2. GHOST LAYER BYPASS: Ensure nothing invisible is blocking the scroll wheel
+        const blockers = ['.aurora', '.background-layer', '#bg-canvas', '.glass-overlay', '[class*="overlay"]', '.aurora-bg', '.breathing-orb-container', '.immersive-page'];
+        blockers.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.style.pointerEvents = 'none';
+                el.style.zIndex = '-1';
+            });
         });
-        console.log("%c[Atmosphere]: Stabilized", "color: #00ffcc");
+
+        // 3. ENSURE MAIN CONTENT IS SCROLLABLE
+        const containers = ['#root', '.sanctuary-root', '.app-root', 'main', '#main-container'];
+        containers.forEach(selector => {
+            const el = document.querySelector(selector);
+            if (el) {
+                el.style.minHeight = '100.1vh';
+                el.style.display = 'block';
+                el.style.overflowY = 'auto';
+            }
+        });
+        
+        console.log("🔓 [Sovereign Spine]: Scrolling Unlocked.");
     },
 
     // 4. PULSE: Visual confirmation that the web is alive
@@ -68,8 +86,3 @@ const ResonanceEngine = {
 
 // Ignite the Web when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => ResonanceEngine.ignite());
-
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ResonanceEngine;
-}

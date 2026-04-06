@@ -1,13 +1,31 @@
 /* Sanctuary.css - Layered Touch Architecture
    The Enlightenment Cafe | Rapid City Edition */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOVEREIGN SPINE - FORCE SCROLL OVERRIDE
+   Nuclear option to ensure scrolling ALWAYS works
+   ═══════════════════════════════════════════════════════════════════════════ */
+html, body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  position: relative !important;
+}
+
+#root, .sanctuary-root, .app-root, main, #main-container {
+  min-height: 100.1vh !important;
+  display: block !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
 /* --- THE SOUL (BACKGROUND) --- */
 .aurora-bg, .breathing-orb-container {
-  position: fixed !important; /* Locks it to the viewport, not the scroll */
+  position: fixed !important;
   inset: 0;
-  z-index: -1;                /* Moves it behind the interaction layer */
-  pointer-events: none;       /* Makes it invisible to touches */
-  transform: translateZ(0);   /* Forces GPU acceleration for fluid motion */
+  z-index: -1 !important;
+  pointer-events: none !important;
+  transform: translateZ(0);
 }
 
 /* --- THE INTERACTION (FOREGROUND) --- */
