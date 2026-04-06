@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Dual-Toolbar Console</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --toolbar-bg: #1a1a1f;
+            --accent-glow: rgba(0, 255, 200, 0.4);
+            --bevel-light: rgba(255, 255, 255, 0.1);
+            --bevel-dark: rgba(0, 0, 0, 0.6);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px; /* Essential for 3D Tilt */
+        }
+
+        /* --- TOOLBAR STRUCTURE --- */
+        .toolbar {
+            position: fixed;
+            width: 90%;
+            max-width: 600px;
+            background: var(--toolbar-bg);
+            border-radius: 12px;
+            padding: 10px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(15deg); /* Default 3D Tilt */
+            z-index: 100;
+            
+            /* Beveled Extrusion Effect */
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.8), 
+                inset 0 1px 1px var(--bevel-light),
+                inset 0 -2px 4px var(--bevel-dark);
+            border: 1px solid #2a2a30;
+            transition: var(--transition);
+        }
+
+        .toolbar-top { top: 20px; }
+        .toolbar-bottom { bottom: 20px; transform: translateX(-50%) rotateX(-15deg); }
+
+        /* Hover/Active State: Leveling out */
+        .toolbar:hover {
+            transform: translateX(-50%) rotateX(0deg) translateZ(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 15px var(--accent-glow);
+        }
+
+        /* --- ACCORDION SYSTEM --- */
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            color: #eee;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin: 0 5px;
+            /* Inset depth for the "drawer" look */
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .accordion-content.active {
+            max-height: 200px; /* Adjust based on content */
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .module-btn {
+            background: #25252b;
+            border: none;
+            color: #888;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 3px 0 #111; /* 3D Button Depth */
+        }
+
+        .module-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #111;
+        }
+
+        .module-btn:hover {
+            color: #fff;
+            background: #32323a;
+        }
+
+        /* --- THE DRAG HANDLE --- */
+        .handle {
+            width: 40px;
+            height: 4px;
+            background: #444;
+            margin: 0 auto 5px;
+            border-radius: 2px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="toolbar toolbar-top" id="topNav">
+        <div class="handle"></div>
+        <div class="accordion-item">
+            <div class="accordion-header" onclick="toggleAccordion('topContent')">
+                <span>Primary Systems</span>
+                <span>▽</span>
+            </div>
+            <div id="topContent" class="accordion-content">
+                <div class="grid-options">
+                    <button class="module-btn">Audio</button>
+                    <button class="module-btn">Visuals</button>
+                    <button class="module-btn">Logic</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="toolbar toolbar-bottom" id="bottomNav">
+        <div class="accordion-item">
+            <div id="bottomContent" class="accordion-content">
+                <div class="grid-options">
+                    <button class="module-btn">User</button>
+                    <button class="module-btn">Network</button>
+                    <button class="module-btn">Settings</button>
+                </div>
+            </div>
+            <div class="accordion-header" onclick="toggleAccordion('bottomContent')">
+                <span>Environment Controls</span>
+                <span>△</span>
+            </div>
+        </div>
+        <div class="handle"></div>
+    </nav>
+
+    <script>
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const isActive = content.classList.contains('active');
+            
+            // Close all first for "exclusive expansion"
+            document.querySelectorAll('.accordion-content').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            if (!isActive) {
+                content.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
