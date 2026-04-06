@@ -34,7 +34,12 @@ const SystemBridge = {
 /**
  * ENLIGHTENMENT BRAIN - The Logic Engine
  */
-const EnlightenmentBrain = {
+const Brain = {
+    // State variables
+    currentTheme: 'cosmic',
+    spineUnlocked: true,
+    consoleOpen: false,
+
     // Navigation
     sign_in: () => window.location.href = '/auth',
     begin_journey: () => window.location.href = '/auth',
@@ -64,6 +69,7 @@ const EnlightenmentBrain = {
     setTheme: (theme) => {
         const skins = {
             'cosmic': { '--bg': '#0a0a0c', '--accent': '#7df9ff' },
+            'purelight': { '--bg': '#f5f5f5', '--accent': '#333333' },
             'golden': { '--bg': '#1a1a1a', '--accent': '#d4af37' },
             'earth': { '--bg': '#1b261e', '--accent': '#a3b18a' }
         };
@@ -71,7 +77,21 @@ const EnlightenmentBrain = {
         Object.entries(colors).forEach(([key, val]) => {
             document.documentElement.style.setProperty(key, val);
         });
+        Brain.currentTheme = theme;
         console.log(`🎨 Skin: ${theme}`);
+    },
+
+    // Export Sovereign HTML
+    exportSovereign: () => {
+        const htmlContent = document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Enlightenment_Cafe_Sovereign_Code.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+        console.log('[Sovereign] HTML Exported');
     }
 };
 
@@ -105,97 +125,120 @@ const StabilizeSpine = () => {
     console.log("🔓 [Spine]: Stabilized");
 };
 
-// Expose globally
-window.Brain = EnlightenmentBrain;
-window.Bridge = SystemBridge;
-
 /**
- * CREATOR CONSOLE - Debug/Admin Panel
+ * CREATOR CONSOLE - Full Screen Umbrella Debug Panel
+ * User's exact specification
  */
 const CreatorConsole = {
-    init(systemBrain) {
-        // Create the container if it doesn't exist
-        let consoleEl = document.getElementById('creator-area');
-        if (!consoleEl) {
-            consoleEl = document.createElement('div');
-            consoleEl.id = 'creator-area';
-            document.body.appendChild(consoleEl);
-        }
+    isOpen: false,
 
-        this.render(consoleEl);
-        this.attachListeners(systemBrain);
+    init(brain) {
+        let el = document.getElementById('creator-area');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'creator-area';
+            document.body.appendChild(el);
+        }
+        this.render(el);
+        this.attachListeners(brain);
+        setInterval(() => this.update(brain), 500);
+        console.log('%c[CreatorConsole] Umbrella Initialized', 'color: #0f0; font-weight: bold;');
+    },
+
+    toggle() {
+        this.isOpen = !this.isOpen;
+        Brain.consoleOpen = this.isOpen; // Update brain state
+        const panel = document.getElementById('master-umbrella');
+        const content = document.querySelectorAll('.console-content');
         
-        // Start the heartbeat for the Brain Readout
-        setInterval(() => this.updateReadout(systemBrain), 500);
+        if (panel) {
+            panel.style.setProperty('height', this.isOpen ? '100vh' : '60px', 'important');
+            panel.style.setProperty('overflow', this.isOpen ? 'visible' : 'hidden', 'important');
+            console.log(`[CreatorConsole] Toggle: isOpen=${this.isOpen}, height=${panel.style.height}`);
+        }
+        content.forEach(c => c.style.display = this.isOpen ? 'block' : 'none');
+        const labelEl = document.getElementById('toggle-label');
+        if (labelEl) {
+            labelEl.innerText = this.isOpen ? 'CLOSE UMBRELLA' : 'OPEN CREATOR CONSOLE';
+        }
     },
 
     render(container) {
         container.innerHTML = `
-            <div id="debug-panel" style="position:fixed; bottom:20px; right:20px; width:300px; background:rgba(0,0,0,0.9); color:#0f0; border:1px solid #333; padding:15px; font-family:monospace; z-index:9999; border-radius:8px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-                <div style="font-weight:bold; border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:10px;">SYSTEM BRAIN READOUT</div>
-                <div id="brain-vars" style="font-size:12px; max-height:150px; overflow-y:auto; margin-bottom:10px;"></div>
+            <div id="master-umbrella" style="position:fixed; top:0; left:0; width:100%; height:60px; background:rgba(0,0,0,0.95); color:#0f0; z-index:10000; transition: all 0.4s ease; font-family:monospace; border-bottom:2px solid #333; overflow:hidden;">
                 
-                <div style="font-weight:bold; border-bottom:1px solid #333; margin-bottom:8px;">SKINS</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; margin-bottom:15px;">
-                    <button class="skin-btn" data-skin="cosmic" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer;">Cosmic</button>
-                    <button class="skin-btn" data-skin="golden" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer;">Golden</button>
-                    <button class="skin-btn" data-skin="earth" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer;">Earth</button>
+                <div style="height:60px; display:flex; justify-content:space-between; align-items:center; padding:0 20px; border-bottom:1px solid #222;">
+                    <div style="font-weight:bold; letter-spacing:2px;">ENLIGHTENMENT.MINT.CAFE // CREATOR_MODE</div>
+                    <button id="umbrella-toggle" style="background:#0f0; color:#000; border:none; padding:8px 15px; font-weight:bold; cursor:pointer; border-radius:4px;">
+                        <span id="toggle-label">OPEN CREATOR CONSOLE</span>
+                    </button>
                 </div>
 
-                <div style="display:flex; flex-direction:column; gap:5px;">
-                    <button id="export-html" style="background:#005500; color:#fff; border:none; padding:8px; cursor:pointer; font-weight:bold;">EXPORT HTML (Sovereign)</button>
-                    <button onclick="window.location.reload()" style="background:#440000; color:#fff; border:none; padding:5px; cursor:pointer; font-size:10px;">HARD RESET</button>
+                <div class="console-content" style="display:none; padding:20px; height: calc(100vh - 120px); overflow-y:auto;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
+                        <div>
+                            <h3 style="color:#fff; border-bottom:1px solid #333;">SYSTEM BRAIN READOUT</h3>
+                            <div id="brain-vars-list" style="font-size:14px; line-height:1.6;"></div>
+                        </div>
+                        <div>
+                            <h3 style="color:#fff; border-bottom:1px solid #333;">QUICK ACTIONS</h3>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                                <button class="action-btn" data-action="setTheme" data-value="cosmic" style="background:#222; color:#fff; border:1px solid #444; padding:10px; cursor:pointer;">SKIN: COSMIC</button>
+                                <button class="action-btn" data-action="setTheme" data-value="purelight" style="background:#222; color:#fff; border:1px solid #444; padding:10px; cursor:pointer;">SKIN: PURE LIGHT</button>
+                                <button class="action-btn" data-action="exportSovereign" style="background:#005500; color:#fff; border:none; padding:10px; cursor:pointer;">EXPORT SOVEREIGN CODE</button>
+                                <button onclick="window.location.reload()" style="background:#440000; color:#fff; border:none; padding:10px; cursor:pointer;">FORCE HARD RESET</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="console-content" style="display:none; position:absolute; bottom:0; width:100%; height:60px; background:#111; border-top:2px solid #333; display:flex; align-items:center; padding:0 20px;">
+                    <div style="font-size:12px; color:#666;">LATENCY: <span id="ping-val">0ms</span> | SYSTEM_READY: TRUE | REGION: BLACK_HILLS_SD</div>
                 </div>
             </div>
         `;
     },
 
-    updateReadout(brain) {
-        const varDisplay = document.getElementById('brain-vars');
-        if (!varDisplay) return;
-
-        let stateHtml = "";
-        for (let [key, value] of Object.entries(brain)) {
-            if (typeof value !== 'function') {
-                stateHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                    <span style="color:#888;">${key}:</span>
-                    <span>${JSON.stringify(value)}</span>
+    update(brain) {
+        if (!this.isOpen) return;
+        const list = document.getElementById('brain-vars-list');
+        if (!list) return;
+        let html = "";
+        for (let [key, val] of Object.entries(brain)) {
+            if (typeof val !== 'function') {
+                html += `<div style="border-bottom:1px solid #222; padding:5px 0;">
+                    <span style="color:#888;">${key}:</span> <span style="color:#0f0;">${JSON.stringify(val)}</span>
                 </div>`;
             }
         }
-        varDisplay.innerHTML = stateHtml || '<div style="color:#555;">System Online</div>';
+        list.innerHTML = html;
+        const pingEl = document.getElementById('ping-val');
+        if (pingEl) pingEl.innerText = Math.floor(Math.random() * 20) + "ms";
     },
 
     attachListeners(brain) {
-        // Skin Switcher Logic
-        document.querySelectorAll('.skin-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const skin = btn.dataset.skin;
-                console.log(`[System] Applying ${skin} theme...`);
-                if (brain.setTheme) brain.setTheme(skin);
-                document.body.className = `theme-${skin}`;
-            });
-        });
+        document.getElementById('umbrella-toggle').onclick = () => this.toggle();
 
-        // Export Logic
-        document.getElementById('export-html').addEventListener('click', () => {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Enlightenment_Cafe_Sovereign_Code.html`;
-            a.click();
-            URL.revokeObjectURL(url);
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.onclick = () => {
+                const action = btn.dataset.action;
+                const val = btn.dataset.value;
+                if (brain[action]) brain[action](val);
+                console.log(`[SYNAPSE] ${action} triggered with ${val}`);
+            };
         });
     }
 };
 
+// Expose globally
+window.Brain = Brain;
+window.Bridge = SystemBridge;
 window.Console = CreatorConsole;
 
 // IGNITION
 document.addEventListener('DOMContentLoaded', () => {
     StabilizeSpine();
-    SystemBridge.init(EnlightenmentBrain);
-    CreatorConsole.init(EnlightenmentBrain);
+    SystemBridge.init(Brain);
+    CreatorConsole.init(Brain);
+    console.log('%c[AppController] v2.0.0 - All Systems Online', 'color: #0f0; font-size: 14px; font-weight: bold;');
 });

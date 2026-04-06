@@ -1,7 +1,7 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.88_SHAMBHALA_FINAL | AETHER_MIRRORLESS | GOLDEN_SPIRAL
-## Last Updated: 2026-04-05
+## Version: 2.90_CREATOR_CONSOLE | AETHER_MIRRORLESS | GOLDEN_SPIRAL
+## Last Updated: 2026-04-06
 
 ---
 
@@ -146,6 +146,15 @@ for (let i = 0; i < 600; i++) {
   - @capacitor/status-bar v8.0.2 - Dark immersive mode
   - capacitor.config.json with iOS/Android settings
   - Sensories.js utility (tap/select/confirm/success/warning/error)
+- [x] **Creator Console (Umbrella Debug Panel)** ✅ (2026-04-06)
+  - Full-screen accordion toggle (60px collapsed / 100vh expanded)
+  - SYSTEM BRAIN READOUT: live state variables (currentTheme, spineUnlocked, consoleOpen)
+  - QUICK ACTIONS: Skin switching (Cosmic, Pure Light), Export Sovereign HTML, Force Hard Reset
+  - Status footer: LATENCY, SYSTEM_READY, REGION
+  - Implemented via Vanilla JS in `/public/AppController.js`
+  - CSS protection rules prevent aggressive hiding by other styles
+  - Cache-busting query strings on script tags (v=20250406a)
+  - Service Worker v2.1.0 forces cache invalidation
 
 ---
 

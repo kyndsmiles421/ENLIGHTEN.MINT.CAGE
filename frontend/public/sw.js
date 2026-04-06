@@ -6,7 +6,7 @@
  * - Background Sync for offline form submissions
  */
 
-const CACHE_NAME = 'enlightenment-v1.2.0-rapid-city';
+const CACHE_NAME = 'enlightenment-v2.1.0-creator-console';
 const OFFLINE_URL = '/offline.html';
 
 // Core assets to pre-cache for instant loading
@@ -21,7 +21,7 @@ const ASSETS_TO_CACHE = [
 
 // 1. INSTALL: Pre-cache the sanctuary essentials
 self.addEventListener('install', (event) => {
-  console.log('[SW] Energizing Sanctuary Cache v1.2.0...');
+  console.log('[SW] Energizing Sanctuary Cache v2.0.0...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -210,4 +210,4 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-console.log('[SW] Enlightenment Cafe Service Worker v1.2.0 loaded');
+console.log('[SW] Enlightenment Cafe Service Worker v2.0.0 loaded');
