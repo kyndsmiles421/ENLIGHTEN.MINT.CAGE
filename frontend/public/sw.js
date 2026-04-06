@@ -1,9 +1,31 @@
 // ━━━ ENLIGHTEN.MINT.CAFE Service Worker ━━━
 // Push Notifications + Offline Solfeggio Oscillator Cache + App Shell
 
-const CACHE_VERSION = 'cosmic-v3';
-const SOLFEGGIO_CACHE = 'solfeggio-wavetables-v1';
-const INSTRUMENT_CACHE = 'organic-instruments-v1';
+const CACHE_VERSION = 'cosmic-v4-force-clear';
+const SOLFEGGIO_CACHE = 'solfeggio-wavetables-v2';
+const INSTRUMENT_CACHE = 'organic-instruments-v2';
+
+// FORCE CLEAR ALL CACHES ON INSTALL
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => caches.delete(cacheName))
+      );
+    })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => caches.delete(cacheName))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
 
 // Core Solfeggio frequencies to pre-cache as wave table data
 const SOLFEGGIO_FREQUENCIES = [396, 432, 528, 639, 741, 852, 963];
