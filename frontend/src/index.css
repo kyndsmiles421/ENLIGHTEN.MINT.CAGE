@@ -6,6 +6,41 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   SOVEREIGN SPINE - NUCLEAR SCROLL FIX (TOP PRIORITY)
+   ═══════════════════════════════════════════════════════════════════════════ */
+html {
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  position: relative !important;
+}
+
+#root {
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  position: relative !important;
+}
+
+.immersive-page,
+.sanctuary-root,
+.min-h-screen {
+  overflow-y: visible !important;
+  height: auto !important;
+  min-height: auto !important;
+  position: relative !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    GLOBAL MATRIX PURGE — Clean Slate CSS
    ═══════════════════════════════════════════════════════════════════════════ */
 [class*="matrix"]:not([class*="FRICTION"]),

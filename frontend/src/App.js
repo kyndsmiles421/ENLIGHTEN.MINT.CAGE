@@ -310,7 +310,7 @@ function CafeApp() {
         />
       )}
       {!isSovereignRoute && <VellumOverlay />}
-      <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
+      <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
         {!isSovereignRoute && <Navigation />}
         <ScrollToTop />
         <Toaster

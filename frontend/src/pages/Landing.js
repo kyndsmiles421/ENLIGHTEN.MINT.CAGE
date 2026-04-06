@@ -933,7 +933,7 @@ export default function Landing() {
   }, [animateBreath]);
 
   return (
-    <div className="min-h-screen immersive-page sanctuary-root relative" style={{ background: 'transparent' }}>
+    <div className="sanctuary-root relative" style={{ background: 'transparent', minHeight: 'auto', overflow: 'visible' }}>
       {/* ═══════════════════════════════════════════════════════════════════
           LAYER 1: THE CORE IMMERSIVE SOUL (Always Visible)
           - Breathing Orb animation
