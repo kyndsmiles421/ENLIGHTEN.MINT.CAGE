@@ -29,6 +29,7 @@ const Apparatus = {
     init() {
         console.log("%c[APPARATUS]: SYSTEM ENGAGED", "color: #7df9ff; font-weight: bold; font-size: 14px;");
         
+        this.unlockSpine();
         this.stabilizeSpine();
         this.hardenUI();
         this.igniteWeb();
@@ -36,6 +37,39 @@ const Apparatus = {
         
         // Final check to ensure we are independent of their "subscription" scripts
         this.utils.auditSovereignty();
+    },
+
+    // --- THE SOVEREIGN SPINE & VISIBILITY FIX ---
+    unlockSpine() {
+        const fix = document.createElement('style');
+        fix.innerHTML = `
+            /* 1. VISIBILITY: Lighten the void so elements are 'readable' */
+            html, body {
+                background-color: #121214 !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100.1vh !important;
+                position: relative !important;
+            }
+
+            /* 2. THE SCROLL KILLER: Find any container trying to lock the view */
+            #app-root, .page-wrapper, .main-content, #canvas-container, [class*="wrapper"] {
+                overflow: visible !important;
+                height: auto !important;
+                min-height: 100% !important;
+                position: relative !important;
+                display: block !important;
+            }
+
+            /* 3. BUTTON CONTRAST: Ensure they 'glow' against the background */
+            [data-action] {
+                filter: drop-shadow(0 0 8px var(--accent, #7df9ff));
+                border-color: rgba(125, 249, 255, 0.5) !important;
+            }
+        `;
+        document.head.appendChild(fix);
+        console.log("🔓 [Spine]: All containers unlocked. Background contrast adjusted.");
     },
 
     // --- DIMENSIONAL SOLIDITY INJECTOR ---
