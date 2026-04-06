@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Login - The Enlightenment Cafe</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0a0a1a 0%, #000 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .container {
+            width: 100%;
+            max-width: 380px;
+        }
+        h1 {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+        p {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 32px;
+        }
+        label {
+            display: block;
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            height: 52px;
+            padding: 14px 16px;
+            font-size: 16px;
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        input:focus {
+            border-color: rgba(255,255,255,0.6);
+        }
+        input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        button {
+            width: 100%;
+            height: 52px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            background: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        button:hover {
+            background: #f0f0f0;
+        }
+        .error {
+            color: #ff6b6b;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .toggle {
+            text-align: center;
+            margin-top: 24px;
+            color: rgba(255,255,255,0.6);
+        }
+        .toggle a {
+            color: #a78bfa;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome Back</h1>
+        <p>Continue your cosmic journey</p>
+        
+        <div class="error" id="error"></div>
+        
+        <form id="loginForm">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="your@email.com" required>
+            
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Your password" required>
+            
+            <button type="submit" id="submitBtn">Begin Journey</button>
+        </form>
+        
+        <p class="toggle">New here? <a href="/auth">Create account</a></p>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        const form = document.getElementById('loginForm');
+        const errorDiv = document.getElementById('error');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorDiv.style.display = 'none';
+            submitBtn.textContent = 'Signing in...';
+            submitBtn.disabled = true;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(API_URL + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    localStorage.setItem('zen_token', data.token);
+                    if (data.user) {
+                        localStorage.setItem('zen_user', JSON.stringify(data.user));
+                    }
+                    window.location.href = '/dashboard';
+                } else {
+                    throw new Error(data.detail || 'Login failed');
+                }
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.style.display = 'block';
+                submitBtn.textContent = 'Begin Journey';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
