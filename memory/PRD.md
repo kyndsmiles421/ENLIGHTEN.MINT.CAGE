@@ -117,6 +117,14 @@ for (let i = 0; i < 600; i++) {
   - 192x192 and 512x512 icons configured
   - Portal shortcut added to app shortcuts
   - Standalone display mode enabled
+- [x] **Landing Page Sign In Fix** ✅ (2026-04-06)
+  - Fixed Guest Mode blocking Sign In button visibility
+  - Updated Landing.js: checks `user.id === 'guest'` instead of `!user`
+  - Top-left "Sign In" button now visible for guests
+  - "Sign In / Register" button in hero section
+  - All buttons route correctly to /auth
+  - VoidShield.css v3.1 with clean pointer-events handling
+  - Mobile responsive - buttons visible on all viewports
 
 ---
 
