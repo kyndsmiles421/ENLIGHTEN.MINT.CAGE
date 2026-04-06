@@ -1,41 +1,30 @@
 /* Sanctuary.css - Layered Touch Architecture
    The Enlightenment Cafe | Rapid City Edition */
 
-/* 1. THE BACKGROUND (The Soul) 
-   Must be visible but UNTOUCHABLE. 
-   'pointer-events: none' is the magic fix. */
-.aurora-bg, 
-.breathing-orb-container, 
-.background-visuals {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;             /* Absolute bottom */
-  pointer-events: none;   /* Touches pass right through this! */
-  user-select: none;
+/* --- THE SOUL (BACKGROUND) --- */
+.aurora-bg, .breathing-orb-container {
+  position: fixed !important; /* Locks it to the viewport, not the scroll */
+  inset: 0;
+  z-index: -1;                /* Moves it behind the interaction layer */
+  pointer-events: none;       /* Makes it invisible to touches */
+  transform: translateZ(0);   /* Forces GPU acceleration for fluid motion */
 }
 
-/* 2. THE SCROLL LAYER (The Interaction) 
-   Must be on top and ALLOW touches. */
-.scroll-viewport, 
-.main-stage, 
-.content-wrapper {
+/* --- THE INTERACTION (FOREGROUND) --- */
+html, body {
+  overflow-x: hidden;
+  height: auto;               /* Allows the body to grow with content */
+}
+
+#root, .sanctuary-root {
+  display: block;
+  min-height: 100vh;
+  overflow-y: auto;           /* THE FIX: Re-enables the scroll-ability */
+  -webkit-overflow-scrolling: touch; /* Momentum scrolling for iOS */
+}
+
+.glass-card {
   position: relative;
-  z-index: 10;            /* Sit on top of the Aurora */
-  pointer-events: auto;   /* Re-enable clicking and scrolling */
-  overflow-y: auto;       /* Ensure scrolling is allowed */
-  -webkit-overflow-scrolling: touch; /* Smooth momentum on iPhone */
-  height: 100vh;
-}
-
-/* 3. THE BUTTONS & PILLARS 
-   Ensure they have high priority. */
-.glass-card, 
-.btn-glass, 
-.pillar-card {
-  z-index: 20;
-  pointer-events: auto;   /* Force interaction */
-  cursor: pointer;
+  z-index: 10;                /* Sits on top of the fixed background */
+  margin-bottom: 2rem;        /* Creates space to see the fluid background */
 }
