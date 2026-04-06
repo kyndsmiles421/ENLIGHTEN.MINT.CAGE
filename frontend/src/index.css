@@ -3352,3 +3352,27 @@ div:has(> a[href*="emergentagent"]) {
   transform: scale(1.02);
   filter: brightness(1.1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MASTER OVERRIDE - FORCE ALL BUTTONS TO WORK
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body * button,
+body * a,
+body * input,
+body * [role="button"],
+body * [onclick],
+body * .btn,
+body * .button {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 100;
+}
+
+/* Remove any blocking overlays */
+.blocking-overlay,
+.invisible-blocker {
+  display: none !important;
+}
+

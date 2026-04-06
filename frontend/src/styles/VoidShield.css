@@ -276,6 +276,23 @@ header:not(.sovereign-header),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   FORCE ALL INTERACTIVE ELEMENTS TO WORK
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+button, 
+a, 
+input, 
+select, 
+textarea,
+[role="button"],
+[onclick],
+.clickable,
+[data-testid] {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    AUTH PAGE - FORCE INPUT VISIBILITY
    ═══════════════════════════════════════════════════════════════════════════ */
 
