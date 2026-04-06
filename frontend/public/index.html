@@ -4,7 +4,10 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="theme-color" content="#0B0C15" />
-        <meta name="description" content="The Enlightenment Cafe — A sacred digital space for breathing, meditation, sound healing, and expanding your awareness. V2.88 SHAMBHALA | AETHER_MIRRORLESS" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        <meta name="description" content="The Enlightenment Cafe — A sacred digital space for breathing, meditation, sound healing, and expanding your awareness. V3.0" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Enlightenment" />
@@ -13,16 +16,29 @@
         <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
         <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
         <meta property="og:title" content="The Enlightenment Cafe" />
-        <meta property="og:description" content="The Enlightenment Cafe — AI-powered wellness with AETHER_MIRRORLESS physics. V2.88 SHAMBHALA" />
+        <meta property="og:description" content="The Enlightenment Cafe — V3.0" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="%PUBLIC_URL%/logo512.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="The Enlightenment Cafe" />
-        <meta name="twitter:description" content="The Enlightenment Cafe — AI-powered wellness with AETHER_MIRRORLESS physics. V2.88 SHAMBHALA" />
+        <meta name="twitter:description" content="The Enlightenment Cafe — V3.0" />
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <script>
+            // Force unregister service worker and clear caches
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+        </script>
         <!--
         manifest.json provides metadata used when your web app is installed on a
         user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
