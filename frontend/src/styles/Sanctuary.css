@@ -28,3 +28,64 @@ html, body {
   z-index: 10;                /* Sits on top of the fixed background */
   margin-bottom: 2rem;        /* Creates space to see the fluid background */
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RECEPTIVE BUTTONS - 44x44px Minimum Touch Targets
+   Apple HIG & WCAG 2.1 compliant hit areas
+   ═══════════════════════════════════════════════════════════════════════════ */
+.receptive-button {
+  position: relative;
+  padding: 10px 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Invisible 44x44px (minimum) hit area expansion */
+.receptive-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px; 
+  height: 44px;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Immediate tactile feedback on press */
+.receptive-button:active {
+  transform: scale(0.95);
+  filter: brightness(0.9);
+}
+
+/* Apply to all interactive elements */
+.btn-glass,
+.pillar-card,
+.glass-card[role="button"],
+[data-testid*="btn"] {
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.btn-glass::after,
+.pillar-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px; 
+  height: 44px;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.btn-glass:active,
+.pillar-card:active {
+  transform: scale(0.97);
+  filter: brightness(0.95);
+}
