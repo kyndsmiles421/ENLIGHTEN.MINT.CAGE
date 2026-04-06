@@ -10,18 +10,15 @@ const SystemBridge = {
     init(systemBrain) {
         this.brain = systemBrain;
         
-        // Listen for all clicks on the document
         document.addEventListener('click', (event) => {
             const target = event.target.closest('button, [role="button"], a');
             
-            // Only proceed if element has data-action
             if (target && target.dataset.action) {
                 const action = target.dataset.action;
                 const value = target.dataset.value || null;
 
                 console.log(`%c[Bridge] Routing action: ${action}`, "color: #00f2ff");
 
-                // Direct connection to system brain functions
                 if (this.brain && typeof this.brain[action] === 'function') {
                     this.brain[action](value, target);
                 } else {
@@ -36,7 +33,6 @@ const SystemBridge = {
 
 /**
  * ENLIGHTENMENT BRAIN - The Logic Engine
- * All system actions defined here
  */
 const EnlightenmentBrain = {
     // Navigation
@@ -64,40 +60,18 @@ const EnlightenmentBrain = {
         }
     },
 
-    // Harvest (RPG)
-    harvest_seed: (value, el) => {
-        el?.classList.add('harvested');
-        console.log(`✨ Resonance Harvested: ${value || el?.id}`);
-    },
-
     // Skin Switching
-    change_skin: (theme) => {
+    setTheme: (theme) => {
         const skins = {
-            'cosmic_neon': { '--bg': '#0a0a0c', '--accent': '#7df9ff' },
-            'vegan_earth': { '--bg': '#1b261e', '--accent': '#a3b18a' },
-            'golden_ratio': { '--bg': '#1a1a1a', '--accent': '#d4af37' }
+            'cosmic': { '--bg': '#0a0a0c', '--accent': '#7df9ff' },
+            'golden': { '--bg': '#1a1a1a', '--accent': '#d4af37' },
+            'earth': { '--bg': '#1b261e', '--accent': '#a3b18a' }
         };
-        const colors = skins[theme] || skins['cosmic_neon'];
+        const colors = skins[theme] || skins['cosmic'];
         Object.entries(colors).forEach(([key, val]) => {
             document.documentElement.style.setProperty(key, val);
         });
         console.log(`🎨 Skin: ${theme}`);
-    },
-
-    // Export
-    export_code: () => {
-        const code = document.documentElement.outerHTML;
-        const blob = new Blob([code], { type: "text/html" });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = "ENLIGHTEN-MINT-CAFE.html";
-        a.click();
-        console.log("📦 Code Exported");
-    },
-
-    // Google Sync
-    sync_google: () => {
-        window.open('https://console.cloud.google.com/', '_blank');
     }
 };
 
@@ -131,19 +105,12 @@ const StabilizeSpine = () => {
     console.log("🔓 [Spine]: Stabilized");
 };
 
-// IGNITION
-document.addEventListener('DOMContentLoaded', () => {
-    StabilizeSpine();
-    SystemBridge.init(EnlightenmentBrain);
-});
-
-// Expose globally for console access
+// Expose globally
 window.Brain = EnlightenmentBrain;
 window.Bridge = SystemBridge;
 
 /**
  * CREATOR CONSOLE - Debug/Admin Panel
- * Shows brain state in real-time
  */
 const CreatorConsole = {
     init(systemBrain) {
@@ -160,7 +127,6 @@ const CreatorConsole = {
         
         // Start the heartbeat for the Brain Readout
         setInterval(() => this.updateReadout(systemBrain), 500);
-        console.log('%c[Creator Console]: Active', 'color: #00ff00; font-weight: bold');
     },
 
     render(container) {
@@ -171,9 +137,9 @@ const CreatorConsole = {
                 
                 <div style="font-weight:bold; border-bottom:1px solid #333; margin-bottom:8px;">SKINS</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; margin-bottom:15px;">
-                    <button class="skin-btn" data-skin="cosmic" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer; padding:5px;">Cosmic</button>
-                    <button class="skin-btn" data-skin="golden" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer; padding:5px;">Golden</button>
-                    <button class="skin-btn" data-skin="earth" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer; padding:5px;">Earth</button>
+                    <button class="skin-btn" data-skin="cosmic" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer;">Cosmic</button>
+                    <button class="skin-btn" data-skin="golden" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer;">Golden</button>
+                    <button class="skin-btn" data-skin="earth" style="background:#222; color:#fff; border:1px solid #444; cursor:pointer;">Earth</button>
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:5px;">
@@ -197,7 +163,7 @@ const CreatorConsole = {
                 </div>`;
             }
         }
-        varDisplay.innerHTML = stateHtml || '<div style="color:#666;">Brain online - no state vars</div>';
+        varDisplay.innerHTML = stateHtml || '<div style="color:#555;">System Online</div>';
     },
 
     attachListeners(brain) {
@@ -206,13 +172,13 @@ const CreatorConsole = {
             btn.addEventListener('click', () => {
                 const skin = btn.dataset.skin;
                 console.log(`[System] Applying ${skin} theme...`);
-                if (brain.change_skin) brain.change_skin(skin === 'cosmic' ? 'cosmic_neon' : skin === 'golden' ? 'golden_ratio' : 'vegan_earth');
+                if (brain.setTheme) brain.setTheme(skin);
                 document.body.className = `theme-${skin}`;
             });
         });
 
         // Export Logic
-        document.getElementById('export-html')?.addEventListener('click', () => {
+        document.getElementById('export-html').addEventListener('click', () => {
             const htmlContent = document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
@@ -227,9 +193,9 @@ const CreatorConsole = {
 
 window.Console = CreatorConsole;
 
-// Start the console after DOM is ready
+// IGNITION
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        CreatorConsole.init(EnlightenmentBrain);
-    }, 1500);
+    StabilizeSpine();
+    SystemBridge.init(EnlightenmentBrain);
+    CreatorConsole.init(EnlightenmentBrain);
 });
