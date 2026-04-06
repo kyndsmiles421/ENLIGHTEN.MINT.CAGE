@@ -1,88 +1,121 @@
 /**
- * THE CRYSTALLINE WEB - ENLIGHTEN.MINT.CAFE CORE
- * A self-healing, resonance-based architecture.
+ * ENLIGHTEN.MINT.CAFE - THE SOVEREIGN APPARATUS
+ * Version: 1.0.0 | Author: Steven Michael (Sovereign Creator)
+ * 
+ * INSTRUCTIONS: 
+ * 1. Replace your entire main.js or Landing.js with this.
+ * 2. This script handles: Scrolling, Buttons, Media, & App Routing.
  */
 
-const ResonanceEngine = {
-    // 1. THE SOURCE: Define your "Frequencies" (Actions) here once.
-    frequencies: {
+const Apparatus = {
+    // --- 1. FREQUENCY MAP (The Brain) ---
+    // Add every tool/action you want here.
+    tools: {
         'nav_toggle': () => document.querySelector('.orbital-nav')?.classList.toggle('active'),
-        'shield_active': () => document.body.classList.toggle('silence-shield'),
-        'seed_harvest': (el) => {
-            el.classList.add('harvested');
-            console.log("✨ Resonance Harvested at Point:", el.dataset.pointId || 'Unknown');
-        },
-        'wellness_sync': () => console.log("🌱 Wellness Hub Synchronized."),
+        'shield_toggle': () => document.body.classList.toggle('silence-shield'),
+        'harvest_seed': (el) => Apparatus.utils.notify(`Resonance Harvested: ${el.id}`),
+        'media_play': (el) => Apparatus.modules.mixer.play(el.dataset.src),
+        'scroll_top': () => window.scrollTo({top: 0, behavior: 'smooth'}),
+        'sync_google': () => Apparatus.modules.auth.googleSync(),
         'quick_reset': () => window.dispatchEvent(new CustomEvent('QUICK_RESET')),
-        'start_meditation': () => window.dispatchEvent(new CustomEvent('START_MEDITATION')),
-        'open_oracle': () => window.dispatchEvent(new CustomEvent('OPEN_ORACLE')),
         'sign_in': () => window.location.href = '/auth',
         'begin_journey': () => window.location.href = '/auth',
         'watch_intro': () => window.location.href = '/intro',
-        'default': (action) => console.warn(`⚠️ Frequency "${action}" not tuned in the Web yet.`)
+        'open_dashboard': () => window.location.href = '/dashboard',
+        'default': (act) => console.log(`Frequency ${act} received.`)
     },
 
-    // 2. THE WEB: The automatic listener that feels every "touch"
-    ignite() {
-        console.log("%c[Crystalline Web]: Online & Resonating", "color: #7df9ff; font-weight: bold;");
+    // --- 2. THE IGNITION (The Nervous System) ---
+    init() {
+        console.log("%c[APPARATUS]: SYSTEM ENGAGED", "color: #7df9ff; font-weight: bold; font-size: 14px;");
         
-        // Fix background interference AND scrolling immediately
-        this.stabilizeAtmosphere();
+        this.stabilizeSpine();
+        this.igniteWeb();
+        this.modules.mixer.init();
+        
+        // Final check to ensure we are independent of their "subscription" scripts
+        this.utils.auditSovereignty();
+    },
 
+    // --- 3. THE SPINE (The Scroll & Layout Fix) ---
+    stabilizeSpine() {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            html, body { 
+                overflow-y: auto !important; 
+                height: auto !important; 
+                position: relative !important; 
+                scroll-behavior: smooth;
+            }
+            .aurora, .bg-layer, [class*="overlay"] { 
+                pointer-events: none !important; 
+                z-index: -1 !important; 
+            }
+            button, a, [data-action] { 
+                pointer-events: auto !important; 
+                cursor: pointer !important;
+            }
+        `;
+        document.head.appendChild(style);
+        console.log("🔓 Spine Stabilized: Scrolling Unlocked.");
+    },
+
+    // --- 4. THE WEB (The Event Dispatcher) ---
+    igniteWeb() {
         window.addEventListener('click', (e) => {
             const point = e.target.closest('[data-action]');
             if (!point) return;
 
             const action = point.dataset.action;
-            this.pulse(point);
+            this.utils.pulse(point);
 
-            if (this.frequencies[action]) {
-                this.frequencies[action](point);
+            if (this.tools[action]) {
+                this.tools[action](point);
             } else {
-                this.frequencies['default'](action);
+                this.tools['default'](action);
             }
         });
     },
 
-    // 3. ATMOSPHERE: THE SOVEREIGN SPINE - Forces scroll to work
-    stabilizeAtmosphere() {
-        // 1. FORCE SCROLL: Unlock the body and html layers
-        document.documentElement.style.overflow = 'auto'; 
-        document.documentElement.style.height = 'auto';
-        document.body.style.overflow = 'auto';
-        document.body.style.height = 'auto';
-        document.body.style.position = 'relative';
-
-        // 2. GHOST LAYER BYPASS: Ensure nothing invisible is blocking the scroll wheel
-        const blockers = ['.aurora', '.background-layer', '#bg-canvas', '.glass-overlay', '[class*="overlay"]', '.aurora-bg', '.breathing-orb-container', '.immersive-page'];
-        blockers.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => {
-                el.style.pointerEvents = 'none';
-                el.style.zIndex = '-1';
-            });
-        });
-
-        // 3. ENSURE MAIN CONTENT IS SCROLLABLE
-        const containers = ['#root', '.sanctuary-root', '.app-root', 'main', '#main-container'];
-        containers.forEach(selector => {
-            const el = document.querySelector(selector);
-            if (el) {
-                el.style.minHeight = '100.1vh';
-                el.style.display = 'block';
-                el.style.overflowY = 'auto';
+    // --- 5. THE MODULES (The Toolset) ---
+    modules: {
+        mixer: {
+            init() { console.log("🔊 Media Mixer Ready."); },
+            play(src) { 
+                const audio = new Audio(src);
+                audio.play();
             }
-        });
-        
-        console.log("🔓 [Sovereign Spine]: Scrolling Unlocked.");
+        },
+        auth: {
+            googleSync() {
+                // This is where your independent Google/GoDaddy API hooks live
+                window.location.href = "https://accounts.google.com/"; 
+            }
+        },
+        wellness: {
+            // Placeholder for your Enlightenment Cafe logic
+            logEnergy: (val) => console.log(`Vibrational State: ${val}`)
+        }
     },
 
-    // 4. PULSE: Visual confirmation that the web is alive
-    pulse(el) {
-        el.style.transition = 'all 0.2s ease';
-        el.style.filter = 'brightness(1.5) drop-shadow(0 0 10px #7df9ff)';
-        setTimeout(() => el.style.filter = '', 200);
+    // --- 6. UTILITIES (The Maintenance) ---
+    utils: {
+        pulse(el) {
+            el.style.transform = 'scale(0.95)';
+            setTimeout(() => el.style.transform = '', 100);
+        },
+        notify(msg) {
+            console.log(`%c[Crystal-Log]: ${msg}`, "color: #bada55");
+        },
+        auditSovereignty() {
+            // Detects if their scripts are still trying to hijack the page
+            const subscriptionScripts = document.querySelectorAll('script[src*="their-platform-name"]');
+            if (subscriptionScripts.length > 0) {
+                console.warn("Found platform-specific scripts. Ready for removal.");
+            }
+        }
     }
 };
 
-// Ignite the Web when the DOM is ready
-document.addEventListener('DOMContentLoaded', () => ResonanceEngine.ignite());
+// Start the Engine
+document.addEventListener('DOMContentLoaded', () => Apparatus.init());
