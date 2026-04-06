@@ -125,12 +125,34 @@ for (let i = 0; i < 600; i++) {
   - All buttons route correctly to /auth
   - VoidShield.css v3.1 with clean pointer-events handling
   - Mobile responsive - buttons visible on all viewports
+- [x] **Four-Tier Gated Architecture** ✅ (2026-04-06)
+  - Layer 1: Aurora/Breathing Orb (Always visible)
+  - Layer 2: Guest → Hero/Pillars | Sovereign → PersonalizedDashboard
+  - Layer 3: Testimonials/How it Works (Guest only)
+  - Layer 4: Waitlist (Guest only) | Footer (Both)
+  - Reduced page weight for authenticated users (mobile performance)
+- [x] **Service Worker v1.2.0** ✅ (2026-04-06)
+  - Network-First for API/Auth (fresh data)
+  - Stale-While-Revalidate for UI assets (instant + background update)
+  - Background Sync for offline form submissions (waitlist, mood)
+  - Push notification support (future daily affirmations)
+- [x] **App Shell** ✅ (2026-04-06)
+  - Breathing gold orb loader while React initializes
+  - Zero white-screen time
+  - Matches void black theme (#0B0C15)
+- [x] **Capacitor Native Foundation** ✅ (2026-04-06)
+  - @capacitor/core v8.3.0
+  - @capacitor/haptics v8.0.2 - Touch feedback
+  - @capacitor/status-bar v8.0.2 - Dark immersive mode
+  - capacitor.config.json with iOS/Android settings
+  - Sensories.js utility (tap/select/confirm/success/warning/error)
 
 ---
 
 ## Future Roadmap
 - [ ] Custom domain (ENLIGHTEN.MINT.CAFE)
-- [ ] App Store deployment (PWA/Capacitor)
+- [ ] **Capacitor Build & Deploy** - `npx cap add ios && npx cap add android && yarn build && npx cap sync`
+- [ ] App Store submission (iOS App Store, Google Play)
 - [ ] Spatial Audio Panning
 - [ ] GPS-based Cosmic Map
 
