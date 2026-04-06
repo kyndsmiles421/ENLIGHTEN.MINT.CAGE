@@ -89,3 +89,23 @@ html, body {
   transform: scale(0.97);
   filter: brightness(0.95);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMMERSIVE CARDS - Glassmorphism with Depth
+   ═══════════════════════════════════════════════════════════════════════════ */
+.immersive-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.immersive-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: #00d4ff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
