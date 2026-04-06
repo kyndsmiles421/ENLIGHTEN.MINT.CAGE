@@ -23,6 +23,8 @@ import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, MANTRAS as MIXER_MANTRAS } 
 import ShareButton from '../components/ShareButton';
 import GuidedTour from '../components/GuidedTour';
 import CosmicMoodRing from '../components/CosmicMoodRing';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -894,6 +896,29 @@ export default function Landing() {
   const [showTour, setShowTour] = useState(false);
   const animRef = useRef(null);
 
+  // ═══ NATIVE UI INITIALIZATION (Capacitor) ═══
+  useEffect(() => {
+    const initNativeUI = async () => {
+      try {
+        // Dark status bar for immersive experience
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setBackgroundColor({ color: '#0B0C15' });
+      } catch (e) {
+        // Web fallback - no-op
+      }
+    };
+    initNativeUI();
+  }, []);
+
+  // ═══ HAPTIC FEEDBACK (Native Touch) ═══
+  const triggerHaptic = async (style = ImpactStyle.Medium) => {
+    try {
+      await Haptics.impact({ style });
+    } catch (e) {
+      // Web fallback - no-op
+    }
+  };
+
   const handleTourFinish = () => {
     localStorage.setItem('zen_tour_seen', 'true');
   };
@@ -936,7 +961,7 @@ export default function Landing() {
       {isGuest && (
         <div className="fixed top-4 left-4 z-50">
           <button 
-            onClick={() => navigate('/auth')}
+            onClick={() => { triggerHaptic(ImpactStyle.Heavy); navigate('/auth'); }}
             style={{
               background: 'rgba(255,255,255,0.15)',
               border: '2px solid rgba(255,255,255,0.5)',
@@ -1012,8 +1037,8 @@ export default function Landing() {
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
               className="flex flex-wrap gap-4">
-              <button onClick={() => setShowQuickReset(true)}
-                onTouchEnd={(e) => { e.preventDefault(); setShowQuickReset(true); }}
+              <button onClick={() => { triggerHaptic(ImpactStyle.Light); setShowQuickReset(true); }}
+                onTouchEnd={(e) => { e.preventDefault(); triggerHaptic(ImpactStyle.Light); setShowQuickReset(true); }}
                 className="group py-3 px-6 rounded-full cursor-pointer glow-primary"
                 style={{
                   background: 'rgba(192,132,252,0.08)',
@@ -1028,7 +1053,7 @@ export default function Landing() {
                   <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
                 </span>
               </button>
-              <button onClick={() => navigate(isGuest ? '/auth' : '/dashboard')}
+              <button onClick={() => { triggerHaptic(ImpactStyle.Medium); navigate(isGuest ? '/auth' : '/dashboard'); }}
                 className="btn-glass group"
                 style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
                 data-testid="begin-journey-btn">
@@ -1039,7 +1064,7 @@ export default function Landing() {
               
               {/* SIGN IN BUTTON - Visible for guests (TIER A Entry) */}
               {isGuest && (
-                <button onClick={() => navigate('/auth')}
+                <button onClick={() => { triggerHaptic(ImpactStyle.Heavy); navigate('/auth'); }}
                   className="group py-3 px-8 rounded-full cursor-pointer"
                   style={{
                     background: 'rgba(255,255,255,0.1)',
@@ -1053,8 +1078,8 @@ export default function Landing() {
                 </button>
               )}
               
-              <button onClick={() => setShowTour(true)}
-                onTouchEnd={(e) => { e.preventDefault(); setShowTour(true); }}
+              <button onClick={() => { triggerHaptic(ImpactStyle.Light); setShowTour(true); }}
+                onTouchEnd={(e) => { e.preventDefault(); triggerHaptic(ImpactStyle.Light); setShowTour(true); }}
                 className="group py-3 px-6 rounded-full cursor-pointer"
                 style={{
                   background: 'rgba(216,180,254,0.08)',
