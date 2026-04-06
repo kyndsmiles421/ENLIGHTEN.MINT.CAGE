@@ -30,11 +30,52 @@ const Apparatus = {
         console.log("%c[APPARATUS]: SYSTEM ENGAGED", "color: #7df9ff; font-weight: bold; font-size: 14px;");
         
         this.stabilizeSpine();
+        this.hardenUI();
         this.igniteWeb();
         this.modules.mixer.init();
         
         // Final check to ensure we are independent of their "subscription" scripts
         this.utils.auditSovereignty();
+    },
+
+    // --- DIMENSIONAL SOLIDITY INJECTOR ---
+    hardenUI() {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            /* 1. PHYSICAL DIMENSION: Give buttons weight and depth */
+            [data-action] {
+                background: rgba(20, 20, 25, 0.85) !important;
+                border: 2px solid var(--accent, #7df9ff) !important;
+                color: var(--accent, #7df9ff) !important;
+                border-radius: 8px;
+                padding: 12px 24px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 
+                            inset 0 0 10px rgba(125, 249, 255, 0.2) !important;
+                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                backdrop-filter: blur(10px) !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            /* 2. OPPOSING COLOR HOVER: Visual confirmation of contact */
+            [data-action]:hover {
+                background: var(--accent, #7df9ff) !important;
+                color: #000 !important;
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 25px rgba(125, 249, 255, 0.6) !important;
+            }
+
+            /* 3. THE "TOUCH" FEEDBACK: Physical depress on click */
+            [data-action]:active {
+                transform: translateY(1px) scale(0.98);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+            }
+        `;
+        document.head.appendChild(style);
+        console.log("💎 [UI Physics]: Buttons Hardened and Dimensionalized.");
     },
 
     // --- 3. THE SPINE (The Scroll & Layout Fix) ---
