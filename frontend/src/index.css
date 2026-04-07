@@ -3163,11 +3163,11 @@ iframe[src*="emergent"] {
 
 /* Hide the green dot completely */
 .green-dot,
-div[style*="background-color: green"],
-div[style*="background: green"],
-div[style*="rgb(0, 128, 0)"],
-div[style*="#00ff00"],
-div[style*="#0f0"],
+div[style*="background-color: green"]:not(#master-umbrella *),
+div[style*="background: green"]:not(#master-umbrella *),
+div[style*="rgb(0, 128, 0)"]:not(#master-umbrella *),
+div[style*="#00ff00"]:not(#master-umbrella *),
+div[style*="#0f0"]:not(#master-umbrella *),
 [style*="width: 10px"][style*="height: 10px"][style*="border-radius"],
 [style*="width: 8px"][style*="height: 8px"][style*="border-radius"] {
   display: none !important;
@@ -3496,7 +3496,7 @@ a,
   opacity: 1 !important;
   pointer-events: auto !important;
   min-height: 60px !important;
-  /* Allow JS to control height dynamically */
+  overflow: hidden !important;
 }
 
 /* Allow internal console-content to be toggled by JS */
