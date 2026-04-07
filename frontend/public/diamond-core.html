@@ -6,11 +6,39 @@
     <title>ENLIGHTENMENT ENGINE - DIAMOND CORE</title>
     <style>
         body { margin: 0; background: #000; overflow: hidden; font-family: monospace; }
-        #ui { position: absolute; top: 20px; left: 20px; color: #00FFFF; pointer-events: none; text-shadow: 0 0 5px #00FFFF; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #00FFFF; pointer-events: none; text-shadow: 0 0 5px #00FFFF; z-index: 100; }
     </style>
 </head>
 <body>
-    <div id="ui">CORE: DIAMOND SINGULARITY<br>RESONANCE: PIEZOELECTRIC BRIDGE<br>SHIELD: METATRON-FLOWER HYBRID</div>
+    <div id="ui">CORE: DIAMOND SINGULARITY<br>RESONANCE: PIEZOELECTRIC BRIDGE<br>SHIELD: METATRON-FLOWER HYBRID<br>SHADER: OCULAR REFRACTION</div>
+    
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec3 vNormal;
+        varying vec3 vEyeVector;
+        void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+            vEyeVector = normalize(worldPosition.xyz - cameraPosition);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform samplerCube envMap;
+        uniform float ior;
+        uniform float lensFactor;
+        varying vec3 vNormal;
+        varying vec3 vEyeVector;
+        
+        void main() {
+            vec3 refraction = refract(vEyeVector, vNormal, 1.0/ior);
+            refraction.xy += (refraction.xy * lensFactor); 
+            
+            vec4 envColor = textureCube(envMap, refraction);
+            gl_FragColor = vec4(envColor.rgb, 1.0);
+        }
+    </script>
+
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
@@ -23,13 +51,66 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // --- THE DIAMOND CORE (Inner Earth) ---
-        const diamondGeo = new THREE.OctahedronGeometry(1, 0);
-        const diamondMat = new THREE.MeshPhysicalMaterial({ 
-            color: 0xffffff, transmission: 1, opacity: 1, roughness: 0, thickness: 5, 
-            ior: 2.4, // Diamond Refractive Index
-            emissive: 0x00ffff, emissiveIntensity: 0.5
+        // --- ENVIRONMENT CUBE MAP ---
+        const cubeTextureLoader = new THREE.CubeTextureLoader();
+        const envMap = new THREE.CubeTextureLoader().load([
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+        ]);
+
+        // Generate procedural environment
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        const envScene = new THREE.Scene();
+        envScene.background = new THREE.Color(0x000011);
+        
+        // Add some lights to environment for reflections
+        for (let i = 0; i < 50; i++) {
+            const starGeo = new THREE.SphereGeometry(0.1, 4, 4);
+            const starMat = new THREE.MeshBasicMaterial({ color: [0xFFD700, 0xC0C0C0, 0x00FFFF][i % 3] });
+            const star = new THREE.Mesh(starGeo, starMat);
+            star.position.set(
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20
+            );
+            envScene.add(star);
+        }
+        
+        const envTexture = pmremGenerator.fromScene(envScene).texture;
+
+        // --- THE DIAMOND CORE with CUSTOM SHADER ---
+        const diamondGeo = new THREE.OctahedronGeometry(1.2, 2);
+        
+        // Custom Shader Material with Ocular Refraction
+        const diamondShaderMat = new THREE.ShaderMaterial({
+            uniforms: {
+                envMap: { value: envTexture },
+                ior: { value: 2.4 }, // Diamond IOR
+                lensFactor: { value: 0.3 } // Convex lens distortion
+            },
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent,
+            side: THREE.DoubleSide
         });
+
+        // Fallback Physical Material (for browsers without good shader support)
+        const diamondMat = new THREE.MeshPhysicalMaterial({ 
+            color: 0xffffff, 
+            transmission: 1, 
+            opacity: 1, 
+            roughness: 0, 
+            thickness: 5, 
+            ior: 2.4,
+            emissive: 0x00ffff, 
+            emissiveIntensity: 0.5,
+            envMap: envTexture,
+            envMapIntensity: 1.5
+        });
+
         const diamond = new THREE.Mesh(diamondGeo, diamondMat);
         scene.add(diamond);
 
@@ -41,7 +122,12 @@
         for (let h = 0; h < 9; h++) {
             for (let p = 0; p < 9; p++) {
                 const nodeGeo = new THREE.DodecahedronGeometry(0.15, 0);
-                const nodeMat = new THREE.MeshStandardMaterial({ color: colors[h % 3], metalness: 1, roughness: 0.2 });
+                const nodeMat = new THREE.MeshStandardMaterial({ 
+                    color: colors[h % 3], 
+                    metalness: 1, 
+                    roughness: 0.2,
+                    envMap: envTexture
+                });
                 const mesh = new THREE.Mesh(nodeGeo, nodeMat);
                 
                 const angle = (h / 9) * Math.PI * 2 + (p * 0.4);
@@ -100,14 +186,12 @@
             if (intersects.length > 0) {
                 const target = intersects[0].object;
                 
-                // Create a "Resonance Spark" from Node to Diamond
                 const points = [target.position, new THREE.Vector3(0, 0, 0)];
                 const sparkGeo = new THREE.BufferGeometry().setFromPoints(points);
                 const sparkMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2 });
                 const spark = new THREE.Line(sparkGeo, sparkMat);
                 scene.add(spark);
                 
-                // Flash the Diamond
                 diamondMat.emissiveIntensity = 5;
                 setTimeout(() => { scene.remove(spark); diamondMat.emissiveIntensity = 0.5; }, 200);
             }
@@ -118,10 +202,18 @@
         light.position.set(5, 5, 5);
         scene.add(light);
         scene.add(new THREE.AmbientLight(0x404040, 2));
+        
+        const light2 = new THREE.PointLight(0x00ffff, 50);
+        light2.position.set(-5, -5, 5);
+        scene.add(light2);
+        
         camera.position.z = 12;
 
+        // --- ANIMATE with LENS FACTOR PULSING ---
+        let time = 0;
         function animate() {
             requestAnimationFrame(animate);
+            time += 0.01;
 
             // Rotate the entire group of curves to match the 81 nodes
             curveGroup.rotation.y += 0.005;
@@ -138,6 +230,11 @@
                 n.rotation.x += n.userData.spin;
                 n.rotation.z += n.userData.spin;
             });
+
+            // Pulse the lens factor for breathing effect
+            if (diamondShaderMat.uniforms) {
+                diamondShaderMat.uniforms.lensFactor.value = 0.3 + Math.sin(time) * 0.1;
+            }
 
             renderer.render(scene, camera);
         }
