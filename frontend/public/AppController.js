@@ -39,6 +39,7 @@ const Brain = {
     currentTheme: 'cosmic',
     spineUnlocked: true,
     consoleOpen: false,
+    vaultUnlocked: false,
 
     // Navigation
     sign_in: () => window.location.href = '/auth',
@@ -126,16 +127,83 @@ const StabilizeSpine = () => {
 };
 
 /**
+ * SOVEREIGN VAULT - Stealth Access System
+ * Hidden "Dead Pixel" access point in top-left corner
+ */
+const SovereignVault = {
+    isLocked: true,
+    vaultKey: null,
+
+    async init(encryptedBrainData) {
+        // 1. Initial Scrubber - Kill distractions before they even render
+        this.runHardScrub();
+        
+        // 2. Setup the "Dead Pixel" - The hidden access point
+        const accessPoint = document.createElement('div');
+        accessPoint.id = 'vault-access';
+        accessPoint.style = "position:fixed;top:0;left:0;width:2px;height:2px;z-index:100000;cursor:crosshair;";
+        document.body.appendChild(accessPoint);
+
+        accessPoint.onclick = () => {
+            const input = prompt("ENTER SOVEREIGN ACCESS KEY:");
+            this.unlock(input, encryptedBrainData);
+        };
+        
+        // Continuous background protection
+        setInterval(() => this.runHardScrub(), 500);
+        
+        console.log("%c[Vault]: Stealth Mode Active - Dead Pixel at (0,0)", "color: #ff0; font-weight: bold;");
+    },
+
+    runHardScrub() {
+        const targets = ['Journey', 'Ancient', 'Tour', 'Divination', 'Emergent'];
+        document.querySelectorAll('button, span, div, h1, p').forEach(el => {
+            if (targets.some(t => el.innerText && el.innerText.includes(t))) {
+                el.style.display = 'none';
+                el.remove();
+            }
+        });
+        // Force-hide their global navigation if it tries to overlap
+        const nav = document.querySelector('nav');
+        if (nav) nav.style.zIndex = "1";
+    },
+
+    async unlock(key, data) {
+        if (!key) return;
+        
+        // Simple hash check to verify the key before attempting decryption
+        const encoder = new TextEncoder();
+        const msgUint8 = encoder.encode(key);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // The "Seal" - If hash matches, launch the Master Console
+        // Hash is SHA-256 of "password"
+        if (hashHex === "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8") {
+            this.isLocked = false;
+            Brain.vaultUnlocked = true;
+            console.log("%c[Vault]: UNLOCKED - SOVEREIGN CONTROL RESTORED", "color: #0f0; font-size: 16px; font-weight: bold;");
+            CreatorConsole.init(Brain); // Launch the UI
+            CreatorConsole.toggle();    // Expand the Umbrella
+        } else {
+            console.error("%c[Vault]: ACCESS DENIED - INCORRECT KEY", "color: #f00; font-weight: bold;");
+            alert("ACCESS DENIED: INCORRECT KEY");
+        }
+    }
+};
+
+/**
  * CREATOR CONSOLE - Sovereign Shield & Unified Console
  * ENLIGHTENMENT.MINT.CAFE // SOVEREIGN_CONTROL
- * Includes: Accordion, Install Button, Background Scrubber
+ * Only visible after vault unlock
  */
 const CreatorConsole = {
     isOpen: false,
     deferredPrompt: null,
 
     init(brain) {
-        // 1. Kill their "distractions" immediately
+        // Inject protection CSS
         this.activateSovereignShield();
 
         let el = document.getElementById('creator-area') || document.createElement('div');
@@ -149,18 +217,13 @@ const CreatorConsole = {
 
         this.render(el);
         this.attachListeners(brain);
-        setInterval(() => {
-            this.update(brain);
-            this.scrubDistractions(); // Ongoing background cleanup
-        }, 500);
+        setInterval(() => this.update(brain), 500);
     },
 
     activateSovereignShield() {
-        // Inject CSS to force-hide their "marketing" garbage and fix alignment
         const style = document.createElement('style');
         style.innerHTML = `
             #creator-area { z-index: 99999 !important; position: relative; }
-            /* Target their distraction buttons/text by common patterns */
             [class*="Journey"], [class*="Ancient"], .made-with-emergent, [id*="divination"] {
                 display: none !important;
                 visibility: hidden !important;
@@ -170,21 +233,11 @@ const CreatorConsole = {
         document.head.appendChild(style);
     },
 
-    scrubDistractions() {
-        // Manually hunt and remove elements that clutter your view
-        const garbage = ['Watch the Journey', 'Begin Journey', 'Take the Tour', 'Ancient Wisdom'];
-        document.querySelectorAll('button, span, div, h1').forEach(el => {
-            if (garbage.some(text => el.innerText.includes(text))) {
-                el.remove();
-            }
-        });
-    },
-
     toggle() {
         this.isOpen = !this.isOpen;
+        Brain.consoleOpen = this.isOpen;
         const panel = document.getElementById('master-umbrella');
         const footer = document.getElementById('console-footer');
-        // Use setProperty with important to override CSS
         panel.style.setProperty('height', this.isOpen ? '100dvh' : '60px', 'important');
         if (footer) footer.style.display = this.isOpen ? 'flex' : 'none';
         document.getElementById('toggle-label').innerText = this.isOpen ? 'CLOSE UMBRELLA' : 'OPEN CREATOR CONSOLE';
@@ -217,7 +270,7 @@ const CreatorConsole = {
                 </div>
 
                 <div id="console-footer" style="display:none; position:absolute; bottom:0; width:100%; height:60px; background:#000; border-top:1px solid #333; align-items:center; padding:0 15px; font-size:10px; color:#444;">
-                    BLACK_HILLS_SD // ENLIGHTENMENT_ENGINE // SHIELD_ACTIVE: TRUE
+                    BLACK_HILLS_SD // ENLIGHTENMENT_ENGINE // VAULT_UNLOCKED: TRUE
                 </div>
             </div>
         `;
@@ -261,11 +314,11 @@ const CreatorConsole = {
 window.Brain = Brain;
 window.Bridge = SystemBridge;
 window.Console = CreatorConsole;
+window.Vault = SovereignVault;
 
-// IGNITION
+// IGNITION - Start in Stealth Mode
 document.addEventListener('DOMContentLoaded', () => {
     StabilizeSpine();
     SystemBridge.init(Brain);
-    CreatorConsole.init(Brain);
-    console.log('%c[AppController] v2.0.0 - All Systems Online', 'color: #0f0; font-size: 14px; font-weight: bold;');
+    SovereignVault.init(); // Start vault in stealth - NO visible console until unlocked
 });
