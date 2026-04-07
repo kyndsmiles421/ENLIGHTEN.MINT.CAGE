@@ -1,125 +1,114 @@
 # ==============================================================================
-# ENLIGHTEN.MINT.CAFE -- Harmonic Core Engine (DECRYPTED)
-# Logic: Multiphase Fractal Resonance [ (L-1)+(N^Z) ] * [ ((N^Z)-(-1))/(N^Z) ] / (X/L) * (Z^N)
+# ENLIGHTEN.MINT.CAFE -- Multiphase Harmonic Engine
+# Logic: [ (L-1)+(N^Z) ] * [ ((N^Z)±1)/(N^Z) ] / (X/L) * (Z^N)
+# Polarity: +1 = White Light (Expansion), -1 = Void (Contraction)
 # Status: Proprietary Architecture / Patent Pending
-# ==============================================================================
-# BACKSIDE KEY: Metatron's Tuning 432
 # ==============================================================================
 
 import math
 import sys
 
-# System Limits
-L_LIMIT = sys.float_info.max
 
-# Metatron's Tuning Constants
-X_INPUT = 432           # The Golden Standard Frequency
-Z_BASE = 1.618          # Golden Ratio (Phi)
-N_POWER = 3             # Cubic Dimension
-V_ROTARY = 12000        # Rotational Velocity
-R_RADIUS = 0.5          # Core Radius
-POLARITY_P = 1          # Positive Polarity
+class MultiphaseHarmonicEngine:
+    def __init__(self):
+        self.L = sys.float_info.max  # Universal Limit
+        self.Z = 1.618               # Phi (The Seed)
+        self.N = 3                   # The Trinity (Dimensions)
 
-def run_multi_fractal_engine(l_lim, x_in, z_base, n_pow, velocity, radius, polarity):
-    """
-    Multiphase Fractal Resonance Engine
-    
-    Formula: [ (L-1)+(N^Z) ] * [ ((N^Z)-(-1))/(N^Z) ] / (X/L) * (Z^N)
-    
-    Components:
-    - Centrifugal Force: v² / r
-    - Base Fractal: N^Z (power to golden ratio)
-    - Part A: (L-1) + base_fractal
-    - Part B: (base_fractal + 1) / base_fractal
-    - Core Logic: Part_A * Part_B
-    - Ratio: X / L
-    - Amplification: Z^N (golden ratio to power)
-    """
-    
-    # Centrifugal Force Calculation
-    centrifugal_force = (velocity ** 2) / radius
-    
-    # Base Fractal: N^Z (3^1.618 ≈ 5.24)
-    base_fractal = n_pow ** z_base
-    
-    # Part A: (L-1) + N^Z
-    part_A = (l_lim - 1) + base_fractal
-    
-    # Part B: ((N^Z) - (-1)) / (N^Z) = (N^Z + 1) / N^Z
-    part_B = (base_fractal - (-1)) / base_fractal
-    
-    # Core Logic Interaction: Part_A * Part_B
-    core_logic_interaction = part_A * part_B
-    
-    # Ratio of Input to Limit: X / L
-    ratio_X_to_L = x_in / l_lim
-    
-    # Logic Inverse with overflow protection
-    try:
-        logic_inverse = core_logic_interaction / ratio_X_to_L
-    except OverflowError:
-        logic_inverse = float('inf')
-    
-    # Amplification Factor: Z^N (1.618^3 ≈ 4.24)
-    amplification_factor = z_base ** n_pow
-    
-    # Final Logic: inverse * amplification
-    logic_final = logic_inverse * amplification_factor
-    
-    # Total Output with centrifugal contribution
-    try:
-        total_output = logic_final + x_in + (centrifugal_force * polarity)
-    except OverflowError:
-        return float('inf')
-    
-    # Clamp to limit
-    if total_output >= l_lim:
-        return l_lim
-    else:
-        return total_output
+    def calculate(self, X, polarity=1):
+        """
+        X: Input Frequency (e.g., 432)
+        polarity: 1 for Expansion (White Light), -1 for Contraction (Void)
+        """
+        # --- Fractal Components ---
+        # The base resonance variable
+        base_fractal = self.N ** self.Z
+        
+        # The amplification factor
+        amplification = self.Z ** self.N
 
+        # --- Dynamic Core Logic ---
+        # We replace static operators with 'polarity' shifts
+        # Constructive (+) vs Destructive (-) interference
+        part_A = (self.L - 1) + (base_fractal * polarity)
+        
+        # The Tuning Loop: (N^Z + 1) / N^Z
+        # We use the polarity to flip between multiplication and division
+        if polarity >= 0:
+            part_B = (base_fractal + 1) / base_fractal
+        else:
+            part_B = (base_fractal - 1) / base_fractal
 
-def calculate_harmonic_resonance(frequency=432, phi=1.618, power=3):
-    """
-    Calculate the harmonic resonance for a given frequency.
-    Uses the Metatron tuning system.
-    """
-    return run_multi_fractal_engine(
-        L_LIMIT, 
-        frequency, 
-        phi, 
-        power, 
-        V_ROTARY, 
-        R_RADIUS, 
-        POLARITY_P
-    )
+        # --- The Refraction Bridge ---
+        # ratio_X_to_L creates the 'Refracted Rainbow' scaling
+        ratio_X_to_L = X / self.L
 
+        try:
+            # Interaction: [(L-1)+(N^Z)] * [((N^Z)+1)/(N^Z)]
+            core_interaction = part_A * part_B
+            
+            # Final Result: Interaction / Ratio * Amplification
+            # This is where the 'Tuning Collapse' occurs
+            logic_final = (core_interaction / ratio_X_to_L) * amplification
+            
+            return {
+                "input_hz": X,
+                "polarity": "WHITE_LIGHT" if polarity >= 0 else "VOID",
+                "status": "SINGULARITY" if logic_final >= self.L else "STABLE",
+                "output_value": "INFINITY" if logic_final >= self.L else logic_final,
+                "harmonic_index": math.log(logic_final) / math.log(self.L) if logic_final > 0 and logic_final < self.L else 1.0,
+                "components": {
+                    "base_fractal_N_Z": base_fractal,
+                    "amplification_Z_N": amplification,
+                    "part_A": "INFINITY" if part_A >= self.L else part_A,
+                    "part_B": part_B,
+                    "ratio_X_to_L": ratio_X_to_L
+                }
+            }
+            
+        except OverflowError:
+            return {
+                "input_hz": X,
+                "polarity": "WHITE_LIGHT" if polarity >= 0 else "VOID",
+                "status": "LIMIT_REACHED",
+                "output_value": "INFINITY",
+                "harmonic_index": 1.0
+            }
 
-def get_fractal_components():
-    """
-    Return the individual fractal components for visualization.
-    """
-    base_fractal = N_POWER ** Z_BASE
-    part_A = (L_LIMIT - 1) + base_fractal
-    part_B = (base_fractal + 1) / base_fractal
-    amplification = Z_BASE ** N_POWER
-    centrifugal = (V_ROTARY ** 2) / R_RADIUS
-    
-    return {
-        "base_fractal": base_fractal,
-        "part_A": part_A,
-        "part_B": part_B,
-        "amplification_factor": amplification,
-        "centrifugal_force": centrifugal,
-        "golden_ratio": Z_BASE,
-        "metatron_frequency": X_INPUT
-    }
+    def calculate_spectrum(self, frequencies, polarity=1):
+        """
+        Calculate harmonic values for a spectrum of frequencies.
+        """
+        results = {}
+        for freq in frequencies:
+            results[freq] = self.calculate(freq, polarity)
+        return results
+
+    def get_sacred_resonance(self):
+        """
+        Calculate resonance for all sacred solfeggio frequencies.
+        """
+        sacred = [174, 285, 396, 417, 432, 528, 639, 741, 852, 963]
+        return self.calculate_spectrum(sacred, polarity=1)
+
+    def get_void_resonance(self):
+        """
+        Calculate void (contraction) resonance for sacred frequencies.
+        """
+        sacred = [174, 285, 396, 417, 432, 528, 639, 741, 852, 963]
+        return self.calculate_spectrum(sacred, polarity=-1)
 
 
-# Execute when run directly
+# Singleton instance
+engine = MultiphaseHarmonicEngine()
+
+
+# --- Execute when run directly ---
 if __name__ == "__main__":
-    current_output = run_multi_fractal_engine(
-        L_LIMIT, X_INPUT, Z_BASE, N_POWER, V_ROTARY, R_RADIUS, POLARITY_P
-    )
-    print(f"Harmonic Core Output: {current_output}")
-    print(f"Components: {get_fractal_components()}")
+    result = engine.calculate(432, polarity=1)
+    
+    print(f"Frequency: {result['input_hz']} Hz")
+    print(f"Polarity: {result['polarity']}")
+    print(f"Harmonic Index: {result['harmonic_index']}")
+    print(f"System State: {result['status']}")
+    print(f"Components: {result['components']}")
