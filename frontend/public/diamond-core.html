@@ -37,11 +37,14 @@
         GOLD GLOW: <span id="gold-glow">0.00</span><br>
         SILVER GLOW: <span id="silver-glow">0.00</span><br>
         COPPER GLOW: <span id="copper-glow">0.00</span><br>
-        CORE SCALE: <span id="core-scale">1.00</span>
+        CORE SCALE: <span id="core-scale">1.00</span><br>
+        REFRACTION: <span id="refraction-status">ENABLED</span><br>
+        INFINITY BOUND: <span id="infinity-val">0.00</span>
     </div>
     
     <div id="controls">
         <button id="toggleMode">TOGGLE CLEAR MODE</button>
+        <button id="toggleRefraction">TOGGLE REFRACTION</button>
         <button id="pulseUp">PULSE +</button>
         <button id="pulseDown">PULSE -</button>
     </div>
@@ -91,6 +94,8 @@
         let baseExponent = 2.718; // Natural growth (e)
         let isClearMode = false;   // User toggle for transparency/autonomy
         let simulatedHeartRate = 72; // Simulated BPM
+        let refractionEnabled = true; // The user's choice for rainbow refraction
+        let infinityBound = 0; // Transcendental formula result
 
         // --- The Inlay Mapping ---
         const INLAYS = {
@@ -302,6 +307,9 @@
             diamondMat.opacity = 1.0;
             diamondMat.transmission = 1.0;
             
+            // Apply refraction based on user choice
+            renderCoreRefraction();
+            
             // CONVEX: Swelling outward (Positive Exponential)
             if (pulse > 1.5) {
                 Core.currentScale = Core.baseScale + (pulse - 1.5) * 0.1;
@@ -324,11 +332,64 @@
             diamondMat.emissiveIntensity += avgGlow * 0.2;
         }
 
+        // --- REFRACTION SYSTEM ---
+        function renderCoreRefraction() {
+            if (refractionEnabled) {
+                // The Transcendental Formula: π * r² * ∞
+                const r = Core.currentScale;
+                // Use a large number to simulate infinity bound
+                const infinitySimulated = 1e6;
+                infinityBound = (Math.PI * Math.pow(r, 2)) * infinitySimulated;
+                
+                // Apply Rainbow Refraction: infinityBound - 1 + 99
+                applyRainbowRefraction(infinityBound - 1 + 99);
+            } else {
+                // The Clear Structure
+                applyStandardView();
+                infinityBound = 0;
+            }
+            
+            // Update display
+            document.getElementById('refraction-status').textContent = refractionEnabled ? 'ENABLED' : 'DISABLED';
+            document.getElementById('infinity-val').textContent = refractionEnabled ? '∞' : '0';
+        }
+
+        function applyRainbowRefraction(boundValue) {
+            // Rainbow IOR shift based on transcendental bound
+            const normalizedBound = (boundValue % 1000) / 1000;
+            
+            // Cycle through rainbow spectrum
+            const time = Date.now() * 0.001;
+            const hue = (normalizedBound + time * 0.1) % 1;
+            
+            // Convert hue to RGB for emissive color
+            const r = Math.sin(hue * Math.PI * 2) * 0.5 + 0.5;
+            const g = Math.sin((hue + 0.33) * Math.PI * 2) * 0.5 + 0.5;
+            const b = Math.sin((hue + 0.66) * Math.PI * 2) * 0.5 + 0.5;
+            
+            diamondMat.emissive.setRGB(r * 0.3, g * 0.3, b * 0.8);
+            diamondMat.ior = 2.4 + Math.sin(time) * 0.3;
+            diamondMat.thickness = 5 + Math.sin(time * 0.5) * 2;
+        }
+
+        function applyStandardView() {
+            // Grounded visuals: Refraction neutralized
+            diamondMat.emissive.setRGB(0, 1, 1); // Cyan
+            diamondMat.ior = 2.4;
+            diamondMat.thickness = 5;
+            console.log("Visuals grounded: Refraction neutralized.");
+        }
+
         // --- CONTROLS ---
         document.getElementById('toggleMode').addEventListener('click', () => {
             isClearMode = !isClearMode;
             document.getElementById('mode-display').textContent = isClearMode ? 'MODE: CLEAR STRUCTURE' : 'MODE: FULL CORE';
             document.getElementById('toggleMode').classList.toggle('active', isClearMode);
+        });
+
+        document.getElementById('toggleRefraction').addEventListener('click', () => {
+            refractionEnabled = !refractionEnabled;
+            document.getElementById('toggleRefraction').classList.toggle('active', !refractionEnabled);
         });
         
         document.getElementById('pulseUp').addEventListener('click', () => {
