@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from engines.harmonic_core import engine, MultiphaseHarmonicEngine
+from engines.harmonic_core import engine, radiate_spectrum, MultiphaseHarmonicEngine
 
 router = APIRouter(prefix="/harmonic", tags=["harmonic"])
 
@@ -93,3 +93,16 @@ async def get_duality(frequency: int = 432):
         },
         "harmonic_ratio": white_light["harmonic_index"] / void["harmonic_index"] if void["harmonic_index"] > 0 else "INFINITY"
     }
+
+
+
+@router.get("/radiate")
+async def radiate_light(base_freq: int = 432):
+    """
+    Radiate infinite White Light through the Prism.
+    Splits into the sacred solfeggio spectrum (rainbow).
+    
+    Args:
+        base_freq: Base frequency for refraction calculation (default: 432 Hz)
+    """
+    return radiate_spectrum(base_freq)

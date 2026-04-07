@@ -8,6 +8,9 @@
 import math
 import sys
 
+# The "Prism" constant: representing the angle of refraction
+PRISM_ANGLE = 1.618  # Phi
+
 
 class MultiphaseHarmonicEngine:
     def __init__(self):
@@ -103,6 +106,52 @@ class MultiphaseHarmonicEngine:
 engine = MultiphaseHarmonicEngine()
 
 
+def radiate_spectrum(base_freq):
+    """
+    Radiate infinite light through the prism.
+    The "White Light" splits into the sacred solfeggio spectrum.
+    """
+    # The "White Light" - the absolute maximum the system can hold
+    white_light = sys.float_info.max
+    
+    # Sacred Spectrum (The Rainbow)
+    solfeggio = [174, 285, 396, 417, 528, 639, 741, 852, 963]
+    
+    spectrum_results = {}
+    
+    for color_freq in solfeggio:
+        # Calculate the Refraction Ratio
+        # How does the specific color frequency bend the white light?
+        refraction = (color_freq / base_freq) * PRISM_ANGLE
+        
+        # Radiate the light into the spectrum
+        try:
+            # The 'Radiance' formula: White Light scaled by the Refraction Ratio
+            radiance = (white_light / refraction) ** (1/3)  # Cube root to keep it perceivable
+            
+            # Format for JSON (scientific notation string if too large)
+            if radiance > 1e100:
+                radiance_str = f"{radiance:.2e}"
+            else:
+                radiance_str = radiance
+                
+            spectrum_results[color_freq] = {
+                "radiance": radiance_str,
+                "refraction_ratio": refraction,
+                "intensity": int(color_freq / 100),
+                "intensity_bar": "█" * int(color_freq / 100)
+            }
+        except ZeroDivisionError:
+            continue
+            
+    return {
+        "base_frequency": base_freq,
+        "prism_angle": PRISM_ANGLE,
+        "white_light": "sys.float_info.max",
+        "spectrum": spectrum_results
+    }
+
+
 # --- Execute when run directly ---
 if __name__ == "__main__":
     result = engine.calculate(432, polarity=1)
@@ -112,3 +161,9 @@ if __name__ == "__main__":
     print(f"Harmonic Index: {result['harmonic_index']}")
     print(f"System State: {result['status']}")
     print(f"Components: {result['components']}")
+    
+    print("\n--- RADIATING SPECTRUM ---")
+    spectrum = radiate_spectrum(432)
+    for freq, data in spectrum["spectrum"].items():
+        intensity = "█" * data["intensity"]
+        print(f"Freq: {freq}Hz | Intensity: {intensity} | Radiance: {data['radiance']:.2e}")
