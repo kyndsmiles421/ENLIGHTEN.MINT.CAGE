@@ -39,7 +39,12 @@
         COPPER GLOW: <span id="copper-glow">0.00</span><br>
         CORE SCALE: <span id="core-scale">1.00</span><br>
         REFRACTION: <span id="refraction-status">ENABLED</span><br>
-        INFINITY BOUND: <span id="infinity-val">0.00</span>
+        INFINITY BOUND: <span id="infinity-val">0.00</span><br>
+        ───────────────<br>
+        DEPTH: <span id="depth-val">0</span><br>
+        LAYER: <span id="layer-val">MID_BASE</span><br>
+        GRAVITY: <span id="gravity-val">1.0</span><br>
+        SYSTEM: <span id="system-val">Initializing...</span>
     </div>
     
     <div id="controls">
@@ -47,6 +52,9 @@
         <button id="toggleRefraction">TOGGLE REFRACTION</button>
         <button id="pulseUp">PULSE +</button>
         <button id="pulseDown">PULSE -</button>
+        <button id="depthUp">DEPTH ↑ SKY</button>
+        <button id="depthDown">DEPTH ↓ EARTH</button>
+        <button id="sensorLatch">SENSOR LATCH</button>
     </div>
     
     <script id="vertexShader" type="x-shader/x-vertex">
@@ -89,13 +97,97 @@
     <script type="module">
         import * as THREE from 'three';
 
+        // ═══════════════════════════════════════════════════════════════════
+        // ENLIGHTEN.MINT.CAFE - Core Logic v1.0
+        // Features: Crystal Gravity, Inverse Ether, and Snap-to-Sensor Latching
+        // ═══════════════════════════════════════════════════════════════════
+
+        const SYSTEM_LAYERS = {
+            HOLLOW_EARTH: { depth: -100, refractionBase: 2.4, gravity: 9.8 },
+            MID_BASE:     { depth: 0,    refractionBase: 3.0, gravity: 1.0 },
+            SKY_ETHER:    { depth: 100,  refractionBase: 0.5, gravity: -0.5 }
+        };
+
+        class SovereignUI {
+            constructor() {
+                this.currentDepth = 0;
+                this.isToggleInverse = false;
+                this.activeData = "Initializing Sanctuary...";
+                this.refraction = 3.0;
+                this.gravity = 1.0;
+            }
+
+            updateAtmosphere(newDepth) {
+                this.currentDepth = newDepth;
+                let config = this.getLayerConfig(newDepth);
+                
+                if (this.currentDepth > 50) {
+                    this.refraction = config.refractionBase / (this.currentDepth / 10);
+                    this.gravity = config.gravity;
+                } else {
+                    this.refraction = config.refractionBase;
+                    this.gravity = config.gravity;
+                }
+            }
+
+            handleButtonInteraction(inputDistance) {
+                const SENSOR_POINT = 0.05;
+                const SNAP_THRESHOLD = 0.4;
+
+                if (inputDistance < SNAP_THRESHOLD && inputDistance > SENSOR_POINT) {
+                    this.applyCrystalPull(inputDistance);
+                }
+
+                if (inputDistance <= SENSOR_POINT) {
+                    this.executeAction();
+                }
+            }
+
+            applyCrystalPull(distance) {
+                // Crystal gravity sucks toward sensor
+                this.refraction += (0.4 - distance) * 2;
+            }
+
+            executeAction() {
+                this.refraction = (Number.MAX_SAFE_INTEGER - 1 + 5);
+                this.activeData = this.fetchSystemInformation();
+                console.log("LATCHED: " + this.activeData);
+                this.initiateRepulsion();
+            }
+
+            initiateRepulsion() {
+                let bounceValue = 5.0;
+                const interval = setInterval(() => {
+                    bounceValue -= 0.2;
+                    if (bounceValue <= 3.0) {
+                        clearInterval(interval);
+                        this.refraction = 3.0;
+                    } else {
+                        this.refraction = bounceValue;
+                    }
+                }, 16);
+            }
+
+            fetchSystemInformation() {
+                return "Recursive Logic System: Operational. 3D Matrix: Synced.";
+            }
+
+            getLayerConfig(depth) {
+                if (depth < -50) return SYSTEM_LAYERS.HOLLOW_EARTH;
+                if (depth > 50)  return SYSTEM_LAYERS.SKY_ETHER;
+                return SYSTEM_LAYERS.MID_BASE;
+            }
+        }
+
+        const EnlightenMint = new SovereignUI();
+
         // --- Core System Parameters ---
         let intensityMultiplier = 1.0;
-        let baseExponent = 2.718; // Natural growth (e)
-        let isClearMode = false;   // User toggle for transparency/autonomy
-        let simulatedHeartRate = 72; // Simulated BPM
-        let refractionEnabled = true; // The user's choice for rainbow refraction
-        let infinityBound = 0; // Transcendental formula result
+        let baseExponent = 2.718;
+        let isClearMode = false;
+        let simulatedHeartRate = 72;
+        let refractionEnabled = true;
+        let infinityBound = 0;
 
         // --- The Inlay Mapping ---
         const INLAYS = {
@@ -400,12 +492,43 @@
             intensityMultiplier = Math.max(0.2, intensityMultiplier - 0.2);
         });
 
+        document.getElementById('depthUp').addEventListener('click', () => {
+            EnlightenMint.updateAtmosphere(Math.min(100, EnlightenMint.currentDepth + 20));
+        });
+
+        document.getElementById('depthDown').addEventListener('click', () => {
+            EnlightenMint.updateAtmosphere(Math.max(-100, EnlightenMint.currentDepth - 20));
+        });
+
+        document.getElementById('sensorLatch').addEventListener('click', () => {
+            EnlightenMint.handleButtonInteraction(0.05); // Direct sensor touch
+        });
+
         // --- ANIMATE ---
         function animate() {
             requestAnimationFrame(animate);
 
             // Apply dynamics system
             applyDynamics();
+
+            // Apply SovereignUI atmosphere to Core
+            const depthNormalized = (EnlightenMint.currentDepth + 100) / 200; // 0 to 1
+            camera.position.z = 12 + (EnlightenMint.currentDepth * 0.05);
+            
+            // Apply gravity to diamond movement
+            diamond.position.y += EnlightenMint.gravity * 0.001 * Math.sin(Date.now() * 0.002);
+            diamond.position.y = Math.max(-2, Math.min(2, diamond.position.y)); // Clamp
+
+            // Update SovereignUI stats
+            document.getElementById('depth-val').textContent = EnlightenMint.currentDepth.toFixed(0);
+            document.getElementById('gravity-val').textContent = EnlightenMint.gravity.toFixed(2);
+            document.getElementById('system-val').textContent = EnlightenMint.activeData.substring(0, 30) + '...';
+            
+            // Determine layer
+            let layerName = 'MID_BASE';
+            if (EnlightenMint.currentDepth < -50) layerName = 'HOLLOW_EARTH';
+            else if (EnlightenMint.currentDepth > 50) layerName = 'SKY_ETHER';
+            document.getElementById('layer-val').textContent = layerName;
 
             // Rotate groups
             curveGroup.rotation.y += 0.005;
