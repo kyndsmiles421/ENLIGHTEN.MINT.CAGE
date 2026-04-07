@@ -48,13 +48,14 @@
     </div>
     
     <div id="controls">
-        <button id="toggleMode">TOGGLE CLEAR MODE</button>
-        <button id="toggleRefraction">TOGGLE REFRACTION</button>
-        <button id="pulseUp">PULSE +</button>
-        <button id="pulseDown">PULSE -</button>
-        <button id="depthUp">DEPTH ↑ SKY</button>
-        <button id="depthDown">DEPTH ↓ EARTH</button>
-        <button id="sensorLatch">SENSOR LATCH</button>
+        <button id="btn_logic" class="core-btn">RECURSIVE LOGIC</button>
+        <button id="btn_viz" class="core-btn">3D VISUALIZATION</button>
+        <button id="btn_sov" class="core-btn">SOVEREIGN FLUX</button>
+        <button id="toggleMode">CLEAR MODE</button>
+        <button id="toggleRefraction">REFRACTION</button>
+        <button id="toggleEther">ETHER MODE</button>
+        <button id="depthUp">↑ SKY</button>
+        <button id="depthDown">↓ EARTH</button>
     </div>
     
     <script id="vertexShader" type="x-shader/x-vertex">
@@ -98,8 +99,9 @@
         import * as THREE from 'three';
 
         // ═══════════════════════════════════════════════════════════════════
-        // ENLIGHTEN.MINT.CAFE - Core Logic v1.0
-        // Features: Crystal Gravity, Inverse Ether, and Snap-to-Sensor Latching
+        // ENLIGHTEN.MINT.CAFE - Full Integration Engine
+        // Physics: Crystal Gravity & Inverse Ether
+        // Visuals: 3-5 Refraction Bounce & Infinity Sensor Snap
         // ═══════════════════════════════════════════════════════════════════
 
         const SYSTEM_LAYERS = {
@@ -108,78 +110,114 @@
             SKY_ETHER:    { depth: 100,  refractionBase: 0.5, gravity: -0.5 }
         };
 
-        class SovereignUI {
+        const CORE_DATA = {
+            "btn_logic": { label: "RECURSIVE LOGIC", layer: "HOLLOW" },
+            "btn_viz":   { label: "3D VISUALIZATION", layer: "MID" },
+            "btn_sov":   { label: "SOVEREIGN FLUX", layer: "SKY" }
+        };
+
+        class EnlightenMintEngine {
             constructor() {
-                this.currentDepth = 0;
-                this.isToggleInverse = false;
-                this.activeData = "Initializing Sanctuary...";
-                this.refraction = 3.0;
+                this.refraction = 3.0; // Starting Mid-Base
                 this.gravity = 1.0;
+                this.isLatching = false;
+                this.currentDepth = 0;
+                this.activeData = "Initializing Sanctuary...";
+                this.latchedButton = null;
+            }
+
+            /**
+             * The Interactive Snap Logic
+             * Ties the bottom buttons to the central 3D core
+             */
+            onButtonPress(buttonID, depthValue) {
+                const SENSOR_TOUCH = 0.05;
+                const SNAP_HORIZON = 0.4;
+
+                // 1. THE PULL (Hollow Earth Effect)
+                if (depthValue < SNAP_HORIZON && depthValue > SENSOR_TOUCH) {
+                    this.refraction = 3.0 + (1 / depthValue);
+                    this.gravity = 15.0; // "Crystal Gravity" sucks it in
+                }
+
+                // 2. THE LATCH (Sensor Contact)
+                if (depthValue <= SENSOR_TOUCH && !this.isLatching) {
+                    this.executeLatch(buttonID);
+                }
+            }
+
+            executeLatch(id) {
+                this.isLatching = true;
+                this.latchedButton = id;
+
+                // THE MATH: (Infinity - 1 + 5) 
+                // Peak refraction distortion at the moment of information sync
+                this.refraction = (Number.MAX_SAFE_INTEGER - 1 + 5); 
+
+                // NO DEAD SPACE: Connect to the actual info map
+                const info = CORE_DATA[id] || { label: "SYNCING...", layer: "MID" };
+                this.activeData = `LATCHED: ${info.label} [${info.layer}]`;
+                console.log(this.activeData);
+
+                // THE BOUNCE: Repel back to the 3-5 tactical range
+                this.triggerRepulsion();
+            }
+
+            triggerRepulsion() {
+                // Linear decay from 5 back to 3 for the spring-back feel
+                let bounce = 5.0;
+                const timer = setInterval(() => {
+                    bounce -= 0.1;
+                    this.refraction = bounce;
+                    
+                    if (bounce <= 3.0) {
+                        clearInterval(timer);
+                        this.refraction = 3.0;
+                        this.isLatching = false;
+                    }
+                }, 10);
+            }
+
+            /**
+             * Toggle for the Sky Level
+             * Makes the toroids feel "Lighter and Lighter"
+             */
+            toggleEtherMode(isActive) {
+                if (isActive) {
+                    // INVERSE MATH: Gravity flips, refraction thins out
+                    this.gravity = -0.5;
+                    this.refraction = 0.5;
+                    this.currentDepth = 100;
+                } else {
+                    this.gravity = 1.0;
+                    this.refraction = 3.0;
+                    this.currentDepth = 0;
+                }
             }
 
             updateAtmosphere(newDepth) {
                 this.currentDepth = newDepth;
-                let config = this.getLayerConfig(newDepth);
-                
-                if (this.currentDepth > 50) {
-                    this.refraction = config.refractionBase / (this.currentDepth / 10);
-                    this.gravity = config.gravity;
+                if (newDepth > 50) {
+                    this.gravity = SYSTEM_LAYERS.SKY_ETHER.gravity;
+                    this.refraction = SYSTEM_LAYERS.SKY_ETHER.refractionBase / (newDepth / 10);
+                } else if (newDepth < -50) {
+                    this.gravity = SYSTEM_LAYERS.HOLLOW_EARTH.gravity;
+                    this.refraction = SYSTEM_LAYERS.HOLLOW_EARTH.refractionBase;
                 } else {
-                    this.refraction = config.refractionBase;
-                    this.gravity = config.gravity;
+                    this.gravity = SYSTEM_LAYERS.MID_BASE.gravity;
+                    this.refraction = SYSTEM_LAYERS.MID_BASE.refractionBase;
                 }
             }
 
-            handleButtonInteraction(inputDistance) {
-                const SENSOR_POINT = 0.05;
-                const SNAP_THRESHOLD = 0.4;
-
-                if (inputDistance < SNAP_THRESHOLD && inputDistance > SENSOR_POINT) {
-                    this.applyCrystalPull(inputDistance);
-                }
-
-                if (inputDistance <= SENSOR_POINT) {
-                    this.executeAction();
-                }
-            }
-
-            applyCrystalPull(distance) {
-                // Crystal gravity sucks toward sensor
-                this.refraction += (0.4 - distance) * 2;
-            }
-
-            executeAction() {
-                this.refraction = (Number.MAX_SAFE_INTEGER - 1 + 5);
-                this.activeData = this.fetchSystemInformation();
-                console.log("LATCHED: " + this.activeData);
-                this.initiateRepulsion();
-            }
-
-            initiateRepulsion() {
-                let bounceValue = 5.0;
-                const interval = setInterval(() => {
-                    bounceValue -= 0.2;
-                    if (bounceValue <= 3.0) {
-                        clearInterval(interval);
-                        this.refraction = 3.0;
-                    } else {
-                        this.refraction = bounceValue;
-                    }
-                }, 16);
-            }
-
-            fetchSystemInformation() {
-                return "Recursive Logic System: Operational. 3D Matrix: Synced.";
-            }
-
-            getLayerConfig(depth) {
-                if (depth < -50) return SYSTEM_LAYERS.HOLLOW_EARTH;
-                if (depth > 50)  return SYSTEM_LAYERS.SKY_ETHER;
-                return SYSTEM_LAYERS.MID_BASE;
+            getLayerName() {
+                if (this.currentDepth < -50) return 'HOLLOW_EARTH';
+                if (this.currentDepth > 50) return 'SKY_ETHER';
+                return 'MID_BASE';
             }
         }
 
-        const EnlightenMint = new SovereignUI();
+        // Initialize the Engine
+        const AppEngine = new EnlightenMintEngine();
 
         // --- Core System Parameters ---
         let intensityMultiplier = 1.0;
@@ -483,25 +521,27 @@
             refractionEnabled = !refractionEnabled;
             document.getElementById('toggleRefraction').classList.toggle('active', !refractionEnabled);
         });
-        
-        document.getElementById('pulseUp').addEventListener('click', () => {
-            intensityMultiplier = Math.min(3.0, intensityMultiplier + 0.2);
-        });
-        
-        document.getElementById('pulseDown').addEventListener('click', () => {
-            intensityMultiplier = Math.max(0.2, intensityMultiplier - 0.2);
+
+        let etherModeActive = false;
+        document.getElementById('toggleEther').addEventListener('click', () => {
+            etherModeActive = !etherModeActive;
+            AppEngine.toggleEtherMode(etherModeActive);
+            document.getElementById('toggleEther').classList.toggle('active', etherModeActive);
         });
 
         document.getElementById('depthUp').addEventListener('click', () => {
-            EnlightenMint.updateAtmosphere(Math.min(100, EnlightenMint.currentDepth + 20));
+            AppEngine.updateAtmosphere(Math.min(100, AppEngine.currentDepth + 20));
         });
 
         document.getElementById('depthDown').addEventListener('click', () => {
-            EnlightenMint.updateAtmosphere(Math.max(-100, EnlightenMint.currentDepth - 20));
+            AppEngine.updateAtmosphere(Math.max(-100, AppEngine.currentDepth - 20));
         });
 
-        document.getElementById('sensorLatch').addEventListener('click', () => {
-            EnlightenMint.handleButtonInteraction(0.05); // Direct sensor touch
+        // Core button latch handlers
+        document.querySelectorAll('.core-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                AppEngine.onButtonPress(btn.id, 0.05); // Direct sensor touch
+            });
         });
 
         // --- ANIMATE ---
@@ -511,24 +551,23 @@
             // Apply dynamics system
             applyDynamics();
 
-            // Apply SovereignUI atmosphere to Core
-            const depthNormalized = (EnlightenMint.currentDepth + 100) / 200; // 0 to 1
-            camera.position.z = 12 + (EnlightenMint.currentDepth * 0.05);
+            // Apply AppEngine atmosphere to Core
+            camera.position.z = 12 + (AppEngine.currentDepth * 0.05);
             
             // Apply gravity to diamond movement
-            diamond.position.y += EnlightenMint.gravity * 0.001 * Math.sin(Date.now() * 0.002);
-            diamond.position.y = Math.max(-2, Math.min(2, diamond.position.y)); // Clamp
+            diamond.position.y += AppEngine.gravity * 0.001 * Math.sin(Date.now() * 0.002);
+            diamond.position.y = Math.max(-2, Math.min(2, diamond.position.y));
 
-            // Update SovereignUI stats
-            document.getElementById('depth-val').textContent = EnlightenMint.currentDepth.toFixed(0);
-            document.getElementById('gravity-val').textContent = EnlightenMint.gravity.toFixed(2);
-            document.getElementById('system-val').textContent = EnlightenMint.activeData.substring(0, 30) + '...';
-            
-            // Determine layer
-            let layerName = 'MID_BASE';
-            if (EnlightenMint.currentDepth < -50) layerName = 'HOLLOW_EARTH';
-            else if (EnlightenMint.currentDepth > 50) layerName = 'SKY_ETHER';
-            document.getElementById('layer-val').textContent = layerName;
+            // Apply refraction from engine to diamond material
+            if (!AppEngine.isLatching) {
+                diamondMat.ior = Math.min(3.0, Math.max(1.0, AppEngine.refraction));
+            }
+
+            // Update stats display
+            document.getElementById('depth-val').textContent = AppEngine.currentDepth.toFixed(0);
+            document.getElementById('gravity-val').textContent = AppEngine.gravity.toFixed(2);
+            document.getElementById('system-val').textContent = AppEngine.activeData.substring(0, 35);
+            document.getElementById('layer-val').textContent = AppEngine.getLayerName();
 
             // Rotate groups
             curveGroup.rotation.y += 0.005;
