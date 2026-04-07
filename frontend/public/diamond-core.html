@@ -6,11 +6,45 @@
     <title>ENLIGHTENMENT ENGINE - DIAMOND CORE</title>
     <style>
         body { margin: 0; background: #000; overflow: hidden; font-family: monospace; }
-        #ui { position: absolute; top: 20px; left: 20px; color: #00FFFF; pointer-events: none; text-shadow: 0 0 5px #00FFFF; z-index: 100; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #00FFFF; pointer-events: none; text-shadow: 0 0 5px #00FFFF; z-index: 100; font-size: 12px; }
+        #controls { position: absolute; bottom: 20px; left: 20px; z-index: 100; }
+        #controls button { 
+            background: rgba(0,255,255,0.2); 
+            color: #0ff; 
+            border: 1px solid #0ff; 
+            padding: 10px 20px; 
+            margin: 5px;
+            cursor: pointer; 
+            font-family: monospace;
+        }
+        #controls button:hover { background: rgba(0,255,255,0.4); }
+        #controls button.active { background: rgba(0,255,255,0.6); }
+        #stats { position: absolute; top: 20px; right: 20px; color: #0f0; font-size: 11px; text-align: right; z-index: 100; }
     </style>
 </head>
 <body>
-    <div id="ui">CORE: DIAMOND SINGULARITY<br>RESONANCE: PIEZOELECTRIC BRIDGE<br>SHIELD: METATRON-FLOWER HYBRID<br>SHADER: OCULAR REFRACTION</div>
+    <div id="ui">
+        CORE: DIAMOND SINGULARITY<br>
+        RESONANCE: PIEZOELECTRIC BRIDGE<br>
+        SHIELD: METATRON-FLOWER HYBRID<br>
+        SHADER: OCULAR REFRACTION<br>
+        <br>
+        <span id="mode-display">MODE: FULL CORE</span>
+    </div>
+    
+    <div id="stats">
+        PULSE: <span id="pulse-val">1.00</span><br>
+        GOLD GLOW: <span id="gold-glow">0.00</span><br>
+        SILVER GLOW: <span id="silver-glow">0.00</span><br>
+        COPPER GLOW: <span id="copper-glow">0.00</span><br>
+        CORE SCALE: <span id="core-scale">1.00</span>
+    </div>
+    
+    <div id="controls">
+        <button id="toggleMode">TOGGLE CLEAR MODE</button>
+        <button id="pulseUp">PULSE +</button>
+        <button id="pulseDown">PULSE -</button>
+    </div>
     
     <script id="vertexShader" type="x-shader/x-vertex">
         varying vec3 vNormal;
@@ -27,6 +61,8 @@
         uniform samplerCube envMap;
         uniform float ior;
         uniform float lensFactor;
+        uniform float u_inlayColor;
+        uniform float u_exponentialFlow;
         varying vec3 vNormal;
         varying vec3 vEyeVector;
         
@@ -35,7 +71,12 @@
             refraction.xy += (refraction.xy * lensFactor); 
             
             vec4 envColor = textureCube(envMap, refraction);
-            gl_FragColor = vec4(envColor.rgb, 1.0);
+            
+            // Apply inlay glow
+            vec3 goldTint = vec3(1.0, 0.84, 0.0) * u_inlayColor;
+            vec3 finalColor = mix(envColor.rgb, goldTint, u_exponentialFlow * 0.3);
+            
+            gl_FragColor = vec4(finalColor, 1.0);
         }
     </script>
 
@@ -45,29 +86,33 @@
     <script type="module">
         import * as THREE from 'three';
 
+        // --- Core System Parameters ---
+        let intensityMultiplier = 1.0;
+        let baseExponent = 2.718; // Natural growth (e)
+        let isClearMode = false;   // User toggle for transparency/autonomy
+        let simulatedHeartRate = 72; // Simulated BPM
+
+        // --- The Inlay Mapping ---
+        const INLAYS = {
+            GOLD:   { freq: 528, color: "#FFD700", conductivity: 1.0, currentGlow: 0 },
+            SILVER: { freq: 432, color: "#C0C0C0", conductivity: 0.8, currentGlow: 0 },
+            COPPER: { freq: 396, color: "#B87333", conductivity: 0.6, currentGlow: 0 }
+        };
+
+        // Active frequencies (simulated)
+        let frequencyData = [528, 432, 396];
+
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // --- ENVIRONMENT CUBE MAP ---
-        const cubeTextureLoader = new THREE.CubeTextureLoader();
-        const envMap = new THREE.CubeTextureLoader().load([
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
-        ]);
-
-        // Generate procedural environment
+        // --- Environment Map ---
         const pmremGenerator = new THREE.PMREMGenerator(renderer);
         const envScene = new THREE.Scene();
         envScene.background = new THREE.Color(0x000011);
         
-        // Add some lights to environment for reflections
         for (let i = 0; i < 50; i++) {
             const starGeo = new THREE.SphereGeometry(0.1, 4, 4);
             const starMat = new THREE.MeshBasicMaterial({ color: [0xFFD700, 0xC0C0C0, 0x00FFFF][i % 3] });
@@ -82,22 +127,8 @@
         
         const envTexture = pmremGenerator.fromScene(envScene).texture;
 
-        // --- THE DIAMOND CORE with CUSTOM SHADER ---
+        // --- THE DIAMOND CORE ---
         const diamondGeo = new THREE.OctahedronGeometry(1.2, 2);
-        
-        // Custom Shader Material with Ocular Refraction
-        const diamondShaderMat = new THREE.ShaderMaterial({
-            uniforms: {
-                envMap: { value: envTexture },
-                ior: { value: 2.4 }, // Diamond IOR
-                lensFactor: { value: 0.3 } // Convex lens distortion
-            },
-            vertexShader: document.getElementById('vertexShader').textContent,
-            fragmentShader: document.getElementById('fragmentShader').textContent,
-            side: THREE.DoubleSide
-        });
-
-        // Fallback Physical Material (for browsers without good shader support)
         const diamondMat = new THREE.MeshPhysicalMaterial({ 
             color: 0xffffff, 
             transmission: 1, 
@@ -114,7 +145,16 @@
         const diamond = new THREE.Mesh(diamondGeo, diamondMat);
         scene.add(diamond);
 
-        // --- 9-HELIX NODES (Flower of Life) ---
+        // Core state object for dynamics
+        const Core = {
+            mesh: diamond,
+            baseScale: 1.0,
+            currentScale: 1.0,
+            refraction: { index: 2.4 },
+            depth: { vortex: 0 }
+        };
+
+        // --- 9-HELIX NODES ---
         const nodes = [];
         const group = new THREE.Group();
         const colors = [0xFFD700, 0xC0C0C0, 0xB87333];
@@ -135,14 +175,14 @@
                 const z = (p - 4) * 1.5;
                 mesh.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, z);
                 
-                mesh.userData = { spin: (h + 1) * 0.02 };
+                mesh.userData = { spin: (h + 1) * 0.02, metal: Object.keys(INLAYS)[h % 3] };
                 nodes.push(mesh);
                 group.add(mesh);
             }
         }
         scene.add(group);
 
-        // --- LIQUID CURVES (Helix Flow Lines) ---
+        // --- LIQUID CURVES ---
         const curveGroup = new THREE.Group();
         const curves = [];
         
@@ -173,11 +213,13 @@
         }
         scene.add(curveGroup);
 
-        // --- INTERACTIVE RESONANCE (The Bridge) ---
+        // --- INTERACTIVE RESONANCE ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
         window.addEventListener('click', (event) => {
+            if (event.target.tagName === 'BUTTON') return;
+            
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -194,6 +236,12 @@
                 
                 diamondMat.emissiveIntensity = 5;
                 setTimeout(() => { scene.remove(spark); diamondMat.emissiveIntensity = 0.5; }, 200);
+                
+                // Trigger frequency
+                const metal = target.userData.metal;
+                if (INLAYS[metal]) {
+                    INLAYS[metal].currentGlow = 2.0;
+                }
             }
         });
 
@@ -209,38 +257,122 @@
         
         camera.position.z = 12;
 
-        // --- ANIMATE with LENS FACTOR PULSING ---
-        let time = 0;
+        // --- DYNAMICS SYSTEM ---
+        function applyDynamics() {
+            // Simulate heart rate variation
+            simulatedHeartRate = 60 + Math.sin(Date.now() * 0.001) * 20;
+            
+            // 1. THE EXPONENTIAL MULTIPLIER
+            let pulse = Math.pow(simulatedHeartRate / 60, baseExponent) * intensityMultiplier;
+
+            // 2. THE INLAY REACTIVITY
+            Object.entries(INLAYS).forEach(([name, metal]) => {
+                if (frequencyData.includes(metal.freq)) {
+                    metal.currentGlow = pulse * metal.conductivity;
+                }
+                // Decay glow over time
+                metal.currentGlow *= 0.98;
+            });
+
+            // 3. THE "CLEAR STRUCTURE" OVERRIDE
+            if (isClearMode) {
+                renderTransparentMinimal(pulse);
+            } else {
+                renderFullCore(pulse);
+            }
+            
+            // Update stats display
+            document.getElementById('pulse-val').textContent = pulse.toFixed(2);
+            document.getElementById('gold-glow').textContent = INLAYS.GOLD.currentGlow.toFixed(2);
+            document.getElementById('silver-glow').textContent = INLAYS.SILVER.currentGlow.toFixed(2);
+            document.getElementById('copper-glow').textContent = INLAYS.COPPER.currentGlow.toFixed(2);
+            document.getElementById('core-scale').textContent = Core.currentScale.toFixed(2);
+        }
+
+        function renderTransparentMinimal(pulse) {
+            // Clear mode: minimal distortion, raw data
+            diamondMat.opacity = 0.3;
+            diamondMat.transmission = 0.9;
+            diamondMat.emissiveIntensity = 0.1;
+            Core.currentScale = 1.0;
+            diamond.scale.setScalar(Core.currentScale);
+        }
+
+        function renderFullCore(pulse) {
+            diamondMat.opacity = 1.0;
+            diamondMat.transmission = 1.0;
+            
+            // CONVEX: Swelling outward (Positive Exponential)
+            if (pulse > 1.5) {
+                Core.currentScale = Core.baseScale + (pulse - 1.5) * 0.1;
+                Core.refraction.index = 2.4 + (pulse - 1.5) * 0.05;
+                diamondMat.emissiveIntensity = 0.5 + (pulse - 1.5) * 0.3;
+            } 
+            // CONCAVE: Receding inward (Endless Opposite)
+            else {
+                Core.currentScale = Core.baseScale - (1.5 - pulse) * 0.05;
+                Core.depth.vortex += 0.01;
+                diamondMat.emissiveIntensity = 0.3;
+            }
+            
+            // Clamp scale
+            Core.currentScale = Math.max(0.5, Math.min(2.0, Core.currentScale));
+            diamond.scale.setScalar(Core.currentScale);
+            
+            // Apply the Gold/Silver/Copper Inlay pulses to emissive
+            const avgGlow = (INLAYS.GOLD.currentGlow + INLAYS.SILVER.currentGlow + INLAYS.COPPER.currentGlow) / 3;
+            diamondMat.emissiveIntensity += avgGlow * 0.2;
+        }
+
+        // --- CONTROLS ---
+        document.getElementById('toggleMode').addEventListener('click', () => {
+            isClearMode = !isClearMode;
+            document.getElementById('mode-display').textContent = isClearMode ? 'MODE: CLEAR STRUCTURE' : 'MODE: FULL CORE';
+            document.getElementById('toggleMode').classList.toggle('active', isClearMode);
+        });
+        
+        document.getElementById('pulseUp').addEventListener('click', () => {
+            intensityMultiplier = Math.min(3.0, intensityMultiplier + 0.2);
+        });
+        
+        document.getElementById('pulseDown').addEventListener('click', () => {
+            intensityMultiplier = Math.max(0.2, intensityMultiplier - 0.2);
+        });
+
+        // --- ANIMATE ---
         function animate() {
             requestAnimationFrame(animate);
-            time += 0.01;
 
-            // Rotate the entire group of curves to match the 81 nodes
+            // Apply dynamics system
+            applyDynamics();
+
+            // Rotate groups
             curveGroup.rotation.y += 0.005;
             group.rotation.y += 0.005;
             diamond.rotation.y -= 0.01;
 
-            // Dynamic "Wobble" for the liquid feel
+            // Liquid wobble
             curves.forEach((curve, index) => {
                 curve.rotation.z = Math.sin(Date.now() * 0.001 + index) * 0.1;
             });
 
-            // Spin individual nodes
+            // Spin nodes with inlay glow effect
             nodes.forEach(n => {
                 n.rotation.x += n.userData.spin;
                 n.rotation.z += n.userData.spin;
+                
+                // Apply glow to node material
+                const metal = n.userData.metal;
+                if (INLAYS[metal] && n.material.emissive) {
+                    n.material.emissiveIntensity = INLAYS[metal].currentGlow * 0.5;
+                }
             });
-
-            // Pulse the lens factor for breathing effect
-            if (diamondShaderMat.uniforms) {
-                diamondShaderMat.uniforms.lensFactor.value = 0.3 + Math.sin(time) * 0.1;
-            }
 
             renderer.render(scene, camera);
         }
         animate();
 
-        // --- RESIZE HANDLER ---
+        // --- RESIZE ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
