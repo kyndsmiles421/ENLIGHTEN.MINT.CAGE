@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENLIGHTENMENT ENGINE - DIAMOND CORE</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: monospace; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #00FFFF; pointer-events: none; text-shadow: 0 0 5px #00FFFF; }
+    </style>
+</head>
+<body>
+    <div id="ui">CORE: DIAMOND SINGULARITY<br>RESONANCE: PIEZOELECTRIC BRIDGE<br>SHIELD: METATRON-FLOWER HYBRID</div>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- THE DIAMOND CORE (Inner Earth) ---
+        const diamondGeo = new THREE.OctahedronGeometry(1, 0);
+        const diamondMat = new THREE.MeshPhysicalMaterial({ 
+            color: 0xffffff, transmission: 1, opacity: 1, roughness: 0, thickness: 5, 
+            ior: 2.4, // Diamond Refractive Index
+            emissive: 0x00ffff, emissiveIntensity: 0.5
+        });
+        const diamond = new THREE.Mesh(diamondGeo, diamondMat);
+        scene.add(diamond);
+
+        // --- 9-HELIX NODES (Flower of Life) ---
+        const nodes = [];
+        const group = new THREE.Group();
+        const colors = [0xFFD700, 0xC0C0C0, 0xB87333];
+
+        for (let h = 0; h < 9; h++) {
+            for (let p = 0; p < 9; p++) {
+                const nodeGeo = new THREE.DodecahedronGeometry(0.15, 0);
+                const nodeMat = new THREE.MeshStandardMaterial({ color: colors[h % 3], metalness: 1, roughness: 0.2 });
+                const mesh = new THREE.Mesh(nodeGeo, nodeMat);
+                
+                const angle = (h / 9) * Math.PI * 2 + (p * 0.4);
+                const radius = 3 * Math.sin((p / 9) * Math.PI) + 1.5;
+                const z = (p - 4) * 1.5;
+                mesh.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, z);
+                
+                mesh.userData = { spin: (h + 1) * 0.02 };
+                nodes.push(mesh);
+                group.add(mesh);
+            }
+        }
+        scene.add(group);
+
+        // --- INTERACTIVE RESONANCE (The Bridge) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const sparkLines = [];
+
+        window.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(nodes);
+            if (intersects.length > 0) {
+                const target = intersects[0].object;
+                
+                // Create a "Resonance Spark" from Node to Diamond
+                const points = [target.position, new THREE.Vector3(0, 0, 0)];
+                const sparkGeo = new THREE.BufferGeometry().setFromPoints(points);
+                const sparkMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2 });
+                const spark = new THREE.Line(sparkGeo, sparkMat);
+                scene.add(spark);
+                
+                // Flash the Diamond
+                diamondMat.emissiveIntensity = 5;
+                setTimeout(() => { scene.remove(spark); diamondMat.emissiveIntensity = 0.5; }, 200);
+            }
+        });
+
+        // --- LIGHTING ---
+        const light = new THREE.PointLight(0xffffff, 100);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040, 2));
+        camera.position.z = 12;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            group.rotation.y += 0.005;
+            diamond.rotation.y -= 0.01;
+            nodes.forEach(n => {
+                n.rotation.x += n.userData.spin;
+                n.rotation.z += n.userData.spin;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
