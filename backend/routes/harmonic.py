@@ -1,276 +1,115 @@
-"""
-HARMONIC ROUTER API
-===================
+from fastapi import APIRouter
+import sys
 
-Exposes the Enlightenment Router for frontend consumption.
+router = APIRouter(prefix="/harmonic", tags=["harmonic"])
 
-Endpoints:
-- POST /api/harmonic/process - Process content through harmonic lanes
-- POST /api/harmonic/batch - Process multiple items concurrently
-- GET /api/harmonic/stats - Get router statistics
-- GET /api/harmonic/lanes - Get available lanes
-"""
+# System Limits
+L_LIMIT = sys.float_info.max
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-import time
-import asyncio
-
-from engines.enlightenment_router import (
-    EnlightenmentRouter,
-    HarmonicPacket,
-    WeightCalculator,
-    LANES,
-    get_router,
-)
-
-router = APIRouter(prefix="/harmonic", tags=["Harmonic Router"])
+# Metatron's Tuning Constants
+X_INPUT = 432
+Z_BASE = 1.618
+N_POWER = 3
+V_ROTARY = 12000
+R_RADIUS = 0.5
+POLARITY_P = 1
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# REQUEST/RESPONSE MODELS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class ProcessRequest(BaseModel):
-    """Request to process content through the router."""
-    content: str = Field(..., description="Content to process")
-    weight: Optional[float] = Field(
-        None, 
-        ge=0.0, 
-        le=1.0,
-        description="Information weight (0.0-1.0). If not provided, auto-calculated."
-    )
-    auto_calculate_weight: bool = Field(
-        True,
-        description="If True and weight not provided, calculate from content"
-    )
-    skip_resistance: bool = Field(
-        False,
-        description="If True, bypass temporal delay (for testing)"
-    )
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata to attach to packet"
-    )
-
-
-class ProcessResponse(BaseModel):
-    """Response from processing."""
-    id: str
-    content: str
-    weight: float
-    lane_used: str
-    lane_label: str
-    lane_emoji: str
-    resistance_applied: float
-    processing_time_ms: float
-    metadata: Dict[str, Any]
-
-
-class BatchRequest(BaseModel):
-    """Request to process multiple items."""
-    items: List[ProcessRequest]
-    concurrent: bool = Field(
-        True,
-        description="If True, process all concurrently (slow lanes finish last)"
-    )
-
-
-class BatchResponse(BaseModel):
-    """Response from batch processing."""
-    results: List[ProcessResponse]
-    total_time_ms: float
-    items_processed: int
-
-
-class LaneInfo(BaseModel):
-    """Information about a processing lane."""
-    key: str
-    label: str
-    emoji: str
-    resistance: float
-    description: str
-    weight_threshold: str
-
-
-class StatsResponse(BaseModel):
-    """Router statistics."""
-    processed_count: int
-    total_resistance_seconds: float
-    lanes: Dict[str, Dict[str, Any]]
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# HELPER FUNCTIONS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def packet_to_response(packet: HarmonicPacket) -> ProcessResponse:
-    """Convert a processed packet to API response."""
-    lane = LANES.get(packet.lane_used, LANES["mid_row"])
-    
-    return ProcessResponse(
-        id=packet.id,
-        content=packet.content if isinstance(packet.content, str) else str(packet.content),
-        weight=packet.weight,
-        lane_used=packet.lane_used or "unknown",
-        lane_label=lane.label,
-        lane_emoji=lane.emoji,
-        resistance_applied=lane.resistance,
-        processing_time_ms=packet.processing_time_ms or 0,
-        metadata=packet.metadata,
-    )
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# ENDPOINTS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-@router.post("/process", response_model=ProcessResponse)
-async def process_content(request: ProcessRequest):
+def run_multi_fractal_engine(l_lim, x_in, z_base, n_pow, velocity, radius, polarity):
     """
-    Process content through the Harmonic Router.
-    
-    The router will:
-    1. Calculate or use provided weight
-    2. Select appropriate lane based on weight
-    3. Apply harmonic resistance (temporal delay)
-    4. Return processed result with lane info
-    
-    Weight thresholds:
-    - > 0.8: Theological (🧘 2.5s delay)
-    - > 0.4: Balanced (⚖️ 0.5s delay)
-    - ≤ 0.4: Kinetic (⚡ 0.01s delay)
+    Multiphase Fractal Resonance Engine
+    Formula: [ (L-1)+(N^Z) ] * [ ((N^Z)-(-1))/(N^Z) ] / (X/L) * (Z^N)
     """
-    harmony_router = get_router()
+    centrifugal_force = (velocity ** 2) / radius
+    base_fractal = n_pow ** z_base
+    part_A = (l_lim - 1) + base_fractal
+    part_B = (base_fractal - (-1)) / base_fractal
+    core_logic_interaction = part_A * part_B
+    ratio_X_to_L = x_in / l_lim
     
-    # Determine weight
-    if request.weight is not None:
-        weight = request.weight
-    elif request.auto_calculate_weight:
-        weight = WeightCalculator.calculate(request.content)
-    else:
-        weight = 0.5  # Default balanced
+    try:
+        logic_inverse = core_logic_interaction / ratio_X_to_L
+    except OverflowError:
+        logic_inverse = float('inf')
     
-    # Create packet
-    packet = HarmonicPacket(
-        id=f"api_{int(time.time() * 1000)}",
-        content=request.content,
-        weight=weight,
-        source="api",
-        metadata=request.metadata,
+    amplification_factor = z_base ** n_pow
+    logic_final = logic_inverse * amplification_factor
+    
+    try:
+        total_output = logic_final + x_in + (centrifugal_force * polarity)
+    except OverflowError:
+        return float('inf')
+    
+    if total_output >= l_lim:
+        return l_lim
+    return total_output
+
+
+@router.get("/resonance")
+async def get_harmonic_resonance(frequency: int = 432):
+    """
+    Calculate harmonic resonance for a given frequency.
+    Default: 432 Hz (Metatron's Tuning)
+    """
+    result = run_multi_fractal_engine(
+        L_LIMIT, frequency, Z_BASE, N_POWER, V_ROTARY, R_RADIUS, POLARITY_P
     )
     
-    # Process through router
-    result = await harmony_router.process(packet, skip_resistance=request.skip_resistance)
-    
-    return packet_to_response(result)
-
-
-@router.post("/batch", response_model=BatchResponse)
-async def process_batch(request: BatchRequest):
-    """
-    Process multiple items through the Harmonic Router.
-    
-    When concurrent=True (default), all items start processing simultaneously.
-    Kinetic items will complete almost instantly, while Theological items
-    will take longer due to their natural resistance.
-    
-    This creates a beautiful cascade effect where quick interactions
-    respond immediately, while deep content takes its proper time.
-    """
-    harmony_router = get_router()
-    start_time = time.time()
-    
-    # Create packets
-    packets = []
-    for item in request.items:
-        if item.weight is not None:
-            weight = item.weight
-        elif item.auto_calculate_weight:
-            weight = WeightCalculator.calculate(item.content)
-        else:
-            weight = 0.5
-        
-        packet = HarmonicPacket(
-            id=f"batch_{int(time.time() * 1000)}_{len(packets)}",
-            content=item.content,
-            weight=weight,
-            source="api_batch",
-            metadata=item.metadata,
-        )
-        packets.append(packet)
-    
-    # Process all packets
-    results = await harmony_router.process_batch(packets, concurrent=request.concurrent)
-    
-    elapsed_ms = (time.time() - start_time) * 1000
-    
-    return BatchResponse(
-        results=[packet_to_response(p) for p in results],
-        total_time_ms=elapsed_ms,
-        items_processed=len(results),
-    )
-
-
-@router.get("/stats", response_model=StatsResponse)
-async def get_stats():
-    """
-    Get router statistics.
-    
-    Returns:
-    - Total packets processed
-    - Total resistance time applied
-    - Lane configurations
-    """
-    harmony_router = get_router()
-    stats = harmony_router.get_stats()
-    
-    return StatsResponse(**stats)
-
-
-@router.get("/lanes", response_model=List[LaneInfo])
-async def get_lanes():
-    """
-    Get information about available processing lanes.
-    
-    Each lane has:
-    - Resistance (temporal delay in seconds)
-    - Weight threshold for selection
-    - Description of typical content
-    """
-    return [
-        LaneInfo(
-            key=lane.key,
-            label=lane.label,
-            emoji=lane.emoji,
-            resistance=lane.resistance,
-            description=lane.description,
-            weight_threshold="≤ 0.4" if lane.key == "fast_row" 
-                           else "> 0.4 and ≤ 0.8" if lane.key == "mid_row"
-                           else "> 0.8"
-        )
-        for lane in LANES.values()
-    ]
-
-
-@router.post("/calculate-weight")
-async def calculate_weight(content: str):
-    """
-    Calculate the information weight for given content.
-    
-    This uses keyword analysis to determine if content is:
-    - Kinetic (UI interactions, light data)
-    - Balanced (standard content)
-    - Theological (deep, contemplative content)
-    """
-    weight = WeightCalculator.calculate(content)
-    lane = get_router().select_lane(weight)
+    base_fractal = N_POWER ** Z_BASE
     
     return {
-        "content_preview": content[:50] + "..." if len(content) > 50 else content,
-        "calculated_weight": weight,
-        "selected_lane": lane.key,
-        "lane_label": f"{lane.emoji} {lane.label}",
-        "resistance": lane.resistance,
+        "input_frequency": frequency,
+        "harmonic_output": result if result != L_LIMIT else "INFINITY_BOUND",
+        "formula": "[(L-1)+(N^Z)] * [((N^Z)+1)/(N^Z)] / (X/L) * (Z^N)",
+        "components": {
+            "L_LIMIT": "sys.float_info.max",
+            "base_fractal_N_Z": base_fractal,
+            "golden_ratio_Z": Z_BASE,
+            "power_N": N_POWER,
+            "amplification_Z_N": Z_BASE ** N_POWER,
+            "centrifugal_force": (V_ROTARY ** 2) / R_RADIUS,
+            "polarity": POLARITY_P
+        }
+    }
+
+
+@router.get("/components")
+async def get_fractal_components():
+    """
+    Get all fractal components for visualization.
+    """
+    base_fractal = N_POWER ** Z_BASE
+    
+    return {
+        "metatron_frequency": X_INPUT,
+        "golden_ratio": Z_BASE,
+        "cubic_power": N_POWER,
+        "base_fractal": base_fractal,
+        "part_A": "L_LIMIT + base_fractal",
+        "part_B": (base_fractal + 1) / base_fractal,
+        "amplification_factor": Z_BASE ** N_POWER,
+        "centrifugal_force": (V_ROTARY ** 2) / R_RADIUS,
+        "rotary_velocity": V_ROTARY,
+        "core_radius": R_RADIUS
+    }
+
+
+@router.get("/frequencies")
+async def get_sacred_frequencies():
+    """
+    Calculate resonance for all sacred frequencies.
+    """
+    sacred_freqs = [174, 285, 396, 417, 432, 528, 639, 741, 852, 963]
+    results = {}
+    
+    for freq in sacred_freqs:
+        result = run_multi_fractal_engine(
+            L_LIMIT, freq, Z_BASE, N_POWER, V_ROTARY, R_RADIUS, POLARITY_P
+        )
+        results[freq] = result if result != L_LIMIT else "INFINITY_BOUND"
+    
+    return {
+        "sacred_frequencies": results,
+        "tuning_system": "Metatron 432",
+        "formula": "[(L-1)+(N^Z)] * [((N^Z)+1)/(N^Z)] / (X/L) * (Z^N)"
     }
