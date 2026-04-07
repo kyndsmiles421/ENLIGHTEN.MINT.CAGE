@@ -56,10 +56,40 @@
         }
         scene.add(group);
 
+        // --- LIQUID CURVES (Helix Flow Lines) ---
+        const curveGroup = new THREE.Group();
+        const curves = [];
+        
+        for (let c = 0; c < 9; c++) {
+            const curvePoints = [];
+            for (let i = 0; i <= 50; i++) {
+                const t = i / 50;
+                const angle = (c / 9) * Math.PI * 2 + t * Math.PI * 4;
+                const radius = 2.5 * Math.sin(t * Math.PI) + 1;
+                const z = (t - 0.5) * 12;
+                curvePoints.push(new THREE.Vector3(
+                    Math.cos(angle) * radius,
+                    Math.sin(angle) * radius,
+                    z
+                ));
+            }
+            
+            const curve = new THREE.CatmullRomCurve3(curvePoints);
+            const tubeGeo = new THREE.TubeGeometry(curve, 50, 0.02, 8, false);
+            const tubeMat = new THREE.MeshBasicMaterial({ 
+                color: colors[c % 3], 
+                transparent: true, 
+                opacity: 0.6 
+            });
+            const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+            curves.push(tubeMesh);
+            curveGroup.add(tubeMesh);
+        }
+        scene.add(curveGroup);
+
         // --- INTERACTIVE RESONANCE (The Bridge) ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        const sparkLines = [];
 
         window.addEventListener('click', (event) => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -92,15 +122,33 @@
 
         function animate() {
             requestAnimationFrame(animate);
+
+            // Rotate the entire group of curves to match the 81 nodes
+            curveGroup.rotation.y += 0.005;
             group.rotation.y += 0.005;
             diamond.rotation.y -= 0.01;
+
+            // Dynamic "Wobble" for the liquid feel
+            curves.forEach((curve, index) => {
+                curve.rotation.z = Math.sin(Date.now() * 0.001 + index) * 0.1;
+            });
+
+            // Spin individual nodes
             nodes.forEach(n => {
                 n.rotation.x += n.userData.spin;
                 n.rotation.z += n.userData.spin;
             });
+
             renderer.render(scene, camera);
         }
         animate();
+
+        // --- RESIZE HANDLER ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
