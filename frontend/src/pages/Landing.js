@@ -816,9 +816,17 @@ function Footer() {
   return (
     <>
       <footer className="relative z-10 px-6 md:px-12 lg:px-24 py-12 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full" style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.6), rgba(124,58,237,0.2))' }} />
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <img 
+              src="/images/hero-bridge.png" 
+              alt="3D World Grid: Refraction Bridge Pulse" 
+              className="w-full max-w-md rounded-xl shadow-lg"
+              style={{ 
+                border: '1px solid rgba(192,132,252,0.2)',
+                boxShadow: '0 0 30px rgba(192,132,252,0.15), 0 8px 32px rgba(0,0,0,0.4)'
+              }}
+            />
             <span className="text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
               The Enlightenment Cafe &copy; {new Date().getFullYear()}
             </span>
