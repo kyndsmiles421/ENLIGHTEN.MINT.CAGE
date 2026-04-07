@@ -58,6 +58,33 @@
         <button id="depthDown">↓ EARTH</button>
     </div>
     
+    <div id="nodule-panel" style="position:absolute; bottom:80px; left:20px; z-index:100;">
+        <button class="nodule-btn" data-nodule="ORACLE" style="background:#003333; color:#0ff; border:1px solid #0ff; padding:8px 12px; margin:2px; cursor:pointer;">ORACLE</button>
+        <button class="nodule-btn" data-nodule="TAROT" style="background:#003333; color:#0ff; border:1px solid #0ff; padding:8px 12px; margin:2px; cursor:pointer;">TAROT</button>
+        <button class="nodule-btn" data-nodule="STARS" style="background:#003333; color:#0ff; border:1px solid #0ff; padding:8px 12px; margin:2px; cursor:pointer;">STARS</button>
+        <button class="nodule-btn" data-nodule="LEGACY" style="background:#003333; color:#0ff; border:1px solid #0ff; padding:8px 12px; margin:2px; cursor:pointer;">LEGACY</button>
+        <button class="nodule-btn" data-nodule="PARCHMENT" style="background:#003333; color:#0ff; border:1px solid #0ff; padding:8px 12px; margin:2px; cursor:pointer;">PARCHMENT</button>
+    </div>
+    
+    <div id="knowledge-stream" style="position:absolute; right:20px; bottom:20px; width:350px; max-height:300px; overflow-y:auto; background:rgba(0,20,20,0.9); border:1px solid #0ff; padding:10px; font-size:10px; z-index:100; display:none;">
+        <div style="color:#0ff; font-weight:bold; border-bottom:1px solid #0ff; padding-bottom:5px; margin-bottom:10px;">KNOWLEDGE STREAM</div>
+        <div data-parent="ORACLE"></div>
+        <div data-parent="ORACLE"></div>
+        <div data-parent="ORACLE"></div>
+        <div data-parent="TAROT"></div>
+        <div data-parent="TAROT"></div>
+        <div data-parent="TAROT"></div>
+        <div data-parent="STARS"></div>
+        <div data-parent="STARS"></div>
+        <div data-parent="STARS"></div>
+        <div data-parent="LEGACY"></div>
+        <div data-parent="LEGACY"></div>
+        <div data-parent="LEGACY"></div>
+        <div data-parent="PARCHMENT"></div>
+        <div data-parent="PARCHMENT"></div>
+        <div data-parent="PARCHMENT"></div>
+    </div>
+    
     <script id="vertexShader" type="x-shader/x-vertex">
         varying vec3 vNormal;
         varying vec3 vEyeVector;
@@ -218,6 +245,107 @@
 
         // Initialize the Engine
         const AppEngine = new EnlightenMintEngine();
+
+        // ═══════════════════════════════════════════════════════════════════
+        // RECURSIVE KNOWLEDGE INJECTOR
+        // Connects every nook and cranny to the Unified Singularity
+        // ═══════════════════════════════════════════════════════════════════
+
+        const NODULE_REGISTRY = {
+            "ORACLE":    { focus: "Probability & Fate", depth: "Advanced" },
+            "TAROT":     { focus: "Archetypal Psychology", depth: "Mastery" },
+            "STARS":     { focus: "Astrological Physics", depth: "Scientific" },
+            "LEGACY":    { focus: "Genealogical Continuity", depth: "Historical" },
+            "PARCHMENT": { focus: "Sovereign Law & Documentation", depth: "Legal" }
+        };
+
+        class KnowledgeEngine {
+            constructor() {
+                this.activeNodule = null;
+                this.knowledgeCache = {};
+            }
+
+            /**
+             * Replaces "Dead Space" with a recursive AI stream
+             */
+            async unfoldNoduleKnowledge(noduleID) {
+                const nodule = NODULE_REGISTRY[noduleID];
+                if (!nodule) return;
+                
+                this.activeNodule = noduleID;
+                
+                // This is the "Substance" trigger
+                const knowledgeStream = await this.queryUnifiedSingularity({
+                    subject: nodule.focus,
+                    complexity: "Academic",
+                    recursiveLayers: 9 // Tied to 9x9 logic
+                });
+
+                this.injectIntoWidget(noduleID, knowledgeStream);
+                return knowledgeStream;
+            }
+
+            async queryUnifiedSingularity(params) {
+                // Simulate AI knowledge stream with recursive layers
+                const chapters = [];
+                const topics = this.generateTopics(params.subject, params.recursiveLayers);
+                
+                for (let i = 0; i < params.recursiveLayers; i++) {
+                    chapters.push({
+                        title: `Layer ${i + 1}: ${topics[i]}`,
+                        deepDive: this.generateDeepDive(params.subject, topics[i], i + 1)
+                    });
+                }
+
+                return {
+                    subject: params.subject,
+                    complexity: params.complexity,
+                    chapters: chapters,
+                    timestamp: Date.now()
+                };
+            }
+
+            generateTopics(subject, count) {
+                const topicMaps = {
+                    "Probability & Fate": ["Quantum Entanglement", "Synchronicity", "Chaos Theory", "Destiny Mapping", "Choice Architecture", "Timeline Branches", "Karmic Vectors", "Probability Fields", "Fate Nodes"],
+                    "Archetypal Psychology": ["The Hero's Journey", "Shadow Integration", "Anima/Animus", "The Self", "Persona Masks", "Collective Unconscious", "Individuation", "Symbolic Language", "Dream Analysis"],
+                    "Astrological Physics": ["Planetary Resonance", "Solar Cycles", "Lunar Tides", "Zodiacal Forces", "House Systems", "Aspect Geometry", "Retrograde Mechanics", "Eclipse Dynamics", "Stellar Influence"],
+                    "Genealogical Continuity": ["DNA Memory", "Ancestral Patterns", "Bloodline Codes", "Heritage Mapping", "Generational Trauma", "Legacy Transfer", "Family Systems", "Inheritance Laws", "Lineage Tracking"],
+                    "Sovereign Law & Documentation": ["Natural Rights", "Contract Theory", "Trust Structures", "Asset Protection", "Legal Personhood", "Jurisdiction", "Estate Planning", "Living Documents", "Sovereign Status"]
+                };
+                return topicMaps[subject] || Array(count).fill("Unknown Topic");
+            }
+
+            generateDeepDive(subject, topic, layer) {
+                return `${topic} represents the ${layer}th dimensional aspect of ${subject}. At this layer, we observe the recursive patterns that connect individual consciousness to the unified field. The mathematical relationship follows the golden ratio, scaled by the ${layer}x${layer} matrix of understanding.`;
+            }
+
+            injectIntoWidget(id, data) {
+                const subNodules = document.querySelectorAll(`[data-parent="${id}"]`);
+                
+                subNodules.forEach((sub, index) => {
+                    if (data.chapters[index]) {
+                        sub.innerHTML = `
+                            <div class="substance-layer" style="background: rgba(0,50,50,0.8); padding: 10px; margin: 5px; border-left: 2px solid #0ff;">
+                                <h4 style="color: #0ff; margin: 0 0 5px 0; font-size: 11px;">${data.chapters[index].title}</h4>
+                                <p style="color: #aaa; margin: 0; font-size: 10px;">${data.chapters[index].deepDive}</p>
+                            </div>
+                        `;
+                        this.applyRefraction(sub, 3.5);
+                    }
+                });
+
+                // Update system display
+                AppEngine.activeData = `KNOWLEDGE: ${id} - ${data.chapters.length} layers loaded`;
+            }
+
+            applyRefraction(element, value) {
+                element.style.filter = `blur(${Math.max(0, 5 - value)}px)`;
+                element.style.opacity = Math.min(1, value / 5);
+            }
+        }
+
+        const KnowledgeCore = new KnowledgeEngine();
 
         // --- Core System Parameters ---
         let intensityMultiplier = 1.0;
@@ -541,6 +669,22 @@
         document.querySelectorAll('.core-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 AppEngine.onButtonPress(btn.id, 0.05); // Direct sensor touch
+            });
+        });
+
+        // Nodule knowledge handlers
+        document.querySelectorAll('.nodule-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const noduleID = btn.dataset.nodule;
+                document.getElementById('knowledge-stream').style.display = 'block';
+                btn.style.background = '#006666';
+                
+                // Clear other nodule highlights
+                document.querySelectorAll('.nodule-btn').forEach(b => {
+                    if (b !== btn) b.style.background = '#003333';
+                });
+                
+                await KnowledgeCore.unfoldNoduleKnowledge(noduleID);
             });
         });
 
