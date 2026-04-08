@@ -819,16 +819,16 @@ function Footer() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-4">
             <img 
-              src="/images/hero-bridge.png" 
-              alt="3D World Grid: Refraction Bridge Pulse" 
-              className="w-full max-w-md rounded-xl shadow-lg"
+              src="/images/trademark-banner.png" 
+              alt="ENLIGHTEN.MINT.CAFE - Copyright and Trademark - O.V.E. CORE 1.0 SECURE" 
+              className="w-full max-w-lg rounded-xl shadow-lg"
               style={{ 
-                border: '1px solid rgba(192,132,252,0.2)',
-                boxShadow: '0 0 30px rgba(192,132,252,0.15), 0 8px 32px rgba(0,0,0,0.4)'
+                border: '1px solid rgba(0,242,255,0.3)',
+                boxShadow: '0 0 40px rgba(0,242,255,0.2), 0 8px 32px rgba(0,0,0,0.5)'
               }}
             />
             <span className="text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
-              The Enlightenment Cafe &copy; {new Date().getFullYear()}
+              ENLIGHTEN.MINT.CAFE &copy; {new Date().getFullYear()} | O.V.E. CORE 1.0
             </span>
           </div>
           <div className="flex items-center gap-6">
