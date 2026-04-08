@@ -41,6 +41,28 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CONTENT WRAPPER FIX — Ensures buttons are never trapped off-screen
+   ═══════════════════════════════════════════════════════════════════════════ */
+.content-wrapper,
+.dashboard-container,
+.mantra-library {
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+  padding-bottom: 80px; /* Space for floating button or navigation bar */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure buttons wrap gracefully on smaller screens */
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    GLOBAL MATRIX PURGE — Clean Slate CSS
    ═══════════════════════════════════════════════════════════════════════════ */
 [class*="matrix"]:not([class*="FRICTION"]),

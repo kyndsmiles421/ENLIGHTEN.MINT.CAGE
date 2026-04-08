@@ -5,6 +5,8 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 import { purgeNoise } from './engines/NukeTheChaos';
 import './engines/SystemRecovery'; // Exposes V_ENGINE.resetSystem() to console
 import './engines/MainframeSync'; // Exposes V_ENGINE.syncMainframe() to console
+import './engines/PerformanceManager'; // Battery & TTS Fallback
+import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check, Capacitor Bridge
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
