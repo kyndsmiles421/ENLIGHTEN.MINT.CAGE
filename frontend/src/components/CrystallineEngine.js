@@ -1,108 +1,198 @@
+import React from 'react';
+
 /**
- * ENLIGHTENMENT ENGINE: METATRON-FLOWER-HELIX CORE
- * Structure: Flower of Life inside Metatron's Cube
- * Materials: Gold/Silver/Copper Microfiber Inlay
- * Physics: White Light Refraction & Sprocket Rotation
+ * CrystallineEngine - CSS-based Dual Barrier Visualization
+ * Displays animated refractive barriers based on RI value
  */
-
-import React, { useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Float } from '@react-three/drei'
-
-const CrystallineNode = ({ position, color, frequency }) => {
-  const mesh = useRef()
+export const CrystallineEngine = ({ riValue = 0.618 }) => {
+  const isStable = riValue > 0.615;
+  const pulseSpeed = riValue * 3;
   
-  useFrame((state) => {
-    if (!mesh.current) return
-    const t = state.clock.getElapsedTime()
-    const rotationSpeed = ((frequency / 100) - 1 + 2) % 144 / 50
-    mesh.current.rotation.z += rotationSpeed
-    mesh.current.rotation.y += rotationSpeed * 0.5
-    
-    const scale = 1 + Math.sin(t * 2) * 0.05
-    mesh.current.scale.set(scale, scale, scale)
-  })
-
   return (
-    <mesh ref={mesh} position={position}>
-      <dodecahedronGeometry args={[0.12, 0]} />
-      <meshPhysicalMaterial 
-        color={color}
-        metalness={1}
-        roughness={0.05}
-        transmission={0.9}
-        thickness={2}
-        emissive={color}
-        emissiveIntensity={0.5}
-        clearcoat={1}
-      />
-    </mesh>
-  )
-}
+    <div style={{ 
+      width: '100%', 
+      height: '500px', 
+      background: 'radial-gradient(ellipse at center, #0a0a1a 0%, #050505 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      {/* Ambient particles */}
+      {Array.from({ length: 30 }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            width: `${2 + Math.random() * 3}px`,
+            height: `${2 + Math.random() * 3}px`,
+            borderRadius: '50%',
+            background: i % 2 === 0 ? '#00f2ff' : '#ff00f2',
+            opacity: 0.3 + Math.random() * 0.4,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animation: `float ${5 + Math.random() * 10}s ease-in-out infinite`,
+            animationDelay: `${Math.random() * 5}s`
+          }}
+        />
+      ))}
 
-const ShieldRing = ({ radius, color }) => {
-  const mesh = useRef()
-  
-  useFrame((state) => {
-    if (!mesh.current) return
-    mesh.current.rotation.z += 0.002
-  })
+      {/* OUTER BARRIER (R_o) - PHI Speed */}
+      <div style={{
+        position: 'absolute',
+        width: '320px',
+        height: '320px',
+        borderRadius: '50%',
+        border: '2px solid rgba(255, 0, 242, 0.3)',
+        boxShadow: `
+          0 0 60px rgba(255, 0, 242, 0.2),
+          inset 0 0 60px rgba(255, 0, 242, 0.1)
+        `,
+        animation: `pulse 1.618s ease-in-out infinite, rotate 20s linear infinite`
+      }}>
+        {/* Outer barrier glow rings */}
+        <div style={{
+          position: 'absolute',
+          inset: '-10px',
+          borderRadius: '50%',
+          border: '1px solid rgba(255, 0, 242, 0.15)',
+          animation: `pulse 1.618s ease-in-out infinite reverse`
+        }} />
+      </div>
 
-  return (
-    <mesh ref={mesh}>
-      <torusGeometry args={[radius, 0.02, 8, 64]} />
-      <meshBasicMaterial color={color} transparent opacity={0.4} />
-    </mesh>
-  )
-}
+      {/* INNER BARRIER (R_i) - RI-Based Speed */}
+      <div style={{
+        position: 'absolute',
+        width: '220px',
+        height: '220px',
+        borderRadius: '50%',
+        border: '2px solid rgba(0, 242, 255, 0.4)',
+        boxShadow: `
+          0 0 50px rgba(0, 242, 255, 0.3),
+          inset 0 0 50px rgba(0, 242, 255, 0.15)
+        `,
+        animation: `pulse ${pulseSpeed}s ease-in-out infinite, rotate 15s linear infinite reverse`
+      }}>
+        {/* Inner barrier glow rings */}
+        <div style={{
+          position: 'absolute',
+          inset: '-8px',
+          borderRadius: '50%',
+          border: '1px solid rgba(0, 242, 255, 0.2)',
+          animation: `pulse ${pulseSpeed}s ease-in-out infinite reverse`
+        }} />
+      </div>
 
-export default function CrystallineEngine() {
-  const nodes = useMemo(() => {
-    const temp = []
-    const colors = ["#FFD700", "#C0C0C0", "#B87333"]
-    
-    for (let h = 0; h < 9; h++) {
-      for (let p = 0; p < 9; p++) {
-        const angle = (h / 9) * Math.PI * 2 + (p * 0.2)
-        const radius = 2.5 * Math.sin((p / 9) * Math.PI) + 1
-        const z = (p - 4) * 1.5
+      {/* INNER CORE */}
+      <div style={{
+        position: 'relative',
+        width: '80px',
+        height: '80px',
+        animation: `coreRotate 8s linear infinite`
+      }}>
+        {/* Diamond shape using rotated square */}
+        <div style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          background: `linear-gradient(135deg, 
+            rgba(0, 242, 255, 0.8) 0%, 
+            rgba(255, 255, 255, 0.9) 50%, 
+            rgba(255, 0, 242, 0.8) 100%)`,
+          transform: 'rotate(45deg)',
+          boxShadow: `
+            0 0 40px rgba(0, 242, 255, 0.6),
+            0 0 80px rgba(255, 0, 242, 0.4),
+            inset 0 0 20px rgba(255, 255, 255, 0.5)
+          `,
+          animation: `corePulse ${pulseSpeed * 0.5}s ease-in-out infinite`
+        }} />
         
-        temp.push({
-          pos: [Math.cos(angle) * radius, Math.sin(angle) * radius, z],
-          color: colors[h % 3],
-          freq: 174 + (h * 100),
-          id: `${h}-${p}`
-        })
-      }
-    }
-    return temp
-  }, [])
+        {/* Core status indicator */}
+        <div style={{
+          position: 'absolute',
+          inset: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          background: isStable ? '#22c55e' : '#ef4444',
+          boxShadow: `0 0 20px ${isStable ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)'}`,
+          animation: `statusPulse 1s ease-in-out infinite`
+        }} />
+      </div>
 
-  return (
-    <div style={{ width: '100vw', height: '100vh', background: '#030303' }}>
-      <Canvas camera={{ position: [0, 0, 15] }}>
-        <color attach="background" args={['#000']} />
-        <ambientLight intensity={0.2} />
-        <pointLight position={[10, 10, 10]} intensity={1.5} color="#fff" />
-        
-        <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-          <group>
-            <ShieldRing radius={4} color="#FFD700" />
-            <ShieldRing radius={3} color="#C0C0C0" />
-            <ShieldRing radius={2} color="#B87333" />
-            {nodes.map(node => (
-              <CrystallineNode 
-                key={node.id} 
-                position={node.pos} 
-                color={node.color} 
-                frequency={node.freq} 
-              />
-            ))}
-          </group>
-        </Float>
-        
-        <OrbitControls autoRotate autoRotateSpeed={0.5} />
-      </Canvas>
+      {/* RI Value Display */}
+      <div style={{
+        position: 'absolute',
+        bottom: '30px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          fontFamily: 'monospace',
+          fontSize: '2rem',
+          fontWeight: 'bold',
+          color: isStable ? '#00f2ff' : '#ef4444',
+          textShadow: `0 0 20px ${isStable ? 'rgba(0, 242, 255, 0.8)' : 'rgba(239, 68, 68, 0.8)'}`
+        }}>
+          RI: {riValue.toFixed(6)}
+        </div>
+        <div style={{
+          fontSize: '0.75rem',
+          color: isStable ? '#22c55e' : '#ef4444',
+          letterSpacing: '0.2em',
+          marginTop: '0.5rem'
+        }}>
+          {isStable ? '● STABLE' : '◉ PATHOGENIC SHIFT'}
+        </div>
+      </div>
+
+      {/* PHI Constant Reference */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        fontFamily: 'monospace',
+        fontSize: '0.75rem',
+        color: 'rgba(255, 255, 255, 0.4)'
+      }}>
+        φ = 1.618033
+      </div>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes coreRotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes corePulse {
+          0%, 100% { transform: rotate(45deg) scale(1); }
+          50% { transform: rotate(45deg) scale(1.1); }
+        }
+        @keyframes statusPulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); }
+          50% { transform: translate(-50%, -50%) scale(1.3); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-20px) translateX(10px); }
+          50% { transform: translateY(-10px) translateX(-10px); }
+          75% { transform: translateY(-30px) translateX(5px); }
+        }
+      `}</style>
     </div>
-  )
-}
+  );
+};
+
+export default CrystallineEngine;
