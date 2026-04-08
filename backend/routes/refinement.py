@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from routes.evolution import SPECIMEN_METADATA, EVOLUTION_STAGES, _compute_vc, _get_stage
+from utils.credits import get_user_credits, modify_credits
 from datetime import datetime, timezone, timedelta
 import random
 
@@ -448,7 +449,7 @@ async def instant_finish(data: dict = Body(...), user=Depends(get_current_user))
     # Cost: 1 credit per remaining hour (min 1)
     cost = max(1, int(remaining["hours_remaining"]))
 
-    from routes.marketplace import get_user_credits, modify_credits
+    # Using shared credits module (no circular import)
     credits = await get_user_credits(user_id)
     if credits < cost:
         raise HTTPException(400, f"Need {cost} Cosmic Credits. Have {credits}.")

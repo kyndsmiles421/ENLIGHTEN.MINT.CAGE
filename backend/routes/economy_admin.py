@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from datetime import datetime, timezone, timedelta
+from utils.credits import modify_credits, get_user_credits
+from engines.crystal_seal import EconomyCommon
 import random
 
 router = APIRouter()
@@ -213,8 +215,7 @@ async def convert_dust(data: dict = Body(...), user=Depends(get_current_user)):
         {"user_id": user_id}, {"$inc": {"cosmic_dust": -dust_consumed}}
     )
 
-    # Add credits
-    from routes.marketplace import modify_credits
+    # Add credits (now using shared module - no circular import)
     new_balance = await modify_credits(user_id, credits_earned, "dust_conversion")
 
     await db.marketplace_transactions.insert_one({
@@ -267,14 +268,13 @@ async def unlock_module(data: dict = Body(...), user=Depends(get_current_user)):
     if existing:
         raise HTTPException(400, "Module already unlocked.")
 
-    # Check credits
-    from routes.marketplace import get_user_credits, modify_credits
+    # Check credits (now using shared module - no circular import)
     credits = await get_user_credits(user_id)
     cost = module["unlock_cost_credits"]
     if credits < cost:
         raise HTTPException(400, f"Need {cost} Credits. Have {credits}.")
 
-    # Deduct and unlock
+    # Deduct and unlock (using shared module)
     new_balance = await modify_credits(user_id, -cost, f"module_unlock:{module_id}")
 
     await db.module_unlocks.insert_one({

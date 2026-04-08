@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from datetime import datetime, timezone, timedelta
 from routes.consciousness import get_consciousness, level_from_consciousness_xp, ACTIVITY_XP
+from utils.credits import modify_credits
 import uuid
 
 router = APIRouter(prefix="/energy-gates")
@@ -442,8 +443,7 @@ async def warp_gate(data: dict = Body(...), user=Depends(get_current_user)):
     if progress["credits"] < warp_cost:
         raise HTTPException(400, f"Need {warp_cost} credits (have {progress['credits']})")
 
-    # Deduct credits
-    from routes.marketplace import modify_credits
+    # Deduct credits (using shared module - no circular import)
     await modify_credits(user_id, -warp_cost, f"warp_gate:{gate_id}")
 
     # Remove the time lock by backdating the previous gate's unlock

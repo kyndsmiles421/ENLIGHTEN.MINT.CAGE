@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from datetime import datetime, timezone, timedelta
+from utils.credits import get_user_credits, modify_credits
+from engines.crystal_seal import EconomyCommon
 import os
 import uuid
 
@@ -264,28 +266,8 @@ ALL_STORE_ITEMS = {**CONSUMABLES, **COSMETICS}
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  HELPER FUNCTIONS
+#  Note: get_user_credits and modify_credits are imported from utils.credits
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-async def get_user_credits(user_id: str) -> int:
-    doc = await db.cosmic_credits.find_one({"user_id": user_id}, {"_id": 0})
-    return (doc or {}).get("balance", 0)
-
-
-async def modify_credits(user_id: str, amount: int, source: str) -> int:
-    await db.cosmic_credits.update_one(
-        {"user_id": user_id},
-        {"$inc": {"balance": amount}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}},
-        upsert=True,
-    )
-    await db.marketplace_transactions.insert_one({
-        "user_id": user_id,
-        "type": "credits",
-        "amount": amount,
-        "source": source,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    })
-    return await get_user_credits(user_id)
-
 
 async def get_user_inventory(user_id: str) -> list:
     items = await db.marketplace_inventory.find(

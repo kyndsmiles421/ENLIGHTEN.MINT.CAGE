@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger
 from datetime import datetime, timezone, timedelta
+from engines.crystal_seal import COMMUNAL_GOALS, secure_hash
 import random
-import hashlib
 
 router = APIRouter()
 
@@ -126,14 +126,14 @@ WORLD_VEINS = {
 
 def _seed_boss(user_id: str, date_str: str) -> str:
     """Deterministic boss spawn based on user and date."""
-    h = hashlib.sha256(f"{user_id}:boss:{date_str}".encode()).hexdigest()
+    h = secure_hash(f"{user_id}:boss:{date_str}")
     boss_list = list(BOSS_TYPES.keys())
     return boss_list[int(h[:4], 16) % len(boss_list)]
 
 
 def _seed_rival(user_id: str, mine_element: str) -> str:
     """Deterministic rival spawn."""
-    h = hashlib.sha256(f"{user_id}:rival:{mine_element}".encode()).hexdigest()
+    h = secure_hash(f"{user_id}:rival:{mine_element}")
     return "sprinter" if int(h[:4], 16) % 2 == 0 else "specialist"
 
 
@@ -205,9 +205,8 @@ async def attempt_boss(data: dict = Body(...), user=Depends(get_current_user)):
         upsert=True,
     )
 
-    # Contribute to communal goal
+    # Contribute to communal goal (using shared COMMUNAL_GOALS - no circular import)
     if success:
-        from routes.economy_admin import COMMUNAL_GOALS
         await db.communal_progress.update_one(
             {"goal_id": "rapid_tumbling"},
             {"$inc": {"current": 1}, "$set": {"updated_at": now}},
