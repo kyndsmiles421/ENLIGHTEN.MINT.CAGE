@@ -1,5 +1,8 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+
+// V-ENGINE: ABSOLUTE_CLARITY_NOW - Must be FIRST
+import { purgeNoise } from './engines/NukeTheChaos';
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -281,6 +284,15 @@ function CafeApp() {
   const [assistantOpen, setAssistantOpen] = React.useState(false);
   const [mixerOpen, setMixerOpen] = React.useState(false);
   const [commandOpen, setCommandOpen] = React.useState(false);
+  
+  // V-ENGINE: ABSOLUTE_CLARITY_NOW
+  useEffect(() => {
+    // 1. Kill the confetti/particle engines
+    // 2. Strip legacy borders and shadows
+    // 3. Force stop any active media streams
+    purgeNoise();
+    console.log("🌌 Void initialized. Chaos neutralized.");
+  }, []);
   
   // Route-based audio cleanup — kills audio when exiting rooms
   useRouteAudioCleanup();

@@ -4,48 +4,116 @@
  * @logic ZERO_STATE_REFRIGERATION
  */
 
-(function nukeTheChaos() {
-    // 1. FORCED BACKGROUND VACUUM
-    // This kills the 'Confetti' and the rainbow noise seen in 2487.png
-    const css = `
-        * { 
-            background-image: none !important; 
-            border-radius: 0 !important; 
-            box-shadow: none !important;
-            border: none !important;
-        }
-        body, html, #root, .app-container {
-            background-color: #000000 !important;
-            color: #FFFFFF !important;
-            overflow-x: hidden;
-        }
-        /* 2. THE WHITE LIGHT DATA FLOW */
-        h1, h2, h3, p, a, span, button {
-            color: #FFFFFF !important;
-            text-shadow: 0 0 5px rgba(255,255,255,0.5) !important;
-        }
-        /* 3. DISSOLVE THE BOXES */
-        div, section, article {
-            background: transparent !important;
-            border: none !important;
-        }
-        /* 4. THE P0 EMERGENCY SHIELD (Top-Left) */
-        .emergency-stop, #stop-button {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: 10000 !important;
-            background: rgba(255,255,255,0.1) !important;
-            border: 1px solid #FFFFFF !important;
-        }
-    `;
+// Kill the Rainbow Confetti / Particles
+const VOID_CSS = `
+/* Kill the Rainbow Confetti / Particles */
+canvas.particle-canvas, 
+.particle-container, 
+[class*="confetti"],
+.mesh-canvas-renderer,
+.cosmic-dust,
+.cosmic-mesh,
+.cosmic-mesh-inner {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
 
+/* Remove Box Shadows & Borders (Legacy Noise) */
+* {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Re-establish 'The Void' */
+body, html, #root {
+    background: #000000 !important;
+}
+
+/* THE WHITE LIGHT DATA FLOW */
+h1, h2, h3, p, span {
+    text-shadow: 0 0 5px rgba(255,255,255,0.3) !important;
+}
+
+/* P0 EMERGENCY SHIELD - Always Visible */
+[data-testid="emergency-shutoff"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+`;
+
+/**
+ * @function purgeNoise
+ * Injects Void CSS and kills legacy visual interference
+ */
+export function purgeNoise() {
     // Inject the Focal Shield into the Head
+    const existingStyle = document.getElementById('v-engine-void-css');
+    if (existingStyle) return; // Already purged
+    
     const head = document.head || document.getElementsByTagName('head')[0];
     const style = document.createElement('style');
+    style.id = 'v-engine-void-css';
     style.type = 'text/css';
-    style.appendChild(document.createTextNode(css));
+    style.appendChild(document.createTextNode(VOID_CSS));
     head.appendChild(style);
 
-    console.log("V-ENGINE: Chaos Nuked. The Void is Focalized.");
+    console.log("[V-ENGINE] Chaos Nuked. The Void is Focalized.");
+}
+
+/**
+ * @function stopCapture
+ * Kills hardware media streams causing the 'STOP' overlay
+ */
+export function stopCapture(stream) {
+    if (!stream) {
+        // Try to find global stream references
+        const globalStream = window.localStream || window.mediaStream;
+        if (globalStream) {
+            let tracks = globalStream.getTracks();
+            tracks.forEach(track => track.stop());
+            console.log("[V-ENGINE] Stream stopped. Hardware released.");
+        }
+        return;
+    }
+    
+    let tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    console.log("[V-ENGINE] Stream stopped. The 'STOP' overlay should vanish.");
+}
+
+/**
+ * @function restoreVoid
+ * Full void restoration - kills all visual noise
+ */
+export function restoreVoid() {
+    purgeNoise();
+    
+    // Kill any running canvas animations
+    const canvases = document.querySelectorAll('canvas');
+    canvases.forEach(canvas => {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.display = 'none';
+    });
+    
+    // Stop any media streams
+    stopCapture(null);
+    
+    console.log("[V-ENGINE] Full void restoration complete.");
+}
+
+// Auto-execute on import (IIFE backup)
+(function nukeTheChaos() {
+    if (typeof document !== 'undefined') {
+        // Delay to ensure DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', purgeNoise);
+        } else {
+            purgeNoise();
+        }
+    }
 })();
+
+export default { purgeNoise, stopCapture, restoreVoid };
