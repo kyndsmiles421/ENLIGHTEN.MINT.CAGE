@@ -94,6 +94,7 @@ import HexagramGhostLayer from './components/HexagramGhostLayer';
 import { useZeroPointFlicker } from './hooks/useZeroPointFlicker';
 import ZeroPointExperience from './components/ZeroPointExperience';
 import { CrystalBadge } from './components/CrystalResonancePanel';
+import MeshCanvasRenderer from './components/MeshCanvasRenderer';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -552,6 +553,7 @@ function App() {
           <SageProvider>
           <VoiceCommandProvider>
           <CosmicMeshWrapper />
+          <MeshCanvasRenderer opacity={0.4} blur={0.5} />
           <CosmicBackground />
           <SplitScreenProvider>
           <RecursivePortal>
