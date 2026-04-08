@@ -9,7 +9,8 @@ import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (cle
 import './utils/SpectralShield';         // Ghostbuster Purge & Spectral Shield
 import './utils/SanctuaryEngine';        // Pure Light Resonance (ghosts Emergent badge)
 import './utils/EnlightenmentKey';       // Back-Side Pass Key (unlocks layers on ASCEND)
-import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (responds to ASCEND)
+// V-ENGINE: GoldenSpiralEngine KILLED - No spiral particles
+// import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (responds to ASCEND)
 import './utils/SovereignCleanup';       // V2.88 Final - Legacy purge, memory optimization, PWA hooks
 import './utils/WebXRPortal';            // WebXR Portal Engine - Spiral zoom → Immersive Dome
 import './utils/PortalAudioEngine';      // Spatial Audio - Shepard Tone + Solfeggio frequencies
@@ -307,8 +308,8 @@ function CafeApp() {
   
   return (
     <>
-      {/* Golden Ratio Spiral Layer - Mounts to this container */}
-      <div className="emergent-layer" style={{ 
+      {/* V-ENGINE: Golden Ratio Spiral KILLED - Pure Obsidian Void */}
+      {/* <div className="emergent-layer" style={{ 
         position: 'fixed', 
         top: 0, 
         left: 0, 
@@ -316,16 +317,16 @@ function CafeApp() {
         height: '100%', 
         zIndex: 0, 
         pointerEvents: 'none' 
-      }} />
+      }} /> */}
       
-      {/* Nebula 3D Scene - Renders behind everything when active */}
-      {!isSovereignRoute && (
+      {/* V-ENGINE: Nebula and VellumOverlay KILLED - Pure Obsidian Void */}
+      {/* {!isSovereignRoute && (
         <NebulaScene 
           onIslandClick={handleIslandClick}
           activeIsland={activeIsland}
         />
       )}
-      {!isSovereignRoute && <VellumOverlay />}
+      {!isSovereignRoute && <VellumOverlay />} */}
       <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
         {!isSovereignRoute && <Navigation />}
         <ScrollToTop />
@@ -564,9 +565,11 @@ function App() {
           <DepthProvider>
           <SageProvider>
           <VoiceCommandProvider>
-          <CosmicMeshWrapper />
-          <MeshCanvasRenderer opacity={0.4} blur={0.5} />
-          <CosmicBackground />
+          {/* V-ENGINE: cosmic-mesh KILLED */}
+          {/* <CosmicMeshWrapper /> */}
+          {/* V-ENGINE: BACKDROP NOISE KILLED - MeshCanvasRenderer and CosmicBackground DISABLED */}
+          {/* <MeshCanvasRenderer opacity={0.4} blur={0.5} /> */}
+          {/* <CosmicBackground /> */}
           <SplitScreenProvider>
           <RecursivePortal>
           <CafeApp />

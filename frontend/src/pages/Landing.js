@@ -970,8 +970,8 @@ export default function Landing() {
         </div>
       )}
 
-      {/* Aurora overlays — immersive portal layers (VoidShield Layer 1) */}
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+      {/* V-ENGINE: Aurora overlays KILLED - Pure Obsidian Void */}
+      {/* <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         <div className="absolute top-0 left-1/4 w-[700px] h-[700px] rounded-full animate-aurora"
           style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, rgba(217,70,239,0.04) 40%, transparent 70%)', filter: 'blur(80px)' }} />
         <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full"
@@ -980,7 +980,7 @@ export default function Landing() {
           style={{ background: 'radial-gradient(ellipse, rgba(234,179,8,0.07) 0%, transparent 60%)', filter: 'blur(100px)', animation: 'aurora 16s ease-in-out infinite' }} />
         <div className="absolute bottom-0 left-0 w-[500px] h-[300px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(253,164,175,0.06) 0%, transparent 60%)', filter: 'blur(90px)', animation: 'aurora 20s ease-in-out infinite reverse' }} />
-      </div>
+      </div> */}
 
       {/* ═══════════════════════════════════════════════════════════════════
           LAYER 2: TIERED INTERACTION WINDOW
@@ -1086,51 +1086,21 @@ export default function Landing() {
             </motion.div>
           </motion.div>
 
-          {/* Breathing orb — immersive cosmic sphere */}
+          {/* Breathing orb — V-ENGINE: Simplified to White Core only */}
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center justify-center">
             <div className="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
-              {/* Orbital particles */}
-              {Array.from({ length: 16 }).map((_, i) => {
-                const angle = (i / 16) * Math.PI * 2;
-                const radius = 42 + (i % 3) * 8;
-                const colors = ['#D8B4FE', '#2DD4BF', '#FCD34D', '#FDA4AF', '#818CF8', '#FB923C'];
-                return (
-                  <motion.div key={i} className="absolute rounded-full"
-                    style={{
-                      width: i % 4 === 0 ? 3 : 2,
-                      height: i % 4 === 0 ? 3 : 2,
-                      background: colors[i % colors.length],
-                      left: `calc(50% + ${Math.cos(angle) * radius}%)`,
-                      top: `calc(50% + ${Math.sin(angle) * radius}%)`,
-                      boxShadow: `0 0 8px ${colors[i % colors.length]}40`,
-                    }}
-                    animate={{ opacity: [0.2, 1, 0.2], scale: [0.6, 1.4, 0.6] }}
-                    transition={{ duration: 3 + i * 0.2, repeat: Infinity, delay: i * 0.15 }} />
-                );
-              })}
-              {/* Multi-layered aura rings */}
-              {[
-                { size: 55, color1: 'rgba(124,58,237,0.12)', color2: 'rgba(6,182,212,0.04)', border: 'rgba(192,132,252,0.08)' },
-                { size: 70, color1: 'rgba(6,182,212,0.08)', color2: 'rgba(234,179,8,0.03)', border: 'rgba(6,182,212,0.06)' },
-                { size: 85, color1: 'rgba(217,70,239,0.06)', color2: 'rgba(253,164,175,0.02)', border: 'rgba(217,70,239,0.05)' },
-                { size: 100, color1: 'rgba(192,132,252,0.04)', color2: 'transparent', border: 'rgba(192,132,252,0.03)' },
-              ].map((ring, i) => (
-                <div key={i} className="absolute rounded-full"
-                  style={{
-                    width: `${ring.size}%`, height: `${ring.size}%`,
-                    background: `radial-gradient(circle, ${ring.color1} 0%, ${ring.color2} 70%)`,
-                    border: `1px solid ${ring.border}`,
-                    transform: `scale(${breathScale * (0.92 + i * 0.03)})`, transition: 'transform 0.1s linear',
-                  }} />
-              ))}
-              {/* Inner core */}
+              {/* V-ENGINE: Orbital particles KILLED */}
+              {/* Multi-layered aura rings KILLED */}
+              
+              {/* Inner core - WHITE LIGHT */}
               <div className="relative z-10 w-20 h-20 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(217,70,239,0.7) 0%, rgba(124,58,237,0.35) 40%, rgba(6,182,212,0.15) 70%, transparent 100%)',
-                  boxShadow: `0 0 ${40 + breathScale * 30}px rgba(192,132,252,${0.25 + breathScale * 0.15}), 0 0 ${80 + breathScale * 40}px rgba(124,58,237,0.1), 0 0 ${120 + breathScale * 50}px rgba(6,182,212,0.06)`,
-                  transform: `scale(${breathScale})`, transition: 'transform 0.1s linear',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                  boxShadow: '0 0 60px rgba(255,255,255,0.4)',
+                  transform: `scale(${breathScale})`,
+                  transition: 'transform 0.1s linear',
                 }} />
             </div>
           </motion.div>
