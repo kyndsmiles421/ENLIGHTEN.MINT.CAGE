@@ -23,7 +23,6 @@ import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, MANTRAS as MIXER_MANTRAS } 
 import ShareButton from '../components/ShareButton';
 import GuidedTour from '../components/GuidedTour';
 import CosmicMoodRing from '../components/CosmicMoodRing';
-import RainbowTrademarkBanner from '../components/RainbowTrademarkBanner';
 import { Sensories } from '../utils/Sensories';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
@@ -819,7 +818,6 @@ function Footer() {
       <footer className="relative z-10 px-6 md:px-12 lg:px-24 py-12 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <RainbowTrademarkBanner />
             <span className="text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
               ENLIGHTEN.MINT.CAFE &copy; {new Date().getFullYear()} | O.V.E. CORE 1.0
             </span>
