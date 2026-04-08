@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CrystallineEngine } from '../components/CrystallineEngine';
+import { QRPortalGrid } from '../components/QRRefractionDisplay';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -227,6 +228,28 @@ export default function RefractorDemo() {
             )}
           </div>
         )}
+
+        {/* QR Portal Gateway Section */}
+        <div style={{ 
+          marginTop: '3rem',
+          padding: '2rem',
+          background: 'rgba(0,0,0,0.3)',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <h2 style={{ 
+            fontFamily: 'Cormorant Garamond, serif',
+            fontSize: '1.5rem',
+            marginBottom: '0.5rem',
+            color: '#fff'
+          }}>
+            Sovereign QR Gateway
+          </h2>
+          <p style={{ color: '#888', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+            Rainbow Refraction Display | Rotation: +62.7°
+          </p>
+          <QRPortalGrid size={150} />
+        </div>
       </div>
     </div>
   );
