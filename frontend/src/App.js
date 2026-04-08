@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 
 // V-ENGINE: ABSOLUTE_CLARITY_NOW - Must be FIRST
 import { purgeNoise } from './engines/NukeTheChaos';
+import './engines/SystemRecovery'; // Exposes V_ENGINE.resetSystem() to console
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
