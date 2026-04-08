@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Square } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useMixer } from '../context/MixerContext';
 import { usePolarity } from '../context/PolarityContext';
 import { useLanguage } from '../context/LanguageContext';
+import { masterReboot } from '../engines/MasterReboot';
 
 /**
  * Emergency Shut-Off Button — GRAVITATIONAL COLLAPSE
@@ -25,6 +26,33 @@ export default function EmergencyShutOff() {
   
   // Collapse animation state
   const [isCollapsing, setIsCollapsing] = useState(false);
+  
+  // Long-press state for Master Reboot (5 second hold)
+  const longPressTimer = useRef(null);
+  const [longPressProgress, setLongPressProgress] = useState(0);
+  
+  const handleLongPressStart = useCallback(() => {
+    let progress = 0;
+    longPressTimer.current = setInterval(() => {
+      progress += 2; // 2% every 100ms = 5 seconds total
+      setLongPressProgress(progress);
+      
+      if (progress >= 100) {
+        clearInterval(longPressTimer.current);
+        console.log('[V-ENGINE] LONG PRESS COMPLETE - INITIATING MASTER REBOOT');
+        vibrate([100, 50, 100, 50, 200]); // Distinct vibration pattern
+        masterReboot();
+      }
+    }, 100);
+  }, [vibrate]);
+  
+  const handleLongPressEnd = useCallback(() => {
+    if (longPressTimer.current) {
+      clearInterval(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    setLongPressProgress(0);
+  }, []);
 
   const handleEmergencyStop = useCallback(() => {
     console.log('[EmergencyShutOff] GRAVITATIONAL COLLAPSE INITIATED');
@@ -203,8 +231,14 @@ export default function EmergencyShutOff() {
       </AnimatePresence>
       
       {/* STOP Button - TOP LEFT corner (V_ENGINE_P0 Spec: max zIndex, bypasses all legacy boxes) */}
+      {/* Long-press (5 sec) triggers MASTER REBOOT */}
       <button
         onClick={handleEmergencyStop}
+        onMouseDown={handleLongPressStart}
+        onMouseUp={handleLongPressEnd}
+        onMouseLeave={handleLongPressEnd}
+        onTouchStart={handleLongPressStart}
+        onTouchEnd={handleLongPressEnd}
         className="emergency-shutoff-btn flex items-center justify-center gap-1.5"
         style={{
           position: 'fixed',
@@ -216,34 +250,40 @@ export default function EmergencyShutOff() {
           height: 32,
           padding: '0 10px',
           borderRadius: 8,
-          background: isVoid 
-            ? 'rgba(239, 68, 68, 0.4)' 
-            : isAtZeroPoint 
-              ? 'rgba(100, 100, 100, 0.3)'
-              : 'rgba(239, 68, 68, 0.15)',
-          border: isVoid
-            ? '2px solid rgba(239, 68, 68, 0.8)'
-            : '1.5px solid rgba(239, 68, 68, 0.4)',
+          background: longPressProgress > 0
+            ? `linear-gradient(90deg, rgba(239,68,68,0.6) ${longPressProgress}%, rgba(239,68,68,0.15) ${longPressProgress}%)`
+            : isVoid 
+              ? 'rgba(239, 68, 68, 0.4)' 
+              : isAtZeroPoint 
+                ? 'rgba(100, 100, 100, 0.3)'
+                : 'rgba(239, 68, 68, 0.15)',
+          border: longPressProgress > 0
+            ? '2px solid rgba(239, 68, 68, 1)'
+            : isVoid
+              ? '2px solid rgba(239, 68, 68, 0.8)'
+              : '1.5px solid rgba(239, 68, 68, 0.4)',
           color: isAtZeroPoint ? '#888888' : '#EF4444',
           cursor: 'pointer',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: isVoid
-            ? '0 0 20px rgba(239, 68, 68, 0.5)'
-            : '0 2px 12px rgba(239, 68, 68, 0.2)',
+          boxShadow: longPressProgress > 0
+            ? `0 0 ${10 + longPressProgress/5}px rgba(239, 68, 68, ${0.3 + longPressProgress/200})`
+            : isVoid
+              ? '0 0 20px rgba(239, 68, 68, 0.5)'
+              : '0 2px 12px rgba(239, 68, 68, 0.2)',
           fontFamily: 'system-ui, -apple-system, sans-serif',
           fontSize: 10,
           fontWeight: 600,
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
-          transition: 'all 0.3s ease',
-          transform: isCollapsing ? 'scale(1.1)' : 'scale(1)',
+          transition: 'all 0.1s ease',
+          transform: isCollapsing ? 'scale(1.1)' : longPressProgress > 50 ? 'scale(1.05)' : 'scale(1)',
         }}
         data-testid="emergency-shutoff"
-        title="Emergency Stop - Gravitational Collapse"
+        title="Emergency Stop (tap) | Master Reboot (hold 5s)"
       >
         <Square size={14} fill="currentColor" />
-        <span>{isVoid ? 'VOID' : 'STOP'}</span>
+        <span>{longPressProgress > 0 ? 'HOLD...' : isVoid ? 'VOID' : 'STOP'}</span>
       </button>
     </>
   );
