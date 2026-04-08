@@ -230,7 +230,7 @@ export default function EmergencyShutOff() {
         )}
       </AnimatePresence>
       
-      {/* STOP Button - Positioned BELOW header to avoid overlap */}
+      {/* STOP Button - Compact, positioned to not overlap */}
       {/* Long-press (5 sec) triggers MASTER REBOOT */}
       <button
         onClick={handleEmergencyStop}
@@ -239,45 +239,41 @@ export default function EmergencyShutOff() {
         onMouseLeave={handleLongPressEnd}
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
-        className="emergency-shutoff-btn flex items-center justify-center gap-1.5"
+        className="emergency-shutoff-btn flex items-center justify-center gap-1"
         style={{
           position: 'fixed',
-          top: 56,
-          left: 12,
-          zIndex: 9998,
+          top: 60,
+          left: 8,
+          zIndex: 9990,
           width: 'auto',
-          minWidth: 36,
-          height: 28,
-          padding: '0 8px',
-          borderRadius: 6,
+          minWidth: 32,
+          height: 24,
+          padding: '0 6px',
+          borderRadius: 4,
           background: longPressProgress > 0
-            ? `linear-gradient(90deg, rgba(239,68,68,0.6) ${longPressProgress}%, rgba(239,68,68,0.15) ${longPressProgress}%)`
+            ? `linear-gradient(90deg, rgba(239,68,68,0.6) ${longPressProgress}%, rgba(30,30,30,0.8) ${longPressProgress}%)`
             : isVoid 
-              ? 'rgba(239, 68, 68, 0.4)' 
+              ? 'rgba(60, 60, 60, 0.9)' 
               : isAtZeroPoint 
-                ? 'rgba(100, 100, 100, 0.3)'
-                : 'rgba(239, 68, 68, 0.12)',
+                ? 'rgba(60, 60, 60, 0.8)'
+                : 'rgba(30, 30, 30, 0.85)',
           border: longPressProgress > 0
-            ? '2px solid rgba(239, 68, 68, 1)'
+            ? '1px solid rgba(239, 68, 68, 0.8)'
             : isVoid
-              ? '1.5px solid rgba(239, 68, 68, 0.6)'
-              : '1px solid rgba(239, 68, 68, 0.25)',
-          color: isAtZeroPoint ? '#888888' : '#EF4444',
+              ? '1px solid rgba(100, 100, 100, 0.5)'
+              : '1px solid rgba(80, 80, 80, 0.4)',
+          color: isVoid ? '#888' : isAtZeroPoint ? '#666' : '#EF4444',
           cursor: 'pointer',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: longPressProgress > 0
-            ? `0 0 ${10 + longPressProgress/5}px rgba(239, 68, 68, ${0.3 + longPressProgress/200})`
-            : isVoid
-              ? '0 0 15px rgba(239, 68, 68, 0.4)'
-              : '0 2px 8px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontSize: 9,
+          fontSize: 8,
           fontWeight: 600,
-          letterSpacing: '0.05em',
+          letterSpacing: '0.03em',
           textTransform: 'uppercase',
-          transition: 'all 0.1s ease',
-          transform: isCollapsing ? 'scale(1.1)' : longPressProgress > 50 ? 'scale(1.05)' : 'scale(1)',
+          transition: 'all 0.15s ease',
+          transform: isCollapsing ? 'scale(1.05)' : 'scale(1)',
         }}
         data-testid="emergency-shutoff"
         title="Emergency Stop (tap) | Master Reboot (hold 5s)"

@@ -3470,15 +3470,15 @@ a,
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   V_ENGINE_P0: Emergency Kill Switch Override
-   Positioned BELOW header (top: 56px) to avoid overlapping branding
+   V_ENGINE_P0: Emergency Kill Switch - Compact design, no overlap
    ═══════════════════════════════════════════════════════════════════════════ */
 [data-testid="emergency-shutoff"],
 .emergency-shutoff-btn {
   position: fixed !important;
-  top: 56px !important;
-  left: 12px !important;
-  z-index: 9998 !important;
+  top: 60px !important;
+  left: 8px !important;
+  z-index: 9990 !important;
+  max-width: 50px !important;
 }
 
 
