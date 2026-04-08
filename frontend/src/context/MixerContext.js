@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import { performanceManager } from '../engines/PerformanceManager';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -152,6 +153,11 @@ export function MixerProvider({ children }) {
       if (!window.__cosmicAudioContexts) window.__cosmicAudioContexts = [];
       window.__cosmicAudioContexts.push(ctx);
       
+      // Register with PerformanceManager for visibility-based suspension
+      if (performanceManager.audioCtx !== ctx) {
+        performanceManager.audioCtx = ctx;
+      }
+      
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = 0.8;
@@ -175,6 +181,31 @@ export function MixerProvider({ children }) {
   useEffect(() => {
     if (masterGainRef.current) masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
   }, [masterVol, muted]);
+
+  // Battery & Performance Optimization: Suspend/resume AudioContext on visibility change
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (!ctxRef.current) return;
+      
+      if (document.visibilityState === 'hidden') {
+        // Tab hidden - suspend to save battery
+        if (ctxRef.current.state === 'running') {
+          ctxRef.current.suspend().catch(() => {});
+          console.log('[MixerContext] AudioContext suspended (tab hidden)');
+        }
+      } else {
+        // Tab visible - resume if we have active audio
+        const hasActiveAudio = activeFreqs.size > 0 || activeSounds.size > 0 || activeDrones.size > 0 || activeMantra;
+        if (hasActiveAudio && ctxRef.current.state === 'suspended') {
+          ctxRef.current.resume().catch(() => {});
+          console.log('[MixerContext] AudioContext resumed (tab visible)');
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [activeFreqs.size, activeSounds.size, activeDrones.size, activeMantra]);
 
   // Stop helpers
   const stopNodesForKey = useCallback((mapRef, key) => {

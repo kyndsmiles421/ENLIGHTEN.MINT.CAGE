@@ -1,7 +1,7 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.90_CREATOR_CONSOLE | AETHER_MIRRORLESS | GOLDEN_SPIRAL
-## Last Updated: 2026-04-06
+## Version: 2.91_PERFORMANCE_OPTIMIZED | AETHER_MIRRORLESS | GOLDEN_SPIRAL
+## Last Updated: 2026-04-08
 
 ---
 
@@ -155,6 +155,18 @@ for (let i = 0; i < 600; i++) {
   - CSS protection rules prevent aggressive hiding by other styles
   - Cache-busting query strings on script tags (v=20250406a)
   - Service Worker v2.1.0 forces cache invalidation
+- [x] **Battery & Performance Optimization (Audit Point 5)** ✅ (2026-04-08)
+  - `/app/frontend/src/engines/PerformanceManager.js` - Unified performance engine
+  - Visibility-based AudioContext suspension (tab hidden → suspend, visible → resume)
+  - Battery API integration (auto-suspend at <15% battery)
+  - RequestAnimationFrame throttling (250ms polling when tab hidden)
+  - Integrated into MixerContext for global audio management
+- [x] **TTS Fallback (Web Speech API)** ✅ (2026-04-08)
+  - Added to `/app/frontend/src/engines/PerformanceManager.js`
+  - `narrationSystem.playVoice()` tries backend first, falls back to browser TTS
+  - Browser fallback uses SpeechSynthesisUtterance with Nova-like settings
+  - Updated `/app/frontend/src/components/NarrationPlayer.js` to use new system
+  - Graceful degradation when `/api/tts/narrate` returns 500
 
 ---
 

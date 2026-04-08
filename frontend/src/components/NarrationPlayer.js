@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
 import { Volume2, VolumeX, Loader2, Pause, Play, ChevronDown, Settings2 } from 'lucide-react';
+import { narrationSystem } from '../engines/PerformanceManager';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -42,8 +42,6 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
   const [showSettings, setShowSettings] = useState(false);
   const [voice, setVoice] = useState(() => loadPrefs().voice);
   const [speed, setSpeed] = useState(() => loadPrefs().speed);
-  const audioRef = useRef(null);
-  const cacheRef = useRef({});
   const settingsRef = useRef(null);
   const textRef = useRef(text);
   const playbackTimeRef = useRef(0);
@@ -63,114 +61,50 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Cleanup on unmount - stop audio but don't lose cache
+  // Cleanup on unmount - stop audio
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+      narrationSystem.stop();
     };
   }, []);
 
   const handlePlay = useCallback(async () => {
-    // Pause currently playing audio
-    if (state === 'playing' && audioRef.current) {
-      playbackTimeRef.current = audioRef.current.currentTime;
-      audioRef.current.pause();
+    // Pause currently playing
+    if (state === 'playing') {
+      narrationSystem.pause();
       setState('paused');
       return;
     }
 
-    // Resume from where we left off
-    if (state === 'paused' && audioRef.current) {
-      try {
-        await audioRef.current.play();
-        setState('playing');
-      } catch {
-        // If resume fails, reset and try from cache
-        playbackTimeRef.current = 0;
-        setState('idle');
-      }
+    // Resume
+    if (state === 'paused') {
+      narrationSystem.resume();
+      setState('playing');
       return;
     }
 
     const currentText = textRef.current;
-    const cacheKey = `${voice}:${speed}:${currentText.substring(0, 80)}`;
 
-    // Try cache first
-    if (cacheRef.current[cacheKey]) {
-      playAudio(cacheRef.current[cacheKey], 0);
-      return;
-    }
-
-    // Fetch new TTS audio
+    // Use unified narration system with automatic fallback
     setState('loading');
-    try {
-      const res = await axios.post(`${API}/tts/narrate`, { text: currentText, speed, voice, context });
-      const b64 = res.data.audio;
-      cacheRef.current[cacheKey] = b64;
-      playAudio(b64, 0);
-    } catch {
-      setState('idle');
-    }
+    
+    narrationSystem.playVoice(currentText, {
+      voice,
+      speed,
+      onStart: () => setState('playing'),
+      onEnd: () => {
+        playbackTimeRef.current = 0;
+        setState('idle');
+      },
+      onError: (err) => {
+        console.warn('[NarrationPlayer] Playback error:', err);
+        setState('idle');
+      }
+    });
   }, [voice, speed, state]);
 
-  const playAudio = useCallback((b64, startTime) => {
-    // Clean up any existing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.removeAttribute('src');
-      audioRef.current = null;
-    }
-
-    const audio = new Audio(`data:audio/mp3;base64,${b64}`);
-
-    audio.oncanplaythrough = () => {
-      if (startTime > 0 && startTime < audio.duration) {
-        audio.currentTime = startTime;
-      }
-      audio.play().catch(() => {
-        setState('idle');
-      });
-    };
-
-    audio.onplay = () => setState('playing');
-
-    audio.onended = () => {
-      playbackTimeRef.current = 0;
-      setState('idle');
-    };
-
-    audio.onerror = () => {
-      // Don't reset on transient errors - allow resume
-      if (audioRef.current && audioRef.current.currentTime > 0) {
-        playbackTimeRef.current = audioRef.current.currentTime;
-        setState('paused');
-      } else {
-        setState('idle');
-      }
-    };
-
-    // Handle browser-initiated pauses (e.g., tab switch, autoplay policy)
-    audio.onpause = () => {
-      if (audio.currentTime < audio.duration && audio.currentTime > 0) {
-        playbackTimeRef.current = audio.currentTime;
-        // Only set paused if we didn't explicitly stop
-        setState(prev => prev === 'idle' ? 'idle' : 'paused');
-      }
-    };
-
-    audioRef.current = audio;
-    audio.load();
-  }, []);
-
   const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.removeAttribute('src');
-      audioRef.current = null;
-    }
+    narrationSystem.stop();
     playbackTimeRef.current = 0;
     setState('idle');
   }, []);
