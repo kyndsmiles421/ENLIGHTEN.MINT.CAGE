@@ -4,6 +4,7 @@ from typing import Optional
 import sys
 sys.path.insert(0, '/app/backend')
 from engines.n_scaled_refractor import get_n_scaled_refractor
+from engines.sovereign_armor import armor_full_artifact, unarmor_full_artifact
 
 router = APIRouter(prefix="/n-refractor", tags=["N-Scaled Refractor"])
 
@@ -13,6 +14,7 @@ class ScaledScanRequest(BaseModel):
     sensor_feed: float = 0.998
     N: int = 1
     z: int = 1
+    armored: bool = False
 
 
 class DecryptRequest(BaseModel):
@@ -22,6 +24,7 @@ class DecryptRequest(BaseModel):
     t: str  # tag
     N: int = 1
     z: int = 1
+    armored: bool = False
 
 
 @router.post("/scan")
@@ -32,12 +35,16 @@ async def execute_scaled_scan(request: ScaledScanRequest):
     Scale factors:
     - N: Primary scale multiplier
     - z: Complex plane factor
+    - armored: If True, wraps email in PGP ASCII Armor
     
     Math: scaled_ri = (base_ri * N*z*N*z) - noise_offset
     Threshold scales with N: 0.615 * N
     """
     refractor = get_n_scaled_refractor(request.N, request.z)
     artifact = refractor.execute_multi_scan(request.sample_id, request.sensor_feed)
+    
+    if request.armored:
+        artifact['email_armored'] = armor_full_artifact(artifact['email'])
     return artifact
 
 
@@ -46,14 +53,26 @@ async def decrypt_email_body(request: DecryptRequest):
     """
     Decrypt the email body from a scaled scan.
     Must use the same N,z configuration as the original scan.
+    Set armored=True if input is PGP ASCII armored.
     """
     refractor = get_n_scaled_refractor(request.N, request.z)
-    email_body = {
-        "p": request.p,
-        "k": request.k,
-        "n": request.n,
-        "t": request.t
-    }
+    
+    # Handle armored input
+    if request.armored:
+        email_body = unarmor_full_artifact({
+            "shielded_data": request.p,
+            "barrier_key": request.k,
+            "nonce": request.n,
+            "auth_tag": request.t
+        })
+    else:
+        email_body = {
+            "p": request.p,
+            "k": request.k,
+            "n": request.n,
+            "t": request.t
+        }
+    
     result = refractor.decrypt_email(email_body)
     
     if result.get("status") == "DECRYPTION_FAILED":
