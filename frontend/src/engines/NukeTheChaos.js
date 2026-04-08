@@ -51,6 +51,21 @@ h1, h2, h3, p, span {
     opacity: 1 !important;
     visibility: visible !important;
 }
+
+/* WHITELIST: Frequency Spectrum Bars */
+[data-testid^="freq-bar"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* WHITELIST: All functional buttons in content areas */
+.glass-card button,
+.glass-card [role="button"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
 `;
 
 /**

@@ -3521,3 +3521,31 @@ a,
   pointer-events: auto !important;
   cursor: pointer !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V-ENGINE: FREQUENCY SPECTRUM BARS - FORCE VISIBLE
+   These must NEVER be hidden by any other rule
+   ═══════════════════════════════════════════════════════════════════════════ */
+html body #root [data-testid^="freq-bar"],
+html body #root .glass-card button.flex-1.rounded-t-lg,
+html body #root .glass-card .flex.items-end.gap-1 > button,
+html body #root .glass-card .flex.items-end > * {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    min-height: 20px !important;
+}
+
+html body #root .glass-card .flex.items-end.gap-1,
+html body #root .glass-card .flex.items-end {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    height: 128px !important;
+}

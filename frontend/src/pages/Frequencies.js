@@ -8,6 +8,7 @@ import DeepDive from '../components/DeepDive';
 import GuidedExperience from '../components/GuidedExperience';
 import FeaturedVideos from '../components/FeaturedVideos';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES } from '../context/MixerContext';
+import { initSpectrum } from '../engines/SpectrumVisualizer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -31,21 +32,83 @@ export default function Frequencies() {
   const [frequencies, setFrequencies] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { activeFreqs, toggleFreq: ctxToggleFreq } = useMixer();
 
   // Track which backend freq ID maps to which Hz for display
   const [idToHz, setIdToHz] = useState({});
 
+  // Fallback frequencies in case API fails
+  const FALLBACK_FREQUENCIES = [
+    { id: 'freq-432', frequency: 432, name: 'Universal Harmony', category: 'earth', description: 'The universal harmony frequency.', benefits: ['Universal alignment', 'Heart resonance'], chakra: 'Heart', color: '#22C55E' },
+    { id: 'freq-528', frequency: 528, name: 'Miracle Tone', category: 'solfeggio', description: 'The Love Frequency for DNA repair.', benefits: ['DNA repair', 'Transformation'], chakra: 'Solar Plexus', color: '#FCD34D' },
+    { id: 'freq-396', frequency: 396, name: 'Liberation from Fear', category: 'solfeggio', description: 'Liberates fear and guilt.', benefits: ['Fear release', 'Goal achievement'], chakra: 'Root', color: '#EF4444' },
+    { id: 'freq-741', frequency: 741, name: 'Awakening Intuition', category: 'solfeggio', description: 'Awakens intuition and self-expression.', benefits: ['Intuition awakening', 'Self-expression'], chakra: 'Throat', color: '#3B82F6' },
+    { id: 'freq-852', frequency: 852, name: 'Return to Spiritual Order', category: 'solfeggio', description: 'Opens third eye and raises awareness.', benefits: ['Third eye activation', 'Spiritual awareness'], chakra: 'Third Eye', color: '#8B5CF6' },
+    { id: 'freq-963', frequency: 963, name: 'Divine Consciousness', category: 'solfeggio', description: 'Crown chakra activation for divine connection.', benefits: ['Crown activation', 'Enlightenment'], chakra: 'Crown', color: '#D8B4FE' },
+    { id: 'freq-7_83', frequency: 7.83, name: 'Schumann Resonance', category: 'earth', description: 'Earth\'s fundamental frequency.', benefits: ['Earth grounding', 'Deep meditation'], chakra: 'Root', color: '#854D0E' },
+    { id: 'freq-40', frequency: 40, name: 'Gamma Consciousness', category: 'binaural', description: '40Hz gamma waves for peak consciousness.', benefits: ['Peak performance', 'Enhanced cognition'], chakra: 'Crown', color: '#E879F9' },
+  ];
+
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     axios.get(`${API}/frequencies`)
       .then(res => {
-        setFrequencies(res.data);
-        const map = {};
-        res.data.forEach(f => { map[f.id] = f.frequency; });
-        setIdToHz(map);
+        if (res.data && res.data.length > 0) {
+          setFrequencies(res.data);
+          const map = {};
+          res.data.forEach(f => { map[f.id] = f.frequency; });
+          setIdToHz(map);
+        } else {
+          // API returned empty, use fallback
+          console.warn('[Frequencies] API returned empty, using fallback');
+          setFrequencies(FALLBACK_FREQUENCIES);
+          const map = {};
+          FALLBACK_FREQUENCIES.forEach(f => { map[f.id] = f.frequency; });
+          setIdToHz(map);
+        }
       })
-      .catch(() => toast.error('Could not load frequencies'));
+      .catch((err) => {
+        console.error('[Frequencies] API error:', err);
+        setError('Could not load frequencies from server');
+        // Use fallback frequencies
+        setFrequencies(FALLBACK_FREQUENCIES);
+        const map = {};
+        FALLBACK_FREQUENCIES.forEach(f => { map[f.id] = f.frequency; });
+        setIdToHz(map);
+        toast.error('Using offline frequency data');
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  // Listen for mainframe sync events
+  useEffect(() => {
+    const handleMainframeSync = (event) => {
+      const data = event.detail;
+      if (data && data.length > 0) {
+        console.log('[Frequencies] Mainframe sync received:', data.length);
+        setFrequencies(data);
+        const map = {};
+        data.forEach(f => { map[f.id] = f.frequency; });
+        setIdToHz(map);
+        setError(null);
+        toast.success('Frequencies synced from mainframe');
+      }
+    };
+    
+    window.addEventListener('mainframeSyncComplete', handleMainframeSync);
+    return () => window.removeEventListener('mainframeSyncComplete', handleMainframeSync);
+  }, []);
+
+  // V-ENGINE: Force spectrum bars visible after data loads
+  useEffect(() => {
+    if (frequencies.length > 0 && !loading) {
+      // Give DOM time to render, then force visibility
+      setTimeout(() => initSpectrum(), 300);
+    }
+  }, [frequencies, loading]);
 
   const filtered = filter === 'all' ? frequencies : frequencies.filter(f => f.category === filter);
 
@@ -105,37 +168,50 @@ export default function Frequencies() {
         {/* Frequency Visualization */}
         <div className="glass-card p-8 mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Frequency Spectrum</p>
-          <div className="flex items-end gap-1 h-32">
-            {filtered.map((freq) => {
-              const isActive = selected?.id === freq.id || isFreqPlaying(freq.id);
-              const height = Math.min(100, Math.max(15, (freq.frequency / 10)));
-              return (
-                <button
-                  key={freq.id}
-                  onClick={() => setSelected(freq)}
-                  className="flex-1 rounded-t-lg relative group"
-                  style={{
-                    height: `${height}%`,
-                    minHeight: '20px',
-                    background: isActive
-                      ? `linear-gradient(to top, ${freq.color}60, ${freq.color}20)`
-                      : `linear-gradient(to top, ${freq.color}25, ${freq.color}08)`,
-                    border: `1px solid ${isActive ? freq.color + '50' : freq.color + '15'}`,
-                    borderBottom: 'none',
-                    transition: 'background 0.3s, border-color 0.3s',
-                    boxShadow: isActive ? `0 -10px 30px ${freq.color}15` : 'none',
-                  }}
-                  data-testid={`freq-bar-${freq.id}`}
-                >
-                  <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100"
-                    style={{ color: freq.color, transition: 'opacity 0.2s' }}
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-center">
+                <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Loading frequencies...</p>
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex items-center justify-center h-32">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No frequencies found. Try refreshing the page.</p>
+            </div>
+          ) : (
+            <div className="flex items-end gap-1 h-32">
+              {filtered.map((freq) => {
+                const isActive = selected?.id === freq.id || isFreqPlaying(freq.id);
+                const height = Math.min(100, Math.max(15, (freq.frequency / 10)));
+                return (
+                  <button
+                    key={freq.id}
+                    onClick={() => setSelected(freq)}
+                    className="flex-1 rounded-t-lg relative group"
+                    style={{
+                      height: `${height}%`,
+                      minHeight: '20px',
+                      background: isActive
+                        ? `linear-gradient(to top, ${freq.color}60, ${freq.color}20)`
+                        : `linear-gradient(to top, ${freq.color}25, ${freq.color}08)`,
+                      border: `1px solid ${isActive ? freq.color + '50' : freq.color + '15'}`,
+                      borderBottom: 'none',
+                      transition: 'background 0.3s, border-color 0.3s',
+                      boxShadow: isActive ? `0 -10px 30px ${freq.color}15` : 'none',
+                    }}
+                    data-testid={`freq-bar-${freq.id}`}
                   >
-                    {freq.frequency}Hz
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100"
+                      style={{ color: freq.color, transition: 'opacity 0.2s' }}
+                    >
+                      {freq.frequency}Hz
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <div className="border-t border-white/5 mt-8 pt-2">
             <div className="flex justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
               <span>Low Frequency</span>
@@ -145,6 +221,7 @@ export default function Frequencies() {
         </div>
 
         {/* Frequency Grid */}
+        {loading ? null : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {filtered.map((freq, i) => {
             const chakraColor = CHAKRA_COLORS[freq.chakra] || '#94A3B8';
@@ -232,6 +309,7 @@ export default function Frequencies() {
             );
           })}
         </div>
+        )}
 
         {/* Selected Detail */}
         <AnimatePresence>
