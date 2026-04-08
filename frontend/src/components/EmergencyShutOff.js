@@ -202,12 +202,13 @@ export default function EmergencyShutOff() {
         )}
       </AnimatePresence>
       
-      {/* STOP Button - BOTTOM LEFT corner */}
-      <motion.button
+      {/* STOP Button - TOP LEFT corner (V_ENGINE_P0 Spec: max zIndex, bypasses all legacy boxes) */}
+      <button
         onClick={handleEmergencyStop}
-        className="fixed flex items-center justify-center gap-1.5"
+        className="emergency-shutoff-btn flex items-center justify-center gap-1.5"
         style={{
-          bottom: 20,
+          position: 'fixed',
+          top: 20,
           left: 20,
           zIndex: 99999,
           width: 'auto',
@@ -235,27 +236,15 @@ export default function EmergencyShutOff() {
           fontWeight: 600,
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
-          transition: 'background 0.3s, border 0.3s, box-shadow 0.3s',
+          transition: 'all 0.3s ease',
+          transform: isCollapsing ? 'scale(1.1)' : 'scale(1)',
         }}
-        whileHover={{
-          scale: 1.05,
-          background: 'rgba(239, 68, 68, 0.25)',
-          boxShadow: '0 4px 20px rgba(239, 68, 68, 0.35)',
-        }}
-        whileTap={{ scale: 0.92 }}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ 
-          opacity: 1, 
-          x: 0,
-          scale: isCollapsing ? [1, 1.2, 0.9, 1] : 1,
-        }}
-        transition={{ duration: 0.3 }}
         data-testid="emergency-shutoff"
         title="Emergency Stop - Gravitational Collapse"
       >
         <Square size={14} fill="currentColor" />
         <span>{isVoid ? 'VOID' : 'STOP'}</span>
-      </motion.button>
+      </button>
     </>
   );
 }

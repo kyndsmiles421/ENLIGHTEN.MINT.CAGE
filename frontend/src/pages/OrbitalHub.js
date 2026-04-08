@@ -10,6 +10,7 @@ import { useDepth, Z_LAYERS } from '../hooks/useDepth';
 import MissionControl from '../components/MissionControl';
 import { useHarmonicResonance, SOLFEGGIO_FREQUENCIES } from '../utils/HarmonicResonance';
 import GrandFinaleCoordinator from '../components/GrandFinaleCoordinator';
+import V_ENGINE_P0 from '../engines/V_ENGINE_P0';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -39,16 +40,21 @@ import GrandFinaleCoordinator from '../components/GrandFinaleCoordinator';
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// ═══ PHYSICS CONSTANTS ═══
-const CORE_SCALE = 1.0;
-const SUB_ORB_LATENT_SCALE = 0;
-const SUB_ORB_BLOOM_SCALE = 0.3;
-const SUB_ORB_EXTRACTED_SCALE = 1.0;
+// ═══ V_ENGINE_P0 PHYSICS CONSTANTS ═══
+// Derived from V_ENGINE_P0: Core 1.0, Bloom √6.25 (2.5), Extract 3.0
+const PHI = 1.618; // Harmonic Resistance constant
+const ROTATION_BASE = 1155.0; // Degrees
+const orbitalPhysics = V_ENGINE_P0.applyOrbitalPhysics(null);
 
-const BLOOM_RADIUS_MULTIPLIER = 2.5;  // Sub-orbs bloom to 2.5x Core radius
+const CORE_SCALE = orbitalPhysics.coreScale; // 1.0
+const SUB_ORB_LATENT_SCALE = 0;
+const SUB_ORB_BLOOM_SCALE = 0.3; // Bloom scale when visible
+const SUB_ORB_EXTRACTED_SCALE = orbitalPhysics.extractScale; // 3.0 (absolute output)
+
+const BLOOM_RADIUS_MULTIPLIER = orbitalPhysics.bloomScale; // √6.25 = 2.5 (radical root)
 const EXTRACTION_THRESHOLD = 3.0;     // Drag beyond 3.0x radius to extract
 
-const LERP_SPEED = 0.12;              // Lerp factor for smooth transitions
+const LERP_SPEED = 0.12;              // Lerp factor for smooth transitions (PHI-harmonic)
 
 // Linear interpolation
 function lerp(a, b, t) {

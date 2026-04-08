@@ -3469,6 +3469,18 @@ a,
   cursor: pointer !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   V_ENGINE_P0: Emergency Kill Switch Override
+   TOP-LEFT anchor, max zIndex, bypasses all legacy boxes
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-testid="emergency-shutoff"],
+.emergency-shutoff-btn {
+  position: fixed !important;
+  top: 20px !important;
+  left: 20px !important;
+  z-index: 99999 !important;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CREATOR CONSOLE PROTECTION — Must NEVER be hidden
