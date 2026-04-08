@@ -230,7 +230,7 @@ export default function EmergencyShutOff() {
         )}
       </AnimatePresence>
       
-      {/* STOP Button - TOP LEFT corner (V_ENGINE_P0 Spec: max zIndex, bypasses all legacy boxes) */}
+      {/* STOP Button - Positioned BELOW header to avoid overlap */}
       {/* Long-press (5 sec) triggers MASTER REBOOT */}
       <button
         onClick={handleEmergencyStop}
@@ -242,37 +242,37 @@ export default function EmergencyShutOff() {
         className="emergency-shutoff-btn flex items-center justify-center gap-1.5"
         style={{
           position: 'fixed',
-          top: 20,
-          left: 20,
-          zIndex: 99999,
+          top: 56,
+          left: 12,
+          zIndex: 9998,
           width: 'auto',
           minWidth: 36,
-          height: 32,
-          padding: '0 10px',
-          borderRadius: 8,
+          height: 28,
+          padding: '0 8px',
+          borderRadius: 6,
           background: longPressProgress > 0
             ? `linear-gradient(90deg, rgba(239,68,68,0.6) ${longPressProgress}%, rgba(239,68,68,0.15) ${longPressProgress}%)`
             : isVoid 
               ? 'rgba(239, 68, 68, 0.4)' 
               : isAtZeroPoint 
                 ? 'rgba(100, 100, 100, 0.3)'
-                : 'rgba(239, 68, 68, 0.15)',
+                : 'rgba(239, 68, 68, 0.12)',
           border: longPressProgress > 0
             ? '2px solid rgba(239, 68, 68, 1)'
             : isVoid
-              ? '2px solid rgba(239, 68, 68, 0.8)'
-              : '1.5px solid rgba(239, 68, 68, 0.4)',
+              ? '1.5px solid rgba(239, 68, 68, 0.6)'
+              : '1px solid rgba(239, 68, 68, 0.25)',
           color: isAtZeroPoint ? '#888888' : '#EF4444',
           cursor: 'pointer',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           boxShadow: longPressProgress > 0
             ? `0 0 ${10 + longPressProgress/5}px rgba(239, 68, 68, ${0.3 + longPressProgress/200})`
             : isVoid
-              ? '0 0 20px rgba(239, 68, 68, 0.5)'
-              : '0 2px 12px rgba(239, 68, 68, 0.2)',
+              ? '0 0 15px rgba(239, 68, 68, 0.4)'
+              : '0 2px 8px rgba(0, 0, 0, 0.2)',
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 600,
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
