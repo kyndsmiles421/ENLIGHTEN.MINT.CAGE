@@ -223,6 +223,7 @@ const MasterViewPage = lazy(() => import('./pages/MasterView'));
 const CollectiveShadowMap = lazy(() => import('./pages/CollectiveShadowMap'));
 const FractalEngine = lazy(() => import('./pages/FractalEngine'));
 const CrystallineEngine = lazy(() => import('./components/CrystallineEngine'));
+const SovereignConsole = lazy(() => import('./components/SovereignConsole'));
 const RefractorDemo = lazy(() => import('./pages/RefractorDemo'));
 const MasteryAvenues = lazy(() => import('./pages/MasteryAvenues'));
 const CosmicMap = lazy(() => import('./pages/CosmicMap'));
@@ -472,6 +473,7 @@ function AnimatedRoutes() {
         <Route path="/collective-shadow-map" element={<CollectiveShadowMap />} />
         <Route path="/fractal-engine" element={<FractalEngine />} />
         <Route path="/crystalline-engine" element={<CrystallineEngine />} />
+        <Route path="/console" element={<SovereignConsole />} />
         <Route path="/refractor" element={<RefractorDemo />} />
         <Route path="/metatron" element={<CrystallineEngine />} />
         <Route path="/mastery-avenues" element={<MasteryAvenues />} />
