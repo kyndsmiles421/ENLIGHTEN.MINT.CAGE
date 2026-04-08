@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+from engines.crystal_seal import secure_hash, secure_hash_short
 from datetime import datetime, timezone, date, timedelta
 from collections import defaultdict
 import asyncio
-import hashlib
 import uuid
 
 router = APIRouter()
@@ -143,7 +143,7 @@ GREETING_TEMPLATES = {
 
 def _get_daily_seed():
     """Deterministic seed from today's date — same content all day, changes tomorrow."""
-    return int(hashlib.md5(date.today().isoformat().encode()).hexdigest(), 16)
+    return int(secure_hash(date.today().isoformat())[:16], 16)
 
 
 def _pick_by_seed(items, seed, offset=0):
@@ -215,8 +215,8 @@ async def get_personalized_dashboard(user=Depends(get_current_user)):
     for f in ALL_FEATURES:
         if f["page"] not in visited:
             new_for_you.append(f)
-    # Shuffle deterministically by seed
-    new_for_you.sort(key=lambda x: hashlib.md5((x["page"] + str(seed)).encode()).hexdigest())
+    # Shuffle deterministically by seed (SHA-256)
+    new_for_you.sort(key=lambda x: secure_hash_short(x["page"] + str(seed)))
     new_for_you = new_for_you[:5]
 
     # 5. Progress stats

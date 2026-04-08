@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai import OpenAITextToSpeech
+from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone
 import uuid
 import asyncio
-import hashlib
 
 router = APIRouter()
 
@@ -253,7 +253,7 @@ async def narrate_creation_story(story_id: str):
         f"The cosmic lesson: {story['lesson']}"
     )
 
-    cache_key = hashlib.md5(f"creation-{story_id}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"creation-{story_id}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key], "story_id": story_id}
 
@@ -470,7 +470,7 @@ async def narrate_myth(myth_id: str):
         f"The wisdom of this tale: {myth.get('lesson', '')}"
     )
 
-    cache_key = hashlib.md5(f"myth-{myth_id}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"myth-{myth_id}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key], "myth_id": myth_id}
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Body, HTTPException
 from deps import db, get_current_user, EMERGENT_LLM_KEY
 from routes.subscriptions import get_user_credits, tier_level, deduct_credits
+from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone
-import hashlib
 
 router = APIRouter()
 
@@ -41,8 +41,8 @@ async def translate_content(body: dict = Body(...), user=Depends(get_current_use
             "current_tier": user_tier,
         })
 
-    # Check cache first
-    cache_key = hashlib.md5(f"{text}:{target_lang}:{context}".encode()).hexdigest()
+    # Check cache first (SHA-256)
+    cache_key = secure_hash_short(f"{text}:{target_lang}:{context}", 32)
     cached = await db.translation_cache.find_one({"cache_key": cache_key}, {"_id": 0})
     if cached:
         return {

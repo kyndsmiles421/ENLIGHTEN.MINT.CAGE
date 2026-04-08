@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from deps import db, logger
-import hashlib
+from engines.crystal_seal import secure_hash_short
 import os
 
 router = APIRouter()
@@ -464,7 +464,7 @@ async def narrate_chapter(text_id: str, chapter_id: str):
     if not chapter_doc:
         raise HTTPException(status_code=404, detail="Chapter not generated yet")
 
-    cache_key = hashlib.md5(f"sacred-{text_id}-{chapter_id}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"sacred-{text_id}-{chapter_id}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
 

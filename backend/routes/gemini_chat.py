@@ -160,9 +160,9 @@ async def gemini_translate(data: dict = Body(...), user=Depends(get_current_user
     if not text:
         raise HTTPException(400, "No text provided")
 
-    # Check cache
-    import hashlib
-    cache_key = hashlib.md5(f"{text}:{target_lang}:{source_lang}".encode()).hexdigest()
+    # Check cache (SHA-256)
+    from engines.crystal_seal import secure_hash_short
+    cache_key = secure_hash_short(f"{text}:{target_lang}:{source_lang}", 32)
     cached = await db.gemini_translations.find_one({"cache_key": cache_key}, {"_id": 0})
     if cached:
         return {"translated": cached["translated"], "target_lang": target_lang, "cached": True}

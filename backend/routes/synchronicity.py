@@ -3,7 +3,6 @@ Synchronicity Events — Coven/Party System & Real-Time Visibility
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WebSocket-based real-time player tracking and party coordination.
 """
-import hashlib
 import asyncio
 from datetime import datetime, timezone
 from typing import Optional
@@ -11,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from pydantic import BaseModel
 
 from deps import db, get_current_user, decode_token
+from engines.crystal_seal import secure_hash_short
 
 router = APIRouter(prefix="/sync", tags=["synchronicity"])
 
@@ -92,8 +92,8 @@ async def create_coven(body: CovenCreate, user=Depends(get_current_user)):
         raise HTTPException(400, "You are already in a coven. Leave first.")
 
     now = datetime.now(timezone.utc).isoformat()
-    invite_code = hashlib.md5(f"{uid}_{now}".encode()).hexdigest()[:8].upper()
-    coven_id = hashlib.md5(f"coven_{uid}_{now}".encode()).hexdigest()[:12]
+    invite_code = secure_hash_short(f"{uid}_{now}", 8).upper()
+    coven_id = secure_hash_short(f"coven_{uid}_{now}")
 
     await db.covens.insert_one({
         "id": coven_id,

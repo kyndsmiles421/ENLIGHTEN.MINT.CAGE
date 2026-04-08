@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 from emergentintegrations.llm.openai.video_generation import OpenAIVideoGeneration
+from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone
 from pathlib import Path
 import base64
-import hashlib
 import asyncio
 import uuid
 import os
@@ -18,10 +18,13 @@ VIDEOS_DIR.mkdir(parents=True, exist_ok=True)
 # In-memory job tracker for video generation
 _video_jobs = {}  # job_id -> { status, video_url, error, prompt }
 
+# Cache refresh flag for MD5 -> SHA-256 migration
+_CACHE_MIGRATED = False
+
 
 async def get_or_generate_image(prompt: str, category: str, ref_id: str):
     """Check cache first, generate if missing. Returns base64 image string."""
-    cache_key = hashlib.md5(f"{category}:{ref_id}:{prompt[:100]}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"{category}:{ref_id}:{prompt[:100]}", 32)
 
     # Check MongoDB cache
     cached = await db.ai_visuals_cache.find_one(
@@ -160,8 +163,8 @@ async def generate_story_scenes(story_id: str, user=Depends(get_current_user)):
     scenes = []
     for i, prompt in enumerate(prompts):
         ref_id = f"{story_id}_scene_{i}"
-        # Check cache first
-        cache_key = hashlib.md5(f"story_scene:{ref_id}:{prompt[:100]}".encode()).hexdigest()
+        # Check cache first (SHA-256 cache key)
+        cache_key = secure_hash_short(f"story_scene:{ref_id}:{prompt[:100]}", 32)
         cached = await db.ai_visuals_cache.find_one(
             {"cache_key": cache_key}, {"_id": 0, "image_b64": 1}
         )
@@ -212,7 +215,7 @@ async def generate_meditation_visual(
     """Generate ambient visual for meditation session."""
     theme = data.get("theme", "cosmic peace")
     prompt = f"Abstract cosmic meditation visualization: {theme}. Deep space nebula, floating luminous particles, gentle aurora waves, spiritual energy field, peaceful serene atmosphere, dark background with soft glowing colors, suitable as meditation ambient background, ultra wide cinematic"
-    ref_id = hashlib.md5(theme.encode()).hexdigest()[:12]
+    ref_id = secure_hash_short(theme)
     image_b64 = await get_or_generate_image(prompt, "meditation", ref_id)
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate visual")
@@ -229,7 +232,7 @@ async def generate_forecast_visual(
     period = data.get("period", "daily")
     summary = data.get("summary", "")[:200]
     prompt = f"Mystical {system} divination cosmic scene for {period} forecast: {summary}. Celestial imagery with zodiac symbols, tarot cards, crystal spheres, cosmic energy flows, mystical purple and gold tones, dark spiritual background, cinematic prophetic atmosphere"
-    ref_id = hashlib.md5(f"{system}:{period}:{summary[:50]}".encode()).hexdigest()[:12]
+    ref_id = secure_hash_short(f"{system}:{period}:{summary[:50]}")
     image_b64 = await get_or_generate_image(prompt, "forecast", ref_id)
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate visual")
@@ -244,7 +247,7 @@ async def generate_dream_visual(
     """Generate AI visual interpretation of dream symbols."""
     description = data.get("description", "")[:300]
     prompt = f"Surreal dreamscape visualization: {description}. Ethereal floating elements, dream-like distortions, soft luminous glow, symbolic imagery, Salvador Dali inspired cosmic surrealism, deep purples and midnight blues with golden dream light, mystical unconscious landscape"
-    ref_id = hashlib.md5(description.encode()).hexdigest()[:12]
+    ref_id = secure_hash_short(description)
     image_b64 = await get_or_generate_image(prompt, "dream", ref_id)
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate visual")
@@ -262,7 +265,7 @@ async def generate_cosmic_portrait(
     element = data.get("element", "")
     traits = data.get("traits", "")[:200]
     prompt = f"Cosmic spiritual portrait: A luminous ethereal being embodying {zodiac} zodiac energy, {element} element, energy level {energy}/10. {traits}. Aura radiating with cosmic light, constellation patterns woven into the figure, celestial background with personal star map, spiritual portrait art, mystical luminous atmosphere, dark cosmic background"
-    ref_id = hashlib.md5(f"{zodiac}:{element}:{energy}".encode()).hexdigest()[:12]
+    ref_id = secure_hash_short(f"{zodiac}:{element}:{energy}")
     image_b64 = await get_or_generate_image(prompt, "cosmic_portrait", ref_id)
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate portrait")
@@ -278,7 +281,7 @@ async def generate_daily_card(
     theme = data.get("theme", "cosmic wisdom")
     affirmation = data.get("affirmation", "")[:150]
     prompt = f"Cosmic card of the day artwork: '{affirmation}'. Theme: {theme}. Mystical tarot-card style illustration with ornate golden border, cosmic symbols, celestial imagery, dark rich background with luminous accents, spiritual divination art, vertical card format"
-    ref_id = hashlib.md5(f"daily:{theme}:{affirmation[:30]}".encode()).hexdigest()[:12]
+    ref_id = secure_hash_short(f"daily:{theme}:{affirmation[:30]}")
     image_b64 = await get_or_generate_image(prompt, "daily_card", ref_id)
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate card")
@@ -401,7 +404,7 @@ async def generate_video(
     else:
         raise HTTPException(status_code=400, detail="Provide story_id or prompt")
 
-    cache_key = hashlib.md5(f"video:{prompt[:200]}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"video:{prompt[:200]}", 32)
 
     # Check MongoDB cache first
     cached = await db.ai_video_cache.find_one(
@@ -459,8 +462,8 @@ async def get_video_stories(user=Depends(get_current_user)):
     """Return available stories that can have video generation."""
     stories = []
     for sid in VIDEO_SCENE_PROMPTS:
-        # Check if video is already cached
-        cache_key = hashlib.md5(f"video:{VIDEO_SCENE_PROMPTS[sid][:200]}".encode()).hexdigest()
+        # Check if video is already cached (SHA-256 cache key)
+        cache_key = secure_hash_short(f"video:{VIDEO_SCENE_PROMPTS[sid][:200]}", 32)
         cached = await db.ai_video_cache.find_one(
             {"cache_key": cache_key}, {"_id": 0, "video_url": 1}
         )
@@ -489,7 +492,7 @@ async def _run_batch_generation(batch_id: str, story_ids: list):
             batch["failed"].append(sid)
             continue
 
-        cache_key = hashlib.md5(f"video:{prompt[:200]}".encode()).hexdigest()
+        cache_key = secure_hash_short(f"video:{prompt[:200]}", 32)
 
         cached = await db.ai_video_cache.find_one(
             {"cache_key": cache_key}, {"_id": 0, "video_url": 1}

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, get_current_user_optional, EMERGENT_LLM_KEY, logger
+from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone, timedelta
 import uuid
 
@@ -10,7 +11,6 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from emergentintegrations.llm.openai import OpenAITextToSpeech
 import random
-import hashlib
 
 # --- AI Knowledge Engine ---
 KNOWLEDGE_PROMPTS = {
@@ -211,7 +211,7 @@ async def generate_narration(req: NarrationRequest):
     voice = req.voice if req.voice and req.voice in VALID_VOICES else ctx_defaults["voice"]
     speed = req.speed if req.speed else ctx_defaults["speed"]
 
-    cache_key = hashlib.md5(f"{text}:{speed}:{voice}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"{text}:{speed}:{voice}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
     try:

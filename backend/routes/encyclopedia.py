@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+from engines.crystal_seal import secure_hash_short
 import asyncio
 import uuid
-import hashlib
 import os
 
 router = APIRouter()
@@ -325,7 +325,7 @@ async def narrate_tradition(tradition_id: str):
     if not tradition:
         raise HTTPException(status_code=404, detail="Tradition not found")
 
-    cache_key = hashlib.md5(f"enc-{tradition_id}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"enc-{tradition_id}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
 
@@ -357,7 +357,7 @@ async def narrate_text(data: dict = Body(...)):
     if not text or len(text) < 10:
         raise HTTPException(status_code=400, detail="Text too short")
 
-    cache_key = hashlib.md5(f"enc-text-{text[:100]}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"enc-text-{text[:100]}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
 

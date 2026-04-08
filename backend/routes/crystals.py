@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
+from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone
 import uuid
-import hashlib
 
 router = APIRouter()
 
@@ -172,7 +172,7 @@ async def narrate_pairing(data: dict, user=Depends(get_current_user)):
     if not text or len(text) < 10:
         raise HTTPException(status_code=400, detail="No text to narrate")
 
-    cache_key = hashlib.md5(f"pairing-{text[:200]}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"pairing-{text[:200]}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
 
@@ -305,7 +305,7 @@ async def narrate_crystal(crystal_id: str):
     if not crystal:
         raise HTTPException(status_code=404, detail="Crystal not found")
 
-    cache_key = hashlib.md5(f"crystal-{crystal_id}".encode()).hexdigest()
+    cache_key = secure_hash_short(f"crystal-{crystal_id}", 32)
     if cache_key in tts_cache:
         return {"audio": tts_cache[cache_key]}
 

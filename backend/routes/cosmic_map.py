@@ -3,7 +3,6 @@ Cosmic Map, Forge Mini-Game, and Exponential Decay Engine
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 import math
-import hashlib
 import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Body
@@ -12,6 +11,7 @@ from typing import Optional
 
 from routes.auth import get_current_user
 from deps import db
+from engines.crystal_seal import secure_hash, secure_hash_short
 
 router = APIRouter(prefix="/cosmic-map", tags=["cosmic-map"])
 
@@ -331,7 +331,7 @@ def generate_nodes_for_location(lat: float, lng: float, radius_km: float = 1.0):
         count = 4 if node_type_key == "kinetic" else 3
         for i in range(count):
             seed_str = f"{day_seed}_{node_type_key}_{i}_{round(lat, 2)}_{round(lng, 2)}"
-            seed_hash = hashlib.md5(seed_str.encode()).hexdigest()
+            seed_hash = secure_hash_short(seed_str, 16)  # SHA-256 truncated for seeding
             rng = random.Random(seed_hash)
 
             angle = rng.uniform(0, 2 * math.pi)
@@ -559,7 +559,7 @@ async def get_power_spots(user=Depends(get_current_user), include_all: bool = Fa
 @router.post("/power-spots")
 async def create_power_spot(spot: PowerSpotCreate, user=Depends(get_current_user)):
     """Create or update a Power Spot (admin)."""
-    spot_id = hashlib.md5(f"{spot.name}_{spot.lat}_{spot.lng}".encode()).hexdigest()[:12]
+    spot_id = secure_hash_short(f"{spot.name}_{spot.lat}_{spot.lng}")
     now = datetime.now(timezone.utc).isoformat()
 
     doc = {
@@ -628,7 +628,7 @@ async def update_power_spot(spot_id: str, update: PowerSpotUpdate, user=Depends(
         "success": True,
         "id": spot_id,
         "updated_fields": list(updates.keys()),
-        "message": f"Power Spot updated.",
+        "message": "Power Spot updated.",
     }
 
 

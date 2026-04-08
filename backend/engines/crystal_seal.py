@@ -36,11 +36,16 @@ def secure_hash_short(data: str, length: int = 12) -> str:
     """Short hash for cache keys and IDs (truncated SHA-256)."""
     return hashlib.sha256(data.encode()).hexdigest()[:length]
 
-def legacy_cache_key(data: str) -> str:
+
+# DEPRECATED: Legacy MD5 function - DO NOT USE IN NEW CODE
+# Keeping for backward compatibility during migration only
+def _legacy_cache_key(data: str) -> str:
     """
-    DEPRECATED: For backward compatibility with existing cache keys.
-    New code should use secure_hash_short().
+    DEPRECATED: For backward compatibility only.
+    New code MUST use secure_hash_short().
     """
+    import warnings
+    warnings.warn("legacy_cache_key is deprecated, use secure_hash_short", DeprecationWarning)
     return hashlib.md5(data.encode()).hexdigest()
 
 # ═══════════════════════════════════════════════════════════════════════════
