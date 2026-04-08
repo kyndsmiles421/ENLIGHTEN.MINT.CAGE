@@ -8,7 +8,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSensory } from '../context/SensoryContext';
-import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus, Search } from 'lucide-react';
+import { Loader2, MapPin, Star, X, Compass, Sparkles, ChevronRight, Eye, BookOpen, Scroll, Volume2, VolumeX, Play, Pause, Share2, Smartphone, Globe, Plus, Minus, Search, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import CultureLayerPanel from '../components/CultureLayerPanel';
 import { useNavigate } from 'react-router-dom';
@@ -1068,6 +1068,7 @@ export default function StarChart() {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [latInput, setLatInput] = useState('40.7');
   const [lngInput, setLngInput] = useState('-74.0');
+  const [error, setError] = useState(null);
   const canvasContainerRef = useRef(null);
 
   // Journey state
@@ -1120,11 +1121,15 @@ export default function StarChart() {
   }, [gyroEnabled]);
 
   const fetchChart = useCallback((lat, lng) => {
-    if (!token) { setLoading(false); return; }
-    setLoading(true); setBirthMsg(null);
+    if (!token) { setLoading(false); setError('Please sign in to view the star chart'); return; }
+    setLoading(true); setBirthMsg(null); setError(null);
     axios.get(`${API}/star-chart/constellations?lat=${lat}&lng=${lng}`, { headers: authHeaders })
       .then(r => setData(r.data))
-      .catch(() => toast.error('Failed to load star chart'))
+      .catch((err) => { 
+        console.error('Star Chart fetch error:', err);
+        setError('Failed to load star chart. Please try refreshing the page.');
+        toast.error('Failed to load star chart');
+      })
       .finally(() => setLoading(false));
   }, [token, authHeaders]);
 
@@ -1852,6 +1857,18 @@ export default function StarChart() {
             <div className="text-center">
               <Loader2 className="animate-spin mx-auto mb-3" size={28} style={{ color: '#818CF8' }} />
               <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>Mapping the celestial sphere...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center px-6">
+              <AlertCircle className="mx-auto mb-3" size={32} style={{ color: '#F87171' }} />
+              <p className="text-sm mb-2" style={{ color: 'rgba(248,250,252,0.7)' }}>{error}</p>
+              <button onClick={() => fetchChart(parseFloat(latInput), parseFloat(lngInput))}
+                className="mt-3 px-4 py-2 rounded-lg text-xs"
+                style={{ background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)', color: '#A78BFA' }}>
+                Try Again
+              </button>
             </div>
           </div>
         ) : data ? (

@@ -6,8 +6,9 @@
 
 // Kill the Rainbow Confetti / Particles
 const VOID_CSS = `
-/* Kill the Rainbow Confetti / Particles */
+/* Kill the Rainbow Confetti / Particles - BUT PRESERVE THREE.JS CANVASES */
 canvas.particle-canvas, 
+canvas#golden-spiral-canvas,
 .particle-container, 
 [class*="confetti"],
 .mesh-canvas-renderer,
@@ -17,6 +18,15 @@ canvas.particle-canvas,
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
+}
+
+/* WHITELIST: Allow Three.js Star Chart and other functional canvases */
+[data-testid="star-chart-canvas"] canvas,
+.three-canvas,
+canvas.r3f-canvas {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* Remove Box Shadows & Borders (Legacy Noise) */
