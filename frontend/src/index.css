@@ -15,6 +15,103 @@
 :root {
   --safe-zone-top: 12vh;
   --safe-zone-bottom: 12vh;
+  
+  /* FREQUENCY ENGINE — Perspective Variables (Default: VOID) */
+  --primary-freq: #FFFFFF;
+  --secondary-freq: #1A1A1A;
+  --global-glow: rgba(255, 255, 255, 0.2);
+  --perspective-blur: 5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FREQUENCY ENGINE — Perspective-Based Theming
+   INTENSE (Red) | CALM (Cyan) | ZENITH (Gold) | VOID (White)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* INTENSE Perspective */
+body[data-perspective="INTENSE"] {
+  --primary-freq: #FF0000;
+  --secondary-freq: #2D0000;
+  --global-glow: rgba(255, 0, 0, 0.7);
+  --perspective-blur: 2px;
+}
+
+body[data-perspective="INTENSE"] .sovereign-toolbar {
+  border-color: rgba(255, 0, 0, 0.4);
+}
+
+body[data-perspective="INTENSE"] .bar-section-archives {
+  box-shadow: 0 0 25px 3px rgba(255, 0, 0, 0.5);
+  border-bottom-color: rgba(255, 0, 0, 0.6);
+}
+
+body[data-perspective="INTENSE"] .bar-section-manifest {
+  box-shadow: 0 0 25px 3px rgba(255, 0, 0, 0.5);
+  border-top-color: rgba(255, 0, 0, 0.6);
+}
+
+/* CALM Perspective */
+body[data-perspective="CALM"] {
+  --primary-freq: #22d3ee;
+  --secondary-freq: #083344;
+  --global-glow: rgba(34, 211, 238, 0.4);
+  --perspective-blur: 12px;
+}
+
+body[data-perspective="CALM"] .sovereign-toolbar {
+  backdrop-filter: blur(24px);
+}
+
+body[data-perspective="CALM"] .bar-nav-item {
+  transition: all 0.4s ease;
+}
+
+/* ZENITH Perspective */
+body[data-perspective="ZENITH"] {
+  --primary-freq: #FFD700;
+  --secondary-freq: #4B2C20;
+  --global-glow: rgba(255, 215, 0, 0.5);
+  --perspective-blur: 8px;
+}
+
+body[data-perspective="ZENITH"] .sovereign-toolbar {
+  background: rgba(75, 44, 32, 0.9);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+body[data-perspective="ZENITH"] .bar-section-archives {
+  box-shadow: 0 0 30px 5px rgba(255, 215, 0, 0.4);
+  border-bottom-color: #FFD700;
+}
+
+body[data-perspective="ZENITH"] .bar-section-manifest {
+  box-shadow: 0 0 30px 5px rgba(255, 215, 0, 0.4);
+  border-top-color: #FFD700;
+}
+
+body[data-perspective="ZENITH"] .temporal-label {
+  color: #FFD700 !important;
+}
+
+/* VOID Perspective (Default) */
+body[data-perspective="VOID"] {
+  --primary-freq: #FFFFFF;
+  --secondary-freq: #1A1A1A;
+  --global-glow: rgba(255, 255, 255, 0.2);
+  --perspective-blur: 5px;
+}
+
+body[data-perspective="VOID"] .sovereign-toolbar {
+  background: rgba(26, 26, 26, 0.95);
+}
+
+body[data-perspective="VOID"] .bar-nav-item {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body[data-perspective="VOID"] .bar-nav-item:hover {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* The Stage (Present) - Protected Center Zone */
@@ -130,6 +227,107 @@
 .bar-nav-item.bar-bottom-item:hover {
   border-color: rgba(168, 85, 247, 0.4);
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RUSSIAN DOLL STAIRCASE — Bloom Animation System
+   Umbrella triggers expand nested content with perspective scaling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Umbrella Trigger Base */
+.umbrella-trigger {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.3s ease;
+}
+
+.umbrella-trigger::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: var(--global-glow);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.umbrella-trigger:hover::before {
+  opacity: 0.5;
+}
+
+/* Bloomed State */
+.umbrella-trigger.bloomed {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px var(--global-glow), 0 0 40px var(--global-glow);
+}
+
+.umbrella-trigger.bloomed::before {
+  opacity: 1;
+  animation: bloom-pulse 2s ease-in-out infinite;
+}
+
+@keyframes bloom-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.4; }
+}
+
+/* App Stage Bloom States */
+#app-stage[data-active-bloom] {
+  transition: filter 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#app-stage[data-active-bloom="archives"] {
+  filter: blur(var(--perspective-blur)) brightness(0.8);
+}
+
+#app-stage[data-active-bloom="manifest"] {
+  filter: blur(var(--perspective-blur)) brightness(1.2);
+}
+
+#app-stage[data-active-bloom="hub"] {
+  filter: none;
+  transform: scale(1.02);
+}
+
+/* Perspective Toggle Button (for Frequency Engine) */
+.perspective-toggle {
+  position: fixed;
+  top: calc(var(--safe-zone-top) + 8px);
+  right: 16px;
+  z-index: 1001;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.perspective-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.perspective-btn[data-mode="INTENSE"] { background: #FF0000; }
+.perspective-btn[data-mode="CALM"] { background: #22d3ee; }
+.perspective-btn[data-mode="ZENITH"] { background: #FFD700; }
+.perspective-btn[data-mode="VOID"] { background: #FFFFFF; }
+
+.perspective-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px currentColor;
+}
+
+.perspective-btn.active {
+  border-color: var(--primary-freq);
+  box-shadow: 0 0 16px var(--global-glow);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

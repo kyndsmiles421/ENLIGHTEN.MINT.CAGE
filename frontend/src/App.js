@@ -10,8 +10,9 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import SovereignGrid from './utils/SovereignGrid'; // Temporal Architecture Controller
+import ENLIGHTEN_SYSTEM from './utils/SovereignMasterController'; // Sovereign Master Controller V2.0
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap } from 'lucide-react';
+import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -316,14 +317,14 @@ function CafeApp() {
       }
     });
     
-    // 7. SOVEREIGN GRID — Initialize Temporal Architecture
-    SovereignGrid.init();
+    // 7. ENLIGHTEN SYSTEM V2.0 — Sovereign Master Controller (replaces SovereignGrid)
+    ENLIGHTEN_SYSTEM.ignite();
     
     console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked. Temporal Architecture Active.");
     
     // Cleanup on unmount
     return () => {
-      SovereignGrid.destroy();
+      ENLIGHTEN_SYSTEM.destroy();
     };
   }, []);
   
@@ -369,15 +370,15 @@ function CafeApp() {
         <div className="sovereign-toolbar bar-top bar-section-archives" data-testid="sovereign-bar-top">
           <span className="temporal-label temporal-label-past">THE VAULT</span>
           <div className="flex items-center gap-2">
-            <Link to="/archives" className="bar-nav-item bar-top-item" data-testid="nav-archives">
+            <Link to="/archives" className="bar-nav-item bar-top-item umbrella-trigger" data-target="archives" data-testid="nav-archives">
               <Archive size={14} />
               <span>Archives</span>
             </Link>
-            <Link to="/journal" className="bar-nav-item bar-top-item" data-testid="nav-journal">
+            <Link to="/journal" className="bar-nav-item bar-top-item umbrella-trigger" data-target="journal" data-testid="nav-journal">
               <BookOpen size={14} />
               <span>Journal</span>
             </Link>
-            <Link to="/cosmic-ledger" className="bar-nav-item bar-top-item" data-testid="nav-ledger">
+            <Link to="/cosmic-ledger" className="bar-nav-item bar-top-item umbrella-trigger" data-target="ledger" data-testid="nav-ledger">
               <Clock size={14} />
               <span>Ledger</span>
             </Link>
@@ -385,6 +386,9 @@ function CafeApp() {
           <span className="temporal-label temporal-label-past">PAST</span>
         </div>
       )}
+      
+      {/* ═══ FREQUENCY ENGINE: Perspective Toggle ═══ */}
+      {!isSovereignRoute && <PerspectiveToggle />}
       
       {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
@@ -420,15 +424,15 @@ function CafeApp() {
         <div id="bottom-dock-future" className="sovereign-toolbar bar-bottom bar-section-manifest" data-testid="sovereign-bar-bottom">
           <span className="temporal-label temporal-label-future">MANIFEST</span>
           <div className="flex items-center gap-2">
-            <Link to="/hub" className="bar-nav-item bar-bottom-item" data-testid="nav-hub">
+            <Link to="/hub" className="bar-nav-item bar-bottom-item umbrella-trigger" data-target="hub" data-testid="nav-hub">
               <Compass size={14} />
               <span>Hub</span>
             </Link>
-            <Link to="/oracle" className="bar-nav-item bar-bottom-item" data-testid="nav-oracle">
+            <Link to="/oracle" className="bar-nav-item bar-bottom-item umbrella-trigger" data-target="oracle" data-testid="nav-oracle">
               <Star size={14} />
               <span>Oracle</span>
             </Link>
-            <Link to="/discover" className="bar-nav-item bar-bottom-item" data-testid="nav-discover">
+            <Link to="/discover" className="bar-nav-item bar-bottom-item umbrella-trigger" data-target="discover" data-testid="nav-discover">
               <Sparkles size={14} />
               <span>Discover</span>
             </Link>

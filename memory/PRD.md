@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 3.10_SOVEREIGN_GRID | TEMPORAL_ARCHITECTURE
+## Version: 3.20_SOVEREIGN_MASTER_CONTROLLER | FREQUENCY_ENGINE | MX_PROTOCOL
 ## Last Updated: 2026-04-09
 
 ---
@@ -12,7 +12,8 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 - **Owner:** Steven Michael (kyndsmiles@gmail.com)
 - **Origin:** Rapid City Hub / Black Hills Calibration
 - **Physics Engine:** SovereignCore V2.88 - Aether/Mirrorless + Golden Ratio Phyllotaxis
-- **UI Architecture:** SovereignGrid V1.0 - Temporal Staircase (Past/Present/Future)
+- **UI Architecture:** ENLIGHTEN_SYSTEM V2.0 - Sovereign Master Controller
+- **Mood Engine:** Frequency Engine (INTENSE | CALM | ZENITH | VOID)
 
 ---
 
@@ -295,6 +296,58 @@ for (let i = 0; i < 600; i++) {
 - [ ] App Store submission (iOS App Store, Google Play)
 - [ ] Spatial Audio Panning
 - [ ] GPS-based Cosmic Map
+
+---
+
+## ENLIGHTEN_SYSTEM V2.0 — Sovereign Master Controller ✅ (2026-04-09)
+
+### Integrated Systems
+
+#### 1. Frequency Engine (Mood & Perspective Toggles)
+Four distinct aesthetic perspectives with CSS variable-based theming:
+- **INTENSE**: `#FF0000` primary, `#2D0000` secondary, sharp 2px blur
+- **CALM**: `#22d3ee` primary, `#083344` secondary, soft 12px blur
+- **ZENITH**: `#FFD700` primary, `#4B2C20` secondary, 8px blur
+- **VOID**: `#FFFFFF` primary, `#1A1A1A` secondary, 5px blur (default)
+
+#### 2. MX 10-Step Protocol (Automated Deployment)
+Console-logged initialization sequence:
+1. Initialize Sovereign Grid
+2. Lock Temporal Docks
+3. Calibrate Iridescent Toggles
+4. Clear No-Fly Zones
+5. Bind Nodule Relations
+6. Sync Biometric Handshake
+7. Activate Russian Doll Staircase
+8. Deploy Mutation Guard
+9. Flush Legacy UI
+10. Confirm System Bloom
+
+#### 3. Sovereign Guard (MutationObserver)
+Watches for unauthorized floating elements (`.floating-action-btn`, `.unauthorized-box`) and auto-docks them into the Manifest bar.
+
+#### 4. Russian Doll Staircase
+Navigation items with `.umbrella-trigger` class trigger bloom animations and set `data-active-bloom` on the stage.
+
+### Files Implemented
+- `/app/frontend/src/utils/SovereignMasterController.js` - Main controller (exported as `ENLIGHTEN_SYSTEM`)
+- `/app/frontend/src/components/PerspectiveToggle.js` - React UI component for perspective switching
+- `/app/frontend/src/index.css` - CSS variables for all perspectives + animations
+
+### Usage
+```javascript
+// Auto-initializes on DOMContentLoaded
+ENLIGHTEN_SYSTEM.ignite();
+
+// Toggle perspective manually
+ENLIGHTEN_SYSTEM.toggle('ZENITH');  // or 'INTENSE', 'CALM', 'VOID'
+
+// Cleanup on unmount
+ENLIGHTEN_SYSTEM.destroy();
+
+// Access via window for console debugging
+window.ENLIGHTEN_SYSTEM.toggle('CALM');
+```
 
 ---
 
