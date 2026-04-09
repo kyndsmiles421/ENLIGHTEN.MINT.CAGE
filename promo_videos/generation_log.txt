@@ -1,0 +1,155 @@
+
+══════════════════════════════════════════════════════════════════════
+  ENLIGHTEN.MINT.CAFE - PROMOTIONAL VIDEO GENERATION
+  Architect: Steven Michael | Terminal: kyndsmiles@gmail.com
+  Total Segments: 8
+  Target Duration: ~96 seconds (8 x 12s clips)
+══════════════════════════════════════════════════════════════════════
+
+[SORA2] API Key configured: sk-emergent-fBd...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 1/8: 01_obsidian_void_awakening
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Cinematic establishing shot: Deep obsidian black void slowly awakening with golden light particles. ...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Error initiating video generation: 503 Server Error: Service Unavailable for url: https://integrations.emergentagent.com/llm/openai/v1/videos
+Response content: upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+[SORA2] ❌ Failed to generate segment: 01_obsidian_void_awakening
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 2/8: 02_crystal_rainbow_refraction
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Mesmerizing close-up of a massive Herkimer diamond crystal rotating slowly in space. Rainbow light r...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Video generation initiated with ID: video_69d7ee8e5b348198a7db227d59f680d707b41df08f1925aa
+Waiting for video generation to complete (ID: video_69d7ee8e5b348198a7db227d59f680d707b41df08f1925aa)...
+Still processing... (0s elapsed, status: in_progress, progress: 0%)
+Still processing... (11s elapsed, status: queued, progress: 0%)
+Still processing... (23s elapsed, status: in_progress, progress: 40%)
+Still processing... (38s elapsed, status: in_progress, progress: 56%)
+Still processing... (56s elapsed, status: in_progress, progress: 63%)
+Still processing... (78s elapsed, status: in_progress, progress: 75%)
+Still processing... (103s elapsed, status: in_progress, progress: 87%)
+Still processing... (133s elapsed, status: in_progress, progress: 99%)
+Video generation completed!
+No URL in response, constructed download URL: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7ee8e5b348198a7db227d59f680d707b41df08f1925aa/content
+Video ready at: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7ee8e5b348198a7db227d59f680d707b41df08f1925aa/content
+Downloading video from: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7ee8e5b348198a7db227d59f680d707b41df08f1925aa/content
+Final download URL: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7ee8e5b348198a7db227d59f680d707b41df08f1925aa/content
+Initial response status: 200
+Content-Type: video/mp4
+Content-Length: 6327025
+Downloaded 6327025 bytes
+Video saved to: /app/promo_videos/02_crystal_rainbow_refraction.mp4
+[SORA2] ✅ Segment saved: /app/promo_videos/02_crystal_rainbow_refraction.mp4
+[SORA2] Generation time: 167.9 seconds
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 3/8: 03_digital_oracle_interface
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Futuristic holographic interface materializes from golden mist. Tarot cards, astrological symbols, a...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Video generation initiated with ID: video_69d7ef3b2b748191b623e3d5f4c6c3020ff18ee9c0b11235
+Waiting for video generation to complete (ID: video_69d7ef3b2b748191b623e3d5f4c6c3020ff18ee9c0b11235)...
+Still processing... (0s elapsed, status: in_progress, progress: 0%)
+Still processing... (11s elapsed, status: queued, progress: 0%)
+Still processing... (24s elapsed, status: in_progress, progress: 10%)
+Error checking status: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7ef3b2b748191b623e3d5f4c6c3020ff18ee9c0b11235
+Still processing... (56s elapsed, status: in_progress, progress: 62%)
+Error checking status: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7ef3b2b748191b623e3d5f4c6c3020ff18ee9c0b11235
+Still processing... (95s elapsed, status: in_progress, progress: 84%)
+Still processing... (117s elapsed, status: in_progress, progress: 89%)
+Still processing... (142s elapsed, status: in_progress, progress: 99%)
+ess, progress: 10%)
+Still processing... (33s elapsed, status: in_progress, progress: 48%)
+Still processing... (49s elapsed, status: in_progress, progress: 63%)
+Still processing... (67s elapsed, status: in_progress, progress: 75%)
+Still processing... (88s elapsed, status: in_progress, progress: 87%)
+Still processing... (114s elapsed, status: in_progress, progress: 87%)
+Still processing... (144s elapsed, status: in_progress, progress: 99%)
+Video generation completed!
+No URL in response, constructed download URL: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7eeaf95ac8198b637033f5c837bf506d35170366b39a9/content
+Video ready at: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7eeaf95ac8198b637033f5c837bf506d35170366b39a9/content
+Downloading video from: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7eeaf95ac8198b637033f5c837bf506d35170366b39a9/content
+Final download URL: https://integrations.emergentagent.com/llm/openai/v1/videos/video_69d7eeaf95ac8198b637033f5c837bf506d35170366b39a9/content
+Initial response status: 200
+Content-Type: video/mp4
+Content-Length: 7220216
+Downloaded 7220216 bytes
+Video saved to: /app/promo_videos/03_digital_oracle_interface.mp4
+[SORA2] ✅ Segment saved: /app/promo_videos/03_digital_oracle_interface.mp4
+[SORA2] Generation time: 180.3 seconds
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 4/8: 04_wellness_transformation
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Smooth transition from digital space to organic wellness environment. Fresh vibrant ingredients - gr...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Error initiating video generation: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos
+Response content: {"error":{"code":"insufficient_balance","message":"insufficient balance, please recharge to generate","type":"insufficient_balance"}}
+[SORA2] ❌ Failed to generate segment: 04_wellness_transformation
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 5/8: 05_mobile_sanctuary_reveal
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Cinematic reveal of a sleek, futuristic food truck wrapped in obsidian black. Gold geometric pattern...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Error initiating video generation: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos
+Response content: {"error":{"code":"insufficient_balance","message":"insufficient balance, please recharge to generate","type":"insufficient_balance"}}
+[SORA2] ❌ Failed to generate segment: 05_mobile_sanctuary_reveal
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 6/8: 06_immersive_experience
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: First-person perspective entering an immersive sensory dome. Walls pulse with bioluminescent pattern...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Error initiating video generation: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos
+Response content: {"error":{"code":"insufficient_balance","message":"insufficient balance, please recharge to generate","type":"insufficient_balance"}}
+[SORA2] ❌ Failed to generate segment: 06_immersive_experience
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 7/8: 07_community_connection
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Diverse group of people in a mystical gathering space. They hold glowing crystals that connect with ...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Error initiating video generation: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos
+Response content: {"error":{"code":"insufficient_balance","message":"insufficient balance, please recharge to generate","type":"insufficient_balance"}}
+[SORA2] ❌ Failed to generate segment: 07_community_connection
+[SORA2] Pausing 5 seconds before next segment...
+
+════════════════════════════════════════════════════════════
+[SORA2] Generating Segment 8/8: 08_brand_finale
+[SORA2] Duration: 12s | Size: 1280x720
+════════════════════════════════════════════════════════════
+[SORA2] Prompt: Final cinematic shot: All elements converge - crystals, golden threads, rainbow refractions. They sp...
+[SORA2] Starting generation (this may take 3-8 minutes)...
+Error initiating video generation: 400 Client Error: Bad Request for url: https://integrations.emergentagent.com/llm/openai/v1/videos
+Response content: {"error":{"code":"insufficient_balance","message":"insufficient balance, please recharge to generate","type":"insufficient_balance"}}
+[SORA2] ❌ Failed to generate segment: 08_brand_finale
+
+══════════════════════════════════════════════════════════════════════
+  GENERATION COMPLETE
+  Successfully generated: 1/8 segments
+══════════════════════════════════════════════════════════════════════
+
+📁 Generated video files:
+   • /app/promo_videos/03_digital_oracle_interface.mp4
+
+📍 All files saved in: /app/promo_videos
+
+💡 To combine clips into one video, use:
+   ffmpeg -f concat -safe 0 -i filelist.txt -c copy /app/promo_videos/enlighten_cafe_promo.mp4
