@@ -148,10 +148,10 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
   height: var(--safe-zone-top);
   position: fixed;
   width: 100%;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  z-index: 1500;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -159,12 +159,15 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
 }
 
 .bar-top { 
-  top: 0; 
+  top: 0;
+  height: calc(12vh * var(--vault-scale, 0.618));
+  border-bottom: 1px solid var(--primary-freq, rgba(168, 85, 247, 0.8));
 }
 
 .bar-bottom { 
   bottom: 0; 
-  height: var(--safe-zone-bottom);
+  height: calc(12vh * var(--manifest-scale, 1.618));
+  border-top: 1px solid var(--primary-freq, rgba(168, 85, 247, 0.8));
 }
 
 /* Bar Section Themes */

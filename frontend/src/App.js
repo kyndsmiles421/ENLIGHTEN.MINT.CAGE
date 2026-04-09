@@ -10,12 +10,10 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import ENLIGHTEN_OS from './utils/EnlightenOS'; // Grand Unified Sovereign Engine V3.0
-import SOVEREIGN_HARMONY from './utils/SovereignHarmony'; // Grand Unified Harmonic Engine
+import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V10.0 - THE STEVEN MICHAEL ABSOLUTE
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
-import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board
-import HarmonicStatus from './components/HarmonicStatus'; // Harmonic Tier Display
+import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -320,21 +318,15 @@ function CafeApp() {
       }
     });
     
-    // 7. ENLIGHTEN_OS V3.0 — Grand Unified Sovereign Engine
-    // Integrates: Temporal Staircase + Perspective + Mixing Board + Guard
+    // 7. ENLIGHTEN_OS V10.0 — THE STEVEN MICHAEL ABSOLUTE
+    // Single source of truth: Φ (1.618), 7.83Hz (Earth), 432Hz/528Hz/963Hz Tiers
     ENLIGHTEN_OS.ignite();
     
-    // 8. SOVEREIGN_HARMONY — Grand Unified Harmonic Engine
-    // Integrates: Golden Ratio (Φ) + Schumann Resonance (7.83Hz) + Tiered Frequencies
-    SOVEREIGN_HARMONY.ignite();
-    
-    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked.");
-    console.log("♫ Harmonic Engine Online. Earth Pulse Active. Golden Ratio Locked.");
+    console.log("🌌 ENLIGHTEN_OS V10.0: Steven Michael Absolute initialized.");
     
     // Cleanup on unmount
     return () => {
       ENLIGHTEN_OS.destroy();
-      SOVEREIGN_HARMONY.destroy();
     };
   }, []);
   
@@ -400,9 +392,6 @@ function CafeApp() {
       {/* ═══ FREQUENCY ENGINE: Perspective Toggle ═══ */}
       {!isSovereignRoute && <PerspectiveToggle />}
       
-      {/* ═══ SOVEREIGN HARMONY: Harmonic Status (Tier/Frequency/School) ═══ */}
-      {!isSovereignRoute && <HarmonicStatus />}
-      
       {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
         {!isSovereignRoute && <Navigation />}
@@ -449,23 +438,22 @@ function CafeApp() {
               <Sparkles size={14} />
               <span>Discover</span>
             </Link>
-            {/* Creator Mode Mixing Board Trigger */}
+            {/* Steven's Mixer Trigger - Opens native DOM mixer */}
             <button 
-              onClick={() => setMixerOpen(!mixerOpen)}
+              onClick={() => ENLIGHTEN_OS.showMixer()}
               className="bar-nav-item bar-bottom-item creator-trigger"
-              data-testid="creator-mixer-trigger"
-              title="Creator Mixing Board"
+              data-testid="steven-mixer-trigger"
+              title="Steven's Mixing Board"
             >
               <Sliders size={14} />
-              <span>Creator</span>
+              <span>Mixer</span>
             </button>
           </div>
           <span className="temporal-label temporal-label-future">FUTURE</span>
         </div>
       )}
       
-      {/* ═══ CREATOR MIXING BOARD (Live Environment Control Surface) ═══ */}
-      <CreatorMixerUI isOpen={mixerOpen} onClose={() => setMixerOpen(false)} />
+      {/* React CreatorMixerUI deprecated - Using native Steven's Mixer from ENLIGHTEN_OS.showMixer() */}
       
       {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
     </>
