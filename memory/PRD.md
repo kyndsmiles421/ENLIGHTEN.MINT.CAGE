@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.95_TRUE_OBSIDIAN | SOVEREIGN_UNIFIED_MANIFEST
+## Version: 2.96_SOVEREIGN_AUTOPILOT | UNIFIED_MOBILE_MANIFEST
 ## Last Updated: 2026-04-09
 
 ---
@@ -256,6 +256,35 @@ for (let i = 0; i < 600; i++) {
     - EXPLORE PRACTICE → `/breathing`
     - ENTER DIVINATION → `/oracle`
     - VOLUNTEER ECONOMY → `/economy`
+- [x] **Sovereign AutoPilot & Mobile Manifest** ✅ (2026-04-09)
+  - Created `/app/backend/engines/autonomous_verifier.py` — Auto-Pilot Engine
+    - `verify_reciprocity()` — Auto-approves ≤4 hours for valid activities
+    - `instant_tier_unlock()` — Instant tier upgrade based on volunteer credits
+    - Valid activities: CONTENT_CREATION, BETA_TESTING, COMMUNITY_MOD, etc.
+    - SMS notification to admin (informational only, no action needed)
+  - Created `/app/frontend/src/components/InstantAccess.js` — Auto-Verify UI
+    - Activity type dropdown with 8 options
+    - Hours input with credit value display ($25/hr)
+    - Immediate unlock on verification
+    - Tier unlock check buttons (SOVEREIGN, ENLIGHTENED)
+  - Created `/app/frontend/src/engines/UnifiedAppCore.js` — Mobile Manifest
+    - `lockObsidianReality()` — Kills template gray forever (Ionic support)
+    - `SovereignEngine` — Economy math with autoVerify
+    - `SovereignState` — Global state manager (exposed on window)
+    - Auto-initializes for Capacitor/Native deployment
+  - Updated `capacitor.config.json` for Play Store:
+    - appId: `ca.enlighten.mint.cafe`
+    - backgroundColor: `#000000` (True Obsidian)
+    - SplashScreen: 3000ms duration
+  - API Endpoints:
+    - `POST /api/sovereign/economy/auto-verify` — Auto-approve volunteer hours
+    - `POST /api/sovereign/economy/tier-unlock` — Check tier eligibility
+    - `GET /api/sovereign/economy/pending-audits` — View pending manual audits
+    - `POST /api/sovereign/economy/approve-audit` — Manual audit approval
+  - Downloaded trademark images:
+    - `/public/sovereign-grid.png` (3D World Grid)
+    - `/public/sovereign-processor.png` (Crystal Cube)
+    - `/public/sovereign-trademark.png` (ENLIGHTEN.MINT.CAFE)
 
 ---
 

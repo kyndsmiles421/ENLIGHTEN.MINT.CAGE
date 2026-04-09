@@ -532,6 +532,107 @@ async def get_economy_rates(tier: str = "BASIC"):
     }
 
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  AUTONOMOUS VERIFIER — Auto-Pilot Endpoints
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post("/economy/auto-verify")
+async def auto_verify_volunteer(data: dict = Body(...)):
+    """
+    Autonomous verification of volunteer hours.
+    Auto-approves up to 4 hours for valid activities.
+    
+    Body:
+        hours: Number of hours to verify
+        activity_type: Type of activity (BETA_TESTING, CONTENT_CREATION, etc.)
+        user_id: (optional) User identifier
+    """
+    from engines.autonomous_verifier import verify_reciprocity
+    
+    hours = data.get("hours", 0)
+    activity_type = data.get("activity_type", "BETA_TESTING")
+    user_id = data.get("user_id", "anonymous")
+    
+    if hours <= 0:
+        raise HTTPException(status_code=400, detail="Hours must be positive")
+    
+    result = verify_reciprocity(user_id, hours, activity_type)
+    
+    # Log to MongoDB
+    try:
+        await db.auto_verifications.insert_one({
+            "id": secure_hash_short(f"autoverify:{user_id}:{datetime.now(timezone.utc).isoformat()}"),
+            "user_id": user_id,
+            "hours": hours,
+            "activity_type": activity_type,
+            "status": result.get("status"),
+            "signature": result.get("short_sig", result.get("signature", "")[:24]),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.error(f"[AutoVerify] DB write failed: {e}")
+    
+    return result
+
+
+@router.post("/economy/tier-unlock")
+async def tier_unlock_check(data: dict = Body(...)):
+    """
+    Check if user qualifies for tier unlock based on volunteer hours.
+    
+    Body:
+        target_tier: The tier to attempt unlocking (SOVEREIGN, ENLIGHTENED)
+        user_id: (optional) User identifier
+    """
+    from engines.autonomous_verifier import instant_tier_unlock
+    
+    target_tier = data.get("target_tier", "SOVEREIGN")
+    user_id = data.get("user_id", "anonymous")
+    
+    result = instant_tier_unlock(user_id, target_tier)
+    
+    # Log tier unlock attempt
+    try:
+        await db.tier_unlocks.insert_one({
+            "id": secure_hash_short(f"tierunlock:{user_id}:{datetime.now(timezone.utc).isoformat()}"),
+            "user_id": user_id,
+            "target_tier": target_tier,
+            "status": result.get("status"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.error(f"[TierUnlock] DB write failed: {e}")
+    
+    return result
+
+
+@router.get("/economy/pending-audits")
+async def get_pending_audits():
+    """Get all pending audit requests for manual review."""
+    from engines.autonomous_verifier import get_pending_audits
+    return {"audits": get_pending_audits()}
+
+
+@router.post("/economy/approve-audit")
+async def approve_audit(data: dict = Body(...)):
+    """
+    Manually approve a pending audit (Creator's Touch).
+    
+    Body:
+        user_id: User whose audit to approve
+        hours: Hours to approve
+    """
+    from engines.autonomous_verifier import approve_audit
+    
+    user_id = data.get("user_id")
+    hours = data.get("hours")
+    
+    if not user_id or not hours:
+        raise HTTPException(status_code=400, detail="user_id and hours required")
+    
+    return approve_audit(user_id, hours)
+
+
 @router.get("/status")
 async def get_sovereign_status():
     """Get Sovereign Engine status - integrations health check."""

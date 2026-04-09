@@ -8,6 +8,7 @@ import './engines/MainframeSync'; // Exposes V_ENGINE.syncMainframe() to console
 import './engines/PerformanceManager'; // Battery & TTS Fallback
 import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check, Capacitor Bridge
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
+import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -300,6 +301,9 @@ function CafeApp() {
     
     // 4. DIRECT DOM OVERRIDE — Force True Obsidian #000000
     applySovereignReality(174);
+    
+    // 5. MOBILE MANIFEST — Obsidian Guard for Capacitor/Native
+    lockObsidianReality();
     
     console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked.");
   }, []);

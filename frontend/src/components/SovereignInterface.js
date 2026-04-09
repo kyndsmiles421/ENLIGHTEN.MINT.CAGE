@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { applySovereignReality, SovereignEconomy, executeEmergencyStop } from '../engines/SovereignCore';
+import InstantAccess from './InstantAccess';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -189,6 +190,17 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
           VOLUNTEER ECONOMY
         </button>
       </nav>
+
+      {/* INSTANT ACCESS — Auto-Verify Volunteer Hours */}
+      <InstantAccess 
+        onAccessGranted={(data) => {
+          console.log('[SovereignInterface] Access granted:', data);
+          setEcon(SovereignEconomy.calculateAccess(volunteerHours + data.hours_logged));
+        }}
+        onTierUnlock={(data) => {
+          console.log('[SovereignInterface] Tier unlocked:', data);
+        }}
+      />
 
       <footer style={{ marginTop: '50px', opacity: 0.5, fontSize: '0.7rem', color: '#F0FFF0' }}>
         Ω INVENTION_NODULE_ID: 2fc0ba69... (SHA-256 VERIFIED)

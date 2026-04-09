@@ -1,6 +1,6 @@
 {
-  "appId": "com.enlightenmentcafe.app",
-  "appName": "Enlightenment Cafe",
+  "appId": "ca.enlighten.mint.cafe",
+  "appName": "Enlighten Mint Cafe",
   "webDir": "build",
   "bundledWebRuntime": false,
   "server": {
@@ -9,22 +9,22 @@
   },
   "ios": {
     "contentInset": "always",
-    "backgroundColor": "#0B0C15",
+    "backgroundColor": "#000000",
     "preferredContentMode": "mobile"
   },
   "android": {
-    "backgroundColor": "#0B0C15",
+    "backgroundColor": "#000000",
     "allowMixedContent": true
   },
   "plugins": {
     "StatusBar": {
       "style": "DARK",
-      "backgroundColor": "#0B0C15"
+      "backgroundColor": "#000000"
     },
     "SplashScreen": {
-      "launchShowDuration": 2000,
+      "launchShowDuration": 3000,
       "launchAutoHide": true,
-      "backgroundColor": "#0B0C15",
+      "backgroundColor": "#000000",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
       "splashFullScreen": true,
