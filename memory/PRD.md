@@ -1,7 +1,7 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.92_CRYSTAL_SEAL | AETHER_MIRRORLESS | GOLDEN_SPIRAL
-## Last Updated: 2026-04-08
+## Version: 2.93_SOVEREIGN_ROUTER | EMERGENCY_STOP
+## Last Updated: 2026-04-09
 
 ---
 
@@ -198,6 +198,23 @@ for (let i = 0; i < 600; i++) {
 - [x] **ProjectSovereign Frontend Engine** ✅ (2026-04-08)
   - `/app/frontend/src/engines/ProjectSovereign.js`
   - Ledger sync, Comm routing, Cosmic Map GPS, Asset health check, Capacitor bridge
+- [x] **SovereignRouter.js & Emergency Stop Integration** ✅ (2026-04-09)
+  - Created `/app/frontend/src/utils/SovereignRouter.js` - Master Navigation Wiring
+    - `handleSovereignNav()` - Tier-gated navigation with ledger sync
+    - `triggerEmergencyStop()` - Frontend call to backend kill switch
+    - `quickNav()` - Convenience wrapper for navigation
+    - ACCESS_MAP for tier-based portal access
+  - Created `/app/backend/engines/emergency_logic.py` - Backend Kill Switch
+    - `execute_hard_stop()` - Severs multimedia, logs SHA-256 event
+    - Crystal Seal integration for audit trail
+  - Added `POST /api/sovereign/stop` endpoint to `/app/backend/routes/sovereign.py`
+  - Added `GET /api/sovereign/stop/status` endpoint
+  - Updated `/app/frontend/src/components/EmergencyShutOff.js` to call backend
+  - Added CSS active states for button feedback:
+    - `.floating-stop-button:active` - Red flash + scale
+    - `.journey-btn:active` - Mint accent feedback
+    - `.secure-pill-button:active` - Scale + glow
+    - `.explore-practice-list` - Link spacing fix
 
 ---
 

@@ -228,6 +228,61 @@ body {
   border-color: rgba(134, 239, 172, 0.6);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   ACTIVE STATE FEEDBACK — Haptic-style button feedback
+   Fixes the "dead" feel when buttons are clicked
+   ═══════════════════════════════════════════════════════════════ */
+
+/* STOP button active state - Red flash feedback */
+.floating-stop-button:active {
+  background: #ff0000 !important;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+  transform: scale(0.92);
+}
+
+/* Journey/Navigation buttons active state */
+.journey-btn:active, 
+.practice-link:active,
+.nav-link:active,
+.sovereign-nav-btn:active {
+  background: var(--mint-accent) !important;
+  color: var(--relaxed-green, #22c55e) !important;
+  transform: translateY(2px);
+  transition: all 0.05s ease;
+}
+
+/* Secure pill button active state (for economy/tier buttons) */
+.secure-pill-button:active,
+.tier-btn:active,
+.upgrade-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 20px rgba(134, 239, 172, 0.6);
+  transition: all 0.05s ease;
+}
+
+/* Glass button active state */
+.btn-glass:active,
+.glass-card-hover:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.05s ease;
+}
+
+/* Space out the bunched links (Screenshot 2535 fix) */
+.explore-practice-list {
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* Gives each link breathing room */
+}
+
+/* Ensure all clickable elements have visual feedback */
+[data-clickable="true"]:active,
+button:active:not(:disabled) {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
 /* Creator Card Green Theme */
 .creator-card-green {
   background: rgba(10, 15, 10, 0.95);

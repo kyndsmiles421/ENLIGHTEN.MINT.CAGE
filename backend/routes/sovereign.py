@@ -339,6 +339,60 @@ async def get_comm_status(tracking_id: str, user=Depends(get_current_user)):
 
 
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  EMERGENCY STOP — Kill Switch Endpoint
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post("/stop")
+async def emergency_stop(data: dict = Body(default={})):
+    """
+    Emergency Stop Kill Switch - halts all multimedia streams.
+    
+    This is the backend 'Red Alert' that:
+    1. Severs multimedia streams
+    2. Logs the SHA-256 event to Creator Mode
+    3. Returns halt confirmation
+    
+    Body (optional):
+        action: The action type (default: "HARD_STOP")
+        timestamp: Client-side timestamp
+    """
+    from engines.emergency_logic import execute_hard_stop
+    
+    action = data.get("action", "HARD_STOP")
+    client_timestamp = data.get("timestamp")
+    
+    logger.warning(f"[EMERGENCY] Stop triggered: action={action}")
+    
+    # Execute the hard stop
+    result = execute_hard_stop()
+    
+    # Add client timestamp to response if provided
+    if client_timestamp:
+        result["client_timestamp"] = client_timestamp
+    
+    # Log to sovereign ledger
+    try:
+        await db.sovereign_ledger.insert_one({
+            "id": secure_hash_short(f"emergency:{result.get('timestamp', '')}"),
+            "type": "EMERGENCY_STOP",
+            "action": action,
+            "status": result.get("status"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.error(f"[EMERGENCY] Ledger write failed: {e}")
+    
+    return result
+
+
+@router.get("/stop/status")
+async def get_stop_status():
+    """Get emergency controller status."""
+    from engines.emergency_logic import get_emergency_status
+    return get_emergency_status()
+
+
 @router.get("/status")
 async def get_sovereign_status():
     """Get Sovereign Engine status - integrations health check."""

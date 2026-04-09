@@ -6,6 +6,7 @@ import { useMixer } from '../context/MixerContext';
 import { usePolarity } from '../context/PolarityContext';
 import { useLanguage } from '../context/LanguageContext';
 import { masterReboot } from '../engines/MasterReboot';
+import { triggerEmergencyStop } from '../utils/SovereignRouter';
 
 /**
  * Emergency Shut-Off Button — GRAVITATIONAL COLLAPSE
@@ -54,7 +55,7 @@ export default function EmergencyShutOff() {
     setLongPressProgress(0);
   }, []);
 
-  const handleEmergencyStop = useCallback(() => {
+  const handleEmergencyStop = useCallback(async () => {
     console.log('[EmergencyShutOff] GRAVITATIONAL COLLAPSE INITIATED');
     
     // Start collapse animation
@@ -171,6 +172,14 @@ export default function EmergencyShutOff() {
 
     // 10. GRAVITATIONAL COLLAPSE HAPTIC — Language-aware
     vibrate('collapse');
+    
+    // 11. BACKEND KILL SWITCH — Notify server of emergency stop
+    try {
+      const backendResult = await triggerEmergencyStop();
+      console.log('[EmergencyShutOff] Backend kill switch result:', backendResult);
+    } catch (err) {
+      console.warn('[EmergencyShutOff] Backend kill switch call failed (continuing):', err);
+    }
     
     // End collapse animation
     setTimeout(() => setIsCollapsing(false), 800);
