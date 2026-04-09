@@ -10,8 +10,8 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V21.0 - THE OMNI-NEURAL MANIFEST
-import './styles/UniverseMaterials.css'; // Universe Materials - Obsidian, Selenite Sensors, Gold Rutilation
+import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V23.0 - THE BIOLOGICAL SUPER-CORE
+import './styles/UniverseMaterials.css'; // Universe Materials - Obsidian, Selenite, Gold Rutilation, Mycelium
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)

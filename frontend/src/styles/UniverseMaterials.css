@@ -1,16 +1,15 @@
 /**
- * ENLIGHTEN_OS V21.0 - UNIVERSE MATERIALS
+ * ENLIGHTEN_OS V23.0 - UNIVERSE MATERIALS
  * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
- * MATERIALS: Obsidian, Selenite End-Points, Gold Rutilation
+ * MATERIALS: Obsidian Void, Selenite End-Points, Gold Rutilation, Mycelium Neural Web
  */
 
 :root {
   --phi: 1.61803398875;
   --gold-rutilation: #D4AF37;
   --selenite-white: rgba(230, 240, 255, 0.95);
-  --obsidian-depth: rgba(5, 5, 5, 0.99);
-  --obsidian-core: #000000;
-  --neural-glow: rgba(212, 175, 55, 0.4);
+  --obsidian-void: rgba(0, 0, 0, 0.99);
+  --mycelium-glow: rgba(0, 255, 100, 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -23,12 +22,12 @@
   backdrop-filter: blur(50px) saturate(var(--phi));
   -webkit-backdrop-filter: blur(50px) saturate(var(--phi));
   border: 1px solid var(--gold-rutilation);
-  box-shadow: 0 0 80px var(--obsidian-core), inset 0 0 30px rgba(212, 175, 55, 0.05);
-  background: var(--obsidian-depth);
+  box-shadow: 0 0 80px #000, inset 0 0 40px rgba(212, 175, 55, 0.03);
+  background: var(--obsidian-void);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SELENITE END-POINT SENSORS (The Nerves)
+   SELENITE END-POINT SENSORS (Nerve Nodes)
    ═══════════════════════════════════════════════════════════════════════════ */
 .selenite-sensor {
   position: absolute;
@@ -72,6 +71,41 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   MYCELIUM HYPHAE STRANDS (Biological Neural Web)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mycelium-strand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  transform-origin: center top;
+  background: linear-gradient(
+    to bottom,
+    var(--mycelium-glow) 0%,
+    rgba(0, 255, 100, 0.6) 30%,
+    rgba(212, 175, 55, 0.4) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px var(--mycelium-glow);
+  z-index: 3;
+  pointer-events: none;
+  animation: hyphaGrow 3s ease-out forwards;
+}
+
+@keyframes hyphaGrow {
+  0% { 
+    height: 0; 
+    opacity: 0; 
+  }
+  50% { 
+    opacity: 0.6; 
+  }
+  100% { 
+    opacity: var(--strand-opacity, 0.4); 
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    GOLD RUTILATION THREADS
    ═══════════════════════════════════════════════════════════════════════════ */
 .gold-thread {
@@ -83,21 +117,15 @@
     transparent 30%,
     rgba(212, 175, 55, 0.05) 50%,
     rgba(212, 175, 55, 0.15) 70%,
-    rgba(168, 85, 247, 0.1) 100%
+    rgba(168, 85, 247, 0.08) 100%
   );
   border-radius: 50%;
   border: 1px solid rgba(212, 175, 55, 0.08);
   transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.gold-bloom-container,
-.rainbow-crystal-container {
+.gold-bloom-container {
   transform-style: preserve-3d;
-}
-
-.rainbow-layer {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -117,7 +145,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 @keyframes sovereignBloom {
   0% { filter: brightness(1) saturate(1); }
-  50% { filter: brightness(1.4) saturate(1.6); }
+  50% { filter: brightness(1.5) saturate(1.8); }
   100% { filter: brightness(1) saturate(1); }
 }
 
@@ -129,20 +157,9 @@ body.sovereign-bloom {
    OBSIDIAN VOID DEPTH
    ═══════════════════════════════════════════════════════════════════════════ */
 #app-stage {
-  background: var(--obsidian-core) !important;
+  background: #000000 !important;
 }
 
 body {
-  background: var(--obsidian-core) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   GOLDEN RATIO SCALING
-   ═══════════════════════════════════════════════════════════════════════════ */
-.phi-scale-up {
-  transform: scale(var(--phi));
-}
-
-.phi-scale-down {
-  transform: scale(calc(1 / var(--phi)));
+  background: #000000 !important;
 }
