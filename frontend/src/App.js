@@ -369,7 +369,7 @@ function CafeApp() {
       {!isSovereignRoute && <VellumOverlay />} */}
       
       {/* ═══ SOVEREIGN GRID: TOP BAR (The Vault / Past / Archives) ═══ */}
-      {!isSovereignRoute && (
+      {!isSovereignRoute && !isHubRoute && (
         <div className="sovereign-toolbar bar-top bar-section-archives" data-testid="sovereign-bar-top">
           <span className="temporal-label temporal-label-past">THE VAULT</span>
           <div className="flex items-center gap-2">
@@ -391,11 +391,11 @@ function CafeApp() {
       )}
       
       {/* ═══ FREQUENCY ENGINE: Perspective Toggle ═══ */}
-      {!isSovereignRoute && <PerspectiveToggle />}
+      {!isSovereignRoute && !isHubRoute && <PerspectiveToggle />}
       
       {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
-        {!isSovereignRoute && <Navigation />}
+        {!isSovereignRoute && !isHubRoute && <Navigation />}
         <ScrollToTop />
         <Toaster
           position="top-right"
@@ -423,7 +423,7 @@ function CafeApp() {
       </div>
       
       {/* ═══ SOVEREIGN GRID: BOTTOM BAR (The Manifest / Future) ═══ */}
-      {!isSovereignRoute && (
+      {!isSovereignRoute && !isHubRoute && (
         <div id="bottom-dock-future" className="sovereign-toolbar bar-bottom bar-section-manifest" data-testid="sovereign-bar-bottom">
           <span className="temporal-label temporal-label-future">MANIFEST</span>
           <div className="flex items-center gap-2">
