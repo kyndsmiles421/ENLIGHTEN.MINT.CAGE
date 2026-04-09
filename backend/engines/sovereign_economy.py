@@ -3,7 +3,7 @@
 ENLIGHTEN.MINT.CAFE - Sovereign Economy System
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Tiered pricing with 20% below market rate + tier bonuses.
-Machine time tracking and financial transaction audit.
+Machine time tracking, volunteer credits, and financial transaction audit.
 """
 from typing import Dict, Any, Optional
 from datetime import datetime, timezone
@@ -17,14 +17,29 @@ class SovereignEconomy:
     Features:
     - 20% below market rate base pricing
     - Tiered discounts (Novice, Sovereign, Enlightened)
+    - Volunteer Time Valuation ($25/hour credit)
+    - 10% April Reduction on packages
     - Machine time tracking
     - SHA-256 financial transaction signatures
     - 80/20 community benefit split
     """
     
     def __init__(self):
+        # 1. Base Machine Rates (20% Below Market)
         self.market_rate_per_hour = 50.00  # Market average
+        self.market_hourly_cost = 50.00    # Alias for compatibility
         self.discount_factor = 0.80        # 20% below market
+        self.base_rate = self.market_hourly_cost * 0.80
+        
+        # 2. Volunteer Valuation
+        # Every hour of volunteer work = $25.00 credit toward packages
+        self.volunteer_credit_value = 25.00
+        
+        # 3. April 2026 Reduction (10% off all packages)
+        self.april_reduction = 0.90
+        self.april_reduction_percent = 10  # Display value
+        
+        # 4. Tier multipliers
         self.user_tiers = {
             "NOVICE": 1.0,       # Base discounted rate
             "SOVEREIGN": 0.9,    # Additional 10% off for Pro
@@ -35,12 +50,23 @@ class SovereignEconomy:
             "SOVEREIGN": "Sovereign", 
             "ENLIGHTENED": "Enlightened"
         }
+        
+        # 5. Package base pricing
+        self.tier_pricing = {
+            "NOVICE": 20.00,
+            "SOVEREIGN": 50.00,
+            "ENLIGHTENED": 100.00
+        }
+        
         # Community split: 80% to house, 20% for community benefits
         self.house_split = 0.80
         self.community_split = 0.20
         
         # Session tracking
         self._active_sessions = {}
+        
+        # Volunteer hours tracking (in-memory, should be DB in production)
+        self._volunteer_ledger = {}
 
     def calculate_machine_rate(self, tier: str = "NOVICE") -> float:
         """
@@ -56,6 +82,103 @@ class SovereignEconomy:
         tier_multiplier = self.user_tiers.get(tier.upper(), 1.0)
         final_rate = base_rate * tier_multiplier
         return round(final_rate, 2)
+
+    def calculate_package_cost(self, user_tier: str, volunteer_hours: float = 0) -> Dict[str, Any]:
+        """
+        Calculates the final cost after applying the 10% April reduction
+        PLUS the new Volunteer Time credits.
+        
+        Args:
+            user_tier: User's tier (NOVICE, SOVEREIGN, ENLIGHTENED)
+            volunteer_hours: Hours of volunteer work to apply as credit
+            
+        Returns:
+            Dict with pricing breakdown
+        """
+        user_tier = user_tier.upper() if user_tier else "NOVICE"
+        
+        # Get base package price
+        original_price = self.tier_pricing.get(user_tier, 20.00)
+        
+        # Apply the 10% April reduction
+        base_price = original_price * self.april_reduction
+        
+        # Calculate Volunteer Credits
+        total_credits = volunteer_hours * self.volunteer_credit_value
+        
+        # Final price (cannot be negative)
+        final_price = max(0, base_price - total_credits)
+        
+        return {
+            "tier": user_tier,
+            "tier_label": self.tier_labels.get(user_tier, "Novice"),
+            "original_price": original_price,
+            "april_reduction": f"{self.april_reduction_percent}%",
+            "price_after_reduction": round(base_price, 2),
+            "volunteer_hours": volunteer_hours,
+            "volunteer_credit_rate": self.volunteer_credit_value,
+            "volunteer_subsidy": round(total_credits, 2),
+            "final_billed_amount": round(final_price, 2),
+            "is_free": final_price == 0,
+        }
+
+    def record_volunteer_hours(self, user_id: str, hours: float, activity: str = "") -> Dict[str, Any]:
+        """
+        Record volunteer hours for a user.
+        
+        Args:
+            user_id: User identifier
+            hours: Hours volunteered
+            activity: Description of volunteer activity
+            
+        Returns:
+            Dict with updated volunteer balance
+        """
+        if user_id not in self._volunteer_ledger:
+            self._volunteer_ledger[user_id] = {
+                "total_hours": 0,
+                "total_credit": 0,
+                "activities": [],
+            }
+        
+        ledger = self._volunteer_ledger[user_id]
+        ledger["total_hours"] += hours
+        ledger["total_credit"] = ledger["total_hours"] * self.volunteer_credit_value
+        ledger["activities"].append({
+            "hours": hours,
+            "activity": activity,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "credit_value": hours * self.volunteer_credit_value,
+        })
+        
+        # Generate ledger signature
+        signature = enlighten_core.secure_hash(
+            f"volunteer:{user_id}:{hours}:{datetime.now(timezone.utc).isoformat()}"
+        )
+        
+        return {
+            "user_id": user_id,
+            "hours_added": hours,
+            "total_hours": ledger["total_hours"],
+            "total_credit": ledger["total_credit"],
+            "signature": signature[:16],
+        }
+
+    def get_volunteer_balance(self, user_id: str) -> Dict[str, Any]:
+        """Get volunteer balance for a user."""
+        ledger = self._volunteer_ledger.get(user_id, {
+            "total_hours": 0,
+            "total_credit": 0,
+            "activities": [],
+        })
+        
+        return {
+            "user_id": user_id,
+            "total_hours": ledger["total_hours"],
+            "total_credit": ledger["total_credit"],
+            "credit_rate": self.volunteer_credit_value,
+            "activity_count": len(ledger.get("activities", [])),
+        }
 
     def get_rate_breakdown(self, tier: str = "NOVICE") -> Dict[str, Any]:
         """

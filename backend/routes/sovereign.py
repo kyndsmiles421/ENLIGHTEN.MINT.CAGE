@@ -517,3 +517,101 @@ async def creator_heartbeat(data: dict = Body(...)):
         "machine_time": machine_time,
         "status": stream_status,
     }
+
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  VOLUNTEER & PACKAGE ROUTES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/economy/package-cost")
+async def get_package_cost(
+    tier: str = "NOVICE",
+    volunteer_hours: float = 0,
+):
+    """
+    Calculate package cost with 10% April reduction + volunteer credits.
+    
+    Query params:
+        tier: NOVICE, SOVEREIGN, or ENLIGHTENED
+        volunteer_hours: Hours of volunteer work to apply as credit
+    """
+    from engines.sovereign_economy import sovereign_economy
+    return sovereign_economy.calculate_package_cost(tier, volunteer_hours)
+
+
+@router.post("/economy/volunteer/record")
+async def record_volunteer_hours(
+    data: dict = Body(...),
+    user=Depends(get_current_user)
+):
+    """
+    Record volunteer hours for a user.
+    
+    Body:
+        hours: Number of hours volunteered
+        activity: Description of volunteer activity
+    """
+    from engines.sovereign_economy import sovereign_economy
+    
+    hours = data.get("hours", 0)
+    activity = data.get("activity", "")
+    
+    if hours <= 0:
+        raise HTTPException(400, "Hours must be positive")
+    
+    result = sovereign_economy.record_volunteer_hours(user["id"], hours, activity)
+    
+    # Also store in database
+    await db.volunteer_ledger.insert_one({
+        "user_id": user["id"],
+        "hours": hours,
+        "activity": activity,
+        "credit_value": hours * sovereign_economy.volunteer_credit_value,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+    
+    return result
+
+
+@router.get("/economy/volunteer/balance")
+async def get_volunteer_balance(user=Depends(get_current_user)):
+    """Get volunteer balance and credit for the current user."""
+    from engines.sovereign_economy import sovereign_economy
+    
+    # Get from database
+    cursor = db.volunteer_ledger.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("timestamp", -1)
+    
+    activities = await cursor.to_list(length=100)
+    
+    total_hours = sum(a.get("hours", 0) for a in activities)
+    total_credit = total_hours * sovereign_economy.volunteer_credit_value
+    
+    return {
+        "user_id": user["id"],
+        "total_hours": total_hours,
+        "total_credit": total_credit,
+        "credit_rate": sovereign_economy.volunteer_credit_value,
+        "activity_count": len(activities),
+        "recent_activities": activities[:10],  # Last 10 activities
+    }
+
+
+@router.get("/economy/packages")
+async def get_all_packages():
+    """Get all package pricing with April reduction applied."""
+    from engines.sovereign_economy import sovereign_economy
+    
+    packages = {}
+    for tier in ["NOVICE", "SOVEREIGN", "ENLIGHTENED"]:
+        packages[tier] = sovereign_economy.calculate_package_cost(tier, 0)
+    
+    return {
+        "packages": packages,
+        "volunteer_credit_rate": sovereign_economy.volunteer_credit_value,
+        "april_reduction": f"{sovereign_economy.april_reduction_percent}%",
+        "note": "Apply volunteer hours to reduce package cost",
+    }
