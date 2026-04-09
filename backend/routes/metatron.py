@@ -120,11 +120,66 @@ async def get_node(x: int, y: int):
 async def get_status():
     """Get the status of the Metatron lattice system."""
     return {
+        "engine": "ENLIGHTEN_OS V6.0",
+        "protocol": "S.I.M. (Square, Invert, Multiply)",
+        "architect": "Steven Michael",
         "status": "ACTIVE",
         "grid": "9x9",
         "total_cooperating_nodes": 81,
         "base_frequency": 432,
+        "seed": 9.0,
         "materials": ["Gold", "Silver", "Copper"],
         "shield": "METATRON-FLOWER HYBRID",
-        "resonance_state": "Cooperative Crystalline Bloom"
+        "resonance_state": "Cooperative Crystalline Bloom",
+        "sim_result": {
+            "square": 81,
+            "invert": 0.012346,
+            "multiply": 6561,
+            "resonance": 6723,
+            "net_gain": "+2"
+        }
+    }
+
+
+@router.get("/visual-grid")
+async def get_visual_grid():
+    """
+    Get positioned nodes for the visual engine.
+    Returns 81 nodes with x,y coordinates for rendering.
+    """
+    nodes = []
+    spacing = 100  # px spacing between nodes
+    
+    for x in range(-4, 5):  # -4 to 4 inclusive
+        for y in range(-4, 5):
+            distance = math.sqrt(x**2 + y**2)
+            
+            # Material based on ring position
+            if distance < 1.5:
+                material = "Gold"
+                color = "#D4AF37"
+            elif distance < 3:
+                material = "Silver"
+                color = "#C0C0C0"
+            else:
+                material = "Copper"
+                color = "#B87333"
+            
+            nodes.append({
+                "id": f"node_{x}_{y}",
+                "grid": {"x": x, "y": y},
+                "pos": {"x": x * spacing, "y": y * spacing},
+                "material": material,
+                "color": color,
+                "frequency": 432 * (1 + distance * 0.1),
+                "state": "Crystalline_Bloom"
+            })
+    
+    return {
+        "engine": "ENLIGHTEN_OS V6.0",
+        "grid": "9x9",
+        "total_nodes": len(nodes),
+        "spacing": spacing,
+        "nodes": nodes,
+        "message": "Lattice Bloom: 81 Nodes Active. Net +2 Gain Secured."
     }
