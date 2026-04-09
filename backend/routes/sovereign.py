@@ -397,3 +397,123 @@ async def execute_action(
     
     return result
 
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  SOVEREIGN ECONOMY ROUTES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/economy/rates")
+async def get_economy_rates(tier: str = "NOVICE"):
+    """Get rate breakdown for a specific tier."""
+    from engines.sovereign_economy import sovereign_economy
+    return sovereign_economy.get_rate_breakdown(tier)
+
+
+@router.get("/economy/tiers")
+async def get_all_tiers():
+    """Get all tier information."""
+    from engines.sovereign_economy import sovereign_economy
+    return sovereign_economy.get_all_tiers()
+
+
+@router.post("/economy/session/start")
+async def start_economy_session(
+    data: dict = Body(...),
+    user=Depends(get_current_user)
+):
+    """Start a machine session for billing."""
+    from engines.sovereign_economy import sovereign_economy
+    
+    tier = data.get("tier", "NOVICE")
+    session = sovereign_economy.start_session(user["id"], tier)
+    
+    # Log to database
+    await db.economy_sessions.insert_one({
+        **session,
+        "user_id": user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    
+    return session
+
+
+@router.post("/economy/session/heartbeat")
+async def record_heartbeat(
+    data: dict = Body(...),
+    user=Depends(get_current_user)
+):
+    """Record a heartbeat for an active session."""
+    from engines.sovereign_economy import sovereign_economy
+    
+    session_id = data.get("session_id")
+    machine_time = data.get("machine_time", 0)
+    
+    if not session_id:
+        raise HTTPException(400, "session_id required")
+    
+    result = sovereign_economy.record_heartbeat(session_id, machine_time)
+    
+    if result.get("error"):
+        raise HTTPException(404, result["error"])
+    
+    return result
+
+
+@router.post("/economy/session/end")
+async def end_economy_session(
+    data: dict = Body(...),
+    user=Depends(get_current_user)
+):
+    """End a machine session and calculate final bill."""
+    from engines.sovereign_economy import sovereign_economy
+    
+    session_id = data.get("session_id")
+    final_time = data.get("final_time", 0)
+    
+    if not session_id:
+        raise HTTPException(400, "session_id required")
+    
+    result = sovereign_economy.end_session(session_id, final_time)
+    
+    if result.get("error"):
+        raise HTTPException(404, result["error"])
+    
+    # Update database
+    await db.economy_sessions.update_one(
+        {"session_id": session_id},
+        {"$set": {
+            "ended_at": result.get("ended_at") or datetime.now(timezone.utc).isoformat(),
+            "final_cost": result["final_cost"],
+            "savings": result["savings"],
+            "ledger_signature": result["ledger_signature"],
+            "status": "completed",
+        }}
+    )
+    
+    return result
+
+
+@router.post("/creator/heartbeat")
+async def creator_heartbeat(data: dict = Body(...)):
+    """
+    Creator Console heartbeat - tracks machine usage.
+    Called every 60 seconds during active broadcast.
+    """
+    machine_time = data.get("machine_time", 0)
+    stream_status = data.get("stream_status", "idle")
+    output_type = data.get("output_type", "frequency")
+    
+    # Log heartbeat
+    await db.creator_heartbeats.insert_one({
+        "machine_time": machine_time,
+        "stream_status": stream_status,
+        "output_type": output_type,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+    
+    return {
+        "received": True,
+        "machine_time": machine_time,
+        "status": stream_status,
+    }
