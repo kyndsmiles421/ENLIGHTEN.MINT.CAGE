@@ -3917,3 +3917,103 @@ html body #root .glass-card .flex.items-end {
     visibility: visible !important;
     height: 128px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IRIDESCENT PULSE — Kill Gray Outlines, Add Radiating Glow
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The "Iridescent Pulse" Animation */
+@keyframes irradiate {
+  0% { filter: drop-shadow(0 0 2px var(--module-color, #86efac)) brightness(1); }
+  50% { filter: drop-shadow(0 0 12px var(--module-color, #86efac)) brightness(1.4); }
+  100% { filter: drop-shadow(0 0 2px var(--module-color, #86efac)) brightness(1); }
+}
+
+@keyframes pulse-radiance {
+  0%, 100% { opacity: 0.4; filter: blur(4px); }
+  50% { opacity: 0.9; filter: blur(8px); transform: scale(1.1); }
+}
+
+/* Module Orb — Breathing Radiance */
+.module-orb,
+.orbital-orb,
+.sovereign-orb,
+.nodule-radiance {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05) !important; /* Transparent center */
+  border: none !important; /* Kills the legacy gray outline */
+  outline: none !important;
+  backdrop-filter: blur(8px);
+  transition: transform 0.4s ease, filter 0.3s ease;
+  animation: irradiate 4s infinite ease-in-out;
+}
+
+/* The "Relation" Glow (Pseudo-element) */
+.module-orb::after,
+.orbital-orb::after,
+.nodule-radiance::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 15px 2px var(--module-color, rgba(134, 239, 172, 0.6));
+  opacity: 0.6;
+  animation: pulse-radiance 3s infinite ease-in-out;
+  pointer-events: none;
+}
+
+/* Hover state — Amplified glow */
+.module-orb:hover,
+.orbital-orb:hover,
+.nodule-radiance:hover {
+  cursor: pointer;
+  filter: drop-shadow(0 0 20px var(--module-color, #86efac)) contrast(1.2);
+  transform: scale(1.05);
+}
+
+/* Active/Pressed state */
+.module-orb:active,
+.orbital-orb:active,
+.nodule-radiance:active {
+  transform: scale(0.95);
+  filter: drop-shadow(0 0 25px var(--module-color, #86efac)) brightness(1.5);
+}
+
+/* Specific Module Colors (Map to your nodule types) */
+.module-orb[data-module="archives"] { --module-color: #00ffff; }
+.module-orb[data-module="scorpio"] { --module-color: #ff4444; }
+.module-orb[data-module="mood"] { --module-color: #ff69b4; }
+.module-orb[data-module="soundscape"] { --module-color: #2dd4bf; }
+.module-orb[data-module="journal"] { --module-color: #60a5fa; }
+.module-orb[data-module="games"] { --module-color: #fbbf24; }
+.module-orb[data-module="oracle"] { --module-color: #c084fc; }
+.module-orb[data-module="cosmic-map"] { --module-color: #22c55e; }
+.module-orb[data-module="breathwork"] { --module-color: #06b6d4; }
+.module-orb[data-module="sanctuary"] { --module-color: #00fa9a; }
+.module-orb[data-module="practice"] { --module-color: #00ffff; }
+.module-orb[data-module="divination"] { --module-color: #c084fc; }
+.module-orb[data-module="economy"] { --module-color: gold; }
+
+/* OrbitalHub specific — Kill all gray borders on the hub */
+.orbital-hub-container button,
+.orbital-hub button,
+[class*="orbital"] button {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+/* Ensure the orb glow is visible */
+.orbital-hub-container .orb-glow,
+[class*="orbital"] .orb-glow {
+  opacity: 0.7 !important;
+}
+
+/* Central Core Pulse */
+.orbital-core,
+.hub-core,
+[data-testid="central-orb"] {
+  animation: pulse-radiance 4s infinite ease-in-out;
+  box-shadow: 0 0 30px 5px rgba(248, 250, 252, 0.3);
+}
+

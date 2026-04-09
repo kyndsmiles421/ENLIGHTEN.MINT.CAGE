@@ -562,6 +562,16 @@ export default function AvatarCreator() {
     if (!aiDescription.trim()) { toast.error('Describe your cosmic being first'); return; }
     setGenerating(true);
     setGeneratedAvatar(null);
+    
+    // HARD TIMEOUT GUARD: 30 seconds max — fail gracefully, don't freeze
+    const HARD_TIMEOUT = 30000;
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('TIMEOUT: Manifestation taking too long. The cosmos needs a moment.'));
+      }, HARD_TIMEOUT);
+    });
+    
     try {
       const extras = {};
       if (aiElement) extras.element = aiElement;
@@ -569,11 +579,17 @@ export default function AvatarCreator() {
       if (aiSacredGeometry) extras.sacred_geometry = aiSacredGeometry;
       if (aiAuraColor) extras.aura_color = aiAuraColor;
 
-      const res = await axios.post(`${API}/ai-visuals/generate-avatar`, {
-        description: aiDescription,
-        style: aiStyle,
-        extras,
-      }, { headers: authHeaders, timeout: 150000 });
+      // Race between actual request and timeout
+      const res = await Promise.race([
+        axios.post(`${API}/ai-visuals/generate-avatar`, {
+          description: aiDescription,
+          style: aiStyle,
+          extras,
+        }, { headers: authHeaders, timeout: 30000 }),
+        timeoutPromise
+      ]);
+      
+      clearTimeout(timeoutId);
 
       setGeneratedAvatar(res.data);
       toast.success('Your cosmic avatar has manifested!');
@@ -585,10 +601,16 @@ export default function AvatarCreator() {
       if (avatars.length > 0) setActiveAvatarTimestamp(avatars[0].created_at);
       refreshAvatar();
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Generation failed. The cosmos needs a moment.';
+      clearTimeout(timeoutId);
+      const msg = err.message?.includes('TIMEOUT') 
+        ? err.message 
+        : (err.response?.data?.detail || 'Generation failed. The cosmos needs a moment.');
       toast.error(msg);
+      console.error('[AvatarCreator] Generation error:', err);
+    } finally {
+      // ALWAYS reset generating state — even if everything crashes
+      setGenerating(false);
     }
-    setGenerating(false);
   };
 
   const setActiveAvatar = async (createdAt) => {

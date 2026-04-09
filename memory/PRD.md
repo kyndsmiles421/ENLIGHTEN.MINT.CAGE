@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.99_RESPONSIVE_LOOP | HARDWARE_LOCK | PLAY_STORE_READY
+## Version: 3.00_IRIDESCENT_HUB | UNIFIED_ENTRY | MANIFEST_TIMEOUT
 ## Last Updated: 2026-04-09
 
 ---

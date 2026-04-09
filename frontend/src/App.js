@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 
 // V-ENGINE: ABSOLUTE_CLARITY_NOW - Must be FIRST
 import { purgeNoise } from './engines/NukeTheChaos';
@@ -403,7 +403,7 @@ function AnimatedRoutes() {
         <Route path="/mood" element={<MoodTracker />} />
         <Route path="/journal" element={<Journal />} />
         <Route path="/soundscapes" element={<Soundscapes />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Navigate to="/hub" replace />} />
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/nourishment" element={<Nourishment />} />
         <Route path="/frequencies" element={<Frequencies />} />
