@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.98_RESPONSIVE_STRIKE | SOVEREIGN_ORB
+## Version: 2.99_RESPONSIVE_LOOP | HARDWARE_LOCK | PLAY_STORE_READY
 ## Last Updated: 2026-04-09
 
 ---

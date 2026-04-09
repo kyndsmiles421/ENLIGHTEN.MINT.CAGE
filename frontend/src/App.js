@@ -9,6 +9,7 @@ import './engines/PerformanceManager'; // Battery & TTS Fallback
 import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check, Capacitor Bridge
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
+import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -304,6 +305,14 @@ function CafeApp() {
     
     // 5. MOBILE MANIFEST — Obsidian Guard for Capacitor/Native
     lockObsidianReality();
+    
+    // 6. HARDWARE LOCK — Status Bar, Navigation Bar, Keyboard to #000000
+    initializeHardware().then(({ isNative, platform }) => {
+      console.log(`Ω [PLATFORM]: ${platform}, Native: ${isNative}`);
+      if (isNative) {
+        lockHardwareAesthetic();
+      }
+    });
     
     console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked.");
   }, []);

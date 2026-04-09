@@ -125,7 +125,7 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
         </p>
       </div>
 
-      {/* RADIAL NAVIGATOR — Hyper-Responsive Orbital Navigation */}
+      {/* RADIAL NAVIGATOR — Hyper-Responsive Orbital Navigation with Rotation */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ 
           textAlign: 'center', 
@@ -137,9 +137,10 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
           TAP TO NAVIGATE
         </div>
         <RadialNavigator 
-          radius={90}
-          centerLabel="COSMIC"
-          centerIcon="✧"
+          radius={110}
+          enableRotation={true}
+          rotationSpeed={0.15}
+          showCenter={true}
         />
       </div>
 

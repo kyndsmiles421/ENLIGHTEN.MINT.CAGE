@@ -1,40 +1,52 @@
 /**
- * RADIAL NAVIGATOR — Hyper-Responsive Orbital Navigation
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Fixed radial layout with locked coordinates — always tappable.
- * Uses SovereignOrb for hitbox alignment.
+ * RADIAL NAVIGATOR — Final Responsive Loop
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Slow rotation animation with locked coordinates.
+ * Hitboxes stay exactly where visuals are.
  */
-import React, { useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SovereignOrb, { SovereignOrbField, getRadialPosition, ORB_COLORS } from './SovereignOrb';
+import SovereignOrb from './SovereignOrb';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /**
- * Navigation destinations with icons and colors
+ * Menu items with routes
  */
-const NAV_DESTINATIONS = [
-  { id: 'sanctuary', label: 'SANCTUARY', icon: '🏛️', color: ORB_COLORS.gold, route: '/zen-garden' },
-  { id: 'practice', label: 'PRACTICE', icon: '🧘', color: ORB_COLORS.mint, route: '/breathing' },
-  { id: 'divination', label: 'DIVINATION', icon: '🔮', color: ORB_COLORS.purple, route: '/oracle' },
-  { id: 'economy', label: 'ECONOMY', icon: '💎', color: ORB_COLORS.teal, route: '/economy' },
-  { id: 'dashboard', label: 'DASHBOARD', icon: '📊', color: ORB_COLORS.blue, route: '/dashboard' },
-  { id: 'journal', label: 'JOURNAL', icon: '📝', color: ORB_COLORS.rose, route: '/journal' },
+const MENU_ITEMS = [
+  { label: 'Sanctuary', icon: '🌌', color: '#00fa9a', route: '/zen-garden' },
+  { label: 'Practice', icon: '💎', color: '#00ffff', route: '/breathing' },
+  { label: 'Divination', icon: '🔮', color: '#c084fc', route: '/oracle' },
+  { label: 'Economy', icon: '⚖️', color: 'gold', route: '/economy' },
+  { label: 'Journal', icon: '📜', color: '#ff69b4', route: '/journal' },
+  { label: 'Dashboard', icon: '📊', color: '#60a5fa', route: '/dashboard' },
 ];
 
 const RadialNavigator = ({ 
-  destinations = NAV_DESTINATIONS,
-  radius = 100,
-  centerLabel = 'COSMIC',
-  centerIcon = '✧',
+  items = MENU_ITEMS,
+  radius = 110,
+  enableRotation = true,
+  rotationSpeed = 0.2,
   showCenter = true,
   onNavigate,
 }) => {
   const navigate = useNavigate();
+  const [rotation, setRotation] = useState(0);
 
-  // Handle navigation with ledger sync
-  const handleOrbClick = useCallback(async (destination) => {
-    console.log(`Ω [RADIAL_NAV]: Navigating to ${destination.label}`);
+  // Slow, passive rotation to look "Sovereign" without breaking UI
+  useEffect(() => {
+    if (!enableRotation) return;
+    
+    const timer = setInterval(() => {
+      setRotation(prev => prev + rotationSpeed);
+    }, 30);
+    
+    return () => clearInterval(timer);
+  }, [enableRotation, rotationSpeed]);
+
+  // Handle orb click with ledger sync
+  const handleOrbClick = useCallback(async (item) => {
+    console.log(`Ω Entering ${item.label}...`);
     
     // Ledger sync (fire and forget)
     try {
@@ -42,7 +54,7 @@ const RadialNavigator = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          data: { module: destination.id, action: 'RADIAL_NAV' },
+          data: { module: item.label, action: 'RADIAL_NAV_CLICK' },
           sig: Date.now().toString(16),
         }),
       });
@@ -52,79 +64,81 @@ const RadialNavigator = ({
 
     // Custom callback
     if (onNavigate) {
-      onNavigate(destination);
+      onNavigate(item);
     }
 
     // Navigate
-    navigate(destination.route);
+    navigate(item.route);
   }, [navigate, onNavigate]);
 
   return (
     <div 
-      className="radial-navigator"
+      className="radial-navigator-container"
       data-testid="radial-navigator"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '40px',
+      style={{ 
+        position: 'relative', 
+        width: '300px', 
+        height: '300px', 
+        margin: '0 auto',
         background: '#000000',
       }}
     >
-      <SovereignOrbField 
-        radius={radius}
-        centerContent={showCenter && (
-          <div 
-            className="radial-center"
-            style={{
-              width: '70px',
-              height: '70px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle at 30% 30%, rgba(248, 250, 252, 0.15), rgba(0,0,0,0.8))',
-              border: '1px solid rgba(248, 250, 252, 0.2)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 30px rgba(248, 250, 252, 0.1)',
-            }}
-          >
-            <span style={{ fontSize: '1.5rem' }}>{centerIcon}</span>
-            <span style={{ fontSize: '0.5rem', color: '#F0FFF0', opacity: 0.7 }}>{centerLabel}</span>
-          </div>
-        )}
-      >
-        {destinations.map((dest, index) => {
-          const position = getRadialPosition(index, destinations.length, radius);
-          
-          return (
-            <SovereignOrb
-              key={dest.id}
-              label={dest.label}
-              icon={dest.icon}
-              color={dest.color}
-              position={position}
-              onClick={() => handleOrbClick(dest)}
-              testId={`nav-orb-${dest.id}`}
-              size={60}
-            />
-          );
-        })}
-      </SovereignOrbField>
-    </div>
-  );
-};
+      {/* Center hub */}
+      {showCenter && (
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '60px',
+          height: '60px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 30% 30%, rgba(248, 250, 252, 0.15), rgba(0,0,0,0.8))',
+          border: '1px solid rgba(248, 250, 252, 0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 0 30px rgba(248, 250, 252, 0.1)',
+          zIndex: 50,
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>✧</span>
+        </div>
+      )}
 
-/**
- * Compact version for embedding
- */
-export const RadialNavigatorCompact = ({ destinations = NAV_DESTINATIONS.slice(0, 4) }) => {
-  return (
-    <RadialNavigator 
-      destinations={destinations}
-      radius={70}
-      showCenter={false}
-    />
+      {/* Orbs */}
+      {items.map((item, i) => {
+        // Calculate position based on rotation
+        const angle = (i * (360 / items.length) + rotation - 90) * (Math.PI / 180);
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+
+        return (
+          <SovereignOrb 
+            key={item.label}
+            label={item.label}
+            icon={item.icon}
+            color={item.color}
+            x={x} 
+            y={y}
+            testId={`orb-${item.label.toLowerCase()}`}
+            onClick={() => handleOrbClick(item)}
+          />
+        );
+      })}
+
+      {/* Orbit ring (visual only) */}
+      <div style={{
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: `${radius * 2}px`,
+        height: `${radius * 2}px`,
+        borderRadius: '50%',
+        border: '1px solid rgba(248, 250, 252, 0.05)',
+        pointerEvents: 'none',
+      }} />
+    </div>
   );
 };
 
