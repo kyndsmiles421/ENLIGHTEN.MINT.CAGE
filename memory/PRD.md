@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.97_SUSTAINABILITY_ENGINE_V1.3 | CAFE_FUND_FLOOR
+## Version: 2.98_RESPONSIVE_STRIKE | SOVEREIGN_ORB
 ## Last Updated: 2026-04-09
 
 ---

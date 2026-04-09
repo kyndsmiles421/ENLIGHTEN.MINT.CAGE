@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { applySovereignReality, SovereignEconomy, executeEmergencyStop } from '../engines/SovereignCore';
 import InstantAccess from './InstantAccess';
+import RadialNavigator from './RadialNavigator';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -124,80 +125,23 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
         </p>
       </div>
 
-      <nav 
-        className="explore-practice-list" 
-        style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}
-        data-testid="sovereign-nav"
-      >
-        <button 
-          className="secure-pill-button" 
-          onClick={() => handleSync('Sanctuary')}
-          data-testid="nav-sanctuary"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '1px solid rgba(134, 239, 172, 0.3)',
-            borderRadius: '16px',
-            padding: '16px 24px',
-            color: '#86efac',
-            fontWeight: '600',
-            fontSize: '14px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}>
-          进入 SANCTUARY
-        </button>
-        <button 
-          className="secure-pill-button" 
-          onClick={() => handleSync('Practice')}
-          data-testid="nav-practice"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '1px solid rgba(134, 239, 172, 0.3)',
-            borderRadius: '16px',
-            padding: '16px 24px',
-            color: '#86efac',
-            fontWeight: '600',
-            fontSize: '14px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}>
-          EXPLORE PRACTICE
-        </button>
-        <button 
-          className="secure-pill-button" 
-          onClick={() => handleSync('Divination')}
-          data-testid="nav-divination"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '1px solid rgba(134, 239, 172, 0.3)',
-            borderRadius: '16px',
-            padding: '16px 24px',
-            color: '#86efac',
-            fontWeight: '600',
-            fontSize: '14px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}>
-          ENTER DIVINATION
-        </button>
-        <button 
-          className="secure-pill-button" 
-          onClick={() => handleSync('Economy')}
-          data-testid="nav-economy"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '1px solid rgba(252, 211, 77, 0.3)',
-            borderRadius: '16px',
-            padding: '16px 24px',
-            color: '#fcd34d',
-            fontWeight: '600',
-            fontSize: '14px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}>
-          VOLUNTEER ECONOMY
-        </button>
-      </nav>
+      {/* RADIAL NAVIGATOR — Hyper-Responsive Orbital Navigation */}
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ 
+          textAlign: 'center', 
+          fontSize: '11px', 
+          color: 'rgba(248, 250, 252, 0.4)', 
+          marginBottom: '8px',
+          letterSpacing: '0.1em',
+        }}>
+          TAP TO NAVIGATE
+        </div>
+        <RadialNavigator 
+          radius={90}
+          centerLabel="COSMIC"
+          centerIcon="✧"
+        />
+      </div>
 
       {/* INSTANT ACCESS — Auto-Verify Volunteer Hours */}
       <InstantAccess 
