@@ -11,12 +11,18 @@
 
 /* Target the main wrapper/container that holds all content */
 .main-wrapper {
-  /* Primary fix: Push content down 60px to separate from floating STOP button */
-  padding-top: 60px;
+  /* Primary fix: Push content down for floating STOP button */
+  padding-top: 80px !important;
+  
+  /* Kill the template gray — Pure Obsidian */
+  background: #000 !important;
   
   /* Breathing room from edges */
   padding-left: 20px;
   padding-right: 20px;
+  
+  /* Sovereign Mint border accent */
+  border-top: 1px solid var(--mint-glow, rgba(0, 255, 195, 0.4));
 }
 
 /* Fix the STOP button positioning */
@@ -281,6 +287,107 @@ body {
 button:active:not(:disabled) {
   opacity: 0.85;
   transform: scale(0.98);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SMASHING THE "BOX" — Platform Template Override
+   Makes the Classes/Dashboard buttons actually POP
+   ═══════════════════════════════════════════════════════════════ */
+
+/* All Classes button from Screenshot 2536 */
+.all-classes-btn,
+.classes-tab-btn,
+[data-testid*="classes-tab"] {
+  border: 1px solid gold !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  transition: all 0.3s ease;
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.all-classes-btn:hover,
+.classes-tab-btn:hover,
+[data-testid*="classes-tab"]:hover {
+  background: gold !important;
+  color: black !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+}
+
+/* Sovereign Navigation Buttons — The REAL links */
+.sovereign-nav-btn {
+  background: rgba(134, 239, 172, 0.08) !important;
+  border: 1px solid rgba(134, 239, 172, 0.3) !important;
+  color: #86efac !important;
+  border-radius: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sovereign-nav-btn:hover {
+  background: rgba(134, 239, 172, 0.15) !important;
+  border-color: rgba(134, 239, 172, 0.5) !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(134, 239, 172, 0.2);
+}
+
+.sovereign-nav-btn:active {
+  transform: translateY(1px) scale(0.98);
+  background: var(--mint-accent) !important;
+}
+
+/* Disruption Banner — The 20% Savings Display */
+.disruption-banner {
+  animation: banner-glow 3s ease-in-out infinite;
+}
+
+@keyframes banner-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(134, 239, 172, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(134, 239, 172, 0.25), 0 0 60px rgba(252, 211, 77, 0.1);
+  }
+}
+
+/* Stat Pills — Economy Stats */
+.stat-pill {
+  transition: all 0.3s ease;
+}
+
+.stat-pill:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Green Text for positive status */
+.green-text {
+  color: #2dd4bf !important;
+  text-shadow: 0 0 10px rgba(45, 212, 191, 0.3);
+}
+
+/* Kill template backgrounds in Cards */
+.glass-card,
+.card-enlighten,
+.stat-card {
+  background: rgba(10, 10, 15, 0.95) !important;
+}
+
+/* Enroll buttons in Classes page */
+[data-testid="enroll-btn"],
+.enroll-btn {
+  background: linear-gradient(135deg, rgba(134, 239, 172, 0.2) 0%, rgba(252, 211, 77, 0.15) 100%) !important;
+  border: 1px solid rgba(134, 239, 172, 0.4) !important;
+  color: #86efac !important;
+  font-weight: 600;
+}
+
+[data-testid="enroll-btn"]:hover,
+.enroll-btn:hover {
+  background: linear-gradient(135deg, rgba(134, 239, 172, 0.3) 0%, rgba(252, 211, 77, 0.25) 100%) !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(134, 239, 172, 0.3);
 }
 
 /* Creator Card Green Theme */

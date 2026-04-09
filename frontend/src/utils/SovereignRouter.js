@@ -15,12 +15,12 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
  */
 const ACCESS_MAP = {
   'Sanctuary': ['SOVEREIGN', 'ENLIGHTENED'],
-  'Practice': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED'],
+  'Practice': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED', 'FREE', 'free', 'discovery'],
   'Divination': ['ENLIGHTENED'],
-  'Dashboard': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED'],
-  'Today': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED'],
-  'Explore': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED'],
-  'Economy': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED'],
+  'Dashboard': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED', 'FREE', 'free', 'discovery'],
+  'Today': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED', 'FREE', 'free', 'discovery'],
+  'Explore': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED', 'FREE', 'free', 'discovery'],
+  'Economy': ['BASIC', 'SOVEREIGN', 'ENLIGHTENED', 'FREE', 'free', 'discovery'],
 };
 
 /**

@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.93_SOVEREIGN_ROUTER | EMERGENCY_STOP
+## Version: 2.94_ECONOMY_INJECTION | RECIPROCITY_GATE
 ## Last Updated: 2026-04-09
 
 ---
@@ -215,6 +215,32 @@ for (let i = 0; i < 600; i++) {
     - `.journey-btn:active` - Mint accent feedback
     - `.secure-pill-button:active` - Scale + glow
     - `.explore-practice-list` - Link spacing fix
+- [x] **SovereignDashboard Economy Injection** ✅ (2026-04-09)
+  - Created `/app/frontend/src/components/SovereignDashboard.js`
+    - 20% Below Market Banner ("$40.00/hr vs $50.00 Market Rate")
+    - Volunteer Balance display with credit value calculation
+    - Tier Status display
+    - Total Savings calculation
+    - Wired navigation buttons: 进入 SANCTUARY, EXPLORE PRACTICE, ENTER DIVINATION, VOLUNTEER ECONOMY
+  - Injected into `/app/frontend/src/pages/Dashboard.js`
+- [x] **Reciprocity Gate Backend** ✅ (2026-04-09)
+  - Created `/app/backend/engines/reciprocity_gate.py`
+    - `check_access_credits()` - Volunteer hours → Access bypass
+    - `record_volunteer_hours()` - Log volunteer activity
+    - `calculate_sovereign_price()` - 20% discount + volunteer credit math
+    - `get_tier_access_map()` - Tier requirements lookup
+  - Added API endpoints:
+    - `POST /api/sovereign/economy/volunteer/check` - Check bypass eligibility
+    - `POST /api/sovereign/economy/volunteer/record` - Record volunteer hours
+    - `GET /api/sovereign/economy/volunteer/balance` - Get volunteer balance
+    - `GET /api/sovereign/economy/rates` - Get economy rates
+- [x] **Platform Box CSS Override** ✅ (2026-04-09)
+  - `.main-wrapper` - Black background, mint border, 80px top padding
+  - `.all-classes-btn` - Gold border + hover effects
+  - `.sovereign-nav-btn` - Mint glow buttons with hover animations
+  - `.disruption-banner` - Animated glow effect
+  - `.stat-pill` - Hover elevation effect
+  - Removed template gray backgrounds
 
 ---
 

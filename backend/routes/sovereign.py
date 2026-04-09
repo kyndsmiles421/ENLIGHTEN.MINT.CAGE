@@ -4,7 +4,7 @@ ENLIGHTEN.MINT.CAFE — Sovereign Ledger & Communication Routes
 Ledger sync for transaction integrity, SMS/Email routing with sanitization.
 Uses production SovereignEngine for Twilio & SendGrid integration.
 """
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, Header
 from pydantic import BaseModel
 from deps import db, get_current_user, logger
 from engines.crystal_seal import sanitize_input, EconomyCommon
@@ -391,6 +391,145 @@ async def get_stop_status():
     """Get emergency controller status."""
     from engines.emergency_logic import get_emergency_status
     return get_emergency_status()
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  RECIPROCITY GATE — Volunteer-to-Access Bridge
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post("/economy/volunteer/check")
+async def check_volunteer_access(data: dict = Body(...)):
+    """
+    Check if user has enough volunteer credits to bypass payment.
+    
+    This is THE BYPASS — the platform can't charge them if they've done the work.
+    
+    Body:
+        user_id: User's unique identifier
+        required_credits: Dollar amount required for access
+    """
+    from engines.reciprocity_gate import check_access_credits
+    
+    user_id = data.get("user_id")
+    required_credits = data.get("required_credits", 0)
+    
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+    
+    result = check_access_credits(user_id, required_credits)
+    
+    # Log to ledger
+    try:
+        await db.sovereign_ledger.insert_one({
+            "id": secure_hash_short(f"access_check:{user_id}:{datetime.now(timezone.utc).isoformat()}"),
+            "type": "ACCESS_CHECK",
+            "user_id": user_id,
+            "access": result.get("access"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.error(f"[ReciprocityGate] Ledger write failed: {e}")
+    
+    return result
+
+
+@router.post("/economy/volunteer/record")
+async def record_volunteer_activity(data: dict = Body(...)):
+    """
+    Record volunteer hours for a user.
+    
+    Body:
+        user_id: User's unique identifier
+        hours: Number of volunteer hours
+        activity: Description of volunteer activity
+    """
+    from engines.reciprocity_gate import record_volunteer_hours
+    
+    user_id = data.get("user_id")
+    hours = data.get("hours", 0)
+    activity = data.get("activity", "")
+    
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+    if hours <= 0:
+        raise HTTPException(status_code=400, detail="hours must be positive")
+    
+    result = record_volunteer_hours(user_id, hours, activity)
+    
+    # Also record to MongoDB for persistence
+    try:
+        await db.volunteer_ledger.insert_one({
+            "id": result.get("ledger_signature"),
+            "user_id": user_id,
+            "hours": hours,
+            "activity": activity,
+            "credit_value": hours * 25.00,  # $25/hr
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.error(f"[ReciprocityGate] Volunteer record failed: {e}")
+    
+    return result
+
+
+@router.get("/economy/volunteer/balance")
+async def get_volunteer_balance(user_id: str = None, authorization: str = Header(None)):
+    """
+    Get volunteer balance for a user.
+    """
+    # Try to get user_id from auth token if not provided
+    if not user_id and authorization:
+        try:
+            token = authorization.replace("Bearer ", "")
+            # Decode token to get user_id (simplified)
+            import jwt
+            payload = jwt.decode(token, options={"verify_signature": False})
+            user_id = payload.get("user_id") or payload.get("sub")
+        except Exception:
+            pass
+    
+    if not user_id:
+        return {"total_hours": 0, "total_credit": 0, "message": "No user identified"}
+    
+    # Query MongoDB for total hours
+    try:
+        pipeline = [
+            {"$match": {"user_id": user_id}},
+            {"$group": {"_id": None, "total_hours": {"$sum": "$hours"}, "total_credit": {"$sum": "$credit_value"}}},
+        ]
+        result = await db.volunteer_ledger.aggregate(pipeline).to_list(1)
+        
+        if result:
+            return {
+                "user_id": user_id,
+                "total_hours": result[0].get("total_hours", 0),
+                "total_credit": result[0].get("total_credit", 0),
+            }
+    except Exception as e:
+        logger.error(f"[ReciprocityGate] Balance query failed: {e}")
+    
+    return {"user_id": user_id, "total_hours": 0, "total_credit": 0}
+
+
+@router.get("/economy/rates")
+async def get_economy_rates(tier: str = "BASIC"):
+    """
+    Get economy rates including 20% below market pricing.
+    """
+    from engines.reciprocity_gate import get_tier_access_map, calculate_sovereign_price
+    
+    tier_map = get_tier_access_map()
+    tier_info = tier_map.get(tier.upper(), tier_map.get("BASIC"))
+    
+    return {
+        "tier": tier.upper(),
+        "market_rate": 50.00,
+        "sovereign_rate": 40.00,  # 20% below market
+        "discount": "20%",
+        "volunteer_value_per_hour": 25.00,
+        "tier_info": tier_info,
+        "pricing_breakdown": calculate_sovereign_price(50.00, 0),
+    }
 
 
 @router.get("/status")
