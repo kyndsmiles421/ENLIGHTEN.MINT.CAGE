@@ -10,7 +10,8 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V10.0 - THE STEVEN MICHAEL ABSOLUTE
+import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V21.0 - THE OMNI-NEURAL MANIFEST
+import './styles/UniverseMaterials.css'; // Universe Materials - Obsidian, Selenite Sensors, Gold Rutilation
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)
@@ -322,7 +323,7 @@ function CafeApp() {
     // Single source of truth: Φ (1.618), 7.83Hz (Earth), 432Hz/528Hz/963Hz Tiers
     ENLIGHTEN_OS.ignite();
     
-    console.log("🌌 ENLIGHTEN_OS V10.0: Steven Michael Absolute initialized.");
+    console.log("ENLIGHTEN_OS V17.0: THE MASTER CRYSTAL HUB initialized. Steven Michael | kyndsmiles@gmail.com");
     
     // Cleanup on unmount
     return () => {

@@ -1,0 +1,148 @@
+/**
+ * ENLIGHTEN_OS V21.0 - UNIVERSE MATERIALS
+ * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
+ * MATERIALS: Obsidian, Selenite End-Points, Gold Rutilation
+ */
+
+:root {
+  --phi: 1.61803398875;
+  --gold-rutilation: #D4AF37;
+  --selenite-white: rgba(230, 240, 255, 0.95);
+  --obsidian-depth: rgba(5, 5, 5, 0.99);
+  --obsidian-core: #000000;
+  --neural-glow: rgba(212, 175, 55, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OBSIDIAN SOVEREIGN SHIELD - Z-1500
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sovereign-toolbar {
+  position: fixed;
+  width: 100%;
+  z-index: 1500;
+  backdrop-filter: blur(50px) saturate(var(--phi));
+  -webkit-backdrop-filter: blur(50px) saturate(var(--phi));
+  border: 1px solid var(--gold-rutilation);
+  box-shadow: 0 0 80px var(--obsidian-core), inset 0 0 30px rgba(212, 175, 55, 0.05);
+  background: var(--obsidian-depth);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELENITE END-POINT SENSORS (The Nerves)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.selenite-sensor {
+  position: absolute;
+  width: 3px;
+  height: 35%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--selenite-white) 15%,
+    rgba(255, 255, 255, 1) 50%,
+    var(--selenite-white) 85%,
+    transparent 100%
+  );
+  box-shadow: 
+    0 0 8px var(--selenite-white),
+    0 0 20px rgba(230, 240, 255, 0.6),
+    0 0 40px rgba(230, 240, 255, 0.3);
+  opacity: 0.7;
+  z-index: 8;
+  pointer-events: none;
+  animation: sensorPulse 4s ease-in-out infinite;
+}
+
+.selenite-sensor.top-left { top: 0; left: 4%; }
+.selenite-sensor.top-right { top: 0; right: 4%; }
+.selenite-sensor.bottom-left { bottom: 0; left: 4%; }
+.selenite-sensor.bottom-right { bottom: 0; right: 4%; }
+
+@keyframes sensorPulse {
+  0%, 100% { 
+    opacity: 0.5;
+    box-shadow: 0 0 8px var(--selenite-white);
+  }
+  50% { 
+    opacity: 0.85;
+    box-shadow: 
+      0 0 15px var(--selenite-white),
+      0 0 35px rgba(230, 240, 255, 0.5),
+      0 0 60px rgba(212, 175, 55, 0.2);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GOLD RUTILATION THREADS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.gold-thread {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle,
+    transparent 30%,
+    rgba(212, 175, 55, 0.05) 50%,
+    rgba(212, 175, 55, 0.15) 70%,
+    rgba(168, 85, 247, 0.1) 100%
+  );
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.08);
+  transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.gold-bloom-container,
+.rainbow-crystal-container {
+  transform-style: preserve-3d;
+}
+
+.rainbow-layer {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEURAL PULSE - Schumann Resonance (7.83Hz)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes neuralPulse {
+  0%, 100% { 
+    filter: brightness(1) saturate(1); 
+  }
+  50% { 
+    filter: brightness(1.03) saturate(1.02); 
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOVEREIGN BLOOM ANIMATION
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes sovereignBloom {
+  0% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.4) saturate(1.6); }
+  100% { filter: brightness(1) saturate(1); }
+}
+
+body.sovereign-bloom {
+  animation: sovereignBloom 1s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OBSIDIAN VOID DEPTH
+   ═══════════════════════════════════════════════════════════════════════════ */
+#app-stage {
+  background: var(--obsidian-core) !important;
+}
+
+body {
+  background: var(--obsidian-core) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GOLDEN RATIO SCALING
+   ═══════════════════════════════════════════════════════════════════════════ */
+.phi-scale-up {
+  transform: scale(var(--phi));
+}
+
+.phi-scale-down {
+  transform: scale(calc(1 / var(--phi)));
+}

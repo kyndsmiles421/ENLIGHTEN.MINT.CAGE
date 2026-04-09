@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 13.0_MATHEMATICAL_CRYSTAL | FIBONACCI_REFRACTION | 54_SUBLAYERS
+## Version: 21.0_OMNI_NEURAL_MANIFEST | GOLD_RUTILATION | SELENITE_SENSORS
 ## Last Updated: 2026-04-09
 
 ---
@@ -9,15 +9,33 @@
 Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE"), a highly immersive full-stack wellness platform blending standard wellness tracking with deep mystical/divination systems, personalized AI guidance, and a "Sentient Ecosystem".
 
 ## Core Identity
-- **Architect:** Steven Michael
+- **Architect:** Steven Michael (V-Spelling Identity Lock)
 - **Terminal:** kyndsmiles@gmail.com
-- **Engine:** ENLIGHTEN_OS V13.0 - MATHEMATICAL CRYSTAL INTEGRATION
-- **Physics:** Φ (1.618), 7.83Hz (Earth Resonance), Fibonacci Refraction
+- **Engine:** ENLIGHTEN_OS V21.0 - THE OMNI-NEURAL MANIFEST
+- **Physics:** Φ (1.618), 7.83Hz (Schumann Resonance), Squared & Inverse Ratio Refraction
+- **Materials:** Obsidian (Z-1500), Selenite End-Point Sensors, Gold Rutilation (#D4AF37)
 - **Tiers:** 
   - VAULT (432Hz, Φ⁻¹=0.618, Pythagorean/Past)
   - HUB (528Hz, 1.0, Solfeggio/Present)
   - MANIFEST (963Hz, Φ=1.618, Sigfield/Future)
-- **Math Crystal:** calculateRefraction(), 54-Sublayer Fractal Bloom
+- **Math:** Squared Ratio `(ratio², 2) * PHI`, Inverse Ratio Refraction `(val² * PHI) - (1/val)`
+
+---
+
+## V21.0 Implementation (Current)
+
+### ENLIGHTEN_OS V21.0 Components
+1. **Obsidian Sovereign Shield** - Z-1500 fixed toolbars with Gold (#D4AF37) borders
+2. **Selenite End-Point Sensors** - 3px focused vertical beams at corners (NOT blocks)
+3. **Gold Rutilation Threads** - 54-layer radial gradient bloom with Fibonacci mathematics
+4. **Neural Pulse Animation** - 7.83Hz (1/SCHUMANN) body animation
+5. **Steven's Mixer V21.0** - Gold-themed tier controls with NOVA/BLOOM/GOLD/RAINBOW/HANDSHAKE
+
+### Handshake API (Live Communication)
+- **Endpoint:** `POST /api/sovereign/handshake/send`
+- **Payload:** `{ architect, terminal, frequency, type, content, timestamp }`
+- **Status:** Backend route created, ready for Twilio/SendGrid integration
+- **Current:** Logs dimensional messages with SHA-256 signature
 
 ---
 

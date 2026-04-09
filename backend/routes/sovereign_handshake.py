@@ -11,7 +11,7 @@ from datetime import datetime
 import os
 import hashlib
 
-router = APIRouter(prefix="/api/sovereign", tags=["sovereign"])
+router = APIRouter(prefix="/sovereign/handshake", tags=["sovereign-handshake"])
 
 # ═══════════════════════════════════════════════════════════════════════════
 # DATA MODELS
@@ -52,7 +52,7 @@ def generate_signature(data: dict) -> str:
 # HANDSHAKE ENDPOINT
 # ═══════════════════════════════════════════════════════════════════════════
 
-@router.post("/handshake", response_model=HandshakeResponse)
+@router.post("/send", response_model=HandshakeResponse)
 async def sovereign_handshake(request: HandshakeRequest):
     """
     Process a Sovereign Handshake request.
