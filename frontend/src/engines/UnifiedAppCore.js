@@ -113,37 +113,48 @@ export const lockObsidianReality = () => {
 };
 
 // ============================================================
-// 2. SOVEREIGN ECONOMY & AUTO-VERIFIER (THE DETACHED ENGINE)
+// 2. SOVEREIGN ECONOMY & AUTO-VERIFIER (SUSTAINABILITY ENGINE V1.3)
 // ============================================================
 export const SovereignEngine = {
   rates: { 
-    market: 50.00, 
-    discount: 0.80,  // 20% below market
-    volValue: 25.00  // $25 per volunteer hour
+    marketRate: 50.00,        // Standard Industry Price
+    sovereignDiscount: 0.80,  // Your 20% "Early Adopter" Savings
+    volunteerValue: 15.00,    // ADJUSTED RECIPROCITY: Fair exchange for time
+    cafeFundFloor: 5.00       // Minimum contribution to cover operational costs
   },
 
-  // Calculate rate with volunteer credits
+  // Calculate rate with volunteer credits + CAFE FUND PROTECTOR
   calculate: (userHours) => {
-    const baseRate = SovereignEngine.rates.market * SovereignEngine.rates.discount;
-    const credits = userHours * SovereignEngine.rates.volValue;
-    const finalPrice = Math.max(0, baseRate - credits);
+    const discountedBase = SovereignEngine.rates.marketRate * SovereignEngine.rates.sovereignDiscount; // $40.00
+    const credits = userHours * SovereignEngine.rates.volunteerValue;
+    
+    // THE FUND PROTECTOR: 
+    // Ensures the user always contributes at least $5.00 to the "Cafe Fund" 
+    // to cover operational costs regardless of volunteer time.
+    const calculatedDue = discountedBase - credits;
+    const finalDue = Math.max(SovereignEngine.rates.cafeFundFloor, calculatedDue);
     
     return {
-      marketRate: SovereignEngine.rates.market.toFixed(2),
-      sovereignRate: baseRate.toFixed(2),
+      marketRate: SovereignEngine.rates.marketRate.toFixed(2),
+      sovereignRate: discountedBase.toFixed(2),
       volunteerCredits: credits.toFixed(2),
-      finalPrice: finalPrice.toFixed(2),
-      isGratis: finalPrice === 0,
-      status: finalPrice === 0 ? 'GRATIS / SOVEREIGN' : 'DISCOUNTED'
+      finalPrice: finalDue.toFixed(2),
+      cafeFundFloor: SovereignEngine.rates.cafeFundFloor.toFixed(2),
+      isFunded: calculatedDue <= SovereignEngine.rates.cafeFundFloor,
+      isGratis: false, // Never fully free - always $5 minimum
+      status: calculatedDue <= SovereignEngine.rates.cafeFundFloor ? 'CAFE FUND SUPPORTER' : 'DISCOUNTED'
     };
   },
 
   // Automates verification so you don't have to do it personally
   autoVerify: (userHours, activityType) => {
     const isApproved = (userHours <= 4); // Auto-approve up to 4 hours
-    const baseRate = SovereignEngine.rates.market * SovereignEngine.rates.discount;
-    const credits = userHours * SovereignEngine.rates.volValue;
-    const finalPrice = Math.max(0, baseRate - credits);
+    const discountedBase = SovereignEngine.rates.marketRate * SovereignEngine.rates.sovereignDiscount;
+    const credits = userHours * SovereignEngine.rates.volunteerValue;
+    
+    // CAFE FUND FLOOR
+    const calculatedDue = discountedBase - credits;
+    const finalPrice = Math.max(SovereignEngine.rates.cafeFundFloor, calculatedDue);
     
     // Generate Crystal Seal signature
     const timestamp = Date.now();
@@ -156,10 +167,12 @@ export const SovereignEngine = {
       activityType: activityType,
       credits: credits.toFixed(2),
       finalPrice: finalPrice.toFixed(2),
+      cafeFundContribution: SovereignEngine.rates.cafeFundFloor.toFixed(2),
+      isFunded: calculatedDue <= SovereignEngine.rates.cafeFundFloor,
       signature: signature,
       timestamp: new Date(timestamp).toISOString(),
       message: isApproved 
-        ? 'Reciprocity verified. Credits applied to your account.'
+        ? `Reciprocity verified. ${userHours} hours credited. Cafe Fund contribution: $${finalPrice.toFixed(2)}`
         : 'Submission pending manual review (exceeds auto-approve limit).'
     };
   }

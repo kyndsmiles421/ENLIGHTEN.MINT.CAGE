@@ -25,8 +25,10 @@ class SovereignAutoPilot:
     """
     Automated verification of Volunteer Hours and Tier Access.
     
-    The Auto-Gate that ensures 99% of standard interactions are handled
-    without requiring the Creator's personal intervention.
+    SUSTAINABILITY ENGINE V1.3:
+    - $15.00 per volunteer hour (adjusted reciprocity)
+    - $5.00 Cafe Fund Floor (minimum contribution)
+    - Auto-approve up to 4 hours for valid activities
     """
     
     # Valid activity types that can be auto-approved
@@ -44,8 +46,11 @@ class SovereignAutoPilot:
     # Maximum hours that can be auto-approved without manual review
     AUTO_APPROVE_LIMIT = 4.0
     
-    # Credit value per volunteer hour
-    CREDIT_VALUE = 25.00
+    # SUSTAINABILITY V1.3: Adjusted credit value
+    CREDIT_VALUE = 15.00  # $15 per volunteer hour
+    
+    # CAFE FUND FLOOR: Minimum contribution
+    CAFE_FUND_FLOOR = 5.00
     
     def __init__(self):
         self.verification_log = []

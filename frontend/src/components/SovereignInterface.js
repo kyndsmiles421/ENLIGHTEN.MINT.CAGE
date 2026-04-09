@@ -106,14 +106,22 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
         borderRadius: '12px',
       }}>
         <h3 style={{ 
-          color: econ.status === 'GRATIS / SOVEREIGN' ? '#86efac' : '#fcd34d',
+          color: econ.isFunded ? '#86efac' : '#fcd34d',
           margin: '0 0 8px 0',
         }}>
           STATUS: {econ.status}
         </h3>
-        {parseFloat(econ.due) > 0 && (
-          <p style={{ color: '#F0FFF0', margin: 0 }}>Balance Due: ${econ.due}</p>
-        )}
+        <p style={{ color: '#F0FFF0', margin: 0 }}>
+          Balance Due: ${econ.due}
+          {econ.isFunded && (
+            <span style={{ color: '#86efac', marginLeft: '8px', fontSize: '12px' }}>
+              (Cafe Fund Supporter)
+            </span>
+          )}
+        </p>
+        <p style={{ color: 'rgba(248, 250, 252, 0.5)', margin: '4px 0 0 0', fontSize: '11px' }}>
+          Minimum Cafe Fund Contribution: ${econ.cafeFundFloor || '5.00'}
+        </p>
       </div>
 
       <nav 

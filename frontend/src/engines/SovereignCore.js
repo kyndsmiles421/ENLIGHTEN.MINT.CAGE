@@ -112,23 +112,31 @@ export const applySovereignReality = (frequency = 174) => {
 };
 
 // ==========================================
-// 2. ECONOMY & VOLUNTEER NODULE
+// 2. ECONOMY & VOLUNTEER NODULE (SUSTAINABILITY ENGINE V1.3)
 // ==========================================
 export const SovereignEconomy = {
-  marketRate: 50.00,
-  discount: 0.80, // 20% Below Market
-  volunteerValue: 25.00, // $25 credit per hour
+  marketRate: 50.00,          // Standard Industry Price
+  sovereignDiscount: 0.80,    // Your 20% "Early Adopter" Savings
+  volunteerValue: 15.00,      // ADJUSTED RECIPROCITY: Fair exchange for time
+  cafeFundFloor: 5.00,        // Minimum contribution to cover operational costs
 
   calculateAccess: (userHours) => {
-    const myRate = SovereignEconomy.marketRate * SovereignEconomy.discount;
+    const discountedBase = SovereignEconomy.marketRate * SovereignEconomy.sovereignDiscount; // $40.00
     const credits = userHours * SovereignEconomy.volunteerValue;
-    const finalCost = Math.max(0, myRate - credits);
+    
+    // THE FUND PROTECTOR: 
+    // Ensures the user always contributes at least $5.00 to the "Cafe Fund" 
+    // to cover operational costs regardless of volunteer time.
+    const calculatedDue = discountedBase - credits;
+    const finalDue = Math.max(SovereignEconomy.cafeFundFloor, calculatedDue);
     
     return {
-      rate: myRate.toFixed(2),
+      rate: discountedBase.toFixed(2),
       credits: credits.toFixed(2),
-      due: finalCost.toFixed(2),
-      status: finalCost === 0 ? "GRATIS / SOVEREIGN" : "DISCOUNTED"
+      due: finalDue.toFixed(2),
+      cafeFundFloor: SovereignEconomy.cafeFundFloor.toFixed(2),
+      isFunded: calculatedDue <= SovereignEconomy.cafeFundFloor,
+      status: calculatedDue <= SovereignEconomy.cafeFundFloor ? "CAFE FUND SUPPORTER" : "DISCOUNTED"
     };
   }
 };

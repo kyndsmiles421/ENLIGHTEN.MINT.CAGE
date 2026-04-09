@@ -200,7 +200,7 @@ const InstantAccess = ({ onAccessGranted, onTierUnlock }) => {
           fontSize: '11px', 
           color: 'rgba(252, 211, 77, 0.8)',
         }}>
-          Credit Value: ${(hours * 25).toFixed(2)} (@ $25/hr)
+          Credit Value: ${(hours * 15).toFixed(2)} (@ $15/hr) | Min: $5.00 Cafe Fund
         </div>
       </div>
 

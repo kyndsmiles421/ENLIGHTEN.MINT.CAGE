@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.96_SOVEREIGN_AUTOPILOT | UNIFIED_MOBILE_MANIFEST
+## Version: 2.97_SUSTAINABILITY_ENGINE_V1.3 | CAFE_FUND_FLOOR
 ## Last Updated: 2026-04-09
 
 ---
