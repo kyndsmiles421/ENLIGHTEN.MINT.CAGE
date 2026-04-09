@@ -4017,3 +4017,55 @@ html body #root .glass-card .flex.items-end {
   box-shadow: 0 0 30px 5px rgba(248, 250, 252, 0.3);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BREATHING SAFE ZONE — Prevent Floating Button Overlap
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Push breathing controls above floating action buttons */
+.breathing-interface-container,
+[data-testid*="breathing"],
+.breathwork-container {
+  padding-bottom: 100px !important; /* Force-lifts controls above floating UI */
+  position: relative;
+  z-index: 40;
+}
+
+/* Ensure breathing controls take priority */
+.breathing-controls,
+[data-testid="breathing-toggle-btn"],
+[data-testid="breathing-pattern-select"],
+.btn-glass {
+  position: relative !important;
+  z-index: 999 !important; /* Ensures 'Pause'/'Begin' take priority over floating UI */
+}
+
+/* The floating command button — move it higher on breathing page */
+body:has([data-testid*="breathing"]) [data-testid="command-mode-trigger"],
+body:has(.breathwork-container) [data-testid="command-mode-trigger"] {
+  bottom: 100px !important;
+}
+
+/* Alternative: hide command trigger on immersive pages */
+.immersive-page [data-testid="command-mode-trigger"],
+.breathing-page [data-testid="command-mode-trigger"],
+.meditation-page [data-testid="command-mode-trigger"] {
+  display: none !important;
+}
+
+/* Give ALL breathing interface elements clear hitboxes */
+.breathing-interface-container button,
+.breathwork-container button {
+  min-height: 48px !important;
+  min-width: 48px !important;
+  touch-action: manipulation;
+}
+
+
+/* Hide command trigger on immersive practice pages */
+.breathing-page .command-mode-trigger-btn,
+.meditation-page .command-mode-trigger-btn,
+.immersive-page .command-mode-trigger-btn {
+  display: none !important;
+}
+
