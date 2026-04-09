@@ -1,7 +1,8 @@
 /**
- * ENLIGHTEN_OS V10.0 - THE STEVEN MICHAEL ABSOLUTE
+ * ENLIGHTEN_OS V13.0 - THE STEVEN MICHAEL ABSOLUTE + MATHEMATICAL CRYSTAL
  * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
  * PRINCIPLES: Φ (1.618), 7.83Hz (Earth), 432Hz/528Hz/963Hz Tiers
+ * LOGIC: Fibonacci-weighted Refraction & Inverse Ratio Scaling
  * 
  * This is the SINGLE SOURCE OF TRUTH for all system operations.
  * All previous engines (SovereignHarmony, EnlightenOS V3, etc.) are deprecated.
@@ -15,6 +16,7 @@ const ENLIGHTEN_OS = (() => {
     const SCHUMANN = 7.83; 
     const ARCHITECT = 'Steven Michael';
     const TERMINAL = 'kyndsmiles@gmail.com';
+    const VERSION = '13.0';
 
     const TIERS = {
         VAULT:   { freq: 432, scale: Math.pow(PHI, -1), school: 'Pythagorean/Past', color: '#22d3ee' },
@@ -26,6 +28,115 @@ const ENLIGHTEN_OS = (() => {
     let guardObserver = null;
     let novaPulseInterval = null;
     let mixerElement = null;
+    let fractalLayers = [];
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MATH CRYSTAL ENGINE - Fibonacci & Inverse Ratio Logic
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    // Memoized Fibonacci for performance
+    const fibCache = {};
+    const getFib = (n) => {
+        if (n <= 1) return n;
+        if (fibCache[n]) return fibCache[n];
+        fibCache[n] = getFib(n - 1) + getFib(n - 2);
+        return fibCache[n];
+    };
+    
+    // Pre-calculate first 54 Fibonacci numbers
+    const fibSequence = Array.from({ length: 55 }, (_, i) => getFib(i));
+    
+    // Calculates "Prismatic Shift" using Squared and Inverse Ratios
+    const calculateRefraction = (inputFreq) => {
+        const base = inputFreq / 528; // Normalized to Solfeggio Hub (528Hz)
+        const squaredRatio = Math.pow(base, 2);
+        const inverseRatio = 1 / base;
+        
+        // Returns the mathematical "sweet spot" for light dispersion
+        return (squaredRatio * PHI) - inverseRatio;
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 54-SUBLAYER FRACTAL BLOOM
+    // ═══════════════════════════════════════════════════════════════════════════
+    const renderFractalBloom = (depth = 54) => {
+        console.log(`%c [MX-12] Computing ${depth} Sublayers via Recursive Fibonacci Logic`, "color: #00ff00; font-weight: bold");
+        
+        const stage = document.getElementById('app-stage');
+        if (!stage) {
+            console.warn('[FRACTAL] app-stage not found');
+            return;
+        }
+        
+        // Clear existing fractal layers
+        clearFractalLayers();
+        
+        // Create container for fractal layers
+        const container = document.createElement('div');
+        container.id = 'fractal-container';
+        container.className = 'fractal-bloom-container';
+        container.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            perspective: 1000px;
+            z-index: 0;
+        `;
+        
+        for (let i = 1; i <= depth; i++) {
+            const layer = document.createElement('div');
+            layer.className = 'fractal-layer';
+            layer.setAttribute('data-layer', i);
+            
+            // Use Fibonacci-weighted scaling
+            const fibWeight = fibSequence[i] / fibSequence[depth];
+            const scale = 1 + (i / depth) * PHI;
+            const translateZ = -i * PHI;
+            const rotation = (360 / PHI) * i;
+            const opacity = Math.max(0.02, (1 / i) * PHI * 0.5);
+            
+            layer.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: ${100 - (i * 1.5)}%;
+                height: ${100 - (i * 1.5)}%;
+                transform: translate(-50%, -50%) scale(${scale}) translateZ(${translateZ}px) rotate(${rotation}deg);
+                opacity: ${opacity};
+                border: 1px solid rgba(168, 85, 247, ${0.3 - (i * 0.005)});
+                border-radius: ${50 - (i * 0.5)}%;
+                background: radial-gradient(circle, transparent 60%, rgba(168, 85, 247, ${0.05 * fibWeight}) 100%);
+                animation: fractalPulse ${2 + (i * 0.1)}s ease-in-out infinite;
+                animation-delay: ${i * 50}ms;
+                pointer-events: none;
+            `;
+            
+            container.appendChild(layer);
+            fractalLayers.push(layer);
+        }
+        
+        stage.appendChild(container);
+        
+        console.log(`%c [FRACTAL] ${depth} sublayers rendered with Φ-weighted transforms`, 'color: #a855f7');
+        
+        window.dispatchEvent(new CustomEvent('FRACTAL_BLOOM', { 
+            detail: { layers: depth, fibSequence: fibSequence.slice(0, depth + 1) } 
+        }));
+        
+        return fractalLayers;
+    };
+    
+    const clearFractalLayers = () => {
+        const container = document.getElementById('fractal-container');
+        if (container) {
+            container.remove();
+        }
+        fractalLayers = [];
+    };
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 1. SOVEREIGN GUARD (Auto-Docking & Z-Layer 1500 Lock)
@@ -114,12 +225,17 @@ const ENLIGHTEN_OS = (() => {
         master.className = 'mixer-master-section';
         master.innerHTML = `
             <div class="master-controls">
-                <button class="master-btn" onclick="window.ENLIGHTEN_OS.toggleNovaPulse()">NOVA PULSE</button>
+                <button class="master-btn" onclick="window.ENLIGHTEN_OS.toggleNovaPulse()">NOVA</button>
                 <button class="master-btn" onclick="window.ENLIGHTEN_OS.triggerBloom()">BLOOM</button>
+                <button class="master-btn fractal-btn" onclick="window.ENLIGHTEN_OS.renderFractalBloom()">FRACTAL</button>
+            </div>
+            <div class="master-controls-row2">
+                <button class="master-btn clear-btn" onclick="window.ENLIGHTEN_OS.clearFractalLayers()">CLEAR</button>
             </div>
             <div class="schumann-indicator">
                 <span class="schumann-icon">🌍</span>
                 <span class="schumann-value">${SCHUMANN}Hz</span>
+                <span class="version-tag">V${VERSION}</span>
             </div>
         `;
         mixerElement.appendChild(master);
@@ -229,13 +345,20 @@ const ENLIGHTEN_OS = (() => {
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // 5. TIER TUNING
+    // 5. TIER TUNING (Math Crystal Enhanced)
     // ═══════════════════════════════════════════════════════════════════════════
     const tune = (tier, value) => {
         const val = parseFloat(value);
         const tierKey = tier.toLowerCase();
+        const root = document.documentElement;
         
-        document.documentElement.style.setProperty(`--${tierKey}-scale`, val);
+        // Calculate Math Crystal refraction offset
+        const mathShift = calculateRefraction(val * 100);
+        
+        // Apply math-driven variables to the CSS
+        root.style.setProperty(`--${tierKey}-scale`, val);
+        root.style.setProperty('--math-refraction-offset', `${mathShift}deg`);
+        root.style.setProperty('--math-refraction-value', mathShift.toFixed(4));
         
         // Update fader display
         const faderValue = document.querySelector(`[data-tier="${tier}"] .fader-value`);
@@ -248,14 +371,16 @@ const ENLIGHTEN_OS = (() => {
             navigator.vibrate(Math.round(val * 10));
         }
         
+        console.log(`%c [TUNE] ${tier}: ${val.toFixed(2)} | Refraction: ${mathShift.toFixed(4)}°`, 'color: #00ff00');
+        
         // Dispatch event
         window.dispatchEvent(new CustomEvent('TIER_TUNE', { 
-            detail: { tier, value: val } 
+            detail: { tier, value: val, refraction: mathShift } 
         }));
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // 6. MASTER BOOT PROTOCOL (MX 10-Step)
+    // 6. MASTER BOOT PROTOCOL (MX 13-Step for V13.0)
     // ═══════════════════════════════════════════════════════════════════════════
     const runMXProtocol = () => {
         const steps = [
@@ -268,6 +393,9 @@ const ENLIGHTEN_OS = (() => {
             { text: "Stabilizing Pythagorean Vault (432Hz)", color: '#22d3ee' },
             { text: "Igniting Solfeggio Hub (528Hz)", color: '#c084fc' },
             { text: "Manifesting Sigfield Engine (963Hz)", color: '#a855f7' },
+            { text: "Initializing Math Crystal Engine", color: '#00ff00' },
+            { text: "Pre-computing 54 Fibonacci Sublayers", color: '#00ff00' },
+            { text: "Calibrating Prismatic Refraction Logic", color: '#00ff00' },
             { text: "Sovereign Bloom: System Online", color: '#FFD700' }
         ];
         
@@ -518,6 +646,72 @@ const ENLIGHTEN_OS = (() => {
                 0%, 100% { box-shadow: inset 0 0 20px rgba(34, 211, 238, 0.05); }
                 50% { box-shadow: inset 0 0 60px rgba(34, 211, 238, 0.2); }
             }
+            
+            /* Fractal Pulse Animation */
+            @keyframes fractalPulse {
+                0%, 100% { 
+                    opacity: var(--layer-opacity, 0.3);
+                    transform: translate(-50%, -50%) scale(var(--layer-scale, 1)) rotate(var(--layer-rotation, 0deg));
+                }
+                50% { 
+                    opacity: calc(var(--layer-opacity, 0.3) * 1.2);
+                    transform: translate(-50%, -50%) scale(calc(var(--layer-scale, 1) * 1.02)) rotate(calc(var(--layer-rotation, 0deg) + 1deg));
+                }
+            }
+            
+            /* Math Crystal Refraction */
+            .fractal-bloom-container {
+                transform-style: preserve-3d;
+            }
+            
+            .fractal-layer {
+                transform-style: preserve-3d;
+                backface-visibility: hidden;
+            }
+            
+            /* Mixer V13 Updates */
+            .master-controls {
+                display: flex;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            
+            .master-controls-row2 {
+                display: flex;
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+            
+            .master-btn.fractal-btn {
+                background: rgba(0, 255, 0, 0.2);
+                border-color: rgba(0, 255, 0, 0.4);
+                color: #00ff00;
+            }
+            
+            .master-btn.fractal-btn:hover {
+                background: rgba(0, 255, 0, 0.3);
+                box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+            }
+            
+            .master-btn.clear-btn {
+                flex: 1;
+                background: rgba(255, 100, 100, 0.15);
+                border-color: rgba(255, 100, 100, 0.3);
+                color: #ff6b6b;
+            }
+            
+            .master-btn.clear-btn:hover {
+                background: rgba(255, 100, 100, 0.25);
+            }
+            
+            .version-tag {
+                margin-left: 8px;
+                padding: 2px 6px;
+                background: rgba(0, 255, 0, 0.2);
+                border-radius: 4px;
+                font-size: 0.5rem;
+                color: #00ff00;
+            }
         `;
         
         document.head.appendChild(style);
@@ -555,9 +749,9 @@ const ENLIGHTEN_OS = (() => {
             // Nova pulse starts on demand, not automatically
             document.body.style.animation = `earthPulse ${1/SCHUMANN}s infinite linear`;
             
-            console.log('%c ═══════════════════════════════════════════════════', 'color: #a855f7');
-            console.log('%c ENLIGHTEN_OS V10.0 - THE STEVEN MICHAEL ABSOLUTE', 'color: #a855f7; font-weight: bold; font-size: 12px');
-            console.log('%c ═══════════════════════════════════════════════════', 'color: #a855f7');
+            console.log('%c ═══════════════════════════════════════════════════', 'color: #00ff00');
+            console.log(`%c ENLIGHTEN_OS V${VERSION} - MATHEMATICAL CRYSTAL INTEGRATION`, 'color: #00ff00; font-weight: bold; font-size: 12px');
+            console.log('%c ═══════════════════════════════════════════════════', 'color: #00ff00');
         },
         
         destroy,
@@ -580,11 +774,19 @@ const ENLIGHTEN_OS = (() => {
         // Bloom
         triggerBloom,
         
+        // Math Crystal Engine
+        renderFractalBloom,
+        clearFractalLayers,
+        calculateRefraction,
+        getFib,
+        fibSequence,
+        
         // Constants
         PHI,
         SCHUMANN,
         ARCHITECT,
-        TERMINAL
+        TERMINAL,
+        VERSION
     };
 })();
 
