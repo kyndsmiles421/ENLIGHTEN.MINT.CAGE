@@ -148,6 +148,11 @@ videos_dir = Path(__file__).parent / "static" / "videos"
 videos_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/api/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 
+# ━━━ Promo Videos Static Mount ━━━
+promo_videos_dir = Path("/app/promo_videos")
+promo_videos_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/api/promo", StaticFiles(directory=str(promo_videos_dir)), name="promo_videos")
+
 
 # ━━━ Startup ━━━
 @app.on_event("startup")
