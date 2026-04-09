@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 
 // V-ENGINE: ABSOLUTE_CLARITY_NOW - Must be FIRST
 import { purgeNoise } from './engines/NukeTheChaos';
@@ -10,6 +10,8 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
+import SovereignGrid from './utils/SovereignGrid'; // Temporal Architecture Controller
+import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap } from 'lucide-react';
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -314,7 +316,15 @@ function CafeApp() {
       }
     });
     
-    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked.");
+    // 7. SOVEREIGN GRID — Initialize Temporal Architecture
+    SovereignGrid.init();
+    
+    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked. Temporal Architecture Active.");
+    
+    // Cleanup on unmount
+    return () => {
+      SovereignGrid.destroy();
+    };
   }, []);
   
   // Route-based audio cleanup — kills audio when exiting rooms
@@ -327,6 +337,10 @@ function CafeApp() {
   // Check if current route is sovereign mode (hide all chrome)
   const isSovereignRoute = window.location.pathname === '/sovereign-canvas' || 
                            window.location.pathname === '/replant';
+  
+  // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
+  const isHubRoute = window.location.pathname === '/hub' || 
+                     window.location.pathname === '/dashboard';
   
   return (
     <>
@@ -349,7 +363,31 @@ function CafeApp() {
         />
       )}
       {!isSovereignRoute && <VellumOverlay />} */}
-      <div className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
+      
+      {/* ═══ SOVEREIGN GRID: TOP BAR (The Vault / Past / Archives) ═══ */}
+      {!isSovereignRoute && (
+        <div className="sovereign-toolbar bar-top bar-section-archives" data-testid="sovereign-bar-top">
+          <span className="temporal-label temporal-label-past">THE VAULT</span>
+          <div className="flex items-center gap-2">
+            <Link to="/archives" className="bar-nav-item bar-top-item" data-testid="nav-archives">
+              <Archive size={14} />
+              <span>Archives</span>
+            </Link>
+            <Link to="/journal" className="bar-nav-item bar-top-item" data-testid="nav-journal">
+              <BookOpen size={14} />
+              <span>Journal</span>
+            </Link>
+            <Link to="/cosmic-ledger" className="bar-nav-item bar-top-item" data-testid="nav-ledger">
+              <Clock size={14} />
+              <span>Ledger</span>
+            </Link>
+          </div>
+          <span className="temporal-label temporal-label-past">PAST</span>
+        </div>
+      )}
+      
+      {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
+      <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
         {!isSovereignRoute && <Navigation />}
         <ScrollToTop />
         <Toaster
@@ -365,15 +403,40 @@ function CafeApp() {
           }}
         />
         <AnimatedRoutes />
-        {!isSovereignRoute && (
+        {/* Only show legacy toolbars on non-sovereign and non-hub routes */}
+        {!isSovereignRoute && !isHubRoute && (
           <>
             <ShambhalaFrontSide />
             <ShambhalaToolbar />
-            <EmergencyShutOff />
             <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
           </>
         )}
+        {/* Emergency Stop is always visible */}
+        {!isSovereignRoute && <EmergencyShutOff />}
       </div>
+      
+      {/* ═══ SOVEREIGN GRID: BOTTOM BAR (The Manifest / Future) ═══ */}
+      {!isSovereignRoute && (
+        <div id="bottom-dock-future" className="sovereign-toolbar bar-bottom bar-section-manifest" data-testid="sovereign-bar-bottom">
+          <span className="temporal-label temporal-label-future">MANIFEST</span>
+          <div className="flex items-center gap-2">
+            <Link to="/hub" className="bar-nav-item bar-bottom-item" data-testid="nav-hub">
+              <Compass size={14} />
+              <span>Hub</span>
+            </Link>
+            <Link to="/oracle" className="bar-nav-item bar-bottom-item" data-testid="nav-oracle">
+              <Star size={14} />
+              <span>Oracle</span>
+            </Link>
+            <Link to="/discover" className="bar-nav-item bar-bottom-item" data-testid="nav-discover">
+              <Sparkles size={14} />
+              <span>Discover</span>
+            </Link>
+          </div>
+          <span className="temporal-label temporal-label-future">FUTURE</span>
+        </div>
+      )}
+      
       {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
     </>
   );

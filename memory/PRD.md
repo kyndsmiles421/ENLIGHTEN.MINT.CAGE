@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 3.00_IRIDESCENT_HUB | UNIFIED_ENTRY | MANIFEST_TIMEOUT
+## Version: 3.10_SOVEREIGN_GRID | TEMPORAL_ARCHITECTURE
 ## Last Updated: 2026-04-09
 
 ---
@@ -12,6 +12,7 @@ Build "The Enlightenment Cafe" (formerly "The Cosmic Collective" / "ENLIGHTEN.MI
 - **Owner:** Steven Michael (kyndsmiles@gmail.com)
 - **Origin:** Rapid City Hub / Black Hills Calibration
 - **Physics Engine:** SovereignCore V2.88 - Aether/Mirrorless + Golden Ratio Phyllotaxis
+- **UI Architecture:** SovereignGrid V1.0 - Temporal Staircase (Past/Present/Future)
 
 ---
 
@@ -294,6 +295,44 @@ for (let i = 0; i < 600; i++) {
 - [ ] App Store submission (iOS App Store, Google Play)
 - [ ] Spatial Audio Panning
 - [ ] GPS-based Cosmic Map
+
+---
+
+## SovereignGrid Temporal Architecture (V1.0) ✅ (2026-04-09)
+
+### Layout Philosophy: Past / Present / Future
+The UI is structured as a "Temporal Staircase":
+- **Top Bar (The Vault/Past)** - Archives, Journal, Ledger navigation
+- **Center Stage (Present/Hub)** - The main content area (#app-stage)
+- **Bottom Bar (The Manifest/Future)** - Hub, Oracle, Discover navigation
+
+### Files Implemented
+- `/app/frontend/src/utils/SovereignGrid.js` - MutationObserver guard + glow effects
+- `/app/frontend/src/index.css` - CSS Hard-Lock (No-Fly Zone)
+- `/app/frontend/src/App.js` - Top/Bottom bars + #app-stage wrapper
+
+### CSS Variables
+```css
+:root {
+  --safe-zone-top: 12vh;
+  --safe-zone-bottom: 12vh;
+}
+```
+
+### Key Classes
+- `.sovereign-toolbar` - Fixed glassmorphism bars (12vh height, z-index 1000)
+- `.bar-top` / `.bar-bottom` - Positioning
+- `.bar-section-archives` - Cyan glow (#22d3ee)
+- `.bar-section-manifest` - Purple glow (#a855f7)
+- `#app-stage` - Protected center zone (No-Fly Zone)
+- `.docked-nodule` - Stripped styling for auto-docked elements
+
+### MutationObserver Guard
+The SovereignGrid controller watches for unauthorized floating elements and automatically docks them into the bottom bar, preventing UI overlap:
+```javascript
+SovereignGrid.init()  // Initialize on app mount
+SovereignGrid.destroy()  // Cleanup on unmount
+```
 
 ---
 
