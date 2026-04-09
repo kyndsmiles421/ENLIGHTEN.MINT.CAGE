@@ -348,3 +348,52 @@ async def get_sovereign_status():
         **enlighten_core.get_status(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+
+
+@router.get("/health")
+async def get_unified_health():
+    """Get full Unified Sovereign system health check."""
+    from engines.enlighten_unified import sovereign
+    return sovereign.health_check()
+
+
+@router.get("/modules")
+async def get_modules():
+    """Get all registered modules and their status."""
+    from engines.base_module import get_all_modules
+    return {
+        "modules": get_all_modules(),
+        "count": len(get_all_modules()),
+    }
+
+
+@router.post("/execute")
+async def execute_action(
+    data: dict = Body(...),
+    user=Depends(get_current_user)
+):
+    """
+    Execute an action through the Unified Sovereign system.
+    
+    Body:
+        module: Module name (e.g., "Crystals")
+        action: Action name (e.g., "polish")
+        payload: Action payload (optional)
+    """
+    from engines.enlighten_unified import sovereign
+    
+    module_name = data.get("module")
+    action = data.get("action")
+    payload = data.get("payload", {})
+    
+    if not module_name or not action:
+        raise HTTPException(400, "module and action are required")
+    
+    # Add user context to payload
+    payload["_user_id"] = user["id"]
+    payload["_timestamp"] = datetime.now(timezone.utc).isoformat()
+    
+    result = sovereign.execute_action(module_name, action, payload)
+    
+    return result
+
