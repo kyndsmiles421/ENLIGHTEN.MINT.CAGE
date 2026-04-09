@@ -6,6 +6,32 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   ENLIGHTEN LAYOUT — Main Wrapper & STOP Button Positioning
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Target the main wrapper/container that holds all content */
+.main-wrapper {
+  /* Primary fix: Push content down 60px to separate from floating STOP button */
+  padding-top: 60px;
+  
+  /* Breathing room from edges */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* Fix the STOP button positioning */
+.floating-stop-button {
+  position: absolute;
+  top: 15px;    /* Pull slightly lower than edge */
+  left: 15px;   /* Pull in from left edge */
+  z-index: 100; /* Stay on top */
+  
+  /* Proper size/padding for usability */
+  padding: 10px 20px;
+  border-radius: 25px; /* Matches other button aesthetics */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SOVEREIGN SPINE - NUCLEAR SCROLL FIX (TOP PRIORITY)
    ═══════════════════════════════════════════════════════════════════════════ */
 html {

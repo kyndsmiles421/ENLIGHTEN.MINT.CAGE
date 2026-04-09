@@ -239,17 +239,17 @@ export default function EmergencyShutOff() {
         onMouseLeave={handleLongPressEnd}
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
-        className="emergency-shutoff-btn flex items-center justify-center gap-1"
+        className="emergency-shutoff-btn floating-stop-button flex items-center justify-center gap-1"
         style={{
           position: 'fixed',
-          top: 60,
-          left: 8,
+          top: 15,
+          left: 15,
           zIndex: 9990,
           width: 'auto',
           minWidth: 32,
-          height: 24,
-          padding: '0 6px',
-          borderRadius: 4,
+          height: 28,
+          padding: '0 12px',
+          borderRadius: 25,
           background: longPressProgress > 0
             ? `linear-gradient(90deg, rgba(239,68,68,0.6) ${longPressProgress}%, rgba(30,30,30,0.8) ${longPressProgress}%)`
             : isVoid 
@@ -268,7 +268,7 @@ export default function EmergencyShutOff() {
           WebkitBackdropFilter: 'blur(8px)',
           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontSize: 8,
+          fontSize: 10,
           fontWeight: 600,
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
