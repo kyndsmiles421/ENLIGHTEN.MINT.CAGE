@@ -1,11 +1,10 @@
 /**
- * ENLIGHTEN_OS V13.0 - THE STEVEN MICHAEL ABSOLUTE + MATHEMATICAL CRYSTAL
+ * ENLIGHTEN_OS V16.0 - THE OMNI-SOVEREIGN ENGINE
  * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
- * PRINCIPLES: Φ (1.618), 7.83Hz (Earth), 432Hz/528Hz/963Hz Tiers
- * LOGIC: Fibonacci-weighted Refraction & Inverse Ratio Scaling
+ * INTEGRATION: Fractal Bloom, Rainbow Refraction, Z-1500 Shield, Recursive Math
+ * HANDSHAKE: Live Twilio/SendGrid Dimensional Communication
  * 
  * This is the SINGLE SOURCE OF TRUTH for all system operations.
- * All previous engines (SovereignHarmony, EnlightenOS V3, etc.) are deprecated.
  */
 
 const ENLIGHTEN_OS = (() => {
@@ -16,7 +15,7 @@ const ENLIGHTEN_OS = (() => {
     const SCHUMANN = 7.83; 
     const ARCHITECT = 'Steven Michael';
     const TERMINAL = 'kyndsmiles@gmail.com';
-    const VERSION = '13.0';
+    const VERSION = '16.0';
 
     const TIERS = {
         VAULT:   { freq: 432, scale: Math.pow(PHI, -1), school: 'Pythagorean/Past', color: '#22d3ee' },
@@ -139,6 +138,129 @@ const ENLIGHTEN_OS = (() => {
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // RAINBOW CRYSTAL ENGINE (Prismatic Hue-Rotate Effect)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const renderRainbowCrystal = (depth = 54) => {
+        console.log(`%c [MX-14] Rendering Rainbow Crystal with ${depth} prismatic layers`, "color: #ff00ff; font-weight: bold");
+        
+        const stage = document.getElementById('app-stage');
+        if (!stage) {
+            console.warn('[RAINBOW] app-stage not found');
+            return;
+        }
+        
+        // Clear existing fractal layers
+        clearFractalLayers();
+        
+        // Create rainbow container
+        const container = document.createElement('div');
+        container.id = 'fractal-container';
+        container.className = 'rainbow-crystal-container';
+        container.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            pointer-events: none;
+            perspective: 1500px;
+            z-index: 0;
+        `;
+
+        for (let i = 1; i <= depth; i++) {
+            const layer = document.createElement('div');
+            const ratio = i / depth;
+            
+            // Steven Michael's Squared & Inverse Ratio logic
+            const mathScale = 1 + (Math.pow(ratio, 2) * PHI);
+            const mathOpacity = Math.max(0.02, (1 / i) * PHI * 0.5);
+            const hueRotation = i * (360 / depth); // Full rainbow spectrum
+            const blurAmount = (1 - ratio) * 8;
+
+            layer.className = 'fractal-layer rainbow-layer';
+            layer.setAttribute('data-layer', i);
+            layer.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: ${90 - (i * 1.2)}%;
+                height: ${90 - (i * 1.2)}%;
+                transform: translate(-50%, -50%) translateZ(${-i * PHI * 10}px) scale(${mathScale}) rotate(${i * 2}deg);
+                opacity: ${mathOpacity};
+                filter: hue-rotate(${hueRotation}deg) blur(${blurAmount}px);
+                border: 1px solid rgba(168, 85, 247, ${0.1 + (0.2 * ratio)});
+                border-radius: ${50 - (i * 0.5)}%;
+                background: radial-gradient(circle, 
+                    transparent 40%, 
+                    hsla(${hueRotation}, 80%, 60%, ${0.08 * ratio}) 70%,
+                    transparent 100%
+                );
+                animation: rainbowPulse ${2 + (i * 0.08)}s ease-in-out infinite;
+                animation-delay: ${i * 30}ms;
+                pointer-events: none;
+            `;
+            
+            container.appendChild(layer);
+            fractalLayers.push(layer);
+        }
+        
+        stage.appendChild(container);
+        
+        console.log(`%c [RAINBOW] ${depth} prismatic layers rendered with hue-rotation spectrum`, 'color: #ff00ff');
+        
+        window.dispatchEvent(new CustomEvent('RAINBOW_BLOOM', { 
+            detail: { layers: depth } 
+        }));
+        
+        return fractalLayers;
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SOVEREIGN HANDSHAKE (Live Twilio/SendGrid Communication)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const sendLiveAlert = async (type, payload) => {
+        console.log(`%c [HANDSHAKE] Initiating ${type} for Steven Michael...`, "color: #00ff00; font-weight: bold");
+        
+        const handshakeData = {
+            architect: ARCHITECT,
+            terminal: TERMINAL,
+            frequency: "963Hz",
+            type: type,
+            content: payload,
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            const response = await fetch('/api/sovereign/handshake', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(handshakeData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                console.log(`%c [HANDSHAKE] ✓ ${type} delivered successfully`, "color: #00ff00");
+                
+                // Trigger bloom effect on successful handshake
+                triggerBloom();
+                
+                window.dispatchEvent(new CustomEvent('HANDSHAKE_SUCCESS', { 
+                    detail: { type, result } 
+                }));
+            } else {
+                console.error(`%c [HANDSHAKE] ✗ ${type} failed: ${result.detail || 'Unknown error'}`, "color: #ff0000");
+            }
+            
+            return result;
+        } catch (error) {
+            console.error(`%c [HANDSHAKE] ✗ Network error: ${error.message}`, "color: #ff0000");
+            throw error;
+        }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // 1. SOVEREIGN GUARD (Auto-Docking & Z-Layer 1500 Lock)
     // ═══════════════════════════════════════════════════════════════════════════
     const deployGuard = () => {
@@ -230,7 +352,11 @@ const ENLIGHTEN_OS = (() => {
                 <button class="master-btn fractal-btn" onclick="window.ENLIGHTEN_OS.renderFractalBloom()">FRACTAL</button>
             </div>
             <div class="master-controls-row2">
+                <button class="master-btn rainbow-btn" onclick="window.ENLIGHTEN_OS.renderRainbowCrystal()">RAINBOW</button>
                 <button class="master-btn clear-btn" onclick="window.ENLIGHTEN_OS.clearFractalLayers()">CLEAR</button>
+            </div>
+            <div class="master-controls-row3">
+                <button class="master-btn handshake-btn" onclick="window.ENLIGHTEN_OS.sendLiveAlert('TEST', 'Dimensional Ping')">HANDSHAKE</button>
             </div>
             <div class="schumann-indicator">
                 <span class="schumann-icon">🌍</span>
@@ -380,7 +506,7 @@ const ENLIGHTEN_OS = (() => {
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // 6. MASTER BOOT PROTOCOL (MX 13-Step for V13.0)
+    // 6. MASTER BOOT PROTOCOL (MX 16-Step for V16.0)
     // ═══════════════════════════════════════════════════════════════════════════
     const runMXProtocol = () => {
         const steps = [
@@ -396,7 +522,10 @@ const ENLIGHTEN_OS = (() => {
             { text: "Initializing Math Crystal Engine", color: '#00ff00' },
             { text: "Pre-computing 54 Fibonacci Sublayers", color: '#00ff00' },
             { text: "Calibrating Prismatic Refraction Logic", color: '#00ff00' },
-            { text: "Sovereign Bloom: System Online", color: '#FFD700' }
+            { text: "Enabling Rainbow Crystal Renderer", color: '#ff00ff' },
+            { text: "Initializing Sovereign Handshake Module", color: '#00ffff' },
+            { text: "Connecting Dimensional Communication Bridge", color: '#00ffff' },
+            { text: "Omni-Sovereign Engine: System Online", color: '#FFD700' }
         ];
         
         steps.forEach((s, i) => {
@@ -659,6 +788,28 @@ const ENLIGHTEN_OS = (() => {
                 }
             }
             
+            /* Rainbow Crystal Pulse Animation */
+            @keyframes rainbowPulse {
+                0%, 100% { 
+                    opacity: var(--layer-opacity, 0.3);
+                    filter: hue-rotate(var(--layer-hue, 0deg)) blur(var(--layer-blur, 0px));
+                }
+                50% { 
+                    opacity: calc(var(--layer-opacity, 0.3) * 1.3);
+                    filter: hue-rotate(calc(var(--layer-hue, 0deg) + 30deg)) blur(calc(var(--layer-blur, 0px) * 0.8));
+                }
+            }
+            
+            /* Rainbow Container */
+            .rainbow-crystal-container {
+                transform-style: preserve-3d;
+            }
+            
+            .rainbow-layer {
+                transform-style: preserve-3d;
+                backface-visibility: hidden;
+            }
+            
             /* Math Crystal Refraction */
             .fractal-bloom-container {
                 transform-style: preserve-3d;
@@ -669,17 +820,18 @@ const ENLIGHTEN_OS = (() => {
                 backface-visibility: hidden;
             }
             
-            /* Mixer V13 Updates */
+            /* Mixer V16 Updates */
             .master-controls {
                 display: flex;
                 gap: 6px;
                 margin-bottom: 8px;
             }
             
-            .master-controls-row2 {
+            .master-controls-row2,
+            .master-controls-row3 {
                 display: flex;
                 gap: 6px;
-                margin-bottom: 12px;
+                margin-bottom: 8px;
             }
             
             .master-btn.fractal-btn {
@@ -691,6 +843,46 @@ const ENLIGHTEN_OS = (() => {
             .master-btn.fractal-btn:hover {
                 background: rgba(0, 255, 0, 0.3);
                 box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+            }
+            
+            .master-btn.rainbow-btn {
+                flex: 1;
+                background: linear-gradient(90deg, 
+                    rgba(255,0,0,0.2), 
+                    rgba(255,165,0,0.2), 
+                    rgba(255,255,0,0.2), 
+                    rgba(0,255,0,0.2), 
+                    rgba(0,0,255,0.2), 
+                    rgba(75,0,130,0.2), 
+                    rgba(238,130,238,0.2)
+                );
+                border-color: rgba(255, 0, 255, 0.4);
+                color: #ff00ff;
+            }
+            
+            .master-btn.rainbow-btn:hover {
+                background: linear-gradient(90deg, 
+                    rgba(255,0,0,0.3), 
+                    rgba(255,165,0,0.3), 
+                    rgba(255,255,0,0.3), 
+                    rgba(0,255,0,0.3), 
+                    rgba(0,0,255,0.3), 
+                    rgba(75,0,130,0.3), 
+                    rgba(238,130,238,0.3)
+                );
+                box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+            }
+            
+            .master-btn.handshake-btn {
+                flex: 1;
+                background: rgba(0, 255, 255, 0.2);
+                border-color: rgba(0, 255, 255, 0.4);
+                color: #00ffff;
+            }
+            
+            .master-btn.handshake-btn:hover {
+                background: rgba(0, 255, 255, 0.3);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
             }
             
             .master-btn.clear-btn {
@@ -749,9 +941,9 @@ const ENLIGHTEN_OS = (() => {
             // Nova pulse starts on demand, not automatically
             document.body.style.animation = `earthPulse ${1/SCHUMANN}s infinite linear`;
             
-            console.log('%c ═══════════════════════════════════════════════════', 'color: #00ff00');
-            console.log(`%c ENLIGHTEN_OS V${VERSION} - MATHEMATICAL CRYSTAL INTEGRATION`, 'color: #00ff00; font-weight: bold; font-size: 12px');
-            console.log('%c ═══════════════════════════════════════════════════', 'color: #00ff00');
+            console.log('%c ═══════════════════════════════════════════════════', 'color: #ff00ff');
+            console.log(`%c ENLIGHTEN_OS V${VERSION} - THE OMNI-SOVEREIGN ENGINE`, 'color: #ff00ff; font-weight: bold; font-size: 12px');
+            console.log('%c ═══════════════════════════════════════════════════', 'color: #ff00ff');
         },
         
         destroy,
@@ -776,10 +968,14 @@ const ENLIGHTEN_OS = (() => {
         
         // Math Crystal Engine
         renderFractalBloom,
+        renderRainbowCrystal,
         clearFractalLayers,
         calculateRefraction,
         getFib,
         fibSequence,
+        
+        // Sovereign Handshake
+        sendLiveAlert,
         
         // Constants
         PHI,
