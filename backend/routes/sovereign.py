@@ -2,19 +2,21 @@
 ENLIGHTEN.MINT.CAFE — Sovereign Ledger & Communication Routes
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Ledger sync for transaction integrity, SMS/Email routing with sanitization.
+Uses production SovereignEngine for Twilio & SendGrid integration.
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from pydantic import BaseModel
 from deps import db, get_current_user, logger
-from engines.crystal_seal import (
+from engines.crystal_seal import sanitize_input, EconomyCommon
+from engines.sovereign_production import (
+    enlighten_core, 
     secure_hash, 
-    secure_hash_short, 
-    sanitize_input,
-    EconomyCommon
+    secure_hash_short,
+    dispatch_sms,
+    dispatch_email
 )
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
-import os
 
 router = APIRouter(prefix="/sovereign", tags=["sovereign"])
 
@@ -135,10 +137,8 @@ async def get_ledger_history(limit: int = 20, user=Depends(get_current_user)):
 async def route_sms(req: SMSRequest, user=Depends(get_current_user)):
     """
     Secure SMS routing with input sanitization.
+    Uses production Twilio integration when configured.
     Scrubs all outgoing metadata to prevent PII leaks.
-    
-    Note: Requires Twilio integration for production.
-    Currently returns mock success for development.
     """
     user_id = user["id"]
     now = datetime.now(timezone.utc).isoformat()
@@ -161,6 +161,9 @@ async def route_sms(req: SMSRequest, user=Depends(get_current_user)):
     if recent_count >= 10:  # Daily limit
         raise HTTPException(429, "Daily SMS limit reached (10/day)")
     
+    # Dispatch via production engine
+    result = dispatch_sms(safe_to, safe_message)
+    
     # Log communication (sanitized)
     comm_entry = {
         "id": tracking_id,
@@ -169,25 +172,20 @@ async def route_sms(req: SMSRequest, user=Depends(get_current_user)):
         "type": safe_type,
         "recipient_hash": secure_hash_short(safe_to),  # Store hash, not actual number
         "message_length": len(safe_message),
-        "status": "queued",
+        "status": result.get("status", "unknown"),
+        "message_sid": result.get("message_sid"),
         "created_at": now,
     }
     
     await db.comm_log.insert_one(comm_entry)
     
-    # TODO: Integrate with Twilio in production
-    # For now, return mock success
-    twilio_enabled = os.getenv("TWILIO_ACCOUNT_SID") is not None
-    
-    if twilio_enabled:
-        # Production: Would call Twilio API here
-        logger.info(f"[SMS] Would send to {safe_to[:3]}***")
-    
     return {
         "channel": "sms",
         "tracking_id": tracking_id,
-        "status": "dispatched" if twilio_enabled else "queued_mock",
-        "message": "SMS queued for delivery" if twilio_enabled else "SMS simulated (Twilio not configured)",
+        "status": result.get("status"),
+        "success": result.get("success", False),
+        "message": "SMS delivered" if result.get("success") else result.get("error", "SMS queued"),
+        "twilio_enabled": enlighten_core.twilio_enabled,
     }
 
 
@@ -275,10 +273,8 @@ EMAIL_TEMPLATES = {
 async def route_email(req: EmailRequest, user=Depends(get_current_user)):
     """
     Secure email routing with refracted-crystal HTML templates.
+    Uses production SendGrid integration when configured.
     Sanitizes all content and logs with hashed PII.
-    
-    Note: Requires SendGrid integration for production.
-    Currently returns mock success for development.
     """
     user_id = user["id"]
     now = datetime.now(timezone.utc).isoformat()
@@ -298,6 +294,9 @@ async def route_email(req: EmailRequest, user=Depends(get_current_user)):
         body=safe_body.replace("\n", "<br>")
     )
     
+    # Dispatch via production engine
+    result = dispatch_email(safe_to, safe_subject, safe_body, html_body)
+    
     # Log communication (sanitized)
     comm_entry = {
         "id": tracking_id,
@@ -307,24 +306,20 @@ async def route_email(req: EmailRequest, user=Depends(get_current_user)):
         "subject_preview": safe_subject[:50],
         "template": safe_template,
         "body_length": len(safe_body),
-        "status": "queued",
+        "status": result.get("status", "unknown"),
         "created_at": now,
     }
     
     await db.comm_log.insert_one(comm_entry)
     
-    # TODO: Integrate with SendGrid in production
-    sendgrid_enabled = os.getenv("SENDGRID_API_KEY") is not None
-    
-    if sendgrid_enabled:
-        logger.info(f"[Email] Would send to {safe_to.split('@')[0][:3]}***@***")
-    
     return {
         "channel": "email",
         "tracking_id": tracking_id,
-        "status": "dispatched" if sendgrid_enabled else "queued_mock",
+        "status": result.get("status"),
+        "success": result.get("success", False),
         "template": safe_template,
-        "message": "Email queued for delivery" if sendgrid_enabled else "Email simulated (SendGrid not configured)",
+        "message": "Email delivered" if result.get("success") else result.get("error", "Email queued"),
+        "sendgrid_enabled": enlighten_core.sendgrid_enabled,
         "html_preview": html_body[:500] + "..." if len(html_body) > 500 else html_body,
     }
 
@@ -341,3 +336,15 @@ async def get_comm_status(tracking_id: str, user=Depends(get_current_user)):
         raise HTTPException(404, "Communication not found")
     
     return entry
+
+
+
+@router.get("/status")
+async def get_sovereign_status():
+    """Get Sovereign Engine status - integrations health check."""
+    return {
+        "engine": "SovereignEngine",
+        "version": "2.0.0",
+        **enlighten_core.get_status(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
