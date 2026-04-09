@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import ENLIGHTEN_SYSTEM from '../utils/SovereignMasterController';
+import ENLIGHTEN_OS from '../utils/EnlightenOS';
 
 const PERSPECTIVES = [
   { mode: 'INTENSE', color: '#FF0000', label: 'Intense' },
@@ -29,7 +29,7 @@ export default function PerspectiveToggle() {
   }, []);
 
   const handleToggle = (mode) => {
-    ENLIGHTEN_SYSTEM.toggle(mode);
+    ENLIGHTEN_OS.togglePerspective(mode);
     setCurrentPerspective(mode);
     setIsExpanded(false);
   };

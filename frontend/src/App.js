@@ -10,9 +10,10 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import ENLIGHTEN_SYSTEM from './utils/SovereignMasterController'; // Sovereign Master Controller V2.0
-import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap } from 'lucide-react';
+import ENLIGHTEN_OS from './utils/EnlightenOS'; // Grand Unified Sovereign Engine V3.0
+import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
+import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -317,14 +318,15 @@ function CafeApp() {
       }
     });
     
-    // 7. ENLIGHTEN SYSTEM V2.0 — Sovereign Master Controller (replaces SovereignGrid)
-    ENLIGHTEN_SYSTEM.ignite();
+    // 7. ENLIGHTEN_OS V3.0 — Grand Unified Sovereign Engine
+    // Integrates: Temporal Staircase + Perspective + Mixing Board + Guard
+    ENLIGHTEN_OS.ignite();
     
-    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked. Temporal Architecture Active.");
+    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked. Temporal Architecture Active. Grand Unified Engine Online.");
     
     // Cleanup on unmount
     return () => {
-      ENLIGHTEN_SYSTEM.destroy();
+      ENLIGHTEN_OS.destroy();
     };
   }, []);
   
@@ -436,10 +438,23 @@ function CafeApp() {
               <Sparkles size={14} />
               <span>Discover</span>
             </Link>
+            {/* Creator Mode Mixing Board Trigger */}
+            <button 
+              onClick={() => setMixerOpen(!mixerOpen)}
+              className="bar-nav-item bar-bottom-item creator-trigger"
+              data-testid="creator-mixer-trigger"
+              title="Creator Mixing Board"
+            >
+              <Sliders size={14} />
+              <span>Creator</span>
+            </button>
           </div>
           <span className="temporal-label temporal-label-future">FUTURE</span>
         </div>
       )}
+      
+      {/* ═══ CREATOR MIXING BOARD (Live Environment Control Surface) ═══ */}
+      <CreatorMixerUI isOpen={mixerOpen} onClose={() => setMixerOpen(false)} />
       
       {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
     </>

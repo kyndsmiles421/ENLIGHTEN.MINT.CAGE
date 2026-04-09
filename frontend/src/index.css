@@ -331,6 +331,491 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CREATOR MIXING BOARD — Channel Strip Styles
+   Live Environment Control Surface
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Mixing Board Overlay */
+.creator-mixer-overlay {
+  position: fixed !important;
+  bottom: calc(var(--safe-zone-bottom) + 16px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 90%;
+  max-width: 900px;
+  max-height: 55vh;
+  background: rgba(0, 0, 0, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 16px;
+  z-index: 2147483646 !important;
+  overflow: hidden;
+  box-shadow: 
+    0 -4px 40px rgba(0, 0, 0, 0.8),
+    0 0 80px rgba(168, 85, 247, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.creator-mixer-overlay.minimized {
+  max-height: 48px;
+}
+
+/* Mixer Header */
+.mixer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mixer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(248, 250, 252, 0.9);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+}
+
+.mixer-header-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.header-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(248, 250, 252, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(248, 250, 252, 1);
+}
+
+.header-btn.close-btn {
+  font-size: 18px;
+  font-weight: 300;
+}
+
+/* Signal Health Monitor */
+.signal-health {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.65rem;
+  color: rgba(248, 250, 252, 0.5);
+}
+
+.health-divider {
+  opacity: 0.3;
+}
+
+.stale-warning {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #f59e0b;
+  margin-left: auto;
+}
+
+/* Global Controls */
+.global-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.global-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.global-section.past { --section-color: #22d3ee; }
+.global-section.present { --section-color: #c084fc; }
+.global-section.future { --section-color: #a855f7; }
+
+.global-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--section-color);
+  opacity: 0.8;
+}
+
+.global-fader {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.global-fader::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--section-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--section-color);
+}
+
+.global-value {
+  font-size: 0.6rem;
+  color: rgba(248, 250, 252, 0.4);
+}
+
+/* Channel Groups */
+.mixer-channels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 12px 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.channel-group {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(248, 250, 252, 0.6);
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 2px solid;
+}
+
+.group-strips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.no-channels {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.65rem;
+  color: rgba(248, 250, 252, 0.3);
+  font-style: italic;
+}
+
+/* Individual Channel Strip */
+.channel-strip {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto auto;
+  gap: 6px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.channel-strip:hover {
+  transform: translateY(-2px);
+}
+
+.channel-header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channel-source {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.channel-id {
+  font-size: 0.5rem;
+  color: rgba(248, 250, 252, 0.4);
+  font-family: monospace;
+}
+
+/* Fader Container */
+.fader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.fader-vertical {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 6px;
+  height: 60px;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.fader-vertical::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 8px;
+  background: var(--fader-color, #fff);
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--fader-color, #fff);
+}
+
+.fader-value {
+  font-size: 0.5rem;
+  color: rgba(248, 250, 252, 0.5);
+}
+
+/* Pan Container */
+.pan-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  grid-column: 2;
+}
+
+.pan-label {
+  font-size: 0.45rem;
+  color: rgba(248, 250, 252, 0.3);
+}
+
+.pan-slider {
+  flex: 1;
+  height: 4px;
+  appearance: none;
+  background: linear-gradient(90deg, #22d3ee, transparent, #a855f7);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.pan-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Channel Controls */
+.channel-controls {
+  display: flex;
+  gap: 4px;
+  grid-column: 3;
+}
+
+.ctrl-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(248, 250, 252, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(248, 250, 252, 0.9);
+}
+
+.ctrl-btn.active {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: #f00;
+  color: #f00;
+}
+
+.mute-btn.active {
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.solo-btn.active {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.kick-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: #a855f7;
+  color: #a855f7;
+}
+
+/* Signal Meter */
+.signal-meter {
+  width: 4px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+  grid-row: 2 / 4;
+}
+
+.signal-level {
+  width: 100%;
+  border-radius: 2px;
+  transition: height 0.1s ease;
+  position: absolute;
+  bottom: 0;
+}
+
+/* Master Section */
+.master-section {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.master-fader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.master-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(248, 250, 252, 0.7);
+}
+
+.master-slider {
+  flex: 1;
+  height: 8px;
+  appearance: none;
+  background: linear-gradient(90deg, #22d3ee, #c084fc, #a855f7);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.master-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+.master-value {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.9);
+  min-width: 40px;
+}
+
+.master-vu {
+  width: 120px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.vu-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22d3ee, #a855f7);
+  border-radius: 4px;
+  transition: width 0.1s ease;
+}
+
+/* Kick Animation */
+@keyframes kick-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(168, 85, 247, 0); }
+  50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(168, 85, 247, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(168, 85, 247, 0); }
+}
+
+/* Responsive: Mobile */
+@media (max-width: 768px) {
+  .creator-mixer-overlay {
+    width: 95%;
+    bottom: calc(var(--safe-zone-bottom) + 4px);
+  }
+  
+  .mixer-channels {
+    grid-template-columns: 1fr;
+  }
+  
+  .global-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Creator Mode Trigger Button */
+.creator-trigger {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(192, 132, 252, 0.2)) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.creator-trigger::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+  animation: creator-shimmer 3s infinite;
+}
+
+@keyframes creator-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.creator-trigger:hover {
+  border-color: rgba(192, 132, 252, 0.6) !important;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    ENLIGHTEN LAYOUT — Main Wrapper & STOP Button Positioning
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -4141,7 +4626,7 @@ main,
 .aurora,
 #bg-canvas,
 .glass-overlay,
-[class*="overlay"]:not(.modal-overlay):not(.dialog-overlay) {
+[class*="overlay"]:not(.modal-overlay):not(.dialog-overlay):not(.creator-mixer-overlay) {
   pointer-events: none !important;
   z-index: -1 !important;
   position: fixed !important;
