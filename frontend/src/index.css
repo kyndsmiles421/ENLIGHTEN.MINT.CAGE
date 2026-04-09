@@ -21,6 +21,23 @@
   --secondary-freq: #1A1A1A;
   --global-glow: rgba(255, 255, 255, 0.2);
   --perspective-blur: 5px;
+  
+  /* SOVEREIGN HARMONY — Golden Ratio & Earth Frequency */
+  --phi: 1.618;
+  --phi-inverse: 0.618;
+  --base-unit: 12vh;
+  --tier-scale: 1.618;
+  --tier-level: 2;
+  --tier-freq: 528;
+  --pulse-speed: 0.19s;
+  --harmonic-color: #c084fc;
+  --earth-freq: 7.83;
+  --earth-pulse-duration: 127.7ms;
+  
+  /* Earth-Tuned Iridescence */
+  --earth-glow: rgba(34, 211, 238, 0.2);
+  --solfeggio-glow: rgba(192, 132, 252, 0.3);
+  --sigfield-glow: rgba(168, 85, 247, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -813,6 +830,311 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
 .creator-trigger:hover {
   border-color: rgba(192, 132, 252, 0.6) !important;
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOVEREIGN HARMONY — Golden Ratio & Earth Pulse Animations
+   Philosophy: Pythagorean (Past) | Solfeggio (Present) | Sigfield (Future)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tiered Mixing Board Layout - Golden Ratio Spacing */
+.mixer-tier {
+  padding: calc(var(--base-unit) / var(--phi));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.5s cubic-bezier(0.618, 0, 0.382, 1);
+}
+
+.mixer-tier:hover {
+  background: rgba(255, 255, 255, 0.02);
+  padding-left: calc(var(--base-unit) / var(--phi) + 8px);
+}
+
+/* Sigfield Frequency Pulse - Earth Heartbeat (7.83Hz) */
+@keyframes earthPulse {
+  0% { box-shadow: 0 0 10px var(--earth-glow); }
+  50% { box-shadow: 0 0 40px var(--earth-glow); }
+  100% { box-shadow: 0 0 10px var(--earth-glow); }
+}
+
+@keyframes earthBreath {
+  0%, 100% { 
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.002);
+  }
+}
+
+/* Active Earth Pulse on Body */
+body.earth-pulse-active {
+  animation: earthBreath calc(1000ms / var(--earth-freq)) infinite ease-in-out;
+}
+
+body.earth-pulse-active #app-stage {
+  animation: earthPulse calc(1000ms / var(--earth-freq)) infinite ease-in-out;
+}
+
+/* The "Russian Doll" Staircase (Tiered Opening) */
+.staircase-open {
+  transform: scale(var(--phi));
+  opacity: 1;
+  z-index: 2000;
+}
+
+.staircase-closed {
+  transform: scale(var(--phi-inverse));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Tier-Specific Styling */
+body[data-tier="VAULT"] .sovereign-toolbar.bar-top {
+  box-shadow: 0 0 calc(25px * var(--phi-inverse)) 3px #22d3ee;
+}
+
+body[data-tier="HUB"] #app-stage {
+  box-shadow: inset 0 0 calc(40px * var(--phi)) var(--solfeggio-glow);
+}
+
+body[data-tier="MANIFEST"] .sovereign-toolbar.bar-bottom {
+  box-shadow: 0 0 calc(25px * var(--phi)) 5px #a855f7;
+}
+
+/* School of Thought Indicators */
+body[data-school="Pythagorean"]::after {
+  content: '♫';
+  position: fixed;
+  bottom: calc(var(--safe-zone-bottom) + 4px);
+  left: 8px;
+  font-size: 12px;
+  opacity: 0.3;
+  color: #22d3ee;
+  z-index: 9999;
+}
+
+body[data-school="Solfeggio"]::after {
+  content: '☯';
+  position: fixed;
+  bottom: calc(var(--safe-zone-bottom) + 4px);
+  left: 8px;
+  font-size: 12px;
+  opacity: 0.3;
+  color: #c084fc;
+  z-index: 9999;
+}
+
+body[data-school="Sigfield"]::after {
+  content: '✧';
+  position: fixed;
+  bottom: calc(var(--safe-zone-bottom) + 4px);
+  left: 8px;
+  font-size: 12px;
+  opacity: 0.3;
+  color: #a855f7;
+  z-index: 9999;
+}
+
+/* Golden Ratio Button Sizing */
+.phi-button {
+  width: calc(var(--base-unit) * var(--phi));
+  height: var(--base-unit);
+  transition: transform 0.3s cubic-bezier(0.618, 0, 0.382, 1);
+}
+
+.phi-button:hover {
+  transform: scale(calc(1 + (var(--phi-inverse) * 0.1)));
+}
+
+/* Fractal Bloom Animation */
+@keyframes fractalBloom {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(calc(var(--phi-inverse))) rotate(calc(180deg / var(--phi)));
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1) rotate(calc(360deg / var(--phi)));
+    opacity: 1;
+  }
+}
+
+.fractal-layer {
+  animation: fractalBloom 0.6s cubic-bezier(0.618, 0, 0.382, 1) forwards;
+  animation-delay: calc(var(--layer-index) * 50ms);
+}
+
+/* Solfeggio Frequency Indicators */
+.freq-indicator {
+  font-family: 'Inter', monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+}
+
+.freq-indicator::before {
+  content: '♪ ';
+}
+
+.freq-indicator[data-freq="432"]::after { content: ' Hz (Pythagorean)'; }
+.freq-indicator[data-freq="528"]::after { content: ' Hz (Solfeggio)'; }
+.freq-indicator[data-freq="963"]::after { content: ' Hz (Sigfield)'; }
+
+/* Harmonic Glow Effects */
+.harmonic-glow {
+  box-shadow: 
+    0 0 calc(10px * var(--tier-scale)) var(--harmonic-color),
+    0 0 calc(20px * var(--tier-scale)) rgba(var(--harmonic-color), 0.5),
+    0 0 calc(40px * var(--tier-scale)) rgba(var(--harmonic-color), 0.25);
+  transition: box-shadow var(--pulse-speed) ease-in-out;
+}
+
+/* Sovereign Bloom State */
+.sovereign-bloom {
+  animation: sovereignBloom 1s cubic-bezier(0.618, 0, 0.382, 1) forwards;
+}
+
+@keyframes sovereignBloom {
+  0% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.2) saturate(1.3);
+    transform: scale(1.02);
+  }
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HARMONIC STATUS — Tier & Frequency Display Widget
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.harmonic-status {
+  position: fixed;
+  top: calc(var(--safe-zone-top) + 8px);
+  left: 16px;
+  z-index: 1001;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.618, 0, 0.382, 1);
+}
+
+.harmonic-status:hover {
+  border-color: var(--harmonic-color);
+  box-shadow: 0 0 20px rgba(var(--harmonic-color), 0.3);
+}
+
+.harmonic-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.school-icon {
+  font-size: 0.9rem;
+}
+
+.freq-display {
+  font-family: 'Inter', monospace;
+  letter-spacing: 0.05em;
+}
+
+.freq-display::after {
+  content: 'Hz';
+  font-size: 0.5rem;
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+.harmonic-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.tier-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.tier-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--tier-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tier-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--tier-color);
+}
+
+.tier-btn.active {
+  background: rgba(var(--tier-color), 0.2);
+  border-color: var(--tier-color);
+  box-shadow: 0 0 12px rgba(var(--tier-color), 0.4);
+}
+
+.tier-school {
+  font-size: 1rem;
+}
+
+.tier-freq {
+  font-size: 0.55rem;
+  font-family: 'Inter', monospace;
+  opacity: 0.8;
+}
+
+.earth-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 12px;
+  color: #22d3ee;
+  font-size: 0.55rem;
+  font-family: 'Inter', monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.earth-toggle:hover {
+  background: rgba(34, 211, 238, 0.2);
+}
+
+.earth-toggle.active {
+  background: rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+  animation: earthPulse calc(1000ms / 7.83) infinite ease-in-out;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

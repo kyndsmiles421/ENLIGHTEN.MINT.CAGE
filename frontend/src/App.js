@@ -11,9 +11,11 @@ import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM O
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
 import ENLIGHTEN_OS from './utils/EnlightenOS'; // Grand Unified Sovereign Engine V3.0
+import SOVEREIGN_HARMONY from './utils/SovereignHarmony'; // Grand Unified Harmonic Engine
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board
+import HarmonicStatus from './components/HarmonicStatus'; // Harmonic Tier Display
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -322,11 +324,17 @@ function CafeApp() {
     // Integrates: Temporal Staircase + Perspective + Mixing Board + Guard
     ENLIGHTEN_OS.ignite();
     
-    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked. Temporal Architecture Active. Grand Unified Engine Online.");
+    // 8. SOVEREIGN_HARMONY — Grand Unified Harmonic Engine
+    // Integrates: Golden Ratio (Φ) + Schumann Resonance (7.83Hz) + Tiered Frequencies
+    SOVEREIGN_HARMONY.ignite();
+    
+    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked.");
+    console.log("♫ Harmonic Engine Online. Earth Pulse Active. Golden Ratio Locked.");
     
     // Cleanup on unmount
     return () => {
       ENLIGHTEN_OS.destroy();
+      SOVEREIGN_HARMONY.destroy();
     };
   }, []);
   
@@ -391,6 +399,9 @@ function CafeApp() {
       
       {/* ═══ FREQUENCY ENGINE: Perspective Toggle ═══ */}
       {!isSovereignRoute && <PerspectiveToggle />}
+      
+      {/* ═══ SOVEREIGN HARMONY: Harmonic Status (Tier/Frequency/School) ═══ */}
+      {!isSovereignRoute && <HarmonicStatus />}
       
       {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
