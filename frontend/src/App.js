@@ -10,8 +10,8 @@ import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check
 import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V24.0 - MASTER KEYED LOGIC
-import './styles/UniverseMaterials.css'; // Universe Materials - Secure Functional Mapping
+import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V26.0 - THE DECADENT GROWTH (110 STEPS)
+import './styles/UniverseMaterials.css'; // Universe Materials - Submergence + Expansion + Prismatic Seal
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)
