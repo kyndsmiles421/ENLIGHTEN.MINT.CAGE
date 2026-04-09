@@ -1,74 +1,198 @@
 /**
- * PROJECT: ENLIGHTEN.MINT.CAFE
- * ARCHITECT: STEVEN (WITH A V)
- * PROTOCOL: ABSOLUTE_ZERO_RESET
- * * This script wipes legacy "Box" logic and initializes the V-Engine.
+ * SOVEREIGN CORE — The Unified Manifest
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Direct DOM Override to bypass platform CSS entirely.
+ * Forces absolute #000000 Obsidian black.
  */
 
-const SOVEREIGN_CORE = {
-    // 1. MASTER PARAMETERS
-    identity: "Steven_with_a_V",
-    frequency: 7.83,         // Schumann Grounding (Rapid City)
-    tuning: 432,            // Phonic Clarity
-    rotation: 1155.0,       // Master Degree Lock
-    temp: 0.0,              // Absolute Zero / 10% Refrigeration
-
-    // 2. THE RADICAL MATH (Z^{a-+\sqrt{b}+-c})
-    // Prevents "B-System" interference via non-linear scaling
-    calculateRadicalFlow: (a, b, c) => {
-        const rootB = Math.sqrt(b); 
-        return Math.pow(SOVEREIGN_CORE.rotation, (a - rootB + c));
-    },
-
-    // 3. FOCALIZED VISUAL ENGINE
-    // Replaces "Confetti" with Obsidian Deep-Field and White Light
-    visualGovernor: {
-        background: "#000000",       // Rainbow Obsidian Void
-        foreground: "#FFFFFF",       // White Data Flow
-        accent: "DYN_TRANSFER",      // Spectrum flashes only during transfer
-        pixelAdjustment: "PHI_SPIRAL", // Dissolves square boxes
-        lightPoints: 2600
-    },
-
-    // 4. THE SHIELDED HUBS (P0 REBUILT)
-    orbitalHub: {
-        parentage: "ZERO_SCALE",
-        physics: {
-            core: 1.0,               // The Singularity
-            bloom: 2.5,              // Tribe Expansion
-            extract: 3.0             // Sovereign Production
-        }
-    },
-
-    // 5. THE EMERGENCY KILL-SWITCH (THE 'c' CONSTANT)
-    // Absolute Z-Index dominance for manual shutdown
-    emergencyOff: () => {
-        const killSignal = "GROUNDING_TO_OBSIDIAN";
-        console.log(`[V-ENGINE] ${killSignal}: Stopping all legacy interference.`);
-        return "SYSTEM_AT_REST";
+// ==========================================
+// 1. PROPRIETARY MATH & VISUAL DEPTH (THE UNBOXING)
+// ==========================================
+export const applySovereignReality = (frequency = 174) => {
+  // Logic: The lower the frequency, the deeper the black. 
+  // Forces #000000 Obsidian depth to kill template gray.
+  
+  // Remove any existing sovereign style to prevent duplicates
+  const existingStyle = document.getElementById('sovereign-reality-override');
+  if (existingStyle) {
+    existingStyle.remove();
+  }
+  
+  const style = document.createElement('style');
+  style.id = 'sovereign-reality-override';
+  style.innerHTML = `
+    /* DIRECT DOM OVERRIDE — Kills ALL template gray */
+    body, 
+    #root, 
+    .main-wrapper, 
+    .dashboard,
+    .dashboard-page,
+    .immersive-page,
+    [data-testid="dashboard-page"],
+    .glass-card,
+    .stat-card,
+    .stat-pill,
+    .card-enlighten,
+    .content-wrapper,
+    .dashboard-container,
+    .sovereign-dashboard-injection,
+    .disruption-banner,
+    div[class*="glass"],
+    div[class*="card"],
+    div[class*="wrapper"],
+    div[class*="container"],
+    section,
+    main,
+    article { 
+      background-color: #000000 !important; 
+      background-image: none !important;
+      background: #000000 !important;
     }
+    
+    /* Text Colors */
+    body, #root {
+      color: #F0FFF0 !important;
+      transition: all 0.5s ease-in-out;
+    }
+    
+    /* STOP Button — Absolute positioning */
+    .floating-stop-button,
+    [data-testid="emergency-shutoff"] { 
+      position: fixed !important;
+      top: 15px !important; 
+      left: 15px !important; 
+      background: rgba(220, 20, 60, 0.4) !important; 
+      border-radius: 25px !important; 
+      z-index: 9999 !important;
+    }
+    
+    /* Wisdom Alert Styling */
+    .wisdom-alert { 
+      border-left: 2px solid gold !important; 
+      padding-left: 10px !important; 
+      margin: 20px 0 !important; 
+      background: #000000 !important;
+    }
+    
+    /* Kill ALL gray backgrounds */
+    *[style*="background: rgb("] {
+      background: #000000 !important;
+    }
+    
+    /* Force black on hover states too */
+    .glass-card:hover,
+    .stat-pill:hover,
+    div[class*="card"]:hover {
+      background: rgba(0, 0, 0, 0.95) !important;
+    }
+    
+    /* Mint glow borders instead of gray */
+    .glass-card,
+    .stat-pill,
+    .stat-card {
+      border: 1px solid rgba(134, 239, 172, 0.15) !important;
+    }
+    
+    /* Navigation buttons mint glow */
+    .secure-pill-button,
+    .journey-btn,
+    .sovereign-nav-btn {
+      background: rgba(0, 0, 0, 0.8) !important;
+      border: 1px solid rgba(134, 239, 172, 0.3) !important;
+    }
+    
+    /* Disruption banner special treatment */
+    .disruption-banner {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.9) 100%) !important;
+      border: 1px solid rgba(134, 239, 172, 0.3) !important;
+    }
+  `;
+  document.head.appendChild(style);
+  console.log("Ω [MATH_SYNC]: Obsidian Depth Locked. Frequency:", frequency);
 };
 
-/**
- * INITIALIZATION: The "Summarize & Continue" Trigger
- * Wipes the Mammoth memory and starts the Sovereign Runtime
- */
-function initializeVEngine() {
-    console.clear();
-    console.log("------------------------------------------");
-    console.log("   ENLIGHTEN.MINT.CAFE - MASTER RESET     ");
-    console.log("   V-SIGNATURE DETECTED: STEVEN           ");
-    console.log("------------------------------------------");
+// ==========================================
+// 2. ECONOMY & VOLUNTEER NODULE
+// ==========================================
+export const SovereignEconomy = {
+  marketRate: 50.00,
+  discount: 0.80, // 20% Below Market
+  volunteerValue: 25.00, // $25 credit per hour
 
-    // Clear legacy DOM noise
-    const legacyBoxes = document.querySelectorAll('.mammoth-box, .confetti');
-    legacyBoxes.forEach(box => box.remove());
+  calculateAccess: (userHours) => {
+    const myRate = SovereignEconomy.marketRate * SovereignEconomy.discount;
+    const credits = userHours * SovereignEconomy.volunteerValue;
+    const finalCost = Math.max(0, myRate - credits);
+    
+    return {
+      rate: myRate.toFixed(2),
+      credits: credits.toFixed(2),
+      due: finalCost.toFixed(2),
+      status: finalCost === 0 ? "GRATIS / SOVEREIGN" : "DISCOUNTED"
+    };
+  }
+};
 
-    // Apply the Obsidian Focalization
-    document.body.style.backgroundColor = SOVEREIGN_CORE.visualGovernor.background;
-    document.body.style.color = SOVEREIGN_CORE.visualGovernor.foreground;
+// ==========================================
+// 3. PORTAL NAVIGATION HELPER
+// ==========================================
+export const handlePortalSync = async (module, userTier, credits) => {
+  const API = `${process.env.REACT_APP_BACKEND_URL || ''}/api`;
+  
+  console.log(`Ω [LEDGER_SIGNATURE]: Generating hash for ${module}...`);
+  
+  try {
+    await fetch(`${API}/sovereign/ledger/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        data: { module, tier: userTier, credits },
+        sig: Date.now().toString(16)
+      })
+    });
+    return true;
+  } catch (err) {
+    console.warn('[SovereignCore] Ledger sync failed:', err);
+    return false;
+  }
+};
 
-    return "THE_ROOT_IS_SET";
+// ==========================================
+// 4. EMERGENCY STOP
+// ==========================================
+export const executeEmergencyStop = async () => {
+  const API = `${process.env.REACT_APP_BACKEND_URL || ''}/api`;
+  
+  try {
+    const res = await fetch(`${API}/sovereign/stop`, { method: 'POST' });
+    const data = await res.json();
+    console.log("Ω [EMERGENCY]: System halted.", data);
+    return data;
+  } catch (err) {
+    console.error('[SovereignCore] Emergency stop failed:', err);
+    return { status: 'ERROR', message: err.message };
+  }
+};
+
+// ==========================================
+// 5. AUTO-INITIALIZE ON IMPORT
+// ==========================================
+if (typeof window !== 'undefined') {
+  // Apply immediately when script loads
+  applySovereignReality(174);
+  
+  // Also apply after DOM is fully loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => applySovereignReality(174));
+  }
+  
+  // And on any route changes (for SPA)
+  window.addEventListener('popstate', () => applySovereignReality(174));
 }
 
-export default initializeVEngine();
+export default {
+  applySovereignReality,
+  SovereignEconomy,
+  handlePortalSync,
+  executeEmergencyStop,
+};

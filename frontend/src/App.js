@@ -7,6 +7,7 @@ import './engines/SystemRecovery'; // Exposes V_ENGINE.resetSystem() to console
 import './engines/MainframeSync'; // Exposes V_ENGINE.syncMainframe() to console
 import './engines/PerformanceManager'; // Battery & TTS Fallback
 import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check, Capacitor Bridge
+import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -296,7 +297,11 @@ function CafeApp() {
     // 2. Strip legacy borders and shadows
     // 3. Force stop any active media streams
     purgeNoise();
-    console.log("🌌 Void initialized. Chaos neutralized.");
+    
+    // 4. DIRECT DOM OVERRIDE — Force True Obsidian #000000
+    applySovereignReality(174);
+    
+    console.log("🌌 Void initialized. Chaos neutralized. Obsidian Depth Locked.");
   }, []);
   
   // Route-based audio cleanup — kills audio when exiting rooms

@@ -1,6 +1,6 @@
 # The Enlightenment Cafe - Product Requirements Document
 
-## Version: 2.94_ECONOMY_INJECTION | RECIPROCITY_GATE
+## Version: 2.95_TRUE_OBSIDIAN | SOVEREIGN_UNIFIED_MANIFEST
 ## Last Updated: 2026-04-09
 
 ---
@@ -241,6 +241,21 @@ for (let i = 0; i < 600; i++) {
   - `.disruption-banner` - Animated glow effect
   - `.stat-pill` - Hover elevation effect
   - Removed template gray backgrounds
+- [x] **Sovereign Unified Manifest (True Obsidian)** ✅ (2026-04-09)
+  - Created `/app/frontend/src/engines/SovereignCore.js` — Direct DOM Override
+    - `applySovereignReality(frequency)` — Forces #000000 on ALL elements
+    - Kills template gray by targeting body, #root, .main-wrapper, .glass-card, div[class*="card"], etc.
+    - Auto-initializes on import + DOMContentLoaded + route changes
+  - Created `/app/frontend/src/components/SovereignInterface.js`
+    - Unified component with STOP button, Economy stats, Portal navigation
+    - Gold border wisdom alert: "Welcome back, Cosmic"
+    - Status display: GRATIS/SOVEREIGN or DISCOUNTED
+  - Integrated into `/app/frontend/src/App.js` CafeApp useEffect
+  - All portals now navigate correctly:
+    - 进入 SANCTUARY → `/zen-garden`
+    - EXPLORE PRACTICE → `/breathing`
+    - ENTER DIVINATION → `/oracle`
+    - VOLUNTEER ECONOMY → `/economy`
 
 ---
 

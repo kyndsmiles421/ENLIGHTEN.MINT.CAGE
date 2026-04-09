@@ -32,7 +32,7 @@ import Walkthrough from '../components/Walkthrough';
 import TrialBanner from '../components/TrialBanner';
 import MissionControlRing from '../components/MissionControlRing';
 import TodaysRitualWidget from '../components/TodaysRitualWidget';
-import SovereignDashboard from '../components/SovereignDashboard';
+import SovereignInterface from '../components/SovereignInterface';
 
 // Extracted section components
 import {
@@ -442,11 +442,11 @@ export default function Dashboard() {
         {/* Trial Banner */}
         <div className="mb-4"><TrialBanner /></div>
 
-        {/* SOVEREIGN DASHBOARD — Economy Injection */}
+        {/* SOVEREIGN INTERFACE — Economy + Portal Wiring + True Obsidian */}
         <div className="mb-6">
-          <SovereignDashboard 
-            userData={{ tier: user?.tier || 'BASIC', volunteerHours: 0 }} 
-            compact={false} 
+          <SovereignInterface 
+            userTier={user?.tier || 'BASIC'} 
+            volunteerHours={0} 
           />
         </div>
 
