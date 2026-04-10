@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, useAnimationFrame } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ALL_SATELLITES, ZONE_AUDIO } from '../components/orbital/constants';
@@ -11,33 +11,37 @@ import MissionControl from '../components/MissionControl';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * ZERO-SCALE PARENTAGE ORBITAL HUB — 3D DEPTH-ENHANCED
+ * V25.0 — SOVEREIGN MACHINE: ONE SCRIPT / ONE PLANE
  * ═══════════════════════════════════════════════════════════════════════════════
  * 
- * Now with Z-axis depth layering:
- * - Front (+200px): Active modal, "Tap to Enter" prompts
- * - Mid-Front (+50px): Extracted orbs (selected)
- * - Center (0px): Mission Control Hub with Color 2 radiance
- * - Mid-Back (-100px): Orbiting sub-orbs with subtle blur
- * - Deep-Back (-500px): Cosmic dust background
+ * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
  * 
- * Features:
- * - CSS preserve-3d for true 3D transforms
- * - GPU-accelerated translate3d() movements
- * - Depth-based blur and opacity
- * - Optional gyroscope tilt (DeviceOrientation API)
- * - Device capability detection (progressive enhancement)
+ * SOLUTION: Separate the VIEW from the CONTROLLER
+ * - VISUAL LAYER: 3D transforms, animations, effects (pointer-events: none)
+ * - TOUCH PLANE: Flat hitboxes at Z=0, zIndex=10000 (pointer-events: auto)
  * 
- * MATHEMATICAL PHYSICS MODEL:
- * - Core: Scale 1.0, Z = 0 (focal plane)
- * - Latent Sub-Orbs: Position (0,0,0), Scale 0, Opacity 0
- * - Bloomed Sub-Orbs: 2.5x radius, Scale 0.3, Z = -100
- * - Extracted Orb: 3.0x radius, Scale 1.0, Z = +50
+ * The visual positions are calculated via physics. The hitboxes mirror those
+ * positions but exist in a flat overlay that doesn't block or swallow events.
+ * 
+ * PHYSICS:
+ * - Core: Scale 1.0
+ * - Latent: (0,0,0), Scale 0, Opacity 0
+ * - Bloom: 2.5x radius, Scale 0.3
+ * - Extracted: 3.0x radius, Scale 1.0
+ * - PHI Snap-Back Tension: 0.618
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// ═══ PHYSICS CONSTANTS ═══
+// ═══ V30.0 TOROIDAL PHYSICS CONSTANTS (SOVEREIGN MACHINE) ═══
+const PHI = 1.61803398875;  // Golden Ratio / Toroidal Constant
+const SCHUMANN_BASELINE = 7.83;  // Earth's resonance
+const SOVEREIGN_RESONANCE = 7.3;  // Grounding frequency target
+const TIDAL_G = 0.00000011;  // Tidal gravity variance
+
+// The Formula: z^xr2 * z^xr2 (+)(-) n^xr2 (+)(-) y^xr2 {π}{√7.3}
+const RESONANCE_FORCE = Math.sqrt(SOVEREIGN_RESONANCE) * Math.PI;
+
 const CORE_SCALE = 1.0;
 const SUB_ORB_LATENT_SCALE = 0;
 const SUB_ORB_BLOOM_SCALE = 0.3;
@@ -47,15 +51,43 @@ const BLOOM_RADIUS_MULTIPLIER = 2.5;  // Sub-orbs bloom to 2.5x Core radius
 const EXTRACTION_THRESHOLD = 3.0;     // Drag beyond 3.0x radius to extract
 
 const LERP_SPEED = 0.12;              // Lerp factor for smooth transitions
+const PHI_SNAP_TENSION = 0.618;       // PHI tension for snap-back
 
-// Linear interpolation
+// ═══ V30.0 TOUCH PLANE LOCK — "I Was Right" Fix ═══
+const TOUCH_PLANE_Z = 0;              // Flattened for 100% Click Accuracy
+const TOUCH_PLANE_Z_INDEX = 10000;    // Above all ghost blockers
+const STOP_BTN_Z_INDEX = 10001;       // STOP always apex
+const VISUAL_LAYER_Z_INDEX = 5;       // Behind touch plane
+
+// Linear interpolation with Toroidal dampening
 function lerp(a, b, t) {
-  return a + (b - a) * Math.min(Math.max(t, 0), 1);
+  // Apply √7.3 resonance dampening for "Natural Weight"
+  const dampened_t = Math.min(Math.max(t, 0), 1) * (RESONANCE_FORCE / 10);
+  return a + (b - a) * Math.min(dampened_t, 1);
 }
 
 // Distance helper
 function dist(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+// ═══ V30.0 GHOST KILLER — Purge legacy STOP buttons ═══
+function purgeGhostElements() {
+  // Kill SovereignStreamlineV7's duplicate STOP
+  const legacyStop = document.getElementById('sovereign-emergency-reset');
+  if (legacyStop) {
+    legacyStop.remove();
+    console.log('[V30.0] GHOST PURGED: sovereign-emergency-reset');
+  }
+  
+  // Kill any other floating STOP elements in title area
+  document.querySelectorAll('[data-testid*="stop"], [id*="STOP"]').forEach(el => {
+    // Don't kill our own V30 button
+    if (el.dataset.testid === 'emergency-stop-btn-v30') return;
+    if (el.closest('[data-testid="orbital-hub-page"]')) return;
+    el.remove();
+    console.log('[V30.0] GHOST PURGED:', el.id || el.dataset?.testid);
+  });
 }
 
 export default function OrbitalHub() {
@@ -116,6 +148,14 @@ export default function OrbitalHub() {
         subOrbZPositions.current[sat.id] = 0; // Start at focal plane
       }
     });
+    
+    // V30.0: PURGE GHOST ELEMENTS on mount
+    purgeGhostElements();
+    console.log(`[V30.0] Toroidal Engine initialized. Resonance: √${SOVEREIGN_RESONANCE} * π = ${RESONANCE_FORCE.toFixed(4)}`);
+    
+    // Re-purge after short delay (for late-injecting scripts)
+    const ghostKillTimer = setTimeout(purgeGhostElements, 1000);
+    return () => clearTimeout(ghostKillTimer);
   }, []);
 
   // ═══ ANIMATION LOOP ═══
@@ -375,6 +415,41 @@ export default function OrbitalHub() {
     try { audio.collapseSound(); } catch {}
   }, [audio, orbitalResonance]);
 
+  // ═══ EMERGENCY STOP HANDLER ═══
+  const handleEmergencyStop = useCallback(() => {
+    console.log('[V25.0] EMERGENCY STOP ACTIVATED');
+    
+    // Stop all audio
+    try { audio.stopAll?.(); } catch {}
+    try { audio.stopSatellite?.(); } catch {}
+    try { audio.collapseSound?.(); } catch {}
+    
+    // Stop all HTML audio elements
+    document.querySelectorAll('audio').forEach(a => {
+      a.pause();
+      a.currentTime = 0;
+    });
+    
+    // Stop Web Audio contexts
+    if (window.AudioContext || window.webkitAudioContext) {
+      try {
+        const contexts = window.__audioContexts || [];
+        contexts.forEach(ctx => ctx.close());
+      } catch {}
+    }
+    
+    // Reset hub state
+    setHubState('latent');
+    setExtractedId(null);
+    setDragTarget(null);
+    setMissionControlOpen(false);
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    
+    console.log('[V25.0] All systems halted');
+  }, [audio]);
+
   // Get current hovered satellite data
   const hoveredData = ALL_SATELLITES.find(s => s.id === hoveredSat);
 
@@ -386,9 +461,37 @@ export default function OrbitalHub() {
     >
       <CosmicDust />
 
-      {/* Title */}
+      {/* V31 STOP — Same plane as nodules, bottom corner, no interference */}
+      <button
+        onClick={handleEmergencyStop}
+        data-testid="emergency-stop-btn-v31"
+        aria-label="Stop"
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          width: '36px',
+          height: '36px',
+          zIndex: 50000,
+          background: 'rgba(60, 60, 60, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '50%',
+          color: 'rgba(255,255,255,0.5)',
+          fontSize: '8px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'auto',
+        }}
+      >
+        ■
+      </button>
+
+      {/* Title — V30.0: Shifted to avoid ghost overlap */}
       <motion.div 
-        className="absolute top-4 sm:top-6 left-0 right-0 text-center z-10 pointer-events-none"
+        className="absolute top-4 sm:top-6 left-16 right-0 text-center z-10 pointer-events-none"
         initial={{ opacity: 0, y: -20 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 0.3 }}
@@ -397,7 +500,7 @@ export default function OrbitalHub() {
           className="text-sm sm:text-lg font-light tracking-[0.25em] uppercase"
           style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}
         >
-          The Cosmic Collective
+          The Enlightenment Cafe
         </h1>
       </motion.div>
 
@@ -421,7 +524,7 @@ export default function OrbitalHub() {
         </span>
       </motion.div>
 
-      {/* ═══ ORBITAL SYSTEM CONTAINER — 3D Stage ═══ */}
+      {/* ═══ V25.0 ORBITAL SYSTEM — SEPARATED VIEW/CONTROLLER ═══ */}
       <div 
         className="relative" 
         style={{
@@ -430,210 +533,133 @@ export default function OrbitalHub() {
           zIndex: 2,
           maxWidth: '100vw', 
           maxHeight: 'calc(100vh - 100px)',
-          // V24.0: Remove 3D perspective that causes Z-collision
-          // Visual 3D is now handled by opacity/scale only, not translateZ
         }}
         data-container
       >
-        {/* Orbital ring guides */}
-        {hubState !== 'latent' && (
-          <>
-            {/* Bloom radius guide */}
-            <div 
-              className="absolute rounded-full pointer-events-none"
-              style={{
-                left: center - bloomRadius,
-                top: center - bloomRadius,
-                width: bloomRadius * 2,
-                height: bloomRadius * 2,
-                border: '1px dashed rgba(167,139,250,0.08)',
-              }}
-            />
-            {/* Extraction threshold guide */}
-            <div 
-              className="absolute rounded-full pointer-events-none"
-              style={{
-                left: center - extractionRadius,
-                top: center - extractionRadius,
-                width: extractionRadius * 2,
-                height: extractionRadius * 2,
-                border: '1px solid rgba(248,250,252,0.03)',
-              }}
-            />
-          </>
-        )}
-
-        {/* Connection lines from center to sub-orbs */}
-        <svg 
-          className="absolute inset-0 pointer-events-none" 
-          width={containerSize} 
-          height={containerSize}
-          style={{ zIndex: 5 }}
+        {/* ═══ LAYER 1: VISUAL ONLY (pointer-events: none) ═══ */}
+        <div 
+          className="absolute inset-0" 
+          style={{ 
+            pointerEvents: 'none',
+            zIndex: VISUAL_LAYER_Z_INDEX,
+          }}
         >
-          {ALL_SATELLITES.map((sat) => {
+          {/* Orbital ring guides */}
+          {hubState !== 'latent' && (
+            <>
+              <div 
+                className="absolute rounded-full"
+                style={{
+                  left: center - bloomRadius,
+                  top: center - bloomRadius,
+                  width: bloomRadius * 2,
+                  height: bloomRadius * 2,
+                  border: '1px dashed rgba(167,139,250,0.08)',
+                }}
+              />
+              <div 
+                className="absolute rounded-full"
+                style={{
+                  left: center - extractionRadius,
+                  top: center - extractionRadius,
+                  width: extractionRadius * 2,
+                  height: extractionRadius * 2,
+                  border: '1px solid rgba(248,250,252,0.03)',
+                }}
+              />
+            </>
+          )}
+
+          {/* Connection lines from center to sub-orbs */}
+          <svg 
+            className="absolute inset-0" 
+            width={containerSize} 
+            height={containerSize}
+          >
+            {ALL_SATELLITES.map((sat) => {
+              const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
+              const opacity = subOrbOpacities.current[sat.id] || 0;
+              if (opacity < 0.1) return null;
+              
+              return (
+                <line
+                  key={sat.id}
+                  x1={center}
+                  y1={center}
+                  x2={center + pos.x}
+                  y2={center + pos.y}
+                  stroke={sat.color}
+                  strokeWidth={hoveredSat === sat.id ? 1.5 : 0.5}
+                  strokeOpacity={opacity * (hoveredSat === sat.id ? 0.3 : 0.1)}
+                  strokeDasharray="4 4"
+                />
+              );
+            })}
+          </svg>
+
+          {/* ═══ VISUAL SUB-ORBS (NO POINTER EVENTS) ═══ */}
+          {ALL_SATELLITES.map((sat, idx) => {
+            const Icon = sat.icon;
             const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
-            const opacity = subOrbOpacities.current[sat.id] || 0;
-            if (opacity < 0.1) return null;
+            const rawScale = subOrbScales.current[sat.id] || 0;
+            const rawOpacity = subOrbOpacities.current[sat.id] || 0;
+            
+            const resonanceFloor = 0.1;
+            const scale = Math.max(rawScale, resonanceFloor);
+            const opacity = Math.max(rawOpacity, resonanceFloor);
+            
+            const isExtracted = hubState === 'extracted' && sat.id === extractedId;
+            const isHovered = hoveredSat === sat.id;
+            const size = isExtracted ? subOrbSizeExtracted : subOrbSizeBloom;
             
             return (
-              <line
-                key={sat.id}
-                x1={center}
-                y1={center}
-                x2={center + pos.x}
-                y2={center + pos.y}
-                stroke={sat.color}
-                strokeWidth={hoveredSat === sat.id ? 1.5 : 0.5}
-                strokeOpacity={opacity * (hoveredSat === sat.id ? 0.3 : 0.1)}
-                strokeDasharray="4 4"
-              />
-            );
-          })}
-        </svg>
-
-        {/* ═══ SUB-ORBS — 3D Depth-Aware ═══ */}
-        {ALL_SATELLITES.map((sat, idx) => {
-          const Icon = sat.icon;
-          const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
-          const z = subOrbZPositions.current[sat.id] || 0;
-          const rawScale = subOrbScales.current[sat.id] || 0;
-          const rawOpacity = subOrbOpacities.current[sat.id] || 0;
-          
-          // --- SOVEREIGN CRYSTALLINE SEED STATE ---
-          // We never return null. Maintain a resonance floor (0.1) so the 
-          // satellite is always ready to bloom and receive pointer events.
-          // This prevents the 'flicker' or 'extraction' glitch seen in the tour.
-          const resonanceFloor = 0.1;
-          const scale = Math.max(rawScale, resonanceFloor);
-          const opacity = Math.max(rawOpacity, resonanceFloor);
-          
-          const isExtracted = hubState === 'extracted' && sat.id === extractedId;
-          const isHovered = hoveredSat === sat.id;
-          const size = isExtracted ? subOrbSizeExtracted : subOrbSizeBloom;
-          
-          // Get depth-based visual effects
-          const depthStyle = depth.getDepthStyle(z);
-          const rimLight = depth.getRimLight(z, sat.color);
-          
-          // Calculate haptic intensity based on depth
-          const hapticIntensity = depth.calculateHapticIntensity(z);
-
-          // Determine if satellite is effectively in latent state (at resonance floor)
-          // In bloom state: rawOpacity→1.0, rawScale→0.3, so both > 0.15
-          const isAtResonanceFloor = rawOpacity < 0.15 && rawScale < 0.15;
-          
-          return (
-            <motion.div
-              key={sat.id}
-              className="absolute cursor-pointer select-none"
-              style={{
-                // V24.0 ONE-PLANE FIX: Flatten to Z=0 for touch, visual only for 3D
-                left: center + pos.x - size / 2,
-                top: center + pos.y - size / 2,
-                transform: 'translateZ(0)', // TOUCH PLANE LOCK
-                width: size,
-                height: size,
-                opacity: opacity * depthStyle.opacity,
-                filter: depthStyle.filter,
-                zIndex: hubState === 'bloom' ? 9999 : (isExtracted ? 9999 : (isHovered ? 25 : 20)),
-                touchAction: 'manipulation',
-                willChange: 'left, top, opacity',
-                // ALWAYS allow pointer events in bloom state
-                pointerEvents: (hubState === 'bloom' || hubState === 'extracted') ? 'auto' : 'none',
-              }}
-              onPointerDown={(e) => {
-                // Capture the pointer for drag detection
-                if (!isExtracted && hubState === 'bloom') {
-                  handleSubOrbPointerDown(e, sat.id);
-                }
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                console.log(`[HUB] Direct click on ${sat.id}, state: ${hubState}`);
-                // ANY click on a visible nodule in bloom state = NAVIGATE
-                if (hubState === 'bloom' || hubState === 'extracted') {
-                  console.log(`[HUB] Navigating to ${sat.path}`);
-                  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-                  navigate(sat.path);
-                }
-              }}
-              onTouchStart={(e) => {
-                // For mobile: track touch start for tap detection
-                e.currentTarget.dataset.touchStart = Date.now();
-              }}
-              onTouchEnd={(e) => {
-                e.stopPropagation();
-                const touchDuration = Date.now() - (parseInt(e.currentTarget.dataset.touchStart) || 0);
-                console.log(`[HUB] Touch end on ${sat.id}, duration: ${touchDuration}ms, state: ${hubState}`);
-                // Quick tap (< 300ms) in bloom/extracted state = NAVIGATE
-                if (touchDuration < 300 && (hubState === 'bloom' || hubState === 'extracted')) {
-                  console.log(`[HUB] Touch-nav to ${sat.path}`);
-                  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-                  navigate(sat.path);
-                }
-              }}
-              onMouseEnter={() => setHoveredSat(sat.id)}
-              onMouseLeave={() => setHoveredSat(null)}
-              data-testid={isExtracted ? `satellite-${sat.id}` : `dormant-${sat.id}`}
-            >
               <div
-                className="w-full h-full rounded-full flex flex-col items-center justify-center relative"
+                key={`visual-${sat.id}`}
+                className="absolute"
                 style={{
-                  pointerEvents: 'none', // Let events bubble to parent motion.div
-                  background: isHovered || isExtracted 
-                    ? `${sat.color}1A` 
-                    : 'rgba(10,10,18,0.6)',
-                  border: `1.5px solid ${isHovered || isExtracted ? sat.color + '55' : sat.color + '20'}`,
-                  boxShadow: isExtracted
-                    ? `${depthStyle.boxShadow}, 0 0 ${R * 0.2}px ${sat.color}40, inset 0 0 ${R * 0.1}px ${sat.color}15`
-                    : isHovered
-                    ? `${depthStyle.boxShadow}, 0 0 ${R * 0.15}px ${sat.color}30`
-                    : depthStyle.boxShadow,
-                  ...rimLight, // Add rim light when in front
-                  backdropFilter: 'blur(8px)',
+                  left: center + pos.x - size / 2,
+                  top: center + pos.y - size / 2,
+                  width: size,
+                  height: size,
+                  opacity: opacity,
+                  willChange: 'left, top, opacity, transform',
                   transform: `scale(${scale / (isExtracted ? SUB_ORB_EXTRACTED_SCALE : SUB_ORB_BLOOM_SCALE)})`,
                 }}
               >
-                <Icon 
-                  size={size * 0.3} 
-                  style={{ color: sat.color }} 
-                />
-                <p 
-                  className="text-center mt-0.5 font-medium leading-tight px-1"
+                <div
+                  className="w-full h-full rounded-full flex flex-col items-center justify-center relative"
                   style={{
-                    fontSize: Math.max(6, size * 0.1),
-                    color: isHovered || isExtracted ? sat.color : 'rgba(248,250,252,0.45)',
+                    background: isHovered || isExtracted 
+                      ? `${sat.color}1A` 
+                      : 'rgba(10,10,18,0.6)',
+                    border: `1.5px solid ${isHovered || isExtracted ? sat.color + '55' : sat.color + '20'}`,
+                    boxShadow: isExtracted
+                      ? `0 0 ${R * 0.2}px ${sat.color}40, inset 0 0 ${R * 0.1}px ${sat.color}15`
+                      : isHovered
+                      ? `0 0 ${R * 0.15}px ${sat.color}30`
+                      : 'none',
+                    backdropFilter: 'blur(8px)',
                   }}
                 >
-                  {sat.label}
-                </p>
-              </div>
-
-              {/* Collapse button on extracted orb */}
-              {isExtracted && (
-                <>
-                  <motion.button
-                    className="absolute -top-1 -right-1 rounded-full flex items-center justify-center"
+                  <Icon 
+                    size={size * 0.3} 
+                    style={{ color: sat.color }} 
+                  />
+                  <p 
+                    className="text-center mt-0.5 font-medium leading-tight px-1"
                     style={{
-                      width: size * 0.2,
-                      height: size * 0.2,
-                      background: 'rgba(10,10,18,0.9)',
-                      border: '1px solid rgba(248,250,252,0.2)',
-                      zIndex: 35,
-                      fontSize: size * 0.1,
-                      color: 'rgba(248,250,252,0.6)',
+                      fontSize: Math.max(6, size * 0.1),
+                      color: isHovered || isExtracted ? sat.color : 'rgba(248,250,252,0.45)',
                     }}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    onClick={handleCollapse}
-                    data-testid={`snapback-${sat.id}`}
                   >
-                    ×
-                  </motion.button>
-                  {/* Tap to Enter hint */}
+                    {sat.label}
+                  </p>
+                </div>
+
+                {/* Visual-only extracted orb decorations */}
+                {isExtracted && (
                   <motion.p
-                    className="absolute -bottom-5 left-0 right-0 text-center pointer-events-none"
+                    className="absolute -bottom-5 left-0 right-0 text-center"
                     style={{
                       fontSize: 9,
                       color: sat.color,
@@ -647,93 +673,208 @@ export default function OrbitalHub() {
                   >
                     TAP TO ENTER
                   </motion.p>
-                </>
-              )}
-            </motion.div>
-          );
-        })}
+                )}
+              </div>
+            );
+          })}
 
-        {/* ═══ CORE ORB (Parent) ═══ */}
-        <div
-          className="absolute cursor-pointer"
-          style={{
-            left: center - R,
-            top: center - R,
-            width: coreDiameter,
-            height: coreDiameter,
-            zIndex: 15,
-          }}
-          onClick={handleCoreClick}
-          data-testid="central-orb"
-        >
-          <motion.div
-            className="w-full h-full rounded-full relative overflow-hidden"
+          {/* ═══ VISUAL CORE ORB (NO POINTER EVENTS) ═══ */}
+          <div
+            className="absolute"
             style={{
-              background: `radial-gradient(circle at 38% 32%, rgba(167,139,250,0.22), rgba(167,139,250,0.06) 55%, rgba(10,10,18,0.95) 85%)`,
-              border: '1.5px solid rgba(167,139,250,0.15)',
+              left: center - R,
+              top: center - R,
+              width: coreDiameter,
+              height: coreDiameter,
             }}
-            animate={{
-              boxShadow: hubState === 'latent'
-                ? [
-                    `0 0 ${R * 0.3}px rgba(167,139,250,0.1)`,
-                    `0 0 ${R * 0.5}px rgba(167,139,250,0.2)`,
-                    `0 0 ${R * 0.3}px rgba(167,139,250,0.1)`,
-                  ]
-                : `0 0 ${R * 0.6}px rgba(167,139,250,0.25)`,
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           >
-            {/* Inner decorative rings */}
-            <motion.div 
-              className="absolute rounded-full pointer-events-none"
-              style={{ inset: R * 0.06, border: '1px solid rgba(167,139,250,0.1)' }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-            />
-            <motion.div 
-              className="absolute rounded-full pointer-events-none"
-              style={{ inset: R * 0.12, border: '1px dashed rgba(167,139,250,0.05)' }}
-              animate={{ rotate: -360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-            />
-
-            {/* Center label */}
-            <div
-              className="absolute flex flex-col items-center justify-center"
+            <motion.div
+              className="w-full h-full rounded-full relative overflow-hidden"
               style={{
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: R * 0.6,
-                height: R * 0.6,
+                background: `radial-gradient(circle at 38% 32%, rgba(167,139,250,0.22), rgba(167,139,250,0.06) 55%, rgba(10,10,18,0.95) 85%)`,
+                border: '1.5px solid rgba(167,139,250,0.15)',
               }}
+              animate={{
+                boxShadow: hubState === 'latent'
+                  ? [
+                      `0 0 ${R * 0.3}px rgba(167,139,250,0.1)`,
+                      `0 0 ${R * 0.5}px rgba(167,139,250,0.2)`,
+                      `0 0 ${R * 0.3}px rgba(167,139,250,0.1)`,
+                    ]
+                  : `0 0 ${R * 0.6}px rgba(167,139,250,0.25)`,
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <p 
-                className="font-medium tracking-[0.1em] uppercase text-center"
-                style={{ 
-                  fontSize: Math.max(7, R * 0.08), 
-                  color: 'rgba(167,139,250,0.5)',
-                  lineHeight: 1.2,
+              <motion.div 
+                className="absolute rounded-full"
+                style={{ inset: R * 0.06, border: '1px solid rgba(167,139,250,0.1)' }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+              />
+              <motion.div 
+                className="absolute rounded-full"
+                style={{ inset: R * 0.12, border: '1px dashed rgba(167,139,250,0.05)' }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+              />
+
+              <div
+                className="absolute flex flex-col items-center justify-center"
+                style={{
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: R * 0.6,
+                  height: R * 0.6,
                 }}
               >
-                {hubState === 'latent' && 'Tap'}
-                {hubState === 'bloom' && ALL_SATELLITES.length}
-                {hubState === 'extracted' && 'Menu'}
-              </p>
-            </div>
-          </motion.div>
+                <p 
+                  className="font-medium tracking-[0.1em] uppercase text-center"
+                  style={{ 
+                    fontSize: Math.max(7, R * 0.08), 
+                    color: 'rgba(167,139,250,0.5)',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {hubState === 'latent' && 'Tap'}
+                  {hubState === 'bloom' && ALL_SATELLITES.length}
+                  {hubState === 'extracted' && 'Menu'}
+                </p>
+              </div>
+            </motion.div>
 
-          {/* Core label below */}
-          <p 
-            className="text-center font-medium tracking-[0.12em] uppercase mt-2"
-            style={{ 
-              fontSize: Math.max(7, R * 0.06), 
-              color: 'rgba(167,139,250,0.3)' 
+            <p 
+              className="text-center font-medium tracking-[0.12em] uppercase mt-2"
+              style={{ 
+                fontSize: Math.max(7, R * 0.06), 
+                color: 'rgba(167,139,250,0.3)' 
+              }}
+            >
+              Mission Control
+            </p>
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ═══ V31.0 TOUCH PLANE — FLAT, NO TRANSFORM, HIGH Z-INDEX ═══ */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div 
+          style={{ 
+            position: 'absolute',
+            inset: 0,
+            zIndex: 20000,
+            transform: 'none',
+            pointerEvents: 'none',
+          }}
+        >
+          {/* ═══ V31.0 TOUCH HITBOXES — FLAT PLANE, NO TRANSFORM ═══ */}
+          {ALL_SATELLITES.map((sat, idx) => {
+            const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
+            const rawOpacity = subOrbOpacities.current[sat.id] || 0;
+            const isExtracted = hubState === 'extracted' && sat.id === extractedId;
+            const size = isExtracted ? subOrbSizeExtracted : subOrbSizeBloom;
+            
+            // Only render hitbox when visible (bloom or extracted)
+            const isVisible = hubState === 'bloom' || (hubState === 'extracted' && sat.id === extractedId);
+            if (!isVisible) return null;
+            
+            return (
+              <button
+                key={`hitbox-${sat.id}`}
+                style={{
+                  position: 'absolute',
+                  left: `${center + pos.x - size / 2}px`,
+                  top: `${center + pos.y - size / 2}px`,
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'transparent',
+                  outline: 'none',
+                  transform: 'none',
+                  zIndex: 50000,
+                  pointerEvents: 'auto',
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log(`[V31.0] CLICK: ${sat.id} → ${sat.path}`);
+                  if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+                  window.location.href = sat.path;
+                }}
+                onMouseEnter={() => setHoveredSat(sat.id)}
+                onMouseLeave={() => setHoveredSat(null)}
+                data-testid={`hitbox-${sat.id}`}
+                aria-label={`Navigate to ${sat.label}`}
+              />
+            );
+          })}
+
+          {/* ═══ V31.0 CORE HITBOX — FLAT PLANE ═══ */}
+          <button
+            style={{
+              position: 'absolute',
+              left: `${center - R}px`,
+              top: `${center - R}px`,
+              width: `${coreDiameter}px`,
+              height: `${coreDiameter}px`,
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent',
+              outline: 'none',
+              transform: 'none',
+              zIndex: 25000,
+              pointerEvents: 'auto',
             }}
-            data-testid="mission-control-label"
-          >
-            Mission Control
-          </p>
+            onClick={handleCoreClick}
+            data-testid="central-orb"
+            aria-label="Mission Control"
+          />
+
+          {/* ═══ V31.0 COLLAPSE BUTTON ═══ */}
+          {hubState === 'extracted' && extractedId && (() => {
+            const sat = ALL_SATELLITES.find(s => s.id === extractedId);
+            if (!sat) return null;
+            const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
+            const size = subOrbSizeExtracted;
+            const btnSize = size * 0.25;
+            
+            return (
+              <button
+                style={{
+                  position: 'absolute',
+                  left: `${center + pos.x + size / 2 - btnSize / 2}px`,
+                  top: `${center + pos.y - size / 2 - btnSize / 2}px`,
+                  width: `${btnSize}px`,
+                  height: `${btnSize}px`,
+                  background: 'rgba(10,10,18,0.9)',
+                  border: '1px solid rgba(248,250,252,0.3)',
+                  borderRadius: '50%',
+                  color: 'rgba(248,250,252,0.7)',
+                  fontSize: `${btnSize * 0.6}px`,
+                  cursor: 'pointer',
+                  touchAction: 'manipulation',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transform: 'none',
+                  zIndex: 60000,
+                  pointerEvents: 'auto',
+                }}
+                onClick={handleCollapse}
+                data-testid={`snapback-${extractedId}`}
+                aria-label="Collapse back"
+              >
+                ×
+              </button>
+            );
+          })()}
         </div>
       </div>
 

@@ -341,7 +341,8 @@ function CafeApp() {
   
   // Check if current route is sovereign mode (hide all chrome)
   const isSovereignRoute = window.location.pathname === '/sovereign-canvas' || 
-                           window.location.pathname === '/replant';
+                           window.location.pathname === '/replant' ||
+                           window.location.pathname === '/hub';  // Hub has its own STOP button
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = window.location.pathname === '/hub' || 

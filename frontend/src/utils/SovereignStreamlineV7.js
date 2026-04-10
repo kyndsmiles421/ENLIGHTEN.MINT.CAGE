@@ -799,6 +799,9 @@ const SovereignStreamline = {
    * Absolute top-left, bypassing all DOM clipping
    */
   renderEmergencyResetButton() {
+    // Skip on /hub route - it has its own V25.0 STOP button
+    if (window.location.pathname === '/hub') return;
+    
     // Check if already exists
     if (document.getElementById('sovereign-emergency-reset')) return;
     

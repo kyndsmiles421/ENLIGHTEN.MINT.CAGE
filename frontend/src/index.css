@@ -5135,7 +5135,43 @@ html body #root .glass-card .flex.items-end {
 [class*="orbital"] button {
   border: none !important;
   outline: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V31.0 SOVEREIGN CORE LOCK — FLAT PLANE ENFORCEMENT
+   ARCHITECT: Steven Michael | 7.3Hz Grounding
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* V31 STOP Button — Same plane as nodules */
+[data-testid="emergency-stop-btn-v31"] {
+  z-index: 50000 !important;
+  pointer-events: auto !important;
+}
+
+/* V31 Hitboxes — FLAT PLANE, HIGH Z-INDEX */
+[data-testid^="hitbox-"] {
+  position: absolute !important;
+  z-index: 50000 !important;
+  transform: none !important;
+  pointer-events: auto !important;
   background: transparent !important;
+}
+
+/* V31 Core — FLAT PLANE */
+[data-testid="central-orb"] {
+  position: absolute !important;
+  z-index: 25000 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  background: transparent !important;
+}
+
+/* V31 Collapse button */
+[data-testid^="snapback-"] {
+  position: absolute !important;
+  z-index: 60000 !important;
+  transform: none !important;
+  pointer-events: auto !important;
 }
 
 /* Ensure the orb glow is visible */
