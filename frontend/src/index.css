@@ -164,33 +164,57 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
   border-bottom: 1px solid var(--primary-freq, rgba(168, 85, 247, 0.8));
 }
 
-/* V46.0 MANIFEST BAR — EXPLICIT OVERRIDE */
+/* ═══════════════════════════════════════════════════════════════════════════
+   V46.1 ANTI-DRIFT SOLDER — KILL AGENT SAFE-ZONE HALLUCINATIONS
+   ARCHITECT: Steven Michael
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. KILL THE AGENT'S "SAFE ZONE" HALLUCINATIONS */
+:root {
+  --safe-zone-top: 0px !important;
+  --safe-zone-bottom: 0px !important;
+  --perspective-blur: 0px !important;
+}
+
+/* 2. V46.1 MANIFEST BAR — ABSOLUTE FLOOR DOMINANCE */
 #MANIFEST_BAR {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   width: 100% !important;
   height: 70px !important;
   min-height: 70px !important;
-  background: rgba(6,6,14,0.95) !important;
+  z-index: 999999 !important;
+  background: rgba(5, 5, 5, 0.98) !important;
   backdrop-filter: blur(12px) !important;
-  z-index: 100000 !important;
-  display: flex !important;
+  border-top: 1px solid rgba(255, 215, 0, 0.4) !important;
   justify-content: space-around !important;
   align-items: center !important;
-  border-top: 1px solid rgba(167,139,250,0.15) !important;
-  visibility: visible !important;
-  opacity: 1 !important;
   transform: none !important;
   pointer-events: auto !important;
 }
 
-#MANIFEST_BAR .bar-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  padding: 8px 12px;
+#MANIFEST_BAR .bar-nav-item,
+#MANIFEST_BAR a,
+#MANIFEST_BAR button {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-decoration: none !important;
+  padding: 8px 12px !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 3. PURGE THE "INTENSE" RED SABOTAGE */
+body[data-perspective="INTENSE"] .bar-section-manifest,
+body[data-perspective="INTENSE"] #MANIFEST_BAR {
+  box-shadow: none !important;
+  border-top-color: rgba(255, 215, 0, 0.4) !important;
 }
 
 .bar-bottom { 
