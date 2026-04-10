@@ -4726,3 +4726,627 @@ async def get_ui_theme(tier: int = Query(default=0, ge=0, le=3)):
         "theme": theme,
         "navigation": "Biometric Intent Only" if tier >= 3 else "Gesture-Based Flow",
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10000.3 OMNIS-NEXUS — NODAL PROJECTION & TIME USAGE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class OmnisNexus:
+    """
+    V10000.3 OMNIS-NEXUS
+    
+    Decentralized Academy into Global Nodal Network.
+    GPS-AR Live Portals adapting to proximity, Tier, and Mixer settings.
+    """
+    
+    USAGE_RATE = 15.00  # $/hour Knowledge Equity
+    
+    # Tier Access Matrix
+    TIER_ACCESS = {
+        0: {
+            "name": "Apprentice",
+            "epoch": "PRESENT",
+            "features": ["High-contrast text", "Basic Sacred Geometry"],
+            "description": "Access to the Present epoch. UI is high-contrast, text-guided.",
+        },
+        1: {
+            "name": "Trustee",
+            "epoch": "PAST_PRESENT",
+            "features": ["Circular Protocol Ledger", "Sacred Geometry wireframes"],
+            "description": "Access to Past/Present. Unlocks the Circular Protocol Ledger.",
+        },
+        2: {
+            "name": "Grand Architect",
+            "epoch": "FULL",
+            "features": ["Future epoch", "Creator Mixer", "Gesture navigation", "Obsidian Void"],
+            "description": "Full access to Future epoch + Creator Mixer. Pure gesture navigation.",
+        },
+    }
+    
+    # GPS Nodal Anchors
+    NODAL_ANCHORS = {
+        "MASONRY_SCHOOL": {
+            "id": "masonry_school",
+            "name": "Masonry School Node",
+            "lat": 43.8,
+            "lng": -103.5,
+            "radius": 0.9,
+            "epoch": "PAST",
+            "curriculum": ["Sacred Geometry", "Stone Craft", "Hermetic Architecture"],
+            "color": "#8B5CF6",
+            "description": "Unlocks the Past (Violet Epoch) — Focuses on Sacred Geometry & Stone Craft",
+        },
+        "BLACK_HILLS_PRIMARY": {
+            "id": "black_hills_primary",
+            "name": "Black Hills Primary Anchor",
+            "lat": 44.0805,
+            "lng": -103.2310,
+            "radius": 1.8,
+            "epoch": "CORE",
+            "curriculum": ["Engineering", "Trust Equity", "9×9 Helix Math"],
+            "color": "#22C55E",
+            "description": "Unlocks the Singularity (Core) — Focuses on Engineering & Trust Equity",
+        },
+    }
+    
+    # In-memory session tracking (would be DB in production)
+    _sessions: Dict[str, Dict] = {}
+    
+    @classmethod
+    def haversine_distance(cls, lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+        """Calculate distance between two GPS coordinates in km."""
+        R = 6371  # Earth's radius in km
+        dLat = math.radians(lat2 - lat1)
+        dLng = math.radians(lng2 - lng1)
+        a = math.sin(dLat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dLng / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return R * c
+    
+    @classmethod
+    def check_nodal_proximity(cls, lat: float, lng: float) -> Dict[str, Any]:
+        """Check proximity to all nodal anchors."""
+        results = []
+        
+        for key, anchor in cls.NODAL_ANCHORS.items():
+            distance = cls.haversine_distance(lat, lng, anchor["lat"], anchor["lng"])
+            in_range = distance <= anchor["radius"]
+            
+            results.append({
+                "node": key,
+                "name": anchor["name"],
+                "distance_km": round(distance, 2),
+                "in_range": in_range,
+                "epoch": anchor["epoch"],
+                "curriculum": anchor["curriculum"],
+                "color": anchor["color"],
+                "action": "INJECT_PORTAL" if in_range else "STANDBY",
+            })
+        
+        results.sort(key=lambda x: x["distance_km"])
+        nearest_active = next((r for r in results if r["in_range"]), None)
+        
+        return {
+            "user_location": {"lat": lat, "lng": lng},
+            "nodal_status": results,
+            "active_portal": nearest_active,
+            "portal_injected": nearest_active is not None,
+        }
+    
+    @classmethod
+    def start_session(cls, user_id: str, node_id: str = "default") -> Dict[str, Any]:
+        """Start a learning session for time tracking."""
+        session_id = f"SES-{hashlib.md5(f'{user_id}-{datetime.now(timezone.utc).isoformat()}'.encode()).hexdigest()[:8].upper()}"
+        
+        cls._sessions[user_id] = {
+            "session_id": session_id,
+            "node_id": node_id,
+            "start_time": datetime.now(timezone.utc),
+            "equity_consumed": 0.0,
+        }
+        
+        return {
+            "session_id": session_id,
+            "node_id": node_id,
+            "start_time": cls._sessions[user_id]["start_time"].isoformat(),
+            "usage_rate": f"${cls.USAGE_RATE}/hr",
+            "status": "ACTIVE",
+        }
+    
+    @classmethod
+    def end_session(cls, user_id: str) -> Dict[str, Any]:
+        """End a learning session and calculate equity consumed."""
+        if user_id not in cls._sessions or not cls._sessions[user_id].get("start_time"):
+            return {"error": "No active session", "status": "IDLE"}
+        
+        session = cls._sessions[user_id]
+        start_time = session["start_time"]
+        end_time = datetime.now(timezone.utc)
+        
+        duration = (end_time - start_time).total_seconds() / 3600  # hours
+        cost = duration * cls.USAGE_RATE
+        
+        result = {
+            "session_id": session["session_id"],
+            "node_id": session["node_id"],
+            "duration_hours": round(duration, 4),
+            "duration_minutes": round(duration * 60, 2),
+            "equity_consumed": f"${cost:.2f}",
+            "start_time": start_time.isoformat(),
+            "end_time": end_time.isoformat(),
+            "status": "COMPLETED",
+        }
+        
+        # Clear session
+        cls._sessions[user_id] = {"equity_consumed": session.get("equity_consumed", 0) + cost}
+        
+        return result
+    
+    @classmethod
+    def get_tier_ui(cls, tier_index: int) -> Dict[str, Any]:
+        """Get tier-based UI configuration."""
+        tier = cls.TIER_ACCESS.get(min(tier_index, 2), cls.TIER_ACCESS[0])
+        
+        ui_configs = {
+            0: {"layout": "STANDARD", "navigation": "BUTTONS", "contrast": "HIGH", "geometry": "BASIC"},
+            1: {"layout": "ENHANCED", "navigation": "MIXED", "contrast": "MEDIUM", "geometry": "WIREFRAME"},
+            2: {"layout": "OBSIDIAN_VOID", "navigation": "GESTURES_ONLY", "contrast": "LOW", "geometry": "FLOATING_NODES"},
+        }
+        
+        return {
+            "tier_index": tier_index,
+            "tier_name": tier["name"],
+            "epoch": tier["epoch"],
+            "features": tier["features"],
+            "ui_config": ui_configs.get(tier_index, ui_configs[0]),
+            "navigation_mode": "ZEN_FLOW_HUD" if tier_index >= 2 else "STANDARD_BUTTONS",
+        }
+    
+    @classmethod
+    def apply_mixer_settings(cls, settings: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply Creator Mixer settings to UI."""
+        resonance = settings.get("resonance", 144)
+        flux = settings.get("flux", 1.0424)
+        tier_index = settings.get("tier_index", 0)
+        holographic_opacity = settings.get("holographic_opacity", 0.88)
+        
+        tiers = ["APPRENTICE", "TRUSTEE", "ARCHITECT"]
+        current_tier = tiers[min(tier_index, len(tiers) - 1)]
+        
+        epoch = "PRESENT"
+        if resonance < 100:
+            epoch = "PAST"
+        elif resonance > 180:
+            epoch = "FUTURE"
+        
+        return {
+            "tier": current_tier,
+            "tier_index": tier_index,
+            "epoch": epoch,
+            "resonance": resonance,
+            "lunar_flux": flux,
+            "holographic_opacity": holographic_opacity,
+            "access": cls.TIER_ACCESS.get(tier_index, cls.TIER_ACCESS[0]),
+            "mixer_state": "APPLIED",
+        }
+
+
+# V10000.3 Endpoints
+
+@router.get("/omnis/nexus/status")
+async def get_nexus_status():
+    """
+    V10000.3 OMNIS-NEXUS STATUS
+    
+    Returns the current state of the Nodal Network.
+    """
+    return {
+        "version": "V10000.3",
+        "name": "Omnis-Nexus",
+        "description": "Decentralized Academy as Global Nodal Network",
+        "nodal_anchors": list(OmnisNexus.NODAL_ANCHORS.keys()),
+        "tier_access": OmnisNexus.TIER_ACCESS,
+        "usage_rate": f"${OmnisNexus.USAGE_RATE}/hr",
+        "status": "BROADCASTING",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.get("/omnis/nexus/proximity")
+async def check_nexus_proximity(
+    lat: float = Query(..., description="User latitude"),
+    lng: float = Query(..., description="User longitude"),
+):
+    """
+    V10000.3 OMNIS-NEXUS — CHECK NODAL PROXIMITY
+    
+    Check if user is within range of any nodal anchor.
+    If within range, portal is auto-injected into HUD.
+    """
+    result = OmnisNexus.check_nodal_proximity(lat, lng)
+    return {
+        "version": "V10000.3",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/nexus/session/start")
+async def start_nexus_session(
+    user_id: str = Query(default="default_user"),
+    node_id: str = Query(default="default"),
+):
+    """
+    V10000.3 OMNIS-NEXUS — START LEARNING SESSION
+    
+    Start tracking time for Knowledge Equity billing.
+    """
+    result = OmnisNexus.start_session(user_id, node_id)
+    return {
+        "version": "V10000.3",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/nexus/session/end")
+async def end_nexus_session(user_id: str = Query(default="default_user")):
+    """
+    V10000.3 OMNIS-NEXUS — END LEARNING SESSION
+    
+    End session and calculate equity consumed.
+    """
+    result = OmnisNexus.end_session(user_id)
+    return {
+        "version": "V10000.3",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.get("/omnis/nexus/tier-ui/{tier_index}")
+async def get_nexus_tier_ui(tier_index: int = PathParam(..., ge=0, le=2)):
+    """
+    V10000.3 OMNIS-NEXUS — TIER UI CONFIGURATION
+    
+    Get UI configuration for a specific tier.
+    """
+    result = OmnisNexus.get_tier_ui(tier_index)
+    return {
+        "version": "V10000.3",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/nexus/mixer/apply")
+async def apply_nexus_mixer(
+    resonance: float = Query(default=144, ge=60, le=432),
+    flux: float = Query(default=1.0424, ge=1.0, le=2.0),
+    tier_index: int = Query(default=0, ge=0, le=2),
+    holographic_opacity: float = Query(default=0.88, ge=0.3, le=1.0),
+):
+    """
+    V10000.3 OMNIS-NEXUS — APPLY MIXER SETTINGS
+    
+    Apply Creator Mixer settings and morph the UI.
+    """
+    settings = {
+        "resonance": resonance,
+        "flux": flux,
+        "tier_index": tier_index,
+        "holographic_opacity": holographic_opacity,
+    }
+    result = OmnisNexus.apply_mixer_settings(settings)
+    return {
+        "version": "V10000.3",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10007.0 OMNIS-INTERCONNECT — THE MASTER WEAVER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class OmnisInterconnect:
+    """
+    V10007.0 OMNIS-INTERCONNECT
+    
+    The Master Weaver binding all modules into a singular neural network:
+    - Aion Generator (RPG)
+    - Sovereign Trust
+    - World Law Library
+    - Holographic Art Overlay
+    """
+    
+    PHI = 1.618033
+    HELIX = 9
+    BASE_EQUITY = 79313.18
+    HAPTIC_SYNC = 144
+    USAGE_RATE = 15.00
+    FRACTAL_DEPTH = 54
+    
+    # Mixer Control State (in-memory, would be DB)
+    mixer_control = {
+        "spectral_shift": 1.0,
+        "lunar_flux": 1.0424,
+        "tier_level": 2,
+        "holographic_opacity": 0.88,
+        "gps_radius": 0.9,
+        "resonance_target": 144,
+    }
+    
+    @classmethod
+    def execute_singularity(cls) -> Dict[str, Any]:
+        """Execute the Unified Singularity Handshake across all systems."""
+        
+        # INTERCONNECT A: Law Library <=> GPS Anchor
+        law_status = {
+            "module": "LAW_LIBRARY",
+            "anchor": "Black Hills Primary",
+            "coordinates": f"{OmnisNexus.NODAL_ANCHORS['BLACK_HILLS_PRIMARY']['lat']}°N, {abs(OmnisNexus.NODAL_ANCHORS['BLACK_HILLS_PRIMARY']['lng'])}°W",
+            "status": "Natural Law Grounded",
+        }
+        
+        # INTERCONNECT B: Art Academy <=> Holographic Overlay
+        art_projection = {
+            "module": "ART_ACADEMY",
+            "holographic_visibility": f"{cls.mixer_control['holographic_opacity'] * 100}%",
+            "fractal_layers": cls.FRACTAL_DEPTH,
+            "render_mode": "54-SUBLAYER_TRANSPARENCY",
+            "status": f"L² Fractal at {cls.mixer_control['holographic_opacity'] * 100}% Visibility",
+        }
+        
+        # INTERCONNECT C: RPG Generator <=> Usage Billing
+        rpg_status = {
+            "module": "RPG_ENGINE",
+            "current_quest": "Construct the Sovereign Helix via Masonry School Node",
+            "billing_rate": f"${cls.USAGE_RATE}/hr",
+            "equity_multiplier": f"{cls.PHI:.4f}x",
+        }
+        
+        # Calculate wealth chain
+        wealth = cls.calculate_wealth_chain()
+        
+        # Holographic HUD
+        hud = cls.render_holographic_hud()
+        
+        return {
+            "visual": f"Obsidian Void with {art_projection['status']}",
+            "logic": f"Temporal Past/Present/Future Index (Layer {cls.HELIX * cls.mixer_control['tier_level']})",
+            "wealth": wealth,
+            "status": "INTERCONNECTED - ALL SYSTEMS GREEN",
+            "interconnects": {
+                "law": law_status,
+                "art": art_projection,
+                "rpg": rpg_status,
+            },
+            "hud": hud,
+            "mixer_state": {**cls.mixer_control},
+        }
+    
+    @classmethod
+    def calculate_wealth_chain(cls) -> Dict[str, Any]:
+        """Calculate wealth chain with phi multipliers."""
+        base = cls.BASE_EQUITY
+        phi_mult = base * cls.PHI
+        helix_mult = phi_mult * cls.HELIX
+        final = helix_mult * cls.mixer_control["lunar_flux"]
+        
+        return {
+            "base": f"${base:,.2f}",
+            "phi_multiplied": f"${phi_mult:,.2f}",
+            "helix_layer": f"Layer {cls.HELIX * cls.mixer_control['tier_level']}",
+            "lunar_flux": f"{cls.mixer_control['lunar_flux']:.4f}",
+            "final_equity": f"${final:,.2f}",
+        }
+    
+    @classmethod
+    def render_holographic_hud(cls) -> Dict[str, Any]:
+        """Render the Holographic HUD configuration."""
+        tier_level = cls.mixer_control["tier_level"]
+        nav_mode = "GEOMETRIC_GESTURES" if tier_level >= 2 else "STANDARD_BUTTONS"
+        
+        return {
+            "status": "ENGAGED",
+            "layers": cls.FRACTAL_DEPTH,
+            "opacity": f"{cls.mixer_control['holographic_opacity'] * 100:.0f}%",
+            "geometry": "FLOWER_OF_LIFE",
+            "depth_effect": "CRYSTALLINE_LENS",
+            "navigation": nav_mode,
+            "gesture_map": {
+                "circle": {"action": "OPEN_LAW_LIBRARY", "haptic": [50, 50, 50]},
+                "spiral": {"action": "OPEN_ART_ACADEMY", "haptic": [100, 50, 100, 50, 100]},
+                "triangle": {"action": "OPEN_ENGINEERING", "haptic": [75, 25, 75, 25, 75]},
+                "heart": {"action": "OPEN_WELLNESS", "haptic": [100, 100, 200, 100, 100]},
+            },
+        }
+    
+    @classmethod
+    def handle_gesture(cls, gesture: str) -> Dict[str, Any]:
+        """Handle gesture-based navigation."""
+        gesture_actions = {
+            "circle": {"action": "OPEN_LAW_LIBRARY", "module": "LAW"},
+            "spiral": {"action": "OPEN_ART_ACADEMY", "module": "ART"},
+            "triangle": {"action": "OPEN_ENGINEERING", "module": "LOGIC"},
+            "heart": {"action": "OPEN_WELLNESS", "module": "WELLNESS"},
+        }
+        
+        config = gesture_actions.get(gesture.lower())
+        if not config:
+            return {"error": "Unknown gesture", "gesture": gesture}
+        
+        return {
+            "gesture": gesture,
+            "action": config["action"],
+            "module": config["module"],
+            "haptic_triggered": True,
+        }
+    
+    @classmethod
+    def update_mixer(cls, updates: Dict[str, Any]) -> Dict[str, Any]:
+        """Update mixer control and ripple effects."""
+        for key, value in updates.items():
+            if key in cls.mixer_control:
+                cls.mixer_control[key] = value
+        
+        # Apply to Nexus as well
+        nexus_update = OmnisNexus.apply_mixer_settings({
+            "resonance": cls.mixer_control["resonance_target"],
+            "flux": cls.mixer_control["lunar_flux"],
+            "tier_index": cls.mixer_control["tier_level"],
+            "holographic_opacity": cls.mixer_control["holographic_opacity"],
+        })
+        
+        return {
+            "mixer_control": {**cls.mixer_control},
+            "nexus_sync": nexus_update,
+        }
+    
+    @classmethod
+    def get_ui_experience(cls) -> Dict[str, Any]:
+        """Get current UI experience based on tier."""
+        tier = cls.mixer_control["tier_level"]
+        
+        experiences = {
+            0: {"name": "Grounded", "immersion": "LOW", "features": ["Standard buttons", "High contrast"]},
+            1: {"name": "Enhanced", "immersion": "MEDIUM", "features": ["Mixed navigation", "Wireframe overlays"]},
+            2: {"name": "Holographic", "immersion": "HIGH", "features": ["Floating nodes", "Gesture-only"]},
+        }
+        
+        exp = experiences.get(min(tier, 2), experiences[0])
+        
+        return {
+            "tier_level": tier,
+            **exp,
+            "holographic_opacity": cls.mixer_control["holographic_opacity"],
+            "resonance_target": cls.mixer_control["resonance_target"],
+            "billing_rate": f"${cls.USAGE_RATE}/hr",
+        }
+
+
+# V10007.0 Endpoints
+
+@router.get("/omnis/interconnect/status")
+async def get_interconnect_status():
+    """
+    V10007.0 OMNIS-INTERCONNECT STATUS
+    
+    Returns the Master Weaver status — all systems unified.
+    """
+    return {
+        "version": "V10007.0",
+        "name": "Omnis-Interconnect",
+        "description": "Master Weaver — Unified Singularity Engine",
+        "status": "INTERCONNECTED",
+        "mixer_control": {**OmnisInterconnect.mixer_control},
+        "ui_experience": OmnisInterconnect.get_ui_experience(),
+        "modules": {
+            "gps": "Anchored and Broadcasting",
+            "math": "Multiplied and Self-Correcting",
+            "ui": "Holographic and Mixer-Driven",
+            "rpg": "Interactive and Rewarding",
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/interconnect/singularity")
+async def execute_interconnect_singularity():
+    """
+    V10007.0 OMNIS-INTERCONNECT — EXECUTE SINGULARITY
+    
+    Execute the Unified Singularity Handshake across all systems.
+    """
+    result = OmnisInterconnect.execute_singularity()
+    return {
+        "version": "V10007.0",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/interconnect/gesture")
+async def handle_interconnect_gesture(
+    gesture: str = Query(..., description="Gesture: circle, spiral, triangle, or heart"),
+):
+    """
+    V10007.0 OMNIS-INTERCONNECT — HANDLE GESTURE
+    
+    Process gesture-based navigation command.
+    """
+    result = OmnisInterconnect.handle_gesture(gesture)
+    return {
+        "version": "V10007.0",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/interconnect/mixer/update")
+async def update_interconnect_mixer(
+    spectral_shift: Optional[float] = Query(default=None),
+    lunar_flux: Optional[float] = Query(default=None),
+    tier_level: Optional[int] = Query(default=None),
+    holographic_opacity: Optional[float] = Query(default=None),
+    gps_radius: Optional[float] = Query(default=None),
+    resonance_target: Optional[float] = Query(default=None),
+):
+    """
+    V10007.0 OMNIS-INTERCONNECT — UPDATE MIXER
+    
+    Update mixer controls and ripple effects through all systems.
+    """
+    updates = {}
+    if spectral_shift is not None:
+        updates["spectral_shift"] = spectral_shift
+    if lunar_flux is not None:
+        updates["lunar_flux"] = lunar_flux
+    if tier_level is not None:
+        updates["tier_level"] = tier_level
+    if holographic_opacity is not None:
+        updates["holographic_opacity"] = holographic_opacity
+    if gps_radius is not None:
+        updates["gps_radius"] = gps_radius
+    if resonance_target is not None:
+        updates["resonance_target"] = resonance_target
+    
+    result = OmnisInterconnect.update_mixer(updates)
+    return {
+        "version": "V10007.0",
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.get("/omnis/interconnect/hud")
+async def get_interconnect_hud():
+    """
+    V10007.0 OMNIS-INTERCONNECT — HOLOGRAPHIC HUD
+    
+    Get the current Holographic HUD configuration.
+    """
+    hud = OmnisInterconnect.render_holographic_hud()
+    return {
+        "version": "V10007.0",
+        **hud,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.get("/omnis/interconnect/wealth")
+async def get_interconnect_wealth():
+    """
+    V10007.0 OMNIS-INTERCONNECT — WEALTH CHAIN
+    
+    Get the phi-multiplied wealth chain calculation.
+    """
+    wealth = OmnisInterconnect.calculate_wealth_chain()
+    return {
+        "version": "V10007.0",
+        **wealth,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
