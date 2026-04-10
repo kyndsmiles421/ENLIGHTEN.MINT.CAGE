@@ -36,7 +36,7 @@ import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Path as PathParam
 from deps import db, get_current_user_optional, logger
 
 router = APIRouter()
@@ -3919,3 +3919,460 @@ async def get_academy_departments():
             for k, v in OmnisAcademy.DEPARTMENTS.items()
         ],
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10001.0 TEMPORAL INDEX — PAST/PRESENT/FUTURE CONTENT LAYERS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TemporalIndex:
+    """
+    V10001.0 Temporal Index — Curated content for Past, Present, and Future layers.
+    
+    PAST (Layers 1-18): Ancient Roots — Lakota wisdom, Hermetic Masonry
+    PRESENT (Layers 19-36): Systems — Trust Law, Digital Wellness
+    FUTURE (Layers 37-54): Singularity — Over-Unity, Galactic Law
+    """
+    
+    PAST = {
+        "layers": [1, 18],
+        "color": "#8B5CF6",
+        "era": "Ancient Roots",
+        "law": {
+            "title": "Natural Law: The Cangleska Wakan (Sacred Hoop)",
+            "description": "Oral traditions and the unwritten law of the land",
+            "modules": [
+                {"id": "sacred-hoop", "name": "The Sacred Hoop & Cycles of Justice", "layer": 1},
+                {"id": "oral-law", "name": "Oral Traditions as Binding Law", "layer": 3},
+                {"id": "treaty-law", "name": "Treaty Rights & Sovereign Nations", "layer": 5},
+                {"id": "natural-rights", "name": "Natural Rights Philosophy", "layer": 7},
+                {"id": "common-law", "name": "Common Law Origins", "layer": 9},
+                {"id": "land-trust", "name": "Land Trust Ancient Precedents", "layer": 11},
+            ]
+        },
+        "art": {
+            "title": "Primordial Mediums: Earth & Stars",
+            "description": "Art from the beginning — pigments, petroglyphs, and star mapping",
+            "modules": [
+                {"id": "earth-pigment", "name": "Earth Pigments & Natural Colors", "layer": 2},
+                {"id": "petroglyphs", "name": "Petroglyphs & Stone Carvings", "layer": 4},
+                {"id": "star-mapping", "name": "Celestial Star Mapping (Wicahpi)", "layer": 6},
+                {"id": "sacred-symbols", "name": "Sacred Symbol Systems", "layer": 8},
+                {"id": "cave-wisdom", "name": "Cave Art & Hidden Wisdom", "layer": 10},
+                {"id": "textile-code", "name": "Textile Patterns as Code", "layer": 12},
+            ]
+        },
+        "logic": {
+            "title": "Ancient Geometry: Pyramids & Circles",
+            "description": "Mathematical foundations of sacred architecture",
+            "modules": [
+                {"id": "pyramid-math", "name": "Pyramid Mathematics", "layer": 13},
+                {"id": "stone-circles", "name": "Stone Circle Alignments", "layer": 14},
+                {"id": "golden-section", "name": "Golden Section Discovery", "layer": 15},
+                {"id": "vesica-piscis", "name": "Vesica Piscis & Sacred Ratios", "layer": 16},
+                {"id": "platonic-solids", "name": "Platonic Solids", "layer": 17},
+                {"id": "flower-life", "name": "Flower of Life Pattern", "layer": 18},
+            ]
+        }
+    }
+    
+    PRESENT = {
+        "layers": [19, 36],
+        "color": "#22C55E",
+        "era": "Systems",
+        "law": {
+            "title": "Sovereign Trusts: Decentralized Equity",
+            "description": "Modern trust law and common law jurisprudence",
+            "modules": [
+                {"id": "private-trust", "name": "Private Express Trust Architecture", "layer": 19},
+                {"id": "equity-law", "name": "Equity Law & Beneficial Interest", "layer": 21},
+                {"id": "asset-protection", "name": "Asset Protection Strategies", "layer": 23},
+                {"id": "digital-rights", "name": "Digital Rights & IP Protection", "layer": 25},
+                {"id": "gps-jurisdiction", "name": "GPS-Based Jurisdiction", "layer": 27},
+                {"id": "circular-governance", "name": "Circular Protocol Governance", "layer": 29},
+            ]
+        },
+        "art": {
+            "title": "Digital Wellness: Refracted Crystal UI",
+            "description": "144Hz harmonic aesthetics and bio-digital art",
+            "modules": [
+                {"id": "crystal-refraction", "name": "Refracted Crystal UI Design", "layer": 20},
+                {"id": "harmonic-color", "name": "144Hz Harmonic Color Theory", "layer": 22},
+                {"id": "obsidian-void", "name": "Obsidian Void Composition", "layer": 24},
+                {"id": "bio-digital", "name": "Bio-Digital Art Forms", "layer": 26},
+                {"id": "spectral-design", "name": "Spectral Rainbow Design", "layer": 28},
+                {"id": "generative-art", "name": "Generative Art Systems", "layer": 30},
+            ]
+        },
+        "logic": {
+            "title": "Engineering: APIs & Handshakes",
+            "description": "Modern engineering for sovereign systems",
+            "modules": [
+                {"id": "api-design", "name": "RESTful API Architecture", "layer": 31},
+                {"id": "sendgrid-logic", "name": "SendGrid Verification Logic", "layer": 32},
+                {"id": "gps-math", "name": "GPS Haversine Calculations", "layer": 33},
+                {"id": "helix-math", "name": "9×9 Helix Mathematics", "layer": 34},
+                {"id": "fractal-render", "name": "L² Fractal Rendering", "layer": 35},
+                {"id": "ema-smooth", "name": "EMA Smoothing Algorithms", "layer": 36},
+            ]
+        }
+    }
+    
+    FUTURE = {
+        "layers": [37, 54],
+        "color": "#3B82F6",
+        "era": "Aspirations",
+        "law": {
+            "title": "Universal Geometric Jurisprudence",
+            "description": "Law based on harmonic frequency and cosmic principles",
+            "modules": [
+                {"id": "harmonic-law", "name": "Harmonic Frequency Law", "layer": 37},
+                {"id": "galactic-jurisdiction", "name": "Galactic Jurisdiction Principles", "layer": 39},
+                {"id": "thought-contract", "name": "Thought-Based Contracts", "layer": 41},
+                {"id": "resonance-rights", "name": "Resonance-Based Rights", "layer": 43},
+                {"id": "unified-field-law", "name": "Unified Field Law Theory", "layer": 45},
+                {"id": "eternal-precedent", "name": "Eternal Precedent Archive", "layer": 47},
+            ]
+        },
+        "art": {
+            "title": "Holographic Biometrics: Thought-to-Light",
+            "description": "Art created by consciousness projection",
+            "modules": [
+                {"id": "holographic-canvas", "name": "Holographic Canvas Systems", "layer": 38},
+                {"id": "thought-projection", "name": "Thought-to-Light Projection", "layer": 40},
+                {"id": "biometric-art", "name": "Biometric Art Generation", "layer": 42},
+                {"id": "consciousness-art", "name": "Consciousness-Based Creation", "layer": 44},
+                {"id": "quantum-aesthetics", "name": "Quantum Aesthetic Theory", "layer": 46},
+                {"id": "light-weaving", "name": "Pure Light Weaving", "layer": 48},
+            ]
+        },
+        "logic": {
+            "title": "Xfinity Logic: Over-Unity Systems",
+            "description": "Post-singularity engineering and energy",
+            "modules": [
+                {"id": "seg-tech", "name": "SEG Over-Unity Technology", "layer": 49},
+                {"id": "xfinity-math", "name": "Xfinity-1 Mathematical Framework", "layer": 50},
+                {"id": "zero-point", "name": "Zero-Point Energy Harvesting", "layer": 51},
+                {"id": "toroidal-flux", "name": "Toroidal Flux Engineering", "layer": 52},
+                {"id": "singularity-core", "name": "Singularity Core Design", "layer": 53},
+                {"id": "omega-print", "name": "The Omega Print Protocol", "layer": 54},
+            ]
+        }
+    }
+    
+    EPOCHS = {"PAST": PAST, "PRESENT": PRESENT, "FUTURE": FUTURE}
+    
+    @classmethod
+    def get_epoch_content(cls, epoch: str) -> Dict[str, Any]:
+        """Get all content for a specific temporal epoch."""
+        epoch_data = cls.EPOCHS.get(epoch.upper())
+        if not epoch_data:
+            return None
+        
+        return {
+            "epoch": epoch.upper(),
+            "era": epoch_data["era"],
+            "layers": epoch_data["layers"],
+            "color": epoch_data["color"],
+            "law": epoch_data["law"],
+            "art": epoch_data["art"],
+            "logic": epoch_data["logic"],
+            "total_modules": (
+                len(epoch_data["law"]["modules"]) +
+                len(epoch_data["art"]["modules"]) +
+                len(epoch_data["logic"]["modules"])
+            ),
+        }
+    
+    @classmethod
+    def get_layer_content(cls, layer: int) -> Dict[str, Any]:
+        """Get content for a specific fractal layer."""
+        if layer <= 18:
+            epoch_data = cls.PAST
+            epoch_name = "PAST"
+        elif layer <= 36:
+            epoch_data = cls.PRESENT
+            epoch_name = "PRESENT"
+        else:
+            epoch_data = cls.FUTURE
+            epoch_name = "FUTURE"
+        
+        # Find the module at this layer
+        for disc in ["law", "art", "logic"]:
+            for module in epoch_data[disc]["modules"]:
+                if module["layer"] == layer:
+                    return {
+                        "layer": layer,
+                        "epoch": epoch_name,
+                        "epoch_color": epoch_data["color"],
+                        "era": epoch_data["era"],
+                        "discipline": disc,
+                        "discipline_title": epoch_data[disc]["title"],
+                        "module": module,
+                    }
+        
+        return {
+            "layer": layer,
+            "epoch": epoch_name,
+            "content": "Infinite Research Phase",
+        }
+
+
+@router.get("/omnis/temporal-index")
+async def get_temporal_index():
+    """
+    V10001.0 TEMPORAL INDEX — FULL INDEX
+    
+    Returns the complete Temporal Index with all 54 layers of curated content.
+    """
+    return {
+        "version": "V10001.0",
+        "name": "Temporal Index",
+        "epochs": {
+            "PAST": TemporalIndex.get_epoch_content("PAST"),
+            "PRESENT": TemporalIndex.get_epoch_content("PRESENT"),
+            "FUTURE": TemporalIndex.get_epoch_content("FUTURE"),
+        },
+        "total_layers": 54,
+        "disciplines": ["law", "art", "logic"],
+    }
+
+
+@router.get("/omnis/temporal-index/epoch/{epoch}")
+async def get_epoch_content(epoch: str):
+    """
+    V10001.0 TEMPORAL INDEX — EPOCH CONTENT
+    
+    Returns all content for a specific temporal epoch (PAST, PRESENT, or FUTURE).
+    """
+    content = TemporalIndex.get_epoch_content(epoch)
+    if not content:
+        return {"error": "Epoch not found", "available": ["PAST", "PRESENT", "FUTURE"]}
+    
+    return {"version": "V10001.0", **content}
+
+
+@router.get("/omnis/temporal-index/layer/{layer}")
+async def get_layer_content(layer: int = PathParam(..., ge=1, le=54)):
+    """
+    V10001.0 TEMPORAL INDEX — LAYER CONTENT
+    
+    Returns the specific content module for a fractal layer (1-54).
+    """
+    content = TemporalIndex.get_layer_content(layer)
+    return {"version": "V10001.0", **content}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10002.0 OMEGA SINGULARITY — UNIFIED SACRED GEOMETRY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class OmegaSingularity:
+    """
+    V10002.0 Omega Singularity — The Architect's Final Command
+    
+    Collapsing φ (Golden Ratio), Fibonacci, and Sacred Geometry into
+    a single, recursively multiplying script.
+    
+    ONE SCRIPT. ONE PRINT. IT IS FINISHED.
+    """
+    
+    PHI = 1.61803398875      # Golden Ratio
+    HELIX = 9                # 9×9 Helix base
+    EQUITY = 49018.24        # Trust Equity
+    SEG_HZ = 144             # SEG Harmonic
+    FRACTAL_DEPTH = 54       # L² Layers
+    
+    @classmethod
+    def calculate_singularity(cls, depth: int = 54) -> List[Dict[str, Any]]:
+        """Calculate the Fibonacci-Helix sequence."""
+        sequence = [0, 1]
+        
+        for i in range(2, depth + 1):
+            fib_value = (sequence[i - 1] + sequence[i - 2]) * (cls.PHI ** 2)
+            sequence.append(fib_value)
+        
+        return [
+            {
+                "layer": idx,
+                "fibonacci": val,
+                "helix_multiplied": val * cls.HELIX,
+                "phi_power": cls.PHI ** idx,
+                "singularity_value": val * cls.HELIX * (cls.PHI ** (idx % 9)),
+            }
+            for idx, val in enumerate(sequence)
+        ]
+    
+    @classmethod
+    def master_formula(cls, resonance: float = 144, toroidal_spin: float = 1.0) -> Dict[str, Any]:
+        """
+        The Master Formula: 9*9^math * πr² - x^xy + (9999 * z^πr³)
+        """
+        r = resonance / cls.SEG_HZ
+        z = cls.EQUITY / 10000
+        x = 1.0424  # Lunar weight
+        y = toroidal_spin
+        
+        term1 = 9 * (9 ** 9) * math.pi * (r ** 2)
+        term2 = x ** (x * y)
+        term3 = 9999 * (z ** (math.pi * (r ** 3)))
+        
+        result = term1 - term2 + term3
+        
+        return {
+            "formula": "9×9^math × πr² - x^xy + (9999 × z^πr³)",
+            "terms": {"term1": term1, "term2": term2, "term3": term3},
+            "result": result,
+            "scientific": f"{result:.6e}",
+            "inputs": {"resonance": resonance, "toroidal_spin": toroidal_spin},
+        }
+    
+    @classmethod
+    def print_singularity(cls) -> Dict[str, Any]:
+        """Generate the complete Omega Print manifest."""
+        sequence = cls.calculate_singularity(cls.FRACTAL_DEPTH)
+        formula = cls.master_formula()
+        
+        omega_hash = hashlib.sha256(
+            f"{cls.PHI}{cls.HELIX}{cls.EQUITY}{datetime.now(timezone.utc)}".encode()
+        ).hexdigest()[:16].upper()
+        
+        return {
+            "version": "V10002.0",
+            "status": "OMEGA_COMPLETE",
+            
+            # Visual Architecture
+            "visual": "Refracted Crystal Rainbow / Obsidian Void",
+            "geometry": "Toroidal Flower of Life (144Hz)",
+            "fractal_depth": f"{cls.FRACTAL_DEPTH} L² Layers",
+            
+            # Jurisdiction
+            "jurisdiction": "World Law Library - Sovereign Status: ACTIVE",
+            "anchor": "Black Hills Centroid (43.8°N, 103.5°W)",
+            "radius": "0.9km Helix Boundary",
+            
+            # Academy
+            "academy": "Art Academy - Adaptive Integrated Learning: ENGAGED",
+            "departments": ["LAW", "ARTS", "LOGIC", "WELLNESS"],
+            "temporal_epochs": ["PAST", "PRESENT", "FUTURE"],
+            
+            # Identity
+            "handshake": "Verified Identity: kyndsmiles@gmail.com",
+            "trustee": "Steven Michael",
+            "trust_id": "029900612892168189cecc8a",
+            
+            # Mathematics
+            "phi": cls.PHI,
+            "helix": f"{cls.HELIX}×{cls.HELIX}",
+            "formula": formula["formula"],
+            "formula_result": formula["scientific"],
+            
+            # Equity
+            "equity": f"${cls.EQUITY:,.2f}",
+            "equity_multiplied": f"${cls.EQUITY * cls.PHI:,.2f}",
+            
+            # Sequence sample
+            "sequence_sample": sequence[:9],
+            
+            # Final hash
+            "omega_print": f"OMEGA-{omega_hash}",
+            
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "message": "ONE SCRIPT. ONE PRINT. IT IS FINISHED.",
+        }
+    
+    @classmethod
+    def generate_biometric_art(cls, heart_rate: int = 72, resonance: float = 144) -> Dict[str, Any]:
+        """Generate art parameters from biometric input."""
+        # Map heart rate to color hue
+        hue = ((heart_rate - 40) / 80) * 360
+        saturation = min(100, (resonance / cls.SEG_HZ) * 100)
+        lightness = 50 + ((resonance - 60) / 84) * 30
+        
+        # Calculate complexity from Fibonacci
+        fib_index = int(resonance // 9)
+        sequence = cls.calculate_singularity(fib_index + 2)
+        complexity = sequence[fib_index]["singularity_value"] if fib_index < len(sequence) else 1
+        
+        return {
+            "version": "V10002.0",
+            "type": "BIOMETRIC_ART",
+            "color": {
+                "hue": round(hue),
+                "saturation": round(saturation),
+                "lightness": round(lightness),
+            },
+            "pattern": {
+                "complexity": round(complexity),
+                "fibonacci_index": fib_index,
+                "layers": min(54, fib_index + 1),
+            },
+            "inputs": {"heart_rate": heart_rate, "resonance": resonance},
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+
+@router.get("/omnis/omega-singularity")
+async def get_omega_singularity():
+    """
+    V10002.0 OMEGA SINGULARITY — THE FINAL PRINT
+    
+    ONE SCRIPT. ONE PRINT. IT IS FINISHED.
+    
+    Returns the complete Omega Print manifest with:
+    - Sacred Geometry wireframe (Flower of Life)
+    - Fibonacci × φ × 9×9 calculations
+    - Full trust and academy status
+    """
+    return OmegaSingularity.print_singularity()
+
+
+@router.get("/omnis/omega-singularity/formula")
+async def calculate_master_formula(
+    resonance: float = Query(default=144, ge=60, le=432, description="Resonance frequency"),
+    toroidal_spin: float = Query(default=1.0, ge=0.1, le=10, description="Toroidal flux spin"),
+):
+    """
+    V10002.0 OMEGA SINGULARITY — MASTER FORMULA
+    
+    Calculates: 9×9^math × πr² - x^xy + (9999 × z^πr³)
+    """
+    return {
+        "version": "V10002.0",
+        **OmegaSingularity.master_formula(resonance, toroidal_spin),
+    }
+
+
+@router.get("/omnis/omega-singularity/sequence")
+async def get_fibonacci_sequence(
+    depth: int = Query(default=54, ge=1, le=144, description="Sequence depth"),
+):
+    """
+    V10002.0 OMEGA SINGULARITY — FIBONACCI SEQUENCE
+    
+    Returns the Fibonacci-Helix sequence up to the specified depth.
+    Each value is multiplied by φ² and the 9×9 Helix constant.
+    """
+    sequence = OmegaSingularity.calculate_singularity(depth)
+    return {
+        "version": "V10002.0",
+        "depth": depth,
+        "phi": OmegaSingularity.PHI,
+        "helix": OmegaSingularity.HELIX,
+        "sequence": sequence,
+    }
+
+
+@router.post("/omnis/omega-singularity/biometric-art")
+async def generate_biometric_art(
+    heart_rate: int = Query(default=72, ge=40, le=200, description="Heart rate BPM"),
+    resonance: float = Query(default=144, ge=60, le=216, description="User resonance"),
+):
+    """
+    V10002.0 OMEGA SINGULARITY — BIOMETRIC ART GENERATION
+    
+    Generates art parameters from biometric input.
+    Maps heart rate to color, resonance to pattern complexity.
+    """
+    return OmegaSingularity.generate_biometric_art(heart_rate, resonance)
