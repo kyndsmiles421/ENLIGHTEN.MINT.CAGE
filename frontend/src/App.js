@@ -178,6 +178,7 @@ const MealPlanning = lazy(() => import('./pages/MealPlanning'));
 const Acupressure = lazy(() => import('./pages/Acupressure'));
 const Reiki = lazy(() => import('./pages/Reiki'));
 const TrySomethingNew = lazy(() => import('./pages/TrySomethingNew'));
+const SovereignHub = lazy(() => import('./pages/SovereignHub'));
 const DailyRitual = lazy(() => import('./pages/DailyRitual'));
 const CosmicCalendar = lazy(() => import('./pages/CosmicCalendar'));
 const Certifications = lazy(() => import('./pages/Certifications'));
