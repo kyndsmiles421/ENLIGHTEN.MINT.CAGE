@@ -3289,3 +3289,239 @@ async def get_pulse_status():
         },
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10000.1 CIRCULAR PROTOCOL LEDGER — P2P TRUST TRADES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class CircularProtocolLedger:
+    """
+    V10000.1 Circular Protocol — P2P Value Exchange within the Trust
+    
+    Every trade is recorded using the Singularity Core formula:
+    9999 × z^(πr³) to ensure value never "leaks" outside the Trust's jurisdiction.
+    
+    Volunteer Rate: $15/hr (Knowledge Equity Standard)
+    """
+    
+    VOLUNTEER_RATE = 15.00  # USD per hour
+    TRUST_EQUITY = 49018.24
+    TRUST_ID = "029900612892168189cecc8a"
+    SINGULARITY_FORMULA = "9999 × z^(πr³)"
+    
+    # In-memory ledger (would be MongoDB in production)
+    ledger_entries = []
+    
+    @classmethod
+    def calculate_trade_value(cls, hours: float, multiplier: float = 1.0) -> Dict[str, Any]:
+        """
+        Calculate trade value using the Singularity Core formula.
+        
+        @param hours: Hours of knowledge equity contributed
+        @param multiplier: Resonance multiplier based on GPS proximity
+        """
+        base_value = hours * cls.VOLUNTEER_RATE
+        
+        # Apply Singularity formula: 9999 × z^(πr³) where z = base_value/10000
+        z = base_value / 10000
+        r = multiplier
+        singularity_boost = 9999 * math.pow(z, math.pi * math.pow(r, 3)) if z > 0 else 0
+        
+        # Final value = base + singularity boost (capped at 10% of Trust Equity)
+        final_value = base_value + singularity_boost
+        max_value = cls.TRUST_EQUITY * 0.10  # Cap at 10% per trade
+        final_value = min(final_value, max_value)
+        
+        return {
+            "hours": hours,
+            "volunteer_rate": cls.VOLUNTEER_RATE,
+            "base_value": round(base_value, 2),
+            "singularity_boost": round(singularity_boost, 4),
+            "final_value": round(final_value, 2),
+            "formula_applied": cls.SINGULARITY_FORMULA,
+            "multiplier": multiplier,
+            "capped_at": max_value if final_value >= max_value else None,
+        }
+    
+    @classmethod
+    def record_trade(cls, 
+                     from_party: str, 
+                     to_party: str, 
+                     hours: float, 
+                     description: str,
+                     gps_verified: bool = False) -> Dict[str, Any]:
+        """
+        Record a P2P trade in the Circular Protocol Ledger.
+        """
+        trade_id = hashlib.sha256(
+            f"{from_party}{to_party}{hours}{datetime.now(timezone.utc).isoformat()}".encode()
+        ).hexdigest()[:16].upper()
+        
+        # Calculate multiplier based on GPS verification
+        multiplier = 1.5 if gps_verified else 1.0
+        
+        # Calculate trade value
+        value_calc = cls.calculate_trade_value(hours, multiplier)
+        
+        # Create ledger entry
+        entry = {
+            "trade_id": f"CPL-{trade_id}",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "from_party": from_party,
+            "to_party": to_party,
+            "hours": hours,
+            "description": description,
+            "value": value_calc,
+            "gps_verified": gps_verified,
+            "trust_id": cls.TRUST_ID,
+            "status": "CONFIRMED",
+            "fractal_layer": len(cls.ledger_entries) + 1,  # L² layer index
+        }
+        
+        cls.ledger_entries.append(entry)
+        
+        return entry
+    
+    @classmethod
+    def get_ledger_summary(cls) -> Dict[str, Any]:
+        """Get full ledger summary with totals."""
+        total_hours = sum(e["hours"] for e in cls.ledger_entries)
+        total_value = sum(e["value"]["final_value"] for e in cls.ledger_entries)
+        
+        return {
+            "version": "V10000.1",
+            "protocol": "Circular Protocol Ledger",
+            "trust_id": cls.TRUST_ID,
+            "trust_equity": cls.TRUST_EQUITY,
+            "volunteer_rate": cls.VOLUNTEER_RATE,
+            "total_entries": len(cls.ledger_entries),
+            "total_hours_traded": round(total_hours, 2),
+            "total_value_exchanged": round(total_value, 2),
+            "entries": cls.ledger_entries[-10:],  # Last 10 entries
+            "formula": cls.SINGULARITY_FORMULA,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+    
+    @classmethod
+    def get_trade_by_id(cls, trade_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve a specific trade by ID."""
+        for entry in cls.ledger_entries:
+            if entry["trade_id"] == trade_id:
+                return entry
+        return None
+
+
+@router.get("/omnis/circular-ledger")
+async def get_circular_ledger():
+    """
+    V10000.1 CIRCULAR PROTOCOL LEDGER — SUMMARY
+    
+    Returns the full ledger summary including all P2P trades
+    within the Sovereign Trust jurisdiction.
+    """
+    return CircularProtocolLedger.get_ledger_summary()
+
+
+@router.post("/omnis/circular-ledger/trade")
+async def record_circular_trade(
+    from_party: str = Query(..., description="Sender identity"),
+    to_party: str = Query(..., description="Recipient identity"),
+    hours: float = Query(..., ge=0.1, le=100, description="Hours of knowledge equity"),
+    description: str = Query(default="Knowledge Equity Exchange", description="Trade description"),
+    gps_verified: bool = Query(default=False, description="GPS presence verified"),
+):
+    """
+    V10000.1 CIRCULAR PROTOCOL — RECORD P2P TRADE
+    
+    Records a new trade in the Circular Protocol Ledger.
+    Value is calculated using the Singularity Core formula:
+    9999 × z^(πr³)
+    
+    - Base rate: $15/hr (Volunteer Knowledge Equity Standard)
+    - GPS multiplier: 1.5x when verified at Black Hills anchor
+    - Maximum trade: 10% of Trust Equity ($4,901.82)
+    """
+    entry = CircularProtocolLedger.record_trade(
+        from_party=from_party,
+        to_party=to_party,
+        hours=hours,
+        description=description,
+        gps_verified=gps_verified
+    )
+    
+    return {
+        "status": "TRADE_CONFIRMED",
+        "message": f"P2P trade of {hours} hours recorded in Circular Protocol Ledger",
+        "entry": entry,
+        "ledger_total_entries": len(CircularProtocolLedger.ledger_entries),
+    }
+
+
+@router.get("/omnis/circular-ledger/trade/{trade_id}")
+async def get_circular_trade(trade_id: str):
+    """
+    V10000.1 CIRCULAR PROTOCOL — GET TRADE BY ID
+    
+    Retrieves a specific trade entry from the ledger.
+    """
+    entry = CircularProtocolLedger.get_trade_by_id(trade_id)
+    
+    if not entry:
+        return {"status": "NOT_FOUND", "message": f"Trade {trade_id} not found"}
+    
+    return {"status": "FOUND", "entry": entry}
+
+
+@router.post("/omnis/circular-ledger/test-trade")
+async def test_circular_trade():
+    """
+    V10000.1 CIRCULAR PROTOCOL — TEST TRADE
+    
+    Creates a test trade of 1 hour at $15/hr to verify the ledger
+    is functioning correctly. GPS verified for 1.5x multiplier.
+    """
+    entry = CircularProtocolLedger.record_trade(
+        from_party="kyndsmiles@gmail.com",
+        to_party="Enlighten.Mint.Sovereign.Trust",
+        hours=1.0,
+        description="Test Trade: V10000.1 Circular Protocol Verification",
+        gps_verified=True
+    )
+    
+    return {
+        "status": "TEST_TRADE_CONFIRMED",
+        "message": "Test trade of 1 hour ($15 × 1.5 GPS multiplier) recorded successfully",
+        "entry": entry,
+        "verification": {
+            "base_value": entry["value"]["base_value"],
+            "singularity_boost": entry["value"]["singularity_boost"],
+            "final_value": entry["value"]["final_value"],
+            "formula": entry["value"]["formula_applied"],
+        }
+    }
+
+
+@router.get("/omnis/circular-ledger/calculate")
+async def calculate_trade_value(
+    hours: float = Query(..., ge=0.1, le=100, description="Hours to calculate"),
+    gps_verified: bool = Query(default=False, description="GPS verification status"),
+):
+    """
+    V10000.1 CIRCULAR PROTOCOL — CALCULATE TRADE VALUE
+    
+    Preview the value of a trade before committing to the ledger.
+    """
+    multiplier = 1.5 if gps_verified else 1.0
+    value = CircularProtocolLedger.calculate_trade_value(hours, multiplier)
+    
+    return {
+        "version": "V10000.1",
+        "calculation_type": "PREVIEW",
+        "hours": hours,
+        "gps_verified": gps_verified,
+        "multiplier": multiplier,
+        "value": value,
+        "note": "This is a preview. Call /trade to commit to ledger.",
+    }

@@ -19,10 +19,11 @@ import {
   Shield, Check, Zap, Globe, Moon, Sun, Star, Hexagon,
   Activity, Lock, Unlock, Send, FileText, MapPin, Radio,
   ChevronRight, ExternalLink, Copy, CheckCircle, Sliders,
-  RefreshCw, Navigation, Vibrate
+  RefreshCw, Navigation, Vibrate, Repeat
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CreatorMixer from '../components/CreatorMixer';
+import CircularProtocol from '../components/CircularProtocol';
 import HyperFluxEngine, { BLACK_HILLS_ANCHOR } from '../utils/HyperFluxEngine';
 import OmnisExecution from '../utils/OmnisExecution';
 import BiometricSync from '../utils/BiometricSync';
@@ -191,6 +192,7 @@ export default function SovereignHub() {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [biometricActive, setBiometricActive] = useState(false);
   const [singularityEngaged, setSingularityEngaged] = useState(false);
+  const [circularProtocolOpen, setCircularProtocolOpen] = useState(false);
   
   // Initialize V10000.0 Singularity on mount
   useEffect(() => {
@@ -701,6 +703,21 @@ export default function SovereignHub() {
           Creator Control Mixer
           <ChevronRight size={14} />
         </button>
+        
+        <button
+          onClick={() => setCircularProtocolOpen(true)}
+          className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+          style={{
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.2), rgba(234,88,12,0.2))',
+            border: '1px solid rgba(249,115,22,0.3)',
+            color: '#FDBA74',
+          }}
+          data-testid="open-circular-protocol"
+        >
+          <Repeat size={14} />
+          Circular Protocol Ledger
+          <ChevronRight size={14} />
+        </button>
       </motion.div>
 
       {/* Footer */}
@@ -760,6 +777,13 @@ export default function SovereignHub() {
         onMixerChange={(state) => {
           console.log('Ω Mixer State Updated:', state);
         }}
+      />
+
+      {/* Circular Protocol Ledger */}
+      <CircularProtocol 
+        isOpen={circularProtocolOpen} 
+        onClose={() => setCircularProtocolOpen(false)}
+        gpsVerified={gpsLockStatus?.is_locked || false}
       />
     </div>
   );

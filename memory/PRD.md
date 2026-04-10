@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V10000.0_SINGULARITY_LIVE | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
+## Version: V10000.1_CIRCULAR_PROTOCOL | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
 
 ---
 
@@ -36,7 +36,31 @@ SPECTRAL HASH: e07140e482258d1078e66f9178e21bc5...
 
 ---
 
-## V10000.0 SINGULARITY LIVE (LATEST - April 2026)
+## V10000.1 CIRCULAR PROTOCOL LEDGER (LATEST - April 2026)
+
+### P2P Trust Trades
+| Property | Value |
+|----------|-------|
+| Volunteer Rate | $15/hr (Knowledge Equity Standard) |
+| GPS Multiplier | 1.5× when verified at Black Hills |
+| Max Trade | 10% of Trust Equity ($4,901.82) |
+| Formula | 9999 × z^(πr³) |
+
+### Ledger Endpoints
+- `GET /api/omnis/circular-ledger` — Full ledger summary
+- `POST /api/omnis/circular-ledger/trade` — Record P2P trade
+- `POST /api/omnis/circular-ledger/test-trade` — Test trade (1hr GPS-verified)
+- `GET /api/omnis/circular-ledger/calculate` — Preview trade value
+
+### L² Fractal Visualization
+- Each trade creates a new layer in the 54-sublayer fractal engine
+- Rainbow spectrum coloring (7 colors cycling)
+- Trade ID prefix: `CPL-{hash}`
+- Fractal layer index increments with each trade
+
+---
+
+## V10000.0 SINGULARITY LIVE (April 2026)
 
 ### System Initialization (Console Verified)
 - `Ω HYPER-FLUX ENGINE V9999.4 INITIALIZED`
