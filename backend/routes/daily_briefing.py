@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query
-from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
+from deps import db, get_current_user, get_current_user_optional, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from datetime import datetime, timezone
 from collections import Counter
@@ -8,6 +8,9 @@ import math
 import uuid
 
 router = APIRouter()
+
+# Alias for clarity
+get_optional_user = get_current_user_optional
 
 
 @router.get("/daily-briefing")
@@ -263,10 +266,11 @@ CONSTELLATIONS = [
 async def get_star_chart(
     lat: float = Query(default=40.7, description="Observer latitude"),
     lng: float = Query(default=-74.0, description="Observer longitude"),
-    user=Depends(get_current_user),
+    user=Depends(get_optional_user),
 ):
-    """Return constellation data for the 3D star chart, filtered by location visibility."""
-    uid = user["id"]
+    """Return constellation data for the 3D star chart, filtered by location visibility.
+    Works for both authenticated and unauthenticated users."""
+    uid = user["id"] if user else None
     now = datetime.now(timezone.utc)
 
     # Calculate Local Sidereal Time (LST) for visibility
@@ -303,9 +307,12 @@ async def get_star_chart(
             is_above = alt > -10  # slightly below horizon still partially visible
             visible.append({**c, "altitude": round(alt, 1), "above_horizon": is_above})
 
-    # Get user's cosmic profile for avatar constellation mapping
-    profile = await db.profiles.find_one({"user_id": uid}, {"_id": 0})
-    aura_doc = await db.aura_readings.find_one({"user_id": uid}, {"_id": 0}, sort=[("created_at", -1)])
+    # Get user's cosmic profile for avatar constellation mapping (only if authenticated)
+    profile = None
+    aura_doc = None
+    if uid:
+        profile = await db.profiles.find_one({"user_id": uid}, {"_id": 0})
+        aura_doc = await db.aura_readings.find_one({"user_id": uid}, {"_id": 0}, sort=[("created_at", -1)])
 
     # Mayan sign for today
     from routes.mayan import get_mayan_sign
