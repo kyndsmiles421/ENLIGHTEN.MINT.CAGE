@@ -59,6 +59,12 @@ const ENLIGHTEN_OS = (() => {
         // RAINBOW REFRACTION - Prismatic Crystal (NO OBSIDIAN)
         // ═══════════════════════════════════════════════════════════════════
         applyRainbowRefraction: () => {
+            // SKIP on /hub route - it has its own visuals
+            if (window.location.pathname === '/hub') {
+                console.log("%c [MX-2] Skipping refraction on /hub route", "color: #4ade80;");
+                return;
+            }
+            
             console.log("%c [MX-2] Applying Rainbow Refraction...", "color: #E5E4E2; font-weight: bold;");
             
             // TERMINATE all obsidian overlays and legacy elements

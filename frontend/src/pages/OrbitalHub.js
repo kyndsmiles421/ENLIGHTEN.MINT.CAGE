@@ -1,383 +1,185 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { ALL_SATELLITES } from '../components/orbital/constants';
-import { CosmicDust } from '../components/orbital/CosmicDust';
-import MissionControl from '../components/MissionControl';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * ENLIGHTEN.MINT.CAFE HUB — V5.1 "The Great Recovery"
+ * ENLIGHTEN_OS V10.1 — THE SOVEREIGN INTERFACE
  * ARCHITECT: Steven Michael
- * ═══════════════════════════════════════════════════════════════════════════════
- * 
- * PHYSICS: DISABLED
- * GRAVITY: 0
- * BACK-BOOM: DELETED
- * LAYOUT: FIXED COORDINATES
- * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// ═══ FIXED LAYOUTS — NO PHYSICS ═══
-const LAYOUTS = {
-  // LAYOUT 1: THE PENTAGRAM (Fixed Star) - Expanded radius for more items
-  star: (count, isMobile) => {
-    const radius = isMobile ? 130 : 200; // Larger radius for desktop
-    const positions = [];
-    for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-      positions.push({
-        x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius,
-      });
-    }
-    return positions;
-  },
-
-  // LAYOUT 2: PILLAR (Vertical for Mobile 605)
-  pillar: (count, isMobile) => {
-    const spacing = isMobile ? 75 : 90;
-    const startY = -((count - 1) * spacing) / 2;
-    return Array.from({ length: count }, (_, i) => ({
-      x: 0,
-      y: startY + i * spacing,
-    }));
-  },
-
-  // LAYOUT 3: ORBIT (Circular ring) - Dual rings for many items
-  orbit: (count, isMobile) => {
-    const innerRadius = isMobile ? 100 : 140;
-    const outerRadius = isMobile ? 170 : 240;
-    const innerCount = Math.ceil(count / 2);
-    const outerCount = count - innerCount;
-    
-    const positions = [];
-    
-    // Inner ring
-    for (let i = 0; i < innerCount; i++) {
-      const angle = (i / innerCount) * Math.PI * 2 - Math.PI / 2;
-      positions.push({
-        x: Math.cos(angle) * innerRadius,
-        y: Math.sin(angle) * innerRadius,
-      });
-    }
-    
-    // Outer ring
-    for (let i = 0; i < outerCount; i++) {
-      const angle = (i / outerCount) * Math.PI * 2 - Math.PI / 2 + Math.PI / outerCount;
-      positions.push({
-        x: Math.cos(angle) * outerRadius,
-        y: Math.sin(angle) * outerRadius,
-      });
-    }
-    
-    return positions;
-  },
-};
-
-// ═══ NODULE SIZE ═══
-const NODULE_SIZE = 72;
-const CORE_SIZE = 100;
+const NODULES = [
+  { id: "ORACLE",     path: "/oracle",     color: "#D4AF37", label: "Oracle" },
+  { id: "ARCHIVES",   path: "/archives",   color: "#C0C0C0", label: "Archives" },
+  { id: "WORKSHOP",   path: "/workshop",   color: "#B87333", label: "Workshop" },
+  { id: "STAR_CHART", path: "/star-chart", color: "#a855f7", label: "Star Chart" },
+  { id: "SOUNDSCAPE", path: "/soundscape", color: "#22d3ee", label: "Soundscape" }
+];
 
 export default function OrbitalHub() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  
-  // ═══ STATE ═══
-  const [layoutMode, setLayoutMode] = useState('star'); // 'star' | 'pillar' | 'orbit'
-  const [missionControlOpen, setMissionControlOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-  
-  // Responsive
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const [activeNodule, setActiveNodule] = useState(null);
 
-  // Auto-select pillar layout on mobile
-  useEffect(() => {
-    if (isMobile) {
-      setLayoutMode('pillar');
-    }
-  }, [isMobile]);
+  const handlePress = (nodule) => {
+    setActiveNodule(nodule.id);
+    if (navigator.vibrate) navigator.vibrate(30);
+    console.log(`[SOVEREIGN] ${nodule.id} Active.`);
+    setTimeout(() => navigate(nodule.path), 100);
+  };
 
-  // Get fixed positions for current layout
-  const positions = LAYOUTS[layoutMode](ALL_SATELLITES.length, isMobile);
-
-  // ═══ NODULE TAP → NAVIGATE ═══
-  const handleNoduleTap = useCallback((sat) => {
-    // Immediate navigation - no physics, no extraction
-    setSelectedId(sat.id);
-    
-    // Brief visual feedback then navigate
-    setTimeout(() => {
-      navigate(sat.path);
-    }, 150);
-  }, [navigate]);
-
-  // ═══ CORE TAP → MISSION CONTROL ═══
-  const handleCoreTap = useCallback(() => {
-    setMissionControlOpen(true);
-  }, []);
-
-  // ═══ LAYOUT CYCLE ═══
-  const cycleLayout = useCallback(() => {
-    const modes = ['star', 'pillar', 'orbit'];
-    const currentIdx = modes.indexOf(layoutMode);
-    const nextIdx = (currentIdx + 1) % modes.length;
-    setLayoutMode(modes[nextIdx]);
-  }, [layoutMode]);
+  // Calculate positions for 5 nodules in a circle
+  const getPosition = (index, total, radius) => {
+    const angle = (index / total) * Math.PI * 2 - Math.PI / 2;
+    return {
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius
+    };
+  };
 
   return (
-    <div
-      className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: '#000000', position: 'relative' }}
-      data-testid="orbital-hub-page"
-    >
-      {/* Obsidian Void Background */}
-      <CosmicDust />
-
+    <div className="orbital-hub-container">
       {/* Title */}
-      <motion.div 
-        className="absolute top-4 sm:top-6 left-0 right-0 text-center pointer-events-none"
-        initial={{ opacity: 0, y: -20 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        transition={{ delay: 0.3 }}
-        style={{ zIndex: 100 }}
-      >
-        <h1 
-          className="brand-logo-large"
-          style={{ 
-            fontFamily: 'Inter, sans-serif',
-            letterSpacing: '0.2em',
-            color: 'rgba(212, 175, 55, 0.8)',
-            textShadow: '0 0 20px rgba(212, 175, 55, 0.3)',
-          }}
-        >
-          ENLIGHTEN.MINT.CAFE
-        </h1>
-      </motion.div>
+      <div className="hub-title">ENLIGHTEN.MINT.CAFE</div>
+      <div className="hub-version">V10.1 SOVEREIGN</div>
 
-      {/* Layout Switcher */}
-      <motion.button
-        className="absolute top-16 right-4 px-3 py-1.5 rounded-full"
-        style={{
-          background: 'rgba(10,10,18,0.8)',
-          border: '1px solid rgba(212, 175, 55, 0.3)',
-          color: 'rgba(212, 175, 55, 0.7)',
-          fontSize: 10,
-          letterSpacing: '0.1em',
-          zIndex: 9999,
-        }}
-        onClick={cycleLayout}
-        whileTap={{ scale: 0.95 }}
-        data-testid="layout-switcher"
-      >
-        {layoutMode.toUpperCase()}
-      </motion.button>
-
-      {/* ═══ HUB CONTAINER ═══ */}
-      <div 
-        className="relative flex items-center justify-center"
-        style={{
-          width: '100%',
-          height: isMobile ? '70vh' : '60vh',
-          maxWidth: 500,
-        }}
-      >
-        {/* ═══ CENTRAL CRYSTAL CORE ═══ */}
-        <motion.div
-          className="absolute cursor-pointer"
-          style={{
-            width: CORE_SIZE,
-            height: CORE_SIZE,
-            zIndex: 50,
-          }}
-          onClick={handleCoreTap}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          data-testid="central-orb"
-        >
-          {/* Core Visual - Diamond Refraction */}
-          <div
-            className="w-full h-full rounded-full relative"
-            style={{
-              background: `radial-gradient(circle at 30% 30%, 
-                rgba(0, 255, 255, 0.15) 0%, 
-                rgba(212, 175, 55, 0.1) 30%,
-                rgba(0, 0, 0, 0.9) 70%)`,
-              border: '2px solid rgba(0, 255, 255, 0.3)',
-              boxShadow: `
-                0 0 30px rgba(0, 255, 255, 0.2),
-                0 0 60px rgba(212, 175, 55, 0.1),
-                inset 0 0 30px rgba(0, 255, 255, 0.1)
-              `,
-            }}
-          >
-            {/* Metatron's Cube Hint */}
-            <div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23d4af37' stroke-width='0.3' opacity='0.3'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='%2300ffff' stroke-width='0.3' opacity='0.3'/%3E%3C/svg%3E") center/contain no-repeat`,
-                animation: 'spin 30s linear infinite',
-              }}
-            />
-            
-            {/* Core Label */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span 
-                style={{ 
-                  color: 'rgba(0, 255, 255, 0.6)', 
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '0.15em',
-                }}
-              >
-                MENU
-              </span>
-            </div>
-          </div>
-          
-          {/* Pulsing Glow */}
-          <motion.div
-            className="absolute inset-0 rounded-full"
-            style={{
-              border: '1px solid rgba(0, 255, 255, 0.2)',
-            }}
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.5, 0, 0.5],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+      {/* Flower of Life */}
+      <svg className="flower-of-life" viewBox="-150 -150 300 300">
+        {[0, 60, 120, 180, 240, 300].map(angle => (
+          <circle
+            key={angle}
+            cx={Math.cos(angle * Math.PI / 180) * 45}
+            cy={Math.sin(angle * Math.PI / 180) * 45}
+            r="45"
+            fill="none"
+            stroke="rgba(212,175,55,0.15)"
+            strokeWidth="1"
           />
-        </motion.div>
+        ))}
+        <circle cx="0" cy="0" r="45" fill="none" stroke="rgba(212,175,55,0.2)" strokeWidth="1" />
+        <circle cx="0" cy="0" r="80" fill="none" stroke="rgba(212,175,55,0.1)" strokeWidth="1" />
+      </svg>
 
-        {/* ═══ SOVEREIGN NODULES — FIXED POSITIONS ═══ */}
-        {ALL_SATELLITES.map((sat, idx) => {
-          const pos = positions[idx];
-          const Icon = sat.icon;
-          const isSelected = selectedId === sat.id;
-
+      {/* Nodule Container - Centered */}
+      <div className="nodules-container">
+        {NODULES.map((nodule, index) => {
+          const pos = getPosition(index, NODULES.length, 100);
+          const isActive = activeNodule === nodule.id;
+          
           return (
-            <motion.div
-              key={sat.id}
-              className="absolute cursor-pointer"
+            <button
+              key={nodule.id}
+              onClick={() => handlePress(nodule)}
+              className="nodule-button"
               style={{
-                width: NODULE_SIZE,
-                height: NODULE_SIZE,
-                // FIXED POSITION — NO PHYSICS
-                left: `calc(50% + ${pos.x}px - ${NODULE_SIZE / 2}px)`,
-                top: `calc(50% + ${pos.y}px - ${NODULE_SIZE / 2}px)`,
-                zIndex: 9999, // ABSOLUTE FRONT
-                touchAction: 'manipulation',
+                transform: `translate(${pos.x}px, ${pos.y}px) ${isActive ? 'scale(1.1)' : 'scale(1)'}`,
+                borderColor: nodule.color,
+                background: isActive 
+                  ? `radial-gradient(circle, ${nodule.color}40 0%, rgba(10,10,20,0.95) 70%)`
+                  : 'rgba(10,10,20,0.95)',
+                boxShadow: isActive
+                  ? `0 0 30px ${nodule.color}, inset 0 0 20px ${nodule.color}50`
+                  : `inset 0 0 15px ${nodule.color}30`,
               }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ 
-                opacity: 1, 
-                scale: isSelected ? 1.15 : 1,
-              }}
-              transition={{ 
-                delay: idx * 0.08,
-                type: 'spring',
-                stiffness: 300,
-                damping: 25,
-              }}
-              onClick={() => handleNoduleTap(sat)}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              data-testid={`satellite-${sat.id}`}
             >
-              {/* Nodule Container */}
-              <div
-                className="w-full h-full rounded-full flex flex-col items-center justify-center relative"
-                style={{
-                  background: isSelected 
-                    ? `${sat.color}30`
-                    : 'rgba(10, 10, 18, 0.85)',
-                  // INSET GLOW — Light stays INSIDE the button boundaries
-                  border: `2px solid ${sat.color}`,
-                  boxShadow: isSelected
-                    ? `0 0 20px ${sat.color}60, inset 0 0 15px ${sat.color}30`
-                    : `inset 0 0 10px ${sat.color}20`,
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
-                {/* Icon */}
-                <Icon 
-                  size={NODULE_SIZE * 0.35} 
-                  style={{ color: sat.color }} 
-                />
-                
-                {/* Label */}
-                <span
-                  className="text-center font-medium mt-1"
-                  style={{
-                    fontSize: 9,
-                    color: sat.color,
-                    letterSpacing: '0.05em',
-                    maxWidth: NODULE_SIZE - 8,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {sat.label}
-                </span>
-              </div>
-
-              {/* Iridescent Touch Feedback Ring */}
-              <motion.div
-                className="absolute inset-0 rounded-full pointer-events-none"
-                style={{
-                  border: `1px solid ${sat.color}`,
-                }}
-                initial={{ scale: 1, opacity: 0 }}
-                whileTap={{
-                  scale: 1.4,
-                  opacity: [0, 0.8, 0],
-                  transition: { duration: 0.3 },
-                }}
-              />
-            </motion.div>
+              <span style={{ color: nodule.color }}>{nodule.label}</span>
+            </button>
           );
         })}
       </div>
 
-      {/* Bottom Hint */}
-      <motion.p 
-        className="absolute bottom-4 text-center pointer-events-none px-4"
-        style={{ 
-          fontSize: 10, 
-          color: 'rgba(212, 175, 55, 0.3)',
-          letterSpacing: '0.1em',
-          zIndex: 100,
-        }}
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        transition={{ delay: 1 }}
-      >
-        tap any module to enter • tap center for menu
-      </motion.p>
+      {/* Hint */}
+      <div className="hub-hint">tap crystal to enter</div>
 
-      {/* Mission Control Modal */}
-      <MissionControl 
-        isOpen={missionControlOpen} 
-        onClose={() => setMissionControlOpen(false)} 
-      />
-
-      {/* CSS Keyframes */}
       <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        .orbital-hub-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: radial-gradient(ellipse at center, #0a0514 0%, #000005 100%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          overflow: hidden;
+        }
+        
+        .hub-title {
+          position: absolute;
+          top: 80px;
+          color: rgba(212,175,55,0.9);
+          font-size: 16px;
+          font-weight: 300;
+          letter-spacing: 0.4em;
+          text-shadow: 0 0 20px rgba(212,175,55,0.3);
+        }
+        
+        .hub-version {
+          position: absolute;
+          top: 105px;
+          color: rgba(212,175,55,0.4);
+          font-size: 9px;
+          letter-spacing: 0.3em;
+        }
+        
+        .flower-of-life {
+          position: absolute;
+          width: 300px;
+          height: 300px;
+          opacity: 0.6;
+          pointer-events: none;
+        }
+        
+        .nodules-container {
+          position: relative;
+          width: 0;
+          height: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .nodule-button {
+          position: absolute;
+          width: 72px;
+          height: 72px;
+          margin-left: -36px;
+          margin-top: -36px;
+          border-radius: 50%;
+          border: 2px solid;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+          outline: none;
+          z-index: 100;
+        }
+        
+        .nodule-button span {
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          text-align: center;
+        }
+        
+        .nodule-button:hover {
+          transform: scale(1.1) !important;
+        }
+        
+        .nodule-button:active {
+          transform: scale(0.95) !important;
+        }
+        
+        .hub-hint {
+          position: absolute;
+          bottom: 100px;
+          color: rgba(212,175,55,0.25);
+          font-size: 10px;
+          letter-spacing: 0.2em;
         }
       `}</style>
     </div>
