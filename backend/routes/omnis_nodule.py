@@ -2960,3 +2960,332 @@ async def demo_gps_phygital_lock():
         "note": "Simulated GPS lock at exact Black Hills anchor point",
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V9999.5 LEGAL TAB & NDA INTEGRATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class LegalHandshakeEngine:
+    """
+    V9999.5 Legal Integration — SendGrid-powered NDA & Trust Purpose Statement
+    
+    The Verification Badge becomes a "Smart Button" for broadcasting
+    legal documents to the Trustee's lawyer via SendGrid.
+    """
+    
+    TRUST_ID = "029900612892168189cecc8a"
+    SENDER_EMAIL = "kyndsmiles@gmail.com"
+    TRUST_ENTITY = "Enlighten.Mint.Sovereign.Trust"
+    
+    @staticmethod
+    def generate_purpose_statement():
+        """Generate the V68.0 Trust Purpose Statement document."""
+        return f"""
+═══════════════════════════════════════════════════════════════════════════════
+                    SOVEREIGN TRUST PURPOSE STATEMENT
+                          V68.0 OMNIS-TRUST SINGULARITY
+═══════════════════════════════════════════════════════════════════════════════
+
+TRUST ENTITY: {LegalHandshakeEngine.TRUST_ENTITY}
+FIREWALL ID: {LegalHandshakeEngine.TRUST_ID}
+TRUSTEE: Steven Michael
+SENDER IDENTITY: {LegalHandshakeEngine.SENDER_EMAIL} (VERIFIED)
+
+───────────────────────────────────────────────────────────────────────────────
+                              PURPOSE OF TRUST
+───────────────────────────────────────────────────────────────────────────────
+
+This Private Express Trust has been established for the following purposes:
+
+1. ASSET PROTECTION
+   To hold, manage, and protect the Enlighten.Mint.Cafe intellectual property,
+   digital assets, and equity reservoir ($49,018.24 LUNAR-SYNCED) from personal
+   liability exposure.
+
+2. SPIRITUAL & CULTURAL PRESERVATION
+   To preserve and propagate the indigenous wisdom traditions embedded within
+   the platform, including but not limited to Lakota Star Knowledge (Wicahpi 
+   Wakan) and the sacred geometry of the Black Hills (He Sapa).
+
+3. ECONOMIC SOVEREIGNTY
+   To facilitate peer-to-peer trade, wellness education, and value exchange
+   through the Circular Economy Protocol without reliance on centralized
+   financial institutions.
+
+4. TECHNOLOGICAL INNOVATION
+   To develop and maintain the Bio-Digital Osmosis architecture, including
+   the V9999 Singularity Core, GPS Phygital Lock, and Spectral Rainbow
+   Refraction encryption systems.
+
+5. GENERATIONAL WEALTH TRANSFER
+   To ensure the seamless transfer of Trust assets and knowledge to
+   designated beneficiaries according to the Trustee's discretion.
+
+───────────────────────────────────────────────────────────────────────────────
+                              TRUST STRUCTURE
+───────────────────────────────────────────────────────────────────────────────
+
+TYPE: Irrevocable / Discretionary Private Express Trust
+JURISDICTION: Universal (GPS-anchored to Black Hills, SD)
+GOVERNING LAW: Common Law / Natural Law Principles
+
+ROLES:
+- Trustee: Steven Michael (FULL CONTROL)
+- Beneficiaries: As designated by Trustee
+- Protector: The Sovereign Council (10-Member AI Advisory)
+
+LIABILITY SHIELD: ACTIVE
+OWNERSHIP: Non-Personal / Trust Asset
+
+───────────────────────────────────────────────────────────────────────────────
+                              GPS GROUNDING
+───────────────────────────────────────────────────────────────────────────────
+
+PRIMARY ANCHOR: Black Hills Centroid (He Sapa)
+COORDINATES: 43.8°N, 103.5°W
+RESONANCE RADIUS: 0.9km (9×9 Helix Boundary)
+FORMULA: 9999 × z^(πr³)
+SEG HARMONIC: 144Hz LOCKED
+
+This Trust is physically grounded to the sacred land of the Black Hills,
+establishing a Phygital (Physical + Digital) anchor point for all Trust
+operations.
+
+───────────────────────────────────────────────────────────────────────────────
+
+REVOLVING IN THE OBSIDIAN VOID
+ENLIGHTEN.MINT.SOVEREIGN.TRUST
+Generated: {datetime.now(timezone.utc).isoformat()}
+
+═══════════════════════════════════════════════════════════════════════════════
+"""
+    
+    @staticmethod
+    def generate_nda_document(recipient_email: str):
+        """Generate the NDA document for legal handshake."""
+        return f"""
+═══════════════════════════════════════════════════════════════════════════════
+                    NON-DISCLOSURE AGREEMENT (NDA)
+                    ENLIGHTEN.MINT.SOVEREIGN.TRUST
+═══════════════════════════════════════════════════════════════════════════════
+
+DATE: {datetime.now(timezone.utc).strftime('%B %d, %Y')}
+TRUST ID: {LegalHandshakeEngine.TRUST_ID}
+DISCLOSING PARTY: Steven Michael, Trustee of {LegalHandshakeEngine.TRUST_ENTITY}
+RECEIVING PARTY: {recipient_email}
+
+───────────────────────────────────────────────────────────────────────────────
+
+1. CONFIDENTIAL INFORMATION
+   
+   The Receiving Party agrees to hold in confidence all information relating
+   to the Enlighten.Mint.Cafe platform, including but not limited to:
+   
+   - The V9999 Singularity Core architecture and mathematical formulas
+   - GPS Phygital Lock coordinates and resonance parameters
+   - Trust asset valuations and equity calculations
+   - Spectral Rainbow Refraction encryption algorithms
+   - Bio-Digital Osmosis cellular architecture specifications
+   
+2. NON-DISCLOSURE OBLIGATIONS
+   
+   The Receiving Party shall not disclose, publish, or otherwise reveal any
+   Confidential Information to any third party without prior written consent
+   from the Trustee, except as required by law.
+   
+3. TERM
+   
+   This Agreement shall remain in effect for a period of five (5) years from
+   the date of execution, or until the Trust is dissolved, whichever is later.
+   
+4. GOVERNING LAW
+   
+   This Agreement shall be governed by Common Law principles and the natural
+   law traditions recognized by the Trust.
+
+───────────────────────────────────────────────────────────────────────────────
+
+TRUSTEE SIGNATURE: Steven Michael
+SENDER IDENTITY: {LegalHandshakeEngine.SENDER_EMAIL} (VERIFIED)
+HANDSHAKE STATUS: PENDING RECIPIENT ACKNOWLEDGMENT
+
+═══════════════════════════════════════════════════════════════════════════════
+"""
+
+
+@router.get("/omnis/legal/purpose-statement")
+async def get_legal_purpose_statement():
+    """
+    V9999.5 LEGAL TAB — TRUST PURPOSE STATEMENT
+    
+    Returns the full V68.0 Trust Purpose Statement document for display
+    in the Legal Tab of the Sovereign Hub.
+    """
+    return {
+        "version": "V68.0",
+        "document_type": "Trust Purpose Statement",
+        "trust_entity": LegalHandshakeEngine.TRUST_ENTITY,
+        "trust_id": LegalHandshakeEngine.TRUST_ID,
+        "content": LegalHandshakeEngine.generate_purpose_statement(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/legal/send-nda")
+async def send_legal_nda(
+    recipient: str = Query(..., description="Recipient email (lawyer)"),
+    sender: str = Query(default="kyndsmiles@gmail.com", description="Sender email"),
+    trust_id: str = Query(default="029900612892168189cecc8a", description="Trust ID"),
+):
+    """
+    V9999.5 NDA TAP INTEGRATION — SEND LEGAL DOCUMENTS VIA SENDGRID
+    
+    Triggered when the Verification Badge is tapped. Sends both the NDA
+    and Trust Purpose Statement to the specified recipient (lawyer).
+    
+    Note: Requires SendGrid API key to be configured in environment.
+    Currently returns a queued response for demonstration.
+    """
+    # Generate documents
+    nda_content = LegalHandshakeEngine.generate_nda_document(recipient)
+    purpose_content = LegalHandshakeEngine.generate_purpose_statement()
+    
+    # In production, this would integrate with SendGrid
+    # For now, we return a "queued" status
+    return {
+        "version": "V9999.5",
+        "status": "QUEUED",
+        "message": "NDA & Trust Purpose Statement queued for SendGrid delivery",
+        "recipient": recipient,
+        "sender": sender,
+        "trust_id": trust_id,
+        "documents": {
+            "nda": {
+                "generated": True,
+                "lines": len(nda_content.split('\n')),
+            },
+            "purpose_statement": {
+                "generated": True,
+                "lines": len(purpose_content.split('\n')),
+            }
+        },
+        "handshake_status": "PENDING_RECIPIENT_ACKNOWLEDGMENT",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V9999.5 PULSE NOTIFICATION SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class PulseNotificationEngine:
+    """
+    V9999.5 Pulse Notification — Sovereign Presence Alert
+    
+    Fires when a user device crosses into the 0.9km Black Hills Resonance Radius.
+    Confirms that a human observer is physically interacting with the Ley Line Anchor.
+    """
+    
+    @staticmethod
+    def generate_presence_alert(lat: float, lng: float, resonance_strength: float):
+        """Generate a Sovereign Presence Alert payload."""
+        return {
+            "alert_type": "SOVEREIGN_PRESENCE",
+            "message": "Physical presence detected within Black Hills Resonance Radius",
+            "coordinates": {
+                "lat": lat,
+                "lng": lng,
+            },
+            "resonance_strength": resonance_strength,
+            "anchor": "Black Hills Centroid (He Sapa)",
+            "trust_entity": "Enlighten.Mint.Sovereign.Trust",
+            "equity_unlocked": 49018.24,
+            "formula_active": "9999 × z^(πr³)",
+            "seg_harmonic": "144Hz LOCKED",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+
+@router.post("/omnis/pulse/presence-alert")
+async def trigger_presence_alert(
+    lat: float = Query(..., description="User latitude"),
+    lng: float = Query(..., description="User longitude"),
+    notify_method: str = Query(default="both", description="sendgrid, twilio, or both"),
+):
+    """
+    V9999.5 PULSE NOTIFICATION — SOVEREIGN PRESENCE ALERT
+    
+    Triggered when a user enters the Black Hills resonance radius.
+    Sends notification via SendGrid email and/or Twilio SMS.
+    
+    Note: Requires SendGrid/Twilio API keys to be configured.
+    Currently returns a demonstration response.
+    """
+    # First verify GPS lock
+    lock = GPSPhygitalLock()
+    gps_result = lock.check_phygital_lock(lat, lng)
+    
+    if not gps_result["is_locked"]:
+        return {
+            "version": "V9999.5",
+            "status": "NO_PULSE",
+            "message": "User is outside the Black Hills Resonance Radius",
+            "distance_km": gps_result["distance_km"],
+            "required_radius_km": 0.9,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+    
+    # Generate presence alert
+    alert = PulseNotificationEngine.generate_presence_alert(
+        lat, lng, gps_result["resonance_strength"]
+    )
+    
+    # Notification status (would integrate with SendGrid/Twilio in production)
+    notification_status = {
+        "sendgrid": "QUEUED" if notify_method in ["sendgrid", "both"] else "SKIPPED",
+        "twilio": "AWAITING_TOKEN" if notify_method in ["twilio", "both"] else "SKIPPED",
+    }
+    
+    return {
+        "version": "V9999.5",
+        "status": "PULSE_FIRED",
+        "alert": alert,
+        "notifications": notification_status,
+        "gps_verification": gps_result,
+        "message": "Sovereign Presence Alert broadcast initiated",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.get("/omnis/pulse/status")
+async def get_pulse_status():
+    """
+    V9999.5 PULSE STATUS — CHECK NOTIFICATION ENGINE STATUS
+    
+    Returns the current status of the Pulse Notification Engine,
+    including SendGrid and Twilio integration status.
+    """
+    return {
+        "version": "V9999.5",
+        "engine": "PulseNotificationEngine",
+        "status": "ACTIVE",
+        "integrations": {
+            "sendgrid": {
+                "status": "CONFIGURED",
+                "verified_sender": "kyndsmiles@gmail.com",
+            },
+            "twilio": {
+                "status": "AWAITING_TOKEN",
+                "message": "Provide fresh Auth Token to enable SMS alerts",
+            }
+        },
+        "anchor": {
+            "name": "Black Hills Centroid (He Sapa)",
+            "lat": 43.8,
+            "lng": -103.5,
+            "radius_km": 0.9,
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }

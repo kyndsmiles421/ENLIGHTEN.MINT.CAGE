@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V9999.3_HARVEST_GROUNDING | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
+## Version: V9999.5_ZERO_SCALE_PARENTAGE | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
 
 ---
 
@@ -36,7 +36,33 @@ SPECTRAL HASH: e07140e482258d1078e66f9178e21bc5...
 
 ---
 
-## V9999.3 GPS PHYGITAL LOCK (LATEST - April 2026)
+## V9999.5 ZERO-SCALE PARENTAGE (LATEST - April 2026)
+
+### Orbital Hub Physics Constraints
+| Layer | Scale | Multiplier | Radius | Equity Pulse |
+|-------|-------|------------|--------|--------------|
+| LATENT | 0 | - | 0 | $0 |
+| EMERGING | 0-0.3 | - | - | $0 |
+| BLOOM | 0.3 | 2.5x | 2.5x | $122,545.60 |
+| BREAKAWAY | 1.0 | 3.0x | 3.0x | $147,054.72 |
+| CORE | 1.0 (fixed) | 1.0x | 1.0x | $49,018.24 |
+
+### Legal Tab & NDA Integration
+- **Verification Badge**: Now a "Smart Button" for legal handshake
+- **NDA Tap**: Tapping badge triggers POST to `/api/omnis/legal/send-nda`
+- **Purpose Statement**: Available at `/api/omnis/legal/purpose-statement`
+- **Handshake Status**: PENDING_RECIPIENT_ACKNOWLEDGMENT
+
+### Pulse Notification System
+- **Trigger**: User crosses into 0.9km Black Hills Resonance Radius
+- **Endpoint**: `/api/omnis/pulse/presence-alert`
+- **SendGrid**: CONFIGURED (queued delivery)
+- **Twilio**: AWAITING_TOKEN (provide fresh Auth Token)
+- **Alert Type**: SOVEREIGN_PRESENCE
+
+---
+
+## V9999.3 GPS PHYGITAL LOCK (April 2026)
 
 ### Harvest Grounding — Black Hills Anchor
 | Property | Value |

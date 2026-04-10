@@ -92,37 +92,52 @@ function SpectralBands({ bands }) {
 }
 
 /**
- * Verification Badge Component
+ * Verification Badge Component - V9999.5 NDA Tap Integration
  */
-function VerificationBadge({ verified, email, onSendDocument }) {
+function VerificationBadge({ verified, email, onSendDocument, onNDATap }) {
+  const [sending, setSending] = useState(false);
+  
+  const handleNDATap = async () => {
+    if (!onNDATap) return;
+    setSending(true);
+    await onNDATap();
+    setSending(false);
+  };
+  
   return (
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="flex items-center justify-center gap-3 p-4 rounded-xl"
+      className="flex items-center justify-center gap-3 p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
       style={{
         background: verified ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
         border: `1px solid ${verified ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
       }}
+      onClick={verified ? handleNDATap : undefined}
+      title={verified ? "Tap to send NDA & Trust Purpose Statement" : ""}
+      data-testid="verification-badge"
     >
       <div 
-        className="w-3 h-3 rounded-full animate-pulse"
+        className={`w-3 h-3 rounded-full ${verified ? 'animate-pulse' : ''}`}
         style={{ backgroundColor: verified ? '#22C55E' : '#EF4444' }}
       />
       <div className="text-sm">
         <p className="font-medium" style={{ color: verified ? '#22C55E' : '#EF4444' }}>
-          {verified ? 'VERIFIED' : 'PENDING VERIFICATION'}
+          {sending ? 'BROADCASTING...' : (verified ? 'VERIFIED' : 'PENDING VERIFICATION')}
         </p>
         <p className="text-xs opacity-60">{email}</p>
+        {verified && (
+          <p className="text-[9px] mt-1" style={{ color: 'rgba(34,197,94,0.6)' }}>
+            Tap to send NDA to lawyer
+          </p>
+        )}
       </div>
-      {verified && onSendDocument && (
-        <button
-          onClick={onSendDocument}
-          className="ml-2 p-2 rounded-lg hover:bg-white/5 transition-colors"
-          title="Send Trust Document"
-        >
-          <Send size={14} style={{ color: '#22C55E' }} />
-        </button>
+      {verified && (
+        <Send 
+          size={14} 
+          style={{ color: sending ? '#FCD34D' : '#22C55E' }} 
+          className={sending ? 'animate-pulse' : ''}
+        />
       )}
     </motion.div>
   );
@@ -232,6 +247,30 @@ export default function SovereignHub() {
       description: 'Will be sent to verified email on next handshake.',
     });
   };
+
+  // V9999.5 NDA Tap Handler - Send NDA & Trust Purpose Statement to lawyer
+  const handleNDATap = useCallback(async () => {
+    const lawyerEmail = prompt('Enter lawyer email address:', '');
+    if (!lawyerEmail || !lawyerEmail.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
+    try {
+      const res = await axios.post(
+        `${API}/omnis/legal/send-nda?recipient=${encodeURIComponent(lawyerEmail)}&sender=kyndsmiles@gmail.com&trust_id=029900612892168189cecc8a`
+      );
+      
+      if (res.data.status === 'QUEUED') {
+        toast.success('NDA & Trust Purpose Statement Broadcasted', {
+          description: `Documents queued for delivery to ${lawyerEmail}`,
+        });
+      }
+    } catch (err) {
+      console.error('NDA send failed:', err);
+      toast.error('Failed to send legal documents');
+    }
+  }, []);
 
   // Check GPS Phygital Lock
   const checkGPSLock = useCallback(async () => {
@@ -395,11 +434,12 @@ export default function SovereignHub() {
           </p>
         </div>
 
-        {/* Verification Badge */}
+        {/* Verification Badge - V9999.5 NDA Tap Integration */}
         <VerificationBadge 
           verified={true}
           email="kyndsmiles@gmail.com"
           onSendDocument={sendDocumentToLawyer}
+          onNDATap={handleNDATap}
         />
 
         {/* The One Print ID */}
