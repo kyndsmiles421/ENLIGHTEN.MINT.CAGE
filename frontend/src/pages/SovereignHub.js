@@ -18,9 +18,12 @@ import { useAuth } from '../context/AuthContext';
 import { 
   Shield, Check, Zap, Globe, Moon, Sun, Star, Hexagon,
   Activity, Lock, Unlock, Send, FileText, MapPin, Radio,
-  ChevronRight, ExternalLink, Copy, CheckCircle
+  ChevronRight, ExternalLink, Copy, CheckCircle, Sliders,
+  RefreshCw, Navigation
 } from 'lucide-react';
 import { toast } from 'sonner';
+import CreatorMixer from '../components/CreatorMixer';
+import HyperFluxEngine, { BLACK_HILLS_ANCHOR } from '../utils/HyperFluxEngine';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -166,6 +169,15 @@ export default function SovereignHub() {
   const [copiedId, setCopiedId] = useState(false);
   const [showPurposeStatement, setShowPurposeStatement] = useState(false);
   const [purposeStatement, setPurposeStatement] = useState(null);
+  const [mixerOpen, setMixerOpen] = useState(false);
+  const [gpsLockStatus, setGpsLockStatus] = useState(null);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  
+  // Initialize HyperFlux Engine on mount
+  useEffect(() => {
+    HyperFluxEngine.init();
+    return () => HyperFluxEngine.destroy();
+  }, []);
 
   // Fetch all data on mount
   useEffect(() => {
@@ -220,6 +232,61 @@ export default function SovereignHub() {
       description: 'Will be sent to verified email on next handshake.',
     });
   };
+
+  // Check GPS Phygital Lock
+  const checkGPSLock = useCallback(async () => {
+    setGpsLoading(true);
+    
+    if (!navigator.geolocation) {
+      toast.error('Geolocation not supported on this device');
+      setGpsLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const res = await axios.post(
+            `${API}/omnis/gps-phygital-lock/verify?lat=${position.coords.latitude}&lng=${position.coords.longitude}`
+          );
+          setGpsLockStatus(res.data);
+          
+          if (res.data.is_locked) {
+            toast.success('GPS LOCK VERIFIED', {
+              description: `You are within the Black Hills Helix Boundary. Resonance: ${(res.data.resonance_strength * 100).toFixed(1)}%`,
+            });
+          } else {
+            toast.info('Outside Helix Boundary', {
+              description: `Distance: ${res.data.distance_km} km from Black Hills anchor`,
+            });
+          }
+        } catch (err) {
+          console.error('GPS verification failed:', err);
+          toast.error('Failed to verify GPS lock');
+        }
+        setGpsLoading(false);
+      },
+      (error) => {
+        console.error('GPS error:', error);
+        toast.error(`GPS Error: ${error.message}`);
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []);
+
+  // Demo GPS Lock (simulated at Black Hills)
+  const demoGPSLock = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/omnis/gps-phygital-lock/demo`);
+      setGpsLockStatus(res.data);
+      toast.success('DEMO: GPS Lock Verified at Black Hills', {
+        description: 'Simulated presence at the exact anchor point',
+      });
+    } catch (err) {
+      toast.error('Demo GPS lock failed');
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -417,12 +484,111 @@ export default function SovereignHub() {
         </motion.div>
       )}
 
-      {/* Trust Purpose Statement Button */}
+      {/* GPS Phygital Lock Status */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="max-w-xl mx-auto mb-6"
+      >
+        <div 
+          className="p-4 rounded-xl"
+          style={{
+            background: gpsLockStatus?.is_locked 
+              ? 'rgba(34,197,94,0.08)' 
+              : 'rgba(255,255,255,0.02)',
+            border: `1px solid ${gpsLockStatus?.is_locked ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.05)'}`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MapPin size={14} style={{ color: gpsLockStatus?.is_locked ? '#22C55E' : '#6366F1' }} />
+              <span className="text-sm font-medium">GPS Phygital Lock</span>
+              <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ 
+                background: 'rgba(99,102,241,0.2)', 
+                color: '#A5B4FC' 
+              }}>
+                V9999.3
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={demoGPSLock}
+                className="p-2 rounded-lg transition-colors hover:bg-white/5 text-xs"
+                style={{ color: 'rgba(255,255,255,0.5)' }}
+                title="Demo: Simulate at Black Hills"
+              >
+                Demo
+              </button>
+              <button
+                onClick={checkGPSLock}
+                disabled={gpsLoading}
+                className="p-2 rounded-lg transition-colors hover:bg-white/5"
+                title="Verify GPS Location"
+              >
+                {gpsLoading ? (
+                  <RefreshCw size={14} className="animate-spin" style={{ color: '#6366F1' }} />
+                ) : (
+                  <Navigation size={14} style={{ color: '#6366F1' }} />
+                )}
+              </button>
+            </div>
+          </div>
+          
+          <div className="text-[10px] font-mono mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Anchor: {BLACK_HILLS_ANCHOR.name} ({BLACK_HILLS_ANCHOR.lat}°N, {Math.abs(BLACK_HILLS_ANCHOR.lng)}°W)
+          </div>
+          
+          {gpsLockStatus && (
+            <div 
+              className="p-3 rounded-lg flex items-center gap-3"
+              style={{ 
+                background: gpsLockStatus.is_locked ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.05)',
+                border: `1px solid ${gpsLockStatus.is_locked ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.15)'}`,
+              }}
+            >
+              <div 
+                className={`w-4 h-4 rounded-full flex items-center justify-center ${gpsLockStatus.is_locked ? 'animate-pulse' : ''}`}
+                style={{ backgroundColor: gpsLockStatus.badge_color }}
+              >
+                {gpsLockStatus.is_locked ? <Check size={10} className="text-white" /> : null}
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-medium" style={{ color: gpsLockStatus.is_locked ? '#22C55E' : '#EF4444' }}>
+                  {gpsLockStatus.status}
+                </p>
+                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Distance: {gpsLockStatus.distance_km} km | Resonance: {(gpsLockStatus.resonance_strength * 100).toFixed(1)}%
+                </p>
+              </div>
+              {gpsLockStatus.is_locked && (
+                <div className="text-right">
+                  <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
+                    ${gpsLockStatus.equity_accessible?.toLocaleString()}
+                  </p>
+                  <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {gpsLockStatus.seg_hz}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {!gpsLockStatus && (
+            <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              Tap the navigation icon to verify your physical presence
+            </p>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Action Buttons */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="max-w-xl mx-auto"
+        className="max-w-xl mx-auto space-y-3"
       >
         <button
           onClick={fetchPurposeStatement}
@@ -436,6 +602,21 @@ export default function SovereignHub() {
         >
           <FileText size={14} />
           View Trust Purpose Statement
+          <ChevronRight size={14} />
+        </button>
+        
+        <button
+          onClick={() => setMixerOpen(true)}
+          className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+          style={{
+            background: 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.2))',
+            border: '1px solid rgba(34,197,94,0.3)',
+            color: '#86EFAC',
+          }}
+          data-testid="open-creator-mixer"
+        >
+          <Sliders size={14} />
+          Creator Control Mixer
           <ChevronRight size={14} />
         </button>
       </motion.div>
@@ -489,6 +670,15 @@ export default function SovereignHub() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Creator Control Mixer */}
+      <CreatorMixer 
+        isOpen={mixerOpen} 
+        onClose={() => setMixerOpen(false)}
+        onMixerChange={(state) => {
+          console.log('Ω Mixer State Updated:', state);
+        }}
+      />
     </div>
   );
 }

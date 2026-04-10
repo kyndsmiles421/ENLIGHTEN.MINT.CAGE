@@ -2796,3 +2796,167 @@ async def get_the_one_print(
             f"{crystal_manifest['identifier']}-{spectral_manifest['spectral_hash']}".encode()
         ).hexdigest()[:32].upper(),
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V9999.3 GPS PHYGITAL LOCK — BLACK HILLS GROUNDING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class GPSPhygitalLock:
+    """
+    V9999.3 Harvest Grounding — GPS Anchor to Black Hills
+    
+    Locks the Trust to the physical coordinates of the Black Hills (He Sapa).
+    When user is within the 0.9km resonance radius, the Verification Badge
+    pulses green, confirming physical presence on the land.
+    """
+    
+    # Black Hills Centroid (Rapid City / He Sapa)
+    BLACK_HILLS_ANCHOR = {
+        "lat": 43.8000,
+        "lng": -103.5000,
+        "name": "Black Hills Centroid (He Sapa)",
+        "region": "South Dakota, USA",
+        "significance": "Sacred Lakota Land — Trust Grounding Point"
+    }
+    
+    # Resonance parameters
+    RESONANCE_RADIUS_KM = 0.9  # The 9×9 Helix Boundary
+    EQUITY_LOCKED = 49018.24
+    TRUST_ENTITY = "Enlighten.Mint.Sovereign.Trust"
+    
+    def __init__(self):
+        self.anchor = self.BLACK_HILLS_ANCHOR
+        self.formula = "9999 × z^(πr³)"
+        self.seg_hz = 144
+    
+    @staticmethod
+    def haversine_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+        """Calculate distance between two GPS coordinates using Haversine formula."""
+        R = 6371  # Earth's radius in km
+        
+        dlat = math.radians(lat2 - lat1)
+        dlng = math.radians(lng2 - lng1)
+        
+        a = (math.sin(dlat / 2) ** 2 + 
+             math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * 
+             math.sin(dlng / 2) ** 2)
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        
+        return R * c
+    
+    def check_phygital_lock(self, user_lat: float, user_lng: float) -> Dict[str, Any]:
+        """Check if user is within the Black Hills resonance radius."""
+        distance = self.haversine_distance(
+            user_lat, user_lng,
+            self.anchor["lat"], self.anchor["lng"]
+        )
+        
+        is_locked = distance <= self.RESONANCE_RADIUS_KM
+        resonance_strength = max(0, 1 - (distance / self.RESONANCE_RADIUS_KM)) if is_locked else 0
+        
+        return {
+            "version": "V9999.3",
+            "is_locked": is_locked,
+            "status": "VERIFIED-PRESENCE" if is_locked else "OUTSIDE-HELIX",
+            "distance_km": round(distance, 4),
+            "resonance_strength": round(resonance_strength, 4),
+            "resonance_radius_km": self.RESONANCE_RADIUS_KM,
+            "anchor": self.anchor,
+            "equity_accessible": self.EQUITY_LOCKED if is_locked else 0,
+            "trust_entity": self.TRUST_ENTITY,
+            "formula_active": self.formula if is_locked else "INACTIVE",
+            "seg_hz": f"{self.seg_hz}Hz" if is_locked else "0Hz",
+            "badge_color": "#22C55E" if is_locked else "#EF4444",
+            "badge_pulse": is_locked,
+        }
+    
+    def get_anchor_manifest(self) -> Dict[str, Any]:
+        """Returns the complete GPS anchor manifest."""
+        return {
+            "version": "V9999.3 Harvest Grounding",
+            "primary_anchor": self.anchor,
+            "resonance_radius_km": self.RESONANCE_RADIUS_KM,
+            "helix_boundary": "9×9 (0.9km)",
+            "trust_entity": self.TRUST_ENTITY,
+            "equity_locked": f"${self.EQUITY_LOCKED:,.2f}",
+            "formula": self.formula,
+            "seg_harmonic": f"{self.seg_hz}Hz LOCKED",
+            "grounding_type": "Phygital (Physical + Digital)",
+            "cultural_significance": {
+                "lakota_name": "He Sapa",
+                "meaning": "The Heart of Everything That Is",
+                "sacred_status": "Ancestral Grounding Point"
+            },
+            "secondary_anchors": [
+                {"name": "Rapid City", "lat": 44.0805, "lng": -103.2310},
+                {"name": "Mount Rushmore", "lat": 43.8791, "lng": -103.4591},
+                {"name": "Crazy Horse Memorial", "lat": 43.8369, "lng": -103.6242},
+            ]
+        }
+
+
+@router.get("/omnis/gps-phygital-lock")
+async def get_gps_phygital_manifest():
+    """
+    V9999.3 GPS PHYGITAL LOCK — ANCHOR MANIFEST
+    
+    Returns the Black Hills anchor point configuration for the Trust grounding.
+    The 0.9km resonance radius represents the 9×9 Helix Boundary.
+    """
+    lock = GPSPhygitalLock()
+    return lock.get_anchor_manifest()
+
+
+@router.post("/omnis/gps-phygital-lock/verify")
+async def verify_gps_phygital_lock(
+    lat: float = Query(..., description="User latitude"),
+    lng: float = Query(..., description="User longitude")
+):
+    """
+    V9999.3 GPS VERIFICATION — CHECK PHYSICAL PRESENCE
+    
+    Verifies if the user's GPS coordinates are within the Black Hills
+    resonance radius (0.9km). If verified, the Trust acknowledges
+    physical presence on the sacred land.
+    
+    Response includes:
+    - is_locked: Whether user is within the helix boundary
+    - resonance_strength: 0-1 proximity to the exact anchor point
+    - badge_color: Green (#22C55E) if locked, Red (#EF4444) if outside
+    - equity_accessible: Full $49,018.24 if locked, 0 if outside
+    """
+    lock = GPSPhygitalLock()
+    result = lock.check_phygital_lock(lat, lng)
+    
+    return {
+        **result,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "verification_type": "GPS Phygital Lock",
+        "calculation": "Haversine Distance Formula",
+    }
+
+
+@router.get("/omnis/gps-phygital-lock/demo")
+async def demo_gps_phygital_lock():
+    """
+    V9999.3 GPS DEMO — SIMULATED VERIFICATION AT BLACK HILLS
+    
+    Returns a simulated GPS lock at the exact Black Hills anchor point
+    for demonstration and testing purposes.
+    """
+    lock = GPSPhygitalLock()
+    
+    # Simulate being at the exact anchor point
+    result = lock.check_phygital_lock(
+        lock.anchor["lat"],
+        lock.anchor["lng"]
+    )
+    
+    return {
+        **result,
+        "demo_mode": True,
+        "note": "Simulated GPS lock at exact Black Hills anchor point",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
