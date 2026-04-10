@@ -12,7 +12,7 @@ import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
 import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V26.8 - THE RUTILATED HERKIMER CORE
 import './styles/UniverseMaterials.css'; // Universe Materials - Herkimer Crystal Lattice
-import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders } from 'lucide-react';
+import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders, ArrowLeftRight } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)
 
@@ -430,36 +430,84 @@ function CafeApp() {
         {!isSovereignRoute && <EmergencyShutOff />}
       </div>
       
-      {/* ═══ SOVEREIGN GRID: BOTTOM BAR (The Manifest / Future) ═══ */}
+      {/* ═══ V46.0 MANIFEST BAR: REVENUE-FOCUSED BOTTOM NAV ═══ */}
       {!isSovereignRoute && !isHubRoute && (
-        <div id="bottom-dock-future" className="sovereign-toolbar bar-bottom bar-section-manifest" data-testid="sovereign-bar-bottom">
-          <span className="temporal-label temporal-label-future">MANIFEST</span>
-          <div className="flex items-center gap-2">
-            <Link to="/hub" className="bar-nav-item bar-bottom-item umbrella-trigger" data-target="hub" data-testid="nav-hub">
-              <Compass size={14} />
-              <span>Hub</span>
-            </Link>
-            <Link to="/oracle" className="bar-nav-item bar-bottom-item umbrella-trigger" data-target="oracle" data-testid="nav-oracle">
-              <Star size={14} />
-              <span>Oracle</span>
-            </Link>
-            <Link to="/discover" className="bar-nav-item bar-bottom-item umbrella-trigger" data-target="discover" data-testid="nav-discover">
-              <Sparkles size={14} />
-              <span>Discover</span>
-            </Link>
-            {/* Steven's Mixer Trigger - Opens native DOM mixer */}
-            <button 
-              onClick={() => ENLIGHTEN_OS.showMixer()}
-              className="bar-nav-item bar-bottom-item creator-trigger"
-              data-testid="steven-mixer-trigger"
-              title="Steven's Mixing Board"
-            >
-              <Sliders size={14} />
-              <span>Mixer</span>
-            </button>
-          </div>
-          <span className="temporal-label temporal-label-future">FUTURE</span>
-        </div>
+        <nav 
+          id="MANIFEST_BAR" 
+          className="sovereign-toolbar bar-bottom bar-section-manifest"
+          data-testid="sovereign-bar-bottom"
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            height: '70px',
+            background: 'rgba(6,6,14,0.95)',
+            backdropFilter: 'blur(12px)',
+            zIndex: 100000,
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            borderTop: '1px solid rgba(167,139,250,0.15)',
+          }}
+        >
+          <Link 
+            to="/hub" 
+            className="bar-nav-item" 
+            data-hz="174"
+            data-testid="nav-hub"
+            style={{ color: '#a78bfa', textAlign: 'center', textDecoration: 'none' }}
+          >
+            <Compass size={20} />
+            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Hub</span>
+          </Link>
+          <Link 
+            to="/trade-circle" 
+            className="bar-nav-item" 
+            data-hz="528"
+            data-testid="nav-trade"
+            style={{ color: '#f472b6', textAlign: 'center', textDecoration: 'none' }}
+          >
+            <ArrowLeftRight size={20} />
+            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Trade</span>
+          </Link>
+          <Link 
+            to="/oracle" 
+            className="bar-nav-item" 
+            data-hz="285"
+            data-testid="nav-oracle"
+            style={{ color: '#fbbf24', textAlign: 'center', textDecoration: 'none' }}
+          >
+            <Star size={20} />
+            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Oracle</span>
+          </Link>
+          <Link 
+            to="/discover" 
+            className="bar-nav-item" 
+            data-hz="639"
+            data-testid="nav-discover"
+            style={{ color: '#34d399', textAlign: 'center', textDecoration: 'none' }}
+          >
+            <Sparkles size={20} />
+            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Discover</span>
+          </Link>
+          <button 
+            onClick={() => window.ENLIGHTEN_OS?.showMixer?.()}
+            className="bar-nav-item"
+            data-hz="963"
+            data-testid="nav-mixer"
+            style={{ 
+              color: '#60a5fa', 
+              textAlign: 'center', 
+              background: 'none', 
+              border: 'none', 
+              cursor: 'pointer' 
+            }}
+          >
+            <Sliders size={20} />
+            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Mixer</span>
+          </button>
+        </nav>
       )}
       
       {/* React CreatorMixerUI deprecated - Using native Steven's Mixer from ENLIGHTEN_OS.showMixer() */}

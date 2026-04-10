@@ -164,6 +164,35 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
   border-bottom: 1px solid var(--primary-freq, rgba(168, 85, 247, 0.8));
 }
 
+/* V46.0 MANIFEST BAR — EXPLICIT OVERRIDE */
+#MANIFEST_BAR {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 70px !important;
+  min-height: 70px !important;
+  background: rgba(6,6,14,0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  z-index: 100000 !important;
+  display: flex !important;
+  justify-content: space-around !important;
+  align-items: center !important;
+  border-top: 1px solid rgba(167,139,250,0.15) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+#MANIFEST_BAR .bar-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  padding: 8px 12px;
+}
+
 .bar-bottom { 
   bottom: 0; 
   height: calc(12vh * var(--manifest-scale, 1.618));

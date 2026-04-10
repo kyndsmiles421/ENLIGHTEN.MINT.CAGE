@@ -309,3 +309,105 @@ async def send_direct_email(request: DirectEmailRequest):
             status_code=500,
             detail="Failed to send email via SendGrid"
         )
+
+# ═══════════════════════════════════════════════════════════════════════════
+# V46.0 TWILIO SMS SERVICE (PLUG-AND-PLAY)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class SMSRequest(BaseModel):
+    to_phone: str
+    message: str
+    frequency: str = "528Hz"
+
+def send_sovereign_sms(to_phone: str, message: str, frequency: str) -> dict:
+    """
+    V46.0: Send SMS via Twilio
+    PLUG-AND-PLAY: Just add TWILIO_AUTH_TOKEN to .env
+    """
+    account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+    from_number = os.environ.get("TWILIO_FROM_NUMBER")
+    
+    if not all([account_sid, auth_token, from_number]):
+        return {
+            "success": False,
+            "error": "TWILIO_AUTH_TOKEN missing - Add to backend/.env",
+            "status": "PENDING"
+        }
+    
+    try:
+        from twilio.rest import Client
+        
+        client = Client(account_sid, auth_token)
+        
+        # Format message with frequency stamp
+        full_message = f"[{frequency}] {message}\n— ENLIGHTEN.MINT.CAFE"
+        
+        sms = client.messages.create(
+            body=full_message,
+            from_=from_number,
+            to=to_phone
+        )
+        
+        print(f"[TWILIO] SMS sent to {to_phone} | SID: {sms.sid}")
+        return {
+            "success": True,
+            "sid": sms.sid,
+            "status": "DELIVERED"
+        }
+        
+    except Exception as e:
+        print(f"[TWILIO] Error: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "status": "FAILED"
+        }
+
+@router.post("/sms")
+async def send_sms(request: SMSRequest):
+    """
+    V46.0: Send SMS notification via Twilio
+    Used for Trade Circle alerts, Oracle readings, etc.
+    """
+    result = send_sovereign_sms(
+        to_phone=request.to_phone,
+        message=request.message,
+        frequency=request.frequency
+    )
+    
+    if not result["success"]:
+        if "TWILIO_AUTH_TOKEN missing" in result.get("error", ""):
+            raise HTTPException(
+                status_code=503,
+                detail=result["error"]
+            )
+        raise HTTPException(
+            status_code=500,
+            detail=f"SMS failed: {result.get('error', 'Unknown error')}"
+        )
+    
+    return {
+        "success": True,
+        "message": f"SMS delivered to {request.to_phone}",
+        "frequency": request.frequency,
+        "sid": result.get("sid")
+    }
+
+@router.get("/sms/status")
+async def sms_status():
+    """Check Twilio SMS configuration status"""
+    account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+    from_number = os.environ.get("TWILIO_FROM_NUMBER")
+    
+    return {
+        "twilio": {
+            "account_sid": "✓ Configured" if account_sid else "✗ Missing",
+            "auth_token": "✓ Configured" if auth_token else "✗ Missing (REQUIRED)",
+            "from_number": from_number or "✗ Missing",
+            "status": "READY" if all([account_sid, auth_token, from_number]) else "PENDING"
+        },
+        "instructions": "Add TWILIO_AUTH_TOKEN to backend/.env to enable SMS"
+    }
+
