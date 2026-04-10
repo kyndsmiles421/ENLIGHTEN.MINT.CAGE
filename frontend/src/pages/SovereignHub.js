@@ -19,11 +19,13 @@ import {
   Shield, Check, Zap, Globe, Moon, Sun, Star, Hexagon,
   Activity, Lock, Unlock, Send, FileText, MapPin, Radio,
   ChevronRight, ExternalLink, Copy, CheckCircle, Sliders,
-  RefreshCw, Navigation
+  RefreshCw, Navigation, Vibrate
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CreatorMixer from '../components/CreatorMixer';
 import HyperFluxEngine, { BLACK_HILLS_ANCHOR } from '../utils/HyperFluxEngine';
+import OmnisExecution from '../utils/OmnisExecution';
+import BiometricSync from '../utils/BiometricSync';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -187,11 +189,33 @@ export default function SovereignHub() {
   const [mixerOpen, setMixerOpen] = useState(false);
   const [gpsLockStatus, setGpsLockStatus] = useState(null);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [biometricActive, setBiometricActive] = useState(false);
+  const [singularityEngaged, setSingularityEngaged] = useState(false);
   
-  // Initialize HyperFlux Engine on mount
+  // Initialize V10000.0 Singularity on mount
   useEffect(() => {
+    // Initialize core engines
     HyperFluxEngine.init();
-    return () => HyperFluxEngine.destroy();
+    OmnisExecution.init();
+    BiometricSync.init();
+    
+    // Engage the Singularity
+    const engageSingularity = async () => {
+      const status = await OmnisExecution.checkPulse();
+      if (status.status === 'ACTIVE') {
+        OmnisExecution.engageFractalEngine();
+        setSingularityEngaged(true);
+        console.log('Ω V10000.0 SINGULARITY ENGAGED');
+      }
+    };
+    
+    engageSingularity();
+    
+    return () => {
+      HyperFluxEngine.destroy();
+      OmnisExecution.disengage();
+      BiometricSync.stopResonance();
+    };
   }, []);
 
   // Fetch all data on mount
@@ -291,10 +315,23 @@ export default function SovereignHub() {
           setGpsLockStatus(res.data);
           
           if (res.data.is_locked) {
-            toast.success('GPS LOCK VERIFIED', {
+            // V10000.0 Biometric: Trigger arrival pulse
+            BiometricSync.triggerArrivalPulse();
+            setBiometricActive(true);
+            
+            // Fire Pulse Notification
+            await OmnisExecution.firePulseNotification(
+              position.coords.latitude,
+              position.coords.longitude
+            );
+            
+            toast.success('GPS LOCK VERIFIED — 144Hz PULSE FIRED', {
               description: `You are within the Black Hills Helix Boundary. Resonance: ${(res.data.resonance_strength * 100).toFixed(1)}%`,
             });
           } else {
+            // Calculate biometric feedback based on distance
+            BiometricSync.vibrateResonance(parseFloat(res.data.distance_km));
+            
             toast.info('Outside Helix Boundary', {
               description: `Distance: ${res.data.distance_km} km from Black Hills anchor`,
             });
@@ -319,7 +356,12 @@ export default function SovereignHub() {
     try {
       const res = await axios.get(`${API}/omnis/gps-phygital-lock/demo`);
       setGpsLockStatus(res.data);
-      toast.success('DEMO: GPS Lock Verified at Black Hills', {
+      
+      // V10000.0 Biometric: Trigger arrival pulse for demo
+      BiometricSync.triggerArrivalPulse();
+      setBiometricActive(true);
+      
+      toast.success('DEMO: GPS Lock Verified — 144Hz ARRIVAL PULSE', {
         description: 'Simulated presence at the exact anchor point',
       });
     } catch (err) {
