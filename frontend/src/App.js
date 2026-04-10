@@ -276,6 +276,7 @@ const TesseractExperience = lazy(() => import('./pages/TesseractExperience'));
 const EnlightenmentOS = lazy(() => import('./pages/EnlightenmentOS'));
 const SovereignLab = lazy(() => import('./pages/SovereignLab'));
 const SovereignCanvasPage = lazy(() => import('./pages/SovereignCanvasPage'));
+const LatticeView = lazy(() => import('./pages/LatticeView'));
 
 function PageLoader() {
   return (
@@ -344,7 +345,8 @@ function CafeApp() {
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = window.location.pathname === '/hub' || 
-                     window.location.pathname === '/dashboard';
+                     window.location.pathname === '/dashboard' ||
+                     window.location.pathname === '/lattice-view';
   
   return (
     <>
@@ -602,6 +604,7 @@ function AnimatedRoutes() {
         <Route path="/workshop" element={<Workshop />} />
         <Route path="/hub" element={<OrbitalHub />} />
         <Route path="/ether-hub" element={<EnlightenMintHub />} />
+        <Route path="/lattice-view" element={<LatticeView />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
         <Route path="/sanctuary" element={<Sanctuary />} />
