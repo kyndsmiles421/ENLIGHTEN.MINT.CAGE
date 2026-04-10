@@ -246,6 +246,7 @@ const ENLIGHTEN_OS = (() => {
             `;
             
             mixerElement.style.display = 'none';
+            mixerElement.style.pointerEvents = 'none'; // Don't block clicks when hidden
             document.body.appendChild(mixerElement);
         },
 
@@ -253,6 +254,7 @@ const ENLIGHTEN_OS = (() => {
             if (!mixerElement) return;
             if (show === undefined) show = mixerElement.style.display === 'none';
             mixerElement.style.display = show ? 'flex' : 'none';
+            mixerElement.style.pointerEvents = show ? 'auto' : 'none'; // Only capture when visible
         },
         showMixer: () => ENLIGHTEN_OS.toggleMixer(true),
         hideMixer: () => ENLIGHTEN_OS.toggleMixer(false),
