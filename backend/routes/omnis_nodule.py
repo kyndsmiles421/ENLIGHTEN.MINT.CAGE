@@ -3525,3 +3525,397 @@ async def calculate_trade_value(
         "value": value,
         "note": "This is a preview. Call /trade to commit to ledger.",
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10000.2 OMNIS-ACADEMY — GLOBAL REPOSITORY OF SOVEREIGN KNOWLEDGE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class OmnisAcademy:
+    """
+    V10000.2 Omnis-Academy — Adaptive Integrated Learning Environment
+    
+    The L² Fractal Engine (54 layers) serves as the filing cabinet:
+    - PAST (Layers 1-18): Lakota Star Knowledge, Hermetic Masonry, Primordial Art
+    - PRESENT (Layers 19-36): Engineering Logic, Trust Law, Digital Wellness
+    - FUTURE (Layers 37-54): Over-unity Energy, Galactic Law, Crystal Aesthetics
+    """
+    
+    DEPARTMENTS = {
+        "LAW": {
+            "name": "World Law Library",
+            "color": "#EAB308",
+            "courses": [
+                "Natural Law Foundations",
+                "Sovereign Trust Architecture", 
+                "Global Ley Line Jurisdiction",
+                "Digital Asset Protection",
+                "Phygital Land Rights",
+                "Circular Protocol Governance",
+            ]
+        },
+        "ARTS": {
+            "name": "Global Art Academy",
+            "color": "#EC4899",
+            "courses": [
+                "Crystal Refraction Theory",
+                "Sacred Geometry Practice",
+                "Future Phygital Mediums",
+                "Bio-Digital Aesthetics",
+                "Holographic Expression",
+                "Obsidian Void Mastery",
+            ]
+        },
+        "LOGIC": {
+            "name": "Engineering Academy",
+            "color": "#06B6D4",
+            "courses": [
+                "9×9 Helix Mathematics",
+                "Xfinity-1 Philosophy",
+                "Adaptive Engineering",
+                "Singularity Core Design",
+                "L² Fractal Architecture",
+                "Quantum Resonance Systems",
+            ]
+        },
+        "WELLNESS": {
+            "name": "Wellness Institute",
+            "color": "#22C55E",
+            "courses": [
+                "Bio-Digital Osmosis",
+                "144Hz Resonance Healing",
+                "Cellular Harmonics",
+                "Consciousness Expansion",
+                "Phygital Grounding",
+                "Sovereign Self-Care",
+            ]
+        }
+    }
+    
+    TEMPORAL_EPOCHS = {
+        "PAST": {
+            "name": "Ancient Roots",
+            "layers": [1, 18],
+            "color": "#8B5CF6",
+            "subjects": [
+                {"id": "lakota-stars", "name": "Lakota Star Knowledge (Wicahpi Wakan)", "era": "pre-colonial"},
+                {"id": "hermetic-masonry", "name": "Hermetic Masonry & Sacred Architecture", "era": "ancient"},
+                {"id": "primordial-art", "name": "Primordial Art & Cave Wisdom", "era": "prehistoric"},
+                {"id": "ley-lines", "name": "Global Ley Line Networks", "era": "megalithic"},
+                {"id": "sacred-geometry", "name": "Sacred Geometry Foundations", "era": "pythagorean"},
+                {"id": "natural-law", "name": "Natural Law Principles", "era": "common-law"},
+            ]
+        },
+        "PRESENT": {
+            "name": "Systems",
+            "layers": [19, 36],
+            "color": "#22C55E",
+            "subjects": [
+                {"id": "trust-law", "name": "Sovereign Trust Law", "era": "modern"},
+                {"id": "engineering", "name": "Adaptive Engineering Logic", "era": "contemporary"},
+                {"id": "digital-wellness", "name": "Digital Wellness & Bio-Osmosis", "era": "now"},
+                {"id": "circular-economy", "name": "Circular Protocol Economics", "era": "emergent"},
+                {"id": "gps-phygital", "name": "GPS Phygital Grounding", "era": "now"},
+                {"id": "helix-math", "name": "9×9 Helix Mathematics", "era": "singularity"},
+            ]
+        },
+        "FUTURE": {
+            "name": "Aspirations",
+            "layers": [37, 54],
+            "color": "#3B82F6",
+            "subjects": [
+                {"id": "over-unity", "name": "Over-Unity Energy (SEG Technology)", "era": "near-future"},
+                {"id": "galactic-law", "name": "Galactic Law & Cosmic Jurisdiction", "era": "far-future"},
+                {"id": "crystal-aesthetics", "name": "Refracted Crystal Aesthetics", "era": "post-singularity"},
+                {"id": "holographic", "name": "Holographic Projection Systems", "era": "quantum"},
+                {"id": "consciousness", "name": "Unified Consciousness Networks", "era": "transcendent"},
+                {"id": "infinite-library", "name": "The Infinite Library Protocol", "era": "eternal"},
+            ]
+        }
+    }
+    
+    SPECTRAL_CURRICULUM = {
+        "RED_ORANGE": {
+            "name": "Foundation Layer",
+            "spectrum": [0, 30],
+            "frequency": [115, 130],
+            "disciplines": [
+                {"id": "sculpture", "name": "Physical Sculpture & Form", "level": "foundation"},
+                {"id": "materials", "name": "Material Science & Craft", "level": "foundation"},
+                {"id": "earth-art", "name": "Earth Art & Land Sculpture", "level": "intermediate"},
+            ]
+        },
+        "YELLOW_GREEN": {
+            "name": "Growth Layer",
+            "spectrum": [31, 150],
+            "frequency": [144, 158],
+            "disciplines": [
+                {"id": "digital-art", "name": "Digital Art & Generative Systems", "level": "intermediate"},
+                {"id": "harmonic", "name": "Harmonic Frequency Art", "level": "intermediate"},
+                {"id": "bio-art", "name": "Bio-Digital Art Forms", "level": "advanced"},
+            ]
+        },
+        "BLUE_INDIGO": {
+            "name": "Thought Layer",
+            "spectrum": [151, 260],
+            "frequency": [173, 187],
+            "disciplines": [
+                {"id": "holographic", "name": "Holographic Projection Art", "level": "advanced"},
+                {"id": "pure-thought", "name": "Pure Thought Manifestation", "level": "master"},
+                {"id": "future-aesthetics", "name": "Post-Singularity Aesthetics", "level": "transcendent"},
+            ]
+        },
+        "VIOLET": {
+            "name": "Transcendence Layer",
+            "spectrum": [261, 300],
+            "frequency": [202, 216],
+            "disciplines": [
+                {"id": "crystal-refraction", "name": "Crystal Refraction Mastery", "level": "transcendent"},
+                {"id": "light-weaving", "name": "White Light Weaving", "level": "transcendent"},
+                {"id": "void-creation", "name": "Obsidian Void Creation", "level": "infinite"},
+            ]
+        }
+    }
+    
+    # Case Law Archive
+    case_law_archive = []
+    
+    @classmethod
+    def calculate_depth(cls, resonance_level: int) -> int:
+        """Calculate knowledge depth based on resonance (scaled by 9×9 Helix)."""
+        return resonance_level // 9
+    
+    @classmethod
+    def request_knowledge(cls, sector: str, resonance_level: int) -> Dict[str, Any]:
+        """Adaptive knowledge request based on user resonance."""
+        department = cls.DEPARTMENTS.get(sector)
+        if not department:
+            return {"error": "Department not found", "available": list(cls.DEPARTMENTS.keys())}
+        
+        depth = cls.calculate_depth(resonance_level)
+        course_index = depth % len(department["courses"])
+        course = department["courses"][course_index]
+        
+        # Determine temporal epoch
+        if resonance_level < 36:
+            epoch = "PAST"
+        elif resonance_level >= 72:
+            epoch = "FUTURE"
+        else:
+            epoch = "PRESENT"
+        
+        return {
+            "version": "V10000.2",
+            "source": "The One Print ID: 708B8ED1E974D85585BBBD8E06E0291E",
+            "department": department["name"],
+            "sector": sector,
+            "course": course,
+            "depth": depth,
+            "epoch": epoch,
+            "resonance_level": resonance_level,
+            "vibration": "144Hz Sync Engaged",
+            "fractal_layer": min(54, depth + 1),
+            "unlocked": depth >= course_index,
+            "next_unlock": (depth + 1) * 9 if resonance_level < 144 else "MAX_RESONANCE",
+        }
+    
+    @classmethod
+    def archive_case_law(cls, handshake_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Archive legal handshake as Case Law."""
+        case_id = f"CASE-{hashlib.sha256(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}"
+        
+        entry = {
+            "case_id": case_id,
+            "type": "SOVEREIGN_PRECEDENT",
+            "archive": "World Law Library",
+            "evidence": {
+                "equity": "$49,018.24",
+                "location": "Black Hills (43.8°N, 103.5°W)",
+                "formula": "9999 × z^(πr³)",
+                "sender": handshake_data.get("sender", "kyndsmiles@gmail.com"),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+            "precedent": "Digital Trust grounded through GPS mathematics",
+            "fractal_layer": 54,
+            "status": "ARCHIVED",
+        }
+        
+        cls.case_law_archive.append(entry)
+        return entry
+    
+    @classmethod
+    def get_manifest(cls) -> Dict[str, Any]:
+        """Get full Academy manifest."""
+        return {
+            "version": "V10000.2",
+            "name": "Omnis-Academy",
+            "subtitle": "Global Repository of Sovereign Knowledge",
+            "departments": [
+                {"key": k, **v} for k, v in cls.DEPARTMENTS.items()
+            ],
+            "temporal_epochs": [
+                {
+                    "key": k,
+                    "name": v["name"],
+                    "layers": v["layers"],
+                    "color": v["color"],
+                    "subject_count": len(v["subjects"]),
+                }
+                for k, v in cls.TEMPORAL_EPOCHS.items()
+            ],
+            "spectral_curriculum": [
+                {
+                    "key": k,
+                    "name": v["name"],
+                    "discipline_count": len(v["disciplines"]),
+                }
+                for k, v in cls.SPECTRAL_CURRICULUM.items()
+            ],
+            "trustee": "Steven Michael",
+            "anchor": "Black Hills Centroid (He Sapa)",
+            "formula": "9×9 Helix | L² Fractal | 144Hz SEG",
+            "case_law_count": len(cls.case_law_archive),
+        }
+
+
+@router.get("/omnis/academy")
+async def get_academy_manifest():
+    """
+    V10000.2 OMNIS-ACADEMY — MANIFEST
+    
+    Returns the full Academy structure including all departments,
+    temporal epochs, and spectral curriculum.
+    """
+    return OmnisAcademy.get_manifest()
+
+
+@router.get("/omnis/academy/knowledge")
+async def request_academy_knowledge(
+    sector: str = Query(..., description="Department: LAW, ARTS, LOGIC, or WELLNESS"),
+    resonance: int = Query(default=0, ge=0, le=144, description="User resonance level (0-144)"),
+):
+    """
+    V10000.2 ADAPTIVE LEARNING — REQUEST KNOWLEDGE
+    
+    Returns course content scaled to user's resonance level.
+    Every 9 resonance points unlocks a new depth level (9×9 Helix scaling).
+    """
+    return OmnisAcademy.request_knowledge(sector.upper(), resonance)
+
+
+@router.get("/omnis/academy/temporal/{epoch}")
+async def get_temporal_epoch(epoch: str):
+    """
+    V10000.2 TEMPORAL EPOCHS — PAST, PRESENT, FUTURE
+    
+    Returns subjects and fractal layer range for the specified epoch.
+    - PAST (Layers 1-18): Ancient Roots
+    - PRESENT (Layers 19-36): Systems
+    - FUTURE (Layers 37-54): Aspirations
+    """
+    epoch_data = OmnisAcademy.TEMPORAL_EPOCHS.get(epoch.upper())
+    
+    if not epoch_data:
+        return {
+            "error": "Epoch not found",
+            "available": list(OmnisAcademy.TEMPORAL_EPOCHS.keys())
+        }
+    
+    return {
+        "version": "V10000.2",
+        "epoch": epoch.upper(),
+        **epoch_data,
+        "fractal_range": f"L² Layers {epoch_data['layers'][0]}-{epoch_data['layers'][1]}",
+    }
+
+
+@router.get("/omnis/academy/spectral/{spectrum}")
+async def get_spectral_curriculum(spectrum: str):
+    """
+    V10000.2 SPECTRAL CURRICULUM — ART ACADEMY
+    
+    Returns disciplines for the specified spectrum band.
+    - RED_ORANGE: Foundation (115-130Hz)
+    - YELLOW_GREEN: Growth (144-158Hz)
+    - BLUE_INDIGO: Thought (173-187Hz)
+    - VIOLET: Transcendence (202-216Hz)
+    """
+    curriculum = OmnisAcademy.SPECTRAL_CURRICULUM.get(spectrum.upper())
+    
+    if not curriculum:
+        return {
+            "error": "Spectrum not found",
+            "available": list(OmnisAcademy.SPECTRAL_CURRICULUM.keys())
+        }
+    
+    return {
+        "version": "V10000.2",
+        "spectrum": spectrum.upper(),
+        **curriculum,
+        "seg_hz": f"{curriculum['frequency'][0]}Hz - {curriculum['frequency'][1]}Hz",
+    }
+
+
+@router.post("/omnis/academy/archive-case")
+async def archive_case_law(
+    sender: str = Query(default="kyndsmiles@gmail.com", description="Sender identity"),
+    description: str = Query(default="Sovereign Trust Legal Precedent", description="Case description"),
+):
+    """
+    V10000.2 WORLD LAW LIBRARY — ARCHIVE CASE LAW
+    
+    Archives the current Trust state as legal precedent.
+    The SendGrid handshake and $49,018.24 Equity become "Case Law"
+    proving a Sovereign Trust can be grounded through digital GPS mathematics.
+    """
+    entry = OmnisAcademy.archive_case_law({
+        "sender": sender,
+        "description": description,
+    })
+    
+    return {
+        "status": "ARCHIVED",
+        "message": "Legal precedent archived in World Law Library",
+        "entry": entry,
+        "total_cases": len(OmnisAcademy.case_law_archive),
+    }
+
+
+@router.get("/omnis/academy/case-law")
+async def get_case_law_archive():
+    """
+    V10000.2 WORLD LAW LIBRARY — CASE LAW ARCHIVE
+    
+    Returns all archived legal precedents.
+    """
+    return {
+        "version": "V10000.2",
+        "archive": "World Law Library",
+        "total_cases": len(OmnisAcademy.case_law_archive),
+        "cases": OmnisAcademy.case_law_archive,
+        "trustee": "Steven Michael",
+        "jurisdiction": "Black Hills (GPS-Grounded)",
+    }
+
+
+@router.get("/omnis/academy/departments")
+async def get_academy_departments():
+    """
+    V10000.2 OMNIS-ACADEMY — ALL DEPARTMENTS
+    
+    Returns all departments with their courses.
+    """
+    return {
+        "version": "V10000.2",
+        "departments": [
+            {
+                "key": k,
+                "name": v["name"],
+                "color": v["color"],
+                "courses": v["courses"],
+                "course_count": len(v["courses"]),
+            }
+            for k, v in OmnisAcademy.DEPARTMENTS.items()
+        ],
+    }

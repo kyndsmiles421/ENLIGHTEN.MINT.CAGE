@@ -19,11 +19,12 @@ import {
   Shield, Check, Zap, Globe, Moon, Sun, Star, Hexagon,
   Activity, Lock, Unlock, Send, FileText, MapPin, Radio,
   ChevronRight, ExternalLink, Copy, CheckCircle, Sliders,
-  RefreshCw, Navigation, Vibrate, Repeat
+  RefreshCw, Navigation, Vibrate, Repeat, BookOpen
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CreatorMixer from '../components/CreatorMixer';
 import CircularProtocol from '../components/CircularProtocol';
+import AcademyPortal from '../components/AcademyPortal';
 import HyperFluxEngine, { BLACK_HILLS_ANCHOR } from '../utils/HyperFluxEngine';
 import OmnisExecution from '../utils/OmnisExecution';
 import BiometricSync from '../utils/BiometricSync';
@@ -193,6 +194,8 @@ export default function SovereignHub() {
   const [biometricActive, setBiometricActive] = useState(false);
   const [singularityEngaged, setSingularityEngaged] = useState(false);
   const [circularProtocolOpen, setCircularProtocolOpen] = useState(false);
+  const [academyOpen, setAcademyOpen] = useState(false);
+  const [userResonance, setUserResonance] = useState(36); // Default resonance
   
   // Initialize V10000.0 Singularity on mount
   useEffect(() => {
@@ -718,6 +721,21 @@ export default function SovereignHub() {
           Circular Protocol Ledger
           <ChevronRight size={14} />
         </button>
+        
+        <button
+          onClick={() => setAcademyOpen(true)}
+          className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+          style={{
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(99,102,241,0.2))',
+            border: '1px solid rgba(139,92,246,0.3)',
+            color: '#C4B5FD',
+          }}
+          data-testid="open-academy-portal"
+        >
+          <BookOpen size={14} />
+          The Great Library
+          <ChevronRight size={14} />
+        </button>
       </motion.div>
 
       {/* Footer */}
@@ -784,6 +802,13 @@ export default function SovereignHub() {
         isOpen={circularProtocolOpen} 
         onClose={() => setCircularProtocolOpen(false)}
         gpsVerified={gpsLockStatus?.is_locked || false}
+      />
+
+      {/* Academy Portal - The Great Library */}
+      <AcademyPortal 
+        isOpen={academyOpen} 
+        onClose={() => setAcademyOpen(false)}
+        userResonance={userResonance}
       />
     </div>
   );

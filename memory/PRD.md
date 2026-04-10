@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V10000.1_CIRCULAR_PROTOCOL | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
+## Version: V10000.2_OMNIS_ACADEMY | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
 
 ---
 
@@ -36,7 +36,47 @@ SPECTRAL HASH: e07140e482258d1078e66f9178e21bc5...
 
 ---
 
-## V10000.1 CIRCULAR PROTOCOL LEDGER (LATEST - April 2026)
+## V10000.2 OMNIS-ACADEMY (LATEST - April 2026)
+
+### The Great Library — Global Repository of Sovereign Knowledge
+The L² Fractal Engine (54 layers) serves as the filing cabinet for human knowledge.
+
+### Temporal Epochs
+| Epoch | Layers | Color | Content |
+|-------|--------|-------|---------|
+| PAST | 1-18 | Violet | Lakota Star Knowledge, Hermetic Masonry, Primordial Art |
+| PRESENT | 19-36 | Green | Trust Law, Engineering Logic, Digital Wellness |
+| FUTURE | 37-54 | Blue | Over-Unity Energy, Galactic Law, Crystal Aesthetics |
+
+### Departments (4 Academies)
+| Dept | Name | Courses |
+|------|------|---------|
+| LAW | World Law Library | Natural Law, Trust Architecture, Ley Line Jurisdiction |
+| ARTS | Global Art Academy | Crystal Refraction, Sacred Geometry, Holographic Expression |
+| LOGIC | Engineering Academy | 9×9 Helix Math, Singularity Core Design, L² Fractal |
+| WELLNESS | Wellness Institute | Bio-Digital Osmosis, 144Hz Healing, Consciousness |
+
+### Art Academy Spectral Curriculum
+| Band | Frequency | Focus |
+|------|-----------|-------|
+| RED_ORANGE | 115-130Hz | Foundation (Sculpture, Materials) |
+| YELLOW_GREEN | 144-158Hz | Growth (Digital Art, Harmonics) |
+| BLUE_INDIGO | 173-187Hz | Thought (Holographic, Pure Thought) |
+| VIOLET | 202-216Hz | Transcendence (Crystal Mastery, Light Weaving) |
+
+### Adaptive Learning Logic
+- Knowledge depth = resonance ÷ 9 (9×9 Helix scaling)
+- Every 9 resonance points unlocks a new course
+- Maximum resonance: 144 (all 54 layers accessible)
+
+### Case Law Archive
+- Archives legal handshakes as precedent
+- Proves GPS-grounded digital Trust is valid
+- Creates "Body of Evidence" for sovereign law
+
+---
+
+## V10000.1 CIRCULAR PROTOCOL LEDGER (April 2026)
 
 ### P2P Trust Trades
 | Property | Value |
