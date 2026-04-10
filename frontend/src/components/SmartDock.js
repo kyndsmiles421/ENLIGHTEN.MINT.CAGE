@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music, Award, Crown, Shield } from 'lucide-react';
+import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music, Award, Crown, Shield, Hexagon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
@@ -11,6 +11,7 @@ import { useTreasury } from '../context/TreasuryContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useHarmonyEngine, getHarmonyColor } from '../hooks/useHarmonyEngine';
 import SovereignConsultOverlay, { SolfeggioGlow } from './SovereignConsultOverlay';
+import { AlchemicalLab } from './AlchemicalLab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const USAGE_KEY = 'cosmic_dock_usage';
@@ -64,6 +65,7 @@ export default function SmartDock() {
     try { return localStorage.getItem('dock_orientation') || 'horizontal'; } catch { return 'horizontal'; }
   });
   const [consultOpen, setConsultOpen] = useState(false);
+  const [alchemicalLabOpen, setAlchemicalLabOpen] = useState(false);
   const [snappedEdge, setSnappedEdge] = useState(() => {
     try { const e = localStorage.getItem('dock_snapped'); return e && e !== 'none' ? e : null; } catch { return null; }
   });
@@ -113,6 +115,13 @@ export default function SmartDock() {
     };
     window.addEventListener('widget-focus', handler);
     return () => window.removeEventListener('widget-focus', handler);
+  }, []);
+
+  // Listen for Alchemical Lab open event
+  useEffect(() => {
+    const openLabHandler = () => setAlchemicalLabOpen(true);
+    window.addEventListener('openAlchemicalLab', openLabHandler);
+    return () => window.removeEventListener('openAlchemicalLab', openLabHandler);
   }, []);
 
   const hidden = location.pathname === '/auth' || location.pathname === '/' || location.pathname === '/tutorial' || location.pathname === '/vr' || location.pathname === '/intro' || location.pathname === '/hub' || location.pathname.startsWith('/live/');
@@ -672,6 +681,12 @@ export default function SmartDock() {
         onClose={() => setConsultOpen(false)}
         pathname={location.pathname}
       />
+
+      {/* ── V64.0 Alchemical Lab ── */}
+      <AlchemicalLab
+        isOpen={alchemicalLabOpen}
+        onClose={() => setAlchemicalLabOpen(false)}
+      />
     </div>,
     document.body
   );
@@ -976,6 +991,22 @@ function MixerPanel({ onClose, navigate }) {
           data-testid="dock-open-mixer-page"
         >
           Full Mixer Page
+        </button>
+        <button
+          onClick={() => { 
+            onClose(); 
+            // Dispatch custom event to open Alchemical Lab
+            window.dispatchEvent(new CustomEvent('openAlchemicalLab'));
+          }}
+          className="w-full py-2 rounded-lg text-[10px] flex items-center justify-center gap-1.5"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(129,140,248,0.12), rgba(244,114,182,0.12))', 
+            border: '1px solid rgba(129,140,248,0.2)', 
+            color: '#818CF8' 
+          }}
+          data-testid="dock-open-alchemical-lab"
+        >
+          <Hexagon size={10} /> Alchemical Lab
         </button>
       </div>
     </motion.div>

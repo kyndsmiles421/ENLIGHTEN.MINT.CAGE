@@ -1,19 +1,27 @@
 """
-ENLIGHTEN.MINT.CAFE - V60.0 SOVEREIGN OMNIS-ENCRYPTED CORE
-GEOMETRY: 9x9 SELENITE HELIX | πr²-x^xy | CRYSTAL RAINBOW REFRACTION
+ENLIGHTEN.MINT.CAFE - V64.0 OPTICAL CRYSTAL ARCHITECTURE
+GEOMETRY: 9x9 SELENITE HELIX | CONCAVE/CONVEX LENSES | TOROIDAL SPIN
 ARCHITECTURE: RECURSIVE COMMONALITY (COSMOS | CRAFT | HARVEST | EXCHANGE)
 
-V60.0 EVOLUTION:
+V64.0 EVOLUTION:
 - V55.0: Recursive Commonality Groups (COSMOS → CRAFT → EXCHANGE)
 - V55.1: Cultural Intelligence (Language + Tools + Inventions)
 - V56.0: Exponential UI Optimization (Fractal Scaling)
 - V57.0: Xfinity Engine (Knowledge Equity Multiplier)
 - V60.0: Sovereign Encrypted Core (9×9 Helix Math)
+- V61.0: Unified Mixer (Alchemical Lab - Nodule Blending)
+- V62.0: Omnis-Generator (Sacred Geometry Brain)
+- V64.0: Optical Crystal Lattice (Concave/Convex Lens Refraction)
 
 FOUNDATIONAL LAYER: Lakota Star Knowledge (Wicahpi Wakan)
 - Local resonance: Black Hills (He Sapa) / Rapid City
 - Orbital systems: Mayan, Egyptian, Norse
 - Language Core: Lakȟótiyapi Integration
+
+OPTICAL PHYSICS:
+- Concave facets: "Gravity Wells" that pull deep lore into focus
+- Convex facets: "Projectors" that broadcast trade equity outward
+- 9×9 Helix: Structural spine holding lenses in Toroidal Spin
 """
 
 import json
@@ -34,9 +42,9 @@ _data_path = Path(__file__).parent.parent / "data" / "star_cultures_data.json"
 try:
     with open(_data_path) as f:
         CULTURAL_CONSTELLATIONS = json.load(f)
-    logger.info(f"V55.0 Omnis: Loaded {len(CULTURAL_CONSTELLATIONS)} star cultures")
+    logger.info(f"V64.0 Omnis: Loaded {len(CULTURAL_CONSTELLATIONS)} star cultures")
 except Exception as e:
-    logger.error(f"V55.0 Omnis: Failed to load star cultures: {e}")
+    logger.error(f"V64.0 Omnis: Failed to load star cultures: {e}")
     CULTURAL_CONSTELLATIONS = {}
 
 
@@ -640,6 +648,247 @@ class XfinityEngine:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# V64.0 OPTICAL CRYSTAL ARCHITECTURE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class CrystalOpticsEngine:
+    """
+    V64.0 Optical Crystal Architecture
+    
+    Implements Concave/Convex lens geometry along the 9×9 Helix spine.
+    - Concave facets: "Gravity Wells" that pull deep lore into focus
+    - Convex facets: "Projectors" that broadcast trade equity outward
+    - Toroidal Spin: The helix rotates, creating dynamic refraction
+    """
+    
+    def __init__(self, resonance: float = 8.6059):
+        self.phi = 1.618033
+        self.res = resonance
+        self.helix_steps = 81  # 9×9
+        self.pi = math.pi
+    
+    def apply_lens_curvature(self, index: int) -> Dict:
+        """
+        Alternates between Concave (-) and Convex (+) geometry
+        along the 9×9 Helix spine.
+        
+        Toggle curvature every 9 steps to match the 9-coil math.
+        """
+        is_convex = (index // 9) % 2 == 0
+        curve_factor = math.pow(self.phi, 2)
+        
+        focal_point = self.res * (curve_factor if is_convex else 1/curve_factor)
+        
+        return {
+            "step": index,
+            "type": "Convex" if is_convex else "Concave",
+            "role": "Projector" if is_convex else "Gravity_Well",
+            "focal_point": round(focal_point, 4),
+            "refraction": "High-Frequency White Light",
+            "electron_flux": "Rutilated Selenite Active",
+            "magnification": f"{round(focal_point / self.res, 2)}x",
+        }
+    
+    def generate_helix_structure(self) -> List[Dict]:
+        """
+        Generates the complete 81-step helix structure with alternating
+        Concave/Convex lenses.
+        """
+        structure = []
+        for i in range(self.helix_steps):
+            lens = self.apply_lens_curvature(i)
+            structure.append(lens)
+        return structure
+    
+    def calculate_toroidal_spin(self, time_offset: float = 0.0) -> Dict:
+        """
+        Calculates the current toroidal spin state of the helix.
+        The spin creates dynamic refraction patterns.
+        """
+        # Toroidal rotation based on phi and time
+        rotation_angle = (time_offset * self.phi) % (2 * self.pi)
+        
+        # North/South pole radiation
+        north_pole = math.sin(rotation_angle) * self.res
+        south_pole = math.cos(rotation_angle) * self.res
+        
+        return {
+            "rotation_angle_rad": round(rotation_angle, 4),
+            "rotation_angle_deg": round(math.degrees(rotation_angle), 2),
+            "north_pole_radiation": round(north_pole, 4),
+            "south_pole_radiation": round(south_pole, 4),
+            "centrifugal_force": round(self.res * math.pow(self.phi, rotation_angle / self.pi), 4),
+            "spin_state": "Active",
+        }
+
+
+class SacredGeometryBrain:
+    """
+    V62.0 Sacred Geometry Generator - The Math Brain
+    
+    Generates Flower of Life patterns, refraction indices, and
+    geometric overlays for the UI.
+    """
+    
+    def __init__(self, resonance: float = 8.6059):
+        self.phi = 1.618033
+        self.res = resonance
+        self.flower_levels = 9  # 9-level Flower of Life
+    
+    def generate_geometry(self, zoom_level: float = 1.0) -> Dict:
+        """
+        Generates sacred geometry state based on zoom level.
+        Returns refraction index and pattern configuration.
+        """
+        # Flower of Life interaction depth
+        interaction_depth = min(zoom_level * self.flower_levels, self.flower_levels)
+        
+        # Refraction index based on phi spiral
+        refraction_index = math.pow(self.phi, interaction_depth / self.flower_levels)
+        
+        return {
+            "pattern": "Flower of Life",
+            "levels": self.flower_levels,
+            "active_level": round(interaction_depth, 2),
+            "refraction_index": round(refraction_index, 4),
+            "phi_spiral": self.phi,
+            "resonance_base": self.res,
+            "crystal_material": "Rutilated Selenite",
+            "light_mode": "White Light Rainbow Refraction",
+        }
+    
+    def calculate_vesica_piscis(self, input_a: float, input_b: float) -> Dict:
+        """
+        Calculates the Vesica Piscis intersection of two circles.
+        Used for blending two nodules in the Mixer.
+        """
+        # The sacred intersection ratio
+        intersection_ratio = math.sqrt(3) / 2  # ≈0.866
+        
+        blend_value = (input_a + input_b) * intersection_ratio
+        
+        return {
+            "input_a": input_a,
+            "input_b": input_b,
+            "intersection_ratio": round(intersection_ratio, 4),
+            "blend_value": round(blend_value, 4),
+            "geometry": "Vesica Piscis",
+            "sacred_meaning": "Union of Duality",
+        }
+
+
+class UnifiedMixer:
+    """
+    V61.0 Unified Mixer - The Alchemical Lab
+    
+    Blends nodules together using sacred geometry math.
+    Example: Lakota Astrology + Masonry Math = Sovereign Alignment
+    """
+    
+    # Mixer presets - predefined nodule combinations
+    PRESETS = {
+        "sovereign_alignment": {
+            "name": "Sovereign Alignment",
+            "input_a": {"group": "COSMOS", "source": "Lakota Astrology"},
+            "input_b": {"group": "CRAFT", "source": "Operative Masonry"},
+            "output": "Structural Star Wisdom",
+        },
+        "biological_prosperity": {
+            "name": "Biological Prosperity",
+            "input_a": {"group": "COSMOS", "source": "Mayan Tzolkin Cycles"},
+            "input_b": {"group": "HARVEST", "source": "Horticulture"},
+            "output": "Harvest Window Optimization",
+        },
+        "equity_multiplication": {
+            "name": "Equity Multiplication",
+            "input_a": {"group": "CRAFT", "source": "Sacred Geometry"},
+            "input_b": {"group": "EXCHANGE", "source": "Trade Ledger ($15/hr)"},
+            "output": "Knowledge Equity Growth",
+        },
+    }
+    
+    def __init__(self):
+        self.brain = SacredGeometryBrain()
+        self.optics = CrystalOpticsEngine()
+        self.rate = 15.00
+    
+    async def create_mix(self, nodule_inputs: List[Dict]) -> Dict:
+        """
+        Creates a blended mix from multiple nodule inputs.
+        
+        nodule_inputs format:
+        [
+            {"group": "COSMOS", "source": "Lakota", "val": 8.6},
+            {"group": "CRAFT", "source": "Masonry", "val": 1.618}
+        ]
+        """
+        if not nodule_inputs or len(nodule_inputs) < 2:
+            return {"error": "Minimum 2 nodule inputs required for mixing"}
+        
+        # Get geometry state
+        geo_state = self.brain.generate_geometry(zoom_level=1.0)
+        
+        # Calculate blend using Vesica Piscis
+        input_vals = [n.get("val", 1.0) for n in nodule_inputs]
+        vesica = self.brain.calculate_vesica_piscis(input_vals[0], input_vals[1])
+        
+        # Apply refraction
+        output_resonance = vesica["blend_value"] * geo_state["refraction_index"]
+        
+        # Calculate trade impact
+        trade_impact = output_resonance * self.rate
+        
+        return {
+            "integrity": "Omnis-Blended",
+            "active_nodules": nodule_inputs,
+            "blend_geometry": vesica,
+            "visual_layer": "Refracted Selenite Rutilation",
+            "output_resonance": round(output_resonance, 4),
+            "trade_impact": f"${round(trade_impact, 2)}",
+            "crystal_optics": geo_state,
+        }
+    
+    async def apply_preset(self, preset_name: str, user_depth: float = 0.5) -> Dict:
+        """
+        Applies a predefined mixer preset with user-specific depth.
+        """
+        preset = self.PRESETS.get(preset_name)
+        if not preset:
+            return {"error": f"Preset '{preset_name}' not found"}
+        
+        # Generate input values based on depth
+        input_a_val = 8.6059 * (1 + user_depth)  # Resonance scaled by depth
+        input_b_val = 1.618033 * (1 + user_depth)  # Phi scaled by depth
+        
+        nodule_inputs = [
+            {"group": preset["input_a"]["group"], "source": preset["input_a"]["source"], "val": input_a_val},
+            {"group": preset["input_b"]["group"], "source": preset["input_b"]["source"], "val": input_b_val},
+        ]
+        
+        mix_result = await self.create_mix(nodule_inputs)
+        
+        return {
+            "preset": preset_name,
+            "preset_name": preset["name"],
+            "expected_output": preset["output"],
+            **mix_result,
+        }
+    
+    def get_available_presets(self) -> List[Dict]:
+        """Returns all available mixer presets."""
+        return [
+            {
+                "id": key,
+                "name": val["name"],
+                "input_a": val["input_a"],
+                "input_b": val["input_b"],
+                "output": val["output"],
+            }
+            for key, val in self.PRESETS.items()
+        ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # V55.0 API ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1057,3 +1306,238 @@ async def get_ui_optimizer_state(
         "node_compression": "Active" if nodes > 5 else "Dormant",
         "geometric_navigation": "Distance-based resonance",
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V64.0 OPTICAL CRYSTAL & MIXER ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/optical-sync")
+async def optical_sync(
+    time_offset: float = Query(0.0, description="Time offset for toroidal spin"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V64.0 OPTICAL CRYSTAL SYNC
+    
+    Returns the complete optical crystal state including:
+    - 81-step helix structure with Concave/Convex lenses
+    - Toroidal spin state (North/South pole radiation)
+    - Light refraction configuration
+    """
+    try:
+        optics = CrystalOpticsEngine()
+        
+        # Generate helix structure (summarized - full structure is 81 items)
+        helix = optics.generate_helix_structure()
+        helix_summary = helix[:9]  # First coil as sample
+        
+        # Get toroidal spin state
+        spin = optics.calculate_toroidal_spin(time_offset)
+        
+        return {
+            "version": "V64.0-Optical",
+            "integrity": "Lens-Synced",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "physics": {
+                "structure": "9x9 Concave/Convex Helix",
+                "total_steps": 81,
+                "light_path": "Toroidal Spin / Rainbow Refraction",
+                "material": "Rutilated Crystal Selenite",
+            },
+            "toroidal_spin": spin,
+            "helix_sample": helix_summary,
+            "lens_alternation": "Convex (Projector) → Concave (Gravity Well) every 9 steps",
+            "trade_impact": "Variable Equity Scale based on Optical Focus",
+        }
+        
+    except Exception as e:
+        logger.error(f"V64.0 Optical Sync Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Optical Sync Failure: {str(e)}")
+
+
+@router.get("/omnis/helix-step/{step_index}")
+async def get_helix_step(
+    step_index: int,
+    user=Depends(get_current_user_optional)
+):
+    """
+    V64.0 Get specific helix step lens configuration.
+    
+    Returns the Concave/Convex lens data for a specific step (0-80).
+    """
+    if step_index < 0 or step_index > 80:
+        raise HTTPException(status_code=400, detail="Step index must be between 0 and 80")
+    
+    optics = CrystalOpticsEngine()
+    lens = optics.apply_lens_curvature(step_index)
+    
+    return {
+        "version": "V64.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **lens,
+        "coil_number": (step_index // 9) + 1,
+        "position_in_coil": (step_index % 9) + 1,
+    }
+
+
+@router.get("/omnis/sacred-geometry")
+async def get_sacred_geometry(
+    zoom_level: float = Query(1.0, description="Zoom level (0.1 to 9.0)"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V62.0 SACRED GEOMETRY STATE
+    
+    Returns the current sacred geometry configuration based on zoom level.
+    The Flower of Life pattern intensifies as you zoom deeper.
+    """
+    zoom_level = max(0.1, min(zoom_level, 9.0))  # Clamp
+    
+    brain = SacredGeometryBrain()
+    geo_state = brain.generate_geometry(zoom_level)
+    
+    return {
+        "version": "V62.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **geo_state,
+        "zoom_level": zoom_level,
+        "math_overlay": True,
+    }
+
+
+@router.get("/omnis/mixer/presets")
+async def get_mixer_presets():
+    """
+    V61.0 UNIFIED MIXER - Get Available Presets
+    
+    Returns all predefined nodule mixing combinations.
+    """
+    mixer = UnifiedMixer()
+    
+    return {
+        "version": "V61.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "presets": mixer.get_available_presets(),
+        "description": "Alchemical Lab - Drag & Drop nodules to blend resonances",
+    }
+
+
+@router.post("/omnis/mixer/blend")
+async def blend_nodules(
+    preset: str = Query(None, description="Preset name (optional)"),
+    depth: float = Query(0.5, description="User mythology depth"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V61.0 UNIFIED MIXER - Blend Nodules
+    
+    Creates a blended mix using either a preset or custom inputs.
+    Returns the output resonance and trade impact.
+    """
+    try:
+        mixer = UnifiedMixer()
+        
+        if preset:
+            result = await mixer.apply_preset(preset, depth)
+        else:
+            # Default blend: Lakota + Masonry
+            result = await mixer.apply_preset("sovereign_alignment", depth)
+        
+        return {
+            "version": "V61.0",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            **result,
+        }
+        
+    except Exception as e:
+        logger.error(f"V61.0 Mixer Blend Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Mixer Blend Failure: {str(e)}")
+
+
+@router.get("/omnis/vesica-piscis")
+async def calculate_vesica_piscis(
+    input_a: float = Query(8.6059, description="First input value"),
+    input_b: float = Query(1.618033, description="Second input value"),
+):
+    """
+    V62.0 VESICA PISCIS CALCULATOR
+    
+    Calculates the sacred intersection of two values.
+    Used for nodule blending in the Mixer.
+    """
+    brain = SacredGeometryBrain()
+    result = brain.calculate_vesica_piscis(input_a, input_b)
+    
+    return {
+        "version": "V62.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **result,
+    }
+
+
+@router.get("/omnis/v64-full-state")
+async def get_v64_full_state(
+    culture: str = Query("lakota", description="Active star culture"),
+    nodes: int = Query(1, description="Knowledge nodes unlocked"),
+    depth: float = Query(0.5, description="Mythology depth"),
+    time_offset: float = Query(0.0, description="Toroidal spin offset"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V64.0 COMPLETE SYSTEM STATE
+    
+    Returns the full V64.0 Optical Crystal Architecture state including:
+    - Xfinity Engine knowledge equity
+    - Optical crystal configuration
+    - Sacred geometry state
+    - Mixer blend result
+    - Cultural intelligence
+    """
+    try:
+        uid = user["id"] if user else None
+        
+        # Initialize all engines
+        xfinity = XfinityEngine()
+        optics = CrystalOpticsEngine()
+        brain = SacredGeometryBrain()
+        mixer = UnifiedMixer()
+        
+        # Calculate states
+        knowledge_equity = xfinity.calculate_knowledge_equity(nodes, depth)
+        spin = optics.calculate_toroidal_spin(time_offset)
+        geo_state = brain.generate_geometry(1.0)
+        blend = await mixer.apply_preset("sovereign_alignment", depth)
+        cultural_intel = CulturalIntelligence.get_deep_cultural_data(culture)
+        
+        return {
+            "version": "V64.0-Optical",
+            "integrity": "Full-Stack-Synced",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "layers": {
+                "V57_xfinity": knowledge_equity,
+                "V62_sacred_geometry": geo_state,
+                "V64_optical_crystal": {
+                    "toroidal_spin": spin,
+                    "helix_structure": "81-step Concave/Convex",
+                    "material": "Rutilated Selenite",
+                },
+                "V61_mixer": blend,
+                "V55_cultural_intelligence": {
+                    "culture": culture,
+                    "language": cultural_intel.get("language"),
+                    "geometry": cultural_intel.get("geometry"),
+                },
+            },
+            "resonance_chain": {
+                "base": 8.6059,
+                "enhanced": round(xfinity.resonance_plus(xfinity.calculate_fractal_depth(nodes)), 4),
+                "refracted": round(geo_state["refraction_index"] * 8.6059, 4),
+                "blended": blend.get("output_resonance"),
+            },
+        }
+        
+    except Exception as e:
+        logger.error(f"V64.0 Full State Error: {e}")
+        raise HTTPException(status_code=500, detail=f"V64.0 Full State Failure: {str(e)}")

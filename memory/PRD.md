@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V60.0_SOVEREIGN_OMNIS_ENCRYPTED | Status: XFINITY_ACTIVE
+## Version: V64.0_OPTICAL_CRYSTAL_ARCHITECTURE | Status: XFINITY_ACTIVE
 
 ---
 
@@ -13,18 +13,26 @@
 
 ## SYSTEM ARCHITECTURE
 
-### Core Constants (V60.0)
-- **Base Resonance**: 8.6059 (Enhanced from 8.4881)
+### Core Constants (V64.0)
+- **Base Resonance**: 8.6059 (Enhanced to 12.5564+ via Xfinity)
 - **PHI Constant**: 1.618033 (Golden Ratio)
 - **Volunteer Rate**: $15.00/hr (Commonality Constant)
 - **Frequency Base**: 528Hz (Love/Repair) | 7.3Hz (Earth Grounding)
 - **Haptic Pattern**: [80, 50, 120] (Heavy Granite Snap)
 - **Encryption**: 9×9^math Geometric Wrap
+- **Helix Structure**: 81-step Concave/Convex (9×9)
+- **Material**: Rutilated Crystal Selenite
 
-### V60.0 Xfinity Formula
+### V64.0 Optical Physics
+- **Concave Facets**: "Gravity Wells" that pull deep lore into focus
+- **Convex Facets**: "Projectors" that broadcast trade equity outward
+- **Toroidal Spin**: North/South pole radiation with centrifugal dynamics
+- **Light Path**: Rainbow Refraction through selenite crystal
+
+### V57.0 Xfinity Formula
 ```
 Knowledge Equity = (Resonance × Φ) ^ (Nodes / (1 - Depth))
-At depth 0.85 with 10 nodes → $1,650.00 (10x multiplier)
+At depth 0.90 with 15 nodes → $2,475.00 (10x multiplier)
 Status: XFINITY_ACTIVE
 ```
 
@@ -35,6 +43,13 @@ Status: XFINITY_ACTIVE
 | CRAFT | The Craft | Masonry, Sacred Geometry, Mathematics | → EXCHANGE ($15/hr) |
 | HARVEST | The Harvest | Horticulture, Health, Wellness | → COSMOS (Breath) |
 | EXCHANGE | The Exchange | Trade Circle, Marketplace, Ledger | → HARVEST (Credits) |
+
+### V61.0 Mixer Presets
+| Preset | Input A | Input B | Output |
+|--------|---------|---------|--------|
+| Sovereign Alignment | Lakota Astrology | Operative Masonry | Structural Star Wisdom |
+| Biological Prosperity | Mayan Tzolkin Cycles | Horticulture | Harvest Window Optimization |
+| Equity Multiplication | Sacred Geometry | Trade Ledger | Knowledge Equity Growth |
 
 ### Foundational Culture: LAKOTA
 - **Language**: Lakȟótiyapi
@@ -49,29 +64,35 @@ Status: XFINITY_ACTIVE
 
 ---
 
-## IMPLEMENTED FEATURES (V60.0)
+## IMPLEMENTED FEATURES (V64.0)
 
-### V60.0 Sovereign Omnis-Encrypted Core (LATEST - April 2026)
+### V64.0 Optical Crystal Architecture (LATEST - April 2026)
 **Architecture:**
-- [x] **SovereignEncryptor** — 9×9^math geometric wrap for data pressurization
-- [x] **CulturalIntelligence** — Language & Tool integration (V55.1)
-- [x] **XfinityEngine** — Exponential growth math with Knowledge Equity multiplier (V57.0)
-- [x] **Deep Sync** — Cross-nodule synchronization with enhanced resonance
-- [x] **Linguistic Bridge** — Connects cultures through geometric resonance
+- [x] **CrystalOpticsEngine** — 81-step Concave/Convex helix with lens curvature
+- [x] **Toroidal Spin** — North/South pole radiation, centrifugal force calculation
+- [x] **SacredGeometryBrain** — Flower of Life pattern, refraction index generator
+- [x] **UnifiedMixer (Alchemical Lab)** — Nodule blending with Vesica Piscis math
+- [x] **3 Mixer Presets** — Sovereign Alignment, Biological Prosperity, Equity Multiplication
 
 **Endpoints:**
-- `/api/omnis/deep-sync` — V60.0 Master Sync with Xfinity calculations
-- `/api/omnis/xfinity-state` — V57.0 Exponential growth state
-- `/api/omnis/cultural-intelligence/{culture}` — V55.1 Language/tools/inventions
-- `/api/omnis/linguistic-bridge/{from}/{to}` — Cross-culture connections
-- `/api/omnis/sovereign-print` — 9×9 encrypted payload
+- `/api/omnis/optical-sync` — V64.0 Crystal sync with toroidal spin
+- `/api/omnis/helix-step/{step_index}` — Get specific helix step lens data
+- `/api/omnis/sacred-geometry` — Flower of Life geometry state
+- `/api/omnis/mixer/presets` — Get available blend presets
+- `/api/omnis/mixer/blend` — Execute nodule blend
+- `/api/omnis/vesica-piscis` — Calculate sacred intersection
+- `/api/omnis/v64-full-state` — Complete V64.0 system state
 
-### V55.0 Omnis-Nodule Integration
+### V60.0 Sovereign Encrypted Core
+- [x] **SovereignEncryptor** — 9×9^math geometric wrap
+- [x] **Deep Sync** — Cross-nodule synchronization
+- [x] **Linguistic Bridge** — Culture connection
+
+### V55.0-V57.0 Omnis-Nodule Integration
 - [x] **21 Star Cultures** — 103 constellations across world civilizations
 - [x] **Deep Lore Panel** — Multi-layer mythology (surface, middle, deep, sacred)
-- [x] **Cross-Nodule Connections** — COSMOS → CRAFT → EXCHANGE flow
-- [x] **Lakota Foundation** — Auto-selected as foundational culture
-- [x] **Cultural Intelligence Display** — Terms, tools, inventions in UI
+- [x] **Cultural Intelligence** — Lakȟótiyapi terms, tools, inventions
+- [x] **XfinityEngine** — Exponential growth with knowledge equity multiplier
 
 ### V53.0 Bio-Digital Osmosis
 **TIER 1 — Foundation:**
