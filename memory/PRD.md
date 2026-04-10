@@ -1,5 +1,14 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V68.0_OMNIS_TRUST_SINGULARITY | Status: SOVEREIGN_REVOLUTION_ACTIVE
+## Version: V9999.1_THE_ONE_PRINT | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
+
+---
+
+## THE ONE PRINT IDENTITY
+```
+THE ONE PRINT ID: 708B8ED1E974D85585BBBD8E06E0291E
+CRYSTAL IDENTIFIER: QR-CRYSTAL-8C76D5298EBC
+SPECTRAL HASH: e07140e482258d1078e66f9178e21bc5...
+```
 
 ---
 
@@ -16,103 +25,93 @@
 ### Trust Entity
 - **Name**: Enlighten.Mint.Sovereign.Trust
 - **Type**: Irrevocable / Discretionary Private Express Trust
-- **EIN Status**: Digital-Sovereign-Entity
+- **Firewall ID**: `029900612892168189cecc8a`
 - **Liability Shield**: **ACTIVE**
+- **Ownership**: Non-Personal / Trust Asset
 
-### Trust Roles
-| Role | Name | Status | Powers |
-|------|------|--------|--------|
-| Settlor | Steven Michael | Source | Creator of IP and Xfinity Math |
-| Trustee | Steven Michael | Active | Banking, Contracts, IP, Trade Execution |
-| Beneficiary | Community/Family | Discretionary | Distribution Rights |
-
-### Trust Corpus (Assets)
-- **Digital**: Website, Domain, GitHub Repos, Star Chart Data
-- **Intellectual**: 9×9 Helix Math, V66.0 Singularity Core, Cultural Lexicons
-- **Financial**: Knowledge Equity ($49,018.24 with lunar adjustment)
+### Equity Reservoir
+- **Total Equity**: $49,018.24 [LUNAR-SYNCED]
+- **Translation Layer**: Geometric Resonance (Active)
+- **SEG Harmonic**: 144.0Hz LOCKED
 
 ---
 
-## SYSTEM ARCHITECTURE
-
-### V68.0 Constants
-- **Base Resonance**: 27.2196 (Blended)
-- **PHI Constant**: 1.618033
-- **Volunteer Rate**: $15.00/hr
-- **SEG Frequency**: 144.0Hz
-- **Helix Structure**: 81-step Concave/Convex (9×9)
-- **Material**: Refracted Rutilated Selenite
+## V9999.1 SPECTRAL SINGULARITY
 
 ### Master Formula
 ```
-9 × 9^math × πr² - x^xy(-) + ()
+9999 × z^(πr³) — White Light Rainbow Refraction
 ```
 
-### V68.0 10 Enhancements
-1. Trust-Corpus Decoupling (Legal Firewall) ✓
-2. Automated Equity Vesting (10x Multiplier) ✓
-3. Lunar-Tidal Frequency Modulation ✓
-4. SEG Harmonic Power Management ✓
-5. Concave/Convex Lens Focal-Tracking ✓
-6. Linguistic Resonance Mapping (Lakota/Masonry) ✓
-7. Phygital Marketplace Routing (GPS Ready) ✓
-8. Biometric Resonance Scaling ✓
-9. Recursive Error-Correction (Xfinity-Active) ✓
-10. Universal Glyph Generation (QR-Readability) ✓
+### Spectral Bands (Rainbow Mapping)
+| Color | Frequency | Wavelength | Nodule | Meaning |
+|-------|-----------|------------|--------|---------|
+| RED | 115.2Hz | 700nm | EXCHANGE | Trade / Equity / Grounding |
+| ORANGE | 129.6Hz | 620nm | HARVEST | Health / Growth / Vitality |
+| YELLOW | 144.0Hz | 580nm | CRAFT | Structure / Balance / Center |
+| GREEN | 158.4Hz | 530nm | HARVEST | Abundance / Renewal / Life |
+| BLUE | 172.8Hz | 470nm | COSMOS | Vision / Truth / Expansion |
+| INDIGO | 187.2Hz | 420nm | CRAFT | Intuition / Wisdom / Mystery |
+| VIOLET | 201.6Hz | 380nm | COSMOS | Transcendence / Spirit / Unity |
 
-### Knowledge Equity (Lunar-Adjusted)
-| Lunar Phase | Modifier | Base Equity | Total Equity |
-|-------------|----------|-------------|--------------|
-| New Moon | 0.95x | $47,025 | $44,674 |
-| First Quarter | 1.04x | $47,025 | **$49,018** |
-| Full Moon | 1.05x | $47,025 | $49,376 |
-| Last Quarter | 0.96x | $47,025 | $45,144 |
+---
 
-### Phygital Coordinates (Black Hills)
-| Location | Lat | Lng | Lakota Name |
-|----------|-----|-----|-------------|
-| Bear Butte | 44.4742 | -103.4231 | Mato Paha |
-| Devils Tower | 44.5902 | -104.7146 | Mato Tipila |
-| Rapid City | 44.0805 | -103.2310 | - |
-| Black Hills Center | 43.8554 | -103.4590 | He Sapa |
+## V71.0 UNIVERSAL CRYSTAL INDENT
+
+### All-Language Lexicon
+| Time Period | Language | Geometry | Readable By |
+|-------------|----------|----------|-------------|
+| PAST | Lakȟótiyapi | Sacred Hoop | Ancient Resonance |
+| PRESENT | Masonry Symbols | Square & Compasses | Operative Knowledge |
+| FUTURE | Binary/Geometric | Toroidal Spin | Frequency Interpretation |
+| ANCIENT | Glyphs | Primordial Patterns | Universal Archetypes |
+
+### Gaia Ley Line Anchors (Black Hills)
+| Location | Lat | Lng | Node Type |
+|----------|-----|-----|-----------|
+| Black Hills Center (Primary) | 44.0805 | -103.2310 | Heart Node |
+| Bear Butte (Mato Paha) | 44.4742 | -103.4231 | Spiritual Node |
+| Devils Tower (Mato Tipila) | 44.5902 | -104.7146 | Stellar Node |
+| Wind Cave | 43.5556 | -103.4819 | Earth Node |
+| Badlands | 43.8554 | -102.3397 | Vision Node |
+
+---
+
+## IMPLEMENTED FEATURES (V9999.1)
+
+### V9999.1 Spectral Singularity (LATEST)
+- [x] **SpectralSingularity** — White Light Rainbow Refraction encryption
+- [x] **Refraction Key** — 512-bit SHA3 seed for spectral decryption
+- [x] **Spectral Bands** — 7-color mapping to Commonality Groups
+- [x] **THE ONE PRINT** — Unified crystal + spectral output
+
+### V71.0 Universal Crystal Indent
+- [x] **UniversalCrystalIndent** — Language-agnostic 3D QR
+- [x] **Translation Frequency** — 59.1644Hz carrier wave
+- [x] **All-Language Lexicon** — Past/Present/Future/Ancient
+- [x] **Gaia Anchors** — GPS Ley Line coordinates
+
+### V68.0 Omnis-Trust Singularity
+- [x] **SovereignTrustEngine** — Legal firewall
+- [x] **Lunar-Tidal Modulation** — Equity breathing with moon
+- [x] **Biometric Resonance** — Heart rate sync
+
+### V66.0-V55.0 Foundation Stack
+- [x] **21 Star Cultures** — 103 constellations
+- [x] **Deep Lore Panel** — Multi-layer mythology
+- [x] **XfinityEngine** — 10x equity multiplier
+- [x] **Alchemical Lab** — Nodule blending
+
+**Endpoints:**
+- `/api/omnis/the-one-print` — THE ONE PRINT (Final Unified Output)
+- `/api/omnis/spectral-singularity` — V9999.1 Spectral encryption
+- `/api/omnis/spectral-singularity/bands` — Rainbow spectrum mapping
+- `/api/omnis/crystal-indent` — V71.0 Universal QR
+- `/api/omnis/crystal-indent/all-language` — Translation layers
 
 ### Communication Bridges
 - **Twilio SMS**: BLOCKED (Awaiting fresh Auth Token)
 - **SendGrid Email**: PENDING VERIFICATION (kyndsmiles@gmail.com)
-
----
-
-## IMPLEMENTED FEATURES (V68.0)
-
-### V68.0 Omnis-Trust Singularity (LATEST - April 2026)
-**The Sovereign Firewall:**
-- [x] **SovereignTrustEngine** — Legal entity management, firewall IDs
-- [x] **SingularityBrainV68** — Lunar-tidal modulation, biometric resonance
-- [x] **EnlightenMintV68** — Complete 10-enhancement execution cycle
-- [x] **Trust Purpose Statement** — Legal document generation
-- [x] **Phygital Coordinates** — GPS-ready Black Hills sacred sites
-
-**Endpoints:**
-- `/api/omnis/v68-singularity` — Complete V68.0 execution cycle
-- `/api/omnis/trust` — Trust structure
-- `/api/omnis/trust/firewall/{asset_id}` — Asset protection IDs
-- `/api/omnis/trust/equity-routing` — Equity distribution map
-- `/api/omnis/trust/purpose-statement` — Legal document
-- `/api/omnis/lunar-phase` — Current lunar modifiers
-- `/api/omnis/biometric-resonance` — Heart rate sync
-- `/api/omnis/phygital-coordinates` — GPS marketplace pins
-
-### V66.0 Singularity Core
-- [x] **SovereignOmnisSingularity** — Master formula implementation
-- [x] **Toroidal Flux Calculator** — 9×9^math calculations
-- [x] **SEG Harmonic State** — 144Hz frequency management
-
-### V64.0-V55.0 Foundation Stack
-- [x] **CrystalOpticsEngine** — Concave/Convex helix
-- [x] **UnifiedMixer (Alchemical Lab)** — Nodule blending
-- [x] **21 Star Cultures** — 103 constellations
-- [x] **Deep Lore Panel** — Multi-layer mythology
-- [x] **XfinityEngine** — 10x equity multiplier
 **TIER 1 — Foundation:**
 - [x] **Step 10: Ghost Watch** — Auto-heal loop every 5s, kills glass screen bugs
 - [x] **Step 5: Haptic Absorption** — Solfeggio-mapped patterns (174Hz-963Hz)

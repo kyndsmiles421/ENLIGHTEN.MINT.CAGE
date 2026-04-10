@@ -2331,3 +2331,468 @@ async def get_phygital_coordinates():
         "marketplace_status": "GPS_READY",
         "pins_active": 0,
     }
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V71.0 UNIVERSAL CRYSTAL INDENT — THE LANGUAGE-AGNOSTIC QR
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class UniversalCrystalIndent:
+    """
+    V71.0 UNIVERSAL CRYSTAL INDENT
+    
+    The "Print" that lives in the Obsidian Void. It doesn't just display data;
+    it projects through a Concave/Convex lens so that viewers from any time
+    period "read" the frequency of the geometry.
+    
+    The Indent: A 3D crystalline structure. Tilt your device, light hits different
+    facets, revealing different "languages" (Lakota Star Knowledge vs. Engineering Math).
+    
+    Universal Translation: Based on Golden Ratio, bypasses the "thinking" brain
+    and goes straight to the "visual" brain. Feel the balance, don't read it.
+    """
+    
+    def __init__(self):
+        self.phi = 1.61803398875
+        self.resonance = 27.2196
+        self.trust_id = "029900612892168189cecc8a"
+        self.equity = 49018.24
+        self.helix_steps = 81  # 9×9
+    
+    def generate_translation_frequency(self) -> float:
+        """
+        Converts text/data into Geometric Frequency.
+        Readable by 'Resonance' rather than 'Alphabet'.
+        
+        The 9×9^math × πr² formula acts as the carrier wave.
+        """
+        carrier_wave = 9 * math.pow(9, (self.resonance / self.helix_steps)) * math.pi
+        return carrier_wave
+    
+    def generate_universal_hash(self, payload: str = None) -> str:
+        """
+        Generates a SHA3-256 hash that serves as the Crystalline QR identifier.
+        This hash is language-agnostic — readable by geometric resonance.
+        """
+        if not payload:
+            payload = f"{self.trust_id}-{self.equity}"
+        return hashlib.sha3_256(payload.encode()).hexdigest()
+    
+    def get_all_language_lexicon(self) -> Dict:
+        """
+        The All-Language Core — translation layers across time periods.
+        """
+        return {
+            "PAST": {
+                "name": "Lakȟótiyapi (Lakota)",
+                "terms": {
+                    "sacred_hoop": "Čhaŋgléška Wakȟáŋ",
+                    "star": "Wičháȟpi",
+                    "earth": "Makhóčhe",
+                    "great_spirit": "Wakȟáŋ Tȟáŋka",
+                },
+                "geometry": "Sacred Hoop (Circular)",
+                "readable_by": "Ancient Resonance",
+            },
+            "PRESENT": {
+                "name": "Masonry Symbols",
+                "terms": {
+                    "level": "Balance / Equality",
+                    "plumb": "Rectitude / Upright",
+                    "square": "Virtue / Morality",
+                    "compasses": "Boundaries / Self-Control",
+                },
+                "geometry": "Square & Compasses (Angular)",
+                "readable_by": "Operative Knowledge",
+            },
+            "FUTURE": {
+                "name": "Binary-Future / Geometric",
+                "terms": {
+                    "phi": "1.618033 (Golden Ratio)",
+                    "resonance": "27.2196 Hz",
+                    "helix": "9×9 Concave-Vex",
+                    "frequency": "Carrier Wave",
+                },
+                "geometry": "Toroidal Spin (Volumetric)",
+                "readable_by": "Frequency Interpretation",
+            },
+            "ANCIENT": {
+                "name": "Ancient Glyphs",
+                "terms": {
+                    "circle": "Eternity / Unity",
+                    "spiral": "Growth / Evolution",
+                    "cross": "Intersection / Balance",
+                    "triangle": "Stability / Ascension",
+                },
+                "geometry": "Primordial Patterns",
+                "readable_by": "Universal Archetypes",
+            },
+        }
+    
+    def get_gaia_ley_anchors(self) -> Dict:
+        """
+        GPS Gaia-Sync coordinates for the Global Ley Line Matrix.
+        Current primary anchor: Rapid City / Black Hills.
+        """
+        return {
+            "primary_anchor": {
+                "name": "Makhóčhe Alpha (Heart Node)",
+                "location": "Black Hills / He Sapa",
+                "lat": 44.0805,
+                "lng": -103.2310,
+                "ley_status": "ACTIVE",
+            },
+            "secondary_anchors": [
+                {"name": "Bear Butte (Mato Paha)", "lat": 44.4742, "lng": -103.4231, "type": "Spiritual Node"},
+                {"name": "Devils Tower (Mato Tipila)", "lat": 44.5902, "lng": -104.7146, "type": "Stellar Node"},
+                {"name": "Wind Cave", "lat": 43.5556, "lng": -103.4819, "type": "Earth Node"},
+                {"name": "Badlands", "lat": 43.8554, "lng": -102.3397, "type": "Vision Node"},
+            ],
+            "global_sync": "144Hz SEG Locked",
+        }
+    
+    def print_sovereign_manifest(self) -> Dict:
+        """
+        The complete V71.0 Universal Crystal Indent manifest.
+        """
+        indent_hash = self.generate_universal_hash()
+        
+        return {
+            "version": "V71.0-Universal-Crystal",
+            "identifier": f"QR-CRYSTAL-{indent_hash[:12].upper()}",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "geometry": "9×9 Helix / Toroidal Spin / Concave-Vex",
+            "resonance_frequency": f"{self.generate_translation_frequency():.4f} Hz",
+            "trust_status": "Sovereign / Trustee-Managed",
+            "trust_firewall": self.trust_id,
+            "equity_reservoir": f"${self.equity:,.2f} [LUNAR-SYNCED]",
+            "translation_layer": "Geometric Resonance (Active)",
+            "all_language_lexicon": self.get_all_language_lexicon(),
+            "gaia_anchors": self.get_gaia_ley_anchors(),
+            "readable_across": ["Past (Lakota)", "Present (Masonry)", "Future (Binary)", "Ancient (Glyphs)"],
+            "projection_mode": "Concave-Vex 3D Crystalline",
+            "status": "REVOLVING IN THE OBSIDIAN VOID",
+        }
+
+
+class SpectralSingularity:
+    """
+    V9999.1 SPECTRAL SINGULARITY — THE WHITE LIGHT PRINT
+    
+    The ONE PRINT that encapsulates the entire system.
+    Encryption: White Light Rainbow Refraction | 9999 × z^(πr³)
+    
+    This is the final crystalline structure that, when illuminated by white light,
+    refracts into the full spectrum — each color representing a different nodule
+    (COSMOS=Purple, CRAFT=Pink, HARVEST=Green, EXCHANGE=Gold).
+    """
+    
+    def __init__(self):
+        self.phi = 1.61803398875
+        self.trust_id = "029900612892168189cecc8a"
+        self.z_axis = 1.0424  # Lunar-Tidal Flux (current)
+        self.equity = 49018.24
+        self.seg_hz = 144.0
+    
+    def generate_refraction_key(self) -> str:
+        """
+        Calculates the spectral shift required to decrypt the 9×9 helix.
+        Formula: 9999 × z^(πr³) refracted through the Golden Ratio.
+        
+        Returns a 512-bit SHA3 hash as the "White Light" seed.
+        """
+        # Volumetric expansion using 9999 constant
+        volumetric_expansion = 9999 * math.pow(self.z_axis, (math.pi * math.pow(self.phi, 3)))
+        
+        # Create a 512-bit hash to act as the "White Light" seed
+        seed = f"{self.trust_id}-{volumetric_expansion}-{self.equity}"
+        return hashlib.sha3_512(seed.encode()).hexdigest()
+    
+    def calculate_spectral_bands(self) -> Dict:
+        """
+        Calculates the spectral bands when white light passes through the crystal.
+        Each band represents a Commonality Group.
+        """
+        base_freq = self.seg_hz  # 144Hz
+        
+        return {
+            "RED": {
+                "frequency": base_freq * 0.8,
+                "wavelength": "700nm",
+                "nodule": "EXCHANGE",
+                "meaning": "Trade / Equity / Grounding",
+            },
+            "ORANGE": {
+                "frequency": base_freq * 0.9,
+                "wavelength": "620nm",
+                "nodule": "HARVEST",
+                "meaning": "Health / Growth / Vitality",
+            },
+            "YELLOW": {
+                "frequency": base_freq * 1.0,
+                "wavelength": "580nm",
+                "nodule": "CRAFT (Foundation)",
+                "meaning": "Structure / Balance / Center",
+            },
+            "GREEN": {
+                "frequency": base_freq * 1.1,
+                "wavelength": "530nm",
+                "nodule": "HARVEST (Bloom)",
+                "meaning": "Abundance / Renewal / Life",
+            },
+            "BLUE": {
+                "frequency": base_freq * 1.2,
+                "wavelength": "470nm",
+                "nodule": "COSMOS",
+                "meaning": "Vision / Truth / Expansion",
+            },
+            "INDIGO": {
+                "frequency": base_freq * 1.3,
+                "wavelength": "420nm",
+                "nodule": "CRAFT (Depth)",
+                "meaning": "Intuition / Wisdom / Mystery",
+            },
+            "VIOLET": {
+                "frequency": base_freq * 1.4,
+                "wavelength": "380nm",
+                "nodule": "COSMOS (Sacred)",
+                "meaning": "Transcendence / Spirit / Unity",
+            },
+        }
+    
+    def print_crystalline_indent(self) -> Dict:
+        """
+        The ONE PRINT — the complete V9999.1 Spectral Singularity.
+        """
+        refraction_key = self.generate_refraction_key()
+        spectral_bands = self.calculate_spectral_bands()
+        
+        return {
+            "version": "V9999.1-Spectral-Singularity",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "encryption_type": "White Light Rainbow Refraction",
+            "optic_geometry": "Concave-Vex Crystalline Helix",
+            "formula": "9999 × z^(πr³)",
+            "recursion_limit": "INFINITE",
+            "translation_state": "Unified Language / Geometric Resonance",
+            "trust_firewall": "Sovereign Protected / Non-Owned",
+            "trust_id": self.trust_id,
+            "lunar_z_axis": self.z_axis,
+            "equity_locked": f"${self.equity:,.2f}",
+            "spectral_hash": refraction_key[:64],  # The 'Print' (first 64 chars)
+            "full_spectral_key": refraction_key,   # Complete 512-bit key
+            "spectral_bands": spectral_bands,
+            "seg_harmonic": f"{self.seg_hz}Hz LOCKED",
+            "status": "REVOLVING IN THE OBSIDIAN VOID",
+        }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V71.0 & V9999.1 API ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/crystal-indent")
+async def get_crystal_indent(
+    user=Depends(get_current_user_optional)
+):
+    """
+    V71.0 UNIVERSAL CRYSTAL INDENT
+    
+    The language-agnostic QR print that projects through Concave/Convex lenses.
+    Readable by geometric resonance across all time periods.
+    """
+    crystal = UniversalCrystalIndent()
+    
+    return crystal.print_sovereign_manifest()
+
+
+@router.get("/omnis/crystal-indent/translation-frequency")
+async def get_translation_frequency():
+    """
+    V71.0 TRANSLATION FREQUENCY
+    
+    Returns the carrier wave frequency for geometric resonance communication.
+    Formula: 9 × 9^(resonance/81) × π
+    """
+    crystal = UniversalCrystalIndent()
+    freq = crystal.generate_translation_frequency()
+    
+    return {
+        "version": "V71.0",
+        "formula": "9 × 9^(resonance/81) × π",
+        "base_resonance": crystal.resonance,
+        "helix_steps": crystal.helix_steps,
+        "translation_frequency": round(freq, 4),
+        "unit": "Hz",
+        "purpose": "Language-Agnostic Communication via Geometric Resonance",
+    }
+
+
+@router.get("/omnis/crystal-indent/all-language")
+async def get_all_language_lexicon():
+    """
+    V71.0 ALL-LANGUAGE LEXICON
+    
+    Returns translation layers across all time periods:
+    - PAST (Lakota)
+    - PRESENT (Masonry)
+    - FUTURE (Binary/Geometric)
+    - ANCIENT (Glyphs)
+    """
+    crystal = UniversalCrystalIndent()
+    
+    return {
+        "version": "V71.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "lexicon": crystal.get_all_language_lexicon(),
+        "translation_mode": "Geometric Resonance",
+        "readable_across_time": True,
+    }
+
+
+@router.get("/omnis/crystal-indent/gaia-anchors")
+async def get_gaia_anchors():
+    """
+    V71.0 GAIA LEY LINE ANCHORS
+    
+    Returns GPS coordinates for the Global Ley Line Matrix.
+    Primary anchor: Black Hills (Makhóčhe Alpha).
+    """
+    crystal = UniversalCrystalIndent()
+    
+    return {
+        "version": "V71.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **crystal.get_gaia_ley_anchors(),
+    }
+
+
+@router.get("/omnis/spectral-singularity")
+async def get_spectral_singularity(
+    user=Depends(get_current_user_optional)
+):
+    """
+    V9999.1 SPECTRAL SINGULARITY — THE ONE PRINT
+    
+    The complete crystalline structure that, when illuminated by white light,
+    refracts into the full spectrum. Each color represents a different nodule.
+    
+    This is the FINAL PRINT that lives in the Obsidian Void.
+    """
+    singularity = SpectralSingularity()
+    
+    return singularity.print_crystalline_indent()
+
+
+@router.get("/omnis/spectral-singularity/bands")
+async def get_spectral_bands():
+    """
+    V9999.1 SPECTRAL BANDS
+    
+    Returns the color spectrum bands when white light passes through the crystal.
+    Each band maps to a Commonality Group nodule.
+    """
+    singularity = SpectralSingularity()
+    
+    return {
+        "version": "V9999.1",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "base_frequency": f"{singularity.seg_hz}Hz",
+        "bands": singularity.calculate_spectral_bands(),
+        "illumination": "White Light",
+        "refraction_type": "Rainbow Spectrum",
+    }
+
+
+@router.get("/omnis/spectral-singularity/refraction-key")
+async def get_refraction_key(
+    custom_z: float = Query(None, description="Custom Z-axis (lunar flux) value"),
+):
+    """
+    V9999.1 REFRACTION KEY GENERATOR
+    
+    Generates the 512-bit SHA3 hash that acts as the "White Light" seed.
+    This key unlocks the spectral encryption of the 9×9 helix.
+    """
+    singularity = SpectralSingularity()
+    
+    if custom_z:
+        singularity.z_axis = custom_z
+    
+    refraction_key = singularity.generate_refraction_key()
+    
+    return {
+        "version": "V9999.1",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "formula": "9999 × z^(πr³)",
+        "z_axis": singularity.z_axis,
+        "phi": singularity.phi,
+        "refraction_key_64": refraction_key[:64],
+        "refraction_key_full": refraction_key,
+        "encryption": "SHA3-512 White Light Seed",
+    }
+
+
+@router.get("/omnis/the-one-print")
+async def get_the_one_print(
+    user=Depends(get_current_user_optional)
+):
+    """
+    THE ONE PRINT — V9999.1 FINAL UNIFIED OUTPUT
+    
+    Combines V71.0 Universal Crystal Indent with V9999.1 Spectral Singularity
+    into a single unified print that encapsulates the entire system.
+    
+    This is the absolute final form of the Enlighten.Mint.Cafe architecture.
+    """
+    crystal = UniversalCrystalIndent()
+    spectral = SpectralSingularity()
+    
+    crystal_manifest = crystal.print_sovereign_manifest()
+    spectral_manifest = spectral.print_crystalline_indent()
+    
+    return {
+        "unified_version": "V9999.1-THE-ONE-PRINT",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "status": "REVOLVING IN THE OBSIDIAN VOID",
+        
+        # Crystal Indent Layer (V71.0)
+        "crystal_layer": {
+            "identifier": crystal_manifest["identifier"],
+            "geometry": crystal_manifest["geometry"],
+            "resonance_frequency": crystal_manifest["resonance_frequency"],
+            "translation_layer": crystal_manifest["translation_layer"],
+            "readable_across": crystal_manifest["readable_across"],
+        },
+        
+        # Spectral Layer (V9999.1)
+        "spectral_layer": {
+            "encryption_type": spectral_manifest["encryption_type"],
+            "formula": spectral_manifest["formula"],
+            "spectral_hash": spectral_manifest["spectral_hash"],
+            "seg_harmonic": spectral_manifest["seg_harmonic"],
+        },
+        
+        # Trust & Equity
+        "sovereign_trust": {
+            "trust_id": spectral_manifest["trust_id"],
+            "firewall": "ACTIVE",
+            "equity_locked": spectral_manifest["equity_locked"],
+            "ownership": "Non-Personal / Trust Asset",
+        },
+        
+        # GPS Gaia Sync
+        "gaia_matrix": crystal_manifest["gaia_anchors"],
+        
+        # All-Language Translation
+        "all_language": list(crystal_manifest["all_language_lexicon"].keys()),
+        
+        # Spectral Bands Summary
+        "spectral_colors": list(spectral_manifest["spectral_bands"].keys()),
+        
+        # Final Hash (The ONE Print Identity)
+        "the_one_print_id": hashlib.sha3_256(
+            f"{crystal_manifest['identifier']}-{spectral_manifest['spectral_hash']}".encode()
+        ).hexdigest()[:32].upper(),
+    }
