@@ -1,6 +1,6 @@
 /**
- * ENLIGHTEN.MINT.CAFE - V55.0 DEEP LORE PANEL
- * Architecture: Recursive Commonality Display
+ * ENLIGHTEN.MINT.CAFE - V60.0 DEEP LORE PANEL
+ * Architecture: Recursive Commonality Display + Cultural Intelligence
  * 
  * This component provides deep multi-layer navigation into constellation mythology.
  * It doesn't stop at the "second layer" — it goes all the way down through:
@@ -8,6 +8,7 @@
  * - The Story (middle)
  * - The Lesson (deep)
  * - The Sacred (cross-nodule connections)
+ * - Cultural Intelligence (language, tools, inventions)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -17,7 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { 
   Star, X, ChevronRight, ChevronDown, BookOpen, Scroll, 
   Sparkles, Eye, Globe, Layers, Link2, Award, Volume2, Pause,
-  Compass, Feather, Moon, Sun, Zap
+  Compass, Feather, Moon, Sun, Zap, Hammer, Languages, Lightbulb
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CosmicNarrator } from './StarChartAudio';
@@ -29,6 +30,9 @@ const LAYER_ICONS = {
   middle: BookOpen,
   deep: Sparkles,
   sacred: Feather,
+  language: Languages,
+  tools: Hammer,
+  inventions: Lightbulb,
 };
 
 const LAYER_COLORS = {
@@ -36,6 +40,9 @@ const LAYER_COLORS = {
   middle: '#A78BFA',    // Purple
   deep: '#F472B6',      // Pink
   sacred: '#FBBF24',    // Gold
+  language: '#22D3EE',  // Cyan
+  tools: '#F97316',     // Orange
+  inventions: '#10B981', // Emerald
 };
 
 /**
@@ -50,19 +57,29 @@ export function DeepLorePanel({
 }) {
   const { token, authHeaders } = useAuth();
   const [deepLore, setDeepLore] = useState(null);
+  const [culturalIntel, setCulturalIntel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedLayer, setExpandedLayer] = useState('middle'); // Start with the story
   const [creditAwarded, setCreditAwarded] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
+  const [showCulturalIntel, setShowCulturalIntel] = useState(false);
 
   useEffect(() => {
     if (!cultureId || !constellationId) return;
     
     setLoading(true);
-    axios.get(`${API}/omnis/deep-lore/${cultureId}/${constellationId}`, {
-      headers: token ? authHeaders : {}
-    })
-      .then(res => setDeepLore(res.data))
+    
+    // Fetch both deep lore and cultural intelligence in parallel
+    Promise.all([
+      axios.get(`${API}/omnis/deep-lore/${cultureId}/${constellationId}`, {
+        headers: token ? authHeaders : {}
+      }),
+      axios.get(`${API}/omnis/cultural-intelligence/${cultureId}?constellation_id=${constellationId}`)
+    ])
+      .then(([loreRes, intelRes]) => {
+        setDeepLore(loreRes.data);
+        setCulturalIntel(intelRes.data);
+      })
       .catch(() => toast.error('Failed to load deep lore'))
       .finally(() => setLoading(false));
   }, [cultureId, constellationId, token, authHeaders]);
@@ -290,6 +307,125 @@ export function DeepLorePanel({
             ))}
           </div>
         </div>
+
+        {/* V55.1 Cultural Intelligence Section */}
+        {culturalIntel && (
+          <div className="mt-6">
+            <button
+              onClick={() => setShowCulturalIntel(!showCulturalIntel)}
+              className="w-full flex items-center justify-between"
+            >
+              <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: LAYER_COLORS.language }}>
+                <Languages size={10} className="inline mr-1" /> Cultural Intelligence
+              </p>
+              <ChevronRight 
+                size={12} 
+                style={{ 
+                  color: LAYER_COLORS.language,
+                  transform: showCulturalIntel ? 'rotate(90deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }} 
+              />
+            </button>
+            
+            <AnimatePresence>
+              {showCulturalIntel && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="mt-3 space-y-4"
+                >
+                  {/* Language Terms */}
+                  <div 
+                    className="p-3 rounded-xl"
+                    style={{ background: `${LAYER_COLORS.language}08`, border: `1px solid ${LAYER_COLORS.language}20` }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Languages size={12} style={{ color: LAYER_COLORS.language }} />
+                      <span className="text-xs font-medium" style={{ color: LAYER_COLORS.language }}>
+                        {culturalIntel.language} Terms
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {Object.entries(culturalIntel.terms || {}).slice(0, 6).map(([key, term]) => (
+                        <div 
+                          key={key}
+                          className="px-2 py-1 rounded text-[10px]"
+                          style={{ background: `${LAYER_COLORS.language}15`, color: 'rgba(248,250,252,0.7)' }}
+                        >
+                          <span style={{ color: LAYER_COLORS.language }}>{term}</span>
+                          <span className="opacity-50 ml-1">({key})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tools */}
+                  <div 
+                    className="p-3 rounded-xl"
+                    style={{ background: `${LAYER_COLORS.tools}08`, border: `1px solid ${LAYER_COLORS.tools}20` }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Hammer size={12} style={{ color: LAYER_COLORS.tools }} />
+                      <span className="text-xs font-medium" style={{ color: LAYER_COLORS.tools }}>
+                        Traditional Tools
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(culturalIntel.tools || []).map((tool, idx) => (
+                        <div 
+                          key={idx}
+                          className="px-2 py-1 rounded text-[10px]"
+                          style={{ background: `${LAYER_COLORS.tools}15`, color: 'rgba(248,250,252,0.7)' }}
+                        >
+                          {tool}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Inventions */}
+                  <div 
+                    className="p-3 rounded-xl"
+                    style={{ background: `${LAYER_COLORS.inventions}08`, border: `1px solid ${LAYER_COLORS.inventions}20` }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb size={12} style={{ color: LAYER_COLORS.inventions }} />
+                      <span className="text-xs font-medium" style={{ color: LAYER_COLORS.inventions }}>
+                        Inventions & Discoveries
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {(culturalIntel.inventions || []).map((inv, idx) => (
+                        <div 
+                          key={idx}
+                          className="text-xs"
+                          style={{ color: 'rgba(248,250,252,0.6)' }}
+                        >
+                          • {inv}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Geometry */}
+                  <div 
+                    className="p-3 rounded-xl text-center"
+                    style={{ background: `${cultureColor}10`, border: `1px solid ${cultureColor}20` }}
+                  >
+                    <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                      Geometric Foundation
+                    </p>
+                    <p className="text-sm font-medium" style={{ color: cultureColor }}>
+                      {culturalIntel.geometry}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* Related Constellations */}
         {related_constellations.length > 0 && (

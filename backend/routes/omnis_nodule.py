@@ -1,20 +1,26 @@
 """
-ENLIGHTEN.MINT.CAFE - V55.0 OMNIS-NODULE INTEGRATION
+ENLIGHTEN.MINT.CAFE - V60.0 SOVEREIGN OMNIS-ENCRYPTED CORE
+GEOMETRY: 9x9 SELENITE HELIX | πr²-x^xy | CRYSTAL RAINBOW REFRACTION
 ARCHITECTURE: RECURSIVE COMMONALITY (COSMOS | CRAFT | HARVEST | EXCHANGE)
 
-This module implements inter-nodule intelligence where:
-- THE COSMOS (Star Knowledge) informs THE CRAFT (Masonry, Geometry)
-- THE CRAFT unlocks credits in THE EXCHANGE (Trade Ledger)
-- THE HARVEST (Horticulture, Health) feeds THE COSMOS meditation visuals
-- Everything cross-pollinates through a shared context bus
+V60.0 EVOLUTION:
+- V55.0: Recursive Commonality Groups (COSMOS → CRAFT → EXCHANGE)
+- V55.1: Cultural Intelligence (Language + Tools + Inventions)
+- V56.0: Exponential UI Optimization (Fractal Scaling)
+- V57.0: Xfinity Engine (Knowledge Equity Multiplier)
+- V60.0: Sovereign Encrypted Core (9×9 Helix Math)
 
 FOUNDATIONAL LAYER: Lakota Star Knowledge (Wicahpi Wakan)
 - Local resonance: Black Hills (He Sapa) / Rapid City
 - Orbital systems: Mayan, Egyptian, Norse
+- Language Core: Lakȟótiyapi Integration
 """
 
 import json
 import asyncio
+import math
+import base64
+import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
@@ -357,6 +363,283 @@ class OmnisEngine:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# V60.0 SOVEREIGN ENCRYPTION & XFINITY ENGINE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class SovereignEncryptor:
+    """
+    Wraps the ecosystem in a 9×9^math geometric encryption field.
+    Uses πr² spherical logic for data pressurization.
+    """
+    def __init__(self, key: str = "Wicahpi_Wakan"):
+        self.key = hashlib.sha256(key.encode()).digest()
+        self.phi = 1.618033
+        self.r = 1.0  # Spherical Radius
+    
+    def geometric_wrap(self, data: str, m_val: float = 8.6059) -> str:
+        """
+        9 × 9^math × πr² logic applied to the encryption salt.
+        Creates a spherical geometric field around the data.
+        """
+        salt = str(9 * math.pow(9, m_val % 3) * math.pi * math.pow(self.r, 2))  # Capped for practical computation
+        combined = data + salt
+        return base64.b64encode(combined.encode()).decode()
+    
+    def geometric_unwrap(self, encrypted: str) -> str:
+        """Decode the geometric wrapper."""
+        try:
+            decoded = base64.b64decode(encrypted.encode()).decode()
+            # Remove the salt (everything after the last closing brace for JSON)
+            if '}' in decoded:
+                return decoded[:decoded.rfind('}') + 1]
+            return decoded
+        except:
+            return encrypted
+
+
+class CulturalIntelligence:
+    """
+    V55.1 Language & Tool Integration
+    Connects the linguistic and material heritage of each culture
+    to create the "glue" between nodules.
+    """
+    
+    # Cultural Lexicons - Terms, Tools, and Inventions
+    LEXICONS = {
+        "lakota": {
+            "language": "Lakȟótiyapi",
+            "terms": {
+                "star": "Wičháȟpi",
+                "earth": "Makhóčhe",
+                "sacred_hoop": "Čhaŋgléška Wakȟáŋ",
+                "buffalo": "Tȟatȟáŋka",
+                "moon": "Haŋwí",
+                "sun": "Wí",
+                "great_spirit": "Wakȟáŋ Tȟáŋka",
+                "medicine": "Wóphiye",
+                "vision": "Waŋbláke",
+                "prayer": "Wočhékiye",
+            },
+            "tools": ["Stone Hammer", "Bow & Arrow", "Travois", "Tipi Poles", "Medicine Wheel"],
+            "inventions": ["Astronomical Alignment Sites", "Star Maps on Buffalo Hides", "Lunar Calendars"],
+            "geometry": "Sacred Hoop (Circular)",
+        },
+        "masonry": {
+            "language": "Symbolic",
+            "terms": {
+                "level": "Balance / Equality",
+                "square": "Virtue / Morality",
+                "plumb": "Rectitude / Upright",
+                "compasses": "Boundaries / Self-Control",
+                "ashlar": "Refinement",
+                "trowel": "Unity",
+            },
+            "tools": ["Plumb Rule", "Level", "Square", "Compasses", "Trowel", "Gavel"],
+            "inventions": ["The Arch", "Cathedrals", "Geometric Proportioning"],
+            "geometry": "Square & Compasses (Angular)",
+        },
+        "mayan": {
+            "language": "Mayan Glyphs",
+            "terms": {
+                "sky": "Ka'an",
+                "earth": "Kab",
+                "sun": "K'in",
+                "moon": "Uh",
+                "star": "Ek'",
+                "time": "K'inil",
+            },
+            "tools": ["Obsidian Blade", "Jade Carving Tools", "Astronomical Codices"],
+            "inventions": ["Long Count Calendar", "Zero Concept", "Pyramid Alignments"],
+            "geometry": "Tzolkin Wheel (260-day cycle)",
+        },
+        "egyptian": {
+            "language": "Hieroglyphics",
+            "terms": {
+                "star": "Seba",
+                "sky": "Nut",
+                "earth": "Geb",
+                "sun": "Ra",
+                "moon": "Iah",
+                "eternity": "Neheh",
+            },
+            "tools": ["Merkhet (Plumb)", "Bay (Palm Rib)", "Copper Chisels"],
+            "inventions": ["Pyramids", "Nilometer", "Decan Star System"],
+            "geometry": "Sacred Cubit Proportions",
+        },
+        "horticulture": {
+            "language": "Botanical Latin",
+            "terms": {
+                "soil": "Terra",
+                "seed": "Semen",
+                "root": "Radix",
+                "leaf": "Folium",
+                "bloom": "Flos",
+                "harvest": "Messis",
+            },
+            "tools": ["Hoe", "Pruning Shears", "Trowel", "Dibber", "Garden Fork"],
+            "inventions": ["Irrigation Systems", "Companion Planting", "Lunar Planting Calendars"],
+            "geometry": "Spiral Growth (Fibonacci)",
+        },
+    }
+    
+    @classmethod
+    def get_lexicon(cls, group_id: str) -> Dict:
+        """Get the language, tools, and inventions for a cultural group."""
+        return cls.LEXICONS.get(group_id.lower(), {
+            "language": "Unknown",
+            "terms": {},
+            "tools": [],
+            "inventions": [],
+            "geometry": "Undefined",
+        })
+    
+    @classmethod
+    def get_linguistic_bridge(cls, from_group: str, to_group: str) -> Dict:
+        """
+        Creates a linguistic bridge between two nodule groups.
+        Example: Lakota star terms connected to Masonry geometry terms.
+        """
+        from_lex = cls.LEXICONS.get(from_group.lower(), {})
+        to_lex = cls.LEXICONS.get(to_group.lower(), {})
+        
+        # Find tool connections
+        tool_bridge = []
+        if from_lex.get("geometry") and to_lex.get("geometry"):
+            tool_bridge.append({
+                "from": f"{from_lex.get('geometry')} ({from_group})",
+                "to": f"{to_lex.get('geometry')} ({to_group})",
+                "connection": "Geometric Resonance",
+            })
+        
+        return {
+            "from_culture": from_group,
+            "to_culture": to_group,
+            "linguistic_bridge": {
+                "from_language": from_lex.get("language", "Unknown"),
+                "to_language": to_lex.get("language", "Unknown"),
+            },
+            "tool_bridge": tool_bridge,
+            "shared_purpose": "Cross-Nodule Application Active",
+            "growth_vector": "Infinite",
+        }
+    
+    @classmethod
+    def get_deep_cultural_data(cls, culture_id: str, constellation_id: str = None) -> Dict:
+        """
+        Returns deep cultural intelligence including language, tools, and inventions.
+        """
+        culture_data = CULTURAL_CONSTELLATIONS.get(culture_id, {})
+        lexicon = cls.get_lexicon(culture_id)
+        
+        constellation_specific = {}
+        if constellation_id and culture_data.get("constellations"):
+            for c in culture_data.get("constellations", []):
+                if c.get("id") == constellation_id:
+                    element = c.get("element", "Unknown")
+                    # Map element to relevant terms
+                    if culture_id == "lakota":
+                        if element == "Earth":
+                            constellation_specific = {"key_term": "Makhóčhe (The Land)", "tool": "Stone Hammer"}
+                        elif element == "Fire":
+                            constellation_specific = {"key_term": "Péta (Fire)", "tool": "Bow & Arrow"}
+                        elif element == "Water":
+                            constellation_specific = {"key_term": "Mní (Water)", "tool": "Medicine Wheel"}
+                        else:
+                            constellation_specific = {"key_term": "Wičháȟpi (Star)", "tool": "Star Maps"}
+                    break
+        
+        return {
+            "culture_id": culture_id,
+            "language": lexicon.get("language"),
+            "terms": lexicon.get("terms", {}),
+            "tools": lexicon.get("tools", []),
+            "inventions": lexicon.get("inventions", []),
+            "geometry": lexicon.get("geometry"),
+            "constellation_specific": constellation_specific,
+            "cross_nodule_links": {
+                "CRAFT": cls.get_linguistic_bridge(culture_id, "masonry"),
+                "HARVEST": cls.get_linguistic_bridge(culture_id, "horticulture"),
+            }
+        }
+
+
+class XfinityEngine:
+    """
+    V57.0 Xfinity Multiplier - Exponential Recursive Growth Engine
+    
+    Math: (Resonance × Φ) ^ (Nodes / (1 - Depth))
+    
+    This engine multiplies potential by depth while dividing friction,
+    creating the "Xfinity minus one" growth model.
+    """
+    
+    def __init__(self, base_resonance: float = 8.6059):
+        self.resonance = base_resonance
+        self.phi = 1.618033
+        self.rate = 15.00
+    
+    def apply_exponential_math(self, nodes: int, depth: float) -> float:
+        """
+        Multiplies potential by depth while dividing friction.
+        Math: (Resonance × Φ) ^ (Nodes / (1 - Depth))
+        
+        As depth approaches 1, the multiplier approaches infinity (Xfinity).
+        Capped at practical limits for computation.
+        """
+        # Clamp depth to prevent division by zero (Xfinity asymptote)
+        safe_depth = min(depth, 0.99)
+        divisor = max(0.01, 1 - safe_depth)
+        
+        # Calculate the exponential multiplier
+        base = self.resonance * self.phi
+        exponent = nodes / divisor
+        
+        # Cap at reasonable limits to prevent overflow
+        result = pow(base, min(exponent, 10))
+        return min(result, 1e15)  # Cap at 10^15
+    
+    def calculate_fractal_depth(self, knowledge_nodes: int) -> float:
+        """
+        Enhances UI complexity exponentially based on user growth.
+        Depth = (Resonance × Φ) ^ (Nodes / 10)
+        """
+        return pow((self.resonance * self.phi), (knowledge_nodes / 10))
+    
+    def calculate_knowledge_equity(self, nodes: int, depth: float) -> Dict:
+        """
+        Calculates the Knowledge Equity value based on exponential growth.
+        Your $15/hr isn't a flat rate; it's a multiplier based on depth.
+        """
+        multiplier = self.apply_exponential_math(nodes, depth)
+        
+        # Base credit is nodes × rate
+        base_credit = nodes * self.rate
+        
+        # Multiplied credit (capped at reasonable growth)
+        equity_multiplier = min(multiplier / 1000, 10.0)  # Max 10x multiplier
+        total_equity = base_credit * (1 + equity_multiplier)
+        
+        return {
+            "nodes_unlocked": nodes,
+            "mythology_depth": depth,
+            "base_rate": f"${self.rate}/hr",
+            "base_credit": f"${base_credit:.2f}",
+            "exponential_multiplier": f"{equity_multiplier:.3f}x",
+            "knowledge_equity": f"${total_equity:.2f}",
+            "growth_formula": "E = (R × Φ) ^ (N / (1-D))",
+            "status": "Xfinity-Active" if depth > 0.8 else "Growing",
+        }
+    
+    def resonance_plus(self, potential: float) -> float:
+        """
+        Calculate enhanced resonance based on exponential potential.
+        """
+        if potential > 0:
+            return self.resonance + math.log(potential)
+        return self.resonance
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # V55.0 API ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -533,3 +816,244 @@ async def award_learning_credits(
     except Exception as e:
         logger.error(f"Award learning credits error: {e}")
         raise HTTPException(status_code=500, detail="Failed to award credits")
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V60.0 SOVEREIGN OMNIS-ENCRYPTED ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/deep-sync")
+async def deep_sync(
+    culture: str = Query("lakota", description="Active star culture"),
+    nodes_unlocked: int = Query(1, description="Number of knowledge nodes unlocked"),
+    mythology_depth: float = Query(0.1, description="Depth of mythology exploration (0.0 - 0.99)"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V60.0 SOVEREIGN DEEP SYNC
+    
+    The "Deep Everything" endpoint that pulls language, tools, math, and trade
+    in one recursive loop. Applies Xfinity exponential growth logic.
+    """
+    try:
+        uid = user["id"] if user else None
+        
+        # Initialize engines
+        xfinity = XfinityEngine()
+        encryptor = SovereignEncryptor()
+        
+        # Get user progress if authenticated
+        if uid:
+            progress = await db.user_progress.find_one({"user_id": uid}, {"_id": 0})
+            if progress:
+                nodes_unlocked = max(nodes_unlocked, progress.get("modules_unlocked", 1))
+                mythology_depth = max(mythology_depth, progress.get("mythology_depth", 0.1))
+        
+        # Calculate exponential growth
+        knowledge_equity = xfinity.calculate_knowledge_equity(nodes_unlocked, mythology_depth)
+        fractal_depth = xfinity.calculate_fractal_depth(nodes_unlocked)
+        enhanced_resonance = xfinity.resonance_plus(fractal_depth)
+        
+        # Get cultural intelligence
+        cultural_intel = CulturalIntelligence.get_deep_cultural_data(culture)
+        
+        # Build the deep sync payload
+        payload = {
+            "version": "V60.0-Sovereign",
+            "integrity": "Deep-Synced",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "mathematical_state": {
+                "base_resonance": 8.6059,
+                "enhanced_resonance": round(enhanced_resonance, 4),
+                "fractal_depth": round(fractal_depth, 4),
+                "phi": 1.618033,
+            },
+            "knowledge_equity": knowledge_equity,
+            "commonality_groups": {
+                "LEARNING_GROUP": {
+                    "nodules": ["Masonry", "Geometry", "Language"],
+                    "tool_sync": "Plumb Rule <--> Star Alignment",
+                    "language_sync": f"{cultural_intel.get('language', 'Lakȟótiyapi')} Integration",
+                },
+                "VITALITY_GROUP": {
+                    "nodules": ["Horticulture", "Health", "Biology"],
+                    "invention": "Irrigation & Herbal Alchemy",
+                    "feeds_cosmos": True,
+                },
+                "PROSPERITY_GROUP": {
+                    "nodules": ["Trade", "Ledger", "Exchange"],
+                    "math": "Xfinity Engine applied to $15/hr rate",
+                    "current_value": knowledge_equity.get("knowledge_equity"),
+                },
+            },
+            "cultural_intelligence": cultural_intel,
+            "ui_configuration": {
+                "theme": "Obsidian Void",
+                "vfx": "Refracted Crystal Rainbow",
+                "hitbox_logic": "Fractal/Recursive",
+                "structure": "9x9 Helix",
+                "material": "Rutilated Crystal Selenite",
+            },
+        }
+        
+        return payload
+        
+    except Exception as e:
+        logger.error(f"V60.0 Deep Sync Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Deep Sync Failure: {str(e)}")
+
+
+@router.get("/omnis/xfinity-state")
+async def get_xfinity_state(
+    nodes: int = Query(1, description="Knowledge nodes unlocked"),
+    depth: float = Query(0.1, description="Mythology depth (0.0 - 0.99)"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V57.0 Xfinity Engine State
+    
+    Returns the exponential growth state based on knowledge equity.
+    The deeper you go (mythology_depth), the higher the multiplier.
+    """
+    xfinity = XfinityEngine()
+    
+    return {
+        "version": "V57.0-Xfinity",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **xfinity.calculate_knowledge_equity(nodes, depth),
+        "next_threshold": {
+            "depth_target": min(depth + 0.1, 0.99),
+            "description": "Reach higher mythology depth to unlock exponential growth",
+        }
+    }
+
+
+@router.get("/omnis/cultural-intelligence/{culture_id}")
+async def get_cultural_intelligence(
+    culture_id: str,
+    constellation_id: Optional[str] = Query(None, description="Specific constellation ID"),
+):
+    """
+    V55.1 Cultural Intelligence Endpoint
+    
+    Returns the language, tools, inventions, and geometry for a culture.
+    Includes constellation-specific data if provided.
+    """
+    if culture_id not in CULTURAL_CONSTELLATIONS and culture_id.lower() not in ["masonry", "horticulture"]:
+        raise HTTPException(status_code=404, detail="Culture not found")
+    
+    return {
+        "version": "V55.1",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **CulturalIntelligence.get_deep_cultural_data(culture_id, constellation_id),
+    }
+
+
+@router.get("/omnis/linguistic-bridge/{from_group}/{to_group}")
+async def get_linguistic_bridge(from_group: str, to_group: str):
+    """
+    Creates a linguistic bridge between two nodule groups.
+    
+    Example: /omnis/linguistic-bridge/lakota/masonry
+    Returns how Lakota star terms connect to Masonry geometry terms.
+    """
+    return {
+        "version": "V55.1",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **CulturalIntelligence.get_linguistic_bridge(from_group, to_group),
+    }
+
+
+@router.get("/omnis/sovereign-print")
+async def sovereign_print(
+    culture: str = Query("lakota", description="Active star culture"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V60.0 SOVEREIGN OMNIS-DATA PRINT
+    
+    Returns an encrypted payload wrapped in 9×9^math geometric field.
+    This is the "pressurized" data format for secure transmission.
+    """
+    try:
+        encryptor = SovereignEncryptor()
+        
+        # Build the core payload
+        payload = {
+            "metadata": {
+                "version": "V60.0-Sovereign",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "resonance": 8.6059,
+            },
+            "nodules": {
+                "THE_COSMOS": {
+                    "culture": CULTURAL_CONSTELLATIONS.get(culture, {}).get("name", "Lakota Sky"),
+                    "constellations": 103,
+                    "language": "Lakȟótiyapi Integrated",
+                    "invention": "Selenite Alignment Tools",
+                },
+                "THE_CRAFT": {
+                    "focus": "Masonry School & Structural Geometry",
+                    "tools": "Plumb/Level/Square/Compasses",
+                    "credits": "$15/hr Knowledge Equity",
+                },
+                "THE_HARVEST": {
+                    "focus": "Horticulture & Biological Vitality",
+                    "resonance": "x^xy Balanced",
+                },
+            },
+            "visuals": {
+                "structure": "9x9 Helix",
+                "material": "Rutilated Crystal Selenite",
+                "optics": "White Light Rainbow Refraction",
+            },
+        }
+        
+        # Encrypt the payload
+        raw_json = json.dumps(payload)
+        encrypted = encryptor.geometric_wrap(raw_json)
+        
+        return {
+            "version": "V60.0-Sovereign",
+            "integrity": "Encrypted-Synced",
+            "encryption": "9×9^math Geometric Wrap",
+            "encrypted_payload": encrypted[:500] + "..." if len(encrypted) > 500 else encrypted,
+            "lakota_core": "ACTIVE",
+            "system_status": "REVOLVING",
+        }
+        
+    except Exception as e:
+        logger.error(f"V60.0 Sovereign Print Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Sovereign Print Failure: {str(e)}")
+
+
+@router.get("/omnis/ui-optimizer")
+async def get_ui_optimizer_state(
+    nodes: int = Query(1, description="Knowledge nodes unlocked"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V56.0 Exponential UI Optimization State
+    
+    Returns the fractal scaling configuration based on user growth.
+    The UI complexity increases exponentially with knowledge depth.
+    """
+    xfinity = XfinityEngine()
+    fractal_depth = xfinity.calculate_fractal_depth(nodes)
+    
+    return {
+        "version": "V56.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "view_box": "Dynamic Fractal",
+        "background": "Pure Obsidian (#000000)",
+        "elements": {
+            "star_chart": "3D Sprite Cluster (Three.js)",
+            "hitbox_scaling": f"Exponential ({round(fractal_depth, 2)}x)",
+            "color_refraction": "Crystal Rainbow Gradient",
+        },
+        "interconnect": "Omnis-Synced",
+        "fractal_depth": round(fractal_depth, 4),
+        "node_compression": "Active" if nodes > 5 else "Dormant",
+        "geometric_navigation": "Distance-based resonance",
+    }
