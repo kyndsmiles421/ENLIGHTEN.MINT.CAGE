@@ -3,128 +3,116 @@ import { useNavigate } from 'react-router-dom';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * KINETIC_GRAVITY_V11.0 — RESTORED PHYSICS ENGINE
+ * ENLIGHTEN.MINT.CAFE — V15.0 "The Last Script"
  * ARCHITECT: Steven Michael
  * ═══════════════════════════════════════════════════════════════════════════════
  * 
- * PHYSICS: Active Tension / Spring-Back / Snap-to-Lattice
- * GRAVITY: 9.81
- * SPRING: 0.55
- * FRICTION: 0.08
- * HITBOX: Absolute (1:1 touch-to-logic)
+ * PHYSICS: Kinetic Core
+ *   - Gravity: 9.81
+ *   - Snap Tension: 0.618 (Golden Ratio Back-Boom)
+ *   - Friction: 0.05
+ *   - Resonance: 432Hz
+ * 
+ * VISUALS: Prismatic Internal Color V16
+ *   - Background Bloom: PURGED (0)
+ *   - Internal Color Only
+ *   - Edge Refraction: Rainbow Chromatic
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// KINETIC ENGINE SETTINGS
-const KINETIC = {
-  gravityConstant: 9.81,
-  springTension: 0.55,
-  friction: 0.08,
-  snapThreshold: 20,
-  extractThreshold: 150
+// SOVEREIGN PHYSICS ENGINE
+const PHYSICS = {
+  gravity: 9.81,
+  snapTension: 0.618,  // Golden Ratio
+  friction: 0.05,
+  resonance: 432
 };
 
-// NODULE DEFINITIONS
-const NODULES_CONFIG = [
-  { id: "oracle", label: "Oracle", path: "/oracle", color: "#D4AF37", icon: "✧" },
-  { id: "archives", label: "Archives", path: "/archives", color: "#C0C0C0", icon: "📁" },
-  { id: "soundscape", label: "Soundscape", path: "/soundscape", color: "#22d3ee", icon: "🎵" },
-  { id: "workshop", label: "Workshop", path: "/workshop", color: "#B87333", icon: "⚒" },
-  { id: "star-chart", label: "Star Chart", path: "/star-chart", color: "#a855f7", icon: "⭐" }
+// THE INITIAL FIVE — Original Architecture
+const NODULES = [
+  { id: "PRACTICE",   label: "Practice",    path: "/oracle",      x: 0,    y: -120, color: "#FFD700", glow: "Gold_Core" },
+  { id: "MODULE_02",  label: "Archives",    path: "/archives",    x: 90,   y: 75,   color: "#00E5FF", glow: "Cyan_Edge" },
+  { id: "MODULE_03",  label: "Soundscape",  path: "/soundscape",  x: -90,  y: 75,   color: "#FF00FF", glow: "Magenta_Internal" },
+  { id: "MODULE_04",  label: "Workshop",    path: "/workshop",    x: 120,  y: -40,  color: "#7FFF00", glow: "Lime_Refraction" },
+  { id: "MODULE_05",  label: "Star Chart",  path: "/star-chart",  x: -120, y: -40,  color: "#FF4500", glow: "Orange_Pulse" }
 ];
-
-// Calculate lattice positions (pentagon formation)
-const getLatticePositions = (centerX, centerY, radius) => {
-  return NODULES_CONFIG.map((_, i) => {
-    const angle = (i / NODULES_CONFIG.length) * Math.PI * 2 - Math.PI / 2;
-    return {
-      x: centerX + Math.cos(angle) * radius,
-      y: centerY + Math.sin(angle) * radius
-    };
-  });
-};
 
 export default function OrbitalHub() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const animationRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 375, height: 700 });
   
-  // Nodule physics state
-  const [nodules, setNodules] = useState([]);
-  const [draggingId, setDraggingId] = useState(null);
-  const [extractedId, setExtractedId] = useState(null);
-  const velocitiesRef = useRef({});
+  // Center coordinates
+  const [center, setCenter] = useState({ x: 187, y: 400 });
   
-  // Initialize nodules at lattice positions
+  // Nodule state with physics
+  const [nodes, setNodes] = useState(() => 
+    NODULES.map(n => ({
+      ...n,
+      currentX: 0,
+      currentY: 0,
+      vx: 0,
+      vy: 0,
+      targetX: n.x,
+      targetY: n.y,
+      isLocked: false,
+      isActive: false
+    }))
+  );
+  
+  const [dragging, setDragging] = useState(null);
+  const [extracted, setExtracted] = useState(null);
+
+  // Initialize positions on mount
   useEffect(() => {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    setDimensions({ width: w, height: h });
+    const cx = w / 2;
+    const cy = h / 2;
+    setCenter({ x: cx, y: cy });
     
-    const centerX = w / 2;
-    const centerY = h / 2;
-    const radius = Math.min(w, h) * 0.25;
-    const lattice = getLatticePositions(centerX, centerY, radius);
-    
-    const initialNodules = NODULES_CONFIG.map((config, i) => ({
-      ...config,
-      x: lattice[i].x,
-      y: lattice[i].y,
-      targetX: lattice[i].x,
-      targetY: lattice[i].y,
-      isLocked: true
-    }));
-    
-    setNodules(initialNodules);
-    
-    // Initialize velocities
-    const vels = {};
-    NODULES_CONFIG.forEach(n => {
-      vels[n.id] = { vx: 0, vy: 0 };
-    });
-    velocitiesRef.current = vels;
+    setNodes(prev => prev.map(n => ({
+      ...n,
+      currentX: cx + n.x,
+      currentY: cy + n.y,
+      targetX: cx + n.x,
+      targetY: cy + n.y
+    })));
   }, []);
 
-  // KINETIC PHYSICS LOOP
+  // KINETIC PHYSICS LOOP — Golden Ratio Back-Boom
   useEffect(() => {
-    if (nodules.length === 0) return;
-    
     const animate = () => {
-      setNodules(prev => prev.map(nodule => {
-        if (draggingId === nodule.id || extractedId === nodule.id) {
-          return nodule;
-        }
+      setNodes(prev => prev.map(node => {
+        if (dragging === node.id) return node;
         
-        const vel = velocitiesRef.current[nodule.id] || { vx: 0, vy: 0 };
+        // Calculate distance to target
+        const dx = node.targetX - node.currentX;
+        const dy = node.targetY - node.currentY;
         
-        // Calculate spring force toward target (lattice position)
-        const dx = nodule.targetX - nodule.x;
-        const dy = nodule.targetY - nodule.y;
+        // Apply Golden Ratio Snap Tension
+        let vx = node.vx + dx * PHYSICS.snapTension * 0.1;
+        let vy = node.vy + dy * PHYSICS.snapTension * 0.1;
         
-        // Apply spring tension (the snap-back force)
-        vel.vx += dx * KINETIC.springTension * 0.1;
-        vel.vy += dy * KINETIC.springTension * 0.1;
-        
-        // Apply friction for stability
-        vel.vx *= (1 - KINETIC.friction);
-        vel.vy *= (1 - KINETIC.friction);
+        // Apply Friction (damping)
+        vx *= (1 - PHYSICS.friction);
+        vy *= (1 - PHYSICS.friction);
         
         // Update position
-        const newX = nodule.x + vel.vx;
-        const newY = nodule.y + vel.vy;
+        const newX = node.currentX + vx;
+        const newY = node.currentY + vy;
         
-        // Check if locked to lattice
+        // Check lock state
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const isLocked = dist < KINETIC.snapThreshold;
-        
-        velocitiesRef.current[nodule.id] = vel;
+        const isLocked = dist < 2;
         
         return {
-          ...nodule,
-          x: newX,
-          y: newY,
+          ...node,
+          currentX: newX,
+          currentY: newY,
+          vx,
+          vy,
           isLocked
         };
       }));
@@ -134,309 +122,306 @@ export default function OrbitalHub() {
     
     animationRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRef.current);
-  }, [nodules.length, draggingId, extractedId]);
+  }, [dragging]);
 
-  // TOUCH HANDLERS
-  const handleTouchStart = useCallback((e, noduleId) => {
+  // Touch/Mouse Handlers
+  const handleStart = useCallback((e, nodeId) => {
     e.preventDefault();
-    setDraggingId(noduleId);
-    setExtractedId(null);
+    e.stopPropagation();
+    setDragging(nodeId);
+    setExtracted(null);
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(20);
   }, []);
 
-  const handleTouchMove = useCallback((e) => {
-    if (!draggingId) return;
+  const handleMove = useCallback((e) => {
+    if (!dragging) return;
     e.preventDefault();
     
-    const touch = e.touches[0];
-    const x = touch.clientX;
-    const y = touch.clientY;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     
-    setNodules(prev => prev.map(n => {
-      if (n.id !== draggingId) return n;
+    setNodes(prev => prev.map(node => {
+      if (node.id !== dragging) return node;
       
-      // Check extraction distance from target
-      const dx = x - n.targetX;
-      const dy = y - n.targetY;
+      // Check extraction threshold
+      const dx = clientX - node.targetX;
+      const dy = clientY - node.targetY;
       const dist = Math.sqrt(dx * dx + dy * dy);
       
-      if (dist > KINETIC.extractThreshold) {
-        setExtractedId(draggingId);
+      if (dist > 100) {
+        setExtracted(dragging);
       }
       
-      return { ...n, x, y };
+      return {
+        ...node,
+        currentX: clientX,
+        currentY: clientY,
+        isActive: true
+      };
     }));
-  }, [draggingId]);
+  }, [dragging]);
 
-  const handleTouchEnd = useCallback((e) => {
-    if (!draggingId) return;
+  const handleEnd = useCallback(() => {
+    if (!dragging) return;
     
-    const nodule = nodules.find(n => n.id === draggingId);
-    if (!nodule) {
-      setDraggingId(null);
+    const node = nodes.find(n => n.id === dragging);
+    if (!node) {
+      setDragging(null);
       return;
     }
     
-    // Check if extracted (pulled far enough)
-    const dx = nodule.x - nodule.targetX;
-    const dy = nodule.y - nodule.targetY;
+    // Check if extracted
+    const dx = node.currentX - node.targetX;
+    const dy = node.currentY - node.targetY;
     const dist = Math.sqrt(dx * dx + dy * dy);
     
-    if (dist > KINETIC.extractThreshold) {
-      // TRIGGER NAVIGATION - Nodule is "hot"
-      console.log(`Kinetic Lock Engaged: ${nodule.id} is Hot.`);
+    if (dist > 100) {
+      // TRIGGER BRIDGE PULSE
+      console.log(`[y] Technical Bridge Pulse: ${node.id} ACTIVE.`);
       
-      // Haptic feedback
-      if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+      // Heavy snap haptic
+      if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
       
-      // Navigate after brief delay for visual feedback
-      setTimeout(() => {
-        navigate(nodule.path);
-      }, 200);
+      // Navigate
+      setTimeout(() => navigate(node.path), 150);
     } else {
-      // Spring back to lattice (the "Back-Boom")
-      velocitiesRef.current[draggingId] = {
-        vx: (nodule.targetX - nodule.x) * 0.3,
-        vy: (nodule.targetY - nodule.y) * 0.3
-      };
+      // Back-Boom: Reset velocity for snap-back
+      setNodes(prev => prev.map(n => {
+        if (n.id !== dragging) return n;
+        return {
+          ...n,
+          vx: (n.targetX - n.currentX) * 0.5,
+          vy: (n.targetY - n.currentY) * 0.5,
+          isActive: false
+        };
+      }));
     }
     
-    setDraggingId(null);
-    setExtractedId(null);
-  }, [draggingId, nodules, navigate]);
+    setDragging(null);
+    setExtracted(null);
+  }, [dragging, nodes, navigate]);
 
   // Direct tap handler
-  const handleTap = useCallback((nodule) => {
+  const handleTap = useCallback((node) => {
+    console.log(`[y] Direct Tap: ${node.id} ACTIVE.`);
     if (navigator.vibrate) navigator.vibrate(30);
-    console.log(`Direct Tap: ${nodule.id} Activated.`);
-    navigate(nodule.path);
+    navigate(node.path);
   }, [navigate]);
 
   return (
     <div 
       ref={containerRef}
-      className="kinetic-hub"
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseMove={(e) => draggingId && handleTouchMove({ touches: [{ clientX: e.clientX, clientY: e.clientY }], preventDefault: () => {} })}
-      onMouseUp={handleTouchEnd}
+      className="sovereign-hub"
+      onTouchMove={handleMove}
+      onTouchEnd={handleEnd}
+      onMouseMove={handleMove}
+      onMouseUp={handleEnd}
+      onMouseLeave={handleEnd}
     >
-      {/* Rainbow Refraction Background */}
-      <div className="refraction-layer">
-        {[0, 51, 102, 153, 204, 255, 306].map((angle, i) => (
-          <div
-            key={angle}
-            className="refraction-ray"
-            style={{
-              transform: `rotate(${angle}deg)`,
-              background: `linear-gradient(to bottom, transparent, ${
-                ['rgba(255,0,0,0.15)', 'rgba(255,127,0,0.12)', 'rgba(255,255,0,0.1)', 
-                 'rgba(0,255,0,0.12)', 'rgba(0,127,255,0.15)', 'rgba(75,0,130,0.12)', 
-                 'rgba(148,0,211,0.1)'][i]
-              }, transparent)`,
-              animationDelay: `${i * 0.3}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Lattice Grid Visualization */}
-      <svg className="lattice-grid" viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}>
-        {/* Connection lines to center */}
-        {nodules.map(n => (
+      {/* 3D World Grid - Sacred Geometry Orbital */}
+      <svg className="world-grid" viewBox="0 0 375 812">
+        {/* Orbital rings */}
+        <circle cx={center.x} cy={center.y} r="60" className="orbital-ring" />
+        <circle cx={center.x} cy={center.y} r="100" className="orbital-ring" />
+        <circle cx={center.x} cy={center.y} r="150" className="orbital-ring" />
+        
+        {/* Connection lines */}
+        {nodes.map(node => (
           <line
-            key={`line-${n.id}`}
-            x1={dimensions.width / 2}
-            y1={dimensions.height / 2}
-            x2={n.x}
-            y2={n.y}
-            stroke={n.isLocked ? n.color : 'rgba(212,175,55,0.3)'}
-            strokeWidth={n.isLocked ? 1 : 2}
-            strokeDasharray={n.isLocked ? "none" : "5,5"}
-            opacity={draggingId === n.id ? 0.8 : 0.3}
+            key={`line-${node.id}`}
+            x1={center.x}
+            y1={center.y}
+            x2={node.currentX}
+            y2={node.currentY}
+            className={`connection-line ${node.isLocked ? 'locked' : ''} ${dragging === node.id ? 'active' : ''}`}
+            style={{ stroke: node.color }}
           />
         ))}
-        {/* Center point */}
-        <circle
-          cx={dimensions.width / 2}
-          cy={dimensions.height / 2}
-          r="8"
-          fill="rgba(212,175,55,0.5)"
-        />
+        
+        {/* Center core */}
+        <circle cx={center.x} cy={center.y} r="12" className="center-core" />
       </svg>
 
       {/* Title */}
       <div className="hub-title">ENLIGHTEN.MINT.CAFE</div>
       <div className="hub-subtitle">DRAG TO EXTRACT</div>
 
-      {/* Kinetic Nodules */}
-      {nodules.map(nodule => {
-        const isActive = draggingId === nodule.id;
-        const isExtracted = extractedId === nodule.id;
-        
-        return (
-          <div
-            key={nodule.id}
-            className={`kinetic-nodule ${isActive ? 'active' : ''} ${isExtracted ? 'extracted' : ''} ${nodule.isLocked ? 'locked' : ''}`}
-            style={{
-              left: nodule.x,
-              top: nodule.y,
-              borderColor: nodule.color,
-              boxShadow: isExtracted 
-                ? `0 0 40px ${nodule.color}, 0 0 80px ${nodule.color}50`
-                : isActive 
-                  ? `0 0 25px ${nodule.color}80`
-                  : `inset 0 0 15px ${nodule.color}30`,
-              transform: `translate(-50%, -50%) scale(${isExtracted ? 1.3 : isActive ? 1.1 : 1})`
-            }}
-            onTouchStart={(e) => handleTouchStart(e, nodule.id)}
-            onMouseDown={(e) => { e.preventDefault(); setDraggingId(nodule.id); }}
-            onClick={() => !draggingId && handleTap(nodule)}
-          >
-            <span className="nodule-icon">{nodule.icon}</span>
-            <span className="nodule-label" style={{ color: nodule.color }}>{nodule.label}</span>
-            
-            {/* Prismatic pulse ring on extraction */}
-            {isExtracted && (
-              <div className="prismatic-pulse" style={{ borderColor: nodule.color }} />
-            )}
+      {/* Prismatic Nodules - Internal Color Only, No Bloom */}
+      {nodes.map(node => (
+        <div
+          key={node.id}
+          className={`prismatic-nodule ${dragging === node.id ? 'dragging' : ''} ${extracted === node.id ? 'extracted' : ''} ${node.isLocked ? 'locked' : ''}`}
+          style={{
+            left: node.currentX,
+            top: node.currentY,
+            '--nodule-color': node.color
+          }}
+          onTouchStart={(e) => handleStart(e, node.id)}
+          onMouseDown={(e) => handleStart(e, node.id)}
+          onClick={() => !dragging && handleTap(node)}
+        >
+          {/* Crystal body - Internal color only */}
+          <div className="crystal-body">
+            <span className="nodule-label">{node.label}</span>
           </div>
-        );
-      })}
+          
+          {/* Edge refraction ring - only on extraction */}
+          {extracted === node.id && (
+            <div className="refraction-ring" />
+          )}
+        </div>
+      ))}
 
       {/* Extraction indicator */}
-      {extractedId && (
-        <div className="extraction-hint">RELEASE TO ENTER</div>
+      {extracted && (
+        <div className="extraction-indicator">RELEASE TO ENTER</div>
       )}
 
+      {/* Physics display */}
+      <div className="physics-display">
+        <span>φ {PHYSICS.snapTension}</span>
+        <span>{PHYSICS.resonance}Hz</span>
+      </div>
+
       <style>{`
-        .kinetic-hub {
+        .sovereign-hub {
           position: fixed;
           top: 0;
           left: 0;
           width: 100vw;
           height: 100vh;
-          background: radial-gradient(ellipse at center, #0a0514 0%, #000005 100%);
+          background: linear-gradient(180deg, #050510 0%, #0a0a1a 50%, #050510 100%);
           overflow: hidden;
           touch-action: none;
           user-select: none;
           z-index: 9999;
         }
-        
-        .refraction-layer {
+
+        .world-grid {
           position: absolute;
-          inset: 0;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
           pointer-events: none;
-          z-index: 1;
         }
-        
-        .refraction-ray {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 2px;
-          height: 200vh;
-          transform-origin: center center;
-          animation: rayPulse 6s ease-in-out infinite;
-          filter: blur(1px);
+
+        .orbital-ring {
+          fill: none;
+          stroke: rgba(212, 175, 55, 0.1);
+          stroke-width: 1;
         }
-        
-        @keyframes rayPulse {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.7; }
+
+        .connection-line {
+          stroke-width: 1;
+          opacity: 0.3;
+          transition: opacity 0.2s;
         }
-        
-        .lattice-grid {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          z-index: 2;
+        .connection-line.locked { opacity: 0.5; }
+        .connection-line.active { opacity: 0.8; stroke-width: 2; }
+
+        .center-core {
+          fill: rgba(212, 175, 55, 0.6);
+          filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
         }
-        
+
         .hub-title {
           position: absolute;
           top: 80px;
           left: 50%;
           transform: translateX(-50%);
-          color: rgba(212,175,55,0.9);
+          color: rgba(212, 175, 55, 0.9);
           font-size: 16px;
           font-weight: 300;
           letter-spacing: 0.4em;
-          text-shadow: 0 0 20px rgba(212,175,55,0.3);
+          text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
           z-index: 10;
         }
-        
+
         .hub-subtitle {
           position: absolute;
           top: 110px;
           left: 50%;
           transform: translateX(-50%);
-          color: rgba(212,175,55,0.4);
+          color: rgba(212, 175, 55, 0.4);
           font-size: 10px;
           letter-spacing: 0.3em;
           z-index: 10;
         }
-        
-        .kinetic-nodule {
+
+        .prismatic-nodule {
           position: absolute;
-          width: 75px;
-          height: 75px;
-          border-radius: 50%;
-          border: 2px solid;
-          background: rgba(10,10,20,0.95);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          cursor: grab;
+          transform: translate(-50%, -50%);
           z-index: 100;
-          transition: box-shadow 0.2s, transform 0.1s;
+          cursor: grab;
+          transition: transform 0.1s;
         }
-        
-        .kinetic-nodule.active {
+        .prismatic-nodule.dragging {
           cursor: grabbing;
           z-index: 200;
         }
-        
-        .kinetic-nodule.extracted {
+        .prismatic-nodule.extracted {
           z-index: 300;
+          transform: translate(-50%, -50%) scale(1.2);
         }
-        
-        .kinetic-nodule.locked::after {
-          content: '';
-          position: absolute;
-          inset: -4px;
+
+        .crystal-body {
+          width: 70px;
+          height: 70px;
           border-radius: 50%;
-          border: 1px solid rgba(212,175,55,0.2);
+          background: rgba(10, 10, 20, 0.95);
+          border: 2px solid var(--nodule-color);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          /* INTERNAL COLOR ONLY - NO BLOOM */
+          box-shadow: inset 0 0 20px var(--nodule-color);
+          transition: box-shadow 0.2s, border-width 0.2s;
         }
-        
-        .nodule-icon {
-          font-size: 20px;
-          margin-bottom: 2px;
+
+        .prismatic-nodule.dragging .crystal-body {
+          border-width: 3px;
+          box-shadow: inset 0 0 30px var(--nodule-color);
         }
-        
+
+        .prismatic-nodule.extracted .crystal-body {
+          border-width: 4px;
+          box-shadow: inset 0 0 40px var(--nodule-color), 0 0 20px var(--nodule-color);
+        }
+
         .nodule-label {
+          color: var(--nodule-color);
           font-size: 9px;
           font-weight: 600;
           letter-spacing: 0.1em;
           text-transform: uppercase;
+          text-align: center;
         }
-        
-        .prismatic-pulse {
+
+        .refraction-ring {
           position: absolute;
-          inset: -15px;
+          top: 50%;
+          left: 50%;
+          width: 90px;
+          height: 90px;
+          margin: -45px 0 0 -45px;
           border-radius: 50%;
           border: 2px solid;
-          animation: pulseOut 0.5s ease-out infinite;
+          border-color: var(--nodule-color);
+          animation: refractionPulse 0.4s ease-out infinite;
+          pointer-events: none;
         }
-        
-        @keyframes pulseOut {
+
+        @keyframes refractionPulse {
           0% { transform: scale(1); opacity: 1; }
           100% { transform: scale(1.5); opacity: 0; }
         }
-        
-        .extraction-hint {
+
+        .extraction-indicator {
           position: absolute;
-          bottom: 150px;
+          bottom: 180px;
           left: 50%;
           transform: translateX(-50%);
           color: #00ff00;
@@ -444,13 +429,26 @@ export default function OrbitalHub() {
           font-weight: 600;
           letter-spacing: 0.2em;
           text-shadow: 0 0 10px #00ff00;
-          animation: blink 0.5s ease-in-out infinite;
+          animation: pulse 0.5s ease-in-out infinite;
           z-index: 500;
         }
-        
-        @keyframes blink {
+
+        @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
+        }
+
+        .physics-display {
+          position: absolute;
+          bottom: 120px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 20px;
+          color: rgba(212, 175, 55, 0.3);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          z-index: 10;
         }
       `}</style>
     </div>
