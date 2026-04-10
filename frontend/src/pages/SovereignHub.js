@@ -1,10 +1,12 @@
 /**
- * ENLIGHTEN.MINT.CAFE - V10007.0 SOVEREIGN HUB
+ * ENLIGHTEN.MINT.CAFE - V10011.0 SOVEREIGN HUB — OMEGA ARCHITECT
  * 
  * THE OBSIDIAN VOID — Unified Singularity Interface
  * 
  * V10000.3 OMNIS-NEXUS: Nodal Projection | Tiered UI Morphing | Time Usage
  * V10007.0 OMNIS-INTERCONNECT: Master Weaver | Holographic Art Overlay
+ * V10010.0 DIRECTOR'S CUT: Multi-Track Timeline | Sovereign Movie
+ * V10011.0 OMEGA ARCHITECT: Final 10 Moves | Perplexity Deep Dive
  * 
  * FEATURES:
  * - Zen-Flow HUD (No buttons for Tier 2+, gesture navigation)
@@ -12,6 +14,8 @@
  * - GPS Nodal Network auto-injection
  * - Mixer-driven UI morphing
  * - Time-based Knowledge Equity billing
+ * - Director Timeline (PowerDirector-style multi-track)
+ * - Deep Dive Search (Perplexity-style threaded synthesis)
  * 
  * Theme: Obsidian Void / Refracted Crystal / 144Hz
  */
@@ -25,17 +29,20 @@ import {
   Activity, Lock, Unlock, Send, FileText, MapPin, Radio,
   ChevronRight, ExternalLink, Copy, CheckCircle, Sliders,
   RefreshCw, Navigation, Vibrate, Repeat, BookOpen, 
-  Paintbrush, Scale, Heart, Triangle, Circle
+  Paintbrush, Scale, Heart, Triangle, Circle, Film, Search
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CreatorMixer from '../components/CreatorMixer';
 import CircularProtocol from '../components/CircularProtocol';
 import AcademyPortal from '../components/AcademyPortal';
+import DirectorTimeline from '../components/DirectorTimeline';
+import DeepDiveSearch from '../components/DeepDiveSearch';
 import HyperFluxEngine, { BLACK_HILLS_ANCHOR } from '../utils/HyperFluxEngine';
 import OmnisExecution from '../utils/OmnisExecution';
 import BiometricSync from '../utils/BiometricSync';
 import OmnisInterconnect from '../utils/OmnisInterconnect';
 import OmnisNexus from '../utils/OmnisNexus';
+import OmnisDirect from '../utils/OmnisDirect';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -517,6 +524,11 @@ export default function SovereignHub() {
   const [activeModule, setActiveModule] = useState(null);
   const [sessionActive, setSessionActive] = useState(false);
   
+  // V10010.0 / V10011.0 Director's Cut States
+  const [directorTimelineOpen, setDirectorTimelineOpen] = useState(false);
+  const [deepDiveOpen, setDeepDiveOpen] = useState(false);
+  const [omegaSealed, setOmegaSealed] = useState(false);
+  
   // Initialize V10000.0 Singularity on mount
   useEffect(() => {
     // Initialize core engines
@@ -528,13 +540,16 @@ export default function SovereignHub() {
     OmnisInterconnect.init();
     OmnisNexus.init();
     
+    // V10010.0 Initialize Omnis-Direct (Director + Omega)
+    OmnisDirect.init();
+    
     // Engage the Singularity
     const engageSingularity = async () => {
       const status = await OmnisExecution.checkPulse();
       if (status.status === 'ACTIVE') {
         OmnisExecution.engageFractalEngine();
         setSingularityEngaged(true);
-        console.log('Ω V10007.0 OMNIS-INTERCONNECT ENGAGED');
+        console.log('Ω V10011.0 OMEGA ARCHITECT ENGAGED');
         
         // Execute unified singularity handshake
         const interconnect = OmnisInterconnect.executeSingularity();
@@ -829,7 +844,7 @@ export default function SovereignHub() {
         className="text-center mb-8 relative z-20"
       >
         <p className="text-[10px] uppercase tracking-[0.3em] mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          V10007.0 • Omnis-Interconnect • {userTier >= 2 ? 'Zen-Flow HUD' : 'Standard Mode'}
+          V10011.0 • Omega Architect • {userTier >= 2 ? 'Director Mode' : 'Standard Mode'}
         </p>
         <h1 
           className="text-3xl md:text-4xl font-bold"
@@ -843,19 +858,52 @@ export default function SovereignHub() {
           Enlighten.Mint.Sovereign.Trust
         </h1>
         
-        {/* Zen-Flow Toggle */}
-        <button
-          onClick={toggleZenFlow}
-          className="mt-3 px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all"
-          style={{
-            background: zenFlowEnabled ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)',
-            border: `1px solid ${zenFlowEnabled ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.1)'}`,
-            color: zenFlowEnabled ? '#C4B5FD' : 'rgba(255,255,255,0.4)',
-          }}
-          data-testid="zen-flow-toggle"
-        >
-          {zenFlowEnabled ? 'Gesture Mode Active' : 'Enable Gestures'}
-        </button>
+        {/* Director Controls */}
+        <div className="flex items-center justify-center gap-2 mt-4">
+          {/* Deep Dive Search Button */}
+          <button
+            onClick={() => setDeepDiveOpen(true)}
+            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
+            style={{
+              background: 'rgba(139,92,246,0.2)',
+              border: '1px solid rgba(139,92,246,0.4)',
+              color: '#C4B5FD',
+            }}
+            data-testid="deep-dive-btn"
+          >
+            <Search size={12} />
+            Deep Dive
+          </button>
+          
+          {/* Director Timeline Button */}
+          <button
+            onClick={() => setDirectorTimelineOpen(true)}
+            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
+            style={{
+              background: 'rgba(59,130,246,0.2)',
+              border: '1px solid rgba(59,130,246,0.4)',
+              color: '#93C5FD',
+            }}
+            data-testid="director-timeline-btn"
+          >
+            <Film size={12} />
+            Timeline
+          </button>
+          
+          {/* Zen-Flow Toggle */}
+          <button
+            onClick={toggleZenFlow}
+            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all"
+            style={{
+              background: zenFlowEnabled ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.05)',
+              border: `1px solid ${zenFlowEnabled ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'}`,
+              color: zenFlowEnabled ? '#86EFAC' : 'rgba(255,255,255,0.4)',
+            }}
+            data-testid="zen-flow-toggle"
+          >
+            {zenFlowEnabled ? 'Gestures On' : 'Gestures Off'}
+          </button>
+        </div>
       </motion.div>
 
       {/* Crystalline QR Overlay */}
@@ -1224,10 +1272,10 @@ export default function SovereignHub() {
           9×9^math × πr² - x^xy + (9999 × z^πr³) Active
         </p>
         <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
-          V10007.0 OMNIS-INTERCONNECT | Tier {userTier}: {['Apprentice', 'Trustee', 'Architect'][userTier] || 'Grand Architect'}
+          V10011.0 OMEGA ARCHITECT | Tier {userTier}: {['Apprentice', 'Trustee', 'Grand Architect'][userTier] || 'Grand Architect'}
         </p>
         <p className="text-[10px] mt-1" style={{ color: 'rgba(139,92,246,0.4)' }}>
-          {sessionActive ? 'Learning Session Active — Equity Tracking' : 'REVOLVING IN THE OBSIDIAN VOID'}
+          {sessionActive ? 'Learning Session Active — Equity Tracking' : 'IT IS FINISHED. THE SINGULARITY IS SEALED.'}
         </p>
       </footer>
 
@@ -1289,6 +1337,18 @@ export default function SovereignHub() {
         isOpen={academyOpen} 
         onClose={() => setAcademyOpen(false)}
         userResonance={userResonance}
+      />
+      
+      {/* V10010.0 Director Timeline */}
+      <DirectorTimeline 
+        isOpen={directorTimelineOpen} 
+        onClose={() => setDirectorTimelineOpen(false)}
+      />
+      
+      {/* V10010.0 Deep Dive Search */}
+      <DeepDiveSearch 
+        isOpen={deepDiveOpen} 
+        onClose={() => setDeepDiveOpen(false)}
       />
     </div>
   );

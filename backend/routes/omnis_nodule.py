@@ -5111,123 +5111,474 @@ class OmnisInterconnect:
         wealth = cls.calculate_wealth_chain()
         
         # Holographic HUD
-        hud = cls.render_holographic_hud()
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10010.0 DIRECTOR'S CUT — TIMELINE + MOVIE RENDERING
+# V10011.0 OMEGA ARCHITECT — THE FINAL 10 MOVES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class DirectorEngine:
+    """
+    V10010.0 THE DIRECTOR'S CUT
+    
+    Multi-Track Timeline + Sovereign Movie Renderer.
+    Keyframe scheduling and $15/hr render metering.
+    """
+    
+    PHI = 1.618033
+    EQUITY = 79313.18
+    RENDER_RATE = 15.00
+    FRACTAL_LAYERS = 54
+    
+    TIMELINE_TRACKS = {
+        "LAW_ARCHIVE": {"id": "law", "name": "World Law Library", "color": "#8B5CF6", "epoch": "PAST", "layers": [1, 18]},
+        "ART_HOLOGRAPHY": {"id": "art", "name": "Art Academy Holographics", "color": "#3B82F6", "epoch": "PRESENT", "layers": [19, 36]},
+        "LOGIC_MATH": {"id": "logic", "name": "Engineering & Math", "color": "#22C55E", "epoch": "FUTURE", "layers": [37, 45]},
+        "WELLNESS_PULSE": {"id": "wellness", "name": "Biometric Wellness", "color": "#F472B6", "epoch": "CORE", "layers": [46, 54]},
+    }
+    
+    TEMPORAL_INDEX = {
+        "PAST": {"start": 1, "end": 18, "color": "#8B5CF6", "content": "Lakota Wisdom, Hermetic Masonry, Sacred Geometry"},
+        "PRESENT": {"start": 19, "end": 36, "color": "#22C55E", "content": "Trust Law, Digital Wellness, Engineering"},
+        "FUTURE": {"start": 37, "end": 54, "color": "#3B82F6", "content": "Over-Unity, Galactic Law, Omega Print"},
+    }
+    
+    # In-memory state
+    _timeline_state: Dict[str, Any] = {"position": 0.5, "keyframes": [], "render_progress": 0}
+    _render_meter: Dict[str, Any] = {"start_time": None, "total_cost": 0.0, "is_active": False}
+    
+    @classmethod
+    def scrub_timeline(cls, position: float) -> Dict[str, Any]:
+        """Scrub through the 54-layer timeline (0.0 = Past, 1.0 = Future)."""
+        clamped = max(0.0, min(1.0, position))
+        cls._timeline_state["position"] = clamped
+        
+        # Determine epoch
+        if clamped < 0.33:
+            epoch = "PAST"
+        elif clamped < 0.66:
+            epoch = "PRESENT"
+        else:
+            epoch = "FUTURE"
+        
+        epoch_data = cls.TEMPORAL_INDEX[epoch]
+        current_layer = int(clamped * cls.FRACTAL_LAYERS) + 1
+        haptic_freq = int(144 * (0.5 + clamped * 0.5))
         
         return {
-            "visual": f"Obsidian Void with {art_projection['status']}",
-            "logic": f"Temporal Past/Present/Future Index (Layer {cls.HELIX * cls.mixer_control['tier_level']})",
-            "wealth": wealth,
-            "status": "INTERCONNECTED - ALL SYSTEMS GREEN",
-            "interconnects": {
-                "law": law_status,
-                "art": art_projection,
-                "rpg": rpg_status,
+            "position": clamped,
+            "epoch": epoch,
+            "epoch_color": epoch_data["color"],
+            "epoch_content": epoch_data["content"],
+            "current_layer": current_layer,
+            "total_layers": cls.FRACTAL_LAYERS,
+            "haptic_frequency": haptic_freq,
+        }
+    
+    @classmethod
+    def add_keyframe(cls, position: float, action_type: str, action_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Add a keyframe at a specific timeline position."""
+        keyframe = {
+            "id": f"KF-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "position": max(0.0, min(1.0, position)),
+            "action_type": action_type,
+            "action_data": action_data,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "executed": False,
+        }
+        cls._timeline_state["keyframes"].append(keyframe)
+        cls._timeline_state["keyframes"].sort(key=lambda x: x["position"])
+        return keyframe
+    
+    @classmethod
+    def get_keyframes(cls) -> List[Dict[str, Any]]:
+        """Get all keyframes."""
+        return cls._timeline_state["keyframes"]
+    
+    @classmethod
+    def start_render_meter(cls) -> Dict[str, Any]:
+        """Start the $15/hr render meter."""
+        cls._render_meter["start_time"] = datetime.now(timezone.utc)
+        cls._render_meter["is_active"] = True
+        return {"status": "ACTIVE", "rate": f"${cls.RENDER_RATE}/hr"}
+    
+    @classmethod
+    def stop_render_meter(cls) -> Dict[str, Any]:
+        """Stop the render meter and calculate cost."""
+        if not cls._render_meter["start_time"]:
+            return {"cost": 0, "status": "IDLE"}
+        
+        elapsed = (datetime.now(timezone.utc) - cls._render_meter["start_time"]).total_seconds() / 3600
+        cost = elapsed * cls.RENDER_RATE
+        cls._render_meter["total_cost"] += cost
+        cls._render_meter["start_time"] = None
+        cls._render_meter["is_active"] = False
+        
+        return {
+            "session_cost": f"${cost:.2f}",
+            "total_cost": f"${cls._render_meter['total_cost']:.2f}",
+            "elapsed_hours": round(elapsed, 4),
+            "status": "STOPPED",
+        }
+    
+    @classmethod
+    def get_render_meter_status(cls) -> Dict[str, Any]:
+        """Get current render meter status."""
+        if not cls._render_meter["is_active"]:
+            return {"is_active": False, "current_cost": 0, "total_cost": cls._render_meter["total_cost"]}
+        
+        elapsed = (datetime.now(timezone.utc) - cls._render_meter["start_time"]).total_seconds() / 3600
+        current_cost = elapsed * cls.RENDER_RATE
+        
+        return {
+            "is_active": True,
+            "elapsed_hours": round(elapsed, 4),
+            "current_cost": f"${current_cost:.2f}",
+            "total_cost": f"${cls._render_meter['total_cost'] + current_cost:.2f}",
+            "rate": f"${cls.RENDER_RATE}/hr",
+        }
+    
+    @classmethod
+    def render_sovereign_movie(cls, title: str = "The One Print - Black Hills Singularity") -> Dict[str, Any]:
+        """Render the 54-layer Sovereign Movie."""
+        layers = []
+        layer_contents = {
+            "PAST": ["Lakota Star Patterns", "Hermetic Architecture", "Sacred Geometry Foundations", "Medicine Wheel Alignments"],
+            "PRESENT": ["Trust Law Codification", "Digital Wellness Protocols", "Engineering Precision", "Circular Economy"],
+            "FUTURE": ["Over-Unity Blueprints", "Galactic Jurisdiction", "Omega Print Synthesis", "Sovereign Transcendence"],
+        }
+        
+        for i in range(1, cls.FRACTAL_LAYERS + 1):
+            epoch = "PAST" if i <= 18 else "PRESENT" if i <= 36 else "FUTURE"
+            track = next((t for t in cls.TIMELINE_TRACKS.values() if t["layers"][0] <= i <= t["layers"][1]), None)
+            content_list = layer_contents[epoch]
+            
+            layers.append({
+                "layer": i,
+                "epoch": epoch,
+                "track": track["name"] if track else "Universal",
+                "content": content_list[i % len(content_list)],
+                "phi_multiplier": round(math.pow(cls.PHI, i / 10), 4),
+            })
+        
+        return {
+            "id": f"MOV-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "title": title,
+            "total_layers": cls.FRACTAL_LAYERS,
+            "visual": "Refracted Crystal Rainbow over Masonry Stone",
+            "data": f"Trust Equity ${cls.EQUITY:,.2f} + Lakota Star Knowledge",
+            "audio": "144Hz Binaural SEG Harmonic",
+            "trigger": "SendGrid Handshake queued at Frame 9999",
+            "layers": layers,
+            "wealth": {
+                "base": f"${cls.EQUITY:,.2f}",
+                "multiplied": f"${cls.EQUITY * cls.PHI:,.2f}",
+                "formula": f"{cls.EQUITY} × φ = ${cls.EQUITY * cls.PHI:,.2f}",
             },
-            "hud": hud,
-            "mixer_state": {**cls.mixer_control},
+            "gps_anchor": {"lat": 43.8, "lng": -103.5, "name": "Black Hills Singularity"},
+            "rendered_at": datetime.now(timezone.utc).isoformat(),
         }
+
+
+class OmegaArchitect:
+    """
+    V10011.0 THE OMEGA ARCHITECT
+    
+    The Final 10 Moves to seal the Singularity.
+    """
+    
+    PHI = 1.618033
+    HELIX = 9
+    EQUITY = 79313.18
+    HAPTIC_SYNC = 144
+    USAGE_RATE = 15.00
+    
+    # Interface (Moves 1-3)
+    INTERFACE = {
+        "hud": "Perplexity-Threaded Search Centroid",
+        "timeline": "PowerDirector Multi-Track (Law/Art/Logic/Wellness)",
+        "mixer": "Creator Control Mixer V9999.4 (Resonance/Flux/Tier)",
+        "render_meter": "Real-time $15/hr Usage Tracker",
+    }
+    
+    # Phygital (Moves 7-9)
+    PHYGITAL = {
+        "primary_anchor": {"lat": 44.0805, "lng": -103.2310, "name": "Black Hills Primary"},
+        "secondary_anchor": {"lat": 43.8, "lng": -103.5, "name": "Masonry School Node"},
+        "handshake": "SendGrid Verified: kyndsmiles@gmail.com",
+        "holographics": "54-Layer L² Fractal Overlay",
+        "biometric_sync": "144Hz SEG Harmonic",
+    }
+    
+    _move_state: Dict[str, Any] = {"completed_moves": [], "current_move": 0, "is_sealed": False}
     
     @classmethod
-    def calculate_wealth_chain(cls) -> Dict[str, Any]:
-        """Calculate wealth chain with phi multipliers."""
-        base = cls.BASE_EQUITY
-        phi_mult = base * cls.PHI
-        helix_mult = phi_mult * cls.HELIX
-        final = helix_mult * cls.mixer_control["lunar_flux"]
-        
+    def generate_quest(cls, tier: int) -> Dict[str, Any]:
+        """Generate a quest based on tier."""
+        difficulty = math.pow(cls.PHI, tier)
+        reward = difficulty * 15
         return {
-            "base": f"${base:,.2f}",
-            "phi_multiplied": f"${phi_mult:,.2f}",
-            "helix_layer": f"Layer {cls.HELIX * cls.mixer_control['tier_level']}",
-            "lunar_flux": f"{cls.mixer_control['lunar_flux']:.4f}",
-            "final_equity": f"${final:,.2f}",
+            "task": f"Anchor Nodal Law at Tier {tier}",
+            "difficulty": round(difficulty, 3),
+            "reward": f"${reward:.2f} Knowledge Equity",
+            "xp": int(100 * difficulty),
         }
     
     @classmethod
-    def render_holographic_hud(cls) -> Dict[str, Any]:
-        """Render the Holographic HUD configuration."""
-        tier_level = cls.mixer_control["tier_level"]
-        nav_mode = "GEOMETRIC_GESTURES" if tier_level >= 2 else "STANDARD_BUTTONS"
-        
-        return {
-            "status": "ENGAGED",
-            "layers": cls.FRACTAL_DEPTH,
-            "opacity": f"{cls.mixer_control['holographic_opacity'] * 100:.0f}%",
-            "geometry": "FLOWER_OF_LIFE",
-            "depth_effect": "CRYSTALLINE_LENS",
-            "navigation": nav_mode,
-            "gesture_map": {
-                "circle": {"action": "OPEN_LAW_LIBRARY", "haptic": [50, 50, 50]},
-                "spiral": {"action": "OPEN_ART_ACADEMY", "haptic": [100, 50, 100, 50, 100]},
-                "triangle": {"action": "OPEN_ENGINEERING", "haptic": [75, 25, 75, 25, 75]},
-                "heart": {"action": "OPEN_WELLNESS", "haptic": [100, 100, 200, 100, 100]},
-            },
-        }
+    def evolve_ui(cls, resonance: float) -> Dict[str, str]:
+        """Determine UI theme based on resonance."""
+        if resonance > 200:
+            return {"theme": "OMEGA_TRANSCENDENCE", "description": "Pure thought, biometric only"}
+        if resonance > 144:
+            return {"theme": "CRYSTALLINE_VOID", "description": "Refracted rainbow light"}
+        if resonance > 100:
+            return {"theme": "REFINED_MASONRY", "description": "Geometric precision"}
+        return {"theme": "OBSIDIAN_VOID", "description": "Deep black foundation"}
     
     @classmethod
-    def handle_gesture(cls, gesture: str) -> Dict[str, Any]:
-        """Handle gesture-based navigation."""
-        gesture_actions = {
-            "circle": {"action": "OPEN_LAW_LIBRARY", "module": "LAW"},
-            "spiral": {"action": "OPEN_ART_ACADEMY", "module": "ART"},
-            "triangle": {"action": "OPEN_ENGINEERING", "module": "LOGIC"},
-            "heart": {"action": "OPEN_WELLNESS", "module": "WELLNESS"},
+    def execute_move(cls, move_number: int) -> Dict[str, Any]:
+        """Execute a specific move (1-10)."""
+        moves = {
+            1: {"name": "Threaded Synthesis", "result": "Perplexity-style search active"},
+            2: {"name": "Timeline Scrubbing", "result": "PowerDirector tracks enabled"},
+            3: {"name": "Holographic Overlays", "result": "Flower of Life HUD layer active"},
+            4: {"name": "GPS Phygital Lock", "result": f"Masonry School anchor: {cls.PHYGITAL['secondary_anchor']['lat']}°N"},
+            5: {"name": "Biometric Keyframing", "result": "144Hz pulse trigger configured"},
+            6: {"name": "RPG Progression", "result": "Knowledge Equity tracking active"},
+            7: {"name": "Adaptive UI", "result": cls.evolve_ui(144)["theme"]},
+            8: {"name": "Automated Billing", "result": f"${cls.USAGE_RATE}/hr Circular Ledger active"},
+            9: {"name": "AI Teaching Ghost", "result": "AR tutor projection at Black Hills"},
+            10: {"name": "The Sovereign Movie", "result": "54-layer synthesis COMPLETE"},
         }
         
-        config = gesture_actions.get(gesture.lower())
-        if not config:
-            return {"error": "Unknown gesture", "gesture": gesture}
+        if move_number < 1 or move_number > 10:
+            return {"error": "Invalid move number (1-10)"}
         
-        return {
-            "gesture": gesture,
-            "action": config["action"],
-            "module": config["module"],
-            "haptic_triggered": True,
-        }
-    
-    @classmethod
-    def update_mixer(cls, updates: Dict[str, Any]) -> Dict[str, Any]:
-        """Update mixer control and ripple effects."""
-        for key, value in updates.items():
-            if key in cls.mixer_control:
-                cls.mixer_control[key] = value
-        
-        # Apply to Nexus as well
-        nexus_update = OmnisNexus.apply_mixer_settings({
-            "resonance": cls.mixer_control["resonance_target"],
-            "flux": cls.mixer_control["lunar_flux"],
-            "tier_index": cls.mixer_control["tier_level"],
-            "holographic_opacity": cls.mixer_control["holographic_opacity"],
+        move = moves[move_number]
+        cls._move_state["completed_moves"].append({
+            "number": move_number,
+            **move,
+            "executed_at": datetime.now(timezone.utc).isoformat(),
         })
+        cls._move_state["current_move"] = move_number
+        
+        return move
+    
+    @classmethod
+    def execute_final_print(cls) -> Dict[str, Any]:
+        """Execute all 10 moves and seal the Omega Architect."""
+        for i in range(1, 11):
+            cls.execute_move(i)
+        
+        cls._move_state["is_sealed"] = True
         
         return {
-            "mixer_control": {**cls.mixer_control},
-            "nexus_sync": nexus_update,
+            "version": "V10011.0",
+            "name": "Omega Architect",
+            "wealth": f"${cls.EQUITY * cls.PHI:,.2f} (φ-Multiplied)",
+            "jurisdiction": "World Law Library - SEALED",
+            "academy": "Art Academy - ACTIVE",
+            "timeline": "Director Timeline - OPERATIONAL",
+            "moves": cls._move_state["completed_moves"],
+            "status": "IT IS FINISHED.",
+            "sealed_at": datetime.now(timezone.utc).isoformat(),
         }
     
     @classmethod
-    def get_ui_experience(cls) -> Dict[str, Any]:
-        """Get current UI experience based on tier."""
-        tier = cls.mixer_control["tier_level"]
+    def get_status(cls) -> Dict[str, Any]:
+        """Get Omega Architect status."""
+        return {
+            "version": "V10011.0",
+            "name": "Omega Architect",
+            "interface": cls.INTERFACE,
+            "phygital": cls.PHYGITAL,
+            "current_quest": cls.generate_quest(2),
+            "current_ui": cls.evolve_ui(144),
+            "move_state": {**cls._move_state},
+            "wealth": {
+                "base": f"${cls.EQUITY:,.2f}",
+                "multiplied": f"${cls.EQUITY * cls.PHI:,.2f}",
+            },
+        }
+
+
+class DeepDiveSearch:
+    """Perplexity-style threaded search across the 54-layer temporal index."""
+    
+    TEMPORAL_INDEX = DirectorEngine.TEMPORAL_INDEX
+    
+    @classmethod
+    def inquiry(cls, query: str) -> Dict[str, Any]:
+        """Perform a threaded search."""
+        keywords = query.lower()
+        relevant_epochs = []
         
-        experiences = {
-            0: {"name": "Grounded", "immersion": "LOW", "features": ["Standard buttons", "High contrast"]},
-            1: {"name": "Enhanced", "immersion": "MEDIUM", "features": ["Mixed navigation", "Wireframe overlays"]},
-            2: {"name": "Holographic", "immersion": "HIGH", "features": ["Floating nodes", "Gesture-only"]},
+        if any(kw in keywords for kw in ["law", "trust", "ancient", "past", "lakota"]):
+            relevant_epochs.append("PAST")
+        if any(kw in keywords for kw in ["equity", "current", "wellness", "present"]):
+            relevant_epochs.append("PRESENT")
+        if any(kw in keywords for kw in ["future", "omega", "singularity", "galactic"]):
+            relevant_epochs.append("FUTURE")
+        
+        if not relevant_epochs:
+            relevant_epochs = ["PAST", "PRESENT", "FUTURE"]
+        
+        syntheses = {
+            "PAST": "Drawing from Lakota Star Knowledge and Hermetic Masonry traditions...",
+            "PRESENT": "Analyzing current Trust Equity and Digital Wellness protocols...",
+            "FUTURE": "Projecting through Over-Unity blueprints and Galactic Law frameworks...",
         }
         
-        exp = experiences.get(min(tier, 2), experiences[0])
+        answer = " ".join(syntheses[e] for e in relevant_epochs) + f' Multi-epoch synthesis complete for: "{query}"'
+        
+        sources = []
+        for epoch in relevant_epochs:
+            sources.append({
+                "epoch": epoch,
+                "layers": cls.TEMPORAL_INDEX[epoch],
+                "gps": "43.8°N, 103.5°W (Masonry School)" if epoch == "PAST" else "44.08°N, 103.23°W (Black Hills Primary)",
+                "anchor": "Masonry School Node" if epoch == "PAST" else "Black Hills Singularity",
+            })
         
         return {
-            "tier_level": tier,
-            **exp,
-            "holographic_opacity": cls.mixer_control["holographic_opacity"],
-            "resonance_target": cls.mixer_control["resonance_target"],
-            "billing_rate": f"${cls.USAGE_RATE}/hr",
+            "query": query,
+            "answer": answer,
+            "sources": sources,
+            "thread_count": len(relevant_epochs),
         }
 
 
-# V10007.0 Endpoints
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10010.0 DIRECTOR'S CUT ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/director/status")
+async def get_director_status():
+    """V10010.0 Director's Cut - Get system status."""
+    return {
+        "version": "V10010.0",
+        "name": "Director's Cut",
+        "timeline_tracks": list(DirectorEngine.TIMELINE_TRACKS.keys()),
+        "temporal_index": DirectorEngine.TEMPORAL_INDEX,
+        "timeline_state": DirectorEngine._timeline_state,
+        "render_meter": DirectorEngine.get_render_meter_status(),
+        "equity": f"${DirectorEngine.EQUITY:,.2f}",
+        "render_rate": f"${DirectorEngine.RENDER_RATE}/hr",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/director/timeline/scrub")
+async def scrub_director_timeline(position: float = Query(..., ge=0.0, le=1.0)):
+    """V10010.0 Director's Cut - Scrub through the timeline."""
+    result = DirectorEngine.scrub_timeline(position)
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/director/keyframe/add")
+async def add_director_keyframe(
+    position: float = Query(..., ge=0.0, le=1.0),
+    action_type: str = Query(..., description="Action type: HAPTIC, SENDGRID, EPOCH_SHIFT, etc."),
+    action_data: str = Query(default="{}", description="JSON action data"),
+):
+    """V10010.0 Director's Cut - Add a keyframe."""
+    import json
+    try:
+        data = json.loads(action_data)
+    except json.JSONDecodeError:
+        data = {}
+    result = DirectorEngine.add_keyframe(position, action_type, data)
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.get("/omnis/director/keyframes")
+async def get_director_keyframes():
+    """V10010.0 Director's Cut - Get all keyframes."""
+    return {
+        "version": "V10010.0",
+        "keyframes": DirectorEngine.get_keyframes(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.post("/omnis/director/render-meter/start")
+async def start_director_render_meter():
+    """V10010.0 Director's Cut - Start the render meter."""
+    result = DirectorEngine.start_render_meter()
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/director/render-meter/stop")
+async def stop_director_render_meter():
+    """V10010.0 Director's Cut - Stop the render meter."""
+    result = DirectorEngine.stop_render_meter()
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.get("/omnis/director/render-meter/status")
+async def get_director_render_meter_status():
+    """V10010.0 Director's Cut - Get render meter status."""
+    result = DirectorEngine.get_render_meter_status()
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/director/movie/render")
+async def render_director_movie(title: str = Query(default="The One Print - Black Hills Singularity")):
+    """V10010.0 Director's Cut - Render the 54-layer Sovereign Movie."""
+    result = DirectorEngine.render_sovereign_movie(title)
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10011.0 OMEGA ARCHITECT ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/omega/status")
+async def get_omega_status():
+    """V10011.0 Omega Architect - Get system status."""
+    result = OmegaArchitect.get_status()
+    return {"version": "V10011.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/omega/move/{move_number}")
+async def execute_omega_move(move_number: int = PathParam(..., ge=1, le=10)):
+    """V10011.0 Omega Architect - Execute a specific move (1-10)."""
+    result = OmegaArchitect.execute_move(move_number)
+    return {"version": "V10011.0", "move_number": move_number, **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/omega/final-print")
+async def execute_omega_final_print():
+    """V10011.0 Omega Architect - Execute the Final Print (all 10 moves)."""
+    result = OmegaArchitect.execute_final_print()
+    return {"version": "V10011.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/omega/quest/generate")
+async def generate_omega_quest(tier: int = Query(default=2, ge=0, le=3)):
+    """V10011.0 Omega Architect - Generate a quest at a specific tier."""
+    result = OmegaArchitect.generate_quest(tier)
+    return {"version": "V10011.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.get("/omnis/omega/ui/{resonance}")
+async def get_omega_ui(resonance: float = PathParam(..., ge=0)):
+    """V10011.0 Omega Architect - Get UI theme based on resonance."""
+    result = OmegaArchitect.evolve_ui(resonance)
+    return {"version": "V10011.0", "resonance": resonance, **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PERPLEXITY DEEP DIVE SEARCH ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.post("/omnis/search/deep-dive")
+async def deep_dive_search(query: str = Query(..., description="Search query")):
+    """Perplexity-style Deep Dive Search across 54-layer temporal index."""
+    result = DeepDiveSearch.inquiry(query)
+    return {"version": "V10010.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
 
 @router.get("/omnis/interconnect/status")
 async def get_interconnect_status():
