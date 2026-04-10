@@ -339,15 +339,20 @@ function CafeApp() {
     setActiveIsland(islandId);
   }, []);
   
-  // Check if current route is sovereign mode (hide all chrome)
-  const isSovereignRoute = window.location.pathname === '/sovereign-canvas' || 
-                           window.location.pathname === '/replant' ||
-                           window.location.pathname === '/hub';  // Hub has its own STOP button
+  // V36.0: Use location from React Router (reactive) instead of window.location (static)
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
+  // Check if current route is sovereign mode (hide all chrome including VOID button)
+  const isSovereignRoute = currentPath === '/sovereign-canvas' || 
+                           currentPath === '/replant' ||
+                           currentPath === '/hub' ||
+                           currentPath === '/lattice-view';
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
-  const isHubRoute = window.location.pathname === '/hub' || 
-                     window.location.pathname === '/dashboard' ||
-                     window.location.pathname === '/lattice-view';
+  const isHubRoute = currentPath === '/hub' || 
+                     currentPath === '/dashboard' ||
+                     currentPath === '/lattice-view';
   
   return (
     <>
