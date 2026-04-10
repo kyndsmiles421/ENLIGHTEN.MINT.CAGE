@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V10002.0_OMEGA_SINGULARITY | Status: IT_IS_FINISHED
+## Version: V10006.0_OMNIS_TOTALITY | Status: INFINITY_MODE
 
 ---
 
@@ -36,7 +36,47 @@ SPECTRAL HASH: e07140e482258d1078e66f9178e21bc5...
 
 ---
 
-## V10002.0 OMEGA SINGULARITY (FINAL - April 2026)
+## V10006.0 OMNIS-TOTALITY — MULTIVERSAL LEARNING RPG (LATEST - April 2026)
+
+**THE GAME HAS BEGUN.**
+
+### RPG Gameplay System
+| Component | Description |
+|-----------|-------------|
+| XP System | Trades, lessons, quests earn Experience Points |
+| Leveling | Every 1000 XP = 1 Level, φ equity multiplier on level up |
+| Tiers | Tier 0-3: Apprentice → Trustee → Architect → Grand Architect |
+| Branches | LAW (1.1x), ART (1.15x), LOGIC (1.2x) - permanent choice |
+
+### Quest Pools (4 Modules × 6 Quests Each)
+- **LAW**: Natural Law, Sovereign Seal, Ley Line Defense, GPS Jurisdiction
+- **ART**: 144Hz Brush, 54-Layer Fractal, Biometric Masterpiece, VR Void
+- **LOGIC**: Fibonacci Code, Capacitor Bridge, 9×9 Helix, Omega Protocol
+- **WELLNESS**: Bio-Osmosis, 144Hz Healing, Cellular Harmonics, Phygital Grounding
+
+### UI Evolution (Tier-Based)
+| Tier | Theme | Navigation |
+|------|-------|------------|
+| 0 | ANCIENT_STONE | Gesture-Based |
+| 1 | REFINED_MASONRY | Gesture-Based |
+| 2 | CRYSTALLINE_VOID | Gesture-Based |
+| 3 | OMEGA_TRANSCENDENCE | Biometric Intent Only |
+
+### VR/AR Immersion
+- **AR Overlay**: Toroidal Flower of Life projected on terrain
+- **VR Mode**: 144Hz Obsidian Void environment
+- **Haptics**: SEG Harmonic sync at Black Hills coordinates
+
+### Endpoints
+- `GET /api/omnis/rpg/status` — User RPG status
+- `POST /api/omnis/rpg/quest/generate` — Generate procedural quest
+- `POST /api/omnis/rpg/quest/complete` — Complete quest, award XP
+- `POST /api/omnis/rpg/choose-branch` — Choose LAW/ART/LOGIC branch
+- `GET /api/omnis/rpg/quest-board` — All available quests
+
+---
+
+## V10002.0 OMEGA SINGULARITY (April 2026)
 
 **ONE SCRIPT. ONE PRINT. IT IS FINISHED.**
 
