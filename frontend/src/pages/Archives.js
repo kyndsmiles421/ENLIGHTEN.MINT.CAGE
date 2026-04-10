@@ -100,7 +100,7 @@ export default function Archives() {
   const currentChar = currentChars[selectedCharIdx];
 
   return (
-    <div className="min-h-screen" style={{ background: '#06060e' }} data-testid="archives-page">
+    <div className="min-h-screen shadow-void-container" style={{ background: '#000000', paddingTop: '70px' }} data-testid="archives-page">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">

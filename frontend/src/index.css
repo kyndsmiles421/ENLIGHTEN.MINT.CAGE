@@ -268,8 +268,33 @@ body {
   width: 100% !important;
   height: 60px !important;
   z-index: 10000 !important;
-  background: rgba(0, 0, 0, 0.85) !important;
-  backdrop-filter: blur(12px) !important;
+  /* ═══ CRYSTAL ANCHOR: SHADOW VOID BASE LAYER ═══
+     Forces a solid mathematical plane behind the UI to prevent
+     alpha-bleed and ghost overlay from transparent backgrounds.
+     Uses pure black (#000) as the "Zero-Point" anchor. */
+  background: #000000 !important; /* Solid foundation - no transparency */
+  border-bottom: 1px solid rgba(139, 92, 246, 0.3) !important;
+  /* Remove backdrop-filter to eliminate ghost blending */
+}
+
+/* ═══ CRYSTAL ANCHOR V2: PAGE CONTENT VOID ═══
+   Ensures every page has an absolute black foundation
+   to prevent the top bar ghosting effect */
+[data-testid="archives-page"],
+[data-testid="journal-page"],
+[data-testid="ledger-page"],
+[data-testid="cosmic-ledger-page"] {
+  background: #000000 !important;
+  min-height: 100vh;
+  padding-top: 70px !important; /* Clear the fixed top bar */
+}
+
+/* Shadow Void Container for all archive-type pages */
+.shadow-void-container {
+  position: relative;
+  background: #000000;
+  min-height: 100vh;
+  z-index: 1;
 }
 
 /* 3. MAIN CONTENT — Flows naturally with padding for fixed bars */
@@ -426,9 +451,10 @@ body[data-perspective="INTENSE"] #MANIFEST_BAR {
 
 /* Bar Section Themes */
 .bar-section-archives {
-  /* Cyan glow for Past/Archives */
-  box-shadow: 0 0 25px 3px #22d3ee;
-  border-bottom: 2px solid #22d3ee;
+  /* ═══ SHADOW VOID: Solid black foundation with cyan accent ═══ */
+  background: #000000 !important;
+  box-shadow: 0 2px 15px rgba(34, 211, 238, 0.15);
+  border-bottom: 1px solid rgba(34, 211, 238, 0.3) !important;
 }
 
 .bar-section-manifest {
