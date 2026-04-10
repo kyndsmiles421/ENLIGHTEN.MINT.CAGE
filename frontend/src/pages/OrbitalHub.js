@@ -33,13 +33,23 @@ import MissionControl from '../components/MissionControl';
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// ═══ V43.0 MASTER SOVEREIGN SOLDER — KINETIC INVERSION ENGINE ═══
+// ═══ V44.0 OMNI-SOVEREIGN SOLDER — FREQUENCY-SCALED KINETICS ═══
 const PHI = 1.61803398875;  // Golden Ratio / Toroidal Constant
 const SOVEREIGN_RESONANCE = 7.3;  // Earth Grounding frequency
 const RESONANCE_FORCE = Math.sqrt(SOVEREIGN_RESONANCE) * Math.PI; // 8.4881
 
 // Solfeggio Frequencies for 9x9 Lattice Mapping
 const SOLFEGGIO = [174, 285, 396, 417, 528, 639, 741, 852, 963];
+
+// V44.0: Frequency-scaled recoil timing (higher freq = faster recoil)
+function getRecoilTiming(freq) {
+  // Map 174Hz→180ms down to 963Hz→80ms
+  const minRecoil = 80;
+  const maxRecoil = 180;
+  const freqRange = 963 - 174;
+  const freqNormalized = (freq - 174) / freqRange;
+  return Math.round(maxRecoil - (freqNormalized * (maxRecoil - minRecoil)));
+}
 
 const CORE_SCALE = 1.0;
 const SUB_ORB_LATENT_SCALE = 0;
@@ -50,23 +60,21 @@ const BLOOM_RADIUS_MULTIPLIER = 2.5;
 const EXTRACTION_THRESHOLD = 3.0;
 const LERP_SPEED = 0.12;
 
-// V43.0: HEAVY PHI TENSION (0.85 for mechanical weight)
+// V44.0: KINETIC INVERSION SCALES (z^xr2 formula)
 const PHI_SNAP_TENSION = 0.85;
-
-// V43.0: KINETIC INVERSION SCALES (z^xr2 formula)
 const HEAVY_SCALE = 0.85 * (1 / PHI);  // 0.525 compression on press
-const LIGHT_SCALE = 1.15 * (PHI / 2);  // 0.93 expansion on release (subtle)
+const LIGHT_SCALE = 1.15 * (PHI / 2);  // Inverse expansion
 const BOUNCE_SCALE = 1.08;              // Overshoot before settling
 
-// V43.0: TOUCH PLANE — ONE LINE, NO GHOSTS
+// V44.0: TOUCH PLANE — ONE LINE, ZERO GHOSTS
 const TOUCH_PLANE_Z = 0;
 const TOUCH_PLANE_Z_INDEX = 50000;
 const STOP_BTN_Z_INDEX = 99999;
 const VISUAL_LAYER_Z_INDEX = 5;
 
-// V43.0: HAPTIC PATTERNS
-const HAPTIC_HEAVY_SNAP = [80, 50, 120];  // Deep mechanical latch
-const HAPTIC_LIGHT_RELEASE = [40];         // Light recoil
+// V44.0: HAPTIC PATTERNS (7.3Hz Grounded)
+const HAPTIC_HEAVY_SNAP = [80, 50, 120];
+const HAPTIC_LIGHT_RELEASE = [40];
 
 // Linear interpolation with Toroidal dampening
 function lerp(a, b, t) {
@@ -79,28 +87,12 @@ function dist(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
-// V43.0: WHITE LIGHT REFRACTION PULSE
-function triggerWhiteLightPulse(element, intensity) {
-  if (!element) return;
-  element.style.filter = `drop-shadow(0 0 ${intensity}px #fff) brightness(1.5)`;
-  element.style.boxShadow = `0 0 ${intensity * 2}px rgba(255,255,255,0.8)`;
-}
-
-function clearWhiteLightPulse(element) {
-  if (!element) return;
-  element.style.filter = 'none';
-  element.style.boxShadow = 'none';
-}
-
-// ═══ GHOST KILLER — Purge legacy elements ═══
+// ═══ GHOST PURGE ═══
 function purgeGhostElements() {
   const legacyStop = document.getElementById('sovereign-emergency-reset');
-  if (legacyStop) {
-    legacyStop.remove();
-    console.log('[V43.0] GHOST PURGED: sovereign-emergency-reset');
-  }
-  
+  if (legacyStop) legacyStop.remove();
   document.querySelectorAll('.VOID, .ghost-layer, .legacy-header').forEach(el => el.remove());
+  console.log('[V44.0] Ghost purge complete');
 }
 
 export default function OrbitalHub() {
@@ -780,7 +772,7 @@ export default function OrbitalHub() {
             pointerEvents: 'none',
           }}
         >
-          {/* ═══ V43.1 TOUCH HITBOXES — ZERO-LAG OCULAR SYNC ═══ */}
+          {/* ═══ V44.0 TOUCH HITBOXES — FREQUENCY-SCALED KINETICS ═══ */}
           {ALL_SATELLITES.map((sat, idx) => {
             const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
             const isExtracted = hubState === 'extracted' && sat.id === extractedId;
@@ -790,12 +782,14 @@ export default function OrbitalHub() {
             if (!isVisible) return null;
 
             const solfeggioFreq = SOLFEGGIO[idx % SOLFEGGIO.length];
+            const recoilTime = getRecoilTiming(solfeggioFreq);
             
             return (
               <button
                 key={`hitbox-${sat.id}`}
                 id={`nodule-${sat.id}`}
                 data-frequency={solfeggioFreq}
+                data-recoil={recoilTime}
                 style={{
                   position: 'absolute',
                   left: `${center + pos.x - size / 2}px`,
@@ -823,33 +817,30 @@ export default function OrbitalHub() {
                     return;
                   }
                   
-                  // V43.1: KILL TRANSITION — INSTANT DISCHARGE
+                  // V44.0: ZERO-LAG LATCH-IN
                   btn.style.transition = 'none';
-                  
-                  // HAPTIC FIRE (Instant)
                   if (navigator.vibrate) navigator.vibrate(HAPTIC_HEAVY_SNAP);
                   
-                  // VISUAL PULSE (Instant - Zero Lag)
-                  btn.style.boxShadow = `0 0 40px rgba(255, 255, 255, 1)`;
-                  btn.style.filter = 'brightness(2) contrast(1.5)';
+                  // Ocular Discharge (Binary)
                   btn.style.transform = `scale(${HEAVY_SCALE}) translateZ(0px)`;
+                  btn.style.filter = 'brightness(2) contrast(1.5) drop-shadow(0 0 30px #fff)';
+                  btn.style.zIndex = '60000';
                   
-                  console.log(`[V43.1] OCULAR RECEIPT: ${sat.id} @ ${solfeggioFreq}Hz`);
+                  console.log(`[V44.0] LATCH: ${sat.id} @ ${solfeggioFreq}Hz (recoil: ${recoilTime}ms)`);
                   
-                  // RECOIL (Controlled Spring-Back)
+                  // V44.0: FREQUENCY-SCALED RECOIL
                   setTimeout(() => {
-                    // Restore transition only for organic settle
                     btn.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                     btn.style.transform = `scale(${BOUNCE_SCALE}) translateZ(0px)`;
                     if (navigator.vibrate) navigator.vibrate(HAPTIC_LIGHT_RELEASE);
                     
                     setTimeout(() => {
                       btn.style.transform = 'scale(1) translateZ(0px)';
-                      btn.style.boxShadow = 'none';
                       btn.style.filter = 'none';
-                      console.log(`[V43.1] DOWNLOAD: ${sat.id} → ${sat.path}`);
+                      btn.style.zIndex = String(TOUCH_PLANE_Z_INDEX);
+                      console.log(`[V44.0] DOWNLOAD: ${sat.id} → ${sat.path}`);
                       window.location.href = sat.path;
-                    }, 150);
+                    }, recoilTime);
                   }, 80);
                 }}
                 onMouseEnter={() => setHoveredSat(sat.id)}
