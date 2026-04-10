@@ -3,27 +3,61 @@ import math
 
 router = APIRouter(prefix="/metatron", tags=["metatron"])
 
+# V36.0 SOVEREIGN CONSTANTS
+EARTH_HZ = 7.3  # Grounding frequency
+PHI = 1.618033  # Toroidal tension
+SCHUMANN = 7.83  # Earth resonance baseline
+
 class MetatronLattice:
+    """
+    V36.0 SOVEREIGN GEOMETRIC PROCESSOR
+    ARCHITECT: Steven Michael
+    ENGINE: ENLIGHTEN.MINT.CAFE
+    FORMULA: z^xr2 * z^xr2 (+)(-) n^xr2 (+)(-) y^xr2 {π}{√7.3}
+    """
+    
     def __init__(self):
         self.grid_size = 9
         self.materials = ['Gold', 'Silver', 'Copper']
         self.base_frequency = 432
+        self.earth_hz = EARTH_HZ
+        self.phi = PHI
         self.modules_active = self.grid_size * self.grid_size
+        # V36.0: Resonance force calculation
+        self.resonance_force = math.sqrt(EARTH_HZ) * math.pi
 
     def initialized_modular_logic(self, data_stream):
         """The Infinity + 1 - 2 + 3 Kernel. Result: Net +2 Gain."""
         return (data_stream + 1 - 2 + 3)
 
+    def calculate_refraction(self, n, y):
+        """
+        V35.0 WHITE LIGHT REFRACTION
+        Computing visuals - not aesthetics, but frequency logic output
+        """
+        phase_shift = (math.pow(n, 2) + math.pow(y, 2)) * math.pi
+        intensity = math.sqrt(self.earth_hz * phase_shift)
+        return {
+            "intensity": intensity,
+            "phase_shift": phase_shift,
+            "earth_grounding": self.earth_hz
+        }
+
     def initialize_lattice_module(self, parent_f_c, parent_scale):
-        """S.I.M. - Square, Invert, Multiply Protocol."""
+        """S.I.M. - Square, Invert, Multiply Protocol with 7.3Hz grounding."""
         modular_squared_force = math.pow(parent_f_c, 2)
         modular_inverse_scale = 1 / modular_squared_force
         final_resonance = (self.initialized_modular_logic(modular_squared_force) * self.modules_active)
+        
+        # V36.0: Apply toroidal tension
+        toroidal_weight = self.phi * self.resonance_force
         
         return {
             "compression_f_c": modular_squared_force,
             "diffusion_scale": modular_inverse_scale,
             "resonance": final_resonance,
+            "toroidal_weight": toroidal_weight,
+            "earth_hz": self.earth_hz,
             "state": "Cooperative Crystalline Bloom"
         }
 
@@ -118,19 +152,23 @@ async def get_node(x: int, y: int):
 
 @router.get("/status")
 async def get_status():
-    """Get the status of the Metatron lattice system."""
+    """Get the status of the Metatron lattice system - V36.0 Sovereign Seal."""
     return {
-        "engine": "ENLIGHTEN_OS V6.0",
+        "engine": "ENLIGHTEN_OS V36.0",
         "protocol": "S.I.M. (Square, Invert, Multiply)",
         "architect": "Steven Michael",
-        "status": "ACTIVE",
+        "status": "SOVEREIGN_SEAL_ACTIVE",
         "grid": "9x9",
         "total_cooperating_nodes": 81,
         "base_frequency": 432,
+        "earth_hz": EARTH_HZ,
+        "phi": PHI,
+        "resonance_force": math.sqrt(EARTH_HZ) * math.pi,
         "seed": 9.0,
         "materials": ["Gold", "Silver", "Copper"],
         "shield": "METATRON-FLOWER HYBRID",
         "resonance_state": "Cooperative Crystalline Bloom",
+        "z_plane": 0,
         "sim_result": {
             "square": 81,
             "invert": 0.012346,
@@ -141,11 +179,20 @@ async def get_status():
     }
 
 
+@router.get("/refraction/{n}/{y}")
+async def calculate_refraction(n: float, y: float):
+    """
+    V35.0 WHITE LIGHT REFRACTION CALCULATOR
+    Returns intensity based on z^xr2 formula with 7.3Hz grounding
+    """
+    return lattice.calculate_refraction(n, y)
+
+
 @router.get("/visual-grid")
 async def get_visual_grid():
     """
-    Get positioned nodes for the visual engine.
-    Returns 81 nodes with x,y coordinates for rendering.
+    V36.0 SOVEREIGN GEOMETRIC PROCESSOR
+    Returns 81 nodes with 7.3Hz grounding and toroidal weight
     """
     nodes = []
     spacing = 100  # px spacing between nodes
@@ -165,6 +212,10 @@ async def get_visual_grid():
                 material = "Copper"
                 color = "#B87333"
             
+            # V36.0: Calculate toroidal weight per node
+            weight = (PHI * lattice.resonance_force) / (distance + 1)
+            refraction = lattice.calculate_refraction(distance, 1.0)
+            
             nodes.append({
                 "id": f"node_{x}_{y}",
                 "grid": {"x": x, "y": y},
@@ -172,14 +223,20 @@ async def get_visual_grid():
                 "material": material,
                 "color": color,
                 "frequency": 432 * (1 + distance * 0.1),
+                "toroidal_weight": weight,
+                "refraction_intensity": refraction["intensity"],
+                "z_plane": 0,
                 "state": "Crystalline_Bloom"
             })
     
     return {
-        "engine": "ENLIGHTEN_OS V6.0",
+        "engine": "ENLIGHTEN_OS V36.0",
         "grid": "9x9",
         "total_nodes": len(nodes),
         "spacing": spacing,
+        "earth_hz": EARTH_HZ,
+        "phi": PHI,
+        "resonance_force": lattice.resonance_force,
         "nodes": nodes,
-        "message": "Lattice Bloom: 81 Nodes Active. Net +2 Gain Secured."
+        "message": "Sovereign Seal Active. 81 Nodes Computing. 7.3Hz Grounded."
     }
