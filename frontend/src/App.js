@@ -347,9 +347,7 @@ function CafeApp() {
   
   // Check if current route is sovereign mode (hide all chrome including VOID button)
   const isSovereignRoute = currentPath === '/sovereign-canvas' || 
-                           currentPath === '/replant' ||
-                           currentPath === '/hub' ||
-                           currentPath === '/lattice-view';
+                           currentPath === '/replant';
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = currentPath === '/hub' || 
@@ -428,8 +426,8 @@ function CafeApp() {
             <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
           </>
         )}
-        {/* Emergency Stop is always visible */}
-        {!isSovereignRoute && <EmergencyShutOff />}
+        {/* Emergency Stop is ALWAYS visible — even on Hub */}
+        <EmergencyShutOff />
       </div>
       
       {/* ═══ V46.0 MANIFEST BAR: REVENUE-FOCUSED BOTTOM NAV ═══ */}

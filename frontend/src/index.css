@@ -165,92 +165,72 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   V50.0 UNIVERSAL SINGULARITY — LIVE HOT-SWAP ARCHITECTURE
+   V51.1 KINETIC CORE — BASELINE STRUCTURE (NO GRID, NO STACKING)
    ARCHITECT: Steven Michael | ROOT: kyndsmiles@gmail.com
-   STATUS: INTERCONNECTED / ZERO_OVERLAP
+   STATUS: FIXED POSITIONING / PULLED UP AS NEEDED
    
-   GRID SYSTEM:
-   ┌─────────────────────────────────────────┐
-   │          POLE BAR (120px)               │  ← The Vault / Archives / Past
-   ├─────────────────────────────────────────┤
-   │                                         │
-   │           BLOOM (1fr)                   │  ← Main Content / Hub / Orbitals
-   │                                         │
-   ├─────────────────────────────────────────┤
-   │         MANIFEST (80px)                 │  ← Revenue Bar / Future
-   └─────────────────────────────────────────┘
-   
-   MATHEMATICAL CONSTANTS:
-   - Resonance: 8.4881 (√7.3 × π)
-   - Composite: 690Hz
-   - PHI: 1.618 (Golden Ratio)
+   PRINCIPLE: Everything is FIXED or ABSOLUTE. Nothing stacks. 
+   Content flows naturally. Bars are pinned, not gridded.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* 1. V50.0 SOVEREIGN ROOT — THE SINGULARITY CONTAINER */
+/* 1. KILL THE GRID — Back to natural flow */
 #root,
 .sovereign-root,
 body {
-  display: grid !important;
-  grid-template-rows: auto 1fr auto !important;
+  display: block !important;
   min-height: 100vh !important;
-  height: 100vh !important;
-  overflow: hidden !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
   background: #000 !important;
 }
 
-/* 2. V50.0 POLE BAR — TOP INTENT LAYER (The Vault) */
+/* 2. POLE BAR — FIXED TOP (Does NOT push content) */
 .sovereign-toolbar.bar-top {
-  grid-row: 1 !important;
-  position: relative !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 60px !important;
   z-index: 10000 !important;
-  height: auto !important;
-  min-height: 60px !important;
-  max-height: 120px !important;
-  overflow: hidden !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
 }
 
-/* 3. V50.0 BLOOM ZONE — MAIN CONTENT (No Overlap Allowed) */
+/* 3. MAIN CONTENT — Flows naturally with padding for fixed bars */
 #app-stage,
 .main-wrapper {
-  grid-row: 2 !important;
   position: relative !important;
-  z-index: 100 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: 100% !important;
-  min-height: 0 !important; /* Critical for grid shrinking */
-  padding-bottom: 0 !important;
+  display: block !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding-top: 0 !important;
+  padding-bottom: 80px !important; /* Space for manifest bar */
 }
 
-/* 4. V50.0 MANIFEST BAR — BOTTOM ROOT (Revenue Layer) */
+/* 4. MANIFEST BAR — FIXED BOTTOM */
 #MANIFEST_BAR,
 .sovereign-toolbar.bar-bottom {
-  grid-row: 3 !important;
-  position: relative !important;
-  z-index: 100000 !important;
-  height: 70px !important;
-  min-height: 70px !important;
-  max-height: 80px !important;
-  flex-shrink: 0 !important;
-}
-
-/* 5. V50.0 MODAL CONTAINMENT — Prevent Z-Fighting */
-.ritual-cycle-panel,
-.matrix-panel,
-.overlay-panel,
-[class*="modal"],
-[class*="overlay"] {
   position: fixed !important;
-  z-index: 50000 !important;
-  /* Modals are ABOVE content but BELOW system controls */
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 70px !important;
+  z-index: 100000 !important;
 }
 
-/* 6. V50.0 SYSTEM CONTROLS — Highest Z-Order */
+/* 5. EMERGENCY STOP — ALWAYS VISIBLE, NEVER BLOCKED */
 .emergency-stop,
 [data-testid="emergency-stop"],
+[data-testid="emergency-stop-btn-v31"],
 #sovereign-emergency-reset {
-  z-index: 999999 !important;
   position: fixed !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

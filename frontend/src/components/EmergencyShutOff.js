@@ -253,7 +253,7 @@ export default function EmergencyShutOff() {
           position: 'fixed',
           top: 15,
           left: 15,
-          zIndex: 9990,
+          zIndex: 999999,  // V51.1: Maximum z-index — NEVER covered
           width: 'auto',
           minWidth: 32,
           height: 28,
@@ -283,8 +283,9 @@ export default function EmergencyShutOff() {
           textTransform: 'uppercase',
           transition: 'all 0.15s ease',
           transform: isCollapsing ? 'scale(1.05)' : 'scale(1)',
+          pointerEvents: 'auto',  // V51.1: Always touchable
         }}
-        data-testid="emergency-shutoff"
+        data-testid="emergency-stop-btn-v31"
         title="Emergency Stop (tap) | Master Reboot (hold 5s)"
       >
         <Square size={14} fill="currentColor" />

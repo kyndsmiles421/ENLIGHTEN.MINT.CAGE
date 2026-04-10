@@ -473,33 +473,7 @@ export default function OrbitalHub() {
         <CosmicDust />
       </div>
 
-      {/* V31 STOP — Same plane as nodules, bottom corner, no interference */}
-      <button
-        onClick={handleEmergencyStop}
-        data-testid="emergency-stop-btn-v31"
-        aria-label="Stop"
-        style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          width: '36px',
-          height: '36px',
-          zIndex: 50000,
-          background: 'rgba(60, 60, 60, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '50%',
-          color: 'rgba(255,255,255,0.5)',
-          fontSize: '8px',
-          fontWeight: 600,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'auto',
-        }}
-      >
-        ■
-      </button>
+      {/* V51.1: STOP button is now handled globally by EmergencyShutOff component */}
 
       {/* Title — V30.0: Shifted to avoid ghost overlap */}
       <motion.div 
