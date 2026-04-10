@@ -461,10 +461,17 @@ export default function OrbitalHub() {
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: '#06060e', position: 'relative' }}
+      style={{ 
+        background: '#06060e', 
+        position: 'relative',
+        touchAction: 'none',  // V47.8: Prevent page slide when dragging nodules
+      }}
       data-testid="orbital-hub-page"
     >
-      <CosmicDust />
+      {/* V47.8: CosmicDust is purely decorative — clicks pass through */}
+      <div style={{ pointerEvents: 'none', position: 'absolute', inset: 0, zIndex: 0 }}>
+        <CosmicDust />
+      </div>
 
       {/* V31 STOP — Same plane as nodules, bottom corner, no interference */}
       <button
@@ -529,15 +536,18 @@ export default function OrbitalHub() {
         </span>
       </motion.div>
 
-      {/* ═══ V25.0 ORBITAL SYSTEM — SEPARATED VIEW/CONTROLLER ═══ */}
+      {/* ═══ V47.8 ORBITAL SYSTEM — SINGLE-PLANE INTERACTIVE SURFACE ═══ */}
       <div 
         className="relative" 
         style={{
           width: containerSize, 
           height: containerSize, 
-          zIndex: 2,
+          zIndex: 100,  // V47.8: Elevated above any ghost layers
           maxWidth: '100vw', 
           maxHeight: 'calc(100vh - 100px)',
+          touchAction: 'none',  // V47.8: Prevent scroll interference
+          WebkitUserSelect: 'none',
+          userSelect: 'none',
         }}
         data-container
       >
@@ -761,15 +771,15 @@ export default function OrbitalHub() {
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        {/* ═══ V31.0 TOUCH PLANE — FLAT, NO TRANSFORM, HIGH Z-INDEX ═══ */}
+        {/* ═══ V47.8 TOUCH PLANE — FLAT, ELEVATED, NO INTERFERENCE ═══ */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         <div 
           style={{ 
             position: 'absolute',
             inset: 0,
-            zIndex: 20000,
-            transform: 'none',
-            pointerEvents: 'none',
+            zIndex: 50000,  // V47.8: Maximum elevation for touch reception
+            transform: 'translateZ(0px)',  // V47.8: Z=0 Touch Line
+            pointerEvents: 'none',  // Container passes through, children catch
           }}
         >
           {/* ═══ V44.0 TOUCH HITBOXES — FREQUENCY-SCALED KINETICS ═══ */}

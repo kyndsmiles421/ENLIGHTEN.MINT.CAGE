@@ -165,6 +165,63 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   V47.8 KINETIC RECOVERY — GHOST LAYER PURGE
+   ARCHITECT: Steven Michael
+   PROBLEM: Fluid backgrounds intercepting touch before nodules receive them
+   SOLUTION: Single-Plane Interactive Surface with Z=0 Touch Line
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. ALL DECORATIVE LAYERS ARE TOUCH-TRANSPARENT */
+.cosmic-dust-layer,
+.cosmic-mesh,
+.cosmic-mesh-inner,
+.cosmic-mesh::before,
+.cosmic-mesh::after,
+.cosmic-mesh-inner::before,
+.cosmic-mesh-inner::after,
+.particle-bg,
+.fluid-layer,
+.nebula-background,
+.aura-layer,
+.svg-tethers,
+.canvas-particles,
+.glow-layer,
+.pulse-overlay,
+.vellum-overlay,
+#background-star-chart {
+  pointer-events: none !important;
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* 2. ORBITAL NODULES ARE FORCE-TOUCHABLE */
+.orbital-nodule,
+[id^="nodule-"],
+[data-testid^="hitbox-"],
+[data-testid="central-orb"],
+.nodule-touch-target {
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer !important;
+  z-index: 50000 !important;
+  transform: translateZ(0px) !important;  /* Z=0 Touch Line */
+}
+
+/* 3. PREVENT PAGE SLIDE WHEN DRAGGING NODULES */
+.enlighten-mint-container,
+[data-testid="orbital-hub-page"] {
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+}
+
+/* 4. FORCE TOUCH PLANE ELEVATION */
+[data-container] {
+  isolation: isolate !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    V46.1 ANTI-DRIFT SOLDER — KILL AGENT SAFE-ZONE HALLUCINATIONS
    ARCHITECT: Steven Michael
    ═══════════════════════════════════════════════════════════════════════════ */
