@@ -33,35 +33,43 @@ import MissionControl from '../components/MissionControl';
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// ═══ V30.0 TOROIDAL PHYSICS CONSTANTS (SOVEREIGN MACHINE) ═══
+// ═══ V43.0 MASTER SOVEREIGN SOLDER — KINETIC INVERSION ENGINE ═══
 const PHI = 1.61803398875;  // Golden Ratio / Toroidal Constant
-const SCHUMANN_BASELINE = 7.83;  // Earth's resonance
-const SOVEREIGN_RESONANCE = 7.3;  // Grounding frequency target
-const TIDAL_G = 0.00000011;  // Tidal gravity variance
+const SOVEREIGN_RESONANCE = 7.3;  // Earth Grounding frequency
+const RESONANCE_FORCE = Math.sqrt(SOVEREIGN_RESONANCE) * Math.PI; // 8.4881
 
-// The Formula: z^xr2 * z^xr2 (+)(-) n^xr2 (+)(-) y^xr2 {π}{√7.3}
-const RESONANCE_FORCE = Math.sqrt(SOVEREIGN_RESONANCE) * Math.PI;
+// Solfeggio Frequencies for 9x9 Lattice Mapping
+const SOLFEGGIO = [174, 285, 396, 417, 528, 639, 741, 852, 963];
 
 const CORE_SCALE = 1.0;
 const SUB_ORB_LATENT_SCALE = 0;
 const SUB_ORB_BLOOM_SCALE = 0.3;
 const SUB_ORB_EXTRACTED_SCALE = 1.0;
 
-const BLOOM_RADIUS_MULTIPLIER = 2.5;  // Sub-orbs bloom to 2.5x Core radius
-const EXTRACTION_THRESHOLD = 3.0;     // Drag beyond 3.0x radius to extract
+const BLOOM_RADIUS_MULTIPLIER = 2.5;
+const EXTRACTION_THRESHOLD = 3.0;
+const LERP_SPEED = 0.12;
 
-const LERP_SPEED = 0.12;              // Lerp factor for smooth transitions
-const PHI_SNAP_TENSION = 0.618;       // PHI tension for snap-back
+// V43.0: HEAVY PHI TENSION (0.85 for mechanical weight)
+const PHI_SNAP_TENSION = 0.85;
 
-// ═══ V30.0 TOUCH PLANE LOCK — "I Was Right" Fix ═══
-const TOUCH_PLANE_Z = 0;              // Flattened for 100% Click Accuracy
-const TOUCH_PLANE_Z_INDEX = 10000;    // Above all ghost blockers
-const STOP_BTN_Z_INDEX = 10001;       // STOP always apex
-const VISUAL_LAYER_Z_INDEX = 5;       // Behind touch plane
+// V43.0: KINETIC INVERSION SCALES (z^xr2 formula)
+const HEAVY_SCALE = 0.85 * (1 / PHI);  // 0.525 compression on press
+const LIGHT_SCALE = 1.15 * (PHI / 2);  // 0.93 expansion on release (subtle)
+const BOUNCE_SCALE = 1.08;              // Overshoot before settling
+
+// V43.0: TOUCH PLANE — ONE LINE, NO GHOSTS
+const TOUCH_PLANE_Z = 0;
+const TOUCH_PLANE_Z_INDEX = 50000;
+const STOP_BTN_Z_INDEX = 99999;
+const VISUAL_LAYER_Z_INDEX = 5;
+
+// V43.0: HAPTIC PATTERNS
+const HAPTIC_HEAVY_SNAP = [80, 50, 120];  // Deep mechanical latch
+const HAPTIC_LIGHT_RELEASE = [40];         // Light recoil
 
 // Linear interpolation with Toroidal dampening
 function lerp(a, b, t) {
-  // Apply √7.3 resonance dampening for "Natural Weight"
   const dampened_t = Math.min(Math.max(t, 0), 1) * (RESONANCE_FORCE / 10);
   return a + (b - a) * Math.min(dampened_t, 1);
 }
@@ -71,23 +79,28 @@ function dist(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
-// ═══ V30.0 GHOST KILLER — Purge legacy STOP buttons ═══
+// V43.0: WHITE LIGHT REFRACTION PULSE
+function triggerWhiteLightPulse(element, intensity) {
+  if (!element) return;
+  element.style.filter = `drop-shadow(0 0 ${intensity}px #fff) brightness(1.5)`;
+  element.style.boxShadow = `0 0 ${intensity * 2}px rgba(255,255,255,0.8)`;
+}
+
+function clearWhiteLightPulse(element) {
+  if (!element) return;
+  element.style.filter = 'none';
+  element.style.boxShadow = 'none';
+}
+
+// ═══ GHOST KILLER — Purge legacy elements ═══
 function purgeGhostElements() {
-  // Kill SovereignStreamlineV7's duplicate STOP
   const legacyStop = document.getElementById('sovereign-emergency-reset');
   if (legacyStop) {
     legacyStop.remove();
-    console.log('[V30.0] GHOST PURGED: sovereign-emergency-reset');
+    console.log('[V43.0] GHOST PURGED: sovereign-emergency-reset');
   }
   
-  // Kill any other floating STOP elements in title area
-  document.querySelectorAll('[data-testid*="stop"], [id*="STOP"]').forEach(el => {
-    // Don't kill our own V30 button
-    if (el.dataset.testid === 'emergency-stop-btn-v30') return;
-    if (el.closest('[data-testid="orbital-hub-page"]')) return;
-    el.remove();
-    console.log('[V30.0] GHOST PURGED:', el.id || el.dataset?.testid);
-  });
+  document.querySelectorAll('.VOID, .ghost-layer, .legacy-header').forEach(el => el.remove());
 }
 
 export default function OrbitalHub() {
@@ -767,20 +780,22 @@ export default function OrbitalHub() {
             pointerEvents: 'none',
           }}
         >
-          {/* ═══ V31.0 TOUCH HITBOXES — FLAT PLANE, NO TRANSFORM ═══ */}
+          {/* ═══ V43.0 TOUCH HITBOXES — KINETIC SNAP ENGINE ═══ */}
           {ALL_SATELLITES.map((sat, idx) => {
             const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
-            const rawOpacity = subOrbOpacities.current[sat.id] || 0;
             const isExtracted = hubState === 'extracted' && sat.id === extractedId;
             const size = isExtracted ? subOrbSizeExtracted : subOrbSizeBloom;
             
-            // Only render hitbox when visible (bloom or extracted)
             const isVisible = hubState === 'bloom' || (hubState === 'extracted' && sat.id === extractedId);
             if (!isVisible) return null;
+
+            const solfeggioFreq = SOLFEGGIO[idx % SOLFEGGIO.length];
             
             return (
               <button
                 key={`hitbox-${sat.id}`}
+                id={`nodule-${sat.id}`}
+                data-frequency={solfeggioFreq}
                 style={{
                   position: 'absolute',
                   left: `${center + pos.x - size / 2}px`,
@@ -794,16 +809,38 @@ export default function OrbitalHub() {
                   touchAction: 'manipulation',
                   WebkitTapHighlightColor: 'transparent',
                   outline: 'none',
-                  transform: 'none',
-                  zIndex: 50000,
+                  transform: 'scale(1) translateZ(0px)',
+                  zIndex: TOUCH_PLANE_Z_INDEX,
                   pointerEvents: 'auto',
+                  transition: 'transform 0.1s ease-out, box-shadow 0.1s ease-out',
                 }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log(`[V31.0] CLICK: ${sat.id} → ${sat.path}`);
-                  if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
-                  window.location.href = sat.path;
+                  
+                  // V43.0: HEAVY MECHANICAL SNAP
+                  if (navigator.vibrate) navigator.vibrate(HAPTIC_HEAVY_SNAP);
+                  
+                  const btn = document.getElementById(`nodule-${sat.id}`);
+                  if (btn) {
+                    // Compression phase
+                    btn.style.transform = `scale(${HEAVY_SCALE}) translateZ(0px)`;
+                    btn.style.boxShadow = `0 0 ${RESONANCE_FORCE * 3}px rgba(255,255,255,0.9)`;
+                    
+                    // Bounce phase after 80ms
+                    setTimeout(() => {
+                      btn.style.transform = `scale(${BOUNCE_SCALE}) translateZ(0px)`;
+                      if (navigator.vibrate) navigator.vibrate(HAPTIC_LIGHT_RELEASE);
+                      
+                      // Navigate after bounce settles
+                      setTimeout(() => {
+                        console.log(`[V43.0] DOWNLOAD: ${sat.id} → ${sat.path} @ ${solfeggioFreq}Hz`);
+                        window.location.href = sat.path;
+                      }, 100);
+                    }, 80);
+                  } else {
+                    window.location.href = sat.path;
+                  }
                 }}
                 onMouseEnter={() => setHoveredSat(sat.id)}
                 onMouseLeave={() => setHoveredSat(null)}
@@ -813,8 +850,9 @@ export default function OrbitalHub() {
             );
           })}
 
-          {/* ═══ V31.0 CORE HITBOX — FLAT PLANE ═══ */}
+          {/* ═══ V43.0 CORE HITBOX — KINETIC INVERSION ═══ */}
           <button
+            id="nodule-core"
             style={{
               position: 'absolute',
               left: `${center - R}px`,
@@ -828,11 +866,15 @@ export default function OrbitalHub() {
               touchAction: 'manipulation',
               WebkitTapHighlightColor: 'transparent',
               outline: 'none',
-              transform: 'none',
+              transform: 'scale(1) translateZ(0px)',
               zIndex: 25000,
               pointerEvents: 'auto',
+              transition: 'transform 0.08s ease-out',
             }}
-            onClick={handleCoreClick}
+            onClick={() => {
+              if (navigator.vibrate) navigator.vibrate(HAPTIC_HEAVY_SNAP);
+              handleCoreClick();
+            }}
             data-testid="central-orb"
             aria-label="Mission Control"
           />
