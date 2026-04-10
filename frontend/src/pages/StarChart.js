@@ -16,6 +16,7 @@ import { useCosmicAmbient, CosmicNarrator } from '../components/StarChartAudio';
 import { BirthConstellationToast, MythologyPanel, JourneyOverlay, JourneyComplete, CelestialBadgesPanel } from '../components/StarChartOverlays';
 import { AstrologyReadingPanel } from '../components/AstrologyReading';
 import { NanoGuide } from '../components/NanoGuide';
+import { DeepLorePanel } from '../components/DeepLorePanel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ELEMENT_COLORS = { Fire: '#EF4444', Water: '#3B82F6', Air: '#A78BFA', Earth: '#22C55E' };
@@ -1096,6 +1097,7 @@ export default function StarChart() {
   const [astrologyReading, setAstrologyReading] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showDeepLore, setShowDeepLore] = useState(false);
 
   const handleZoom = useCallback((delta) => {
     setLastZoomDelta(delta);
@@ -1142,9 +1144,23 @@ export default function StarChart() {
     } else { fetchChart(40.7, -74.0); }
   }, [token]);
 
-  // Fetch available cultures
+  // Fetch available cultures - V55.0 uses omnis/cultures with Lakota as foundational
   useEffect(() => {
-    axios.get(`${API}/star-chart/cultures`).then(r => setCultures(r.data.cultures || [])).catch(() => {});
+    axios.get(`${API}/omnis/cultures`)
+      .then(r => {
+        setCultures(r.data.cultures || []);
+        // Auto-select Lakota as foundational layer if no culture is active
+        if (!activeCulture && r.data.foundational_culture) {
+          // Delay to allow initial render
+          setTimeout(() => {
+            selectCulture(r.data.foundational_culture);
+          }, 500);
+        }
+      })
+      .catch(() => {
+        // Fallback to original endpoint
+        axios.get(`${API}/star-chart/cultures`).then(r => setCultures(r.data.cultures || [])).catch(() => {});
+      });
   }, []);
 
   // Fetch culture constellation data when a culture is selected
@@ -1801,6 +1817,21 @@ export default function StarChart() {
                           token={token}
                         />
                       </div>
+
+                      {/* Go Deeper Button - V55.0 Deep Lore */}
+                      <button
+                        onClick={() => setShowDeepLore(true)}
+                        className="mt-4 w-full py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+                        style={{
+                          background: `linear-gradient(135deg, ${cultureData.color}20, ${cultureData.color}08)`,
+                          border: `1px solid ${cultureData.color}30`,
+                          color: cultureData.color,
+                        }}
+                        data-testid="go-deeper-btn"
+                      >
+                        <Sparkles size={12} />
+                        Go Deeper → Sacred Layers
+                      </button>
                     </>
                   )}
 
@@ -1823,6 +1854,33 @@ export default function StarChart() {
               </AnimatePresence>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Deep Lore Panel - V55.0 Multi-layer mythology explorer */}
+      <AnimatePresence>
+        {showDeepLore && selectedCulturalConst && cultureData && (
+          <DeepLorePanel
+            cultureId={activeCulture}
+            constellationId={selectedCulturalConst.id}
+            cultureColor={cultureData.color}
+            onClose={() => setShowDeepLore(false)}
+            onNavigateConstellation={(cId, constId) => {
+              // Navigate to a related constellation
+              if (cId !== activeCulture) {
+                selectCulture(cId);
+              }
+              // Find the constellation in the new culture data
+              axios.get(`${API}/star-chart/cultures/${cId}`).then(r => {
+                const newConst = r.data.constellations?.find(c => c.id === constId);
+                if (newConst) {
+                  setSelectedCulturalConst(newConst);
+                  setCultureData(r.data);
+                  setActiveCulture(cId);
+                }
+              }).catch(() => {});
+            }}
+          />
         )}
       </AnimatePresence>
 
