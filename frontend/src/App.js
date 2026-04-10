@@ -39,6 +39,7 @@ import './utils/RefractionEngine';        // White Light → Rainbow Split → I
 import './utils/SovereignCore';           // V2.88 Unified Core (Refraction + Stabilization + Encryption)
 import './utils/RainbowKeyGenerator';     // Back-end key encryption
 import './utils/SovereignHandshake';      // Bi-directional handshake orchestrator
+import './utils/SovereignSingularity';    // V50.0 UNIVERSAL SINGULARITY — Zero Overlap Grid
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';

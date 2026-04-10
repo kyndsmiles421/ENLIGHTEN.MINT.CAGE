@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V47.8_KINETIC_RECOVERY | Status: GHOST_LAYER_PURGED
+## Version: V50.0_UNIVERSAL_SINGULARITY | Status: INTERCONNECTED_ZERO_OVERLAP
 
 ---
 
@@ -34,9 +34,17 @@
 
 ---
 
-## IMPLEMENTED FEATURES (V47.8)
+## IMPLEMENTED FEATURES (V50.0)
 
-### V47.8 Kinetic Recovery (LATEST)
+### V50.0 Universal Singularity (LATEST)
+- [x] Live Hot-Swap — Legacy architecture stripped, Hybrid Core injected
+- [x] 3-Row Grid System: Pole (auto) | Bloom (1fr) | Manifest (80px)
+- [x] Zero Overlap Guarantee — All panels mathematically constrained
+- [x] Modal Containment — z-index hierarchy prevents z-fighting
+- [x] `SovereignSingularity.js` engine with `hotSwap()` and `runNerveTest()`
+- [x] Console access: `window.SovereignSingularity` / `window.V_SINGULARITY`
+
+### V47.8 Kinetic Recovery
 - [x] Ghost Layer Purge — Fluid backgrounds now touch-transparent
 - [x] Single-Plane Interactive Surface — All decorative layers have `pointer-events: none`
 - [x] Z=0 Touch Line — All nodules force `translateZ(0px)` and `z-index: 50000`
