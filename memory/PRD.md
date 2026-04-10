@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V50.0_UNIVERSAL_SINGULARITY | Status: INTERCONNECTED_ZERO_OVERLAP
+## Version: V52.0_CELLULAR_EVOLUTION | Status: GHOSTBUSTER_COMPLETE
 
 ---
 
@@ -34,17 +34,21 @@
 
 ---
 
-## IMPLEMENTED FEATURES (V50.0)
+## IMPLEMENTED FEATURES (V52.0)
 
-### V50.0 Universal Singularity (LATEST)
-- [x] Live Hot-Swap — Legacy architecture stripped, Hybrid Core injected
-- [x] 3-Row Grid System: Pole (auto) | Bloom (1fr) | Manifest (80px)
-- [x] Zero Overlap Guarantee — All panels mathematically constrained
-- [x] Modal Containment — z-index hierarchy prevents z-fighting
-- [x] `SovereignSingularity.js` engine with `hotSwap()` and `runNerveTest()`
-- [x] Console access: `window.SovereignSingularity` / `window.V_SINGULARITY`
+### V52.0 Cellular Evolution / Ghostbuster Protocol (LATEST)
+- [x] Ghostbuster Purge — Fixed CSS selector `[data-testid*="crystal"]` → `[data-testid="crystal-badge"]`
+- [x] Crystals page now renders all 12 crystals with full details, VR buttons, and categories
+- [x] SovereignSingularity.js upgraded to V52.0 with MutationObserver for dynamic visibility
+- [x] Nanoid class added for cellular modular elements (nucleus, cell wall, radiation)
+- [x] Force visibility CSS added for `.immersive-page` and page components
 
-### V47.8 Kinetic Recovery
+### V51.1 Kinetic Core
+- [x] Grid layout killed — back to fixed/absolute positioning
+- [x] STOP button now rendered on ALL pages including Hub (z-index 999999)
+- [x] Duplicate STOP button removed from OrbitalHub (handled globally by EmergencyShutOff)
+
+### V50.0 Universal Singularity
 - [x] Ghost Layer Purge — Fluid backgrounds now touch-transparent
 - [x] Single-Plane Interactive Surface — All decorative layers have `pointer-events: none`
 - [x] Z=0 Touch Line — All nodules force `translateZ(0px)` and `z-index: 50000`
