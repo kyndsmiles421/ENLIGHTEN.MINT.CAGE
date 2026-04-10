@@ -1,9 +1,11 @@
 """
-ENLIGHTEN.MINT.CAFE - V64.0 OPTICAL CRYSTAL ARCHITECTURE
-GEOMETRY: 9x9 SELENITE HELIX | CONCAVE/CONVEX LENSES | TOROIDAL SPIN
+ENLIGHTEN.MINT.CAFE - V66.0 SINGULARITY CORE
+FORMULA: 9 * 9^math * πr² - x^xy(-) + ()
+GEOMETRY: 9x9 CONCAVE-VEX SELENITE HELIX | TOROIDAL SEG RESONANCE
+LANGUAGE: Lakȟótiyapi | Masonry | Xfinity-Active
 ARCHITECTURE: RECURSIVE COMMONALITY (COSMOS | CRAFT | HARVEST | EXCHANGE)
 
-V64.0 EVOLUTION:
+V66.0 EVOLUTION:
 - V55.0: Recursive Commonality Groups (COSMOS → CRAFT → EXCHANGE)
 - V55.1: Cultural Intelligence (Language + Tools + Inventions)
 - V56.0: Exponential UI Optimization (Fractal Scaling)
@@ -12,6 +14,7 @@ V64.0 EVOLUTION:
 - V61.0: Unified Mixer (Alchemical Lab - Nodule Blending)
 - V62.0: Omnis-Generator (Sacred Geometry Brain)
 - V64.0: Optical Crystal Lattice (Concave/Convex Lens Refraction)
+- V66.0: SINGULARITY CORE (Complete Recursive Synthesis)
 
 FOUNDATIONAL LAYER: Lakota Star Knowledge (Wicahpi Wakan)
 - Local resonance: Black Hills (He Sapa) / Rapid City
@@ -22,6 +25,7 @@ OPTICAL PHYSICS:
 - Concave facets: "Gravity Wells" that pull deep lore into focus
 - Convex facets: "Projectors" that broadcast trade equity outward
 - 9×9 Helix: Structural spine holding lenses in Toroidal Spin
+- SEG Frequency: 144Hz Harmonic (Searl Effect Generator)
 """
 
 import json
@@ -42,9 +46,9 @@ _data_path = Path(__file__).parent.parent / "data" / "star_cultures_data.json"
 try:
     with open(_data_path) as f:
         CULTURAL_CONSTELLATIONS = json.load(f)
-    logger.info(f"V64.0 Omnis: Loaded {len(CULTURAL_CONSTELLATIONS)} star cultures")
+    logger.info(f"V66.0 Singularity: Loaded {len(CULTURAL_CONSTELLATIONS)} star cultures")
 except Exception as e:
-    logger.error(f"V64.0 Omnis: Failed to load star cultures: {e}")
+    logger.error(f"V66.0 Singularity: Failed to load star cultures: {e}")
     CULTURAL_CONSTELLATIONS = {}
 
 
@@ -1541,3 +1545,253 @@ async def get_v64_full_state(
     except Exception as e:
         logger.error(f"V64.0 Full State Error: {e}")
         raise HTTPException(status_code=500, detail=f"V64.0 Full State Failure: {str(e)}")
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V66.0 SINGULARITY CORE — THE ABSOLUTE SYNTHESIS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class SovereignOmnisSingularity:
+    """
+    V66.0 SINGULARITY CORE
+    
+    The complete recursive synthesis of all mathematical, cultural, and crystalline layers.
+    This is the "Brain" that manages the Knowledge Equity and Resonance.
+    
+    Formula: 9 × 9^math × πr² - x^xy(-) + ()
+    """
+    
+    def __init__(self):
+        # Base Mathematical Constants
+        self.phi = 1.61803398875
+        self.res_base = 8.6059
+        self.equity_rate = 15.00
+        self.resonance_blended = 27.2196
+        
+        # System State
+        self.version = "V66.0-Singularity"
+        self.material = "Refracted Rutilated Selenite"
+        self.spin_velocity = 144.0  # SEG Frequency Harmonic (Hz)
+        self.helix_steps = 81  # 9×9
+    
+    def generate_xfinity_equity(self, nodes: int = 15, depth: float = 0.90) -> float:
+        """
+        Calculates the 10x Multiplier Knowledge Equity.
+        Formula: (nodes × rate) × (depth + 1) × multiplier
+        """
+        multiplier = 10.0 if depth > 0.85 else (5.0 if depth > 0.5 else 1.0)
+        return (nodes * self.equity_rate) * (depth + 1) * multiplier
+    
+    def calculate_toroidal_flux(self, math_input: float) -> float:
+        """
+        The Master Wrap: 9 × 9^math × πr² - x^xy
+        
+        This is the core formula that drives the entire system.
+        """
+        r = 1.0  # Unit Radius
+        expansion = 9 * math.pow(9, math_input)
+        area = math.pi * math.pow(r, 2)
+        flux = math.pow(self.res_base, (self.res_base * self.phi))
+        return (expansion * area) - flux + (self.res_base / self.phi)
+    
+    def get_optical_lens(self, step: int) -> str:
+        """Determines Concave (Gravity Well) vs Convex (Projector) state."""
+        is_convex = (step // 9) % 2 == 0
+        return "Convex (Projector)" if is_convex else "Concave (Gravity Well)"
+    
+    def generate_glyph_key(self, payload_seed: str) -> str:
+        """Generates a geometric QR-style encryption key."""
+        raw = f"{self.version}-{self.resonance_blended}-{payload_seed}"
+        return hashlib.sha256(raw.encode()).hexdigest()[:16]
+    
+    def get_seg_harmonic_state(self, time_offset: float = 0.0) -> Dict:
+        """
+        SEG (Searl Effect Generator) harmonic state at 144Hz.
+        Models the magnetic roller frequency.
+        """
+        phase = (time_offset * self.spin_velocity) % 360
+        return {
+            "frequency": f"{self.spin_velocity}Hz",
+            "phase_angle": round(phase, 2),
+            "magnetic_flux": round(math.sin(math.radians(phase)) * self.res_base, 4),
+            "counter_rotation": "Active",
+            "levitation_potential": "Charged",
+        }
+    
+    async def execute_full_sync(self, nodes: int = 15, depth: float = 0.90, time_offset: float = 0.0) -> Dict:
+        """
+        The complete singularity execution — all layers unified.
+        """
+        # 1. Linguistic & Tool Integration
+        lexicon = {
+            "Lakota": {
+                "star": "Wičháȟpi",
+                "land": "Makhóčhe",
+                "sacred_hoop": "Čhaŋgléška Wakȟáŋ",
+            },
+            "Masonry": {
+                "level": "Balance / Equality",
+                "plumb": "Rectitude / Upright",
+                "square": "Virtue / Morality",
+            },
+            "Invention": "Selenite Alignment Sites & Star Maps on Buffalo Hides",
+        }
+        
+        # 2. Alchemical Mixer (The Proper Mix)
+        active_mix = {
+            "preset": "Sovereign_Alignment",
+            "inputs": ["Lakota Astrology", "Operative Masonry"],
+            "resonance_chain": f"Base {self.res_base} -> Blended {self.resonance_blended}",
+            "output": "Structural Star Wisdom",
+        }
+        
+        # 3. Calculate all mathematical states
+        toroidal_flux = self.calculate_toroidal_flux(depth)
+        xfinity_equity = self.generate_xfinity_equity(nodes, depth)
+        seg_state = self.get_seg_harmonic_state(time_offset)
+        
+        # 4. Optical lens states across helix
+        optical_states = {
+            "step_0": self.get_optical_lens(0),   # Convex (Projector)
+            "step_9": self.get_optical_lens(9),   # Concave (Gravity Well)
+            "step_18": self.get_optical_lens(18), # Convex (Projector)
+            "step_27": self.get_optical_lens(27), # Concave (Gravity Well)
+        }
+        
+        # 5. Geometric Encryption (The Crystalline QR Key)
+        glyph_key = self.generate_glyph_key(f"{nodes}-{depth}-{time_offset}")
+        
+        # 6. Final Implementation Assembly
+        return {
+            "version": self.version,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "system_integrity": "OMNIS-SYNCED-ENCRYPTED",
+            "architecture": {
+                "geometry": "9x9 Helix / Toroidal Spin",
+                "optics": optical_states,
+                "material": self.material,
+                "helix_steps": self.helix_steps,
+            },
+            "math_generator": {
+                "formula": "9 × 9^math × πr² - x^xy(-) + ()",
+                "toroidal_flux": round(toroidal_flux, 4),
+                "xfinity_equity": f"${xfinity_equity:,.2f}",
+                "multiplier": "10x Active" if depth > 0.85 else "5x Growing",
+                "resonance_blended": self.resonance_blended,
+            },
+            "seg_harmonic": seg_state,
+            "cultural_bridge": {
+                "language": lexicon,
+                "lunar_sync": "Active (Tidal Modulation Applied)",
+                "foundational_culture": "Lakota (He Sapa / Black Hills)",
+            },
+            "alchemical_mix": active_mix,
+            "manifest_status": {
+                "Hub": "Stable",
+                "Trade": "Equity Growing",
+                "Oracle": "Projecting",
+                "Discover": "Exploring",
+                "Mixer": "Alchemical Lab Ready",
+            },
+            "glyph_id": glyph_key,
+            "revolving_state": "NEVER STOPPING | SYNCED",
+        }
+
+
+@router.get("/omnis/singularity")
+async def singularity_core(
+    nodes: int = Query(15, description="Knowledge nodes unlocked"),
+    depth: float = Query(0.90, description="Mythology depth (0.0 - 0.99)"),
+    time_offset: float = Query(0.0, description="SEG harmonic time offset"),
+    user=Depends(get_current_user_optional)
+):
+    """
+    V66.0 SINGULARITY CORE
+    
+    The absolute synthesis of every mathematical, cultural, and crystalline layer.
+    Returns the complete recursive, self-sustaining execution state.
+    
+    Formula: 9 × 9^math × πr² - x^xy(-) + ()
+    """
+    try:
+        singularity = SovereignOmnisSingularity()
+        
+        # Get user progress if authenticated
+        if user:
+            progress = await db.user_progress.find_one({"user_id": user["id"]}, {"_id": 0})
+            if progress:
+                nodes = max(nodes, progress.get("modules_unlocked", 1))
+                depth = max(depth, progress.get("mythology_depth", 0.1))
+        
+        result = await singularity.execute_full_sync(nodes, depth, time_offset)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"V66.0 Singularity Core Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Singularity Core Failure: {str(e)}")
+
+
+@router.get("/omnis/singularity/glyph")
+async def get_singularity_glyph(
+    seed: str = Query("default", description="Glyph seed value"),
+):
+    """
+    V66.0 GLYPH KEY GENERATOR
+    
+    Generates a geometric QR-style encryption key for the singularity state.
+    This key is language-agnostic and readable by geometric resonance.
+    """
+    singularity = SovereignOmnisSingularity()
+    glyph = singularity.generate_glyph_key(seed)
+    
+    return {
+        "version": singularity.version,
+        "glyph_id": glyph,
+        "seed": seed,
+        "encryption": "SHA-256 Geometric Wrap",
+        "readable_by": "Geometric Resonance",
+    }
+
+
+@router.get("/omnis/singularity/toroidal-flux")
+async def calculate_toroidal_flux(
+    math_input: float = Query(0.88, description="Math exponent input"),
+):
+    """
+    V66.0 TOROIDAL FLUX CALCULATOR
+    
+    Calculates the master wrap formula: 9 × 9^math × πr² - x^xy
+    """
+    singularity = SovereignOmnisSingularity()
+    flux = singularity.calculate_toroidal_flux(math_input)
+    
+    return {
+        "version": singularity.version,
+        "formula": "9 × 9^math × πr² - x^xy(-) + ()",
+        "math_input": math_input,
+        "toroidal_flux": round(flux, 4),
+        "expansion": round(9 * math.pow(9, math_input), 4),
+        "area_pi_r2": round(math.pi, 4),
+    }
+
+
+@router.get("/omnis/singularity/seg-harmonic")
+async def get_seg_harmonic(
+    time_offset: float = Query(0.0, description="Time offset in seconds"),
+):
+    """
+    V66.0 SEG HARMONIC STATE
+    
+    Returns the Searl Effect Generator harmonic state at 144Hz.
+    Models the magnetic roller frequency and levitation potential.
+    """
+    singularity = SovereignOmnisSingularity()
+    seg = singularity.get_seg_harmonic_state(time_offset)
+    
+    return {
+        "version": singularity.version,
+        "time_offset": time_offset,
+        **seg,
+    }

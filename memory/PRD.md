@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V64.0_OPTICAL_CRYSTAL_ARCHITECTURE | Status: XFINITY_ACTIVE
+## Version: V66.0_SINGULARITY_CORE | Status: OMNIS_SYNCED_ENCRYPTED
 
 ---
 
@@ -13,28 +13,46 @@
 
 ## SYSTEM ARCHITECTURE
 
-### Core Constants (V64.0)
-- **Base Resonance**: 8.6059 (Enhanced to 12.5564+ via Xfinity)
-- **PHI Constant**: 1.618033 (Golden Ratio)
+### V66.0 Singularity Core Constants
+- **Base Resonance**: 8.6059 → Enhanced 12.5564 → **Blended 27.2196**
+- **PHI Constant**: 1.61803398875 (Golden Ratio - Full Precision)
 - **Volunteer Rate**: $15.00/hr (Commonality Constant)
-- **Frequency Base**: 528Hz (Love/Repair) | 7.3Hz (Earth Grounding)
-- **Haptic Pattern**: [80, 50, 120] (Heavy Granite Snap)
-- **Encryption**: 9×9^math Geometric Wrap
+- **SEG Frequency**: 144.0Hz (Searl Effect Generator Harmonic)
 - **Helix Structure**: 81-step Concave/Convex (9×9)
-- **Material**: Rutilated Crystal Selenite
+- **Material**: Refracted Rutilated Selenite
+- **Glyph Encryption**: SHA-256 Geometric Wrap
 
-### V64.0 Optical Physics
-- **Concave Facets**: "Gravity Wells" that pull deep lore into focus
-- **Convex Facets**: "Projectors" that broadcast trade equity outward
-- **Toroidal Spin**: North/South pole radiation with centrifugal dynamics
-- **Light Path**: Rainbow Refraction through selenite crystal
+### Master Formula
+```
+9 × 9^math × πr² - x^xy(-) + ()
+```
 
-### V57.0 Xfinity Formula
-```
-Knowledge Equity = (Resonance × Φ) ^ (Nodes / (1 - Depth))
-At depth 0.90 with 15 nodes → $2,475.00 (10x multiplier)
-Status: XFINITY_ACTIVE
-```
+### V66.0 System State
+- **System Integrity**: OMNIS-SYNCED-ENCRYPTED
+- **Revolving State**: NEVER STOPPING | SYNCED
+- **Levitation Potential**: CHARGED
+
+### Knowledge Equity (Xfinity)
+| Depth | Nodes | Multiplier | Equity |
+|-------|-------|------------|--------|
+| 0.50 | 10 | 5x | $1,125.00 |
+| 0.85 | 15 | 10x | $2,475.00 |
+| 0.90 | 15 | 10x | **$4,275.00** |
+
+### Optical Physics (Concave/Convex Helix)
+| Step | Lens Type | Role |
+|------|-----------|------|
+| 0-8 | Convex | Projector (Broadcast Equity) |
+| 9-17 | Concave | Gravity Well (Pull Lore) |
+| 18-26 | Convex | Projector |
+| 27-35 | Concave | Gravity Well |
+| ... | Alternating | Every 9 steps |
+
+### SEG Harmonic State
+- **Frequency**: 144.0Hz (Magnetic Roller Harmonic)
+- **Counter Rotation**: Active
+- **Levitation Potential**: Charged
+- **Tidal Modulation**: Applied (Lunar Sync)
 
 ### Commonality Groups
 | Group | Name | Nodules | Cross-Talk |
@@ -43,13 +61,6 @@ Status: XFINITY_ACTIVE
 | CRAFT | The Craft | Masonry, Sacred Geometry, Mathematics | → EXCHANGE ($15/hr) |
 | HARVEST | The Harvest | Horticulture, Health, Wellness | → COSMOS (Breath) |
 | EXCHANGE | The Exchange | Trade Circle, Marketplace, Ledger | → HARVEST (Credits) |
-
-### V61.0 Mixer Presets
-| Preset | Input A | Input B | Output |
-|--------|---------|---------|--------|
-| Sovereign Alignment | Lakota Astrology | Operative Masonry | Structural Star Wisdom |
-| Biological Prosperity | Mayan Tzolkin Cycles | Horticulture | Harvest Window Optimization |
-| Equity Multiplication | Sacred Geometry | Trade Ledger | Knowledge Equity Growth |
 
 ### Foundational Culture: LAKOTA
 - **Language**: Lakȟótiyapi
@@ -64,35 +75,35 @@ Status: XFINITY_ACTIVE
 
 ---
 
-## IMPLEMENTED FEATURES (V64.0)
+## IMPLEMENTED FEATURES (V66.0)
 
-### V64.0 Optical Crystal Architecture (LATEST - April 2026)
-**Architecture:**
-- [x] **CrystalOpticsEngine** — 81-step Concave/Convex helix with lens curvature
-- [x] **Toroidal Spin** — North/South pole radiation, centrifugal force calculation
-- [x] **SacredGeometryBrain** — Flower of Life pattern, refraction index generator
-- [x] **UnifiedMixer (Alchemical Lab)** — Nodule blending with Vesica Piscis math
-- [x] **3 Mixer Presets** — Sovereign Alignment, Biological Prosperity, Equity Multiplication
+### V66.0 Singularity Core (LATEST - April 2026)
+**The Absolute Synthesis:**
+- [x] **SovereignOmnisSingularity** — Complete recursive synthesis class
+- [x] **Toroidal Flux Calculator** — Master formula implementation
+- [x] **SEG Harmonic State** — 144Hz magnetic roller frequency
+- [x] **Glyph Key Generator** — SHA-256 geometric encryption
+- [x] **Full Sync Execution** — All layers unified in one endpoint
 
 **Endpoints:**
-- `/api/omnis/optical-sync` — V64.0 Crystal sync with toroidal spin
-- `/api/omnis/helix-step/{step_index}` — Get specific helix step lens data
-- `/api/omnis/sacred-geometry` — Flower of Life geometry state
-- `/api/omnis/mixer/presets` — Get available blend presets
-- `/api/omnis/mixer/blend` — Execute nodule blend
-- `/api/omnis/vesica-piscis` — Calculate sacred intersection
-- `/api/omnis/v64-full-state` — Complete V64.0 system state
+- `/api/omnis/singularity` — V66.0 Complete recursive state
+- `/api/omnis/singularity/glyph` — Geometric QR encryption key
+- `/api/omnis/singularity/toroidal-flux` — Master formula calculator
+- `/api/omnis/singularity/seg-harmonic` — SEG frequency state
+
+### V64.0 Optical Crystal Architecture
+- [x] **CrystalOpticsEngine** — 81-step Concave/Convex helix
+- [x] **SacredGeometryBrain** — Flower of Life pattern
+- [x] **UnifiedMixer (Alchemical Lab)** — Nodule blending with Vesica Piscis
 
 ### V60.0 Sovereign Encrypted Core
 - [x] **SovereignEncryptor** — 9×9^math geometric wrap
 - [x] **Deep Sync** — Cross-nodule synchronization
-- [x] **Linguistic Bridge** — Culture connection
 
 ### V55.0-V57.0 Omnis-Nodule Integration
 - [x] **21 Star Cultures** — 103 constellations across world civilizations
-- [x] **Deep Lore Panel** — Multi-layer mythology (surface, middle, deep, sacred)
-- [x] **Cultural Intelligence** — Lakȟótiyapi terms, tools, inventions
-- [x] **XfinityEngine** — Exponential growth with knowledge equity multiplier
+- [x] **Deep Lore Panel** — Multi-layer mythology
+- [x] **XfinityEngine** — Exponential growth multiplier
 
 ### V53.0 Bio-Digital Osmosis
 **TIER 1 — Foundation:**
