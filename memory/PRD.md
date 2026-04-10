@@ -36,12 +36,20 @@
 
 ## IMPLEMENTED FEATURES (V53.0)
 
-### V53.0 Bio-Digital Osmosis — Foundation Stack (LATEST)
+### V53.0 Bio-Digital Osmosis — Full Stack (LATEST)
+**TIER 1 — Foundation:**
 - [x] **Step 10: Ghost Watch** — Auto-heal loop every 5s, kills glass screen bugs
 - [x] **Step 5: Haptic Absorption** — Solfeggio-mapped patterns (174Hz-963Hz)
 - [x] **Step 3: DNA Morphing** — Nucleus color shift with frequency-to-color mapping
-- [x] Nanoid class upgraded with `onAbsorb()` triggering DNA morph + haptic
-- [x] Console shortcuts: `window.ghostWatch`, `window.haptic`, `window.dnaMorph`
+
+**TIER 2 — Immersion:**
+- [x] **Step 4: Radiating Membranes** — Pulsing opacity animation tied to data weight
+- [x] **Step 2: Collision Physics** — AABB detection for orb-to-bit interaction
+- [x] **Step 8: Neural Connectors** — SVG strings between related orbs
+
+**Console Shortcuts:**
+- `window.ghostWatch`, `window.haptic`, `window.dnaMorph` (Tier 1)
+- `window.membranes`, `window.collision`, `window.neural` (Tier 2)
 
 ### V52.0 Cellular Evolution / Ghostbuster Protocol
 - [x] Ghostbuster Purge — Fixed CSS selector `[data-testid*="crystal"]` → `[data-testid="crystal-badge"]`

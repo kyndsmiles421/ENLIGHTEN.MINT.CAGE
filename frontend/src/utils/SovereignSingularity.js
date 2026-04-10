@@ -1,12 +1,17 @@
 /**
- * ENLIGHTEN.MINT.CAFE - V53.0 BIO-DIGITAL OSMOSIS / FOUNDATION STACK
+ * ENLIGHTEN.MINT.CAFE - V53.0 FULL STACK (TIER 1 & TIER 2)
  * ARCHITECT: STEVEN MICHAEL | ROOT: kyndsmiles@gmail.com
- * STATUS: GHOST_WATCH_ACTIVE / HAPTIC_BOUND / DNA_MORPH_READY
+ * STATUS: BIO_DIGITAL_OSMOSIS / IMMERSION_LAYER_ACTIVE
  * 
  * TIER 1 FOUNDATION:
  * - Step 10: Ghost Watch (Auto-Heal) — Kills glass screen bug every 5s
  * - Step 5: Haptic Absorption — Physical confirmation [80, 50, 120]
  * - Step 3: DNA Morphing — Nucleus color shift on data absorption
+ *
+ * TIER 2 IMMERSION:
+ * - Step 4: Radiating Membranes — Pulsing opacity tied to data weight
+ * - Step 2: Collision Physics — AABB detection for orb-to-bit interaction
+ * - Step 8: Neural Connectors — Visual strings between related orbs
  */
 
 const SovereignSingularity = {
@@ -44,7 +49,7 @@ const SovereignSingularity = {
     intervalId: null,
     
     start: function() {
-      if (this.intervalId) return; // Already running
+      if (this.intervalId) return;
       
       this.intervalId = setInterval(() => {
         const targets = [
@@ -56,11 +61,11 @@ const SovereignSingularity = {
 
         targets.forEach(el => {
           const style = window.getComputedStyle(el);
-          if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') {
+          if (style.visibility === 'hidden' || style.display === 'none' || parseFloat(style.opacity) < 0.1) {
             el.style.setProperty('visibility', 'visible', 'important');
             el.style.setProperty('display', 'block', 'important');
             el.style.setProperty('opacity', '1', 'important');
-            console.log(`[V53.0] Ghost Watch: Blockage detected on ${el.className || el.tagName} — PURGED`);
+            console.log(`[V53.0] 🛡️ Ghost Watch: Blockage purged on ${el.className || el.tagName}`);
           }
         });
       }, 5000);
@@ -82,34 +87,30 @@ const SovereignSingularity = {
   // Physical confirmation when an orb swallows a bit
   // ═══════════════════════════════════════════════════════════════════════════
   haptic: {
-    // Default LOX Injection pattern
     default: [80, 50, 120],
     
-    // Solfeggio-mapped patterns
     patterns: {
-      '174': [100, 30, 80],   // Grounding
-      '285': [90, 40, 100],   // Quantum Field
-      '396': [80, 50, 120],   // Liberation
-      '417': [70, 60, 110],   // Transformation
-      '432': [60, 70, 100],   // Earth Harmony
-      '528': [50, 80, 90],    // DNA Repair / Love
-      '639': [40, 90, 80],    // Connection
-      '741': [30, 100, 70],   // Expression
-      '852': [20, 110, 60],   // Intuition
-      '963': [10, 120, 50],   // Divine Connection
+      '174': [100, 30, 80],
+      '285': [90, 40, 100],
+      '396': [80, 50, 120],
+      '417': [70, 60, 110],
+      '432': [60, 70, 100],
+      '528': [50, 80, 90],
+      '639': [40, 90, 80],
+      '741': [30, 100, 70],
+      '852': [20, 110, 60],
+      '963': [10, 120, 50],
     },
     
     trigger: function(pattern = null) {
       const vibrationPattern = pattern || this.default;
       if ("vibrate" in navigator) {
         navigator.vibrate(vibrationPattern);
-        console.log(`[V53.0] Haptic: Triggered [${vibrationPattern.join(', ')}]`);
         return true;
       }
       return false;
     },
     
-    // Frequency-specific haptic
     triggerByFrequency: function(freq) {
       const pattern = this.patterns[String(freq)] || this.default;
       return this.trigger(pattern);
@@ -121,18 +122,17 @@ const SovereignSingularity = {
   // Changes the core color of the cell based on data type
   // ═══════════════════════════════════════════════════════════════════════════
   dnaMorph: {
-    // Frequency-to-color mapping (Solfeggio spectrum)
     colorMap: {
-      '174': '#8B0000',   // Deep Red — Root/Grounding
-      '285': '#FF4500',   // Orange Red — Sacral
-      '396': '#FFD700',   // Gold — Solar Plexus
-      '417': '#32CD32',   // Lime Green — Heart
-      '432': '#00CED1',   // Dark Cyan — Earth Harmony
-      '528': '#00FF00',   // Green — DNA Repair
-      '639': '#1E90FF',   // Dodger Blue — Throat
-      '741': '#4B0082',   // Indigo — Third Eye
-      '852': '#9400D3',   // Dark Violet — Crown
-      '963': '#FFFFFF',   // White — Divine
+      '174': '#8B0000',
+      '285': '#FF4500',
+      '396': '#FFD700',
+      '417': '#32CD32',
+      '432': '#00CED1',
+      '528': '#00FF00',
+      '639': '#1E90FF',
+      '741': '#4B0082',
+      '852': '#9400D3',
+      '963': '#FFFFFF',
     },
     
     morphNucleus: function(orbId, newColor, frequency = null) {
@@ -142,17 +142,15 @@ const SovereignSingularity = {
         return false;
       }
       
-      // Find nucleus element or use orb itself
       const nucleus = orb.querySelector('.nucleus') || orb;
       
-      // Apply color transformation
-      nucleus.style.backgroundColor = newColor;
+      // Apply radial gradient for nucleus glow
+      nucleus.style.background = `radial-gradient(circle, ${newColor} 0%, transparent 70%)`;
       nucleus.style.boxShadow = `0 0 20px ${newColor}, 0 0 40px ${newColor}40`;
       
-      // Set CSS variable for inheritance
       orb.style.setProperty('--nucleus-color', newColor);
+      orb.style.setProperty('--membrane-color', newColor);
       
-      // Trigger haptic feedback (Step 5 linked to Step 3)
       if (frequency) {
         SovereignSingularity.haptic.triggerByFrequency(frequency);
       } else {
@@ -163,10 +161,274 @@ const SovereignSingularity = {
       return true;
     },
     
-    // Morph by frequency (auto-color)
     morphByFrequency: function(orbId, frequency) {
       const color = this.colorMap[String(frequency)] || '#A855F7';
       return this.morphNucleus(orbId, color, frequency);
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // STEP 4: RADIATING MEMBRANES (TIER 2)
+  // Pulsing opacity tied to data weight — makes orbs feel ALIVE
+  // ═══════════════════════════════════════════════════════════════════════════
+  membranes: {
+    initialized: false,
+    
+    init: function() {
+      if (this.initialized) return;
+      
+      const styleId = 'sovereign-membranes-v53';
+      if (document.getElementById(styleId)) return;
+      
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        /* V53.0 RADIATING MEMBRANES — Living Cell Animation */
+        @keyframes membrane-radiate {
+          0% { 
+            box-shadow: 0 0 10px rgba(255,255,255,0.15); 
+            opacity: 0.75; 
+            transform: scale(1);
+          }
+          50% { 
+            box-shadow: 0 0 35px var(--membrane-color, rgba(168,85,247,0.5)), 
+                        0 0 60px var(--membrane-color, rgba(168,85,247,0.2)); 
+            opacity: 1; 
+            transform: scale(1.02);
+          }
+          100% { 
+            box-shadow: 0 0 10px rgba(255,255,255,0.15); 
+            opacity: 0.75; 
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes nucleus-pulse {
+          0%, 100% { 
+            filter: brightness(1) saturate(1); 
+          }
+          50% { 
+            filter: brightness(1.3) saturate(1.2); 
+          }
+        }
+        
+        /* Apply to all cellular elements */
+        .nanoid-cell,
+        .sphere-mode,
+        .cellular-active,
+        [data-cell-type="nanoid"] {
+          animation: membrane-radiate 4s infinite ease-in-out;
+          --membrane-color: rgba(168, 85, 247, 0.4);
+        }
+        
+        .nanoid-cell .nucleus,
+        .sphere-mode .nucleus,
+        [data-cell-type="nanoid"] .nucleus {
+          animation: nucleus-pulse 2s infinite ease-in-out;
+        }
+        
+        /* Intensity levels based on data weight */
+        .cell-intensity-low { animation-duration: 6s; }
+        .cell-intensity-medium { animation-duration: 4s; }
+        .cell-intensity-high { animation-duration: 2s; }
+        .cell-intensity-critical { animation-duration: 1s; }
+        
+        /* Orbital nodules get subtle breathing */
+        [data-testid^="hitbox-"],
+        .orbital-nodule {
+          transition: all 0.3s ease;
+        }
+        
+        [data-testid^="hitbox-"]:hover,
+        .orbital-nodule:hover {
+          animation: membrane-radiate 1.5s infinite ease-in-out;
+          --membrane-color: rgba(255, 255, 255, 0.3);
+        }
+      `;
+      document.head.appendChild(style);
+      this.initialized = true;
+      console.log("[V53.0] 🫧 Radiating Membranes: Initialized");
+    },
+    
+    // Set intensity level on a cell
+    setIntensity: function(element, level = 'medium') {
+      if (!element) return;
+      element.classList.remove('cell-intensity-low', 'cell-intensity-medium', 'cell-intensity-high', 'cell-intensity-critical');
+      element.classList.add(`cell-intensity-${level}`);
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // STEP 2: COLLISION PHYSICS (TIER 2)
+  // AABB detection for orb-to-bit interaction
+  // ═══════════════════════════════════════════════════════════════════════════
+  collision: {
+    // AABB (Axis-Aligned Bounding Box) collision detection
+    checkAABB: function(rect1, rect2) {
+      return !(
+        rect1.right < rect2.left || 
+        rect1.left > rect2.right || 
+        rect1.bottom < rect2.top || 
+        rect1.top > rect2.bottom
+      );
+    },
+    
+    // Circle collision (for spheres)
+    checkCircle: function(x1, y1, r1, x2, y2, r2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      return distance < (r1 + r2);
+    },
+    
+    // Get element bounding rect
+    getRect: function(element) {
+      if (!element) return null;
+      return element.getBoundingClientRect();
+    },
+    
+    // Check if two elements are colliding
+    areColliding: function(el1, el2) {
+      const rect1 = this.getRect(el1);
+      const rect2 = this.getRect(el2);
+      if (!rect1 || !rect2) return false;
+      return this.checkAABB(rect1, rect2);
+    },
+    
+    // Find all elements colliding with a target
+    findCollisions: function(targetElement, candidateSelector) {
+      const targetRect = this.getRect(targetElement);
+      if (!targetRect) return [];
+      
+      const candidates = document.querySelectorAll(candidateSelector);
+      const collisions = [];
+      
+      candidates.forEach(el => {
+        if (el !== targetElement && this.checkAABB(targetRect, this.getRect(el))) {
+          collisions.push(el);
+        }
+      });
+      
+      return collisions;
+    },
+    
+    // Monitor drag collisions (call during drag events)
+    onDragCheck: function(draggedElement, targetSelector, onCollide) {
+      const collisions = this.findCollisions(draggedElement, targetSelector);
+      if (collisions.length > 0 && typeof onCollide === 'function') {
+        collisions.forEach(target => onCollide(draggedElement, target));
+      }
+      return collisions;
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // STEP 8: NEURAL CONNECTORS (TIER 2)
+  // Visual strings between related orbs — shows hidden relationships
+  // ═══════════════════════════════════════════════════════════════════════════
+  neural: {
+    svgContainer: null,
+    connections: new Map(),
+    
+    // Initialize SVG container for neural strings
+    init: function() {
+      if (this.svgContainer) return;
+      
+      this.svgContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      this.svgContainer.id = 'neural-connector-layer';
+      this.svgContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+      `;
+      document.body.appendChild(this.svgContainer);
+      console.log("[V53.0] 🧠 Neural Connector Layer: Initialized");
+    },
+    
+    // Draw a connection between two elements
+    connect: function(idA, idB, color = 'rgba(168, 85, 247, 0.4)', strength = 1) {
+      this.init();
+      
+      const elA = document.getElementById(idA) || document.querySelector(`[data-orb-id="${idA}"]`);
+      const elB = document.getElementById(idB) || document.querySelector(`[data-orb-id="${idB}"]`);
+      
+      if (!elA || !elB) {
+        console.warn(`[V53.0] Neural: Cannot connect ${idA} to ${idB} — element not found`);
+        return null;
+      }
+      
+      const connectionId = `neural-${idA}-${idB}`;
+      
+      // Remove existing connection if any
+      const existing = this.svgContainer.querySelector(`#${connectionId}`);
+      if (existing) existing.remove();
+      
+      // Create line element
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.id = connectionId;
+      line.style.cssText = `
+        stroke: ${color};
+        stroke-width: ${strength * 2}px;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 ${strength * 3}px ${color});
+        opacity: 0.6;
+      `;
+      
+      // Store connection data
+      this.connections.set(connectionId, { elA, elB, line, color, strength });
+      
+      // Update position
+      this.updateConnection(connectionId);
+      
+      // Add to SVG
+      this.svgContainer.appendChild(line);
+      
+      console.log(`[V53.0] 🧠 Neural Link established: ${idA} ↔ ${idB}`);
+      return connectionId;
+    },
+    
+    // Update a connection's position
+    updateConnection: function(connectionId) {
+      const conn = this.connections.get(connectionId);
+      if (!conn) return;
+      
+      const rectA = conn.elA.getBoundingClientRect();
+      const rectB = conn.elB.getBoundingClientRect();
+      
+      const x1 = rectA.left + rectA.width / 2;
+      const y1 = rectA.top + rectA.height / 2;
+      const x2 = rectB.left + rectB.width / 2;
+      const y2 = rectB.top + rectB.height / 2;
+      
+      conn.line.setAttribute('x1', x1);
+      conn.line.setAttribute('y1', y1);
+      conn.line.setAttribute('x2', x2);
+      conn.line.setAttribute('y2', y2);
+    },
+    
+    // Update all connections
+    updateAll: function() {
+      this.connections.forEach((_, id) => this.updateConnection(id));
+    },
+    
+    // Remove a connection
+    disconnect: function(connectionId) {
+      const conn = this.connections.get(connectionId);
+      if (conn) {
+        conn.line.remove();
+        this.connections.delete(connectionId);
+        console.log(`[V53.0] Neural Link severed: ${connectionId}`);
+      }
+    },
+    
+    // Clear all connections
+    clearAll: function() {
+      this.connections.forEach((_, id) => this.disconnect(id));
+      console.log("[V53.0] All Neural Links cleared");
     },
   },
 
@@ -197,19 +459,17 @@ const SovereignSingularity = {
           el.style.setProperty('left', '0', 'important');
           el.classList.add('cellular-active');
         });
-      } catch (e) {
-        // Selector may not exist
-      }
+      } catch (e) {}
     });
 
     console.log("[V53.0] Ghostbuster Complete. Glass screens shattered.");
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // HOT SWAP (V52.0 — preserved with V53.0 additions)
+  // HOT SWAP — BOOT ALL SYSTEMS
   // ═══════════════════════════════════════════════════════════════════════════
   hotSwap: function() {
-    console.log("[V53.0] BIO-DIGITAL OSMOSIS: Initializing Foundation Stack...");
+    console.log("[V53.0] 🚀 BIO-DIGITAL OSMOSIS: Booting Full Stack...");
     
     // A. Kill grid on root
     const root = document.getElementById('root');
@@ -242,18 +502,28 @@ const SovereignSingularity = {
       stopBtn.style.pointerEvents = 'auto';
     }
 
-    // E. START GHOST WATCH (Step 10)
+    // E. TIER 1: Start Ghost Watch (Step 10)
     this.ghostWatch.start();
 
-    // F. Sync CPU
+    // F. TIER 2: Initialize Radiating Membranes (Step 4)
+    this.membranes.init();
+
+    // G. TIER 2: Initialize Neural Connector Layer (Step 8)
+    this.neural.init();
+
+    // H. Sync CPU
     this.cpu.sync();
     
-    console.log("[V53.0] FOUNDATION STACK COMPLETE: Ghost Watch Active, Haptic Ready, DNA Morph Online");
-    return { status: "OSMOSIS_ACTIVE", ghostWatch: "RUNNING", haptic: "BOUND", dnaMorph: "READY" };
+    console.log("[V53.0] ✅ FULL STACK BOOTED: Tier 1 (Foundation) + Tier 2 (Immersion) ONLINE");
+    return { 
+      status: "OSMOSIS_ACTIVE", 
+      tier1: { ghostWatch: "RUNNING", haptic: "BOUND", dnaMorph: "READY" },
+      tier2: { membranes: "RADIATING", collision: "READY", neural: "INITIALIZED" }
+    };
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // NANOID CLASS (V52.0 — preserved)
+  // NANOID CLASS — Upgraded with Tier 2 features
   // ═══════════════════════════════════════════════════════════════════════════
   Nanoid: class {
     constructor(moduleId) {
@@ -262,7 +532,9 @@ const SovereignSingularity = {
       this.nucleusColor = '#a855f7';
       this.cellWallColor = '#1e1e2e';
       this.bitsContainer = [];
-      this.frequency = 528; // Default to Love/DNA Repair
+      this.frequency = 528;
+      this.intensity = 'medium';
+      this.connections = [];
     }
 
     onDetach() {
@@ -278,61 +550,80 @@ const SovereignSingularity = {
       if (dataBit.frequency) this.frequency = dataBit.frequency;
       this.coreState = 'sphere-active';
       
-      // Trigger DNA Morph with haptic
+      // DNA Morph with haptic
       SovereignSingularity.dnaMorph.morphNucleus(this.moduleId, this.nucleusColor, this.frequency);
       
-      console.log(`[V53.0] Nanoid ${this.moduleId}: Absorbed bit. Color: ${this.nucleusColor}, Freq: ${this.frequency}Hz`);
+      // Update intensity based on data weight
+      const weight = this.bitsContainer.length;
+      if (weight >= 10) this.intensity = 'critical';
+      else if (weight >= 5) this.intensity = 'high';
+      else if (weight >= 2) this.intensity = 'medium';
+      else this.intensity = 'low';
+      
+      const el = document.getElementById(this.moduleId);
+      if (el) SovereignSingularity.membranes.setIntensity(el, this.intensity);
+      
+      console.log(`[V53.0] Nanoid ${this.moduleId}: Absorbed. Weight: ${weight}, Intensity: ${this.intensity}`);
       return this;
     }
 
     onRelease() {
       const bit = this.bitsContainer.shift();
-      SovereignSingularity.haptic.trigger([50, 30, 80]); // Lighter release pattern
+      SovereignSingularity.haptic.trigger([50, 30, 80]);
       console.log(`[V53.0] Nanoid ${this.moduleId}: Released bit`);
       return bit;
+    }
+
+    connectTo(otherNanoidId, color = 'rgba(168,85,247,0.4)') {
+      const connectionId = SovereignSingularity.neural.connect(this.moduleId, otherNanoidId, color);
+      if (connectionId) this.connections.push(connectionId);
+      return connectionId;
+    }
+
+    disconnectFrom(otherNanoidId) {
+      const connectionId = `neural-${this.moduleId}-${otherNanoidId}`;
+      SovereignSingularity.neural.disconnect(connectionId);
+      this.connections = this.connections.filter(id => id !== connectionId);
     }
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // NERVE TEST (V53.0)
+  // NERVE TEST (V53.0 FULL STACK)
   // ═══════════════════════════════════════════════════════════════════════════
   runNerveTest: async function() {
-    console.log("[V53.0] STARTING FOUNDATION STACK NERVE TEST...");
+    console.log("[V53.0] STARTING FULL STACK NERVE TEST...");
     
     const results = {
-      ghostWatch: false,
-      haptic: false,
-      dnaMorph: false,
+      tier1: { ghostWatch: false, haptic: false, dnaMorph: false },
+      tier2: { membranes: false, collision: false, neural: false },
       stopButton: false,
       crystalsPage: false,
     };
 
-    // A. Ghost Watch running?
-    results.ghostWatch = this.ghostWatch.intervalId !== null;
-    console.log(`[CHECK] Ghost Watch: ${results.ghostWatch ? 'ACTIVE' : 'INACTIVE'}`);
+    // TIER 1 CHECKS
+    results.tier1.ghostWatch = this.ghostWatch.intervalId !== null;
+    results.tier1.haptic = "vibrate" in navigator;
+    results.tier1.dnaMorph = typeof this.dnaMorph.morphNucleus === 'function';
+    
+    // TIER 2 CHECKS
+    results.tier2.membranes = this.membranes.initialized;
+    results.tier2.collision = typeof this.collision.checkAABB === 'function';
+    results.tier2.neural = this.neural.svgContainer !== null;
 
-    // B. Haptic available?
-    results.haptic = "vibrate" in navigator;
-    console.log(`[CHECK] Haptic: ${results.haptic ? 'AVAILABLE' : 'NOT SUPPORTED'}`);
-
-    // C. DNA Morph ready?
-    results.dnaMorph = typeof this.dnaMorph.morphNucleus === 'function';
-    console.log(`[CHECK] DNA Morph: ${results.dnaMorph ? 'READY' : 'OFFLINE'}`);
-
-    // D. STOP Button visible?
+    // STOP Button
     const stopBtn = document.querySelector('[data-testid="emergency-stop-btn-v31"]');
     results.stopButton = stopBtn ? window.getComputedStyle(stopBtn).display !== 'none' : false;
-    console.log(`[CHECK] STOP Button: ${results.stopButton ? 'VISIBLE' : 'HIDDEN'}`);
 
-    // E. Crystals page visibility
+    // Crystals page
     const crystalsPage = document.querySelector('[data-testid="crystals-page"]');
     if (crystalsPage) {
       const style = window.getComputedStyle(crystalsPage);
       results.crystalsPage = style.visibility !== 'hidden' && style.opacity !== '0';
-      console.log(`[CHECK] Crystals Page: ${results.crystalsPage ? 'VISIBLE' : 'HIDDEN'}`);
     }
 
-    console.log("[V53.0] FOUNDATION NERVE TEST COMPLETE");
+    console.log("[V53.0] TIER 1:", results.tier1);
+    console.log("[V53.0] TIER 2:", results.tier2);
+    console.log("[V53.0] FULL STACK NERVE TEST COMPLETE");
     return results;
   },
 
@@ -348,7 +639,6 @@ const SovereignSingularity = {
       this.hotSwap();
     }
     
-    // Re-run after route changes
     window.addEventListener('popstate', () => {
       setTimeout(() => this.hotSwap(), 100);
     });
@@ -360,13 +650,19 @@ const SovereignSingularity = {
     window.SovereignRestore = { execute: () => this.hotSwap() };
     window.Nanoid = this.Nanoid;
     
-    // Expose foundation stack shortcuts
+    // Tier 1 shortcuts
     window.ghostWatch = this.ghostWatch;
     window.haptic = this.haptic;
     window.dnaMorph = this.dnaMorph;
     
-    console.log("[V53.0] BIO-DIGITAL OSMOSIS ENGINE LOADED");
-    console.log("[V53.0] Foundation Stack: Ghost Watch | Haptic Absorption | DNA Morphing");
+    // Tier 2 shortcuts
+    window.membranes = this.membranes;
+    window.collision = this.collision;
+    window.neural = this.neural;
+    
+    console.log("[V53.0] 🚀 BIO-DIGITAL OSMOSIS ENGINE LOADED");
+    console.log("[V53.0] Tier 1: Ghost Watch | Haptic | DNA Morph");
+    console.log("[V53.0] Tier 2: Membranes | Collision | Neural");
   },
 };
 
