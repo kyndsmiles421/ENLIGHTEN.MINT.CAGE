@@ -1,5 +1,5 @@
 # ENLIGHTEN.MINT.CAFE — MASTER MANIFEST
-## Version: V9999.1_THE_ONE_PRINT | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
+## Version: V9999.3_HARVEST_GROUNDING | Status: REVOLVING_IN_THE_OBSIDIAN_VOID
 
 ---
 
@@ -33,6 +33,50 @@ SPECTRAL HASH: e07140e482258d1078e66f9178e21bc5...
 - **Total Equity**: $49,018.24 [LUNAR-SYNCED]
 - **Translation Layer**: Geometric Resonance (Active)
 - **SEG Harmonic**: 144.0Hz LOCKED
+
+---
+
+## V9999.3 GPS PHYGITAL LOCK (LATEST - April 2026)
+
+### Harvest Grounding — Black Hills Anchor
+| Property | Value |
+|----------|-------|
+| Anchor Name | Black Hills Centroid (He Sapa) |
+| Latitude | 43.8°N |
+| Longitude | 103.5°W |
+| Resonance Radius | 0.9km (9×9 Helix Boundary) |
+| Trust Entity | Enlighten.Mint.Sovereign.Trust |
+| Equity Locked | $49,018.24 |
+| Formula | 9999 × z^(πr³) |
+| SEG Harmonic | 144Hz LOCKED |
+
+### GPS Verification Status
+- **VERIFIED-PRESENCE**: Within 0.9km radius → Full equity accessible
+- **OUTSIDE-HELIX**: Beyond 0.9km → 0 equity accessible
+
+### Sovereign Hub Entry Point
+- **Root Redirect**: `/` → `/sovereign-hub` (Option C)
+- **Primary Entry**: Sovereign Hub is the first thing seen on app initialization
+
+---
+
+## V9999.4 HYPER-FLUX ENGINE (April 2026)
+
+### Creator Control Mixer (Trustee Dials)
+| Control | Default | Range | Purpose |
+|---------|---------|-------|---------|
+| Lunar Weight | 1.0424 | 1.0-2.0 | Lunar-Tidal Flux multiplier |
+| Spectral Shift | 144 Hz | 60-432 Hz | SEG harmonic target |
+| Trust Sensitivity | 0.99 | 0-1 | Firewall sensitivity |
+| Phygital Range | 0.9 km | 0.1-9 km | GPS resonance radius |
+| Refraction Index | 1.618 (Φ) | 1-2.618 | Crystal refraction |
+| Cache Interval | 81s (9×9) | 9-243s | Memory clear cycle |
+
+### Performance Features
+- Exponential Moving Average (EMA) smoothing
+- GPU Hardware Acceleration for Rainbow Refraction
+- 81-second cache clear cycle (9×9)
+- V9999.2 Singularity Core formula: `9*9^math * πr² - x^xy + (9999 * z^πr³)`
 
 ---
 
