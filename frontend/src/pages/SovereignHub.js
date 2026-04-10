@@ -1,5 +1,5 @@
 /**
- * ENLIGHTEN.MINT.CAFE - V10011.0 SOVEREIGN HUB — OMEGA ARCHITECT
+ * ENLIGHTEN.MINT.CAFE - V10013.0 SOVEREIGN HUB — OMNI-EXPANSION
  * 
  * THE OBSIDIAN VOID — Unified Singularity Interface
  * 
@@ -7,6 +7,8 @@
  * V10007.0 OMNIS-INTERCONNECT: Master Weaver | Holographic Art Overlay
  * V10010.0 DIRECTOR'S CUT: Multi-Track Timeline | Sovereign Movie
  * V10011.0 OMEGA ARCHITECT: Final 10 Moves | Perplexity Deep Dive
+ * V10012.0 SINGULARITY NEXUS: Communications | Quest System
+ * V10013.0 OMNI-EXPANSION: Global Nodal Map | World Law Broadcast | Moves 11-20
  * 
  * FEATURES:
  * - Zen-Flow HUD (No buttons for Tier 2+, gesture navigation)
@@ -16,6 +18,7 @@
  * - Time-based Knowledge Equity billing
  * - Director Timeline (PowerDirector-style multi-track)
  * - Deep Dive Search (Perplexity-style threaded synthesis)
+ * - Global Nodal Map (Refracted Crystal Rainbow world projection)
  * 
  * Theme: Obsidian Void / Refracted Crystal / 144Hz
  */
@@ -29,7 +32,7 @@ import {
   Activity, Lock, Unlock, Send, FileText, MapPin, Radio,
   ChevronRight, ExternalLink, Copy, CheckCircle, Sliders,
   RefreshCw, Navigation, Vibrate, Repeat, BookOpen, 
-  Paintbrush, Scale, Heart, Triangle, Circle, Film, Search
+  Paintbrush, Scale, Heart, Triangle, Circle, Film, Search, Map
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CreatorMixer from '../components/CreatorMixer';
@@ -37,12 +40,14 @@ import CircularProtocol from '../components/CircularProtocol';
 import AcademyPortal from '../components/AcademyPortal';
 import DirectorTimeline from '../components/DirectorTimeline';
 import DeepDiveSearch from '../components/DeepDiveSearch';
+import GlobalNodalMap from '../components/GlobalNodalMap';
 import HyperFluxEngine, { BLACK_HILLS_ANCHOR } from '../utils/HyperFluxEngine';
 import OmnisExecution from '../utils/OmnisExecution';
 import BiometricSync from '../utils/BiometricSync';
 import OmnisInterconnect from '../utils/OmnisInterconnect';
 import OmnisNexus from '../utils/OmnisNexus';
 import OmnisDirect from '../utils/OmnisDirect';
+import OmniExpansion from '../utils/OmniExpansion';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -529,6 +534,10 @@ export default function SovereignHub() {
   const [deepDiveOpen, setDeepDiveOpen] = useState(false);
   const [omegaSealed, setOmegaSealed] = useState(false);
   
+  // V10013.0 Omni-Expansion States
+  const [globalMapOpen, setGlobalMapOpen] = useState(false);
+  const [expansionStatus, setExpansionStatus] = useState(null);
+  
   // Initialize V10000.0 Singularity on mount
   useEffect(() => {
     // Initialize core engines
@@ -543,13 +552,16 @@ export default function SovereignHub() {
     // V10010.0 Initialize Omnis-Direct (Director + Omega)
     OmnisDirect.init();
     
+    // V10013.0 Initialize Omni-Expansion
+    OmniExpansion.init();
+    
     // Engage the Singularity
     const engageSingularity = async () => {
       const status = await OmnisExecution.checkPulse();
       if (status.status === 'ACTIVE') {
         OmnisExecution.engageFractalEngine();
         setSingularityEngaged(true);
-        console.log('Ω V10011.0 OMEGA ARCHITECT ENGAGED');
+        console.log('Ω V10013.0 OMNI-EXPANSION ENGAGED');
         
         // Execute unified singularity handshake
         const interconnect = OmnisInterconnect.executeSingularity();
@@ -558,6 +570,18 @@ export default function SovereignHub() {
     };
     
     engageSingularity();
+    
+    // Fetch expansion status
+    const fetchExpansionStatus = async () => {
+      try {
+        const res = await axios.get(`${API}/omnis/expansion/status`);
+        setExpansionStatus(res.data);
+      } catch (e) {
+        console.log('Expansion status fetch skipped');
+      }
+    };
+    
+    fetchExpansionStatus();
     
     // Fetch interconnect status
     const fetchInterconnectStatus = async () => {
@@ -844,7 +868,7 @@ export default function SovereignHub() {
         className="text-center mb-8 relative z-20"
       >
         <p className="text-[10px] uppercase tracking-[0.3em] mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          V10011.0 • Omega Architect • {userTier >= 2 ? 'Director Mode' : 'Standard Mode'}
+          V10013.0 • Omni-Expansion • {userTier >= 2 ? 'Director Mode' : 'Standard Mode'}
         </p>
         <h1 
           className="text-3xl md:text-4xl font-bold"
@@ -859,7 +883,7 @@ export default function SovereignHub() {
         </h1>
         
         {/* Director Controls */}
-        <div className="flex items-center justify-center gap-2 mt-4">
+        <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
           {/* Deep Dive Search Button */}
           <button
             onClick={() => setDeepDiveOpen(true)}
@@ -890,14 +914,29 @@ export default function SovereignHub() {
             Timeline
           </button>
           
+          {/* Global Nodal Map Button */}
+          <button
+            onClick={() => setGlobalMapOpen(true)}
+            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
+            style={{
+              background: 'rgba(34,197,94,0.2)',
+              border: '1px solid rgba(34,197,94,0.4)',
+              color: '#86EFAC',
+            }}
+            data-testid="global-map-btn"
+          >
+            <Map size={12} />
+            Global Map
+          </button>
+          
           {/* Zen-Flow Toggle */}
           <button
             onClick={toggleZenFlow}
             className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all"
             style={{
-              background: zenFlowEnabled ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${zenFlowEnabled ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'}`,
-              color: zenFlowEnabled ? '#86EFAC' : 'rgba(255,255,255,0.4)',
+              background: zenFlowEnabled ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.05)',
+              border: `1px solid ${zenFlowEnabled ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.1)'}`,
+              color: zenFlowEnabled ? '#FDBA74' : 'rgba(255,255,255,0.4)',
             }}
             data-testid="zen-flow-toggle"
           >
@@ -1272,10 +1311,10 @@ export default function SovereignHub() {
           9×9^math × πr² - x^xy + (9999 × z^πr³) Active
         </p>
         <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
-          V10011.0 OMEGA ARCHITECT | Tier {userTier}: {['Apprentice', 'Trustee', 'Grand Architect'][userTier] || 'Grand Architect'}
+          V10013.0 OMNI-EXPANSION | {expansionStatus?.nodal_map?.active_nodes || 3}/{expansionStatus?.nodal_map?.total_nodes || 7} Nodes Active
         </p>
-        <p className="text-[10px] mt-1" style={{ color: 'rgba(139,92,246,0.4)' }}>
-          {sessionActive ? 'Learning Session Active — Equity Tracking' : 'IT IS FINISHED. THE SINGULARITY IS SEALED.'}
+        <p className="text-[10px] mt-1" style={{ color: 'rgba(34,197,94,0.4)' }}>
+          {sessionActive ? 'Learning Session Active — Equity Tracking' : 'NEXUS LIVE — GLOBAL EXPANSION MODE'}
         </p>
       </footer>
 
@@ -1349,6 +1388,12 @@ export default function SovereignHub() {
       <DeepDiveSearch 
         isOpen={deepDiveOpen} 
         onClose={() => setDeepDiveOpen(false)}
+      />
+      
+      {/* V10013.0 Global Nodal Map */}
+      <GlobalNodalMap 
+        isOpen={globalMapOpen} 
+        onClose={() => setGlobalMapOpen(false)}
       />
     </div>
   );

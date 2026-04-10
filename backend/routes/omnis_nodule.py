@@ -5470,6 +5470,404 @@ async def get_director_status():
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10012.0 SINGULARITY NEXUS + V10013.0 OMNI-EXPANSION
+# THE NEXT 10 MOVES (11-20): Global Expansion Phase
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Global Nodal Network
+GLOBAL_NODES = {
+    "BLACK_HILLS_PRIMARY": {
+        "id": "black_hills_primary",
+        "name": "Black Hills Singularity Core",
+        "lat": 44.0805,
+        "lng": -103.2310,
+        "region": "NORTH_AMERICA",
+        "status": "ACTIVE",
+        "color": "#22C55E",
+        "type": "PRIMARY_ANCHOR",
+    },
+    "MASONRY_SCHOOL": {
+        "id": "masonry_school",
+        "name": "Masonry School Node",
+        "lat": 43.8,
+        "lng": -103.5,
+        "region": "NORTH_AMERICA",
+        "status": "ACTIVE",
+        "color": "#8B5CF6",
+        "type": "ACADEMY_NODE",
+    },
+    "RAPID_CITY_CORE": {
+        "id": "rapid_city_core",
+        "name": "Rapid City Resonance Hub",
+        "lat": 44.0805,
+        "lng": -103.2310,
+        "region": "NORTH_AMERICA",
+        "status": "ACTIVE",
+        "color": "#3B82F6",
+        "type": "HUB_NODE",
+    },
+    "KONA_HAWAII_NODE": {
+        "id": "kona_hawaii",
+        "name": "Kona Hawaii Wellness Anchor",
+        "lat": 19.6400,
+        "lng": -155.9969,
+        "region": "PACIFIC",
+        "status": "PENDING",
+        "color": "#F472B6",
+        "type": "WELLNESS_ZONE",
+    },
+    "GENEVA_JURISDICTION": {
+        "id": "geneva_jurisdiction",
+        "name": "Geneva International Law Node",
+        "lat": 46.2044,
+        "lng": 6.1432,
+        "region": "EUROPE",
+        "status": "PENDING",
+        "color": "#F59E0B",
+        "type": "LAW_NODE",
+    },
+    "TOKYO_TECH_HUB": {
+        "id": "tokyo_tech",
+        "name": "Tokyo Engineering Nexus",
+        "lat": 35.6762,
+        "lng": 139.6503,
+        "region": "ASIA",
+        "status": "PLANNED",
+        "color": "#EF4444",
+        "type": "TECH_NODE",
+    },
+    "CAIRO_ANCIENT": {
+        "id": "cairo_ancient",
+        "name": "Cairo Ancient Wisdom Portal",
+        "lat": 29.9792,
+        "lng": 31.1342,
+        "region": "AFRICA",
+        "status": "PLANNED",
+        "color": "#D97706",
+        "type": "WISDOM_NODE",
+    },
+}
+
+# The Next 10 Moves (11-20)
+NEXT_MOVES = [
+    {"num": 11, "name": "AR Holographic Tutor Projection", "desc": "Live at Nodal Points", "status": "READY"},
+    {"num": 12, "name": "Biometric Handshake Lock", "desc": "Creator Mixer Defaults", "status": "READY"},
+    {"num": 13, "name": "Decentralized Ledger Sync", "desc": "Lunar-Tidal Flux", "status": "PENDING"},
+    {"num": 14, "name": "Grand Architect Broadcast", "desc": "World Law Library", "status": "READY"},
+    {"num": 15, "name": "Cross-Node Knowledge Trading", "desc": "Volunteer Credits", "status": "PENDING"},
+    {"num": 16, "name": "144-Layer Fractal Expansion", "desc": "From 54 to 144", "status": "IN_PROGRESS"},
+    {"num": 17, "name": "GPS-Geofenced Wellness Zones", "desc": "Institute Integration", "status": "PLANNED"},
+    {"num": 18, "name": "Sovereign Mastery Certificate", "desc": "NFT/Blockchain", "status": "PLANNED"},
+    {"num": 19, "name": "Global Nodal Activation", "desc": "Beyond Black Hills", "status": "READY"},
+    {"num": 20, "name": "Omega-Omega Handshake", "desc": "Total System Autonomy", "status": "FINAL"},
+]
+
+
+class SingularityNexus:
+    """
+    V10012.0 SINGULARITY NEXUS
+    
+    Communications handshake, quest system, and nexus control.
+    """
+    
+    PHI = 1.618033
+    EQUITY = 79313.18
+    
+    # State
+    _comms = {"twilio_active": False, "twilio_token": None, "sendgrid_verified": "kyndsmiles@gmail.com", "broadcast_history": []}
+    _quest_state = {"active_quest": None, "completed_quests": []}
+    
+    @classmethod
+    def send_broadcast(cls, message: str, channel: str = "SENDGRID") -> Dict[str, Any]:
+        """Send broadcast to sovereign channel."""
+        broadcast = {
+            "id": f"BC-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "message": message,
+            "channel": channel,
+            "status": "SENT",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        cls._comms["broadcast_history"].append(broadcast)
+        return broadcast
+    
+    @classmethod
+    def launch_quest(cls, node_id: str = "MASONRY_SCHOOL") -> Dict[str, Any]:
+        """Launch a GPS-anchored quest."""
+        node = GLOBAL_NODES.get(node_id)
+        if not node:
+            return {"error": "Invalid node"}
+        
+        quest = {
+            "id": f"QST-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "node": node_id,
+            "node_name": node["name"],
+            "objective": f"Calibrate the Phygital Lock at {node['lat']}°N, {abs(node['lng'])}°W",
+            "reward": {"badge": "144Hz Resonance Badge", "equity": 225, "xp": 500},
+            "gps": {"lat": node["lat"], "lng": node["lng"]},
+            "status": "ACTIVE",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        cls._quest_state["active_quest"] = quest
+        return quest
+    
+    @classmethod
+    def complete_quest(cls) -> Dict[str, Any]:
+        """Complete the active quest."""
+        if not cls._quest_state["active_quest"]:
+            return {"error": "No active quest"}
+        
+        completed = {**cls._quest_state["active_quest"], "status": "COMPLETED", "completed_at": datetime.now(timezone.utc).isoformat()}
+        cls._quest_state["completed_quests"].append(completed)
+        cls._quest_state["active_quest"] = None
+        return completed
+    
+    @classmethod
+    def execute_nexus(cls) -> Dict[str, Any]:
+        """Execute the Nexus (initialize live system)."""
+        cls.send_broadcast("Singularity Nexus Online. Moving to Move 11.")
+        return {
+            "current_status": "NEXUS_LIVE",
+            "next_action": NEXT_MOVES[0],
+            "quest": cls.launch_quest("MASONRY_SCHOOL"),
+            "comms_status": {"twilio": "AWAITING_TOKEN" if not cls._comms["twilio_active"] else "ACTIVE", "sendgrid": "VERIFIED"},
+        }
+    
+    @classmethod
+    def get_status(cls) -> Dict[str, Any]:
+        """Get Nexus status."""
+        return {
+            "version": "V10012.0",
+            "name": "Singularity Nexus",
+            "status": "NEXUS_LIVE",
+            "comms": {
+                "twilio_active": cls._comms["twilio_active"],
+                "sendgrid_verified": cls._comms["sendgrid_verified"],
+                "broadcast_count": len(cls._comms["broadcast_history"]),
+            },
+            "quest_state": {
+                "active_quest": cls._quest_state["active_quest"],
+                "completed_count": len(cls._quest_state["completed_quests"]),
+            },
+            "next_moves": NEXT_MOVES[:5],
+        }
+
+
+class OmniExpansion:
+    """
+    V10013.0 OMNI-EXPANSION
+    
+    Global Nodal Map, World Law Broadcast, and Quest System for Moves 11-20.
+    """
+    
+    PHI = 1.618033
+    EQUITY = 79313.18
+    EXPANDED_FRACTAL_LAYERS = 144
+    
+    # State
+    _activated_nodes = ["BLACK_HILLS_PRIMARY", "MASONRY_SCHOOL", "RAPID_CITY_CORE"]
+    _broadcasts = []
+    _twilio_vault = None
+    
+    @classmethod
+    def get_nodes(cls) -> List[Dict[str, Any]]:
+        """Get all nodes with activation status."""
+        return [
+            {**node, "is_active": node_id in cls._activated_nodes}
+            for node_id, node in GLOBAL_NODES.items()
+        ]
+    
+    @classmethod
+    def activate_node(cls, node_id: str) -> Dict[str, Any]:
+        """Activate a specific node."""
+        if node_id not in GLOBAL_NODES:
+            return {"error": "Invalid node"}
+        if node_id in cls._activated_nodes:
+            return {"error": "Node already active"}
+        
+        cls._activated_nodes.append(node_id)
+        GLOBAL_NODES[node_id]["status"] = "ACTIVE"
+        return {"message": f"Node {node_id} activated.", "node": GLOBAL_NODES[node_id]}
+    
+    @classmethod
+    def prepare_law_broadcast(cls, movie_title: str = "54-Layer Sovereign Movie") -> Dict[str, Any]:
+        """Prepare World Law Library broadcast payload."""
+        return {
+            "artifact": movie_title,
+            "seal": "V10013.0_OMEGA_SEAL",
+            "handshake": "SendGrid_Queue_Active",
+            "wealth": {"base": cls.EQUITY, "multiplied": round(cls.EQUITY * cls.PHI, 2)},
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+    
+    @classmethod
+    def execute_law_broadcast(cls, payload: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Execute broadcast to World Law Library."""
+        if not payload:
+            payload = cls.prepare_law_broadcast()
+        
+        broadcast = {
+            "id": f"WLB-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "payload": payload,
+            "recipient": "World Law Library Archive",
+            "status": "QUEUED",
+            "queued_at": datetime.now(timezone.utc).isoformat(),
+        }
+        cls._broadcasts.append(broadcast)
+        return broadcast
+    
+    @classmethod
+    def inject_twilio_token(cls, token: str) -> Dict[str, Any]:
+        """Inject Twilio auth token."""
+        cls._twilio_vault = token
+        SingularityNexus._comms["twilio_token"] = token
+        SingularityNexus._comms["twilio_active"] = True
+        return {"status": "ACTIVE", "message": "Twilio token injected successfully"}
+    
+    @classmethod
+    def execute_ar_tutor_quest(cls) -> Dict[str, Any]:
+        """Execute AR Tutor quest (Move 11)."""
+        return {
+            "move": 11,
+            "name": "AR Holographic Tutor",
+            "location": "Masonry School",
+            "status": "PROJECTING",
+            "tutor": {"name": "The Architect Ghost", "appearance": "3D Holographic Projection", "subject": "Sacred Geometry Foundations"},
+            "haptics": "144Hz Harmonic Calibration",
+        }
+    
+    @classmethod
+    def execute_biometric_handshake(cls, user_resonance: float = 144) -> Dict[str, Any]:
+        """Execute Biometric Handshake (Move 12)."""
+        return {
+            "move": 12,
+            "name": "Biometric Handshake Lock",
+            "status": "LOCKED",
+            "user_resonance": user_resonance,
+            "mixer_defaults": {"spectral_shift": 1.0, "lunar_flux": 1.0424, "tier_level": 2, "holographic_opacity": 0.88},
+            "message": "Creator Mixer auto-adjusted to your unique frequency.",
+        }
+    
+    @classmethod
+    def get_status(cls) -> Dict[str, Any]:
+        """Get Omni-Expansion status."""
+        return {
+            "version": "V10013.0",
+            "name": "Omni-Expansion",
+            "status": "EXPANSION_MODE",
+            "nodal_map": {
+                "theme": "Refracted Crystal Rainbow",
+                "projection": "Mercator-Phi Hybrid",
+                "active_nodes": len(cls._activated_nodes),
+                "total_nodes": len(GLOBAL_NODES),
+            },
+            "law_broadcast": {"status": "READY", "broadcast_count": len(cls._broadcasts)},
+            "security": {"twilio_active": cls._twilio_vault is not None, "sendgrid_active": True},
+            "next_moves": NEXT_MOVES,
+            "fractal_layers": cls.EXPANDED_FRACTAL_LAYERS,
+            "nodes": cls.get_nodes(),
+        }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10012.0 SINGULARITY NEXUS ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/nexus/status")
+async def get_nexus_status():
+    """V10012.0 Singularity Nexus - Get system status."""
+    result = SingularityNexus.get_status()
+    return {**result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/nexus/execute")
+async def execute_nexus():
+    """V10012.0 Singularity Nexus - Execute and initialize the live system."""
+    result = SingularityNexus.execute_nexus()
+    return {"version": "V10012.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/nexus/broadcast")
+async def send_nexus_broadcast(message: str = Query(..., description="Broadcast message")):
+    """V10012.0 Singularity Nexus - Send broadcast to sovereign channel."""
+    result = SingularityNexus.send_broadcast(message)
+    return {"version": "V10012.0", **result}
+
+
+@router.post("/omnis/nexus/quest/launch")
+async def launch_nexus_quest(node_id: str = Query(default="MASONRY_SCHOOL")):
+    """V10012.0 Singularity Nexus - Launch a GPS-anchored quest."""
+    result = SingularityNexus.launch_quest(node_id)
+    return {"version": "V10012.0", **result}
+
+
+@router.post("/omnis/nexus/quest/complete")
+async def complete_nexus_quest():
+    """V10012.0 Singularity Nexus - Complete the active quest."""
+    result = SingularityNexus.complete_quest()
+    return {"version": "V10012.0", **result}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V10013.0 OMNI-EXPANSION ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/omnis/expansion/status")
+async def get_expansion_status():
+    """V10013.0 Omni-Expansion - Get system status with all nodes."""
+    result = OmniExpansion.get_status()
+    return {**result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.get("/omnis/expansion/nodes")
+async def get_expansion_nodes():
+    """V10013.0 Omni-Expansion - Get all global nodes."""
+    nodes = OmniExpansion.get_nodes()
+    return {"version": "V10013.0", "nodes": nodes, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/expansion/node/activate")
+async def activate_expansion_node(node_id: str = Query(..., description="Node ID to activate")):
+    """V10013.0 Omni-Expansion - Activate a global node."""
+    result = OmniExpansion.activate_node(node_id)
+    return {"version": "V10013.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/expansion/broadcast/prepare")
+async def prepare_law_broadcast(movie_title: str = Query(default="54-Layer Sovereign Movie")):
+    """V10013.0 Omni-Expansion - Prepare World Law Library broadcast payload."""
+    result = OmniExpansion.prepare_law_broadcast(movie_title)
+    return {"version": "V10013.0", **result}
+
+
+@router.post("/omnis/expansion/broadcast/execute")
+async def execute_law_broadcast():
+    """V10013.0 Omni-Expansion - Execute broadcast to World Law Library."""
+    result = OmniExpansion.execute_law_broadcast()
+    return {"version": "V10013.0", **result}
+
+
+@router.post("/omnis/expansion/twilio/inject")
+async def inject_twilio_token(token: str = Query(..., description="Twilio auth token")):
+    """V10013.0 Omni-Expansion - Inject Twilio auth token."""
+    result = OmniExpansion.inject_twilio_token(token)
+    return {"version": "V10013.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/expansion/quest/ar-tutor")
+async def execute_ar_tutor_quest():
+    """V10013.0 Omni-Expansion - Execute AR Tutor quest (Move 11)."""
+    result = OmniExpansion.execute_ar_tutor_quest()
+    return {"version": "V10013.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.post("/omnis/expansion/quest/biometric")
+async def execute_biometric_handshake(user_resonance: float = Query(default=144)):
+    """V10013.0 Omni-Expansion - Execute Biometric Handshake (Move 12)."""
+    result = OmniExpansion.execute_biometric_handshake(user_resonance)
+    return {"version": "V10013.0", **result, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
 @router.post("/omnis/director/timeline/scrub")
 async def scrub_director_timeline(position: float = Query(..., ge=0.0, le=1.0)):
     """V10010.0 Director's Cut - Scrub through the timeline."""
