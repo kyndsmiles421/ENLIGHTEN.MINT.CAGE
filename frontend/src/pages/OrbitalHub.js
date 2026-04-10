@@ -780,7 +780,7 @@ export default function OrbitalHub() {
             pointerEvents: 'none',
           }}
         >
-          {/* ═══ V43.0 TOUCH HITBOXES — KINETIC SNAP ENGINE ═══ */}
+          {/* ═══ V43.1 TOUCH HITBOXES — ZERO-LAG OCULAR SYNC ═══ */}
           {ALL_SATELLITES.map((sat, idx) => {
             const pos = subOrbPositions.current[sat.id] || { x: 0, y: 0 };
             const isExtracted = hubState === 'extracted' && sat.id === extractedId;
@@ -812,35 +812,45 @@ export default function OrbitalHub() {
                   transform: 'scale(1) translateZ(0px)',
                   zIndex: TOUCH_PLANE_Z_INDEX,
                   pointerEvents: 'auto',
-                  transition: 'transform 0.1s ease-out, box-shadow 0.1s ease-out',
                 }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   
-                  // V43.0: HEAVY MECHANICAL SNAP
+                  const btn = document.getElementById(`nodule-${sat.id}`);
+                  if (!btn) {
+                    window.location.href = sat.path;
+                    return;
+                  }
+                  
+                  // V43.1: KILL TRANSITION — INSTANT DISCHARGE
+                  btn.style.transition = 'none';
+                  
+                  // HAPTIC FIRE (Instant)
                   if (navigator.vibrate) navigator.vibrate(HAPTIC_HEAVY_SNAP);
                   
-                  const btn = document.getElementById(`nodule-${sat.id}`);
-                  if (btn) {
-                    // Compression phase
-                    btn.style.transform = `scale(${HEAVY_SCALE}) translateZ(0px)`;
-                    btn.style.boxShadow = `0 0 ${RESONANCE_FORCE * 3}px rgba(255,255,255,0.9)`;
+                  // VISUAL PULSE (Instant - Zero Lag)
+                  btn.style.boxShadow = `0 0 40px rgba(255, 255, 255, 1)`;
+                  btn.style.filter = 'brightness(2) contrast(1.5)';
+                  btn.style.transform = `scale(${HEAVY_SCALE}) translateZ(0px)`;
+                  
+                  console.log(`[V43.1] OCULAR RECEIPT: ${sat.id} @ ${solfeggioFreq}Hz`);
+                  
+                  // RECOIL (Controlled Spring-Back)
+                  setTimeout(() => {
+                    // Restore transition only for organic settle
+                    btn.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    btn.style.transform = `scale(${BOUNCE_SCALE}) translateZ(0px)`;
+                    if (navigator.vibrate) navigator.vibrate(HAPTIC_LIGHT_RELEASE);
                     
-                    // Bounce phase after 80ms
                     setTimeout(() => {
-                      btn.style.transform = `scale(${BOUNCE_SCALE}) translateZ(0px)`;
-                      if (navigator.vibrate) navigator.vibrate(HAPTIC_LIGHT_RELEASE);
-                      
-                      // Navigate after bounce settles
-                      setTimeout(() => {
-                        console.log(`[V43.0] DOWNLOAD: ${sat.id} → ${sat.path} @ ${solfeggioFreq}Hz`);
-                        window.location.href = sat.path;
-                      }, 100);
-                    }, 80);
-                  } else {
-                    window.location.href = sat.path;
-                  }
+                      btn.style.transform = 'scale(1) translateZ(0px)';
+                      btn.style.boxShadow = 'none';
+                      btn.style.filter = 'none';
+                      console.log(`[V43.1] DOWNLOAD: ${sat.id} → ${sat.path}`);
+                      window.location.href = sat.path;
+                    }, 150);
+                  }, 80);
                 }}
                 onMouseEnter={() => setHoveredSat(sat.id)}
                 onMouseLeave={() => setHoveredSat(null)}
