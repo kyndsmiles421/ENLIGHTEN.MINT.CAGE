@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CreatorMixer from '../components/CreatorMixer';
+import MixerV27 from '../components/MixerV27';
 import CircularProtocol from '../components/CircularProtocol';
 import AcademyPortal from '../components/AcademyPortal';
 import DirectorTimeline from '../components/DirectorTimeline';
@@ -503,7 +504,7 @@ function GaiaAnchorCard({ anchor, isPrimary }) {
  * V10007.0 — The Obsidian Void with Zen-Flow HUD
  */
 export default function SovereignHub() {
-  const { token, authHeaders } = useAuth();
+  const { token, authHeaders, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [onePrint, setOnePrint] = useState(null);
   const [spectralBands, setSpectralBands] = useState(null);
@@ -513,6 +514,7 @@ export default function SovereignHub() {
   const [showPurposeStatement, setShowPurposeStatement] = useState(false);
   const [purposeStatement, setPurposeStatement] = useState(null);
   const [mixerOpen, setMixerOpen] = useState(false);
+  const [physicsMixerOpen, setPhysicsMixerOpen] = useState(false);
   const [gpsLockStatus, setGpsLockStatus] = useState(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [biometricActive, setBiometricActive] = useState(false);
@@ -927,6 +929,21 @@ export default function SovereignHub() {
           >
             <Map size={12} />
             Global Map
+          </button>
+          
+          {/* Physics Mixer V27.0 Button */}
+          <button
+            onClick={() => setPhysicsMixerOpen(true)}
+            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.2))',
+              border: '1px solid rgba(139,92,246,0.5)',
+              color: '#C4B5FD',
+            }}
+            data-testid="physics-mixer-btn"
+          >
+            <Sliders size={12} />
+            Physics V27
           </button>
           
           {/* Zen-Flow Toggle */}
@@ -1395,6 +1412,14 @@ export default function SovereignHub() {
         isOpen={globalMapOpen} 
         onClose={() => setGlobalMapOpen(false)}
       />
+      
+      {/* V27.0 Physics Mixer - Crystal & Math License Interface */}
+      {physicsMixerOpen && (
+        <MixerV27 
+          userId={user?.email || 'default_user'}
+          onClose={() => setPhysicsMixerOpen(false)}
+        />
+      )}
     </div>
   );
 }
