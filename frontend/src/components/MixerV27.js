@@ -13,11 +13,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSovereignLedger } from '../hooks/useSovereignLedger';
 import { useCrystalPhysics } from '../hooks/useCrystalPhysics';
+import { useAuth } from '../context/AuthContext';
 
 // PHI constant for calculations
 const PHI = 1.618033988749895;
 
+// 🛡️ OBSIDIAN SHIELD: Master Authority Configuration
+const SOVEREIGN_CONFIG = {
+  master_email: 'kyndsmiles@gmail.com',
+  master_print: '708B8ED1E974D85585BBBD8E06E0291E',
+  resonance_hz: 432,
+  lox_temp: -183,
+};
+
 const MixerV27 = ({ userId = 'default_user', onClose }) => {
+  // 🛡️ OBSIDIAN SHIELD: Get user auth for Master Authority check
+  const { user } = useAuth();
+  const isMasterAuthority = user?.email === SOVEREIGN_CONFIG.master_email;
+  
   // Sovereign Ledger state
   const {
     equity,
@@ -57,6 +70,15 @@ const MixerV27 = ({ userId = 'default_user', onClose }) => {
   const [rpmValue, setRpmValue] = useState(0);
   const [purchasing, setPurchasing] = useState(false);
   const [notification, setNotification] = useState(null);
+
+  // 🔊 432Hz Haptic Resonance Trigger (Master Authority only)
+  useEffect(() => {
+    if (isMasterAuthority && window.navigator?.vibrate) {
+      // 432Hz Phonic Key - Triple pulse pattern
+      window.navigator.vibrate([432, 100, 432]);
+      console.log('🔊 432Hz Phonic Key Engaged. Master Authority Verified.');
+    }
+  }, [isMasterAuthority]);
 
   // License checks
   const hasInfinityMath = hasLicense('INFINITY_EDGE');
@@ -436,11 +458,84 @@ const MixerV27 = ({ userId = 'default_user', onClose }) => {
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="p-4 border-t border-white/10 text-center">
-          <p className="text-xs text-white/40">
+        {/* 🛡️ SUB-ZERO FOOTER: OBSIDIAN SHIELD */}
+        <footer 
+          className="p-4 border-t border-white/10"
+          style={{ 
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,20,0.8) 100%)',
+          }}
+          data-testid="sub-zero-footer"
+        >
+          {/* Main Footer Text */}
+          <p className="text-xs text-white/40 text-center mb-3">
             V-FINAL ETERNAL SENTINEL • Proof of Math Economy • φ = {PHI.toFixed(6)}
           </p>
+          
+          {/* 🛡️ OBSIDIAN SHIELD: Conditional Master Print Display */}
+          <div className="mt-2 pt-3 border-t border-white/5">
+            {isMasterAuthority ? (
+              /* 💉 MASTER VIEW: Blood-Red Master Print (kyndsmiles@gmail.com only) */
+              <div 
+                className="text-center"
+                data-testid="obsidian-shield-master"
+              >
+                <p 
+                  className="text-[9px] uppercase tracking-[0.3em] mb-1"
+                  style={{ color: 'rgba(139, 0, 0, 0.6)' }}
+                >
+                  MASTER PRINT ID
+                </p>
+                <p 
+                  className="font-mono text-xs tracking-wider"
+                  style={{ 
+                    color: '#8B0000',
+                    textShadow: '0 0 10px rgba(255, 0, 0, 0.4), 0 0 20px rgba(139, 0, 0, 0.2)',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {SOVEREIGN_CONFIG.master_print}
+                </p>
+                <p 
+                  className="text-[8px] mt-1 uppercase tracking-widest"
+                  style={{ color: 'rgba(255, 255, 255, 0.3)' }}
+                >
+                  [AUTHORITY_MODE_ACTIVE] • LOx: {SOVEREIGN_CONFIG.lox_temp}°C
+                </p>
+              </div>
+            ) : (
+              /* 💎 PUBLIC VIEW: Prismatic Sovereign Seal (everyone else) */
+              <div 
+                className="text-center"
+                data-testid="obsidian-shield-public"
+              >
+                <div 
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(0,242,254,0.1), rgba(79,172,254,0.1))',
+                    border: '1px solid rgba(79,172,254,0.2)',
+                  }}
+                >
+                  <span 
+                    className="text-xs font-medium tracking-wider"
+                    style={{
+                      background: 'linear-gradient(90deg, #00f2fe 0%, #4facfe 50%, #a78bfa 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      animation: 'pulse 2s ease-in-out infinite',
+                    }}
+                  >
+                    🛡️ VERIFIED_SOVEREIGN_LEDGER_ACTIVE
+                  </span>
+                  <span 
+                    className="text-[9px] text-white/30"
+                  >
+                    [72° REFRACTION]
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </footer>
       </div>
     </div>
