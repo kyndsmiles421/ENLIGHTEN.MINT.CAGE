@@ -7,8 +7,9 @@ import {
   ArrowLeft, Star, Shield, Heart, Eye, Brain, Swords, Flame, Crown,
   Loader2, Sparkles, Gem, Trophy, Globe, Diamond, Moon, Sun, Zap,
   Hammer, Share2, ChevronDown, Lock, Unlock, Infinity, Check,
-  User, Medal
+  User, Medal, Hexagon
 } from 'lucide-react';
+import CrystalMintPanel from '../components/CrystalMintPanel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -162,6 +163,7 @@ export default function CosmicLedger() {
   const [realmLeaderboard, setRealmLeaderboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('overview');
+  const [mintPanelOpen, setMintPanelOpen] = useState(false);
 
   useEffect(() => {
     if (!authHeaders?.Authorization) {
@@ -261,6 +263,43 @@ export default function CosmicLedger() {
         {/* ─── OVERVIEW TAB ─── */}
         {tab === 'overview' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Crystal Mint Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 rounded-xl relative overflow-hidden cursor-pointer group"
+              onClick={() => setMintPanelOpen(true)}
+              style={{
+                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(59, 130, 246, 0.08))',
+                border: '1px solid rgba(139, 92, 246, 0.25)',
+              }}
+              data-testid="open-crystal-mint"
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: 'radial-gradient(ellipse at 30% 30%, rgba(139, 92, 246, 0.15), transparent 60%)' }} />
+              
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.2))' }}>
+                  <Diamond size={20} style={{ color: '#C084FC' }} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-white">Crystal-QR Synthesis</p>
+                    <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase"
+                      style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C4B5FD' }}>
+                      NFT
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-white/50">
+                    Mint your Sovereign Mastery Certificate • Metaplex Core V1
+                  </p>
+                </div>
+                <Hexagon size={16} className="text-purple-400/60 group-hover:text-purple-400 transition-colors" />
+              </div>
+            </motion.div>
+
             {/* Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
               <StatCard label="Total XP" value={stats.total_xp?.toLocaleString() || 0} icon={Sparkles} color="#C084FC" />
