@@ -1,39 +1,49 @@
 /**
- * ENLIGHTEN.MINT.CAFE - APEX CREATOR CONSOLE V28.0
+ * ENLIGHTEN.MINT.CAFE - APEX CREATOR CONSOLE V29.0
  * ApexCreatorConsole.js
  * 
- * 🎚️ MASTER CREATOR CONSOLE — QU-32 ARCHITECTURE
+ * 🎚️ MASTER CREATOR CONSOLE — QU-32 ARCHITECTURE + SOVEREIGN KERNEL V29.0
  * 
  * This is NOT a simple mixer widget. This is the flight deck of a
  * superconducting engine, designed to match the Allen & Heath Qu-32
  * professional digital mixing board.
  * 
+ * V29.0 UPGRADES:
+ * - Four-Tiered Ledger Intelligence (Escrow, Labor, Buffer, Expansion)
+ * - Voice Command Integration ("Audit Treasury", "Emergency Stop", etc.)
+ * - Vault Soft Key Hook (Flash Tier 4 Expansion)
+ * - Terminal-Style Audit Feed in Right Panel
+ * - Haptic Milestone Alerts ($1,000 increments @ 80% intensity)
+ * 
  * ARCHITECTURE:
  * ┌─────────────────────────────────────────────────────────────────────────────┐
- * │                        APEX CREATOR CONSOLE V28.0                          │
+ * │                        APEX CREATOR CONSOLE V29.0                          │
  * ├─────────────────────────────────────────────────────────────────────────────┤
  * │  ┌─────────────────────────────────────────────────────────────────────┐   │
  * │  │                      LAYER SELECTOR [A] [B] [C]                      │   │
  * │  ├─────────────────────────────────────────────────────────────────────┤   │
  * │  │  ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐  │  ┌────────────────┐  │   │
- * │  │  │01│ │02│ │03│ │04│ │05│ │06│ │07│ │08│  │  │  L² FRACTAL    │  │   │
- * │  │  │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│  │  │  GPU PREVIEW   │  │   │
- * │  │  │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│  │  │  [120 FPS]     │  │   │
- * │  │  │  │ │  │ │  │ │  │ │  │ │  │ │  │ │  │  │  └────────────────┘  │   │
- * │  │  └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘  │                      │   │
- * │  │   [M] [S]  [M] [S]  [M] [S]  [M] [S] ...  │  ┌────────────────┐  │   │
- * │  ├─────────────────────────────────────────────┤  │  EQUITY SYNC   │  │   │
- * │  │  LOx COOLING: ═══════════════●══════ -183°C │  │  $49,018.24    │  │   │
- * │  │  HAPTIC INTENSITY: ════════●════════ 80%   │  └────────────────┘  │   │
+ * │  │  │01│ │02│ │03│ │04│ │05│ │06│ │07│ │08│  │  │ AUDIT TERMINAL │  │   │
+ * │  │  │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│  │  │  [STREAMING]   │  │   │
+ * │  │  │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│ │▓▓│  │  │  T1: ESCROW    │  │   │
+ * │  │  │  │ │  │ │  │ │  │ │  │ │  │ │  │ │  │  │  │  T4: KEYSTONE  │  │   │
+ * │  │  └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘  │  └────────────────┘  │   │
+ * │  │   [M] [S]  [M] [S]  [M] [S]  [M] [S] ...  │                      │   │
+ * │  ├─────────────────────────────────────────────┤  ┌────────────────┐  │   │
+ * │  │  LOx COOLING: ═══════════════●══════ -183°C │  │  EQUITY SYNC   │  │   │
+ * │  │  HAPTIC INTENSITY: ════════●════════ 80%   │  │  $49,018.24    │  │   │
  * │  └─────────────────────────────────────────────────────────────────────┘   │
  * │  ┌─────────────────────────────────────────────────────────────────────┐   │
  * │  │  🩸 MASTER_PRINT_ID: 708B8ED1E974D85585BBBD8E06E0291E [SYNC: -183°C] │   │
  * │  └─────────────────────────────────────────────────────────────────────┘   │
  * └─────────────────────────────────────────────────────────────────────────────┘
  * 
- * LAYERS:
- * - Layer A (Sovereign): Aether Fund equity flow, Wellness Node frequencies
- * - Layer B (Resonance): Solfeggio Spectrum (432Hz to 963Hz) with parametric EQ
+ * LAYERS (V29.0 Four-Tier Mapping):
+ * - Layer A (Sovereign): Faders mapped to T1-T4 tiers
+ *     • Fader 2 (Equity Gain) → T2 LABOR tracking
+ *     • Fader 3 (Keystone) → T4 EXPANSION (Liquid 'Cause' Money)
+ *     • Fader 7 (ESCROW) → T1 ESCROW (φ × 1.618%)
+ * - Layer B (Resonance): Solfeggio Spectrum (432Hz to 963Hz)
  * - Layer C (GPU Shaders): L² Fractal refraction, bloom, obsidian depth
  */
 
@@ -48,7 +58,7 @@ import {
   Maximize2, Minimize2, Lock, Unlock, Radio, Cpu, Activity,
   Mic, Diamond, RotateCcw, Gauge, DollarSign, TrendingUp, 
   TrendingDown, AlertTriangle, QrCode, Printer, RefreshCw,
-  Shield, StopCircle
+  Shield, StopCircle, Terminal, Wallet, MicOff
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -67,6 +77,16 @@ const SOVEREIGN_CONFIG = {
   volunteer_rate: 15.00,
 };
 
+// V29.0: Haptic Configuration
+const HAPTIC_CONFIG = {
+  threshold: 1000.00,
+  intensity: 0.80,
+  solfeggio_pulse: [174, 100, 528, 100, 174],
+  success_pulse: [100, 50, 100],
+  warning_pulse: [300, 100, 300, 100, 300],
+  acknowledgment: [50],
+};
+
 // Solfeggio Frequency Stack
 const SOLFEGGIO_FREQUENCIES = [
   { hz: 174, name: 'Foundation', color: '#EF4444' },
@@ -81,19 +101,19 @@ const SOLFEGGIO_FREQUENCIES = [
   { hz: 963, name: 'Transcendence', color: '#EC4899' },
 ];
 
-// Layer Configuration
+// V29.0: Layer A with Four-Tier Mapping
 const LAYERS = {
   A: {
     name: 'SOVEREIGN',
     color: '#8B5CF6',
     strips: [
       { id: 1, name: 'Aether Flow', value: 75 },
-      { id: 2, name: 'Equity Gain', value: 60 },
-      { id: 3, name: 'Keystone', value: 80, node: true },
+      { id: 2, name: 'EQUITY GAIN', value: 60, tier: 'T2_LABOR', color: '#3B82F6' },
+      { id: 3, name: 'KEYSTONE', value: 80, tier: 'T4_EXPANSION', node: true, color: '#22C55E' },
       { id: 4, name: 'Rapid City', value: 65, node: true },
       { id: 5, name: 'Black Elk', value: 90, node: true },
       { id: 6, name: 'AUTO-PAY', value: 50, special: 'autopay', color: '#22C55E' },
-      { id: 7, name: 'ESCROW', value: 0, special: 'escrow', color: '#F59E0B' },
+      { id: 7, name: 'ESCROW', value: 0, tier: 'T1_ESCROW', special: 'escrow', color: '#F59E0B' },
       { id: 8, name: 'Master Out', value: 85 },
     ],
   },
@@ -179,13 +199,196 @@ const FADER_BANKS = {
   },
 };
 
-// Soft Keys Configuration (QU-32 Style)
+// Soft Keys Configuration (QU-32 Style) - V29.0 with Vault Hook
 const SOFT_KEYS = [
   { id: 'VOICE_CMD', label: 'Voice', icon: 'mic', color: '#8B5CF6', active: false },
   { id: 'OBSIDIAN_VOID', label: 'Void', icon: 'eye', color: '#000000', active: true },
-  { id: 'VAULT_SYNC', label: 'Vault', icon: 'lock', color: '#22C55E', active: true },
+  { id: 'VAULT_SYNC', label: 'Vault', icon: 'wallet', color: '#22C55E', active: true },
   { id: 'GENESIS_MINT', label: 'Mint', icon: 'diamond', color: '#F59E0B', active: false },
+  { id: 'AUDIT_FEED', label: 'Audit', icon: 'terminal', color: '#06B6D4', active: false },
 ];
+
+/**
+ * V29.0: Sovereign Ledger Terminal Feed
+ * Scrolling terminal-style display of the Four-Tiered Audit
+ */
+function AuditTerminalFeed({ auditStream, isVisible, onClose }) {
+  const terminalRef = useRef(null);
+  
+  useEffect(() => {
+    // Auto-scroll to bottom on new data
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [auditStream]);
+  
+  if (!isVisible) return null;
+  
+  const stream = auditStream?.stream || [];
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="rounded-lg overflow-hidden"
+      style={{
+        background: 'rgba(0,0,0,0.95)',
+        border: '1px solid rgba(6,182,212,0.3)',
+        fontFamily: 'monospace',
+      }}
+      data-testid="audit-terminal-feed"
+    >
+      <div 
+        className="flex items-center justify-between px-3 py-1.5"
+        style={{ 
+          background: 'linear-gradient(90deg, rgba(6,182,212,0.2), rgba(139,92,246,0.2))',
+          borderBottom: '1px solid rgba(6,182,212,0.2)',
+        }}
+      >
+        <span className="text-[9px] text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+          <Terminal size={10} />
+          SOVEREIGN LEDGER V29.0
+        </span>
+        <button
+          onClick={onClose}
+          className="text-white/40 hover:text-white/80 text-xs"
+        >
+          ×
+        </button>
+      </div>
+      
+      <div 
+        ref={terminalRef}
+        className="p-2 overflow-y-auto max-h-48 text-[10px] space-y-0.5"
+        style={{ scrollbarWidth: 'thin' }}
+      >
+        {stream.map((line, idx) => {
+          if (line.type === 'header') {
+            return (
+              <div key={idx} className="text-cyan-400 font-bold">{line.text}</div>
+            );
+          }
+          if (line.type === 'timestamp') {
+            return (
+              <div key={idx} className="text-white/40">{line.text}</div>
+            );
+          }
+          if (line.type === 'separator') {
+            return (
+              <div key={idx} className="text-white/20">{line.text}</div>
+            );
+          }
+          if (line.type === 'tier') {
+            const color = line.tier === 'T4' ? '#22C55E' 
+                        : line.tier === 'T3' ? '#EF4444'
+                        : line.tier === 'T1' ? '#F59E0B'
+                        : '#3B82F6';
+            return (
+              <div key={idx} className="flex justify-between">
+                <span style={{ color }}>
+                  {line.icon} {line.tier} {line.label}:
+                </span>
+                <span className="text-white/80">
+                  ${line.amount?.toLocaleString()}{line.unit || ''}
+                </span>
+              </div>
+            );
+          }
+          if (line.type === 'total') {
+            return (
+              <div key={idx} className="flex justify-between text-green-400 font-bold pt-1">
+                <span>{line.label}:</span>
+                <span>${line.amount?.toLocaleString()}</span>
+              </div>
+            );
+          }
+          if (line.type === 'status') {
+            return (
+              <div key={idx} className="text-purple-400">{line.text}</div>
+            );
+          }
+          if (line.type === 'resonance') {
+            return (
+              <div key={idx} className="text-amber-400">RESONANCE: {line.value}</div>
+            );
+          }
+          return null;
+        })}
+        
+        {/* Blinking cursor */}
+        <div className="text-cyan-400 animate-pulse">▊</div>
+      </div>
+    </motion.div>
+  );
+}
+
+/**
+ * V29.0: Four-Tiered Ledger Display Panel
+ */
+function FourTierLedger({ tiers, isFlashing }) {
+  if (!tiers) return null;
+  
+  const tierConfig = [
+    { key: 'T1_ESCROW', label: 'ESCROW', icon: '🔒', color: '#F59E0B', formula: 'φ × 1.618%' },
+    { key: 'T2_LABOR', label: 'LABOR', icon: '📊', color: '#3B82F6', formula: '$15/hr', isRate: true },
+    { key: 'T3_BUFFER', label: 'RED LIMIT', icon: '🔴', color: '#EF4444', formula: '$40k LOCKED' },
+    { key: 'T4_EXPANSION', label: 'KEYSTONE', icon: '🔓', color: '#22C55E', formula: 'LIQUID' },
+  ];
+  
+  return (
+    <div 
+      className="p-3 rounded-lg space-y-2"
+      style={{
+        background: 'linear-gradient(135deg, rgba(10,10,30,0.9), rgba(20,10,40,0.8))',
+        border: '1px solid rgba(139,92,246,0.2)',
+      }}
+      data-testid="four-tier-ledger"
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[9px] uppercase tracking-wider text-purple-400/80">
+          Four-Tier Ledger Intelligence
+        </span>
+        <span className="text-[7px] text-white/30">V29.0</span>
+      </div>
+      
+      {tierConfig.map((tier) => (
+        <motion.div
+          key={tier.key}
+          animate={isFlashing && tier.key === 'T4_EXPANSION' ? { 
+            boxShadow: ['0 0 0px rgba(34,197,94,0)', '0 0 15px rgba(34,197,94,0.6)', '0 0 0px rgba(34,197,94,0)'] 
+          } : {}}
+          transition={{ duration: 0.5, repeat: isFlashing ? 3 : 0 }}
+          className="flex items-center justify-between p-1.5 rounded"
+          style={{
+            background: `rgba(${tier.color === '#F59E0B' ? '245,158,11' : tier.color === '#3B82F6' ? '59,130,246' : tier.color === '#EF4444' ? '239,68,68' : '34,197,94'},0.1)`,
+            border: `1px solid ${tier.color}33`,
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{tier.icon}</span>
+            <div>
+              <div className="text-[9px] font-bold" style={{ color: tier.color }}>
+                {tier.label}
+              </div>
+              <div className="text-[7px] text-white/30">{tier.formula}</div>
+            </div>
+          </div>
+          <div 
+            className="text-sm font-mono font-bold"
+            style={{ color: tier.color }}
+          >
+            {tier.isRate ? (
+              <span>${tiers[tier.key]?.toFixed(0) || 15}/hr</span>
+            ) : (
+              <span>${(tiers[tier.key] || 0).toLocaleString()}</span>
+            )}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 /**
  * Vertical Fader Strip Component
@@ -628,15 +831,17 @@ function SuperStrip({ selectedStrip, layerColor, onUpdate }) {
 }
 
 /**
- * Soft Keys Panel (QU-32 Style)
+ * Soft Keys Panel (QU-32 Style) - V29.0 Enhanced
  */
-function SoftKeysPanel({ softKeys, onKeyPress }) {
+function SoftKeysPanel({ softKeys, onKeyPress, voiceActive }) {
   const getIcon = (iconName) => {
     switch (iconName) {
-      case 'mic': return Mic;
+      case 'mic': return voiceActive ? Mic : MicOff;
       case 'eye': return Eye;
       case 'lock': return Lock;
+      case 'wallet': return Wallet;
       case 'diamond': return Diamond;
+      case 'terminal': return Terminal;
       default: return Zap;
     }
   };
@@ -645,6 +850,8 @@ function SoftKeysPanel({ softKeys, onKeyPress }) {
     <div className="flex gap-2">
       {softKeys.map((key) => {
         const Icon = getIcon(key.icon);
+        const isVoiceKey = key.id === 'VOICE_CMD';
+        
         return (
           <button
             key={key.id}
@@ -656,7 +863,9 @@ function SoftKeysPanel({ softKeys, onKeyPress }) {
                 : 'rgba(255,255,255,0.03)',
               border: `1px solid ${key.active ? key.color + '44' : 'rgba(255,255,255,0.08)'}`,
               minWidth: '56px',
+              animation: isVoiceKey && voiceActive ? 'pulse 1s infinite' : 'none',
             }}
+            data-testid={`soft-key-${key.id.toLowerCase()}`}
           >
             <Icon 
               size={14} 
@@ -704,7 +913,7 @@ function HorizontalSlider({ label, value, onChange, min = 0, max = 100, unit = '
 }
 
 /**
- * Main Apex Creator Console Component
+ * Main Apex Creator Console Component - V29.0
  */
 export default function ApexCreatorConsole({ onClose }) {
   const { user, authHeaders } = useAuth();
@@ -731,6 +940,113 @@ export default function ApexCreatorConsole({ onClose }) {
   const [treasury, setTreasury] = useState(null);
   const [cashFlow, setCashFlow] = useState(null);
   
+  // V29.0: New State for Four-Tiered Ledger
+  const [fourTierLedger, setFourTierLedger] = useState(null);
+  const [auditStream, setAuditStream] = useState(null);
+  const [showAuditTerminal, setShowAuditTerminal] = useState(false);
+  const [vaultFlashing, setVaultFlashing] = useState(false);
+  const [voiceCommandActive, setVoiceCommandActive] = useState(false);
+  const [voiceRecognition, setVoiceRecognition] = useState(null);
+  const [hapticStatus, setHapticStatus] = useState(null);
+  
+  // V29.0: Initialize Speech Recognition
+  useEffect(() => {
+    if (isMasterAuthority && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('Voice command received:', transcript);
+        await handleVoiceCommand(transcript);
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setVoiceCommandActive(false);
+      };
+      
+      recognition.onend = () => {
+        setVoiceCommandActive(false);
+      };
+      
+      setVoiceRecognition(recognition);
+    }
+  }, [isMasterAuthority]);
+  
+  // V29.0: Voice Command Handler
+  const handleVoiceCommand = async (command) => {
+    if (!authHeaders?.Authorization) return;
+    
+    try {
+      const response = await axios.post(
+        `${API}/treasury/voice-command`,
+        { command },
+        { headers: authHeaders }
+      );
+      
+      if (response.data.status === 'success') {
+        // Trigger haptic feedback
+        if (window.navigator?.vibrate && response.data.haptic_pulse) {
+          window.navigator.vibrate(response.data.haptic_pulse);
+        }
+        
+        const cmdType = response.data.command_recognized;
+        
+        if (cmdType === 'AUDIT_TREASURY') {
+          setAuditStream(response.data.response);
+          setShowAuditTerminal(true);
+        } else if (cmdType === 'VAULT_STATUS') {
+          setVaultFlashing(true);
+          setTimeout(() => setVaultFlashing(false), 2000);
+        }
+      }
+    } catch (err) {
+      console.error('Voice command failed:', err);
+    }
+  };
+  
+  // V29.0: Fetch Four-Tiered Audit Data
+  const fetchAuditStream = async () => {
+    if (!isMasterAuthority || !authHeaders?.Authorization) return;
+    
+    try {
+      const response = await axios.get(`${API}/treasury/audit-stream`, { headers: authHeaders });
+      if (response.data.status === 'success') {
+        setAuditStream(response.data.audit_stream);
+      }
+    } catch (err) {
+      console.warn('Audit stream fetch failed:', err);
+    }
+  };
+  
+  // V29.0: Fetch Haptic Status
+  const fetchHapticStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/treasury/haptic-status`);
+      if (response.data.status === 'success') {
+        setHapticStatus(response.data);
+        
+        // Check if haptic event pending
+        if (response.data.recent_haptic_events?.length > 0) {
+          const latestEvent = response.data.recent_haptic_events[response.data.recent_haptic_events.length - 1];
+          const eventTime = new Date(latestEvent.timestamp);
+          const now = new Date();
+          
+          // If event within last 30 seconds, trigger haptic
+          if ((now - eventTime) < 30000 && window.navigator?.vibrate) {
+            window.navigator.vibrate(HAPTIC_CONFIG.solfeggio_pulse);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Haptic status fetch failed:', err);
+    }
+  };
+  
   // Fetch treasury data
   useEffect(() => {
     const fetchTreasury = async () => {
@@ -752,8 +1068,13 @@ export default function ApexCreatorConsole({ onClose }) {
           const auditRes = await axios.get(`${API}/treasury/audit`, { headers: authHeaders });
           if (auditRes.data.status === 'success') {
             setTreasury(prev => ({ ...prev, ...auditRes.data.audit }));
+            setFourTierLedger(auditRes.data.audit.four_tier_ledger);
           }
         }
+        
+        // V29.0: Fetch haptic status
+        await fetchHapticStatus();
+        
       } catch (err) {
         console.warn('Treasury fetch failed:', err);
       }
@@ -789,30 +1110,57 @@ export default function ApexCreatorConsole({ onClose }) {
     setBankStrips(prev => prev.map(s => s.id === id ? { ...s, value } : s));
   }, []);
   
-  const handleSoftKeyPress = useCallback((keyId) => {
+  // V29.0: Enhanced Soft Key Handler with Voice & Vault Integration
+  const handleSoftKeyPress = useCallback(async (keyId) => {
     setSoftKeys(prev => prev.map(k => k.id === keyId ? { ...k, active: !k.active } : k));
     
-    // Handle specific soft key actions
     switch (keyId) {
       case 'OBSIDIAN_VOID':
         setObsidianVoid(prev => !prev);
         break;
+        
       case 'VAULT_SYNC':
+        // V29.0: Vault key flashes Tier 4 Expansion balance
+        setVaultFlashing(true);
+        if (window.navigator?.vibrate) {
+          window.navigator.vibrate(HAPTIC_CONFIG.acknowledgment);
+        }
+        setTimeout(() => setVaultFlashing(false), 2000);
         setVaultSync(prev => !prev);
         break;
+        
       case 'VOICE_CMD':
-        // Voice command would trigger speech recognition
-        if (window.navigator?.vibrate) {
-          window.navigator.vibrate([100, 50, 100]);
+        // V29.0: Toggle voice recognition
+        if (voiceRecognition) {
+          if (voiceCommandActive) {
+            voiceRecognition.stop();
+            setVoiceCommandActive(false);
+          } else {
+            voiceRecognition.start();
+            setVoiceCommandActive(true);
+            if (window.navigator?.vibrate) {
+              window.navigator.vibrate(HAPTIC_CONFIG.success_pulse);
+            }
+          }
         }
         break;
+        
+      case 'AUDIT_FEED':
+        // V29.0: Toggle audit terminal
+        if (!showAuditTerminal) {
+          await fetchAuditStream();
+        }
+        setShowAuditTerminal(prev => !prev);
+        break;
+        
       case 'GENESIS_MINT':
         // Would open Genesis Mint panel
         break;
+        
       default:
         break;
     }
-  }, []);
+  }, [voiceRecognition, voiceCommandActive, showAuditTerminal]);
   
   const layerConfig = LAYERS[activeLayer];
   const bankConfig = FADER_BANKS[activeBank];
@@ -848,11 +1196,28 @@ export default function ApexCreatorConsole({ onClose }) {
             className="text-[9px] px-2 py-0.5 rounded"
             style={{ background: 'rgba(139,92,246,0.2)', color: '#C4B5FD' }}
           >
-            V28.0 • QU-32 HYBRID
+            V29.0 • QU-32 HYBRID + 4-TIER LEDGER
           </span>
           
-          {/* Soft Keys */}
-          <SoftKeysPanel softKeys={softKeys} onKeyPress={handleSoftKeyPress} />
+          {/* Soft Keys - V29.0 Enhanced */}
+          <SoftKeysPanel 
+            softKeys={softKeys} 
+            onKeyPress={handleSoftKeyPress}
+            voiceActive={voiceCommandActive}
+          />
+          
+          {/* V29.0: Voice Command Indicator */}
+          {voiceCommandActive && (
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ repeat: Infinity, duration: 1 }}
+              className="flex items-center gap-1 px-2 py-0.5 rounded text-[8px]"
+              style={{ background: 'rgba(139,92,246,0.3)', color: '#A78BFA' }}
+            >
+              <Mic size={10} className="animate-pulse" />
+              LISTENING...
+            </motion.div>
+          )}
         </div>
         
         <div className="flex items-center gap-3">
@@ -1076,9 +1441,22 @@ export default function ApexCreatorConsole({ onClose }) {
         
         {/* Right Panel - GPU Preview & Metrics */}
         <div 
-          className="w-80 flex flex-col p-3 border-l"
+          className="w-80 flex flex-col p-3 border-l overflow-y-auto"
           style={{ borderColor: 'rgba(255,255,255,0.06)' }}
         >
+          {/* V29.0: Audit Terminal Feed (Collapsible) */}
+          <AnimatePresence>
+            {showAuditTerminal && (
+              <div className="mb-3">
+                <AuditTerminalFeed 
+                  auditStream={auditStream}
+                  isVisible={showAuditTerminal}
+                  onClose={() => setShowAuditTerminal(false)}
+                />
+              </div>
+            )}
+          </AnimatePresence>
+          
           {/* L² Fractal GPU Preview */}
           <div 
             className="rounded-lg overflow-hidden mb-3"
@@ -1103,13 +1481,33 @@ export default function ApexCreatorConsole({ onClose }) {
             </div>
           </div>
           
+          {/* V29.0: Four-Tiered Ledger Display (Master Only) */}
+          {isMasterAuthority && fourTierLedger && (
+            <div className="mb-3">
+              <FourTierLedger 
+                tiers={{
+                  T1_ESCROW: fourTierLedger.T1_ESCROW?.amount || 0,
+                  T2_LABOR: fourTierLedger.T2_LABOR?.amount || 15,
+                  T3_BUFFER: fourTierLedger.T3_BUFFER?.amount || 40000,
+                  T4_EXPANSION: fourTierLedger.T4_EXPANSION?.amount || 0,
+                }}
+                isFlashing={vaultFlashing}
+              />
+            </div>
+          )}
+          
           {/* Equity Sync Monitor */}
-          <div 
+          <motion.div 
+            animate={vaultFlashing ? { 
+              boxShadow: ['0 0 0px rgba(34,197,94,0)', '0 0 20px rgba(34,197,94,0.8)', '0 0 0px rgba(34,197,94,0)'] 
+            } : {}}
+            transition={{ duration: 0.3, repeat: vaultFlashing ? 5 : 0 }}
             className="p-3 rounded-lg mb-3"
             style={{
               background: 'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(6,182,212,0.1))',
               border: '1px solid rgba(34,197,94,0.2)',
             }}
+            data-testid="equity-reservoir-display"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[9px] text-green-400/80 uppercase tracking-wider">Equity Reservoir</span>
@@ -1121,7 +1519,38 @@ export default function ApexCreatorConsole({ onClose }) {
             <div className="text-[9px] text-white/40 mt-1">
               Volunteer Rate: ${SOVEREIGN_CONFIG.volunteer_rate}/hr
             </div>
-          </div>
+            
+            {/* V29.0: Tier 4 Expansion Highlight */}
+            {fourTierLedger?.T4_EXPANSION && (
+              <div className="mt-2 pt-2 border-t border-white/10">
+                <div className="flex justify-between text-[9px]">
+                  <span className="text-white/50">T4 KEYSTONE (Liquid)</span>
+                  <span className="text-green-400 font-mono font-bold">
+                    ${fourTierLedger.T4_EXPANSION.amount?.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
+          </motion.div>
+          
+          {/* V29.0: Haptic Status Indicator */}
+          {hapticStatus && (
+            <div 
+              className="p-2 rounded-lg mb-3 flex items-center justify-between"
+              style={{
+                background: 'rgba(139,92,246,0.1)',
+                border: '1px solid rgba(139,92,246,0.2)',
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Activity size={12} className="text-purple-400" />
+                <span className="text-[8px] text-white/60 uppercase">Next Milestone</span>
+              </div>
+              <span className="text-[9px] font-mono text-purple-400">
+                ${hapticStatus.distance_to_next?.toFixed(0)} to ${hapticStatus.next_milestone?.toLocaleString()}
+              </span>
+            </div>
+          )}
           
           {/* Cash Flow Visualizer */}
           <div className="mb-3">
@@ -1174,6 +1603,10 @@ export default function ApexCreatorConsole({ onClose }) {
               <div className="flex justify-between text-[10px]">
                 <span className="text-white/60">Lattice</span>
                 <span className="font-mono text-green-400">9×9 (81 nodes)</span>
+              </div>
+              <div className="flex justify-between text-[10px]">
+                <span className="text-white/60">Kernel</span>
+                <span className="font-mono text-cyan-400">V29.0</span>
               </div>
             </div>
           </div>

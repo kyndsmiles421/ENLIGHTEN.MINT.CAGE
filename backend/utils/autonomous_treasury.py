@@ -1,6 +1,6 @@
 """
 ═══════════════════════════════════════════════════════════════════════════════
-💰 AUTONOMOUS_TREASURY: SELF-SUSTAINING LEDGER
+💰 AUTONOMOUS_TREASURY: SINGULARITY KERNEL V29.0
 ═══════════════════════════════════════════════════════════════════════════════
 👑 ARCHITECT: Steven Michael | 🛡️ MASTER: 708B...291E
 ❄️ STATE: -183°C | ⚙️ MODE: AUTONOMOUS_CREATOR
@@ -9,20 +9,23 @@
 The Self-Sustaining Ledger Protocol enables ENLIGHTEN.MINT.CAFE to manage its own
 operating costs automatically using the Golden Ratio (φ) spending cap.
 
-ARCHITECTURE:
+FOUR-TIERED PAY STRUCTURE (V29.0):
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    AUTONOMOUS TREASURY SYSTEM                               │
+│                    SOVEREIGN LEDGER INTELLIGENCE                            │
 │                                                                             │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
-│  │ EQUITY RESERVOIR │───▶│  PHI GOVERNOR   │───▶│  AUTO-PAY EXEC  │        │
-│  │   $49,018.24     │    │   1.618% Cap    │    │  Obsidian Auth  │        │
+│  │   TIER 1        │    │   TIER 2        │    │   TIER 3        │        │
+│  │   ESCROW        │    │   LABOR         │    │   BUFFER        │        │
+│  │  φ% (1.618%)    │    │  $15/hr Tracks  │    │  $40,000 LOCKED │        │
 │  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
 │           │                     │                      │                   │
-│           ▼                     ▼                      ▼                   │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
-│  │  SAFETY BUFFER  │    │  HAPTIC PULSE   │    │ RECEIPT VAULT   │        │
-│  │   $40,000.00    │    │    528Hz OK     │    │  QR Regenerated │        │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
+│           └──────────────┬──────┴──────────────────────┘                   │
+│                          ▼                                                  │
+│              ┌─────────────────────┐                                       │
+│              │       TIER 4        │                                       │
+│              │     EXPANSION       │  ◄── Liquid 'Cause' Money             │
+│              │   (Keystone Fader)  │      Haptic @ $1,000 milestone        │
+│              └─────────────────────┘                                       │
 │                                                                             │
 │  🛡️ OBSIDIAN SHIELD: Only Master Authority sees the Blood                  │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -41,10 +44,15 @@ from utils.sovereign_main_brain import main_brain
 
 class AutonomousTreasury:
     """
-    💰 SELF-SUSTAINING LEDGER: Autonomous Economic Agent
+    💰 SINGULARITY KERNEL V29.0: Four-Tiered Ledger Intelligence
     
-    Manages the Equity Reservoir, automated bill payments, and
-    maintains transparency through the Live Audit HUD.
+    Manages the Equity Reservoir with a transparent 4-tier system:
+      T1 ESCROW: φ-based escrow (1.618%)
+      T2 LABOR: Volunteer credit tracking ($15/hr)
+      T3 BUFFER: Safety floor ($40,000 LOCKED)
+      T4 EXPANSION: Liquid 'Cause' money for real-world events
+    
+    Includes Haptic Milestone Alerts at 80% intensity.
     """
     
     # ═══════════════════════════════════════════════════════════════════════════
@@ -53,16 +61,19 @@ class AutonomousTreasury:
     
     PHI = 1.618033988749895
     PHI_CAP = 0.01618  # φ-based spending cap (1.618%)
-    SAFETY_BUFFER = 40000.00  # Minimum equity floor
+    SAFETY_BUFFER = 40000.00  # Minimum equity floor (TIER 3 - LOCKED)
     SUCCESS_FREQUENCY = 528  # Hz - Healing/Success pulse
-    VOLUNTEER_RATE = 15.00  # $/hr
+    SOLFEGGIO_PULSE = [174, 100, 528, 100, 174]  # Solfeggio-aligned vibration pattern
+    VOLUNTEER_RATE = 15.00  # $/hr (TIER 2 tracking)
+    HAPTIC_THRESHOLD = 1000.00  # $1,000 milestone for haptic pulse
+    HAPTIC_INTENSITY = 0.80  # 80% intensity
     
     # Master Authority
     MASTER_EMAIL = "kyndsmiles@gmail.com"
     MASTER_PRINT_ID = "708B8ED1E974D85585BBBD8E06E0291E"
     
     def __init__(self):
-        """Initialize the Autonomous Treasury System."""
+        """Initialize the Singularity Kernel V29.0."""
         
         # Core state
         self.equity_reservoir = 49018.24
@@ -71,15 +82,30 @@ class AutonomousTreasury:
         self.lox_stable = True
         self.lox_temp = -183.0
         
+        # V29.0: Four-Tiered Structure
+        self.tiers = {
+            "T1_ESCROW": 0.0,       # φ-based escrow (1.618%)
+            "T2_LABOR": 0.0,        # Volunteer credit tracking
+            "T3_BUFFER": self.SAFETY_BUFFER,  # Safety floor (LOCKED)
+            "T4_EXPANSION": 0.0,    # Liquid 'Cause' money
+        }
+        
+        # Haptic milestone tracking
+        self.last_haptic_milestone = 8000.00  # Baseline starting point
+        self.haptic_events: List[Dict[str, Any]] = []
+        
+        # Refresh tier calculations
+        self._refresh_tiers()
+        
         # Transaction ledger
         self.ledger: List[Dict[str, Any]] = []
         self.pending_authorizations: List[Dict[str, Any]] = []
         
         # Wellness Nodes
         self.nodes = {
-            "keystone": {"lat": 43.8955, "lon": -103.4182, "revenue": 0.0},
-            "rapid_city": {"lat": 44.0831, "lon": -103.2244, "revenue": 0.0},
-            "black_elk": {"lat": 43.8661, "lon": -103.5314, "revenue": 0.0},
+            "keystone": {"lat": 43.8955, "lon": -103.4182, "revenue": 0.0, "frequency": 528},
+            "rapid_city": {"lat": 44.0831, "lon": -103.2244, "revenue": 0.0, "frequency": 639},
+            "black_elk": {"lat": 43.8661, "lon": -103.5314, "revenue": 0.0, "frequency": 432},
         }
         
         # Spending categories
@@ -91,8 +117,69 @@ class AutonomousTreasury:
             "maintenance": 0.0,
         }
         
-        logger.info("💰 AUTONOMOUS_TREASURY: Self-Sustaining Ledger initialized")
-        logger.info(f"   Equity: ${self.equity_reservoir:,.2f} | Buffer: ${self.SAFETY_BUFFER:,.2f}")
+        logger.info("💰 SINGULARITY_KERNEL_V29.0: Four-Tiered Ledger Intelligence initialized")
+        logger.info(f"   Equity: ${self.equity_reservoir:,.2f} | T4 Expansion: ${self.tiers['T4_EXPANSION']:,.2f}")
+    
+    def _refresh_tiers(self):
+        """
+        V29.0: Recalculate the Four-Tiered distribution.
+        
+        Formula:
+          T1 ESCROW = Reservoir × φ% (1.618%)
+          T2 LABOR = Volunteer rate tracking ($15/hr unit)
+          T3 BUFFER = $40,000 (LOCKED)
+          T4 EXPANSION = Reservoir - Buffer - Escrow (Liquid 'Cause' Money)
+        """
+        # Tier 1: Phi-based Escrow (1.618%)
+        self.tiers["T1_ESCROW"] = self.equity_reservoir * self.PHI_CAP
+        
+        # Tier 3: Safety Buffer (Locked)
+        self.tiers["T3_BUFFER"] = self.SAFETY_BUFFER
+        
+        # Tier 4: Expansion Fund (The Liquid 'Cause' Money)
+        # Formula: Total - Buffer - Escrow
+        self.tiers["T4_EXPANSION"] = max(
+            0, 
+            self.equity_reservoir - self.SAFETY_BUFFER - self.tiers["T1_ESCROW"]
+        )
+        
+        # Tier 2: Labor/Volunteer Credits (Unit representation)
+        self.tiers["T2_LABOR"] = self.VOLUNTEER_RATE
+        
+        # Check for Haptic Milestone
+        self._check_haptic_milestone()
+    
+    def _check_haptic_milestone(self) -> Optional[Dict[str, Any]]:
+        """
+        V29.0: Check if Tier 4 Expansion Fund crossed a $1,000 milestone.
+        
+        Returns haptic event data if milestone crossed, None otherwise.
+        """
+        current_expansion = self.tiers["T4_EXPANSION"]
+        
+        # Calculate which $1,000 milestone we're at
+        current_milestone = int(current_expansion / self.HAPTIC_THRESHOLD) * self.HAPTIC_THRESHOLD
+        
+        if current_milestone > self.last_haptic_milestone:
+            # MILESTONE CROSSED! Generate haptic event
+            haptic_event = {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "milestone_amount": current_milestone,
+                "tier4_balance": current_expansion,
+                "pulse_pattern": self.SOLFEGGIO_PULSE,
+                "intensity": self.HAPTIC_INTENSITY,
+                "frequency": self.SUCCESS_FREQUENCY,
+                "message": f"Tier 4 Expansion Fund reached ${current_milestone:,.0f}!"
+            }
+            
+            self.haptic_events.append(haptic_event)
+            self.last_haptic_milestone = current_milestone
+            
+            logger.info(f"📳 HAPTIC MILESTONE: T4 Expansion hit ${current_milestone:,.0f}")
+            
+            return haptic_event
+        
+        return None
     
     def verify_sovereign_solvency(self, amount: float) -> bool:
         """
@@ -300,11 +387,13 @@ class AutonomousTreasury:
         node: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Add incoming revenue to the equity reservoir.
+        V29.0: Add incoming revenue to the equity reservoir.
+        
+        Revenue is instantly partitioned across the Four Tiers.
         
         Args:
             amount: Revenue amount
-            source: Revenue source (e.g., "volunteer_credit", "advocacy")
+            source: Revenue source (e.g., "volunteer_credit", "advocacy", "seven_seals")
             node: Optional wellness node attribution
         """
         self.equity_reservoir += amount
@@ -325,17 +414,26 @@ class AutonomousTreasury:
         
         self.ledger.append(transaction)
         
-        # Divert maintenance portion (φ-based)
-        maintenance_portion = amount * 0.01618  # 1.618%
+        # Divert maintenance portion (φ-based) to Tier 1 Escrow
+        maintenance_portion = amount * self.PHI_CAP  # 1.618%
         self.escrow_vault += maintenance_portion
         
-        logger.info(f"💎 REVENUE: +${amount:.2f} from {source} | Escrow: +${maintenance_portion:.2f}")
+        # V29.0: Refresh tiers after revenue addition
+        haptic_event = self._refresh_tiers()
+        
+        # Check for haptic milestone
+        self._check_haptic_milestone()
+        
+        logger.info(f"💎 REVENUE: +${amount:.2f} from {source} | T4 Expansion: ${self.tiers['T4_EXPANSION']:,.2f}")
         
         return {
             "status": "RECEIVED",
             "transaction": transaction,
             "maintenance_diverted": maintenance_portion,
             "escrow_balance": self.escrow_vault,
+            "tier_update": {k: round(v, 2) for k, v in self.tiers.items()},
+            "haptic_triggered": haptic_event is not None,
+            "haptic_event": haptic_event,
         }
     
     def get_cash_flow_waveform(self, hours: int = 24) -> Dict[str, Any]:
@@ -368,14 +466,19 @@ class AutonomousTreasury:
     
     def get_master_audit(self, user_email: str) -> Optional[Dict[str, Any]]:
         """
-        Get the full audit view - only accessible to Master Authority.
+        V29.0: Full Sovereign Ledger Audit - MASTER AUTHORITY ONLY.
         
+        Returns the complete 'Blood' view including the Four-Tiered breakdown.
         The 'Blood' is only visible to Steven Michael.
         """
         if user_email != self.MASTER_EMAIL:
             return None
         
+        # Refresh tiers before audit
+        self._refresh_tiers()
+        
         return {
+            "version": "V29.0",
             "equity_reservoir": self.equity_reservoir,
             "escrow_vault": self.escrow_vault,
             "safety_buffer": self.SAFETY_BUFFER,
@@ -385,9 +488,78 @@ class AutonomousTreasury:
             "spending_by_category": self.spending_categories,
             "node_revenues": self.nodes,
             "pending_authorizations": self.pending_authorizations,
-            "recent_transactions": self.ledger[-20:],  # Last 20
+            "recent_transactions": self.ledger[-20:],
             "master_print_id": self.MASTER_PRINT_ID,
             "system_health": "SUPERCONDUCTING" if self.lox_temp <= -183.0 else "WARMING",
+            # V29.0: Four-Tiered Intelligence
+            "four_tier_ledger": {
+                "T1_ESCROW": {
+                    "label": "ESCROW",
+                    "amount": round(self.tiers["T1_ESCROW"], 2),
+                    "formula": "φ × 1.618%",
+                    "status": "🔒 LOCKED",
+                    "fader_position": 7,  # Layer A fader #7
+                },
+                "T2_LABOR": {
+                    "label": "LABOR RATE",
+                    "amount": self.tiers["T2_LABOR"],
+                    "formula": "$15/hr Volunteer Credits",
+                    "status": "📊 TRACKING",
+                    "fader_position": 2,  # Layer A fader #2 (Equity Gain)
+                },
+                "T3_BUFFER": {
+                    "label": "RED LIMIT",
+                    "amount": round(self.tiers["T3_BUFFER"], 2),
+                    "formula": "$40,000 Safety Floor",
+                    "status": "🔴 LOCKED",
+                    "fader_position": None,  # LED indicator only
+                },
+                "T4_EXPANSION": {
+                    "label": "KEYSTONE",
+                    "amount": round(self.tiers["T4_EXPANSION"], 2),
+                    "formula": "Reservoir - Buffer - Escrow",
+                    "status": "🔓 LIQUID",
+                    "fader_position": 3,  # Layer A fader #3 (Keystone)
+                },
+            },
+            "haptic_config": {
+                "threshold": self.HAPTIC_THRESHOLD,
+                "intensity": self.HAPTIC_INTENSITY,
+                "last_milestone": self.last_haptic_milestone,
+                "pulse_pattern": self.SOLFEGGIO_PULSE,
+                "recent_events": self.haptic_events[-5:],  # Last 5 haptic events
+            },
+            "resonance": (self.PHI ** 2) / math.pi,
+        }
+    
+    def get_tiered_audit_stream(self) -> Dict[str, Any]:
+        """
+        V29.0: Terminal-style Sovereign Ledger Audit Feed.
+        
+        Returns data formatted for the scrolling terminal display in the
+        Apex Creator Console right panel.
+        """
+        self._refresh_tiers()
+        
+        stream_lines = [
+            {"type": "header", "text": "--- SOVEREIGN LEDGER V29.0 ---"},
+            {"type": "timestamp", "text": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")},
+            {"type": "separator", "text": "─" * 40},
+            {"type": "tier", "tier": "T1", "label": "ESCROW", "amount": self.tiers["T1_ESCROW"], "icon": "🔒"},
+            {"type": "tier", "tier": "T2", "label": "LABOR RATE", "amount": self.tiers["T2_LABOR"], "icon": "📊", "unit": "/hr"},
+            {"type": "tier", "tier": "T3", "label": "RED LIMIT (BUFFER)", "amount": self.tiers["T3_BUFFER"], "icon": "🔴"},
+            {"type": "tier", "tier": "T4", "label": "KEYSTONE (EXPANSION)", "amount": self.tiers["T4_EXPANSION"], "icon": "🔓"},
+            {"type": "separator", "text": "─" * 40},
+            {"type": "total", "label": "TOTAL RESERVOIR", "amount": self.equity_reservoir},
+            {"type": "status", "text": f"SYSTEM: {'HYPER-CONDUCTIVE' if self.lox_temp <= -183.0 else 'WARMING'}"},
+            {"type": "resonance", "value": round((self.PHI ** 2) / math.pi, 4)},
+        ]
+        
+        return {
+            "stream": stream_lines,
+            "tier_summary": {k: round(v, 2) for k, v in self.tiers.items()},
+            "total_reservoir": round(self.equity_reservoir, 2),
+            "haptic_pending": len([e for e in self.haptic_events if e["timestamp"] > (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat()]),
         }
     
     def get_public_telemetry(self) -> Dict[str, Any]:

@@ -243,3 +243,138 @@ async def get_pending_authorizations(user=Depends(get_current_user)):
         "pending": autonomous_treasury.pending_authorizations,
         "phi_cap": autonomous_treasury.equity_reservoir * autonomous_treasury.PHI_CAP,
     }
+
+
+@router.get("/treasury/audit-stream")
+async def get_tiered_audit_stream(user=Depends(get_current_user)):
+    """
+    V29.0: Get the terminal-style Sovereign Ledger Audit Feed.
+    
+    Returns the Four-Tiered breakdown formatted for the scrolling terminal
+    display in the Apex Creator Console.
+    
+    MASTER AUTHORITY ONLY.
+    """
+    if user.get("email") != autonomous_treasury.MASTER_EMAIL:
+        raise HTTPException(403, "Only Master Authority can access the audit stream")
+    
+    try:
+        stream_data = autonomous_treasury.get_tiered_audit_stream()
+        return {
+            "status": "success",
+            "audit_stream": stream_data,
+        }
+    except Exception as e:
+        logger.error(f"TREASURY_API: Audit stream failed | Error: {str(e)}")
+        raise HTTPException(500, f"Audit stream failed: {str(e)}")
+
+
+@router.get("/treasury/haptic-status")
+async def get_haptic_status():
+    """
+    V29.0: Get current haptic milestone status.
+    
+    Returns Tier 4 Expansion Fund level and whether a haptic pulse is pending.
+    """
+    try:
+        tier4 = autonomous_treasury.tiers.get("T4_EXPANSION", 0)
+        threshold = autonomous_treasury.HAPTIC_THRESHOLD
+        last_milestone = autonomous_treasury.last_haptic_milestone
+        
+        # Calculate next milestone
+        next_milestone = ((int(tier4 / threshold) + 1) * threshold)
+        distance_to_next = next_milestone - tier4
+        
+        return {
+            "status": "success",
+            "tier4_expansion": round(tier4, 2),
+            "last_milestone": last_milestone,
+            "next_milestone": next_milestone,
+            "distance_to_next": round(distance_to_next, 2),
+            "haptic_intensity": autonomous_treasury.HAPTIC_INTENSITY,
+            "pulse_pattern": autonomous_treasury.SOLFEGGIO_PULSE,
+            "recent_haptic_events": autonomous_treasury.haptic_events[-3:],
+        }
+    except Exception as e:
+        logger.error(f"TREASURY_API: Haptic status failed | Error: {str(e)}")
+        raise HTTPException(500, f"Haptic status failed: {str(e)}")
+
+
+@router.post("/treasury/voice-command")
+async def handle_voice_command(
+    data: dict = Body(...),
+    user=Depends(get_current_user)
+):
+    """
+    V29.0: Handle voice commands for the Apex Creator Console.
+    
+    Supported Commands:
+    - "Audit Treasury" → Returns full 4-tier audit stream
+    - "Emergency Stop" → Halts autonomous spending
+    - "Resume Auto-Pay" → Resumes autonomous spending
+    - "Vault Status" → Returns Tier 4 Expansion balance
+    
+    MASTER AUTHORITY ONLY.
+    """
+    if user.get("email") != autonomous_treasury.MASTER_EMAIL:
+        raise HTTPException(403, "Only Master Authority can issue voice commands")
+    
+    command = data.get("command", "").lower().strip()
+    
+    try:
+        if "audit" in command and "treasury" in command:
+            audit_data = autonomous_treasury.get_tiered_audit_stream()
+            return {
+                "status": "success",
+                "command_recognized": "AUDIT_TREASURY",
+                "response": audit_data,
+                "haptic_pulse": [100, 50, 100],  # Acknowledgment pulse
+            }
+        
+        elif "emergency" in command and "stop" in command:
+            result = autonomous_treasury.emergency_stop(user.get("email"), command)
+            return {
+                "status": "success",
+                "command_recognized": "EMERGENCY_STOP",
+                "response": result,
+                "haptic_pulse": [300, 100, 300, 100, 300],  # Warning pulse
+            }
+        
+        elif "resume" in command and ("auto" in command or "pay" in command):
+            result = autonomous_treasury.resume_autonomous(user.get("email"))
+            return {
+                "status": "success",
+                "command_recognized": "RESUME_AUTOPAY",
+                "response": result,
+                "haptic_pulse": [174, 100, 528],  # Success pulse
+            }
+        
+        elif "vault" in command and "status" in command:
+            tier4 = autonomous_treasury.tiers.get("T4_EXPANSION", 0)
+            return {
+                "status": "success",
+                "command_recognized": "VAULT_STATUS",
+                "response": {
+                    "tier4_expansion": round(tier4, 2),
+                    "label": "KEYSTONE (Liquid Expansion)",
+                    "formula": "Reservoir - Buffer - Escrow",
+                },
+                "haptic_pulse": [100],  # Quick acknowledgment
+            }
+        
+        else:
+            return {
+                "status": "unrecognized",
+                "command_received": command,
+                "available_commands": [
+                    "Audit Treasury",
+                    "Emergency Stop",
+                    "Resume Auto-Pay",
+                    "Vault Status",
+                ],
+                "haptic_pulse": [50, 50, 50],  # Confused pulse
+            }
+    
+    except Exception as e:
+        logger.error(f"TREASURY_API: Voice command failed | Error: {str(e)}")
+        raise HTTPException(500, f"Voice command failed: {str(e)}")
