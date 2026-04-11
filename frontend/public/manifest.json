@@ -1,8 +1,8 @@
 {
-  "short_name": "ENLIGHTEN.MINT",
-  "name": "ENLIGHTEN.MINT.CAFE — Singularity Kernel V29.0",
-  "version": "29.0_SINGULARITY_KERNEL",
-  "description": "The Autonomous Wellness Engine — QU-32 Hardware-Emulated Creator Console, Four-Tiered Treasury Intelligence, L² Fractal GPU Shaders, and Solfeggio-Aligned Haptic Orchestration.",
+  "short_name": "Enlighten",
+  "name": "ENLIGHTEN.MINT.CAFE",
+  "version": "29.1_ZERO_POINT",
+  "description": "The Autonomous Wellness Engine — QU-32 Hardware-Emulated Creator Console, Zero-Point Ledger, Gamified Fan System, and Solfeggio-Aligned Haptic Orchestration.",
   "id": "cafe.enlighten.mint",
   "icons": [
     {
@@ -32,18 +32,15 @@
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "fullscreen"],
-  "theme_color": "#0B0C15",
-  "background_color": "#000000",
+  "theme_color": "#4B0082",
+  "background_color": "#0B0B0B",
   "orientation": "any",
-  "categories": ["health", "lifestyle", "wellness", "productivity", "finance"],
+  "categories": ["health", "lifestyle", "wellness", "productivity", "social"],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
   "launch_handler": {
     "client_mode": "navigate-existing"
-  },
-  "edge_side_panel": {
-    "preferred_width": 480
   },
   "handle_links": "preferred",
   "shortcuts": [
@@ -51,14 +48,14 @@
       "name": "Apex Creator Console",
       "short_name": "Mixer",
       "url": "/creator-console",
-      "description": "QU-32 Hardware-Emulated Fader Banks — V29.0 Singularity Kernel",
+      "description": "QU-32 Hardware-Emulated Fader Banks — V29.1 Singularity Kernel",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Treasury Audit",
+      "name": "Audit Treasury",
       "short_name": "Treasury",
-      "url": "/creator-console?audit=true",
-      "description": "Four-Tiered Ledger Intelligence Dashboard",
+      "url": "/creator-console?action=audit",
+      "description": "Zero-Point Ledger + Gamified Fan System",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
@@ -66,13 +63,6 @@
       "short_name": "AR Portal",
       "url": "/ar-portal",
       "description": "WebXR Geospatial Anchors — Black Hills Wellness Zones",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Crystal-QR Synthesis",
-      "short_name": "QR Mint",
-      "url": "/crystal-mint",
-      "description": "NFT-backed QR Code Generation & Verification",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
@@ -89,7 +79,7 @@
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Apex Creator Console V29.0"
+      "label": "Apex Creator Console V29.1"
     }
   ],
   "related_applications": [],

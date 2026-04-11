@@ -44,15 +44,19 @@ from utils.sovereign_main_brain import main_brain
 
 class AutonomousTreasury:
     """
-    💰 SINGULARITY KERNEL V29.0: Four-Tiered Ledger Intelligence
+    💰 SINGULARITY KERNEL V29.1: Zero-Point Ledger + Gamified Credits
     
-    Manages the Equity Reservoir with a transparent 4-tier system:
-      T1 ESCROW: φ-based escrow (1.618%)
-      T2 LABOR: Volunteer credit tracking ($15/hr)
-      T3 BUFFER: Safety floor ($40,000 LOCKED)
-      T4 EXPANSION: Liquid 'Cause' money for real-world events
+    V29.1 CHANGES:
+      - Equity Reservoir RESET to $0.00 (placeholder purged)
+      - Volunteer "Pay" converted to Fans/Credits gamification
+      - Revenue Node LOCKED to Admin (kyndsmiles) only
+      - Milestone tracking shifted to system growth resonance
     
-    Includes Haptic Milestone Alerts at 80% intensity.
+    FOUR-TIERED STRUCTURE (Production Mode):
+      T1 ESCROW: φ-based escrow (1.618%) — $0.00 base
+      T2 FANS: Gamified contribution tracking (10 Fans/hr)
+      T3 BUFFER: Safety floor ($0.00 — no placeholder)
+      T4 EXPANSION: Real liquid funds (Admin-visible only)
     """
     
     # ═══════════════════════════════════════════════════════════════════════════
@@ -61,10 +65,15 @@ class AutonomousTreasury:
     
     PHI = 1.618033988749895
     PHI_CAP = 0.01618  # φ-based spending cap (1.618%)
-    SAFETY_BUFFER = 40000.00  # Minimum equity floor (TIER 3 - LOCKED)
+    SAFETY_BUFFER = 0.00  # V29.1: Zero-Point (no placeholder)
     SUCCESS_FREQUENCY = 528  # Hz - Healing/Success pulse
     SOLFEGGIO_PULSE = [174, 100, 528, 100, 174]  # Solfeggio-aligned vibration pattern
-    VOLUNTEER_RATE = 15.00  # $/hr (TIER 2 tracking)
+    
+    # V29.1: Gamified Volunteer System
+    VOLUNTEER_RATE_USD = 0.00  # No USD payout
+    FANS_PER_HOUR = 10  # Gamified: 10 Fans per volunteer hour
+    CREDITS_PER_HOUR = 5  # Secondary: 5 Credits per hour
+    
     HAPTIC_THRESHOLD = 1000.00  # $1,000 milestone for haptic pulse
     HAPTIC_INTENSITY = 0.80  # 80% intensity
     
@@ -73,42 +82,44 @@ class AutonomousTreasury:
     MASTER_PRINT_ID = "708B8ED1E974D85585BBBD8E06E0291E"
     
     def __init__(self):
-        """Initialize the Singularity Kernel V29.0."""
+        """Initialize the Singularity Kernel V29.1 — Zero-Point Production Mode."""
         
-        # Core state
-        self.equity_reservoir = 49018.24
+        # V29.1: Zero-Point Ledger (Placeholders PURGED)
+        self.equity_reservoir = 0.00  # Real value only
         self.escrow_vault = 0.00
         self.autopay_enabled = True
         self.lox_stable = True
         self.lox_temp = -183.0
         
-        # V29.0: Four-Tiered Structure
+        # V29.1: Four-Tiered Structure (Production)
         self.tiers = {
             "T1_ESCROW": 0.0,       # φ-based escrow (1.618%)
-            "T2_LABOR": 0.0,        # Volunteer credit tracking
-            "T3_BUFFER": self.SAFETY_BUFFER,  # Safety floor (LOCKED)
-            "T4_EXPANSION": 0.0,    # Liquid 'Cause' money
+            "T2_FANS": 0,           # Gamified: Fans count (integer)
+            "T3_BUFFER": 0.0,       # Zero-Point (no placeholder buffer)
+            "T4_EXPANSION": 0.0,    # Real liquid funds
         }
         
+        # V29.1: Gamified Volunteer Tracking
+        self.total_fans = 0
+        self.total_credits = 0
+        self.volunteer_hours = 0.0
+        
         # Haptic milestone tracking
-        self.last_haptic_milestone = 8000.00  # Baseline starting point
+        self.last_haptic_milestone = 0.00  # V29.1: Start at zero
         self.haptic_events: List[Dict[str, Any]] = []
         
         # Refresh tier calculations
         self._refresh_tiers()
         
-        # Transaction ledger
+        # Transaction ledger (empty — no demo data in production)
         self.ledger: List[Dict[str, Any]] = []
         self.pending_authorizations: List[Dict[str, Any]] = []
         
-        # V29.0: Seed with demo transactions for Live Ledger Feed
-        self._seed_demo_transactions()
-        
-        # Wellness Nodes
+        # Wellness Nodes (Revenue locked to Admin)
         self.nodes = {
-            "keystone": {"lat": 43.8955, "lon": -103.4182, "revenue": 0.0, "frequency": 528},
-            "rapid_city": {"lat": 44.0831, "lon": -103.2244, "revenue": 0.0, "frequency": 639},
-            "black_elk": {"lat": 43.8661, "lon": -103.5314, "revenue": 0.0, "frequency": 432},
+            "keystone": {"lat": 43.8955, "lon": -103.4182, "revenue": 0.0, "frequency": 528, "fans": 0},
+            "rapid_city": {"lat": 44.0831, "lon": -103.2244, "revenue": 0.0, "frequency": 639, "fans": 0},
+            "black_elk": {"lat": 43.8661, "lon": -103.5314, "revenue": 0.0, "frequency": 432, "fans": 0},
         }
         
         # Spending categories
@@ -120,112 +131,84 @@ class AutonomousTreasury:
             "maintenance": 0.0,
         }
         
-        logger.info("💰 SINGULARITY_KERNEL_V29.0: Four-Tiered Ledger Intelligence initialized")
-        logger.info(f"   Equity: ${self.equity_reservoir:,.2f} | T4 Expansion: ${self.tiers['T4_EXPANSION']:,.2f}")
-    
-    def _seed_demo_transactions(self):
-        """
-        V29.0: Seed demo transactions for the Live Ledger Feed.
-        Shows realistic fund flow for the Master Authority view.
-        """
-        demo_txns = [
-            {
-                "id": "TXN_SEED_001",
-                "amount": 250.00,
-                "type": "REVENUE",
-                "source": "Seven Seals Advocacy",
-                "node": "keystone",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat(),
-                "equity_after": 49018.24,
-            },
-            {
-                "id": "TXN_SEED_002",
-                "amount": 15.00,
-                "type": "REVENUE",
-                "source": "Volunteer Credit (1hr)",
-                "node": "rapid_city",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=5)).isoformat(),
-                "equity_after": 49033.24,
-            },
-            {
-                "id": "TXN_SEED_003",
-                "amount": 29.99,
-                "type": "EXPENSE",
-                "vendor": "Vercel Hosting",
-                "category": "hosting",
-                "status": "COMPLETED",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=4)).isoformat(),
-                "equity_after": 49003.25,
-            },
-            {
-                "id": "TXN_SEED_004",
-                "amount": 500.00,
-                "type": "REVENUE",
-                "source": "Black Hills Wellness Donation",
-                "node": "black_elk",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=3)).isoformat(),
-                "equity_after": 49503.25,
-            },
-            {
-                "id": "TXN_SEED_005",
-                "amount": 45.00,
-                "type": "REVENUE",
-                "source": "Volunteer Credits (3hr)",
-                "node": "keystone",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat(),
-                "equity_after": 49548.25,
-            },
-            {
-                "id": "TXN_SEED_006",
-                "amount": 75.00,
-                "type": "REVENUE",
-                "source": "Crystal Workshop Registration",
-                "node": "rapid_city",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat(),
-                "equity_after": 49623.25,
-            },
-            {
-                "id": "TXN_SEED_007",
-                "amount": 100.00,
-                "type": "REVENUE",
-                "source": "Masonry School Tuition",
-                "node": "keystone",
-                "timestamp": (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat(),
-                "equity_after": 49723.25,
-            },
-        ]
-        
-        self.ledger.extend(demo_txns)
-        logger.info(f"📜 LIVE_LEDGER: Seeded {len(demo_txns)} demo transactions")
+        logger.info("💰 SINGULARITY_KERNEL_V29.1: Zero-Point Ledger + Gamified Credits initialized")
+        logger.info(f"   Equity: ${self.equity_reservoir:,.2f} | Fans: {self.total_fans} | Mode: PRODUCTION")
     
     def _refresh_tiers(self):
         """
-        V29.0: Recalculate the Four-Tiered distribution.
+        V29.1: Recalculate the Four-Tiered distribution (Zero-Point Mode).
         
         Formula:
           T1 ESCROW = Reservoir × φ% (1.618%)
-          T2 LABOR = Volunteer rate tracking ($15/hr unit)
-          T3 BUFFER = $40,000 (LOCKED)
-          T4 EXPANSION = Reservoir - Buffer - Escrow (Liquid 'Cause' Money)
+          T2 FANS = Gamified contribution count (integer)
+          T3 BUFFER = $0.00 (Zero-Point — no placeholder)
+          T4 EXPANSION = Reservoir - Escrow (Real liquid funds)
         """
         # Tier 1: Phi-based Escrow (1.618%)
         self.tiers["T1_ESCROW"] = self.equity_reservoir * self.PHI_CAP
         
-        # Tier 3: Safety Buffer (Locked)
-        self.tiers["T3_BUFFER"] = self.SAFETY_BUFFER
+        # Tier 2: V29.1 — Gamified Fans (not USD)
+        self.tiers["T2_FANS"] = self.total_fans
         
-        # Tier 4: Expansion Fund (The Liquid 'Cause' Money)
-        # Formula: Total - Buffer - Escrow
-        self.tiers["T4_EXPANSION"] = max(
-            0, 
-            self.equity_reservoir - self.SAFETY_BUFFER - self.tiers["T1_ESCROW"]
-        )
+        # Tier 3: Zero-Point Buffer (no placeholder)
+        self.tiers["T3_BUFFER"] = 0.0
         
-        # Tier 2: Labor/Volunteer Credits (Unit representation)
-        self.tiers["T2_LABOR"] = self.VOLUNTEER_RATE
+        # Tier 4: Expansion Fund (Real Liquid)
+        self.tiers["T4_EXPANSION"] = max(0, self.equity_reservoir - self.tiers["T1_ESCROW"])
         
         # Check for Haptic Milestone
         self._check_haptic_milestone()
+    
+    def record_volunteer_contribution(self, hours: float, node: Optional[str] = None) -> Dict[str, Any]:
+        """
+        V29.1: Record volunteer contribution as Fans/Credits (NO USD PAYOUT).
+        
+        Args:
+            hours: Volunteer hours contributed
+            node: Optional wellness node attribution
+        
+        Returns:
+            Gamification reward details
+        """
+        fans_earned = int(hours * self.FANS_PER_HOUR)
+        credits_earned = int(hours * self.CREDITS_PER_HOUR)
+        
+        self.total_fans += fans_earned
+        self.total_credits += credits_earned
+        self.volunteer_hours += hours
+        
+        # Track node attribution
+        if node and node in self.nodes:
+            self.nodes[node]["fans"] += fans_earned
+        
+        # Refresh tiers
+        self._refresh_tiers()
+        
+        # Log contribution
+        contribution = {
+            "id": str(uuid.uuid4()),
+            "type": "VOLUNTEER_CONTRIBUTION",
+            "hours": hours,
+            "fans_earned": fans_earned,
+            "credits_earned": credits_earned,
+            "node": node,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "total_fans": self.total_fans,
+            "total_credits": self.total_credits,
+        }
+        
+        self.ledger.append(contribution)
+        
+        logger.info(f"🎮 VOLUNTEER: +{hours}hr → +{fans_earned} Fans, +{credits_earned} Credits")
+        
+        return {
+            "status": "ACCRUED",
+            "fans_earned": fans_earned,
+            "credits_earned": credits_earned,
+            "total_fans": self.total_fans,
+            "total_credits": self.total_credits,
+            "message": f"{hours * 10} Fans Accrued",
+        }
     
     def _check_haptic_milestone(self) -> Optional[Dict[str, Any]]:
         """

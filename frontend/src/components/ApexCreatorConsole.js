@@ -73,11 +73,13 @@ const RESONANCE = (PHI ** 2) / Math.PI;
 const SOVEREIGN_CONFIG = {
   master_email: 'kyndsmiles@gmail.com',
   master_print: '708B8ED1E974D85585BBBD8E06E0291E',
-  equity: 49018.24,
-  volunteer_rate: 15.00,
+  equity: 0.00,  // V29.1: Zero-Point (placeholder purged)
+  volunteer_rate: 0.00,  // V29.1: No USD payout
+  fans_per_hour: 10,  // V29.1: Gamified
+  credits_per_hour: 5,
 };
 
-// V29.0: Haptic Configuration
+// V29.1: Haptic Configuration
 const HAPTIC_CONFIG = {
   threshold: 1000.00,
   intensity: 0.80,
@@ -424,15 +426,15 @@ function AuditTerminalFeed({ auditStream, isVisible, onClose }) {
 }
 
 /**
- * V29.0: Four-Tiered Ledger Display Panel
+ * V29.1: Four-Tiered Ledger Display Panel (Zero-Point + Gamified)
  */
 function FourTierLedger({ tiers, isFlashing }) {
   if (!tiers) return null;
   
   const tierConfig = [
     { key: 'T1_ESCROW', label: 'ESCROW', icon: '🔒', color: '#F59E0B', formula: 'φ × 1.618%' },
-    { key: 'T2_LABOR', label: 'LABOR', icon: '📊', color: '#3B82F6', formula: '$15/hr', isRate: true },
-    { key: 'T3_BUFFER', label: 'RED LIMIT', icon: '🔴', color: '#EF4444', formula: '$40k LOCKED' },
+    { key: 'T2_FANS', label: 'FANS', icon: '⭐', color: '#8B5CF6', formula: '10 Fans/hr', isFans: true },
+    { key: 'T3_BUFFER', label: 'ZERO-POINT', icon: '⚫', color: '#6B7280', formula: '$0.00 BASE' },
     { key: 'T4_EXPANSION', label: 'KEYSTONE', icon: '🔓', color: '#22C55E', formula: 'LIQUID' },
   ];
   
@@ -447,9 +449,9 @@ function FourTierLedger({ tiers, isFlashing }) {
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-[9px] uppercase tracking-wider text-purple-400/80">
-          Four-Tier Ledger Intelligence
+          Zero-Point Ledger + Fan System
         </span>
-        <span className="text-[7px] text-white/30">V29.0</span>
+        <span className="text-[7px] text-white/30">V29.1</span>
       </div>
       
       {tierConfig.map((tier) => (
@@ -461,7 +463,7 @@ function FourTierLedger({ tiers, isFlashing }) {
           transition={{ duration: 0.5, repeat: isFlashing ? 3 : 0 }}
           className="flex items-center justify-between p-1.5 rounded"
           style={{
-            background: `rgba(${tier.color === '#F59E0B' ? '245,158,11' : tier.color === '#3B82F6' ? '59,130,246' : tier.color === '#EF4444' ? '239,68,68' : '34,197,94'},0.1)`,
+            background: `rgba(${tier.color === '#F59E0B' ? '245,158,11' : tier.color === '#8B5CF6' ? '139,92,246' : tier.color === '#6B7280' ? '107,114,128' : '34,197,94'},0.1)`,
             border: `1px solid ${tier.color}33`,
           }}
         >
@@ -478,8 +480,8 @@ function FourTierLedger({ tiers, isFlashing }) {
             className="text-sm font-mono font-bold"
             style={{ color: tier.color }}
           >
-            {tier.isRate ? (
-              <span>${tiers[tier.key]?.toFixed(0) || 15}/hr</span>
+            {tier.isFans ? (
+              <span>{tiers[tier.key] || 0} Fans</span>
             ) : (
               <span>${(tiers[tier.key] || 0).toLocaleString()}</span>
             )}
@@ -1304,7 +1306,7 @@ export default function ApexCreatorConsole({ onClose }) {
             className="text-[9px] px-2 py-0.5 rounded"
             style={{ background: 'rgba(139,92,246,0.2)', color: '#C4B5FD' }}
           >
-            V29.0 • QU-32 HYBRID + 4-TIER LEDGER
+            V29.1 • QU-32 HYBRID + ZERO-POINT LEDGER
           </span>
           
           {/* Soft Keys - V29.0 Enhanced */}
@@ -1589,14 +1591,14 @@ export default function ApexCreatorConsole({ onClose }) {
             </div>
           </div>
           
-          {/* V29.0: Four-Tiered Ledger Display (Master Only) */}
+          {/* V29.1: Four-Tiered Ledger Display (Master Only) */}
           {isMasterAuthority && fourTierLedger && (
             <div className="mb-3">
               <FourTierLedger 
                 tiers={{
                   T1_ESCROW: fourTierLedger.T1_ESCROW?.amount || 0,
-                  T2_LABOR: fourTierLedger.T2_LABOR?.amount || 15,
-                  T3_BUFFER: fourTierLedger.T3_BUFFER?.amount || 40000,
+                  T2_FANS: fourTierLedger.T2_FANS?.amount || 0,  // V29.1: Fans not Labor
+                  T3_BUFFER: fourTierLedger.T3_BUFFER?.amount || 0,  // V29.1: Zero-Point
                   T4_EXPANSION: fourTierLedger.T4_EXPANSION?.amount || 0,
                 }}
                 isFlashing={vaultFlashing}
@@ -1622,19 +1624,20 @@ export default function ApexCreatorConsole({ onClose }) {
               <DollarSign size={12} className="text-green-400" />
             </div>
             <div className="text-2xl font-mono text-green-400" style={{ fontWeight: '600' }}>
-              ${(treasury?.equity_reservoir || SOVEREIGN_CONFIG.equity).toLocaleString()}
+              ${(treasury?.equity_reservoir ?? SOVEREIGN_CONFIG.equity).toLocaleString()}
             </div>
             <div className="text-[9px] text-white/40 mt-1">
-              Volunteer Rate: ${SOVEREIGN_CONFIG.volunteer_rate}/hr
+              {/* V29.1: Gamified Fans System */}
+              Fan Rate: {SOVEREIGN_CONFIG.fans_per_hour} Fans/hr
             </div>
             
-            {/* V29.0: Tier 4 Expansion Highlight */}
+            {/* V29.1: Tier 4 Expansion Highlight */}
             {fourTierLedger?.T4_EXPANSION && (
               <div className="mt-2 pt-2 border-t border-white/10">
                 <div className="flex justify-between text-[9px]">
                   <span className="text-white/50">T4 KEYSTONE (Liquid)</span>
                   <span className="text-green-400 font-mono font-bold">
-                    ${fourTierLedger.T4_EXPANSION.amount?.toLocaleString()}
+                    ${fourTierLedger.T4_EXPANSION.amount?.toLocaleString() || '0'}
                   </span>
                 </div>
               </div>
@@ -1714,7 +1717,7 @@ export default function ApexCreatorConsole({ onClose }) {
               </div>
               <div className="flex justify-between text-[10px]">
                 <span className="text-white/60">Kernel</span>
-                <span className="font-mono text-cyan-400">V29.0</span>
+                <span className="font-mono text-cyan-400">V29.1</span>
               </div>
             </div>
           </div>
