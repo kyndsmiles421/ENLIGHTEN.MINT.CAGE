@@ -87,7 +87,7 @@ export function AvatarBadge({ authHeaders, size = 36 }) {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/avatar/profile`, { headers: authHeaders })
       .then(r => setProfile(r.data))
       .catch(() => {});

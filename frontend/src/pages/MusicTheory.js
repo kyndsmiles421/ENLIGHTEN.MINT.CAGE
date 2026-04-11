@@ -184,7 +184,7 @@ export default function MusicTheory() {
 
   // Load mastery data
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/mastery/tier`, { headers: authHeaders })
       .then(r => setMasteryData(r.data))
       .catch(() => {});

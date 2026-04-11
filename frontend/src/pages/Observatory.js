@@ -158,16 +158,26 @@ export default function Observatory() {
   const audioCtxRef = useRef(null);
 
   useEffect(() => {
-    if (!authHeaders) return;
-    axios.get(`${API}/observatory/planets`, { headers: authHeaders })
-      .then(r => { setPlanets(r.data.planets); setSelectedPlanet(r.data.planets[2]); }) // Default to Earth
-      .catch(() => {});
-    axios.get(`${API}/observatory/stars`, { headers: authHeaders })
+    // Observatory is now public - fetch data without auth requirement
+    // Auth headers are optional for personalization
+    const headers = authHeaders?.Authorization ? authHeaders : {};
+    
+    axios.get(`${API}/observatory/planets`, { headers })
+      .then(r => { 
+        setPlanets(r.data.planets); 
+        if (r.data.planets && r.data.planets.length > 2) {
+          setSelectedPlanet(r.data.planets[2]); // Default to Earth
+        }
+      })
+      .catch((err) => console.warn('Observatory planets fetch failed:', err?.response?.status));
+    
+    axios.get(`${API}/observatory/stars`, { headers })
       .then(r => setStars(r.data.stars))
-      .catch(() => {});
-    axios.get(`${API}/observatory/events`, { headers: authHeaders })
+      .catch((err) => console.warn('Observatory stars fetch failed:', err?.response?.status));
+    
+    axios.get(`${API}/observatory/events`, { headers })
       .then(r => { setEvents(r.data.events); setMoon(r.data.moon); })
-      .catch(() => {});
+      .catch((err) => console.warn('Observatory events fetch failed:', err?.response?.status));
   }, [authHeaders]);
 
   const playSonification = useCallback((hz, color) => {

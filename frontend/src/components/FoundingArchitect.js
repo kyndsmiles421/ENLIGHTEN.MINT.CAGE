@@ -10,7 +10,7 @@ export function FoundingArchitectBadge({ authHeaders, compact = false }) {
   const [status, setStatus] = useState(null);
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/founding-architect/status`, { headers: authHeaders })
       .then(r => setStatus(r.data))
       .catch(() => {});
@@ -48,7 +48,7 @@ export default function FoundingArchitectPanel({ authHeaders }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/founding-architect/status`, { headers: authHeaders })
       .then(r => setStatus(r.data))
       .catch(() => {})

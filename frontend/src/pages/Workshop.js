@@ -126,7 +126,7 @@ export default function Workshop() {
   const [isqResult, setIsqResult] = useState(null);
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/workshop/platonic-solids`, { headers: authHeaders })
       .then(r => { setSolids(r.data.solids); setSelectedSolid(r.data.solids[0]); })
       .catch(() => {});
@@ -143,7 +143,7 @@ export default function Workshop() {
   }, [authHeaders, grDimension]);
 
   const calcHarmonics = useCallback(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     const speed = selectedMaterial?.speed_of_sound || 343;
     axios.post(`${API}/workshop/harmonic-nodes`, { length: stringLength, harmonic: harmonicNum, speed_of_sound: speed }, { headers: authHeaders })
       .then(r => setHarmonicResult(r.data))
@@ -151,7 +151,7 @@ export default function Workshop() {
   }, [authHeaders, stringLength, harmonicNum, selectedMaterial]);
 
   const calcInverseSquare = useCallback(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.post(`${API}/workshop/inverse-square`, { power: isqPower, distance: isqDistance }, { headers: authHeaders })
       .then(r => setIsqResult(r.data))
       .catch(() => {});

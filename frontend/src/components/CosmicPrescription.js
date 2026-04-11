@@ -39,7 +39,7 @@ export default function CosmicPrescription({ authHeaders }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/wellness/prescription`, { headers: authHeaders })
       .then(r => setRx(r.data))
       .catch(() => {})

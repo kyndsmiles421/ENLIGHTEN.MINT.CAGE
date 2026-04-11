@@ -17,7 +17,7 @@ export default function FidelityHUD({ authHeaders }) {
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = useCallback(async () => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     try {
       const res = await axios.get(`${API}/fidelity/status`, { headers: authHeaders });
       setStatus(res.data);
@@ -32,7 +32,7 @@ export default function FidelityHUD({ authHeaders }) {
   useEffect(() => { fetchStatus(); }, [fetchStatus]);
   // Poll every 60s to update timer
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     const interval = setInterval(fetchStatus, 60000);
     return () => clearInterval(interval);
   }, [authHeaders, fetchStatus]);

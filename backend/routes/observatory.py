@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Body
-from deps import db, get_current_user, logger
+from deps import db, get_current_user, get_current_user_optional, logger
 from datetime import datetime, timezone, timedelta
 import math
 
@@ -97,7 +97,7 @@ def generate_celestial_events():
 
 
 @router.get("/observatory/planets")
-async def get_planet_data(user=Depends(get_current_user)):
+async def get_planet_data(user=Depends(get_current_user_optional)):
     """Planet electromagnetic frequencies and orbital data."""
     planets = []
     for name, data in PLANET_FREQUENCIES.items():
@@ -117,7 +117,7 @@ async def get_planet_data(user=Depends(get_current_user)):
 
 
 @router.get("/observatory/stars")
-async def get_star_data(user=Depends(get_current_user)):
+async def get_star_data(user=Depends(get_current_user_optional)):
     """Notable stars with light-time distances and sonification data."""
     stars = []
     for s in NOTABLE_STARS:
@@ -132,7 +132,7 @@ async def get_star_data(user=Depends(get_current_user)):
 
 
 @router.get("/observatory/events")
-async def get_celestial_events(user=Depends(get_current_user)):
+async def get_celestial_events(user=Depends(get_current_user_optional)):
     """Upcoming celestial events and current moon phase."""
     events, moon = generate_celestial_events()
     # Sort by days until
@@ -145,7 +145,7 @@ async def get_celestial_events(user=Depends(get_current_user)):
 
 
 @router.post("/observatory/sonify")
-async def sonify_object(data: dict = Body(...), user=Depends(get_current_user)):
+async def sonify_object(data: dict = Body(...), user=Depends(get_current_user_optional)):
     """Convert astronomical data into sound parameters."""
     object_type = data.get("type", "")  # "planet" or "star"
     name = data.get("name", "").lower()

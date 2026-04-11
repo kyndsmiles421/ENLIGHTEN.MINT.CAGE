@@ -18,7 +18,7 @@ export function SatelliteInspector({ sat, onClose, authHeaders }) {
   const Icon = sat.icon;
 
   useEffect(() => {
-    if (!authHeaders) return;
+    if (!authHeaders?.Authorization) return;
     axios.get(`${API}/archives/entry/${sat.id}`, { headers: authHeaders })
       .then(r => { if (!r.data.error && !r.data.locked) setArchiveData(r.data); })
       .catch(() => {});
