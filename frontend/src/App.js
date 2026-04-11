@@ -281,6 +281,7 @@ const SovereignLab = lazy(() => import('./pages/SovereignLab'));
 const SovereignCanvasPage = lazy(() => import('./pages/SovereignCanvasPage'));
 const LatticeView = lazy(() => import('./pages/LatticeView'));
 const SovereignFabricator = lazy(() => import('./pages/SovereignFabricator'));
+const ARPortalPage = lazy(() => import('./pages/ARPortalPage'));
 
 function PageLoader() {
   return (
@@ -664,6 +665,7 @@ function AnimatedRoutes() {
         <Route path="/sovereign-hub" element={<SovereignHub />} />
         <Route path="/ether-hub" element={<EnlightenMintHub />} />
         <Route path="/lattice-view" element={<LatticeView />} />
+        <Route path="/ar-portal" element={<ARPortalPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
         <Route path="/sanctuary" element={<Sanctuary />} />
