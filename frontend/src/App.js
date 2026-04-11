@@ -495,26 +495,25 @@ function CafeApp() {
             <Sparkles size={20} />
             <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Discover</span>
           </Link>
-          <button 
-            onClick={() => window.ENLIGHTEN_OS?.showMixer?.()}
+          {/* V29.0: HARD-ROUTED TO APEX CREATOR CONSOLE — Legacy V27 showMixer() PURGED */}
+          <Link 
+            to="/creator-console"
             className="bar-nav-item"
             data-hz="963"
             data-testid="nav-mixer"
             style={{ 
               color: '#60a5fa', 
-              textAlign: 'center', 
-              background: 'none', 
-              border: 'none', 
-              cursor: 'pointer' 
+              textAlign: 'center',
+              textDecoration: 'none'
             }}
           >
             <Sliders size={20} />
             <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Mixer</span>
-          </button>
+          </Link>
         </nav>
       )}
       
-      {/* React CreatorMixerUI deprecated - Using native Steven's Mixer from ENLIGHTEN_OS.showMixer() */}
+      {/* V29.0: Legacy CreatorMixerUI & ENLIGHTEN_OS.showMixer() DEPRECATED — Mixer routes to /creator-console */}
       
       {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
     </>

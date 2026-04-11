@@ -192,72 +192,26 @@ const ENLIGHTEN_OS = (() => {
         // STEVEN'S MIXING BOARD V26.8
         // ═══════════════════════════════════════════════════════════════════
         initMixingBoard: () => {
-            const existing = document.getElementById('sovereign-mixer');
-            if (existing) existing.remove();
-            
-            mixerElement = document.createElement('div');
-            mixerElement.id = 'sovereign-mixer';
-            mixerElement.className = 'herkimer-mixer';
-            mixerElement.setAttribute('data-testid', 'steven-mixer');
-            
-            mixerElement.innerHTML = `
-                <div class="mixer-header-section">
-                    <h2 class="mixer-title">STEVEN'S MIXER V${VERSION}</h2>
-                    <div class="mixer-meta">${ARCHITECT} | ${TERMINAL}</div>
-                    <div class="mixer-subtitle">RAINBOW REFRACTION</div>
-                    <div class="mixer-seed">${OMEGA_SEED.substring(0, 12)}...</div>
-                </div>
-                <div class="mixer-channels-section">
-                    ${Object.keys(TIERS).map(key => {
-                        const t = TIERS[key];
-                        return `
-                            <div class="mixer-channel-tier" data-tier="${key}">
-                                <div class="channel-meta">
-                                    <strong style="color: ${t.color}">${key}</strong>
-                                    <span class="channel-freq">[${t.freq}Hz]</span>
-                                    <span class="channel-school">${t.school}</span>
-                                </div>
-                                <div class="channel-fader">
-                                    <input type="range" min="0.5" max="2.5" step="0.01" value="${t.scale}" 
-                                           class="tier-fader" data-tier="${key}"
-                                           oninput="window.ENLIGHTEN_OS.tune('${key}', this.value)">
-                                    <span class="fader-value">${t.scale.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <div class="mixer-master-section">
-                    <div class="master-controls">
-                        <button class="master-btn nova-btn" onclick="window.ENLIGHTEN_OS.toggleNovaPulse()">NOVA</button>
-                        <button class="master-btn bloom-btn" onclick="window.ENLIGHTEN_OS.triggerBloom()">BLOOM</button>
-                        <button class="master-btn refract-btn" onclick="window.ENLIGHTEN_OS.applyRainbowRefraction()">REFRACT</button>
-                    </div>
-                    <div class="master-controls-row2">
-                        <button class="master-btn handshake-btn" onclick="window.ENLIGHTEN_OS.sendLiveAlert('RAINBOW', 'V27.0 Prismatic Transmission')">HANDSHAKE</button>
-                    </div>
-                    <div class="schumann-indicator">
-                        <span class="crystal-icon">PRISM</span>
-                        <span class="schumann-value">${SCHUMANN}Hz</span>
-                        <span class="version-tag">V${VERSION}</span>
-                    </div>
-                </div>
-                <button class="mixer-close-btn" onclick="window.ENLIGHTEN_OS.hideMixer()">x</button>
-            `;
-            
-            mixerElement.style.display = 'none';
-            mixerElement.style.pointerEvents = 'none'; // Don't block clicks when hidden
-            document.body.appendChild(mixerElement);
+            // V29.0: LEGACY MIXER DISABLED — All mixer traffic now routes to /creator-console (Apex Creator Console V29.0)
+            // The QU-32 hardware-emulated engine at /creator-console replaces this V27 overlay
+            console.log("%c [V29.0] Legacy V27 mixer overlay DISABLED — Use /creator-console for Apex Console", "color: #22c55e; font-weight: bold;");
+            return; // NOOP
         },
 
         toggleMixer: (show) => {
-            if (!mixerElement) return;
-            if (show === undefined) show = mixerElement.style.display === 'none';
-            mixerElement.style.display = show ? 'flex' : 'none';
-            mixerElement.style.pointerEvents = show ? 'auto' : 'none'; // Only capture when visible
+            // V29.0: LEGACY MIXER DISABLED — Redirect to /creator-console
+            if (show) {
+                console.log("%c [V29.0] Redirecting to Apex Creator Console...", "color: #22c55e;");
+                window.location.href = '/creator-console';
+            }
         },
-        showMixer: () => ENLIGHTEN_OS.toggleMixer(true),
-        hideMixer: () => ENLIGHTEN_OS.toggleMixer(false),
+        showMixer: () => {
+            // V29.0: Hard redirect to Apex Console
+            window.location.href = '/creator-console';
+        },
+        hideMixer: () => {
+            // NOOP - no legacy mixer to hide
+        },
 
         // ═══════════════════════════════════════════════════════════════════
         // NOVA PULSE

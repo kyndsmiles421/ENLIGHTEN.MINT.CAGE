@@ -976,16 +976,17 @@ function MixerPanel({ onClose, navigate }) {
             <Square size={10} /> Stop All
           </button>
         )}
+        {/* V29.0: Direct route to Apex Creator Console */}
         <button
-          onClick={() => { onClose(); document.querySelector('[data-testid="mixer-toggle"]')?.click(); }}
+          onClick={() => { onClose(); navigate('/creator-console'); }}
           className="w-full py-2 rounded-lg text-[10px]"
           style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.12)', color: '#818CF8' }}
           data-testid="dock-open-mixer"
         >
-          Open Console
+          Apex Console V29
         </button>
         <button
-          onClick={() => { onClose(); navigate('/cosmic-mixer'); }}
+          onClick={() => { onClose(); navigate('/creator-console'); }}
           className="w-full py-2 rounded-lg text-[10px]"
           style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', color: 'rgba(248,250,252,0.45)' }}
           data-testid="dock-open-mixer-page"
