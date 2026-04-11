@@ -39,14 +39,19 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import L2FractalShader from './L2FractalShader';
 import {
   Sliders, Volume2, Waves, Thermometer, Zap, Eye, EyeOff,
   Layers, Settings, Play, Pause, SkipBack, SkipForward,
   Maximize2, Minimize2, Lock, Unlock, Radio, Cpu, Activity,
-  Mic, Diamond, RotateCcw, Gauge
+  Mic, Diamond, RotateCcw, Gauge, DollarSign, TrendingUp, 
+  TrendingDown, AlertTriangle, QrCode, Printer, RefreshCw,
+  Shield, StopCircle
 } from 'lucide-react';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SACRED CONSTANTS
@@ -84,11 +89,11 @@ const LAYERS = {
     strips: [
       { id: 1, name: 'Aether Flow', value: 75 },
       { id: 2, name: 'Equity Gain', value: 60 },
-      { id: 3, name: 'Keystone', value: 80 },
-      { id: 4, name: 'Rapid City', value: 65 },
-      { id: 5, name: 'Black Elk', value: 90 },
-      { id: 6, name: 'Advocacy', value: 55 },
-      { id: 7, name: 'Seven Seals', value: 70 },
+      { id: 3, name: 'Keystone', value: 80, node: true },
+      { id: 4, name: 'Rapid City', value: 65, node: true },
+      { id: 5, name: 'Black Elk', value: 90, node: true },
+      { id: 6, name: 'AUTO-PAY', value: 50, special: 'autopay', color: '#22C55E' },
+      { id: 7, name: 'ESCROW', value: 0, special: 'escrow', color: '#F59E0B' },
       { id: 8, name: 'Master Out', value: 85 },
     ],
   },
@@ -115,6 +120,20 @@ const LAYERS = {
       { id: 6, name: 'Depth', value: 65 },
       { id: 7, name: 'Void Floor', value: 100 },
       { id: 8, name: 'GPU Out', value: 80 },
+    ],
+  },
+  D: {
+    name: 'QR/PRINT',
+    color: '#F59E0B',
+    strips: [
+      { id: 1, name: 'QR Gen', value: 100, special: 'qr_generate' },
+      { id: 2, name: 'Regen Math', value: 85, special: 'regenerate' },
+      { id: 3, name: 'Print Drv', value: 70, special: 'print' },
+      { id: 4, name: 'Verify', value: 100, special: 'verify' },
+      { id: 5, name: 'Receipt', value: 90 },
+      { id: 6, name: 'Cert Gen', value: 75 },
+      { id: 7, name: 'NFT Mint', value: 60 },
+      { id: 8, name: 'Output', value: 95 },
     ],
   },
 };
@@ -278,6 +297,235 @@ function FaderStrip({ strip, layerColor, onValueChange, onMute, onSolo }) {
           S
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Cash Flow Visualizer - Live Treasury Waveform
+ */
+function CashFlowVisualizer({ cashFlow, isMaster }) {
+  const canvasRef = useRef(null);
+  
+  useEffect(() => {
+    if (!canvasRef.current || !cashFlow) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Clear canvas
+    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw center line
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+    
+    // Draw waveform
+    const peaks = cashFlow?.waveform?.peaks || [];
+    const dips = cashFlow?.waveform?.dips || [];
+    
+    // Simulate waveform with peaks (revenue) going up, dips (expenses) going down
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    
+    for (let i = 0; i < 50; i++) {
+      const x = (i / 50) * width;
+      const peakNoise = peaks.length > 0 ? Math.sin(i * 0.3) * 15 : 0;
+      const dipNoise = dips.length > 0 ? Math.sin(i * 0.5 + 1) * 10 : 0;
+      const y = (height / 2) - peakNoise + dipNoise + Math.random() * 5;
+      ctx.lineTo(x, y);
+    }
+    
+    ctx.strokeStyle = 'rgba(34, 197, 94, 0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Fill gradient
+    ctx.lineTo(width, height / 2);
+    ctx.lineTo(0, height / 2);
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.2)');
+    gradient.addColorStop(0.5, 'rgba(0,0,0,0)');
+    gradient.addColorStop(1, 'rgba(239, 68, 68, 0.2)');
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    
+  }, [cashFlow]);
+  
+  return (
+    <div 
+      className="rounded-lg overflow-hidden"
+      style={{
+        background: 'rgba(0,0,0,0.4)',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <div className="px-2 py-1 border-b border-white/5 flex items-center justify-between">
+        <span className="text-[8px] text-white/40 uppercase tracking-wider">Cash Flow</span>
+        <div className="flex items-center gap-2 text-[7px]">
+          <span className="flex items-center gap-1 text-green-400">
+            <TrendingUp size={8} /> +${cashFlow?.total_revenue?.toFixed(0) || 0}
+          </span>
+          <span className="flex items-center gap-1 text-red-400">
+            <TrendingDown size={8} /> -${cashFlow?.total_expenses?.toFixed(0) || 0}
+          </span>
+        </div>
+      </div>
+      <canvas ref={canvasRef} width={200} height={60} className="w-full" />
+    </div>
+  );
+}
+
+/**
+ * Treasury Control Panel - Autonomous System Controls
+ */
+function TreasuryPanel({ treasury, onEmergencyStop, onResume, isMaster, authHeaders }) {
+  const [autopayEnabled, setAutopayEnabled] = useState(true);
+  
+  const handleEmergencyStop = async () => {
+    try {
+      await axios.post(`${API}/treasury/emergency-stop`, {}, { headers: authHeaders });
+      setAutopayEnabled(false);
+      onEmergencyStop?.();
+    } catch (err) {
+      console.error('Emergency stop failed:', err);
+    }
+  };
+  
+  const handleResume = async () => {
+    try {
+      await axios.post(`${API}/treasury/resume`, {}, { headers: authHeaders });
+      setAutopayEnabled(true);
+      onResume?.();
+    } catch (err) {
+      console.error('Resume failed:', err);
+    }
+  };
+  
+  return (
+    <div 
+      className="p-3 rounded-lg"
+      style={{
+        background: 'linear-gradient(135deg, rgba(34,197,94,0.05), rgba(245,158,11,0.05))',
+        border: '1px solid rgba(34,197,94,0.2)',
+      }}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[9px] uppercase tracking-wider text-green-400/80">
+          Autonomous Treasury
+        </span>
+        <div 
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[7px]"
+          style={{
+            background: autopayEnabled ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)',
+            color: autopayEnabled ? '#22C55E' : '#EF4444',
+          }}
+        >
+          {autopayEnabled ? <Shield size={8} /> : <AlertTriangle size={8} />}
+          {autopayEnabled ? 'AUTO-PAY ACTIVE' : 'STOPPED'}
+        </div>
+      </div>
+      
+      {/* φ Cap Display */}
+      <div className="flex items-center justify-between text-[9px] mb-2">
+        <span className="text-white/50">φ Cap (1.618%)</span>
+        <span className="font-mono text-amber-400">
+          ${((treasury?.equity_reservoir || 49018.24) * 0.01618).toFixed(2)}
+        </span>
+      </div>
+      
+      {/* Safety Buffer */}
+      <div className="flex items-center justify-between text-[9px] mb-3">
+        <span className="text-white/50">Safety Buffer</span>
+        <span className="font-mono text-cyan-400">$40,000.00</span>
+      </div>
+      
+      {/* Control Buttons (Master Only) */}
+      {isMaster && (
+        <div className="flex gap-2">
+          {autopayEnabled ? (
+            <button
+              onClick={handleEmergencyStop}
+              className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded text-[8px] font-bold uppercase tracking-wider transition-all hover:scale-105"
+              style={{
+                background: 'rgba(239,68,68,0.2)',
+                border: '1px solid rgba(239,68,68,0.4)',
+                color: '#FCA5A5',
+              }}
+            >
+              <StopCircle size={10} />
+              Emergency Stop
+            </button>
+          ) : (
+            <button
+              onClick={handleResume}
+              className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded text-[8px] font-bold uppercase tracking-wider transition-all hover:scale-105"
+              style={{
+                background: 'rgba(34,197,94,0.2)',
+                border: '1px solid rgba(34,197,94,0.4)',
+                color: '#86EFAC',
+              }}
+            >
+              <Play size={10} />
+              Resume Auto-Pay
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Unified QR/Print Strip - Generate, Regenerate, Print, Verify
+ */
+function QRPrintStrip({ onGenerate, onRegenerate, onPrint, onVerify }) {
+  return (
+    <div 
+      className="p-2 rounded-lg flex items-center gap-2"
+      style={{
+        background: 'rgba(245,158,11,0.1)',
+        border: '1px solid rgba(245,158,11,0.2)',
+      }}
+    >
+      <button
+        onClick={onGenerate}
+        className="flex flex-col items-center gap-1 p-2 rounded transition-all hover:scale-105"
+        style={{ background: 'rgba(255,255,255,0.05)' }}
+      >
+        <QrCode size={14} className="text-amber-400" />
+        <span className="text-[7px] text-white/50">GEN</span>
+      </button>
+      <button
+        onClick={onRegenerate}
+        className="flex flex-col items-center gap-1 p-2 rounded transition-all hover:scale-105"
+        style={{ background: 'rgba(255,255,255,0.05)' }}
+      >
+        <RefreshCw size={14} className="text-purple-400" />
+        <span className="text-[7px] text-white/50">REGEN</span>
+      </button>
+      <button
+        onClick={onPrint}
+        className="flex flex-col items-center gap-1 p-2 rounded transition-all hover:scale-105"
+        style={{ background: 'rgba(255,255,255,0.05)' }}
+      >
+        <Printer size={14} className="text-cyan-400" />
+        <span className="text-[7px] text-white/50">PRINT</span>
+      </button>
+      <button
+        onClick={onVerify}
+        className="flex flex-col items-center gap-1 p-2 rounded transition-all hover:scale-105"
+        style={{ background: 'rgba(255,255,255,0.05)' }}
+      >
+        <Shield size={14} className="text-green-400" />
+        <span className="text-[7px] text-white/50">VERIFY</span>
+      </button>
     </div>
   );
 }
@@ -459,7 +707,7 @@ function HorizontalSlider({ label, value, onChange, min = 0, max = 100, unit = '
  * Main Apex Creator Console Component
  */
 export default function ApexCreatorConsole({ onClose }) {
-  const { user } = useAuth();
+  const { user, authHeaders } = useAuth();
   const isMasterAuthority = user?.email === SOVEREIGN_CONFIG.master_email;
   
   // State
@@ -478,6 +726,43 @@ export default function ApexCreatorConsole({ onClose }) {
   const [masterVolume, setMasterVolume] = useState(85);
   const [showSuperStrip, setShowSuperStrip] = useState(true);
   const [softKeys, setSoftKeys] = useState(SOFT_KEYS);
+  
+  // Treasury state
+  const [treasury, setTreasury] = useState(null);
+  const [cashFlow, setCashFlow] = useState(null);
+  
+  // Fetch treasury data
+  useEffect(() => {
+    const fetchTreasury = async () => {
+      try {
+        const [statusRes, cashFlowRes] = await Promise.all([
+          axios.get(`${API}/treasury/status`),
+          axios.get(`${API}/treasury/cashflow?hours=24`),
+        ]);
+        
+        if (statusRes.data.status === 'success') {
+          setTreasury(statusRes.data.treasury);
+        }
+        if (cashFlowRes.data.status === 'success') {
+          setCashFlow(cashFlowRes.data.cashflow);
+        }
+        
+        // Fetch full audit if master
+        if (isMasterAuthority && authHeaders?.Authorization) {
+          const auditRes = await axios.get(`${API}/treasury/audit`, { headers: authHeaders });
+          if (auditRes.data.status === 'success') {
+            setTreasury(prev => ({ ...prev, ...auditRes.data.audit }));
+          }
+        }
+      } catch (err) {
+        console.warn('Treasury fetch failed:', err);
+      }
+    };
+    
+    fetchTreasury();
+    const interval = setInterval(fetchTreasury, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, [isMasterAuthority, authHeaders]);
   
   // Layer switching
   useEffect(() => {
@@ -827,15 +1112,41 @@ export default function ApexCreatorConsole({ onClose }) {
             }}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] text-green-400/80 uppercase tracking-wider">Equity Sync</span>
-              <Activity size={12} className="text-green-400" />
+              <span className="text-[9px] text-green-400/80 uppercase tracking-wider">Equity Reservoir</span>
+              <DollarSign size={12} className="text-green-400" />
             </div>
             <div className="text-2xl font-mono text-green-400" style={{ fontWeight: '600' }}>
-              ${SOVEREIGN_CONFIG.equity.toLocaleString()}
+              ${(treasury?.equity_reservoir || SOVEREIGN_CONFIG.equity).toLocaleString()}
             </div>
             <div className="text-[9px] text-white/40 mt-1">
               Volunteer Rate: ${SOVEREIGN_CONFIG.volunteer_rate}/hr
             </div>
+          </div>
+          
+          {/* Cash Flow Visualizer */}
+          <div className="mb-3">
+            <CashFlowVisualizer cashFlow={cashFlow} isMaster={isMasterAuthority} />
+          </div>
+          
+          {/* Treasury Control Panel */}
+          <div className="mb-3">
+            <TreasuryPanel 
+              treasury={treasury}
+              isMaster={isMasterAuthority}
+              authHeaders={authHeaders}
+              onEmergencyStop={() => console.log('Emergency stop triggered')}
+              onResume={() => console.log('Auto-pay resumed')}
+            />
+          </div>
+          
+          {/* QR/Print Unified Strip */}
+          <div className="mb-3">
+            <QRPrintStrip 
+              onGenerate={() => console.log('QR Generate')}
+              onRegenerate={() => console.log('Math Regenerate')}
+              onPrint={() => console.log('Print')}
+              onVerify={() => console.log('Verify')}
+            />
           </div>
           
           {/* System Status */}
