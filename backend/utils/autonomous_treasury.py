@@ -101,6 +101,9 @@ class AutonomousTreasury:
         self.ledger: List[Dict[str, Any]] = []
         self.pending_authorizations: List[Dict[str, Any]] = []
         
+        # V29.0: Seed with demo transactions for Live Ledger Feed
+        self._seed_demo_transactions()
+        
         # Wellness Nodes
         self.nodes = {
             "keystone": {"lat": 43.8955, "lon": -103.4182, "revenue": 0.0, "frequency": 528},
@@ -119,6 +122,81 @@ class AutonomousTreasury:
         
         logger.info("💰 SINGULARITY_KERNEL_V29.0: Four-Tiered Ledger Intelligence initialized")
         logger.info(f"   Equity: ${self.equity_reservoir:,.2f} | T4 Expansion: ${self.tiers['T4_EXPANSION']:,.2f}")
+    
+    def _seed_demo_transactions(self):
+        """
+        V29.0: Seed demo transactions for the Live Ledger Feed.
+        Shows realistic fund flow for the Master Authority view.
+        """
+        demo_txns = [
+            {
+                "id": "TXN_SEED_001",
+                "amount": 250.00,
+                "type": "REVENUE",
+                "source": "Seven Seals Advocacy",
+                "node": "keystone",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat(),
+                "equity_after": 49018.24,
+            },
+            {
+                "id": "TXN_SEED_002",
+                "amount": 15.00,
+                "type": "REVENUE",
+                "source": "Volunteer Credit (1hr)",
+                "node": "rapid_city",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=5)).isoformat(),
+                "equity_after": 49033.24,
+            },
+            {
+                "id": "TXN_SEED_003",
+                "amount": 29.99,
+                "type": "EXPENSE",
+                "vendor": "Vercel Hosting",
+                "category": "hosting",
+                "status": "COMPLETED",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=4)).isoformat(),
+                "equity_after": 49003.25,
+            },
+            {
+                "id": "TXN_SEED_004",
+                "amount": 500.00,
+                "type": "REVENUE",
+                "source": "Black Hills Wellness Donation",
+                "node": "black_elk",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=3)).isoformat(),
+                "equity_after": 49503.25,
+            },
+            {
+                "id": "TXN_SEED_005",
+                "amount": 45.00,
+                "type": "REVENUE",
+                "source": "Volunteer Credits (3hr)",
+                "node": "keystone",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat(),
+                "equity_after": 49548.25,
+            },
+            {
+                "id": "TXN_SEED_006",
+                "amount": 75.00,
+                "type": "REVENUE",
+                "source": "Crystal Workshop Registration",
+                "node": "rapid_city",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat(),
+                "equity_after": 49623.25,
+            },
+            {
+                "id": "TXN_SEED_007",
+                "amount": 100.00,
+                "type": "REVENUE",
+                "source": "Masonry School Tuition",
+                "node": "keystone",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat(),
+                "equity_after": 49723.25,
+            },
+        ]
+        
+        self.ledger.extend(demo_txns)
+        logger.info(f"📜 LIVE_LEDGER: Seeded {len(demo_txns)} demo transactions")
     
     def _refresh_tiers(self):
         """

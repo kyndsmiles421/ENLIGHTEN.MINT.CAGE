@@ -209,6 +209,106 @@ const SOFT_KEYS = [
 ];
 
 /**
+ * V29.0: Live Ledger Feed - Scrolling Transaction Ticker
+ * Shows the "who" and "what" of money flow in real-time
+ */
+function LiveLedgerFeed({ transactions, isActive }) {
+  const scrollRef = useRef(null);
+  
+  // Auto-scroll animation
+  useEffect(() => {
+    if (!scrollRef.current || !isActive) return;
+    
+    const scroll = scrollRef.current;
+    let animationId;
+    let position = 0;
+    
+    const animate = () => {
+      position += 0.5; // Scroll speed
+      if (position >= scroll.scrollWidth / 2) {
+        position = 0;
+      }
+      scroll.scrollLeft = position;
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [isActive, transactions]);
+  
+  if (!transactions || transactions.length === 0) {
+    return (
+      <div className="flex items-center gap-2 text-[9px] text-white/30">
+        <Activity size={10} className="animate-pulse" />
+        <span>Awaiting ledger activity...</span>
+      </div>
+    );
+  }
+  
+  // Duplicate transactions for seamless loop
+  const displayTxns = [...transactions, ...transactions];
+  
+  return (
+    <div 
+      ref={scrollRef}
+      className="flex items-center gap-6 overflow-hidden whitespace-nowrap"
+      style={{ scrollBehavior: 'auto' }}
+      data-testid="live-ledger-feed"
+    >
+      {displayTxns.map((txn, idx) => (
+        <div 
+          key={`${txn.id}-${idx}`}
+          className="flex items-center gap-2 text-[9px]"
+        >
+          {/* Transaction Icon */}
+          {txn.type === 'REVENUE' ? (
+            <TrendingUp size={10} className="text-green-400" />
+          ) : (
+            <TrendingDown size={10} className="text-red-400" />
+          )}
+          
+          {/* Amount */}
+          <span 
+            className="font-mono font-bold"
+            style={{ color: txn.type === 'REVENUE' ? '#22C55E' : '#EF4444' }}
+          >
+            {txn.type === 'REVENUE' ? '+' : '-'}${txn.amount?.toFixed(2)}
+          </span>
+          
+          {/* Source/Vendor */}
+          <span className="text-white/60">
+            {txn.source || txn.vendor || 'Unknown'}
+          </span>
+          
+          {/* Node Attribution */}
+          {txn.node && (
+            <span 
+              className="px-1.5 py-0.5 rounded text-[7px] uppercase"
+              style={{ 
+                background: 'rgba(139,92,246,0.2)', 
+                color: '#A78BFA' 
+              }}
+            >
+              {txn.node}
+            </span>
+          )}
+          
+          {/* Tier Impact */}
+          {txn.tier_update?.T4_EXPANSION && (
+            <span className="text-[8px] text-green-400/60">
+              → T4: ${txn.tier_update.T4_EXPANSION.toLocaleString()}
+            </span>
+          )}
+          
+          {/* Divider */}
+          <span className="text-white/10 mx-2">│</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
  * V29.0: Sovereign Ledger Terminal Feed
  * Scrolling terminal-style display of the Four-Tiered Audit
  */
@@ -949,6 +1049,10 @@ export default function ApexCreatorConsole({ onClose }) {
   const [voiceRecognition, setVoiceRecognition] = useState(null);
   const [hapticStatus, setHapticStatus] = useState(null);
   
+  // V29.0: Live Ledger Feed State
+  const [ledgerTransactions, setLedgerTransactions] = useState([]);
+  const [liveLedgerEnabled, setLiveLedgerEnabled] = useState(true);
+  
   // V29.0: Initialize Speech Recognition
   useEffect(() => {
     if (isMasterAuthority && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -1069,6 +1173,10 @@ export default function ApexCreatorConsole({ onClose }) {
           if (auditRes.data.status === 'success') {
             setTreasury(prev => ({ ...prev, ...auditRes.data.audit }));
             setFourTierLedger(auditRes.data.audit.four_tier_ledger);
+            
+            // V29.0: Extract recent transactions for Live Ledger Feed
+            const recentTxns = auditRes.data.audit.recent_transactions || [];
+            setLedgerTransactions(recentTxns.slice(-10)); // Last 10 transactions
           }
         }
         
@@ -1639,31 +1747,77 @@ export default function ApexCreatorConsole({ onClose }) {
         </div>
       </div>
       
-      {/* Master Footer - One Print ID */}
+      {/* Master Footer - Live Ledger Feed + Master Print */}
       <div 
         className="px-4 py-2"
         style={{
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.9), rgba(20,0,30,0.9))',
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.95), rgba(20,0,30,0.95))',
           borderTop: '1px solid rgba(139,92,246,0.2)',
         }}
         data-testid="apex-master-footer"
       >
         {isMasterAuthority ? (
-          /* 💉 MASTER VIEW: Blood-Red Master Print */
-          <div className="flex items-center justify-center gap-4">
-            <Radio size={12} className="text-red-500 animate-pulse" />
-            <span className="text-[8px] text-red-800/60 uppercase tracking-widest">MASTER CLOCK</span>
-            <span 
-              className="font-mono text-xs tracking-wider"
-              style={{
-                color: '#8B0000',
-                textShadow: '0 0 10px rgba(255,0,0,0.4), 0 0 20px rgba(139,0,0,0.2)',
-                fontWeight: 'bold',
+          /* 💉 MASTER VIEW: Live Ledger Feed + Blood-Red Master Print */
+          <div className="flex flex-col gap-1">
+            {/* Row 1: Live Ledger Feed */}
+            <div 
+              className="flex items-center gap-3 py-1 px-2 rounded"
+              style={{ 
+                background: 'rgba(34,197,94,0.05)',
+                border: '1px solid rgba(34,197,94,0.1)',
               }}
             >
-              {SOVEREIGN_CONFIG.master_print}
-            </span>
-            <span className="text-[8px] text-white/30">[SYNC: {loxTemp}°C]</span>
+              <button
+                onClick={() => setLiveLedgerEnabled(prev => !prev)}
+                className="flex items-center gap-1 text-[8px] uppercase tracking-wider"
+                style={{ color: liveLedgerEnabled ? '#22C55E' : 'rgba(255,255,255,0.3)' }}
+              >
+                <Activity size={10} className={liveLedgerEnabled ? 'animate-pulse' : ''} />
+                LIVE
+              </button>
+              <div className="flex-1 overflow-hidden">
+                <LiveLedgerFeed 
+                  transactions={ledgerTransactions} 
+                  isActive={liveLedgerEnabled}
+                />
+              </div>
+              <span className="text-[8px] text-white/20">
+                {ledgerTransactions.length} TXN
+              </span>
+            </div>
+            
+            {/* Row 2: Master Clock + Print ID */}
+            <div className="flex items-center justify-center gap-4">
+              <Radio size={12} className="text-red-500 animate-pulse" />
+              <span className="text-[8px] text-red-800/60 uppercase tracking-widest">MASTER CLOCK</span>
+              <span 
+                className="font-mono text-xs tracking-wider"
+                style={{
+                  color: '#8B0000',
+                  textShadow: '0 0 10px rgba(255,0,0,0.4), 0 0 20px rgba(139,0,0,0.2)',
+                  fontWeight: 'bold',
+                }}
+              >
+                {SOVEREIGN_CONFIG.master_print}
+              </span>
+              <span className="text-[8px] text-white/30">[SYNC: {loxTemp}°C]</span>
+              
+              {/* V29.0: T4 Expansion Quick View */}
+              {fourTierLedger?.T4_EXPANSION && (
+                <motion.span
+                  animate={vaultFlashing ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.3, repeat: vaultFlashing ? 3 : 0 }}
+                  className="text-[9px] font-mono px-2 py-0.5 rounded"
+                  style={{ 
+                    background: 'rgba(34,197,94,0.2)', 
+                    color: '#22C55E',
+                    border: '1px solid rgba(34,197,94,0.3)',
+                  }}
+                >
+                  T4: ${fourTierLedger.T4_EXPANSION.amount?.toLocaleString()}
+                </motion.span>
+              )}
+            </div>
           </div>
         ) : (
           /* 💎 PUBLIC VIEW: Prismatic Sovereign Seal */
