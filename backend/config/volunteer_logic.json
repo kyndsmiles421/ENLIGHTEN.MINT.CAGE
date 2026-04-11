@@ -1,0 +1,54 @@
+{
+  "version": "29.1_FINAL",
+  "description": "INFINITY-SOVEREIGN Hybrid Volunteer Economy Configuration",
+  
+  "hybrid_economy": {
+    "internal_valuation_usd": 15.00,
+    "frontend_gamification_unit": "Fans",
+    "frontend_rate_per_hour": 10,
+    "secondary_unit": "Credits",
+    "secondary_rate_per_hour": 5,
+    "mandatory_server_floor_usd": 5.00
+  },
+  
+  "sovereignty_discount": {
+    "active": true,
+    "discount_factor": 0.90,
+    "discount_percent": 10,
+    "applies_to": [
+      "academy_modules",
+      "progressive_learning",
+      "learning_packs",
+      "educational_content"
+    ]
+  },
+  
+  "tier_structure": {
+    "T1_ESCROW": {
+      "formula": "equity × φ% (1.618%)",
+      "purpose": "Phi-based escrow reserve"
+    },
+    "T2_FANS": {
+      "formula": "hours × 10",
+      "purpose": "Gamified contribution tracking"
+    },
+    "T3_BUFFER": {
+      "formula": "$5.00 minimum",
+      "purpose": "Mandatory server floor"
+    },
+    "T4_EXPANSION": {
+      "formula": "equity - escrow - buffer",
+      "purpose": "Liquid funds for real-world operations"
+    }
+  },
+  
+  "master_authority": {
+    "email": "kyndsmiles@gmail.com",
+    "print_id": "708B8ED1E974D85585BBBD8E06E0291E",
+    "can_view_internal_usd": true,
+    "can_modify_rates": true
+  },
+  
+  "created": "2024-04-11",
+  "kernel": "SINGULARITY_V29.1_FINAL"
+}

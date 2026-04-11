@@ -69,17 +69,19 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const PHI = 1.618033988749895;
 const RESONANCE = (PHI ** 2) / Math.PI;
 
-// Master Authority Configuration
+// Master Authority Configuration - V29.1 FINAL HYBRID ECONOMY
 const SOVEREIGN_CONFIG = {
   master_email: 'kyndsmiles@gmail.com',
   master_print: '708B8ED1E974D85585BBBD8E06E0291E',
-  equity: 0.00,  // V29.1: Zero-Point (placeholder purged)
-  volunteer_rate: 0.00,  // V29.1: No USD payout
-  fans_per_hour: 10,  // V29.1: Gamified
+  // Hybrid Economy: Internal $15/hr | Frontend 10 Fans/hr
+  internal_valuation_usd: 15.00,  // Backend tracking (Master only)
+  fans_per_hour: 10,              // Frontend gamification
   credits_per_hour: 5,
+  server_floor: 5.00,             // Mandatory $5 minimum
+  sovereignty_discount: 0.90,     // 10% off Learning Packs
 };
 
-// V29.1: Haptic Configuration
+// V29.1 FINAL: Haptic Configuration
 const HAPTIC_CONFIG = {
   threshold: 1000.00,
   intensity: 0.80,

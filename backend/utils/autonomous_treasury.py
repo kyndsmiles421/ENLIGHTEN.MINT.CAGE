@@ -44,18 +44,18 @@ from utils.sovereign_main_brain import main_brain
 
 class AutonomousTreasury:
     """
-    💰 SINGULARITY KERNEL V29.1: Zero-Point Ledger + Gamified Credits
+    💰 SINGULARITY KERNEL V29.1: Zero-Point Ledger + Hybrid Volunteer Economy
     
-    V29.1 CHANGES:
-      - Equity Reservoir RESET to $0.00 (placeholder purged)
-      - Volunteer "Pay" converted to Fans/Credits gamification
+    V29.1 FINAL DEPLOYMENT:
+      - Hybrid Volunteer: Internal $15/hr USD + Frontend 10 Fans/hr Gamification
+      - Mandatory Server Floor: $5 USD minimum
+      - Sovereignty Discount: 10% reduction on all Learning Packs
       - Revenue Node LOCKED to Admin (kyndsmiles) only
-      - Milestone tracking shifted to system growth resonance
     
     FOUR-TIERED STRUCTURE (Production Mode):
-      T1 ESCROW: φ-based escrow (1.618%) — $0.00 base
+      T1 ESCROW: φ-based escrow (1.618%) — Real USD tracking
       T2 FANS: Gamified contribution tracking (10 Fans/hr)
-      T3 BUFFER: Safety floor ($0.00 — no placeholder)
+      T3 BUFFER: Safety floor ($5.00 — Server Floor)
       T4 EXPANSION: Real liquid funds (Admin-visible only)
     """
     
@@ -65,53 +65,58 @@ class AutonomousTreasury:
     
     PHI = 1.618033988749895
     PHI_CAP = 0.01618  # φ-based spending cap (1.618%)
-    SAFETY_BUFFER = 0.00  # V29.1: Zero-Point (no placeholder)
-    SUCCESS_FREQUENCY = 528  # Hz - Healing/Success pulse
-    SOLFEGGIO_PULSE = [174, 100, 528, 100, 174]  # Solfeggio-aligned vibration pattern
     
-    # V29.1: Gamified Volunteer System
-    VOLUNTEER_RATE_USD = 0.00  # No USD payout
-    FANS_PER_HOUR = 10  # Gamified: 10 Fans per volunteer hour
-    CREDITS_PER_HOUR = 5  # Secondary: 5 Credits per hour
+    # V29.1 FINAL: Hybrid Volunteer Economy
+    INTERNAL_VALUATION_USD = 15.00  # Backend tracks real $15/hr value
+    MANDATORY_SERVER_FLOOR = 5.00   # $5 minimum server floor
+    FANS_PER_HOUR = 10              # Frontend gamification: 10 Fans/hr
+    CREDITS_PER_HOUR = 5            # Secondary: 5 Credits/hr
     
-    HAPTIC_THRESHOLD = 1000.00  # $1,000 milestone for haptic pulse
-    HAPTIC_INTENSITY = 0.80  # 80% intensity
+    # Sovereignty Discount
+    SOVEREIGNTY_DISCOUNT = 0.90     # 10% reduction on Learning Packs
+    SOVEREIGNTY_DISCOUNT_ACTIVE = True
+    
+    SUCCESS_FREQUENCY = 528         # Hz - Healing/Success pulse
+    SOLFEGGIO_PULSE = [174, 100, 528, 100, 174]  # Solfeggio-aligned vibration
+    HAPTIC_THRESHOLD = 1000.00      # $1,000 milestone for haptic pulse
+    HAPTIC_INTENSITY = 0.80         # 80% intensity
     
     # Master Authority
     MASTER_EMAIL = "kyndsmiles@gmail.com"
     MASTER_PRINT_ID = "708B8ED1E974D85585BBBD8E06E0291E"
     
     def __init__(self):
-        """Initialize the Singularity Kernel V29.1 — Zero-Point Production Mode."""
+        """Initialize the Singularity Kernel V29.1 FINAL — Hybrid Economy Mode."""
         
-        # V29.1: Zero-Point Ledger (Placeholders PURGED)
-        self.equity_reservoir = 0.00  # Real value only
+        # V29.1 FINAL: Hybrid Ledger (Internal USD + Frontend Fans)
+        self.equity_reservoir = 0.00          # Real USD value (internal)
+        self.internal_volunteer_value = 0.00  # Tracks $15/hr internally
         self.escrow_vault = 0.00
         self.autopay_enabled = True
         self.lox_stable = True
         self.lox_temp = -183.0
         
-        # V29.1: Four-Tiered Structure (Production)
+        # V29.1: Four-Tiered Structure (Hybrid Production)
         self.tiers = {
-            "T1_ESCROW": 0.0,       # φ-based escrow (1.618%)
-            "T2_FANS": 0,           # Gamified: Fans count (integer)
-            "T3_BUFFER": 0.0,       # Zero-Point (no placeholder buffer)
-            "T4_EXPANSION": 0.0,    # Real liquid funds
+            "T1_ESCROW": 0.0,                      # φ-based escrow (1.618%)
+            "T2_FANS": 0,                          # Gamified: Fans count (integer)
+            "T3_BUFFER": self.MANDATORY_SERVER_FLOOR,  # $5 Server Floor
+            "T4_EXPANSION": 0.0,                   # Real liquid funds
         }
         
-        # V29.1: Gamified Volunteer Tracking
+        # V29.1: Gamified Volunteer Tracking (Hybrid)
         self.total_fans = 0
         self.total_credits = 0
         self.volunteer_hours = 0.0
         
         # Haptic milestone tracking
-        self.last_haptic_milestone = 0.00  # V29.1: Start at zero
+        self.last_haptic_milestone = 0.00
         self.haptic_events: List[Dict[str, Any]] = []
         
         # Refresh tier calculations
         self._refresh_tiers()
         
-        # Transaction ledger (empty — no demo data in production)
+        # Transaction ledger
         self.ledger: List[Dict[str, Any]] = []
         self.pending_authorizations: List[Dict[str, Any]] = []
         
@@ -131,8 +136,8 @@ class AutonomousTreasury:
             "maintenance": 0.0,
         }
         
-        logger.info("💰 SINGULARITY_KERNEL_V29.1: Zero-Point Ledger + Gamified Credits initialized")
-        logger.info(f"   Equity: ${self.equity_reservoir:,.2f} | Fans: {self.total_fans} | Mode: PRODUCTION")
+        logger.info("💰 SINGULARITY_KERNEL_V29.1_FINAL: Hybrid Economy + Sovereignty Discount initialized")
+        logger.info(f"   Internal: ${self.INTERNAL_VALUATION_USD}/hr | Frontend: {self.FANS_PER_HOUR} Fans/hr | Floor: ${self.MANDATORY_SERVER_FLOOR}")
     
     def _refresh_tiers(self):
         """
@@ -161,45 +166,58 @@ class AutonomousTreasury:
     
     def record_volunteer_contribution(self, hours: float, node: Optional[str] = None) -> Dict[str, Any]:
         """
-        V29.1: Record volunteer contribution as Fans/Credits (NO USD PAYOUT).
+        V29.1 FINAL: Record volunteer contribution with HYBRID tracking.
+        
+        - Internal: Tracks $15/hr USD value (for admin/accounting)
+        - Frontend: Awards 10 Fans/hr (gamification display)
+        - Server Floor: $5 minimum maintained
         
         Args:
             hours: Volunteer hours contributed
             node: Optional wellness node attribution
         
         Returns:
-            Gamification reward details
+            Hybrid reward details (internal USD + frontend Fans)
         """
+        # Frontend Gamification
         fans_earned = int(hours * self.FANS_PER_HOUR)
         credits_earned = int(hours * self.CREDITS_PER_HOUR)
         
+        # Internal USD Tracking (not shown to public, only Master Authority)
+        internal_usd_value = hours * self.INTERNAL_VALUATION_USD
+        
+        # Update totals
         self.total_fans += fans_earned
         self.total_credits += credits_earned
         self.volunteer_hours += hours
+        self.internal_volunteer_value += internal_usd_value
         
         # Track node attribution
         if node and node in self.nodes:
             self.nodes[node]["fans"] += fans_earned
+            self.nodes[node]["revenue"] += internal_usd_value  # Internal tracking
         
         # Refresh tiers
         self._refresh_tiers()
         
-        # Log contribution
+        # Log contribution (hybrid format)
         contribution = {
             "id": str(uuid.uuid4()),
             "type": "VOLUNTEER_CONTRIBUTION",
             "hours": hours,
             "fans_earned": fans_earned,
             "credits_earned": credits_earned,
+            "internal_usd_value": internal_usd_value,  # Hidden from public API
             "node": node,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "total_fans": self.total_fans,
             "total_credits": self.total_credits,
+            "total_internal_value": self.internal_volunteer_value,
         }
         
         self.ledger.append(contribution)
         
-        logger.info(f"🎮 VOLUNTEER: +{hours}hr → +{fans_earned} Fans, +{credits_earned} Credits")
+        logger.info(f"🎮 VOLUNTEER_HYBRID: +{hours}hr → +{fans_earned} Fans | Internal: +${internal_usd_value:.2f}")
         
         return {
             "status": "ACCRUED",
@@ -207,7 +225,43 @@ class AutonomousTreasury:
             "credits_earned": credits_earned,
             "total_fans": self.total_fans,
             "total_credits": self.total_credits,
-            "message": f"{hours * 10} Fans Accrued",
+            "message": f"{fans_earned} Fans Accrued",
+            # Internal values only visible to Master Authority
+            "_internal": {
+                "usd_value": internal_usd_value,
+                "total_internal_value": self.internal_volunteer_value,
+                "rate_per_hour": self.INTERNAL_VALUATION_USD,
+            }
+        }
+    
+    def apply_sovereignty_discount(self, base_price: float) -> float:
+        """
+        V29.1 FINAL: Apply 10% Sovereignty Discount to Learning Pack prices.
+        
+        Args:
+            base_price: Original price before discount
+        
+        Returns:
+            Discounted price (base_price * 0.90)
+        """
+        if self.SOVEREIGNTY_DISCOUNT_ACTIVE:
+            return base_price * self.SOVEREIGNTY_DISCOUNT
+        return base_price
+    
+    def get_learning_pack_price(self, pack_id: str, base_price: float) -> Dict[str, Any]:
+        """
+        V29.1 FINAL: Get discounted Learning Pack price with audit trail.
+        """
+        discounted_price = self.apply_sovereignty_discount(base_price)
+        savings = base_price - discounted_price
+        
+        return {
+            "pack_id": pack_id,
+            "base_price": base_price,
+            "discounted_price": round(discounted_price, 2),
+            "savings": round(savings, 2),
+            "discount_percent": 10,
+            "sovereignty_active": self.SOVEREIGNTY_DISCOUNT_ACTIVE,
         }
     
     def _check_haptic_milestone(self) -> Optional[Dict[str, Any]]:
