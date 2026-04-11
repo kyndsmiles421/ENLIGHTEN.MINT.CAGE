@@ -5,13 +5,18 @@
 ### LATEST SESSION UPDATES
 | Date | Action | Status |
 |------|--------|--------|
+| 2026-04-11 | **Singularity Kernel V29.0** — Four-Tiered Ledger Intelligence | ✅ DEPLOYED |
+| 2026-04-11 | Master Audit Script & Terminal Feed | ✅ OPERATIONAL |
+| 2026-04-11 | Voice Command Integration ("Audit Treasury") | ✅ ACTIVE |
+| 2026-04-11 | Vault Soft Key Hook (T4 Expansion Flash) | ✅ HOOKED |
+| 2026-04-11 | Haptic Milestone Alerts ($1,000 @ 80% Solfeggio) | ✅ PULSING |
 | 2026-04-11 | Comprehensive App Audit - 100% Pass Rate | ✅ ALL SYSTEMS GO |
 | 2026-04-11 | Observatory Orrery Fix (Auth → Optional Auth) | ✅ FIXED |
 | 2026-04-11 | WebXR AR Portal + GPS Wellness Zones (Phygital Deployment) | ✅ SPATIAL LOCK |
 | 2026-04-11 | Crystal-QR Synthesis NFT Minting System | ✅ DEPLOYED |
 | 2026-04-11 | Sovereign Main Brain (9x9 Crystalline Lattice) | ✅ OPERATIONAL |
 | 2026-04-11 | L² Fractal GPU Shader (120 FPS Dynamic Prismatic Liquid) | ✅ RENDERING |
-| 2026-04-11 | Testing Agent: 12/12 Backend + 100% Frontend PASS | ✅ VERIFIED |
+| 2026-04-11 | Testing Agent: 13/13 Backend + 100% Frontend PASS | ✅ VERIFIED |
 | 2026-04-10 | Full 30/30 Integration Test Sweep | ✅ PASSED |
 | 2026-04-10 | Twilio Auth Token Injected | ✅ OPERATIONAL |
 | 2026-04-10 | Backend Refactor Phase 1: omnis_rpg.py extracted | ✅ COMPLETE |
@@ -52,6 +57,36 @@ FIREWALL ID: 029900612892168189cecc8a
 | Geneva | Europe | LAW | ████████ STABLE |
 | Tokyo | Asia | TECH | ████████ STABLE |
 | Cairo | Africa | WISDOM | ████████ STABLE |
+
+---
+
+## SINGULARITY KERNEL V29.0 — FOUR-TIERED LEDGER INTELLIGENCE
+
+| Tier | Label | Formula | Status |
+|------|-------|---------|--------|
+| T1 | ESCROW | φ × 1.618% of Reservoir | 🔒 LOCKED |
+| T2 | LABOR | $15/hr Volunteer Credits | 📊 TRACKING |
+| T3 | BUFFER (RED LIMIT) | $40,000 Safety Floor | 🔴 LOCKED |
+| T4 | KEYSTONE (EXPANSION) | Reservoir - Buffer - Escrow | 🔓 LIQUID |
+
+### Master Audit Script
+```
+GET /api/treasury/audit         → Full Blood view (Master Only)
+GET /api/treasury/audit-stream  → Terminal feed (Master Only)
+POST /api/treasury/voice-command → Voice commands (Master Only)
+```
+
+### Voice Commands
+- "Audit Treasury" → Display terminal-style Sovereign Ledger feed
+- "Emergency Stop" → Halt autonomous spending
+- "Resume Auto-Pay" → Resume autonomous operations
+- "Vault Status" → Flash Tier 4 Expansion balance
+
+### Haptic Milestone Alerts
+- **Threshold**: $1,000 increments
+- **Intensity**: 80%
+- **Pulse Pattern**: [174, 100, 528, 100, 174] (Solfeggio-aligned)
+- **Trigger**: Physical "heartbeat" when T4 Expansion crosses milestone
 
 ---
 
