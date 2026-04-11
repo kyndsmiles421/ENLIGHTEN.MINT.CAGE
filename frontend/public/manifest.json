@@ -1,8 +1,9 @@
 {
-  "short_name": "Enlightenment",
-  "name": "The Enlightenment Cafe",
-  "version": "2.88_SHAMBHALA",
-  "description": "The Enlightenment Cafe — AI-powered wellness with AETHER_MIRRORLESS physics: meditation, breathwork, sound healing, divination, and Shambhala guidance.",
+  "short_name": "ENLIGHTEN.MINT",
+  "name": "ENLIGHTEN.MINT.CAFE — Singularity Kernel V29.0",
+  "version": "29.0_SINGULARITY_KERNEL",
+  "description": "The Autonomous Wellness Engine — QU-32 Hardware-Emulated Creator Console, Four-Tiered Treasury Intelligence, L² Fractal GPU Shaders, and Solfeggio-Aligned Haptic Orchestration.",
+  "id": "cafe.enlighten.mint",
   "icons": [
     {
       "src": "favicon.ico",
@@ -27,47 +28,75 @@
       "sizes": "180x180"
     }
   ],
-  "start_url": "/",
+  "start_url": "/creator-console",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "fullscreen"],
   "theme_color": "#0B0C15",
-  "background_color": "#0B0C15",
-  "orientation": "portrait-primary",
-  "categories": ["health", "lifestyle", "wellness", "education"],
+  "background_color": "#000000",
+  "orientation": "any",
+  "categories": ["health", "lifestyle", "wellness", "productivity", "finance"],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "handle_links": "preferred",
   "shortcuts": [
     {
-      "name": "Portal to Dome",
-      "short_name": "Portal",
-      "url": "/vr/celestial-dome",
-      "description": "Enter the Celestial Dome via Golden Spiral Portal",
+      "name": "Apex Creator Console",
+      "short_name": "Mixer",
+      "url": "/creator-console",
+      "description": "QU-32 Hardware-Emulated Fader Banks — V29.0 Singularity Kernel",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Breathwork",
-      "short_name": "Breathe",
-      "url": "/breathing",
+      "name": "Treasury Audit",
+      "short_name": "Treasury",
+      "url": "/creator-console?audit=true",
+      "description": "Four-Tiered Ledger Intelligence Dashboard",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Meditation",
-      "short_name": "Meditate",
-      "url": "/meditation",
+      "name": "AR Wellness Portal",
+      "short_name": "AR Portal",
+      "url": "/ar-portal",
+      "description": "WebXR Geospatial Anchors — Black Hills Wellness Zones",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Sage AI Coach",
-      "short_name": "Sage",
-      "url": "/coach",
+      "name": "Crystal-QR Synthesis",
+      "short_name": "QR Mint",
+      "url": "/crystal-mint",
+      "description": "NFT-backed QR Code Generation & Verification",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Daily Briefing",
-      "short_name": "Today",
-      "url": "/daily-briefing",
+      "name": "Sovereign Hub",
+      "short_name": "Hub",
+      "url": "/",
+      "description": "Main Dashboard — Observatory Orrery & Wellness Metrics",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Apex Creator Console V29.0"
+    }
+  ],
+  "related_applications": [],
+  "protocol_handlers": [
+    {
+      "protocol": "web+enlighten",
+      "url": "/handle?protocol=%s"
     }
   ]
 }

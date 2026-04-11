@@ -4,52 +4,61 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="theme-color" content="#0B0C15" />
+        <meta name="color-scheme" content="dark" />
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
-        <meta name="description" content="The Enlightenment Cafe — A sacred digital space for breathing, meditation, sound healing, and expanding your awareness." />
+        
+        <!-- V29.0 SINGULARITY KERNEL META -->
+        <meta name="application-name" content="ENLIGHTEN.MINT.CAFE" />
+        <meta name="description" content="ENLIGHTEN.MINT.CAFE — Singularity Kernel V29.0: QU-32 Hardware-Emulated Creator Console, Four-Tiered Treasury Intelligence, L² Fractal GPU Shaders, and Solfeggio-Aligned Haptic Orchestration." />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Enlightenment" />
+        <meta name="apple-mobile-web-app-title" content="ENLIGHTEN.MINT" />
+        
+        <!-- Play Store / TWA Configuration -->
+        <meta name="google-play-app" content="app-id=cafe.enlighten.mint" />
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        
+        <!-- Icons -->
         <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
         <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-        <meta property="og:title" content="The Enlightenment Cafe" />
-        <meta property="og:description" content="The Enlightenment Cafe — Digital Sanctuary for Wellness" />
+        
+        <!-- Open Graph / Social -->
+        <meta property="og:title" content="ENLIGHTEN.MINT.CAFE — Singularity Kernel V29.0" />
+        <meta property="og:description" content="The Autonomous Wellness Engine — QU-32 Creator Console, Four-Tiered Treasury, L² Fractal GPU" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="%PUBLIC_URL%/logo512.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="The Enlightenment Cafe" />
-        <meta name="twitter:description" content="The Enlightenment Cafe — Digital Sanctuary for Wellness" />
-        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <meta name="twitter:title" content="ENLIGHTEN.MINT.CAFE — Singularity Kernel V29.0" />
+        <meta name="twitter:description" content="The Autonomous Wellness Engine — QU-32 Creator Console, Four-Tiered Treasury, L² Fractal GPU" />
+        
+        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-        <!--
-        manifest.json provides metadata used when your web app is installed on a
-        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-        -->
-        <!--
-        Notice the use of %PUBLIC_URL% in the tags above.
-        It will be replaced with the URL of the `public` folder during the build.
-        Only files inside the `public` folder can be referenced from the HTML.
-
-        Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-        work correctly both with client-side routing and a non-root public URL.
-        Learn how to configure a non-root public URL by running `npm run build`.
-        -->
-        <title>The Enlightenment Cafe</title>
+        
+        <title>ENLIGHTEN.MINT.CAFE — V29.0</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
         
-        <!-- App Shell Styles for instant loading -->
+        <!-- V29.0 Singularity Kernel Boot Sequence -->
         <style>
+          :root {
+            --lox-temp: -183;
+            --phi: 1.618034;
+            --resonance: 0.8333;
+            --haptic-intensity: 0.80;
+          }
           #app-shell {
             position: fixed;
             inset: 0;
-            background: #0B0C15;
+            background: #000000;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
@@ -59,29 +68,37 @@
             opacity: 0;
             pointer-events: none;
           }
-          .breathing-loader {
-            width: 80px;
-            height: 80px;
+          .kernel-loader {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.6) 0%, rgba(212, 175, 55, 0.1) 50%, transparent 70%);
-            animation: breathe 3s infinite ease-in-out;
-            box-shadow: 0 0 60px rgba(212, 175, 55, 0.3);
+            background: radial-gradient(circle, rgba(139,92,246, 0.8) 0%, rgba(6,182,212, 0.4) 40%, transparent 70%);
+            animation: kernel-pulse 2s infinite ease-in-out;
+            box-shadow: 0 0 80px rgba(139,92,246, 0.5), 0 0 120px rgba(6,182,212, 0.3);
           }
-          @keyframes breathe {
-            0%, 100% { transform: scale(0.8); opacity: 0.4; }
-            50% { transform: scale(1.15); opacity: 0.8; }
+          .kernel-version {
+            margin-top: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(139,92,246, 0.8);
+            letter-spacing: 2px;
+          }
+          @keyframes kernel-pulse {
+            0%, 100% { transform: scale(0.85); opacity: 0.5; filter: hue-rotate(0deg); }
+            50% { transform: scale(1.1); opacity: 1; filter: hue-rotate(30deg); }
           }
         </style>
-        <script src="%PUBLIC_URL%/AppController.js?v=20250406g" defer></script>
-        <script src="%PUBLIC_URL%/CreatorMixer.js?v=20250406g" defer></script>
-        <script src="%PUBLIC_URL%/MixmasterConsultant.js?v=20250406g" defer></script>
+        <script src="%PUBLIC_URL%/AppController.js?v=29" defer></script>
+        <script src="%PUBLIC_URL%/CreatorMixer.js?v=29" defer></script>
+        <script src="%PUBLIC_URL%/MixmasterConsultant.js?v=29" defer></script>
     </head>
-    <body style="overflow-y: scroll !important; height: auto !important;">
-        <noscript>You need to enable JavaScript to run this app.</noscript>
+    <body style="overflow-y: scroll !important; height: auto !important; background: #000000;">
+        <noscript>ENLIGHTEN.MINT.CAFE requires JavaScript. Enable it to access the Singularity Kernel V29.0.</noscript>
         
-        <!-- App Shell: Instant Gold Orb while React loads -->
+        <!-- V29.0 Kernel Boot Shell -->
         <div id="app-shell">
-          <div class="breathing-loader"></div>
+          <div class="kernel-loader"></div>
+          <div class="kernel-version">SINGULARITY KERNEL V29.0</div>
         </div>
         
         <div id="root" style="overflow: visible !important; height: auto !important;"></div>
@@ -99,15 +116,24 @@
             }, 100);
           });
           
+          // V29.0 Solfeggio Haptic Configuration
+          window.SINGULARITY_HAPTIC = {
+            solfeggio_pulse: [174, 100, 528, 100, 174],
+            success_pulse: [100, 50, 100],
+            warning_pulse: [300, 100, 300, 100, 300],
+            intensity: 0.80,
+            threshold: 1000
+          };
+          
           // Register Service Worker for PWA
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
               navigator.serviceWorker.register('/sw.js')
                 .then(function(registration) {
-                  console.log('[App] Service Worker registered:', registration.scope);
+                  console.log('[V29.0] Service Worker registered:', registration.scope);
                 })
                 .catch(function(error) {
-                  console.log('[App] Service Worker registration failed:', error);
+                  console.log('[V29.0] Service Worker registration failed:', error);
                 });
             });
           }
