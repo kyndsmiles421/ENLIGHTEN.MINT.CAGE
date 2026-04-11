@@ -24,6 +24,7 @@ import {
   Hexagon, ChevronRight, AlertTriangle, CheckCircle2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import L2FractalShader from './L2FractalShader';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -648,18 +649,35 @@ export default function CrystalMintPanel({ isOpen, onClose }) {
                   )}
                 </div>
                 
-                {/* Pentagonal Crystal Preview */}
+                {/* L² Fractal GPU Shader + Pentagonal Crystal Preview */}
                 <div className="text-center">
                   <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">
-                    Pentagonal Symmetry Preview
+                    L² Fractal Crystal • GPU Shader
                   </p>
-                  <PentagonalCrystal
-                    languages={languages}
-                    active={eligibility?.eligible}
-                    size={180}
-                  />
+                  
+                  {/* GPU-Rendered Fractal Shader */}
+                  <div className="relative mx-auto" style={{ width: 200, height: 200 }}>
+                    <L2FractalShader 
+                      size={200} 
+                      quality="medium" 
+                      autoRotate={true} 
+                      pulseOnHover={eligibility?.eligible}
+                    />
+                    {/* Pentagonal overlay showing language facets */}
+                    <div className="absolute inset-0 pointer-events-none opacity-30">
+                      <PentagonalCrystal
+                        languages={languages}
+                        active={eligibility?.eligible}
+                        size={200}
+                      />
+                    </div>
+                  </div>
+                  
                   <p className="text-[9px] text-white/30 mt-2">
-                    5 Language Facets • 72° Refraction Angles
+                    Dynamic Prismatic Liquid • 120 FPS Target
+                  </p>
+                  <p className="text-[8px] text-purple-400/60 mt-1">
+                    5 Language Facets • 72° Refraction • GLSL Shader
                   </p>
                 </div>
                 

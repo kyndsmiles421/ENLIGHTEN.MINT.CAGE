@@ -552,6 +552,12 @@ export default function CosmicLedger() {
           </motion.div>
         )}
       </div>
+      
+      {/* Crystal Mint Panel Modal */}
+      <CrystalMintPanel 
+        isOpen={mintPanelOpen} 
+        onClose={() => setMintPanelOpen(false)} 
+      />
     </div>
   );
 }
