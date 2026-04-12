@@ -991,134 +991,48 @@ export default function Landing() {
         <PersonalizedDashboard user={user} onQuickReset={() => setShowQuickReset(true)} />
       )}
 
-      {/* ═══ Hero (shown for everyone, adjusted padding for tier) ═══ */}
-      <div className={`relative z-10 px-6 md:px-12 lg:px-24 ${!isGuest ? 'pt-8 pb-12' : 'pt-28 pb-20'}`}>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
-            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="text-xs font-bold uppercase tracking-[0.3em] mb-6" style={{ color: 'var(--secondary)' }}>
-              <Sparkles size={14} className="inline mr-2" style={{ color: 'var(--accent-gold)' }} />
-              Ancient Wisdom, Modern Practice
-            </motion.p>
-            <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-none mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>The Enlightenment</motion.span>
-              <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                className="block animate-text-shimmer" style={{ lineHeight: 1.2 }}>Cafe</motion.span>
-            </h1>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              className="text-base md:text-lg leading-relaxed max-w-md mb-6" style={{ color: '#C8C5D0', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
-              Your sanctuary for breathwork, meditation, divination, and spiritual growth — guided by ancient wisdom and modern technology.
-            </motion.p>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-              className="flex items-center gap-3 mb-8">
-              <button
-                onClick={() => navigate('/intro')}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium transition-all hover:scale-105 group"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05))',
-                  border: '1px solid rgba(251,191,36,0.18)',
-                  color: '#FBBF24',
-                }}
-                data-testid="watch-intro-btn"
-              >
-                <Play size={13} className="transition-transform group-hover:scale-110" />
-                Watch the Journey
-              </button>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
-              className="flex flex-wrap gap-4">
-              <button onClick={() => { Sensories.tap(); setShowQuickReset(true); }}
-                onTouchEnd={(e) => { e.preventDefault(); Sensories.tap(); setShowQuickReset(true); }}
-                className="group py-3 px-6 rounded-full cursor-pointer glow-primary"
-                style={{
-                  background: 'rgba(192,132,252,0.08)',
-                  border: '1px solid rgba(192,132,252,0.18)',
-                  backdropFilter: 'blur(12px)',
-                  touchAction: 'manipulation',
-                  WebkitTapHighlightColor: 'rgba(192,132,252,0.1)',
-                }}
-                data-testid="quick-reset-btn">
-                <span className="relative z-10 flex items-center gap-2" style={{ color: '#D8B4FE' }}>
-                  Quick Reset
-                  <Zap size={16} className="transition-transform duration-300 group-hover:scale-110" />
-                </span>
-              </button>
-              <button onClick={() => { Sensories.select(); navigate(isGuest ? '/auth' : '/dashboard'); }}
-                className="btn-glass group"
-                style={{ background: 'rgba(45,212,191,0.06)', borderColor: 'rgba(45,212,191,0.15)' }}
-                data-testid="begin-journey-btn">
-                <span className="flex items-center gap-2" style={{ color: '#2DD4BF' }}>
-                  {isGuest ? 'Begin Journey' : 'Continue Journey'} <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </button>
-              
-              {/* SIGN IN BUTTON - Visible for guests (TIER A Entry) */}
-              {isGuest && (
-                <button onClick={() => { Sensories.confirm(); navigate('/auth'); }}
-                  className="group py-3 px-8 rounded-full cursor-pointer"
-                  style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: '2px solid rgba(255,255,255,0.4)',
-                    backdropFilter: 'blur(12px)',
-                  }}
-                  data-testid="sign-in-btn">
-                  <span className="flex items-center gap-2 text-white font-semibold">
-                    Sign In / Register
-                  </span>
-                </button>
-              )}
-              
-              <button onClick={() => { Sensories.tap(); setShowTour(true); }}
-                onTouchEnd={(e) => { e.preventDefault(); Sensories.tap(); setShowTour(true); }}
-                className="group py-3 px-6 rounded-full cursor-pointer"
-                style={{
-                  background: 'rgba(216,180,254,0.08)',
-                  border: '1px solid rgba(216,180,254,0.2)',
-                  backdropFilter: 'blur(12px)',
-                  touchAction: 'manipulation',
-                  WebkitTapHighlightColor: 'rgba(216,180,254,0.1)',
-                }}
-                data-testid="take-tour-btn">
-                <span className="flex items-center gap-2" style={{ color: '#D8B4FE' }}>
-                  Take the Tour <Play size={14} className="transition-transform duration-300 group-hover:scale-110" />
-                </span>
-              </button>
-            </motion.div>
-          </motion.div>
+      {/* ═══ Hero — Streamlined: Sign In + Direct Navigation ═══ */}
+      <div className={`relative z-10 px-4 ${!isGuest ? 'pt-4 pb-4' : 'pt-16 pb-6'}`}>
+        <div className="max-w-xl mx-auto">
+          {/* Compact Title */}
+          <motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="text-3xl font-light tracking-tight mb-3 text-center" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC' }}>
+            Enlighten.Mint.Cafe
+          </motion.h1>
 
-          {/* Breathing orb — V-ENGINE: Simplified to White Core only */}
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center justify-center">
-            <div className="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
-              {/* V-ENGINE: Orbital particles KILLED */}
-              {/* Multi-layered aura rings KILLED */}
-              
-              {/* Inner core - WHITE LIGHT */}
-              <div className="relative z-10 w-20 h-20 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
-                  boxShadow: '0 0 60px rgba(255,255,255,0.4)',
-                  transform: `scale(${breathScale})`,
-                  transition: 'transform 0.1s linear',
-                }} />
-            </div>
+          {/* Action Buttons — compact row */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            className="flex items-center justify-center gap-3 mb-6">
+            {isGuest ? (
+              <button onClick={() => { Sensories.confirm(); navigate('/auth'); }}
+                className="py-2.5 px-6 rounded-full text-sm font-medium"
+                style={{ background: 'rgba(255,255,255,0.1)', border: '2px solid rgba(255,255,255,0.3)', color: '#F8FAFC' }}
+                data-testid="sign-in-btn">
+                Sign In / Register
+              </button>
+            ) : (
+              <button onClick={() => { Sensories.select(); navigate('/sovereign-hub'); }}
+                className="py-2.5 px-6 rounded-full text-sm font-medium"
+                style={{ background: 'rgba(45,212,191,0.08)', border: '1px solid rgba(45,212,191,0.2)', color: '#2DD4BF' }}
+                data-testid="begin-journey-btn">
+                Sovereign Hub
+              </button>
+            )}
+            <button onClick={() => { Sensories.tap(); setShowQuickReset(true); }}
+              className="py-2.5 px-5 rounded-full text-xs"
+              style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.18)', color: '#D8B4FE' }}
+              data-testid="quick-reset-btn">
+              Quick Reset
+            </button>
+            <ShareButton />
           </motion.div>
         </div>
       </div>
 
-      {/* ═══ Category Pillars (replaces 24-card grid) ═══ */}
-      <div className="relative z-10 px-6 md:px-12 lg:px-24 pb-20" data-testid="category-pillars-section">
-        <div className="max-w-7xl mx-auto">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12">
-            <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--text-muted)' }}>
-              Explore Your Path
-            </p>
-            <h2 className="text-2xl md:text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              Six Pillars of <span className="animate-text-shimmer">Transformation</span>
-            </h2>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* ═══ CATEGORY PILLARS — Functional Navigation Grid ═══ */}
+      <div className="relative z-10 px-4 pb-20" data-testid="category-pillars-section">
+        <div className="max-w-xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {CATEGORY_PILLARS.map((pillar, i) => (
               <PillarCard key={pillar.id} pillar={pillar} index={i} />
             ))}
