@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import CelebrationBurst from '../components/CelebrationBurst';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
+import useWorkAccrual from '../hooks/useWorkAccrual';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -670,6 +671,9 @@ function BuildYourOwn({ onPlay }) {
       } catch { toast.error('Could not save, but you can still play it.'); }
       setSaving(false);
     }
+
+    // Silent dust accrual for meditation creation
+    if (typeof window.__workAccrue === 'function') window.__workAccrue('meditation_session', duration || 15);
 
     onPlay(med);
   };

@@ -330,11 +330,14 @@ export default function Breathing() {
             phaseRef.current = { phase: 'inhale', remaining: pattern.inhale };
             setPhase('Inhale'); setTimer(pattern.inhale);
             setCycles(c => c + 1);
+            // Silent dust accrual per breathing cycle
+            if (typeof window.__workAccrue === 'function') window.__workAccrue('breathing_exercise', 7);
           }
         } else {
           phaseRef.current = { phase: 'inhale', remaining: pattern.inhale };
           setPhase('Inhale'); setTimer(pattern.inhale);
           setCycles(c => c + 1);
+          if (typeof window.__workAccrue === 'function') window.__workAccrue('breathing_exercise', 7);
         }
       }
     }, 1000);

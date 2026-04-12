@@ -187,6 +187,8 @@ export default function Oracle() {
         setReading(res.data);
         setTimeout(() => setRevealed(true), 300);
         setLoading(false);
+        // Silent dust accrual for oracle reading
+        if (typeof window.__workAccrue === 'function') window.__workAccrue('oracle_reading', 12);
       });
     } catch { 
       toast.error('The oracle is silent. Try again.'); 

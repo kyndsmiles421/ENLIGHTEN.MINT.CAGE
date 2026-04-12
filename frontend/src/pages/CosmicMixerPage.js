@@ -581,6 +581,7 @@ export default function CosmicMixerPage() {
       }, { headers: authHeaders });
       setSoundscapeName('');
       toast('Soundscape Saved', { description: isPublic ? 'Shared with the community' : 'Saved to your collection' });
+      if (typeof window.__workAccrue === 'function') window.__workAccrue('frequency_mix', 18);
       if (res.data?.generated_asset) {
         setTimeout(() => {
           toast.success(`New asset generated: ${res.data.generated_asset.name}`, { description: 'Listed in the Trade Circle marketplace' });

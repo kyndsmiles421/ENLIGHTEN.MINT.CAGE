@@ -48,6 +48,7 @@ import './utils/NoduleBridge';            // V53.0 UNIFIED SYNC — Frontend Bri
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
 import { useAmbientSoundscape } from './hooks/useAmbientSoundscape';
+import useWorkAccrual from './hooks/useWorkAccrual';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -535,6 +536,8 @@ function AnimatedRoutes() {
   useGlobalSounds();
   useAmbientSoundscape();
   useGateNotifications();
+  // V2.1: Silent Dust Heartbeat — accumulates across all modules
+  useWorkAccrual();
 
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';

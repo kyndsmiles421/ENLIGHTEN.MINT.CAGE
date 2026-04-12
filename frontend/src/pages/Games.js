@@ -570,6 +570,7 @@ export default function Games() {
       setScores(s => ({ ...s, [activeGame.id]: { best_score: res.data.best_score, total_plays: res.data.total_plays } }));
       if (score >= (scores[activeGame.id]?.best_score || 0)) {
         toast.success(`New best score: ${score}!`);
+        if (typeof window.__workAccrue === 'function') window.__workAccrue('task_completion', Math.min(30, score / 10));
       }
     } catch {
       /* ignore */

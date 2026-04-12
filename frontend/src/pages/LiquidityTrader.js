@@ -9,6 +9,7 @@ import {
   TrendingUp, Clock, FileText, Lock, ChevronRight, Sparkles,
   Activity, Layers, BarChart3, Hexagon, Share2, FlaskConical
 } from 'lucide-react';
+import { subscribeBuffer, getBufferState } from '../hooks/useWorkAccrual';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -477,6 +478,14 @@ export default function LiquidityTrader() {
   const [transmuting, setTransmuting] = useState(false);
   const [lastAlchemy, setLastAlchemy] = useState(null);
   const [tab, setTab] = useState('alchemy');
+  const [heartbeatBuffer, setHeartbeatBuffer] = useState(0);
+
+  // Subscribe to global dust buffer for heartbeat indicator
+  useEffect(() => {
+    const { buffer } = getBufferState();
+    setHeartbeatBuffer(buffer);
+    return subscribeBuffer(val => setHeartbeatBuffer(val));
+  }, []);
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -557,9 +566,23 @@ export default function LiquidityTrader() {
           <ArrowLeft size={16} color="#F8FAFC" />
         </button>
         <h1 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Marketplace Trader</h1>
-        <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', border: '1px solid rgba(252,211,77,0.15)' }}>
-          <Sparkles size={10} color="#A855F7" />
-          <span className="text-[10px] font-bold" style={{ color: '#A855F7' }}>{(status?.dust_balance || 0).toLocaleString()}</span>
+        <div className="flex items-center gap-2">
+          {/* Heartbeat Indicator — alpha-wave pulse */}
+          {heartbeatBuffer > 0 && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(45,212,191,0.06)', border: '1px solid rgba(45,212,191,0.12)' }} data-testid="heartbeat-indicator">
+              <motion.div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: '#2DD4BF' }}
+                animate={{ opacity: [0.2, 0.8, 0.2] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <span className="text-[9px] font-bold" style={{ color: '#2DD4BF' }}>+{heartbeatBuffer}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', border: '1px solid rgba(252,211,77,0.15)' }}>
+            <Sparkles size={10} color="#A855F7" />
+            <span className="text-[10px] font-bold" style={{ color: '#A855F7' }}>{(status?.dust_balance || 0).toLocaleString()}</span>
+          </div>
         </div>
       </div>
 

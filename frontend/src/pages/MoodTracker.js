@@ -139,6 +139,8 @@ export default function MoodTracker() {
           ? `Chorded resonance: ${res.data.frequency_stack?.join('Hz + ')}Hz`
           : 'Mood captured'
       );
+      // Silent dust accrual for mood logging
+      if (typeof window.__workAccrue === 'function') window.__workAccrue('mood_log', 5);
     } catch {
       toast.error('Could not save mood');
     } finally {

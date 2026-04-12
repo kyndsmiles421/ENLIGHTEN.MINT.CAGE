@@ -6,12 +6,14 @@ import { useSensory } from '../context/SensoryContext';
 import { toast } from 'sonner';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import CelebrationBurst from '../components/CelebrationBurst';
+import useWorkAccrual from '../hooks/useWorkAccrual';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Journal() {
   const { user, authHeaders } = useAuth();
   const { playCelebration } = useSensory();
+  const { accrue } = useWorkAccrual();
   const [entries, setEntries] = useState([]);
   const [showForm, setShowForm] = useState(true);
   const [title, setTitle] = useState('');
@@ -45,6 +47,7 @@ export default function Journal() {
       setCelebrating(true);
       playCelebration();
       toast.success('Entry saved to your sacred journal');
+      accrue('journal_entry', Math.max(8, content.length / 20));
     } catch {
       toast.error('Could not save entry');
     } finally {

@@ -283,6 +283,7 @@ export default function Rituals() {
         steps_completed: stepsCompleted,
       }, { headers: authHeaders });
       toast.success('Ritual completed! Your energy is radiant.');
+      if (typeof window.__workAccrue === 'function') window.__workAccrue('task_completion', 15);
       // Refresh history
       const res = await axios.get(`${API}/rituals/history`, { headers: authHeaders });
       setHistory(res.data);
