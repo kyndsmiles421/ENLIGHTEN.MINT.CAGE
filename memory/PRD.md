@@ -1,98 +1,99 @@
 # ENLIGHTEN.MINT.CAFE — ETERNAL MANIFEST
-## Version: V30.3_TRANSMUTER | Status: **WASTE-TO-VALUE LOOP DEPLOYED**
+## Version: V30.3_SOVEREIGN_ENGINE | Status: **APPARATUS v2.0 DEPLOYED**
 ## Last Updated: April 12, 2026
 
-### COMPLETE SYSTEM AUDIT RESULTS
-| Module | Route | Buttons | Status |
-|--------|-------|---------|--------|
-| Orbital Hub | /hub | 15 orbs | BLOOM WORKING |
-| Creator Console | /creator-console | 89 + 23 sliders | QU-32 MIXER |
-| Sovereign Hub | /sovereign-hub | Master Gated | V29.1 OPERATIONAL |
-| Trade Circle | /trade-circle | 49 + Trader tab | TRADING + LIQUIDITY |
-| Oracle | /oracle | 29 | TAROT/ASTROLOGY |
-| Discover | /discover | 23 | EXPLORATION |
-| Cosmic Ledger | /cosmic-ledger | 28 | ACHIEVEMENTS |
-| Archives | /archives | 24 | DEEP-DIVE |
-| Journal | /journal | 26 | REFLECTIONS |
-| Meditation | /meditation | 34 | GUIDED |
-| Breathing | /breathing | 33 | PATTERNS |
-| Games | /games | 28 | AI RPG |
-| Observatory | /observatory | 27 | ORRERY |
-| Star Chart | /star-chart | 34 | LAKOTA SKY |
-| Workshop | /workshop | 27 | SACRED GEOMETRY |
-| Theory | /theory | 39 | CIRCLE OF FIFTHS |
-| Suanpan | /suanpan | 40 | DIVINE DIRECTOR |
-| Cosmic Map | /cosmic-map | 27 | GPS |
-| Mood | /mood | 60 | EMOTIONAL LANDSCAPE |
-| Cosmic Mixer | /cosmic-mixer | 57 | SOLFEGGIO |
-| **Liquidity Trader** | **/liquidity-trader** | **Trade/Blueprint/Rewards** | **PHI CAP LIVE** |
+### MODULE REGISTRY (21 Modules)
+| Module | Route | Status |
+|--------|-------|--------|
+| Orbital Hub | /hub | BLOOM WORKING |
+| Creator Console | /creator-console | QU-32 MIXER |
+| Sovereign Hub | /sovereign-hub | V29.1 OPERATIONAL |
+| Trade Circle | /trade-circle | TRADING + LIQUIDITY |
+| Oracle | /oracle | TAROT/ASTROLOGY |
+| Discover | /discover | EXPLORATION |
+| Cosmic Ledger | /cosmic-ledger | ACHIEVEMENTS |
+| Archives | /archives | DEEP-DIVE |
+| Journal | /journal | REFLECTIONS |
+| Meditation | /meditation | GUIDED |
+| Breathing | /breathing | PATTERNS |
+| Games | /games | AI RPG |
+| Observatory | /observatory | ORRERY |
+| Star Chart | /star-chart | LAKOTA SKY |
+| Workshop | /workshop | SACRED GEOMETRY |
+| Theory | /theory | CIRCLE OF FIFTHS |
+| Suanpan | /suanpan | DIVINE DIRECTOR |
+| Cosmic Map | /cosmic-map | GPS |
+| Mood | /mood | EMOTIONAL LANDSCAPE |
+| Cosmic Mixer | /cosmic-mixer | SOLFEGGIO |
+| **Liquidity Trader** | **/liquidity-trader** | **APPARATUS v2.0 LIVE** |
 
 ---
 
-## WASTE-TO-VALUE LOOP (V30.3)
+## SOVEREIGN ENGINE APPARATUS v2.0
 
-### Architecture
-- **Digital Dust**: Accumulated from all module interactions via complexity scoring
-- **Phi Cap Exchange**: 1618 Dust = 1 Fan (base rate, fluctuates with market activity)
-- **Liquidity Controller**: Marketplace Trader at /liquidity-trader
-- **Sacred Blueprints**: Tier-gated construction data processing
-  - SEED (Tier 1): Basic dimensions + standard cuts
-  - ARTISAN (Tier 2): + Phi Optimization + Masonry Ratio + Golden Area
-  - SOVEREIGN (Tier 3): + Sacred Geometry + Resonant Frequency + White Light Encryption (7-layer Rainbow Refraction)
+### Fibonacci Accrual Ratios
+| Tier | Ratio | Tax | Label |
+|------|-------|-----|-------|
+| SOVEREIGN | 0.618 | 0% | High Rebate |
+| ARTISAN | 0.382 | 5% | Mid Rebate |
+| SEED | 0.236 | 15% | Scholarship |
+| BASE | 0.09 | 14.4% | Scavenger |
+
+### Core Logic
+- **Phi Cap Ceiling**: Output capped at input x 1.618 (prevents inflation)
+- **Scholarship Tax**: 15% redirected to Master Ledger (community reinvestment)
+- **Fibonacci Dampening**: Work output divided by Fib[3]=3 (earned < purchased)
+- **Dynamic Phi Cap**: Fibonacci-scaled exchange rate based on total circulating Dust
 
 ### API Endpoints
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| /api/transmuter/status | GET | Full transmuter state (balances, tier, rate) |
-| /api/transmuter/trade-dust-to-fans | POST | Convert Dust to Fans via Phi Cap |
-| /api/transmuter/accrue-dust | POST | Log Dust from module interactions |
-| /api/transmuter/generate-blueprint | POST | Generate Sacred Blueprint |
-| /api/transmuter/blueprints | GET | User's blueprint history |
+| /api/transmuter/status | GET | Full state with tier_dynamics |
+| /api/transmuter/transmute | POST | Fibonacci alchemy with Phi Cap + Tax |
+| /api/transmuter/work-submit | POST | Unified endpoint for all 20 modules |
+| /api/transmuter/trade-dust-to-fans | POST | Dust-to-Fans via Phi Cap exchange |
+| /api/transmuter/accrue-dust | POST | Legacy dust accrual |
+| /api/transmuter/generate-blueprint | POST | Sacred Blueprint generation |
+| /api/transmuter/blueprints | GET | User blueprint history |
 | /api/transmuter/history | GET | Transaction log |
 | /api/transmuter/exchange-preview | GET | Preview conversion |
 
-### Dust Complexity Rewards
-| Action | Base Dust |
-|--------|-----------|
-| streak_bonus | 30 |
-| blueprint_generation | 25 |
-| forge_creation | 20 |
-| frequency_mix | 18 |
-| trade_listing | 16 |
-| meditation_session | 15 |
-| constellation_trace | 14 |
-| oracle_reading | 12 |
-| task_completion | 10 |
-| daily_login | 10 |
-| journal_entry | 8 |
-| breathing_exercise | 7 |
-| archive_save | 6 |
-| mood_log | 5 |
-| module_interaction | 3 |
-| kinetic_movement | 2 |
+### Frontend Apparatus
+- **Alchemy Tab**: Tier dynamics display (accrual %, tax %, phi cap), input, preview calculator, Execute Alchemy + Share Yield buttons
+- **Trade Tab**: Dust-to-Fans conversion via Liquidity Controller
+- **Blueprints Tab**: Sacred Blueprint generator with tier-gated overlays
+- **Rewards Tab**: 16 Dust complexity reward types
+
+### STOP Button Fix
+- **Moved**: from top: 70px, left: 15px → bottom: 85px, right: 15px
+- **Shape**: 36px circular icon (compact, non-intrusive)
+- **Sources fixed**: EmergencyShutOff.js, UnifiedAppCore.js, SovereignCore.js, SovereignInterface.js, index.css
+- **Result**: Zero content blocking on any page
 
 ---
 
 ## KEY FILES
 | File | Purpose |
 |------|---------|
-| /app/backend/utils/master_transmuter.py | InfinitySovereignGenerator class |
-| /app/backend/routes/transmuter.py | Transmuter API routes |
-| /app/frontend/src/pages/LiquidityTrader.js | Liquidity Controller UI |
-| /app/frontend/src/engines/MasterKey.js | Central frontend config (updated) |
-| /app/backend/utils/master_key.py | Central backend config (updated) |
-| /app/frontend/src/engines/OmnisUniversalCore.js | V30.2 physics/economy engine |
-| /app/frontend/src/pages/TradeCircle.js | Trade Circle with Trader tab |
+| /app/backend/utils/master_transmuter.py | SovereignEngine v2.0 class |
+| /app/backend/routes/transmuter.py | All transmuter API routes |
+| /app/frontend/src/pages/LiquidityTrader.js | Full Apparatus UI |
+| /app/frontend/src/components/EmergencyShutOff.js | STOP button (bottom-right) |
+| /app/frontend/src/engines/MasterKey.js | Central frontend config |
+| /app/backend/utils/master_key.py | Central backend config |
 
 ---
 
 ## UPCOMING TASKS
+- Wire /api/transmuter/work-submit into all 20 modules (silent dust accrual)
 - P1: Resource Alchemy (Ledger gaming interface)
 - P1: Gravity Well Exchange (Trade module gaming)
 - P1: Cryptic Quest Nodes (Oracle gaming)
-- P2: Sovereign "Live" Sessions
-- P2: Phygital Marketplace foraging expansion
-- Blocked: Play Store AAB deployment (Google verification pending)
+
+## FUTURE/BACKLOG
+- Sovereign "Live" Sessions
+- Phygital Marketplace foraging expansion
+- Play Store AAB deployment (Google verification pending)
 
 ---
 
@@ -100,16 +101,14 @@
 - Name: Steven Michael
 - Email: kyndsmiles@gmail.com
 - Print ID: 708B8ED1E974D85585BBBD8E06E0291E
-- Trust ID: 029900612892168189cecc8a
 
 ## ECONOMY
 - 10 Fans/hr (gamified, NO USD)
 - Digital Dust scavenger loop (Waste-to-Value)
-- Phi Cap exchange: 1618 Dust = 1 Fan (fluctuating)
-- Kinetic XP: Movement → Resonance → Bonus Fans
+- Sovereign Engine: Fibonacci accrual + Phi Cap + Scholarship Tax
+- Kinetic XP: Movement to Resonance to Bonus Fans
 
 ## 3RD PARTY INTEGRATIONS
-- OpenAI GPT & TTS (Emergent LLM Key)
+- OpenAI GPT and TTS (Emergent LLM Key)
 - WebXR API (Browser Native)
 - Stripe (Payments)
-- Resend (Emails — blocked on user API key)
