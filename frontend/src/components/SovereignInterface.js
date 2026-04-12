@@ -70,18 +70,22 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
         data-testid="sovereign-stop-btn"
         style={{
           position: 'fixed',
-          top: '15px',
-          left: '15px',
-          background: 'rgba(220, 20, 60, 0.4)',
-          border: '1px solid rgba(220, 20, 60, 0.6)',
-          borderRadius: '25px',
-          padding: '8px 16px',
-          color: '#fff',
-          fontWeight: 'bold',
+          bottom: '85px',
+          right: '15px',
+          background: 'rgba(30, 30, 30, 0.85)',
+          border: '1px solid rgba(80, 80, 80, 0.4)',
+          borderRadius: '50%',
+          padding: 0,
+          width: '36px',
+          height: '36px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#EF4444',
           cursor: 'pointer',
           zIndex: 9999,
         }}>
-        ■ STOP
+        <span style={{ fontSize: '14px' }}>■</span>
       </button>
       
       <div className="wisdom-alert" style={{

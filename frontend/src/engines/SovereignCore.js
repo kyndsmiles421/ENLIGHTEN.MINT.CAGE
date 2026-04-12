@@ -55,14 +55,16 @@ export const applySovereignReality = (frequency = 174) => {
       transition: all 0.5s ease-in-out;
     }
     
-    /* STOP Button — Absolute positioning */
+    /* STOP Button — Bottom-right positioning */
     .floating-stop-button,
     [data-testid="emergency-shutoff"] { 
       position: fixed !important;
-      top: 15px !important; 
-      left: 15px !important; 
-      background: rgba(220, 20, 60, 0.4) !important; 
-      border-radius: 25px !important; 
+      bottom: 85px !important; 
+      right: 15px !important; 
+      top: auto !important;
+      left: auto !important;
+      background: rgba(30, 30, 30, 0.85) !important; 
+      border-radius: 50% !important; 
       z-index: 9999 !important;
     }
     

@@ -320,7 +320,7 @@ body {
   z-index: 100000 !important;
 }
 
-/* 5. EMERGENCY STOP — Position consolidated in V29.1 section (line 5259) */
+/* 5. EMERGENCY STOP — Position: bottom-right, above nav bar */
 .emergency-stop,
 [data-testid="emergency-stop"],
 #sovereign-emergency-reset {
@@ -5248,10 +5248,11 @@ a,
 .emergency-shutoff-btn,
 .floating-stop-button {
   position: fixed !important;
-  top: 70px !important;
-  left: 15px !important;
+  bottom: 85px !important;
+  right: 15px !important;
+  top: auto !important;
+  left: auto !important;
   z-index: 9999 !important;
-  max-width: none !important;
   pointer-events: auto !important;
 }
 

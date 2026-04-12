@@ -381,7 +381,7 @@ const API_ENDPOINTS = {
 
 const EMERGENCY_CONTROLS = {
   stop_button: {
-    position: { top: 70, left: 15 },
+    position: { bottom: 85, right: 15 },
     z_index: 9999,
     actions: {
       tap: 'halt_all_audio_visual',

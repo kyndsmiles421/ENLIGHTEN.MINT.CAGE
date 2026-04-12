@@ -239,7 +239,7 @@ export default function EmergencyShutOff() {
         )}
       </AnimatePresence>
       
-      {/* STOP Button - Compact, positioned to not overlap */}
+      {/* STOP Button - Compact circle, bottom-right above nav bar */}
       {/* Long-press (5 sec) triggers MASTER REBOOT */}
       <button
         onClick={handleEmergencyStop}
@@ -248,26 +248,25 @@ export default function EmergencyShutOff() {
         onMouseLeave={handleLongPressEnd}
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
-        className="emergency-shutoff-btn floating-stop-button flex items-center justify-center gap-1"
+        className="emergency-shutoff-btn floating-stop-button flex items-center justify-center"
         style={{
           position: 'fixed',
-          top: 70,  // V29.1: Below top navigation bar (60px) to prevent overlap
-          left: 15,
-          zIndex: 9999,  // V29.1: Same plane as other UI elements - no z-index wars
-          width: 'auto',
-          minWidth: 32,
-          height: 28,
-          padding: '0 12px',
-          borderRadius: 25,
+          bottom: 85,
+          right: 15,
+          zIndex: 9999,
+          width: 36,
+          height: 36,
+          padding: 0,
+          borderRadius: '50%',
           background: longPressProgress > 0
-            ? `linear-gradient(90deg, rgba(239,68,68,0.6) ${longPressProgress}%, rgba(30,30,30,0.8) ${longPressProgress}%)`
+            ? `conic-gradient(rgba(239,68,68,0.8) ${longPressProgress}%, rgba(30,30,30,0.85) ${longPressProgress}%)`
             : isVoid 
               ? 'rgba(60, 60, 60, 0.9)' 
               : isAtZeroPoint 
                 ? 'rgba(60, 60, 60, 0.8)'
                 : 'rgba(30, 30, 30, 0.85)',
           border: longPressProgress > 0
-            ? '1px solid rgba(239, 68, 68, 0.8)'
+            ? '2px solid rgba(239, 68, 68, 0.8)'
             : isVoid
               ? '1px solid rgba(100, 100, 100, 0.5)'
               : '1px solid rgba(80, 80, 80, 0.4)',
@@ -275,21 +274,15 @@ export default function EmergencyShutOff() {
           cursor: 'pointer',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontSize: 10,
-          fontWeight: 600,
-          letterSpacing: '0.03em',
-          textTransform: 'uppercase',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
           transition: 'all 0.15s ease',
-          transform: isCollapsing ? 'scale(1.05)' : 'scale(1)',
+          transform: isCollapsing ? 'scale(1.1)' : 'scale(1)',
           pointerEvents: 'auto',
         }}
         data-testid="emergency-stop-btn-v31"
         title="Emergency Stop (tap) | Master Reboot (hold 5s)"
       >
         <Square size={14} fill="currentColor" />
-        <span>{longPressProgress > 0 ? 'HOLD...' : isVoid ? 'VOID' : 'STOP'}</span>
       </button>
     </>
   );

@@ -36,19 +36,22 @@ export const lockObsidianReality = () => {
       --background: #000000 !important; 
     }
     
-    /* STOP Pill — Fixed position, BELOW top nav bar */
+    /* STOP Pill — Fixed position, bottom-right above nav */
     .pill-stop, .floating-stop-button { 
       position: fixed !important; 
-      top: 70px !important; 
-      left: 15px !important; 
+      bottom: 85px !important; 
+      right: 15px !important; 
+      top: auto !important;
+      left: auto !important;
       z-index: 9999 !important; 
-      background: rgba(220, 20, 60, 0.6) !important; 
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      border-radius: 20px !important; 
-      padding: 5px 15px !important; 
-      font-weight: bold !important;
+      background: rgba(30, 30, 30, 0.85) !important; 
+      border: 1px solid rgba(80, 80, 80, 0.4) !important;
+      border-radius: 50% !important; 
+      padding: 0 !important;
+      width: 36px !important;
+      height: 36px !important;
       cursor: pointer !important;
-      color: #ffffff !important;
+      color: #EF4444 !important;
     }
     
     /* Disruption Banner */
