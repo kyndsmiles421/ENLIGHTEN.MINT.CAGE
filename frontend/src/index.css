@@ -1442,10 +1442,10 @@ body[data-school="Sigfield"]::after {
 
 /* Fix the STOP button positioning */
 .floating-stop-button {
-  position: absolute;
-  top: 15px;    /* Pull slightly lower than edge */
-  left: 15px;   /* Pull in from left edge */
-  z-index: 100; /* Stay on top */
+  position: fixed;
+  top: 15px;    /* V29.1: Restored to top-left corner */
+  left: 15px;   /* V29.1: Restored to top-left corner */
+  z-index: 999999; /* V29.1: Maximum z-index - NEVER covered */
   
   /* Proper size/padding for usability */
   padding: 10px 20px;
@@ -5253,15 +5253,16 @@ a,
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   V_ENGINE_P0: Emergency Kill Switch - Compact design, no overlap
+   V_ENGINE_P0: Emergency Kill Switch - Compact design, ALWAYS VISIBLE
+   V29.1 FIX: Restored top-left position with maximum z-index
    ═══════════════════════════════════════════════════════════════════════════ */
-[data-testid="emergency-shutoff"],
+[data-testid="emergency-stop-btn-v31"],
 .emergency-shutoff-btn {
   position: fixed !important;
-  top: 60px !important;
-  left: 8px !important;
-  z-index: 9990 !important;
-  max-width: 50px !important;
+  top: 15px !important;
+  left: 15px !important;
+  z-index: 999999 !important;
+  max-width: none !important;
 }
 
 
@@ -5422,10 +5423,17 @@ html body #root .glass-card .flex.items-end {
    ARCHITECT: Steven Michael | 7.3Hz Grounding
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* V31 STOP Button — Same plane as nodules */
+/* V31 STOP Button — ALWAYS VISIBLE in top-left corner */
+/* V29.1 FIX: z-index must be higher than sovereign-toolbar (10000) */
 [data-testid="emergency-stop-btn-v31"] {
-  z-index: 50000 !important;
+  position: fixed !important;
+  top: 15px !important;
+  left: 15px !important;
+  z-index: 1000000 !important;
   pointer-events: auto !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* V31 Hitboxes — FLAT PLANE, HIGH Z-INDEX */

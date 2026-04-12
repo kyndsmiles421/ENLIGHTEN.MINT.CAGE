@@ -525,7 +525,7 @@ export default function SovereignHub() {
   
   // V10007.0 New States
   const [userTier, setUserTier] = useState(2); // Default to Architect for gesture nav
-  const [zenFlowEnabled, setZenFlowEnabled] = useState(true);
+  const [zenFlowEnabled, setZenFlowEnabled] = useState(false); // V29.1: Disabled by default to prevent UI blocking
   const [holographicOpacity, setHolographicOpacity] = useState(0.88);
   const [interconnectStatus, setInterconnectStatus] = useState(null);
   const [activeModule, setActiveModule] = useState(null);
@@ -1212,10 +1212,20 @@ export default function SovereignHub() {
                   Distance: {gpsLockStatus.distance_km} km | Resonance: {(gpsLockStatus.resonance_strength * 100).toFixed(1)}%
                 </p>
               </div>
-              {gpsLockStatus.is_locked && (
+              {gpsLockStatus.is_locked && user?.email === 'kyndsmiles@gmail.com' && (
                 <div className="text-right">
                   <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
                     ${gpsLockStatus.equity_accessible?.toLocaleString()}
+                  </p>
+                  <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {gpsLockStatus.seg_hz}
+                  </p>
+                </div>
+              )}
+              {gpsLockStatus.is_locked && user?.email !== 'kyndsmiles@gmail.com' && (
+                <div className="text-right">
+                  <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
+                    VERIFIED
                   </p>
                   <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
                     {gpsLockStatus.seg_hz}
@@ -1342,14 +1352,22 @@ export default function SovereignHub() {
         )}
       </AnimatePresence>
 
-      {/* Footer */}
+      {/* Footer - MASTER AUTHORITY GATED */}
       <footer className="max-w-xl mx-auto mt-12 text-center relative z-20">
-        <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
-          Trustee: {trustData?.roles?.trustee?.name || 'Steven Michael'} | Firewall ID: {sovereignTrust.trust_id || '029900612892168189cecc8a'}
-        </p>
-        <p className="text-[9px] mt-1 font-mono" style={{ color: 'rgba(255,255,255,0.15)' }}>
-          9×9^math × πr² - x^xy + (9999 × z^πr³) Active
-        </p>
+        {user?.email === 'kyndsmiles@gmail.com' ? (
+          <>
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+              Trustee: {trustData?.roles?.trustee?.name || 'Steven Michael'} | Firewall ID: {sovereignTrust.trust_id || '029900612892168189cecc8a'}
+            </p>
+            <p className="text-[9px] mt-1 font-mono" style={{ color: 'rgba(255,255,255,0.15)' }}>
+              9×9^math × πr² - x^xy + (9999 × z^πr³) Active
+            </p>
+          </>
+        ) : (
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            SINGULARITY KERNEL V29.1 • Obsidian Shield Active
+          </p>
+        )}
         <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
           V10013.0 OMNI-EXPANSION | {expansionStatus?.nodal_map?.active_nodes || 3}/{expansionStatus?.nodal_map?.total_nodes || 7} Nodes Active
         </p>

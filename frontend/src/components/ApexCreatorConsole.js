@@ -740,18 +740,18 @@ function TreasuryPanel({ treasury, onEmergencyStop, onResume, isMaster, authHead
         </div>
       </div>
       
-      {/* φ Cap Display */}
+      {/* φ Cap Display - MASTER ONLY */}
       <div className="flex items-center justify-between text-[9px] mb-2">
         <span className="text-white/50">φ Cap (1.618%)</span>
         <span className="font-mono text-amber-400">
-          ${((treasury?.equity_reservoir || 49018.24) * 0.01618).toFixed(2)}
+          {isMaster ? `$${((treasury?.equity_reservoir || 49018.24) * 0.01618).toFixed(2)}` : '●●●●●●'}
         </span>
       </div>
       
-      {/* Safety Buffer */}
+      {/* Safety Buffer - MASTER ONLY */}
       <div className="flex items-center justify-between text-[9px] mb-3">
         <span className="text-white/50">Safety Buffer</span>
-        <span className="font-mono text-cyan-400">$40,000.00</span>
+        <span className="font-mono text-cyan-400">{isMaster ? '$40,000.00' : '●●●●●●'}</span>
       </div>
       
       {/* Control Buttons (Master Only) */}
@@ -1609,45 +1609,68 @@ export default function ApexCreatorConsole({ onClose }) {
             </div>
           )}
           
-          {/* Equity Sync Monitor */}
-          <motion.div 
-            animate={vaultFlashing ? { 
-              boxShadow: ['0 0 0px rgba(34,197,94,0)', '0 0 20px rgba(34,197,94,0.8)', '0 0 0px rgba(34,197,94,0)'] 
-            } : {}}
-            transition={{ duration: 0.3, repeat: vaultFlashing ? 5 : 0 }}
-            className="p-3 rounded-lg mb-3"
-            style={{
-              background: 'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(6,182,212,0.1))',
-              border: '1px solid rgba(34,197,94,0.2)',
-            }}
-            data-testid="equity-reservoir-display"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] text-green-400/80 uppercase tracking-wider">Equity Reservoir</span>
-              <DollarSign size={12} className="text-green-400" />
-            </div>
-            <div className="text-2xl font-mono text-green-400" style={{ fontWeight: '600' }}>
-              ${(treasury?.equity_reservoir ?? SOVEREIGN_CONFIG.equity).toLocaleString()}
-            </div>
-            <div className="text-[9px] text-white/40 mt-1">
-              {/* V29.1: Gamified Fans System */}
-              Fan Rate: {SOVEREIGN_CONFIG.fans_per_hour} Fans/hr
-            </div>
-            
-            {/* V29.1: Tier 4 Expansion Highlight */}
-            {fourTierLedger?.T4_EXPANSION && (
-              <div className="mt-2 pt-2 border-t border-white/10">
-                <div className="flex justify-between text-[9px]">
-                  <span className="text-white/50">T4 KEYSTONE (Liquid)</span>
-                  <span className="text-green-400 font-mono font-bold">
-                    ${fourTierLedger.T4_EXPANSION.amount?.toLocaleString() || '0'}
-                  </span>
-                </div>
+          {/* V29.1: Equity Display - MASTER AUTHORITY GATED */}
+          {isMasterAuthority ? (
+            <motion.div 
+              animate={vaultFlashing ? { 
+                boxShadow: ['0 0 0px rgba(34,197,94,0)', '0 0 20px rgba(34,197,94,0.8)', '0 0 0px rgba(34,197,94,0)'] 
+              } : {}}
+              transition={{ duration: 0.3, repeat: vaultFlashing ? 5 : 0 }}
+              className="p-3 rounded-lg mb-3"
+              style={{
+                background: 'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(6,182,212,0.1))',
+                border: '1px solid rgba(34,197,94,0.2)',
+              }}
+              data-testid="equity-reservoir-display"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] text-green-400/80 uppercase tracking-wider">Equity Reservoir</span>
+                <DollarSign size={12} className="text-green-400" />
               </div>
-            )}
-          </motion.div>
+              <div className="text-2xl font-mono text-green-400" style={{ fontWeight: '600' }}>
+                ${(treasury?.equity_reservoir ?? SOVEREIGN_CONFIG.equity).toLocaleString()}
+              </div>
+              <div className="text-[9px] text-white/40 mt-1">
+                {/* V29.1: Gamified Fans System */}
+                Fan Rate: {SOVEREIGN_CONFIG.fans_per_hour} Fans/hr
+              </div>
+              
+              {/* V29.1: Tier 4 Expansion Highlight */}
+              {fourTierLedger?.T4_EXPANSION && (
+                <div className="mt-2 pt-2 border-t border-white/10">
+                  <div className="flex justify-between text-[9px]">
+                    <span className="text-white/50">T4 KEYSTONE (Liquid)</span>
+                    <span className="text-green-400 font-mono font-bold">
+                      ${fourTierLedger.T4_EXPANSION.amount?.toLocaleString() || '0'}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            /* Public View - Kernel Status */
+            <motion.div 
+              className="p-3 rounded-lg mb-3"
+              style={{
+                background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1))',
+                border: '1px solid rgba(99,102,241,0.2)',
+              }}
+              data-testid="kernel-status-display"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] text-indigo-400/80 uppercase tracking-wider">Singularity Kernel</span>
+                <Zap size={12} className="text-indigo-400" />
+              </div>
+              <div className="text-xl font-mono text-indigo-400" style={{ fontWeight: '600' }}>
+                V29.1 OPERATIONAL
+              </div>
+              <div className="text-[9px] text-white/40 mt-1">
+                Obsidian Shield Active • 144Hz LOCKED
+              </div>
+            </motion.div>
+          )}
           
-          {/* V29.0: Haptic Status Indicator */}
+          {/* V29.0: Haptic Status Indicator - Gated Values */}
           {hapticStatus && (
             <div 
               className="p-2 rounded-lg mb-3 flex items-center justify-between"
@@ -1661,7 +1684,9 @@ export default function ApexCreatorConsole({ onClose }) {
                 <span className="text-[8px] text-white/60 uppercase">Next Milestone</span>
               </div>
               <span className="text-[9px] font-mono text-purple-400">
-                ${hapticStatus.distance_to_next?.toFixed(0)} to ${hapticStatus.next_milestone?.toLocaleString()}
+                {isMasterAuthority 
+                  ? `$${hapticStatus.distance_to_next?.toFixed(0)} to $${hapticStatus.next_milestone?.toLocaleString()}`
+                  : 'SYNC ACTIVE'}
               </span>
             </div>
           )}

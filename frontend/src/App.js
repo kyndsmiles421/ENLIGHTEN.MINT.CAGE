@@ -351,7 +351,8 @@ function CafeApp() {
   
   // Check if current route is sovereign mode (hide all chrome including VOID button)
   const isSovereignRoute = currentPath === '/sovereign-canvas' || 
-                           currentPath === '/replant';
+                           currentPath === '/replant' ||
+                           currentPath === '/sovereign-hub'; // V29.1: Include sovereign-hub
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = currentPath === '/hub' || 
