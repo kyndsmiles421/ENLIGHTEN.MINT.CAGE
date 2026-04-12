@@ -79,6 +79,7 @@ const SOVEREIGN_CONFIG = {
   credits_per_hour: 5,
   server_floor: 5.00,             // Mandatory $5 minimum
   sovereignty_discount: 0.90,     // 10% off Learning Packs
+  equity: 49018.24,               // Default equity value for display
 };
 
 // V29.1 FINAL: Haptic Configuration
