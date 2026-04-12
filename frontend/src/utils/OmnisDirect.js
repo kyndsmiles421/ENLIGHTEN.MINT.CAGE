@@ -20,11 +20,13 @@
 import { PHI, HELIX, SEG_HZ } from './OmegaSingularity';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CORE CONSTANTS
+// CORE CONSTANTS — V29.2 GAMIFIED CREDITS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const EQUITY_BASE = 79313.18;
-const RENDER_RATE = 15.00; // $/hr
+const CREDIT_RATE = 10; // Fans/hr — Gamified internal credits (NO USD)
+const CREDIT_UNIT = 'Fans';
+const RENDER_RATE = CREDIT_RATE; // Alias for backward compatibility
 const FRACTAL_LAYERS = 54;
 
 // Track definitions for the timeline

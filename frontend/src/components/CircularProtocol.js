@@ -85,7 +85,7 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
       await fetchLedger();
       
       toast.success('Test Trade Confirmed', {
-        description: `1 hour × $15 × 1.5 GPS = $${res.data.entry.value.final_value}`,
+        description: `1 hour × 10 Fans × 1.5 GPS = ${res.data.entry.value.final_value} Fans`,
       });
     } catch (err) {
       toast.error('Test trade failed');

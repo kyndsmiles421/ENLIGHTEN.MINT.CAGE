@@ -492,10 +492,10 @@ export function DeepLorePanel({
               data-testid="award-credit-btn"
             >
               <Award size={14} />
-              Claim Learning Credit ($3.75 value)
+              Claim Learning Credit (2.5 Fans)
             </button>
             <p className="text-[10px] text-center mt-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
-              15 minutes of deep exploration → $15/hr rate
+              15 minutes of deep exploration → 10 Fans/hr rate
             </p>
           </div>
         )}

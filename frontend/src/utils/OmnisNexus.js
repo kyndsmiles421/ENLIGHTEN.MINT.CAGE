@@ -1,5 +1,5 @@
 /**
- * ENLIGHTEN.MINT.CAFE - V10000.3 OMNIS-NEXUS
+ * ENLIGHTEN.MINT.CAFE - V29.2 OMNIS-NEXUS
  * 
  * PURPOSE: Nodal Projection | Tiered UI Morphing | Time Usage Tracking
  * 
@@ -7,39 +7,41 @@
  * - Decentralized Academy into Global Nodal Network
  * - GPS-AR Live Portals adapting to proximity, Tier, and Mixer settings
  * - Creator Mixer cross-pollination with UI Mixer
- * - Sovereign Time-Equity system ($15/hr Volunteer Credits)
+ * - Gamified Credit System (10 Fans/hr) — NO USD VALUES
  */
 
 import { PHI, HELIX, SEG_HZ } from './OmegaSingularity';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TIER STRUCTURE & CONSTANTS
+// TIER STRUCTURE & CONSTANTS — GAMIFIED CREDITS (NO USD)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export const ACTIVE_TIERS = ['APPRENTICE', 'TRUSTEE', 'ARCHITECT'];
-export const USAGE_RATE = 15.00; // $/hour Knowledge Equity
+export const CREDIT_RATE = 10; // Fans/hour — Gamified internal credits
+export const CREDIT_UNIT = 'Fans';
+export const USAGE_RATE = CREDIT_RATE; // Alias for backward compatibility
 
-// Tier Access Matrix
+// Tier Access Matrix — Credit-based (no USD)
 export const TIER_ACCESS = {
   0: {
     name: 'Apprentice',
     epoch: 'PRESENT',
     features: ['High-contrast text', 'Basic Sacred Geometry'],
-    equityRate: 15.00,
+    creditRate: 10,
     description: 'Access to the Present epoch. UI is high-contrast, text-guided.',
   },
   1: {
     name: 'Trustee',
     epoch: 'PAST_PRESENT',
     features: ['Circular Protocol Ledger', 'Sacred Geometry wireframes'],
-    equityRate: 15.00,
+    creditRate: 10,
     description: 'Access to Past/Present. Unlocks the Circular Protocol Ledger.',
   },
   2: {
     name: 'Grand Architect',
     epoch: 'FULL',
     features: ['Future epoch', 'Creator Mixer', 'Gesture navigation', 'Obsidian Void'],
-    equityRate: 15.00,
+    creditRate: 10,
     description: 'Full access to Future epoch + Creator Mixer. Pure gesture navigation.',
   },
 };

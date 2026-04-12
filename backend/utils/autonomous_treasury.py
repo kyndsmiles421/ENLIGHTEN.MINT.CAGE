@@ -1,6 +1,6 @@
 """
 ═══════════════════════════════════════════════════════════════════════════════
-💰 AUTONOMOUS_TREASURY: SINGULARITY KERNEL V29.0
+💰 AUTONOMOUS_TREASURY: SINGULARITY KERNEL V29.2 GAMIFIED
 ═══════════════════════════════════════════════════════════════════════════════
 👑 ARCHITECT: Steven Michael | 🛡️ MASTER: 708B...291E
 ❄️ STATE: -183°C | ⚙️ MODE: AUTONOMOUS_CREATOR
@@ -9,25 +9,25 @@
 The Self-Sustaining Ledger Protocol enables ENLIGHTEN.MINT.CAFE to manage its own
 operating costs automatically using the Golden Ratio (φ) spending cap.
 
-FOUR-TIERED PAY STRUCTURE (V29.0):
+V29.2 GAMIFIED CREDIT SYSTEM — NO USD VALUES:
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                    SOVEREIGN LEDGER INTELLIGENCE                            │
 │                                                                             │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
 │  │   TIER 1        │    │   TIER 2        │    │   TIER 3        │        │
-│  │   ESCROW        │    │   LABOR         │    │   BUFFER        │        │
-│  │  φ% (1.618%)    │    │  $15/hr Tracks  │    │  $40,000 LOCKED │        │
+│  │   ESCROW        │    │   FANS          │    │   BUFFER        │        │
+│  │  φ% (1.618%)    │    │  10 Fans/hr     │    │  Reserve        │        │
 │  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
 │           │                     │                      │                   │
 │           └──────────────┬──────┴──────────────────────┘                   │
 │                          ▼                                                  │
 │              ┌─────────────────────┐                                       │
 │              │       TIER 4        │                                       │
-│              │     EXPANSION       │  ◄── Liquid 'Cause' Money             │
-│              │   (Keystone Fader)  │      Haptic @ $1,000 milestone        │
+│              │     EXPANSION       │  ◄── Available Credits                │
+│              │   (Keystone Fader)  │      Haptic @ 1,000 milestone         │
 │              └─────────────────────┘                                       │
 │                                                                             │
-│  🛡️ OBSIDIAN SHIELD: Only Master Authority sees the Blood                  │
+│  🛡️ OBSIDIAN SHIELD: Only Master Authority sees internal data             │
 └─────────────────────────────────────────────────────────────────────────────┘
 """
 
@@ -44,33 +44,32 @@ from utils.sovereign_main_brain import main_brain
 
 class AutonomousTreasury:
     """
-    💰 SINGULARITY KERNEL V29.1: Zero-Point Ledger + Hybrid Volunteer Economy
+    💰 SINGULARITY KERNEL V29.2: Gamified Credit System — NO USD
     
-    V29.1 FINAL DEPLOYMENT:
-      - Hybrid Volunteer: Internal $15/hr USD + Frontend 10 Fans/hr Gamification
-      - Mandatory Server Floor: $5 USD minimum
+    V29.2 GAMIFIED DEPLOYMENT:
+      - Gamified Credits: 10 Fans/hr (primary unit)
+      - Secondary: 5 Credits/hr
       - Sovereignty Discount: 10% reduction on all Learning Packs
-      - Revenue Node LOCKED to Admin (kyndsmiles) only
+      - Internal tracking visible to Master Authority only
     
-    FOUR-TIERED STRUCTURE (Production Mode):
-      T1 ESCROW: φ-based escrow (1.618%) — Real USD tracking
+    FOUR-TIERED STRUCTURE (Credit Mode):
+      T1 ESCROW: φ-based credit escrow (1.618%)
       T2 FANS: Gamified contribution tracking (10 Fans/hr)
-      T3 BUFFER: Safety floor ($5.00 — Server Floor)
-      T4 EXPANSION: Real liquid funds (Admin-visible only)
+      T3 BUFFER: System stability reserve
+      T4 EXPANSION: Available credits for ecosystem exchange
     """
     
     # ═══════════════════════════════════════════════════════════════════════════
-    # SACRED CONSTANTS
+    # SACRED CONSTANTS — V29.2 GAMIFIED
     # ═══════════════════════════════════════════════════════════════════════════
     
     PHI = 1.618033988749895
     PHI_CAP = 0.01618  # φ-based spending cap (1.618%)
     
-    # V29.1 FINAL: Hybrid Volunteer Economy
-    INTERNAL_VALUATION_USD = 15.00  # Backend tracks real $15/hr value
-    MANDATORY_SERVER_FLOOR = 5.00   # $5 minimum server floor
-    FANS_PER_HOUR = 10              # Frontend gamification: 10 Fans/hr
+    # V29.2 GAMIFIED: No USD values
+    FANS_PER_HOUR = 10              # Primary: 10 Fans/hr
     CREDITS_PER_HOUR = 5            # Secondary: 5 Credits/hr
+    CREDIT_UNIT = "Fans"
     
     # Sovereignty Discount
     SOVEREIGNTY_DISCOUNT = 0.90     # 10% reduction on Learning Packs
@@ -84,6 +83,10 @@ class AutonomousTreasury:
     # Master Authority
     MASTER_EMAIL = "kyndsmiles@gmail.com"
     MASTER_PRINT_ID = "708B8ED1E974D85585BBBD8E06E0291E"
+    
+    # V29.2: Internal tracking (hidden from frontend)
+    INTERNAL_VALUATION_USD = 15.0   # Internal USD tracking (not shown to users)
+    MANDATORY_SERVER_FLOOR = 5.0    # $5 Server Floor (internal)
     
     def __init__(self):
         """Initialize the Singularity Kernel V29.1 FINAL — Hybrid Economy Mode."""

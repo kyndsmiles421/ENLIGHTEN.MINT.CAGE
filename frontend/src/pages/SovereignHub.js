@@ -52,6 +52,15 @@ import OmniExpansion from '../utils/OmniExpansion';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// V29.2 GAMIFIED CREDIT SYSTEM — NO USD VALUES
+const VOLUNTEER_RATE = 10; // Credits per hour (Fans)
+const UNIT_NAME = "Fans";  // Gamified unit name
+
+// Calculate credits from hours worked
+const calculateCredits = (hoursWorked) => {
+  return hoursWorked * VOLUNTEER_RATE;
+};
+
 // Spectral color mapping
 const SPECTRAL_COLORS = {
   RED: '#EF4444',

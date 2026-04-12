@@ -44,7 +44,8 @@ const OmnisInterconnect = {
   helix: HELIX,
   equity: BASE_EQUITY,
   hapticSync: SEG_HZ,
-  usageRate: 15.00,
+  creditRate: 10,  // V29.2: Gamified Fans/hr — NO USD
+  creditUnit: 'Fans',
   fractalDepth: FRACTAL_DEPTH,
 
   // The Mixer Hub: Interconnects all Tier-based modules

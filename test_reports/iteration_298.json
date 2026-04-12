@@ -1,0 +1,100 @@
+{
+  "summary": "V29.2 Comprehensive Testing - Fixed 3 critical bugs, tested all navigation and pages",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "/api/treasury/status",
+        "issue": "FIXED - AutonomousTreasury missing MANDATORY_SERVER_FLOOR and INTERNAL_VALUATION_USD attributes",
+        "priority": "CRITICAL",
+        "status": "RESOLVED"
+      }
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "OmnisNexus.js",
+        "issue": "FIXED - USAGE_RATE not defined, added alias for CREDIT_RATE",
+        "priority": "CRITICAL",
+        "status": "RESOLVED"
+      },
+      {
+        "component": "OmnisDirect.js",
+        "issue": "FIXED - RENDER_RATE not defined, added alias for CREDIT_RATE",
+        "priority": "CRITICAL",
+        "status": "RESOLVED"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "navigation_test_results": {
+    "bottom_nav": {
+      "Hub": "PASS - /hub loads correctly with orbital menu",
+      "Trade": "PASS - /trade loads correctly",
+      "Oracle": "PASS - /oracle loads correctly",
+      "Discover": "PASS - /discover loads correctly",
+      "Mixer": "FAIL - /mixer returns 404"
+    },
+    "top_nav": {
+      "Archives": "PASS - /archives loads correctly",
+      "Journal": "PASS - /journal loads correctly",
+      "Ledger": "FAIL - /ledger returns 404"
+    },
+    "other_pages": {
+      "Sovereign Hub": "PASS - /sovereign-hub loads with V29.1 OPERATIONAL",
+      "Creator Console": "PASS - /creator-console loads with V29.1 OPERATIONAL",
+      "Dashboard": "REDIRECTS - /dashboard redirects to /hub",
+      "Auth": "PASS - /auth login and registration work"
+    }
+  },
+  "v29_2_gamified_credits_verification": {
+    "no_usd_in_ui": "PASS - No $15 or USD references visible in tested pages",
+    "fans_per_hour": "PASS - Console shows '10 Fans/hr' rate",
+    "instant_access_component": "PASS - Shows 'Credit Accrual: X Fans (@ 10 Fans/hr)'"
+  },
+  "api_test_results": {
+    "/api/health": "PASS - Returns {status: ok}",
+    "/api/treasury/status": "PASS - Returns treasury telemetry after fix"
+  },
+  "test_account_created": {
+    "email": "test_v29_user@test.com",
+    "password": "testpass123",
+    "name": "Test User V29"
+  },
+  "bugs_fixed": [
+    {
+      "file": "/app/frontend/src/utils/OmnisNexus.js",
+      "issue": "USAGE_RATE not defined",
+      "fix": "Added 'export const USAGE_RATE = CREDIT_RATE;' alias"
+    },
+    {
+      "file": "/app/frontend/src/utils/OmnisDirect.js",
+      "issue": "RENDER_RATE not defined",
+      "fix": "Added 'const RENDER_RATE = CREDIT_RATE;' alias"
+    },
+    {
+      "file": "/app/backend/utils/autonomous_treasury.py",
+      "issue": "Missing MANDATORY_SERVER_FLOOR and INTERNAL_VALUATION_USD class attributes",
+      "fix": "Added class attributes: INTERNAL_VALUATION_USD = 15.0, MANDATORY_SERVER_FLOOR = 5.0"
+    }
+  ],
+  "action_items": [
+    "Create /mixer route - currently returns 404",
+    "Create /ledger route - currently returns 404"
+  ],
+  "test_report_links": [],
+  "updated_files": [
+    "/app/frontend/src/utils/OmnisNexus.js",
+    "/app/frontend/src/utils/OmnisDirect.js",
+    "/app/backend/utils/autonomous_treasury.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "85%"
+  },
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "V29.2 gamified credits system is working. Fixed 3 critical bugs (USAGE_RATE, RENDER_RATE, MANDATORY_SERVER_FLOOR). Two routes still return 404: /mixer and /ledger. All other navigation works. New test account created: test_v29_user@test.com / testpass123"
+}
