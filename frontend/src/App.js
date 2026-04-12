@@ -288,6 +288,7 @@ const SovereignFabricator = lazy(() => import('./pages/SovereignFabricator'));
 const ARPortalPage = lazy(() => import('./pages/ARPortalPage'));
 const ApexCreatorPage = lazy(() => import('./pages/ApexCreatorPage'));
 const LiquidityTrader = lazy(() => import('./pages/LiquidityTrader'));
+const SovereignMasterEngine = lazy(() => import('./pages/SovereignMasterEngine'));
 
 function PageLoader() {
   return (
@@ -361,7 +362,8 @@ function CafeApp() {
   // Check if current route is sovereign mode (hide all chrome including VOID button)
   const isSovereignRoute = currentPath === '/sovereign-canvas' || 
                            currentPath === '/replant' ||
-                           currentPath === '/sovereign-hub'; // V29.1: Include sovereign-hub
+                           currentPath === '/sovereign-hub' ||
+                           currentPath === '/master-engine'; // V2.1: Master Engine is immersive
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = currentPath === '/hub' || 
@@ -679,6 +681,7 @@ function AnimatedRoutes() {
         <Route path="/lattice-view" element={<LatticeView />} />
         <Route path="/ar-portal" element={<ARPortalPage />} />
         <Route path="/liquidity-trader" element={<LiquidityTrader />} />
+        <Route path="/master-engine" element={<SovereignMasterEngine />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
