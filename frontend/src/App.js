@@ -286,6 +286,7 @@ const LatticeView = lazy(() => import('./pages/LatticeView'));
 const SovereignFabricator = lazy(() => import('./pages/SovereignFabricator'));
 const ARPortalPage = lazy(() => import('./pages/ARPortalPage'));
 const ApexCreatorPage = lazy(() => import('./pages/ApexCreatorPage'));
+const LiquidityTrader = lazy(() => import('./pages/LiquidityTrader'));
 
 function PageLoader() {
   return (
@@ -674,6 +675,7 @@ function AnimatedRoutes() {
         <Route path="/ether-hub" element={<EnlightenMintHub />} />
         <Route path="/lattice-view" element={<LatticeView />} />
         <Route path="/ar-portal" element={<ARPortalPage />} />
+        <Route path="/liquidity-trader" element={<LiquidityTrader />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />

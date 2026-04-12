@@ -46,6 +46,7 @@ const CATEGORIES = [
 
 const TABS = [
   { id: 'browse', label: 'Browse' },
+  { id: 'trader', label: 'Trader', icon: ArrowRightLeft, color: '#FCD34D' },
   { id: 'gates', label: 'Gates', icon: Zap, color: '#D97706' },
   { id: 'resonance', label: 'Resonance', icon: Sparkles, color: '#8B5CF6' },
   { id: 'broker', label: 'Broker', icon: Sparkles, color: '#EAB308' },
@@ -267,6 +268,25 @@ export default function TradeCircle() {
             {tab === 'gates' && (
               <motion.div key="gates" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <EnergyGates />
+              </motion.div>
+            )}
+
+            {/* Liquidity Trader (Waste-to-Value) */}
+            {tab === 'trader' && (
+              <motion.div key="trader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="text-center py-6">
+                  <Sparkles size={32} color="#FCD34D" className="mx-auto mb-3" />
+                  <h3 className="text-base font-bold mb-2" style={{ color: '#F8FAFC' }}>Marketplace Trader</h3>
+                  <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                    The Liquidity Controller — convert Digital Dust into Fans via Phi Cap exchange.
+                  </p>
+                  <button onClick={() => navigate('/liquidity-trader')}
+                    className="px-6 py-3 rounded-xl text-sm font-bold"
+                    style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(168,85,247,0.15))', border: '1px solid rgba(252,211,77,0.25)', color: '#FCD34D' }}
+                    data-testid="open-liquidity-trader-btn">
+                    Open Liquidity Trader
+                  </button>
+                </div>
               </motion.div>
             )}
 

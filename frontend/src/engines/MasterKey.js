@@ -149,6 +149,16 @@ const GAMIFIED_ECONOMY = {
     credits: Math.floor(hours * 5),
     escrow: Math.floor(hours * 10 * 0.01618),
   }),
+  
+  // Waste-to-Value Loop (Digital Dust Economy)
+  wasteToValue: {
+    dustUnit: 'Digital Dust',
+    phiExchangeBase: 1618,
+    phiCapRate: 1.618,
+    scavengerMode: true,
+    exchangeFluctuation: 0.1,
+    memberTiers: { 1: 'SEED', 2: 'ARTISAN', 3: 'SOVEREIGN' },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -351,6 +361,17 @@ const API_ENDPOINTS = {
   marketplace: {
     store: '/api/marketplace/store',
     inventory: '/api/marketplace/inventory',
+  },
+  
+  // Transmuter (Waste-to-Value Liquidity Controller)
+  transmuter: {
+    status: '/api/transmuter/status',
+    tradeDust: '/api/transmuter/trade-dust-to-fans',
+    accrueDust: '/api/transmuter/accrue-dust',
+    generateBlueprint: '/api/transmuter/generate-blueprint',
+    blueprints: '/api/transmuter/blueprints',
+    history: '/api/transmuter/history',
+    exchangePreview: '/api/transmuter/exchange-preview',
   },
 };
 

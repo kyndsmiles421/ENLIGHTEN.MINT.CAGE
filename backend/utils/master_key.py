@@ -127,6 +127,12 @@ class GamifiedEconomy:
         if self.discount_active:
             return price * self.discount_factor
         return price
+    
+    # Waste-to-Value Loop
+    dust_unit: str = "Digital Dust"
+    phi_exchange_base: int = 1618  # 1618 Dust = 1 Fan (Phi Cap)
+    phi_cap_rate: float = 1.618   # Golden Ratio %
+    dust_scavenger_mode: bool = True  # Every interaction yields Dust
 
 
 ECONOMY = GamifiedEconomy()
