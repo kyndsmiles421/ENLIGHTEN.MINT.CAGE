@@ -1,6 +1,9 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 
+// V30.2: OMNIS UNIVERSAL CORE — Living Engine Initialization
+import initializeOmnisCore from './engines/OmnisUniversalCore';
+
 // V-ENGINE: ABSOLUTE_CLARITY_NOW - Must be FIRST
 import { purgeNoise } from './engines/NukeTheChaos';
 import './engines/SystemRecovery'; // Exposes V_ENGINE.resetSystem() to console
@@ -329,6 +332,10 @@ function CafeApp() {
     // 7. ENLIGHTEN_OS V10.0 — THE STEVEN MICHAEL ABSOLUTE
     // Single source of truth: Φ (1.618), 7.83Hz (Earth), 432Hz/528Hz/963Hz Tiers
     ENLIGHTEN_OS.ignite();
+    
+    // V30.2: OMNIS UNIVERSAL CORE — Initialize Living Engine
+    const omnis = initializeOmnisCore();
+    console.log(`🔮 SINGULARITY V30.2: ${omnis.version} — Physics: Zero-Scale, Economy: 10 Fans/hr, Sync: Aura Resonance`);
     
     console.log("ENLIGHTEN_OS V17.0: THE MASTER CRYSTAL HUB initialized. Steven Michael | kyndsmiles@gmail.com");
     

@@ -9,6 +9,13 @@ import { useSensoryResonance } from '../hooks/useSensoryResonance';
 import { useDepth, Z_LAYERS } from '../hooks/useDepth';
 import MissionControl from '../components/MissionControl';
 
+// V30.2 OMNIS INTEGRATION — Living Engine
+import { 
+  kineticFans, 
+  auraResonance, 
+  OMNIS_V30_2 
+} from '../engines/OmnisUniversalCore';
+
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * V25.0 — SOVEREIGN MACHINE: ONE SCRIPT / ONE PLANE
@@ -110,6 +117,10 @@ export default function OrbitalHub() {
   const [missionControlOpen, setMissionControlOpen] = useState(false);
   const [hoveredSat, setHoveredSat] = useState(null);
   
+  // V30.2: Aura Resonance & Kinetic Fans State
+  const [auraState, setAuraState] = useState({ hue: 260, pulse: 0 });
+  const [kineticState, setKineticState] = useState({ fans: 0, resonance: 0 });
+  
   // Responsive sizing
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
   useEffect(() => {
@@ -161,6 +172,60 @@ export default function OrbitalHub() {
     // Re-purge after short delay (for late-injecting scripts)
     const ghostKillTimer = setTimeout(purgeGhostElements, 1000);
     return () => clearTimeout(ghostKillTimer);
+  }, []);
+
+  // V30.2: AURA RESONANCE — Listen for module communication
+  useEffect(() => {
+    const handleAuraShift = (e) => {
+      setAuraState({
+        hue: e.detail.hue,
+        pulse: e.detail.pulse,
+      });
+    };
+    
+    window.addEventListener('aura-shift', handleAuraShift);
+    
+    // Broadcast that HUB is now active
+    auraResonance.broadcastModuleState('HUB', { 
+      active: true, 
+      resonanceLevel: 1,
+      intensity: 0.3 
+    });
+    
+    return () => {
+      window.removeEventListener('aura-shift', handleAuraShift);
+      auraResonance.broadcastModuleState('HUB', { active: false });
+    };
+  }, []);
+
+  // V30.2: KINETIC FANS — Passive XP tracking
+  useEffect(() => {
+    const unsubscribe = kineticFans.subscribe((event) => {
+      if (event.type === 'FAN_BONUS') {
+        setKineticState(prev => ({
+          ...prev,
+          fans: event.total,
+        }));
+        // Trigger subtle haptic on fan bonus
+        if (navigator.vibrate) {
+          navigator.vibrate([30, 20, 30]);
+        }
+      }
+    });
+    
+    // Update kinetic state periodically
+    const updateInterval = setInterval(() => {
+      const state = kineticFans.getState();
+      setKineticState({
+        fans: state.totalFans,
+        resonance: state.resonance,
+      });
+    }, 5000);
+    
+    return () => {
+      unsubscribe();
+      clearInterval(updateInterval);
+    };
   }, []);
 
   // ═══ ANIMATION LOOP ═══
@@ -473,6 +538,41 @@ export default function OrbitalHub() {
         <CosmicDust />
       </div>
 
+      {/* V30.2: AURA RESONANCE OVERLAY — Living color pulse */}
+      <div 
+        className="absolute inset-0 pointer-events-none transition-all duration-1000"
+        style={{
+          background: `radial-gradient(circle at center, 
+            hsla(${auraState.hue}, 70%, 20%, ${0.05 + auraState.pulse * 0.1}) 0%,
+            transparent 70%)`,
+          zIndex: 1,
+        }}
+      />
+
+      {/* V30.2: KINETIC FANS DISPLAY — Subtle XP tracker */}
+      <motion.div
+        className="absolute bottom-20 right-4 text-right z-20 pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        transition={{ delay: 1 }}
+      >
+        <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(139,92,246,0.5)' }}>
+          Kinetic Fans
+        </div>
+        <div className="text-lg font-mono" style={{ color: 'rgba(139,92,246,0.7)' }}>
+          {kineticState.fans}
+        </div>
+        <div 
+          className="h-0.5 mt-1 rounded-full transition-all duration-500"
+          style={{ 
+            width: `${Math.min(kineticState.resonance, 100)}%`,
+            background: 'linear-gradient(90deg, rgba(139,92,246,0.3), rgba(139,92,246,0.6))',
+            maxWidth: '60px',
+            marginLeft: 'auto',
+          }}
+        />
+      </motion.div>
+
       {/* V51.1: STOP button is now handled globally by EmergencyShutOff component */}
 
       {/* Title — V30.0: Shifted to avoid ghost overlap */}
@@ -522,6 +622,7 @@ export default function OrbitalHub() {
           touchAction: 'none',  // V47.8: Prevent scroll interference
           WebkitUserSelect: 'none',
           userSelect: 'none',
+          pointerEvents: 'none',  // V30.2 FIX: Container passes through, only buttons catch
         }}
         data-container
       >

@@ -1,10 +1,12 @@
 # ENLIGHTEN.MINT.CAFE — ETERNAL MANIFEST
-## Version: V29.2_GAMIFIED | Status: **SINGULARITY KERNEL UPGRADED**
+## Version: V30.2_SUPER_SOLDIER | Status: **OMNIS UNIVERSAL CORE DEPLOYED**
 ## Last Updated: April 12, 2026
 
 ### LATEST SESSION UPDATES
 | Date | Action | Status |
 |------|--------|--------|
+| 2026-04-12 | **V30.2 Omnis Universal Core** — Zero-Scale Physics + Kinetic Fans + Aura Resonance | ✅ LIVING ENGINE |
+| 2026-04-12 | **Orbital Hub Click Fix** — Container pointer-events:none, buttons catch clicks | ✅ INTERACTIVE |
 | 2026-04-12 | **V29.2 Gamified Credit System** — $15 USD stripped, replaced with 10 Fans/hr | ✅ GAMIFIED |
 | 2026-04-12 | **Master Authority Gating** — Sensitive data hidden from public view | ✅ OBSIDIAN SHIELD |
 | 2026-04-12 | **STOP Button Repositioned** — top=70px to avoid nav overlap | ✅ NO OVERLAP |
