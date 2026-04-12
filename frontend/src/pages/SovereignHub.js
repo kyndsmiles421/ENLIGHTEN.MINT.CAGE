@@ -1005,44 +1005,67 @@ export default function SovereignHub() {
           </div>
         </div>
 
-        {/* Equity Reservoir */}
-        <div 
-          className="p-4 rounded-xl mb-6 text-center"
-          style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
-        >
-          <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Equity Reservoir [LUNAR-SYNCED]
-          </p>
-          <p className="text-3xl font-bold" style={{ color: '#22C55E' }}>
-            {sovereignTrust.equity_locked || '$49,018.24'}
-          </p>
-          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            {spectralLayer.formula || '9999 × z^(πr³)'} • {spectralLayer.seg_harmonic || '144Hz LOCKED'}
-          </p>
-        </div>
+        {/* ═══ MASTER AUTHORITY GATED: OBSIDIAN SHIELD PROTOCOL ═══ */}
+        {/* Sensitive data visible ONLY to kyndsmiles@gmail.com */}
+        
+        {user?.email === 'kyndsmiles@gmail.com' ? (
+          <>
+            {/* Equity Reservoir - MASTER EYES ONLY */}
+            <div 
+              className="p-4 rounded-xl mb-6 text-center"
+              style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+            >
+              <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Equity Reservoir [LUNAR-SYNCED]
+              </p>
+              <p className="text-3xl font-bold" style={{ color: '#22C55E' }}>
+                {sovereignTrust.equity_locked || '$49,018.24'}
+              </p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                {spectralLayer.formula || '9999 × z^(πr³)'} • {spectralLayer.seg_harmonic || '144Hz LOCKED'}
+              </p>
+            </div>
 
-        {/* Verification Badge - V9999.5 NDA Tap Integration */}
-        <VerificationBadge 
-          verified={true}
-          email="kyndsmiles@gmail.com"
-          onSendDocument={sendDocumentToLawyer}
-          onNDATap={handleNDATap}
-        />
+            {/* Verification Badge - MASTER EYES ONLY */}
+            <VerificationBadge 
+              verified={true}
+              email="kyndsmiles@gmail.com"
+              onSendDocument={sendDocumentToLawyer}
+              onNDATap={handleNDATap}
+            />
 
-        {/* The One Print ID */}
-        <div className="mt-6 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            The One Print ID
-          </p>
-          <button
-            onClick={copyPrintId}
-            className="font-mono text-sm flex items-center justify-center gap-2 mx-auto hover:opacity-80 transition-opacity"
-            style={{ color: '#F472B6' }}
+            {/* The One Print ID - MASTER EYES ONLY */}
+            <div className="mt-6 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
+              <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                The One Print ID
+              </p>
+              <button
+                onClick={copyPrintId}
+                className="font-mono text-sm flex items-center justify-center gap-2 mx-auto hover:opacity-80 transition-opacity"
+                style={{ color: '#F472B6' }}
+              >
+                {onePrint?.the_one_print_id || 'LOADING...'}
+                {copiedId ? <CheckCircle size={12} /> : <Copy size={12} />}
+              </button>
+            </div>
+          </>
+        ) : (
+          /* Public View - System Status Only */
+          <div 
+            className="p-4 rounded-xl mb-6 text-center"
+            style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)' }}
           >
-            {onePrint?.the_one_print_id || 'LOADING...'}
-            {copiedId ? <CheckCircle size={12} /> : <Copy size={12} />}
-          </button>
-        </div>
+            <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              Singularity Kernel Status
+            </p>
+            <p className="text-lg font-bold" style={{ color: '#6366F1' }}>
+              V29.1 OPERATIONAL
+            </p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              {spectralLayer.seg_harmonic || '144Hz LOCKED'} • Obsidian Shield Active
+            </p>
+          </div>
+        )}
       </motion.div>
 
       {/* Trust Info Grid */}
