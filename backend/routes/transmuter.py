@@ -13,10 +13,14 @@ from datetime import datetime, timezone
 from utils.master_transmuter import (
     TRANSMUTER,
     TIERS,
+    TIER_DYNAMICS,
     SUBSCRIPTION_TO_TRANSMUTER,
+    SUBSCRIPTION_TO_TIER_NAME,
     DUST_COMPLEXITY_REWARDS,
     BASE_PHI_EXCHANGE,
     PHI,
+    TIER_RATIOS,
+    SCHOLARSHIP_TAX_RATE,
 )
 from utils.credits import modify_credits, get_user_credits
 import uuid
@@ -30,6 +34,13 @@ async def get_user_tier(user_id: str) -> int:
     sub = await db.subscriptions.find_one({"user_id": user_id}, {"_id": 0})
     tier_name = (sub or {}).get("tier", "discovery")
     return SUBSCRIPTION_TO_TRANSMUTER.get(tier_name, 1)
+
+
+async def get_user_tier_name(user_id: str) -> str:
+    """Resolve user's tier NAME from their subscription."""
+    sub = await db.subscriptions.find_one({"user_id": user_id}, {"_id": 0})
+    tier_name = (sub or {}).get("tier", "discovery")
+    return SUBSCRIPTION_TO_TIER_NAME.get(tier_name, "SEED")
 
 
 async def get_wallet(user_id: str) -> dict:
@@ -91,6 +102,10 @@ async def get_transmuter_status(user=Depends(get_current_user)):
         "fans_balance": fans,
         "tier": tier,
         "tier_name": TIERS.get(tier, "SEED"),
+        "tier_dynamics": TRANSMUTER.get_tier_dynamics(TIERS.get(tier, "SEED")),
+        "tier_ratios": TIER_RATIOS,
+        "all_tier_dynamics": TIER_DYNAMICS,
+        "scholarship_tax_rate": SCHOLARSHIP_TAX_RATE,
         "exchange_rate": exchange_rate,
         "base_exchange_rate": BASE_PHI_EXCHANGE,
         "phi_constant": PHI,
@@ -311,4 +326,139 @@ async def preview_exchange(dust_amount: int = 1618, user=Depends(get_current_use
         "dust_consumed": conversion["dust_consumed"],
         "dust_remainder": conversion["dust_remainder"],
         "market_activity": round(activity, 2),
+    }
+
+
+@router.post("/transmute")
+async def execute_transmutation(data: dict = Body(...), user=Depends(get_current_user)):
+    """
+    Sovereign Engine Alchemy: apply Fibonacci accrual, Phi Cap, and Scholarship Tax.
+    Input Dust is transmuted with tier-based ratios.
+    """
+    user_id = user["id"]
+    input_amount = data.get("input_amount", 100)
+
+    if not isinstance(input_amount, (int, float)) or input_amount <= 0:
+        raise HTTPException(400, "input_amount must be positive")
+
+    wallet = await get_wallet(user_id)
+    if wallet["dust"] < input_amount:
+        raise HTTPException(400, f"Insufficient Dust. Have {wallet['dust']}, need {input_amount}.")
+
+    tier = await get_user_tier(user_id)
+    result = TRANSMUTER.transmute(input_amount, tier)
+    now = datetime.now(timezone.utc).isoformat()
+
+    net_dust = int(result["net_result"])
+    tax_dust = int(result["tax_amount"])
+
+    # Deduct input, credit net result (input transforms into output)
+    # Net effect: user loses input_amount, gains net_result
+    dust_delta = net_dust - int(input_amount)
+    await db.hub_wallets.update_one(
+        {"user_id": user_id},
+        {"$inc": {"dust": dust_delta}},
+    )
+
+    # Tax goes to community/master ledger
+    if tax_dust > 0:
+        await db.hub_wallets.update_one(
+            {"user_id": "sovereign_master"},
+            {"$inc": {"dust": tax_dust, "total_dust_earned": tax_dust}},
+            upsert=True,
+        )
+
+    # Log
+    tx_id = str(uuid.uuid4())
+    await db.transmuter_log.insert_one({
+        "id": tx_id,
+        "user_id": user_id,
+        "type": "alchemy",
+        "input_amount": int(input_amount),
+        "net_result": net_dust,
+        "tax_amount": tax_dust,
+        "capped_output": int(result["capped_output"]),
+        "tier_ratio": result["tier_ratio"],
+        "tax_rate": result["tax_rate"],
+        "tier_name": result["tier_name"],
+        "phi_cap_applied": result["phi_cap_applied"],
+        "created_at": now,
+    })
+
+    updated_wallet = await get_wallet(user_id)
+    return {
+        "transmuted": True,
+        "input_amount": int(input_amount),
+        "net_result": net_dust,
+        "tax_amount": tax_dust,
+        "capped_output": int(result["capped_output"]),
+        "tier_ratio": result["tier_ratio"],
+        "tax_rate": result["tax_rate"],
+        "tier_name": result["tier_name"],
+        "phi_cap_applied": result["phi_cap_applied"],
+        "dust_balance": updated_wallet["dust"],
+        "transaction_id": tx_id,
+    }
+
+
+@router.post("/work-submit")
+async def work_submit(data: dict = Body(...), user=Depends(get_current_user)):
+    """
+    Unified Work Endpoint — all 20 modules call this on 'Save'/'Complete'.
+    Silent dust accrual with tier-based dynamics and Fibonacci dampening.
+    """
+    user_id = user["id"]
+    module = data.get("module", "unknown")
+    interaction_weight = data.get("interaction_weight", 10)
+
+    if not isinstance(interaction_weight, (int, float)) or interaction_weight <= 0:
+        interaction_weight = 10
+
+    interaction_weight = min(1000, interaction_weight)
+    tier_name = await get_user_tier_name(user_id)
+    result = TRANSMUTER.process_interaction(tier_name, module, interaction_weight)
+
+    earned = max(1, int(result["earned"]))
+    taxed = int(result["taxed_to_master"])
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Credit user
+    await get_wallet(user_id)
+    await db.hub_wallets.update_one(
+        {"user_id": user_id},
+        {"$inc": {"dust": earned, "total_dust_earned": earned}},
+    )
+
+    # Tax to master ledger
+    if taxed > 0:
+        await db.hub_wallets.update_one(
+            {"user_id": "sovereign_master"},
+            {"$inc": {"dust": taxed, "total_dust_earned": taxed}},
+            upsert=True,
+        )
+
+    # Log silently
+    await db.transmuter_log.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "type": "work_submit",
+        "module": module,
+        "interaction_weight": interaction_weight,
+        "earned": earned,
+        "taxed": taxed,
+        "tier": tier_name,
+        "ratio": result["ratio"],
+        "tax_rate": result["tax_rate"],
+        "created_at": now,
+    })
+
+    updated_wallet = await get_wallet(user_id)
+    return {
+        "accrued": True,
+        "earned": earned,
+        "taxed_to_master": taxed,
+        "tier": tier_name,
+        "ratio": result["ratio"],
+        "tax_rate": result["tax_rate"],
+        "dust_balance": updated_wallet["dust"],
     }

@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft, ArrowRightLeft, Gem, Coins, Zap, Star, Shield,
   TrendingUp, Clock, FileText, Lock, ChevronRight, Sparkles,
-  Activity, Layers, BarChart3, Hexagon
+  Activity, Layers, BarChart3, Hexagon, Share2, FlaskConical
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -311,6 +311,161 @@ function TransactionHistory({ entries }) {
   );
 }
 
+function AlchemyPanel({ dust, tier, tierName, tierDynamics, onTransmute, loading, lastResult }) {
+  const [amount, setAmount] = useState('100');
+  const numAmount = parseInt(amount) || 0;
+  const dynamics = tierDynamics || { ratio: 0.236, tax: 0.15, label: 'Scholarship' };
+  const tierColor = TIER_COLORS[tierName] || '#6B7280';
+
+  // Preview calculation
+  const grossOutput = numAmount * (1 + dynamics.ratio);
+  const cappedOutput = Math.min(grossOutput, numAmount * 1.618);
+  const taxAmount = cappedOutput * dynamics.tax;
+  const netResult = cappedOutput - taxAmount;
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Sovereign Hub Achievement',
+      text: `I just achieved a ${(dynamics.ratio * 100).toFixed(1)}% yield in the Master Transmuter on Enlighten.Mint.Cafe!`,
+      url: window.location.href,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast.success('Shared successfully');
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        toast.success('Achievement copied to clipboard');
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') toast.error('Share failed');
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      {/* Tier Dynamics Card */}
+      <div className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }} data-testid="alchemy-panel">
+        <div className="flex items-center gap-2 mb-3">
+          <FlaskConical size={16} color={tierColor} />
+          <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Sovereign Engine Alchemy</h2>
+        </div>
+        <div className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>
+          Transmute Dust through the Fibonacci accrual engine. Phi Cap ceiling protects value.
+        </div>
+
+        {/* Tier Dynamics Display */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="rounded-xl p-2 text-center" style={{ background: `${tierColor}08`, border: `1px solid ${tierColor}15` }}>
+            <div className="text-lg font-bold" style={{ color: tierColor }}>{(dynamics.ratio * 100).toFixed(1)}%</div>
+            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Accrual Rate</div>
+          </div>
+          <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(252,211,77,0.12)' }}>
+            <div className="text-lg font-bold" style={{ color: '#FCD34D' }}>{(dynamics.tax * 100).toFixed(1)}%</div>
+            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              {dynamics.tax > 0 ? 'Scholarship Tax' : 'Zero Tax'}
+            </div>
+          </div>
+          <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(45,212,191,0.06)', border: '1px solid rgba(45,212,191,0.12)' }}>
+            <div className="text-lg font-bold" style={{ color: '#2DD4BF' }}>1.618</div>
+            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Phi Cap</div>
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="relative mb-3">
+          <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
+            placeholder="Dust amount to transmute"
+            className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#F8FAFC' }}
+            data-testid="alchemy-input" />
+          <button onClick={() => setAmount(String(dust))}
+            className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-[10px] font-bold"
+            style={{ background: `${tierColor}20`, color: tierColor }}
+            data-testid="alchemy-max-btn">MAX</button>
+        </div>
+
+        {/* Preview */}
+        {numAmount > 0 && (
+          <div className="rounded-xl p-3 mb-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="flex justify-between text-xs mb-1">
+              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Input</span>
+              <span style={{ color: '#A855F7' }}>{numAmount.toLocaleString()} Dust</span>
+            </div>
+            <div className="flex justify-between text-xs mb-1">
+              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Gross ({(dynamics.ratio * 100).toFixed(1)}% accrual)</span>
+              <span style={{ color: 'rgba(248,250,252,0.6)' }}>{Math.round(grossOutput).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-xs mb-1">
+              <span style={{ color: 'rgba(248,250,252,0.5)' }}>After Phi Cap</span>
+              <span style={{ color: '#2DD4BF' }}>{Math.round(cappedOutput).toLocaleString()}</span>
+            </div>
+            {dynamics.tax > 0 && (
+              <div className="flex justify-between text-xs mb-1">
+                <span style={{ color: 'rgba(248,250,252,0.5)' }}>Scholarship Tax ({(dynamics.tax * 100).toFixed(1)}%)</span>
+                <span style={{ color: '#FCD34D' }}>-{Math.round(taxAmount).toLocaleString()}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-xs font-bold pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <span style={{ color: '#F8FAFC' }}>Net Result</span>
+              <span style={{ color: tierColor }} data-testid="alchemy-net-preview">{Math.round(netResult).toLocaleString()} Dust</span>
+            </div>
+          </div>
+        )}
+
+        {/* Execute */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => { if (numAmount > 0 && numAmount <= dust) onTransmute(numAmount); }}
+            disabled={loading || numAmount <= 0 || numAmount > dust}
+            className="flex-1 py-3 rounded-xl text-sm font-bold transition-all"
+            style={{
+              background: numAmount > 0 && numAmount <= dust
+                ? `linear-gradient(135deg, ${tierColor}20, rgba(168,85,247,0.15))`
+                : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${numAmount > 0 && numAmount <= dust ? `${tierColor}40` : 'rgba(255,255,255,0.05)'}`,
+              color: numAmount > 0 && numAmount <= dust ? tierColor : 'rgba(248,250,252,0.3)',
+            }}
+            data-testid="execute-alchemy-btn"
+          >
+            {loading ? 'Transmuting...' : 'Execute Alchemy'}
+          </button>
+          <button onClick={handleShare}
+            className="px-4 py-3 rounded-xl text-sm font-bold transition-all"
+            style={{
+              background: 'rgba(34,197,94,0.08)',
+              border: '1px solid rgba(34,197,94,0.2)',
+              color: '#22C55E',
+            }}
+            data-testid="share-yield-btn">
+            <Share2 size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Last Alchemy Result */}
+      {lastResult && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+          data-testid="alchemy-result">
+          <div className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>Last Transmutation</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Input:</span> <span style={{ color: '#A855F7' }}>{lastResult.input_amount}</span></div>
+            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Net:</span> <span className="font-bold" style={{ color: '#2DD4BF' }}>{lastResult.net_result}</span></div>
+            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Tax:</span> <span style={{ color: '#FCD34D' }}>{lastResult.tax_amount}</span></div>
+            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Ratio:</span> <span style={{ color: '#818CF8' }}>{(lastResult.tier_ratio * 100).toFixed(1)}%</span></div>
+          </div>
+          {lastResult.phi_cap_applied && (
+            <div className="mt-2 text-[10px] px-2 py-1 rounded-md inline-block" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
+              Phi Cap Applied
+            </div>
+          )}
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
 export default function LiquidityTrader() {
   const { authHeaders, user } = useAuth();
   const navigate = useNavigate();
@@ -319,7 +474,9 @@ export default function LiquidityTrader() {
   const [trading, setTrading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [lastBlueprint, setLastBlueprint] = useState(null);
-  const [tab, setTab] = useState('trade');
+  const [transmuting, setTransmuting] = useState(false);
+  const [lastAlchemy, setLastAlchemy] = useState(null);
+  const [tab, setTab] = useState('alchemy');
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -361,6 +518,20 @@ export default function LiquidityTrader() {
     }
   };
 
+  const handleTransmute = async (inputAmount) => {
+    setTransmuting(true);
+    try {
+      const { data } = await axios.post(`${API}/transmuter/transmute`, { input_amount: inputAmount }, { headers: authHeaders() });
+      setLastAlchemy(data);
+      toast.success(`Alchemy complete! Net: ${data.net_result} Dust (${data.tier_name} @ ${(data.tier_ratio * 100).toFixed(1)}%)`);
+      fetchStatus();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Transmutation failed');
+    } finally {
+      setTransmuting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#030308' }}>
@@ -372,6 +543,7 @@ export default function LiquidityTrader() {
   }
 
   const tabs = [
+    { id: 'alchemy', label: 'Alchemy', icon: FlaskConical },
     { id: 'trade', label: 'Trade', icon: ArrowRightLeft },
     { id: 'blueprint', label: 'Blueprints', icon: FileText },
     { id: 'rewards', label: 'Rewards', icon: BarChart3 },
@@ -426,6 +598,19 @@ export default function LiquidityTrader() {
 
         {/* Tab Content */}
         <AnimatePresence mode="wait">
+          {tab === 'alchemy' && (
+            <motion.div key="alchemy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <AlchemyPanel
+                dust={status?.dust_balance || 0}
+                tier={status?.tier || 1}
+                tierName={status?.tier_name || 'SEED'}
+                tierDynamics={status?.tier_dynamics}
+                onTransmute={handleTransmute}
+                loading={transmuting}
+                lastResult={lastAlchemy}
+              />
+            </motion.div>
+          )}
           {tab === 'trade' && (
             <motion.div key="trade" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <TradePanel
