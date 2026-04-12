@@ -72,8 +72,8 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
           position: 'fixed',
           bottom: '85px',
           right: '15px',
-          background: 'rgba(30, 30, 30, 0.85)',
-          border: '1px solid rgba(80, 80, 80, 0.4)',
+          background: 'rgba(10, 10, 10, 0.95)',
+          border: '1px solid rgba(30, 30, 30, 0.6)',
           borderRadius: '50%',
           padding: 0,
           width: '36px',
@@ -81,9 +81,10 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#EF4444',
+          color: 'rgba(40, 40, 40, 0.8)',
           cursor: 'pointer',
           zIndex: 9999,
+          opacity: 0.08,
         }}>
         <span style={{ fontSize: '14px' }}>■</span>
       </button>

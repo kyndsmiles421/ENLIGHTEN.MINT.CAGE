@@ -259,23 +259,15 @@ export default function EmergencyShutOff() {
           padding: 0,
           borderRadius: '50%',
           background: longPressProgress > 0
-            ? `conic-gradient(rgba(239,68,68,0.8) ${longPressProgress}%, rgba(30,30,30,0.85) ${longPressProgress}%)`
-            : isVoid 
-              ? 'rgba(60, 60, 60, 0.9)' 
-              : isAtZeroPoint 
-                ? 'rgba(60, 60, 60, 0.8)'
-                : 'rgba(30, 30, 30, 0.85)',
+            ? `conic-gradient(rgba(239,68,68,0.8) ${longPressProgress}%, rgba(10,10,10,0.95) ${longPressProgress}%)`
+            : 'rgba(10, 10, 10, 0.95)',
           border: longPressProgress > 0
             ? '2px solid rgba(239, 68, 68, 0.8)'
-            : isVoid
-              ? '1px solid rgba(100, 100, 100, 0.5)'
-              : '1px solid rgba(80, 80, 80, 0.4)',
-          color: isVoid ? '#888' : isAtZeroPoint ? '#666' : '#EF4444',
+            : '1px solid rgba(30, 30, 30, 0.6)',
+          color: longPressProgress > 0 ? '#EF4444' : 'rgba(40, 40, 40, 0.8)',
           cursor: 'pointer',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
-          transition: 'all 0.15s ease',
+          opacity: longPressProgress > 0 ? 1 : 0.08,
+          transition: 'opacity 0.3s ease, all 0.15s ease',
           transform: isCollapsing ? 'scale(1.1)' : 'scale(1)',
           pointerEvents: 'auto',
         }}

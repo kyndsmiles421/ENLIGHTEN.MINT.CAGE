@@ -415,7 +415,7 @@ function CafeApp() {
       )}
       
       {/* ═══ FREQUENCY ENGINE: Perspective Toggle ═══ */}
-      {!isSovereignRoute && !isHubRoute && <PerspectiveToggle />}
+      {/* V30.3: PerspectiveToggle PURGED — ghost nodule killer */}
       
       {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>

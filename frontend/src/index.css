@@ -588,18 +588,22 @@ body[data-perspective="INTENSE"] #MANIFEST_BAR {
 }
 
 /* Perspective Toggle Button (for Frequency Engine) */
-.perspective-toggle {
-  position: fixed;
-  top: calc(var(--safe-zone-top) + 8px);
-  right: 16px;
-  z-index: 1001;
-  display: flex;
-  gap: 4px;
-  padding: 6px;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(16px);
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* V30.3: GHOST ELEMENT PURGE — No floating nodules, no colored circles */
+.perspective-toggle,
+.perspective-btn,
+.floating-nodule,
+.lightning-bolt-circle,
+.emergent-overlay,
+[id*="nodule"],
+#back-up-banner,
+.made-with-emergent {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
 .perspective-btn {
@@ -5254,6 +5258,14 @@ a,
   left: auto !important;
   z-index: 9999 !important;
   pointer-events: auto !important;
+  opacity: 0.08 !important;
+  transition: opacity 0.3s ease !important;
+}
+[data-testid="emergency-stop-btn-v31"]:hover,
+[data-testid="emergency-stop-btn-v31"]:active,
+.emergency-shutoff-btn:hover,
+.emergency-shutoff-btn:active {
+  opacity: 0.6 !important;
 }
 
 

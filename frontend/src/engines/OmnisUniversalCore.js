@@ -626,8 +626,30 @@ export const initializeOmnisCore = () => {
     });
   }
   
+  // V30.3: SOVEREIGN OVERRIDE — Continuous ghost element purge
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const purgeGhosts = () => {
+      const selectors = [
+        '.floating-nodule', '.lightning-bolt-circle',
+        '#back-up-banner', '.made-with-emergent',
+        '.emergent-overlay', '[id*="nodule"]',
+        '.perspective-toggle', '.perspective-btn',
+      ];
+      selectors.forEach(sel => {
+        try {
+          document.querySelectorAll(sel).forEach(el => {
+            el.style.display = 'none';
+            el.style.pointerEvents = 'none';
+          });
+        } catch {}
+      });
+    };
+    purgeGhosts();
+    setInterval(purgeGhosts, 2000);
+  }
+
   console.log("═══════════════════════════════════════════════════════════════");
-  console.log("🔮 SINGULARITY V30.2: Omnis-Universal Core Online");
+  console.log("SINGULARITY V30.3: Omnis-Universal Core Online");
   console.log("   Physics: Zero-Scale Parentage ACTIVE");
   console.log("   Economy: 10 Fans/hr + Kinetic XP ACTIVE");
   console.log("   Sync: Aura Resonance Protocol ACTIVE");

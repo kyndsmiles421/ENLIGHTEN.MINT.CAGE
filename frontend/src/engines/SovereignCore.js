@@ -55,7 +55,7 @@ export const applySovereignReality = (frequency = 174) => {
       transition: all 0.5s ease-in-out;
     }
     
-    /* STOP Button — Bottom-right positioning */
+    /* STOP Button — Nearly invisible bottom-right */
     .floating-stop-button,
     [data-testid="emergency-shutoff"] { 
       position: fixed !important;
@@ -63,9 +63,10 @@ export const applySovereignReality = (frequency = 174) => {
       right: 15px !important; 
       top: auto !important;
       left: auto !important;
-      background: rgba(30, 30, 30, 0.85) !important; 
+      background: rgba(10, 10, 10, 0.95) !important; 
       border-radius: 50% !important; 
       z-index: 9999 !important;
+      opacity: 0.08 !important;
     }
     
     /* Wisdom Alert Styling */
