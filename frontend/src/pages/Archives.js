@@ -32,6 +32,9 @@ export default function Archives() {
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [conceptData, setConceptData] = useState(null);
 
+  // Silent dust accrual on page visit
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('archive_save', 6); }, []);
+
   const audioCtxRef = useRef(null);
 
   useEffect(() => {

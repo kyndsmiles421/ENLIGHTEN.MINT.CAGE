@@ -154,6 +154,9 @@ export default function Observatory() {
   const [selectedStar, setSelectedStar] = useState(null);
   const [sonifyResult, setSonifyResult] = useState(null);
 
+  // Silent dust accrual
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 10); }, []);
+
   // Audio context for sonification
   const audioCtxRef = useRef(null);
 

@@ -111,6 +111,9 @@ export default function Workshop() {
   const [selectedSolid, setSelectedSolid] = useState(null);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
+  // Silent dust accrual on page visit
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 12); }, []);
+
   // Golden ratio
   const [grDimension, setGrDimension] = useState(100);
   const [grResult, setGrResult] = useState(null);

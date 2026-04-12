@@ -42,6 +42,9 @@ export default function TrySomethingNew() {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
 
+  // Silent dust accrual
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 10); }, []);
+
   useEffect(() => {
     if (!token) { setLoading(false); return; }
     Promise.all([

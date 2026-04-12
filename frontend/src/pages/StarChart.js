@@ -1070,6 +1070,9 @@ export default function StarChart() {
   const [latInput, setLatInput] = useState('40.7');
   const [lngInput, setLngInput] = useState('-74.0');
   const [error, setError] = useState(null);
+
+  // Silent dust accrual
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('constellation_trace', 14); }, []);
   const canvasContainerRef = useRef(null);
 
   // Journey state
@@ -1120,6 +1123,7 @@ export default function StarChart() {
     }
     setGyroEnabled(true);
     toast.success('Gyroscope active — move your phone to explore the sky');
+    if (typeof window.__workAccrue === 'function') window.__workAccrue('constellation_trace', 14);
   }, [gyroEnabled]);
 
   const fetchChart = useCallback((lat, lng) => {

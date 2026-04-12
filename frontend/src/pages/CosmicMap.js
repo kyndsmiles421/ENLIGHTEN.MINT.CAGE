@@ -217,9 +217,12 @@ export default function CosmicMap() {
   const [decayStatus, setDecayStatus] = useState(null);
   const [harvestHistory, setHarvestHistory] = useState(null);
   const [ripple, setRipple] = useState(null);
-  const posHistoryRef = useRef([]); // Track position history for aura wake
-  const [auraTrail, setAuraTrail] = useState([]); // {lat, lng, color} for harvest ripple
+  const posHistoryRef = useRef([]);
+  const [auraTrail, setAuraTrail] = useState([]);
   const [geoError, setGeoError] = useState(null);
+
+  // Silent dust accrual
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 10); }, []);
   const [loading, setLoading] = useState(true);
   const [layer, setLayer] = useState('ground'); // ground | celestial
   const [aligning, setAligning] = useState(false);
