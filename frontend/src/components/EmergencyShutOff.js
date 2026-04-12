@@ -251,9 +251,9 @@ export default function EmergencyShutOff() {
         className="emergency-shutoff-btn floating-stop-button flex items-center justify-center gap-1"
         style={{
           position: 'fixed',
-          top: 15,
+          top: 70,  // V29.1: Below top navigation bar (60px) to prevent overlap
           left: 15,
-          zIndex: 999999,  // V51.1: Maximum z-index — NEVER covered
+          zIndex: 9999,  // V29.1: Same plane as other UI elements - no z-index wars
           width: 'auto',
           minWidth: 32,
           height: 28,
@@ -283,7 +283,7 @@ export default function EmergencyShutOff() {
           textTransform: 'uppercase',
           transition: 'all 0.15s ease',
           transform: isCollapsing ? 'scale(1.05)' : 'scale(1)',
-          pointerEvents: 'auto',  // V51.1: Always touchable
+          pointerEvents: 'auto',
         }}
         data-testid="emergency-stop-btn-v31"
         title="Emergency Stop (tap) | Master Reboot (hold 5s)"

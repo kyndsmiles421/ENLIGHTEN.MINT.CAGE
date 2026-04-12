@@ -36,11 +36,11 @@ export const lockObsidianReality = () => {
       --background: #000000 !important; 
     }
     
-    /* STOP Pill — Fixed position, always accessible */
+    /* STOP Pill — Fixed position, BELOW top nav bar */
     .pill-stop, .floating-stop-button { 
       position: fixed !important; 
-      top: 10px !important; 
-      left: 10px !important; 
+      top: 70px !important; 
+      left: 15px !important; 
       z-index: 9999 !important; 
       background: rgba(220, 20, 60, 0.6) !important; 
       border: 1px solid rgba(255, 255, 255, 0.2) !important;
