@@ -16,6 +16,14 @@ const TIER_COLORS = { SEED: '#6B7280', ARTISAN: '#818CF8', SOVEREIGN: '#2DD4BF' 
 const TIER_ICONS = { SEED: Gem, ARTISAN: Hexagon, SOVEREIGN: Star };
 const SPECTRUM = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6', '#6366F1', '#8B5CF6'];
 
+const DEFAULT_REWARDS = {
+  streak_bonus: 30, blueprint_generation: 25, forge_creation: 20,
+  frequency_mix: 18, trade_listing: 16, meditation_session: 15,
+  constellation_trace: 14, oracle_reading: 12, task_completion: 10,
+  daily_login: 10, journal_entry: 8, breathing_exercise: 7,
+  archive_save: 6, mood_log: 5, module_interaction: 3, kinetic_movement: 2,
+};
+
 function StatusCard({ dust, gems, fans, tier, tierName, exchangeRate, baseRate }) {
   const TierIcon = TIER_ICONS[tierName] || Gem;
   const tierColor = TIER_COLORS[tierName] || '#6B7280';
@@ -442,7 +450,7 @@ export default function LiquidityTrader() {
           )}
           {tab === 'rewards' && (
             <motion.div key="rewards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <RewardsList rewards={status?.complexity_rewards || {}} />
+              <RewardsList rewards={status?.complexity_rewards || DEFAULT_REWARDS} />
             </motion.div>
           )}
         </AnimatePresence>

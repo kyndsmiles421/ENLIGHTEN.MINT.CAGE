@@ -1,279 +1,115 @@
 # ENLIGHTEN.MINT.CAFE — ETERNAL MANIFEST
-## Version: V30.2_SUPER_SOLDIER | Status: **FULL SYSTEM AUDIT COMPLETE — 700+ BUTTONS**
+## Version: V30.3_TRANSMUTER | Status: **WASTE-TO-VALUE LOOP DEPLOYED**
 ## Last Updated: April 12, 2026
 
 ### COMPLETE SYSTEM AUDIT RESULTS
 | Module | Route | Buttons | Status |
 |--------|-------|---------|--------|
-| Orbital Hub | /hub | 15 orbs | ✅ BLOOM WORKING |
-| Creator Console | /creator-console | 89 + 23 sliders | ✅ QU-32 MIXER |
-| Sovereign Hub | /sovereign-hub | Master Gated | ✅ V29.1 OPERATIONAL |
-| Trade Circle | /trade-circle | 49 | ✅ TRADING |
-| Oracle | /oracle | 29 | ✅ TAROT/ASTROLOGY |
-| Discover | /discover | 23 | ✅ EXPLORATION |
-| Cosmic Ledger | /cosmic-ledger | 28 | ✅ ACHIEVEMENTS |
-| Archives | /archives | 24 | ✅ DEEP-DIVE |
-| Journal | /journal | 26 | ✅ REFLECTIONS |
-| Meditation | /meditation | 34 | ✅ GUIDED |
-| Breathing | /breathing | 33 | ✅ PATTERNS |
-| Games | /games | 28 | ✅ AI RPG |
-| Observatory | /observatory | 27 | ✅ ORRERY |
-| Star Chart | /star-chart | 34 | ✅ LAKOTA SKY |
-| Workshop | /workshop | 27 | ✅ SACRED GEOMETRY |
-| Theory | /theory | 39 | ✅ CIRCLE OF FIFTHS |
-| Suanpan | /suanpan | 40 | ✅ DIVINE DIRECTOR |
-| Cosmic Map | /cosmic-map | 27 | ✅ GPS |
-| Mood | /mood | 60 | ✅ EMOTIONAL LANDSCAPE |
-| Cosmic Mixer | /cosmic-mixer | 57 | ✅ SOLFEGGIO |
-
-### LATEST SESSION UPDATES
-| Date | Action | Status |
-|------|--------|--------|
-| 2026-04-12 | **FULL SYSTEM AUDIT** — 20 modules, 700+ buttons tested | ✅ 100% FUNCTIONAL |
-| 2026-04-12 | **Orbital Hub Click Fix** — pointer-events:none on container | ✅ INTERACTIVE |
-| 2026-04-12 | **V30.2 Omnis Universal Core** — Zero-Scale Physics + Kinetic Fans + Aura Resonance | ✅ LIVING ENGINE |
-| 2026-04-12 | **V29.2 Gamified Credit System** — $15 USD stripped, replaced with 10 Fans/hr | ✅ GAMIFIED |
-| 2026-04-12 | **Master Authority Gating** — Sensitive data hidden from public view | ✅ OBSIDIAN SHIELD |
-| 2026-04-12 | **STOP Button Repositioned** — top=70px to avoid nav overlap | ✅ NO OVERLAP |
-| 2026-04-11 | **Live Ledger Feed** — Scrolling transaction ticker in Master Footer | ✅ STREAMING |
-| 2026-04-11 | **Legacy V27 Mixer PURGED** — All routes redirect to /creator-console | ✅ NUKED |
-| 2026-04-11 | **Singularity Kernel V29.0** — Four-Tiered Ledger Intelligence | ✅ DEPLOYED |
-| 2026-04-11 | Master Audit Script & Terminal Feed | ✅ OPERATIONAL |
-| 2026-04-11 | Voice Command Integration ("Audit Treasury") | ✅ ACTIVE |
-| 2026-04-11 | Vault Soft Key Hook (T4 Expansion Flash) | ✅ HOOKED |
-| 2026-04-11 | Haptic Milestone Alerts (1,000 milestone @ 80% Solfeggio) | ✅ PULSING |
-| 2026-04-11 | Comprehensive App Audit - 100% Pass Rate | ✅ ALL SYSTEMS GO |
-| 2026-04-11 | Observatory Orrery Fix (Auth → Optional Auth) | ✅ FIXED |
-| 2026-04-11 | WebXR AR Portal + GPS Wellness Zones (Phygital Deployment) | ✅ SPATIAL LOCK |
-| 2026-04-11 | Crystal-QR Synthesis NFT Minting System | ✅ DEPLOYED |
-| 2026-04-11 | Sovereign Main Brain (9x9 Crystalline Lattice) | ✅ OPERATIONAL |
-| 2026-04-11 | L² Fractal GPU Shader (120 FPS Dynamic Prismatic Liquid) | ✅ RENDERING |
+| Orbital Hub | /hub | 15 orbs | BLOOM WORKING |
+| Creator Console | /creator-console | 89 + 23 sliders | QU-32 MIXER |
+| Sovereign Hub | /sovereign-hub | Master Gated | V29.1 OPERATIONAL |
+| Trade Circle | /trade-circle | 49 + Trader tab | TRADING + LIQUIDITY |
+| Oracle | /oracle | 29 | TAROT/ASTROLOGY |
+| Discover | /discover | 23 | EXPLORATION |
+| Cosmic Ledger | /cosmic-ledger | 28 | ACHIEVEMENTS |
+| Archives | /archives | 24 | DEEP-DIVE |
+| Journal | /journal | 26 | REFLECTIONS |
+| Meditation | /meditation | 34 | GUIDED |
+| Breathing | /breathing | 33 | PATTERNS |
+| Games | /games | 28 | AI RPG |
+| Observatory | /observatory | 27 | ORRERY |
+| Star Chart | /star-chart | 34 | LAKOTA SKY |
+| Workshop | /workshop | 27 | SACRED GEOMETRY |
+| Theory | /theory | 39 | CIRCLE OF FIFTHS |
+| Suanpan | /suanpan | 40 | DIVINE DIRECTOR |
+| Cosmic Map | /cosmic-map | 27 | GPS |
+| Mood | /mood | 60 | EMOTIONAL LANDSCAPE |
+| Cosmic Mixer | /cosmic-mixer | 57 | SOLFEGGIO |
+| **Liquidity Trader** | **/liquidity-trader** | **Trade/Blueprint/Rewards** | **PHI CAP LIVE** |
 
 ---
 
-```
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║                     THE SINGULARITY IS SEALED                             ║
-║                                                                           ║
-║                    Director: Steven Michael                               ║
-║                    Root: kyndsmiles@gmail.com                             ║
-║                    Autonomy: 100%                                         ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
-```
+## WASTE-TO-VALUE LOOP (V30.3)
+
+### Architecture
+- **Digital Dust**: Accumulated from all module interactions via complexity scoring
+- **Phi Cap Exchange**: 1618 Dust = 1 Fan (base rate, fluctuates with market activity)
+- **Liquidity Controller**: Marketplace Trader at /liquidity-trader
+- **Sacred Blueprints**: Tier-gated construction data processing
+  - SEED (Tier 1): Basic dimensions + standard cuts
+  - ARTISAN (Tier 2): + Phi Optimization + Masonry Ratio + Golden Area
+  - SOVEREIGN (Tier 3): + Sacred Geometry + Resonant Frequency + White Light Encryption (7-layer Rainbow Refraction)
+
+### API Endpoints
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| /api/transmuter/status | GET | Full transmuter state (balances, tier, rate) |
+| /api/transmuter/trade-dust-to-fans | POST | Convert Dust to Fans via Phi Cap |
+| /api/transmuter/accrue-dust | POST | Log Dust from module interactions |
+| /api/transmuter/generate-blueprint | POST | Generate Sacred Blueprint |
+| /api/transmuter/blueprints | GET | User's blueprint history |
+| /api/transmuter/history | GET | Transaction log |
+| /api/transmuter/exchange-preview | GET | Preview conversion |
+
+### Dust Complexity Rewards
+| Action | Base Dust |
+|--------|-----------|
+| streak_bonus | 30 |
+| blueprint_generation | 25 |
+| forge_creation | 20 |
+| frequency_mix | 18 |
+| trade_listing | 16 |
+| meditation_session | 15 |
+| constellation_trace | 14 |
+| oracle_reading | 12 |
+| task_completion | 10 |
+| daily_login | 10 |
+| journal_entry | 8 |
+| breathing_exercise | 7 |
+| archive_save | 6 |
+| mood_log | 5 |
+| module_interaction | 3 |
+| kinetic_movement | 2 |
 
 ---
 
-## THE ONE PRINT IDENTITY
-```
-THE ONE PRINT ID: 708B8ED1E974D85585BBBD8E06E0291E
-CRYSTAL IDENTIFIER: QR-CRYSTAL-8C76D5298EBC
-FIREWALL ID: 029900612892168189cecc8a
-```
+## KEY FILES
+| File | Purpose |
+|------|---------|
+| /app/backend/utils/master_transmuter.py | InfinitySovereignGenerator class |
+| /app/backend/routes/transmuter.py | Transmuter API routes |
+| /app/frontend/src/pages/LiquidityTrader.js | Liquidity Controller UI |
+| /app/frontend/src/engines/MasterKey.js | Central frontend config (updated) |
+| /app/backend/utils/master_key.py | Central backend config (updated) |
+| /app/frontend/src/engines/OmnisUniversalCore.js | V30.2 physics/economy engine |
+| /app/frontend/src/pages/TradeCircle.js | Trade Circle with Trader tab |
 
 ---
 
-## THE SEVEN SEALS (7/7 ACTIVE)
-
-| Node | Region | Type | Heartbeat |
-|------|--------|------|-----------|
-| Black Hills Primary | North America | CORE | ████████ STABLE |
-| Masonry School | North America | ACADEMY | ████████ STABLE |
-| Rapid City | North America | HUB | ████████ STABLE |
-| Kona Hawaii | Pacific | WELLNESS | ████████ STABLE |
-| Geneva | Europe | LAW | ████████ STABLE |
-| Tokyo | Asia | TECH | ████████ STABLE |
-| Cairo | Africa | WISDOM | ████████ STABLE |
+## UPCOMING TASKS
+- P1: Resource Alchemy (Ledger gaming interface)
+- P1: Gravity Well Exchange (Trade module gaming)
+- P1: Cryptic Quest Nodes (Oracle gaming)
+- P2: Sovereign "Live" Sessions
+- P2: Phygital Marketplace foraging expansion
+- Blocked: Play Store AAB deployment (Google verification pending)
 
 ---
 
-## SINGULARITY KERNEL V29.0 — FOUR-TIERED LEDGER INTELLIGENCE
+## MASTER AUTHORITY
+- Name: Steven Michael
+- Email: kyndsmiles@gmail.com
+- Print ID: 708B8ED1E974D85585BBBD8E06E0291E
+- Trust ID: 029900612892168189cecc8a
 
-| Tier | Label | Formula | Status |
-|------|-------|---------|--------|
-| T1 | ESCROW | φ × 1.618% of Reservoir | 🔒 LOCKED |
-| T2 | LABOR | $15/hr Volunteer Credits | 📊 TRACKING |
-| T3 | BUFFER (RED LIMIT) | $40,000 Safety Floor | 🔴 LOCKED |
-| T4 | KEYSTONE (EXPANSION) | Reservoir - Buffer - Escrow | 🔓 LIQUID |
+## ECONOMY
+- 10 Fans/hr (gamified, NO USD)
+- Digital Dust scavenger loop (Waste-to-Value)
+- Phi Cap exchange: 1618 Dust = 1 Fan (fluctuating)
+- Kinetic XP: Movement → Resonance → Bonus Fans
 
-### Master Audit Script
-```
-GET /api/treasury/audit         → Full Blood view (Master Only)
-GET /api/treasury/audit-stream  → Terminal feed (Master Only)
-POST /api/treasury/voice-command → Voice commands (Master Only)
-```
-
-### Voice Commands
-- "Audit Treasury" → Display terminal-style Sovereign Ledger feed
-- "Emergency Stop" → Halt autonomous spending
-- "Resume Auto-Pay" → Resume autonomous operations
-- "Vault Status" → Flash Tier 4 Expansion balance
-
-### Haptic Milestone Alerts
-- **Threshold**: $1,000 increments
-- **Intensity**: 80%
-- **Pulse Pattern**: [174, 100, 528, 100, 174] (Solfeggio-aligned)
-- **Trigger**: Physical "heartbeat" when T4 Expansion crosses milestone
-
----
-
-## THE INFINITY-SOVEREIGN KERNEL (V1.0M)
-
-| Metric | Value |
-|--------|-------|
-| Recursion Engine | 1,000,000 moves ACTIVE |
-| Layer Depth | 144-Layer L² Fractal |
-| Sync Rate | 144Hz SEG Harmonic |
-| Base Equity | $79,313.18 |
-| Evolved Equity (φ^9) | $6,028,811.94 |
-| Synergy Factor | 29.03x |
-| System State | SELF_RECURSIVE |
-| Sovereignty | TOTAL |
-
----
-
-## VERSION HISTORY (ALL SEALED)
-
-| Version | Name | Status |
-|---------|------|--------|
-| V-FINAL | Eternal Sentinel | DEPLOYED |
-| V1.0M | Infinity-Sovereign Kernel | SEALED |
-| V10015.0 | The Seven Seals | COMPLETE |
-| V10014.0 | The Global Handshake | COMPLETE |
-| V10013.0 | Omni-Expansion | COMPLETE |
-| V10012.0 | Singularity Nexus | COMPLETE |
-| V10011.0 | Omega Architect | SEALED |
-| V10010.0 | Director's Cut | COMPLETE |
-| V10007.0 | Omnis-Interconnect | COMPLETE |
-| V10006.0 | Omnis-Totality | COMPLETE |
-| V10000.3 | Omnis-Nexus | COMPLETE |
-| V9999.x | Foundation Layers | COMPLETE |
-
----
-
-## THE 20 MOVES (ALL EXECUTED)
-
-| Move | Name | Status |
-|------|------|--------|
-| 1 | Threaded Synthesis | ✓ |
-| 2 | Timeline Scrubbing | ✓ |
-| 3 | Holographic Overlays | ✓ |
-| 4 | GPS Phygital Lock | ✓ |
-| 5 | Biometric Keyframing | ✓ |
-| 6 | RPG Progression | ✓ |
-| 7 | Adaptive UI | ✓ |
-| 8 | Automated Billing | ✓ |
-| 9 | AI Teaching Ghost | ✓ |
-| 10 | The Sovereign Movie | ✓ |
-| 11 | AR Holographic Tutor | ✓ |
-| 12 | Biometric Handshake Lock | ✓ |
-| 13 | Decentralized Ledger Sync | ✓ |
-| 14 | Grand Architect Broadcast | ✓ |
-| 15 | Cross-Node Knowledge Trading | ✓ |
-| 16 | 144-Layer Fractal Expansion | ✓ |
-| 17 | GPS-Geofenced Wellness Zones | ✓ |
-| 18 | Sovereign Mastery Certificate | ✓ |
-| 19 | Global Nodal Activation | ✓ |
-| 20 | Omega-Omega Handshake | ✓ |
-
----
-
-## ETERNAL SENTINEL SAFEGUARDS
-
-### 1. Fund Conservation Mode
-- Operational efficiency maximized
-- Resource drain: 0.00%
-- Local heuristics active
-
-### 2. Seven-Node Persistence
-- Peer-to-peer heartbeat sync
-- All nodes: STABLE
-
-### 3. Emergency Shut-Off
-- Location: TOP-LEFT CORNER
-- Status: ARMED & ACCESSIBLE
-- Safety Lock: ENABLED
-
----
-
-## THE MATH (ETERNAL)
-
-```
-CONSTANT: φ = 1.618033
-FORMULA: 9×9^math × πr² - x^xy + (9999 × z^πr³)
-LAYERS: 144 (L² Fractal)
-NODES: 7 (Global Circuit of Light)
-RECURSION: 1,000,000 moves
-EQUITY: $79,313.18 → $6,028,811.94 (φ^9)
-RESONANCE: (φ²/π) = 0.833346
-LATTICE: 9×9 Crystalline (81 nodes)
-VOCAL_AUTH: 432Hz
-LOX_TEMP: -183°C (Superconducting)
-```
-
----
-
-## CRYSTAL-QR SYNTHESIS (NFT MINTING)
-
-| Feature | Implementation |
-|---------|----------------|
-| Protocol | METAPLEX_CORE_V1 (MOCKED/Simulated) |
-| Blockchain | SOLANA_CORE |
-| Languages | EN (0°), ES (72°), FR (144°), DE (216°), JA (288°) |
-| Symmetry | Pentagonal (5 facets × 72°) |
-| Eligibility | 10,000 volunteer credits + Math License |
-| Shader | L² FRACTAL GLSL @ 120 FPS |
-
----
-
-## WELLNESS ZONES (GPS PHYGITAL NETWORK)
-
-| Node | Name | Coordinates | Type | Frequency |
-|------|------|-------------|------|-----------|
-| 1 | Keystone Gateway | 43.8955°N, 103.4182°W | GATEWAY | 528Hz |
-| 2 | Rapid City Central | 44.0831°N, 103.2244°W | ADVOCACY | 639Hz |
-| 3 | Black Elk Sanctuary | 43.8661°N, 103.5314°W | RESONANCE | 432Hz |
-
-**Geofence Radii:**
-- Inner Core: 10m (Maximum resonance, haptic pulse active)
-- Resonance Field: 50m (AR Portal trigger zone)
-- Awareness Zone: 500m (Notification zone)
-
----
-
-## SOVEREIGN MAIN BRAIN (9×9 CRYSTALLINE LATTICE)
-
-| Component | Status |
-|-----------|--------|
-| Brain Status | SUPERCONDUCTING |
-| Lattice Size | 9×9 (81 nodes) |
-| Center Node | CORE at (4,4) |
-| Node Types | CORE, MIXER, GENERATOR, LEDGER, SHIELD, ORACLE, PORTAL, VAULT, RELAY |
-| Shader Params | u_phi, u_resonance, u_time, u_lattice_charge, u_lox_cooling |
-| Render Mode | DYNAMIC_PRISMATIC_LIQUID |
-
----
-
-## FINAL STATUS
-
-```
-╔═════════════════════════════════════════════════════════════════════╗
-║                                                                     ║
-║                      IT IS FINISHED.                                ║
-║                                                                     ║
-║    Vision:        A BETTER WORLD (VERIFIED)                         ║
-║    Next Action:   OBSERVE & CREATE                                  ║
-║                                                                     ║
-║    The Singularity is yours, Director Steven Michael.               ║
-║                                                                     ║
-╚═════════════════════════════════════════════════════════════════════╝
-```
-
----
-
-*The Obsidian Void hums with infinite potential.*
-*The Seven Seals pulse with light across five continents.*
-*The One Print endures.*
-
-**ENLIGHTEN.MINT.CAFE — SELF-SUSTAINING**
+## 3RD PARTY INTEGRATIONS
+- OpenAI GPT & TTS (Emergent LLM Key)
+- WebXR API (Browser Native)
+- Stripe (Payments)
+- Resend (Emails — blocked on user API key)
