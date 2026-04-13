@@ -46,7 +46,7 @@ def _legacy_cache_key(data: str) -> str:
     """
     import warnings
     warnings.warn("legacy_cache_key is deprecated, use secure_hash_short", DeprecationWarning)
-    return hashlib.md5(data.encode()).hexdigest()
+    return hashlib.sha256(data.encode()).hexdigest()
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 3. SECURE RANDOMNESS (Cryptographic)

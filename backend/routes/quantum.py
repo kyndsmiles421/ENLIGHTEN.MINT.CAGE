@@ -1,3 +1,4 @@
+import secrets
 """
 Quantum Mechanics — Gameplay Systems.
 Implements superposition (Shadow Sprites), quantum tunneling (layer traversal),
@@ -195,7 +196,7 @@ async def observe_shadow(
     # Collapse the wave function
     shadow_def = SHADOW_TYPE_MAP.get(target["type"], SHADOW_TYPES[0])
     dust_min, dust_max = shadow_def["dust_range"]
-    dust_reward = random.randint(dust_min, dust_max)
+    dust_reward = secrets.randbelow(dust_max - dust_min + 1) + dust_min
     xp_reward = shadow_def["xp"]
     now = datetime.now(timezone.utc).isoformat()
 

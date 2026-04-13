@@ -1,3 +1,4 @@
+import secrets
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, logger, EMERGENT_LLM_KEY
 from datetime import datetime, timezone, timedelta
@@ -445,7 +446,7 @@ async def explore_universe_region(data: dict = Body(...), user=Depends(get_curre
     )
 
     # Currency reward
-    dust_reward = random.randint(5, 15) if new_discovery else random.randint(1, 5)
+    dust_reward = secrets.randbelow(11) + 5 if new_discovery else random.randint(1, 5)
     await db.rpg_currencies.update_one(
         {"user_id": user["id"]}, {"$inc": {"cosmic_dust": dust_reward}}, upsert=True,
     )
@@ -492,7 +493,7 @@ async def explore_universe_region(data: dict = Body(...), user=Depends(get_curre
                 ripple["detail"] = f"Discovered {new_reg['name']} in {UNIVERSES[target_uid]['name']}"
 
         elif effect_def["effect"] == "boost_loot":
-            extra_dust = random.randint(3, 10)
+            extra_dust = secrets.randbelow(8) + 3
             await db.rpg_currencies.update_one(
                 {"user_id": user["id"]}, {"$inc": {"cosmic_dust": extra_dust}}, upsert=True,
             )

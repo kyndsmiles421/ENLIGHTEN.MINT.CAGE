@@ -1,3 +1,4 @@
+import secrets
 """
 seed_hunting.py — The Daily Coordinate Hunt
 
@@ -148,8 +149,8 @@ def generate_random_address() -> str:
     """Generate a random 36-bit address"""
     segments = []
     for i in range(6):  # 6 depth levels max
-        hex_bits = ''.join(random.choice('01') for _ in range(6))
-        lang_bits = ''.join(random.choice('01') for _ in range(4))
+        hex_bits = ''.join(secrets.choice('01') for _ in range(6))
+        lang_bits = ''.join(secrets.choice('01') for _ in range(4))
         segments.append(f"{hex_bits}|{lang_bits}")
     return '|'.join(segments)
 
@@ -184,7 +185,7 @@ def generate_hunt_target(hunt_type: str) -> HuntTarget:
     elif hunt_type == "DEPTH":
         return HuntTarget(
             hunt_type=hunt_type,
-            target_depth=random.randint(3, 5),  # L3, L4, or L5
+            target_depth=secrets.randbelow(3) + 3,  # L3, L4, or L5
         )
     elif hunt_type == "LANGUAGE":
         return HuntTarget(

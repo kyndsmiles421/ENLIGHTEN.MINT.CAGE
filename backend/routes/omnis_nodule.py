@@ -2020,7 +2020,7 @@ class EnlightenMintV68:
         
         # 5. Generate Universal Glyph
         glyph_seed = f"{nodes}-{depth}-{tide}-{firewall_id}"
-        glyph_key = hashlib.md5(glyph_seed.encode()).hexdigest()
+        glyph_key = hashlib.sha256(glyph_seed.encode()).hexdigest()
         
         # 6. Linguistic Resonance Map
         linguistic_map = {
@@ -4837,7 +4837,7 @@ class OmnisNexus:
     @classmethod
     def start_session(cls, user_id: str, node_id: str = "default") -> Dict[str, Any]:
         """Start a learning session for time tracking."""
-        session_id = f"SES-{hashlib.md5(f'{user_id}-{datetime.now(timezone.utc).isoformat()}'.encode()).hexdigest()[:8].upper()}"
+        session_id = f"SES-{hashlib.sha256(f'{user_id}-{datetime.now(timezone.utc).isoformat()}'.encode()).hexdigest()[:8].upper()}"
         
         cls._sessions[user_id] = {
             "session_id": session_id,
@@ -5258,7 +5258,7 @@ class DirectorEngine:
     def add_keyframe(cls, position: float, action_type: str, action_data: Dict[str, Any]) -> Dict[str, Any]:
         """Add a keyframe at a specific timeline position."""
         keyframe = {
-            "id": f"KF-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "id": f"KF-{hashlib.sha256(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
             "position": max(0.0, min(1.0, position)),
             "action_type": action_type,
             "action_data": action_data,
@@ -5341,7 +5341,7 @@ class DirectorEngine:
             })
         
         return {
-            "id": f"MOV-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "id": f"MOV-{hashlib.sha256(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
             "title": title,
             "total_layers": cls.FRACTAL_LAYERS,
             "visual": "Refracted Crystal Rainbow over Masonry Stone",
@@ -5659,7 +5659,7 @@ class SingularityNexus:
     def send_broadcast(cls, message: str, channel: str = "SENDGRID") -> Dict[str, Any]:
         """Send broadcast to sovereign channel."""
         broadcast = {
-            "id": f"BC-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "id": f"BC-{hashlib.sha256(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
             "message": message,
             "channel": channel,
             "status": "SENT",
@@ -5676,7 +5676,7 @@ class SingularityNexus:
             return {"error": "Invalid node"}
         
         quest = {
-            "id": f"QST-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "id": f"QST-{hashlib.sha256(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
             "node": node_id,
             "node_name": node["name"],
             "objective": f"Calibrate the Phygital Lock at {node['lat']}°N, {abs(node['lng'])}°W",
@@ -5784,7 +5784,7 @@ class OmniExpansion:
             payload = cls.prepare_law_broadcast()
         
         broadcast = {
-            "id": f"WLB-{hashlib.md5(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
+            "id": f"WLB-{hashlib.sha256(str(datetime.now(timezone.utc)).encode()).hexdigest()[:8].upper()}",
             "payload": payload,
             "recipient": "World Law Library Archive",
             "status": "QUEUED",
