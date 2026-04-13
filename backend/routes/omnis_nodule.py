@@ -405,7 +405,7 @@ class SovereignEncryptor:
             if '}' in decoded:
                 return decoded[:decoded.rfind('}') + 1]
             return decoded
-        except:
+        except Exception:
             return encrypted
 
 
@@ -971,7 +971,7 @@ async def get_deep_lore(
                 {"$inc": {"deep_lore_explored": 1}},
                 upsert=True
             )
-        except:
+        except Exception:
             pass
     
     return {

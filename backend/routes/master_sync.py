@@ -107,7 +107,7 @@ class V53_LogicEngine:
         try:
             from routes.daily_briefing import CONSTELLATIONS
             visible_count = len([c for c in CONSTELLATIONS if c.get("dec", 0) > -60])
-        except:
+        except Exception:
             visible_count = 16
         
         cultures_count = 21  # Loaded from star_cultures.json

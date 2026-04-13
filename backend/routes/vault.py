@@ -96,7 +96,7 @@ async def vault_status():
         encrypted = vault.protect(test_data)
         decrypted = vault.recover(encrypted)
         operational = decrypted == test_data
-    except:
+    except Exception:
         operational = False
     
     return {

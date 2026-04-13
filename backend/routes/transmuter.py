@@ -8,7 +8,7 @@ PROTOCOL: Waste-to-Value Loop
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Body
-from deps import db, get_current_user, logger
+from deps import db, get_current_user
 from datetime import datetime, timezone
 from utils.master_transmuter import (
     TRANSMUTER,
@@ -24,7 +24,6 @@ from utils.master_transmuter import (
 )
 from utils.credits import modify_credits, get_user_credits
 import uuid
-import math
 
 router = APIRouter(prefix="/transmuter", tags=["Master Transmuter"])
 
