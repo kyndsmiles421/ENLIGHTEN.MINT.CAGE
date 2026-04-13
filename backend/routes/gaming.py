@@ -319,3 +319,90 @@ async def solve_quest_node(data: dict = Body(...), user=Depends(get_current_user
         return {"correct": True, "dust_earned": dust, "node_name": node["name"]}
     else:
         return {"correct": False, "hint": node["hint"]}
+
+
+# ═══ CRYSTAL ENCRYPTION SKINS ═══
+# Phygital marketplace: buy UI skins with Dust
+
+CRYSTAL_SKINS = {
+    "AMETHYST": {"cost": 500, "tier": 1, "name": "Amethyst Encryption"},
+    "OBSIDIAN": {"cost": 800, "tier": 2, "name": "Obsidian Shield"},
+    "CITRINE": {"cost": 600, "tier": 1, "name": "Citrine Radiance"},
+    "ROSE_QUARTZ": {"cost": 700, "tier": 2, "name": "Rose Quartz Heart"},
+    "CLEAR_QUARTZ": {"cost": 1000, "tier": 3, "name": "Clear Quartz Master"},
+}
+
+
+@router.get("/skins/available")
+async def get_available_skins(user=Depends(get_current_user)):
+    """Get all skins and user's owned skins."""
+    owned = await db.crystal_skins.find_one({"user_id": user["id"]}, {"_id": 0})
+    owned_list = (owned or {}).get("owned", ["AMETHYST"])
+    active = (owned or {}).get("active", "AMETHYST")
+    wallet = await db.hub_wallets.find_one({"user_id": user["id"]}, {"_id": 0})
+    dust = (wallet or {}).get("dust", 0)
+
+    skins = []
+    for key, skin in CRYSTAL_SKINS.items():
+        skins.append({
+            "key": key,
+            "name": skin["name"],
+            "cost": skin["cost"],
+            "tier": skin["tier"],
+            "owned": key in owned_list,
+            "active": key == active,
+        })
+
+    return {"skins": skins, "dust_balance": dust, "active_skin": active}
+
+
+@router.post("/skins/purchase")
+async def purchase_skin(data: dict = Body(...), user=Depends(get_current_user)):
+    """Purchase a Crystal Encryption Skin with Dust."""
+    skin_key = data.get("skin_key", "").upper()
+    if skin_key not in CRYSTAL_SKINS:
+        raise HTTPException(400, "Invalid skin")
+
+    skin = CRYSTAL_SKINS[skin_key]
+    owned = await db.crystal_skins.find_one({"user_id": user["id"]}, {"_id": 0})
+    owned_list = (owned or {}).get("owned", ["AMETHYST"])
+
+    if skin_key in owned_list:
+        raise HTTPException(400, "Already owned")
+
+    wallet = await db.hub_wallets.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not wallet or wallet.get("dust", 0) < skin["cost"]:
+        raise HTTPException(400, f"Not enough Dust. Need {skin['cost']}")
+
+    await db.hub_wallets.update_one(
+        {"user_id": user["id"]},
+        {"$inc": {"dust": -skin["cost"]}},
+    )
+    await db.crystal_skins.update_one(
+        {"user_id": user["id"]},
+        {"$addToSet": {"owned": skin_key}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True,
+    )
+
+    return {"purchased": True, "skin": skin_key, "name": skin["name"], "cost": skin["cost"]}
+
+
+@router.post("/skins/equip")
+async def equip_skin(data: dict = Body(...), user=Depends(get_current_user)):
+    """Equip an owned Crystal Encryption Skin."""
+    skin_key = data.get("skin_key", "").upper()
+    if skin_key not in CRYSTAL_SKINS:
+        raise HTTPException(400, "Invalid skin")
+
+    owned = await db.crystal_skins.find_one({"user_id": user["id"]}, {"_id": 0})
+    owned_list = (owned or {}).get("owned", ["AMETHYST"])
+
+    if skin_key not in owned_list:
+        raise HTTPException(400, "Skin not owned")
+
+    await db.crystal_skins.update_one(
+        {"user_id": user["id"]},
+        {"$set": {"active": skin_key}},
+    )
+
+    return {"equipped": True, "skin": skin_key, "name": CRYSTAL_SKINS[skin_key]["name"]}

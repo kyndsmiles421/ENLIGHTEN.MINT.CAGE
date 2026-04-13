@@ -597,7 +597,8 @@ body[data-perspective="INTENSE"] #MANIFEST_BAR {
 [id*="nodule"],
 #back-up-banner,
 .made-with-emergent,
-[data-testid="dock-restore"] {
+[data-testid="dock-restore"],
+[data-testid="dock-restore"] * {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -605,6 +606,9 @@ body[data-perspective="INTENSE"] #MANIFEST_BAR {
   width: 0 !important;
   height: 0 !important;
   overflow: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
 }
 
 .perspective-btn {

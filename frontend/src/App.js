@@ -49,6 +49,7 @@ import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
 import { useAmbientSoundscape } from './hooks/useAmbientSoundscape';
 import useWorkAccrual from './hooks/useWorkAccrual';
+import { useCrystalEncryption } from './hooks/useCrystalEncryption';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -292,6 +293,7 @@ const SovereignMasterEngine = lazy(() => import('./pages/SovereignMasterEngine')
 const ResourceAlchemy = lazy(() => import('./pages/ResourceAlchemy'));
 const GravityWellExchange = lazy(() => import('./pages/GravityWellExchange'));
 const CrypticQuestNodes = lazy(() => import('./pages/CrypticQuestNodes'));
+const CrystalMarketplace = lazy(() => import('./pages/CrystalMarketplace'));
 
 function PageLoader() {
   return (
@@ -542,6 +544,8 @@ function AnimatedRoutes() {
   useGateNotifications();
   // V2.1: Silent Dust Heartbeat — accumulates across all modules
   useWorkAccrual();
+  // Crystal Encryption — global UI skin system
+  useCrystalEncryption();
 
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
@@ -687,6 +691,7 @@ function AnimatedRoutes() {
         <Route path="/resource-alchemy" element={<ResourceAlchemy />} />
         <Route path="/gravity-well" element={<GravityWellExchange />} />
         <Route path="/cryptic-quest" element={<CrypticQuestNodes />} />
+        <Route path="/crystal-skins" element={<CrystalMarketplace />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />

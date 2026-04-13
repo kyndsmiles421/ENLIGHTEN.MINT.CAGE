@@ -929,7 +929,7 @@ export default function SovereignHub() {
           { title: 'Sovereign Council', color: '#C084FC', items: [
             { label: 'Council Advisors', route: '/sovereigns' }, { label: 'Economy & Dust', route: '/economy' },
             { label: 'Academy', route: '/academy' }, { label: 'Trade Circle', route: '/trade-circle' },
-            { label: 'Cosmic Map', route: '/cosmic-map' }, { label: 'Archives', route: '/archives' },
+            { label: 'Crystal Skins', route: '/crystal-skins' }, { label: 'Archives', route: '/archives' },
           ]},
         ].map((group) => (
           <div key={group.title} className="mb-4">
