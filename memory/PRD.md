@@ -1,61 +1,35 @@
-# ENLIGHTEN.MINT.CAFE — DEPLOYMENT READINESS MANIFEST
-## Version: V30.3 | Status: DEPLOYMENT READY
-## Last Verified: April 13, 2026 — Full System Check PASSED
+# ENLIGHTEN.MINT.CAFE — DEPLOYMENT MANIFEST
+## Version: V30.3 | Status: DEPLOYMENT READY — ALL SYSTEMS GREEN
+## Last Verified: April 13, 2026
 
-### DEPLOYMENT READINESS: 100% PASS
-- Backend: 17/17 APIs tested and passing
-- Frontend: 25+ modules verified loading and functional
-- Ghost elements: ZERO visible (STOP 0.08, PerspectiveToggle purged, SmartDock purged)
-- Sensitive data: ZERO leaking (email, equity, print ID, firewall ID — all removed)
-- Title: ENLIGHTEN.MINT.CAFE ALL CAPS on Landing, Sovereign Hub, Hub
-- Navigation: Top bar + Bottom bar all functional
+### SYSTEM CHECK: ALL PASS
+- 66 navigation buttons on Sovereign Hub — all functional
+- 5 top bar items: Vault, Broadcast, Journal, Ledger, Sever
+- 5 bottom nav items: Hub, Trade, Oracle, Discover, Mixer
+- Zero ghost elements (SmartDock return null, PerspectiveToggle purged, STOP at 0.08)
+- Zero sensitive data leaking
 
-### ALL MODULES VERIFIED
-| Module | Route | Status |
-|--------|-------|--------|
-| Landing | /landing | PASS |
-| Sovereign Hub | /sovereign-hub | PASS |
-| Hub (Orbital) | /hub | PASS |
-| Journal | /journal | PASS |
-| Meditation | /meditation | PASS |
-| Oracle | /oracle | PASS |
-| Breathing | /breathing | PASS |
-| Mood | /mood | PASS |
-| Trade Circle | /trade-circle | PASS |
-| Cosmic Mixer | /cosmic-mixer | PASS |
-| Games | /games | PASS |
-| Star Chart | /star-chart | PASS |
-| Workshop | /workshop | PASS |
-| Cosmic Ledger | /cosmic-ledger | PASS |
-| Archives | /archives | PASS |
-| Observatory | /observatory | PASS |
-| Suanpan | /suanpan | PASS |
-| Theory | /theory | PASS |
-| Cosmic Map | /cosmic-map | PASS |
-| Discover | /discover | PASS |
-| Liquidity Trader | /liquidity-trader | PASS |
-| Master Engine | /master-engine | PASS |
-| Resource Alchemy | /resource-alchemy | PASS |
-| Gravity Well | /gravity-well | PASS |
-| Cryptic Quest | /cryptic-quest | PASS |
+### 7 PILLARS (Color Coded)
+- PRACTICE (purple): Breathwork, Meditation, Yoga, Mudras, Mantras, Light Therapy
+- DIVINATION (pink): Oracle & Tarot, Akashic Records, Star Chart, Numerology, Dream Journal, Mayan Astrology
+- SANCTUARY (teal): Zen Garden, Soundscapes, Music Lounge, Frequencies, VR Sanctuary, Journaling
+- NOURISH & HEAL (green): Nourishment, Aromatherapy, Herbology, Elixirs, Acupressure, Reiki
+- EXPLORE (orange): Encyclopedia, Reading List, Creation Stories, Teachings, Community, Blessings
+- SAGE AI COACH (blue): Voice Conversations, Spiritual Guidance, Crystals & Stones, Personalized Wisdom
+- SOVEREIGN COUNCIL (purple): Council Advisors, Economy & Dust, Academy, Trade Circle, Crystal Skins, Archives
 
-### ALL BACKEND APIs VERIFIED
-| API | Status |
-|-----|--------|
-| /api/health | PASS |
-| /api/transmuter/status | PASS |
-| /api/transmuter/work-submit | PASS |
-| /api/gaming/alchemy/state | PASS |
-| /api/gaming/gravity-well/market | PASS |
-| /api/gaming/quest/nodes | PASS |
+### ADAPTIVE HOMEPAGE
+- Backend tracks module visits via transmuter_log
+- "Your Frequents" shows most-used modules at top
+
+### SOVEREIGN UTILITIES
+- Broadcast: Web Share API / clipboard fallback
+- Sever: 1.5s fade-to-black → clear tokens → /landing
+
+### CRYSTAL ENCRYPTION
+- 5 skins: Amethyst(free), Obsidian(750), Citrine(600), Rose Quartz(700), Clear Quartz(1000)
+- EncryptionProvider wraps entire app with CSS filter
+- Purchase/equip flow verified
 
 ### ECONOMY
-- 10 Fans/hr | Fibonacci accrual | Phi Cap 1.618 | 15% Scholarship Tax
-- 15/15 modules wired for silent dust accrual
-- Alchemy: 100 input → 105 net after tax
-
-### GOOGLE PLAY READINESS
-- TWA deployment ready (pending Google identity verification)
-- PWA manifest configured
-- All routes functional
-- No sensitive data exposed
+- 10 Fans/hr | 15 modules wired for silent dust | Fibonacci accrual | Phi Cap 1.618

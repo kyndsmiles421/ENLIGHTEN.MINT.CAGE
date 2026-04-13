@@ -372,34 +372,8 @@ export default function SmartDock() {
     const minStyle = hasCustomPos
       ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
       : { bottom: 80, left: 12 };
-    return createPortal(
-      <motion.button
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.15, opacity: 0.9 }}
-        whileTap={{ scale: 0.85 }}
-        onClick={() => { haptic('Light'); setMinimized(false); bringToFront(); }}
-        className="fixed flex items-center justify-center"
-        style={{
-          ...minStyle,
-          zIndex: baseZ,
-          width: 36,
-          height: 36,
-          borderRadius: '50%',
-          background: 'rgba(11,12,21,0.5)',
-          border: '1px solid rgba(192,132,252,0.15)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          cursor: 'pointer',
-          boxShadow: '0 2px 12px rgba(192,132,252,0.1)',
-        }}
-        data-testid="dock-restore"
-        title="Open Dock"
-      >
-        <Sparkles size={14} style={{ color: '#C084FC' }} className="animate-pulse" />
-      </motion.button>,
-      document.body
-    );
+    // V30.3: SmartDock restore button PURGED - ghost element killer
+    return null;
   }
 
   const posStyle = hasCustomPos
