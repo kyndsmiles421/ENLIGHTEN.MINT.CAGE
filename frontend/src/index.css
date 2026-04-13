@@ -305,7 +305,7 @@ body {
   min-height: 100vh !important;
   height: auto !important;
   overflow: visible !important;
-  padding-top: 0 !important;
+  padding-top: 64px !important; /* Clear the 60px fixed top bar */
   padding-bottom: 80px !important; /* Space for manifest bar */
 }
 
