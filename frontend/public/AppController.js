@@ -77,7 +77,7 @@ const SovereignVault = {
         // Setup the "Dead Pixel" - The hidden access point (top-left corner)
         const accessPoint = document.createElement('div');
         accessPoint.id = 'vault-access';
-        accessPoint.style.cssText = "position:fixed;top:0;left:0;width:10px;height:10px;z-index:999999;cursor:crosshair;background:transparent;";
+        accessPoint.style.cssText = "position:fixed;top:0;left:0;width:10px;height:10px;z-index:-1;cursor:crosshair;background:transparent;pointer-events:none;";
         document.body.appendChild(accessPoint);
 
         accessPoint.onclick = () => {

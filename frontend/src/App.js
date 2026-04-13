@@ -460,7 +460,8 @@ function CafeApp() {
       
       {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
-        {!isSovereignRoute && !isHubRoute && <Navigation />}
+        {/* V30.5: Navigation PURGED from non-hub pages — sovereign utility bar handles all nav */}
+        {false && !isSovereignRoute && !isHubRoute && <Navigation />}
         <ScrollToTop />
         <Toaster
           position="top-right"
@@ -475,13 +476,10 @@ function CafeApp() {
           }}
         />
         <AnimatedRoutes />
-        {/* Only show legacy toolbars on non-sovereign and non-hub routes */}
+        {/* V30.5: ShambhalaFrontSide + ShambhalaToolbar PERMANENTLY PURGED — ghost touch blockers */}
+        {/* CommandMode kept but only on non-sovereign/non-hub routes */}
         {!isSovereignRoute && !isHubRoute && (
-          <>
-            <ShambhalaFrontSide />
-            <ShambhalaToolbar />
-            <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
-          </>
+          <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
         )}
         {/* Emergency Stop is ALWAYS visible — even on Hub */}
         <EmergencyShutOff />
