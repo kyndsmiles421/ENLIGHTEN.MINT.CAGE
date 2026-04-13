@@ -4937,7 +4937,7 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
 .fixed.bottom-5.left-5,
 .fixed.bottom-6.left-0,
 .fixed.bottom-8.left-0,
-[style*="bottom"][style*="left"]:not(.shambhala-toolbar):not([class*="ShambhalaToolbar"]),
+[style*="bottom"][style*="left"]:not(.shambhala-toolbar):not([class*="ShambhalaToolbar"]):not([data-testid="sovereign-mixer"]):not([data-testid="mixer-strip"]):not([data-testid="mixer-nav"]):not([data-sovereign-mixer]),
 .green-dot,
 [class*="nebula-toggle"],
 [class*="crystal-badge"],
@@ -4955,6 +4955,16 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
   position: absolute !important;
   left: -9999px !important;
   bottom: -9999px !important;
+}
+
+/* SOVEREIGN MIXER — Protected from ghost purge */
+[data-sovereign-mixer],
+[data-testid="sovereign-mixer"],
+[data-testid="mixer-nav"] {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 /* Ensure SHAMBHALA toolbar is ABOVE the Emergent badge */
@@ -5002,9 +5012,9 @@ div[style*="#0f0"]:not(#master-umbrella *),
   z-index: 999999 !important;
 }
 
-/* Add bottom padding to account for badge */
+/* Bottom padding for sovereign mixer nav bar */
 body {
-  padding-bottom: 60px !important;
+  padding-bottom: var(--mixer-nav-height, 44px) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
