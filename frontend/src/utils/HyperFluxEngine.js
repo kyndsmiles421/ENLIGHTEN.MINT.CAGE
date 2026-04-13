@@ -13,7 +13,7 @@ const BLACK_HILLS_ANCHOR = {
   lng: -103.5000,
   name: 'Black Hills Centroid',
   resonanceRadius: 0.9, // km - The 9×9 Helix Boundary
-  trustEntity: 'Enlighten.Mint.Sovereign.Trust',
+  trustEntity: 'ENLIGHTEN.MINT.CAFE',
   equity: 49018.24,
 };
 

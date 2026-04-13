@@ -890,7 +890,7 @@ export default function SovereignHub() {
             fontFamily: 'Cormorant Garamond, serif',
           }}
         >
-          Enlighten.Mint.Sovereign.Trust
+          ENLIGHTEN.MINT.CAFE
         </h1>
         
         {/* Director Controls */}

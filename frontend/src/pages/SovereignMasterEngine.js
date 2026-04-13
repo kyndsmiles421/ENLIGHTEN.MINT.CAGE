@@ -176,7 +176,7 @@ export default function SovereignMasterEngine() {
   };
 
   const handleShare = async () => {
-    const text = `Operating the Sovereign Master Engine on Enlighten.Mint.Cafe — ${ALL_MODULES.length} modules, ${STRIPS.length} channels, PHI-locked economy.`;
+    const text = `Operating the Sovereign Master Engine on ENLIGHTEN.MINT.CAFE — ${ALL_MODULES.length} modules, ${STRIPS.length} channels, PHI-locked economy.`;
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Sovereign Master Engine', text, url: window.location.href });

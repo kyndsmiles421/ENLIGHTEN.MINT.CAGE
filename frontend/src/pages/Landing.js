@@ -997,7 +997,7 @@ export default function Landing() {
           {/* Compact Title */}
           <motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="text-3xl font-light tracking-tight mb-3 text-center" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC' }}>
-            Enlighten.Mint.Cafe
+            ENLIGHTEN.MINT.CAFE
           </motion.h1>
 
           {/* Action Buttons — compact row */}
