@@ -51,6 +51,7 @@ export default function Frequencies() {
     { id: 'freq-40', frequency: 40, name: 'Gamma Consciousness', category: 'binaural', description: '40Hz gamma waves for peak consciousness.', benefits: ['Peak performance', 'Enhanced cognition'], chakra: 'Crown', color: '#E879F9' },
   ];
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('frequencies', 8); }, []);
   useEffect(() => {
     setLoading(true);
     setError(null);

@@ -192,6 +192,7 @@ export default function MealPlanning() {
     axios.get(`${API}/meals/log`, { headers: authHeaders }).then(r => setLogs(r.data.logs)).catch(() => {});
   };
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('meal_planning', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/meals/plans`).then(r => setPlans(r.data.plans))
       .catch(() => toast.error('Failed to load plans'))

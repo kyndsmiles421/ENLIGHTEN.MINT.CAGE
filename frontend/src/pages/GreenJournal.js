@@ -33,6 +33,7 @@ function NewGreenEntry({ onSaved, moonPhase }) {
   const [saving, setSaving] = useState(false);
   const [prompt, setPrompt] = useState('');
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('green_journal', 8); }, []);
   useEffect(() => { setPrompt(NATURE_PROMPTS[Math.floor(Math.random() * NATURE_PROMPTS.length)]); }, []);
 
   const save = async () => {

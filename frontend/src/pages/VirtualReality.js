@@ -77,6 +77,7 @@ export default function VirtualReality() {
   const [celestial, setCelestial] = useState(null);
 
   // Load data
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('vr_sanctuary', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/avatar`, { headers: authHeaders }).then(r => setAvatarConfig(r.data)).catch(() => {});
     axios.get(`${API}/avatar/energy-state`, { headers: authHeaders }).then(r => setEnergyState(r.data)).catch(() => {});

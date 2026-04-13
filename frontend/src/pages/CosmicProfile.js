@@ -68,6 +68,7 @@ export default function CosmicProfile() {
     setLoading(false);
   }, [user, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('cosmic_profile', 8); }, []);
   useEffect(() => { load(); }, [load]);
 
   if (!user) return (

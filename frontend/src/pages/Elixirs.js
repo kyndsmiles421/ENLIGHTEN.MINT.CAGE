@@ -127,6 +127,7 @@ export default function Elixirs() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('elixirs', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/elixirs/all`)
       .then(r => { setElixirs(r.data.elixirs); setCategories(r.data.categories); })

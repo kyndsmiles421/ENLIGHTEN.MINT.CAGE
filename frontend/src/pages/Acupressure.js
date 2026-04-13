@@ -127,6 +127,7 @@ export default function Acupressure() {
   const [routineDetail, setRoutineDetail] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('acupressure', 8); }, []);
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/acupressure/points`),

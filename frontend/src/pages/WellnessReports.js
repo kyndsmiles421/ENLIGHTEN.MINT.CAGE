@@ -48,6 +48,7 @@ export default function WellnessReports() {
   const [period, setPeriod] = useState('weekly');
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('wellness_reports', 8); }, []);
   useEffect(() => {
     if (!token) { setLoading(false); return; }
     setLoading(true);

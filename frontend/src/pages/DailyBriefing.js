@@ -39,6 +39,7 @@ export default function DailyBriefing() {
   const [dailyCard, setDailyCard] = useState(null);
   const [genCard, setGenCard] = useState(false);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('daily_briefing', 8); }, []);
   useEffect(() => {
     if (!token) { setLoading(false); return; }
     axios.get(`${API}/daily-briefing`, { headers: authHeaders })

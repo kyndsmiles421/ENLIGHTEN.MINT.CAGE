@@ -44,6 +44,7 @@ function BuildYourOwn() {
     } catch {}
   }, [user, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('affirmations', 8); }, []);
   useEffect(() => { loadSaved(); }, [loadSaved]);
 
   const generate = async () => {

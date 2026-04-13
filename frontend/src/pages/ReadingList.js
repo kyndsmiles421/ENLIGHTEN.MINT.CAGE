@@ -93,6 +93,7 @@ export default function ReadingList() {
     setLoading(false);
   }, [token]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('reading_list', 8); }, []);
   useEffect(() => { if (token) fetchData(); else setLoading(false); }, [token, fetchData]);
 
   const handleSave = async (book) => {

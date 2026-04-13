@@ -441,6 +441,7 @@ export default function Community() {
     } catch {} finally { setLoading(false); }
   }, []);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('community', 8); }, []);
   useEffect(() => {
     loadFeed();
     axios.get(`${API}/community/users/active`).then(res => setActiveUsers(res.data)).catch(() => {});

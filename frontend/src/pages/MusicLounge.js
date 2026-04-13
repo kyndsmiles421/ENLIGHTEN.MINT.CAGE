@@ -260,6 +260,7 @@ export default function MusicLounge() {
     setPlaying(p => p);
   }, []);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('music_lounge', 8); }, []);
   useEffect(() => {
     if (gainRef.current) {
       gainRef.current.gain.value = muted ? 0 : volume / 100;

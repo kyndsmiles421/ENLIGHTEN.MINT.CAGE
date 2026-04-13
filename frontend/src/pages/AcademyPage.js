@@ -147,6 +147,7 @@ function ImmersiveOverlay({ active }) {
 /* ── Fractal Certificate SVG ── */
 function FractalCertificate({ seed, fingerprint, programName, tier, issuedAt }) {
   const canvasRef = useRef(null);
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('academy', 8); }, []);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !seed) return;

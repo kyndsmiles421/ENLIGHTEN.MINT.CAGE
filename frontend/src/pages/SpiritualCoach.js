@@ -299,6 +299,7 @@ export default function SpiritualCoach() {
   const currentAudioRef = useRef(null);
   const streamRef = useRef(null);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sage_coach', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/coach/modes`).then(r => setModes(r.data.modes)).catch(() => {});
     if (token) fetchSessions();

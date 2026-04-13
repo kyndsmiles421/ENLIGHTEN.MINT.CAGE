@@ -86,6 +86,7 @@ function ChatView({ session, onSend, onBack, sending }) {
   const bottomRef = useRef(null);
   const messages = session?.messages || [];
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('akashic_records', 8); }, []);
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);

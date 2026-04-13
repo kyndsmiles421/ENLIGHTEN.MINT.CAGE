@@ -35,6 +35,7 @@ function AmbientParticles({ theme, active }) {
   const particlesRef = useRef([]);
   const config = THEME_PARTICLES[theme] || THEME_PARTICLES.golden_particles;
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sacred_texts', 8); }, []);
   useEffect(() => {
     if (!active || !canvasRef.current) return;
     const canvas = canvasRef.current;

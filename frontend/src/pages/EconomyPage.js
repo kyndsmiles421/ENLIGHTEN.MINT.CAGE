@@ -238,6 +238,7 @@ export default function EconomyPage() {
     } catch {}
   }, [token, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('economy', 8); }, []);
   useEffect(() => {
     fetchTiers(); fetchPacks(); fetchCommissions();
   }, [fetchTiers, fetchPacks, fetchCommissions]);

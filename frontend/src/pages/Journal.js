@@ -23,6 +23,7 @@ export default function Journal() {
   const [expanded, setExpanded] = useState(null);
   const [celebrating, setCelebrating] = useState(false);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('journaling', 8); }, []);
   useEffect(() => {
     if (user) {
       axios.get(`${API}/journal`, { headers: authHeaders })

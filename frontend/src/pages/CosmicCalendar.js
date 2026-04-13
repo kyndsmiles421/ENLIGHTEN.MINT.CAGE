@@ -62,6 +62,7 @@ export default function CosmicCalendar() {
       .catch(() => {});
   };
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('cosmic_calendar', 8); }, []);
   useEffect(() => { fetchCalendar(); }, [birthMonth, birthDay, birthYear]);
   useEffect(() => { fetchContext(); }, [token]);
 

@@ -277,6 +277,7 @@ export default function Mudras() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mudras', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/mudras`)
       .then(r => setMudras(r.data))

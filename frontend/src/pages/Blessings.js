@@ -45,6 +45,7 @@ export default function Blessings() {
     }
   }, [token, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('blessings', 8); }, []);
   useEffect(() => { loadData(); }, [loadData]);
 
   const handleGenerateAI = async () => {

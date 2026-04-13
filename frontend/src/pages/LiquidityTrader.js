@@ -481,6 +481,7 @@ export default function LiquidityTrader() {
   const [heartbeatBuffer, setHeartbeatBuffer] = useState(0);
 
   // Subscribe to global dust buffer for heartbeat indicator
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('liquidity_trader', 8); }, []);
   useEffect(() => {
     const { buffer } = getBufferState();
     setHeartbeatBuffer(buffer);

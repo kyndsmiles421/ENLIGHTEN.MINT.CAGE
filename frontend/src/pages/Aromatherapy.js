@@ -122,6 +122,7 @@ export default function Aromatherapy() {
   const [tab, setTab] = useState('oils');
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('aromatherapy', 8); }, []);
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/aromatherapy/oils`),

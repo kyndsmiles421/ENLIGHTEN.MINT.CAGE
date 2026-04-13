@@ -87,6 +87,7 @@ function MantraSession({ mantra, targetReps, soundId, onEnd }) {
   const nodesRef = useRef([]);
   const { playCelebration } = useSensory();
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mantras', 8); }, []);
   useEffect(() => {
     if (soundId && soundId !== 'silence') {
       try {

@@ -183,6 +183,7 @@ function DreamPatterns({ authHeaders }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('dream_journal', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/dreams/patterns`, { headers: authHeaders })
       .then(r => setPatterns(r.data))

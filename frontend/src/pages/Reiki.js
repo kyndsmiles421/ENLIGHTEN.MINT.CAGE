@@ -112,6 +112,7 @@ export default function Reiki() {
   const [birthMonth, setBirthMonth] = useState(1);
   const [birthDay, setBirthDay] = useState(1);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('reiki', 8); }, []);
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/reiki/chakras`),

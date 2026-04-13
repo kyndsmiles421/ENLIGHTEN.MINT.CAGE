@@ -44,6 +44,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
   const videoRef = useRef(null);
   const pollRef = useRef(null);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('creation_stories', 8); }, []);
   useEffect(() => {
     if (!story?.id) return;
     loadScenes();

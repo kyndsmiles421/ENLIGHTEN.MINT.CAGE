@@ -116,6 +116,7 @@ export default function Herbology() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('herbology', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/herbology/herbs`)
       .then(r => setHerbs(r.data.herbs))

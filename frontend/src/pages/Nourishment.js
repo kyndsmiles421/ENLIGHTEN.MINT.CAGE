@@ -31,6 +31,7 @@ export default function Nourishment() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiTopic, setAiTopic] = useState('boost energy before meditation');
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('nourishment', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/nourishment`)
       .then(res => setItems(res.data))

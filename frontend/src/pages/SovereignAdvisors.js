@@ -325,6 +325,7 @@ export default function SovereignAdvisors() {
     } catch {}
   }, [token, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('council_advisors', 8); }, []);
   useEffect(() => { fetchCouncil(); }, [fetchCouncil]);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 

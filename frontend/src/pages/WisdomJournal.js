@@ -16,6 +16,7 @@ function NewEntryForm({ onSaved, teachers }) {
   const [saving, setSaving] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('wisdom_journal', 8); }, []);
   useEffect(() => {
     if (teacher) {
       axios.get(`${API}/teachings/teacher/${teacher}`).then(r => setTeacherData(r.data)).catch(() => {});

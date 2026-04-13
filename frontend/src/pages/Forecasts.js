@@ -214,6 +214,7 @@ export default function Forecasts() {
     setLoading(false);
   }, [user, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('forecasts', 8); }, []);
   useEffect(() => { load(); }, [load]);
 
   const generate = async () => {

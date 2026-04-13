@@ -101,6 +101,7 @@ function ImmersiveSession({ color, duration, onEnd }) {
   const { playChime } = useSensory();
 
   // Ambient tone for the color
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('light_therapy', 8); }, []);
   useEffect(() => {
     const freqMap = { red: 256, orange: 288, yellow: 320, green: 341, blue: 384, indigo: 426, violet: 480 };
     try {

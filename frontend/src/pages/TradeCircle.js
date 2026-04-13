@@ -80,6 +80,7 @@ export default function TradeCircle() {
   const [founderStatus, setFounderStatus] = useState(null);
 
   // Handle Stripe payment redirect
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('trade_circle', 8); }, []);
   useEffect(() => {
     const payment = searchParams.get('payment');
     const sessionId = searchParams.get('session_id');

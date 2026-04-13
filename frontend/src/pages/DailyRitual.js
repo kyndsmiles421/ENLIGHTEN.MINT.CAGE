@@ -30,6 +30,7 @@ function RitualStep({ step, index, completed, activeIndex, onActivate, onComplet
   const intervalRef = useRef(null);
 
   // Reset timer when step becomes active
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('daily_ritual', 8); }, []);
   useEffect(() => {
     if (isActive) {
       setTimeLeft(step.duration * 60);

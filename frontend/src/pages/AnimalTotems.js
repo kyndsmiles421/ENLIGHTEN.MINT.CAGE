@@ -165,6 +165,7 @@ export default function AnimalTotems() {
   const [challenger, setChallenger] = useState(null);
   const [search, setSearch] = useState('');
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('animal_totems', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/animal-totems/all`).then(r => { setTotems(r.data.birth_totems); setSpirits(r.data.spirit_animals); }).catch(() => {});
   }, []);

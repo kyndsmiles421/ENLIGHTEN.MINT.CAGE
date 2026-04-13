@@ -149,6 +149,7 @@ function PlantCare({ user, authHeaders }) {
     } catch {}
   }, [user, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('zen_garden', 8); }, []);
   useEffect(() => { loadPlants(); }, [loadPlants]);
 
   const addPlant = async (type) => {

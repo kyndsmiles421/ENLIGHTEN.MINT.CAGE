@@ -169,6 +169,7 @@ function TeacherDetail({ teacher, onBack, authHeaders }) {
   const [full, setFull] = useState(null);
   const [activeQuote, setActiveQuote] = useState(0);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('teachings', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/teachings/teacher/${teacher.id}`).then(r => setFull(r.data)).catch(() => {});
   }, [teacher.id]);

@@ -34,6 +34,7 @@ function AmbientParticles({ colors, active }) {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('encyclopedia', 8); }, []);
   useEffect(() => {
     if (!active || !canvasRef.current) return;
     const canvas = canvasRef.current;

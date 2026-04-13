@@ -133,6 +133,7 @@ function YogaAvatarMini({ avatarConfig, poseName, color }) {
     animRef.current = requestAnimationFrame(draw);
   }, [avatarConfig, silhouette, color]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('yoga', 8); }, []);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;

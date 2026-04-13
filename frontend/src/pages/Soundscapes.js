@@ -145,6 +145,7 @@ export default function Soundscapes() {
     } catch {}
   }, [user, authHeaders]);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('soundscapes', 8); }, []);
   useEffect(() => { loadSavedMixes(); }, [loadSavedMixes]);
 
   const getAudioCtx = useCallback(async () => {
