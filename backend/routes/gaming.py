@@ -321,6 +321,23 @@ async def solve_quest_node(data: dict = Body(...), user=Depends(get_current_user
         return {"correct": False, "hint": node["hint"]}
 
 
+# ═══ ADAPTIVE HOMEPAGE ═══
+# Tracks which modules the user visits most, serves personalized homepage order
+
+@router.get("/adaptive/top-modules")
+async def get_top_modules(user=Depends(get_current_user)):
+    """Get user's most-used modules for adaptive homepage."""
+    pipeline = [
+        {"$match": {"user_id": user["id"], "type": {"$in": ["work_submit", "dust_accrual"]}}},
+        {"$group": {"_id": "$module", "count": {"$sum": 1}, "last_used": {"$max": "$created_at"}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 12},
+    ]
+    results = await db.transmuter_log.aggregate(pipeline).to_list(12)
+    modules = [{"module": r["_id"], "visits": r["count"], "last_used": r.get("last_used")} for r in results if r["_id"]]
+    return {"top_modules": modules}
+
+
 # ═══ CRYSTAL ENCRYPTION SKINS ═══
 # Phygital marketplace: buy UI skins with Dust
 

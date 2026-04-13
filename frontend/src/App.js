@@ -15,7 +15,7 @@ import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/
 import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
 import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V26.8 - THE RUTILATED HERKIMER CORE
 import './styles/UniverseMaterials.css'; // Universe Materials - Herkimer Crystal Lattice
-import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders, ArrowLeftRight } from 'lucide-react';
+import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders, ArrowLeftRight, Share2, LogOut } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
 import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)
 
@@ -396,25 +396,61 @@ function CafeApp() {
       )}
       {!isSovereignRoute && <VellumOverlay />} */}
       
-      {/* ═══ SOVEREIGN GRID: TOP BAR (The Vault / Past / Archives) ═══ */}
+      {/* ═══ SOVEREIGN UTILITY BAR: Vault / Broadcast / Dust / Journal / Sever ═══ */}
       {!isSovereignRoute && !isHubRoute && (
-        <div className="sovereign-toolbar bar-top bar-section-archives" data-testid="sovereign-bar-top">
-          <span className="temporal-label temporal-label-past">THE VAULT</span>
+        <div className="sovereign-toolbar bar-top bar-section-archives" data-testid="sovereign-bar-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="flex items-center gap-2">
-            <Link to="/archives" className="bar-nav-item bar-top-item umbrella-trigger" data-target="archives" data-testid="nav-archives">
+            <Link to="/archives" className="bar-nav-item bar-top-item" data-testid="nav-archives">
               <Archive size={14} />
-              <span>Archives</span>
+              <span>Vault</span>
             </Link>
-            <Link to="/journal" className="bar-nav-item bar-top-item umbrella-trigger" data-target="journal" data-testid="nav-journal">
+            <button
+              onClick={async () => {
+                const shareData = {
+                  title: 'ENLIGHTEN.MINT.CAFE',
+                  text: 'Experience the Sovereign Engine — breathwork, divination, alchemy, and more.',
+                  url: window.location.origin,
+                };
+                try {
+                  if (navigator.share) { await navigator.share(shareData); }
+                  else { await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`); }
+                } catch {}
+              }}
+              className="bar-nav-item bar-top-item" data-testid="nav-broadcast"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <Share2 size={14} />
+              <span>Broadcast</span>
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/journal" className="bar-nav-item bar-top-item" data-testid="nav-journal">
               <BookOpen size={14} />
               <span>Journal</span>
             </Link>
-            <Link to="/cosmic-ledger" className="bar-nav-item bar-top-item umbrella-trigger" data-target="ledger" data-testid="nav-ledger">
+            <Link to="/cosmic-ledger" className="bar-nav-item bar-top-item" data-testid="nav-ledger">
               <Clock size={14} />
               <span>Ledger</span>
             </Link>
+            <button
+              onClick={() => {
+                const root = document.documentElement;
+                root.style.transition = 'filter 1.5s ease-in-out';
+                root.style.filter = 'brightness(0) blur(10px)';
+                setTimeout(() => {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  sessionStorage.clear();
+                  window.location.href = '/landing';
+                }, 1500);
+              }}
+              className="bar-nav-item bar-top-item" data-testid="nav-sever"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(239,68,68,0.5)' }}
+            >
+              <LogOut size={14} />
+              <span>Sever</span>
+            </button>
           </div>
-          <span className="temporal-label temporal-label-past">PAST</span>
         </div>
       )}
       

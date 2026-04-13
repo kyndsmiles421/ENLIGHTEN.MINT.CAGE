@@ -48,6 +48,19 @@ import BiometricSync from '../utils/BiometricSync';
 import OmnisInterconnect from '../utils/OmnisInterconnect';
 import OmnisNexus from '../utils/OmnisNexus';
 import OmnisDirect from '../utils/OmnisDirect';
+import { useNavigate } from 'react-router-dom';
+
+const MODULE_ROUTE_MAP = {
+  journal: '/journal', meditation: '/meditation', oracle: '/oracle',
+  breathing: '/breathing', mood: '/mood', games: '/games',
+  rituals: '/rituals', cosmic_mixer: '/cosmic-mixer', archives: '/archives',
+  workshop: '/workshop', cosmic_ledger: '/cosmic-ledger', star_chart: '/star-chart',
+  observatory: '/observatory', cosmic_map: '/cosmic-map', discover: '/discover',
+  heartbeat_sync: '/liquidity-trader', test: '/sovereign-hub',
+  forge_creation: '/resource-alchemy', trade_listing: '/gravity-well',
+  oracle_reading: '/oracle', constellation_trace: '/star-chart',
+  module_interaction: '/sovereign-hub', exit_sync: '/sovereign-hub',
+};
 import OmniExpansion from '../utils/OmniExpansion';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -514,6 +527,7 @@ function GaiaAnchorCard({ anchor, isPrimary }) {
  */
 export default function SovereignHub() {
   const { token, authHeaders, user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [onePrint, setOnePrint] = useState(null);
   const [spectralBands, setSpectralBands] = useState(null);
@@ -548,6 +562,7 @@ export default function SovereignHub() {
   // V10013.0 Omni-Expansion States
   const [globalMapOpen, setGlobalMapOpen] = useState(false);
   const [expansionStatus, setExpansionStatus] = useState(null);
+  const [topModules, setTopModules] = useState([]);
   
   // Initialize V10000.0 Singularity on mount
   useEffect(() => {
@@ -641,6 +656,14 @@ export default function SovereignHub() {
     };
     
     fetchData();
+  }, [token, authHeaders]);
+
+  // Fetch adaptive top modules
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API}/gaming/adaptive/top-modules`, { headers: authHeaders })
+      .then(res => setTopModules(res.data?.top_modules || []))
+      .catch(() => {});
   }, [token, authHeaders]);
 
   // Copy One Print ID to clipboard
@@ -893,6 +916,31 @@ export default function SovereignHub() {
           ENLIGHTEN.MINT.CAFE
         </h1>
       </motion.div>
+
+      {/* ═══ ADAPTIVE: Your Most-Used Modules ═══ */}
+      {topModules.length > 0 && (
+        <div className="max-w-xl mx-auto mb-6 px-2">
+          <div className="text-[10px] font-bold uppercase tracking-[0.15em] mb-2 px-1" style={{ color: 'rgba(255,255,255,0.3)' }}>Your Frequents</div>
+          <div className="flex gap-1.5 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {topModules.map((mod) => {
+              const route = MODULE_ROUTE_MAP[mod.module];
+              if (!route) return null;
+              return (
+                <button
+                  key={mod.module}
+                  onClick={() => navigate(route)}
+                  className="shrink-0 py-2 px-3 rounded-lg text-[11px] transition-all active:scale-95"
+                  style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.18)', color: 'rgba(248,250,252,0.7)' }}
+                  data-testid={`freq-${mod.module}`}
+                >
+                  {mod.module.replace(/_/g, ' ')}
+                  <span className="text-[8px] ml-1" style={{ color: 'rgba(168,85,247,0.5)' }}>{mod.visits}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ═══ FUNCTIONAL NAVIGATION — 7 Pillars, Color Coded, Every Button Goes Somewhere ═══ */}
       <div className="max-w-xl mx-auto mb-8 px-2">
