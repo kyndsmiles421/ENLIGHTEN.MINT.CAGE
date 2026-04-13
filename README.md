@@ -1,2 +1,2 @@
 # ENLIGHTEN.MINT.CAFE
-Comprehensive wellness spiritualalty and gamingg
+Comprehensive wellness spiritualalty and gaming
