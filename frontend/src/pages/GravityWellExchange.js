@@ -9,7 +9,7 @@ import { ArrowLeft, TrendingUp, TrendingDown, ShoppingCart, DollarSign, Sparkles
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function GravityWellExchange() {
-  const { authHeaders } = useAuth();
+  const { authHeaders, token } = useAuth();
   const navigate = useNavigate();
   const [market, setMarket] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,12 +18,13 @@ export default function GravityWellExchange() {
   const [trading, setTrading] = useState(false);
 
   const fetchMarket = useCallback(async () => {
+    if (!token) { setLoading(false); return; }
     try {
       const { data } = await axios.get(`${API}/gaming/gravity-well/market`, { headers: authHeaders });
       setMarket(data.market);
     } catch { toast.error('Failed to load market'); }
     finally { setLoading(false); }
-  }, [authHeaders]);
+  }, [authHeaders, token]);
 
   useEffect(() => { fetchMarket(); }, [fetchMarket]);
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('trade_listing', 16); }, []);

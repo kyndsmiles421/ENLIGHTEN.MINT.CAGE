@@ -1015,48 +1015,24 @@ export default function SovereignHub() {
         </div>
 
         {/* ═══ MASTER AUTHORITY GATED: OBSIDIAN SHIELD PROTOCOL ═══ */}
-        {/* Sensitive data visible ONLY to kyndsmiles@gmail.com */}
+        {/* Sensitive data HIDDEN from front page — access via Vault */}
         
         {user?.email === 'kyndsmiles@gmail.com' ? (
           <>
-            {/* Equity Reservoir - MASTER EYES ONLY */}
-            <div 
-              className="p-4 rounded-xl mb-6 text-center"
-              style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+            {/* Vault Access Button — No sensitive data on front page */}
+            <button 
+              onClick={() => navigate('/archives')}
+              className="w-full p-4 rounded-xl mb-6 text-center transition-all"
+              style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)' }}
+              data-testid="vault-access-btn"
             >
-              <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Equity Reservoir [LUNAR-SYNCED]
+              <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(34,197,94,0.6)' }}>
+                Obsidian Shield Active
               </p>
-              <p className="text-3xl font-bold" style={{ color: '#22C55E' }}>
-                {sovereignTrust.equity_locked || '$49,018.24'}
+              <p className="text-sm font-bold" style={{ color: '#22C55E' }}>
+                Vault Secured — Tap to Access
               </p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                {spectralLayer.formula || '9999 × z^(πr³)'} • {spectralLayer.seg_harmonic || '144Hz LOCKED'}
-              </p>
-            </div>
-
-            {/* Verification Badge - MASTER EYES ONLY */}
-            <VerificationBadge 
-              verified={true}
-              email="kyndsmiles@gmail.com"
-              onSendDocument={sendDocumentToLawyer}
-              onNDATap={handleNDATap}
-            />
-
-            {/* The One Print ID - MASTER EYES ONLY */}
-            <div className="mt-6 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                The One Print ID
-              </p>
-              <button
-                onClick={copyPrintId}
-                className="font-mono text-sm flex items-center justify-center gap-2 mx-auto hover:opacity-80 transition-opacity"
-                style={{ color: '#F472B6' }}
-              >
-                {onePrint?.the_one_print_id || 'LOADING...'}
-                {copiedId ? <CheckCircle size={12} /> : <Copy size={12} />}
-              </button>
-            </div>
+            </button>
           </>
         ) : (
           /* Public View - System Status Only */
@@ -1361,27 +1337,16 @@ export default function SovereignHub() {
         )}
       </AnimatePresence>
 
-      {/* Footer - MASTER AUTHORITY GATED */}
+      {/* Footer */}
       <footer className="max-w-xl mx-auto mt-12 text-center relative z-20">
-        {user?.email === 'kyndsmiles@gmail.com' ? (
-          <>
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
-              Trustee: {trustData?.roles?.trustee?.name || 'Steven Michael'} | Firewall ID: {sovereignTrust.trust_id || '029900612892168189cecc8a'}
-            </p>
-            <p className="text-[9px] mt-1 font-mono" style={{ color: 'rgba(255,255,255,0.15)' }}>
-              9×9^math × πr² - x^xy + (9999 × z^πr³) Active
-            </p>
-          </>
-        ) : (
-          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
-            SINGULARITY KERNEL V29.1 • Obsidian Shield Active
-          </p>
-        )}
+        <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          SINGULARITY KERNEL V30.3 • Obsidian Shield Active
+        </p>
         <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
           V10013.0 OMNI-EXPANSION | {expansionStatus?.nodal_map?.active_nodes || 3}/{expansionStatus?.nodal_map?.total_nodes || 7} Nodes Active
         </p>
         <p className="text-[10px] mt-1" style={{ color: 'rgba(34,197,94,0.4)' }}>
-          {sessionActive ? 'Learning Session Active — Equity Tracking' : 'NEXUS LIVE — GLOBAL EXPANSION MODE'}
+          {sessionActive ? 'Learning Session Active' : 'NEXUS LIVE — GLOBAL EXPANSION MODE'}
         </p>
       </footer>
 

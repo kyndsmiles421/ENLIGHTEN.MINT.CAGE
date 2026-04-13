@@ -10,7 +10,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const TIER_COLORS = ['#94A3B8', '#F97316', '#E2E8F0', '#FCD34D', '#A855F7', '#1E293B', '#2DD4BF'];
 
 export default function ResourceAlchemy() {
-  const { authHeaders } = useAuth();
+  const { authHeaders, token } = useAuth();
   const navigate = useNavigate();
   const [state, setState] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,12 +18,13 @@ export default function ResourceAlchemy() {
   const [mining, setMining] = useState(false);
 
   const fetchState = useCallback(async () => {
+    if (!token) { setLoading(false); return; }
     try {
       const { data } = await axios.get(`${API}/gaming/alchemy/state`, { headers: authHeaders });
       setState(data);
     } catch { toast.error('Failed to load alchemy state'); }
     finally { setLoading(false); }
-  }, [authHeaders]);
+  }, [authHeaders, token]);
 
   useEffect(() => { fetchState(); }, [fetchState]);
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('forge_creation', 20); }, []);

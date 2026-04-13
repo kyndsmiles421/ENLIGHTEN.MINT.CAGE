@@ -10,7 +10,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const NODE_COLORS = { Water: '#3B82F6', Air: '#A855F7', Fire: '#EF4444', Earth: '#22C55E', Ether: '#FCD34D' };
 
 export default function CrypticQuestNodes() {
-  const { authHeaders } = useAuth();
+  const { authHeaders, token } = useAuth();
   const navigate = useNavigate();
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,12 +19,13 @@ export default function CrypticQuestNodes() {
   const [solving, setSolving] = useState(false);
 
   const fetchNodes = useCallback(async () => {
+    if (!token) { setLoading(false); return; }
     try {
       const { data } = await axios.get(`${API}/gaming/quest/nodes`, { headers: authHeaders });
       setNodes(data.nodes);
     } catch { toast.error('Failed to load quest nodes'); }
     finally { setLoading(false); }
-  }, [authHeaders]);
+  }, [authHeaders, token]);
 
   useEffect(() => { fetchNodes(); }, [fetchNodes]);
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('oracle_reading', 12); }, []);
