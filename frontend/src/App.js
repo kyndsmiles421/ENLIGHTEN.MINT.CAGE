@@ -437,7 +437,7 @@ function AnimatedRoutes() {
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
 
-  const showBackBtn = !['/sovereign-hub', '/landing', '/auth', '/intro', '/', '/hub'].includes(location.pathname);
+  const showBackBtn = !['/sovereign-hub', '/landing', '/auth', '/intro', '/', '/hub', '/creator-console'].includes(location.pathname);
 
   return (
     <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 10 }}>

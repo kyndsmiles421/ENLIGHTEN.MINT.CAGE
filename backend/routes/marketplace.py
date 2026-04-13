@@ -263,6 +263,87 @@ NEXUS_SUBSCRIPTION = {
 
 ALL_STORE_ITEMS = {**CONSUMABLES, **COSMETICS}
 
+# ── Mixer Channel Upgrades (à la carte purchases for Creator Console) ──
+MIXER_ITEMS = {
+    "mixer_channel_pack_practice": {
+        "id": "mixer_channel_pack_practice", "name": "Practice Channel Pack",
+        "description": "Unlock all 9 Practice module fader strips in the Creator Console.",
+        "category": "mixer", "price_credits": 50, "pillar": "Practice", "color": "#D8B4FE",
+    },
+    "mixer_channel_pack_divination": {
+        "id": "mixer_channel_pack_divination", "name": "Divination Channel Pack",
+        "description": "Unlock all 9 Divination module fader strips.",
+        "category": "mixer", "price_credits": 50, "pillar": "Divination", "color": "#E879F9",
+    },
+    "mixer_channel_pack_sanctuary": {
+        "id": "mixer_channel_pack_sanctuary", "name": "Sanctuary Channel Pack",
+        "description": "Unlock all 8 Sanctuary module fader strips.",
+        "category": "mixer", "price_credits": 45, "pillar": "Sanctuary", "color": "#2DD4BF",
+    },
+    "mixer_channel_pack_nourish": {
+        "id": "mixer_channel_pack_nourish", "name": "Nourish & Heal Channel Pack",
+        "description": "Unlock all 8 Nourishment module fader strips.",
+        "category": "mixer", "price_credits": 45, "pillar": "Nourish", "color": "#22C55E",
+    },
+    "mixer_channel_pack_explore": {
+        "id": "mixer_channel_pack_explore", "name": "Explore Channel Pack",
+        "description": "Unlock all 9 Explore module fader strips.",
+        "category": "mixer", "price_credits": 50, "pillar": "Explore", "color": "#FB923C",
+    },
+    "mixer_channel_pack_sage": {
+        "id": "mixer_channel_pack_sage", "name": "Sage AI Channel Pack",
+        "description": "Unlock all 4 Sage AI Coach module fader strips.",
+        "category": "mixer", "price_credits": 60, "pillar": "Sage AI", "color": "#38BDF8",
+    },
+    "mixer_channel_pack_council": {
+        "id": "mixer_channel_pack_council", "name": "Council Channel Pack",
+        "description": "Unlock all 11 Sovereign Council module fader strips.",
+        "category": "mixer", "price_credits": 75, "pillar": "Council", "color": "#C084FC",
+    },
+    "mixer_effects_reverb": {
+        "id": "mixer_effects_reverb", "name": "Reverb Engine",
+        "description": "Add reverb send to your mixer routing chain.",
+        "category": "mixer_fx", "price_credits": 30, "fx": "reverb", "color": "#8B5CF6",
+    },
+    "mixer_effects_delay": {
+        "id": "mixer_effects_delay", "name": "Delay Engine",
+        "description": "Add delay send to your mixer routing chain.",
+        "category": "mixer_fx", "price_credits": 30, "fx": "delay", "color": "#3B82F6",
+    },
+    "mixer_effects_harmonic": {
+        "id": "mixer_effects_harmonic", "name": "Harmonic Resonance",
+        "description": "Cross-route modules with harmonic frequency linking.",
+        "category": "mixer_fx", "price_credits": 40, "fx": "harmonic", "color": "#EAB308",
+    },
+    "mixer_effects_sidechain": {
+        "id": "mixer_effects_sidechain", "name": "Sidechain Compressor",
+        "description": "Dynamic sidechain compression between module channels.",
+        "category": "mixer_fx", "price_credits": 35, "fx": "sidechain", "color": "#EF4444",
+    },
+    "mixer_gpu_shader": {
+        "id": "mixer_gpu_shader", "name": "L² Fractal GPU",
+        "description": "Unlock the real-time fractal shader visualization in the visual screen.",
+        "category": "mixer_visual", "price_credits": 100, "color": "#C084FC",
+    },
+    "mixer_waveform": {
+        "id": "mixer_waveform", "name": "Live Waveform Display",
+        "description": "Unlock live waveform visualization across all pillar channels.",
+        "category": "mixer_visual", "price_credits": 40, "color": "#2DD4BF",
+    },
+    "mixer_superstrip": {
+        "id": "mixer_superstrip", "name": "SuperStrip Module",
+        "description": "Unlock the detailed SuperStrip panel for deep per-channel control.",
+        "category": "mixer_visual", "price_credits": 80, "color": "#F59E0B",
+    },
+    "mixer_full_unlock": {
+        "id": "mixer_full_unlock", "name": "Full Mixer Unlock",
+        "description": "Unlock ALL mixer features: every channel pack, all effects, GPU, waveform, SuperStrip.",
+        "category": "mixer_bundle", "price_credits": 400, "color": "#F59E0B",
+    },
+}
+
+ALL_STORE_ITEMS = {**CONSUMABLES, **COSMETICS, **MIXER_ITEMS}
+
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  HELPER FUNCTIONS
@@ -470,6 +551,52 @@ async def buy_item(data: dict = Body(...), user=Depends(get_current_user)):
         "purchased": True,
         "item": {"id": item_id, "name": item["name"], "quantity": quantity},
         "credits_remaining": new_balance,
+    }
+
+
+@router.get("/marketplace/mixer-store")
+async def get_mixer_store(user=Depends(get_current_user)):
+    """Get mixer store catalog with user's unlock status."""
+    user_id = user["id"]
+    owned = await db.marketplace_inventory.find(
+        {"user_id": user_id, "item_id": {"$regex": "^mixer_"}}, {"_id": 0}
+    ).to_list(100)
+    owned_ids = {item["item_id"] for item in owned}
+    credits = await get_user_credits(user_id)
+
+    items = []
+    for item_id, item in MIXER_ITEMS.items():
+        items.append({
+            "id": item_id,
+            "name": item["name"],
+            "description": item["description"],
+            "category": item["category"],
+            "price_credits": item["price_credits"],
+            "color": item.get("color", "#8B5CF6"),
+            "pillar": item.get("pillar"),
+            "fx": item.get("fx"),
+            "owned": item_id in owned_ids,
+        })
+    return {"items": items, "credits": credits, "owned_ids": list(owned_ids)}
+
+
+@router.get("/marketplace/mixer-unlocks")
+async def get_mixer_unlocks(user=Depends(get_current_user)):
+    """Get user's mixer unlock state for the Creator Console."""
+    user_id = user["id"]
+    owned = await db.marketplace_inventory.find(
+        {"user_id": user_id, "item_id": {"$regex": "^mixer_"}}, {"_id": 0, "item_id": 1}
+    ).to_list(100)
+    owned_ids = [item["item_id"] for item in owned]
+    has_full = "mixer_full_unlock" in owned_ids
+    return {
+        "unlocked_pillars": [i["item_id"].replace("mixer_channel_pack_", "") for i in owned if i["item_id"].startswith("mixer_channel_pack_")] if not has_full else ["practice", "divination", "sanctuary", "nourish", "explore", "sage", "council"],
+        "unlocked_fx": [i["item_id"].replace("mixer_effects_", "") for i in owned if i["item_id"].startswith("mixer_effects_")] if not has_full else ["reverb", "delay", "harmonic", "sidechain"],
+        "has_gpu": has_full or "mixer_gpu_shader" in owned_ids,
+        "has_waveform": has_full or "mixer_waveform" in owned_ids,
+        "has_superstrip": has_full or "mixer_superstrip" in owned_ids,
+        "has_full_unlock": has_full,
+        "owned_ids": owned_ids,
     }
 
 
