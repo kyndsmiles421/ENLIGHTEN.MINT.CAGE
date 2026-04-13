@@ -501,46 +501,192 @@ export function MixerProvider({ children }) {
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center justify-between px-2 py-1" style={{ background: '#080812', borderTop: '1px solid rgba(139,92,246,0.12)' }}>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => handleNav('/sovereign-hub')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }}><Home size={10} className="text-white/30" /></button>
-                      {/* RECORDING CONTROLS */}
-                      <button onClick={() => media.isRecVideo ? media.stopAll() : media.startRecording('video')}
-                        className="px-1.5 py-0.5 rounded text-[6px] font-bold uppercase active:scale-90"
-                        style={{ background: media.isRecVideo ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.03)', border: `1px solid ${media.isRecVideo ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.06)'}`, color: media.isRecVideo ? '#EF4444' : 'rgba(255,255,255,0.25)' }}
-                        data-testid="rec-video">{media.isRecVideo ? 'STOP' : 'VID'}</button>
-                      <button onClick={() => media.isRecAudio ? media.stopAll() : media.startRecording('audio')}
-                        className="px-1.5 py-0.5 rounded text-[6px] font-bold uppercase active:scale-90"
-                        style={{ background: media.isRecAudio ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.03)', border: `1px solid ${media.isRecAudio ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.06)'}`, color: media.isRecAudio ? '#EF4444' : 'rgba(255,255,255,0.25)' }}
-                        data-testid="rec-audio">{media.isRecAudio ? 'STOP' : 'MIC'}</button>
-                      <button onClick={() => media.isRecScreen ? media.stopAll() : media.startRecording('screen')}
-                        className="px-1.5 py-0.5 rounded text-[6px] font-bold uppercase active:scale-90"
-                        style={{ background: media.isRecScreen ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.03)', border: `1px solid ${media.isRecScreen ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.06)'}`, color: media.isRecScreen ? '#EF4444' : 'rgba(255,255,255,0.25)' }}
-                        data-testid="rec-screen">{media.isRecScreen ? 'STOP' : 'SCR'}</button>
-                      {media.isRecording && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => setViewMode(v => v === 'strip' ? 'orbital' : 'strip')}
-                        className="px-2 py-0.5 rounded text-[7px] font-bold uppercase active:scale-90"
-                        style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.15)', color: '#C4B5FD' }}
-                        data-testid="mode-toggle">
-                        {viewMode === 'strip' ? <><Globe size={8} className="inline mr-1" />Orbital</> : <><BarChart3 size={8} className="inline mr-1" />Strip</>}
-                      </button>
-                      <button onClick={loadStore} className="p-1 rounded active:scale-90" style={{ background: 'rgba(234,179,8,0.05)' }} data-testid="mixer-store-btn"><ShoppingCart size={9} className="text-yellow-400/50" /></button>
-                      <button onClick={() => setMixerState('collapsed')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="mixer-collapse"><ChevronDown size={10} className="text-white/40" /></button>
-                    </div>
-                  </div>
-                  <div style={{ height: 'calc(var(--mixer-height, 33.34vh) - 28px)', overflowY: 'auto' }}>
-                    {viewMode === 'strip' ? (
-                      <StripView pillars={PILLARS} pillarLevels={pillarLevels} setPillarLevels={setPillarLevels}
-                        masterLevel={masterLevel} setMasterLevel={setMasterLevel} expandedPillar={expandedPillar}
-                        setExpandedPillar={setExpandedPillar} modStates={modStates} setModStates={setModStates}
-                        onNav={handleNav} currentRoute={location.pathname} onMuteChange={handleMuteChange} />
-                    ) : (
-                      <div className="h-full" style={{ background: '#050508' }}>
-                        <OrbitalSphere pillars={PILLARS} pillarLevels={pillarLevels} onNav={handleNav} currentRoute={location.pathname} />
+                  {/* TOOL CONTENT AREA — swaps based on active tab */}
+                  <div style={{ height: 'calc(var(--mixer-height, 33.34vh) - 40px)', overflowY: 'auto', background: '#080812', borderTop: '1px solid rgba(139,92,246,0.12)' }}>
+                    {activeTab === 'mix' && (
+                      viewMode === 'strip' ? (
+                        <StripView pillars={PILLARS} pillarLevels={pillarLevels} setPillarLevels={setPillarLevels}
+                          masterLevel={masterLevel} setMasterLevel={setMasterLevel} expandedPillar={expandedPillar}
+                          setExpandedPillar={setExpandedPillar} modStates={modStates} setModStates={setModStates}
+                          onNav={handleNav} currentRoute={location.pathname} onMuteChange={handleMuteChange} />
+                      ) : (
+                        <div className="h-full" style={{ background: '#050508' }}>
+                          <OrbitalSphere pillars={PILLARS} pillarLevels={pillarLevels} onNav={handleNav} currentRoute={location.pathname} />
+                        </div>
+                      )
+                    )}
+
+                    {activeTab === 'record' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">Capture</div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { key: 'video', label: 'Video', desc: 'Camera + Mic', active: media.isRecVideo, color: '#EF4444' },
+                            { key: 'audio', label: 'Audio', desc: 'Mic Only', active: media.isRecAudio, color: '#F59E0B' },
+                            { key: 'screen', label: 'Screen', desc: 'Screen Capture', active: media.isRecScreen, color: '#8B5CF6' },
+                          ].map(r => (
+                            <button key={r.key} onClick={() => r.active ? media.stopAll() : media.startRecording(r.key)}
+                              className="p-3 rounded-xl text-center active:scale-95"
+                              style={{ background: r.active ? `${r.color}20` : 'rgba(255,255,255,0.02)', border: `1px solid ${r.active ? `${r.color}40` : 'rgba(255,255,255,0.06)'}` }}
+                              data-testid={`rec-${r.key}`}>
+                              {r.active && <div className="w-3 h-3 rounded-full mx-auto mb-1 animate-pulse" style={{ background: r.color }} />}
+                              <div className="text-[10px] font-bold" style={{ color: r.active ? r.color : 'rgba(255,255,255,0.6)' }}>{r.active ? 'STOP' : r.label}</div>
+                              <div className="text-[7px] text-white/25">{r.desc}</div>
+                            </button>
+                          ))}
+                        </div>
+                        {media.isRecording && (
+                          <div className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                            <span className="text-[9px] text-red-400/70">Recording — tap STOP to save</span>
+                          </div>
+                        )}
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mt-3 mb-2">Timeline</div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                          <span className="text-[9px] font-mono text-white/40">00:00 / 00:00</span>
+                          <div className="flex-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                          <button className="text-[8px] text-white/30 px-2 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.03)' }}>+Intro</button>
+                          <button className="text-[8px] text-white/30 px-2 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.03)' }}>+Outro</button>
+                        </div>
                       </div>
                     )}
+
+                    {activeTab === 'audio' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">Audio Mixing</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { label: 'Record Voice', desc: 'Mic capture', action: () => media.startRecording('audio') },
+                            { label: 'Import Audio', desc: 'From device', action: () => document.getElementById('audio-import')?.click() },
+                            { label: 'Mute Track', desc: 'Silence audio', action: () => toast('Track muted') },
+                            { label: 'Volume', desc: 'Adjust levels', action: null },
+                          ].map(a => (
+                            <button key={a.label} onClick={a.action} className="p-2.5 rounded-xl text-left active:scale-95" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                              <div className="text-[10px] font-medium text-white/60">{a.label}</div>
+                              <div className="text-[7px] text-white/25">{a.desc}</div>
+                            </button>
+                          ))}
+                        </div>
+                        <input type="file" id="audio-import" accept="audio/*" className="hidden" onChange={(e) => { if (e.target.files[0]) toast.success(`Audio loaded: ${e.target.files[0].name}`); }} />
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mt-3 mb-1">Master Volume</div>
+                        <input type="range" min="0" max="100" defaultValue={80} className="w-full h-1.5 rounded-full cursor-pointer" style={{ accentColor: '#38BDF8' }} />
+                      </div>
+                    )}
+
+                    {activeTab === 'text' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">Text & Titles</div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {['Title', 'Subtitle', 'Caption', 'Quote', 'Label', 'Watermark'].map(t => (
+                            <button key={t} className="p-2.5 rounded-xl text-center active:scale-95" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                              <div className="text-[10px] font-medium text-white/60">{t}</div>
+                            </button>
+                          ))}
+                        </div>
+                        <textarea placeholder="Enter text..." rows={2} className="w-full mt-2 p-2 rounded-lg text-[11px] text-white/70 resize-none" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }} />
+                      </div>
+                    )}
+
+                    {activeTab === 'overlay' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">Overlay & Layers</div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { label: 'Image', desc: 'Add photo' },
+                            { label: 'Video', desc: 'Layer video' },
+                            { label: 'Sticker', desc: 'Add sticker' },
+                            { label: 'Logo', desc: 'Brand mark' },
+                            { label: 'Frame', desc: 'Border frame' },
+                            { label: 'Shape', desc: 'Geometric' },
+                          ].map(o => (
+                            <button key={o.label} onClick={() => { if (o.label === 'Image') document.getElementById('img-import')?.click(); }}
+                              className="p-2.5 rounded-xl text-center active:scale-95" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                              <div className="text-[10px] font-medium text-white/60">{o.label}</div>
+                              <div className="text-[7px] text-white/25">{o.desc}</div>
+                            </button>
+                          ))}
+                        </div>
+                        <input type="file" id="img-import" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files[0]) toast.success(`Image loaded: ${e.target.files[0].name}`); }} />
+                      </div>
+                    )}
+
+                    {activeTab === 'effects' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">Effects & Filters</div>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {[
+                            { label: 'Blur', color: '#8B5CF6' }, { label: 'Adjust', color: '#3B82F6' },
+                            { label: 'Filter', color: '#2DD4BF' }, { label: 'Video FX', color: '#E879F9' },
+                            { label: 'Overlay FX', color: '#FB923C' }, { label: 'Body FX', color: '#22C55E' },
+                            { label: 'Highlight', color: '#EAB308' }, { label: 'Mosaic', color: '#EF4444' },
+                          ].map(fx => (
+                            <button key={fx.label} className="p-2 rounded-xl text-center active:scale-95" style={{ background: `${fx.color}08`, border: `1px solid ${fx.color}15` }}>
+                              <div className="text-[9px] font-medium" style={{ color: fx.color }}>{fx.label}</div>
+                            </button>
+                          ))}
+                        </div>
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mt-3 mb-1">Intensity</div>
+                        <input type="range" min="0" max="100" defaultValue={50} className="w-full h-1.5 rounded-full cursor-pointer" style={{ accentColor: '#8B5CF6' }} />
+                      </div>
+                    )}
+
+                    {activeTab === 'ai' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">AI Creation Tools</div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { label: 'Image to Video', color: '#E879F9' },
+                            { label: 'AI Art', color: '#8B5CF6' },
+                            { label: 'Text to Image', color: '#3B82F6' },
+                            { label: 'Text to Speech', color: '#2DD4BF' },
+                            { label: 'AI Music', color: '#22C55E' },
+                            { label: 'AI Avatar', color: '#FB923C' },
+                          ].map(ai => (
+                            <button key={ai.label} className="p-2.5 rounded-xl text-center active:scale-95" style={{ background: `${ai.color}08`, border: `1px solid ${ai.color}18` }}>
+                              <div className="text-[9px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
+                            </button>
+                          ))}
+                        </div>
+                        <textarea placeholder="Describe what to create..." rows={2} className="w-full mt-2 p-2 rounded-lg text-[11px] text-white/70 resize-none" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }} />
+                      </div>
+                    )}
+
+                    {activeTab === 'export' && (
+                      <div className="p-3 space-y-2">
+                        <div className="text-[8px] text-white/30 uppercase tracking-wider mb-2">Export & Share</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { label: 'Aspect Ratio', desc: '16:9 / 9:16 / 1:1 / 4:3' },
+                            { label: 'Quality', desc: 'HD / Full HD / 4K' },
+                            { label: 'Export Video', desc: 'Save to device' },
+                            { label: 'Broadcast', desc: 'Share to platform' },
+                          ].map(ex => (
+                            <button key={ex.label} onClick={() => {
+                              if (ex.label === 'Broadcast') {
+                                navigator.share?.({ title: 'ENLIGHTEN.MINT.CAFE', text: 'Created with the Sovereign Engine', url: window.location.origin }).catch(() => {});
+                              }
+                            }}
+                              className="p-3 rounded-xl text-left active:scale-95" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                              <div className="text-[10px] font-medium text-white/60">{ex.label}</div>
+                              <div className="text-[7px] text-white/25">{ex.desc}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* TOOL TAB BAR — bottom of mixer */}
+                  <div className="flex items-center justify-between px-1" style={{ height: '40px', background: '#060610', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    {TOOL_TABS.map(tab => (
+                      <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                        className="flex-1 flex flex-col items-center justify-center py-1 active:scale-95 transition-all"
+                        style={{ color: activeTab === tab.key ? tab.color : 'rgba(255,255,255,0.2)' }}
+                        data-testid={`tab-${tab.key}`}>
+                        <tab.icon size={12} />
+                        <span className="text-[6px] font-bold mt-0.5 uppercase">{tab.label}</span>
+                      </button>
+                    ))}
                   </div>
                 </>
               )}
