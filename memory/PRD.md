@@ -1,13 +1,15 @@
 # ENLIGHTEN.MINT.CAFE — DEPLOYMENT MANIFEST
-## Version: V30.3 | Status: DEPLOYMENT READY — ALL SYSTEMS GREEN
+## Version: V30.4 | Status: ALL SYSTEMS GREEN
 ## Last Verified: April 13, 2026
 
 ### SYSTEM CHECK: ALL PASS
-- 66 navigation buttons on Sovereign Hub — all functional
-- 5 top bar items: Vault, Broadcast, Journal, Ledger, Sever
-- 5 bottom nav items: Hub, Trade, Oracle, Discover, Mixer
+- 40+ navigation buttons on Sovereign Hub — all functional, zero overlaps
+- 4 action buttons (Purpose Statement, Creator Mixer, Circular Protocol, Academy) — all open modals
+- 5 top bar items: Vault, Broadcast, Journal, Ledger, Sever (hidden on Hub per design)
+- 5 bottom nav items: Hub, Trade, Oracle, Discover, Mixer (hidden on Hub per design)
 - Zero ghost elements (SmartDock return null, PerspectiveToggle purged, STOP at 0.08)
-- Zero sensitive data leaking
+- Zero sensitive data leaking (kyndsmiles@gmail.com / Steven Michael scrubbed from all components)
+- Legacy toolbars (ShambhalaToolbar, MANIFEST_BAR, Navigation) hidden on /sovereign-hub via isHubRoute
 
 ### 7 PILLARS (Color Coded)
 - PRACTICE (purple): Breathwork, Meditation, Yoga, Mudras, Mantras, Light Therapy
@@ -33,3 +35,15 @@
 
 ### ECONOMY
 - 10 Fans/hr | 15 modules wired for silent dust | Fibonacci accrual | Phi Cap 1.618
+
+### BUGS FIXED (V30.4)
+- P0: Sovereign Hub click-blocking — /sovereign-hub added to isHubRoute, legacy toolbars hidden
+- P1: Sensitive data scrubbed from all DOM-renderable components and utility files
+- P1: CharacterSelect undefined.map crash — safe navigation added
+- P1: GravityWellExchange empty market — defensive empty state + safe data access
+
+### BACKLOG
+- Play Store AAB Generation (blocked on user's Google Console verification)
+- Sovereign "Live" Sessions (P2)
+- Phygital Marketplace NFC expansion (P2)
+- Refactor SovereignHub.js — extract dead components (VerificationBadge, GaiaAnchorCard, etc.)
