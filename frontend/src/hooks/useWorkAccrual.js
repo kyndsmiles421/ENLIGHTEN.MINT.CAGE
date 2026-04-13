@@ -1,28 +1,41 @@
 /**
- * useWorkAccrual — Silent Dust Accumulation Hook
- * SOVEREIGN ENGINE v2.1 — Local Heartbeat Buffer
+ * useWorkAccrual — V34.0 INVERSE EXPONENTIAL SURGE
+ * Silent Dust Accumulation with Resonance + Session Duration tracking.
  * 
- * Accumulates Digital Dust locally, syncs to /api/transmuter/work-submit
- * when buffer exceeds threshold OR on heartbeat interval.
- * 
- * Anti-Seizure: Alpha-wave pulse (slow, 0.5Hz) — no flashing.
- * Silent: Zero pop-ups. Values update in Liquidity Trader only.
+ * Frontend calculates:
+ *   resonance_score = engagement quality (0.0 - 1.0)
+ *   session_duration = seconds since module entered
+ * Backend applies:
+ *   exponential_accrual = base * e^(resonance * time/3600) * φ
+ *   inverse_multiplier = φ^(-1 / (pool + 1))
  */
 import { useRef, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const PHI = 1.618033988749895;
 const SYNC_THRESHOLD = 50;
 const HEARTBEAT_MS = 30000;
-const PHI_ENTROPY = 0.01618; // Slight randomness to prevent network sync storms
+const PHI_ENTROPY = 0.01618;
 
 let globalBuffer = 0;
+let globalResonance = 0.5;
+let globalSessionStart = Date.now();
 let globalLastSync = Date.now();
+let globalInteractionCount = 0;
 let globalListeners = new Set();
 
 function notifyListeners() {
   globalListeners.forEach(fn => fn(globalBuffer));
+}
+
+// Resonance builds with interaction frequency (capped at 1.0)
+function updateResonance() {
+  const elapsed = (Date.now() - globalSessionStart) / 1000;
+  const freq = globalInteractionCount / Math.max(1, elapsed / 60); // interactions per minute
+  // Resonance = tanh(freq * φ^-1) — approaches 1.0 asymptotically
+  globalResonance = Math.tanh(freq * (1 / PHI));
 }
 
 export default function useWorkAccrual() {
@@ -34,9 +47,13 @@ export default function useWorkAccrual() {
     if (globalBuffer <= 0) return;
     if (!user) return;
 
+    const sessionDuration = (Date.now() - globalSessionStart) / 1000;
+
     const payload = {
       module: 'heartbeat_sync',
       interaction_weight: globalBuffer,
+      session_duration: Math.round(sessionDuration),
+      resonance_score: parseFloat(globalResonance.toFixed(4)),
     };
 
     try {
@@ -47,27 +64,30 @@ export default function useWorkAccrual() {
       globalLastSync = Date.now();
       notifyListeners();
     } catch {
-      // Retention active — buffer preserved for next heartbeat
+      // Retention — buffer preserved for next heartbeat
     }
   }, [authHeaders, user]);
 
   const accrue = useCallback((module, weight = 10) => {
     globalBuffer += weight;
+    globalInteractionCount++;
+    updateResonance();
     notifyListeners();
 
-    // Auto-sync if buffer exceeds threshold
     if (globalBuffer >= SYNC_THRESHOLD) {
       syncToBackend();
     }
   }, [syncToBackend]);
 
-  // Expose globally for modules that don't import the hook directly
+  // Expose globally
   useEffect(() => {
     window.__workAccrue = accrue;
+    globalSessionStart = Date.now();
+    globalInteractionCount = 0;
     return () => { delete window.__workAccrue; };
   }, [accrue]);
 
-  // Heartbeat interval with PHI entropy
+  // Heartbeat with PHI entropy
   useEffect(() => {
     mountedRef.current = true;
     const jitter = 1 + (Math.random() * PHI_ENTROPY * 2 - PHI_ENTROPY);
@@ -83,17 +103,18 @@ export default function useWorkAccrual() {
     };
   }, [syncToBackend]);
 
-  // Sync on unmount (page navigation)
+  // Beacon sync on exit
   useEffect(() => {
     return () => {
       if (globalBuffer > 0 && user) {
-        // Fire-and-forget sync on exit
-        const headers = authHeaders();
+        const sessionDuration = (Date.now() - globalSessionStart) / 1000;
         navigator.sendBeacon?.(
           `${API}/transmuter/work-submit`,
           new Blob([JSON.stringify({
             module: 'exit_sync',
             interaction_weight: globalBuffer,
+            session_duration: Math.round(sessionDuration),
+            resonance_score: parseFloat(globalResonance.toFixed(4)),
           })], { type: 'application/json' })
         );
       }
@@ -104,15 +125,21 @@ export default function useWorkAccrual() {
     accrue,
     getBuffer: () => globalBuffer,
     getLastSync: () => globalLastSync,
+    getResonance: () => globalResonance,
+    getSessionDuration: () => (Date.now() - globalSessionStart) / 1000,
   };
 }
 
-// Subscribe to buffer changes (for UI indicators)
 export function subscribeBuffer(fn) {
   globalListeners.add(fn);
   return () => globalListeners.delete(fn);
 }
 
 export function getBufferState() {
-  return { buffer: globalBuffer, lastSync: globalLastSync };
+  return {
+    buffer: globalBuffer,
+    lastSync: globalLastSync,
+    resonance: globalResonance,
+    sessionDuration: (Date.now() - globalSessionStart) / 1000,
+  };
 }

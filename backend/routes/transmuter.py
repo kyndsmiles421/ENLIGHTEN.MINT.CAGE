@@ -404,19 +404,30 @@ async def execute_transmutation(data: dict = Body(...), user=Depends(get_current
 @router.post("/work-submit")
 async def work_submit(data: dict = Body(...), user=Depends(get_current_user)):
     """
-    Unified Work Endpoint — all 20 modules call this on 'Save'/'Complete'.
-    Silent dust accrual with tier-based dynamics and Fibonacci dampening.
+    V34.0 Unified Work Endpoint — Inverse Exponential Surge.
+    All modules call this. Accepts session_duration + resonance_score for exponential math.
     """
     user_id = user["id"]
     module = data.get("module", "unknown")
     interaction_weight = data.get("interaction_weight", 10)
+    session_duration = data.get("session_duration", 0)
+    resonance_score = data.get("resonance_score", 0.5)
 
     if not isinstance(interaction_weight, (int, float)) or interaction_weight <= 0:
         interaction_weight = 10
+    if not isinstance(session_duration, (int, float)) or session_duration < 0:
+        session_duration = 0
+    if not isinstance(resonance_score, (int, float)):
+        resonance_score = 0.5
+    resonance_score = max(0.0, min(1.0, resonance_score))
 
     interaction_weight = min(1000, interaction_weight)
     tier_name = await get_user_tier_name(user_id)
-    result = TRANSMUTER.process_interaction(tier_name, module, interaction_weight)
+    result = TRANSMUTER.process_interaction(
+        tier_name, module, interaction_weight,
+        session_duration=session_duration,
+        resonance_score=resonance_score,
+    )
 
     earned = max(1, int(result["earned"]))
     taxed = int(result["taxed_to_master"])
@@ -444,11 +455,15 @@ async def work_submit(data: dict = Body(...), user=Depends(get_current_user)):
         "type": "work_submit",
         "module": module,
         "interaction_weight": interaction_weight,
+        "session_duration": session_duration,
+        "resonance_score": resonance_score,
         "earned": earned,
         "taxed": taxed,
         "tier": tier_name,
         "ratio": result["ratio"],
         "tax_rate": result["tax_rate"],
+        "inverse_multiplier": result.get("inverse_multiplier", 1.0),
+        "math_version": result.get("math_version", "V34.0"),
         "created_at": now,
     })
 

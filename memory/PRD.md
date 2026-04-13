@@ -1,33 +1,37 @@
-# ENLIGHTEN.MINT.CAFE — V33.0
-## System-Wide Mixer — 2/3 Monitor + 1/3 Mixer + Orbital Sphere
+# ENLIGHTEN.MINT.CAFE — V34.0
+## INVERSE EXPONENTIAL SURGE — Math Infusion Complete
 ## Last Verified: April 13, 2026
 
-### Layout
-- Top 2/3 (66.66vh): Module content (Breathing, Oracle, Soundscapes, etc.)
-- Bottom 1/3 (33.34vh): System-wide mixer strip
-- Collapsible: tap chevron to shrink to 36px thin bar
-- Hideable: tap X to fully hide, tap fader icon to restore
-- Rendered via React Portal to escape #app-stage CSS constraints
+### V34.0 Math Upgrade
+Backend: /app/backend/utils/master_transmuter.py (SovereignEngine v3.4)
+Frontend: /app/frontend/src/hooks/useWorkAccrual.js (resonance + session tracking)
 
-### Mixer Modes
-- STRIP: 7 pillar horizontal faders + expandable module channels + M/S buttons
-- ORBITAL: Golden-ratio (φ=1.618) spiral sphere with 7 pillar nodes orbiting central phi core
-  - Node sizes = pillar intensity levels
-  - Connection opacity = engagement level
-  - Fibonacci orbital radii (34, 55, 89)
-  - Golden angle (137.5°) rotation animation
-
-### Sacred Math (mirrors master_transmuter.py)
+#### Sacred Constants
 - PHI = 1.618033988749895
-- GOLDEN_ANGLE = π(3-√5) ≈ 137.5°
-- FIB = [1,1,2,3,5,8,13,21,34,55,89,144]
-- SOLFEGGIO = [174,285,396,417,528,639,741,852,963]
-- Pillar Hz assignments: Practice=528, Divination=963, Sanctuary=432, Nourish=639, Explore=741, Sage=852, Council=396
+- PHI² = 2.618033988749895
+- PHI³ = 4.236067977499790
+- E = 2.7182818284590452
+- Fibonacci: [1,1,2,3,5,8,13,21,34,55,89,144]
+- Solfeggio: {Transformation: 528, Harmony: 432, Spiritual: 963}
 
-### Tier-Gated Features + Marketplace
-- 15 purchasable mixer items via /api/marketplace/mixer-store
-- Individual channel packs, effects, visuals, full unlock bundle
-- Credits-based economy connected to Transmuter
+#### Equations
+- Inverse Multiplier: φ^(-1/(pool+1)) — protects value as pool grows
+- Exponential Accrual: base * e^(resonance * time/3600) * φ (capped at φ³)
+- Transmutation: input * φ² * (1-tax) * inverse_multiplier (capped at input * φ³)
+- Dynamic Phi Cap: Fibonacci-indexed * inverse_multiplier against circulating supply
+- Resonance Score: tanh(interactions_per_minute * φ^(-1))
+
+#### Results (verified)
+- 100 Dust transmute at SEED: 221 net (2.21x, was 1.05x linear)
+- 1hr full resonance session: 4.24x multiplier (φ³ ceiling)
+- Inverse multiplier at pool=1000: 0.999 (near full pass-through)
+- Scholarship tax: 0-15% tier-dependent
+
+### System Architecture
+- 7 pillars, 58 modules, system-wide mixer (2/3 monitor + 1/3 mixer)
+- Strip mode + Orbital Sphere mode (collapsible)
+- Marketplace with 15 purchasable mixer items
+- Dust accrual on 63+ pages with resonance tracking
 
 ### Backlog
 - Google Play Console → upload AAB
