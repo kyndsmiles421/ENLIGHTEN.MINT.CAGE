@@ -89,6 +89,7 @@ const RELATED = {
     { label: 'Meditation', route: '/meditation' },
     { label: 'Zen Garden', route: '/zen-garden' },
     { label: 'Music Lounge', route: '/music-lounge' },
+    { label: 'Cosmic Mixer', route: '/cosmic-mixer' },
   ],
   '/zen-garden': [
     { label: 'Meditation', route: '/meditation' },
