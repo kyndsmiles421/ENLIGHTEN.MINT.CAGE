@@ -1,8 +1,7 @@
 {
   "short_name": "Enlighten",
   "name": "ENLIGHTEN.MINT.CAFE",
-  "version": "29.1_ZERO_POINT",
-  "description": "The Autonomous Wellness Engine — QU-32 Hardware-Emulated Creator Console, Zero-Point Ledger, Gamified Fan System, and Solfeggio-Aligned Haptic Orchestration.",
+  "description": "The Sovereign Wellness Engine — Sacred Geometry, Divination Systems, Gamified Economy, and AI-Powered Spiritual Guidance.",
   "id": "cafe.enlighten.mint",
   "icons": [
     {
@@ -11,31 +10,62 @@
       "type": "image/x-icon"
     },
     {
+      "src": "icon_48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon_96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon_144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "maskable_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "maskable_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     },
     {
       "src": "apple-touch-icon.png",
       "type": "image/png",
-      "sizes": "180x180"
+      "sizes": "180x180",
+      "purpose": "any"
     }
   ],
-  "start_url": "/creator-console",
+  "start_url": "/sovereign-hub",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "fullscreen"],
-  "theme_color": "#4B0082",
-  "background_color": "#0B0B0B",
+  "display_override": ["standalone", "fullscreen"],
+  "theme_color": "#0B0B0B",
+  "background_color": "#000000",
   "orientation": "any",
-  "categories": ["health", "lifestyle", "wellness", "productivity", "social"],
+  "categories": ["health", "lifestyle", "wellness", "productivity"],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
@@ -45,48 +75,32 @@
   "handle_links": "preferred",
   "shortcuts": [
     {
-      "name": "Apex Creator Console",
-      "short_name": "Mixer",
-      "url": "/creator-console",
-      "description": "QU-32 Hardware-Emulated Fader Banks — V29.1 Singularity Kernel",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Audit Treasury",
-      "short_name": "Treasury",
-      "url": "/creator-console?action=audit",
-      "description": "Zero-Point Ledger + Gamified Fan System",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "AR Wellness Portal",
-      "short_name": "AR Portal",
-      "url": "/ar-portal",
-      "description": "WebXR Geospatial Anchors — Black Hills Wellness Zones",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
-    },
-    {
       "name": "Sovereign Hub",
       "short_name": "Hub",
-      "url": "/",
-      "description": "Main Dashboard — Observatory Orrery & Wellness Metrics",
+      "url": "/sovereign-hub",
+      "description": "Main Navigation — 7 Pillar Wellness Grid",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
-    }
-  ],
-  "screenshots": [
+    },
     {
-      "src": "logo512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Apex Creator Console V29.1"
-    }
-  ],
-  "related_applications": [],
-  "protocol_handlers": [
+      "name": "Oracle & Divination",
+      "short_name": "Oracle",
+      "url": "/oracle",
+      "description": "Tarot, I Ching, Star Charts",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
     {
-      "protocol": "web+enlighten",
-      "url": "/handle?protocol=%s"
+      "name": "Breathwork",
+      "short_name": "Breathe",
+      "url": "/breathing",
+      "description": "Guided Breathwork Sessions",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Crystal Skins",
+      "short_name": "Crystals",
+      "url": "/crystal-skins",
+      "description": "Crystal Encryption Marketplace",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     }
   ]
 }

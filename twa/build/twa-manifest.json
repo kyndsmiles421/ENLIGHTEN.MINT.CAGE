@@ -1,0 +1,55 @@
+{
+  "packageId": "cafe.enlighten.mint",
+  "host": "zero-scale-physics.preview.emergentagent.com",
+  "name": "ENLIGHTEN.MINT.CAFE",
+  "launcherName": "Enlighten",
+  "display": "standalone",
+  "themeColor": "#0B0B0B",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#000000",
+  "enableNotifications": true,
+  "startUrl": "/sovereign-hub",
+  "iconUrl": "https://zero-scale-physics.preview.emergentagent.com/logo512.png",
+  "maskableIconUrl": "https://zero-scale-physics.preview.emergentagent.com/maskable_512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/app/twa/enlighten.keystore",
+    "alias": "enlighten-key"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [
+    {
+      "name": "Sovereign Hub",
+      "shortName": "Hub",
+      "url": "/sovereign-hub",
+      "chosenIconUrl": "https://zero-scale-physics.preview.emergentagent.com/logo192.png"
+    },
+    {
+      "name": "Oracle",
+      "shortName": "Oracle",
+      "url": "/oracle",
+      "chosenIconUrl": "https://zero-scale-physics.preview.emergentagent.com/logo192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://zero-scale-physics.preview.emergentagent.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://zero-scale-physics.preview.emergentagent.com/",
+  "minSdkVersion": 19,
+  "orientation": "default",
+  "fingerprints": [
+    {
+      "name": "assetlinks",
+      "value": "3E:3A:69:90:70:14:4B:6C:B9:11:23:AE:11:3C:4B:C7:6F:DF:0C:C5:E2:71:CF:36:B8:59:D2:3F:D7:85:77:E2"
+    }
+  ]
+}
