@@ -71,6 +71,7 @@ import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { MixerProvider } from './context/MixerContext';
+import { MixerProvider as SystemMixerProvider } from './components/UnifiedCreatorConsole';
 import { FocusProvider } from './context/FocusContext';
 import { ClassProvider } from './context/ClassContext';
 import { TreasuryProvider } from './context/TreasuryContext';
@@ -659,7 +660,9 @@ function App() {
           {/* <CosmicBackground /> */}
           <SplitScreenProvider>
           <RecursivePortal>
+          <SystemMixerProvider>
           <CafeApp />
+          </SystemMixerProvider>
           </RecursivePortal>
           </SplitScreenProvider>
           </VoiceCommandProvider>

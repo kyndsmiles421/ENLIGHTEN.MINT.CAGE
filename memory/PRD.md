@@ -1,41 +1,35 @@
-# ENLIGHTEN.MINT.CAFE — V32.1
-## Unified Creator Console + Marketplace + Tier-Gated Mixer
+# ENLIGHTEN.MINT.CAFE — V33.0
+## System-Wide Mixer — 2/3 Monitor + 1/3 Mixer + Orbital Sphere
 ## Last Verified: April 13, 2026
 
-### Creator Console Architecture
-- Top: Visual screen (waveform display when unlocked, otherwise status)
-- Bottom: Mixer board with 7 pillar master faders, expandable module strips, metrics
-- 58 total module channels across 7 pillars
-- Each module = a fader strip. Tap label to navigate to module. Slide to control.
-- Mute/Solo per channel. Master fader controls overall level.
+### Layout
+- Top 2/3 (66.66vh): Module content (Breathing, Oracle, Soundscapes, etc.)
+- Bottom 1/3 (33.34vh): System-wide mixer strip
+- Collapsible: tap chevron to shrink to 36px thin bar
+- Hideable: tap X to fully hide, tap fader icon to restore
+- Rendered via React Portal to escape #app-stage CSS constraints
 
-### Tier-Gated Features
-- BASE (free): 7 pillar master faders + quick launch grid
-- SEED (discovery): + Individual module strips per pillar + metrics
-- ARTISAN (resonance): + Effects routing (Reverb, Delay, Harmonic, Sidechain) + Waveform
-- SOVEREIGN (top): All features unlocked
+### Mixer Modes
+- STRIP: 7 pillar horizontal faders + expandable module channels + M/S buttons
+- ORBITAL: Golden-ratio (φ=1.618) spiral sphere with 7 pillar nodes orbiting central phi core
+  - Node sizes = pillar intensity levels
+  - Connection opacity = engagement level
+  - Fibonacci orbital radii (34, 55, 89)
+  - Golden angle (137.5°) rotation animation
 
-### Marketplace (À La Carte)
-Backend: /api/marketplace/mixer-store, /api/marketplace/mixer-unlocks, /api/marketplace/buy-item
-15 purchasable items:
-- 7 Channel Packs (one per pillar, 45-75 credits each)
-- 4 Effects (Reverb, Delay, Harmonic, Sidechain, 30-40 credits)
-- 3 Visuals (Waveform 40c, GPU Shader 100c, SuperStrip 80c)
-- 1 Full Unlock Bundle (400 credits)
+### Sacred Math (mirrors master_transmuter.py)
+- PHI = 1.618033988749895
+- GOLDEN_ANGLE = π(3-√5) ≈ 137.5°
+- FIB = [1,1,2,3,5,8,13,21,34,55,89,144]
+- SOLFEGGIO = [174,285,396,417,528,639,741,852,963]
+- Pillar Hz assignments: Practice=528, Divination=963, Sanctuary=432, Nourish=639, Explore=741, Sage=852, Council=396
 
-### Upsell Integration
-- Every module page has a gold "Mix" button → navigates to Creator Console
-- Store accessible from console header (cart icon) and Tier section
-- Locked channel strips show "Unlock" button → opens store
-
-### Economy
-- Dust accrual on 63+ pages. Credits earned via transmuter.
-- Purchases deduct credits, unlock mixer features permanently.
-
-### PWA
-- Package: cafe.enlighten.mint | AAB: https://www.pwabuilder.com
+### Tier-Gated Features + Marketplace
+- 15 purchasable mixer items via /api/marketplace/mixer-store
+- Individual channel packs, effects, visuals, full unlock bundle
+- Credits-based economy connected to Transmuter
 
 ### Backlog
-- Google Play Console verification → upload AAB
+- Google Play Console → upload AAB
 - Sovereign "Live" Sessions (P2)
 - Phygital NFC expansion (P2)

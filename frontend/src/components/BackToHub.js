@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, ChevronUp, Sliders } from 'lucide-react';
+import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const RELATED = {
@@ -249,7 +249,7 @@ export default function BackToHub() {
 
   return (
     <>
-      {/* Back + Related + Mixer upsell */}
+      {/* Back + Related */}
       <div className="fixed top-3 left-3 z-50 flex items-center gap-1.5" data-testid="nav-controls">
         <button
           onClick={() => navigate('/sovereign-hub')}
@@ -282,24 +282,6 @@ export default function BackToHub() {
               <ChevronUp size={13} />
             </motion.div>
             <span className="text-[10px]">Related</span>
-          </button>
-        )}
-
-        {/* Mixer upsell — on every module page except the console itself */}
-        {!isCreatorPage && (
-          <button
-            onClick={() => navigate('/creator-console')}
-            className="flex items-center gap-1 px-2 py-2 rounded-xl transition-all active:scale-95"
-            style={{
-              background: 'rgba(0,0,0,0.7)',
-              border: '1px solid rgba(234,179,8,0.12)',
-              color: 'rgba(234,179,8,0.5)',
-              backdropFilter: 'blur(12px)',
-            }}
-            data-testid="mixer-upsell"
-          >
-            <Sliders size={11} />
-            <span className="text-[9px]">Mix</span>
           </button>
         )}
       </div>
