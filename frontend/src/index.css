@@ -5012,10 +5012,7 @@ div[style*="#0f0"]:not(#master-umbrella *),
   z-index: 999999 !important;
 }
 
-/* Bottom padding for sovereign mixer nav bar */
-body {
-  padding-bottom: var(--mixer-nav-height, 44px) !important;
-}
+/* Sovereign mixer handles its own layout via flexbox — no body padding needed */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LOGIN CONTAINER

@@ -1,27 +1,29 @@
 /**
- * V37.0 SOVEREIGN MIXER — ONE COHESIVE ORGANISM
+ * V38.0 SOVEREIGN MIXER — SAME PLANE ARCHITECTURE
  * 
- * Full-screen content. Thin bottom nav. Slide-up tool panels.
- * The mixer IS the app. The app IS the mixer.
- * Inspired by: Allen & Heath Qu-32 + CapCut/CyberLink
+ * Zero floating buttons. Zero overlays. Zero z-index.
+ * Everything is a sibling in a flex column:
+ *   [content]  ← flex: 1, scrollable
+ *   [panel]    ← slides open when tab tapped
+ *   [nav bar]  ← 44px, always at bottom
+ * 
+ * One plane. One organism. Pulled up as needed.
  */
 
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
-import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
-  ChevronDown, ChevronUp, Lock, Sliders, ShoppingCart,
-  Home, X, Check, Globe, BarChart3, ArrowLeft,
-  Video, Mic, Music, Type, Layers, Wand2,
-  Sparkles, Download, Share2, Maximize2, Minimize2
+  ChevronUp, Lock, Sliders, ShoppingCart,
+  X, Check, Globe, ArrowLeft,
+  Video, Music, Type, Layers, Wand2,
+  Sparkles, Download, Maximize2, Minimize2
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
-const PHI = 1.618033988749895;
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
 const PILLARS = [
@@ -119,17 +121,14 @@ function useMediaControls() {
       recorder.onstop = () => {
         stream.getTracks().forEach(t => t.stop());
         const blob = new Blob(chunksRef.current, { type: type === 'audio' ? 'audio/webm' : 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url;
-        a.download = `enlighten_${type}_${Date.now()}.webm`; a.click();
+        const url = URL.createObjectURL(blob); const a = document.createElement('a');
+        a.href = url; a.download = `enlighten_${type}_${Date.now()}.webm`; a.click();
         URL.revokeObjectURL(url);
         toast.success(`${type} saved (${(blob.size / 1024).toFixed(0)}KB)`);
         setRecVideo(false); setRecAudio(false); setRecScreen(false);
       };
       recorderRef.current = recorder; recorder.start(1000);
-      if (type === 'video') setRecVideo(true);
-      else if (type === 'audio') setRecAudio(true);
-      else setRecScreen(true);
+      if (type === 'video') setRecVideo(true); else if (type === 'audio') setRecAudio(true); else setRecScreen(true);
       toast.success(`${type} recording started`);
     } catch (e) { toast.error(`Permission denied: ${e.message}`); }
   }, [stopAll]);
@@ -142,42 +141,16 @@ function findModule(route) {
   return null;
 }
 
-// ═══ STORE PANEL ═══
-function StorePanel({ items, credits, onBuy, onClose }) {
-  return (
-    <div id="mixer-store-overlay" style={{ position: 'fixed', inset: 0, zIndex: 2147483647, background: '#060610' }}>
-      <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(139,92,246,0.15)' }}>
-        <div><div className="text-sm font-bold text-white/90">Mixer Store</div><div className="text-[10px] text-white/40">{credits} Credits</div></div>
-        <button onClick={onClose} className="p-2 rounded-lg active:scale-90" style={{ background: 'rgba(255,255,255,0.05)' }}><X size={16} className="text-white/60" /></button>
-      </div>
-      <div style={{ height: 'calc(100vh - 52px)', overflowY: 'auto', padding: '12px' }}>
-        {[{ key: 'mixer', label: 'Channel Packs' }, { key: 'mixer_fx', label: 'Effects' }, { key: 'mixer_visual', label: 'Visuals' }, { key: 'mixer_bundle', label: 'Bundles' }].map(cat => {
-          const ci = items.filter(i => i.category === cat.key);
-          if (!ci.length) return null;
-          return (<div key={cat.key} className="mb-4">
-            <div className="text-[9px] text-white/30 uppercase tracking-wider mb-2">{cat.label}</div>
-            {ci.map(item => (
-              <div key={item.id} className="flex items-center gap-3 p-3 rounded-xl mb-1.5" style={{ background: item.owned ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${item.owned ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.05)'}` }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${item.color}12` }}>{item.owned ? <Check size={12} style={{ color: '#22C55E' }} /> : <Lock size={10} style={{ color: item.color }} />}</div>
-                <div className="flex-1 min-w-0"><div className="text-[11px] font-medium text-white/80">{item.name}</div><div className="text-[9px] text-white/30 truncate">{item.description}</div></div>
-                {item.owned ? <span className="text-[8px] text-green-400/50">OWNED</span> : <button onClick={() => onBuy(item.id)} className="px-2.5 py-1 rounded-lg text-[9px] font-bold active:scale-95" style={{ background: `${item.color}12`, border: `1px solid ${item.color}25`, color: item.color }}>{item.price_credits}c</button>}
-              </div>
-            ))}
-          </div>);
-        })}
-      </div>
-    </div>
-  );
-}
-
 // ═══════════════════════════════════════════════════════════════
-// MAIN MIXER PROVIDER — ONE COHESIVE ORGANISM
-// Full-screen content + thin bottom nav + slide-up tool panels
+// MIXER PROVIDER — SAME PLANE, NO PORTALS, NO FLOATING
+// Flex column: [content | panel | nav]
 // ═══════════════════════════════════════════════════════════════
 
 export function MixerProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const media = useMediaControls();
+
   const [tier, setTier] = useState('SEED');
   const [unlocks, setUnlocks] = useState({ unlocked_pillars: [], unlocked_fx: [], has_full_unlock: false });
   const [pillarLevels, setPillarLevels] = useState(PILLARS.map(() => 75));
@@ -189,11 +162,9 @@ export function MixerProvider({ children }) {
   const [credits, setCredits] = useState(0);
   const [viewMode, setViewMode] = useState('strip');
   const [mutedModules, setMutedModules] = useState(new Set());
-  const media = useMediaControls();
 
-  // Unified organism state
-  const [activePanel, setActivePanel] = useState(null); // null = closed, 'mix'/'record'/'effects'/etc
-  const [isFullscreen, setIsFullscreen] = useState(false); // hides even the nav bar
+  const [activePanel, setActivePanel] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [monitorFilters, setMonitorFilters] = useState({ ...DEFAULT_FILTERS });
   const [textOverlays, setTextOverlays] = useState([]);
   const [imageOverlays, setImageOverlays] = useState([]);
@@ -201,8 +172,8 @@ export function MixerProvider({ children }) {
   const textInputRef = useRef(null);
 
   const hideMixer = ['/', '/sovereign-hub', '/landing', '/auth', '/intro'].includes(location.pathname);
+  const showMixer = !hideMixer && !isFullscreen;
 
-  // Toggle panel: tap same tab = close, tap different = switch
   const togglePanel = useCallback((key) => {
     setActivePanel(prev => prev === key ? null : key);
   }, []);
@@ -222,7 +193,6 @@ export function MixerProvider({ children }) {
     axios.get(`${API}/marketplace/mixer-unlocks`, { headers: h }).then(({ data }) => setUnlocks(data)).catch(() => {});
   }, []);
 
-  // Mute/unmute controls dust accrual
   useEffect(() => {
     window.__mixerMuted = mutedModules;
     const origAccrue = window.__workAccrueOriginal || window.__workAccrue;
@@ -233,7 +203,7 @@ export function MixerProvider({ children }) {
     };
   }, [mutedModules]);
 
-  // REAL: Apply CSS filters to monitor viewport
+  // REAL: CSS filters on content
   useEffect(() => {
     const stage = document.getElementById('app-stage');
     if (!stage) return;
@@ -245,18 +215,24 @@ export function MixerProvider({ children }) {
     stage.style.transition = 'filter 0.3s ease';
   }, [monitorFilters]);
 
-  // REAL: Master volume controls all media elements on page
+  // REAL: Master volume
   useEffect(() => {
     const vol = masterLevel / 100;
     document.querySelectorAll('audio, video').forEach(el => { el.volume = Math.min(1, Math.max(0, vol)); });
   }, [masterLevel]);
 
+  // Force #app-stage to NOT have minHeight: 100vh when mixer is inline
+  useEffect(() => {
+    const stage = document.getElementById('app-stage');
+    if (stage) {
+      stage.style.minHeight = showMixer ? '0' : '';
+      stage.style.flex = showMixer ? '1' : '';
+      stage.style.overflow = showMixer ? 'auto' : '';
+    }
+  }, [showMixer]);
+
   const handleMuteChange = useCallback((modId, muted) => {
-    setMutedModules(prev => {
-      const next = new Set(prev);
-      if (muted) next.add(modId); else next.delete(modId);
-      return next;
-    });
+    setMutedModules(prev => { const next = new Set(prev); if (muted) next.add(modId); else next.delete(modId); return next; });
   }, []);
 
   const loadStore = useCallback(() => {
@@ -268,41 +244,29 @@ export function MixerProvider({ children }) {
   const handleBuy = useCallback(async (itemId) => {
     try {
       const { data } = await axios.post(`${API}/marketplace/buy-item`, { item_id: itemId }, { headers: getHeaders() });
-      toast.success(`Purchased ${data.item.name}`);
-      setCredits(data.credits_remaining);
+      toast.success(`Purchased ${data.item.name}`); setCredits(data.credits_remaining);
       setStoreItems(prev => prev.map(i => i.id === itemId ? { ...i, owned: true } : i));
       const { data: u } = await axios.get(`${API}/marketplace/mixer-unlocks`, { headers: getHeaders() });
       setUnlocks(u);
     } catch (e) { toast.error(e.response?.data?.detail || 'Purchase failed'); }
   }, []);
 
-  // Navigate via mixer = the mixer IS the navigation
   const handleNav = useCallback((route) => {
-    setExpandedPillar(null);
-    setActivePanel(null);
-    navigate(route);
+    setExpandedPillar(null); setActivePanel(null); navigate(route);
   }, [navigate]);
 
-  // Set CSS variable for content padding
-  useEffect(() => {
-    const navHeight = hideMixer || isFullscreen ? '0px' : '44px';
-    document.documentElement.style.setProperty('--mixer-nav-height', navHeight);
-    document.documentElement.style.setProperty('--mixer-height', hideMixer || isFullscreen ? '0px' : activePanel ? '40vh' : '0px');
-    document.documentElement.style.setProperty('--monitor-height', '100vh');
-  }, [hideMixer, isFullscreen, activePanel]);
+  const current = findModule(location.pathname);
 
   const ctx = {
     tier, unlocks, pillarLevels, masterLevel, modStates, viewMode, setViewMode,
     loadStore, handleNav, mutedModules, activePanel, setActivePanel: togglePanel,
     isFullscreen, setIsFullscreen, monitorFilters, setMonitorFilters,
     textOverlays, setTextOverlays, imageOverlays, setImageOverlays,
-    selectedAspectRatio, setSelectedAspectRatio, mixerState: activePanel ? 'expanded' : 'collapsed',
-    setMixerState: () => {},
+    selectedAspectRatio, setSelectedAspectRatio,
+    mixerState: activePanel ? 'expanded' : 'collapsed', setMixerState: () => {},
   };
 
-  const current = findModule(location.pathname);
-
-  // ═══ PANEL CONTENT RENDERERS ═══
+  // ═══ PANEL CONTENT ═══
 
   const renderMixPanel = () => (
     <div style={{ background: '#080812' }}>
@@ -320,21 +284,18 @@ export function MixerProvider({ children }) {
         </div>
       </div>
       <div className="flex gap-0.5 px-2 py-1.5 items-end">
-        {PILLARS.map((p, i) => {
-          const isActive = current?.pillar.key === p.key;
-          return (
-            <div key={p.key} className="flex-1 min-w-0 flex flex-col items-center">
-              <div className="text-[6px] font-mono" style={{ color: p.color + (isActive ? 'FF' : '66') }}>{pillarLevels[i]}</div>
-              <input type="range" min="0" max="100" value={pillarLevels[i]}
-                onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[i] = Number(e.target.value); return n; })}
-                className="w-full h-1.5 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
-              <button onClick={() => setExpandedPillar(expandedPillar === i ? null : i)}
-                className="text-[7px] font-bold uppercase active:scale-90 mt-0.5"
-                style={{ color: expandedPillar === i ? p.color : isActive ? p.color + 'CC' : p.color + '55' }}
-                data-testid={`pillar-fader-${p.key}`}>{p.title}</button>
-            </div>
-          );
-        })}
+        {PILLARS.map((p, i) => (
+          <div key={p.key} className="flex-1 min-w-0 flex flex-col items-center">
+            <div className="text-[6px] font-mono" style={{ color: p.color + (current?.pillar.key === p.key ? 'FF' : '66') }}>{pillarLevels[i]}</div>
+            <input type="range" min="0" max="100" value={pillarLevels[i]}
+              onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[i] = Number(e.target.value); return n; })}
+              className="w-full h-1.5 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
+            <button onClick={() => setExpandedPillar(expandedPillar === i ? null : i)}
+              className="text-[7px] font-bold uppercase active:scale-90 mt-0.5"
+              style={{ color: expandedPillar === i ? p.color : current?.pillar.key === p.key ? p.color + 'CC' : p.color + '55' }}
+              data-testid={`pillar-fader-${p.key}`}>{p.title}</button>
+          </div>
+        ))}
       </div>
       <AnimatePresence>
         {expandedPillar !== null && (() => {
@@ -408,10 +369,7 @@ export function MixerProvider({ children }) {
           className="p-2.5 rounded-xl text-left active:scale-95"
           style={{ background: media.isRecAudio ? 'rgba(239,68,68,0.08)' : 'rgba(255,255,255,0.02)', border: `1px solid ${media.isRecAudio ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)'}` }}
           data-testid="audio-record-voice">
-          <div className="flex items-center gap-1.5">
-            {media.isRecAudio && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
-            <div className="text-[10px] font-medium" style={{ color: media.isRecAudio ? '#EF4444' : 'rgba(255,255,255,0.6)' }}>{media.isRecAudio ? 'Stop' : 'Record Voice'}</div>
-          </div>
+          <div className="text-[10px] font-medium" style={{ color: media.isRecAudio ? '#EF4444' : 'rgba(255,255,255,0.6)' }}>{media.isRecAudio ? 'Stop Recording' : 'Record Voice'}</div>
         </button>
         <button onClick={() => document.getElementById('audio-import')?.click()}
           className="p-2.5 rounded-xl text-left active:scale-95" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
@@ -597,116 +555,131 @@ export function MixerProvider({ children }) {
     ai: renderAIPanel, export: renderExportPanel,
   };
 
+  // ═══ STORE (full-page takeover, same plane) ═══
+  if (showStore) {
+    return (
+      <MixerContext.Provider value={ctx}>
+        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#060610' }}>
+          <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(139,92,246,0.15)' }}>
+            <div><div className="text-sm font-bold text-white/90">Mixer Store</div><div className="text-[10px] text-white/40">{credits} Credits</div></div>
+            <button onClick={() => setShowStore(false)} className="p-2 rounded-lg active:scale-90" style={{ background: 'rgba(255,255,255,0.05)' }}><X size={16} className="text-white/60" /></button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+            {[{ key: 'mixer', label: 'Channel Packs' }, { key: 'mixer_fx', label: 'Effects' }, { key: 'mixer_visual', label: 'Visuals' }, { key: 'mixer_bundle', label: 'Bundles' }].map(cat => {
+              const ci = storeItems.filter(i => i.category === cat.key);
+              if (!ci.length) return null;
+              return (<div key={cat.key} className="mb-4">
+                <div className="text-[9px] text-white/30 uppercase tracking-wider mb-2">{cat.label}</div>
+                {ci.map(item => (
+                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-xl mb-1.5" style={{ background: item.owned ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${item.owned ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.05)'}` }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${item.color}12` }}>{item.owned ? <Check size={12} style={{ color: '#22C55E' }} /> : <Lock size={10} style={{ color: item.color }} />}</div>
+                    <div className="flex-1 min-w-0"><div className="text-[11px] font-medium text-white/80">{item.name}</div><div className="text-[9px] text-white/30 truncate">{item.description}</div></div>
+                    {item.owned ? <span className="text-[8px] text-green-400/50">OWNED</span> : <button onClick={() => handleBuy(item.id)} className="px-2.5 py-1 rounded-lg text-[9px] font-bold active:scale-95" style={{ background: `${item.color}12`, border: `1px solid ${item.color}25`, color: item.color }}>{item.price_credits}c</button>}
+                  </div>
+                ))}
+              </div>);
+            })}
+          </div>
+        </div>
+      </MixerContext.Provider>
+    );
+  }
+
+  // ═══ THE ORGANISM: SAME PLANE FLEX COLUMN ═══
   return (
     <MixerContext.Provider value={ctx}>
-      {children}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#000' }} data-testid="sovereign-organism">
+        {/* CONTENT — fills available space, scrollable */}
+        <div style={{ flex: 1, overflow: 'auto', position: 'relative' }} data-testid="content-area">
+          {children}
 
-      {createPortal(
-        <>
-          {/* TEXT OVERLAYS on screen */}
+          {/* Text overlays — positioned within content area, not floating */}
           {textOverlays.map(overlay => (
-            <div key={overlay.id} data-sovereign-mixer="true"
-              style={{ position: 'fixed', left: `${overlay.x}%`, top: `${overlay.y}%`, zIndex: 9990, color: '#fff', ...overlay.style, cursor: 'grab', textShadow: '0 2px 12px rgba(0,0,0,0.9)', userSelect: 'none', pointerEvents: 'auto', maxWidth: '80vw' }}
+            <div key={overlay.id}
+              style={{ position: 'absolute', left: `${overlay.x}%`, top: `${overlay.y}%`, color: '#fff', ...overlay.style, textShadow: '0 2px 12px rgba(0,0,0,0.9)', userSelect: 'none', maxWidth: '80%', pointerEvents: 'auto' }}
               data-testid={`text-overlay-${overlay.id}`}>
               {overlay.text}
               <button onClick={() => setTextOverlays(prev => prev.filter(t => t.id !== overlay.id))}
-                style={{ position: 'absolute', top: -10, right: -10, background: 'rgba(239,68,68,0.9)', borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: '#fff', fontSize: '10px', cursor: 'pointer' }}>x</button>
+                className="ml-2 text-[8px] text-red-400/70 align-top">x</button>
             </div>
           ))}
 
-          {/* IMAGE OVERLAYS on screen */}
+          {/* Image overlays — positioned within content area */}
           {imageOverlays.filter(o => !o.isFrame).map(overlay => (
-            <div key={overlay.id} data-sovereign-mixer="true"
-              style={{ position: 'fixed', left: `${overlay.x}%`, top: `${overlay.y}%`, zIndex: 9989, cursor: 'grab', userSelect: 'none', pointerEvents: 'auto' }}
+            <div key={overlay.id}
+              style={{ position: 'absolute', left: `${overlay.x}%`, top: `${overlay.y}%`, pointerEvents: 'auto' }}
               data-testid={`img-overlay-${overlay.id}`}>
-              <img src={overlay.url} alt="overlay" style={{ width: overlay.width, opacity: overlay.opacity, borderRadius: '4px', pointerEvents: 'none' }} />
+              <img src={overlay.url} alt="overlay" style={{ width: overlay.width, opacity: overlay.opacity, borderRadius: '4px' }} />
               <button onClick={() => { URL.revokeObjectURL(overlay.url); setImageOverlays(prev => prev.filter(i => i.id !== overlay.id)); }}
-                style={{ position: 'absolute', top: -8, right: -8, background: 'rgba(239,68,68,0.9)', borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: '#fff', fontSize: '10px', cursor: 'pointer' }}>x</button>
+                className="ml-1 text-[8px] text-red-400/70 align-top">x</button>
             </div>
           ))}
+        </div>
 
-          {/* FRAME OVERLAYS */}
-          {imageOverlays.filter(o => o.isFrame).map(overlay => (
-            <div key={overlay.id} data-sovereign-mixer="true"
-              style={{ position: 'fixed', inset: 0, zIndex: 9988, pointerEvents: 'none', border: '4px solid rgba(192,132,252,0.3)', borderRadius: '8px', boxShadow: 'inset 0 0 40px rgba(139,92,246,0.08)' }}
-              data-testid={`frame-overlay-${overlay.id}`} />
-          ))}
-
-          {/* ═══ THE ORGANISM: Bottom Nav + Slide-Up Panel ═══ */}
-          {!hideMixer && !isFullscreen && (
-            <div data-testid="sovereign-mixer" data-sovereign-mixer="true"
-              style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999, pointerEvents: 'auto' }}>
-
-              {/* SLIDE-UP TOOL PANEL */}
-              <AnimatePresence>
-                {activePanel && (
-                  <motion.div
-                    key="panel"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    style={{ background: '#080812', borderTop: '1px solid rgba(139,92,246,0.15)', maxHeight: '45vh', overflowY: 'auto', overflowX: 'hidden' }}
-                    data-testid="tool-panel">
-                    {/* Panel grab handle */}
-                    <div className="flex justify-center py-1.5" onClick={() => setActivePanel(null)} style={{ cursor: 'pointer' }}>
-                      <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }} />
-                    </div>
-                    {PANEL_RENDERERS[activePanel]?.()}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* BOTTOM NAV BAR — Always visible, 44px */}
-              <div data-testid="mixer-nav" data-sovereign-mixer="true"
-                style={{ height: 44, background: '#060610', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 4, paddingRight: 4 }}>
-                {TOOL_TABS.map(tab => (
-                  <button key={tab.key} onClick={() => togglePanel(tab.key)}
-                    className="flex-1 flex flex-col items-center justify-center active:scale-95 transition-all"
-                    style={{ color: activePanel === tab.key ? tab.color : 'rgba(255,255,255,0.2)', height: '100%' }}
-                    data-testid={`tab-${tab.key}`}>
-                    <tab.icon size={14} />
-                    <span className="text-[6px] font-bold mt-0.5 uppercase">{tab.label}</span>
-                    {/* Active indicator dot */}
-                    {activePanel === tab.key && <div style={{ width: 3, height: 3, borderRadius: '50%', background: tab.color, marginTop: 1 }} />}
-                  </button>
-                ))}
-                {/* Recording indicator in nav */}
-                {media.isRecording && (
-                  <div style={{ position: 'absolute', top: 4, right: 8, width: 6, height: 6, borderRadius: '50%', background: '#EF4444', animation: 'pulse 1s infinite' }} />
-                )}
-                {/* Fullscreen toggle */}
-                <button onClick={() => setIsFullscreen(true)}
-                  className="flex flex-col items-center justify-center px-1 active:scale-95"
-                  style={{ color: 'rgba(255,255,255,0.12)', height: '100%' }} data-testid="go-fullscreen">
-                  <Maximize2 size={12} />
-                  <span className="text-[5px] mt-0.5">Full</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* FULLSCREEN EXIT BUTTON — tiny, corner */}
-          {!hideMixer && isFullscreen && (
-            <button data-sovereign-mixer="true" onClick={() => setIsFullscreen(false)}
-              style={{ position: 'fixed', bottom: 8, right: 8, zIndex: 9999, background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '8px', padding: '4px 8px', pointerEvents: 'auto' }}
-              className="active:scale-95" data-testid="exit-fullscreen">
-              <Minimize2 size={12} className="text-purple-400/50" />
-            </button>
-          )}
-
-          {/* STORE */}
+        {/* TOOL PANEL — slides open between content and nav, same plane */}
+        {showMixer && (
           <AnimatePresence>
-            {showStore && <StorePanel items={storeItems} credits={credits} onBuy={handleBuy} onClose={() => setShowStore(false)} />}
+            {activePanel && (
+              <motion.div
+                key="panel"
+                initial={{ height: 0 }}
+                animate={{ height: 'auto' }}
+                exit={{ height: 0 }}
+                transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+                style={{ overflow: 'hidden', background: '#080812', borderTop: '1px solid rgba(139,92,246,0.15)', maxHeight: '45vh' }}
+                data-testid="tool-panel">
+                <div style={{ overflowY: 'auto', maxHeight: '45vh' }}>
+                  <div className="flex justify-center py-1" onClick={() => setActivePanel(null)} style={{ cursor: 'pointer' }}>
+                    <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }} />
+                  </div>
+                  {PANEL_RENDERERS[activePanel]?.()}
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
-        </>,
-        document.body
-      )}
+        )}
+
+        {/* NAV BAR — bottom of flex, same plane as content */}
+        {showMixer && (
+          <div data-testid="mixer-nav"
+            style={{ height: 44, minHeight: 44, background: '#060610', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center' }}>
+            {TOOL_TABS.map(tab => (
+              <button key={tab.key} onClick={() => togglePanel(tab.key)}
+                className="flex-1 flex flex-col items-center justify-center active:scale-95 transition-all"
+                style={{ color: activePanel === tab.key ? tab.color : 'rgba(255,255,255,0.2)', height: '100%' }}
+                data-testid={`tab-${tab.key}`}>
+                <tab.icon size={14} />
+                <span className="text-[6px] font-bold mt-0.5 uppercase">{tab.label}</span>
+                {activePanel === tab.key && <div style={{ width: 3, height: 3, borderRadius: '50%', background: tab.color, marginTop: 1 }} />}
+              </button>
+            ))}
+            {/* Inline recording indicator — not floating */}
+            {media.isRecording && (
+              <div className="flex items-center px-2">
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444' }} className="animate-pulse" />
+              </div>
+            )}
+            {/* Fullscreen toggle — inline, not floating */}
+            <button onClick={() => setIsFullscreen(true)}
+              className="flex flex-col items-center justify-center px-2 active:scale-95"
+              style={{ color: 'rgba(255,255,255,0.12)', height: '100%' }} data-testid="go-fullscreen">
+              <Maximize2 size={12} />
+            </button>
+          </div>
+        )}
+
+        {/* Fullscreen exit — inline thin strip at bottom, not floating */}
+        {!hideMixer && isFullscreen && (
+          <div onClick={() => setIsFullscreen(false)}
+            style={{ height: 8, background: 'rgba(139,92,246,0.08)', cursor: 'pointer' }}
+            data-testid="exit-fullscreen" />
+        )}
+      </div>
     </MixerContext.Provider>
   );
 }
 
-// Creator Console standalone page
+// Creator Console page
 export default function UnifiedCreatorConsole({ onClose }) {
   const navigate = useNavigate();
   const mixer = useMixer();
@@ -714,18 +687,13 @@ export default function UnifiedCreatorConsole({ onClose }) {
     <div className="min-h-screen p-4" style={{ background: '#000' }}>
       <button onClick={() => onClose ? onClose() : navigate('/sovereign-hub')} className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl active:scale-95" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.5)' }} data-testid="creator-exit"><ArrowLeft size={14} /><span className="text-xs">Hub</span></button>
       <h1 className="text-lg font-bold text-white/80 mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Creator Console</h1>
-      <p className="text-[10px] text-white/25 mb-4">Tap any tool tab below to open the production panel. Use Mix to navigate modules. FX to apply live filters. Text/Layer for overlays. Rec to capture your screen.</p>
+      <p className="text-[10px] text-white/25 mb-4">Tap any tool tab below. Everything on the same plane — pulled up as needed.</p>
       <div className="grid grid-cols-4 gap-2 mb-4">
         {[{ l: 'Channels', v: TOTAL, c: '#C084FC' }, { l: 'Tier', v: mixer?.tier || '-', c: '#8B5CF6' }, { l: 'Master', v: mixer?.masterLevel || 80, c: '#F8FAFC' }, { l: 'Muted', v: mixer?.mutedModules?.size || 0, c: '#EF4444' }].map(m => (
           <div key={m.l} className="p-2 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}><div className="text-sm font-mono font-bold" style={{ color: m.c }}>{m.v}</div><div className="text-[6px] text-white/25 uppercase">{m.l}</div></div>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <button onClick={() => mixer?.loadStore?.()} className="flex items-center gap-2 px-4 py-2 rounded-xl active:scale-95 justify-center" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)', color: '#EAB308' }} data-testid="store-btn"><ShoppingCart size={14} />Store</button>
-        <button onClick={() => mixer?.setViewMode?.(mixer.viewMode === 'strip' ? 'orbital' : 'strip')} className="flex items-center gap-2 px-4 py-2 rounded-xl active:scale-95 justify-center" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', color: '#8B5CF6' }} data-testid="view-toggle">
-          <Globe size={14} />{mixer?.viewMode === 'strip' ? 'Orbital' : 'Strip'}
-        </button>
-      </div>
+      <button onClick={() => mixer?.loadStore?.()} className="flex items-center gap-2 px-4 py-2 rounded-xl active:scale-95 w-full justify-center" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)', color: '#EAB308' }} data-testid="store-btn"><ShoppingCart size={14} />Store</button>
     </div>
   );
 }
