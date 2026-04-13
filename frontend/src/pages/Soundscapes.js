@@ -230,17 +230,17 @@ export default function Soundscapes() {
   };
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen px-5 py-8" style={{ background: '#000' }}>
+      <div className="max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: '#93C5FD' }}>Soundscapes</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-4xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC' }}>
             Ambient Worlds
           </h1>
-          <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-sm mb-4" style={{ color: 'rgba(248,250,252,0.5)' }}>
             Mix your perfect soundscape. Layer sounds to create your unique sanctuary.
           </p>
-          <p className="text-xs mb-12 flex items-center gap-2" style={{ color: activeSounds.length > 0 ? '#2DD4BF' : 'var(--text-muted)' }}>
+          <p className="text-xs mb-8 flex items-center gap-2" style={{ color: activeSounds.length > 0 ? '#2DD4BF' : 'rgba(248,250,252,0.3)' }}>
             {activeSounds.length > 0 ? <Volume2 size={14} /> : <VolumeX size={14} />}
             {activeSounds.length > 0
               ? `${activeSounds.length} sound${activeSounds.length > 1 ? 's' : ''} playing`
@@ -250,21 +250,18 @@ export default function Soundscapes() {
 
         {/* Saved Mixes */}
         {savedMixes.length > 0 && (
-          <div className="mb-10">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Your Saved Mixes</p>
-            <div className="flex gap-3 flex-wrap">
+          <div className="mb-8">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>Your Saved Mixes</p>
+            <div className="flex gap-2 flex-wrap">
               {savedMixes.map((mix) => {
                 const soundNames = Object.keys(mix.volumes).map(id => SOUNDS.find(s => s.id === id)?.name).filter(Boolean);
                 return (
-                  <div key={mix.id} className="glass-card p-4 group flex items-center gap-3" data-testid={`saved-mix-${mix.id}`}>
-                    <button onClick={() => loadMix(mix)} className="text-left" data-testid={`load-mix-${mix.id}`}>
-                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{mix.name}</p>
-                      <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{soundNames.join(', ')}</p>
+                  <div key={mix.id} className="group flex items-center gap-2 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <button onClick={() => loadMix(mix)} className="text-left">
+                      <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{mix.name}</p>
+                      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{soundNames.join(', ')}</p>
                     </button>
-                    <button onClick={() => deleteMix(mix.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                      data-testid={`delete-mix-${mix.id}`}>
-                      <Trash2 size={13} style={{ color: 'var(--text-muted)' }} />
-                    </button>
+                    <button onClick={() => deleteMix(mix.id)} className="opacity-0 group-hover:opacity-100 p-1"><Trash2 size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
                   </div>
                 );
               })}
@@ -272,63 +269,45 @@ export default function Soundscapes() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-3">
           {SOUNDS.map((sound, i) => {
             const vol = volumes[sound.id];
             const isActive = vol > 0;
             return (
               <motion.div
                 key={sound.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
-                className="glass-card p-6"
+                transition={{ delay: i * 0.04 }}
+                className="p-4 rounded-xl"
                 style={{
-                  borderColor: isActive ? `${sound.color}30` : 'rgba(255,255,255,0.08)',
-                  boxShadow: isActive ? `0 0 40px ${sound.color}10` : 'none',
-                  transition: 'border-color 0.5s, box-shadow 0.5s',
+                  background: isActive ? `${sound.color}08` : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${isActive ? `${sound.color}25` : 'rgba(255,255,255,0.06)'}`,
                 }}
                 data-testid={`soundscape-${sound.id}`}
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-base font-medium mb-1" style={{ color: isActive ? sound.color : 'var(--text-primary)' }}>
-                      {sound.name}
-                    </h3>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{sound.desc}</p>
+                    <h3 className="text-sm font-medium" style={{ color: isActive ? sound.color : '#F8FAFC' }}>{sound.name}</h3>
+                    <p className="text-[11px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{sound.desc}</p>
                   </div>
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{
-                      background: isActive ? `${sound.color}20` : 'rgba(255,255,255,0.04)',
-                      transition: 'background 0.3s',
-                    }}
-                  >
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{
-                        background: sound.color,
-                        opacity: isActive ? 0.8 : 0.2,
-                        transition: 'opacity 0.3s',
-                        boxShadow: isActive ? `0 0 12px ${sound.color}60` : 'none',
-                      }}
-                    />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: isActive ? `${sound.color}15` : 'rgba(255,255,255,0.03)' }}>
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: sound.color, opacity: isActive ? 0.9 : 0.2, boxShadow: isActive ? `0 0 10px ${sound.color}60` : 'none' }} />
                   </div>
                 </div>
-                <div className="mt-4">
-                  <Slider
-                    defaultValue={[0]}
-                    value={[vol]}
-                    max={100}
-                    step={1}
-                    onValueChange={([v]) => setVolumes(prev => ({ ...prev, [sound.id]: v }))}
-                    className="w-full"
-                    data-testid={`slider-${sound.id}`}
-                  />
-                  <div className="flex justify-between mt-2">
-                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>0%</span>
-                    <span className="text-xs" style={{ color: isActive ? sound.color : 'var(--text-muted)' }}>{vol}%</span>
-                  </div>
+                <Slider
+                  defaultValue={[0]}
+                  value={[vol]}
+                  max={100}
+                  step={1}
+                  onValueChange={([v]) => setVolumes(prev => ({ ...prev, [sound.id]: v }))}
+                  className="w-full"
+                  data-testid={`slider-${sound.id}`}
+                />
+                <div className="flex justify-between mt-1.5">
+                  <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>0%</span>
+                  <span className="text-[10px]" style={{ color: isActive ? sound.color : 'rgba(248,250,252,0.3)' }}>{vol}%</span>
                 </div>
               </motion.div>
             );
@@ -339,11 +318,12 @@ export default function Soundscapes() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-12 glass-card p-6"
+            className="mt-8 p-5 rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--text-muted)' }}>Your Mix</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Your Mix</p>
                 <div className="flex flex-wrap gap-2">
                   {activeSounds.map(([id, v]) => {
                     const s = SOUNDS.find(s => s.id === id);

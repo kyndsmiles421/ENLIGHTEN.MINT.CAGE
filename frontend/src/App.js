@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
+import BackToHub from './components/BackToHub';
 
 // V30.2: OMNIS UNIVERSAL CORE — Living Engine Initialization
 import initializeOmnisCore from './engines/OmnisUniversalCore';
@@ -397,71 +398,10 @@ function CafeApp() {
       )}
       {!isSovereignRoute && <VellumOverlay />} */}
       
-      {/* ═══ SOVEREIGN UTILITY BAR: Vault / Broadcast / Dust / Journal / Sever ═══ */}
-      {!isSovereignRoute && !isHubRoute && (
-        <div className="sovereign-toolbar bar-top bar-section-archives" data-testid="sovereign-bar-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="flex items-center gap-2">
-            <Link to="/archives" className="bar-nav-item bar-top-item" data-testid="nav-archives">
-              <Archive size={14} />
-              <span>Vault</span>
-            </Link>
-            <button
-              onClick={async () => {
-                const shareData = {
-                  title: 'ENLIGHTEN.MINT.CAFE',
-                  text: 'Experience the Sovereign Engine — breathwork, divination, alchemy, and more.',
-                  url: window.location.origin,
-                };
-                try {
-                  if (navigator.share) { await navigator.share(shareData); }
-                  else { await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`); }
-                } catch {}
-              }}
-              className="bar-nav-item bar-top-item" data-testid="nav-broadcast"
-              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-            >
-              <Share2 size={14} />
-              <span>Broadcast</span>
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link to="/journal" className="bar-nav-item bar-top-item" data-testid="nav-journal">
-              <BookOpen size={14} />
-              <span>Journal</span>
-            </Link>
-            <Link to="/cosmic-ledger" className="bar-nav-item bar-top-item" data-testid="nav-ledger">
-              <Clock size={14} />
-              <span>Ledger</span>
-            </Link>
-            <button
-              onClick={() => {
-                const root = document.documentElement;
-                root.style.transition = 'filter 1.5s ease-in-out';
-                root.style.filter = 'brightness(0) blur(10px)';
-                setTimeout(() => {
-                  localStorage.removeItem('token');
-                  localStorage.removeItem('user');
-                  sessionStorage.clear();
-                  window.location.href = '/landing';
-                }, 1500);
-              }}
-              className="bar-nav-item bar-top-item" data-testid="nav-sever"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(239,68,68,0.5)' }}
-            >
-              <LogOut size={14} />
-              <span>Sever</span>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* V31.0: ALL CHROME PURGED — Pure 7-pillar drill-down navigation */}
       
-      {/* ═══ FREQUENCY ENGINE: Perspective Toggle ═══ */}
-      {/* V30.3: PerspectiveToggle PURGED — ghost nodule killer */}
-      
-      {/* ═══ MAIN CONTENT STAGE (Present / Hub) ═══ */}
+      {/* ═══ MAIN CONTENT STAGE ═══ */}
       <div id="app-stage" className="main-wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'visible' }}>
-        {/* V30.5: Navigation PURGED from non-hub pages — sovereign utility bar handles all nav */}
-        {false && !isSovereignRoute && !isHubRoute && <Navigation />}
         <ScrollToTop />
         <Toaster
           position="top-right"
@@ -476,95 +416,7 @@ function CafeApp() {
           }}
         />
         <AnimatedRoutes />
-        {/* V30.5: ShambhalaFrontSide + ShambhalaToolbar PERMANENTLY PURGED — ghost touch blockers */}
-        {/* CommandMode kept but only on non-sovereign/non-hub routes */}
-        {!isSovereignRoute && !isHubRoute && (
-          <CommandMode context="general" isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
-        )}
-        {/* Emergency Stop is ALWAYS visible — even on Hub */}
-        <EmergencyShutOff />
       </div>
-      
-      {/* ═══ V46.0 MANIFEST BAR: REVENUE-FOCUSED BOTTOM NAV ═══ */}
-      {!isSovereignRoute && !isHubRoute && (
-        <nav 
-          id="MANIFEST_BAR" 
-          className="sovereign-toolbar bar-bottom bar-section-manifest"
-          data-testid="sovereign-bar-bottom"
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            height: '70px',
-            background: 'rgba(6,6,14,0.95)',
-            backdropFilter: 'blur(12px)',
-            zIndex: 100000,
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            borderTop: '1px solid rgba(167,139,250,0.15)',
-          }}
-        >
-          <Link 
-            to="/hub" 
-            className="bar-nav-item" 
-            data-hz="174"
-            data-testid="nav-hub"
-            style={{ color: '#a78bfa', textAlign: 'center', textDecoration: 'none' }}
-          >
-            <Compass size={20} />
-            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Hub</span>
-          </Link>
-          <Link 
-            to="/trade-circle" 
-            className="bar-nav-item" 
-            data-hz="528"
-            data-testid="nav-trade"
-            style={{ color: '#f472b6', textAlign: 'center', textDecoration: 'none' }}
-          >
-            <ArrowLeftRight size={20} />
-            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Trade</span>
-          </Link>
-          <Link 
-            to="/oracle" 
-            className="bar-nav-item" 
-            data-hz="285"
-            data-testid="nav-oracle"
-            style={{ color: '#fbbf24', textAlign: 'center', textDecoration: 'none' }}
-          >
-            <Star size={20} />
-            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Oracle</span>
-          </Link>
-          <Link 
-            to="/discover" 
-            className="bar-nav-item" 
-            data-hz="639"
-            data-testid="nav-discover"
-            style={{ color: '#34d399', textAlign: 'center', textDecoration: 'none' }}
-          >
-            <Sparkles size={20} />
-            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Discover</span>
-          </Link>
-          {/* V29.0: HARD-ROUTED TO APEX CREATOR CONSOLE — Legacy V27 showMixer() PURGED */}
-          <Link 
-            to="/creator-console"
-            className="bar-nav-item"
-            data-hz="963"
-            data-testid="nav-mixer"
-            style={{ 
-              color: '#60a5fa', 
-              textAlign: 'center',
-              textDecoration: 'none'
-            }}
-          >
-            <Sliders size={20} />
-            <span style={{ fontSize: '10px', display: 'block', marginTop: '2px' }}>Mixer</span>
-          </Link>
-        </nav>
-      )}
-      
-      {/* V29.0: Legacy CreatorMixerUI & ENLIGHTEN_OS.showMixer() DEPRECATED — Mixer routes to /creator-console */}
       
       {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
     </>
@@ -585,8 +437,11 @@ function AnimatedRoutes() {
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
 
+  const showBackBtn = !['/sovereign-hub', '/landing', '/auth', '/intro', '/', '/hub'].includes(location.pathname);
+
   return (
     <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 10 }}>
+    {showBackBtn && <BackToHub />}
     <CosmicErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes location={location}>
