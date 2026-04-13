@@ -61,11 +61,20 @@
   "start_url": "/sovereign-hub",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "fullscreen"],
+  "display_override": [
+    "standalone",
+    "fullscreen",
+    "window-controls-overlay"
+  ],
   "theme_color": "#0B0B0B",
   "background_color": "#000000",
   "orientation": "any",
-  "categories": ["health", "lifestyle", "wellness", "productivity"],
+  "categories": [
+    "health",
+    "lifestyle",
+    "wellness",
+    "productivity"
+  ],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
@@ -79,28 +88,48 @@
       "short_name": "Hub",
       "url": "/sovereign-hub",
       "description": "Main Navigation — 7 Pillar Wellness Grid",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Oracle & Divination",
       "short_name": "Oracle",
       "url": "/oracle",
       "description": "Tarot, I Ching, Star Charts",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Breathwork",
       "short_name": "Breathe",
       "url": "/breathing",
       "description": "Guided Breathwork Sessions",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Crystal Skins",
       "short_name": "Crystals",
       "url": "/crystal-skins",
       "description": "Crystal Encryption Marketplace",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
