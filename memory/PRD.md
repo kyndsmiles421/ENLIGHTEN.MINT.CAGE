@@ -1,44 +1,38 @@
-# ENLIGHTEN.MINT.CAFE — V38.0 SAME PLANE ARCHITECTURE
+# ENLIGHTEN.MINT.CAFE — V39.0 CELESTIAL ENGINE
 ## Last Verified: April 14, 2026
 
-### Architecture: Same Plane, Zero Floating
-- Flex column: `[content-area | tool-panel | mixer-nav]` — all siblings, all `position: static`
-- Zero `position: fixed` on any mixer element (verified: 0 count)
-- Zero portals — everything renders inline in the React tree
-- Content compresses from 852px → 742px when panel opens (flex: 1 behavior)
+### Architecture: Same Plane + Celestial Torus Engine
+- Flex column: `[content-area | tool-panel | mixer-nav]` — all siblings, position:static
+- Celestial Torus: Canvas-based orbital renderer driven by φ³ math
+- 7 pillar planets orbit a phi core on golden-angle-spaced tracks
+- Tap planet = expand modules. Tap module = navigate.
+- Dust accrual: `φ³ × (1 - e^(-0.01t))` approaching 4.236 ceiling
+- Inverse multiplier: `φ^(-1/(pool+1))` — protects value as pool grows
 
-### Production Studio (All 8 Tabs Functional)
-- **Mix**: 7 pillar faders + master, mute/solo per module, tap module label = navigate
-- **Rec**: Video/Audio/Screen capture via MediaRecorder API, auto-download .webm
-- **Audio**: Record Voice, Import Audio, Master Volume (controls all page media)
-- **Text**: 6 styles (Title/Subtitle/Caption/Quote/Label/Watermark), overlays in content-area
-- **Layer**: Image/Logo/Frame overlays in content-area
-- **FX**: Real CSS filters on #app-stage (Blur/Brightness/Contrast/Hue/Saturate/Sepia/Invert + RESET)
-- **AI**: Placeholder for Sage AI (6 tool buttons + prompt input)
-- **Export**: 5 aspect ratios (16:9/9:16/1:1/4:3/4:5) + Export + Broadcast
+### Nav Tabs (9 total)
+1. **Orbit** — Celestial Torus (planetary orbital hub + fader strip)
+2. **Mix** — Traditional fader bank (7 pillars + master + module accordion)
+3. **Rec** — Video/Audio/Screen capture (MediaRecorder)
+4. **Audio** — Record Voice, Import, Master Volume
+5. **Text** — 6 text styles, overlays in content-area
+6. **Layer** — Image/Logo/Frame overlays
+7. **FX** — Real CSS filters on #app-stage
+8. **AI** — Sage AI placeholder
+9. **Out** — Aspect ratios + Export/Broadcast
 
 ### Module Coverage
-- 58 modules across 7 pillars, all mapped to valid App.js routes
-- 171 total routes in the application
-- Cross-pillar navigation verified: Practice→Divination→Sanctuary→Nourish→Explore→Council
+- 58 modules across 7 pillars mapped to 171 App.js routes
+- Cross-pillar navigation verified: all pillars accessible via Torus and Mix
 
 ### Testing
-- V38.0 iteration_313: **21/21 PASS (100%)**
+- V39.0: Torus canvas rendering, dust math live, navigation via orbit
+- V38.0 iteration_313: 21/21 PASS (100%)
 - V37.0 iteration_312: 20/20 PASS
-- V34.2 iteration_311: 20/20 PASS
-
-### Security: PASS
-- SHA-256 hashing, secrets module, zero bare excepts, zero eval()
-
-### PWA: READY
-- Package: cafe.enlighten.mint
-- AAB generation: https://www.pwabuilder.com
-- Guide: /app/twa/PLAY_STORE_GUIDE.md
 
 ### Blocked
 - Play Store AAB: Google identity verification pending
 
 ### Next
 - Sage AI integration for AI tab
+- Tie resonance variable to user USB Bank data
 - Sovereign "Live" Sessions
-- Phygital Marketplace (NFC crystal cards)

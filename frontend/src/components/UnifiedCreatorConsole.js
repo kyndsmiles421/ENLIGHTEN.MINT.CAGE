@@ -10,7 +10,7 @@
  * One plane. One organism. Pulled up as needed.
  */
 
-import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useRef, createContext, useContext, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -19,12 +19,26 @@ import {
   ChevronUp, Lock, Sliders, ShoppingCart,
   X, Check, Globe, ArrowLeft,
   Video, Music, Type, Layers, Wand2,
-  Sparkles, Download, Maximize2, Minimize2
+  Sparkles, Download, Maximize2, Minimize2, Zap
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
+// ═══ SACRED CONSTANTS — φ³ MATH ENGINE ═══
+const PHI = 1.618033988749895;
+const PHI_CUBED = 4.236067977499790;
+
+// V34.2 Inverse Exponential Dust Accrual
+function calculateDustAccrual(tick) {
+  return PHI_CUBED * (1 - Math.exp(-0.01 * tick));
+}
+
+// Inverse Multiplier — protects value as pool grows
+function inverseMultiplier(pool) {
+  return Math.pow(PHI, -1 / (pool + 1));
+}
 
 const PILLARS = [
   { key: 'practice', title: 'PRA', full: 'Practice', color: '#D8B4FE', modules: [
@@ -76,6 +90,7 @@ const PILLARS = [
 const TOTAL = PILLARS.reduce((a, p) => a + p.modules.length, 0);
 
 const TOOL_TABS = [
+  { key: 'torus', label: 'Orbit', icon: Globe, color: '#10B981' },
   { key: 'mix', label: 'Mix', icon: Sliders, color: '#C084FC' },
   { key: 'record', label: 'Rec', icon: Video, color: '#EF4444' },
   { key: 'audio', label: 'Audio', icon: Music, color: '#38BDF8' },
@@ -90,6 +105,194 @@ const DEFAULT_FILTERS = { blur: 0, brightness: 100, contrast: 100, hueRotate: 0,
 
 const MixerContext = createContext(null);
 export const useMixer = () => useContext(MixerContext);
+
+// ═══════════════════════════════════════════════════════════════
+// CELESTIAL TORUS ENGINE — φ³ Orbital Planetary Canvas
+// The 7 pillars orbit a phi core. Tap a planet to expand modules.
+// Dust accrual and resonance drive the animation speed.
+// ═══════════════════════════════════════════════════════════════
+
+function CelestialTorus({ pillars, pillarLevels, onNav, currentRoute, onPillarTap, expandedPillar }) {
+  const canvasRef = useRef(null);
+  const frameRef = useRef(null);
+  const tickRef = useRef(0);
+  const [dust, setDust] = useState(0);
+
+  useEffect(() => {
+    const c = canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d');
+    const w = c.width; const h = c.height;
+    const cx = w / 2; const cy = h / 2;
+
+    const draw = () => {
+      tickRef.current++;
+      const t = tickRef.current;
+      const dustVal = calculateDustAccrual(t);
+      if (t % 10 === 0) setDust(dustVal);
+
+      // Resonance-based orbit speed — faster as dust accrues
+      const speed = 0.002 + (dustVal / PHI_CUBED) * 0.003;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Torus rings — phi-spaced orbital tracks
+      const rings = [PHI * 25, PHI * 40, PHI * 58, PHI * 72];
+      rings.forEach((r, i) => {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(16,185,129,${0.03 + i * 0.015})`;
+        ctx.lineWidth = 0.5;
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Central phi core — the singularity
+      const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 18);
+      coreGrad.addColorStop(0, `rgba(16,185,129,${0.15 + Math.sin(t * 0.02) * 0.08})`);
+      coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath(); ctx.arc(cx, cy, 18, 0, Math.PI * 2); ctx.fill();
+
+      // φ symbol at core
+      ctx.fillStyle = `rgba(16,185,129,${0.3 + Math.sin(t * 0.03) * 0.1})`;
+      ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+      ctx.fillText('\u03C6\u00B3', cx, cy + 4);
+
+      // 7 Pillar Planets — orbiting on phi-spaced tracks
+      pillars.forEach((p, i) => {
+        const orbitR = 30 + i * PHI * 10;
+        const angle = i * GOLDEN_ANGLE + t * speed * (1 + i * 0.15);
+        const x = cx + Math.cos(angle) * orbitR;
+        const y = cy + Math.sin(angle) * orbitR * 0.7; // Elliptical = torus perspective
+        const level = pillarLevels[i] / 100;
+        const size = 6 + level * 6;
+        const isCurrent = findModule(currentRoute)?.pillar.key === p.key;
+        const isExpanded = expandedPillar === i;
+
+        // Connection line to core
+        ctx.beginPath();
+        ctx.strokeStyle = p.color + Math.round(level * 40 + 10).toString(16).padStart(2, '0');
+        ctx.lineWidth = isCurrent ? 1.5 : 0.5;
+        ctx.setLineDash(isExpanded ? [] : [2, 4]);
+        ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Planet body
+        const planetGrad = ctx.createRadialGradient(x, y, 0, x, y, size);
+        planetGrad.addColorStop(0, p.color + (isCurrent || isExpanded ? 'FF' : 'AA'));
+        planetGrad.addColorStop(1, p.color + '22');
+        ctx.fillStyle = planetGrad;
+        ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+
+        // Glow for active/expanded
+        if (isCurrent || isExpanded || level > 0.6) {
+          const glow = ctx.createRadialGradient(x, y, 0, x, y, size * 2.5);
+          glow.addColorStop(0, p.color + '18');
+          glow.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(x, y, size * 2.5, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Planet label
+        ctx.fillStyle = isCurrent ? '#fff' : isExpanded ? p.color : p.color + '88';
+        ctx.font = `${isCurrent || isExpanded ? 'bold ' : ''}8px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(p.title, x, y + size + 10);
+
+        // Module count
+        ctx.fillStyle = p.color + '44';
+        ctx.font = '6px monospace';
+        ctx.fillText(`${p.modules.length}`, x, y + size + 17);
+
+        // Expanded pillar sub-nodes
+        if (isExpanded) {
+          p.modules.forEach((m, mi) => {
+            const subAngle = angle + (mi - p.modules.length / 2) * 0.3;
+            const subR = orbitR + 22 + mi * 3;
+            const mx = cx + Math.cos(subAngle) * subR;
+            const my = cy + Math.sin(subAngle) * subR * 0.7;
+            const isThisMod = m.route === currentRoute;
+
+            ctx.beginPath();
+            ctx.fillStyle = isThisMod ? p.color : p.color + '66';
+            ctx.arc(mx, my, isThisMod ? 5 : 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = isThisMod ? '#fff' : p.color + '55';
+            ctx.font = `${isThisMod ? 'bold ' : ''}6px monospace`;
+            ctx.fillText(m.label, mx, my + 9);
+          });
+        }
+      });
+
+      // Dust accrual readout
+      ctx.fillStyle = 'rgba(16,185,129,0.4)';
+      ctx.font = '7px monospace'; ctx.textAlign = 'left';
+      ctx.fillText(`DUST ${dustVal.toFixed(3)} / ${PHI_CUBED.toFixed(3)}`, 6, 12);
+      ctx.fillText(`INV ${inverseMultiplier(dustVal).toFixed(4)}`, 6, 21);
+
+      frameRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [pillars, pillarLevels, currentRoute, expandedPillar]);
+
+  // Handle tap on canvas — find nearest pillar or module
+  const handleTap = (e) => {
+    const c = canvasRef.current; const rect = c.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (c.width / rect.width);
+    const y = (e.clientY - rect.top) * (c.height / rect.height);
+    const cx = c.width / 2; const cy = c.height / 2;
+    const t = tickRef.current;
+    const dustVal = calculateDustAccrual(t);
+    const speed = 0.002 + (dustVal / PHI_CUBED) * 0.003;
+
+    // Check expanded sub-nodes first
+    if (expandedPillar !== null) {
+      const p = pillars[expandedPillar]; const i = expandedPillar;
+      const orbitR = 30 + i * PHI * 10;
+      const angle = i * GOLDEN_ANGLE + t * speed * (1 + i * 0.15);
+      for (let mi = 0; mi < p.modules.length; mi++) {
+        const subAngle = angle + (mi - p.modules.length / 2) * 0.3;
+        const subR = orbitR + 22 + mi * 3;
+        const mx = cx + Math.cos(subAngle) * subR;
+        const my = cy + Math.sin(subAngle) * subR * 0.7;
+        if (Math.sqrt((x - mx) ** 2 + (y - my) ** 2) < 15) {
+          onNav(p.modules[mi].route);
+          return;
+        }
+      }
+    }
+
+    // Check pillar planets
+    pillars.forEach((p, i) => {
+      const orbitR = 30 + i * PHI * 10;
+      const angle = i * GOLDEN_ANGLE + t * speed * (1 + i * 0.15);
+      const px = cx + Math.cos(angle) * orbitR;
+      const py = cy + Math.sin(angle) * orbitR * 0.7;
+      if (Math.sqrt((x - px) ** 2 + (y - py) ** 2) < 18) {
+        onPillarTap(i);
+      }
+    });
+  };
+
+  return (
+    <div data-testid="celestial-torus">
+      <canvas ref={canvasRef} width={380} height={240} onClick={handleTap}
+        className="w-full cursor-pointer" style={{ background: 'transparent', touchAction: 'manipulation' }} />
+      <div className="flex items-center justify-between px-3 py-1" style={{ borderTop: '1px solid rgba(16,185,129,0.06)' }}>
+        <span className="text-[7px] font-mono" style={{ color: 'rgba(16,185,129,0.4)' }}>
+          DUST {dust.toFixed(3)} / {PHI_CUBED.toFixed(3)}
+        </span>
+        <span className="text-[7px] font-mono" style={{ color: 'rgba(16,185,129,0.3)' }}>
+          INV {inverseMultiplier(dust).toFixed(4)}
+        </span>
+        <span className="text-[7px] font-mono" style={{ color: 'rgba(192,132,252,0.3)' }}>
+          {TOTAL}ch
+        </span>
+      </div>
+    </div>
+  );
+}
 
 // ═══ MEDIA RECORDER ═══
 function useMediaControls() {
@@ -169,7 +372,17 @@ export function MixerProvider({ children }) {
   const [textOverlays, setTextOverlays] = useState([]);
   const [imageOverlays, setImageOverlays] = useState([]);
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('16:9');
+  const [resonance, setResonance] = useState(0.5);
   const textInputRef = useRef(null);
+
+  // Track resonance from global work accrual
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const r = window.__globalResonance || 0.5;
+      setResonance(typeof r === 'number' ? r : 0.5);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const hideMixer = ['/', '/sovereign-hub', '/landing', '/auth', '/intro'].includes(location.pathname);
   const showMixer = !hideMixer && !isFullscreen;
@@ -262,11 +475,40 @@ export function MixerProvider({ children }) {
     loadStore, handleNav, mutedModules, activePanel, setActivePanel: togglePanel,
     isFullscreen, setIsFullscreen, monitorFilters, setMonitorFilters,
     textOverlays, setTextOverlays, imageOverlays, setImageOverlays,
-    selectedAspectRatio, setSelectedAspectRatio,
+    selectedAspectRatio, setSelectedAspectRatio, resonance,
     mixerState: activePanel ? 'expanded' : 'collapsed', setMixerState: () => {},
   };
 
   // ═══ PANEL CONTENT ═══
+
+  const renderTorusPanel = () => (
+    <div style={{ background: '#050508' }}>
+      <CelestialTorus
+        pillars={PILLARS}
+        pillarLevels={pillarLevels}
+        onNav={handleNav}
+        currentRoute={location.pathname}
+        onPillarTap={(i) => setExpandedPillar(expandedPillar === i ? null : i)}
+        expandedPillar={expandedPillar}
+      />
+      {/* Fader strip below torus — compact */}
+      <div className="flex gap-0.5 px-2 py-1 items-end" style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+        {PILLARS.map((p, i) => (
+          <div key={p.key} className="flex-1 min-w-0 flex flex-col items-center">
+            <input type="range" min="0" max="100" value={pillarLevels[i]}
+              onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[i] = Number(e.target.value); return n; })}
+              className="w-full h-1 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
+            <span className="text-[5px] font-bold" style={{ color: current?.pillar.key === p.key ? p.color : p.color + '55' }}>{p.title}</span>
+          </div>
+        ))}
+        <div className="flex flex-col items-center ml-1" style={{ minWidth: 28 }}>
+          <input type="range" min="0" max="100" value={masterLevel} onChange={(e) => setMasterLevel(Number(e.target.value))}
+            className="w-full h-1 rounded-full cursor-pointer" style={{ accentColor: '#F8FAFC' }} data-testid="master-fader" />
+          <span className="text-[5px] font-bold text-white/20">MST</span>
+        </div>
+      </div>
+    </div>
+  );
 
   const renderMixPanel = () => (
     <div style={{ background: '#080812' }}>
@@ -550,7 +792,7 @@ export function MixerProvider({ children }) {
   );
 
   const PANEL_RENDERERS = {
-    mix: renderMixPanel, record: renderRecordPanel, audio: renderAudioPanel,
+    torus: renderTorusPanel, mix: renderMixPanel, record: renderRecordPanel, audio: renderAudioPanel,
     text: renderTextPanel, overlay: renderOverlayPanel, effects: renderEffectsPanel,
     ai: renderAIPanel, export: renderExportPanel,
   };
