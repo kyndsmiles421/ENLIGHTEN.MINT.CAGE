@@ -586,7 +586,7 @@ export default function OrbitalHub() {
           className="text-sm sm:text-lg font-light tracking-[0.25em] uppercase"
           style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}
         >
-          The Enlightenment Cafe
+          ENLIGHTEN.MINT.CAFE
         </h1>
       </motion.div>
 
