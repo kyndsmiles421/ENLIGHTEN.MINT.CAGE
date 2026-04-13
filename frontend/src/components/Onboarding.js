@@ -3,16 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const STEPS = [
   {
-    title: 'Welcome to the Singularity',
-    text: 'Your ecosystem is divided into 7 core pillars. Tap any pillar to expand, then tap a module to dive deep.',
+    title: 'Welcome to ENLIGHTEN.MINT.CAFE',
+    text: 'Your sovereign wellness engine is divided into 7 core pillars. Tap any pillar to expand, then tap a module to dive deep.',
   },
   {
     title: 'The Mixer Controls Everything',
     text: 'The persistent mixer at the bottom of every page lets you control all 58 modules. Switch between Strip and Orbital Sphere modes. Collapse it anytime.',
   },
   {
-    title: 'The Transmuter is Active',
-    text: 'Your Sovereign Engine accrues Digital Dust as you engage. The longer you stay, the higher your resonance multiplier climbs — up to 4.24x.',
+    title: 'The Sovereign Engine is Active',
+    text: 'Your engine accrues Digital Dust as you engage. The longer you stay, the higher your resonance multiplier climbs — up to 4.24x.',
   },
 ];
 
