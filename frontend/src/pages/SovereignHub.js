@@ -892,293 +892,64 @@ export default function SovereignHub() {
         >
           ENLIGHTEN.MINT.CAFE
         </h1>
-        
-        {/* Director Controls */}
-        <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
-          {/* Deep Dive Search Button */}
-          <button
-            onClick={() => setDeepDiveOpen(true)}
-            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
-            style={{
-              background: 'rgba(139,92,246,0.2)',
-              border: '1px solid rgba(139,92,246,0.4)',
-              color: '#C4B5FD',
-            }}
-            data-testid="deep-dive-btn"
-          >
-            <Search size={12} />
-            Deep Dive
-          </button>
-          
-          {/* Director Timeline Button */}
-          <button
-            onClick={() => setDirectorTimelineOpen(true)}
-            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
-            style={{
-              background: 'rgba(59,130,246,0.2)',
-              border: '1px solid rgba(59,130,246,0.4)',
-              color: '#93C5FD',
-            }}
-            data-testid="director-timeline-btn"
-          >
-            <Film size={12} />
-            Timeline
-          </button>
-          
-          {/* Global Nodal Map Button */}
-          <button
-            onClick={() => setGlobalMapOpen(true)}
-            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
-            style={{
-              background: 'rgba(34,197,94,0.2)',
-              border: '1px solid rgba(34,197,94,0.4)',
-              color: '#86EFAC',
-            }}
-            data-testid="global-map-btn"
-          >
-            <Map size={12} />
-            Global Map
-          </button>
-          
-          {/* Physics Mixer V27.0 Button */}
-          <button
-            onClick={() => setPhysicsMixerOpen(true)}
-            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all flex items-center gap-2"
-            style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.2))',
-              border: '1px solid rgba(139,92,246,0.5)',
-              color: '#C4B5FD',
-            }}
-            data-testid="physics-mixer-btn"
-          >
-            <Sliders size={12} />
-            Physics V27
-          </button>
-          
-          {/* Zen-Flow Toggle */}
-          <button
-            onClick={toggleZenFlow}
-            className="px-4 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all"
-            style={{
-              background: zenFlowEnabled ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${zenFlowEnabled ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.1)'}`,
-              color: zenFlowEnabled ? '#FDBA74' : 'rgba(255,255,255,0.4)',
-            }}
-            data-testid="zen-flow-toggle"
-          >
-            {zenFlowEnabled ? 'Gestures On' : 'Gestures Off'}
-          </button>
-        </div>
       </motion.div>
 
-      {/* Crystalline QR Overlay */}
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="max-w-xl mx-auto rounded-3xl p-6 md:p-8 mb-8"
-        style={{
-          background: 'radial-gradient(circle at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 50%)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          boxShadow: '0 0 60px rgba(99,102,241,0.1)',
-        }}
-      >
-        {/* Crystal Identifier */}
-        <div className="text-center mb-6">
-          <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Crystal Identifier
-          </p>
-          <p className="font-mono text-lg" style={{ color: '#6366F1' }}>
-            {crystalLayer.identifier || 'QR-CRYSTAL-LOADING'}
-          </p>
-        </div>
-
-        {/* Spectral Bands */}
-        <SpectralBands bands={spectralBands} />
-
-        {/* Resonance Gauge */}
-        <div className="mb-6">
-          <div className="flex justify-between text-xs mb-2">
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Current Resonance</span>
-            <span style={{ color: '#22C55E' }}>
-              {parseFloat(crystalLayer.resonance_frequency || '59.16').toFixed(2)} Hz
-            </span>
-          </div>
-          <ResonanceGauge 
-            current={parseFloat(crystalLayer.resonance_frequency || '59.16')} 
-            target={144.0} 
-          />
-          <div className="flex justify-between text-[10px] mt-1">
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>0 Hz</span>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>144 Hz (SEG Target)</span>
-          </div>
-        </div>
-
-        {/* ═══ MASTER AUTHORITY GATED: OBSIDIAN SHIELD PROTOCOL ═══ */}
-        {/* Sensitive data HIDDEN from front page — access via Vault */}
-        
-        {user?.email === 'kyndsmiles@gmail.com' ? (
-          <>
-            {/* Vault Access Button — No sensitive data on front page */}
-            <button 
-              onClick={() => navigate('/archives')}
-              className="w-full p-4 rounded-xl mb-6 text-center transition-all"
-              style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)' }}
-              data-testid="vault-access-btn"
-            >
-              <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(34,197,94,0.6)' }}>
-                Obsidian Shield Active
-              </p>
-              <p className="text-sm font-bold" style={{ color: '#22C55E' }}>
-                Vault Secured — Tap to Access
-              </p>
-            </button>
-          </>
-        ) : (
-          /* Public View - System Status Only */
-          <div 
-            className="p-4 rounded-xl mb-6 text-center"
-            style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)' }}
-          >
-            <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Singularity Kernel Status
-            </p>
-            <p className="text-lg font-bold" style={{ color: '#6366F1' }}>
-              V29.1 OPERATIONAL
-            </p>
-            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              {spectralLayer.seg_harmonic || '144Hz LOCKED'} • Obsidian Shield Active
-            </p>
-          </div>
-        )}
-      </motion.div>
-
-      {/* Trust Info Grid — HIDDEN from all users on front page */}
-      {/* Sensitive trust/trustee data moved behind Vault access */}
-
-      {/* Gaia Anchors */}
-      {gaiaMatrix.primary_anchor && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="max-w-xl mx-auto mb-8"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Globe size={14} style={{ color: '#22C55E' }} />
-            <span className="text-xs font-medium">Gaia Ley Line Anchors</span>
-            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(34,197,94,0.2)', color: '#22C55E' }}>
-              {gaiaMatrix.global_sync || '144Hz LOCKED'}
-            </span>
-          </div>
-          
-          <div className="grid gap-2">
-            <GaiaAnchorCard anchor={gaiaMatrix.primary_anchor} isPrimary />
-            {gaiaMatrix.secondary_anchors?.slice(0, 3).map((anchor, idx) => (
-              <GaiaAnchorCard key={idx} anchor={anchor} />
-            ))}
-          </div>
-        </motion.div>
-      )}
-
-      {/* GPS Phygital Lock Status */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="max-w-xl mx-auto mb-6"
-      >
-        <div 
-          className="p-4 rounded-xl"
-          style={{
-            background: gpsLockStatus?.is_locked 
-              ? 'rgba(34,197,94,0.08)' 
-              : 'rgba(255,255,255,0.02)',
-            border: `1px solid ${gpsLockStatus?.is_locked ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.05)'}`,
-          }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <MapPin size={14} style={{ color: gpsLockStatus?.is_locked ? '#22C55E' : '#6366F1' }} />
-              <span className="text-sm font-medium">GPS Phygital Lock</span>
-              <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ 
-                background: 'rgba(99,102,241,0.2)', 
-                color: '#A5B4FC' 
-              }}>
-                V9999.3
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <button
-                onClick={demoGPSLock}
-                className="p-2 rounded-lg transition-colors hover:bg-white/5 text-xs"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-                title="Demo: Simulate at Black Hills"
-              >
-                Demo
-              </button>
-              <button
-                onClick={checkGPSLock}
-                disabled={gpsLoading}
-                className="p-2 rounded-lg transition-colors hover:bg-white/5"
-                title="Verify GPS Location"
-              >
-                {gpsLoading ? (
-                  <RefreshCw size={14} className="animate-spin" style={{ color: '#6366F1' }} />
-                ) : (
-                  <Navigation size={14} style={{ color: '#6366F1' }} />
-                )}
-              </button>
+      {/* ═══ FUNCTIONAL NAVIGATION — 7 Pillars, Color Coded, Every Button Goes Somewhere ═══ */}
+      <div className="max-w-xl mx-auto mb-8 px-2">
+        {[
+          { title: 'Practice', color: '#D8B4FE', items: [
+            { label: 'Breathwork', route: '/breathing' }, { label: 'Meditation', route: '/meditation' },
+            { label: 'Yoga', route: '/yoga' }, { label: 'Mudras', route: '/mudras' },
+            { label: 'Mantras', route: '/mantras' }, { label: 'Light Therapy', route: '/light-therapy' },
+          ]},
+          { title: 'Divination', color: '#E879F9', items: [
+            { label: 'Oracle & Tarot', route: '/oracle' }, { label: 'Akashic Records', route: '/akashic-records' },
+            { label: 'Star Chart', route: '/star-chart' }, { label: 'Numerology', route: '/numerology' },
+            { label: 'Dream Journal', route: '/dreams' }, { label: 'Mayan Astrology', route: '/mayan' },
+          ]},
+          { title: 'Sanctuary', color: '#2DD4BF', items: [
+            { label: 'Zen Garden', route: '/zen-garden' }, { label: 'Soundscapes', route: '/soundscapes' },
+            { label: 'Music Lounge', route: '/music-lounge' }, { label: 'Frequencies', route: '/frequencies' },
+            { label: 'VR Sanctuary', route: '/vr' }, { label: 'Journaling', route: '/journal' },
+          ]},
+          { title: 'Nourish & Heal', color: '#22C55E', items: [
+            { label: 'Nourishment', route: '/nourishment' }, { label: 'Aromatherapy', route: '/aromatherapy' },
+            { label: 'Herbology', route: '/herbology' }, { label: 'Elixirs', route: '/elixirs' },
+            { label: 'Acupressure', route: '/acupressure' }, { label: 'Reiki', route: '/reiki' },
+          ]},
+          { title: 'Explore', color: '#FB923C', items: [
+            { label: 'Encyclopedia', route: '/encyclopedia' }, { label: 'Reading List', route: '/reading-list' },
+            { label: 'Creation Stories', route: '/creation-stories' }, { label: 'Teachings', route: '/teachings' },
+            { label: 'Community', route: '/community' }, { label: 'Blessings', route: '/blessings' },
+          ]},
+          { title: 'Sage AI Coach', color: '#38BDF8', items: [
+            { label: 'Voice Conversations', route: '/coach' }, { label: 'Spiritual Guidance', route: '/coach' },
+            { label: 'Crystals & Stones', route: '/crystals' }, { label: 'Personalized Wisdom', route: '/coach' },
+          ]},
+          { title: 'Sovereign Council', color: '#C084FC', items: [
+            { label: 'Council Advisors', route: '/sovereigns' }, { label: 'Economy & Dust', route: '/economy' },
+            { label: 'Academy', route: '/academy' }, { label: 'Trade Circle', route: '/trade-circle' },
+            { label: 'Cosmic Map', route: '/cosmic-map' }, { label: 'Archives', route: '/archives' },
+          ]},
+        ].map((group) => (
+          <div key={group.title} className="mb-4">
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] mb-2 px-1" style={{ color: group.color }}>{group.title}</div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {group.items.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.route)}
+                  className="py-2.5 px-2 rounded-lg text-[11px] text-left transition-all active:scale-95"
+                  style={{ background: `${group.color}08`, border: `1px solid ${group.color}18`, color: 'rgba(248,250,252,0.7)' }}
+                  data-testid={`nav-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
-          
-          <div className="text-[10px] font-mono mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Anchor: {BLACK_HILLS_ANCHOR.name} ({BLACK_HILLS_ANCHOR.lat}°N, {Math.abs(BLACK_HILLS_ANCHOR.lng)}°W)
-          </div>
-          
-          {gpsLockStatus && (
-            <div 
-              className="p-3 rounded-lg flex items-center gap-3"
-              style={{ 
-                background: gpsLockStatus.is_locked ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.05)',
-                border: `1px solid ${gpsLockStatus.is_locked ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.15)'}`,
-              }}
-            >
-              <div 
-                className={`w-4 h-4 rounded-full flex items-center justify-center ${gpsLockStatus.is_locked ? 'animate-pulse' : ''}`}
-                style={{ backgroundColor: gpsLockStatus.badge_color }}
-              >
-                {gpsLockStatus.is_locked ? <Check size={10} className="text-white" /> : null}
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-medium" style={{ color: gpsLockStatus.is_locked ? '#22C55E' : '#EF4444' }}>
-                  {gpsLockStatus.status}
-                </p>
-                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  Distance: {gpsLockStatus.distance_km} km | Resonance: {(gpsLockStatus.resonance_strength * 100).toFixed(1)}%
-                </p>
-              </div>
-              {gpsLockStatus.is_locked && (
-                <div className="text-right">
-                  <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
-                    VERIFIED
-                  </p>
-                  <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    {gpsLockStatus.seg_hz}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {!gpsLockStatus && (
-            <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Tap the navigation icon to verify your physical presence
-            </p>
-          )}
-        </div>
-      </motion.div>
+        ))}
+      </div>
 
       {/* Action Buttons - Hidden in Zen-Flow mode for Tier 2+ */}
       <AnimatePresence>
