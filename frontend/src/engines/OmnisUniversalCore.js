@@ -634,6 +634,7 @@ export const initializeOmnisCore = () => {
         '#back-up-banner', '.made-with-emergent',
         '.emergent-overlay', '[id*="nodule"]',
         '.perspective-toggle', '.perspective-btn',
+        '[data-testid="dock-restore"]',
       ];
       selectors.forEach(sel => {
         try {

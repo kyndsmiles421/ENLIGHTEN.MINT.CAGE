@@ -1,34 +1,37 @@
 # ENLIGHTEN.MINT.CAFE — ETERNAL MANIFEST
-## Version: V30.3_SOVEREIGN_ENGINE | Status: **ALL 15 MODULES WIRED — FULL CYCLE**
-## Last Updated: April 12, 2026
+## Version: V30.3 SOVEREIGN ENGINE | Status: P1 GAMING LIVE + 15/15 MODULES WELDED
+## Last Updated: April 13, 2026
 
-### SILENT DUST ACCRUAL — ALL 15 MODULES WIRED
-| Module | Route | Dust | Wire Method |
-|--------|-------|------|-------------|
-| Journal | /journal | 8+ (content length) | useWorkAccrual hook |
-| Meditation | /meditation | 15 | window.__workAccrue |
-| Oracle | /oracle | 12 | window.__workAccrue |
-| Breathing | /breathing | 7/cycle | window.__workAccrue |
-| Mood | /mood | 5 | window.__workAccrue |
-| Games | /games | score/10 | window.__workAccrue |
-| Rituals | /rituals | 15 | window.__workAccrue |
-| Cosmic Mixer | /cosmic-mixer | 18 | window.__workAccrue |
-| Archives | /archives | 6 | useEffect on mount |
-| Workshop | /workshop | 12 | useEffect on mount |
-| Cosmic Ledger | /cosmic-ledger | 10 | useEffect on mount |
-| Star Chart | /star-chart | 14 | useEffect on mount |
-| Observatory | /observatory | 10 | useEffect on mount |
-| Cosmic Map | /cosmic-map | 10 | useEffect on mount |
-| Discover | /discover | 10 | useEffect on mount |
+### P1 GAMING MODULES (NEW)
+| Module | Route | Backend | Frontend | Dust Rewards |
+|--------|-------|---------|----------|-------------|
+| Resource Alchemy | /resource-alchemy | /api/gaming/alchemy/* | ResourceAlchemy.js | 15-250 per forge |
+| Gravity Well Exchange | /gravity-well | /api/gaming/gravity-well/* | GravityWellExchange.js | Buy/sell elements |
+| Cryptic Quest Nodes | /cryptic-quest | /api/gaming/quest/* | CrypticQuestNodes.js | 20-300 per solve |
 
-### Ghost Purge: ACTIVE
-- STOP: opacity 0.08, bottom-right
+### Resource Alchemy
+- Elements: iron(1), copper(2), silver(5), gold(13), crystal(34), obsidian(89), phi_stone(144)
+- 5 recipes: iron+iron+copper→silver, silver+copper+copper→gold, etc.
+- Mine action: random iron/copper/silver
+
+### Gravity Well Exchange  
+- Phi-weighted hourly price fluctuation on all elements
+- Buy at market price, sell at 80%
+- Prices scale with Fibonacci weights
+
+### Cryptic Quest Nodes
+- 5 nodes: Mirror Gate(Water), Spiral Path(Air), Obsidian Forge(Fire), Root Chamber(Earth), Sovereign Throne(Ether)
+- Progressive unlock (solve previous to access next)
+- Rewards: 20, 40, 80, 150, 300 Dust
+
+### 15/15 MODULES WIRED (Silent Dust Accrual)
+All modules hit /api/transmuter/work-submit on visit/interaction
+
+### Ghost Purge
+- STOP: opacity 0.08
 - PerspectiveToggle: purged
-- DOM heartbeat: every 2s
+- SmartDock restore button: purged (dock-restore)
+- DOM heartbeat: 1.5s
 
-### Landing Page: STREAMLINED
-- Compact title + Sign In + Quick Reset + 6 Category Pillars
-- No marketing copy
-
-### Economy
-- 10 Fans/hr | Fibonacci accrual | Phi Cap 1.618 | Scholarship Tax 15%
+### Economy: 10 Fans/hr | Fibonacci accrual | Phi Cap 1.618 | 15% Tax
+### Master: kyndsmiles@gmail.com | 708B8ED1E974D85585BBBD8E06E0291E
