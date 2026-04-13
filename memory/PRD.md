@@ -1,37 +1,31 @@
-# ENLIGHTEN.MINT.CAFE — DEPLOYMENT MANIFEST
-## Version: V30.5 | Status: PLAY STORE READY — ALL GHOSTS PURGED
+# ENLIGHTEN.MINT.CAFE — V31.0
+## Pure 7-Pillar Drill-Down Navigation
 ## Last Verified: April 13, 2026
 
-### SYSTEM CHECK: ALL PASS
-- 40 nav buttons on Sovereign Hub — all functional
-- ALL sub-pages (Academy, Breathing, Oracle, Mantras, etc.) — zero ghost blockers
-- Page content properly clears 60px fixed top bar (padding-top: 64px)
-- Top bar: Vault, Broadcast, Journal, Ledger, Sever
-- Bottom bar: Hub, Trade, Oracle, Discover, Mixer
+### Architecture
+- NO header bar, NO footer bar, NO floating widgets
+- 7 pillars on Hub → tap to expand → tap item → navigate
+- Every sub-page has "Back to Hub" button (top-left)
+- Zero fixed blocking elements on any page
 
-### V30.5 GHOST PURGE LOG
-- ShambhalaFrontSide (white 66px circle, z-index 2B) — REMOVED from App.js
-- ShambhalaToolbar (z-index 2B) — REMOVED from App.js
-- Navigation mobile bar (z-50, overlapping sovereign bar) — DISABLED
-- vault-access dead pixel (z-999999) — pointer-events:none, z:-1
-- Content padding fixed: padding-top 0→64px to clear fixed top bar
+### 7 Pillars
+- Practice: Breathwork, Meditation, Yoga, Mudras, Mantras, Light Therapy
+- Divination: Oracle & Tarot, Akashic Records, Star Chart, Numerology, Dream Journal, Mayan Astrology
+- Sanctuary: Zen Garden, Soundscapes, Music Lounge, Frequencies, VR Sanctuary, Journaling
+- Nourish & Heal: Nourishment, Aromatherapy, Herbology, Elixirs, Acupressure, Reiki
+- Explore: Encyclopedia, Reading List, Creation Stories, Teachings, Community, Blessings
+- Sage AI Coach: Voice Conversations, Spiritual Guidance, Crystals & Stones, Personalized Wisdom
+- Sovereign Council: Council Advisors, Economy & Dust, Academy, Trade Circle, Crystal Skins, Archives, Vault, Ledger, Creator Console
 
-### PWA COMPLIANCE: ALL PASS
-- manifest.json: 9 icons, 2 maskable, start_url /sovereign-hub, standalone
-- Service Worker with offline + background sync + push
-- assetlinks.json configured with signing key SHA256
-- Production build at /app/frontend/build/
+### Economy
+- 10 Fans/hr | 15 modules silent dust | Fibonacci | Phi Cap 1.618
 
-### PLAY STORE
-- Keystore: /app/twa/enlighten.keystore
-- Guide: /app/twa/PLAY_STORE_GUIDE.md
+### PWA
+- manifest.json, sw.js, offline.html, maskable icons, assetlinks.json all deployed
 - Package: cafe.enlighten.mint
 - Generate AAB: https://www.pwabuilder.com
 
-### ECONOMY
-- 10 Fans/hr | 15 modules silent dust | Fibonacci | Phi Cap 1.618
-
-### BACKLOG
+### Backlog
 - Google Play Console identity verification → upload AAB
-- Sovereign "Live" Sessions with Sage AI (P2)
+- Sovereign "Live" Sessions (P2)
 - Phygital Marketplace NFC expansion (P2)
