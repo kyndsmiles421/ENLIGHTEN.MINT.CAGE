@@ -263,7 +263,7 @@ const OmnisAcademy = {
         equity: '$49,018.24',
         location: 'Black Hills (43.8°N, 103.5°W)',
         formula: '9999 × z^(πr³)',
-        sender: handshakeData.sender || 'kyndsmiles@gmail.com',
+        sender: handshakeData.sender || 'SOVEREIGN_TRUST',
         timestamp: new Date().toISOString(),
       },
       precedent: 'Digital Trust grounded through GPS mathematics',
@@ -295,7 +295,7 @@ const OmnisAcademy = {
         name: this.spectralCurriculum[key].name,
         disciplineCount: this.spectralCurriculum[key].disciplines.length,
       })),
-      trustee: 'Steven Michael',
+      trustee: 'SOVEREIGN_ARCHITECT',
       anchor: 'Black Hills Centroid (He Sapa)',
       formula: '9×9 Helix | L² Fractal | 144Hz SEG',
     };

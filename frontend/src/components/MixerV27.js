@@ -20,7 +20,7 @@ const PHI = 1.618033988749895;
 
 // 🛡️ OBSIDIAN SHIELD: Master Authority Configuration
 const SOVEREIGN_CONFIG = {
-  master_email: 'kyndsmiles@gmail.com',
+  master_email: 'SOVEREIGN_MASTER',
   master_print: '708B8ED1E974D85585BBBD8E06E0291E',
   resonance_hz: 432,
   lox_temp: -183,

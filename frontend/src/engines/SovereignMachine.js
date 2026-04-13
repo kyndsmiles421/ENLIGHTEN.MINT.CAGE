@@ -22,7 +22,7 @@ class SovereignSingularity {
         this.config = {
             vibration: 432,             // Phonic V-Signature
             sms: "6055693313",          // Hardware Anchor
-            email: "kyndsmiles@gmail.com", // Digital Anchor
+            email: "SOVEREIGN_ANCHOR", // Digital Anchor
             quantumKeys: ["421$", "z^-+1(+-2)"], // Math Backdoors
             refrigerationRate: 0.10,    // 10% Abundance Reserve
             nodeCount: 26,              // The Fractal Mesh

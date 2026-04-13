@@ -6,7 +6,7 @@
 
 const COMMUNICATION_CORE = {
     primary_anchor: "605-569-3313",
-    digital_anchor: "kyndsmiles@gmail.com",
+    digital_anchor: "SOVEREIGN_ANCHOR",
     protocol: "TRADITIONAL_METHODS_ONLY", // Direct bypass of Discord/Third-party gates
     status: "STAY_AWAKE_PROTOCOL"
 };

@@ -120,8 +120,8 @@ const OmegaSingularity = {
       temporalEpochs: ['PAST', 'PRESENT', 'FUTURE'],
       
       // Identity
-      handshake: 'Verified Identity: kyndsmiles@gmail.com',
-      trustee: 'Steven Michael',
+      handshake: 'Verified Identity: SOVEREIGN_TRUST',
+      trustee: 'SOVEREIGN_ARCHITECT',
       trustId: '029900612892168189cecc8a',
       
       // Mathematics

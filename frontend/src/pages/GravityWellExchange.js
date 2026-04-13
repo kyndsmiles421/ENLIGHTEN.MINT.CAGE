@@ -21,7 +21,7 @@ export default function GravityWellExchange() {
     if (!token) return;
     try {
       const { data } = await axios.get(`${API}/gaming/gravity-well/market`, { headers: authHeaders });
-      setMarket(data.market);
+      setMarket(data.market || data || []);
     } catch { toast.error('Failed to load market'); }
     finally { setLoading(false); }
   }, [authHeaders, token]);
@@ -51,6 +51,12 @@ export default function GravityWellExchange() {
       </div>
       <div className="px-4 pt-2">
         {/* Market Grid */}
+        {(market || []).length === 0 ? (
+          <div className="text-center py-12">
+            <Sparkles size={24} color="#2DD4BF" className="mx-auto mb-3 opacity-40" />
+            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Market loading... gravitational pull stabilizing</p>
+          </div>
+        ) : (
         <div className="grid grid-cols-2 gap-2 mb-4">
           {market.map(m => (
             <button key={m.element} onClick={() => setSelected(m)}
@@ -65,6 +71,7 @@ export default function GravityWellExchange() {
             </button>
           ))}
         </div>
+        )}
         {/* Trade Panel */}
         {selected && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}

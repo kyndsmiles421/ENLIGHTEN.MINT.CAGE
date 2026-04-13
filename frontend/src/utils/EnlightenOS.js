@@ -10,8 +10,8 @@ const ENLIGHTEN_OS = (() => {
     const PHI = 1.61803398875;
     const SCHUMANN = 7.83;
     const VERSION = '27.0';
-    const ARCHITECT = 'Steven Michael';
-    const TERMINAL = 'kyndsmiles@gmail.com';
+    const ARCHITECT = 'SOVEREIGN_ARCHITECT';
+    const TERMINAL = 'SOVEREIGN_TERMINAL';
     const OMEGA_SEED = 'KMMDDZREGGUKH2KUTPSPMRW1';
     
     const CONFIG = {

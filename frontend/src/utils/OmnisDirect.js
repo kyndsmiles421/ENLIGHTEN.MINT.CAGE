@@ -350,7 +350,7 @@ const OmegaArchitect = {
   phygital: {
     primaryAnchor: { lat: 44.0805, lng: -103.2310, name: 'Black Hills Primary' },
     secondaryAnchor: { lat: 43.8, lng: -103.5, name: 'Masonry School Node' },
-    handshake: 'SendGrid Verified: kyndsmiles@gmail.com',
+    handshake: 'SendGrid Verified: SOVEREIGN_TRUST',
     holographics: '54-Layer L² Fractal Overlay',
     biometricSync: '144Hz SEG Harmonic',
   },

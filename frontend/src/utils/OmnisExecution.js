@@ -250,7 +250,7 @@ const OmnisExecution = {
   async sendLegalHandshake(recipientEmail) {
     try {
       const res = await fetch(
-        `${API_BASE}/api/omnis/legal/send-nda?recipient=${encodeURIComponent(recipientEmail)}&sender=kyndsmiles@gmail.com&trust_id=029900612892168189cecc8a`,
+        `${API_BASE}/api/omnis/legal/send-nda?recipient=${encodeURIComponent(recipientEmail)}&sender=SOVEREIGN_TRUST&trust_id=029900612892168189cecc8a`,
         { method: 'POST' }
       );
       const data = await res.json();

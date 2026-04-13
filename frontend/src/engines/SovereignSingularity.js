@@ -18,7 +18,7 @@ const CORE_DNA = {
     rotation: 1060.0,
     anchors: { 
         sms: "6055693313", 
-        email: "kyndsmiles@gmail.com" 
+        email: "SOVEREIGN_ROOT" 
     },
     master: "STEVEN_WITH_A_V",
     version: "63.0.0",

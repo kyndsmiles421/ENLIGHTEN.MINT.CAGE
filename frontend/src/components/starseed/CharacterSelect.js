@@ -81,7 +81,7 @@ export function CharacterSelect({ origins, existingCharacters, onSelect, onResum
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {existingCharacters.map((ch, i) => {
-              const origin = origins.find(o => o.id === ch.origin_id);
+              const origin = (origins || []).find(o => o.id === ch.origin_id);
               if (!origin) return null;
               const isExpanded = expandedChar === ch.origin_id;
               return (

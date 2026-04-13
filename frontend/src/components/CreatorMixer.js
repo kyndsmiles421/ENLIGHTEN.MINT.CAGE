@@ -295,7 +295,7 @@ const CreatorMixer = ({ isOpen, onClose, onMixerChange }) => {
               HANDSHAKE STATUS: SECURE-CONNECTED
             </p>
             <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              kyndsmiles@gmail.com
+              SOVEREIGN TRUST VERIFIED
             </p>
           </div>
         </motion.div>

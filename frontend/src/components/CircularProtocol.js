@@ -103,7 +103,7 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
     setLoading(true);
     try {
       const res = await axios.post(
-        `${API}/omnis/circular-ledger/trade?from_party=kyndsmiles@gmail.com&to_party=${encodeURIComponent(tradeForm.toParty)}&hours=${tradeForm.hours}&description=${encodeURIComponent(tradeForm.description)}&gps_verified=${gpsVerified}`
+        `${API}/omnis/circular-ledger/trade?from_party=SOVEREIGN_TRUST&to_party=${encodeURIComponent(tradeForm.toParty)}&hours=${tradeForm.hours}&description=${encodeURIComponent(tradeForm.description)}&gps_verified=${gpsVerified}`
       );
       
       // 144Hz haptic confirmation

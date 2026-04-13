@@ -9,7 +9,7 @@
 const AIR_GAP_AUTH = {
     fixed_point: 1.0,
     identity_anchor: "605-569-3313",
-    email_anchor: "kyndsmiles@gmail.com",
+    email_anchor: "SOVEREIGN_ANCHOR",
     bypass_legacy: true
 };
 

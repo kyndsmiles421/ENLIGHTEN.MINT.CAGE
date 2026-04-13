@@ -70,8 +70,8 @@ const SACRED_CONSTANTS = {
 
 const MASTER_AUTHORITY = {
   identity: {
-    name: 'Steven Michael',
-    email: 'kyndsmiles@gmail.com',
+    name: 'SOVEREIGN_ARCHITECT',
+    email: 'SOVEREIGN_ROOT',
     print_id: '708B8ED1E974D85585BBBD8E06E0291E',
     trust_id: '029900612892168189cecc8a',
   },
@@ -85,7 +85,7 @@ const MASTER_AUTHORITY = {
   },
   
   // Verification function
-  isMaster: (email) => email === 'kyndsmiles@gmail.com',
+  isMaster: (email) => email === 'SOVEREIGN_ROOT',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════

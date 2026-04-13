@@ -17,7 +17,7 @@
 const SovereignSingularity = {
   version: "53.0",
   identity: {
-    root: "kyndsmiles@gmail.com",
+    root: "SOVEREIGN_ROOT",
     sms: "6055693313",
     resonance: 8.4881,
     composite: 690,

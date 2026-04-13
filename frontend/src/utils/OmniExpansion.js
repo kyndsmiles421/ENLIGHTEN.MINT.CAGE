@@ -129,7 +129,7 @@ const SingularityNexus = {
   comms: {
     twilioActive: false,
     twilioToken: null,
-    sendgridVerified: 'kyndsmiles@gmail.com',
+    sendgridVerified: 'SOVEREIGN_VERIFIED',
     broadcastHistory: [],
   },
   

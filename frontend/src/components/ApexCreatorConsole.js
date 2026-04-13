@@ -71,7 +71,7 @@ const RESONANCE = (PHI ** 2) / Math.PI;
 
 // Master Authority Configuration - V29.2 GAMIFIED CREDIT SYSTEM
 const SOVEREIGN_CONFIG = {
-  master_email: 'kyndsmiles@gmail.com',
+  master_email: 'SOVEREIGN_MASTER',
   master_print: '708B8ED1E974D85585BBBD8E06E0291E',
   // V29.2: GAMIFIED CREDITS — NO USD VALUES
   fans_per_hour: 10,              // Primary credit unit

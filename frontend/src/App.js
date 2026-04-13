@@ -345,7 +345,7 @@ function CafeApp() {
     const omnis = initializeOmnisCore();
     console.log(`🔮 SINGULARITY V30.2: ${omnis.version} — Physics: Zero-Scale, Economy: 10 Fans/hr, Sync: Aura Resonance`);
     
-    console.log("ENLIGHTEN_OS V17.0: THE MASTER CRYSTAL HUB initialized. Steven Michael | kyndsmiles@gmail.com");
+    console.log("ENLIGHTEN_OS V17.0: THE MASTER CRYSTAL HUB initialized. SOVEREIGN_ARCHITECT");
     
     // Cleanup on unmount
     return () => {
@@ -372,7 +372,8 @@ function CafeApp() {
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = currentPath === '/hub' || 
                      currentPath === '/dashboard' ||
-                     currentPath === '/lattice-view';
+                     currentPath === '/lattice-view' ||
+                     currentPath === '/sovereign-hub';
   
   return (
     <>

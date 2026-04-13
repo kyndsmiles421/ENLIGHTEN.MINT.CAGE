@@ -704,7 +704,7 @@ export default function SovereignHub() {
     
     try {
       const res = await axios.post(
-        `${API}/omnis/legal/send-nda?recipient=${encodeURIComponent(lawyerEmail)}&sender=kyndsmiles@gmail.com&trust_id=029900612892168189cecc8a`
+        `${API}/omnis/legal/send-nda?recipient=${encodeURIComponent(lawyerEmail)}&sender=${encodeURIComponent(user?.email || '')}&trust_id=029900612892168189cecc8a`
       );
       
       if (res.data.status === 'QUEUED') {
