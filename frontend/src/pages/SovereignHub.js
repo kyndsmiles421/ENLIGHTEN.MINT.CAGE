@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Share2, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+import Onboarding from '../components/Onboarding';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -131,6 +132,7 @@ export default function SovereignHub() {
 
   return (
     <div className="min-h-screen" style={{ background: '#000000' }} data-testid="sovereign-hub">
+      <Onboarding />
       {/* Title */}
       <div className="pt-10 pb-4 px-5">
         <h1
