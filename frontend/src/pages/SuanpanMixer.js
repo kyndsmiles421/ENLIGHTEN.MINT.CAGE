@@ -87,6 +87,7 @@ export default function SuanpanMixer() {
   }));
 
   // ━━━ EventBus listeners for cross-component commands ━━━
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('suanpan_mixer', 12); }, []);
   useEffect(() => {
     const unsub = eventBus.subscribe('mixer_command', (data) => {
       if (data?.action === 'add_track' && data.source) addTrack(data.source);

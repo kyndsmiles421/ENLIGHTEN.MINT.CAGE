@@ -36,6 +36,7 @@ export default function CreatorDashboard() {
   const [liveFeed, setLiveFeed] = useState([]);
   const feedIntervalRef = React.useRef(null);
 
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('creator_dashboard', 12); }, []);
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate('/auth'); return; }

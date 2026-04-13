@@ -16,6 +16,7 @@ export default function ApexCreatorPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('creator_console', 12); }, []);
   useEffect(() => {
     // Brief loading state for dramatic effect
     const timer = setTimeout(() => setLoading(false), 800);
@@ -23,7 +24,7 @@ export default function ApexCreatorPage() {
   }, []);
   
   const handleClose = () => {
-    navigate(-1);
+    navigate('/sovereign-hub');
   };
   
   if (loading) {

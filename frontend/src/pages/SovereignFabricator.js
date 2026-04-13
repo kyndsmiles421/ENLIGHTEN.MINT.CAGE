@@ -56,6 +56,7 @@ const SovereignFabricator = () => {
   const [shimmerPhase, setShimmerPhase] = useState(0);
   
   // V47.4: Breathing shimmer synced to 8.4881 resonance
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('fabricator', 12); }, []);
   useEffect(() => {
     const resonancePeriod = 1000 / (SOVEREIGN_IDENTITY.resonance / 10); // ~118ms per cycle
     const interval = setInterval(() => {
