@@ -1373,187 +1373,11 @@ export default function ApexCreatorConsole({ onClose }) {
         </div>
       </div>
       
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Fader Bank */}
-        <div className="flex-1 flex flex-col p-3 overflow-hidden">
-          {/* Layer Selector */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[9px] text-white/40 uppercase tracking-wider">LAYER:</span>
-            {Object.entries(LAYERS).map(([key, layer]) => (
-              <button
-                key={key}
-                onClick={() => setActiveLayer(key)}
-                className="px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider transition-all"
-                style={{
-                  background: activeLayer === key 
-                    ? layer.color 
-                    : 'rgba(255,255,255,0.05)',
-                  color: activeLayer === key ? '#000' : 'rgba(255,255,255,0.5)',
-                  border: `1px solid ${activeLayer === key ? layer.color : 'rgba(255,255,255,0.1)'}`,
-                }}
-              >
-                [{key}] {layer.name}
-              </button>
-            ))}
-            
-            {/* Divider */}
-            <div className="w-px h-6 bg-white/10 mx-2" />
-            
-            {/* Bank Selector (QU-32 Style) */}
-            <span className="text-[9px] text-white/40 uppercase tracking-wider">BANK:</span>
-            {Object.entries(FADER_BANKS).map(([key, bank]) => (
-              <button
-                key={key}
-                onClick={() => setActiveBank(key)}
-                className="px-2 py-1 rounded text-[9px] font-medium uppercase tracking-wider transition-all"
-                style={{
-                  background: activeBank === key 
-                    ? bank.color + '33' 
-                    : 'rgba(255,255,255,0.03)',
-                  color: activeBank === key ? bank.color : 'rgba(255,255,255,0.4)',
-                  border: `1px solid ${activeBank === key ? bank.color + '44' : 'rgba(255,255,255,0.08)'}`,
-                }}
-              >
-                {bank.name}
-              </button>
-            ))}
-          </div>
-          
-          {/* Two-Row Fader System */}
-          <div className="flex gap-3">
-            {/* Primary Faders (Layer) */}
-            <div className="flex-1">
-              <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">
-                Layer {activeLayer}: {layerConfig.name}
-              </div>
-              <div 
-                className="flex gap-1 overflow-x-auto pb-2"
-                style={{ scrollbarWidth: 'thin' }}
-              >
-                {strips.map((strip) => (
-                  <FaderStrip
-                    key={strip.id}
-                    strip={strip}
-                    layerColor={layerConfig.color}
-                    onValueChange={handleStripChange}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            {/* SuperStrip Panel */}
-            {showSuperStrip && (
-              <div className="w-48 flex-shrink-0">
-                <SuperStrip 
-                  selectedStrip={selectedStrip || strips[0]} 
-                  layerColor={layerConfig.color}
-                />
-              </div>
-            )}
-          </div>
-          
-          {/* Bank Faders (QU-32 Style Input/Group/Master) */}
-          <div className="mt-3 pt-3 border-t border-white/5">
-            <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">
-              Bank: {bankConfig.name}
-            </div>
-            <div 
-              className="flex gap-1 overflow-x-auto pb-2"
-              style={{ scrollbarWidth: 'thin' }}
-            >
-              {bankStrips.map((strip) => (
-                <FaderStrip
-                  key={strip.id}
-                  strip={strip}
-                  layerColor={bankConfig.color}
-                  onValueChange={handleBankStripChange}
-                />
-              ))}
-            </div>
-          </div>
-          
-          {/* Control Section */}
-          <div 
-            className="mt-3 p-3 rounded-lg space-y-3"
-            style={{
-              background: 'rgba(10,10,20,0.8)',
-              border: '1px solid rgba(255,255,255,0.06)',
-            }}
-          >
-            <HorizontalSlider
-              label="LOx Cooling"
-              value={loxTemp}
-              onChange={setLoxTemp}
-              min={-200}
-              max={-100}
-              unit="°C"
-              color="#06B6D4"
-              icon={Thermometer}
-            />
-            
-            <HorizontalSlider
-              label="Haptic Intensity"
-              value={hapticIntensity}
-              onChange={setHapticIntensity}
-              unit="%"
-              color="#8B5CF6"
-              icon={Activity}
-            />
-            
-            {/* Control Toggles */}
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={() => setGpuActive(!gpuActive)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[9px] uppercase tracking-wider transition-all"
-                style={{
-                  background: gpuActive ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${gpuActive ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'}`,
-                  color: gpuActive ? '#22C55E' : 'rgba(255,255,255,0.4)',
-                }}
-              >
-                <Cpu size={10} />
-                GPU {gpuActive ? 'ON' : 'OFF'}
-              </button>
-              
-              <button
-                onClick={() => setObsidianVoid(!obsidianVoid)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[9px] uppercase tracking-wider transition-all"
-                style={{
-                  background: obsidianVoid ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${obsidianVoid ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.1)'}`,
-                  color: obsidianVoid ? '#A78BFA' : 'rgba(255,255,255,0.4)',
-                }}
-              >
-                {obsidianVoid ? <Eye size={10} /> : <EyeOff size={10} />}
-                Obsidian Void
-              </button>
-              
-              {/* Transport Controls */}
-              <div className="flex items-center gap-1 ml-auto">
-                <button className="p-1.5 rounded hover:bg-white/10 transition-all">
-                  <SkipBack size={14} className="text-white/60" />
-                </button>
-                <button 
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="p-2 rounded transition-all"
-                  style={{
-                    background: isPlaying ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.1)',
-                  }}
-                >
-                  {isPlaying ? <Pause size={16} className="text-green-400" /> : <Play size={16} className="text-white/80" />}
-                </button>
-                <button className="p-1.5 rounded hover:bg-white/10 transition-all">
-                  <SkipForward size={14} className="text-white/60" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Right Panel - GPU Preview & Metrics */}
+      {/* Main Content — Mobile: stacked (visual top, mixer bottom). Desktop: side-by-side */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Visual Screen (Top on mobile, Right on desktop) */}
         <div 
-          className="w-80 flex flex-col p-3 border-l overflow-y-auto"
+          className="h-[35vh] lg:h-auto lg:w-80 flex flex-col p-3 border-b lg:border-b-0 lg:border-l overflow-y-auto order-first lg:order-last"
           style={{ borderColor: 'rgba(255,255,255,0.06)' }}
         >
           {/* V29.0: Audit Terminal Feed (Collapsible) */}
@@ -1769,6 +1593,109 @@ export default function ApexCreatorConsole({ onClose }) {
                     color: freq.color,
                   }}
                 >
+                  {freq.hz}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Mixer Panel (Bottom on mobile, Left on desktop) */}
+        <div className="flex-1 flex flex-col p-3 overflow-y-auto order-last lg:order-first">
+          {/* Layer + Bank Selectors */}
+          <div className="flex flex-wrap items-center gap-1.5 mb-2">
+            {Object.entries(LAYERS).map(([key, layer]) => (
+              <button
+                key={key}
+                onClick={() => setActiveLayer(key)}
+                className="px-2.5 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all"
+                style={{
+                  background: activeLayer === key ? layer.color : 'rgba(255,255,255,0.05)',
+                  color: activeLayer === key ? '#000' : 'rgba(255,255,255,0.5)',
+                  border: `1px solid ${activeLayer === key ? layer.color : 'rgba(255,255,255,0.1)'}`,
+                }}
+              >
+                [{key}] {layer.name}
+              </button>
+            ))}
+            <div className="w-px h-5 bg-white/10 mx-1" />
+            {Object.entries(FADER_BANKS).map(([key, bank]) => (
+              <button
+                key={key}
+                onClick={() => setActiveBank(key)}
+                className="px-2 py-1 rounded text-[8px] font-medium uppercase tracking-wider transition-all"
+                style={{
+                  background: activeBank === key ? bank.color + '33' : 'rgba(255,255,255,0.03)',
+                  color: activeBank === key ? bank.color : 'rgba(255,255,255,0.4)',
+                  border: `1px solid ${activeBank === key ? bank.color + '44' : 'rgba(255,255,255,0.08)'}`,
+                }}
+              >
+                {bank.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Primary Faders */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">
+                Layer {activeLayer}: {layerConfig.name}
+              </div>
+              <div className="flex gap-1 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+                {strips.map((strip) => (
+                  <FaderStrip key={strip.id} strip={strip} layerColor={layerConfig.color} onValueChange={handleStripChange} />
+                ))}
+              </div>
+            </div>
+            {showSuperStrip && (
+              <div className="w-48 flex-shrink-0 hidden lg:block">
+                <SuperStrip selectedStrip={selectedStrip || strips[0]} layerColor={layerConfig.color} />
+              </div>
+            )}
+          </div>
+
+          {/* Bank Faders */}
+          <div className="mt-2 pt-2 border-t border-white/5">
+            <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Bank: {bankConfig.name}</div>
+            <div className="flex gap-1 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+              {bankStrips.map((strip) => (
+                <FaderStrip key={strip.id} strip={strip} layerColor={bankConfig.color} onValueChange={handleBankStripChange} />
+              ))}
+            </div>
+          </div>
+
+          {/* Controls Row */}
+          <div className="mt-2 p-2 rounded-lg space-y-2" style={{ background: 'rgba(10,10,20,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <HorizontalSlider label="LOx Cooling" value={loxTemp} onChange={setLoxTemp} min={-200} max={-100} unit="°C" color="#06B6D4" icon={Thermometer} />
+            <HorizontalSlider label="Haptic Intensity" value={hapticIntensity} onChange={setHapticIntensity} unit="%" color="#8B5CF6" icon={Activity} />
+            <div className="flex items-center gap-2 pt-1 flex-wrap">
+              <button onClick={() => setGpuActive(!gpuActive)}
+                className="flex items-center gap-1 px-2 py-1 rounded text-[8px] uppercase tracking-wider transition-all"
+                style={{ background: gpuActive ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${gpuActive ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'}`, color: gpuActive ? '#22C55E' : 'rgba(255,255,255,0.4)' }}>
+                <Cpu size={9} /> GPU {gpuActive ? 'ON' : 'OFF'}
+              </button>
+              <button onClick={() => setObsidianVoid(!obsidianVoid)}
+                className="flex items-center gap-1 px-2 py-1 rounded text-[8px] uppercase tracking-wider transition-all"
+                style={{ background: obsidianVoid ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${obsidianVoid ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.1)'}`, color: obsidianVoid ? '#A78BFA' : 'rgba(255,255,255,0.4)' }}>
+                {obsidianVoid ? <Eye size={9} /> : <EyeOff size={9} />} Void
+              </button>
+              <div className="flex items-center gap-1 ml-auto">
+                <button className="p-1 rounded hover:bg-white/10"><SkipBack size={12} className="text-white/60" /></button>
+                <button onClick={() => setIsPlaying(!isPlaying)} className="p-1.5 rounded" style={{ background: isPlaying ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.1)' }}>
+                  {isPlaying ? <Pause size={14} className="text-green-400" /> : <Play size={14} className="text-white/80" />}
+                </button>
+                <button className="p-1 rounded hover:bg-white/10"><SkipForward size={12} className="text-white/60" /></button>
+              </div>
+            </div>
+          </div>
+
+          {/* Solfeggio Quick Access */}
+          <div className="mt-2 p-2 rounded-lg" style={{ background: 'rgba(10,10,20,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="text-[8px] text-white/40 uppercase tracking-wider mb-1">Solfeggio Stack</div>
+            <div className="grid grid-cols-5 gap-1">
+              {SOLFEGGIO_FREQUENCIES.map((freq) => (
+                <button key={freq.hz} className="p-1.5 rounded text-[8px] font-mono transition-all hover:scale-105"
+                  style={{ background: freq.color + '22', border: `1px solid ${freq.color}44`, color: freq.color }}>
                   {freq.hz}
                 </button>
               ))}
