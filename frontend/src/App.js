@@ -289,6 +289,9 @@ const ARPortalPage = lazy(() => import('./pages/ARPortalPage'));
 const ApexCreatorPage = lazy(() => import('./pages/ApexCreatorPage'));
 const LiquidityTrader = lazy(() => import('./pages/LiquidityTrader'));
 const SovereignMasterEngine = lazy(() => import('./pages/SovereignMasterEngine'));
+const ResourceAlchemy = lazy(() => import('./pages/ResourceAlchemy'));
+const GravityWellExchange = lazy(() => import('./pages/GravityWellExchange'));
+const CrypticQuestNodes = lazy(() => import('./pages/CrypticQuestNodes'));
 
 function PageLoader() {
   return (
@@ -682,6 +685,9 @@ function AnimatedRoutes() {
         <Route path="/ar-portal" element={<ARPortalPage />} />
         <Route path="/liquidity-trader" element={<LiquidityTrader />} />
         <Route path="/master-engine" element={<SovereignMasterEngine />} />
+        <Route path="/resource-alchemy" element={<ResourceAlchemy />} />
+        <Route path="/gravity-well" element={<GravityWellExchange />} />
+        <Route path="/cryptic-quest" element={<CrypticQuestNodes />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
