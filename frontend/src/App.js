@@ -365,8 +365,7 @@ function CafeApp() {
   // Check if current route is sovereign mode (hide all chrome including VOID button)
   const isSovereignRoute = currentPath === '/sovereign-canvas' || 
                            currentPath === '/replant' ||
-                           currentPath === '/sovereign-hub' ||
-                           currentPath === '/master-engine'; // V2.1: Master Engine is immersive
+                           currentPath === '/master-engine'; // Only truly immersive pages
   
   // Check if current route is hub (hide legacy toolbars to avoid overlap with SovereignGrid)
   const isHubRoute = currentPath === '/hub' || 
