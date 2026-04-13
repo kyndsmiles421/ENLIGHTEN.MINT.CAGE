@@ -1,10 +1,10 @@
 /**
- * V33.0 SYSTEM-WIDE MIXER — Collapsible + Orbital Sphere Mode
+ * V35.0 SYSTEM-WIDE MIXER — CONTROLS THE SCREEN
  * 
- * Layout: Monitor (top 2/3) + Mixer (bottom 1/3)
- * Mixer modes: STRIP (horizontal faders) | ORBITAL (sphere with golden-ratio orbits)
- * Collapsible: tap chevron to collapse to thin bar, expand back to 1/3
- * All math follows: PHI (1.618), Fibonacci sequence, Solfeggio frequencies, 9x9 lattice
+ * Tap a module label on the mixer → it loads in the monitor (top 2/3)
+ * Slide a pillar fader → adjusts that pillar's weight in the economy
+ * Mute a channel → stops dust accrual for that module
+ * The mixer IS the navigation. The mixer IS the controller.
  */
 
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
@@ -14,59 +14,55 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
-  ChevronDown, ChevronUp, Lock, Play, Pause, Sliders, ShoppingCart,
-  ArrowLeft, Home, X, Check, Globe, BarChart3
+  ChevronDown, ChevronUp, Lock, Sliders, ShoppingCart,
+  Home, X, Check, Globe, BarChart3
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
-// ═══ SACRED CONSTANTS (mirrors master_transmuter.py) ═══
 const PHI = 1.618033988749895;
-const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // 137.5° — sunflower spiral
-const FIB = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
-const SOLFEGGIO = [174, 285, 396, 417, 528, 639, 741, 852, 963];
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
-// ═══ PILLARS ═══
 const PILLARS = [
-  { key: 'practice', title: 'PRA', full: 'Practice', color: '#D8B4FE', hz: 528, modules: [
+  { key: 'practice', title: 'PRA', full: 'Practice', color: '#D8B4FE', modules: [
     { id: 'breathwork', label: 'Breath', route: '/breathing' }, { id: 'meditation', label: 'Medit', route: '/meditation' },
     { id: 'yoga', label: 'Yoga', route: '/yoga' }, { id: 'mudras', label: 'Mudra', route: '/mudras' },
     { id: 'mantras', label: 'Mantra', route: '/mantras' }, { id: 'light', label: 'Light', route: '/light-therapy' },
     { id: 'affirm', label: 'Affirm', route: '/affirmations' }, { id: 'ritual', label: 'Ritual', route: '/daily-ritual' },
     { id: 'mood', label: 'Mood', route: '/mood' },
   ]},
-  { key: 'divination', title: 'DIV', full: 'Divination', color: '#E879F9', hz: 963, modules: [
+  { key: 'divination', title: 'DIV', full: 'Divination', color: '#E879F9', modules: [
     { id: 'oracle', label: 'Oracle', route: '/oracle' }, { id: 'akashic', label: 'Akashic', route: '/akashic-records' },
     { id: 'stars', label: 'Stars', route: '/star-chart' }, { id: 'numbers', label: 'Numer', route: '/numerology' },
     { id: 'dreams', label: 'Dreams', route: '/dreams' }, { id: 'mayan', label: 'Mayan', route: '/mayan' },
     { id: 'calendar', label: 'Calend', route: '/cosmic-calendar' }, { id: 'cards', label: 'Cards', route: '/cardology' },
     { id: 'totems', label: 'Totems', route: '/animal-totems' },
   ]},
-  { key: 'sanctuary', title: 'SAN', full: 'Sanctuary', color: '#2DD4BF', hz: 432, modules: [
+  { key: 'sanctuary', title: 'SAN', full: 'Sanctuary', color: '#2DD4BF', modules: [
     { id: 'zen', label: 'Zen', route: '/zen-garden' }, { id: 'sound', label: 'Sound', route: '/soundscapes' },
     { id: 'music', label: 'Music', route: '/music-lounge' }, { id: 'freq', label: 'Freq', route: '/frequencies' },
     { id: 'vr', label: 'VR', route: '/vr' }, { id: 'journal', label: 'Journal', route: '/journal' },
     { id: 'wisdom', label: 'Wisdom', route: '/wisdom-journal' }, { id: 'green', label: 'Green', route: '/green-journal' },
   ]},
-  { key: 'nourish', title: 'NOU', full: 'Nourish', color: '#22C55E', hz: 639, modules: [
+  { key: 'nourish', title: 'NOU', full: 'Nourish', color: '#22C55E', modules: [
     { id: 'nourish', label: 'Nourish', route: '/nourishment' }, { id: 'aroma', label: 'Aroma', route: '/aromatherapy' },
     { id: 'herbs', label: 'Herbs', route: '/herbology' }, { id: 'elixirs', label: 'Elixir', route: '/elixirs' },
     { id: 'acu', label: 'Acu', route: '/acupressure' }, { id: 'reiki', label: 'Reiki', route: '/reiki' },
     { id: 'meals', label: 'Meals', route: '/meal-planning' }, { id: 'reports', label: 'Report', route: '/wellness-reports' },
   ]},
-  { key: 'explore', title: 'EXP', full: 'Explore', color: '#FB923C', hz: 741, modules: [
+  { key: 'explore', title: 'EXP', full: 'Explore', color: '#FB923C', modules: [
     { id: 'discover', label: 'Discov', route: '/discover' }, { id: 'encycl', label: 'Encycl', route: '/encyclopedia' },
     { id: 'reading', label: 'Read', route: '/reading-list' }, { id: 'stories', label: 'Stories', route: '/creation-stories' },
     { id: 'teach', label: 'Teach', route: '/teachings' }, { id: 'commun', label: 'Commun', route: '/community' },
     { id: 'bless', label: 'Bless', route: '/blessings' }, { id: 'sacred', label: 'Sacred', route: '/sacred-texts' },
     { id: 'profile', label: 'Profile', route: '/cosmic-profile' },
   ]},
-  { key: 'sage', title: 'SAG', full: 'Sage AI', color: '#38BDF8', hz: 852, modules: [
+  { key: 'sage', title: 'SAG', full: 'Sage AI', color: '#38BDF8', modules: [
     { id: 'coach', label: 'Coach', route: '/coach' }, { id: 'crystals', label: 'Crystal', route: '/crystals' },
     { id: 'briefing', label: 'Brief', route: '/daily-briefing' }, { id: 'forecast', label: 'Forcast', route: '/forecasts' },
   ]},
-  { key: 'council', title: 'COU', full: 'Council', color: '#C084FC', hz: 396, modules: [
+  { key: 'council', title: 'COU', full: 'Council', color: '#C084FC', modules: [
     { id: 'advisors', label: 'Council', route: '/sovereigns' }, { id: 'economy', label: 'Econ', route: '/economy' },
     { id: 'academy', label: 'Academ', route: '/academy' }, { id: 'trade', label: 'Trade', route: '/trade-circle' },
     { id: 'skins', label: 'Skins', route: '/crystal-skins' }, { id: 'vault', label: 'Vault', route: '/archives' },
@@ -77,226 +73,164 @@ const PILLARS = [
 ];
 const TOTAL = PILLARS.reduce((a, p) => a + p.modules.length, 0);
 
-// ═══ CONTEXT ═══
 const MixerContext = createContext(null);
 export const useMixer = () => useContext(MixerContext);
 
-// ═══ ORBITAL SPHERE VIEW ═══
-function OrbitalSphere({ pillars, pillarLevels, onNav, currentRoute }) {
-  const canvasRef = useRef(null);
-  const frameRef = useRef(null);
-  const [hovered, setHovered] = useState(null);
+// ═══ MEDIA RECORDER HOOK ═══
+function useMediaControls() {
+  const [isRecVideo, setRecVideo] = useState(false);
+  const [isRecAudio, setRecAudio] = useState(false);
+  const [isRecScreen, setRecScreen] = useState(false);
+  const recorderRef = useRef(null);
+  const streamRef = useRef(null);
+  const chunksRef = useRef([]);
 
-  useEffect(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ctx = c.getContext('2d');
-    const w = c.width;
-    const h = c.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    let t = 0;
+  const stopAll = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state !== 'inactive') recorderRef.current.stop();
+    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+    streamRef.current = null;
+    recorderRef.current = null;
+    setRecVideo(false); setRecAudio(false); setRecScreen(false);
+  }, []);
 
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-
-      // Central sphere glow
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40);
-      grad.addColorStop(0, 'rgba(139,92,246,0.3)');
-      grad.addColorStop(0.5, 'rgba(139,92,246,0.08)');
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 40, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Draw orbital rings using Fibonacci radii
-      const fibRadii = [34, 55, 89];
-      fibRadii.forEach((r, i) => {
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(139,92,246,${0.04 + i * 0.02})`;
-        ctx.lineWidth = 0.5;
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.stroke();
-      });
-
-      // Place 7 pillars on golden-angle spiral
-      pillars.forEach((p, i) => {
-        const r = 30 + (i * 12); // Spiral out
-        const angle = i * GOLDEN_ANGLE + t * 0.003; // Slow rotation
-        const x = cx + Math.cos(angle) * r;
-        const y = cy + Math.sin(angle) * r;
-        const level = pillarLevels[i] / 100;
-        const size = 5 + level * 8; // Size = intensity
-
-        // Pillar node
-        ctx.beginPath();
-        ctx.fillStyle = p.color + Math.round(level * 200 + 55).toString(16).padStart(2, '0');
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Glow
-        if (level > 0.5) {
-          ctx.beginPath();
-          const glow = ctx.createRadialGradient(x, y, 0, x, y, size * 2);
-          glow.addColorStop(0, p.color + '30');
-          glow.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = glow;
-          ctx.arc(x, y, size * 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Connection line to center (phi-weighted opacity)
-        ctx.beginPath();
-        ctx.strokeStyle = p.color + Math.round(level * 60).toString(16).padStart(2, '0');
-        ctx.lineWidth = level * 1.5;
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-
-        // Label
-        ctx.fillStyle = p.color + '99';
-        ctx.font = '7px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(p.title, x, y + size + 9);
-
-        // Draw module sub-nodes for expanded pillar
-        if (hovered === i) {
-          p.modules.forEach((m, mi) => {
-            const subAngle = angle + (mi - p.modules.length / 2) * 0.3;
-            const subR = r + 20 + mi * 3;
-            const mx = cx + Math.cos(subAngle) * subR;
-            const my = cy + Math.sin(subAngle) * subR;
-            ctx.beginPath();
-            ctx.fillStyle = p.color + '66';
-            ctx.arc(mx, my, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = p.color + '55';
-            ctx.font = '5px monospace';
-            ctx.fillText(m.label, mx, my + 7);
-          });
-        }
-      });
-
-      // Center label
-      ctx.fillStyle = 'rgba(248,250,252,0.4)';
-      ctx.font = 'bold 7px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('φ', cx, cy + 3);
-
-      t++;
-      frameRef.current = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => cancelAnimationFrame(frameRef.current);
-  }, [pillars, pillarLevels, hovered]);
-
-  // Handle taps
-  const handleTap = (e) => {
-    const c = canvasRef.current;
-    const rect = c.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (c.width / rect.width);
-    const y = (e.clientY - rect.top) * (c.height / rect.height);
-    const cx = c.width / 2;
-    const cy = c.height / 2;
-
-    // Check which pillar was tapped
-    PILLARS.forEach((p, i) => {
-      const r = 30 + i * 12;
-      const angle = i * GOLDEN_ANGLE;
-      const px = cx + Math.cos(angle) * r;
-      const py = cy + Math.sin(angle) * r;
-      const dist = Math.sqrt((x - px) ** 2 + (y - py) ** 2);
-      if (dist < 15) {
-        if (hovered === i) {
-          // Double-tap: navigate to first module
-          onNav(p.modules[0].route);
-        } else {
-          setHovered(i);
-        }
+  const startRecording = useCallback(async (type) => {
+    try {
+      stopAll();
+      let stream;
+      if (type === 'screen') {
+        stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      } else if (type === 'video') {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } }, audio: true });
+      } else {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: { ideal: 44100 }, echoCancellation: true, noiseSuppression: true } });
       }
-    });
-  };
+      streamRef.current = stream;
+      chunksRef.current = [];
 
-  return (
-    <canvas ref={canvasRef} width={280} height={200}
-      onClick={handleTap}
-      className="w-full h-full cursor-pointer"
-      style={{ background: 'transparent' }} />
-  );
+      const mimeType = type === 'audio' ? 'audio/webm;codecs=opus' : 'video/webm;codecs=vp9,opus';
+      const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported(mimeType) ? mimeType : undefined });
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      recorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(chunksRef.current, { type: type === 'audio' ? 'audio/webm' : 'video/webm' });
+        // Auto-download the recording
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `enlighten_${type}_${Date.now()}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success(`${type} saved (${(blob.size / 1024).toFixed(0)}KB)`);
+        setRecVideo(false); setRecAudio(false); setRecScreen(false);
+      };
+
+      recorderRef.current = recorder;
+      recorder.start(1000);
+      if (type === 'video') setRecVideo(true);
+      else if (type === 'audio') setRecAudio(true);
+      else setRecScreen(true);
+      toast.success(`${type} recording started`);
+    } catch (e) {
+      toast.error(`Permission denied: ${e.message}`);
+    }
+  }, [stopAll]);
+
+  return { isRecVideo, isRecAudio, isRecScreen, startRecording, stopAll, isRecording: isRecVideo || isRecAudio || isRecScreen };
+}
+
+// Find which module matches a route
+function findModule(route) {
+  for (const p of PILLARS) {
+    for (const m of p.modules) {
+      if (m.route === route) return { ...m, pillar: p };
+    }
+  }
+  return null;
 }
 
 // ═══ STRIP VIEW ═══
-function StripView({ pillars, pillarLevels, setPillarLevels, masterLevel, setMasterLevel, expandedPillar, setExpandedPillar, modStates, setModStates, tier, unlocks, onStore, onNav, currentRoute }) {
-  const isPillarUnlocked = (key) => unlocks.has_full_unlock || unlocks.unlocked_pillars?.includes(key) || tier === 'SOVEREIGN' || tier === 'ARTISAN';
-  const currentMod = pillars.flatMap(p => p.modules.map(m => ({ ...m, pk: p.key }))).find(m => m.route === currentRoute);
+function StripView({ pillars, pillarLevels, setPillarLevels, masterLevel, setMasterLevel, expandedPillar, setExpandedPillar, modStates, setModStates, onNav, currentRoute, onMuteChange }) {
+  const current = findModule(currentRoute);
 
   return (
     <div style={{ background: '#080812' }}>
-      {/* Status */}
+      {/* Status + Master */}
       <div className="flex items-center justify-between px-3 py-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 4px #22C55E' }} />
           <span className="text-[7px] font-mono text-green-400/60">LIVE</span>
-          {currentMod && <span className="text-[7px] text-white/25">· {currentMod.label}</span>}
+          {current && <span className="text-[7px] font-bold" style={{ color: current.pillar.color }}>{current.label}</span>}
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[6px] text-white/15">MST</span>
           <input type="range" min="0" max="100" value={masterLevel} onChange={(e) => setMasterLevel(Number(e.target.value))}
             className="w-10 h-1 rounded-full cursor-pointer" style={{ accentColor: '#F8FAFC' }} />
-          <button onClick={onStore} className="p-1 rounded active:scale-90" style={{ background: 'rgba(234,179,8,0.05)' }} data-testid="mixer-store-btn">
-            <ShoppingCart size={9} className="text-yellow-400/50" />
-          </button>
         </div>
       </div>
 
-      {/* Faders */}
-      <div className="flex gap-0.5 px-2 py-1 items-end">
-        {pillars.map((p, i) => (
-          <div key={p.key} className="flex-1 min-w-0 flex flex-col items-center">
-            <div className="text-[6px] font-mono" style={{ color: p.color + '88' }}>{pillarLevels[i]}</div>
-            <input type="range" min="0" max="100" value={pillarLevels[i]}
-              onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[i] = Number(e.target.value); return n; })}
-              className="w-full h-1.5 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
-            <button onClick={() => setExpandedPillar(expandedPillar === i ? null : i)}
-              className="text-[6px] font-bold uppercase active:scale-90 mt-0.5"
-              style={{ color: expandedPillar === i ? p.color : p.color + '44' }}
-              data-testid={`pillar-fader-${p.key}`}>
-              {p.title}<ChevronUp size={5} className="inline ml-px" style={{ transform: expandedPillar === i ? 'rotate(180deg)' : 'none', transition: '.15s' }} />
-            </button>
-          </div>
-        ))}
+      {/* Pillar faders — tap label to expand, drag to control weight */}
+      <div className="flex gap-0.5 px-2 py-1.5 items-end">
+        {pillars.map((p, i) => {
+          const isActive = current?.pillar.key === p.key;
+          return (
+            <div key={p.key} className="flex-1 min-w-0 flex flex-col items-center">
+              <div className="text-[6px] font-mono" style={{ color: p.color + (isActive ? 'FF' : '66') }}>{pillarLevels[i]}</div>
+              <input type="range" min="0" max="100" value={pillarLevels[i]}
+                onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[i] = Number(e.target.value); return n; })}
+                className="w-full h-1.5 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
+              <button onClick={() => setExpandedPillar(expandedPillar === i ? null : i)}
+                className="text-[6px] font-bold uppercase active:scale-90 mt-0.5"
+                style={{ color: expandedPillar === i ? p.color : isActive ? p.color + 'CC' : p.color + '44' }}
+                data-testid={`pillar-fader-${p.key}`}>
+                {p.title}
+                <ChevronUp size={5} className="inline ml-px" style={{ transform: expandedPillar === i ? 'rotate(180deg)' : 'none', transition: '.15s' }} />
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Expanded channels */}
+      {/* Expanded channels — tap label = NAVIGATE to that module */}
       <AnimatePresence>
         {expandedPillar !== null && (() => {
           const p = pillars[expandedPillar];
-          const unlocked = isPillarUnlocked(p.key);
           return (
             <motion.div key={p.key} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.12 }} className="overflow-hidden">
               <div className="px-2 pb-1">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[6px] font-bold uppercase tracking-wider" style={{ color: p.color }}>{p.full} · {p.modules.length}ch · {p.hz}Hz</span>
-                  {!unlocked && <button onClick={onStore} className="text-[5px] flex items-center gap-0.5" style={{ color: p.color + '66' }}><Lock size={5} />Unlock</button>}
+                  <span className="text-[6px] font-bold uppercase tracking-wider" style={{ color: p.color }}>{p.full} · {p.modules.length}ch</span>
                 </div>
                 <div className="flex gap-0.5 overflow-x-auto pb-0.5">
                   {p.modules.map(mod => {
                     const st = modStates[mod.id] || { value: 50, muted: false, solo: false };
+                    const isCurrentMod = currentRoute === mod.route;
                     return (
-                      <div key={mod.id} className="flex flex-col items-center w-[34px] flex-shrink-0">
-                        {unlocked ? (
-                          <input type="range" min="0" max="100" value={st.value}
-                            onChange={(e) => setModStates(prev => ({ ...prev, [mod.id]: { ...prev[mod.id], value: Number(e.target.value) } }))}
-                            className="w-full h-1 rounded-full cursor-pointer mb-px" style={{ accentColor: p.color }} />
-                        ) : <div className="w-full h-1 rounded-full mb-px" style={{ background: 'rgba(255,255,255,0.03)' }} />}
+                      <div key={mod.id} className="flex flex-col items-center w-[36px] flex-shrink-0" style={{ opacity: st.muted ? 0.3 : 1 }}>
+                        <input type="range" min="0" max="100" value={st.value}
+                          onChange={(e) => setModStates(prev => ({ ...prev, [mod.id]: { ...prev[mod.id], value: Number(e.target.value) } }))}
+                          className="w-full h-1 rounded-full cursor-pointer mb-0.5" style={{ accentColor: p.color }} />
                         <div className="flex gap-px">
-                          <button onClick={() => setModStates(prev => ({ ...prev, [mod.id]: { ...prev[mod.id], muted: !st.muted } }))}
+                          <button onClick={() => {
+                            const newMuted = !st.muted;
+                            setModStates(prev => ({ ...prev, [mod.id]: { ...prev[mod.id], muted: newMuted } }));
+                            onMuteChange(mod.id, newMuted);
+                          }}
                             className="w-3 h-2 rounded-sm text-[4px] font-bold" style={{ background: st.muted ? '#EF4444' : 'rgba(255,255,255,0.04)', color: st.muted ? '#fff' : 'rgba(255,255,255,0.12)' }}>M</button>
                           <button onClick={() => setModStates(prev => ({ ...prev, [mod.id]: { ...prev[mod.id], solo: !st.solo } }))}
                             className="w-3 h-2 rounded-sm text-[4px] font-bold" style={{ background: st.solo ? '#EAB308' : 'rgba(255,255,255,0.04)', color: st.solo ? '#000' : 'rgba(255,255,255,0.12)' }}>S</button>
                         </div>
-                        <button onClick={() => onNav(mod.route)} className="text-[5px] truncate w-full text-center active:scale-90" style={{ color: p.color + 'AA' }}>{mod.label}</button>
+                        {/* TAP LABEL = LOAD THIS MODULE ON SCREEN */}
+                        <button onClick={() => onNav(mod.route)}
+                          className="text-[5px] truncate w-full text-center active:scale-90 mt-px font-bold"
+                          style={{
+                            color: isCurrentMod ? '#000' : p.color + 'CC',
+                            background: isCurrentMod ? p.color : 'transparent',
+                            borderRadius: '2px',
+                            padding: isCurrentMod ? '1px 0' : 0,
+                          }}
+                          data-testid={`mixer-nav-${mod.id}`}>
+                          {mod.label}
+                        </button>
                       </div>
                     );
                   })}
@@ -306,15 +240,123 @@ function StripView({ pillars, pillarLevels, setPillarLevels, masterLevel, setMas
           );
         })()}
       </AnimatePresence>
-
-      {/* Quick nav */}
-      <div className="flex items-center px-2 pb-1">
-        <button onClick={() => onNav('/sovereign-hub')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="mixer-hub-btn"><Home size={9} className="text-white/30" /></button>
-        <div className="flex-1" />
-        <div className="flex gap-0.5">{['BASE', 'SEED', 'ARTISAN', 'SOVEREIGN'].map(t => <div key={t} className="w-1.5 h-1.5 rounded-full" style={{ background: t === tier ? '#C084FC' : 'rgba(255,255,255,0.05)' }} />)}</div>
-      </div>
     </div>
   );
+}
+
+// ═══ ORBITAL SPHERE ═══
+function OrbitalSphere({ pillars, pillarLevels, onNav, currentRoute }) {
+  const canvasRef = useRef(null);
+  const frameRef = useRef(null);
+  const [hoveredPillar, setHoveredPillar] = useState(null);
+
+  useEffect(() => {
+    const c = canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d');
+    const w = c.width; const h = c.height;
+    const cx = w / 2; const cy = h / 2;
+    let t = 0;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      // Central phi core
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 35);
+      grad.addColorStop(0, 'rgba(139,92,246,0.25)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, 35, 0, Math.PI * 2); ctx.fill();
+
+      // Orbital rings
+      [34, 55, 89].forEach((r, i) => {
+        ctx.beginPath(); ctx.strokeStyle = `rgba(139,92,246,${0.03 + i * 0.02})`; ctx.lineWidth = 0.5;
+        ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      });
+
+      // Pillar nodes
+      pillars.forEach((p, i) => {
+        const r = 28 + i * 12;
+        const angle = i * GOLDEN_ANGLE + t * 0.003;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        const level = pillarLevels[i] / 100;
+        const size = 4 + level * 7;
+        const isCurrent = findModule(currentRoute)?.pillar.key === p.key;
+
+        // Connection line
+        ctx.beginPath(); ctx.strokeStyle = p.color + Math.round(level * 50 + 10).toString(16).padStart(2, '0');
+        ctx.lineWidth = isCurrent ? 2 : level * 1.2; ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+
+        // Node
+        ctx.beginPath(); ctx.fillStyle = p.color + (isCurrent ? 'FF' : Math.round(level * 180 + 40).toString(16).padStart(2, '0'));
+        ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+
+        if (isCurrent || level > 0.6) {
+          ctx.beginPath();
+          const glow = ctx.createRadialGradient(x, y, 0, x, y, size * 2.5);
+          glow.addColorStop(0, p.color + '25'); glow.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = glow; ctx.arc(x, y, size * 2.5, 0, Math.PI * 2); ctx.fill();
+        }
+
+        ctx.fillStyle = isCurrent ? '#fff' : p.color + '88';
+        ctx.font = `${isCurrent ? 'bold ' : ''}7px monospace`; ctx.textAlign = 'center';
+        ctx.fillText(p.title, x, y + size + 9);
+
+        // Sub-nodes when hovered
+        if (hoveredPillar === i) {
+          p.modules.forEach((m, mi) => {
+            const subAngle = angle + (mi - p.modules.length / 2) * 0.28;
+            const subR = r + 18 + mi * 2.5;
+            const mx = cx + Math.cos(subAngle) * subR;
+            const my = cy + Math.sin(subAngle) * subR;
+            const isThisMod = m.route === currentRoute;
+            ctx.beginPath(); ctx.fillStyle = isThisMod ? p.color : p.color + '55';
+            ctx.arc(mx, my, isThisMod ? 4 : 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = isThisMod ? '#fff' : p.color + '44';
+            ctx.font = '5px monospace'; ctx.fillText(m.label, mx, my + 8);
+          });
+        }
+      });
+
+      ctx.fillStyle = 'rgba(248,250,252,0.35)'; ctx.font = 'bold 8px monospace'; ctx.textAlign = 'center';
+      ctx.fillText('\u03C6', cx, cy + 3);
+      t++; frameRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [pillars, pillarLevels, hoveredPillar, currentRoute]);
+
+  const handleTap = (e) => {
+    const c = canvasRef.current; const rect = c.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (c.width / rect.width);
+    const y = (e.clientY - rect.top) * (c.height / rect.height);
+    const cx = c.width / 2; const cy = c.height / 2;
+
+    // Check sub-nodes first (if a pillar is hovered/expanded)
+    if (hoveredPillar !== null) {
+      const p = pillars[hoveredPillar]; const i = hoveredPillar;
+      const r = 28 + i * 12; const angle = i * GOLDEN_ANGLE;
+      for (let mi = 0; mi < p.modules.length; mi++) {
+        const subAngle = angle + (mi - p.modules.length / 2) * 0.28;
+        const subR = r + 18 + mi * 2.5;
+        const mx = cx + Math.cos(subAngle) * subR;
+        const my = cy + Math.sin(subAngle) * subR;
+        if (Math.sqrt((x - mx) ** 2 + (y - my) ** 2) < 12) {
+          onNav(p.modules[mi].route);
+          return;
+        }
+      }
+    }
+
+    // Check pillar nodes
+    pillars.forEach((p, i) => {
+      const r = 28 + i * 12; const angle = i * GOLDEN_ANGLE;
+      const px = cx + Math.cos(angle) * r; const py = cy + Math.sin(angle) * r;
+      if (Math.sqrt((x - px) ** 2 + (y - py) ** 2) < 15) {
+        setHoveredPillar(hoveredPillar === i ? null : i);
+      }
+    });
+  };
+
+  return <canvas ref={canvasRef} width={300} height={200} onClick={handleTap} className="w-full h-full cursor-pointer" style={{ background: 'transparent' }} />;
 }
 
 // ═══ STORE ═══
@@ -345,7 +387,7 @@ function StorePanel({ items, credits, onBuy, onClose }) {
   );
 }
 
-// ═══ MAIN PROVIDER ═══
+// ═══ MAIN PROVIDER — Wraps entire app ═══
 export function MixerProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -358,14 +400,16 @@ export function MixerProvider({ children }) {
   const [showStore, setShowStore] = useState(false);
   const [storeItems, setStoreItems] = useState([]);
   const [credits, setCredits] = useState(0);
-  const [mixerState, setMixerState] = useState('expanded'); // 'expanded' | 'collapsed' | 'hidden'
-  const [viewMode, setViewMode] = useState('strip'); // 'strip' | 'orbital'
+  const [mixerState, setMixerState] = useState('expanded');
+  const [viewMode, setViewMode] = useState('strip');
+  const [mutedModules, setMutedModules] = useState(new Set());
+  const media = useMediaControls();
 
   const hideMixer = ['/', '/landing', '/auth', '/intro', '/sovereign-hub'].includes(location.pathname);
 
   useEffect(() => {
     const s = {};
-    PILLARS.forEach(p => p.modules.forEach(m => { s[m.id] = { value: 40 + Math.floor(Math.random() * 40), muted: false, solo: false }; }));
+    PILLARS.forEach(p => p.modules.forEach(m => { s[m.id] = { value: 50, muted: false, solo: false }; }));
     setModStates(s);
   }, []);
 
@@ -376,6 +420,28 @@ export function MixerProvider({ children }) {
       if (['BASE', 'SEED', 'ARTISAN', 'SOVEREIGN'].includes(t)) setTier(t);
     }).catch(() => {});
     axios.get(`${API}/marketplace/mixer-unlocks`, { headers: h }).then(({ data }) => setUnlocks(data)).catch(() => {});
+  }, []);
+
+  // Mute/unmute controls dust accrual — expose to global window
+  useEffect(() => {
+    window.__mixerMuted = mutedModules;
+    // Override workAccrue to respect muted channels
+    const origAccrue = window.__workAccrueOriginal || window.__workAccrue;
+    if (origAccrue && !window.__workAccrueOriginal) {
+      window.__workAccrueOriginal = origAccrue;
+    }
+    window.__workAccrue = (module, weight) => {
+      if (mutedModules.has(module)) return; // MUTED — no dust
+      if (window.__workAccrueOriginal) window.__workAccrueOriginal(module, weight);
+    };
+  }, [mutedModules]);
+
+  const handleMuteChange = useCallback((modId, muted) => {
+    setMutedModules(prev => {
+      const next = new Set(prev);
+      if (muted) next.add(modId); else next.delete(modId);
+      return next;
+    });
   }, []);
 
   const loadStore = useCallback(() => {
@@ -395,102 +461,107 @@ export function MixerProvider({ children }) {
     } catch (e) { toast.error(e.response?.data?.detail || 'Purchase failed'); }
   }, []);
 
-  const handleNav = useCallback((route) => { setExpandedPillar(null); navigate(route); }, [navigate]);
+  // THIS IS THE KEY: tapping a module label navigates the SCREEN
+  const handleNav = useCallback((route) => {
+    setExpandedPillar(null);
+    navigate(route);
+  }, [navigate]);
 
   const mixerHeight = mixerState === 'expanded' ? '33.34vh' : mixerState === 'collapsed' ? '36px' : '0px';
   const monitorHeight = hideMixer || mixerState === 'hidden' ? '100vh' : mixerState === 'expanded' ? '66.66vh' : 'calc(100vh - 36px)';
 
-  // Set CSS variables for the !important overrides
   useEffect(() => {
     document.documentElement.style.setProperty('--mixer-height', hideMixer ? '0px' : mixerHeight);
     document.documentElement.style.setProperty('--monitor-height', monitorHeight);
   }, [mixerState, hideMixer, mixerHeight, monitorHeight]);
 
-  const ctx = { tier, unlocks, pillarLevels, masterLevel, modStates, mixerState, setMixerState, viewMode, setViewMode, loadStore };
+  const ctx = { tier, unlocks, pillarLevels, masterLevel, modStates, mixerState, setMixerState, viewMode, setViewMode, loadStore, handleNav, mutedModules };
 
   return (
     <MixerContext.Provider value={ctx}>
-      {/* Monitor viewport — children render normally */}
       {children}
 
-      {/* Everything below renders via portal to escape #app-stage */}
       {createPortal(
         <>
-          {/* Mixer panel */}
           {!hideMixer && mixerState !== 'hidden' && (
             <div data-testid="mixer-strip">
-          {mixerState === 'collapsed' ? (
-            /* Collapsed bar */
-            <div className="h-full flex items-center justify-between px-3" style={{ background: '#080812', borderTop: '1px solid rgba(139,92,246,0.1)' }}>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 3px #22C55E' }} />
-                <span className="text-[7px] font-mono text-white/30">{TOTAL}ch · {tier}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                {PILLARS.map((p, i) => <div key={p.key} className="w-1 h-3 rounded-full" style={{ background: p.color + Math.round(pillarLevels[i] * 2.55).toString(16).padStart(2, '0') }} />)}
-              </div>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setViewMode(v => v === 'strip' ? 'orbital' : 'strip')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  {viewMode === 'orbital' ? <BarChart3 size={9} className="text-purple-400/50" /> : <Globe size={9} className="text-purple-400/50" />}
-                </button>
-                <button onClick={() => setMixerState('expanded')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  <ChevronUp size={10} className="text-white/40" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* Expanded mixer */
-            <>
-              {/* Control bar */}
-              <div className="flex items-center justify-between px-2 py-1" style={{ background: '#080812', borderTop: '1px solid rgba(139,92,246,0.12)' }}>
-                <button onClick={() => handleNav('/sovereign-hub')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }}><Home size={10} className="text-white/30" /></button>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => setViewMode(v => v === 'strip' ? 'orbital' : 'strip')}
-                    className="px-2 py-0.5 rounded text-[7px] font-bold uppercase active:scale-90"
-                    style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.15)', color: '#C4B5FD' }}
-                    data-testid="mode-toggle">
-                    {viewMode === 'strip' ? <><Globe size={8} className="inline mr-1" />Orbital</> : <><BarChart3 size={8} className="inline mr-1" />Strip</>}
-                  </button>
-                  <button onClick={loadStore} className="p-1 rounded active:scale-90" style={{ background: 'rgba(234,179,8,0.05)' }} data-testid="mixer-store-btn"><ShoppingCart size={9} className="text-yellow-400/50" /></button>
-                  <button onClick={() => setMixerState('collapsed')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="mixer-collapse"><ChevronDown size={10} className="text-white/40" /></button>
-                </div>
-              </div>
-
-              {/* Mode content — fills remaining space */}
-              <div style={{ height: 'calc(var(--mixer-height, 33.34vh) - 28px)', overflowY: 'auto' }}>
-                {viewMode === 'strip' ? (
-                  <StripView pillars={PILLARS} pillarLevels={pillarLevels} setPillarLevels={setPillarLevels}
-                    masterLevel={masterLevel} setMasterLevel={setMasterLevel} expandedPillar={expandedPillar}
-                    setExpandedPillar={setExpandedPillar} modStates={modStates} setModStates={setModStates}
-                    tier={tier} unlocks={unlocks} onStore={loadStore} onNav={handleNav} currentRoute={location.pathname} />
-                ) : (
-                  <div className="h-full" style={{ background: '#050508' }}>
-                    <OrbitalSphere pillars={PILLARS} pillarLevels={pillarLevels} onNav={handleNav} currentRoute={location.pathname} />
+              {mixerState === 'collapsed' ? (
+                <div className="h-full flex items-center justify-between px-3" style={{ background: '#080812', borderTop: '1px solid rgba(139,92,246,0.1)' }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 3px #22C55E' }} />
+                    <span className="text-[7px] font-mono text-white/30">{TOTAL}ch</span>
+                    {findModule(location.pathname) && <span className="text-[7px] font-bold" style={{ color: findModule(location.pathname).pillar.color }}>{findModule(location.pathname).label}</span>}
                   </div>
-                )}
-              </div>
-            </>
+                  <div className="flex items-center gap-1">
+                    {PILLARS.map((p, i) => <div key={p.key} className="w-1 h-3 rounded-full" style={{ background: p.color + Math.round(pillarLevels[i] * 2.55).toString(16).padStart(2, '0') }} />)}
+                  </div>
+                  <button onClick={() => setMixerState('expanded')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <ChevronUp size={10} className="text-white/40" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between px-2 py-1" style={{ background: '#080812', borderTop: '1px solid rgba(139,92,246,0.12)' }}>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => handleNav('/sovereign-hub')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }}><Home size={10} className="text-white/30" /></button>
+                      {/* RECORDING CONTROLS */}
+                      <button onClick={() => media.isRecVideo ? media.stopAll() : media.startRecording('video')}
+                        className="px-1.5 py-0.5 rounded text-[6px] font-bold uppercase active:scale-90"
+                        style={{ background: media.isRecVideo ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.03)', border: `1px solid ${media.isRecVideo ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.06)'}`, color: media.isRecVideo ? '#EF4444' : 'rgba(255,255,255,0.25)' }}
+                        data-testid="rec-video">{media.isRecVideo ? 'STOP' : 'VID'}</button>
+                      <button onClick={() => media.isRecAudio ? media.stopAll() : media.startRecording('audio')}
+                        className="px-1.5 py-0.5 rounded text-[6px] font-bold uppercase active:scale-90"
+                        style={{ background: media.isRecAudio ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.03)', border: `1px solid ${media.isRecAudio ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.06)'}`, color: media.isRecAudio ? '#EF4444' : 'rgba(255,255,255,0.25)' }}
+                        data-testid="rec-audio">{media.isRecAudio ? 'STOP' : 'MIC'}</button>
+                      <button onClick={() => media.isRecScreen ? media.stopAll() : media.startRecording('screen')}
+                        className="px-1.5 py-0.5 rounded text-[6px] font-bold uppercase active:scale-90"
+                        style={{ background: media.isRecScreen ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.03)', border: `1px solid ${media.isRecScreen ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.06)'}`, color: media.isRecScreen ? '#EF4444' : 'rgba(255,255,255,0.25)' }}
+                        data-testid="rec-screen">{media.isRecScreen ? 'STOP' : 'SCR'}</button>
+                      {media.isRecording && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => setViewMode(v => v === 'strip' ? 'orbital' : 'strip')}
+                        className="px-2 py-0.5 rounded text-[7px] font-bold uppercase active:scale-90"
+                        style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.15)', color: '#C4B5FD' }}
+                        data-testid="mode-toggle">
+                        {viewMode === 'strip' ? <><Globe size={8} className="inline mr-1" />Orbital</> : <><BarChart3 size={8} className="inline mr-1" />Strip</>}
+                      </button>
+                      <button onClick={loadStore} className="p-1 rounded active:scale-90" style={{ background: 'rgba(234,179,8,0.05)' }} data-testid="mixer-store-btn"><ShoppingCart size={9} className="text-yellow-400/50" /></button>
+                      <button onClick={() => setMixerState('collapsed')} className="p-1 rounded active:scale-90" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="mixer-collapse"><ChevronDown size={10} className="text-white/40" /></button>
+                    </div>
+                  </div>
+                  <div style={{ height: 'calc(var(--mixer-height, 33.34vh) - 28px)', overflowY: 'auto' }}>
+                    {viewMode === 'strip' ? (
+                      <StripView pillars={PILLARS} pillarLevels={pillarLevels} setPillarLevels={setPillarLevels}
+                        masterLevel={masterLevel} setMasterLevel={setMasterLevel} expandedPillar={expandedPillar}
+                        setExpandedPillar={setExpandedPillar} modStates={modStates} setModStates={setModStates}
+                        onNav={handleNav} currentRoute={location.pathname} onMuteChange={handleMuteChange} />
+                    ) : (
+                      <div className="h-full" style={{ background: '#050508' }}>
+                        <OrbitalSphere pillars={PILLARS} pillarLevels={pillarLevels} onNav={handleNav} currentRoute={location.pathname} />
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
-      {/* Show button when hidden */}
-      {!hideMixer && mixerState === 'hidden' && (
-        <button onClick={() => setMixerState('collapsed')} style={{ position: 'fixed', bottom: 6, right: 6, zIndex: 10, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '8px', padding: '5px 8px' }} className="active:scale-95" data-testid="mixer-show">
-          <Sliders size={12} className="text-purple-400/50" />
-        </button>
-      )}
+          {!hideMixer && mixerState === 'hidden' && (
+            <button onClick={() => setMixerState('collapsed')} style={{ position: 'fixed', bottom: 6, right: 6, zIndex: 10, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '8px', padding: '5px 8px' }} className="active:scale-95" data-testid="mixer-show">
+              <Sliders size={12} className="text-purple-400/50" />
+            </button>
+          )}
 
-      {/* Hide button */}
-      {!hideMixer && mixerState !== 'hidden' && (
-        <button onClick={() => setMixerState('hidden')} style={{ position: 'fixed', bottom: `calc(var(--mixer-height, 0px) + 3px)`, right: 6, zIndex: 11, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '5px', padding: '2px 5px' }} className="active:scale-95" data-testid="mixer-hide">
-          <X size={8} className="text-white/30" />
-        </button>
-      )}
+          {!hideMixer && mixerState !== 'hidden' && (
+            <button onClick={() => setMixerState('hidden')} style={{ position: 'fixed', bottom: `calc(var(--mixer-height, 0px) + 3px)`, right: 6, zIndex: 11, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '5px', padding: '2px 5px' }} className="active:scale-95" data-testid="mixer-hide">
+              <X size={8} className="text-white/30" />
+            </button>
+          )}
 
-      <AnimatePresence>
-        {showStore && <StorePanel items={storeItems} credits={credits} onBuy={handleBuy} onClose={() => setShowStore(false)} />}
-      </AnimatePresence>
+          <AnimatePresence>
+            {showStore && <StorePanel items={storeItems} credits={credits} onBuy={handleBuy} onClose={() => setShowStore(false)} />}
+          </AnimatePresence>
         </>,
         document.body
       )}
@@ -507,9 +578,9 @@ export default function UnifiedCreatorConsole({ onClose }) {
     <div className="min-h-screen p-4" style={{ background: '#000' }}>
       <button onClick={() => onClose ? onClose() : navigate('/sovereign-hub')} className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl active:scale-95" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.5)' }} data-testid="creator-exit"><ArrowLeft size={14} /><span className="text-xs">Hub</span></button>
       <h1 className="text-lg font-bold text-white/80 mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Creator Console</h1>
-      <p className="text-[10px] text-white/25 mb-4">The mixer below controls all {TOTAL} modules. Switch between Strip and Orbital sphere modes. Expand pillars for individual channels. Tap module names to navigate.</p>
+      <p className="text-[10px] text-white/25 mb-4">The mixer below controls the screen. Tap any module name to load it in the monitor. Mute a channel to stop its dust accrual. Switch between Strip and Orbital modes.</p>
       <div className="grid grid-cols-4 gap-2 mb-4">
-        {[{ l: 'Channels', v: TOTAL, c: '#C084FC' }, { l: 'Tier', v: mixer?.tier || '—', c: '#8B5CF6' }, { l: 'Master', v: mixer?.masterLevel || 80, c: '#F8FAFC' }, { l: 'Active', v: Object.values(mixer?.modStates || {}).filter(s => s?.value > 20 && !s?.muted).length, c: '#22C55E' }].map(m => (
+        {[{ l: 'Channels', v: TOTAL, c: '#C084FC' }, { l: 'Tier', v: mixer?.tier || '—', c: '#8B5CF6' }, { l: 'Master', v: mixer?.masterLevel || 80, c: '#F8FAFC' }, { l: 'Muted', v: mixer?.mutedModules?.size || 0, c: '#EF4444' }].map(m => (
           <div key={m.l} className="p-2 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}><div className="text-sm font-mono font-bold" style={{ color: m.c }}>{m.v}</div><div className="text-[6px] text-white/25 uppercase">{m.l}</div></div>
         ))}
       </div>
