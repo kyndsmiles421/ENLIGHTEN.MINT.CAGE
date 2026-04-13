@@ -337,7 +337,9 @@ CRYSTAL_SKINS = {
 async def get_available_skins(user=Depends(get_current_user)):
     """Get all skins and user's owned skins."""
     owned = await db.crystal_skins.find_one({"user_id": user["id"]}, {"_id": 0})
-    owned_list = (owned or {}).get("owned", ["AMETHYST"])
+    owned_list = (owned or {}).get("owned", [])
+    if "AMETHYST" not in owned_list:
+        owned_list = ["AMETHYST"] + owned_list
     active = (owned or {}).get("active", "AMETHYST")
     wallet = await db.hub_wallets.find_one({"user_id": user["id"]}, {"_id": 0})
     dust = (wallet or {}).get("dust", 0)

@@ -8,6 +8,7 @@ import { useCrystalEncryption, CRYSTAL_SKINS } from '../hooks/useCrystalEncrypti
 import { ArrowLeft, Gem, Check, Lock, Sparkles } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const SKIN_KEYS = Object.keys(CRYSTAL_SKINS);
 
 export default function CrystalMarketplace() {
   const { authHeaders, token } = useAuth();
@@ -53,98 +54,116 @@ export default function CrystalMarketplace() {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#030308' }}><Sparkles className="animate-spin" color="#9b59b6" /></div>;
 
+  // Build skin list from backend + frontend config
+  const skinList = SKIN_KEYS.map(key => {
+    const backendSkin = skins.find(s => s.key === key);
+    const config = CRYSTAL_SKINS[key];
+    return {
+      key,
+      ...config,
+      owned: backendSkin?.owned || key === 'AMETHYST',
+      isActive: activeSkin?.id === config.id,
+      cost: backendSkin?.cost || config.dust_cost,
+    };
+  });
+
   return (
-    <div className="min-h-screen pb-24" style={{ background: '#030308' }} data-testid="crystal-marketplace-page">
-      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'blur(20px)' }}>
-        <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="crystal-back-btn"><ArrowLeft size={16} color="#F8FAFC" /></button>
-        <h1 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Crystal Encryption Skins</h1>
-        <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.15)' }}>
-          <Sparkles size={10} color="#A855F7" />
-          <span className="text-[10px] font-bold" style={{ color: '#A855F7' }}>{dust.toLocaleString()}</span>
+    <div className="min-h-screen pb-24" style={{ background: '#000', color: '#fff', fontFamily: 'monospace' }} data-testid="crystal-marketplace-page">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <button onClick={() => navigate(-1)} className="p-2" data-testid="crystal-back-btn"><ArrowLeft size={16} /></button>
+        <div>
+          <h1 className="text-xs font-bold uppercase tracking-[0.2em]">The Vault: Marketplace</h1>
+          <p className="text-[9px] text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>Current: {activeSkin.name}</p>
         </div>
-      </div>
+        <div className="text-right">
+          <span className="text-[10px] font-bold" style={{ color: '#f1c40f' }}>{dust.toLocaleString()} DUST</span>
+        </div>
+      </header>
 
-      <div className="px-4 pt-2">
-        <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.4)' }}>
-          Each skin transforms the entire UI — buttons, glows, transitions, frequency. Equip to activate.
-        </p>
-
-        <div className="space-y-3">
-          {skins.map((skin) => {
-            const fullSkin = CRYSTAL_SKINS[skin.key] || {};
-            const isActive = activeSkin?.id === fullSkin.id;
-            const canAfford = dust >= skin.cost;
-
-            return (
-              <motion.div key={skin.key} layout
-                className="rounded-2xl p-4 transition-all"
+      {/* Skin Grid */}
+      <div className="px-4 pt-4 space-y-4">
+        {skinList.map((skin) => (
+          <motion.div
+            key={skin.key}
+            whileHover={{ y: -2 }}
+            className="relative p-5 rounded-2xl transition-all"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.04), transparent)',
+              border: `1px solid ${skin.isActive ? skin.primary : 'rgba(255,255,255,0.08)'}`,
+              boxShadow: skin.isActive ? `0 0 20px ${skin.glow}` : 'none',
+            }}
+            data-testid={`skin-${skin.key.toLowerCase()}`}
+          >
+            {/* Crystal Preview */}
+            <div className="w-full h-24 mb-4 rounded-lg flex items-center justify-center"
+              style={{ background: `radial-gradient(circle, ${skin.primary}44 0%, transparent 70%)` }}>
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 8 / (skin.speed || 1), repeat: Infinity, ease: 'linear' }}
+                className="w-10 h-10 border-2"
                 style={{
-                  background: isActive ? `${fullSkin.primary}12` : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${isActive ? `${fullSkin.primary}40` : skin.owned ? `${fullSkin.primary}20` : 'rgba(255,255,255,0.06)'}`,
+                  borderColor: skin.primary,
+                  boxShadow: `0 0 15px ${skin.primary}`,
+                  transform: 'rotate(45deg)',
                 }}
-                data-testid={`skin-${skin.key.toLowerCase()}`}
+              />
+            </div>
+
+            <h2 className="text-base font-bold mb-0.5" style={{ color: skin.primary }}>{skin.name}</h2>
+            <p className="text-[10px] mb-1 font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              FREQ_OSC: {skin.speed}Hz | TIER: {skin.tier}
+            </p>
+            <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{skin.description}</p>
+
+            {skin.owned ? (
+              <button
+                onClick={() => handleEquip(skin.key)}
+                disabled={skin.isActive}
+                className="w-full py-3 rounded-full font-bold uppercase tracking-[0.15em] text-[10px] transition-all"
+                style={{
+                  background: skin.isActive ? 'rgba(255,255,255,0.03)' : '#fff',
+                  color: skin.isActive ? 'rgba(255,255,255,0.2)' : '#000',
+                }}
+                data-testid={`equip-${skin.key.toLowerCase()}`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${fullSkin.primary}20`, boxShadow: isActive ? `0 0 12px ${fullSkin.glow}` : 'none' }}>
-                      <Gem size={16} color={fullSkin.primary} />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold" style={{ color: fullSkin.primary || '#F8FAFC' }}>{skin.name}</div>
-                      <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Tier {skin.tier} {isActive ? '— ACTIVE' : ''}</div>
-                    </div>
-                  </div>
-                  {isActive && <Check size={16} color={fullSkin.primary} />}
-                </div>
-
-                <p className="text-[11px] mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>{fullSkin.description}</p>
-
-                {/* Preview bar */}
-                <div className="flex gap-1 mb-3">
-                  {[fullSkin.primary, fullSkin.secondary, fullSkin.primary + '80', fullSkin.secondary + '60'].map((c, i) => (
-                    <div key={i} className="flex-1 h-1.5 rounded-full" style={{ background: c }} />
-                  ))}
-                </div>
-
-                {skin.owned ? (
-                  <button
-                    onClick={() => handleEquip(skin.key)}
-                    disabled={isActive}
-                    className="w-full py-2.5 rounded-xl text-xs font-bold transition-all"
-                    style={{
-                      background: isActive ? `${fullSkin.primary}10` : `${fullSkin.primary}15`,
-                      border: `1px solid ${fullSkin.primary}30`,
-                      color: isActive ? `${fullSkin.primary}60` : fullSkin.primary,
-                    }}
-                    data-testid={`equip-${skin.key.toLowerCase()}`}
-                  >
-                    {isActive ? 'Equipped' : 'Equip'}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handlePurchase(skin.key)}
-                    disabled={!canAfford || purchasing === skin.key}
-                    className="w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-                    style={{
-                      background: canAfford ? `${fullSkin.primary}15` : 'rgba(255,255,255,0.03)',
-                      border: `1px solid ${canAfford ? `${fullSkin.primary}30` : 'rgba(255,255,255,0.05)'}`,
-                      color: canAfford ? fullSkin.primary : 'rgba(248,250,252,0.3)',
-                    }}
-                    data-testid={`buy-${skin.key.toLowerCase()}`}
-                  >
-                    {purchasing === skin.key ? 'Purchasing...' : (
-                      <>
-                        <Lock size={12} />
-                        {skin.cost} Dust
-                      </>
-                    )}
-                  </button>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+                {skin.isActive ? 'Active Encryption' : 'Equip'}
+              </button>
+            ) : (
+              <button
+                onClick={() => handlePurchase(skin.key)}
+                disabled={dust < skin.cost || purchasing === skin.key}
+                className="w-full py-3 rounded-full font-bold uppercase tracking-[0.15em] text-[10px] transition-all"
+                style={{
+                  background: dust >= skin.cost ? '#fff' : 'rgba(255,255,255,0.05)',
+                  color: dust >= skin.cost ? '#000' : 'rgba(255,255,255,0.2)',
+                }}
+                data-testid={`buy-${skin.key.toLowerCase()}`}
+              >
+                {purchasing === skin.key ? 'Encrypting...' : `Equip (${skin.cost} Dust)`}
+              </button>
+            )}
+          </motion.div>
+        ))}
       </div>
+
+      {/* System Flow Preview */}
+      <section className="px-4 mt-8 mb-8">
+        <h3 className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>Active System Flow</h3>
+        <div className="flex gap-2 flex-wrap">
+          {['PRACTICE', 'DIVINATION', 'SANCTUARY', 'NOURISH', 'EXPLORE', 'SAGE', 'COUNCIL'].map((pillar) => (
+            <motion.div
+              key={pillar}
+              animate={{ boxShadow: ['0 0 0px transparent', `0 0 12px var(--crystal-glow)`, '0 0 0px transparent'] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="px-3 py-1.5 rounded-md text-[9px] font-bold"
+              style={{ color: 'var(--crystal-primary)', border: '1px solid var(--crystal-primary)' }}
+            >
+              {pillar}
+            </motion.div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

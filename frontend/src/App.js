@@ -49,7 +49,7 @@ import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
 import { useAmbientSoundscape } from './hooks/useAmbientSoundscape';
 import useWorkAccrual from './hooks/useWorkAccrual';
-import { useCrystalEncryption } from './hooks/useCrystalEncryption';
+import { useCrystalEncryption, EncryptionProvider } from './hooks/useCrystalEncryption';
 import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -756,6 +756,7 @@ function App() {
       <MeshNetworkProvider>
       <EnlightenmentCafeProvider>
       <EnlightenmentProvider>
+        <EncryptionProvider>
         <BrowserRouter>
           <PolarityProvider>
           <DepthProvider>
@@ -776,6 +777,7 @@ function App() {
           </DepthProvider>
           </PolarityProvider>
         </BrowserRouter>
+        </EncryptionProvider>
       </EnlightenmentProvider>
       </EnlightenmentCafeProvider>
       </MeshNetworkProvider>
