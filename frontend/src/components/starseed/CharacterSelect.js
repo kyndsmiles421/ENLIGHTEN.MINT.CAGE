@@ -143,7 +143,7 @@ export function CharacterSelect({ origins, existingCharacters, onSelect, onResum
           <Star size={10} /> {existingCharacters.length > 0 ? 'Begin New Adventure' : 'Select Your Starseed Origin'}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {origins.map((origin, i) => {
+          {(origins || []).map((origin, i) => {
             const isSelected = selected?.id === origin.id;
             return (
               <motion.button key={origin.id}
@@ -173,7 +173,7 @@ export function CharacterSelect({ origins, existingCharacters, onSelect, onResum
                   </div>
                   <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>{origin.description}</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {origin.traits.map(t => (
+                    {(origin.traits || []).map(t => (
                       <span key={t} className="text-[8px] px-2 py-0.5 rounded-full font-medium"
                         style={{ background: `${origin.color}10`, color: origin.color, border: `1px solid ${origin.color}15` }}>
                         {t}

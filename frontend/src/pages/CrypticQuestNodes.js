@@ -19,7 +19,7 @@ export default function CrypticQuestNodes() {
   const [solving, setSolving] = useState(false);
 
   const fetchNodes = useCallback(async () => {
-    if (!token) { setLoading(false); return; }
+    if (!token) return;
     try {
       const { data } = await axios.get(`${API}/gaming/quest/nodes`, { headers: authHeaders });
       setNodes(data.nodes);

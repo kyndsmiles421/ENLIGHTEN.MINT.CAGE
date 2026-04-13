@@ -18,7 +18,7 @@ export default function GravityWellExchange() {
   const [trading, setTrading] = useState(false);
 
   const fetchMarket = useCallback(async () => {
-    if (!token) { setLoading(false); return; }
+    if (!token) return;
     try {
       const { data } = await axios.get(`${API}/gaming/gravity-well/market`, { headers: authHeaders });
       setMarket(data.market);

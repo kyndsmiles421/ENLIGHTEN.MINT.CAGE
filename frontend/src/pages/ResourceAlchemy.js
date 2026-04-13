@@ -18,7 +18,7 @@ export default function ResourceAlchemy() {
   const [mining, setMining] = useState(false);
 
   const fetchState = useCallback(async () => {
-    if (!token) { setLoading(false); return; }
+    if (!token) return;
     try {
       const { data } = await axios.get(`${API}/gaming/alchemy/state`, { headers: authHeaders });
       setState(data);
