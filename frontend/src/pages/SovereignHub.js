@@ -1053,46 +1053,8 @@ export default function SovereignHub() {
         )}
       </motion.div>
 
-      {/* Trust Info Grid */}
-      <div className="max-w-xl mx-auto grid grid-cols-2 gap-4 mb-8">
-        {/* Trust Status */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="p-4 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Shield size={14} style={{ color: '#6366F1' }} />
-            <span className="text-xs font-medium">Trust Status</span>
-          </div>
-          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Firewall: <span className="text-green-400">ACTIVE</span>
-          </p>
-          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Ownership: <span className="text-indigo-400">Non-Personal</span>
-          </p>
-        </motion.div>
-
-        {/* Trustee */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
-          className="p-4 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Lock size={14} style={{ color: '#F472B6' }} />
-            <span className="text-xs font-medium">Trustee</span>
-          </div>
-          <p className="text-sm font-medium">{trustData?.roles?.trustee?.name || 'Steven Michael'}</p>
-          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            FULL CONTROL
-          </p>
-        </motion.div>
-      </div>
+      {/* Trust Info Grid — HIDDEN from all users on front page */}
+      {/* Sensitive trust/trustee data moved behind Vault access */}
 
       {/* Gaia Anchors */}
       {gaiaMatrix.primary_anchor && (
@@ -1197,17 +1159,7 @@ export default function SovereignHub() {
                   Distance: {gpsLockStatus.distance_km} km | Resonance: {(gpsLockStatus.resonance_strength * 100).toFixed(1)}%
                 </p>
               </div>
-              {gpsLockStatus.is_locked && user?.email === 'kyndsmiles@gmail.com' && (
-                <div className="text-right">
-                  <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
-                    ${gpsLockStatus.equity_accessible?.toLocaleString()}
-                  </p>
-                  <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    {gpsLockStatus.seg_hz}
-                  </p>
-                </div>
-              )}
-              {gpsLockStatus.is_locked && user?.email !== 'kyndsmiles@gmail.com' && (
+              {gpsLockStatus.is_locked && (
                 <div className="text-right">
                   <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
                     VERIFIED
