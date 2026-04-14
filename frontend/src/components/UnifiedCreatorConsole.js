@@ -977,7 +977,7 @@ All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gam
   // ═══ THE ORGANISM: SAME PLANE FLEX COLUMN ═══
   return (
     <MixerContext.Provider value={ctx}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#000' }} data-testid="sovereign-organism">
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: '#000', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} data-testid="sovereign-organism">
         {/* CONTENT — fills available space, scrollable */}
         <div style={{ flex: 1, overflow: 'auto', position: 'relative' }} data-testid="content-area">
           {children}
@@ -1028,18 +1028,18 @@ All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gam
           </AnimatePresence>
         )}
 
-        {/* NAV BAR — bottom of flex, same plane as content */}
+        {/* NAV BAR — bottom of flex, same plane as content, above system nav */}
         {showMixer && (
           <div data-testid="mixer-nav"
-            style={{ height: 44, minHeight: 44, background: '#060610', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center' }}>
+            style={{ height: 52, minHeight: 52, background: '#060610', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center' }}>
             {TOOL_TABS.map(tab => (
               <button key={tab.key} onClick={() => togglePanel(tab.key)}
                 className="flex-1 flex flex-col items-center justify-center active:scale-95 transition-all"
-                style={{ color: activePanel === tab.key ? tab.color : 'rgba(255,255,255,0.2)', height: '100%' }}
+                style={{ color: activePanel === tab.key ? tab.color : 'rgba(255,255,255,0.25)', height: '100%', minWidth: 0 }}
                 data-testid={`tab-${tab.key}`}>
-                <tab.icon size={14} />
-                <span className="text-[6px] font-bold mt-0.5 uppercase">{tab.label}</span>
-                {activePanel === tab.key && <div style={{ width: 3, height: 3, borderRadius: '50%', background: tab.color, marginTop: 1 }} />}
+                <tab.icon size={16} />
+                <span className="text-[7px] font-bold mt-0.5 uppercase">{tab.label}</span>
+                {activePanel === tab.key && <div style={{ width: 4, height: 4, borderRadius: '50%', background: tab.color, marginTop: 2 }} />}
               </button>
             ))}
             {/* Inline recording indicator — not floating */}

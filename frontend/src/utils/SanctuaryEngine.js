@@ -44,22 +44,29 @@ const SanctuaryEngine = {
   }
 };
 
-// Mission Control: Ghosting the Badge
+// Mission Control: KILL the Badge — not ghost, KILL
 const MissionControlKey = {
   ghostEmergent() {
-    const badge = document.querySelector('[class*="emergent"]');
-    if (badge) {
-      badge.style.mixBlendMode = 'screen';
-      badge.style.opacity = '0.1'; // Barely visible, part of the starfield
-      badge.style.pointerEvents = 'none'; // Never blocks your clicks
-    }
-    // Also target by href
-    document.querySelectorAll('a[href*="emergentagent"]').forEach(el => {
-      el.style.mixBlendMode = 'screen';
-      el.style.opacity = '0.1';
-      el.style.pointerEvents = 'none';
+    const selectors = [
+      '#emergent-badge',
+      '[class*="emergent"]',
+      '[id*="emergent"]',
+      'a[href*="emergentagent"]',
+    ];
+    selectors.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+        el.style.setProperty('opacity', '0', 'important');
+        el.style.setProperty('pointer-events', 'none', 'important');
+        el.style.setProperty('height', '0', 'important');
+        el.style.setProperty('width', '0', 'important');
+        el.style.setProperty('z-index', '-1', 'important');
+        el.style.setProperty('position', 'absolute', 'important');
+        el.style.setProperty('left', '-9999px', 'important');
+      });
     });
-    console.log("[MissionControlKey] Emergent badge ghosted into starfield.");
+    console.log("[MissionControlKey] Emergent badge eliminated.");
   }
 };
 
@@ -79,10 +86,12 @@ if (typeof window !== 'undefined') {
     MissionControlKey.ghostEmergent();
   }
   
-  // Also run after full page load
+  // Also run after full page load and on interval to catch re-injections
   window.addEventListener('load', () => {
     MissionControlKey.ghostEmergent();
   });
+  // Recurring purge — badge script re-injects, we re-kill
+  setInterval(() => MissionControlKey.ghostEmergent(), 3000);
 }
 
 export { SanctuaryEngine, MissionControlKey };

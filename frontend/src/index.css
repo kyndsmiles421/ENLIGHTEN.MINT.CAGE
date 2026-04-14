@@ -5008,16 +5008,23 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
    PUSH EMERGENT BADGE TO BACK
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Target the Emergent badge and push it behind everything */
+/* Target the Emergent badge — FORCE below everything, no touch intercept */
 #emergent-badge,
 [id*="emergent"],
 [class*="emergent-badge"],
 a[href*="emergentagent.com"],
 div[style*="Made with Emergent"],
 iframe[src*="emergent"] {
-  z-index: 1 !important;
-  opacity: 0.3 !important;
+  z-index: -1 !important;
+  opacity: 0 !important;
   pointer-events: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
 }
 
 /* Hide the green dot completely */
@@ -5130,18 +5137,20 @@ div[style*="bottom: 16px"][style*="left: 16px"] {
                -2px 0 5px rgba(0, 255, 255, 0.2); /* Rainbow Refraction */
 }
 
-/* Remove the 'Made with Emergent' block - turn it into a light-stamp */
+/* Remove the 'Made with Emergent' block — KILLED */
 .emergent-badge,
 [class*="emergent"],
 [id*="emergent"],
 a[href*="emergentagent"] {
-  position: absolute !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  opacity: 0.3 !important;
-  mix-blend-mode: screen !important; /* Blends into the starfield */
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
   pointer-events: none !important;
-  z-index: 1 !important;
+  z-index: -1 !important;
+  height: 0 !important;
+  width: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
 }
 
 .shambhala-mixer {
@@ -5222,14 +5231,18 @@ body {
    GHOST THE EMERGENT BADGE - 10% opacity starfield blend
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* GHOST THE EMERGENT BADGE — FULLY KILLED */
 [class*="emergent"],
 [id*="emergent"],
 a[href*="emergentagent"],
 div:has(> a[href*="emergentagent"]) {
-  mix-blend-mode: screen !important;
-  opacity: 0.1 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
   pointer-events: none !important;
-  z-index: 0 !important;
+  z-index: -1 !important;
+  height: 0 !important;
+  width: 0 !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
