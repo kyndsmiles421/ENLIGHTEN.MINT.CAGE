@@ -433,15 +433,19 @@ body {
 /* 2. ORBITAL NODULES ARE FORCE-TOUCHABLE */
 .orbital-nodule,
 [id^="nodule-"],
+[id="nodule-core"],
 [data-testid^="hitbox-"],
 [data-testid="central-orb"],
 .nodule-touch-target {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   pointer-events: auto !important;
   touch-action: manipulation !important;
   -webkit-tap-highlight-color: transparent !important;
   cursor: pointer !important;
   z-index: 50000 !important;
-  transform: translateZ(0px) !important;  /* Z=0 Touch Line */
+  transform: translateZ(0px) !important;
 }
 
 /* 3. PREVENT PAGE SLIDE WHEN DRAGGING NODULES */
@@ -659,12 +663,12 @@ body[data-perspective="INTENSE"] #MANIFEST_BAR {
 
 /* Perspective Toggle Button (for Frequency Engine) */
 /* V30.3: GHOST ELEMENT PURGE — No floating nodules, no colored circles */
+/* V40.0: Excludes OrbitalHub hitboxes (nodule-*) which are real interactive buttons */
 .perspective-toggle,
 .perspective-btn,
 .floating-nodule,
 .lightning-bolt-circle,
 .emergent-overlay,
-[id*="nodule"],
 #back-up-banner,
 .made-with-emergent,
 [data-testid="dock-restore"],

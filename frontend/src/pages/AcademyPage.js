@@ -541,7 +541,7 @@ export default function AcademyPage() {
   const [activeZone, setActiveZone] = useState(null); // null = all zones
 
   const fetchPrograms = useCallback(async () => {
-    if (!token) return;
+    if (!token || token === 'guest_token') return;
     try {
       const res = await fetch(`${API}/api/academy/programs`, { headers: authHeaders });
       const data = await res.json();
@@ -551,7 +551,7 @@ export default function AcademyPage() {
   }, [token, authHeaders]);
 
   const fetchAccreditation = useCallback(async () => {
-    if (!token) return;
+    if (!token || token === 'guest_token') return;
     try {
       const res = await fetch(`${API}/api/academy/accreditation`, { headers: authHeaders });
       const data = await res.json();
@@ -632,10 +632,19 @@ export default function AcademyPage() {
     dismissAutoScale();
   };
 
-  if (!token) {
+  if (!token || token === 'guest_token') {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B0C15' }}>
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to access the Academy</p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ background: '#0B0C15' }}>
+        <h2 className="text-lg font-bold" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>Academy</h2>
+        <p className="text-sm text-center" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to access the Academy — lessons, certifications, and mastery paths.</p>
+        <button 
+          onClick={() => window.location.href = '/auth'}
+          className="px-6 py-3 rounded-xl text-sm font-medium active:scale-95"
+          style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#22C55E' }}
+          data-testid="academy-login-btn"
+        >
+          Sign In to Begin
+        </button>
       </div>
     );
   }

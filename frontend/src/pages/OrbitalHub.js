@@ -622,7 +622,7 @@ export default function OrbitalHub() {
           touchAction: 'none',  // V47.8: Prevent scroll interference
           WebkitUserSelect: 'none',
           userSelect: 'none',
-          pointerEvents: 'none',  // V30.2 FIX: Container passes through, only buttons catch
+          pointerEvents: 'none',  // V40.0: Container must be none — core hitbox catches via auto
         }}
         data-container
       >
@@ -854,7 +854,7 @@ export default function OrbitalHub() {
             inset: 0,
             zIndex: 50000,  // V47.8: Maximum elevation for touch reception
             transform: 'translateZ(0px)',  // V47.8: Z=0 Touch Line
-            pointerEvents: 'none',  // Container passes through, children catch
+            pointerEvents: 'none',  // V40.0: Container MUST be none — children set auto individually
           }}
         >
           {/* ═══ V44.0 TOUCH HITBOXES — FREQUENCY-SCALED KINETICS ═══ */}
@@ -1043,6 +1043,38 @@ export default function OrbitalHub() {
           tap the core to reveal modules
         </motion.p>
       )}
+
+      {/* ═══ V40.0 FLAT MODULE LIST — FALLBACK NAVIGATION ═══ */}
+      {/* Shows when bloomed, so even if orbital hitboxes fail, you can tap real buttons */}
+      <AnimatePresence>
+        {hubState !== 'latent' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="w-full px-3 pb-4"
+            style={{ zIndex: 200, position: 'relative' }}
+          >
+            <div className="flex flex-wrap gap-1.5 justify-center">
+              {ALL_SATELLITES.map(sat => (
+                <button
+                  key={sat.id}
+                  onClick={() => navigate(sat.path)}
+                  className="px-3 py-2 rounded-lg text-[9px] font-medium active:scale-95 transition-all"
+                  style={{
+                    background: `${sat.color}10`,
+                    border: `1px solid ${sat.color}25`,
+                    color: sat.color,
+                  }}
+                  data-testid={`flat-nav-${sat.id}`}
+                >
+                  {sat.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <MissionControl 
         isOpen={missionControlOpen} 
