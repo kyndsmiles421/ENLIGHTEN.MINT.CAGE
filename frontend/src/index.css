@@ -5,6 +5,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══ PRINT STYLESHEET — Clean Plane Print ═══ */
+@media print {
+  [data-testid="mixer-nav"],
+  [data-testid="tool-panel"],
+  [data-testid="compliance-footer"],
+  [data-testid="exit-fullscreen"],
+  nav, .mixer-nav, button[data-testid^="tab-"] {
+    display: none !important;
+  }
+  [data-testid="content-area"],
+  #app-stage {
+    height: auto !important;
+    position: static !important;
+    width: 100% !important;
+    filter: none !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+  [data-testid="sovereign-organism"] {
+    height: auto !important;
+    display: block !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+  }
+}
+
+
 /* ═══════════════════════════════════════════════════════════════════════════
    SOVEREIGN GRID — Temporal Architecture CSS Hard-Lock
    Past (Top) | Present (Center) | Future (Bottom)

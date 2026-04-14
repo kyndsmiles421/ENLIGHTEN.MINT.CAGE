@@ -373,14 +373,24 @@ export function MixerProvider({ children }) {
   const [imageOverlays, setImageOverlays] = useState([]);
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('16:9');
   const [resonance, setResonance] = useState(0.5);
+  const [bankBalance, setBankBalance] = useState(0);
+  const [sagePrompt, setSagePrompt] = useState('');
   const textInputRef = useRef(null);
 
-  // Track resonance from global work accrual
+  // USB Bank → Resonance Wiring: balance acts as dust multiplier
   useEffect(() => {
-    const interval = setInterval(() => {
-      const r = window.__globalResonance || 0.5;
-      setResonance(typeof r === 'number' ? r : 0.5);
-    }, 2000);
+    const h = getHeaders();
+    const fetchBank = () => {
+      axios.get(`${API}/bank/wallet`, { headers: h }).then(({ data }) => {
+        const bal = data.cosmic_dust || data.balance || 0;
+        setBankBalance(bal);
+        // Bank balance modulates resonance: tanh(balance * φ^-1 / 100)
+        const bankResonance = Math.tanh(bal * (1 / PHI) / 100);
+        setResonance(Math.max(0.1, bankResonance));
+      }).catch(() => {});
+    };
+    fetchBank();
+    const interval = setInterval(fetchBank, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -475,7 +485,7 @@ export function MixerProvider({ children }) {
     loadStore, handleNav, mutedModules, activePanel, setActivePanel: togglePanel,
     isFullscreen, setIsFullscreen, monitorFilters, setMonitorFilters,
     textOverlays, setTextOverlays, imageOverlays, setImageOverlays,
-    selectedAspectRatio, setSelectedAspectRatio, resonance,
+    selectedAspectRatio, setSelectedAspectRatio, resonance, bankBalance,
     mixerState: activePanel ? 'expanded' : 'collapsed', setMixerState: () => {},
   };
 
@@ -748,19 +758,83 @@ export function MixerProvider({ children }) {
     );
   };
 
+  // ═══ SAGE AI PROMPT-TO-FX ENGINE ═══
+  const SAGE_FX_PRESETS = {
+    sunset:    { blur: 0, brightness: 120, contrast: 110, hueRotate: 15, saturate: 140, sepia: 30, invert: 0 },
+    sunrise:   { blur: 0, brightness: 130, contrast: 105, hueRotate: 340, saturate: 130, sepia: 15, invert: 0 },
+    focus:     { blur: 1, brightness: 90, contrast: 120, hueRotate: 200, saturate: 80, sepia: 0, invert: 0 },
+    calm:      { blur: 2, brightness: 95, contrast: 90, hueRotate: 180, saturate: 70, sepia: 10, invert: 0 },
+    dream:     { blur: 3, brightness: 110, contrast: 80, hueRotate: 270, saturate: 120, sepia: 20, invert: 0 },
+    night:     { blur: 0, brightness: 60, contrast: 130, hueRotate: 240, saturate: 60, sepia: 0, invert: 0 },
+    fire:      { blur: 0, brightness: 120, contrast: 140, hueRotate: 0, saturate: 200, sepia: 40, invert: 0 },
+    ocean:     { blur: 1, brightness: 100, contrast: 100, hueRotate: 190, saturate: 130, sepia: 0, invert: 0 },
+    crystal:   { blur: 0, brightness: 140, contrast: 120, hueRotate: 280, saturate: 150, sepia: 0, invert: 0 },
+    void:      { blur: 0, brightness: 30, contrast: 150, hueRotate: 0, saturate: 0, sepia: 0, invert: 0 },
+    sacred:    { blur: 1, brightness: 110, contrast: 100, hueRotate: 45, saturate: 110, sepia: 25, invert: 0 },
+    energy:    { blur: 0, brightness: 130, contrast: 130, hueRotate: 90, saturate: 180, sepia: 0, invert: 0 },
+    meditation:{ blur: 2, brightness: 85, contrast: 90, hueRotate: 220, saturate: 70, sepia: 15, invert: 0 },
+    reset:     { ...DEFAULT_FILTERS },
+  };
+
+  const handleSagePrompt = useCallback((prompt) => {
+    const words = prompt.toLowerCase().trim().split(/\s+/);
+    for (const word of words) {
+      if (SAGE_FX_PRESETS[word]) {
+        setMonitorFilters(SAGE_FX_PRESETS[word]);
+        toast.success(`Sage: "${word}" atmosphere applied`);
+        return;
+      }
+    }
+    // Partial keyword matching
+    for (const [key, preset] of Object.entries(SAGE_FX_PRESETS)) {
+      if (prompt.toLowerCase().includes(key)) {
+        setMonitorFilters(preset);
+        toast.success(`Sage: "${key}" atmosphere applied`);
+        return;
+      }
+    }
+    toast(`Sage: Try keywords like sunset, focus, dream, ocean, crystal, void, sacred`);
+  }, []);
+
+  const handlePrintModule = useCallback(() => {
+    window.print();
+  }, []);
+
   const renderAIPanel = () => (
     <div className="p-3 space-y-2">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Sage Prompt-to-FX</div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={sagePrompt}
+          onChange={(e) => setSagePrompt(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && sagePrompt.trim()) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
+          placeholder="Type: sunset, focus, dream, ocean, crystal..."
+          className="flex-1 p-2 rounded-lg text-[11px] text-white/70"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+          data-testid="sage-prompt-input" />
+        <button onClick={() => { if (sagePrompt.trim()) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
+          className="px-3 py-2 rounded-lg text-[10px] font-bold active:scale-95"
+          style={{ background: 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C' }}
+          data-testid="sage-apply-btn">Apply</button>
+      </div>
+      <div className="flex flex-wrap gap-1.5 mt-2">
+        {Object.keys(SAGE_FX_PRESETS).filter(k => k !== 'reset').map(preset => (
+          <button key={preset} onClick={() => { setMonitorFilters(SAGE_FX_PRESETS[preset]); toast.success(`Sage: "${preset}"`); }}
+            className="px-2 py-1 rounded-lg text-[8px] font-bold active:scale-95 capitalize"
+            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}
+            data-testid={`sage-preset-${preset}`}>{preset}</button>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-3">
         {[{ label: 'Image to Video', color: '#E879F9' }, { label: 'AI Art', color: '#8B5CF6' }, { label: 'Text to Image', color: '#3B82F6' },
           { label: 'Text to Speech', color: '#2DD4BF' }, { label: 'AI Music', color: '#22C55E' }, { label: 'AI Avatar', color: '#FB923C' }].map(ai => (
-          <button key={ai.label} onClick={() => toast('Sage AI loading...')} className="p-2.5 rounded-xl text-center active:scale-95"
+          <button key={ai.label} onClick={() => toast('Sage AI module loading...')} className="p-2 rounded-xl text-center active:scale-95"
             style={{ background: `${ai.color}08`, border: `1px solid ${ai.color}18` }} data-testid={`ai-${ai.label.toLowerCase().replace(/\s+/g, '-')}`}>
-            <div className="text-[9px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
+            <div className="text-[8px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
           </button>
         ))}
       </div>
-      <textarea placeholder="Describe what to create..." rows={2} className="w-full mt-2 p-2 rounded-lg text-[11px] text-white/70 resize-none"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }} data-testid="ai-prompt-input" />
     </div>
   );
 
@@ -778,7 +852,7 @@ export function MixerProvider({ children }) {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <button onClick={() => toast.success(`Export: ${selectedAspectRatio}`)} className="p-3 rounded-xl text-center active:scale-95"
           style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }} data-testid="export-video">
           <div className="text-[10px] font-bold text-green-400">Export</div>
@@ -786,6 +860,10 @@ export function MixerProvider({ children }) {
         <button onClick={() => { navigator.share?.({ title: 'ENLIGHTEN.MINT.CAFE', text: 'Created with the Sovereign Engine', url: window.location.origin }).catch(() => {}); }}
           className="p-3 rounded-xl text-center active:scale-95" style={{ background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)' }} data-testid="broadcast-btn">
           <div className="text-[10px] font-bold text-sky-400">Broadcast</div>
+        </button>
+        <button onClick={handlePrintModule} className="p-3 rounded-xl text-center active:scale-95"
+          style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.2)' }} data-testid="print-btn">
+          <div className="text-[10px] font-bold text-purple-400">Print</div>
         </button>
       </div>
     </div>
@@ -915,6 +993,15 @@ export function MixerProvider({ children }) {
           <div onClick={() => setIsFullscreen(false)}
             style={{ height: 8, background: 'rgba(139,92,246,0.08)', cursor: 'pointer' }}
             data-testid="exit-fullscreen" />
+        )}
+
+        {/* COMPLIANCE FOOTER — Prominent Disclosure, same plane */}
+        {showMixer && !activePanel && (
+          <div style={{ padding: '4px 12px', background: '#030306', borderTop: '1px solid rgba(255,255,255,0.02)' }} data-testid="compliance-footer">
+            <p style={{ fontSize: '6px', lineHeight: '8px', color: 'rgba(255,255,255,0.12)', fontFamily: 'monospace', margin: 0 }}>
+              All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gamified ecosystem and do not involve real-world currency or external financial institutions. All wellness, acupressure, and herbology content is provided for informational and educational purposes only and does not constitute medical advice or a claim of healing.
+            </p>
+          </div>
         )}
       </div>
     </MixerContext.Provider>
