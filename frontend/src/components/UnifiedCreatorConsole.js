@@ -898,7 +898,7 @@ export function MixerProvider({ children }) {
 <div class="row"><span class="label">FX</span><span class="value">${activeFx}</span></div>
 <div class="row"><span class="label">Aspect Ratio</span><span class="value">${selectedAspectRatio}</span></div>
 <div class="footer">
-All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gamified ecosystem and do not involve real-world currency or external financial institutions. All wellness content is provided for informational and educational purposes only and does not constitute medical advice.
+Operated under a Private Sovereign Trust. All AI-generated structures, virtual resources, and intellectual property are the sole property of the Trust. Closed-loop ecosystem: no real-world currency exchange. All wellness content is provided for informational and educational purposes only and does not constitute medical advice. Cryptographic integrity: Crystal Seal (SHA-256).
 </div>
 </body></html>`;
 
@@ -1228,7 +1228,7 @@ All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gam
         {showMixer && !activePanel && (
           <div style={{ padding: '4px 12px', background: '#030306', borderTop: '1px solid rgba(255,255,255,0.02)' }} data-testid="compliance-footer">
             <p style={{ fontSize: '6px', lineHeight: '8px', color: 'rgba(255,255,255,0.12)', fontFamily: 'monospace', margin: 0 }}>
-              All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gamified ecosystem and do not involve real-world currency or external financial institutions. All wellness, acupressure, and herbology content is provided for informational and educational purposes only and does not constitute medical advice or a claim of healing.
+              Operated under a Private Sovereign Trust. All AI-generated structures, virtual resources, and intellectual property are the sole property of the Trust. Closed-loop ecosystem: no real-world currency exchange. "Fans" and "Credits" are internal virtual units used exclusively for gamified participation. All wellness, acupressure, and herbology content is provided for informational and educational purposes only and does not constitute medical advice, diagnosis, or treatment. Cryptographic integrity maintained via Crystal Seal (SHA-256).
             </p>
           </div>
         )}
