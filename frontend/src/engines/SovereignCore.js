@@ -77,10 +77,8 @@ export const applySovereignReality = (frequency = 174) => {
       background: #000000 !important;
     }
     
-    /* Kill ALL gray backgrounds */
-    *[style*="background: rgb("] {
-      background: #000000 !important;
-    }
+    /* V40.0: REMOVED — was killing ALL color circles on Light Therapy and other pages */
+    /* Previously: *[style*="background: rgb("] { background: #000000 !important; } */
     
     /* Force black on hover states too */
     .glass-card:hover,
