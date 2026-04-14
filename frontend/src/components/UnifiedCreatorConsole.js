@@ -800,6 +800,67 @@ export function MixerProvider({ children }) {
     window.print();
   }, []);
 
+  // ═══ SOVEREIGN LEDGER — Snapshot of math state + module data ═══
+  const handlePrintLedger = useCallback(() => {
+    const now = new Date();
+    const dustVal = calculateDustAccrual(Math.floor((Date.now() - performance.timeOrigin) / 100));
+    const invMult = inverseMultiplier(dustVal);
+    const currentMod = findModule(location.pathname);
+    const activeFx = Object.entries(monitorFilters)
+      .filter(([k, v]) => (k === 'brightness' || k === 'contrast' || k === 'saturate') ? v !== 100 : v !== 0)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(', ') || 'None';
+
+    const ledgerHTML = `<!DOCTYPE html><html><head><title>Sovereign Ledger — ENLIGHTEN.MINT.CAFE</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; background: #fff; color: #000; padding: 32px; max-width: 600px; margin: 0 auto; }
+  h1 { font-size: 18px; letter-spacing: 4px; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; }
+  h2 { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin: 16px 0 8px; }
+  .row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; font-size: 12px; }
+  .row .label { color: #666; } .row .value { font-weight: bold; }
+  .footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #000; font-size: 8px; color: #999; line-height: 1.4; }
+  .phi { font-size: 14px; text-align: center; margin: 12px 0; color: #333; }
+</style></head><body>
+<h1>Sovereign Ledger</h1>
+<div class="phi">ENLIGHTEN.MINT.CAFE</div>
+<h2>Timestamp</h2>
+<div class="row"><span class="label">Date</span><span class="value">${now.toLocaleDateString()}</span></div>
+<div class="row"><span class="label">Time</span><span class="value">${now.toLocaleTimeString()}</span></div>
+<h2>Sacred Mathematics</h2>
+<div class="row"><span class="label">Dust Accrual</span><span class="value">${dustVal.toFixed(6)} / ${PHI_CUBED.toFixed(6)}</span></div>
+<div class="row"><span class="label">Inverse Multiplier</span><span class="value">${invMult.toFixed(6)}</span></div>
+<div class="row"><span class="label">Resonance</span><span class="value">${resonance.toFixed(4)}</span></div>
+<div class="row"><span class="label">Ceiling</span><span class="value">${PHI} ^ 3 = ${PHI_CUBED.toFixed(6)}</span></div>
+<h2>Account State</h2>
+<div class="row"><span class="label">Tier</span><span class="value">${tier}</span></div>
+<div class="row"><span class="label">Bank Balance</span><span class="value">${bankBalance}</span></div>
+<div class="row"><span class="label">Master Level</span><span class="value">${masterLevel}%</span></div>
+<div class="row"><span class="label">Muted Channels</span><span class="value">${mutedModules.size}</span></div>
+<div class="row"><span class="label">Total Channels</span><span class="value">${TOTAL}</span></div>
+<h2>Current Module</h2>
+<div class="row"><span class="label">Route</span><span class="value">${location.pathname}</span></div>
+<div class="row"><span class="label">Module</span><span class="value">${currentMod?.label || 'Hub'}</span></div>
+<div class="row"><span class="label">Pillar</span><span class="value">${currentMod?.pillar.full || 'N/A'}</span></div>
+<h2>Active Effects</h2>
+<div class="row"><span class="label">FX</span><span class="value">${activeFx}</span></div>
+<div class="row"><span class="label">Aspect Ratio</span><span class="value">${selectedAspectRatio}</span></div>
+<div class="footer">
+All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gamified ecosystem and do not involve real-world currency or external financial institutions. All wellness content is provided for informational and educational purposes only and does not constitute medical advice.
+</div>
+</body></html>`;
+
+    const printWindow = window.open('', '_blank', 'width=650,height=800');
+    if (printWindow) {
+      printWindow.document.write(ledgerHTML);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 300);
+    } else {
+      toast.error('Popup blocked — allow popups for ledger print');
+    }
+  }, [location.pathname, monitorFilters, resonance, tier, bankBalance, masterLevel, mutedModules, selectedAspectRatio]);
+
   const renderAIPanel = () => (
     <div className="p-3 space-y-2">
       <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Sage Prompt-to-FX</div>
@@ -852,7 +913,7 @@ export function MixerProvider({ children }) {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <button onClick={() => toast.success(`Export: ${selectedAspectRatio}`)} className="p-3 rounded-xl text-center active:scale-95"
           style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }} data-testid="export-video">
           <div className="text-[10px] font-bold text-green-400">Export</div>
@@ -861,9 +922,17 @@ export function MixerProvider({ children }) {
           className="p-3 rounded-xl text-center active:scale-95" style={{ background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)' }} data-testid="broadcast-btn">
           <div className="text-[10px] font-bold text-sky-400">Broadcast</div>
         </button>
-        <button onClick={handlePrintModule} className="p-3 rounded-xl text-center active:scale-95"
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={handlePrintModule} className="p-2.5 rounded-xl text-center active:scale-95"
           style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.2)' }} data-testid="print-btn">
-          <div className="text-[10px] font-bold text-purple-400">Print</div>
+          <div className="text-[10px] font-bold text-purple-400">Print Page</div>
+          <div className="text-[7px] text-white/20">Module content</div>
+        </button>
+        <button onClick={handlePrintLedger} className="p-2.5 rounded-xl text-center active:scale-95"
+          style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)' }} data-testid="ledger-btn">
+          <div className="text-[10px] font-bold" style={{ color: '#D4AF37' }}>Sovereign Ledger</div>
+          <div className="text-[7px] text-white/20">Math + Bank snapshot</div>
         </button>
       </div>
     </div>
