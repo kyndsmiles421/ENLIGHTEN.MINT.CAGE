@@ -491,34 +491,84 @@ export function MixerProvider({ children }) {
 
   // ═══ PANEL CONTENT ═══
 
-  const renderTorusPanel = () => (
-    <div style={{ background: '#050508' }}>
-      <CelestialTorus
-        pillars={PILLARS}
-        pillarLevels={pillarLevels}
-        onNav={handleNav}
-        currentRoute={location.pathname}
-        onPillarTap={(i) => setExpandedPillar(expandedPillar === i ? null : i)}
-        expandedPillar={expandedPillar}
-      />
-      {/* Fader strip below torus — compact */}
-      <div className="flex gap-0.5 px-2 py-1 items-end" style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-        {PILLARS.map((p, i) => (
-          <div key={p.key} className="flex-1 min-w-0 flex flex-col items-center">
-            <input type="range" min="0" max="100" value={pillarLevels[i]}
-              onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[i] = Number(e.target.value); return n; })}
-              className="w-full h-1 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
-            <span className="text-[5px] font-bold" style={{ color: current?.pillar.key === p.key ? p.color : p.color + '55' }}>{p.title}</span>
+  const renderTorusPanel = () => {
+    // When a pillar is expanded, show its modules FULL SCREEN — not tiny dots
+    if (expandedPillar !== null) {
+      const p = PILLARS[expandedPillar];
+      return (
+        <div style={{ background: '#050508' }} data-testid="torus-expanded">
+          {/* Header with back button */}
+          <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: `1px solid ${p.color}20` }}>
+            <button onClick={() => setExpandedPillar(null)}
+              className="flex items-center gap-1.5 active:scale-95"
+              style={{ color: p.color }} data-testid="torus-back">
+              <ChevronUp size={14} style={{ transform: 'rotate(-90deg)' }} />
+              <span className="text-[10px] font-bold">Orbit</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-[12px] font-bold" style={{ color: p.color }}>{p.full}</span>
+              <span className="text-[9px] font-mono" style={{ color: p.color + '66' }}>{p.modules.length} modules</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <input type="range" min="0" max="100" value={pillarLevels[expandedPillar]}
+                onChange={(e) => setPillarLevels(prev => { const n = [...prev]; n[expandedPillar] = Number(e.target.value); return n; })}
+                className="w-10 h-1 rounded-full cursor-pointer" style={{ accentColor: p.color }} />
+              <span className="text-[7px] font-mono" style={{ color: p.color + '66' }}>{pillarLevels[expandedPillar]}</span>
+            </div>
           </div>
-        ))}
-        <div className="flex flex-col items-center ml-1" style={{ minWidth: 28 }}>
-          <input type="range" min="0" max="100" value={masterLevel} onChange={(e) => setMasterLevel(Number(e.target.value))}
-            className="w-full h-1 rounded-full cursor-pointer" style={{ accentColor: '#F8FAFC' }} data-testid="master-fader" />
-          <span className="text-[5px] font-bold text-white/20">MST</span>
+          {/* Module grid — big tappable cards */}
+          <div className="grid grid-cols-3 gap-2 p-3" style={{ maxHeight: '40vh', overflowY: 'auto' }}>
+            {p.modules.map(mod => {
+              const st = modStates[mod.id] || { value: 50, muted: false };
+              const isCurrentMod = location.pathname === mod.route;
+              return (
+                <button key={mod.id} onClick={() => handleNav(mod.route)}
+                  className="p-3 rounded-xl text-center active:scale-95 transition-all"
+                  style={{
+                    background: isCurrentMod ? `${p.color}20` : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${isCurrentMod ? `${p.color}40` : 'rgba(255,255,255,0.06)'}`,
+                    opacity: st.muted ? 0.3 : 1,
+                  }}
+                  data-testid={`torus-mod-${mod.id}`}>
+                  <div className="text-[11px] font-bold" style={{ color: isCurrentMod ? p.color : 'rgba(255,255,255,0.6)' }}>{mod.label}</div>
+                  {isCurrentMod && <div className="w-1.5 h-1.5 rounded-full mx-auto mt-1" style={{ background: p.color }} />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Default: Show the orbital torus + fader strip
+    return (
+      <div style={{ background: '#050508' }}>
+        <CelestialTorus
+          pillars={PILLARS}
+          pillarLevels={pillarLevels}
+          onNav={handleNav}
+          currentRoute={location.pathname}
+          onPillarTap={(i) => setExpandedPillar(i)}
+          expandedPillar={null}
+        />
+        {/* Pillar buttons below torus — tap to expand into full module view */}
+        <div className="flex gap-1 px-2 py-1.5" style={{ borderTop: '1px solid rgba(16,185,129,0.06)' }}>
+          {PILLARS.map((p, i) => (
+            <button key={p.key} onClick={() => setExpandedPillar(i)}
+              className="flex-1 py-1.5 rounded-lg text-center active:scale-95 transition-all"
+              style={{
+                background: current?.pillar.key === p.key ? `${p.color}15` : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${current?.pillar.key === p.key ? `${p.color}30` : 'rgba(255,255,255,0.04)'}`,
+              }}
+              data-testid={`torus-pillar-${p.key}`}>
+              <div className="text-[7px] font-bold" style={{ color: current?.pillar.key === p.key ? p.color : p.color + '55' }}>{p.title}</div>
+              <div className="text-[5px]" style={{ color: p.color + '33' }}>{p.modules.length}</div>
+            </button>
+          ))}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderMixPanel = () => (
     <div style={{ background: '#080812' }}>
@@ -1015,9 +1065,9 @@ All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gam
                 animate={{ height: 'auto' }}
                 exit={{ height: 0 }}
                 transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-                style={{ overflow: 'hidden', background: '#080812', borderTop: '1px solid rgba(139,92,246,0.15)', maxHeight: '45vh' }}
+                style={{ overflow: 'hidden', background: '#080812', borderTop: '1px solid rgba(139,92,246,0.15)', maxHeight: activePanel === 'torus' && expandedPillar !== null ? '70vh' : '50vh' }}
                 data-testid="tool-panel">
-                <div style={{ overflowY: 'auto', maxHeight: '45vh' }}>
+                <div style={{ overflowY: 'auto', maxHeight: activePanel === 'torus' && expandedPillar !== null ? '70vh' : '50vh' }}>
                   <div className="flex justify-center py-1" onClick={() => setActivePanel(null)} style={{ cursor: 'pointer' }}>
                     <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }} />
                   </div>
