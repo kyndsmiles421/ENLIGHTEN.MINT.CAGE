@@ -1,27 +1,37 @@
 # ENLIGHTEN.MINT.CAFE — V40.0 DEPLOYMENT BLUEPRINT
 ## Last Verified: April 14, 2026
 
-### V40.0 Integrated Systems
-1. **Celestial Torus Engine** — Canvas orbital renderer, φ³ math heartbeat
-2. **USB Bank → Resonance Wiring** — wallet balance modulates dust accrual via `tanh(balance × φ^-1 / 100)`
-3. **Sage AI Prompt-to-FX** — 13 atmosphere presets (sunset/sunrise/focus/calm/dream/night/fire/ocean/crystal/void/sacred/energy/meditation), type keyword or tap preset = instant CSS filter
-4. **Legal Compliance Footer** — Closed-loop economy + educational disclaimer, position:static, same plane
-5. **Print System** — @media print CSS hides mixer/nav, content prints clean on white
-6. **Same Plane Architecture** — Zero position:fixed from mixer, all flex siblings
+### V40.0 Complete Feature Set
 
-### Nav Tabs (9)
-ORBIT | MIX | REC | AUDIO | TEXT | LAYER | FX | AI | OUT
+**Mixer Nav (10 tabs)**:
+ORBIT | MIX | REC | AUDIO | TEXT | LAYER | FX | AI | OUT | ME
 
-### Play Store Submission Guide
-- **Financial Features**: "My app does not provide any regulated financial features" (closed-loop virtual economy)
-- **Health Apps**: "My app is not a health app" (educational/informational only)
-- **Data Safety**: Collect "App Activity" (resonance tracking), mark "Not linked to user identity"
-- **Compliance Footer**: Hard-coded in UI, satisfies Google's "Prominent Disclosure" requirement
+**Me Tab** — Account, Share, Login/Logout accessible from every module page:
+- User status (Guest/Sovereign + tier)
+- Share/Broadcast (Web Share API + clipboard fallback)
+- Profile (Cosmic Profile page)
+- Login (→ /auth) or Sever/Logout (→ /landing with fade animation)
+- Hub shortcut (→ /sovereign-hub)
+- Mixer Store
 
-### Module Coverage
-- 58 modules, 7 pillars, 171 routes, all interconnected
+**Orbit Tab** — Celestial Torus Engine:
+- φ³ orbital renderer, 7 pillar planets, golden-angle tracks
+- Tap pillar → expands to full module grid (3-column cards)
+- Tap module → navigates to page
+- "< Orbit" back button returns to torus
+- Live dust readout + inverse multiplier
 
-### Security: PASS | PWA: READY | Testing: 21/21 PASS
+**Production Studio** (Mix/Rec/Audio/Text/Layer/FX/AI/Out):
+- All functional, same plane architecture
+- Sage AI: 13 atmosphere presets (sunset/focus/dream/ocean/crystal/void...)
+- FX: Real CSS filters on #app-stage
+- Sovereign Ledger print snapshot
+
+**Architecture**: Same Plane flex column, zero position:fixed from mixer
+**Emergent Badge**: Killed (CSS + JS 3-sec recurring purge)
+**Compliance Footer**: Closed-loop economy + educational disclaimer
+
+### Module Coverage: 58 modules, 7 pillars, 171 routes
 
 ### Blocked: Play Store AAB (Google identity verification)
-### Next: Tie Sage AI to deeper LLM for generative FX, Sovereign "Live" Sessions
+### Next: Sage AI → deeper LLM, Sovereign "Live" Sessions

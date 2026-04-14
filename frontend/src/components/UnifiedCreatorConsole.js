@@ -19,7 +19,8 @@ import {
   ChevronUp, Lock, Sliders, ShoppingCart,
   X, Check, Globe, ArrowLeft,
   Video, Music, Type, Layers, Wand2,
-  Sparkles, Download, Maximize2, Minimize2, Zap
+  Sparkles, Download, Maximize2, Minimize2, Zap,
+  User, LogOut, LogIn, Share2
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -99,6 +100,7 @@ const TOOL_TABS = [
   { key: 'effects', label: 'FX', icon: Wand2, color: '#E879F9' },
   { key: 'ai', label: 'AI', icon: Sparkles, color: '#FB923C' },
   { key: 'export', label: 'Out', icon: Download, color: '#22C55E' },
+  { key: 'account', label: 'Me', icon: User, color: '#F8FAFC' },
 ];
 
 const DEFAULT_FILTERS = { blur: 0, brightness: 100, contrast: 100, hueRotate: 0, saturate: 100, sepia: 0, invert: 0 };
@@ -988,10 +990,118 @@ All financial functions within ENLIGHTEN.MINT.CAFE are part of a closed-loop gam
     </div>
   );
 
+  const handleBroadcast = useCallback(async () => {
+    const shareData = {
+      title: 'ENLIGHTEN.MINT.CAFE',
+      text: 'Sovereign Wellness Engine — breathwork, divination, alchemy, and more.',
+      url: window.location.origin,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        toast.success('Link copied to clipboard');
+      }
+    } catch {}
+  }, []);
+
+  const handleSever = useCallback(() => {
+    const root = document.documentElement;
+    root.style.transition = 'filter 1.5s ease-in-out';
+    root.style.filter = 'brightness(0) blur(10px)';
+    setTimeout(() => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('zen_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('zen_user');
+      sessionStorage.clear();
+      window.location.href = '/landing';
+    }, 1500);
+  }, []);
+
+  const renderAccountPanel = () => {
+    const zenToken = localStorage.getItem('zen_token');
+    const regularToken = localStorage.getItem('token');
+    const isLoggedIn = (zenToken && zenToken !== 'guest_token') || (regularToken && regularToken !== 'guest_token');
+    const userName = (() => { try { return JSON.parse(localStorage.getItem('zen_user') || localStorage.getItem('user') || '{}').name; } catch { return null; } })();
+    return (
+      <div className="p-3 space-y-2">
+        {/* User status */}
+        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: isLoggedIn ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.04)' }}>
+            <User size={14} style={{ color: isLoggedIn ? '#22C55E' : 'rgba(255,255,255,0.3)' }} />
+          </div>
+          <div className="flex-1">
+            <div className="text-[11px] font-medium text-white/80">{userName || (isLoggedIn ? 'Sovereign' : 'Guest')}</div>
+            <div className="text-[8px] text-white/30">{isLoggedIn ? `Tier: ${tier}` : 'Not logged in'}</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          {/* Share / Broadcast */}
+          <button onClick={handleBroadcast}
+            className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+            style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.15)' }}
+            data-testid="account-share">
+            <Share2 size={14} style={{ color: '#38BDF8' }} />
+            <div><div className="text-[10px] font-bold text-sky-400">Share</div><div className="text-[7px] text-white/20">Broadcast link</div></div>
+          </button>
+
+          {/* Profile */}
+          <button onClick={() => handleNav('/cosmic-profile')}
+            className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+            style={{ background: 'rgba(192,132,252,0.06)', border: '1px solid rgba(192,132,252,0.15)' }}
+            data-testid="account-profile">
+            <User size={14} style={{ color: '#C084FC' }} />
+            <div><div className="text-[10px] font-bold text-purple-400">Profile</div><div className="text-[7px] text-white/20">Cosmic view</div></div>
+          </button>
+
+          {/* Login or Logout */}
+          {isLoggedIn ? (
+            <button onClick={handleSever}
+              className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+              style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)' }}
+              data-testid="account-logout">
+              <LogOut size={14} style={{ color: '#EF4444' }} />
+              <div><div className="text-[10px] font-bold text-red-400">Sever</div><div className="text-[7px] text-white/20">Log out</div></div>
+            </button>
+          ) : (
+            <button onClick={() => { window.location.href = '/auth'; }}
+              className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+              style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)' }}
+              data-testid="account-login">
+              <LogIn size={14} style={{ color: '#22C55E' }} />
+              <div><div className="text-[10px] font-bold text-green-400">Login</div><div className="text-[7px] text-white/20">Sign in</div></div>
+            </button>
+          )}
+
+          {/* Hub */}
+          <button onClick={() => handleNav('/sovereign-hub')}
+            className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+            style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)' }}
+            data-testid="account-hub">
+            <Globe size={14} style={{ color: '#EAB308' }} />
+            <div><div className="text-[10px] font-bold text-yellow-400">Hub</div><div className="text-[7px] text-white/20">Sovereign Hub</div></div>
+          </button>
+        </div>
+
+        {/* Store shortcut */}
+        <button onClick={loadStore}
+          className="w-full flex items-center gap-2 p-3 rounded-xl active:scale-95"
+          style={{ background: 'rgba(234,179,8,0.04)', border: '1px solid rgba(234,179,8,0.1)' }}
+          data-testid="account-store">
+          <ShoppingCart size={14} style={{ color: '#EAB308' }} />
+          <div className="text-[10px] font-bold text-yellow-400/80">Mixer Store</div>
+        </button>
+      </div>
+    );
+  };
+
   const PANEL_RENDERERS = {
     torus: renderTorusPanel, mix: renderMixPanel, record: renderRecordPanel, audio: renderAudioPanel,
     text: renderTextPanel, overlay: renderOverlayPanel, effects: renderEffectsPanel,
-    ai: renderAIPanel, export: renderExportPanel,
+    ai: renderAIPanel, export: renderExportPanel, account: renderAccountPanel,
   };
 
   // ═══ STORE (full-page takeover, same plane) ═══
