@@ -99,6 +99,38 @@ function hexToGlow(hex, alpha = 0.4) {
   return `rgba(${parseInt(h.substring(0,2),16)},${parseInt(h.substring(2,4),16)},${parseInt(h.substring(4,6),16)},${alpha})`;
 }
 
+/* ── Resonance Name Engine (φ-Seeded) ───────────────────── */
+const PHI = 1.618033988749895;
+const RESONANCE_STYLES = {
+  lakota: {
+    label: 'Lakota Sky',
+    first: ['Cansasa', 'Keya', 'Wicapi', 'Tatanka', 'Maka', 'Wakan', 'Takoja', 'Anpo', 'Mahpiya', 'Canku', 'Wanbli', 'Zitkala', 'Hanwi', 'Tunkasila', 'Sinte'],
+    second: ['Ember', 'Jade', 'Aurora', 'Stone', 'Horizon', 'Bloom', 'Drift', 'Echo', 'Flame', 'Crown', 'Pulse', 'Veil', 'Dawn', 'Root', 'Spiral'],
+  },
+  mineral: {
+    label: 'Mineral',
+    first: ['Obsidian', 'Solar', 'Lunar', 'Crystal', 'Amber', 'Opal', 'Quartz', 'Onyx', 'Pearl', 'Sapphire', 'Garnet', 'Citrine', 'Topaz', 'Agate', 'Beryl'],
+    second: ['Pulse', 'Flare', 'Mist', 'Tide', 'Glow', 'Frost', 'Bloom', 'Storm', 'Haze', 'Shard', 'Core', 'Drift', 'Flame', 'Ridge', 'Vein'],
+  },
+  wellness: {
+    label: 'Wellness',
+    first: ['Kinetic', 'Ethereal', 'Radiant', 'Primal', 'Harmonic', 'Zenith', 'Subtle', 'Infinite', 'Serene', 'Lucid', 'Quantum', 'Vital', 'Cosmic', 'Neural', 'Sacred'],
+    second: ['Calm', 'Focus', 'Flow', 'Surge', 'Balance', 'Drift', 'Bloom', 'Depth', 'Peak', 'Pulse', 'Rise', 'Wave', 'Shield', 'Anchor', 'Breath'],
+  },
+};
+const STYLE_KEYS = Object.keys(RESONANCE_STYLES);
+
+function getResonanceName(colors, style) {
+  if (colors.length < 2) return null;
+  const key = [...colors].sort((a, b) => a.id.localeCompare(b.id)).map(c => c.id).join('+');
+  const hash = [...key].reduce((sum, ch, i) => sum + ch.charCodeAt(0) * Math.pow(PHI, i + 1), 0);
+  const pool = RESONANCE_STYLES[style];
+  if (!pool) return null;
+  const fi = Math.floor(hash) % pool.first.length;
+  const si = Math.floor(hash * PHI) % pool.second.length;
+  return `${pool.first[fi]} ${pool.second[si]}`;
+}
+
 /* ── Audio Engine: Layered Oscillators per Color ────────── */
 function useColorAudio(colors, muted) {
   const ctxRef = useRef(null);
@@ -220,41 +252,70 @@ function ColorSelector({ colors, selected, onToggle, max }) {
   );
 }
 
-/* ── Blend Indicator ────────────────────────────────────── */
-function BlendIndicator({ colors }) {
+/* ── Blend Indicator + Resonance Name ───────────────────── */
+function BlendIndicator({ colors, nameStyle, onStyleChange }) {
   if (colors.length < 2) return null;
   const blended = blendHex(colors);
+  const rName = getResonanceName(colors, nameStyle);
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex items-center justify-center gap-2.5 mt-5"
+      className="mt-5 flex flex-col items-center gap-3"
       data-testid="light-blend-indicator"
     >
-      {colors.map((c, i) => (
-        <React.Fragment key={c.id}>
-          <div className="w-4 h-4 rounded-full" style={{ background: c.hex, boxShadow: `0 0 10px ${c.glow}` }} />
-          {i < colors.length - 1 && (
-            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
-          )}
-        </React.Fragment>
-      ))}
-      <span className="text-[10px] mx-1" style={{ color: 'rgba(255,255,255,0.15)' }}>=</span>
-      <motion.div
-        animate={{ boxShadow: [`0 0 12px ${blended}55`, `0 0 28px ${blended}35`, `0 0 12px ${blended}55`] }}
-        transition={{ duration: 3, repeat: Infinity }}
-        className="w-6 h-6 rounded-full"
-        style={{ background: blended }}
-      />
-      <span className="text-[10px] font-medium ml-0.5" style={{ color: `${blended}AA` }}>
-        Blend
-      </span>
+      <div className="flex items-center gap-2.5">
+        {colors.map((c, i) => (
+          <React.Fragment key={c.id}>
+            <div className="w-4 h-4 rounded-full" style={{ background: c.hex, boxShadow: `0 0 10px ${c.glow}` }} />
+            {i < colors.length - 1 && (
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
+            )}
+          </React.Fragment>
+        ))}
+        <span className="text-[10px] mx-1" style={{ color: 'rgba(255,255,255,0.15)' }}>=</span>
+        <motion.div
+          animate={{ boxShadow: [`0 0 12px ${blended}55`, `0 0 28px ${blended}35`, `0 0 12px ${blended}55`] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="w-6 h-6 rounded-full"
+          style={{ background: blended }}
+        />
+      </div>
+      {rName && (
+        <motion.p
+          key={rName}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm font-light tracking-wide"
+          style={{ color: `${blended}CC`, fontFamily: 'Cormorant Garamond, serif' }}
+          data-testid="light-resonance-name"
+        >
+          {rName}
+        </motion.p>
+      )}
+      <div className="flex items-center gap-1.5" data-testid="light-name-style-selector">
+        {STYLE_KEYS.map(sk => (
+          <button
+            key={sk}
+            onClick={() => onStyleChange(sk)}
+            className="px-2.5 py-1 rounded-full text-[9px] transition-all"
+            style={{
+              background: nameStyle === sk ? `${blended}18` : 'transparent',
+              border: `1px solid ${nameStyle === sk ? `${blended}40` : 'rgba(255,255,255,0.06)'}`,
+              color: nameStyle === sk ? `${blended}CC` : 'rgba(255,255,255,0.2)',
+            }}
+            data-testid={`light-style-${sk}`}
+          >
+            {RESONANCE_STYLES[sk].label}
+          </button>
+        ))}
+      </div>
     </motion.div>
   );
 }
 
 /* ── Immersive Session (Multi-Frequency) ────────────────── */
-function ImmersiveSession({ colors, duration, onEnd }) {
+function ImmersiveSession({ colors, duration, onEnd, resonanceName }) {
   const [timeLeft, setTimeLeft] = useState(duration * 60);
   const [paused, setPaused] = useState(false);
   const [breathPhase, setBreathPhase] = useState('inhale');
@@ -392,6 +453,13 @@ function ImmersiveSession({ colors, duration, onEnd }) {
         {breathPhase === 'inhale' ? 'Breathe In' : 'Breathe Out'}
       </motion.p>
 
+      {resonanceName && (
+        <p className="relative z-10 mt-3 text-xs tracking-wider" style={{ color: `${blended}66`, fontFamily: 'Cormorant Garamond, serif' }}
+          data-testid="light-session-resonance-name">
+          {resonanceName}
+        </p>
+      )}
+
       <p className="relative z-10 mt-6 text-3xl font-light tabular-nums" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Cormorant Garamond, serif' }}>
         {mins}:{secs.toString().padStart(2, '0')}
       </p>
@@ -424,6 +492,7 @@ export default function LightTherapy() {
   const [duration, setDuration] = useState(5);
   const [sessionActive, setSessionActive] = useState(false);
   const [audioOn, setAudioOn] = useState(false);
+  const [nameStyle, setNameStyle] = useState('lakota');
   useLightTherapyOverride();
   useColorAudio(selected, !audioOn);
 
@@ -439,6 +508,7 @@ export default function LightTherapy() {
   const primary = selected[0];
   const blended = useMemo(() => blendHex(selected), [selected]);
   const accent = selected.length ? blended : '#A855F7';
+  const resonanceName = useMemo(() => getResonanceName(selected, nameStyle), [selected, nameStyle]);
 
   return (
     <div className="min-h-screen relative overflow-hidden" data-light-therapy="true"
@@ -503,11 +573,11 @@ export default function LightTherapy() {
               </motion.button>
             )}
           </div>
-          <h1 className="text-3xl font-light tracking-tight mb-2" style={{
+          <h1 className="text-3xl font-light tracking-tight mb-1" style={{
             fontFamily: 'Cormorant Garamond, serif',
             color: selected.length ? `${blended}DD` : 'rgba(248,250,252,0.85)',
           }}>
-            {selected.length > 1 ? 'Blended Light' : selected.length === 1 ? primary.name : 'Light Therapy'}
+            {selected.length > 1 && resonanceName ? resonanceName : selected.length === 1 ? primary.name : 'Light Therapy'}
           </h1>
           {selected.length > 0 ? (
             <p className="text-[10px] mb-4" style={{ color: `${accent}88` }}>
@@ -521,7 +591,7 @@ export default function LightTherapy() {
         </motion.div>
 
         <ColorSelector colors={COLORS} selected={selected} onToggle={toggleColor} max={MAX_BLEND} />
-        <BlendIndicator colors={selected} />
+        <BlendIndicator colors={selected} nameStyle={nameStyle} onStyleChange={setNameStyle} />
 
         <AnimatePresence mode="wait">
           {selected.length > 0 && (
@@ -594,7 +664,9 @@ export default function LightTherapy() {
                   }}
                   data-testid="light-start-session">
                   <Play size={14} fill={accent} />
-                  {selected.length > 1
+                  {selected.length > 1 && resonanceName
+                    ? `Immerse in ${resonanceName}`
+                    : selected.length > 1
                     ? `Immerse in ${selected.length}-Color Blend`
                     : `Immerse in ${primary.id.charAt(0).toUpperCase() + primary.id.slice(1)}`}
                 </button>
@@ -606,7 +678,7 @@ export default function LightTherapy() {
 
       <AnimatePresence>
         {sessionActive && selected.length > 0 && (
-          <ImmersiveSession colors={selected} duration={duration} onEnd={() => setSessionActive(false)} />
+          <ImmersiveSession colors={selected} duration={duration} onEnd={() => setSessionActive(false)} resonanceName={resonanceName} />
         )}
       </AnimatePresence>
     </div>
