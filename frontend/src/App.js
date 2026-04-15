@@ -223,6 +223,7 @@ const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
 const CreatorDashboard = lazy(() => import('./pages/CreatorDashboard'));
 const LiveSessions = lazy(() => import('./pages/LiveSessions'));
 const LiveRoom = lazy(() => import('./pages/LiveRoom'));
+const SovereignCircle = lazy(() => import('./pages/SovereignCircle'));
 const DanceMusicStudio = lazy(() => import('./pages/DanceMusicStudio'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
 const Bible = lazy(() => import('./pages/Bible'));
@@ -536,6 +537,7 @@ function AnimatedRoutes() {
         <Route path="/starseed" element={<Starseed />} />
         <Route path="/creator" element={<CreatorDashboard />} />
         <Route path="/live" element={<LiveSessions />} />
+        <Route path="/sovereign-circle" element={<SovereignCircle />} />
         <Route path="/live/:sessionId" element={<LiveRoom />} />
         <Route path="/dance-music" element={<DanceMusicStudio />} />
         <Route path="/my-creations" element={<MediaLibrary />} />

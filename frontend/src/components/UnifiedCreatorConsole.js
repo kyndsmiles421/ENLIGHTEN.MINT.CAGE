@@ -104,6 +104,7 @@ const PILLARS = [
   { key: 'sage', title: 'SAG', full: 'Sage AI', color: '#38BDF8', modules: [
     { id: 'coach', label: 'Coach', route: '/coach' }, { id: 'crystals', label: 'Crystal', route: '/crystals' },
     { id: 'briefing', label: 'Brief', route: '/daily-briefing' }, { id: 'forecast', label: 'Forcast', route: '/forecasts' },
+    { id: 'circle', label: 'Circle', route: '/sovereign-circle' },
   ]},
   { key: 'council', title: 'COU', full: 'Council', color: '#C084FC', modules: [
     { id: 'advisors', label: 'Council', route: '/sovereigns' }, { id: 'economy', label: 'Econ', route: '/economy' },
