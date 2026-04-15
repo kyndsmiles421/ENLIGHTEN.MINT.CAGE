@@ -27,6 +27,8 @@ import {
   ParticleField, TOOL_TABS,
 } from './console';
 import { useMediaControls } from './console/useMediaControls';
+import { useAudioVisualizer } from '../hooks/useAudioVisualizer';
+import { useMixer as useAudioMixer } from '../context/MixerContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -44,6 +46,14 @@ export function MixerProvider({ children }) {
   const location = useLocation();
   const media = useMediaControls();
   const { user: authUser, token: authToken, logout: authLogout } = useAuth();
+
+  // Audio-Visual Bridge: tap into MixerContext's AnalyserNode for particle visualization
+  const audioMixer = useAudioMixer();
+  const audioData = useAudioVisualizer(
+    audioMixer?.analyserRef || { current: null },
+    audioMixer?.ctxRef || { current: null },
+    { enabled: true }
+  );
 
   const [tier, setTier] = useState('SEED');
   const [unlocks, setUnlocks] = useState({ unlocked_pillars: [], unlocked_fx: [], has_full_unlock: false });
@@ -296,7 +306,7 @@ export function MixerProvider({ children }) {
                   <div className="flex justify-center py-1" onClick={() => setActivePanel(null)} style={{ cursor: 'pointer' }}>
                     <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }} />
                   </div>
-                  {/* 3D Particle Field — breathes behind active panel */}
+                  {/* 3D Particle Field — breathes with ChaosEngine + audio */}
                   {activePanel === 'torus' && (
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.6 }}>
@@ -304,6 +314,7 @@ export function MixerProvider({ children }) {
                           pillarKey={current?.pillar?.key}
                           chaosCoeff={1.0 + (resonance * 0.618)}
                           intensity={0.5 + resonance * 0.3}
+                          audioData={audioData}
                           width={380}
                           height={200}
                         />
