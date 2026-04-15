@@ -24,6 +24,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem('zen_token');
+    localStorage.removeItem('zen_user');
     setToken(null);
     setUser(null);
   }, []);
@@ -36,7 +37,10 @@ export function AuthProvider({ children }) {
     }
     if (token) {
       axios.get(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(res => setUser(res.data))
+        .then(res => {
+          setUser(res.data);
+          localStorage.setItem('zen_user', JSON.stringify(res.data));
+        })
         .catch(() => {
           // On auth failure, fall back to guest mode instead of logging out
           setUser({
@@ -56,6 +60,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const res = await axios.post(`${API}/auth/login`, { email, password });
     localStorage.setItem('zen_token', res.data.token);
+    localStorage.setItem('zen_user', JSON.stringify(res.data.user));
     setToken(res.data.token);
     setUser(res.data.user);
     return res.data;
@@ -64,6 +69,7 @@ export function AuthProvider({ children }) {
   const register = async (name, email, password) => {
     const res = await axios.post(`${API}/auth/register`, { name, email, password });
     localStorage.setItem('zen_token', res.data.token);
+    localStorage.setItem('zen_user', JSON.stringify(res.data.user));
     setToken(res.data.token);
     setUser(res.data.user);
     return res.data;

@@ -15,6 +15,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
 import {
   ChevronUp, Lock, Sliders, ShoppingCart,
   X, Check, Globe, ArrowLeft,
@@ -382,6 +383,7 @@ export function MixerProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const media = useMediaControls();
+  const { user: authUser, token: authToken, logout: authLogout } = useAuth();
 
   const [tier, setTier] = useState('SEED');
   const [unlocks, setUnlocks] = useState({ unlocked_pillars: [], unlocked_fx: [], has_full_unlock: false });
@@ -1127,10 +1129,8 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
   }, []);
 
   const renderAccountPanel = () => {
-    const zenToken = localStorage.getItem('zen_token');
-    const regularToken = localStorage.getItem('token');
-    const isLoggedIn = (zenToken && zenToken !== 'guest_token') || (regularToken && regularToken !== 'guest_token');
-    const userName = (() => { try { return JSON.parse(localStorage.getItem('zen_user') || localStorage.getItem('user') || '{}').name; } catch { return null; } })();
+    const isLoggedIn = !!(authToken && authToken !== 'guest_token');
+    const userName = authUser?.name || null;
     const sceneCtx = document.querySelector('[data-testid="scene-picker"]') ? null : true; // check if picker available
     return (
       <div className="p-3 space-y-2">
