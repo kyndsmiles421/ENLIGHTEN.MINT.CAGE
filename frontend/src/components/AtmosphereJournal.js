@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Trash2, RotateCcw, Save, X } from 'lucide-react';
+import { BookOpen, Trash2, RotateCcw, Save, X, Share2 } from 'lucide-react';
 import axios from 'axios';
+import { generateShareCard, downloadShareCard } from './ShareCardService';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -11,6 +12,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
  */
 
 function AtmosphereCard({ atm, onApply, onDelete, accent }) {
+  const [sharing, setSharing] = useState(false);
   const f = atm.filters || {};
   const filterCSS = `blur(${f.blur || 0}px) brightness(${(f.brightness || 100) / 100}) contrast(${(f.contrast || 100) / 100}) hue-rotate(${f.hueRotate || 0}deg) saturate(${(f.saturate || 100) / 100}) sepia(${(f.sepia || 0) / 100})`;
   const ts = atm.created_at ? new Date(atm.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
@@ -53,6 +55,19 @@ function AtmosphereCard({ atm, onApply, onDelete, accent }) {
           style={{ background: `${accent}20`, border: `1px solid ${accent}40` }}
           data-testid={`atm-apply-${atm.id}`}>
           <RotateCcw size={14} style={{ color: accent }} />
+        </button>
+        <button onClick={async () => {
+          setSharing(true);
+          try {
+            const dataUrl = await generateShareCard(atm);
+            downloadShareCard(dataUrl, atm.name);
+          } catch {}
+          setSharing(false);
+        }}
+          className="p-2 rounded-lg active:scale-90 transition-all"
+          style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)' }}
+          data-testid={`atm-share-${atm.id}`}>
+          <Share2 size={14} style={{ color: sharing ? '#93C5FD' : '#3B82F6' }} />
         </button>
         <button onClick={() => onDelete(atm.id)}
           className="p-2 rounded-lg active:scale-90 transition-all"

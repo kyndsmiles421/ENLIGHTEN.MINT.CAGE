@@ -29,6 +29,8 @@ import { AtmosphereJournal, saveAtmosphere } from './AtmosphereJournal';
 import { useScene } from './SceneEngine';
 import { ZDepthTransition } from './UnifiedFieldEngine';
 
+// Extracted modules available: CelestialTorus.js, ConsoleConstants.js (for external consumers)
+
 // Scene picker button for the account panel
 function SceneButton() {
   const scene = useScene();

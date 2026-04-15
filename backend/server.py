@@ -105,6 +105,36 @@ async def websocket_sync(ws: WebSocket, token: str = ""):
 
 
 # ━━━ Stripe Webhook ━━━
+# ━━━ WebSocket for Sovereign Circle Live Sessions ━━━
+from routes.sovereign_live import manager as circle_manager
+
+@app.websocket("/api/ws/sovereign-circle")
+async def websocket_sovereign_circle(ws: WebSocket, room: str = "", peer: str = ""):
+    if not room:
+        await ws.close(code=4000, reason="Room ID required")
+        return
+    peer_id = peer or f"peer_{id(ws)}"
+    await ws.accept()
+    joined = await circle_manager.join(room, peer_id, ws)
+    if not joined:
+        await ws.send_json({"type": "error", "message": "Room not found"})
+        await ws.close(code=4004, reason="Room not found")
+        return
+    try:
+        while True:
+            data = await ws.receive_json()
+            msg_type = data.get("type")
+            if msg_type == "atmosphere_sync":
+                await circle_manager.sync_atmosphere(room, peer_id, data.get("payload", {}))
+            elif msg_type == "ping":
+                rm = circle_manager.get_room(room)
+                await ws.send_json({"type": "pong", "peers": len(rm["connections"]) if rm else 0})
+    except WebSocketDisconnect:
+        circle_manager.leave(room, peer_id)
+    except Exception:
+        circle_manager.leave(room, peer_id)
+
+
 @app.post("/api/webhook/stripe")
 async def stripe_webhook(request: Request):
     from emergentintegrations.payments.stripe.checkout import StripeCheckout
