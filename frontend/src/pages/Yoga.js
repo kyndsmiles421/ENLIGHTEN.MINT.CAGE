@@ -418,6 +418,8 @@ function StyleDetail({ style, onBack, authHeaders, avatarConfig }) {
   );
 }
 
+import SovereignViewport from '../components/SovereignViewport';
+
 export default function Yoga() {
   const { authHeaders } = useAuth();
   const [styles, setStyles] = useState([]);
@@ -433,8 +435,14 @@ export default function Yoga() {
     }
   }, [authHeaders]);
 
+  const yogaBg = activeStyle
+    ? undefined
+    : 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=70';
+  const yogaAccent = activeStyle?.color || '#FB923C';
+
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="yoga-page">
+    <SovereignViewport bgImage={yogaBg} accentColor={yogaAccent}>
+      <div className="px-6 md:px-12 lg:px-24 py-12" data-testid="yoga-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {activeStyle ? (
@@ -466,6 +474,7 @@ export default function Yoga() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+      </div>
+    </SovereignViewport>
   );
 }

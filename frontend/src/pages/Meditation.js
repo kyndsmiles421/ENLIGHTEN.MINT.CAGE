@@ -8,6 +8,7 @@ import { useSensory } from '../context/SensoryContext';
 import { useSearchParams } from 'react-router-dom';
 import CelebrationBurst from '../components/CelebrationBurst';
 import NarrationPlayer from '../components/NarrationPlayer';
+import SovereignViewport from '../components/SovereignViewport';
 import FeaturedVideos from '../components/FeaturedVideos';
 import useWorkAccrual from '../hooks/useWorkAccrual';
 
@@ -1288,7 +1289,8 @@ export default function Meditation() {
   const filtered = filter === 'all' ? GUIDED_MEDITATIONS : GUIDED_MEDITATIONS.filter(m => m.category === filter);
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+    <SovereignViewport bgImage="https://images.unsplash.com/photo-1735213005665-f5b93d0795fe?w=1200&q=70" accentColor="var(--primary)">
+      <div className="px-6 md:px-12 lg:px-24 py-12">
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--primary)' }}>Meditation</p>
@@ -1418,5 +1420,6 @@ export default function Meditation() {
         )}
       </AnimatePresence>
     </div>
+    </SovereignViewport>
   );
 }

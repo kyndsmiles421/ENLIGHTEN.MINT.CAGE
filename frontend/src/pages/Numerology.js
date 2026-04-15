@@ -156,6 +156,8 @@ function CompatibilityResult({ result, onBack }) {
   );
 }
 
+import SovereignViewport from '../components/SovereignViewport';
+
 export default function Numerology() {
   const [tab, setTab] = useState('reading'); // 'reading' | 'compatibility'
   const [name, setName] = useState('');
@@ -189,7 +191,8 @@ export default function Numerology() {
   };
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" data-testid="numerology-page">
+    <SovereignViewport bgImage="https://images.unsplash.com/photo-1735213005665-f5b93d0795fe?w=1200&q=70" accentColor="#D4AF37">
+      <div className="px-6 md:px-12 lg:px-24 py-12" data-testid="numerology-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {result ? (
@@ -314,7 +317,8 @@ export default function Numerology() {
         {/* Connected Systems */}
         <NumerologyCrossLinks />
       </div>
-    </div>
+      </div>
+    </SovereignViewport>
   );
 }
 

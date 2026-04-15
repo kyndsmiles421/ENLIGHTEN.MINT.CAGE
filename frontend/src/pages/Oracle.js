@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import { Sparkles, Loader2, RotateCcw, Star, Sun, Moon, Hexagon, Triangle, X } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 
+import SovereignViewport from '../components/SovereignViewport';
+
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const TABS = [
@@ -211,7 +213,8 @@ export default function Oracle() {
   const currentTabColor = TABS.find(t => t.id === tab)?.color || '#D8B4FE';
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 immersive-page" style={{ background: 'transparent', position: 'relative', zIndex: 10 }}>
+    <SovereignViewport bgImage="https://images.unsplash.com/photo-1656542198209-4758a1afc42f?w=1200&q=70" accentColor={currentTabColor}>
+      <div className="px-6 md:px-12 lg:px-24 py-12" style={{ position: 'relative', zIndex: 10 }}>
       {/* Crystal Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (
@@ -647,6 +650,7 @@ export default function Oracle() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </SovereignViewport>
   );
 }

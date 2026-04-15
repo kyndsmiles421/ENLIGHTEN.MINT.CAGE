@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import SovereignViewport from '../components/SovereignViewport';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -755,7 +756,8 @@ export default function Crystals() {
   ];
 
   return (
-    <div className="min-h-screen immersive-page pt-20 pb-12 px-4" data-testid="crystals-page" style={{ background: 'var(--bg-primary)' }}>
+    <SovereignViewport bgImage="https://images.unsplash.com/photo-1656542198209-4758a1afc42f?w=1200&q=70" accentColor="#A855F7">
+      <div className="pt-20 pb-12 px-4" data-testid="crystals-page">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -882,6 +884,7 @@ export default function Crystals() {
         {vrCrystal && <VRCrystalView crystal={vrCrystal} onClose={() => setVrCrystal(null)} />}
       </AnimatePresence>
     </div>
+    </SovereignViewport>
   );
 }
 
