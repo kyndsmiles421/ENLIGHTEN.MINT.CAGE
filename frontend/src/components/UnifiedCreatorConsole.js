@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { useScene } from './SceneEngine';
+import { ZDepthTransition } from './UnifiedFieldEngine';
 
 // Scene picker button for the account panel
 function SceneButton() {
@@ -1172,8 +1173,10 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
     <MixerContext.Provider value={ctx}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'transparent', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} data-testid="sovereign-organism">
         {/* CONTENT — fills available space, scrollable */}
-        <div style={{ flex: 1, overflow: 'auto', position: 'relative' }} data-testid="content-area">
+        <div style={{ flex: 1, overflow: 'auto', position: 'relative', perspective: '1200px' }} data-testid="content-area">
+          <ZDepthTransition>
           {children}
+          </ZDepthTransition>
 
           {/* Text overlays — positioned within content area, not floating */}
           {textOverlays.map(overlay => (

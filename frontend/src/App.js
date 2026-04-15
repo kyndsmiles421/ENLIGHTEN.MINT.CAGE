@@ -55,6 +55,7 @@ import { AuthProvider } from './context/AuthContext';
 import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { SceneProvider } from './components/SceneEngine';
+import { TouchLightEngine, ZDepthTransition } from './components/UnifiedFieldEngine';
 import { Toaster } from 'sonner';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
@@ -664,6 +665,7 @@ function App() {
           <SplitScreenProvider>
           <RecursivePortal>
           <SceneProvider>
+          <TouchLightEngine />
           <SystemMixerProvider>
           <CafeApp />
           </SystemMixerProvider>
