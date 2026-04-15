@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
 from deps import db, get_current_user, logger, create_token
 from datetime import datetime, timezone, timedelta
-import uuid, bcrypt, os
+import uuid
+import bcrypt
+import os
 from models import UserCreate, UserLogin
 
 router = APIRouter()
@@ -74,6 +77,25 @@ async def login(user: UserLogin):
     token = create_token(found["id"], found["name"])
     role = found.get("role", "user")
     return {"token": token, "user": {"id": found["id"], "name": found["name"], "email": found["email"], "role": role}}
+
+
+class PasswordReset(BaseModel):
+    email: str
+    new_password: str
+
+
+@router.post("/auth/reset-password")
+async def reset_password(data: PasswordReset):
+    """Simple password reset — verify email exists, then set new password."""
+    found = await db.users.find_one({"email": data.email}, {"_id": 0, "id": 1})
+    if not found:
+        raise HTTPException(status_code=404, detail="No account found with that email")
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    hashed = bcrypt.hashpw(data.new_password.encode(), bcrypt.gensalt()).decode()
+    await db.users.update_one({"id": found["id"]}, {"$set": {"password": hashed}})
+    return {"status": "Password updated successfully"}
+
 
 @router.get("/auth/me")
 async def get_me(user=Depends(get_current_user)):

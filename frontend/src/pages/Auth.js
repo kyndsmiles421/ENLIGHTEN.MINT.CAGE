@@ -10,6 +10,7 @@ export default function Auth() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
@@ -22,13 +23,27 @@ export default function Auth() {
       if (mode === 'login') {
         await login(email, password);
         toast.success('Welcome back, cosmic traveler');
-      } else {
+        navigate('/dashboard');
+      } else if (mode === 'register') {
         await register(name, email, password);
         toast.success('Your journey begins now');
+        navigate('/dashboard');
+      } else if (mode === 'reset') {
+        const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+        const res = await fetch(`${API}/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, new_password: newPassword }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Reset failed');
+        toast.success('Password updated — you can now log in');
+        setMode('login');
+        setPassword(newPassword);
+        setNewPassword('');
       }
-      navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Something went wrong');
+      toast.error(err.response?.data?.detail || err.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -101,14 +116,14 @@ export default function Auth() {
           color: '#fff',
           fontFamily: 'Cormorant Garamond, Georgia, serif'
         }}>
-          {mode === 'login' ? 'Welcome Back' : 'Join the Light'}
+          {mode === 'login' ? 'Welcome Back' : mode === 'register' ? 'Join the Light' : 'Reset Password'}
         </h1>
         <p style={{ 
           fontSize: '16px', 
           marginBottom: '40px',
           color: 'rgba(255,255,255,0.6)'
         }}>
-          {mode === 'login' ? 'Continue your cosmic journey' : 'Create your sanctuary account'}
+          {mode === 'login' ? 'Continue your cosmic journey' : mode === 'register' ? 'Create your sanctuary account' : 'Enter your email and a new password'}
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -165,14 +180,15 @@ export default function Auth() {
               letterSpacing: '0.2em', 
               marginBottom: '8px',
               color: 'rgba(255,255,255,0.5)'
-            }}>Password</label>
+            }}>{mode === 'reset' ? 'New Password' : 'Password'}</label>
             <div style={{ position: 'relative' }}>
               <input
                 type={showPw ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
+                value={mode === 'reset' ? newPassword : password}
+                onChange={(e) => mode === 'reset' ? setNewPassword(e.target.value) : setPassword(e.target.value)}
+                placeholder={mode === 'reset' ? 'Enter new password (min 6 chars)' : 'Your password'}
                 required
+                minLength={mode === 'reset' ? 6 : undefined}
                 data-testid="auth-password-input"
                 style={{...inputStyle, paddingRight: '48px'}}
               />
@@ -195,6 +211,20 @@ export default function Auth() {
                 {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {mode === 'login' && (
+              <button
+                type="button"
+                onClick={() => setMode('reset')}
+                data-testid="auth-forgot-password-btn"
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: 'rgba(167,139,250,0.7)', fontSize: '13px', marginTop: '8px',
+                  padding: 0,
+                }}
+              >
+                Forgot password?
+              </button>
+            )}
           </div>
           
           <button
@@ -215,7 +245,7 @@ export default function Auth() {
               marginTop: '8px'
             }}
           >
-            {loading ? 'Aligning energies...' : 'Begin Journey'}
+            {loading ? 'Aligning energies...' : mode === 'reset' ? 'Reset Password' : 'Begin Journey'}
           </button>
         </form>
 
@@ -225,7 +255,7 @@ export default function Auth() {
           fontSize: '14px',
           color: 'rgba(255,255,255,0.6)'
         }}>
-          {mode === 'login' ? "New to the cosmos? " : "Already a traveler? "}
+          {mode === 'login' ? "New to the cosmos? " : mode === 'register' ? "Already a traveler? " : "Remember your password? "}
           <button
             onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
             data-testid="auth-toggle-mode-btn"
