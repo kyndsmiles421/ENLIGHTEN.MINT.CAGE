@@ -9,15 +9,25 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /* ── Planet Visual Profiles ──────────────────────────────── */
 const PLANET_VISUALS = {
-  Mercury: { bg: '#4A4A4A', accent: '#B8B8B8', glow: 'rgba(184,184,184,0.15)', desc: 'Scorched cratered world closest to the Sun', chaos: 1.8 },
-  Venus:   { bg: '#C4A35A', accent: '#F5D78E', glow: 'rgba(245,215,142,0.2)', desc: 'Shrouded in sulfuric clouds, 900°F surface', chaos: 1.3 },
-  Earth:   { bg: '#1E6B4E', accent: '#4FC3F7', glow: 'rgba(79,195,247,0.2)', desc: 'Our home, the pale blue dot', chaos: 1.0 },
-  Mars:    { bg: '#8B3A2A', accent: '#E57C5B', glow: 'rgba(229,124,91,0.2)', desc: 'The red planet, iron-oxide dust storms', chaos: 1.2 },
-  Jupiter: { bg: '#8B6914', accent: '#D4A843', glow: 'rgba(212,168,67,0.2)', desc: 'Great Red Spot, king of the gas giants', chaos: 0.8 },
-  Saturn:  { bg: '#C4A35A', accent: '#E8D48B', glow: 'rgba(232,212,139,0.18)', desc: 'Golden rings of ice and rock', chaos: 0.6 },
-  Uranus:  { bg: '#2F6B6B', accent: '#69D2D2', glow: 'rgba(105,210,210,0.15)', desc: 'Ice giant tilted on its side', chaos: 1.5 },
-  Neptune: { bg: '#1B3A6B', accent: '#5B7FE5', glow: 'rgba(91,127,229,0.2)', desc: 'Supersonic winds, deep blue methane', chaos: 1.618 },
+  Mercury: { bg: '#4A4A4A', accent: '#B8B8B8', glow: 'rgba(184,184,184,0.15)', desc: 'Scorched cratered world closest to the Sun', chaos: 1.8,
+    img: 'https://images.unsplash.com/photo-1568581357528-69b82742efa1?w=1200&q=80' },
+  Venus:   { bg: '#C4A35A', accent: '#F5D78E', glow: 'rgba(245,215,142,0.2)', desc: 'Shrouded in sulfuric clouds, 900°F surface', chaos: 1.3,
+    img: 'https://images.unsplash.com/photo-1633034974812-702a0da55cfc?w=1200&q=80' },
+  Earth:   { bg: '#1E6B4E', accent: '#4FC3F7', glow: 'rgba(79,195,247,0.2)', desc: 'Our home, the pale blue dot', chaos: 1.0,
+    img: 'https://images.unsplash.com/photo-1736326268574-8bfa8c1b69a5?w=1200&q=80' },
+  Mars:    { bg: '#8B3A2A', accent: '#E57C5B', glow: 'rgba(229,124,91,0.2)', desc: 'The red planet, iron-oxide dust storms', chaos: 1.2,
+    img: 'https://images.unsplash.com/photo-1660251146550-40e7c9d841b3?w=1200&q=80' },
+  Jupiter: { bg: '#8B6914', accent: '#D4A843', glow: 'rgba(212,168,67,0.2)', desc: 'Great Red Spot, king of the gas giants', chaos: 0.8,
+    img: 'https://images.unsplash.com/photo-1768032504914-dc0f699db615?w=1200&q=80' },
+  Saturn:  { bg: '#C4A35A', accent: '#E8D48B', glow: 'rgba(232,212,139,0.18)', desc: 'Golden rings of ice and rock', chaos: 0.6,
+    img: 'https://images.unsplash.com/photo-1771422964049-2cc26fcd241b?w=1200&q=80' },
+  Uranus:  { bg: '#2F6B6B', accent: '#69D2D2', glow: 'rgba(105,210,210,0.15)', desc: 'Ice giant tilted on its side', chaos: 1.5,
+    img: 'https://images.unsplash.com/photo-1698243282692-616402a5d535?w=1200&q=80' },
+  Neptune: { bg: '#1B3A6B', accent: '#5B7FE5', glow: 'rgba(91,127,229,0.2)', desc: 'Supersonic winds, deep blue methane', chaos: 1.618,
+    img: 'https://images.unsplash.com/photo-1590821695525-1e86ef70a7ee?w=1200&q=80' },
 };
+
+const DEEP_SKY_BG = 'https://images.unsplash.com/photo-1735213005665-f5b93d0795fe?w=1200&q=80';
 
 /* ── Atmospheric Particles (chaos-synced) ────────────────── */
 function AtmosphericParticles({ color, count = 30 }) {
@@ -229,7 +239,32 @@ export default function Observatory() {
     <div className="min-h-screen relative overflow-hidden" style={{ background: '#06060C' }}
       data-testid="observatory-page">
 
-      {/* ── Immersive Background Layers ── */}
+      {/* ── Immersive Background: Full-bleed planetary imagery ── */}
+      {/* Planet image layer */}
+      <AnimatePresence mode="wait">
+        {tab === 'orrery' && planetVisual?.img && (
+          <motion.div key={`planet-bg-${selectedPlanet?.name}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.7 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0"
+            style={{ zIndex: 0, backgroundImage: `url(${planetVisual.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        )}
+        {tab === 'stars' && (
+          <motion.div key="deep-sky-bg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.55 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0"
+            style={{ zIndex: 0, backgroundImage: `url(${DEEP_SKY_BG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        )}
+      </AnimatePresence>
+      {/* Dark vignette overlay to keep text readable */}
+      <div className="absolute inset-0" style={{ zIndex: 0,
+        background: 'radial-gradient(ellipse at 50% 40%, rgba(6,6,12,0.15) 0%, rgba(6,6,12,0.6) 50%, rgba(6,6,12,0.92) 100%)' }} />
+      {/* Color glow layer (chaos-synced) */}
       <motion.div className="absolute inset-0"
         animate={{ background: `radial-gradient(ellipse at 50% 30%, ${immBg.glow} 0%, transparent 70%)` }}
         transition={{ duration: 1.5 }} style={{ zIndex: 0 }} />
@@ -276,7 +311,7 @@ export default function Observatory() {
         {/* ═══ ORRERY TAB ═══ */}
         {tab === 'orrery' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${immBg.color}15` }}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${immBg.color}15`, backdropFilter: 'blur(8px)' }}>
               <div className="px-3 pt-2">
                 <p className="text-[7px] uppercase tracking-widest" style={{ color: `${immBg.color}66` }}>
                   Interactive Orrery — Tap a planet to immerse
@@ -292,7 +327,7 @@ export default function Observatory() {
                 <motion.div key={selectedPlanet.name}
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                   className="rounded-2xl p-5 space-y-4"
-                  style={{ background: `${selectedPlanet.color}06`, border: `1px solid ${selectedPlanet.color}20` }}>
+                  style={{ background: `rgba(0,0,0,0.55)`, border: `1px solid ${selectedPlanet.color}20`, backdropFilter: 'blur(12px)' }}>
                   <div className="flex items-center gap-4">
                     <motion.div className="w-14 h-14 rounded-full flex-shrink-0"
                       animate={isPlanetPlaying ? { boxShadow: [`0 0 15px ${selectedPlanet.color}30`, `0 0 40px ${selectedPlanet.color}50`, `0 0 15px ${selectedPlanet.color}30`] } : {}}
