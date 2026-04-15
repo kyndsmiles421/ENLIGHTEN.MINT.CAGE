@@ -398,6 +398,7 @@ export function MixerProvider({ children }) {
   const [resonance, setResonance] = useState(0.5);
   const [bankBalance, setBankBalance] = useState(0);
   const [sagePrompt, setSagePrompt] = useState('');
+  const [sageLoading, setSageLoading] = useState(false);
   const textInputRef = useRef(null);
 
   // USB Bank → Resonance Wiring: balance acts as dust multiplier
@@ -849,7 +850,8 @@ export function MixerProvider({ children }) {
     reset:     { ...DEFAULT_FILTERS },
   };
 
-  const handleSagePrompt = useCallback((prompt) => {
+  const handleSagePrompt = useCallback(async (prompt) => {
+    // First try keyword matching for instant response
     const words = prompt.toLowerCase().trim().split(/\s+/);
     for (const word of words) {
       if (SAGE_FX_PRESETS[word]) {
@@ -858,7 +860,6 @@ export function MixerProvider({ children }) {
         return;
       }
     }
-    // Partial keyword matching
     for (const [key, preset] of Object.entries(SAGE_FX_PRESETS)) {
       if (prompt.toLowerCase().includes(key)) {
         setMonitorFilters(preset);
@@ -866,7 +867,21 @@ export function MixerProvider({ children }) {
         return;
       }
     }
-    toast(`Sage: Try keywords like sunset, focus, dream, ocean, crystal, void, sacred`);
+    // No keyword match → call AI
+    setSageLoading(true);
+    try {
+      const res = await axios.post(`${API}/sage-fx/prompt-to-fx`, { prompt });
+      if (res.data?.filters) {
+        setMonitorFilters(res.data.filters);
+        toast.success(`Sage: "${res.data.mood || 'Applied'}" atmosphere created`);
+      } else {
+        toast(`Sage: ${res.data?.error || 'Could not interpret that atmosphere'}`);
+      }
+    } catch (e) {
+      toast(`Sage: Try descriptive phrases like "twilight forest" or "golden sunrise"`);
+    } finally {
+      setSageLoading(false);
+    }
   }, []);
 
   const handlePrintModule = useCallback(() => {
@@ -936,21 +951,22 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
 
   const renderAIPanel = () => (
     <div className="p-3 space-y-2">
-      <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Sage Prompt-to-FX</div>
+      <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Sage Prompt-to-FX — AI Powered</div>
       <div className="flex gap-2">
         <input
           type="text"
           value={sagePrompt}
           onChange={(e) => setSagePrompt(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && sagePrompt.trim()) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
-          placeholder="Type: sunset, focus, dream, ocean, crystal..."
+          onKeyDown={(e) => { if (e.key === 'Enter' && sagePrompt.trim() && !sageLoading) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
+          placeholder="Describe any atmosphere: twilight forest, golden temple..."
           className="flex-1 p-2 rounded-lg text-[11px] text-white/70"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+          disabled={sageLoading}
           data-testid="sage-prompt-input" />
-        <button onClick={() => { if (sagePrompt.trim()) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
+        <button onClick={() => { if (sagePrompt.trim() && !sageLoading) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
           className="px-3 py-2 rounded-lg text-[10px] font-bold active:scale-95"
-          style={{ background: 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C' }}
-          data-testid="sage-apply-btn">Apply</button>
+          style={{ background: sageLoading ? 'rgba(251,146,60,0.06)' : 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C', opacity: sageLoading ? 0.5 : 1 }}
+          data-testid="sage-apply-btn">{sageLoading ? '...' : 'Apply'}</button>
       </div>
       <div className="flex flex-wrap gap-1.5 mt-2">
         {Object.keys(SAGE_FX_PRESETS).filter(k => k !== 'reset').map(preset => (

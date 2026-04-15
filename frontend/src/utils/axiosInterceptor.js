@@ -15,13 +15,15 @@ const cosmicToast = (msg, type = 'error') => {
 export function setupAxiosInterceptors() {
   // Request interceptor: attach token, gate guest calls to protected endpoints
   axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem('zen_token');
-    if (token && token !== 'guest_token') {
-      config.headers.Authorization = config.headers.Authorization || `Bearer ${token}`;
+    const zenToken = localStorage.getItem('zen_token');
+    const hasRealToken = zenToken && zenToken !== 'guest_token';
+    if (hasRealToken) {
+      config.headers.Authorization = config.headers.Authorization || `Bearer ${zenToken}`;
     } else {
       const url = config.url || '';
-      const isPublic = url.includes('/auth/') || url.includes('/public/');
-      if (!isPublic && !config.headers?.Authorization) {
+      const isPublic = url.includes('/auth/') || url.includes('/public/') || url.includes('/sage-fx/');
+      if (!isPublic) {
+        // Guest user — abort protected requests silently
         const ctrl = new AbortController();
         ctrl.abort();
         config.signal = ctrl.signal;
