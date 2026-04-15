@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Waves, Heart, Zap, Eye, Sparkles, Play, Pause, Clock, Volume2, VolumeX } from 'lucide-react';
+import { Sun, Moon, Waves, Heart, Zap, Eye, Sparkles, Play, Pause, Clock, Volume2, VolumeX, Image as ImageIcon, Loader } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
+import SceneGenerator from '../components/SceneGenerator';
 
 /* ── Scene Override: Pure black canvas, no realm tinting ── */
 function useLightTherapyOverride() {
@@ -315,7 +316,7 @@ function BlendIndicator({ colors, nameStyle, onStyleChange }) {
 }
 
 /* ── Immersive Session (Multi-Frequency) ────────────────── */
-function ImmersiveSession({ colors, duration, onEnd, resonanceName }) {
+function ImmersiveSession({ colors, duration, onEnd, resonanceName, sceneUrl }) {
   const [timeLeft, setTimeLeft] = useState(duration * 60);
   const [paused, setPaused] = useState(false);
   const [breathPhase, setBreathPhase] = useState('inhale');
@@ -397,6 +398,21 @@ function ImmersiveSession({ colors, duration, onEnd, resonanceName }) {
       style={{ background: '#000' }}
       data-testid="light-therapy-session"
     >
+      {/* AI-generated scene background */}
+      {sceneUrl && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 3 }}
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url(${sceneUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+          data-testid="light-session-scene-bg"
+        />
+      )}
       {/* Multi-color gradient layers */}
       {colors.map((c, i) => (
         <motion.div
@@ -493,6 +509,8 @@ export default function LightTherapy() {
   const [sessionActive, setSessionActive] = useState(false);
   const [audioOn, setAudioOn] = useState(false);
   const [nameStyle, setNameStyle] = useState('lakota');
+  const [sceneUrl, setSceneUrl] = useState(null);
+  const [sceneLoading, setSceneLoading] = useState(false);
   useLightTherapyOverride();
   useColorAudio(selected, !audioOn);
 
@@ -503,7 +521,18 @@ export default function LightTherapy() {
       return [...prev, color];
     });
     setAudioOn(true);
+    setSceneUrl(null);
   }, []);
+
+  const handleGenerateScene = useCallback(async () => {
+    if (selected.length < 2 || sceneLoading) return;
+    setSceneLoading(true);
+    const hexes = selected.map(c => c.hex);
+    const rn = getResonanceName(selected, nameStyle);
+    const result = await SceneGenerator.generateScene(rn, hexes, null, null);
+    if (result?.imageUrl) setSceneUrl(result.imageUrl);
+    setSceneLoading(false);
+  }, [selected, nameStyle, sceneLoading]);
 
   const primary = selected[0];
   const blended = useMemo(() => blendHex(selected), [selected]);
@@ -546,6 +575,16 @@ export default function LightTherapy() {
           zIndex: 0,
           background: 'radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.55) 100%)',
         }} />
+      )}
+      {/* AI-generated scene preview */}
+      {sceneUrl && !sessionActive && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.35 }}
+          className="absolute inset-0"
+          style={{ zIndex: 0, backgroundImage: `url(${sceneUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+          data-testid="light-scene-preview"
+        />
       )}
 
       {/* Content */}
@@ -637,6 +676,23 @@ export default function LightTherapy() {
               )}
 
               <div className="pt-4" style={{ borderTop: `1px solid ${accent}15` }}>
+                {/* Generate Scene button for blends */}
+                {selected.length > 1 && (
+                  <button
+                    onClick={handleGenerateScene}
+                    disabled={sceneLoading}
+                    className="w-full mb-4 py-2.5 rounded-xl text-xs font-medium active:scale-95 transition-all flex items-center justify-center gap-2"
+                    style={{
+                      background: sceneUrl ? `${accent}10` : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${sceneUrl ? `${accent}30` : 'rgba(255,255,255,0.08)'}`,
+                      color: sceneUrl ? accent : 'rgba(255,255,255,0.35)',
+                      opacity: sceneLoading ? 0.5 : 1,
+                    }}
+                    data-testid="light-generate-scene">
+                    {sceneLoading ? <Loader size={12} className="animate-spin" /> : <ImageIcon size={12} />}
+                    {sceneLoading ? 'Generating Scene...' : sceneUrl ? 'Regenerate Scene' : 'Generate AI Scene'}
+                  </button>
+                )}
                 <div className="flex items-center gap-2 mb-3">
                   <Clock size={12} style={{ color: `${accent}66` }} />
                   <span className="text-[9px] uppercase tracking-wider" style={{ color: `${accent}44` }}>Session Duration</span>
@@ -678,7 +734,7 @@ export default function LightTherapy() {
 
       <AnimatePresence>
         {sessionActive && selected.length > 0 && (
-          <ImmersiveSession colors={selected} duration={duration} onEnd={() => setSessionActive(false)} resonanceName={resonanceName} />
+          <ImmersiveSession colors={selected} duration={duration} onEnd={() => setSessionActive(false)} resonanceName={resonanceName} sceneUrl={sceneUrl} />
         )}
       </AnimatePresence>
     </div>
