@@ -14,5 +14,7 @@ export { default as AccountPanel } from './AccountPanel';
 export { default as StoreView } from './StoreView';
 export { default as MixerNavBar } from './MixerNavBar';
 export { default as ParticleField } from './ParticleField';
+export { default as ResonanceCamera } from './ResonanceCamera';
 export { TOOL_TABS } from './constants';
 export { useMediaControls } from './useMediaControls';
+export { useResonanceCapture } from './useResonanceCapture';

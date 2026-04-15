@@ -19,7 +19,7 @@
  *   Sage AI   → electric arcs, sky blue
  *   Council   → crystalline lattice, violet nodes
  */
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { chaosValue, chaosGlow } from '../../lib/ChaosEngine';
 import { PHI, PHI_CUBED, calculateDustAccrual } from '../ConsoleConstants';
 
@@ -60,7 +60,7 @@ function createParticle(w, h, sig, chaos, isBurst = false) {
   };
 }
 
-export default function ParticleField({
+const ParticleField = forwardRef(function ParticleField({
   pillarKey = null,
   chaosCoeff = 1.0,
   intensity = 0.7,
@@ -69,13 +69,18 @@ export default function ParticleField({
   height,
   className = '',
   style = {},
-}) {
+}, ref) {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const frameRef = useRef(null);
   const startTimeRef = useRef(Date.now());
   const tickRef = useRef(0);
   const lastBurstRef = useRef(0);
+
+  // Expose canvas element to parent via ref
+  useImperativeHandle(ref, () => ({
+    getCanvas: () => canvasRef.current,
+  }), []);
 
   const getSig = useCallback(() => {
     return PILLAR_SIGNATURES[pillarKey] || DEFAULT_SIG;
@@ -263,4 +268,6 @@ export default function ParticleField({
       data-testid="particle-field"
     />
   );
-}
+});
+
+export default ParticleField;

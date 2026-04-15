@@ -24,9 +24,10 @@ import {
   TorusPanel, MixPanel, RecordPanel, AudioPanel,
   TextPanel, OverlayPanel, EffectsPanel, AIPanel,
   ExportPanel, AccountPanel, StoreView, MixerNavBar,
-  ParticleField, TOOL_TABS,
+  ParticleField, ResonanceCamera, TOOL_TABS,
 } from './console';
 import { useMediaControls } from './console/useMediaControls';
+import { useResonanceCapture } from './console/useResonanceCapture';
 import { useAudioVisualizer } from '../hooks/useAudioVisualizer';
 import { useMixer as useAudioMixer } from '../context/MixerContext';
 
@@ -53,6 +54,14 @@ export function MixerProvider({ children }) {
     audioMixer?.analyserRef || { current: null },
     audioMixer?.ctxRef || { current: null },
     { enabled: true }
+  );
+
+  // Resonance Camera: canvas + audio capture pipeline
+  const particleFieldRef = useRef(null);
+  const resonanceCapture = useResonanceCapture(
+    particleFieldRef,
+    audioMixer?.ctxRef || { current: null },
+    audioMixer?.masterGainRef || { current: null }
   );
 
   const [tier, setTier] = useState('SEED');
@@ -311,6 +320,7 @@ export function MixerProvider({ children }) {
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.6 }}>
                         <ParticleField
+                          ref={particleFieldRef}
                           pillarKey={current?.pillar?.key}
                           chaosCoeff={1.0 + (resonance * 0.618)}
                           intensity={0.5 + resonance * 0.3}
@@ -322,6 +332,10 @@ export function MixerProvider({ children }) {
                     </div>
                   )}
                   {PANEL_RENDERERS[activePanel]?.()}
+                  {/* Resonance Camera — capture ParticleField + audio */}
+                  {activePanel === 'torus' && (
+                    <ResonanceCamera capture={resonanceCapture} />
+                  )}
                 </div>
               </motion.div>
             )}
