@@ -1,39 +1,39 @@
-# ENLIGHTEN.MINT.CAFE — V46.0 ATMOSPHERE JOURNAL ENGINE
+# ENLIGHTEN.MINT.CAFE — V47.0 NANO BANANA SCENE ENGINE
 ## Last Verified: April 15, 2026
 
+### V47.0: AI Scene Generator (Gemini Nano Banana)
+- **Image generation**: Blend 2+ colors → click "Generate AI Scene" → Nano Banana creates a unique immersive background
+- **Prompt engine**: Builds rich visual prompts from resonance name, color hex values, and mood descriptors
+- **Scene preview**: Generated image appears at 35% opacity behind Light Therapy content
+- **Session carry-over**: Generated scene persists into the full immersive breathing session at 50% opacity
+- **Backend**: `POST /api/scene-gen/generate` + `GET /api/scene-gen/image/{filename}`
+- **Decoupled**: `SceneGenerator.js` service module can be used from any component
+- **Generation time**: ~15-25 seconds via Gemini Nano Banana (gemini-3.1-flash-image-preview)
+
 ### V46.0: Atmosphere Journal — Collectible Mood Gallery
-- **Save any Sage FX mood** to a persistent journal (MongoDB for auth users, localStorage for guests)
-- **Aesthetic card gallery**: 2-column grid with CSS filter preview thumbnails over gradient backgrounds
-- **One-tap re-apply**: Hover a card → restore that atmosphere's CSS filters instantly
-- **CRUD operations**: Save, browse, rename, delete atmospheres
-- **Backend API**: POST/GET/DELETE/PATCH `/api/atmosphere/*`
-- **Decoupled architecture**: `AtmosphereJournal.js` is a standalone module, not embedded in UnifiedCreatorConsole
-- **Last mood indicator**: Shows current atmosphere name with color dot below the prompt input
+- Save/browse/re-apply/delete Sage FX mood snapshots
+- Aesthetic card gallery with CSS filter preview thumbnails
+- MongoDB persistence for auth users, localStorage for guests
 
 ### V45.0: Sage AI Prompt-to-FX + Resonance Names
-- Sage AI Deep LLM Wiring: Natural language → CSS filters via Gemini Flash
-- Resonance Name Engine: phi-seeded 3-style naming (Lakota Sky, Mineral, Wellness)
+- Natural language → CSS filters via Gemini Flash
+- phi-seeded 3-style naming (Lakota Sky, Mineral, Wellness)
 
 ### V44.0: Chromatic Resonance (Blendable Chromotherapy)
-- Multi-color blending (up to 3), Web Audio API oscillators (256Hz-480Hz)
-- Sound On/Off toggle, blend indicator, API interceptor tightening
+- Multi-color blending (up to 3), Web Audio API (256Hz-480Hz)
 
 ### V43.1: Unified Field Transition Engine
-- Z-depth route transitions (1/phi scale), touch-reactive light mapping
-
-### V42.0: Realm Skin Engine
-- 28 realm skins, auto-contextual per module, 58 modules mapped
+### V42.0: Realm Skin Engine (28 skins, 58 modules)
 
 ### Complete System
-- 10 mixer nav tabs: ORBIT | MIX | REC | AUDIO | TEXT | LAYER | FX | AI | OUT | ME
-- Celestial Torus Engine with phi-cubed math
-- Sage AI prompt-to-FX (13 presets + Gemini Flash AI + Atmosphere Journal)
-- 62 modules, 7 pillars, 171 routes
-- Same plane architecture
+- 62 modules, 7 pillars, 171 routes, Same plane architecture
+- Sage AI: 13 presets + Gemini Flash AI + Atmosphere Journal + Nano Banana Scenes
 
 ### 3rd Party Integrations
-- Gemini Flash (gemini-2.5-flash via emergentintegrations) for Sage FX
-- Web Audio API for chromotherapy frequencies
+- Gemini Flash (gemini-2.5-flash) — Sage FX prompt interpretation
+- Gemini Nano Banana (gemini-3.1-flash-image-preview) — Scene image generation
+- Web Audio API — Chromotherapy frequencies
+- MediaRecorder API — Mixer recording
 
 ### Blocked: Play Store AAB (Google identity verification)
-### Next: AI-generated immersive scenes per color/mood, Sovereign Live Sessions
+### Next: Sovereign Live Sessions (P2), Share atmosphere cards
