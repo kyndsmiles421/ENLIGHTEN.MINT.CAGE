@@ -1173,7 +1173,7 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
     <MixerContext.Provider value={ctx}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'transparent', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} data-testid="sovereign-organism">
         {/* CONTENT — fills available space, scrollable */}
-        <div style={{ flex: 1, overflow: 'auto', position: 'relative', perspective: '1200px' }} data-testid="content-area">
+        <div style={{ flex: 1, overflow: 'auto', position: 'relative', WebkitOverflowScrolling: 'touch' }} data-testid="content-area">
           <ZDepthTransition>
           {children}
           </ZDepthTransition>
@@ -1211,9 +1211,9 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
                 animate={{ height: 'auto' }}
                 exit={{ height: 0 }}
                 transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-                style={{ overflow: 'hidden', background: '#080812', borderTop: '1px solid rgba(139,92,246,0.15)', maxHeight: activePanel === 'torus' && expandedPillar !== null ? '70vh' : '50vh' }}
+                style={{ overflow: 'hidden', background: '#080812', borderTop: '1px solid rgba(139,92,246,0.15)', maxHeight: activePanel === 'torus' && expandedPillar !== null ? '55vh' : '35vh', flexShrink: 0 }}
                 data-testid="tool-panel">
-                <div style={{ overflowY: 'auto', maxHeight: activePanel === 'torus' && expandedPillar !== null ? '70vh' : '50vh' }}>
+                <div style={{ overflowY: 'auto', maxHeight: activePanel === 'torus' && expandedPillar !== null ? '55vh' : '35vh' }}>
                   <div className="flex justify-center py-1" onClick={() => setActivePanel(null)} style={{ cursor: 'pointer' }}>
                     <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }} />
                   </div>
