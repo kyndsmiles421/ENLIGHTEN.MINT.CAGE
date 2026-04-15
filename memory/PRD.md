@@ -1,23 +1,22 @@
-# ENLIGHTEN.MINT.CAFE — V45.0 SAGE RESONANCE ENGINE
+# ENLIGHTEN.MINT.CAFE — V46.0 ATMOSPHERE JOURNAL ENGINE
 ## Last Verified: April 15, 2026
 
+### V46.0: Atmosphere Journal — Collectible Mood Gallery
+- **Save any Sage FX mood** to a persistent journal (MongoDB for auth users, localStorage for guests)
+- **Aesthetic card gallery**: 2-column grid with CSS filter preview thumbnails over gradient backgrounds
+- **One-tap re-apply**: Hover a card → restore that atmosphere's CSS filters instantly
+- **CRUD operations**: Save, browse, rename, delete atmospheres
+- **Backend API**: POST/GET/DELETE/PATCH `/api/atmosphere/*`
+- **Decoupled architecture**: `AtmosphereJournal.js` is a standalone module, not embedded in UnifiedCreatorConsole
+- **Last mood indicator**: Shows current atmosphere name with color dot below the prompt input
+
 ### V45.0: Sage AI Prompt-to-FX + Resonance Names
-- **Sage AI Deep LLM Wiring**: Natural language prompts → dynamic CSS filter atmospheres via Gemini Flash
-  - Backend: `POST /api/sage-fx/prompt-to-fx` → `{filters: {...}, mood: "Crimson Glow"}`
-  - Keyword presets (13) apply instantly; creative phrases call Gemini Flash (~3-5s)
-  - Loading state on Apply button, poetic mood names in toast
-- **Resonance Name Engine**: phi-seeded deterministic naming for color blends
-  - 3 naming styles: Lakota Sky, Mineral & Atmospheric, Abstract Wellness
-  - User toggles between styles via UI buttons
-  - Names appear in title, blend indicator, immerse button, and immersive session
-  - Same combination always yields same name per style (Golden Ratio hash)
+- Sage AI Deep LLM Wiring: Natural language → CSS filters via Gemini Flash
+- Resonance Name Engine: phi-seeded 3-style naming (Lakota Sky, Mineral, Wellness)
 
 ### V44.0: Chromatic Resonance (Blendable Chromotherapy)
-- Multi-color blending (up to 3 colors) with hex value mixing
-- Web Audio API oscillators (256Hz-480Hz per chakra) with layered sine + sub-harmonics
-- Live audio preview on selection, enhanced immersive session with multi-color gradients
-- Sound On/Off toggle, blend indicator with blended color circle
-- API interceptor tightening: guest-mode requests silently aborted for protected endpoints
+- Multi-color blending (up to 3), Web Audio API oscillators (256Hz-480Hz)
+- Sound On/Off toggle, blend indicator, API interceptor tightening
 
 ### V43.1: Unified Field Transition Engine
 - Z-depth route transitions (1/phi scale), touch-reactive light mapping
@@ -28,16 +27,13 @@
 ### Complete System
 - 10 mixer nav tabs: ORBIT | MIX | REC | AUDIO | TEXT | LAYER | FX | AI | OUT | ME
 - Celestial Torus Engine with phi-cubed math
-- Sage AI prompt-to-FX (13 presets + Gemini Flash AI)
-- USB Bank → Resonance wiring
-- Sovereign Ledger print, Trust compliance footer + /terms page
+- Sage AI prompt-to-FX (13 presets + Gemini Flash AI + Atmosphere Journal)
 - 62 modules, 7 pillars, 171 routes
-- Same plane architecture, zero position:fixed from mixer
+- Same plane architecture
 
 ### 3rd Party Integrations
 - Gemini Flash (gemini-2.5-flash via emergentintegrations) for Sage FX
 - Web Audio API for chromotherapy frequencies
-- MediaRecorder API for mixer recording
 
 ### Blocked: Play Store AAB (Google identity verification)
 ### Next: AI-generated immersive scenes per color/mood, Sovereign Live Sessions
