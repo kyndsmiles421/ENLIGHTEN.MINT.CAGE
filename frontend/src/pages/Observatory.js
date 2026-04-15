@@ -207,16 +207,15 @@ function MoonPhaseSVG({ illumination, phase }) {
 /* ── Star Card (Expandable) ──────────────────────────────── */
 function StarCard({ star, isSelected, onSelect, isPlaying, onToggleSound }) {
   return (
-    <motion.button layout
+    <motion.div layout
       onClick={() => onSelect(star)}
-      className="w-full text-left p-3 rounded-xl transition-all"
+      className="w-full text-left p-3 rounded-xl transition-all cursor-pointer"
       style={{
         background: isSelected ? `${star.color}0A` : 'rgba(248,250,252,0.02)',
         border: isSelected ? `1px solid ${star.color}30` : '1px solid rgba(248,250,252,0.06)',
       }}
       data-testid={`star-${star.name.toLowerCase().replace(/\s/g, '-')}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between">        <div className="flex items-center gap-2.5">
           <motion.div className="w-3 h-3 rounded-full"
             animate={isPlaying ? { boxShadow: [`0 0 6px ${star.color}`, `0 0 20px ${star.color}`, `0 0 6px ${star.color}`] } : {}}
             transition={isPlaying ? { duration: 2, repeat: Infinity } : {}}
@@ -255,7 +254,7 @@ function StarCard({ star, isSelected, onSelect, isPlaying, onToggleSound }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.button>
+    </motion.div>
   );
 }
 
