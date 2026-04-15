@@ -1044,9 +1044,9 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
             ))}
           </div>
           <div className="grid grid-cols-3 gap-2 mt-3">
-            {[{ label: 'Image to Video', color: '#E879F9' }, { label: 'AI Art', color: '#8B5CF6' }, { label: 'Text to Image', color: '#3B82F6' },
-              { label: 'Text to Speech', color: '#2DD4BF' }, { label: 'AI Music', color: '#22C55E' }, { label: 'AI Avatar', color: '#FB923C' }].map(ai => (
-              <button key={ai.label} onClick={() => toast('Sage AI module loading...')} className="p-2 rounded-xl text-center active:scale-95"
+            {[{ label: 'Image to Video', color: '#E879F9', route: '/vr' }, { label: 'AI Art', color: '#8B5CF6', route: '/creation-stories' }, { label: 'Text to Image', color: '#3B82F6', route: '/avatar' },
+              { label: 'Text to Speech', color: '#2DD4BF', route: '/mantras' }, { label: 'AI Music', color: '#22C55E', route: '/soundscapes' }, { label: 'AI Avatar', color: '#FB923C', route: '/avatar' }].map(ai => (
+              <button key={ai.label} onClick={() => handleNav(ai.route)} className="p-2 rounded-xl text-center active:scale-95"
                 style={{ background: `${ai.color}08`, border: `1px solid ${ai.color}18` }} data-testid={`ai-${ai.label.toLowerCase().replace(/\s+/g, '-')}`}>
                 <div className="text-[8px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
               </button>

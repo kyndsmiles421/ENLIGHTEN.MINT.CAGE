@@ -214,6 +214,8 @@ export default function Observatory() {
     }
   }, [authHeaders, playSonification]);
 
+  const [expandedEvent, setExpandedEvent] = useState(null);
+
   const TABS = [
     { id: 'orrery', label: 'Orrery', icon: OrbitIcon },
     { id: 'stars', label: 'Deep Sky', icon: Star },
@@ -416,20 +418,66 @@ export default function Observatory() {
                 </h3>
                 <div className="space-y-2">
                   {events.map((evt, i) => (
-                    <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all"
-                      style={{ background: evt.active ? `${evt.color}08` : 'rgba(248,250,252,0.02)', border: evt.active ? `1px solid ${evt.color}20` : '1px solid transparent' }}
+                    <motion.button key={i} layout
+                      onClick={() => setExpandedEvent(expandedEvent === i ? null : i)}
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-all"
+                      style={{
+                        background: expandedEvent === i ? `${evt.color}10` : evt.active ? `${evt.color}08` : 'rgba(248,250,252,0.02)',
+                        border: expandedEvent === i ? `1px solid ${evt.color}30` : evt.active ? `1px solid ${evt.color}20` : '1px solid transparent',
+                      }}
                       data-testid={`event-${i}`}>
-                      <div className="w-2 h-2 rounded-full" style={{ background: evt.color, boxShadow: evt.active ? `0 0 8px ${evt.color}40` : 'none' }} />
-                      <div className="flex-1">
-                        <p className="text-[10px] font-medium" style={{ color: evt.active ? evt.color : 'var(--text-primary)' }}>
-                          {evt.name} {evt.active && <span className="text-[7px] px-1.5 py-0.5 rounded-full ml-1" style={{ background: `${evt.color}15`, color: evt.color }}>ACTIVE</span>}
-                        </p>
-                        <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>
-                          {evt.type === 'meteor_shower' ? `Peak rate: ~${evt.peak_rate}/hr` : evt.type.replace('_', ' ')} | {evt.days_until === 0 ? 'Tonight' : `in ${evt.days_until} days`}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: evt.color, boxShadow: evt.active ? `0 0 8px ${evt.color}40` : 'none' }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-medium" style={{ color: evt.active ? evt.color : 'var(--text-primary)' }}>
+                            {evt.name} {evt.active && <span className="text-[7px] px-1.5 py-0.5 rounded-full ml-1" style={{ background: `${evt.color}15`, color: evt.color }}>ACTIVE</span>}
+                          </p>
+                          <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>
+                            {evt.type === 'meteor_shower' ? `Peak rate: ~${evt.peak_rate}/hr` : evt.type.replace('_', ' ')} | {evt.days_until === 0 ? 'Tonight' : `in ${evt.days_until} days`}
+                          </p>
+                        </div>
+                        <ChevronRight size={10} style={{
+                          color: 'var(--text-muted)',
+                          transform: expandedEvent === i ? 'rotate(90deg)' : 'none',
+                          transition: 'transform 0.2s',
+                        }} />
                       </div>
-                      <ChevronRight size={10} style={{ color: 'var(--text-muted)' }} />
-                    </div>
+                      <AnimatePresence>
+                        {expandedEvent === i && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-2 pt-2 space-y-1.5"
+                            style={{ borderTop: `1px solid ${evt.color}15` }}>
+                            <p className="text-[9px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                              {evt.type === 'meteor_shower'
+                                ? `The ${evt.name} is a ${evt.peak_rate ? 'major' : 'minor'} meteor shower${evt.peak_rate ? ` with up to ${evt.peak_rate} meteors per hour at peak` : ''}. Best viewed after midnight in a dark sky location.`
+                                : evt.type === 'solstice'
+                                ? `The ${evt.name} marks the longest/shortest day of the year. A powerful time for meditation and intention setting.`
+                                : evt.type === 'equinox'
+                                ? `The ${evt.name} brings equal day and night. A moment of perfect celestial balance — ideal for alignment practices.`
+                                : evt.type === 'eclipse'
+                                ? `${evt.name} — a rare celestial alignment. Eclipses amplify transformative energy and inner reflection.`
+                                : `${evt.name} — a celestial phenomenon. Set an intention to observe and connect with the cosmos.`}
+                            </p>
+                            <div className="flex items-center gap-2 pt-1">
+                              <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[8px]"
+                                style={{ background: `${evt.color}08`, color: evt.color }}>
+                                <Clock size={8} />
+                                {evt.days_until === 0 ? 'Happening now' : evt.days_until === 1 ? 'Tomorrow' : `${evt.days_until} days away`}
+                              </div>
+                              {evt.type === 'meteor_shower' && evt.peak_rate && (
+                                <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[8px]"
+                                  style={{ background: 'rgba(251,191,36,0.08)', color: '#FBBF24' }}>
+                                  <Zap size={8} /> {evt.peak_rate}/hr peak
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
                   ))}
                 </div>
               </div>
