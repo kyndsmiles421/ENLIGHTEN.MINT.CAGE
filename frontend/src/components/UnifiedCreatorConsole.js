@@ -20,8 +20,11 @@ import {
   X, Check, Globe, ArrowLeft,
   Video, Music, Type, Layers, Wand2,
   Sparkles, Download, Maximize2, Minimize2, Zap,
-  User, LogOut, LogIn, Share2, Image as ImageIcon
+  User, LogOut, LogIn, Share2, Image as ImageIcon,
+  Save, BookOpen
 } from 'lucide-react';
+
+import { AtmosphereJournal, saveAtmosphere } from './AtmosphereJournal';
 
 import { useScene } from './SceneEngine';
 import { ZDepthTransition } from './UnifiedFieldEngine';
@@ -399,6 +402,8 @@ export function MixerProvider({ children }) {
   const [bankBalance, setBankBalance] = useState(0);
   const [sagePrompt, setSagePrompt] = useState('');
   const [sageLoading, setSageLoading] = useState(false);
+  const [lastMood, setLastMood] = useState(null);
+  const [journalOpen, setJournalOpen] = useState(false);
   const textInputRef = useRef(null);
 
   // USB Bank → Resonance Wiring: balance acts as dust multiplier
@@ -856,6 +861,7 @@ export function MixerProvider({ children }) {
     for (const word of words) {
       if (SAGE_FX_PRESETS[word]) {
         setMonitorFilters(SAGE_FX_PRESETS[word]);
+        setLastMood({ name: word.charAt(0).toUpperCase() + word.slice(1), filters: SAGE_FX_PRESETS[word], prompt });
         toast.success(`Sage: "${word}" atmosphere applied`);
         return;
       }
@@ -863,6 +869,7 @@ export function MixerProvider({ children }) {
     for (const [key, preset] of Object.entries(SAGE_FX_PRESETS)) {
       if (prompt.toLowerCase().includes(key)) {
         setMonitorFilters(preset);
+        setLastMood({ name: key.charAt(0).toUpperCase() + key.slice(1), filters: preset, prompt });
         toast.success(`Sage: "${key}" atmosphere applied`);
         return;
       }
@@ -873,6 +880,7 @@ export function MixerProvider({ children }) {
       const res = await axios.post(`${API}/sage-fx/prompt-to-fx`, { prompt });
       if (res.data?.filters) {
         setMonitorFilters(res.data.filters);
+        setLastMood({ name: res.data.mood || 'Applied', filters: res.data.filters, prompt });
         toast.success(`Sage: "${res.data.mood || 'Applied'}" atmosphere created`);
       } else {
         toast(`Sage: ${res.data?.error || 'Could not interpret that atmosphere'}`);
@@ -949,42 +957,100 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
     }
   }, [location.pathname, monitorFilters, resonance, tier, bankBalance, masterLevel, mutedModules, selectedAspectRatio]);
 
+  const handleSaveAtmosphere = useCallback(async () => {
+    if (!lastMood) { toast('Apply an atmosphere first'); return; }
+    try {
+      await saveAtmosphere(lastMood.name, lastMood.filters, lastMood.prompt);
+      toast.success(`Saved "${lastMood.name}" to your journal`);
+    } catch { toast.error('Could not save atmosphere'); }
+  }, [lastMood]);
+
+  const handleApplyFromJournal = useCallback((atm) => {
+    if (atm.filters) {
+      setMonitorFilters(atm.filters);
+      setLastMood({ name: atm.name, filters: atm.filters, prompt: atm.source_prompt });
+      toast.success(`Restored: "${atm.name}"`);
+    }
+  }, []);
+
   const renderAIPanel = () => (
     <div className="p-3 space-y-2">
-      <div className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Sage Prompt-to-FX — AI Powered</div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={sagePrompt}
-          onChange={(e) => setSagePrompt(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && sagePrompt.trim() && !sageLoading) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
-          placeholder="Describe any atmosphere: twilight forest, golden temple..."
-          className="flex-1 p-2 rounded-lg text-[11px] text-white/70"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
-          disabled={sageLoading}
-          data-testid="sage-prompt-input" />
-        <button onClick={() => { if (sagePrompt.trim() && !sageLoading) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
-          className="px-3 py-2 rounded-lg text-[10px] font-bold active:scale-95"
-          style={{ background: sageLoading ? 'rgba(251,146,60,0.06)' : 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C', opacity: sageLoading ? 0.5 : 1 }}
-          data-testid="sage-apply-btn">{sageLoading ? '...' : 'Apply'}</button>
-      </div>
-      <div className="flex flex-wrap gap-1.5 mt-2">
-        {Object.keys(SAGE_FX_PRESETS).filter(k => k !== 'reset').map(preset => (
-          <button key={preset} onClick={() => { setMonitorFilters(SAGE_FX_PRESETS[preset]); toast.success(`Sage: "${preset}"`); }}
-            className="px-2 py-1 rounded-lg text-[8px] font-bold active:scale-95 capitalize"
-            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}
-            data-testid={`sage-preset-${preset}`}>{preset}</button>
-        ))}
-      </div>
-      <div className="grid grid-cols-3 gap-2 mt-3">
-        {[{ label: 'Image to Video', color: '#E879F9' }, { label: 'AI Art', color: '#8B5CF6' }, { label: 'Text to Image', color: '#3B82F6' },
-          { label: 'Text to Speech', color: '#2DD4BF' }, { label: 'AI Music', color: '#22C55E' }, { label: 'AI Avatar', color: '#FB923C' }].map(ai => (
-          <button key={ai.label} onClick={() => toast('Sage AI module loading...')} className="p-2 rounded-xl text-center active:scale-95"
-            style={{ background: `${ai.color}08`, border: `1px solid ${ai.color}18` }} data-testid={`ai-${ai.label.toLowerCase().replace(/\s+/g, '-')}`}>
-            <div className="text-[8px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
+      <div className="flex items-center justify-between mb-1">
+        <div className="text-[8px] text-white/30 uppercase tracking-wider">Sage Prompt-to-FX — AI Powered</div>
+        <div className="flex items-center gap-1.5">
+          {lastMood && (
+            <button onClick={handleSaveAtmosphere}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-[8px] active:scale-95 transition-all"
+              style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#22C55E' }}
+              data-testid="sage-save-btn">
+              <Save size={9} /> Save
+            </button>
+          )}
+          <button onClick={() => setJournalOpen(p => !p)}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[8px] active:scale-95 transition-all"
+            style={{ background: journalOpen ? 'rgba(251,146,60,0.12)' : 'rgba(255,255,255,0.02)', border: `1px solid ${journalOpen ? 'rgba(251,146,60,0.3)' : 'rgba(255,255,255,0.06)'}`, color: journalOpen ? '#FB923C' : 'rgba(255,255,255,0.3)' }}
+            data-testid="sage-journal-btn">
+            <BookOpen size={9} /> Journal
           </button>
-        ))}
+        </div>
       </div>
+      <AnimatePresence>
+        {journalOpen && (
+          <AtmosphereJournal isOpen={journalOpen} onClose={() => setJournalOpen(false)} onApply={handleApplyFromJournal} />
+        )}
+      </AnimatePresence>
+      {!journalOpen && (
+        <>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={sagePrompt}
+              onChange={(e) => setSagePrompt(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && sagePrompt.trim() && !sageLoading) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
+              placeholder="Describe any atmosphere: twilight forest, golden temple..."
+              className="flex-1 p-2 rounded-lg text-[11px] text-white/70"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+              disabled={sageLoading}
+              data-testid="sage-prompt-input" />
+            <button onClick={() => { if (sagePrompt.trim() && !sageLoading) { handleSagePrompt(sagePrompt); setSagePrompt(''); } }}
+              className="px-3 py-2 rounded-lg text-[10px] font-bold active:scale-95"
+              style={{ background: sageLoading ? 'rgba(251,146,60,0.06)' : 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C', opacity: sageLoading ? 0.5 : 1 }}
+              data-testid="sage-apply-btn">{sageLoading ? '...' : 'Apply'}</button>
+          </div>
+          {lastMood && (
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
+              <div className="w-3 h-3 rounded-full" style={{
+                filter: `hue-rotate(${lastMood.filters?.hueRotate || 0}deg) brightness(${(lastMood.filters?.brightness || 100) / 100})`,
+                background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)',
+              }} />
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Cormorant Garamond, serif' }}>
+                {lastMood.name}
+              </span>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {Object.keys(SAGE_FX_PRESETS).filter(k => k !== 'reset').map(preset => (
+              <button key={preset} onClick={() => {
+                setMonitorFilters(SAGE_FX_PRESETS[preset]);
+                setLastMood({ name: preset.charAt(0).toUpperCase() + preset.slice(1), filters: SAGE_FX_PRESETS[preset], prompt: preset });
+                toast.success(`Sage: "${preset}"`);
+              }}
+                className="px-2 py-1 rounded-lg text-[8px] font-bold active:scale-95 capitalize"
+                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}
+                data-testid={`sage-preset-${preset}`}>{preset}</button>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            {[{ label: 'Image to Video', color: '#E879F9' }, { label: 'AI Art', color: '#8B5CF6' }, { label: 'Text to Image', color: '#3B82F6' },
+              { label: 'Text to Speech', color: '#2DD4BF' }, { label: 'AI Music', color: '#22C55E' }, { label: 'AI Avatar', color: '#FB923C' }].map(ai => (
+              <button key={ai.label} onClick={() => toast('Sage AI module loading...')} className="p-2 rounded-xl text-center active:scale-95"
+                style={{ background: `${ai.color}08`, border: `1px solid ${ai.color}18` }} data-testid={`ai-${ai.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                <div className="text-[8px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 
