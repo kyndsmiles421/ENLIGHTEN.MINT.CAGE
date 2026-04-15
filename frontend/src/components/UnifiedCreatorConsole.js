@@ -1094,6 +1094,15 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
           <ShoppingCart size={14} style={{ color: '#EAB308' }} />
           <div className="text-[10px] font-bold text-yellow-400/80">Mixer Store</div>
         </button>
+
+        {/* Terms & Compliance */}
+        <button onClick={() => handleNav('/terms')}
+          className="w-full flex items-center gap-2 p-2 rounded-lg active:scale-95"
+          style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)' }}
+          data-testid="account-terms">
+          <Lock size={12} style={{ color: 'rgba(255,255,255,0.2)' }} />
+          <div className="text-[8px] text-white/20">Trust & Compliance</div>
+        </button>
       </div>
     );
   };
@@ -1228,7 +1237,7 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
         {showMixer && !activePanel && (
           <div style={{ padding: '4px 12px', background: '#030306', borderTop: '1px solid rgba(255,255,255,0.02)' }} data-testid="compliance-footer">
             <p style={{ fontSize: '6px', lineHeight: '8px', color: 'rgba(255,255,255,0.12)', fontFamily: 'monospace', margin: 0 }}>
-              Operated under a Private Sovereign Trust. All AI-generated structures, virtual resources, and intellectual property are the sole property of the Trust. Closed-loop ecosystem: no real-world currency exchange. "Fans" and "Credits" are internal virtual units used exclusively for gamified participation. All wellness, acupressure, and herbology content is provided for informational and educational purposes only and does not constitute medical advice, diagnosis, or treatment. Cryptographic integrity maintained via Crystal Seal (SHA-256).
+              Operated under a Private Sovereign Trust. All internal units including "Fans," "Credits," and "Crystals" are purely functional digital utilities — they carry no real-world monetary value, cannot be exchanged between users, and are not redeemable for fiat currency or external goods. Closed-loop environment managed by the Trust for educational engagement only. All wellness content is informational/educational and does not constitute medical advice, diagnosis, or treatment. Crystal Seal integrity (SHA-256).
             </p>
           </div>
         )}
