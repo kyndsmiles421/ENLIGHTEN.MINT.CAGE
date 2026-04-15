@@ -1,0 +1,138 @@
+{
+  "summary": "Iteration 321: Bug fix verification for Herbology search (axios interceptor) and Breathing page footer. ALL TESTS PASSED. Herbology search for 'Ashwagandha' and 'Turmeric' works instantly without spinner stuck. Breathing 'Begin Breathwork' button is clickable and changes to 'Stop'. Compliance footer is compact (11px). All 10 content pages load correctly for guest users.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_321.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "100% (All bug fixes verified, all pages load correctly)"
+  },
+  "test_credentials": "test_v29_user@test.com / testpass123",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bug fixes verified: (1) Herbology search works instantly - axios interceptor now uses deny-list approach, only gates user-specific endpoints for guests. (2) Breathing footer is compact at 11px. All content pages load for guests: /herbology (12 herbs), /breathing (5 patterns), /meditation, /oracle, /crystals, /light-therapy (7 colors, blend, resonance names), /hub (10 mixer tabs), /yoga (Hatha/Vinyasa/Kundalini), /star-chart, /numerology. Sage AI prompt-to-FX and Atmosphere Journal save/browse/re-apply all working.",
+  "tests_executed": [
+    {
+      "test": "Herbology page loads with 12 herb cards for guest",
+      "result": "PASS",
+      "details": "Found 12 herb cards, page loads without auth"
+    },
+    {
+      "test": "Herbology search for 'Ashwagandha' returns 1 result instantly",
+      "result": "PASS",
+      "details": "No spinner stuck, search completed instantly, 1 result returned"
+    },
+    {
+      "test": "Herbology search for 'Turmeric' returns results",
+      "result": "PASS",
+      "details": "1 result returned for Turmeric search"
+    },
+    {
+      "test": "Breathing page loads with 5 patterns visible",
+      "result": "PASS",
+      "details": "Found 5 patterns: Box Breathing, 4-7-8 Relaxation, Energizing Breath, Wim Hof, Pranayama"
+    },
+    {
+      "test": "Breathing 'Begin Breathwork' button is clickable and starts session",
+      "result": "PASS",
+      "details": "Button text changes from 'Begin Breathwork' to 'Stop' when clicked"
+    },
+    {
+      "test": "Breathing page compliance footer is compact (< 20px height)",
+      "result": "PASS",
+      "details": "Footer height is 11px, well under 20px threshold"
+    },
+    {
+      "test": "Meditation page loads with guided meditations",
+      "result": "PASS",
+      "details": "Found 19 meditation elements, keywords: Meditation, Guided, Calm, Focus"
+    },
+    {
+      "test": "Oracle page loads with Tarot/Astrology/I Ching options",
+      "result": "PASS",
+      "details": "Found all options: Tarot, Astrology, I Ching, Draw Cards button"
+    },
+    {
+      "test": "Crystals page loads with crystal guide and search",
+      "result": "PASS",
+      "details": "Found 13 crystal elements, search input present"
+    },
+    {
+      "test": "Light Therapy loads with 7 colors, blend, resonance names",
+      "result": "PASS",
+      "details": "All 7 colors (red, orange, yellow, green, blue, indigo, violet), blend indicator works, resonance name 'Wicapi Crown' displayed"
+    },
+    {
+      "test": "Hub loads with ENLIGHTEN MINT CAFE title and 10 mixer tabs",
+      "result": "PASS",
+      "details": "All 10 tabs present: ORBIT, MIX, REC, AUDIO, TEXT, LAYER, FX, AI, OUT, ME"
+    },
+    {
+      "test": "Yoga page loads with Hatha/Vinyasa/Kundalini paths",
+      "result": "PASS",
+      "details": "Found all yoga paths: Hatha, Vinyasa, Kundalini"
+    },
+    {
+      "test": "Star Chart loads with constellation map",
+      "result": "PASS",
+      "details": "Found keywords: Star, Constellation, Chart, Sky"
+    },
+    {
+      "test": "Numerology loads with Personal Reading option",
+      "result": "PASS",
+      "details": "Found keywords: Numerology, Personal, Reading, Number, Life Path"
+    },
+    {
+      "test": "Sage AI prompt-to-FX works in AI tab",
+      "result": "PASS",
+      "details": "Sage prompt input found, 'sunset' and 'ocean' atmospheres applied successfully"
+    },
+    {
+      "test": "Atmosphere Journal save/browse/re-apply works",
+      "result": "PASS",
+      "details": "Saved atmosphere to journal, found 2 saved atmospheres, re-applied from journal"
+    }
+  ],
+  "bug_fixes_verified": {
+    "herbology_search_spinner_stuck": {
+      "status": "FIXED",
+      "details": "Axios interceptor now uses deny-list approach - only aborts user-specific endpoints (/bank/wallet, /treasury/, /classes/mine, etc.) for guests. Content endpoints like /herbology/herbs pass through."
+    },
+    "breathing_footer_overlap": {
+      "status": "FIXED",
+      "details": "Compliance footer compacted to 11px (maxHeight: 16px in code), no longer overlaps mixer nav"
+    }
+  },
+  "data_testids_verified": [
+    "herbology-page",
+    "herb-card-{id}",
+    "herb-search",
+    "breathing-mode-presets",
+    "breathing-pattern-{name}",
+    "breathing-toggle-btn",
+    "compliance-footer",
+    "light-color-selector",
+    "light-color-{color}",
+    "light-blend-indicator",
+    "light-resonance-name",
+    "sage-prompt-input",
+    "sage-apply-btn",
+    "sage-save-btn",
+    "sage-journal-btn",
+    "atm-card-{id}",
+    "atm-apply-{id}"
+  ]
+}

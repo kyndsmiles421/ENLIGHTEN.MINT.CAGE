@@ -6,16 +6,11 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Auth-aware request interceptor: attach token, skip guest calls to protected endpoints
+// Auth-aware request interceptor: attach token when available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('zen_token');
   if (token && token !== 'guest_token') {
     config.headers.Authorization = `Bearer ${token}`;
-  } else if (!config.url?.includes('/auth/')) {
-    // Guest user hitting protected endpoint — abort silently
-    const controller = new AbortController();
-    controller.abort();
-    config.signal = controller.signal;
   }
   return config;
 });

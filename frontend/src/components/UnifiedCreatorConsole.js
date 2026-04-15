@@ -1344,11 +1344,11 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
             data-testid="exit-fullscreen" />
         )}
 
-        {/* COMPLIANCE FOOTER — Prominent Disclosure, same plane */}
+        {/* COMPLIANCE FOOTER — Minimal inline disclosure, collapses on small screens */}
         {showMixer && !activePanel && (
-          <div style={{ padding: '4px 12px', background: '#030306', borderTop: '1px solid rgba(255,255,255,0.02)' }} data-testid="compliance-footer">
-            <p style={{ fontSize: '6px', lineHeight: '8px', color: 'rgba(255,255,255,0.12)', fontFamily: 'monospace', margin: 0 }}>
-              Operated under a Private Sovereign Trust. All internal units including "Fans," "Credits," and "Crystals" are purely functional digital utilities — they carry no real-world monetary value, cannot be exchanged between users, and are not redeemable for fiat currency or external goods. Closed-loop environment managed by the Trust for educational engagement only. All wellness content is informational/educational and does not constitute medical advice, diagnosis, or treatment. Crystal Seal integrity (SHA-256).
+          <div style={{ padding: '2px 12px', background: '#030306', borderTop: '1px solid rgba(255,255,255,0.02)', maxHeight: '16px', overflow: 'hidden' }} data-testid="compliance-footer">
+            <p style={{ fontSize: '5px', lineHeight: '6px', color: 'rgba(255,255,255,0.08)', fontFamily: 'monospace', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Sovereign Trust · Closed-loop ecosystem · Educational only · Not medical advice · Crystal Seal (SHA-256) · See /terms
             </p>
           </div>
         )}

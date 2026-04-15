@@ -13,17 +13,25 @@ const cosmicToast = (msg, type = 'error') => {
 };
 
 export function setupAxiosInterceptors() {
-  // Request interceptor: attach token, gate guest calls to protected endpoints
+  // Request interceptor: attach auth token when available
   axios.interceptors.request.use((config) => {
     const zenToken = localStorage.getItem('zen_token');
     const hasRealToken = zenToken && zenToken !== 'guest_token';
     if (hasRealToken) {
       config.headers.Authorization = config.headers.Authorization || `Bearer ${zenToken}`;
     } else {
+      // Guest user — only abort endpoints that explicitly require auth
+      // These are user-specific data fetches that will 401 anyway
       const url = config.url || '';
-      const isPublic = url.includes('/auth/') || url.includes('/public/') || url.includes('/sage-fx/');
-      if (!isPublic) {
-        // Guest user — abort protected requests silently
+      const authRequired = [
+        '/bank/wallet', '/treasury/', '/classes/mine', '/energy-gates/status',
+        '/transmuter/status', '/marketplace/mixer-unlocks', '/sages/quests',
+        '/sages/progress', '/academy/', '/activity/track', '/ai-visuals/my-avatar',
+        '/atmosphere/gallery', '/atmosphere/save', '/breathing/my-custom',
+        '/breathing/save-custom', '/breathing/custom/',
+      ];
+      const needsAuth = authRequired.some(p => url.includes(p));
+      if (needsAuth) {
         const ctrl = new AbortController();
         ctrl.abort();
         config.signal = ctrl.signal;
