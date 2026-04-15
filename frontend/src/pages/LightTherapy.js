@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Waves, Heart, Zap, Eye, Sparkles, Play, Pause, Clock, Volume2, VolumeX, Image as ImageIcon, Loader } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import SceneGenerator from '../components/SceneGenerator';
+import { chaosValue, chaosDrift } from '../lib/ChaosEngine';
 
 /* ── Scene Override: Pure black canvas, no realm tinting ── */
 function useLightTherapyOverride() {
@@ -136,6 +137,7 @@ function getResonanceName(colors, style) {
 function useColorAudio(colors, muted) {
   const ctxRef = useRef(null);
   const nodesRef = useRef({});
+  const chaosRaf = useRef(null);
 
   const ensureCtx = useCallback(() => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
@@ -148,6 +150,7 @@ function useColorAudio(colors, muted) {
 
   useEffect(() => {
     if (muted || !colors.length) {
+      cancelAnimationFrame(chaosRaf.current);
       const ctx = ctxRef.current;
       if (ctx && ctx.state !== 'closed') {
         Object.values(nodesRef.current).forEach(({ g, sg }) => {
@@ -205,9 +208,30 @@ function useColorAudio(colors, muted) {
         try { nodesRef.current[c.id].sg.gain.linearRampToValueAtTime(subVol, ctx.currentTime + 0.3); } catch(e){}
       }
     });
+
+    // Chaos modulation — z/z drift on all active oscillators
+    const startT = Date.now();
+    const chaosLoop = () => {
+      if (!nodesRef.current || !Object.keys(nodesRef.current).length) return;
+      const t = (Date.now() - startT) * 0.001;
+      const cv = chaosValue(t, 1.0);
+      Object.values(nodesRef.current).forEach(({ o, s }) => {
+        try {
+          const base = o._baseFreq || o.frequency.value;
+          if (!o._baseFreq) o._baseFreq = base;
+          o.frequency.setTargetAtTime(chaosDrift(base, cv, 3), ctx.currentTime, 0.1);
+          const subBase = s._baseFreq || s.frequency.value;
+          if (!s._baseFreq) s._baseFreq = subBase;
+          s.frequency.setTargetAtTime(chaosDrift(subBase, cv, 1.5), ctx.currentTime, 0.1);
+        } catch(e){}
+      });
+      chaosRaf.current = requestAnimationFrame(chaosLoop);
+    };
+    chaosRaf.current = requestAnimationFrame(chaosLoop);
   }, [colors, muted, ensureCtx]);
 
   useEffect(() => () => {
+    cancelAnimationFrame(chaosRaf.current);
     Object.values(nodesRef.current).forEach(({ o, s }) => {
       try { o.stop(); } catch(e){} try { s.stop(); } catch(e){}
     });

@@ -187,6 +187,26 @@ export function SceneProvider({ children }) {
         body.scene-active #root {
           background: transparent !important;
         }
+        /* Sovereign Glass — All interactive cards get glass treatment */
+        body.scene-active .immersive-page [class*="rounded-xl"][class*="p-4"],
+        body.scene-active .immersive-page [class*="rounded-xl"][class*="p-3"],
+        body.scene-active .immersive-page [class*="rounded-lg"][class*="p-4"],
+        body.scene-active .immersive-page [class*="rounded-lg"][class*="p-3"] {
+          background: rgba(6,6,12,0.45) !important;
+          backdrop-filter: blur(10px) saturate(140%) !important;
+          -webkit-backdrop-filter: blur(10px) saturate(140%) !important;
+          border: 1px solid rgba(255,255,255,0.06) !important;
+          cursor: pointer;
+          transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        body.scene-active .immersive-page [class*="rounded-xl"][class*="p-4"]:hover,
+        body.scene-active .immersive-page [class*="rounded-xl"][class*="p-3"]:hover,
+        body.scene-active .immersive-page [class*="rounded-lg"][class*="p-4"]:hover,
+        body.scene-active .immersive-page [class*="rounded-lg"][class*="p-3"]:hover {
+          background: rgba(6,6,12,0.55) !important;
+          border-color: rgba(255,255,255,0.12) !important;
+          box-shadow: 0 0 20px rgba(var(--skin-accent-rgb, 99,102,241), 0.08);
+        }
       `;
     } else if (styleEl) {
       styleEl.remove();
