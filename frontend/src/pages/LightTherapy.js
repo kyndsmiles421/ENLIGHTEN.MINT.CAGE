@@ -3,29 +3,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Waves, Heart, Zap, Eye, Sparkles, Play, Pause, Clock, ChevronLeft } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 
-// Light Therapy: NO realm skin. Pure black until user picks a color.
+// Light Therapy: NO realm skin. NO backdrop-filter. Pure black + pure color.
 const LT_OVERRIDE_ID = 'light-therapy-override';
 function useLightTherapyOverride() {
   useEffect(() => {
-    let style = document.getElementById(LT_OVERRIDE_ID);
-    if (!style) {
-      style = document.createElement('style');
-      style.id = LT_OVERRIDE_ID;
-      document.head.appendChild(style);
-    }
-    // Kill the realm scene entirely — pure black canvas for chromotherapy
-    style.textContent = `
-      [data-testid="realm-scene-bg"] {
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-      body.scene-active [data-testid="content-area"] > [data-testid="z-depth-container"] > [data-light-therapy] {
-        background: #000 !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
-    `;
-    return () => { style.remove(); };
+    // Remove scene-active class entirely so no backdrop-filter tints the colors
+    const wasSceneActive = document.body.classList.contains('scene-active');
+    document.body.classList.remove('scene-active');
+    
+    // Also hide the realm background image
+    const sceneBg = document.querySelector('[data-testid="realm-scene-bg"]');
+    if (sceneBg) sceneBg.style.display = 'none';
+    
+    // Remove the injected scene-override-styles that add backdrop-filter
+    const sceneOverride = document.getElementById('scene-override-styles');
+    const savedCSS = sceneOverride?.textContent;
+    if (sceneOverride) sceneOverride.textContent = '';
+
+    return () => {
+      // Restore everything when leaving Light Therapy
+      if (wasSceneActive) document.body.classList.add('scene-active');
+      if (sceneBg) sceneBg.style.display = '';
+      if (sceneOverride && savedCSS) sceneOverride.textContent = savedCSS;
+    };
   }, []);
 }
 

@@ -7,6 +7,18 @@
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 
 export const CRYSTAL_SKINS = {
+  NONE: {
+    id: 'none',
+    name: 'Natural',
+    primary: '#8B5CF6',
+    secondary: '#4B0082',
+    glow: 'rgba(139, 92, 246, 0.3)',
+    speed: 1.0,
+    filter: 'none',
+    dust_cost: 0,
+    tier: 0,
+    description: 'Pure unfiltered — true colors',
+  },
   AMETHYST: {
     id: 'amethyst_001',
     name: 'Amethyst Frequency',
@@ -88,7 +100,7 @@ export function EncryptionProvider({ children }) {
   const [activeSkin, setActiveSkin] = useState(() => {
     if (typeof localStorage === 'undefined') return CRYSTAL_SKINS.AMETHYST;
     const saved = localStorage.getItem(STORAGE_KEY);
-    return (saved && CRYSTAL_SKINS[saved]) || CRYSTAL_SKINS.AMETHYST;
+    return (saved && CRYSTAL_SKINS[saved]) || CRYSTAL_SKINS.NONE;
   });
 
   useEffect(() => {
@@ -121,7 +133,7 @@ export function useCrystalEncryption() {
   // Fallback for when used outside provider (during init)
   if (!ctx) {
     return {
-      activeSkin: CRYSTAL_SKINS.AMETHYST,
+      activeSkin: CRYSTAL_SKINS.NONE,
       equipSkin: () => {},
       allSkins: CRYSTAL_SKINS,
     };
