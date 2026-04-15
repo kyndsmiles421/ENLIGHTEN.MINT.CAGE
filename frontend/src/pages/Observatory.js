@@ -3,101 +3,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { Star, Sparkles, Volume2, VolumeX, Radio, Clock, Zap, ChevronRight } from 'lucide-react';
 import axios from 'axios';
+import { useChaosOscillator, chaosGlow } from '../lib/ChaosEngine';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /* ── Planet Visual Profiles ──────────────────────────────── */
 const PLANET_VISUALS = {
-  Mercury: { bg: '#4A4A4A', accent: '#B8B8B8', glow: 'rgba(184,184,184,0.15)', desc: 'Scorched cratered world closest to the Sun' },
-  Venus:   { bg: '#C4A35A', accent: '#F5D78E', glow: 'rgba(245,215,142,0.2)', desc: 'Shrouded in sulfuric clouds, 900°F surface' },
-  Earth:   { bg: '#1E6B4E', accent: '#4FC3F7', glow: 'rgba(79,195,247,0.2)', desc: 'Our home, the pale blue dot' },
-  Mars:    { bg: '#8B3A2A', accent: '#E57C5B', glow: 'rgba(229,124,91,0.2)', desc: 'The red planet, iron-oxide dust storms' },
-  Jupiter: { bg: '#8B6914', accent: '#D4A843', glow: 'rgba(212,168,67,0.2)', desc: 'Great Red Spot, king of the gas giants' },
-  Saturn:  { bg: '#C4A35A', accent: '#E8D48B', glow: 'rgba(232,212,139,0.18)', desc: 'Golden rings of ice and rock' },
-  Uranus:  { bg: '#2F6B6B', accent: '#69D2D2', glow: 'rgba(105,210,210,0.15)', desc: 'Ice giant tilted on its side' },
-  Neptune: { bg: '#1B3A6B', accent: '#5B7FE5', glow: 'rgba(91,127,229,0.2)', desc: 'Supersonic winds, deep blue methane' },
+  Mercury: { bg: '#4A4A4A', accent: '#B8B8B8', glow: 'rgba(184,184,184,0.15)', desc: 'Scorched cratered world closest to the Sun', chaos: 1.8 },
+  Venus:   { bg: '#C4A35A', accent: '#F5D78E', glow: 'rgba(245,215,142,0.2)', desc: 'Shrouded in sulfuric clouds, 900°F surface', chaos: 1.3 },
+  Earth:   { bg: '#1E6B4E', accent: '#4FC3F7', glow: 'rgba(79,195,247,0.2)', desc: 'Our home, the pale blue dot', chaos: 1.0 },
+  Mars:    { bg: '#8B3A2A', accent: '#E57C5B', glow: 'rgba(229,124,91,0.2)', desc: 'The red planet, iron-oxide dust storms', chaos: 1.2 },
+  Jupiter: { bg: '#8B6914', accent: '#D4A843', glow: 'rgba(212,168,67,0.2)', desc: 'Great Red Spot, king of the gas giants', chaos: 0.8 },
+  Saturn:  { bg: '#C4A35A', accent: '#E8D48B', glow: 'rgba(232,212,139,0.18)', desc: 'Golden rings of ice and rock', chaos: 0.6 },
+  Uranus:  { bg: '#2F6B6B', accent: '#69D2D2', glow: 'rgba(105,210,210,0.15)', desc: 'Ice giant tilted on its side', chaos: 1.5 },
+  Neptune: { bg: '#1B3A6B', accent: '#5B7FE5', glow: 'rgba(91,127,229,0.2)', desc: 'Supersonic winds, deep blue methane', chaos: 1.618 },
 };
 
-/* ── Persistent Audio Engine (Toggle, not Hold) ──────────── */
-function usePersistentTone() {
-  const ctxRef = useRef(null);
-  const nodesRef = useRef(null);
-  const [activeHz, setActiveHz] = useState(null);
-  const [activeName, setActiveName] = useState(null);
-
-  const toggle = useCallback((hz, name) => {
-    // If same object is playing, stop it
-    if (activeName === name && nodesRef.current) {
-      const ctx = ctxRef.current;
-      try {
-        nodesRef.current.forEach(n => {
-          if (n.gain) n.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
-        });
-      } catch {}
-      setTimeout(() => {
-        nodesRef.current?.forEach(n => { try { n.osc?.stop(); } catch {} });
-        nodesRef.current = null;
-      }, 900);
-      setActiveHz(null);
-      setActiveName(null);
-      return;
-    }
-
-    // Stop previous
-    if (nodesRef.current) {
-      nodesRef.current.forEach(n => {
-        try { n.gain?.gain?.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.3); } catch {}
-        setTimeout(() => { try { n.osc?.stop(); } catch {} }, 400);
-      });
-      nodesRef.current = null;
-    }
-
-    // Start new
-    try {
-      if (!ctxRef.current || ctxRef.current.state === 'closed') {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        ctxRef.current = new AC();
-      }
-      if (ctxRef.current.state === 'suspended') ctxRef.current.resume();
-      const ctx = ctxRef.current;
-      const nodes = [];
-
-      // Primary sine
-      const osc1 = ctx.createOscillator(); osc1.type = 'sine'; osc1.frequency.value = hz;
-      const g1 = ctx.createGain(); g1.gain.setValueAtTime(0, ctx.currentTime);
-      g1.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 1.5);
-      osc1.connect(g1); g1.connect(ctx.destination); osc1.start();
-      nodes.push({ osc: osc1, gain: g1 });
-
-      // Sub-harmonic (octave below)
-      const osc2 = ctx.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = hz / 2;
-      const g2 = ctx.createGain(); g2.gain.setValueAtTime(0, ctx.currentTime);
-      g2.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 2);
-      osc2.connect(g2); g2.connect(ctx.destination); osc2.start();
-      nodes.push({ osc: osc2, gain: g2 });
-
-      // Fifth harmonic (subtle)
-      const osc3 = ctx.createOscillator(); osc3.type = 'sine'; osc3.frequency.value = hz * 1.5;
-      const g3 = ctx.createGain(); g3.gain.setValueAtTime(0, ctx.currentTime);
-      g3.gain.linearRampToValueAtTime(0.015, ctx.currentTime + 2.5);
-      osc3.connect(g3); g3.connect(ctx.destination); osc3.start();
-      nodes.push({ osc: osc3, gain: g3 });
-
-      nodesRef.current = nodes;
-      setActiveHz(hz);
-      setActiveName(name);
-    } catch {}
-  }, [activeName]);
-
-  useEffect(() => () => {
-    nodesRef.current?.forEach(n => { try { n.osc?.stop(); } catch {} });
-    try { ctxRef.current?.close(); } catch {};
-  }, []);
-
-  return { toggle, activeHz, activeName };
-}
-
-/* ── Atmospheric Particles ───────────────────────────────── */
+/* ── Atmospheric Particles (chaos-synced) ────────────────── */
 function AtmosphericParticles({ color, count = 30 }) {
   const particles = useMemo(() =>
     Array.from({ length: count }, (_, i) => ({
@@ -269,7 +191,7 @@ export default function Observatory() {
   const [selectedPlanet, setSelectedPlanet] = useState(null);
   const [selectedStar, setSelectedStar] = useState(null);
   const [expandedEvent, setExpandedEvent] = useState(null);
-  const audio = usePersistentTone();
+  const audio = useChaosOscillator({ chaosCoeff: 1.0, driftRange: 5, chaosEnabled: true });
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 10); }, []);
 
@@ -316,10 +238,7 @@ export default function Observatory() {
         transition={{ duration: 2 }} style={{ zIndex: 0 }} />
       {(audio.activeName) && (
         <motion.div className="absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 4, repeat: Infinity }}
-          style={{ zIndex: 0, background: `radial-gradient(ellipse at 50% 50%, ${immBg.color}12 0%, transparent 50%)` }} />
+          style={{ zIndex: 0, opacity: chaosGlow(audio.chaosState), background: `radial-gradient(ellipse at 50% 50%, ${immBg.color}18 0%, transparent 50%)`, transition: 'opacity 0.15s ease-out' }} />
       )}
       <AtmosphericParticles color={immBg.color} count={audio.activeName ? 50 : 20} />
 
@@ -407,7 +326,7 @@ export default function Observatory() {
                   </div>
 
                   {/* Toggle Sonification Button */}
-                  <button onClick={() => audio.toggle(selectedPlanet.hz, selectedPlanet.name)}
+                  <button onClick={() => audio.toggle(selectedPlanet.hz, selectedPlanet.name, planetVisual?.chaos || 1.0)}
                     className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-medium transition-all active:scale-[0.97]"
                     style={{
                       background: isPlanetPlaying ? `${selectedPlanet.color}20` : `${selectedPlanet.color}08`,
@@ -453,7 +372,7 @@ export default function Observatory() {
                     isSelected={selectedStar?.name === s.name}
                     onSelect={setSelectedStar}
                     isPlaying={audio.activeName === s.name}
-                    onToggleSound={(st) => audio.toggle(st.sonified_hz, st.name)}
+                    onToggleSound={(st) => audio.toggle(st.sonified_hz, st.name, 1.618)}
                   />
                 ))}
               </div>

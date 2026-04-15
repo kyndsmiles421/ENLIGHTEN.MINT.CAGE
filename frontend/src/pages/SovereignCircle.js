@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateShareCard, downloadShareCard } from '../components/ShareCardService';
+import { useChaosOscillator } from '../lib/ChaosEngine';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const WS_BASE = `${process.env.REACT_APP_BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/api/ws/sovereign-circle`;
@@ -91,36 +92,7 @@ function useSovereignSocket(roomId, peerId) {
   return { connect, disconnect, connected, peerCount, atmosphere, isHost, setIsHost, broadcastAtmosphere };
 }
 
-/* ── Audio Engine for Solfeggio ──────────────────────────── */
-function useSolfeggioTone(hz, active) {
-  const ctxRef = useRef(null);
-  const oscRef = useRef(null);
-  const gainRef = useRef(null);
-
-  useEffect(() => {
-    if (!active || !hz) {
-      if (gainRef.current && ctxRef.current) {
-        try { gainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.5); } catch {}
-        setTimeout(() => { try { oscRef.current?.stop(); ctxRef.current?.close(); } catch {} }, 600);
-        ctxRef.current = null; oscRef.current = null; gainRef.current = null;
-      }
-      return;
-    }
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AC(); ctxRef.current = ctx;
-      const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = hz; oscRef.current = osc;
-      const g = ctx.createGain(); g.gain.setValueAtTime(0, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 2);
-      gainRef.current = g;
-      osc.connect(g); g.connect(ctx.destination); osc.start();
-    } catch {}
-    return () => {
-      try { oscRef.current?.stop(); } catch {}
-      try { ctxRef.current?.close(); } catch {}
-    };
-  }, [hz, active]);
-}
+/* ── Audio handled by ChaosEngine globally ───────────────── */
 
 /* ── Orbital Canvas ──────────────────────────────────────── */
 function OrbitalPeers({ peerCount, activeColor, isHost }) {
@@ -270,7 +242,7 @@ export default function SovereignCircle() {
 
   const peerId = useMemo(() => `peer_${Date.now().toString(36)}`, []);
   const socket = useSovereignSocket(roomId, peerId);
-  useSolfeggioTone(activeFreq, audioOn && socket.connected);
+  const chaosAudio = useChaosOscillator({ chaosCoeff: 1.0, driftRange: 3, chaosEnabled: true });
 
   // Apply received atmosphere
   useEffect(() => {
@@ -325,8 +297,11 @@ export default function SovereignCircle() {
 
   const handleFreqChange = useCallback((hz) => {
     setActiveFreq(hz);
+    if (chaosAudio.activeName) {
+      chaosAudio.toggle(hz, `solfeggio-${hz}`);
+    }
     socket.broadcastAtmosphere({ color: activeColor, freq: hz });
-  }, [socket, activeColor]);
+  }, [socket, activeColor, chaosAudio]);
 
   const handleShare = useCallback(async () => {
     const entry = {
@@ -466,7 +441,14 @@ export default function SovereignCircle() {
               {socket.connected ? 'Connected' : 'Connecting...'}
             </span>
           </div>
-          <button onClick={() => setAudioOn(p => !p)}
+          <button onClick={() => {
+            setAudioOn(p => {
+              const next = !p;
+              if (next) chaosAudio.toggle(activeFreq, `solfeggio-${activeFreq}`);
+              else chaosAudio.stopAll();
+              return next;
+            });
+          }}
             className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}
             data-testid="sovereign-audio-toggle">
             {audioOn ? <Volume2 size={14} style={{ color: activeColor }} /> : <VolumeX size={14} style={{ color: 'rgba(255,255,255,0.2)' }} />}
