@@ -204,7 +204,7 @@ export function SceneProvider({ children }) {
   return (
     <SceneContext.Provider value={ctx}>
       {activeSkin.url && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div data-testid="realm-scene-bg" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', transition: 'opacity 0.5s ease' }}>
           <img src={activeSkin.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8, transition: 'opacity 0.8s ease' }} />
           <div style={{ position: 'absolute', inset: 0, background: activeSkin.overlay || 'rgba(0,0,0,0.5)', transition: 'background 0.5s ease' }} />
         </div>

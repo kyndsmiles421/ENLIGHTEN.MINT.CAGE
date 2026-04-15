@@ -3,6 +3,32 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Waves, Heart, Zap, Eye, Sparkles, Play, Pause, Clock, ChevronLeft } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 
+// Light Therapy: NO realm skin. Pure black until user picks a color.
+const LT_OVERRIDE_ID = 'light-therapy-override';
+function useLightTherapyOverride() {
+  useEffect(() => {
+    let style = document.getElementById(LT_OVERRIDE_ID);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = LT_OVERRIDE_ID;
+      document.head.appendChild(style);
+    }
+    // Kill the realm scene entirely — pure black canvas for chromotherapy
+    style.textContent = `
+      [data-testid="realm-scene-bg"] {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      body.scene-active [data-testid="content-area"] > [data-testid="z-depth-container"] > [data-light-therapy] {
+        background: #000 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+    `;
+    return () => { style.remove(); };
+  }, []);
+}
+
 const COLORS = [
   {
     id: 'red', name: 'Red — Vitality', hex: '#EF4444', glow: 'rgba(239,68,68,0.4)',
@@ -76,7 +102,7 @@ function ColorSelector({ colors, selected, onSelect }) {
             }}
             data-testid={`light-color-${c.id}`}
           >
-            <div className="w-10 h-10 rounded-full transition-all duration-300" style={{
+            <div className="w-10 h-10 rounded-full light-color-circle transition-all duration-300" style={{
               background: c.hex,
               boxShadow: active ? `0 0 25px ${c.glow}, 0 0 50px ${c.glow}` : `0 0 10px ${c.glow}`,
             }} />
@@ -248,115 +274,135 @@ export default function LightTherapy() {
   const [selected, setSelected] = useState(null);
   const [duration, setDuration] = useState(5);
   const [sessionActive, setSessionActive] = useState(false);
+  useLightTherapyOverride();
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12 relative" style={{ background: 'transparent' }}>
-      <div className="max-w-4xl mx-auto relative z-10">
+    <div className="min-h-screen relative overflow-hidden" data-light-therapy="true"
+      style={{ background: selected ? '#000' : '#000', transition: 'background 1s ease' }}>
+
+      {/* FULL-SCREEN COLOR BATH — the room IS the color */}
+      <AnimatePresence>
+        {selected && !sessionActive && (
+          <motion.div
+            key={`bath-${selected.id}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2 }}
+            className="absolute inset-0"
+            style={{ zIndex: 0 }}>
+            {/* Primary color wash */}
+            <div className="absolute inset-0" style={{
+              background: `radial-gradient(ellipse at 50% 40%, ${selected.hex}35 0%, ${selected.hex}12 40%, ${selected.hex}06 70%, #000 100%)`,
+            }} />
+            {/* Slow-moving secondary glow */}
+            <motion.div className="absolute inset-0"
+              animate={{
+                background: [
+                  `radial-gradient(ellipse at 30% 60%, ${selected.hex}20 0%, transparent 50%)`,
+                  `radial-gradient(ellipse at 70% 30%, ${selected.hex}25 0%, transparent 50%)`,
+                  `radial-gradient(ellipse at 40% 70%, ${selected.hex}20 0%, transparent 50%)`,
+                ],
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            {/* Edge vignette */}
+            <div className="absolute inset-0" style={{
+              background: 'radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%)',
+            }} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CONTENT — floats on the color room */}
+      <div className="relative z-10 px-5 py-8 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#A855F7' }}>
-            <Sun size={14} className="inline mr-2" /> Chromotherapy
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: selected ? selected.hex : '#A855F7' }}>
+            <Sun size={12} className="inline mr-1.5" /> Chromotherapy
           </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Light Therapy
+          <h1 className="text-3xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: selected ? selected.hex + 'DD' : 'rgba(248,250,252,0.85)' }}>
+            {selected ? selected.name : 'Light Therapy'}
           </h1>
-          <p className="text-base mb-12 max-w-xl" style={{ color: 'var(--text-secondary)' }}>
-            Immerse yourself in healing colors. Each wavelength of light carries unique vibrational energy that resonates with your body's energy centers.
-          </p>
+          {selected && (
+            <p className="text-[10px] mb-6" style={{ color: `${selected.hex}88` }}>
+              {selected.chakra} &middot; {selected.frequency} &middot; {selected.wavelength}
+            </p>
+          )}
+          {!selected && (
+            <p className="text-xs mb-8" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              Select a healing color. The room will transform.
+            </p>
+          )}
         </motion.div>
 
-        {/* Color Selector */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <ColorSelector colors={COLORS} selected={selected} onSelect={setSelected} />
-        </motion.div>
+        {/* Color Selector — always visible */}
+        <ColorSelector colors={COLORS} selected={selected} onSelect={setSelected} />
 
-        {/* Selected color details */}
+        {/* Selected color deep info — part of the room, not a card */}
         <AnimatePresence mode="wait">
           {selected && (
             <motion.div
               key={selected.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mt-10 glass-card p-8 relative overflow-hidden"
-              style={{ borderColor: `${selected.hex}20` }}
-              data-testid="light-color-detail"
-            >
-              <div className="absolute top-0 right-0 w-60 h-60 rounded-full" style={{
-                background: `radial-gradient(circle, ${selected.hex}10 0%, transparent 70%)`,
-                filter: 'blur(40px)',
-                transform: 'translate(30%, -30%)',
-              }} />
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.5 }}
+              className="mt-8 space-y-6">
 
-              <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: selected.hex }}>
-                    {selected.name}
-                  </h2>
-                  <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>{selected.chakra}</p>
-                  <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-                    {selected.description}
-                  </p>
-                  <div className="flex gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-                    <span>{selected.frequency}</span>
-                    <span>&middot;</span>
-                    <span>{selected.wavelength}</span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Benefits</p>
-                  <div className="space-y-2.5">
-                    {selected.benefits.map((b, i) => (
-                      <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
-                        className="flex items-center gap-3">
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: selected.hex, boxShadow: `0 0 6px ${selected.glow}` }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{b}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
+              {/* Description */}
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                {selected.description}
+              </p>
+
+              {/* Benefits */}
+              <div className="space-y-2">
+                <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: `${selected.hex}66` }}>Benefits</p>
+                {selected.benefits.map((b, i) => (
+                  <motion.div key={i} initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+                    className="flex items-center gap-2.5">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: selected.hex, boxShadow: `0 0 8px ${selected.glow}` }} />
+                    <span className="text-xs" style={{ color: 'rgba(248,250,252,0.45)' }}>{b}</span>
+                  </motion.div>
+                ))}
               </div>
 
-              {/* Duration + Start */}
-              <div className="relative z-10 mt-8 pt-6 flex flex-wrap items-center gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <div className="flex items-center gap-2">
-                  <Clock size={14} style={{ color: 'var(--text-muted)' }} />
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Duration:</span>
+              {/* Duration selector + Begin */}
+              <div className="pt-4" style={{ borderTop: `1px solid ${selected.hex}15` }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock size={12} style={{ color: `${selected.hex}66` }} />
+                  <span className="text-[9px] uppercase tracking-wider" style={{ color: `${selected.hex}44` }}>Session Duration</span>
                 </div>
-                {DURATIONS.map(d => (
-                  <button key={d} onClick={() => setDuration(d)}
-                    className="px-3 py-1.5 rounded-full text-xs transition-all"
-                    style={{
-                      background: duration === d ? `${selected.hex}20` : 'rgba(255,255,255,0.03)',
-                      color: duration === d ? selected.hex : 'var(--text-muted)',
-                      border: `1px solid ${duration === d ? `${selected.hex}40` : 'rgba(255,255,255,0.06)'}`,
-                    }}
-                    data-testid={`light-duration-${d}`}
-                  >
-                    {d} min
-                  </button>
-                ))}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {DURATIONS.map(d => (
+                    <button key={d} onClick={() => setDuration(d)}
+                      className="px-4 py-2 rounded-full text-xs active:scale-95 transition-all"
+                      style={{
+                        background: duration === d ? `${selected.hex}20` : 'rgba(255,255,255,0.02)',
+                        color: duration === d ? selected.hex : 'rgba(255,255,255,0.3)',
+                        border: `1px solid ${duration === d ? `${selected.hex}40` : 'rgba(255,255,255,0.06)'}`,
+                      }}
+                      data-testid={`light-duration-${d}`}>{d} min</button>
+                  ))}
+                </div>
                 <button
                   onClick={() => setSessionActive(true)}
-                  className="ml-auto btn-glass px-6 py-2.5 text-sm flex items-center gap-2"
-                  style={{ background: `${selected.hex}15`, borderColor: `${selected.hex}30`, color: selected.hex }}
-                  data-testid="light-start-session"
-                >
-                  <Play size={14} fill={selected.hex} /> Begin Session
+                  className="w-full mt-4 py-3 rounded-xl text-sm font-medium active:scale-95 transition-all flex items-center justify-center gap-2"
+                  style={{
+                    background: `${selected.hex}15`,
+                    border: `1px solid ${selected.hex}30`,
+                    color: selected.hex,
+                    boxShadow: `0 0 30px ${selected.hex}10`,
+                  }}
+                  data-testid="light-start-session">
+                  <Play size={14} fill={selected.hex} /> Immerse in {selected.id.charAt(0).toUpperCase() + selected.id.slice(1)}
                 </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {!selected && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-            className="mt-16 text-center">
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Select a healing color above to begin your light therapy session.</p>
-          </motion.div>
-        )}
       </div>
 
-      {/* Immersive Session */}
+      {/* FULL IMMERSIVE SESSION — takes over everything */}
       <AnimatePresence>
         {sessionActive && selected && (
           <ImmersiveSession color={selected} duration={duration} onEnd={() => setSessionActive(false)} />
