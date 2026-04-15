@@ -1,37 +1,32 @@
-# ENLIGHTEN.MINT.CAFE — V40.0 DEPLOYMENT BLUEPRINT
-## Last Verified: April 14, 2026
+# ENLIGHTEN.MINT.CAFE — V42.0 REALM SKIN ENGINE
+## Last Verified: April 15, 2026
 
-### V40.0 Complete Feature Set
+### V42.0: Each Module is Its Own World
+- **28 realm skins** across 11 categories (Meditation, Aurora, Crystals, Sacred, Cosmos, Ocean, Forest, Stars, Nature, Contextual, Minimal)
+- **Auto-contextual mode**: Each module auto-loads its matching scene (Herbology → herb garden, Crystals → crystal cave, Oracle → temple, etc.)
+- **Lock mode**: User locks a global skin → same visual identity across every page
+- **CSS variables**: `--skin-accent`, `--skin-card-tint`, `--skin-border-tint` injected per-skin for component theming
+- **58 modules mapped** to their contextual skins in MODULE_SKINS
+- **Frosted glass cards**: Content floats with `backdrop-filter: blur(8px)` over the scene
 
-**Mixer Nav (10 tabs)**:
-ORBIT | MIX | REC | AUDIO | TEXT | LAYER | FX | AI | OUT | ME
+### Complete System
+- 10 mixer nav tabs: ORBIT | MIX | REC | AUDIO | TEXT | LAYER | FX | AI | OUT | ME
+- Celestial Torus Engine with φ³ math
+- Sage AI prompt-to-FX (13 presets)
+- USB Bank → Resonance wiring
+- Sovereign Ledger print
+- Trust compliance footer + /terms page
+- 58 modules, 7 pillars, 171 routes
+- Same plane architecture, zero position:fixed from mixer
 
-**Me Tab** — Account, Share, Login/Logout accessible from every module page:
-- User status (Guest/Sovereign + tier)
-- Share/Broadcast (Web Share API + clipboard fallback)
-- Profile (Cosmic Profile page)
-- Login (→ /auth) or Sever/Logout (→ /landing with fade animation)
-- Hub shortcut (→ /sovereign-hub)
-- Mixer Store
-
-**Orbit Tab** — Celestial Torus Engine:
-- φ³ orbital renderer, 7 pillar planets, golden-angle tracks
-- Tap pillar → expands to full module grid (3-column cards)
-- Tap module → navigates to page
-- "< Orbit" back button returns to torus
-- Live dust readout + inverse multiplier
-
-**Production Studio** (Mix/Rec/Audio/Text/Layer/FX/AI/Out):
-- All functional, same plane architecture
-- Sage AI: 13 atmosphere presets (sunset/focus/dream/ocean/crystal/void...)
-- FX: Real CSS filters on #app-stage
-- Sovereign Ledger print snapshot
-
-**Architecture**: Same Plane flex column, zero position:fixed from mixer
-**Emergent Badge**: Killed (CSS + JS 3-sec recurring purge)
-**Compliance Footer**: Closed-loop economy + educational disclaimer
-
-### Module Coverage: 58 modules, 7 pillars, 171 routes
+### Module → Skin Mapping (examples)
+- /herbology → herb-garden (lavender field, lime accent)
+- /crystals → amethyst-glow (crystal cave, violet accent)
+- /oracle → oracle-temple (candlelight temple, amber accent)
+- /meditation → cosmic-silhouette (purple cosmos, lavender accent)
+- /zen-garden → zen-pond (water garden, teal accent)
+- /star-chart → star-observatory (night sky, orange accent)
+- /soundscapes → deep-blue (ocean depths, sky accent)
 
 ### Blocked: Play Store AAB (Google identity verification)
-### Next: Sage AI → deeper LLM, Sovereign "Live" Sessions
+### Next: AI-generated custom skins, gamification nodules per realm

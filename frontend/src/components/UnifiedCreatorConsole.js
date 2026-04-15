@@ -32,10 +32,13 @@ function SceneButton() {
   return (
     <button onClick={() => scene.setPickerOpen(true)}
       className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
-      style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' }}
+      style={{ background: `${scene.activeSkin.accent}08`, border: `1px solid ${scene.activeSkin.accent}20` }}
       data-testid="account-scene">
-      <ImageIcon size={14} style={{ color: '#10B981' }} />
-      <div><div className="text-[10px] font-bold text-emerald-400">Scenes</div><div className="text-[7px] text-white/20">{scene.activeScene?.name || 'Void'}</div></div>
+      <ImageIcon size={14} style={{ color: scene.activeSkin.accent }} />
+      <div>
+        <div className="text-[10px] font-bold" style={{ color: scene.activeSkin.accent }}>Realms</div>
+        <div className="text-[7px] text-white/20">{scene.isLocked ? scene.activeSkin.name : 'Auto'}</div>
+      </div>
     </button>
   );
 }
