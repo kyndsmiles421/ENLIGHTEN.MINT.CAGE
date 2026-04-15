@@ -70,6 +70,81 @@ function AmbientParticles({ colors, active }) {
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[1]" style={{ opacity: 0.6 }} />;
 }
 
+/* ═══ INTERACTIVE CONCEPT CARD ═══ */
+function ConceptCard({ concept, color, index, revealedItems, tradition, compact }) {
+  const [expanded, setExpanded] = useState(false);
+  const [exploring, setExploring] = useState(false);
+  const [insight, setInsight] = useState(null);
+
+  const deepExplore = async () => {
+    setExploring(true);
+    try {
+      const res = await axios.post(`${API}/encyclopedia/explore`, {
+        tradition: tradition.name || tradition.id, concept: concept.name, question: ''
+      });
+      setInsight(res.data);
+    } catch { toast.error('Could not explore deeper'); }
+    setExploring(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: compact ? 0 : -15, filter: 'blur(4px)' }}
+      animate={index + 1 < revealedItems ? { opacity: 1, x: 0, filter: 'blur(0px)' } : { opacity: 1, x: 0, filter: 'blur(0px)' }}
+      transition={{ duration: 0.6, delay: index * 0.05 }}
+      onClick={() => setExpanded(!expanded)}
+      className="rounded-xl p-4 cursor-pointer transition-all"
+      style={{
+        background: expanded ? `${color}08` : `${color}04`,
+        border: `1px solid ${expanded ? `${color}20` : `${color}08`}`,
+        boxShadow: expanded ? `0 0 20px ${color}06` : 'none',
+      }}
+      data-testid={`concept-${concept.name?.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1">
+          <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium mb-1`}
+            style={{ color, fontFamily: compact ? 'inherit' : 'Cormorant Garamond, serif' }}>
+            {concept.name}
+          </p>
+          <p className={`${compact ? 'text-[11px]' : 'text-xs'} leading-relaxed`} style={{ color: 'rgba(248,250,252,0.5)' }}>
+            {concept.desc}
+          </p>
+        </div>
+        <ChevronRight size={12} style={{
+          color: expanded ? color : 'rgba(248,250,252,0.15)',
+          transform: expanded ? 'rotate(90deg)' : 'none',
+          transition: 'transform 0.2s',
+          flexShrink: 0, marginTop: 4,
+        }} />
+      </div>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden">
+            <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${color}12` }}>
+              {insight ? (
+                <div className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(248,250,252,0.55)' }}>
+                  {insight.exploration || insight.content || JSON.stringify(insight)}
+                </div>
+              ) : (
+                <button onClick={(e) => { e.stopPropagation(); deepExplore(); }}
+                  disabled={exploring}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
+                  style={{ background: `${color}08`, border: `1px solid ${color}15`, color, opacity: exploring ? 0.5 : 1 }}
+                  data-testid={`explore-${concept.name?.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {exploring ? <Loader2 size={10} className="animate-spin" /> : <Eye size={10} />}
+                  {exploring ? 'Exploring...' : `Explore ${concept.name} deeper`}
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+
 /* ═══════════════════════════════════════
    AUDIO NARRATOR
    ═══════════════════════════════════════ */
@@ -204,19 +279,12 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
             {tradition.overview}
           </motion.p>
 
-          {/* Key Concepts */}
+          {/* Key Concepts — Interactive */}
           <div className="mb-8">
             <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Core Teachings</p>
             <div className="space-y-3">
               {tradition.key_concepts.map((concept, i) => (
-                <motion.div key={i}
-                  initial={{ opacity: 0, x: -15, filter: 'blur(4px)' }}
-                  animate={i + 1 < revealedItems ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
-                  transition={{ duration: 0.6 }}
-                  className="rounded-xl p-4" style={{ background: `${tradition.color}04`, border: `1px solid ${tradition.color}08` }}>
-                  <p className="text-sm font-medium mb-1" style={{ color: tradition.color, fontFamily: 'Cormorant Garamond, serif' }}>{concept.name}</p>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>{concept.desc}</p>
-                </motion.div>
+                <ConceptCard key={i} concept={concept} color={tradition.color} index={i} revealedItems={revealedItems} tradition={tradition} />
               ))}
             </div>
           </div>
@@ -461,16 +529,11 @@ export default function Encyclopedia() {
               {activeTradition.overview}
             </motion.p>
 
-            {/* Key Concepts */}
+            {/* Key Concepts — Interactive */}
             <p className="text-[9px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.25)' }}>Core Teachings</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {activeTradition.key_concepts?.map((c, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="rounded-xl p-4" style={{ background: `${activeTradition.color}04`, border: `1px solid ${activeTradition.color}08` }}>
-                  <p className="text-xs font-medium mb-1" style={{ color: activeTradition.color }}>{c.name}</p>
-                  <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.45)' }}>{c.desc}</p>
-                </motion.div>
+                <ConceptCard key={i} concept={c} color={activeTradition.color} index={i} revealedItems={999} tradition={activeTradition} compact />
               ))}
             </div>
 
