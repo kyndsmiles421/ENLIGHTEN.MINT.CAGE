@@ -20,8 +20,25 @@ import {
   X, Check, Globe, ArrowLeft,
   Video, Music, Type, Layers, Wand2,
   Sparkles, Download, Maximize2, Minimize2, Zap,
-  User, LogOut, LogIn, Share2
+  User, LogOut, LogIn, Share2, Image as ImageIcon
 } from 'lucide-react';
+
+import { useScene } from './SceneEngine';
+
+// Scene picker button for the account panel
+function SceneButton() {
+  const scene = useScene();
+  if (!scene) return null;
+  return (
+    <button onClick={() => scene.setPickerOpen(true)}
+      className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+      style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' }}
+      data-testid="account-scene">
+      <ImageIcon size={14} style={{ color: '#10B981' }} />
+      <div><div className="text-[10px] font-bold text-emerald-400">Scenes</div><div className="text-[7px] text-white/20">{scene.activeScene?.name || 'Void'}</div></div>
+    </button>
+  );
+}
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -1025,6 +1042,7 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
     const regularToken = localStorage.getItem('token');
     const isLoggedIn = (zenToken && zenToken !== 'guest_token') || (regularToken && regularToken !== 'guest_token');
     const userName = (() => { try { return JSON.parse(localStorage.getItem('zen_user') || localStorage.getItem('user') || '{}').name; } catch { return null; } })();
+    const sceneCtx = document.querySelector('[data-testid="scene-picker"]') ? null : true; // check if picker available
     return (
       <div className="p-3 space-y-2">
         {/* User status */}
@@ -1047,6 +1065,9 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
             <Share2 size={14} style={{ color: '#38BDF8' }} />
             <div><div className="text-[10px] font-bold text-sky-400">Share</div><div className="text-[7px] text-white/20">Broadcast link</div></div>
           </button>
+
+          {/* Scene Picker */}
+          <SceneButton />
 
           {/* Profile */}
           <button onClick={() => handleNav('/cosmic-profile')}
@@ -1146,7 +1167,7 @@ Operated under a Private Sovereign Trust. All AI-generated structures, virtual r
   // ═══ THE ORGANISM: SAME PLANE FLEX COLUMN ═══
   return (
     <MixerContext.Provider value={ctx}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: '#000', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} data-testid="sovereign-organism">
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'transparent', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} data-testid="sovereign-organism">
         {/* CONTENT — fills available space, scrollable */}
         <div style={{ flex: 1, overflow: 'auto', position: 'relative' }} data-testid="content-area">
           {children}

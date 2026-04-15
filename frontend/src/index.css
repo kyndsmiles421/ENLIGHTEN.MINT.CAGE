@@ -34,6 +34,24 @@
   }
 }
 
+/* ═══ SCENE ENGINE — Transparent backgrounds when a scene is active ═══ */
+body.scene-active,
+body.scene-active #root,
+body.scene-active .sovereign-root {
+  background: transparent !important;
+}
+body.scene-active [data-testid="content-area"] {
+  background: transparent !important;
+}
+body.scene-active [data-testid="sovereign-organism"] {
+  background: transparent !important;
+}
+/* Module pages set their own backgrounds — override when scene is active */
+body.scene-active .min-h-screen {
+  background: transparent !important;
+}
+
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SOVEREIGN GRID — Temporal Architecture CSS Hard-Lock
