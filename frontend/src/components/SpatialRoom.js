@@ -420,16 +420,27 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         }}
         data-testid={`spatial-room-${room}`}
       >
+        {/* V56.0 — Portal Entry Flash — brief accent burst when entering a room */}
+        <motion.div
+          initial={{ opacity: 0.7, scale: 1.5 }}
+          animate={{ opacity: 0, scale: 2.5 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${theme.accent}35, ${theme.accent}10, transparent 60%)`,
+            zIndex: 50,
+          }}
+        />
+
         {/* Floor plane */}
         <div className="absolute inset-0 pointer-events-none" style={{
           background: `linear-gradient(180deg, ${theme.wall} 0%, ${theme.floor} 25%, ${theme.floor} 75%, ${theme.wall}80 100%)`,
           zIndex: 0,
         }} />
 
-        {/* V56.0 — Scene Environment Image — the immersive room background */}
+        {/* V56.0 — Scene Environment Image — atmospheric room background */}
         {theme.scene && (
           <>
-            {/* Scene image — full bleed cover */}
             <motion.div
               initial={{ opacity: 0, scale: 1.1 }}
               animate={{ opacity: entered ? 1 : 0, scale: entered ? 1 : 1.1 }}
@@ -440,30 +451,25 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
                 backgroundSize: 'cover',
                 backgroundPosition: 'center 40%',
                 zIndex: 0,
-                opacity: 0.35,
-                filter: 'saturate(0.8)',
+                opacity: 0.18,
+                filter: 'saturate(0.6) brightness(0.7)',
               }}
             />
-            {/* Dark gradient overlay for text readability */}
             <div className="absolute inset-0 pointer-events-none" style={{
               background: `linear-gradient(180deg, 
-                ${theme.floor}E8 0%, 
-                ${theme.floor}C8 10%, 
-                ${theme.floor}A0 30%, 
-                ${theme.floor}80 50%, 
-                ${theme.floor}A0 70%, 
-                ${theme.floor}D0 90%, 
+                ${theme.floor}F5 0%, 
+                ${theme.floor}D0 15%, 
+                ${theme.floor}B8 40%, 
+                ${theme.floor}C8 70%, 
                 ${theme.floor}F0 100%)`,
               zIndex: 0,
             }} />
-            {/* Center vignette for content readability */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: `radial-gradient(ellipse at 50% 35%, ${theme.floor}D0 0%, ${theme.floor}80 35%, transparent 65%)`,
+              background: `radial-gradient(ellipse at 50% 35%, ${theme.floor}D8 0%, transparent 60%)`,
               zIndex: 0,
             }} />
-            {/* Accent color tint over scene */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: `radial-gradient(ellipse at 50% 50%, ${theme.accent}15, transparent 70%)`,
+              background: `radial-gradient(ellipse at 50% 50%, ${theme.accent}10, transparent 70%)`,
               zIndex: 0,
             }} />
           </>
