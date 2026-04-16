@@ -13,21 +13,21 @@ import { toast } from 'sonner';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-// Node cultural mythology labels (maps to /api/omni-bridge/node-mythology)
+// Node labels — Western Sacred Geometry tradition (Kabbalistic/Hermetic, NOT Lakota)
 const NODE_LABELS = [
-  "Center — Sacred Geometry",
-  "East — Breathwork",
-  "South — Movement",
-  "West — Herbology",
-  "North — Earth Medicine",
-  "Sound & Frequency",
-  "Meditation",
-  "Oracle & Divination",
-  "Community",
-  "Economy",
-  "Creation",
-  "Sacred History",
-  "Connection",
+  "Center — Bindu",
+  "Fire Tetrahedron",
+  "Earth Hexahedron",
+  "Water Icosahedron",
+  "Air Octahedron",
+  "Ether Dodecahedron",
+  "Seed of Life",
+  "Flower of Life",
+  "Fruit of Life",
+  "Tree of Life",
+  "Vesica Piscis",
+  "Torus",
+  "Merkaba",
 ];
 
 // 13 vertices of Metatron's Cube
@@ -290,18 +290,20 @@ export default function InteractiveMasonry({ room = 'default', authHeaders = {},
           {nodeMyth ? (
             <>
               <p className="text-[10px] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                {nodeMyth.lakota_star && <span style={{ color: '#D8B4FE' }}>{nodeMyth.lakota_star}</span>}
-                {nodeMyth.lakota_english && <span style={{ color: 'rgba(255,255,255,0.5)' }}> ({nodeMyth.lakota_english})</span>}
+                <span style={{ color: '#D8B4FE' }}>{nodeMyth.tradition}</span>
+                {nodeMyth.platonic_element && <span style={{ color: 'rgba(255,255,255,0.5)' }}> — {nodeMyth.platonic_element}</span>}
               </p>
               <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                {nodeMyth.lakota_teaching?.slice(0, 150)}
+                Academy: {nodeMyth.academy_module}
               </p>
+              {nodeMyth.note && (
+                <p className="text-[8px] mt-1 italic" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {nodeMyth.note}
+                </p>
+              )}
               <div className="flex gap-2 mt-1.5">
                 <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(252,211,77,0.06)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.1)' }}>
-                  {nodeMyth.chakra}
-                </span>
-                <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(45,212,191,0.06)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.1)' }}>
-                  {nodeMyth.element}
+                  {nodeMyth.platonic_element}
                 </span>
                 <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(139,92,246,0.06)', color: '#A78BFA', border: '1px solid rgba(139,92,246,0.1)' }}>
                   {nodeMyth.academy_module}
