@@ -1,50 +1,70 @@
-# ENLIGHTEN.MINT.CAFE — V54.7 SPATIAL CREATION ENGINE (FINAL)
-## Last Verified: April 16, 2026 — 100% Pass (51/51 routes, Iteration 338)
+# ENLIGHTEN.MINT.CAFE — V54.8 AVATAR PRESENCE ENGINE
+## Last Verified: April 16, 2026 — 100% Pass (Iteration 339)
 
-### V54.7: Complete Spatial Architecture
-- **SpatialRouter**: Auto-wraps ALL 160+ pages with correct realm/theme
-- **ProximityItem**: 3-second auto-trigger — items extrude (translateZ:16, scale:1.03, glow border) when avatar stays near them
-- **SpatialRecorder**: Record Journey + Cinematic Mode on every InteractiveModule page
-- **Avatar Badge**: [x,y] coordinate pointer + 9-segment depth indicator on all rooms
-- **9x9 Grid**: 81 nodes, ROOM_DEPTH varies per room (500-1200px), OCTANT_DEPTH=room/9
-- **3 Realms**: HOLLOW_EARTH (crystalline tunnels), SURFACE (standard), AIR (open sky)
-- **Breathing pulse**: Perspective oscillates with 4s sine wave
-- **Meditation stillness**: 30s without scroll → hidden octants reveal
-- **DeepDive AI**: In-place expansion on every item, no overlays
-- **Gamification**: +5 XP per interaction, mastery levels, streak badges
+### V54.8: Avatar Presence + Spatial Migration Sweep
+- **Avatar3D**: Visual CSS 3D "Light Being" — diamond crystal form that inhabits every spatial room
+  - Realm-specific appearance: Crystalline (HOLLOW_EARTH), Grounded (SURFACE), Ethereal (AIR)
+  - Idle breathing animation + walk bobbing on scroll
+  - Stillness ghosting — translucent after 30s without scroll
+  - Trail particles mark avatar's path through Z-depth
+  - Coordinate label [x,y] below the avatar body
+- **Collision-Based ProximityItem**: Enhanced interaction radius (1/18th of grid = ~50px equivalent)
+  - Items unfold/extrude as avatar approaches (collision → active → near → far)
+  - Opacity gradient: 1.0 (collision) → 0.95 (active) → 0.75 (near) → 0.5/0.25 (far)
+  - Auto-trigger after 3s in active zone with visual pulse
+- **World Progress Tracking**: AvatarContext tracks visited rooms across all 50+ routes
+  - Stored in localStorage `emcafe_world_progress`
+  - World completion percentage calculated against ALL_SPATIAL_ROUTES
+- **SpatialRouter**: Expanded with 10+ new route→room mappings (exercises, hooponopono, tantra, etc.)
 
-### 11 Interactive Pages
-| Page | Items | Filters | Realm |
-|------|-------|---------|-------|
-| Crystals | 12 | 7 Chakras | HOLLOW_EARTH |
-| Herbology | 12 | 5 Body Systems | SURFACE |
-| Nourishment | 8 | Category | SURFACE |
-| Aromatherapy | 12 | 5 Elements | SURFACE |
-| Elixirs | 10 | 5 Categories | HOLLOW_EARTH |
-| Acupressure | 10 | 5 Meridians | SURFACE |
-| Yoga | 7 styles | Style→Sequence→Pose | SURFACE |
-| Reiki | 10 | 7 Chakras | SURFACE |
-| Mudras | 25 | Element | SURFACE |
-| Mantras | 3 | Category | SURFACE |
-| MealPlanning | 5 plans | Plan→Meal | SURFACE |
+### 19 Interactive Spatial Pages (V54.8)
+| Page | Type | Realm | Status |
+|------|------|-------|--------|
+| Crystals | InteractiveModule | HOLLOW_EARTH | DONE |
+| Herbology | InteractiveModule | SURFACE | DONE |
+| Nourishment | InteractiveModule | SURFACE | DONE |
+| Aromatherapy | InteractiveModule | SURFACE | DONE |
+| Elixirs | InteractiveModule | HOLLOW_EARTH | DONE |
+| Acupressure | InteractiveModule | SURFACE | DONE |
+| Yoga | InteractiveModule | SURFACE | DONE |
+| Reiki | InteractiveModule | SURFACE | DONE |
+| Mudras | InteractiveModule | SURFACE | DONE |
+| Mantras | InteractiveModule | SURFACE | DONE |
+| MealPlanning | InteractiveModule | SURFACE | DONE |
+| **Games** | ProximityItem Catalog | SURFACE | **NEW V54.8** |
+| **Dreams** | ProximityItem + Tabs | HOLLOW_EARTH (Oracle) | **NEW V54.8** |
+| **Soundscapes** | ProximityItem Sliders | HOLLOW_EARTH (Frequencies) | **NEW V54.8** |
+| **Affirmations** | ProximityItem Sections | SURFACE | **NEW V54.8** |
+| **Academy** | ProximityItem Programs | SURFACE (Teachings) | **NEW V54.8** |
+| **Breathing** | Spatial Wrapper | AIR | **NEW V54.8** |
+| **Meditation** | Spatial Wrapper | HOLLOW_EARTH | **NEW V54.8** |
+| **Sacred Texts** | Spatial Wrapper | HOLLOW_EARTH | **NEW V54.8** |
 
 ### Zero-Stack Directive (PERMANENT LAW)
 - NO overlays, NO modals, NO z-index boxes over content
 - Mixer HUD at Z:100 (static). Room content Z:0 to Z:-1200 (fluid)
 - Content expands IN-PLACE. DeepDive expands below trigger.
-- If item is "hidden" it's out of range in 3D volume, not "off-screen"
+- Avatar3D is a fixed element at Z:3 — follows scroll progress
 
 ### Architecture
 ```
-App → MixerProvider → SpatialRouter → SpatialRoom (per-route)
+App → MixerProvider → SpatialRouter (world tracking) → SpatialRoom (per-route)
   ├── DepthParticles (Z-space ambient)
-  ├── AvatarBadge ([x,y] + depth indicator + realm label)  
+  ├── Avatar3D (Visual Light Being — realm-colored, trail particles, stillness ghost)
+  ├── AvatarBadge ([x,y] + depth indicator + realm label)
   ├── Realm Atmosphere (HOLLOW_EARTH tunnels / AIR glow / SURFACE walls)
   └── Content (perspective + translateZ entry)
-       └── InteractiveModule
+       └── InteractiveModule / Spatial Wrapper
             ├── SpatialRecorderUI (Record Journey / Cinematic Mode)
             ├── ModuleMastery (Novice→Master progress)
             ├── SearchBar + FilterTabs
-            └── ProximityItem[] (scroll-based Z-reveal + 3s auto-trigger)
+            └── ProximityItem[] (collision-based Z-reveal + 3s auto-trigger)
                  └── InteractiveItem (tap → expand → DeepDive → XP → Narration)
 ```
+
+### Remaining Work
+- ~140 static pages need transition to spatial architecture
+- Cinematic auto-walkthrough (scripted SpatialRecorder route)
+- Depth-of-field shader during recording
+- Phygital Marketplace NFC hooks
+- Google Play AAB (blocked on user identity verification)
