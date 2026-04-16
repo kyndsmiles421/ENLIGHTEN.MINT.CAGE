@@ -14,6 +14,7 @@ import NarrationPlayer from './NarrationPlayer';
 import { ProximityItem } from './SpatialRoom';
 import SpatialRecorderUI, { useSpatialRecorder } from './SpatialRecorder';
 import OmniBridge from './OmniBridge';
+import TraditionLens from './TraditionLens';
 
 // Visual element icon based on item properties
 function ItemVisual({ color, element, size = 56 }) {
@@ -363,6 +364,11 @@ export default function InteractiveModule({
 
         {/* Avatar Journey Recorder */}
         <SpatialRecorderUI recorder={recorder} />
+
+        {/* Cultural Lens — view this module through any tradition */}
+        <div className="mb-3">
+          <TraditionLens module={category || title.toLowerCase()} topic={title} />
+        </div>
 
         {headerExtra}
 

@@ -25,7 +25,7 @@ import {
   TorusPanel, MixPanel, RecordPanel, AudioPanel,
   TextPanel, OverlayPanel, EffectsPanel, AIPanel,
   ExportPanel, AccountPanel, StoreView, MixerNavBar,
-  ParticleField, ResonanceCamera, TOOL_TABS,
+  CulturalMixerPanel, ParticleField, ResonanceCamera, TOOL_TABS,
 } from './console';
 import { useMediaControls } from './console/useMediaControls';
 import { useResonanceCapture } from './console/useResonanceCapture';
@@ -250,6 +250,7 @@ export function MixerProvider({ children }) {
   const PANEL_RENDERERS = {
     torus: () => <TorusPanel expandedPillar={expandedPillar} setExpandedPillar={setExpandedPillar} pillarLevels={pillarLevels} setPillarLevels={setPillarLevels} modStates={modStates} handleNav={handleNav} currentRoute={location.pathname} />,
     mix: () => <MixPanel masterLevel={masterLevel} setMasterLevel={setMasterLevel} pillarLevels={pillarLevels} setPillarLevels={setPillarLevels} expandedPillar={expandedPillar} setExpandedPillar={setExpandedPillar} modStates={modStates} setModStates={setModStates} handleMuteChange={handleMuteChange} handleNav={handleNav} currentRoute={location.pathname} />,
+    culture: () => <CulturalMixerPanel />,
     record: () => <RecordPanel media={media} />,
     audio: () => <AudioPanel media={media} masterLevel={masterLevel} setMasterLevel={setMasterLevel} />,
     text: () => <TextPanel textOverlays={textOverlays} setTextOverlays={setTextOverlays} />,

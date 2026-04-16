@@ -4,12 +4,13 @@
  */
 import {
   Globe, Sliders, Video, Music, Type, Layers, Wand2,
-  Sparkles, Download, User,
+  Sparkles, Download, User, Compass,
 } from 'lucide-react';
 
 export const TOOL_TABS = [
   { key: 'torus', label: 'Orbit', icon: Globe, color: '#10B981' },
   { key: 'mix', label: 'Mix', icon: Sliders, color: '#C084FC' },
+  { key: 'culture', label: 'Culture', icon: Compass, color: '#D946EF' },
   { key: 'record', label: 'Rec', icon: Video, color: '#EF4444' },
   { key: 'audio', label: 'Audio', icon: Music, color: '#38BDF8' },
   { key: 'text', label: 'Text', icon: Type, color: '#F8FAFC' },
