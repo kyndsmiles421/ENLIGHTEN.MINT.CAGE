@@ -1,4 +1,4 @@
-# ENLIGHTEN.MINT.CAFE — V56.0 Vitality Overlay
+# ENLIGHTEN.MINT.CAFE — V56.0 Vitality Overlay + Discovery Engine
 ## Product Requirements Document
 ### Last Updated: April 16, 2026
 
@@ -33,41 +33,52 @@ Build "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE", an esoteric, immersive fu
 - 160+ page batch migration to SpatialRoom system
 - SpatialRouter auto-wrapping all routes
 
-### V56.0 Vitality Overlay (April 16, 2026)
-- **ProgressionToast**: Floating 3D progression feedback system. Fires on dust/XP gain, level-ups, and milestone unlocks. Mounted globally in App.js.
-- **useWorkAccrual RPG Bridge**: Now calls POST /rpg/character/gain-xp after every dust sync. Fires vitality-pulse custom event for visual feedback. Checks milestones locally.
-- **Cinematic Walkthrough Rewrite**: True 3D camera animation via translate3d+rotateY on #app-stage. 5 sequences (wellness, divination, nature, sovereign, full) with cinematic letterbox bars and HUD overlay.
-- **Oracle/Tarot 3D Restoration**: TarotCard component rebuilt with preserve-3d, Z-depth fan spread, hover translateZ lift, backface-visibility, glow effects.
-- **VitalityBar**: Real-time level/XP progress bar in SpatialRoom header. Subscribes to vitality-pulse events for live updates.
-- **Cross-System Milestones API**: GET /api/rpg/milestones (progress tracking), POST /api/rpg/milestones/claim (reward XP + items). 8 milestones: Air Temple (3 breathing), Crystal Skin (5 meditations), Mystic Cloak (3 oracle readings), Dream Realms (3 dream journals), Ritual Master (7 daily rituals), Mood Cartographer (10 mood logs), Herbalist (5 herbology), Sound Weaver (5 frequencies).
+### V56.0 Vitality Overlay + Discovery Engine (April 16, 2026)
+
+#### System-Wide Gamification
+- **InteractiveModule → Discovery Exploration Engine**: Complete rewrite. Items appear as fog-shrouded nodes on a grid. Tap to discover (awards 8 XP with animated popup). Mastery tracking: Novice → Student → Adept → Master. Knowledge Challenge mode with quizzes from discovered items. Discovery state persists in localStorage. Powers 8 pages: Crystals, Herbology, Aromatherapy, Elixirs, Mudras, Nourishment, Reiki, Acupressure.
+
+#### Visual Immersion
+- **SpatialRoom atmosphere boost**: Cave walls 30% width with crystal vein lines, atmospheric fog at bottom, larger glowing particles (3-9px at 15-50% opacity), ceiling shadows for HOLLOW_EARTH rooms. Air realm horizon line and sky gradient. Surface realm visible wall edges.
+- **Portal Entry Flash**: Accent-colored radial gradient burst on every room entry.
+- **Scene Environment Images**: Subtle atmospheric backgrounds for Oracle (tarot cloth), Meditation (candlelit temple), Breathing (sky temple columns), Crystals (underground cavern), Herbology (botanical greenhouse), Star Chart (observatory), Yoga (zen studio), Frequencies (sound visualization), Teachings (temple incense).
+- **Room Name Badge**: Visible location marker with room name and realm in top-left of every spatial room.
+
+#### Progression Engine
+- **ProgressionToast**: Floating 3D toasts for Stardust gains, level-ups, milestone unlocks.
+- **useWorkAccrual RPG Bridge**: Calls POST /rpg/character/gain-xp after every dust sync. Fires vitality-pulse events.
+- **VitalityBar**: Real-time level/XP bar in SpatialRoom header.
+- **Cross-System Milestones**: 8 milestones tied to activity counts (Air Temple, Crystal Skin, Mystic Cloak, Dream Realms, Ritual Master, Mood Cartographer, Herbalist, Sound Weaver).
+
+#### Cinematic Engine
+- **CinematicWalkthrough rewrite**: True 3D camera animation via translate3d+rotateY on #app-stage. 5 sequences with cinematic letterbox bars and HUD.
+
+#### Oracle/Tarot 3D
+- **TarotCard**: preserve-3d, Z-depth fan spread, hover translateZ lift, backface-visibility, glow effects.
 
 ---
 
 ## Key API Endpoints
-- POST /api/transmuter/work-submit — Dust accrual with exponential math
-- POST /api/rpg/character/gain-xp — Award XP from any source
+- POST /api/transmuter/work-submit — Dust accrual
+- POST /api/rpg/character/gain-xp — Award XP
 - GET /api/rpg/milestones — Cross-system milestone progress
 - POST /api/rpg/milestones/claim — Claim milestone rewards
 - GET /api/rpg/character — Full character stats
-- GET /api/omni-bridge/traditions — All 10 cultural traditions
-- POST /api/omni-bridge/cross-tradition — GPT-5.2 cultural bridging
 
 ---
 
 ## Prioritized Backlog
 
-### P0 (Critical)
-- All V56.0 features implemented and tested ✅
-
 ### P1 (Important)
 - Code splitting for dynamic imports (1.70MB bundle)
-- Audit remaining pages for batch CSS purge collateral damage
+- More room-specific interactive simulations (I Ching coin toss, yoga guided flows)
+- Progressive content gating (lock pages behind milestone completion)
 
 ### P2 (Future)
-- Native mobile screen recording (currently shows fallback toast)
+- Native mobile screen recording
 - Phygital Marketplace NFC hooks
-- Progressive content locking (gate pages behind milestone completion)
 - Daily challenges spanning multiple modules
+- Vitality Dashboard page (optional, user's choice if they want it)
 
 ---
 
@@ -76,3 +87,4 @@ Build "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE", an esoteric, immersive fu
 - Z-axis navigation via translateZ, not vertical scrolling.
 - Sacred Geometry math: Phi (1.618), Fibonacci depth steps.
 - The "Flatland Trap": Never batch-purge 3D CSS. Each page may have unique 3D implementations.
+- InteractiveModule powers 8 pages — changes to it are system-wide.
