@@ -1548,7 +1548,7 @@ html {
   overflow-x: hidden !important;
   height: auto !important;
   min-height: 100% !important;
-  background: #06060C !important;
+  background: #0a0a12 !important;
 }
 
 body {
@@ -1958,8 +1958,8 @@ button:active:not(:disabled) {
   --accent-coral: #FB923C;
   --accent-sapphire: #3B82F6;
   --text-primary: #FFFFFF;
-  --text-secondary: #D1D5DB;
-  --text-muted: #9CA3AF;
+  --text-secondary: #E5E7EB;
+  --text-muted: #B0B8C4;
 
   /* ── Sovereign Chaos Engine Variables ── */
   --chaos-opacity: 0.5;
@@ -2298,10 +2298,7 @@ textarea,
   box-sizing: border-box;
 }
 
-/* ═══ GLOBAL TEXT READABILITY — All text readable on any background ═══ */
-#root {
-  text-shadow: 0 1px 8px rgba(0,0,0,0.8), 0 0 3px rgba(0,0,0,0.6);
-}
+/* ═══ GLOBAL TEXT READABILITY ═══ */
 #root input, #root textarea, #root select {
   text-shadow: none;
 }
@@ -2309,7 +2306,7 @@ textarea,
 body {
   margin: 0;
   font-family: 'Manrope', sans-serif;
-  background: transparent;
+  background: #0a0a12;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -3261,6 +3258,13 @@ body[data-theme="light"] .glass-card span[class*="rounded-full"] {
 /* All interactive cards get subtle color border on hover */
 .glass-card {
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ═══ CONTENT BACKING — Clean dark base, content IS the visual ═══ */
+.immersive-page,
+[data-testid*="page"],
+.min-h-screen {
+  background: #0a0a12 !important;
 }
 
 /* Enhanced scrollbar for immersive feel */

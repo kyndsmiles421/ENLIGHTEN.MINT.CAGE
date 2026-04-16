@@ -15,42 +15,42 @@ import { X, Check, Lock, Unlock } from 'lucide-react';
 // ═══ REALM SKINS — Each is a full visual identity ═══
 const SKINS = [
   // Meditation & Chakra
-  { id: 'chakra-meditation', name: 'Chakra Meditation', category: 'Meditation', accent: '#C084FC', cardTint: 'rgba(192,132,252,0.06)', borderTint: 'rgba(192,132,252,0.15)', url: 'https://images.unsplash.com/photo-1633434896425-715c2c82509a?w=1200&q=80', overlay: 'rgba(0,0,0,0.25)' },
-  { id: 'cosmic-silhouette', name: 'Cosmic Silhouette', category: 'Meditation', accent: '#A78BFA', cardTint: 'rgba(167,139,250,0.06)', borderTint: 'rgba(167,139,250,0.15)', url: 'https://images.unsplash.com/photo-1612890877530-85a8c47d968b?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'golden-meditation', name: 'Golden Meditation', category: 'Meditation', accent: '#F59E0B', cardTint: 'rgba(245,158,11,0.06)', borderTint: 'rgba(245,158,11,0.15)', url: 'https://images.unsplash.com/photo-1633942941070-0fb66452f4f7?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'chakra-meditation', name: 'Chakra Meditation', category: 'Meditation', accent: '#C084FC', cardTint: 'rgba(192,132,252,0.06)', borderTint: 'rgba(192,132,252,0.15)', url: 'https://images.unsplash.com/photo-1633434896425-715c2c82509a?w=1920&q=90', overlay: 'rgba(0,0,0,0.25)' },
+  { id: 'cosmic-silhouette', name: 'Cosmic Silhouette', category: 'Meditation', accent: '#A78BFA', cardTint: 'rgba(167,139,250,0.06)', borderTint: 'rgba(167,139,250,0.15)', url: 'https://images.unsplash.com/photo-1612890877530-85a8c47d968b?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'golden-meditation', name: 'Golden Meditation', category: 'Meditation', accent: '#F59E0B', cardTint: 'rgba(245,158,11,0.06)', borderTint: 'rgba(245,158,11,0.15)', url: 'https://images.unsplash.com/photo-1633942941070-0fb66452f4f7?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
   // Aurora
-  { id: 'aurora-green', name: 'Emerald Aurora', category: 'Aurora', accent: '#10B981', cardTint: 'rgba(16,185,129,0.06)', borderTint: 'rgba(16,185,129,0.15)', url: 'https://images.unsplash.com/photo-1610989432929-9769f3cf8006?w=1200&q=80', overlay: 'rgba(0,0,0,0.15)' },
-  { id: 'aurora-pink', name: 'Pink Aurora', category: 'Aurora', accent: '#EC4899', cardTint: 'rgba(236,72,153,0.06)', borderTint: 'rgba(236,72,153,0.15)', url: 'https://images.unsplash.com/photo-1716155705161-fcf2e13da07a?w=1200&q=80', overlay: 'rgba(0,0,0,0.18)' },
+  { id: 'aurora-green', name: 'Emerald Aurora', category: 'Aurora', accent: '#10B981', cardTint: 'rgba(16,185,129,0.06)', borderTint: 'rgba(16,185,129,0.15)', url: 'https://images.unsplash.com/photo-1610989432929-9769f3cf8006?w=1920&q=90', overlay: 'rgba(0,0,0,0.15)' },
+  { id: 'aurora-pink', name: 'Pink Aurora', category: 'Aurora', accent: '#EC4899', cardTint: 'rgba(236,72,153,0.06)', borderTint: 'rgba(236,72,153,0.15)', url: 'https://images.unsplash.com/photo-1716155705161-fcf2e13da07a?w=1920&q=90', overlay: 'rgba(0,0,0,0.18)' },
   // Crystals
-  { id: 'amethyst-glow', name: 'Amethyst Glow', category: 'Crystals', accent: '#8B5CF6', cardTint: 'rgba(139,92,246,0.08)', borderTint: 'rgba(139,92,246,0.18)', url: 'https://images.unsplash.com/photo-1728934140045-8b849067e0a8?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'crystal-cave', name: 'Crystal Cave', category: 'Crystals', accent: '#6366F1', cardTint: 'rgba(99,102,241,0.06)', borderTint: 'rgba(99,102,241,0.15)', url: 'https://images.unsplash.com/photo-1636548974452-7217d5eab8dc?w=1200&q=80', overlay: 'rgba(0,0,0,0.18)' },
+  { id: 'amethyst-glow', name: 'Amethyst Glow', category: 'Crystals', accent: '#8B5CF6', cardTint: 'rgba(139,92,246,0.08)', borderTint: 'rgba(139,92,246,0.18)', url: 'https://images.unsplash.com/photo-1728934140045-8b849067e0a8?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'crystal-cave', name: 'Crystal Cave', category: 'Crystals', accent: '#6366F1', cardTint: 'rgba(99,102,241,0.06)', borderTint: 'rgba(99,102,241,0.15)', url: 'https://images.unsplash.com/photo-1636548974452-7217d5eab8dc?w=1920&q=90', overlay: 'rgba(0,0,0,0.18)' },
   // Sacred
-  { id: 'lotus-bloom', name: 'Lotus Bloom', category: 'Sacred', accent: '#F472B6', cardTint: 'rgba(244,114,182,0.06)', borderTint: 'rgba(244,114,182,0.15)', url: 'https://images.unsplash.com/photo-1603368565782-aedb588ab683?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'buddha-garden', name: 'Buddha Garden', category: 'Sacred', accent: '#D4AF37', cardTint: 'rgba(212,175,55,0.06)', borderTint: 'rgba(212,175,55,0.15)', url: 'https://images.unsplash.com/photo-1771613934266-0f474dc34245?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'lotus-bloom', name: 'Lotus Bloom', category: 'Sacred', accent: '#F472B6', cardTint: 'rgba(244,114,182,0.06)', borderTint: 'rgba(244,114,182,0.15)', url: 'https://images.unsplash.com/photo-1603368565782-aedb588ab683?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'buddha-garden', name: 'Buddha Garden', category: 'Sacred', accent: '#D4AF37', cardTint: 'rgba(212,175,55,0.06)', borderTint: 'rgba(212,175,55,0.15)', url: 'https://images.unsplash.com/photo-1771613934266-0f474dc34245?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
   // Cosmos
-  { id: 'nebula-purple', name: 'Purple Nebula', category: 'Cosmos', accent: '#A855F7', cardTint: 'rgba(168,85,247,0.07)', borderTint: 'rgba(168,85,247,0.15)', url: 'https://images.unsplash.com/photo-1709141428125-fa4c35fa99cc?w=1200&q=80', overlay: 'rgba(0,0,0,0.15)' },
-  { id: 'cosmic-dust', name: 'Cosmic Dust', category: 'Cosmos', accent: '#3B82F6', cardTint: 'rgba(59,130,246,0.06)', borderTint: 'rgba(59,130,246,0.15)', url: 'https://images.unsplash.com/photo-1767188789418-6d531d8a89f7?w=1200&q=80', overlay: 'rgba(0,0,0,0.12)' },
+  { id: 'nebula-purple', name: 'Purple Nebula', category: 'Cosmos', accent: '#A855F7', cardTint: 'rgba(168,85,247,0.07)', borderTint: 'rgba(168,85,247,0.15)', url: 'https://images.unsplash.com/photo-1709141428125-fa4c35fa99cc?w=1920&q=90', overlay: 'rgba(0,0,0,0.15)' },
+  { id: 'cosmic-dust', name: 'Cosmic Dust', category: 'Cosmos', accent: '#3B82F6', cardTint: 'rgba(59,130,246,0.06)', borderTint: 'rgba(59,130,246,0.15)', url: 'https://images.unsplash.com/photo-1767188789418-6d531d8a89f7?w=1920&q=90', overlay: 'rgba(0,0,0,0.12)' },
   // Ocean
-  { id: 'jellyfish-purple', name: 'Jellyfish Depths', category: 'Ocean', accent: '#06B6D4', cardTint: 'rgba(6,182,212,0.06)', borderTint: 'rgba(6,182,212,0.15)', url: 'https://images.unsplash.com/photo-1771864808299-d380c14eecdb?w=1200&q=80', overlay: 'rgba(0,0,0,0.15)' },
-  { id: 'deep-blue', name: 'Deep Blue', category: 'Ocean', accent: '#0EA5E9', cardTint: 'rgba(14,165,233,0.06)', borderTint: 'rgba(14,165,233,0.15)', url: 'https://images.unsplash.com/photo-1744366071461-983202aa41c5?w=1200&q=80', overlay: 'rgba(0,0,0,0.12)' },
+  { id: 'jellyfish-purple', name: 'Jellyfish Depths', category: 'Ocean', accent: '#06B6D4', cardTint: 'rgba(6,182,212,0.06)', borderTint: 'rgba(6,182,212,0.15)', url: 'https://images.unsplash.com/photo-1771864808299-d380c14eecdb?w=1920&q=90', overlay: 'rgba(0,0,0,0.15)' },
+  { id: 'deep-blue', name: 'Deep Blue', category: 'Ocean', accent: '#0EA5E9', cardTint: 'rgba(14,165,233,0.06)', borderTint: 'rgba(14,165,233,0.15)', url: 'https://images.unsplash.com/photo-1744366071461-983202aa41c5?w=1920&q=90', overlay: 'rgba(0,0,0,0.12)' },
   // Forest
-  { id: 'sunbeam-forest', name: 'Sunbeam Forest', category: 'Forest', accent: '#22C55E', cardTint: 'rgba(34,197,94,0.06)', borderTint: 'rgba(34,197,94,0.15)', url: 'https://images.unsplash.com/photo-1768903709732-11743cca896c?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'misty-woods', name: 'Misty Woods', category: 'Forest', accent: '#059669', cardTint: 'rgba(5,150,105,0.06)', borderTint: 'rgba(5,150,105,0.15)', url: 'https://images.unsplash.com/photo-1767948156141-42785b949ed6?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'sunbeam-forest', name: 'Sunbeam Forest', category: 'Forest', accent: '#22C55E', cardTint: 'rgba(34,197,94,0.06)', borderTint: 'rgba(34,197,94,0.15)', url: 'https://images.unsplash.com/photo-1768903709732-11743cca896c?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'misty-woods', name: 'Misty Woods', category: 'Forest', accent: '#059669', cardTint: 'rgba(5,150,105,0.06)', borderTint: 'rgba(5,150,105,0.15)', url: 'https://images.unsplash.com/photo-1767948156141-42785b949ed6?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
   // Stars
-  { id: 'milky-way', name: 'Milky Way', category: 'Stars', accent: '#818CF8', cardTint: 'rgba(129,140,248,0.06)', borderTint: 'rgba(129,140,248,0.15)', url: 'https://images.unsplash.com/photo-1773760008677-938aece4d407?w=1200&q=80', overlay: 'rgba(0,0,0,0.12)' },
-  { id: 'stargazer', name: 'Stargazer', category: 'Stars', accent: '#E0E7FF', cardTint: 'rgba(224,231,255,0.04)', borderTint: 'rgba(224,231,255,0.1)', url: 'https://images.unsplash.com/photo-1580734829638-25f80443ff4f?w=1200&q=80', overlay: 'rgba(0,0,0,0.15)' },
+  { id: 'milky-way', name: 'Milky Way', category: 'Stars', accent: '#818CF8', cardTint: 'rgba(129,140,248,0.06)', borderTint: 'rgba(129,140,248,0.15)', url: 'https://images.unsplash.com/photo-1773760008677-938aece4d407?w=1920&q=90', overlay: 'rgba(0,0,0,0.12)' },
+  { id: 'stargazer', name: 'Stargazer', category: 'Stars', accent: '#E0E7FF', cardTint: 'rgba(224,231,255,0.04)', borderTint: 'rgba(224,231,255,0.1)', url: 'https://images.unsplash.com/photo-1580734829638-25f80443ff4f?w=1920&q=90', overlay: 'rgba(0,0,0,0.15)' },
   // Nature
-  { id: 'zen-pond', name: 'Zen Pond', category: 'Nature', accent: '#2DD4BF', cardTint: 'rgba(45,212,191,0.06)', borderTint: 'rgba(45,212,191,0.15)', url: 'https://images.unsplash.com/photo-1769973418397-4e2289f885c5?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'waterfall', name: 'Jungle Waterfall', category: 'Nature', accent: '#34D399', cardTint: 'rgba(52,211,153,0.06)', borderTint: 'rgba(52,211,153,0.15)', url: 'https://images.unsplash.com/photo-1682965742213-a6017eb1f750?w=1200&q=80', overlay: 'rgba(0,0,0,0.18)' },
+  { id: 'zen-pond', name: 'Zen Pond', category: 'Nature', accent: '#2DD4BF', cardTint: 'rgba(45,212,191,0.06)', borderTint: 'rgba(45,212,191,0.15)', url: 'https://images.unsplash.com/photo-1769973418397-4e2289f885c5?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'waterfall', name: 'Jungle Waterfall', category: 'Nature', accent: '#34D399', cardTint: 'rgba(52,211,153,0.06)', borderTint: 'rgba(52,211,153,0.15)', url: 'https://images.unsplash.com/photo-1682965742213-a6017eb1f750?w=1920&q=90', overlay: 'rgba(0,0,0,0.18)' },
   // Contextual (module-specific)
-  { id: 'herb-garden', name: 'Herb Garden', category: 'Contextual', accent: '#84CC16', cardTint: 'rgba(132,204,22,0.06)', borderTint: 'rgba(132,204,22,0.15)', url: 'https://images.unsplash.com/photo-1719294552069-6aee7e529f46?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'yoga-summit', name: 'Yoga Summit', category: 'Contextual', accent: '#F97316', cardTint: 'rgba(249,115,22,0.06)', borderTint: 'rgba(249,115,22,0.15)', url: 'https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=1200&q=80', overlay: 'rgba(0,0,0,0.18)' },
-  { id: 'oracle-temple', name: 'Oracle Temple', category: 'Contextual', accent: '#D97706', cardTint: 'rgba(217,119,6,0.07)', borderTint: 'rgba(217,119,6,0.15)', url: 'https://images.unsplash.com/photo-1699817674427-d053cf057c0b?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'aromatherapy-spa', name: 'Aromatherapy Spa', category: 'Contextual', accent: '#F59E0B', cardTint: 'rgba(245,158,11,0.05)', borderTint: 'rgba(245,158,11,0.12)', url: 'https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'star-observatory', name: 'Star Observatory', category: 'Contextual', accent: '#F97316', cardTint: 'rgba(249,115,22,0.06)', borderTint: 'rgba(249,115,22,0.15)', url: 'https://images.unsplash.com/photo-1604423477447-70dd36d47c61?w=1200&q=80', overlay: 'rgba(0,0,0,0.12)' },
-  { id: 'ancient-library', name: 'Ancient Library', category: 'Contextual', accent: '#B45309', cardTint: 'rgba(180,83,9,0.06)', borderTint: 'rgba(180,83,9,0.15)', url: 'https://images.unsplash.com/photo-1722182877533-7378b60bf1e8?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'nourish-bowl', name: 'Nourish Kitchen', category: 'Contextual', accent: '#65A30D', cardTint: 'rgba(101,163,13,0.06)', borderTint: 'rgba(101,163,13,0.12)', url: 'https://images.unsplash.com/photo-1567575990843-105a1c70d76e?w=1200&q=80', overlay: 'rgba(0,0,0,0.2)' },
-  { id: 'lavender-field', name: 'Lavender Field', category: 'Contextual', accent: '#A855F7', cardTint: 'rgba(168,85,247,0.06)', borderTint: 'rgba(168,85,247,0.15)', url: 'https://images.unsplash.com/photo-1633527912957-ef20ddcb9d1d?w=1200&q=80', overlay: 'rgba(0,0,0,0.18)' },
+  { id: 'herb-garden', name: 'Herb Garden', category: 'Contextual', accent: '#84CC16', cardTint: 'rgba(132,204,22,0.06)', borderTint: 'rgba(132,204,22,0.15)', url: 'https://images.unsplash.com/photo-1568284652231-d53ae13b4a54?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'yoga-summit', name: 'Yoga Summit', category: 'Contextual', accent: '#F97316', cardTint: 'rgba(249,115,22,0.06)', borderTint: 'rgba(249,115,22,0.15)', url: 'https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=1920&q=90', overlay: 'rgba(0,0,0,0.18)' },
+  { id: 'oracle-temple', name: 'Oracle Temple', category: 'Contextual', accent: '#D97706', cardTint: 'rgba(217,119,6,0.07)', borderTint: 'rgba(217,119,6,0.15)', url: 'https://images.unsplash.com/photo-1699817674427-d053cf057c0b?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'aromatherapy-spa', name: 'Aromatherapy Spa', category: 'Contextual', accent: '#F59E0B', cardTint: 'rgba(245,158,11,0.05)', borderTint: 'rgba(245,158,11,0.12)', url: 'https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'star-observatory', name: 'Star Observatory', category: 'Contextual', accent: '#F97316', cardTint: 'rgba(249,115,22,0.06)', borderTint: 'rgba(249,115,22,0.15)', url: 'https://images.unsplash.com/photo-1604423477447-70dd36d47c61?w=1920&q=90', overlay: 'rgba(0,0,0,0.12)' },
+  { id: 'ancient-library', name: 'Ancient Library', category: 'Contextual', accent: '#B45309', cardTint: 'rgba(180,83,9,0.06)', borderTint: 'rgba(180,83,9,0.15)', url: 'https://images.unsplash.com/photo-1722182877533-7378b60bf1e8?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'nourish-bowl', name: 'Nourish Kitchen', category: 'Contextual', accent: '#65A30D', cardTint: 'rgba(101,163,13,0.06)', borderTint: 'rgba(101,163,13,0.12)', url: 'https://images.unsplash.com/photo-1577594412925-39643a5fa813?w=1920&q=90', overlay: 'rgba(0,0,0,0.2)' },
+  { id: 'lavender-field', name: 'Lavender Field', category: 'Contextual', accent: '#A855F7', cardTint: 'rgba(168,85,247,0.06)', borderTint: 'rgba(168,85,247,0.15)', url: 'https://images.unsplash.com/photo-1633527912957-ef20ddcb9d1d?w=1920&q=90', overlay: 'rgba(0,0,0,0.18)' },
   // Void
   { id: 'void', name: 'Void (Default)', category: 'Minimal', accent: '#8B5CF6', cardTint: 'rgba(255,255,255,0.02)', borderTint: 'rgba(255,255,255,0.06)', url: null, overlay: null },
 ];
@@ -223,11 +223,6 @@ export function SceneProvider({ children }) {
 
   return (
     <SceneContext.Provider value={ctx}>
-      {activeSkin.url && (
-        <div data-testid="realm-scene-bg" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', transition: 'opacity 0.5s ease' }}>
-          <img src={activeSkin.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 1, transition: 'opacity 0.8s ease' }} />
-        </div>
-      )}
       <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
       <AnimatePresence>
         {pickerOpen && <SkinPicker onClose={() => setPickerOpen(false)} />}
