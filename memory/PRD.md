@@ -1,31 +1,35 @@
-# ENLIGHTEN.MINT.CAFE — V53.8 ZERO-STACK ARCHITECTURE
+# ENLIGHTEN.MINT.CAFE — V54.0 INTERACTIVE MODULE ARCHITECTURE
 ## Last Verified: April 16, 2026
 
-### V53.8: Zero-Stack — No Modals, No Overlays, No Z-Index Boxes
-- **ALL fixed overlay patterns purged** from every page and component file
-- **DeepDive.js rewritten**: From fixed z-50 modal to in-place height expansion
-- **ContemplationModal**: Converted to in-place expansion within page flow
-- **ALL backdropFilter:blur removed** from all pages and components
-- **ALL inline dark backgrounds removed** across entire codebase
-- **glass-card class removed** from all JSX files
-- **Star Chart**: constellation-visual canvas renders star patterns
-- **53+ routes verified**, 0 crashes, 0 fixed overlays found (except mixer nav)
+### V54.0: Content IS The Interface
+- **InteractiveModule.js**: Universal component for ALL learning modules
+  - Visual tiles with color identity per item
+  - Tap-to-expand in-place (ZERO-STACK, no overlays)
+  - Search bar, filter tabs, mastery progress bar
+  - DeepDive AI on every item, NarrationPlayer on every item
+  - XP rewards (+5 per interaction), mastery levels (Novice→Student→Adept→Master)
+- **ExplorationReward.js**: Gamification — XP toast, streak badge, level progress
+- **SceneEngine backdrop REMOVED** — dark base (#0a0a12), content IS the visual
+- **7 pages rebuilt**: Nourishment, Crystals, Herbology, Aromatherapy, Elixirs, Acupressure, MealPlanning
+- **100% test pass** (Iteration 336)
 
-### ZERO-STACK DIRECTIVE (DO NOT VIOLATE)
-- NO position:fixed with z-index >= 50 (except mixer nav)
-- NO modals. NO dialogs. NO popups.
-- NO backdrop-filter blur on ANY content element
-- NO dark backgrounds blocking the SceneEngine
-- Content EXPANDS IN-PLACE using height animation
-- The background IS the interface
-- When you tap something, the world BECOMES that thing
+### Rebuilt Pages
+| Page | Items | Filters | API |
+|------|-------|---------|-----|
+| Nourishment | 8 | Category (drinks/meals) | /api/nourishment |
+| Crystals | 12 | Chakra (7 types) | /api/crystals |
+| Herbology | 12 | Body System (5 types) | /api/herbology/herbs |
+| Aromatherapy | 12 | Element (5 types) | /api/aromatherapy/oils |
+| Elixirs | 10 | Category (5 types) | /api/elixirs/all |
+| Acupressure | 10 | Meridian (5 types) | /api/acupressure/points |
+| MealPlanning | 5 plans | Plan→Meal expansion | /api/meals/plans |
 
-### Architecture
-- SceneEngine: position:fixed z-index:0 — full-bleed background, NO overlay
-- Content: position:relative z-index:1 — transparent, flows naturally
-- Interaction: AnimatePresence + height:auto — in-place expansion
-- Mixer: Bottom nav bar — the ONE exception for fixed positioning
+### ZERO-STACK DIRECTIVE
+- NO overlays, NO modals, NO z-index boxes
+- Content expands IN-PLACE
+- DeepDive expands below trigger button
+- Background is dark (#0a0a12), text is white, items have color identity
 
 ### Upcoming
-- MediaVault (P1)
-- Phygital NFC (P2)
+- Apply InteractiveModule to remaining pages (Breathing, Yoga, Mudras, Mantras, etc.)
+- Phygital NFC hooks (P2)
