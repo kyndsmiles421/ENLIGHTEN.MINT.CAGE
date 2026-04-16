@@ -1,0 +1,113 @@
+{
+  "summary": "ENLIGHTEN.MINT.CAFE V54.5 Global Spatial Engine Testing Complete. SpatialRouter auto-wraps all pages correctly. Reiki (10 positions), Mudras (25), Mantras (3) all work with InteractiveModule. YOGA has a BUG: 7 styles load but poses don't expand (API returns styles without poses, frontend needs to fetch full style). Spatial rooms display correct names (Yoga Studio, Crystal Chamber, Oracle Chamber). Avatar badge with [x,y] coordinates and 9-segment depth indicator visible on all pages. Proximity glow working. 52/52 routes pass. Mixer 10 tabs work. Nourishment 8 items, Crystals 12 items work.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Yoga.js",
+        "issue": "Poses don't load when clicking a yoga style. The /api/yoga/styles endpoint returns styles WITHOUT poses (sequences stripped). Frontend sets activeStyle from the list which has no poses. Need to fetch /api/yoga/style/{style_id} when a style is selected to get full data with sequences/poses.",
+        "selector": "[data-testid='style-hatha']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_337.json"
+  ],
+  "action_items": [
+    "FIX YOGA.JS: When a style is clicked (setActiveStyle), fetch /api/yoga/style/{style_id} to get full style data with sequences/poses instead of using the style from the list"
+  ],
+  "critical_code_review_comments": [
+    "Yoga.js line 100: axios.get(`${API}/yoga/styles`) returns styles without poses",
+    "Yoga.js line 125: (activeStyle.poses || []).map() expects poses but they're not in the style object",
+    "Yoga.js line 138: onSelect={setActiveStyle} sets style from list (no poses) instead of fetching full style",
+    "Backend avatar_yoga.py line 239: styles = [{k: v for k, v in s.items() if k != 'sequences'} for s in YOGA_STYLES] - intentionally strips sequences",
+    "Backend has /api/yoga/style/{style_id} endpoint that returns full style with sequences/poses"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (all APIs return data)",
+    "frontend": "95% (Yoga poses bug)"
+  },
+  "test_credentials": "test_v29_user@test.com / testpass123",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "V54.5 Spatial Engine verified. SpatialRouter wraps all pages. Reiki/Mudras/Mantras use InteractiveModule correctly. YOGA BUG: styles load but poses don't - frontend needs to fetch /api/yoga/style/{id} when style clicked. Proximity glow works. 52 routes pass. Mixer 10 tabs work.",
+  "tests_executed": [
+    {
+      "test": "YOGA /yoga",
+      "result": "PARTIAL",
+      "details": "7 styles load correctly. Clicking Hatha expands but shows 'POSES (0)'. Bug: frontend doesn't fetch full style data with poses."
+    },
+    {
+      "test": "REIKI /reiki",
+      "result": "PASS",
+      "details": "10 positions load (API returns 10), chakra filters work (Crown, Third_eye, Throat, Heart, Solar, Sacral, Root), tap expands with placement+intention+sensations, DeepDive+Listen buttons present, +5 XP on expand"
+    },
+    {
+      "test": "MUDRAS /mudras",
+      "result": "PASS",
+      "details": "25 mudras load, element filters work (All, Air, All Five, Fire, Earth+Water, Earth+Ether), tap Gyan Mudra expands with benefits, DeepDive+Listen buttons present"
+    },
+    {
+      "test": "MANTRAS /mantras",
+      "result": "PASS",
+      "details": "3 mantras load, category filters work (All, Chinese, Connection, Gates), tap expands with Chant+Explore meaning buttons"
+    },
+    {
+      "test": "SPATIAL ROOMS",
+      "result": "PASS",
+      "details": "/yoga shows 'Yoga Studio', /crystals shows 'Crystal Chamber', /oracle shows 'Oracle Chamber'. Room themes applied correctly."
+    },
+    {
+      "test": "AVATAR BADGE",
+      "result": "PASS",
+      "details": "Visible on all pages with [x,y] coordinates (e.g., [4,0]) and 9-segment depth indicator. Updates on scroll."
+    },
+    {
+      "test": "PROXIMITY GLOW",
+      "result": "PASS",
+      "details": "Items have data-proximity attribute (active/near/far). Active octant items have left border glow (2px solid rgba). Proximity changes on scroll."
+    },
+    {
+      "test": "NOURISHMENT /nourishment",
+      "result": "PASS",
+      "details": "8 items load, search works (filtered to 1 with 'Golden'), filter tabs present (All, Elixirs & Drinks, Sacred Meals)"
+    },
+    {
+      "test": "CRYSTALS /crystals",
+      "result": "PASS",
+      "details": "12 crystals load, chakra filters work, spatial room 'crystals' (HOLLOW_EARTH realm) applied"
+    },
+    {
+      "test": "MIXER",
+      "result": "PASS",
+      "details": "All 10 tabs work: orbit, mix, rec, audio, text, layer, fx, ai, out, me"
+    },
+    {
+      "test": "50+ ROUTE SWEEP",
+      "result": "PASS",
+      "details": "52/52 routes load without crash. Minor: CanceledError on rapid navigation (expected), ChunkLoadError for SpiritualCoach caught by error boundary"
+    },
+    {
+      "test": "BREATHING /breathing",
+      "result": "PASS",
+      "details": "Spatial room 'breathing' (AIR realm) applied, 'Breath Chamber' displayed, video section accessible by scrolling"
+    }
+  ],
+  "api_verification": {
+    "/api/yoga/styles": "200 OK - 7 styles (without poses)",
+    "/api/yoga/style/hatha": "200 OK - full style with sequences/poses",
+    "/api/reiki/positions": "200 OK - 10 positions",
+    "/api/mudras": "200 OK - 25 mudras",
+    "/api/mantras": "200 OK - 3 mantras",
+    "/api/nourishment": "200 OK - 8 items",
+    "/api/crystals": "200 OK - 12 crystals"
+  }
+}

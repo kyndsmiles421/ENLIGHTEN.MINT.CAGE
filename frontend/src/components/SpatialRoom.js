@@ -165,32 +165,43 @@ function DepthParticles({ color, count = 16 }) {
 }
 
 /**
- * ProximityRevealWrapper — Wraps each child and fades it based on scroll proximity.
- * Simulates "walking toward" content in Z-space.
+ * ProximityItem — Wraps each child with scroll-based Z-reveal + proximity glow.
+ * Items in the active octant PULSE with a glow border.
+ * Items approaching the avatar EXTRUDE forward (translateZ toward user).
  */
-export function ProximityItem({ index, children, totalItems }) {
+export function ProximityItem({ index, children, totalItems, color }) {
   const spatial = useSpatial();
   if (!spatial) return <div>{children}</div>;
 
-  const { scrollProgress } = spatial;
+  const { scrollProgress, theme } = spatial;
   const itemProgress = totalItems > 1 ? index / (totalItems - 1) : 0;
   const distance = Math.abs(scrollProgress - itemProgress);
-  
-  // Items close to current scroll position are fully visible and slightly scaled up
-  const opacity = distance < 0.15 ? 1 : distance < 0.3 ? 0.75 : distance < 0.5 ? 0.5 : 0.3;
-  const scale = distance < 0.15 ? 1.0 : distance < 0.3 ? 0.98 : 0.96;
-  const translateZ = distance < 0.15 ? 0 : distance < 0.3 ? -10 : -20;
+  const itemColor = color || theme?.accent || '#A78BFA';
+
+  // Active octant = within 1/9th of total scroll
+  const isActive = distance < (1 / GRID_SIZE);
+  const isNear = distance < (2 / GRID_SIZE);
+
+  // Proximity-based values
+  const opacity = isActive ? 1 : isNear ? 0.8 : distance < 0.4 ? 0.55 : 0.3;
+  const scale = isActive ? 1.01 : isNear ? 0.99 : 0.97;
+  const translateZ = isActive ? 8 : isNear ? 0 : -15; // Active items push TOWARD user
 
   return (
-    <motion.div
+    <div
       style={{
         opacity,
         transform: `scale(${scale}) translateZ(${translateZ}px)`,
-        transition: 'opacity 0.4s, transform 0.4s',
+        transition: 'opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease',
+        borderLeft: isActive ? `2px solid ${itemColor}40` : '2px solid transparent',
+        boxShadow: isActive ? `0 0 20px ${itemColor}08, inset 0 0 12px ${itemColor}04` : 'none',
+        borderRadius: isActive ? '8px' : '0px',
+        paddingLeft: isActive ? '4px' : '0px',
       }}
+      data-proximity={isActive ? 'active' : isNear ? 'near' : 'far'}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
