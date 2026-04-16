@@ -487,7 +487,7 @@ export default function SuanpanMixer() {
 
       {/* ━━━ HEADER ━━━ */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b z-[10000]"
-        style={{ borderColor: 'rgba(248,250,252,0.05)', background: 'rgba(6,6,14,0.96)', backdropFilter: 'blur(12px)' }}>
+        style={{ borderColor: 'rgba(248,250,252,0.05)', background: 'rgba(6,6,14,0.96)', backdropFilter: 'none'}}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/hub')} className="p-1.5 rounded-lg"
             style={{ background: 'rgba(248,250,252,0.03)' }} data-testid="director-back-btn">
@@ -1080,7 +1080,7 @@ export default function SuanpanMixer() {
       <AnimatePresence>
         {showProjects && (
           <motion.div className="fixed top-0 right-0 h-full z-[10001] w-64 flex flex-col"
-            style={{ background: 'rgba(6,6,14,0.97)', backdropFilter: 'blur(20px)', borderLeft: '1px solid rgba(248,250,252,0.05)' }}
+            style={{ background: 'rgba(6,6,14,0.97)', backdropFilter: 'none', borderLeft: '1px solid rgba(248,250,252,0.05)' }}
             initial={{ x: 260 }} animate={{ x: 0 }} exit={{ x: 260 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }} data-testid="projects-panel">
             <div className="flex items-center justify-between p-3 border-b" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>

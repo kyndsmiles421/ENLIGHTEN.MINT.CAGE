@@ -106,7 +106,7 @@ export function OrbitalTransitionPortal() {
               className="relative flex items-center gap-1 rounded-full transition-all"
               style={{
                 padding: isCurrent ? '5px 12px' : '5px 8px',
-                background: isCurrent ? `${page.color}12` : 'rgba(10,10,18,0.6)',
+                background: isCurrent ? `${page.color}12` : 'rgba(0,0,0,0)',
                 border: `1px solid ${isCurrent ? page.color + '30' : 'rgba(248,250,252,0.04)'}`,
                 backdropFilter: 'blur(12px)',
               }}

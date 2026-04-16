@@ -1023,7 +1023,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
               className={`fixed z-50 rounded-t-2xl ${fullScreen ? 'inset-x-0 bottom-0' : 'bottom-0 left-0 right-0'}`}
               onClick={(e) => e.stopPropagation()}
               style={{
-                background: 'rgba(8,8,18,0.98)',
+                background: 'rgba(0,0,0,0)',
                 border: '1px solid rgba(192,132,252,0.1)',
                 borderBottom: 'none',
                 backdropFilter: 'blur(32px)',
@@ -1035,7 +1035,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
 
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3 sticky top-0 z-10"
-                style={{ background: 'rgba(8,8,18,0.98)', borderBottom: '1px solid rgba(192,132,252,0.06)' }}>
+                style={{ background: 'rgba(0,0,0,0)', borderBottom: '1px solid rgba(192,132,252,0.06)' }}>
                 <div className="flex items-center gap-2">
                   <Sliders size={14} style={{ color: '#C084FC' }} />
                   <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#C084FC' }}>

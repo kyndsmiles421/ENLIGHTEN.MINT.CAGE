@@ -65,7 +65,7 @@ function OrbitalNode({ node, x, y, isActive, isLocked, onSelect, onHover, hovere
       {/* Sphere hitbox — exclusive interaction target */}
       <div className="w-full h-full rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-300"
         style={{
-          background: isActive ? `${node.color}15` : isHovered ? `${node.color}10` : 'rgba(10,10,18,0.55)',
+          background: isActive ? `${node.color}15` : isHovered ? `${node.color}10` : 'rgba(0,0,0,0)',
           border: `${isActive ? '1.5px' : '1px'} solid ${isActive ? node.color + '50' : isHovered ? node.color + '40' : node.color + '12'}`,
           boxShadow: isActive ? `0 0 28px ${node.color}20, inset 0 0 12px ${node.color}08` : 'none',
           backdropFilter: 'blur(10px)',
@@ -106,7 +106,7 @@ function CenterSun({ sun, containerCenter, onBack, depth }) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 80, damping: 16 }}
         style={{
-          background: `radial-gradient(circle, ${sun.color}12 0%, rgba(10,10,18,0.7) 70%)`,
+          background: `radial-gradient(circle, ${sun.color}12 0%, rgba(0,0,0,0) 70%)`,
           border: `1.5px solid ${sun.color}30`,
           boxShadow: `0 0 40px ${sun.color}15, inset 0 0 20px ${sun.color}08`,
           backdropFilter: 'blur(16px)',
@@ -137,7 +137,7 @@ function CenterSun({ sun, containerCenter, onBack, depth }) {
         <motion.button
           className="absolute -top-3 -left-3 w-6 h-6 rounded-full flex items-center justify-center z-30"
           style={{
-            background: 'rgba(10,10,18,0.8)',
+            background: 'rgba(0,0,0,0)',
             border: '1px solid rgba(248,250,252,0.1)',
           }}
           onClick={(e) => { e.stopPropagation(); onBack(); }}

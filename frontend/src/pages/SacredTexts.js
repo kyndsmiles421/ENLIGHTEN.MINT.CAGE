@@ -357,7 +357,7 @@ function TextCard({ text, onSelect, index }) {
       onClick={() => onSelect(text)}
       data-testid={`text-card-${text.id}`}
       className="rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'none'}}
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
@@ -461,7 +461,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
 
   return (
     <div ref={readerRef} className="mt-4 rounded-2xl overflow-hidden" data-testid="inline-reader"
-      style={{ background: 'rgba(8,10,18,0.7)', border: `1px solid ${text.color}15`, backdropFilter: 'blur(8px)' }}>
+      style={{ background: 'rgba(8,10,18,0.7)', border: `1px solid ${text.color}15`, backdropFilter: 'none'}}>
 
       {/* Reader header */}
       <div className="px-5 py-4 flex items-center justify-between"
@@ -630,7 +630,7 @@ function ChapterRowItem({ index, style, text, chapters, onGenerate, onRead, onVR
           transition={{ delay: Math.min(index * 0.03, 0.3) }}
           data-testid={`chapter-${ch.id}`}
           className="rounded-xl p-4 cursor-pointer group relative overflow-hidden"
-          style={{ background: ch.generated ? 'rgba(15,17,28,0.4)' : 'rgba(15,17,28,0.3)', border: `1px solid ${ch.generated ? text.color + '12' : 'rgba(248,250,252,0.04)'}`, height: 64 }}
+          style={{ background: ch.generated ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0)', border: `1px solid ${ch.generated ? text.color + '12' : 'rgba(248,250,252,0.04)'}`, height: 64 }}
           onClick={() => ch.generated ? onRead(ch) : onGenerate(ch)}
           whileHover={{ x: 4, transition: { duration: 0.15 } }}
         >
@@ -881,7 +881,7 @@ export default function SacredTexts() {
           <input type="text" placeholder="Search by title, tradition, or region..."
             value={searchQuery} onChange={e => setSearchQuery(e.target.value)} data-testid="sacred-search"
             className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs"
-            style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
+            style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
               <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
@@ -918,7 +918,7 @@ export default function SacredTexts() {
             {selectedText && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
                 className="w-full lg:w-2/3 lg:sticky lg:top-24 lg:max-h-[80vh] lg:overflow-y-auto">
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${selectedText.color}15`, backdropFilter: 'blur(12px)' }}>
+                <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent', border: `1px solid ${selectedText.color}15`, backdropFilter: 'none'}}>
                   {/* Header */}
                   <div className="p-6 pb-4 relative overflow-hidden"
                     style={{ background: `linear-gradient(180deg, ${selectedText.color}08 0%, transparent 100%)` }}>

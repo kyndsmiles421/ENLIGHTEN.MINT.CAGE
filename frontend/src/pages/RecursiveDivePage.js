@@ -52,7 +52,7 @@ export default function RecursiveDivePage() {
             style={{
               background: 'rgba(0,0,0,0.4)',
               color: 'rgba(255,255,255,0.7)',
-              backdropFilter: 'blur(10px)',
+              backdropFilter: 'none',
             }}
           >
             <ArrowLeft size={16} />
@@ -67,7 +67,7 @@ export default function RecursiveDivePage() {
               style={{
                 background: showSeeds ? 'rgba(255,215,0,0.2)' : 'rgba(0,0,0,0.4)',
                 color: showSeeds ? '#FFD700' : 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(10px)',
+                backdropFilter: 'none',
                 border: `1px solid ${showSeeds ? 'rgba(255,215,0,0.3)' : 'transparent'}`,
               }}
             >
@@ -82,7 +82,7 @@ export default function RecursiveDivePage() {
               style={{
                 background: showInfo ? 'rgba(100,149,237,0.2)' : 'rgba(0,0,0,0.4)',
                 color: showInfo ? '#6495ED' : 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(10px)',
+                backdropFilter: 'none',
               }}
             >
               <Info size={16} />
@@ -98,7 +98,7 @@ export default function RecursiveDivePage() {
             className="fixed top-20 right-4 z-40 w-80 p-4 rounded-xl"
             style={{
               background: 'rgba(0,0,0,0.8)',
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
               border: '1px solid rgba(100,149,237,0.3)',
             }}
             initial={{ opacity: 0, x: 20 }}
@@ -139,7 +139,7 @@ export default function RecursiveDivePage() {
             className="fixed top-20 right-4 z-40 w-80 max-h-[60vh] overflow-y-auto p-4 rounded-xl"
             style={{
               background: 'rgba(0,0,0,0.8)',
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
               border: '1px solid rgba(255,215,0,0.3)',
             }}
             initial={{ opacity: 0, x: 20 }}

@@ -111,7 +111,7 @@ export default function CollectiveShadowMap() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
         className="rounded-xl overflow-hidden relative"
         style={{
-          background: 'rgba(10,10,18,0.6)',
+          background: 'rgba(0,0,0,0)',
           border: '1px solid rgba(139,92,246,0.1)',
           height: '280px',
         }}
@@ -150,7 +150,7 @@ export default function CollectiveShadowMap() {
         {/* Map label */}
         <div className="absolute bottom-2 left-2">
           <span className="text-[7px] px-1.5 py-0.5 rounded-full"
-            style={{ background: 'rgba(10,10,18,0.8)', color: 'var(--text-muted)', border: '1px solid rgba(248,250,252,0.06)' }}>
+            style={{ background: 'rgba(0,0,0,0)', color: 'var(--text-muted)', border: '1px solid rgba(248,250,252,0.06)' }}>
             <Globe size={7} className="inline mr-1" />
             {hotspots.length} active regions
           </span>

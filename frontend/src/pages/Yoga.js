@@ -143,7 +143,7 @@ function YogaAvatarMini({ avatarConfig, poseName, color }) {
   }, [draw]);
 
   return (
-    <div className="rounded-xl overflow-hidden" style={{ width: 180, height: 220, background: 'rgba(5,5,12,0.95)', border: `1px solid ${avatarConfig?.aura_color || color}15` }}
+    <div className="rounded-xl overflow-hidden" style={{ width: 180, height: 220, background: 'rgba(0,0,0,0)', border: `1px solid ${avatarConfig?.aura_color || color}15` }}
       data-testid="yoga-avatar-mini">
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
     </div>

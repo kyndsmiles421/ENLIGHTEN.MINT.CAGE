@@ -44,7 +44,7 @@ export default function FeaturedVideos({ category, color = '#2DD4BF', title = 'R
             }}
             data-testid="featured-video-player"
           >
-            <div className="flex items-center justify-between p-3" style={{ background: 'rgba(6,6,12,0.9)', borderBottom: `1px solid ${color}20` }}>
+            <div className="flex items-center justify-between p-3" style={{ background: 'rgba(0,0,0,0)', borderBottom: `1px solid ${color}20` }}>
               <div>
                 <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color }}>{title}</p>
                 <p className="text-sm font-medium text-white/90">{playing.title}</p>
@@ -75,7 +75,7 @@ export default function FeaturedVideos({ category, color = '#2DD4BF', title = 'R
           <button key={v.id} onClick={() => setPlaying(v)}
             className="flex-shrink-0 w-64 text-left rounded-2xl overflow-hidden cursor-pointer group active:scale-[0.97] transition-transform"
             style={{
-              background: 'rgba(6,6,12,0.6)',
+              background: 'rgba(0,0,0,0)',
               border: `1px solid ${playing?.id === v.id ? `${color}40` : 'rgba(255,255,255,0.06)'}`,
               boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
             }}

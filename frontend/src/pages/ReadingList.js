@@ -18,7 +18,7 @@ function BookCard({ book, onSave, onComplete }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl p-5 transition-all"
-      style={{ background: 'rgba(15,17,28,0.5)', border: `1px solid ${book.color}10`, backdropFilter: 'blur(12px)' }}
+      style={{ background: 'transparent', border: `1px solid ${book.color}10`, backdropFilter: 'none'}}
       data-testid={`book-card-${book.id}`}>
       <div className="flex items-start gap-4">
         <div className="w-11 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
@@ -196,7 +196,7 @@ export default function ReadingList() {
 
         {/* AI Recommendation */}
         <div className="rounded-2xl p-5 mb-8"
-          style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(251,146,60,0.1)' }}>
+          style={{ background: 'transparent', border: '1px solid rgba(251,146,60,0.1)' }}>
           <p className="text-xs font-medium mb-2 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <Sparkles size={12} style={{ color: '#FB923C' }} /> Ask the Cosmic Librarian
           </p>
@@ -209,7 +209,7 @@ export default function ReadingList() {
               placeholder="e.g. I'm drawn to meditation and want to understand consciousness..."
               data-testid="ai-reading-input"
               className="flex-1 text-xs rounded-xl px-4 py-2.5 outline-none"
-              style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }} />
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }} />
             <button onClick={getAiRecommendation} disabled={aiLoading}
               data-testid="ai-reading-btn"
               className="px-3 py-2 rounded-xl transition-all"
@@ -235,7 +235,7 @@ export default function ReadingList() {
               placeholder="Search books, authors, traditions..."
               data-testid="reading-search"
               className="w-full text-xs rounded-xl pl-10 pr-4 py-3 outline-none"
-              style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }} />
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-primary)' }} />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
             {['all', 'foryou', 'saved', 'completed'].map(v => (

@@ -234,7 +234,7 @@ export default function GrowthTimeline() {
                   onClick={() => navigate(h.page)}
                   data-testid={`highlight-${i}`}
                   className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all hover:scale-[1.005]"
-                  style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: h.color }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{h.label}</p>

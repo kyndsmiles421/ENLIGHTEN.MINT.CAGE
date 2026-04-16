@@ -67,7 +67,7 @@ function RecenterButton({ center }) {
     <button
       onClick={() => map.flyTo(center, 15)}
       className="absolute top-3 right-3 z-[1000] w-8 h-8 rounded-lg flex items-center justify-center"
-      style={{ background: 'rgba(15,15,25,0.8)', backdropFilter: 'blur(8px)', border: '1px solid rgba(251,191,36,0.15)' }}
+      style={{ background: 'rgba(15,15,25,0.8)', backdropFilter: 'none', border: '1px solid rgba(251,191,36,0.15)' }}
       data-testid="recenter-btn"
     >
       <Navigation size={12} style={{ color: '#FBBF24' }} />
@@ -310,7 +310,7 @@ export default function CosmicMap() {
           icon: '👑',
           duration: 6000,
           style: {
-            background: 'rgba(10,10,18,0.95)',
+            background: 'rgba(0,0,0,0)',
             border: '1px solid rgba(251,191,36,0.25)',
             color: '#FBBF24',
           },
@@ -640,7 +640,7 @@ export default function CosmicMap() {
         {layer === 'ground' && decayStatus?.at_risk && (
           <motion.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ duration: decayStatus.pulse_speed || 1.5, repeat: Infinity }}
             className="mb-2 px-3 py-1.5 rounded-lg pointer-events-auto"
-            style={{ background: 'rgba(239,68,68,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(239,68,68,0.2)' }}
+            style={{ background: 'rgba(239,68,68,0.12)', backdropFilter: 'none', border: '1px solid rgba(239,68,68,0.2)' }}
             data-testid="decay-warning">
             <p className="text-[8px] text-center" style={{ color: '#EF4444' }}>
               Resonance Decay: {decayStatus.days_inactive?.toFixed(1)}d inactive
@@ -650,7 +650,7 @@ export default function CosmicMap() {
         {layer === 'celestial' && celestialDecay?.quadratic_decay_active && (
           <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: celestialDecay.pulse_speed || 1, repeat: Infinity }}
             className="mb-2 px-3 py-1.5 rounded-lg pointer-events-auto"
-            style={{ background: 'rgba(139,92,246,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(139,92,246,0.2)' }}
+            style={{ background: 'rgba(139,92,246,0.12)', backdropFilter: 'none', border: '1px solid rgba(139,92,246,0.2)' }}
             data-testid="celestial-decay-warning">
             <p className="text-[8px] text-center" style={{ color: '#A78BFA' }}>
               Celestial Decay (t²): {celestialDecay.days_inactive?.toFixed(1)}d — {(celestialDecay.decay_factor * 100).toFixed(1)}% retained
@@ -662,7 +662,7 @@ export default function CosmicMap() {
         <div className="rounded-xl px-3 py-2 pointer-events-auto"
           style={{
             background: layer === 'ground' ? 'rgba(15,15,25,0.7)' : 'rgba(5,5,16,0.85)',
-            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            backdropFilter: 'none', WebkitBackdropFilter: 'none',
             border: `1px solid ${layer === 'ground' ? 'rgba(248,250,252,0.06)' : 'rgba(139,92,246,0.12)'}`,
           }}
           data-testid="map-hud">
@@ -770,8 +770,8 @@ export default function CosmicMap() {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="absolute top-28 right-3 z-[1001] w-56 rounded-xl p-3 space-y-2"
             style={{
-              background: 'rgba(10,10,18,0.9)',
-              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              background: 'rgba(0,0,0,0)',
+              backdropFilter: 'none', WebkitBackdropFilter: 'none',
               border: '1px solid rgba(45,212,191,0.12)',
             }}
             data-testid="coven-panel">
@@ -949,7 +949,7 @@ export default function CosmicMap() {
             className="absolute bottom-0 left-0 right-0 z-[1001] rounded-t-2xl px-4 pt-4 pb-8"
             style={{
               background: layer === 'celestial' ? 'rgba(5,5,16,0.92)' : 'rgba(15,15,25,0.85)',
-              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              backdropFilter: 'none', WebkitBackdropFilter: 'none',
               borderTop: `2px solid ${(selectedNode.color || '#FBBF24')}40`,
             }}
             data-testid="node-detail-panel">

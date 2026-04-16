@@ -38,11 +38,11 @@ function UploadForm({ onUploaded, authHeaders }) {
     setUploading(false);
   };
 
-  const inputStyle = { background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
+  const inputStyle = { background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
 
   return (
     <div className="rounded-2xl p-5 mb-6" data-testid="upload-form"
-      style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(59,130,246,0.1)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(59,130,246,0.1)' }}>
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#3B82F6' }}>
         <Upload size={12} className="inline mr-1" /> Upload Media
       </p>
@@ -87,7 +87,7 @@ function MediaCard({ item, onDelete }) {
 
   return (
     <div className="rounded-xl p-4" data-testid={`media-${item.id}`}
-      style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.06)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {isAudio ? <FileAudio size={14} style={{ color: '#3B82F6' }} /> : <Video size={14} style={{ color: '#8B5CF6' }} />}

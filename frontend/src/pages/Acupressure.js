@@ -14,9 +14,9 @@ function PointCard({ point, onSelect, selected }) {
       onClick={() => onSelect(point)} className="cursor-pointer rounded-2xl p-5 transition-all"
       data-testid={`point-card-${point.id}`}
       style={{
-        background: selected?.id === point.id ? `linear-gradient(135deg, ${point.color}22, ${point.color}08)` : 'rgba(15,17,28,0.6)',
+        background: selected?.id === point.id ? `linear-gradient(135deg, ${point.color}22, ${point.color}08)` : 'rgba(0,0,0,0)',
         border: `1px solid ${selected?.id === point.id ? point.color + '55' : 'rgba(248,250,252,0.06)'}`,
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
       }}>
       <div className="flex items-center gap-3 mb-3">
         <div className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -43,7 +43,7 @@ function PointDetail({ point, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="rounded-2xl p-6 mb-6" data-testid="point-detail"
-      style={{ background: 'rgba(15,17,28,0.85)', border: `1px solid ${point.color}30`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${point.color}30`, backdropFilter: 'none'}}>
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{point.name}</h3>
@@ -93,7 +93,7 @@ function PointDetail({ point, onClose }) {
 function RoutineCard({ routine, onStart }) {
   return (
     <div className="rounded-2xl p-5" data-testid={`routine-${routine.id}`}
-      style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'none'}}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -180,7 +180,7 @@ export default function Acupressure() {
               data-testid={`tab-${t.id}`}
               className="px-4 py-2 rounded-xl text-xs font-medium transition-all"
               style={{
-                background: tab === t.id ? 'rgba(239,68,68,0.15)' : 'rgba(15,17,28,0.4)',
+                background: tab === t.id ? 'rgba(239,68,68,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(239,68,68,0.3)' : 'rgba(248,250,252,0.06)'}`,
                 color: tab === t.id ? '#EF4444' : 'rgba(248,250,252,0.5)',
               }}>{t.label}</button>
@@ -202,7 +202,7 @@ export default function Acupressure() {
             {routineDetail && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 className="rounded-2xl p-6 mb-6"
-                style={{ background: 'rgba(15,17,28,0.85)', border: `1px solid ${routineDetail.color}30`, backdropFilter: 'blur(24px)' }}>
+                style={{ background: 'transparent', border: `1px solid ${routineDetail.color}30`, backdropFilter: 'none'}}>
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-bold" style={{ color: '#F8FAFC' }}>{routineDetail.name}</h3>
                   <button onClick={() => setRoutineDetail(null)} className="p-1.5 rounded-lg hover:bg-white/5">

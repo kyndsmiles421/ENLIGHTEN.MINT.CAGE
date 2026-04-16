@@ -94,7 +94,7 @@ export default function SovereignDashboard() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#060610' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Authentication required</p>
       </div>
     );

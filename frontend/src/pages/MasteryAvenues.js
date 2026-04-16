@@ -700,8 +700,8 @@ export default function MasteryAvenues() {
       <div className="rounded-xl p-3"
         style={{
           background: 'rgba(15,15,25,0.6)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
           border: '1px solid rgba(248,250,252,0.05)',
         }}
         data-testid="global-tickers"
@@ -734,7 +734,7 @@ export default function MasteryAvenues() {
           className="rounded-xl px-3 py-2"
           style={{
             background: 'rgba(239,68,68,0.08)',
-            backdropFilter: 'blur(8px)',
+            backdropFilter: 'none',
             border: '1px solid rgba(239,68,68,0.15)',
           }}
           data-testid="decay-warning"
@@ -823,7 +823,7 @@ export default function MasteryAvenues() {
         className="w-full py-2.5 rounded-lg text-[9px] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01]"
         style={{
           background: 'rgba(15,15,25,0.6)',
-          backdropFilter: 'blur(8px)',
+          backdropFilter: 'none',
           color: '#FBBF24',
           border: '1px solid rgba(251,191,36,0.1)',
         }}
@@ -836,7 +836,7 @@ export default function MasteryAvenues() {
         className="w-full py-2 rounded-lg text-[9px] flex items-center justify-center gap-1 transition-all hover:scale-[1.01]"
         style={{
           background: 'rgba(15,15,25,0.6)',
-          backdropFilter: 'blur(8px)',
+          backdropFilter: 'none',
           color: '#8B5CF6',
           border: '1px solid rgba(139,92,246,0.1)',
         }}

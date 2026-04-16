@@ -292,7 +292,7 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
           {/* Sacred Texts & Figures */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-              className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
               <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
                 <ScrollText size={9} /> Sacred Texts
               </p>
@@ -301,7 +301,7 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
               ))}
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}
-              className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
               <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
                 <Users size={9} /> Notable Figures
               </p>
@@ -380,7 +380,7 @@ function TraditionCard({ t, onClick }) {
       onClick={onClick}
       data-testid={`tradition-card-${t.id}`}
       className="rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'none'}}
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
@@ -483,7 +483,7 @@ export default function Encyclopedia() {
               <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search traditions..." data-testid="encyclopedia-search"
                 className="w-full text-xs rounded-xl pl-9 pr-4 py-2.5 outline-none"
-                style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }} />
+                style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }} />
               {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>}
             </div>
 
@@ -539,15 +539,15 @@ export default function Encyclopedia() {
 
             {/* Texts, Figures, Practices */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-              <div className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Sacred Texts</p>
                 {activeTradition.sacred_texts?.map((t, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{t}</p>)}
               </div>
-              <div className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Notable Figures</p>
                 {activeTradition.notable_figures?.map((f, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{f}</p>)}
               </div>
-              <div className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Practices</p>
                 {activeTradition.practices?.map((p, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{p}</p>)}
               </div>

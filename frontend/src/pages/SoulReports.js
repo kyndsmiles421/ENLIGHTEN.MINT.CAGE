@@ -246,7 +246,7 @@ export default function SoulReports() {
               <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}
                 data-testid="month-selector"
                 className="w-full text-xs rounded-xl px-4 py-2.5 outline-none"
-                style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(216,180,254,0.12)', color: 'var(--text-primary)' }}>
+                style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.12)', color: 'var(--text-primary)' }}>
                 {monthOptions.map(m => (
                   <option key={m.value} value={m.value}>{m.label}</option>
                 ))}

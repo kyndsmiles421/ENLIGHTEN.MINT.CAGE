@@ -24,7 +24,7 @@ function CardVisual({ card, size = 'lg' }) {
       style={{
         width: isLg ? 200 : 120,
         height: isLg ? 280 : 168,
-        background: 'linear-gradient(145deg, rgba(18,20,32,0.95), rgba(30,35,55,0.95))',
+        background: 'linear-gradient(145deg, rgba(0,0,0,0), rgba(0,0,0,0))',
         border: `2px solid ${color}30`,
         boxShadow: `0 0 40px ${color}15, inset 0 0 30px ${color}05`,
       }}

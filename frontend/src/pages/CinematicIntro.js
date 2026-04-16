@@ -282,7 +282,7 @@ export default function CinematicIntro() {
   const level = LEVELS[currentLevel];
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: '#0d0e1a', zIndex: 9999, width: '100vw', height: '100vh', top: 0, left: 0 }} data-testid="cinematic-intro">
+    <div className="fixed inset-0 overflow-hidden" style={{ background: 'transparent', zIndex: 9999, width: '100vw', height: '100vh', top: 0, left: 0 }} data-testid="cinematic-intro">
       {/* Skip button */}
       <motion.button
         initial={{ opacity: 0 }}

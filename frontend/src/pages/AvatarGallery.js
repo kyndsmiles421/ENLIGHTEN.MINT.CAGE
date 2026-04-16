@@ -108,7 +108,7 @@ function GalleryCard({ entry, onClick, onRadiate }) {
 
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
+          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'none'}}>
           <div className="flex items-center gap-2">
             <Eye size={16} style={{ color: '#C084FC' }} />
             <span className="text-xs font-medium" style={{ color: '#C084FC' }}>View Avatar</span>
@@ -187,7 +187,7 @@ function AvatarViewModal({ entry, onClose, onRadiate, authHeaders }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(24px)' }}
+      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div
         initial={{ scale: 0.85, opacity: 0, y: 20 }}
@@ -201,7 +201,7 @@ function AvatarViewModal({ entry, onClose, onRadiate, authHeaders }) {
 
         {/* Close Button */}
         <button onClick={onClose} className="absolute top-3 right-3 z-20 p-1.5 rounded-lg transition-all hover:scale-110"
-          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
+          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'none'}}>
           <X size={14} style={{ color: 'var(--text-muted)' }} />
         </button>
 
@@ -337,7 +337,7 @@ function PublishModal({ onPublish, onClose, publishing }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)' }}
+      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         className="rounded-2xl p-6 max-w-sm w-full"
@@ -481,7 +481,7 @@ export default function AvatarGallery() {
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
-        style={{ background: 'rgba(10,10,15,0.88)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        style={{ background: 'rgba(10,10,15,0.88)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl transition-all hover:scale-105"
           style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="gallery-back">
           <ArrowLeft size={16} style={{ color: 'var(--text-secondary)' }} />

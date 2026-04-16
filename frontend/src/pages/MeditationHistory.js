@@ -41,7 +41,7 @@ export default function MeditationHistory() {
 
   const sessions = [...(data?.sessions || []), ...(data?.guided_sessions || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   const stats = data?.stats;
-  const inputStyle = { background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
+  const inputStyle = { background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
 
   return (
     <div className="min-h-screen immersive-page pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="meditation-history-page">
@@ -90,7 +90,7 @@ export default function MeditationHistory() {
             {showLog && (
               <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                 className="rounded-2xl p-5 mb-6" data-testid="meditation-log-form"
-                style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(216,180,254,0.1)' }}>
+                style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.1)' }}>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
                     <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Type</label>
@@ -148,7 +148,7 @@ export default function MeditationHistory() {
               <div className="space-y-3" data-testid="session-list">
                 {sessions.map(s => (
                   <div key={s.id} className="rounded-xl p-4"
-                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.06)' }}>
+                    style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <Brain size={14} style={{ color: '#D8B4FE' }} />

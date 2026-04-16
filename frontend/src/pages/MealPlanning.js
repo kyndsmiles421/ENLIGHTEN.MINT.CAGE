@@ -14,9 +14,9 @@ function PlanCard({ plan, onSelect, active }) {
       onClick={() => onSelect(plan)} className="cursor-pointer rounded-2xl p-5 transition-all"
       data-testid={`plan-card-${plan.id}`}
       style={{
-        background: active?.id === plan.id ? `linear-gradient(135deg, ${plan.color}20, ${plan.color}06)` : 'rgba(15,17,28,0.6)',
+        background: active?.id === plan.id ? `linear-gradient(135deg, ${plan.color}20, ${plan.color}06)` : 'rgba(0,0,0,0)',
         border: `1px solid ${active?.id === plan.id ? plan.color + '50' : 'rgba(248,250,252,0.06)'}`,
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
       }}>
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -37,7 +37,7 @@ function PlanDetail({ plan, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="rounded-2xl p-6 mb-6" data-testid="plan-detail"
-      style={{ background: 'rgba(15,17,28,0.85)', border: `1px solid ${plan.color}30`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${plan.color}30`, backdropFilter: 'none'}}>
       <div className="flex justify-between items-start mb-5">
         <div>
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{plan.name}</h3>
@@ -93,11 +93,11 @@ function MealLogger({ onSaved }) {
     setSaving(false);
   };
 
-  const inputStyle = { background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
+  const inputStyle = { background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
 
   return (
     <div className="rounded-2xl p-6 mb-6" data-testid="meal-logger"
-      style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(34,197,94,0.1)', backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(34,197,94,0.1)', backdropFilter: 'none'}}>
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#22C55E' }}>
         <Plus size={12} className="inline mr-1" /> Log a Meal
       </p>
@@ -106,7 +106,7 @@ function MealLogger({ onSaved }) {
           <button key={t} onClick={() => setMealType(t)} data-testid={`meal-type-${t}`}
             className="py-1.5 rounded-lg text-[10px] uppercase tracking-wider transition-all"
             style={{
-              background: mealType === t ? 'rgba(34,197,94,0.15)' : 'rgba(15,17,28,0.4)',
+              background: mealType === t ? 'rgba(34,197,94,0.15)' : 'rgba(0,0,0,0)',
               border: `1px solid ${mealType === t ? 'rgba(34,197,94,0.3)' : 'rgba(248,250,252,0.06)'}`,
               color: mealType === t ? '#22C55E' : 'rgba(248,250,252,0.4)',
             }}>{t}</button>
@@ -154,7 +154,7 @@ function MealLogList({ logs, onDelete }) {
       <div className="space-y-3">
         {logs.map(l => (
           <div key={l.id} className="rounded-xl p-4 flex justify-between items-start"
-            style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.06)' }}>
+            style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-[10px] uppercase px-2 py-0.5 rounded-full"
@@ -239,7 +239,7 @@ export default function MealPlanning() {
             <button key={t.id} onClick={() => setTab(t.id)} data-testid={`tab-${t.id}`}
               className="px-4 py-2 rounded-xl text-xs font-medium transition-all"
               style={{
-                background: tab === t.id ? 'rgba(34,197,94,0.15)' : 'rgba(15,17,28,0.4)',
+                background: tab === t.id ? 'rgba(34,197,94,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(34,197,94,0.3)' : 'rgba(248,250,252,0.06)'}`,
                 color: tab === t.id ? '#22C55E' : 'rgba(248,250,252,0.5)',
               }}>{t.label}</button>

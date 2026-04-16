@@ -26,7 +26,7 @@ export default function OrbCorner() {
           left: 'calc(50% - 22px)',
           width: 44,
           height: 44,
-          background: `radial-gradient(circle at 40% 35%, ${pulseColor}25, rgba(10,10,18,0.85) 70%)`,
+          background: `radial-gradient(circle at 40% 35%, ${pulseColor}25, rgba(0,0,0,0) 70%)`,
           border: `1px solid ${pulseColor}20`,
           boxShadow: `0 0 20px ${pulseColor}10`,
           backdropFilter: 'blur(12px)',

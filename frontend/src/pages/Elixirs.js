@@ -14,7 +14,7 @@ function CategoryFilter({ categories, active, onSelect }) {
         className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
         data-testid="filter-all"
         style={{
-          background: !active ? 'rgba(192,132,252,0.15)' : 'rgba(15,17,28,0.4)',
+          background: !active ? 'rgba(192,132,252,0.15)' : 'rgba(0,0,0,0)',
           border: `1px solid ${!active ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.06)'}`,
           color: !active ? '#C084FC' : 'rgba(248,250,252,0.5)',
         }}>All</button>
@@ -23,7 +23,7 @@ function CategoryFilter({ categories, active, onSelect }) {
           className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
           data-testid={`filter-${c.id}`}
           style={{
-            background: active === c.id ? `${c.color}18` : 'rgba(15,17,28,0.4)',
+            background: active === c.id ? `${c.color}18` : 'rgba(0,0,0,0)',
             border: `1px solid ${active === c.id ? c.color + '35' : 'rgba(248,250,252,0.06)'}`,
             color: active === c.id ? c.color : 'rgba(248,250,252,0.5)',
           }}>{c.name}</button>
@@ -37,7 +37,7 @@ function ElixirCard({ elixir, onSelect }) {
     <motion.div whileHover={{ scale: 1.02, y: -3 }} whileTap={{ scale: 0.98 }}
       onClick={() => onSelect(elixir)} className="cursor-pointer rounded-2xl p-5 transition-all"
       data-testid={`elixir-card-${elixir.id}`}
-      style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'none'}}>
       <div className="flex items-center gap-3 mb-3">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center"
           style={{ background: `${elixir.color}18`, boxShadow: `0 0 25px ${elixir.color}12` }}>
@@ -70,7 +70,7 @@ function ElixirDetail({ elixir, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="rounded-2xl p-6 mb-6" data-testid="elixir-detail"
-      style={{ background: 'rgba(15,17,28,0.85)', border: `1px solid ${elixir.color}30`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${elixir.color}30`, backdropFilter: 'none'}}>
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{elixir.name}</h3>

@@ -65,7 +65,7 @@ function CodexDetailPanel({ planet, onClose, onDive }) {
       className="absolute right-4 top-16 z-40 rounded-2xl overflow-hidden overflow-y-auto"
       style={{
         width: 340, maxHeight: 'calc(100vh - 120px)',
-        background: 'rgba(10,10,18,0.85)', backdropFilter: 'blur(24px)',
+        background: 'rgba(0,0,0,0)', backdropFilter: 'none',
         border: '1px solid rgba(248,250,252,0.06)',
         boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
       }}

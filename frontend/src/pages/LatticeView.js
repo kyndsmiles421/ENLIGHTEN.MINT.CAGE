@@ -102,7 +102,7 @@ export default function LatticeView() {
           onClick={() => navigate('/hub')}
           className="flex items-center gap-2 px-3 py-2 rounded-lg"
           style={{
-            background: 'rgba(10,10,18,0.8)',
+            background: 'rgba(0,0,0,0)',
             border: '1px solid rgba(212, 175, 55, 0.3)',
             color: '#D4AF37',
           }}
@@ -121,7 +121,7 @@ export default function LatticeView() {
         <div 
           className="px-3 py-2 rounded-lg text-xs"
           style={{
-            background: 'rgba(10,10,18,0.8)',
+            background: 'rgba(0,0,0,0)',
             border: '1px solid rgba(0, 255, 255, 0.3)',
             color: '#00FFFF',
           }}
@@ -134,7 +134,7 @@ export default function LatticeView() {
       <div 
         className="absolute top-20 left-4 p-3 rounded-lg text-xs"
         style={{
-          background: 'rgba(10,10,18,0.9)',
+          background: 'rgba(0,0,0,0)',
           border: '1px solid rgba(212, 175, 55, 0.2)',
         }}
       >
@@ -154,7 +154,7 @@ export default function LatticeView() {
       <div 
         className="absolute top-20 right-4 p-3 rounded-lg"
         style={{
-          background: 'rgba(10,10,18,0.9)',
+          background: 'rgba(0,0,0,0)',
           border: '1px solid rgba(212, 175, 55, 0.2)',
         }}
       >
@@ -180,7 +180,7 @@ export default function LatticeView() {
       <div 
         className="absolute bottom-20 left-4 p-3 rounded-lg text-xs"
         style={{
-          background: 'rgba(10,10,18,0.9)',
+          background: 'rgba(0,0,0,0)',
           border: '1px solid rgba(212, 175, 55, 0.2)',
         }}
       >
@@ -210,7 +210,7 @@ export default function LatticeView() {
       <div 
         className="absolute bottom-20 right-4 p-3 rounded-lg text-center"
         style={{
-          background: 'rgba(10,10,18,0.9)',
+          background: 'rgba(0,0,0,0)',
           border: '1px solid rgba(0, 255, 255, 0.2)',
         }}
       >
@@ -316,7 +316,7 @@ export default function LatticeView() {
                 <motion.div
                   className="absolute top-full mt-2 px-2 py-1 rounded text-[9px] whitespace-nowrap"
                   style={{
-                    background: 'rgba(10,10,18,0.95)',
+                    background: 'rgba(0,0,0,0)',
                     border: `1px solid ${mat.color}`,
                     color: mat.color,
                     left: '50%',
@@ -353,7 +353,7 @@ export default function LatticeView() {
         <motion.div
           className="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-lg"
           style={{
-            background: 'rgba(10,10,18,0.95)',
+            background: 'rgba(0,0,0,0)',
             border: `1px solid ${MATERIALS[hoveredNode.material].color}`,
           }}
           initial={{ opacity: 0, y: 10 }}

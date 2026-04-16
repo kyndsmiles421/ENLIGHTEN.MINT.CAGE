@@ -140,7 +140,7 @@ function CollapseModal({ result, onClose }) {
         animate={{ scale: 1 }}
         exit={{ scale: 0.8 }}
         className="w-full max-w-sm rounded-xl p-5 text-center space-y-3"
-        style={{ background: 'rgba(10,10,18,0.95)', border: `1px solid ${rarity.color}20` }}
+        style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${rarity.color}20` }}
         onClick={e => e.stopPropagation()}
         data-testid="collapse-modal"
       >

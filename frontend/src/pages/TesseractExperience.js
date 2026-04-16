@@ -893,7 +893,7 @@ export default function TesseractExperience() {
                 border: isEscaping 
                   ? `2px solid rgba(255,255,255,${escapeProgress})` 
                   : '2px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(4px)',
+                backdropFilter: 'none',
               }}
               onMouseDown={startEscapeSequence}
               onMouseUp={cancelEscapeSequence}

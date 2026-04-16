@@ -46,7 +46,7 @@ export function NanoGuide({ guideId, position = 'top-right' }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className="absolute z-[100] w-64 rounded-xl overflow-hidden"
-            style={{ ...posStyles[position], background: 'rgba(10,10,18,0.95)', border: '1px solid rgba(192,132,252,0.15)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+            style={{ ...posStyles[position], background: 'rgba(0,0,0,0)', border: '1px solid rgba(192,132,252,0.15)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
             onClick={e => e.stopPropagation()}
             data-testid={`nano-guide-panel-${guideId}`}>
             <div className="px-3 py-2 flex items-center justify-between"

@@ -130,7 +130,7 @@ export default function NotificationSettings({ onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       className="w-80 rounded-xl overflow-hidden"
-      style={{ background: isLight ? 'rgba(255,255,255,0.96)' : 'rgba(8,8,18,0.95)', backdropFilter: 'blur(20px)', border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(255,255,255,0.06)'}`, boxShadow: isLight ? '0 16px 48px rgba(30,27,46,0.12)' : '0 20px 60px rgba(0,0,0,0.6)' }}
+      style={{ background: isLight ? 'rgba(255,255,255,0.96)' : 'rgba(0,0,0,0)', backdropFilter: 'blur(20px)', border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(255,255,255,0.06)'}`, boxShadow: isLight ? '0 16px 48px rgba(30,27,46,0.12)' : '0 20px 60px rgba(0,0,0,0.6)' }}
       data-testid="notification-settings"
     >
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)'}` }}>

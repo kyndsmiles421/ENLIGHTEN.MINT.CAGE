@@ -169,7 +169,7 @@ export default function UniversalCommand() {
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           className="relative w-full max-w-lg mx-4 rounded-2xl overflow-hidden"
           style={{
-            background: 'linear-gradient(180deg, rgba(20,20,30,0.98) 0%, rgba(10,10,18,0.99) 100%)',
+            background: 'linear-gradient(180deg, rgba(20,20,30,0.98) 0%, rgba(0,0,0,0) 100%)',
             border: '1px solid rgba(255,255,255,0.08)',
             boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.1)',
           }}

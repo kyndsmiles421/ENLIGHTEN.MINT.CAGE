@@ -295,7 +295,7 @@ function LessonViewer({ content, modality, onClose, onComplete, completing }) {
       style={{ background: 'rgba(0,0,0,0.85)' }} data-testid="lesson-viewer">
       <motion.div initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
         className="rounded-2xl max-w-md w-full overflow-hidden"
-        style={{ background: '#0B0C15', border: `1px solid ${modality?.color || '#C084FC'}18` }}>
+        style={{ background: 'transparent', border: `1px solid ${modality?.color || '#C084FC'}18` }}>
         <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${modality?.color || '#C084FC'}10` }}>
           <div className="flex items-center gap-2">
             <BookOpen size={14} style={{ color: modality?.color || '#C084FC' }} />
@@ -367,11 +367,11 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
       style={{ background: 'rgba(0,0,0,0.88)' }} data-testid="forge-lab-modal">
       <motion.div initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
         className="rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
-        style={{ background: '#0B0C15', border: `1px solid ${modality?.color || '#C084FC'}15` }}>
+        style={{ background: 'transparent', border: `1px solid ${modality?.color || '#C084FC'}15` }}>
         {!result ? (
           <>
             <div className="px-5 pt-4 pb-3 flex items-center justify-between sticky top-0 z-10"
-              style={{ background: '#0B0C15', borderBottom: `1px solid ${modality?.color || '#C084FC'}10` }}>
+              style={{ background: 'transparent', borderBottom: `1px solid ${modality?.color || '#C084FC'}10` }}>
               <div className="flex items-center gap-2">
                 <Beaker size={16} style={{ color: modality?.color || '#C084FC' }} />
                 <div>
@@ -634,7 +634,7 @@ export default function AcademyPage() {
 
   if (!token || token === 'guest_token') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ background: '#0B0C15' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ background: 'transparent' }}>
         <h2 className="text-lg font-bold" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>Academy</h2>
         <p className="text-sm text-center" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to access the Academy — lessons, certifications, and mastery paths.</p>
         <button 
@@ -653,7 +653,7 @@ export default function AcademyPage() {
   const filteredPrograms = activeZone ? programs.filter(p => p.zone === activeZone) : programs;
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: '#0B0C15' }}>
+    <div className="min-h-screen pb-32" style={{ background: 'transparent' }}>
       <ImmersiveOverlay active={intensity === 'immersive'} />
 
       <div className="px-4 py-6 max-w-2xl mx-auto relative z-10">

@@ -35,7 +35,7 @@ function PromptSelector({ prompts, onSelect, sessions, onOpenSession, onDeleteSe
               onClick={() => onSelect(p)}
               data-testid={`akashic-prompt-${p.id}`}
               className="rounded-2xl p-4 text-left transition-all"
-              style={{ background: 'rgba(15,17,28,0.5)', border: `1px solid ${p.color}12`, backdropFilter: 'blur(12px)' }}>
+              style={{ background: 'transparent', border: `1px solid ${p.color}12`, backdropFilter: 'none'}}>
               <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3"
                 style={{ background: `${p.color}12` }}>
                 <Icon size={16} style={{ color: p.color }} />
@@ -57,7 +57,7 @@ function PromptSelector({ prompts, onSelect, sessions, onOpenSession, onDeleteSe
                 <button onClick={() => onOpenSession(s.id)}
                   data-testid={`akashic-session-${s.id}`}
                   className="flex-1 rounded-xl px-4 py-3 text-left transition-all hover:scale-[1.01]"
-                  style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <div className="flex items-center justify-between">
                     <p className="text-xs" style={{ color: 'var(--text-primary)' }}>
                       {s.preview || `${s.prompt_id || 'Open'} reading`}
@@ -124,11 +124,11 @@ function ChatView({ session, onSend, onBack, sending }) {
               style={{
                 background: msg.role === 'user'
                   ? 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(192,132,252,0.1))'
-                  : 'rgba(15,17,28,0.6)',
+                  : 'rgba(0,0,0,0)',
                 border: msg.role === 'user'
                   ? '1px solid rgba(129,140,248,0.2)'
                   : '1px solid rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(8px)',
+                backdropFilter: 'none',
               }}>
               {msg.role === 'assistant' && (
                 <div className="flex items-center gap-1.5 mb-2">
@@ -143,7 +143,7 @@ function ChatView({ session, onSend, onBack, sending }) {
         {sending && (
           <div className="flex justify-start">
             <div className="rounded-2xl px-4 py-3 rounded-bl-md"
-              style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(255,255,255,0.04)' }}>
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.04)' }}>
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin" size={12} style={{ color: '#818CF8' }} />
                 <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Consulting the Records...</span>
@@ -162,11 +162,11 @@ function ChatView({ session, onSend, onBack, sending }) {
             placeholder="Ask the Records anything..."
             data-testid="akashic-input"
             className="flex-1 text-sm rounded-xl px-4 py-3 outline-none transition-all"
-            style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(129,140,248,0.12)', color: 'var(--text-primary)', caretColor: '#818CF8' }} />
+            style={{ background: 'transparent', border: '1px solid rgba(129,140,248,0.12)', color: 'var(--text-primary)', caretColor: '#818CF8' }} />
           <button onClick={handleSend} disabled={sending || !input.trim()}
             data-testid="akashic-send-btn"
             className="p-3 rounded-xl transition-all"
-            style={{ background: input.trim() ? 'rgba(129,140,248,0.15)' : 'rgba(15,17,28,0.4)', border: '1px solid rgba(129,140,248,0.2)', opacity: input.trim() ? 1 : 0.4 }}>
+            style={{ background: input.trim() ? 'rgba(129,140,248,0.15)' : 'rgba(0,0,0,0)', border: '1px solid rgba(129,140,248,0.2)', opacity: input.trim() ? 1 : 0.4 }}>
             <Send size={16} style={{ color: '#818CF8' }} />
           </button>
         </div>

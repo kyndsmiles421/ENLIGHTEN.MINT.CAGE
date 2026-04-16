@@ -149,7 +149,7 @@ function DescentModal({ layer, onDescend, onTunnel, onClose, tunnelCosts, dust }
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           className="w-full max-w-md rounded-xl p-5 space-y-4"
-          style={{ background: 'rgba(10,10,18,0.95)', border: `1px solid ${layer.color}20` }}
+          style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${layer.color}20` }}
           onClick={e => e.stopPropagation()}
           data-testid="descent-modal"
         >

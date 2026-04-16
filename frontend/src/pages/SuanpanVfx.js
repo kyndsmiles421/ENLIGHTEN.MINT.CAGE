@@ -24,7 +24,7 @@ export function SacredAssemblyLoader({ delay, onComplete }) {
 
   return (
     <motion.div className="fixed inset-0 z-[10002] flex flex-col items-center justify-center"
-      style={{ background: 'rgba(6,6,14,0.95)', backdropFilter: 'blur(16px)' }}
+      style={{ background: 'rgba(6,6,14,0.95)', backdropFilter: 'none'}}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       data-testid="sacred-assembly-loader"
     >

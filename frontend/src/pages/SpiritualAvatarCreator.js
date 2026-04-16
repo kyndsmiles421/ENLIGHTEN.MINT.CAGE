@@ -145,7 +145,7 @@ export default function SpiritualAvatarCreator() {
 
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
-        style={{ background: 'rgba(10,10,15,0.88)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        style={{ background: 'rgba(10,10,15,0.88)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl transition-all hover:scale-105"
           style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="avatar-builder-back">
           <ArrowLeft size={16} style={{ color: 'var(--text-secondary)' }} />

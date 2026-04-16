@@ -470,7 +470,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
       <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.6)' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-lg rounded-2xl overflow-y-auto max-h-[85vh] p-6"
-        style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(20px)' }}
+        style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'none'}}
         onClick={e => e.stopPropagation()} data-testid="create-session-modal">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Host a Live Session</h2>
@@ -803,7 +803,7 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
       <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.7)' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-2xl rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(10,11,20,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(20px)', maxHeight: '85vh' }}
+        style={{ background: 'rgba(10,11,20,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'none', maxHeight: '85vh' }}
         onClick={e => e.stopPropagation()} data-testid="replay-modal">
 
         {/* Header */}

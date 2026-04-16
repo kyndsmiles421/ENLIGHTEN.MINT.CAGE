@@ -25,7 +25,7 @@ function ModeSelector({ modes, onSelect }) {
             onClick={() => onSelect(mode.id)}
             data-testid={`mode-${mode.id}`}
             className="rounded-2xl p-5 text-left transition-all"
-            style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${mode.color}15`, backdropFilter: 'blur(12px)' }}>
+            style={{ background: 'transparent', border: `1px solid ${mode.color}15`, backdropFilter: 'none'}}>
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background: `${mode.color}15` }}>
@@ -69,7 +69,7 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
 
       {dreams.length === 0 ? (
         <div className="text-center py-8 rounded-2xl"
-          style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.06)' }}>
+          style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
           <Moon size={32} className="mx-auto mb-3" style={{ color: 'rgba(129,140,248,0.25)' }} />
           <p className="text-sm mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>No dreams logged yet</p>
           <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>
@@ -86,7 +86,7 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
               onClick={() => onSelect(dream)}
               data-testid={`dream-pick-${dream.id}`}
               className="w-full rounded-xl p-4 text-left transition-all"
-              style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(129,140,248,0.08)' }}>
+              style={{ background: 'transparent', border: '1px solid rgba(129,140,248,0.08)' }}>
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
                   style={{ background: 'rgba(129,140,248,0.1)' }}>
@@ -183,7 +183,7 @@ function ChatBubble({ msg, isUser, onPlayAudio, playingId, currentMsgId }) {
       <div className="max-w-[80%] rounded-2xl px-4 py-3"
         data-testid={isUser ? 'user-message' : 'coach-message'}
         style={{
-          background: isUser ? 'rgba(99,102,241,0.15)' : 'rgba(15,17,28,0.6)',
+          background: isUser ? 'rgba(99,102,241,0.15)' : 'rgba(0,0,0,0)',
           border: `1px solid ${isUser ? 'rgba(99,102,241,0.2)' : 'rgba(248,250,252,0.06)'}`,
         }}>
         {msg.voice && isUser && (
@@ -244,7 +244,7 @@ function SessionList({ sessions, onSelect, onNew, onDelete, modes }) {
             const mode = modes.find(m => m.id === s.mode);
             return (
               <div key={s.id} className="rounded-xl p-4 flex items-center justify-between group"
-                style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.06)' }}>
+                style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
                 <button onClick={() => onSelect(s.id)} className="flex-1 text-left" data-testid={`session-${s.id}`}>
                   <div className="flex items-center gap-2 mb-1">
                     <div className="w-5 h-5 rounded flex items-center justify-center"
@@ -637,9 +637,9 @@ export default function SpiritualCoach() {
                 <div className="rounded-2xl p-4 mb-4 min-h-[300px] max-h-[55vh] overflow-y-auto"
                   data-testid="chat-messages"
                   style={{
-                    background: 'rgba(10,10,18,0.5)',
+                    background: 'rgba(0,0,0,0)',
                     border: '1px solid rgba(192,132,252,0.06)',
-                    backdropFilter: 'blur(20px)',
+                    backdropFilter: 'none',
                     boxShadow: 'inset 0 0 40px rgba(0,0,0,0.2)',
                   }}>
                   {messages.length === 0 && (
@@ -731,12 +731,12 @@ export default function SpiritualCoach() {
                         rows={1}
                         data-testid="coach-input"
                         className="flex-1 px-4 py-3 rounded-xl text-xs resize-none"
-                        style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
+                        style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
                       <button onClick={sendMessage} disabled={sending || !input.trim()}
                         data-testid="send-message-btn"
                         className="px-4 py-3 rounded-xl transition-all flex items-center justify-center"
                         style={{
-                          background: input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.15)' : 'rgba(216,180,254,0.15)') : 'rgba(15,17,28,0.4)',
+                          background: input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.15)' : 'rgba(216,180,254,0.15)') : 'rgba(0,0,0,0)',
                           border: `1px solid ${input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.3)' : 'rgba(216,180,254,0.3)') : 'rgba(248,250,252,0.06)'}`,
                           color: input.trim() ? (isDreamOracle ? '#818CF8' : '#D8B4FE') : 'rgba(248,250,252,0.2)',
                         }}>

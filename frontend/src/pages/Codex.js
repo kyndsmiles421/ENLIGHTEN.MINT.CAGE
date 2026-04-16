@@ -136,7 +136,7 @@ export default function Codex() {
               <motion.div key={entry.id}
                 className="rounded-xl overflow-hidden"
                 style={{
-                  background: entry.locked ? 'rgba(10,10,18,0.3)' : 'rgba(10,10,18,0.5)',
+                  background: entry.locked ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0)',
                   border: `1px solid ${entry.locked ? 'rgba(248,250,252,0.03)' : `${tierColor}12`}`,
                   opacity: entry.locked ? 0.6 : 1,
                 }}

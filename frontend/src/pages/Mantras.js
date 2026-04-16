@@ -123,7 +123,7 @@ function MantraSession({ mantra, targetReps, soundId, onEnd }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
-      style={{ background: '#0B0C15' }}
+      style={{ background: 'transparent' }}
       data-testid="mantra-session">
       <CelebrationBurst active={celebrating} onComplete={() => { setCelebrating(false); onEnd(); }} />
 

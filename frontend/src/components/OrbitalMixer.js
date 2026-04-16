@@ -240,7 +240,7 @@ function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isL
         zIndex: dragging ? 100 : (isActive ? 50 : 10),
         background: isActive
           ? `radial-gradient(circle, ${mod.color}30, ${mod.color}10)`
-          : `radial-gradient(circle, ${mod.color}18, rgba(10,10,18,0.7))`,
+          : `radial-gradient(circle, ${mod.color}18, rgba(0,0,0,0))`,
         border: `1.5px solid ${isActive ? `${mod.color}60` : (inMagneticZone ? `${mod.color}50` : `${mod.color}25`)}`,
         boxShadow: glowIntensity > 0
           ? `0 0 ${12 + glowIntensity * 30}px ${mod.color}${Math.round(glowIntensity * 255).toString(16).padStart(2, '0')}, inset 0 0 8px ${mod.color}${Math.round(glowIntensity * 80).toString(16).padStart(2, '0')}`
@@ -1038,7 +1038,7 @@ export default function OrbitalMixer() {
       {activeModuleObjects.length === 0 && (
         <div className="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
           <span className="text-[10px] px-3 py-1 rounded-full"
-            style={{ background: 'rgba(10,10,18,0.6)', color: 'rgba(248,250,252,0.3)', border: '1px solid rgba(255,255,255,0.04)' }}>
+            style={{ background: 'rgba(0,0,0,0)', color: 'rgba(248,250,252,0.3)', border: '1px solid rgba(255,255,255,0.04)' }}>
             Drag or tap bubbles to activate
           </span>
         </div>

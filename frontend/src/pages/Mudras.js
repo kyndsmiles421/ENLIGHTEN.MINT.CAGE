@@ -90,7 +90,7 @@ function MudraDetail({ mudra, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
       onClick={onClose}
       data-testid="mudra-detail-overlay"
     >
@@ -137,7 +137,7 @@ function MudraDetail({ mudra, onClose }) {
                   }} />
                   <button onClick={() => setActiveTab('video')}
                     className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all hover:scale-105"
-                    style={{ background: `${mudra.color}90`, color: '#fff', backdropFilter: 'blur(8px)' }}
+                    style={{ background: `${mudra.color}90`, color: '#fff', backdropFilter: 'none'}}
                     data-testid={`mudra-play-video-${mudra.id}`}>
                     <Play size={14} fill="#fff" /> Watch Tutorial
                   </button>

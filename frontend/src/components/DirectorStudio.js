@@ -180,7 +180,7 @@ export default function DirectorStudio({
   return (
     <div className="rounded-2xl overflow-hidden" 
       style={{ 
-        background: 'linear-gradient(180deg, rgba(10,10,20,0.98) 0%, rgba(5,5,12,0.99) 100%)',
+        background: 'linear-gradient(180deg, rgba(10,10,20,0.98) 0%, rgba(0,0,0,0) 100%)',
         border: '1px solid rgba(129,140,248,0.15)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02)',
       }}

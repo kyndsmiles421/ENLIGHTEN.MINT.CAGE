@@ -548,7 +548,7 @@ export default function Dashboard() {
             <motion.div initial={{ y: 300 }} animate={{ y: 0 }} exit={{ y: 300 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="relative w-full max-w-lg rounded-t-2xl overflow-hidden max-h-[70vh] flex flex-col"
-              style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', borderBottom: 'none', backdropFilter: 'blur(20px)' }}
+              style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', borderBottom: 'none', backdropFilter: 'none'}}
               onClick={e => e.stopPropagation()} data-testid="add-shortcuts-sheet">
               <div className="px-4 py-3 flex items-center justify-between sticky top-0 z-10"
                 style={{ background: 'inherit', borderBottom: '1px solid rgba(248,250,252,0.04)' }}>

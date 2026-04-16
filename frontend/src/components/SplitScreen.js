@@ -299,7 +299,7 @@ export function SplitScreenLauncher() {
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
             className="absolute right-0 top-full mt-2 w-64 max-h-[420px] overflow-y-auto rounded-2xl z-50 p-2"
             style={{
-              background: 'rgba(10,10,18,0.95)',
+              background: 'rgba(0,0,0,0)',
               border: '1px solid rgba(192,132,252,0.12)',
               backdropFilter: 'blur(24px)',
               boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 20px rgba(192,132,252,0.05)',

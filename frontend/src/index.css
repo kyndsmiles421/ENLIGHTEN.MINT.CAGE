@@ -187,7 +187,7 @@ body[data-perspective="VOID"] .bar-nav-item:hover {
   left: 0;
   right: 0;
   overflow: hidden;
-  background: #000000; /* True Obsidian */
+  background: transparent; /* Let SceneEngine show through */
   z-index: 50;
 }
 
@@ -305,7 +305,7 @@ body {
   height: auto !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  background: #000 !important;
+  background: transparent !important;
 }
 
 /* 2. POLE BAR — FIXED TOP (Does NOT push content) */
@@ -332,7 +332,7 @@ body {
 [data-testid="journal-page"],
 [data-testid="ledger-page"],
 [data-testid="cosmic-ledger-page"] {
-  background: #000000 !important;
+  background: transparent !important;
   min-height: 100vh;
   padding-top: 70px !important; /* Clear the fixed top bar */
 }
@@ -340,7 +340,7 @@ body {
 /* Shadow Void Container for all archive-type pages */
 .shadow-void-container {
   position: relative;
-  background: #000000;
+  background: transparent;
   min-height: 100vh;
   z-index: 1;
 }
@@ -1526,8 +1526,8 @@ body[data-school="Sigfield"]::after {
   /* Primary fix: Push content down for floating STOP button */
   padding-top: 80px !important;
   
-  /* Kill the template gray — Pure Obsidian */
-  background: #000 !important;
+  /* Kill the template gray — transparent for SceneEngine */
+  background: transparent !important;
   
   /* Breathing room from edges */
   padding-left: 20px;
@@ -1548,6 +1548,7 @@ html {
   overflow-x: hidden !important;
   height: auto !important;
   min-height: 100% !important;
+  background: #06060C !important;
 }
 
 body {
@@ -1947,7 +1948,7 @@ button:active:not(:disabled) {
   --bg-default: #0B0C15;
   --bg-deep: #050508;
   --bg-surface: #161826;
-  --bg-card: #0d0e1a;
+  --bg-card: transparent;
   --primary: #D8B4FE;
   --primary-glow: #C084FC;
   --secondary: #2DD4BF;
@@ -1990,14 +1991,16 @@ button:active:not(:disabled) {
 
 /* ═══ SOVEREIGN GLASS PANELS — Global Module Theming ═══ */
 .sovereign-glass {
-  background: rgba(6, 6, 12, 0.12);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7), 0 0 2px rgba(0,0,0,0.5);
 }
 .sovereign-glass-strong {
-  background: rgba(6, 6, 12, 0.18);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7), 0 0 2px rgba(0,0,0,0.5);
 }
 .sovereign-viewport {
   position: relative;
@@ -2394,20 +2397,16 @@ h1, h2, h3 {
 
 /* ============ GLASS MORPHISM ============ */
 .glass-card {
-  background: rgba(6, 6, 12, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.5rem;
   position: relative;
   overflow: hidden;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7), 0 0 2px rgba(0,0,0,0.5);
 }
 
 .glass-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, transparent 50%);
-  pointer-events: none;
+  display: none;
 }
 
 .glass-card-hover {
@@ -2819,11 +2818,12 @@ body[data-theme="light"] .animate-text-shimmer {
 
 /* ============ ENHANCED DEPTH & DIMENSION ============ */
 .glass-card-deep {
-  background: rgba(6, 6, 12, 0.15);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 1.5rem;
   position: relative;
   overflow: hidden;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7), 0 0 2px rgba(0,0,0,0.5);
   box-shadow:
     0 12px 48px rgba(0, 0, 0, 0.4),
     0 2px 0 rgba(255, 255, 255, 0.04) inset,

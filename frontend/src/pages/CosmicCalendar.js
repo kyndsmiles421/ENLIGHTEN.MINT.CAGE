@@ -16,7 +16,7 @@ function CosmicCard({ title, icon: Icon, color, link, children }) {
   const navigate = useNavigate();
   return (
     <div className="rounded-2xl p-5 h-full relative group"
-      style={{ background: 'rgba(15,17,28,0.65)', border: `1px solid ${color}15`, backdropFilter: 'blur(16px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${color}15`, backdropFilter: 'none'}}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}15` }}>
@@ -76,7 +76,7 @@ export default function CosmicCalendar() {
   const m = data?.moon;
   const my = data?.mayan;
   const c = data?.cardology;
-  const inputStyle = { background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
+  const inputStyle = { background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 max-w-5xl mx-auto" data-testid="cosmic-calendar-page">
@@ -111,7 +111,7 @@ export default function CosmicCalendar() {
         {/* Energy Summary */}
         {data && (
           <div className="rounded-2xl p-5 mb-6 text-center relative overflow-hidden"
-            style={{ background: 'rgba(15,17,28,0.7)', border: '1px solid rgba(216,180,254,0.15)', backdropFilter: 'blur(24px)' }}>
+            style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.15)', backdropFilter: 'none'}}>
             <div className="absolute inset-0 opacity-5"
               style={{ background: 'radial-gradient(circle at 50% 50%, #D8B4FE, transparent 70%)' }} />
             <p className="text-sm leading-relaxed relative z-10" style={{ color: 'rgba(248,250,252,0.75)' }}>{data.energy_summary}</p>
@@ -120,7 +120,7 @@ export default function CosmicCalendar() {
 
         {/* Personalized Suggestions (from Cosmic Context) */}
         {cosmicCtx?.suggestions?.length > 0 && (
-          <div className="rounded-2xl p-5 mb-6" style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(216,180,254,0.08)' }}>
+          <div className="rounded-2xl p-5 mb-6" style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.08)' }}>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#D8B4FE' }}>
               <Sparkles size={10} className="inline mr-1" /> Today's Cosmic Practices
             </p>
@@ -214,7 +214,7 @@ export default function CosmicCalendar() {
 
         {/* Recent Dreams (from Cosmic Context) */}
         {cosmicCtx?.recent_dreams?.length > 0 && (
-          <div className="mt-6 rounded-2xl p-5" style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(129,140,248,0.08)' }}>
+          <div className="mt-6 rounded-2xl p-5" style={{ background: 'transparent', border: '1px solid rgba(129,140,248,0.08)' }}>
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#818CF8' }}>
                 <Eye size={10} className="inline mr-1" /> Recent Dreams

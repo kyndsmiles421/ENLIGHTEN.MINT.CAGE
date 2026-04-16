@@ -187,7 +187,7 @@ export default function Archives() {
           <div className="col-span-6">
             {selectedEntry && !selectedEntry.locked ? (
               <div className="rounded-xl p-5" style={{
-                background: 'rgba(10,10,18,0.6)', backdropFilter: 'blur(20px)',
+                background: 'rgba(0,0,0,0)', backdropFilter: 'none',
                 border: '1px solid rgba(248,250,252,0.04)',
               }}>
                 <div className="flex items-center justify-between mb-4">
@@ -334,7 +334,7 @@ export default function Archives() {
               </div>
             ) : selectedEntry?.locked ? (
               <div className="rounded-xl p-8 flex flex-col items-center justify-center" style={{
-                background: 'rgba(10,10,18,0.6)', backdropFilter: 'blur(20px)',
+                background: 'rgba(0,0,0,0)', backdropFilter: 'none',
                 border: '1px solid rgba(248,250,252,0.04)', minHeight: 400,
               }}>
                 <Lock size={32} style={{ color: 'rgba(248,250,252,0.1)' }} />
@@ -343,7 +343,7 @@ export default function Archives() {
               </div>
             ) : conceptData ? (
               <div className="rounded-xl p-5" style={{
-                background: 'rgba(10,10,18,0.6)', backdropFilter: 'blur(20px)',
+                background: 'rgba(0,0,0,0)', backdropFilter: 'none',
                 border: '1px solid rgba(248,250,252,0.04)',
               }}>
                 <h2 className="text-base font-medium mb-4" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
@@ -380,7 +380,7 @@ export default function Archives() {
               </div>
             ) : (
               <div className="rounded-xl p-8 flex flex-col items-center justify-center" style={{
-                background: 'rgba(10,10,18,0.3)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 400,
+                background: 'rgba(0,0,0,0)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 400,
               }}>
                 <Globe size={32} style={{ color: 'rgba(248,250,252,0.08)' }} />
                 <p className="text-xs mt-4" style={{ color: 'rgba(248,250,252,0.15)' }}>Select an archive entry to explore</p>
@@ -392,7 +392,7 @@ export default function Archives() {
           <div className="col-span-3">
             {currentChar ? (
               <div className="rounded-xl p-4" style={{
-                background: 'rgba(10,10,18,0.6)', backdropFilter: 'blur(20px)',
+                background: 'rgba(0,0,0,0)', backdropFilter: 'none',
                 border: '1px solid rgba(248,250,252,0.04)',
               }}>
                 <div className="flex items-center justify-between mb-3">
@@ -441,7 +441,7 @@ export default function Archives() {
               </div>
             ) : (
               <div className="rounded-xl p-6 flex flex-col items-center justify-center"
-                style={{ background: 'rgba(10,10,18,0.3)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 380 }}>
+                style={{ background: 'rgba(0,0,0,0)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 380 }}>
                 <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.12)' }}>
                   Select an entry to trace characters
                 </p>

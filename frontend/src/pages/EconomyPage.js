@@ -364,7 +364,7 @@ export default function EconomyPage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B0C15' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to access the Economy</p>
       </div>
     );
@@ -378,7 +378,7 @@ export default function EconomyPage() {
   ];
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: '#0B0C15' }}>
+    <div className="min-h-screen pb-32" style={{ background: 'transparent' }}>
       <div className="px-4 py-6 max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-5" data-testid="economy-header">

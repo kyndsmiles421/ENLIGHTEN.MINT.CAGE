@@ -49,15 +49,15 @@ export default function ResourceAlchemy() {
     finally { setForging(false); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#030308' }}><Sparkles className="animate-spin" color="#A855F7" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}><Sparkles className="animate-spin" color="#A855F7" /></div>;
 
   const inv = state?.inventory || {};
   const recipes = state?.recipes || [];
   const elements = state?.elements || {};
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: '#030308' }} data-testid="resource-alchemy-page">
-      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'blur(20px)' }}>
+    <div className="min-h-screen pb-24" style={{ background: 'transparent' }} data-testid="resource-alchemy-page">
+      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'none'}}>
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="alchemy-back-btn"><ArrowLeft size={16} color="#F8FAFC" /></button>
         <h1 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Resource Alchemy</h1>
         <div className="text-[10px]" style={{ color: '#A855F7' }}>Forged: {state?.forged_count || 0}</div>

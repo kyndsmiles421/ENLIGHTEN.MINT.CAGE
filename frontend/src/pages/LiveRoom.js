@@ -762,7 +762,7 @@ export default function LiveRoom() {
       </AnimatePresence>
 
       {/* Top Bar */}
-      <div className="relative z-20 px-4 py-3 flex items-center justify-between" style={{ background: 'rgba(10,11,20,0.6)', backdropFilter: 'blur(12px)' }}>
+      <div className="relative z-20 px-4 py-3 flex items-center justify-between" style={{ background: 'rgba(10,11,20,0.6)', backdropFilter: 'none'}}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/live')} className="p-1.5 rounded-lg hover:bg-white/5" data-testid="live-room-back">
             <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.6)' }} />
@@ -804,7 +804,7 @@ export default function LiveRoom() {
                 {showVideoSettings && (
                   <motion.div initial={{ opacity: 0, y: -5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -5, scale: 0.95 }}
                     className="absolute right-0 top-10 z-50 w-56 rounded-xl overflow-hidden"
-                    style={{ background: 'rgba(20,22,40,0.95)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'blur(16px)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
+                    style={{ background: 'rgba(20,22,40,0.95)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
                     data-testid="video-settings-dropdown">
                     <div className="p-2">
                       <p className="text-[9px] font-bold uppercase tracking-wider px-2 pb-2" style={{ color: 'var(--text-muted)' }}>Video Mode</p>
@@ -876,7 +876,7 @@ export default function LiveRoom() {
           )}
 
           {/* Bottom Controls Bar */}
-          <div className="relative z-20 px-4 py-3 flex items-center justify-center gap-2" style={{ background: 'rgba(10,11,20,0.7)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(248,250,252,0.04)' }}
+          <div className="relative z-20 px-4 py-3 flex items-center justify-center gap-2" style={{ background: 'rgba(10,11,20,0.7)', backdropFilter: 'none', borderTop: '1px solid rgba(248,250,252,0.04)' }}
             data-testid="bottom-controls">
 
             {/* Camera Toggle (all users when allowed) */}
@@ -989,7 +989,7 @@ export default function LiveRoom() {
           {/* Recording Status */}
           {recordingStatus && (
             <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+              style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'none'}}>
               {recordingStatus === 'recording' && <>
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />
                 <span className="text-[9px]" style={{ color: '#EF4444' }}>Recording...</span>
@@ -1005,7 +1005,7 @@ export default function LiveRoom() {
           {(showChat || showParticipants) && (
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
               className="flex flex-col overflow-hidden flex-shrink-0 min-h-0"
-              style={{ background: 'rgba(10,11,20,0.8)', backdropFilter: 'blur(16px)', borderLeft: '1px solid rgba(248,250,252,0.04)' }}>
+              style={{ background: 'rgba(10,11,20,0.8)', backdropFilter: 'none', borderLeft: '1px solid rgba(248,250,252,0.04)' }}>
 
               {/* Participants Panel */}
               {showParticipants && (
@@ -1218,7 +1218,7 @@ function VideoTile({ tile, localVideoRef }) {
 
       {/* Name badge */}
       <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-lg"
-        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'none'}}>
         <span className="text-[9px] font-medium" style={{ color: '#F8FAFC' }}>
           {tile.name}
         </span>
@@ -1256,7 +1256,7 @@ function ScreenShareTile({ stream, sharerName }) {
         style={{ background: '#000' }}
       />
       <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
-        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
+        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}>
         <Monitor size={12} style={{ color: '#EAB308' }} />
         <span className="text-[10px] font-medium" style={{ color: '#FDE68A' }}>
           {sharerName}'s screen
@@ -1337,7 +1337,7 @@ function AvatarCircle({ participants, currentUserId, myAvatar }) {
                 style={{ border: `1px solid ${isMe ? '#C084FC' : 'rgba(248,250,252,0.1)'}` }} />
             </motion.div>
             <span className="text-[8px] mt-1 px-1.5 py-0.5 rounded-full max-w-16 truncate"
-              style={{ background: 'rgba(0,0,0,0.5)', color: isMe ? '#C084FC' : 'rgba(248,250,252,0.6)', backdropFilter: 'blur(4px)' }}>
+              style={{ background: 'rgba(0,0,0,0.5)', color: isMe ? '#C084FC' : 'rgba(248,250,252,0.6)', backdropFilter: 'none'}}>
               {isMe ? 'You' : p.name?.split(' ')[0]}
             </span>
           </motion.div>

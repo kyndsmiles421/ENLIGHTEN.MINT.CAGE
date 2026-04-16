@@ -35,7 +35,7 @@ function ReikiPositionCard({ pos, chakras }) {
   const color = chakra?.color || '#C084FC';
   return (
     <div className="rounded-xl p-4" data-testid={`position-${pos.id}`}
-      style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${color}12` }}>
+      style={{ background: 'transparent', border: `1px solid ${color}12` }}>
       <div className="flex items-center gap-2 mb-2">
         <div className="w-6 h-6 rounded-full flex items-center justify-center"
           style={{ background: `${color}20` }}>
@@ -58,7 +58,7 @@ function AuraReading({ reading, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
       className="rounded-2xl p-6 mb-6 relative overflow-hidden" data-testid="aura-reading"
-      style={{ background: 'rgba(15,17,28,0.9)', border: `1px solid ${color}30`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${color}30`, backdropFilter: 'none'}}>
       <div className="absolute inset-0 opacity-5"
         style={{ background: `radial-gradient(circle at 50% 30%, ${color}, transparent 70%)` }} />
       <div className="relative z-10">
@@ -169,7 +169,7 @@ export default function Reiki() {
             <button key={t.id} onClick={() => setTab(t.id)} data-testid={`tab-${t.id}`}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all"
               style={{
-                background: tab === t.id ? 'rgba(129,140,248,0.15)' : 'rgba(15,17,28,0.4)',
+                background: tab === t.id ? 'rgba(129,140,248,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(129,140,248,0.3)' : 'rgba(248,250,252,0.06)'}`,
                 color: tab === t.id ? '#818CF8' : 'rgba(248,250,252,0.5)',
               }}><t.icon size={14} />{t.label}</button>
@@ -183,7 +183,7 @@ export default function Reiki() {
             </AnimatePresence>
             {!reading && (
               <div className="max-w-md mx-auto rounded-2xl p-6 text-center"
-                style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(129,140,248,0.15)', backdropFilter: 'blur(12px)' }}>
+                style={{ background: 'transparent', border: '1px solid rgba(129,140,248,0.15)', backdropFilter: 'none'}}>
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
                   style={{ background: 'rgba(129,140,248,0.1)', boxShadow: '0 0 60px rgba(129,140,248,0.15)' }}>
                   <Eye size={32} style={{ color: '#818CF8' }} />
@@ -195,7 +195,7 @@ export default function Reiki() {
                   <select value={birthMonth} onChange={e => setBirthMonth(+e.target.value)}
                     data-testid="aura-birth-month"
                     className="px-3 py-2 rounded-xl text-xs"
-                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}>
+                    style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}>
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]}</option>
                     ))}
@@ -203,7 +203,7 @@ export default function Reiki() {
                   <select value={birthDay} onChange={e => setBirthDay(+e.target.value)}
                     data-testid="aura-birth-day"
                     className="px-3 py-2 rounded-xl text-xs"
-                    style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}>
+                    style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: 'var(--text-primary)' }}>
                     {Array.from({ length: 31 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>{i + 1}</option>
                     ))}

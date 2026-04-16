@@ -80,7 +80,7 @@ export default function WellnessReports() {
             <button key={p} onClick={() => setPeriod(p)} data-testid={`period-${p}`}
               className="px-5 py-2 rounded-xl text-xs font-medium transition-all capitalize"
               style={{
-                background: period === p ? 'rgba(129,140,248,0.15)' : 'rgba(15,17,28,0.4)',
+                background: period === p ? 'rgba(129,140,248,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${period === p ? 'rgba(129,140,248,0.3)' : 'rgba(248,250,252,0.06)'}`,
                 color: period === p ? '#818CF8' : 'rgba(248,250,252,0.5)',
               }}>{p}</button>
@@ -102,7 +102,7 @@ export default function WellnessReports() {
             </div>
 
             {/* Activity breakdown */}
-            <div className="rounded-2xl p-5" style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(129,140,248,0.1)' }}>
+            <div className="rounded-2xl p-5" style={{ background: 'transparent', border: '1px solid rgba(129,140,248,0.1)' }}>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#818CF8' }}>Activity Breakdown</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
@@ -126,7 +126,7 @@ export default function WellnessReports() {
 
             {/* Mood breakdown */}
             {s?.mood_breakdown && Object.keys(s.mood_breakdown).length > 0 && (
-              <div className="rounded-2xl p-5" style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(216,180,254,0.1)' }}>
+              <div className="rounded-2xl p-5" style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.1)' }}>
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#D8B4FE' }}>Mood Distribution</p>
                 <div className="space-y-2">
                   {Object.entries(s.mood_breakdown).sort((a, b) => b[1] - a[1]).map(([mood, count]) => (

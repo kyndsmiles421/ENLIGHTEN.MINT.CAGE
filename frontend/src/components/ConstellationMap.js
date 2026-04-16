@@ -158,7 +158,7 @@ export default function ConstellationMap({ isOpen, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className={`fixed inset-0 z-[9998] ${isFullscreen ? '' : 'p-4 md:p-8'}`}
-        style={{ background: 'rgba(5,5,12,0.95)' }}
+        style={{ background: 'rgba(0,0,0,0)' }}
         data-testid="constellation-map"
       >
         {/* Header */}

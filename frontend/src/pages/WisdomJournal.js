@@ -63,9 +63,9 @@ function NewEntryForm({ onSaved, teachers }) {
             className="w-full px-3 py-2 rounded-lg text-sm bg-transparent"
             style={{ border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-primary)' }}
             data-testid="journal-teacher-select">
-            <option value="" style={{ background: '#161826' }}>Personal Reflection</option>
+            <option value="" style={{ background: 'transparent' }}>Personal Reflection</option>
             {teachers.map(t => (
-              <option key={t.id} value={t.id} style={{ background: '#161826' }}>{t.name}</option>
+              <option key={t.id} value={t.id} style={{ background: 'transparent' }}>{t.name}</option>
             ))}
           </select>
         </div>
@@ -76,9 +76,9 @@ function NewEntryForm({ onSaved, teachers }) {
               className="w-full px-3 py-2 rounded-lg text-sm bg-transparent"
               style={{ border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-primary)' }}
               data-testid="journal-teaching-select">
-              <option value="" style={{ background: '#161826' }}>General</option>
+              <option value="" style={{ background: 'transparent' }}>General</option>
               {teacherData.teachings.map(t => (
-                <option key={t.id} value={t.id} style={{ background: '#161826' }}>{t.title}</option>
+                <option key={t.id} value={t.id} style={{ background: 'transparent' }}>{t.title}</option>
               ))}
             </select>
           </div>
@@ -92,9 +92,9 @@ function NewEntryForm({ onSaved, teachers }) {
             className="w-full px-3 py-2 rounded-lg text-sm bg-transparent"
             style={{ border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-primary)' }}
             data-testid="journal-quote-select">
-            <option value="" style={{ background: '#161826' }}>None</option>
+            <option value="" style={{ background: 'transparent' }}>None</option>
             {teacherData.quotes.map((q, i) => (
-              <option key={i} value={q} style={{ background: '#161826' }}>{q.slice(0, 60)}...</option>
+              <option key={i} value={q} style={{ background: 'transparent' }}>{q.slice(0, 60)}...</option>
             ))}
           </select>
         </div>

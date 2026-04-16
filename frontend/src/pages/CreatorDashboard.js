@@ -699,7 +699,7 @@ function BroadcastModal({ authHeaders, onClose, onSent }) {
       <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.6)' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-md rounded-2xl p-6"
-        style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(234,179,8,0.12)', backdropFilter: 'blur(20px)' }}
+        style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(234,179,8,0.12)', backdropFilter: 'none'}}
         onClick={e => e.stopPropagation()} data-testid="broadcast-modal">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Send Broadcast</h2>
@@ -753,7 +753,7 @@ function UserDetailModal({ user: u, onClose, onToggleStatus }) {
       <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.6)' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-md rounded-2xl p-6"
-        style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.12)', backdropFilter: 'blur(20px)' }}
+        style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.12)', backdropFilter: 'none'}}
         onClick={e => e.stopPropagation()} data-testid="user-detail-modal">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>User Details</h2>

@@ -152,7 +152,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
               <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 100%)' }} />
             </motion.div>
           ) : videoMode && videoStatus === 'generating' ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(15,17,28,1) 0%, #000 70%)' }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}><Video size={32} style={{ color: story.color }} /></motion.div>
               <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.5)' }}>Generating cinematic video with Sora 2...</p>
             </div>
@@ -162,12 +162,12 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
               <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 100%)' }} />
             </motion.div>
           ) : generating ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(15,17,28,1) 0%, #000 70%)' }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}><Sparkles size={32} style={{ color: story.color }} /></motion.div>
               <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.5)' }}>{genProgress || 'Preparing the cosmic canvas...'}</p>
             </div>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(15,17,28,1) 0%, #000 70%)' }}>
+            <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
               <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No scene generated yet</p>
             </div>
           )}
@@ -335,7 +335,7 @@ function StoryCard({ story, onSelect, index }) {
       onClick={() => onSelect(story)}
       data-testid={`story-card-${story.id}`}
       className="rounded-2xl p-5 cursor-pointer group relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'none'}}
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
     >
       {/* Animated glow on hover */}
@@ -390,7 +390,7 @@ function CivilizationCard({ civ, onSelect, index }) {
       onClick={() => onSelect(civ)}
       data-testid={`civ-card-${civ.id}`}
       className="rounded-2xl p-4 cursor-pointer group relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'none'}}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
     >
       {/* Animated corner glow */}
@@ -459,7 +459,7 @@ function MythCard({ myth, color, onSelect, onGenerate, index, generating }) {
       transition={{ delay: index * 0.04 }}
       data-testid={`myth-card-${myth.seed_title?.replace(/\s+/g, '-').toLowerCase()}`}
       className="rounded-xl p-4 cursor-pointer group relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.4)', border: `1px solid ${myth.generated ? color + '12' : 'rgba(248,250,252,0.04)'}`, backdropFilter: 'blur(6px)' }}
+      style={{ background: 'transparent', border: `1px solid ${myth.generated ? color + '12' : 'rgba(248,250,252,0.04)'}`, backdropFilter: 'none'}}
       whileHover={{ x: 4, transition: { duration: 0.15 } }}
       onClick={() => myth.generated ? onSelect(myth) : onGenerate(myth)}
     >
@@ -519,7 +519,7 @@ function MythDetail({ myth, color, onBack }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
       className="rounded-2xl overflow-hidden" data-testid="myth-detail"
-      style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${color}15`, backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${color}15`, backdropFilter: 'none'}}>
 
       {/* Header with animated gradient */}
       <div className="p-6 pb-4 relative overflow-hidden">
@@ -660,7 +660,7 @@ function MythSearchResults({ results, onSelectResult, searchQuery }) {
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
           onClick={() => onSelectResult(r)}
           className="rounded-xl p-3 cursor-pointer group hover:bg-white/[0.02] transition-colors"
-          style={{ background: 'rgba(15,17,28,0.3)', border: '1px solid rgba(248,250,252,0.04)' }}>
+          style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: `${r.color}10`, border: `1px solid ${r.color}15` }}>
@@ -844,7 +844,7 @@ export default function CreationStories() {
         </div>
 
         {/* Tab Bar with animated underline */}
-        <div className="flex gap-1 mb-6 p-1 rounded-xl" style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="flex gap-1 mb-6 p-1 rounded-xl" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
           {tabs.map(tab => {
             const TabIcon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -885,7 +885,7 @@ export default function CreationStories() {
                   <input type="text" placeholder="Search cultures, deities, stories..." value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)} data-testid="story-search"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs"
-                    style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
+                    style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
                   {searchQuery && (
                     <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
                   )}
@@ -893,14 +893,14 @@ export default function CreationStories() {
                 <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
                   <button onClick={() => setActiveRegion('all')} data-testid="region-all"
                     className="flex-shrink-0 px-3 py-2 rounded-xl text-[10px] font-medium transition-all"
-                    style={{ background: activeRegion === 'all' ? 'rgba(192,132,252,0.12)' : 'rgba(15,17,28,0.6)', border: `1px solid ${activeRegion === 'all' ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === 'all' ? '#C084FC' : 'rgba(248,250,252,0.4)' }}>
+                    style={{ background: activeRegion === 'all' ? 'rgba(192,132,252,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${activeRegion === 'all' ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === 'all' ? '#C084FC' : 'rgba(248,250,252,0.4)' }}>
                     All Regions
                   </button>
                   {Object.keys(regions).map(region => (
                     <button key={region} onClick={() => setActiveRegion(region)}
                       data-testid={`region-${region.toLowerCase().replace(/[^a-z]/g, '-')}`}
                       className="flex-shrink-0 px-3 py-2 rounded-xl text-[10px] font-medium transition-all whitespace-nowrap"
-                      style={{ background: activeRegion === region ? 'rgba(192,132,252,0.12)' : 'rgba(15,17,28,0.6)', border: `1px solid ${activeRegion === region ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === region ? '#C084FC' : 'rgba(248,250,252,0.4)' }}>
+                      style={{ background: activeRegion === region ? 'rgba(192,132,252,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${activeRegion === region ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === region ? '#C084FC' : 'rgba(248,250,252,0.4)' }}>
                       {REGION_ICONS[region] || ''} {region}
                     </button>
                   ))}
@@ -932,7 +932,7 @@ export default function CreationStories() {
                   {selected && (
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
                       className="w-full lg:w-1/2 lg:sticky lg:top-24 lg:max-h-[80vh] lg:overflow-y-auto" data-testid="story-detail-panel">
-                      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${selected.color}15`, backdropFilter: 'blur(12px)' }}>
+                      <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent', border: `1px solid ${selected.color}15`, backdropFilter: 'none'}}>
                         <div className="p-6 pb-4" style={{ background: `linear-gradient(180deg, ${selected.color}08 0%, transparent 100%)` }}>
                           <div className="flex items-center justify-between mb-4">
                             <button onClick={() => { setSelected(null); setFullStory(null); }} data-testid="close-story-detail"
@@ -1017,7 +1017,7 @@ export default function CreationStories() {
                 <input type="text" placeholder="Search all myths, legends, and folklore across civilizations..."
                   value={mythSearchQuery} onChange={e => setMythSearchQuery(e.target.value)} data-testid="myth-search"
                   className="w-full pl-9 pr-10 py-2.5 rounded-xl text-xs"
-                  style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
+                  style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
                 {mythSearchQuery && (
                   <button onClick={() => { setMythSearchQuery(''); setMythSearchResults(null); }}
                     className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
@@ -1027,7 +1027,7 @@ export default function CreationStories() {
 
               {/* Search results overlay */}
               {mythSearchResults !== null && (
-                <div className="mb-6 rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)' }}>
+                <div className="mb-6 rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
                   <MythSearchResults results={mythSearchResults} onSelectResult={handleSearchResultSelect} searchQuery={mythSearchQuery} />
                 </div>
               )}
@@ -1060,7 +1060,7 @@ export default function CreationStories() {
 
                     {/* Civ header */}
                     <div className="rounded-xl p-4 mb-4 relative overflow-hidden"
-                      style={{ background: 'rgba(15,17,28,0.5)', border: `1px solid ${selectedCiv.color}15` }}>
+                      style={{ background: 'transparent', border: `1px solid ${selectedCiv.color}15` }}>
                       <motion.div className="absolute inset-0 pointer-events-none"
                         style={{ background: `linear-gradient(135deg, ${selectedCiv.color}06, transparent 60%)` }} />
                       <div className="relative z-10 flex items-center justify-between">

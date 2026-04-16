@@ -18,7 +18,7 @@ function SuggestionCard({ feat, index }) {
       onClick={() => navigate(feat.path)}
       className="cursor-pointer rounded-2xl p-5 transition-all group"
       data-testid={`suggestion-${feat.id}`}
-      style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${feat.color}15`, backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${feat.color}15`, backdropFilter: 'none'}}>
       <div className="flex items-center gap-3 mb-3">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center"
           style={{ background: `${feat.color}15`, boxShadow: `0 0 25px ${feat.color}10` }}>
@@ -85,7 +85,7 @@ export default function TrySomethingNew() {
           <>
             {/* Exploration Progress */}
             <div className="max-w-md mx-auto mb-8 rounded-2xl p-5"
-              style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(232,121,249,0.1)', backdropFilter: 'blur(12px)' }}>
+              style={{ background: 'transparent', border: '1px solid rgba(232,121,249,0.1)', backdropFilter: 'none'}}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Your Exploration Journey</p>
                 <span className="text-xs font-bold" style={{ color: '#E879F9' }}>{stats.percent || 0}%</span>

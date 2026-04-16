@@ -544,7 +544,7 @@ export default function LiquidityTrader() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#030308' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
           <Sparkles size={24} color="#A855F7" />
         </motion.div>
@@ -560,9 +560,9 @@ export default function LiquidityTrader() {
   ];
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: '#030308' }} data-testid="liquidity-trader-page">
+    <div className="min-h-screen pb-24" style={{ background: 'transparent' }} data-testid="liquidity-trader-page">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'blur(20px)' }}>
+      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'none'}}>
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="trader-back-btn">
           <ArrowLeft size={16} color="#F8FAFC" />
         </button>

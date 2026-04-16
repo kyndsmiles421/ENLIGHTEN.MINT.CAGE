@@ -13,7 +13,7 @@ export function StrokeTracer({ character, strokes, size = 280, onComplete, color
   const drawReference = useCallback((ctx) => {
     ctx.clearRect(0, 0, size, size);
 
-    ctx.fillStyle = 'rgba(10,10,18,0.95)';
+    ctx.fillStyle = 'rgba(0,0,0,0)';
     ctx.fillRect(0, 0, size, size);
 
     ctx.strokeStyle = 'rgba(248,250,252,0.04)';
@@ -165,7 +165,7 @@ export function StrokeTracer({ character, strokes, size = 280, onComplete, color
         {accuracy !== null && (
           <motion.div
             className="absolute inset-0 flex items-center justify-center rounded-lg"
-            style={{ background: 'rgba(10,10,18,0.85)' }}
+            style={{ background: 'rgba(0,0,0,0)' }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           >
             <div className="text-center">

@@ -444,7 +444,7 @@ export default function RPGPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="rpg-page">
       {/* Header */}
-      <div className="sticky top-0 z-10 px-4 py-3" style={{ background: 'rgba(8,8,16,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="sticky top-0 z-10 px-4 py-3" style={{ background: 'rgba(8,8,16,0.9)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/dashboard')} className="p-1.5 rounded-lg hover:bg-white/5"><ArrowLeft size={16} style={{ color: 'var(--text-muted)' }} /></button>

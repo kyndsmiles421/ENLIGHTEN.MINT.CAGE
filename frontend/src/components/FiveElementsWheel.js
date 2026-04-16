@@ -57,7 +57,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
 
   return (
     <div className="rounded-xl overflow-hidden" data-testid="five-elements-wheel"
-      style={{ background: 'rgba(10,10,18,0.6)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(20px)' }}>
+      style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(20px)' }}>
 
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
@@ -165,7 +165,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                   style={{ transition: 'r 0.2s' }} />
                 {/* Outer ring */}
                 <circle cx={pos.x} cy={pos.y} r={nodeR}
-                  fill={isActive ? `${e.color}20` : 'rgba(10,10,18,0.8)'}
+                  fill={isActive ? `${e.color}20` : 'rgba(0,0,0,0)'}
                   stroke={e.color} strokeWidth={isActive ? 2 : 1 + proximity * 0.5}
                   opacity={dimmed ? 0.3 : 1}
                   style={{ transition: 'all 0.2s' }} />
@@ -392,7 +392,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
             </div>
 
             {/* Flow meter */}
-            <div className="px-3 py-2" style={{ background: 'rgba(10,10,18,0.4)' }}>
+            <div className="px-3 py-2" style={{ background: 'rgba(0,0,0,0)' }}>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-[7px] font-mono" style={{ color: '#22C55E' }}>+{resonanceData.totals?.boost || 0}</span>
                 <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
@@ -413,7 +413,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
 
             {/* Synergy list */}
             {resonanceData.synergies?.length > 0 && (
-              <div className="px-3 py-2 space-y-1" style={{ background: 'rgba(10,10,18,0.3)' }}>
+              <div className="px-3 py-2 space-y-1" style={{ background: 'rgba(0,0,0,0)' }}>
                 {resonanceData.synergies.slice(0, 6).map((s, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">

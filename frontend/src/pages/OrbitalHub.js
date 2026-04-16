@@ -721,14 +721,14 @@ export default function OrbitalHub() {
                   style={{
                     background: isHovered || isExtracted 
                       ? `${sat.color}1A` 
-                      : 'rgba(10,10,18,0.6)',
+                      : 'rgba(0,0,0,0)',
                     border: `1.5px solid ${isHovered || isExtracted ? sat.color + '55' : sat.color + '20'}`,
                     boxShadow: isExtracted
                       ? `0 0 ${R * 0.2}px ${sat.color}40, inset 0 0 ${R * 0.1}px ${sat.color}15`
                       : isHovered
                       ? `0 0 ${R * 0.15}px ${sat.color}30`
                       : 'none',
-                    backdropFilter: 'blur(8px)',
+                    backdropFilter: 'none',
                   }}
                 >
                   <Icon 
@@ -781,7 +781,7 @@ export default function OrbitalHub() {
             <motion.div
               className="w-full h-full rounded-full relative overflow-hidden"
               style={{
-                background: `radial-gradient(circle at 38% 32%, rgba(167,139,250,0.22), rgba(167,139,250,0.06) 55%, rgba(10,10,18,0.95) 85%)`,
+                background: `radial-gradient(circle at 38% 32%, rgba(167,139,250,0.22), rgba(167,139,250,0.06) 55%, rgba(0,0,0,0) 85%)`,
                 border: '1.5px solid rgba(167,139,250,0.15)',
               }}
               animate={{
@@ -981,7 +981,7 @@ export default function OrbitalHub() {
                   top: `${center + pos.y - size / 2 - btnSize / 2}px`,
                   width: `${btnSize}px`,
                   height: `${btnSize}px`,
-                  background: 'rgba(10,10,18,0.9)',
+                  background: 'rgba(0,0,0,0)',
                   border: '1px solid rgba(248,250,252,0.3)',
                   borderRadius: '50%',
                   color: 'rgba(248,250,252,0.7)',

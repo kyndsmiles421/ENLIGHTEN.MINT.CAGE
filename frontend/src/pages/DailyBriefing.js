@@ -17,7 +17,7 @@ function Section({ title, icon: Icon, color, children, delay = 0 }) {
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: 'easeOut' }}
       className="rounded-2xl p-5 relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.65)', border: `1px solid ${color}12`, backdropFilter: 'blur(16px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${color}12`, backdropFilter: 'none'}}>
       <div className="absolute inset-0 opacity-[0.03]"
         style={{ background: `radial-gradient(circle at 20% 30%, ${color}, transparent 60%)` }} />
       <div className="flex items-center gap-2 mb-4 relative z-10">
@@ -97,7 +97,7 @@ export default function DailyBriefing() {
         {dailyCard ? (
           <div className="rounded-2xl overflow-hidden mx-auto max-w-sm" style={{ border: '1px solid rgba(216,180,254,0.15)', boxShadow: '0 0 40px rgba(216,180,254,0.05)' }}>
             <img src={`data:image/png;base64,${dailyCard}`} alt="Card of the day" className="w-full h-48 object-cover" style={{ filter: 'saturate(1.15)' }} />
-            <div className="p-3 text-center" style={{ background: 'rgba(15,17,28,0.9)' }}>
+            <div className="p-3 text-center" style={{ background: 'transparent'}}>
               <p className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#D8B4FE' }}>Your Cosmic Card</p>
             </div>
           </div>

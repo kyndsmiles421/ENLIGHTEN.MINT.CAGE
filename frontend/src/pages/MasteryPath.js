@@ -255,7 +255,7 @@ export default function MasteryPath() {
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b"
-        style={{ borderColor: 'rgba(248,250,252,0.05)', background: 'rgba(6,6,14,0.96)', backdropFilter: 'blur(12px)' }}>
+        style={{ borderColor: 'rgba(248,250,252,0.05)', background: 'rgba(6,6,14,0.96)', backdropFilter: 'none'}}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/hub')} className="p-1.5 rounded-lg"
             style={{ background: 'rgba(248,250,252,0.03)' }} data-testid="mastery-back-btn">

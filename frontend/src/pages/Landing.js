@@ -600,7 +600,7 @@ function QuickResetModal({ open, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center px-4"
-        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)' }}
+        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <motion.div
@@ -608,7 +608,7 @@ function QuickResetModal({ open, onClose }) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}
           className="w-full max-w-lg p-8 relative rounded-3xl overflow-hidden"
-          style={{ background: 'rgba(13,14,26,0.97)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(28px)', boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(192,132,252,0.06)' }}
+          style={{ background: 'rgba(13,14,26,0.97)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'none', boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(192,132,252,0.06)' }}
           data-testid="quick-reset-modal"
         >
           <button onClick={() => { onClose(); reset(); }} className="absolute top-4 right-4" style={{ color: 'var(--text-muted)' }}>
@@ -837,7 +837,7 @@ function Footer() {
         {showPrivacy && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
             onClick={(e) => e.target === e.currentTarget && setShowPrivacy(false)}>
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="glass-card w-full max-w-lg p-8 max-h-[80vh] overflow-y-auto relative">
               <button onClick={() => setShowPrivacy(false)} className="absolute top-4 right-4" style={{ color: 'var(--text-muted)' }}><X size={18} /></button>
@@ -860,7 +860,7 @@ function Footer() {
         {showDisclaimer && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
             onClick={(e) => e.target === e.currentTarget && setShowDisclaimer(false)}>
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="glass-card w-full max-w-lg p-8 max-h-[80vh] overflow-y-auto relative">
               <button onClick={() => setShowDisclaimer(false)} className="absolute top-4 right-4" style={{ color: 'var(--text-muted)' }}><X size={18} /></button>
@@ -901,7 +901,7 @@ export default function Landing() {
       try {
         // Dark status bar for immersive experience
         await StatusBar.setStyle({ style: Style.Dark });
-        await StatusBar.setBackgroundColor({ color: '#0B0C15' });
+        await StatusBar.setBackgroundColor({ color: 'transparent' });
       } catch (e) {
         // Web fallback - no-op
       }
@@ -961,7 +961,7 @@ export default function Landing() {
               fontWeight: '600',
               fontSize: '14px',
               cursor: 'pointer',
-              backdropFilter: 'blur(12px)',
+              backdropFilter: 'none',
             }}
             data-testid="header-sign-in-btn"
           >

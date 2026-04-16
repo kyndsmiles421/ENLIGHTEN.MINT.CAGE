@@ -44,9 +44,9 @@ function PlantCard({ plant, onSelect, selected }) {
       style={{
         background: selected?.id === plant.id
           ? `linear-gradient(135deg, ${plant.element_color}12, ${plant.element_color}06)`
-          : 'rgba(10,10,18,0.5)',
+          : 'rgba(0,0,0,0)',
         border: `1px solid ${selected?.id === plant.id ? plant.element_color + '40' : 'rgba(248,250,252,0.04)'}`,
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
         opacity: plant.locked ? 0.5 : 1,
       }}
       whileHover={!plant.locked ? { scale: 1.01, y: -2 } : {}}
@@ -113,7 +113,7 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
       className="rounded-xl overflow-hidden" data-testid="plant-detail-panel"
-      style={{ background: 'rgba(10,10,18,0.7)', border: `1px solid ${plant.element_color}20`, backdropFilter: 'blur(24px)' }}
+      style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${plant.element_color}20`, backdropFilter: 'none'}}
     >
       {/* Header bar */}
       <div className="px-5 py-4 flex items-center justify-between"
@@ -267,7 +267,7 @@ function GardenPanel({ garden, summary, onNurture, nurturing }) {
   if (!garden.length) {
     return (
       <div className="rounded-xl p-6 flex flex-col items-center justify-center"
-        style={{ background: 'rgba(10,10,18,0.3)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 300 }}>
+        style={{ background: 'rgba(0,0,0,0)', border: '1px dashed rgba(248,250,252,0.05)', minHeight: 300 }}>
         <Leaf size={28} style={{ color: 'rgba(248,250,252,0.08)' }} />
         <p className="text-[10px] mt-3" style={{ color: 'rgba(248,250,252,0.15)' }}>Your garden is empty</p>
         <p className="text-[9px] mt-1" style={{ color: 'rgba(248,250,252,0.1)' }}>Add plants from the catalog</p>
@@ -279,7 +279,7 @@ function GardenPanel({ garden, summary, onNurture, nurturing }) {
     <div className="space-y-3" data-testid="garden-panel">
       {/* Garden Summary */}
       {summary && (
-        <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,18,0.5)', border: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)' }}>
           <p className="text-[8px] uppercase tracking-[0.15em] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>Garden Energetics</p>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
@@ -337,7 +337,7 @@ function IdentifyPanel({ onIdentify, identifying, result }) {
   const [desc, setDesc] = useState('');
 
   return (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(10,10,18,0.5)', border: '1px solid rgba(248,250,252,0.04)' }}
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)' }}
       data-testid="identify-panel">
       <p className="text-[8px] uppercase tracking-[0.15em] mb-2" style={{ color: '#C084FC' }}>
         <Sparkles size={10} className="inline mr-1" /> AI Plant Identification
@@ -662,7 +662,7 @@ export default function Botany() {
               )}
 
               {/* Quick garden view */}
-              <div className="rounded-xl p-3" style={{ background: 'rgba(10,10,18,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[8px] uppercase tracking-[0.15em]" style={{ color: 'rgba(248,250,252,0.2)' }}>My Garden</p>
                   <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>{garden.length}/24</span>

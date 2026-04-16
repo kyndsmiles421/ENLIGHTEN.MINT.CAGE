@@ -140,7 +140,7 @@ export default function StarseedRealm() {
         toast('Cosmic Founder Badge Claimed!', {
           description: 'You now have access to the exclusive Founder\'s Harmonic frequency',
           style: {
-            background: 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(10,10,18,0.92))',
+            background: 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(0,0,0,0))',
             border: '1px solid rgba(252,211,77,0.3)',
             color: '#FCD34D',
             boxShadow: '0 0 30px rgba(252,211,77,0.15)',

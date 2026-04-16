@@ -234,7 +234,7 @@ export default function SovereignMasterEngine() {
 
         {/* Module Content */}
         <section className="z-10 w-full max-w-3xl rounded-xl p-6 sm:p-8"
-          style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.04)' }}>
+          style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'none', border: '1px solid rgba(255,255,255,0.04)' }}>
 
           <AnimatePresence mode="wait">
             {selectedModule ? (

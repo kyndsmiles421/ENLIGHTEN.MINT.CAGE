@@ -229,7 +229,7 @@ export default function CosmicToolbar() {
       zenSoundsRef.current = [];
       setMeditating(false);
       setBpm(0);
-      toast('Meditation ended', { style: { background: 'rgba(10,10,18,0.92)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(248,250,252,0.6)' } });
+      toast('Meditation ended', { style: { background: 'rgba(0,0,0,0)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(248,250,252,0.6)' } });
       return;
     }
     // Start 528Hz + 174Hz + Ocean via MixerContext
@@ -245,7 +245,7 @@ export default function CosmicToolbar() {
     setMeditating(true);
     toast('Deep Zen activated', {
       description: '528Hz + 174Hz + Ocean \u00b7 60 BPM',
-      style: { background: 'linear-gradient(135deg, rgba(10,10,18,0.95), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80' },
+      style: { background: 'linear-gradient(135deg, rgba(0,0,0,0), rgba(20,40,20,0.95))', border: '1px solid rgba(34,197,94,0.3)', color: '#4ADE80' },
     });
   }, [meditating, setBpm, refreshCollapse, mixerToggleFreq, mixerToggleSound, mixerActiveFreqs, mixerActiveSounds]);
 
@@ -319,7 +319,7 @@ export default function CosmicToolbar() {
         zIndex: baseZ,
         padding: expanded ? '5px 8px' : '5px 6px',
         borderRadius: 24,
-        background: anyActive ? 'rgba(10,10,18,0.55)' : 'rgba(10,10,18,0.35)',
+        background: anyActive ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0)',
         border: `1px solid ${anyActive ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.05)'}`,
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
@@ -496,7 +496,7 @@ function ToolBtn({ children, testId, onClick, onPointerDown, onPointerUp, onPoin
       </span>
       {badge && (
         <div className="absolute -top-0.5 -right-0.5 w-[6px] h-[6px] rounded-full"
-          style={{ background: '#22C55E', border: '1.5px solid rgba(10,10,18,0.9)' }} />
+          style={{ background: '#22C55E', border: '1.5px solid rgba(0,0,0,0)' }} />
       )}
       <AnimatePresence>
         {expanded && label && (

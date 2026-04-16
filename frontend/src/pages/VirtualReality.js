@@ -1081,7 +1081,7 @@ export default function VirtualReality() {
   const hoveredData = hoveredPortal ? PORTALS.find(p => p.id === hoveredPortal) : null;
 
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: '#030308' }} data-testid="vr-page">
+    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: 'transparent' }} data-testid="vr-page">
       {/* 3D Scene */}
       <div ref={mountRef} className="w-full h-full" data-testid="vr-canvas-container" />
 
@@ -1092,8 +1092,8 @@ export default function VirtualReality() {
             className="p-2.5 rounded-xl transition-all"
             style={{
               background: 'rgba(10,10,20,0.4)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: '1px solid rgba(255,255,255,0.06)',
               color: 'var(--text-secondary)',
             }}
@@ -1102,8 +1102,8 @@ export default function VirtualReality() {
           </button>
           <div className="px-4 py-2 rounded-xl" style={{
             background: 'rgba(10,10,20,0.4)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
             border: '1px solid rgba(192,132,252,0.12)',
             boxShadow: '0 0 16px rgba(192,132,252,0.06)',
           }}>
@@ -1116,8 +1116,8 @@ export default function VirtualReality() {
             className="p-2.5 rounded-xl transition-all"
             style={{
               background: vrTheater ? 'rgba(249,115,22,0.12)' : 'rgba(10,10,20,0.4)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: `1px solid ${vrTheater ? 'rgba(249,115,22,0.25)' : 'rgba(255,255,255,0.06)'}`,
               color: vrTheater ? '#F97316' : 'var(--text-secondary)',
               boxShadow: vrTheater ? '0 0 12px rgba(249,115,22,0.1)' : 'none',
@@ -1129,8 +1129,8 @@ export default function VirtualReality() {
             className="p-2.5 rounded-xl transition-all"
             style={{
               background: activeJourney ? 'rgba(252,211,77,0.12)' : 'rgba(10,10,20,0.4)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: `1px solid ${activeJourney ? 'rgba(252,211,77,0.25)' : 'rgba(255,255,255,0.06)'}`,
               color: activeJourney ? '#FCD34D' : 'var(--text-secondary)',
               boxShadow: activeJourney ? '0 0 12px rgba(252,211,77,0.1)' : 'none',
@@ -1142,8 +1142,8 @@ export default function VirtualReality() {
             className="p-2.5 rounded-xl transition-all"
             style={{
               background: ambientAudio ? 'rgba(192,132,252,0.12)' : 'rgba(10,10,20,0.4)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: `1px solid ${ambientAudio ? 'rgba(192,132,252,0.25)' : 'rgba(255,255,255,0.06)'}`,
               color: ambientAudio ? '#C084FC' : 'var(--text-secondary)',
               boxShadow: ambientAudio ? '0 0 12px rgba(192,132,252,0.1)' : 'none',
@@ -1155,8 +1155,8 @@ export default function VirtualReality() {
             className="p-2.5 rounded-xl transition-all"
             style={{
               background: 'rgba(10,10,20,0.4)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: '1px solid rgba(255,255,255,0.06)',
               color: 'var(--text-secondary)',
             }}
@@ -1176,8 +1176,8 @@ export default function VirtualReality() {
         >
           <div className="rounded-xl p-3" style={{
             background: 'rgba(10,10,20,0.45)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
             border: `1px solid ${energyState.dominant_chakra?.color || '#C084FC'}25`,
             boxShadow: `0 0 24px ${energyState.dominant_chakra?.color || '#C084FC'}08, 0 4px 16px rgba(0,0,0,0.3)`,
           }}>
@@ -1210,8 +1210,8 @@ export default function VirtualReality() {
         >
           <div className="rounded-xl p-2.5" style={{
             background: 'rgba(10,10,20,0.4)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
             border: `1px solid ${celestial.atmosphere.accent}15`,
             boxShadow: `0 0 16px ${celestial.atmosphere.accent}06`,
           }}>
@@ -1250,8 +1250,8 @@ export default function VirtualReality() {
           >
             <div className="px-5 py-3 rounded-xl text-center" style={{
               background: 'rgba(10,10,20,0.5)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: `1px solid ${hoveredData.color}35`,
               boxShadow: `0 0 30px ${hoveredData.color}12, 0 4px 16px rgba(0,0,0,0.3)`,
             }}>
@@ -1271,8 +1271,8 @@ export default function VirtualReality() {
             data-testid="vr-theater-picker">
             <div className="rounded-xl p-4" style={{
               background: 'rgba(10,10,20,0.5)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: '1px solid rgba(249,115,22,0.15)',
               boxShadow: '0 0 30px rgba(249,115,22,0.06), 0 4px 16px rgba(0,0,0,0.3)',
             }}>
@@ -1465,8 +1465,8 @@ export default function VirtualReality() {
             data-testid="vr-journey-picker">
             <div className="rounded-xl p-4" style={{
               background: 'rgba(10,10,20,0.5)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: '1px solid rgba(252,211,77,0.15)',
               boxShadow: '0 0 30px rgba(252,211,77,0.06), 0 4px 16px rgba(0,0,0,0.3)',
             }}>
@@ -1511,8 +1511,8 @@ export default function VirtualReality() {
             data-testid="vr-quantum-picker">
             <div className="rounded-xl p-4" style={{
               background: 'rgba(10,10,20,0.45)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: '1px solid rgba(0,229,255,0.15)',
               boxShadow: '0 0 30px rgba(0,229,255,0.06), 0 4px 16px rgba(0,0,0,0.3)',
             }}>
@@ -1631,8 +1631,8 @@ export default function VirtualReality() {
               className="absolute top-20 right-4 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto"
               style={{
                 background: 'rgba(10,10,20,0.4)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
                 border: `1px solid ${activeJourney.journey.color}25`,
                 color: activeJourney.journey.color,
                 boxShadow: `0 0 12px ${activeJourney.journey.color}08`,
@@ -1651,8 +1651,8 @@ export default function VirtualReality() {
             style={{
               background: hoveredPortal === p.id ? `${p.color}12` : 'rgba(10,10,20,0.35)',
               border: `1px solid ${hoveredPortal === p.id ? `${p.color}40` : `${p.color}10`}`,
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               boxShadow: hoveredPortal === p.id ? `0 0 16px ${p.color}15` : 'none',
             }}>
             <div className="w-1.5 h-1.5 rounded-full" style={{ background: p.color, boxShadow: `0 0 8px ${p.color}80` }} />
@@ -1677,7 +1677,7 @@ export default function VirtualReality() {
                 <div className="px-4 py-1.5 rounded-full" style={{
                   background: `${vrMeditation.color || '#C084FC'}08`,
                   border: `1px solid ${vrMeditation.color || '#C084FC'}20`,
-                  backdropFilter: 'blur(12px)',
+                  backdropFilter: 'none',
                 }}>
                   <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: `${vrMeditation.color || '#C084FC'}90` }}>
                     {vrMeditation.name}
@@ -1743,8 +1743,8 @@ export default function VirtualReality() {
               className="absolute top-20 right-4 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto"
               style={{
                 background: 'rgba(10,10,20,0.45)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
                 border: `1px solid ${vrMeditation.color || '#C084FC'}20`,
                 color: `${vrMeditation.color || '#C084FC'}90`,
                 boxShadow: `0 0 12px ${vrMeditation.color || '#C084FC'}08`,
@@ -1790,7 +1790,7 @@ export default function VirtualReality() {
         >
           <div className="px-3 py-1.5 rounded-lg flex items-center gap-2" style={{
             background: 'rgba(10,10,20,0.4)',
-            backdropFilter: 'blur(16px)',
+            backdropFilter: 'none',
             border: '1px solid rgba(192,132,252,0.12)',
           }}>
             <motion.div

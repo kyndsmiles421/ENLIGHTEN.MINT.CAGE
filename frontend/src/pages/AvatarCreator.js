@@ -295,7 +295,7 @@ function AvatarPreview({ config, energyState }) {
   }, [draw]);
 
   return (
-    <div className="rounded-2xl overflow-hidden relative" style={{ width: '100%', maxWidth: 400, aspectRatio: '4/5', background: 'rgba(5,5,12,0.95)', border: `1px solid ${config.aura_color}20` }}>
+    <div className="rounded-2xl overflow-hidden relative" style={{ width: '100%', maxWidth: 400, aspectRatio: '4/5', background: 'rgba(0,0,0,0)', border: `1px solid ${config.aura_color}20` }}>
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} data-testid="avatar-preview-canvas" />
     </div>
   );
@@ -384,7 +384,7 @@ function GenerationLoadingOverlay({ style: aiStyle }) {
   }, [rgb]);
 
   return (
-    <div className="relative rounded-2xl overflow-hidden" style={{ width: '100%', maxWidth: 400, aspectRatio: '1', background: 'rgba(5,5,12,0.95)', border: `1px solid ${styleObj.color}20` }}>
+    <div className="relative rounded-2xl overflow-hidden" style={{ width: '100%', maxWidth: 400, aspectRatio: '1', background: 'rgba(0,0,0,0)', border: `1px solid ${styleObj.color}20` }}>
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
         <motion.div
@@ -738,14 +738,14 @@ export default function AvatarCreator() {
                         style={{ boxShadow: `inset 0 0 40px ${selectedAiStyle.color}15, 0 0 60px ${selectedAiStyle.color}10` }} />
                       {/* Active badge */}
                       <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"
-                        style={{ background: 'rgba(5,5,12,0.7)', backdropFilter: 'blur(12px)', color: selectedAiStyle.color, border: `1px solid ${selectedAiStyle.color}30` }}>
+                        style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'none', color: selectedAiStyle.color, border: `1px solid ${selectedAiStyle.color}30` }}>
                         <Check size={10} /> Active Avatar
                       </div>
                     </motion.div>
                   ) : (
                     /* Empty state */
                     <div className="rounded-2xl flex flex-col items-center justify-center gap-4 aspect-square" data-testid="ai-avatar-empty"
-                      style={{ width: '100%', maxWidth: 400, background: 'rgba(5,5,12,0.6)', border: '1px dashed rgba(192,132,252,0.15)' }}>
+                      style={{ width: '100%', maxWidth: 400, background: 'rgba(0,0,0,0)', border: '1px dashed rgba(192,132,252,0.15)' }}>
                       <motion.div
                         animate={{ rotate: [0, 360] }}
                         transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}

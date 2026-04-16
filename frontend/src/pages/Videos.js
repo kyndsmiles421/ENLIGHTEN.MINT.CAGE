@@ -53,7 +53,7 @@ function CinemaCard({ storyId, videoInfo, onGenerate, onPlay, generating }) {
     >
       {/* Visual area */}
       <div className="relative h-44 overflow-hidden" style={{
-        background: `linear-gradient(135deg, ${meta.color}08, ${meta.color}03, rgba(15,17,28,0.95))`,
+        background: `linear-gradient(135deg, ${meta.color}08, ${meta.color}03, rgba(0,0,0,0))`,
       }}>
         {/* Decorative glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full"
@@ -63,7 +63,7 @@ function CinemaCard({ storyId, videoInfo, onGenerate, onPlay, generating }) {
           <div className="absolute inset-0 flex items-center justify-center">
             <button onClick={() => onPlay(storyId, videoInfo.video_url)}
               className="w-16 h-16 rounded-full flex items-center justify-center transition-all group-hover:scale-110 cursor-pointer"
-              style={{ background: `${meta.color}20`, border: `2px solid ${meta.color}40`, backdropFilter: 'blur(10px)' }}
+              style={{ background: `${meta.color}20`, border: `2px solid ${meta.color}40`, backdropFilter: 'none'}}
               data-testid={`play-cinema-${storyId}`}>
               <Play size={28} fill={meta.color} style={{ color: meta.color, marginLeft: 3 }} />
             </button>
@@ -147,7 +147,7 @@ function VideoPlayerModal({ storyId, videoUrl, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       data-testid="video-player-modal"
     >
@@ -512,16 +512,16 @@ export default function Videos() {
                         style={{ filter: 'brightness(0.7)', transition: 'transform 0.5s' }} loading="lazy" />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110"
-                          style={{ background: 'rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)', transition: 'transform 0.3s' }}>
+                          style={{ background: 'rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'none', transition: 'transform 0.3s' }}>
                           <Play size={24} fill="white" style={{ color: 'white', marginLeft: '2px' }} />
                         </div>
                       </div>
                       <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs flex items-center gap-1"
-                        style={{ background: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'blur(10px)' }}>
+                        style={{ background: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'none'}}>
                         <Clock size={10} /> {video.duration}
                       </div>
                       <div className="absolute bottom-3 left-3 px-2 py-1 rounded-full text-xs"
-                        style={{ background: 'rgba(0,0,0,0.6)', color: '#2DD4BF', backdropFilter: 'blur(10px)' }}>
+                        style={{ background: 'rgba(0,0,0,0.6)', color: '#2DD4BF', backdropFilter: 'none'}}>
                         {video.level}
                       </div>
                     </div>

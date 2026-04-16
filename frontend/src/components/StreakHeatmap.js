@@ -205,7 +205,7 @@ export default function StreakHeatmap() {
                   {/* Tooltip */}
                   {isHovered && day.total_activities > 0 && (
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg whitespace-nowrap z-50"
-                      style={{ background: 'rgba(10,10,18,0.95)', border: '1px solid rgba(248,250,252,0.1)' }}>
+                      style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.1)' }}>
                       <p className="text-[8px] font-medium" style={{ color: ELEMENT_COLORS[elem] }}>
                         {new Date(day.date).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
                       </p>

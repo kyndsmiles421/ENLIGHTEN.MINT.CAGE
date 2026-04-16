@@ -45,7 +45,7 @@ export function CosmicBanner({ filter, compact = false }) {
       initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
       data-testid="cosmic-banner"
       className="rounded-2xl p-4 mb-6 relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(216,180,254,0.08)', backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(216,180,254,0.08)', backdropFilter: 'blur(12px)' }}>
       <div className="absolute inset-0 opacity-[0.03]"
         style={{ background: 'radial-gradient(circle at 30% 50%, #818CF8, transparent 60%)' }} />
 

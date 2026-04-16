@@ -331,7 +331,7 @@ function NumerologyCrossLinks() {
     { label: 'Daily Ritual', desc: 'Your ritual adapts to your numerology cycle', path: '/daily-ritual', color: '#22C55E' },
   ];
   return (
-    <div className="mt-8 rounded-2xl p-5" style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(212,175,55,0.08)' }}>
+    <div className="mt-8 rounded-2xl p-5" style={{ background: 'transparent', border: '1px solid rgba(212,175,55,0.08)' }}>
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
         <Star size={10} className="inline mr-1" /> Connected Systems
       </p>

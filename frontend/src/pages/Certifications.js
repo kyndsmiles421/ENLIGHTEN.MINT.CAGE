@@ -57,7 +57,7 @@ export default function Certifications() {
                 transition={{ delay: i * 0.1 }}
                 className="rounded-2xl p-6 relative overflow-hidden"
                 data-testid={`cert-${cert.id || i}`}
-                style={{ background: 'rgba(15,17,28,0.7)', border: '1px solid rgba(212,175,55,0.2)', backdropFilter: 'blur(16px)' }}>
+                style={{ background: 'transparent', border: '1px solid rgba(212,175,55,0.2)', backdropFilter: 'none'}}>
                 <div className="absolute top-0 right-0 w-32 h-32 opacity-5"
                   style={{ background: 'radial-gradient(circle, #D4AF37, transparent 70%)' }} />
                 <div className="relative z-10">

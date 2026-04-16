@@ -173,8 +173,8 @@ export function JourneyOverlay({ constellations, active, currentIdx, phase, onPl
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="absolute bottom-0 left-0 right-0 z-20" data-testid="journey-overlay">
-      <div className="h-24 pointer-events-none" style={{ background: 'linear-gradient(transparent, rgba(5,5,12,0.9))' }} />
-      <div className="px-6 pb-6 pt-2" style={{ background: 'rgba(5,5,12,0.95)' }}>
+      <div className="h-24 pointer-events-none" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0))' }} />
+      <div className="px-6 pb-6 pt-2" style={{ background: 'rgba(0,0,0,0)' }}>
         {current && (
           <div className="flex items-center gap-3 mb-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}12`, border: `1px solid ${color}20` }}>
@@ -259,7 +259,7 @@ export function JourneyComplete({ count, onClose, authHeaders, token }) {
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute inset-0 z-30 flex items-center justify-center" style={{ background: 'rgba(5,5,12,0.85)', backdropFilter: 'blur(12px)' }}
+      className="absolute inset-0 z-30 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'blur(12px)' }}
       data-testid="journey-complete">
       <div className="text-center max-w-sm px-6">
         <div className="text-4xl mb-3">&#10024;</div>

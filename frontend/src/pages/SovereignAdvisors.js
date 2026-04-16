@@ -193,7 +193,7 @@ function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading })
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[300] flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
       onClick={onClose}
       data-testid="purchase-modal"
     >
@@ -201,7 +201,7 @@ function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading })
         initial={{ scale: 0.92, y: 16 }} animate={{ scale: 1, y: 0 }}
         onClick={e => e.stopPropagation()}
         className="w-full max-w-sm rounded-2xl overflow-hidden"
-        style={{ background: '#0B0C15', border: `1px solid ${color}18` }}
+        style={{ background: 'transparent', border: `1px solid ${color}18` }}
       >
         <div className="p-5 text-center">
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{
@@ -454,7 +454,7 @@ export default function SovereignAdvisors() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B0C15' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <p className="text-sm" style={{ color: 'rgba(248,250,252,0.25)' }}>Sign in to consult the Sovereign Council</p>
       </div>
     );
@@ -465,7 +465,7 @@ export default function SovereignAdvisors() {
     const Icon = ICON_MAP[selectedMember.icon] || Sparkles;
     const isFaculty = selectedMember.role_type === 'faculty';
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: '#0B0C15' }} data-testid="council-chat-view">
+      <div className="min-h-screen flex flex-col" style={{ background: 'transparent' }} data-testid="council-chat-view">
         {/* Header */}
         <div className="px-4 py-3 flex items-center gap-3" style={{
           borderBottom: `1px solid ${selectedMember.color}0C`,
@@ -603,7 +603,7 @@ export default function SovereignAdvisors() {
 
         {/* Input */}
         <div className="fixed bottom-0 left-0 right-0 px-4 py-3" style={{
-          background: 'rgba(11,12,21,0.95)', backdropFilter: 'blur(12px)',
+          background: 'rgba(11,12,21,0.95)', backdropFilter: 'none',
           borderTop: `1px solid ${selectedMember.color}08`,
         }}>
           <div className="max-w-2xl mx-auto flex items-center gap-2">
@@ -636,7 +636,7 @@ export default function SovereignAdvisors() {
 
   /* ── Council List View ── */
   return (
-    <div className="min-h-screen pb-32" style={{ background: '#0B0C15' }} data-testid="sovereign-council-page">
+    <div className="min-h-screen pb-32" style={{ background: 'transparent' }} data-testid="sovereign-council-page">
       <div className="px-4 py-6 max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-5">

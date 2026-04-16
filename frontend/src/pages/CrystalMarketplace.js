@@ -52,7 +52,7 @@ export default function CrystalMarketplace() {
     } catch (e) { toast.error(e.response?.data?.detail || 'Equip failed'); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#030308' }}><Sparkles className="animate-spin" color="#9b59b6" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}><Sparkles className="animate-spin" color="#9b59b6" /></div>;
 
   // Build skin list from backend + frontend config
   const skinList = SKIN_KEYS.map(key => {
@@ -70,7 +70,7 @@ export default function CrystalMarketplace() {
   return (
     <div className="min-h-screen pb-24" style={{ background: '#000', color: '#fff', fontFamily: 'monospace' }} data-testid="crystal-marketplace-page">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(0,0,0,0.9)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={() => navigate(-1)} className="p-2" data-testid="crystal-back-btn"><ArrowLeft size={16} /></button>
         <div>
           <h1 className="text-xs font-bold uppercase tracking-[0.2em]">The Vault: Marketplace</h1>

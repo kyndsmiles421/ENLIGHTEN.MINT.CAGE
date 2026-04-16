@@ -62,7 +62,7 @@ function ContemplationModal({ contemplation, teacher, teaching, color, onClose }
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(5,5,12,0.9)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'transparent', backdropFilter: 'none'}}
       onClick={onClose}
     >
       <motion.div

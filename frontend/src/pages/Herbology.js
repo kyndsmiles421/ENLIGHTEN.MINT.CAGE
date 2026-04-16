@@ -14,9 +14,9 @@ function HerbCard({ herb, onSelect, selected }) {
       onClick={() => onSelect(herb)} className="cursor-pointer rounded-2xl p-5 transition-all"
       data-testid={`herb-card-${herb.id}`}
       style={{
-        background: selected?.id === herb.id ? `linear-gradient(135deg, ${herb.color}22, ${herb.color}08)` : 'rgba(15,17,28,0.6)',
+        background: selected?.id === herb.id ? `linear-gradient(135deg, ${herb.color}22, ${herb.color}08)` : 'rgba(0,0,0,0)',
         border: `1px solid ${selected?.id === herb.id ? herb.color + '55' : 'rgba(248,250,252,0.06)'}`,
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
       }}>
       <div className="flex items-center gap-3 mb-3">
         <div className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -43,7 +43,7 @@ function HerbDetail({ herb, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="rounded-2xl p-6 mb-6" data-testid="herb-detail"
-      style={{ background: 'rgba(15,17,28,0.8)', border: `1px solid ${herb.color}30`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${herb.color}30`, backdropFilter: 'none'}}>
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{herb.name}</h3>
@@ -160,7 +160,7 @@ export default function Herbology() {
               placeholder="Search herbs, properties, or body systems..."
               data-testid="herb-search"
               className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs"
-              style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
+              style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
           </div>
         </div>
 

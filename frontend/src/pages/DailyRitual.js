@@ -91,7 +91,7 @@ function RitualStep({ step, index, completed, activeIndex, onActivate, onComplet
       data-testid={`ritual-step-${index}`}
       className="rounded-xl overflow-hidden transition-all cursor-pointer"
       style={{
-        background: isCompleted ? 'rgba(34,197,94,0.06)' : isActive ? 'rgba(216,180,254,0.06)' : 'rgba(15,17,28,0.5)',
+        background: isCompleted ? 'rgba(34,197,94,0.06)' : isActive ? 'rgba(216,180,254,0.06)' : 'rgba(0,0,0,0)',
         border: `1px solid ${isCompleted ? 'rgba(34,197,94,0.2)' : isActive ? 'rgba(216,180,254,0.25)' : 'rgba(248,250,252,0.06)'}`,
       }}>
       {/* Step Header - always visible */}
@@ -309,7 +309,7 @@ export default function DailyRitual() {
               data-testid={`tod-${t.id}`}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-all"
               style={{
-                background: timeOfDay === t.id ? `${t.color}15` : 'rgba(15,17,28,0.4)',
+                background: timeOfDay === t.id ? `${t.color}15` : 'rgba(0,0,0,0)',
                 border: `1px solid ${timeOfDay === t.id ? `${t.color}35` : 'rgba(248,250,252,0.06)'}`,
                 color: timeOfDay === t.id ? t.color : 'rgba(248,250,252,0.5)',
               }}><t.icon size={16} />{t.label}</button>
@@ -327,7 +327,7 @@ export default function DailyRitual() {
           <>
             {/* Progress Bar */}
             <div className="rounded-2xl p-5 mb-6"
-              style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(216,180,254,0.1)', backdropFilter: 'blur(12px)' }}>
+              style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.1)', backdropFilter: 'none'}}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
                   {completed.length} of {steps.length} steps | ~{totalDuration} min total

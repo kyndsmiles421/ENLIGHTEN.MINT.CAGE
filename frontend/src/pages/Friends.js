@@ -433,7 +433,7 @@ function MessagesTab({ authHeaders, initialChat, onBack }) {
               </div>
               {c.unread_count > 0 && (
                 <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
-                  style={{ background: '#D8B4FE', color: '#0B0C15' }}>{c.unread_count}</span>
+                  style={{ background: '#D8B4FE', color: 'transparent' }}>{c.unread_count}</span>
               )}
               <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="opacity-0 group-hover:opacity-100 transition-all" />
             </button>
@@ -504,7 +504,7 @@ function ShareModal({ open, onClose, authHeaders }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="glass-card w-full max-w-md p-6 relative" data-testid="share-modal">
         <button onClick={onClose} className="absolute top-3 right-3" style={{ color: 'var(--text-muted)' }}><X size={16} /></button>
@@ -822,7 +822,7 @@ export default function Friends() {
                 <Icon size={13} /> {t.label}
                 {badge > 0 && (
                   <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ml-1"
-                    style={{ background: '#D8B4FE', color: '#0B0C15' }}>{badge}</span>
+                    style={{ background: '#D8B4FE', color: 'transparent' }}>{badge}</span>
                 )}
               </button>
             );

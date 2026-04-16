@@ -236,7 +236,7 @@ function VRCrystalView({ crystal, onClose }) {
           <motion.div initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
             animate={2 < revealed ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ duration: 0.8 }}
-            className="rounded-xl p-5 mb-5" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+            className="rounded-xl p-5 mb-5" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
             <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
               <Heart size={9} /> Healing Properties
             </p>
@@ -273,7 +273,7 @@ function VRCrystalView({ crystal, onClose }) {
               { label: 'Hardness', value: `${crystal.hardness}/10`, icon: Shield },
               { label: 'Rarity', value: crystal.rarity, icon: Gem },
             ].map((item, i) => (
-              <div key={i} className="rounded-lg p-3 text-center" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              <div key={i} className="rounded-lg p-3 text-center" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <item.icon size={12} className="mx-auto mb-1" style={{ color: 'rgba(248,250,252,0.2)' }} />
                 <p className="text-[9px] uppercase mb-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>{item.label}</p>
                 <p className="text-xs capitalize" style={{ color: 'rgba(248,250,252,0.6)' }}>{item.value}</p>
@@ -295,7 +295,7 @@ function CrystalCard({ crystal, onClick, onVR, index }) {
       transition={{ delay: index * 0.03, type: 'spring', stiffness: 200, damping: 25 }}
       data-testid={`crystal-card-${crystal.id}`}
       className="rounded-2xl p-4 group relative overflow-hidden"
-      style={{ background: 'rgba(15,17,28,0.5)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'none'}}
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         style={{ background: `radial-gradient(circle at 50% 0%, ${crystal.color}06 0%, transparent 60%)` }} />
@@ -343,7 +343,7 @@ function CrystalDetail({ crystal, onClose, onVR, onAddCollection }) {
   return (
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
       className="w-full lg:w-2/5 lg:sticky lg:top-24 lg:max-h-[80vh] lg:overflow-y-auto" data-testid="crystal-detail">
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,17,28,0.6)', border: `1px solid ${crystal.color}15`, backdropFilter: 'blur(12px)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent', border: `1px solid ${crystal.color}15`, backdropFilter: 'none'}}>
         <div className="p-5 relative overflow-hidden" style={{ background: `linear-gradient(180deg, ${crystal.color}06 0%, transparent 100%)` }}>
           <div className="flex items-center justify-between mb-3">
             <button onClick={onClose} className="lg:hidden flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg hover:bg-white/5"
@@ -453,7 +453,7 @@ function RockHoundPanel({ token, headers }) {
             <motion.div key={env.id} whileHover={{ y: -2 }}
               className="rounded-xl p-4 cursor-pointer group" onClick={() => !digging && dig(env.id)}
               data-testid={`env-${env.id}`}
-              style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+              style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <MapPin size={12} style={{ color: '#C084FC' }} />
                 <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{env.name}</span>
@@ -566,7 +566,7 @@ function CrystalPairingPanel({ token, headers }) {
                 <button key={m} onClick={() => setSelectedMood(selectedMood === m ? '' : m)}
                   className="px-3 py-1.5 rounded-full text-[10px] transition-all"
                   style={{
-                    background: selectedMood === m ? 'rgba(168,85,247,0.12)' : 'rgba(15,17,28,0.6)',
+                    background: selectedMood === m ? 'rgba(168,85,247,0.12)' : 'rgba(0,0,0,0)',
                     color: selectedMood === m ? '#A855F7' : 'rgba(248,250,252,0.35)',
                     border: `1px solid ${selectedMood === m ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`,
                   }}>
@@ -586,7 +586,7 @@ function CrystalPairingPanel({ token, headers }) {
                 <button key={i} onClick={() => setSelectedIntention(selectedIntention === i ? '' : i)}
                   className="px-3 py-1.5 rounded-full text-[10px] transition-all"
                   style={{
-                    background: selectedIntention === i ? 'rgba(45,212,191,0.12)' : 'rgba(15,17,28,0.6)',
+                    background: selectedIntention === i ? 'rgba(45,212,191,0.12)' : 'rgba(0,0,0,0)',
                     color: selectedIntention === i ? '#2DD4BF' : 'rgba(248,250,252,0.35)',
                     border: `1px solid ${selectedIntention === i ? 'rgba(45,212,191,0.25)' : 'rgba(248,250,252,0.04)'}`,
                   }}>
@@ -604,7 +604,7 @@ function CrystalPairingPanel({ token, headers }) {
             <input value={customNote} onChange={e => setCustomNote(e.target.value)}
               placeholder="E.g., preparing for a new job, healing from heartbreak..."
               className="w-full px-4 py-2.5 rounded-xl text-xs outline-none"
-              style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }}
+              style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }}
               data-testid="pairing-custom-note" />
           </div>
 
@@ -628,7 +628,7 @@ function CrystalPairingPanel({ token, headers }) {
                     <motion.div key={c.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.1 }}
                       className="rounded-xl p-4 text-center"
-                      style={{ background: 'rgba(15,17,28,0.5)', border: `1px solid ${c.color}20` }}>
+                      style={{ background: 'transparent', border: `1px solid ${c.color}20` }}>
                       <div className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
                         style={{ background: `${c.color}15`, boxShadow: `0 0 30px ${c.color}10` }}>
                         <Gem size={20} style={{ color: c.color }} />
@@ -641,7 +641,7 @@ function CrystalPairingPanel({ token, headers }) {
                 </div>
 
                 {/* AI explanation */}
-                <div className="rounded-xl p-4" style={{ background: 'rgba(15,17,28,0.4)', border: '1px solid rgba(248,250,252,0.04)' }}>
+                <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#A855F7' }}>Crystal Guidance</p>
                     <div className="flex items-center gap-1.5">
@@ -672,7 +672,7 @@ function CrystalPairingPanel({ token, headers }) {
               <div className="space-y-2">
                 {history.slice(0, 5).map((p, i) => (
                   <div key={p.id} className="rounded-lg p-3 flex items-center gap-3"
-                    style={{ background: 'rgba(15,17,28,0.3)', border: '1px solid rgba(248,250,252,0.03)' }}
+                    style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.03)' }}
                     data-testid={`history-pairing-${i}`}>
                     <div className="flex -space-x-1">
                       {(p.crystals || []).slice(0, 3).map(c => (
@@ -782,7 +782,7 @@ export default function Crystals() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 p-1 rounded-xl" style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.04)' }}>
+        <div className="flex gap-1 mb-6 p-1 rounded-xl" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
           {tabs.map(tab => {
             const TIcon = tab.icon; const isActive = activeTab === tab.id;
             return (
@@ -809,14 +809,14 @@ export default function Crystals() {
                   <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search crystals..."
                     data-testid="crystal-search"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs outline-none"
-                    style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }} />
+                    style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }} />
                   {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>}
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
                   {categories.map(cat => (
                     <button key={cat} onClick={() => setCategory(cat)} data-testid={`cat-${cat}`}
                       className="px-3 py-2 rounded-xl text-[10px] font-medium capitalize whitespace-nowrap transition-all"
-                      style={{ background: category === cat ? 'rgba(168,85,247,0.12)' : 'rgba(15,17,28,0.6)', border: `1px solid ${category === cat ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`, color: category === cat ? '#A855F7' : 'rgba(248,250,252,0.4)' }}>
+                      style={{ background: category === cat ? 'rgba(168,85,247,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${category === cat ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`, color: category === cat ? '#A855F7' : 'rgba(248,250,252,0.4)' }}>
                       {cat}
                     </button>
                   ))}

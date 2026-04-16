@@ -162,7 +162,7 @@ export default function Pricing() {
         {polling && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[300] flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)' }}
+            style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
             data-testid="payment-polling-overlay">
             <div className="text-center">
               <Loader2 className="animate-spin mx-auto mb-4" size={32} style={{ color: '#C084FC' }} />

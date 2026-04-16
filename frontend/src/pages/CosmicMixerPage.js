@@ -225,7 +225,7 @@ export default function CosmicMixerPage() {
         toast('Sonic Crystal Collected!', {
           description: `${res.data.frequency.name} (${res.data.frequency.hz}Hz) is now permanently yours`,
           style: {
-            background: `linear-gradient(135deg, ${res.data.frequency.color}15, rgba(10,10,18,0.95))`,
+            background: `linear-gradient(135deg, ${res.data.frequency.color}15, rgba(0,0,0,0))`,
             border: `1px solid ${res.data.frequency.color}40`,
             color: res.data.frequency.color,
             boxShadow: `0 0 24px ${res.data.frequency.color}15`,
@@ -612,7 +612,7 @@ export default function CosmicMixerPage() {
 
       {/* Session progress bar */}
       {sessionActive && sessionData && (
-        <div className="fixed top-0 left-0 right-0 z-40" style={{ background: 'rgba(10,10,18,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="fixed top-0 left-0 right-0 z-40" style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="max-w-2xl mx-auto px-4 py-2.5">
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
@@ -639,7 +639,7 @@ export default function CosmicMixerPage() {
 
       {/* ─── Sticky Master Controls Footer ─── */}
       <div className="fixed bottom-0 left-0 right-0 z-50" data-testid="mixer-sticky-footer"
-        style={{ background: 'rgba(10,10,18,0.94)', backdropFilter: 'blur(24px)', borderTop: `1px solid ${hasActive ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.05)'}` }}>
+        style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'none', borderTop: `1px solid ${hasActive ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.05)'}` }}>
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <button onClick={() => setMuted(m => !m)} className="p-1.5 rounded-lg flex-shrink-0 transition-all active:scale-90"

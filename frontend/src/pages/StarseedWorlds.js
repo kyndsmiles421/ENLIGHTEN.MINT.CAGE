@@ -419,7 +419,7 @@ function ExplorationResult({ result, onClose }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)' }}
+      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.3, opacity: 0, rotateY: -20 }}
         animate={{ scale: 1, opacity: 1, rotateY: 0 }}
@@ -676,7 +676,7 @@ export default function StarseedWorlds() {
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
-        style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <button onClick={() => navigate('/starseed-adventure')} className="p-2 rounded-xl transition-all hover:scale-105"
           style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="worlds-back">
           <ArrowLeft size={16} style={{ color: 'var(--text-secondary)' }} />

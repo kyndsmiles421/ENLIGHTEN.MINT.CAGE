@@ -99,7 +99,7 @@ export default function MissionControl({ isOpen, onClose }) {
               top: '50%',
               width: Math.min(360, window.innerWidth - 32),
               maxHeight: 'calc(100vh - 48px)',
-              background: 'rgba(10,10,18,0.72)',
+              background: 'rgba(0,0,0,0)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
               border: '1px solid rgba(248,250,252,0.08)',

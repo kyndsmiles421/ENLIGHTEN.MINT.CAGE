@@ -226,7 +226,7 @@ export default function PowerSpotAdmin() {
       {/* Active Broadcasts */}
       {broadcasts.length > 0 && (
         <div className="rounded-xl p-3"
-          style={{ background: 'rgba(251,191,36,0.05)', backdropFilter: 'blur(8px)', border: '1px solid rgba(251,191,36,0.1)' }}
+          style={{ background: 'rgba(251,191,36,0.05)', backdropFilter: 'none', border: '1px solid rgba(251,191,36,0.1)' }}
           data-testid="active-broadcasts">
           <p className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: '#FBBF24' }}>
             <Radio size={8} className="inline mr-1" /> Active Broadcasts
@@ -280,7 +280,7 @@ export default function PowerSpotAdmin() {
         {showCreate && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="rounded-xl p-4 space-y-3"
-            style={{ background: 'rgba(15,15,25,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(251,191,36,0.1)' }}
+            style={{ background: 'rgba(15,15,25,0.6)', backdropFilter: 'none', border: '1px solid rgba(251,191,36,0.1)' }}
             data-testid="create-spot-form">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-medium flex items-center gap-1" style={{ color: '#FBBF24' }}>
@@ -363,7 +363,7 @@ export default function PowerSpotAdmin() {
           <div key={spot.id} className="rounded-xl p-3"
             style={{
               background: 'rgba(15,15,25,0.6)',
-              backdropFilter: 'blur(8px)',
+              backdropFilter: 'none',
               border: `1px solid rgba(251,191,36,${spot.active ? '0.12' : '0.04'})`,
               borderLeft: `2px solid ${spot.active ? 'rgba(251,191,36,0.4)' : 'rgba(248,250,252,0.08)'}`,
             }}

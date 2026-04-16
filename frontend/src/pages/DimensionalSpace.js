@@ -106,7 +106,7 @@ function PhaseShiftModal({ currentDim, dimensions, level, dust, onShift, onClose
       <motion.div
         initial={{ scale: 0.9 }} animate={{ scale: 1 }}
         className="w-full max-w-sm rounded-xl p-5 space-y-3"
-        style={{ background: 'rgba(10,10,18,0.95)', border: '1px solid rgba(139,92,246,0.15)' }}
+        style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(139,92,246,0.15)' }}
         onClick={e => e.stopPropagation()}
         data-testid="phase-shift-modal"
       >

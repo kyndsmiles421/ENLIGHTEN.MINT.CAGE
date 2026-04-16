@@ -18,9 +18,9 @@ function OilCard({ oil, onSelect, selected }) {
       style={{
         background: selected?.id === oil.id
           ? `linear-gradient(135deg, ${oil.color}22, ${oil.color}08)`
-          : 'rgba(15,17,28,0.6)',
+          : 'rgba(0,0,0,0)',
         border: `1px solid ${selected?.id === oil.id ? oil.color + '55' : 'rgba(248,250,252,0.06)'}`,
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
       }}
       data-testid={`oil-card-${oil.id}`}
     >
@@ -48,7 +48,7 @@ function OilDetail({ oil, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="rounded-2xl p-6 mb-6" data-testid="oil-detail"
-      style={{ background: 'rgba(15,17,28,0.8)', border: `1px solid ${oil.color}30`, backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'transparent', border: `1px solid ${oil.color}30`, backdropFilter: 'none' }}>
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{oil.name}</h3>
@@ -94,7 +94,7 @@ function OilDetail({ oil, onClose }) {
 function BlendCard({ blend, oils }) {
   return (
     <div className="rounded-2xl p-5" data-testid={`blend-${blend.name.toLowerCase().replace(/\s/g, '-')}`}
-      style={{ background: 'rgba(15,17,28,0.6)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'blur(12px)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'none' }}>
       <p className="font-semibold text-sm mb-2" style={{ color: '#F8FAFC' }}>{blend.name}</p>
       <div className="flex gap-2 mb-3">
         {blend.oils.map(oilId => {
@@ -168,7 +168,7 @@ export default function Aromatherapy() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all"
               data-testid={`tab-${t.id}`}
               style={{
-                background: tab === t.id ? 'rgba(192,132,252,0.15)' : 'rgba(15,17,28,0.4)',
+                background: tab === t.id ? 'rgba(192,132,252,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.06)'}`,
                 color: tab === t.id ? '#C084FC' : 'rgba(248,250,252,0.5)',
               }}>
