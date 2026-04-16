@@ -87,6 +87,172 @@ CHALLENGES_DATA = [
     }
 ]
 
+# ═══════════════════════════════════════════════════════════════
+# V56.1 — CROSS-MODULE DAILY CHALLENGES
+# Multi-room tasks that span breathing, meditation, crystals, etc.
+# Completing all tasks in a challenge awards bonus XP with multiplier.
+# ═══════════════════════════════════════════════════════════════
+
+CROSS_MODULE_CHALLENGES = [
+    {
+        "id": "earth-element",
+        "name": "The Earth Element Challenge",
+        "description": "Ground yourself through crystals, earth yoga, and dream journaling in one day.",
+        "tasks": [
+            {"source": "crystals", "action": "discover", "count": 3, "label": "Discover 3 crystals"},
+            {"source": "yoga_practice", "action": "complete", "count": 1, "label": "Complete 1 yoga flow"},
+            {"source": "dream_journal", "action": "log", "count": 1, "label": "Log a dream"},
+        ],
+        "xp_reward": 100,
+        "xp_multiplier": 1.2,
+        "color": "#22C55E",
+        "element": "Earth",
+    },
+    {
+        "id": "air-temple",
+        "name": "Air Temple Ascension",
+        "description": "Master the breath, consult the stars, and attune to healing frequencies.",
+        "tasks": [
+            {"source": "breathing_exercise", "action": "complete", "count": 3, "label": "Complete 3 breathing sessions"},
+            {"source": "oracle_reading", "action": "complete", "count": 1, "label": "Get an oracle reading"},
+            {"source": "frequencies", "action": "explore", "count": 2, "label": "Explore 2 frequencies"},
+        ],
+        "xp_reward": 120,
+        "xp_multiplier": 1.3,
+        "color": "#2DD4BF",
+        "element": "Air",
+    },
+    {
+        "id": "fire-alchemy",
+        "name": "Fire of Transformation",
+        "description": "Ignite your inner fire through meditation, elixirs, and mantras.",
+        "tasks": [
+            {"source": "meditation_session", "action": "complete", "count": 1, "label": "Complete a meditation"},
+            {"source": "elixirs", "action": "discover", "count": 2, "label": "Discover 2 elixirs"},
+            {"source": "mantras", "action": "practice", "count": 1, "label": "Practice a mantra"},
+        ],
+        "xp_reward": 110,
+        "xp_multiplier": 1.2,
+        "color": "#EF4444",
+        "element": "Fire",
+    },
+    {
+        "id": "water-healing",
+        "name": "Waters of Healing",
+        "description": "Flow through herbology, reiki, and mood tracking to heal body and spirit.",
+        "tasks": [
+            {"source": "herbology", "action": "discover", "count": 3, "label": "Discover 3 herbs"},
+            {"source": "reiki", "action": "discover", "count": 2, "label": "Learn 2 reiki positions"},
+            {"source": "mood_log", "action": "log", "count": 1, "label": "Log your mood"},
+        ],
+        "xp_reward": 100,
+        "xp_multiplier": 1.2,
+        "color": "#3B82F6",
+        "element": "Water",
+    },
+]
+
+
+@router.get("/challenges/daily-cross-module")
+async def get_daily_cross_module(user=Depends(get_current_user)):
+    """Return today's cross-module challenges with user progress."""
+    uid = user["id"]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    # Get today's activity counts from xp_log
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    pipeline = [
+        {"$match": {"user_id": uid, "timestamp": {"$gte": today_start.isoformat()}}},
+        {"$group": {"_id": "$source", "count": {"$sum": 1}}},
+    ]
+    counts = {}
+    async for doc in db.rpg_xp_log.aggregate(pipeline):
+        counts[doc["_id"]] = doc["count"]
+
+    # Check completed challenges today
+    completed_doc = await db.daily_challenges_completed.find_one(
+        {"user_id": uid, "date": today}, {"_id": 0}
+    )
+    completed_ids = set((completed_doc or {}).get("completed", []))
+
+    result = []
+    for ch in CROSS_MODULE_CHALLENGES:
+        tasks_progress = []
+        all_done = True
+        for task in ch["tasks"]:
+            current = counts.get(task["source"], 0)
+            done = current >= task["count"]
+            if not done:
+                all_done = False
+            tasks_progress.append({
+                **task,
+                "current": min(current, task["count"]),
+                "done": done,
+            })
+        result.append({
+            "id": ch["id"],
+            "name": ch["name"],
+            "description": ch["description"],
+            "tasks": tasks_progress,
+            "xp_reward": ch["xp_reward"],
+            "xp_multiplier": ch["xp_multiplier"],
+            "color": ch["color"],
+            "element": ch["element"],
+            "all_tasks_done": all_done,
+            "claimed": ch["id"] in completed_ids,
+        })
+
+    return {"challenges": result, "date": today}
+
+
+@router.post("/challenges/daily-cross-module/claim")
+async def claim_cross_module(data: dict = Body(...), user=Depends(get_current_user)):
+    """Claim a completed cross-module challenge for bonus XP."""
+    uid = user["id"]
+    challenge_id = data.get("challenge_id")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    ch = next((c for c in CROSS_MODULE_CHALLENGES if c["id"] == challenge_id), None)
+    if not ch:
+        raise HTTPException(404, "Challenge not found")
+
+    # Check not already claimed
+    completed_doc = await db.daily_challenges_completed.find_one(
+        {"user_id": uid, "date": today}, {"_id": 0}
+    )
+    if challenge_id in (completed_doc or {}).get("completed", []):
+        return {"already_claimed": True}
+
+    # Verify tasks completed
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    for task in ch["tasks"]:
+        count = await db.rpg_xp_log.count_documents({
+            "user_id": uid, "source": task["source"],
+            "timestamp": {"$gte": today_start.isoformat()}
+        })
+        if count < task["count"]:
+            raise HTTPException(400, f"Task not complete: {task['label']}")
+
+    # Award XP with multiplier
+    xp = int(ch["xp_reward"] * ch["xp_multiplier"])
+    await db.rpg_characters.update_one({"user_id": uid}, {"$inc": {"xp": xp}})
+    await db.rpg_xp_log.insert_one({
+        "user_id": uid, "amount": xp,
+        "source": f"daily_challenge_{challenge_id}",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+
+    # Mark as claimed
+    await db.daily_challenges_completed.update_one(
+        {"user_id": uid, "date": today},
+        {"$addToSet": {"completed": challenge_id}, "$set": {"user_id": uid, "date": today}},
+        upsert=True,
+    )
+
+    return {"claimed": True, "xp_earned": xp, "multiplier": ch["xp_multiplier"]}
+
+
+
 @router.get("/challenges")
 async def get_challenges():
     # Single aggregation query instead of N+1 (was 14 queries, now 1)

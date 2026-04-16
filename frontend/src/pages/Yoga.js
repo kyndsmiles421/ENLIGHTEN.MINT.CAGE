@@ -6,6 +6,7 @@ import { ChevronDown, Sparkles } from 'lucide-react';
 import DeepDive from '../components/DeepDive';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
+import YogaGuidedFlow from '../components/YogaGuidedFlow';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -133,14 +134,25 @@ export default function Yoga() {
                 </div>
                 <p className="text-sm mb-4" style={{color:'rgba(255,255,255,0.7)'}}>{activeStyle.desc}</p>
                 {(activeStyle.sequences || []).map((seq, si) => (
-                  <div key={si} className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{color:activeStyle.color}}>{seq.name}</p>
-                      <span className="text-[10px]" style={{color:'rgba(255,255,255,0.3)'}}>{seq.duration}min · {seq.level} · {seq.poses?.length || 0} poses</span>
+                  <div key={si} className="mb-6">
+                    {/* V56.1 — Guided Flow for each sequence */}
+                    <YogaGuidedFlow
+                      sequence={seq}
+                      style={activeStyle}
+                      color={activeStyle.color}
+                      onComplete={() => {
+                        toast.success(`${seq.name} complete! +${(seq.poses?.length || 0) * 5 + 25} XP`);
+                      }}
+                    />
+                    <div className="mt-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{color:activeStyle.color}}>{seq.name} — Poses</p>
+                        <span className="text-[10px]" style={{color:'rgba(255,255,255,0.3)'}}>{seq.duration}min · {seq.level} · {seq.poses?.length || 0} poses</span>
+                      </div>
+                      {(seq.poses || []).map((pose, i) => (
+                        <PoseItem key={i} pose={pose} color={activeStyle.color} styleName={activeStyle.name} />
+                      ))}
                     </div>
-                    {(seq.poses || []).map((pose, i) => (
-                      <PoseItem key={i} pose={pose} color={activeStyle.color} styleName={activeStyle.name} />
-                    ))}
                   </div>
                 ))}
                 <div className="mt-4">

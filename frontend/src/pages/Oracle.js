@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Sparkles, Loader2, RotateCcw, Star, Sun, Moon, Hexagon, Triangle, X } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
+import IChingCoinToss from '../components/IChingCoinToss';
 
 
 
@@ -464,6 +465,33 @@ export default function Oracle() {
                   })}
                 </div>
               </div>
+            )}
+
+            {/* I Ching Interactive Coin Toss */}
+            {tab === 'iching' && !reading && (
+              <IChingCoinToss
+                color="#2DD4BF"
+                onComplete={(lines) => {
+                  // Auto-fire the reading with the cast lines
+                  setLoading(true);
+                  triggerCrystalTransition(async () => {
+                    try {
+                      const res = await axios.post(`${API}/oracle/reading`, {
+                        reading_type: 'iching',
+                        question: question || null,
+                        focus_tags: focusTags.map(t => t.label),
+                        lines: lines,
+                      });
+                      setReading(res.data);
+                      setTimeout(() => setRevealed(true), 300);
+                      if (typeof window.__workAccrue === 'function') window.__workAccrue('oracle_reading', 15);
+                    } catch {
+                      toast.error('The oracle is silent. Try again.');
+                    }
+                    setLoading(false);
+                  });
+                }}
+              />
             )}
 
             {/* Focus Area: Dynamic Tag Container */}
