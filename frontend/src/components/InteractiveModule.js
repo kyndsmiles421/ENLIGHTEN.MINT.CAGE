@@ -12,6 +12,7 @@ import { ChevronDown, Sparkles, BookOpen, Star, Headphones, Flame } from 'lucide
 import DeepDive from './DeepDive';
 import NarrationPlayer from './NarrationPlayer';
 import { ProximityItem } from './SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from './SpatialRecorder';
 
 // Visual element icon based on item properties
 function ItemVisual({ color, element, size = 56 }) {
@@ -326,6 +327,7 @@ export default function InteractiveModule({
   const [filter, setFilter] = useState(filters?.[0]?.key || 'all');
   const [search, setSearch] = useState('');
   const [exploredItems, setExploredItems] = useState(new Set());
+  const recorder = useSpatialRecorder();
 
   let filtered = items;
   if (filterFn && filter !== 'all') {
@@ -355,6 +357,9 @@ export default function InteractiveModule({
 
         {/* Mastery progress */}
         <ModuleMastery explored={exploredItems.size} total={items.length} color={color} />
+
+        {/* Avatar Journey Recorder */}
+        <SpatialRecorderUI recorder={recorder} />
 
         {headerExtra}
 
