@@ -19,8 +19,8 @@ import React, { useEffect, useRef, useState, useCallback, createContext, useCont
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import Avatar3D from './Avatar3D';
+import { PHI, PHI_INV, FIB_DEPTH_STEPS, phiExtrusion, getFibBreathPhase } from '../lib/SacredGeometry';
 
-const PHI = 1.618033988749895;
 const GRID_SIZE = 9;
 const TOTAL_NODES = GRID_SIZE * GRID_SIZE; // 81
 const ROOM_DEPTH = 1200; // Total Z-depth of a room
@@ -87,11 +87,13 @@ function indexToGrid(index) {
 }
 
 /**
- * AvatarBadge — Coordinate pointer showing user's position in the room.
- * Not an image — a living data point that tracks scroll-based Z position.
+ * AvatarBadge — Coordinate pointer with Fibonacci depth indicator.
+ * Uses FIB_DEPTH_STEPS for natural acceleration depth mapping.
  */
 function AvatarBadge({ scrollProgress, theme, nodesExplored, totalNodes }) {
-  const gridY = Math.floor(scrollProgress * (GRID_SIZE - 1));
+  const fibIndex = Math.min(8, Math.floor(scrollProgress * 8));
+  const fibDepth = FIB_DEPTH_STEPS[fibIndex];
+  const gridY = Math.floor(fibDepth * (GRID_SIZE - 1));
   const pct = totalNodes > 0 ? Math.round((nodesExplored / totalNodes) * 100) : 0;
 
   return (
@@ -109,16 +111,20 @@ function AvatarBadge({ scrollProgress, theme, nodesExplored, totalNodes }) {
             {pct}% mapped
           </span>
         </div>
-        {/* Mini 9-segment depth indicator */}
+        {/* Fibonacci-spaced 9-segment depth indicator */}
         <div className="flex gap-px mt-0.5">
-          {Array.from({ length: GRID_SIZE }).map((_, i) => (
-            <div key={i} className="h-1 rounded-full"
-              style={{
-                width: 6,
-                background: i <= gridY ? theme.accent : 'rgba(255,255,255,0.06)',
-                opacity: i <= gridY ? 0.8 : 0.3,
-              }} />
-          ))}
+          {FIB_DEPTH_STEPS.map((step, i) => {
+            const nextStep = i < FIB_DEPTH_STEPS.length - 1 ? FIB_DEPTH_STEPS[i + 1] : 1;
+            const segWidth = Math.max(3, (nextStep - step) * 50);
+            return (
+              <div key={i} className="h-1 rounded-full"
+                style={{
+                  width: segWidth,
+                  background: i <= fibIndex ? theme.accent : 'rgba(255,255,255,0.06)',
+                  opacity: i <= fibIndex ? 0.8 : 0.3,
+                }} />
+            );
+          })}
         </div>
       </div>
     </div>
@@ -167,11 +173,11 @@ function DepthParticles({ color, count = 16 }) {
 }
 
 /**
- * ProximityItem — Wraps each child with scroll-based Z-reveal + proximity glow.
- * V54.8: Collision-based interaction. Items unfold their 3D detail as the Avatar approaches.
- * Items in the active octant PULSE with a glow border.
- * Items approaching the avatar EXTRUDE forward (translateZ toward user).
- * 3-second hover in active octant = auto-extrude trigger.
+ * ProximityItem — V54.9 φ-Ratio Collision Extrusion
+ * 
+ * Items don't pop forward linearly — they expand at the Golden Ratio (φ = 1.618).
+ * Collision radius uses Fibonacci-spaced depth zones.
+ * 3-second hover in active octant = auto-extrude with Phi scaling.
  */
 export function ProximityItem({ index, children, totalItems, color }) {
   const spatial = useSpatial();
@@ -186,9 +192,9 @@ export function ProximityItem({ index, children, totalItems, color }) {
   const distance = Math.abs(scrollProgress - itemProgress);
   const itemColor = color || theme?.accent || '#A78BFA';
 
-  // Collision radius: avatar Z within 50px equivalent (1/18th of grid)
-  const COLLISION_RADIUS = 1 / 18;
-  const isColliding = spatial ? distance < COLLISION_RADIUS : false;
+  // φ-scaled collision zones (tighter than linear)
+  const PHI_COLLISION = PHI_INV / GRID_SIZE; // ~0.069
+  const isColliding = spatial ? distance < PHI_COLLISION : false;
   const isActive = spatial ? distance < (1 / GRID_SIZE) : false;
   const isNear = spatial ? distance < (2 / GRID_SIZE) : false;
 
@@ -201,7 +207,7 @@ export function ProximityItem({ index, children, totalItems, color }) {
     }
   }, [isColliding, isActive, collisionActive]);
 
-  // 3-second auto-trigger: if item stays in active octant for 3s, auto-extrude
+  // 3-second auto-trigger
   useEffect(() => {
     if (isActive && !wasActiveRef.current) {
       wasActiveRef.current = true;
@@ -219,17 +225,18 @@ export function ProximityItem({ index, children, totalItems, color }) {
 
   if (!spatial) return <div>{children}</div>;
 
-  // Proximity-based values — enhanced collision physics
-  const opacity = isColliding ? 1 : isActive ? 0.95 : isNear ? 0.75 : distance < 0.4 ? 0.5 : 0.25;
-  const scale = autoTriggered ? 1.04 : isColliding ? 1.02 : isActive ? 1.01 : isNear ? 0.99 : 0.96;
-  const translateZ = autoTriggered ? 20 : isColliding ? 12 : isActive ? 6 : isNear ? 0 : -20;
+  // φ-Ratio Extrusion — Golden Ratio scaling instead of linear
+  const phi = phiExtrusion(distance);
+  const opacity = autoTriggered ? 1 : isColliding ? 1 : phi.opacity;
+  const scale = autoTriggered ? PHI_INV + 0.42 : isColliding ? phi.scale + 0.02 : phi.scale;
+  const translateZ = autoTriggered ? phi.translateZ + 6 : phi.translateZ;
   const unfoldPad = collisionActive ? 4 : 0;
 
   return (
     <div
       style={{
         opacity,
-        transform: `scale(${scale}) translateZ(${translateZ}px)`,
+        transform: `scale(${scale.toFixed(4)}) translateZ(${translateZ.toFixed(1)}px)`,
         transition: 'opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease',
         borderLeft: autoTriggered
           ? `3px solid ${itemColor}70`
@@ -239,7 +246,7 @@ export function ProximityItem({ index, children, totalItems, color }) {
           ? `2px solid ${itemColor}35`
           : '2px solid transparent',
         boxShadow: autoTriggered
-          ? `0 0 40px ${itemColor}18, inset 0 0 20px ${itemColor}08`
+          ? `0 0 ${Math.round(40 * PHI_INV)}px ${itemColor}18, inset 0 0 20px ${itemColor}08`
           : isColliding
           ? `0 0 30px ${itemColor}12, inset 0 0 16px ${itemColor}06`
           : isActive
@@ -254,7 +261,6 @@ export function ProximityItem({ index, children, totalItems, color }) {
       data-testid={`proximity-item-${index}`}
     >
       {children}
-      {/* Collision extrusion indicator */}
       {(autoTriggered || isColliding) && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -299,15 +305,15 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
     return () => clearTimeout(t);
   }, []);
 
-  // Breathing perspective pulse — sine wave oscillation
+  // Fibonacci breathing perspective pulse — replaces simple sine wave
   useEffect(() => {
     if (theme.mode !== 'rhythmic') return;
-    let frame = 0;
+    const startTime = Date.now();
     const animate = () => {
-      frame++;
-      // ~4 second breath cycle (inhale 2s, exhale 2s)
-      const phase = (Math.sin(frame * 0.026) + 1) / 2; // 0-1
-      setBreathPhase(phase);
+      const elapsed = Date.now() - startTime;
+      const fibState = getFibBreathPhase(elapsed);
+      // Map breath intensity to 0-1 for perspective modulation
+      setBreathPhase(fibState.intensity);
       breathRef.current = requestAnimationFrame(animate);
     };
     breathRef.current = requestAnimationFrame(animate);
