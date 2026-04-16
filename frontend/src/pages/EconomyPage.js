@@ -210,9 +210,9 @@ export default function EconomyPage() {
   const [drafts, setDrafts] = useState([]);
 
   const fetchTiers = useCallback(async () => {
-    if (!token) return;
     try {
-      const res = await fetch(`${API}/api/economy/tiers`, { headers: authHeaders });
+      const headers = token ? authHeaders : {};
+      const res = await fetch(`${API}/api/economy/tiers`, { headers });
       const data = await res.json();
       setTiers(data.tiers || []);
       setCurrentTier(data.current_tier || 'discovery');

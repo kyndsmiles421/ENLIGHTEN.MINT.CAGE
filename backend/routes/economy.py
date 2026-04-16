@@ -214,10 +214,16 @@ POLYMATH_PASS = {
 # ═══════════════════════════════════════
 
 @router.get("/tiers")
-async def get_subscription_tiers(user=Depends(get_current_user)):
+async def get_subscription_tiers(request: Request):
     """Get all subscription tiers and user's current tier."""
-    profile = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
-    current_tier = profile.get("tier", "discovery") if profile else "discovery"
+    current_tier = "discovery"
+    try:
+        from deps import get_current_user
+        user = await get_current_user(request)
+        profile = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
+        current_tier = profile.get("tier", "discovery") if profile else "discovery"
+    except Exception:
+        pass
     return {
         "tiers": list(SUBSCRIPTION_TIERS.values()),
         "current_tier": current_tier,
