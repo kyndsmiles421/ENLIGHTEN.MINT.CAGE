@@ -25,31 +25,39 @@ const ROOM_DEPTH = 1200; // Total Z-depth of a room
 const OCTANT_DEPTH = ROOM_DEPTH / GRID_SIZE; // ~133px per Z-layer (1/9th)
 const MIXER_Z = 100; // Mixer HUD sits at Z:100 (in front of everything)
 
-// Spatial context — any child can read the avatar's position and room state
+// ═══ ELEVATION REALMS ═══
+// Y-axis determines the "realm" — vertical plane of existence
+const REALMS = {
+  HOLLOW_EARTH: { yOffset: -1200, atmosphere: 'dense', blur: '2px', label: 'Crystalline Depths' },
+  SURFACE:      { yOffset: 0,     atmosphere: 'normal', blur: '0px', label: 'Surface Realm' },
+  AIR:          { yOffset: 1200,  atmosphere: 'ethereal', blur: '0px', label: 'Sky Temple' },
+};
+
+// Spatial context — any child can read avatar position, realm, room state
 const SpatialContext = createContext(null);
 export const useSpatial = () => useContext(SpatialContext);
 
 const ROOM_THEMES = {
-  nourishment:  { floor: '#0d1a0f', wall: '#0a150c', accent: '#22C55E', particles: '#22C55E', icon: '🍃', name: 'The Living Kitchen', zDepth: -600 },
-  herbology:    { floor: '#0f1a0d', wall: '#0c150a', accent: '#84CC16', particles: '#84CC16', icon: '🌿', name: 'Herb Garden Sanctum', zDepth: -700 },
-  crystals:     { floor: '#0d0d1a', wall: '#0a0a15', accent: '#8B5CF6', particles: '#8B5CF6', icon: '💎', name: 'Crystal Chamber', zDepth: -800 },
-  aromatherapy: { floor: '#1a0d1a', wall: '#150a15', accent: '#C084FC', particles: '#C084FC', icon: '🌸', name: 'Essence Temple', zDepth: -600 },
-  meditation:   { floor: '#0d0d18', wall: '#0a0a14', accent: '#D8B4FE', particles: '#D8B4FE', icon: '🧘', name: 'Meditation Hall', zDepth: -900 },
-  breathing:    { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🌬', name: 'Breath Chamber', zDepth: -500 },
-  yoga:         { floor: '#18150d', wall: '#14120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🕉', name: 'Yoga Studio', zDepth: -700 },
-  elixirs:      { floor: '#1a160d', wall: '#15120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🧪', name: 'Alchemy Lab', zDepth: -600 },
-  acupressure:  { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🤲', name: 'Meridian Room', zDepth: -500 },
-  oracle:       { floor: '#150d18', wall: '#120a14', accent: '#E879F9', particles: '#E879F9', icon: '🔮', name: 'Oracle Chamber', zDepth: -800 },
-  star_chart:   { floor: '#0a0a14', wall: '#080810', accent: '#6366F1', particles: '#6366F1', icon: '✨', name: 'Observatory', zDepth: -1000 },
-  teachings:    { floor: '#1a150d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📿', name: 'Temple of Wisdom', zDepth: -700 },
-  encyclopedia: { floor: '#18120d', wall: '#140e0a', accent: '#FB923C', particles: '#FB923C', icon: '📖', name: 'Grand Library', zDepth: -900 },
-  frequencies:  { floor: '#120d18', wall: '#0e0a14', accent: '#8B5CF6', particles: '#8B5CF6', icon: '🎵', name: 'Frequency Lab', zDepth: -600 },
-  sacred_texts: { floor: '#1a160d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📜', name: 'Sacred Archive', zDepth: -800 },
-  community:    { floor: '#0d1518', wall: '#0a1214', accent: '#38BDF8', particles: '#38BDF8', icon: '🌐', name: 'Gathering Hall', zDepth: -500 },
-  reiki:        { floor: '#180d15', wall: '#140a12', accent: '#F472B6', particles: '#F472B6', icon: '🙌', name: 'Reiki Chamber', zDepth: -600 },
-  mudras:       { floor: '#18150d', wall: '#14120a', accent: '#FDA4AF', particles: '#FDA4AF', icon: '🤲', name: 'Mudra Studio', zDepth: -500 },
-  mantras:      { floor: '#1a160d', wall: '#15120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🕉', name: 'Mantra Hall', zDepth: -600 },
-  default:      { floor: '#0a0a12', wall: '#08080e', accent: '#A78BFA', particles: '#A78BFA', icon: '✦', name: 'Sovereign Space', zDepth: -600 },
+  nourishment:  { floor: '#0d1a0f', wall: '#0a150c', accent: '#22C55E', particles: '#22C55E', icon: '🍃', name: 'The Living Kitchen', zDepth: -600, realm: 'SURFACE' },
+  herbology:    { floor: '#0f1a0d', wall: '#0c150a', accent: '#84CC16', particles: '#84CC16', icon: '🌿', name: 'Herb Garden Sanctum', zDepth: -700, realm: 'SURFACE' },
+  crystals:     { floor: '#0d0d1a', wall: '#0a0a15', accent: '#8B5CF6', particles: '#8B5CF6', icon: '💎', name: 'Crystal Chamber', zDepth: -800, realm: 'HOLLOW_EARTH' },
+  aromatherapy: { floor: '#1a0d1a', wall: '#150a15', accent: '#C084FC', particles: '#C084FC', icon: '🌸', name: 'Essence Temple', zDepth: -600, realm: 'SURFACE' },
+  meditation:   { floor: '#0d0d18', wall: '#0a0a14', accent: '#D8B4FE', particles: '#D8B4FE', icon: '🧘', name: 'Meditation Hall', zDepth: -1200, realm: 'HOLLOW_EARTH', mode: 'stillness' },
+  breathing:    { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🌬', name: 'Breath Chamber', zDepth: -500, realm: 'AIR', mode: 'rhythmic' },
+  yoga:         { floor: '#18150d', wall: '#14120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🕉', name: 'Yoga Studio', zDepth: -700, realm: 'SURFACE' },
+  elixirs:      { floor: '#1a160d', wall: '#15120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🧪', name: 'Alchemy Lab', zDepth: -600, realm: 'HOLLOW_EARTH' },
+  acupressure:  { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🤲', name: 'Meridian Room', zDepth: -500, realm: 'SURFACE' },
+  oracle:       { floor: '#150d18', wall: '#120a14', accent: '#E879F9', particles: '#E879F9', icon: '🔮', name: 'Oracle Chamber', zDepth: -800, realm: 'HOLLOW_EARTH' },
+  star_chart:   { floor: '#0a0a14', wall: '#080810', accent: '#6366F1', particles: '#6366F1', icon: '✨', name: 'Observatory', zDepth: -1000, realm: 'AIR' },
+  teachings:    { floor: '#1a150d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📿', name: 'Temple of Wisdom', zDepth: -700, realm: 'SURFACE' },
+  encyclopedia: { floor: '#18120d', wall: '#140e0a', accent: '#FB923C', particles: '#FB923C', icon: '📖', name: 'Grand Library', zDepth: -900, realm: 'SURFACE' },
+  frequencies:  { floor: '#120d18', wall: '#0e0a14', accent: '#8B5CF6', particles: '#8B5CF6', icon: '🎵', name: 'Frequency Lab', zDepth: -600, realm: 'HOLLOW_EARTH' },
+  sacred_texts: { floor: '#1a160d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📜', name: 'Sacred Archive', zDepth: -800, realm: 'HOLLOW_EARTH' },
+  community:    { floor: '#0d1518', wall: '#0a1214', accent: '#38BDF8', particles: '#38BDF8', icon: '🌐', name: 'Gathering Hall', zDepth: -500, realm: 'SURFACE' },
+  reiki:        { floor: '#180d15', wall: '#140a12', accent: '#F472B6', particles: '#F472B6', icon: '🙌', name: 'Reiki Chamber', zDepth: -600, realm: 'SURFACE' },
+  mudras:       { floor: '#18150d', wall: '#14120a', accent: '#FDA4AF', particles: '#FDA4AF', icon: '🤲', name: 'Mudra Studio', zDepth: -500, realm: 'SURFACE' },
+  mantras:      { floor: '#1a160d', wall: '#15120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🕉', name: 'Mantra Hall', zDepth: -600, realm: 'SURFACE' },
+  default:      { floor: '#0a0a12', wall: '#08080e', accent: '#A78BFA', particles: '#A78BFA', icon: '✦', name: 'Sovereign Space', zDepth: -600, realm: 'SURFACE' },
 };
 
 /**
@@ -189,19 +197,26 @@ export function ProximityItem({ index, children, totalItems }) {
 /**
  * SpatialRoom — The main room wrapper.
  * Transforms a page into a 3D volume with the 9x9 grid math.
+ * Supports realm elevation (HOLLOW_EARTH / SURFACE / AIR).
+ * Breathing rooms pulse the grid. Meditation rooms reward stillness.
  */
 export default function SpatialRoom({ room = 'default', children, nodesExplored = 0, totalNodes = 0 }) {
   const theme = ROOM_THEMES[room] || ROOM_THEMES.default;
+  const realm = REALMS[theme.realm || 'SURFACE'];
   const [entered, setEntered] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [stillnessTimer, setStillnessTimer] = useState(0);
+  const [hiddenRevealed, setHiddenRevealed] = useState(false);
   const containerRef = useRef(null);
+  const stillnessRef = useRef(null);
+  const lastScrollRef = useRef(0);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 50);
     return () => clearTimeout(t);
   }, []);
 
-  // Map scroll to Z-axis progress (0 = room entrance, 1 = deepest point)
+  // Map scroll to Z-axis progress
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -214,6 +229,7 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         : el.scrollHeight - el.clientHeight;
       const progress = scrollHeight > 0 ? Math.min(1, scrollTop / scrollHeight) : 0;
       setScrollProgress(progress);
+      lastScrollRef.current = Date.now();
     };
 
     const scrollEl = container.closest('[data-testid="content-area"]') || window;
@@ -221,17 +237,47 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
     return () => scrollEl.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Meditation stillness reward: if user stays still for 30s, reveal hidden octants
+  useEffect(() => {
+    if (theme.mode !== 'stillness') return;
+    stillnessRef.current = setInterval(() => {
+      const timeSinceScroll = Date.now() - lastScrollRef.current;
+      if (timeSinceScroll > 1000) {
+        setStillnessTimer(prev => {
+          const next = prev + 1;
+          if (next >= 30 && !hiddenRevealed) {
+            setHiddenRevealed(true);
+          }
+          return next;
+        });
+      } else {
+        setStillnessTimer(0);
+        setHiddenRevealed(false);
+      }
+    }, 1000);
+    return () => clearInterval(stillnessRef.current);
+  }, [theme.mode, hiddenRevealed]);
+
+  // Realm-specific atmosphere
+  const isHollowEarth = theme.realm === 'HOLLOW_EARTH';
+  const isAir = theme.realm === 'AIR';
+  const roomDepth = Math.abs(theme.zDepth);
+
   const spatialCtx = {
     room,
     theme,
+    realm: theme.realm || 'SURFACE',
     scrollProgress,
     gridPosition: {
-      x: 4, // Avatar centered
+      x: 4,
       y: Math.floor(scrollProgress * (GRID_SIZE - 1)),
     },
     entered,
     nodesExplored,
     totalNodes,
+    stillnessTimer,
+    hiddenRevealed,
+    mode: theme.mode || 'standard',
   };
 
   return (
@@ -240,34 +286,74 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         ref={containerRef}
         className="relative min-h-screen"
         style={{
-          perspective: `${ROOM_DEPTH}px`,
+          perspective: `${roomDepth}px`,
           perspectiveOrigin: '50% 40%',
           background: theme.floor,
           overflow: 'hidden',
         }}
         data-testid={`spatial-room-${room}`}
       >
-        {/* Floor plane — depth gradient */}
+        {/* Floor plane */}
         <div className="absolute inset-0 pointer-events-none" style={{
           background: `linear-gradient(180deg, ${theme.wall} 0%, ${theme.floor} 25%, ${theme.floor} 75%, ${theme.wall}80 100%)`,
           zIndex: 0,
         }} />
 
-        {/* Side walls — peripheral depth cues */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-          <div className="absolute left-0 top-0 bottom-0 w-16"
-            style={{ background: `linear-gradient(90deg, ${theme.wall}80, transparent)` }} />
-          <div className="absolute right-0 top-0 bottom-0 w-16"
-            style={{ background: `linear-gradient(-90deg, ${theme.wall}80, transparent)` }} />
-        </div>
+        {/* HOLLOW EARTH: Crystalline tunnel walls — tighter, more contained */}
+        {isHollowEarth && (
+          <>
+            <div className="absolute left-0 top-0 bottom-0 pointer-events-none" style={{
+              width: '25%',
+              background: `linear-gradient(90deg, ${theme.wall}DD, ${theme.wall}40, transparent)`,
+              zIndex: 0,
+            }} />
+            <div className="absolute right-0 top-0 bottom-0 pointer-events-none" style={{
+              width: '25%',
+              background: `linear-gradient(-90deg, ${theme.wall}DD, ${theme.wall}40, transparent)`,
+              zIndex: 0,
+            }} />
+            {/* Crystal vein lines on walls */}
+            {[15, 35, 55, 75, 90].map((top, i) => (
+              <div key={`cl-${i}`} className="absolute pointer-events-none" style={{
+                top: `${top}%`, left: 0, right: 0, height: 1,
+                background: `linear-gradient(90deg, ${theme.accent}25, transparent 15%, transparent 85%, ${theme.accent}25)`,
+                zIndex: 0,
+              }} />
+            ))}
+            {/* Ambient heat haze for dense atmosphere */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: `radial-gradient(ellipse at 50% 80%, ${theme.accent}06, transparent 60%)`,
+              filter: realm.blur !== '0px' ? `blur(${realm.blur})` : undefined,
+              zIndex: 0,
+            }} />
+          </>
+        )}
 
-        {/* Ceiling accent — top edge glow */}
+        {/* AIR: Open sky — no side walls, lighter top gradient */}
+        {isAir && (
+          <div className="absolute inset-0 pointer-events-none" style={{
+            background: `radial-gradient(ellipse at 50% 0%, ${theme.accent}08, transparent 70%)`,
+            zIndex: 0,
+          }} />
+        )}
+
+        {/* SURFACE: Standard side walls */}
+        {!isHollowEarth && !isAir && (
+          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+            <div className="absolute left-0 top-0 bottom-0 w-16"
+              style={{ background: `linear-gradient(90deg, ${theme.wall}80, transparent)` }} />
+            <div className="absolute right-0 top-0 bottom-0 w-16"
+              style={{ background: `linear-gradient(-90deg, ${theme.wall}80, transparent)` }} />
+          </div>
+        )}
+
+        {/* Ceiling accent */}
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `${theme.accent}20`, zIndex: 1 }} />
 
-        {/* Depth particles floating in Z-space */}
-        <DepthParticles color={theme.particles} count={18} />
+        {/* Depth particles */}
+        <DepthParticles color={theme.particles} count={isHollowEarth ? 24 : 16} />
 
-        {/* Room header — name + avatar badge */}
+        {/* Room header — name + realm indicator + avatar badge */}
         <motion.div
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : -15 }}
@@ -277,20 +363,40 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         >
           <div className="flex items-center gap-2">
             <span className="text-sm">{theme.icon}</span>
-            <span className="text-[8px] font-bold uppercase tracking-[0.2em]"
-              style={{ color: `${theme.accent}50` }}>
-              {theme.name}
-            </span>
+            <div>
+              <span className="text-[8px] font-bold uppercase tracking-[0.2em] block"
+                style={{ color: `${theme.accent}50` }}>
+                {theme.name}
+              </span>
+              <span className="text-[6px] uppercase tracking-[0.15em]"
+                style={{ color: `${theme.accent}30` }}>
+                {realm.label}
+              </span>
+            </div>
           </div>
           <AvatarBadge scrollProgress={scrollProgress} theme={theme} nodesExplored={nodesExplored} totalNodes={totalNodes} />
         </motion.div>
 
-        {/* Content — enters from Z-depth with the 9x9 grid extrusion */}
+        {/* Stillness indicator for meditation rooms */}
+        {theme.mode === 'stillness' && stillnessTimer > 5 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute top-12 left-0 right-0 text-center pointer-events-none"
+            style={{ zIndex: 2 }}
+          >
+            <span className="text-[9px] font-mono" style={{ color: `${theme.accent}40` }}>
+              Stillness: {stillnessTimer}s {hiddenRevealed && '— deeper layers revealed'}
+            </span>
+          </motion.div>
+        )}
+
+        {/* Content — enters from Z-depth */}
         <motion.div
-          initial={{ opacity: 0, transform: 'translateZ(-100px) rotateX(2deg)' }}
+          initial={{ opacity: 0, transform: `translateZ(${theme.zDepth * 0.08}px) rotateX(2deg)` }}
           animate={{
             opacity: entered ? 1 : 0,
-            transform: entered ? 'translateZ(0px) rotateX(0deg)' : 'translateZ(-100px) rotateX(2deg)',
+            transform: entered ? 'translateZ(0px) rotateX(0deg)' : `translateZ(${theme.zDepth * 0.08}px) rotateX(2deg)`,
           }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
@@ -303,4 +409,4 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
   );
 }
 
-export { ROOM_THEMES, GRID_SIZE, TOTAL_NODES, ROOM_DEPTH, OCTANT_DEPTH, calculateProximity, indexToGrid };
+export { ROOM_THEMES, REALMS, GRID_SIZE, TOTAL_NODES, ROOM_DEPTH, OCTANT_DEPTH, calculateProximity, indexToGrid };

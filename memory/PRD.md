@@ -1,43 +1,35 @@
-# ENLIGHTEN.MINT.CAFE — V54.2 9x9 SPATIAL GRID ENGINE
+# ENLIGHTEN.MINT.CAFE — V54.3 REALM ELEVATION + CRYSTALLINE TUNNELS
 ## Last Verified: April 16, 2026
 
-### V54.2: 9x9 Grid Z-Axis Architecture
-- **SpatialRoom.js rebuilt** with 9x9 occupancy grid (81 nodes)
-  - GRID_SIZE=9, TOTAL_NODES=81, ROOM_DEPTH=1200, OCTANT_DEPTH=133
-  - Scroll maps to Z-axis penetration (not 2D movement)
-  - Items materialize via proximity — within 1 octant = full opacity, beyond 3 octants = 0.15
-  - Mixer HUD at Z:100 (static), room content Z:0 to Z:-1200 (fluid)
-- **Avatar Badge**: Grid coordinate pointer [x,y] + % mapped + 9-segment depth indicator
-- **ProximityItem**: Wraps each InteractiveItem with scroll-based Z-reveal
-- **DepthParticles**: Particles scaled by Z-layer (closer = larger)
-- **SpatialContext**: Any child component can read avatar position and room state
-- **20 room themes** with zDepth values
+### V54.3: Elevation Realms + Room Modes
+- **3 Elevation Realms**: HOLLOW_EARTH (Y:-1200), SURFACE (Y:0), AIR (Y:+1200)
+  - HOLLOW_EARTH: Crystalline tunnel walls (25% width), crystal vein lines, dense particles (24), heat haze blur
+  - SURFACE: Standard side wall gradients (16px)
+  - AIR: Open sky, no side walls, top radial glow
+- **Room Modes**:
+  - `rhythmic` (Breathing): Grid pulses with breath cycle — zDepth:-500 (shorter/contained)
+  - `stillness` (Meditation): zDepth:-1200 (full depth). Stillness timer tracks seconds without scroll. After 30s, hidden octants reveal (deeper content materializes)
+  - `standard`: Normal proximity reveal
+- **Realm assignments**: Crystals/Oracle/Frequencies/Elixirs/Sacred Texts → HOLLOW_EARTH. Breathing/Star Chart → AIR. Everything else → SURFACE.
+- **SpatialContext enhanced**: Now exposes `realm`, `stillnessTimer`, `hiddenRevealed`, `mode`
 
-### Spatial Rules (DO NOT VIOLATE)
-- Mixer is STATIC at Z:100 — never use padding to fix visibility
-- Content terminates before hitting Mixer's Z-plane
-- Avatar is a Coordinate Pointer, not an image
-- If an item is "hidden" it's out of range in 3D volume, not "off-screen"
-- Room transitions: fold previous 9x9 grid, extrude new one
-
-### Architecture
+### 9x9 Grid Architecture (LOCKED)
 ```
-Z-Axis:
-  Z:100  → Mixer HUD (static)
-  Z:0    → Room entrance (content starts here)
-  Z:-133 → Octant 1 (first 1/9th of room)
-  Z:-266 → Octant 2
-  ...
-  Z:-1200 → Room back wall
-  
-Scroll → Z mapping:
-  scrollProgress 0.0 → Avatar at grid [4,0] (entrance)
-  scrollProgress 0.5 → Avatar at grid [4,4] (center)
-  scrollProgress 1.0 → Avatar at grid [4,8] (deepest point)
+Elevation (Y-axis):
+  Y:+1200 → Air Temple (Breathing, Observatory)
+  Y:0     → Surface Realm (Kitchen, Garden, Studio)
+  Y:-1200 → Crystalline Depths (Crystals, Oracle, Frequencies)
+
+Depth (Z-axis per room):
+  Z:100   → Mixer HUD (static)
+  Z:0     → Room entrance
+  Z:-500  → Breath Chamber back wall (short room)
+  Z:-800  → Crystal Chamber back wall
+  Z:-1200 → Meditation Hall back wall (deepest room)
 ```
 
 ### Upcoming
-- Wrap ALL remaining pages in SpatialRoom
-- Room-to-room fold/extrude transitions
+- Wrap remaining pages in SpatialRoom (Breathing, Meditation, Yoga, Teachings, Encyclopedia, etc.)
+- Breathing grid pulse (perspective oscillates with inhale/exhale)
+- Room fold/extrude transitions between modules
 - Avatar visual presence in rooms
-- Collision-based interaction (proximity triggers instead of tap)
