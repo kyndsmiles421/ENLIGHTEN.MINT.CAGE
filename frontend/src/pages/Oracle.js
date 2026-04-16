@@ -20,26 +20,97 @@ const TABS = [
 // ═══════════════════════════════════════════════════════════════════
 // COMPONENT: TarotCard
 // ═══════════════════════════════════════════════════════════════════
-function TarotCard({ card, index, revealed }) {
+// V56.0 — 3D Immersive Tarot Card with Z-depth, hover lift, preserve-3d
+function TarotCard({ card, index, revealed, totalCards }) {
+  const [hovered, setHovered] = React.useState(false);
+  // Fan spread: each card gets a unique rotation and Z-offset
+  const spreadAngle = totalCards > 1 ? (index - (totalCards - 1) / 2) * 12 : 0;
+  const zOffset = totalCards > 1 ? Math.abs(index - (totalCards - 1) / 2) * -15 : 0;
+  const cardColor = card.reversed ? '#EF4444' : '#D8B4FE';
+
   return (
     <motion.div
-      initial={{ rotateY: 180, opacity: 0 }}
-      animate={{ rotateY: revealed ? 0 : 180, opacity: 1 }}
-      transition={{ delay: index * 0.3, duration: 0.6 }}
-      className="p-5 text-center w-40 md:w-48 flex-shrink-0"
+      initial={{ rotateY: 180, opacity: 0, z: -200, scale: 0.6 }}
+      animate={{
+        rotateY: revealed ? 0 : 180,
+        opacity: 1,
+        z: revealed ? zOffset : -200,
+        scale: revealed ? 1 : 0.6,
+        rotateZ: revealed ? spreadAngle : 0,
+      }}
+      transition={{ delay: index * 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative p-5 text-center w-44 md:w-52 flex-shrink-0 cursor-pointer"
       style={{
-        borderColor: card.reversed ? 'rgba(239,68,68,0.2)' : 'rgba(216,180,254,0.2)',
-        boxShadow: `0 0 30px ${card.reversed ? 'rgba(239,68,68,0.1)' : 'rgba(216,180,254,0.1)'}`,
+        transformStyle: 'preserve-3d',
+        transform: hovered && revealed
+          ? `translateZ(60px) rotateY(-8deg) rotateX(5deg) scale(1.08)`
+          : undefined,
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease',
+        background: `linear-gradient(145deg, rgba(10,10,20,0.95), rgba(15,10,25,0.9))`,
+        border: `1px solid ${cardColor}30`,
+        borderRadius: 16,
+        boxShadow: hovered && revealed
+          ? `0 0 40px ${cardColor}30, 0 20px 60px rgba(0,0,0,0.5), inset 0 0 30px ${cardColor}08`
+          : `0 0 20px ${cardColor}10, 0 8px 30px rgba(0,0,0,0.3)`,
+        backfaceVisibility: 'hidden',
       }}
       data-testid={`tarot-card-${index}`}
     >
-      <div className="text-4xl mb-3" style={{ fontFamily: 'Cormorant Garamond, serif', color: card.reversed ? '#EF4444' : '#D8B4FE' }}>
-        {card.name === 'The Fool' ? 'O' : card.name.match(/\d+/) ? card.name.match(/\d+/)[0] : String.fromCharCode(9812 + index)}
+      {/* Card back face */}
+      <div
+        className="absolute inset-0 rounded-2xl flex items-center justify-center"
+        style={{
+          backfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          background: `linear-gradient(145deg, ${cardColor}15, rgba(10,10,20,0.95))`,
+          border: `1px solid ${cardColor}20`,
+        }}
+      >
+        <div className="w-16 h-16 rounded-full" style={{
+          background: `radial-gradient(circle, ${cardColor}20, transparent)`,
+          border: `1px solid ${cardColor}15`,
+        }} />
       </div>
-      <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>{card.name}</p>
-      {card.reversed && <p className="text-xs mb-1" style={{ color: '#EF4444' }}>Reversed</p>}
-      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{card.element}</p>
-      <p className="text-xs mt-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{card.keywords}</p>
+
+      {/* Card front face */}
+      <div style={{ backfaceVisibility: 'hidden' }}>
+        {/* Arcana symbol */}
+        <motion.div
+          animate={hovered ? { scale: [1, 1.1, 1], textShadow: `0 0 20px ${cardColor}60` } : {}}
+          transition={{ duration: 1.5, repeat: hovered ? Infinity : 0 }}
+          className="text-5xl mb-4"
+          style={{
+            fontFamily: 'Cormorant Garamond, serif',
+            color: cardColor,
+            textShadow: `0 0 12px ${cardColor}40`,
+          }}
+        >
+          {card.name === 'The Fool' ? 'O' : card.name.match(/\d+/) ? card.name.match(/\d+/)[0] : String.fromCharCode(9812 + index)}
+        </motion.div>
+        <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>{card.name}</p>
+        {card.reversed && (
+          <p className="text-xs mb-1 font-mono" style={{ color: '#EF4444', textShadow: '0 0 8px rgba(239,68,68,0.3)' }}>
+            Reversed
+          </p>
+        )}
+        <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: `${cardColor}80` }}>{card.element}</p>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{card.keywords}</p>
+
+        {/* Phi-glow ring on hover */}
+        {hovered && revealed && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            style={{
+              border: `1px solid ${cardColor}25`,
+              boxShadow: `inset 0 0 40px ${cardColor}08`,
+            }}
+          />
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -473,15 +544,23 @@ export default function Oracle() {
                   style={{ transformStyle: 'preserve-3d' }}
                 >
 
-                  {/* Tarot */}
+                  {/* Tarot — V56.0 Immersive 3D Card Spread */}
                   {reading.type === 'tarot' && (
                     <>
                       <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: '#D8B4FE' }}>
                         <Star size={12} className="inline mr-1" /> Your Tarot Reading
                       </p>
-                      <div className="flex gap-4 justify-center mb-8 overflow-x-auto pb-2">
+                      <div
+                        className="flex gap-6 justify-center mb-8 overflow-visible pb-4 pt-4"
+                        style={{
+                          perspective: '1000px',
+                          perspectiveOrigin: '50% 60%',
+                          transformStyle: 'preserve-3d',
+                        }}
+                        data-testid="tarot-card-spread"
+                      >
                         {reading.cards?.map((card, i) => (
-                          <TarotCard key={i} card={card} index={i} revealed={revealed} />
+                          <TarotCard key={i} card={card} index={i} revealed={revealed} totalCards={reading.cards.length} />
                         ))}
                       </div>
                       <div className="border-t border-white/5 pt-6">
@@ -623,17 +702,42 @@ export default function Oracle() {
                   exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px) brightness(1.5)' }}
                   transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
                   className="p-12 flex flex-col items-center justify-center min-h-[400px] text-center"
-                  style={{ transformStyle: 'preserve-3d' }}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    perspective: '800px',
+                  }}
                 >
-                  <div className="relative mb-6">
+                  {/* 3D rotating orbital rings */}
+                  <div className="relative mb-6" style={{ transformStyle: 'preserve-3d' }}>
                     {[0, 1, 2].map(i => (
                       <motion.div key={i}
-                        animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-                        transition={{ duration: 8 + i * 3, repeat: Infinity, ease: 'linear' }}
+                        animate={{
+                          rotateX: [0, 360],
+                          rotateY: [0, i % 2 === 0 ? 360 : -360],
+                          scale: [1, 1.05, 1],
+                        }}
+                        transition={{ duration: 10 + i * 4, repeat: Infinity, ease: 'linear' }}
                         className="absolute rounded-full border"
-                        style={{ width: `${80 + i * 40}px`, height: `${80 + i * 40}px`, top: `${-(i * 20)}px`, left: `${-(i * 20)}px`, borderColor: `${currentTabColor}${Math.round((0.15 - i * 0.03) * 255).toString(16).padStart(2, '0')}` }} />
+                        style={{
+                          width: `${80 + i * 40}px`,
+                          height: `${80 + i * 40}px`,
+                          top: `${-(i * 20)}px`,
+                          left: `${-(i * 20)}px`,
+                          borderColor: `${currentTabColor}${Math.round((0.18 - i * 0.04) * 255).toString(16).padStart(2, '0')}`,
+                          transformStyle: 'preserve-3d',
+                          boxShadow: `0 0 15px ${currentTabColor}08`,
+                        }} />
                     ))}
-                    <Sparkles size={32} style={{ color: 'var(--text-muted)', opacity: 0.4, position: 'relative', zIndex: 1, margin: '24px' }} />
+                    <motion.div
+                      animate={{
+                        rotateY: [0, 360],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                      style={{ transformStyle: 'preserve-3d' }}
+                    >
+                      <Sparkles size={32} style={{ color: currentTabColor, opacity: 0.5, position: 'relative', zIndex: 1, margin: '24px', filter: `drop-shadow(0 0 8px ${currentTabColor}40)` }} />
+                    </motion.div>
                   </div>
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                     {tab === 'tarot' ? 'The cards await your question' :

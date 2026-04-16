@@ -57,6 +57,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { SceneProvider } from './components/SceneEngine';
 import { TouchLightEngine, ZDepthTransition } from './components/UnifiedFieldEngine';
 import { Toaster } from 'sonner';
+import ProgressionToast from './components/ProgressionToast';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
 import SmartDock from './components/SmartDock';
@@ -420,6 +421,7 @@ function CafeApp() {
             },
           }}
         />
+        <ProgressionToast />
         <AnimatedRoutes />
       </div>
       

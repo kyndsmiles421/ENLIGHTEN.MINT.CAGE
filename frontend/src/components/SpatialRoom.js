@@ -21,6 +21,7 @@ import { Sparkles } from 'lucide-react';
 import Avatar3D from './Avatar3D';
 import SacredGeometryOverlay from './SacredGeometrySVG';
 import GhostTrails from './GhostTrails';
+import VitalityBar from './VitalityBar';
 import { useAvatar } from '../context/AvatarContext';
 import { PHI, PHI_INV, FIB_DEPTH_STEPS, phiExtrusion, getFibBreathPhase } from '../lib/SacredGeometry';
 
@@ -526,6 +527,7 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
             </div>
           </div>
           <AvatarBadge scrollProgress={scrollProgress} theme={theme} nodesExplored={nodesExplored} totalNodes={totalNodes} />
+          <VitalityBar accent={theme.accent} />
         </motion.div>
 
         {/* Stillness indicator for meditation rooms */}

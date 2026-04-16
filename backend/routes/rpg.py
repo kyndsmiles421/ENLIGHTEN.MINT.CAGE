@@ -118,6 +118,116 @@ async def gain_xp(data: dict = Body(...), user=Depends(get_current_user)):
     return result
 
 
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  V56.0 VITALITY — CROSS-SYSTEM MILESTONES & QUEST TRIGGERS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MILESTONE_DEFINITIONS = [
+    {"id": "air_temple_quest", "source": "breathing_exercise", "count": 3, "reward_xp": 50, "reward_item": "air_temple_key", "label": "Air Temple Unlocked"},
+    {"id": "crystal_skin_001", "source": "meditation_session", "count": 5, "reward_xp": 75, "reward_item": "crystal_skin_luminous", "label": "Crystal Skin Earned"},
+    {"id": "mystic_cloak_001", "source": "oracle_reading", "count": 3, "reward_xp": 60, "reward_item": "mystic_cloak", "label": "Mystic Cloak Unlocked"},
+    {"id": "dream_realms_access", "source": "dream_journal", "count": 3, "reward_xp": 50, "reward_item": "dream_key", "label": "Dream Realms Opened"},
+    {"id": "ritual_master_badge", "source": "daily_ritual", "count": 7, "reward_xp": 100, "reward_item": "ritual_master_badge", "label": "Sovereign Ritual Master"},
+    {"id": "mood_cartographer", "source": "mood_log", "count": 10, "reward_xp": 80, "reward_item": "mood_map_badge", "label": "Emotional Cartographer"},
+    {"id": "herbalist_badge", "source": "herbology", "count": 5, "reward_xp": 60, "reward_item": "herbalist_badge", "label": "Herbalist Adept"},
+    {"id": "sound_weaver", "source": "frequencies", "count": 5, "reward_xp": 60, "reward_item": "sound_weaver_badge", "label": "Sound Weaver"},
+]
+
+
+@router.get("/milestones")
+async def get_milestones(user=Depends(get_current_user)):
+    """Return all milestones with completion status for this user."""
+    uid = user["id"]
+    unlocked_doc = await db.rpg_milestones.find_one({"user_id": uid}, {"_id": 0})
+    unlocked = set((unlocked_doc or {}).get("unlocked", []))
+
+    # Count activities from XP log
+    pipeline = [
+        {"$match": {"user_id": uid}},
+        {"$group": {"_id": "$source", "count": {"$sum": 1}}},
+    ]
+    counts = {}
+    async for doc in db.rpg_xp_log.aggregate(pipeline):
+        counts[doc["_id"]] = doc["count"]
+
+    milestones = []
+    for m in MILESTONE_DEFINITIONS:
+        progress = counts.get(m["source"], 0)
+        milestones.append({
+            "id": m["id"],
+            "label": m["label"],
+            "source": m["source"],
+            "required": m["count"],
+            "progress": min(progress, m["count"]),
+            "completed": m["id"] in unlocked,
+            "reward_item": m["reward_item"],
+        })
+    return {"milestones": milestones}
+
+
+@router.post("/milestones/claim")
+async def claim_milestone(data: dict = Body(...), user=Depends(get_current_user)):
+    """Claim a completed milestone reward."""
+    uid = user["id"]
+    milestone_id = data.get("milestone_id")
+    if not milestone_id:
+        raise HTTPException(400, "milestone_id required")
+
+    milestone = next((m for m in MILESTONE_DEFINITIONS if m["id"] == milestone_id), None)
+    if not milestone:
+        raise HTTPException(404, "Milestone not found")
+
+    # Check if already claimed
+    unlocked_doc = await db.rpg_milestones.find_one({"user_id": uid}, {"_id": 0})
+    unlocked = set((unlocked_doc or {}).get("unlocked", []))
+    if milestone_id in unlocked:
+        return {"already_claimed": True}
+
+    # Check progress
+    count = await db.rpg_xp_log.count_documents({"user_id": uid, "source": milestone["source"]})
+    if count < milestone["count"]:
+        raise HTTPException(400, f"Need {milestone['count']} {milestone['source']} activities, have {count}")
+
+    # Award XP
+    char = await get_or_create_character(uid)
+    old_level = level_from_xp(char["xp"])
+    new_xp = char["xp"] + milestone["reward_xp"]
+    new_level = level_from_xp(new_xp)
+    level_ups = new_level - old_level
+
+    await db.rpg_characters.update_one({"user_id": uid}, {"$inc": {"xp": milestone["reward_xp"]}})
+
+    # Grant reward item
+    item_doc = {
+        "user_id": uid,
+        "id": str(uuid.uuid4()),
+        "name": milestone["label"],
+        "type": "badge" if "badge" in milestone["reward_item"] else "equipment",
+        "slot": "trinket" if "badge" not in milestone["reward_item"] else "badge",
+        "rarity": "epic",
+        "source": f"milestone_{milestone_id}",
+        "granted_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.rpg_inventory.insert_one(item_doc)
+
+    # Mark as claimed
+    await db.rpg_milestones.update_one(
+        {"user_id": uid},
+        {"$addToSet": {"unlocked": milestone_id}, "$set": {"user_id": uid}},
+        upsert=True,
+    )
+
+    return {
+        "claimed": True,
+        "milestone": milestone["label"],
+        "xp_gained": milestone["reward_xp"],
+        "item_granted": milestone["reward_item"],
+        "level_up": level_ups > 0,
+        "new_level": new_level,
+    }
+
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  ITEMS & RARITY
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
