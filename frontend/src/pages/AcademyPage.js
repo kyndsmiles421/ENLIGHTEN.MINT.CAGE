@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useModality } from '../context/ModalityContext';
+import { ProximityItem } from '../components/SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -536,6 +538,7 @@ export default function AcademyPage() {
   const [activeLesson, setActiveLesson] = useState(null);
   const [activeForgeLab, setActiveForgeLab] = useState(null);
   const [forgeResult, setForgeResult] = useState(null);
+  const recorder = useSpatialRecorder();
   const [completing, setCompleting] = useState(false);
   const [expandedProgram, setExpandedProgram] = useState(null);
   const [activeZone, setActiveZone] = useState(null); // null = all zones
@@ -653,15 +656,19 @@ export default function AcademyPage() {
   const filteredPrograms = activeZone ? programs.filter(p => p.zone === activeZone) : programs;
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
       <ImmersiveOverlay active={intensity === 'immersive'} />
 
-      <div className="px-4 py-6 max-w-2xl mx-auto relative z-10">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         {/* Header */}
-        <div className="flex items-start justify-between mb-5" data-testid="academy-header">
+        <div className="flex items-center gap-2 mb-1">
+          <BookOpen size={14} style={{ color: skinColor }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: skinColor }}>Academy</p>
+        </div>
+        <div className="flex items-start justify-between mb-2" data-testid="academy-header">
           <div>
-            <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#F8FAFC' }} data-testid="academy-title">Academy</h1>
-            <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <h1 className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }} data-testid="academy-title">Academy</h1>
+            <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {modalityData?.name || 'Omni-Modality'} | {INTENSITY_META[intensity]?.label || 'Guided'} Mode
             </p>
           </div>
@@ -669,6 +676,8 @@ export default function AcademyPage() {
             <MasteryRing level={accreditation.mastery_level} resonanceScore={accreditation.resonance_score} />
           )}
         </div>
+
+        <SpatialRecorderUI recorder={recorder} />
 
         {/* Auto-Scale Prompt */}
         <AnimatePresence>
@@ -759,14 +768,14 @@ export default function AcademyPage() {
           })}
         </div>
 
-        {/* Programs */}
+        {/* Programs — proximity-revealed */}
         <div className="space-y-3">
           {filteredPrograms.map((prog, pi) => {
             const isExpanded = expandedProgram === prog.id || expandedProgram === null;
             const zoneColor = prog.zone_data?.color || '#818CF8';
             return (
-              <motion.div key={prog.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: pi * 0.05 }} className="rounded-xl overflow-hidden"
+              <ProximityItem key={prog.id} index={pi} totalItems={filteredPrograms.length}>
+                <div className="rounded-xl overflow-hidden"
                 style={{
                   background: 'rgba(255,255,255,0.015)',
                   border: `1px solid ${prog.completed ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.03)'}`,
@@ -840,7 +849,8 @@ export default function AcademyPage() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
+              </ProximityItem>
             );
           })}
         </div>
@@ -860,7 +870,7 @@ export default function AcademyPage() {
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Modals */}
       <AnimatePresence>

@@ -9,6 +9,8 @@ import {
   Gamepad2, Brain, Wind, Palette, Sparkles, ArrowLeft,
   Trophy, RotateCcw, Clock, Star, ChevronRight, Zap
 } from 'lucide-react';
+import { ProximityItem } from '../components/SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -552,12 +554,12 @@ export default function Games() {
   const [activeGame, setActiveGame] = useState(null);
   const [scores, setScores] = useState({});
   const [saving, setSaving] = useState(false);
+  const recorder = useSpatialRecorder();
 
   useEffect(() => {
     if (!authLoading && !user) { navigate('/auth'); return; }
     if (user) {
       axios.get(`${API}/games/scores`, { headers: authHeaders }).then(r => setScores(r.data.scores)).catch(() => {});
-      // Auto check-in streak
       axios.post(`${API}/streak/checkin`, {}, { headers: authHeaders }).catch(() => {});
     }
   }, [user, authLoading, navigate, authHeaders]);
@@ -581,139 +583,104 @@ export default function Games() {
 
   if (authLoading) return null;
 
-  // Game view
+  // Active game view — still spatial
   if (activeGame) {
     const GameComponent = activeGame.Component;
     return (
-      <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-        <div className="max-w-2xl mx-auto relative z-10">
-          <button onClick={() => setActiveGame(null)}
-            className="flex items-center gap-2 text-xs mb-8 group" style={{ color: 'var(--text-muted)' }}
-            data-testid="game-back-btn">
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> All Games
-          </button>
-          <div className="mb-6">
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold" style={{ color: activeGame.color }}>{activeGame.benefit}</span>
-            <h2 className="text-2xl md:text-3xl font-light mt-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-              {activeGame.title}
-            </h2>
-            {scores[activeGame.id] && (
-              <p className="text-xs mt-1 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
-                <Trophy size={11} style={{ color: '#FCD34D' }} /> Best: {scores[activeGame.id].best_score} | Played: {scores[activeGame.id].total_plays}x
-              </p>
-            )}
-          </div>
-          <GameComponent onScore={saveScore} />
+      <div className="min-h-screen pt-20 pb-24 px-5 max-w-2xl mx-auto" style={{ background: 'transparent' }} data-testid="games-page">
+        <button onClick={() => setActiveGame(null)}
+          className="flex items-center gap-2 text-xs mb-8 group" style={{ color: 'rgba(255,255,255,0.5)' }}
+          data-testid="game-back-btn">
+          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> All Games
+        </button>
+        <div className="mb-6">
+          <span className="text-[10px] uppercase tracking-[0.2em] font-bold" style={{ color: activeGame.color }}>{activeGame.benefit}</span>
+          <h2 className="text-2xl md:text-3xl font-light mt-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+            {activeGame.title}
+          </h2>
+          {scores[activeGame.id] && (
+            <p className="text-xs mt-1 flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              <Trophy size={11} style={{ color: '#FCD34D' }} /> Best: {scores[activeGame.id].best_score} | Played: {scores[activeGame.id].total_plays}x
+            </p>
+          )}
         </div>
+        <GameComponent onScore={saveScore} />
       </div>
     );
   }
 
-  // Game list
+  // Game catalog — spatial proximity reveals
+  const allGames = [
+    { id: 'starseed-adventure', title: 'Starseed: Choose Your Destiny', subtitle: 'RPG Adventure',
+      desc: 'An AI-powered cosmic RPG. Choose your starseed origin and embark on a branching adventure through the stars.',
+      benefit: 'RPG Adventure', icon: Star, color: '#818CF8', isLink: true, link: '/starseed-adventure',
+      tags: ['Pleiadian', 'Sirian', 'Arcturian', 'Lyran', 'Andromedan', 'Orion'],
+    },
+    ...GAMES.map(g => ({ ...g, isLink: false })),
+  ];
+
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="games-page">
-      <div className="max-w-5xl mx-auto relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#FCD34D' }}>
-            <Gamepad2 size={14} className="inline mr-2" /> Wellness Games
-          </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Play Your Way to Peace
-          </h1>
-          <p className="text-base mb-10 max-w-xl" style={{ color: 'var(--text-secondary)' }}>
-            Games designed to sharpen your mind, deepen your breath, and brighten your mood. Each one is a mini-meditation in disguise.
-          </p>
-        </motion.div>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }} data-testid="games-page">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Gamepad2 size={14} style={{ color: '#FCD34D' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#FCD34D' }}>Wellness Games</p>
+        </div>
+        <h1 className="text-3xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+          Play Your Way to Peace
+        </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Featured: Starseed Adventure */}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            onClick={() => navigate('/starseed-adventure')}
-            className="p-6 text-left group hover:scale-[1.02] transition-all md:col-span-2 relative overflow-hidden"
-            style={{ borderColor: 'rgba(129,140,248,0.15)' }}
-            data-testid="game-card-starseed">
-            <div className="absolute inset-0 opacity-[0.04]"
-              style={{ background: 'radial-gradient(ellipse at 20% 50%, #818CF8 0%, transparent 60%)' }} />
-            <div className="relative flex items-start gap-5">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.2)' }}>
-                <Star size={24} style={{ color: '#818CF8' }} />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase"
-                    style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.2)' }}>
-                    RPG Adventure
-                  </span>
-                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase"
-                    style={{ background: 'rgba(252,211,77,0.1)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)' }}>
-                    AI-Powered
-                  </span>
-                </div>
-                <h3 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                  Starseed: Choose Your Destiny
-                </h3>
-                <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  An AI-powered cosmic RPG. Choose your starseed origin — Pleiadian, Sirian, Arcturian, Lyran, Andromedan, or Orion — and embark on a branching adventure through the stars. Every choice shapes your stats, unlocks achievements, and determines your cosmic destiny.
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {['Pleiadian', 'Sirian', 'Arcturian', 'Lyran', 'Andromedan', 'Orion'].map(t => (
-                    <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full"
-                      style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.1)' }}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <ChevronRight size={18} style={{ color: '#818CF8' }} className="flex-shrink-0 mt-2 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-            </div>
-          </motion.button>
+        <SpatialRecorderUI recorder={recorder} />
 
-          {GAMES.map((game, i) => {
+        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Games designed to sharpen your mind, deepen your breath, and brighten your mood.
+        </p>
+
+        <div>
+          {allGames.map((game, i) => {
             const Icon = game.icon;
             const s = scores[game.id];
             return (
-              <motion.button key={game.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.08 }}
-                onClick={() => setActiveGame(game)}
-                className="p-6 text-left group hover:scale-[1.02] transition-all"
-                data-testid={`game-card-${game.id}`}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
+              <ProximityItem key={game.id} index={i} totalItems={allGames.length}>
+                <button
+                  onClick={() => game.isLink ? navigate(game.link) : setActiveGame(game)}
+                  className="w-full text-left py-4 flex items-start gap-4 active:opacity-80"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  data-testid={`game-card-${game.id}`}
+                >
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
                     style={{ background: `${game.color}12`, border: `1px solid ${game.color}20` }}>
-                    <Icon size={20} style={{ color: game.color }} />
+                    <Icon size={22} style={{ color: game.color }} />
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold"
-                    style={{ background: `${game.color}10`, color: game.color }}>
-                    {game.benefit}
-                  </span>
-                </div>
-                <h3 className="text-lg font-light mb-0.5" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                  {game.title}
-                </h3>
-                <p className="text-[10px] mb-2" style={{ color: game.color }}>{game.subtitle}</p>
-                <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>{game.desc}</p>
-                <div className="flex items-center justify-between">
-                  {s ? (
-                    <span className="text-[10px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                      <Trophy size={10} style={{ color: '#FCD34D' }} /> Best: {s.best_score} | {s.total_plays}x played
-                    </span>
-                  ) : (
-                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Not played yet</span>
-                  )}
-                  <ChevronRight size={14} style={{ color: 'var(--text-muted)' }}
-                    className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </div>
-              </motion.button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-base font-semibold" style={{ color: '#fff' }}>{game.title}</p>
+                    </div>
+                    <p className="text-xs" style={{ color: game.color }}>{game.subtitle || game.benefit}</p>
+                    <p className="text-sm mt-1 line-clamp-2" style={{ color: 'rgba(255,255,255,0.6)' }}>{game.desc}</p>
+                    {game.tags && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {game.tags.map(t => (
+                          <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full"
+                            style={{ background: `${game.color}10`, color: game.color, border: `1px solid ${game.color}15` }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {s && (
+                      <p className="text-[10px] mt-2 flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                        <Trophy size={10} style={{ color: '#FCD34D' }} /> Best: {s.best_score} | {s.total_plays}x played
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight size={16} style={{ color: 'rgba(255,255,255,0.2)', marginTop: 4, flexShrink: 0 }} />
+                </button>
+              </ProximityItem>
             );
           })}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

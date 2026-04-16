@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Wand2, Save, Trash2, Play, ArrowLeft, Loader2 } from 'lucide-react';
+import { Wand2, Save, Trash2, Play, ArrowLeft, Loader2, Wind } from 'lucide-react';
 import { Slider } from '../components/ui/slider';
 import { useAuth } from '../context/AuthContext';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
+import { ProximityItem } from '../components/SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -358,18 +360,25 @@ export default function Breathing() {
     setMode('presets');
   };
 
+  const recorder = useSpatialRecorder();
+
   return (
-    <div className="min-h-screen immersive-page breathing-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-      <div className="max-w-6xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--secondary)' }}>Breathwork</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Conscious Breathing
-          </h1>
-          <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>
-            Follow the rhythm. Let each breath expand your awareness.
-          </p>
-        </motion.div>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Wind size={14} style={{ color: '#2DD4BF' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#2DD4BF' }}>Breathwork</p>
+        </div>
+        <h1 className="text-3xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+          Conscious Breathing
+        </h1>
+
+        <SpatialRecorderUI recorder={recorder} />
+
+        <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Follow the rhythm. Let each breath expand your awareness.
+        </p>
+      </motion.div>
 
         {/* Mode Toggle */}
         <div className="flex gap-2 mb-8 flex-wrap" data-testid="breathing-mode-toggle">
@@ -518,9 +527,6 @@ export default function Breathing() {
           </div>
         )}
         <FeaturedVideos category="breathwork" color="#2DD4BF" title="Breathing Practice Videos" />
-        {/* Spacer for mixer bar */}
-        <div style={{ height: 80 }} />
-      </div>
     </div>
   );
 }

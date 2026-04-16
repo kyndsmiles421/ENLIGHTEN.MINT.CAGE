@@ -13,6 +13,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpatialRoom, { ROOM_THEMES } from './SpatialRoom';
+import { useAvatar } from '../context/AvatarContext';
 
 // Route → Room key mapping
 const ROUTE_TO_ROOM = {
@@ -68,6 +69,15 @@ const ROUTE_TO_ROOM = {
   '/cosmic-profile': 'default',
   '/games': 'default',
   '/starseed': 'star_chart',
+  '/exercises': 'default',
+  '/hooponopono': 'meditation',
+  '/tantra': 'teachings',
+  '/yantra': 'teachings',
+  '/botany': 'herbology',
+  '/rituals': 'oracle',
+  '/challenges': 'default',
+  '/friends': 'community',
+  '/analytics': 'default',
 };
 
 // Routes that should NOT get a SpatialRoom wrapper
@@ -85,10 +95,18 @@ export default function SpatialRouter({ children }) {
   const [prevRoom, setPrevRoom] = useState(null);
   const [transitioning, setTransitioning] = useState(false);
   const prevPathRef = useRef(location.pathname);
+  const avatarCtx = useAvatar();
 
   const currentPath = location.pathname;
   const isExcluded = EXCLUDED_ROUTES.some(r => currentPath === r || currentPath.startsWith(r + '/'));
   const roomKey = ROUTE_TO_ROOM[currentPath] || 'default';
+
+  // Track world exploration
+  useEffect(() => {
+    if (!isExcluded && avatarCtx?.visitRoom) {
+      avatarCtx.visitRoom(currentPath);
+    }
+  }, [currentPath, isExcluded, avatarCtx]);
 
   // Detect route change for fold/extrude transition
   useEffect(() => {

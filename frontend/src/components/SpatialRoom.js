@@ -18,6 +18,7 @@
 import React, { useEffect, useRef, useState, useCallback, createContext, useContext } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
+import Avatar3D from './Avatar3D';
 
 const PHI = 1.618033988749895;
 const GRID_SIZE = 9;
@@ -167,6 +168,7 @@ function DepthParticles({ color, count = 16 }) {
 
 /**
  * ProximityItem — Wraps each child with scroll-based Z-reveal + proximity glow.
+ * V54.8: Collision-based interaction. Items unfold their 3D detail as the Avatar approaches.
  * Items in the active octant PULSE with a glow border.
  * Items approaching the avatar EXTRUDE forward (translateZ toward user).
  * 3-second hover in active octant = auto-extrude trigger.
@@ -174,6 +176,7 @@ function DepthParticles({ color, count = 16 }) {
 export function ProximityItem({ index, children, totalItems, color }) {
   const spatial = useSpatial();
   const [autoTriggered, setAutoTriggered] = useState(false);
+  const [collisionActive, setCollisionActive] = useState(false);
   const triggerTimerRef = useRef(null);
   const wasActiveRef = useRef(false);
 
@@ -183,8 +186,20 @@ export function ProximityItem({ index, children, totalItems, color }) {
   const distance = Math.abs(scrollProgress - itemProgress);
   const itemColor = color || theme?.accent || '#A78BFA';
 
+  // Collision radius: avatar Z within 50px equivalent (1/18th of grid)
+  const COLLISION_RADIUS = 1 / 18;
+  const isColliding = spatial ? distance < COLLISION_RADIUS : false;
   const isActive = spatial ? distance < (1 / GRID_SIZE) : false;
   const isNear = spatial ? distance < (2 / GRID_SIZE) : false;
+
+  // Track collision state for unfold animation
+  useEffect(() => {
+    if (isColliding && !collisionActive) setCollisionActive(true);
+    if (!isActive && collisionActive) {
+      const t = setTimeout(() => setCollisionActive(false), 600);
+      return () => clearTimeout(t);
+    }
+  }, [isColliding, isActive, collisionActive]);
 
   // 3-second auto-trigger: if item stays in active octant for 3s, auto-extrude
   useEffect(() => {
@@ -204,37 +219,54 @@ export function ProximityItem({ index, children, totalItems, color }) {
 
   if (!spatial) return <div>{children}</div>;
 
-  // Proximity-based values
-  const opacity = isActive ? 1 : isNear ? 0.8 : distance < 0.4 ? 0.55 : 0.3;
-  const scale = autoTriggered ? 1.03 : isActive ? 1.01 : isNear ? 0.99 : 0.97;
-  const translateZ = autoTriggered ? 16 : isActive ? 8 : isNear ? 0 : -15;
+  // Proximity-based values — enhanced collision physics
+  const opacity = isColliding ? 1 : isActive ? 0.95 : isNear ? 0.75 : distance < 0.4 ? 0.5 : 0.25;
+  const scale = autoTriggered ? 1.04 : isColliding ? 1.02 : isActive ? 1.01 : isNear ? 0.99 : 0.96;
+  const translateZ = autoTriggered ? 20 : isColliding ? 12 : isActive ? 6 : isNear ? 0 : -20;
+  const unfoldPad = collisionActive ? 4 : 0;
 
   return (
     <div
       style={{
         opacity,
         transform: `scale(${scale}) translateZ(${translateZ}px)`,
-        transition: 'opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease',
-        borderLeft: autoTriggered ? `3px solid ${itemColor}60` : isActive ? `2px solid ${itemColor}40` : '2px solid transparent',
+        transition: 'opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease',
+        borderLeft: autoTriggered
+          ? `3px solid ${itemColor}70`
+          : isColliding
+          ? `3px solid ${itemColor}50`
+          : isActive
+          ? `2px solid ${itemColor}35`
+          : '2px solid transparent',
         boxShadow: autoTriggered
-          ? `0 0 30px ${itemColor}15, inset 0 0 16px ${itemColor}06`
-          : isActive ? `0 0 20px ${itemColor}08, inset 0 0 12px ${itemColor}04` : 'none',
-        borderRadius: isActive || autoTriggered ? '8px' : '0px',
-        paddingLeft: isActive || autoTriggered ? '4px' : '0px',
+          ? `0 0 40px ${itemColor}18, inset 0 0 20px ${itemColor}08`
+          : isColliding
+          ? `0 0 30px ${itemColor}12, inset 0 0 16px ${itemColor}06`
+          : isActive
+          ? `0 0 20px ${itemColor}08`
+          : 'none',
+        borderRadius: isActive || autoTriggered || isColliding ? '10px' : '0px',
+        paddingLeft: unfoldPad + (isActive || autoTriggered ? 4 : 0),
+        paddingTop: unfoldPad,
+        paddingBottom: unfoldPad,
       }}
-      data-proximity={autoTriggered ? 'triggered' : isActive ? 'active' : isNear ? 'near' : 'far'}
+      data-proximity={autoTriggered ? 'triggered' : isColliding ? 'collision' : isActive ? 'active' : isNear ? 'near' : 'far'}
+      data-testid={`proximity-item-${index}`}
     >
       {children}
-      {/* Auto-trigger pulse indicator */}
-      {autoTriggered && (
+      {/* Collision extrusion indicator */}
+      {(autoTriggered || isColliding) && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
           className="flex items-center gap-1.5 py-1 px-3 mt-1"
           style={{ color: itemColor }}
         >
           <Sparkles size={10} />
-          <span className="text-[9px] font-medium">Avatar proximity — exploring</span>
+          <span className="text-[9px] font-medium">
+            {autoTriggered ? 'Avatar proximity — auto-exploring' : 'Approaching...'}
+          </span>
         </motion.div>
       )}
     </div>
@@ -254,11 +286,13 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [stillnessTimer, setStillnessTimer] = useState(0);
   const [hiddenRevealed, setHiddenRevealed] = useState(false);
-  const [breathPhase, setBreathPhase] = useState(0); // 0-1 sine wave for breathing pulse
+  const [breathPhase, setBreathPhase] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef(null);
   const stillnessRef = useRef(null);
   const lastScrollRef = useRef(0);
   const breathRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 50);
@@ -294,6 +328,9 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
       const progress = scrollHeight > 0 ? Math.min(1, scrollTop / scrollHeight) : 0;
       setScrollProgress(progress);
       lastScrollRef.current = Date.now();
+      setIsScrolling(true);
+      clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => setIsScrolling(false), 200);
     };
 
     const scrollEl = container.closest('[data-testid="content-area"]') || window;
@@ -332,6 +369,7 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
     theme,
     realm: theme.realm || 'SURFACE',
     scrollProgress,
+    isScrolling,
     gridPosition: {
       x: 4,
       y: Math.floor(scrollProgress * (GRID_SIZE - 1)),
@@ -422,6 +460,19 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
 
         {/* Depth particles */}
         <DepthParticles color={theme.particles} count={isHollowEarth ? 24 : 16} />
+
+        {/* V54.8 — 3D Avatar Presence */}
+        {entered && (
+          <Avatar3D
+            scrollProgress={scrollProgress}
+            realm={theme.realm || 'SURFACE'}
+            theme={theme}
+            isScrolling={isScrolling}
+            stillnessTimer={stillnessTimer}
+            hiddenRevealed={hiddenRevealed}
+            roomName={theme.name}
+          />
+        )}
 
         {/* Room header — name + realm indicator + avatar badge */}
         <motion.div

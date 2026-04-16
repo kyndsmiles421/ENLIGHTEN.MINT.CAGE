@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight, Compass, Star, TrendingUp, Image } from 'lucide-react';
 import { toast } from 'sonner';
 import { CosmicBanner, CosmicMiniTag } from '../components/CosmicBanner';
+import { ProximityItem } from '../components/SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const MOODS = ['peaceful','joyful','anxious','confused','mysterious','frightening','neutral','profound'];
@@ -342,6 +344,7 @@ export default function Dreams() {
   const [moonPhase, setMoonPhase] = useState(null);
   const [tab, setTab] = useState('journal');
   const [loading, setLoading] = useState(true);
+  const recorder = useSpatialRecorder();
 
   const load = () => {
     Promise.all([
@@ -361,56 +364,59 @@ export default function Dreams() {
     } catch { toast.error('Failed to delete'); }
   };
 
-  if (loading) return <div className="min-h-screen immersive-page flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'rgba(255,255,255,0.3)' }} /></div>;
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" data-testid="dreams-page">
-      <div className="max-w-3xl mx-auto relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-start justify-between mb-8">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#A78BFA' }}>
-                <Moon size={14} className="inline mr-2" /> Dream Journal
-              </p>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                The Dreamscape
-              </h1>
-              <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
-                Record your dreams, discover their symbols, and receive AI-powered spiritual interpretations.
-              </p>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" data-testid="dreams-page" style={{ background: 'transparent' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Moon size={14} style={{ color: '#A78BFA' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#A78BFA' }}>Dream Journal</p>
+        </div>
+        <div className="flex items-start justify-between mb-2">
+          <h1 className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+            The Dreamscape
+          </h1>
+          {moonPhase && (
+            <div className="text-right flex-shrink-0" data-testid="moon-phase-display">
+              <p className="text-[8px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>Moon</p>
+              <p className="text-xs font-medium" style={{ color: '#FCD34D' }}>{moonPhase.name}</p>
             </div>
-            {moonPhase && (
-              <div className="p-3 text-center flex-shrink-0" data-testid="moon-phase-display">
-                <p className="text-[9px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Moon</p>
-                <p className="text-xs font-medium" style={{ color: '#FCD34D' }}>{moonPhase.name}</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
+          )}
+        </div>
 
-        <div className="flex rounded-xl overflow-hidden mb-8" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+        <SpatialRecorderUI recorder={recorder} />
+
+        <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Record your dreams, discover their symbols, and receive AI-powered spiritual interpretations.
+        </p>
+
+        <div className="flex rounded-xl overflow-hidden mb-6" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
           {[{ id: 'journal', label: 'Journal' }, { id: 'patterns', label: 'Patterns' }, { id: 'symbols', label: 'Symbol Library' }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className="flex-1 px-4 py-2.5 text-xs font-medium transition-all"
-              style={{ background: tab === t.id ? 'rgba(167,139,250,0.12)' : 'transparent', color: tab === t.id ? '#A78BFA' : 'var(--text-muted)' }}
+              style={{ background: tab === t.id ? 'rgba(167,139,250,0.12)' : 'transparent', color: tab === t.id ? '#A78BFA' : 'rgba(255,255,255,0.4)' }}
               data-testid={`dream-tab-${t.id}`}>
               {t.label}
             </button>
           ))}
         </div>
 
-        {/* Cosmic Banner */}
         <CosmicBanner filter={['dreams', 'meditation', 'journal']} compact />
 
         {tab === 'journal' ? (
           <>
             <NewDreamForm onSaved={load} symbols={symbols} />
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {dreams.length} Dream{dreams.length !== 1 ? 's' : ''} Recorded
             </p>
-            <div className="space-y-3" data-testid="dream-list">
-              {dreams.map(d => <DreamEntry key={d.id} dream={d} onDelete={handleDelete} />)}
-              {dreams.length === 0 && <p className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>No dreams recorded yet. Start by writing one above.</p>}
+            <div data-testid="dream-list">
+              {dreams.map((d, i) => (
+                <ProximityItem key={d.id} index={i} totalItems={dreams.length}>
+                  <DreamEntry dream={d} onDelete={handleDelete} />
+                </ProximityItem>
+              ))}
+              {dreams.length === 0 && <p className="text-center py-12 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>No dreams recorded yet.</p>}
             </div>
           </>
         ) : tab === 'patterns' ? (
@@ -418,7 +424,7 @@ export default function Dreams() {
         ) : (
           <SymbolLibrary symbols={symbols} />
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

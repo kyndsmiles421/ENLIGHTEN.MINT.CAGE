@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Slider } from '../components/ui/slider';
-import { Volume2, VolumeX, Save, Trash2, Loader2, Upload } from 'lucide-react';
+import { Volume2, VolumeX, Save, Trash2, Loader2, Upload, Music } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import FeaturedVideos from '../components/FeaturedVideos';
+import { ProximityItem } from '../components/SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -136,6 +138,7 @@ export default function Soundscapes() {
   const [mixName, setMixName] = useState('');
   const [saving, setSaving] = useState(false);
   const [showSavePanel, setShowSavePanel] = useState(false);
+  const recorder = useSpatialRecorder();
 
   const loadSavedMixes = useCallback(async () => {
     if (!user) return;
@@ -231,23 +234,27 @@ export default function Soundscapes() {
   };
 
   return (
-    <div className="min-h-screen px-5 py-8" style={{ background: 'transparent' }}>
-      <div className="max-w-2xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: '#93C5FD' }}>Soundscapes</p>
-          <h1 className="text-4xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC' }}>
-            Ambient Worlds
-          </h1>
-          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.75)' }}>
-            Mix your perfect soundscape. Layer sounds to create your unique sanctuary.
-          </p>
-          <p className="text-xs mb-8 flex items-center gap-2" style={{ color: activeSounds.length > 0 ? '#2DD4BF' : 'rgba(255,255,255,0.65)' }}>
-            {activeSounds.length > 0 ? <Volume2 size={14} /> : <VolumeX size={14} />}
-            {activeSounds.length > 0
-              ? `${activeSounds.length} sound${activeSounds.length > 1 ? 's' : ''} playing`
-              : 'Slide to mix and play'}
-          </p>
-        </motion.div>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Music size={14} style={{ color: '#93C5FD' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#93C5FD' }}>Soundscapes</p>
+        </div>
+        <h1 className="text-3xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+          Ambient Worlds
+        </h1>
+
+        <SpatialRecorderUI recorder={recorder} />
+
+        <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Mix your perfect soundscape. Layer sounds to create your unique sanctuary.
+        </p>
+        <p className="text-xs mb-6 flex items-center gap-2" style={{ color: activeSounds.length > 0 ? '#2DD4BF' : 'rgba(255,255,255,0.5)' }}>
+          {activeSounds.length > 0 ? <Volume2 size={14} /> : <VolumeX size={14} />}
+          {activeSounds.length > 0
+            ? `${activeSounds.length} sound${activeSounds.length > 1 ? 's' : ''} playing`
+            : 'Slide to mix and play'}
+        </p>
 
         {/* Saved Mixes */}
         {savedMixes.length > 0 && (
@@ -275,42 +282,40 @@ export default function Soundscapes() {
             const vol = volumes[sound.id];
             const isActive = vol > 0;
             return (
-              <motion.div
-                key={sound.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                className="p-4 rounded-xl"
-                style={{
-                  background: isActive ? `${sound.color}08` : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${isActive ? `${sound.color}25` : 'rgba(255,255,255,0.06)'}`,
-                }}
-                data-testid={`soundscape-${sound.id}`}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="text-sm font-medium" style={{ color: isActive ? sound.color : '#F8FAFC' }}>{sound.name}</h3>
-                    <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{sound.desc}</p>
+              <ProximityItem key={sound.id} index={i} totalItems={SOUNDS.length}>
+                <div
+                  className="p-4 rounded-xl"
+                  style={{
+                    background: isActive ? `${sound.color}08` : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${isActive ? `${sound.color}25` : 'rgba(255,255,255,0.06)'}`,
+                  }}
+                  data-testid={`soundscape-${sound.id}`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-sm font-medium" style={{ color: isActive ? sound.color : '#F8FAFC' }}>{sound.name}</h3>
+                      <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{sound.desc}</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ background: isActive ? `${sound.color}15` : 'rgba(255,255,255,0.03)' }}>
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: sound.color, opacity: isActive ? 0.9 : 0.2, boxShadow: isActive ? `0 0 10px ${sound.color}60` : 'none' }} />
+                    </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: isActive ? `${sound.color}15` : 'rgba(255,255,255,0.03)' }}>
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: sound.color, opacity: isActive ? 0.9 : 0.2, boxShadow: isActive ? `0 0 10px ${sound.color}60` : 'none' }} />
+                  <Slider
+                    defaultValue={[0]}
+                    value={[vol]}
+                    max={100}
+                    step={1}
+                    onValueChange={([v]) => setVolumes(prev => ({ ...prev, [sound.id]: v }))}
+                    className="w-full"
+                    data-testid={`slider-${sound.id}`}
+                  />
+                  <div className="flex justify-between mt-1.5">
+                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>0%</span>
+                    <span className="text-[10px]" style={{ color: isActive ? sound.color : 'rgba(255,255,255,0.65)' }}>{vol}%</span>
                   </div>
                 </div>
-                <Slider
-                  defaultValue={[0]}
-                  value={[vol]}
-                  max={100}
-                  step={1}
-                  onValueChange={([v]) => setVolumes(prev => ({ ...prev, [sound.id]: v }))}
-                  className="w-full"
-                  data-testid={`slider-${sound.id}`}
-                />
-                <div className="flex justify-between mt-1.5">
-                  <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>0%</span>
-                  <span className="text-[10px]" style={{ color: isActive ? sound.color : 'rgba(255,255,255,0.65)' }}>{vol}%</span>
-                </div>
-              </motion.div>
+              </ProximityItem>
             );
           })}
         </div>
@@ -378,7 +383,7 @@ export default function Soundscapes() {
           </motion.div>
         )}
         <FeaturedVideos category="soundscapes" color="#3B82F6" title="Ambient Sound Videos" />
-      </div>
+      </motion.div>
     </div>
   );
 }

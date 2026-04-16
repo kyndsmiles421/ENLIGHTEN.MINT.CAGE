@@ -5,6 +5,8 @@ import { RefreshCw, Sparkles, Copy, Check, Wand2, Save, Trash2, Play, Loader2, C
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import NarrationPlayer from '../components/NarrationPlayer';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
+import { ProximityItem } from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -359,6 +361,7 @@ export default function Affirmations() {
   const [loading, setLoading] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(THEMES[0]);
   const [copied, setCopied] = useState(false);
+  const recorder = useSpatialRecorder();
 
   useEffect(() => {
     axios.get(`${API}/affirmations/daily`)
@@ -388,32 +391,33 @@ export default function Affirmations() {
   const displayText = generated?.text || daily?.text || '';
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-      <div className="max-w-5xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--accent-gold)' }}>
-            <Sparkles size={14} className="inline mr-2" />
-            Affirmations
-          </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Words of Power
-          </h1>
-          <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>
-            Let these words resonate through every cell of your being.
-          </p>
-        </motion.div>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles size={14} style={{ color: '#FCD34D' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#FCD34D' }}>Affirmations</p>
+        </div>
+        <h1 className="text-3xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+          Words of Power
+        </h1>
+
+        <SpatialRecorderUI recorder={recorder} />
+
+        <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Let these words resonate through every cell of your being.
+        </p>
 
         {/* Mode Toggle */}
-        <div className="flex gap-2 mb-10 flex-wrap" data-testid="affirmation-mode-toggle">
+        <div className="flex gap-2 mb-8 flex-wrap" data-testid="affirmation-mode-toggle">
           {[
             { id: 'daily', label: 'Daily Affirmation' },
             { id: 'build', label: 'Build Your Own Set' },
           ].map(m => (
             <button key={m.id} onClick={() => setMode(m.id)}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs transition-all"
               style={{
-                background: mode === m.id ? 'rgba(252,211,77,0.12)' : 'rgba(255,255,255,0.02)',
-                color: mode === m.id ? '#FCD34D' : 'var(--text-muted)',
+                background: mode === m.id ? 'rgba(252,211,77,0.12)' : 'rgba(255,255,255,0.03)',
+                color: mode === m.id ? '#FCD34D' : 'rgba(255,255,255,0.5)',
                 border: `1px solid ${mode === m.id ? 'rgba(252,211,77,0.3)' : 'rgba(255,255,255,0.06)'}`,
               }}
               data-testid={`affirmation-mode-${m.id}`}>
@@ -427,59 +431,57 @@ export default function Affirmations() {
         ) : (
           <>
             {/* Main Affirmation Display */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="p-12 md:p-16 text-center mb-16 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 opacity-10"
-                style={{ background: 'radial-gradient(circle at 30% 50%, #C084FC 0%, transparent 50%), radial-gradient(circle at 70% 50%, #2DD4BF 0%, transparent 50%)' }}
-              />
-              <div className="relative z-10">
-                <AnimatePresence mode="wait">
-                  <motion.p
-                    key={displayText}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="text-2xl md:text-4xl font-light leading-relaxed mb-8"
-                    style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
-                    data-testid="affirmation-text"
-                  >
-                    {displayText || 'Loading your daily wisdom...'}
-                  </motion.p>
-                </AnimatePresence>
-                {displayText && (
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <button
-                      onClick={() => copyText(displayText)}
-                      className="btn-glass px-6 py-2 text-sm inline-flex items-center gap-2"
-                      data-testid="copy-affirmation-btn"
+            <ProximityItem index={0} totalItems={3}>
+              <div className="py-10 text-center mb-8 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10"
+                  style={{ background: 'radial-gradient(circle at 30% 50%, #C084FC 0%, transparent 50%), radial-gradient(circle at 70% 50%, #2DD4BF 0%, transparent 50%)' }}
+                />
+                <div className="relative z-10">
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={displayText}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-2xl md:text-3xl font-light leading-relaxed mb-6"
+                      style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}
+                      data-testid="affirmation-text"
                     >
-                      {copied ? <Check size={14} /> : <Copy size={14} />}
-                      {copied ? 'Copied' : 'Copy'}
-                    </button>
-                    <NarrationPlayer text={displayText} label="Speak Affirmation" color="#FCD34D" context="affirmations" />
-                  </div>
-                )}
+                      {displayText || 'Loading your daily wisdom...'}
+                    </motion.p>
+                  </AnimatePresence>
+                  {displayText && (
+                    <div className="flex items-center justify-center gap-3 flex-wrap">
+                      <button
+                        onClick={() => copyText(displayText)}
+                        className="px-4 py-2 rounded-xl text-xs inline-flex items-center gap-2"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+                        data-testid="copy-affirmation-btn"
+                      >
+                        {copied ? <Check size={12} /> : <Copy size={12} />}
+                        {copied ? 'Copied' : 'Copy'}
+                      </button>
+                      <NarrationPlayer text={displayText} label="Speak Affirmation" color="#FCD34D" context="affirmations" />
+                    </div>
+                  )}
+                </div>
               </div>
-            </motion.div>
+            </ProximityItem>
 
-            {/* AI Generation */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Choose a Theme</p>
-                <div className="grid grid-cols-2 gap-2">
+            {/* Theme Selection */}
+            <ProximityItem index={1} totalItems={3}>
+              <div className="mb-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>Choose a Theme</p>
+                <div className="flex flex-wrap gap-2">
                   {THEMES.map(t => (
                     <button
                       key={t.name}
                       onClick={() => setSelectedTheme(t)}
-                      className="p-3 text-sm text-left"
+                      className="px-3 py-2 rounded-full text-xs"
                       style={{
-                        borderColor: selectedTheme.name === t.name ? 'rgba(252,211,77,0.3)' : 'rgba(255,255,255,0.08)',
-                        color: selectedTheme.name === t.name ? 'var(--text-primary)' : 'var(--text-muted)',
-                        transition: 'border-color 0.3s, color 0.3s',
+                        background: selectedTheme.name === t.name ? 'rgba(252,211,77,0.1)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${selectedTheme.name === t.name ? 'rgba(252,211,77,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                        color: selectedTheme.name === t.name ? '#FCD34D' : 'rgba(255,255,255,0.5)',
                       }}
                       data-testid={`theme-${t.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
@@ -488,31 +490,35 @@ export default function Affirmations() {
                   ))}
                 </div>
               </div>
-              <div className="flex flex-col items-start justify-center">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>AI-Powered Generation</p>
-                <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+            </ProximityItem>
+
+            {/* AI Generation */}
+            <ProximityItem index={2} totalItems={3}>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>AI-Powered Generation</p>
+                <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Let artificial intelligence channel cosmic wisdom tailored to your chosen theme.
                 </p>
                 <button
                   onClick={generateSingle}
                   disabled={loading}
-                  className="btn-glass glow-primary flex items-center gap-3"
+                  className="px-5 py-2.5 rounded-xl text-xs flex items-center gap-2"
+                  style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.2)', color: '#FCD34D', opacity: loading ? 0.6 : 1 }}
                   data-testid="generate-affirmation-btn"
-                  style={{ opacity: loading ? 0.6 : 1 }}
                 >
-                  <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                  <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                   {loading ? 'Channeling...' : 'Generate Affirmation'}
                 </button>
                 {generated && (
-                  <p className="text-xs mt-4" style={{ color: 'var(--text-muted)' }}>
+                  <p className="text-xs mt-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
                     Theme: {generated.theme} {generated.generated ? '(AI generated)' : '(curated)'}
                   </p>
                 )}
               </div>
-            </div>
+            </ProximityItem>
           </>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

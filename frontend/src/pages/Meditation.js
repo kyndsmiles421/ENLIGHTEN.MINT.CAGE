@@ -11,6 +11,8 @@ import NarrationPlayer from '../components/NarrationPlayer';
 import SovereignViewport from '../components/SovereignViewport';
 import FeaturedVideos from '../components/FeaturedVideos';
 import useWorkAccrual from '../hooks/useWorkAccrual';
+import { ProximityItem } from '../components/SpatialRoom';
+import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -1285,22 +1287,27 @@ export default function Meditation() {
   const [mode, setMode] = useState(constellationParam ? 'constellation' : 'guided');
   const [filter, setFilter] = useState('all');
   const [activeSession, setActiveSession] = useState(null);
+  const recorder = useSpatialRecorder();
 
   const filtered = filter === 'all' ? GUIDED_MEDITATIONS : GUIDED_MEDITATIONS.filter(m => m.category === filter);
 
   return (
-    <SovereignViewport bgImage="https://images.unsplash.com/photo-1735213005665-f5b93d0795fe?w=1200&q=70" accentColor="var(--primary)">
-      <div className="px-6 md:px-12 lg:px-24 py-12">
-      <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--primary)' }}>Meditation</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Stillness Within
-          </h1>
-          <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>
-            Choose a guided journey or set your own timer. Enter the silence. Emerge renewed.
-          </p>
-        </motion.div>
+    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Brain size={14} style={{ color: '#D8B4FE' }} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#D8B4FE' }}>Meditation</p>
+        </div>
+        <h1 className="text-3xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+          Stillness Within
+        </h1>
+
+        <SpatialRecorderUI recorder={recorder} />
+
+        <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Choose a guided journey or set your own timer. Enter the silence.
+        </p>
+      </motion.div>
 
         {/* Mode Toggle */}
         <div className="flex gap-2 mb-8 flex-wrap" data-testid="meditation-mode-toggle">
@@ -1393,7 +1400,6 @@ export default function Meditation() {
         <div className="mt-16">
           <FeaturedVideos category="meditation" color="#D8B4FE" title="Meditation Practice Videos" />
         </div>
-      </div>
 
       {/* Guided Session Overlay */}
       <AnimatePresence>
@@ -1420,6 +1426,5 @@ export default function Meditation() {
         )}
       </AnimatePresence>
     </div>
-    </SovereignViewport>
   );
 }
