@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useModality } from '../context/ModalityContext';
 import { ProximityItem } from '../components/SpatialRoom';
 import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
+import InteractiveMasonry from '../components/InteractiveMasonry';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -678,6 +679,11 @@ export default function AcademyPage() {
         </div>
 
         <SpatialRecorderUI recorder={recorder} />
+
+        {/* V55.0 — Interactive Masonry Module */}
+        <div className="my-6 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}>
+          <InteractiveMasonry room="academy" authHeaders={authHeaders} userId={token ? 'user' : ''} />
+        </div>
 
         {/* Auto-Scale Prompt */}
         <AnimatePresence>

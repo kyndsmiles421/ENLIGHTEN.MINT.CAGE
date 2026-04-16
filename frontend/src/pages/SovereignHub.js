@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Share2, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import Onboarding from '../components/Onboarding';
+import CinematicWalkthrough from '../components/CinematicWalkthrough';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -167,6 +168,11 @@ export default function SovereignHub() {
         >
           <LogOut size={12} /> Sever
         </button>
+      </div>
+
+      {/* Cinematic Walkthrough */}
+      <div className="flex justify-center px-4 pb-4">
+        <CinematicWalkthrough />
       </div>
 
       {/* 7 Pillars — Accordion */}

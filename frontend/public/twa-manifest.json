@@ -1,0 +1,67 @@
+{
+  "packageId": "com.enlighten.mint.cafe",
+  "host": "zero-scale-physics.preview.emergentagent.com",
+  "name": "ENLIGHTEN.MINT.CAFE",
+  "launcherName": "Enlighten",
+  "display": "standalone",
+  "themeColor": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "backgroundColor": "#000000",
+  "enableNotifications": true,
+  "startUrl": "/sovereign-hub",
+  "iconUrl": "https://zero-scale-physics.preview.emergentagent.com/logo512.png",
+  "maskableIconUrl": "https://zero-scale-physics.preview.emergentagent.com/maskable_512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "enlighten-key"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "55.0.0",
+  "shortcuts": [
+    {
+      "name": "Sovereign Hub",
+      "short_name": "Hub",
+      "url": "/sovereign-hub",
+      "icons": [{"src": "https://zero-scale-physics.preview.emergentagent.com/logo192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Oracle",
+      "short_name": "Oracle",
+      "url": "/oracle",
+      "icons": [{"src": "https://zero-scale-physics.preview.emergentagent.com/logo192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Breathwork",
+      "short_name": "Breathe",
+      "url": "/breathing",
+      "icons": [{"src": "https://zero-scale-physics.preview.emergentagent.com/logo192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Academy",
+      "short_name": "Academy",
+      "url": "/academy",
+      "icons": [{"src": "https://zero-scale-physics.preview.emergentagent.com/logo192.png", "sizes": "192x192"}]
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://zero-scale-physics.preview.emergentagent.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "orientation": "any"
+}

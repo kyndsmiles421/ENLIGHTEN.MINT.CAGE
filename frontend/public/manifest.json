@@ -1,8 +1,8 @@
 {
   "short_name": "Enlighten",
   "name": "ENLIGHTEN.MINT.CAFE",
-  "description": "The Sovereign Wellness Engine — Sacred Geometry, Divination Systems, Gamified Economy, and AI-Powered Spiritual Guidance.",
-  "id": "cafe.enlighten.mint",
+  "description": "The Sovereign Wellness Engine — Sacred Geometry, Divination, Gamified Economy, AI Spiritual Guidance, and 3D Spatial Exploration across 160+ interactive realms.",
+  "id": "com.enlighten.mint.cafe",
   "icons": [
     {
       "src": "favicon.ico",
@@ -66,70 +66,68 @@
     "fullscreen",
     "window-controls-overlay"
   ],
-  "theme_color": "#0B0B0B",
+  "theme_color": "#000000",
   "background_color": "#000000",
   "orientation": "any",
   "categories": [
     "health",
     "lifestyle",
-    "wellness",
-    "productivity"
+    "education",
+    "games"
   ],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.enlighten.mint.cafe"
+    }
+  ],
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
   "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
   "shortcuts": [
     {
       "name": "Sovereign Hub",
       "short_name": "Hub",
       "url": "/sovereign-hub",
-      "description": "Main Navigation — 7 Pillar Wellness Grid",
-      "icons": [
-        {
-          "src": "logo192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Main Navigation — Orbital Command Center",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
       "name": "Oracle & Divination",
       "short_name": "Oracle",
       "url": "/oracle",
-      "description": "Tarot, I Ching, Star Charts",
-      "icons": [
-        {
-          "src": "logo192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Tarot, Astrology, I Ching, Sacred Geometry",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Breathwork",
+      "name": "Sacred Breathwork",
       "short_name": "Breathe",
       "url": "/breathing",
-      "description": "Guided Breathwork Sessions",
-      "icons": [
-        {
-          "src": "logo192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Fibonacci-Timed Sacred Breath & Patterns",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Crystal Skins",
-      "short_name": "Crystals",
-      "url": "/crystal-skins",
-      "description": "Crystal Encryption Marketplace",
-      "icons": [
-        {
-          "src": "logo192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Academy",
+      "short_name": "Academy",
+      "url": "/academy",
+      "description": "Sacred Education & Masonry Modules",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ENLIGHTEN.MINT.CAFE — Sovereign Wellness Engine"
     }
   ]
 }
