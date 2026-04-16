@@ -1,8 +1,25 @@
 {
-  "short_name": "Enlighten",
   "name": "ENLIGHTEN.MINT.CAFE",
-  "description": "The Sovereign Wellness Engine — Sacred Geometry, Divination, Gamified Economy, AI Spiritual Guidance, and 3D Spatial Exploration across 160+ interactive realms.",
+  "short_name": "Enlighten",
+  "description": "Wellness OS powered by Sacred Geometry and Zero-Scale Physics.",
   "id": "com.enlighten.mint.cafe",
+  "start_url": "/sovereign-hub",
+  "scope": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "window-controls-overlay"],
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "categories": ["health", "lifestyle", "education", "games"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.enlighten.mint.cafe"
+    }
+  ],
   "icons": [
     {
       "src": "favicon.ico",
@@ -31,13 +48,7 @@
       "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any"
-    },
-    {
-      "src": "maskable_192.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
@@ -58,39 +69,10 @@
       "purpose": "any"
     }
   ],
-  "start_url": "/sovereign-hub",
-  "scope": "/",
-  "display": "standalone",
-  "display_override": [
-    "standalone",
-    "fullscreen",
-    "window-controls-overlay"
-  ],
-  "theme_color": "#000000",
-  "background_color": "#000000",
-  "orientation": "any",
-  "categories": [
-    "health",
-    "lifestyle",
-    "education",
-    "games"
-  ],
-  "lang": "en",
-  "dir": "ltr",
-  "prefer_related_applications": false,
-  "related_applications": [
-    {
-      "platform": "play",
-      "id": "com.enlighten.mint.cafe"
-    }
-  ],
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
   "handle_links": "preferred",
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
   "shortcuts": [
     {
       "name": "Sovereign Hub",
@@ -119,15 +101,6 @@
       "url": "/academy",
       "description": "Sacred Education & Masonry Modules",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "logo512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "ENLIGHTEN.MINT.CAFE — Sovereign Wellness Engine"
     }
   ]
 }
