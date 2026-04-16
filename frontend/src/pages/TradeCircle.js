@@ -177,7 +177,7 @@ export default function TradeCircle() {
               { label: 'Pending Offers', value: stats.pending_offers, color: '#FB923C' },
               { label: 'Trade Karma', value: stats.karma || 0, color: stats.karma_tier?.color || '#94A3B8', sub: stats.karma_tier?.name },
             ].map(s => (
-              <div key={s.label} className="glass-card p-3 text-center cursor-pointer hover:scale-[1.02] transition-transform"
+              <div key={s.label} className="p-3 text-center cursor-pointer hover:scale-[1.02] transition-transform"
                 onClick={s.label === 'Trade Karma' ? () => setShowKarmaProfile(user?.id) : undefined}
                 data-testid={`stat-${s.label.toLowerCase().replace(/\s/g, '-')}`}>
                 <p className="text-xl font-light" style={{ color: s.color, fontFamily: 'Cormorant Garamond, serif' }}>{s.value}</p>
@@ -394,7 +394,7 @@ export default function TradeCircle() {
                   ) : (
                     <div className="space-y-2">
                       {myOffers.received.map(o => (
-                        <div key={o.id} className="glass-card p-3" data-testid={`received-offer-${o.id}`}>
+                        <div key={o.id} className="p-3" data-testid={`received-offer-${o.id}`}>
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-xs" style={{ color: 'var(--text-primary)' }}>{o.offerer_name} on <span style={{ color: '#C084FC' }}>{o.listing_title}</span></p>
                             <span className="text-[8px] px-1.5 py-0.5 rounded capitalize"
@@ -431,7 +431,7 @@ export default function TradeCircle() {
                   ) : (
                     <div className="space-y-2">
                       {myOffers.sent.map(o => (
-                        <div key={o.id} className="glass-card p-3" data-testid={`sent-offer-${o.id}`}>
+                        <div key={o.id} className="p-3" data-testid={`sent-offer-${o.id}`}>
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-xs" style={{ color: 'var(--text-primary)' }}>You on <span style={{ color: '#C084FC' }}>{o.listing_title}</span></p>
                             <span className="text-[8px] px-1.5 py-0.5 rounded capitalize"
@@ -476,7 +476,7 @@ export default function TradeCircle() {
                   <div className="space-y-2" data-testid="karma-leaderboard">
                     {leaderboard.map((entry, idx) => (
                       <div key={entry.user_id}
-                        className="glass-card p-3 flex items-center gap-3 cursor-pointer hover:scale-[1.01] transition-transform"
+                        className="p-3 flex items-center gap-3 cursor-pointer hover:scale-[1.01] transition-transform"
                         onClick={() => setShowKarmaProfile(entry.user_id)}
                         data-testid={`leaderboard-entry-${idx}`}>
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"

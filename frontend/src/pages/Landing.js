@@ -200,7 +200,7 @@ function PillarCard({ pillar, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ delay: index * 0.08, duration: 0.5 }}
-      className="glass-card glass-card-hover p-8 group relative"
+      className="p-8 group relative"
       style={{ borderColor: `${pillar.color}12` }}
       data-testid={`pillar-${pillar.id}`}
     >
@@ -277,7 +277,7 @@ function MantraCard({ mantra, accentColor }) {
   useEffect(() => () => { if (audioRef.current) audioRef.current.pause(); }, []);
 
   return (
-    <div className="glass-card p-4 relative overflow-hidden" data-testid="reset-mantra">
+    <div className="p-4 relative overflow-hidden" data-testid="reset-mantra">
       <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-[0.06]"
         style={{ background: accentColor, filter: 'blur(20px)', transform: 'translate(30%, -30%)' }} />
       <div className="flex items-start gap-3">
@@ -388,7 +388,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
   const widgetMap = {
     'mood-ring': <CosmicMoodRing />,
     'wisdom': (
-      <div className="glass-card p-6 relative overflow-hidden animate-portal-pulse" data-testid="daily-wisdom">
+      <div className="p-6 relative overflow-hidden animate-portal-pulse" data-testid="daily-wisdom">
         <div className="absolute top-3 right-10 opacity-10">
           <Quote size={36} style={{ color: wisdom.color }} />
         </div>
@@ -437,7 +437,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
             <motion.button key={i} whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }}
               onClick={() => navigate(item.page)}
               data-testid={`continue-item-${i}`}
-              className="glass-card p-4 text-left group transition-all"
+              className="p-4 text-left group transition-all"
               style={{ borderColor: `${item.color}0a` }}>
               <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
                 style={{ background: `${item.color}10`, boxShadow: `0 0 12px ${item.color}08` }}>
@@ -460,7 +460,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
             <motion.button key={i} whileHover={{ y: -3 }}
               onClick={() => navigate(item.page)}
               data-testid={`new-item-${i}`}
-              className="glass-card p-4 min-w-[160px] flex-shrink-0 text-left transition-all hover:scale-[1.02]"
+              className="p-4 min-w-[160px] flex-shrink-0 text-left transition-all hover:scale-[1.02]"
               style={{ borderColor: `${item.color}0a` }}>
               <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
                 style={{ background: `${item.color}10`, boxShadow: `0 0 12px ${item.color}08` }}>
@@ -487,7 +487,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
             { label: 'Features Found', value: `${progress.features_discovered}/${progress.total_features}`, color: '#FB923C' },
             { label: 'Streak Days', value: progress.streak_days, color: '#FCD34D' },
           ].map((stat, i) => (
-            <motion.div key={i} whileHover={{ y: -2, scale: 1.03 }} className="glass-card p-3 text-center transition-all cursor-default"
+            <motion.div key={i} whileHover={{ y: -2, scale: 1.03 }} className="p-3 text-center transition-all cursor-default"
               style={{ borderColor: `${stat.color}08` }}>
               <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: stat.color }}>{stat.value}</p>
               <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{stat.label}</p>
@@ -641,7 +641,7 @@ function QuickResetModal({ open, onClose }) {
                   const FIcon = f.icon;
                   return (
                     <button key={f.id} onClick={() => selectFeeling(f)}
-                      className="glass-card p-3 flex flex-col items-center gap-1.5 hover:scale-[1.03] transition-all"
+                      className="p-3 flex flex-col items-center gap-1.5 hover:scale-[1.03] transition-all"
                       style={{ border: `1px solid ${f.color}15`, touchAction: 'pan-y' }}
                       data-testid={`feeling-${f.id}`}>
                       <FIcon size={18} style={{ color: f.color }} />
@@ -674,7 +674,7 @@ function QuickResetModal({ open, onClose }) {
               </h2>
               <div className="space-y-3">
                 <button onClick={() => playFrequency(flow.frequency.hz)}
-                  className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
+                  className="w-full p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
                   style={{ borderColor: activeFreqs.has(flow.frequency.hz) ? `${feeling.color}30` : undefined }}
                   data-testid="reset-frequency">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${feeling.color}12` }}>
@@ -694,7 +694,7 @@ function QuickResetModal({ open, onClose }) {
                   </div>
                 </button>
                 <button onClick={() => { navigate(flow.tool.path); onClose(); reset(); }}
-                  className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
+                  className="w-full p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
                   data-testid="reset-tool">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(45,212,191,0.1)' }}>
                     <Wind size={16} style={{ color: '#2DD4BF' }} />
@@ -706,7 +706,7 @@ function QuickResetModal({ open, onClose }) {
                   <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} className="mt-1 opacity-0 group-hover:opacity-100 transition-all" />
                 </button>
                 <button onClick={() => { navigate('/nourishment'); onClose(); reset(); }}
-                  className="w-full glass-card p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
+                  className="w-full p-4 flex items-start gap-3 text-left hover:scale-[1.01] transition-all group"
                   data-testid="reset-nourishment">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(34,197,94,0.1)' }}>
                     <Leaf size={16} style={{ color: '#22C55E' }} />
@@ -776,7 +776,7 @@ function WaitlistSection() {
           </p>
 
           {status?.status === 'joined' || status?.status === 'already_joined' ? (
-            <div className="glass-card p-6 max-w-md mx-auto">
+            <div className="p-6 max-w-md mx-auto">
               <Sparkles size={24} style={{ color: '#FCD34D', margin: '0 auto 12px' }} />
               <p className="text-base font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 {status.status === 'joined' ? "You're in!" : "You're already on the list!"}
@@ -839,7 +839,7 @@ function Footer() {
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
             onClick={(e) => e.target === e.currentTarget && setShowPrivacy(false)}>
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="glass-card w-full max-w-lg p-8 max-h-[80vh] overflow-y-auto relative">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="w-full max-w-lg p-8 max-h-[80vh] overflow-y-auto relative">
               <button onClick={() => setShowPrivacy(false)} className="absolute top-4 right-4" style={{ color: 'var(--text-muted)' }}><X size={18} /></button>
               <Shield size={24} style={{ color: '#2DD4BF', marginBottom: 12 }} />
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Privacy Policy</h2>
@@ -862,7 +862,7 @@ function Footer() {
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
             onClick={(e) => e.target === e.currentTarget && setShowDisclaimer(false)}>
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="glass-card w-full max-w-lg p-8 max-h-[80vh] overflow-y-auto relative">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="w-full max-w-lg p-8 max-h-[80vh] overflow-y-auto relative">
               <button onClick={() => setShowDisclaimer(false)} className="absolute top-4 right-4" style={{ color: 'var(--text-muted)' }}><X size={18} /></button>
               <Heart size={24} style={{ color: '#FDA4AF', marginBottom: 12 }} />
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Digital Wellness Disclaimer</h2>
@@ -1065,7 +1065,7 @@ export default function Landing() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-30px' }}
                     transition={{ delay: i * 0.06 }}
-                    className="glass-card glass-card-hover p-6 relative"
+                    className="p-6 relative"
                     style={{ borderColor: `${item.color}0a` }}
                   >
                     {/* Top accent line */}
@@ -1117,7 +1117,7 @@ export default function Landing() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="glass-card glass-card-hover p-8 text-center relative overflow-hidden"
+                    className="p-8 text-center relative overflow-hidden"
                     style={{ borderColor: `${item.color}08` }}
                   >
                     {/* Glow accent */}
@@ -1138,7 +1138,7 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="glass-card p-8 md:p-10 text-center relative overflow-hidden"
+                className="p-8 md:p-10 text-center relative overflow-hidden"
                 style={{ borderColor: 'rgba(45,212,191,0.12)' }}
               >
                 <div className="absolute top-0 right-0 w-60 h-60 rounded-full opacity-[0.03]"

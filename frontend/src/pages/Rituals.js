@@ -135,7 +135,7 @@ function RitualPlayer({ ritual, onComplete, onClose }) {
   if (completed) {
     return (
       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-        className="glass-card p-12 text-center"
+        className="p-12 text-center"
       >
         <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
           style={{ background: 'rgba(45,212,191,0.15)', border: '2px solid rgba(45,212,191,0.3)' }}>
@@ -156,7 +156,7 @@ function RitualPlayer({ ritual, onComplete, onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-8 md:p-10"
+      className="p-8 md:p-10"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -406,7 +406,7 @@ export default function Rituals() {
             ].map(stat => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className="glass-card p-5 flex items-center gap-4">
+                <div key={stat.label} className="p-5 flex items-center gap-4">
                   <Icon size={20} style={{ color: stat.color }} />
                   <div>
                     <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{stat.value}</p>
@@ -427,7 +427,7 @@ export default function Rituals() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden mb-10"
             >
-              <div className="glass-card p-8">
+              <div className="p-8">
                 <h3 className="text-xl font-light mb-6" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Design Your Ritual</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -475,7 +475,7 @@ export default function Rituals() {
                     </p>
                     <div className="space-y-2">
                       {builderSteps.map((step, i) => (
-                        <div key={i} className="flex items-center gap-3 glass-card p-3">
+                        <div key={i} className="flex items-center gap-3 p-3">
                           <span className="text-xs w-6 h-6 rounded-full flex items-center justify-center"
                             style={{ background: `${STEP_COLORS[step.type]}20`, color: STEP_COLORS[step.type] }}>
                             {i + 1}
@@ -501,7 +501,7 @@ export default function Rituals() {
                     <button
                       key={i}
                       onClick={() => addStep(step)}
-                      className="glass-card p-3 text-left flex items-center gap-3 group"
+                      className="p-3 text-left flex items-center gap-3 group"
                       style={{ transition: 'border-color 0.3s' }}
                       data-testid={`ritual-add-step-${i}`}
                     >
@@ -561,7 +561,7 @@ export default function Rituals() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="glass-card p-6"
+                  className="p-6"
                   style={{ borderColor: `${tmpl.color}15` }}
                   data-testid={`template-${tmpl.id}`}
                 >
@@ -618,13 +618,13 @@ export default function Rituals() {
         {tab === 'my-rituals' && (
           <div>
             {!user ? (
-              <div className="glass-card p-12 text-center">
+              <div className="p-12 text-center">
                 <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                   Sign in to create and save your personal rituals.
                 </p>
               </div>
             ) : myRituals.length === 0 ? (
-              <div className="glass-card p-12 text-center">
+              <div className="p-12 text-center">
                 <p className="text-lg mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                   No rituals saved yet.
                 </p>
@@ -642,7 +642,7 @@ export default function Rituals() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      className="glass-card p-6 flex items-center gap-6"
+                      className="p-6 flex items-center gap-6"
                       data-testid={`my-ritual-${i}`}
                     >
                       <div className="flex-1">
@@ -691,13 +691,13 @@ export default function Rituals() {
         {tab === 'history' && (
           <div>
             {!user ? (
-              <div className="glass-card p-12 text-center">
+              <div className="p-12 text-center">
                 <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                   Sign in to view your practice history.
                 </p>
               </div>
             ) : !history?.completions?.length ? (
-              <div className="glass-card p-12 text-center">
+              <div className="p-12 text-center">
                 <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                   No sessions completed yet. Start a ritual to begin tracking.
                 </p>
@@ -710,7 +710,7 @@ export default function Rituals() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.04 }}
-                    className="glass-card p-5 flex items-center gap-4"
+                    className="p-5 flex items-center gap-4"
                   >
                     <div className="w-10 h-10 rounded-full flex items-center justify-center"
                       style={{ background: 'rgba(45,212,191,0.1)' }}>

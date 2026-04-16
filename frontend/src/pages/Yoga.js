@@ -158,7 +158,7 @@ function StyleCard({ style, onClick }) {
     <motion.button
       whileHover={{ y: -4 }}
       onClick={onClick}
-      className="glass-card glass-card-hover p-6 text-left w-full"
+      className="p-6 text-left w-full"
       data-testid={`yoga-style-${style.id}`}
     >
       <div className="flex items-start gap-4">
@@ -273,7 +273,7 @@ function SequenceView({ style, sequence, onBack, authHeaders, avatarConfig }) {
 
       {sessionComplete && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-6 mb-6 text-center" style={{ borderColor: `${style.color}15` }}>
+          className="p-6 mb-6 text-center" style={{ borderColor: `${style.color}15` }}>
           <Check size={32} className="mx-auto mb-2" style={{ color: style.color }} />
           <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Session Complete</p>
           <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Namaste. Your practice has been recorded.</p>
@@ -286,7 +286,7 @@ function SequenceView({ style, sequence, onBack, authHeaders, avatarConfig }) {
           const isActive = currentPose === i;
           const done = completedPoses.has(i);
           return (
-            <motion.div key={i} layout className="glass-card overflow-hidden" style={{ borderColor: done ? `${style.color}20` : 'rgba(255,255,255,0.06)' }}>
+            <motion.div key={i} layout className="overflow-hidden" style={{ borderColor: done ? `${style.color}20` : 'rgba(255,255,255,0.06)' }}>
               <button onClick={() => togglePose(i)} className="w-full p-4 flex items-center gap-3 text-left"
                 data-testid={`yoga-pose-${i}`}>
                 <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
@@ -313,11 +313,11 @@ function SequenceView({ style, sequence, onBack, authHeaders, avatarConfig }) {
                     <div className="px-4 pb-4 pt-0 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
                       <p className="text-sm leading-relaxed mt-3 mb-3" style={{ color: 'var(--text-secondary)' }}>{pose.instruction}</p>
                       <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="glass-card p-3">
+                        <div className="p-3">
                           <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Breath</p>
                           <p className="text-xs mt-1" style={{ color: style.color }}>{pose.breath}</p>
                         </div>
-                        <div className="glass-card p-3">
+                        <div className="p-3">
                           <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Focus</p>
                           <p className="text-xs mt-1" style={{ color: style.color }}>{pose.focus}</p>
                         </div>
@@ -386,7 +386,7 @@ function StyleDetail({ style, onBack, authHeaders, avatarConfig }) {
       {/* Benefits */}
       <div className="grid grid-cols-2 gap-3 mb-8">
         {style.benefits.map((b, i) => (
-          <div key={i} className="glass-card p-4 flex items-start gap-2">
+          <div key={i} className="p-4 flex items-start gap-2">
             <Check size={12} style={{ color: style.color }} className="flex-shrink-0 mt-0.5" />
             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{b}</p>
           </div>
@@ -398,7 +398,7 @@ function StyleDetail({ style, onBack, authHeaders, avatarConfig }) {
       <div className="space-y-3">
         {sequences ? sequences.map(seq => (
           <button key={seq.id} onClick={() => setActiveSeq(seq)}
-            className="glass-card glass-card-hover p-5 w-full text-left flex items-center gap-4"
+            className="p-5 w-full text-left flex items-center gap-4"
             data-testid={`yoga-seq-${seq.id}`}>
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{seq.name}</p>

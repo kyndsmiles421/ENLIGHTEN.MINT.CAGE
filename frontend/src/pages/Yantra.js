@@ -83,7 +83,7 @@ export default function Yantra() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Select a Yantra</p>
               {yantras.map(y => (
                 <button key={y.id} onClick={() => setSelected(y.id)}
-                  className="glass-card p-4 w-full text-left flex items-center gap-4"
+                  className="p-4 w-full text-left flex items-center gap-4"
                   style={{ borderColor: selected === y.id ? `${y.color}30` : 'rgba(255,255,255,0.06)', transition: 'border-color 0.3s' }}
                   data-testid={`yantra-${y.id}`}>
                   <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: `${y.color}10` }}>
@@ -102,7 +102,7 @@ export default function Yantra() {
               <AnimatePresence mode="wait">
                 {active ? (
                   <motion.div key={active.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                    className="glass-card p-8 md:p-10">
+                    className="p-8 md:p-10">
                     <div className="flex flex-col items-center mb-8">
                       <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
                         className="w-48 h-48 md:w-64 md:h-64 mb-6" style={{ filter: `drop-shadow(0 0 20px ${active.color}20)` }}>
@@ -168,7 +168,7 @@ export default function Yantra() {
                   </motion.div>
                 ) : (
                   <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="glass-card p-12 flex flex-col items-center justify-center min-h-[500px] text-center">
+                    className="p-12 flex flex-col items-center justify-center min-h-[500px] text-center">
                     <div className="w-32 h-32 mb-6 opacity-20">
                       <svg viewBox="0 0 120 120">
                         <polygon points="60,15 100,80 20,80" fill="none" stroke="currentColor" strokeWidth="0.8"/>

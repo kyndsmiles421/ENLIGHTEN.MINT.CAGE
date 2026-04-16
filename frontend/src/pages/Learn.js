@@ -28,7 +28,7 @@ function ModuleCard({ mod, onClick }) {
       onClick={() => mod.unlocked && onClick(mod)}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`glass-card p-6 text-left w-full relative overflow-hidden group transition-all duration-300 ${mod.unlocked ? 'hover:scale-[1.02] cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+      className={`p-6 text-left w-full relative overflow-hidden group transition-all duration-300 ${mod.unlocked ? 'hover:scale-[1.02] cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
       data-testid={`module-card-${mod.id}`}
     >
       {/* Glow */}
@@ -121,7 +121,7 @@ function LessonView({ lesson, moduleColor, onComplete, isCompleted }) {
       </div>
 
       {/* Content */}
-      <div className="glass-card p-6 md:p-8 mb-6">
+      <div className="p-6 md:p-8 mb-6">
         <div className="prose prose-invert max-w-none">
           {lesson.content.split('\n\n').map((paragraph, i) => (
             <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
@@ -135,7 +135,7 @@ function LessonView({ lesson, moduleColor, onComplete, isCompleted }) {
       {lesson.tool_link && (
         <button
           onClick={() => navigate(lesson.tool_link)}
-          className="w-full glass-card p-4 flex items-center justify-between group hover:scale-[1.01] transition-transform mb-6"
+          className="w-full p-4 flex items-center justify-between group hover:scale-[1.01] transition-transform mb-6"
           data-testid={`lesson-tool-link-${lesson.id}`}
         >
           <div className="flex items-center gap-3">
@@ -287,7 +287,7 @@ export default function Learn() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                   onClick={() => !isLocked && setSelectedLesson(lesson)}
-                  className={`w-full glass-card p-5 flex items-center gap-4 text-left transition-all group ${isLocked ? 'opacity-40 cursor-not-allowed' : 'hover:scale-[1.01] cursor-pointer'}`}
+                  className={`w-full p-5 flex items-center gap-4 text-left transition-all group ${isLocked ? 'opacity-40 cursor-not-allowed' : 'hover:scale-[1.01] cursor-pointer'}`}
                   data-testid={`lesson-card-${lesson.id}`}
                 >
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -342,7 +342,7 @@ export default function Learn() {
           </p>
 
           {/* Overall progress */}
-          <div className="glass-card p-5 mb-10 flex items-center gap-6">
+          <div className="p-5 mb-10 flex items-center gap-6">
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Overall Progress</span>
@@ -381,7 +381,7 @@ export default function Learn() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-12 glass-card p-6"
+          className="mt-12 p-6"
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>
             <BookOpen size={12} className="inline mr-2" /> Your Learning Path

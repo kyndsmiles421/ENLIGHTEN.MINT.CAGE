@@ -142,7 +142,7 @@ function BuildYourOwn({ onSelectPattern }) {
   };
 
   if (!user) return (
-    <div className="glass-card p-12 text-center">
+    <div className="p-12 text-center">
       <Wand2 size={32} style={{ color: 'rgba(45,212,191,0.3)', margin: '0 auto 12px' }} />
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to create and save custom breathing patterns.</p>
     </div>
@@ -156,7 +156,7 @@ function BuildYourOwn({ onSelectPattern }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {saved.map((s, i) => (
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="glass-card p-5 group" data-testid={`saved-breathing-${s.id}`}>
+                className="p-5 group" data-testid={`saved-breathing-${s.id}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{s.name}</h4>
@@ -182,7 +182,7 @@ function BuildYourOwn({ onSelectPattern }) {
         </div>
       )}
 
-      <div className="glass-card p-8 relative overflow-hidden">
+      <div className="p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full" style={{
           background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`, filter: 'blur(30px)',
         }} />
@@ -401,7 +401,7 @@ export default function Breathing() {
                 <button
                   key={p.name}
                   onClick={() => { if (!active) setPattern(p); }}
-                  className="glass-card w-full text-left p-4 flex items-center gap-4"
+                  className="w-full text-left p-4 flex items-center gap-4"
                   style={{
                     borderColor: pattern.name === p.name ? `${p.color}40` : 'rgba(255,255,255,0.08)',
                     opacity: active && pattern.name !== p.name ? 0.4 : 1,
@@ -416,7 +416,7 @@ export default function Breathing() {
                   </div>
                 </button>
               ))}
-              <div className="glass-card p-4 mt-6">
+              <div className="p-4 mt-6">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Rhythm</p>
                 <div className="flex gap-3 text-center">
                   {[{ l: 'In', v: pattern.inhale }, { l: 'Hold', v: pattern.hold1 }, { l: 'Out', v: pattern.exhale }, { l: 'Hold', v: pattern.hold2 }].map((s, i) => (

@@ -53,7 +53,7 @@ function AvatarBubble({ style, name, size = 36, color }) {
 function UserCard({ u, onAction, actionLabel, actionIcon: ActionIcon, loading, actionColor, onMessage, showMessageBtn }) {
   const canMessage = u.message_privacy !== 'nobody' && !(u.message_privacy === 'friends_only' && !u.is_friend);
   return (
-    <div className="glass-card p-4 flex items-center gap-3">
+    <div className="p-4 flex items-center gap-3">
       <AvatarBubble style={u.avatar_style} name={u.display_name || u.name} color={u.theme_color} />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{u.display_name || u.name}</p>
@@ -228,7 +228,7 @@ function RequestsTab({ authHeaders, onUpdate }) {
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Received</p>
           <div className="space-y-2 mb-8">
             {requests.received.map(r => (
-              <div key={r.id} className="glass-card p-4 flex items-center gap-3">
+              <div key={r.id} className="p-4 flex items-center gap-3">
                 <AvatarBubble style="purple-teal" name={r.from_name} />
                 <div className="flex-1">
                   <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{r.from_name}</p>
@@ -256,7 +256,7 @@ function RequestsTab({ authHeaders, onUpdate }) {
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Sent</p>
           <div className="space-y-2">
             {requests.sent.map(r => (
-              <div key={r.id} className="glass-card p-4 flex items-center gap-3">
+              <div key={r.id} className="p-4 flex items-center gap-3">
                 <AvatarBubble style="purple-teal" name={r.to_name} />
                 <div className="flex-1">
                   <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{r.to_name}</p>
@@ -292,7 +292,7 @@ function FriendsListTab({ authHeaders, onMessage }) {
   return (
     <div className="space-y-2" data-testid="friends-list-tab">
       {friends.map(f => (
-        <div key={f.id} className="glass-card p-4 flex items-center gap-3 group">
+        <div key={f.id} className="p-4 flex items-center gap-3 group">
           <AvatarBubble style={f.avatar_style} name={f.display_name} color={f.theme_color} />
           <div className="flex-1 min-w-0 cursor-pointer" onClick={() => navigate(`/profile/${f.id}`)}>
             <p className="text-sm font-medium truncate group-hover:underline" style={{ color: 'var(--text-primary)' }}>{f.display_name}</p>
@@ -424,7 +424,7 @@ function MessagesTab({ authHeaders, initialChat, onBack }) {
           {convos.map(c => (
             <button key={c.conversation_id}
               onClick={() => setActiveChat({ id: c.other_id, display_name: c.other_name, avatar_style: c.avatar_style })}
-              className="w-full glass-card p-4 flex items-center gap-3 text-left hover:scale-[1.01] transition-all group"
+              className="w-full p-4 flex items-center gap-3 text-left hover:scale-[1.01] transition-all group"
               data-testid={`convo-${c.other_id}`}>
               <AvatarBubble style={c.avatar_style} name={c.other_name} color={c.theme_color} />
               <div className="flex-1 min-w-0">
@@ -462,7 +462,7 @@ function FeedTab({ authHeaders }) {
         const Icon = ACTIVITY_ICONS[a.type] || Sparkles;
         const color = ACTIVITY_COLORS[a.type] || '#D8B4FE';
         return (
-          <div key={a.id} className="glass-card p-4 flex items-start gap-3">
+          <div key={a.id} className="p-4 flex items-start gap-3">
             <AvatarBubble style={a.avatar_style} name={a.user_name} size={32} />
             <div className="flex-1">
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -506,7 +506,7 @@ function ShareModal({ open, onClose, authHeaders }) {
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="glass-card w-full max-w-md p-6 relative" data-testid="share-modal">
+      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="w-full max-w-md p-6 relative" data-testid="share-modal">
         <button onClick={onClose} className="absolute top-3 right-3" style={{ color: 'var(--text-muted)' }}><X size={16} /></button>
         <Share2 size={20} style={{ color: '#D8B4FE', marginBottom: 12 }} />
         <h3 className="text-lg font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Share with Friends</h3>
@@ -608,7 +608,7 @@ function ChallengesTab({ authHeaders }) {
       {view === 'today' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           {/* Challenge Card */}
-          <div className="glass-card p-6 mb-6 relative overflow-hidden" data-testid="daily-challenge-card">
+          <div className="p-6 mb-6 relative overflow-hidden" data-testid="daily-challenge-card">
             <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.04]"
               style={{ background: challenge.color, filter: 'blur(40px)', transform: 'translate(30%, -30%)' }} />
             <div className="flex items-center gap-2 mb-3">
@@ -656,15 +656,15 @@ function ChallengesTab({ authHeaders }) {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="glass-card p-4 text-center">
+            <div className="p-4 text-center">
               <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FCD34D' }}>{stats.total_completed}</p>
               <p className="text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Completed</p>
             </div>
-            <div className="glass-card p-4 text-center">
+            <div className="p-4 text-center">
               <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#2DD4BF' }}>{totalXp}</p>
               <p className="text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Total XP</p>
             </div>
-            <div className="glass-card p-4 text-center">
+            <div className="p-4 text-center">
               <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FB923C' }}>{stats.current_streak}</p>
               <p className="text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
             </div>
@@ -679,7 +679,7 @@ function ChallengesTab({ authHeaders }) {
           ) : (
             <div className="space-y-2">
               {history.map(h => (
-                <div key={h.id} className="glass-card p-4 flex items-center gap-3">
+                <div key={h.id} className="p-4 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ background: `${CATEGORY_COLORS[h.category] || '#D8B4FE'}12` }}>
                     <Check size={14} style={{ color: CATEGORY_COLORS[h.category] || '#D8B4FE' }} />
@@ -705,7 +705,7 @@ function ChallengesTab({ authHeaders }) {
           ) : (
             <div className="space-y-2">
               {leaderboard.map(l => (
-                <div key={l.user_id} className={`glass-card p-4 flex items-center gap-3 ${l.is_me ? 'ring-1 ring-yellow-500/20' : ''}`}
+                <div key={l.user_id} className={`p-4 flex items-center gap-3 ${l.is_me ? 'ring-1 ring-yellow-500/20' : ''}`}
                   data-testid={`lb-${l.rank}`}>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
                     style={{

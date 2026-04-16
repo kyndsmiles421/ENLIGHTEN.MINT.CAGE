@@ -173,7 +173,7 @@ export default function CosmicMoodRing() {
       <motion.div
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
-        className="glass-card p-5 relative overflow-hidden cursor-pointer group transition-all"
+        className="p-5 relative overflow-hidden cursor-pointer group transition-all"
         style={{ border: `1px solid transparent` }}
         onClick={() => {
           if (showQuickLog) return;
@@ -269,7 +269,7 @@ export default function CosmicMoodRing() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden">
-            <div className="glass-card mt-2 p-4" data-testid="quick-mood-panel">
+            <div className="mt-2 p-4" data-testid="quick-mood-panel">
               <p className="text-[10px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>
                 How are you feeling right now?
               </p>

@@ -92,7 +92,7 @@ function BuildYourOwn() {
   };
 
   if (!user) return (
-    <div className="glass-card p-12 text-center">
+    <div className="p-12 text-center">
       <Wand2 size={32} style={{ color: 'rgba(252,211,77,0.3)', margin: '0 auto 12px' }} />
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to create personalized affirmation sets with AI.</p>
     </div>
@@ -107,7 +107,7 @@ function BuildYourOwn() {
           className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
           <ArrowLeft size={14} /> Back to sets
         </button>
-        <div className="glass-card p-10 md:p-16 text-center relative overflow-hidden">
+        <div className="p-10 md:p-16 text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10"
             style={{ background: `radial-gradient(circle at 50% 50%, ${viewingSet.color || '#FCD34D'} 0%, transparent 60%)` }} />
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6 relative z-10" style={{ color: viewingSet.color || '#FCD34D' }}>
@@ -152,7 +152,7 @@ function BuildYourOwn() {
         {/* Full list */}
         <div className="space-y-2">
           {viewingSet.affirmations.map((a, i) => (
-            <div key={i} className="glass-card p-4 flex items-start gap-3 cursor-pointer" onClick={() => setCurrentAffIdx(i)}
+            <div key={i} className="p-4 flex items-start gap-3 cursor-pointer" onClick={() => setCurrentAffIdx(i)}
               style={{ borderColor: i === currentAffIdx ? `${viewingSet.color || '#FCD34D'}30` : 'rgba(255,255,255,0.06)' }}>
               <span className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
                 style={{ background: `${viewingSet.color || '#FCD34D'}15`, color: viewingSet.color || '#FCD34D' }}>
@@ -175,7 +175,7 @@ function BuildYourOwn() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {saved.map((s, i) => (
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="glass-card p-5 group" data-testid={`saved-affirmation-set-${s.id}`}>
+                className="p-5 group" data-testid={`saved-affirmation-set-${s.id}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{s.name}</h4>
@@ -200,7 +200,7 @@ function BuildYourOwn() {
       )}
 
       {/* Builder */}
-      <div className="glass-card p-8 relative overflow-hidden">
+      <div className="p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full" style={{
           background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`, filter: 'blur(30px)',
         }} />
@@ -431,7 +431,7 @@ export default function Affirmations() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="glass-card p-12 md:p-16 text-center mb-16 relative overflow-hidden"
+              className="p-12 md:p-16 text-center mb-16 relative overflow-hidden"
             >
               <div className="absolute inset-0 opacity-10"
                 style={{ background: 'radial-gradient(circle at 30% 50%, #C084FC 0%, transparent 50%), radial-gradient(circle at 70% 50%, #2DD4BF 0%, transparent 50%)' }}
@@ -475,7 +475,7 @@ export default function Affirmations() {
                     <button
                       key={t.name}
                       onClick={() => setSelectedTheme(t)}
-                      className="glass-card p-3 text-sm text-left"
+                      className="p-3 text-sm text-left"
                       style={{
                         borderColor: selectedTheme.name === t.name ? 'rgba(252,211,77,0.3)' : 'rgba(255,255,255,0.08)',
                         color: selectedTheme.name === t.name ? 'var(--text-primary)' : 'var(--text-muted)',

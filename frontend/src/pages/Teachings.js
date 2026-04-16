@@ -27,7 +27,7 @@ function TeacherCard({ teacher, onClick }) {
     <motion.button
       whileHover={{ y: -4 }}
       onClick={onClick}
-      className="glass-card glass-card-hover p-6 text-left w-full"
+      className="p-6 text-left w-full"
       data-testid={`teacher-card-${teacher.id}`}
     >
       <div className="flex items-start gap-4">
@@ -67,7 +67,7 @@ function ContemplationModal({ contemplation, teacher, teaching, color, onClose }
     >
       <motion.div
         initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }}
-        className="glass-card max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8"
+        className="max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8"
         style={{ borderColor: `${color}15` }}
         onClick={e => e.stopPropagation()}
         data-testid="contemplation-modal"
@@ -113,7 +113,7 @@ function TeachingCard({ teaching, teacher, color, authHeaders }) {
 
   return (
     <>
-      <motion.div layout className="glass-card overflow-hidden" style={{ borderColor: expanded ? `${color}15` : 'rgba(255,255,255,0.06)' }}>
+      <motion.div layout className="overflow-hidden" style={{ borderColor: expanded ? `${color}15` : 'rgba(255,255,255,0.06)' }}>
         <button onClick={() => setExpanded(!expanded)} className="w-full p-5 text-left flex items-start gap-3"
           data-testid={`teaching-${teaching.id}`}>
           <BookOpen size={16} className="flex-shrink-0 mt-0.5" style={{ color }} />
@@ -130,7 +130,7 @@ function TeachingCard({ teaching, teacher, color, authHeaders }) {
                   {teaching.content}
                 </div>
                 {teaching.practice && (
-                  <div className="glass-card p-4 mb-4" style={{ borderColor: `${color}10` }}>
+                  <div className="p-4 mb-4" style={{ borderColor: `${color}10` }}>
                     <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color }}>Practice</p>
                     <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{teaching.practice}</p>
                   </div>
@@ -207,7 +207,7 @@ function TeacherDetail({ teacher, onBack, authHeaders }) {
       </div>
 
       {/* Core Principle */}
-      <div className="glass-card p-5 mb-8" style={{ borderColor: `${full.color}15` }}>
+      <div className="p-5 mb-8" style={{ borderColor: `${full.color}15` }}>
         <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: full.color }}>Core Principle</p>
         <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>{full.core_principle}</p>
       </div>
@@ -216,7 +216,7 @@ function TeacherDetail({ teacher, onBack, authHeaders }) {
       <div className="mb-8 relative min-h-[80px]">
         <AnimatePresence mode="wait">
           <motion.div key={activeQuote} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="glass-card p-5" style={{ borderColor: `${full.color}10` }}>
+            className="p-5" style={{ borderColor: `${full.color}10` }}>
             <Quote size={16} className="mb-2" style={{ color: `${full.color}40` }} />
             <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)' }}>
               "{full.quotes[activeQuote]}"
@@ -249,7 +249,7 @@ function TeacherDetail({ teacher, onBack, authHeaders }) {
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {full.quotes.map((q, i) => (
-          <div key={i} className="glass-card p-4">
+          <div key={i} className="p-4">
             <p className="text-xs italic leading-relaxed" style={{ color: 'var(--text-secondary)' }}>"{q}"</p>
           </div>
         ))}
@@ -272,7 +272,7 @@ function ThemeView({ themes, teachers, onSelectTeacher }) {
               if (!t) return null;
               return (
                 <button key={tid} onClick={() => onSelectTeacher(t)}
-                  className="px-3 py-1.5 rounded-lg text-xs transition-all glass-card glass-card-hover"
+                  className="px-3 py-1.5 rounded-lg text-xs transition-all"
                   style={{ color: t.color, borderColor: `${t.color}15` }}
                   data-testid={`theme-teacher-${tid}`}>
                   {t.name}

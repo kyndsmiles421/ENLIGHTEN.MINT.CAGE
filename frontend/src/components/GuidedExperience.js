@@ -183,7 +183,7 @@ export default function GuidedExperience({ practiceName, description, instructio
   // Generating state
   if (mode === 'generating') {
     return (
-      <div className="glass-card p-8 text-center" data-testid="guided-generating">
+      <div className="p-8 text-center" data-testid="guided-generating">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}>
           <Loader2 size={32} style={{ color }} />
         </motion.div>
@@ -196,7 +196,7 @@ export default function GuidedExperience({ practiceName, description, instructio
   // Ready state — preview before starting
   if (mode === 'ready') {
     return (
-      <div className="glass-card p-6" data-testid="guided-ready">
+      <div className="p-6" data-testid="guided-ready">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color }}>Guided Meditation Ready</p>
@@ -250,7 +250,7 @@ export default function GuidedExperience({ practiceName, description, instructio
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={`glass-card overflow-hidden relative ${holographic ? 'min-h-[500px]' : ''}`}
+      className={`overflow-hidden relative ${holographic ? 'min-h-[500px]' : ''}`}
       style={{ borderColor: `${color}15` }}
       data-testid="guided-immersive-player"
     >

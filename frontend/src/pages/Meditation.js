@@ -532,7 +532,7 @@ function TimerMode() {
             <div className="space-y-2">
               {PRESETS.map(p => (
                 <button key={p.name} onClick={() => { if (!running) setPreset(p); }}
-                  className="glass-card w-full text-left p-4 flex items-center justify-between"
+                  className="w-full text-left p-4 flex items-center justify-between"
                   style={{ borderColor: preset.name === p.name ? `${p.color}40` : 'rgba(255,255,255,0.08)', opacity: running && preset.name !== p.name ? 0.3 : 1, transition: 'all 0.3s' }}
                   data-testid={`meditation-preset-${p.minutes}`}>
                   <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{p.name}</span>
@@ -546,7 +546,7 @@ function TimerMode() {
             <div className="grid grid-cols-2 gap-2">
               {AMBIENT_SOUNDS.map(s => (
                 <button key={s.id} onClick={() => setSound(s.id)}
-                  className="glass-card p-3 text-center text-sm"
+                  className="p-3 text-center text-sm"
                   style={{ borderColor: sound === s.id ? 'rgba(216,180,254,0.3)' : 'rgba(255,255,255,0.08)', color: sound === s.id ? 'var(--text-primary)' : 'var(--text-muted)', transition: 'all 0.3s' }}
                   data-testid={`sound-${s.id}`}>{s.name}</button>
               ))}
@@ -727,7 +727,7 @@ function BuildYourOwn({ onPlay }) {
   };
 
   if (!user) return (
-    <div className="glass-card p-12 text-center">
+    <div className="p-12 text-center">
       <Wand2 size={32} style={{ color: 'rgba(216,180,254,0.3)', margin: '0 auto 12px' }} />
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to build personalized guided meditations with AI.</p>
     </div>
@@ -744,7 +744,7 @@ function BuildYourOwn({ onPlay }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {saved.map((s, i) => (
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="glass-card p-5 group" data-testid={`saved-meditation-${s.id}`}>
+                className="p-5 group" data-testid={`saved-meditation-${s.id}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{s.name}</h4>
@@ -769,7 +769,7 @@ function BuildYourOwn({ onPlay }) {
       )}
 
       {/* Builder */}
-      <div className="glass-card p-8 relative overflow-hidden">
+      <div className="p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full" style={{
           background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`, filter: 'blur(30px)',
         }} />
@@ -1000,7 +1000,7 @@ function BuildYourOwn({ onPlay }) {
             </div>
 
             {/* AI Audio Narration */}
-            <div className="glass-card p-5 mt-2" data-testid="meditation-audio-section">
+            <div className="p-5 mt-2" data-testid="meditation-audio-section">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Headphones size={14} style={{ color }} />
@@ -1130,7 +1130,7 @@ function ConstellationMeditations({ onPlay, highlightId }) {
   };
 
   if (!user) return (
-    <div className="glass-card p-12 text-center">
+    <div className="p-12 text-center">
       <Star size={32} style={{ color: 'rgba(252,211,77,0.3)', margin: '0 auto 12px' }} />
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to access constellation-linked meditations.</p>
     </div>
@@ -1175,7 +1175,7 @@ function ConstellationMeditations({ onPlay, highlightId }) {
               const theme = themes.find(t => t.id === med.constellation_id);
               return (
                 <motion.div key={med.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                  className="glass-card p-4 group" data-testid={`saved-constellation-${med.id}`}>
+                  className="p-4 group" data-testid={`saved-constellation-${med.id}`}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ background: theme?.color || '#C084FC', boxShadow: `0 0 6px ${theme?.color || '#C084FC'}60` }} />
@@ -1209,7 +1209,7 @@ function ConstellationMeditations({ onPlay, highlightId }) {
           return (
           <motion.div key={c.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
             ref={isHighlighted ? highlightRef : null}
-            className="glass-card glass-card-hover p-6 relative overflow-hidden group"
+            className="p-6 relative overflow-hidden group"
             style={isHighlighted ? { border: `1px solid ${c.color}40`, boxShadow: `0 0 30px ${c.color}15` } : {}}
             data-testid={`constellation-card-${c.id}`}>
             {/* Background glow */}
@@ -1353,7 +1353,7 @@ export default function Meditation() {
                 const Icon = m.icon;
                 return (
                   <motion.div key={m.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                    className="glass-card glass-card-hover p-7 cursor-pointer group"
+                    className="p-7 cursor-pointer group"
                     onClick={() => setActiveSession(m)}
                     data-testid={`meditation-card-${m.id}`}>
                     <div className="flex items-start gap-4 mb-4">

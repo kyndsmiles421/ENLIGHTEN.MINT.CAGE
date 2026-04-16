@@ -64,7 +64,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden group"
+      className="overflow-hidden group"
       data-testid={`forecast-card-${forecast.id}`}
     >
       {/* Header */}
@@ -274,7 +274,7 @@ export default function Forecasts() {
 
   if (!user) return (
     <div className="min-h-screen immersive-page flex items-center justify-center px-6">
-      <div className="glass-card p-12 text-center max-w-md">
+      <div className="p-12 text-center max-w-md">
         <Star size={32} style={{ color: 'rgba(192,132,252,0.3)', margin: '0 auto 12px' }} />
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to access cosmic forecasts.</p>
       </div>
@@ -393,7 +393,7 @@ export default function Forecasts() {
 
         {/* Empty state */}
         {filteredHistory.length === 0 && !activeForecast && (
-          <div className="glass-card p-12 text-center">
+          <div className="p-12 text-center">
             <Star size={28} style={{ color: `${sysColor}30`, margin: '0 auto 12px' }} />
             <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>No {currentSystem?.name} forecasts yet</p>
             <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Generate your first forecast to receive cosmic guidance</p>

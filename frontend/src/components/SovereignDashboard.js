@@ -129,7 +129,7 @@ const SovereignDashboard = ({ userData: propUserData, compact = false }) => {
            }}>
         
         {/* Volunteer Balance */}
-        <div className="stat-pill glass-card p-5" data-testid="stat-volunteer-balance"
+        <div className="stat-pill p-5" data-testid="stat-volunteer-balance"
              style={{ borderColor: 'rgba(134, 239, 172, 0.2)' }}>
           <div className="text-xs font-medium uppercase tracking-wider mb-2" 
                style={{ color: 'rgba(134, 239, 172, 0.7)' }}>
@@ -144,7 +144,7 @@ const SovereignDashboard = ({ userData: propUserData, compact = false }) => {
         </div>
 
         {/* Crystal Seal Status */}
-        <div className="stat-pill glass-card p-5" data-testid="stat-crystal-seal"
+        <div className="stat-pill p-5" data-testid="stat-crystal-seal"
              style={{ borderColor: 'rgba(45, 212, 191, 0.2)' }}>
           <div className="text-xs font-medium uppercase tracking-wider mb-2" 
                style={{ color: 'rgba(45, 212, 191, 0.7)' }}>
@@ -159,7 +159,7 @@ const SovereignDashboard = ({ userData: propUserData, compact = false }) => {
         </div>
 
         {/* Tier Status */}
-        <div className="stat-pill glass-card p-5" data-testid="stat-tier"
+        <div className="stat-pill p-5" data-testid="stat-tier"
              style={{ borderColor: 'rgba(252, 211, 77, 0.2)' }}>
           <div className="text-xs font-medium uppercase tracking-wider mb-2" 
                style={{ color: 'rgba(252, 211, 77, 0.7)' }}>
@@ -174,7 +174,7 @@ const SovereignDashboard = ({ userData: propUserData, compact = false }) => {
         </div>
 
         {/* Savings Earned */}
-        <div className="stat-pill glass-card p-5" data-testid="stat-savings"
+        <div className="stat-pill p-5" data-testid="stat-savings"
              style={{ borderColor: 'rgba(192, 132, 252, 0.2)' }}>
           <div className="text-xs font-medium uppercase tracking-wider mb-2" 
                style={{ color: 'rgba(192, 132, 252, 0.7)' }}>

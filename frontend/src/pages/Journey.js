@@ -839,7 +839,7 @@ export default function Journey() {
                 {/* Stage Card */}
                 <button
                   onClick={() => unlocked && setExpandedStage(isExpanded ? null : stage.id)}
-                  className="w-full glass-card p-6 md:p-8 text-left transition-all"
+                  className="w-full p-6 md:p-8 text-left transition-all"
                   style={{
                     opacity: unlocked ? 1 : 0.4,
                     borderColor: isExpanded ? `${stage.color}30` : 'rgba(255,255,255,0.08)',
@@ -902,7 +902,7 @@ export default function Journey() {
                               key={lesson.id}
                               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: li * 0.05 }}
                               onClick={() => { setActiveLesson(lesson); setActiveStage(stage); }}
-                              className="w-full glass-card p-5 text-left flex items-start gap-4 group transition-all hover:scale-[1.01]"
+                              className="w-full p-5 text-left flex items-start gap-4 group transition-all hover:scale-[1.01]"
                               style={{ borderColor: done ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)' }}
                               data-testid={`lesson-${lesson.id}`}>
                               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
@@ -936,7 +936,7 @@ export default function Journey() {
             Go Deeper
           </p>
           <button onClick={() => navigate('/bible')}
-            className="w-full glass-card p-6 md:p-8 text-left group hover:scale-[1.01] transition-all relative overflow-hidden"
+            className="w-full p-6 md:p-8 text-left group hover:scale-[1.01] transition-all relative overflow-hidden"
             style={{ borderColor: 'rgba(217,119,6,0.15)' }}
             data-testid="journey-to-scriptures-btn">
             <div className="absolute inset-0 opacity-[0.04]"
@@ -980,7 +980,7 @@ export default function Journey() {
               <motion.button key={j.id}
                 initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55 + i * 0.04 }}
                 onClick={() => navigate(`/bible?tab=journeys`)}
-                className="glass-card p-3.5 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
+                className="p-3.5 flex items-center gap-3 text-left group hover:scale-[1.01] transition-all"
                 data-testid={`journey-link-${j.id}`}>
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ background: `${j.color}10`, border: `1px solid ${j.color}18` }}>
@@ -997,7 +997,7 @@ export default function Journey() {
         </motion.div>
 
         {!user && (
-          <div className="glass-card p-8 text-center mt-12">
+          <div className="p-8 text-center mt-12">
             <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>Sign in to save your progress and unlock stages as you grow.</p>
             <a href="/auth" className="btn-glass px-6 py-2 text-sm inline-block" style={{ color: '#C084FC' }}>Begin Journey</a>
           </div>

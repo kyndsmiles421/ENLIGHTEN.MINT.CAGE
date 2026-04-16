@@ -101,7 +101,7 @@ export default function Nourishment() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => setSelected(selected?.id === item.id ? null : item)}
-                className="glass-card glass-card-hover p-6 cursor-pointer"
+                className="p-6 cursor-pointer"
                 style={{
                   borderColor: selected?.id === item.id ? `${item.color}40` : 'rgba(255,255,255,0.08)',
                 }}
@@ -213,7 +213,7 @@ export default function Nourishment() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="glass-card p-6">
+                  className="p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                       style={{ background: `${item.color}12`, border: `1px solid ${item.color}20` }}>
@@ -234,7 +234,7 @@ export default function Nourishment() {
 
         {/* AI Suggestion */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="glass-card p-8 md:p-10"
+          className="p-8 md:p-10"
         >
           <div className="flex items-center gap-2 mb-6">
             <Sparkles size={16} style={{ color: 'var(--accent-gold)' }} />
@@ -266,7 +266,7 @@ export default function Nourishment() {
           </div>
           {aiSuggestion && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              className="glass-card p-6"
+              className="p-6"
               style={{ background: 'rgba(34,197,94,0.03)', borderColor: 'rgba(34,197,94,0.1)' }}
             >
               <p className="text-sm leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--text-secondary)' }} data-testid="nourish-ai-result">

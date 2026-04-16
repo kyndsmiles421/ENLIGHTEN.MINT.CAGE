@@ -160,7 +160,7 @@ export default function Create() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Manual Creation */}
-                <div className="glass-card p-6">
+                <div className="p-6">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-4" style={{ color: 'var(--text-muted)' }}>
                     <PenTool size={12} className="inline mr-1" /> Write Your Own
                   </p>
@@ -201,7 +201,7 @@ export default function Create() {
                 </div>
 
                 {/* AI Generation */}
-                <div className="glass-card p-6" style={{ borderColor: `${typeConfig.color}10` }}>
+                <div className="p-6" style={{ borderColor: `${typeConfig.color}10` }}>
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-4" style={{ color: typeConfig.color }}>
                     <Sparkles size={12} className="inline mr-1" /> AI-Powered Creation
                   </p>
@@ -235,11 +235,11 @@ export default function Create() {
           {tab === 'mine' && (
             <motion.div key="mine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {!user ? (
-                <div className="glass-card p-12 text-center">
+                <div className="p-12 text-center">
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>Sign in to see your creations</p>
                 </div>
               ) : myCreations.length === 0 ? (
-                <div className="glass-card p-12 text-center">
+                <div className="p-12 text-center">
                   <PenTool size={32} style={{ color: 'var(--text-muted)', opacity: 0.3, margin: '0 auto 16px' }} />
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>No creations yet</p>
                   <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>Create your first affirmation, meditation, or ritual above.</p>
@@ -250,7 +250,7 @@ export default function Create() {
                     const tc = TYPES.find(t => t.id === c.type) || TYPES[0];
                     const Icon = tc.icon;
                     return (
-                      <div key={c.id} className="glass-card p-6" data-testid={`creation-${c.id}`}>
+                      <div key={c.id} className="p-6" data-testid={`creation-${c.id}`}>
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: `${tc.color}15` }}>
@@ -307,7 +307,7 @@ export default function Create() {
               </div>
 
               {filteredShared.length === 0 ? (
-                <div className="glass-card p-12 text-center">
+                <div className="p-12 text-center">
                   <Share2 size={32} style={{ color: 'var(--text-muted)', opacity: 0.3, margin: '0 auto 16px' }} />
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>No shared creations yet</p>
                   <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>Be the first to share your practice with the community.</p>
@@ -318,7 +318,7 @@ export default function Create() {
                     const tc = TYPES.find(t => t.id === c.type) || TYPES[0];
                     const Icon = tc.icon;
                     return (
-                      <div key={c.id} className="glass-card p-6" data-testid={`shared-${c.id}`}>
+                      <div key={c.id} className="p-6" data-testid={`shared-${c.id}`}>
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: `${tc.color}15` }}>

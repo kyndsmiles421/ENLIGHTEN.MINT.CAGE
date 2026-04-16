@@ -91,7 +91,7 @@ function PostCard({ post, currentUserId, authHeaders, onDelete, onUpdate }) {
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden"
+      className="overflow-hidden"
       data-testid={`community-post-${post.id}`}
     >
       {/* Header */}
@@ -282,7 +282,7 @@ function CreatePostForm({ authHeaders, onCreated, onClose }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="glass-card p-6 mb-8"
+      className="p-6 mb-8"
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Share with the Community</h3>
@@ -393,7 +393,7 @@ function UserCard({ member, currentUserId, authHeaders, followingList, onFollowT
   };
 
   return (
-    <div className="glass-card p-4 flex items-center gap-4" data-testid={`user-card-${member.id}`}>
+    <div className="p-4 flex items-center gap-4" data-testid={`user-card-${member.id}`}>
       <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
         style={{ background: 'linear-gradient(135deg, rgba(192,132,252,0.25), rgba(45,212,191,0.25))', color: 'var(--text-primary)' }}>
         {member.name?.charAt(0)?.toUpperCase()}
@@ -538,14 +538,14 @@ export default function Community() {
             </div>
 
             {loading ? (
-              <div className="glass-card p-12 text-center">
+              <div className="p-12 text-center">
                 <Loader2 size={24} className="animate-spin mx-auto mb-4" style={{ color: 'var(--text-muted)' }} />
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading community feed...</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {(tab === 'following' ? feed.filter(p => followingList.includes(p.user_id)) : feed).length === 0 ? (
-                  <div className="glass-card p-12 text-center">
+                  <div className="p-12 text-center">
                     <Users size={32} className="mx-auto mb-4" style={{ color: 'var(--text-muted)', opacity: 0.3 }} />
                     <p className="text-lg mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                       {tab === 'following' ? 'Follow others to see their posts here.' : 'The community space awaits its first voice.'}
@@ -575,7 +575,7 @@ export default function Community() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Community Stats */}
-            <div className="glass-card p-6">
+            <div className="p-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Community Pulse</p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -599,7 +599,7 @@ export default function Community() {
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Active Seekers</p>
               {activeUsers.length === 0 ? (
-                <div className="glass-card p-6 text-center">
+                <div className="p-6 text-center">
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No active members yet.</p>
                 </div>
               ) : (
@@ -620,7 +620,7 @@ export default function Community() {
 
             {/* Quick Actions */}
             {!user && (
-              <div className="glass-card p-6 text-center">
+              <div className="p-6 text-center">
                 <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                   Join the community to share, connect, and grow together.
                 </p>

@@ -50,7 +50,7 @@ function ReportView({ report, onBack }) {
       </div>
 
       {/* Header Card */}
-      <div className="glass-card p-6 mb-6 relative overflow-hidden">
+      <div className="p-6 mb-6 relative overflow-hidden">
         <div className="absolute top-4 right-4 opacity-10">
           <Sparkles size={48} style={{ color: '#D8B4FE' }} />
         </div>
@@ -73,7 +73,7 @@ function ReportView({ report, onBack }) {
           { label: 'Mood Entries', value: stats.mood_entries || 0, color: '#FDA4AF', icon: Heart },
           { label: 'AI Sessions', value: stats.akashic_sessions || 0, color: '#38BDF8', icon: Brain },
         ].map((s, i) => (
-          <div key={i} className="glass-card p-3 text-center">
+          <div key={i} className="p-3 text-center">
             <s.icon size={12} style={{ color: s.color, margin: '0 auto 4px' }} />
             <p className="text-base font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: s.color }}>{s.value}</p>
             <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
@@ -94,7 +94,7 @@ function ReportView({ report, onBack }) {
       )}
 
       {/* Report Content — Markdown-like rendering */}
-      <div className="glass-card p-6 mb-8" data-testid="report-content">
+      <div className="p-6 mb-8" data-testid="report-content">
         <ReportMarkdown text={report.report} />
       </div>
     </div>
@@ -236,7 +236,7 @@ export default function SoulReports() {
         </div>
 
         {/* Generate New Report */}
-        <div className="glass-card p-6 mb-8" data-testid="generate-section">
+        <div className="p-6 mb-8" data-testid="generate-section">
           <p className="text-xs font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <Sparkles size={14} style={{ color: '#D8B4FE' }} /> Generate a Report
           </p>
@@ -284,7 +284,7 @@ export default function SoulReports() {
                   transition={{ delay: i * 0.05 }}
                   onClick={() => openReport(r.month)}
                   data-testid={`report-item-${r.month}`}
-                  className="w-full glass-card p-5 text-left transition-all hover:scale-[1.005]">
+                  className="w-full p-5 text-left transition-all hover:scale-[1.005]">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{r.month_name}</h3>

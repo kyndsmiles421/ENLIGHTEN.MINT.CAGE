@@ -176,7 +176,7 @@ function PlantCare({ user, authHeaders }) {
   };
 
   if (!user) return (
-    <div className="glass-card p-8 text-center">
+    <div className="p-8 text-center">
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to nurture your garden</p>
     </div>
   );
@@ -198,7 +198,7 @@ function PlantCare({ user, authHeaders }) {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {PLANT_TYPES.map(t => (
-              <button key={t.id} onClick={() => addPlant(t)} className="glass-card p-4 text-left group hover:scale-[1.02] transition-transform"
+              <button key={t.id} onClick={() => addPlant(t)} className="p-4 text-left group hover:scale-[1.02] transition-transform"
                 data-testid={`plant-type-${t.id}`}>
                 <div className="w-12 h-12 mb-2"><PlantVisual type={t} stageIdx={2} /></div>
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{t.name}</p>
@@ -210,7 +210,7 @@ function PlantCare({ user, authHeaders }) {
       </AnimatePresence>
 
       {plants.length === 0 ? (
-        <div className="glass-card p-12 text-center">
+        <div className="p-12 text-center">
           <Sprout size={32} style={{ color: 'rgba(34,197,94,0.3)', margin: '0 auto 12px' }} />
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Your garden is empty. Plant your first seed above.</p>
         </div>
@@ -223,7 +223,7 @@ function PlantCare({ user, authHeaders }) {
             const canWater = !p.watered_today;
             return (
               <motion.div key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                className="glass-card p-6 relative overflow-hidden group" data-testid={`plant-card-${p.id}`}>
+                className="p-6 relative overflow-hidden group" data-testid={`plant-card-${p.id}`}>
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full" style={{
                   background: `radial-gradient(circle, ${type.color}08 0%, transparent 70%)`, filter: 'blur(20px)',
                 }} />

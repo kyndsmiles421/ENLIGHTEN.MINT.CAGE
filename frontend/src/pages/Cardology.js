@@ -69,7 +69,7 @@ function BirthCardCalculator() {
 
   return (
     <div data-testid="birth-card-calculator">
-      <div className="glass-card p-6 mb-6">
+      <div className="p-6 mb-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
           <Sun size={12} className="inline mr-1.5" /> Enter Your Birthday
         </p>
@@ -123,39 +123,39 @@ function BirthCardCalculator() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="glass-card p-4">
+                  <div className="p-4">
                     <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Element</p>
                     <p className="text-sm font-medium" style={{ color: result.suit_theme?.color }}>{result.element}</p>
                   </div>
-                  <div className="glass-card p-4">
+                  <div className="p-4">
                     <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Ruling Planet</p>
                     <p className="text-sm font-medium" style={{ color: result.planet?.color || '#FCD34D' }}>{result.planet?.planet}</p>
                   </div>
                 </div>
 
                 {result.magi_formula && (
-                  <div className="glass-card p-4" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>
+                  <div className="p-4" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>
                     <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#D4AF37' }}>Magi Formula (Robert Lee Camp)</p>
                     <p className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>{result.magi_formula}</p>
                     <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>Solar Value: {result.solar_value}</p>
                   </div>
                 )}
 
-                <div className="glass-card p-5">
+                <div className="p-5">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#FDA4AF' }}>
                     <Heart size={10} className="inline mr-1" /> Love & Relationships
                   </p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{result.love}</p>
                 </div>
 
-                <div className="glass-card p-5">
+                <div className="p-5">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#22C55E' }}>
                     <Compass size={10} className="inline mr-1" /> Life Path
                   </p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{result.life}</p>
                 </div>
 
-                <div className="glass-card p-5">
+                <div className="p-5">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: 'var(--text-muted)' }}>Suit Theme: {result.suit_theme?.theme}</p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{result.suit_theme?.desc}</p>
                 </div>
@@ -186,7 +186,7 @@ function CompatibilityChecker() {
 
   return (
     <div data-testid="compatibility-checker">
-      <div className="glass-card p-6 mb-6">
+      <div className="p-6 mb-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#FDA4AF' }}>
           <Heart size={12} className="inline mr-1.5" /> Love Compatibility
         </p>
@@ -225,7 +225,7 @@ function CompatibilityChecker() {
         {result && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             {/* Score */}
-            <div className="glass-card p-6 mb-6 text-center" data-testid="compatibility-result">
+            <div className="p-6 mb-6 text-center" data-testid="compatibility-result">
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Compatibility Score</p>
               <p className="text-6xl font-light mb-3" style={{
                 fontFamily: 'Cormorant Garamond, serif',
@@ -273,7 +273,7 @@ function DailyCard() {
   return (
     <div data-testid="daily-card">
       {!revealed ? (
-        <div className="glass-card p-8 text-center">
+        <div className="p-8 text-center">
           <div className="w-20 h-28 mx-auto mb-6 rounded-xl flex items-center justify-center"
             style={{ background: 'linear-gradient(145deg, rgba(192,132,252,0.08), rgba(45,212,191,0.05))', border: '2px solid rgba(192,132,252,0.15)' }}>
             <Sparkles size={28} style={{ color: '#D8B4FE', opacity: 0.5 }} />
@@ -306,20 +306,20 @@ function DailyCard() {
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{card.desc}</p>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div className="glass-card p-3 text-center">
+                <div className="p-3 text-center">
                   <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Element</p>
                   <p className="text-sm font-medium" style={{ color: card.suit_theme?.color }}>{card.element}</p>
                 </div>
-                <div className="glass-card p-3 text-center">
+                <div className="p-3 text-center">
                   <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Planet</p>
                   <p className="text-sm font-medium" style={{ color: card.planet?.color }}>{card.planet?.planet}</p>
                 </div>
-                <div className="glass-card p-3 text-center">
+                <div className="p-3 text-center">
                   <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Suit</p>
                   <p className="text-sm font-medium" style={{ color: card.suit_theme?.color }}>{card.suit}</p>
                 </div>
               </div>
-              <div className="glass-card p-5">
+              <div className="p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#FDA4AF' }}>
                   <Heart size={10} className="inline mr-1" /> Love Message
                 </p>
@@ -360,7 +360,7 @@ function YearlySpread() {
 
   return (
     <div data-testid="yearly-spread">
-      <div className="glass-card p-6 mb-6">
+      <div className="p-6 mb-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#D8B4FE' }}>
           <Calendar size={12} className="inline mr-1" /> Your Yearly Spread
         </p>
@@ -431,7 +431,7 @@ function YearlySpread() {
                 const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 return (
                   <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
-                    className={`glass-card p-5 ${period.is_current ? 'ring-1' : ''}`}
+                    className={`p-5 ${period.is_current ? 'ring-1' : ''}`}
                     style={{ borderColor: period.is_current ? `${period.planet_color}30` : 'rgba(255,255,255,0.06)',
                       ringColor: period.is_current ? period.planet_color : 'transparent' }}
                     data-testid={`period-${i+1}`}>
@@ -478,7 +478,7 @@ function YearlySpread() {
 
             {/* Current Period Highlight */}
             {spread.current_period && (
-              <div className="glass-card p-6 mt-6" style={{ borderColor: `${spread.current_period.planet_color}20` }}>
+              <div className="p-6 mt-6" style={{ borderColor: `${spread.current_period.planet_color}20` }}>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: spread.current_period.planet_color }}>
                   Your Current Period: {spread.current_period.planet}
                 </p>

@@ -81,22 +81,22 @@ function SignDetails({ data }) {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="glass-card p-3 text-center">
+            <div className="p-3 text-center">
               <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Element</p>
               <ElemIcon size={16} className="mx-auto my-1" style={{ color: sign.color }} />
               <p className="text-sm font-medium" style={{ color: sign.color }}>{sign.element}</p>
             </div>
-            <div className="glass-card p-3 text-center">
+            <div className="p-3 text-center">
               <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Direction</p>
               <Compass size={16} className="mx-auto my-1" style={{ color: sign.color }} />
               <p className="text-sm font-medium" style={{ color: sign.color }}>{sign.direction}</p>
             </div>
-            <div className="glass-card p-3 text-center">
+            <div className="p-3 text-center">
               <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Tone</p>
               <p className="text-lg font-light mx-auto my-0.5" style={{ fontFamily: 'Cormorant Garamond, serif', color: tone.color }}>{tone.num}</p>
               <p className="text-sm font-medium" style={{ color: tone.color }}>{tone.name}</p>
             </div>
-            <div className="glass-card p-3 text-center">
+            <div className="p-3 text-center">
               <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Kin</p>
               <p className="text-lg font-light mx-auto my-0.5" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#C084FC' }}>{kin}</p>
               <p className="text-sm font-medium" style={{ color: '#C084FC' }}>of 260</p>
@@ -106,7 +106,7 @@ function SignDetails({ data }) {
       </div>
 
       {/* Tone Details */}
-      <div className="glass-card p-5" style={{ borderColor: `${tone.color}15` }}>
+      <div className="p-5" style={{ borderColor: `${tone.color}15` }}>
         <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: tone.color }}>
           <Sparkles size={10} className="inline mr-1" /> Tone {tone.num}: {tone.name}
         </p>
@@ -123,13 +123,13 @@ function SignDetails({ data }) {
 
       {/* Shadow & Affirmation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="glass-card p-5">
+        <div className="p-5">
           <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#8B5CF6' }}>
             <Moon size={10} className="inline mr-1" /> Shadow Side
           </p>
           <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{sign.shadow}</p>
         </div>
-        <div className="glass-card p-5" style={{ borderColor: `${sign.color}12` }}>
+        <div className="p-5" style={{ borderColor: `${sign.color}12` }}>
           <p className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: sign.color }}>
             <Sun size={10} className="inline mr-1" /> Affirmation
           </p>
@@ -159,7 +159,7 @@ function BirthSignCalc() {
 
   return (
     <div data-testid="mayan-birth-calc">
-      <div className="glass-card p-6 mb-6">
+      <div className="p-6 mb-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
           <Sun size={12} className="inline mr-1.5" /> Enter Your Birth Date
         </p>
@@ -246,7 +246,7 @@ function MayanCompat() {
 
   return (
     <div data-testid="mayan-compatibility">
-      <div className="glass-card p-6 mb-6">
+      <div className="p-6 mb-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#FDA4AF' }}>
           <Heart size={12} className="inline mr-1.5" /> Galactic Compatibility
         </p>
@@ -266,7 +266,7 @@ function MayanCompat() {
       <AnimatePresence>
         {result && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="glass-card p-6 mb-6 text-center" data-testid="mayan-compat-result">
+            <div className="p-6 mb-6 text-center" data-testid="mayan-compat-result">
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Galactic Resonance</p>
               <p className="text-6xl font-light mb-3" style={{
                 fontFamily: 'Cormorant Garamond, serif',
@@ -315,7 +315,7 @@ function TodaySign() {
   return (
     <div data-testid="mayan-today">
       {!revealed ? (
-        <div className="glass-card p-8 text-center">
+        <div className="p-8 text-center">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}

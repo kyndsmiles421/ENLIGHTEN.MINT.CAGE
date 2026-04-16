@@ -167,7 +167,7 @@ export default function Frequencies() {
         </div>
 
         {/* Frequency Visualization */}
-        <div className="glass-card p-8 mb-12">
+        <div className="p-8 mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Frequency Spectrum</p>
           {loading ? (
             <div className="flex items-center justify-center h-32">
@@ -233,7 +233,7 @@ export default function Frequencies() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="glass-card p-6"
+                className="p-6"
                 style={{
                   borderColor: isPlaying ? `${freq.color}40` : selected?.id === freq.id ? `${freq.color}25` : 'rgba(255,255,255,0.08)',
                   transition: 'border-color 0.3s',
@@ -319,7 +319,7 @@ export default function Frequencies() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="glass-card p-8 md:p-10"
+              className="p-8 md:p-10"
             >
               <div className="flex items-start gap-3 mb-6">
                 <Info size={18} style={{ color: selected.color, marginTop: '2px' }} />

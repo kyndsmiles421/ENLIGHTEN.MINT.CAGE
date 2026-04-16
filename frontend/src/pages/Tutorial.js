@@ -143,7 +143,7 @@ export default function Tutorial() {
                     <motion.div key={item.label}
                       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: si * 0.05 + ii * 0.03 }}
-                      className="glass-card glass-card-hover p-5 cursor-pointer group"
+                      className="p-5 cursor-pointer group"
                       onClick={() => navigate(item.path)}
                       data-testid={`tutorial-card-${item.path.replace('/', '')}`}
                     >
@@ -168,7 +168,7 @@ export default function Tutorial() {
 
         {/* Tips section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="mt-12 glass-card p-8">
+          className="mt-12 p-8">
           <h2 className="text-lg font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Pro Tips</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[

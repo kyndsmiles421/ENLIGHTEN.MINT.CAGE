@@ -55,7 +55,7 @@ function NewGreenEntry({ onSaved, moonPhase }) {
   };
 
   return (
-    <div className="glass-card p-6 mb-8" style={{ borderColor: 'rgba(34,197,94,0.1)' }} data-testid="green-journal-form">
+    <div className="p-6 mb-8" style={{ borderColor: 'rgba(34,197,94,0.1)' }} data-testid="green-journal-form">
       <p className="text-xs font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#22C55E' }}>
         <Leaf size={12} className="inline mr-1" /> New Entry
       </p>
@@ -128,7 +128,7 @@ function GreenEntry({ entry, onDelete }) {
   const WeatherIcon = weatherIcons[entry.weather] || Leaf;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-5" data-testid={`green-entry-${entry.id}`}>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-5" data-testid={`green-entry-${entry.id}`}>
       <div className="flex items-start justify-between mb-2">
         <div>
           <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{entry.title || 'Nature Note'}</p>

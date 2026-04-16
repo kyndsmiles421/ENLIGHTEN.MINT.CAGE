@@ -105,7 +105,7 @@ export default function Journal() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden mb-12"
             >
-              <div className="glass-card p-8 space-y-5">
+              <div className="p-8 space-y-5">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-[0.2em] mb-2 block" style={{ color: 'var(--text-muted)' }}>Title</label>
                   <input
@@ -157,13 +157,13 @@ export default function Journal() {
 
         {/* Entries */}
         {!user ? (
-          <div className="glass-card p-12 text-center">
+          <div className="p-12 text-center">
             <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
               Sign in to begin your journal practice.
             </p>
           </div>
         ) : entries.length === 0 ? (
-          <div className="glass-card p-12 text-center">
+          <div className="p-12 text-center">
             <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
               Your journal awaits its first words.
             </p>
@@ -176,7 +176,7 @@ export default function Journal() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="glass-card overflow-hidden"
+                className="overflow-hidden"
               >
                 <button
                   onClick={() => setExpanded(expanded === entry.id ? null : entry.id)}

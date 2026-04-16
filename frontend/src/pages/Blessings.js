@@ -116,7 +116,7 @@ export default function Blessings() {
             { label: 'Received', value: stats.received, color: '#2DD4BF' },
             { label: 'Community', value: stats.community_total, color: '#FCD34D' },
           ].map(s => (
-            <div key={s.label} className="flex-1 glass-card p-3 text-center">
+            <div key={s.label} className="flex-1 p-3 text-center">
               <p className="text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
               <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
@@ -148,7 +148,7 @@ export default function Blessings() {
           <AnimatePresence>
             {sent && (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-                className="glass-card p-8 text-center" data-testid="blessing-sent-confirmation">
+                className="p-8 text-center" data-testid="blessing-sent-confirmation">
                 <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: 'rgba(192,132,252,0.1)' }}>
                   <Check size={28} style={{ color: '#C084FC' }} />
                 </div>
@@ -236,7 +236,7 @@ export default function Blessings() {
                   </button>
                   {aiText && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                      className="glass-card p-5 relative" data-testid="ai-blessing-preview">
+                      className="p-5 relative" data-testid="ai-blessing-preview">
                       <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.04]"
                         style={{ background: '#C084FC', filter: 'blur(30px)', transform: 'translate(30%, -30%)' }} />
                       <p className="text-[10px] uppercase tracking-widest font-bold mb-2" style={{ color: '#C084FC' }}>
@@ -267,7 +267,7 @@ export default function Blessings() {
                         return (
                           <motion.button key={t.id} whileTap={{ scale: 0.95 }}
                             onClick={() => setSelected(t)}
-                            className="glass-card p-3 flex flex-col items-center gap-2 transition-all"
+                            className="p-3 flex flex-col items-center gap-2 transition-all"
                             style={{
                               borderColor: active ? `${t.color}40` : undefined,
                               background: active ? `${t.color}08` : undefined,
@@ -288,7 +288,7 @@ export default function Blessings() {
                   <AnimatePresence>
                     {selected && (
                       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                        className="glass-card p-5 relative overflow-hidden" data-testid="blessing-preview">
+                        className="p-5 relative overflow-hidden" data-testid="blessing-preview">
                         <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.04]"
                           style={{ background: selected.color, filter: 'blur(30px)', transform: 'translate(30%, -30%)' }} />
                         <p className="text-[10px] uppercase tracking-widest font-bold mb-2" style={{ color: selected.color }}>
@@ -348,7 +348,7 @@ function BlessingList({ items, emptyText, label }) {
   return (
     <div className="space-y-3" data-testid={`blessing-${label}`}>
       {items.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="p-8 text-center">
           <Heart size={24} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{emptyText}</p>
         </div>
@@ -357,7 +357,7 @@ function BlessingList({ items, emptyText, label }) {
         return (
           <motion.div key={b.id || i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
-            className="glass-card p-4 relative overflow-hidden" data-testid={`${label}-blessing-${i}`}>
+            className="p-4 relative overflow-hidden" data-testid={`${label}-blessing-${i}`}>
             <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.03]"
               style={{ background: b.color || '#C084FC', filter: 'blur(20px)', transform: 'translate(30%, -30%)' }} />
             <div className="flex items-start gap-3">

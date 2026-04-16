@@ -26,7 +26,7 @@ function TarotCard({ card, index, revealed }) {
       initial={{ rotateY: 180, opacity: 0 }}
       animate={{ rotateY: revealed ? 0 : 180, opacity: 1 }}
       transition={{ delay: index * 0.3, duration: 0.6 }}
-      className="glass-card p-5 text-center w-40 md:w-48 flex-shrink-0"
+      className="p-5 text-center w-40 md:w-48 flex-shrink-0"
       style={{
         borderColor: card.reversed ? 'rgba(239,68,68,0.2)' : 'rgba(216,180,254,0.2)',
         boxShadow: `0 0 30px ${card.reversed ? 'rgba(239,68,68,0.1)' : 'rgba(216,180,254,0.1)'}`,
@@ -304,7 +304,7 @@ export default function Oracle() {
                           scale: isActive ? 1.05 : 1,
                         }}
                         transition={{ duration: 0.3 }}
-                        className={`glass-card p-2 text-center text-xs transition-all duration-300 ${isActive ? 'ring-2' : ''}`}
+                        className={`p-2 text-center text-xs transition-all duration-300 ${isActive ? 'ring-2' : ''}`}
                         style={{ 
                           borderColor: isActive ? `${s.color}60` : 'rgba(255,255,255,0.08)', 
                           color: isActive ? s.color : 'var(--text-muted)',
@@ -350,7 +350,7 @@ export default function Oracle() {
                         }
                       }
                       return z ? (
-                        <div className="glass-card p-4" style={{ borderColor: `${z.color}20`, boxShadow: `0 0 20px ${z.color}15` }}>
+                        <div className="p-4" style={{ borderColor: `${z.color}20`, boxShadow: `0 0 20px ${z.color}15` }}>
                           <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: z.color }}>{element} {animal}</p>
                           <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{z.traits}</p>
                         </div>
@@ -371,7 +371,7 @@ export default function Oracle() {
                     return (
                       <motion.div 
                         key={g.id} 
-                        className="glass-card p-4 cursor-pointer transition-all duration-300"
+                        className="p-4 cursor-pointer transition-all duration-300"
                         onClick={() => addFocusTag(g.name, g.color)}
                         animate={{
                           borderColor: isSelected ? `${g.color}50` : 'rgba(255,255,255,0.08)',
@@ -469,7 +469,7 @@ export default function Oracle() {
                   animate={{ opacity: 1, z: 0, scale: 1, filter: 'blur(0px)' }} 
                   exit={{ opacity: 0, z: 100, scale: 1.1, filter: 'blur(10px)' }}
                   transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                  className="glass-card p-8 md:p-10"
+                  className="p-8 md:p-10"
                   style={{ transformStyle: 'preserve-3d' }}
                 >
 
@@ -622,7 +622,7 @@ export default function Oracle() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px) brightness(1.5)' }}
                   transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                  className="glass-card p-12 flex flex-col items-center justify-center min-h-[400px] text-center"
+                  className="p-12 flex flex-col items-center justify-center min-h-[400px] text-center"
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   <div className="relative mb-6">

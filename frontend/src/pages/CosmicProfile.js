@@ -12,7 +12,7 @@ const ENERGY_COLORS = { positive: '#22C55E', neutral: '#94A3B8', challenging: '#
 
 function StatCard({ icon: Icon, label, value, color, sub }) {
   return (
-    <div className="glass-card p-4">
+    <div className="p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon size={14} style={{ color }} />
         <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{label}</span>
@@ -27,7 +27,7 @@ function BarSection({ items, colorMap, label }) {
   if (!items || items.length === 0) return null;
   const max = Math.max(...items.map(i => i.count));
   return (
-    <div className="glass-card p-5">
+    <div className="p-5">
       <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>{label}</p>
       <div className="space-y-2">
         {items.map((item, i) => {
@@ -73,7 +73,7 @@ export default function CosmicProfile() {
 
   if (!user) return (
     <div className="min-h-screen immersive-page flex items-center justify-center px-6">
-      <div className="glass-card p-12 text-center">
+      <div className="p-12 text-center">
         <Star size={32} style={{ color: 'rgba(192,132,252,0.3)', margin: '0 auto 12px' }} />
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to view your cosmic profile.</p>
       </div>
@@ -106,7 +106,7 @@ export default function CosmicProfile() {
         </motion.div>
 
         {/* AI Cosmic Portrait */}
-        <div className="glass-card p-5 mb-8 flex flex-col sm:flex-row items-center gap-5">
+        <div className="p-5 mb-8 flex flex-col sm:flex-row items-center gap-5">
           {portrait ? (
             <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden flex-shrink-0"
               style={{ border: `2px solid ${domColor}30`, boxShadow: `0 0 30px ${domColor}15` }}>
@@ -196,7 +196,7 @@ export default function CosmicProfile() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {/* Lucky numbers */}
           {profile.recurring_numbers?.length > 0 && (
-            <div className="glass-card p-5">
+            <div className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Hash size={14} style={{ color: '#FCD34D' }} />
                 <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Recurring Numbers</span>
@@ -214,7 +214,7 @@ export default function CosmicProfile() {
 
           {/* Crystals */}
           {profile.recurring_crystals?.length > 0 && (
-            <div className="glass-card p-5">
+            <div className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Heart size={14} style={{ color: '#2DD4BF' }} />
                 <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Cosmic Crystals</span>
@@ -232,7 +232,7 @@ export default function CosmicProfile() {
 
           {/* Elements */}
           {profile.recurring_elements?.length > 0 && (
-            <div className="glass-card p-5">
+            <div className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Globe size={14} style={{ color: '#FB923C' }} />
                 <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Elemental Affinity</span>
@@ -250,7 +250,7 @@ export default function CosmicProfile() {
         </div>
 
         {/* Garden stats */}
-        <div className="glass-card p-5">
+        <div className="p-5">
           <div className="flex items-center gap-2 mb-2">
             <Sprout size={14} style={{ color: '#22C55E' }} />
             <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Zen Garden</span>
@@ -269,7 +269,7 @@ export default function CosmicProfile() {
 
         {/* Empty state */}
         {profile.total_forecasts === 0 && (
-          <div className="glass-card p-12 text-center mt-8">
+          <div className="p-12 text-center mt-8">
             <TrendingUp size={28} style={{ color: 'rgba(192,132,252,0.3)', margin: '0 auto 12px' }} />
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Your cosmic fingerprint grows with each forecast and meditation.</p>
             <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>Generate forecasts and explore constellations to build your profile.</p>

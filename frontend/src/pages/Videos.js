@@ -48,7 +48,7 @@ function CinemaCard({ storyId, videoInfo, onGenerate, onPlay, generating }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden group relative"
+      className="overflow-hidden group relative"
       data-testid={`cinema-card-${storyId}`}
     >
       {/* Visual area */}
@@ -369,7 +369,7 @@ export default function Videos() {
         {/* ═══ Cosmic Cinema Tab ═══ */}
         {tab === 'cinema' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="glass-card p-5 mb-8" data-testid="cinema-info-bar">
+            <div className="p-5 mb-8" data-testid="cinema-info-bar">
               <div className="flex items-center gap-4">
                 <Film size={20} style={{ color: '#E879F9', flexShrink: 0 }} />
                 <div className="flex-1">
@@ -471,7 +471,7 @@ export default function Videos() {
             <AnimatePresence>
               {playing && (
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                  className="glass-card overflow-hidden mb-8">
+                  className="overflow-hidden mb-8">
                   <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                     <div>
                       <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#2DD4BF' }}>Now Playing</p>
@@ -503,7 +503,7 @@ export default function Videos() {
                 {filtered.map((video, i) => (
                   <motion.div key={video.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.06 }}
-                    className="glass-card overflow-hidden group cursor-pointer"
+                    className="overflow-hidden group cursor-pointer"
                     onClick={() => setPlaying(video)}
                     style={{ borderColor: playing?.id === video.id ? 'rgba(45,212,191,0.3)' : undefined }}
                     data-testid={`video-${video.id}`}>

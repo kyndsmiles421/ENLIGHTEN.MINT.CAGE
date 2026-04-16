@@ -111,7 +111,7 @@ export default function Classes() {
 
             {/* Video */}
             {lesson.video_url && (
-              <div className="glass-card overflow-hidden mb-8">
+              <div className="overflow-hidden mb-8">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%', background: '#000' }}>
                   <iframe src={lesson.video_url} title={lesson.title}
                     className="absolute inset-0 w-full h-full" style={{ border: 'none' }}
@@ -121,7 +121,7 @@ export default function Classes() {
             )}
 
             {/* Lesson content */}
-            <div className="glass-card p-6 md:p-8 mb-8">
+            <div className="p-6 md:p-8 mb-8">
               <div className="flex items-center justify-between mb-6">
                 <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: classDetail.color }}>
                   <BookOpen size={12} className="inline mr-2" /> Lesson Content
@@ -183,7 +183,7 @@ export default function Classes() {
 
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             {/* Class header */}
-            <div className="glass-card overflow-hidden mb-8">
+            <div className="overflow-hidden mb-8">
               <div className="relative h-48 md:h-56">
                 <img src={classDetail.thumbnail} alt={classDetail.title} className="w-full h-full object-cover" style={{ filter: 'brightness(0.4)' }} />
                 <div className="absolute inset-0 p-8 flex flex-col justify-end" style={{ background: 'linear-gradient(to top, rgba(11,12,21,0.95), transparent)' }}>
@@ -235,7 +235,7 @@ export default function Classes() {
                 const isEnrolled = !!enrollment;
                 return (
                   <div key={lesson.id}
-                    className={`glass-card p-5 flex items-center gap-4 ${isEnrolled ? 'cursor-pointer' : ''}`}
+                    className={`p-5 flex items-center gap-4 ${isEnrolled ? 'cursor-pointer' : ''}`}
                     onClick={() => isEnrolled && setOpenLesson(lesson.id)}
                     style={{ borderColor: isCompleted ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.06)' }}
                     data-testid={`lesson-${lesson.id}`}>
@@ -314,7 +314,7 @@ export default function Classes() {
               {certs.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {certs.map(c => (
-                    <div key={c.id} className="glass-card p-6 text-center" style={{ borderColor: 'rgba(252,211,77,0.2)', background: 'rgba(252,211,77,0.03)' }}>
+                    <div key={c.id} className="p-6 text-center" style={{ borderColor: 'rgba(252,211,77,0.2)', background: 'rgba(252,211,77,0.03)' }}>
                       <div className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
                         style={{ background: 'linear-gradient(135deg, #FCD34D, #FB923C)', boxShadow: '0 0 30px rgba(252,211,77,0.2)' }}>
                         <Award size={28} style={{ color: 'white' }} />
@@ -328,7 +328,7 @@ export default function Classes() {
                   ))}
                 </div>
               ) : (
-                <div className="glass-card p-12 text-center">
+                <div className="p-12 text-center">
                   <Award size={40} style={{ color: 'var(--text-muted)', opacity: 0.3, margin: '0 auto 16px' }} />
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>No certifications yet</p>
                   <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>Complete all lessons in a class to earn your certification.</p>
@@ -347,7 +347,7 @@ export default function Classes() {
                   <motion.div key={cls.id}
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.06 }}
-                    className="glass-card overflow-hidden cursor-pointer group"
+                    className="overflow-hidden cursor-pointer group"
                     onClick={() => openClass(cls.id)}
                     data-testid={`class-${cls.id}`}>
                     <div className="relative h-40 overflow-hidden">
@@ -386,7 +386,7 @@ export default function Classes() {
                 );
               })}
               {view === 'enrolled' && classes.filter(c => getEnrollment(c.id)).length === 0 && (
-                <div className="col-span-full glass-card p-12 text-center">
+                <div className="col-span-full p-12 text-center">
                   <BookOpen size={40} style={{ color: 'var(--text-muted)', opacity: 0.3, margin: '0 auto 16px' }} />
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>No enrolled classes yet</p>
                 </div>

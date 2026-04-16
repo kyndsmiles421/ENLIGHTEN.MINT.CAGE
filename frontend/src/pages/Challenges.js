@@ -82,7 +82,7 @@ function ChallengeCard({ challenge, joined, participation, onJoin, onCheckin, on
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden"
+      className="overflow-hidden"
       data-testid={`challenge-${challenge.id}`}
     >
       {/* Progress bar at top */}
@@ -234,7 +234,7 @@ function LeaderboardModal({ challengeId, challenges, onClose }) {
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
-        className="glass-card p-8 w-full max-w-md max-h-[80vh] overflow-y-auto"
+        className="p-8 w-full max-w-md max-h-[80vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
         data-testid="leaderboard-modal"
       >
@@ -381,28 +381,28 @@ export default function Challenges() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
           >
-            <div className="glass-card p-5 flex items-center gap-4">
+            <div className="p-5 flex items-center gap-4">
               <StreakFlame streak={totalStreakDays} size="sm" />
               <div>
                 <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{totalStreakDays}</p>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Active Streaks</p>
               </div>
             </div>
-            <div className="glass-card p-5 flex items-center gap-4">
+            <div className="p-5 flex items-center gap-4">
               <Target size={20} style={{ color: '#2DD4BF' }} />
               <div>
                 <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{activeChallenges.length}</p>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Active Challenges</p>
               </div>
             </div>
-            <div className="glass-card p-5 flex items-center gap-4">
+            <div className="p-5 flex items-center gap-4">
               <Calendar size={20} style={{ color: '#D8B4FE' }} />
               <div>
                 <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{totalCheckins}</p>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Total Check-ins</p>
               </div>
             </div>
-            <div className="glass-card p-5 flex items-center gap-4">
+            <div className="p-5 flex items-center gap-4">
               <Trophy size={20} style={{ color: '#FCD34D' }} />
               <div>
                 <p className="text-2xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{completedChallenges.length}</p>
@@ -438,7 +438,7 @@ export default function Challenges() {
 
         {/* Challenge Grid */}
         {loading ? (
-          <div className="glass-card p-12 text-center">
+          <div className="p-12 text-center">
             <Loader2 size={24} className="animate-spin mx-auto" style={{ color: 'var(--text-muted)' }} />
           </div>
         ) : (
@@ -455,7 +455,7 @@ export default function Challenges() {
               />
             ))}
             {tab === 'active' && (activeChallenges.length === 0 ? (
-              <div className="glass-card p-12 text-center md:col-span-2">
+              <div className="p-12 text-center md:col-span-2">
                 <Target size={32} className="mx-auto mb-4" style={{ color: 'var(--text-muted)', opacity: 0.3 }} />
                 <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                   No active challenges. Browse the All tab to join one.
@@ -473,7 +473,7 @@ export default function Challenges() {
               />
             )))}
             {tab === 'completed' && (completedChallenges.length === 0 ? (
-              <div className="glass-card p-12 text-center md:col-span-2">
+              <div className="p-12 text-center md:col-span-2">
                 <Trophy size={32} className="mx-auto mb-4" style={{ color: 'var(--text-muted)', opacity: 0.3 }} />
                 <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                   No completed challenges yet. Keep going!

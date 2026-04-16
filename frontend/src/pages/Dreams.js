@@ -49,7 +49,7 @@ function NewDreamForm({ onSaved, symbols }) {
   };
 
   return (
-    <div className="glass-card p-6 mb-8" data-testid="dream-form">
+    <div className="p-6 mb-8" data-testid="dream-form">
       <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#A78BFA' }}>
         <Moon size={12} className="inline mr-1" /> Record a Dream
       </p>
@@ -80,7 +80,7 @@ function NewDreamForm({ onSaved, symbols }) {
       </div>
 
       {interpretation && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-5 mb-4" style={{ borderColor: 'rgba(167,139,250,0.15)' }} data-testid="dream-interpretation">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-5 mb-4" style={{ borderColor: 'rgba(167,139,250,0.15)' }} data-testid="dream-interpretation">
           <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#A78BFA' }}>AI Interpretation</p>
           <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>{interpretation}</p>
           {/* AI Dream Visual */}
@@ -134,7 +134,7 @@ function DreamEntry({ dream, onDelete }) {
   const moodColors = { peaceful: '#22C55E', joyful: '#FCD34D', anxious: '#FB923C', confused: '#06B6D4', mysterious: '#A78BFA', frightening: '#EF4444', neutral: '#6B7280', profound: '#D4AF37' };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden" data-testid={`dream-${dream.id}`}>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="overflow-hidden" data-testid={`dream-${dream.id}`}>
       <button onClick={() => setExpanded(!expanded)} className="w-full p-5 text-left flex items-start gap-3">
         <Moon size={16} className="flex-shrink-0 mt-0.5" style={{ color: '#A78BFA' }} />
         <div className="flex-1 min-w-0">
@@ -162,7 +162,7 @@ function DreamEntry({ dream, onDelete }) {
                 </div>
               )}
               {dream.interpretation && (
-                <div className="glass-card p-4 mb-3" style={{ borderColor: 'rgba(167,139,250,0.1)' }}>
+                <div className="p-4 mb-3" style={{ borderColor: 'rgba(167,139,250,0.1)' }}>
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#A78BFA' }}>Interpretation</p>
                   <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>{dream.interpretation}</p>
                 </div>
@@ -325,7 +325,7 @@ function SymbolLibrary({ symbols }) {
       </div>
       <div className="space-y-2">
         {filtered.map(([key, sym]) => (
-          <div key={key} className="glass-card p-4">
+          <div key={key} className="p-4">
             <p className="text-sm font-medium capitalize mb-1" style={{ color: 'var(--text-primary)' }}>{key.replace('_', ' ')}</p>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{sym.meaning}</p>
           </div>
@@ -380,7 +380,7 @@ export default function Dreams() {
               </p>
             </div>
             {moonPhase && (
-              <div className="glass-card p-3 text-center flex-shrink-0" data-testid="moon-phase-display">
+              <div className="p-3 text-center flex-shrink-0" data-testid="moon-phase-display">
                 <p className="text-[9px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Moon</p>
                 <p className="text-xs font-medium" style={{ color: '#FCD34D' }}>{moonPhase.name}</p>
               </div>

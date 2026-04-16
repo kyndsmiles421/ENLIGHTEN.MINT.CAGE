@@ -234,7 +234,7 @@ export default function Hooponopono() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-16">
           {PHRASES.map((p, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-              className="glass-card p-6 text-center" data-testid={`phrase-card-${i}`}>
+              className="p-6 text-center" data-testid={`phrase-card-${i}`}>
               <div className="w-10 h-10 rounded-full mx-auto mb-4 flex items-center justify-center"
                 style={{ background: `${p.color}12`, border: `1px solid ${p.color}20` }}>
                 <span className="text-sm font-bold" style={{ color: p.color }}>{i + 1}</span>
@@ -249,7 +249,7 @@ export default function Hooponopono() {
 
         {/* About Section */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-          className="glass-card p-8 md:p-10 mb-12 relative overflow-hidden">
+          className="p-8 md:p-10 mb-12 relative overflow-hidden">
           <div className="absolute inset-0 opacity-5"
             style={{ background: 'radial-gradient(circle at 30% 50%, #FDA4AF 0%, transparent 50%), radial-gradient(circle at 70% 50%, #D8B4FE 0%, transparent 50%)' }} />
           <div className="relative z-10">
@@ -287,7 +287,7 @@ export default function Hooponopono() {
 
         {/* Session Setup */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-          className="glass-card p-8 md:p-10">
+          className="p-8 md:p-10">
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--text-muted)' }}>Begin Your Practice</p>
 
           {/* Target Selection */}
@@ -300,7 +300,7 @@ export default function Hooponopono() {
                 const Icon = t.icon;
                 return (
                   <button key={t.id} onClick={() => setTarget(t.id)}
-                    className="glass-card p-4 text-center transition-all"
+                    className="p-4 text-center transition-all"
                     style={{
                       borderColor: target === t.id ? `${t.color}40` : 'rgba(255,255,255,0.08)',
                       background: target === t.id ? `${t.color}06` : 'transparent',

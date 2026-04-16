@@ -128,7 +128,7 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
                 </>
               )}
               {myth.best_viewing && (
-                <div className="glass-card p-3 mt-3">
+                <div className="p-3 mt-3">
                   <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(248,250,252,0.3)' }}>Best Viewing</p>
                   <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{myth.best_viewing}</p>
                 </div>

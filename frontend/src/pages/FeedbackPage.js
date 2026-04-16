@@ -93,7 +93,7 @@ export default function FeedbackPage() {
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div key="thanks" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-              className="glass-card p-8 text-center" data-testid="feedback-thanks">
+              className="p-8 text-center" data-testid="feedback-thanks">
               <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: 'rgba(45,212,191,0.1)' }}>
                 <Check size={28} style={{ color: '#2DD4BF' }} />
               </div>
@@ -110,7 +110,7 @@ export default function FeedbackPage() {
                     const Icon = t.icon;
                     return (
                       <button key={t.id} onClick={() => setType(t.id)}
-                        className="glass-card p-3 flex flex-col items-center gap-1.5 transition-all"
+                        className="p-3 flex flex-col items-center gap-1.5 transition-all"
                         style={{
                           borderColor: type === t.id ? `${t.color}30` : undefined,
                           background: type === t.id ? `${t.color}08` : undefined,
@@ -166,7 +166,7 @@ export default function FeedbackPage() {
       ) : (
         <div className="space-y-3" data-testid="feedback-history">
           {myFeedback.length === 0 ? (
-            <div className="glass-card p-8 text-center">
+            <div className="p-8 text-center">
               <MessageCircle size={24} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
               <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No submissions yet</p>
             </div>
@@ -175,7 +175,7 @@ export default function FeedbackPage() {
             const Icon = typeInfo.icon;
             return (
               <motion.div key={f.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="glass-card p-4" data-testid={`feedback-item-${i}`}>
+                className="p-4" data-testid={`feedback-item-${i}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <Icon size={12} style={{ color: typeInfo.color }} />
                   <span className="text-[10px] font-bold" style={{ color: typeInfo.color }}>{typeInfo.label}</span>

@@ -86,7 +86,7 @@ export default function Exercises() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
-                className="glass-card overflow-hidden"
+                className="overflow-hidden"
                 data-testid={`exercise-${ex.id}`}
               >
                 {/* Header */}

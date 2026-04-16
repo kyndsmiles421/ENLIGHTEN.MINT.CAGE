@@ -77,7 +77,7 @@ export default function Tantra() {
                   data-testid="tantra-back-btn">
                   &larr; Back to practices
                 </button>
-                <div className="glass-card p-8 md:p-10">
+                <div className="p-8 md:p-10">
                   <div className="flex items-start gap-4 mb-6">
                     <div className="w-14 h-14 rounded-full flex items-center justify-center"
                       style={{ background: `${active.color}15`, border: `1px solid ${active.color}25` }}>
@@ -154,7 +154,7 @@ export default function Tantra() {
                 {filtered.map((p, i) => (
                   <motion.button key={p.id} onClick={() => setSelected(p.id)}
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                    className="glass-card glass-card-hover p-6 text-left"
+                    className="p-6 text-left"
                     data-testid={`tantra-${p.id}`}>
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-12 h-12 rounded-full flex items-center justify-center"

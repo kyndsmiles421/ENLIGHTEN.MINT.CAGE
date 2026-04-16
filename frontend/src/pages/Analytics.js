@@ -112,7 +112,7 @@ export default function Analytics() {
             {tab === 'overview' && analytics && (
               <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 {/* Feature Usage */}
-                <div className="glass-card p-6 mb-6" data-testid="analytics-feature-usage">
+                <div className="p-6 mb-6" data-testid="analytics-feature-usage">
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Feature Usage</p>
                   <div className="space-y-3">
                     {analytics.feature_usage.map(f => {
@@ -143,7 +143,7 @@ export default function Analytics() {
                 </div>
 
                 {/* Coherence History */}
-                <div className="glass-card p-6 mb-6" data-testid="analytics-coherence-history">
+                <div className="p-6 mb-6" data-testid="analytics-coherence-history">
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Coherence History</p>
                   {analytics.coherence_history.length > 0 ? (
                     <div className="flex items-end gap-1 h-32">
@@ -178,7 +178,7 @@ export default function Analytics() {
                     { label: 'Divinations', value: analytics.totals.all_divinations, color: '#E879F9' },
                     { label: 'Sage Chats', value: analytics.totals.all_coaching, color: '#38BDF8' },
                   ].map(s => (
-                    <div key={s.label} className="glass-card p-4 text-center">
+                    <div key={s.label} className="p-4 text-center">
                       <p className="text-2xl font-light" style={{ color: s.color, fontFamily: 'Cormorant Garamond, serif' }}>{s.value}</p>
                       <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
                     </div>
@@ -201,7 +201,7 @@ export default function Analytics() {
 
                 {achievements.newly_unlocked.length > 0 && (
                   <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-                    className="glass-card p-4 mb-6 text-center"
+                    className="p-4 mb-6 text-center"
                     style={{ border: '1px solid rgba(252,211,77,0.2)', background: 'rgba(252,211,77,0.03)' }}>
                     <Trophy size={20} className="mx-auto mb-2" style={{ color: '#FCD34D' }} />
                     <p className="text-sm font-medium" style={{ color: '#FCD34D' }}>New Achievement{achievements.newly_unlocked.length > 1 ? 's' : ''} Unlocked!</p>
@@ -218,7 +218,7 @@ export default function Analytics() {
                       <motion.div key={a.id}
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.04 }}
-                        className="glass-card p-4 flex items-center gap-3 transition-all"
+                        className="p-4 flex items-center gap-3 transition-all"
                         style={{
                           opacity: a.earned ? 1 : 0.35,
                           border: a.earned ? `1px solid ${a.color}18` : undefined,
@@ -251,7 +251,7 @@ export default function Analytics() {
             {/* Activity Tab */}
             {tab === 'activity' && analytics && (
               <motion.div key="activity" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <div className="glass-card p-6 mb-6" data-testid="analytics-daily-activity">
+                <div className="p-6 mb-6" data-testid="analytics-daily-activity">
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>
                     Daily Activity — Last 14 Days
                   </p>
@@ -288,7 +288,7 @@ export default function Analytics() {
                 </div>
 
                 {/* Streak Card */}
-                <div className="glass-card p-6">
+                <div className="p-6">
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Streak</p>
                   <div className="grid grid-cols-3 gap-4 text-center">
                     {[

@@ -434,7 +434,7 @@ export default function MusicTheory() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Circle Visualization */}
-            <div className="glass-card p-6 rounded-2xl flex items-center justify-center"
+            <div className="p-6 rounded-2xl flex items-center justify-center"
               style={{ border: '1px solid rgba(251,191,36,0.08)' }}>
               <div className="relative w-64 h-64">
                 {/* Dodecahedron lines */}
@@ -493,7 +493,7 @@ export default function MusicTheory() {
             </div>
 
             {/* Theory Info */}
-            <div className="glass-card p-5 rounded-2xl space-y-3"
+            <div className="p-5 rounded-2xl space-y-3"
               style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
               <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
                 The Dodecahedron of Sound
@@ -530,7 +530,7 @@ export default function MusicTheory() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {PRACTICE_TARGETS.map(t => (
                 <button key={t.hz} onClick={() => { setPracticeTarget(t); setLocked(false); }}
-                  className="glass-card p-4 rounded-xl text-left transition-all"
+                  className="p-4 rounded-xl text-left transition-all"
                   style={{
                     border: practiceTarget.hz === t.hz ? `1px solid ${t.color}40` : '1px solid rgba(248,250,252,0.06)',
                     background: practiceTarget.hz === t.hz ? `${t.color}06` : undefined,
@@ -544,7 +544,7 @@ export default function MusicTheory() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Chladni Pattern */}
-              <div className="glass-card p-4 rounded-2xl" style={{ border: `1px solid ${practiceTarget.color}15` }}>
+              <div className="p-4 rounded-2xl" style={{ border: `1px solid ${practiceTarget.color}15` }}>
                 <p className="text-[8px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
                   Chladni Pattern — {practiceTarget.hz}Hz {locked ? '(LOCKED)' : ''}
                 </p>
@@ -563,7 +563,7 @@ export default function MusicTheory() {
               </div>
 
               {/* Mic Control */}
-              <div className="glass-card p-4 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
+              <div className="p-4 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
                 <p className="text-[8px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
                   Vocal Resonance
                 </p>
@@ -628,7 +628,7 @@ export default function MusicTheory() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             {/* Mastery Tier Banner */}
             {masteryData && (
-              <div className="glass-card px-4 py-3 rounded-xl flex items-center justify-between"
+              <div className="px-4 py-3 rounded-xl flex items-center justify-between"
                 style={{ border: '1px solid rgba(248,250,252,0.06)' }}
                 data-testid="mastery-tier-banner">
                 <div className="flex items-center gap-3">
@@ -665,7 +665,7 @@ export default function MusicTheory() {
                 const isMastered = masteryData?.vowels_mastered?.includes(v.vowel);
                 return (
                   <div key={v.vowel}
-                    className="glass-card p-3 rounded-xl text-center transition-all"
+                    className="p-3 rounded-xl text-center transition-all"
                     style={{
                       border: isDetected ? `2px solid ${v.color}` : isMastered ? `1px solid ${v.color}30` : '1px solid rgba(248,250,252,0.06)',
                       background: isDetected ? `${v.color}10` : undefined,
@@ -687,7 +687,7 @@ export default function MusicTheory() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Vowel Chladni Canvas */}
-              <div className="glass-card p-4 rounded-2xl" style={{ border: vowelBloomed ? '2px solid #FBBF24' : `1px solid ${detectedVowel ? VOWEL_MAP.find(v => v.vowel === detectedVowel)?.color + '15' : 'rgba(248,250,252,0.06)'}` }}>
+              <div className="p-4 rounded-2xl" style={{ border: vowelBloomed ? '2px solid #FBBF24' : `1px solid ${detectedVowel ? VOWEL_MAP.find(v => v.vowel === detectedVowel)?.color + '15' : 'rgba(248,250,252,0.06)'}` }}>
                 <p className="text-[8px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
                   Formant Geometry {detectedVowel ? `— "${VOWEL_MAP.find(v => v.vowel === detectedVowel)?.label}"` : ''} {vowelBloomed ? '(BLOOMED)' : ''}
                 </p>
@@ -712,7 +712,7 @@ export default function MusicTheory() {
               </div>
 
               {/* Phonics Mic Control */}
-              <div className="glass-card p-4 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
+              <div className="p-4 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
                 <p className="text-[8px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
                   Vowel Formant Tracker
                 </p>
@@ -795,7 +795,7 @@ export default function MusicTheory() {
         {/* Voice Tab — Real-time Voice to Geometry */}
         {tab === 'voice' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="glass-card p-6 rounded-2xl text-center space-y-4"
+            className="p-6 rounded-2xl text-center space-y-4"
             style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
             <Music size={24} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto' }} />
             <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>

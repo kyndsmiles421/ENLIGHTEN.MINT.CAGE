@@ -181,7 +181,7 @@ export default function LiveSessions() {
                     ))}
                   </div>
                 ) : (
-                  <div className="glass-card p-8 text-center">
+                  <div className="p-8 text-center">
                     <Radio size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
                     <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No live sessions right now</p>
                     <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Be the first to host a session for the community</p>
@@ -205,7 +205,7 @@ export default function LiveSessions() {
                     return (
                       <motion.div key={t.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.2 + i * 0.03 }}
-                        className="glass-card p-4 text-center">
+                        className="p-4 text-center">
                         <Icon size={20} style={{ color: t.color, margin: '0 auto 8px' }} />
                         <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-primary)' }}>{t.label}</p>
                         <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{t.description}</p>
@@ -237,7 +237,7 @@ export default function LiveSessions() {
                   ))}
                 </div>
               ) : (
-                <div className="glass-card p-8 text-center">
+                <div className="p-8 text-center">
                   <CalendarClock size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
                   <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No recurring sessions yet</p>
                   <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Create a recurring session to build a consistent community practice</p>
@@ -272,7 +272,7 @@ export default function LiveSessions() {
                   ))}
                 </div>
               ) : (
-                <div className="glass-card p-8 text-center">
+                <div className="p-8 text-center">
                   <Archive size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
                   <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No recordings yet</p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>When live sessions end, their guided commands and chat are saved here for replay</p>
@@ -317,7 +317,7 @@ function SessionCard({ session, types, scenes, isLive, navigate, delay }) {
   return (
     <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
       onClick={() => navigate(`/live/${session.id}`)}
-      className="glass-card p-5 text-left group hover:scale-[1.01] transition-all relative overflow-hidden"
+      className="p-5 text-left group hover:scale-[1.01] transition-all relative overflow-hidden"
       style={{ border: isLive ? '1px solid rgba(239,68,68,0.15)' : undefined }}
       data-testid={`session-card-${session.id}`}>
       <div className="absolute inset-0 opacity-30" style={{ background: scene.bg || 'transparent' }} />
@@ -372,7 +372,7 @@ function RecurringCard({ series, types, delay, onToggleSubscribe }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
-      className="glass-card p-5 relative overflow-hidden"
+      className="p-5 relative overflow-hidden"
       data-testid={`recurring-card-${series.id}`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -683,7 +683,7 @@ function PastSessionCard({ recording, types, delay, onReplay, authHeaders }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
-      className="glass-card p-5 relative overflow-hidden"
+      className="p-5 relative overflow-hidden"
       data-testid={`past-card-${recording.id}`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">

@@ -51,7 +51,7 @@ function NewEntryForm({ onSaved, teachers }) {
   const selectedColor = teacherData?.color || '#A78BFA';
 
   return (
-    <div className="glass-card p-6 mb-8" style={{ borderColor: `${selectedColor}15` }} data-testid="wisdom-journal-form">
+    <div className="p-6 mb-8" style={{ borderColor: `${selectedColor}15` }} data-testid="wisdom-journal-form">
       <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: selectedColor }}>
         <PenTool size={12} className="inline mr-2" /> New Reflection
       </p>
@@ -128,7 +128,7 @@ function JournalEntry({ entry, onDelete }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-5" data-testid={`journal-entry-${entry.id}`}>
+      className="p-5" data-testid={`journal-entry-${entry.id}`}>
       <div className="flex items-start justify-between mb-3">
         <div>
           {entry.teacher_name && entry.teacher_name !== 'Personal Reflection' && (

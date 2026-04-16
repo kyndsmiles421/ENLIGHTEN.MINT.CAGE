@@ -13,7 +13,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 function MeditationCard({ med, onSelect }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-4 cursor-pointer transition-all hover:scale-[1.02]"
+      className="p-4 cursor-pointer transition-all hover:scale-[1.02]"
       onClick={() => onSelect(med)}
       data-testid={`meditation-${med.id}`}>
       <div className="flex items-start gap-3">
@@ -42,7 +42,7 @@ function SessionCard({ session, userId, onJoin, onComplete }) {
   const colors = { waiting: '#EAB308', active: '#22C55E', completed: '#818CF8' };
 
   return (
-    <div className="glass-card p-3" data-testid={`session-${session.id}`}>
+    <div className="p-3" data-testid={`session-${session.id}`}>
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full" style={{ background: colors[session.status] }} />
@@ -172,7 +172,7 @@ export default function Entanglement() {
             { label: 'Completed', value: mySessions.stats.completed || 0, color: '#22C55E' },
             { label: 'Open Now', value: openSessions.length, color: '#EAB308' },
           ].map(s => (
-            <div key={s.label} className="glass-card p-2.5 text-center">
+            <div key={s.label} className="p-2.5 text-center">
               <p className="text-lg font-light" style={{ color: s.color, fontFamily: 'Cormorant Garamond, serif' }}>{s.value}</p>
               <p className="text-[8px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
@@ -204,7 +204,7 @@ export default function Entanglement() {
           <div className="space-y-3">
             <p className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'var(--text-muted)' }}>Choose a paired meditation</p>
             {meditations.map(med => (
-              <div key={med.id} className="glass-card p-4">
+              <div key={med.id} className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ background: `${med.color}12`, border: `1px solid ${med.color}25` }}>

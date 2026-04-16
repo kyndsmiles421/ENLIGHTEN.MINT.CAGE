@@ -181,7 +181,7 @@ export default function GrowthTimeline() {
             { label: 'Milestones', value: `${data.milestones_earned}/${data.milestones_total}`, color: '#2DD4BF', icon: Trophy },
           ].map((s, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="glass-card p-3 text-center">
+              className="p-3 text-center">
               <s.icon size={14} style={{ color: s.color, margin: '0 auto 4px' }} />
               <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: s.color }}>{s.value}</p>
               <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
@@ -190,7 +190,7 @@ export default function GrowthTimeline() {
         </div>
 
         {/* Weekly Activity Heatmap */}
-        <div className="glass-card p-5 mb-6" data-testid="heatmap-section">
+        <div className="p-5 mb-6" data-testid="heatmap-section">
           <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <Calendar size={14} style={{ color: '#D8B4FE' }} /> 12-Week Activity
           </h2>
@@ -199,7 +199,7 @@ export default function GrowthTimeline() {
 
         {/* Category Breakdown */}
         {category_breakdown.length > 0 && (
-          <div className="glass-card p-5 mb-6" data-testid="categories-section">
+          <div className="p-5 mb-6" data-testid="categories-section">
             <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
               <Star size={14} style={{ color: '#FB923C' }} /> Where You Spend Time
             </h2>
@@ -248,7 +248,7 @@ export default function GrowthTimeline() {
         )}
 
         {/* Detailed Counts */}
-        <div className="glass-card p-5 mb-8" data-testid="detailed-stats">
+        <div className="p-5 mb-8" data-testid="detailed-stats">
           <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <BookOpen size={14} style={{ color: '#86EFAC' }} /> Full Journey Stats
           </h2>
@@ -276,7 +276,7 @@ export default function GrowthTimeline() {
         <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
           onClick={() => navigate('/soul-reports')}
           data-testid="soul-reports-cta"
-          className="w-full glass-card p-5 mb-8 text-left transition-all hover:scale-[1.005] group"
+          className="w-full p-5 mb-8 text-left transition-all hover:scale-[1.005] group"
           style={{ borderColor: 'rgba(216,180,254,0.1)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

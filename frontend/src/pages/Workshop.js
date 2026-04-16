@@ -205,7 +205,7 @@ export default function Workshop() {
             <div className="grid grid-cols-5 gap-2">
               {solids.map(s => (
                 <button key={s.id} onClick={() => setSelectedSolid(s)}
-                  className="glass-card p-3 rounded-xl text-center transition-all"
+                  className="p-3 rounded-xl text-center transition-all"
                   style={{
                     border: selectedSolid?.id === s.id ? `2px solid ${s.color}` : '1px solid rgba(248,250,252,0.06)',
                     background: selectedSolid?.id === s.id ? `${s.color}08` : undefined,
@@ -220,7 +220,7 @@ export default function Workshop() {
 
             {selectedSolid && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="glass-card p-5 rounded-2xl" style={{ border: `1px solid ${selectedSolid.color}15` }}>
+                <div className="p-5 rounded-2xl" style={{ border: `1px solid ${selectedSolid.color}15` }}>
                   <div className="flex items-center gap-3 mb-3">
                     <SolidIcon id={selectedSolid.id} color={selectedSolid.color} size={48} />
                     <div>
@@ -247,7 +247,7 @@ export default function Workshop() {
                   </p>
                 </div>
 
-                <div className="glass-card p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
+                <div className="p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
                   <h4 className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
                     Structural Analysis
                   </h4>
@@ -270,7 +270,7 @@ export default function Workshop() {
         {tab === 'golden' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="glass-card p-5 rounded-2xl space-y-4" style={{ border: '1px solid rgba(251,191,36,0.1)' }}>
+              <div className="p-5 rounded-2xl space-y-4" style={{ border: '1px solid rgba(251,191,36,0.1)' }}>
                 <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
                   Golden Ratio Calculator
                 </h3>
@@ -321,7 +321,7 @@ export default function Workshop() {
                 )}
               </div>
 
-              <div className="glass-card p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
+              <div className="p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(248,250,252,0.06)' }}>
                 <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
                   The Divine Proportion
                 </h4>
@@ -359,7 +359,7 @@ export default function Workshop() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Harmonic Oscillation */}
-              <div className="glass-card p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(59,130,246,0.1)' }}>
+              <div className="p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(59,130,246,0.1)' }}>
                 <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
                   Harmonic Oscillation
                 </h3>
@@ -405,7 +405,7 @@ export default function Workshop() {
               </div>
 
               {/* Inverse Square Law */}
-              <div className="glass-card p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(239,68,68,0.1)' }}>
+              <div className="p-5 rounded-2xl space-y-3" style={{ border: '1px solid rgba(239,68,68,0.1)' }}>
                 <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
                   Inverse Square Law
                 </h3>
@@ -459,7 +459,7 @@ export default function Workshop() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {materials.map(m => (
                 <button key={m.id} onClick={() => setSelectedMaterial(m)}
-                  className="glass-card p-3 rounded-xl text-left transition-all"
+                  className="p-3 rounded-xl text-left transition-all"
                   style={{
                     border: selectedMaterial?.id === m.id ? `2px solid ${m.color}` : '1px solid rgba(248,250,252,0.06)',
                     background: selectedMaterial?.id === m.id ? `${m.color}08` : undefined,
@@ -472,7 +472,7 @@ export default function Workshop() {
             </div>
 
             {selectedMaterial && (
-              <div className="glass-card p-5 rounded-2xl" style={{ border: `1px solid ${selectedMaterial.color}15` }}>
+              <div className="p-5 rounded-2xl" style={{ border: `1px solid ${selectedMaterial.color}15` }}>
                 <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
                   {selectedMaterial.name} — Resonance Profile
                 </h3>

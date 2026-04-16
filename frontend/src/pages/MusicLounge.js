@@ -321,7 +321,7 @@ export default function MusicLounge() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
               onClick={() => isPlaying ? togglePause() : playTrack(track)}
-              className="glass-card glass-card-hover flex items-center gap-4 p-4 cursor-pointer group"
+              className="flex items-center gap-4 p-4 cursor-pointer group"
               style={{ borderColor: isPlaying ? `${track.color}30` : undefined }}
               data-testid={`track-${track.id}`}>
               {/* Play indicator */}
@@ -367,7 +367,7 @@ export default function MusicLounge() {
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            className="fixed bottom-4 left-4 right-4 z-40 max-w-3xl mx-auto glass-card p-4 flex items-center gap-4"
+            className="fixed bottom-4 left-4 right-4 z-40 max-w-3xl mx-auto p-4 flex items-center gap-4"
             style={{ borderColor: `${currentTrack.color}20`, boxShadow: `0 8px 32px rgba(0,0,0,0.3), 0 0 20px ${currentTrack.color}08` }}
             data-testid="now-playing-bar">
             {/* Album art placeholder */}

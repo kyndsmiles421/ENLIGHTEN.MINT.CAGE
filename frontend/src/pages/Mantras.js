@@ -271,7 +271,7 @@ function BuildYourOwn({ onStartPractice }) {
   };
 
   if (!user) return (
-    <div className="glass-card p-12 text-center">
+    <div className="p-12 text-center">
       <Wand2 size={32} style={{ color: 'rgba(252,211,77,0.3)', margin: '0 auto 12px' }} />
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to create custom mantra practices.</p>
     </div>
@@ -285,7 +285,7 @@ function BuildYourOwn({ onStartPractice }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {saved.map((s, i) => (
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="glass-card p-5 group" data-testid={`saved-mantra-${s.id}`}>
+                className="p-5 group" data-testid={`saved-mantra-${s.id}`}>
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{s.name}</h4>
                   <button onClick={() => deleteMantra(s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1">
@@ -306,7 +306,7 @@ function BuildYourOwn({ onStartPractice }) {
         </div>
       )}
 
-      <div className="glass-card p-8 relative overflow-hidden">
+      <div className="p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full" style={{
           background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`, filter: 'blur(30px)',
         }} />
@@ -469,7 +469,7 @@ export default function Mantras() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
               {filtered.map((m, i) => (
                 <motion.div key={m.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                  className="glass-card glass-card-hover p-6 cursor-pointer group"
+                  className="p-6 cursor-pointer group"
                   onClick={() => setSelected(selected?.id === m.id ? null : m)}
                   data-testid={`mantra-card-${m.id}`}>
                   <div className="flex items-start gap-4">
@@ -498,7 +498,7 @@ export default function Mantras() {
             <AnimatePresence>
               {selected && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                  className="glass-card p-8 md:p-10 mb-12">
+                  className="p-8 md:p-10 mb-12">
                   <div className="flex items-start justify-between mb-6">
                     <div>
                       <h2 className="text-2xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{selected.name}</h2>

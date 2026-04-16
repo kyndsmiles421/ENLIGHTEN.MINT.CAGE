@@ -491,7 +491,7 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
   return (
     <div className="space-y-5">
       {/* Instrument Selector */}
-      <div className="glass-card p-5" data-testid="instrument-selector">
+      <div className="p-5" data-testid="instrument-selector">
         <div className="flex items-center justify-between mb-3">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
             Select Instrument
@@ -565,7 +565,7 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
 
       {/* Scale & Octave Controls */}
       <div className="flex flex-wrap gap-3">
-        <div className="glass-card p-4 flex-1 min-w-[200px]">
+        <div className="p-4 flex-1 min-w-[200px]">
           <p className="text-[9px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Scale</p>
           <div className="flex flex-wrap gap-1.5">
             {Object.entries(SCALES).map(([key, s]) => (
@@ -582,7 +582,7 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
             ))}
           </div>
         </div>
-        <div className="glass-card p-4">
+        <div className="p-4">
           <p className="text-[9px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Octave</p>
           <div className="flex items-center gap-2">
             {[2, 3, 4, 5].map(o => (
@@ -598,7 +598,7 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
             ))}
           </div>
         </div>
-        <div className="glass-card p-4">
+        <div className="p-4">
           <p className="text-[9px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Volume</p>
           <input type="range" min="0" max="1" step="0.05" value={volume} onChange={e => onVolumeChange(parseFloat(e.target.value))}
             className="w-24" style={{ accentColor: selected.color }} data-testid="volume-slider" />
@@ -606,7 +606,7 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
       </div>
 
       {/* Play Pads */}
-      <div className="glass-card p-5" data-testid="play-pads">
+      <div className="p-5" data-testid="play-pads">
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-xs font-medium" style={{ color: selected.color }}>{selected.name}</p>
@@ -641,7 +641,7 @@ function InstrumentPanel({ instruments, selected, onSelect, scale, onScaleChange
       </div>
 
       {/* Recording Controls */}
-      <div className="glass-card p-4 flex items-center justify-between flex-wrap gap-2" data-testid="recording-controls">
+      <div className="p-4 flex items-center justify-between flex-wrap gap-2" data-testid="recording-controls">
         <div className="flex items-center gap-2">
           {!isRecording ? (
             <button onClick={onStartRecording}
@@ -718,7 +718,7 @@ function DanceExplorer({ dances, selected, onSelect }) {
             )}
           </div>
           {filteredDances.length === 0 ? (
-            <div className="glass-card p-8 text-center">
+            <div className="p-8 text-center">
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No dances match "{danceSearch}"</p>
             </div>
           ) : (
@@ -729,7 +729,7 @@ function DanceExplorer({ dances, selected, onSelect }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
               onClick={() => onSelect(dance)}
-              className="glass-card p-5 text-left group transition-all hover:scale-[1.01]"
+              className="p-5 text-left group transition-all hover:scale-[1.01]"
               style={{
                 borderColor: `${dance.color}15`,
               }}
@@ -770,7 +770,7 @@ function DanceDetail({ dance, onBack }) {
         <ArrowLeft size={12} /> Back to all dances
       </button>
 
-      <div className="glass-card p-6">
+      <div className="p-6">
         <div className="mb-4" style={{ borderBottom: `2px solid ${dance.color}20`, paddingBottom: 16 }}>
           <h2 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: dance.color }}>{dance.name}</h2>
           <div className="flex items-center gap-3 flex-wrap">
@@ -819,7 +819,7 @@ function DanceDetail({ dance, onBack }) {
 function RecordingsPanel({ recordings, instruments, onPlay, onDelete }) {
   if (recordings.length === 0) {
     return (
-      <div className="glass-card p-12 text-center" data-testid="recordings-empty">
+      <div className="p-12 text-center" data-testid="recordings-empty">
         <Music size={32} style={{ color: 'rgba(248,250,252,0.1)', margin: '0 auto 12px' }} />
         <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>No recordings yet</p>
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Play some instruments and hit Record to save your cosmic tunes</p>
@@ -836,7 +836,7 @@ function RecordingsPanel({ recordings, instruments, onPlay, onDelete }) {
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
-            className="glass-card px-4 py-3 flex items-center justify-between"
+            className="px-4 py-3 flex items-center justify-between"
             data-testid={`recording-${rec.id}`}>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center"

@@ -290,7 +290,7 @@ function LiveFeedTab({ events, onRefresh }) {
       </div>
       <p className="text-[9px] mb-4" style={{ color: 'var(--text-muted)' }}>Auto-refreshes every 5 seconds</p>
       {events.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="p-8 text-center">
           <Radio size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
           <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No recent activity</p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>User actions will appear here in real-time</p>
@@ -305,7 +305,7 @@ function LiveFeedTab({ events, onRefresh }) {
                 initial={i < 5 ? { opacity: 0, x: -10 } : false}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i < 5 ? i * 0.03 : 0 }}
-                className="glass-card px-4 py-2.5 flex items-center gap-3"
+                className="px-4 py-2.5 flex items-center gap-3"
                 data-testid={`feed-event-${i}`}>
                 <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ background: `${ai.color}12` }}>
@@ -352,7 +352,7 @@ function OverviewTab({ overview, activeTrend, growthData, features, onExport }) 
           return (
             <motion.button key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
               onClick={s.action} disabled={!s.action}
-              className="glass-card p-4 text-left transition-all hover:scale-[1.02] group"
+              className="p-4 text-left transition-all hover:scale-[1.02] group"
               style={{ cursor: s.action ? 'pointer' : 'default' }}
               data-testid={`creator-stat-${s.label.toLowerCase().replace(/\s/g, '-')}`}>
               <div className="flex items-center justify-between mb-2">
@@ -373,7 +373,7 @@ function OverviewTab({ overview, activeTrend, growthData, features, onExport }) 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
         {/* Active Users Trend */}
         {activeTrend.length > 0 && (
-          <div className="glass-card p-5" data-testid="creator-active-trend">
+          <div className="p-5" data-testid="creator-active-trend">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
               <Activity size={10} className="inline mr-1" /> Daily Active Users — 14 Days
             </p>
@@ -394,7 +394,7 @@ function OverviewTab({ overview, activeTrend, growthData, features, onExport }) 
 
         {/* User Growth Chart */}
         {growthData.length > 0 && (
-          <div className="glass-card p-5" data-testid="creator-user-growth">
+          <div className="p-5" data-testid="creator-user-growth">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
               <UserPlus size={10} className="inline mr-1" /> New Users — 30 Days
             </p>
@@ -416,7 +416,7 @@ function OverviewTab({ overview, activeTrend, growthData, features, onExport }) 
 
       {/* Top Features */}
       {features.length > 0 && (
-        <div className="glass-card p-5" data-testid="creator-top-features">
+        <div className="p-5" data-testid="creator-top-features">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Top Features by Usage</p>
           <div className="space-y-2">
             {features.slice(0, 8).map((f, i) => (
@@ -475,7 +475,7 @@ function FeedbackTab({ feedback, onStatusChange, onExport }) {
             const s = STATUS[f.status] || STATUS.new;
             const SIcon = s.icon;
             return (
-              <div key={f.id} className="glass-card p-4" data-testid={`feedback-item-${f.id}`}>
+              <div key={f.id} className="p-4" data-testid={`feedback-item-${f.id}`}>
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}><SIcon size={14} style={{ color: s.color }} /></div>
                   <div className="flex-1 min-w-0">
@@ -514,7 +514,7 @@ function CommentsTab({ comments, onDelete }) {
       ) : (
         <div className="space-y-2">
           {comments.map(c => (
-            <div key={c.id} className="glass-card p-3 flex items-start gap-3" data-testid={`comment-item-${c.id}`}>
+            <div key={c.id} className="p-3 flex items-start gap-3" data-testid={`comment-item-${c.id}`}>
               <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0" style={{ background: 'rgba(192,132,252,0.12)', color: '#D8B4FE' }}>{c.user_name?.charAt(0)?.toUpperCase() || '?'}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
@@ -546,7 +546,7 @@ function UsersTab({ users, overview, userSearch, searchResults, onSearch, onView
           { icon: Download, val: overview?.total_installs, label: 'Installs', color: '#2DD4BF' },
           { icon: UserPlus, val: overview?.new_users_week, label: 'New/Week', color: '#22C55E' },
         ].map(s => (
-          <div key={s.label} className="glass-card px-4 py-3 flex items-center gap-3">
+          <div key={s.label} className="px-4 py-3 flex items-center gap-3">
             <s.icon size={16} style={{ color: s.color }} />
             <div>
               <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{s.val || 0}</p>
@@ -581,7 +581,7 @@ function UsersTab({ users, overview, userSearch, searchResults, onSearch, onView
       ) : (
         <div className="space-y-2">
           {displayUsers.slice(0, 30).map(u => (
-            <button key={u.id} onClick={() => onViewUser(u.id)} className="w-full glass-card p-3 flex items-center gap-3 text-left hover:scale-[1.005] transition-all" data-testid={`user-item-${u.id}`}>
+            <button key={u.id} onClick={() => onViewUser(u.id)} className="w-full p-3 flex items-center gap-3 text-left hover:scale-[1.005] transition-all" data-testid={`user-item-${u.id}`}>
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: u.disabled ? 'rgba(239,68,68,0.12)' : 'rgba(192,132,252,0.12)', color: u.disabled ? '#EF4444' : '#D8B4FE' }}>
                 {u.name?.charAt(0)?.toUpperCase() || '?'}
               </div>
@@ -614,7 +614,7 @@ function FeaturesTab({ features }) {
       ) : (
         <div className="space-y-2">
           {features.map((f, i) => (
-            <div key={f.page} className="glass-card p-3 flex items-center gap-3" data-testid={`feature-${i}`}>
+            <div key={f.page} className="p-3 flex items-center gap-3" data-testid={`feature-${i}`}>
               <span className="text-sm font-medium w-6 text-center tabular-nums" style={{ color: i < 3 ? '#EAB308' : 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{i + 1}</span>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
@@ -646,7 +646,7 @@ function BroadcastsTab({ broadcasts, onNew }) {
           data-testid="new-broadcast-btn"><Megaphone size={10} /> New Broadcast</button>
       </div>
       {broadcasts.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="p-8 text-center">
           <Megaphone size={28} style={{ color: 'rgba(248,250,252,0.15)', margin: '0 auto 12px' }} />
           <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>No broadcasts sent yet</p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Send announcements to your community</p>
@@ -655,7 +655,7 @@ function BroadcastsTab({ broadcasts, onNew }) {
         <div className="space-y-3">
           {broadcasts.map((b, i) => (
             <motion.div key={b.id || i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-              className="glass-card p-4" data-testid={`broadcast-${b.id}`}>
+              className="p-4" data-testid={`broadcast-${b.id}`}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>{b.title}</p>
@@ -776,7 +776,7 @@ function UserDetailModal({ user: u, onClose, onToggleStatus }) {
             { label: 'AI Sessions', val: u.session_count || 0, color: '#C084FC' },
             { label: 'Activity (7d)', val: u.activity_this_week || 0, color: '#22C55E' },
           ].map(s => (
-            <div key={s.label} className="glass-card p-3 text-center">
+            <div key={s.label} className="p-3 text-center">
               <p className="text-lg font-light tabular-nums" style={{ fontFamily: 'Cormorant Garamond, serif', color: s.color }}>{s.val}</p>
               <p className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>

@@ -135,7 +135,7 @@ export default function ProfilePage() {
     const VisIcon = profile.visibility === 'private' ? Lock : Users;
     return (
       <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }} data-testid="restricted-profile">
-        <div className="glass-card p-12 text-center max-w-md">
+        <div className="p-12 text-center max-w-md">
           <AvatarDisplay style={profile.avatar_style} size={80} name={profile.display_name || '?'} />
           <h2 className="text-2xl font-light mt-6 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             {profile.display_name}
@@ -255,7 +255,7 @@ export default function ProfilePage() {
         <AnimatePresence>
           {editing && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden mb-8">
-              <div className="glass-card p-6 space-y-6">
+              <div className="p-6 space-y-6">
                 {/* Cover Selection */}
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Cover Photo</p>
@@ -319,7 +319,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {MUSIC_OPTIONS.map(m => (
                       <button key={m.id} onClick={() => { update('music_choice', m.id); update('music_frequency', m.freq); }}
-                        className="glass-card p-3 text-sm text-center"
+                        className="p-3 text-sm text-center"
                         style={{ borderColor: draft.music_choice === m.id ? `${themeColor}40` : 'rgba(255,255,255,0.08)', color: draft.music_choice === m.id ? themeColor : 'var(--text-muted)', transition: 'border-color 0.3s, color 0.3s' }}
                         data-testid={`music-${m.id}`}>
                         {m.name}
@@ -340,7 +340,7 @@ export default function ProfilePage() {
                       const sel = (draft.visibility || 'public') === v.id;
                       return (
                         <button key={v.id} onClick={() => update('visibility', v.id)}
-                          className="glass-card p-4 text-left transition-all"
+                          className="p-4 text-left transition-all"
                           style={{ borderColor: sel ? `${v.color}40` : 'rgba(255,255,255,0.06)' }}
                           data-testid={`visibility-${v.id}`}>
                           <div className="flex items-center gap-2 mb-1.5">
@@ -366,7 +366,7 @@ export default function ProfilePage() {
                       const sel = (draft.message_privacy || 'everyone') === v.id;
                       return (
                         <button key={v.id} onClick={() => update('message_privacy', v.id)}
-                          className="glass-card p-4 text-left transition-all"
+                          className="p-4 text-left transition-all"
                           style={{ borderColor: sel ? `${v.color}40` : 'rgba(255,255,255,0.06)' }}
                           data-testid={`msg-privacy-${v.id}`}>
                           <div className="flex items-center gap-2 mb-1.5">
@@ -389,13 +389,13 @@ export default function ProfilePage() {
           {/* Left - Bio & Quote */}
           <div className="md:col-span-2 space-y-6">
             {p.bio && (
-              <div className="glass-card p-6">
+              <div className="p-6">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: themeColor }}>About</p>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{p.bio}</p>
               </div>
             )}
             {p.favorite_quote && (
-              <div className="glass-card p-6" style={{ borderColor: `${themeColor}15` }}>
+              <div className="p-6" style={{ borderColor: `${themeColor}15` }}>
                 <Quote size={20} style={{ color: themeColor, opacity: 0.4 }} className="mb-3" />
                 <p className="text-xl font-light italic" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                   "{p.favorite_quote}"
@@ -403,7 +403,7 @@ export default function ProfilePage() {
               </div>
             )}
             {!p.bio && !p.favorite_quote && !editing && (
-              <div className="glass-card p-8 text-center">
+              <div className="p-8 text-center">
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   {isOwnProfile ? 'Click "Edit Profile" to add your bio, favorite quote, cover photo, and personal music.' : 'This user hasn\'t customized their profile yet.'}
                 </p>
@@ -413,7 +413,7 @@ export default function ProfilePage() {
 
           {/* Right - Stats */}
           <div className="space-y-6">
-            <div className="glass-card p-6">
+            <div className="p-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Customization</p>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">

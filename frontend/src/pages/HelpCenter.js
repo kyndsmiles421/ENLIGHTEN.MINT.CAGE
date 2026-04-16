@@ -115,7 +115,7 @@ export default function HelpCenter() {
           <div className="space-y-2" data-testid="faq-list">
             {filtered.map((faq, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
-                className="glass-card overflow-hidden">
+                className="overflow-hidden">
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-4 text-left"
                   data-testid={`faq-${i}`}>
@@ -146,7 +146,7 @@ export default function HelpCenter() {
             return (
               <motion.button key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
                 onClick={() => navigate(t.path)}
-                className="glass-card p-4 w-full flex items-center gap-4 text-left group hover:scale-[1.01] transition-all"
+                className="p-4 w-full flex items-center gap-4 text-left group hover:scale-[1.01] transition-all"
                 data-testid={`tutorial-${i}`}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{ background: `${t.color}10`, border: `1px solid ${t.color}20` }}>
@@ -165,7 +165,7 @@ export default function HelpCenter() {
 
       {tab === 'contact' && (
         <div className="space-y-4" data-testid="contact-section">
-          <div className="glass-card p-6 text-center">
+          <div className="p-6 text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
               style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)' }}>
               <MessageCircle size={24} style={{ color: '#C084FC' }} />

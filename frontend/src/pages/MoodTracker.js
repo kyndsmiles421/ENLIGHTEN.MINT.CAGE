@@ -214,7 +214,7 @@ export default function MoodTracker() {
                   <motion.button key={mood.id}
                     whileTap={{ scale: 0.92 }}
                     onClick={() => toggleMood(mood)}
-                    className="glass-card p-3 flex flex-col items-center gap-1.5 transition-all hover:scale-[1.03] relative overflow-hidden"
+                    className="p-3 flex flex-col items-center gap-1.5 transition-all hover:scale-[1.03] relative overflow-hidden"
                     style={{
                       border: `1px solid ${isSelected ? `${mood.color}50` : 'rgba(255,255,255,0.06)'}`,
                       background: isSelected ? `${mood.color}10` : undefined,
@@ -244,7 +244,7 @@ export default function MoodTracker() {
             <AnimatePresence>
               {selectedMoods.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                  className="mt-6 space-y-4 glass-card p-5 rounded-2xl relative overflow-hidden"
+                  className="mt-6 space-y-4 p-5 rounded-2xl relative overflow-hidden"
                   style={{ border: `1px solid ${selectedMoods[0].color}20` }}>
 
                   {/* Moiré Shimmer for multi-select */}
@@ -393,7 +393,7 @@ export default function MoodTracker() {
             {/* Frequency Recipe (Culinary Mode) */}
             {recipe?.has_recipe && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="mb-6 glass-card p-4 rounded-2xl space-y-3"
+                className="mb-6 p-4 rounded-2xl space-y-3"
                 style={{ border: '1px solid rgba(251,191,36,0.1)' }}
                 data-testid="frequency-recipe">
                 <div className="flex items-center justify-between">
@@ -432,15 +432,15 @@ export default function MoodTracker() {
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6 space-y-3" data-testid="mood-insights">
                 {/* Stats Row */}
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="glass-card p-3 text-center">
+                  <div className="p-3 text-center">
                     <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FCD34D' }}>{insights.logging_streak}</p>
                     <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
                   </div>
-                  <div className="glass-card p-3 text-center">
+                  <div className="p-3 text-center">
                     <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#FDA4AF' }}>{insights.total_entries}</p>
                     <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Logged</p>
                   </div>
-                  <div className="glass-card p-3 text-center">
+                  <div className="p-3 text-center">
                     <p className="text-xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#2DD4BF' }}>{insights.avg_intensity}</p>
                     <p className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg Feel</p>
                   </div>
@@ -448,7 +448,7 @@ export default function MoodTracker() {
 
                 {/* Top Moods */}
                 {insights.top_moods?.length > 0 && (
-                  <div className="glass-card p-4">
+                  <div className="p-4">
                     <p className="text-[9px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>Most Frequent Emotions</p>
                     <div className="space-y-1.5">
                       {insights.top_moods.slice(0, 5).map((tm, i) => {
@@ -474,7 +474,7 @@ export default function MoodTracker() {
 
                 {/* Weekly Activity */}
                 {insights.weekly?.some(d => d.count > 0) && (
-                  <div className="glass-card p-4">
+                  <div className="p-4">
                     <p className="text-[9px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>This Week</p>
                     <div className="flex items-end gap-1.5 h-16">
                       {insights.weekly.map((d, i) => (
@@ -495,7 +495,7 @@ export default function MoodTracker() {
 
                 {/* AI Insight */}
                 {insights.ai_insight && (
-                  <div className="glass-card p-4" style={{ border: '1px solid rgba(192,132,252,0.1)' }} data-testid="mood-ai-insight">
+                  <div className="p-4" style={{ border: '1px solid rgba(192,132,252,0.1)' }} data-testid="mood-ai-insight">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles size={12} style={{ color: '#C084FC' }} />
                       <p className="text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: '#C084FC' }}>AI Insight</p>
@@ -507,7 +507,7 @@ export default function MoodTracker() {
             )}
 
             {insightsLoading && !insights && (
-              <div className="glass-card p-6 mb-6 text-center">
+              <div className="p-6 mb-6 text-center">
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Analyzing your emotional patterns...</p>
               </div>
             )}
@@ -515,7 +515,7 @@ export default function MoodTracker() {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Your Journey</p>
 
             {chartData.length > 0 ? (
-              <div className="glass-card p-5 mb-6">
+              <div className="p-5 mb-6">
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={chartData}>
                     <XAxis dataKey="name" tick={{ fill: 'rgba(248,250,252,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -528,7 +528,7 @@ export default function MoodTracker() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="glass-card p-8 text-center mb-6">
+              <div className="p-8 text-center mb-6">
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   {user ? 'No moods logged yet. Start tracking to see your journey.' : 'Sign in to track your emotional journey.'}
                 </p>
@@ -541,7 +541,7 @@ export default function MoodTracker() {
                 const MIcon = moodObj?.icon || Meh;
                 return (
                   <motion.div key={m.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                    className="glass-card p-3 flex items-center gap-3">
+                    className="p-3 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                       style={{ background: `${moodObj?.color || '#94A3B8'}12` }}>
                       <MIcon size={14} style={{ color: moodObj?.color || '#94A3B8' }} />

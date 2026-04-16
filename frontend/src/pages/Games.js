@@ -115,7 +115,7 @@ function MemoryMatch({ onScore }) {
       </div>
       {complete && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-6 text-center mt-6">
+          className="p-6 text-center mt-6">
           <Sparkles size={24} style={{ color: '#FCD34D', margin: '0 auto 8px' }} />
           <p className="text-lg font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Matched!</p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{moves} moves in {time}s</p>
@@ -254,7 +254,7 @@ function BreathingBubble({ onScore }) {
         </button>
       )}
       {complete && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6 mt-4">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 mt-4">
           <Sparkles size={24} style={{ color: '#FCD34D', margin: '0 auto 8px' }} />
           <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Deep Calm Achieved</p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Score: {score} / 500</p>
@@ -368,7 +368,7 @@ function ColorHarmony({ onScore }) {
       )}
 
       {complete && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6 text-center mt-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 text-center mt-6">
           <Sparkles size={24} style={{ color: '#FCD34D', margin: '0 auto 8px' }} />
           <p className="text-lg font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Color Master</p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Score: {score + (userOrder.every((c, i) => c === palette?.colors[i]) ? 100 : 0)} / 500</p>
@@ -486,7 +486,7 @@ function MindfulPattern({ onScore }) {
       </div>
 
       {gameOver && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6 text-center mt-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 text-center mt-6">
           <p className="text-lg font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Mindful Focus</p>
           <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>Reached level {level} — Score: {(level - 1) * 100 + score}</p>
           <button onClick={() => { setLevel(1); setScore(0); setGameOver(false); }}
@@ -632,7 +632,7 @@ export default function Games() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
             onClick={() => navigate('/starseed-adventure')}
-            className="glass-card p-6 text-left group hover:scale-[1.02] transition-all md:col-span-2 relative overflow-hidden"
+            className="p-6 text-left group hover:scale-[1.02] transition-all md:col-span-2 relative overflow-hidden"
             style={{ borderColor: 'rgba(129,140,248,0.15)' }}
             data-testid="game-card-starseed">
             <div className="absolute inset-0 opacity-[0.04]"
@@ -681,7 +681,7 @@ export default function Games() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.08 }}
                 onClick={() => setActiveGame(game)}
-                className="glass-card p-6 text-left group hover:scale-[1.02] transition-all"
+                className="p-6 text-left group hover:scale-[1.02] transition-all"
                 data-testid={`game-card-${game.id}`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-11 h-11 rounded-2xl flex items-center justify-center"

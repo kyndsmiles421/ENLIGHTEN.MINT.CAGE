@@ -46,7 +46,7 @@ function ResultView({ result, onBack }) {
       </div>
 
       {/* Life Path Detail */}
-      <div className="glass-card p-6 mb-6" style={{ borderColor: `${lp.color}15` }}>
+      <div className="p-6 mb-6" style={{ borderColor: `${lp.color}15` }}>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-light"
             style={{ background: `${lp.color}12`, color: lp.color, fontFamily: 'Cormorant Garamond, serif' }}>
@@ -63,7 +63,7 @@ function ResultView({ result, onBack }) {
         <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>{lp.meaning}</p>
 
         <div className="grid grid-cols-2 gap-4 mb-5">
-          <div className="glass-card p-4">
+          <div className="p-4">
             <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: '#22C55E' }}>Strengths</p>
             <div className="flex flex-wrap gap-1.5">
               {lp.strengths.map((s, i) => (
@@ -71,7 +71,7 @@ function ResultView({ result, onBack }) {
               ))}
             </div>
           </div>
-          <div className="glass-card p-4">
+          <div className="p-4">
             <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: '#FB923C' }}>Challenges</p>
             <div className="flex flex-wrap gap-1.5">
               {lp.challenges.map((c, i) => (
@@ -81,7 +81,7 @@ function ResultView({ result, onBack }) {
           </div>
         </div>
 
-        <div className="glass-card p-4" style={{ borderColor: `${lp.color}10` }}>
+        <div className="p-4" style={{ borderColor: `${lp.color}10` }}>
           <p className="text-[10px] uppercase tracking-widest mb-1.5" style={{ color: lp.color }}>Spiritual Lesson</p>
           <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)' }}>{lp.spiritual_lesson}</p>
         </div>
@@ -95,7 +95,7 @@ function ResultView({ result, onBack }) {
           { label: 'Personality Number', num: result.personality.number, text: result.personality.meaning, color: '#FB923C' },
           { label: 'Birthday Number', num: result.birthday.number, text: result.birthday.meaning, color: '#22C55E' },
         ].map(item => (
-          <div key={item.label} className="glass-card p-5 flex items-start gap-4">
+          <div key={item.label} className="p-5 flex items-start gap-4">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-light flex-shrink-0"
               style={{ background: `${item.color}12`, color: item.color, fontFamily: 'Cormorant Garamond, serif' }}>
               {item.num}
@@ -144,7 +144,7 @@ function CompatibilityResult({ result, onBack }) {
         </div>
       </div>
 
-      <div className="glass-card p-6 text-center" style={{ borderColor: `${color}15` }}>
+      <div className="p-6 text-center" style={{ borderColor: `${color}15` }}>
         <p className="text-5xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color }}>{score}%</p>
         <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Harmony Score</p>
         <div className="w-full h-2 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.04)' }}>
@@ -230,7 +230,7 @@ export default function Numerology() {
               </div>
 
               {tab === 'reading' ? (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6" data-testid="numerology-reading-form">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6" data-testid="numerology-reading-form">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-4" style={{ color: '#D4AF37' }}>Your Details</p>
                   <div className="space-y-4 mb-6">
                     <div>
@@ -258,7 +258,7 @@ export default function Numerology() {
                   </button>
                 </motion.div>
               ) : (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6" data-testid="numerology-compat-form">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6" data-testid="numerology-compat-form">
                   <p className="text-xs font-bold uppercase tracking-[0.15em] mb-4" style={{ color: '#EC4899' }}>Compatibility Reading</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-3">
@@ -303,7 +303,7 @@ export default function Numerology() {
                   { num: 'PN', label: 'Personality', desc: 'How others see you', color: '#FB923C' },
                   { num: 'BN', label: 'Birthday', desc: 'Special talent', color: '#22C55E' },
                 ].map(item => (
-                  <div key={item.label} className="glass-card p-3 text-center">
+                  <div key={item.label} className="p-3 text-center">
                     <p className="text-lg font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: item.color }}>{item.num}</p>
                     <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{item.label}</p>
                     <p className="text-[9px] mt-1" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>

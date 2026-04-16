@@ -7,7 +7,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 function TotemCard({ totem, onClick }) {
   return (
-    <motion.button whileHover={{ y: -3 }} onClick={onClick} className="glass-card glass-card-hover p-5 text-left w-full" data-testid={`totem-${totem.id}`}>
+    <motion.button whileHover={{ y: -3 }} onClick={onClick} className="p-5 text-left w-full" data-testid={`totem-${totem.id}`}>
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg" style={{ background: `${totem.color}12`, border: `1px solid ${totem.color}20` }}>
           <Feather size={20} style={{ color: totem.color }} />
@@ -25,7 +25,7 @@ function TotemCard({ totem, onClick }) {
 
 function SpiritCard({ animal, onClick }) {
   return (
-    <motion.button whileHover={{ y: -2 }} onClick={() => onClick(animal)} className="glass-card glass-card-hover p-4 text-left" data-testid={`spirit-${animal.id}`}>
+    <motion.button whileHover={{ y: -2 }} onClick={() => onClick(animal)} className="p-4 text-left" data-testid={`spirit-${animal.id}`}>
       <Feather size={16} className="mb-2" style={{ color: animal.color }} />
       <p className="text-sm font-medium mb-0.5" style={{ color: 'var(--text-primary)' }}>{animal.name}</p>
       <p className="text-[10px]" style={{ color: animal.color }}>{animal.element}</p>
@@ -62,7 +62,7 @@ function AnimalDetail({ animal, onBack, isBirthTotem, companion, challenger }) {
           { label: 'When This Spirit Appears', content: animal.when_appears, color: '#A78BFA' },
           { label: 'Dream Meaning', content: animal.dream_meaning, color: '#3B82F6' },
         ].filter(s => s.content).map(section => (
-          <div key={section.label} className="glass-card p-5" style={{ borderColor: `${section.color}10` }}>
+          <div key={section.label} className="p-5" style={{ borderColor: `${section.color}10` }}>
             <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: section.color }}>{section.label}</p>
             <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{section.content}</p>
           </div>
@@ -71,11 +71,11 @@ function AnimalDetail({ animal, onBack, isBirthTotem, companion, challenger }) {
 
       {animal.stone && (
         <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="glass-card p-4">
+          <div className="p-4">
             <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Sacred Stone</p>
             <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{animal.stone}</p>
           </div>
-          <div className="glass-card p-4">
+          <div className="p-4">
             <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Plant Ally</p>
             <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{animal.plant}</p>
           </div>
@@ -85,13 +85,13 @@ function AnimalDetail({ animal, onBack, isBirthTotem, companion, challenger }) {
       {(companion || challenger) && (
         <div className="grid grid-cols-2 gap-3 mt-4">
           {companion && (
-            <div className="glass-card p-4" style={{ borderColor: `${companion.color}10` }}>
+            <div className="p-4" style={{ borderColor: `${companion.color}10` }}>
               <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#22C55E' }}>Complementary Totem</p>
               <p className="text-sm" style={{ color: companion.color }}>{companion.name}</p>
             </div>
           )}
           {challenger && (
-            <div className="glass-card p-4" style={{ borderColor: `${challenger.color}10` }}>
+            <div className="p-4" style={{ borderColor: `${challenger.color}10` }}>
               <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#FB923C' }}>Challenging Totem</p>
               <p className="text-sm" style={{ color: challenger.color }}>{challenger.name}</p>
             </div>
@@ -116,7 +116,7 @@ function BirthTotemCalc({ totems, onSelect }) {
   };
 
   return (
-    <div className="glass-card p-6 mb-8" data-testid="birth-totem-calc">
+    <div className="p-6 mb-8" data-testid="birth-totem-calc">
       <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#22C55E' }}>
         <Compass size={12} className="inline mr-1" /> Find Your Birth Totem
       </p>
@@ -140,7 +140,7 @@ function BirthTotemCalc({ totems, onSelect }) {
         </button>
       </div>
       {result && (
-        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="glass-card p-5 cursor-pointer" style={{borderColor:`${result.totem.color}15`}} onClick={() => onSelect(result.totem)}>
+        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="p-5 cursor-pointer" style={{borderColor:`${result.totem.color}15`}} onClick={() => onSelect(result.totem)}>
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{background:`${result.totem.color}12`}}>
               <Feather size={24} style={{color:result.totem.color}} />
