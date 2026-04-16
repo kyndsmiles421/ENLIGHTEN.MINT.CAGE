@@ -1,20 +1,27 @@
-# ENLIGHTEN.MINT.CAFE — V53.5 ZERO DARK BOXES + DEEP DIVE EVERYWHERE
+# ENLIGHTEN.MINT.CAFE — V53.6 SAME PLANE / ZERO CARDS
 ## Last Verified: April 16, 2026
 
-### V53.5: System-Wide Dark Box Elimination + Universal Deep Dive
-- **ALL inline dark backgrounds nuked** across ALL 60+ page files (rgba(15,17,28), rgba(6,6,12), rgba(5,5,12), rgba(10,10,18), rgba(18,20,32), etc.)
-- **CSS glass-card**: background: transparent, no ::before pseudo-element, no backdrop-filter
-- **SceneEngine**: overlay div REMOVED, bg image at full opacity
-- **body + #root**: background: transparent (SceneEngine bg shows through)
-- **ExpandableInfoCard**: Now has BUILT-IN DeepDive button — every card across the entire app connects to the AI knowledge engine
-- **sovereign-vignette**: display: none
+### V53.6: Card Layer Elimination
+- glass-card CSS stripped to just `position: relative` — no background, no border, no border-radius, no overflow:hidden
+- glass-card-deep, sovereign-glass, sovereign-glass-strong — all stripped to `position: relative`
+- glass-card::before pseudo-element — display:none
+- glass-card-hover — simple translateY only, no box-shadow layers
+- ExpandableInfoCard — NO card wrapper, just border-bottom divider line, content sits on plane
+- body background: transparent, html: #06060C, SceneEngine shows through everything
 
-### Design Philosophy (FINAL)
-- Background IS the experience — zero overlays, zero vignettes, zero dark boxes
-- Content floats on one plane, text-shadow for readability
-- Every piece of content can "Explore deeper" via built-in AI Deep Dive
-- Everything simple, functional, interconnected
+### Design Philosophy (FINAL — DO NOT DEVIATE)
+- ONE PLANE. No card layers. No overlays. No vignettes.
+- Content floats directly on the SceneEngine background
+- Text-shadow for readability against any background
+- Every content item connects to AI Deep Dive for progressive exploration
+- Borders: thin divider lines only (1px solid rgba(255,255,255,0.04))
 
-### Upcoming Tasks
-- Universal MediaVault Access (P1)
-- Phygital Marketplace NFC hooks (P2)
+### Architecture
+- SceneEngine: position:fixed, z-index:0, full-bleed realm backgrounds, NO overlay
+- Content: position:relative, z-index:1, transparent backgrounds throughout
+- ExpandableInfoCard: flat list items with dividers, built-in DeepDive
+- FeaturedVideos: z-index:50 player, inline cards
+
+### Upcoming
+- Universal MediaVault (P1)
+- Phygital NFC hooks (P2)
