@@ -1,65 +1,36 @@
-# ENLIGHTEN.MINT.CAFE — V53.2 RESONANCE CAMERA ENGINE
-## Last Verified: April 15, 2026
+# ENLIGHTEN.MINT.CAFE — V53.3 TRANSPARENCY FIX
+## Last Verified: April 16, 2026
 
-### V53.2: Resonance Camera (Canvas + Audio Capture Pipeline)
-- **useResonanceCapture.js**: Full capture pipeline — `canvas.captureStream(30fps)` + `MediaStreamAudioDestinationNode` → muxed `MediaRecorder` → WebM/VP9+Opus
-- **ResonanceCamera.js**: Compact UI strip in Orbit panel with 3 states: Idle (Record button), Recording (Stop + pulsing timer), Preview (Download/Share/Discard)
-- **ParticleField.js**: Now uses `forwardRef` + `useImperativeHandle` to expose canvas element for the capture pipeline
-- **17/17 tests PASSED** (Iteration 332) including logged-in state verification
+### V53.3: Kill Dark Boxes + Fix Videos + Fix VR Crash
+- **glass-card**: Removed ALL backdrop-filter blur. Background now rgba(6,6,12,0.25) — translucent, not opaque
+- **sovereign-glass**: Removed backdrop-filter. Light transparent background only
+- **glass-card-deep**: Removed backdrop-filter blur
+- **sovereign-vignette**: Lightened from 0.95→0.7 max opacity
+- **SovereignViewport bg**: Opacity raised from 0.55→0.8 — images are the experience
+- **FeaturedVideos.js**: Rewritten — proper z-index, mobile-friendly player, YouTube iframe works
+- **VirtualReality.js**: position:fixed→relative, no more crash on mobile
+- **All tests PASSED** (Iteration 333)
 
-### V53.1: Audio-Visual Bridge (useAudioVisualizer Hook)
-- **useAudioVisualizer.js**: Bridges MixerContext's AnalyserNode to ParticleField
-- **3 channels**: Amplitude-to-Scale, Frequency-to-Hue (Solfeggio map), Transient Detection
-
-### V53.0: Console Decomposition + 3D Visualization Hooks
-- **UnifiedCreatorConsole.js decomposed**: 1379 → ~390 lines (72% reduction)
-- **18 extracted modules** in `/components/console/`
+### V53.2: Resonance Camera
+### V53.1: Audio-Visual Bridge
+### V53.0: Console Decomposition (1379→~390 lines)
 
 ### Architecture
-```
-/components/console/
-├── index.js                  (barrel exports)
-├── TorusPanel.js             (orbital navigation)
-├── MixPanel.js               (channel faders)
-├── RecordPanel.js            (media recording)
-├── AudioPanel.js             (audio controls)
-├── TextPanel.js              (text overlays)
-├── OverlayPanel.js           (image overlays)
-├── EffectsPanel.js           (CSS filters)
-├── AIPanel.js                (Sage FX prompt-to-fx)
-├── ExportPanel.js            (export/share/print)
-├── AccountPanel.js           (user account)
-├── StoreView.js              (mixer store)
-├── MixerNavBar.js            (bottom nav bar)
-├── ParticleField.js          (3D particles — ChaosEngine + Audio)
-├── ResonanceCamera.js        (capture UI)
-├── useResonanceCapture.js    (capture pipeline hook)
-├── useMediaControls.js       (media recorder hook)
-└── constants.js              (TOOL_TABS config)
+- `/components/console/` — 18 decomposed mixer modules
+- `/hooks/useAudioVisualizer.js` — Audio→particle bridge
+- `lib/ChaosEngine.js` — z/z feedback oscillator
+- `SovereignViewport.js` — Immersive wrapper (0.8 opacity bg)
+- `FeaturedVideos.js` — YouTube embed video player
 
-/hooks/
-└── useAudioVisualizer.js     (AnalyserNode → visual params)
-```
-
-### Capture Pipeline
-```
-ParticleField Canvas ──→ captureStream(30fps) ──→ videoTrack ─┐
-                                                                ├→ MediaRecorder → WebM/VP9+Opus
-MixerContext AudioCtx ──→ MediaStreamDestination ──→ audioTrack ─┘
-                                                                     ↓
-                                                          Download / Share (Web Share API)
-```
-
-### 3rd Party Integrations
-- Gemini Flash — Sage FX + Encyclopedia AI
-- Gemini Nano Banana — Scene generation
-- Web Audio API — Full audio pipeline + Chaos Engine
-- FastAPI WebSocket — Sovereign Live Sessions
+### Design Philosophy
+- Background IS the experience — no opaque dark boxes
+- Content floats on one plane with text-shadow for readability
+- glass-card = translucent (0.25 alpha), NO backdrop-filter blur
+- Everything on the same plane, simple, functional
 
 ### Blocked: Play Store AAB (Google identity verification)
 
 ### Upcoming Tasks
-- Universal MediaVault Access (P1): Glass-stack z-layered video with lazy loading
-- Deeper ParticleField embedding: LightTherapy, Frequencies, Observatory modules
-- AAB signing logic preparation
+- Universal MediaVault Access (P1)
+- Deeper ParticleField embedding
 - Phygital Marketplace NFC hooks (P2)
