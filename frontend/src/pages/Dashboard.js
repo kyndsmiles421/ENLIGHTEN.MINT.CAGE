@@ -544,7 +544,7 @@ export default function Dashboard() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-end justify-center"
             onClick={() => setShowAddSheet(false)}>
-            <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.4)' }} />
+            <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.1)' }} />
             <motion.div initial={{ y: 300 }} animate={{ y: 0 }} exit={{ y: 300 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="relative w-full max-w-lg rounded-t-2xl overflow-hidden max-h-[70vh] flex flex-col"

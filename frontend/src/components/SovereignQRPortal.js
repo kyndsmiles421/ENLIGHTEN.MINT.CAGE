@@ -110,7 +110,7 @@ const SovereignQRPortal = () => {
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+                        background: 'linear-gradient(transparent, rgba(0,0,0,0.15))',
                         padding: '20px 10px 10px',
                         textAlign: 'center'
                     }}>

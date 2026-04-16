@@ -82,7 +82,7 @@ export default function LearningToggle() {
           background: learningToggle ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.04)',
           border: `1px solid ${learningToggle ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.06)'}`,
           cursor: 'pointer',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'none',
         }}
         whileTap={{ scale: 0.95 }}
         data-testid="learning-toggle-btn"
@@ -116,7 +116,7 @@ export default function LearningToggle() {
               maxHeight: 420,
               background: '#0D0E18',
               border: '1px solid rgba(255,255,255,0.06)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
             }}
             data-testid="learning-toggle-panel"
           >

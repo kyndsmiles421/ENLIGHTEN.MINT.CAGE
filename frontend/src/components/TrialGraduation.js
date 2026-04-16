@@ -123,7 +123,7 @@ export default function TrialGraduation() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[10000] flex items-center justify-center px-4"
-        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
         data-testid="trial-graduation-overlay"
       >
         <motion.div
@@ -135,7 +135,7 @@ export default function TrialGraduation() {
           style={{
             background: 'rgba(8,8,16,0.98)',
             border: '1px solid rgba(129,140,248,0.12)',
-            boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(129,140,248,0.04)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(129,140,248,0.04)',
           }}
           data-testid="trial-graduation-modal"
         >

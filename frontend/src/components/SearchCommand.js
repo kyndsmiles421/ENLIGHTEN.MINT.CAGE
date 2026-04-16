@@ -185,7 +185,7 @@ export default function SearchCommand({ open, onClose }) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
         className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] px-4"
-        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
         onClick={(e) => e.target === e.currentTarget && onClose()}
         data-testid="search-overlay"
       >
@@ -198,7 +198,7 @@ export default function SearchCommand({ open, onClose }) {
           style={{
             background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(13, 14, 26, 0.97)',
             border: `1px solid ${isLight ? 'rgba(30,27,46,0.1)' : 'rgba(192,132,252,0.1)'}`,
-            boxShadow: isLight ? '0 24px 60px rgba(30,27,46,0.15)' : '0 24px 80px rgba(0,0,0,0.6), 0 0 60px rgba(192,132,252,0.04)',
+            boxShadow: isLight ? '0 24px 60px rgba(30,27,46,0.15)' : '0 24px 80px rgba(0,0,0,0.15), 0 0 60px rgba(192,132,252,0.04)',
           }}
           data-testid="search-palette"
         >

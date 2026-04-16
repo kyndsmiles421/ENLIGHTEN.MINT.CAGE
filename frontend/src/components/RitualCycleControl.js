@@ -143,8 +143,8 @@ export default function RitualCycleControl({
     <div 
       className="relative p-3 rounded-xl"
       style={{
-        background: 'rgba(0,0,0,0.4)',
-        backdropFilter: 'blur(15px)',
+        background: 'rgba(0,0,0,0.1)',
+        backdropFilter: 'none',
         border: `1px solid ${active ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.1)'}`,
       }}
     >

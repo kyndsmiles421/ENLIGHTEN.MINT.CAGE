@@ -93,8 +93,8 @@ export function ImmersionToggle() {
             style={{
               background: 'rgba(6,6,18,0.97)',
               border: '1px solid rgba(248,250,252,0.08)',
-              backdropFilter: 'blur(24px)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+              backdropFilter: 'none',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
             }}
             data-testid="immersion-panel"
           >

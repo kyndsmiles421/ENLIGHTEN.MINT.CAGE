@@ -197,7 +197,7 @@ export default function MediaLibrary() {
                       const LIcon = lm.icon;
                       return (
                         <div key={j} className="w-5 h-5 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${lm.color}40` }}>
+                          style={{ background: 'rgba(0,0,0,0.15)', border: `1px solid ${lm.color}40` }}>
                           <LIcon size={8} style={{ color: lm.color }} />
                         </div>
                       );
@@ -205,13 +205,13 @@ export default function MediaLibrary() {
                   </div>
                   {/* Type badge */}
                   <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-medium"
-                    style={{ background: 'rgba(0,0,0,0.5)', color: typeMeta.color }}>
+                    style={{ background: 'rgba(0,0,0,0.15)', color: typeMeta.color }}>
                     <TypeIcon size={8} /> {typeMeta.label}
                   </div>
                   {/* Duration */}
                   {item.duration_seconds > 0 && (
                     <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full text-[8px]"
-                      style={{ background: 'rgba(0,0,0,0.5)', color: 'var(--text-muted)' }}>
+                      style={{ background: 'rgba(0,0,0,0.15)', color: 'var(--text-muted)' }}>
                       <Clock size={8} /> {formatDuration(item.duration_seconds)}
                     </div>
                   )}

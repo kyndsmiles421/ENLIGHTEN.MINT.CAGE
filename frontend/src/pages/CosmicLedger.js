@@ -223,7 +223,7 @@ export default function CosmicLedger() {
   }
 
   return (
-    <div className="min-h-screen pb-24 shadow-void-container" style={{ background: '#000000', paddingTop: '70px' }} data-testid="cosmic-ledger-page">
+    <div className="min-h-screen pb-24 shadow-void-container" style={{ background: 'transparent', paddingTop: '70px' }} data-testid="cosmic-ledger-page">
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
         style={{ background: 'rgba(10,10,15,0.88)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>

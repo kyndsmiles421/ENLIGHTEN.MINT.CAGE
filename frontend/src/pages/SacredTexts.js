@@ -461,7 +461,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
 
   return (
     <div ref={readerRef} className="mt-4 rounded-2xl overflow-hidden" data-testid="inline-reader"
-      style={{ background: 'rgba(8,10,18,0.7)', border: `1px solid ${text.color}15`, backdropFilter: 'none'}}>
+      style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${text.color}15`, backdropFilter: 'none'}}>
 
       {/* Reader header */}
       <div className="px-5 py-4 flex items-center justify-between"

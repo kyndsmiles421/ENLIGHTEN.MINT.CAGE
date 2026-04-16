@@ -132,7 +132,7 @@ export default function Walkthrough({ onComplete }) {
           data-testid="walkthrough-overlay"
         >
           {/* Backdrop */}
-          <div className="absolute inset-0" style={{ background: 'rgba(3,3,8,0.85)', backdropFilter: 'blur(8px)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(3,3,8,0.85)', backdropFilter: 'none'}} />
 
           {/* Content card */}
           <motion.div

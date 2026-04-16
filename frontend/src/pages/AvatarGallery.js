@@ -108,7 +108,7 @@ function GalleryCard({ entry, onClick, onRadiate }) {
 
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'none'}}>
+          style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}>
           <div className="flex items-center gap-2">
             <Eye size={16} style={{ color: '#C084FC' }} />
             <span className="text-xs font-medium" style={{ color: '#C084FC' }}>View Avatar</span>
@@ -187,7 +187,7 @@ function AvatarViewModal({ entry, onClose, onRadiate, authHeaders }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
+      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div
         initial={{ scale: 0.85, opacity: 0, y: 20 }}
@@ -195,13 +195,13 @@ function AvatarViewModal({ entry, onClose, onRadiate, authHeaders }) {
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: 'spring', duration: 0.5 }}
         className="rounded-2xl overflow-hidden max-w-lg w-full max-h-[90vh] overflow-y-auto relative"
-        style={{ background: 'rgba(16,14,28,0.97)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 80px rgba(0,0,0,0.6)' }}
+        style={{ background: 'rgba(16,14,28,0.97)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 80px rgba(0,0,0,0.15)' }}
         onClick={e => e.stopPropagation()}
         data-testid="avatar-view-modal">
 
         {/* Close Button */}
         <button onClick={onClose} className="absolute top-3 right-3 z-20 p-1.5 rounded-lg transition-all hover:scale-110"
-          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'none'}}>
+          style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}>
           <X size={14} style={{ color: 'var(--text-muted)' }} />
         </button>
 
@@ -337,7 +337,7 @@ function PublishModal({ onPublish, onClose, publishing }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'none'}}
+      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         className="rounded-2xl p-6 max-w-sm w-full"

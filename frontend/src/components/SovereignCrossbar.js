@@ -304,9 +304,9 @@ export default function SovereignCrossbar({ onModuleDetach, detachedModules = []
         className="w-full max-w-4xl mx-auto flex items-center justify-between px-6 py-2 relative"
         style={{
           background: 'rgba(6,6,14,0.92)',
-          backdropFilter: 'blur(20px)',
+          backdropFilter: 'none',
           borderBottom: `1px solid ${barColor}15`,
-          boxShadow: `0 4px 30px rgba(0,0,0,0.4), 0 1px 0 ${barColor}08`,
+          boxShadow: `0 4px 30px rgba(0,0,0,0.1), 0 1px 0 ${barColor}08`,
         }}
       >
         {/* Left: Sovereign badge */}

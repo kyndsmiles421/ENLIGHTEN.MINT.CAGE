@@ -696,7 +696,7 @@ function BroadcastModal({ authHeaders, onClose, onSent }) {
   return createPortal(
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.6)' }} />
+      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-md rounded-2xl p-6"
         style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(234,179,8,0.12)', backdropFilter: 'none'}}
@@ -750,7 +750,7 @@ function UserDetailModal({ user: u, onClose, onToggleStatus }) {
   return createPortal(
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.6)' }} />
+      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-md rounded-2xl p-6"
         style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.12)', backdropFilter: 'none'}}

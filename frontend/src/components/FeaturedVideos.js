@@ -38,9 +38,9 @@ export default function FeaturedVideos({ category, color = '#2DD4BF', title = 'R
               marginBottom: '24px',
               borderRadius: '16px',
               overflow: 'hidden',
-              background: '#000',
+              background: 'transparent',
               border: `1px solid ${color}30`,
-              boxShadow: `0 8px 40px rgba(0,0,0,0.6), 0 0 20px ${color}15`,
+              boxShadow: `0 8px 40px rgba(0,0,0,0.15), 0 0 20px ${color}15`,
             }}
             data-testid="featured-video-player"
           >
@@ -56,7 +56,7 @@ export default function FeaturedVideos({ category, color = '#2DD4BF', title = 'R
                 <X size={16} style={{ color: '#EF4444' }} />
               </button>
             </div>
-            <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', background: '#000' }}>
+            <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', background: 'transparent' }}>
               <iframe
                 src={`${playing.video_url}?autoplay=1&rel=0&modestbranding=1`}
                 title={playing.title}
@@ -85,12 +85,12 @@ export default function FeaturedVideos({ category, color = '#2DD4BF', title = 'R
                 style={{ transition: 'transform 0.4s' }} loading="lazy" />
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.2)' }}>
                 <div className="w-12 h-12 rounded-full flex items-center justify-center group-hover:scale-110"
-                  style={{ background: `${color}30`, border: `2px solid ${color}80`, transition: 'transform 0.3s', backdropFilter: 'blur(8px)' }}>
+                  style={{ background: `${color}30`, border: `2px solid ${color}80`, transition: 'transform 0.3s', backdropFilter: 'none'}}>
                   <Play size={20} fill="white" style={{ color: 'white', marginLeft: '2px' }} />
                 </div>
               </div>
               <span className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'rgba(0,0,0,0.7)', color: 'white' }}>
+                style={{ background: 'rgba(0,0,0,0.15)', color: 'white' }}>
                 <Clock size={9} className="inline mr-1" />{v.duration}
               </span>
             </div>

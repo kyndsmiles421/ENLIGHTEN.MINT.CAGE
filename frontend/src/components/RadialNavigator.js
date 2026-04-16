@@ -80,7 +80,7 @@ const RadialNavigator = ({
         width: '300px', 
         height: '300px', 
         margin: '0 auto',
-        background: '#000000',
+        background: 'transparent',
       }}
     >
       {/* Center hub */}
@@ -93,7 +93,7 @@ const RadialNavigator = ({
           width: '60px',
           height: '60px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, rgba(248, 250, 252, 0.15), rgba(0,0,0,0.8))',
+          background: 'radial-gradient(circle at 30% 30%, rgba(248, 250, 252, 0.15), rgba(0,0,0,0.15))',
           border: '1px solid rgba(248, 250, 252, 0.2)',
           display: 'flex',
           alignItems: 'center',

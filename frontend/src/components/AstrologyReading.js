@@ -78,7 +78,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
       style={{
         background: 'rgba(6,6,18,0.97)',
         border: `1px solid ${color}25`,
-        backdropFilter: 'blur(30px)',
+        backdropFilter: 'none',
         boxShadow: `0 0 60px ${color}10, inset 0 1px 0 ${color}08`,
       }}
       data-testid="astrology-reading-panel"

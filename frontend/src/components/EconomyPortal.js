@@ -62,7 +62,7 @@ const TieredPayScale = ({
         border: '1px solid rgba(134, 239, 172, 0.3)',
         borderRadius: '20px',
         padding: '28px',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         maxWidth: '480px',
       }}>
         {/* Header */}

@@ -87,7 +87,7 @@ const RegistryStatusWidget = React.memo(({
         right: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect instead of solid bg
         background: `rgba(0,0,0,0.3)`,
-        backdropFilter: 'blur(12px) saturate(180%)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: `1px solid rgba(255,255,255,0.1)`,
         boxShadow: `0 0 20px ${statusColor}20`,
@@ -137,7 +137,7 @@ const DustWalletWidget = React.memo(({
         right: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect
         background: 'rgba(0,0,0,0.3)',
-        backdropFilter: 'blur(12px) saturate(180%)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: '1px solid rgba(255,255,255,0.1)',
         opacity,
@@ -201,7 +201,7 @@ const GravityIndicatorWidget = React.memo(({
         left: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect
         background: 'rgba(0,0,0,0.3)',
-        backdropFilter: 'blur(12px) saturate(180%)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: '1px solid rgba(255,255,255,0.1)',
         minWidth: 140,
@@ -284,7 +284,7 @@ const StabilityIndicatorWidget = React.memo(({
         left: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect
         background: 'rgba(0,0,0,0.3)',
-        backdropFilter: 'blur(12px) saturate(180%)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: '1px solid rgba(255,255,255,0.1)',
         opacity,

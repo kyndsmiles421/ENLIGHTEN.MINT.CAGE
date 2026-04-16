@@ -158,7 +158,7 @@ export default function UniversalCommand() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+          style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
         />
 
         {/* Command Panel */}
@@ -171,7 +171,7 @@ export default function UniversalCommand() {
           style={{
             background: 'linear-gradient(180deg, rgba(20,20,30,0.98) 0%, rgba(0,0,0,0) 100%)',
             border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.1)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.15), 0 0 1px rgba(255,255,255,0.1)',
           }}
           onClick={e => e.stopPropagation()}
           data-testid="universal-command-panel"

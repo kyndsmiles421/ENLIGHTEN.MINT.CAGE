@@ -56,7 +56,7 @@ export default function CafeSettingsPanel({ isOpen, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
         onClick={onClose}
       >
         <motion.div
@@ -71,7 +71,7 @@ export default function CafeSettingsPanel({ isOpen, onClose }) {
             border: `1px solid ${viewTier === 'parchment' 
               ? (colorMode === 'light' ? '#E8E4DC' : '#3A3A3E')
               : 'rgba(129, 140, 248, 0.15)'}`,
-            boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.1)',
           }}
           onClick={e => e.stopPropagation()}
           data-testid="cafe-settings-panel"

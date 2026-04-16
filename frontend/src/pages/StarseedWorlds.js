@@ -263,7 +263,7 @@ function RealmDetailPanel({ realm, onExplore, exploring, onClose }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
       className="rounded-2xl p-6 relative overflow-hidden"
-      style={{ background: `linear-gradient(135deg, ${realm.color}08, rgba(0,0,0,0.4))`, border: `1px solid ${realm.color}20` }}
+      style={{ background: `linear-gradient(135deg, ${realm.color}08, rgba(0,0,0,0.1))`, border: `1px solid ${realm.color}20` }}
       data-testid={`realm-detail-${realm.id}`}>
       <div className="absolute inset-0 opacity-[0.04]"
         style={{ background: `radial-gradient(ellipse at 30% 30%, ${realm.color}, transparent 60%)` }} />
@@ -419,13 +419,13 @@ function ExplorationResult({ result, onClose }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'none'}}
+      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.3, opacity: 0, rotateY: -20 }}
         animate={{ scale: 1, opacity: 1, rotateY: 0 }}
         transition={{ type: 'spring', duration: 0.8, bounce: 0.3 }}
         className="rounded-2xl p-8 text-center max-w-sm mx-4 relative overflow-hidden"
-        style={{ background: 'rgba(16,14,28,0.97)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}
+        style={{ background: 'rgba(16,14,28,0.97)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }}
         onClick={e => e.stopPropagation()}
         data-testid="exploration-result">
         {/* Decorative glow */}

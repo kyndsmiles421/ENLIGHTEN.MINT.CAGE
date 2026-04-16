@@ -203,9 +203,9 @@ export default function UtilityDock({
                   className="relative w-12 h-12 rounded-full flex items-center justify-center group"
                   style={{
                     background: colors.background,
-                    backdropFilter: 'blur(20px)',
+                    backdropFilter: 'none',
                     border: `1px solid ${borderColor}`,
-                    boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 15px ${colors.glow}`,
+                    boxShadow: `0 4px 20px rgba(0,0,0,0.1), 0 0 15px ${colors.glow}`,
                   }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -245,9 +245,9 @@ export default function UtilityDock({
                   className="p-2 rounded-xl"
                   style={{
                     background: colors.background,
-                    backdropFilter: 'blur(20px)',
+                    backdropFilter: 'none',
                     border: `1px solid ${borderColor}`,
-                    boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 15px ${colors.glow}`,
+                    boxShadow: `0 4px 20px rgba(0,0,0,0.1), 0 0 15px ${colors.glow}`,
                   }}
                 >
                   <HexagramCompass 
@@ -281,11 +281,11 @@ export default function UtilityDock({
                   className="p-3 rounded-xl"
                   style={{
                     background: colors.background,
-                    backdropFilter: 'blur(20px)',
+                    backdropFilter: 'none',
                     border: `1px solid ${isAtZeroPoint ? 'rgba(255,255,255,0.3)' : borderColor}`,
                     boxShadow: isAtZeroPoint 
                       ? '0 0 20px rgba(255,255,255,0.2)' 
-                      : `0 4px 20px rgba(0,0,0,0.4)`,
+                      : `0 4px 20px rgba(0,0,0,0.1)`,
                   }}
                 >
                   {/* Zero Point Toggle */}
@@ -409,13 +409,13 @@ export default function UtilityDock({
             background: expanded 
               ? `linear-gradient(135deg, ${colors.background} 0%, rgba(201, 169, 98, 0.15) 100%)`
               : colors.background,
-            backdropFilter: 'blur(24px)',
+            backdropFilter: 'none',
             border: expanded 
               ? `1px solid ${colors.accent}40` 
               : `1px solid ${borderColor}`,
             boxShadow: expanded
               ? `0 8px 32px ${colors.glow}, 0 0 20px ${colors.glow}`
-              : `0 4px 24px rgba(0,0,0,0.5), 0 0 10px ${colors.glow}`,
+              : `0 4px 24px rgba(0,0,0,0.15), 0 0 10px ${colors.glow}`,
             cursor: isDragging ? 'grabbing' : 'pointer',
           }}
           whileHover={{ scale: 1.05 }}

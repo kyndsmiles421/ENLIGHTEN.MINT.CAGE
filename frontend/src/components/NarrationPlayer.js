@@ -199,8 +199,8 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
               style={{
                 background: 'rgba(18, 20, 32, 0.98)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                backdropFilter: 'none',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
               }}
             >
               <div className="p-4">

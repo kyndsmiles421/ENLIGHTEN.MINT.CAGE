@@ -178,7 +178,7 @@ export function SceneProvider({ children }) {
       }
       styleEl.textContent = `
         body.scene-active [data-testid="content-area"] > * {
-          background: rgba(0,0,0,0.4) !important;
+          background: rgba(0,0,0,0.1) !important;
           backdrop-filter: blur(8px) !important;
           -webkit-backdrop-filter: blur(8px) !important;
         }
@@ -192,7 +192,7 @@ export function SceneProvider({ children }) {
         body.scene-active .immersive-page [class*="rounded-xl"][class*="p-3"],
         body.scene-active .immersive-page [class*="rounded-lg"][class*="p-4"],
         body.scene-active .immersive-page [class*="rounded-lg"][class*="p-3"] {
-          background: rgba(6,6,12,0.45) !important;
+          background: rgba(0,0,0,0) !important;
           backdrop-filter: blur(10px) saturate(140%) !important;
           -webkit-backdrop-filter: blur(10px) saturate(140%) !important;
           border: 1px solid rgba(255,255,255,0.06) !important;
@@ -203,7 +203,7 @@ export function SceneProvider({ children }) {
         body.scene-active .immersive-page [class*="rounded-xl"][class*="p-3"]:hover,
         body.scene-active .immersive-page [class*="rounded-lg"][class*="p-4"]:hover,
         body.scene-active .immersive-page [class*="rounded-lg"][class*="p-3"]:hover {
-          background: rgba(6,6,12,0.55) !important;
+          background: rgba(0,0,0,0) !important;
           border-color: rgba(255,255,255,0.12) !important;
           box-shadow: 0 0 20px rgba(var(--skin-accent-rgb, 99,102,241), 0.08);
         }
@@ -243,7 +243,7 @@ function SkinPicker({ onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(0,0,0,0.95)', display: 'flex', flexDirection: 'column' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}
       data-testid="scene-picker">
       <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div>
@@ -298,7 +298,7 @@ function SkinPicker({ onClose }) {
                   {skin.url ? (
                     <img src={skin.url} alt={skin.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '100%', height: '100%', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span className="text-[10px] text-white/15">VOID</span>
                     </div>
                   )}
@@ -308,12 +308,12 @@ function SkinPicker({ onClose }) {
                     </div>
                   )}
                   {isContextual && !isActive && (
-                    <div style={{ position: 'absolute', top: 4, left: 4, background: 'rgba(0,0,0,0.7)', borderRadius: 4, padding: '1px 4px' }}>
+                    <div style={{ position: 'absolute', top: 4, left: 4, background: 'rgba(0,0,0,0.15)', borderRadius: 4, padding: '1px 4px' }}>
                       <span className="text-[6px] text-white/50">THIS PAGE</span>
                     </div>
                   )}
                 </div>
-                <div className="p-2" style={{ background: 'rgba(0,0,0,0.8)' }}>
+                <div className="p-2" style={{ background: 'rgba(0,0,0,0.15)' }}>
                   <div className="text-[10px] font-medium" style={{ color: isActive ? skin.accent : 'rgba(255,255,255,0.7)' }}>{skin.name}</div>
                   <div className="flex items-center gap-1 mt-0.5">
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: skin.accent }} />

@@ -246,7 +246,7 @@ function DraggableBubble({ mod, homePos, playerCenter, onActivate, isActive, isL
           ? `0 0 ${12 + glowIntensity * 30}px ${mod.color}${Math.round(glowIntensity * 255).toString(16).padStart(2, '0')}, inset 0 0 8px ${mod.color}${Math.round(glowIntensity * 80).toString(16).padStart(2, '0')}`
           : `0 2px 8px rgba(0,0,0,0.3)`,
         opacity: isLocked ? 0.35 : 1,
-        backdropFilter: 'blur(8px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(8px)',
       }}
     >
@@ -911,7 +911,7 @@ export default function OrbitalMixer() {
               color: '#EF4444',
               fontSize: '10px',
               cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
+              backdropFilter: 'none',
             }}
             onClick={() => {
               haptic('Medium');
@@ -990,7 +990,7 @@ export default function OrbitalMixer() {
             style={{
               background: 'rgba(11,12,21,0.97)',
               border: '1px solid rgba(192,132,252,0.1)',
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
               width: isMobile ? 200 : 220,
             }}
             data-testid="class-picker"

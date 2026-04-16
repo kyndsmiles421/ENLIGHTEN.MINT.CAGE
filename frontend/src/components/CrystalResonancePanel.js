@@ -94,7 +94,7 @@ export default function CrystalResonancePanel({
       animate={{ opacity: 1, y: 0 }}
       style={{
         background: 'rgba(10, 10, 18, 0.85)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         borderRadius: 16,
         border: `1px solid ${frequencyColor}33`,
         padding: compact ? 12 : 20,

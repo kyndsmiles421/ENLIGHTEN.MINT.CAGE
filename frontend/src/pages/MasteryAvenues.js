@@ -72,7 +72,7 @@ function GlassPanel({ children, theme, expanded, onClick, testId }) {
       className="rounded-2xl overflow-hidden transition-all"
       style={{
         background: expanded ? theme.glassBg : theme.glassCollapsed,
-        backdropFilter: expanded ? 'blur(8px)' : 'blur(10px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: expanded ? 'blur(8px)' : 'blur(10px)',
         borderLeft: `2px solid ${theme.edgeGlow}`,
         border: '1px solid ' + theme.hueDim + (expanded ? '0.12)' : '0.06)'),

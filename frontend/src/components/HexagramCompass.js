@@ -525,7 +525,7 @@ export default function HexagramCompass({
           width: svgWidth,
           height: svgHeight,
           background: colors.background,
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'none',
           WebkitBackdropFilter: 'blur(12px)',
           border: `1px solid ${colors.border}`,
           boxShadow: `
@@ -637,7 +637,7 @@ export default function HexagramCompass({
         {isVoid && (
           <motion.div
             className="absolute inset-0 flex items-center justify-center rounded-xl"
-            style={{ background: 'rgba(0,0,0,0.5)' }}
+            style={{ background: 'rgba(0,0,0,0.15)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

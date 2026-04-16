@@ -291,7 +291,7 @@ export default function CosmicToolbar() {
           borderRadius: '50%',
           background: 'rgba(11,12,21,0.5)',
           border: '1px solid rgba(192,132,252,0.15)',
-          backdropFilter: 'blur(16px)',
+          backdropFilter: 'none',
           WebkitBackdropFilter: 'blur(16px)',
           cursor: 'pointer',
           boxShadow: '0 2px 12px rgba(192,132,252,0.1)',
@@ -321,7 +321,7 @@ export default function CosmicToolbar() {
         borderRadius: 24,
         background: anyActive ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0)',
         border: `1px solid ${anyActive ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.05)'}`,
-        backdropFilter: 'blur(24px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(24px)',
         boxShadow: anyActive
           ? `0 0 20px ${haloColor}, 0 0 40px ${haloColor}, 0 4px 16px rgba(0,0,0,0.3)`

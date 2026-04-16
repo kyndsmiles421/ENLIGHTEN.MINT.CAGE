@@ -70,7 +70,7 @@ const MarketplaceGallery = ({ onSelect, isVisible = true }) => {
                             background: selectedItem === item.id 
                                 ? 'rgba(0, 240, 255, 0.15)' 
                                 : 'rgba(255, 255, 255, 0.05)',
-                            backdropFilter: 'blur(10px)',
+                            backdropFilter: 'none',
                             border: `1px solid ${
                                 selectedItem === item.id 
                                     ? 'rgba(0, 240, 255, 0.6)' 
@@ -185,7 +185,7 @@ export const MarketplaceItemDetail = ({ item, onClose, onPurchase }) => {
                 position: 'fixed',
                 inset: 0,
                 background: 'rgba(0, 0, 0, 0.8)',
-                backdropFilter: 'blur(20px)',
+                backdropFilter: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

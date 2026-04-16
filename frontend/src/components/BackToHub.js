@@ -255,10 +255,10 @@ export default function BackToHub() {
           onClick={() => navigate('/sovereign-hub')}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all active:scale-95"
           style={{
-            background: 'rgba(0,0,0,0.7)',
+            background: 'rgba(0,0,0,0.15)',
             border: '1px solid rgba(255,255,255,0.08)',
             color: 'rgba(248,250,252,0.6)',
-            backdropFilter: 'blur(12px)',
+            backdropFilter: 'none',
           }}
           data-testid="back-to-hub"
         >
@@ -271,10 +271,10 @@ export default function BackToHub() {
             onClick={() => setShowRelated(!showRelated)}
             className="flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all active:scale-95"
             style={{
-              background: showRelated ? 'rgba(139,92,246,0.12)' : 'rgba(0,0,0,0.7)',
+              background: showRelated ? 'rgba(139,92,246,0.12)' : 'rgba(0,0,0,0.15)',
               border: `1px solid ${showRelated ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.08)'}`,
               color: showRelated ? '#C4B5FD' : 'rgba(248,250,252,0.5)',
-              backdropFilter: 'blur(12px)',
+              backdropFilter: 'none',
             }}
             data-testid="related-toggle"
           >
@@ -302,10 +302,10 @@ export default function BackToHub() {
                 onClick={() => { navigate(item.route); setShowRelated(false); }}
                 className="px-3 py-1.5 rounded-lg text-[11px] transition-all active:scale-95"
                 style={{
-                  background: 'rgba(0,0,0,0.85)',
+                  background: 'rgba(0,0,0,0.15)',
                   border: '1px solid rgba(139,92,246,0.15)',
                   color: 'rgba(248,250,252,0.7)',
-                  backdropFilter: 'blur(16px)',
+                  backdropFilter: 'none',
                 }}
                 data-testid={`related-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
               >

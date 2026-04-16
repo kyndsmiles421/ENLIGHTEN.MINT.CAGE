@@ -110,7 +110,7 @@ export default function FidelityHUD({ authHeaders }) {
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[200]"
-            style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+            style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
             onClick={() => setShowPanel(false)}
           >
             <motion.div
@@ -120,9 +120,9 @@ export default function FidelityHUD({ authHeaders }) {
               className="absolute top-16 right-4 w-80 max-h-[75vh] overflow-y-auto rounded-xl"
               style={{
                 background: 'rgba(3,3,8,0.95)',
-                backdropFilter: 'blur(16px)',
+                backdropFilter: 'none',
                 border: '1px solid rgba(192,132,252,0.15)',
-                boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
               }}
               onClick={e => e.stopPropagation()}
               data-testid="fidelity-panel"

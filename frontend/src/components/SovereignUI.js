@@ -193,7 +193,7 @@ export const ResonanceOrb = forwardRef(({
         boxShadow: extracted
           ? `0 0 ${size * 0.3}px ${orbColor}40, inset 0 0 ${size * 0.15}px ${orbColor}15`
           : `0 0 ${size * 0.1}px ${orbColor}10`,
-        backdropFilter: 'blur(8px)',
+        backdropFilter: 'none',
         ...style,
       }}
       whileHover={{ 
@@ -239,7 +239,7 @@ export const ResonanceSurface = forwardRef(({
       className={`${className}`}
       style={{
         background: 'var(--resonance-surface)',
-        backdropFilter: `blur(${blur}px)`,
+        backdropFilter: 'none',
         WebkitBackdropFilter: `blur(${blur}px)`,
         border: '1px solid var(--resonance-border)',
         position: 'relative',

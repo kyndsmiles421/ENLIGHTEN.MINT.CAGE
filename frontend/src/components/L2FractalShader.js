@@ -382,7 +382,7 @@ export default function L2FractalShader({
       <div 
         className="absolute top-2 right-2 text-[8px] font-mono px-1.5 py-0.5 rounded"
         style={{ 
-          background: 'rgba(0,0,0,0.5)', 
+          background: 'rgba(0,0,0,0.15)', 
           color: fps >= 60 ? '#22C55E' : fps >= 30 ? '#F59E0B' : '#EF4444',
         }}
       >

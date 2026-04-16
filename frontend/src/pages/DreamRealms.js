@@ -65,7 +65,7 @@ function EntropyLayer({ harmony }) {
   return (
     <>
       {blur > 0 && <div className="absolute inset-0 pointer-events-none z-[1]"
-        style={{ backdropFilter: `blur(${blur}px) saturate(${harmony >= 50 ? 1 : 0.7})` }} />}
+        style={{ backdropFilter: 'none' }} />}
       {flickerOpacity > 0 && (
         <motion.div className="absolute inset-0 pointer-events-none z-[2]"
           animate={{ opacity: [0, flickerOpacity, 0, flickerOpacity * 0.5, 0] }}
@@ -354,7 +354,7 @@ function LoopBrokenOverlay({ result, onDismiss }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onDismiss} data-testid="loop-broken-overlay">
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'none'}} />
+      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}} />
       <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} transition={{ type: 'spring', damping: 15 }}
         className="relative w-full max-w-sm rounded-2xl p-6 text-center"
         style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(252,211,77,0.2)' }}

@@ -95,7 +95,7 @@ function BubbleView({ module, isActive, onClose }) {
       {/* Curved edge vignette — spherical distortion reminder */}
       <div className="absolute inset-0 pointer-events-none z-10"
         style={{
-          boxShadow: `inset 0 0 80px 20px rgba(0,0,0,0.6), inset 0 0 200px 60px ${module.color}08`,
+          boxShadow: `inset 0 0 80px 20px rgba(0,0,0,0.15), inset 0 0 200px 60px ${module.color}08`,
           borderRadius: '8px',
         }} />
 
@@ -287,7 +287,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
         {/* Globe curvature vignette overlay */}
         <div className="absolute inset-0 pointer-events-none z-20"
           style={{
-            background: 'radial-gradient(ellipse 120% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.4) 100%)',
+            background: 'radial-gradient(ellipse 120% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.1) 100%)',
           }} />
       </motion.div>
     </AnimatePresence>

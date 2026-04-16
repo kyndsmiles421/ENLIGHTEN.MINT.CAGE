@@ -131,7 +131,7 @@ export default function SovereignHub() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#000000' }} data-testid="sovereign-hub">
+    <div className="min-h-screen" style={{ background: 'transparent' }} data-testid="sovereign-hub">
       <Onboarding />
       {/* Title */}
       <div className="pt-10 pb-4 px-5">

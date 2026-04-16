@@ -147,7 +147,7 @@ const ConstellationVisualizer = React.memo(({ address, path, rarityTier, size = 
       height={size} 
       viewBox="0 0 100 100"
       className="rounded-lg"
-      style={{ background: 'rgba(0,0,0,0.5)' }}
+      style={{ background: 'rgba(0,0,0,0.15)' }}
     >
       {/* Background glow */}
       <circle
@@ -220,7 +220,7 @@ const SeedCard = React.memo(({ seed, onClick }) => {
     <motion.div
       className={`relative p-4 rounded-xl cursor-pointer overflow-hidden ${style.border} border`}
       style={{
-        background: `linear-gradient(135deg, rgba(0,0,0,0.8), rgba(20,20,30,0.9))`,
+        background: `linear-gradient(135deg, rgba(0,0,0,0.15), rgba(20,20,30,0.9))`,
         boxShadow: `0 4px 20px ${style.glow}`,
       }}
       initial={{ opacity: 0, y: 20 }}

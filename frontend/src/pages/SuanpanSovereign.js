@@ -19,7 +19,7 @@ export function SpeedBridgeModal({ currentTier, onUpgrade, onClose }) {
 
   return (
     <motion.div className="fixed inset-0 z-[10002] flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'none'}}
+      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       data-testid="speed-bridge-modal">
       <motion.div className="w-full max-w-2xl mx-4 rounded-2xl overflow-hidden"

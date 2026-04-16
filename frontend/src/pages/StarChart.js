@@ -1387,7 +1387,7 @@ export default function StarChart() {
             </div>
             {data && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto flex-shrink-0"
-                style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8', backdropFilter: 'none'}}>
+                style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(129,140,248,0.15)', color: '#818CF8', backdropFilter: 'none'}}>
                 <Eye size={10} /> {data.constellations?.length} visible
               </div>
             )}
@@ -1397,7 +1397,7 @@ export default function StarChart() {
             <button onClick={() => setShowCulturePicker(!showCulturePicker)} data-testid="culture-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
-                background: activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}18` : 'rgba(8,10,18,0.8)',
+                background: activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}18` : 'rgba(0,0,0,0)',
                 border: `1px solid ${activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}40` : 'rgba(248,250,252,0.06)'}`,
                 color: activeCulture ? (cultures.find(c => c.id === activeCulture)?.color || '#818CF8') : 'rgba(248,250,252,0.5)',
                 backdropFilter: 'none',
@@ -1432,7 +1432,7 @@ export default function StarChart() {
             <button onClick={() => setMythologyMode(!mythologyMode)} data-testid="mythology-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
-                background: mythologyMode ? 'rgba(167,139,250,0.15)' : 'rgba(8,10,18,0.8)',
+                background: mythologyMode ? 'rgba(167,139,250,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${mythologyMode ? 'rgba(167,139,250,0.4)' : 'rgba(248,250,252,0.06)'}`,
                 color: mythologyMode ? '#A78BFA' : 'rgba(248,250,252,0.5)',
                 backdropFilter: 'none',
@@ -1443,7 +1443,7 @@ export default function StarChart() {
             <button onClick={() => setShowBadges(!showBadges)} data-testid="badges-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
-                background: showBadges ? 'rgba(192,132,252,0.15)' : 'rgba(8,10,18,0.8)',
+                background: showBadges ? 'rgba(192,132,252,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${showBadges ? 'rgba(192,132,252,0.4)' : 'rgba(248,250,252,0.06)'}`,
                 color: showBadges ? '#C084FC' : 'rgba(248,250,252,0.5)',
                 backdropFilter: 'none',
@@ -1454,7 +1454,7 @@ export default function StarChart() {
             <button onClick={() => setShowSearch(!showSearch)} data-testid="star-search-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
-                background: showSearch ? 'rgba(45,212,191,0.15)' : 'rgba(8,10,18,0.8)',
+                background: showSearch ? 'rgba(45,212,191,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${showSearch ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
                 color: showSearch ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
                 backdropFilter: 'none',
@@ -1463,14 +1463,14 @@ export default function StarChart() {
             </button>
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 whitespace-nowrap"
-              style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'none'}}>
+              style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'none'}}>
               <MapPin size={10} /> {locationName}
             </button>
             {/* Gyroscope toggle */}
             <button onClick={toggleGyro} data-testid="gyro-toggle"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all flex-shrink-0 whitespace-nowrap"
               style={{
-                background: gyroEnabled ? 'rgba(45,212,191,0.15)' : 'rgba(8,10,18,0.8)',
+                background: gyroEnabled ? 'rgba(45,212,191,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${gyroEnabled ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
                 color: gyroEnabled ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
                 backdropFilter: 'none',
@@ -1487,7 +1487,7 @@ export default function StarChart() {
         {showLocationPicker && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="absolute top-28 right-4 z-20 w-64 rounded-2xl p-4" data-testid="location-picker"
-            style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'none'}}>
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'none'}}>
             <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: 'rgba(248,250,252,0.4)' }}>Set Location</p>
             <div className="flex gap-2 mb-3">
               <input type="text" value={latInput} onChange={e => setLatInput(e.target.value)} placeholder="Lat" data-testid="lat-input"
@@ -1514,7 +1514,7 @@ export default function StarChart() {
         {showSearch && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="absolute top-28 left-4 z-20 w-72 rounded-2xl p-4" data-testid="star-search-panel"
-            style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(45,212,191,0.12)', backdropFilter: 'none'}}>
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(45,212,191,0.12)', backdropFilter: 'none'}}>
             <div className="flex items-center gap-2 mb-3">
               <Search size={12} style={{ color: '#2DD4BF' }} />
               <input
@@ -1585,7 +1585,7 @@ export default function StarChart() {
         {showCulturePicker && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="absolute top-28 right-4 z-20 w-72 rounded-2xl p-4" data-testid="culture-picker"
-            style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none'}}>
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none'}}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Globe size={12} style={{ color: '#818CF8' }} />
@@ -1643,19 +1643,19 @@ export default function StarChart() {
         <div className="absolute bottom-4 left-4 z-10 flex flex-wrap gap-2 pointer-events-none">
           {Object.entries(ELEMENT_COLORS).map(([elem, col]) => (
             <div key={elem} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
-              style={{ background: 'rgba(8,10,18,0.8)', border: `1px solid ${col}20`, color: col, backdropFilter: 'none'}}>
+              style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${col}20`, color: col, backdropFilter: 'none'}}>
               <div className="w-2 h-2 rounded-full" style={{ background: col, boxShadow: `0 0 6px ${col}80` }} /> {elem}
             </div>
           ))}
           {data.user_zodiac && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
-              style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(216,180,254,0.2)', color: '#D8B4FE', backdropFilter: 'none'}}>
+              style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(216,180,254,0.2)', color: '#D8B4FE', backdropFilter: 'none'}}>
               <div className="w-2 h-2 rounded-full" style={{ background: '#D8B4FE', boxShadow: '0 0 6px rgba(216,180,254,0.8)' }} /> Your Constellation
             </div>
           )}
           {activeCulture && cultureData && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px]"
-              style={{ background: 'rgba(8,10,18,0.8)', border: `1px solid ${cultureData.color}25`, color: cultureData.color, backdropFilter: 'none'}}>
+              style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${cultureData.color}25`, color: cultureData.color, backdropFilter: 'none'}}>
               <div className="w-2 h-2 rounded-full" style={{ background: cultureData.color, boxShadow: `0 0 6px ${cultureData.color}80` }} /> {cultureData.name}
             </div>
           )}
@@ -1665,7 +1665,7 @@ export default function StarChart() {
       {/* Mayan badge */}
       {data && (
         <div className="absolute bottom-4 right-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] pointer-events-none"
-          style={{ background: 'rgba(8,10,18,0.8)', border: '1px solid rgba(167,139,250,0.15)', color: '#A78BFA', backdropFilter: 'none'}}>
+          style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(167,139,250,0.15)', color: '#A78BFA', backdropFilter: 'none'}}>
           <Compass size={10} /> Today: {data.mayan_glyph} ({data.mayan_element})
         </div>
       )}
@@ -1703,7 +1703,7 @@ export default function StarChart() {
         {mythologyMode && !selected && !journeyActive && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
             className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-xl text-center pointer-events-none"
-            style={{ background: 'rgba(8,10,18,0.85)', border: '1px solid rgba(167,139,250,0.2)', backdropFilter: 'none'}}>
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(167,139,250,0.2)', backdropFilter: 'none'}}>
             <p className="text-[10px] flex items-center gap-1.5" style={{ color: '#A78BFA' }}>
               <Scroll size={10} /> Mythology figures visible | Click a constellation for its story
             </p>
@@ -1718,7 +1718,7 @@ export default function StarChart() {
             className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-xl text-center cursor-pointer"
             onClick={() => setSelectedCulturalConst(cultureData.constellations?.[0] || null)}
             data-testid="culture-overlay-indicator"
-            style={{ background: 'rgba(8,10,18,0.85)', border: `1px solid ${cultureData.color}25`, backdropFilter: 'none'}}>
+            style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${cultureData.color}25`, backdropFilter: 'none'}}>
             <p className="text-[10px] flex items-center gap-1.5" style={{ color: cultureData.color }}>
               <Globe size={10} /> {cultureData.name} — {cultureData.constellations?.length} patterns | Tap to explore stories
             </p>
@@ -1732,7 +1732,7 @@ export default function StarChart() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
             className="absolute top-20 right-4 w-80 max-h-[75vh] overflow-y-auto rounded-2xl z-20"
             data-testid="cultural-story-panel"
-            style={{ background: 'rgba(8,10,18,0.96)', border: `1px solid ${cultureData.color}20`, backdropFilter: 'none', boxShadow: `0 0 30px ${cultureData.color}10` }}>
+            style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${cultureData.color}20`, backdropFilter: 'none', boxShadow: `0 0 30px ${cultureData.color}10` }}>
             <button onClick={() => setSelectedCulturalConst(null)} className="absolute top-3 right-3 p-1 rounded-lg hover:bg-white/5 z-10" data-testid="close-cultural-story">
               <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
             </button>
@@ -1780,6 +1780,83 @@ export default function StarChart() {
                       </p>
                     </div>
                   </div>
+
+                  {/* CONSTELLATION STAR PATTERN — Visual of the actual stars */}
+                  {selectedCulturalConst.stars && selectedCulturalConst.stars.length > 0 && (
+                    <div className="mb-3 rounded-xl overflow-hidden" style={{ border: `1px solid ${cultureData.color}15` }}>
+                      <canvas
+                        ref={el => {
+                          if (!el) return;
+                          const ctx = el.getContext('2d');
+                          const w = el.width = 280;
+                          const h = el.height = 180;
+                          const stars = selectedCulturalConst.stars;
+                          const col = cultureData.color;
+                          
+                          // Clear
+                          ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                          ctx.fillRect(0, 0, w, h);
+                          
+                          // Normalize star positions to canvas
+                          const ras = stars.map(s => s.ra || 0);
+                          const decs = stars.map(s => s.dec || 0);
+                          const minRa = Math.min(...ras), maxRa = Math.max(...ras);
+                          const minDec = Math.min(...decs), maxDec = Math.max(...decs);
+                          const rangeRa = maxRa - minRa || 1;
+                          const rangeDec = maxDec - minDec || 1;
+                          const pad = 30;
+                          
+                          const positions = stars.map(s => ({
+                            x: pad + ((s.ra || 0) - minRa) / rangeRa * (w - pad * 2),
+                            y: pad + (1 - ((s.dec || 0) - minDec) / rangeDec) * (h - pad * 2),
+                            mag: s.magnitude || 3,
+                            name: s.name || '',
+                          }));
+                          
+                          // Draw connecting lines
+                          if (positions.length > 1) {
+                            ctx.strokeStyle = col + '40';
+                            ctx.lineWidth = 1;
+                            ctx.setLineDash([4, 4]);
+                            ctx.beginPath();
+                            positions.forEach((p, i) => {
+                              if (i === 0) ctx.moveTo(p.x, p.y);
+                              else ctx.lineTo(p.x, p.y);
+                            });
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                          }
+                          
+                          // Draw stars
+                          positions.forEach(p => {
+                            const size = Math.max(2, 6 - p.mag);
+                            const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 3);
+                            grad.addColorStop(0, col);
+                            grad.addColorStop(0.3, col + 'AA');
+                            grad.addColorStop(0.7, col + '30');
+                            grad.addColorStop(1, 'transparent');
+                            ctx.fillStyle = grad;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);
+                            ctx.fill();
+                            // Core
+                            ctx.fillStyle = '#fff';
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, size * 0.6, 0, Math.PI * 2);
+                            ctx.fill();
+                          });
+                          
+                          // Label
+                          ctx.fillStyle = col + '80';
+                          ctx.font = '9px Manrope, sans-serif';
+                          ctx.textAlign = 'center';
+                          ctx.fillText(selectedCulturalConst.name.split('(')[0].trim(), w / 2, h - 8);
+                        }}
+                        style={{ width: '100%', height: 180, display: 'block' }}
+                        data-testid="constellation-visual"
+                      />
+                    </div>
+                  )}
 
                   {selectedCulturalConst.mythology && (
                     <>
@@ -1913,7 +1990,7 @@ export default function StarChart() {
       </AnimatePresence>
 
       {/* 3D Canvas */}
-      <div ref={canvasContainerRef} className="w-full h-[calc(100vh-4rem)]" data-testid="star-chart-canvas" style={{ background: '#000005' }}>
+      <div ref={canvasContainerRef} className="w-full h-[calc(100vh-4rem)]" data-testid="star-chart-canvas" style={{ background: 'transparent' }}>
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -1943,14 +2020,14 @@ export default function StarChart() {
         <div className="absolute bottom-20 right-4 z-10 flex flex-col gap-1.5" data-testid="zoom-controls">
           <button onClick={() => handleZoom(-8)}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
-            style={{ background: 'rgba(8,10,18,0.85)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(248,250,252,0.6)' }}
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(248,250,252,0.6)' }}
             data-testid="zoom-in-btn"
             aria-label="Zoom In">
             <Plus size={16} />
           </button>
           <button onClick={() => handleZoom(8)}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
-            style={{ background: 'rgba(8,10,18,0.85)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(248,250,252,0.6)' }}
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(248,250,252,0.6)' }}
             data-testid="zoom-out-btn"
             aria-label="Zoom Out">
             <Minus size={16} />

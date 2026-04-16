@@ -109,9 +109,9 @@ export function DeepLorePanel({
         animate={{ opacity: 1, x: 0 }}
         className="absolute top-20 right-4 w-[420px] max-w-[90vw] rounded-2xl z-30 p-6"
         style={{ 
-          background: 'rgba(8,10,18,0.98)', 
+          background: 'rgba(0,0,0,0)', 
           border: `1px solid ${cultureColor}25`,
-          backdropFilter: 'blur(24px)',
+          backdropFilter: 'none',
         }}
       >
         <div className="flex items-center justify-center gap-3 py-12">
@@ -134,9 +134,9 @@ export function DeepLorePanel({
       exit={{ opacity: 0, x: 20 }}
       className="absolute top-20 right-4 w-[420px] max-w-[90vw] max-h-[80vh] overflow-hidden rounded-2xl z-30"
       style={{ 
-        background: 'rgba(8,10,18,0.98)', 
+        background: 'rgba(0,0,0,0)', 
         border: `1px solid ${cultureColor}25`,
-        backdropFilter: 'blur(24px)',
+        backdropFilter: 'none',
         boxShadow: `0 0 40px ${cultureColor}10`,
       }}
       data-testid="deep-lore-panel"
@@ -144,7 +144,7 @@ export function DeepLorePanel({
       {/* Header */}
       <div 
         className="sticky top-0 z-10 px-5 pt-5 pb-4"
-        style={{ background: 'rgba(8,10,18,0.98)', borderBottom: `1px solid ${cultureColor}15` }}
+        style={{ background: 'rgba(0,0,0,0)', borderBottom: `1px solid ${cultureColor}15` }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -531,9 +531,9 @@ export function CultureSelector({
     <div 
       className="absolute top-32 left-4 w-80 max-w-[85vw] max-h-[70vh] overflow-y-auto rounded-2xl z-20"
       style={{ 
-        background: 'rgba(8,10,18,0.96)', 
+        background: 'rgba(0,0,0,0)', 
         border: '1px solid rgba(248,250,252,0.08)',
-        backdropFilter: 'blur(24px)',
+        backdropFilter: 'none',
       }}
       data-testid="culture-selector"
     >

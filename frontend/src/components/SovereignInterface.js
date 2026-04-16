@@ -93,7 +93,7 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
         borderLeft: '2px solid gold',
         paddingLeft: '10px',
         margin: '20px 0',
-        background: '#000000',
+        background: 'transparent',
       }}>
         <h2 style={{ color: '#F0FFF0', margin: '0 0 8px 0' }}>Welcome back, Cosmic.</h2>
         <p style={{ margin: '4px 0', color: '#F0FFF0' }}>
@@ -107,7 +107,7 @@ const SovereignInterface = ({ userTier = 'BASIC', volunteerHours = 0 }) => {
       <div className="access-status" style={{
         padding: '16px',
         marginBottom: '20px',
-        background: '#000000',
+        background: 'transparent',
         border: '1px solid rgba(134, 239, 172, 0.2)',
         borderRadius: '12px',
       }}>

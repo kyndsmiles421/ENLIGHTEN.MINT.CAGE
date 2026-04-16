@@ -49,8 +49,8 @@ export default function CreditNudge() {
           style={{
             background: isZero ? 'rgba(127, 29, 29, 0.95)' : 'rgba(30, 27, 50, 0.95)',
             border: `1px solid ${isZero ? 'rgba(239,68,68,0.25)' : 'rgba(234,179,8,0.2)'}`,
-            backdropFilter: 'blur(20px)',
-            boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 30px ${isZero ? 'rgba(239,68,68,0.08)' : 'rgba(234,179,8,0.06)'}`,
+            backdropFilter: 'none',
+            boxShadow: `0 20px 60px rgba(0,0,0,0.15), 0 0 30px ${isZero ? 'rgba(239,68,68,0.08)' : 'rgba(234,179,8,0.06)'}`,
           }}>
           <div className="p-4 flex items-start gap-3">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"

@@ -44,7 +44,7 @@ function MudraCard({ mudra, onSelect, index }) {
             loading="lazy"
           />
           <div className="absolute inset-0" style={{
-            background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)`
+            background: `linear-gradient(to top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)`
           }} />
           <div className="absolute top-3 right-3">
             <span className="text-[10px] font-medium px-2 py-1 rounded-full backdrop-blur-sm flex items-center gap-1"
@@ -90,7 +90,7 @@ function MudraDetail({ mudra, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
+      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
       onClick={onClose}
       data-testid="mudra-detail-overlay"
     >
@@ -115,7 +115,7 @@ function MudraDetail({ mudra, onClose }) {
           <div className="relative">
             <div className="aspect-square md:sticky md:top-0">
               {activeTab === 'video' ? (
-                <div className="w-full h-full flex items-center justify-center" style={{ background: '#000' }}>
+                <div className="w-full h-full flex items-center justify-center" style={{ background: 'transparent' }}>
                   <iframe
                     src={mudra.video_url}
                     title={mudra.video_title}

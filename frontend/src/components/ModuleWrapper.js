@@ -105,7 +105,7 @@ const ModuleWrapper = ({
               : '1px solid rgba(80, 80, 80, 0.4)',
             color: creatorOpen ? '#86efac' : '#888',
             cursor: 'pointer',
-            backdropFilter: 'blur(8px)',
+            backdropFilter: 'none',
             fontSize: '11px',
             fontWeight: 600,
             letterSpacing: '0.05em',
@@ -136,7 +136,7 @@ const ModuleWrapper = ({
               border: '1px solid rgba(134, 239, 172, 0.3)',
               borderRadius: '12px',
               overflow: 'hidden',
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
               boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
             }}
           >

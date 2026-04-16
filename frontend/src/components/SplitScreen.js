@@ -186,7 +186,7 @@ export function SplitScreenProvider({ children }) {
             <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 border-b"
               style={{
                 background: 'rgba(3,3,8,0.95)',
-                backdropFilter: 'blur(20px)',
+                backdropFilter: 'none',
                 borderColor: 'rgba(192,132,252,0.08)',
               }}>
               <div className="flex items-center gap-2">
@@ -237,7 +237,7 @@ export function SplitScreenProvider({ children }) {
                 background: 'rgba(3,3,8,0.9)',
                 border: '1px solid rgba(192,132,252,0.15)',
                 borderRight: 'none',
-                backdropFilter: 'blur(20px)',
+                backdropFilter: 'none',
               }}
               data-testid="split-expand-btn"
             >
@@ -301,8 +301,8 @@ export function SplitScreenLauncher() {
             style={{
               background: 'rgba(0,0,0,0)',
               border: '1px solid rgba(192,132,252,0.12)',
-              backdropFilter: 'blur(24px)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 20px rgba(192,132,252,0.05)',
+              backdropFilter: 'none',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.15), 0 0 20px rgba(192,132,252,0.05)',
               scrollbarWidth: 'none',
             }}
             data-testid="split-screen-menu"

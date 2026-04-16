@@ -330,7 +330,7 @@ export default function QuantumLoom() {
           padding: 50px;
           border: 1px solid #FFD700;
           border-radius: 20px;
-          background: rgba(0,0,0,0.5);
+          background: rgba(0,0,0,0.15);
           box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
         }
         .completion-title {

@@ -100,7 +100,7 @@ export default function IntroVideo() {
         style={{
           background: 'linear-gradient(135deg, rgba(216,180,254,0.08), rgba(129,140,248,0.06))',
           border: '1px solid rgba(216,180,254,0.15)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'none',
         }}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center"
           style={{
@@ -130,7 +130,7 @@ export default function IntroVideo() {
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="fixed inset-0 z-[9998] flex items-center justify-center"
-              style={{ background: 'rgba(3,4,10,0.95)', backdropFilter: 'blur(24px)' }}
+              style={{ background: 'rgba(3,4,10,0.95)', backdropFilter: 'none'}}
               onClick={closePlayer}
               data-testid="intro-video-player">
               <div onClick={e => e.stopPropagation()} className="relative w-full max-w-4xl mx-4">
@@ -164,8 +164,8 @@ export default function IntroVideo() {
                     data-testid="intro-video-mute-toggle"
                     className="absolute bottom-4 right-4 p-3 rounded-xl transition-all hover:scale-110 active:scale-95"
                     style={{
-                      background: 'rgba(0,0,0,0.7)',
-                      backdropFilter: 'blur(8px)',
+                      background: 'rgba(0,0,0,0.15)',
+                      backdropFilter: 'none',
                       border: '1px solid rgba(255,255,255,0.12)',
                       touchAction: 'manipulation',
                       zIndex: 30,

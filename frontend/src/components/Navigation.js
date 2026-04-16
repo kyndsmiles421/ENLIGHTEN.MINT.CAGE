@@ -192,10 +192,10 @@ function MegaDropdown({ category, onClose }) {
       style={{
         background: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(13, 14, 26, 0.96)',
         border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(192,132,252,0.08)'}`,
-        backdropFilter: 'blur(32px)',
+        backdropFilter: 'none',
         boxShadow: isLight
           ? '0 16px 48px rgba(30,27,46,0.12), 0 0 0 1px rgba(30,27,46,0.04)'
-          : '0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(192,132,252,0.04)',
+          : '0 24px 80px rgba(0,0,0,0.15), 0 0 40px rgba(192,132,252,0.04)',
         minWidth: category.items.length > 6 ? '340px' : '200px',
       }}
       data-testid={`mega-menu-${category.id}`}
@@ -411,7 +411,7 @@ export default function Navigation() {
         className="hidden lg:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-5 py-2.5"
         style={{
           background: isLight ? 'rgba(248, 246, 243, 0.88)' : 'rgba(11, 12, 21, 0.8)',
-          backdropFilter: 'blur(28px)',
+          backdropFilter: 'none',
           borderBottom: `1px solid ${isLight ? 'rgba(30,27,46,0.06)' : 'rgba(192,132,252,0.05)'}`,
         }}
         data-testid="desktop-nav"
@@ -634,8 +634,8 @@ export default function Navigation() {
                     style={{
                       background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(13, 14, 26, 0.96)',
                       border: `1px solid ${isLight ? 'rgba(30,27,46,0.08)' : 'rgba(192,132,252,0.08)'}`,
-                      backdropFilter: 'blur(32px)',
-                      boxShadow: isLight ? '0 16px 48px rgba(30,27,46,0.12)' : '0 24px 80px rgba(0,0,0,0.5)',
+                      backdropFilter: 'none',
+                      boxShadow: isLight ? '0 16px 48px rgba(30,27,46,0.12)' : '0 24px 80px rgba(0,0,0,0.15)',
                     }}
                     data-testid="nav-profile-dropdown"
                   >
@@ -741,7 +741,7 @@ export default function Navigation() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
         style={{
           background: isLight ? 'rgba(248, 246, 243, 0.88)' : 'rgba(11, 12, 21, 0.85)',
-          backdropFilter: 'blur(28px)',
+          backdropFilter: 'none',
           borderBottom: `1px solid ${isLight ? 'rgba(30,27,46,0.06)' : 'rgba(192,132,252,0.05)'}`,
         }}
       >
@@ -770,7 +770,7 @@ export default function Navigation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="lg:hidden fixed inset-0 z-40 pt-16 overflow-y-auto"
-            style={{ background: isLight ? 'rgba(248, 246, 243, 0.98)' : 'rgba(11, 12, 21, 0.98)', backdropFilter: 'blur(24px)' }}
+            style={{ background: isLight ? 'rgba(248, 246, 243, 0.98)' : 'rgba(11, 12, 21, 0.98)', backdropFilter: 'none'}}
             data-testid="mobile-menu-overlay"
           >
             <div className="p-4 pb-24">
@@ -903,7 +903,7 @@ function NotificationInbox({ notifications, onClose, onMarkRead, onMarkAllRead, 
   return (
     <motion.div initial={{ opacity: 0, y: -8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.96 }}
       className="w-80 max-h-[420px] rounded-2xl overflow-hidden flex flex-col"
-      style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'blur(20px)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}
+      style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'none', boxShadow: '0 12px 40px rgba(0,0,0,0.15)' }}
       data-testid="notification-inbox">
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
         <div className="flex items-center gap-2">

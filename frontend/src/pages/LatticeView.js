@@ -94,7 +94,7 @@ export default function LatticeView() {
   return (
     <div 
       className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: '#000000' }}
+      style={{ background: 'transparent' }}
     >
       {/* Header */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-50">

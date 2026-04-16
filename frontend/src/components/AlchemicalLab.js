@@ -204,7 +204,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.9)' }}
+      style={{ background: 'rgba(0,0,0,0.15)' }}
       data-testid="alchemical-lab"
     >
       <motion.div
@@ -213,7 +213,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-[90vw] max-w-xl max-h-[85vh] overflow-hidden rounded-2xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(8,10,18,0.98), rgba(15,20,35,0.98))',
+          background: 'linear-gradient(135deg, rgba(0,0,0,0), rgba(15,20,35,0.98))',
           border: '1px solid rgba(129,140,248,0.2)',
           boxShadow: '0 0 60px rgba(129,140,248,0.15)',
         }}

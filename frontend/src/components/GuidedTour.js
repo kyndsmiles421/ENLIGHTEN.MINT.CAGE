@@ -144,7 +144,7 @@ function VideoIntro({ onComplete, onSkip }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[350] flex flex-col items-center justify-center"
-      style={{ background: '#000' }}
+      style={{ background: 'transparent' }}
       data-testid="tour-video-phase"
     >
       {loading && (
@@ -176,7 +176,7 @@ function VideoIntro({ onComplete, onSkip }) {
             onClick={toggleMute}
             data-testid="tour-video-mute-toggle"
             className="absolute bottom-8 left-8 p-2.5 rounded-lg transition-all hover:scale-110 z-10"
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none', border: '1px solid rgba(255,255,255,0.08)' }}>
             {muted
               ? <VolumeX size={16} style={{ color: '#F8FAFC' }} />
               : <Volume2 size={16} style={{ color: '#D8B4FE' }} />
@@ -190,7 +190,7 @@ function VideoIntro({ onComplete, onSkip }) {
               background: 'rgba(255,255,255,0.08)',
               border: '1px solid rgba(255,255,255,0.12)',
               color: 'rgba(248,250,252,0.7)',
-              backdropFilter: 'blur(12px)',
+              backdropFilter: 'none',
             }}
             data-testid="tour-video-skip"
           >
@@ -300,7 +300,7 @@ function CardWalkthrough({ onClose, onFinish }) {
           style={{
             background: 'rgba(20,22,45,0.98)',
             border: `1px solid ${current.color}18`,
-            boxShadow: `0 0 80px ${current.color}08, 0 24px 60px rgba(0,0,0,0.4)`,
+            boxShadow: `0 0 80px ${current.color}08, 0 24px 60px rgba(0,0,0,0.1)`,
           }}
           data-testid={`tour-step-${current.id}`}
         >

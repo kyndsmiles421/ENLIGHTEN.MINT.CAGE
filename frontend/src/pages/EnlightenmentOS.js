@@ -350,7 +350,7 @@ export default function EnlightenmentOS() {
           width: 100%;
           height: 40px;
           z-index: 100;
-          background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+          background: linear-gradient(to bottom, rgba(0,0,0,0.15), transparent);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -380,7 +380,7 @@ export default function EnlightenmentOS() {
           width: 100%;
           z-index: 100;
           transition: height 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-          background: rgba(0,0,0,0.95);
+          background: rgba(0,0,0,0.15);
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
@@ -490,7 +490,7 @@ export default function EnlightenmentOS() {
           align-items: center;
           gap: 8px;
           padding: 20px 16px;
-          background: rgba(0,0,0,0.4);
+          background: rgba(0,0,0,0.1);
           border: 1px solid rgba(255,255,255,0.08);
           cursor: pointer;
           transition: all 0.3s;

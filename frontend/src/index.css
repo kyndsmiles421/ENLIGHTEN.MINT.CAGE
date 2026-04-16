@@ -540,7 +540,7 @@ body[data-perspective="INTENSE"] #MANIFEST_BAR {
 /* Bar Section Themes */
 .bar-section-archives {
   /* ═══ SHADOW VOID: Solid black foundation with cyan accent ═══ */
-  background: #000000 !important;
+  background: transparent !important;
   box-shadow: 0 2px 15px rgba(34, 211, 238, 0.15);
   border-bottom: 1px solid rgba(34, 211, 238, 0.3) !important;
 }
@@ -2301,7 +2301,7 @@ textarea,
 body {
   margin: 0;
   font-family: 'Manrope', sans-serif;
-  background: #030308;
+  background: transparent;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

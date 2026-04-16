@@ -224,7 +224,7 @@ export default function Oracle() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 pointer-events-none"
             style={{
-              background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%)',
+              background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.15) 100%)',
             }}
           >
             <motion.div

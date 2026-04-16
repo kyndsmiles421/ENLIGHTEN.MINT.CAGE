@@ -190,7 +190,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
       style={{
         background: 'rgba(11,12,21,0.97)',
         border: '1px solid rgba(192,132,252,0.1)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         maxHeight: 320,
       }}
       data-testid="constellation-panel"

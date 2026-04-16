@@ -123,9 +123,9 @@ export default function DevConsole({ isOpen, onClose, authHeaders }) {
         className="fixed top-16 right-4 z-[300] w-80 max-h-[70vh] overflow-y-auto rounded-xl"
         style={{
           background: 'rgba(3,3,8,0.95)',
-          backdropFilter: 'blur(16px)',
+          backdropFilter: 'none',
           border: '1px solid rgba(34,197,94,0.2)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
         }}
         data-testid="dev-console"
       >

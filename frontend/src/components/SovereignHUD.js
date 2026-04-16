@@ -252,7 +252,7 @@ export default function SovereignHUD() {
         className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl cursor-pointer"
         style={{
           background: stats.npu_burst ? 'rgba(234,179,8,0.12)' : 'rgba(6,6,14,0.85)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'none',
           border: `1px solid ${stats.npu_burst ? 'rgba(234,179,8,0.3)' : 'rgba(248,250,252,0.06)'}`,
           boxShadow: stats.npu_burst ? `0 0 20px rgba(234,179,8,0.15)` : 'none',
         }}
@@ -310,7 +310,7 @@ export default function SovereignHUD() {
             className="absolute bottom-full left-0 mb-2 w-56 rounded-xl overflow-hidden"
             style={{
               background: 'rgba(6,6,14,0.95)',
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'none',
               border: '1px solid rgba(248,250,252,0.06)',
             }}
             initial={{ opacity: 0, y: 10, scale: 0.95 }}

@@ -40,7 +40,7 @@ export default function ShareButton() {
       style={{
         background: 'rgba(22,24,38,0.8)',
         border: '1px solid rgba(255,255,255,0.08)',
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
         color: 'var(--text-muted)',
       }}
       data-testid="share-btn">

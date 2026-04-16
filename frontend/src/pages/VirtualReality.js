@@ -1332,12 +1332,12 @@ export default function VirtualReality() {
                     autoPlay loop playsInline
                     data-testid="vr-theater-video"
                   />
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%)' }} />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.15) 100%)' }} />
                   <div className="absolute bottom-0 left-0 right-0 p-5">
                     <p className="text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: vrTheater.story?.color }}>
                       {vrTheater.story?.culture} Creation Story — Video
                     </p>
-                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                       {vrTheater.fullStory?.story?.split('\n\n')[0] || ''}
                     </p>
                   </div>
@@ -1376,14 +1376,14 @@ export default function VirtualReality() {
                       </div>
                     )}
                   </AnimatePresence>
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%)' }} />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.15) 100%)' }} />
 
                   {/* Story text overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-5">
                     <p className="text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: vrTheater.story?.color }}>
                       {vrTheater.story?.culture} Creation Story
                     </p>
-                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                       {vrTheater.fullStory?.story?.split('\n\n')[vrTheater.scene] || ''}
                     </p>
                   </div>

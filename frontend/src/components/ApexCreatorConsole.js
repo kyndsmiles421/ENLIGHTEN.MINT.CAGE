@@ -337,7 +337,7 @@ function AuditTerminalFeed({ auditStream, isVisible, onClose }) {
       exit={{ opacity: 0, y: -10 }}
       className="rounded-lg overflow-hidden"
       style={{
-        background: 'rgba(0,0,0,0.95)',
+        background: 'rgba(0,0,0,0.15)',
         border: '1px solid rgba(6,182,212,0.3)',
         fontFamily: 'monospace',
       }}
@@ -537,7 +537,7 @@ function FaderStrip({ strip, layerColor, onValueChange, onMute, onSolo }) {
       {/* Fader Track */}
       <div 
         className="relative w-4 h-32 rounded-sm"
-        style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)' }}
+        style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.1)' }}
       >
         {/* Meter */}
         <div 
@@ -623,7 +623,7 @@ function CashFlowVisualizer({ cashFlow, isMaster }) {
     const height = canvas.height;
     
     // Clear canvas
-    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.fillRect(0, 0, width, height);
     
     // Draw center line
@@ -669,7 +669,7 @@ function CashFlowVisualizer({ cashFlow, isMaster }) {
     <div 
       className="rounded-lg overflow-hidden"
       style={{
-        background: 'rgba(0,0,0,0.4)',
+        background: 'rgba(0,0,0,0.1)',
         border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
@@ -871,7 +871,7 @@ function SuperStrip({ selectedStrip, layerColor, onUpdate }) {
             <span className="text-[7px] text-white/40">{label}</span>
             <div 
               className="w-8 h-20 rounded relative"
-              style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(0,0,0,0.1)', border: '1px solid rgba(255,255,255,0.1)' }}
             >
               <div 
                 className="absolute bottom-0 left-0 right-0 rounded-b transition-all"
@@ -1708,7 +1708,7 @@ export default function ApexCreatorConsole({ onClose }) {
       <div 
         className="px-4 py-2"
         style={{
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.95), rgba(20,0,30,0.95))',
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.15), rgba(20,0,30,0.95))',
           borderTop: '1px solid rgba(139,92,246,0.2)',
         }}
         data-testid="apex-master-footer"

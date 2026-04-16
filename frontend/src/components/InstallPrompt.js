@@ -74,8 +74,8 @@ export default function InstallPrompt() {
         style={{
           background: 'rgba(13, 14, 26, 0.97)',
           border: '1px solid rgba(192,132,252,0.12)',
-          backdropFilter: 'blur(24px)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(192,132,252,0.05)',
+          backdropFilter: 'none',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.15), 0 0 30px rgba(192,132,252,0.05)',
         }}
         data-testid="install-prompt"
       >

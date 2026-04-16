@@ -214,7 +214,7 @@ export default function SeedHuntWidget({
     return (
       <div 
         className="rounded-xl p-4 animate-pulse"
-        style={{ background: 'rgba(0,0,0,0.4)' }}
+        style={{ background: 'rgba(0,0,0,0.1)' }}
       >
         <div className="h-4 bg-gray-700 rounded w-1/2 mb-2" />
         <div className="h-3 bg-gray-700 rounded w-3/4" />
@@ -226,7 +226,7 @@ export default function SeedHuntWidget({
     return (
       <div 
         className="rounded-xl p-4 text-center"
-        style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,100,100,0.3)' }}
+        style={{ background: 'rgba(0,0,0,0.1)', border: '1px solid rgba(255,100,100,0.3)' }}
       >
         <AlertCircle size={20} className="mx-auto text-red-400 mb-2" />
         <p className="text-[10px] text-red-400">Hunt unavailable</p>
@@ -240,7 +240,7 @@ export default function SeedHuntWidget({
     <motion.div
       className="rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(0,0,0,0.6)',
+        background: 'rgba(0,0,0,0.15)',
         border: `1px solid ${style.border}`,
         boxShadow: isNearTarget ? style.glow : 'none',
       }}

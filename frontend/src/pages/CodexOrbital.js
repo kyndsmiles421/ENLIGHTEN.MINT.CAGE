@@ -67,7 +67,7 @@ function CodexDetailPanel({ planet, onClose, onDive }) {
         width: 340, maxHeight: 'calc(100vh - 120px)',
         background: 'rgba(0,0,0,0)', backdropFilter: 'none',
         border: '1px solid rgba(248,250,252,0.06)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.1)',
       }}
       initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 40 }}

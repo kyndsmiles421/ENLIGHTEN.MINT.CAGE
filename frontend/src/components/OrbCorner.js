@@ -29,7 +29,7 @@ export default function OrbCorner() {
           background: `radial-gradient(circle at 40% 35%, ${pulseColor}25, rgba(0,0,0,0) 70%)`,
           border: `1px solid ${pulseColor}20`,
           boxShadow: `0 0 20px ${pulseColor}10`,
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'none',
         }}
         animate={{
           scale: [1, 1.04, 1],

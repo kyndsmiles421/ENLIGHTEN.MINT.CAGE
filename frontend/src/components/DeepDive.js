@@ -50,7 +50,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+            style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
             onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
           >
             <motion.div
@@ -61,7 +61,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
               style={{
                 background: 'rgba(18, 20, 32, 0.98)',
                 border: `1px solid ${color}20`,
-                boxShadow: `0 30px 80px rgba(0,0,0,0.5), 0 0 40px ${color}08`,
+                boxShadow: `0 30px 80px rgba(0,0,0,0.15), 0 0 40px ${color}08`,
               }}
             >
               {/* Header */}
@@ -69,7 +69,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
                 style={{
                   background: 'rgba(18, 20, 32, 0.95)',
                   borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  backdropFilter: 'blur(20px)',
+                  backdropFilter: 'none',
                 }}>
                 <div className="flex items-center gap-3">
                   <BookOpen size={18} style={{ color }} />

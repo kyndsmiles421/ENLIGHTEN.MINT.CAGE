@@ -24,10 +24,10 @@ export function ExpandableInfoCard({ title, subtitle, description, color = '#A78
           <Icon size={13} style={{ color }} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium" style={{ color: expanded ? color : 'rgba(248,250,252,0.85)', textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
+          <p className="text-sm font-medium" style={{ color: expanded ? color : 'rgba(248,250,252,0.85)', textShadow: '0 1px 6px rgba(0,0,0,0.15)' }}>
             {title}
           </p>
-          {subtitle && <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.35)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{subtitle}</p>}
+          {subtitle && <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.35)', textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>{subtitle}</p>}
         </div>
         <ChevronRight size={12} style={{
           color: expanded ? color : 'rgba(248,250,252,0.2)',
@@ -46,7 +46,7 @@ export function ExpandableInfoCard({ title, subtitle, description, color = '#A78
             className="overflow-hidden">
             <div className="mt-3 pt-3 pl-10" style={{ borderTop: `1px solid ${color}10` }}>
               {description && (
-                <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(248,250,252,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(248,250,252,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>
                   {description}
                 </p>
               )}

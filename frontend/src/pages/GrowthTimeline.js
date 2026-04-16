@@ -32,7 +32,7 @@ function WeeklyHeatmap({ weeks }) {
               />
               {/* Tooltip */}
               <div className="absolute -top-16 left-1/2 -translate-x-1/2 rounded-lg px-2.5 py-1.5 text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20"
-                style={{ background: 'rgba(8,10,18,0.95)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)' }}>
+                style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)' }}>
                 <span className="font-medium">{w.count}</span> activities &middot; <span style={{ color: w.top_color }}>{w.top_category || 'None'}</span>
               </div>
             </div>

@@ -147,7 +147,7 @@ function VideoPlayerModal({ storyId, videoUrl, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'none'}}
+      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       data-testid="video-player-modal"
     >
@@ -163,13 +163,13 @@ function VideoPlayerModal({ storyId, videoUrl, onClose }) {
         </button>
 
         <div className="rounded-2xl overflow-hidden" style={{
-          boxShadow: `0 0 80px ${meta.color}15, 0 24px 60px rgba(0,0,0,0.5)`,
+          boxShadow: `0 0 80px ${meta.color}15, 0 24px 60px rgba(0,0,0,0.15)`,
           border: `1px solid ${meta.color}15`,
         }}>
           <video
             src={`${process.env.REACT_APP_BACKEND_URL}${videoUrl}`}
             className="w-full"
-            style={{ aspectRatio: '16/9', background: '#000' }}
+            style={{ aspectRatio: '16/9', background: 'transparent' }}
             autoPlay loop controls playsInline
             data-testid="cinema-video-element"
           />
@@ -483,7 +483,7 @@ export default function Videos() {
                       <X size={16} style={{ color: 'var(--text-muted)' }} />
                     </button>
                   </div>
-                  <div className="relative w-full" style={{ paddingBottom: '56.25%', background: '#000' }}>
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%', background: 'transparent' }}>
                     <iframe src={`${playing.video_url}?autoplay=1`} title={playing.title}
                       className="absolute inset-0 w-full h-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -512,16 +512,16 @@ export default function Videos() {
                         style={{ filter: 'brightness(0.7)', transition: 'transform 0.5s' }} loading="lazy" />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110"
-                          style={{ background: 'rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'none', transition: 'transform 0.3s' }}>
+                          style={{ background: 'rgba(0,0,0,0.15)', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'none', transition: 'transform 0.3s' }}>
                           <Play size={24} fill="white" style={{ color: 'white', marginLeft: '2px' }} />
                         </div>
                       </div>
                       <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs flex items-center gap-1"
-                        style={{ background: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'none'}}>
+                        style={{ background: 'rgba(0,0,0,0.15)', color: 'white', backdropFilter: 'none'}}>
                         <Clock size={10} /> {video.duration}
                       </div>
                       <div className="absolute bottom-3 left-3 px-2 py-1 rounded-full text-xs"
-                        style={{ background: 'rgba(0,0,0,0.6)', color: '#2DD4BF', backdropFilter: 'none'}}>
+                        style={{ background: 'rgba(0,0,0,0.15)', color: '#2DD4BF', backdropFilter: 'none'}}>
                         {video.level}
                       </div>
                     </div>

@@ -280,10 +280,10 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
         style={{
           width: 'min(340px, 85vw)',
           background: 'rgba(11,12,21,0.92)',
-          backdropFilter: 'blur(24px)',
+          backdropFilter: 'none',
           WebkitBackdropFilter: 'blur(24px)',
           borderLeft: `1px solid ${color}12`,
-          boxShadow: `-8px 0 40px rgba(0,0,0,0.5), -2px 0 16px ${color}08`,
+          boxShadow: `-8px 0 40px rgba(0,0,0,0.15), -2px 0 16px ${color}08`,
         }}
         data-testid="consult-overlay"
       >

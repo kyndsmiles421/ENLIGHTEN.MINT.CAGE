@@ -78,7 +78,7 @@ export default function MissionControl({ isOpen, onClose }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', pointerEvents: 'none' }}
+            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'none', WebkitBackdropFilter: 'blur(20px)', pointerEvents: 'none' }}
           />
 
           {/* Click-capture layer — only covers panel area for close-on-outside-click */}
@@ -100,7 +100,7 @@ export default function MissionControl({ isOpen, onClose }) {
               width: Math.min(360, window.innerWidth - 32),
               maxHeight: 'calc(100vh - 48px)',
               background: 'rgba(0,0,0,0)',
-              backdropFilter: 'blur(24px)',
+              backdropFilter: 'none',
               WebkitBackdropFilter: 'blur(24px)',
               border: '1px solid rgba(248,250,252,0.08)',
               boxShadow: '0 0 60px rgba(167,139,250,0.06), 0 24px 80px rgba(0,0,0,0.3)',

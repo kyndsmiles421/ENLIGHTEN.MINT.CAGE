@@ -83,7 +83,7 @@ export default function SageAvatar() {
             className="max-w-[220px] p-3 rounded-xl relative"
             style={{
               background: 'rgba(40, 40, 50, 0.9)',
-              backdropFilter: 'blur(12px)',
+              backdropFilter: 'none',
               border: `1px solid ${currentSage.color}40`,
               boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
             }}

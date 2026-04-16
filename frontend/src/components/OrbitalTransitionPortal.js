@@ -108,7 +108,7 @@ export function OrbitalTransitionPortal() {
                 padding: isCurrent ? '5px 12px' : '5px 8px',
                 background: isCurrent ? `${page.color}12` : 'rgba(0,0,0,0)',
                 border: `1px solid ${isCurrent ? page.color + '30' : 'rgba(248,250,252,0.04)'}`,
-                backdropFilter: 'blur(12px)',
+                backdropFilter: 'none',
               }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}

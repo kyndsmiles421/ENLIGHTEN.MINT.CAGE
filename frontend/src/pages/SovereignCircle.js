@@ -417,7 +417,7 @@ export default function SovereignCircle() {
   const freqData = SOLFEGGIO.find(s => s.hz === activeFreq) || SOLFEGGIO[4];
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: '#000' }}
+    <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}
       data-testid="sovereign-session">
       {/* Atmospheric background */}
       <motion.div className="absolute inset-0" animate={{

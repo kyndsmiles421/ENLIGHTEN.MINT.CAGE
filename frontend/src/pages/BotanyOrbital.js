@@ -115,7 +115,7 @@ function DetailPanel({ planet, onClose, authHeaders }) {
         background: 'rgba(0,0,0,0)',
         backdropFilter: 'none',
         border: '1px solid rgba(248,250,252,0.06)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.1)',
       }}
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}

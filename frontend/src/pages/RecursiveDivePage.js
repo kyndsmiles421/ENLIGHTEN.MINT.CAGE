@@ -50,7 +50,7 @@ export default function RecursiveDivePage() {
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all"
             style={{
-              background: 'rgba(0,0,0,0.4)',
+              background: 'rgba(0,0,0,0.1)',
               color: 'rgba(255,255,255,0.7)',
               backdropFilter: 'none',
             }}
@@ -65,7 +65,7 @@ export default function RecursiveDivePage() {
               onClick={() => setShowSeeds(!showSeeds)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all"
               style={{
-                background: showSeeds ? 'rgba(255,215,0,0.2)' : 'rgba(0,0,0,0.4)',
+                background: showSeeds ? 'rgba(255,215,0,0.2)' : 'rgba(0,0,0,0.1)',
                 color: showSeeds ? '#FFD700' : 'rgba(255,255,255,0.7)',
                 backdropFilter: 'none',
                 border: `1px solid ${showSeeds ? 'rgba(255,215,0,0.3)' : 'transparent'}`,
@@ -80,7 +80,7 @@ export default function RecursiveDivePage() {
               onClick={() => setShowInfo(!showInfo)}
               className="p-2 rounded-lg transition-all"
               style={{
-                background: showInfo ? 'rgba(100,149,237,0.2)' : 'rgba(0,0,0,0.4)',
+                background: showInfo ? 'rgba(100,149,237,0.2)' : 'rgba(0,0,0,0.1)',
                 color: showInfo ? '#6495ED' : 'rgba(255,255,255,0.7)',
                 backdropFilter: 'none',
               }}
@@ -97,7 +97,7 @@ export default function RecursiveDivePage() {
           <motion.div
             className="fixed top-20 right-4 z-40 w-80 p-4 rounded-xl"
             style={{
-              background: 'rgba(0,0,0,0.8)',
+              background: 'rgba(0,0,0,0.15)',
               backdropFilter: 'none',
               border: '1px solid rgba(100,149,237,0.3)',
             }}
@@ -138,7 +138,7 @@ export default function RecursiveDivePage() {
           <motion.div
             className="fixed top-20 right-4 z-40 w-80 max-h-[60vh] overflow-y-auto p-4 rounded-xl"
             style={{
-              background: 'rgba(0,0,0,0.8)',
+              background: 'rgba(0,0,0,0.15)',
               backdropFilter: 'none',
               border: '1px solid rgba(255,215,0,0.3)',
             }}
@@ -204,7 +204,7 @@ export default function RecursiveDivePage() {
         <div className="mt-6 text-center">
           <div className="inline-flex items-center gap-4 px-4 py-2 rounded-full text-[10px]"
             style={{
-              background: 'rgba(0,0,0,0.4)',
+              background: 'rgba(0,0,0,0.1)',
               color: 'rgba(255,255,255,0.4)',
             }}
           >

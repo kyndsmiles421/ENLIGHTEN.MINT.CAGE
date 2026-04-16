@@ -236,7 +236,7 @@ export default function ARPortalPage() {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#000' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <Loader2 className="animate-spin text-purple-400" size={24} />
       </div>
     );
@@ -245,7 +245,7 @@ export default function ARPortalPage() {
   return (
     <div 
       className="min-h-screen pb-24"
-      style={{ background: '#000000', paddingTop: '70px' }}
+      style={{ background: 'transparent', paddingTop: '70px' }}
       data-testid="ar-portal-page"
     >
       {/* Header */}

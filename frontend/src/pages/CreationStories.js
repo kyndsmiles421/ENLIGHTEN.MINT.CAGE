@@ -130,7 +130,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex flex-col" data-testid="cinematic-mode" style={{ background: '#000' }}>
+      className="fixed inset-0 z-[100] flex flex-col" data-testid="cinematic-mode" style={{ background: 'transparent' }}>
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
         <button onClick={toggleVideoMode} data-testid="toggle-video-mode"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
@@ -149,7 +149,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
           {videoMode && videoStatus === 'complete' && videoUrl ? (
             <motion.div key="video-scene" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }} className="absolute inset-0">
               <video ref={videoRef} src={`${process.env.REACT_APP_BACKEND_URL}${videoUrl}`} className="w-full h-full object-cover" style={{ filter: 'brightness(0.7) saturate(1.2)' }} autoPlay loop muted playsInline data-testid="cinema-video-player" />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 100%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.15) 100%)' }} />
             </motion.div>
           ) : videoMode && videoStatus === 'generating' ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
@@ -159,7 +159,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
           ) : currentImg ? (
             <motion.div key={`scene-${currentScene}`} initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 1.5 }} className="absolute inset-0">
               <img src={`data:image/png;base64,${currentImg}`} alt={`Scene ${currentScene + 1}`} className="w-full h-full object-cover" style={{ filter: 'brightness(0.7) saturate(1.2)' }} />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 100%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.15) 100%)' }} />
             </motion.div>
           ) : generating ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
@@ -177,13 +177,13 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
             <div className="w-2 h-2 rounded-full" style={{ background: story.color, boxShadow: `0 0 8px ${story.color}80` }} />
             <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: story.color }}>{story.culture}</span>
           </div>
-          <p className="text-lg font-semibold" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{story.title}</p>
+          <p className="text-lg font-semibold" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>{story.title}</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-10 px-8 pb-24">
           <AnimatePresence mode="wait">
             <motion.p key={currentScene} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.8 }}
               className="text-base md:text-lg leading-relaxed max-w-3xl mx-auto text-center"
-              style={{ color: 'rgba(248,250,252,0.85)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 20px rgba(0,0,0,0.9)' }}>
+              style={{ color: 'rgba(248,250,252,0.85)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 20px rgba(0,0,0,0.15)' }}>
               {currentParagraph}
             </motion.p>
           </AnimatePresence>

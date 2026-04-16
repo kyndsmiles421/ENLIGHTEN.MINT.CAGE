@@ -292,7 +292,7 @@ function LessonViewer({ content, modality, onClose, onComplete, completing }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.85)' }} data-testid="lesson-viewer">
+      style={{ background: 'rgba(0,0,0,0.15)' }} data-testid="lesson-viewer">
       <motion.div initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
         className="rounded-2xl max-w-md w-full overflow-hidden"
         style={{ background: 'transparent', border: `1px solid ${modality?.color || '#C084FC'}18` }}>
@@ -364,7 +364,7 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.88)' }} data-testid="forge-lab-modal">
+      style={{ background: 'rgba(0,0,0,0.15)' }} data-testid="forge-lab-modal">
       <motion.div initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
         className="rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
         style={{ background: 'transparent', border: `1px solid ${modality?.color || '#C084FC'}15` }}>

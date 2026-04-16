@@ -101,8 +101,8 @@ export default function FloatingAssistant() {
             style={{
               background: 'rgba(11,12,21,0.97)',
               border: '1px solid rgba(192,132,252,0.15)',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(192,132,252,0.08)',
-              backdropFilter: 'blur(20px)',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.15), 0 0 30px rgba(192,132,252,0.08)',
+              backdropFilter: 'none',
               maxHeight: '480px',
             }}
             data-testid="assistant-panel"

@@ -100,8 +100,8 @@ export default function QuickMeditationWidget() {
             style={{
               background: 'rgba(12, 14, 24, 0.98)',
               border: '1px solid rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(24px)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+              backdropFilter: 'none',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
             }}
           >
             <div className="p-4">
@@ -167,7 +167,7 @@ export default function QuickMeditationWidget() {
         style={{
           background: playing ? `${current?.color || '#D8B4FE'}20` : 'rgba(22, 24, 38, 0.9)',
           border: `1px solid ${playing ? `${current?.color || '#D8B4FE'}30` : 'rgba(255,255,255,0.08)'}`,
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'none',
           boxShadow: playing ? `0 0 30px ${current?.color || '#D8B4FE'}15` : '0 4px 24px rgba(0,0,0,0.3)',
         }}
         data-testid="quick-meditation-btn"

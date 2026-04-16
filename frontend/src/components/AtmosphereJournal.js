@@ -49,7 +49,7 @@ function AtmosphereCard({ atm, onApply, onDelete, accent }) {
 
       {/* Hover actions */}
       <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ background: 'rgba(0,0,0,0.7)' }}>
+        style={{ background: 'rgba(0,0,0,0.15)' }}>
         <button onClick={() => onApply(atm)}
           className="p-2 rounded-lg active:scale-90 transition-all"
           style={{ background: `${accent}20`, border: `1px solid ${accent}40` }}

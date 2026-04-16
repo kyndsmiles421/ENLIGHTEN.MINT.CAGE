@@ -46,7 +46,7 @@ export default function TermsPage() {
   ];
 
   return (
-    <div className="min-h-screen px-4 py-8" style={{ background: '#000' }}>
+    <div className="min-h-screen px-4 py-8" style={{ background: 'transparent' }}>
       <div className="max-w-2xl mx-auto">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 mb-6 px-3 py-2 rounded-xl active:scale-95"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.5)' }}

@@ -196,7 +196,7 @@ export default function Exercises() {
                       className="overflow-hidden"
                     >
                       <div className="px-6 md:px-8 pb-6">
-                        <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%', background: '#000' }}>
+                        <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%', background: 'transparent' }}>
                           <iframe
                             src={ex.video_url}
                             title={ex.name}

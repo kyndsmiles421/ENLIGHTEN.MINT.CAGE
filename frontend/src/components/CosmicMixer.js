@@ -996,7 +996,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
           style={{
             background: hasActive ? 'rgba(192,132,252,0.2)' : 'rgba(22,24,38,0.9)',
             border: `1px solid ${hasActive ? 'rgba(192,132,252,0.3)' : 'rgba(255,255,255,0.06)'}`,
-            backdropFilter: 'blur(16px)',
+            backdropFilter: 'none',
             boxShadow: hasActive ? '0 0 20px rgba(192,132,252,0.15)' : '0 4px 20px rgba(0,0,0,0.3)',
             display: 'none', // Hidden by default - UtilityDock handles this
           }}
@@ -1014,7 +1014,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
         {open && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40" style={{ background: 'rgba(0,0,0,0.4)' }}
+              className="fixed inset-0 z-40" style={{ background: 'rgba(0,0,0,0.1)' }}
               onClick={() => { if (!fullScreen) setOpen(false); }}
               data-testid="mixer-backdrop" />
             <motion.div
@@ -1026,7 +1026,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
                 background: 'rgba(0,0,0,0)',
                 border: '1px solid rgba(192,132,252,0.1)',
                 borderBottom: 'none',
-                backdropFilter: 'blur(32px)',
+                backdropFilter: 'none',
                 maxHeight: panelMaxH,
                 overflowY: 'auto',
                 scrollbarWidth: 'none',

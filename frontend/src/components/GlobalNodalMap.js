@@ -181,7 +181,7 @@ export default function GlobalNodalMap({ isOpen, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: 'rgba(0,0,0,0.95)' }}
+        style={{ background: 'rgba(0,0,0,0.15)' }}
       >
         {/* Close button */}
         <button
@@ -212,7 +212,7 @@ export default function GlobalNodalMap({ isOpen, onClose }) {
           <div 
             className="relative rounded-2xl overflow-hidden"
             style={{ 
-              background: 'radial-gradient(ellipse at center, rgba(34,197,94,0.05) 0%, rgba(0,0,0,0.9) 70%)',
+              background: 'radial-gradient(ellipse at center, rgba(34,197,94,0.05) 0%, rgba(0,0,0,0.15) 70%)',
               border: '1px solid rgba(34,197,94,0.2)',
             }}
           >

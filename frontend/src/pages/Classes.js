@@ -112,7 +112,7 @@ export default function Classes() {
             {/* Video */}
             {lesson.video_url && (
               <div className="overflow-hidden mb-8">
-                <div className="relative w-full" style={{ paddingBottom: '56.25%', background: '#000' }}>
+                <div className="relative w-full" style={{ paddingBottom: '56.25%', background: 'transparent' }}>
                   <iframe src={lesson.video_url} title={lesson.title}
                     className="absolute inset-0 w-full h-full" style={{ border: 'none' }}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />

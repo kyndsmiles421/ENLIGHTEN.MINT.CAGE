@@ -61,7 +61,7 @@ const SovereignOrb = ({ label, icon, onClick, color, x, y, testId }) => (
       width: '40px',
       height: '40px',
       borderRadius: '50%',
-      background: `radial-gradient(circle at 30% 30%, ${color}, rgba(0,0,0,0.6))`,
+      background: `radial-gradient(circle at 30% 30%, ${color}, rgba(0,0,0,0.15))`,
       border: `1px solid ${color}`,
       position: 'absolute',
       pointerEvents: 'none',
@@ -80,7 +80,7 @@ const SovereignOrb = ({ label, icon, onClick, color, x, y, testId }) => (
       textTransform: 'uppercase',
       letterSpacing: '0.05em',
       fontWeight: '600',
-      textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+      textShadow: '0 1px 3px rgba(0,0,0,0.15)',
     }}>{label}</span>
   </button>
 );

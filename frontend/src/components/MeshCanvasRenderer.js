@@ -132,7 +132,7 @@ const MeshCanvasRenderer = ({ opacity = 0.6, blur = 0.5 }) => {
                 position: 'fixed', 
                 inset: 0, 
                 zIndex: -1, 
-                background: '#000',
+                background: 'transparent',
                 filter: `blur(${blur}px) contrast(1.2)`,
                 opacity: opacity
             }} 

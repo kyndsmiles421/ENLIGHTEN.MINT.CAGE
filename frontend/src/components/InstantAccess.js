@@ -116,7 +116,7 @@ const InstantAccess = ({ onAccessGranted, onTierUnlock }) => {
       className="instant-access-panel" 
       data-testid="instant-access"
       style={{
-        background: '#000000',
+        background: 'transparent',
         border: '1px solid rgba(134, 239, 172, 0.2)',
         borderRadius: '16px',
         padding: '24px',

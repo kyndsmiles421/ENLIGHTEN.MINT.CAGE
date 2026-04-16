@@ -311,7 +311,7 @@ export default function Observatory() {
         {/* ═══ ORRERY TAB ═══ */}
         {tab === 'orrery' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${immBg.color}15`, backdropFilter: 'none'}}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.15)', border: `1px solid ${immBg.color}15`, backdropFilter: 'none'}}>
               <div className="px-3 pt-2">
                 <p className="text-[7px] uppercase tracking-widest" style={{ color: `${immBg.color}66` }}>
                   Interactive Orrery — Tap a planet to immerse
@@ -327,7 +327,7 @@ export default function Observatory() {
                 <motion.div key={selectedPlanet.name}
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                   className="rounded-2xl p-5 space-y-4"
-                  style={{ background: `rgba(0,0,0,0.55)`, border: `1px solid ${selectedPlanet.color}20`, backdropFilter: 'none'}}>
+                  style={{ background: `rgba(0,0,0,0.15)`, border: `1px solid ${selectedPlanet.color}20`, backdropFilter: 'none'}}>
                   <div className="flex items-center gap-4">
                     <motion.div className="w-14 h-14 rounded-full flex-shrink-0"
                       animate={isPlanetPlaying ? { boxShadow: [`0 0 15px ${selectedPlanet.color}30`, `0 0 40px ${selectedPlanet.color}50`, `0 0 15px ${selectedPlanet.color}30`] } : {}}

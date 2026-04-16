@@ -85,7 +85,7 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
             {/* Background blur overlay */}
             <motion.div
               className="fixed inset-0 z-[94]"
-              style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }}
+              style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'none'}}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -123,9 +123,9 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
                     background: isHovered ? `${action.color}25` : 'rgba(12,14,24,0.95)',
                     border: `1.5px solid ${isHovered ? action.color : action.color + '40'}`,
                     boxShadow: isHovered
-                      ? `0 0 20px ${action.color}30, 0 4px 16px rgba(0,0,0,0.4)`
-                      : '0 4px 16px rgba(0,0,0,0.4)',
-                    backdropFilter: 'blur(16px)',
+                      ? `0 0 20px ${action.color}30, 0 4px 16px rgba(0,0,0,0.1)`
+                      : '0 4px 16px rgba(0,0,0,0.1)',
+                    backdropFilter: 'none',
                   }}
                   initial={{ opacity: 0, scale: 0, x: -pos.x, y: -pos.y }}
                   animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
@@ -156,7 +156,7 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
                     top: -ringRadius - 40,
                     background: 'rgba(12,14,24,0.95)',
                     border: '1px solid rgba(248,250,252,0.1)',
-                    backdropFilter: 'blur(12px)',
+                    backdropFilter: 'none',
                     minWidth: 100,
                     textAlign: 'center',
                   }}
@@ -188,9 +188,9 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
             ? '1.5px solid rgba(239,68,68,0.4)' 
             : '1.5px solid rgba(192,132,252,0.25)',
           boxShadow: expanded
-            ? '0 0 24px rgba(239,68,68,0.2), 0 4px 20px rgba(0,0,0,0.4)'
-            : '0 0 24px rgba(192,132,252,0.15), 0 4px 20px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(20px)',
+            ? '0 0 24px rgba(239,68,68,0.2), 0 4px 20px rgba(0,0,0,0.1)'
+            : '0 0 24px rgba(192,132,252,0.15), 0 4px 20px rgba(0,0,0,0.1)',
+          backdropFilter: 'none',
           WebkitBackdropFilter: 'blur(20px)',
         }}
         whileHover={{ scale: 1.08 }}

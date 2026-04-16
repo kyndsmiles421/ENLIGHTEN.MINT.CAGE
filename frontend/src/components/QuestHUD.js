@@ -49,9 +49,9 @@ export default function QuestHUD() {
         className="rounded-2xl overflow-hidden"
         style={{
           background: 'rgba(10, 10, 18, 0.9)',
-          backdropFilter: 'blur(20px)',
+          backdropFilter: 'none',
           border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
         }}
         layout
       >

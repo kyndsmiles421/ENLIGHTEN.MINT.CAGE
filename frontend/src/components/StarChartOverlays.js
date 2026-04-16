@@ -19,7 +19,7 @@ export function BirthConstellationToast({ info, onClose }) {
     <motion.div initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ duration: 0.6 }}
       className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 w-80 max-w-[90vw] rounded-2xl p-5 text-center"
-      style={{ background: 'rgba(8,10,18,0.92)', border: `1px solid ${color}30`, backdropFilter: 'blur(24px)', boxShadow: `0 0 40px ${color}15` }}
+      style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${color}30`, backdropFilter: 'none', boxShadow: `0 0 40px ${color}15` }}
       data-testid="birth-constellation-toast">
       <button onClick={onClose} className="absolute top-2 right-2 p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
       <div className="text-2xl mb-1">{info.symbol}</div>
@@ -58,10 +58,10 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
   return (
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
       className="absolute top-20 right-4 w-96 max-w-[85vw] max-h-[75vh] overflow-y-auto rounded-2xl z-20"
-      style={{ background: 'rgba(8,10,18,0.96)', border: `1px solid ${color}20`, backdropFilter: 'blur(24px)', boxShadow: `0 0 30px ${color}08` }}
+      style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${color}20`, backdropFilter: 'none', boxShadow: `0 0 30px ${color}08` }}
       data-testid="mythology-panel">
       {/* Header */}
-      <div className="sticky top-0 z-10 px-5 pt-5 pb-3" style={{ background: 'rgba(8,10,18,0.98)' }}>
+      <div className="sticky top-0 z-10 px-5 pt-5 pb-3" style={{ background: 'rgba(0,0,0,0)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-xl">{constellation.symbol}</div>
@@ -259,7 +259,7 @@ export function JourneyComplete({ count, onClose, authHeaders, token }) {
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute inset-0 z-30 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'blur(12px)' }}
+      className="absolute inset-0 z-30 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'none'}}
       data-testid="journey-complete">
       <div className="text-center max-w-sm px-6">
         <div className="text-4xl mb-3">&#10024;</div>
@@ -311,8 +311,8 @@ export function CelestialBadgesPanel({ onClose, token, authHeaders }) {
     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
       data-testid="badges-panel"
       className="absolute top-20 left-4 w-80 max-h-[75vh] overflow-y-auto rounded-2xl z-20"
-      style={{ background: 'rgba(8,10,18,0.96)', border: '1px solid rgba(192,132,252,0.15)', backdropFilter: 'blur(24px)', boxShadow: '0 0 30px rgba(192,132,252,0.08)' }}>
-      <div className="sticky top-0 z-10 px-5 pt-5 pb-3" style={{ background: 'rgba(8,10,18,0.98)' }}>
+      style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(192,132,252,0.15)', backdropFilter: 'none', boxShadow: '0 0 30px rgba(192,132,252,0.08)' }}>
+      <div className="sticky top-0 z-10 px-5 pt-5 pb-3" style={{ background: 'rgba(0,0,0,0)' }}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.25)' }}>

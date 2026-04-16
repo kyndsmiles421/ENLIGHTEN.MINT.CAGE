@@ -42,7 +42,7 @@ const ShambhalaMissionCircle = () => {
         onClick={handleToggle} 
         style={{
           pointerEvents: 'auto', width: '66px', height: '66px', borderRadius: '50%',
-          backgroundColor: '#FFFFFF', boxShadow: isAscended ? '0 0 40px #FFF' : '0 4px 10px rgba(0,0,0,0.5)',
+          backgroundColor: '#FFFFFF', boxShadow: isAscended ? '0 0 40px #FFF' : '0 4px 10px rgba(0,0,0,0.15)',
           cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', border: 'none',
           transition: 'box-shadow 0.4s ease'
         }}

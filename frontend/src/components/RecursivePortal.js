@@ -323,7 +323,7 @@ export default function RecursivePortal({ children }) {
           className="fixed top-12 left-1/2 -translate-x-1/2 z-[200] px-4 py-2 rounded-xl"
           style={{
             background: 'rgba(20, 20, 30, 0.9)',
-            backdropFilter: 'blur(12px)',
+            backdropFilter: 'none',
             border: '1px solid rgba(255,255,255,0.08)',
           }}
           initial={{ opacity: 0, y: -20 }}
@@ -378,7 +378,7 @@ export default function RecursivePortal({ children }) {
             className="fixed bottom-40 left-4 z-[80] flex items-center gap-2 px-3 py-2 rounded-full"
             style={{
               background: 'rgba(8, 8, 15, 0.9)',
-              backdropFilter: 'blur(12px)',
+              backdropFilter: 'none',
               border: '1px solid rgba(255,255,255,0.1)',
             }}
             initial={{ opacity: 0, x: -20 }}

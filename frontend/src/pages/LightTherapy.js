@@ -419,7 +419,7 @@ function ImmersiveSession({ colors, duration, onEnd, resonanceName, sceneUrl }) 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-      style={{ background: '#000' }}
+      style={{ background: 'transparent' }}
       data-testid="light-therapy-session"
     >
       {/* AI-generated scene background */}
@@ -565,7 +565,7 @@ export default function LightTherapy() {
 
   return (
     <div className="min-h-screen relative overflow-hidden" data-light-therapy="true"
-      style={{ background: '#000', transition: 'background 1s ease' }}>
+      style={{ background: 'transparent', transition: 'background 1s ease' }}>
 
       {/* Multi-color bath layers */}
       <AnimatePresence>
@@ -597,7 +597,7 @@ export default function LightTherapy() {
       {selected.length > 0 && !sessionActive && (
         <div className="absolute inset-0" style={{
           zIndex: 0,
-          background: 'radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.55) 100%)',
+          background: 'radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.15) 100%)',
         }} />
       )}
       {/* AI-generated scene preview */}

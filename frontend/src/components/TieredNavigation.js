@@ -359,7 +359,7 @@ export default function TieredNavigation({ className = '' }) {
         width: 160,
         zIndex: 9980,
         background: 'rgba(8, 8, 15, 0.92)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         borderRadius: 12,
         border: '1px solid rgba(255,255,255,0.06)',
@@ -514,7 +514,7 @@ export default function TieredNavigation({ className = '' }) {
         {isVoid && (
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.7)' }}
+            style={{ background: 'rgba(0,0,0,0.15)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -584,9 +584,9 @@ export function FloatingTierToggle({ onToggle, isOpen }) {
       className="fixed left-4 bottom-48 z-[9975] flex items-center gap-2 px-3 py-2 rounded-full"
       style={{
         background: isAtZeroPoint ? 'rgba(80,80,80,0.9)' : 'rgba(8,8,15,0.9)',
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'none',
         border: `1px solid ${isAtZeroPoint ? 'rgba(128,128,128,0.4)' : tier.colors.glow}`,
-        boxShadow: `0 4px 20px rgba(0,0,0,0.5)`,
+        boxShadow: `0 4px 20px rgba(0,0,0,0.15)`,
       }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}

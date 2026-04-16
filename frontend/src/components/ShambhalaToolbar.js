@@ -164,7 +164,7 @@ const ShambhalaToolbar = () => {
           justifyContent: 'space-between',
           padding: '0 16px',
           zIndex: 2147483647,
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'none'
         }}
       >
         {/* Left: Navigation Toggle - 44x44px touch target */}

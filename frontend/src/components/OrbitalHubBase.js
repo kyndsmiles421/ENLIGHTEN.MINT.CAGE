@@ -68,7 +68,7 @@ function OrbitalNode({ node, x, y, isActive, isLocked, onSelect, onHover, hovere
           background: isActive ? `${node.color}15` : isHovered ? `${node.color}10` : 'rgba(0,0,0,0)',
           border: `${isActive ? '1.5px' : '1px'} solid ${isActive ? node.color + '50' : isHovered ? node.color + '40' : node.color + '12'}`,
           boxShadow: isActive ? `0 0 28px ${node.color}20, inset 0 0 12px ${node.color}08` : 'none',
-          backdropFilter: 'blur(10px)',
+          backdropFilter: 'none',
           filter: isLocked ? 'grayscale(0.8) blur(1px)' : 'none',
         }}>
         {Icon && <Icon size={isActive ? 20 : 17} style={{ color: isLocked ? 'rgba(248,250,252,0.15)' : node.color }} />}
@@ -109,7 +109,7 @@ function CenterSun({ sun, containerCenter, onBack, depth }) {
           background: `radial-gradient(circle, ${sun.color}12 0%, rgba(0,0,0,0) 70%)`,
           border: `1.5px solid ${sun.color}30`,
           boxShadow: `0 0 40px ${sun.color}15, inset 0 0 20px ${sun.color}08`,
-          backdropFilter: 'blur(16px)',
+          backdropFilter: 'none',
         }}
         data-testid="orbital-center-sun"
       >

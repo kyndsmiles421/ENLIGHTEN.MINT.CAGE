@@ -340,7 +340,7 @@ export default function SmartDock() {
             ? 'radial-gradient(circle, rgba(192,132,252,0.12), rgba(6,6,14,0.9))'
             : 'radial-gradient(circle, rgba(192,132,252,0.08), rgba(6,6,14,0.85))',
           border: `1px solid rgba(192,132,252,${hyperFocus ? '0.25' : '0.12'})`,
-          backdropFilter: 'blur(16px)',
+          backdropFilter: 'none',
           WebkitBackdropFilter: 'blur(16px)',
           cursor: 'pointer',
           boxShadow: `0 0 ${hyperFocus ? 24 : 14}px rgba(192,132,252,${hyperFocus ? '0.15' : '0.08'})`,
@@ -642,7 +642,7 @@ export default function SmartDock() {
             data-testid="xp-flash"
           >
             <span className="text-sm font-mono font-bold px-4 py-2 rounded-full"
-              style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.3)', backdropFilter: 'blur(8px)' }}>
+              style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.3)', backdropFilter: 'none'}}>
               +{harmonyEngine.xpFlash} XP
             </span>
           </motion.div>
@@ -762,12 +762,12 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
       style={{
         background: 'rgba(25,27,38,0.95)',
         border: `1px solid ${data?.atmosphere?.accent || '#818CF8'}18`,
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         width: '260px',
         maxHeight: 'calc(100vh - 120px)',
         overflowY: 'auto',
-        boxShadow: `0 0 24px ${data?.atmosphere?.accent || '#818CF8'}08, 0 8px 32px rgba(0,0,0,0.4)`,
+        boxShadow: `0 0 24px ${data?.atmosphere?.accent || '#818CF8'}08, 0 8px 32px rgba(0,0,0,0.1)`,
       }}
       data-testid="harmonics-panel"
     >
@@ -892,10 +892,10 @@ function MixerPanel({ onClose, navigate }) {
       style={{
         background: 'rgba(11,12,21,0.95)',
         border: '1px solid rgba(129,140,248,0.12)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         width: '220px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
       }}
       data-testid="dock-mixer-panel"
     >
@@ -1038,11 +1038,11 @@ function AssistantPanel({ onClose, token, authHeaders }) {
       style={{
         background: 'rgba(25,27,38,0.95)',
         border: '1px solid rgba(192,132,252,0.12)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         width: '280px',
         maxHeight: '350px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
       }}
       data-testid="assistant-panel"
     >
@@ -1125,10 +1125,10 @@ function FrequencyPanel({ onClose }) {
       style={{
         background: 'rgba(25,27,38,0.95)',
         border: '1px solid rgba(45,212,191,0.12)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         width: '200px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
       }}
       data-testid="frequency-panel"
     >
@@ -1243,10 +1243,10 @@ function HarmonyNPUPanel({ onClose, engine }) {
       style={{
         background: 'rgba(20,22,32,0.95)',
         border: '1px solid rgba(167,139,250,0.12)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         width: '260px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(167,139,250,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 0 20px rgba(167,139,250,0.06)',
       }}
       data-testid="harmony-npu-panel"
     >
@@ -1437,10 +1437,10 @@ function LanguagePanel({ onClose }) {
       style={{
         background: 'rgba(25,27,38,0.95)',
         border: '1px solid rgba(245,158,11,0.12)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(20px)',
         width: '200px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
       }}
       data-testid="language-panel"
     >

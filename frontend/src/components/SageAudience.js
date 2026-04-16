@@ -85,7 +85,7 @@ export default function SageAudience() {
           className="absolute inset-0"
           style={{
             background: 'rgba(10, 10, 18, 0.85)',
-            backdropFilter: 'blur(20px)',
+            backdropFilter: 'none',
           }}
           onClick={closeAudience}
           initial={{ opacity: 0 }}
@@ -98,7 +98,7 @@ export default function SageAudience() {
           style={{
             background: 'rgba(15, 15, 25, 0.98)',
             border: `1px solid ${currentSage.color}30`,
-            boxShadow: `0 0 80px ${currentSage.color}20, 0 25px 50px rgba(0,0,0,0.5)`,
+            boxShadow: `0 0 80px ${currentSage.color}20, 0 25px 50px rgba(0,0,0,0.15)`,
           }}
           initial={{ scale: 0.9, y: 50, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}

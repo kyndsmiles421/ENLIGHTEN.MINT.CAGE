@@ -57,7 +57,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
 
   return (
     <div className="rounded-xl overflow-hidden" data-testid="five-elements-wheel"
-      style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'blur(20px)' }}>
+      style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)', backdropFilter: 'none'}}>
 
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">

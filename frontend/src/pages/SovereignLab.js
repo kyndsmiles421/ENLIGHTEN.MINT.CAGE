@@ -257,7 +257,7 @@ export default function SovereignLab() {
         }
 
         .engine-btn {
-          background: rgba(0,0,0,0.5);
+          background: rgba(0,0,0,0.15);
           border: 1px solid rgba(251,192,45,0.3);
           padding: 20px 30px;
           border-radius: 12px;
@@ -305,7 +305,7 @@ export default function SovereignLab() {
         }
 
         .control-btn {
-          background: rgba(0,0,0,0.5);
+          background: rgba(0,0,0,0.15);
           border: 1px solid rgba(255,255,255,0.2);
           color: white;
           padding: 12px 24px;
@@ -340,7 +340,7 @@ export default function SovereignLab() {
           position: fixed;
           bottom: 20px;
           left: 20px;
-          background: rgba(0,0,0,0.8);
+          background: rgba(0,0,0,0.15);
           border: 1px solid rgba(251,192,45,0.3);
           border-radius: 12px;
           padding: 20px;
