@@ -437,13 +437,17 @@ async def check_volunteer_access(data: dict = Body(...)):
 async def record_volunteer_activity(data: dict = Body(...)):
     """
     Record volunteer hours for a user.
+    GATE: Volunteer credits only unlock after initial $5 credit purchase.
+    RATE: 10 Credits/hr + 10 Fans/hr. φ-escrow (1.618%) applied silently.
     
     Body:
         user_id: User's unique identifier
         hours: Number of volunteer hours
         activity: Description of volunteer activity
     """
-    from engines.reciprocity_gate import record_volunteer_hours
+    PHI = 1.618033988749895
+    CREDIT_RATE = 10  # 10 Credits/hr — in-app value, not USD
+    FAN_RATE = 10     # 10 Fans/hr
     
     user_id = data.get("user_id")
     hours = data.get("hours", 0)
@@ -454,22 +458,67 @@ async def record_volunteer_activity(data: dict = Body(...)):
     if hours <= 0:
         raise HTTPException(status_code=400, detail="hours must be positive")
     
-    result = record_volunteer_hours(user_id, hours, activity)
+    # ═══ $5 CREDIT PURCHASE GATE ═══
+    # Volunteer credits only activate after user has made initial $5 purchase
+    purchase_record = await db.transactions.find_one(
+        {"user_id": user_id, "amount": {"$gte": 5}, "status": "completed"},
+        {"_id": 0}
+    )
+    logger.info(f"[VolunteerGate] user_id={user_id}, purchase_found={purchase_record is not None}")
+    if not purchase_record:
+        # Check subscription too — any paid tier counts
+        sub = await db.subscriptions.find_one(
+            {"user_id": user_id, "tier": {"$ne": "discovery"}},
+            {"_id": 0, "tier": 1}
+        )
+        if not sub:
+            return {
+                "status": "locked",
+                "message": "Volunteer credits unlock after initial credit purchase ($5 minimum).",
+                "gate": "purchase_required",
+                "credits": 0,
+                "fans": 0,
+            }
     
-    # Also record to MongoDB for persistence
+    # ═══ φ-ESCROW CALCULATION ═══
+    gross_credits = hours * CREDIT_RATE
+    phi_escrow = gross_credits * (PHI / 100)  # 1.618% system escrow
+    net_credits = gross_credits - phi_escrow
+    fans_earned = hours * FAN_RATE
+    
+    # Record to volunteer ledger
+    try:
+        from engines.reciprocity_gate import record_volunteer_hours
+        result = record_volunteer_hours(user_id, hours, activity)
+    except Exception:
+        result = {"status": "recorded"}
+    
+    # Persist to MongoDB
     try:
         await db.volunteer_ledger.insert_one({
-            "id": result.get("ledger_signature"),
+            "id": result.get("ledger_signature", f"vol_{user_id}_{datetime.now(timezone.utc).isoformat()}"),
             "user_id": user_id,
             "hours": hours,
             "activity": activity,
-            "credit_value": hours * 25.00,  # $25/hr
+            "gross_credits": gross_credits,
+            "phi_escrow": round(phi_escrow, 4),
+            "net_credits": round(net_credits, 2),
+            "fans_earned": fans_earned,
+            "rate": CREDIT_RATE,
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
     except Exception as e:
         logger.error(f"[ReciprocityGate] Volunteer record failed: {e}")
     
-    return result
+    return {
+        "status": "recorded",
+        "hours": hours,
+        "gross_credits": gross_credits,
+        "phi_escrow": round(phi_escrow, 4),
+        "net_credits": round(net_credits, 2),
+        "fans_earned": fans_earned,
+        "sovereignty_discount": True,
+    }
 
 
 @router.get("/economy/volunteer/balance")
@@ -834,38 +883,8 @@ async def get_package_cost(
     return sovereign_economy.calculate_package_cost(tier, volunteer_hours)
 
 
-@router.post("/economy/volunteer/record")
-async def record_volunteer_hours(
-    data: dict = Body(...),
-    user=Depends(get_current_user)
-):
-    """
-    Record volunteer hours for a user.
-    
-    Body:
-        hours: Number of hours volunteered
-        activity: Description of volunteer activity
-    """
-    from engines.sovereign_economy import sovereign_economy
-    
-    hours = data.get("hours", 0)
-    activity = data.get("activity", "")
-    
-    if hours <= 0:
-        raise HTTPException(400, "Hours must be positive")
-    
-    result = sovereign_economy.record_volunteer_hours(user["id"], hours, activity)
-    
-    # Also store in database
-    await db.volunteer_ledger.insert_one({
-        "user_id": user["id"],
-        "hours": hours,
-        "activity": activity,
-        "credit_value": hours * sovereign_economy.volunteer_credit_value,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    })
-    
-    return result
+# NOTE: Duplicate volunteer/record route removed — gated version at line 436 handles this
+# with $5 purchase gate + φ-escrow + 10 Credits/hr rate
 
 
 @router.get("/economy/volunteer/balance")
