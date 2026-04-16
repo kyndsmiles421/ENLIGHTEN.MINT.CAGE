@@ -154,7 +154,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
           ) : videoMode && videoStatus === 'generating' ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}><Video size={32} style={{ color: story.color }} /></motion.div>
-              <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.5)' }}>Generating cinematic video with Sora 2...</p>
+              <p className="text-sm mt-4" style={{ color: 'rgba(255,255,255,0.75)' }}>Generating cinematic video with Sora 2...</p>
             </div>
           ) : currentImg ? (
             <motion.div key={`scene-${currentScene}`} initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 1.5 }} className="absolute inset-0">
@@ -164,11 +164,11 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
           ) : generating ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}><Sparkles size={32} style={{ color: story.color }} /></motion.div>
-              <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.5)' }}>{genProgress || 'Preparing the cosmic canvas...'}</p>
+              <p className="text-sm mt-4" style={{ color: 'rgba(255,255,255,0.75)' }}>{genProgress || 'Preparing the cosmic canvas...'}</p>
             </div>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #000 70%)' }}>
-              <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No scene generated yet</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>No scene generated yet</p>
             </div>
           )}
         </AnimatePresence>
@@ -217,7 +217,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
             <SkipForward size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
           </button>
         </div>
-        <p className="text-[9px] text-center mt-2" style={{ color: 'rgba(255,255,255,0.2)' }}>
+        <p className="text-[9px] text-center mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Scene {currentScene + 1} of {scenes.length} &middot; {narrating ? (paused ? 'Paused' : 'Narrating...') : 'Tap play to begin narrated cinema'}
         </p>
       </div>
@@ -300,7 +300,7 @@ function StoryNarrator({ storyId, color, endpoint = 'creation-stories' }) {
             Listen to Story
           </button>
         ) : state === 'loading' ? (
-          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
             <Loader2 size={12} className="animate-spin" style={{ color }} /> Channeling the ancient voices...
           </div>
         ) : (
@@ -313,7 +313,7 @@ function StoryNarrator({ storyId, color, endpoint = 'creation-stories' }) {
             <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: `${color}10` }}>
               <motion.div className="h-full rounded-full" style={{ background: color }} animate={{ width: `${progress * 100}%` }} transition={{ duration: 0.2 }} />
             </div>
-            <button onClick={stop} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <button onClick={stop} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <VolumeX size={10} />
             </button>
           </>
@@ -353,25 +353,25 @@ function StoryCard({ story, onSelect, index }) {
             <div>
               <p className="text-sm font-semibold" style={{ color: '#F8FAFC' }}>{story.culture}</p>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.3)' }}><MapPin size={8} /> {story.region}</span>
-                <span className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.2)' }}><Clock size={8} /> {story.era}</span>
+                <span className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.65)' }}><MapPin size={8} /> {story.region}</span>
+                <span className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.6)' }}><Clock size={8} /> {story.era}</span>
               </div>
             </div>
           </div>
           <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.15)' }} className="group-hover:translate-x-1 transition-transform duration-300" />
         </div>
         <p className="text-xs font-medium mb-2" style={{ color: story.color, fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>{story.title}</p>
-        <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'rgba(248,250,252,0.35)' }}>{story.story_preview}</p>
+        <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>{story.story_preview}</p>
         <div className="flex items-center gap-2 mb-2">
           <Star size={9} style={{ color: story.color }} />
-          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Deity: {story.deity}</span>
+          <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Deity: {story.deity}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {story.symbols?.slice(0, 3).map((s, i) => (
             <span key={i} className="px-2 py-0.5 rounded-full text-[9px]"
               style={{ background: `${story.color}08`, border: `1px solid ${story.color}10`, color: `${story.color}90` }}>{s}</span>
           ))}
-          {story.symbols?.length > 3 && <span className="px-2 py-0.5 rounded-full text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>+{story.symbols.length - 3}</span>}
+          {story.symbols?.length > 3 && <span className="px-2 py-0.5 rounded-full text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>+{story.symbols.length - 3}</span>}
         </div>
       </div>
     </motion.div>
@@ -411,7 +411,7 @@ function CivilizationCard({ civ, onSelect, index }) {
           </motion.div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: '#F8FAFC' }}>{civ.name}</p>
-            <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <MapPin size={8} /> {civ.region}
             </p>
           </div>
@@ -436,7 +436,7 @@ function CivilizationCard({ civ, onSelect, index }) {
         <div className="mt-2 flex flex-wrap gap-1">
           {civ.myths_preview?.slice(0, 2).map((m, i) => (
             <span key={i} className="text-[9px] px-1.5 py-0.5 rounded-full truncate max-w-[120px]"
-              style={{ background: `${civ.color}06`, border: `1px solid ${civ.color}08`, color: 'rgba(248,250,252,0.25)' }}>{m}</span>
+              style={{ background: `${civ.color}06`, border: `1px solid ${civ.color}08`, color: 'rgba(255,255,255,0.6)' }}>{m}</span>
           ))}
           {civ.myths_preview?.length > 2 && (
             <span className="text-[9px] px-1.5 py-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>+{civ.myths_preview.length - 2}</span>
@@ -466,17 +466,17 @@ function MythCard({ myth, color, onSelect, onGenerate, index, generating }) {
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ background: myth.generated ? `${color}12` : 'rgba(248,250,252,0.03)', border: `1px solid ${myth.generated ? color + '20' : 'rgba(248,250,252,0.06)'}` }}>
-          {myth.generated ? <Icon size={16} style={{ color }} /> : <Sparkles size={14} style={{ color: 'rgba(248,250,252,0.2)' }} />}
+          {myth.generated ? <Icon size={16} style={{ color }} /> : <Sparkles size={14} style={{ color: 'rgba(255,255,255,0.6)' }} />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium truncate" style={{ color: myth.generated ? '#F8FAFC' : 'rgba(248,250,252,0.5)' }}>
+          <p className="text-xs font-medium truncate" style={{ color: myth.generated ? '#F8FAFC' : 'rgba(255,255,255,0.75)' }}>
             {myth.title || myth.seed_title}
           </p>
           {myth.generated && myth.type && (
             <p className="text-[9px] capitalize mt-0.5" style={{ color: `${color}80` }}>{myth.type.replace('_', ' ')}</p>
           )}
           {!myth.generated && (
-            <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>Tap to generate with AI</p>
+            <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>Tap to generate with AI</p>
           )}
         </div>
         {generating === myth.seed_title ? (
@@ -531,7 +531,7 @@ function MythDetail({ myth, color, onBack }) {
         <div className="relative z-10">
           <button onClick={onBack} data-testid="myth-detail-back"
             className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg mb-4 hover:bg-white/5 transition-colors"
-            style={{ color: 'rgba(248,250,252,0.4)' }}>
+            style={{ color: 'rgba(255,255,255,0.7)' }}>
             <ArrowLeft size={10} /> Back to myths
           </button>
 
@@ -544,7 +544,7 @@ function MythDetail({ myth, color, onBack }) {
             </motion.div>
             <div>
               <p className="text-lg font-bold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>{myth.title}</p>
-              <div className="flex items-center gap-3 mt-0.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+              <div className="flex items-center gap-3 mt-0.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 <span className="flex items-center gap-1"><Globe size={8} /> {myth.culture}</span>
                 <span className="flex items-center gap-1 capitalize"><Feather size={8} /> {myth.type?.replace('_', ' ')}</span>
               </div>
@@ -563,14 +563,14 @@ function MythDetail({ myth, color, onBack }) {
         {myth.characters?.length > 0 && (
           <div className="mb-5">
             <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"
-              style={{ color: 'rgba(248,250,252,0.25)' }}><Users size={9} /> Characters</p>
+              style={{ color: 'rgba(255,255,255,0.6)' }}><Users size={9} /> Characters</p>
             <div className="grid grid-cols-2 gap-2">
               {myth.characters.map((c, i) => (
                 <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.1 + i * 0.05 }}
                   className="rounded-lg p-2.5" style={{ background: `${color}04`, border: `1px solid ${color}08` }}>
                   <p className="text-[11px] font-medium" style={{ color: '#F8FAFC' }}>{c.name}</p>
-                  <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{c.role}</p>
+                  <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{c.role}</p>
                 </motion.div>
               ))}
             </div>
@@ -580,14 +580,14 @@ function MythDetail({ myth, color, onBack }) {
         {/* Story — with narrative reveal */}
         <div className="mb-5">
           <p className="text-[9px] uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5"
-            style={{ color: 'rgba(248,250,252,0.25)' }}><BookOpen size={9} /> The Tale</p>
+            style={{ color: 'rgba(255,255,255,0.6)' }}><BookOpen size={9} /> The Tale</p>
           {paragraphs.map((para, i) => (
             <motion.p key={i}
               initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
               animate={i < revealedParagraphs ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 10, filter: 'blur(4px)' }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
               className="text-[13px] leading-[1.85] mb-3"
-              style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
+              style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
               {para}
             </motion.p>
           ))}
@@ -599,14 +599,14 @@ function MythDetail({ myth, color, onBack }) {
             className="rounded-xl p-4 mb-4" style={{ background: `${color}06`, border: `1px solid ${color}12` }}>
             <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color }}><Crown size={8} className="inline mr-1" />Wisdom</p>
             <p className="text-sm leading-relaxed italic"
-              style={{ color: 'rgba(248,250,252,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>"{myth.lesson}"</p>
+              style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>"{myth.lesson}"</p>
           </motion.div>
         )}
 
         {/* Symbols */}
         {myth.symbols?.length > 0 && (
           <div className="mb-4">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Symbols</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Symbols</p>
             <div className="flex flex-wrap gap-2">
               {myth.symbols.map((s, i) => (
                 <motion.span key={i} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
@@ -623,11 +623,11 @@ function MythDetail({ myth, color, onBack }) {
         {/* Connected myths */}
         {myth.connected_myths?.length > 0 && (
           <div>
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Connected Myths</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Connected Myths</p>
             <div className="flex flex-wrap gap-2">
               {myth.connected_myths.map((m, i) => (
                 <span key={i} className="px-2.5 py-1 rounded-full text-[9px]"
-                  style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.35)' }}>{m}</span>
+                  style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.65)' }}>{m}</span>
               ))}
             </div>
           </div>
@@ -645,14 +645,14 @@ function MythSearchResults({ results, onSelectResult, searchQuery }) {
     return (
       <div className="text-center py-12">
         <Search size={24} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.1)' }} />
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No myths found for "{searchQuery}"</p>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>No myths found for "{searchQuery}"</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-2">
-      <p className="text-[10px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+      <p className="text-[10px] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
         {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
       </p>
       {results.map((r, i) => (
@@ -664,16 +664,16 @@ function MythSearchResults({ results, onSelectResult, searchQuery }) {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: `${r.color}10`, border: `1px solid ${r.color}15` }}>
-              {r.generated ? <BookOpen size={14} style={{ color: r.color }} /> : <Sparkles size={12} style={{ color: r.color || 'rgba(248,250,252,0.3)' }} />}
+              {r.generated ? <BookOpen size={14} style={{ color: r.color }} /> : <Sparkles size={12} style={{ color: r.color || 'rgba(255,255,255,0.65)' }} />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium truncate" style={{ color: '#F8FAFC' }}>{r.title || r.seed_title}</p>
-              <p className="text-[9px]" style={{ color: r.color || 'rgba(248,250,252,0.3)' }}>{r.culture} &middot; {r.region}</p>
+              <p className="text-[9px]" style={{ color: r.color || 'rgba(255,255,255,0.65)' }}>{r.culture} &middot; {r.region}</p>
             </div>
             {r.generated ? (
               <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${r.color}10`, color: r.color }}>Generated</span>
             ) : (
-              <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.2)' }}>Seed</span>
+              <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.6)' }}>Seed</span>
             )}
           </div>
         </motion.div>
@@ -852,7 +852,7 @@ export default function CreationStories() {
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                 data-testid={`tab-${tab.id}`}
                 className="flex-1 relative flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-all duration-300"
-                style={{ color: isActive ? '#F8FAFC' : 'rgba(248,250,252,0.35)' }}>
+                style={{ color: isActive ? '#F8FAFC' : 'rgba(255,255,255,0.65)' }}>
                 {isActive && (
                   <motion.div layoutId="activeTab" className="absolute inset-0 rounded-lg"
                     style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)' }}
@@ -864,7 +864,7 @@ export default function CreationStories() {
                   <span className="sm:hidden">{tab.id === 'creation' ? 'Origins' : 'Myths'}</span>
                   {tab.count > 0 && (
                     <span className="text-[9px] px-1.5 py-0.5 rounded-full"
-                      style={{ background: isActive ? 'rgba(192,132,252,0.15)' : 'rgba(248,250,252,0.04)', color: isActive ? '#C084FC' : 'rgba(248,250,252,0.2)' }}>
+                      style={{ background: isActive ? 'rgba(192,132,252,0.15)' : 'rgba(248,250,252,0.04)', color: isActive ? '#C084FC' : 'rgba(255,255,255,0.6)' }}>
                       {tab.count}
                     </span>
                   )}
@@ -881,26 +881,26 @@ export default function CreationStories() {
               {/* Search + Region Filter */}
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
                   <input type="text" placeholder="Search cultures, deities, stories..." value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)} data-testid="story-search"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs"
                     style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
                   {searchQuery && (
-                    <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+                    <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
                   )}
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
                   <button onClick={() => setActiveRegion('all')} data-testid="region-all"
                     className="flex-shrink-0 px-3 py-2 rounded-xl text-[10px] font-medium transition-all"
-                    style={{ background: activeRegion === 'all' ? 'rgba(192,132,252,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${activeRegion === 'all' ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === 'all' ? '#C084FC' : 'rgba(248,250,252,0.4)' }}>
+                    style={{ background: activeRegion === 'all' ? 'rgba(192,132,252,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${activeRegion === 'all' ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === 'all' ? '#C084FC' : 'rgba(255,255,255,0.7)' }}>
                     All Regions
                   </button>
                   {Object.keys(regions).map(region => (
                     <button key={region} onClick={() => setActiveRegion(region)}
                       data-testid={`region-${region.toLowerCase().replace(/[^a-z]/g, '-')}`}
                       className="flex-shrink-0 px-3 py-2 rounded-xl text-[10px] font-medium transition-all whitespace-nowrap"
-                      style={{ background: activeRegion === region ? 'rgba(192,132,252,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${activeRegion === region ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === region ? '#C084FC' : 'rgba(248,250,252,0.4)' }}>
+                      style={{ background: activeRegion === region ? 'rgba(192,132,252,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${activeRegion === region ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`, color: activeRegion === region ? '#C084FC' : 'rgba(255,255,255,0.7)' }}>
                       {REGION_ICONS[region] || ''} {region}
                     </button>
                   ))}
@@ -910,7 +910,7 @@ export default function CreationStories() {
               {loading && (
                 <div className="flex items-center justify-center py-20">
                   <Loader2 className="animate-spin mr-3" size={20} style={{ color: '#C084FC' }} />
-                  <span className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Loading creation stories...</span>
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Loading creation stories...</span>
                 </div>
               )}
 
@@ -919,7 +919,7 @@ export default function CreationStories() {
                   {!loading && filteredStories.length === 0 && (
                     <div className="text-center py-16">
                       <Globe size={28} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.15)' }} />
-                      <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No stories match your search</p>
+                      <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>No stories match your search</p>
                     </div>
                   )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -937,9 +937,9 @@ export default function CreationStories() {
                           <div className="flex items-center justify-between mb-4">
                             <button onClick={() => { setSelected(null); setFullStory(null); }} data-testid="close-story-detail"
                               className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg lg:hidden"
-                              style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.4)' }}><ArrowLeft size={10} /> Back</button>
+                              style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.7)' }}><ArrowLeft size={10} /> Back</button>
                             <button onClick={() => { setSelected(null); setFullStory(null); }} data-testid="close-story-x"
-                              className="hidden lg:block p-1 rounded hover:bg-white/5"><X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+                              className="hidden lg:block p-1 rounded hover:bg-white/5"><X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
                           </div>
                           <div className="flex items-center gap-3 mb-3">
                             <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${selected.color}12`, border: `1px solid ${selected.color}20` }}>
@@ -947,7 +947,7 @@ export default function CreationStories() {
                             </div>
                             <div>
                               <p className="text-lg font-bold" style={{ color: '#F8FAFC' }}>{selected.culture}</p>
-                              <div className="flex items-center gap-3 text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                              <div className="flex items-center gap-3 text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                                 <span className="flex items-center gap-1"><MapPin size={8} /> {selected.region}</span>
                                 <span className="flex items-center gap-1"><Clock size={8} /> {selected.era}</span>
                               </div>
@@ -956,7 +956,7 @@ export default function CreationStories() {
                           <p className="text-base font-semibold leading-snug" style={{ color: selected.color, fontFamily: 'Cormorant Garamond, serif', fontSize: '18px' }}>{selected.title}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <Star size={10} style={{ color: selected.color }} />
-                            <span className="text-[11px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Deity: {selected.deity}</span>
+                            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Deity: {selected.deity}</span>
                           </div>
                         </div>
 
@@ -978,19 +978,19 @@ export default function CreationStories() {
                               </button>
 
                               <div className="mb-5">
-                                <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}><BookOpen size={9} /> The Creation Story</p>
+                                <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}><BookOpen size={9} /> The Creation Story</p>
                                 {fullStory.story.split('\n\n').map((para, i) => (
-                                  <p key={i} className="text-[13px] leading-[1.8] mb-3" style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>{para}</p>
+                                  <p key={i} className="text-[13px] leading-[1.8] mb-3" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>{para}</p>
                                 ))}
                               </div>
 
                               <div className="rounded-xl p-4 mb-4" style={{ background: `${fullStory.color}06`, border: `1px solid ${fullStory.color}12` }}>
                                 <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: fullStory.color }}>Cosmic Lesson</p>
-                                <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(248,250,252,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>"{fullStory.lesson}"</p>
+                                <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>"{fullStory.lesson}"</p>
                               </div>
 
                               <div>
-                                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Sacred Symbols</p>
+                                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Sacred Symbols</p>
                                 <div className="flex flex-wrap gap-2">
                                   {fullStory.symbols?.map((s, i) => (
                                     <span key={i} className="px-3 py-1.5 rounded-lg text-[10px]" style={{ background: `${fullStory.color}08`, border: `1px solid ${fullStory.color}12`, color: fullStory.color }}>{s}</span>
@@ -1013,14 +1013,14 @@ export default function CreationStories() {
             <motion.div key="myths" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25 }}>
               {/* Search */}
               <div className="relative mb-6">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
                 <input type="text" placeholder="Search all myths, legends, and folklore across civilizations..."
                   value={mythSearchQuery} onChange={e => setMythSearchQuery(e.target.value)} data-testid="myth-search"
                   className="w-full pl-9 pr-10 py-2.5 rounded-xl text-xs"
                   style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
                 {mythSearchQuery && (
                   <button onClick={() => { setMythSearchQuery(''); setMythSearchResults(null); }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+                    className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
                 )}
                 {searching && <Loader2 size={12} className="absolute right-8 top-1/2 -translate-y-1/2 animate-spin" style={{ color: '#C084FC' }} />}
               </div>
@@ -1039,11 +1039,11 @@ export default function CreationStories() {
                   {civsLoading ? (
                     <div className="flex items-center justify-center py-20">
                       <Loader2 className="animate-spin mr-3" size={20} style={{ color: '#C084FC' }} />
-                      <span className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Loading civilizations...</span>
+                      <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Loading civilizations...</span>
                     </div>
                   ) : (
                     <>
-                      <p className="text-[10px] uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      <p className="text-[10px] uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         <Globe size={10} /> {civilizations.length} civilizations
                       </p>
                       <div className={`grid gap-3 ${selectedCiv ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
@@ -1067,7 +1067,7 @@ export default function CreationStories() {
                         <div className="flex items-center gap-3">
                           <button onClick={() => { setSelectedCiv(null); setSelectedMyth(null); setCivMyths([]); }}
                             data-testid="back-to-civs" className="p-1.5 rounded-lg hover:bg-white/5 transition-colors lg:hidden">
-                            <ArrowLeft size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+                            <ArrowLeft size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
                           </button>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                             style={{ background: `${selectedCiv.color}12`, border: `1px solid ${selectedCiv.color}25` }}>
@@ -1075,12 +1075,12 @@ export default function CreationStories() {
                           </div>
                           <div>
                             <p className="text-sm font-semibold" style={{ color: '#F8FAFC' }}>{selectedCiv.name}</p>
-                            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{selectedCiv.region} &middot; {civMyths.length} tales</p>
+                            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{selectedCiv.region} &middot; {civMyths.length} tales</p>
                           </div>
                         </div>
                         <button onClick={() => { setSelectedCiv(null); setSelectedMyth(null); setCivMyths([]); }}
                           data-testid="close-civ" className="hidden lg:block p-1 rounded hover:bg-white/5">
-                          <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                          <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
                         </button>
                       </div>
                     </div>

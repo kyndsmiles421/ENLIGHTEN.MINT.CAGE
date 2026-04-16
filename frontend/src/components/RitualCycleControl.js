@@ -257,7 +257,7 @@ export default function RitualCycleControl({
               className="p-2 rounded-lg transition-all hover:scale-105"
               style={{
                 background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 color: 'rgba(255,255,255,0.7)',
               }}
               data-testid="ritual-pause"

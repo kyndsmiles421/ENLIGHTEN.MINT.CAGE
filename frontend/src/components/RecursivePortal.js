@@ -57,7 +57,7 @@ const BreadcrumbTrail = React.memo(({ breadcrumbs, onJumpTo, currentDepth }) => 
         
         return (
           <React.Fragment key={`${crumb.depth}-${crumb.timestamp}`}>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>→</span>
+            <span style={{ color: 'rgba(255,255,255,0.65)' }}>→</span>
             <motion.button
               onClick={() => onJumpTo(crumb.depth + 1)}
               className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium"
@@ -384,7 +384,7 @@ export default function RecursivePortal({ children }) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            whileHover={{ scale: 1.05, borderColor: 'rgba(255,255,255,0.3)' }}
+            whileHover={{ scale: 1.05, borderColor: 'rgba(255,255,255,0.65)' }}
             whileTap={{ scale: 0.95 }}
             data-testid="surface-macro-btn"
           >

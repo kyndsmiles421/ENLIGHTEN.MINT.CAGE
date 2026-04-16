@@ -72,7 +72,7 @@ function AIChat({ bookTitle, chapterNum, contextText }) {
                 style={{
                   background: m.role === 'user' ? 'rgba(167,139,250,0.12)' : 'rgba(248,250,252,0.04)',
                   border: `1px solid ${m.role === 'user' ? 'rgba(167,139,250,0.2)' : 'rgba(248,250,252,0.06)'}`,
-                  color: 'rgba(248,250,252,0.7)',
+                  color: 'rgba(255,255,255,0.9)',
                 }}>
                 {m.text}
               </div>
@@ -193,7 +193,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4 relative z-10">
         <button onClick={onBack} data-testid="chapter-back" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
-          style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
+          style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(255,255,255,0.75)' }}>
           <ArrowLeft size={12} /> {book.title}
         </button>
         <div className="flex items-center gap-2">
@@ -205,11 +205,11 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
             />
           )}
           <button onClick={speak} data-testid="chapter-tts" className="p-2 rounded-lg"
-            style={{ background: speaking ? `${color}15` : 'rgba(248,250,252,0.04)', border: `1px solid ${speaking ? `${color}30` : 'rgba(248,250,252,0.08)'}`, color: speaking ? color : 'rgba(248,250,252,0.4)' }}>
+            style={{ background: speaking ? `${color}15` : 'rgba(248,250,252,0.04)', border: `1px solid ${speaking ? `${color}30` : 'rgba(248,250,252,0.08)'}`, color: speaking ? color : 'rgba(255,255,255,0.7)' }}>
             {speaking ? <Pause size={14} /> : <Volume2 size={14} />}
           </button>
           <button onClick={toggleBookmark} data-testid="chapter-bookmark" className="p-2 rounded-lg"
-            style={{ background: isBookmarked ? `${color}15` : 'rgba(248,250,252,0.04)', border: `1px solid ${isBookmarked ? `${color}30` : 'rgba(248,250,252,0.08)'}`, color: isBookmarked ? color : 'rgba(248,250,252,0.4)' }}>
+            style={{ background: isBookmarked ? `${color}15` : 'rgba(248,250,252,0.04)', border: `1px solid ${isBookmarked ? `${color}30` : 'rgba(248,250,252,0.08)'}`, color: isBookmarked ? color : 'rgba(255,255,255,0.7)' }}>
             {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
           </button>
         </div>
@@ -222,14 +222,14 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
           Chapter {chapterNum}
         </h2>
         {chapter?.title && (
-          <p className="text-xs mt-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{chapter.title}</p>
+          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>{chapter.title}</p>
         )}
       </div>
 
       {loading ? (
         <div className="flex flex-col items-center gap-3 py-20 relative z-10">
           <Loader2 className="animate-spin" size={24} style={{ color }} />
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Generating sacred text...</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Generating sacred text...</p>
         </div>
       ) : chapter ? (
         <div className="relative z-10">
@@ -243,7 +243,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[11px] font-medium transition-all"
                   style={{
                     background: active ? `${color}12` : 'rgba(248,250,252,0.03)',
-                    color: active ? color : 'rgba(248,250,252,0.35)',
+                    color: active ? color : 'rgba(255,255,255,0.65)',
                     border: `1px solid ${active ? `${color}20` : 'rgba(248,250,252,0.06)'}`,
                   }}>
                   <Icon size={12} /> {t.label}
@@ -259,7 +259,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
               {activeTab === 'retelling' && chapter.retelling && (
                 <div className="prose prose-invert max-w-none">
                   {chapter.retelling.split('\n\n').map((p, i) => (
-                    <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>{p}</p>
+                    <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>{p}</p>
                   ))}
                 </div>
               )}
@@ -267,7 +267,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
                 <div className="space-y-4">
                   {chapter.key_verses.split('\n\n').map((v, i) => (
                     <div key={i} className="pl-4" style={{ borderLeft: `2px solid ${color}40` }}>
-                      <p className="text-sm italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.65)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>{v}</p>
+                      <p className="text-sm italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>{v}</p>
                     </div>
                   ))}
                 </div>
@@ -275,7 +275,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
               {activeTab === 'commentary' && chapter.commentary && (
                 <div>
                   {chapter.commentary.split('\n\n').map((p, i) => (
-                    <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(248,250,252,0.6)' }}>{p}</p>
+                    <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.85)' }}>{p}</p>
                   ))}
                 </div>
               )}
@@ -286,15 +286,15 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
           <div className="flex items-center justify-between mt-5">
             <button onClick={() => onNav(chapterNum - 1)} disabled={chapterNum <= 1} data-testid="chapter-prev"
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs disabled:opacity-30"
-              style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
+              style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(255,255,255,0.75)' }}>
               <ChevronLeft size={14} /> Previous
             </button>
-            <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {chapterNum} of {book.chapters}
             </span>
             <button onClick={() => onNav(chapterNum + 1)} disabled={chapterNum >= book.chapters} data-testid="chapter-next"
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs disabled:opacity-30"
-              style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
+              style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(255,255,255,0.75)' }}>
               Next <ChevronRight size={14} />
             </button>
           </div>
@@ -303,7 +303,7 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
           <AIChat bookTitle={book.title} chapterNum={chapterNum} contextText={chapter?.retelling?.slice(0, 300) || ''} />
         </div>
       ) : (
-        <p className="text-center text-xs py-10" style={{ color: 'rgba(248,250,252,0.3)' }}>Failed to load chapter</p>
+        <p className="text-center text-xs py-10" style={{ color: 'rgba(255,255,255,0.65)' }}>Failed to load chapter</p>
       )}
     </motion.div>
   );
@@ -404,7 +404,7 @@ export default function Bible() {
         <div className="max-w-3xl mx-auto">
           <button onClick={() => { setActiveJourney(null); setJourneyDetail(null); }} data-testid="journey-back"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs mb-6"
-            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
+            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(255,255,255,0.75)' }}>
             <ArrowLeft size={12} /> All Journeys
           </button>
 
@@ -415,7 +415,7 @@ export default function Bible() {
             <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
               {journeyDetail.title}
             </h1>
-            <p className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.45)' }}>{journeyDetail.description}</p>
+            <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>{journeyDetail.description}</p>
             <div className="flex items-center justify-center gap-2 mb-4">
               {journeyDetail.traditions?.map(t => (
                 <span key={t} className="text-[8px] px-2 py-0.5 rounded"
@@ -425,7 +425,7 @@ export default function Bible() {
             {/* Progress bar */}
             <div className="max-w-xs mx-auto">
               <div className="flex items-center justify-between text-[9px] mb-1">
-                <span style={{ color: 'rgba(248,250,252,0.3)' }}>Progress</span>
+                <span style={{ color: 'rgba(255,255,255,0.65)' }}>Progress</span>
                 <span style={{ color: journeyDetail.color }}>{journeyDetail.progress_pct}%</span>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.06)' }}>
@@ -466,14 +466,14 @@ export default function Bible() {
                       border: `1px solid ${isCompleted ? `${journeyDetail.color}30` : 'rgba(248,250,252,0.08)'}`,
                     }}>
                     {isCompleted ? <CheckCircle size={14} style={{ color: journeyDetail.color }} />
-                      : !isUnlocked ? <Lock size={12} style={{ color: 'rgba(248,250,252,0.2)' }} />
-                      : <span className="text-xs font-medium" style={{ color: isNext ? journeyDetail.color : 'rgba(248,250,252,0.3)' }}>{i + 1}</span>}
+                      : !isUnlocked ? <Lock size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                      : <span className="text-xs font-medium" style={{ color: isNext ? journeyDetail.color : 'rgba(255,255,255,0.65)' }}>{i + 1}</span>}
                   </div>
 
                   {/* Step content */}
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium" style={{ color: isCompleted ? journeyDetail.color : '#F8FAFC' }}>{step.label}</p>
-                    <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>{step.tradition}</p>
+                    <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{step.tradition}</p>
                   </div>
 
                   {/* Action */}
@@ -485,7 +485,7 @@ export default function Bible() {
                       style={{
                         background: isCompleted ? 'rgba(248,250,252,0.04)' : `${journeyDetail.color}12`,
                         border: `1px solid ${isCompleted ? 'rgba(248,250,252,0.08)' : `${journeyDetail.color}25`}`,
-                        color: isCompleted ? 'rgba(248,250,252,0.4)' : journeyDetail.color,
+                        color: isCompleted ? 'rgba(255,255,255,0.7)' : journeyDetail.color,
                       }}>
                       {isCompleted ? 'Re-read' : 'Read'} <ChevronRight size={10} />
                     </button>
@@ -501,7 +501,7 @@ export default function Bible() {
               style={{ background: `${journeyDetail.color}08`, border: `1px solid ${journeyDetail.color}20` }}>
               <Trophy size={24} className="mx-auto mb-2" style={{ color: journeyDetail.color }} />
               <p className="text-sm font-semibold mb-1" style={{ color: journeyDetail.color }}>Journey Complete!</p>
-              <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>You've completed "{journeyDetail.title}" — achievement unlocked</p>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>You've completed "{journeyDetail.title}" — achievement unlocked</p>
             </motion.div>
           )}
         </div>
@@ -529,7 +529,7 @@ export default function Bible() {
         <div className="max-w-4xl mx-auto">
           <button onClick={() => setSelectedBook(null)} data-testid="book-back"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs mb-4"
-            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(248,250,252,0.5)' }}>
+            style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: 'rgba(255,255,255,0.75)' }}>
             <ArrowLeft size={12} /> All Books
           </button>
 
@@ -538,11 +538,11 @@ export default function Bible() {
             <h1 className="text-3xl font-bold mb-2" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
               {selectedBook.title}
             </h1>
-            <p className="text-sm max-w-xl mx-auto" style={{ color: 'rgba(248,250,252,0.5)' }}>{selectedBook.description}</p>
+            <p className="text-sm max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.75)' }}>{selectedBook.description}</p>
             <div className="flex items-center justify-center gap-3 mt-3">
               <span className="text-[9px] px-2 py-0.5 rounded" style={{ background: `${color}12`, color, border: `1px solid ${color}20` }}>{selectedBook.era}</span>
               {selectedBook.themes?.map(t => (
-                <span key={t} className="text-[9px] px-2 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.4)', border: '1px solid rgba(248,250,252,0.06)' }}>{t}</span>
+                <span key={t} className="text-[9px] px-2 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(248,250,252,0.06)' }}>{t}</span>
               ))}
             </div>
           </div>
@@ -555,7 +555,7 @@ export default function Bible() {
                 style={{
                   background: ch.generated ? `${color}12` : 'rgba(248,250,252,0.03)',
                   border: `1px solid ${ch.generated ? `${color}20` : 'rgba(248,250,252,0.06)'}`,
-                  color: ch.generated ? color : 'rgba(248,250,252,0.4)',
+                  color: ch.generated ? color : 'rgba(255,255,255,0.7)',
                 }}>
                 {ch.number}
               </button>
@@ -574,7 +574,7 @@ export default function Bible() {
           <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
             Sacred Scriptures & Lost Books
           </h1>
-          <p className="text-sm max-w-lg mx-auto" style={{ color: 'rgba(248,250,252,0.45)' }}>
+          <p className="text-sm max-w-lg mx-auto" style={{ color: 'rgba(255,255,255,0.75)' }}>
             Bible, Torah, Kabbalah, Quran, and lost apocryphal texts — with AI-powered deep-dive exploration
           </p>
         </div>
@@ -582,7 +582,7 @@ export default function Bible() {
         {/* Search + Bookmarks */}
         <div className="flex items-center gap-3 mb-6 max-w-xl mx-auto">
           <div className="flex-1 relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.65)' }} />
             <input
               type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search books, themes..."
@@ -597,7 +597,7 @@ export default function Bible() {
               style={{
                 background: showBookmarks ? 'rgba(167,139,250,0.12)' : 'rgba(248,250,252,0.04)',
                 border: `1px solid ${showBookmarks ? 'rgba(167,139,250,0.25)' : 'rgba(248,250,252,0.08)'}`,
-                color: showBookmarks ? '#A78BFA' : 'rgba(248,250,252,0.4)',
+                color: showBookmarks ? '#A78BFA' : 'rgba(255,255,255,0.7)',
               }}>
               <Bookmark size={14} /> {bookmarks.length}
             </button>
@@ -614,7 +614,7 @@ export default function Bible() {
                 {bookmarks.map((bm, i) => (
                   <button key={i} onClick={() => { openBook(bm.book_id).then(() => setActiveChapter(bm.chapter_num)); setShowBookmarks(false); }}
                     className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs hover:bg-white/5 transition-colors"
-                    style={{ color: 'rgba(248,250,252,0.6)' }}>
+                    style={{ color: 'rgba(255,255,255,0.85)' }}>
                     <span>{bm.book_title} — Chapter {bm.chapter_num}</span>
                     <ChevronRight size={12} />
                   </button>
@@ -650,12 +650,12 @@ export default function Bible() {
                       <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${j.color}10`, color: j.color }}>{j.progress_pct}%</span>
                     ) : null}
                   </div>
-                  <p className="text-[10px] line-clamp-2 mb-2" style={{ color: 'rgba(248,250,252,0.35)' }}>{j.description}</p>
+                  <p className="text-[10px] line-clamp-2 mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{j.description}</p>
                   <div className="flex items-center gap-2">
                     {j.traditions?.slice(0, 3).map(t => (
                       <span key={t} className="text-[7px] px-1.5 py-0.5 rounded" style={{ background: `${j.color}08`, color: `${j.color}CC`, border: `1px solid ${j.color}10` }}>{t}</span>
                     ))}
-                    <span className="text-[8px] ml-auto" style={{ color: 'rgba(248,250,252,0.25)' }}>{j.total_steps} steps</span>
+                    <span className="text-[8px] ml-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>{j.total_steps} steps</span>
                   </div>
                   {j.started && !j.completed && (
                     <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.06)' }}>
@@ -675,7 +675,7 @@ export default function Bible() {
             style={{
               background: !activeCat ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.03)',
               border: `1px solid ${!activeCat ? 'rgba(248,250,252,0.15)' : 'rgba(248,250,252,0.06)'}`,
-              color: !activeCat ? '#F8FAFC' : 'rgba(248,250,252,0.4)',
+              color: !activeCat ? '#F8FAFC' : 'rgba(255,255,255,0.7)',
             }}>
             All ({books.length})
           </button>
@@ -690,7 +690,7 @@ export default function Bible() {
                 style={{
                   background: active ? `${color}12` : 'rgba(248,250,252,0.03)',
                   border: `1px solid ${active ? `${color}25` : 'rgba(248,250,252,0.06)'}`,
-                  color: active ? color : 'rgba(248,250,252,0.4)',
+                  color: active ? color : 'rgba(255,255,255,0.7)',
                 }}>
                 <Icon size={12} /> {cat.name} ({cat.book_count})
               </button>
@@ -734,15 +734,15 @@ export default function Bible() {
                           {book.chapters} ch
                         </span>
                       </div>
-                      <p className="text-[10px] mt-1 line-clamp-2" style={{ color: 'rgba(248,250,252,0.4)' }}>{book.description}</p>
+                      <p className="text-[10px] mt-1 line-clamp-2" style={{ color: 'rgba(255,255,255,0.7)' }}>{book.description}</p>
                       <div className="flex items-center gap-1.5 mt-2">
-                        <span className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)' }}>{book.era}</span>
+                        <span className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)' }}>{book.era}</span>
                         {book.themes?.slice(0, 2).map(t => (
-                          <span key={t} className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.25)' }}>{t}</span>
+                          <span key={t} className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.6)' }}>{t}</span>
                         ))}
                       </div>
                     </div>
-                    <ChevronRight size={14} className="opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0 mt-1" style={{ color: 'rgba(248,250,252,0.3)' }} />
+                    <ChevronRight size={14} className="opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0 mt-1" style={{ color: 'rgba(255,255,255,0.65)' }} />
                   </div>
                 </motion.button>
               );
@@ -752,8 +752,8 @@ export default function Bible() {
 
         {!loading && filteredBooks.length === 0 && (
           <div className="text-center py-16">
-            <BookOpen size={24} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.2)' }} />
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>No books found matching "{search}"</p>
+            <BookOpen size={24} className="mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.6)' }} />
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>No books found matching "{search}"</p>
           </div>
         )}
       </div>

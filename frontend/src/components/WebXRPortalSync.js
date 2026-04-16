@@ -663,7 +663,7 @@ export default function WebXRPortalSync({
                     ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.3))'
                     : 'rgba(255,255,255,0.05)',
                   border: `1px solid ${xrSupported ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255,255,255,0.1)'}`,
-                  color: xrSupported ? '#C4B5FD' : 'rgba(255,255,255,0.3)',
+                  color: xrSupported ? '#C4B5FD' : 'rgba(255,255,255,0.65)',
                   boxShadow: xrSupported ? '0 0 30px rgba(139, 92, 246, 0.2)' : 'none',
                 }}
                 data-testid="start-ar-btn"

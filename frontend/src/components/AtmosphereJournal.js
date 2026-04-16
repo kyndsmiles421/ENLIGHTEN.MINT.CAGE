@@ -39,10 +39,10 @@ function AtmosphereCard({ atm, onApply, onDelete, accent }) {
 
       {/* Info */}
       <div className="p-2.5">
-        <p className="text-[11px] font-medium truncate" style={{ color: 'rgba(248,250,252,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
+        <p className="text-[11px] font-medium truncate" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
           {atm.name}
         </p>
-        <p className="text-[8px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.2)' }}>
+        <p className="text-[8px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>
           {atm.source_prompt || 'Manual'} &middot; {ts}
         </p>
       </div>
@@ -145,14 +145,14 @@ export function AtmosphereJournal({ isOpen, onClose, onApply, accent = '#FB923C'
           </span>
         </div>
         <button onClick={onClose} className="p-1 rounded active:scale-90" data-testid="atm-journal-close">
-          <X size={12} style={{ color: 'rgba(255,255,255,0.3)' }} />
+          <X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
         </button>
       </div>
 
       {loading ? (
-        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.2)' }}>Loading...</p>
+        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>Loading...</p>
       ) : gallery.length === 0 ? (
-        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.2)' }}>
+        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
           No atmospheres saved yet. Use Sage Prompt-to-FX and tap Save.
         </p>
       ) : (

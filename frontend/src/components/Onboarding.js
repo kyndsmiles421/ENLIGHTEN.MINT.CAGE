@@ -99,7 +99,7 @@ export default function Onboarding() {
 
             <p style={{
               fontSize: '14px',
-              color: 'rgba(248,250,252,0.55)',
+              color: 'rgba(255,255,255,0.8)',
               lineHeight: 1.6,
               marginBottom: '28px',
             }}>
@@ -132,7 +132,7 @@ export default function Onboarding() {
                   marginTop: '12px',
                   background: 'none',
                   border: 'none',
-                  color: 'rgba(248,250,252,0.25)',
+                  color: 'rgba(255,255,255,0.6)',
                   fontSize: '12px',
                   cursor: 'pointer',
                 }}

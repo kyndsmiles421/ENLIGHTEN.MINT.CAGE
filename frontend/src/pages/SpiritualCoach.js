@@ -15,7 +15,7 @@ function ModeSelector({ modes, onSelect }) {
           style={{ background: 'rgba(216,180,254,0.1)', boxShadow: '0 0 60px rgba(216,180,254,0.1)' }}>
           <Sparkles size={28} style={{ color: '#D8B4FE' }} />
         </div>
-        <p className="text-sm mb-1" style={{ color: 'rgba(248,250,252,0.6)' }}>
+        <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.85)' }}>
           Choose how Sage can guide you today
         </p>
       </div>
@@ -34,7 +34,7 @@ function ModeSelector({ modes, onSelect }) {
               </div>
               <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{mode.name}</p>
             </div>
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{mode.desc}</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{mode.desc}</p>
           </motion.button>
         ))}
       </div>
@@ -53,7 +53,7 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <button onClick={onBack} className="flex items-center gap-1 mb-4 text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>
+      <button onClick={onBack} className="flex items-center gap-1 mb-4 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
         <ChevronLeft size={14} /> Back to modes
       </button>
       <div className="text-center mb-6">
@@ -62,7 +62,7 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
           <Moon size={24} style={{ color: '#818CF8' }} />
         </div>
         <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Select a Dream to Analyze</h2>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
           The Dream Oracle will interpret it through your cosmic profile
         </p>
       </div>
@@ -71,8 +71,8 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
         <div className="text-center py-8 rounded-2xl"
           style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)' }}>
           <Moon size={32} className="mx-auto mb-3" style={{ color: 'rgba(129,140,248,0.25)' }} />
-          <p className="text-sm mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>No dreams logged yet</p>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>No dreams logged yet</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Log your dreams in the Dream Journal first, then return here for deep analysis
           </p>
         </div>
@@ -100,10 +100,10 @@ function DreamPicker({ dreams, onSelect, onBack, loading }) {
                         style={{ background: 'rgba(216,180,254,0.15)', color: '#D8B4FE' }}>Lucid</span>
                     )}
                   </div>
-                  <p className="text-[11px] line-clamp-2 mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                  <p className="text-[11px] line-clamp-2 mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
                     {dream.content?.substring(0, 120)}{dream.content?.length > 120 ? '...' : ''}
                   </p>
-                  <div className="flex items-center gap-3 text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <div className="flex items-center gap-3 text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {dream.moon_phase && <span className="flex items-center gap-1"><Moon size={10} />{dream.moon_phase}</span>}
                     <span>Mood: {dream.mood}</span>
                     <span>Vivid: {dream.vividness}/10</span>
@@ -126,7 +126,7 @@ function CosmicProfileBadge({ profile }) {
       className="rounded-xl p-3 mb-4 flex flex-wrap gap-3 items-center justify-center"
       data-testid="cosmic-profile-badge"
       style={{ background: 'rgba(129,140,248,0.05)', border: '1px solid rgba(129,140,248,0.12)' }}>
-      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>
+      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>
         Dream Lens:
       </span>
       {profile.aura_color && (
@@ -165,7 +165,7 @@ function ChatBubble({ msg, isUser, onPlayAudio, playingId, currentMsgId }) {
         <div className="rounded-full px-4 py-1.5 flex items-center gap-2"
           style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.12)' }}>
           <Moon size={11} style={{ color: '#818CF8' }} />
-          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{msg.text}</span>
+          <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{msg.text}</span>
         </div>
       </motion.div>
     );
@@ -188,8 +188,8 @@ function ChatBubble({ msg, isUser, onPlayAudio, playingId, currentMsgId }) {
         }}>
         {msg.voice && isUser && (
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Mic size={10} style={{ color: 'rgba(248,250,252,0.35)' }} />
-            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Voice message</span>
+            <Mic size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
+            <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Voice message</span>
           </div>
         )}
         <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: 'rgba(248,250,252,0.8)' }}>
@@ -219,7 +219,7 @@ function ChatBubble({ msg, isUser, onPlayAudio, playingId, currentMsgId }) {
               )}
             </button>
           )}
-          <p className="text-[9px] text-right flex-1" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <p className="text-[9px] text-right flex-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
           </p>
         </div>
@@ -237,7 +237,7 @@ function SessionList({ sessions, onSelect, onNew, onDelete, modes }) {
         <Plus size={16} /> New Conversation
       </button>
       {sessions.length === 0 ? (
-        <p className="text-center text-sm py-8" style={{ color: 'rgba(248,250,252,0.3)' }}>No conversations yet. Start one!</p>
+        <p className="text-center text-sm py-8" style={{ color: 'rgba(255,255,255,0.65)' }}>No conversations yet. Start one!</p>
       ) : (
         <div className="space-y-2">
           {sessions.map(s => {
@@ -253,17 +253,17 @@ function SessionList({ sessions, onSelect, onNew, onDelete, modes }) {
                        <Sparkles size={10} style={{ color: mode?.color || '#D8B4FE' }} />}
                     </div>
                     <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{mode?.name || s.mode}</span>
-                    <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       {s.message_count} msgs
                     </span>
                   </div>
                   {s.preview && (
-                    <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.35)' }}>{s.preview}</p>
+                    <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.65)' }}>{s.preview}</p>
                   )}
                 </button>
                 <button onClick={() => onDelete(s.id)}
                   className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/5">
-                  <Trash2 size={12} style={{ color: 'rgba(248,250,252,0.25)' }} />
+                  <Trash2 size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
                 </button>
               </div>
             );
@@ -603,7 +603,7 @@ export default function SpiritualCoach() {
         </div>
 
         {!token ? (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to speak with Sage</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to speak with Sage</p>
         ) : loading ? (
           <div className="flex justify-center py-12"><Loader2 className="animate-spin" size={28} style={{ color: '#D8B4FE' }} /></div>
         ) : (
@@ -612,7 +612,7 @@ export default function SpiritualCoach() {
               <button onClick={() => { setView('list'); setActiveSession(null); setCosmicProfile(null); }}
                 data-testid="back-to-list"
                 className="flex items-center gap-1 mb-4 text-xs"
-                style={{ color: 'rgba(248,250,252,0.4)' }}>
+                style={{ color: 'rgba(255,255,255,0.7)' }}>
                 <ChevronLeft size={14} /> All conversations
               </button>
             )}
@@ -647,10 +647,10 @@ export default function SpiritualCoach() {
                       {isDreamOracle ?
                         <Moon size={24} className="mx-auto mb-3" style={{ color: 'rgba(129,140,248,0.3)' }} /> :
                         <Sparkles size={24} className="mx-auto mb-3" style={{ color: 'rgba(216,180,254,0.3)' }} />}
-                      <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {isDreamOracle ? 'Select a dream to begin the analysis...' : 'Share what\'s on your mind. Sage is here to listen.'}
                       </p>
-                      <p className="text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                      <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         Tap the mic to speak or type below
                       </p>
                     </div>
@@ -673,8 +673,8 @@ export default function SpiritualCoach() {
                             style={{ background: voiceProcessing ? '#A78BFA' : (isDreamOracle ? '#818CF8' : '#D8B4FE'), animationDelay: `${delay}ms` }} />
                         ))}
                       </div>
-                      {voiceProcessing && <span className="text-[10px] ml-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Sage is listening and composing a response...</span>}
-                      {isDreamOracle && !voiceProcessing && <span className="text-[10px] ml-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Interpreting through your cosmic lens...</span>}
+                      {voiceProcessing && <span className="text-[10px] ml-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Sage is listening and composing a response...</span>}
+                      {isDreamOracle && !voiceProcessing && <span className="text-[10px] ml-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Interpreting through your cosmic lens...</span>}
                     </div>
                   )}
                   <div ref={chatEndRef} />
@@ -719,7 +719,7 @@ export default function SpiritualCoach() {
                           />
                         ))}
                       </span>
-                      <span className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>
                         Recording... Tap mic to stop
                       </span>
                     </div>
@@ -738,7 +738,7 @@ export default function SpiritualCoach() {
                         style={{
                           background: input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.15)' : 'rgba(216,180,254,0.15)') : 'rgba(0,0,0,0)',
                           border: `1px solid ${input.trim() ? (isDreamOracle ? 'rgba(129,140,248,0.3)' : 'rgba(216,180,254,0.3)') : 'rgba(248,250,252,0.06)'}`,
-                          color: input.trim() ? (isDreamOracle ? '#818CF8' : '#D8B4FE') : 'rgba(248,250,252,0.2)',
+                          color: input.trim() ? (isDreamOracle ? '#818CF8' : '#D8B4FE') : 'rgba(255,255,255,0.6)',
                         }}>
                         <Send size={16} />
                       </button>

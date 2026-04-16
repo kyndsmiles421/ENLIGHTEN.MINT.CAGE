@@ -251,7 +251,7 @@ const CreatorMixer = ({ isOpen, onClose, onMixerChange }) => {
                   </button>
                 </div>
                 
-                <div className="text-[10px] font-mono mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <div className="text-[10px] font-mono mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   {BLACK_HILLS_ANCHOR.lat}°N, {Math.abs(BLACK_HILLS_ANCHOR.lng)}°W
                 </div>
                 
@@ -294,7 +294,7 @@ const CreatorMixer = ({ isOpen, onClose, onMixerChange }) => {
             <p className="text-[10px]" style={{ color: 'rgba(34,197,94,0.8)' }}>
               HANDSHAKE STATUS: SECURE-CONNECTED
             </p>
-            <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>
               SOVEREIGN TRUST VERIFIED
             </p>
           </div>

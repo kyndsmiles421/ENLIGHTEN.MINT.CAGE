@@ -155,15 +155,15 @@ function CouncilGlanceSection({ data, navigate }) {
       <div className="grid grid-cols-3 gap-1.5 mb-2">
         <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
           <div className="text-xs font-semibold" style={{ color: tc }}>{TIER_NAMES_MAP[tier]}</div>
-          <div className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>Tier</div>
+          <div className="text-[6px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>Tier</div>
         </div>
         <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
           <div className="text-xs font-semibold" style={{ color: '#FBBF24' }}>{data.dust_balance}</div>
-          <div className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>Dust</div>
+          <div className="text-[6px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>Dust</div>
         </div>
         <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
           <div className="text-xs font-semibold" style={{ color: '#2DD4BF' }}>{data.utilities_owned}/{data.utilities_total}</div>
-          <div className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>Tools</div>
+          <div className="text-[6px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>Tools</div>
         </div>
       </div>
 
@@ -418,7 +418,7 @@ export default function Dashboard() {
                 style={{
                   background: editMode ? 'rgba(192,132,252,0.15)' : 'rgba(248,250,252,0.04)',
                   border: `1px solid ${editMode ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.08)'}`,
-                  color: editMode ? '#C084FC' : 'rgba(248,250,252,0.6)',
+                  color: editMode ? '#C084FC' : 'rgba(255,255,255,0.85)',
                 }}
                 data-testid="dashboard-edit-btn">
                 {editMode ? <><Save size={11} /> Done</> : <><LayoutGrid size={11} /> Customize</>}
@@ -503,24 +503,24 @@ export default function Dashboard() {
                   <div onPointerDown={(e) => onReorderPointerDown(idx, e)}
                     className="flex-shrink-0 cursor-grab active:cursor-grabbing p-1 -m-1 rounded-lg hover:bg-white/5"
                     style={{ touchAction: 'none' }} data-testid={`drag-handle-${sectionId}`} title="Drag to reorder">
-                    <GripVertical size={14} style={{ color: isBeingDragged ? 'rgba(192,132,252,0.6)' : 'rgba(248,250,252,0.25)' }} />
+                    <GripVertical size={14} style={{ color: isBeingDragged ? 'rgba(192,132,252,0.6)' : 'rgba(255,255,255,0.6)' }} />
                   </div>
                   <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: meta?.color || '#fff' }} />
-                  <span className="text-xs font-medium flex-1" style={{ color: isHidden ? 'rgba(248,250,252,0.3)' : 'rgba(248,250,252,0.8)' }}>
+                  <span className="text-xs font-medium flex-1" style={{ color: isHidden ? 'rgba(255,255,255,0.65)' : 'rgba(248,250,252,0.8)' }}>
                     {meta?.tKey ? t(meta.tKey, meta.label) : (meta?.label || sectionId)}
                   </span>
                   <div className="flex items-center gap-1">
                     <button onClick={() => moveSection(idx, -1)} disabled={idx === 0}
                       className="p-1 rounded-lg disabled:opacity-20 hover:bg-white/5" data-testid={`move-up-${sectionId}`}>
-                      <ArrowUp size={12} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                      <ArrowUp size={12} style={{ color: 'rgba(255,255,255,0.75)' }} />
                     </button>
                     <button onClick={() => moveSection(idx, 1)} disabled={idx === sectionsOrder.length - 1}
                       className="p-1 rounded-lg disabled:opacity-20 hover:bg-white/5" data-testid={`move-down-${sectionId}`}>
-                      <ArrowDown size={12} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                      <ArrowDown size={12} style={{ color: 'rgba(255,255,255,0.75)' }} />
                     </button>
                     <button onClick={() => toggleSectionVisibility(sectionId)}
                       className="p-1 rounded-lg hover:bg-white/5" data-testid={`toggle-${sectionId}`}>
-                      {isHidden ? <EyeOff size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /> : <Eye size={12} style={{ color: meta?.color || '#fff' }} />}
+                      {isHidden ? <EyeOff size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /> : <Eye size={12} style={{ color: meta?.color || '#fff' }} />}
                     </button>
                   </div>
                 </motion.div>
@@ -557,16 +557,16 @@ export default function Dashboard() {
                   <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Add Shortcuts</span>
                 </div>
                 <button onClick={() => setShowAddSheet(false)} className="p-1 rounded-lg hover:bg-white/5">
-                  <X size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                  <X size={14} style={{ color: 'rgba(255,255,255,0.75)' }} />
                 </button>
               </div>
-              <p className="px-4 py-2 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <p className="px-4 py-2 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 Tap to pin or unpin shortcuts to your dashboard
               </p>
               <div className="px-4 pb-6 overflow-y-auto space-y-4" style={{ scrollbarWidth: 'thin' }}>
                 {['Today', 'Practice', 'Divination', 'Sanctuary', 'Explore', 'Economy'].map(group => (
                   <div key={group}>
-                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>{group}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>{group}</p>
                     <div className="grid grid-cols-4 gap-2">
                       {ALL_ACTIONS.filter(a => a.group === group).map(action => {
                         const Icon = action.icon;
@@ -580,7 +580,7 @@ export default function Dashboard() {
                             }}
                             data-testid={`pin-${action.label.toLowerCase()}`}>
                             <div className="relative">
-                              <Icon size={16} style={{ color: isPinned ? action.color : 'rgba(248,250,252,0.4)' }} />
+                              <Icon size={16} style={{ color: isPinned ? action.color : 'rgba(255,255,255,0.7)' }} />
                               {isPinned && (
                                 <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full flex items-center justify-center"
                                   style={{ background: action.color }}>
@@ -588,7 +588,7 @@ export default function Dashboard() {
                                 </div>
                               )}
                             </div>
-                            <span className="text-[9px]" style={{ color: isPinned ? action.color : 'rgba(248,250,252,0.5)' }}>{action.label}</span>
+                            <span className="text-[9px]" style={{ color: isPinned ? action.color : 'rgba(255,255,255,0.75)' }}>{action.label}</span>
                           </button>
                         );
                       })}

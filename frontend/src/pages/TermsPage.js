@@ -49,7 +49,7 @@ export default function TermsPage() {
     <div className="min-h-screen px-4 py-8" style={{ background: 'transparent' }}>
       <div className="max-w-2xl mx-auto">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 mb-6 px-3 py-2 rounded-xl active:scale-95"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.5)' }}
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.75)' }}
           data-testid="terms-back">
           <ArrowLeft size={14} /><span className="text-xs">Back</span>
         </button>
@@ -57,7 +57,7 @@ export default function TermsPage() {
         <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'rgba(248,250,252,0.85)' }} data-testid="terms-title">
           Trust & Compliance
         </h1>
-        <p className="text-[11px] mb-8" style={{ color: 'rgba(248,250,252,0.25)' }}>
+        <p className="text-[11px] mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
           ENLIGHTEN.MINT.CAFE | Sovereign Trust Framework
         </p>
 
@@ -68,7 +68,7 @@ export default function TermsPage() {
                 <s.icon size={14} style={{ color: s.color }} />
                 <h2 className="text-sm font-bold" style={{ color: s.color }}>{s.title}</h2>
               </div>
-              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.45)' }}>{s.content}</p>
+              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{s.content}</p>
             </div>
           ))}
         </div>

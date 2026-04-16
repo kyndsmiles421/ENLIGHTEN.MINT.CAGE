@@ -150,7 +150,7 @@ function VideoIntro({ onComplete, onSkip }) {
       {loading && (
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={28} className="animate-spin" style={{ color: '#D8B4FE' }} />
-          <p className="text-sm" style={{ color: 'rgba(248,250,252,0.5)', fontFamily: 'Cormorant Garamond, serif' }}>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
             Preparing your cosmic journey...
           </p>
         </div>
@@ -189,7 +189,7 @@ function VideoIntro({ onComplete, onSkip }) {
             style={{
               background: 'rgba(255,255,255,0.08)',
               border: '1px solid rgba(255,255,255,0.12)',
-              color: 'rgba(248,250,252,0.7)',
+              color: 'rgba(255,255,255,0.9)',
               backdropFilter: 'none',
             }}
             data-testid="tour-video-skip"
@@ -200,7 +200,7 @@ function VideoIntro({ onComplete, onSkip }) {
           <button
             onClick={onSkip}
             className="absolute top-6 right-6 p-2 rounded-xl transition-all hover:bg-white/10"
-            style={{ color: 'rgba(248,250,252,0.6)' }}
+            style={{ color: 'rgba(255,255,255,0.85)' }}
             data-testid="tour-video-close"
           >
             <X size={20} />
@@ -274,7 +274,7 @@ function CardWalkthrough({ onClose, onFinish }) {
       {/* Close */}
       <button onClick={onClose} data-testid="tour-close-btn"
         className="absolute top-6 right-6 p-2 rounded-xl z-20 transition-all hover:bg-white/10"
-        style={{ color: 'rgba(248,250,252,0.7)' }}>
+        style={{ color: 'rgba(255,255,255,0.9)' }}>
         <X size={20} />
       </button>
 
@@ -285,7 +285,7 @@ function CardWalkthrough({ onClose, onFinish }) {
       </div>
 
       {/* Step counter */}
-      <div className="absolute top-6 left-6 text-[10px] font-medium z-20" style={{ color: 'rgba(248,250,252,0.6)' }}>
+      <div className="absolute top-6 left-6 text-[10px] font-medium z-20" style={{ color: 'rgba(255,255,255,0.85)' }}>
         {step + 1} / {total}
       </div>
 
@@ -323,7 +323,7 @@ function CardWalkthrough({ onClose, onFinish }) {
           </h2>
 
           {/* Description */}
-          <p className="text-xs sm:text-sm leading-relaxed mb-5" style={{ color: 'rgba(248,250,252,0.75)' }}>
+          <p className="text-xs sm:text-sm leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.9)' }}>
             {current.desc}
           </p>
 
@@ -332,7 +332,7 @@ function CardWalkthrough({ onClose, onFinish }) {
             <div className="flex flex-wrap justify-center gap-1.5 mb-5">
               {current.features.map((f, i) => (
                 <span key={i} className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.5)' }}>
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.75)' }}>
                   {f}
                 </span>
               ))}

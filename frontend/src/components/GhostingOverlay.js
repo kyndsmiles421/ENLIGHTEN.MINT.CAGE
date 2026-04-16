@@ -190,7 +190,7 @@ export default function GhostingOverlay({
       >
         <span 
           className="text-[10px] uppercase tracking-[0.3em]"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
+          style={{ color: 'rgba(255,255,255,0.65)' }}
         >
           Your Path
         </span>

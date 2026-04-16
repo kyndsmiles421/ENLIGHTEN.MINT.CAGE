@@ -303,7 +303,7 @@ export default function MintingCeremony() {
           left: 20px;
           top: 20px;
           background: transparent;
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.6);
           color: white;
           padding: 8px 16px;
           font-size: 11px;
@@ -321,7 +321,7 @@ export default function MintingCeremony() {
           right: 20px;
           top: 20px;
           background: transparent;
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.6);
           padding: 8px 12px;
           font-size: 16px;
           cursor: pointer;
@@ -400,7 +400,7 @@ export default function MintingCeremony() {
         }
 
         .seed-input::placeholder {
-          color: rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.65);
         }
 
         .mint-btn {
@@ -519,7 +519,7 @@ export default function MintingCeremony() {
         .action-btn {
           padding: 12px 24px;
           background: transparent;
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.6);
           color: white;
           font-size: 10px;
           letter-spacing: 0.15em;
@@ -549,7 +549,7 @@ export default function MintingCeremony() {
         .history-section h3 {
           font-size: 10px;
           letter-spacing: 0.2em;
-          color: rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.65);
           margin-bottom: 20px;
         }
 

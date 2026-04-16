@@ -26,7 +26,7 @@ function TumblerSlots({ tumbler, onCollect, onInstantFinish }) {
           <Timer size={12} color="#F59E0B" />
           <span className="text-[10px] font-bold" style={{ color: '#F8FAFC' }}>Digital Tumbler</span>
         </div>
-        <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
           {tumbler.slots_used}/{tumbler.slots_max} slots
         </span>
       </div>
@@ -56,7 +56,7 @@ function TumblerSlots({ tumbler, onCollect, onInstantFinish }) {
             <motion.div animate={{ width: `${slot.progress}%` }} transition={{ duration: 1 }}
               className="h-full rounded-full" style={{ background: '#F59E0B' }} />
           </div>
-          <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {slot.hours_remaining}h remaining · {slot.progress}% complete
           </span>
         </motion.div>
@@ -85,7 +85,7 @@ function TumblerSlots({ tumbler, onCollect, onInstantFinish }) {
 
       {/* Empty slots */}
       {tumbler.slots_used === 0 && !tumbler.ready_to_collect?.length && (
-        <div className="text-center py-3 text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        <div className="text-center py-3 text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Tumbler empty. Extract & tumble specimens below.
         </div>
       )}
@@ -100,7 +100,7 @@ function ToolSelector({ tools, selected, onSelect, mohs }) {
       <div className="flex items-center gap-2 mb-2">
         <Hammer size={10} color="#F59E0B" />
         <span className="text-[9px] font-bold" style={{ color: '#F8FAFC' }}>Select Tool</span>
-        <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Mohs {mohs}</span>
+        <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Mohs {mohs}</span>
       </div>
       <div className="flex gap-1.5">
         {tools.map(t => {
@@ -122,8 +122,8 @@ function ToolSelector({ tools, selected, onSelect, mohs }) {
                 </div>
               )}
               <Icon size={14} color={t.color} className="mx-auto mb-1" />
-              <p className="text-[7px] font-bold" style={{ color: isSelected ? t.color : 'rgba(248,250,252,0.4)' }}>{t.name}</p>
-              <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>Mohs {t.mohs_range[0]}-{t.mohs_range[1]}</p>
+              <p className="text-[7px] font-bold" style={{ color: isSelected ? t.color : 'rgba(255,255,255,0.7)' }}>{t.name}</p>
+              <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Mohs {t.mohs_range[0]}-{t.mohs_range[1]}</p>
             </button>
           );
         })}
@@ -154,7 +154,7 @@ function SpecimenCard({ spec, onSelect, selectedId }) {
               style={{ background: `${rc}12`, color: rc }}>{spec.best_rarity || spec.rarity}</span>
             {spec.polished && <Sparkles size={8} color="#FCD34D" />}
           </div>
-          <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Mohs {spec.mohs} · {spec.element}
           </span>
         </div>
@@ -173,7 +173,7 @@ function StarSeedPanel({ components }) {
       <div className="flex items-center gap-2 mb-2">
         <Rocket size={12} color="#A855F7" />
         <span className="text-[10px] font-bold" style={{ color: '#F8FAFC' }}>Starseed Components</span>
-        <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
           {components.total_components} parts · {components.total_power} power
         </span>
       </div>
@@ -185,7 +185,7 @@ function StarSeedPanel({ components }) {
               style={{ background: `${c.color}06`, border: `1px solid ${c.color}10` }}>
               <Icon size={10} style={{ color: c.color }} />
               <p className="text-[8px] font-semibold mt-0.5" style={{ color: c.color }}>{c.component}</p>
-              <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Power: {c.power} · {c.category}
               </p>
             </div>

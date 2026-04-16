@@ -131,7 +131,7 @@ function TradeDetailPanel({ planet, onClose }) {
           <span className="text-xs font-medium" style={{ color: planet.color }}>{planet.label}</span>
         </div>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-white/5">
-          <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+          <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
         </button>
       </div>
       <div className="p-4 space-y-3">
@@ -142,7 +142,7 @@ function TradeDetailPanel({ planet, onClose }) {
                 style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <div className="w-2 h-2 rounded-full" style={{ background: planet.color }} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.5)' }}>{l.title}</p>
+                  <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.75)' }}>{l.title}</p>
                   <p className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
                     Mass: {l.mass || l.gravity_mass || '—'}
                   </p>
@@ -158,10 +158,10 @@ function TradeDetailPanel({ planet, onClose }) {
           <div className="space-y-2">
             {Object.entries(data.stats).filter(([k]) => k !== '_id').map(([key, val]) => (
               <div key={key} className="flex justify-between items-center">
-                <span className="text-[9px] capitalize" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                <span className="text-[9px] capitalize" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   {key.replace(/_/g, ' ')}
                 </span>
-                <span className="text-[10px] font-mono" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                <span className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   {typeof val === 'number' ? val : String(val)}
                 </span>
               </div>
@@ -169,22 +169,22 @@ function TradeDetailPanel({ planet, onClose }) {
           </div>
         )}
         {data?.type === 'escrow' && (
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Server-side escrow management for secure trades. Navigate to the full Trade Circle for escrow operations.
           </p>
         )}
         {data?.type === 'forge' && (
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Craft unique items by combining frequency recipes. Requires at least one Suanpan export.
           </p>
         )}
         {data?.type === 'genesis' && (
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Mint origin tokens for your crafted items. Requires at least one completed trade.
           </p>
         )}
         {data?.type === 'karma' && (
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Your reputation and trust metrics in the Trade Circle ecosystem.
           </p>
         )}
@@ -256,10 +256,10 @@ export default function TradeCircleOrbital() {
         <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
           style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
           data-testid="trade-orbital-back">
-          <ArrowLeft size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          <ArrowLeft size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
         </button>
         <span className="text-[9px] uppercase tracking-[0.15em]"
-          style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}>
+          style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
           Trade Orbital
         </span>
         <NanoGuide guideId="trade-circle" position="top-right" />
@@ -270,7 +270,7 @@ export default function TradeCircleOrbital() {
         <button onClick={() => navigate('/trade-circle')}
           className="px-3 py-1.5 rounded-full text-[8px] font-medium uppercase tracking-wider"
           style={{
-            background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)',
+            background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)',
             border: '1px solid rgba(248,250,252,0.06)',
           }}
           data-testid="switch-to-full-trade">

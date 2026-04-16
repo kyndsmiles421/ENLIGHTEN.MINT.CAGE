@@ -181,7 +181,7 @@ const ConstellationVisualizer = React.memo(({ address, path, rarityTier, size = 
           cx={star.x}
           cy={star.y}
           r={star.size}
-          fill={star.bright ? style.text : 'rgba(255,255,255,0.3)'}
+          fill={star.bright ? style.text : 'rgba(255,255,255,0.65)'}
         />
       ))}
       

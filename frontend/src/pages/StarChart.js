@@ -1368,7 +1368,7 @@ export default function StarChart() {
 
   if (!token) return (
     <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
-      <p className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to explore the cosmic star chart</p>
+      <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to explore the cosmic star chart</p>
     </div>
   );
 
@@ -1383,7 +1383,7 @@ export default function StarChart() {
                 <Star size={16} style={{ color: '#818CF8' }} /> Constellation Chart
                 <NanoGuide guideId="star-chart" position="top-right" />
               </h1>
-              <p className="text-[10px] hidden sm:block" style={{ color: 'rgba(248,250,252,0.3)' }}>Drag to rotate | Scroll/pinch to zoom | Click constellations for stories</p>
+              <p className="text-[10px] hidden sm:block" style={{ color: 'rgba(255,255,255,0.65)' }}>Drag to rotate | Scroll/pinch to zoom | Click constellations for stories</p>
             </div>
             {data && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] pointer-events-auto flex-shrink-0"
@@ -1399,7 +1399,7 @@ export default function StarChart() {
               style={{
                 background: activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}18` : 'rgba(0,0,0,0)',
                 border: `1px solid ${activeCulture ? `${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}40` : 'rgba(248,250,252,0.06)'}`,
-                color: activeCulture ? (cultures.find(c => c.id === activeCulture)?.color || '#818CF8') : 'rgba(248,250,252,0.5)',
+                color: activeCulture ? (cultures.find(c => c.id === activeCulture)?.color || '#818CF8') : 'rgba(255,255,255,0.75)',
                 backdropFilter: 'none',
                 boxShadow: activeCulture ? `0 0 15px ${cultures.find(c => c.id === activeCulture)?.color || '#818CF8'}15` : 'none',
               }}>
@@ -1434,7 +1434,7 @@ export default function StarChart() {
               style={{
                 background: mythologyMode ? 'rgba(167,139,250,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${mythologyMode ? 'rgba(167,139,250,0.4)' : 'rgba(248,250,252,0.06)'}`,
-                color: mythologyMode ? '#A78BFA' : 'rgba(248,250,252,0.5)',
+                color: mythologyMode ? '#A78BFA' : 'rgba(255,255,255,0.75)',
                 backdropFilter: 'none',
                 boxShadow: mythologyMode ? '0 0 20px rgba(167,139,250,0.15)' : 'none',
               }}>
@@ -1445,7 +1445,7 @@ export default function StarChart() {
               style={{
                 background: showBadges ? 'rgba(192,132,252,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${showBadges ? 'rgba(192,132,252,0.4)' : 'rgba(248,250,252,0.06)'}`,
-                color: showBadges ? '#C084FC' : 'rgba(248,250,252,0.5)',
+                color: showBadges ? '#C084FC' : 'rgba(255,255,255,0.75)',
                 backdropFilter: 'none',
               }}>
               <Star size={10} /> Badges
@@ -1456,14 +1456,14 @@ export default function StarChart() {
               style={{
                 background: showSearch ? 'rgba(45,212,191,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${showSearch ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
-                color: showSearch ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                color: showSearch ? '#2DD4BF' : 'rgba(255,255,255,0.75)',
                 backdropFilter: 'none',
               }}>
               <Search size={10} /> Search
             </button>
             <button onClick={() => setShowLocationPicker(!showLocationPicker)} data-testid="location-btn"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 whitespace-nowrap"
-              style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)', backdropFilter: 'none'}}>
+              style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.75)', backdropFilter: 'none'}}>
               <MapPin size={10} /> {locationName}
             </button>
             {/* Gyroscope toggle */}
@@ -1472,7 +1472,7 @@ export default function StarChart() {
               style={{
                 background: gyroEnabled ? 'rgba(45,212,191,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${gyroEnabled ? 'rgba(45,212,191,0.4)' : 'rgba(248,250,252,0.06)'}`,
-                color: gyroEnabled ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                color: gyroEnabled ? '#2DD4BF' : 'rgba(255,255,255,0.75)',
                 backdropFilter: 'none',
                 boxShadow: gyroEnabled ? '0 0 20px rgba(45,212,191,0.15)' : 'none',
               }}>
@@ -1488,7 +1488,7 @@ export default function StarChart() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="absolute top-28 right-4 z-20 w-64 rounded-2xl p-4" data-testid="location-picker"
             style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.06)', backdropFilter: 'none'}}>
-            <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: 'rgba(248,250,252,0.4)' }}>Set Location</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>Set Location</p>
             <div className="flex gap-2 mb-3">
               <input type="text" value={latInput} onChange={e => setLatInput(e.target.value)} placeholder="Lat" data-testid="lat-input"
                 className="flex-1 px-2 py-1.5 rounded-lg text-[10px]" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' }} />
@@ -1502,7 +1502,7 @@ export default function StarChart() {
               {presetLocations.map(loc => (
                 <button key={loc.name} onClick={() => { setLatInput(loc.lat.toString()); setLngInput(loc.lng.toString()); setLocationName(loc.name); setShowLocationPicker(false); fetchChart(loc.lat, loc.lng); }}
                   data-testid={`preset-${loc.name.toLowerCase().replace(/\s/g, '-')}`}
-                  className="px-2 py-1 rounded text-[9px]" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}>{loc.name}</button>
+                  className="px-2 py-1 rounded text-[9px]" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.7)' }}>{loc.name}</button>
               ))}
             </div>
           </motion.div>
@@ -1529,7 +1529,7 @@ export default function StarChart() {
               />
               {searchQuery && (
                 <button onClick={() => setSearchQuery('')} className="p-0.5">
-                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                  <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
                 </button>
               )}
             </div>
@@ -1558,7 +1558,7 @@ export default function StarChart() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] truncate" style={{ color: '#F8FAFC' }}>{c.name}</p>
-                        <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                           {c.type === 'cultural' ? `Cultural` : c.element || 'Star'}
                           {c.meaning && ` · ${c.meaning.slice(0, 30)}`}
                         </p>
@@ -1567,12 +1567,12 @@ export default function StarChart() {
                   ))}
                 </div>
               ) : (
-                <p className="text-[10px] text-center py-3" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[10px] text-center py-3" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   No constellations found — try a different spelling
                 </p>
               )
             ) : (
-              <p className="text-[9px] text-center py-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <p className="text-[9px] text-center py-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Type at least 2 characters to search
               </p>
             )}
@@ -1589,13 +1589,13 @@ export default function StarChart() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Globe size={12} style={{ color: '#818CF8' }} />
-                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.5)' }}>World Sky Views</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.75)' }}>World Sky Views</p>
               </div>
               <button onClick={() => setShowCulturePicker(false)} className="p-1 rounded hover:bg-white/5">
-                <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
               </button>
             </div>
-            <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
               Explore how different civilizations mapped the same stars into their own mythologies
             </p>
             {cultureLoading && (
@@ -1609,7 +1609,7 @@ export default function StarChart() {
                 <button onClick={() => { setActiveCulture(null); setCultureData(null); setSelectedCulturalConst(null); setShowCulturePicker(false); }}
                   data-testid="culture-clear"
                   className="w-full text-left rounded-xl px-3 py-2.5 text-[10px] transition-all"
-                  style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}>
+                  style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.7)' }}>
                   Show Western (Default)
                 </button>
               )}
@@ -1626,10 +1626,10 @@ export default function StarChart() {
                     }}>
                     <div className="flex items-center gap-2 mb-0.5">
                       <div className="w-2 h-2 rounded-full" style={{ background: c.color, boxShadow: `0 0 6px ${c.color}80` }} />
-                      <span className="text-[11px] font-semibold" style={{ color: isActive ? c.color : 'rgba(248,250,252,0.7)' }}>{c.name}</span>
-                      <span className="text-[9px] ml-auto" style={{ color: 'rgba(248,250,252,0.2)' }}>{c.constellation_count} patterns</span>
+                      <span className="text-[11px] font-semibold" style={{ color: isActive ? c.color : 'rgba(255,255,255,0.9)' }}>{c.name}</span>
+                      <span className="text-[9px] ml-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>{c.constellation_count} patterns</span>
                     </div>
-                    <p className="text-[9px] pl-4 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>{c.description?.substring(0, 80)}...</p>
+                    <p className="text-[9px] pl-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>{c.description?.substring(0, 80)}...</p>
                   </button>
                 );
               })}
@@ -1734,7 +1734,7 @@ export default function StarChart() {
             data-testid="cultural-story-panel"
             style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${cultureData.color}20`, backdropFilter: 'none', boxShadow: `0 0 30px ${cultureData.color}10` }}>
             <button onClick={() => setSelectedCulturalConst(null)} className="absolute top-3 right-3 p-1 rounded-lg hover:bg-white/5 z-10" data-testid="close-cultural-story">
-              <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+              <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
             </button>
 
             {/* Culture header */}
@@ -1743,7 +1743,7 @@ export default function StarChart() {
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: cultureData.color, boxShadow: `0 0 8px ${cultureData.color}80` }} />
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: cultureData.color }}>{cultureData.name}</p>
               </div>
-              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.4)' }}>{cultureData.description}</p>
+              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>{cultureData.description}</p>
             </div>
 
             {/* Constellation tabs */}
@@ -1757,7 +1757,7 @@ export default function StarChart() {
                     style={{
                       background: isActive ? `${cultureData.color}15` : 'transparent',
                       border: `1px solid ${isActive ? `${cultureData.color}30` : 'rgba(248,250,252,0.04)'}`,
-                      color: isActive ? cultureData.color : 'rgba(248,250,252,0.35)',
+                      color: isActive ? cultureData.color : 'rgba(255,255,255,0.65)',
                     }}>
                     {c.name.split('(')[0].trim()}
                   </button>
@@ -1775,7 +1775,7 @@ export default function StarChart() {
                     </div>
                     <div>
                       <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>{selectedCulturalConst.name}</p>
-                      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {selectedCulturalConst.element} element &middot; {selectedCulturalConst.stars?.length || 0} stars
                       </p>
                     </div>
@@ -1862,9 +1862,9 @@ export default function StarChart() {
                     <>
                       {/* Figure card */}
                       <div className="rounded-xl p-3 mb-3" style={{ background: `${cultureData.color}06`, border: `1px solid ${cultureData.color}10` }}>
-                        <p className="text-[9px] uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(248,250,252,0.25)' }}>Figure</p>
+                        <p className="text-[9px] uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>Figure</p>
                         <p className="text-sm font-semibold" style={{ color: cultureData.color, fontFamily: 'Cormorant Garamond, serif' }}>{selectedCulturalConst.mythology.figure}</p>
-                        <div className="flex gap-3 text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        <div className="flex gap-3 text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
                           <span>Origin: {selectedCulturalConst.mythology.origin}</span>
                           <span>Deity: {selectedCulturalConst.mythology.deity}</span>
                         </div>
@@ -1872,10 +1872,10 @@ export default function StarChart() {
 
                       {/* Story */}
                       <div className="mb-3">
-                        <p className="text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                        <p className="text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           <BookOpen size={9} /> The Story
                         </p>
-                        <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif', fontSize: '13px' }}>
+                        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif', fontSize: '13px' }}>
                           {selectedCulturalConst.mythology.story}
                         </p>
                       </div>
@@ -1883,7 +1883,7 @@ export default function StarChart() {
                       {/* Lesson */}
                       <div className="rounded-xl p-3" style={{ background: `${cultureData.color}06`, border: `1px solid ${cultureData.color}12` }}>
                         <p className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: cultureData.color }}>Cosmic Lesson</p>
-                        <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                        <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                           "{selectedCulturalConst.mythology.lesson}"
                         </p>
                       </div>
@@ -1919,13 +1919,13 @@ export default function StarChart() {
                   {/* Stars list */}
                   {selectedCulturalConst.stars && (
                     <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(248,250,252,0.04)' }}>
-                      <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Stars</p>
+                      <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Stars</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedCulturalConst.stars.map((s, i) => (
                           <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-lg" style={{ background: `${cultureData.color}06`, border: `1px solid ${cultureData.color}08` }}>
                             <div className="w-1.5 h-1.5 rounded-full" style={{ background: cultureData.color }} />
-                            <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{s.name}</span>
-                            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>m{s.mag}</span>
+                            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{s.name}</span>
+                            <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>m{s.mag}</span>
                           </div>
                         ))}
                       </div>
@@ -1995,14 +1995,14 @@ export default function StarChart() {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <Loader2 className="animate-spin mx-auto mb-3" size={28} style={{ color: '#818CF8' }} />
-              <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>Mapping the celestial sphere...</p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Mapping the celestial sphere...</p>
             </div>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center px-6">
               <AlertCircle className="mx-auto mb-3" size={32} style={{ color: '#F87171' }} />
-              <p className="text-sm mb-2" style={{ color: 'rgba(248,250,252,0.7)' }}>{error}</p>
+              <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{error}</p>
               <button onClick={() => fetchChart(parseFloat(latInput), parseFloat(lngInput))}
                 className="mt-3 px-4 py-2 rounded-lg text-xs"
                 style={{ background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)', color: '#A78BFA' }}>
@@ -2020,14 +2020,14 @@ export default function StarChart() {
         <div className="absolute bottom-20 right-4 z-10 flex flex-col gap-1.5" data-testid="zoom-controls">
           <button onClick={() => handleZoom(-8)}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
-            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(248,250,252,0.6)' }}
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(255,255,255,0.85)' }}
             data-testid="zoom-in-btn"
             aria-label="Zoom In">
             <Plus size={16} />
           </button>
           <button onClick={() => handleZoom(8)}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
-            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(248,250,252,0.6)' }}
+            style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.08)', backdropFilter: 'none', color: 'rgba(255,255,255,0.85)' }}
             data-testid="zoom-out-btn"
             aria-label="Zoom Out">
             <Minus size={16} />

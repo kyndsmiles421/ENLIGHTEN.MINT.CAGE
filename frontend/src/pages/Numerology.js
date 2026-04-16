@@ -332,7 +332,7 @@ function NumerologyCrossLinks() {
   ];
   return (
     <div className="mt-8 rounded-2xl p-5" style={{ background: 'transparent', border: '1px solid rgba(212,175,55,0.08)' }}>
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
         <Star size={10} className="inline mr-1" /> Connected Systems
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -348,7 +348,7 @@ function NumerologyCrossLinks() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{l.label}</p>
-              <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.35)' }}>{l.desc}</p>
+              <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.65)' }}>{l.desc}</p>
             </div>
             <ChevronRight size={12} style={{ color: 'rgba(248,250,252,0.15)' }} />
           </button>

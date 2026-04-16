@@ -73,7 +73,7 @@ function OrbitalNode({ node, x, y, isActive, isLocked, onSelect, onHover, hovere
         }}>
         {Icon && <Icon size={isActive ? 20 : 17} style={{ color: isLocked ? 'rgba(248,250,252,0.15)' : node.color }} />}
         <p className="text-[7px] mt-0.5 font-medium text-center leading-tight max-w-[54px] truncate"
-          style={{ color: isActive || isHovered ? node.color : 'rgba(248,250,252,0.3)' }}>
+          style={{ color: isActive || isHovered ? node.color : 'rgba(255,255,255,0.65)' }}>
           {node.label}
         </p>
         {isLocked && (
@@ -144,7 +144,7 @@ function CenterSun({ sun, containerCenter, onBack, depth }) {
           whileHover={{ scale: 1.15 }}
           data-testid="orbital-back-btn"
         >
-          <ChevronLeft size={12} style={{ color: 'rgba(248,250,252,0.5)' }} />
+          <ChevronLeft size={12} style={{ color: 'rgba(255,255,255,0.75)' }} />
         </motion.button>
       )}
     </div>
@@ -393,7 +393,7 @@ export function OrbitalHubBase({
                 {hovered.label}
               </p>
               {hovered.desc && (
-                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{hovered.desc}</p>
+                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{hovered.desc}</p>
               )}
             </motion.div>
           );
@@ -411,8 +411,8 @@ export function OrbitalHubBase({
               border: '1px solid rgba(248,250,252,0.06)',
             }}
             data-testid="orbital-back-btn">
-            <ArrowLeft size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
-            <span className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <ArrowLeft size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
+            <span className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>
               Back
             </span>
           </button>

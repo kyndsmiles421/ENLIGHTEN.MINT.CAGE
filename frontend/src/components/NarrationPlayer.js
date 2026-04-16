@@ -237,7 +237,7 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
                       className="flex-1 py-2 rounded-lg text-xs text-center"
                       style={{
                         background: speed === s.value ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)',
-                        border: `1px solid ${speed === s.value ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                        border: `1px solid ${speed === s.value ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.06)'}`,
                         color: speed === s.value ? 'var(--text-primary)' : 'var(--text-muted)',
                         transition: 'all 0.2s',
                       }}

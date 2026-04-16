@@ -1231,7 +1231,7 @@ export default function VirtualReality() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{Math.round(celestial.moon.illumination * 100)}% lit</p>
+                <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{Math.round(celestial.moon.illumination * 100)}% lit</p>
                 <p className="text-[8px]" style={{ color: `${celestial.solar.color}80` }}>{celestial.solar.period}</p>
               </div>
             </div>
@@ -1282,10 +1282,10 @@ export default function VirtualReality() {
                   <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(249,115,22,0.7)' }}>Story Theater</span>
                 </div>
                 <button onClick={() => setShowTheaterPicker(false)} className="p-1 rounded hover:bg-white/5">
-                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                  <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
                 </button>
               </div>
-              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Immersive AI-generated cinematic creation stories in VR
               </p>
               <div className="space-y-2">
@@ -1296,9 +1296,9 @@ export default function VirtualReality() {
                     style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 6px ${s.color}80` }} />
-                      <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{s.culture}</span>
+                      <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>{s.culture}</span>
                     </div>
-                    <p className="text-[9px] pl-4 mt-0.5 truncate" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.title}</p>
+                    <p className="text-[9px] pl-4 mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.title}</p>
                   </button>
                 ))}
               </div>
@@ -1317,7 +1317,7 @@ export default function VirtualReality() {
               {vrTheater.loading ? (
                 <div className="flex flex-col items-center gap-3 pointer-events-auto">
                   <Loader2 className="animate-spin" size={28} style={{ color: vrTheater.story?.color }} />
-                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>Generating cinematic scenes...</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>Generating cinematic scenes...</p>
                 </div>
               ) : theaterVideoMode && theaterVideoUrl ? (
                 <motion.div
@@ -1350,8 +1350,8 @@ export default function VirtualReality() {
                   <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}>
                     <Film size={28} style={{ color: vrTheater.story?.color }} />
                   </motion.div>
-                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>Generating Sora 2 video...</p>
-                  <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>This may take 2-5 minutes</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>Generating Sora 2 video...</p>
+                  <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>This may take 2-5 minutes</p>
                 </div>
               ) : (
                 <motion.div
@@ -1392,7 +1392,7 @@ export default function VirtualReality() {
                   <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {vrTheater.scenes?.map((_, i) => (
                       <div key={i} className="rounded-full transition-all"
-                        style={{ width: i === vrTheater.scene ? 14 : 5, height: 5, background: i === vrTheater.scene ? vrTheater.story?.color : 'rgba(255,255,255,0.2)' }} />
+                        style={{ width: i === vrTheater.scene ? 14 : 5, height: 5, background: i === vrTheater.scene ? vrTheater.story?.color : 'rgba(255,255,255,0.6)' }} />
                     ))}
                   </div>
                 </motion.div>
@@ -1476,10 +1476,10 @@ export default function VirtualReality() {
                   <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(252,211,77,0.7)' }}>Star Journeys</span>
                 </div>
                 <button onClick={() => setShowJourneyPicker(false)} className="p-1 rounded hover:bg-white/5">
-                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                  <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
                 </button>
               </div>
-              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Guided flights through the cosmos with narrated constellation stories
               </p>
               <div className="space-y-2">
@@ -1492,7 +1492,7 @@ export default function VirtualReality() {
                       <div className="w-2 h-2 rounded-full" style={{ background: j.color, boxShadow: `0 0 8px ${j.color}80` }} />
                       <span className="text-[11px] font-medium" style={{ color: `${j.color}CC` }}>{j.name}</span>
                     </div>
-                    <p className="text-[9px] pl-4" style={{ color: 'rgba(248,250,252,0.3)' }}>{j.description}</p>
+                    <p className="text-[9px] pl-4" style={{ color: 'rgba(255,255,255,0.65)' }}>{j.description}</p>
                   </button>
                 ))}
               </div>
@@ -1522,10 +1522,10 @@ export default function VirtualReality() {
                   <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,229,255,0.7)' }}>Quantum Field</span>
                 </div>
                 <button onClick={() => setShowQuantumPicker(false)} className="p-1 rounded hover:bg-white/5">
-                  <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                  <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
                 </button>
               </div>
-              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[9px] mb-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Guided quantum meditations — where physics meets consciousness
               </p>
 
@@ -1544,9 +1544,9 @@ export default function VirtualReality() {
                       style={{ background: 'rgba(0,229,255,0.03)', border: '1px solid rgba(0,229,255,0.06)' }}>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ background: principle?.color || '#00E5FF', boxShadow: `0 0 6px ${principle?.color || '#00E5FF'}80` }} />
-                        <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{m.name}</span>
+                        <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>{m.name}</span>
                       </div>
-                      <p className="text-[9px] pl-4 mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      <p className="text-[9px] pl-4 mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {Math.floor(m.total_duration / 60)}:{String(m.total_duration % 60).padStart(2, '0')} min
                       </p>
                     </button>
@@ -1563,7 +1563,7 @@ export default function VirtualReality() {
                       <div className="w-1.5 h-1.5 rounded-full" style={{ background: p.color }} />
                       <span className="text-[10px] font-medium capitalize" style={{ color: `${p.color}CC` }}>{p.id.replace(/_/g, ' ')}</span>
                     </div>
-                    <p className="text-[8px] pl-3 leading-relaxed" style={{ color: 'rgba(248,250,252,0.25)' }}>{p.spiritual.slice(0, 80)}...</p>
+                    <p className="text-[8px] pl-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{p.spiritual.slice(0, 80)}...</p>
                   </div>
                 ))}
               </div>
@@ -1597,7 +1597,7 @@ export default function VirtualReality() {
                     <span className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: activeJourney.journey.color }}>
                       {activeJourney.journey.name}
                     </span>
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                       {activeJourney.step + 1} / {activeJourney.journey.waypoints.length}
                     </span>
                   </div>
@@ -1620,7 +1620,7 @@ export default function VirtualReality() {
                     style={{ background: `${activeJourney.journey.color}80`, width: `${(activeJourney.elapsed / activeJourney.total) * 100}%` }}
                   />
                 </div>
-                <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {Math.floor((activeJourney.total - activeJourney.elapsed) / 60)}:{String((activeJourney.total - activeJourney.elapsed) % 60).padStart(2, '0')} remaining
                 </p>
               </div>
@@ -1732,7 +1732,7 @@ export default function VirtualReality() {
                     style={{ background: `${vrMeditation.color || '#C084FC'}80`, width: `${(vrMeditation.elapsed / vrMeditation.total) * 100}%`, boxShadow: `0 0 6px ${vrMeditation.color || '#C084FC'}40` }}
                   />
                 </div>
-                <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                <p className="text-[9px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   {Math.floor((vrMeditation.total - vrMeditation.elapsed) / 60)}:{String((vrMeditation.total - vrMeditation.elapsed) % 60).padStart(2, '0')} remaining
                 </p>
               </div>
@@ -1761,7 +1761,7 @@ export default function VirtualReality() {
         <div className="relative w-10 h-10 flex items-center justify-center">
           {/* Center dot */}
           <div className="w-2 h-2 rounded-full" style={{
-            background: gazeTarget ? PORTALS.find(p => p.id === gazeTarget)?.color || '#C084FC' : 'rgba(248,250,252,0.25)',
+            background: gazeTarget ? PORTALS.find(p => p.id === gazeTarget)?.color || '#C084FC' : 'rgba(255,255,255,0.6)',
             boxShadow: gazeTarget ? `0 0 12px ${PORTALS.find(p => p.id === gazeTarget)?.color || '#C084FC'}80` : '0 0 6px rgba(248,250,252,0.1)',
             transition: 'all 0.2s ease',
           }} />

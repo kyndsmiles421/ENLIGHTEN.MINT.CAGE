@@ -138,13 +138,13 @@ export default function MultiverseRealms() {
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] mb-1.5" style={{ color: 'rgba(248,250,252,0.4)' }}>{realm.subtitle}</p>
-                          <p className="text-[10px] leading-relaxed line-clamp-2" style={{ color: 'rgba(248,250,252,0.3)' }}>{realm.desc}</p>
+                          <p className="text-[10px] mb-1.5" style={{ color: 'rgba(255,255,255,0.7)' }}>{realm.subtitle}</p>
+                          <p className="text-[10px] leading-relaxed line-clamp-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{realm.desc}</p>
                           <div className="flex items-center gap-3 mt-2">
                             <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: `${realm.color}08`, color: `${realm.color}70`, border: `1px solid ${realm.color}10` }}>
                               {realm.frequency} Hz
                             </span>
-                            <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{realm.element}</span>
+                            <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{realm.element}</span>
                           </div>
                         </div>
                         <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.15)' }} className="mt-1 group-hover:translate-x-1 transition-all flex-shrink-0" />
@@ -187,7 +187,7 @@ export default function MultiverseRealms() {
 
               {/* Practices */}
               <div className="mb-6">
-                <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Realm Practices</p>
+                <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Realm Practices</p>
                 <div className="grid grid-cols-3 gap-2">
                   {(activeRealm.realm.practices || []).map(p => (
                     <div key={p} className="p-3 rounded-xl text-center"
@@ -202,11 +202,11 @@ export default function MultiverseRealms() {
               {/* Stats */}
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="p-3 rounded-xl" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Total Visits</p>
+                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.65)' }}>Total Visits</p>
                   <p className="text-xl font-light mt-1" style={{ color: activeRealm.realm.color }}>{activeRealm.total_visits}</p>
                 </div>
                 <div className="p-3 rounded-xl" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>This Realm</p>
+                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.65)' }}>This Realm</p>
                   <p className="text-xl font-light mt-1" style={{ color: activeRealm.realm.color }}>{activeRealm.realm_visits}</p>
                 </div>
               </div>

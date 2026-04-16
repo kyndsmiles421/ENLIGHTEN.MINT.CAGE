@@ -571,7 +571,7 @@ export default function SmartDock() {
             data-testid="wallet-micro-badge"
           >
             <span className="text-[6px] font-mono" style={{ color: '#FBBF24' }}>{dust}</span>
-            <span className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>|</span>
+            <span className="text-[5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>|</span>
             <span className="text-[6px] font-mono" style={{ color: '#818CF8' }}>{gems}</span>
           </motion.div>
         )}
@@ -777,7 +777,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
           <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: `${data?.atmosphere?.accent || '#818CF8'}CC` }}>Cosmic Harmonics</span>
         </div>
         <button onClick={() => { onClose(); }} className="p-1 rounded-lg hover:bg-white/5">
-          <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          <X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} />
         </button>
       </div>
 
@@ -796,14 +796,14 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
                   {MOON_GLYPHS[data.moon.phase_id] || '\u25CF'}
                 </div>
                 <p className="text-[8px] font-medium" style={{ color: `${data.atmosphere.accent}CC` }}>{data.moon.phase}</p>
-                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{Math.round(data.moon.illumination * 100)}% lit</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{Math.round(data.moon.illumination * 100)}% lit</p>
               </div>
             </div>
             {/* Zodiac */}
             <div className="flex-1 rounded-lg p-2" style={{ background: `${data.zodiac.color}08`, border: `1px solid ${data.zodiac.color}12` }}>
               <div className="text-center">
                 <p className="text-[10px] font-medium" style={{ color: `${data.zodiac.color}CC` }}>{data.zodiac.sign}</p>
-                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{data.zodiac.element}</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{data.zodiac.element}</p>
                 <p className="text-[7px] mt-0.5 leading-tight" style={{ color: `${data.zodiac.color}80` }}>{data.zodiac.theme.split(' & ')[0]}</p>
               </div>
             </div>
@@ -811,7 +811,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
             <div className="flex-1 rounded-lg p-2" style={{ background: `${data.solar.color}08`, border: `1px solid ${data.solar.color}12` }}>
               <div className="text-center">
                 <p className="text-[10px] font-medium" style={{ color: `${data.solar.color}CC` }}>{data.solar.period}</p>
-                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>Energy: {data.guidance.energy}</p>
+                <p className="text-[7px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>Energy: {data.guidance.energy}</p>
               </div>
             </div>
           </div>
@@ -834,7 +834,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
               <p className="text-[10px] font-medium" style={{ color: isRecPlaying ? data.atmosphere.accent : `${data.atmosphere.accent}CC` }}>
                 {data.guidance.recommended_frequency_name}
               </p>
-              <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Aligned with {data.moon.phase}
               </p>
             </div>
@@ -846,7 +846,7 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
           {/* Meditation suggestion */}
           <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
             <p className="text-[8px] uppercase tracking-widest mb-1" style={{ color: `${data.atmosphere.accent}60` }}>Suggested Practice</p>
-            <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.65)' }}>{data.guidance.recommended_meditation}</p>
+            <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>{data.guidance.recommended_meditation}</p>
           </div>
 
           {/* AI Affirmation — personalized from mood trends + celestial */}
@@ -863,18 +863,18 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
               )}
             </div>
             {affirmation ? (
-              <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)' }}>
+              <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
                 {affirmation.affirmation}
               </p>
             ) : (
-              <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(248,250,252,0.35)' }}>
+              <p className="text-[9px] italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 {data.guidance.affirmation_seed.charAt(0).toUpperCase() + data.guidance.affirmation_seed.slice(1)}
               </p>
             )}
           </div>
         </div>
       ) : (
-        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>Unable to load celestial data</p>
+        <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>Unable to load celestial data</p>
       )}
     </motion.div>
   );
@@ -901,7 +901,7 @@ function MixerPanel({ onClose, navigate }) {
     >
       <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
         <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#818CF8' }}>Production Console</span>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
 
       {/* Master Volume */}
@@ -931,7 +931,7 @@ function MixerPanel({ onClose, navigate }) {
       {isPlaying && (
         <div className="px-3 py-1.5 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
           <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22C55E', boxShadow: '0 0 6px #22C55E' }} />
-          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>
+          <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>
             {totalActive} layer{totalActive !== 1 ? 's' : ''} active
             {activeMantra && <span style={{ color: '#2DD4BF' }}> + voice</span>}
           </span>
@@ -962,7 +962,7 @@ function MixerPanel({ onClose, navigate }) {
         <button
           onClick={() => { onClose(); navigate('/creator-console'); }}
           className="w-full py-2 rounded-lg text-[10px]"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', color: 'rgba(248,250,252,0.45)' }}
+          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.75)' }}
           data-testid="dock-open-mixer-page"
         >
           Full Mixer Page
@@ -1051,11 +1051,11 @@ function AssistantPanel({ onClose, token, authHeaders }) {
           <Sparkles size={11} style={{ color: '#C084FC' }} />
           <span className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>Sage</span>
         </div>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
       <div ref={scrollRef} className="px-3 py-2 space-y-2 overflow-y-auto" style={{ maxHeight: '220px', scrollbarWidth: 'thin' }}>
         {messages.length === 0 && (
-          <p className="text-[9px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {token ? 'Ask anything about wellness or the app' : 'Sign in to chat'}
           </p>
         )}
@@ -1064,7 +1064,7 @@ function AssistantPanel({ onClose, token, authHeaders }) {
             <div className="max-w-[85%] px-2.5 py-1.5 rounded-lg text-[10px] leading-relaxed"
               style={{
                 background: m.role === 'user' ? 'rgba(192,132,252,0.08)' : 'rgba(248,250,252,0.02)',
-                color: m.role === 'user' ? '#D8B4FE' : 'rgba(248,250,252,0.65)',
+                color: m.role === 'user' ? '#D8B4FE' : 'rgba(255,255,255,0.85)',
                 border: `1px solid ${m.role === 'user' ? 'rgba(192,132,252,0.1)' : 'rgba(248,250,252,0.03)'}`,
               }}>
               {m.text}
@@ -1134,7 +1134,7 @@ function FrequencyPanel({ onClose }) {
     >
       <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
         <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#2DD4BF' }}>Solfeggio Tones</span>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
       <div className="p-2 space-y-0.5">
         {FREQUENCIES.map(f => {
@@ -1152,8 +1152,8 @@ function FrequencyPanel({ onClose }) {
             >
               {isActive
                 ? <Pause size={10} style={{ color: f.color }} />
-                : <Play size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />}
-              <span className="text-[9px]" style={{ color: isActive ? f.color : 'rgba(248,250,252,0.45)' }}>{f.name}</span>
+                : <Play size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />}
+              <span className="text-[9px]" style={{ color: isActive ? f.color : 'rgba(255,255,255,0.75)' }}>{f.name}</span>
             </button>
           );
         })}
@@ -1265,7 +1265,7 @@ function HarmonyNPUPanel({ onClose, engine }) {
           )}
         </div>
         <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5">
-          <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          <X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} />
         </button>
       </div>
 
@@ -1305,7 +1305,7 @@ function HarmonyNPUPanel({ onClose, engine }) {
                 { label: 'Depth', value: harmonyScore.breakdown.harmonic_depth, max: 30, color: '#F59E0B' },
               ].map(bar => (
                 <div key={bar.label} className="flex items-center gap-1.5">
-                  <span className="text-[6px] font-mono w-10 text-right" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <span className="text-[6px] font-mono w-10 text-right" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {bar.label}
                   </span>
                   <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
@@ -1322,7 +1322,7 @@ function HarmonyNPUPanel({ onClose, engine }) {
             </div>
           </div>
           {/* Insight */}
-          <p className="text-[7px] mt-2 leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+          <p className="text-[7px] mt-2 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
             {harmonyScore.insight}
           </p>
         </div>
@@ -1333,13 +1333,13 @@ function HarmonyNPUPanel({ onClose, engine }) {
         <div className="px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }} data-testid="streak-panel">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-1.5">
-              <Zap size={9} style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.3)' }} />
-              <span className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <Zap size={9} style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(255,255,255,0.65)' }} />
+              <span className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Resonance Streak
               </span>
             </div>
             <motion.span className="text-[11px] font-mono font-bold"
-              style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.4)' }}
+              style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(255,255,255,0.7)' }}
               animate={streak.streak_active ? { scale: [1, 1.1, 1] } : {}}
               transition={{ duration: 1.5, repeat: Infinity }}
               data-testid="streak-value">
@@ -1360,7 +1360,7 @@ function HarmonyNPUPanel({ onClose, engine }) {
             </div>
             <div className="flex-1" />
             <div className="text-right">
-              <p className="text-[6px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <p className="text-[6px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Best: {streak.best_streak}x
               </p>
               {streak.total_xp_earned > 0 && (
@@ -1379,15 +1379,15 @@ function HarmonyNPUPanel({ onClose, engine }) {
         <div className="grid grid-cols-3 gap-2">
           <div className="text-center">
             <p className="text-[11px] font-mono font-bold" style={{ color: '#22C55E' }}>{npuStats.completed}</p>
-            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Done</p>
+            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Done</p>
           </div>
           <div className="text-center">
             <p className="text-[11px] font-mono font-bold" style={{ color: '#EAB308' }}>{npuStats.pending}</p>
-            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Queue</p>
+            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Queue</p>
           </div>
           <div className="text-center">
-            <p className="text-[11px] font-mono font-bold" style={{ color: npuStats.errors > 0 ? '#EF4444' : 'rgba(248,250,252,0.2)' }}>{npuStats.errors}</p>
-            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Errors</p>
+            <p className="text-[11px] font-mono font-bold" style={{ color: npuStats.errors > 0 ? '#EF4444' : 'rgba(255,255,255,0.6)' }}>{npuStats.errors}</p>
+            <p className="text-[6px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Errors</p>
           </div>
         </div>
       </div>
@@ -1412,7 +1412,7 @@ function HarmonyNPUPanel({ onClose, engine }) {
               <div className="w-1.5 h-1.5 rounded-full" style={{
                 background: task.type === 'complete' ? '#22C55E' : task.type === 'error' ? '#EF4444' : '#EAB308',
               }} />
-              <span className="text-[6px] font-mono truncate flex-1" style={{ color: 'rgba(248,250,252,0.35)' }}>
+              <span className="text-[6px] font-mono truncate flex-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 {task.label || task.channel}
               </span>
               <span className="text-[5px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -1446,7 +1446,7 @@ function LanguagePanel({ onClose }) {
     >
       <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
         <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#F59E0B' }}>Language</span>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
       <div className="p-2 space-y-0.5">
         {LANGUAGES.map(l => (
@@ -1460,9 +1460,9 @@ function LanguagePanel({ onClose }) {
             }}
             data-testid={`lang-${l.code}`}
           >
-            <span className="text-[9px] font-bold w-5" style={{ color: language === l.code ? '#F59E0B' : 'rgba(248,250,252,0.3)' }}>{l.flag}</span>
-            <span className="text-[10px] flex-1" style={{ color: language === l.code ? '#F59E0B' : 'rgba(248,250,252,0.5)' }}>{l.label}</span>
-            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{l.native}</span>
+            <span className="text-[9px] font-bold w-5" style={{ color: language === l.code ? '#F59E0B' : 'rgba(255,255,255,0.65)' }}>{l.flag}</span>
+            <span className="text-[10px] flex-1" style={{ color: language === l.code ? '#F59E0B' : 'rgba(255,255,255,0.75)' }}>{l.label}</span>
+            <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{l.native}</span>
           </button>
         ))}
       </div>

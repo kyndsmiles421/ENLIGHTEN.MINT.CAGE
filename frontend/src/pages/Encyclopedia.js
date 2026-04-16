@@ -106,7 +106,7 @@ function ConceptCard({ concept, color, index, revealedItems, tradition, compact 
             style={{ color, fontFamily: compact ? 'inherit' : 'Cormorant Garamond, serif' }}>
             {concept.name}
           </p>
-          <p className={`${compact ? 'text-[11px]' : 'text-xs'} leading-relaxed`} style={{ color: 'rgba(248,250,252,0.5)' }}>
+          <p className={`${compact ? 'text-[11px]' : 'text-xs'} leading-relaxed`} style={{ color: 'rgba(255,255,255,0.75)' }}>
             {concept.desc}
           </p>
         </div>
@@ -123,7 +123,7 @@ function ConceptCard({ concept, color, index, revealedItems, tradition, compact 
             className="overflow-hidden">
             <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${color}12` }}>
               {insight ? (
-                <div className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(248,250,252,0.55)' }}>
+                <div className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.8)' }}>
                   {insight.exploration || insight.content || JSON.stringify(insight)}
                 </div>
               ) : (
@@ -185,7 +185,7 @@ function AudioNarrator({ endpoint, payload, color, label = 'Listen' }) {
             {label}
           </button>
         ) : state === 'loading' ? (
-          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
             <Loader2 size={12} className="animate-spin" style={{ color }} /> Channeling the voice...
           </div>
         ) : (
@@ -198,7 +198,7 @@ function AudioNarrator({ endpoint, payload, color, label = 'Listen' }) {
             <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: `${color}10` }}>
               <motion.div className="h-full rounded-full" style={{ background: color }} animate={{ width: `${progress * 100}%` }} transition={{ duration: 0.2 }} />
             </div>
-            <button onClick={stop} className="p-1"><VolumeX size={10} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+            <button onClick={stop} className="p-1"><VolumeX size={10} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
           </>
         )}
       </div>
@@ -238,14 +238,14 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
       <div className="absolute top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between"
         style={{ background: 'linear-gradient(180deg, rgba(6,7,14,0.9) 0%, transparent 100%)' }}>
         <div className="flex items-center gap-3">
-          <button onClick={onClose} data-testid="close-vr-tradition" className="p-2 rounded-lg hover:bg-white/5"><Minimize2 size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+          <button onClick={onClose} data-testid="close-vr-tradition" className="p-2 rounded-lg hover:bg-white/5"><Minimize2 size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: tradition.color }}>{tradition.origin}</p>
             <p className="text-sm font-medium" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif' }}>{tradition.name}</p>
           </div>
         </div>
         <button onClick={() => setShowParticles(p => !p)} className="p-1.5 rounded-lg"
-          style={{ background: showParticles ? `${tradition.color}10` : 'rgba(255,255,255,0.04)', color: showParticles ? tradition.color : 'rgba(248,250,252,0.2)' }}>
+          style={{ background: showParticles ? `${tradition.color}10` : 'rgba(255,255,255,0.04)', color: showParticles ? tradition.color : 'rgba(255,255,255,0.6)' }}>
           <Sparkles size={14} />
         </button>
       </div>
@@ -262,7 +262,7 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
               {React.createElement(theme.icon, { size: 28, style: { color: tradition.color } })}
             </motion.div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>{tradition.name}</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(248,250,252,0.3)' }}>{tradition.era} &middot; {tradition.origin}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.65)' }}>{tradition.era} &middot; {tradition.origin}</p>
           </motion.div>
 
           {/* Narration */}
@@ -275,13 +275,13 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
             animate={0 < revealedItems ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ duration: 0.8 }}
             className="text-base leading-[1.9] mb-8 text-center"
-            style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
+            style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
             {tradition.overview}
           </motion.p>
 
           {/* Key Concepts — Interactive */}
           <div className="mb-8">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Core Teachings</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>Core Teachings</p>
             <div className="space-y-3">
               {tradition.key_concepts.map((concept, i) => (
                 <ConceptCard key={i} concept={concept} color={tradition.color} index={i} revealedItems={revealedItems} tradition={tradition} />
@@ -293,27 +293,27 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
               className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-              <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 <ScrollText size={9} /> Sacred Texts
               </p>
               {tradition.sacred_texts?.map((t, i) => (
-                <p key={i} className="text-xs mb-1" style={{ color: 'rgba(248,250,252,0.45)' }}>{t}</p>
+                <p key={i} className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{t}</p>
               ))}
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}
               className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-              <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 <Users size={9} /> Notable Figures
               </p>
               {tradition.notable_figures?.map((f, i) => (
-                <p key={i} className="text-xs mb-1" style={{ color: 'rgba(248,250,252,0.45)' }}>{f}</p>
+                <p key={i} className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{f}</p>
               ))}
             </motion.div>
           </div>
 
           {/* Practices */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }} className="mb-8">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-3 text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Practices</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-3 text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>Practices</p>
             <div className="flex flex-wrap justify-center gap-2">
               {tradition.practices?.map((p, i) => (
                 <span key={i} className="px-3 py-1.5 rounded-lg text-[10px]"
@@ -354,7 +354,7 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{ delay: i * 0.2, duration: 0.5 }}
                     className="text-sm leading-[1.85] mb-3"
-                    style={{ color: 'rgba(248,250,252,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {para}
                   </motion.p>
                 ))}
@@ -393,11 +393,11 @@ function TraditionCard({ t, onClick }) {
         </motion.div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>{t.name}</p>
-          <div className="flex items-center gap-2 mt-0.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <div className="flex items-center gap-2 mt-0.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             <span>{t.origin}</span><span>&middot;</span><span>{t.era}</span>
           </div>
-          <p className="text-[11px] mt-1.5 line-clamp-2" style={{ color: 'rgba(248,250,252,0.35)' }}>{t.overview}</p>
-          <div className="flex items-center gap-3 mt-2 text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <p className="text-[11px] mt-1.5 line-clamp-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{t.overview}</p>
+          <div className="flex items-center gap-3 mt-2 text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <span>{t.concept_count} teachings</span><span>{t.text_count} texts</span>
           </div>
         </div>
@@ -479,12 +479,12 @@ export default function Encyclopedia() {
             </div>
 
             <div className="relative mb-6">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
               <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search traditions..." data-testid="encyclopedia-search"
                 className="w-full text-xs rounded-xl pl-9 pr-4 py-2.5 outline-none"
                 style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }} />
-              {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>}
+              {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>}
             </div>
 
             {loading ? (
@@ -525,12 +525,12 @@ export default function Encyclopedia() {
             {/* Overview */}
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="text-sm leading-[1.8] mb-6"
-              style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
+              style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
               {activeTradition.overview}
             </motion.p>
 
             {/* Key Concepts — Interactive */}
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.25)' }}>Core Teachings</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>Core Teachings</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {activeTradition.key_concepts?.map((c, i) => (
                 <ConceptCard key={i} concept={c} color={activeTradition.color} index={i} revealedItems={999} tradition={activeTradition} compact />
@@ -540,16 +540,16 @@ export default function Encyclopedia() {
             {/* Texts, Figures, Practices */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
               <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Sacred Texts</p>
-                {activeTradition.sacred_texts?.map((t, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{t}</p>)}
+                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Sacred Texts</p>
+                {activeTradition.sacred_texts?.map((t, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>{t}</p>)}
               </div>
               <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Notable Figures</p>
-                {activeTradition.notable_figures?.map((f, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{f}</p>)}
+                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Notable Figures</p>
+                {activeTradition.notable_figures?.map((f, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>{f}</p>)}
               </div>
               <div className="rounded-xl p-4" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Practices</p>
-                {activeTradition.practices?.map((p, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{p}</p>)}
+                <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Practices</p>
+                {activeTradition.practices?.map((p, i) => <p key={i} className="text-[11px] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>{p}</p>)}
               </div>
             </div>
 
@@ -577,7 +577,7 @@ export default function Encyclopedia() {
               {exploring && (
                 <div className="flex items-center gap-2 mt-4">
                   <Loader2 size={14} className="animate-spin" style={{ color: activeTradition.color }} />
-                  <span className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Channeling ancient wisdom...</span>
+                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Channeling ancient wisdom...</span>
                 </div>
               )}
               {exploreResult && (
@@ -587,7 +587,7 @@ export default function Encyclopedia() {
                       color={activeTradition.color} label="Listen to Response" />
                   </div>
                   {exploreResult.split('\n\n').map((p, i) => (
-                    <p key={i} className="text-sm leading-[1.8] mb-3" style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>{p}</p>
+                    <p key={i} className="text-sm leading-[1.8] mb-3" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>{p}</p>
                   ))}
                 </motion.div>
               )}

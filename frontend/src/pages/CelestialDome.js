@@ -501,7 +501,7 @@ export default function CelestialDome() {
         }
         .dome-btn.primary { border-color: #A855F7; color: #A855F7; }
         .dome-btn.primary:hover { background: #A855F7; color: #000; }
-        .dome-btn.secondary { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+        .dome-btn.secondary { border-color: rgba(255,255,255,0.6); color: rgba(255,255,255,0.6); }
         .dome-btn.secondary:hover { border-color: rgba(255,255,255,0.4); color: white; }
         
         .karma-badge {
@@ -533,7 +533,7 @@ export default function CelestialDome() {
           letter-spacing: 0.1em;
           transition: all 0.3s;
         }
-        .back-btn:hover { border-color: rgba(255,255,255,0.3); color: white; }
+        .back-btn:hover { border-color: rgba(255,255,255,0.65); color: white; }
         
         .error-toast {
           position: absolute;

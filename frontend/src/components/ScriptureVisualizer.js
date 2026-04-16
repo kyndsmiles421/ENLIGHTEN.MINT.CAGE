@@ -389,7 +389,7 @@ export function VisionModeToggle({ isActive, onToggle, scenes }) {
           ? 'linear-gradient(135deg, rgba(232,121,249,0.15), rgba(129,140,248,0.15))'
           : 'rgba(248,250,252,0.04)',
         border: `1px solid ${isActive ? 'rgba(232,121,249,0.3)' : 'rgba(248,250,252,0.08)'}`,
-        color: isActive ? '#E879F9' : 'rgba(248,250,252,0.4)',
+        color: isActive ? '#E879F9' : 'rgba(255,255,255,0.7)',
         boxShadow: isActive ? '0 0 12px rgba(232,121,249,0.1)' : 'none',
       }}
     >

@@ -74,7 +74,7 @@ function PresetCard({ preset, isSelected, onSelect, isBlending }) {
           <span className="text-[10px]" style={{ color: colorA }}>{preset.input_a.source}</span>
         </div>
         
-        <Zap size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+        <Zap size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
         
         <div 
           className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
@@ -87,8 +87,8 @@ function PresetCard({ preset, isSelected, onSelect, isBlending }) {
       
       {/* Output */}
       <div className="flex items-center gap-2">
-        <ChevronRight size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
-        <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>
+        <ChevronRight size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
+        <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>
           {preset.output}
         </span>
       </div>
@@ -145,7 +145,7 @@ function VesicaPiscisViz({ blendResult, isAnimating }) {
         <p className="text-lg font-bold" style={{ color: '#FBBF24' }}>
           {bg.blend_value?.toFixed(2)}
         </p>
-        <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.5)' }}>
+        <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.75)' }}>
           Union
         </p>
       </div>
@@ -244,7 +244,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
             className="p-2 rounded-lg hover:bg-white/5 transition-colors"
             data-testid="close-lab"
           >
-            <X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
         </div>
 
@@ -258,7 +258,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
             <>
               {/* Preset Selection */}
               <div className="mb-6">
-                <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
                   Select Blend Preset
                 </p>
                 <div className="space-y-2">
@@ -277,7 +277,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
               {/* Depth Slider */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                  <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                     Mythology Depth
                   </p>
                   <span className="text-sm font-mono" style={{ color: '#FBBF24' }}>
@@ -298,8 +298,8 @@ export function AlchemicalLab({ isOpen, onClose }) {
                   data-testid="depth-slider"
                 />
                 <div className="flex justify-between mt-1">
-                  <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Growing</span>
-                  <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Xfinity-Active</span>
+                  <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Growing</span>
+                  <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Xfinity-Active</span>
                 </div>
               </div>
 
@@ -353,7 +353,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
                     {/* Result Stats */}
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       <div className="p-3 rounded-lg" style={{ background: 'rgba(248,250,252,0.03)' }}>
-                        <p className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                        <p className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>
                           Output Resonance
                         </p>
                         <p className="text-lg font-bold" style={{ color: '#F8FAFC' }}>
@@ -361,7 +361,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
                         </p>
                       </div>
                       <div className="p-3 rounded-lg" style={{ background: 'rgba(248,250,252,0.03)' }}>
-                        <p className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                        <p className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>
                           Trade Impact
                         </p>
                         <p className="text-lg font-bold" style={{ color: '#22C55E' }}>
@@ -372,7 +372,7 @@ export function AlchemicalLab({ isOpen, onClose }) {
 
                     {/* Crystal Optics */}
                     <div className="mt-3 p-2 rounded-lg text-center" style={{ background: 'rgba(248,250,252,0.02)' }}>
-                      <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                      <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                         {blendResult.crystal_optics?.pattern} • Refraction: {blendResult.crystal_optics?.refraction_index}x
                       </p>
                     </div>

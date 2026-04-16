@@ -360,7 +360,7 @@ export default function QuantumLoom() {
         .completion-btn.purple:hover { background: #A855F7; color: #000; }
         .dismiss-btn {
           margin-top: 20px;
-          color: rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.65);
           background: none;
           border: none;
           cursor: pointer;

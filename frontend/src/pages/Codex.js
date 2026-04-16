@@ -68,11 +68,11 @@ export default function Codex() {
             <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
               style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
               data-testid="codex-back-btn">
-              <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+              <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
             </button>
             <div>
               <h1 className="text-xl font-light tracking-[0.2em] uppercase"
-                style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+                style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
                 Sovereign Codex
               </h1>
               <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -91,7 +91,7 @@ export default function Codex() {
         {/* Search + Section Filters */}
         <div className="flex gap-3 mb-4">
           <div className="relative flex-1">
-            <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+            <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search the Codex..."
               className="w-full pl-8 pr-3 py-2 rounded-lg text-[10px]"
@@ -103,7 +103,7 @@ export default function Codex() {
               className="px-2 py-1 rounded-full text-[8px] font-medium"
               style={{
                 background: !activeSection ? 'rgba(192,132,252,0.12)' : 'rgba(248,250,252,0.02)',
-                color: !activeSection ? '#C084FC' : 'rgba(248,250,252,0.2)',
+                color: !activeSection ? '#C084FC' : 'rgba(255,255,255,0.6)',
                 border: `1px solid ${!activeSection ? 'rgba(192,132,252,0.2)' : 'rgba(248,250,252,0.04)'}`,
               }}
               data-testid="codex-filter-all">All</button>
@@ -114,7 +114,7 @@ export default function Codex() {
                   className="flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-medium capitalize"
                   style={{
                     background: activeSection === s ? 'rgba(192,132,252,0.12)' : 'rgba(248,250,252,0.02)',
-                    color: activeSection === s ? '#C084FC' : 'rgba(248,250,252,0.2)',
+                    color: activeSection === s ? '#C084FC' : 'rgba(255,255,255,0.6)',
                     border: `1px solid ${activeSection === s ? 'rgba(192,132,252,0.2)' : 'rgba(248,250,252,0.04)'}`,
                   }}
                   data-testid={`codex-filter-${s}`}>
@@ -152,10 +152,10 @@ export default function Codex() {
                         : <SIcon size={13} style={{ color: tierColor }} />}
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium" style={{ color: entry.locked ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.6)' }}>
+                      <p className="text-[10px] font-medium" style={{ color: entry.locked ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.85)' }}>
                         {entry.title}
                       </p>
-                      <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{entry.summary}</p>
+                      <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{entry.summary}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -179,7 +179,7 @@ export default function Codex() {
                       <div className="px-4 pb-4 pt-1"
                         style={{ borderTop: `1px solid ${tierColor}10` }}>
                         <p className="text-[10px] leading-relaxed whitespace-pre-line"
-                          style={{ color: 'rgba(248,250,252,0.5)' }}>
+                          style={{ color: 'rgba(255,255,255,0.75)' }}>
                           {entry.body}
                         </p>
                         {entry.tags && (

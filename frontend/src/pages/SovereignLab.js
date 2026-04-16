@@ -236,7 +236,7 @@ export default function SovereignLab() {
 
         .back-btn {
           background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.6);
           color: white;
           padding: 10px 20px;
           border-radius: 8px;
@@ -246,7 +246,7 @@ export default function SovereignLab() {
         }
 
         .back-btn:hover {
-          background: rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.6);
         }
 
         .engine-selector {
@@ -306,7 +306,7 @@ export default function SovereignLab() {
 
         .control-btn {
           background: rgba(0,0,0,0.15);
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.6);
           color: white;
           padding: 12px 24px;
           border-radius: 8px;

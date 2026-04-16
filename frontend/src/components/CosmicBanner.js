@@ -51,7 +51,7 @@ export function CosmicBanner({ filter, compact = false }) {
 
       {/* Top row: cosmic alignment at a glance */}
       <div className="flex items-center gap-3 flex-wrap mb-3 relative z-10">
-        <span className="text-[9px] font-bold uppercase tracking-[0.25em]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+        <span className="text-[9px] font-bold uppercase tracking-[0.25em]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Cosmic Alignment
         </span>
         <button onClick={() => navigate('/cosmic-calendar')} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all hover:scale-105"
@@ -84,7 +84,7 @@ export function CosmicBanner({ filter, compact = false }) {
 
       {/* Mayan energy summary */}
       {!compact && (
-        <p className="text-[11px] mb-3 relative z-10" style={{ color: 'rgba(248,250,252,0.5)' }}>
+        <p className="text-[11px] mb-3 relative z-10" style={{ color: 'rgba(255,255,255,0.75)' }}>
           Today's Mayan energy: <span style={{ color: '#A78BFA' }}>{cosmic.mayan.galactic_signature}</span> — {cosmic.mayan.meaning}.
           {cosmic.mayan.element && <> Element: <span style={{ color: '#93C5FD' }}>{cosmic.mayan.element}</span>.</>}
         </p>
@@ -99,7 +99,7 @@ export function CosmicBanner({ filter, compact = false }) {
               <button key={i} onClick={() => navigate(s.link)}
                 data-testid={`cosmic-suggestion-${s.type}`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] transition-all hover:scale-[1.02]"
-                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.55)' }}>
+                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.8)' }}>
                 <Icon size={10} />
                 <span className="truncate max-w-[200px]">{s.text.split(' — ')[0]}</span>
                 <ChevronRight size={9} style={{ opacity: 0.4 }} />

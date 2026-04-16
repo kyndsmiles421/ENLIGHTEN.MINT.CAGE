@@ -53,7 +53,7 @@ function CertificateCard({ cert }) {
         <div className="flex items-center justify-between mb-2">
           <Award size={16} style={{ color: cert.color }} />
           <span className="text-[6px] font-mono px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.25)' }}>
+            style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.6)' }}>
             {cert.verification_code}
           </span>
         </div>
@@ -62,7 +62,7 @@ function CertificateCard({ cert }) {
         </p>
         <p className="text-[8px]" style={{ color: `${cert.color}80` }}>{cert.avenue_name}</p>
         <div className="flex items-center justify-between mt-2">
-          <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {new Date(cert.issued_at).toLocaleDateString()}
           </span>
           <span className="text-[7px] font-mono" style={{ color: '#22C55E' }}>
@@ -107,7 +107,7 @@ function AvenueCard({ avenue, onCompleteLesson, completing }) {
             <p className="text-[11px] font-semibold" style={{ color: '#F8FAFC' }}>{avenue.name}</p>
             {avenue.certified && <CheckCircle size={12} style={{ color: '#22C55E' }} />}
           </div>
-          <p className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[8px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {avenue.certificate_title}
           </p>
           <div className="flex items-center gap-2 mt-1.5">
@@ -133,7 +133,7 @@ function AvenueCard({ avenue, onCompleteLesson, completing }) {
           <motion.div className="px-4 pb-4 space-y-1.5"
             initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}>
-            <p className="text-[8px] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <p className="text-[8px] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {avenue.description}
             </p>
             {avenue.curriculum.map((lesson, i) => {
@@ -156,10 +156,10 @@ function AvenueCard({ avenue, onCompleteLesson, completing }) {
                       : <span className="text-[8px] font-mono" style={{ color: avenue.color }}>{i + 1}</span>}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-medium" style={{ color: done ? 'rgba(248,250,252,0.5)' : '#F8FAFC' }}>
+                    <p className="text-[9px] font-medium" style={{ color: done ? 'rgba(255,255,255,0.75)' : '#F8FAFC' }}>
                       {lesson.title}
                     </p>
-                    <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{lesson.description}</p>
+                    <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{lesson.description}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <span className="text-[7px] font-mono" style={{ color: `${avenue.color}60` }}>{lesson.xp} XP</span>
@@ -259,11 +259,11 @@ export default function MasteryPath() {
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/hub')} className="p-1.5 rounded-lg"
             style={{ background: 'rgba(248,250,252,0.03)' }} data-testid="mastery-back-btn">
-            <ArrowLeft size={13} style={{ color: 'rgba(248,250,252,0.35)' }} />
+            <ArrowLeft size={13} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </button>
           <div>
             <h1 className="text-sm font-light tracking-[0.15em] uppercase"
-              style={{ color: 'rgba(248,250,252,0.35)', fontFamily: 'Cormorant Garamond, serif' }}>
+              style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
               Sovereign Mastery
             </h1>
             {tierInfo && (
@@ -275,7 +275,7 @@ export default function MasteryPath() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {status?.total_xp || 0} XP
           </span>
           <span className="text-[7px] font-mono px-1.5 py-0.5 rounded"
@@ -292,7 +292,7 @@ export default function MasteryPath() {
             className="px-3 py-1 rounded-lg text-[8px] tracking-wider uppercase cursor-pointer"
             style={{
               background: tab === t ? `${tierColor}10` : 'transparent',
-              color: tab === t ? tierColor : 'rgba(248,250,252,0.25)',
+              color: tab === t ? tierColor : 'rgba(255,255,255,0.6)',
               border: `1px solid ${tab === t ? `${tierColor}20` : 'transparent'}`,
             }}
             onClick={() => setTab(t)} data-testid={`mastery-tab-${t}`}>
@@ -313,7 +313,7 @@ export default function MasteryPath() {
                 <TierRing tier={tier} maxTier={4} color={tierColor} size={90} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <p className="text-lg font-bold" style={{ color: tierColor }}>{tier}</p>
-                  <p className="text-[5px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>of 4</p>
+                  <p className="text-[5px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>of 4</p>
                 </div>
               </div>
               <div className="flex-1">
@@ -321,7 +321,7 @@ export default function MasteryPath() {
                   {tier > 0 ? tierInfo?.name : 'Unranked'}
                 </p>
                 {tier > 0 && <p className="text-[8px] mt-0.5" style={{ color: `${tierColor}80` }}>{tierInfo?.codename}</p>}
-                <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[8px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {tier > 0 ? tierInfo?.reward : 'Complete Core Orientation to begin your path'}
                 </p>
 
@@ -329,10 +329,10 @@ export default function MasteryPath() {
                 {nextReq && (
                   <div className="mt-3 p-2 rounded-lg" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[7px] uppercase tracking-wider" style={{ color: nextTier?.color || 'rgba(248,250,252,0.2)' }}>
+                      <span className="text-[7px] uppercase tracking-wider" style={{ color: nextTier?.color || 'rgba(255,255,255,0.6)' }}>
                         Next: {nextTier?.name || 'Max'}
                       </span>
-                      <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <span className="text-[7px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {nextReq.current}/{nextReq.target}
                       </span>
                     </div>
@@ -366,13 +366,13 @@ export default function MasteryPath() {
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2 rounded-lg" style={{ background: 'rgba(248,250,252,0.015)' }}>
-                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Gravity</p>
+                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Gravity</p>
                   <p className="text-[14px] font-mono font-bold" style={{ color: tierColor }}>
                     {status?.gravity_multiplier?.toFixed(1) || '1.0'}x
                   </p>
                 </div>
                 <div className="p-2 rounded-lg" style={{ background: 'rgba(248,250,252,0.015)' }}>
-                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Bloom</p>
+                  <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Bloom</p>
                   <p className="text-[14px] font-mono font-bold" style={{ color: tierColor }}>
                     {status?.bloom_multiplier?.toFixed(1) || '1.0'}x
                   </p>
@@ -395,18 +395,18 @@ export default function MasteryPath() {
                     data-testid={`tier-row-${t.tier}`}>
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                       style={{ background: `${t.color}12` }}>
-                      {isLocked ? <Lock size={12} style={{ color: 'rgba(248,250,252,0.2)' }} />
+                      {isLocked ? <Lock size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
                         : isActive ? <Star size={12} style={{ color: t.color }} />
                         : <CheckCircle size={12} style={{ color: '#22C55E' }} />}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[7px] font-mono" style={{ color: t.color }}>T{t.tier}</span>
-                        <p className="text-[9px] font-medium" style={{ color: isActive ? '#F8FAFC' : 'rgba(248,250,252,0.4)' }}>
+                        <p className="text-[9px] font-medium" style={{ color: isActive ? '#F8FAFC' : 'rgba(255,255,255,0.7)' }}>
                           {t.name}
                         </p>
                       </div>
-                      <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>{t.requirement}</p>
+                      <p className="text-[7px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t.requirement}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[7px]" style={{ color: isLocked ? 'rgba(248,250,252,0.1)' : `${t.color}60` }}>

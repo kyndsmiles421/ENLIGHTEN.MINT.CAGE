@@ -1388,7 +1388,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
                       </ChipButton>
                     ))}
                   </div>
-                  {activeMantra && <p className="text-[9px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>{activeMantra.tradition} tradition</p>}
+                  {activeMantra && <p className="text-[9px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>{activeMantra.tradition} tradition</p>}
                 </ChannelStrip>
 
                 {/* ── Director's Cut Studio Toggle ── */}

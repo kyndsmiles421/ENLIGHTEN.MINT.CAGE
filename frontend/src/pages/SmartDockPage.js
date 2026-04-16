@@ -28,7 +28,7 @@ function PedestalDisplay({ state }) {
           style={{ background: 'rgba(168,85,247,0.04)', border: '1px solid rgba(168,85,247,0.1)' }}>
           <Gem size={32} color="rgba(168,85,247,0.3)" />
         </motion.div>
-        <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.65)' }}>
           Slot a stone to activate the SmartDock
         </p>
       </motion.div>
@@ -92,17 +92,17 @@ function PedestalDisplay({ state }) {
         <div className="text-center p-2.5 rounded-xl" style={{ background: `${color}04`, border: `1px solid ${color}08` }}>
           <Heart size={14} color={color} className="mx-auto mb-1" />
           <p className="text-[9px] font-bold" style={{ color }}>{resonance_effect?.chakra}</p>
-          <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Chakra</p>
+          <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Chakra</p>
         </div>
         <div className="text-center p-2.5 rounded-xl" style={{ background: `${color}04`, border: `1px solid ${color}08` }}>
           <Radio size={14} color={color} className="mx-auto mb-1" />
           <p className="text-[9px] font-bold" style={{ color }}>{resonance_effect?.frequency} Hz</p>
-          <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Frequency</p>
+          <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Frequency</p>
         </div>
         <div className="text-center p-2.5 rounded-xl" style={{ background: `${color}04`, border: `1px solid ${color}08` }}>
           <Volume2 size={14} color={color} className="mx-auto mb-1" />
           <p className="text-[9px] font-bold" style={{ color }}>{audio_blend?.blend_mode}</p>
-          <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Audio</p>
+          <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Audio</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ function PedestalDisplay({ state }) {
           className="w-full max-w-sm p-3 rounded-xl text-center"
           style={{ background: `${color}04`, border: `1px solid ${color}08` }}>
           <BookOpen size={10} color={color} className="mx-auto mb-1.5" />
-          <p className="text-[10px] italic" style={{ color: 'rgba(248,250,252,0.6)' }}>
+          <p className="text-[10px] italic" style={{ color: 'rgba(255,255,255,0.85)' }}>
             "{active_mantra}"
           </p>
         </motion.div>
@@ -121,13 +121,13 @@ function PedestalDisplay({ state }) {
       {/* Color palette preview */}
       {visual_palette && (
         <div className="flex items-center gap-2 mt-4">
-          <Palette size={8} color="rgba(248,250,252,0.3)" />
+          <Palette size={8} color="rgba(255,255,255,0.65)" />
           <div className="flex gap-1">
             {[visual_palette.primary, visual_palette.secondary, visual_palette.accent].map((c, i) => (
               <div key={i} className="w-4 h-4 rounded-full" style={{ background: c, border: '1px solid rgba(255,255,255,0.1)' }} />
             ))}
           </div>
-          <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Active Palette</span>
+          <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Active Palette</span>
         </div>
       )}
     </motion.div>
@@ -148,7 +148,7 @@ function StonePickerModal({ stones, onSlot, onClose }) {
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Select a Stone</h3>
           <button onClick={onClose} className="p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <X size={14} color="rgba(248,250,252,0.4)" />
+            <X size={14} color="rgba(255,255,255,0.7)" />
           </button>
         </div>
         {stones.map(stone => {
@@ -168,12 +168,12 @@ function StonePickerModal({ stones, onSlot, onClose }) {
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     {stone.chakra && (
-                      <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         <Heart size={6} className="inline mr-0.5" />{stone.chakra}
                       </span>
                     )}
                     {stone.frequency && (
-                      <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         <Radio size={6} className="inline mr-0.5" />{stone.frequency}Hz
                       </span>
                     )}
@@ -279,7 +279,7 @@ export default function SmartDockPage() {
         </div>
 
         {/* Subtitle */}
-        <p className="text-center text-[9px] mb-4 px-8" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <p className="text-center text-[9px] mb-4 px-8" style={{ color: 'rgba(255,255,255,0.65)' }}>
           The Relic Pedestal. Slot a stone to shift audio, visuals, and teachings.
         </p>
 
@@ -301,7 +301,7 @@ export default function SmartDockPage() {
           {dockState?.slotted && (
             <button onClick={handleUnslot}
               className="px-4 py-2.5 rounded-xl text-sm font-medium"
-              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(248,250,252,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.05)' }}
               data-testid="unslot-btn">
               Remove
             </button>

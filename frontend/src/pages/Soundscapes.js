@@ -238,10 +238,10 @@ export default function Soundscapes() {
           <h1 className="text-4xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC' }}>
             Ambient Worlds
           </h1>
-          <p className="text-sm mb-4" style={{ color: 'rgba(248,250,252,0.5)' }}>
+          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.75)' }}>
             Mix your perfect soundscape. Layer sounds to create your unique sanctuary.
           </p>
-          <p className="text-xs mb-8 flex items-center gap-2" style={{ color: activeSounds.length > 0 ? '#2DD4BF' : 'rgba(248,250,252,0.3)' }}>
+          <p className="text-xs mb-8 flex items-center gap-2" style={{ color: activeSounds.length > 0 ? '#2DD4BF' : 'rgba(255,255,255,0.65)' }}>
             {activeSounds.length > 0 ? <Volume2 size={14} /> : <VolumeX size={14} />}
             {activeSounds.length > 0
               ? `${activeSounds.length} sound${activeSounds.length > 1 ? 's' : ''} playing`
@@ -252,7 +252,7 @@ export default function Soundscapes() {
         {/* Saved Mixes */}
         {savedMixes.length > 0 && (
           <div className="mb-8">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>Your Saved Mixes</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>Your Saved Mixes</p>
             <div className="flex gap-2 flex-wrap">
               {savedMixes.map((mix) => {
                 const soundNames = Object.keys(mix.volumes).map(id => SOUNDS.find(s => s.id === id)?.name).filter(Boolean);
@@ -260,9 +260,9 @@ export default function Soundscapes() {
                   <div key={mix.id} className="group flex items-center gap-2 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <button onClick={() => loadMix(mix)} className="text-left">
                       <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{mix.name}</p>
-                      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{soundNames.join(', ')}</p>
+                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{soundNames.join(', ')}</p>
                     </button>
-                    <button onClick={() => deleteMix(mix.id)} className="opacity-0 group-hover:opacity-100 p-1"><Trash2 size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+                    <button onClick={() => deleteMix(mix.id)} className="opacity-0 group-hover:opacity-100 p-1"><Trash2 size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
                   </div>
                 );
               })}
@@ -290,7 +290,7 @@ export default function Soundscapes() {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="text-sm font-medium" style={{ color: isActive ? sound.color : '#F8FAFC' }}>{sound.name}</h3>
-                    <p className="text-[11px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{sound.desc}</p>
+                    <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{sound.desc}</p>
                   </div>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ background: isActive ? `${sound.color}15` : 'rgba(255,255,255,0.03)' }}>
@@ -307,8 +307,8 @@ export default function Soundscapes() {
                   data-testid={`slider-${sound.id}`}
                 />
                 <div className="flex justify-between mt-1.5">
-                  <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>0%</span>
-                  <span className="text-[10px]" style={{ color: isActive ? sound.color : 'rgba(248,250,252,0.3)' }}>{vol}%</span>
+                  <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>0%</span>
+                  <span className="text-[10px]" style={{ color: isActive ? sound.color : 'rgba(255,255,255,0.65)' }}>{vol}%</span>
                 </div>
               </motion.div>
             );
@@ -324,7 +324,7 @@ export default function Soundscapes() {
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Your Mix</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Your Mix</p>
                 <div className="flex flex-wrap gap-2">
                   {activeSounds.map(([id, v]) => {
                     const s = SOUNDS.find(s => s.id === id);

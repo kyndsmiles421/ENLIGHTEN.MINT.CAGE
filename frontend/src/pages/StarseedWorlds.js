@@ -114,7 +114,7 @@ function MultiverseMap({ realms, onRealmClick, reduceParticles }) {
                 {realm.unlocked ? (
                   <RealmIcon size={20} style={{ color: realm.color }} />
                 ) : (
-                  <Lock size={16} style={{ color: 'rgba(255,255,255,0.2)' }} />
+                  <Lock size={16} style={{ color: 'rgba(255,255,255,0.6)' }} />
                 )}
               </motion.div>
               <span className="text-[8px] font-bold uppercase tracking-widest text-center max-w-[80px]"

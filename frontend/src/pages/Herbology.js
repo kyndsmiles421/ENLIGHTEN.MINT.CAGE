@@ -25,7 +25,7 @@ function HerbCard({ herb, onSelect, selected }) {
         </div>
         <div>
           <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{herb.name}</p>
-          <p className="text-[10px] italic" style={{ color: 'rgba(248,250,252,0.35)' }}>{herb.latin}</p>
+          <p className="text-[10px] italic" style={{ color: 'rgba(255,255,255,0.65)' }}>{herb.latin}</p>
         </div>
       </div>
       <div className="flex flex-wrap gap-1.5 mb-2">
@@ -34,7 +34,7 @@ function HerbCard({ herb, onSelect, selected }) {
             style={{ background: `${herb.color}15`, color: herb.color, border: `1px solid ${herb.color}25` }}>{p}</span>
         ))}
       </div>
-      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>Parts: {herb.parts_used} | Energy: {herb.energy}</p>
+      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Parts: {herb.parts_used} | Energy: {herb.energy}</p>
     </motion.div>
   );
 }
@@ -47,9 +47,9 @@ function HerbDetail({ herb, onClose }) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{herb.name}</h3>
-          <p className="text-xs italic mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{herb.latin} | {herb.family} family</p>
+          <p className="text-xs italic mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>{herb.latin} | {herb.family} family</p>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
 
       <div className="grid grid-cols-3 gap-3 mb-4">
@@ -69,7 +69,7 @@ function HerbDetail({ herb, onClose }) {
 
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color: herb.color }}>Traditional Use</p>
-        <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.65)' }}>{herb.traditional_use}</p>
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>{herb.traditional_use}</p>
       </div>
 
       <div className="mb-4">
@@ -87,24 +87,24 @@ function HerbDetail({ herb, onClose }) {
         {herb.preparations.map((p, i) => (
           <div key={i} className="flex items-start gap-2 mb-1.5">
             <ChevronRight size={12} style={{ color: herb.color, marginTop: 2 }} />
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.7)' }}>{p}</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.9)' }}>{p}</p>
           </div>
         ))}
       </div>
 
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: herb.color }}>Dosage</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{herb.dosage}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{herb.dosage}</p>
       </div>
 
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: herb.color }}>Spiritual</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{herb.spiritual}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{herb.spiritual}</p>
       </div>
 
       <div className="rounded-xl p-3" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)' }}>
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: '#EAB308' }}>Caution</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{herb.caution}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{herb.caution}</p>
       </div>
     </motion.div>
   );
@@ -155,7 +155,7 @@ export default function Herbology() {
 
         <div className="max-w-md mx-auto mb-8">
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.65)' }} />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search herbs, properties, or body systems..."
               data-testid="herb-search"
@@ -172,7 +172,7 @@ export default function Herbology() {
           {filtered.map(herb => <HerbCard key={herb.id} herb={herb} onSelect={setSelected} selected={selected} />)}
         </div>
         {filtered.length === 0 && (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.3)' }}>No herbs match your search</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.65)' }}>No herbs match your search</p>
         )}
       </motion.div>
     </div>

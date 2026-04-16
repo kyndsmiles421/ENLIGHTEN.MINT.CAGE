@@ -73,7 +73,7 @@ function CinemaCard({ storyId, videoInfo, onGenerate, onPlay, generating }) {
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}>
               <Film size={28} style={{ color: meta.color }} />
             </motion.div>
-            <p className="text-[10px] mt-3" style={{ color: 'rgba(248,250,252,0.4)' }}>Generating with Sora 2...</p>
+            <p className="text-[10px] mt-3" style={{ color: 'rgba(255,255,255,0.7)' }}>Generating with Sora 2...</p>
             <div className="mt-2 w-24 h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
               <motion.div className="h-full rounded-full" style={{ background: meta.color }}
                 animate={{ width: ['0%', '80%'] }} transition={{ duration: 120, ease: 'linear' }} />
@@ -85,7 +85,7 @@ function CinemaCard({ storyId, videoInfo, onGenerate, onPlay, generating }) {
               style={{ background: `${meta.color}08`, border: `1px solid ${meta.color}15` }}>
               <Globe size={24} style={{ color: meta.color, opacity: 0.5 }} />
             </div>
-            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Not generated yet</p>
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Not generated yet</p>
           </div>
         )}
 
@@ -98,7 +98,7 @@ function CinemaCard({ storyId, videoInfo, onGenerate, onPlay, generating }) {
             </span>
           ) : (
             <span className="px-2 py-0.5 rounded-full text-[8px]"
-              style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.25)' }}>
+              style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.6)' }}>
               4s clip
             </span>
           )}
@@ -512,7 +512,7 @@ export default function Videos() {
                         style={{ filter: 'brightness(0.7)', transition: 'transform 0.5s' }} loading="lazy" />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110"
-                          style={{ background: 'transparent', border: '2px solid rgba(255,255,255,0.3)', backdropFilter: 'none', transition: 'transform 0.3s' }}>
+                          style={{ background: 'transparent', border: '2px solid rgba(255,255,255,0.65)', backdropFilter: 'none', transition: 'transform 0.3s' }}>
                           <Play size={24} fill="white" style={{ color: 'white', marginLeft: '2px' }} />
                         </div>
                       </div>

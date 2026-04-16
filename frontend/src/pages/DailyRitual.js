@@ -108,18 +108,18 @@ function RitualStep({ step, index, completed, activeIndex, onActivate, onComplet
           }}>
           {isCompleted ? <Check size={14} style={{ color: '#22C55E' }} /> :
            isActive ? <Play size={12} style={{ color: '#D8B4FE' }} /> :
-           <span className="text-[10px] font-bold" style={{ color: 'rgba(248,250,252,0.3)' }}>{index + 1}</span>}
+           <span className="text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.65)' }}>{index + 1}</span>}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <Icon size={14} style={{ color: isCompleted ? '#22C55E' : isActive ? '#D8B4FE' : 'rgba(248,250,252,0.5)' }} />
+            <Icon size={14} style={{ color: isCompleted ? '#22C55E' : isActive ? '#D8B4FE' : 'rgba(255,255,255,0.75)' }} />
             <p className={`text-sm font-medium ${isCompleted ? 'line-through' : ''}`}
-              style={{ color: isCompleted ? 'rgba(248,250,252,0.35)' : isActive ? '#F8FAFC' : '#F8FAFC' }}>{step.name}</p>
+              style={{ color: isCompleted ? 'rgba(255,255,255,0.65)' : isActive ? '#F8FAFC' : '#F8FAFC' }}>{step.name}</p>
             <span className="text-[10px] ml-auto px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(248,250,252,0.05)', color: isActive ? '#D8B4FE' : 'rgba(248,250,252,0.3)' }}>{step.duration} min</span>
+              style={{ background: 'rgba(248,250,252,0.05)', color: isActive ? '#D8B4FE' : 'rgba(255,255,255,0.65)' }}>{step.duration} min</span>
           </div>
           {!isActive && (
-            <p className="text-xs" style={{ color: isCompleted ? 'rgba(248,250,252,0.25)' : 'rgba(248,250,252,0.5)' }}>
+            <p className="text-xs" style={{ color: isCompleted ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.75)' }}>
               {step.instruction}
             </p>
           )}
@@ -140,7 +140,7 @@ function RitualStep({ step, index, completed, activeIndex, onActivate, onComplet
               {/* Instruction box */}
               <div className="rounded-lg p-3 mb-4"
                 style={{ background: 'rgba(216,180,254,0.05)', border: '1px solid rgba(216,180,254,0.1)' }}>
-                <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.7)' }}>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.9)' }}>
                   {step.instruction}
                 </p>
               </div>
@@ -186,7 +186,7 @@ function RitualStep({ step, index, completed, activeIndex, onActivate, onComplet
                     style={{
                       background: 'rgba(248,250,252,0.04)',
                       border: '1px solid rgba(248,250,252,0.08)',
-                      color: 'rgba(248,250,252,0.4)',
+                      color: 'rgba(255,255,255,0.7)',
                       opacity: timerDone ? 0.4 : 1,
                     }}>
                     <SkipForward size={12} /> Skip
@@ -203,14 +203,14 @@ function RitualStep({ step, index, completed, activeIndex, onActivate, onComplet
                 className="w-full py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
                 style={{
                   background: timerDone ? 'linear-gradient(135deg, #22C55E, #16A34A)' : 'rgba(248,250,252,0.06)',
-                  color: timerDone ? '#FFF' : 'rgba(248,250,252,0.4)',
+                  color: timerDone ? '#FFF' : 'rgba(255,255,255,0.7)',
                   border: `1px solid ${timerDone ? 'rgba(34,197,94,0.4)' : 'rgba(248,250,252,0.08)'}`,
                 }}>
                 <Check size={16} />
                 {timerDone ? 'Mark Complete' : 'Complete Step'}
               </motion.button>
               {!timerDone && (
-                <p className="text-center text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-center text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Start the timer or skip to mark this step complete
                 </p>
               )}
@@ -311,7 +311,7 @@ export default function DailyRitual() {
               style={{
                 background: timeOfDay === t.id ? `${t.color}15` : 'rgba(0,0,0,0)',
                 border: `1px solid ${timeOfDay === t.id ? `${t.color}35` : 'rgba(248,250,252,0.06)'}`,
-                color: timeOfDay === t.id ? t.color : 'rgba(248,250,252,0.5)',
+                color: timeOfDay === t.id ? t.color : 'rgba(255,255,255,0.75)',
               }}><t.icon size={16} />{t.label}</button>
           ))}
         </div>
@@ -320,7 +320,7 @@ export default function DailyRitual() {
         {token && <CosmicBanner filter={['yoga', 'aromatherapy', 'breathing', 'reiki', 'acupressure']} compact />}
 
         {!token ? (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to receive your personalized daily ritual</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to receive your personalized daily ritual</p>
         ) : loading ? (
           <div className="flex justify-center py-12"><Loader2 className="animate-spin" size={28} style={{ color: '#D8B4FE' }} /></div>
         ) : ritual ? (
@@ -329,7 +329,7 @@ export default function DailyRitual() {
             <div className="rounded-2xl p-5 mb-6"
               style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.1)', backdropFilter: 'none'}}>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   {completed.length} of {steps.length} steps | ~{totalDuration} min total
                 </p>
                 <span className="text-xs font-bold" style={{ color: progressPct === 100 ? '#22C55E' : '#D8B4FE' }}>
@@ -342,7 +342,7 @@ export default function DailyRitual() {
                   style={{ background: progressPct === 100 ? '#22C55E' : 'linear-gradient(90deg, #D8B4FE, #818CF8)' }} />
               </div>
               {profile && (
-                <p className="text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Level: {profile.profile?.experience_level} | Streak: {profile.profile?.streak || 0} days |
                   Mood: {profile.profile?.dominant_mood}
                 </p>
@@ -364,7 +364,7 @@ export default function DailyRitual() {
                 style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)' }}>
                 <Check size={32} style={{ color: '#22C55E', margin: '0 auto 8px' }} />
                 <h3 className="text-lg font-bold mb-1" style={{ color: '#22C55E' }}>Ritual Complete</h3>
-                <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   You've completed your {timeOfDay} ritual. Honor this moment of self-care.
                 </p>
               </motion.div>

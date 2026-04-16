@@ -129,7 +129,7 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
       {/* Target indicator */}
       <div className="flex items-center gap-2 mb-4 relative z-10">
         {targetConfig && <targetConfig.icon size={14} style={{ color: targetConfig.color }} />}
-        <p className="text-xs uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>
+        <p className="text-xs uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.65)' }}>
           {targetConfig?.label}{targetName ? ` — ${targetName}` : ''}
         </p>
       </div>
@@ -164,7 +164,7 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
               data-testid="hooponopono-phrase-text">
               {phrase.text}
             </p>
-            <p className="text-xs mt-3 max-w-xs mx-auto" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-xs mt-3 max-w-xs mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {phrase.description}
             </p>
           </motion.div>
@@ -184,7 +184,7 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
       </div>
 
       {/* Timer & cycles */}
-      <p className="text-2xl font-light tabular-nums relative z-10" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+      <p className="text-2xl font-light tabular-nums relative z-10" style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
         {mins}:{secs.toString().padStart(2, '0')}
       </p>
       <p className="text-xs mt-1 relative z-10" style={{ color: 'rgba(255,255,255,0.15)' }}>

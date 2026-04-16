@@ -54,7 +54,7 @@ export default function GravityWellExchange() {
         {(market || []).length === 0 ? (
           <div className="text-center py-12">
             <Sparkles size={24} color="#2DD4BF" className="mx-auto mb-3 opacity-40" />
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Market loading... gravitational pull stabilizing</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Market loading... gravitational pull stabilizing</p>
           </div>
         ) : (
         <div className="grid grid-cols-2 gap-2 mb-4">
@@ -67,7 +67,7 @@ export default function GravityWellExchange() {
                 {m.trend === 'up' ? <TrendingUp size={10} color="#22C55E" /> : <TrendingDown size={10} color="#EF4444" />}
               </div>
               <div className="text-lg font-bold" style={{ color: '#F8FAFC' }}>{m.price_dust}</div>
-              <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Dust/unit | T{m.tier}</div>
+              <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Dust/unit | T{m.tier}</div>
             </button>
           ))}
         </div>
@@ -80,7 +80,7 @@ export default function GravityWellExchange() {
             <div className="flex items-center gap-2 mb-3">
               <input type="number" value={quantity} onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} min={1} max={100}
                 className="flex-1 px-3 py-2 rounded-lg text-sm outline-none" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#F8FAFC' }} data-testid="trade-quantity" />
-              <span className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>= {selected.price_dust * quantity} Dust</span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>= {selected.price_dust * quantity} Dust</span>
             </div>
             <div className="flex gap-2">
               <button onClick={() => handleTrade('buy')} disabled={trading} className="flex-1 py-2.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#22C55E' }} data-testid="buy-btn">{trading ? '...' : 'Buy'}</button>

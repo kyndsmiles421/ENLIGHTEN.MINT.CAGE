@@ -491,12 +491,12 @@ export default function SuanpanMixer() {
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/hub')} className="p-1.5 rounded-lg"
             style={{ background: 'rgba(248,250,252,0.03)' }} data-testid="director-back-btn">
-            <ArrowLeft size={13} style={{ color: 'rgba(248,250,252,0.35)' }} />
+            <ArrowLeft size={13} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </button>
           <div>
             <div className="flex items-center gap-1.5">
               <h1 className="text-sm font-light tracking-[0.15em] uppercase"
-                style={{ color: 'rgba(248,250,252,0.35)', fontFamily: 'Cormorant Garamond, serif' }}>
+                style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
                 Divine Director
               </h1>
               <NanoGuide guideId="divine-director" position="top-right" />
@@ -506,7 +506,7 @@ export default function SuanpanMixer() {
                 style={{ background: `${tierColor}12`, color: tierColor, border: `1px solid ${tierColor}20` }}>
                 {TIER_DISPLAY[subTier] || subTier}
               </span>
-              <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span className="text-[7px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {aiCredits} AI &middot; {speedBonus > 0 ? `+${speedBonus}% speed` : ''}
               </span>
             </div>
@@ -521,14 +521,14 @@ export default function SuanpanMixer() {
           <motion.button className="p-1.5 rounded-lg cursor-pointer" style={{ background: 'rgba(248,250,252,0.03)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={() => setShowProjects(!showProjects)} data-testid="open-projects-btn">
-            <FolderOpen size={12} style={{ color: 'rgba(248,250,252,0.35)' }} />
+            <FolderOpen size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </motion.button>
           <motion.button className="p-1.5 rounded-lg cursor-pointer"
             style={{ background: saving ? `${tierColor}12` : 'rgba(248,250,252,0.03)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={saveProject} disabled={saving} data-testid="save-project-btn">
             {saving ? <Loader2 size={12} className="animate-spin" style={{ color: tierColor }} />
-              : <Save size={12} style={{ color: 'rgba(248,250,252,0.35)' }} />}
+              : <Save size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />}
           </motion.button>
           <motion.button className="p-1.5 rounded-lg cursor-pointer" style={{ background: 'rgba(248,250,252,0.03)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
@@ -556,7 +556,7 @@ export default function SuanpanMixer() {
 
             <div className="flex-1 flex items-center gap-2">
               <Layers size={10} style={{ color: 'rgba(248,250,252,0.15)' }} />
-              <p className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {tracks.length}{layerCap > 0 ? `/${layerCap}` : ''} layers
               </p>
               {atCap && <span className="text-[6px] px-1.5 py-0.5 rounded-full"
@@ -567,7 +567,7 @@ export default function SuanpanMixer() {
 
             <div className="flex items-center gap-1">
               <motion.button className="flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer text-[7px]"
-                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.35)' }}
+                style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)' }}
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 onClick={() => setSourcesOpen(!sourcesOpen)} data-testid="add-source-btn">
                 <Plus size={9} /> Sources
@@ -644,7 +644,7 @@ export default function SuanpanMixer() {
                           onClick={() => addTrack(s)} data-testid={`source-${s.id}`}>
                           {s.locked ? <Lock size={8} style={{ color: 'rgba(248,250,252,0.15)' }} />
                             : <m.icon size={8} style={{ color: m.color }} />}
-                          <span className="text-[7px] truncate" style={{ color: s.locked ? 'rgba(248,250,252,0.15)' : 'rgba(248,250,252,0.45)' }}>
+                          <span className="text-[7px] truncate" style={{ color: s.locked ? 'rgba(248,250,252,0.15)' : 'rgba(255,255,255,0.75)' }}>
                             {s.label}
                           </span>
                         </motion.button>
@@ -678,7 +678,7 @@ export default function SuanpanMixer() {
                   {recommendations.length > 0 && (
                     <div className="mt-3 pt-3 border-t" style={{ borderColor: 'rgba(248,250,252,0.04)' }}>
                       <div className="flex items-center gap-1.5 mb-2">
-                        <Compass size={9} style={{ color: hexagramInfo ? '#C084FC' : 'rgba(248,250,252,0.2)' }} />
+                        <Compass size={9} style={{ color: hexagramInfo ? '#C084FC' : 'rgba(255,255,255,0.6)' }} />
                         <p className="text-[7px] tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.15)' }}>
                           Hexagram Recommendations
                         </p>
@@ -690,7 +690,7 @@ export default function SuanpanMixer() {
                         )}
                       </div>
                       {hexagramInfo && (
-                        <p className="text-[7px] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                        <p className="text-[7px] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           Lower: {hexagramInfo.lower_trigram?.name} ({hexagramInfo.lower_trigram?.quality}) &middot;
                           Upper: {hexagramInfo.upper_trigram?.name} ({hexagramInfo.upper_trigram?.quality})
                         </p>
@@ -721,11 +721,11 @@ export default function SuanpanMixer() {
                         Mantra DJ Auto-Compose
                       </p>
                     </div>
-                    <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                    <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       {aiCredits} AI credits remaining
                     </p>
                   </div>
-                  <p className="text-[7px] mb-3" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                  <p className="text-[7px] mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     Select a wellness goal. The DJ will arrange frequencies, mantras, and ambience with intelligent cross-fading.
                   </p>
                   <div className="grid grid-cols-3 gap-1.5">
@@ -753,7 +753,7 @@ export default function SuanpanMixer() {
                           {composing ? <Loader2 size={14} className="animate-spin" style={{ color: c }} />
                             : <GoalIcon size={14} style={{ color: c }} />}
                           <span className="text-[8px] font-medium" style={{ color: c }}>{g.label}</span>
-                          <span className="text-[5px] text-center leading-tight" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                          <span className="text-[5px] text-center leading-tight" style={{ color: 'rgba(255,255,255,0.6)' }}>
                             {g.description}
                           </span>
                         </motion.button>
@@ -782,7 +782,7 @@ export default function SuanpanMixer() {
                       <Layout size={10} style={{ color: '#FBBF24' }} />
                       <p className="text-[8px] tracking-wider uppercase font-medium" style={{ color: '#FBBF24' }}>Mix Templates</p>
                     </div>
-                    <p className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{templates.filter(t => !t.locked).length}/{templates.length} available</p>
+                    <p className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{templates.filter(t => !t.locked).length}/{templates.length} available</p>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
                     {templates.map(tpl => {
@@ -798,7 +798,7 @@ export default function SuanpanMixer() {
                           data-testid={`template-${tpl.id}`}>
                           {tpl.locked && <Lock size={10} className="absolute top-1.5 right-1.5" style={{ color: 'var(--text-muted)' }} />}
                           <span className="text-[8px] font-semibold mb-0.5" style={{ color: tpl.color }}>{tpl.name}</span>
-                          <span className="text-[6px] mb-1 leading-tight" style={{ color: 'rgba(248,250,252,0.2)' }}>{tpl.description}</span>
+                          <span className="text-[6px] mb-1 leading-tight" style={{ color: 'rgba(255,255,255,0.6)' }}>{tpl.description}</span>
                           <div className="flex items-center gap-1 mt-auto">
                             <span className="text-[6px] px-1 py-0.5 rounded" style={{ background: `${tierColors[tpl.tier]}15`, color: tierColors[tpl.tier] }}>{tierLabels[tpl.tier]}</span>
                             <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.15)' }}>{tpl.duration_minutes}m - {tpl.track_count} tracks</span>
@@ -833,10 +833,10 @@ export default function SuanpanMixer() {
                         <span className="text-[8px] font-semibold" style={{ color: '#F472B6' }}>Camera</span>
                       </div>
                       <div className="space-y-0.5 mb-2">
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Resolution: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.res_label}</span></p>
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>FPS: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.max_fps}</span></p>
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Bitrate: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.bitrate_label}</span></p>
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Max: <span style={{ color: '#F472B6' }}>{Math.round(recordingConfig.video?.max_duration_sec / 60)}min</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Resolution: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.res_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>FPS: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.max_fps}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Bitrate: <span style={{ color: '#F472B6' }}>{recordingConfig.video?.bitrate_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Max: <span style={{ color: '#F472B6' }}>{Math.round(recordingConfig.video?.max_duration_sec / 60)}min</span></p>
                       </div>
                       {isRecordingVideo ? (
                         <motion.button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[8px] cursor-pointer"
@@ -860,10 +860,10 @@ export default function SuanpanMixer() {
                         <span className="text-[8px] font-semibold" style={{ color: '#2DD4BF' }}>Microphone</span>
                       </div>
                       <div className="space-y-0.5 mb-2">
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Quality: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.sample_label}</span></p>
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Channels: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.channel_label}</span></p>
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Depth: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.bit_depth}-bit</span></p>
-                        <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Max: <span style={{ color: '#2DD4BF' }}>{Math.round(recordingConfig.audio?.max_duration_sec / 60)}min</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Quality: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.sample_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Channels: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.channel_label}</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Depth: <span style={{ color: '#2DD4BF' }}>{recordingConfig.audio?.bit_depth}-bit</span></p>
+                        <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Max: <span style={{ color: '#2DD4BF' }}>{Math.round(recordingConfig.audio?.max_duration_sec / 60)}min</span></p>
                       </div>
                       {isRecordingAudio ? (
                         <motion.button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[8px] cursor-pointer"
@@ -883,7 +883,7 @@ export default function SuanpanMixer() {
                     </div>
                   </div>
                   <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.015)' }}>
-                    <p className="text-[7px] mb-1.5 font-medium" style={{ color: 'rgba(248,250,252,0.3)' }}>Recording Quality by Tier</p>
+                    <p className="text-[7px] mb-1.5 font-medium" style={{ color: 'rgba(255,255,255,0.65)' }}>Recording Quality by Tier</p>
                     <div className="grid grid-cols-4 gap-1">
                       {['discovery', 'player', 'ultra_player', 'sovereign'].map(t => {
                         const v = recordingConfig.all_video_tiers?.[t] || {};
@@ -896,8 +896,8 @@ export default function SuanpanMixer() {
                             border: `1px solid ${active ? tierColors[t] + '30' : 'rgba(255,255,255,0.03)'}`,
                           }}>
                             <p className="text-[6px] font-bold mb-0.5" style={{ color: tierColors[t] }}>{v.label || t}</p>
-                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{v.res_label} {v.max_fps}fps</p>
-                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{a.sample_label} {a.channel_label}</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{v.res_label} {v.max_fps}fps</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{a.sample_label} {a.channel_label}</p>
                           </div>
                         );
                       })}
@@ -921,7 +921,7 @@ export default function SuanpanMixer() {
                       <p className="text-[8px] tracking-wider uppercase font-medium" style={{ color: '#60A5FA' }}>AI Mix Generator</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                      <span className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {aiCapabilities.credits_remaining} credits - {aiCapabilities.capabilities?.credits_per_mix}/mix
                       </span>
                       <span className="text-[6px] px-1 py-0.5 rounded" style={{ background: 'rgba(96,165,250,0.1)', color: '#60A5FA' }}>
@@ -929,7 +929,7 @@ export default function SuanpanMixer() {
                       </span>
                     </div>
                   </div>
-                  <p className="text-[7px] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                  <p className="text-[7px] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {aiCapabilities.capabilities?.description}. Max {aiCapabilities.capabilities?.max_tracks_gen} tracks.
                   </p>
                   <div className="flex gap-1.5 mb-2">
@@ -967,7 +967,7 @@ export default function SuanpanMixer() {
                     )}
                   </div>
                   <div className="mt-2 rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.015)' }}>
-                    <p className="text-[7px] mb-1.5 font-medium" style={{ color: 'rgba(248,250,252,0.3)' }}>AI by Tier</p>
+                    <p className="text-[7px] mb-1.5 font-medium" style={{ color: 'rgba(255,255,255,0.65)' }}>AI by Tier</p>
                     <div className="grid grid-cols-4 gap-1">
                       {['discovery', 'player', 'ultra_player', 'sovereign'].map(t => {
                         const ai = aiCapabilities.all_tiers?.[t] || {};
@@ -979,8 +979,8 @@ export default function SuanpanMixer() {
                             border: `1px solid ${active ? tierColors[t] + '30' : 'rgba(255,255,255,0.03)'}`,
                           }}>
                             <p className="text-[6px] font-bold mb-0.5" style={{ color: tierColors[t] }}>{ai.label || t}</p>
-                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>Max {ai.max_tracks_gen} trks</p>
-                            <p className="text-[5px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                            <p className="text-[5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Max {ai.max_tracks_gen} trks</p>
+                            <p className="text-[5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                               {ai.video_gen ? 'Video' : '-'} {ai.voice_clone ? '+ Voice' : ''}
                             </p>
                           </div>
@@ -1084,9 +1084,9 @@ export default function SuanpanMixer() {
             initial={{ x: 260 }} animate={{ x: 0 }} exit={{ x: 260 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }} data-testid="projects-panel">
             <div className="flex items-center justify-between p-3 border-b" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>
-              <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.3)' }}>Projects</p>
+              <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color: 'rgba(255,255,255,0.65)' }}>Projects</p>
               <button className="p-1 rounded" onClick={() => setShowProjects(false)} data-testid="close-projects-btn">
-                <X size={11} style={{ color: 'rgba(248,250,252,0.25)' }} />
+                <X size={11} style={{ color: 'rgba(255,255,255,0.6)' }} />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -1094,7 +1094,7 @@ export default function SuanpanMixer() {
                 <motion.button key={p.id} className="w-full text-left px-3 py-2 rounded-lg cursor-pointer"
                   style={{ background: 'rgba(248,250,252,0.015)', border: '1px solid rgba(248,250,252,0.03)' }}
                   whileHover={{ scale: 1.02 }} onClick={() => loadProject(p.id)} data-testid={`project-item-${p.id}`}>
-                  <p className="text-[9px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{p.name}</p>
+                  <p className="text-[9px] font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>{p.name}</p>
                   <p className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
                     {p.track_count} tracks &middot; {new Date(p.updated_at).toLocaleDateString()}
                   </p>

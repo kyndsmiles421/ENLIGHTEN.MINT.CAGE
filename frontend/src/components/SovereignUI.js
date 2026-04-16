@@ -209,7 +209,7 @@ export const ResonanceOrb = forwardRef(({
           className="text-center font-medium mt-1"
           style={{ 
             fontSize: Math.max(8, size * 0.12), 
-            color: extracted ? orbColor : 'rgba(248,250,252,0.6)',
+            color: extracted ? orbColor : 'rgba(255,255,255,0.85)',
           }}
         >
           {label}

@@ -16,7 +16,7 @@ function CategoryFilter({ categories, active, onSelect }) {
         style={{
           background: !active ? 'rgba(192,132,252,0.15)' : 'rgba(0,0,0,0)',
           border: `1px solid ${!active ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.06)'}`,
-          color: !active ? '#C084FC' : 'rgba(248,250,252,0.5)',
+          color: !active ? '#C084FC' : 'rgba(255,255,255,0.75)',
         }}>All</button>
       {categories.map(c => (
         <button key={c.id} onClick={() => onSelect(c.id)}
@@ -25,7 +25,7 @@ function CategoryFilter({ categories, active, onSelect }) {
           style={{
             background: active === c.id ? `${c.color}18` : 'rgba(0,0,0,0)',
             border: `1px solid ${active === c.id ? c.color + '35' : 'rgba(248,250,252,0.06)'}`,
-            color: active === c.id ? c.color : 'rgba(248,250,252,0.5)',
+            color: active === c.id ? c.color : 'rgba(255,255,255,0.75)',
           }}>{c.name}</button>
       ))}
     </div>
@@ -45,14 +45,14 @@ function ElixirCard({ elixir, onSelect }) {
         </div>
         <div className="flex-1">
           <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{elixir.name}</p>
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{elixir.subtitle}</p>
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{elixir.subtitle}</p>
         </div>
       </div>
       <div className="flex items-center gap-3 mb-3">
-        <span className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
           <Clock size={10} />{elixir.prep_time}
         </span>
-        <span className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
           Best: {elixir.best_time}
         </span>
       </div>
@@ -74,9 +74,9 @@ function ElixirDetail({ elixir, onClose }) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{elixir.name}</h3>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{elixir.subtitle}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{elixir.subtitle}</p>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
 
       <div className="mb-5">
@@ -85,7 +85,7 @@ function ElixirDetail({ elixir, onClose }) {
           {elixir.ingredients.map((ing, i) => (
             <div key={i} className="flex items-start gap-2 mb-1.5">
               <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ background: elixir.color }} />
-              <p className="text-xs" style={{ color: 'rgba(248,250,252,0.7)' }}>{ing}</p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.9)' }}>{ing}</p>
             </div>
           ))}
         </div>
@@ -93,17 +93,17 @@ function ElixirDetail({ elixir, onClose }) {
 
       <div className="mb-5">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color: elixir.color }}>Instructions</p>
-        <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.65)' }}>{elixir.instructions}</p>
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>{elixir.instructions}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div className="rounded-xl p-3" style={{ background: `${elixir.color}08`, border: `1px solid ${elixir.color}15` }}>
           <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: elixir.color }}>Tradition</p>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>{elixir.tradition}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{elixir.tradition}</p>
         </div>
         <div className="rounded-xl p-3" style={{ background: `${elixir.color}08`, border: `1px solid ${elixir.color}15` }}>
           <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: elixir.color }}>Intention</p>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>{elixir.intention}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{elixir.intention}</p>
         </div>
       </div>
 

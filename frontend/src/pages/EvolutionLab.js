@@ -40,7 +40,7 @@ function SeasonBanner({ season }) {
           </div>
           <div>
             <p className="text-[10px] font-bold" style={{ color: season.color }}>{season.name}</p>
-            <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+            <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {season.rock_type} Cycle · {season.days_remaining} days remaining
             </p>
           </div>
@@ -50,7 +50,7 @@ function SeasonBanner({ season }) {
             <motion.div initial={{ width: 0 }} animate={{ width: `${season.progress}%` }}
               className="h-full rounded-full" style={{ background: season.color }} />
           </div>
-          <p className="text-[6px] text-right mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <p className="text-[6px] text-right mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {season.frequency_base} Hz
           </p>
         </div>
@@ -75,7 +75,7 @@ function StageOverview({ counts, totalVc }) {
             style={{ background: `${s.color}04`, border: `1px solid ${s.color}08` }}>
             <Icon size={14} color={s.color} className="mx-auto mb-1" />
             <p className="text-lg font-bold" style={{ color: s.color }}>{count}</p>
-            <p className="text-[7px]" style={{ color: 'rgba(248,250,252,0.35)' }}>{s.name}</p>
+            <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{s.name}</p>
           </div>
         );
       })}
@@ -91,7 +91,7 @@ function EvolutionBar({ vc, stage, progress }) {
       <div className="flex items-center justify-between mb-1">
         <span className="text-[7px] font-bold uppercase" style={{ color: stageColor }}>{stage.name}</span>
         {progress.next_stage && (
-          <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <span className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {progress.vc_needed} VC to {progress.next_stage}
           </span>
         )}
@@ -157,7 +157,7 @@ function SpecimenEvolutionCard({ item, onInteract, interacting }) {
             <EvolutionBar vc={item.vitality_coefficient} stage={item.stage} progress={item.stage_progress} />
 
             {/* Metadata row */}
-            <div className="flex items-center gap-1.5 text-[7px] flex-wrap" style={{ color: 'rgba(248,250,252,0.4)' }}>
+            <div className="flex items-center gap-1.5 text-[7px] flex-wrap" style={{ color: 'rgba(255,255,255,0.7)' }}>
               <ElIcon size={7} style={{ color: EL_COLORS[item.element] }} />
               <span>{item.element}</span>
               <span>·</span>
@@ -199,7 +199,7 @@ function SpecimenEvolutionCard({ item, onInteract, interacting }) {
             <button
               onClick={() => setShowDetails(!showDetails)}
               className="px-2 py-1 rounded-lg text-[8px]"
-              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(248,250,252,0.4)' }}>
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.7)' }}>
               {showDetails ? 'Hide' : 'Info'}
             </button>
           </div>
@@ -213,22 +213,22 @@ function SpecimenEvolutionCard({ item, onInteract, interacting }) {
               <div className="mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                 {item.mantra && (
                   <div className="mb-2 p-2 rounded-lg" style={{ background: `${sc}05` }}>
-                    <p className="text-[8px] italic" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                    <p className="text-[8px] italic" style={{ color: 'rgba(255,255,255,0.85)' }}>
                       "{item.mantra}"
                     </p>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-1.5 text-[7px]">
                   {item.crystal_system && (
-                    <div><span style={{ color: 'rgba(248,250,252,0.3)' }}>Crystal:</span> <span style={{ color: 'rgba(248,250,252,0.6)' }}>{item.crystal_system}</span></div>
+                    <div><span style={{ color: 'rgba(255,255,255,0.65)' }}>Crystal:</span> <span style={{ color: 'rgba(255,255,255,0.85)' }}>{item.crystal_system}</span></div>
                   )}
                   {item.cleavage && (
-                    <div><span style={{ color: 'rgba(248,250,252,0.3)' }}>Cleavage:</span> <span style={{ color: 'rgba(248,250,252,0.6)' }}>{item.cleavage}</span></div>
+                    <div><span style={{ color: 'rgba(255,255,255,0.65)' }}>Cleavage:</span> <span style={{ color: 'rgba(255,255,255,0.85)' }}>{item.cleavage}</span></div>
                   )}
                   {item.mohs && (
-                    <div><span style={{ color: 'rgba(248,250,252,0.3)' }}>Mohs:</span> <span style={{ color: 'rgba(248,250,252,0.6)' }}>{item.mohs}</span></div>
+                    <div><span style={{ color: 'rgba(255,255,255,0.65)' }}>Mohs:</span> <span style={{ color: 'rgba(255,255,255,0.85)' }}>{item.mohs}</span></div>
                   )}
-                  <div><span style={{ color: 'rgba(248,250,252,0.3)' }}>Interactions:</span> <span style={{ color: 'rgba(248,250,252,0.6)' }}>{item.interactions}</span></div>
+                  <div><span style={{ color: 'rgba(255,255,255,0.65)' }}>Interactions:</span> <span style={{ color: 'rgba(255,255,255,0.85)' }}>{item.interactions}</span></div>
                 </div>
               </div>
             </motion.div>
@@ -250,7 +250,7 @@ function DustConverter({ dust, onConvert }) {
       <div className="flex items-center gap-2 mb-2">
         <Coins size={12} color="#FCD34D" />
         <span className="text-[10px] font-bold" style={{ color: '#FCD34D' }}>Alchemical Exchange</span>
-        <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>100 Dust = 1 Credit</span>
+        <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>100 Dust = 1 Credit</span>
       </div>
       <div className="flex items-center gap-1.5 mb-2">
         {presets.map(p => (
@@ -258,7 +258,7 @@ function DustConverter({ dust, onConvert }) {
             className="px-2 py-1 rounded-lg text-[8px] font-medium"
             style={{
               background: amount === p ? 'rgba(252,211,77,0.1)' : 'rgba(255,255,255,0.02)',
-              color: amount === p ? '#FCD34D' : 'rgba(248,250,252,0.3)',
+              color: amount === p ? '#FCD34D' : 'rgba(255,255,255,0.65)',
               border: `1px solid ${amount === p ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.04)'}`,
             }}>
             {p} Dust
@@ -266,16 +266,16 @@ function DustConverter({ dust, onConvert }) {
         ))}
       </div>
       <div className="flex items-center justify-between">
-        <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+        <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
           {amount} Dust → <span style={{ color: '#FCD34D' }}>{creditsOut} Credits</span>
-          <span className="ml-1" style={{ color: 'rgba(248,250,252,0.2)' }}>(have {dust})</span>
+          <span className="ml-1" style={{ color: 'rgba(255,255,255,0.6)' }}>(have {dust})</span>
         </div>
         <button onClick={() => onConvert(amount)}
           disabled={dust < 100 || amount > dust}
           className="px-3 py-1 rounded-lg text-[9px] font-bold"
           style={{
             background: dust >= amount ? 'rgba(252,211,77,0.12)' : 'rgba(255,255,255,0.03)',
-            color: dust >= amount ? '#FCD34D' : 'rgba(248,250,252,0.2)',
+            color: dust >= amount ? '#FCD34D' : 'rgba(255,255,255,0.6)',
             opacity: dust >= amount ? 1 : 0.5,
           }}
           data-testid="convert-dust-btn">
@@ -423,7 +423,7 @@ export default function EvolutionLab() {
                 className="px-2 py-1 rounded-lg text-[8px] font-medium whitespace-nowrap capitalize"
                 style={{
                   background: active ? `${color}10` : 'rgba(255,255,255,0.02)',
-                  color: active ? color : 'rgba(248,250,252,0.3)',
+                  color: active ? color : 'rgba(255,255,255,0.65)',
                   border: `1px solid ${active ? `${color}18` : 'rgba(255,255,255,0.04)'}`,
                 }}
                 data-testid={`evo-filter-${f}`}>
@@ -438,7 +438,7 @@ export default function EvolutionLab() {
           {filtered.length === 0 ? (
             <div className="text-center py-12">
               <Gem size={24} color="rgba(248,250,252,0.1)" className="mx-auto mb-2" />
-              <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {filter === 'all' ? 'No specimens yet. Mine some in Rock Hounding!' : `No ${filter} specimens`}
               </p>
             </div>

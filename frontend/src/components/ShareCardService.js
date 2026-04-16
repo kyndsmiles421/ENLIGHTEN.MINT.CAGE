@@ -114,7 +114,7 @@ export async function generateShareCard(entry, colorHexes) {
 
   // ── Frequency/Filters info ──
   ctx.font = '400 26px "JetBrains Mono", monospace';
-  ctx.fillStyle = 'rgba(248,250,252,0.3)';
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
   const filterStr = [];
   if (f.hueRotate) filterStr.push(`${f.hueRotate}° hue`);
   if (f.brightness && f.brightness !== 100) filterStr.push(`${f.brightness}% bright`);

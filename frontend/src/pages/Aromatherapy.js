@@ -31,7 +31,7 @@ function OilCard({ oil, onSelect, selected }) {
         </div>
         <div>
           <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{oil.name}</p>
-          <p className="text-[10px] italic" style={{ color: 'rgba(248,250,252,0.35)' }}>{oil.latin}</p>
+          <p className="text-[10px] italic" style={{ color: 'rgba(255,255,255,0.65)' }}>{oil.latin}</p>
         </div>
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -52,9 +52,9 @@ function OilDetail({ oil, onClose }) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{oil.name}</h3>
-          <p className="text-xs italic" style={{ color: 'rgba(248,250,252,0.4)' }}>{oil.latin}</p>
+          <p className="text-xs italic" style={{ color: 'rgba(255,255,255,0.7)' }}>{oil.latin}</p>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="rounded-xl p-3" style={{ background: `${oil.color}08`, border: `1px solid ${oil.color}15` }}>
@@ -71,21 +71,21 @@ function OilDetail({ oil, onClose }) {
         {oil.uses.map((u, i) => (
           <div key={i} className="flex items-start gap-2 mb-1.5">
             <ChevronRight size={12} style={{ color: oil.color, marginTop: 2 }} />
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.7)' }}>{u}</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.9)' }}>{u}</p>
           </div>
         ))}
       </div>
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color: oil.color }}>Emotional</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>{oil.emotional}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{oil.emotional}</p>
       </div>
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color: oil.color }}>Spiritual</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>{oil.spiritual}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{oil.spiritual}</p>
       </div>
       <div className="rounded-xl p-3" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)' }}>
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: '#EAB308' }}>Caution</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{oil.caution}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{oil.caution}</p>
       </div>
     </motion.div>
   );
@@ -108,8 +108,8 @@ function BlendCard({ blend, oils }) {
           ) : null;
         })}
       </div>
-      <p className="text-[10px] mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>Ratio: {blend.ratio}</p>
-      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Method: {blend.method}</p>
+      <p className="text-[10px] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Ratio: {blend.ratio}</p>
+      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Method: {blend.method}</p>
     </div>
   );
 }
@@ -170,7 +170,7 @@ export default function Aromatherapy() {
               style={{
                 background: tab === t.id ? 'rgba(192,132,252,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(192,132,252,0.3)' : 'rgba(248,250,252,0.06)'}`,
-                color: tab === t.id ? '#C084FC' : 'rgba(248,250,252,0.5)',
+                color: tab === t.id ? '#C084FC' : 'rgba(255,255,255,0.75)',
               }}>
               <t.icon size={14} />{t.label}
             </button>

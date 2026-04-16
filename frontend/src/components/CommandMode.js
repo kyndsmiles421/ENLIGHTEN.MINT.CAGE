@@ -78,7 +78,7 @@ export default function CommandMode({ context = 'general', pageData = {}, trigge
           className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer shadow-2xl command-mode-trigger-btn"
           style={{
             background: 'linear-gradient(135deg, rgba(139,92,246,0.9), rgba(96,165,250,0.9))',
-            border: '1px solid rgba(255,255,255,0.2)',
+            border: '1px solid rgba(255,255,255,0.6)',
           }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}

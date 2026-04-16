@@ -123,7 +123,7 @@ export default function CrystalMarketplace() {
                 className="w-full py-3 rounded-full font-bold uppercase tracking-[0.15em] text-[10px] transition-all"
                 style={{
                   background: skin.isActive ? 'rgba(255,255,255,0.03)' : '#fff',
-                  color: skin.isActive ? 'rgba(255,255,255,0.2)' : '#000',
+                  color: skin.isActive ? 'rgba(255,255,255,0.6)' : '#000',
                 }}
                 data-testid={`equip-${skin.key.toLowerCase()}`}
               >
@@ -136,7 +136,7 @@ export default function CrystalMarketplace() {
                 className="w-full py-3 rounded-full font-bold uppercase tracking-[0.15em] text-[10px] transition-all"
                 style={{
                   background: dust >= skin.cost ? '#fff' : 'rgba(255,255,255,0.05)',
-                  color: dust >= skin.cost ? '#000' : 'rgba(255,255,255,0.2)',
+                  color: dust >= skin.cost ? '#000' : 'rgba(255,255,255,0.6)',
                 }}
                 data-testid={`buy-${skin.key.toLowerCase()}`}
               >
@@ -149,7 +149,7 @@ export default function CrystalMarketplace() {
 
       {/* System Flow Preview */}
       <section className="px-4 mt-8 mb-8">
-        <h3 className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>Active System Flow</h3>
+        <h3 className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>Active System Flow</h3>
         <div className="flex gap-2 flex-wrap">
           {['PRACTICE', 'DIVINATION', 'SANCTUARY', 'NOURISH', 'EXPLORE', 'SAGE', 'COUNCIL'].map((pillar) => (
             <motion.div

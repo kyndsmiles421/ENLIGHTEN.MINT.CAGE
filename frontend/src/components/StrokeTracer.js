@@ -68,7 +68,7 @@ export function StrokeTracer({ character, strokes, size = 280, onComplete, color
       ctx.fill();
 
       ctx.font = '10px monospace';
-      ctx.fillStyle = 'rgba(248,250,252,0.3)';
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
       ctx.fillText(`${currentStroke + 1}/${strokes.length}`, start.x * size + 10, start.y * size - 8);
     }
 
@@ -172,7 +172,7 @@ export function StrokeTracer({ character, strokes, size = 280, onComplete, color
               <p className="text-3xl font-bold" style={{ color: unlocked ? '#2DD4BF' : '#F59E0B', fontFamily: 'Cormorant Garamond, serif' }}>
                 {accuracy}%
               </p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(248,250,252,0.5)' }}>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
                 {unlocked ? 'Character Mastered' : 'Keep Practicing'}
               </p>
               <button

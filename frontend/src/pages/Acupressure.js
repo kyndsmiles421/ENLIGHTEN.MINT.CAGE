@@ -25,10 +25,10 @@ function PointCard({ point, onSelect, selected }) {
         </div>
         <div>
           <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{point.name}</p>
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>{point.meridian} Meridian</p>
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{point.meridian} Meridian</p>
         </div>
       </div>
-      <p className="text-xs mb-2" style={{ color: 'rgba(248,250,252,0.5)' }}>{point.location}</p>
+      <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>{point.location}</p>
       <div className="flex flex-wrap gap-1.5">
         {point.benefits.slice(0, 3).map(b => (
           <span key={b} className="text-[10px] px-2 py-0.5 rounded-full"
@@ -47,9 +47,9 @@ function PointDetail({ point, onClose }) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold" style={{ color: '#F8FAFC' }}>{point.name}</h3>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{point.meridian} Meridian | {point.element} Element</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{point.meridian} Meridian | {point.element} Element</p>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
       </div>
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="rounded-xl p-3" style={{ background: `${point.color}08`, border: `1px solid ${point.color}15` }}>
@@ -63,7 +63,7 @@ function PointDetail({ point, onClose }) {
       </div>
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color: point.color }}>Technique</p>
-        <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.65)' }}>{point.technique}</p>
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>{point.technique}</p>
       </div>
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color: point.color }}>Helps With</p>
@@ -76,15 +76,15 @@ function PointDetail({ point, onClose }) {
       </div>
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: point.color }}>Duration</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{point.duration}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{point.duration}</p>
       </div>
       <div className="mb-4">
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: point.color }}>Spiritual Significance</p>
-        <p className="text-xs italic" style={{ color: 'rgba(248,250,252,0.55)' }}>{point.spiritual}</p>
+        <p className="text-xs italic" style={{ color: 'rgba(255,255,255,0.8)' }}>{point.spiritual}</p>
       </div>
       <div className="rounded-xl p-3" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)' }}>
         <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color: '#EAB308' }}>Caution</p>
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{point.caution}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{point.caution}</p>
       </div>
     </motion.div>
   );
@@ -102,7 +102,7 @@ function RoutineCard({ routine, onStart }) {
           </div>
           <div>
             <p className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{routine.name}</p>
-            <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
+            <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
               <Clock size={10} />{routine.duration} | {routine.points.length} points
             </p>
           </div>
@@ -113,8 +113,8 @@ function RoutineCard({ routine, onStart }) {
           View
         </button>
       </div>
-      <p className="text-xs mb-2" style={{ color: 'rgba(248,250,252,0.5)' }}>{routine.instructions}</p>
-      <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Best for: {routine.best_for}</p>
+      <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>{routine.instructions}</p>
+      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Best for: {routine.best_for}</p>
     </div>
   );
 }
@@ -182,7 +182,7 @@ export default function Acupressure() {
               style={{
                 background: tab === t.id ? 'rgba(239,68,68,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(239,68,68,0.3)' : 'rgba(248,250,252,0.06)'}`,
-                color: tab === t.id ? '#EF4444' : 'rgba(248,250,252,0.5)',
+                color: tab === t.id ? '#EF4444' : 'rgba(255,255,255,0.75)',
               }}>{t.label}</button>
           ))}
         </div>
@@ -206,9 +206,9 @@ export default function Acupressure() {
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-bold" style={{ color: '#F8FAFC' }}>{routineDetail.name}</h3>
                   <button onClick={() => setRoutineDetail(null)} className="p-1.5 rounded-lg hover:bg-white/5">
-                    <X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+                    <X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
                 </div>
-                <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.5)' }}>{routineDetail.instructions}</p>
+                <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.75)' }}>{routineDetail.instructions}</p>
                 <div className="space-y-3">
                   {(routineDetail.points_detail || []).map((p, i) => (
                     <div key={p.id} className="rounded-xl p-4"
@@ -218,8 +218,8 @@ export default function Acupressure() {
                           style={{ background: `${p.color}20`, color: p.color }}>{i + 1}</span>
                         <p className="text-sm font-semibold" style={{ color: '#F8FAFC' }}>{p.name}</p>
                       </div>
-                      <p className="text-xs mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>{p.location}</p>
-                      <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>{p.technique}</p>
+                      <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{p.location}</p>
+                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{p.technique}</p>
                     </div>
                   ))}
                 </div>

@@ -50,7 +50,7 @@ export default function DailyBriefing() {
 
   if (!token) return (
     <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
-      <p className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to receive your cosmic briefing</p>
+      <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to receive your cosmic briefing</p>
     </div>
   );
 
@@ -58,7 +58,7 @@ export default function DailyBriefing() {
     <div className="min-h-screen flex items-center justify-center pt-20">
       <div className="text-center">
         <Loader2 className="animate-spin mx-auto mb-3" size={28} style={{ color: '#D8B4FE' }} />
-        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>Reading the cosmic frequencies...</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Reading the cosmic frequencies...</p>
       </div>
     </div>
   );
@@ -126,7 +126,7 @@ export default function DailyBriefing() {
         <Section title={`${data.element.name} Element Day`} icon={ElemIcon} color={data.element.color} delay={0.1}>
           <div className="rounded-xl p-4 mb-3" style={{ background: `${data.element.color}06`, border: `1px solid ${data.element.color}12` }}>
             <p className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{data.element.energy}</p>
-            <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)' }}>{data.element.focus}</p>
+            <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>{data.element.focus}</p>
           </div>
         </Section>
 
@@ -136,12 +136,12 @@ export default function DailyBriefing() {
             <div className="text-center flex-shrink-0">
               <p className="text-4xl mb-1">{MOON_EMOJIS[data.moon.code] || '🌕'}</p>
               <p className="text-xs font-medium" style={{ color: '#93C5FD' }}>{data.moon.phase}</p>
-              <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {data.moon.illumination}% illumination
               </p>
             </div>
             <div className="flex-1">
-              <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.7)' }}>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.9)' }}>
                 {data.moon.guidance}
               </p>
             </div>
@@ -153,7 +153,7 @@ export default function DailyBriefing() {
           <button onClick={() => navigate('/mayan')} className="w-full text-left">
             <p className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{data.mayan.galactic_signature}</p>
             <p className="text-xs mb-2" style={{ color: '#A78BFA' }}>Kin {data.mayan.kin} — Tone: {data.mayan.tone}</p>
-            <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{data.mayan.meaning}</p>
+            <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{data.mayan.meaning}</p>
           </button>
         </Section>
 
@@ -164,13 +164,13 @@ export default function DailyBriefing() {
               <div className="flex gap-3">
                 <div className="rounded-xl p-3 flex-1 text-center" style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(252,211,77,0.12)' }}>
                   <p className="text-2xl font-bold" style={{ color: '#FCD34D' }}>{data.numerology.personal_year}</p>
-                  <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(248,250,252,0.35)' }}>Personal Year</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.5)' }}>{data.numerology.year_theme}</p>
+                  <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>Personal Year</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>{data.numerology.year_theme}</p>
                 </div>
                 <div className="rounded-xl p-3 flex-1 text-center" style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(252,211,77,0.12)' }}>
                   <p className="text-2xl font-bold" style={{ color: '#FCD34D' }}>{data.numerology.personal_day}</p>
-                  <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(248,250,252,0.35)' }}>Personal Day</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.5)' }}>{data.numerology.day_theme}</p>
+                  <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>Personal Day</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>{data.numerology.day_theme}</p>
                 </div>
               </div>
             </button>
@@ -181,7 +181,7 @@ export default function DailyBriefing() {
         {data.dream_symbols.length > 0 && (
           <Section title="Dream Echoes" icon={Eye} color="#818CF8" delay={0.4}>
             <button onClick={() => navigate('/dreams')} className="w-full text-left">
-              <p className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.55)' }}>
+              <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.8)' }}>
                 Recurring symbols from your recent dreamscape:
               </p>
               <div className="flex flex-wrap gap-2 mb-3">
@@ -195,7 +195,7 @@ export default function DailyBriefing() {
               {data.recent_dreams.length > 0 && (
                 <div className="space-y-1.5">
                   {data.recent_dreams.map((d, i) => (
-                    <div key={i} className="flex items-center gap-2 text-[11px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                    <div key={i} className="flex items-center gap-2 text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                       <Moon size={9} style={{ color: '#818CF8' }} />
                       <span className="truncate">{d.title || 'Untitled'}</span>
                       <span className="text-[9px] ml-auto">{d.mood}</span>
@@ -217,7 +217,7 @@ export default function DailyBriefing() {
               }} />
               <div>
                 <p className="text-sm font-medium capitalize" style={{ color: 'var(--text-primary)' }}>{data.aura_color} Aura</p>
-                <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Your current energetic signature</p>
+                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Your current energetic signature</p>
               </div>
             </div>
           </Section>
@@ -237,7 +237,7 @@ export default function DailyBriefing() {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
-                  <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>{p.duration}</p>
+                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{p.duration}</p>
                 </div>
                 <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.15)' }} />
               </button>

@@ -36,12 +36,12 @@ function StatusCard({ dust, gems, fans, tier, tierName, exchangeRate, baseRate }
             <TierIcon size={16} color={tierColor} />
           </div>
           <div>
-            <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Transmuter Tier</div>
+            <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Transmuter Tier</div>
             <div className="text-sm font-bold" style={{ color: tierColor }}>{tierName}</div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Phi Cap Rate</div>
+          <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Phi Cap Rate</div>
           <div className="text-sm font-bold flex items-center gap-1" style={{ color: '#FCD34D' }}>
             <Activity size={12} />
             {exchangeRate} Dust = 1 Fan
@@ -62,7 +62,7 @@ function BalancePill({ label, value, icon: Icon, color, testId }) {
     <div className="rounded-xl p-2.5 text-center" style={{ background: `${color}08`, border: `1px solid ${color}15` }} data-testid={testId}>
       <Icon size={14} color={color} className="mx-auto mb-1" />
       <div className="text-lg font-bold" style={{ color }}>{(value || 0).toLocaleString()}</div>
-      <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>{label}</div>
+      <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>{label}</div>
     </div>
   );
 }
@@ -80,7 +80,7 @@ function TradePanel({ dust, exchangeRate, onTrade, loading }) {
         <ArrowRightLeft size={16} color="#FCD34D" />
         <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Liquidity Controller</h2>
       </div>
-      <div className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>
+      <div className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
         Convert Digital Dust into Fans via the Phi Cap exchange. The scavenger's loop — every fragment has value.
       </div>
       <div className="relative mb-3">
@@ -103,16 +103,16 @@ function TradePanel({ dust, exchangeRate, onTrade, loading }) {
       {numAmount > 0 && (
         <div className="rounded-xl p-3 mb-3" style={{ background: 'rgba(252,211,77,0.04)', border: '1px solid rgba(252,211,77,0.1)' }}>
           <div className="flex justify-between text-xs mb-1">
-            <span style={{ color: 'rgba(248,250,252,0.5)' }}>Dust consumed</span>
+            <span style={{ color: 'rgba(255,255,255,0.75)' }}>Dust consumed</span>
             <span style={{ color: '#A855F7' }}>{dustConsumed.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-xs mb-1">
-            <span style={{ color: 'rgba(248,250,252,0.5)' }}>Fans received</span>
+            <span style={{ color: 'rgba(255,255,255,0.75)' }}>Fans received</span>
             <span style={{ color: '#FCD34D' }} data-testid="fans-preview">{fansPreview}</span>
           </div>
           <div className="flex justify-between text-xs">
-            <span style={{ color: 'rgba(248,250,252,0.5)' }}>Dust remaining</span>
-            <span style={{ color: 'rgba(248,250,252,0.6)' }}>{(dust - dustConsumed).toLocaleString()}</span>
+            <span style={{ color: 'rgba(255,255,255,0.75)' }}>Dust remaining</span>
+            <span style={{ color: 'rgba(255,255,255,0.85)' }}>{(dust - dustConsumed).toLocaleString()}</span>
           </div>
         </div>
       )}
@@ -123,7 +123,7 @@ function TradePanel({ dust, exchangeRate, onTrade, loading }) {
         style={{
           background: canTrade ? 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(168,85,247,0.15))' : 'rgba(255,255,255,0.03)',
           border: `1px solid ${canTrade ? 'rgba(252,211,77,0.3)' : 'rgba(255,255,255,0.05)'}`,
-          color: canTrade ? '#FCD34D' : 'rgba(248,250,252,0.3)',
+          color: canTrade ? '#FCD34D' : 'rgba(255,255,255,0.65)',
           cursor: canTrade ? 'pointer' : 'not-allowed',
         }}
         data-testid="execute-trade-btn"
@@ -147,19 +147,19 @@ function BlueprintPanel({ tier, tierName, onGenerate, loading, lastBlueprint }) 
         <FileText size={16} color="#2DD4BF" />
         <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Sacred Blueprint Generator</h2>
       </div>
-      <div className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>
+      <div className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
         Process physical construction data into Sacred Blueprints. Higher tiers unlock Phi Optimization and White Light Encryption.
       </div>
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div>
-          <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Length</label>
+          <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Length</label>
           <input type="number" value={length} onChange={e => setLength(e.target.value)}
             className="w-full px-3 py-2 rounded-lg text-xs outline-none"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#F8FAFC' }}
             data-testid="blueprint-length-input" />
         </div>
         <div>
-          <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Width</label>
+          <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Width</label>
           <input type="number" value={width} onChange={e => setWidth(e.target.value)}
             className="w-full px-3 py-2 rounded-lg text-xs outline-none"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#F8FAFC' }}
@@ -167,7 +167,7 @@ function BlueprintPanel({ tier, tierName, onGenerate, loading, lastBlueprint }) 
         </div>
       </div>
       <div className="mb-3">
-        <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Trade Type</label>
+        <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Trade Type</label>
         <div className="flex gap-1.5 flex-wrap">
           {tradeTypes.map(t => (
             <button key={t} onClick={() => setTradeType(t)}
@@ -175,7 +175,7 @@ function BlueprintPanel({ tier, tierName, onGenerate, loading, lastBlueprint }) 
               style={{
                 background: tradeType === t ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.03)',
                 border: `1px solid ${tradeType === t ? 'rgba(45,212,191,0.25)' : 'rgba(255,255,255,0.06)'}`,
-                color: tradeType === t ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                color: tradeType === t ? '#2DD4BF' : 'rgba(255,255,255,0.75)',
               }}
               data-testid={`trade-type-${t.toLowerCase()}`}>{t}</button>
           ))}
@@ -212,7 +212,7 @@ function BlueprintDisplay({ blueprint, tierName, tierColor }) {
         <div className="text-xs font-bold" style={{ color: tierColor }}>{bp.tier} Blueprint</div>
         <div className="text-[9px] px-2 py-0.5 rounded-md" style={{ background: `${tierColor}15`, color: tierColor }}>{bp.dimensions}</div>
       </div>
-      <div className="space-y-1 text-[11px]" style={{ color: 'rgba(248,250,252,0.6)' }}>
+      <div className="space-y-1 text-[11px]" style={{ color: 'rgba(255,255,255,0.85)' }}>
         <div>Studs: {bp.standard_cuts}</div>
         <div>Trade: {bp.trade_type}</div>
         {bp.phi_optimized && <div style={{ color: '#818CF8' }}>Phi Optimized: {bp.phi_optimized}</div>}
@@ -223,7 +223,7 @@ function BlueprintDisplay({ blueprint, tierName, tierColor }) {
       </div>
       {hasRefraction && (
         <div className="mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <div className="text-[9px] uppercase tracking-wider mb-1.5" style={{ color: 'rgba(248,250,252,0.3)' }}>White Light Encryption</div>
+          <div className="text-[9px] uppercase tracking-wider mb-1.5" style={{ color: 'rgba(255,255,255,0.65)' }}>White Light Encryption</div>
           <div className="flex gap-1">
             {SPECTRUM.map((color, i) => {
               const keys = Object.keys(bp.refraction_key);
@@ -254,14 +254,14 @@ function RewardsList({ rewards }) {
         <BarChart3 size={16} color="#A855F7" />
         <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Dust Complexity Rewards</h2>
       </div>
-      <div className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>
+      <div className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
         Every interaction sweeps up value. Higher complexity actions yield more Dust.
       </div>
       <div className="space-y-1">
         {entries.map(([action, base]) => (
           <div key={action} className="flex items-center justify-between py-1.5 px-2 rounded-lg"
             style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <span className="text-[11px] capitalize" style={{ color: 'rgba(248,250,252,0.6)' }}>
+            <span className="text-[11px] capitalize" style={{ color: 'rgba(255,255,255,0.85)' }}>
               {action.replace(/_/g, ' ')}
             </span>
             <span className="text-[11px] font-bold" style={{ color: '#A855F7' }}>+{base} Dust</span>
@@ -294,7 +294,7 @@ function TransactionHistory({ entries }) {
                    tx.type === 'dust_accrual' ? `+${tx.dust_earned} Dust (${tx.action?.replace(/_/g, ' ')})` :
                    'Blueprint Generated'}
                 </div>
-                <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   {tx.created_at ? new Date(tx.created_at).toLocaleString() : ''}
                 </div>
               </div>
@@ -351,7 +351,7 @@ function AlchemyPanel({ dust, tier, tierName, tierDynamics, onTransmute, loading
           <FlaskConical size={16} color={tierColor} />
           <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Sovereign Engine Alchemy</h2>
         </div>
-        <div className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>
+        <div className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
           Transmute Dust through the Fibonacci accrual engine. Phi Cap ceiling protects value.
         </div>
 
@@ -359,17 +359,17 @@ function AlchemyPanel({ dust, tier, tierName, tierDynamics, onTransmute, loading
         <div className="grid grid-cols-3 gap-2 mb-3">
           <div className="rounded-xl p-2 text-center" style={{ background: `${tierColor}08`, border: `1px solid ${tierColor}15` }}>
             <div className="text-lg font-bold" style={{ color: tierColor }}>{(dynamics.ratio * 100).toFixed(1)}%</div>
-            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Accrual Rate</div>
+            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Accrual Rate</div>
           </div>
           <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(252,211,77,0.12)' }}>
             <div className="text-lg font-bold" style={{ color: '#FCD34D' }}>{(dynamics.tax * 100).toFixed(1)}%</div>
-            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>
+            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>
               {dynamics.tax > 0 ? 'Scholarship Tax' : 'Zero Tax'}
             </div>
           </div>
           <div className="rounded-xl p-2 text-center" style={{ background: 'rgba(45,212,191,0.06)', border: '1px solid rgba(45,212,191,0.12)' }}>
             <div className="text-lg font-bold" style={{ color: '#2DD4BF' }}>1.618</div>
-            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Phi Cap</div>
+            <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Phi Cap</div>
           </div>
         </div>
 
@@ -390,20 +390,20 @@ function AlchemyPanel({ dust, tier, tierName, tierDynamics, onTransmute, loading
         {numAmount > 0 && (
           <div className="rounded-xl p-3 mb-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
             <div className="flex justify-between text-xs mb-1">
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Input</span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>Input</span>
               <span style={{ color: '#A855F7' }}>{numAmount.toLocaleString()} Dust</span>
             </div>
             <div className="flex justify-between text-xs mb-1">
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Gross ({(dynamics.ratio * 100).toFixed(1)}% accrual)</span>
-              <span style={{ color: 'rgba(248,250,252,0.6)' }}>{Math.round(grossOutput).toLocaleString()}</span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>Gross ({(dynamics.ratio * 100).toFixed(1)}% accrual)</span>
+              <span style={{ color: 'rgba(255,255,255,0.85)' }}>{Math.round(grossOutput).toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-xs mb-1">
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>After Phi Cap</span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>After Phi Cap</span>
               <span style={{ color: '#2DD4BF' }}>{Math.round(cappedOutput).toLocaleString()}</span>
             </div>
             {dynamics.tax > 0 && (
               <div className="flex justify-between text-xs mb-1">
-                <span style={{ color: 'rgba(248,250,252,0.5)' }}>Scholarship Tax ({(dynamics.tax * 100).toFixed(1)}%)</span>
+                <span style={{ color: 'rgba(255,255,255,0.75)' }}>Scholarship Tax ({(dynamics.tax * 100).toFixed(1)}%)</span>
                 <span style={{ color: '#FCD34D' }}>-{Math.round(taxAmount).toLocaleString()}</span>
               </div>
             )}
@@ -425,7 +425,7 @@ function AlchemyPanel({ dust, tier, tierName, tierDynamics, onTransmute, loading
                 ? `linear-gradient(135deg, ${tierColor}20, rgba(168,85,247,0.15))`
                 : 'rgba(255,255,255,0.03)',
               border: `1px solid ${numAmount > 0 && numAmount <= dust ? `${tierColor}40` : 'rgba(255,255,255,0.05)'}`,
-              color: numAmount > 0 && numAmount <= dust ? tierColor : 'rgba(248,250,252,0.3)',
+              color: numAmount > 0 && numAmount <= dust ? tierColor : 'rgba(255,255,255,0.65)',
             }}
             data-testid="execute-alchemy-btn"
           >
@@ -449,12 +449,12 @@ function AlchemyPanel({ dust, tier, tierName, tierDynamics, onTransmute, loading
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           data-testid="alchemy-result">
-          <div className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>Last Transmutation</div>
+          <div className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>Last Transmutation</div>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Input:</span> <span style={{ color: '#A855F7' }}>{lastResult.input_amount}</span></div>
-            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Net:</span> <span className="font-bold" style={{ color: '#2DD4BF' }}>{lastResult.net_result}</span></div>
-            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Tax:</span> <span style={{ color: '#FCD34D' }}>{lastResult.tax_amount}</span></div>
-            <div><span style={{ color: 'rgba(248,250,252,0.5)' }}>Ratio:</span> <span style={{ color: '#818CF8' }}>{(lastResult.tier_ratio * 100).toFixed(1)}%</span></div>
+            <div><span style={{ color: 'rgba(255,255,255,0.75)' }}>Input:</span> <span style={{ color: '#A855F7' }}>{lastResult.input_amount}</span></div>
+            <div><span style={{ color: 'rgba(255,255,255,0.75)' }}>Net:</span> <span className="font-bold" style={{ color: '#2DD4BF' }}>{lastResult.net_result}</span></div>
+            <div><span style={{ color: 'rgba(255,255,255,0.75)' }}>Tax:</span> <span style={{ color: '#FCD34D' }}>{lastResult.tax_amount}</span></div>
+            <div><span style={{ color: 'rgba(255,255,255,0.75)' }}>Ratio:</span> <span style={{ color: '#818CF8' }}>{(lastResult.tier_ratio * 100).toFixed(1)}%</span></div>
           </div>
           {lastResult.phi_cap_applied && (
             <div className="mt-2 text-[10px] px-2 py-1 rounded-md inline-block" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
@@ -610,7 +610,7 @@ export default function LiquidityTrader() {
                 style={{
                   background: active ? 'rgba(168,85,247,0.1)' : 'rgba(255,255,255,0.02)',
                   border: `1px solid ${active ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.04)'}`,
-                  color: active ? '#A855F7' : 'rgba(248,250,252,0.4)',
+                  color: active ? '#A855F7' : 'rgba(255,255,255,0.7)',
                 }}
                 data-testid={`trader-tab-${t.id}`}>
                 <Icon size={12} />

@@ -95,7 +95,7 @@ export default function SovereignDashboard() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Authentication required</p>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>Authentication required</p>
       </div>
     );
   }
@@ -115,11 +115,11 @@ export default function SovereignDashboard() {
       <div className="max-w-3xl mx-auto px-4 pt-6">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.5)' }} />
+            <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.75)' }} />
           </button>
           <div>
             <h1 className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>Sovereign Dashboard</h1>
-            <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Treasury Control & Framework Administration</p>
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Treasury Control & Framework Administration</p>
           </div>
           {config && (
             <div className="ml-auto flex items-center gap-1.5">
@@ -144,7 +144,7 @@ export default function SovereignDashboard() {
                 style={{
                   background: active ? 'rgba(192,132,252,0.08)' : 'rgba(255,255,255,0.02)',
                   border: `1px solid ${active ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.04)'}`,
-                  color: active ? '#C084FC' : 'rgba(248,250,252,0.35)',
+                  color: active ? '#C084FC' : 'rgba(255,255,255,0.65)',
                   fontSize: '11px',
                 }}
                 data-testid={`sovereign-tab-${t.id}`}
@@ -175,7 +175,7 @@ export default function SovereignDashboard() {
                     <div key={s.label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <s.icon size={11} style={{ color: `${s.color}80` }} />
-                        <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>{s.label}</span>
+                        <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>{s.label}</span>
                       </div>
                       <div className="text-lg font-semibold" style={{ color: s.color }}>{s.value}</div>
                     </div>
@@ -185,24 +185,24 @@ export default function SovereignDashboard() {
                 {/* Fee + Status */}
                 <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>Platform Status</span>
+                    <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>Platform Status</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3 text-center">
                     <div>
                       <div className="text-sm font-semibold" style={{ color: '#FBBF24' }}>{dashboard.fee_percent}%</div>
-                      <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Fee Rate</div>
+                      <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Fee Rate</div>
                     </div>
                     <div>
                       <div className="text-sm font-semibold" style={{ color: dashboard.mirror_active ? '#22C55E' : '#EF4444' }}>
                         {dashboard.mirror_active ? 'ON' : 'OFF'}
                       </div>
-                      <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Mirror</div>
+                      <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Mirror</div>
                     </div>
                     <div>
                       <div className="text-sm font-semibold" style={{ color: dashboard.frozen_transactions ? '#EF4444' : '#22C55E' }}>
                         {dashboard.frozen_transactions ? 'FROZEN' : 'ACTIVE'}
                       </div>
-                      <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Trades</div>
+                      <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Trades</div>
                     </div>
                   </div>
                 </div>
@@ -210,11 +210,11 @@ export default function SovereignDashboard() {
                 {/* Recent Fees */}
                 {dashboard.recent_fees?.length > 0 && (
                   <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Recent Fees</h3>
+                    <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Recent Fees</h3>
                     <div className="space-y-1.5 max-h-40 overflow-y-auto">
                       {dashboard.recent_fees.map((f, i) => (
                         <div key={i} className="flex items-center justify-between text-[10px] py-1 px-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                          <span style={{ color: 'rgba(248,250,252,0.4)' }}>{f.description}</span>
+                          <span style={{ color: 'rgba(255,255,255,0.7)' }}>{f.description}</span>
                           <span style={{ color: '#FBBF24' }}>+{f.amount}</span>
                         </div>
                       ))}
@@ -246,7 +246,7 @@ export default function SovereignDashboard() {
                     style={{ height: 4 }}
                     data-testid="fee-slider"
                   />
-                  <div className="flex justify-between text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                  <div className="flex justify-between text-[8px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     <span>0%</span>
                     <span>5% default</span>
                     <span>25%</span>
@@ -266,7 +266,7 @@ export default function SovereignDashboard() {
                         <toggle.icon size={14} style={{ color: toggle.color }} />
                         <div>
                           <div className="text-[11px] font-medium" style={{ color: '#F8FAFC' }}>{toggle.label}</div>
-                          <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{toggle.desc}</div>
+                          <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{toggle.desc}</div>
                         </div>
                       </div>
                       <button
@@ -284,7 +284,7 @@ export default function SovereignDashboard() {
                           className="absolute top-0.5 w-4 h-4 rounded-full"
                           animate={{ left: toggle.active ? 20 : 2 }}
                           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                          style={{ background: toggle.active ? toggle.color : 'rgba(255,255,255,0.2)' }}
+                          style={{ background: toggle.active ? toggle.color : 'rgba(255,255,255,0.6)' }}
                         />
                       </button>
                     </div>
@@ -315,7 +315,7 @@ export default function SovereignDashboard() {
                       ].map(s => (
                         <div key={s.label} className="text-center rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
                           <div className="text-sm font-semibold" style={{ color: s.color }}>{s.value}</div>
-                          <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.label}</div>
+                          <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
                         </div>
                       ))}
                     </div>
@@ -362,7 +362,7 @@ export default function SovereignDashboard() {
                     ].map(s => (
                       <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                         <div className="text-lg font-semibold" style={{ color: s.color }}>{s.value}</div>
-                        <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.label}</div>
+                        <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -371,11 +371,11 @@ export default function SovereignDashboard() {
                 {/* Category Breakdown */}
                 {sentinelStats?.categories && Object.keys(sentinelStats.categories).length > 0 && (
                   <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Violation Categories</h3>
+                    <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Violation Categories</h3>
                     <div className="space-y-1.5">
                       {Object.entries(sentinelStats.categories).map(([cat, count]) => (
                         <div key={cat} className="flex items-center justify-between px-2 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                          <span className="text-[10px] capitalize" style={{ color: 'rgba(248,250,252,0.5)' }}>{cat.replace('_', ' ')}</span>
+                          <span className="text-[10px] capitalize" style={{ color: 'rgba(255,255,255,0.75)' }}>{cat.replace('_', ' ')}</span>
                           <span className="text-[10px] font-semibold" style={{ color: '#EF4444' }}>{count}</span>
                         </div>
                       ))}
@@ -385,16 +385,16 @@ export default function SovereignDashboard() {
 
                 {/* Shadow-Muted Users */}
                 <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                  <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Shadow-Muted Users ({sentinelMutes.length})</h3>
+                  <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Shadow-Muted Users ({sentinelMutes.length})</h3>
                   {sentinelMutes.length === 0 ? (
-                    <p className="text-[10px] text-center py-3" style={{ color: 'rgba(248,250,252,0.2)' }}>No muted users</p>
+                    <p className="text-[10px] text-center py-3" style={{ color: 'rgba(255,255,255,0.6)' }}>No muted users</p>
                   ) : (
                     <div className="space-y-1.5 max-h-32 overflow-y-auto">
                       {sentinelMutes.map((m, i) => (
                         <div key={i} className="flex items-center justify-between px-2 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
                           <div>
-                            <div className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{m.user_id}</div>
-                            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{m.reason}</div>
+                            <div className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{m.user_id}</div>
+                            <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{m.reason}</div>
                           </div>
                           <button
                             onClick={async () => {
@@ -420,17 +420,17 @@ export default function SovereignDashboard() {
 
                 {/* Violation Log */}
                 <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                  <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  <h3 className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     Violation Log ({sentinelLog.total} total)
                   </h3>
                   {sentinelLog.entries?.length === 0 ? (
-                    <p className="text-[10px] text-center py-3" style={{ color: 'rgba(248,250,252,0.2)' }}>No violations logged</p>
+                    <p className="text-[10px] text-center py-3" style={{ color: 'rgba(255,255,255,0.6)' }}>No violations logged</p>
                   ) : (
                     <div className="space-y-1.5 max-h-48 overflow-y-auto">
                       {sentinelLog.entries?.map((entry, i) => (
                         <div key={i} className="rounded-lg px-2 py-2" style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.06)' }}>
                           <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[9px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{entry.user_name || entry.user_id}</span>
+                            <span className="text-[9px] font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>{entry.user_name || entry.user_id}</span>
                             <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{
                               background: entry.risk_score > 0.7 ? 'rgba(239,68,68,0.1)' : 'rgba(251,191,36,0.1)',
                               color: entry.risk_score > 0.7 ? '#EF4444' : '#FBBF24',
@@ -438,7 +438,7 @@ export default function SovereignDashboard() {
                               Risk: {(entry.risk_score * 100).toFixed(0)}%
                             </span>
                           </div>
-                          <p className="text-[9px] truncate" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                          <p className="text-[9px] truncate" style={{ color: 'rgba(255,255,255,0.65)' }}>
                             "{entry.content_preview}"
                           </p>
                           <div className="flex gap-1 mt-1">
@@ -463,12 +463,12 @@ export default function SovereignDashboard() {
             {activeTab === 'mirror' && (
               <div className="space-y-2" data-testid="sovereign-mirror">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     Sovereign Mirror ({mirror.total} entries)
                   </span>
                 </div>
                 {mirror.entries.length === 0 ? (
-                  <p className="text-[11px] text-center py-8" style={{ color: 'rgba(248,250,252,0.2)' }}>No mirror entries yet</p>
+                  <p className="text-[11px] text-center py-8" style={{ color: 'rgba(255,255,255,0.6)' }}>No mirror entries yet</p>
                 ) : (
                   mirror.entries.map((entry, i) => (
                     <div key={i} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
@@ -476,14 +476,14 @@ export default function SovereignDashboard() {
                         <span className="text-[10px] font-medium" style={{ color: entry.type === 'purchase' ? '#FBBF24' : '#C084FC' }}>
                           {entry.type === 'purchase' ? 'Purchase' : 'Created'}
                         </span>
-                        <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                        <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           {new Date(entry.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="text-[11px]" style={{ color: '#F8FAFC' }}>
                         {entry.constellation?.name || 'Untitled'}
                       </div>
-                      <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         by {entry.creator_name || entry.buyer_id || 'Unknown'} — {entry.constellation?.module_ids?.length || 0} modules
                       </div>
                       {entry.price > 0 && (
@@ -501,12 +501,12 @@ export default function SovereignDashboard() {
             {activeTab === 'escrow' && (
               <div className="space-y-2" data-testid="sovereign-escrow">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     Escrow Contracts
                   </span>
                 </div>
                 {escrow.length === 0 ? (
-                  <p className="text-[11px] text-center py-8" style={{ color: 'rgba(248,250,252,0.2)' }}>No escrow contracts</p>
+                  <p className="text-[11px] text-center py-8" style={{ color: 'rgba(255,255,255,0.6)' }}>No escrow contracts</p>
                 ) : (
                   escrow.map((contract, i) => {
                     const statusColor = contract.status === 'completed' ? '#22C55E' : contract.status === 'frozen' ? '#EF4444' : '#FBBF24';
@@ -518,7 +518,7 @@ export default function SovereignDashboard() {
                             {contract.status}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                        <div className="flex items-center gap-3 text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                           <span>Total: {contract.total_price}</span>
                           <span>Fee: {contract.sovereign_cut}</span>
                           <span>Seller: {contract.seller_amount}</span>
@@ -535,7 +535,7 @@ export default function SovereignDashboard() {
               <div className="space-y-3" data-testid="sovereign-skeleton">
                 <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <h3 className="text-xs font-medium mb-1" style={{ color: '#F8FAFC' }}>Framework Skeleton Export</h3>
-                  <p className="text-[10px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  <p className="text-[10px] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     Download the Universal Synthesis Interface skeleton — stripped of cosmic paint, ready for white-label domain injection.
                   </p>
                   <button
@@ -557,7 +557,7 @@ export default function SovereignDashboard() {
 
                 {skeleton && (
                   <div className="rounded-xl p-3 overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <div className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Preview</div>
+                    <div className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Preview</div>
                     <pre className="text-[9px] overflow-x-auto max-h-60 overflow-y-auto" style={{ color: 'rgba(192,132,252,0.7)', fontFamily: 'monospace', lineHeight: '1.5' }}>
                       {JSON.stringify(skeleton, null, 2)}
                     </pre>

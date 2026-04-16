@@ -50,7 +50,7 @@ function TabBar({ active, onTab }) {
             style={{
               background: isActive ? 'rgba(252,211,77,0.1)' : 'rgba(255,255,255,0.02)',
               border: `1px solid ${isActive ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.04)'}`,
-              color: isActive ? '#FCD34D' : 'rgba(248,250,252,0.5)',
+              color: isActive ? '#FCD34D' : 'rgba(255,255,255,0.75)',
             }}
             data-testid={`store-tab-${t.id}`}>
             <Icon size={12} />
@@ -82,14 +82,14 @@ function ConsumableCard({ item, onBuy, onUse }) {
               {item.rarity}
             </span>
           </div>
-          <p className="text-[10px] mb-2" style={{ color: 'rgba(248,250,252,0.45)' }}>{item.description}</p>
+          <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.description}</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 <Coins size={10} color="#FCD34D" />
                 <span className="text-[10px] font-bold" style={{ color: '#FCD34D' }}>{item.price_credits}</span>
               </div>
-              <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {item.quantity_per_purchase > 1 ? `×${item.quantity_per_purchase}` : ''} · {item.duration_minutes}min
               </span>
             </div>
@@ -113,7 +113,7 @@ function ConsumableCard({ item, onBuy, onUse }) {
                 disabled={!item.can_afford}
                 style={{
                   background: item.can_afford ? 'rgba(252,211,77,0.12)' : 'rgba(255,255,255,0.03)',
-                  color: item.can_afford ? '#FCD34D' : 'rgba(248,250,252,0.2)',
+                  color: item.can_afford ? '#FCD34D' : 'rgba(255,255,255,0.6)',
                   border: `1px solid ${item.can_afford ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.05)'}`,
                   opacity: item.can_afford ? 1 : 0.5,
                 }}
@@ -149,12 +149,12 @@ function CosmeticCard({ item, onBuy, onEquip }) {
             <h3 className="text-sm font-semibold" style={{ color: '#F8FAFC' }}>{item.name}</h3>
             {item.owned && <Check size={10} color="#22C55E" />}
           </div>
-          <p className="text-[10px] mb-2" style={{ color: 'rgba(248,250,252,0.45)' }}>{item.description}</p>
+          <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.description}</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <Coins size={10} color="#FCD34D" />
               <span className="text-[10px] font-bold" style={{ color: '#FCD34D' }}>{item.price_credits}</span>
-              <span className="text-[8px] ml-1" style={{ color: 'rgba(248,250,252,0.25)' }}>Permanent</span>
+              <span className="text-[8px] ml-1" style={{ color: 'rgba(255,255,255,0.6)' }}>Permanent</span>
             </div>
             {item.owned ? (
               <button onClick={() => onEquip(item.id)}
@@ -169,7 +169,7 @@ function CosmeticCard({ item, onBuy, onEquip }) {
                 className="px-2.5 py-1 rounded-lg text-[9px] font-bold"
                 style={{
                   background: item.can_afford ? 'rgba(252,211,77,0.12)' : 'rgba(255,255,255,0.03)',
-                  color: item.can_afford ? '#FCD34D' : 'rgba(248,250,252,0.2)',
+                  color: item.can_afford ? '#FCD34D' : 'rgba(255,255,255,0.6)',
                   opacity: item.can_afford ? 1 : 0.5,
                 }}
                 data-testid={`buy-cosmetic-${item.id}`}>
@@ -207,7 +207,7 @@ function CreditPackageCard({ pkg, onBuy }) {
           <div>
             <h3 className="text-sm font-semibold" style={{ color: '#F8FAFC' }}>{pkg.name}</h3>
             <div className="flex items-center gap-2">
-              <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{pkg.price_display}</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{pkg.price_display}</span>
               {pkg.bonus > 0 && (
                 <span className="text-[8px] px-1.5 py-0.5 rounded-md font-bold"
                   style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}>
@@ -255,7 +255,7 @@ function NexusPassSection({ nexus, onSubscribe }) {
           </div>
           <div>
             <h2 className="text-base font-bold" style={{ color: '#FCD34D' }}>{nexus.name}</h2>
-            <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{nexus.price_display}</span>
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{nexus.price_display}</span>
           </div>
           {nexus.is_subscribed && (
             <div className="ml-auto px-2 py-1 rounded-lg text-[9px] font-bold"
@@ -265,13 +265,13 @@ function NexusPassSection({ nexus, onSubscribe }) {
           )}
         </div>
 
-        <p className="text-[10px] mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>{nexus.description}</p>
+        <p className="text-[10px] mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>{nexus.description}</p>
 
         <div className="space-y-1.5 mb-4">
           {nexus.perks.map((perk, i) => (
             <div key={i} className="flex items-center gap-2">
               <Star size={8} color="#FCD34D" style={{ flexShrink: 0 }} />
-              <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.6)' }}>{perk}</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.85)' }}>{perk}</span>
             </div>
           ))}
         </div>
@@ -320,7 +320,7 @@ function ActiveEffectsBanner({ effects }) {
               style={{ background: `${meta.color}10`, border: `1px solid ${meta.color}18` }}>
               <Icon size={10} color={meta.color} />
               <span className="text-[8px] font-bold" style={{ color: meta.color }}>{meta.name}</span>
-              <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{remaining}m</span>
+              <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{remaining}m</span>
             </div>
           );
         })}
@@ -468,7 +468,7 @@ export default function CosmicStore() {
                 <div className="flex items-center gap-2 mb-3">
                   <Zap size={14} color="#F59E0B" />
                   <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Consumables</h2>
-                  <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Temporary boosts & tools</span>
+                  <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Temporary boosts & tools</span>
                 </div>
                 {(store?.consumables || []).map(item => (
                   <ConsumableCard key={item.id} item={item} onBuy={handleBuyItem} onUse={handleUseItem} />
@@ -481,7 +481,7 @@ export default function CosmicStore() {
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles size={14} color="#A855F7" />
                   <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Cosmetics</h2>
-                  <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Auras & Premium Themes</span>
+                  <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Auras & Premium Themes</span>
                 </div>
                 {(store?.cosmetics || []).map(item => (
                   <CosmeticCard key={item.id} item={item} onBuy={handleBuyItem} onEquip={handleEquipCosmetic} />
@@ -494,7 +494,7 @@ export default function CosmicStore() {
                 <div className="flex items-center gap-2 mb-3">
                   <Coins size={14} color="#FCD34D" />
                   <h2 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Cosmic Credits</h2>
-                  <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Purchase premium currency</span>
+                  <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Purchase premium currency</span>
                 </div>
 
                 {/* Dev: Grant test credits */}
@@ -541,7 +541,7 @@ export default function CosmicStore() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-[9px] mt-2 text-center" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <p className="text-[9px] mt-2 text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     Sell minerals from Rock Hounding to earn Cosmic Credits
                   </p>
                 </div>

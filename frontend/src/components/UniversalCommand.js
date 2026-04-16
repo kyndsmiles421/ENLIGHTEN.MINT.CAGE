@@ -178,7 +178,7 @@ export default function UniversalCommand() {
         >
           {/* Search Input */}
           <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <Search size={18} style={{ color: 'rgba(255,255,255,0.3)' }} />
+            <Search size={18} style={{ color: 'rgba(255,255,255,0.65)' }} />
             <input
               ref={inputRef}
               type="text"
@@ -207,7 +207,7 @@ export default function UniversalCommand() {
                 return (
                   <div key={`header-${item.label}`} className="px-4 py-2 mt-1 first:mt-0">
                     <span className="text-[9px] uppercase tracking-widest font-semibold" 
-                      style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      style={{ color: 'rgba(255,255,255,0.6)' }}>
                       {item.label}
                     </span>
                   </div>
@@ -253,7 +253,7 @@ export default function UniversalCommand() {
                       {item.label}
                     </span>
                     {item.category && (
-                      <span className="text-[10px] capitalize" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <span className="text-[10px] capitalize" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {item.category}
                       </span>
                     )}
@@ -261,7 +261,7 @@ export default function UniversalCommand() {
 
                   {/* Type Badge */}
                   {item.type === 'recent' && (
-                    <Clock size={12} style={{ color: 'rgba(255,255,255,0.2)' }} />
+                    <Clock size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
                   )}
                   {item.type === 'action' && (
                     <Zap size={12} style={{ color }} />
@@ -276,7 +276,7 @@ export default function UniversalCommand() {
             {selectableResults.length === 0 && query && (
               <div className="px-4 py-8 text-center">
                 <Sparkles size={24} className="mx-auto mb-2" style={{ color: 'rgba(255,255,255,0.15)' }} />
-                <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   No destinations found for "{query}"
                 </p>
               </div>
@@ -290,20 +290,20 @@ export default function UniversalCommand() {
               <div className="flex items-center gap-1">
                 <kbd className="px-1 py-0.5 rounded text-[9px]" 
                   style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>↑↓</kbd>
-                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.25)' }}>Navigate</span>
+                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Navigate</span>
               </div>
               <div className="flex items-center gap-1">
                 <kbd className="px-1 py-0.5 rounded text-[9px]" 
                   style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>↵</kbd>
-                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.25)' }}>Open</span>
+                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Open</span>
               </div>
               <div className="flex items-center gap-1">
                 <kbd className="px-1 py-0.5 rounded text-[9px]" 
                   style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>esc</kbd>
-                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.25)' }}>Close</span>
+                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Close</span>
               </div>
             </div>
-            <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Mesh Network v1
             </span>
           </div>

@@ -73,7 +73,7 @@ export default function ResourceAlchemy() {
             {Object.entries(elements).map(([name, el]) => (
               <div key={name} className="rounded-lg px-3 py-2 text-center" style={{ background: `${el.color}10`, border: `1px solid ${el.color}25`, minWidth: 70 }}>
                 <div className="text-lg font-bold" style={{ color: el.color }}>{inv[name] || 0}</div>
-                <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>{name}</div>
+                <div className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>{name}</div>
               </div>
             ))}
           </div>
@@ -90,12 +90,12 @@ export default function ResourceAlchemy() {
               return (
                 <div key={i} className="flex items-center justify-between p-3 rounded-xl" style={{ background: canForge ? `${outEl.color}08` : 'rgba(255,255,255,0.02)', border: `1px solid ${canForge ? `${outEl.color}20` : 'rgba(255,255,255,0.04)'}` }}>
                   <div>
-                    <div className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>{r.inputs.join(' + ')}</div>
+                    <div className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{r.inputs.join(' + ')}</div>
                     <div className="text-sm font-bold flex items-center gap-1" style={{ color: outEl.color || '#F8FAFC' }}>
                       <ChevronRight size={10} /> {r.output} <span className="text-[9px] font-normal" style={{ color: '#A855F7' }}>+{r.dust_reward} Dust</span>
                     </div>
                   </div>
-                  <button onClick={() => handleForge(i)} disabled={!canForge || forging} className="px-3 py-1.5 rounded-lg text-[10px] font-bold" style={{ background: canForge ? `${outEl.color}15` : 'rgba(255,255,255,0.03)', border: `1px solid ${canForge ? `${outEl.color}30` : 'rgba(255,255,255,0.05)'}`, color: canForge ? outEl.color : 'rgba(248,250,252,0.2)' }} data-testid={`forge-btn-${i}`}>{forging ? '...' : 'Forge'}</button>
+                  <button onClick={() => handleForge(i)} disabled={!canForge || forging} className="px-3 py-1.5 rounded-lg text-[10px] font-bold" style={{ background: canForge ? `${outEl.color}15` : 'rgba(255,255,255,0.03)', border: `1px solid ${canForge ? `${outEl.color}30` : 'rgba(255,255,255,0.05)'}`, color: canForge ? outEl.color : 'rgba(255,255,255,0.6)' }} data-testid={`forge-btn-${i}`}>{forging ? '...' : 'Forge'}</button>
                 </div>
               );
             })}

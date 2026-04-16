@@ -61,14 +61,14 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
 
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <p className="text-[8px] uppercase tracking-[0.2em] font-medium" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <p className="text-[8px] uppercase tracking-[0.2em] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Five Elements Wheel
           </p>
           <NanoGuide guideId="five-elements-wheel" position="top-right" />
         </div>
         {activeElement && (
           <button onClick={() => onElementClick(null)} className="text-[8px] px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)' }}
+            style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)' }}
             data-testid="wheel-clear-filter">Clear</button>
         )}
       </div>
@@ -182,7 +182,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                 </text>
                 {/* Plant count */}
                 <text x={pos.x} y={pos.y + 9} textAnchor="middle"
-                  fill={dimmed ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.35)'}
+                  fill={dimmed ? 'rgba(248,250,252,0.08)' : 'rgba(255,255,255,0.65)'}
                   fontSize={7} fontFamily="monospace"
                   style={{ transition: 'fill 0.2s' }}>
                   {plantCount} plant{plantCount !== 1 ? 's' : ''}
@@ -242,7 +242,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
       {stability && (
         <div className="mx-4 mb-2 flex items-center justify-between px-3 py-1.5 rounded-lg"
           style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
-          <span className="text-[7px] uppercase tracking-[0.15em]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <span className="text-[7px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Energy State
           </span>
           <div className="flex items-center gap-1.5">
@@ -271,7 +271,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ background: activeData.color }} />
                 <span className="text-xs font-medium" style={{ color: activeData.color }}>{activeData.id}</span>
-                <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{activeData.label}</span>
+                <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{activeData.label}</span>
               </div>
               <span className="text-[10px] font-mono" style={{ color: activeData.color }}>
                 {activeData.freq}Hz
@@ -285,7 +285,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
               </p>
               <div className="flex gap-1 items-center">
                 <span className="text-[8px] font-mono px-1.5 py-0.5 rounded"
-                  style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.3)' }}>
+                  style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.65)' }}>
                   Base: 60
                 </span>
                 <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.1)' }}>+</span>
@@ -295,7 +295,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                 </span>
                 <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.1)' }}>+</span>
                 <span className="text-[8px] font-mono px-1.5 py-0.5 rounded"
-                  style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.3)' }}>
+                  style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.65)' }}>
                   Nature + Meridian + Rarity
                 </span>
               </div>
@@ -303,12 +303,12 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
 
             {/* Cycle relationships */}
             <div className="flex gap-3 text-[8px]">
-              <span style={{ color: 'rgba(248,250,252,0.2)' }}>
-                Generates: <span style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)' }}>
+                Generates: <span style={{ color: 'rgba(255,255,255,0.7)' }}>
                   {GENERATING.find(([f]) => f === activeData.id)?.[1]}
                 </span>
               </span>
-              <span style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Controls: <span style={{ color: 'rgba(239,68,68,0.5)' }}>
                   {CONTROLLING.find(([f]) => f === activeData.id)?.[1]}
                 </span>
@@ -377,7 +377,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                     : resonanceData.totals?.forecast === 'strained' ? '#FB923C'
                     : resonanceData.totals?.forecast === 'depleted' ? '#EF4444' : '#A3A3A3'
                 }} />
-                <p className="text-[8px] uppercase tracking-[0.15em] font-medium" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[8px] uppercase tracking-[0.15em] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Energy Forecast
                 </p>
               </div>
@@ -406,7 +406,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                 </div>
                 <span className="text-[7px] font-mono" style={{ color: '#EF4444' }}>-{resonanceData.totals?.conflict || 0}</span>
               </div>
-              <p className="text-[7px] text-center font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <p className="text-[7px] text-center font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Net: {(resonanceData.totals?.net_flow || 0) >= 0 ? '+' : ''}{resonanceData.totals?.net_flow || 0}
               </p>
             </div>
@@ -428,7 +428,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
                           : s.synergy_type === 'controlled' || s.synergy_type === 'controlling' ? '↓'
                           : '·'}
                       </span>
-                      <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{s.plant_name}</span>
+                      <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{s.plant_name}</span>
                       <span className="text-[6px]" style={{ color: 'rgba(248,250,252,0.15)' }}>{s.stage}</span>
                     </div>
                     <span className="text-[8px] font-mono" style={{
@@ -444,7 +444,7 @@ export function FiveElementsWheel({ activeElement, onElementClick, plants = [], 
             {/* Projection */}
             {resonanceData.projection && (
               <div className="px-3 py-2" style={{ background: `${resonanceData.color}05`, borderTop: `1px solid ${resonanceData.color}08` }}>
-                <p className="text-[8px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                <p className="text-[8px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   {resonanceData.projection.recommendation}
                 </p>
               </div>

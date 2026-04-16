@@ -196,7 +196,7 @@ export default function MoodTracker() {
                   style={{
                     background: activeGroup === g.id ? `${g.color}15` : 'rgba(248,250,252,0.03)',
                     border: `1px solid ${activeGroup === g.id ? `${g.color}30` : 'rgba(248,250,252,0.06)'}`,
-                    color: activeGroup === g.id ? g.color : 'rgba(248,250,252,0.5)',
+                    color: activeGroup === g.id ? g.color : 'rgba(255,255,255,0.75)',
                   }}
                   data-testid={`mood-group-${g.id}`}>
                   {g.label}
@@ -227,7 +227,7 @@ export default function MoodTracker() {
                         {selIndex + 1}
                       </span>
                     )}
-                    <Icon size={18} style={{ color: isSelected ? mood.color : 'rgba(248,250,252,0.5)', transition: 'color 0.2s' }} />
+                    <Icon size={18} style={{ color: isSelected ? mood.color : 'rgba(255,255,255,0.75)', transition: 'color 0.2s' }} />
                     <span className="text-[9px] font-medium text-center leading-tight" style={{ color: isSelected ? mood.color : 'var(--text-primary)' }}>
                       {mood.name}
                     </span>
@@ -518,8 +518,8 @@ export default function MoodTracker() {
               <div className="p-5 mb-6">
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={chartData}>
-                    <XAxis dataKey="name" tick={{ fill: 'rgba(248,250,252,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis domain={[0, 10]} tick={{ fill: 'rgba(248,250,252,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, 10]} tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }} axisLine={false} tickLine={false} />
                     <Tooltip
                       contentStyle={{ background: 'rgba(13,14,26,0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#F8FAFC', fontSize: '11px' }}
                     />

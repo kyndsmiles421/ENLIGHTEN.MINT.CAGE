@@ -154,7 +154,7 @@ export default function SovereignHub() {
         <button
           onClick={handleBroadcast}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs transition-all active:scale-95"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(248,250,252,0.5)' }}
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
           data-testid="hub-broadcast"
         >
           <Share2 size={12} /> Broadcast

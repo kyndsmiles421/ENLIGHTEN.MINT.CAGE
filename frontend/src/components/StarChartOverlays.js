@@ -21,11 +21,11 @@ export function BirthConstellationToast({ info, onClose }) {
       className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 w-80 max-w-[90vw] rounded-2xl p-5 text-center"
       style={{ background: 'rgba(0,0,0,0)', border: `1px solid ${color}30`, backdropFilter: 'none', boxShadow: `0 0 40px ${color}15` }}
       data-testid="birth-constellation-toast">
-      <button onClick={onClose} className="absolute top-2 right-2 p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+      <button onClick={onClose} className="absolute top-2 right-2 p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
       <div className="text-2xl mb-1">{info.symbol}</div>
       <p className="text-xs uppercase tracking-[0.25em] mb-1" style={{ color }}>Your Constellation</p>
       <p className="text-base font-semibold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>{info.name}</p>
-      <p className="text-[11px] mt-2 leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{info.meaning}</p>
+      <p className="text-[11px] mt-2 leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{info.meaning}</p>
       <div className="mt-3 flex items-center justify-center gap-1"><Sparkles size={10} style={{ color }} /><span className="text-[10px]" style={{ color }}>Aligned with your cosmic path</span></div>
     </motion.div>
   );
@@ -71,7 +71,7 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
             </div>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5" data-testid="close-mythology-panel">
-            <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </button>
         </div>
       </div>
@@ -85,7 +85,7 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
             </div>
             <div>
               <p className="text-sm font-medium" style={{ color: '#F8FAFC' }}>{myth.figure}</p>
-              <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Mythological Figure</p>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Mythological Figure</p>
             </div>
           </div>
 
@@ -93,20 +93,20 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
           <div className="flex gap-1 mb-3">
             <button onClick={() => setShowMyth(true)}
               className="px-3 py-1.5 rounded-lg text-[10px] font-medium"
-              style={{ background: showMyth ? `${color}12` : 'transparent', color: showMyth ? color : 'rgba(248,250,252,0.35)', border: `1px solid ${showMyth ? `${color}20` : 'rgba(248,250,252,0.06)'}` }}
+              style={{ background: showMyth ? `${color}12` : 'transparent', color: showMyth ? color : 'rgba(255,255,255,0.65)', border: `1px solid ${showMyth ? `${color}20` : 'rgba(248,250,252,0.06)'}` }}
               data-testid="myth-tab">
               <BookOpen size={10} className="inline mr-1" /> Story
             </button>
             <button onClick={() => setShowMyth(false)}
               className="px-3 py-1.5 rounded-lg text-[10px] font-medium"
-              style={{ background: !showMyth ? `${color}12` : 'transparent', color: !showMyth ? color : 'rgba(248,250,252,0.35)', border: `1px solid ${!showMyth ? `${color}20` : 'rgba(248,250,252,0.06)'}` }}>
+              style={{ background: !showMyth ? `${color}12` : 'transparent', color: !showMyth ? color : 'rgba(255,255,255,0.65)', border: `1px solid ${!showMyth ? `${color}20` : 'rgba(248,250,252,0.06)'}` }}>
               <Eye size={10} className="inline mr-1" /> Wisdom
             </button>
           </div>
 
           {showMyth ? (
             <>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(248,250,252,0.65)' }}>{myth.origin_story}</p>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.85)' }}>{myth.origin_story}</p>
               {/* TTS Narrator */}
               <CosmicNarrator text={myth.origin_story} constellationName={constellation.name} color={color} authHeaders={authHeaders} token={token} ELEMENT_COLORS={ELEMENT_COLORS} />
             </>
@@ -117,20 +117,20 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
                 {(myth.spiritual_meaning || []).map((w, i) => (
                   <div key={i} className="flex items-start gap-2 py-1.5">
                     <Sparkles size={10} style={{ color, marginTop: 3, flexShrink: 0 }} />
-                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{w}</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{w}</p>
                   </div>
                 ))}
               </div>
               {myth.ritual_use && (
                 <>
                   <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color }}>Ritual Use</p>
-                  <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'rgba(248,250,252,0.45)' }}>{myth.ritual_use}</p>
+                  <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>{myth.ritual_use}</p>
                 </>
               )}
               {myth.best_viewing && (
                 <div className="p-3 mt-3">
-                  <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(248,250,252,0.3)' }}>Best Viewing</p>
-                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{myth.best_viewing}</p>
+                  <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.65)' }}>Best Viewing</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{myth.best_viewing}</p>
                 </div>
               )}
             </div>
@@ -149,14 +149,14 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
             </button>
             <button onClick={() => navigate('/star-chart')}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px]"
-              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.35)' }}>
+              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.65)' }}>
               <ChevronRight size={10} /> More Stories
             </button>
           </div>
         </div>
       ) : (
         <div className="px-5 pb-5 text-center py-8">
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>No mythology data available for this constellation.</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>No mythology data available for this constellation.</p>
         </div>
       )}
     </motion.div>
@@ -187,7 +187,7 @@ export function JourneyOverlay({ constellations, active, currentIdx, phase, onPl
                   {currentIdx + 1}/{constellations.length}
                 </span>
               </div>
-              <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 {phase === 'moving' ? 'Navigating to constellation...' : phase === 'narrating' ? 'Listening to the story...' : phase === 'waiting' ? 'Preparing next story...' : current.mythology?.figure || current.symbol}
               </p>
             </div>
@@ -221,7 +221,7 @@ export function JourneyOverlay({ constellations, active, currentIdx, phase, onPl
           <button onClick={onStop} data-testid="journey-stop-btn"
             className="w-8 h-8 rounded-full flex items-center justify-center"
             style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}>
-            <X size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <X size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
           <button onClick={isPaused ? onPlay : onPause} data-testid="journey-play-pause-btn"
             className="w-12 h-12 rounded-full flex items-center justify-center"
@@ -231,7 +231,7 @@ export function JourneyOverlay({ constellations, active, currentIdx, phase, onPl
           <button onClick={onSkip} data-testid="journey-skip-btn"
             className="w-8 h-8 rounded-full flex items-center justify-center"
             style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}>
-            <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
         </div>
       </div>
@@ -264,7 +264,7 @@ export function JourneyComplete({ count, onClose, authHeaders, token }) {
       <div className="text-center max-w-sm px-6">
         <div className="text-4xl mb-3">&#10024;</div>
         <p className="text-lg font-bold mb-1" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>Journey Complete</p>
-        <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.45)' }}>
+        <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.75)' }}>
           You've traversed {count} constellations and heard their ancient stories. The cosmos has shared its wisdom with you.
         </p>
         <div className="flex gap-2 justify-center">
@@ -323,10 +323,10 @@ export function CelestialBadgesPanel({ onClose, token, authHeaders }) {
               {data && <p className="text-[10px]" style={{ color: '#C084FC' }}>{data.total_earned}/{data.total_badges} earned</p>}
             </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
         </div>
         {data && (
-          <div className="flex gap-3 text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <div className="flex gap-3 text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             <span>{data.stats.constellations_explored} explored</span>
             <span>{data.stats.stories_listened} stories</span>
             <span>{data.stats.journeys_completed} journeys</span>
@@ -350,20 +350,20 @@ export function CelestialBadgesPanel({ onClose, token, authHeaders }) {
                   boxShadow: badge.earned ? `0 0 12px ${color}20` : 'none',
                   opacity: badge.earned ? 1 : 0.4,
                 }}>
-                <Icon size={16} style={{ color: badge.earned ? color : 'rgba(248,250,252,0.2)' }} />
+                <Icon size={16} style={{ color: badge.earned ? color : 'rgba(255,255,255,0.6)' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <p className="text-[11px] font-semibold truncate" style={{ color: badge.earned ? '#F8FAFC' : 'rgba(248,250,252,0.35)' }}>{badge.name}</p>
+                  <p className="text-[11px] font-semibold truncate" style={{ color: badge.earned ? '#F8FAFC' : 'rgba(255,255,255,0.65)' }}>{badge.name}</p>
                   {badge.earned && <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>Earned</span>}
                 </div>
-                <p className="text-[9px] truncate" style={{ color: 'rgba(248,250,252,0.25)' }}>{badge.description}</p>
+                <p className="text-[9px] truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>{badge.description}</p>
                 {!badge.earned && (
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
                       <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
                     </div>
-                    <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{badge.progress}/{badge.target}</span>
+                    <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{badge.progress}/{badge.target}</span>
                   </div>
                 )}
               </div>

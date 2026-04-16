@@ -113,7 +113,7 @@ export default function CosmicMoodRing() {
       const sC = parseColor(colors.secondary);
 
       const coreGrad = ctx.createRadialGradient(cx - 5, cy - 5, 2, cx, cy, coreR);
-      coreGrad.addColorStop(0, `rgba(255,255,255,0.3)`);
+      coreGrad.addColorStop(0, `rgba(255,255,255,0.65)`);
       coreGrad.addColorStop(0.3, `rgba(${pC.r},${pC.g},${pC.b},0.7)`);
       coreGrad.addColorStop(0.7, `rgba(${sC.r},${sC.g},${sC.b},0.4)`);
       coreGrad.addColorStop(1, `rgba(${sC.r},${sC.g},${sC.b},0)`);
@@ -123,7 +123,7 @@ export default function CosmicMoodRing() {
       ctx.fill();
 
       const gleamGrad = ctx.createRadialGradient(cx - 8, cy - 10, 0, cx - 8, cy - 10, 12);
-      gleamGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
+      gleamGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
       gleamGrad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = gleamGrad;
       ctx.beginPath();

@@ -941,7 +941,7 @@ function NotificationInbox({ notifications, onClose, onMarkRead, onMarkAllRead, 
                   {!n.read && <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#C084FC' }} />}
                 </div>
                 <p className="text-[9px] mt-0.5 line-clamp-2" style={{ color: 'var(--text-muted)' }}>{n.message}</p>
-                <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[8px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {n.created_at ? new Date(n.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
                 </p>
               </div>

@@ -117,12 +117,12 @@ export default function FloatingAssistant() {
                 </div>
                 <div>
                   <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>Sage Assistant</p>
-                  <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.4)' }}>AI guide & help</p>
+                  <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.7)' }}>AI guide & help</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg hover:bg-white/5 transition-all"
                 data-testid="close-assistant">
-                <X size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                <X size={14} style={{ color: 'rgba(255,255,255,0.75)' }} />
               </button>
             </div>
 
@@ -146,7 +146,7 @@ export default function FloatingAssistant() {
               {messages.length === 0 && (
                 <div className="text-center py-6">
                   <Sparkles size={20} style={{ color: 'rgba(192,132,252,0.3)', margin: '0 auto 8px' }} />
-                  <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     {token ? 'Ask me anything about wellness, the app, or your spiritual path.' : 'Sign in to chat with Sage'}
                   </p>
                 </div>
@@ -157,7 +157,7 @@ export default function FloatingAssistant() {
                   <div className="max-w-[85%] px-3 py-2 rounded-xl text-[11px] leading-relaxed"
                     style={{
                       background: m.role === 'user' ? 'rgba(192,132,252,0.1)' : 'rgba(248,250,252,0.03)',
-                      color: m.role === 'user' ? '#D8B4FE' : 'rgba(248,250,252,0.7)',
+                      color: m.role === 'user' ? '#D8B4FE' : 'rgba(255,255,255,0.9)',
                       border: `1px solid ${m.role === 'user' ? 'rgba(192,132,252,0.15)' : 'rgba(248,250,252,0.04)'}`,
                     }}>
                     {m.text}

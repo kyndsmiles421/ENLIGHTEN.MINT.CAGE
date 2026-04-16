@@ -166,7 +166,7 @@ const DustWalletWidget = React.memo(({
             key={i}
             className="w-1.5 h-1.5 rounded-full transition-all"
             style={{
-              background: i <= depth ? '#FFD700' : 'rgba(255,255,255,0.2)',
+              background: i <= depth ? '#FFD700' : 'rgba(255,255,255,0.6)',
               boxShadow: i === depth ? '0 0 8px #FFD700' : 'none',
             }}
           />
@@ -385,7 +385,7 @@ const HexagramTrackerRing = React.memo(({
             cx={50 + 45 * Math.cos((angle * Math.PI) / 180)}
             cy={50 + 45 * Math.sin((angle * Math.PI) / 180)}
             r={isActive ? 4 : 2}
-            fill={isActive ? ringGlow : 'rgba(255,255,255,0.3)'}
+            fill={isActive ? ringGlow : 'rgba(255,255,255,0.65)'}
             animate={{
               scale: isActive ? [1, 1.3, 1] : 1,
             }}

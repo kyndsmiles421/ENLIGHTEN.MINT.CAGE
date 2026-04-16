@@ -110,11 +110,11 @@ export default function Archives() {
           <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
             style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
             data-testid="archives-back-btn">
-            <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
           <div>
             <h1 className="text-xl font-light tracking-[0.2em] uppercase"
-              style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+              style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
               The Deep-Dive Archives
             </h1>
             <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -127,7 +127,7 @@ export default function Archives() {
           {/* Left — Entry List */}
           <div className="col-span-3 space-y-2 overflow-y-auto pr-2" style={{ maxHeight: 'calc(100vh - 140px)' }}>
             <p className="text-[9px] font-medium tracking-[0.15em] uppercase mb-3"
-              style={{ color: 'rgba(248,250,252,0.2)' }}>Archives</p>
+              style={{ color: 'rgba(255,255,255,0.6)' }}>Archives</p>
             {entries.map(entry => (
               <motion.button key={entry.id}
                 className="w-full text-left p-3 rounded-lg transition-all"
@@ -140,14 +140,14 @@ export default function Archives() {
                 data-testid={`archive-entry-${entry.id}`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium" style={{ color: entry.unlocked ? 'rgba(248,250,252,0.6)' : 'rgba(248,250,252,0.2)' }}>
+                  <span className="text-xs font-medium" style={{ color: entry.unlocked ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)' }}>
                     {entry.title}
                   </span>
                   {!entry.unlocked ? <Lock size={10} style={{ color: 'rgba(248,250,252,0.15)' }} /> : <ChevronRight size={10} style={{ color: 'rgba(248,250,252,0.15)' }} />}
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[8px] px-1.5 py-0.5 rounded-full"
-                    style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.25)' }}>
+                    style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.6)' }}>
                     {CATEGORY_LABELS[entry.category] || entry.category}
                   </span>
                   <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -155,7 +155,7 @@ export default function Archives() {
                   </span>
                 </div>
                 {Object.entries(entry.scripts_preview || {}).map(([lang, data]) => (
-                  <span key={lang} className="text-[10px] mr-2" style={{ color: LANG_COLORS[lang] || 'rgba(248,250,252,0.3)' }}>
+                  <span key={lang} className="text-[10px] mr-2" style={{ color: LANG_COLORS[lang] || 'rgba(255,255,255,0.65)' }}>
                     {data.original}
                   </span>
                 ))}
@@ -164,7 +164,7 @@ export default function Archives() {
 
             {/* Comparative Linguistics */}
             <p className="text-[9px] font-medium tracking-[0.15em] uppercase mt-6 mb-3"
-              style={{ color: 'rgba(248,250,252,0.2)' }}>Comparative Linguistics</p>
+              style={{ color: 'rgba(255,255,255,0.6)' }}>Comparative Linguistics</p>
             {linguistics.map(c => (
               <button key={c.id}
                 className="w-full text-left p-3 rounded-lg mb-1"
@@ -175,8 +175,8 @@ export default function Archives() {
                 onClick={() => loadConcept(c.id)}
                 data-testid={`linguistics-${c.id}`}
               >
-                <span className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>{c.concept}</span>
-                <span className="text-[8px] ml-2 font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{c.concept}</span>
+                <span className="text-[8px] ml-2 font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {c.language_count} languages
                 </span>
               </button>
@@ -191,11 +191,11 @@ export default function Archives() {
                 border: '1px solid rgba(248,250,252,0.04)',
               }}>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-medium" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                  <h2 className="text-base font-medium" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {selectedEntry.title}
                   </h2>
                   <span className="text-[8px] px-2 py-1 rounded-full font-mono"
-                    style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)' }}>
+                    style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)' }}>
                     Mass: {selectedEntry.gravity_mass}
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export default function Archives() {
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-medium tracking-wider uppercase transition-all"
                       style={{
                         background: activeLayer === tab.id ? 'rgba(192,132,252,0.12)' : 'rgba(248,250,252,0.03)',
-                        color: activeLayer === tab.id ? '#C084FC' : 'rgba(248,250,252,0.25)',
+                        color: activeLayer === tab.id ? '#C084FC' : 'rgba(255,255,255,0.6)',
                         border: `1px solid ${activeLayer === tab.id ? 'rgba(192,132,252,0.2)' : 'rgba(248,250,252,0.04)'}`,
                       }}
                       onClick={() => setActiveLayer(tab.id)}
@@ -226,15 +226,15 @@ export default function Archives() {
                 <AnimatePresence mode="wait">
                   {activeLayer === 'origin' && (
                     <motion.div key="origin" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-                      <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(248,250,252,0.55)' }}>
+                      <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
                         {selectedEntry.trinity?.origin?.text}
                       </p>
                       <div className="flex items-center gap-2 mb-3">
                         <span className="text-[8px] px-2 py-0.5 rounded-full"
-                          style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)' }}>
+                          style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)' }}>
                           {selectedEntry.trinity?.origin?.language}
                         </span>
-                        <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                        <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           {selectedEntry.trinity?.origin?.script}
                         </span>
                       </div>
@@ -246,7 +246,7 @@ export default function Archives() {
                             className="px-3 py-1.5 rounded-full text-[9px] font-medium tracking-wider uppercase"
                             style={{
                               background: selectedLang === lang ? `${LANG_COLORS[lang]}15` : 'rgba(248,250,252,0.03)',
-                              color: selectedLang === lang ? LANG_COLORS[lang] : 'rgba(248,250,252,0.25)',
+                              color: selectedLang === lang ? LANG_COLORS[lang] : 'rgba(255,255,255,0.6)',
                               border: `1px solid ${selectedLang === lang ? `${LANG_COLORS[lang]}30` : 'rgba(248,250,252,0.04)'}`,
                             }}
                             onClick={() => { setSelectedLang(lang); setSelectedCharIdx(0); }}
@@ -262,14 +262,14 @@ export default function Archives() {
                           <p className="text-3xl mb-1" style={{ color: LANG_COLORS[selectedLang], fontFamily: 'serif' }}>
                             {currentScript.original}
                           </p>
-                          <p className="text-[10px] font-mono" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                          <p className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>
                             {currentScript.transliteration}
                           </p>
                           {currentScript.evolution && (
                             <div className="flex items-center gap-2 mt-2">
                               {currentScript.evolution.map((era, i) => (
                                 <React.Fragment key={i}>
-                                  <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{era}</span>
+                                  <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{era}</span>
                                   {i < currentScript.evolution.length - 1 && <ChevronRight size={8} style={{ color: 'rgba(248,250,252,0.1)' }} />}
                                 </React.Fragment>
                               ))}
@@ -282,13 +282,13 @@ export default function Archives() {
 
                   {activeLayer === 'synthesis' && (
                     <motion.div key="synthesis" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-                      <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(248,250,252,0.55)' }}>
+                      <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
                         {selectedEntry.trinity?.synthesis?.text}
                       </p>
                       {selectedEntry.trinity?.synthesis?.connections?.length > 0 && (
                         <div className="mt-3">
                           <p className="text-[8px] font-medium tracking-wider uppercase mb-2"
-                            style={{ color: 'rgba(248,250,252,0.2)' }}>Connected Nodes</p>
+                            style={{ color: 'rgba(255,255,255,0.6)' }}>Connected Nodes</p>
                           <div className="flex flex-wrap gap-2">
                             {selectedEntry.trinity.synthesis.connections.map(c => (
                               <button key={c} className="px-2.5 py-1 rounded-full text-[9px]"
@@ -315,8 +315,8 @@ export default function Archives() {
                           { label: 'Element', value: selectedEntry.trinity?.frequency?.element },
                         ].map(item => (
                           <div key={item.label} className="p-3 rounded-lg" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.03)' }}>
-                            <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>{item.label}</p>
-                            <p className="text-sm font-mono mt-1" style={{ color: 'rgba(248,250,252,0.5)' }}>{item.value}</p>
+                            <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.label}</p>
+                            <p className="text-sm font-mono mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.value}</p>
                           </div>
                         ))}
                       </div>
@@ -338,7 +338,7 @@ export default function Archives() {
                 border: '1px solid rgba(248,250,252,0.04)', minHeight: 400,
               }}>
                 <Lock size={32} style={{ color: 'rgba(248,250,252,0.1)' }} />
-                <p className="text-sm mt-4" style={{ color: 'rgba(248,250,252,0.3)' }}>{selectedEntry.title}</p>
+                <p className="text-sm mt-4" style={{ color: 'rgba(255,255,255,0.65)' }}>{selectedEntry.title}</p>
                 <p className="text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.15)' }}>{selectedEntry.locked_reason}</p>
               </div>
             ) : conceptData ? (
@@ -346,10 +346,10 @@ export default function Archives() {
                 background: 'rgba(0,0,0,0)', backdropFilter: 'none',
                 border: '1px solid rgba(248,250,252,0.04)',
               }}>
-                <h2 className="text-base font-medium mb-4" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                <h2 className="text-base font-medium mb-4" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                   {conceptData.concept}
                 </h2>
-                <p className="text-[9px] mb-4" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <p className="text-[9px] mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   One concept, many civilizations. Click to hear the phonetic frequency.
                 </p>
                 <div className="space-y-2">
@@ -366,13 +366,13 @@ export default function Archives() {
                           {data.word}
                         </span>
                         <div className="text-left">
-                          <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{data.transliteration}</p>
-                          <p className="text-[8px] uppercase tracking-wider" style={{ color: LANG_COLORS[lang] || 'rgba(248,250,252,0.2)' }}>{lang}</p>
+                          <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>{data.transliteration}</p>
+                          <p className="text-[8px] uppercase tracking-wider" style={{ color: LANG_COLORS[lang] || 'rgba(255,255,255,0.6)' }}>{lang}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-mono" style={{ color: 'rgba(248,250,252,0.25)' }}>{data.frequency}Hz</span>
-                        <Volume2 size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
+                        <span className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>{data.frequency}Hz</span>
+                        <Volume2 size={10} style={{ color: 'rgba(255,255,255,0.6)' }} />
                       </div>
                     </motion.button>
                   ))}
@@ -397,7 +397,7 @@ export default function Archives() {
               }}>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                    <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       Stroke Tracing
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: LANG_COLORS[selectedLang] || '#A78BFA' }}>
@@ -405,12 +405,12 @@ export default function Archives() {
                     </p>
                   </div>
                   <span className="text-[8px] font-mono px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.25)' }}>
+                    style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.6)' }}>
                     {currentChar.frequency}Hz
                   </span>
                 </div>
 
-                <p className="text-[9px] mb-3" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[9px] mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {currentChar.meaning}
                 </p>
 
@@ -429,7 +429,7 @@ export default function Archives() {
                         className="px-2 py-1 rounded text-[9px]"
                         style={{
                           background: i === selectedCharIdx ? `${LANG_COLORS[selectedLang]}15` : 'rgba(248,250,252,0.03)',
-                          color: i === selectedCharIdx ? LANG_COLORS[selectedLang] : 'rgba(248,250,252,0.2)',
+                          color: i === selectedCharIdx ? LANG_COLORS[selectedLang] : 'rgba(255,255,255,0.6)',
                         }}
                         onClick={() => setSelectedCharIdx(i)}
                       >

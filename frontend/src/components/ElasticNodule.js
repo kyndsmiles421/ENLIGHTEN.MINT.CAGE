@@ -306,7 +306,7 @@ export function ElasticNoduleWeb({
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: '1.2rem',
-          color: 'rgba(255,255,255,0.3)',
+          color: 'rgba(255,255,255,0.65)',
           pointerEvents: 'none',
         }}
       >

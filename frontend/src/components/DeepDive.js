@@ -63,7 +63,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
               {loading ? (
                 <div className="flex items-center gap-3 py-8">
                   <Loader2 size={18} className="animate-spin" style={{ color }} />
-                  <p className="text-sm" style={{ color: 'rgba(248,250,252,0.5)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Channeling deep knowledge...</p>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Channeling deep knowledge...</p>
                 </div>
               ) : content ? (
                 <div>
@@ -98,7 +98,7 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
                         return (
                           <div key={i} className="flex gap-3 ml-2 mb-1">
                             <span className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: color, opacity: 0.5 }} />
-                            <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.65)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{trimmed.replace(/^[-•] /, '')}</p>
+                            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{trimmed.replace(/^[-•] /, '')}</p>
                           </div>
                         );
                       }
@@ -111,18 +111,18 @@ export default function DeepDive({ topic, category, context, color = '#D8B4FE', 
                               style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>
                               {num}
                             </span>
-                            <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.65)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{text}</p>
+                            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{text}</p>
                           </div>
                         );
                       }
-                      return <p key={i} className="text-sm leading-relaxed mb-2" style={{ color: 'rgba(248,250,252,0.65)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{trimmed}</p>;
+                      return <p key={i} className="text-sm leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.85)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{trimmed}</p>;
                     })}
                   </div>
 
                   {/* Collapse button */}
                   <button onClick={() => setOpen(false)}
                     className="mt-4 flex items-center gap-1.5 text-xs"
-                    style={{ color: 'rgba(248,250,252,0.3)' }}
+                    style={{ color: 'rgba(255,255,255,0.65)' }}
                     data-testid="deep-dive-collapse">
                     <ChevronUp size={10} /> Collapse
                   </button>

@@ -81,14 +81,14 @@ function CodexDetailPanel({ planet, onClose, onDive }) {
           <span className="text-xs font-medium" style={{ color: planet.color }}>{planet.label}</span>
         </div>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-white/5">
-          <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+          <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
         </button>
       </div>
       <div className="p-4 space-y-2">
         {data?.type === 'section' && (
           <>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 {data.entries.length} entries in this section
               </span>
               {planet.subPlanets && (
@@ -111,7 +111,7 @@ function CodexDetailPanel({ planet, onClose, onDive }) {
                   {e.locked ? <Lock size={10} style={{ color: 'rgba(248,250,252,0.15)' }} />
                     : <div className="w-2 h-2 rounded-full" style={{ background: planet.color }} />}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] truncate" style={{ color: e.locked ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.5)' }}>
+                    <p className="text-[10px] truncate" style={{ color: e.locked ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.75)' }}>
                       {e.title}
                     </p>
                     {e.min_tier && (
@@ -130,13 +130,13 @@ function CodexDetailPanel({ planet, onClose, onDive }) {
             {data.entry.locked ? (
               <div className="text-center py-4">
                 <Lock size={20} className="mx-auto mb-2" style={{ color: 'rgba(248,250,252,0.1)' }} />
-                <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Requires {data.entry.min_tier} tier to unlock
                 </p>
               </div>
             ) : (
               <>
-                <p className="text-[10px] mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
                   {data.entry.excerpt || data.entry.content?.substring(0, 200)}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
@@ -255,10 +255,10 @@ export default function CodexOrbital() {
           <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
             style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
             data-testid="codex-orbital-back">
-            <ArrowLeft size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <ArrowLeft size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
           <span className="text-[9px] uppercase tracking-[0.15em]"
-            style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}>
+            style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
             Codex Orbital
           </span>
           {cosmicState?.hexagram && (
@@ -285,7 +285,7 @@ export default function CodexOrbital() {
         <button onClick={() => navigate('/codex')}
           className="px-3 py-1.5 rounded-full text-[8px] font-medium uppercase tracking-wider"
           style={{
-            background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.3)',
+            background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)',
             border: '1px solid rgba(248,250,252,0.06)',
           }}
           data-testid="switch-to-full-codex">

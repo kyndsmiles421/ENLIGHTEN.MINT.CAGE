@@ -764,7 +764,7 @@ export default function OrbitalMixer() {
           style={{
             background: resonanceOpen ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${resonanceOpen ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)'}`,
-            color: resonanceOpen ? '#FBBF24' : 'rgba(248,250,252,0.4)',
+            color: resonanceOpen ? '#FBBF24' : 'rgba(255,255,255,0.7)',
             fontSize: '9px',
             cursor: 'pointer',
           }}
@@ -780,7 +780,7 @@ export default function OrbitalMixer() {
           style={{
             background: hexGridOpen ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${hexGridOpen ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)'}`,
-            color: hexGridOpen ? '#FBBF24' : 'rgba(248,250,252,0.4)',
+            color: hexGridOpen ? '#FBBF24' : 'rgba(255,255,255,0.7)',
             fontSize: '9px',
             cursor: 'pointer',
           }}
@@ -796,7 +796,7 @@ export default function OrbitalMixer() {
           style={{
             background: communityOpen ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${communityOpen ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.06)'}`,
-            color: communityOpen ? '#2DD4BF' : 'rgba(248,250,252,0.4)',
+            color: communityOpen ? '#2DD4BF' : 'rgba(255,255,255,0.7)',
             fontSize: '9px',
             cursor: 'pointer',
           }}
@@ -818,7 +818,7 @@ export default function OrbitalMixer() {
           style={{
             background: constellationOpen ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${constellationOpen ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)'}`,
-            color: constellationOpen ? '#C084FC' : 'rgba(248,250,252,0.4)',
+            color: constellationOpen ? '#C084FC' : 'rgba(255,255,255,0.7)',
             fontSize: '9px',
             cursor: 'pointer',
           }}
@@ -835,7 +835,7 @@ export default function OrbitalMixer() {
             style={{
               background: focusMode ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',
               border: `1px solid ${focusMode ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.06)'}`,
-              color: focusMode ? '#C084FC' : 'rgba(248,250,252,0.4)',
+              color: focusMode ? '#C084FC' : 'rgba(255,255,255,0.7)',
               fontSize: '9px',
               cursor: 'pointer',
             }}
@@ -958,7 +958,7 @@ export default function OrbitalMixer() {
             style={{
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
-              color: 'rgba(248,250,252,0.35)',
+              color: 'rgba(255,255,255,0.65)',
               fontSize: '9px',
               cursor: 'pointer',
             }}
@@ -998,7 +998,7 @@ export default function OrbitalMixer() {
             <div className="flex items-center justify-between mb-1">
               <span className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(192,132,252,0.5)' }}>Archetype</span>
               <button onClick={() => setClassPickerOpen(false)} className="p-0.5 rounded hover:bg-white/5">
-                <X size={9} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <X size={9} style={{ color: 'rgba(255,255,255,0.65)' }} />
               </button>
             </div>
             {['shaman', 'nomad', 'architect', 'merchant'].map(cid => {
@@ -1038,7 +1038,7 @@ export default function OrbitalMixer() {
       {activeModuleObjects.length === 0 && (
         <div className="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
           <span className="text-[10px] px-3 py-1 rounded-full"
-            style={{ background: 'rgba(0,0,0,0)', color: 'rgba(248,250,252,0.3)', border: '1px solid rgba(255,255,255,0.04)' }}>
+            style={{ background: 'rgba(0,0,0,0)', color: 'rgba(255,255,255,0.65)', border: '1px solid rgba(255,255,255,0.04)' }}>
             Drag or tap bubbles to activate
           </span>
         </div>

@@ -79,7 +79,7 @@ export default function Nourishment() {
               className="px-5 py-2 rounded-full text-sm"
               style={{
                 background: filter === c.key ? 'rgba(255,255,255,0.1)' : 'transparent',
-                border: `1px solid ${filter === c.key ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                border: `1px solid ${filter === c.key ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.06)'}`,
                 color: filter === c.key ? 'var(--text-primary)' : 'var(--text-muted)',
                 transition: 'background 0.3s, border-color 0.3s, color 0.3s',
               }}

@@ -106,7 +106,7 @@ export default function AvatarCustomizer({ onSave }) {
               }}
               data-testid={`avatar-symbol-${s}`}>
               <svg viewBox="0 0 24 24" width={14} height={14} fill="none"
-                stroke={avatar.symbol === s ? avatar.color : 'rgba(248,250,252,0.2)'} strokeWidth={1.5}>
+                stroke={avatar.symbol === s ? avatar.color : 'rgba(255,255,255,0.6)'} strokeWidth={1.5}>
                 <path d={SYMBOL_PATHS[s] || SYMBOL_PATHS.star} />
               </svg>
             </button>

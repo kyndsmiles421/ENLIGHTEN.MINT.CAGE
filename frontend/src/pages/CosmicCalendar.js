@@ -114,7 +114,7 @@ export default function CosmicCalendar() {
             style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.15)', backdropFilter: 'none'}}>
             <div className="absolute inset-0 opacity-5"
               style={{ background: 'radial-gradient(circle at 50% 50%, #D8B4FE, transparent 70%)' }} />
-            <p className="text-sm leading-relaxed relative z-10" style={{ color: 'rgba(248,250,252,0.75)' }}>{data.energy_summary}</p>
+            <p className="text-sm leading-relaxed relative z-10" style={{ color: 'rgba(255,255,255,0.9)' }}>{data.energy_summary}</p>
           </div>
         )}
 
@@ -136,7 +136,7 @@ export default function CosmicCalendar() {
                       style={{ background: 'rgba(216,180,254,0.08)' }}>
                       <Icon size={12} style={{ color: '#D8B4FE' }} />
                     </div>
-                    <span className="text-[11px] leading-snug" style={{ color: 'rgba(248,250,252,0.6)' }}>{s.text}</span>
+                    <span className="text-[11px] leading-snug" style={{ color: 'rgba(255,255,255,0.85)' }}>{s.text}</span>
                     <ChevronRight size={12} className="ml-auto flex-shrink-0" style={{ color: 'rgba(248,250,252,0.15)' }} />
                   </button>
                 );
@@ -158,7 +158,7 @@ export default function CosmicCalendar() {
                       <span className="text-lg font-bold" style={{ color: item.data?.color }}>{item.data?.number}</span>
                     </div>
                     <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{item.data?.theme}</p>
-                    <p className="text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.4)' }}>{item.data?.advice}</p>
+                    <p className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.data?.advice}</p>
                   </div>
                 ))}
               </div>
@@ -169,10 +169,10 @@ export default function CosmicCalendar() {
               <div className="text-center py-4">
                 <p className="text-5xl mb-3">{MOON_EMOJIS[m?.code] || '🌕'}</p>
                 <p className="text-lg font-bold mb-1" style={{ color: '#F8FAFC' }}>{m?.phase}</p>
-                <p className="text-xs mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>Moon age: {m?.age} days</p>
+                <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>Moon age: {m?.age} days</p>
                 <div className="rounded-xl p-3 mt-3 text-left" style={{ background: 'rgba(147,197,253,0.06)', border: '1px solid rgba(147,197,253,0.12)' }}>
                   <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>Guidance</p>
-                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{m?.guidance}</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{m?.guidance}</p>
                 </div>
               </div>
             </CosmicCard>
@@ -180,7 +180,7 @@ export default function CosmicCalendar() {
             {/* Mayan */}
             <CosmicCard title="Mayan Tzolk'in" icon={Compass} color="#A78BFA" link="/mayan">
               <div className="text-center py-3">
-                <p className="text-xs mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>Kin {my?.kin}</p>
+                <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Kin {my?.kin}</p>
                 <p className="text-lg font-bold mb-1" style={{ color: '#F8FAFC' }}>{my?.galactic_signature}</p>
                 <div className="flex gap-2 justify-center mt-3">
                   <div className="rounded-xl p-3 flex-1" style={{ background: 'rgba(167,139,250,0.06)', border: '1px solid rgba(167,139,250,0.12)' }}>
@@ -206,7 +206,7 @@ export default function CosmicCalendar() {
                   </div>
                 </div>
                 <p className="text-lg font-bold" style={{ color: '#F8FAFC' }}>{c?.card}</p>
-                <p className="text-xs mt-1" style={{ color: 'rgba(248,250,252,0.4)' }}>Your energetic card for today</p>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Your energetic card for today</p>
               </div>
             </CosmicCard>
           </div>
@@ -229,7 +229,7 @@ export default function CosmicCalendar() {
                   className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:scale-[1.01]"
                   style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
                   <Moon size={12} style={{ color: '#818CF8' }} />
-                  <span className="text-xs truncate flex-1" style={{ color: 'rgba(248,250,252,0.6)' }}>{d.title || 'Untitled'}</span>
+                  <span className="text-xs truncate flex-1" style={{ color: 'rgba(255,255,255,0.85)' }}>{d.title || 'Untitled'}</span>
                   <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(129,140,248,0.08)', color: '#818CF8' }}>{d.moon_phase}</span>
                 </button>
               ))}

@@ -256,7 +256,7 @@ function SkinPicker({ onClose }) {
             style={{ background: isLocked ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${isLocked ? 'rgba(139,92,246,0.3)' : 'rgba(255,255,255,0.08)'}` }}
             data-testid="skin-lock-toggle">
             {isLocked ? <Lock size={12} className="text-purple-400" /> : <Unlock size={12} className="text-white/40" />}
-            <span className="text-[8px] font-bold" style={{ color: isLocked ? '#A78BFA' : 'rgba(255,255,255,0.3)' }}>{isLocked ? 'Locked' : 'Auto'}</span>
+            <span className="text-[8px] font-bold" style={{ color: isLocked ? '#A78BFA' : 'rgba(255,255,255,0.65)' }}>{isLocked ? 'Locked' : 'Auto'}</span>
           </button>
           <button onClick={onClose} className="p-2 rounded-lg active:scale-90" style={{ background: 'rgba(255,255,255,0.05)' }}>
             <X size={16} className="text-white/60" />

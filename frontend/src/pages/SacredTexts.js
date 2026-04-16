@@ -163,7 +163,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
         <div className="flex items-center gap-3">
           <button onClick={onClose} data-testid="close-vr-reader"
             className="p-2 rounded-lg hover:bg-white/5 transition-colors">
-            <Minimize2 size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <Minimize2 size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: text.color }}>{text.tradition}</p>
@@ -178,7 +178,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
             {['slow', 'normal', 'fast'].map(s => (
               <button key={s} onClick={() => setAnimationSpeed(s)}
                 className="px-2 py-0.5 rounded text-[9px] capitalize transition-all"
-                style={{ background: animationSpeed === s ? `${text.color}15` : 'transparent', color: animationSpeed === s ? text.color : 'rgba(248,250,252,0.25)' }}>
+                style={{ background: animationSpeed === s ? `${text.color}15` : 'transparent', color: animationSpeed === s ? text.color : 'rgba(255,255,255,0.6)' }}>
                 {s}
               </button>
             ))}
@@ -186,7 +186,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
           {/* Particles toggle */}
           <button onClick={() => setShowParticles(p => !p)} data-testid="toggle-particles"
             className="p-1.5 rounded-lg transition-colors"
-            style={{ background: showParticles ? `${text.color}10` : 'rgba(255,255,255,0.04)', color: showParticles ? text.color : 'rgba(248,250,252,0.2)' }}>
+            style={{ background: showParticles ? `${text.color}10` : 'rgba(255,255,255,0.04)', color: showParticles ? text.color : 'rgba(255,255,255,0.6)' }}>
             <Sparkles size={14} />
           </button>
         </div>
@@ -216,9 +216,9 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
                 {paused ? <Play size={14} style={{ color: text.color }} /> : <Pause size={14} style={{ color: text.color }} />}
               </button>
               <button onClick={stopNarration} className="p-2 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <VolumeX size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <VolumeX size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
               </button>
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {narrating ? (paused ? 'Paused' : 'Narrating...') : ''}
               </span>
             </>
@@ -252,7 +252,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
           {paragraphs.length > 0 && (
             <div className="mb-10">
               <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center"
-                style={{ color: 'rgba(248,250,252,0.2)' }}>The Retelling</p>
+                style={{ color: 'rgba(255,255,255,0.6)' }}>The Retelling</p>
               {paragraphs.map((para, i) => {
                 const idx = paraIdx++;
                 return (
@@ -261,7 +261,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
                     animate={idx < revealedParagraphs ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     className="text-base md:text-lg leading-[2] mb-5 text-center"
-                    style={{ color: 'rgba(248,250,252,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {para}
                   </motion.p>
                 );
@@ -283,7 +283,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
           {excerptParagraphs.length > 0 && (
             <div className="mb-10">
               <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center"
-                style={{ color: 'rgba(248,250,252,0.2)' }}>Sacred Passages</p>
+                style={{ color: 'rgba(255,255,255,0.6)' }}>Sacred Passages</p>
               {excerptParagraphs.map((para, i) => {
                 const idx = paraIdx++;
                 return (
@@ -294,7 +294,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
                     className="mb-5 pl-4 py-2"
                     style={{ borderLeft: `2px solid ${text.color}30` }}>
                     <p className="text-sm md:text-base leading-[1.9] italic"
-                      style={{ color: 'rgba(248,250,252,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
+                      style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                       {para}
                     </p>
                   </motion.div>
@@ -313,7 +313,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
                 <div className="flex-1 h-px" style={{ background: `${text.color}15` }} />
               </motion.div>
               <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center"
-                style={{ color: 'rgba(248,250,252,0.2)' }}>Deeper Meaning</p>
+                style={{ color: 'rgba(255,255,255,0.6)' }}>Deeper Meaning</p>
               {commentaryParagraphs.map((para, i) => {
                 const idx = paraIdx++;
                 return (
@@ -322,7 +322,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
                     animate={idx < revealedParagraphs ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.6 }}
                     className="text-sm leading-[1.9] mb-4 text-center"
-                    style={{ color: 'rgba(248,250,252,0.5)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {para}
                   </motion.p>
                 );
@@ -372,7 +372,7 @@ function TextCard({ text, onSelect, index }) {
           </motion.div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>{text.title}</p>
-            <div className="flex items-center gap-2 mt-0.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <div className="flex items-center gap-2 mt-0.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <span>{text.tradition}</span>
               <span>&middot;</span>
               <span>{text.era}</span>
@@ -381,12 +381,12 @@ function TextCard({ text, onSelect, index }) {
           <ChevronRight size={14} style={{ color: 'rgba(248,250,252,0.12)' }} className="group-hover:translate-x-1 transition-transform" />
         </div>
 
-        <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
           {text.description.length > 120 ? text.description.slice(0, 120) + '...' : text.description}
         </p>
 
         <div className="flex items-center justify-between">
-          <span className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <span className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <BookOpen size={9} /> {text.chapter_count} chapters
           </span>
           {progressPct > 0 && (
@@ -481,7 +481,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
           </button>
           <button onClick={() => { stopNarration(); onClose(); }}
             className="p-1.5 rounded-lg hover:bg-white/5 transition-colors" data-testid="close-inline-reader">
-            <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </button>
         </div>
       </div>
@@ -505,7 +505,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
             </button>
             <button onClick={stopNarration}
               className="p-1.5 rounded-lg hover:bg-white/5 transition-all"
-              style={{ color: 'rgba(248,250,252,0.4)' }}>
+              style={{ color: 'rgba(255,255,255,0.7)' }}>
               <X size={12} />
             </button>
             <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: `${text.color}10` }}>
@@ -520,7 +520,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
       {/* Text content */}
       <div className="px-5 py-6 max-h-[60vh] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
         {!hasContent ? (
-          <p className="text-center text-sm py-8" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <p className="text-center text-sm py-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
             This chapter has not been generated yet. Tap it from the chapter list to generate.
           </p>
         ) : (
@@ -532,7 +532,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05, duration: 0.4 }}
                 className="text-sm leading-[2] mb-5"
-                style={{ color: 'rgba(248,250,252,0.75)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>
+                style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>
                 {para}
               </motion.p>
             ))}
@@ -577,7 +577,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 + i * 0.08 }}
                     className="text-xs leading-[1.9] mb-4"
-                    style={{ color: 'rgba(248,250,252,0.45)', fontFamily: 'Cormorant Garamond, serif' }}>
+                    style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {para}
                   </motion.p>
                 ))}
@@ -594,7 +594,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
           <button
             onClick={() => prevCh.generated ? onClose() || setTimeout(() => document.querySelector(`[data-testid="chapter-${prevCh.id}"]`)?.click(), 100) : null}
             className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
-            style={{ color: prevCh.generated ? 'rgba(248,250,252,0.5)' : 'rgba(248,250,252,0.15)' }}
+            style={{ color: prevCh.generated ? 'rgba(255,255,255,0.75)' : 'rgba(248,250,252,0.15)' }}
             disabled={!prevCh.generated}
             data-testid="prev-chapter">
             <ArrowLeft size={10} /> {prevCh.title?.slice(0, 20)}{prevCh.title?.length > 20 ? '...' : ''}
@@ -604,7 +604,7 @@ function InlineReader({ chapter, text, textDetail, onClose, onVR, authHeaders })
           <button
             onClick={() => nextCh.generated ? onClose() || setTimeout(() => document.querySelector(`[data-testid="chapter-${nextCh.id}"]`)?.click(), 100) : null}
             className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
-            style={{ color: nextCh.generated ? 'rgba(248,250,252,0.5)' : 'rgba(248,250,252,0.15)' }}
+            style={{ color: nextCh.generated ? 'rgba(255,255,255,0.75)' : 'rgba(248,250,252,0.15)' }}
             disabled={!nextCh.generated}
             data-testid="next-chapter">
             {nextCh.title?.slice(0, 20)}{nextCh.title?.length > 20 ? '...' : ''} <ChevronRight size={10} />
@@ -636,14 +636,14 @@ function ChapterRowItem({ index, style, text, chapters, onGenerate, onRead, onVR
         >
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
-              style={{ background: ch.generated ? `${text.color}12` : 'rgba(248,250,252,0.03)', border: `1px solid ${ch.generated ? text.color + '20' : 'rgba(248,250,252,0.06)'}`, color: ch.generated ? text.color : 'rgba(248,250,252,0.2)' }}>
+              style={{ background: ch.generated ? `${text.color}12` : 'rgba(248,250,252,0.03)', border: `1px solid ${ch.generated ? text.color + '20' : 'rgba(248,250,252,0.06)'}`, color: ch.generated ? text.color : 'rgba(255,255,255,0.6)' }}>
               {ch.number}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" style={{ color: ch.generated ? '#F8FAFC' : 'rgba(248,250,252,0.5)' }}>
+              <p className="text-xs font-medium truncate" style={{ color: ch.generated ? '#F8FAFC' : 'rgba(255,255,255,0.75)' }}>
                 {ch.title}
               </p>
-              <p className="text-[9px] mt-0.5" style={{ color: ch.generated ? `${text.color}80` : 'rgba(248,250,252,0.2)' }}>
+              <p className="text-[9px] mt-0.5" style={{ color: ch.generated ? `${text.color}80` : 'rgba(255,255,255,0.6)' }}>
                 {ch.generated ? 'Tap to read' : 'Tap to generate with AI'}
               </p>
             </div>
@@ -877,14 +877,14 @@ export default function SacredTexts() {
 
         {/* Search */}
         <div className="relative mb-6">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
           <input type="text" placeholder="Search by title, tradition, or region..."
             value={searchQuery} onChange={e => setSearchQuery(e.target.value)} data-testid="sacred-search"
             className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs"
             style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC', outline: 'none' }} />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+              <X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
             </button>
           )}
         </div>
@@ -892,7 +892,7 @@ export default function SacredTexts() {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="animate-spin mr-3" size={20} style={{ color: '#C084FC' }} />
-            <span className="text-sm" style={{ color: 'rgba(248,250,252,0.4)' }}>Loading sacred library...</span>
+            <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Loading sacred library...</span>
           </div>
         )}
 
@@ -903,7 +903,7 @@ export default function SacredTexts() {
             {!loading && filtered.length === 0 && (
               <div className="text-center py-16">
                 <BookOpen size={28} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.15)' }} />
-                <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No texts match your search</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>No texts match your search</p>
               </div>
             )}
             <VirtualizedTextGrid
@@ -925,12 +925,12 @@ export default function SacredTexts() {
                     <div className="flex items-center justify-between mb-4">
                       <button onClick={() => { setSelectedText(null); setTextDetail(null); }}
                         className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg lg:hidden hover:bg-white/5 transition-colors"
-                        style={{ color: 'rgba(248,250,252,0.4)' }} data-testid="close-text-mobile">
+                        style={{ color: 'rgba(255,255,255,0.7)' }} data-testid="close-text-mobile">
                         <ArrowLeft size={10} /> Back
                       </button>
                       <button onClick={() => { setSelectedText(null); setTextDetail(null); }}
                         className="hidden lg:block p-1 rounded hover:bg-white/5" data-testid="close-text-desktop">
-                        <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                        <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
                       </button>
                     </div>
 
@@ -945,7 +945,7 @@ export default function SacredTexts() {
                         <p className="text-lg font-bold" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>
                           {selectedText.title}
                         </p>
-                        <div className="flex items-center gap-3 text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                        <div className="flex items-center gap-3 text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                           <span>{selectedText.tradition}</span>
                           <span>&middot;</span>
                           <span>{selectedText.region}</span>
@@ -955,7 +955,7 @@ export default function SacredTexts() {
                       </div>
                     </div>
 
-                    <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.45)' }}>
+                    <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
                       {selectedText.description}
                     </p>
 
@@ -974,7 +974,7 @@ export default function SacredTexts() {
                   {/* Chapters */}
                   <div className="px-6 pb-6">
                     <p className="text-[9px] uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5 mt-2"
-                      style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      style={{ color: 'rgba(255,255,255,0.6)' }}>
                       <Layers size={9} /> Chapters
                     </p>
 

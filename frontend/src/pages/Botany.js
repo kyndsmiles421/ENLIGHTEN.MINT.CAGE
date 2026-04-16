@@ -58,14 +58,14 @@ function PlantCard({ plant, onSelect, selected }) {
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center"
             style={{ background: `${plant.element_color}15`, border: `1px solid ${plant.element_color}25` }}>
-            {plant.locked ? <Lock size={14} style={{ color: 'rgba(248,250,252,0.2)' }} />
+            {plant.locked ? <Lock size={14} style={{ color: 'rgba(255,255,255,0.6)' }} />
               : <ElemIcon size={16} style={{ color: plant.element_color }} />}
           </div>
           <div>
-            <p className="text-xs font-medium" style={{ color: plant.locked ? 'rgba(248,250,252,0.25)' : 'rgba(248,250,252,0.7)' }}>
+            <p className="text-xs font-medium" style={{ color: plant.locked ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.9)' }}>
               {plant.name}
             </p>
-            <p className="text-[9px] italic" style={{ color: 'rgba(248,250,252,0.2)' }}>{plant.latin}</p>
+            <p className="text-[9px] italic" style={{ color: 'rgba(255,255,255,0.6)' }}>{plant.latin}</p>
           </div>
         </div>
         <span className="text-[8px] px-1.5 py-0.5 rounded-full font-medium"
@@ -85,14 +85,14 @@ function PlantCard({ plant, onSelect, selected }) {
               style={{ background: `${plant.element_color}15`, color: plant.element_color, border: `1px solid ${plant.element_color}25` }}>
               {plant.element}
             </span>
-            <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {plant.frequency}Hz
             </span>
           </div>
           <div className="flex flex-wrap gap-1">
             {plant.properties.slice(0, 3).map(p => (
               <span key={p} className="text-[8px] px-1.5 py-0.5 rounded"
-                style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.35)' }}>{p}</span>
+                style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.65)' }}>{p}</span>
             ))}
           </div>
         </>
@@ -127,7 +127,7 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
             <h2 className="text-base font-medium" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif' }}>
               {plant.name}
             </h2>
-            <p className="text-[9px] italic" style={{ color: 'rgba(248,250,252,0.3)' }}>{plant.latin} | {plant.family}</p>
+            <p className="text-[9px] italic" style={{ color: 'rgba(255,255,255,0.65)' }}>{plant.latin} | {plant.family}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
               <Leaf size={10} /> In Garden
             </span>
           )}
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={14} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5"><X size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
             <div className="flex flex-wrap gap-1">
               {plant.meridians.map(m => (
                 <span key={m} className="text-[9px] px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.45)' }}>{m}</span>
+                  style={{ background: 'rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.75)' }}>{m}</span>
               ))}
             </div>
           </div>
@@ -194,8 +194,8 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(plant.energetic_profile).map(([k, v]) => (
                 <div key={k}>
-                  <p className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{k.replace(/_/g, ' ')}</p>
-                  <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{v}</p>
+                  <p className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{k.replace(/_/g, ' ')}</p>
+                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{v}</p>
                 </div>
               ))}
             </div>
@@ -209,7 +209,7 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
             {plant.tcm_actions.map((a, i) => (
               <div key={i} className="flex items-start gap-2">
                 <ChevronRight size={10} className="mt-0.5 shrink-0" style={{ color: plant.element_color }} />
-                <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.55)' }}>{a}</p>
+                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.8)' }}>{a}</p>
               </div>
             ))}
           </div>
@@ -218,13 +218,13 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
         {/* Traditional Use */}
         <div>
           <p className="text-[8px] uppercase tracking-[0.15em] mb-2" style={{ color: plant.element_color }}>Traditional Use</p>
-          <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>{plant.traditional_use}</p>
+          <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{plant.traditional_use}</p>
         </div>
 
         {/* Spiritual */}
         <div className="rounded-lg p-3" style={{ background: 'rgba(192,132,252,0.05)', border: '1px solid rgba(192,132,252,0.1)' }}>
           <p className="text-[8px] uppercase tracking-[0.15em] mb-1" style={{ color: '#C084FC' }}>Spiritual Resonance</p>
-          <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>{plant.spiritual}</p>
+          <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{plant.spiritual}</p>
         </div>
 
         {/* Trade Value + Growing */}
@@ -233,17 +233,17 @@ function PlantDetail({ plant, onClose, onAddToGarden, gardenIds }) {
             <div className="rounded-lg p-3" style={{ background: 'rgba(234,179,8,0.05)', border: '1px solid rgba(234,179,8,0.1)' }}>
               <p className="text-[8px] uppercase tracking-[0.15em] mb-1.5" style={{ color: '#EAB308' }}>Trade Value</p>
               <p className="text-lg font-mono" style={{ color: '#EAB308' }}>{plant.trade_value.base_credits}<span className="text-[9px] ml-1">credits</span></p>
-              <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[8px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Season x{plant.trade_value.seasonal_multiplier}
               </p>
             </div>
           )}
           {plant.growing && (
             <div className="rounded-lg p-3" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
-              <p className="text-[8px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(248,250,252,0.3)' }}>Growing</p>
-              <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Zone {plant.growing.zone}</p>
-              <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{plant.growing.sun}</p>
-              <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{plant.growing.years_to_harvest}yr harvest</p>
+              <p className="text-[8px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.65)' }}>Growing</p>
+              <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Zone {plant.growing.zone}</p>
+              <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{plant.growing.sun}</p>
+              <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{plant.growing.years_to_harvest}yr harvest</p>
             </div>
           )}
         </div>
@@ -280,19 +280,19 @@ function GardenPanel({ garden, summary, onNurture, nurturing }) {
       {/* Garden Summary */}
       {summary && (
         <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)' }}>
-          <p className="text-[8px] uppercase tracking-[0.15em] mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>Garden Energetics</p>
+          <p className="text-[8px] uppercase tracking-[0.15em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Garden Energetics</p>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
               <p className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.15)' }}>Dominant</p>
-              <p className="text-xs font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{summary.dominant_element}</p>
+              <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>{summary.dominant_element}</p>
             </div>
             <div>
               <p className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.15)' }}>Nature</p>
-              <p className="text-xs font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{summary.dominant_nature}</p>
+              <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>{summary.dominant_nature}</p>
             </div>
             <div>
               <p className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.15)' }}>Frequency</p>
-              <p className="text-xs font-mono" style={{ color: 'rgba(248,250,252,0.5)' }}>{summary.garden_frequency}Hz</p>
+              <p className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.75)' }}>{summary.garden_frequency}Hz</p>
             </div>
           </div>
         </div>
@@ -308,8 +308,8 @@ function GardenPanel({ garden, summary, onNurture, nurturing }) {
             <div className="flex items-center gap-2">
               <Leaf size={14} style={{ color: g.element === 'Fire' ? '#EF4444' : g.element === 'Water' ? '#3B82F6' : '#22C55E' }} />
               <div>
-                <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.6)' }}>{g.plant_name}</p>
-                <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{g.stage} | Nurtured {g.nurture_count}x</p>
+                <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>{g.plant_name}</p>
+                <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{g.stage} | Nurtured {g.nurture_count}x</p>
               </div>
             </div>
             <button
@@ -360,19 +360,19 @@ function IdentifyPanel({ onIdentify, identifying, result }) {
         {result && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             className="rounded-lg p-3" style={{ background: `${result.element_color || '#A3A3A3'}08`, border: `1px solid ${result.element_color || '#A3A3A3'}15` }}>
-            <p className="text-xs font-medium mb-1" style={{ color: 'rgba(248,250,252,0.7)' }}>
-              {result.name} {result.latin ? <span className="italic text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>({result.latin})</span> : null}
+            <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              {result.name} {result.latin ? <span className="italic text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>({result.latin})</span> : null}
             </p>
             <div className="flex gap-1.5 mb-2">
               <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${result.element_color}15`, color: result.element_color }}>{result.element}</span>
               <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${result.nature_color}15`, color: result.nature_color }}>{result.nature}</span>
-              <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.3)' }}>{result.frequency}Hz</span>
+              <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>{result.frequency}Hz</span>
             </div>
             {result.tcm_actions && result.tcm_actions.map((a, i) => (
-              <p key={i} className="text-[9px] ml-2" style={{ color: 'rgba(248,250,252,0.4)' }}>- {a}</p>
+              <p key={i} className="text-[9px] ml-2" style={{ color: 'rgba(255,255,255,0.7)' }}>- {a}</p>
             ))}
             {result.preparation_suggestion && (
-              <p className="text-[9px] mt-2 italic" style={{ color: 'rgba(248,250,252,0.35)' }}>{result.preparation_suggestion}</p>
+              <p className="text-[9px] mt-2 italic" style={{ color: 'rgba(255,255,255,0.65)' }}>{result.preparation_suggestion}</p>
             )}
           </motion.div>
         )}
@@ -521,11 +521,11 @@ export default function Botany() {
             <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
               style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
               data-testid="botany-back-btn">
-              <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+              <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
             </button>
             <div>
               <h1 className="text-xl font-light tracking-[0.2em] uppercase"
-                style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+                style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
                 Botanical Codex
               </h1>
               <div className="flex items-center gap-1.5">
@@ -542,7 +542,7 @@ export default function Botany() {
                 className="px-3 py-1.5 rounded-full text-[9px] font-medium tracking-wider uppercase"
                 style={{
                   background: view === v ? 'rgba(34,197,94,0.12)' : 'rgba(248,250,252,0.03)',
-                  color: view === v ? '#22C55E' : 'rgba(248,250,252,0.25)',
+                  color: view === v ? '#22C55E' : 'rgba(255,255,255,0.6)',
                   border: `1px solid ${view === v ? 'rgba(34,197,94,0.25)' : 'rgba(248,250,252,0.04)'}`,
                 }}
                 data-testid={`view-${v}-btn`}>
@@ -558,7 +558,7 @@ export default function Botany() {
             <div className="col-span-4 space-y-3">
               {/* Search */}
               <div className="relative">
-                <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+                <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
                 <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                   placeholder="Search plants, elements, properties..."
                   className="w-full pl-8 pr-3 py-2 rounded-lg text-[10px]"
@@ -572,7 +572,7 @@ export default function Botany() {
                   className="px-2 py-1 rounded-full text-[8px] font-medium"
                   style={{
                     background: !elementFilter ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.02)',
-                    color: !elementFilter ? 'rgba(248,250,252,0.5)' : 'rgba(248,250,252,0.2)',
+                    color: !elementFilter ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.6)',
                     border: `1px solid ${!elementFilter ? 'rgba(248,250,252,0.12)' : 'rgba(248,250,252,0.04)'}`,
                   }}
                   data-testid="filter-all">All</button>
@@ -583,7 +583,7 @@ export default function Botany() {
                       className="flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-medium"
                       style={{
                         background: elementFilter === elem ? `${color}15` : 'rgba(248,250,252,0.02)',
-                        color: elementFilter === elem ? color : 'rgba(248,250,252,0.2)',
+                        color: elementFilter === elem ? color : 'rgba(255,255,255,0.6)',
                         border: `1px solid ${elementFilter === elem ? `${color}30` : 'rgba(248,250,252,0.04)'}`,
                       }}
                       data-testid={`filter-${elem.toLowerCase()}`}>
@@ -645,7 +645,7 @@ export default function Botany() {
                       transition: 'width 0.5s',
                     }} />
                   </div>
-                  <div className="flex justify-between text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                  <div className="flex justify-between text-[7px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     <span>{balanceScore.balance_score || 0}/100</span>
                     {balanceScore.next_tier && <span>{balanceScore.points_to_next}pts to {balanceScore.next_tier.name}</span>}
                   </div>
@@ -653,8 +653,8 @@ export default function Botany() {
                   <div className="mt-2 space-y-1">
                     {balanceScore.breakdown && Object.values(balanceScore.breakdown).map(b => (
                       <div key={b.label} className="flex items-center justify-between">
-                        <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{b.label}</span>
-                        <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.35)' }}>{b.score}/{b.max}</span>
+                        <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{b.label}</span>
+                        <span className="text-[7px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>{b.score}/{b.max}</span>
                       </div>
                     ))}
                   </div>
@@ -664,13 +664,13 @@ export default function Botany() {
               {/* Quick garden view */}
               <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0)', border: '1px solid rgba(248,250,252,0.04)' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[8px] uppercase tracking-[0.15em]" style={{ color: 'rgba(248,250,252,0.2)' }}>My Garden</p>
+                  <p className="text-[8px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.6)' }}>My Garden</p>
                   <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>{garden.length}/24</span>
                 </div>
                 {garden.slice(0, 5).map(g => (
                   <div key={g.id} className="flex items-center gap-2 py-1">
                     <Leaf size={10} style={{ color: '#22C55E' }} />
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{g.plant_name}</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{g.plant_name}</span>
                     <span className="text-[7px] ml-auto" style={{ color: 'rgba(248,250,252,0.15)' }}>{g.stage}</span>
                   </div>
                 ))}

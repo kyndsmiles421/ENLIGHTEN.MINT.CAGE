@@ -147,7 +147,7 @@ export default function NotificationSettings({ onClose }) {
 
       <div className="p-4 space-y-4">
         {!supported ? (
-          <p className="text-xs text-center py-4" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
             Push notifications are not supported in this browser.
           </p>
         ) : loading ? (
@@ -168,12 +168,12 @@ export default function NotificationSettings({ onClose }) {
               data-testid="notification-toggle-btn"
             >
               <div className="flex items-center gap-2.5">
-                {isSubscribed ? <Bell size={14} style={{ color: '#C084FC' }} /> : <BellOff size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />}
+                {isSubscribed ? <Bell size={14} style={{ color: '#C084FC' }} /> : <BellOff size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />}
                 <div className="text-left">
-                  <p className="text-[11px] font-medium" style={{ color: isSubscribed ? '#C084FC' : 'rgba(248,250,252,0.6)' }}>
+                  <p className="text-[11px] font-medium" style={{ color: isSubscribed ? '#C084FC' : 'rgba(255,255,255,0.85)' }}>
                     {isSubscribed ? 'Notifications Active' : 'Enable Notifications'}
                   </p>
-                  <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {isSubscribed ? 'Quantum field connected' : 'Receive daily cosmic reminders'}
                   </p>
                 </div>
@@ -181,14 +181,14 @@ export default function NotificationSettings({ onClose }) {
               <div className={`w-8 h-4 rounded-full relative transition-all ${subscribing ? 'opacity-50' : ''}`}
                 style={{ background: isSubscribed ? 'rgba(192,132,252,0.4)' : 'rgba(248,250,252,0.1)' }}>
                 <div className="absolute top-0.5 w-3 h-3 rounded-full transition-all"
-                  style={{ left: isSubscribed ? '18px' : '2px', background: isSubscribed ? '#C084FC' : 'rgba(248,250,252,0.3)' }} />
+                  style={{ left: isSubscribed ? '18px' : '2px', background: isSubscribed ? '#C084FC' : 'rgba(255,255,255,0.65)' }} />
               </div>
             </button>
 
             {/* Preferences */}
             {isSubscribed && (
               <div className="space-y-2" data-testid="notification-preferences">
-                <p className="text-[9px] uppercase tracking-widest font-bold" style={{ color: 'rgba(248,250,252,0.25)' }}>Preferences</p>
+                <p className="text-[9px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Preferences</p>
                 {prefItems.map(({ key, label, desc, icon: Icon, color }) => (
                   <button key={key} onClick={() => updatePref(key, !prefs[key])}
                     className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all hover:bg-white/[0.02]"
@@ -198,8 +198,8 @@ export default function NotificationSettings({ onClose }) {
                     <div className="flex items-center gap-2">
                       <Icon size={12} style={{ color: prefs[key] ? color : 'rgba(248,250,252,0.15)' }} />
                       <div className="text-left">
-                        <p className="text-[10px] font-medium" style={{ color: prefs[key] ? 'rgba(248,250,252,0.7)' : 'rgba(248,250,252,0.3)' }}>{label}</p>
-                        <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{desc}</p>
+                        <p className="text-[10px] font-medium" style={{ color: prefs[key] ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.65)' }}>{label}</p>
+                        <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{desc}</p>
                       </div>
                     </div>
                     <div className="w-3.5 h-3.5 rounded flex items-center justify-center"
@@ -212,7 +212,7 @@ export default function NotificationSettings({ onClose }) {
                 {/* Test notification */}
                 {/* Reminder Times */}
                 <div className="space-y-2 mt-1">
-                  <p className="text-[8px] uppercase tracking-widest font-bold" style={{ color: 'rgba(248,250,252,0.25)' }}>Reminder Times</p>
+                  <p className="text-[8px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Reminder Times</p>
                   {[
                     { key: 'reminder_hour', label: 'Morning', desc: 'Superposition activation' },
                     { key: 'evening_hour', label: 'Evening', desc: 'Wave-function settling' },
@@ -220,14 +220,14 @@ export default function NotificationSettings({ onClose }) {
                     <div key={key} className="flex items-center justify-between px-3 py-1.5 rounded-lg"
                       style={{ border: '1px solid rgba(248,250,252,0.03)' }}>
                       <div>
-                        <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>{label}</p>
-                        <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{desc}</p>
+                        <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>{label}</p>
+                        <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{desc}</p>
                       </div>
                       <select
                         value={prefs[key]}
                         onChange={(e) => updatePref(key, parseInt(e.target.value))}
                         className="text-[10px] rounded px-1.5 py-0.5 outline-none"
-                        style={{ background: 'rgba(248,250,252,0.05)', color: 'rgba(248,250,252,0.5)', border: '1px solid rgba(248,250,252,0.08)' }}
+                        style={{ background: 'rgba(248,250,252,0.05)', color: 'rgba(255,255,255,0.75)', border: '1px solid rgba(248,250,252,0.08)' }}
                         data-testid={`notification-time-${key}`}
                       >
                         {Array.from({ length: 24 }, (_, i) => (
@@ -244,8 +244,8 @@ export default function NotificationSettings({ onClose }) {
                   style={{ border: '1px solid rgba(248,250,252,0.05)' }}
                   data-testid="notification-test-btn"
                 >
-                  <TestTube size={11} style={{ color: 'rgba(248,250,252,0.3)' }} />
-                  <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                  <TestTube size={11} style={{ color: 'rgba(255,255,255,0.65)' }} />
+                  <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                     {sendingTest ? 'Sending...' : 'Send Test Notification'}
                   </span>
                 </button>

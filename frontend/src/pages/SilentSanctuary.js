@@ -259,7 +259,7 @@ export default function SilentSanctuary() {
         .void-label {
           font-size: 0.6rem;
           letter-spacing: 0.3em;
-          color: rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.65);
           margin-top: 10px;
         }
         
@@ -273,7 +273,7 @@ export default function SilentSanctuary() {
           right: 20px;
           font-size: 0.6rem;
           letter-spacing: 0.2em;
-          color: rgba(255,255,255,0.2);
+          color: rgba(255,255,255,0.6);
           cursor: pointer;
           transition: color 0.3s;
           z-index: 100;
@@ -383,7 +383,7 @@ export default function SilentSanctuary() {
         .action-btn {
           padding: 10px 20px;
           background: transparent;
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.6);
           color: white;
           font-size: 0.6rem;
           letter-spacing: 0.15em;

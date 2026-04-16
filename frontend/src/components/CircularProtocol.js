@@ -211,7 +211,7 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
                 </div>
                 
                 <div className="mt-3 pt-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                  <p className="text-[10px] text-center font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <p className="text-[10px] text-center font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     {ledgerData.formula} • Trust Equity: ${ledgerData.trust_equity.toLocaleString()}
                   </p>
                 </div>
@@ -302,12 +302,12 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
                   <span className="text-lg" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     ${previewValue.base_value}
                   </span>
-                  <ArrowRight size={14} style={{ color: 'rgba(255,255,255,0.3)' }} />
+                  <ArrowRight size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
                   <span className="text-2xl font-bold" style={{ color: '#6366F1' }}>
                     ${previewValue.final_value}
                   </span>
                 </div>
-                <p className="text-[9px] mt-1 font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-[9px] mt-1 font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   Base: ${previewValue.volunteer_rate}/hr × {previewValue.hours}h × {previewValue.multiplier}× + Singularity
                 </p>
               </div>
@@ -360,7 +360,7 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
                   <span className="text-xs font-medium" style={{ color: '#22C55E' }}>
                     Trade Confirmed
                   </span>
-                  <span className="text-[9px] font-mono ml-auto" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <span className="text-[9px] font-mono ml-auto" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     {recentTrade.trade_id}
                   </span>
                 </div>
@@ -376,7 +376,7 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
             {/* Fractal Layer Visualization */}
             {ledgerData && ledgerData.entries.length > 0 && (
               <div className="pt-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                <p className="text-[10px] mb-2 uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-[10px] mb-2 uppercase" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   L² Fractal Layers (Recent Trades)
                 </p>
                 <div className="flex gap-1 flex-wrap">
@@ -407,7 +407,7 @@ const CircularProtocol = ({ isOpen, onClose, gpsVerified = false }) => {
             <p className="text-[10px]" style={{ color: 'rgba(34,197,94,0.6)' }}>
               CIRCULAR PROTOCOL: VALUE NEVER LEAKS
             </p>
-            <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Enlighten.Mint.Sovereign.Trust
             </p>
           </div>

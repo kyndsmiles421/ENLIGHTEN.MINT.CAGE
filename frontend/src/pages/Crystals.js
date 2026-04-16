@@ -114,7 +114,7 @@ function CrystalNarrator({ crystalId, color }) {
             Listen to Crystal Guide
           </button>
         ) : state === 'loading' ? (
-          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
             <Loader2 size={12} className="animate-spin" style={{ color }} /> Channeling crystal energy...
           </div>
         ) : (
@@ -127,7 +127,7 @@ function CrystalNarrator({ crystalId, color }) {
             <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: `${color}10` }}>
               <motion.div className="h-full rounded-full" style={{ background: color }} animate={{ width: `${progress * 100}%` }} transition={{ duration: 0.2 }} />
             </div>
-            <button onClick={stop} className="p-1"><VolumeX size={10} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+            <button onClick={stop} className="p-1"><VolumeX size={10} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
           </>
         )}
       </div>
@@ -165,7 +165,7 @@ function VRCrystalView({ crystal, onClose }) {
         style={{ background: 'linear-gradient(180deg, rgba(6,7,14,0.9) 0%, transparent 100%)' }}>
         <div className="flex items-center gap-3">
           <button onClick={onClose} data-testid="close-vr-crystal" className="p-2 rounded-lg hover:bg-white/5">
-            <Minimize2 size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <Minimize2 size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: crystal.color }}>{crystal.aka}</p>
@@ -173,7 +173,7 @@ function VRCrystalView({ crystal, onClose }) {
           </div>
         </div>
         <button onClick={() => setShowParticles(p => !p)} className="p-1.5 rounded-lg"
-          style={{ background: showParticles ? `${crystal.color}10` : 'rgba(255,255,255,0.04)', color: showParticles ? crystal.color : 'rgba(248,250,252,0.2)' }}>
+          style={{ background: showParticles ? `${crystal.color}10` : 'rgba(255,255,255,0.04)', color: showParticles ? crystal.color : 'rgba(255,255,255,0.6)' }}>
           <Sparkles size={14} />
         </button>
       </div>
@@ -212,9 +212,9 @@ function VRCrystalView({ crystal, onClose }) {
           <motion.div initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
             animate={0 < revealed ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ duration: 0.8 }} className="mb-8">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-3 text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Essence</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-3 text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>Essence</p>
             <p className="text-base leading-[1.9] text-center"
-              style={{ color: 'rgba(248,250,252,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
+              style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
               {crystal.description}
             </p>
           </motion.div>
@@ -227,7 +227,7 @@ function VRCrystalView({ crystal, onClose }) {
             <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: crystal.color }}>
               <Eye size={9} /> Spiritual Significance
             </p>
-            <p className="text-sm leading-[1.85] italic" style={{ color: 'rgba(248,250,252,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
+            <p className="text-sm leading-[1.85] italic" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif' }}>
               {crystal.spiritual}
             </p>
           </motion.div>
@@ -237,10 +237,10 @@ function VRCrystalView({ crystal, onClose }) {
             animate={2 < revealed ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ duration: 0.8 }}
             className="rounded-xl p-5 mb-5" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <Heart size={9} /> Healing Properties
             </p>
-            <p className="text-sm leading-[1.85]" style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'Cormorant Garamond, serif' }}>
+            <p className="text-sm leading-[1.85]" style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'Cormorant Garamond, serif' }}>
               {crystal.healing}
             </p>
           </motion.div>
@@ -249,7 +249,7 @@ function VRCrystalView({ crystal, onClose }) {
           <motion.div initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
             animate={3 < revealed ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ duration: 0.8 }} className="mb-8">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-3 text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Best Used For</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-3 text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>Best Used For</p>
             <div className="flex flex-wrap justify-center gap-2">
               {crystal.uses?.map((u, i) => (
                 <motion.span key={i} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
@@ -274,9 +274,9 @@ function VRCrystalView({ crystal, onClose }) {
               { label: 'Rarity', value: crystal.rarity, icon: Gem },
             ].map((item, i) => (
               <div key={i} className="rounded-lg p-3 text-center" style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.04)' }}>
-                <item.icon size={12} className="mx-auto mb-1" style={{ color: 'rgba(248,250,252,0.2)' }} />
-                <p className="text-[9px] uppercase mb-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>{item.label}</p>
-                <p className="text-xs capitalize" style={{ color: 'rgba(248,250,252,0.6)' }}>{item.value}</p>
+                <item.icon size={12} className="mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                <p className="text-[9px] uppercase mb-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.label}</p>
+                <p className="text-xs capitalize" style={{ color: 'rgba(255,255,255,0.85)' }}>{item.value}</p>
               </div>
             ))}
           </motion.div>
@@ -311,18 +311,18 @@ function CrystalCard({ crystal, onClick, onVR, index }) {
             <p className="text-[10px]" style={{ color: crystal.color }}>{crystal.aka}</p>
           </div>
         </div>
-        <p className="text-[11px] leading-relaxed mb-3 line-clamp-2" style={{ color: 'rgba(248,250,252,0.35)' }}>{crystal.description}</p>
+        <p className="text-[11px] leading-relaxed mb-3 line-clamp-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{crystal.description}</p>
         <div className="flex items-center gap-1.5 mb-3 flex-wrap">
           {crystal.chakra.split(', ').slice(0, 2).map((ch, i) => (
             <span key={i} className="px-1.5 py-0.5 rounded text-[8px]"
               style={{ background: `${CHAKRA_COLORS[ch.trim()] || crystal.color}10`, color: CHAKRA_COLORS[ch.trim()] || crystal.color }}>{ch.trim()}</span>
           ))}
-          <span className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.2)' }}>{crystal.element}</span>
+          <span className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.6)' }}>{crystal.element}</span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => onClick(crystal)} data-testid={`view-crystal-${crystal.id}`}
             className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium transition-all hover:bg-white/[0.02]"
-            style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.5)' }}>
+            style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.75)' }}>
             <ChevronRight size={10} /> Details
           </button>
           <button onClick={() => onVR(crystal)} data-testid={`vr-crystal-${crystal.id}`}
@@ -347,8 +347,8 @@ function CrystalDetail({ crystal, onClose, onVR, onAddCollection }) {
         <div className="p-5 relative overflow-hidden" style={{ background: `linear-gradient(180deg, ${crystal.color}06 0%, transparent 100%)` }}>
           <div className="flex items-center justify-between mb-3">
             <button onClick={onClose} className="lg:hidden flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg hover:bg-white/5"
-              style={{ color: 'rgba(248,250,252,0.4)' }}><ArrowLeft size={10} /> Back</button>
-            <button onClick={onClose} className="hidden lg:block p-1 rounded hover:bg-white/5"><X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>
+              style={{ color: 'rgba(255,255,255,0.7)' }}><ArrowLeft size={10} /> Back</button>
+            <button onClick={onClose} className="hidden lg:block p-1 rounded hover:bg-white/5"><X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>
           </div>
           <div className="flex items-center gap-3 mb-3">
             <motion.div className="w-14 h-14 rounded-xl flex items-center justify-center"
@@ -370,7 +370,7 @@ function CrystalDetail({ crystal, onClose, onVR, onAddCollection }) {
             </button>
             <button onClick={() => onAddCollection(crystal.id)} data-testid="add-collection-btn"
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px]"
-              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(248,250,252,0.4)' }}>
+              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.7)' }}>
               <Plus size={10} /> Collection
             </button>
           </div>
@@ -378,16 +378,16 @@ function CrystalDetail({ crystal, onClose, onVR, onAddCollection }) {
         <div className="px-5 pb-5">
           <div className="mb-4"><CrystalNarrator crystalId={crystal.id} color={crystal.color} /></div>
           <div className="mb-4">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Description</p>
-            <p className="text-sm leading-[1.8]" style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'Cormorant Garamond, serif' }}>{crystal.description}</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Description</p>
+            <p className="text-sm leading-[1.8]" style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'Cormorant Garamond, serif' }}>{crystal.description}</p>
           </div>
           <div className="rounded-xl p-4 mb-4" style={{ background: `${crystal.color}04`, border: `1px solid ${crystal.color}08` }}>
             <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: crystal.color }}>Spiritual</p>
-            <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(248,250,252,0.6)' }}>{crystal.spiritual}</p>
+            <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.85)' }}>{crystal.spiritual}</p>
           </div>
           <div className="mb-4">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Healing</p>
-            <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.45)' }}>{crystal.healing}</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Healing</p>
+            <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{crystal.healing}</p>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-4">
             {crystal.uses?.map((u, i) => (
@@ -403,8 +403,8 @@ function CrystalDetail({ crystal, onClose, onVR, onAddCollection }) {
               { label: 'Hardness', value: `${crystal.hardness}/10 (${crystal.rarity})` },
             ].map((item, i) => (
               <div key={i} className="rounded-lg p-2.5" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
-                <p className="text-[8px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{item.label}</p>
-                <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{item.value}</p>
+                <p className="text-[8px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.label}</p>
+                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.value}</p>
               </div>
             ))}
           </div>
@@ -442,11 +442,11 @@ function RockHoundPanel({ token, headers }) {
 
   return (
     <div>
-      <p className="text-[9px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.25)' }}>
+      <p className="text-[9px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>
         <Pickaxe size={9} className="inline mr-1" /> Virtual Rock Hounding
       </p>
       {!token ? (
-        <p className="text-xs text-center py-6" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to go rock hounding</p>
+        <p className="text-xs text-center py-6" style={{ color: 'rgba(255,255,255,0.65)' }}>Sign in to go rock hounding</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {environments.map(env => (
@@ -457,9 +457,9 @@ function RockHoundPanel({ token, headers }) {
               <div className="flex items-center gap-2 mb-2">
                 <MapPin size={12} style={{ color: '#C084FC' }} />
                 <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{env.name}</span>
-                <span className="text-[8px] px-1.5 py-0.5 rounded ml-auto capitalize" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(248,250,252,0.25)' }}>{env.difficulty}</span>
+                <span className="text-[8px] px-1.5 py-0.5 rounded ml-auto capitalize" style={{ background: 'rgba(248,250,252,0.03)', color: 'rgba(255,255,255,0.6)' }}>{env.difficulty}</span>
               </div>
-              <p className="text-[10px] mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>{env.description}</p>
+              <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{env.description}</p>
               <button disabled={digging}
                 className="w-full py-2 rounded-lg text-[10px] font-medium transition-all"
                 style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC', opacity: digging ? 0.5 : 1 }}>
@@ -482,9 +482,9 @@ function RockHoundPanel({ token, headers }) {
                 {result.is_new && <p className="text-[9px] mt-2 px-2 py-0.5 rounded inline-block" style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}>New Discovery!</p>}
               </>
             ) : (
-              <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>No crystals found... try again!</p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>No crystals found... try again!</p>
             )}
-            <p className="text-[9px] mt-2" style={{ color: 'rgba(248,250,252,0.2)' }}>{result.digs_remaining} digs remaining today</p>
+            <p className="text-[9px] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>{result.digs_remaining} digs remaining today</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -548,17 +548,17 @@ function CrystalPairingPanel({ token, headers }) {
 
   return (
     <div data-testid="crystal-pairing-panel">
-      <p className="text-[9px] uppercase tracking-[0.2em] mb-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+      <p className="text-[9px] uppercase tracking-[0.2em] mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
         <Brain size={9} className="inline mr-1" /> AI Crystal Pairing
       </p>
 
       {!token ? (
-        <p className="text-xs text-center py-6" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to get personalized crystal pairings</p>
+        <p className="text-xs text-center py-6" style={{ color: 'rgba(255,255,255,0.65)' }}>Sign in to get personalized crystal pairings</p>
       ) : (
         <div className="space-y-4">
           {/* Mood selection */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(255,255,255,0.6)' }}>
               How are you feeling?
             </label>
             <div className="flex flex-wrap gap-1.5" data-testid="mood-picker">
@@ -567,7 +567,7 @@ function CrystalPairingPanel({ token, headers }) {
                   className="px-3 py-1.5 rounded-full text-[10px] transition-all"
                   style={{
                     background: selectedMood === m ? 'rgba(168,85,247,0.12)' : 'rgba(0,0,0,0)',
-                    color: selectedMood === m ? '#A855F7' : 'rgba(248,250,252,0.35)',
+                    color: selectedMood === m ? '#A855F7' : 'rgba(255,255,255,0.65)',
                     border: `1px solid ${selectedMood === m ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`,
                   }}>
                   {m}
@@ -578,7 +578,7 @@ function CrystalPairingPanel({ token, headers }) {
 
           {/* Intention selection */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(255,255,255,0.6)' }}>
               What is your intention?
             </label>
             <div className="flex flex-wrap gap-1.5" data-testid="intention-picker">
@@ -587,7 +587,7 @@ function CrystalPairingPanel({ token, headers }) {
                   className="px-3 py-1.5 rounded-full text-[10px] transition-all"
                   style={{
                     background: selectedIntention === i ? 'rgba(45,212,191,0.12)' : 'rgba(0,0,0,0)',
-                    color: selectedIntention === i ? '#2DD4BF' : 'rgba(248,250,252,0.35)',
+                    color: selectedIntention === i ? '#2DD4BF' : 'rgba(255,255,255,0.65)',
                     border: `1px solid ${selectedIntention === i ? 'rgba(45,212,191,0.25)' : 'rgba(248,250,252,0.04)'}`,
                   }}>
                   {i}
@@ -598,7 +598,7 @@ function CrystalPairingPanel({ token, headers }) {
 
           {/* Custom note */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <label className="text-[10px] uppercase tracking-widest font-bold mb-2 block" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Additional context (optional)
             </label>
             <input value={customNote} onChange={e => setCustomNote(e.target.value)}
@@ -635,7 +635,7 @@ function CrystalPairingPanel({ token, headers }) {
                       </div>
                       <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{c.name}</p>
                       <p className="text-[9px]" style={{ color: c.color }}>{c.aka}</p>
-                      <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.3)' }}>{c.chakra} Chakra</p>
+                      <p className="text-[8px] mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>{c.chakra} Chakra</p>
                     </motion.div>
                   ))}
                 </div>
@@ -655,7 +655,7 @@ function CrystalPairingPanel({ token, headers }) {
                       </button>
                     </div>
                   </div>
-                  <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                  <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                     {result.explanation}
                   </p>
                 </div>
@@ -666,7 +666,7 @@ function CrystalPairingPanel({ token, headers }) {
           {/* History */}
           {history.length > 0 && (
             <div>
-              <p className="text-[9px] uppercase tracking-[0.15em] mb-2 mt-4" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <p className="text-[9px] uppercase tracking-[0.15em] mb-2 mt-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Recent Pairings
               </p>
               <div className="space-y-2">
@@ -683,10 +683,10 @@ function CrystalPairingPanel({ token, headers }) {
                       ))}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] truncate" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                      <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.85)' }}>
                         {(p.crystals || []).map(c => c.name).join(', ')}
                       </p>
-                      <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {p.mood && `Mood: ${p.mood}`}{p.mood && p.intention && ' · '}{p.intention && `Intent: ${p.intention}`}
                       </p>
                     </div>
@@ -788,7 +788,7 @@ export default function Crystals() {
             return (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)} data-testid={`tab-${tab.id}`}
                 className="flex-1 relative flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-all"
-                style={{ color: isActive ? '#F8FAFC' : 'rgba(248,250,252,0.35)' }}>
+                style={{ color: isActive ? '#F8FAFC' : 'rgba(255,255,255,0.65)' }}>
                 {isActive && <motion.div layoutId="crystalTab" className="absolute inset-0 rounded-lg"
                   style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.15)' }}
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }} />}
@@ -805,18 +805,18 @@ export default function Crystals() {
               {/* Search + Category */}
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(248,250,252,0.2)' }} />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.6)' }} />
                   <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search crystals..."
                     data-testid="crystal-search"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs outline-none"
                     style={{ background: 'transparent', border: '1px solid rgba(248,250,252,0.06)', color: '#F8FAFC' }} />
-                  {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} /></button>}
+                  {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} /></button>}
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
                   {categories.map(cat => (
                     <button key={cat} onClick={() => setCategory(cat)} data-testid={`cat-${cat}`}
                       className="px-3 py-2 rounded-xl text-[10px] font-medium capitalize whitespace-nowrap transition-all"
-                      style={{ background: category === cat ? 'rgba(168,85,247,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${category === cat ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`, color: category === cat ? '#A855F7' : 'rgba(248,250,252,0.4)' }}>
+                      style={{ background: category === cat ? 'rgba(168,85,247,0.12)' : 'rgba(0,0,0,0)', border: `1px solid ${category === cat ? 'rgba(168,85,247,0.25)' : 'rgba(248,250,252,0.04)'}`, color: category === cat ? '#A855F7' : 'rgba(255,255,255,0.7)' }}>
                       {cat}
                     </button>
                   ))}
@@ -828,7 +828,7 @@ export default function Crystals() {
                   {loading ? (
                     <div className="flex justify-center py-20"><Loader2 className="animate-spin" size={20} style={{ color: '#A855F7' }} /></div>
                   ) : crystals.length === 0 ? (
-                    <div className="text-center py-16"><Gem size={28} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.15)' }} /><p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>No crystals found</p></div>
+                    <div className="text-center py-16"><Gem size={28} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.15)' }} /><p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>No crystals found</p></div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {crystals.map((c, i) => <CrystalCard key={c.id} crystal={c} onClick={setSelected} onVR={setVrCrystal} index={i} />)}
@@ -846,9 +846,9 @@ export default function Crystals() {
           {activeTab === 'collection' && (
             <motion.div key="coll" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
               {!token ? (
-                <p className="text-center text-xs py-12" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to view your crystal collection</p>
+                <p className="text-center text-xs py-12" style={{ color: 'rgba(255,255,255,0.65)' }}>Sign in to view your crystal collection</p>
               ) : collection.length === 0 ? (
-                <div className="text-center py-16"><Package size={28} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.15)' }} /><p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Your collection is empty</p><p className="text-xs mt-1" style={{ color: 'rgba(248,250,252,0.2)' }}>Browse the Crystal Guide or go Rock Hounding</p></div>
+                <div className="text-center py-16"><Package size={28} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.15)' }} /><p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>Your collection is empty</p><p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>Browse the Crystal Guide or go Rock Hounding</p></div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {collection.map((entry, i) => {

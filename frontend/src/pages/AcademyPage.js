@@ -67,8 +67,8 @@ function IntensitySwitch({ intensity, onChange }) {
               }}
               data-testid={`intensity-${lv}`}
             >
-              <Icon size={13} style={{ color: active ? meta.color : 'rgba(248,250,252,0.2)' }} />
-              <span className="text-[8px] font-medium" style={{ color: active ? meta.color : 'rgba(248,250,252,0.25)' }}>
+              <Icon size={13} style={{ color: active ? meta.color : 'rgba(255,255,255,0.6)' }} />
+              <span className="text-[8px] font-medium" style={{ color: active ? meta.color : 'rgba(255,255,255,0.6)' }}>
                 {meta.label}
               </span>
               <span className="text-[6px]" style={{ color: active ? `${meta.color}80` : 'rgba(248,250,252,0.12)' }}>
@@ -101,7 +101,7 @@ function AutoScalePrompt({ data, onAccept, onDismiss }) {
           <div className="text-[10px] font-semibold mb-0.5" style={{ color: targetMeta.color }}>
             Ready for {targetMeta.label} Mode?
           </div>
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{data.reason}</p>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{data.reason}</p>
           <div className="flex gap-2 mt-2">
             <button
               onClick={onAccept}
@@ -114,7 +114,7 @@ function AutoScalePrompt({ data, onAccept, onDismiss }) {
             <button
               onClick={onDismiss}
               className="text-[9px] px-3 py-1 rounded-lg"
-              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(248,250,252,0.3)', cursor: 'pointer' }}
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.65)', cursor: 'pointer' }}
               data-testid="auto-scale-dismiss"
             >
               Not now
@@ -192,11 +192,11 @@ function FractalCertificate({ seed, fingerprint, programName, tier, issuedAt }) 
         <Award size={20} style={{ color: '#FBBF24', margin: '0 auto 6px' }} />
         <div className="text-[8px] uppercase tracking-[3px] mb-1" style={{ color: 'rgba(251,191,36,0.5)' }}>Fractal Certificate</div>
         <div className="text-sm font-semibold mb-0.5" style={{ color: '#FBBF24' }}>{programName}</div>
-        <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Tier: {tier}</div>
+        <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Tier: {tier}</div>
         <div className="font-mono text-[10px] mt-2 px-3 py-1 rounded-lg inline-block" style={{
           background: 'rgba(251,191,36,0.06)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.1)',
         }}>{fingerprint}</div>
-        {issuedAt && <div className="text-[8px] mt-2" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        {issuedAt && <div className="text-[8px] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Issued {new Date(issuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
         </div>}
       </div>
@@ -273,7 +273,7 @@ function MasteryRing({ level, resonanceScore }) {
       </div>
       <div>
         <div className="text-xs font-semibold" style={{ color: level.color }}>{level.tier}</div>
-        <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
           {resonanceScore} RP{level.next_tier && <> / {level.next_threshold} for {level.next_tier}</>}
         </div>
       </div>
@@ -302,7 +302,7 @@ function LessonViewer({ content, modality, onClose, onComplete, completing }) {
             <span className="text-xs font-medium" style={{ color: modality?.color || '#C084FC' }}>{modality?.lesson_label || 'Lesson'}</span>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}>
-            <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </button>
         </div>
         <div className="px-5 pt-3 flex gap-1.5">
@@ -316,13 +316,13 @@ function LessonViewer({ content, modality, onClose, onComplete, completing }) {
           <AnimatePresence mode="wait">
             <motion.div key={currentSection} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h3 className="text-base font-semibold mb-3" style={{ color: '#F8FAFC' }}>{section?.heading}</h3>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{section?.body}</p>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{section?.body}</p>
             </motion.div>
           </AnimatePresence>
         </div>
         {isLast && content.key_concepts && (
           <div className="px-5 pb-3">
-            <div className="text-[8px] uppercase tracking-wider mb-1.5" style={{ color: 'rgba(248,250,252,0.2)' }}>Key Concepts</div>
+            <div className="text-[8px] uppercase tracking-wider mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>Key Concepts</div>
             <div className="flex flex-wrap gap-1.5">
               {content.key_concepts.map(kc => (
                 <span key={kc} className="text-[9px] px-2 py-0.5 rounded-full" style={{
@@ -336,7 +336,7 @@ function LessonViewer({ content, modality, onClose, onComplete, completing }) {
         <div className="px-5 pb-4 flex gap-2">
           {currentSection > 0 && (
             <button onClick={() => setCurrentSection(p => p - 1)} className="px-4 py-2.5 rounded-xl text-xs"
-              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(248,250,252,0.4)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
               data-testid="lesson-prev-btn">Back</button>
           )}
           <button onClick={() => { if (isLast) onComplete(); else setCurrentSection(p => p + 1); }}
@@ -376,16 +376,16 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                 <Beaker size={16} style={{ color: modality?.color || '#C084FC' }} />
                 <div>
                   <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>{sim.display_label || 'Forge Lab'}</span>
-                  <span className="text-[9px] ml-2" style={{ color: 'rgba(248,250,252,0.3)' }}>{sim.duration_min}m | {(sim.complexity * 100).toFixed(0)}%</span>
+                  <span className="text-[9px] ml-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{sim.duration_min}m | {(sim.complexity * 100).toFixed(0)}%</span>
                 </div>
               </div>
               <button onClick={onClose} className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}>
-                <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
               </button>
             </div>
             <div className="px-5 py-4">
               <h3 className="text-sm font-semibold mb-1" style={{ color: '#F8FAFC' }}>{forgeData.module?.title}</h3>
-              {challenge.objective && <p className="text-[10px] mb-4" style={{ color: 'rgba(248,250,252,0.4)' }}>{challenge.objective}</p>}
+              {challenge.objective && <p className="text-[10px] mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>{challenge.objective}</p>}
               <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <div className="flex-shrink-0 rounded-xl p-3 flex items-center justify-center" style={{
                   background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}>
@@ -393,20 +393,20 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                     determinantPositive={sim.h2_state?.determinant_positive} density={sim.h2_state?.density || 0} />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <div className="text-[8px] uppercase tracking-wider mb-1" style={{ color: 'rgba(248,250,252,0.2)' }}>Cluster State</div>
+                  <div className="text-[8px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>Cluster State</div>
                   {(sim.cluster_scores || []).map(cs => {
                     const Icon = CLUSTER_ICONS[cs.name] || Shield;
                     const pct = (cs.score / cs.max) * 100;
                     return (
                       <div key={cs.name} className="flex items-center gap-2">
-                        <Icon size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
-                        <span className="text-[9px] w-14" style={{ color: 'rgba(248,250,252,0.4)' }}>{cs.name}</span>
+                        <Icon size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
+                        <span className="text-[9px] w-14" style={{ color: 'rgba(255,255,255,0.7)' }}>{cs.name}</span>
                         <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                           <div className="h-full rounded-full transition-all" style={{
                             width: `${pct}%`, background: pct > 66 ? '#22C55E' : pct > 33 ? '#FBBF24' : '#EF4444',
                           }} />
                         </div>
-                        <span className="text-[9px] font-mono w-8 text-right" style={{ color: 'rgba(248,250,252,0.35)' }}>{cs.score}/{cs.max}</span>
+                        <span className="text-[9px] font-mono w-8 text-right" style={{ color: 'rgba(255,255,255,0.65)' }}>{cs.score}/{cs.max}</span>
                       </div>
                     );
                   })}
@@ -423,7 +423,7 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                     }} data-testid="determinant-status">
                       Det: {sim.h2_state?.determinant_positive ? 'Positive' : 'Negative'}
                     </span>
-                    <span className="text-[8px] ml-auto" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                    <span className="text-[8px] ml-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       Density: {((sim.h2_state?.density || 0) * 100).toFixed(0)}%
                     </span>
                   </div>
@@ -431,7 +431,7 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
               </div>
               {tasks.length > 0 && (
                 <div className="mb-4">
-                  <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.2)' }}>Simulation Tasks</div>
+                  <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Simulation Tasks</div>
                   <div className="space-y-1.5">
                     {tasks.map((task, i) => (
                       <div key={task.id} className="flex items-start gap-2 px-3 py-2 rounded-lg" style={{
@@ -442,8 +442,8 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                           <span className="text-[8px] font-mono" style={{ color: modality?.color || '#C084FC' }}>{i + 1}</span>
                         </div>
                         <div className="flex-1">
-                          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.55)' }}>{task.desc}</span>
-                          <div className="text-[7px] mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>Weight: {(task.weight * 100).toFixed(0)}%</div>
+                          <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.8)' }}>{task.desc}</span>
+                          <div className="text-[7px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>Weight: {(task.weight * 100).toFixed(0)}%</div>
                         </div>
                       </div>
                     ))}
@@ -455,11 +455,11 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                   <Sparkles size={10} style={{ color: '#FBBF24' }} />
                   <span className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(251,191,36,0.5)' }}>Validation Rule</span>
                 </div>
-                <p className="text-[9px] mt-1" style={{ color: 'rgba(248,250,252,0.35)' }}>{sim.validation_rule}</p>
+                <p className="text-[9px] mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>{sim.validation_rule}</p>
               </div>
               <div className="flex gap-2">
                 <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-xs"
-                  style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(248,250,252,0.4)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
+                  style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
                   data-testid="forge-cancel-btn">Cancel</button>
                 <button onClick={onComplete} disabled={completing} className="flex-1 py-2.5 rounded-xl text-xs font-medium"
                   style={{
@@ -490,7 +490,7 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                   ].map(s => (
                     <div key={s.label} className="rounded-lg p-2.5" style={{ background: `${s.color}06` }}>
                       <div className="text-sm font-semibold" style={{ color: s.color }}>{s.value}</div>
-                      <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.25)' }}>{s.label}</div>
+                      <div className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
@@ -507,14 +507,14 @@ function ForgeLab({ forgeData, modality, onClose, onComplete, completing, result
                   <Lock size={36} style={{ color: '#EF4444', margin: '0 auto 12px' }} />
                 </motion.div>
                 <h3 className="text-sm font-semibold mb-1" style={{ color: '#EF4444' }}>Validation Failed</h3>
-                <p className="text-xs mb-3" style={{ color: 'rgba(248,250,252,0.4)' }}>{result.reason}</p>
+                <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>{result.reason}</p>
                 {result.hint && <p className="text-[9px] px-3 py-2 rounded-lg mb-3" style={{
                   background: 'rgba(251,191,36,0.05)', color: '#FBBF24',
                 }}>{result.hint}</p>}
               </>
             )}
             <button onClick={onClose} className="mt-2 px-6 py-2 rounded-xl text-xs"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(248,250,252,0.5)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
+              style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.75)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
               data-testid="forge-result-close-btn">Continue</button>
           </div>
         )}
@@ -635,8 +635,8 @@ export default function AcademyPage() {
   if (!token || token === 'guest_token') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ background: 'transparent' }}>
-        <h2 className="text-lg font-bold" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>Academy</h2>
-        <p className="text-sm text-center" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to access the Academy — lessons, certifications, and mastery paths.</p>
+        <h2 className="text-lg font-bold" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>Academy</h2>
+        <p className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.65)' }}>Sign in to access the Academy — lessons, certifications, and mastery paths.</p>
         <button 
           onClick={() => window.location.href = '/auth'}
           className="px-6 py-3 rounded-xl text-sm font-medium active:scale-95"
@@ -661,7 +661,7 @@ export default function AcademyPage() {
         <div className="flex items-start justify-between mb-5" data-testid="academy-header">
           <div>
             <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#F8FAFC' }} data-testid="academy-title">Academy</h1>
-            <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {modalityData?.name || 'Omni-Modality'} | {INTENSITY_META[intensity]?.label || 'Guided'} Mode
             </p>
           </div>
@@ -698,8 +698,8 @@ export default function AcademyPage() {
                     border: `1px solid ${active ? `${colors[mid]}20` : 'rgba(255,255,255,0.03)'}`,
                     cursor: 'pointer',
                   }} data-testid={`modality-${mid}`}>
-                  <Icon size={16} style={{ color: active ? colors[mid] : 'rgba(248,250,252,0.2)' }} />
-                  <span className="text-[9px] font-medium" style={{ color: active ? colors[mid] : 'rgba(248,250,252,0.3)' }}>{labels[mid]}</span>
+                  <Icon size={16} style={{ color: active ? colors[mid] : 'rgba(255,255,255,0.6)' }} />
+                  <span className="text-[9px] font-medium" style={{ color: active ? colors[mid] : 'rgba(255,255,255,0.65)' }}>{labels[mid]}</span>
                   <span className="text-[7px]" style={{ color: active ? `${colors[mid]}80` : 'rgba(248,250,252,0.15)' }}>{frameworks[mid]}</span>
                 </motion.button>
               );
@@ -723,7 +723,7 @@ export default function AcademyPage() {
                 }}>
                   <Icon size={12} style={{ color: s.color, margin: '0 auto 4px', opacity: 0.6 }} />
                   <div className="text-xs font-semibold" style={{ color: s.color }}>{s.value}</div>
-                  <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{s.label}</div>
+                  <div className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
                 </div>
               );
             })}
@@ -736,7 +736,7 @@ export default function AcademyPage() {
             className="text-[9px] px-3 py-1.5 rounded-lg font-medium transition-all"
             style={{
               background: !activeZone ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.015)',
-              color: !activeZone ? '#F8FAFC' : 'rgba(248,250,252,0.3)',
+              color: !activeZone ? '#F8FAFC' : 'rgba(255,255,255,0.65)',
               border: `1px solid ${!activeZone ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}`,
               cursor: 'pointer',
             }} data-testid="zone-all">All</button>
@@ -748,7 +748,7 @@ export default function AcademyPage() {
                 className="flex items-center gap-1.5 text-[9px] px-3 py-1.5 rounded-lg font-medium transition-all"
                 style={{
                   background: active ? `${z.color}0A` : 'rgba(255,255,255,0.015)',
-                  color: active ? z.color : 'rgba(248,250,252,0.3)',
+                  color: active ? z.color : 'rgba(255,255,255,0.65)',
                   border: `1px solid ${active ? `${z.color}18` : 'rgba(255,255,255,0.03)'}`,
                   cursor: 'pointer',
                 }} data-testid={`zone-${z.id}`}>
@@ -780,7 +780,7 @@ export default function AcademyPage() {
                       <h3 className="text-xs font-semibold" style={{ color: prog.completed ? '#22C55E' : '#F8FAFC' }}>{prog.name}</h3>
                       {prog.completed && <CheckCircle size={12} style={{ color: '#22C55E' }} />}
                     </div>
-                    <p className="text-[9px] mt-0.5 ml-3.5" style={{ color: 'rgba(248,250,252,0.25)' }}>{prog.description}</p>
+                    <p className="text-[9px] mt-0.5 ml-3.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{prog.description}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-3">
                     <div className="text-right">
@@ -789,7 +789,7 @@ export default function AcademyPage() {
                           width: `${prog.progress * 100}%`, background: prog.completed ? '#22C55E' : skinColor,
                         }} />
                       </div>
-                      <span className="text-[8px]" style={{ color: prog.completed ? '#22C55E' : 'rgba(248,250,252,0.25)' }}>
+                      <span className="text-[8px]" style={{ color: prog.completed ? '#22C55E' : 'rgba(255,255,255,0.6)' }}>
                         {(prog.progress * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -826,7 +826,7 @@ export default function AcademyPage() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="text-[10px] font-medium truncate" style={{ color: mod.completed ? '#22C55E' : '#F8FAFC' }}>{mod.title}</div>
-                                <div className="text-[8px] flex items-center gap-1.5 mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                                <div className="text-[8px] flex items-center gap-1.5 mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                                   <span style={{ color: typeColor }}>{mod.display_label}</span>
                                   <span>{mod.duration_min}m</span>
                                   <span>{(mod.complexity * 100).toFixed(0)}%</span>

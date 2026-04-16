@@ -18,7 +18,7 @@ function ChakraBar({ chakra }) {
       </div>
       <div className="flex-1">
         <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{chakra.name}</p>
-        <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{chakra.location} | {chakra.frequency}</p>
+        <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{chakra.location} | {chakra.frequency}</p>
       </div>
       <div className="flex flex-wrap gap-1 max-w-[200px]">
         {chakra.qualities.slice(0, 2).map(q => (
@@ -42,9 +42,9 @@ function ReikiPositionCard({ pos, chakras }) {
           <Sparkles size={12} style={{ color }} />
         </div>
         <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{pos.name}</p>
-        <span className="text-[10px] ml-auto" style={{ color: 'rgba(248,250,252,0.3)' }}>{pos.duration}</span>
+        <span className="text-[10px] ml-auto" style={{ color: 'rgba(255,255,255,0.65)' }}>{pos.duration}</span>
       </div>
-      <p className="text-xs mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>{pos.placement}</p>
+      <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{pos.placement}</p>
       <p className="text-[10px] italic" style={{ color: `${color}99` }}>{pos.intention}</p>
     </div>
   );
@@ -70,31 +70,31 @@ function AuraReading({ reading, onClose }) {
             </div>
             <div>
               <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{aura?.name || 'Your Aura'}</h3>
-              <p className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Dominant: {chakra?.name}</p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Dominant: {chakra?.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5">
-            <X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} /></button>
+            <X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
         </div>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="rounded-xl p-3" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
             <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color }}>Strengths</p>
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>{aura?.strengths}</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{aura?.strengths}</p>
           </div>
           <div className="rounded-xl p-3" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
             <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color }}>Shadow</p>
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>{aura?.shadow}</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{aura?.shadow}</p>
           </div>
         </div>
         <div className="mb-4">
           <p className="text-[10px] uppercase tracking-[0.15em] mb-2" style={{ color }}>Your Reading</p>
-          <div className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(248,250,252,0.7)' }}>
+          <div className="text-xs leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.9)' }}>
             {reading.reading}
           </div>
         </div>
         <div className="rounded-xl p-3" style={{ background: `${color}06`, border: `1px solid ${color}12` }}>
           <p className="text-[10px] uppercase tracking-[0.15em] mb-1" style={{ color }}>Guidance</p>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.6)' }}>{aura?.advice}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.85)' }}>{aura?.advice}</p>
         </div>
       </div>
     </motion.div>
@@ -171,7 +171,7 @@ export default function Reiki() {
               style={{
                 background: tab === t.id ? 'rgba(129,140,248,0.15)' : 'rgba(0,0,0,0)',
                 border: `1px solid ${tab === t.id ? 'rgba(129,140,248,0.3)' : 'rgba(248,250,252,0.06)'}`,
-                color: tab === t.id ? '#818CF8' : 'rgba(248,250,252,0.5)',
+                color: tab === t.id ? '#818CF8' : 'rgba(255,255,255,0.75)',
               }}><t.icon size={14} />{t.label}</button>
           ))}
         </div>
@@ -188,7 +188,7 @@ export default function Reiki() {
                   style={{ background: 'rgba(129,140,248,0.1)', boxShadow: '0 0 60px rgba(129,140,248,0.15)' }}>
                   <Eye size={32} style={{ color: '#818CF8' }} />
                 </div>
-                <p className="text-sm mb-4" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.85)' }}>
                   Enter your birth date for a personalized aura reading based on your energy profile and recent moods
                 </p>
                 <div className="flex gap-3 justify-center mb-5">
@@ -215,7 +215,7 @@ export default function Reiki() {
                   style={{ background: 'rgba(129,140,248,0.15)', border: '1px solid rgba(129,140,248,0.35)', color: '#818CF8' }}>
                   {readingLoading ? <Loader2 size={16} className="animate-spin inline" /> : 'Read My Aura'}
                 </button>
-                {!token && <p className="text-[10px] mt-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in for a personalized reading</p>}
+                {!token && <p className="text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Sign in for a personalized reading</p>}
               </div>
             )}
           </div>

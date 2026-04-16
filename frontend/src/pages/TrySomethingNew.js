@@ -30,7 +30,7 @@ function SuggestionCard({ feat, index }) {
         </div>
         <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: feat.color }} />
       </div>
-      <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>{feat.desc}</p>
+      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{feat.desc}</p>
     </motion.div>
   );
 }
@@ -80,7 +80,7 @@ export default function TrySomethingNew() {
         </div>
 
         {!token ? (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to get personalized suggestions</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to get personalized suggestions</p>
         ) : (
           <>
             {/* Exploration Progress */}
@@ -96,7 +96,7 @@ export default function TrySomethingNew() {
                   className="h-full rounded-full"
                   style={{ background: 'linear-gradient(90deg, #E879F9, #818CF8)' }} />
               </div>
-              <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 {stats.explored || 0} of {stats.total || 0} features explored | {stats.unexplored || 0} waiting for you
               </p>
             </div>
@@ -104,7 +104,7 @@ export default function TrySomethingNew() {
             {/* Mood-Based Recommendation */}
             {personalized && (
               <div className="mb-8">
-                <p className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                <p className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   <TrendingUp size={14} style={{ color: '#E879F9' }} />
                   {personalized.reason}
                 </p>
@@ -119,7 +119,7 @@ export default function TrySomethingNew() {
             {/* Unexplored Features */}
             {suggestions.length > 0 && (
               <div>
-                <p className="text-xs font-medium mb-3" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                <p className="text-xs font-medium mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   <Compass size={14} className="inline mr-1" style={{ color: '#E879F9' }} />
                   Unexplored — waiting for you
                 </p>
@@ -134,7 +134,7 @@ export default function TrySomethingNew() {
             {suggestions.length === 0 && (
               <div className="text-center py-12">
                 <Sparkles size={32} className="mx-auto mb-3" style={{ color: '#E879F9' }} />
-                <p className="text-sm" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   You've explored everything! You are a true cosmic explorer.
                 </p>
               </div>

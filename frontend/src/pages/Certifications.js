@@ -42,12 +42,12 @@ export default function Certifications() {
         </div>
 
         {!token ? (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to view your certifications</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to view your certifications</p>
         ) : certs.length === 0 ? (
           <div className="text-center py-16">
             <Award size={48} className="mx-auto mb-4" style={{ color: 'rgba(248,250,252,0.15)' }} />
-            <p className="text-sm mb-2" style={{ color: 'rgba(248,250,252,0.5)' }}>No certifications yet</p>
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>Complete all lessons in a class to earn your certificate</p>
+            <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>No certifications yet</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Complete all lessons in a class to earn your certificate</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -68,13 +68,13 @@ export default function Certifications() {
                     </div>
                     <div>
                       <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{cert.class_name || 'Course Completed'}</p>
-                      <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                      <p className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
                         <CheckCircle size={10} style={{ color: '#22C55E' }} /> Certified
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                    <div className="flex items-center gap-1 text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                       <Calendar size={10} />
                       {cert.completed_at ? new Date(cert.completed_at).toLocaleDateString() : 'Completed'}
                     </div>

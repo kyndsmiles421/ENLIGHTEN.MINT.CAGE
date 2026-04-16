@@ -153,22 +153,22 @@ function StarCard({ star, isSelected, onSelect, isPlaying, onToggleSound }) {
             transition={isPlaying ? { duration: 2, repeat: Infinity } : {}}
             style={{ background: star.color, boxShadow: `0 0 8px ${star.color}40` }} />
           <div>
-            <p className="text-[11px] font-medium" style={{ color: isSelected ? star.color : 'rgba(248,250,252,0.7)' }}>{star.name}</p>
-            <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{star.constellation} · {star.distance_ly} ly</p>
+            <p className="text-[11px] font-medium" style={{ color: isSelected ? star.color : 'rgba(255,255,255,0.9)' }}>{star.name}</p>
+            <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{star.constellation} · {star.distance_ly} ly</p>
           </div>
         </div>
         <button onClick={(e) => { e.stopPropagation(); onToggleSound(star); }}
           className="p-1.5 rounded-lg transition-all"
           style={{ background: isPlaying ? `${star.color}15` : 'transparent' }}
           data-testid={`sonify-${star.name.toLowerCase().replace(/\s/g, '-')}`}>
-          {isPlaying ? <Volume2 size={12} style={{ color: star.color }} /> : <VolumeX size={12} style={{ color: 'rgba(248,250,252,0.2)' }} />}
+          {isPlaying ? <Volume2 size={12} style={{ color: star.color }} /> : <VolumeX size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />}
         </button>
       </div>
       <AnimatePresence>
         {isSelected && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="mt-2.5 pt-2.5 space-y-1.5" style={{ borderTop: `1px solid ${star.color}15` }}>
-            <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.4)' }}>
+            <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
               The light you see from <strong style={{ color: star.color }}>{star.name}</strong> left
               in <strong style={{ color: '#FBBF24' }}>year {star.light_departed_year}</strong>.
               Surface: <strong>{star.temp_k?.toLocaleString()}K</strong>. Sonified: <strong style={{ color: '#2DD4BF' }}>{star.sonified_hz}Hz</strong>.
@@ -178,7 +178,7 @@ function StarCard({ star, isSelected, onSelect, isPlaying, onToggleSound }) {
                 { l: 'Temperature', v: `${star.temp_k?.toLocaleString()}K`, c: star.color },
                 { l: 'Magnitude', v: `${star.magnitude}`, c: '#A78BFA' }].map(m => (
                 <div key={m.l} className="px-2 py-1 rounded-lg text-center" style={{ background: 'rgba(248,250,252,0.03)' }}>
-                  <p className="text-[6px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{m.l}</p>
+                  <p className="text-[6px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{m.l}</p>
                   <p className="text-[9px] font-mono" style={{ color: m.c }}>{m.v}</p>
                 </div>
               ))}
@@ -287,7 +287,7 @@ export default function Observatory() {
             style={{ color: 'rgba(248,250,252,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
             {tab === 'orrery' && selectedPlanet ? selectedPlanet.name : tab === 'stars' && selectedStar ? selectedStar.name : 'Celestial Portal'}
           </h1>
-          <p className="text-xs mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {tab === 'orrery' && selectedPlanet ? planetVisual?.desc || selectedPlanet.desc : 'Celestial Mechanics, Data Sonification & Live Sky Events'}
           </p>
         </div>
@@ -299,7 +299,7 @@ export default function Observatory() {
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium transition-all"
               style={{
                 background: tab === t.id ? `${immBg.color}12` : 'rgba(248,250,252,0.03)',
-                color: tab === t.id ? immBg.color : 'rgba(248,250,252,0.35)',
+                color: tab === t.id ? immBg.color : 'rgba(255,255,255,0.65)',
                 border: `1px solid ${tab === t.id ? `${immBg.color}25` : 'rgba(248,250,252,0.06)'}`,
               }}
               data-testid={`observatory-tab-${t.id}`}>
@@ -337,7 +337,7 @@ export default function Observatory() {
                       <h3 className="text-lg font-light" style={{ color: selectedPlanet.color, fontFamily: 'Cormorant Garamond, serif' }}>
                         {selectedPlanet.name}
                       </h3>
-                      <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                      <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {planetVisual?.desc || selectedPlanet.desc}
                       </p>
                     </div>
@@ -353,7 +353,7 @@ export default function Observatory() {
                       <div key={m.label} className="px-3 py-2 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)' }}>
                         <div className="flex items-center gap-1 mb-0.5">
                           <m.icon size={8} style={{ color: m.color }} />
-                          <p className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.25)' }}>{m.label}</p>
+                          <p className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{m.label}</p>
                         </div>
                         <p className="text-xs font-mono" style={{ color: m.color }}>{m.value}</p>
                       </div>
@@ -399,7 +399,7 @@ export default function Observatory() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <p className="text-[8px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <p className="text-[8px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Tap to explore — Toggle speaker to immerse in frequency
                 </p>
                 {stars.map(s => (
@@ -414,10 +414,10 @@ export default function Observatory() {
 
               {/* Light-Time Explorer */}
               <div className="rounded-2xl p-5 space-y-4" style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${selectedStar ? `${selectedStar.color}15` : 'rgba(248,250,252,0.06)'}` }}>
-                <h3 className="text-sm font-light" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                <h3 className="text-sm font-light" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                   Light-Time Explorer
                 </h3>
-                <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Every photon you see from a star is ancient light:
                 </p>
                 <div className="space-y-2">
@@ -427,7 +427,7 @@ export default function Observatory() {
                         animate={audio.activeName === s.name ? { scale: [1, 1.4, 1] } : {}}
                         transition={audio.activeName === s.name ? { duration: 1.5, repeat: Infinity } : {}}
                         style={{ background: s.color }} />
-                      <span className="text-[9px] w-20 truncate" style={{ color: 'rgba(248,250,252,0.5)' }}>{s.name}</span>
+                      <span className="text-[9px] w-20 truncate" style={{ color: 'rgba(255,255,255,0.75)' }}>{s.name}</span>
                       <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
                         <motion.div className="h-full rounded-full"
                           initial={{ width: 0 }}
@@ -443,7 +443,7 @@ export default function Observatory() {
                 {selectedStar && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     className="pt-3" style={{ borderTop: `1px solid ${selectedStar.color}15` }}>
-                    <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                    <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                       Light from <strong style={{ color: selectedStar.color }}>{selectedStar.name}</strong> departed
                       in <strong style={{ color: '#FBBF24' }}>year {selectedStar.light_departed_year}</strong>.
                       Surface temperature: <strong>{selectedStar.temp_k?.toLocaleString()}K</strong>.
@@ -468,7 +468,7 @@ export default function Observatory() {
                       <h3 className="text-sm font-light" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif' }}>
                         {moon.phase}
                       </h3>
-                      <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {moon.illumination}% illuminated · Day {moon.age_days} of cycle
                       </p>
                     </div>
@@ -478,7 +478,7 @@ export default function Observatory() {
 
               <div className="rounded-2xl p-5 space-y-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(248,250,252,0.06)' }}
                 data-testid="celestial-events-card">
-                <h3 className="text-sm font-light" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif' }}>
+                <h3 className="text-sm font-light" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif' }}>
                   Upcoming Celestial Events
                 </h3>
                 <div className="space-y-2">
@@ -494,11 +494,11 @@ export default function Observatory() {
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: evt.color, boxShadow: evt.active ? `0 0 8px ${evt.color}40` : 'none' }} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-medium" style={{ color: evt.active ? evt.color : 'rgba(248,250,252,0.6)' }}>
+                          <p className="text-[10px] font-medium" style={{ color: evt.active ? evt.color : 'rgba(255,255,255,0.85)' }}>
                             {evt.name}
                             {evt.active && <span className="text-[7px] px-1.5 py-0.5 rounded-full ml-1" style={{ background: `${evt.color}15`, color: evt.color }}>ACTIVE</span>}
                           </p>
-                          <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                          <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                             {evt.type === 'meteor_shower' ? `Peak: ~${evt.peak_rate}/hr` : evt.type.replace('_', ' ')} · {evt.days_until === 0 ? 'Tonight' : `in ${evt.days_until} days`}
                           </p>
                         </div>
@@ -508,7 +508,7 @@ export default function Observatory() {
                         {expandedEvent === i && (
                           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                             className="mt-2 pt-2 space-y-1.5" style={{ borderTop: `1px solid ${evt.color}15` }}>
-                            <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                            <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                               {evt.type === 'meteor_shower' ? `The ${evt.name} peaks at ~${evt.peak_rate} meteors/hr. Best after midnight, dark skies.`
                                 : evt.type === 'solstice' ? `${evt.name} — longest/shortest day. Powerful for meditation and intention.`
                                 : evt.type === 'equinox' ? `${evt.name} — equal day and night. Perfect celestial balance.`

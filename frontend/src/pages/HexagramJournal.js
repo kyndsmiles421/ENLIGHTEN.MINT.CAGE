@@ -38,7 +38,7 @@ function JournalEntry({ entry, isLatest }) {
         <div className="flex flex-col gap-[1px] items-center flex-shrink-0" style={{ width: 16 }}>
           {lineChars.slice().reverse().map((ch, i) => (
             <div key={i} className="text-[6px] font-mono leading-none"
-              style={{ color: entry.changing_lines?.some(cl => cl.line === 5 - i) ? '#FBBF24' : 'rgba(248,250,252,0.25)' }}>
+              style={{ color: entry.changing_lines?.some(cl => cl.line === 5 - i) ? '#FBBF24' : 'rgba(255,255,255,0.6)' }}>
               {ch}
             </div>
           ))}
@@ -46,7 +46,7 @@ function JournalEntry({ entry, isLatest }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium" style={{ color: 'rgba(248,250,252,0.6)' }}>
+            <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>
               {entry.chinese} {entry.pinyin}
             </span>
             <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -57,13 +57,13 @@ function JournalEntry({ entry, isLatest }) {
                 style={{ background: 'rgba(167,139,250,0.12)', color: '#A78BFA' }}>current</span>
             )}
           </div>
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {entry.name}
           </p>
         </div>
 
         <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {timeStr}
           </span>
           <div className="flex items-center gap-1">
@@ -87,15 +87,15 @@ function JournalEntry({ entry, isLatest }) {
             <div className="flex gap-4 mt-2">
               <div>
                 <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.12)' }}>Upper</p>
-                <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{entry.trigrams?.upper}</p>
+                <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{entry.trigrams?.upper}</p>
               </div>
               <div>
                 <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.12)' }}>Lower</p>
-                <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{entry.trigrams?.lower}</p>
+                <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{entry.trigrams?.lower}</p>
               </div>
               <div>
                 <p className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.12)' }}>Frequency</p>
-                <p className="text-[9px] font-mono" style={{ color: 'rgba(248,250,252,0.3)' }}>{entry.solfeggio_hz}Hz</p>
+                <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>{entry.solfeggio_hz}Hz</p>
               </div>
             </div>
 
@@ -122,7 +122,7 @@ function JournalEntry({ entry, isLatest }) {
                   Changing Lines
                 </p>
                 {entry.changing_lines.map((cl, i) => (
-                  <p key={i} className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <p key={i} className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     Line {cl.line}: {cl.label} ({cl.direction})
                   </p>
                 ))}
@@ -145,7 +145,7 @@ function JournalEntry({ entry, isLatest }) {
                   background: entry.equilibrium_score >= 60 ? '#22C55E' : entry.equilibrium_score >= 30 ? '#FBBF24' : '#EF4444',
                 }} />
               </div>
-              <span className="text-[8px] font-mono" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {entry.equilibrium_score?.toFixed(0) || 0}%
               </span>
             </div>
@@ -209,11 +209,11 @@ export default function HexagramJournal() {
             <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
               style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
               data-testid="journal-back-btn">
-              <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+              <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
             </button>
             <div>
               <h1 className="text-xl font-light tracking-[0.2em] uppercase flex items-center gap-2"
-                style={{ color: 'rgba(248,250,252,0.3)', fontFamily: 'Cormorant Garamond, serif' }}>
+                style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Cormorant Garamond, serif' }}>
                 <BookOpen size={18} style={{ color: '#C084FC' }} />
                 Book of Changes
               </h1>
@@ -248,7 +248,7 @@ export default function HexagramJournal() {
         {entries.length === 0 ? (
           <div className="text-center py-16">
             <BookOpen size={32} className="mx-auto mb-3" style={{ color: 'rgba(248,250,252,0.08)' }} />
-            <p className="text-[11px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               No transitions recorded yet
             </p>
             <p className="text-[9px] mt-1" style={{ color: 'rgba(248,250,252,0.1)' }}>

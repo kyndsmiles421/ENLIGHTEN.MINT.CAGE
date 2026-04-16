@@ -117,7 +117,7 @@ export function DeepLorePanel({
         <div className="flex items-center justify-center gap-3 py-12">
           <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" 
             style={{ borderColor: `${cultureColor}40`, borderTopColor: 'transparent' }} />
-          <span className="text-sm" style={{ color: 'rgba(248,250,252,0.5)' }}>Descending into deep lore...</span>
+          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>Descending into deep lore...</span>
         </div>
       </motion.div>
     );
@@ -168,7 +168,7 @@ export function DeepLorePanel({
             className="p-2 rounded-lg hover:bg-white/5 transition-colors"
             data-testid="close-deep-lore"
           >
-            <X size={16} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <X size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
         </div>
         
@@ -180,8 +180,8 @@ export function DeepLorePanel({
           </span>
           {mythology.deity && (
             <>
-              <span style={{ color: 'rgba(248,250,252,0.2)' }}>•</span>
-              <span className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)' }}>•</span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 {mythology.deity}
               </span>
             </>
@@ -194,7 +194,7 @@ export function DeepLorePanel({
         
         {/* Depth Layers - The "goes deep down" navigation */}
         <div className="mt-4 space-y-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
             <Layers size={10} className="inline mr-1" /> Depth Layers
           </p>
           
@@ -224,14 +224,14 @@ export function DeepLorePanel({
                     >
                       <LayerIcon size={14} style={{ color: layerColor }} />
                     </div>
-                    <span className="text-sm font-medium" style={{ color: isExpanded ? '#F8FAFC' : 'rgba(248,250,252,0.6)' }}>
+                    <span className="text-sm font-medium" style={{ color: isExpanded ? '#F8FAFC' : 'rgba(255,255,255,0.85)' }}>
                       {layer.name}
                     </span>
                   </div>
                   <ChevronRight 
                     size={14} 
                     style={{ 
-                      color: 'rgba(248,250,252,0.3)',
+                      color: 'rgba(255,255,255,0.65)',
                       transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                       transition: 'transform 0.2s',
                     }} 
@@ -249,7 +249,7 @@ export function DeepLorePanel({
                     >
                       <p 
                         className="text-sm leading-relaxed"
-                        style={{ color: 'rgba(248,250,252,0.65)', fontFamily: layerKey === 'deep' ? 'Cormorant Garamond, serif' : 'inherit' }}
+                        style={{ color: 'rgba(255,255,255,0.85)', fontFamily: layerKey === 'deep' ? 'Cormorant Garamond, serif' : 'inherit' }}
                       >
                         {layer.description}
                       </p>
@@ -277,7 +277,7 @@ export function DeepLorePanel({
 
         {/* Cross-Nodule Connections */}
         <div className="mt-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
             <Link2 size={10} className="inline mr-1" /> Cross-Nodule Connections
           </p>
           
@@ -295,12 +295,12 @@ export function DeepLorePanel({
                   <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: cultureColor }}>
                     The {nodule}
                   </span>
-                  <ChevronRight size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
-                  <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  <ChevronRight size={10} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                  <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>
                     {data.connection}
                   </span>
                 </div>
-                <p className="text-xs" style={{ color: 'rgba(248,250,252,0.45)' }}>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   {data.description}
                 </p>
               </div>
@@ -352,7 +352,7 @@ export function DeepLorePanel({
                         <div 
                           key={key}
                           className="px-2 py-1 rounded text-[10px]"
-                          style={{ background: `${LAYER_COLORS.language}15`, color: 'rgba(248,250,252,0.7)' }}
+                          style={{ background: `${LAYER_COLORS.language}15`, color: 'rgba(255,255,255,0.9)' }}
                         >
                           <span style={{ color: LAYER_COLORS.language }}>{term}</span>
                           <span className="opacity-50 ml-1">({key})</span>
@@ -377,7 +377,7 @@ export function DeepLorePanel({
                         <div 
                           key={idx}
                           className="px-2 py-1 rounded text-[10px]"
-                          style={{ background: `${LAYER_COLORS.tools}15`, color: 'rgba(248,250,252,0.7)' }}
+                          style={{ background: `${LAYER_COLORS.tools}15`, color: 'rgba(255,255,255,0.9)' }}
                         >
                           {tool}
                         </div>
@@ -401,7 +401,7 @@ export function DeepLorePanel({
                         <div 
                           key={idx}
                           className="text-xs"
-                          style={{ color: 'rgba(248,250,252,0.6)' }}
+                          style={{ color: 'rgba(255,255,255,0.85)' }}
                         >
                           • {inv}
                         </div>
@@ -414,7 +414,7 @@ export function DeepLorePanel({
                     className="p-3 rounded-xl text-center"
                     style={{ background: `${cultureColor}10`, border: `1px solid ${cultureColor}20` }}
                   >
-                    <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                    <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
                       Geometric Foundation
                     </p>
                     <p className="text-sm font-medium" style={{ color: cultureColor }}>
@@ -430,7 +430,7 @@ export function DeepLorePanel({
         {/* Related Constellations */}
         {related_constellations.length > 0 && (
           <div className="mt-6">
-            <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <Compass size={10} className="inline mr-1" /> Related Constellations
             </p>
             
@@ -443,7 +443,7 @@ export function DeepLorePanel({
                   style={{ 
                     background: 'rgba(248,250,252,0.03)',
                     border: '1px solid rgba(248,250,252,0.08)',
-                    color: 'rgba(248,250,252,0.6)',
+                    color: 'rgba(255,255,255,0.85)',
                   }}
                   data-testid={`related-${rel.id}`}
                 >
@@ -457,7 +457,7 @@ export function DeepLorePanel({
 
         {/* Stars in this constellation */}
         <div className="mt-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
             <Star size={10} className="inline mr-1" /> Stars ({constellation.stars?.length || 0})
           </p>
           
@@ -494,7 +494,7 @@ export function DeepLorePanel({
               <Award size={14} />
               Claim Learning Credit (2.5 Fans)
             </button>
-            <p className="text-[10px] text-center mt-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[10px] text-center mt-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
               15 minutes of deep exploration → 10 Fans/hr rate
             </p>
           </div>
@@ -538,7 +538,7 @@ export function CultureSelector({
       data-testid="culture-selector"
     >
       <div className="p-4">
-        <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(248,250,252,0.4)' }}>
+        <p className="text-[10px] uppercase tracking-[0.2em] mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
           <Globe size={10} className="inline mr-1" /> 21 World Sky Systems
         </p>
 
@@ -566,7 +566,7 @@ export function CultureSelector({
                   {foundational.constellation_count} constellations
                 </span>
               </div>
-              <p className="text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <p className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 Black Hills (He Sapa) • Sacred Mirror
               </p>
             </button>
@@ -574,7 +574,7 @@ export function CultureSelector({
         )}
 
         {/* Orbital Cultures */}
-        <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
           Orbital Systems ({orbitals.length})
         </p>
         <div className="space-y-1.5">
@@ -590,10 +590,10 @@ export function CultureSelector({
               data-testid={`culture-${culture.id}`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: activeCulture === culture.id ? culture.color : 'rgba(248,250,252,0.6)' }}>
+                <span className="text-sm" style={{ color: activeCulture === culture.id ? culture.color : 'rgba(255,255,255,0.85)' }}>
                   {culture.name}
                 </span>
-                <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   {culture.constellation_count}
                 </span>
               </div>
@@ -609,7 +609,7 @@ export function CultureSelector({
             style={{ 
               background: 'rgba(248,250,252,0.03)',
               border: '1px solid rgba(248,250,252,0.06)',
-              color: 'rgba(248,250,252,0.4)',
+              color: 'rgba(255,255,255,0.7)',
             }}
           >
             <X size={10} className="inline mr-1" /> Clear Culture Filter
@@ -652,7 +652,7 @@ export function CommonalityDisplay({ syncData }) {
               <Icon size={14} style={{ color }} />
               <span className="text-xs font-medium" style={{ color }}>{name}</span>
             </div>
-            <div className="text-[10px]" style={{ color: 'rgba(248,250,252,0.5)' }}>
+            <div className="text-[10px]" style={{ color: 'rgba(255,255,255,0.75)' }}>
               {key === 'COSMOS' && `${data.culture_name} • ${data.constellation_count} constellations`}
               {key === 'CRAFT' && `${data.lessons_completed} lessons • ${data.credit_yield}hr yield`}
               {key === 'HARVEST' && `${data.body_vitality} • ${data.herbal_logic}`}

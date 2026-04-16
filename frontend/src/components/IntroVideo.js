@@ -117,7 +117,7 @@ export default function IntroVideo() {
           <p className="text-xs font-medium" style={{ color: '#F8FAFC' }}>
             {status === 'generating' ? 'Creating Cosmic Vision...' : 'Watch the Cosmic Journey'}
           </p>
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
             {status === 'generating' ? 'AI is crafting your video' : 'Cinematic intro powered by Sora 2'}
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function IntroVideo() {
                 {/* Close */}
                 <button onClick={closePlayer} data-testid="intro-video-close"
                   className="absolute -top-12 right-0 p-2 rounded-xl transition-all hover:bg-white/5 z-10"
-                  style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  style={{ color: 'rgba(255,255,255,0.75)' }}>
                   <X size={20} />
                 </button>
 
@@ -181,7 +181,7 @@ export default function IntroVideo() {
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#D8B4FE' }}>
                       The ENLIGHTEN.MINT.CAFE
                     </p>
-                    <p className="text-xs" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>
                       A cinematic vision powered by Sora 2 AI
                     </p>
                   </div>

@@ -584,7 +584,7 @@ export default function OrbitalHub() {
       >
         <h1 
           className="text-sm sm:text-lg font-light tracking-[0.25em] uppercase"
-          style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}
+          style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}
         >
           ENLIGHTEN.MINT.CAFE
         </h1>
@@ -600,7 +600,7 @@ export default function OrbitalHub() {
           className="text-[10px] uppercase tracking-widest px-3 py-1 rounded-full"
           style={{ 
             background: hubState === 'extracted' ? 'rgba(167,139,250,0.15)' : 'rgba(248,250,252,0.05)',
-            color: hubState === 'extracted' ? '#A78BFA' : 'rgba(248,250,252,0.25)',
+            color: hubState === 'extracted' ? '#A78BFA' : 'rgba(255,255,255,0.6)',
             border: `1px solid ${hubState === 'extracted' ? 'rgba(167,139,250,0.2)' : 'rgba(248,250,252,0.05)'}`,
           }}
         >
@@ -739,7 +739,7 @@ export default function OrbitalHub() {
                     className="text-center mt-0.5 font-medium leading-tight px-1"
                     style={{
                       fontSize: Math.max(6, size * 0.1),
-                      color: isHovered || isExtracted ? sat.color : 'rgba(248,250,252,0.45)',
+                      color: isHovered || isExtracted ? sat.color : 'rgba(255,255,255,0.75)',
                     }}
                   >
                     {sat.label}
@@ -982,9 +982,9 @@ export default function OrbitalHub() {
                   width: `${btnSize}px`,
                   height: `${btnSize}px`,
                   background: 'rgba(0,0,0,0)',
-                  border: '1px solid rgba(248,250,252,0.3)',
+                  border: '1px solid rgba(255,255,255,0.65)',
                   borderRadius: '50%',
-                  color: 'rgba(248,250,252,0.7)',
+                  color: 'rgba(255,255,255,0.9)',
                   fontSize: `${btnSize * 0.6}px`,
                   cursor: 'pointer',
                   touchAction: 'manipulation',
@@ -1023,7 +1023,7 @@ export default function OrbitalHub() {
             </p>
             <p 
               className="text-[10px]" 
-              style={{ color: 'rgba(248,250,252,0.3)' }}
+              style={{ color: 'rgba(255,255,255,0.65)' }}
             >
               {hoveredData.desc}
             </p>

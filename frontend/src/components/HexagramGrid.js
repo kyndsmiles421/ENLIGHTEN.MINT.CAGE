@@ -103,21 +103,21 @@ export default function HexagramGrid({ isOpen, onClose }) {
           <div className="grid grid-cols-4 gap-1.5 mb-3">
             <div className="rounded-lg p-2 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
               <div className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>{h2Data.phase_mode}</div>
-              <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Phase</div>
+              <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Phase</div>
             </div>
             <div className="rounded-lg p-2 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
               <div className="text-[10px] font-semibold" style={{ color: '#FBBF24' }}>{(h2Data.alignment_score * 100).toFixed(0)}%</div>
-              <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Alignment</div>
+              <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Alignment</div>
             </div>
             <div className="rounded-lg p-2 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
               <div className="text-[10px] font-semibold" style={{ color: '#818CF8' }}>{(h2Data.matrix_density * 100).toFixed(0)}%</div>
-              <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Density</div>
+              <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Density</div>
             </div>
             <div className="rounded-lg p-2 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
               <div className="text-[10px] font-semibold" style={{ color: h2Data.determinant_positive ? '#22C55E' : '#EF4444' }}>
                 {h2Data.determinant_proxy > 0 ? '+' : ''}{h2Data.determinant_proxy.toFixed(3)}
               </div>
-              <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Determinant</div>
+              <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Determinant</div>
             </div>
           </div>
 
@@ -156,7 +156,7 @@ export default function HexagramGrid({ isOpen, onClose }) {
             <button
               onClick={() => setExpanded(!expanded)}
               className="flex items-center gap-1 text-[8px] mb-1.5"
-              style={{ color: 'rgba(248,250,252,0.3)', cursor: 'pointer' }}
+              style={{ color: 'rgba(255,255,255,0.65)', cursor: 'pointer' }}
               data-testid="h2-grid-toggle"
             >
               {expanded ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
@@ -219,13 +219,13 @@ export default function HexagramGrid({ isOpen, onClose }) {
               background: 'rgba(255,255,255,0.02)',
               border: '1px solid rgba(255,255,255,0.04)',
             }}>
-              <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Cross-Cluster Resonance
               </div>
               <div className="space-y-1">
                 {Object.entries(h2Data.cross_cluster_resonance).map(([key, value]) => (
                   <div key={key} className="flex items-center justify-between">
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{key}</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{key}</span>
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                         <div className="h-full rounded-full" style={{
@@ -249,30 +249,30 @@ export default function HexagramGrid({ isOpen, onClose }) {
               background: 'rgba(255,255,255,0.02)',
               border: '1px solid rgba(255,255,255,0.04)',
             }}>
-              <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Interference Effects
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Transmute Modifier</div>
+                  <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Transmute Modifier</div>
                   <div className="text-[10px] font-semibold" style={{ color: '#FBBF24' }}>
                     ×{h2Data.cross_cluster_effects.transmutation_modifier}
                   </div>
                 </div>
                 <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Tax Modifier</div>
+                  <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Tax Modifier</div>
                   <div className="text-[10px] font-semibold" style={{ color: '#818CF8' }}>
                     ×{h2Data.cross_cluster_effects.tax_modifier}
                   </div>
                 </div>
                 <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Variable Tax</div>
+                  <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Variable Tax</div>
                   <div className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>
                     {h2Data.variable_return_tax}%
                   </div>
                 </div>
                 <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>Economy</div>
+                  <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Economy</div>
                   <div className="text-[10px] font-semibold capitalize" style={{
                     color: h2Data.cross_cluster_effects.economy_health === 'stable' ? '#22C55E'
                       : h2Data.cross_cluster_effects.economy_health === 'cautious' ? '#FBBF24' : '#EF4444'
@@ -288,7 +288,7 @@ export default function HexagramGrid({ isOpen, onClose }) {
 
       {!h2Data && !loading && (
         <div className="px-4 py-8 text-center">
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Resolve your State Matrix to see the 576-intersection interference grid
           </p>
         </div>

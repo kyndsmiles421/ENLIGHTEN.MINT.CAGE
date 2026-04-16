@@ -53,7 +53,7 @@ export function SuanpanSource({ onFrequencySet, color }) {
   return (
     <div className="p-3" data-testid="suanpan-source-panel">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[8px] font-medium tracking-wider uppercase" style={{ color: 'rgba(248,250,252,0.25)' }}>Frequency Source</p>
+        <p className="text-[8px] font-medium tracking-wider uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>Frequency Source</p>
         <p className="text-sm font-mono font-light" style={{ color }}>{totalHz.toFixed(1)} Hz</p>
       </div>
       <div className="flex items-start justify-center gap-1 mb-2">
@@ -245,16 +245,16 @@ export function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostCli
         <GripVertical size={9} className="opacity-0 group-hover:opacity-30 transition-opacity cursor-grab" style={{ color: '#F8FAFC' }} />
 
         <div className="p-1 rounded" style={{ background: `${meta.color}10` }}>
-          <Icon size={10} style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : meta.color }} />
+          <Icon size={10} style={{ color: track.muted ? 'rgba(255,255,255,0.6)' : meta.color }} />
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-[9px] font-medium truncate" style={{ color: track.muted ? 'rgba(248,250,252,0.2)' : 'rgba(248,250,252,0.6)' }}>
+          <p className="text-[9px] font-medium truncate" style={{ color: track.muted ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.85)' }}>
             {track.source_label}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5">
             {track.frequency && <span className="text-[6px] font-mono" style={{ color: `${meta.color}50` }}>{track.frequency}Hz</span>}
-            <span className="text-[6px] font-mono flex items-center gap-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <span className="text-[6px] font-mono flex items-center gap-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
               <Clock size={6} /> {track.start_time || 0}s
             </span>
           </div>
@@ -263,14 +263,14 @@ export function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostCli
         <div className="flex items-center gap-0.5">
           <button className="text-[7px] px-0.5 rounded hover:bg-white/5" data-testid={`dur-minus-${index}`}
             onClick={() => handleDurationChange((track.duration || 60) - 5)}
-            style={{ color: 'rgba(248,250,252,0.3)' }}>-</button>
+            style={{ color: 'rgba(255,255,255,0.65)' }}>-</button>
           <span className="text-[7px] font-mono w-6 text-center" style={{ color: meta.color }}
             data-testid={`track-duration-${index}`}>
             {track.duration || 60}s
           </span>
           <button className="text-[7px] px-0.5 rounded hover:bg-white/5" data-testid={`dur-plus-${index}`}
             onClick={() => handleDurationChange((track.duration || 60) + 5)}
-            style={{ color: 'rgba(248,250,252,0.3)' }}>+</button>
+            style={{ color: 'rgba(255,255,255,0.65)' }}>+</button>
         </div>
 
         <div className="w-10 h-1.5 rounded-full overflow-hidden cursor-pointer relative"
@@ -284,11 +284,11 @@ export function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostCli
         </div>
 
         <button className="p-0.5 rounded" onClick={() => onUpdate(index, { muted: !track.muted })} data-testid={`track-mute-${index}`}>
-          {track.muted ? <VolumeX size={9} style={{ color: 'rgba(248,250,252,0.25)' }} /> : <Volume2 size={9} style={{ color: meta.color }} />}
+          {track.muted ? <VolumeX size={9} style={{ color: 'rgba(255,255,255,0.6)' }} /> : <Volume2 size={9} style={{ color: meta.color }} />}
         </button>
 
         <button className="text-[6px] font-bold px-0.5 py-0.5 rounded" data-testid={`track-solo-${index}`}
-          style={{ color: track.solo ? '#EAB308' : 'rgba(248,250,252,0.2)', background: track.solo ? 'rgba(234,179,8,0.1)' : 'transparent' }}
+          style={{ color: track.solo ? '#EAB308' : 'rgba(255,255,255,0.6)', background: track.solo ? 'rgba(234,179,8,0.1)' : 'transparent' }}
           onClick={() => onUpdate(index, { solo: !track.solo })}>S</button>
 
         <button className="p-0.5 rounded" data-testid={`track-lock-${index}`}
@@ -303,7 +303,7 @@ export function TrackRow({ track, index, onUpdate, onRemove, isGhost, onGhostCli
           <button className="p-0.5 rounded" onClick={() => setExpanded(!expanded)}
             data-testid={`track-keyframe-toggle-${index}`}>
             <ChevronDown size={9} style={{
-              color: expanded ? meta.color : 'rgba(248,250,252,0.2)',
+              color: expanded ? meta.color : 'rgba(255,255,255,0.6)',
               transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s',
             }} />
           </button>

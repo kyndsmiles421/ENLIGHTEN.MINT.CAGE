@@ -69,7 +69,7 @@ function PromptSelector({ prompts, onSelect, sessions, onOpenSession, onDeleteSe
                 </button>
                 <button onClick={() => onDeleteSession(s.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
                   data-testid={`akashic-delete-${s.id}`}>
-                  <Trash2 size={12} style={{ color: 'rgba(248,250,252,0.2)' }} />
+                  <Trash2 size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
                 </button>
               </div>
             ))}

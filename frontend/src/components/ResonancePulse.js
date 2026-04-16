@@ -157,7 +157,7 @@ export function HexagramBadge({ hexagram, compact = false }) {
   if (compact) {
     return (
       <div className="flex items-center gap-1.5" data-testid="hexagram-badge-compact">
-        <span className="text-[10px] font-mono" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <span className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.65)' }}>
           {hexagram.chinese}
         </span>
         <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -175,16 +175,16 @@ export function HexagramBadge({ hexagram, compact = false }) {
       <div className="flex flex-col gap-[1px] items-center" style={{ width: 20 }}>
         {lineChars.slice().reverse().map((ch, i) => (
           <div key={i} className="text-[8px] font-mono leading-none"
-            style={{ color: hexagram.is_transitioning ? '#FBBF24' : 'rgba(248,250,252,0.3)' }}>
+            style={{ color: hexagram.is_transitioning ? '#FBBF24' : 'rgba(255,255,255,0.65)' }}>
             {ch}
           </div>
         ))}
       </div>
       <div>
-        <p className="text-[10px] font-medium" style={{ color: 'rgba(248,250,252,0.5)' }}>
+        <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>
           {hexagram.chinese} {hexagram.pinyin}
         </p>
-        <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           {hexagram.name} &middot; #{hexagram.number}
         </p>
         {hexagram.is_transitioning && (

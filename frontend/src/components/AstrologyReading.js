@@ -108,7 +108,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
                 {constellation.name}
               </p>
               {user_zodiac && (
-                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   Your sign: {user_zodiac}
                 </p>
               )}
@@ -116,7 +116,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
           </div>
           <button onClick={onClose} data-testid="close-astrology-panel"
             className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
-            <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+            <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
           </button>
         </div>
 
@@ -124,7 +124,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
         <div className="mt-4 flex items-center gap-3">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Cosmic Intensity
               </span>
               <span className="text-[9px] font-medium" style={{ color: powerColor }}>
@@ -153,7 +153,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
         <div className="flex items-center gap-1.5 px-2 py-1 rounded-md"
           style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)' }}>
           <Moon size={10} style={{ color: '#E2E8F0' }} />
-          <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.5)' }}>{moon_phase}</span>
+          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{moon_phase}</span>
         </div>
         {active_transits && active_transits.length > 0 && (
           <div className="flex items-center gap-1 flex-wrap">
@@ -178,7 +178,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
               style={{
                 background: active ? `${color}12` : 'transparent',
-                color: active ? color : 'rgba(248,250,252,0.35)',
+                color: active ? color : 'rgba(255,255,255,0.65)',
                 border: `1px solid ${active ? `${color}20` : 'rgba(248,250,252,0.06)'}`,
               }}>
               <Icon size={10} /> {s.label}
@@ -193,14 +193,14 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
           {activeSection === 'influence' && (
             <motion.div key="influence" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
               <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color }}>Cosmic Influence</p>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
                 {reading.cosmic_influence}
               </p>
               <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: '#F59E0B' }}>Energy Forecast</p>
               <div className="p-3 rounded-xl" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.12)' }}>
                 <div className="flex items-start gap-2">
                   <Zap size={12} style={{ color: '#F59E0B', marginTop: 2, flexShrink: 0 }} />
-                  <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                  <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
                     {reading.energy_forecast}
                   </p>
                 </div>
@@ -211,16 +211,16 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
           {activeSection === 'planets' && (
             <motion.div key="planets" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
               <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color }}>Planetary Message</p>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
                 {reading.planetary_message}
               </p>
-              <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Moon Energy</p>
+              <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Moon Energy</p>
               <div className="p-3 rounded-xl" style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)' }}>
                 <div className="flex items-center gap-2 mb-1">
                   <Moon size={12} style={{ color: '#E2E8F0' }} />
                   <span className="text-xs font-medium" style={{ color: '#E2E8F0' }}>{moon_phase}</span>
                 </div>
-                <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.45)' }}>
+                <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   The current lunar phase invites {moon_energy}.
                 </p>
               </div>
@@ -230,7 +230,7 @@ export function AstrologyReadingPanel({ readingData, onClose }) {
           {activeSection === 'guidance' && (
             <motion.div key="guidance" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
               <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color }}>Personal Guidance</p>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(248,250,252,0.7)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>
                 {reading.personal_guidance}
               </p>
               {/* Affirmation card */}

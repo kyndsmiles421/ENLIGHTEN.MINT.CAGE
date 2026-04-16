@@ -132,14 +132,14 @@ function DetailPanel({ planet, onClose, authHeaders }) {
           </span>
         </div>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-white/5">
-          <X size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+          <X size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
         </button>
       </div>
 
       <div className="p-4 space-y-3">
         {data?.type === 'element' && (
           <>
-            <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {data.plants.length} specimens in this element family
             </p>
             <div className="space-y-1.5 max-h-[300px] overflow-y-auto">
@@ -147,7 +147,7 @@ function DetailPanel({ planet, onClose, authHeaders }) {
                 <div key={p.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
                   style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
                   <div className="w-2 h-2 rounded-full" style={{ background: p.locked ? 'rgba(248,250,252,0.1)' : planet.color }} />
-                  <span className="text-[10px] flex-1" style={{ color: p.locked ? 'rgba(248,250,252,0.15)' : 'rgba(248,250,252,0.5)' }}>
+                  <span className="text-[10px] flex-1" style={{ color: p.locked ? 'rgba(248,250,252,0.15)' : 'rgba(255,255,255,0.75)' }}>
                     {p.name}
                   </span>
                   <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -160,7 +160,7 @@ function DetailPanel({ planet, onClose, authHeaders }) {
         )}
         {data?.type === 'garden' && (
           <>
-            <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {data.garden.length} plants in your garden
             </p>
             <div className="space-y-1.5 max-h-[300px] overflow-y-auto">
@@ -168,7 +168,7 @@ function DetailPanel({ planet, onClose, authHeaders }) {
                 <div key={g.garden_id || g.plant_id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
                   style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
                   <div className="w-2 h-2 rounded-full" style={{ background: ELEMENT_COLORS[g.element] || '#22C55E' }} />
-                  <span className="text-[10px] flex-1" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  <span className="text-[10px] flex-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
                     {g.plant_name || g.name}
                   </span>
                   <span className="text-[7px] font-mono" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -182,7 +182,7 @@ function DetailPanel({ planet, onClose, authHeaders }) {
         {data?.type === 'resonance' && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Compatibility</span>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Compatibility</span>
               <span className="text-xs font-mono" style={{ color: planet.color }}>
                 {data.resonanceData.compatibility_score || 0}%
               </span>
@@ -197,23 +197,23 @@ function DetailPanel({ planet, onClose, authHeaders }) {
         {data?.type === 'balance' && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Balance Score</span>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Balance Score</span>
               <span className="text-xs font-mono" style={{ color: planet.color }}>
                 {data.gardenSummary.balance_score?.toFixed(1) || 0}
               </span>
             </div>
-            <p className="text-[8px] capitalize" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <p className="text-[8px] capitalize" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Tier: {data.gardenSummary.balance_tier || 'observer'}
             </p>
           </div>
         )}
         {data?.type === 'identify' && (
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Use AI to identify any plant from a photo. Navigate to the full Botany page for the camera interface.
           </p>
         )}
         {data?.type === 'alchemy' && (
-          <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Transmutation recipes unlock at Archivist tier with 3+ elements explored.
           </p>
         )}
@@ -317,10 +317,10 @@ export default function BotanyOrbital() {
         <button onClick={() => navigate('/hub')} className="p-2 rounded-full"
           style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
           data-testid="botany-orbital-back">
-          <ArrowLeft size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          <ArrowLeft size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
         </button>
         <span className="text-[9px] uppercase tracking-[0.15em]"
-          style={{ color: 'rgba(248,250,252,0.2)', fontFamily: 'Cormorant Garamond, serif' }}>
+          style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
           Botanical Orbital
         </span>
         <NanoGuide guideId="botany" position="top-right" />
@@ -332,7 +332,7 @@ export default function BotanyOrbital() {
           className="px-3 py-1.5 rounded-full text-[8px] font-medium uppercase tracking-wider"
           style={{
             background: 'rgba(248,250,252,0.04)',
-            color: 'rgba(248,250,252,0.3)',
+            color: 'rgba(255,255,255,0.65)',
             border: '1px solid rgba(248,250,252,0.06)',
           }}
           data-testid="switch-to-full-botany">

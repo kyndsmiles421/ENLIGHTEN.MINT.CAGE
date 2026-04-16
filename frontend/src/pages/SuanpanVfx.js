@@ -47,7 +47,7 @@ export function SacredAssemblyLoader({ delay, onComplete }) {
       </div>
 
       <motion.p className="text-[10px] tracking-[0.25em] uppercase mb-2"
-        style={{ color: 'rgba(248,250,252,0.2)' }}
+        style={{ color: 'rgba(255,255,255,0.6)' }}
         key={phase} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         Sacred Assembly
       </motion.p>

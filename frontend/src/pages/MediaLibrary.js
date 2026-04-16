@@ -166,7 +166,7 @@ export default function MediaLibrary() {
           <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
             {tab === 'mine' ? 'Your library is empty' : 'No creations found'}
           </p>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {tab === 'mine' ? 'Record a session in the Production Console to get started' : 'Be the first to share!'}
           </p>
         </div>
@@ -226,7 +226,7 @@ export default function MediaLibrary() {
                     <p className="text-[10px] mb-2 line-clamp-2" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
                   )}
                   {item.creator_name && tab === 'community' && (
-                    <p className="text-[9px] mb-2" style={{ color: 'rgba(255,255,255,0.2)' }}>by {item.creator_name}</p>
+                    <p className="text-[9px] mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>by {item.creator_name}</p>
                   )}
 
                   {/* Tags */}

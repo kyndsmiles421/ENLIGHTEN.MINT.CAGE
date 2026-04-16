@@ -61,7 +61,7 @@ function CouncilCard({ member, onSelect, onPurchaseUtility }) {
                 <Crown size={10} style={{ color: member.color, opacity: 0.6 }} />
               )}
             </div>
-            <div className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <div className="text-[8px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {member.module}
             </div>
           </div>
@@ -80,7 +80,7 @@ function CouncilCard({ member, onSelect, onPurchaseUtility }) {
           </div>
         </div>
 
-        <p className="text-[9px] leading-relaxed mb-2" style={{ color: 'rgba(248,250,252,0.4)' }}>
+        <p className="text-[9px] leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
           {member.backstory ? member.backstory.slice(0, 120) + '...' : member.expertise}
         </p>
 
@@ -112,7 +112,7 @@ function CouncilCard({ member, onSelect, onPurchaseUtility }) {
               <div className="text-[8px] font-semibold truncate" style={{ color: util.color }}>
                 {util.name}
               </div>
-              <div className="text-[7px] truncate" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <div className="text-[7px] truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {util.description.slice(0, 60)}...
               </div>
             </div>
@@ -137,7 +137,7 @@ function CouncilCard({ member, onSelect, onPurchaseUtility }) {
               }}
               data-testid={`buy-utility-${util.id}`}
             >
-              <span className="text-[7px] line-through" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span className="text-[7px] line-through" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {util.base_price}
               </span>
               <span className="text-[8px] font-bold" style={{ color: util.color }}>
@@ -173,7 +173,7 @@ function ChatBubble({ msg, color, name }) {
           <div className="text-[7px] font-semibold mb-1" style={{ color }}>{name}</div>
         )}
         <div className="text-[10px] leading-relaxed whitespace-pre-wrap" style={{
-          color: isUser ? 'rgba(248,250,252,0.65)' : 'rgba(248,250,252,0.5)',
+          color: isUser ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.75)',
         }}>
           {msg.content?.replace(/\[BRIDGE:\w+\]/g, '')}
         </div>
@@ -213,13 +213,13 @@ function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading })
           <h3 className="text-sm font-semibold mb-1" style={{ color: '#F8FAFC' }}>
             {isUtility ? item.name : `Consult ${item.member?.name}`}
           </h3>
-          <p className="text-[9px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <p className="text-[9px] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {isUtility ? item.description : item.member?.role}
           </p>
 
           {isUtility && (
             <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="text-[9px] line-through" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span className="text-[9px] line-through" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {item.base_price} Dust
               </span>
               <span className="text-xs font-bold" style={{ color }}>
@@ -237,11 +237,11 @@ function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading })
             background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)',
           }}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>Cost</span>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Cost</span>
               <span className="text-xs font-bold" style={{ color }}>{cost} Dust</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.35)' }}>Balance</span>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Balance</span>
               <span className="text-xs font-semibold" style={{
                 color: canAfford ? '#22C55E' : '#EF4444',
               }}>{dustBalance} Dust</span>
@@ -250,7 +250,7 @@ function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading })
 
           {isUtility && (
             <div className="text-[7px] mb-3 px-2 py-1.5 rounded-lg" style={{
-              background: 'rgba(192,132,252,0.04)', color: 'rgba(248,250,252,0.3)',
+              background: 'rgba(192,132,252,0.04)', color: 'rgba(255,255,255,0.65)',
               border: '1px solid rgba(192,132,252,0.08)',
             }}>
               Lifetime license. Protected by the 30% Failure Charge refund protocol.
@@ -277,7 +277,7 @@ function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading })
         </div>
 
         <button onClick={onClose} className="w-full py-2 text-[9px]" style={{
-          color: 'rgba(248,250,252,0.25)', background: 'rgba(255,255,255,0.01)',
+          color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.01)',
           borderTop: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer',
         }}>Cancel</button>
       </motion.div>
@@ -455,7 +455,7 @@ export default function SovereignAdvisors() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.25)' }}>Sign in to consult the Sovereign Council</p>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>Sign in to consult the Sovereign Council</p>
       </div>
     );
   }
@@ -475,7 +475,7 @@ export default function SovereignAdvisors() {
             className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}
             data-testid="back-to-list-btn"
           >
-            <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.45)' }} />
+            <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.75)' }} />
           </button>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
             background: `${selectedMember.color}0A`,
@@ -490,7 +490,7 @@ export default function SovereignAdvisors() {
               {isFaculty ? <GraduationCap size={10} style={{ color: selectedMember.color, opacity: 0.5 }} />
                 : <Crown size={10} style={{ color: selectedMember.color, opacity: 0.5 }} />}
             </div>
-            <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {selectedMember.module} — Knowledge: {TIER_LABELS[userTier]} depth
             </div>
           </div>
@@ -502,13 +502,13 @@ export default function SovereignAdvisors() {
             }}
             data-testid="voice-toggle-btn"
           >
-            {voiceEnabled ? <Volume2 size={13} style={{ color: '#8B5CF6' }} /> : <VolumeX size={13} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+            {voiceEnabled ? <Volume2 size={13} style={{ color: '#8B5CF6' }} /> : <VolumeX size={13} style={{ color: 'rgba(255,255,255,0.6)' }} />}
           </button>
           <button onClick={handleClear}
             className="p-1.5 rounded-lg" style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}
             data-testid="clear-history-btn"
           >
-            <Trash2 size={13} style={{ color: 'rgba(248,250,252,0.25)' }} />
+            <Trash2 size={13} style={{ color: 'rgba(255,255,255,0.6)' }} />
           </button>
         </div>
 
@@ -556,7 +556,7 @@ export default function SovereignAdvisors() {
               <p className="text-[10px] font-medium mb-1" style={{ color: selectedMember.color }}>
                 {selectedMember.name}
               </p>
-              <p className="text-[8px] max-w-xs mx-auto mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[8px] max-w-xs mx-auto mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {selectedMember.backstory}
               </p>
               <p className="text-[7px] italic" style={{ color: 'rgba(248,250,252,0.15)' }}>
@@ -644,7 +644,7 @@ export default function SovereignAdvisors() {
             data-testid="council-title">
             The Sovereign Council
           </h1>
-          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
             10 Domain Authorities — Advisors & Faculty — Tiered Knowledge
           </p>
         </div>
@@ -670,8 +670,8 @@ export default function SovereignAdvisors() {
         <div className="flex items-center gap-1.5 mb-5 px-2 py-1.5 rounded-lg w-fit" style={{
           background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)',
         }} data-testid="language-indicator">
-          <Globe size={9} style={{ color: 'rgba(248,250,252,0.25)' }} />
-          <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <Globe size={9} style={{ color: 'rgba(255,255,255,0.6)' }} />
+          <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Council responds in: <span style={{ color: '#818CF8' }}>{language.toUpperCase()}</span>
           </span>
         </div>
@@ -683,7 +683,7 @@ export default function SovereignAdvisors() {
             <span className="text-[10px] font-semibold" style={{ color: '#FBBF24' }}>
               Sovereign Advisors
             </span>
-            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Strategic Guidance
             </span>
           </div>
@@ -701,7 +701,7 @@ export default function SovereignAdvisors() {
             <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>
               Faculty Teachers
             </span>
-            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Utility Tools & Education
             </span>
           </div>
@@ -722,7 +722,7 @@ export default function SovereignAdvisors() {
               Council Protocol
             </span>
           </div>
-          <div className="space-y-1.5 text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <div className="space-y-1.5 text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             <p>Knowledge depth scales with your tier. Seekers receive foundational guidance; Architects access unrestricted intelligence.</p>
             <p>Lower-tier users can purchase utility tools at a {discountRate}% Universal Subsidy. Own 3+ Architect tools and the $89/mo subscription becomes the logical upgrade.</p>
             <p>Every purchase is protected by the 30% Failure Charge refund protocol via The Principal Economist.</p>

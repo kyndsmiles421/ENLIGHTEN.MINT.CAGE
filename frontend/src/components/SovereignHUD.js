@@ -21,7 +21,7 @@ function getHarmonyColor(score) {
   if (score >= 60) return '#60A5FA'; // Blue — resonant
   if (score >= 40) return '#FBBF24'; // Amber — awakening
   if (score >= 20) return '#F97316'; // Orange — seeking
-  return 'rgba(248,250,252,0.3)';    // Gray — dormant
+  return 'rgba(255,255,255,0.65)';    // Gray — dormant
 }
 
 export default function SovereignHUD() {
@@ -271,8 +271,8 @@ export default function SovereignHUD() {
           />
         )}
 
-        <Activity size={9} style={{ color: stats.active > 0 ? '#EAB308' : 'rgba(248,250,252,0.2)' }} />
-        <span className="text-[7px] font-mono" style={{ color: stats.active > 0 ? hColor : 'rgba(248,250,252,0.25)' }}>
+        <Activity size={9} style={{ color: stats.active > 0 ? '#EAB308' : 'rgba(255,255,255,0.6)' }} />
+        <span className="text-[7px] font-mono" style={{ color: stats.active > 0 ? hColor : 'rgba(255,255,255,0.6)' }}>
           {stats.active > 0 ? `${stats.active} active` : 'idle'}
         </span>
         {stats.pending > 0 && (
@@ -294,7 +294,7 @@ export default function SovereignHUD() {
           <span className="text-[6px] px-1 py-0.5 rounded-full font-mono"
             style={{
               background: streak.streak_active ? 'rgba(251,191,36,0.15)' : 'rgba(248,250,252,0.04)',
-              color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.3)',
+              color: streak.streak_active ? '#FBBF24' : 'rgba(255,255,255,0.65)',
               border: streak.streak_active ? '1px solid rgba(251,191,36,0.2)' : 'none',
             }}
             data-testid="streak-counter">
@@ -373,7 +373,7 @@ export default function SovereignHUD() {
                 <p className="text-[5px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.15)' }}>Queue</p>
               </div>
               <div className="text-center">
-                <p className="text-[10px] font-mono font-bold" style={{ color: stats.errors > 0 ? '#EF4444' : 'rgba(248,250,252,0.2)' }}>{stats.errors}</p>
+                <p className="text-[10px] font-mono font-bold" style={{ color: stats.errors > 0 ? '#EF4444' : 'rgba(255,255,255,0.6)' }}>{stats.errors}</p>
                 <p className="text-[5px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.15)' }}>Errors</p>
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function SovereignHUD() {
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1">
                     <Music size={8} style={{ color: getHarmonyColor(harmonyScore.score) }} />
-                    <span className="text-[6px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                    <span className="text-[6px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       Harmony
                     </span>
                   </div>
@@ -420,7 +420,7 @@ export default function SovereignHUD() {
                       { label: 'Depth', value: harmonyScore.breakdown.harmonic_depth, max: 30, color: '#F59E0B' },
                     ].map(bar => (
                       <div key={bar.label} className="flex items-center gap-1">
-                        <span className="text-[5px] font-mono w-7 text-right" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                        <span className="text-[5px] font-mono w-7 text-right" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           {bar.label}
                         </span>
                         <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
@@ -438,7 +438,7 @@ export default function SovereignHUD() {
                 </div>
 
                 {/* Insight */}
-                <p className="text-[6px] mt-1.5 leading-relaxed" style={{ color: 'rgba(248,250,252,0.25)', fontFamily: 'Cormorant Garamond, serif' }}>
+                <p className="text-[6px] mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>
                   {harmonyScore.insight}
                 </p>
               </div>
@@ -449,13 +449,13 @@ export default function SovereignHUD() {
               <div className="px-3 py-2 border-t" style={{ borderColor: 'rgba(248,250,252,0.03)' }} data-testid="streak-panel">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1">
-                    <Zap size={8} style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.3)' }} />
-                    <span className="text-[6px] uppercase tracking-widest" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                    <Zap size={8} style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(255,255,255,0.65)' }} />
+                    <span className="text-[6px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       Streak
                     </span>
                   </div>
                   <motion.span className="text-[10px] font-mono font-bold"
-                    style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(248,250,252,0.4)' }}
+                    style={{ color: streak.streak_active ? '#FBBF24' : 'rgba(255,255,255,0.7)' }}
                     animate={streak.streak_active ? { scale: [1, 1.1, 1] } : {}}
                     transition={{ duration: 1.5, repeat: Infinity }}
                     data-testid="streak-value">
@@ -503,7 +503,7 @@ export default function SovereignHUD() {
                       <div className="w-1 h-1 rounded-full" style={{
                         background: task.type === 'complete' ? '#22C55E' : task.type === 'error' ? '#EF4444' : meta.color,
                       }} />
-                      <span className="text-[5px] font-mono truncate flex-1" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <span className="text-[5px] font-mono truncate flex-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {task.label || task.channel}
                       </span>
                       <span className="text-[5px] font-mono" style={{ color: 'rgba(248,250,252,0.1)' }}>

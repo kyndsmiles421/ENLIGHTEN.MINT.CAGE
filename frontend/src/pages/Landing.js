@@ -1006,7 +1006,7 @@ export default function Landing() {
             {isGuest ? (
               <button onClick={() => { Sensories.confirm(); navigate('/auth'); }}
                 className="py-2.5 px-6 rounded-full text-sm font-medium"
-                style={{ background: 'rgba(255,255,255,0.1)', border: '2px solid rgba(255,255,255,0.3)', color: '#F8FAFC' }}
+                style={{ background: 'rgba(255,255,255,0.1)', border: '2px solid rgba(255,255,255,0.65)', color: '#F8FAFC' }}
                 data-testid="sign-in-btn">
                 Sign In / Register
               </button>

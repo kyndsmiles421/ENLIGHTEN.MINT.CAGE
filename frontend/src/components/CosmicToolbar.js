@@ -229,7 +229,7 @@ export default function CosmicToolbar() {
       zenSoundsRef.current = [];
       setMeditating(false);
       setBpm(0);
-      toast('Meditation ended', { style: { background: 'rgba(0,0,0,0)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(248,250,252,0.6)' } });
+      toast('Meditation ended', { style: { background: 'rgba(0,0,0,0)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)' } });
       return;
     }
     // Start 528Hz + 174Hz + Ocean via MixerContext
@@ -428,7 +428,7 @@ export default function CosmicToolbar() {
               style={{ width: 22, height: 22, flexShrink: 0 }}
               title="Minimize toolbar"
             >
-              <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+              <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
             </button>
           </motion.div>
         )}

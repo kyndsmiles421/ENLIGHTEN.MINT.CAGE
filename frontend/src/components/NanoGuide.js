@@ -55,7 +55,7 @@ export function NanoGuide({ guideId, position = 'top-right' }) {
                 {tips.title}
               </span>
               <button onClick={() => setOpen(false)} className="p-0.5 rounded hover:bg-white/5">
-                <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
               </button>
             </div>
             <div className="p-3 space-y-2">
@@ -65,7 +65,7 @@ export function NanoGuide({ guideId, position = 'top-right' }) {
                     style={{ background: 'rgba(192,132,252,0.12)', color: '#C084FC' }}>
                     {i + 1}
                   </span>
-                  <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>{tip}</p>
+                  <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{tip}</p>
                 </div>
               ))}
             </div>

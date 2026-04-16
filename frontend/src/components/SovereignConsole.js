@@ -382,7 +382,7 @@ export const SovereignConsole = () => {
             </pre>
           ) : (
             <p style={{ 
-              color: 'rgba(255,255,255,0.3)', 
+              color: 'rgba(255,255,255,0.65)', 
               fontStyle: 'italic', 
               fontSize: '0.75rem' 
             }}>

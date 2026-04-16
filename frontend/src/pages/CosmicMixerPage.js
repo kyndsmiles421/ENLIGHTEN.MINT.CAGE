@@ -61,7 +61,7 @@ function WaveformSelector({ value, onChange, color }) {
           className="px-1 py-0.5 rounded text-[8px] font-mono transition-all"
           style={{
             background: value === w ? `${color}18` : 'rgba(255,255,255,0.02)',
-            color: value === w ? color : 'rgba(248,250,252,0.25)',
+            color: value === w ? color : 'rgba(255,255,255,0.6)',
             border: `1px solid ${value === w ? `${color}30` : 'rgba(255,255,255,0.04)'}`,
           }}
           data-testid={`waveform-${w}`}
@@ -620,7 +620,7 @@ export default function CosmicMixerPage() {
                 <span className="text-xs font-medium" style={{ color: sessionData.color }}>{sessionData.label}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs tabular-nums" style={{ color: 'rgba(248,250,252,0.5)' }}>{fmtTime(sessionTimeLeft)}</span>
+                <span className="text-xs tabular-nums" style={{ color: 'rgba(255,255,255,0.75)' }}>{fmtTime(sessionTimeLeft)}</span>
                 <button onClick={stopSession} className="text-[10px] px-2.5 py-1 rounded-lg" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }} data-testid="session-stop">End</button>
               </div>
             </div>
@@ -631,7 +631,7 @@ export default function CosmicMixerPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[10px]" style={{ color: sessionData.color }}>Phase {sessionPhaseIdx + 1}/{sessionData.phases.length}: {sessionData.phases[sessionPhaseIdx]?.desc}</span>
-              <span className="text-[9px] tabular-nums" style={{ color: 'rgba(248,250,252,0.3)' }}>{fmtTime(sessionPhaseTimeLeft)} left</span>
+              <span className="text-[9px] tabular-nums" style={{ color: 'rgba(255,255,255,0.65)' }}>{fmtTime(sessionPhaseTimeLeft)} left</span>
             </div>
           </div>
         </div>
@@ -651,7 +651,7 @@ export default function CosmicMixerPage() {
               className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
               style={{ background: `linear-gradient(to right, #C084FC ${muted ? 0 : masterVol}%, rgba(255,255,255,0.08) ${muted ? 0 : masterVol}%)` }}
               data-testid="sticky-volume" />
-            <span className="text-[11px] w-8 text-right tabular-nums flex-shrink-0" style={{ color: 'rgba(248,250,252,0.5)' }}>{muted ? 0 : masterVol}%</span>
+            <span className="text-[11px] w-8 text-right tabular-nums flex-shrink-0" style={{ color: 'rgba(255,255,255,0.75)' }}>{muted ? 0 : masterVol}%</span>
             <button onClick={stopAll}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl flex-shrink-0 transition-all active:scale-95"
               style={{
@@ -659,8 +659,8 @@ export default function CosmicMixerPage() {
                 border: `1px solid ${hasActive ? 'rgba(239,68,68,0.3)' : 'rgba(248,250,252,0.06)'}`,
               }}
               data-testid="sticky-stop-all">
-              <Square size={12} style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }} />
-              <span className="text-[11px] font-medium" style={{ color: hasActive ? '#EF4444' : 'rgba(248,250,252,0.3)' }}>{t('mixer.stopAll', 'Stop All')}</span>
+              <Square size={12} style={{ color: hasActive ? '#EF4444' : 'rgba(255,255,255,0.65)' }} />
+              <span className="text-[11px] font-medium" style={{ color: hasActive ? '#EF4444' : 'rgba(255,255,255,0.65)' }}>{t('mixer.stopAll', 'Stop All')}</span>
             </button>
           </div>
           {hasActive && (
@@ -676,7 +676,7 @@ export default function CosmicMixerPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <button onClick={() => { stopAll(); stopSession(); navigate(-1); }} className="p-2 rounded-xl transition-all hover:scale-105" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }} data-testid="mixer-back">
-            <ArrowLeft size={18} style={{ color: 'rgba(248,250,252,0.6)' }} />
+            <ArrowLeft size={18} style={{ color: 'rgba(255,255,255,0.85)' }} />
           </button>
           <div className="text-center">
             <div className="flex items-center gap-2 justify-center">
@@ -707,7 +707,7 @@ export default function CosmicMixerPage() {
                 style={{
                   background: active ? 'rgba(192,132,252,0.08)' : 'rgba(255,255,255,0.02)',
                   border: `1px solid ${active ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.04)'}`,
-                  color: active ? '#C084FC' : 'rgba(248,250,252,0.35)',
+                  color: active ? '#C084FC' : 'rgba(255,255,255,0.65)',
                 }}
                 data-testid={`mixer-mode-${mode.id}`}
               >
@@ -730,7 +730,7 @@ export default function CosmicMixerPage() {
           <AccordionSection title={t("mixer.sessionMode", "Session Mode")} icon={Play} color="#EC4899" open={openSections.session} onToggle={() => toggleSection('session')} badge={sessionActive ? sessionData?.label : null}>
             {sessionActive ? (
               <div className="text-center py-3">
-                <p className="text-xs mb-2" style={{ color: 'rgba(248,250,252,0.5)' }}>Session in progress</p>
+                <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>Session in progress</p>
                 <button onClick={stopSession} className="text-xs px-5 py-2 rounded-xl" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }} data-testid="session-stop-inner">End Session</button>
               </div>
             ) : (
@@ -742,7 +742,7 @@ export default function CosmicMixerPage() {
                       <span className="text-sm">{s.icon}</span>
                       <span className="text-xs font-medium" style={{ color: s.color }}>{s.label}</span>
                     </div>
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{fmtTime(s.duration)} — {s.phases.length} phases</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{fmtTime(s.duration)} — {s.phases.length} phases</span>
                   </button>
                 ))}
               </div>
@@ -775,7 +775,7 @@ export default function CosmicMixerPage() {
                   {soundscapeSaving ? <Loader2 size={10} className="animate-spin" /> : <Globe size={10} />} Share
                 </button>
               </div>
-              {!hasActive && <p className="text-[9px] mt-1.5 text-center" style={{ color: 'rgba(248,250,252,0.25)' }}>Activate layers to capture a soundscape</p>}
+              {!hasActive && <p className="text-[9px] mt-1.5 text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>Activate layers to capture a soundscape</p>}
             </div>
 
             {/* Tabs */}
@@ -783,7 +783,7 @@ export default function CosmicMixerPage() {
               {[{ id: 'mine', label: 'My Soundscapes' }, { id: 'community', label: 'Community' }].map(t => (
                 <button key={t.id} onClick={() => setSoundscapeTab(t.id)}
                   className="flex-1 py-1.5 rounded-lg text-[10px] transition-all"
-                  style={{ background: soundscapeTab === t.id ? 'rgba(129,140,248,0.1)' : 'transparent', border: `1px solid ${soundscapeTab === t.id ? 'rgba(129,140,248,0.15)' : 'rgba(255,255,255,0.04)'}`, color: soundscapeTab === t.id ? '#818CF8' : 'rgba(248,250,252,0.35)' }}
+                  style={{ background: soundscapeTab === t.id ? 'rgba(129,140,248,0.1)' : 'transparent', border: `1px solid ${soundscapeTab === t.id ? 'rgba(129,140,248,0.15)' : 'rgba(255,255,255,0.04)'}`, color: soundscapeTab === t.id ? '#818CF8' : 'rgba(255,255,255,0.65)' }}
                   data-testid={`soundscape-tab-${t.id}`}>
                   {t.label}
                 </button>
@@ -793,7 +793,7 @@ export default function CosmicMixerPage() {
             {/* Soundscape list */}
             <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
               {(soundscapeTab === 'mine' ? savedSoundscapes : communitySoundscapes).length === 0 ? (
-                <p className="text-[10px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                <p className="text-[10px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {soundscapeTab === 'mine' ? 'No saved soundscapes yet' : 'No community soundscapes yet'}
                 </p>
               ) : (
@@ -802,7 +802,7 @@ export default function CosmicMixerPage() {
                     style={{ border: '1px solid rgba(255,255,255,0.04)' }} data-testid={`soundscape-${s.id}`}>
                     <button onClick={() => loadSoundscape(s)} className="flex-1 text-left">
                       <div className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{s.name}</div>
-                      <div className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         {s.creator_name && soundscapeTab === 'community' ? `by ${s.creator_name} · ` : ''}
                         {new Date(s.created_at).toLocaleDateString()}
                       </div>
@@ -811,7 +811,7 @@ export default function CosmicMixerPage() {
                       <Download size={12} style={{ color: '#818CF8' }} />
                     </button>
                     {soundscapeTab === 'community' && (
-                      <span className="text-[9px] flex items-center gap-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <span className="text-[9px] flex items-center gap-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         <Heart size={9} /> {s.like_count || 0}
                       </span>
                     )}
@@ -829,7 +829,7 @@ export default function CosmicMixerPage() {
           {/* ── AI Frequency Blend ── */}
           <AccordionSection title={t("mixer.aiblend", "AI Frequency Blend")} icon={Wand2} color="#C084FC" open={openSections.aiblend} onToggle={() => toggleSection('aiblend')} badge={aiBlend ? (aiBlend.type === 'ai_enhanced' ? 'AI' : 'Auto') : null}>
             <div className="space-y-3">
-              <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.4)' }}>
+              <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 Analyzes your mood journal patterns and creates a personalized healing frequency blend just for you.
               </p>
               <button
@@ -846,7 +846,7 @@ export default function CosmicMixerPage() {
                 {aiBlendLoading ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
                 {aiBlendLoading ? 'Analyzing Your Moods...' : 'Generate My Blend'}
               </button>
-              <div className="flex items-center gap-2 text-[9px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <div className="flex items-center gap-2 text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 <Crown size={9} style={{ color: '#C084FC' }} />
                 <span>Free: Algorithmic blend | Plus+: AI-enhanced with deep mood analysis</span>
               </div>
@@ -864,7 +864,7 @@ export default function CosmicMixerPage() {
                     )}
                     {aiBlend.blend_name && <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{aiBlend.blend_name}</span>}
                   </div>
-                  <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>{aiBlend.summary}</p>
+                  <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{aiBlend.summary}</p>
                   {aiBlend.insight && (
                     <p className="text-[10px] leading-relaxed italic" style={{ color: 'rgba(192,132,252,0.5)' }}>{aiBlend.insight}</p>
                   )}
@@ -910,7 +910,7 @@ export default function CosmicMixerPage() {
                         <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${p.color}20`, color: p.color }}>ACTIVE</span>
                       )}
                     </div>
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{p.desc} — {p.bpm} BPM</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{p.desc} — {p.bpm} BPM</span>
                   </button>
                 );
               })}
@@ -939,8 +939,8 @@ export default function CosmicMixerPage() {
                         }}
                         data-testid={`mixer-freq-${f.hz}`}>
                         {badgeLabel && <span className="absolute -top-1.5 -right-1.5 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{ background: `${badgeColor}18`, color: badgeColor, border: `1px solid ${badgeColor}35` }}>{badgeLabel}</span>}
-                        <span className="text-[11px] font-medium block" style={{ color: isActive ? f.color : special ? badgeColor : 'rgba(248,250,252,0.7)' }}>{f.label}</span>
-                        <span className="text-[8px] block" style={{ color: special ? `${badgeColor}60` : 'rgba(248,250,252,0.25)' }}>{f.desc}</span>
+                        <span className="text-[11px] font-medium block" style={{ color: isActive ? f.color : special ? badgeColor : 'rgba(255,255,255,0.9)' }}>{f.label}</span>
+                        <span className="text-[8px] block" style={{ color: special ? `${badgeColor}60` : 'rgba(255,255,255,0.6)' }}>{f.desc}</span>
                       </button>
                     </div>
                   );
@@ -976,8 +976,8 @@ export default function CosmicMixerPage() {
                   <button key={s.id} onClick={() => toggleSound(s)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
                     style={{ background: activeSounds.has(s.id) ? `${s.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeSounds.has(s.id) ? `${s.color}35` : 'rgba(255,255,255,0.04)'}` }}
                     data-testid={`mixer-sound-${s.id}`}>
-                    {activeSounds.has(s.id) ? <Pause size={10} style={{ color: s.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
-                    <span className="text-[11px]" style={{ color: activeSounds.has(s.id) ? s.color : 'rgba(248,250,252,0.55)' }}>{s.label}</span>
+                    {activeSounds.has(s.id) ? <Pause size={10} style={{ color: s.color }} /> : <Play size={10} style={{ color: 'rgba(255,255,255,0.6)' }} />}
+                    <span className="text-[11px]" style={{ color: activeSounds.has(s.id) ? s.color : 'rgba(255,255,255,0.8)' }}>{s.label}</span>
                   </button>
                 ))}
               </div>
@@ -1000,7 +1000,7 @@ export default function CosmicMixerPage() {
                           <span className="text-[8px] w-8 text-right tabular-nums" style={{ color: `${s.color}50` }}>{channelVols[`sound-${id}`] ?? 75}%</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[7px] w-10 flex-shrink-0" style={{ color: 'rgba(248,250,252,0.2)' }}>Filter</span>
+                          <span className="text-[7px] w-10 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }}>Filter</span>
                           <input type="range" min={100} max={20000} value={sf.cutoff} step={100}
                             onChange={e => setChannelFilter(soundFilterMapRef, setSoundFilters, id, Number(e.target.value), sf.resonance)}
                             className="flex-1 h-0.5 rounded-full appearance-none cursor-pointer"
@@ -1027,8 +1027,8 @@ export default function CosmicMixerPage() {
                   <button key={d.id} onClick={() => toggleDrone(d)} className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.97]"
                     style={{ background: activeDrones.has(d.id) ? `${d.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeDrones.has(d.id) ? `${d.color}35` : 'rgba(255,255,255,0.04)'}` }}
                     data-testid={`mixer-drone-${d.id}`}>
-                    {activeDrones.has(d.id) ? <Pause size={10} style={{ color: d.color }} /> : <Play size={10} style={{ color: 'rgba(248,250,252,0.25)' }} />}
-                    <span className="text-[11px]" style={{ color: activeDrones.has(d.id) ? d.color : 'rgba(248,250,252,0.55)' }}>{d.label}</span>
+                    {activeDrones.has(d.id) ? <Pause size={10} style={{ color: d.color }} /> : <Play size={10} style={{ color: 'rgba(255,255,255,0.6)' }} />}
+                    <span className="text-[11px]" style={{ color: activeDrones.has(d.id) ? d.color : 'rgba(255,255,255,0.8)' }}>{d.label}</span>
                   </button>
                 ))}
               </div>
@@ -1051,7 +1051,7 @@ export default function CosmicMixerPage() {
                           <span className="text-[8px] w-8 text-right tabular-nums" style={{ color: `${d.color}50` }}>{channelVols[`drone-${id}`] ?? 75}%</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[7px] w-10 flex-shrink-0" style={{ color: 'rgba(248,250,252,0.2)' }}>Filter</span>
+                          <span className="text-[7px] w-10 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }}>Filter</span>
                           <input type="range" min={80} max={8000} value={df.cutoff} step={50}
                             onChange={e => setChannelFilter(droneFilterMapRef, setDroneFilters, id, Number(e.target.value), df.resonance)}
                             className="flex-1 h-0.5 rounded-full appearance-none cursor-pointer"
@@ -1080,8 +1080,8 @@ export default function CosmicMixerPage() {
                   data-testid={`mixer-mantra-${m.id}`}>
                   {mantraLoading && activeMantra?.id === m.id && <Loader2 size={9} className="animate-spin flex-shrink-0" style={{ color: m.color }} />}
                   <div>
-                    <span className="text-[11px] font-medium block" style={{ color: activeMantra?.id === m.id ? m.color : 'rgba(248,250,252,0.65)' }}>{m.label}</span>
-                    <span className="text-[8px] block" style={{ color: 'rgba(248,250,252,0.2)' }}>{m.tradition}</span>
+                    <span className="text-[11px] font-medium block" style={{ color: activeMantra?.id === m.id ? m.color : 'rgba(255,255,255,0.85)' }}>{m.label}</span>
+                    <span className="text-[8px] block" style={{ color: 'rgba(255,255,255,0.6)' }}>{m.tradition}</span>
                   </div>
                 </button>
               ))}
@@ -1092,7 +1092,7 @@ export default function CosmicMixerPage() {
           <AccordionSection title={t("mixer.voiceEngine", "Voice Engine")} icon={Sparkles} color="#E879F9" open={openSections.voice || showVoiceEngine} onToggle={() => { toggleSection('voice'); setShowVoiceEngine(s => !s); }} badge={activeMantra ? 'Active' : null}>
             <div className="space-y-3" data-testid="voice-morph-engine">
               {!activeMantra && (
-                <p className="text-[10px] text-center py-2" style={{ color: 'rgba(248,250,252,0.3)' }}>Select a mantra above to activate the Voice Engine</p>
+                <p className="text-[10px] text-center py-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Select a mantra above to activate the Voice Engine</p>
               )}
 
               {/* Voice Gain (Volume Boost) */}
@@ -1153,7 +1153,7 @@ export default function CosmicMixerPage() {
 
               {/* Presets */}
               <div className="pt-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>Voice Presets</p>
+                <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Voice Presets</p>
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { label: 'Clean', preset: { pitch: 0, formant: 0, reverb: 20, delay: 0, delayTime: 300, chorus: 0, distortion: 0, eqLow: 0, eqMid: 0, eqHigh: 0, speed: 100, width: 0, gain: 100 }, color: '#94A3B8' },
@@ -1184,7 +1184,7 @@ export default function CosmicMixerPage() {
           {/* Master Effects Bus */}
           <AccordionSection title={t("mixer.masterFx", "Master FX Bus")} icon={Sliders} color="#06B6D4" open={openSections.masterFx} onToggle={() => toggleSection('masterFx')} badge={masterFx.reverb > 5 || masterFx.delay > 5 || masterFx.chorus > 5 ? 'Active' : null}>
             <div className="space-y-2" data-testid="master-fx-bus">
-              <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Global effects on master output</p>
+              <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Global effects on master output</p>
 
               <VoiceSlider label="Reverb" value={masterFx.reverb} min={0} max={60} color="#3B82F6" unit="%"
                 onChange={v => setMasterFx(m => ({...m, reverb: v}))} testId="master-reverb" />
@@ -1201,12 +1201,12 @@ export default function CosmicMixerPage() {
                 onChange={v => setMasterFx(m => ({...m, chorus: v}))} testId="master-chorus" />
 
               <div className="flex items-center gap-2 pt-1">
-                <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Compressor</span>
+                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Compressor</span>
                 <button onClick={() => setMasterFx(m => ({...m, compressor: !m.compressor}))}
                   className="px-2 py-0.5 rounded text-[8px] transition-all"
                   style={{
                     background: masterFx.compressor ? 'rgba(6,182,212,0.12)' : 'rgba(255,255,255,0.03)',
-                    color: masterFx.compressor ? '#06B6D4' : 'rgba(248,250,252,0.25)',
+                    color: masterFx.compressor ? '#06B6D4' : 'rgba(255,255,255,0.6)',
                     border: `1px solid ${masterFx.compressor ? 'rgba(6,182,212,0.25)' : 'rgba(255,255,255,0.06)'}`,
                   }}
                   data-testid="master-compressor-toggle"
@@ -1219,7 +1219,7 @@ export default function CosmicMixerPage() {
           {/* Layer Crossfade */}
           <AccordionSection title="Layer Crossfade" icon={ArrowRightLeft} open={openSections.crossfade} onToggle={() => toggleSection('crossfade')} color="#A855F7" badge={null}>
             <div className="space-y-2" data-testid="layer-crossfade">
-              <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Balance between layer groups</p>
+              <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Balance between layer groups</p>
 
               {/* Freq vs Ambient crossfade */}
               <div className="flex items-center gap-2">
@@ -1275,7 +1275,7 @@ export default function CosmicMixerPage() {
                   style={{ background: activeLight?.id === l.id ? `${l.colors[0]}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activeLight?.id === l.id ? `${l.colors[1]}35` : 'rgba(255,255,255,0.04)'}` }}
                   data-testid={`mixer-light-${l.id}`}>
                   <div className="flex gap-0.5 flex-shrink-0">{l.colors.slice(0, 3).map((c, i) => <div key={i} className="w-2 h-2 rounded-full" style={{ background: c }} />)}</div>
-                  <span className="text-[11px]" style={{ color: activeLight?.id === l.id ? l.colors[1] : 'rgba(248,250,252,0.55)' }}>{l.label}</span>
+                  <span className="text-[11px]" style={{ color: activeLight?.id === l.id ? l.colors[1] : 'rgba(255,255,255,0.8)' }}>{l.label}</span>
                 </button>
               ))}
             </div>
@@ -1286,10 +1286,10 @@ export default function CosmicMixerPage() {
               <button onClick={toggleVibe} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:scale-[1.01] w-full"
                 style={{ background: vibeOn ? 'rgba(251,146,60,0.12)' : 'rgba(255,255,255,0.02)', border: `1px solid ${vibeOn ? 'rgba(251,146,60,0.25)' : 'rgba(255,255,255,0.04)'}` }}
                 data-testid="mixer-vibe-toggle">
-                <Vibrate size={16} style={{ color: vibeOn ? '#FB923C' : 'rgba(248,250,252,0.4)' }} />
+                <Vibrate size={16} style={{ color: vibeOn ? '#FB923C' : 'rgba(255,255,255,0.7)' }} />
                 <div className="text-left">
-                  <span className="text-xs block" style={{ color: vibeOn ? '#FB923C' : 'rgba(248,250,252,0.6)' }}>{vibeOn ? 'Vibrating — Tap to Stop' : 'Enable Haptic Pulse'}</span>
-                  <span className="text-[9px] block" style={{ color: 'rgba(248,250,252,0.3)' }}>{firstActiveFreq ? `Synced to ${firstActiveFreq.label}` : 'Pulses at a calm rhythm'}</span>
+                  <span className="text-xs block" style={{ color: vibeOn ? '#FB923C' : 'rgba(255,255,255,0.85)' }}>{vibeOn ? 'Vibrating — Tap to Stop' : 'Enable Haptic Pulse'}</span>
+                  <span className="text-[9px] block" style={{ color: 'rgba(255,255,255,0.65)' }}>{firstActiveFreq ? `Synced to ${firstActiveFreq.label}` : 'Pulses at a calm rhythm'}</span>
                 </div>
               </button>
               {vibeOn && (
@@ -1308,7 +1308,7 @@ export default function CosmicMixerPage() {
           <AccordionSection title="Tempo & Beat" icon={Radio} color="#EC4899" open={openSections.tempo} onToggle={() => toggleSection('tempo')} badge={bpm > 0 ? `${bpm} BPM` : null}>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold tabular-nums w-16" style={{ color: bpm > 0 ? '#EC4899' : 'rgba(248,250,252,0.35)' }}>{bpm > 0 ? `${bpm} BPM` : 'Off'}</span>
+                <span className="text-sm font-bold tabular-nums w-16" style={{ color: bpm > 0 ? '#EC4899' : 'rgba(255,255,255,0.65)' }}>{bpm > 0 ? `${bpm} BPM` : 'Off'}</span>
                 <input type="range" min="0" max="200" step="1" value={bpm} onChange={e => setBpm(Number(e.target.value))}
                   className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer" style={{ background: `linear-gradient(to right, #EC4899 ${bpm / 2}%, rgba(255,255,255,0.06) ${bpm / 2}%)`, accentColor: '#EC4899' }}
                   data-testid="tempo-slider-page" />
@@ -1328,7 +1328,7 @@ export default function CosmicMixerPage() {
               <div className="flex flex-wrap gap-1.5">
                 {TEMPO_PRESETS.map(p => (
                   <button key={p.id} onClick={() => setTempoFromPreset(p)} className="text-[10px] px-2.5 py-1.5 rounded-xl transition-all hover:scale-[1.03]"
-                    style={{ background: activePreset?.id === p.id ? `${p.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activePreset?.id === p.id ? `${p.color}35` : 'rgba(255,255,255,0.04)'}`, color: activePreset?.id === p.id ? p.color : 'rgba(248,250,252,0.5)' }}
+                    style={{ background: activePreset?.id === p.id ? `${p.color}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${activePreset?.id === p.id ? `${p.color}35` : 'rgba(255,255,255,0.04)'}`, color: activePreset?.id === p.id ? p.color : 'rgba(255,255,255,0.75)' }}
                     data-testid={`tempo-preset-page-${p.id}`}>{p.label}</button>
                 ))}
               </div>
@@ -1347,12 +1347,12 @@ function AccordionSection({ title, icon: Icon, color, open, onToggle, badge, chi
       <button onClick={onToggle} className="w-full flex items-center justify-between px-4 py-3 transition-colors hover:bg-white/[0.02]"
         data-testid={`accordion-${title.toLowerCase().replace(/[^a-z]/g, '-')}`}>
         <div className="flex items-center gap-2">
-          <Icon size={14} style={{ color: badge ? color : 'rgba(248,250,252,0.4)' }} />
-          <span className="text-[11px] uppercase tracking-[0.12em] font-semibold" style={{ color: badge ? color : 'rgba(248,250,252,0.45)' }}>{title}</span>
+          <Icon size={14} style={{ color: badge ? color : 'rgba(255,255,255,0.7)' }} />
+          <span className="text-[11px] uppercase tracking-[0.12em] font-semibold" style={{ color: badge ? color : 'rgba(255,255,255,0.75)' }}>{title}</span>
           {badge && <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: `${color}12`, color, border: `1px solid ${color}25` }}>{badge}</span>}
         </div>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown size={14} style={{ color: 'rgba(248,250,252,0.3)' }} />
+          <ChevronDown size={14} style={{ color: 'rgba(255,255,255,0.65)' }} />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>

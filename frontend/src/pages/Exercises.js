@@ -63,7 +63,7 @@ export default function Exercises() {
               className="px-5 py-2 rounded-full text-sm"
               style={{
                 background: filter === f.k ? 'rgba(255,255,255,0.1)' : 'transparent',
-                border: `1px solid ${filter === f.k ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                border: `1px solid ${filter === f.k ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.06)'}`,
                 color: filter === f.k ? 'var(--text-primary)' : 'var(--text-muted)',
               }}
               data-testid={`exercise-filter-${f.k}`}

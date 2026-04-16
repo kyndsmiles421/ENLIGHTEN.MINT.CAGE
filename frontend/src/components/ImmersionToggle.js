@@ -101,10 +101,10 @@ export function ImmersionToggle() {
             {/* Header */}
             <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(248,250,252,0.06)' }}>
               <div className="flex items-center gap-2 mb-1">
-                <Monitor size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                <Monitor size={14} style={{ color: 'rgba(255,255,255,0.75)' }} />
                 <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Atmosphere Switch</span>
               </div>
-              <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.35)' }}>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Control the rendering resolution across the entire app
               </p>
             </div>
@@ -137,7 +137,7 @@ export function ImmersionToggle() {
                           </span>
                           {active && <Check size={12} style={{ color: level.color }} />}
                         </div>
-                        <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                        <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>
                           {level.description}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-2">
@@ -145,7 +145,7 @@ export function ImmersionToggle() {
                             <span key={i} className="text-[8px] px-1.5 py-0.5 rounded"
                               style={{
                                 background: active ? `${level.color}08` : 'rgba(248,250,252,0.03)',
-                                color: active ? `${level.color}CC` : 'rgba(248,250,252,0.3)',
+                                color: active ? `${level.color}CC` : 'rgba(255,255,255,0.65)',
                                 border: `1px solid ${active ? `${level.color}12` : 'rgba(248,250,252,0.04)'}`,
                               }}>
                               {f}
@@ -153,7 +153,7 @@ export function ImmersionToggle() {
                           ))}
                         </div>
                         {level.device && (
-                          <p className="text-[8px] mt-1.5 italic" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                          <p className="text-[8px] mt-1.5 italic" style={{ color: 'rgba(255,255,255,0.6)' }}>
                             {level.device}
                           </p>
                         )}
@@ -168,7 +168,7 @@ export function ImmersionToggle() {
             <div className="px-4 py-3" style={{ borderTop: '1px solid rgba(248,250,252,0.06)' }}>
               <div className="flex items-start gap-2">
                 <AlertTriangle size={11} style={{ color: '#F59E0B', marginTop: 2, flexShrink: 0 }} />
-                <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   If you have photosensitive epilepsy or motion sensitivity, we recommend <strong style={{ color: '#22C55E' }}>Calm</strong> mode for a safe, comfortable experience.
                 </p>
               </div>

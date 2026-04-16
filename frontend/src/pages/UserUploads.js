@@ -61,7 +61,7 @@ function UploadForm({ onUploaded, authHeaders }) {
         placeholder="Tags (comma-separated)" className="w-full px-3 py-2 rounded-xl text-xs mb-3" style={inputStyle} data-testid="upload-tags" />
       <div className="flex items-center gap-3">
         <input ref={fileRef} type="file" accept="audio/*,video/*" data-testid="upload-file-input"
-          className="text-xs flex-1" style={{ color: 'rgba(248,250,252,0.5)' }} />
+          className="text-xs flex-1" style={{ color: 'rgba(255,255,255,0.75)' }} />
         <button onClick={upload} disabled={uploading} data-testid="upload-submit-btn"
           className="px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2"
           style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#3B82F6' }}>
@@ -98,20 +98,20 @@ function MediaCard({ item, onDelete }) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {new Date(item.created_at).toLocaleDateString()}
           </span>
           <button onClick={() => onDelete(item.id)} className="p-1 rounded-lg hover:bg-white/5">
-            <Trash2 size={12} style={{ color: 'rgba(248,250,252,0.25)' }} />
+            <Trash2 size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
           </button>
         </div>
       </div>
-      {item.description && <p className="text-[10px] mb-2" style={{ color: 'rgba(248,250,252,0.35)' }}>{item.description}</p>}
+      {item.description && <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{item.description}</p>}
       {item.tags?.length > 0 && (
         <div className="flex gap-1 mb-2 flex-wrap">
           {item.tags.map(t => (
             <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full"
-              style={{ background: 'rgba(248,250,252,0.05)', color: 'rgba(248,250,252,0.3)' }}>{t}</span>
+              style={{ background: 'rgba(248,250,252,0.05)', color: 'rgba(255,255,255,0.65)' }}>{t}</span>
           ))}
         </div>
       )}
@@ -122,7 +122,7 @@ function MediaCard({ item, onDelete }) {
             {playing ? <Pause size={14} style={{ color: '#3B82F6' }} /> : <Play size={14} style={{ color: '#3B82F6' }} />}
           </button>
           <audio ref={audioRef} src={fileUrl} onEnded={() => setPlaying(false)} preload="none" />
-          <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.3)' }}>{(item.file_size / 1024 / 1024).toFixed(1)} MB</span>
+          <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>{(item.file_size / 1024 / 1024).toFixed(1)} MB</span>
         </div>
       )}
       {isVideo && (
@@ -171,7 +171,7 @@ export default function UserUploads() {
         </div>
 
         {!token ? (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to manage your media</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to manage your media</p>
         ) : (
           <>
             <UploadForm onUploaded={fetch} authHeaders={authHeaders} />
@@ -182,7 +182,7 @@ export default function UserUploads() {
                 {uploads.map(u => <MediaCard key={u.id} item={u} onDelete={deleteFile} />)}
               </div>
             ) : (
-              <p className="text-center text-sm py-8" style={{ color: 'rgba(248,250,252,0.3)' }}>No uploads yet. Share your sacred sounds!</p>
+              <p className="text-center text-sm py-8" style={{ color: 'rgba(255,255,255,0.65)' }}>No uploads yet. Share your sacred sounds!</p>
             )}
           </>
         )}

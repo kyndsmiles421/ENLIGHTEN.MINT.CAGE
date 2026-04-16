@@ -167,7 +167,7 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
                   <p className="text-[10px] font-medium" style={{ color: RING_ACTIONS.find(a => a.id === hoveredAction)?.color }}>
                     {RING_ACTIONS.find(a => a.id === hoveredAction)?.label}
                   </p>
-                  <p className="text-[8px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                  <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                     {RING_ACTIONS.find(a => a.id === hoveredAction)?.description}
                   </p>
                 </motion.div>
@@ -236,7 +236,7 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
       {/* Small label below hub */}
       <motion.p
         className="text-center mt-1.5 pointer-events-none"
-        style={{ fontSize: 8, color: 'rgba(248,250,252,0.25)', letterSpacing: '0.1em' }}
+        style={{ fontSize: 8, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}

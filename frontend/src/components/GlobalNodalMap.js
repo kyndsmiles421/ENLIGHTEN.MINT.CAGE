@@ -269,11 +269,11 @@ export default function GlobalNodalMap({ isOpen, onClose }) {
               <g transform={`translate(20, ${mapHeight - 80})`}>
                 <text x="0" y="0" fill="rgba(255,255,255,0.4)" fontSize="10">Node Status:</text>
                 <circle cx="10" cy="15" r="5" fill="#22C55E" />
-                <text x="20" y="18" fill="rgba(255,255,255,0.3)" fontSize="9">Active</text>
-                <circle cx="70" cy="15" r="5" fill="rgba(255,255,255,0.3)" />
-                <text x="80" y="18" fill="rgba(255,255,255,0.3)" fontSize="9">Pending</text>
-                <circle cx="140" cy="15" r="5" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" />
-                <text x="150" y="18" fill="rgba(255,255,255,0.3)" fontSize="9">Planned</text>
+                <text x="20" y="18" fill="rgba(255,255,255,0.65)" fontSize="9">Active</text>
+                <circle cx="70" cy="15" r="5" fill="rgba(255,255,255,0.65)" />
+                <text x="80" y="18" fill="rgba(255,255,255,0.65)" fontSize="9">Pending</text>
+                <circle cx="140" cy="15" r="5" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.6)" />
+                <text x="150" y="18" fill="rgba(255,255,255,0.65)" fontSize="9">Planned</text>
               </g>
             </svg>
 

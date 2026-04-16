@@ -23,19 +23,19 @@ function CultureCard({ layer, isActive, onToggle, isLoading }) {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full"
             style={{ background: layer.primary_color, boxShadow: isActive ? `0 0 8px ${layer.primary_color}60` : 'none' }} />
-          <span className="text-xs font-medium" style={{ color: isActive ? layer.primary_color : 'rgba(248,250,252,0.7)' }}>
+          <span className="text-xs font-medium" style={{ color: isActive ? layer.primary_color : 'rgba(255,255,255,0.9)' }}>
             {layer.name}
           </span>
         </div>
         {isLoading ? (
           <Loader2 size={10} className="animate-spin" style={{ color: layer.primary_color }} />
         ) : (
-          <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {layer.constellation_count} formations
           </span>
         )}
       </div>
-      <p className="text-[9px] mt-1 leading-relaxed" style={{ color: 'rgba(248,250,252,0.35)' }}>
+      <p className="text-[9px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
         {layer.culture} / {layer.frequency}Hz
       </p>
     </motion.button>
@@ -116,13 +116,13 @@ export default function CultureLayerPanel({ onLayerData }) {
         whileHover={{ scale: 1.02 }}
         data-testid="culture-layer-toggle"
       >
-        <Globe size={11} style={{ color: activeLayers.size > 0 ? '#A78BFA' : 'rgba(248,250,252,0.4)' }} />
+        <Globe size={11} style={{ color: activeLayers.size > 0 ? '#A78BFA' : 'rgba(255,255,255,0.7)' }} />
         <span className="text-[9px] tracking-wider uppercase"
-          style={{ color: 'rgba(248,250,252,0.5)', fontFamily: 'Cormorant Garamond, serif' }}>
+          style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
           Culture Layers {activeLayers.size > 0 && `(${activeLayers.size})`}
         </span>
         <ChevronDown size={9} className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
-          style={{ color: 'rgba(248,250,252,0.3)' }} />
+          style={{ color: 'rgba(255,255,255,0.65)' }} />
       </motion.button>
 
       {/* Layer cards */}

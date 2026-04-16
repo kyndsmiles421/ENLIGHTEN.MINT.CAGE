@@ -309,7 +309,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
               </span>
               <ChevronDown size={10} style={{ color, opacity: 0.5 }} />
             </button>
-            <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {selectedMember?.module || 'Select a Sovereign'}
             </div>
           </div>
@@ -325,13 +325,13 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
           >
             {voiceEnabled
               ? <Volume2 size={13} style={{ color: '#8B5CF6' }} />
-              : <VolumeX size={13} style={{ color: 'rgba(248,250,252,0.25)' }} />
+              : <VolumeX size={13} style={{ color: 'rgba(255,255,255,0.6)' }} />
             }
           </button>
           <button onClick={onClose} className="p-1.5 rounded-lg" style={{
             cursor: 'pointer', background: 'rgba(255,255,255,0.03)',
           }} data-testid="consult-close-btn">
-            <X size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <X size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
         </div>
 
@@ -367,7 +367,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
                       <span className="text-[8px] flex-1 truncate" style={{ color: m.color }}>
                         {m.name}
                       </span>
-                      {!isAccessible && <Lock size={8} style={{ color: 'rgba(248,250,252,0.25)' }} />}
+                      {!isAccessible && <Lock size={8} style={{ color: 'rgba(255,255,255,0.6)' }} />}
                     </button>
                   );
                 })}
@@ -387,14 +387,14 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
               <div className="text-[8px] font-semibold" style={{ color: util.color }}>
                 {util.name}
               </div>
-              <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {util.description.slice(0, 50)}...
               </div>
             </div>
             <div className="flex items-center gap-1 px-2 py-1 rounded-md flex-shrink-0" style={{
               background: `${util.color}08`, border: `1px solid ${util.color}12`,
             }}>
-              <span className="text-[6px] line-through" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <span className="text-[6px] line-through" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {util.base_price}
               </span>
               <span className="text-[8px] font-bold" style={{ color: util.color }}>
@@ -412,7 +412,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
           {!accessible ? (
             <div className="text-center py-8">
               <Lock size={20} style={{ color: 'rgba(248,250,252,0.15)' }} className="mx-auto mb-2" />
-              <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Purchase a session ({selectedMember?.session_cost} Dust) to consult this Sovereign
               </p>
             </div>
@@ -426,7 +426,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
               <p className="text-[9px] font-medium mb-1" style={{ color }}>
                 {selectedMember?.name}
               </p>
-              <p className="text-[7px] max-w-[200px] mx-auto" style={{ color: 'rgba(248,250,252,0.2)' }}>
+              <p className="text-[7px] max-w-[200px] mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {selectedMember?.backstory?.slice(0, 100)}...
               </p>
             </div>
@@ -455,7 +455,7 @@ export default function SovereignConsultOverlay({ isOpen, onClose, pathname }) {
                           <div className="text-[6px] font-semibold mb-0.5" style={{ color }}>{selectedMember?.name}</div>
                         )}
                         <div className="text-[9px] leading-relaxed whitespace-pre-wrap" style={{
-                          color: isUser ? 'rgba(248,250,252,0.6)' : 'rgba(248,250,252,0.45)',
+                          color: isUser ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.75)',
                         }}>
                           {msg.content?.replace(/\[BRIDGE:\w+\]/g, '')}
                         </div>

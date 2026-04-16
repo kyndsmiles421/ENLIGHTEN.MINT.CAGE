@@ -56,7 +56,7 @@ export default function MeditationHistory() {
         </div>
 
         {!token ? (
-          <p className="text-center text-sm py-12" style={{ color: 'rgba(248,250,252,0.4)' }}>Sign in to view history</p>
+          <p className="text-center text-sm py-12" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to view history</p>
         ) : loading ? (
           <div className="flex justify-center py-12"><Loader2 className="animate-spin" size={28} style={{ color: '#D8B4FE' }} /></div>
         ) : (
@@ -66,15 +66,15 @@ export default function MeditationHistory() {
               <div className="grid grid-cols-3 gap-3 mb-6">
                 <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(216,180,254,0.06)', border: '1px solid rgba(216,180,254,0.12)' }}>
                   <p className="text-2xl font-bold" style={{ color: '#D8B4FE' }}>{stats.total_sessions}</p>
-                  <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Sessions</p>
+                  <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Sessions</p>
                 </div>
                 <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(216,180,254,0.06)', border: '1px solid rgba(216,180,254,0.12)' }}>
                   <p className="text-2xl font-bold" style={{ color: '#D8B4FE' }}>{stats.total_minutes}</p>
-                  <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Minutes</p>
+                  <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Minutes</p>
                 </div>
                 <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(216,180,254,0.06)', border: '1px solid rgba(216,180,254,0.12)' }}>
                   <p className="text-2xl font-bold" style={{ color: '#D8B4FE' }}>{stats.avg_duration}</p>
-                  <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.4)' }}>Avg Min</p>
+                  <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Avg Min</p>
                 </div>
               </div>
             )}
@@ -93,21 +93,21 @@ export default function MeditationHistory() {
                 style={{ background: 'transparent', border: '1px solid rgba(216,180,254,0.1)' }}>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Type</label>
+                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Type</label>
                     <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} data-testid="med-type"
                       className="w-full px-3 py-2 rounded-xl text-xs capitalize" style={inputStyle}>
                       {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Duration (min)</label>
+                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Duration (min)</label>
                     <input type="number" value={form.duration_minutes} onChange={e => setForm({ ...form, duration_minutes: +e.target.value })}
                       min={1} max={180} className="w-full px-3 py-2 rounded-xl text-xs" style={inputStyle} data-testid="med-duration" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Mood Before</label>
+                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Mood Before</label>
                     <select value={form.mood_before} onChange={e => setForm({ ...form, mood_before: e.target.value })} data-testid="med-mood-before"
                       className="w-full px-3 py-2 rounded-xl text-xs" style={inputStyle}>
                       <option value="">Select...</option>
@@ -115,7 +115,7 @@ export default function MeditationHistory() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(248,250,252,0.4)' }}>Mood After</label>
+                    <label className="text-[10px] uppercase tracking-wider mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Mood After</label>
                     <select value={form.mood_after} onChange={e => setForm({ ...form, mood_after: e.target.value })} data-testid="med-mood-after"
                       className="w-full px-3 py-2 rounded-xl text-xs" style={inputStyle}>
                       <option value="">Select...</option>
@@ -130,7 +130,7 @@ export default function MeditationHistory() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Star size={14} style={{ color: '#D8B4FE' }} />
-                    <span className="text-xs" style={{ color: 'rgba(248,250,252,0.4)' }}>Depth: {form.depth_rating}/10</span>
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Depth: {form.depth_rating}/10</span>
                     <input type="range" min={1} max={10} value={form.depth_rating}
                       onChange={e => setForm({ ...form, depth_rating: +e.target.value })} data-testid="med-depth" className="w-24" />
                   </div>
@@ -158,17 +158,17 @@ export default function MeditationHistory() {
                           {s.duration_minutes || s.duration || '?'} min
                         </span>
                       </div>
-                      <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                      <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {new Date(s.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                    {s.intention && <p className="text-[10px] italic" style={{ color: 'rgba(248,250,252,0.35)' }}>{s.intention}</p>}
-                    {s.notes && <p className="text-[10px] mt-1" style={{ color: 'rgba(248,250,252,0.3)' }}>{s.notes}</p>}
+                    {s.intention && <p className="text-[10px] italic" style={{ color: 'rgba(255,255,255,0.65)' }}>{s.intention}</p>}
+                    {s.notes && <p className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>{s.notes}</p>}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-center text-sm py-8" style={{ color: 'rgba(248,250,252,0.3)' }}>No meditation sessions recorded yet</p>
+              <p className="text-center text-sm py-8" style={{ color: 'rgba(255,255,255,0.65)' }}>No meditation sessions recorded yet</p>
             )}
           </>
         )}

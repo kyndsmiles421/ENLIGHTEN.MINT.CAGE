@@ -135,7 +135,7 @@ export default function LiveSessions() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all"
               style={{
                 background: activeTab === tab.id ? 'rgba(192,132,252,0.12)' : 'transparent',
-                color: activeTab === tab.id ? '#C084FC' : 'rgba(248,250,252,0.45)',
+                color: activeTab === tab.id ? '#C084FC' : 'rgba(255,255,255,0.75)',
                 border: activeTab === tab.id ? '1px solid rgba(192,132,252,0.15)' : '1px solid transparent',
               }}
               data-testid={`tab-${tab.id}`}>
@@ -420,7 +420,7 @@ function RecurringCard({ series, types, delay, onToggleSubscribe }) {
 
       {nextDate && (
         <div className="mt-3 pt-3 flex items-center gap-1.5 text-[9px]"
-          style={{ borderTop: '1px solid rgba(248,250,252,0.04)', color: 'rgba(248,250,252,0.35)' }}>
+          style={{ borderTop: '1px solid rgba(248,250,252,0.04)', color: 'rgba(255,255,255,0.65)' }}>
           <CalendarClock size={10} />
           Next: {nextDate.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' })} at {nextDate.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}
         </div>
@@ -487,7 +487,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                 style={{
                   background: !isRecurring ? 'rgba(192,132,252,0.1)' : 'rgba(248,250,252,0.02)',
                   border: `1px solid ${!isRecurring ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`,
-                  color: !isRecurring ? '#C084FC' : 'rgba(248,250,252,0.5)',
+                  color: !isRecurring ? '#C084FC' : 'rgba(255,255,255,0.75)',
                 }}
                 data-testid="mode-onetime">
                 <Play size={12} /> One-Time
@@ -497,7 +497,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                 style={{
                   background: isRecurring ? 'rgba(45,212,191,0.1)' : 'rgba(248,250,252,0.02)',
                   border: `1px solid ${isRecurring ? 'rgba(45,212,191,0.25)' : 'rgba(248,250,252,0.04)'}`,
-                  color: isRecurring ? '#2DD4BF' : 'rgba(248,250,252,0.5)',
+                  color: isRecurring ? '#2DD4BF' : 'rgba(255,255,255,0.75)',
                 }}
                 data-testid="mode-recurring">
                 <Repeat size={12} /> Recurring
@@ -533,8 +533,8 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                       border: `1px solid ${sessionType === t.id ? `${t.color}30` : 'rgba(248,250,252,0.04)'}`,
                     }}
                     data-testid={`type-${t.id}`}>
-                    <Icon size={14} style={{ color: sessionType === t.id ? t.color : 'rgba(248,250,252,0.4)' }} />
-                    <span className="text-[8px]" style={{ color: sessionType === t.id ? t.color : 'rgba(248,250,252,0.5)' }}>{t.label}</span>
+                    <Icon size={14} style={{ color: sessionType === t.id ? t.color : 'rgba(255,255,255,0.7)' }} />
+                    <span className="text-[8px]" style={{ color: sessionType === t.id ? t.color : 'rgba(255,255,255,0.75)' }}>{t.label}</span>
                   </button>
                 );
               })}
@@ -552,7 +552,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                   }}
                   data-testid={`scene-${s.id}`}>
                   <div className="absolute inset-0" style={{ background: s.bg, opacity: 0.6 }} />
-                  <span className="relative text-[9px] font-medium" style={{ color: scene === s.id ? '#C084FC' : 'rgba(248,250,252,0.6)' }}>{s.label}</span>
+                  <span className="relative text-[9px] font-medium" style={{ color: scene === s.id ? '#C084FC' : 'rgba(255,255,255,0.85)' }}>{s.label}</span>
                 </button>
               ))}
             </div>
@@ -567,7 +567,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                   style={{
                     background: duration === d ? 'rgba(192,132,252,0.1)' : 'rgba(248,250,252,0.02)',
                     border: `1px solid ${duration === d ? 'rgba(192,132,252,0.25)' : 'rgba(248,250,252,0.04)'}`,
-                    color: duration === d ? '#C084FC' : 'rgba(248,250,252,0.5)',
+                    color: duration === d ? '#C084FC' : 'rgba(255,255,255,0.75)',
                   }}>
                   {d}m
                 </button>
@@ -591,8 +591,8 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                         border: `1px solid ${recurrence === r.id ? 'rgba(45,212,191,0.2)' : 'rgba(248,250,252,0.04)'}`,
                       }}
                       data-testid={`recurrence-${r.id}`}>
-                      <p className="text-[10px] font-medium" style={{ color: recurrence === r.id ? '#2DD4BF' : 'rgba(248,250,252,0.6)' }}>{r.label}</p>
-                      <p className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.3)' }}>{r.desc}</p>
+                      <p className="text-[10px] font-medium" style={{ color: recurrence === r.id ? '#2DD4BF' : 'rgba(255,255,255,0.85)' }}>{r.label}</p>
+                      <p className="text-[8px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{r.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -608,7 +608,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
                         style={{
                           background: dayOfWeek === i ? 'rgba(45,212,191,0.1)' : 'rgba(248,250,252,0.02)',
                           border: `1px solid ${dayOfWeek === i ? 'rgba(45,212,191,0.25)' : 'rgba(248,250,252,0.04)'}`,
-                          color: dayOfWeek === i ? '#2DD4BF' : 'rgba(248,250,252,0.4)',
+                          color: dayOfWeek === i ? '#2DD4BF' : 'rgba(255,255,255,0.7)',
                         }}
                         data-testid={`day-${i}`}>
                         {d}

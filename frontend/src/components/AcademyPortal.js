@@ -258,7 +258,7 @@ const AcademyPortal = ({ isOpen, onClose, userResonance = 36 }) => {
                       style={{ background: 'rgba(255,255,255,0.02)' }}
                     >
                       <p className="text-xs text-white">{subject.name}</p>
-                      <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         Era: {subject.era}
                       </p>
                     </div>
@@ -350,7 +350,7 @@ const AcademyPortal = ({ isOpen, onClose, userResonance = 36 }) => {
                   </div>
                 </div>
                 
-                <p className="text-[9px] mt-2 font-mono text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-[9px] mt-2 font-mono text-center" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   Next unlock: {knowledgeResult.next_unlock} resonance
                 </p>
               </motion.div>
@@ -381,7 +381,7 @@ const AcademyPortal = ({ isOpen, onClose, userResonance = 36 }) => {
             <p className="text-[10px]" style={{ color: 'rgba(139,92,246,0.6)' }}>
               THE LAW ADAPTS TO YOU
             </p>
-            <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
               World Law Library • Black Hills Jurisdiction
             </p>
           </div>

@@ -484,7 +484,7 @@ export default function DirectorStudio({
                       <div className="flex items-center gap-0.5">
                         <button onClick={(e) => { e.stopPropagation(); updateLayer(layer.uid, { visible: !layer.visible }); }}
                           className="p-1 rounded hover:bg-white/5 transition-all"
-                          style={{ color: layer.visible ? 'var(--text-muted)' : 'rgba(255,255,255,0.2)' }}
+                          style={{ color: layer.visible ? 'var(--text-muted)' : 'rgba(255,255,255,0.6)' }}
                           data-testid={`vis-${layer.uid}`}>
                           {layer.visible ? <Eye size={10} /> : <EyeOff size={10} />}
                         </button>

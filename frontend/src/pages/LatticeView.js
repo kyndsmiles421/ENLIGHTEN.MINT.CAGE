@@ -141,7 +141,7 @@ export default function LatticeView() {
         <div className="text-[10px] tracking-widest mb-2" style={{ color: '#D4AF37' }}>
           S.I.M. PROTOCOL
         </div>
-        <div className="space-y-1" style={{ color: 'rgba(248,250,252,0.7)' }}>
+        <div className="space-y-1" style={{ color: 'rgba(255,255,255,0.9)' }}>
           <div>SQUARE: <span style={{ color: '#00FFFF' }}>81</span></div>
           <div>INVERT: <span style={{ color: '#00FFFF' }}>0.012346</span></div>
           <div>MULTIPLY: <span style={{ color: '#00FFFF' }}>6,561</span></div>
@@ -191,17 +191,17 @@ export default function LatticeView() {
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ background: MATERIALS.Gold.color }} />
             <span style={{ color: MATERIALS.Gold.color }}>Gold ({goldNodes})</span>
-            <span style={{ color: 'rgba(248,250,252,0.4)' }}>r &lt; 1.5</span>
+            <span style={{ color: 'rgba(255,255,255,0.7)' }}>r &lt; 1.5</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ background: MATERIALS.Silver.color }} />
             <span style={{ color: MATERIALS.Silver.color }}>Silver ({silverNodes})</span>
-            <span style={{ color: 'rgba(248,250,252,0.4)' }}>1.5 ≤ r &lt; 3</span>
+            <span style={{ color: 'rgba(255,255,255,0.7)' }}>1.5 ≤ r &lt; 3</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ background: MATERIALS.Copper.color }} />
             <span style={{ color: MATERIALS.Copper.color }}>Copper ({copperNodes})</span>
-            <span style={{ color: 'rgba(248,250,252,0.4)' }}>r ≥ 3</span>
+            <span style={{ color: 'rgba(255,255,255,0.7)' }}>r ≥ 3</span>
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ export default function LatticeView() {
         }}
       >
         <div className="text-3xl font-bold" style={{ color: '#00FFFF' }}>81</div>
-        <div className="text-[10px] tracking-widest" style={{ color: 'rgba(248,250,252,0.5)' }}>
+        <div className="text-[10px] tracking-widest" style={{ color: 'rgba(255,255,255,0.75)' }}>
           COOPERATING NODES
         </div>
         <div className="text-xs mt-1" style={{ color: '#D4AF37' }}>
@@ -361,19 +361,19 @@ export default function LatticeView() {
         >
           <div className="flex items-center gap-4 text-xs">
             <div>
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Node: </span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>Node: </span>
               <span style={{ color: MATERIALS[hoveredNode.material].color }}>{hoveredNode.id}</span>
             </div>
             <div>
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Ring: </span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>Ring: </span>
               <span style={{ color: MATERIALS[hoveredNode.material].color }}>{hoveredNode.ring}</span>
             </div>
             <div>
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Distance: </span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>Distance: </span>
               <span style={{ color: '#00FFFF' }}>{hoveredNode.distance}</span>
             </div>
             <div>
-              <span style={{ color: 'rgba(248,250,252,0.5)' }}>Function: </span>
+              <span style={{ color: 'rgba(255,255,255,0.75)' }}>Function: </span>
               <span style={{ color: '#00FF00' }}>{MATERIALS[hoveredNode.material].name}</span>
             </div>
           </div>

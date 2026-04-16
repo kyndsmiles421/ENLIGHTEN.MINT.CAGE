@@ -344,7 +344,7 @@ export default function SovereignCrossbar({ onModuleDetach, detachedModules = []
 
         {/* Right: Activity indicator */}
         <div className="flex items-center gap-2">
-          <Activity size={10} style={{ color: 'rgba(248,250,252,0.2)' }} />
+          <Activity size={10} style={{ color: 'rgba(255,255,255,0.6)' }} />
           <div className="flex gap-0.5">
             {[0, 1, 2].map(i => (
               <motion.div

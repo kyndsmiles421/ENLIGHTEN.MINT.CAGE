@@ -294,7 +294,7 @@ function BlendIndicator({ colors, nameStyle, onStyleChange }) {
           <React.Fragment key={c.id}>
             <div className="w-4 h-4 rounded-full" style={{ background: c.hex, boxShadow: `0 0 10px ${c.glow}` }} />
             {i < colors.length - 1 && (
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>+</span>
             )}
           </React.Fragment>
         ))}
@@ -327,7 +327,7 @@ function BlendIndicator({ colors, nameStyle, onStyleChange }) {
             style={{
               background: nameStyle === sk ? `${blended}18` : 'transparent',
               border: `1px solid ${nameStyle === sk ? `${blended}40` : 'rgba(255,255,255,0.06)'}`,
-              color: nameStyle === sk ? `${blended}CC` : 'rgba(255,255,255,0.2)',
+              color: nameStyle === sk ? `${blended}CC` : 'rgba(255,255,255,0.6)',
             }}
             data-testid={`light-style-${sk}`}
           >
@@ -627,7 +627,7 @@ export default function LightTherapy() {
                 style={{
                   background: audioOn ? `${accent}15` : 'rgba(255,255,255,0.03)',
                   border: `1px solid ${audioOn ? `${accent}40` : 'rgba(255,255,255,0.06)'}`,
-                  color: audioOn ? accent : 'rgba(255,255,255,0.3)',
+                  color: audioOn ? accent : 'rgba(255,255,255,0.65)',
                 }}
                 data-testid="light-audio-toggle"
               >
@@ -647,7 +647,7 @@ export default function LightTherapy() {
               {selected.map(c => `${c.hz}Hz`).join(' + ')}{selected.length > 1 ? ' — Harmonic Blend' : ` — ${primary.chakra}`}
             </p>
           ) : (
-            <p className="text-xs mb-6" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-xs mb-6" style={{ color: 'rgba(255,255,255,0.65)' }}>
               Select up to {MAX_BLEND} colors to blend. The room transforms.
             </p>
           )}
@@ -668,7 +668,7 @@ export default function LightTherapy() {
 
               {selected.length === 1 ? (
                 <>
-                  <p className="text-sm leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
                     {primary.description}
                   </p>
                   <div className="space-y-2">
@@ -677,7 +677,7 @@ export default function LightTherapy() {
                       <motion.div key={i} initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                         className="flex items-center gap-2.5">
                         <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: primary.hex, boxShadow: `0 0 8px ${primary.glow}` }} />
-                        <span className="text-xs" style={{ color: 'rgba(248,250,252,0.45)' }}>{b}</span>
+                        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{b}</span>
                       </motion.div>
                     ))}
                   </div>
@@ -692,7 +692,7 @@ export default function LightTherapy() {
                       <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1" style={{ background: c.hex, boxShadow: `0 0 8px ${c.glow}` }} />
                       <div>
                         <span className="text-xs font-medium" style={{ color: `${c.hex}CC` }}>{c.name}</span>
-                        <span className="text-[10px] ml-2" style={{ color: 'rgba(255,255,255,0.25)' }}>{c.hz}Hz &middot; {c.chakra}</span>
+                        <span className="text-[10px] ml-2" style={{ color: 'rgba(255,255,255,0.6)' }}>{c.hz}Hz &middot; {c.chakra}</span>
                       </div>
                     </div>
                   ))}
@@ -727,7 +727,7 @@ export default function LightTherapy() {
                       className="px-4 py-2 rounded-full text-xs active:scale-95 transition-all"
                       style={{
                         background: duration === d ? `${accent}20` : 'rgba(255,255,255,0.02)',
-                        color: duration === d ? accent : 'rgba(255,255,255,0.3)',
+                        color: duration === d ? accent : 'rgba(255,255,255,0.65)',
                         border: `1px solid ${duration === d ? `${accent}40` : 'rgba(255,255,255,0.06)'}`,
                       }}
                       data-testid={`light-duration-${d}`}>{d} min</button>

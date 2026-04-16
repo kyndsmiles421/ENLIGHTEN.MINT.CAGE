@@ -195,8 +195,8 @@ function DreamPatterns({ authHeaders }) {
   if (!patterns || patterns.total === 0) return (
     <div className="text-center py-12">
       <TrendingUp size={32} className="mx-auto mb-3" style={{ color: 'rgba(129,140,248,0.25)' }} />
-      <p className="text-sm mb-1" style={{ color: 'rgba(248,250,252,0.5)' }}>Not enough data yet</p>
-      <p className="text-xs" style={{ color: 'rgba(248,250,252,0.3)' }}>Log more dreams to reveal patterns in your dreamscape</p>
+      <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Not enough data yet</p>
+      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Log more dreams to reveal patterns in your dreamscape</p>
     </div>
   );
 
@@ -214,7 +214,7 @@ function DreamPatterns({ authHeaders }) {
         ].map(s => (
           <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: `${s.color}06`, border: `1px solid ${s.color}12` }}>
             <p className="text-xl font-bold" style={{ color: s.color }}>{s.value}</p>
-            <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(248,250,252,0.35)' }}>{s.label}</p>
+            <p className="text-[10px] uppercase tracking-wider mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>{s.label}</p>
           </div>
         ))}
       </div>
@@ -229,7 +229,7 @@ function DreamPatterns({ authHeaders }) {
             <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
               className="rounded-xl p-4" style={{ background: `${ins.color}06`, border: `1px solid ${ins.color}12` }}>
               <p className="text-xs font-semibold mb-1" style={{ color: ins.color }}>{ins.title}</p>
-              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.55)' }}>{ins.text}</p>
+              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{ins.text}</p>
             </motion.div>
           ))}
         </div>
@@ -244,7 +244,7 @@ function DreamPatterns({ authHeaders }) {
           <div className="space-y-2">
             {symbolEntries.map(([symbol, count]) => (
               <div key={symbol} className="flex items-center gap-3">
-                <span className="text-xs capitalize w-24 truncate" style={{ color: 'rgba(248,250,252,0.6)' }}>{symbol}</span>
+                <span className="text-xs capitalize w-24 truncate" style={{ color: 'rgba(255,255,255,0.85)' }}>{symbol}</span>
                 <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: 'rgba(248,250,252,0.04)' }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${(count / maxCount) * 100}%` }}
                     transition={{ duration: 0.6, delay: 0.1 }}
@@ -270,7 +270,7 @@ function DreamPatterns({ authHeaders }) {
                 <Moon size={14} style={{ color: '#93C5FD' }} />
                 <div>
                   <p className="text-xs font-medium capitalize" style={{ color: '#F8FAFC' }}>{mc.symbol}</p>
-                  <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{mc.count}x during {mc.moon_phase}</p>
+                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{mc.count}x during {mc.moon_phase}</p>
                 </div>
               </div>
             ))}
@@ -288,7 +288,7 @@ function DreamPatterns({ authHeaders }) {
             {Object.entries(patterns.moon_moods).map(([phase, data]) => (
               <div key={phase} className="rounded-xl px-3 py-2" style={{ background: 'rgba(252,211,77,0.04)', border: '1px solid rgba(252,211,77,0.1)' }}>
                 <p className="text-[10px] font-medium" style={{ color: '#FCD34D' }}>{phase}</p>
-                <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{data.count} dreams - {data.dominant_mood}</p>
+                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{data.count} dreams - {data.dominant_mood}</p>
               </div>
             ))}
           </div>
@@ -304,7 +304,7 @@ function DreamPatterns({ authHeaders }) {
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-medium" style={{ color: '#F8FAFC' }}>Deep Dream Analysis with Sage</p>
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Get cosmic interpretation through your aura, moon phase, and numerology</p>
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Get cosmic interpretation through your aura, moon phase, and numerology</p>
         </div>
         <ChevronRight size={16} style={{ color: '#818CF8' }} />
       </button>

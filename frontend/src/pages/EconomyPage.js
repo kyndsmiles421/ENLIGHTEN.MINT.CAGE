@@ -43,7 +43,7 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
           </div>
           <div>
             <div className="text-xs font-semibold" style={{ color: tier.color }}>{tier.name}</div>
-            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{tier.label}</div>
+            <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{tier.label}</div>
           </div>
         </div>
 
@@ -53,7 +53,7 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
           ) : (
             <div className="flex items-baseline gap-0.5">
               <span className="text-lg font-bold" style={{ color: '#F8FAFC' }}>${tier.price_monthly}</span>
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>/mo</span>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>/mo</span>
             </div>
           )}
         </div>
@@ -64,7 +64,7 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
             <div className="text-[7px] uppercase tracking-wider mb-0.5" style={{ color: `${tier.color}80` }}>
               {tier.education_level} Education
             </div>
-            <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {tier.education_desc}
             </div>
           </div>
@@ -74,12 +74,12 @@ function TierCard({ tier, isCurrent, onSelect, loading }) {
           {tier.features.map((f, i) => (
             <div key={i} className="flex items-start gap-1.5">
               <Check size={10} style={{ color: tier.color, marginTop: 2, flexShrink: 0 }} />
-              <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.45)' }}>{f}</span>
+              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{f}</span>
             </div>
           ))}
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap text-[7px] mb-3" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        <div className="flex items-center gap-2 flex-wrap text-[7px] mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>
           <span>{tier.fidelity}</span>
           <span>{tier.max_project_slots === -1 ? 'Unlimited' : tier.max_project_slots} slots</span>
           {tier.marketplace_discount > 0 && (
@@ -128,8 +128,8 @@ function PackCard({ pack, onPurchase, loading, hasPolymath }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-[10px] font-semibold" style={{ color: purchased ? '#22C55E' : '#F8FAFC' }}>{pack.name}</div>
-        <div className="text-[8px] mt-0.5" style={{ color: 'rgba(248,250,252,0.35)' }}>{pack.description}</div>
-        <div className="flex items-center gap-2 mt-1.5 text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        <div className="text-[8px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{pack.description}</div>
+        <div className="flex items-center gap-2 mt-1.5 text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           <span>{pack.modules_included} modules</span>
           <span>{pack.category_data?.name}</span>
         </div>
@@ -173,16 +173,16 @@ function CommissionRow({ tier, isActive, isCapped }) {
         <span className="text-[9px] font-bold" style={{ color: tier.color }}>{tier.level}</span>
       </div>
       <div className="flex-1">
-        <div className="text-[10px] font-medium" style={{ color: isActive ? tier.color : 'rgba(248,250,252,0.4)' }}>
+        <div className="text-[10px] font-medium" style={{ color: isActive ? tier.color : 'rgba(255,255,255,0.7)' }}>
           {tier.name}
         </div>
-        <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{tier.status}</div>
+        <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{tier.status}</div>
       </div>
       <div className="text-right">
         <div className="text-xs font-bold" style={{ color: tier.color }}>
           {tier.commission_rate > 0 ? `${tier.commission_rate}%` : '—'}
         </div>
-        {isCapped && <div className="text-[6px]" style={{ color: 'rgba(248,250,252,0.2)' }}>Upgrade to unlock</div>}
+        {isCapped && <div className="text-[6px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Upgrade to unlock</div>}
       </div>
     </div>
   );
@@ -365,7 +365,7 @@ export default function EconomyPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
-        <p className="text-sm" style={{ color: 'rgba(248,250,252,0.3)' }}>Sign in to access the Economy</p>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>Sign in to access the Economy</p>
       </div>
     );
   }
@@ -385,7 +385,7 @@ export default function EconomyPage() {
           <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#F8FAFC' }} data-testid="economy-title">
             Economy
           </h1>
-          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Dual-Track System — Utility + Learning & Brokerage
           </p>
         </div>
@@ -410,7 +410,7 @@ export default function EconomyPage() {
                   <Check size={14} style={{ color: '#22C55E' }} />
                   <span className="text-xs" style={{ color: '#22C55E' }}>Payment successful! Your account has been updated.</span>
                   <button onClick={() => setPaymentResult(null)} className="ml-auto p-1" style={{ cursor: 'pointer' }}>
-                    <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                    <X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
                   </button>
                 </>
               ) : (
@@ -418,7 +418,7 @@ export default function EconomyPage() {
                   <X size={14} style={{ color: '#EF4444' }} />
                   <span className="text-xs" style={{ color: '#EF4444' }}>{paymentResult?.message || 'Payment failed'}</span>
                   <button onClick={() => setPaymentResult(null)} className="ml-auto p-1" style={{ cursor: 'pointer' }}>
-                    <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                    <X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
                   </button>
                 </>
               )}
@@ -440,7 +440,7 @@ export default function EconomyPage() {
               }}>
                 <Icon size={12} style={{ color: s.color, margin: '0 auto 4px', opacity: 0.6 }} />
                 <div className="text-xs font-semibold" style={{ color: s.color }}>{s.value}</div>
-                <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{s.label}</div>
+                <div className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
               </div>
             );
           })}
@@ -458,7 +458,7 @@ export default function EconomyPage() {
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[9px] font-medium transition-all"
                 style={{
                   background: active ? 'rgba(255,255,255,0.05)' : 'transparent',
-                  color: active ? '#F8FAFC' : 'rgba(248,250,252,0.3)',
+                  color: active ? '#F8FAFC' : 'rgba(255,255,255,0.65)',
                   cursor: 'pointer',
                 }}
                 data-testid={`tab-${tab.id}`}
@@ -494,13 +494,13 @@ export default function EconomyPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles size={16} style={{ color: '#C084FC' }} />
                     <span className="text-xs font-semibold" style={{ color: '#C084FC' }}>Polymath All-Access Pass</span>
-                    <span className="ml-auto text-sm font-bold" style={{ color: '#F8FAFC' }}>$1,797<span className="text-[8px] font-normal" style={{ color: 'rgba(248,250,252,0.3)' }}>/year</span></span>
+                    <span className="ml-auto text-sm font-bold" style={{ color: '#F8FAFC' }}>$1,797<span className="text-[8px] font-normal" style={{ color: 'rgba(255,255,255,0.65)' }}>/year</span></span>
                   </div>
                   <div className="space-y-1 mb-3">
                     {['Full Architect subscription ($89/mo value)', 'All current & future Specialized Packs', 'Instant Level 4 Sovereign (27% Commission)', '30% member discount on all assets'].map(f => (
                       <div key={f} className="flex items-start gap-1.5">
                         <Check size={10} style={{ color: '#C084FC', marginTop: 2 }} />
-                        <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.45)' }}>{f}</span>
+                        <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{f}</span>
                       </div>
                     ))}
                   </div>
@@ -531,7 +531,7 @@ export default function EconomyPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <CIcon size={13} style={{ color: catData.color || '#818CF8' }} />
                     <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>{catData.name}</span>
-                    <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>{catData.range}</span>
+                    <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{catData.range}</span>
                   </div>
                   <div className="space-y-1.5">
                     {catPacks.map(pack => (
@@ -561,11 +561,11 @@ export default function EconomyPage() {
               background: 'rgba(251,191,36,0.03)', border: '1px solid rgba(251,191,36,0.08)',
             }} data-testid="earnings-summary">
               <div>
-                <div className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Total Earned</div>
+                <div className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Total Earned</div>
                 <div className="text-lg font-bold" style={{ color: '#FBBF24' }}>${commissions.total_earned.toFixed(2)}</div>
               </div>
               <div className="text-right">
-                <div className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.2)' }}>Max Level</div>
+                <div className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>Max Level</div>
                 <div className="text-xs font-semibold" style={{ color: '#818CF8' }}>
                   Level {commissions.max_allowed_level}
                   {commissions.has_polymath && <span className="text-[7px] ml-1" style={{ color: '#C084FC' }}>(Polymath)</span>}
@@ -624,7 +624,7 @@ export default function EconomyPage() {
                     <div key={i} className="flex items-center justify-between px-3 py-1.5 rounded-lg" style={{
                       background: 'rgba(255,255,255,0.015)',
                     }}>
-                      <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{e.description || 'Commission'}</span>
+                      <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{e.description || 'Commission'}</span>
                       <span className="text-[9px] font-semibold" style={{ color: '#22C55E' }}>+${e.amount?.toFixed(2)}</span>
                     </div>
                   ))}
@@ -637,7 +637,7 @@ export default function EconomyPage() {
               <div className="rounded-xl p-3 mt-4 text-center" style={{
                 background: 'rgba(251,191,36,0.03)', border: '1px solid rgba(251,191,36,0.08)',
               }}>
-                <div className="text-[9px] mb-1" style={{ color: 'rgba(248,250,252,0.35)' }}>
+                <div className="text-[9px] mb-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   Upgrade to <span style={{ color: '#FBBF24' }}>Sovereign</span> to unlock 27% Master commissions
                 </div>
                 <button onClick={() => setActiveTab('subscriptions')}
@@ -662,7 +662,7 @@ export default function EconomyPage() {
                 <Wand2 size={14} style={{ color: '#C084FC' }} />
                 <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Synthesis Forge</span>
               </div>
-              <p className="text-[8px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+              <p className="text-[8px] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 Enter your niche. The AI sweeps global standards, builds the curriculum, assessment engine, and brokerage tags.
               </p>
 
@@ -686,7 +686,7 @@ export default function EconomyPage() {
                         className="flex-1 text-[8px] py-1.5 rounded-lg font-medium transition-all"
                         style={{
                           background: genType === t ? `${colors[t]}0A` : 'rgba(255,255,255,0.015)',
-                          color: genType === t ? colors[t] : 'rgba(248,250,252,0.3)',
+                          color: genType === t ? colors[t] : 'rgba(255,255,255,0.65)',
                           border: `1px solid ${genType === t ? `${colors[t]}18` : 'rgba(255,255,255,0.03)'}`,
                           cursor: 'pointer',
                         }} data-testid={`gen-type-${t}`}>{labels[t]}</button>
@@ -721,11 +721,11 @@ export default function EconomyPage() {
                         <span className="text-[10px] font-semibold" style={{ color: '#C084FC' }}>Generated Curriculum</span>
                       </div>
                       <button onClick={() => setGenResult(null)} className="p-1" style={{ cursor: 'pointer' }}>
-                        <X size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                        <X size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
                       </button>
                     </div>
                     <div className="text-[9px] leading-relaxed whitespace-pre-wrap rounded-lg p-3" style={{
-                      color: 'rgba(248,250,252,0.5)', background: 'rgba(0,0,0,0.2)', maxHeight: 300, overflowY: 'auto',
+                      color: 'rgba(255,255,255,0.75)', background: 'rgba(0,0,0,0.2)', maxHeight: 300, overflowY: 'auto',
                     }}>
                       {genResult.outline}
                     </div>
@@ -748,11 +748,11 @@ export default function EconomyPage() {
                         ].map(s => (
                           <div key={s.label} className="rounded-lg p-2 text-center" style={{ background: 'rgba(0,0,0,0.2)' }}>
                             <div className="text-sm font-bold" style={{ color: s.color }}>{s.value}</div>
-                            <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.2)' }}>{s.label}</div>
+                            <div className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
                           </div>
                         ))}
                       </div>
-                      <div className="space-y-1 text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <div className="space-y-1 text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         <div className="flex justify-between"><span>Resonance subscriber price</span><span style={{ color: '#818CF8' }}>${genResult.financials.resonance_discount}</span></div>
                         <div className="flex justify-between"><span>Sovereign subscriber price</span><span style={{ color: '#FBBF24' }}>${genResult.financials.sovereign_discount}</span></div>
                         <div className="flex justify-between"><span>27% Master commission</span><span style={{ color: '#22C55E' }}>${genResult.financials.commission_27_pct}</span></div>
@@ -770,7 +770,7 @@ export default function EconomyPage() {
                       <ArrowRight size={12} style={{ color: '#22C55E' }} />
                       <span className="text-[10px] font-semibold" style={{ color: '#22C55E' }}>Publishing Gate</span>
                     </div>
-                    <p className="text-[8px] mb-3" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                    <p className="text-[8px] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
                       One click deploys this pack to the Trade Circle Marketplace. Commission metadata (27%) is auto-tagged. Buyers can purchase a la carte without a subscription.
                     </p>
                     <button onClick={async () => {
@@ -826,7 +826,7 @@ export default function EconomyPage() {
                           </div>
                         </div>
                         {d.financials && (
-                          <div className="flex gap-3 mt-1 text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                          <div className="flex gap-3 mt-1 text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                             <span>Retail: ${d.financials.suggested_retail}</span>
                             <span>Revenue/sale: ${d.financials.creator_revenue_per_sale}</span>
                           </div>

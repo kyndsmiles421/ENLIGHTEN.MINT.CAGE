@@ -1957,9 +1957,9 @@ button:active:not(:disabled) {
   --accent-rose: #FDA4AF;
   --accent-coral: #FB923C;
   --accent-sapphire: #3B82F6;
-  --text-primary: #F0F0F8;
-  --text-secondary: #A0AEC0;
-  --text-muted: #5A6478;
+  --text-primary: #FFFFFF;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
 
   /* ── Sovereign Chaos Engine Variables ── */
   --chaos-opacity: 0.5;
@@ -2296,6 +2296,14 @@ textarea,
 
 * {
   box-sizing: border-box;
+}
+
+/* ═══ GLOBAL TEXT READABILITY — All text readable on any background ═══ */
+#root {
+  text-shadow: 0 1px 8px rgba(0,0,0,0.8), 0 0 3px rgba(0,0,0,0.6);
+}
+#root input, #root textarea, #root select {
+  text-shadow: none;
 }
 
 body {

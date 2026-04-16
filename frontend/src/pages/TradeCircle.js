@@ -278,7 +278,7 @@ export default function TradeCircle() {
                 <div className="text-center py-6">
                   <Sparkles size={32} color="#FCD34D" className="mx-auto mb-3" />
                   <h3 className="text-base font-bold mb-2" style={{ color: '#F8FAFC' }}>Marketplace Trader</h3>
-                  <p className="text-xs mb-4" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                  <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.75)' }}>
                     The Liquidity Controller — convert Digital Dust into Fans via Phi Cap exchange.
                   </p>
                   <button onClick={() => navigate('/liquidity-trader')}

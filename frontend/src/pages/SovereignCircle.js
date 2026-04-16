@@ -159,7 +159,7 @@ function OrbitalPeers({ peerCount, activeColor, isHost }) {
       }
 
       // Count label
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
       ctx.font = '8px monospace'; ctx.textAlign = 'center';
       ctx.fillText(`${peerCount} node${peerCount !== 1 ? 's' : ''}`, cx, h - 6);
 
@@ -181,7 +181,7 @@ function HostControls({ onColorChange, onFreqChange, activeColor, activeFreq, on
   return (
     <div className="space-y-4" data-testid="sovereign-host-controls">
       <div>
-        <p className="text-[8px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
+        <p className="text-[8px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Broadcast Color
         </p>
         <div className="flex flex-wrap gap-2 justify-center">
@@ -198,7 +198,7 @@ function HostControls({ onColorChange, onFreqChange, activeColor, activeFreq, on
         </div>
       </div>
       <div>
-        <p className="text-[8px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
+        <p className="text-[8px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Solfeggio Frequency
         </p>
         <div className="grid grid-cols-3 gap-1.5">
@@ -208,7 +208,7 @@ function HostControls({ onColorChange, onFreqChange, activeColor, activeFreq, on
               style={{
                 background: activeFreq === s.hz ? `${s.color}18` : 'rgba(255,255,255,0.02)',
                 border: `1px solid ${activeFreq === s.hz ? `${s.color}40` : 'rgba(255,255,255,0.06)'}`,
-                color: activeFreq === s.hz ? s.color : 'rgba(255,255,255,0.25)',
+                color: activeFreq === s.hz ? s.color : 'rgba(255,255,255,0.6)',
               }}
               data-testid={`host-freq-${s.hz}`}>
               <span className="text-[10px] font-bold">{s.hz}Hz</span>
@@ -331,7 +331,7 @@ export default function SovereignCircle() {
         <h1 className="text-3xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'rgba(248,250,252,0.85)' }}>
           Live Sessions
         </h1>
-        <p className="text-xs mb-8" style={{ color: 'rgba(248,250,252,0.3)' }}>
+        <p className="text-xs mb-8" style={{ color: 'rgba(255,255,255,0.65)' }}>
           Share atmosphere in real-time. One host, infinite nodes.
         </p>
 
@@ -341,7 +341,7 @@ export default function SovereignCircle() {
           <div className="w-2 h-2 rounded-full" style={{ background: '#22C55E', boxShadow: '0 0 8px #22C55E60' }} />
           <div>
             <p className="text-[10px] font-bold" style={{ color: '#6366F1' }}>{DEFAULT_NODE.name}</p>
-            <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Default Local Node · {DEFAULT_NODE.lat.toFixed(2)}°N, {Math.abs(DEFAULT_NODE.lng).toFixed(2)}°W
             </p>
           </div>
@@ -349,7 +349,7 @@ export default function SovereignCircle() {
 
         {/* Create */}
         <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.2)' }}>Create Circle</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>Create Circle</p>
           <input
             type="text" value={roomName} onChange={e => setRoomName(e.target.value)}
             placeholder="Circle name (optional)"
@@ -367,7 +367,7 @@ export default function SovereignCircle() {
 
         {/* Join by code */}
         <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.2)' }}>Join Circle</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>Join Circle</p>
           <div className="flex gap-2">
             <input
               type="text" value={joinCode} onChange={e => setJoinCode(e.target.value)}
@@ -387,7 +387,7 @@ export default function SovereignCircle() {
         {/* Active rooms */}
         {rooms.length > 0 && (
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Active Circles
             </p>
             <div className="space-y-2">
@@ -399,8 +399,8 @@ export default function SovereignCircle() {
                   <div className="flex items-center gap-2.5">
                     <div className="w-2 h-2 rounded-full" style={{ background: r.has_atmosphere ? '#22C55E' : '#FB923C', boxShadow: `0 0 8px ${r.has_atmosphere ? '#22C55E' : '#FB923C'}40` }} />
                     <div>
-                      <p className="text-xs font-medium" style={{ color: 'rgba(248,250,252,0.7)' }}>{r.name}</p>
-                      <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.2)' }}>{r.peer_count} node{r.peer_count !== 1 ? 's' : ''}</p>
+                      <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>{r.name}</p>
+                      <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{r.peer_count} node{r.peer_count !== 1 ? 's' : ''}</p>
                     </div>
                   </div>
                   <Users size={12} style={{ color: 'rgba(255,255,255,0.15)' }} />
@@ -437,7 +437,7 @@ export default function SovereignCircle() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full" style={{ background: socket.connected ? '#22C55E' : '#EF4444', boxShadow: `0 0 8px ${socket.connected ? '#22C55E' : '#EF4444'}60` }} />
-            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {socket.connected ? 'Connected' : 'Connecting...'}
             </span>
           </div>
@@ -451,7 +451,7 @@ export default function SovereignCircle() {
           }}
             className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}
             data-testid="sovereign-audio-toggle">
-            {audioOn ? <Volume2 size={14} style={{ color: activeColor }} /> : <VolumeX size={14} style={{ color: 'rgba(255,255,255,0.2)' }} />}
+            {audioOn ? <Volume2 size={14} style={{ color: activeColor }} /> : <VolumeX size={14} style={{ color: 'rgba(255,255,255,0.6)' }} />}
           </button>
         </div>
 
@@ -466,7 +466,7 @@ export default function SovereignCircle() {
           {/* Room code copy */}
           <button onClick={() => { navigator.clipboard?.writeText(roomId); toast.success('Room code copied'); }}
             className="inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-1 rounded-full text-[9px] active:scale-95"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.25)' }}
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
             data-testid="sovereign-copy-code">
             <Copy size={9} /> {roomId}
           </button>
@@ -498,8 +498,8 @@ export default function SovereignCircle() {
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-2 py-3 rounded-xl"
               style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <Eye size={12} style={{ color: 'rgba(255,255,255,0.2)' }} />
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+              <Eye size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Synced to host atmosphere
               </span>
             </div>

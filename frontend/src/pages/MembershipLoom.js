@@ -134,7 +134,7 @@ const TierCard = ({ tier, isSelected, onSelect, isLoading }) => {
         }
         .tier-card.hovered {
           transform: translateY(-5px);
-          border-color: rgba(255,255,255,0.2);
+          border-color: rgba(255,255,255,0.6);
         }
         .tier-glyph {
           font-size: 2.5rem;
@@ -429,7 +429,7 @@ export default function MembershipLoom() {
           z-index: 100;
         }
         .back-btn:hover {
-          border-color: rgba(255,255,255,0.3);
+          border-color: rgba(255,255,255,0.65);
           color: white;
         }
       `}</style>

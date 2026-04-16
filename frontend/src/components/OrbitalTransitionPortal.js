@@ -114,7 +114,7 @@ export function OrbitalTransitionPortal() {
               whileTap={{ scale: 0.95 }}
               data-testid={`portal-${page.label.toLowerCase()}`}
             >
-              <Icon size={11} style={{ color: isCurrent ? page.color : 'rgba(248,250,252,0.25)' }} />
+              <Icon size={11} style={{ color: isCurrent ? page.color : 'rgba(255,255,255,0.6)' }} />
               {isCurrent && (
                 <motion.span
                   className="text-[7px] uppercase tracking-wider font-medium"

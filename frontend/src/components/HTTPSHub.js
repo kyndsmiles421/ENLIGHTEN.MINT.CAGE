@@ -42,7 +42,7 @@ const HTTPSHub = () => {
       {frameUrl && (
         <div style={{ 
           width: '100%', height: '70vh', borderRadius: '15px', overflow: 'hidden', 
-          border: '1px solid rgba(255,255,255,0.2)', background: 'white' 
+          border: '1px solid rgba(255,255,255,0.6)', background: 'white' 
         }}>
           <iframe 
             src={frameUrl} 

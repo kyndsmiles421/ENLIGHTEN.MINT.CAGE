@@ -93,7 +93,7 @@ export default function BackgroundPicker({ isOpen, onClose, onSelect, currentBg,
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
               <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5" data-testid="bg-picker-close">
-                <X size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                <X size={14} style={{ color: 'rgba(255,255,255,0.75)' }} />
               </button>
             </div>
           </div>

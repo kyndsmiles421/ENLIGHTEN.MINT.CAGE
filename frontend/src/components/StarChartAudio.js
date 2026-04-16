@@ -195,7 +195,7 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
             Listen to Story
           </button>
         ) : state === 'loading' ? (
-          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(248,250,252,0.4)' }}>
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
             <Loader2 size={12} className="animate-spin" style={{ color }} />
             Channeling the cosmos...
           </div>
@@ -210,7 +210,7 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
             <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: `${color}10` }}>
               <motion.div className="h-full rounded-full" style={{ background: color }} animate={{ width: `${progress * 100}%` }} transition={{ duration: 0.2 }} />
             </div>
-            <button onClick={stopNarration} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <button onClick={stopNarration} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <VolumeX size={10} />
             </button>
           </>
@@ -219,7 +219,7 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
       {(state === 'playing' || state === 'paused') && (
         <div className="px-3 pb-2 flex items-center gap-1">
           <div className="w-1 h-1 rounded-full animate-pulse" style={{ background: color }} />
-          <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>Cosmic ambient active</span>
+          <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Cosmic ambient active</span>
         </div>
       )}
     </div>

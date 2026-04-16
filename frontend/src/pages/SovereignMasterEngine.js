@@ -122,7 +122,7 @@ function FaderStrip({ strip, index, isActive, faderPos, onSelect, onFaderChange 
 
       {/* Channel Label */}
       <div className="mt-2 flex flex-col items-center gap-0.5">
-        {Icon && <Icon size={8} color={isActive ? strip.color : 'rgba(255,255,255,0.2)'} />}
+        {Icon && <Icon size={8} color={isActive ? strip.color : 'rgba(255,255,255,0.6)'} />}
         <span
           className="text-[6px] uppercase tracking-wider whitespace-nowrap"
           style={{ color: isActive ? strip.color : 'rgba(255,255,255,0.15)' }}
@@ -194,7 +194,7 @@ export default function SovereignMasterEngine() {
           <button onClick={() => navigate(-1)} className="opacity-40 hover:opacity-100 transition-opacity" data-testid="engine-back-btn">
             <ArrowLeft size={14} />
           </button>
-          <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.65)' }}>
             ENLIGHTEN.MINT.CAFE // APEX V2.1
           </span>
         </div>
@@ -206,7 +206,7 @@ export default function SovereignMasterEngine() {
             animate={isSyncing ? { opacity: [0.3, 0.8, 0.3] } : { opacity: 0.2 }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
             BUFFER: {heartbeatBuffer.toFixed(0)}
           </span>
           <button onClick={handleShare} className="opacity-30 hover:opacity-80 transition-opacity" data-testid="engine-share-btn">
@@ -278,7 +278,7 @@ export default function SovereignMasterEngine() {
                 <h1 className="text-2xl sm:text-3xl font-thin tracking-tighter uppercase mb-6" style={{ color: '#F8FAFC' }}>
                   Sovereign Console
                 </h1>
-                <p className="text-xs mb-6" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-xs mb-6" style={{ color: 'rgba(255,255,255,0.65)' }}>
                   Select a channel strip below. {ALL_MODULES.length} modules across {GROUP_NAMES.length} utility clusters.
                 </p>
                 {/* Cluster Overview */}

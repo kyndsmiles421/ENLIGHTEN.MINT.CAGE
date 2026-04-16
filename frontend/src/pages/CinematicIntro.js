@@ -110,7 +110,7 @@ function FeatureShowcase({ features, color, active }) {
             <p className="text-[10px] font-medium relative z-10" style={{ color: f.color }}>
               {f.label}
             </p>
-            <p className="text-[8px] mt-0.5 leading-relaxed relative z-10" style={{ color: 'rgba(248,250,252,0.5)' }}>
+            <p className="text-[8px] mt-0.5 leading-relaxed relative z-10" style={{ color: 'rgba(255,255,255,0.75)' }}>
               {f.desc}
             </p>
           </motion.div>

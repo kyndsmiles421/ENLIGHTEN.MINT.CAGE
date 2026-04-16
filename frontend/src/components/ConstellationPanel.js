@@ -207,7 +207,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
             </span>
           )}
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5">
-            <X size={11} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
         </div>
       </div>
@@ -224,7 +224,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
               className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[9px] transition-all"
               style={{
                 background: active ? 'rgba(192,132,252,0.08)' : 'transparent',
-                color: active ? '#C084FC' : 'rgba(248,250,252,0.3)',
+                color: active ? '#C084FC' : 'rgba(255,255,255,0.65)',
                 border: `1px solid ${active ? 'rgba(192,132,252,0.15)' : 'transparent'}`,
               }}
               data-testid={`constellation-tab-${t.id}`}
@@ -242,7 +242,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
         {tab === 'save' && (
           <div className="space-y-2.5">
             {activeModuleIds.length === 0 ? (
-              <p className="text-[10px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <p className="text-[10px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Activate modules in the playground to save a constellation
               </p>
             ) : (
@@ -254,7 +254,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
                       <div key={id} className="w-4 h-4 rounded-full" style={{ background: mod.color, opacity: 0.7 }} title={mod.name} />
                     ) : null;
                   })}
-                  <span className="text-[9px] ml-1" style={{ color: 'rgba(248,250,252,0.3)' }}>{activeModuleIds.length} modules</span>
+                  <span className="text-[9px] ml-1" style={{ color: 'rgba(255,255,255,0.65)' }}>{activeModuleIds.length} modules</span>
                 </div>
 
                 <input
@@ -290,12 +290,12 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)}
                       className="w-3 h-3 rounded accent-purple-500" />
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Public</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Public</span>
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked={isForSale} onChange={e => setIsForSale(e.target.checked)}
                       className="w-3 h-3 rounded accent-purple-500" />
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>Sell</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Sell</span>
                   </label>
                   {isForSale && (
                     <input type="number" value={price} onChange={e => setPrice(parseInt(e.target.value) || 0)} min={0}
@@ -329,7 +329,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
                 )}
 
                 {!token && (
-                  <p className="text-[9px] text-center" style={{ color: 'rgba(248,250,252,0.2)' }}>Sign in to save</p>
+                  <p className="text-[9px] text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>Sign in to save</p>
                 )}
               </>
             )}
@@ -346,7 +346,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
             ) : (
               <>
                 {(tab === 'my' ? myRecipes : tab === 'community' ? communityRecipes : marketRecipes).length === 0 ? (
-                  <p className="text-[10px] text-center py-4" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <p className="text-[10px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {tab === 'my' ? 'No saved constellations yet' : 'No constellations shared yet'}
                   </p>
                 ) : (
@@ -391,7 +391,7 @@ function RecipeCard({ recipe, onLoad, onLike, onDelete, onPurchase, showCreator,
         <div>
           <h4 className="text-[11px] font-medium" style={{ color: '#F8FAFC' }}>{recipe.name}</h4>
           {showCreator && (
-            <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>by {recipe.creator_name}</span>
+            <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>by {recipe.creator_name}</span>
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -409,12 +409,12 @@ function RecipeCard({ recipe, onLoad, onLike, onDelete, onPurchase, showCreator,
           <div key={m.id} className="w-3 h-3 rounded-full" style={{ background: m.color, opacity: 0.6 }} title={m.name} />
         ))}
         {moduleCount > 6 && (
-          <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>+{moduleCount - 6}</span>
+          <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>+{moduleCount - 6}</span>
         )}
       </div>
 
       {recipe.description && (
-        <p className="text-[9px] mb-2 line-clamp-2" style={{ color: 'rgba(248,250,252,0.3)' }}>{recipe.description}</p>
+        <p className="text-[9px] mb-2 line-clamp-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{recipe.description}</p>
       )}
 
       {/* Actions */}
@@ -427,7 +427,7 @@ function RecipeCard({ recipe, onLoad, onLike, onDelete, onPurchase, showCreator,
             style={{
               background: canAfford ? 'rgba(251,191,36,0.1)' : 'rgba(255,255,255,0.03)',
               border: `1px solid ${canAfford ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)'}`,
-              color: canAfford ? '#FBBF24' : 'rgba(248,250,252,0.2)',
+              color: canAfford ? '#FBBF24' : 'rgba(255,255,255,0.6)',
               cursor: canAfford ? 'pointer' : 'not-allowed',
               opacity: canAfford ? 1 : 0.5,
             }}
@@ -466,12 +466,12 @@ function RecipeCard({ recipe, onLoad, onLike, onDelete, onPurchase, showCreator,
           <button
             onClick={onDelete}
             className="ml-auto px-2 py-1 rounded-md text-[9px]"
-            style={{ color: 'rgba(248,250,252,0.2)', cursor: 'pointer' }}
+            style={{ color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}
           >
             <X size={9} />
           </button>
         )}
-        <span className="ml-auto text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        <span className="ml-auto text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           {recipe.load_count || 0} loads
         </span>
       </div>

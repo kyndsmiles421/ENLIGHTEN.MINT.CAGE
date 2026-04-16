@@ -453,7 +453,7 @@ export default function Rituals() {
                             className="flex items-center gap-2 px-4 py-2 rounded-full text-sm capitalize"
                             style={{
                               background: builderTime === t ? 'rgba(255,255,255,0.1)' : 'transparent',
-                              border: `1px solid ${builderTime === t ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                              border: `1px solid ${builderTime === t ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.06)'}`,
                               color: builderTime === t ? 'var(--text-primary)' : 'var(--text-muted)',
                               transition: 'background 0.3s, border-color 0.3s, color 0.3s',
                             }}
@@ -539,7 +539,7 @@ export default function Rituals() {
               className="px-5 py-2 rounded-full text-sm"
               style={{
                 background: tab === t.k ? 'rgba(255,255,255,0.1)' : 'transparent',
-                border: `1px solid ${tab === t.k ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                border: `1px solid ${tab === t.k ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.06)'}`,
                 color: tab === t.k ? 'var(--text-primary)' : 'var(--text-muted)',
                 transition: 'background 0.3s, border-color 0.3s, color 0.3s',
               }}

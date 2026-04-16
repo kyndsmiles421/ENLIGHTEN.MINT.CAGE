@@ -765,14 +765,14 @@ export default function LiveRoom() {
       <div className="relative z-20 px-4 py-3 flex items-center justify-between" style={{ background: 'rgba(10,11,20,0.6)', backdropFilter: 'none'}}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/live')} className="p-1.5 rounded-lg hover:bg-white/5" data-testid="live-room-back">
-            <ArrowLeft size={16} style={{ color: 'rgba(248,250,252,0.6)' }} />
+            <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.85)' }} />
           </button>
           <div>
             <div className="flex items-center gap-2">
               {session.status === 'active' && <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />}
               <h1 className="text-sm font-medium" style={{ color: '#F8FAFC' }}>{session.title}</h1>
             </div>
-            <p className="text-[9px] flex items-center gap-2" style={{ color: 'rgba(248,250,252,0.4)' }}>
+            <p className="text-[9px] flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
               <Crown size={8} style={{ color: '#EAB308' }} /> {session.host_name}
               <span style={{ color: 'rgba(248,250,252,0.15)' }}>|</span>
               <Users size={8} /> {participants.length}
@@ -798,7 +798,7 @@ export default function LiveRoom() {
               <button onClick={() => setShowVideoSettings(!showVideoSettings)}
                 className="p-1.5 rounded-lg hover:bg-white/5 transition-all"
                 data-testid="video-settings-btn">
-                <Settings size={14} style={{ color: 'rgba(248,250,252,0.5)' }} />
+                <Settings size={14} style={{ color: 'rgba(255,255,255,0.75)' }} />
               </button>
               <AnimatePresence>
                 {showVideoSettings && (
@@ -834,10 +834,10 @@ export default function LiveRoom() {
           )}
 
           <button onClick={() => setShowParticipants(!showParticipants)} className="p-1.5 rounded-lg hover:bg-white/5">
-            <Users size={14} style={{ color: showParticipants ? '#C084FC' : 'rgba(248,250,252,0.5)' }} />
+            <Users size={14} style={{ color: showParticipants ? '#C084FC' : 'rgba(255,255,255,0.75)' }} />
           </button>
           <button onClick={() => setShowChat(!showChat)} className="p-1.5 rounded-lg hover:bg-white/5">
-            <MessageCircle size={14} style={{ color: showChat ? '#C084FC' : 'rgba(248,250,252,0.5)' }} />
+            <MessageCircle size={14} style={{ color: showChat ? '#C084FC' : 'rgba(255,255,255,0.75)' }} />
           </button>
         </div>
       </div>
@@ -1046,7 +1046,7 @@ export default function LiveRoom() {
                     {messages.map((msg, i) => (
                       <div key={i} className={msg.type === 'system' ? 'text-center py-1' : ''}>
                         {msg.type === 'system' ? (
-                          <span className="text-[9px] italic" style={{ color: 'rgba(248,250,252,0.3)' }}>{msg.text}</span>
+                          <span className="text-[9px] italic" style={{ color: 'rgba(255,255,255,0.65)' }}>{msg.text}</span>
                         ) : (
                           <div>
                             <span className="text-[9px] font-medium mr-1.5" style={{ color: msg.user_id === user?.id ? '#C084FC' : '#2DD4BF' }}>
@@ -1337,7 +1337,7 @@ function AvatarCircle({ participants, currentUserId, myAvatar }) {
                 style={{ border: `1px solid ${isMe ? '#C084FC' : 'rgba(248,250,252,0.1)'}` }} />
             </motion.div>
             <span className="text-[8px] mt-1 px-1.5 py-0.5 rounded-full max-w-16 truncate"
-              style={{ background: 'transparent', color: isMe ? '#C084FC' : 'rgba(248,250,252,0.6)', backdropFilter: 'none'}}>
+              style={{ background: 'transparent', color: isMe ? '#C084FC' : 'rgba(255,255,255,0.85)', backdropFilter: 'none'}}>
               {isMe ? 'You' : p.name?.split(' ')[0]}
             </span>
           </motion.div>

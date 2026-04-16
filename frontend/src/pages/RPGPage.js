@@ -755,7 +755,7 @@ export default function RPGPage() {
                       <div className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
                         <span style={{ color: '#F59E0B' }}>{dustTransmuteAmt} Dust</span> → <span style={{ color: '#FCD34D' }}>{Math.floor(dustTransmuteAmt / 150)} Credits</span>
                       </div>
-                      <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+                      <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         Balance: {shop.currencies.dust} Dust
                       </div>
                     </div>
@@ -776,7 +776,7 @@ export default function RPGPage() {
                       className="w-full py-2.5 rounded-xl text-[11px] font-bold transition-all"
                       style={{
                         background: shop.currencies.dust >= dustTransmuteAmt ? 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(245,158,11,0.1))' : 'rgba(255,255,255,0.02)',
-                        color: shop.currencies.dust >= dustTransmuteAmt ? '#FCD34D' : 'rgba(248,250,252,0.2)',
+                        color: shop.currencies.dust >= dustTransmuteAmt ? '#FCD34D' : 'rgba(255,255,255,0.6)',
                         border: `1px solid ${shop.currencies.dust >= dustTransmuteAmt ? 'rgba(252,211,77,0.2)' : 'rgba(255,255,255,0.04)'}`,
                         touchAction: 'manipulation',
                       }}

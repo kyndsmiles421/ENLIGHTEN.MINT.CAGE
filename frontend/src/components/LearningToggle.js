@@ -87,9 +87,9 @@ export default function LearningToggle() {
         whileTap={{ scale: 0.95 }}
         data-testid="learning-toggle-btn"
       >
-        <BookOpen size={13} style={{ color: learningToggle ? '#22C55E' : 'rgba(248,250,252,0.3)' }} />
+        <BookOpen size={13} style={{ color: learningToggle ? '#22C55E' : 'rgba(255,255,255,0.65)' }} />
         <span className="text-[9px] font-medium" style={{
-          color: learningToggle ? '#22C55E' : 'rgba(248,250,252,0.35)',
+          color: learningToggle ? '#22C55E' : 'rgba(255,255,255,0.65)',
         }}>
           {learningToggle ? 'Learning ON' : 'Learn'}
         </span>
@@ -125,13 +125,13 @@ export default function LearningToggle() {
               borderBottom: '1px solid rgba(255,255,255,0.04)',
             }}>
               <div className="flex items-center gap-2">
-                <BookOpen size={14} style={{ color: learningToggle ? '#22C55E' : 'rgba(248,250,252,0.3)' }} />
+                <BookOpen size={14} style={{ color: learningToggle ? '#22C55E' : 'rgba(255,255,255,0.65)' }} />
                 <span className="text-xs font-semibold" style={{ color: '#F8FAFC' }}>Learning Toggle</span>
               </div>
               <button onClick={() => setExpanded(false)} className="p-1 rounded-lg" style={{
                 cursor: 'pointer', background: 'rgba(255,255,255,0.03)',
               }}>
-                <X size={12} style={{ color: 'rgba(248,250,252,0.3)' }} />
+                <X size={12} style={{ color: 'rgba(255,255,255,0.65)' }} />
               </button>
             </div>
 
@@ -144,7 +144,7 @@ export default function LearningToggle() {
                   <div className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>
                     {learningToggle ? 'Active Education Mode' : 'Professional Utility Mode'}
                   </div>
-                  <div className="text-[8px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+                  <div className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {learningToggle ? '"Why" tooltips + AI Co-Pilot active' : 'Clean dashboard, no overlays'}
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export default function LearningToggle() {
                     animate={{ left: learningToggle ? 22 : 2 }}
                     transition={{ type: 'spring', damping: 20 }}
                     style={{
-                      background: learningToggle ? '#22C55E' : 'rgba(248,250,252,0.3)',
+                      background: learningToggle ? '#22C55E' : 'rgba(255,255,255,0.65)',
                     }}
                   />
                 </button>
@@ -180,7 +180,7 @@ export default function LearningToggle() {
                   </div>
                   <div className="flex-1">
                     <div className="text-[9px] font-semibold" style={{ color: advColor }}>{advName}</div>
-                    <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                    <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       {toggleStatus.advancement.modules_completed} modules completed
                       {toggleStatus.advancement.next_level_at && (
                         <> | {toggleStatus.advancement.next_level_at - toggleStatus.advancement.modules_completed} to next level</>
@@ -215,7 +215,7 @@ export default function LearningToggle() {
                         className="text-[7px] px-2 py-1 rounded-md capitalize transition-all"
                         style={{
                           background: 'rgba(255,255,255,0.03)',
-                          color: 'rgba(248,250,252,0.35)',
+                          color: 'rgba(255,255,255,0.65)',
                           border: '1px solid rgba(255,255,255,0.04)',
                           cursor: loadingLesson ? 'wait' : 'pointer',
                         }}
@@ -282,13 +282,13 @@ export default function LearningToggle() {
                             }}>Cached</span>
                           )}
                         </div>
-                        <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(248,250,252,0.5)' }}>
+                        <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
                           {microLesson.lesson}
                         </p>
                         {microLesson.hint?.pack_link && (
                           <div className="mt-2 flex items-center gap-1">
-                            <ChevronRight size={8} style={{ color: 'rgba(248,250,252,0.2)' }} />
-                            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                            <ChevronRight size={8} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                            <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                               Related program: {microLesson.hint.pack_link}
                             </span>
                           </div>
@@ -311,7 +311,7 @@ export default function LearningToggle() {
                     className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[9px] transition-all"
                     style={{
                       background: 'rgba(255,255,255,0.015)',
-                      color: 'rgba(248,250,252,0.4)',
+                      color: 'rgba(255,255,255,0.7)',
                       textDecoration: 'none',
                     }}
                     data-testid={`toggle-link-${link.label.toLowerCase()}`}

@@ -575,7 +575,7 @@ function FaderStrip({ strip, layerColor, onValueChange, onMute, onSolo }) {
         {/* Value Display */}
         <div 
           className="absolute top-1 left-0 right-0 text-[7px] font-mono text-center"
-          style={{ color: muted ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.8)' }}
+          style={{ color: muted ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.8)' }}
         >
           {localValue}
         </div>
@@ -923,7 +923,7 @@ function SuperStrip({ selectedStrip, layerColor, onUpdate }) {
           className="px-2 py-1 rounded text-[7px] uppercase tracking-wider transition-all"
           style={{
             background: gate.enabled ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)',
-            color: gate.enabled ? '#FCA5A5' : 'rgba(255,255,255,0.3)',
+            color: gate.enabled ? '#FCA5A5' : 'rgba(255,255,255,0.65)',
             border: `1px solid ${gate.enabled ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.1)'}`,
           }}
         >
@@ -973,7 +973,7 @@ function SoftKeysPanel({ softKeys, onKeyPress, voiceActive }) {
           >
             <Icon 
               size={14} 
-              style={{ color: key.active ? key.color : 'rgba(255,255,255,0.3)' }} 
+              style={{ color: key.active ? key.color : 'rgba(255,255,255,0.65)' }} 
             />
             <span 
               className="text-[7px] uppercase tracking-wider"
@@ -1727,7 +1727,7 @@ export default function ApexCreatorConsole({ onClose }) {
               <button
                 onClick={() => setLiveLedgerEnabled(prev => !prev)}
                 className="flex items-center gap-1 text-[8px] uppercase tracking-wider"
-                style={{ color: liveLedgerEnabled ? '#22C55E' : 'rgba(255,255,255,0.3)' }}
+                style={{ color: liveLedgerEnabled ? '#22C55E' : 'rgba(255,255,255,0.65)' }}
               >
                 <Activity size={10} className={liveLedgerEnabled ? 'animate-pulse' : ''} />
                 LIVE

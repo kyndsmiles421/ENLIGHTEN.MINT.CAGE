@@ -170,7 +170,7 @@ export default function ConstellationMap({ isOpen, onClose }) {
             </div>
             <div>
               <h2 className="text-sm font-semibold" style={{ color: '#818CF8' }}>Constellation Map</h2>
-              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 {Object.keys(CONSTELLATION_NODES).length} nodes • {connectionLines.length} connections
               </p>
             </div>

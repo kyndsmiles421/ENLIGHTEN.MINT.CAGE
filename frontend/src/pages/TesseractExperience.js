@@ -69,7 +69,7 @@ const GravitySlider = React.memo(({
               key={point}
               className="w-1 h-3 rounded-full -mt-1"
               style={{
-                background: point === 0.5 ? '#10B981' : 'rgba(255,255,255,0.3)',
+                background: point === 0.5 ? '#10B981' : 'rgba(255,255,255,0.65)',
                 boxShadow: point === 0.5 && atSourceState ? '0 0 10px #10B981' : 'none',
               }}
             />
@@ -917,7 +917,7 @@ export default function TesseractExperience() {
                         cx="40"
                         cy="40"
                         r="35"
-                        stroke="rgba(255,255,255,0.2)"
+                        stroke="rgba(255,255,255,0.6)"
                         strokeWidth="3"
                         fill="none"
                       />

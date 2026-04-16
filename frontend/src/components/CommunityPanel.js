@@ -144,7 +144,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
           <span className="text-xs font-medium" style={{ color: '#F8FAFC' }}>Community</span>
         </div>
         <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5" data-testid="community-close">
-          <X size={14} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          <X size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
         </button>
       </div>
 
@@ -152,8 +152,8 @@ export default function CommunityPanel({ isOpen, onClose }) {
         {/* Identity Controls */}
         <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
           <div className="flex items-center gap-1.5 mb-2.5">
-            <Shield size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
-            <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>Identity Mode</span>
+            <Shield size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
+            <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>Identity Mode</span>
           </div>
 
           <div className="flex gap-1.5 mb-2" data-testid="identity-mode-selector">
@@ -168,7 +168,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
                   style={{
                     background: active ? `${IDENTITY_COLORS[mode]}12` : 'rgba(255,255,255,0.02)',
                     border: `1px solid ${active ? `${IDENTITY_COLORS[mode]}30` : 'rgba(255,255,255,0.04)'}`,
-                    color: active ? IDENTITY_COLORS[mode] : 'rgba(248,250,252,0.35)',
+                    color: active ? IDENTITY_COLORS[mode] : 'rgba(255,255,255,0.65)',
                     cursor: 'pointer',
                   }}
                   data-testid={`identity-mode-${mode}`}
@@ -181,7 +181,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
           </div>
 
           {identity?.mode_data && (
-            <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {identity.mode_data.description}
             </p>
           )}
@@ -223,7 +223,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
 
         {/* Guild Channels (class-based) */}
         <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-          <div className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <div className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Guild Channels
           </div>
           <div className="space-y-1.5">
@@ -242,11 +242,11 @@ export default function CommunityPanel({ isOpen, onClose }) {
               >
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ background: guild.color }} />
-                  <span className="text-[10px]" style={{ color: activeFeed === guild.id ? guild.color : 'rgba(248,250,252,0.5)' }}>
+                  <span className="text-[10px]" style={{ color: activeFeed === guild.id ? guild.color : 'rgba(255,255,255,0.75)' }}>
                     {guild.name}
                   </span>
                 </div>
-                <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {guild.member_count || 0}
                 </span>
               </button>
@@ -256,7 +256,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
 
         {/* Widget Feed Channels */}
         <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-          <div className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.3)' }}>
+          <div className="text-[9px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Widget Feeds
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -273,7 +273,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
                 data-testid={`feed-${feed.widget}`}
               >
                 <div className="w-1.5 h-1.5 rounded-full" style={{ background: feed.color }} />
-                <span className="text-[9px]" style={{ color: activeFeed === feed.id ? feed.color : 'rgba(248,250,252,0.4)' }}>
+                <span className="text-[9px]" style={{ color: activeFeed === feed.id ? feed.color : 'rgba(255,255,255,0.7)' }}>
                   {feed.name}
                 </span>
               </button>
@@ -286,7 +286,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
           <div className="px-4 py-3">
             <div className="flex items-center gap-1.5 mb-2.5">
               <MessageSquare size={10} style={{ color: '#C084FC' }} />
-              <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.3)' }}>Feed</span>
+              <span className="text-[9px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.65)' }}>Feed</span>
             </div>
 
             {/* Post Input */}
@@ -347,7 +347,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
             {/* Posts List */}
             <div className="space-y-1.5 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
               {posts.length === 0 ? (
-                <p className="text-[10px] text-center py-4" style={{ color: 'rgba(248,250,252,0.2)' }}>
+                <p className="text-[10px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   No posts yet. Be the first to share.
                 </p>
               ) : (
@@ -358,7 +358,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
                   >
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-[9px] font-medium" style={{
-                        color: post.identity_mode === 'avatar' ? '#818CF8' : 'rgba(248,250,252,0.5)'
+                        color: post.identity_mode === 'avatar' ? '#818CF8' : 'rgba(255,255,255,0.75)'
                       }}>
                         {post.user_name}
                       </span>
@@ -366,7 +366,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
                         {new Date(post.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.6)' }}>
+                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.85)' }}>
                       {post.text}
                     </p>
                   </div>

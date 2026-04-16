@@ -275,7 +275,7 @@ export default function ZeroPointExperience() {
               <div
                 className="mt-4 text-xs uppercase tracking-[0.5em]"
                 style={{
-                  color: 'rgba(255,255,255,0.3)',
+                  color: 'rgba(255,255,255,0.65)',
                 }}
               >
                 {currentFlickerLang.category}
@@ -328,7 +328,7 @@ export default function ZeroPointExperience() {
               {/* Haptic style indicator */}
               <div 
                 className="text-[8px] uppercase tracking-wider"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
+                style={{ color: 'rgba(255,255,255,0.65)' }}
               >
                 {hapticStyle} · Depth {depthLevel}
               </div>
@@ -369,7 +369,7 @@ export default function ZeroPointExperience() {
               style={{
                 background: 'transparent',
                 color: 'rgba(255,255,255,0.7)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 backdropFilter: 'none',
               }}
             >

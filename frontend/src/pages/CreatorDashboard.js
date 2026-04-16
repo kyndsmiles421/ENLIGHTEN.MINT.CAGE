@@ -219,7 +219,7 @@ export default function CreatorDashboard() {
                 style={{
                   background: active ? 'rgba(234,179,8,0.1)' : 'rgba(248,250,252,0.03)',
                   border: `1px solid ${active ? 'rgba(234,179,8,0.2)' : 'rgba(248,250,252,0.06)'}`,
-                  color: active ? '#EAB308' : 'rgba(248,250,252,0.5)',
+                  color: active ? '#EAB308' : 'rgba(255,255,255,0.75)',
                 }}
                 data-testid={`creator-tab-${tab.id}`}>
                 <Icon size={12} /> {tab.label}
@@ -450,7 +450,7 @@ function FeedbackTab({ feedback, onStatusChange, onExport }) {
     new: { bg: 'rgba(59,130,246,0.1)', color: '#3B82F6', icon: AlertCircle, label: 'New' },
     in_review: { bg: 'rgba(234,179,8,0.1)', color: '#EAB308', icon: Clock, label: 'In Review' },
     resolved: { bg: 'rgba(34,197,94,0.1)', color: '#22C55E', icon: CheckCircle, label: 'Resolved' },
-    dismissed: { bg: 'rgba(248,250,252,0.05)', color: 'rgba(248,250,252,0.4)', icon: XCircle, label: 'Dismissed' },
+    dismissed: { bg: 'rgba(248,250,252,0.05)', color: 'rgba(255,255,255,0.7)', icon: XCircle, label: 'Dismissed' },
   };
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} data-testid="creator-feedback-tab">
@@ -458,7 +458,7 @@ function FeedbackTab({ feedback, onStatusChange, onExport }) {
         <div className="flex items-center gap-2 flex-wrap">
           {['all', 'new', 'in_review', 'resolved', 'dismissed'].map(f => (
             <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-full text-[10px] font-medium transition-all"
-              style={{ background: filter === f ? 'rgba(234,179,8,0.1)' : 'rgba(248,250,252,0.03)', border: `1px solid ${filter === f ? 'rgba(234,179,8,0.2)' : 'rgba(248,250,252,0.06)'}`, color: filter === f ? '#EAB308' : 'rgba(248,250,252,0.5)' }}>
+              style={{ background: filter === f ? 'rgba(234,179,8,0.1)' : 'rgba(248,250,252,0.03)', border: `1px solid ${filter === f ? 'rgba(234,179,8,0.2)' : 'rgba(248,250,252,0.06)'}`, color: filter === f ? '#EAB308' : 'rgba(255,255,255,0.75)' }}>
               {f === 'all' ? `All (${feedback.length})` : `${f.replace('_', ' ')} (${feedback.filter(x => x.status === f).length})`}
             </button>
           ))}
@@ -711,7 +711,7 @@ function BroadcastModal({ authHeaders, onClose, onSent }) {
             <div className="flex gap-2">
               {[{ id: 'all', label: 'All Users' }, { id: 'active', label: 'Active (7d)' }, { id: 'new', label: 'New (7d)' }].map(t => (
                 <button key={t.id} onClick={() => setTarget(t.id)} className="flex-1 py-2 rounded-xl text-xs font-medium"
-                  style={{ background: target === t.id ? 'rgba(234,179,8,0.1)' : 'rgba(248,250,252,0.02)', border: `1px solid ${target === t.id ? 'rgba(234,179,8,0.2)' : 'rgba(248,250,252,0.05)'}`, color: target === t.id ? '#EAB308' : 'rgba(248,250,252,0.5)' }}
+                  style={{ background: target === t.id ? 'rgba(234,179,8,0.1)' : 'rgba(248,250,252,0.02)', border: `1px solid ${target === t.id ? 'rgba(234,179,8,0.2)' : 'rgba(248,250,252,0.05)'}`, color: target === t.id ? '#EAB308' : 'rgba(255,255,255,0.75)' }}
                   data-testid={`broadcast-target-${t.id}`}>{t.label}</button>
               ))}
             </div>

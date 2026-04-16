@@ -154,7 +154,7 @@ function MantraSession({ mantra, targetReps, soundId, onEnd }) {
           <p className="text-5xl font-light tabular-nums" style={{ fontFamily: 'Cormorant Garamond, serif', color }}>
             {count}
           </p>
-          <p className="text-xs uppercase tracking-widest mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="text-xs uppercase tracking-widest mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {targetReps > 0 ? `of ${targetReps}` : 'repetitions'}
           </p>
         </button>
@@ -176,7 +176,7 @@ function MantraSession({ mantra, targetReps, soundId, onEnd }) {
         data-testid="mantra-session-text">
         {mantra.text}
       </motion.p>
-      <p className="text-xs mb-6 relative z-10" style={{ color: 'rgba(255,255,255,0.3)' }}>
+      <p className="text-xs mb-6 relative z-10" style={{ color: 'rgba(255,255,255,0.65)' }}>
         Tap the circle with each repetition
       </p>
 

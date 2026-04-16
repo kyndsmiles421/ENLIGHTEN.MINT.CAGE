@@ -282,9 +282,9 @@ export default function UtilityDock({
                   style={{
                     background: colors.background,
                     backdropFilter: 'none',
-                    border: `1px solid ${isAtZeroPoint ? 'rgba(255,255,255,0.3)' : borderColor}`,
+                    border: `1px solid ${isAtZeroPoint ? 'rgba(255,255,255,0.65)' : borderColor}`,
                     boxShadow: isAtZeroPoint 
-                      ? '0 0 20px rgba(255,255,255,0.2)' 
+                      ? '0 0 20px rgba(255,255,255,0.6)' 
                       : `0 4px 20px rgba(0,0,0,0.1)`,
                   }}
                 >
@@ -300,7 +300,7 @@ export default function UtilityDock({
                       onClick={toggleZeroPointMode}
                       className="px-2 py-0.5 rounded text-[8px] uppercase tracking-wider transition-all"
                       style={{
-                        background: isAtZeroPoint ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
+                        background: isAtZeroPoint ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.05)',
                         color: isAtZeroPoint ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
                         border: `1px solid ${isAtZeroPoint ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
                       }}
@@ -340,7 +340,7 @@ export default function UtilityDock({
                       className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 pointer-events-none"
                       style={{
                         left: '50%',
-                        background: isAtZeroPoint ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                        background: isAtZeroPoint ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
                         boxShadow: isAtZeroPoint ? '0 0 8px rgba(255,255,255,0.5)' : 'none',
                       }}
                     />

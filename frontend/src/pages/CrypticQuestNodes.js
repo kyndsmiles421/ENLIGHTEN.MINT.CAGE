@@ -78,7 +78,7 @@ export default function CrypticQuestNodes() {
                 </div>
                 {node.solved && <div className="text-[10px]" style={{ color: `${color}80` }}>Completed</div>}
                 {!node.solved && !node.locked && (
-                  <div className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(248,250,252,0.4)' }}>
+                  <div className="text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
                     <HelpCircle size={10} /> {node.hint}
                   </div>
                 )}

@@ -266,7 +266,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
             </motion.span>
           )}
         </div>
-        <span className="text-[8px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+        <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           {globalData?.total_users_in_matrix || 0} users
         </span>
       </div>
@@ -282,7 +282,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
             }}>
               {((globalData?.global_density || 0) * 100).toFixed(1)}%
             </div>
-            <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.25)' }}>Global Density</div>
+            <div className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>Global Density</div>
           </div>
           <div className="rounded-lg p-2.5 text-center" style={{
             background: surgeActive ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
@@ -291,7 +291,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
             <div className="text-lg font-semibold" style={{ color: surgeActive ? '#FBBF24' : '#6B7280' }}>
               {surgeActive ? 'Active' : 'Dormant'}
             </div>
-            <div className="text-[7px] uppercase" style={{ color: 'rgba(248,250,252,0.25)' }}>Surge State</div>
+            <div className="text-[7px] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>Surge State</div>
           </div>
         </div>
 
@@ -307,14 +307,14 @@ export default function CollectiveResonance({ isOpen, onClose }) {
             </div>
             <div className="grid grid-cols-2 gap-1.5">
               <div className="rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.2)' }}>
-                <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Commerce Fee</div>
+                <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Commerce Fee</div>
                 <div className="text-[11px] font-semibold" style={{ color: '#22C55E' }}>
                   {globalData.surge.effects.commerce_fee_override}%
                   <span className="text-[7px] line-through ml-1" style={{ color: '#6B7280' }}>2%</span>
                 </div>
               </div>
               <div className="rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.2)' }}>
-                <div className="text-[7px]" style={{ color: 'rgba(248,250,252,0.3)' }}>Transmute Cost</div>
+                <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Transmute Cost</div>
                 <div className="text-[11px] font-semibold" style={{ color: '#22C55E' }}>
                   -40%
                   <span className="text-[7px] ml-1" style={{ color: '#6B7280' }}>discount</span>
@@ -328,8 +328,8 @@ export default function CollectiveResonance({ isOpen, onClose }) {
         {globalMatrix && (
           <div className="mb-3">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <Activity size={10} style={{ color: 'rgba(248,250,252,0.3)' }} />
-              <span className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(248,250,252,0.25)' }}>
+              <Activity size={10} style={{ color: 'rgba(255,255,255,0.65)' }} />
+              <span className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Interference Field (Live)
               </span>
             </div>
@@ -350,7 +350,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
             background: 'rgba(255,255,255,0.02)',
             border: '1px solid rgba(255,255,255,0.04)',
           }}>
-            <p className="text-[9px]" style={{ color: 'rgba(248,250,252,0.3)' }}>
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               Collective matrix forming as users resolve their H² states...
             </p>
           </div>
@@ -359,7 +359,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
         {/* 4×4 Cluster Heatmap */}
         {globalData?.cluster_heatmap && (
           <div className="mb-3">
-            <div className="text-[8px] uppercase tracking-wider mb-1.5" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <div className="text-[8px] uppercase tracking-wider mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Cluster Resonance Map
             </div>
             <div className="grid grid-cols-4 gap-0.5">
@@ -403,7 +403,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
             background: 'rgba(255,255,255,0.02)',
             border: '1px solid rgba(255,255,255,0.04)',
           }}>
-            <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(248,250,252,0.25)' }}>
+            <div className="text-[8px] uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Global Cross-Cluster Resonance
             </div>
             <div className="space-y-1">
@@ -411,7 +411,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
                 const isAboveThreshold = value >= 0.85;
                 return (
                   <div key={key} className="flex items-center justify-between">
-                    <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.4)' }}>{key}</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{key}</span>
                     <div className="flex items-center gap-2">
                       <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                         <motion.div

@@ -257,7 +257,7 @@ export default function BackToHub() {
           style={{
             background: 'transparent',
             border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(248,250,252,0.6)',
+            color: 'rgba(255,255,255,0.85)',
             backdropFilter: 'none',
           }}
           data-testid="back-to-hub"
@@ -273,7 +273,7 @@ export default function BackToHub() {
             style={{
               background: showRelated ? 'rgba(139,92,246,0.12)' : 'rgba(0,0,0,0.15)',
               border: `1px solid ${showRelated ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.08)'}`,
-              color: showRelated ? '#C4B5FD' : 'rgba(248,250,252,0.5)',
+              color: showRelated ? '#C4B5FD' : 'rgba(255,255,255,0.75)',
               backdropFilter: 'none',
             }}
             data-testid="related-toggle"
@@ -304,7 +304,7 @@ export default function BackToHub() {
                 style={{
                   background: 'transparent',
                   border: '1px solid rgba(139,92,246,0.15)',
-                  color: 'rgba(248,250,252,0.7)',
+                  color: 'rgba(255,255,255,0.9)',
                   backdropFilter: 'none',
                 }}
                 data-testid={`related-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}

@@ -28,10 +28,10 @@ export function SpeedBridgeModal({ currentTier, onUpgrade, onClose }) {
 
         <div className="p-5 text-center border-b" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>
           <p className="text-[9px] tracking-[0.2em] uppercase mb-1" style={{ color: '#EAB308' }}>Speed Bridge</p>
-          <p className="text-base font-light" style={{ color: 'rgba(248,250,252,0.5)', fontFamily: 'Cormorant Garamond, serif' }}>
+          <p className="text-base font-light" style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'Cormorant Garamond, serif' }}>
             Your composition has reached Divine Complexity
           </p>
-          <p className="text-[8px] mt-1" style={{ color: 'rgba(248,250,252,0.2)' }}>
+          <p className="text-[8px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Upgrade for more layers, faster rendering, and expanded libraries
           </p>
         </div>
@@ -45,10 +45,10 @@ export function SpeedBridgeModal({ currentTier, onUpgrade, onClose }) {
                 style={{ background: isCurrent ? `${t.color}06` : 'rgba(248,250,252,0.015)', border: `1px solid ${isCurrent ? `${t.color}25` : 'rgba(248,250,252,0.04)'}` }}
                 data-testid={`tier-card-${t.key}`}>
                 <p className="text-[10px] font-medium tracking-wider" style={{ color: t.color }}>{t.name}</p>
-                <p className="text-[11px] font-light mt-0.5" style={{ color: 'rgba(248,250,252,0.4)' }}>{t.price}</p>
+                <p className="text-[11px] font-light mt-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>{t.price}</p>
                 <p className="text-[8px] font-mono mt-1" style={{ color: `${t.color}80` }}>{t.cap}</p>
                 <div className="mt-2 space-y-0.5 flex-1">
-                  {t.features.map((f, fi) => <p key={fi} className="text-[7px]" style={{ color: 'rgba(248,250,252,0.25)' }}>{f}</p>)}
+                  {t.features.map((f, fi) => <p key={fi} className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{f}</p>)}
                 </div>
                 {isCurrent && (
                   <p className="text-[7px] mt-2 px-2 py-0.5 rounded-full inline-block mx-auto"
@@ -69,7 +69,7 @@ export function SpeedBridgeModal({ currentTier, onUpgrade, onClose }) {
 
         <div className="p-3 text-center border-t" style={{ borderColor: 'rgba(248,250,252,0.05)' }}>
           <button className="text-[8px] px-4 py-1.5 rounded-full cursor-pointer"
-            style={{ color: 'rgba(248,250,252,0.25)', background: 'rgba(248,250,252,0.02)' }}
+            style={{ color: 'rgba(255,255,255,0.6)', background: 'rgba(248,250,252,0.02)' }}
             onClick={onClose} data-testid="close-speed-bridge">
             Continue with {TIER_DISPLAY[currentTier] || 'Current'}
           </button>
@@ -104,7 +104,7 @@ export function BonusPackCard({ pack, onPurchase, purchasing }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>{pack.name}</p>
-          <p className="text-[7px] mt-0.5 line-clamp-2" style={{ color: 'rgba(248,250,252,0.3)' }}>{pack.description}</p>
+          <p className="text-[7px] mt-0.5 line-clamp-2" style={{ color: 'rgba(255,255,255,0.65)' }}>{pack.description}</p>
           <div className="flex items-center gap-2 mt-1.5">
             <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase tracking-wider"
               style={{ background: `${tierColor}12`, color: tierColor, border: `1px solid ${tierColor}20` }}>
@@ -113,7 +113,7 @@ export function BonusPackCard({ pack, onPurchase, purchasing }) {
             <span className="text-[7px] font-mono" style={{ color: '#22C55E' }}>
               {pack.bonus_wrap?.label}
             </span>
-            <span className="text-[7px]" style={{ color: 'rgba(248,250,252,0.2)' }}>
+            <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {pack.tracks_included} tracks
             </span>
           </div>
@@ -137,8 +137,8 @@ export function BonusPackCard({ pack, onPurchase, purchasing }) {
               disabled={purchasing || !pack.can_afford}
               data-testid={`buy-pack-${pack.id}`}>
               {purchasing ? <Loader2 size={9} className="animate-spin" style={{ color: pack.color }} />
-                : <ShoppingCart size={9} style={{ color: pack.can_afford ? pack.color : 'rgba(248,250,252,0.2)' }} />}
-              <span className="text-[8px] font-mono" style={{ color: pack.can_afford ? pack.color : 'rgba(248,250,252,0.2)' }}>
+                : <ShoppingCart size={9} style={{ color: pack.can_afford ? pack.color : 'rgba(255,255,255,0.6)' }} />}
+              <span className="text-[8px] font-mono" style={{ color: pack.can_afford ? pack.color : 'rgba(255,255,255,0.6)' }}>
                 {pack.price_credits}c
               </span>
             </motion.button>
@@ -177,12 +177,12 @@ export function RecommendationCard({ rec, onPurchase, purchasing }) {
             </p>
             <span className="text-[6px] px-1 py-0.5 rounded-full"
               style={{ background: isActive ? `${borderColor}15` : 'rgba(248,250,252,0.03)',
-                       color: isActive ? borderColor : 'rgba(248,250,252,0.3)' }}>
+                       color: isActive ? borderColor : 'rgba(255,255,255,0.65)' }}>
               {isActive ? 'RECOMMENDED' : 'IN YOUR KIT'}
             </span>
           </div>
           <p className="text-[10px] font-medium mt-0.5" style={{ color: '#F8FAFC' }}>{rec.pack_name}</p>
-          <p className="text-[7px] mt-0.5" style={{ color: isActive ? 'rgba(248,250,252,0.4)' : 'rgba(248,250,252,0.25)' }}>
+          <p className="text-[7px] mt-0.5" style={{ color: isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.6)' }}>
             {rec.message}
           </p>
           {rec.bonus_wrap && (

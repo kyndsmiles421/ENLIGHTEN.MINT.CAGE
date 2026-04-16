@@ -113,7 +113,7 @@ function BubbleView({ module, isActive, onClose }) {
           style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }}
           whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
           data-testid={`bubble-close-${module.id}`}>
-          <X size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+          <X size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
         </motion.button>
       </div>
 
@@ -242,7 +242,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
               style={{ background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(248,250,252,0.08)' }}
               whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
               data-testid="bubble-nav-left">
-              <ChevronLeft size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+              <ChevronLeft size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
             </motion.button>
           )}
 
@@ -271,7 +271,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
               style={{ background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(248,250,252,0.08)' }}
               whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
               data-testid="bubble-nav-right">
-              <ChevronRight size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+              <ChevronRight size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
             </motion.button>
           )}
 
@@ -280,7 +280,7 @@ export default function BubblePortal({ activeBubbles, onCloseBubble, onCloseAll,
             style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.08)' }}
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             data-testid="bubble-close-all">
-            <Minimize2 size={12} style={{ color: 'rgba(248,250,252,0.4)' }} />
+            <Minimize2 size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </motion.button>
         </div>
 
