@@ -67,7 +67,7 @@ export default function CosmicCalendar() {
   useEffect(() => { fetchContext(); }, [token]);
 
   if (loading && !data) return (
-    <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
+    <div className="min-h-screen flex items-center justify-center pt-20">
       <Loader2 className="animate-spin" size={28} style={{ color: '#D8B4FE' }} />
     </div>
   );
@@ -79,7 +79,7 @@ export default function CosmicCalendar() {
   const inputStyle = { background: 'transparent', border: '1px solid rgba(248,250,252,0.08)', color: '#F8FAFC', outline: 'none' };
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 max-w-5xl mx-auto" data-testid="cosmic-calendar-page">
+    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="cosmic-calendar-page">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D8B4FE' }}>

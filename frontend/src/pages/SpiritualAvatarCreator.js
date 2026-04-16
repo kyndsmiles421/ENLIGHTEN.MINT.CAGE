@@ -170,7 +170,7 @@ export default function SpiritualAvatarCreator() {
         </button>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pt-6 relative z-10">
+      <div className="max-w-3xl mx-auto px-4 pt-6 relative z-10">
         <div className="mb-6">
           <EvolutionBar stages={stages} currentLevel={currentLevel} />
         </div>

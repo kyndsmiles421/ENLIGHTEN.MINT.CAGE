@@ -173,7 +173,7 @@ export default function Workshop() {
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid="workshop-page">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-light tracking-tight" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
             The Architect's Workshop

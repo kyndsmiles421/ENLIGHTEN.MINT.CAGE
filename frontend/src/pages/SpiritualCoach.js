@@ -579,7 +579,7 @@ export default function SpiritualCoach() {
   const isDreamOracle = activeMode === 'dream_oracle';
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto immersive-page" data-testid="coach-page">
+    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="coach-page">
       {/* Sage ambient aura */}
       <div className="fixed top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.04) 0%, transparent 60%)', filter: 'blur(60px)' }} />

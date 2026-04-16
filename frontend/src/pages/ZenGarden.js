@@ -909,13 +909,13 @@ export default function ZenGarden() {
   const [tab, setTab] = useState('plants');
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-      <div className="max-w-5xl mx-auto relative z-10">
+    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="max-w-3xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#22C55E' }}>
             <Sprout size={14} className="inline mr-2" /> Decompression
           </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Zen Garden
           </h1>
           <p className="text-base mb-10 max-w-xl" style={{ color: 'var(--text-secondary)' }}>

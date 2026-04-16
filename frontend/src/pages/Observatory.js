@@ -278,7 +278,7 @@ export default function Observatory() {
       <AtmosphericParticles color={immBg.color} count={audio.activeName ? 50 : 20} />
 
       {/* ── Content ── */}
-      <div className="relative z-10 px-4 py-6 sm:px-8 max-w-5xl mx-auto">
+      <div className="relative z-10 px-4 py-6 sm:px-8 max-w-3xl mx-auto">
         <div className="mb-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-1" style={{ color: immBg.color }}>
             <Star size={10} className="inline mr-1" /> The Observatory

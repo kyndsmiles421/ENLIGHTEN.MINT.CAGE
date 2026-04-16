@@ -3260,12 +3260,13 @@ body[data-theme="light"] .glass-card span[class*="rounded-full"] {
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* ═══ CONTENT BACKING — Clean dark base, content IS the visual ═══ */
+/* ═══ V55.0 SPATIAL ARCHITECTURE — Room IS the background ═══ */
+/* The SpatialRoom provides all visual atmosphere.              */
+/* Pages must be transparent to let the room show through.      */
 .immersive-page,
 [data-testid*="page"],
 .min-h-screen {
-  background: #0a0a12 !important;
-  padding-bottom: 120px !important; /* Space above mixer bar so nothing gets cut off */
+  background: transparent !important;
 }
 
 /* Enhanced scrollbar for immersive feel */

@@ -52,7 +52,7 @@ export default function HelpCenter() {
   });
 
   return (
-    <div className="min-h-screen immersive-page pt-20 pb-24 px-4 max-w-3xl mx-auto" data-testid="help-center-page">
+    <div className="min-h-screen pt-20 pb-24 px-4 max-w-3xl mx-auto" data-testid="help-center-page">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-white/5 transition-all" data-testid="help-back">
           <ArrowLeft size={18} style={{ color: 'var(--text-muted)' }} />

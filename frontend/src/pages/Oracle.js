@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { Sparkles, Loader2, RotateCcw, Star, Sun, Moon, Hexagon, Triangle, X } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 
-import SovereignViewport from '../components/SovereignViewport';
+
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -213,8 +213,8 @@ export default function Oracle() {
   const currentTabColor = TABS.find(t => t.id === tab)?.color || '#D8B4FE';
 
   return (
-    <SovereignViewport bgImage="https://images.unsplash.com/photo-1656542198209-4758a1afc42f?w=1200&q=70" accentColor={currentTabColor}>
-      <div className="px-6 md:px-12 lg:px-24 py-12" style={{ position: 'relative', zIndex: 10 }}>
+    
+      <div className="pt-20 pb-24 px-5" style={{ position: 'relative', zIndex: 10 }}>
       {/* Crystal Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (
@@ -240,12 +240,12 @@ export default function Oracle() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: '#D8B4FE' }}>
             <Sparkles size={14} className="inline mr-2" /> Divination Oracle
           </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Seek the Oracle
           </h1>
           <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
@@ -651,6 +651,6 @@ export default function Oracle() {
         </div>
       </div>
       </div>
-    </SovereignViewport>
+    
   );
 }

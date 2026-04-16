@@ -159,8 +159,8 @@ export default function CreatorDashboard() {
   ];
 
   return (
-    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10 immersive-page" style={{ background: 'transparent' }} data-testid="creator-dashboard">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10" style={{ background: 'transparent' }} data-testid="creator-dashboard">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <div className="flex items-center justify-between">

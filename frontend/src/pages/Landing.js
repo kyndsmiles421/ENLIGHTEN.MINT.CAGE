@@ -500,7 +500,7 @@ function PersonalizedDashboard({ user, onQuickReset }) {
 
   return (
     <div className="relative z-10 px-6 md:px-12 lg:px-24 pt-24 pb-12" data-testid="personalized-dashboard">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Greeting + Wisdom */}
         <div className="mb-8">
           <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -815,7 +815,7 @@ function Footer() {
 
   return (
     <>
-      <footer className="relative z-10 px-6 md:px-12 lg:px-24 py-12 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+      <footer className="relative z-10 pt-20 pb-24 px-5 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-4">
             <span className="text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>
@@ -1095,7 +1095,7 @@ export default function Landing() {
 
           {/* ═══ How it Works ═══ */}
           <div className="relative z-10 px-6 md:px-12 lg:px-24 py-20" data-testid="how-it-works-section">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-3xl mx-auto">
               <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-14">
                 <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: '#2DD4BF' }}>Our Story</p>
                 <h2 className="text-2xl md:text-3xl font-light mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>

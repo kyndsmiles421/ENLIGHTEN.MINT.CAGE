@@ -1367,7 +1367,7 @@ export default function StarChart() {
     : [];
 
   if (!token) return (
-    <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
+    <div className="min-h-screen flex items-center justify-center pt-20">
       <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to explore the cosmic star chart</p>
     </div>
   );
@@ -1376,7 +1376,7 @@ export default function StarChart() {
     <div className="min-h-screen pt-16 relative overflow-hidden" data-testid="star-chart-page">
       {/* Header */}
       <div className="absolute top-16 left-0 right-0 z-10 px-4 py-3 pointer-events-none">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <div>
               <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: '#F8FAFC' }}>

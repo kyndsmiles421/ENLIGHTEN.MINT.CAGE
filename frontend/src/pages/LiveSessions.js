@@ -100,8 +100,8 @@ export default function LiveSessions() {
   ];
 
   return (
-    <div className="min-h-screen immersive-page px-4 md:px-12 lg:px-24 py-10" style={{ background: 'transparent' }} data-testid="live-sessions-page">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10" style={{ background: 'transparent' }} data-testid="live-sessions-page">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-2">

@@ -145,7 +145,7 @@ function CompatibilityResult({ result, onBack }) {
       </div>
 
       <div className="p-6 text-center" style={{ borderColor: `${color}15` }}>
-        <p className="text-5xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color }}>{score}%</p>
+        <p className="text-3xl font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color }}>{score}%</p>
         <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Harmony Score</p>
         <div className="w-full h-2 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.04)' }}>
           <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${score}%`, background: color }} />
@@ -156,7 +156,7 @@ function CompatibilityResult({ result, onBack }) {
   );
 }
 
-import SovereignViewport from '../components/SovereignViewport';
+
 
 export default function Numerology() {
   const [tab, setTab] = useState('reading'); // 'reading' | 'compatibility'
@@ -191,8 +191,8 @@ export default function Numerology() {
   };
 
   return (
-    <SovereignViewport bgImage="https://images.unsplash.com/photo-1735213005665-f5b93d0795fe?w=1200&q=70" accentColor="#D4AF37">
-      <div className="px-6 md:px-12 lg:px-24 py-12" data-testid="numerology-page">
+    
+      <div className="pt-20 pb-24 px-5" data-testid="numerology-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {result ? (
@@ -205,7 +205,7 @@ export default function Numerology() {
                 <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D4AF37' }}>
                   <Hash size={14} className="inline mr-2" /> Numerology
                 </p>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                <h1 className="text-3xl md:text-3xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                   The Sacred Numbers
                 </h1>
                 <p className="text-base mb-10" style={{ color: 'var(--text-secondary)' }}>
@@ -318,7 +318,7 @@ export default function Numerology() {
         <NumerologyCrossLinks />
       </div>
       </div>
-    </SovereignViewport>
+    
   );
 }
 

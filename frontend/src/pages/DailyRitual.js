@@ -285,7 +285,7 @@ export default function DailyRitual() {
   const progressPct = steps.length ? Math.round((completed.length / steps.length) * 100) : 0;
 
   return (
-    <div className="min-h-screen immersive-page pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="daily-ritual-page">
+    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="daily-ritual-page">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-8">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#D8B4FE' }}>

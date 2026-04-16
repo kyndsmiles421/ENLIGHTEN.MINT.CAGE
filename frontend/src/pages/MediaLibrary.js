@@ -89,7 +89,7 @@ export default function MediaLibrary() {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-24 px-4 sm:px-6 max-w-6xl mx-auto" data-testid="media-library-page">
+    <div className="min-h-screen pt-16 pb-24 px-4 sm:px-6 max-w-3xl mx-auto" data-testid="media-library-page">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <div className="flex items-center gap-3 mb-2">

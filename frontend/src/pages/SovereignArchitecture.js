@@ -84,7 +84,7 @@ export default function SovereignArchitecture() {
         background: `radial-gradient(ellipse at 30% 20%, ${userColor}08 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(139,92,246,0.04) 0%, transparent 50%)`,
       }} />
 
-      <div className="relative max-w-5xl mx-auto px-4 pt-6">
+      <div className="relative max-w-3xl mx-auto px-4 pt-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

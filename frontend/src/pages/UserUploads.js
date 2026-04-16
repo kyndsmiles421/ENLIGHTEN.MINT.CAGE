@@ -156,7 +156,7 @@ export default function UserUploads() {
   };
 
   return (
-    <div className="min-h-screen immersive-page pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="uploads-page">
+    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="uploads-page">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#3B82F6' }}>

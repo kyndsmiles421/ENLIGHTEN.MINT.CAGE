@@ -515,7 +515,7 @@ export default function AvatarGallery() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 pt-4">
+      <div className="max-w-3xl mx-auto px-4 pt-4">
         {/* Filter Bar */}
         <AnimatePresence>
           {showFilters && (

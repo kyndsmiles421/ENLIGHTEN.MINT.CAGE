@@ -352,7 +352,7 @@ export default function Rituals() {
   // Active ritual mode
   if (activeRitual) {
     return (
-      <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
+      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
         <div className="max-w-3xl mx-auto">
           <RitualPlayer
             ritual={activeRitual}
@@ -365,8 +365,8 @@ export default function Rituals() {
   }
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-start justify-between mb-12">
             <div>
@@ -374,7 +374,7 @@ export default function Rituals() {
                 <Sunrise size={14} className="inline mr-2" />
                 Daily Rituals
               </p>
-              <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+              <h1 className="text-3xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                 Ritual Builder
               </h1>
               <p className="text-base" style={{ color: 'var(--text-secondary)' }}>

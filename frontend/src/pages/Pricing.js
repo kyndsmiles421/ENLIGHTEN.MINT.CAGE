@@ -144,7 +144,7 @@ export default function Pricing() {
 
   if (loading) {
     return (
-      <div className="min-h-screen immersive-page flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
         <Loader2 className="animate-spin" size={24} style={{ color: 'var(--text-muted)' }} />
       </div>
     );
@@ -174,7 +174,7 @@ export default function Pricing() {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="px-4 pt-4 pb-6 max-w-6xl mx-auto">
+      <div className="px-4 pt-4 pb-6 max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate(-1)} className="p-2 rounded-lg transition-all hover:bg-white/5"
             data-testid="pricing-back-btn">

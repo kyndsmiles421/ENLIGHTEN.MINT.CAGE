@@ -59,13 +59,13 @@ export default function TrySomethingNew() {
   }, [token]);
 
   if (loading) return (
-    <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
+    <div className="min-h-screen flex items-center justify-center pt-20">
       <Loader2 className="animate-spin" size={28} style={{ color: '#E879F9' }} />
     </div>
   );
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 max-w-5xl mx-auto" data-testid="discover-page">
+    <div className="min-h-screen pt-24 pb-20 px-4 max-w-3xl mx-auto" data-testid="discover-page">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-8">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#E879F9' }}>

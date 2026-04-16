@@ -203,7 +203,7 @@ export default function StarseedRealm() {
 
   return (
     <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10" data-testid="starseed-realm-page">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <button onClick={() => navigate('/starseed-adventure')} className="text-xs flex items-center gap-1"

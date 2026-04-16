@@ -452,8 +452,8 @@ export default function Encyclopedia() {
   );
 
   return (
-    <div className="min-h-screen immersive-page pt-20 pb-12 px-4" data-testid="encyclopedia-page" style={{ background: 'var(--bg-primary)' }}>
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen pt-20 pb-12 px-4" data-testid="encyclopedia-page" style={{ background: 'var(--bg-primary)' }}>
+      <div className="max-w-3xl mx-auto">
         {!activeTradition ? (
           <>
             {/* Header */}

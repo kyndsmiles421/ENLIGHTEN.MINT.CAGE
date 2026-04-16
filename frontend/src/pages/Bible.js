@@ -568,7 +568,7 @@ export default function Bible() {
 
   return (
     <div className="min-h-screen pt-20 pb-12 px-4" data-testid="bible-page">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#F8FAFC', fontFamily: 'Cormorant Garamond, serif' }}>

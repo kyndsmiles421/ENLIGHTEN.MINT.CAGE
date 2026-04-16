@@ -186,13 +186,13 @@ export default function WisdomJournal() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12 immersive-page" data-testid="wisdom-journal-page">
+    <div className="min-h-screen pt-20 pb-24 px-5" data-testid="wisdom-journal-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#A78BFA' }}>
             <BookOpen size={14} className="inline mr-2" /> Wisdom Journal
           </p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl md:text-3xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Your Sacred Study Log
           </h1>
           <p className="text-base mb-10" style={{ color: 'var(--text-secondary)' }}>

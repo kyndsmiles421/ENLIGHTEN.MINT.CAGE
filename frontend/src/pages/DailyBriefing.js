@@ -49,7 +49,7 @@ export default function DailyBriefing() {
   }, [token]);
 
   if (!token) return (
-    <div className="min-h-screen immersive-page flex items-center justify-center pt-20">
+    <div className="min-h-screen flex items-center justify-center pt-20">
       <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Sign in to receive your cosmic briefing</p>
     </div>
   );

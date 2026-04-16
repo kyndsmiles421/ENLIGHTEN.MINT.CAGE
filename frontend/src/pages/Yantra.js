@@ -60,13 +60,13 @@ export default function Yantra() {
   const active = selected ? yantras.find(y => y.id === selected) : null;
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: '#EF4444' }}>
             <Triangle size={14} className="inline mr-2" /> Sacred Diagrams
           </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Yantras
           </h1>
           <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>

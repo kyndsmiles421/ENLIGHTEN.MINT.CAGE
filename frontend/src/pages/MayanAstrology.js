@@ -349,13 +349,13 @@ export default function MayanAstrology() {
   const [tab, setTab] = useState('birth');
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="mayan-page">
+    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }} data-testid="mayan-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#2DD4BF' }}>
             <Compass size={14} className="inline mr-2" /> Mayan Astrology
           </p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl md:text-3xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Tzolk'in — The Sacred Calendar
           </h1>
           <p className="text-base mb-10" style={{ color: 'var(--text-secondary)' }}>

@@ -72,7 +72,7 @@ export default function CosmicProfile() {
   useEffect(() => { load(); }, [load]);
 
   if (!user) return (
-    <div className="min-h-screen immersive-page flex items-center justify-center px-6">
+    <div className="min-h-screen flex items-center justify-center px-6">
       <div className="p-12 text-center">
         <Star size={32} style={{ color: 'rgba(192,132,252,0.3)', margin: '0 auto 12px' }} />
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to view your cosmic profile.</p>
@@ -91,8 +91,8 @@ export default function CosmicProfile() {
   const domColor = SYSTEM_COLORS[profile.dominant_system] || '#C084FC';
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" data-testid="cosmic-profile-page">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen pt-20 pb-24 px-5" data-testid="cosmic-profile-page">
+      <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: domColor }}>
             <BarChart3 size={14} className="inline mr-2" />Cosmic Profile

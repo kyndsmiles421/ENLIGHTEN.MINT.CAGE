@@ -218,7 +218,7 @@ export default function Learn() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen immersive-page flex items-center justify-center" style={{ background: 'transparent' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}>
         <p style={{ color: 'var(--text-muted)' }}>Preparing your learning path...</p>
       </div>
     );
@@ -227,8 +227,8 @@ export default function Learn() {
   // Lesson view
   if (selectedLesson) {
     return (
-      <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-        <div className="max-w-5xl mx-auto relative z-10">
+      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+        <div className="max-w-3xl mx-auto relative z-10">
           <button
             onClick={() => setSelectedLesson(null)}
             className="flex items-center gap-2 text-xs mb-8 group"
@@ -252,8 +252,8 @@ export default function Learn() {
   // Module detail view
   if (selectedModule) {
     return (
-      <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }}>
-        <div className="max-w-5xl mx-auto relative z-10">
+      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+        <div className="max-w-3xl mx-auto relative z-10">
           <button
             onClick={() => setSelectedModule(null)}
             className="flex items-center gap-2 text-xs mb-8 group"
@@ -328,13 +328,13 @@ export default function Learn() {
   const totalLessons = modules.reduce((s, m) => s + m.total_lessons, 0);
 
   return (
-    <div className="min-h-screen px-6 md:px-12 lg:px-24 py-12" style={{ background: 'transparent' }} data-testid="learn-page">
-      <div className="max-w-5xl mx-auto relative z-10">
+    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }} data-testid="learn-page">
+      <div className="max-w-3xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#E879F9' }}>
             <GraduationCap size={14} className="inline mr-2" /> Progressive Learning
           </p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Advanced Modules
           </h1>
           <p className="text-base mb-4 max-w-xl" style={{ color: 'var(--text-secondary)' }}>

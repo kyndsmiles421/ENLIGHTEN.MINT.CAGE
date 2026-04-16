@@ -390,8 +390,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10 relative immersive-page" style={{ background: 'transparent' }} data-testid="dashboard-page">
-      <div className="max-w-6xl mx-auto relative z-10">
+    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10 relative" style={{ background: 'transparent' }} data-testid="dashboard-page">
+      <div className="max-w-3xl mx-auto relative z-10">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-4 mb-1">

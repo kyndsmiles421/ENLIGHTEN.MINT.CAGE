@@ -297,7 +297,7 @@ export default function Teachings() {
     : teachers;
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" data-testid="teachings-page">
+    <div className="min-h-screen pt-20 pb-24 px-5" data-testid="teachings-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {activeTeacher ? (
@@ -310,7 +310,7 @@ export default function Teachings() {
                 <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#A78BFA' }}>
                   <BookOpen size={14} className="inline mr-2" /> Spiritual Teachings
                 </p>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                <h1 className="text-3xl md:text-3xl font-light tracking-tight mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                   Wisdom of the Ages
                 </h1>
                 <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>

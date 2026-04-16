@@ -662,7 +662,7 @@ export default function AvatarCreator() {
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#C084FC' }}>
             <Sparkles size={14} className="inline mr-2" /> Avatar Creator
           </p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+          <h1 className="text-3xl md:text-3xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Your Cosmic Identity
           </h1>
           <p className="text-sm mb-8 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>

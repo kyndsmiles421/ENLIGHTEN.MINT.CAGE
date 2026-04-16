@@ -179,7 +179,7 @@ export default function AnimalTotems() {
   const filtered = search ? totems.filter(t => t.name.toLowerCase().includes(search.toLowerCase())) : totems;
 
   return (
-    <div className="min-h-screen immersive-page px-6 md:px-12 lg:px-24 py-12" data-testid="animal-totems-page">
+    <div className="min-h-screen pt-20 pb-24 px-5" data-testid="animal-totems-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {active ? (
@@ -192,7 +192,7 @@ export default function AnimalTotems() {
                 <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{color:'#22C55E'}}>
                   <Feather size={14} className="inline mr-2" /> Animal Speak
                 </p>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-3" style={{fontFamily:'Cormorant Garamond, serif'}}>
+                <h1 className="text-3xl md:text-3xl font-light tracking-tight mb-3" style={{fontFamily:'Cormorant Garamond, serif'}}>
                   Spirit Animal Totems
                 </h1>
                 <p className="text-base mb-8" style={{color:'var(--text-secondary)'}}>

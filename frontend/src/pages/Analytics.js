@@ -51,7 +51,7 @@ export default function Analytics() {
   const maxActivity = analytics?.daily_activity ? Math.max(...analytics.daily_activity.map(d => d.total), 1) : 1;
 
   return (
-    <div className="min-h-screen immersive-page pt-20 pb-24 px-4" style={{ background: 'var(--bg-primary)' }} data-testid="analytics-page">
+    <div className="min-h-screen pt-20 pb-24 px-4" style={{ background: 'var(--bg-primary)' }} data-testid="analytics-page">
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-8">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 mb-6 group" data-testid="analytics-back-btn">

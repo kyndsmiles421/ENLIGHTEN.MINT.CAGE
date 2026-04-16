@@ -155,9 +155,9 @@ export default function MoodTracker() {
   }));
 
   return (
-    <div className="min-h-screen immersive-page px-4 md:px-12 lg:px-24 py-10" style={{ background: 'transparent' }} data-testid="mood-tracker-page">
+    <div className="min-h-screen px-4 md:px-12 lg:px-24 py-10" style={{ background: 'transparent' }} data-testid="mood-tracker-page">
       <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--accent-rose)' }}>Mood Tracker</p>
           <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
