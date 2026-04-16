@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Sparkles, BookOpen, Star, Headphones, Flame } from 'lucide-react';
 import DeepDive from './DeepDive';
 import NarrationPlayer from './NarrationPlayer';
+import { ProximityItem } from './SpatialRoom';
 
 // Visual element icon based on item properties
 function ItemVisual({ color, element, size = 56 }) {
@@ -365,10 +366,12 @@ export default function InteractiveModule({
           <FilterTabs tabs={filters} active={filter} onSelect={setFilter} color={color} />
         )}
 
-        {/* Items */}
+        {/* Items — proximity-revealed in Z-space */}
         <div>
           {filtered.map((item, i) => (
-            <InteractiveItem key={item.id || i} item={item} color={color} category={category} index={i} />
+            <ProximityItem key={item.id || i} index={i} totalItems={filtered.length}>
+              <InteractiveItem item={item} color={color} category={category} index={i} />
+            </ProximityItem>
           ))}
           {filtered.length === 0 && (
             <p className="text-center py-12 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
