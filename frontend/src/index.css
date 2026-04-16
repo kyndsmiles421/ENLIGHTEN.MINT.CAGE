@@ -1990,20 +1990,20 @@ button:active:not(:disabled) {
 
 /* ═══ SOVEREIGN GLASS PANELS — Global Module Theming ═══ */
 .sovereign-glass {
-  background: rgba(6, 6, 12, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(6, 6, 12, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
 }
 .sovereign-glass-strong {
-  background: rgba(6, 6, 12, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 6, 12, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
 }
 .sovereign-viewport {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background: #06060C;
+  background: transparent;
 }
 .sovereign-bg-img {
   position: absolute;
@@ -2014,10 +2014,7 @@ button:active:not(:disabled) {
   transition: opacity 1.5s ease-in-out;
 }
 .sovereign-vignette {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: radial-gradient(ellipse at 50% 40%, transparent 0%, rgba(6,6,12,0.3) 55%, rgba(6,6,12,0.7) 100%);
+  display: none;
 }
 .sovereign-content {
   position: relative;
@@ -2397,14 +2394,11 @@ h1, h2, h3 {
 
 /* ============ GLASS MORPHISM ============ */
 .glass-card {
-  background: rgba(6, 6, 12, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 6, 12, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 1.5rem;
   position: relative;
   overflow: hidden;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
 .glass-card::before {
@@ -2825,7 +2819,7 @@ body[data-theme="light"] .animate-text-shimmer {
 
 /* ============ ENHANCED DEPTH & DIMENSION ============ */
 .glass-card-deep {
-  background: rgba(6, 6, 12, 0.3);
+  background: rgba(6, 6, 12, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 1.5rem;
   position: relative;
