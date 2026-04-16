@@ -1,4 +1,4 @@
-# ENLIGHTEN.MINT.CAFE — V56.1 Full System Verification
+# ENLIGHTEN.MINT.CAFE — V56.1 Interactive Simulations
 ## Product Requirements Document
 ### Last Updated: April 16, 2026
 
@@ -7,8 +7,6 @@
 ## Original Problem Statement
 Build "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE", an esoteric, immersive full-stack wellness platform blending standard wellness tracking with deep mathematical/divination systems, personalized AI, and Wellness MMORPG mechanics.
 
-**Core Requirements**: PWA, Sovereign Unified Engine, "Zero-Scale Parentage" physics, 3D Spatial Environment (9x9xZ math coordinate system), In-Place Transformations (No Modals/Overlays), Global Gamification.
-
 ---
 
 ## Architecture
@@ -16,48 +14,30 @@ Build "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE", an esoteric, immersive fu
 - **Backend**: FastAPI with auto-discovered routes (170+), MongoDB
 - **Economy**: Credits-only ($10/hr = 10 Credits/hr), Phi-escrow (1.618%)
 - **3D System**: CSS translate3d/perspective, 9x9xZ grid, Fibonacci depth steps
-- **Cultural**: 10-tradition OmniBridge
 - **AI**: GPT-5.2 via Emergent LLM Key
-- **Deployment**: TWA for Google Play Store
 
 ---
 
-## What's Been Implemented
+## Implemented Features
 
-### V55.0 (Previous Sessions)
-- Avatar Integration, Sacred Geometry Engine, Sovereign Economy
-- TWA & Manifest Config, OmniBridge & Sovereign Library
-- 160+ page batch migration to SpatialRoom system
+### V55.0 — Foundation
+- Avatar Integration, Sacred Geometry Engine, Sovereign Economy, TWA, OmniBridge, 160+ page migration
 
-### V56.0 — Vitality Overlay + Discovery Engine (April 16, 2026)
+### V56.0 — Vitality Overlay + Discovery Engine
+- InteractiveModule → Discovery Exploration Engine (8 pages: Crystals 12, Herbology 12, Aromatherapy 12, Elixirs 10, Mudras 25, Nourishment 8, Reiki 10, Acupressure 10)
+- SpatialRoom atmosphere (cave walls, particles, fog, portal flash, scene images, room name badges)
+- ProgressionToast, useWorkAccrual RPG Bridge, VitalityBar, 8 cross-system milestones
+- CinematicWalkthrough 3D camera, Oracle/Tarot 3D cards
 
-#### System-Wide Gamification (8 pages)
-- **InteractiveModule → Discovery Exploration Engine**: Fog-shrouded nodes, tap to discover (+8 XP), mastery tracking (Novice→Student→Adept→Master), Knowledge Challenge quizzes. Verified working on: Crystals (12), Herbology (12), Aromatherapy (12), Elixirs (10), Mudras (25), Nourishment (8), Reiki (10), Acupressure (10)
-
-#### Visual Immersion
-- SpatialRoom atmosphere: cave walls, crystal veins, particles, fog, portal entry flash
-- Scene environment images for Oracle, Meditation, Breathing, Crystals, Herbology, Star Chart, Yoga, Frequencies, Teachings
-- Room name badges in every spatial room
-
-#### Progression Engine
-- ProgressionToast, useWorkAccrual RPG Bridge, VitalityBar
-- 8 cross-system milestones with claimable rewards
-
-#### Cinematic Engine
-- CinematicWalkthrough: True 3D camera animation, 5 sequences
-
-#### Oracle/Tarot 3D
-- TarotCard: preserve-3d, Z-depth fan spread, hover lift
-
-### V56.1 — Full System Verification (April 16, 2026)
-- **Code splitting**: 161/166 pages lazy-loaded (3 entry points direct: Landing, Auth, CinematicIntro)
-- **API verification**: All data endpoints verified returning items
-- **Interactive pages verified**: Meditation (34 btns), Breathing (30), Games (21), Star Chart (25), Dreams (21+5 inputs), Yoga (22), Frequencies (46), Numerology (21+2 inputs)
-- **Discovery pages verified**: All 8 InteractiveModule pages confirmed loading with correct item counts
+### V56.1 — Interactive Simulations + Cross-Module Challenges
+- **I Ching Coin Toss**: Yarrow stalk probability model (6.25% Old Yin, 31.25% Young Yang, 43.75% Young Yin, 18.75% Old Yang). 3D animated coin flips, hexagram builds bottom-up line by line (6 lines), auto-fires oracle reading on completion. Changing lines highlighted in gold.
+- **Yoga Guided Flow**: Timed pose sequence with breath sync ring (inhale/hold/exhale phases). Displays poses one at a time with countdown timer. Awards +5 XP per pose, +25 XP for full sequence completion. Breath patterns vary by difficulty (default/restorative/power/meditation).
+- **Progressive Content Gating**: ProgressGate component checks milestones via /api/rpg/milestones before rendering content. Shows locked state with progress bar toward requirement.
+- **Cross-Module Daily Challenges API**: 4 elemental challenges (Earth, Air, Fire, Water) with multi-room tasks and XP multipliers (1.2-1.3x). Tasks span breathing, crystals, oracle, yoga, meditation, herbs, reiki, mood tracking. GET /api/challenges/daily-cross-module + POST /api/challenges/daily-cross-module/claim.
 
 ---
 
-## Verified API Data Endpoints
+## All Verified Data Endpoints (15 APIs confirmed)
 | Endpoint | Items | Status |
 |----------|-------|--------|
 | GET /api/crystals | 12 | OK |
@@ -74,25 +54,26 @@ Build "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE", an esoteric, immersive fu
 | GET /api/rpg/character | - | OK |
 | GET /api/rpg/milestones | 8 | OK |
 | POST /api/transmuter/work-submit | - | OK |
+| GET /api/challenges/daily-cross-module | 4 | OK |
 
 ---
 
 ## Prioritized Backlog
 
-### P1 (Important)
-- More room-specific simulations (I Ching coin toss, yoga guided flow timer)
-- Progressive content gating behind milestones
+### P1
+- Wire ProgressGate into DreamRealms/StarseedAdventure pages
+- Build frontend UI for Cross-Module Daily Challenges display
+- Add more room scene environments
 
-### P2 (Future)
-- Native mobile screen recording
-- Phygital Marketplace NFC hooks
-- Daily challenges spanning multiple modules
-- Vitality Dashboard (optional per user preference)
+### P2
+- Native mobile recording
+- Phygital NFC hooks
+- Vitality Dashboard (optional)
 
 ---
 
 ## Technical Notes
-- Economy uses CREDITS ONLY. Never "$" or "USD".
-- Z-axis navigation via translateZ.
-- InteractiveModule powers 8 pages — changes to it are system-wide.
-- The "Flatland Trap": Never batch-purge 3D CSS.
+- Economy uses CREDITS ONLY. Never "$" or "USD"
+- InteractiveModule powers 8 pages — changes system-wide
+- Never batch-purge 3D CSS (Flatland Trap)
+- Code splitting: 161/166 pages lazy-loaded
