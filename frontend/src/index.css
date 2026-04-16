@@ -3265,6 +3265,7 @@ body[data-theme="light"] .glass-card span[class*="rounded-full"] {
 [data-testid*="page"],
 .min-h-screen {
   background: #0a0a12 !important;
+  padding-bottom: 120px !important; /* Space above mixer bar so nothing gets cut off */
 }
 
 /* Enhanced scrollbar for immersive feel */

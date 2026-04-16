@@ -518,6 +518,8 @@ export default function Breathing() {
           </div>
         )}
         <FeaturedVideos category="breathwork" color="#2DD4BF" title="Breathing Practice Videos" />
+        {/* Spacer for mixer bar */}
+        <div style={{ height: 80 }} />
       </div>
     </div>
   );
