@@ -61,7 +61,7 @@ class OmnisEngine:
     # Mathematical Constants
     RESONANCE_BASE = 8.4881      # √7.3 × π
     PHI = 1.618                   # Golden Ratio
-    VOLUNTEER_RATE = 15.00        # $15/hr Commonality Constant
+    VOLUNTEER_RATE = 10.00        # 10 Credits/hr — in-app value, not USD
     
     # Commonality Groups
     GROUPS = {
@@ -620,7 +620,7 @@ class XfinityEngine:
     def calculate_knowledge_equity(self, nodes: int, depth: float) -> Dict:
         """
         Calculates the Knowledge Equity value based on exponential growth.
-        Your $15/hr isn't a flat rate; it's a multiplier based on depth.
+        Your 10 Credits/hr isn't a flat rate; it's a multiplier based on depth.
         """
         multiplier = self.apply_exponential_math(nodes, depth)
         
@@ -806,7 +806,7 @@ class UnifiedMixer:
         "equity_multiplication": {
             "name": "Equity Multiplication",
             "input_a": {"group": "CRAFT", "source": "Sacred Geometry"},
-            "input_b": {"group": "EXCHANGE", "source": "Trade Ledger ($15/hr)"},
+            "input_b": {"group": "EXCHANGE", "source": "Trade Ledger (10 Credits/hr)"},
             "output": "Knowledge Equity Growth",
         },
     }
@@ -1017,7 +1017,7 @@ async def get_commonality_groups():
         "groups": OmnisEngine.GROUPS,
         "cross_talk_map": {
             "COSMOS -> CRAFT": "Star geometry informs Sacred Geometry meditation",
-            "CRAFT -> EXCHANGE": "Learning hours convert to $15/hr credits",
+            "CRAFT -> EXCHANGE": "Learning hours convert to 10 Credits/hr credits",
             "HARVEST -> COSMOS": "Biological rhythms sync with breath meditation",
             "EXCHANGE -> HARVEST": "Credits fund garden and health modules",
         },
@@ -1136,7 +1136,7 @@ async def deep_sync(
                 },
                 "PROSPERITY_GROUP": {
                     "nodules": ["Trade", "Ledger", "Exchange"],
-                    "math": "Xfinity Engine applied to $15/hr rate",
+                    "math": "Xfinity Engine applied to 10 Credits/hr rate",
                     "current_value": knowledge_equity.get("knowledge_equity"),
                 },
             },
@@ -1249,7 +1249,7 @@ async def sovereign_print(
                 "THE_CRAFT": {
                     "focus": "Masonry School & Structural Geometry",
                     "tools": "Plumb/Level/Square/Compasses",
-                    "credits": "$15/hr Knowledge Equity",
+                    "credits": "10 Credits/hr Knowledge Equity",
                 },
                 "THE_HARVEST": {
                     "focus": "Horticulture & Biological Vitality",
@@ -2086,7 +2086,7 @@ class EnlightenMintV68:
                 "COSMOS": "Lakota Sky / Star Mapping / 103 Constellations",
                 "CRAFT": "Masonry School / Sacred Geometry / Xfinity Math",
                 "HARVEST": "Horticulture / Lunar-Sync / Black Hills Flora",
-                "EXCHANGE": "Trust-Corpus Distribution / $15/hr Rate",
+                "EXCHANGE": "Trust-Corpus Distribution / 10 Credits/hr Rate",
             },
             
             # Optical Focus (Next 10 Steps)
@@ -2146,7 +2146,7 @@ THE TRUST IS ESTABLISHED for the following purposes:
 3. EDUCATION: To provide access to the Masonry School, Lakota Star Knowledge,
    and Sacred Geometry resources without commercial exploitation.
 
-4. DISTRIBUTION: To route Knowledge Equity ($15/hr rate) through the Trust's
+4. DISTRIBUTION: To route Knowledge Equity (10 Credits/hr rate) through the Trust's
    financial reservoir, ensuring sustainable growth aligned with lunar cycles.
 
 THE TRUSTEE (Steven Michael) shall have FULL MANAGEMENT AND CONTROL including:
@@ -3303,10 +3303,10 @@ class CircularProtocolLedger:
     Every trade is recorded using the Singularity Core formula:
     9999 × z^(πr³) to ensure value never "leaks" outside the Trust's jurisdiction.
     
-    Volunteer Rate: $15/hr (Knowledge Equity Standard)
+    Volunteer Rate: 10 Credits/hr (Knowledge Equity Standard)
     """
     
-    VOLUNTEER_RATE = 15.00  # USD per hour
+    VOLUNTEER_RATE = 10.00  # Credits per hour — in-app value only
     TRUST_EQUITY = 49018.24
     TRUST_ID = "029900612892168189cecc8a"
     SINGULARITY_FORMULA = "9999 × z^(πr³)"
@@ -3439,7 +3439,7 @@ async def record_circular_trade(
     Value is calculated using the Singularity Core formula:
     9999 × z^(πr³)
     
-    - Base rate: $15/hr (Volunteer Knowledge Equity Standard)
+    - Base rate: 10 Credits/hr (Volunteer Knowledge Equity Standard)
     - GPS multiplier: 1.5x when verified at Black Hills anchor
     - Maximum trade: 10% of Trust Equity ($4,901.82)
     """
@@ -3479,7 +3479,7 @@ async def test_circular_trade():
     """
     V10000.1 CIRCULAR PROTOCOL — TEST TRADE
     
-    Creates a test trade of 1 hour at $15/hr to verify the ledger
+    Creates a test trade of 1 hour at 10 Credits/hr to verify the ledger
     is functioning correctly. GPS verified for 1.5x multiplier.
     """
     entry = CircularProtocolLedger.record_trade(
@@ -3492,7 +3492,7 @@ async def test_circular_trade():
     
     return {
         "status": "TEST_TRADE_CONFIRMED",
-        "message": "Test trade of 1 hour ($15 × 1.5 GPS multiplier) recorded successfully",
+        "message": "Test trade of 1 hour (15 Credits × 1.5 GPS multiplier) recorded successfully",
         "entry": entry,
         "verification": {
             "base_value": entry["value"]["base_value"],
@@ -5201,7 +5201,7 @@ class DirectorEngine:
     V10010.0 THE DIRECTOR'S CUT
     
     Multi-Track Timeline + Sovereign Movie Renderer.
-    Keyframe scheduling and $15/hr render metering.
+    Keyframe scheduling and 10 Credits/hr render metering.
     """
     
     PHI = 1.618033
@@ -5276,7 +5276,7 @@ class DirectorEngine:
     
     @classmethod
     def start_render_meter(cls) -> Dict[str, Any]:
-        """Start the $15/hr render meter."""
+        """Start the 10 Credits/hr render meter."""
         cls._render_meter["start_time"] = datetime.now(timezone.utc)
         cls._render_meter["is_active"] = True
         return {"status": "ACTIVE", "rate": f"${cls.RENDER_RATE}/hr"}
@@ -5377,7 +5377,7 @@ class OmegaArchitect:
         "hud": "Perplexity-Threaded Search Centroid",
         "timeline": "PowerDirector Multi-Track (Law/Art/Logic/Wellness)",
         "mixer": "Creator Control Mixer V9999.4 (Resonance/Flux/Tier)",
-        "render_meter": "Real-time $15/hr Usage Tracker",
+        "render_meter": "Real-time 10 Credits/hr Usage Tracker",
     }
     
     # Phygital (Moves 7-9)

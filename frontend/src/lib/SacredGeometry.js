@@ -226,14 +226,14 @@ export function velocityIntegral(velocityHistory, dt = 1) {
 
 // ═══ FIBONACCI ESCROW ENGINE ═══
 /**
- * Calculate φ-based escrow for volunteer compensation.
- * Anchors the volunteer rate ($15-$18/hr) in mathematical fairness.
+ * Calculate φ-based escrow for volunteer credit value.
+ * Produces in-app Credits — NOT USD. No cash equivalent.
  * Escrow = rate × φ% (1.618%)
  * @param {number} hours - volunteer hours
- * @param {number} rate - hourly rate (default: 15)
+ * @param {number} rate - credits per hour (default: 10)
  * @returns {{ gross: number, escrow: number, net: number, fans: number, credits: number }}
  */
-export function fibonacciEscrow(hours, rate = 15) {
+export function fibonacciEscrow(hours, rate = 10) {
   const gross = hours * rate;
   const escrowRate = PHI / 100; // 1.618%
   const escrow = gross * escrowRate;
@@ -262,7 +262,7 @@ export function realmTileScale(index) {
  * @param {number} baseRate - base cost (default: 15)
  * @returns {{ cost: number, escrow: number, total: number }}
  */
-export function metatronNodeCost(nodeIndex, baseRate = 15) {
+export function metatronNodeCost(nodeIndex, baseRate = 10) {
   const fibMultiplier = FIB[Math.min(nodeIndex, FIB.length - 1)] || 1;
   const cost = baseRate * Math.max(1, fibMultiplier);
   const escrow = cost * (PHI / 100);

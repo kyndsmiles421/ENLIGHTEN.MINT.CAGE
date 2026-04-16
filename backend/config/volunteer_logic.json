@@ -1,14 +1,16 @@
 {
-  "version": "29.2_GAMIFIED",
-  "description": "INFINITY-SOVEREIGN Gamified Credit System - No USD Values",
+  "version": "55.0_OMNICORE",
+  "description": "INFINITY-SOVEREIGN Gamified Credit System — In-App Value Only, No Cash Equivalent",
   
   "gamified_economy": {
     "primary_unit": "Fans",
     "primary_rate_per_hour": 10,
     "secondary_unit": "Credits",
     "secondary_rate_per_hour": 5,
+    "base_credit_rate": 10,
     "internal_only": true,
-    "no_cash_equivalent": true
+    "no_cash_equivalent": true,
+    "disclaimer": "All values are in-app credits. No USD, no cash payout, no real-money equivalent."
   },
   
   "sovereignty_discount": {
@@ -50,5 +52,6 @@
   },
   
   "created": "2024-04-12",
-  "kernel": "SINGULARITY_V29.2_GAMIFIED"
+  "updated": "2026-04-16",
+  "kernel": "OMNICORE_V55.0"
 }
