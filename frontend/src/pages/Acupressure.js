@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Hand } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
+import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -17,18 +18,20 @@ export default function Acupressure() {
   const meridians = [...new Set(points.map(p => p.meridian).filter(Boolean))];
 
   return (
-    <InteractiveModule
-      title="Acupressure Points"
-      subtitle="Energy Meridians"
-      icon={Hand}
-      color="#2DD4BF"
-      category="acupressure"
-      items={points}
-      filters={[
-        { key: 'all', label: 'All', count: points.length },
-        ...meridians.slice(0, 6).map(m => ({ key: m, label: m, count: points.filter(p => p.meridian === m).length })),
-      ]}
-      filterFn={(item, filter) => item.meridian === filter}
-    />
+    <SpatialRoom room="acupressure">
+      <InteractiveModule
+        title="Acupressure Points"
+        subtitle="Energy Meridians"
+        icon={Hand}
+        color="#2DD4BF"
+        category="acupressure"
+        items={points}
+        filters={[
+          { key: 'all', label: 'All', count: points.length },
+          ...meridians.slice(0, 6).map(m => ({ key: m, label: m, count: points.filter(p => p.meridian === m).length })),
+        ]}
+        filterFn={(item, filter) => item.meridian === filter}
+      />
+    </SpatialRoom>
   );
 }

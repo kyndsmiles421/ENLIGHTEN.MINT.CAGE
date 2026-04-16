@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Leaf } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
 import FeaturedVideos from '../components/FeaturedVideos';
+import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -16,21 +17,23 @@ export default function Nourishment() {
   }, []);
 
   return (
-    <InteractiveModule
-      title="Sacred Nourishment"
-      subtitle="Food for the Spirit"
-      icon={Leaf}
-      color="#22C55E"
-      category="nourishment"
-      items={items}
-      filters={[
-        { key: 'all', label: 'All', count: items.length },
-        { key: 'drinks', label: 'Elixirs & Drinks', count: items.filter(i => i.category === 'drinks').length },
-        { key: 'meals', label: 'Sacred Meals', count: items.filter(i => i.category === 'meals').length },
-      ]}
-      filterFn={(item, filter) => item.category === filter}
-    >
-      <FeaturedVideos category="nourishment" color="#22C55E" title="Mindful Eating Videos" />
-    </InteractiveModule>
+    <SpatialRoom room="nourishment">
+      <InteractiveModule
+        title="Sacred Nourishment"
+        subtitle="Food for the Spirit"
+        icon={Leaf}
+        color="#22C55E"
+        category="nourishment"
+        items={items}
+        filters={[
+          { key: 'all', label: 'All', count: items.length },
+          { key: 'drinks', label: 'Elixirs & Drinks', count: items.filter(i => i.category === 'drinks').length },
+          { key: 'meals', label: 'Sacred Meals', count: items.filter(i => i.category === 'meals').length },
+        ]}
+        filterFn={(item, filter) => item.category === filter}
+      >
+        <FeaturedVideos category="nourishment" color="#22C55E" title="Mindful Eating Videos" />
+      </InteractiveModule>
+    </SpatialRoom>
   );
 }
