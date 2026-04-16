@@ -1,0 +1,125 @@
+{
+  "summary": "V56.0 Full System Audit Complete - Mobile PWA (390x844). All critical buttons verified functional. Backend: 14/14 tests pass (100%). Frontend: All major features working. Record Journey/Cinematic Mode show mobile fallback toast. OmniBridge cross-cultural insight works. Cultural Lens dropdown opens. All 11 mixer tabs respond. 7 Pillars accordion works. Breathing 3 modes work. Economy 4 tiers visible.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Crystals page",
+        "issues": ["Search input may intercept clicks on Cultural Lens dropdown items when dropdown overlaps search area - use force=True or scroll to avoid"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v56_full_audit.py",
+    "/app/test_reports/pytest/pytest_v56_full_audit.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Bundle size warning: 1.70MB exceeds 1MB threshold for fast mobile loading - consider code splitting",
+    "SVG element with z-index 9999 detected - verify this is intentional and not a ghost element"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_v56_full_audit.py"
+  ],
+  "success_rate": {
+    "backend": "100% (14/14 tests passed)",
+    "frontend": "100% (All critical buttons functional)"
+  },
+  "test_credentials": "test_v29_user@test.com / testpass123 (user), kyndsmiles@gmail.com / testpass123 (admin)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "V56.0 Full System Audit verified all critical mobile buttons. Key findings: 1) Record Journey and Cinematic Mode buttons on /crystals page work - they show toast 'Screen recording not available on this device' which is the expected mobile fallback (getDisplayMedia not supported on mobile). 2) Cinematic Walkthrough on /sovereign-hub opens route picker correctly. 3) Cultural Lens dropdown opens and shows all 10 traditions. 4) OmniBridge Cross-Cultural Insight button works - triggers API call and displays Lakota perspective insights. 5) All 11 mixer bar tabs (Orbit, Mix, Culture, Rec, Audio, Text, Layer, FX, AI, Out, Me) respond to clicks. 6) Culture tab opens CulturalMixerPanel with 3 layers (Grounding, Spirit, Earth). 7) All 7 Pillars accordion buttons expand/collapse correctly. 8) Breathing page 3 mode tabs work (Patterns, Sacred Breath, Build Your Own). 9) Economy page shows all 4 subscription tiers + Polymath Pass. 10) Oracle and Games pages load correctly. Backend APIs: /api/health OK, /api/omni-bridge/traditions returns 10 traditions, /api/omni-bridge/mixer-tags returns tags for all traditions.",
+  "tests_executed": [
+    {
+      "test": "Backend API Tests (14 tests)",
+      "result": "PASS",
+      "details": "Health OK, OmniBridge traditions (10), mixer-tags (10 traditions), lakota-sky (7+ constellations), cultural-map, node-mythology, economy tiers (4), auth login, breathing, crystals, oracle, games"
+    },
+    {
+      "test": "Sovereign Hub - Cinematic Walkthrough",
+      "result": "PASS",
+      "details": "Button visible, opens route picker with 5 journey options (Wellness, Oracle, Nature, Sovereign, Grand)"
+    },
+    {
+      "test": "Sovereign Hub - 7 Pillars Accordion",
+      "result": "PASS",
+      "details": "All 7 pillars expand/collapse, navigation items visible inside each"
+    },
+    {
+      "test": "Crystals - Record Journey Button",
+      "result": "PASS",
+      "details": "Button visible and clickable, shows toast 'Screen recording not available on this device' (expected mobile fallback)"
+    },
+    {
+      "test": "Crystals - Cinematic Mode Button",
+      "result": "PASS",
+      "details": "Button visible and clickable, shows same mobile fallback toast"
+    },
+    {
+      "test": "Crystals - Cultural Lens Dropdown",
+      "result": "PASS",
+      "details": "Dropdown opens, shows all 10 traditions + Omni option"
+    },
+    {
+      "test": "Crystals - OmniBridge Cross-Cultural Insight",
+      "result": "PASS",
+      "details": "Trigger button works, API call succeeds, Lakota perspective insight displayed for Clear Quartz"
+    },
+    {
+      "test": "Mixer Bar - All 11 Tabs",
+      "result": "PASS",
+      "details": "All tabs visible and respond to clicks: Orbit, Mix, Culture, Rec, Audio, Text, Layer, FX, AI, Out, Me"
+    },
+    {
+      "test": "Mixer Bar - Culture Tab Panel",
+      "result": "PASS",
+      "details": "CulturalMixerPanel opens with 3 layers (Grounding, Spirit, Earth)"
+    },
+    {
+      "test": "Breathing - 3 Mode Tabs",
+      "result": "PASS",
+      "details": "Patterns (5 presets), Sacred Breath (Fibonacci), Build Your Own all work"
+    },
+    {
+      "test": "Economy - 4 Subscription Tiers",
+      "result": "PASS",
+      "details": "Discovery, Resonance, Sovereign, Architect all visible"
+    },
+    {
+      "test": "Economy - Polymath Pass",
+      "result": "PASS",
+      "details": "Polymath All-Access Pass card visible"
+    },
+    {
+      "test": "Oracle Page",
+      "result": "PASS",
+      "details": "Page loads with Tarot, Astrology, I Ching, Sacred Geometry buttons and Draw Cards"
+    },
+    {
+      "test": "Games Page",
+      "result": "PASS",
+      "details": "Page loads with game cards (Starseed, Sacred Symbols, Breath of Life)"
+    },
+    {
+      "test": "Academy Page",
+      "result": "PASS",
+      "details": "Page loads, shows Sign In to Begin (requires auth for Interactive Masonry)"
+    },
+    {
+      "test": "Overlap Check",
+      "result": "PASS",
+      "details": "No critical overlaps blocking content. Footer at y=833 (11px height). Mixer bar at bottom."
+    }
+  ],
+  "mobile_viewport_tested": "390x844 (iPhone 14 Pro equivalent)",
+  "mocked_apis": {
+    "ghost_trails_resonance": "Uses in-memory storage (not MongoDB) - by design for real-time presence",
+    "omni_bridge_insight": "Uses real GPT-5.2 via EMERGENT_LLM_KEY"
+  }
+}

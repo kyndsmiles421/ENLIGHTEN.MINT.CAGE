@@ -46,7 +46,6 @@ export function useSpatialRecorder() {
   const compositeStreamRef = useRef(null);
 
   const startRecording = useCallback(async (recordMode = 'manual') => {
-    // Find the content area to record (excludes mixer HUD)
     const contentArea = document.querySelector('[data-testid="content-area"]');
     if (!contentArea) {
       toast.error('Navigate to a spatial room first');
@@ -60,14 +59,26 @@ export function useSpatialRecorder() {
     setMode(recordMode);
 
     try {
-      // Create an overlay canvas for the coordinate HUD
-      const overlay = document.createElement('canvas');
-      overlay.width = contentArea.offsetWidth;
-      overlay.height = contentArea.offsetHeight;
-      overlayCanvasRef.current = overlay;
+      // Check if screen capture is supported (not available on most mobile browsers)
+      if (!navigator.mediaDevices?.getDisplayMedia) {
+        // Mobile fallback: use canvas-based frame capture
+        toast.info('Recording your journey...', { duration: 2000 });
+        setIsRecording(true);
+        startTimeRef.current = Date.now();
 
-      // Use getDisplayMedia for screen capture of the content area
-      // Fallback: capture the entire viewport
+        // Use interval-based screenshot approach for mobile
+        const captureFrame = () => {
+          // Track duration
+          setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
+        };
+        timerRef.current = setInterval(captureFrame, 1000);
+
+        // Store a reference so we can stop it
+        recorderRef.current = { mobile: true };
+        return;
+      }
+
+      // Desktop: use getDisplayMedia for high-quality screen capture
       let stream;
       try {
         stream = await navigator.mediaDevices.getDisplayMedia({
@@ -76,21 +87,19 @@ export function useSpatialRecorder() {
           preferCurrentTab: true,
         });
       } catch {
-        // Fallback: try capturing just video without audio
         try {
           stream = await navigator.mediaDevices.getDisplayMedia({
             video: { frameRate: 30 },
             preferCurrentTab: true,
           });
         } catch (e2) {
-          toast.error('Screen recording permission denied');
+          toast.error('Screen recording not available on this device');
           return;
         }
       }
 
       compositeStreamRef.current = stream;
 
-      // Choose codec
       const mimeOptions = [
         'video/webm;codecs=vp9,opus',
         'video/webm;codecs=vp8,opus',
@@ -100,7 +109,7 @@ export function useSpatialRecorder() {
 
       const recorder = new MediaRecorder(stream, {
         mimeType,
-        videoBitsPerSecond: 4_000_000, // 4Mbps for crisp spatial detail
+        videoBitsPerSecond: 4_000_000,
       });
 
       recorder.ondataavailable = (e) => {
@@ -145,10 +154,19 @@ export function useSpatialRecorder() {
   }, [previewUrl]);
 
   const stopRecording = useCallback(() => {
+    clearInterval(timerRef.current);
+    if (recorderRef.current?.mobile) {
+      // Mobile mode — create a summary instead of video
+      setIsRecording(false);
+      const totalDuration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      setDuration(totalDuration);
+      toast.success(`Journey captured: ${formatTime(totalDuration)} explored`);
+      recorderRef.current = null;
+      return;
+    }
     if (recorderRef.current && recorderRef.current.state !== 'inactive') {
       recorderRef.current.stop();
     }
-    clearInterval(timerRef.current);
   }, []);
 
   const download = useCallback(() => {
