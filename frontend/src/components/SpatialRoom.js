@@ -44,20 +44,20 @@ const SpatialContext = createContext(null);
 export const useSpatial = () => useContext(SpatialContext);
 
 const ROOM_THEMES = {
-  nourishment:  { floor: '#0d1a0f', wall: '#0a150c', accent: '#22C55E', particles: '#22C55E', icon: '🍃', name: 'The Living Kitchen', zDepth: -600, realm: 'SURFACE' },
-  herbology:    { floor: '#0f1a0d', wall: '#0c150a', accent: '#84CC16', particles: '#84CC16', icon: '🌿', name: 'Herb Garden Sanctum', zDepth: -700, realm: 'SURFACE' },
-  crystals:     { floor: '#0d0d1a', wall: '#0a0a15', accent: '#8B5CF6', particles: '#8B5CF6', icon: '💎', name: 'Crystal Chamber', zDepth: -800, realm: 'HOLLOW_EARTH' },
+  nourishment:  { floor: '#0d1a0f', wall: '#0a150c', accent: '#22C55E', particles: '#22C55E', icon: '🍃', name: 'The Living Kitchen', zDepth: -600, realm: 'SURFACE', scene: 'https://images.unsplash.com/photo-1659794959253-ec0feb65a7fd?w=1200&q=60&auto=format' },
+  herbology:    { floor: '#0f1a0d', wall: '#0c150a', accent: '#84CC16', particles: '#84CC16', icon: '🌿', name: 'Herb Garden Sanctum', zDepth: -700, realm: 'SURFACE', scene: 'https://images.unsplash.com/photo-1772907952266-3a7981f3f234?w=1200&q=60&auto=format' },
+  crystals:     { floor: '#0d0d1a', wall: '#0a0a15', accent: '#8B5CF6', particles: '#8B5CF6', icon: '💎', name: 'Crystal Chamber', zDepth: -800, realm: 'HOLLOW_EARTH', scene: 'https://images.unsplash.com/photo-1673879279182-76be6b52075c?w=1200&q=60&auto=format' },
   aromatherapy: { floor: '#1a0d1a', wall: '#150a15', accent: '#C084FC', particles: '#C084FC', icon: '🌸', name: 'Essence Temple', zDepth: -600, realm: 'SURFACE' },
-  meditation:   { floor: '#0d0d18', wall: '#0a0a14', accent: '#D8B4FE', particles: '#D8B4FE', icon: '🧘', name: 'Meditation Hall', zDepth: -1200, realm: 'HOLLOW_EARTH', mode: 'stillness' },
-  breathing:    { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🌬', name: 'Breath Chamber', zDepth: -500, realm: 'AIR', mode: 'rhythmic' },
-  yoga:         { floor: '#18150d', wall: '#14120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🕉', name: 'Yoga Studio', zDepth: -700, realm: 'SURFACE' },
+  meditation:   { floor: '#0d0d18', wall: '#0a0a14', accent: '#D8B4FE', particles: '#D8B4FE', icon: '🧘', name: 'Meditation Hall', zDepth: -1200, realm: 'HOLLOW_EARTH', mode: 'stillness', scene: 'https://images.unsplash.com/photo-1677138155365-58e1be01c787?w=1200&q=60&auto=format' },
+  breathing:    { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🌬', name: 'Breath Chamber', zDepth: -500, realm: 'AIR', mode: 'rhythmic', scene: 'https://images.unsplash.com/photo-1758413354966-3b545c78844f?w=1200&q=60&auto=format' },
+  yoga:         { floor: '#18150d', wall: '#14120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🕉', name: 'Yoga Studio', zDepth: -700, realm: 'SURFACE', scene: 'https://images.unsplash.com/photo-1706285101032-a23ba26940d7?w=1200&q=60&auto=format' },
   elixirs:      { floor: '#1a160d', wall: '#15120a', accent: '#FCD34D', particles: '#FCD34D', icon: '🧪', name: 'Alchemy Lab', zDepth: -600, realm: 'HOLLOW_EARTH' },
   acupressure:  { floor: '#0d1518', wall: '#0a1214', accent: '#2DD4BF', particles: '#2DD4BF', icon: '🤲', name: 'Meridian Room', zDepth: -500, realm: 'SURFACE' },
-  oracle:       { floor: '#150d18', wall: '#120a14', accent: '#E879F9', particles: '#E879F9', icon: '🔮', name: 'Oracle Chamber', zDepth: -800, realm: 'HOLLOW_EARTH' },
-  star_chart:   { floor: '#0a0a14', wall: '#080810', accent: '#6366F1', particles: '#6366F1', icon: '✨', name: 'Observatory', zDepth: -1000, realm: 'AIR' },
-  teachings:    { floor: '#1a150d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📿', name: 'Temple of Wisdom', zDepth: -700, realm: 'SURFACE' },
+  oracle:       { floor: '#150d18', wall: '#120a14', accent: '#E879F9', particles: '#E879F9', icon: '🔮', name: 'Oracle Chamber', zDepth: -800, realm: 'HOLLOW_EARTH', scene: 'https://images.unsplash.com/photo-1753797782254-4ef6719c7bcd?w=1200&q=60&auto=format' },
+  star_chart:   { floor: '#0a0a14', wall: '#080810', accent: '#6366F1', particles: '#6366F1', icon: '✨', name: 'Observatory', zDepth: -1000, realm: 'AIR', scene: 'https://images.unsplash.com/photo-1759772082797-6c5fef25a39c?w=1200&q=60&auto=format' },
+  teachings:    { floor: '#1a150d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📿', name: 'Temple of Wisdom', zDepth: -700, realm: 'SURFACE', scene: 'https://images.unsplash.com/photo-1774270149458-567a943e774b?w=1200&q=60&auto=format' },
   encyclopedia: { floor: '#18120d', wall: '#140e0a', accent: '#FB923C', particles: '#FB923C', icon: '📖', name: 'Grand Library', zDepth: -900, realm: 'SURFACE' },
-  frequencies:  { floor: '#120d18', wall: '#0e0a14', accent: '#8B5CF6', particles: '#8B5CF6', icon: '🎵', name: 'Frequency Lab', zDepth: -600, realm: 'HOLLOW_EARTH' },
+  frequencies:  { floor: '#120d18', wall: '#0e0a14', accent: '#8B5CF6', particles: '#8B5CF6', icon: '🎵', name: 'Frequency Lab', zDepth: -600, realm: 'HOLLOW_EARTH', scene: 'https://images.unsplash.com/photo-1668749092870-9e3d91dca34f?w=1200&q=60&auto=format' },
   sacred_texts: { floor: '#1a160d', wall: '#15120a', accent: '#D4AF37', particles: '#D4AF37', icon: '📜', name: 'Sacred Archive', zDepth: -800, realm: 'HOLLOW_EARTH' },
   community:    { floor: '#0d1518', wall: '#0a1214', accent: '#38BDF8', particles: '#38BDF8', icon: '🌐', name: 'Gathering Hall', zDepth: -500, realm: 'SURFACE' },
   reiki:        { floor: '#180d15', wall: '#140a12', accent: '#F472B6', particles: '#F472B6', icon: '🙌', name: 'Reiki Chamber', zDepth: -600, realm: 'SURFACE' },
@@ -136,37 +136,43 @@ function AvatarBadge({ scrollProgress, theme, nodesExplored, totalNodes }) {
 }
 
 /**
- * Ambient depth particles — float in Z-space, not just X/Y
+ * Ambient depth particles — float in Z-space with visible presence
  */
 function DepthParticles({ color, count = 16 }) {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
       {Array.from({ length: count }).map((_, i) => {
         const zLayer = (i / count) * GRID_SIZE;
-        const size = 1.5 + (1 - zLayer / GRID_SIZE) * 2.5; // Closer = larger
-        const opacity = 0.08 + (1 - zLayer / GRID_SIZE) * 0.15;
+        const closeness = 1 - zLayer / GRID_SIZE;
+        const size = 3 + closeness * 6; // 3-9px — actually visible
+        const opacity = 0.15 + closeness * 0.35; // 0.15-0.50 — actually visible
+        const isLarge = i % 5 === 0; // Every 5th particle is a "mote"
         return (
           <motion.div
             key={i}
             className="absolute rounded-full"
             style={{
-              width: size,
-              height: size,
-              background: color,
-              opacity,
-              left: `${10 + Math.random() * 80}%`,
+              width: isLarge ? size * 2 : size,
+              height: isLarge ? size * 2 : size,
+              background: isLarge
+                ? `radial-gradient(circle, ${color}90, ${color}30, transparent)`
+                : color,
+              opacity: isLarge ? opacity * 0.6 : opacity,
+              left: `${5 + Math.random() * 90}%`,
               top: `${5 + Math.random() * 90}%`,
+              filter: isLarge ? `blur(${1 + closeness * 2}px)` : 'none',
+              boxShadow: closeness > 0.6 ? `0 0 ${Math.round(closeness * 12)}px ${color}40` : 'none',
             }}
             animate={{
-              y: [0, -20 - Math.random() * 30, 0],
-              x: [0, (Math.random() - 0.5) * 15, 0],
-              opacity: [opacity * 0.5, opacity, opacity * 0.5],
-              scale: [0.8, 1.2, 0.8],
+              y: [0, -30 - Math.random() * 50, 0],
+              x: [0, (Math.random() - 0.5) * 30, 0],
+              opacity: [opacity * 0.4, opacity, opacity * 0.4],
+              scale: [0.7, 1.3, 0.7],
             }}
             transition={{
-              duration: 5 + Math.random() * 7,
+              duration: 4 + Math.random() * 6,
               repeat: Infinity,
-              delay: Math.random() * 4,
+              delay: Math.random() * 3,
               ease: 'easeInOut',
             }}
           />
@@ -420,6 +426,49 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           zIndex: 0,
         }} />
 
+        {/* V56.0 — Scene Environment Image — the immersive room background */}
+        {theme.scene && (
+          <>
+            {/* Scene image — full bleed cover */}
+            <motion.div
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: entered ? 1 : 0, scale: entered ? 1 : 1.1 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: `url(${theme.scene})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center 40%',
+                zIndex: 0,
+                opacity: 0.35,
+                filter: 'saturate(0.8)',
+              }}
+            />
+            {/* Dark gradient overlay for text readability */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: `linear-gradient(180deg, 
+                ${theme.floor}E8 0%, 
+                ${theme.floor}C8 10%, 
+                ${theme.floor}A0 30%, 
+                ${theme.floor}80 50%, 
+                ${theme.floor}A0 70%, 
+                ${theme.floor}D0 90%, 
+                ${theme.floor}F0 100%)`,
+              zIndex: 0,
+            }} />
+            {/* Center vignette for content readability */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: `radial-gradient(ellipse at 50% 35%, ${theme.floor}D0 0%, ${theme.floor}80 35%, transparent 65%)`,
+              zIndex: 0,
+            }} />
+            {/* Accent color tint over scene */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: `radial-gradient(ellipse at 50% 50%, ${theme.accent}15, transparent 70%)`,
+              zIndex: 0,
+            }} />
+          </>
+        )}
+
         {/* V55.0 — Sacred Geometry Overlay (Sri Yantra + Metatron's Cube + Flower of Life) */}
         <SacredGeometryOverlay
           realm={theme.realm || 'SURFACE'}
@@ -428,59 +477,105 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           breathIntensity={breathPhase}
         />
 
-        {/* HOLLOW EARTH: Crystalline tunnel walls — tighter, more contained */}
+        {/* HOLLOW EARTH: Crystalline tunnel — dramatic cave walls with visible depth */}
         {isHollowEarth && (
           <>
+            {/* Left cave wall — thick, dark, dramatic */}
             <div className="absolute left-0 top-0 bottom-0 pointer-events-none" style={{
-              width: '25%',
-              background: `linear-gradient(90deg, ${theme.wall}DD, ${theme.wall}40, transparent)`,
-              zIndex: 0,
+              width: '30%',
+              background: `linear-gradient(90deg, ${theme.wall}FF, ${theme.wall}CC, ${theme.wall}60, transparent)`,
+              zIndex: 1,
             }} />
+            {/* Right cave wall */}
             <div className="absolute right-0 top-0 bottom-0 pointer-events-none" style={{
-              width: '25%',
-              background: `linear-gradient(-90deg, ${theme.wall}DD, ${theme.wall}40, transparent)`,
-              zIndex: 0,
+              width: '30%',
+              background: `linear-gradient(-90deg, ${theme.wall}FF, ${theme.wall}CC, ${theme.wall}60, transparent)`,
+              zIndex: 1,
             }} />
-            {/* Crystal vein lines on walls */}
-            {[15, 35, 55, 75, 90].map((top, i) => (
+            {/* Crystal vein lines on walls — brighter */}
+            {[10, 25, 40, 55, 70, 85].map((top, i) => (
               <div key={`cl-${i}`} className="absolute pointer-events-none" style={{
-                top: `${top}%`, left: 0, right: 0, height: 1,
-                background: `linear-gradient(90deg, ${theme.accent}25, transparent 15%, transparent 85%, ${theme.accent}25)`,
-                zIndex: 0,
+                top: `${top}%`, left: 0, right: 0, height: i % 2 === 0 ? 2 : 1,
+                background: `linear-gradient(90deg, ${theme.accent}60, ${theme.accent}20 10%, transparent 20%, transparent 80%, ${theme.accent}20 90%, ${theme.accent}60)`,
+                zIndex: 1,
+                boxShadow: `0 0 8px ${theme.accent}30`,
               }} />
             ))}
-            {/* Ambient heat haze for dense atmosphere */}
+            {/* Vertical crystal veins on walls */}
+            {[3, 8, 92, 97].map((left, i) => (
+              <div key={`cv-${i}`} className="absolute pointer-events-none" style={{
+                left: `${left}%`, top: 0, bottom: 0, width: 1,
+                background: `linear-gradient(180deg, transparent, ${theme.accent}30, ${theme.accent}15, ${theme.accent}30, transparent)`,
+                zIndex: 1,
+              }} />
+            ))}
+            {/* Atmospheric fog at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
+              height: '35%',
+              background: `linear-gradient(to top, ${theme.accent}18, ${theme.accent}08, transparent)`,
+              filter: 'blur(20px)',
+              zIndex: 1,
+            }} />
+            {/* Top shadow — ceiling of the cave */}
+            <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{
+              height: '15%',
+              background: `linear-gradient(to bottom, ${theme.wall}EE, ${theme.wall}80, transparent)`,
+              zIndex: 1,
+            }} />
+            {/* Ambient core glow from chamber center */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: `radial-gradient(ellipse at 50% 80%, ${theme.accent}06, transparent 60%)`,
-              filter: realm.blur !== '0px' ? `blur(${realm.blur})` : undefined,
+              background: `radial-gradient(ellipse at 50% 60%, ${theme.accent}12, ${theme.accent}06, transparent 60%)`,
               zIndex: 0,
             }} />
           </>
         )}
 
-        {/* AIR: Open sky — no side walls, lighter top gradient */}
+        {/* AIR: Open sky — ethereal glow from above, subtle horizon */}
         {isAir && (
-          <div className="absolute inset-0 pointer-events-none" style={{
-            background: `radial-gradient(ellipse at 50% 0%, ${theme.accent}08, transparent 70%)`,
-            zIndex: 0,
-          }} />
+          <>
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: `radial-gradient(ellipse at 50% -10%, ${theme.accent}20, ${theme.accent}08 40%, transparent 70%)`,
+              zIndex: 0,
+            }} />
+            {/* Horizon line */}
+            <div className="absolute left-0 right-0 pointer-events-none" style={{
+              top: '70%', height: 2,
+              background: `linear-gradient(90deg, transparent, ${theme.accent}25, ${theme.accent}40, ${theme.accent}25, transparent)`,
+              boxShadow: `0 0 20px ${theme.accent}15`,
+              zIndex: 0,
+            }} />
+            {/* Sky gradient overlay */}
+            <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{
+              height: '50%',
+              background: `linear-gradient(to bottom, ${theme.accent}0A, transparent)`,
+              zIndex: 0,
+            }} />
+          </>
         )}
 
-        {/* SURFACE: Standard side walls */}
+        {/* SURFACE: Visible side walls + floor edge glow */}
         {!isHollowEarth && !isAir && (
           <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-            <div className="absolute left-0 top-0 bottom-0 w-16"
-              style={{ background: `linear-gradient(90deg, ${theme.wall}80, transparent)` }} />
-            <div className="absolute right-0 top-0 bottom-0 w-16"
-              style={{ background: `linear-gradient(-90deg, ${theme.wall}80, transparent)` }} />
+            {/* Left wall */}
+            <div className="absolute left-0 top-0 bottom-0 w-24"
+              style={{ background: `linear-gradient(90deg, ${theme.wall}CC, ${theme.wall}60, transparent)` }} />
+            {/* Right wall */}
+            <div className="absolute right-0 top-0 bottom-0 w-24"
+              style={{ background: `linear-gradient(-90deg, ${theme.wall}CC, ${theme.wall}60, transparent)` }} />
+            {/* Floor edge glow */}
+            <div className="absolute bottom-0 left-0 right-0"
+              style={{
+                height: '20%',
+                background: `linear-gradient(to top, ${theme.accent}0C, transparent)`,
+              }} />
           </div>
         )}
 
         {/* Ceiling accent */}
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `${theme.accent}20`, zIndex: 1 }} />
 
-        {/* Depth particles */}
-        <DepthParticles color={theme.particles} count={isHollowEarth ? 24 : 16} />
+        {/* Depth particles — boosted count for atmosphere */}
+        <DepthParticles color={theme.particles} count={isHollowEarth ? 32 : 24} />
 
         {/* V55.0 — 3D Avatar Presence (User's actual avatar or crystal fallback) */}
         {entered && (
@@ -505,29 +600,36 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           gridPosition={spatialCtx.gridPosition}
         />
 
-        {/* Room header — name + realm indicator + avatar badge */}
+        {/* Room header — location marker + realm + vitality */}
         <motion.div
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : -15 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : -20 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="absolute top-2.5 left-4 right-4 flex items-center justify-between pointer-events-none"
-          style={{ zIndex: 2 }}
+          style={{ zIndex: 10 }}
         >
-          <div className="flex items-center gap-2">
-            <span className="text-sm">{theme.icon}</span>
+          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg"
+            style={{
+              background: `${theme.accent}08`,
+              border: `1px solid ${theme.accent}15`,
+              backdropFilter: 'blur(8px)',
+            }}>
+            <span className="text-base">{theme.icon}</span>
             <div>
-              <span className="text-[8px] font-bold uppercase tracking-[0.2em] block"
-                style={{ color: `${theme.accent}50` }}>
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] block"
+                style={{ color: `${theme.accent}80` }}>
                 {theme.name}
               </span>
-              <span className="text-[6px] uppercase tracking-[0.15em]"
-                style={{ color: `${theme.accent}30` }}>
+              <span className="text-[7px] uppercase tracking-[0.15em]"
+                style={{ color: `${theme.accent}40` }}>
                 {realm.label}
               </span>
             </div>
           </div>
-          <AvatarBadge scrollProgress={scrollProgress} theme={theme} nodesExplored={nodesExplored} totalNodes={totalNodes} />
-          <VitalityBar accent={theme.accent} />
+          <div className="flex items-center gap-3">
+            <AvatarBadge scrollProgress={scrollProgress} theme={theme} nodesExplored={nodesExplored} totalNodes={totalNodes} />
+            <VitalityBar accent={theme.accent} />
+          </div>
         </motion.div>
 
         {/* Stillness indicator for meditation rooms */}
@@ -544,16 +646,23 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           </motion.div>
         )}
 
-        {/* Content — enters from Z-depth */}
+        {/* Content — dramatic Z-depth entrance */}
         <motion.div
-          initial={{ opacity: 0, transform: `translateZ(${theme.zDepth * 0.08}px) rotateX(2deg)` }}
+          initial={{
+            opacity: 0,
+            transform: `translateZ(${theme.zDepth * 0.15}px) rotateX(4deg) scale(0.92)`,
+            filter: 'blur(6px)',
+          }}
           animate={{
             opacity: entered ? 1 : 0,
-            transform: entered ? 'translateZ(0px) rotateX(0deg)' : `translateZ(${theme.zDepth * 0.08}px) rotateX(2deg)`,
+            transform: entered
+              ? 'translateZ(0px) rotateX(0deg) scale(1)'
+              : `translateZ(${theme.zDepth * 0.15}px) rotateX(4deg) scale(0.92)`,
+            filter: entered ? 'blur(0px)' : 'blur(6px)',
           }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
-          style={{ zIndex: 1, transformStyle: 'preserve-3d' }}
+          style={{ zIndex: 2, transformStyle: 'preserve-3d' }}
         >
           {children}
         </motion.div>

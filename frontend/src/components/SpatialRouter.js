@@ -248,23 +248,26 @@ export default function SpatialRouter({ children }) {
         key={currentPath}
         initial={{
           opacity: 0,
-          rotateY: transitioning ? 15 : 0,
-          scale: 0.92,
-          filter: 'blur(4px)',
+          rotateY: transitioning ? 20 : 5,
+          scale: 0.88,
+          z: -200,
+          filter: 'blur(8px) brightness(0.7)',
         }}
         animate={{
           opacity: 1,
           rotateY: 0,
           scale: 1,
-          filter: 'blur(0px)',
+          z: 0,
+          filter: 'blur(0px) brightness(1)',
         }}
         exit={{
           opacity: 0,
-          rotateY: -15,
-          scale: 0.92,
-          filter: 'blur(4px)',
+          rotateY: transitioning ? -20 : -5,
+          scale: 0.88,
+          z: -200,
+          filter: 'blur(8px) brightness(0.7)',
         }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{ transformStyle: 'preserve-3d', perspective: '1200px' }}
       >
         <SpatialRoom room={roomKey}>
