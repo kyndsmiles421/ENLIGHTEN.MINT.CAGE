@@ -58,6 +58,7 @@ export function AvatarProvider({ children }) {
   const { user, authHeaders } = useAuth();
   const [avatarB64, setAvatarB64] = useState(null);
   const [avatarStyle, setAvatarStyle] = useState(null);
+  const [starseedAvatar, setStarseedAvatar] = useState(null);
   const [worldProgress, setWorldProgress] = useState(() => {
     try {
       const saved = localStorage.getItem('emcafe_world_progress');
@@ -66,8 +67,9 @@ export function AvatarProvider({ children }) {
   });
 
   const refreshAvatar = useCallback(async () => {
-    if (!user) { setAvatarB64(null); return; }
+    if (!user) { setAvatarB64(null); setStarseedAvatar(null); return; }
     try {
+      // Fetch user's active avatar (from AvatarCreator)
       const res = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/ai-visuals/my-avatar`,
         { headers: authHeaders }
@@ -81,7 +83,28 @@ export function AvatarProvider({ children }) {
     } catch {
       setAvatarB64(null);
     }
+
+    // Also check for starseed character avatar
+    try {
+      const ssRes = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/starseed/my-characters`,
+        { headers: authHeaders }
+      );
+      const chars = ssRes.data.characters || [];
+      // Use the most recently updated character with an avatar
+      const withAvatar = chars.filter(c => c.avatar_base64).sort((a, b) =>
+        (b.updated_at || '').localeCompare(a.updated_at || '')
+      );
+      if (withAvatar.length > 0) {
+        setStarseedAvatar(withAvatar[0].avatar_base64);
+      }
+    } catch {
+      // Starseed characters not available
+    }
   }, [user, authHeaders]);
+
+  // The active avatar image: prefer user-set avatar, then starseed, then null
+  const activeAvatarB64 = avatarB64 || starseedAvatar || null;
 
   // Visit a room — track exploration
   const visitRoom = useCallback((route) => {
@@ -101,9 +124,9 @@ export function AvatarProvider({ children }) {
   const worldCompletionPct = Math.round((totalRoomsVisited / ALL_SPATIAL_ROUTES.length) * 100);
 
   const value = useMemo(() => ({
-    avatarB64, avatarStyle, refreshAvatar,
+    avatarB64, avatarStyle, activeAvatarB64, starseedAvatar, refreshAvatar,
     worldProgress, visitRoom, totalRoomsVisited, worldCompletionPct,
-  }), [avatarB64, avatarStyle, refreshAvatar, worldProgress, visitRoom, totalRoomsVisited, worldCompletionPct]);
+  }), [avatarB64, avatarStyle, activeAvatarB64, starseedAvatar, refreshAvatar, worldProgress, visitRoom, totalRoomsVisited, worldCompletionPct]);
 
   return (
     <AvatarContext.Provider value={value}>

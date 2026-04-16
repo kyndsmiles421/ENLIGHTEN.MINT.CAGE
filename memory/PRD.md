@@ -1,53 +1,39 @@
 # ENLIGHTEN.MINT.CAFE — V55.0 OMNICORE SACRED ARCHITECTURE
-## Last Verified: April 16, 2026 — 100% Pass (Iteration 342)
+## Last Verified: April 16, 2026 — 100% Pass (Iteration 342) + Avatar Integration
 
-### Core Equation
-```
-Z^{xyz} · (φ^(x+y+z) / Z^{xyz}) + Σ Resonance(u) - ∫ Stillness dt
-```
+### Avatar System Integration (Latest)
+- **Avatar3D** now renders user's actual avatar image (from AvatarCreator or Starseed RPG)
+- Priority chain: Active Avatar (user_avatars) → Starseed Character Portrait → Crystal Diamond Fallback
+- AvatarContext pulls from both `/api/ai-visuals/my-avatar` and `/api/starseed/my-characters`
+- User's image renders as circular portrait with realm-colored ring + breathing pulse animation
+- Realm filters: HOLLOW_EARTH = saturated/dark, AIR = bright/shifted, SURFACE = natural
+
+### Subscription Tiers Fix
+- Economy page `/economy` now shows all 4 tiers (Discovery $0, Resonance $27, Sovereign $49, Architect $89)
+- Fixed: `/api/economy/tiers` endpoint no longer requires auth to view pricing
 
 ### V55.0 Final Sweep — 160/160 Pages Spatial
-- **149 Route→Room Mappings**: Every page in the app is wrapped by SpatialRouter
-- **Batch CSS Purge**: Removed `immersive-page` class, opaque backgrounds, oversized padding from ALL 102 legacy pages
-- **Resonance Score System**: φ-scaled collective stillness multiplier
-  - 1 still user = 10 RP (centered, x1.0)
-  - 2 still users = 32.4 RP (attuned, x**φ** = 1.618)
-  - 3 still users = 78.5 RP (harmonic, x**φ²** = 2.618)
-  - 5+ still users = "radiant" tier
-- **Masonry Crafting**: Residue sparks serve as building materials
-  - GET /api/masonry/materials/{room} — collect craftable sparks
-  - POST /api/masonry/gift-spark — bless another user's structure
-- **Sacred Geometry Overlays**: Sri Yantra + Metatron's Cube + Flower of Life in every room
-- **Sacred Breath Mode**: Fibonacci-timed (1,1,2,3,5) Flower of Life expansion on /breathing
-- **Ghost Trails + Resonance**: 30s stillness reveals community paths with resonance scoring
-- **Toroidal Room Transitions**: rotateY + blur vortex between pages
-- **World Map**: 120+ routes tracked for world completion percentage
-
-### Sovereign Economy (UNCHANGED)
-- Core currency: **10 Fans/hr** + Credits system
-- Sparks are aesthetic residue only, NOT currency
-- Economy endpoints remain at /api/sovereign-economy/*
+- 149 Route→Room Mappings in SpatialRouter
+- Batch CSS Purge: all 102 legacy pages converted
+- Resonance Score: φ-scaled collective stillness (1=x1.0, 2=x1.618, 3=x2.618)
+- Sacred Geometry Overlays: Sri Yantra + Metatron's Cube + Flower of Life
+- Sacred Breath Mode: Fibonacci-timed Flower of Life expansion
+- Ghost Trails + Resonance: 30s stillness reveals community paths
+- Toroidal Room Transitions: rotateY + blur vortex
 
 ### Architecture
 ```
-App → MixerProvider → SpatialRouter (149 routes, toroidal transitions)
-  → SpatialRoom (per-route, realm-themed)
-    ├── Sacred Geometry Overlay (Sri Yantra + Metatron's Cube + Flower of Life)
-    ├── DepthParticles
-    ├── Avatar3D (Diamond Crystal Light Being)
-    │    ├── Golden Spiral Trail
-    │    ├── Fibonacci Breathing Core
-    │    ├── Seed of Life Bloom (stillness)
-    │    └── Chakra Color System
-    ├── GhostTrails (30s stillness → paths + sparks + resonance)
-    │    └── ResonanceIndicator (φ-scaled score display)
-    ├── AvatarBadge (Fibonacci depth indicator)
-    └── Content (φ-scaled ProximityItem extrusion)
+AvatarContext (pulls user avatar + starseed character)
+  → activeAvatarB64 (user image OR starseed portrait OR null)
+  → Avatar3D renders:
+     - User's actual portrait (circular, realm-filtered)
+     - OR Crystal Diamond fallback (with Sacred Geometry)
+  → Both get: Golden Spiral trail, Fibonacci breathing, Chakra color, Seed of Life bloom
 ```
 
 ### Remaining Work
-- Interactive Masonry: click-and-lock Metatron's Cube building in Academy
-- Community Blueprint: shared Metatron's Cube in Sovereign Circle
-- RPG Inventory: manual avatar hue picker
+- Interactive Masonry: click-and-lock Metatron's Cube building
+- Community Blueprint: shared structures in Sovereign Circle
 - Cinematic auto-walkthrough (scripted SpatialRecorder)
-- Depth-of-field shader during recording
+- Custom domain setup (awaiting support@emergent.sh)
+- App Store submission (awaiting domain)

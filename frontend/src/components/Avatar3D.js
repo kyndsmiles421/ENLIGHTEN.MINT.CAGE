@@ -91,6 +91,7 @@ export default function Avatar3D({
   roomName = '',
   chakraXP = 0,
   customHue = null,
+  avatarImage = null,
 }) {
   const realmStyle = REALM_STYLES[realm] || REALM_STYLES.SURFACE;
   const chakra = getChakraColor(chakraXP);
@@ -257,98 +258,102 @@ export default function Avatar3D({
           ease: 'easeInOut',
         }}
       >
-        {/* Crystal diamond body */}
+        {/* Avatar Body — User's actual avatar image or crystal fallback */}
         <div
           className="relative"
           style={{
-            width: 44,
-            height: 56,
+            width: avatarImage ? 52 : 44,
+            height: avatarImage ? 52 : 56,
             opacity: isGhosted ? 0.35 : 1,
             transition: 'opacity 2s',
           }}
         >
-          <svg viewBox="0 0 44 56" width="44" height="56" style={{ overflow: 'visible' }}>
-            {/* Body — diamond crystal */}
-            <polygon
-              points="22,2 40,22 22,54 4,22"
-              fill={`${avatarColor}18`}
-              stroke={avatarColor}
-              strokeWidth="1.2"
-              strokeLinejoin="round"
-            />
-            {/* Inner facet lines */}
-            <line x1="22" y1="2" x2="22" y2="54" stroke={avatarColor} strokeWidth="0.5" opacity="0.3" />
-            <line x1="4" y1="22" x2="40" y2="22" stroke={avatarColor} strokeWidth="0.5" opacity="0.3" />
-            <line x1="22" y1="2" x2="4" y2="22" stroke={avatarColor} strokeWidth="0.3" opacity="0.2" />
-            <line x1="22" y1="2" x2="40" y2="22" stroke={avatarColor} strokeWidth="0.3" opacity="0.2" />
-
-            {/* Core energy — Fibonacci breathing pulse */}
-            <circle cx="22" cy="22" r="6" fill={avatarColor} opacity="0.8">
-              <animate
-                attributeName="r"
-                values={isStill ? '6;8;6' : `5;${5 + breathState.intensity * 3};5`}
-                dur={isStill ? '3s' : `${1 + breathState.intensity * 2}s`}
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values={isGhosted ? '0.3;0.6;0.3' : `${0.6 + breathState.intensity * 0.2};1;${0.6 + breathState.intensity * 0.2}`}
-                dur="2s"
-                repeatCount="indefinite"
-              />
-            </circle>
-
-            {/* Consciousness point */}
-            <circle cx="22" cy="16" r="2" fill={avatarColor} opacity="0.9">
-              <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
-            </circle>
-
-            {/* HOLLOW_EARTH: Crystal vein decorations */}
-            {realm === 'HOLLOW_EARTH' && (
-              <>
-                <line x1="13" y1="12" x2="22" y2="22" stroke="#C084FC" strokeWidth="0.4" opacity="0.5" />
-                <line x1="31" y1="12" x2="22" y2="22" stroke="#C084FC" strokeWidth="0.4" opacity="0.5" />
-                <line x1="13" y1="32" x2="22" y2="22" stroke="#C084FC" strokeWidth="0.4" opacity="0.5" />
-                <line x1="31" y1="32" x2="22" y2="22" stroke="#C084FC" strokeWidth="0.4" opacity="0.5" />
-                {/* Glowing veins */}
-                <line x1="8" y1="18" x2="15" y2="22" stroke="#A78BFA" strokeWidth="0.6" opacity="0.3">
-                  <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" />
-                </line>
-                <line x1="36" y1="18" x2="29" y2="22" stroke="#A78BFA" strokeWidth="0.6" opacity="0.3">
-                  <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" />
-                </line>
-              </>
-            )}
-
-            {/* AIR: Ethereal transparency wings */}
-            {realm === 'AIR' && (
-              <>
-                <ellipse cx="4" cy="20" rx="10" ry="14" fill="none" stroke="#38BDF8" strokeWidth="0.5" opacity="0.25">
-                  <animate attributeName="rx" values="10;13;10" dur="3s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.25;0.4;0.25" dur="3s" repeatCount="indefinite" />
-                </ellipse>
-                <ellipse cx="40" cy="20" rx="10" ry="14" fill="none" stroke="#38BDF8" strokeWidth="0.5" opacity="0.25">
-                  <animate attributeName="rx" values="10;13;10" dur="3s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.25;0.4;0.25" dur="3s" repeatCount="indefinite" />
-                </ellipse>
-              </>
-            )}
-
-            {/* SURFACE: Solid grounded quartz facets */}
-            {realm === 'SURFACE' && (
-              <>
-                <line x1="13" y1="22" x2="22" y2="38" stroke={avatarColor} strokeWidth="0.3" opacity="0.25" />
-                <line x1="31" y1="22" x2="22" y2="38" stroke={avatarColor} strokeWidth="0.3" opacity="0.25" />
-              </>
-            )}
-
-            {/* Chakra indicator — small ring at base */}
-            {chakraXP > 0 && (
-              <circle cx="22" cy="48" r="3" fill="none" stroke={chakra.color} strokeWidth="1" opacity="0.6">
-                <animate attributeName="r" values="3;4;3" dur="4s" repeatCount="indefinite" />
+          {avatarImage ? (
+            /* ═══ USER'S AVATAR IMAGE ═══ */
+            <div className="relative" style={{ width: '100%', height: '100%' }}>
+              {/* Circular avatar with realm-colored ring */}
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: `2px solid ${avatarColor}60`,
+                  boxShadow: `0 0 12px ${avatarColor}30, inset 0 0 8px ${avatarColor}15`,
+                }}
+              >
+                <img
+                  src={`data:image/png;base64,${avatarImage}`}
+                  alt="Avatar"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: realm === 'HOLLOW_EARTH'
+                      ? 'saturate(1.2) brightness(0.9) hue-rotate(-10deg)'
+                      : realm === 'AIR'
+                      ? 'saturate(0.9) brightness(1.1) hue-rotate(10deg)'
+                      : 'none',
+                  }}
+                  data-testid="avatar-user-image"
+                />
+              </div>
+              {/* Realm indicator ring */}
+              <svg
+                viewBox="0 0 56 56"
+                width="56"
+                height="56"
+                className="absolute -top-0.5 -left-0.5"
+                style={{ overflow: 'visible', pointerEvents: 'none' }}
+              >
+                <circle cx="28" cy="28" r="27" fill="none" stroke={avatarColor} strokeWidth="0.5" opacity="0.3">
+                  <animate attributeName="r" values="27;28;27" dur="4s" repeatCount="indefinite" />
+                </circle>
+                {/* Breathing pulse ring */}
+                <circle cx="28" cy="28" r="30" fill="none" stroke={avatarColor} strokeWidth="0.3" opacity={breathState.intensity * 0.4}>
+                  <animate attributeName="r" values="30;33;30" dur={`${2 + breathState.intensity}s`} repeatCount="indefinite" />
+                </circle>
+              </svg>
+              {/* Chakra indicator dot */}
+              {chakraXP > 0 && (
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
+                  style={{ background: chakra.color, boxShadow: `0 0 6px ${chakra.glow}`, border: '1px solid rgba(0,0,0,0.3)' }} />
+              )}
+            </div>
+          ) : (
+            /* ═══ CRYSTAL DIAMOND FALLBACK ═══ */
+            <svg viewBox="0 0 44 56" width="44" height="56" style={{ overflow: 'visible' }}>
+              <polygon points="22,2 40,22 22,54 4,22" fill={`${avatarColor}18`} stroke={avatarColor} strokeWidth="1.2" strokeLinejoin="round" />
+              <line x1="22" y1="2" x2="22" y2="54" stroke={avatarColor} strokeWidth="0.5" opacity="0.3" />
+              <line x1="4" y1="22" x2="40" y2="22" stroke={avatarColor} strokeWidth="0.5" opacity="0.3" />
+              <circle cx="22" cy="22" r="6" fill={avatarColor} opacity="0.8">
+                <animate attributeName="r" values={isStill ? '6;8;6' : `5;${5 + breathState.intensity * 3};5`}
+                  dur={isStill ? '3s' : `${1 + breathState.intensity * 2}s`} repeatCount="indefinite" />
               </circle>
-            )}
-          </svg>
+              <circle cx="22" cy="16" r="2" fill={avatarColor} opacity="0.9">
+                <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
+              </circle>
+              {realm === 'HOLLOW_EARTH' && (
+                <>
+                  <line x1="13" y1="12" x2="22" y2="22" stroke="#C084FC" strokeWidth="0.4" opacity="0.5" />
+                  <line x1="31" y1="12" x2="22" y2="22" stroke="#C084FC" strokeWidth="0.4" opacity="0.5" />
+                </>
+              )}
+              {realm === 'AIR' && (
+                <>
+                  <ellipse cx="4" cy="20" rx="10" ry="14" fill="none" stroke="#38BDF8" strokeWidth="0.5" opacity="0.25">
+                    <animate attributeName="rx" values="10;13;10" dur="3s" repeatCount="indefinite" />
+                  </ellipse>
+                  <ellipse cx="40" cy="20" rx="10" ry="14" fill="none" stroke="#38BDF8" strokeWidth="0.5" opacity="0.25">
+                    <animate attributeName="rx" values="10;13;10" dur="3s" repeatCount="indefinite" />
+                  </ellipse>
+                </>
+              )}
+              {chakraXP > 0 && (
+                <circle cx="22" cy="48" r="3" fill="none" stroke={chakra.color} strokeWidth="1" opacity="0.6" />
+              )}
+            </svg>
+          )}
         </div>
 
         {/* Coordinate + Chakra label */}

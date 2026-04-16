@@ -21,6 +21,7 @@ import { Sparkles } from 'lucide-react';
 import Avatar3D from './Avatar3D';
 import SacredGeometryOverlay from './SacredGeometrySVG';
 import GhostTrails from './GhostTrails';
+import { useAvatar } from '../context/AvatarContext';
 import { PHI, PHI_INV, FIB_DEPTH_STEPS, phiExtrusion, getFibBreathPhase } from '../lib/SacredGeometry';
 
 const GRID_SIZE = 9;
@@ -302,6 +303,9 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
   const breathRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
 
+  // Get user's avatar image from context
+  const avatarCtx = useAvatar();
+
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 50);
     return () => clearTimeout(t);
@@ -477,7 +481,7 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         {/* Depth particles */}
         <DepthParticles color={theme.particles} count={isHollowEarth ? 24 : 16} />
 
-        {/* V54.8 — 3D Avatar Presence */}
+        {/* V55.0 — 3D Avatar Presence (User's actual avatar or crystal fallback) */}
         {entered && (
           <Avatar3D
             scrollProgress={scrollProgress}
@@ -487,6 +491,7 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
             stillnessTimer={stillnessTimer}
             hiddenRevealed={hiddenRevealed}
             roomName={theme.name}
+            avatarImage={avatarCtx?.activeAvatarB64}
           />
         )}
 
