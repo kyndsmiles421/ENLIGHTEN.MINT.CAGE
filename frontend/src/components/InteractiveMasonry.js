@@ -7,11 +7,28 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hammer, Sparkles, Lock, Unlock, RotateCcw, Trophy, Gem } from 'lucide-react';
+import { Hammer, Sparkles, Lock, Unlock, RotateCcw, Trophy, Gem, Star } from 'lucide-react';
 import { PHI, metatronVertices, goldenSpiralPoints } from '../lib/SacredGeometry';
 import { toast } from 'sonner';
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+// Node cultural mythology labels (maps to /api/omni-bridge/node-mythology)
+const NODE_LABELS = [
+  "Center — Sacred Geometry",
+  "East — Breathwork",
+  "South — Movement",
+  "West — Herbology",
+  "North — Earth Medicine",
+  "Sound & Frequency",
+  "Meditation",
+  "Oracle & Divination",
+  "Community",
+  "Economy",
+  "Creation",
+  "Sacred History",
+  "Connection",
+];
 
 // 13 vertices of Metatron's Cube
 const VERTICES = metatronVertices(100);
@@ -48,8 +65,21 @@ export default function InteractiveMasonry({ room = 'default', authHeaders = {},
   });
   const [materials, setMaterials] = useState(0);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [nodeMyth, setNodeMyth] = useState(null);
   const [structures, setStructures] = useState([]);
   const [showReset, setShowReset] = useState(false);
+
+  // Fetch node mythology when a locked node is selected
+  const selectNode = useCallback(async (index) => {
+    setSelectedNode(index);
+    setNodeMyth(null);
+    if (lockedNodes.includes(index)) {
+      try {
+        const res = await fetch(`${API}/api/omni-bridge/node-mythology/${index}`);
+        if (res.ok) setNodeMyth(await res.json());
+      } catch {}
+    }
+  }, [lockedNodes]);
 
   // Fetch materials from Masonry API
   const fetchMaterials = useCallback(async () => {
@@ -201,8 +231,8 @@ export default function InteractiveMasonry({ room = 'default', authHeaders = {},
 
             return (
               <g key={`node-${i}`}
-                onClick={() => !isLocked && unlockNode(i)}
-                style={{ cursor: isLocked ? 'default' : isAdjacent ? 'pointer' : 'not-allowed' }}
+                onClick={() => isLocked ? selectNode(i) : unlockNode(i)}
+                style={{ cursor: isLocked ? 'pointer' : isAdjacent ? 'pointer' : 'not-allowed' }}
                 data-testid={`masonry-node-${i}`}
               >
                 {/* Glow for locked nodes */}
@@ -241,6 +271,48 @@ export default function InteractiveMasonry({ room = 'default', authHeaders = {},
           })}
         </svg>
       </div>
+
+      {/* Selected Node Info Panel */}
+      {selectedNode !== null && lockedNodes.includes(selectedNode) && (
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 rounded-xl p-3"
+          style={{ background: 'rgba(192,132,252,0.04)', border: '1px solid rgba(192,132,252,0.1)' }}
+          data-testid="node-info-panel"
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <Star size={10} style={{ color: '#C084FC' }} />
+            <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: '#C084FC' }}>
+              Node {selectedNode}: {NODE_LABELS[selectedNode] || 'Unknown'}
+            </span>
+          </div>
+          {nodeMyth ? (
+            <>
+              <p className="text-[10px] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                {nodeMyth.lakota_star && <span style={{ color: '#D8B4FE' }}>{nodeMyth.lakota_star}</span>}
+                {nodeMyth.lakota_english && <span style={{ color: 'rgba(255,255,255,0.5)' }}> ({nodeMyth.lakota_english})</span>}
+              </p>
+              <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                {nodeMyth.lakota_teaching?.slice(0, 150)}
+              </p>
+              <div className="flex gap-2 mt-1.5">
+                <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(252,211,77,0.06)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.1)' }}>
+                  {nodeMyth.chakra}
+                </span>
+                <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(45,212,191,0.06)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.1)' }}>
+                  {nodeMyth.element}
+                </span>
+                <span className="text-[7px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(139,92,246,0.06)', color: '#A78BFA', border: '1px solid rgba(139,92,246,0.1)' }}>
+                  {nodeMyth.academy_module}
+                </span>
+              </div>
+            </>
+          ) : (
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.4)' }}>Loading mythology...</p>
+          )}
+        </motion.div>
+      )}
 
       {/* Progress bar */}
       <div className="mb-3">

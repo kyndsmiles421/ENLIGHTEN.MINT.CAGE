@@ -13,6 +13,7 @@ import DeepDive from './DeepDive';
 import NarrationPlayer from './NarrationPlayer';
 import { ProximityItem } from './SpatialRoom';
 import SpatialRecorderUI, { useSpatialRecorder } from './SpatialRecorder';
+import OmniBridge from './OmniBridge';
 
 // Visual element icon based on item properties
 function ItemVisual({ color, element, size = 56 }) {
@@ -231,6 +232,8 @@ function InteractiveItem({ item, color, category, index }) {
                   color={itemColor}
                   label={`Explore ${title} deeper`}
                 />
+                {/* OmniBridge — Cross-cultural intelligence for this item */}
+                <OmniBridge module={category} topic={title} context={subtitle} />
               </div>
             </div>
           </motion.div>
