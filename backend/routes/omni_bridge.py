@@ -408,3 +408,125 @@ async def get_node_mythology(node_index: int):
         "academy_module": node["academy"],
         "note": "Metatron's Cube is from the Kabbalistic/Western esoteric tradition. It is not Lakota.",
     }
+
+
+# ═══════════════════════════════════════════════════════════════
+# SOVEREIGN LIBRARY API — All 10 traditions accessible system-wide
+# ═══════════════════════════════════════════════════════════════
+from routes.sovereign_library import (
+    get_tradition, get_all_traditions, get_mixer_tags, get_geometry_forms,
+    SOVEREIGN_LIBRARY
+)
+
+
+@router.get("/omni-bridge/traditions")
+async def list_all_traditions():
+    """List all traditions in the Sovereign Library."""
+    traditions = []
+    for tid, t in SOVEREIGN_LIBRARY.items():
+        traditions.append({
+            "id": t["id"],
+            "name": t["name"],
+            "region": t["region"],
+            "core_teaching": t["core_teaching"],
+            "practices_count": len(t.get("practices", [])),
+            "has_rhythm": bool(t.get("rhythm", {}).get("mixer_tags")),
+            "has_geometry": bool(t.get("geometry", {}).get("forms")),
+            "has_healing": bool(t.get("healing", {}).get("modalities")),
+            "has_stars": bool(t.get("stars", {}).get("key_stars")),
+        })
+    return {"traditions": traditions, "count": len(traditions)}
+
+
+@router.get("/omni-bridge/tradition/{tradition_id}")
+async def get_tradition_detail(tradition_id: str):
+    """Get full detail for a single tradition."""
+    t = get_tradition(tradition_id)
+    if not t:
+        raise HTTPException(404, f"Tradition '{tradition_id}' not found")
+    return t
+
+
+@router.get("/omni-bridge/mixer-tags")
+async def get_all_mixer_tags():
+    """Get all mixer-compatible audio tags across all 10 traditions — for the Monitor screen."""
+    return get_mixer_tags()
+
+
+@router.get("/omni-bridge/geometry-forms")
+async def get_all_geometry_forms():
+    """Get all sacred geometry forms across all 10 traditions."""
+    return get_geometry_forms()
+
+
+@router.get("/omni-bridge/tradition/{tradition_id}/{dimension}")
+async def get_tradition_dimension(tradition_id: str, dimension: str):
+    """Get a specific dimension (wisdom, rhythm, geometry, healing, stars, practices) of a tradition."""
+    t = get_tradition(tradition_id)
+    if not t:
+        raise HTTPException(404, f"Tradition '{tradition_id}' not found")
+    if dimension not in t:
+        raise HTTPException(400, f"Dimension '{dimension}' not found. Available: wisdom, rhythm, geometry, healing, stars, practices")
+    return {"tradition": t["name"], "dimension": dimension, "data": t[dimension]}
+
+
+@router.post("/omni-bridge/cross-tradition")
+async def cross_tradition_insight(data: dict = Body(...)):
+    """
+    Generate AI insight bridging TWO or more specific traditions on a topic.
+    Body: { traditions: ["lakota", "kemetic"], topic: "healing with stones", module: "crystals" }
+    """
+    traditions = data.get("traditions", [])
+    topic = data.get("topic", "")
+    module = data.get("module", "general")
+
+    if not topic:
+        raise HTTPException(400, "topic is required")
+    if len(traditions) < 1:
+        raise HTTPException(400, "At least one tradition required")
+
+    tradition_contexts = []
+    for tid in traditions[:4]:  # Max 4 traditions per query
+        t = get_tradition(tid)
+        if t:
+            wisdom = t.get("wisdom", {}).get("philosophy", "")
+            healing = t.get("healing", {}).get("principle", "")
+            tradition_contexts.append(f"\n{t['name'].upper()}:\nPhilosophy: {wisdom}\nHealing principle: {healing}\nCore: {t['core_teaching']}")
+
+    if not tradition_contexts:
+        raise HTTPException(400, "No valid traditions found")
+
+    prompt = f"""You are the OmniCultural Intelligence. The user wants to understand "{topic}" 
+through {len(traditions)} traditions simultaneously.
+
+{''.join(tradition_contexts)}
+
+MODULE CONTEXT: {module}
+
+Rules:
+1. Let EACH tradition speak in its OWN authentic voice — specific terminology, specific practices
+2. Find the GENUINE common thread (if one exists)
+3. Be honest when traditions DIFFER or approach the topic completely differently
+4. Give ONE practical exercise from EACH tradition the user can try
+5. No forced equivalences. Respect each lineage.
+6. Keep it concise — 2-3 paragraphs total.
+End with the genuine bridge between these traditions (or honestly state there isn't one)."""
+
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"cross-trad-{str(uuid.uuid4())}",
+            system_message="You bridge traditions with respect and authenticity. Each voice speaks for itself.",
+        )
+        chat.with_model("openai", "gpt-5.2")
+        msg = UserMessage(text=prompt)
+        response = await asyncio.wait_for(chat.send_message(msg), timeout=45)
+        return {
+            "traditions": traditions,
+            "topic": topic,
+            "insight": response,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+        }
+    except Exception as e:
+        logger.error(f"Cross-tradition error: {e}")
+        raise HTTPException(500, "Could not generate cross-tradition insight")
