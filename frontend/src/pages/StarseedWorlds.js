@@ -91,7 +91,7 @@ function MultiverseMap({ realms, onRealmClick, reduceParticles }) {
 
   return (
     <div className="relative w-full h-48 md:h-56 rounded-2xl overflow-hidden mb-6"
-      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+      style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.05)' }}>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       <div className="relative z-10 flex items-center justify-around h-full px-4">
         {realms.map((realm, i) => {
@@ -418,8 +418,8 @@ function ExplorationResult({ result, onClose }) {
   const hasDiscoveries = result.discoveries.length > 0;
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+      className="relative w-full flex flex-col"
+      style={{ background: 'transparent', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.3, opacity: 0, rotateY: -20 }}
         animate={{ scale: 1, opacity: 1, rotateY: 0 }}

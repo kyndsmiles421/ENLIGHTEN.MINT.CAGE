@@ -226,8 +226,8 @@ function LeaderboardModal({ challengeId, challenges, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center px-6"
-      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+      className="relative w-full flex flex-col px-6"
+      style={{ background: 'transparent', backdropFilter: 'none'}}
       onClick={onClose}
     >
       <motion.div

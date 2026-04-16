@@ -165,7 +165,7 @@ export default function HexagramGrid({ isOpen, onClose }) {
 
             {expanded && h2Data.h2_matrix && (
               <div className="rounded-lg p-2 overflow-auto" style={{
-                background: 'rgba(0,0,0,0.3)',
+                background: 'transparent',
                 border: '1px solid rgba(255,255,255,0.03)',
                 maxHeight: '300px',
               }}>

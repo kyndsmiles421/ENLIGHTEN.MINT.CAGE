@@ -176,7 +176,7 @@ function VideoIntro({ onComplete, onSkip }) {
             onClick={toggleMute}
             data-testid="tour-video-mute-toggle"
             className="absolute bottom-8 left-8 p-2.5 rounded-lg transition-all hover:scale-110 z-10"
-            style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none', border: '1px solid rgba(255,255,255,0.08)' }}>
+            style={{ background: 'transparent', backdropFilter: 'none', border: '1px solid rgba(255,255,255,0.08)' }}>
             {muted
               ? <VolumeX size={16} style={{ color: '#F8FAFC' }} />
               : <Volume2 size={16} style={{ color: '#D8B4FE' }} />

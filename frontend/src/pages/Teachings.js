@@ -60,35 +60,28 @@ function ContemplationModal({ contemplation, teacher, teaching, color, onClose }
   if (!contemplation) return null;
   return (
     <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'transparent', backdropFilter: 'none'}}
-      onClick={onClose}
+      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+      className="overflow-hidden mt-4"
+      style={{ borderTop: `1px solid ${color}15` }}
     >
-      <motion.div
-        initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }}
-        className="max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8"
-        style={{ borderColor: `${color}15` }}
-        onClick={e => e.stopPropagation()}
-        data-testid="contemplation-modal"
-      >
-        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color }}>
+      <div className="pt-4 pb-2">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
           Guided Contemplation
         </p>
-        <h3 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+        <h3 className="text-xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
           {teaching}
         </h3>
-        <p className="text-xs mb-6" style={{ color: 'var(--text-muted)' }}>Inspired by {teacher}</p>
-        <div className="text-sm leading-relaxed whitespace-pre-line mb-6" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-xs mb-4" style={{ color: 'var(--text-muted)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>Inspired by {teacher}</p>
+        <div className="text-sm leading-relaxed whitespace-pre-line mb-4" style={{ color: 'var(--text-secondary)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
           {contemplation}
         </div>
         <div className="flex items-center gap-3">
           <NarrationPlayer text={contemplation} label="Listen" color={color} context="knowledge" />
           <button onClick={onClose} className="px-4 py-2 rounded-full text-xs" style={{ color: 'var(--text-muted)' }}>
-            Close
+            Collapse
           </button>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

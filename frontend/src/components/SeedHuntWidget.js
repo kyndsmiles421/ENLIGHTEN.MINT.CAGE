@@ -240,7 +240,7 @@ export default function SeedHuntWidget({
     <motion.div
       className="rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(0,0,0,0.15)',
+        background: 'transparent',
         border: `1px solid ${style.border}`,
         boxShadow: isNearTarget ? style.glow : 'none',
       }}
@@ -263,7 +263,7 @@ export default function SeedHuntWidget({
         <div 
           className="text-[10px] px-2 py-0.5 rounded-full uppercase"
           style={{ 
-            background: 'rgba(0,0,0,0.3)',
+            background: 'transparent',
             color: style.text,
           }}
         >

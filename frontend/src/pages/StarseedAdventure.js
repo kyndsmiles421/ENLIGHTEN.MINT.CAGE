@@ -186,8 +186,8 @@ export default function StarseedAdventure() {
       <AnimatePresence>
         {loading && view === 'select' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}>
+            className="relative w-full flex flex-col"
+            style={{ background: 'transparent', backdropFilter: 'none'}}>
             <div className="text-center">
               <motion.div
                 animate={{ rotate: 360, scale: [1, 1.15, 1] }}

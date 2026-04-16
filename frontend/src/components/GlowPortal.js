@@ -199,7 +199,7 @@ export default function GlowPortal() {
                   }}
                   className="absolute -top-1 -left-1 w-4 h-4 rounded-full flex items-center justify-center"
                   style={{ 
-                    background: 'rgba(0,0,0,0.15)', 
+                    background: 'transparent', 
                     border: `1px solid ${portal.color}40`,
                   }}
                   whileHover={{ scale: 1.2 }}

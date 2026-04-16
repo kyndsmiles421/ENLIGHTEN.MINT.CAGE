@@ -180,8 +180,8 @@ export default function GlobalNodalMap({ isOpen, onClose }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: 'rgba(0,0,0,0.15)' }}
+        className="relative w-full flex flex-col p-4"
+        style={{ background: 'transparent' }}
       >
         {/* Close button */}
         <button

@@ -503,8 +503,8 @@ function ShareModal({ open, onClose, authHeaders }) {
   if (!open) return null;
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+      className="relative w-full flex flex-col px-4"
+      style={{ background: 'transparent', backdropFilter: 'none'}}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="w-full max-w-md p-6 relative" data-testid="share-modal">
         <button onClick={onClose} className="absolute top-3 right-3" style={{ color: 'var(--text-muted)' }}><X size={16} /></button>

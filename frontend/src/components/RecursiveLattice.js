@@ -342,7 +342,7 @@ const DepthHUD = React.memo(({
     <div 
       className="p-3 rounded-xl"
       style={{
-        background: 'rgba(0,0,0,0.15)',
+        background: 'transparent',
         backdropFilter: 'none',
         border: `1px solid ${style.cellBorder}`,
       }}
@@ -374,7 +374,7 @@ const DepthHUD = React.memo(({
       <div 
         className="text-[9px] font-mono mb-2 p-2 rounded"
         style={{ 
-          background: 'rgba(0,0,0,0.3)',
+          background: 'transparent',
           color: 'rgba(255,255,255,0.5)',
           wordBreak: 'break-all',
         }}
@@ -582,7 +582,7 @@ export default function RecursiveLattice({
         {isZooming && (
           <motion.div
             className="absolute inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.15)' }}
+            style={{ background: 'transparent' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

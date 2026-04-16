@@ -519,7 +519,7 @@ export default function WebXRPortalSync({
       {/* AR Canvas Container */}
       <div 
         ref={containerRef} 
-        className="fixed inset-0 z-50 pointer-events-none"
+        className="relative w-full pointer-events-none"
         style={{ display: sessionActive ? 'block' : 'none' }}
       />
       

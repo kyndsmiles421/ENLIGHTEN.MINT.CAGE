@@ -97,7 +97,7 @@ export default function RecursiveDivePage() {
           <motion.div
             className="fixed top-20 right-4 z-40 w-80 p-4 rounded-xl"
             style={{
-              background: 'rgba(0,0,0,0.15)',
+              background: 'transparent',
               backdropFilter: 'none',
               border: '1px solid rgba(100,149,237,0.3)',
             }}
@@ -138,7 +138,7 @@ export default function RecursiveDivePage() {
           <motion.div
             className="fixed top-20 right-4 z-40 w-80 max-h-[60vh] overflow-y-auto p-4 rounded-xl"
             style={{
-              background: 'rgba(0,0,0,0.15)',
+              background: 'transparent',
               backdropFilter: 'none',
               border: '1px solid rgba(255,215,0,0.3)',
             }}

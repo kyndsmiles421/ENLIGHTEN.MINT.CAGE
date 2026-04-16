@@ -85,7 +85,7 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
             {/* Background blur overlay */}
             <motion.div
               className="fixed inset-0 z-[94]"
-              style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'none'}}
+              style={{ background: 'transparent', backdropFilter: 'none'}}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

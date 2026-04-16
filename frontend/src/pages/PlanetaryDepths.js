@@ -140,7 +140,7 @@ function DescentModal({ layer, onDescend, onTunnel, onClose, tunnelCosts, dust }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        className="relative w-full flex flex-col p-4"
         style={{ background: 'rgba(2,2,8,0.85)' }}
         onClick={onClose}
       >

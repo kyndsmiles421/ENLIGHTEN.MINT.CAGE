@@ -90,7 +90,7 @@ export default function FeaturedVideos({ category, color = '#2DD4BF', title = 'R
                 </div>
               </div>
               <span className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'rgba(0,0,0,0.15)', color: 'white' }}>
+                style={{ background: 'transparent', color: 'white' }}>
                 <Clock size={9} className="inline mr-1" />{v.duration}
               </span>
             </div>

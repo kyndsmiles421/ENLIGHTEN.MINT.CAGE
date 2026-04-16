@@ -197,8 +197,8 @@ export function LootDropReveal({ loot, onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+      className="relative w-full flex flex-col"
+      style={{ background: 'transparent', backdropFilter: 'none'}}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', duration: 0.6 }}
         className="rounded-2xl p-8 text-center max-w-xs mx-4 relative overflow-hidden"

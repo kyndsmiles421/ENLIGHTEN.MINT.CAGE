@@ -147,7 +147,7 @@ const ConstellationVisualizer = React.memo(({ address, path, rarityTier, size = 
       height={size} 
       viewBox="0 0 100 100"
       className="rounded-lg"
-      style={{ background: 'rgba(0,0,0,0.15)' }}
+      style={{ background: 'transparent' }}
     >
       {/* Background glow */}
       <circle
@@ -411,7 +411,7 @@ const SeedDetailModal = React.memo(({ seed, onClose }) => {
   
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+      className="relative w-full flex flex-col p-4 bg-black/80"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

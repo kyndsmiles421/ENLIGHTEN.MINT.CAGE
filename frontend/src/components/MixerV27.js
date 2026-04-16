@@ -173,7 +173,7 @@ const MixerV27 = ({ userId = 'default_user', onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      className="relative w-full flex flex-col bg-black/80 backdrop-blur-sm"
       data-testid="mixer-v27-overlay"
     >
       <div 

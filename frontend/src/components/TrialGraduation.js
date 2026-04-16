@@ -123,7 +123,7 @@ export default function TrialGraduation() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[10000] flex items-center justify-center px-4"
-        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+        style={{ background: 'transparent', backdropFilter: 'none'}}
         data-testid="trial-graduation-overlay"
       >
         <motion.div

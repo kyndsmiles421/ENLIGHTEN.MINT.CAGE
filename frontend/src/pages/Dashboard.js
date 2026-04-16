@@ -542,7 +542,7 @@ export default function Dashboard() {
       <AnimatePresence>
         {showAddSheet && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center"
+            className="relative w-full flex items-end justify-center"
             onClick={() => setShowAddSheet(false)}>
             <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.1)' }} />
             <motion.div initial={{ y: 300 }} animate={{ y: 0 }} exit={{ y: 300 }}

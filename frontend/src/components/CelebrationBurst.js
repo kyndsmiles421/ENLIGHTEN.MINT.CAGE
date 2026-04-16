@@ -84,7 +84,7 @@ export default function CelebrationBurst({ active, onComplete }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0"
-            style={{ background: 'rgba(0,0,0,0.3)' }}
+            style={{ background: 'transparent' }}
           />
 
           {/* Center glow */}

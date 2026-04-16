@@ -305,7 +305,7 @@ function NFTCard({ nft, onVerify }) {
         </div>
         
         {/* Verification hash */}
-        <div className="flex items-center gap-2 p-2 rounded-lg mb-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+        <div className="flex items-center gap-2 p-2 rounded-lg mb-3" style={{ background: 'transparent' }}>
           <p className="text-[9px] font-mono text-white/50 flex-1 truncate">
             {nft.verification_hash}
           </p>
@@ -495,7 +495,7 @@ export default function CrystalMintPanel({ isOpen, onClose }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        className="relative w-full flex flex-col p-4"
         style={{ background: 'rgba(0, 0, 0, 0.9)' }}
         onClick={onClose}
       >

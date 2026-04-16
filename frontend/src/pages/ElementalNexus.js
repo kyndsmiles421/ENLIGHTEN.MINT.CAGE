@@ -370,9 +370,9 @@ function BirthModal({ onSubmit, onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      className="relative w-full flex flex-col px-4"
       onClick={onClose}>
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}} />
+      <div className="absolute inset-0" style={{ background: 'transparent', backdropFilter: 'none'}} />
       <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
         className="relative w-full max-w-sm rounded-2xl p-5"
         style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(168,85,247,0.15)' }}

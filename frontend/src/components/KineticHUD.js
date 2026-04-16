@@ -136,7 +136,7 @@ const DustWalletWidget = React.memo(({
         bottom: HUD_CONFIG.SPACER,
         right: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect
-        background: 'rgba(0,0,0,0.3)',
+        background: 'transparent',
         backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: '1px solid rgba(255,255,255,0.1)',
@@ -200,7 +200,7 @@ const GravityIndicatorWidget = React.memo(({
         top: HUD_CONFIG.SPACER,
         left: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect
-        background: 'rgba(0,0,0,0.3)',
+        background: 'transparent',
         backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: '1px solid rgba(255,255,255,0.1)',
@@ -283,7 +283,7 @@ const StabilityIndicatorWidget = React.memo(({
         bottom: HUD_CONFIG.SPACER,
         left: HUD_CONFIG.SPACER,
         // CLEAN SWEEP: Smart Glass effect
-        background: 'rgba(0,0,0,0.3)',
+        background: 'transparent',
         backdropFilter: 'none',
         WebkitBackdropFilter: 'blur(12px) saturate(180%)',
         border: '1px solid rgba(255,255,255,0.1)',

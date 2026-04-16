@@ -311,7 +311,7 @@ export default function Observatory() {
         {/* ═══ ORRERY TAB ═══ */}
         {tab === 'orrery' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.15)', border: `1px solid ${immBg.color}15`, backdropFilter: 'none'}}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent', border: `1px solid ${immBg.color}15`, backdropFilter: 'none'}}>
               <div className="px-3 pt-2">
                 <p className="text-[7px] uppercase tracking-widest" style={{ color: `${immBg.color}66` }}>
                   Interactive Orrery — Tap a planet to immerse

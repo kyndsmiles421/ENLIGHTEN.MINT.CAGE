@@ -158,7 +158,7 @@ export default function UniversalCommand() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+          style={{ background: 'transparent', backdropFilter: 'none'}}
         />
 
         {/* Command Panel */}

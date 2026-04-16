@@ -98,7 +98,7 @@ export default function CommandMode({ context = 'general', pageData = {}, trigge
             onClick={handleClose}
           >
             {/* Backdrop */}
-            <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}} />
+            <div className="absolute inset-0" style={{ background: 'transparent', backdropFilter: 'none'}} />
 
             <motion.div
               className="relative w-full max-w-2xl rounded-2xl overflow-hidden"

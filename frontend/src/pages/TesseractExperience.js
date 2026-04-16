@@ -996,7 +996,7 @@ export default function TesseractExperience() {
           <div 
             className="font-mono text-[11px] px-4 py-2 rounded-lg"
             style={{ 
-              background: 'rgba(0,0,0,0.15)',
+              background: 'transparent',
               color: core.colors.primary,
               border: `1px solid ${core.colors.primary}40`,
             }}

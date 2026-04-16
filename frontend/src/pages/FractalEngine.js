@@ -10,7 +10,7 @@ const SecurePortal = ({ isLoggedIn, children, onLogin }) => {
       <div style={{ 
         position: 'absolute', zIndex: 10, width: '100%', height: '100%', 
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'
+        background: 'transparent', backdropFilter: 'none'
       }}>
         <h1 style={{ color: '#00ffcc', letterSpacing: '5px' }}>ENLIGHTEN.MINT.CAFE</h1>
         <p style={{ color: 'white', marginBottom: '20px' }}>Secure Lattice Encryption Active</p>

@@ -989,7 +989,7 @@ export default function LiveRoom() {
           {/* Recording Status */}
           {recordingStatus && (
             <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}>
+              style={{ background: 'transparent', backdropFilter: 'none'}}>
               {recordingStatus === 'recording' && <>
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#EF4444' }} />
                 <span className="text-[9px]" style={{ color: '#EF4444' }}>Recording...</span>
@@ -1218,7 +1218,7 @@ function VideoTile({ tile, localVideoRef }) {
 
       {/* Name badge */}
       <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-lg"
-        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}>
+        style={{ background: 'transparent', backdropFilter: 'none'}}>
         <span className="text-[9px] font-medium" style={{ color: '#F8FAFC' }}>
           {tile.name}
         </span>
@@ -1227,7 +1227,7 @@ function VideoTile({ tile, localVideoRef }) {
 
       {/* Live indicator */}
       <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full"
-        style={{ background: 'rgba(0,0,0,0.15)' }}>
+        style={{ background: 'transparent' }}>
         <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#3B82F6' }} />
         <span className="text-[7px] font-medium" style={{ color: '#93C5FD' }}>LIVE</span>
       </div>
@@ -1256,7 +1256,7 @@ function ScreenShareTile({ stream, sharerName }) {
         style={{ background: 'transparent' }}
       />
       <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
-        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}>
+        style={{ background: 'transparent', backdropFilter: 'none'}}>
         <Monitor size={12} style={{ color: '#EAB308' }} />
         <span className="text-[10px] font-medium" style={{ color: '#FDE68A' }}>
           {sharerName}'s screen
@@ -1337,7 +1337,7 @@ function AvatarCircle({ participants, currentUserId, myAvatar }) {
                 style={{ border: `1px solid ${isMe ? '#C084FC' : 'rgba(248,250,252,0.1)'}` }} />
             </motion.div>
             <span className="text-[8px] mt-1 px-1.5 py-0.5 rounded-full max-w-16 truncate"
-              style={{ background: 'rgba(0,0,0,0.15)', color: isMe ? '#C084FC' : 'rgba(248,250,252,0.6)', backdropFilter: 'none'}}>
+              style={{ background: 'transparent', color: isMe ? '#C084FC' : 'rgba(248,250,252,0.6)', backdropFilter: 'none'}}>
               {isMe ? 'You' : p.name?.split(' ')[0]}
             </span>
           </motion.div>

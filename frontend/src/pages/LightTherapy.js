@@ -418,7 +418,7 @@ function ImmersiveSession({ colors, duration, onEnd, resonanceName, sceneUrl }) 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+      className="relative w-full flex flex-col items-center justify-center"
       style={{ background: 'transparent' }}
       data-testid="light-therapy-session"
     >

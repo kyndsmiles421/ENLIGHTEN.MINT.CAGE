@@ -396,7 +396,7 @@ export default function Sanctuary() {
                 {deeds.slice(0, 5).map((deed, i) => (
                   <div key={i} style={{
                     padding: '12px 16px',
-                    background: 'rgba(0,0,0,0.3)',
+                    background: 'transparent',
                     borderRadius: 8,
                     borderLeft: '3px solid var(--mint-primary, #00FFC2)',
                   }}>

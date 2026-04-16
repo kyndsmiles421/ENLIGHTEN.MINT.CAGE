@@ -65,8 +65,8 @@ export default function DeepDiveSearch({ isOpen, onClose }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex flex-col items-center justify-start pt-20"
-        style={{ background: 'rgba(0,0,0,0.15)' }}
+        className="relative w-full flex flex-col items-center justify-start pt-20"
+        style={{ background: 'transparent' }}
       >
         {/* Close button */}
         <button

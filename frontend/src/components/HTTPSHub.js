@@ -26,7 +26,7 @@ const HTTPSHub = () => {
           placeholder="Enter HTTPS Address or Search Wisdom..."
           style={{ 
             flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid #00ffcc',
-            background: 'rgba(0,0,0,0.15)', color: '#00ffcc', backdropFilter: 'none',
+            background: 'transparent', color: '#00ffcc', backdropFilter: 'none',
             outline: 'none', fontSize: '1rem'
           }}
         />

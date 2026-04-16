@@ -74,7 +74,7 @@ export default function MissionControl({ isOpen, onClose }) {
         <>
           {/* Backdrop — pointer-events: none so 3D background stays interactive */}
           <motion.div
-            className="fixed inset-0 z-50"
+            className="relative w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -83,7 +83,7 @@ export default function MissionControl({ isOpen, onClose }) {
 
           {/* Click-capture layer — only covers panel area for close-on-outside-click */}
           <motion.div
-            className="fixed inset-0 z-50"
+            className="relative w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

@@ -185,7 +185,7 @@ export default function SearchCommand({ open, onClose }) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
         className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] px-4"
-        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+        style={{ background: 'transparent', backdropFilter: 'none'}}
         onClick={(e) => e.target === e.currentTarget && onClose()}
         data-testid="search-overlay"
       >

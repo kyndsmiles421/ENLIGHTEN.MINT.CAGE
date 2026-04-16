@@ -243,7 +243,7 @@ function SkinPicker({ onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'transparent', display: 'flex', flexDirection: 'column' }}
       data-testid="scene-picker">
       <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div>
@@ -308,12 +308,12 @@ function SkinPicker({ onClose }) {
                     </div>
                   )}
                   {isContextual && !isActive && (
-                    <div style={{ position: 'absolute', top: 4, left: 4, background: 'rgba(0,0,0,0.15)', borderRadius: 4, padding: '1px 4px' }}>
+                    <div style={{ position: 'absolute', top: 4, left: 4, background: 'transparent', borderRadius: 4, padding: '1px 4px' }}>
                       <span className="text-[6px] text-white/50">THIS PAGE</span>
                     </div>
                   )}
                 </div>
-                <div className="p-2" style={{ background: 'rgba(0,0,0,0.15)' }}>
+                <div className="p-2" style={{ background: 'transparent' }}>
                   <div className="text-[10px] font-medium" style={{ color: isActive ? skin.accent : 'rgba(255,255,255,0.7)' }}>{skin.name}</div>
                   <div className="flex items-center gap-1 mt-0.5">
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: skin.accent }} />

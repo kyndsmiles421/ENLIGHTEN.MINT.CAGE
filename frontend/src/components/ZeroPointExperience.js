@@ -298,7 +298,7 @@ export default function ZeroPointExperience() {
             <div 
               className="flex flex-col items-center gap-2 px-4 py-2 rounded-lg"
               style={{
-                background: 'rgba(0,0,0,0.15)',
+                background: 'transparent',
                 backdropFilter: 'none',
                 border: `1px solid ${stabilityColor}40`,
                 boxShadow: `0 0 15px ${stabilityColor}30`,
@@ -367,7 +367,7 @@ export default function ZeroPointExperience() {
             <div 
               className="text-xs uppercase tracking-[0.5em] px-6 py-2 rounded-full"
               style={{
-                background: 'rgba(0,0,0,0.15)',
+                background: 'transparent',
                 color: 'rgba(255,255,255,0.7)',
                 border: '1px solid rgba(255,255,255,0.2)',
                 backdropFilter: 'none',

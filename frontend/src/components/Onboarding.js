@@ -51,7 +51,7 @@ export default function Onboarding() {
           exit={{ opacity: 0 }}
           style={{
             position: 'fixed', inset: 0, zIndex: 2147483647,
-            background: 'rgba(0,0,0,0.15)', backdropFilter: 'none',
+            background: 'transparent', backdropFilter: 'none',
             display: 'flex', justifyContent: 'center', alignItems: 'center',
             padding: '20px',
           }}

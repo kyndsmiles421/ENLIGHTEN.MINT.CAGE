@@ -160,7 +160,7 @@ export default function MultiverseRealms() {
           {activeRealm && (
             <motion.div key="inside" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
               {/* Realm Description */}
-              <div className="p-5 rounded-2xl mb-6" style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'none', border: `1px solid ${activeRealm.realm.color}15` }}>
+              <div className="p-5 rounded-2xl mb-6" style={{ background: 'transparent', backdropFilter: 'none', border: `1px solid ${activeRealm.realm.color}15` }}>
                 <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8 }}>
                   {activeRealm.realm.desc}
                 </p>
@@ -214,7 +214,7 @@ export default function MultiverseRealms() {
               {/* Leave Button */}
               <button onClick={leaveRealm}
                 className="w-full py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
-                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}
+                style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}
                 data-testid="leave-realm-btn">
                 <ArrowLeft size={14} /> Return to the Multiverse
               </button>

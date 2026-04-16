@@ -60,7 +60,7 @@ export default function BackgroundPicker({ isOpen, onClose, onSelect, currentBg,
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center"
-        style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}}
+        style={{ background: 'transparent', backdropFilter: 'none'}}
         onClick={onClose}
         data-testid="bg-picker-overlay">
         <motion.div

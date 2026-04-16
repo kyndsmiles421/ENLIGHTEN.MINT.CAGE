@@ -184,7 +184,7 @@ function DistortionCompositor({ harmony, elements, decay, cycle, mantraActive, m
 function TransitionShader({ active, color, onDone }) {
   if (!active) return null;
   return (
-    <motion.div className="fixed inset-0 z-50 pointer-events-none"
+    <motion.div className="relative w-full pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: [0, 1, 1, 0] }}
       transition={{ duration: 1.8, times: [0, 0.3, 0.7, 1] }}
@@ -353,8 +353,8 @@ function LegendaryCard({ frequency }) {
 function LoopBrokenOverlay({ result, onDismiss }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onDismiss} data-testid="loop-broken-overlay">
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none'}} />
+      className="relative w-full flex flex-col px-4" onClick={onDismiss} data-testid="loop-broken-overlay">
+      <div className="absolute inset-0" style={{ background: 'transparent', backdropFilter: 'none'}} />
       <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} transition={{ type: 'spring', damping: 15 }}
         className="relative w-full max-w-sm rounded-2xl p-6 text-center"
         style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(252,211,77,0.2)' }}

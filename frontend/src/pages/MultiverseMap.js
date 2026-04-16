@@ -304,7 +304,7 @@ export default function MultiverseMap() {
 
           {exploring && (
             <div className="absolute inset-0 flex items-center justify-center"
-              style={{ background: 'rgba(0,0,0,0.3)' }}>
+              style={{ background: 'transparent' }}>
               <CosmicInlineLoader message="Exploring..." />
             </div>
           )}

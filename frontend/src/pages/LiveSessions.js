@@ -467,7 +467,7 @@ function CreateSessionModal({ types, scenes, authHeaders, onClose, onCreated, on
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       onClick={onClose}>
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)' }} />
+      <div className="absolute inset-0" style={{ background: 'transparent' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-lg rounded-2xl overflow-y-auto max-h-[85vh] p-6"
         style={{ background: 'rgba(13,14,26,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'none'}}
@@ -800,7 +800,7 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       onClick={onClose}>
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.15)' }} />
+      <div className="absolute inset-0" style={{ background: 'transparent' }} />
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="relative w-full max-w-2xl rounded-2xl overflow-hidden"
         style={{ background: 'rgba(10,11,20,0.98)', border: '1px solid rgba(192,132,252,0.1)', backdropFilter: 'none', maxHeight: '85vh' }}

@@ -337,7 +337,7 @@ function AuditTerminalFeed({ auditStream, isVisible, onClose }) {
       exit={{ opacity: 0, y: -10 }}
       className="rounded-lg overflow-hidden"
       style={{
-        background: 'rgba(0,0,0,0.15)',
+        background: 'transparent',
         border: '1px solid rgba(6,182,212,0.3)',
         fontFamily: 'monospace',
       }}
@@ -537,7 +537,7 @@ function FaderStrip({ strip, layerColor, onValueChange, onMute, onSolo }) {
       {/* Fader Track */}
       <div 
         className="relative w-4 h-32 rounded-sm"
-        style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.1)' }}
+        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)' }}
       >
         {/* Meter */}
         <div 

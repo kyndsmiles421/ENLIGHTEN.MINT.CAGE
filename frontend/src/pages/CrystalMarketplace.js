@@ -70,7 +70,7 @@ export default function CrystalMarketplace() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'transparent', color: '#fff', fontFamily: 'monospace' }} data-testid="crystal-marketplace-page">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(0,0,0,0.15)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'transparent', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={() => navigate(-1)} className="p-2" data-testid="crystal-back-btn"><ArrowLeft size={16} /></button>
         <div>
           <h1 className="text-xs font-bold uppercase tracking-[0.2em]">The Vault: Marketplace</h1>

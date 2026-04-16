@@ -637,7 +637,7 @@ export default function HexagramCompass({
         {isVoid && (
           <motion.div
             className="absolute inset-0 flex items-center justify-center rounded-xl"
-            style={{ background: 'rgba(0,0,0,0.15)' }}
+            style={{ background: 'transparent' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

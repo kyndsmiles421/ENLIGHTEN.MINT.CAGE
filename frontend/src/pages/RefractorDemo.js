@@ -156,7 +156,7 @@ export default function RefractorDemo() {
                 {artifact.sms_summary}
               </p>
               <pre style={{ 
-                background: 'rgba(0,0,0,0.3)', 
+                background: 'transparent', 
                 padding: '1rem', 
                 borderRadius: '8px',
                 fontSize: '0.75rem',
@@ -177,7 +177,7 @@ export default function RefractorDemo() {
                 📧 EMAIL CHANNEL (INNER CORE)
               </h3>
               <pre style={{ 
-                background: 'rgba(0,0,0,0.3)', 
+                background: 'transparent', 
                 padding: '1rem', 
                 borderRadius: '8px',
                 fontSize: '0.65rem',
@@ -217,7 +217,7 @@ export default function RefractorDemo() {
                   ✅ STREAMS REUNITED - DECRYPTED REPORT
                 </h3>
                 <pre style={{ 
-                  background: 'rgba(0,0,0,0.3)', 
+                  background: 'transparent', 
                   padding: '1rem', 
                   borderRadius: '8px',
                   fontSize: '0.75rem',
@@ -234,7 +234,7 @@ export default function RefractorDemo() {
         <div style={{ 
           marginTop: '3rem',
           padding: '2rem',
-          background: 'rgba(0,0,0,0.3)',
+          background: 'transparent',
           borderRadius: '16px',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
