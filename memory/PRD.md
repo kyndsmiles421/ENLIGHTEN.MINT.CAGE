@@ -1,32 +1,28 @@
-# ENLIGHTEN.MINT.CAFE — V54.4 GLOBAL SPATIAL ENGINE
+# ENLIGHTEN.MINT.CAFE — V54.5 SPATIAL ENGINE COMPLETE
 ## Last Verified: April 16, 2026
 
-### V54.4: SpatialRouter — ALL Pages Auto-Wrapped
-- **SpatialRouter.js**: Global wrapper that auto-applies SpatialRoom based on route
-  - 50+ route-to-room mappings defined
-  - Fold/extrude transition on route change (AnimatePresence + scaleZ)
-  - Excluded routes: /, /landing, /auth, /intro, /sovereign-hub
-- **ALL 160+ pages** now get SpatialRoom wrapping automatically
-- **Breathing Perspective Pulse**: In rhythmic mode, perspective oscillates 60%-100% of roomDepth via requestAnimationFrame sine wave (~4s breath cycle)
-- **Meditation Stillness Reward**: Timer tracks scroll inactivity. After 30s still at any coordinate, hidden octants materialize
+### V54.5: Full Spatial Engine + 11 InteractiveModule Pages
+- **SpatialRouter**: Auto-wraps ALL 160+ pages with correct SpatialRoom
+- **ProximityItem**: Active octant items get glow border + translateZ push toward user
+- **11 pages rebuilt as interactive modules**:
+  | Page | Items | Filters | Features |
+  |------|-------|---------|----------|
+  | Nourishment | 8 | Category | DeepDive, Videos |
+  | Crystals | 12 | Chakra | DeepDive, XP |
+  | Herbology | 12 | Body System | DeepDive, XP |
+  | Aromatherapy | 12 | Element | DeepDive, XP |
+  | Elixirs | 10 | Category | DeepDive, XP |
+  | Acupressure | 10 | Meridian | DeepDive, XP |
+  | MealPlanning | 5 plans | Plan→Meal | DeepDive per meal |
+  | Yoga | 7 styles | Style→Sequence→Pose | Full pose instructions |
+  | Reiki | 10 | Chakra | Position details |
+  | Mudras | list | Element | Benefits, DeepDive |
+  | Mantras | list | Category | Chant, DeepDive |
 
-### 9x9 Grid Engine (LOCKED)
-- GRID_SIZE=9, TOTAL_NODES=81, ROOM_DEPTH=1200, OCTANT_DEPTH=133
-- 3 Realms: HOLLOW_EARTH (crystalline tunnels), SURFACE (standard), AIR (open sky)
-- Avatar Badge: [x,y] coordinate + 9-segment depth indicator + % mapped
-- Proximity reveal: Items materialize based on Z-distance from avatar
-- Breathing pulse: Perspective oscillates with inhale/exhale
-- Stillness reward: 30s without scroll → hidden content reveals
-
-### Architecture
-```
-SpatialRouter (global, in MixerProvider)
-  └── SpatialRoom (per-route, with realm/mode)
-       ├── DepthParticles (Z-space ambient)
-       ├── AvatarBadge (coordinate pointer)
-       ├── Realm Atmosphere (HOLLOW_EARTH walls / AIR glow / SURFACE standard)
-       └── Content (perspective + translateZ entry)
-            └── InteractiveModule (where applicable)
-                 └── ProximityItem (scroll-based Z-reveal)
-                      └── InteractiveItem (tap → expand → DeepDive → XP)
-```
+### Spatial Architecture (LOCKED)
+- 9x9 grid (81 nodes), 3 realms (HOLLOW_EARTH/SURFACE/AIR)
+- Breathing pulse: perspective oscillates 60-100% of roomDepth
+- Meditation stillness: 30s still → hidden octants reveal
+- Proximity glow: active octant items get border + translateZ push
+- Fold/extrude transitions on route change
+- Avatar Badge: [x,y] + 9-segment depth + realm label

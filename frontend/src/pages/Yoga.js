@@ -82,7 +82,7 @@ function StyleCard({ style, onSelect, active }) {
           <div className="flex items-center gap-3 mt-2 text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
             <span>{style.difficulty}</span>
             <span>{style.duration_range}</span>
-            <span>{style.poses?.length || 0} poses</span>
+            <span>{style.sequences?.length || style.poses?.length || 0} sequences</span>
           </div>
         </div>
       </div>
@@ -101,6 +101,16 @@ export default function Yoga() {
       .catch(() => toast.error('Could not load yoga styles'))
       .finally(() => setLoading(false));
   }, []);
+
+  const selectStyle = async (style) => {
+    if (activeStyle?.id === style.id) { setActiveStyle(null); return; }
+    try {
+      const res = await axios.get(`${API}/yoga/style/${style.id}`);
+      setActiveStyle(res.data);
+    } catch {
+      setActiveStyle(style);
+    }
+  };
 
   return (
     <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" data-testid="yoga-page">
@@ -122,9 +132,16 @@ export default function Yoga() {
                   <button onClick={() => setActiveStyle(null)} className="text-xs px-3 py-1 rounded-full" style={{color:'rgba(255,255,255,0.4)',border:'1px solid rgba(255,255,255,0.08)'}}>Back</button>
                 </div>
                 <p className="text-sm mb-4" style={{color:'rgba(255,255,255,0.7)'}}>{activeStyle.desc}</p>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{color:activeStyle.color}}>Poses ({activeStyle.poses?.length || 0})</p>
-                {(activeStyle.poses || []).map((pose, i) => (
-                  <PoseItem key={i} pose={pose} color={activeStyle.color} styleName={activeStyle.name} />
+                {(activeStyle.sequences || []).map((seq, si) => (
+                  <div key={si} className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{color:activeStyle.color}}>{seq.name}</p>
+                      <span className="text-[10px]" style={{color:'rgba(255,255,255,0.3)'}}>{seq.duration}min · {seq.level} · {seq.poses?.length || 0} poses</span>
+                    </div>
+                    {(seq.poses || []).map((pose, i) => (
+                      <PoseItem key={i} pose={pose} color={activeStyle.color} styleName={activeStyle.name} />
+                    ))}
+                  </div>
                 ))}
                 <div className="mt-4">
                   <DeepDive topic={`${activeStyle.name} yoga`} category="yoga" context={activeStyle.subtitle} color={activeStyle.color} label={`Explore ${activeStyle.name} deeper`} />
@@ -135,7 +152,7 @@ export default function Yoga() {
         </AnimatePresence>
 
         {/* Style list */}
-        {!activeStyle && styles.map(s => <StyleCard key={s.id} style={s} onSelect={setActiveStyle} active={activeStyle} />)}
+        {!activeStyle && styles.map(s => <StyleCard key={s.id} style={s} onSelect={selectStyle} active={activeStyle} />)}
 
         <FeaturedVideos category="exercises" color="#FCD34D" title="Yoga Practice Videos" />
       </motion.div>
