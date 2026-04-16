@@ -1081,7 +1081,7 @@ export default function VirtualReality() {
   const hoveredData = hoveredPortal ? PORTALS.find(p => p.id === hoveredPortal) : null;
 
   return (
-    <div className="fixed inset-0 z-40" style={{ background: '#030308' }} data-testid="vr-page">
+    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: '#030308' }} data-testid="vr-page">
       {/* 3D Scene */}
       <div ref={mountRef} className="w-full h-full" data-testid="vr-canvas-container" />
 

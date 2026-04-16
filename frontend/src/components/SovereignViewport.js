@@ -33,7 +33,7 @@ export default function SovereignViewport({ bgImage, accentColor = '#6366F1', ch
         {bgImage && (
           <motion.div key={bgImage}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.55 }}
+            animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5 }}
             className="sovereign-bg-img"
