@@ -16,7 +16,8 @@
  * Room Transitions: Previous room folds, new room extrudes from the grid.
  */
 import React, { useEffect, useRef, useState, useCallback, createContext, useContext } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 const PHI = 1.618033988749895;
 const GRID_SIZE = 9;
@@ -168,24 +169,45 @@ function DepthParticles({ color, count = 16 }) {
  * ProximityItem — Wraps each child with scroll-based Z-reveal + proximity glow.
  * Items in the active octant PULSE with a glow border.
  * Items approaching the avatar EXTRUDE forward (translateZ toward user).
+ * 3-second hover in active octant = auto-extrude trigger.
  */
 export function ProximityItem({ index, children, totalItems, color }) {
   const spatial = useSpatial();
-  if (!spatial) return <div>{children}</div>;
+  const [autoTriggered, setAutoTriggered] = useState(false);
+  const triggerTimerRef = useRef(null);
+  const wasActiveRef = useRef(false);
 
-  const { scrollProgress, theme } = spatial;
+  const scrollProgress = spatial?.scrollProgress || 0;
+  const theme = spatial?.theme;
   const itemProgress = totalItems > 1 ? index / (totalItems - 1) : 0;
   const distance = Math.abs(scrollProgress - itemProgress);
   const itemColor = color || theme?.accent || '#A78BFA';
 
-  // Active octant = within 1/9th of total scroll
-  const isActive = distance < (1 / GRID_SIZE);
-  const isNear = distance < (2 / GRID_SIZE);
+  const isActive = spatial ? distance < (1 / GRID_SIZE) : false;
+  const isNear = spatial ? distance < (2 / GRID_SIZE) : false;
+
+  // 3-second auto-trigger: if item stays in active octant for 3s, auto-extrude
+  useEffect(() => {
+    if (isActive && !wasActiveRef.current) {
+      wasActiveRef.current = true;
+      triggerTimerRef.current = setTimeout(() => {
+        setAutoTriggered(true);
+        setTimeout(() => setAutoTriggered(false), 4000);
+      }, 3000);
+    } else if (!isActive && wasActiveRef.current) {
+      wasActiveRef.current = false;
+      clearTimeout(triggerTimerRef.current);
+      setAutoTriggered(false);
+    }
+    return () => clearTimeout(triggerTimerRef.current);
+  }, [isActive]);
+
+  if (!spatial) return <div>{children}</div>;
 
   // Proximity-based values
   const opacity = isActive ? 1 : isNear ? 0.8 : distance < 0.4 ? 0.55 : 0.3;
-  const scale = isActive ? 1.01 : isNear ? 0.99 : 0.97;
-  const translateZ = isActive ? 8 : isNear ? 0 : -15; // Active items push TOWARD user
+  const scale = autoTriggered ? 1.03 : isActive ? 1.01 : isNear ? 0.99 : 0.97;
+  const translateZ = autoTriggered ? 16 : isActive ? 8 : isNear ? 0 : -15;
 
   return (
     <div
@@ -193,14 +215,28 @@ export function ProximityItem({ index, children, totalItems, color }) {
         opacity,
         transform: `scale(${scale}) translateZ(${translateZ}px)`,
         transition: 'opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease',
-        borderLeft: isActive ? `2px solid ${itemColor}40` : '2px solid transparent',
-        boxShadow: isActive ? `0 0 20px ${itemColor}08, inset 0 0 12px ${itemColor}04` : 'none',
-        borderRadius: isActive ? '8px' : '0px',
-        paddingLeft: isActive ? '4px' : '0px',
+        borderLeft: autoTriggered ? `3px solid ${itemColor}60` : isActive ? `2px solid ${itemColor}40` : '2px solid transparent',
+        boxShadow: autoTriggered
+          ? `0 0 30px ${itemColor}15, inset 0 0 16px ${itemColor}06`
+          : isActive ? `0 0 20px ${itemColor}08, inset 0 0 12px ${itemColor}04` : 'none',
+        borderRadius: isActive || autoTriggered ? '8px' : '0px',
+        paddingLeft: isActive || autoTriggered ? '4px' : '0px',
       }}
-      data-proximity={isActive ? 'active' : isNear ? 'near' : 'far'}
+      data-proximity={autoTriggered ? 'triggered' : isActive ? 'active' : isNear ? 'near' : 'far'}
     >
       {children}
+      {/* Auto-trigger pulse indicator */}
+      {autoTriggered && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-1.5 py-1 px-3 mt-1"
+          style={{ color: itemColor }}
+        >
+          <Sparkles size={10} />
+          <span className="text-[9px] font-medium">Avatar proximity — exploring</span>
+        </motion.div>
+      )}
     </div>
   );
 }
