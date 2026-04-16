@@ -19,6 +19,8 @@ import React, { useEffect, useRef, useState, useCallback, createContext, useCont
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import Avatar3D from './Avatar3D';
+import SacredGeometryOverlay from './SacredGeometrySVG';
+import GhostTrails from './GhostTrails';
 import { PHI, PHI_INV, FIB_DEPTH_STEPS, phiExtrusion, getFibBreathPhase } from '../lib/SacredGeometry';
 
 const GRID_SIZE = 9;
@@ -413,6 +415,14 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           zIndex: 0,
         }} />
 
+        {/* V55.0 — Sacred Geometry Overlay (Sri Yantra + Metatron's Cube + Flower of Life) */}
+        <SacredGeometryOverlay
+          realm={theme.realm || 'SURFACE'}
+          accent={theme.accent}
+          scrollProgress={scrollProgress}
+          breathIntensity={breathPhase}
+        />
+
         {/* HOLLOW EARTH: Crystalline tunnel walls — tighter, more contained */}
         {isHollowEarth && (
           <>
@@ -479,6 +489,15 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
             roomName={theme.name}
           />
         )}
+
+        {/* V55.0 — Ghost Trails (Community Presence — visible after 30s stillness) */}
+        <GhostTrails
+          room={room}
+          stillnessTimer={stillnessTimer}
+          userId={typeof window !== 'undefined' ? window.__userId : undefined}
+          avatarColor={theme.accent}
+          gridPosition={spatialCtx.gridPosition}
+        />
 
         {/* Room header — name + realm indicator + avatar badge */}
         <motion.div

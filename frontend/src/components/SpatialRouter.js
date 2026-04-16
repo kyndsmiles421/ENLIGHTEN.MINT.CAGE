@@ -135,11 +135,26 @@ export default function SpatialRouter({ children }) {
     <AnimatePresence mode="wait">
       <motion.div
         key={currentPath}
-        initial={{ opacity: 0, scaleZ: 0.8 }}
-        animate={{ opacity: 1, scaleZ: 1 }}
-        exit={{ opacity: 0, scaleZ: 0 }}
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        style={{ transformStyle: 'preserve-3d' }}
+        initial={{
+          opacity: 0,
+          rotateY: transitioning ? 15 : 0,
+          scale: 0.92,
+          filter: 'blur(4px)',
+        }}
+        animate={{
+          opacity: 1,
+          rotateY: 0,
+          scale: 1,
+          filter: 'blur(0px)',
+        }}
+        exit={{
+          opacity: 0,
+          rotateY: -15,
+          scale: 0.92,
+          filter: 'blur(4px)',
+        }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        style={{ transformStyle: 'preserve-3d', perspective: '1200px' }}
       >
         <SpatialRoom room={roomKey}>
           {children}

@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Wand2, Save, Trash2, Play, ArrowLeft, Loader2, Wind } from 'lucide-react';
+import { Wand2, Save, Trash2, Play, ArrowLeft, Loader2, Wind, Flower2 } from 'lucide-react';
 import { Slider } from '../components/ui/slider';
 import { useAuth } from '../context/AuthContext';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
 import { ProximityItem } from '../components/SpatialRoom';
 import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
+import { FlowerOfLife } from '../components/SacredGeometrySVG';
+import { FIB_BREATH_CYCLE, FIB_BREATH_PHASES, FIB_BREATH_TOTAL, getFibBreathPhase } from '../lib/SacredGeometry';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -280,6 +282,136 @@ function BuildYourOwn({ onSelectPattern }) {
   );
 }
 
+// ═══ SACRED BREATH MODE — Fibonacci Flower of Life ═══
+function SacredBreath() {
+  const [active, setActive] = useState(false);
+  const [breathState, setBreathState] = useState({ phase: 'rest', intensity: 0, progress: 0 });
+  const [cycles, setCycles] = useState(0);
+  const startRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  const start = () => {
+    setActive(true);
+    setCycles(0);
+    startRef.current = Date.now();
+    intervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startRef.current;
+      const state = getFibBreathPhase(elapsed);
+      setBreathState(state);
+      // Count completed cycles
+      const cycleNum = Math.floor(elapsed / (FIB_BREATH_TOTAL * 1000));
+      setCycles(cycleNum);
+      if (typeof window.__workAccrue === 'function' && state.phase === 'rest' && state.progress < 0.1) {
+        window.__workAccrue('sacred_breathing', 10);
+      }
+    }, 80);
+  };
+
+  const stop = () => {
+    setActive(false);
+    clearInterval(intervalRef.current);
+    setBreathState({ phase: 'rest', intensity: 0, progress: 0 });
+  };
+
+  useEffect(() => () => clearInterval(intervalRef.current), []);
+
+  const phaseColors = {
+    'inhale': '#2DD4BF', 'hold': '#FCD34D', 'exhale': '#D8B4FE',
+    'deep-inhale': '#22C55E', 'rest': 'rgba(255,255,255,0.3)',
+  };
+  const currentColor = phaseColors[breathState.phase] || phaseColors.rest;
+
+  return (
+    <div className="text-center" data-testid="sacred-breath-mode">
+      <div className="mb-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#22C55E' }}>
+          Sacred Fibonacci Breath
+        </p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          Breathe with the Golden Ratio: 1, 1, 2, 3, 5 second phases
+        </p>
+      </div>
+
+      {/* Flower of Life visual guide */}
+      <div className="relative w-64 h-64 mx-auto mb-6 flex items-center justify-center">
+        <motion.div
+          animate={{ scale: 0.8 + breathState.intensity * 0.4 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          <FlowerOfLife
+            size={240}
+            color={currentColor}
+            opacity={active ? 0.3 + breathState.intensity * 0.4 : 0.1}
+            level={active ? Math.ceil(breathState.intensity * 3) + 1 : 1}
+            breathProgress={breathState.intensity}
+          />
+        </motion.div>
+
+        {/* Phase label in center */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <motion.span
+            key={breathState.phase}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-lg font-light capitalize"
+            style={{ color: currentColor, fontFamily: 'Cormorant Garamond, serif' }}
+          >
+            {active ? breathState.phase.replace('-', ' ') : 'Ready'}
+          </motion.span>
+          {active && (
+            <span className="text-[10px] font-mono mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {FIB_BREATH_CYCLE[breathState.index || 0]}s phase
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Fibonacci sequence visualization */}
+      <div className="flex items-center justify-center gap-1 mb-6">
+        {FIB_BREATH_CYCLE.map((dur, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-300"
+            style={{
+              width: 8 + dur * 5,
+              height: 8 + dur * 5,
+              background: active && breathState.index === i
+                ? `${phaseColors[FIB_BREATH_PHASES[i]] || '#2DD4BF'}40`
+                : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${active && breathState.index === i
+                ? phaseColors[FIB_BREATH_PHASES[i]] || '#2DD4BF'
+                : 'rgba(255,255,255,0.08)'}`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={active ? stop : start}
+          className="px-6 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2"
+          style={{
+            background: active ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
+            border: `1px solid ${active ? 'rgba(239,68,68,0.2)' : 'rgba(34,197,94,0.2)'}`,
+            color: active ? '#EF4444' : '#22C55E',
+          }}
+          data-testid="sacred-breath-toggle"
+        >
+          <Flower2 size={14} />
+          {active ? 'End Sacred Breath' : 'Begin Sacred Breath'}
+        </button>
+      </div>
+
+      {cycles > 0 && (
+        <p className="mt-4 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          {cycles} sacred cycle{cycles > 1 ? 's' : ''} completed ({cycles * 19}s total)
+        </p>
+      )}
+    </div>
+  );
+}
+
+
 export default function Breathing() {
   const [mode, setMode] = useState('presets');
   const [pattern, setPattern] = useState(PATTERNS[0]);
@@ -384,22 +516,27 @@ export default function Breathing() {
         <div className="flex gap-2 mb-8 flex-wrap" data-testid="breathing-mode-toggle">
           {[
             { id: 'presets', label: 'Breathing Patterns' },
+            { id: 'sacred', label: 'Sacred Breath' },
             { id: 'build', label: 'Build Your Own' },
           ].map(m => (
             <button key={m.id} onClick={() => { if (active) stop(); setMode(m.id); }}
               className="flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all"
               style={{
-                background: mode === m.id ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.02)',
-                color: mode === m.id ? '#2DD4BF' : 'var(--text-muted)',
-                border: `1px solid ${mode === m.id ? 'rgba(45,212,191,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                background: mode === m.id ? (m.id === 'sacred' ? 'rgba(34,197,94,0.12)' : 'rgba(45,212,191,0.12)') : 'rgba(255,255,255,0.02)',
+                color: mode === m.id ? (m.id === 'sacred' ? '#22C55E' : '#2DD4BF') : 'var(--text-muted)',
+                border: `1px solid ${mode === m.id ? (m.id === 'sacred' ? 'rgba(34,197,94,0.3)' : 'rgba(45,212,191,0.3)') : 'rgba(255,255,255,0.06)'}`,
               }}
               data-testid={`breathing-mode-${m.id}`}>
-              {m.id === 'build' && <Wand2 size={14} />} {m.label}
+              {m.id === 'build' && <Wand2 size={14} />}
+              {m.id === 'sacred' && <Flower2 size={14} />}
+              {m.label}
             </button>
           ))}
         </div>
 
-        {mode === 'build' ? (
+        {mode === 'sacred' ? (
+          <SacredBreath />
+        ) : mode === 'build' ? (
           <BuildYourOwn onSelectPattern={handleSelectFromBuild} />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
