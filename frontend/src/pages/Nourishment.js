@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import { Leaf } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
 import FeaturedVideos from '../components/FeaturedVideos';
-import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -17,7 +16,7 @@ export default function Nourishment() {
   }, []);
 
   return (
-    <SpatialRoom room="nourishment">
+    
       <InteractiveModule
         title="Sacred Nourishment"
         subtitle="Food for the Spirit"
@@ -34,6 +33,6 @@ export default function Nourishment() {
       >
         <FeaturedVideos category="nourishment" color="#22C55E" title="Mindful Eating Videos" />
       </InteractiveModule>
-    </SpatialRoom>
+    
   );
 }

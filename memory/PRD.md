@@ -1,35 +1,32 @@
-# ENLIGHTEN.MINT.CAFE — V54.3 REALM ELEVATION + CRYSTALLINE TUNNELS
+# ENLIGHTEN.MINT.CAFE — V54.4 GLOBAL SPATIAL ENGINE
 ## Last Verified: April 16, 2026
 
-### V54.3: Elevation Realms + Room Modes
-- **3 Elevation Realms**: HOLLOW_EARTH (Y:-1200), SURFACE (Y:0), AIR (Y:+1200)
-  - HOLLOW_EARTH: Crystalline tunnel walls (25% width), crystal vein lines, dense particles (24), heat haze blur
-  - SURFACE: Standard side wall gradients (16px)
-  - AIR: Open sky, no side walls, top radial glow
-- **Room Modes**:
-  - `rhythmic` (Breathing): Grid pulses with breath cycle — zDepth:-500 (shorter/contained)
-  - `stillness` (Meditation): zDepth:-1200 (full depth). Stillness timer tracks seconds without scroll. After 30s, hidden octants reveal (deeper content materializes)
-  - `standard`: Normal proximity reveal
-- **Realm assignments**: Crystals/Oracle/Frequencies/Elixirs/Sacred Texts → HOLLOW_EARTH. Breathing/Star Chart → AIR. Everything else → SURFACE.
-- **SpatialContext enhanced**: Now exposes `realm`, `stillnessTimer`, `hiddenRevealed`, `mode`
+### V54.4: SpatialRouter — ALL Pages Auto-Wrapped
+- **SpatialRouter.js**: Global wrapper that auto-applies SpatialRoom based on route
+  - 50+ route-to-room mappings defined
+  - Fold/extrude transition on route change (AnimatePresence + scaleZ)
+  - Excluded routes: /, /landing, /auth, /intro, /sovereign-hub
+- **ALL 160+ pages** now get SpatialRoom wrapping automatically
+- **Breathing Perspective Pulse**: In rhythmic mode, perspective oscillates 60%-100% of roomDepth via requestAnimationFrame sine wave (~4s breath cycle)
+- **Meditation Stillness Reward**: Timer tracks scroll inactivity. After 30s still at any coordinate, hidden octants materialize
 
-### 9x9 Grid Architecture (LOCKED)
+### 9x9 Grid Engine (LOCKED)
+- GRID_SIZE=9, TOTAL_NODES=81, ROOM_DEPTH=1200, OCTANT_DEPTH=133
+- 3 Realms: HOLLOW_EARTH (crystalline tunnels), SURFACE (standard), AIR (open sky)
+- Avatar Badge: [x,y] coordinate + 9-segment depth indicator + % mapped
+- Proximity reveal: Items materialize based on Z-distance from avatar
+- Breathing pulse: Perspective oscillates with inhale/exhale
+- Stillness reward: 30s without scroll → hidden content reveals
+
+### Architecture
 ```
-Elevation (Y-axis):
-  Y:+1200 → Air Temple (Breathing, Observatory)
-  Y:0     → Surface Realm (Kitchen, Garden, Studio)
-  Y:-1200 → Crystalline Depths (Crystals, Oracle, Frequencies)
-
-Depth (Z-axis per room):
-  Z:100   → Mixer HUD (static)
-  Z:0     → Room entrance
-  Z:-500  → Breath Chamber back wall (short room)
-  Z:-800  → Crystal Chamber back wall
-  Z:-1200 → Meditation Hall back wall (deepest room)
+SpatialRouter (global, in MixerProvider)
+  └── SpatialRoom (per-route, with realm/mode)
+       ├── DepthParticles (Z-space ambient)
+       ├── AvatarBadge (coordinate pointer)
+       ├── Realm Atmosphere (HOLLOW_EARTH walls / AIR glow / SURFACE standard)
+       └── Content (perspective + translateZ entry)
+            └── InteractiveModule (where applicable)
+                 └── ProximityItem (scroll-based Z-reveal)
+                      └── InteractiveItem (tap → expand → DeepDive → XP)
 ```
-
-### Upcoming
-- Wrap remaining pages in SpatialRoom (Breathing, Meditation, Yoga, Teachings, Encyclopedia, etc.)
-- Breathing grid pulse (perspective oscillates with inhale/exhale)
-- Room fold/extrude transitions between modules
-- Avatar visual presence in rooms

@@ -3,7 +3,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Gem } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
-import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,7 +17,7 @@ export default function Crystals() {
   const chakras = [...new Set(crystals.map(c => c.chakra).filter(Boolean))];
 
   return (
-    <SpatialRoom room="crystals">
+    
       <InteractiveModule
         title="Crystal Encyclopedia"
         subtitle="Sacred Crystals"
@@ -36,6 +35,6 @@ export default function Crystals() {
           return item.name?.toLowerCase().includes(s) || item.aka?.toLowerCase().includes(s) || item.chakra?.toLowerCase().includes(s);
         }}
       />
-    </SpatialRoom>
+    
   );
 }

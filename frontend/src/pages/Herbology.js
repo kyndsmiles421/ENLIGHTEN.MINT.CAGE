@@ -3,7 +3,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Leaf } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
-import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,7 +17,7 @@ export default function Herbology() {
   const allSystems = [...new Set(herbs.flatMap(h => h.systems || []))];
 
   return (
-    <SpatialRoom room="herbology">
+    
       <InteractiveModule
         title="The Healing Herb Garden"
         subtitle="Sacred Herbology"
@@ -36,6 +35,6 @@ export default function Herbology() {
           return item.name?.toLowerCase().includes(s) || item.latin?.toLowerCase().includes(s) || item.properties?.some(p => p.toLowerCase().includes(s));
         }}
       />
-    </SpatialRoom>
+    
   );
 }

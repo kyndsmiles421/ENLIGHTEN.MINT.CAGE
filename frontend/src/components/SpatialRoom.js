@@ -207,14 +207,31 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [stillnessTimer, setStillnessTimer] = useState(0);
   const [hiddenRevealed, setHiddenRevealed] = useState(false);
+  const [breathPhase, setBreathPhase] = useState(0); // 0-1 sine wave for breathing pulse
   const containerRef = useRef(null);
   const stillnessRef = useRef(null);
   const lastScrollRef = useRef(0);
+  const breathRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 50);
     return () => clearTimeout(t);
   }, []);
+
+  // Breathing perspective pulse — sine wave oscillation
+  useEffect(() => {
+    if (theme.mode !== 'rhythmic') return;
+    let frame = 0;
+    const animate = () => {
+      frame++;
+      // ~4 second breath cycle (inhale 2s, exhale 2s)
+      const phase = (Math.sin(frame * 0.026) + 1) / 2; // 0-1
+      setBreathPhase(phase);
+      breathRef.current = requestAnimationFrame(animate);
+    };
+    breathRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(breathRef.current);
+  }, [theme.mode]);
 
   // Map scroll to Z-axis progress
   useEffect(() => {
@@ -280,16 +297,22 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
     mode: theme.mode || 'standard',
   };
 
+  // Breathing rooms pulse perspective between zDepth and zDepth*0.6
+  const breathingPerspective = theme.mode === 'rhythmic'
+    ? roomDepth * (0.6 + breathPhase * 0.4)
+    : roomDepth;
+
   return (
     <SpatialContext.Provider value={spatialCtx}>
       <div
         ref={containerRef}
         className="relative min-h-screen"
         style={{
-          perspective: `${roomDepth}px`,
+          perspective: `${breathingPerspective}px`,
           perspectiveOrigin: '50% 40%',
           background: theme.floor,
           overflow: 'hidden',
+          transition: theme.mode === 'rhythmic' ? 'none' : 'perspective 0.5s',
         }}
         data-testid={`spatial-room-${room}`}
       >

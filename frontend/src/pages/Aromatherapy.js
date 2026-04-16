@@ -3,7 +3,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Droplets } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
-import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,7 +17,7 @@ export default function Aromatherapy() {
   const elements = [...new Set(oils.map(o => o.element).filter(Boolean))];
 
   return (
-    <SpatialRoom room="aromatherapy">
+    
       <InteractiveModule
         title="Sacred Aromatherapy"
         subtitle="Essential Oil Wisdom"
@@ -32,6 +31,6 @@ export default function Aromatherapy() {
         ]}
         filterFn={(item, filter) => item.element === filter}
       />
-    </SpatialRoom>
+    
   );
 }

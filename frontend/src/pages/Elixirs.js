@@ -3,7 +3,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Wine } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
-import SpatialRoom from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,7 +17,7 @@ export default function Elixirs() {
   const cats = [...new Set(elixirs.map(e => e.category).filter(Boolean))];
 
   return (
-    <SpatialRoom room="elixirs">
+    
       <InteractiveModule
         title="Sacred Elixirs"
         subtitle="Alchemical Recipes"
@@ -32,6 +31,6 @@ export default function Elixirs() {
         ]}
         filterFn={(item, filter) => item.category === filter}
       />
-    </SpatialRoom>
+    
   );
 }

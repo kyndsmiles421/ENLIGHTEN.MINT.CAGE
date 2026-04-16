@@ -17,6 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, ShoppingCart, Maximize2 } from 'lucide-react';
 
 import { ZDepthTransition } from './UnifiedFieldEngine';
+import SpatialRouter from './SpatialRouter';
 import { PILLARS, TOTAL, findModule, PHI, PHI_CUBED, DEFAULT_FILTERS, calculateDustAccrual, inverseMultiplier } from './ConsoleConstants';
 
 // Extracted console modules
@@ -274,9 +275,9 @@ export function MixerProvider({ children }) {
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'transparent', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} data-testid="sovereign-organism">
         {/* CONTENT */}
         <div style={{ flex: 1, overflow: 'auto', position: 'relative', WebkitOverflowScrolling: 'touch' }} data-testid="content-area">
-          <ZDepthTransition>
+          <SpatialRouter>
           {children}
-          </ZDepthTransition>
+          </SpatialRouter>
 
           {textOverlays.map(overlay => (
             <div key={overlay.id}
