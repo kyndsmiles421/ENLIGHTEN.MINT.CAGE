@@ -222,3 +222,49 @@ export function velocityIntegral(velocityHistory, dt = 1) {
     isStill: integral < 0.01 && velocityHistory.length >= 30,
   };
 }
+
+
+// ═══ FIBONACCI ESCROW ENGINE ═══
+/**
+ * Calculate φ-based escrow for volunteer compensation.
+ * Anchors the volunteer rate ($15-$18/hr) in mathematical fairness.
+ * Escrow = rate × φ% (1.618%)
+ * @param {number} hours - volunteer hours
+ * @param {number} rate - hourly rate (default: 15)
+ * @returns {{ gross: number, escrow: number, net: number, fans: number, credits: number }}
+ */
+export function fibonacciEscrow(hours, rate = 15) {
+  const gross = hours * rate;
+  const escrowRate = PHI / 100; // 1.618%
+  const escrow = gross * escrowRate;
+  const net = gross - escrow;
+  const fans = hours * 10; // 10 Fans/hr
+  const credits = hours * 5; // 5 Credits/hr
+  return { gross: Math.round(gross * 100) / 100, escrow: Math.round(escrow * 100) / 100, net: Math.round(net * 100) / 100, fans, credits };
+}
+
+// ═══ REALM TILE SCALING ═══
+/**
+ * Calculate Fibonacci-based scaling for realm tiles.
+ * Tiles scale by φ^(position mod 3 - 1) for natural visual rhythm.
+ * @param {number} index - tile index
+ * @returns {number} scale factor
+ */
+export function realmTileScale(index) {
+  return Math.pow(PHI, (index % 3) - 1);
+}
+
+// ═══ METATRON NODE DEPLOYMENT COST ═══
+/**
+ * Calculate the cost to deploy a Metatron's Cube node.
+ * Cost = base × Fib(nodeIndex) with φ-escrow.
+ * @param {number} nodeIndex - which node (0-12)
+ * @param {number} baseRate - base cost (default: 15)
+ * @returns {{ cost: number, escrow: number, total: number }}
+ */
+export function metatronNodeCost(nodeIndex, baseRate = 15) {
+  const fibMultiplier = FIB[Math.min(nodeIndex, FIB.length - 1)] || 1;
+  const cost = baseRate * Math.max(1, fibMultiplier);
+  const escrow = cost * (PHI / 100);
+  return { cost: Math.round(cost), escrow: Math.round(escrow * 100) / 100, total: Math.round(cost + escrow) };
+}

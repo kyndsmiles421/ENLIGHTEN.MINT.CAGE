@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "cafe.enlighten.mint",
+      "package_name": "com.enlighten.mint.cafe",
       "sha256_cert_fingerprints": [
-        "3E:3A:69:90:70:14:4B:6C:B9:11:23:AE:11:3C:4B:C7:6F:DF:0C:C5:E2:71:CF:36:B8:59:D2:3F:D7:85:77:E2"
+        "PLACEHOLDER:REPLACE_WITH_YOUR_KEYSTORE_SHA256_FINGERPRINT"
       ]
     }
   }

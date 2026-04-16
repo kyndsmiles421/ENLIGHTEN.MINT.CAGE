@@ -66,6 +66,18 @@ export default function CinematicWalkthrough({ onStart, onEnd }) {
   const timerRef = useRef(null);
   const scrollRef = useRef(null);
 
+  // Auto-trigger on first TWA launch (display-mode: fullscreen)
+  useEffect(() => {
+    const isFirstLaunch = !localStorage.getItem('emcafe_walkthrough_seen');
+    const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches ||
+                         window.matchMedia('(display-mode: standalone)').matches;
+    if (isFirstLaunch && isFullscreen && location.pathname === '/sovereign-hub') {
+      // Show picker automatically on first app launch
+      setTimeout(() => setShowPicker(true), 2000);
+      localStorage.setItem('emcafe_walkthrough_seen', '1');
+    }
+  }, [location.pathname]);
+
   // Auto-scroll simulation within each room
   const simulateScroll = useCallback((duration) => {
     const start = Date.now();
