@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.cosmiccollective.app',
-  appName: 'The ENLIGHTEN.MINT.CAFE',
+  appId: 'com.infinitysovereign.app',
+  appName: 'INFINITY SOVEREIGN',
   webDir: 'build',
   server: {
     androidScheme: 'https',

@@ -28,12 +28,14 @@ class SeparationProtocol {
     async executeLegacyFlush() {
         console.log("Flushing Legacy Loops... Purging Discord/App-Gate static.");
         
-        // Clearing cache to break 'Credential Fix' loops
+        // V68.1: Preserve auth tokens during flush
         if (typeof localStorage !== 'undefined') {
-            localStorage.clear();
-        }
-        if (typeof sessionStorage !== 'undefined') {
+            const token = localStorage.getItem('zen_token');
+            const user = localStorage.getItem('zen_user');
             sessionStorage.clear();
+            // Do NOT clear localStorage — auth must persist
+            if (token) localStorage.setItem('zen_token', token);
+            if (user) localStorage.setItem('zen_user', user);
         }
 
         return this.activateSovereignShield();

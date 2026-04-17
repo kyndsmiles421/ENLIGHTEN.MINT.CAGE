@@ -6,11 +6,12 @@
 
 // IMMEDIATE EXECUTION: Sovereign State Initialization
 (function initializeSovereignState() {
-  // 1. CLEAR PERSISTENT STORAGE (The "Ghost" Cache)
+  // V68.1: DO NOT clear localStorage — it destroys auth sessions
+  // Auth tokens and user data must persist across page loads
   try {
-    localStorage.clear();
+    // Only clear sessionStorage (temporary data), not localStorage (persistent auth)
     sessionStorage.clear();
-    console.log("[ROOT_ANCHOR] Storage cleared — Ghost cache purged.");
+    console.log("[ROOT_ANCHOR] Session storage cleared — auth preserved.");
   } catch (e) {
     console.warn("[ROOT_ANCHOR] Storage clear failed:", e);
   }

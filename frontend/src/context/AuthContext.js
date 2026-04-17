@@ -41,15 +41,22 @@ export function AuthProvider({ children }) {
           setUser(res.data);
           localStorage.setItem('zen_user', JSON.stringify(res.data));
         })
-        .catch(() => {
-          // On auth failure, fall back to guest mode instead of logging out
-          setUser({
-            id: 'guest',
-            name: 'Cosmic Traveler',
-            email: 'guest@enlightenment.cafe',
-            tier: 'free'
-          });
-          setToken('guest_token');
+        .catch((err) => {
+          // Only fall back to guest on actual auth rejection (401/403)
+          // Network errors or server issues should NOT wipe the session
+          const status = err?.response?.status;
+          if (status === 401 || status === 403) {
+            localStorage.removeItem('zen_token');
+            localStorage.removeItem('zen_user');
+            setUser({
+              id: 'guest',
+              name: 'Cosmic Traveler',
+              email: 'guest@enlightenment.cafe',
+              tier: 'free'
+            });
+            setToken('guest_token');
+          }
+          // For network errors, keep the cached user from localStorage
         })
         .finally(() => setLoading(false));
     } else {
