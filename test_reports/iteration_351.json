@@ -1,0 +1,49 @@
+{
+  "summary": "V64.1 Oracle Search UI & BackToHub Route Purge - All tests pass. Oracle Search component renders inline on SovereignHub with domain-grouped results, bridge indicators, and correct /workshop/{moduleId} routes. BackToHub Related dropdown uses new /workshop/ paths. Legacy redirects work correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v64_oracle_search.py",
+    "/app/test_reports/pytest/pytest_v64_oracle_search.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_v64_oracle_search.py"
+  ],
+  "success_rate": {
+    "backend": "100% (17/17 tests pass)",
+    "frontend": "100% (All features verified)"
+  },
+  "test_credentials": "Guest mode - no auth required for workshop/search endpoints",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "V64.1 Oracle Search & BackToHub verified: (1) Oracle Search UI renders inline on SovereignHub at /sovereign-hub with data-testid='oracle-search', (2) Search input accepts text and queries /api/workshop/search endpoint with 250ms debounce, (3) Search 'foundation' returns results grouped by 4 domains (Trade & Craft, Healing Arts, Sacred Knowledge, Exploration) with domain bridge bar showing counts, (4) '4 domains bridged' indicator appears when multiple domains hit, (5) Search 'pressure' returns Trade & Craft and Healing Arts results, (6) Search 'safety' returns Healing Arts and Trade & Craft bridged results, (7) Empty state shows for non-existent searches like 'xyznonexistent', (8) Clear button (X) clears search and results, (9) Clicking search result navigates to correct /workshop/{moduleId} route, (10) BackToHub Related dropdown on /workshop/masonry shows '/workshop/carpentry' not '/carpentry-workbench', (11) BackToHub Related dropdown on /workshop/electrical shows '/workshop/plumbing' and '/workshop/hvac', (12) Legacy redirect /masonry-workbench → /workshop/masonry works correctly, (13) All search results use NO modals - everything is inline as specified, (14) Backend /api/workshop/search returns results with id, title, domain, icon, accentColor, route, score, matchedTags fields, (15) Backend /api/workshop/registry returns 22+ modules across 6 domains.",
+  "features_verified": {
+    "oracle_search_renders": "PASS - OracleSearch component renders on SovereignHub",
+    "oracle_search_input": "PASS - Search input accepts text with data-testid='oracle-search-input'",
+    "search_foundation_multi_domain": "PASS - Returns Trade & Craft, Healing Arts, Sacred Knowledge, Exploration",
+    "search_pressure_domains": "PASS - Returns Trade & Craft and Healing Arts results",
+    "search_safety_bridging": "PASS - Returns Healing Arts and Trade & Craft bridged",
+    "domain_bridge_bar": "PASS - Shows domain indicators with counts and glow",
+    "domains_bridged_indicator": "PASS - Shows '4 domains bridged' when multiple domains hit",
+    "search_empty_state": "PASS - Shows empty state for 'xyznonexistent'",
+    "clear_button": "PASS - X button clears search and results",
+    "search_result_navigation": "PASS - Clicking result navigates to /workshop/{moduleId}",
+    "backtohub_masonry_related": "PASS - Shows Carpentry at /workshop/carpentry",
+    "backtohub_electrical_related": "PASS - Shows Plumbing at /workshop/plumbing, HVAC at /workshop/hvac",
+    "legacy_redirect_masonry": "PASS - /masonry-workbench redirects to /workshop/masonry",
+    "no_modals": "PASS - All expansion is inline, no fixed positioning or z-index overlays",
+    "backend_search_endpoint": "PASS - /api/workshop/search returns correct structure",
+    "backend_registry_endpoint": "PASS - /api/workshop/registry returns 22+ modules",
+    "backend_workshop_endpoints": "PASS - All workshop material/tool endpoints work"
+  }
+}

@@ -4,7 +4,7 @@
  * Broadcast + Sever + Discover integrated into pillars.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { ChevronDown, Share2, LogOut, LogIn } from 'lucide-react';
@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import Onboarding from '../components/Onboarding';
 import CinematicWalkthrough from '../components/CinematicWalkthrough';
 import DailyChallenges from '../components/DailyChallenges';
+import OracleSearch from '../components/OracleSearch';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -217,6 +218,7 @@ export default function SovereignHub() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [expanded, setExpanded] = useState(null);
+  const [glowDomains, setGlowDomains] = useState([]);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -225,6 +227,20 @@ export default function SovereignHub() {
   const togglePillar = (idx) => {
     setExpanded(prev => prev === idx ? null : idx);
   };
+
+  // Map backend domain names to pillar titles for glow bridging
+  const DOMAIN_TO_PILLAR = {
+    'Trade & Craft': 'Sovereign Council',
+    'Healing Arts': 'Nourish & Heal',
+    'Sacred Knowledge': 'Knowledge',
+    'Science & Physics': 'Cosmos & Physics',
+    'Mind & Spirit': 'Practice',
+    'Exploration': 'Knowledge',
+  };
+
+  const handleActiveDomains = useCallback((domains) => {
+    setGlowDomains(domains);
+  }, []);
 
   const handleBroadcast = async () => {
     const shareData = {
@@ -314,18 +330,26 @@ export default function SovereignHub() {
         <DailyChallenges compact />
       </div>
 
+      {/* V64.1 — Oracle: Intent-Based Neural Search */}
+      <div className="px-4 pb-4">
+        <OracleSearch onActiveDomains={handleActiveDomains} />
+      </div>
+
       {/* 7 Pillars — Accordion */}
       <div className="px-4 pb-20">
         {PILLARS.map((pillar, idx) => {
           const isOpen = expanded === idx;
+          // Oracle glow: pillar glows when its domain has search results
+          const isGlowing = glowDomains.some(d => DOMAIN_TO_PILLAR[d] === pillar.title);
           return (
             <div key={pillar.title} className="mb-2" data-testid={`pillar-${pillar.title.toLowerCase().replace(/[\s&]/g, '-')}`}>
               <button
                 onClick={() => togglePillar(idx)}
                 className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all active:scale-[0.98]"
                 style={{
-                  background: isOpen ? `${pillar.color}12` : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${isOpen ? `${pillar.color}30` : 'rgba(255,255,255,0.06)'}`,
+                  background: isOpen ? `${pillar.color}12` : isGlowing ? `${pillar.color}08` : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${isOpen ? `${pillar.color}30` : isGlowing ? `${pillar.color}20` : 'rgba(255,255,255,0.06)'}`,
+                  boxShadow: isGlowing && !isOpen ? `0 0 12px ${pillar.color}15, inset 0 0 8px ${pillar.color}08` : 'none',
                 }}
                 data-testid={`pillar-btn-${pillar.title.toLowerCase().replace(/[\s&]/g, '-')}`}
               >
