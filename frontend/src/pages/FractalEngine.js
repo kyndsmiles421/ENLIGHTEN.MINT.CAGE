@@ -1,6 +1,6 @@
 import React, { Suspense, useState, useMemo, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars, Text, Float, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Stars, Float, PerspectiveCamera, Html } from '@react-three/drei';
 
 // --- 1. THE SECURITY GATE: Authentication Logic ---
 // In your live system, 'user' will come from your Google Social Login provider

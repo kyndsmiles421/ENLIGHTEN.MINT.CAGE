@@ -139,38 +139,33 @@ function AvatarBadge({ scrollProgress, theme, nodesExplored, totalNodes }) {
  * Ambient depth particles — float in Z-space with visible presence
  */
 function DepthParticles({ color, count = 16 }) {
+  // Halve particle count on mobile for performance
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const actualCount = isMobile ? Math.min(count, 8) : count;
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
-      {Array.from({ length: count }).map((_, i) => {
-        const zLayer = (i / count) * GRID_SIZE;
-        const closeness = 1 - zLayer / GRID_SIZE;
-        const size = 3 + closeness * 6; // 3-9px — actually visible
-        const opacity = 0.15 + closeness * 0.35; // 0.15-0.50 — actually visible
-        const isLarge = i % 5 === 0; // Every 5th particle is a "mote"
+      {Array.from({ length: actualCount }).map((_, i) => {
+        const closeness = 1 - (i / actualCount);
+        const size = 3 + closeness * 4;
+        const opacity = 0.12 + closeness * 0.25;
         return (
           <motion.div
             key={i}
             className="absolute rounded-full"
             style={{
-              width: isLarge ? size * 2 : size,
-              height: isLarge ? size * 2 : size,
-              background: isLarge
-                ? `radial-gradient(circle, ${color}90, ${color}30, transparent)`
-                : color,
-              opacity: isLarge ? opacity * 0.6 : opacity,
+              width: size,
+              height: size,
+              background: color,
+              opacity,
               left: `${5 + Math.random() * 90}%`,
               top: `${5 + Math.random() * 90}%`,
-              filter: isLarge ? `blur(${1 + closeness * 2}px)` : 'none',
-              boxShadow: closeness > 0.6 ? `0 0 ${Math.round(closeness * 12)}px ${color}40` : 'none',
             }}
             animate={{
-              y: [0, -30 - Math.random() * 50, 0],
-              x: [0, (Math.random() - 0.5) * 30, 0],
-              opacity: [opacity * 0.4, opacity, opacity * 0.4],
-              scale: [0.7, 1.3, 0.7],
+              y: [0, -20 - Math.random() * 25, 0],
+              opacity: [opacity * 0.5, opacity, opacity * 0.5],
             }}
             transition={{
-              duration: 4 + Math.random() * 6,
+              duration: 5 + Math.random() * 5,
               repeat: Infinity,
               delay: Math.random() * 3,
               ease: 'easeInOut',
@@ -420,17 +415,6 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         }}
         data-testid={`spatial-room-${room}`}
       >
-        {/* V56.0 — Portal Entry Flash — brief accent burst when entering a room */}
-        <motion.div
-          initial={{ opacity: 0.7, scale: 1.5 }}
-          animate={{ opacity: 0, scale: 2.5 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${theme.accent}35, ${theme.accent}10, transparent 60%)`,
-            zIndex: 50,
-          }}
-        />
 
         {/* Floor plane */}
         <div className="absolute inset-0 pointer-events-none" style={{
@@ -438,8 +422,8 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           zIndex: 0,
         }} />
 
-        {/* V56.0 — Scene Environment Image — atmospheric room background */}
-        {theme.scene && (
+        {/* Scene Environment Image — desktop only for performance */}
+        {theme.scene && typeof window !== 'undefined' && window.innerWidth >= 768 && (
           <>
             <motion.div
               initial={{ opacity: 0, scale: 1.1 }}
@@ -483,55 +467,20 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           breathIntensity={breathPhase}
         />
 
-        {/* HOLLOW EARTH: Crystalline tunnel — dramatic cave walls with visible depth */}
+        {/* HOLLOW EARTH: Cave walls */}
         {isHollowEarth && (
           <>
-            {/* Left cave wall — thick, dark, dramatic */}
             <div className="absolute left-0 top-0 bottom-0 pointer-events-none" style={{
-              width: '30%',
-              background: `linear-gradient(90deg, ${theme.wall}FF, ${theme.wall}CC, ${theme.wall}60, transparent)`,
-              zIndex: 1,
+              width: '20%', background: `linear-gradient(90deg, ${theme.wall}EE, ${theme.wall}80, transparent)`, zIndex: 1,
             }} />
-            {/* Right cave wall */}
             <div className="absolute right-0 top-0 bottom-0 pointer-events-none" style={{
-              width: '30%',
-              background: `linear-gradient(-90deg, ${theme.wall}FF, ${theme.wall}CC, ${theme.wall}60, transparent)`,
-              zIndex: 1,
+              width: '20%', background: `linear-gradient(-90deg, ${theme.wall}EE, ${theme.wall}80, transparent)`, zIndex: 1,
             }} />
-            {/* Crystal vein lines on walls — brighter */}
-            {[10, 25, 40, 55, 70, 85].map((top, i) => (
-              <div key={`cl-${i}`} className="absolute pointer-events-none" style={{
-                top: `${top}%`, left: 0, right: 0, height: i % 2 === 0 ? 2 : 1,
-                background: `linear-gradient(90deg, ${theme.accent}60, ${theme.accent}20 10%, transparent 20%, transparent 80%, ${theme.accent}20 90%, ${theme.accent}60)`,
-                zIndex: 1,
-                boxShadow: `0 0 8px ${theme.accent}30`,
-              }} />
-            ))}
-            {/* Vertical crystal veins on walls */}
-            {[3, 8, 92, 97].map((left, i) => (
-              <div key={`cv-${i}`} className="absolute pointer-events-none" style={{
-                left: `${left}%`, top: 0, bottom: 0, width: 1,
-                background: `linear-gradient(180deg, transparent, ${theme.accent}30, ${theme.accent}15, ${theme.accent}30, transparent)`,
-                zIndex: 1,
-              }} />
-            ))}
-            {/* Atmospheric fog at bottom */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
-              height: '35%',
-              background: `linear-gradient(to top, ${theme.accent}18, ${theme.accent}08, transparent)`,
-              filter: 'blur(20px)',
-              zIndex: 1,
+              height: '25%', background: `linear-gradient(to top, ${theme.accent}10, transparent)`, zIndex: 1,
             }} />
-            {/* Top shadow — ceiling of the cave */}
             <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{
-              height: '15%',
-              background: `linear-gradient(to bottom, ${theme.wall}EE, ${theme.wall}80, transparent)`,
-              zIndex: 1,
-            }} />
-            {/* Ambient core glow from chamber center */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-              background: `radial-gradient(ellipse at 50% 60%, ${theme.accent}12, ${theme.accent}06, transparent 60%)`,
-              zIndex: 0,
+              height: '10%', background: `linear-gradient(to bottom, ${theme.wall}DD, transparent)`, zIndex: 1,
             }} />
           </>
         )}
@@ -616,9 +565,8 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
         >
           <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg"
             style={{
-              background: `${theme.accent}08`,
+              background: `${theme.accent}0C`,
               border: `1px solid ${theme.accent}15`,
-              backdropFilter: 'blur(8px)',
             }}>
             <span className="text-base">{theme.icon}</span>
             <div>
@@ -652,23 +600,13 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           </motion.div>
         )}
 
-        {/* Content — dramatic Z-depth entrance */}
+        {/* Content entrance */}
         <motion.div
-          initial={{
-            opacity: 0,
-            transform: `translateZ(${theme.zDepth * 0.15}px) rotateX(4deg) scale(0.92)`,
-            filter: 'blur(6px)',
-          }}
-          animate={{
-            opacity: entered ? 1 : 0,
-            transform: entered
-              ? 'translateZ(0px) rotateX(0deg) scale(1)'
-              : `translateZ(${theme.zDepth * 0.15}px) rotateX(4deg) scale(0.92)`,
-            filter: entered ? 'blur(0px)' : 'blur(6px)',
-          }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : 10 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
-          style={{ zIndex: 2, transformStyle: 'preserve-3d' }}
+          style={{ zIndex: 2 }}
         >
           {children}
         </motion.div>

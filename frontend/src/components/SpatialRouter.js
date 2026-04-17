@@ -242,33 +242,28 @@ export default function SpatialRouter({ children }) {
     return <>{children}</>;
   }
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={currentPath}
         initial={{
           opacity: 0,
-          rotateY: transitioning ? 20 : 5,
-          scale: 0.88,
-          z: -200,
-          filter: 'blur(8px) brightness(0.7)',
+          scale: isMobile ? 0.97 : 0.92,
+          y: isMobile ? 8 : 0,
         }}
         animate={{
           opacity: 1,
-          rotateY: 0,
           scale: 1,
-          z: 0,
-          filter: 'blur(0px) brightness(1)',
+          y: 0,
         }}
         exit={{
           opacity: 0,
-          rotateY: transitioning ? -20 : -5,
-          scale: 0.88,
-          z: -200,
-          filter: 'blur(8px) brightness(0.7)',
+          scale: isMobile ? 0.97 : 0.92,
+          y: isMobile ? -8 : 0,
         }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        style={{ transformStyle: 'preserve-3d', perspective: '1200px' }}
+        transition={{ duration: isMobile ? 0.25 : 0.35, ease: [0.16, 1, 0.3, 1] }}
       >
         <SpatialRoom room={roomKey}>
           {children}
