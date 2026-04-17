@@ -6,9 +6,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Share2, LogOut } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ChevronDown, Share2, LogOut, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
 import Onboarding from '../components/Onboarding';
 import CinematicWalkthrough from '../components/CinematicWalkthrough';
 import DailyChallenges from '../components/DailyChallenges';
@@ -94,6 +95,7 @@ const PILLARS = [
 
 export default function SovereignHub() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
@@ -151,23 +153,34 @@ export default function SovereignHub() {
         </h1>
       </div>
 
-      {/* Utility Row: Broadcast + Sever */}
+      {/* Utility Row: Sign In / Share / Sign Out */}
       <div className="flex justify-center gap-3 px-4 pb-6">
+        {!user ? (
+          <Link
+            to="/auth"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-all active:scale-95"
+            style={{ background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.25)', color: '#C084FC' }}
+            data-testid="hub-signin"
+          >
+            <LogIn size={14} /> Sign In
+          </Link>
+        ) : (
+          <button
+            onClick={handleSever}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs transition-all active:scale-95"
+            style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)', color: 'rgba(239,68,68,0.5)' }}
+            data-testid="hub-sever"
+          >
+            <LogOut size={12} /> Sign Out
+          </button>
+        )}
         <button
           onClick={handleBroadcast}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs transition-all active:scale-95"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
-          data-testid="hub-broadcast"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-all active:scale-95"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)' }}
+          data-testid="hub-share"
         >
-          <Share2 size={12} /> Broadcast
-        </button>
-        <button
-          onClick={handleSever}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs transition-all active:scale-95"
-          style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)', color: 'rgba(239,68,68,0.5)' }}
-          data-testid="hub-sever"
-        >
-          <LogOut size={12} /> Sever
+          <Share2 size={14} /> Share
         </button>
       </div>
 
