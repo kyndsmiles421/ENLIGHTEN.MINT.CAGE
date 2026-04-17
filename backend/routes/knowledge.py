@@ -24,17 +24,29 @@ KNOWLEDGE_PROMPTS = {
 }
 
 @router.post("/knowledge/deep-dive")
-async def knowledge_deep_dive(req: KnowledgeRequest):
+async def knowledge_deep_dive(req: KnowledgeRequest, user=Depends(get_current_user_optional)):
     if not req.topic or len(req.topic.strip()) < 2:
         raise HTTPException(status_code=400, detail="Topic too short")
 
-    # Check MongoDB cache first
-    cached = await db.knowledge_cache.find_one(
-        {"topic": req.topic, "category": req.category}, {"_id": 0}
-    )
-    if cached:
-        return cached
+    uid = user["id"] if user else "anon"
+    fresh = req.context and "fresh" in req.context.lower() if req.context else False
 
+    # Track what the user has already seen for this topic
+    seen_count = await db.knowledge_views.count_documents({"user_id": uid, "topic": req.topic})
+
+    # If user hasn't seen it and we have a cache, serve it
+    if seen_count == 0 and not fresh:
+        cached = await db.knowledge_cache.find_one(
+            {"topic": req.topic, "category": req.category}, {"_id": 0}
+        )
+        if cached:
+            await db.knowledge_views.insert_one({
+                "user_id": uid, "topic": req.topic, "category": req.category,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            })
+            return cached
+
+    # User has seen this before — generate fresh perspective
     category = req.category if req.category in KNOWLEDGE_PROMPTS else "general"
     prompt_template = KNOWLEDGE_PROMPTS[category]
     prompt = prompt_template.replace("{topic}", req.topic)
@@ -43,14 +55,27 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
     else:
         prompt = prompt.replace("{context}", "")
 
-    # Retry up to 2 times on transient failures, with strict timeout
+    # Add adaptive perspective rotation based on view count
+    perspectives = [
+        "Focus on practical application and hands-on exercises the reader can do right now.",
+        "Explore the historical and cross-cultural connections — how does this appear in different traditions?",
+        "Go deep into the science — what does modern research say about this practice?",
+        "Tell a story — use narrative and metaphor to make this teaching come alive.",
+        "Focus on common mistakes and misconceptions. What do most people get wrong?",
+        "Connect this to daily life — morning routines, work, relationships, sleep.",
+        "Explore the esoteric and mystical dimensions that most guides skip.",
+        "Frame this as a progressive journey — beginner to advanced stages of mastery.",
+    ]
+    perspective = perspectives[seen_count % len(perspectives)]
+    prompt += f"\n\nIMPORTANT: {perspective} This is visit #{seen_count + 1} for this user — they already know the basics. Go deeper, offer something new."
+
     last_error = None
     for attempt in range(2):
         try:
             chat = LlmChat(
                 api_key=EMERGENT_LLM_KEY,
                 session_id=f"knowledge-{str(uuid.uuid4())}",
-                system_message="You are a deeply knowledgeable spiritual teacher and wellness expert. Provide thorough, well-structured guides with markdown formatting.",
+                system_message="You are a deeply knowledgeable spiritual teacher and wellness expert. Provide thorough, well-structured guides with markdown formatting. Never repeat what the user already knows — always go deeper.",
             )
             chat.with_model("openai", "gpt-5.2")
             msg = UserMessage(text=prompt)
@@ -61,9 +86,20 @@ async def knowledge_deep_dive(req: KnowledgeRequest):
                 "category": req.category,
                 "content": response,
                 "generated_at": datetime.now(timezone.utc).isoformat(),
+                "perspective": perspective,
+                "visit_number": seen_count + 1,
             }
 
-            await db.knowledge_cache.insert_one({**result})
+            # Store for this user's history
+            await db.knowledge_views.insert_one({
+                "user_id": uid, "topic": req.topic, "category": req.category,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            })
+
+            # Cache for first-time viewers
+            if seen_count == 0:
+                await db.knowledge_cache.insert_one({**result})
+
             return result
 
         except asyncio.TimeoutError:
