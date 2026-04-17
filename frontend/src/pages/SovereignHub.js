@@ -11,7 +11,6 @@ import { ChevronDown, Share2, LogOut, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import Onboarding from '../components/Onboarding';
-import CinematicWalkthrough from '../components/CinematicWalkthrough';
 import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
 
@@ -318,11 +317,6 @@ export default function SovereignHub() {
         >
           <Share2 size={14} /> Share
         </button>
-      </div>
-
-      {/* Cinematic Walkthrough */}
-      <div className="flex justify-center px-4 pb-4">
-        <CinematicWalkthrough />
       </div>
 
       {/* V56.1 — Daily Elemental Challenges */}
