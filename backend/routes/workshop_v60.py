@@ -1710,6 +1710,211 @@ MACHINING_TOOLS = [
     {"id": "workholding", "name": "Workholding Setup", "action_verb": "Fixture", "description": "Securing the workpiece for repeatable, rigid machining", "technique": "Support near the cut. Clamp against a solid surface. Over-clamping distorts thin parts. Under-clamping = flying parts. The fixture is 50% of the machining problem.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "F"},
 ]
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V65.0 PARITY PUSH — Expand 5 modules from 3 → 6 materials
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ── MACHINING +3 ──
+MACHINING_MATERIALS.extend([
+    {"id": "surface_grinding", "name": "Surface Grinding", "color": "#EF4444", "category": "Finishing",
+     "origin": "Abrasive machining — achieving mirror finishes and sub-micron flatness with a spinning wheel",
+     "components": ["Grinding wheel (Al₂O₃/CBN)", "Magnetic chuck", "Dresser", "Coolant flood", "Spark-out pass"],
+     "system": "Abrasive material removal", "uses": "Gauge blocks, die plates, seal surfaces, heat-treated parts, tooling",
+     "dive_layers": [
+         {"depth": 0, "label": "The Setup", "desc": "Part on magnetic chuck, wheel dressed true, coolant flooding. Surface grinding is the slowest and most precise metal removal process"},
+         {"depth": 1, "label": "Wheel Selection", "desc": "Grain (Al₂O₃ for steel, SiC for cast iron, CBN for hardened), bond (vitrified/resinoid), structure (open/dense). The wheel IS the cutting tool"},
+         {"depth": 2, "label": "Spark-Out", "desc": "Final passes with zero down-feed — the wheel continues cutting as the machine relaxes elastic deflection. Where flatness is born"},
+         {"depth": 3, "label": "Thermal Damage", "desc": "Grinding burn: surface rehardening or tempering from friction heat. Blue discoloration = ruined part. Nital etch reveals subsurface damage"},
+         {"depth": 4, "label": "Abrasive Mechanics", "desc": "Each grain is a negative-rake cutting tool. Specific grinding energy: 10-50 J/mm³ — 10x higher than turning because of rubbing and plowing"},
+         {"depth": 5, "label": "Crystal Fracture", "desc": "Self-sharpening: vitrified bond fractures to expose new grain edges. The wheel renews itself at the atomic level during cutting"},
+     ]},
+    {"id": "edm", "name": "EDM (Electric Discharge)", "color": "#FBBF24", "category": "Non-Traditional",
+     "origin": "Spark erosion — removing metal without mechanical contact using controlled electrical discharge",
+     "components": ["Electrode (graphite/copper)", "Dielectric fluid", "Spark gap", "Servo feed", "Flushing system"],
+     "system": "Electrothermal material removal", "uses": "Injection molds, aerospace turbine blades, medical implants, hardened dies",
+     "dive_layers": [
+         {"depth": 0, "label": "The Machine", "desc": "Sinker or wire EDM. The electrode never touches the work. Material is removed spark by spark, each one a tiny lightning bolt"},
+         {"depth": 1, "label": "Spark Gap", "desc": "0.001-0.002 inch gap maintained by servo. Dielectric (kerosene or deionized water) insulates until voltage breaks through — then: discharge"},
+         {"depth": 2, "label": "Crater Formation", "desc": "Each spark melts and vaporizes a 10-50 micron crater. 10,000 sparks per second. The surface is a moonscape of overlapping craters"},
+         {"depth": 3, "label": "Recast Layer", "desc": "Rapidly solidified material on the crater rim: amorphous, brittle, tensile-stressed. Must be removed for fatigue-critical parts"},
+         {"depth": 4, "label": "Plasma Channel", "desc": "10,000-20,000°C plasma column lasting microseconds. Thermal conductivity of dielectric determines how fast the crater quenches"},
+         {"depth": 5, "label": "Quantum Tunneling Ignition", "desc": "Spark initiation: electron field emission across the gap (Fowler-Nordheim tunneling) creates the first conductive bridge through the dielectric"},
+     ]},
+    {"id": "threading", "name": "Thread Cutting", "color": "#A78BFA", "category": "Precision",
+     "origin": "Creating helical grooves — the universal mechanical fastening system since Archimedes",
+     "components": ["Thread form (60° UNC/UNF)", "Lead screw synchronization", "Thread gauge", "Single-point tool", "Pitch diameter"],
+     "system": "Helical geometry generation", "uses": "Fastener production, lead screws, pipe threads, ball screws, worm gears",
+     "dive_layers": [
+         {"depth": 0, "label": "The Cut", "desc": "Lathe synchronized: spindle rotation locked to carriage feed via lead screw. One revolution = one pitch advanced. The helix writes itself"},
+         {"depth": 1, "label": "Thread Geometry", "desc": "Major diameter, minor diameter, pitch diameter — the pitch diameter is the functional size. Thread gauges check this invisible cylinder"},
+         {"depth": 2, "label": "Multi-Pass Strategy", "desc": "29.5° infeed (modified flank) or radial infeed. 6-12 spring passes. Depth per pass decreases as thread deepens to manage chip load"},
+         {"depth": 3, "label": "Thread Fit Classes", "desc": "Class 1 (loose), Class 2 (general), Class 3 (precision). Tolerance bands measured in 0.0001 inch on pitch diameter. Fit is function"},
+         {"depth": 4, "label": "Helix Mechanics", "desc": "Mechanical advantage = pitch / (π × mean diameter). A 1/4-20 bolt multiplies torque 28x. The inclined plane wrapped around a cylinder"},
+         {"depth": 5, "label": "Friction & Preload", "desc": "Bolt preload creates clamping force via elastic stretch. 90% of torque is lost to friction. The coefficient of friction between threads determines everything"},
+     ]},
+])
+
+# ── ANATOMY +3 ──
+ANATOMY_MATERIALS.extend([
+    {"id": "endocrine", "name": "Endocrine System", "color": "#F59E0B", "category": "Chemical Signaling",
+     "origin": "The body's chemical messenger network — glands secreting hormones that regulate every physiological process",
+     "components": ["Hypothalamus", "Pituitary", "Thyroid", "Adrenals", "Pancreatic islets"],
+     "system": "Neuroendocrine axis", "uses": "Metabolic regulation, growth, stress response, reproduction, homeostasis",
+     "dive_layers": [
+         {"depth": 0, "label": "Gland Network", "desc": "Endocrine glands release hormones directly into blood — no ducts. The hypothalamus is the master regulator, governing the pituitary below it"},
+         {"depth": 1, "label": "Feedback Loops", "desc": "Negative feedback: high thyroid hormone (T4) suppresses TSH. The thermostat principle applied to biochemistry. Disruption = disease"},
+         {"depth": 2, "label": "Hormone Classes", "desc": "Peptides (insulin: fast, water-soluble), steroids (cortisol: slow, lipid-soluble), amines (epinephrine: rapid). Structure determines speed and mechanism"},
+         {"depth": 3, "label": "Receptor Binding", "desc": "Peptides bind surface receptors → second messenger cascade (cAMP). Steroids enter the cell → bind nuclear receptors → alter gene transcription directly"},
+         {"depth": 4, "label": "HPA Axis", "desc": "Hypothalamus → CRH → Pituitary → ACTH → Adrenal cortex → Cortisol. The stress response cascade that can save your life or destroy your health"},
+         {"depth": 5, "label": "Molecular Signaling", "desc": "G-protein coupled receptors: ligand binding → conformational change → GDP/GTP exchange → adenylyl cyclase activation. Signal amplification: 1 hormone molecule activates 10,000 enzyme molecules"},
+     ]},
+    {"id": "lymphatic", "name": "Lymphatic System", "color": "#22C55E", "category": "Immune Defense",
+     "origin": "The body's drainage and defense network — one-way fluid recovery system and immune surveillance highway",
+     "components": ["Lymph nodes", "Thoracic duct", "Spleen", "Thymus", "MALT (mucosal tissue)"],
+     "system": "Immune-Fluid axis", "uses": "Infection defense, fluid balance, fat absorption, cancer metastasis surveillance",
+     "dive_layers": [
+         {"depth": 0, "label": "Lymph Network", "desc": "3 liters of fluid leak from capillaries daily. Without lymphatic return, tissues would swell fatally in hours. The forgotten circulatory system"},
+         {"depth": 1, "label": "Node Architecture", "desc": "600+ lymph nodes: cortex (B-cells), paracortex (T-cells), medulla (macrophages). Each node filters lymph and mounts immune responses"},
+         {"depth": 2, "label": "Immune Surveillance", "desc": "Dendritic cells carry antigens from tissue to lymph node → present to naive T-cells → clonal expansion. The adaptive immune response is born here"},
+         {"depth": 3, "label": "Lymphocyte Activation", "desc": "Antigen presentation via MHC-I (CD8 T-cells) or MHC-II (CD4 T-cells). Two-signal requirement prevents autoimmunity: antigen + co-stimulation"},
+         {"depth": 4, "label": "Cytokine Networks", "desc": "IL-2 (T-cell growth), IFN-γ (macrophage activation), TNF-α (inflammation). Cytokine storms: when the immune system's volume knob breaks off"},
+         {"depth": 5, "label": "Clonal Selection", "desc": "Burnet's theory: 10¹¹ unique lymphocyte clones, each with a randomly generated receptor. Antigen selects the matching clone for expansion. Evolution in miniature, happening inside you right now"},
+     ]},
+    {"id": "integumentary", "name": "Integumentary (Skin)", "color": "#EC4899", "category": "Barrier System",
+     "origin": "The body's largest organ — 22 square feet of living armor that senses, protects, and thermoregulates",
+     "components": ["Epidermis", "Dermis", "Hypodermis", "Melanocytes", "Sensory receptors"],
+     "system": "Barrier-Sensory axis", "uses": "Protection, thermoregulation, sensation, vitamin D synthesis, immune defense",
+     "dive_layers": [
+         {"depth": 0, "label": "Skin Surface", "desc": "Stratum corneum: 15-20 layers of dead, keratin-packed cells. You shed 30,000-40,000 of these cells every hour. Your outer shell is a graveyard"},
+         {"depth": 1, "label": "Epidermal Layers", "desc": "Basale → spinosum → granulosum → lucidum → corneum. A 28-day conveyor belt from living stem cell to dead armor plate"},
+         {"depth": 2, "label": "Melanin Shield", "desc": "Melanocytes transfer melanosomes to keratinocytes via dendrites. UVB → DNA thymine dimers → melanin absorbs future UV. Tan is a scar response"},
+         {"depth": 3, "label": "Dermal Matrix", "desc": "Collagen Type I (80%) + elastin (2%) in a ground substance of glycosaminoglycans. The dermis gives skin its tensile strength and elasticity"},
+         {"depth": 4, "label": "Sensory Transduction", "desc": "Merkel cells (pressure), Meissner (light touch), Pacinian (vibration), Ruffini (stretch). Each converts mechanical energy to action potentials"},
+         {"depth": 5, "label": "Mechanotransduction", "desc": "Piezo1/Piezo2 ion channels: mechanical force opens the channel → Ca²⁺ influx → depolarization. Touch becomes electricity at the molecular gate"},
+     ]},
+])
+
+# ── PEDAGOGY +3 ──
+PEDAGOGY_MATERIALS.extend([
+    {"id": "curriculum_mapping", "name": "Curriculum Mapping", "color": "#F59E0B", "category": "Design",
+     "origin": "Backward design architecture — building the learning map before writing a single lesson",
+     "components": ["Standards alignment", "Scope & sequence", "Vertical articulation", "Horizontal integration", "Assessment mapping"],
+     "system": "Instructional design axis", "uses": "Course development, program coherence, accreditation, gap analysis",
+     "dive_layers": [
+         {"depth": 0, "label": "The Map", "desc": "What students should know (standards), when they learn it (sequence), and how we verify (assessments). The blueprint before the building"},
+         {"depth": 1, "label": "Backward Design", "desc": "Wiggins & McTighe: Start with the assessment. What evidence of understanding do you need? Then design the learning experience to produce that evidence"},
+         {"depth": 2, "label": "Spiral Curriculum", "desc": "Bruner: Revisit core concepts at increasing complexity. Fractions in 3rd grade become ratios in 6th and proportional reasoning in 9th. The helix of mastery"},
+         {"depth": 3, "label": "Cognitive Load Theory", "desc": "Sweller: Working memory holds 4±1 chunks. Intrinsic load (content complexity) + extraneous load (poor design) must not exceed capacity. Design for the bottleneck"},
+         {"depth": 4, "label": "Transfer Theory", "desc": "Near transfer (similar context) is easy. Far transfer (novel context) is the holy grail. Teach for transfer by varying practice contexts and requiring abstraction"},
+         {"depth": 5, "label": "Schema Construction", "desc": "Expert knowledge is organized in hierarchical schemas that chunk information. Novices see details; experts see patterns. Curriculum builds schemas deliberately"},
+     ]},
+    {"id": "differentiation", "name": "Differentiated Instruction", "color": "#22C55E", "category": "Adaptive",
+     "origin": "Teaching the same standard through multiple pathways — because 30 students means 30 different brains",
+     "components": ["Readiness tiers", "Learning profiles", "Interest grouping", "Flexible pacing", "Formative assessment loops"],
+     "system": "Adaptive instruction axis", "uses": "Inclusive classrooms, gifted education, special education, multilingual learners",
+     "dive_layers": [
+         {"depth": 0, "label": "The Classroom", "desc": "Same learning goal, multiple pathways. Tier 1 (approaching), Tier 2 (meeting), Tier 3 (exceeding). The ceiling is removed, the floor is supported"},
+         {"depth": 1, "label": "Content-Process-Product", "desc": "Differentiate WHAT students learn (content), HOW they process it (activities), or WHAT they produce (assessment). Tomlinson's three levers"},
+         {"depth": 2, "label": "Formative Assessment", "desc": "Exit tickets, think-pair-share, whiteboards. The 3-minute check that tells you who needs reteaching BEFORE the test. Assessment AS learning, not OF learning"},
+         {"depth": 3, "label": "Zone of Proximal Development", "desc": "Vygotsky: The sweet spot between 'I can do this alone' and 'I can't do this at all.' Scaffolding provides temporary support in this zone"},
+         {"depth": 4, "label": "Neuroplasticity in Learning", "desc": "Repeated retrieval strengthens synaptic connections (Hebb's Law). Spaced practice > massed practice. Interleaving > blocking. The brain learns by struggling, not by ease"},
+         {"depth": 5, "label": "Universal Design for Learning", "desc": "CAST framework: Multiple means of engagement (WHY), representation (WHAT), action/expression (HOW). Designing for the margins benefits the center. Variability is the norm, not the exception"},
+     ]},
+    {"id": "behavioral_psych", "name": "Behavioral Psychology", "color": "#EF4444", "category": "Motivation",
+     "origin": "The science of why students do what they do — from Pavlov's bell to self-determination theory",
+     "components": ["Classical conditioning", "Operant conditioning", "Self-determination theory", "Growth mindset", "Intrinsic motivation"],
+     "system": "Behavioral-Motivational axis", "uses": "Classroom management, habit formation, motivation design, behavior intervention",
+     "dive_layers": [
+         {"depth": 0, "label": "Observable Behavior", "desc": "Stimulus → Response. The behaviorist sees what the student DOES, not what they think. Measurable, observable, modifiable"},
+         {"depth": 1, "label": "Reinforcement Schedules", "desc": "Variable ratio (gambling, most addictive), fixed interval (paycheck), variable interval (pop quizzes). The schedule determines persistence of behavior"},
+         {"depth": 2, "label": "Self-Determination", "desc": "Deci & Ryan: Autonomy (I choose), Competence (I can), Relatedness (I belong). Satisfy all three and intrinsic motivation ignites. Deprive one and it dies"},
+         {"depth": 3, "label": "Growth Mindset", "desc": "Dweck: 'I can't do this YET.' Neural pathways strengthen with effort. Praising effort over ability increases persistence. Fixed mindset is a self-fulfilling prophecy"},
+         {"depth": 4, "label": "Extinction Burst", "desc": "Remove a reinforcer and the behavior temporarily INCREASES before decreasing. The tantrum gets worse before it stops. Understanding this prevents giving in at the worst moment"},
+         {"depth": 5, "label": "Dopamine Prediction Error", "desc": "Schultz: Dopamine fires not for reward, but for UNEXPECTED reward. Predicted rewards produce no dopamine signal. The brain learns from surprise, not from satisfaction"},
+     ]},
+])
+
+# ── WELDING +3 ──
+WELDING_MATERIALS.extend([
+    {"id": "flux_core", "name": "Flux-Core Arc", "color": "#F97316", "gauge": "0.045 wire", "tensile_mpa": 480,
+     "origin": "Self-shielded or dual-shield wire welding — structural steel fabrication without external gas bottles",
+     "composition": ["Steel sheath (outer)", "Flux core (rutile/fluoride)", "Deoxidizers", "Alloying elements", "Gas-forming compounds"],
+     "crystal_structure": "Tubular wire with mineral core", "uses": "Structural steel, shipbuilding, bridge fabrication, field welding in wind",
+     "dive_layers": [
+         {"depth": 0, "label": "Wire Feed", "desc": "Looks like MIG but the wire is hollow — flux inside creates its own shielding gas and slag. Drag technique, not push. Deeper penetration than solid wire"},
+         {"depth": 1, "label": "Self-Shielding", "desc": "Inner flux decomposes at arc temperature: CaCO₃ → CaO + CO₂. The CO₂ displaces atmospheric nitrogen. No gas bottle needed — works in 35 mph wind"},
+         {"depth": 2, "label": "Slag System", "desc": "Molten flux floats on top of the weld pool, protecting it during solidification. Basic flux: CaF₂ + CaCO₃ + TiO₂. Rutile flux: higher deposition, less impact toughness"},
+         {"depth": 3, "label": "Hydrogen Control", "desc": "Moisture in flux = hydrogen in weld = delayed cracking. Store wire in heated cabinets. H4 designation means <4 mL H₂ per 100g of deposited metal"},
+         {"depth": 4, "label": "Transfer Modes", "desc": "Globular transfer at low voltage, spray above threshold. Dual-shield (E71T-1) achieves spray arc with CO₂/Ar mix. Transfer mode determines spatter and penetration"},
+         {"depth": 5, "label": "Thermodynamic Shielding", "desc": "Flux decomposition is endothermic — it cools the arc periphery, constricting the plasma column. Hotter, narrower arc = deeper penetration. Chemistry shapes the physics"},
+     ]},
+    {"id": "plasma_cutting", "name": "Plasma Cutting", "color": "#60A5FA", "gauge": "Up to 1.5 inch", "tensile_mpa": 0,
+     "origin": "Ionized gas cutting — a 40,000°F plasma jet that melts and blows metal away at sonic velocity",
+     "composition": ["Tungsten electrode (cathode)", "Copper nozzle (constricts arc)", "Plasma gas (air/N₂/O₂)", "Shield gas (CO₂/N₂)", "Swirl ring"],
+     "crystal_structure": "Plasma (4th state of matter)", "uses": "Steel/aluminum plate cutting, CNC profiling, gouging, demolition, art fabrication",
+     "dive_layers": [
+         {"depth": 0, "label": "The Cut", "desc": "Pilot arc ionizes the gas → transferred arc to workpiece → 40,000°F plasma jet melts metal → high-velocity gas blows molten metal away. 200 inches/minute on thin plate"},
+         {"depth": 1, "label": "Arc Constriction", "desc": "Copper nozzle orifice squeezes the arc from 3/8 inch to 0.040 inch diameter. Energy density increases 100x. Same power, smaller target = hotter"},
+         {"depth": 2, "label": "Dross Formation", "desc": "Low-speed dross: re-solidified metal on bottom edge (too slow). High-speed dross: uncut material (too fast). Perfect speed = clean edge, no dross"},
+         {"depth": 3, "label": "Gas Selection", "desc": "Air: cheapest (mild steel). O₂: exothermic reaction on steel (fastest). N₂: non-reactive (stainless/aluminum). H₂/N₂ mix: best quality on stainless"},
+         {"depth": 4, "label": "Ionization Energy", "desc": "First ionization of nitrogen: 14.5 eV. The nozzle voltage must overcome this threshold. Once ionized, the gas conducts — plasma is the 4th state of matter"},
+         {"depth": 5, "label": "Magneto-Hydrodynamics", "desc": "Lorentz force (J × B) constricts the plasma column (pinch effect). Self-magnetic field from 200A current squeezes the arc. The plasma confines itself"},
+     ]},
+    {"id": "underwater", "name": "Underwater/Hyperbaric", "color": "#2DD4BF", "gauge": "Depth-rated", "tensile_mpa": 460,
+     "origin": "Welding at depth — where water pressure, limited visibility, and hydrogen embrittlement make every joint a survival challenge",
+     "composition": ["Waterproof electrode coating", "Bubble-forming flux", "Diving gas (HeO₂)", "Hyperbaric chamber", "Sacrificial anodes"],
+     "crystal_structure": "Wet/Dry weld microstructure depends on pressure", "uses": "Pipeline repair, offshore rigs, ship hull repair, dam gates, submarine maintenance",
+     "dive_layers": [
+         {"depth": 0, "label": "Wet Welding", "desc": "Stick welding directly in water. The flux coating creates a gas bubble around the arc. Visibility: 6 inches. Current: 20% higher than dry. The most hostile welding environment on Earth"},
+         {"depth": 1, "label": "Dry Habitat", "desc": "Hyperbaric chamber clamped to structure, water pumped out. Divers weld in a gas environment at ambient pressure. Better quality but 10x the cost of wet welding"},
+         {"depth": 2, "label": "Hydrogen Challenge", "desc": "Water dissociates at arc temperature: H₂O → H₂ + O. Atomic hydrogen dissolves in steel, causes porosity, cold cracking. The #1 enemy of underwater welds"},
+         {"depth": 3, "label": "Pressure Effects", "desc": "At depth, increased gas density stabilizes the arc but raises arc voltage. 10 meters = 1 additional atmosphere. Weld cooling rate increases dramatically in water"},
+         {"depth": 4, "label": "Rapid Quenching", "desc": "Water cooling rate: 100-500°C/second vs 10-50°C/second in air. Martensite forms in HAZ even on mild steel. Pre-heat is impossible. Temper bead technique compensates"},
+         {"depth": 5, "label": "Henry's Law", "desc": "Gas solubility in metal proportional to partial pressure. At 30 meters depth, hydrogen solubility in weld pool quadruples. The physics of depth makes every dive-weld a metallurgical challenge"},
+     ]},
+])
+
+# ── NUTRITION +3 ──
+NUTRITION_MATERIALS.extend([
+    {"id": "micronutrient", "name": "Micronutrient Density", "color": "#22C55E", "category": "Vitamins & Minerals",
+     "origin": "The invisible architecture of health — 30+ essential micronutrients that run 10,000 enzymatic reactions per second",
+     "components": ["Fat-soluble vitamins (A, D, E, K)", "Water-soluble vitamins (B-complex, C)", "Macro-minerals (Ca, Mg, K)", "Trace minerals (Fe, Zn, Se)", "Phytonutrients"],
+     "system": "Enzymatic-Cofactor axis", "uses": "Deficiency prevention, performance optimization, immune function, bone health, mental clarity",
+     "dive_layers": [
+         {"depth": 0, "label": "Nutrient Label", "desc": "RDA (Recommended Daily Allowance) vs DV (Daily Value) vs UL (Upper Limit). The label tells you the minimum; optimal intake is often higher"},
+         {"depth": 1, "label": "Bioavailability", "desc": "Heme iron (meat): 25% absorbed. Non-heme iron (plants): 5% absorbed. Vitamin C boosts non-heme absorption 3-6x. The nutrient is only as good as its absorption"},
+         {"depth": 2, "label": "Synergy & Antagonism", "desc": "Vitamin D enables calcium absorption. Zinc and copper compete for the same transporter. Iron blocks zinc. Magnesium activates vitamin D. Nutrients are a network, not a list"},
+         {"depth": 3, "label": "Enzymatic Cofactors", "desc": "Zinc is a cofactor for 300+ enzymes. Magnesium for 600+. B12 for methylation. Without the cofactor, the enzyme is a lock without a key"},
+         {"depth": 4, "label": "Epigenetic Effects", "desc": "Folate provides methyl groups for DNA methylation — literally controlling which genes are expressed. Nutrient status writes on the genome"},
+         {"depth": 5, "label": "Redox Biochemistry", "desc": "Vitamin C donates electrons (antioxidant), then vitamin E regenerates it, then glutathione regenerates E. The antioxidant relay: a chain of electron transfers protecting every cell membrane"},
+     ]},
+    {"id": "gut_microbiome", "name": "Gut Microbiome", "color": "#A78BFA", "category": "Microbial Ecosystem",
+     "origin": "The 100 trillion organisms in your gut — a metabolic organ weighing 4 pounds that we didn't know existed 30 years ago",
+     "components": ["Bacteroidetes", "Firmicutes", "Short-chain fatty acids", "Gut-brain axis", "Mucosal barrier"],
+     "system": "Microbiome-Immune axis", "uses": "Immune regulation, mood modulation, metabolic health, inflammation control, disease prevention",
+     "dive_layers": [
+         {"depth": 0, "label": "The Ecosystem", "desc": "More microbial cells than human cells. More microbial genes than human genes. You are a superorganism — a walking ecosystem with a human scaffold"},
+         {"depth": 1, "label": "Diversity = Health", "desc": "Shannon diversity index: higher = healthier. Hunter-gatherers: 1,200+ species. Western gut: 600-800. Every course of antibiotics is a forest fire"},
+         {"depth": 2, "label": "Fermentation Products", "desc": "Fiber → butyrate (fuels colonocytes), propionate (liver), acetate (peripheral). Short-chain fatty acids are the currency your microbes pay you for feeding them fiber"},
+         {"depth": 3, "label": "Gut-Brain Axis", "desc": "Vagus nerve: 80% of fibers run gut → brain. Serotonin: 95% made in gut. Microbes produce GABA, dopamine, norepinephrine. Your mood is partly microbial"},
+         {"depth": 4, "label": "Immune Training", "desc": "70% of immune tissue is gut-associated (GALT). Commensal bacteria train regulatory T-cells to tolerate self. No microbiome = autoimmunity"},
+         {"depth": 5, "label": "Quorum Sensing", "desc": "Bacteria communicate via signaling molecules (autoinducers). At threshold concentration, the colony switches behavior collectively. Democracy at the molecular level"},
+     ]},
+    {"id": "metabolic_flex", "name": "Metabolic Flexibility", "color": "#F59E0B", "category": "Energy Systems",
+     "origin": "The body's ability to switch between fuel sources — the metabolic skill that separates health from disease",
+     "components": ["Glycolysis", "Beta-oxidation", "Ketogenesis", "Mitochondrial biogenesis", "Insulin sensitivity"],
+     "system": "Energy-Substrate axis", "uses": "Fat loss, endurance performance, metabolic health, diabetes prevention, longevity",
+     "dive_layers": [
+         {"depth": 0, "label": "Fuel Selection", "desc": "Fed state: glucose (insulin high). Fasted state: fatty acids (insulin low). Metabolic flexibility means you can switch smoothly. Metabolic inflexibility means you can't burn fat"},
+         {"depth": 1, "label": "Randle Cycle", "desc": "Fatty acid oxidation inhibits glucose oxidation and vice versa. The two fuel systems compete at the mitochondrial gate. Insulin is the traffic controller"},
+         {"depth": 2, "label": "Mitochondrial Density", "desc": "Exercise increases mitochondrial number (biogenesis via PGC-1α) and efficiency. More mitochondria = more metabolic flexibility = better fuel switching"},
+         {"depth": 3, "label": "Ketone Metabolism", "desc": "Liver converts fatty acids to beta-hydroxybutyrate and acetoacetate. Brain runs on ketones when glucose is scarce. Evolutionary insurance policy for famine"},
+         {"depth": 4, "label": "Insulin Signaling", "desc": "Insulin binds receptor → IRS-1 → PI3K → Akt → GLUT4 translocation. This cascade moves glucose transporters to the cell surface. Resistance at any step = type 2 diabetes"},
+         {"depth": 5, "label": "Electron Transport Chain", "desc": "Complex I-IV + ATP synthase: electrons from food fall through redox potential gradient, pumping protons. ATP synthase spins at 9,000 RPM. All of metabolism converges on this molecular turbine"},
+     ]},
+])
+
+
 # Register V64.0 modules
 MODULES["speaking"] = {"materials": SPEAKING_MATERIALS, "tools": SPEAKING_TOOLS, "mat_key": "topics", "mat_id_key": "topic_id", "skill": "Speaking_Skill"}
 MODULES["philosophy"] = {"materials": PHILOSOPHY_MATERIALS, "tools": PHILOSOPHY_TOOLS, "mat_key": "branches", "mat_id_key": "branch_id", "skill": "Philosophy_Skill"}

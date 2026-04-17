@@ -1,0 +1,57 @@
+{
+  "summary": "V65.0 Parity Push & XP Wiring - All tests pass. 22/22 backend tests pass. 5 expanded modules (Machining, Anatomy, Pedagogy, Welding, Nutrition) now have 6 materials each with full 6-depth dive_layers. 5 new skill sources wired to correct domains. 13 hybrid titles present including 6 new ones. Oracle Search finds new materials correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v65_parity_push.py",
+    "/app/test_reports/pytest/pytest_v65_parity_push.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_v65_parity_push.py"
+  ],
+  "success_rate": {
+    "backend": "100% (22/22 tests pass)",
+    "frontend": "100% (All workshop pages load with correct materials)"
+  },
+  "test_credentials": "test_v29_user@test.com / testpass123 (for XP wiring tests)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "V65.0 verified: (1) Workshop registry returns 22 modules - 18 with 6 materials, 4 with 3 materials (automotive, meditation, speaking, philosophy not expanded), (2) Machining has 6 materials: Lathe Work, Milling Operations, CNC Programming, Surface Grinding, EDM, Threading, (3) Anatomy has 6 systems: Musculoskeletal, Cardiovascular, Nervous, Endocrine, Lymphatic, Integumentary, (4) Pedagogy has 6 domains: Lesson Design, Assessment Design, Classroom Management, Curriculum Mapping, Differentiated Instruction, Behavioral Psychology, (5) Welding has 6 materials: Mild Steel, Aluminum 6061, Stainless 304, Flux-Core Arc, Plasma Cutting, Underwater/Hyperbaric, (6) Nutrition has 6 foods: Whole Foods, Fermented Foods, Superfoods, Micronutrient Density, Gut Microbiome, Metabolic Flexibility, (7) All new materials have 6-depth dive_layers (depth 0-5), (8) XP wiring: Machining_Skill→Trade & Craft, Anatomy_Skill→Science & Physics, Philosophy_Skill→Sacred Knowledge, Speaking_Skill→Exploration, Pedagogy_Skill→Exploration, (9) Passport returns 13 hybrid titles including 6 new: Biomechanical Engineer, Climate Architect, Sovereign Medic, Philosopher King, Sacred Engineer, (10) Oracle Search finds new materials: 'grinding'→Machining, 'microbiome'→Nutrition, 'plasma'→Welding, 'endocrine'→Anatomy, 'curriculum'→Pedagogy, (11) All frontend workshop pages load correctly with new materials visible in tabs.",
+  "features_verified": {
+    "registry_22_modules": "PASS - 22 modules returned",
+    "registry_material_counts": "PASS - 18 at 6 materials, 4 at 3 materials",
+    "machining_6_materials": "PASS - Surface Grinding, EDM, Threading added",
+    "anatomy_6_materials": "PASS - Endocrine, Lymphatic, Integumentary added",
+    "pedagogy_6_materials": "PASS - Curriculum Mapping, Differentiation, Behavioral Psych added",
+    "welding_6_materials": "PASS - Flux-Core, Plasma Cutting, Underwater added",
+    "nutrition_6_materials": "PASS - Micronutrient Density, Gut Microbiome, Metabolic Flexibility added",
+    "dive_layers_6_depth": "PASS - All new materials have depth 0-5",
+    "xp_machining_skill": "PASS - Maps to Trade & Craft",
+    "xp_anatomy_skill": "PASS - Maps to Science & Physics",
+    "xp_philosophy_skill": "PASS - Maps to Sacred Knowledge",
+    "xp_speaking_skill": "PASS - Maps to Exploration",
+    "xp_pedagogy_skill": "PASS - Maps to Exploration",
+    "passport_13_titles": "PASS - 7 original + 6 new hybrid titles",
+    "new_hybrid_titles": "PASS - Biomechanical Engineer, Climate Architect, Sovereign Medic, Philosopher King, Sacred Engineer present",
+    "oracle_search_grinding": "PASS - Finds Machining",
+    "oracle_search_microbiome": "PASS - Finds Nutrition",
+    "oracle_search_plasma": "PASS - Finds Welding in Trade & Craft",
+    "oracle_search_endocrine": "PASS - Finds Anatomy",
+    "oracle_search_curriculum": "PASS - Finds Pedagogy",
+    "frontend_machining_page": "PASS - Shows 6 materials",
+    "frontend_anatomy_page": "PASS - Shows 6 systems",
+    "frontend_pedagogy_page": "PASS - Shows 6 domains",
+    "frontend_welding_page": "PASS - Shows 6 materials",
+    "frontend_nutrition_page": "PASS - Shows 6 foods"
+  }
+}

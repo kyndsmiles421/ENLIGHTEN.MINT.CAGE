@@ -132,7 +132,8 @@ SKILL_DOMAINS = {
                      "Electrical_Skill", "Plumbing_Skill", "Landscaping_Skill",
                      "electrical_inspect", "plumbing_inspect", "landscaping_inspect",
                      "Welding_Skill", "welding_inspect", "Automotive_Skill", "automotive_inspect",
-                     "HVAC_Skill", "hvac_inspect"],
+                     "HVAC_Skill", "hvac_inspect",
+                     "Machining_Skill", "machining_inspect"],
     },
     "Healing Arts": {
         "color": "#22C55E",
@@ -155,7 +156,8 @@ SKILL_DOMAINS = {
         "color": "#3B82F6",
         "sources": ["quantum", "fractal", "physics", "astronomy",
                      "observatory", "dimensional", "planetary",
-                     "Robotics_Skill", "robotics_inspect"],
+                     "Robotics_Skill", "robotics_inspect",
+                     "Anatomy_Skill", "anatomy_inspect"],
     },
     "Creative Arts": {
         "color": "#EC4899",
@@ -165,14 +167,17 @@ SKILL_DOMAINS = {
     "Exploration": {
         "color": "#F97316",
         "sources": ["exploration", "module_interaction", "vr_sanctuary",
-                     "animal_totems", "cosmic_profile", "sage_coach"],
+                     "animal_totems", "cosmic_profile", "sage_coach",
+                     "Speaking_Skill", "speaking_inspect",
+                     "Pedagogy_Skill", "pedagogy_inspect"],
     },
     "Sacred Knowledge": {
         "color": "#D4AF37",
         "sources": ["wisdom_journal", "numerology", "cardology",
                      "astrology", "sacred_texts", "bible", "mayan",
                      "Bible_Study_Skill", "bible_inspect",
-                     "Hermetics_Skill", "hermetics_inspect"],
+                     "Hermetics_Skill", "hermetics_inspect",
+                     "Philosophy_Skill", "philosophy_inspect"],
     },
 }
 
@@ -202,6 +207,21 @@ HYBRID_TITLES = [
     {"id": "hardscape_engineer", "title": "Hardscape Engineer",
      "requires": {"Trade & Craft": 40},
      "color": "#94A3B8", "desc": "Stone, wood, and steel — shaped by sovereign hands"},
+    {"id": "biomechanical_engineer", "title": "Biomechanical Engineer",
+     "requires": {"Trade & Craft": 25, "Science & Physics": 25},
+     "color": "#60A5FA", "desc": "Where machined precision meets anatomical intelligence"},
+    {"id": "climate_architect", "title": "Climate Architect",
+     "requires": {"Trade & Craft": 30, "Healing Arts": 15},
+     "color": "#2DD4BF", "desc": "Mastering the flow of heat, air, and human comfort"},
+    {"id": "sovereign_medic", "title": "Sovereign Medic",
+     "requires": {"Healing Arts": 40, "Science & Physics": 15},
+     "color": "#EF4444", "desc": "Clinical mastery fused with scientific depth"},
+    {"id": "philosopher_king", "title": "Philosopher King",
+     "requires": {"Sacred Knowledge": 40, "Exploration": 20},
+     "color": "#8B5CF6", "desc": "Ancient wisdom channeled through modern pedagogy"},
+    {"id": "sacred_engineer", "title": "Sacred Engineer",
+     "requires": {"Trade & Craft": 20, "Sacred Knowledge": 20, "Mind & Spirit": 20},
+     "color": "#D4AF37", "desc": "Building temples for the body, mind, and spirit simultaneously"},
 ]
 
 
