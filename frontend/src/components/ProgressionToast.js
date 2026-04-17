@@ -46,6 +46,8 @@ const SOURCE_META = {
   Landscaping_Skill:   { label: 'Landscaping Work',  color: '#22C55E', icon: Shield },
   Nursing_Skill:       { label: 'Nursing Practice',  color: '#EF4444', icon: Shield },
   Bible_Study_Skill:   { label: 'Scripture Study',   color: '#D4AF37', icon: Shield },
+  Childcare_Skill:     { label: 'Child Care',        color: '#F472B6', icon: Shield },
+  Eldercare_Skill:     { label: 'Elderly Care',      color: '#A78BFA', icon: Shield },
   exploration:         { label: 'Exploration',       color: '#38BDF8', icon: Sparkles },
   vr_sanctuary:        { label: 'VR Sanctuary',      color: '#D8B4FE', icon: Star },
   animal_totems:       { label: 'Animal Totems',     color: '#22C55E', icon: Star },

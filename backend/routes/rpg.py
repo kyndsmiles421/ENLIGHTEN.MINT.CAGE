@@ -136,7 +136,9 @@ SKILL_DOMAINS = {
         "color": "#22C55E",
         "sources": ["herbology", "aromatherapy", "reiki", "acupressure",
                      "healing", "elixirs", "nourishment", "meal_planning",
-                     "Nursing_Skill", "nursing_inspect"],
+                     "Nursing_Skill", "nursing_inspect",
+                     "Childcare_Skill", "childcare_inspect",
+                     "Eldercare_Skill", "eldercare_inspect"],
     },
     "Mind & Spirit": {
         "color": "#A78BFA",

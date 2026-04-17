@@ -1,61 +1,48 @@
-# ENLIGHTEN.MINT.CAFE — V60.0 Total Organism Activation
+# ENLIGHTEN.MINT.CAFE — V61.0 Total Organism
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## V60.0 — Universal Workshop DNA + 5 New Cells
+## V61.0 — Parity + Social Pillar + Neural Clusters
 
-### Universal Workshop Engine
-- **`UniversalWorkshop.js`**: ONE component powering ALL workshop cells
-- Props-driven: moduleId, title, icon, accentColor, skillKey → renders any cell
-- Page wrappers are 8 lines each — pure config, zero logic duplication
-- **`workshop_v60.py`**: Universal backend with dynamic `/workshop/{module_id}/materials|tools|tool-action` endpoints
+### Strike 1: Material Parity (3→6)
+- All V60 workshops expanded to 6 materials each:
+  - Electrical: +Fiber Optic Cable, GFCI Outlet, Circuit Breaker
+  - Plumbing: +Cast Iron DWV, SharkBite Push-Fit, Brass Ball Valve
+  - Landscaping: +River Rock, Sphagnum Peat, Hardwood Mulch
+  - Nursing: +Fall Risk Assessment, Cardiac Monitoring, Patient Education
+  - Bible Study: +Romans, Proverbs, Revelation
 
-### 5 New Sovereign Cells (Batch Activated)
-- **Electrical** (`/electrical-workbench`): Copper Wire, Romex, EMT Conduit × 9 tools (Wire Stripper through Torque Driver)
-- **Plumbing** (`/plumbing-workbench`): Copper Type L, PVC Sch 40, PEX-A × 9 tools (Pipe Wrench through Deburring Tool)
-- **Landscaping** (`/landscaping-workbench`): Loam Topsoil, Crushed Gravel, Compost × 9 tools (Spade through Line Level)
-- **Nursing** (`/nursing-workbench`): Patient Vitals, Wound Assessment, Medication Admin × 9 tools (Stethoscope through Therapeutic Presence)
-- **Bible Study** (`/bible-study-workbench`): Genesis, Psalms, Gospel of John × 9 tools (Greek/Hebrew Lexicon through Lectio Divina)
-- All have 6-depth Recursive Dives from surface to quantum/molecular/spiritual level
+### Strike 2: Social Pillar (2 New Cells)
+- **Child Care** (`/childcare-workbench`): Developmental Milestones, Play-Based Learning, Safety Protocol × 9 tools (Storytelling, Guided Play, Safety Protocol, Nutrition, Positive Guidance, Observation, Sensory Activity, Music/Movement, Empathy Modeling)
+- **Elderly Care** (`/eldercare-workbench`): Resident Dignity, Mobility & Transfers, Memory Care × 9 tools (Mobility Assist, Memory Engagement, Med-Pass, Companionship, Comfort Measures, Fall Prevention, Nutrition Support, Hygiene Care, Activity Planning)
+- Both mapped to Healing Arts domain in Trade Passport
 
-### Trade Passport Domain Integration
-- Trade & Craft domain: +Electrical_Skill, +Plumbing_Skill, +Landscaping_Skill
-- Healing Arts domain: +Nursing_Skill
-- Sacred Knowledge domain: +Bible_Study_Skill
-- ProgressionToast recognizes all new skill sources
+### Strike 3: Neural Clusters (Related Navigation)
+- **Trades cluster**: Electrical ↔ Plumbing ↔ Landscaping ↔ Masonry ↔ Carpentry
+- **Healing cluster**: Nursing ↔ Elderly Care ↔ Child Care ↔ Herbology
+- **Sacred cluster**: Bible Study ↔ Meditation ↔ Oracle
+- All workshops link back to Trade Passport
 
-## V59.0 — 800KB Metabolic Seal
-- **Main bundle: 791KB** (250KB gzipped) — target was 800KB
-- SovereignProviders: 26 contexts consolidated into single lazy chunk
-- 30+ dead imports purged, engines deferred to requestIdleCallback
-
-## V57.0-V58.0 — Foundation
-- Masonry + Carpentry workshops (original DNA)
-- Trade Passport (7 domains, 8 hybrid titles, dive clearance)
-- Neural Context Signal, system-wide card purge, XP audit
+### System Totals
+- **163 hub nodules**, **9 Circular Workshop cells** (Masonry, Carpentry, Electrical, Plumbing, Landscaping, Nursing, Bible Study, Child Care, Elderly Care)
+- **39 materials** with 6-depth Recursive Dives
+- **81 tools** across all workshops
+- **791KB main bundle** (unchanged — new cells are lazy chunks)
 
 ## Architecture
-- **161 hub nodules** across 10 Command Pillars
-- **UniversalWorkshop.js**: Single component for all workshop cells
-- **workshop_v60.py**: Dynamic endpoints for all V60+ modules
-- Trade Passport aggregates 7 domains from rpg_xp_log
-- 791KB main bundle + 210+ lazy chunks
-
-## Key Files
-- `/app/frontend/src/components/UniversalWorkshop.js` — Universal cell engine
-- `/app/frontend/src/components/SovereignProviders.js` — Consolidated 26-provider tree
-- `/app/backend/routes/workshop_v60.py` — 5 new module data + universal endpoints
-- `/app/backend/routes/workshop.py` — Original masonry/carpentry data
-- `/app/backend/routes/rpg.py` — Passport with updated domain sources
+- `UniversalWorkshop.js` — ONE component for all cells
+- `workshop_v60.py` — Universal dynamic endpoints
+- `SovereignProviders.js` — 26 contexts consolidated
+- Trade Passport: 7 domains, 8+ hybrid titles
+- Neural Context Signal + cross-cell Related navigation
 
 ## Backlog
 ### P1
-- Add more materials to each workshop (3 → 6 for parity with Masonry/Carpentry)
 - Intent-based search across Passport domains
-- Cross-cell Related navigation for new workshops
+- Expand Child Care + Elderly Care to 6 materials (parity)
 ### P2
-- Child Care, Elderly Care, Meditation workshops
+- More workshop cells (Welding, Automotive, Nutrition, Meditation)
 - Meritocratic depth tiers
 - Sovereign Leaderboard
-- Native mobile recording, Phygital NFC
+- Predictive navigation

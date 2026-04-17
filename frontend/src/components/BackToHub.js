@@ -239,6 +239,48 @@ const RELATED = {
     { label: 'RPG Character', route: '/rpg' },
     { label: 'Trade Circle', route: '/trade-circle' },
   ],
+  '/electrical-workbench': [
+    { label: 'Plumbing Workshop', route: '/plumbing-workbench' },
+    { label: 'Landscaping Workshop', route: '/landscaping-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+    { label: 'Masonry Workshop', route: '/masonry-workbench' },
+  ],
+  '/plumbing-workbench': [
+    { label: 'Electrical Workshop', route: '/electrical-workbench' },
+    { label: 'Landscaping Workshop', route: '/landscaping-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+    { label: 'Carpentry Workshop', route: '/carpentry-workbench' },
+  ],
+  '/landscaping-workbench': [
+    { label: 'Plumbing Workshop', route: '/plumbing-workbench' },
+    { label: 'Electrical Workshop', route: '/electrical-workbench' },
+    { label: 'Herbology', route: '/herbology' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/nursing-workbench': [
+    { label: 'Elderly Care', route: '/eldercare-workbench' },
+    { label: 'Child Care', route: '/childcare-workbench' },
+    { label: 'Herbology', route: '/herbology' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/eldercare-workbench': [
+    { label: 'Nursing Workshop', route: '/nursing-workbench' },
+    { label: 'Child Care', route: '/childcare-workbench' },
+    { label: 'Meditation', route: '/meditation' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/childcare-workbench': [
+    { label: 'Nursing Workshop', route: '/nursing-workbench' },
+    { label: 'Elderly Care', route: '/eldercare-workbench' },
+    { label: 'Bible Study', route: '/bible-study-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/bible-study-workbench': [
+    { label: 'Meditation', route: '/meditation' },
+    { label: 'Oracle', route: '/oracle' },
+    { label: 'Child Care', route: '/childcare-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
   '/frequencies': [
     { label: 'Soundscapes', route: '/soundscapes' },
     { label: 'Cosmic Mixer', route: '/cosmic-mixer' },

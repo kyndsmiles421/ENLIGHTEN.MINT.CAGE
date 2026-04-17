@@ -173,6 +173,8 @@ const PILLARS = [
     { label: 'Landscaping Workshop', route: '/landscaping-workbench' },
     { label: 'Nursing Workshop', route: '/nursing-workbench' },
     { label: 'Bible Study Workshop', route: '/bible-study-workbench' },
+    { label: 'Child Care Workshop', route: '/childcare-workbench' },
+    { label: 'Elderly Care Workshop', route: '/eldercare-workbench' },
     { label: 'Crystal Skins', route: '/crystal-skins' },
     { label: 'Archives & Vault', route: '/archives' },
     { label: 'Cosmic Ledger', route: '/cosmic-ledger' },
