@@ -112,18 +112,17 @@ export default function CinematicWalkthrough() {
 
   return (
     <>
-      {/* Tour HUD — shows during playback */}
+      {/* Tour HUD — inline, not fixed */}
       <AnimatePresence>
         {playing && currentStop && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2.5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center justify-between px-3 py-2 rounded-xl mb-3"
             style={{
-              background: 'rgba(0,0,0,0.85)',
-              borderBottom: `1px solid ${sequence.color}25`,
-              backdropFilter: 'blur(8px)',
+              background: 'rgba(0,0,0,0.6)',
+              border: `1px solid ${sequence.color}20`,
             }}
             data-testid="tour-hud"
           >

@@ -79,8 +79,8 @@ export default function ProgressionToast() {
 
   return (
     <div
-      className="fixed bottom-20 right-4 flex flex-col-reverse gap-2 pointer-events-none"
-      style={{ zIndex: 180, perspective: '600px', maxWidth: 280 }}
+      className="pointer-events-none"
+      style={{ display: 'none' }}
       data-testid="progression-toast-container"
     >
       <AnimatePresence>

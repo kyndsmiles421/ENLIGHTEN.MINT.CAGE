@@ -286,7 +286,7 @@ export default function Oracle() {
 
   return (
     
-      <div className="pt-20 pb-24 px-5" style={{ position: 'relative', zIndex: 10 }}>
+      <div className="pt-16 pb-24 px-5" style={{ position: 'relative', zIndex: 2 }}>
       {/* Crystal Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (
@@ -320,13 +320,13 @@ export default function Oracle() {
           <h1 className="text-3xl font-light tracking-tight mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             Seek the Oracle
           </h1>
-          <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-base mb-6" style={{ color: 'var(--text-secondary)' }}>
             Tarot, Astrology, I Ching, and Sacred Geometry — ancient wisdom channeled through AI.
           </p>
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-10">
+        <div className="flex flex-wrap gap-2 mb-6">
           {TABS.map(t => {
             const Icon = t.icon;
             return (
@@ -727,46 +727,11 @@ export default function Oracle() {
                   key="empty" 
                   initial={{ opacity: 0 }} 
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px) brightness(1.5)' }}
-                  transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                  className="p-12 flex flex-col items-center justify-center min-h-[400px] text-center"
-                  style={{
-                    transformStyle: 'preserve-3d',
-                    perspective: '800px',
-                  }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="py-12 flex flex-col items-center justify-center text-center"
                 >
-                  {/* 3D rotating orbital rings */}
-                  <div className="relative mb-6" style={{ transformStyle: 'preserve-3d' }}>
-                    {[0, 1, 2].map(i => (
-                      <motion.div key={i}
-                        animate={{
-                          rotateX: [0, 360],
-                          rotateY: [0, i % 2 === 0 ? 360 : -360],
-                          scale: [1, 1.05, 1],
-                        }}
-                        transition={{ duration: 10 + i * 4, repeat: Infinity, ease: 'linear' }}
-                        className="absolute rounded-full border"
-                        style={{
-                          width: `${80 + i * 40}px`,
-                          height: `${80 + i * 40}px`,
-                          top: `${-(i * 20)}px`,
-                          left: `${-(i * 20)}px`,
-                          borderColor: `${currentTabColor}${Math.round((0.18 - i * 0.04) * 255).toString(16).padStart(2, '0')}`,
-                          transformStyle: 'preserve-3d',
-                          boxShadow: `0 0 15px ${currentTabColor}08`,
-                        }} />
-                    ))}
-                    <motion.div
-                      animate={{
-                        rotateY: [0, 360],
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-                      style={{ transformStyle: 'preserve-3d' }}
-                    >
-                      <Sparkles size={32} style={{ color: currentTabColor, opacity: 0.5, position: 'relative', zIndex: 1, margin: '24px', filter: `drop-shadow(0 0 8px ${currentTabColor}40)` }} />
-                    </motion.div>
-                  </div>
+                  <Sparkles size={28} style={{ color: currentTabColor, opacity: 0.4, marginBottom: 12 }} />
                   <p className="text-lg" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-muted)' }}>
                     {tab === 'tarot' ? 'The cards await your question' :
                      tab === 'iching' ? 'The hexagram waits to be cast' :

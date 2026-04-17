@@ -555,36 +555,7 @@ export default function SpatialRoom({ room = 'default', children, nodesExplored 
           gridPosition={spatialCtx.gridPosition}
         />
 
-        {/* Room header — location marker + realm + vitality */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : -20 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="absolute top-2.5 left-4 right-4 flex items-center justify-between pointer-events-none"
-          style={{ zIndex: 10 }}
-        >
-          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg"
-            style={{
-              background: `${theme.accent}0C`,
-              border: `1px solid ${theme.accent}15`,
-            }}>
-            <span className="text-base">{theme.icon}</span>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[0.2em] block"
-                style={{ color: `${theme.accent}80` }}>
-                {theme.name}
-              </span>
-              <span className="text-[7px] uppercase tracking-[0.15em]"
-                style={{ color: `${theme.accent}40` }}>
-                {realm.label}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <AvatarBadge scrollProgress={scrollProgress} theme={theme} nodesExplored={nodesExplored} totalNodes={totalNodes} />
-            <VitalityBar accent={theme.accent} />
-          </div>
-        </motion.div>
+        {/* Room indicator — removed fixed positioning, no overlap */}
 
         {/* Stillness indicator for meditation rooms */}
         {theme.mode === 'stillness' && stillnessTimer > 5 && (
