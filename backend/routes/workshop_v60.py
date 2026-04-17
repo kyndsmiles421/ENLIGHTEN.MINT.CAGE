@@ -761,3 +761,348 @@ async def module_tool_action(module_id: str, data: dict = Body(...)):
             f"Include safety notes and a professional tip."
         ),
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V62.0 — PARITY II: Expand Child Care & Elderly Care to 6 materials
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHILDCARE_MATERIALS.extend([
+    {"id": "toddler_nutrition", "name": "Toddler Nutrition", "color": "#22C55E", "category": "Health", "complexity": "Foundation",
+     "origin": "Feeding the growing brain — nutrition in the first 1,000 days shapes lifelong health",
+     "components": ["Iron-rich foods", "Healthy fats", "Limited sugar", "Self-feeding skills", "Mealtime routine"],
+     "system": "Nutritional-Developmental axis",
+     "uses": "Meal planning, picky eating strategies, allergy introduction, growth monitoring",
+     "dive_layers": [
+         {"depth": 0, "label": "Mealtime", "desc": "Colorful plates, small portions, family-style service — making nutrition a social experience"},
+         {"depth": 1, "label": "Macro Balance", "desc": "Toddlers need 40% calories from fat (brain building), 15% protein, 45% carbs — different from adults"},
+         {"depth": 2, "label": "Micronutrient Needs", "desc": "Iron deficiency affects 7% of toddlers — impacts cognitive development before anemia appears on labs"},
+         {"depth": 3, "label": "Gut-Brain Axis", "desc": "70% of serotonin is produced in the gut. Microbiome diversity in early childhood shapes mental health"},
+         {"depth": 4, "label": "Taste Development", "desc": "Bitter rejection is genetic (TAS2R38 gene). Repeated neutral exposure (10-15 times) overcomes neophobia"},
+         {"depth": 5, "label": "Epigenetic Nutrition", "desc": "Early nutrition methylates genes controlling metabolism — 'programming' obesity risk for life"},
+     ]},
+    {"id": "conflict_resolution", "name": "Conflict Resolution", "color": "#F59E0B", "category": "Social", "complexity": "Intermediate",
+     "origin": "Teaching children to solve problems without aggression — the foundation of emotional intelligence",
+     "components": ["Emotion naming", "Turn-taking", "Compromise", "Using words", "Seeking help"],
+     "system": "Social-Emotional axis",
+     "uses": "Peer disputes, sharing struggles, sibling rivalry, classroom management",
+     "dive_layers": [
+         {"depth": 0, "label": "The Conflict", "desc": "Two children want the same toy. This is not a problem — it's a developmental opportunity"},
+         {"depth": 1, "label": "Emotion Coaching", "desc": "Gottman's 5 steps: notice the emotion, see it as teaching moment, validate, label, set limits"},
+         {"depth": 2, "label": "Prefrontal Development", "desc": "The PFC (impulse control center) isn't fully myelinated until age 25. Expecting adult self-control is neurologically impossible"},
+         {"depth": 3, "label": "Mirror Neuron Modeling", "desc": "Children who observe adults resolving conflict calmly build stronger conflict-resolution neural circuits"},
+         {"depth": 4, "label": "Cortisol Regulation", "desc": "Unresolved conflict floods cortisol. Co-regulation (calm adult presence) teaches the child's HPA axis to self-regulate"},
+         {"depth": 5, "label": "Attachment Security", "desc": "Secure attachment = safe base for conflict. The child who knows they won't be abandoned can tolerate disagreement"},
+     ]},
+    {"id": "cognitive_play", "name": "Cognitive Play", "color": "#3B82F6", "category": "Learning", "complexity": "Intermediate",
+     "origin": "Structured play activities that build problem-solving, memory, and abstract thinking",
+     "components": ["Puzzles", "Sorting/matching", "Pattern recognition", "Cause-effect toys", "Pretend play"],
+     "system": "Cognitive-Executive axis",
+     "uses": "School readiness, STEM foundations, gifted identification, developmental screening",
+     "dive_layers": [
+         {"depth": 0, "label": "Play Activity", "desc": "Sorting buttons by color, building block towers, completing puzzles — play that looks easy but builds genius"},
+         {"depth": 1, "label": "Piaget's Stages", "desc": "Sensorimotor (0-2) → Preoperational (2-7): object permanence, symbolic thought, egocentrism — the cognitive ladder"},
+         {"depth": 2, "label": "Executive Function", "desc": "Working memory (hold info) + inhibitory control (resist impulse) + cognitive flexibility (switch strategies)"},
+         {"depth": 3, "label": "Synaptic Density", "desc": "Peak synapse count at age 3: 1,000 trillion connections. Experience determines which survive pruning"},
+         {"depth": 4, "label": "Scaffolding Theory", "desc": "Bruner: adult provides just enough support for the child to succeed, then withdraws. The zone of proximal development in action"},
+         {"depth": 5, "label": "Neurogenesis", "desc": "Hippocampal neurogenesis continues through childhood — enriched environments literally grow more brain cells"},
+     ]},
+])
+
+ELDERCARE_MATERIALS.extend([
+    {"id": "palliative", "name": "Palliative Care", "color": "#8B5CF6", "category": "End-of-Life", "complexity": "Advanced",
+     "origin": "Comfort-focused care for serious illness — quality of life when cure is no longer the goal",
+     "components": ["Pain management", "Symptom control", "Psychosocial support", "Advance directives", "Family meetings"],
+     "system": "Holistic-Comfort axis",
+     "uses": "Hospice, oncology, chronic disease, goals-of-care discussions, bereavement",
+     "dive_layers": [
+         {"depth": 0, "label": "Comfort Plan", "desc": "Shift from 'doing everything' to 'doing the right things.' The bravest medical decision is choosing comfort"},
+         {"depth": 1, "label": "Pain Assessment", "desc": "FLACC scale for non-verbal patients. Pain is the 5th vital sign. Believe the patient's report, not your assumptions"},
+         {"depth": 2, "label": "Opioid Pharmacology", "desc": "Morphine binds μ-opioid receptors in the dorsal horn, blocking substance P transmission. Titrate to effect, not to fear"},
+         {"depth": 3, "label": "Total Pain Concept", "desc": "Cicely Saunders: physical + emotional + social + spiritual pain = total suffering. You can't medicate grief"},
+         {"depth": 4, "label": "Dying Process", "desc": "Cheyne-Stokes breathing, mottling, terminal restlessness — the body's natural shutdown sequence"},
+         {"depth": 5, "label": "Cellular Apoptosis", "desc": "Programmed cell death: caspase cascades dismantle the cell from within. Death is not failure — it is biology"},
+     ]},
+    {"id": "occupational_therapy", "name": "Occupational Therapy", "color": "#F97316", "category": "Rehabilitation", "complexity": "Intermediate",
+     "origin": "Restoring independence in daily living — helping people do what matters most to them",
+     "components": ["ADL assessment", "Adaptive equipment", "Energy conservation", "Home modification", "Cognitive rehab"],
+     "system": "Functional-Adaptive axis",
+     "uses": "Post-stroke rehab, arthritis management, dementia adaptation, discharge planning",
+     "dive_layers": [
+         {"depth": 0, "label": "Daily Living", "desc": "Can they dress, bathe, eat, toilet independently? The Katz ADL Index measures functional independence"},
+         {"depth": 1, "label": "Task Analysis", "desc": "Break 'making breakfast' into 47 discrete steps. Find where the chain breaks. Adapt that specific link"},
+         {"depth": 2, "label": "Neuroplastic Rehab", "desc": "Constraint-induced movement therapy: force the affected limb to work. 10,000 repetitions rewire the motor cortex"},
+         {"depth": 3, "label": "Assistive Technology", "desc": "Built-up utensil grips, button hooks, reachers, shower chairs — engineering solutions for biological limitations"},
+         {"depth": 4, "label": "Motor Learning", "desc": "Fitts & Posner: cognitive → associative → autonomous. Practice schedule matters more than practice volume"},
+         {"depth": 5, "label": "Cortical Reorganization", "desc": "After stroke, adjacent brain areas recruit to compensate. The brain's map literally redraws itself with practice"},
+     ]},
+    {"id": "end_of_life", "name": "End-of-Life Dignity", "color": "#D4AF37", "category": "Ethics", "complexity": "Critical",
+     "origin": "The final chapter — ensuring every person dies with the same respect they deserved in life",
+     "components": ["Advance directives", "DNR/POLST", "Family presence", "Spiritual care", "Legacy work"],
+     "system": "Ethical-Spiritual axis",
+     "uses": "Hospice enrollment, family conferences, ethical decision-making, grief support",
+     "dive_layers": [
+         {"depth": 0, "label": "The Conversation", "desc": "'What matters most to you?' is more important than 'What treatment do you want?' Goals before options"},
+         {"depth": 1, "label": "Advance Directives", "desc": "Living will + healthcare proxy. Only 37% of Americans have them. The conversation saves families from impossible choices"},
+         {"depth": 2, "label": "Ethical Framework", "desc": "Autonomy, beneficence, non-maleficence, justice — the four pillars of medical ethics at the bedside"},
+         {"depth": 3, "label": "Grief Anticipation", "desc": "Anticipatory grief begins before death. Acknowledge it: 'You're already grieving. That's normal and human'"},
+         {"depth": 4, "label": "Spiritual Distress", "desc": "Existential questions intensify: 'Why me? Was my life meaningful? What happens next?' Listen, don't answer"},
+         {"depth": 5, "label": "Consciousness & Dying", "desc": "Terminal lucidity — unexplained cognitive clarity before death. Hearing is the last sense to fade. Speak to the dying"},
+     ]},
+])
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V62.0 — 4 NEW CELLS: Welding, Automotive, Nutrition, Meditation
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WELDING_MATERIALS = [
+    {"id": "mild_steel", "name": "Mild Steel", "color": "#6B7280", "gauge": "1/4 inch plate", "tensile_mpa": 400,
+     "origin": "Low-carbon steel — the most commonly welded metal on Earth", "composition": ["Iron (98.5%)", "Carbon (0.2%)", "Manganese (0.8%)"],
+     "crystal_structure": "Ferrite + Pearlite (BCC iron)", "uses": "Structural fabrication, frames, brackets, general repair",
+     "dive_layers": [
+         {"depth": 0, "label": "Base Metal", "desc": "Hot-rolled A36 plate with mill scale — the workhorse of structural steel fabrication"},
+         {"depth": 1, "label": "Heat-Affected Zone", "desc": "The HAZ: base metal altered by weld heat but not melted. Grain growth here reduces toughness"},
+         {"depth": 2, "label": "Weld Pool", "desc": "Molten puddle at 2,800°F: base metal + filler mix. Shielding gas prevents atmospheric contamination"},
+         {"depth": 3, "label": "Solidification", "desc": "Epitaxial grain growth from fusion line inward. Columnar dendrites form as the pool freezes"},
+         {"depth": 4, "label": "Phase Transformation", "desc": "Austenite → ferrite/pearlite on cooling. Fast cooling creates martensite — hard, brittle, crack-prone"},
+         {"depth": 5, "label": "Dislocation Theory", "desc": "Strength comes from dislocation pinning: carbon atoms lock crystal defects. The physics of steel strength"},
+     ]},
+    {"id": "aluminum", "name": "Aluminum 6061", "color": "#C0C0C0", "gauge": "3/16 inch plate", "tensile_mpa": 310,
+     "origin": "Heat-treatable aluminum alloy — lightweight, corrosion-resistant, the metal of modern fabrication",
+     "composition": ["Aluminum (97%)", "Magnesium (1%)", "Silicon (0.6%)", "Copper (0.3%)"],
+     "crystal_structure": "FCC aluminum with Mg₂Si precipitates", "uses": "Boat hulls, bike frames, truck bodies, aerospace",
+     "dive_layers": [
+         {"depth": 0, "label": "Cleaned Surface", "desc": "Wire-brushed to remove aluminum oxide — the invisible 3,700°F-melting barrier that sabotages welds"},
+         {"depth": 1, "label": "AC TIG Process", "desc": "AC current: electrode-positive half-cycle blasts oxide off; electrode-negative melts the base. Alternating 120 times/second"},
+         {"depth": 2, "label": "Thermal Conductivity", "desc": "Aluminum conducts heat 5x faster than steel — the weld pool runs away if you don't compensate with higher amperage"},
+         {"depth": 3, "label": "Precipitate Dissolution", "desc": "HAZ temperatures dissolve Mg₂Si precipitates that give 6061-T6 its strength — the weld zone is always weaker"},
+         {"depth": 4, "label": "Hot Cracking", "desc": "Solidification cracking in the partially-solidified zone: silicon-rich eutectic films between grains"},
+         {"depth": 5, "label": "Oxide Thermodynamics", "desc": "Al₂O₃: ΔG = -1582 kJ/mol. Aluminum WANTS to oxidize more than almost any metal — constant battle"},
+     ]},
+    {"id": "stainless", "name": "Stainless 304", "color": "#E8E8E8", "gauge": "16 gauge sheet", "tensile_mpa": 515,
+     "origin": "Austenitic stainless steel — chromium creates an invisible, self-healing oxide shield",
+     "composition": ["Iron (68%)", "Chromium (18%)", "Nickel (8%)", "Carbon (<0.08%)"],
+     "crystal_structure": "FCC austenite (stabilized by nickel)", "uses": "Food equipment, medical, chemical processing, architectural",
+     "dive_layers": [
+         {"depth": 0, "label": "Brushed Finish", "desc": "Satin #4 finish — chromium oxide reforms in seconds after scratching. Self-healing surface"},
+         {"depth": 1, "label": "TIG Purge", "desc": "Back-purge with argon prevents 'sugaring' (chromium oxide contamination) on the root side of the joint"},
+         {"depth": 2, "label": "Sensitization", "desc": "Heating to 800-1500°F precipitates chromium carbides at grain boundaries — stealing chromium from the matrix"},
+         {"depth": 3, "label": "Passive Film", "desc": "Cr₂O₃ film: 1-5nm thick, transparent, self-healing. Requires minimum 10.5% Cr in solution to form"},
+         {"depth": 4, "label": "Austenite Stability", "desc": "Nickel stabilizes FCC structure at room temp. Without Ni, chromium steels are ferritic (BCC) and less tough"},
+         {"depth": 5, "label": "Corrosion Electrochemistry", "desc": "Pitting potential (Epit) vs repassivation potential (Erp): the electrochemical window of safety"},
+     ]},
+]
+
+WELDING_TOOLS = [
+    {"id": "tig_torch", "name": "TIG Torch", "action_verb": "Weld", "description": "Gas tungsten arc welding torch for precision fusion of all metals", "technique": "Hold like a pencil at 15° from vertical. Maintain 1/8-inch arc length. Add filler rod to the leading edge of the pool. Never touch tungsten to the pool.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "mig_gun", "name": "MIG Gun", "action_verb": "Feed", "description": "Wire-feed welding gun for fast, semi-automatic fusion", "technique": "Push technique for thin metal (better penetration), drag for thick. Maintain consistent 3/4-inch stickout. Listen for the steady 'bacon frying' sound — crackle means settings are off.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "angle_grinder", "name": "Angle Grinder", "action_verb": "Grind", "description": "High-speed rotary tool for surface prep, weld cleanup, and cutting", "technique": "10-15° angle to the work surface. Let the disc do the work — excessive pressure glazes the abrasive. Always grind INTO the edge, never away from it. Guard must be between you and the disc.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "G"},
+    {"id": "welding_clamp", "name": "Welding Clamp", "action_verb": "Fixture", "description": "Heavy-duty clamps and fixtures for holding workpieces in alignment", "technique": "Tack weld at ends first, then middle. Alternate sides to minimize distortion. A part that moves during welding is a weld that fails in service.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "flux_weld", "name": "Flux Paste", "action_verb": "Flux", "description": "Chemical cleaning agent that prevents oxidation during brazing and soldering", "technique": "Apply thin coat to both surfaces. Flux activates at temperature — it bubbles, clears, and goes glassy. If it turns black, you overheated it.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "chipping_hammer", "name": "Chipping Hammer", "action_verb": "Chip", "description": "Spring-handle hammer for removing slag from stick and flux-core welds", "technique": "Angle the chisel point at 30° to the bead surface. Short, sharp strikes. The slag should pop off in sheets — if it sticks, your weld is too cold.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "H"},
+    {"id": "welding_helmet", "name": "Auto-Dark Helmet", "action_verb": "Shield", "description": "Variable-shade auto-darkening helmet protecting eyes from UV/IR arc radiation", "technique": "Set shade 10 for TIG, shade 11-13 for MIG/Stick. Reaction time under 1/25,000 second. Always check the auto-dark sensor BEFORE striking an arc.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "filler_rod", "name": "Filler Rod", "action_verb": "Fill", "description": "Consumable wire or rod that adds material to the weld joint", "technique": "Match filler to base metal: ER70S-6 for mild steel, ER4043 for aluminum, ER308L for stainless. Dip into the leading edge of the pool, not the arc.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "R"},
+    {"id": "wire_brush", "name": "Wire Brush", "action_verb": "Clean", "description": "Stainless steel bristle brush for pre-weld cleaning and inter-pass cleaning", "technique": "Dedicated brushes per metal type — steel brush on stainless causes contamination. Clean 1 inch past the weld zone. Remove mill scale, rust, oil, and paint.", "color": "#2DD4BF", "xp_per_action": 12, "icon_symbol": "B"},
+]
+
+AUTOMOTIVE_MATERIALS = [
+    {"id": "engine_block", "name": "Engine Block", "color": "#6B7280", "category": "Powertrain", "complexity": "Advanced",
+     "origin": "Internal combustion engine — 150 years of thermodynamic engineering in a single casting",
+     "components": ["Cylinder bores", "Crankshaft journals", "Water jacket", "Oil galleries", "Deck surface"],
+     "system": "Thermodynamic-Mechanical axis", "uses": "Diagnostics, rebuilding, performance tuning, emissions",
+     "dive_layers": [
+         {"depth": 0, "label": "Under the Hood", "desc": "Cast iron or aluminum block — the heart of the vehicle. Every component connects to this one casting"},
+         {"depth": 1, "label": "Four-Stroke Cycle", "desc": "Intake-Compression-Power-Exhaust: 4 strokes, 2 revolutions, 1 power pulse. Otto cycle efficiency: ~25-30%"},
+         {"depth": 2, "label": "Combustion Chamber", "desc": "Fuel-air mixture compressed 10:1, ignited by spark at 40,000V. Flame front propagates at 30 m/s"},
+         {"depth": 3, "label": "Thermodynamics", "desc": "PV diagram: work = area inside the curve. Carnot efficiency limits what any heat engine can achieve"},
+         {"depth": 4, "label": "Tribology", "desc": "Hydrodynamic oil film: 0.001mm thick between bearing and journal. No metal-to-metal contact at speed"},
+         {"depth": 5, "label": "Molecular Combustion", "desc": "C₈H₁₈ + 12.5O₂ → 8CO₂ + 9H₂O + 5,471 kJ/mol. Every explosion is controlled chemistry"},
+     ]},
+    {"id": "brake_system", "name": "Brake System", "color": "#EF4444", "category": "Safety", "complexity": "Critical",
+     "origin": "Hydraulic friction braking — converting kinetic energy to heat through Pascal's principle",
+     "components": ["Master cylinder", "Calipers", "Rotors", "Pads", "Brake fluid (DOT 4)"],
+     "system": "Hydraulic-Friction axis", "uses": "Brake service, pad replacement, fluid flush, ABS diagnostics",
+     "dive_layers": [
+         {"depth": 0, "label": "Brake Components", "desc": "Pedal → master cylinder → brake lines → calipers → pads → rotors. Your foot controls 2 tons at 70 mph"},
+         {"depth": 1, "label": "Pascal's Law", "desc": "Pressure applied to confined fluid is transmitted equally. 4:1 mechanical advantage at the caliper"},
+         {"depth": 2, "label": "Friction Interface", "desc": "Pad meets rotor at 600°F under braking. Semi-metallic compounds: steel fiber + ceramic + friction modifiers"},
+         {"depth": 3, "label": "Heat Dissipation", "desc": "Vented rotors: 60 mph stop converts 500 kJ to heat. Brake fade = boiled fluid or glazed pads"},
+         {"depth": 4, "label": "ABS Logic", "desc": "Wheel speed sensors detect lockup. ECU pulses caliper pressure 15 times/second — faster than any human"},
+         {"depth": 5, "label": "Energy Conservation", "desc": "½mv² = Fd. All kinetic energy must go somewhere: heat in pads, or deformation in a crash. Physics has no sympathy"},
+     ]},
+    {"id": "electrical_harness", "name": "Electrical System", "color": "#FBBF24", "category": "Electronics", "complexity": "Intermediate",
+     "origin": "Vehicle wiring — 2+ miles of copper connecting 100+ computers in a modern car",
+     "components": ["ECU", "CAN bus", "Fuse box", "Alternator", "Battery (12V/48V)"],
+     "system": "Electronic-Communication axis", "uses": "Diagnostics, wiring repair, module programming, sensor replacement",
+     "dive_layers": [
+         {"depth": 0, "label": "Wiring Harness", "desc": "Color-coded wires bundled in looms — the nervous system of the vehicle. One broken wire = one dead system"},
+         {"depth": 1, "label": "CAN Bus Network", "desc": "Controller Area Network: 40+ modules sharing data at 500 kbps on twisted-pair wire. Invented by Bosch in 1983"},
+         {"depth": 2, "label": "OBD-II Protocol", "desc": "Standardized diagnostic port: 16 pins, 5 protocols. DTCs (P0xxx) tell you what failed, freeze frame tells you when"},
+         {"depth": 3, "label": "Sensor Physics", "desc": "O₂ sensor: zirconia generates voltage from exhaust oxygen differential. MAP sensor: piezoresistive silicon diaphragm"},
+         {"depth": 4, "label": "PWM Control", "desc": "Pulse Width Modulation: rapid on/off cycling controls average voltage. 100 Hz switching drives motors, LEDs, injectors"},
+         {"depth": 5, "label": "Semiconductor Logic", "desc": "MOSFET switches: gate voltage creates inversion layer in silicon. 0V = off, 5V = on. Billions per ECU"},
+     ]},
+]
+
+AUTOMOTIVE_TOOLS = [
+    {"id": "torque_wrench", "name": "Torque Wrench", "action_verb": "Torque", "description": "Calibrated wrench ensuring fasteners are tightened to manufacturer specifications", "technique": "Set to spec in ft-lbs or Nm. Pull smoothly — the click means 'stop.' Over-torquing stretches bolts; under-torquing lets them back out. Lug nuts: star pattern, 3 passes.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "obd_scanner", "name": "OBD-II Scanner", "action_verb": "Scan", "description": "Diagnostic tool reading fault codes and live data from the vehicle's computer", "technique": "Plug into the 16-pin port under the dash. Read DTCs first, then check freeze frame data. A code tells you what happened, not why — diagnosis starts after the scan.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "O"},
+    {"id": "oil_filter_wrench", "name": "Oil Filter Wrench", "action_verb": "Extract", "description": "Grip tool for removing spin-on oil filters without crushing them", "technique": "Loosen counter-clockwise. If stuck, drive a screwdriver through it for leverage (messy but effective). New filter: hand-tight plus 3/4 turn. Never over-tighten.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "auto_multimeter", "name": "Automotive DMM", "action_verb": "Diagnose", "description": "Digital multimeter rated for automotive voltage, current, and resistance testing", "technique": "Voltage drop test: the most powerful diagnostic technique. Measure across a connection under load — more than 0.1V means resistance. The problem is always at the connection.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "jack_stands", "name": "Jack & Stands", "action_verb": "Lift", "description": "Hydraulic floor jack and safety stands for under-vehicle access", "technique": "Jack at the manufacturer's lift point ONLY. Place stands on frame rails. Shake the vehicle before going under. The jack is for lifting; the stands are for living.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "J"},
+    {"id": "socket_set", "name": "Socket Set", "action_verb": "Fasten", "description": "Ratcheting drive sockets in 6-point and 12-point configurations", "technique": "6-point for loosening (more contact area). 12-point for tight spaces (30° increments). Extensions flex under load — support the socket with your other hand.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "brake_bleeder", "name": "Brake Bleeder", "action_verb": "Bleed", "description": "Pressure or vacuum tool for removing air from hydraulic brake lines", "technique": "Start at the wheel farthest from the master cylinder. Open bleeder, press pedal, close bleeder, release pedal. Repeat until fluid runs clear with no bubbles.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "B"},
+    {"id": "timing_light", "name": "Timing Light", "action_verb": "Time", "description": "Strobe light for checking ignition timing against crankshaft position", "technique": "Clip inductive pickup around #1 plug wire. Aim strobe at timing marks. Advance/retard to spec. On modern cars, timing is ECU-controlled — the light confirms, not adjusts.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "L"},
+    {"id": "compression_tester", "name": "Compression Tester", "action_verb": "Test", "description": "Gauge measuring cylinder compression to assess engine health", "technique": "Remove all spark plugs. Disable ignition. Thread gauge into cylinder. Crank 4-5 revolutions. All cylinders should be within 10% of each other. Low compression = rings, valves, or head gasket.", "color": "#2DD4BF", "xp_per_action": 12, "icon_symbol": "C"},
+]
+
+NUTRITION_MATERIALS = [
+    {"id": "whole_foods", "name": "Whole Foods", "color": "#22C55E", "category": "Foundation", "complexity": "Foundation",
+     "origin": "Unprocessed, nutrient-dense foods — the way humans ate for 200,000 years before 1950",
+     "components": ["Vegetables", "Fruits", "Whole grains", "Legumes", "Nuts/seeds"],
+     "system": "Nutritional-Metabolic axis", "uses": "Daily nutrition, disease prevention, energy optimization, gut health",
+     "dive_layers": [
+         {"depth": 0, "label": "The Plate", "desc": "Half vegetables, quarter protein, quarter whole grain — the simplest nutrition advice that actually works"},
+         {"depth": 1, "label": "Macronutrient Balance", "desc": "Carbs (45-65%), Protein (10-35%), Fat (20-35%). Ratios matter less than quality — a nut is not a doughnut"},
+         {"depth": 2, "label": "Phytochemicals", "desc": "8,000+ plant compounds: lycopene, sulforaphane, quercetin — not vitamins, but potent cell protectors"},
+         {"depth": 3, "label": "Fiber Fermentation", "desc": "Gut bacteria ferment soluble fiber into short-chain fatty acids (butyrate) — fuel for colonocytes and immune regulation"},
+         {"depth": 4, "label": "Nutrient Synergy", "desc": "Iron + vitamin C = 6x absorption. Turmeric + piperine = 2,000% bioavailability. Foods work in concert, not isolation"},
+         {"depth": 5, "label": "Metabolic Signaling", "desc": "mTOR, AMPK, sirtuins — nutrient sensors that toggle between growth and repair modes. Fasting activates cellular cleanup (autophagy)"},
+     ]},
+    {"id": "fermented", "name": "Fermented Foods", "color": "#A78BFA", "category": "Gut Health", "complexity": "Intermediate",
+     "origin": "Microbial transformation — 10,000 years of humans partnering with bacteria and yeast",
+     "components": ["Sauerkraut", "Kimchi", "Kefir", "Miso", "Kombucha"],
+     "system": "Microbiome-Immune axis", "uses": "Probiotic intake, digestive health, immune support, food preservation",
+     "dive_layers": [
+         {"depth": 0, "label": "Fermented Product", "desc": "Tangy, alive, bubbling — billions of beneficial organisms in every tablespoon"},
+         {"depth": 1, "label": "Lacto-Fermentation", "desc": "Lactobacillus converts sugars to lactic acid. pH drops from 6.5 to 3.5 — preserving food and creating probiotics simultaneously"},
+         {"depth": 2, "label": "Microbiome Diversity", "desc": "Fermented food consumers have 10,000+ unique microbial taxa. Diversity = resilience in the gut ecosystem"},
+         {"depth": 3, "label": "Immune Crosstalk", "desc": "70% of immune cells live in GALT (gut-associated lymphoid tissue). Probiotics train immune tolerance through dendritic cell signaling"},
+         {"depth": 4, "label": "Postbiotics", "desc": "Dead bacteria still beneficial: cell wall components (lipoteichoic acid) modulate inflammation independent of viability"},
+         {"depth": 5, "label": "Quorum Sensing", "desc": "Bacteria communicate via autoinducer molecules. At critical density, they collectively activate biofilm, virulence, or cooperation genes"},
+     ]},
+    {"id": "superfoods", "name": "Superfoods", "color": "#F59E0B", "category": "Optimization", "complexity": "Intermediate",
+     "origin": "Nutrient-dense foods with extraordinary concentrations of vitamins, minerals, and antioxidants",
+     "components": ["Spirulina", "Cacao", "Turmeric", "Moringa", "Açaí"],
+     "system": "Antioxidant-Longevity axis", "uses": "Supplementation, smoothie building, anti-inflammatory protocols, athletic recovery",
+     "dive_layers": [
+         {"depth": 0, "label": "Superfood Selection", "desc": "Deeply pigmented, minimally processed, traditionally revered — color intensity correlates with antioxidant density"},
+         {"depth": 1, "label": "ORAC Value", "desc": "Oxygen Radical Absorbance Capacity: cacao = 95,500 μmol TE/100g. For comparison, blueberries = 4,669"},
+         {"depth": 2, "label": "Polyphenol Action", "desc": "Flavonoids, stilbenes, lignans cross the blood-brain barrier. Reduce neuroinflammation. Improve cerebral blood flow"},
+         {"depth": 3, "label": "Curcumin Pathway", "desc": "Curcumin inhibits NF-κB (master inflammation switch), COX-2, and MMP-9 simultaneously — multi-target pharmacology"},
+         {"depth": 4, "label": "Xenohormesis", "desc": "Plant stress compounds (resveratrol from UV-stressed grapes) activate human stress-response pathways (sirtuins). Borrowed resilience"},
+         {"depth": 5, "label": "Mitochondrial Biogenesis", "desc": "PGC-1α activation by polyphenols triggers new mitochondria production — more cellular power plants from food compounds"},
+     ]},
+]
+
+NUTRITION_TOOLS = [
+    {"id": "macro_tracker", "name": "Macro Tracker", "action_verb": "Track", "description": "Caloric and macronutrient logging for nutritional awareness", "technique": "Log before you eat, not after. Focus on protein first (0.7-1g per lb bodyweight), then fill with vegetables and whole carbs. Tracking is a skill — accuracy improves with practice.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "ferment_vessel", "name": "Fermentation Vessel", "action_verb": "Culture", "description": "Airlock-sealed container for lacto-fermentation and kombucha brewing", "technique": "Salt brine for vegetables (2-3%). Submerge completely — anything above the brine spoils. Room temperature for 3-14 days. Taste daily. Your palate is the best pH meter.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "dehydrator", "name": "Food Dehydrator", "action_verb": "Preserve", "description": "Low-temperature dryer for creating raw snacks, herbs, and preserved foods", "technique": "Slice uniformly (1/4 inch). 115°F for 'raw' preservation, 135°F for jerky. Rotate trays halfway through. Done when leathery, not crunchy (fruits) or brittle (herbs).", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "sprouting_jar", "name": "Sprouting Jar", "action_verb": "Sprout", "description": "Mesh-lidded jar for germinating seeds into living nutrition", "technique": "Soak seeds overnight. Drain and rinse 2x daily. Keep inverted at 45° for drainage. Harvest when tails are 1-2x seed length. Sprouts have 10-100x the nutrients of dry seeds.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "ph_meter", "name": "pH Meter", "action_verb": "Measure", "description": "Digital probe for monitoring fermentation acidity and soil health", "technique": "Calibrate with buffer solutions before each use. Fermentation target: pH 3.5-4.0 for vegetables, 2.5-3.5 for kombucha. Below 4.6 prevents botulism — the critical safety line.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "P"},
+    {"id": "refractometer", "name": "Brix Refractometer", "action_verb": "Analyze", "description": "Optical instrument measuring sugar content in fruits and juices", "technique": "Place 2 drops on the prism. Close the lid. Look through the eyepiece. The blue-white boundary line reads in °Brix. Higher Brix = more minerals, better flavor, longer shelf life.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "B"},
+    {"id": "mortar_pestle", "name": "Mortar & Pestle", "action_verb": "Grind", "description": "Ancient stone tool for crushing spices, herbs, and medicinal preparations", "technique": "Coarse to fine: crack first with downward strikes, then grind in circles. Stone mortars absorb flavor over decades — season yours. Freshly ground spices have 10x the volatile oils.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "kitchen_scale", "name": "Digital Scale", "action_verb": "Weigh", "description": "Precision gram scale for accurate portioning and recipe consistency", "technique": "Tare between ingredients. Weigh in grams (more precise than ounces). Baking is chemistry — 10g extra flour changes texture. Weighing eliminates the #1 source of recipe failure.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "W"},
+    {"id": "food_journal", "name": "Food Journal", "action_verb": "Reflect", "description": "Mindful eating diary connecting food choices to energy, mood, and symptoms", "technique": "Log food AND how you feel 2 hours later. Patterns emerge in 2 weeks: 'dairy → brain fog, greens → energy.' The journal makes the invisible visible.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "J"},
+]
+
+MEDITATION_MATERIALS = [
+    {"id": "silence", "name": "Inner Silence", "color": "#6366F1", "category": "Foundation", "complexity": "Foundation",
+     "origin": "The practice of pure awareness — the space between thoughts where consciousness rests",
+     "components": ["Posture", "Stillness", "Non-attachment", "Present moment", "Witness awareness"],
+     "system": "Consciousness-Awareness axis", "uses": "Stress reduction, mental clarity, spiritual development, emotional regulation",
+     "dive_layers": [
+         {"depth": 0, "label": "Seated Practice", "desc": "Spine tall, eyes soft, jaw relaxed. The posture is the practice — alert without effort, relaxed without collapse"},
+         {"depth": 1, "label": "Thought Observation", "desc": "Thoughts arise like clouds. You are the sky, not the weather. Noticing a thought IS the practice succeeding"},
+         {"depth": 2, "label": "Default Mode Network", "desc": "DMN activity decreases with meditation. The 'monkey mind' is a measurable neural network — and it can be quieted"},
+         {"depth": 3, "label": "Gamma Synchrony", "desc": "Long-term meditators show 25x gamma wave activity (25-100 Hz) — neural coherence across the entire cortex"},
+         {"depth": 4, "label": "Cortical Thickening", "desc": "8 weeks of mindfulness measurably thickens the prefrontal cortex and shrinks the amygdala. The brain literally reshapes"},
+         {"depth": 5, "label": "Non-Dual Awareness", "desc": "Subject-object collapse: the observer and the observed merge. Neuroscience calls it 'minimal phenomenal experience'"},
+     ]},
+    {"id": "breath", "name": "Breath Awareness", "color": "#22C55E", "category": "Technique", "complexity": "Foundation",
+     "origin": "Pranayama — conscious breathing as the bridge between body and mind",
+     "components": ["Diaphragmatic breath", "4-7-8 pattern", "Box breathing", "Alternate nostril", "Breath retention"],
+     "system": "Autonomic-Respiratory axis", "uses": "Anxiety relief, sleep improvement, performance, vagal tone enhancement",
+     "dive_layers": [
+         {"depth": 0, "label": "Conscious Breath", "desc": "Notice the breath without changing it. Where do you feel it? Nostrils, chest, belly? This is the anchor"},
+         {"depth": 1, "label": "Autonomic Shift", "desc": "Extended exhale activates parasympathetic nervous system. 4-count inhale, 7-count hold, 8-count exhale = instant calm"},
+         {"depth": 2, "label": "Vagal Tone", "desc": "Slow breathing stimulates the vagus nerve. High vagal tone = better emotional regulation, lower inflammation, faster recovery"},
+         {"depth": 3, "label": "CO₂ Tolerance", "desc": "Breath retention builds chemoreceptor tolerance. Higher CO₂ tolerance = lower anxiety response. The chemistry of calm"},
+         {"depth": 4, "label": "Nitric Oxide", "desc": "Nasal breathing releases NO from paranasal sinuses — vasodilator, bronchodilator, antimicrobial. Mouth breathing bypasses this"},
+         {"depth": 5, "label": "Respiratory Sinus Arrhythmia", "desc": "Heart rate increases on inhale, decreases on exhale. Coherent breathing at 5.5 breaths/min maximizes heart rate variability"},
+     ]},
+    {"id": "visualization", "name": "Visualization", "color": "#F59E0B", "category": "Advanced", "complexity": "Intermediate",
+     "origin": "Mental imagery practice — the brain cannot distinguish vividly imagined experience from reality",
+     "components": ["Guided imagery", "Body of light", "Nature sanctuary", "Future self", "Healing visualization"],
+     "system": "Cognitive-Imaginative axis", "uses": "Goal achievement, pain management, sports performance, creative problem-solving",
+     "dive_layers": [
+         {"depth": 0, "label": "Inner Landscape", "desc": "Close eyes. Build the scene: a forest, a temple, a horizon. Add sensory detail until you can smell the air"},
+         {"depth": 1, "label": "Motor Imagery", "desc": "Imagining a movement activates 80% of the same neural circuits as performing it. Mental rehearsal IS physical practice"},
+         {"depth": 2, "label": "Reticular Activation", "desc": "RAS filters 11 million bits/second down to 50. Visualization programs the RAS to notice opportunities aligned with your image"},
+         {"depth": 3, "label": "Psychoneuroimmunology", "desc": "Visualizing immune cells attacking pathogens measurably increases NK cell activity. The mind heals the body"},
+         {"depth": 4, "label": "Theta State", "desc": "4-8 Hz theta waves during deep visualization — the same frequency as REM sleep and hypnagogic creativity"},
+         {"depth": 5, "label": "Quantum Observer Effect", "desc": "Consciousness collapses the wavefunction. At the deepest level, observation and reality are inseparable — the meditator's ultimate insight"},
+     ]},
+]
+
+MEDITATION_TOOLS = [
+    {"id": "focus_anchor", "name": "Focus Anchor", "action_verb": "Focus", "description": "Single-pointed concentration on a chosen object: breath, flame, or mantra", "technique": "Choose one anchor. When attention wanders (it will), gently return. Each return IS a repetition — like a bicep curl for attention. 10 returns = 10 reps of focus training.", "color": "#6366F1", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "breath_counter", "name": "Breath Counter", "action_verb": "Count", "description": "Counting breaths to stabilize wandering attention", "technique": "Count exhales from 1 to 10. If you lose count, start over without judgment. Reaching 10 consistently takes weeks. The practice is the restart, not the number.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "body_scan", "name": "Body Scan", "action_verb": "Scan", "description": "Systematic attention through every body region for somatic awareness", "technique": "Start at the crown. Move down slowly: forehead, eyes, jaw, throat, shoulders... Notice sensation without changing it. Tension you notice dissolves. Tension you ignore persists.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "B"},
+    {"id": "mantra_tool", "name": "Mantra Repetition", "action_verb": "Chant", "description": "Sacred syllable or phrase repeated to quiet the discursive mind", "technique": "Choose a resonant word: 'Om,' 'Shalom,' 'Peace.' Synchronize with breath. Let it become automatic — the mantra meditates you. In time, it continues in the background of awareness.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "loving_kindness", "name": "Loving-Kindness", "action_verb": "Radiate", "description": "Metta bhavana — generating compassion for self, loved ones, and all beings", "technique": "'May I be happy. May I be healthy. May I be safe.' Extend to a loved one, a neutral person, a difficult person, then all beings. The order matters — you can't give what you don't have.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "L"},
+    {"id": "walking_practice", "name": "Walking Meditation", "action_verb": "Walk", "description": "Slow, deliberate walking with full attention on each step", "technique": "10-pace path. Lift, move, place. Feel the heel, ball, toes. At the end, pause, turn mindfully, return. Speed is inversely proportional to depth. Slower = deeper.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "W"},
+    {"id": "sound_bath", "name": "Sound Immersion", "action_verb": "Listen", "description": "Deep listening to singing bowls, gongs, or ambient tones for vibrational healing", "technique": "Lie down. Close eyes. Let sound wash over you without analyzing. Tibetan bowls produce binaural beating that entrains brainwaves toward theta. Surrender to the frequency.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "med_journal", "name": "Meditation Journal", "action_verb": "Record", "description": "Post-sit documentation of insights, challenges, and subtle shifts", "technique": "Write immediately after sitting. Note: duration, technique, quality of attention, any insights or resistance. Patterns emerge over months that are invisible in the moment.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "J"},
+    {"id": "gratitude", "name": "Gratitude Practice", "action_verb": "Appreciate", "description": "Structured appreciation training rewiring the brain's negativity bias", "technique": "Three specifics, not generics. Not 'I'm grateful for my family' but 'I'm grateful my daughter laughed at breakfast today.' Specificity activates the reward circuitry.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "G"},
+]
+
+# Register V62.0 modules
+MODULES["welding"] = {"materials": WELDING_MATERIALS, "tools": WELDING_TOOLS, "mat_key": "materials", "mat_id_key": "material_id", "skill": "Welding_Skill"}
+MODULES["automotive"] = {"materials": AUTOMOTIVE_MATERIALS, "tools": AUTOMOTIVE_TOOLS, "mat_key": "systems", "mat_id_key": "system_id", "skill": "Automotive_Skill"}
+MODULES["nutrition"] = {"materials": NUTRITION_MATERIALS, "tools": NUTRITION_TOOLS, "mat_key": "foods", "mat_id_key": "food_id", "skill": "Nutrition_Skill"}
+MODULES["meditation"] = {"materials": MEDITATION_MATERIALS, "tools": MEDITATION_TOOLS, "mat_key": "practices", "mat_id_key": "practice_id", "skill": "Meditation_Skill"}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V62.0 — MASTER REGISTRY ENDPOINT
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WORKSHOP_REGISTRY = {
+    "welding": {"title": "Welding Workshop", "subtitle": "Trade Pillar — Tap the metal to dive into metallurgy. Select a tool to fuse.", "icon": "Flame", "accentColor": "#6B7280", "skillKey": "Welding_Skill", "matLabel": "Metal", "domain": "Trade & Craft"},
+    "automotive": {"title": "Automotive Workshop", "subtitle": "Trade Pillar — Tap the system to dive into engineering. Select a tool to diagnose.", "icon": "Car", "accentColor": "#6B7280", "skillKey": "Automotive_Skill", "matLabel": "System", "domain": "Trade & Craft"},
+    "nutrition": {"title": "Nutrition Workshop", "subtitle": "Healing Arts Cell — Tap the food group to dive into biochemistry. Select a tool to nourish.", "icon": "Apple", "accentColor": "#22C55E", "skillKey": "Nutrition_Skill", "matLabel": "Food", "domain": "Healing Arts"},
+    "meditation": {"title": "Meditation Workshop", "subtitle": "Mind & Spirit Cell — Tap the practice to dive into consciousness. Select a tool to awaken.", "icon": "Brain", "accentColor": "#6366F1", "skillKey": "Meditation_Skill", "matLabel": "Practice", "domain": "Mind & Spirit"},
+    "electrical": {"title": "Electrical Workshop", "subtitle": "Trade Pillar — Tap the conductor to dive into electron flow.", "icon": "Zap", "accentColor": "#B87333", "skillKey": "Electrical_Skill", "matLabel": "Conductor", "domain": "Trade & Craft"},
+    "plumbing": {"title": "Plumbing Workshop", "subtitle": "Trade Pillar — Tap the pipe to dive into fluid dynamics.", "icon": "Droplets", "accentColor": "#3B82F6", "skillKey": "Plumbing_Skill", "matLabel": "Pipe", "domain": "Trade & Craft"},
+    "landscaping": {"title": "Landscaping Workshop", "subtitle": "Trade Pillar — Tap the soil to dive into earth science.", "icon": "Leaf", "accentColor": "#22C55E", "skillKey": "Landscaping_Skill", "matLabel": "Material", "domain": "Trade & Craft"},
+    "nursing": {"title": "Nursing Workshop", "subtitle": "Healing Arts Cell — Tap the scenario to dive into physiology.", "icon": "Heart", "accentColor": "#EF4444", "skillKey": "Nursing_Skill", "matLabel": "Scenario", "domain": "Healing Arts"},
+    "bible": {"title": "Bible Study Workshop", "subtitle": "Sacred Knowledge Cell — Tap the scripture to dive into original language.", "icon": "BookOpen", "accentColor": "#D4AF37", "skillKey": "Bible_Study_Skill", "matLabel": "Scripture", "domain": "Sacred Knowledge"},
+    "childcare": {"title": "Child Care Workshop", "subtitle": "Social Pillar — Tap the scenario to dive into child development.", "icon": "Baby", "accentColor": "#F472B6", "skillKey": "Childcare_Skill", "matLabel": "Scenario", "domain": "Healing Arts"},
+    "eldercare": {"title": "Elderly Care Workshop", "subtitle": "Social Pillar — Tap the scenario to dive into gerontology.", "icon": "HandHeart", "accentColor": "#A78BFA", "skillKey": "Eldercare_Skill", "matLabel": "Scenario", "domain": "Healing Arts"},
+}
+
+
+@router.get("/workshop/registry")
+async def get_workshop_registry():
+    """V62.0 Master Registry — returns all available workshop modules with metadata."""
+    registry = []
+    for mod_id, meta in WORKSHOP_REGISTRY.items():
+        module = MODULES.get(mod_id)
+        registry.append({
+            "id": mod_id,
+            "title": meta["title"],
+            "subtitle": meta["subtitle"],
+            "icon": meta["icon"],
+            "accentColor": meta["accentColor"],
+            "skillKey": meta["skillKey"],
+            "matLabel": meta["matLabel"],
+            "domain": meta["domain"],
+            "materialCount": len(module["materials"]) if module else 0,
+            "toolCount": len(module["tools"]) if module else 0,
+            "route": f"/workshop/{mod_id}",
+        })
+    return {"modules": registry, "total": len(registry)}
+

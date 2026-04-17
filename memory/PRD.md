@@ -1,48 +1,51 @@
-# ENLIGHTEN.MINT.CAFE — V61.0 Total Organism
+# ENLIGHTEN.MINT.CAFE — V62.0 Dynamic Registry Architecture
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## V61.0 — Parity + Social Pillar + Neural Clusters
+## V62.0 — Dynamic Workshop Router + 4 New Cells + Parity II
 
-### Strike 1: Material Parity (3→6)
-- All V60 workshops expanded to 6 materials each:
-  - Electrical: +Fiber Optic Cable, GFCI Outlet, Circuit Breaker
-  - Plumbing: +Cast Iron DWV, SharkBite Push-Fit, Brass Ball Valve
-  - Landscaping: +River Rock, Sphagnum Peat, Hardwood Mulch
-  - Nursing: +Fall Risk Assessment, Cardiac Monitoring, Patient Education
-  - Bible Study: +Romans, Proverbs, Revelation
+### Dynamic Workshop Router (The Ghost Router)
+- **`DynamicWorkshop.js`**: Single route `/workshop/:moduleId` renders ANY workshop
+- Reads config from `GET /api/workshop/registry`, shapes itself dynamically
+- Adding a new module: 1 data block in workshop_v60.py, 1 registry entry. Zero frontend code.
+- **`GET /api/workshop/registry`**: Returns full manifest of all 11+ workshop modules
 
-### Strike 2: Social Pillar (2 New Cells)
-- **Child Care** (`/childcare-workbench`): Developmental Milestones, Play-Based Learning, Safety Protocol × 9 tools (Storytelling, Guided Play, Safety Protocol, Nutrition, Positive Guidance, Observation, Sensory Activity, Music/Movement, Empathy Modeling)
-- **Elderly Care** (`/eldercare-workbench`): Resident Dignity, Mobility & Transfers, Memory Care × 9 tools (Mobility Assist, Memory Engagement, Med-Pass, Companionship, Comfort Measures, Fall Prevention, Nutrition Support, Hygiene Care, Activity Planning)
-- Both mapped to Healing Arts domain in Trade Passport
+### 4 New Cells (V62.0)
+- **Welding** (`/workshop/welding`): Mild Steel, Aluminum 6061, Stainless 304 × 9 tools
+- **Automotive** (`/workshop/automotive`): Engine Block, Brake System, Electrical Harness × 9 tools
+- **Nutrition** (`/workshop/nutrition`): Whole Foods, Fermented Foods, Superfoods × 9 tools
+- **Meditation** (`/workshop/meditation`): Inner Silence, Breath Awareness, Visualization × 9 tools
 
-### Strike 3: Neural Clusters (Related Navigation)
-- **Trades cluster**: Electrical ↔ Plumbing ↔ Landscaping ↔ Masonry ↔ Carpentry
-- **Healing cluster**: Nursing ↔ Elderly Care ↔ Child Care ↔ Herbology
-- **Sacred cluster**: Bible Study ↔ Meditation ↔ Oracle
-- All workshops link back to Trade Passport
+### Parity II (V62.0)
+- Child Care expanded to 6: +Toddler Nutrition, Conflict Resolution, Cognitive Play
+- Elderly Care expanded to 6: +Palliative Care, Occupational Therapy, End-of-Life Dignity
+
+### Neural Clusters (V62.0)
+- Welding ↔ Automotive ↔ Electrical (Trades cluster)
+- Nutrition ↔ Herbology ↔ Nursing (Healing cluster)
+- Meditation ↔ Yoga ↔ Breathing ↔ Bible Study (Spirit cluster)
 
 ### System Totals
-- **163 hub nodules**, **9 Circular Workshop cells** (Masonry, Carpentry, Electrical, Plumbing, Landscaping, Nursing, Bible Study, Child Care, Elderly Care)
-- **39 materials** with 6-depth Recursive Dives
-- **81 tools** across all workshops
-- **791KB main bundle** (unchanged — new cells are lazy chunks)
+- **167 hub nodules**, **13 Circular Workshop cells**
+- **51 materials** with 6-depth Recursive Dives, **117 tools**
+- **791KB main bundle** (unchanged)
+- **11 modules** in the Master Registry, expandable to 200+ with data entries only
 
 ## Architecture
-- `UniversalWorkshop.js` — ONE component for all cells
-- `workshop_v60.py` — Universal dynamic endpoints
-- `SovereignProviders.js` — 26 contexts consolidated
-- Trade Passport: 7 domains, 8+ hybrid titles
-- Neural Context Signal + cross-cell Related navigation
+- `DynamicWorkshop.js` → reads registry → renders `UniversalWorkshop`
+- `workshop_v60.py` → all module data + universal endpoints + Master Registry
+- `SovereignProviders.js` → 26 contexts consolidated
+- Trade Passport: 7 domains, 8+ hybrid titles, all new skills mapped
+- Dynamic route: `/workshop/:moduleId` handles infinite modules
 
 ## Backlog
 ### P1
 - Intent-based search across Passport domains
-- Expand Child Care + Elderly Care to 6 materials (parity)
+- Expand new V62 modules to 6 materials (parity)
+- Migrate existing workshop pages (Masonry/Carpentry) to dynamic router
 ### P2
-- More workshop cells (Welding, Automotive, Nutrition, Meditation)
+- More workshop cells via registry (HVAC, Robotics, Public Speaking, Philosophy, etc.)
 - Meritocratic depth tiers
 - Sovereign Leaderboard
 - Predictive navigation

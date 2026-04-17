@@ -130,7 +130,8 @@ SKILL_DOMAINS = {
         "sources": ["Masonry_Skill", "masonry_build", "masonry_dive", "masonry_inspect",
                      "Carpentry_Skill", "carpentry_dive", "carpentry_inspect",
                      "Electrical_Skill", "Plumbing_Skill", "Landscaping_Skill",
-                     "electrical_inspect", "plumbing_inspect", "landscaping_inspect"],
+                     "electrical_inspect", "plumbing_inspect", "landscaping_inspect",
+                     "Welding_Skill", "welding_inspect", "Automotive_Skill", "automotive_inspect"],
     },
     "Healing Arts": {
         "color": "#22C55E",
@@ -138,13 +139,15 @@ SKILL_DOMAINS = {
                      "healing", "elixirs", "nourishment", "meal_planning",
                      "Nursing_Skill", "nursing_inspect",
                      "Childcare_Skill", "childcare_inspect",
-                     "Eldercare_Skill", "eldercare_inspect"],
+                     "Eldercare_Skill", "eldercare_inspect",
+                     "Nutrition_Skill", "nutrition_inspect"],
     },
     "Mind & Spirit": {
         "color": "#A78BFA",
         "sources": ["meditation_session", "breathing_exercise", "sacred_breathing",
                      "yoga_practice", "affirmations", "mantras", "daily_ritual",
-                     "oracle_reading", "dream_journal"],
+                     "oracle_reading", "dream_journal",
+                     "Meditation_Skill", "meditation_inspect"],
     },
     "Science & Physics": {
         "color": "#3B82F6",

@@ -276,9 +276,33 @@ const RELATED = {
     { label: 'Trade Passport', route: '/trade-passport' },
   ],
   '/bible-study-workbench': [
-    { label: 'Meditation', route: '/meditation' },
+    { label: 'Meditation', route: '/workshop/meditation' },
     { label: 'Oracle', route: '/oracle' },
     { label: 'Child Care', route: '/childcare-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/welding': [
+    { label: 'Masonry Workshop', route: '/masonry-workbench' },
+    { label: 'Automotive Workshop', route: '/workshop/automotive' },
+    { label: 'Electrical Workshop', route: '/electrical-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/automotive': [
+    { label: 'Welding Workshop', route: '/workshop/welding' },
+    { label: 'Electrical Workshop', route: '/electrical-workbench' },
+    { label: 'Plumbing Workshop', route: '/plumbing-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/nutrition': [
+    { label: 'Herbology', route: '/herbology' },
+    { label: 'Nursing Workshop', route: '/nursing-workbench' },
+    { label: 'Meal Planning', route: '/meal-planning' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/meditation': [
+    { label: 'Yoga', route: '/yoga' },
+    { label: 'Breathing', route: '/breathing' },
+    { label: 'Bible Study', route: '/bible-study-workbench' },
     { label: 'Trade Passport', route: '/trade-passport' },
   ],
   '/frequencies': [

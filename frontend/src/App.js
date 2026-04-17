@@ -266,6 +266,7 @@ const NursingWorkbench = lazy(() => import('./pages/NursingWorkbench'));
 const BibleStudyWorkbench = lazy(() => import('./pages/BibleStudyWorkbench'));
 const ChildCareWorkbench = lazy(() => import('./pages/ChildCareWorkbench'));
 const ElderCareWorkbench = lazy(() => import('./pages/ElderCareWorkbench'));
+const DynamicWorkshop = lazy(() => import('./components/DynamicWorkshop'));
 
 function PageLoader() {
   return (
@@ -568,6 +569,7 @@ function AnimatedRoutes() {
         <Route path="/bible-study-workbench" element={<BibleStudyWorkbench />} />
         <Route path="/childcare-workbench" element={<ChildCareWorkbench />} />
         <Route path="/eldercare-workbench" element={<ElderCareWorkbench />} />
+        <Route path="/workshop/:moduleId" element={<DynamicWorkshop />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
