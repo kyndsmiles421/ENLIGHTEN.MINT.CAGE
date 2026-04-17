@@ -256,7 +256,7 @@ export function MixerProvider({ children }) {
     text: () => <TextPanel textOverlays={textOverlays} setTextOverlays={setTextOverlays} />,
     overlay: () => <OverlayPanel imageOverlays={imageOverlays} setImageOverlays={setImageOverlays} />,
     effects: () => <EffectsPanel monitorFilters={monitorFilters} setMonitorFilters={setMonitorFilters} />,
-    ai: () => <AIPanel monitorFilters={monitorFilters} setMonitorFilters={setMonitorFilters} handleNav={handleNav} />,
+    ai: () => <AIPanel monitorFilters={monitorFilters} setMonitorFilters={setMonitorFilters} handleNav={handleNav} currentRoute={location.pathname} />,
     export: () => <ExportPanel selectedAspectRatio={selectedAspectRatio} setSelectedAspectRatio={setSelectedAspectRatio} handlePrintModule={handlePrintModule} handlePrintLedger={handlePrintLedger} />,
     account: () => <AccountPanel authToken={authToken} authUser={authUser} tier={tier} handleBroadcast={handleBroadcast} handleSever={handleSever} handleNav={handleNav} loadStore={loadStore} />,
   };

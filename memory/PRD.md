@@ -1,39 +1,39 @@
-# ENLIGHTEN.MINT.CAFE — V56.5 Production Ready
+# ENLIGHTEN.MINT.CAFE — V56.5 Global Generator Bridge
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## System Status: FULLY AUDITED + BUILD VERIFIED
-- **153 hub nodules** — zero hidden modules
-- **152/153 routes verified functional** via automated browser testing
-- **Production build**: SUCCESS — 1.2MB main bundle + 183 lazy chunks
-- **Code splitting active**: Three.js isolated to 3 chunks (~350KB each), only loaded on VR/StarChart/Fractal pages
-- **Zero overlays**, zero ghost buttons, zero dead links
+## V56.5 — Global Tool Bridge (April 17, 2026)
+- **Generators wired globally** via AI panel in bottom toolbar
+- 4 context-aware generators: Script, Lesson, Game, Ritual
+- **Context-aware**: Shows "GENERATORS — [current module]" — knows where you are
+- Generates content using GPT-5.2 specifically for the active module
+- Available from ANY of the 153 modules without leaving the room
+- Awards 15 XP per generation
 
-### Bundle Architecture (Sprocket Data Highway)
-- **Centripetal Core (1.2MB)**: React, Framer Motion, routing, auth, SpatialRoom — loads once
-- **Rotor Lanes (183 chunks)**: Each page is a separate chunk, loaded on-demand
-- **Freight Lane**: Three.js (393KB), @react-three (358KB), heavy 3D (346KB) — only loaded when user enters VR/3D modules
+### Full AI Panel Tools (accessible from any module):
+- Sage Prompt-to-FX (atmosphere presets)
+- Image to Video, AI Art, Text to Image, Text to Speech, AI Music, AI Avatar
+- **Script Generator** — creates scripts/manuals for current module
+- **Lesson Generator** — creates lessons for current module
+- **Game Generator** — creates game scenarios for current module
+- **Ritual Generator** — creates rituals/practices for current module
+- Journal quick-entry
 
-### 10 Command Pillars (153 total)
-| Pillar | Count | Status |
-|--------|-------|--------|
-| Practice | 15 | ALL ALIVE |
-| Divination | 15 | ALL ALIVE |
-| Sanctuary | 12 | ALL ALIVE |
-| Nourish & Heal | 13 | ALL ALIVE |
-| Knowledge | 16 | ALL ALIVE |
-| Creators & Generators | 15 | ALL ALIVE |
-| Sage AI Coach | 10 | ALL ALIVE |
-| RPG & Adventure | 10 | ALL ALIVE |
-| Cosmos & Physics | 21 | ALL ALIVE |
-| Sovereign Council | 26 | ALL ALIVE |
+---
+
+## System Status
+- 153 hub nodules, 152 verified functional
+- Zero hidden modules, zero overlays, zero ghost buttons
+- Production build: 1.2MB core + 183 lazy chunks
+- Adaptive AI (8 perspectives), 11 teacher scenes, 8 discovery scenes
+- Global generators accessible from bottom toolbar on every page
 
 ---
 
 ## Backlog
 ### P1
-- Further main bundle reduction (target <800KB)
-- Wire generators as global tools
+- Deepen room simulations for trade modules
+- Tree-shake main bundle below 800KB
 ### P2
 - Native mobile recording, Phygital NFC

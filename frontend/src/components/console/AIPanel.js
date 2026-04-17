@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, BookOpen } from 'lucide-react';
+import { Save, BookOpen, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import { AtmosphereJournal, saveAtmosphere } from '../AtmosphereJournal';
 import { DEFAULT_FILTERS } from '../ConsoleConstants';
@@ -30,11 +30,34 @@ export const SAGE_FX_PRESETS = {
   reset:     { ...DEFAULT_FILTERS },
 };
 
-export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav }) {
+export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, currentRoute }) {
   const [sagePrompt, setSagePrompt] = useState('');
   const [sageLoading, setSageLoading] = useState(false);
   const [lastMood, setLastMood] = useState(null);
   const [journalOpen, setJournalOpen] = useState(false);
+  const [genResult, setGenResult] = useState(null);
+  const [genLoading, setGenLoading] = useState(false);
+
+  // Determine current module context for generators
+  const currentModule = currentRoute?.replace(/^\//, '').replace(/-/g, ' ') || 'sovereign hub';
+
+  const handleGenerate = useCallback(async (toolType) => {
+    setGenLoading(true);
+    setGenResult(null);
+    try {
+      const res = await axios.post(`${API}/knowledge/deep-dive`, {
+        topic: `${toolType} for ${currentModule}`,
+        category: toolType === 'script' ? 'spiritual' : toolType === 'game' ? 'wellness' : 'general',
+        context: `Generate a ${toolType} specifically for the ${currentModule} module. The user is currently inside the ${currentModule} room. Make it practical and immediately usable. fresh`,
+      }, { timeout: 90000 });
+      setGenResult({ type: toolType, content: res.data?.content || 'No content generated' });
+      if (typeof window.__workAccrue === 'function') window.__workAccrue('generator', 15);
+      toast.success(`${toolType} generated for ${currentModule}`);
+    } catch {
+      toast.error('Generator unavailable. Try again.');
+    }
+    setGenLoading(false);
+  }, [currentModule]);
 
   const handleSagePrompt = useCallback(async (prompt) => {
     const words = prompt.toLowerCase().trim().split(/\s+/);
@@ -162,6 +185,53 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav }
                 <div className="text-[8px] font-bold" style={{ color: ai.color }}>{ai.label}</div>
               </button>
             ))}
+          </div>
+
+          {/* GLOBAL GENERATORS — Context-aware, works from any module */}
+          <div className="mt-3 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+            <div className="flex items-center gap-1.5 mb-2">
+              <Sparkles size={9} style={{ color: '#FBBF24' }} />
+              <span className="text-[7px] font-bold uppercase tracking-wider" style={{ color: '#FBBF24' }}>
+                Generators — {currentModule}
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5">
+              {[
+                { type: 'script', label: 'Script', color: '#C084FC' },
+                { type: 'lesson', label: 'Lesson', color: '#38BDF8' },
+                { type: 'game', label: 'Game', color: '#EF4444' },
+                { type: 'ritual', label: 'Ritual', color: '#22C55E' },
+              ].map(gen => (
+                <button key={gen.type} onClick={() => handleGenerate(gen.type)}
+                  disabled={genLoading}
+                  className="p-2 rounded-lg text-center active:scale-95"
+                  style={{
+                    background: genLoading ? 'rgba(255,255,255,0.01)' : `${gen.color}08`,
+                    border: `1px solid ${gen.color}18`,
+                    opacity: genLoading ? 0.4 : 1,
+                  }}
+                  data-testid={`gen-${gen.type}`}>
+                  <div className="text-[8px] font-bold" style={{ color: gen.color }}>{gen.label}</div>
+                </button>
+              ))}
+            </div>
+            {genLoading && (
+              <div className="flex items-center gap-2 mt-2 p-2 rounded-lg" style={{ background: 'rgba(251,191,36,0.04)' }}>
+                <div className="w-3 h-3 border border-yellow-500/40 border-t-yellow-500 rounded-full animate-spin" />
+                <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Generating for {currentModule}...</span>
+              </div>
+            )}
+            {genResult && !genLoading && (
+              <div className="mt-2 p-2.5 rounded-lg max-h-32 overflow-y-auto" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[8px] font-bold uppercase" style={{ color: '#FBBF24' }}>{genResult.type} — {currentModule}</span>
+                  <button onClick={() => setGenResult(null)} className="text-[8px]" style={{ color: 'rgba(255,255,255,0.3)' }}>Close</button>
+                </div>
+                <p className="text-[10px] leading-relaxed whitespace-pre-wrap" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                  {genResult.content.substring(0, 800)}{genResult.content.length > 800 ? '...' : ''}
+                </p>
+              </div>
+            )}
           </div>
         </>
       )}
