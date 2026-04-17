@@ -241,7 +241,7 @@ export default function TradePassport() {
             </h1>
           </div>
           <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-            Your unified mastery across the 155-cell organism. Every action, every dive, every discovery — recorded.
+            Your unified mastery across the 176-nodule organism. Every action, every dive, every discovery — recorded.
           </p>
         </div>
 
@@ -254,7 +254,7 @@ export default function TradePassport() {
               Sign in to activate your Sovereign Passport
             </p>
             <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              Your mastery across all 155 cells will be tracked, synthesized, and visualized here.
+              Your mastery across all 176 nodules will be tracked, synthesized, and visualized here.
             </p>
           </div>
         ) : loading ? (
@@ -343,7 +343,7 @@ export default function TradePassport() {
         ) : (
           <div className="text-center py-12">
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Begin exploring the 155 cells to build your Sovereign Passport.
+              Begin exploring the 176 nodules to build your Sovereign Passport.
             </p>
           </div>
         )}
