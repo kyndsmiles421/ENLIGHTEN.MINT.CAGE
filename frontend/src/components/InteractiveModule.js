@@ -24,7 +24,6 @@ import {
 import DeepDive from './DeepDive';
 import NarrationPlayer from './NarrationPlayer';
 import { ProximityItem } from './SpatialRoom';
-import SpatialRecorderUI, { useSpatialRecorder } from './SpatialRecorder';
 import OmniBridge from './OmniBridge';
 import TraditionLens from './TraditionLens';
 
@@ -659,7 +658,6 @@ export default function InteractiveModule({
   const [search, setSearch] = useState('');
   const [discoveredSet, setDiscoveredSet] = useState(new Set());
   const [studyItem, setStudyItem] = useState(null);
-  const recorder = useSpatialRecorder();
 
   // Load discovered state from localStorage
   useEffect(() => {
@@ -784,7 +782,6 @@ export default function InteractiveModule({
             <Zap size={12} /> Challenge
           </button>
           <div className="flex-1" />
-          <SpatialRecorderUI recorder={recorder} />
         </div>
 
         {/* Cultural Lens */}

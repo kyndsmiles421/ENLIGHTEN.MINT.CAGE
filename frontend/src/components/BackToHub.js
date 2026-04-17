@@ -293,7 +293,8 @@ export default function BackToHub() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed top-14 left-3 z-50 flex flex-wrap gap-1.5 max-w-[300px]"
+            className="absolute top-full left-0 mt-2 flex flex-wrap gap-1.5 max-w-[300px]"
+            style={{ zIndex: 4 }}
             data-testid="related-modules"
           >
             {related.map((item) => (
