@@ -133,7 +133,8 @@ SKILL_DOMAINS = {
                      "electrical_inspect", "plumbing_inspect", "landscaping_inspect",
                      "Welding_Skill", "welding_inspect", "Automotive_Skill", "automotive_inspect",
                      "HVAC_Skill", "hvac_inspect",
-                     "Machining_Skill", "machining_inspect"],
+                     "Machining_Skill", "machining_inspect",
+                     "Forestry_Skill", "forestry_inspect"],
     },
     "Healing Arts": {
         "color": "#22C55E",
@@ -143,7 +144,8 @@ SKILL_DOMAINS = {
                      "Childcare_Skill", "childcare_inspect",
                      "Eldercare_Skill", "eldercare_inspect",
                      "Nutrition_Skill", "nutrition_inspect",
-                     "FirstAid_Skill", "first_aid_inspect"],
+                     "FirstAid_Skill", "first_aid_inspect",
+                     "Permaculture_Skill", "permaculture_inspect"],
     },
     "Mind & Spirit": {
         "color": "#A78BFA",
@@ -157,12 +159,14 @@ SKILL_DOMAINS = {
         "sources": ["quantum", "fractal", "physics", "astronomy",
                      "observatory", "dimensional", "planetary",
                      "Robotics_Skill", "robotics_inspect",
-                     "Anatomy_Skill", "anatomy_inspect"],
+                     "Anatomy_Skill", "anatomy_inspect",
+                     "Geology_Skill", "geology_inspect"],
     },
     "Creative Arts": {
         "color": "#EC4899",
         "sources": ["generator_script", "generator_lesson", "generator_game",
-                     "generator_ritual", "creation_stories", "music", "soundscapes"],
+                     "generator_ritual", "creation_stories", "music", "soundscapes",
+                     "Music_Skill", "music_inspect"],
     },
     "Exploration": {
         "color": "#F97316",
@@ -177,7 +181,8 @@ SKILL_DOMAINS = {
                      "astrology", "sacred_texts", "bible", "mayan",
                      "Bible_Study_Skill", "bible_inspect",
                      "Hermetics_Skill", "hermetics_inspect",
-                     "Philosophy_Skill", "philosophy_inspect"],
+                     "Philosophy_Skill", "philosophy_inspect",
+                     "Economics_Skill", "economics_inspect"],
     },
 }
 

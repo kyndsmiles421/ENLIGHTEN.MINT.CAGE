@@ -375,6 +375,36 @@ const RELATED = {
     { label: 'Creator Console', route: '/creator-console' },
     { label: 'Cosmic Profile', route: '/cosmic-profile' },
   ],
+  '/workshop/forestry': [
+    { label: 'Landscaping', route: '/workshop/landscaping' },
+    { label: 'Carpentry', route: '/workshop/carpentry' },
+    { label: 'Permaculture', route: '/workshop/permaculture' },
+    { label: 'Geology', route: '/workshop/geology' },
+  ],
+  '/workshop/geology': [
+    { label: 'Forestry', route: '/workshop/forestry' },
+    { label: 'Anatomy', route: '/workshop/anatomy' },
+    { label: 'Robotics', route: '/workshop/robotics' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/economics': [
+    { label: 'Philosophy', route: '/workshop/philosophy' },
+    { label: 'Bible Study', route: '/workshop/bible' },
+    { label: 'Pedagogy', route: '/workshop/pedagogy' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/music': [
+    { label: 'Meditation', route: '/workshop/meditation' },
+    { label: 'Speaking', route: '/workshop/speaking' },
+    { label: 'Philosophy', route: '/workshop/philosophy' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
+  '/workshop/permaculture': [
+    { label: 'Forestry', route: '/workshop/forestry' },
+    { label: 'Landscaping', route: '/workshop/landscaping' },
+    { label: 'Nutrition', route: '/workshop/nutrition' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+  ],
 };
 
 export default function BackToHub() {
