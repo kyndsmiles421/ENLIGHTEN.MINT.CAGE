@@ -1299,6 +1299,432 @@ MODULES["hermetics"] = {"materials": HERMETICS_MATERIALS, "tools": HERMETICS_TOO
 # V63.0 — INTENT-BASED SEARCH TAGS + SEARCH ENDPOINT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V64.0 STRIKE 2: FULL PARITY for HVAC, Robotics, First Aid, Hermetics
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HVAC_MATERIALS.extend([
+    {"id": "heat_pump", "name": "Heat Pump System", "color": "#F97316", "category": "Heating/Cooling", "complexity": "Advanced",
+     "origin": "Reversible vapor compression — one machine for heating AND cooling", "composition": ["Reversing valve", "Indoor coil", "Outdoor coil", "Compressor"],
+     "system": "Thermodynamic cycle", "uses": "Year-round comfort, energy efficiency, electrification",
+     "dive_layers": [
+         {"depth": 0, "label": "Split System", "desc": "Indoor air handler + outdoor condenser connected by refrigerant lines — moves heat in either direction"},
+         {"depth": 1, "label": "Reversing Valve", "desc": "4-way valve swaps hot/cold coils: cooling mode = outdoor rejection, heating mode = outdoor absorption"},
+         {"depth": 2, "label": "COP in Heating", "desc": "COP of 3-4 in heating: for every 1 kW of electricity, moves 3-4 kW of heat from cold outdoor air into your home"},
+         {"depth": 3, "label": "Defrost Cycle", "desc": "Below 35°F, ice forms on outdoor coil. Reversal briefly melts it. The system heats itself to keep heating you"},
+         {"depth": 4, "label": "Carnot Limit", "desc": "COPmax = TH/(TH-TL). As outdoor temp drops, efficiency drops. At -10°F, backup heat required"},
+         {"depth": 5, "label": "Entropy Flow", "desc": "Heat naturally flows hot→cold (2nd Law). Heat pump forces cold→hot by adding work. You are paying to reverse entropy"},
+     ]},
+    {"id": "boiler", "name": "Hydronic Boiler", "color": "#EF4444", "category": "Heating", "complexity": "Advanced",
+     "origin": "Hot water heating — radiant comfort through heated water circulated in piping", "composition": ["Heat exchanger", "Circulator pump", "Expansion tank", "Air separator"],
+     "system": "Hydronic loop", "uses": "Radiant floor, baseboard, fan coil, snow melt, pool heating",
+     "dive_layers": [
+         {"depth": 0, "label": "Boiler Room", "desc": "Wall-hung condensing boiler: 95% AFUE. Stainless steel heat exchanger extracts maximum BTU from flue gas"},
+         {"depth": 1, "label": "Condensing Technology", "desc": "Return water below 130°F → flue gas condenses → latent heat captured. 10-15% more efficient than non-condensing"},
+         {"depth": 2, "label": "Radiant Physics", "desc": "Warm floor radiates infrared to objects/people. Mean Radiant Temperature drives comfort more than air temperature"},
+         {"depth": 3, "label": "Pump Curves", "desc": "System curve (resistance) intersects pump curve (flow/head). The crossing point IS the operating condition"},
+         {"depth": 4, "label": "Heat Transfer Coefficients", "desc": "Convection (h=5-25 W/m²K air), forced convection (h=50-20,000 water). Water moves 3,500x more heat than air per volume"},
+         {"depth": 5, "label": "Latent Heat", "desc": "Water vapor in flue gas: 970 BTU/lb released during condensation. The hidden energy that non-condensing boilers waste"},
+     ]},
+    {"id": "mini_split", "name": "Ductless Mini-Split", "color": "#22C55E", "category": "Zoned Comfort", "complexity": "Intermediate",
+     "origin": "Inverter-driven ductless system — individual room control without ductwork", "composition": ["Inverter compressor", "Wall cassette", "Line set", "Wireless remote"],
+     "system": "Variable refrigerant flow", "uses": "Room additions, old homes, server rooms, garages, multi-zone",
+     "dive_layers": [
+         {"depth": 0, "label": "Wall Cassette", "desc": "Sleek indoor unit with washable filter. Whisper-quiet: 19 dB. Each room gets its own thermostat"},
+         {"depth": 1, "label": "Inverter Technology", "desc": "Variable-speed compressor: runs at 10-100% capacity. No on/off cycling = tighter temp control and 30% energy savings"},
+         {"depth": 2, "label": "Refrigerant Metering", "desc": "Electronic expansion valve adjusts superheat in real-time. Better efficiency than fixed orifice across all conditions"},
+         {"depth": 3, "label": "SEER2 Rating", "desc": "Seasonal Energy Efficiency Ratio: BTU cooling per watt-hour. Top mini-splits hit SEER2 42 — 3x better than window units"},
+         {"depth": 4, "label": "DC Motor Physics", "desc": "Brushless DC motor in inverter compressor: permanent magnet rotor, electronically commutated. 95% electrical efficiency"},
+         {"depth": 5, "label": "Exergy Analysis", "desc": "Available work destroyed = T₀ × entropy generated. The mini-split minimizes irreversibility by matching capacity to load"},
+     ]},
+])
+
+ROBOTICS_MATERIALS.extend([
+    {"id": "lidar", "name": "LiDAR Scanner", "color": "#EF4444", "category": "Perception", "complexity": "Advanced",
+     "origin": "Light Detection and Ranging — laser-based 3D spatial mapping", "composition": ["Pulsed laser", "Rotating mirror", "Photodetector", "Time counter"],
+     "system": "Point cloud generation", "uses": "SLAM, obstacle avoidance, autonomous navigation, 3D mapping",
+     "dive_layers": [
+         {"depth": 0, "label": "Spinning Scanner", "desc": "360° rotating laser fires 300,000 pulses/second, building a real-time 3D point cloud of the environment"},
+         {"depth": 1, "label": "Time-of-Flight", "desc": "Laser pulse leaves, reflects off object, returns. Distance = (speed_of_light × time) / 2. Resolution: ±2cm at 100m"},
+         {"depth": 2, "label": "SLAM Algorithm", "desc": "Simultaneous Localization And Mapping: builds a map while tracking its own position within that map. The chicken-and-egg of robotics"},
+         {"depth": 3, "label": "Point Cloud Processing", "desc": "Millions of XYZ points → voxel grid → ground plane extraction → object clustering → bounding boxes. Raw data → understanding"},
+         {"depth": 4, "label": "Photon Detection", "desc": "Avalanche photodiode: single photon triggers electron cascade. Gain of 10⁶. Detects the faintest reflections"},
+         {"depth": 5, "label": "Quantum Noise Limit", "desc": "Shot noise from photon statistics sets fundamental detection limit. √N photons = minimum uncertainty in measurement"},
+     ]},
+    {"id": "stepper", "name": "Stepper Motor", "color": "#F59E0B", "category": "Actuation", "complexity": "Foundation",
+     "origin": "Open-loop positioning — precise step-by-step rotation without feedback", "composition": ["Stator coils (bipolar)", "Permanent magnet rotor", "1.8° step angle", "200 steps/revolution"],
+     "system": "Discrete position control", "uses": "3D printers, CNC, camera gimbals, pick-and-place machines",
+     "dive_layers": [
+         {"depth": 0, "label": "Motor Unit", "desc": "NEMA 17 frame: 4 wires, 200 steps per revolution. Each step = 1.8° of precise, repeatable rotation"},
+         {"depth": 1, "label": "Microstepping", "desc": "Driver subdivides each step into 16-256 microsteps via current shaping. 200 × 256 = 51,200 positions per revolution"},
+         {"depth": 2, "label": "Torque Curve", "desc": "Holding torque highest at standstill. Torque drops with speed due to back-EMF and inductance limiting current rise time"},
+         {"depth": 3, "label": "Magnetic Detent", "desc": "Permanent magnet rotor aligns with stator teeth. Each detent position = one full step. The physics of digital positioning"},
+         {"depth": 4, "label": "Current Chopping", "desc": "Driver switches current on/off at 20-50 kHz to maintain constant current despite changing back-EMF. Active current regulation"},
+         {"depth": 5, "label": "Reluctance Torque", "desc": "Torque = -dW/dθ. Magnetic energy varies with rotor angle. Minimum energy = stable position. Maximum gradient = peak torque"},
+     ]},
+    {"id": "end_effector", "name": "Robot End Effector", "color": "#22C55E", "category": "Manipulation", "complexity": "Intermediate",
+     "origin": "The robot's 'hand' — the tool that makes contact with the physical world", "composition": ["Gripper fingers", "Force sensor", "Pneumatic actuator", "Compliance mechanism"],
+     "system": "Grasping and manipulation", "uses": "Pick-and-place, assembly, material handling, surgical robotics",
+     "dive_layers": [
+         {"depth": 0, "label": "Gripper Assembly", "desc": "Parallel-jaw, soft-finger, or vacuum: each type matches a class of objects. The right gripper makes the robot useful"},
+         {"depth": 1, "label": "Grasp Planning", "desc": "Force closure: contact points must resist all external wrenches. Minimum 3 contacts for planar, 7 for spatial stability"},
+         {"depth": 2, "label": "Force Control", "desc": "Impedance control: the gripper behaves like a virtual spring-damper. Soft enough to hold an egg, firm enough to turn a bolt"},
+         {"depth": 3, "label": "Tactile Sensing", "desc": "Piezoresistive arrays at fingertips: 16×16 taxel grid detecting 0.01N force changes. The robot feels what it touches"},
+         {"depth": 4, "label": "Compliance Design", "desc": "Remote Center Compliance (RCC): passive mechanical device allowing peg-in-hole insertion despite 1mm misalignment"},
+         {"depth": 5, "label": "Contact Mechanics", "desc": "Hertz contact theory: elastic deformation at fingertip-object interface. Contact area grows as F^(2/3). Friction = μ × F_normal"},
+     ]},
+])
+
+FIRSTAID_MATERIALS.extend([
+    {"id": "burns", "name": "Burn Treatment", "color": "#F97316", "category": "Thermal", "complexity": "Intermediate",
+     "origin": "Thermal injury management — cooling, classifying, and covering burned tissue",
+     "components": ["Cool water", "Sterile dressing", "Pain management", "Fluid monitoring"],
+     "system": "Integumentary-Thermoregulatory axis", "uses": "Kitchen burns, sunburn, chemical exposure, electrical burns",
+     "dive_layers": [
+         {"depth": 0, "label": "Initial Response", "desc": "Stop the burning process. Cool with running water for 20 minutes. Do NOT use ice, butter, or toothpaste"},
+         {"depth": 1, "label": "Burn Classification", "desc": "Superficial (red), Partial-thickness (blisters), Full-thickness (white/charred). Rule of 9s estimates body surface area"},
+         {"depth": 2, "label": "Fluid Shift", "desc": "Burns >20% BSA cause massive capillary leak. Parkland formula: 4ml × kg × %BSA in first 24 hours"},
+         {"depth": 3, "label": "Inflammatory Cascade", "desc": "Histamine, bradykinin, prostaglandins flood the wound. Vasodilation + increased permeability = edema"},
+         {"depth": 4, "label": "Protein Denaturation", "desc": "At 60°C, collagen triple helix unwinds. At 70°C, cell membranes fail. Burns are molecular-level destruction"},
+         {"depth": 5, "label": "Zone of Stasis", "desc": "Jackson's burn model: zone of coagulation (dead), zone of stasis (salvageable), zone of hyperemia (will recover). Treatment targets the stasis zone"},
+     ]},
+    {"id": "choking", "name": "Choking / Heimlich", "color": "#8B5CF6", "category": "Airway", "complexity": "Critical",
+     "origin": "Foreign body airway obstruction — the technique that saves 50,000 lives per year",
+     "components": ["Recognition", "Back blows", "Abdominal thrusts", "Chest thrusts (infants/pregnant)"],
+     "system": "Respiratory-Mechanical axis", "uses": "Restaurant emergencies, pediatric choking, elderly aspiration",
+     "dive_layers": [
+         {"depth": 0, "label": "Recognition", "desc": "Universal choking sign: hands to throat. Can they speak? If yes = mild obstruction (encourage coughing). If no = severe = act NOW"},
+         {"depth": 1, "label": "Abdominal Thrust", "desc": "Stand behind, fist above navel, grasp with other hand, thrust inward-upward. The diaphragm compresses, forcing air up and object out"},
+         {"depth": 2, "label": "Physics of Expulsion", "desc": "Abdominal thrust creates 2-4 PSI surge in airway. This equals ~30 L/min airflow — enough to dislodge most objects"},
+         {"depth": 3, "label": "Airway Anatomy", "desc": "Epiglottis, vocal cords, trachea → carina → bronchi. Objects lodge most often at the right main bronchus (wider, more vertical)"},
+         {"depth": 4, "label": "Vagal Response", "desc": "Laryngospasm: protective reflex seals the airway. Can persist even after obstruction is cleared. Positive pressure ventilation may be needed"},
+         {"depth": 5, "label": "Hypoxic Cascade", "desc": "SpO₂ drops 3-5% per minute without ventilation. At 4 minutes: brain damage begins. At 6: irreversible. Time is everything"},
+     ]},
+    {"id": "allergic", "name": "Allergic Reaction", "color": "#EC4899", "category": "Immune", "complexity": "Advanced",
+     "origin": "Anaphylaxis recognition and treatment — the immune system attacking itself",
+     "components": ["Epinephrine", "Antihistamines", "Airway management", "Position of comfort"],
+     "system": "Immune-Vascular axis", "uses": "Bee stings, food allergies, drug reactions, latex sensitivity",
+     "dive_layers": [
+         {"depth": 0, "label": "Symptom Recognition", "desc": "Hives + swelling + difficulty breathing + dropping BP = anaphylaxis. Two or more body systems involved = give epi"},
+         {"depth": 1, "label": "EpiPen Protocol", "desc": "Outer thigh, through clothing if needed. Hold 10 seconds. Massage site. Effects last 15-20 minutes. Call 911 — biphasic reaction possible"},
+         {"depth": 2, "label": "Mast Cell Degranulation", "desc": "IgE antibodies crosslink on mast cells → histamine release → vasodilation, bronchospasm, increased permeability. The allergic cascade"},
+         {"depth": 3, "label": "Epinephrine Mechanism", "desc": "α₁: vasoconstriction (raises BP). β₁: increases heart rate/contractility. β₂: bronchodilation. One drug, three life-saving actions"},
+         {"depth": 4, "label": "Biphasic Reaction", "desc": "20% of anaphylaxis cases have a second wave 1-72 hours later. This is why observation is mandatory after epinephrine"},
+         {"depth": 5, "label": "IgE Sensitization", "desc": "First exposure: immune system creates IgE antibodies. Second exposure: pre-formed IgE triggers instant response. The immune memory that kills"},
+     ]},
+])
+
+HERMETICS_MATERIALS.extend([
+    {"id": "sacred_geometry", "name": "Sacred Geometry", "color": "#6366F1", "category": "Mathematics", "complexity": "Intermediate",
+     "origin": "The geometric patterns underlying all creation — the architecture of the universe made visible",
+     "components": ["Flower of Life", "Metatron's Cube", "Fibonacci spiral", "Platonic solids", "Vesica Piscis"],
+     "literary_form": "Visual mathematics", "uses": "Meditation objects, architectural design, artistic composition, cosmological understanding",
+     "dive_layers": [
+         {"depth": 0, "label": "The Patterns", "desc": "Circles within circles, spirals within spirals — the same geometry appears in galaxies, hurricanes, sunflowers, and DNA"},
+         {"depth": 1, "label": "Flower of Life", "desc": "19 interlocking circles: the matrix from which all Platonic solids can be derived. Found in temples from Egypt to China"},
+         {"depth": 2, "label": "Golden Ratio", "desc": "φ = 1.618033... Self-similar proportion found in nautilus shells, DNA helix, leaf arrangement (phyllotaxis), and the Parthenon"},
+         {"depth": 3, "label": "Platonic Solids", "desc": "Only 5 regular polyhedra exist: tetrahedron, cube, octahedron, dodecahedron, icosahedron. Mapped to elements since Plato"},
+         {"depth": 4, "label": "Fractal Self-Similarity", "desc": "Mandelbrot set: infinite complexity from z → z² + c. The boundary between order and chaos is infinitely detailed"},
+         {"depth": 5, "label": "Toroidal Field", "desc": "The torus: the only shape that folds into itself. The geometry of magnetic fields, blood flow, and — some say — consciousness"},
+     ]},
+    {"id": "tarot_arcana", "name": "Tarot Major Arcana", "color": "#EC4899", "category": "Symbolism", "complexity": "Intermediate",
+     "origin": "22 archetypal images mapping the soul's journey from Fool to World",
+     "components": ["The Fool (0)", "The Magician (I)", "The High Priestess (II)", "The Wheel (X)", "The World (XXI)"],
+     "literary_form": "Symbolic narrative", "uses": "Self-reflection, decision-making, archetypal psychology, creative inspiration",
+     "dive_layers": [
+         {"depth": 0, "label": "The Card", "desc": "22 Major Arcana: each card is a doorway into a universal human experience. Not fortune-telling — mirror-holding"},
+         {"depth": 1, "label": "The Fool's Journey", "desc": "Card 0 → XXI: the archetypal hero's journey. Innocence → mastery → surrender → completion. Every human walks this path"},
+         {"depth": 2, "label": "Jungian Archetypes", "desc": "Magician = conscious will. High Priestess = unconscious knowing. Tower = ego dissolution. These are the faces of the psyche"},
+         {"depth": 3, "label": "Hermetic Correspondence", "desc": "Each card maps to a Hebrew letter, an astrological sign, and a path on the Tree of Life. Three systems in one symbol"},
+         {"depth": 4, "label": "Active Imagination", "desc": "Jung's technique: dialogue with the archetypal image. The card speaks if you listen. The unconscious has information the ego lacks"},
+         {"depth": 5, "label": "Synchronicity", "desc": "Jung: meaningful coincidence without causal connection. The 'right' card appearing is not randomness — it is acausal orderedness"},
+     ]},
+    {"id": "astral", "name": "Astral Projection", "color": "#38BDF8", "category": "Consciousness", "complexity": "Advanced",
+     "origin": "Out-of-body experience — the ancient practice of separating awareness from the physical form",
+     "components": ["Relaxation", "Vibrational state", "Separation technique", "Navigation", "Return"],
+     "literary_form": "Experiential practice", "uses": "Consciousness exploration, lucid dreaming bridge, spiritual development",
+     "dive_layers": [
+         {"depth": 0, "label": "The Practice", "desc": "Deep relaxation → hypnagogic state → vibrational sensation → separation of awareness from body. Reported across all cultures"},
+         {"depth": 1, "label": "Monroe Technique", "desc": "Robert Monroe's method: reach the vibrational state, then 'roll out' or 'float up.' Maintain calm — fear snaps you back instantly"},
+         {"depth": 2, "label": "Sleep Paralysis Gateway", "desc": "REM atonia: the body paralyzes during sleep to prevent acting out dreams. Conscious awareness during atonia = the doorway"},
+         {"depth": 3, "label": "Theta-Gamma Burst", "desc": "EEG shows theta waves (4-8 Hz) with gamma bursts (40+ Hz) during reported OBEs — the brain signature of non-local awareness"},
+         {"depth": 4, "label": "Phenomenological Reports", "desc": "360° vision, passing through walls, silver cord connection, meeting entities. Cross-cultural consistency despite no shared training"},
+         {"depth": 5, "label": "Consciousness Beyond Brain", "desc": "The hard problem: if awareness separates from the brain, materialism is incomplete. NDEs and OBEs are the frontier of consciousness science"},
+     ]},
+])
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V64.0 STRIKE 3: 5 NEW CELLS — Public Speaking, Philosophy, Pedagogy, Anatomy, Machining
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SPEAKING_MATERIALS = [
+    {"id": "audience", "name": "Audience Analysis", "color": "#F59E0B", "category": "Preparation",
+     "origin": "Know your audience before you speak — the foundation of all effective communication",
+     "components": ["Demographics", "Knowledge level", "Attitudes", "Needs", "Context"],
+     "system": "Rhetorical-Analytical axis", "uses": "Speech prep, pitch meetings, teaching, advocacy",
+     "dive_layers": [
+         {"depth": 0, "label": "The Room", "desc": "Who are they? What do they already know? What do they need? What will move them? Answer these before writing a word"},
+         {"depth": 1, "label": "Aristotle's Triad", "desc": "Ethos (credibility), Pathos (emotion), Logos (logic). Every great speech balances all three. Most fail by relying on one"},
+         {"depth": 2, "label": "Cognitive Load", "desc": "Working memory holds 4±1 chunks. Structure your speech in 3 main points. More = forgotten. Fewer = thin"},
+         {"depth": 3, "label": "Mirror Neurons", "desc": "When you feel it, they feel it. Authentic emotion activates the listener's mirror neuron system. You can't fake passion"},
+         {"depth": 4, "label": "Primacy-Recency", "desc": "People remember the first thing and the last thing. Open with a hook. Close with a call to action. The middle is filler"},
+         {"depth": 5, "label": "Narrative Transport", "desc": "Stories reduce cortisol and increase oxytocin. A transported listener's resistance to persuasion drops by 50%. Story IS the mechanism"},
+     ]},
+    {"id": "persuasion", "name": "Persuasion Framework", "color": "#EF4444", "category": "Influence",
+     "origin": "The art and science of ethical influence — moving people toward better decisions",
+     "components": ["Framing", "Social proof", "Reciprocity", "Scarcity", "Commitment"],
+     "system": "Psychological-Rhetorical axis", "uses": "Sales, leadership, negotiation, activism, fundraising",
+     "dive_layers": [
+         {"depth": 0, "label": "The Ask", "desc": "What do you want them to DO after listening? If you don't know, neither will they. Start with the outcome"},
+         {"depth": 1, "label": "Cialdini's Principles", "desc": "Reciprocity, Commitment, Social Proof, Authority, Liking, Scarcity — the 6 weapons of ethical influence"},
+         {"depth": 2, "label": "Framing Effect", "desc": "'90% survival rate' vs '10% mortality rate.' Same data, opposite reactions. The frame IS the message"},
+         {"depth": 3, "label": "Cognitive Biases", "desc": "Anchoring, confirmation bias, availability heuristic — the shortcuts your audience's brain takes. Work with them, not against"},
+         {"depth": 4, "label": "Elaboration Likelihood", "desc": "Central route (logic) for engaged audiences. Peripheral route (cues) for disengaged. Match your approach to their investment"},
+         {"depth": 5, "label": "Neural Coupling", "desc": "fMRI shows speaker-listener brain patterns synchronize during effective communication. Literally: your brains connect"},
+     ]},
+    {"id": "storytelling_ps", "name": "Storytelling", "color": "#A78BFA", "category": "Delivery",
+     "origin": "The oldest technology for transmitting knowledge — 100,000 years of human narrative",
+     "components": ["Character", "Conflict", "Resolution", "Sensory detail", "Emotional arc"],
+     "system": "Narrative-Emotional axis", "uses": "Keynotes, teaching, branding, therapy, leadership",
+     "dive_layers": [
+         {"depth": 0, "label": "The Story", "desc": "Character + Want + Obstacle + Resolution = Story. Miss any element and you have an anecdote, not a narrative"},
+         {"depth": 1, "label": "Story Structure", "desc": "Freytag's pyramid: exposition → rising action → climax → falling action → resolution. The shape of every compelling story"},
+         {"depth": 2, "label": "Emotional Arc", "desc": "Vonnegut's shape of stories: 'Man in Hole' (fall then rise) is the most universally satisfying narrative shape"},
+         {"depth": 3, "label": "Sensory Anchoring", "desc": "'The room smelled like burnt coffee and ambition.' Concrete sensory details activate the listener's sensory cortex. They EXPERIENCE your story"},
+         {"depth": 4, "label": "Oxytocin Response", "desc": "Character-driven stories increase oxytocin by 47%. Oxytocin = trust, empathy, cooperation. Stories literally change brain chemistry"},
+         {"depth": 5, "label": "Collective Unconscious", "desc": "Campbell's monomyth: all human stories follow the same deep structure. The Hero's Journey is not a formula — it is an archetypal truth"},
+     ]},
+]
+
+SPEAKING_TOOLS = [
+    {"id": "hook", "name": "Opening Hook", "action_verb": "Hook", "description": "The first 30 seconds that determine if anyone listens to the next 30 minutes", "technique": "Start with a question, a startling statistic, a story, or a bold statement. Never start with 'My name is...' or 'Today I'm going to talk about...' Those are sleep signals.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "H"},
+    {"id": "vocal_variety", "name": "Vocal Variety", "action_verb": "Modulate", "description": "Using pitch, pace, volume, and pause to create meaning beyond words", "technique": "Speed up during excitement, slow down for emphasis. Pause BEFORE your key point (creates anticipation), not after (that's just... awkward). Whisper to draw them in.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "V"},
+    {"id": "body_language", "name": "Stage Presence", "action_verb": "Command", "description": "Using physical space, gesture, and posture to amplify your message", "technique": "Plant your feet. Gesture above the waist. Move with purpose — walk TO a new point when transitioning ideas. Open palms = trust. Pointed finger = aggression.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "structure_speech", "name": "Speech Structure", "action_verb": "Organize", "description": "The invisible skeleton that makes complex ideas feel simple", "technique": "Tell them what you'll tell them. Tell them. Tell them what you told them. Within the body: Problem-Solution, Chronological, or Cause-Effect. Pick ONE structure.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "O"},
+    {"id": "callback", "name": "Callback Technique", "action_verb": "Echo", "description": "Referencing earlier points to create thematic unity and audience recognition", "technique": "Plant a phrase in your opening. Reference it in the middle. Repeat it in the close with new meaning. The audience feels the circle close. This creates 'Aha.'", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "q_and_a", "name": "Q&A Mastery", "action_verb": "Field", "description": "Handling audience questions without losing control or credibility", "technique": "Repeat the question (buys time + ensures everyone heard). Answer the question you WISH they asked if the real one is hostile. End on YOUR terms — 'One final thought...'", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "Q"},
+    {"id": "visual_aid", "name": "Visual Design", "action_verb": "Show", "description": "Creating slides and visuals that amplify rather than replace your message", "technique": "One idea per slide. 6 words maximum. Full-bleed images. If the slide makes sense without you, you're the unnecessary one. Slides support; they don't substitute.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "rehearsal", "name": "Rehearsal Protocol", "action_verb": "Rehearse", "description": "The practice method that separates amateurs from professionals", "technique": "Record yourself. Watch without sound (check body language). Listen without video (check vocal variety). Time it. Cut 20%. Rehearse transitions most — that's where speakers stumble.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "R"},
+    {"id": "close", "name": "Power Close", "action_verb": "Close", "description": "The final impression that determines what they remember and what they do", "technique": "Circle back to your opening story/image with new meaning. End with a specific call to action. Never say 'In conclusion' or 'That's all I have.' Drop the mic, don't place it.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "P"},
+]
+
+PHILOSOPHY_MATERIALS = [
+    {"id": "ethics", "name": "Ethics", "color": "#22C55E", "category": "Moral", "complexity": "Foundation",
+     "origin": "The study of right action — how should we live?", "components": ["Virtue ethics", "Deontology", "Consequentialism", "Care ethics"],
+     "system": "Moral reasoning", "uses": "Decision-making, professional ethics, bioethics, justice",
+     "dive_layers": [
+         {"depth": 0, "label": "The Question", "desc": "'What should I do?' — the most practical question in all of philosophy. Every action has ethical weight"},
+         {"depth": 1, "label": "Three Frameworks", "desc": "Virtue (be good), Deontology (follow rules), Consequentialism (maximize outcomes). Each illuminates; none is complete alone"},
+         {"depth": 2, "label": "Trolley Problem", "desc": "Pull the lever? Push the man? Same outcome, different moral intuitions. The gap between these IS the territory of ethics"},
+         {"depth": 3, "label": "Moral Development", "desc": "Kohlberg: pre-conventional (punishment) → conventional (conformity) → post-conventional (principle). Most adults plateau at stage 4"},
+         {"depth": 4, "label": "Categorical Imperative", "desc": "Kant: act only by rules you could will to be universal law. 'Could I want everyone to do this?' If no, it's wrong. Period"},
+         {"depth": 5, "label": "Meta-Ethics", "desc": "Are moral facts real (realism) or constructed (anti-realism)? If constructed, by whom? If real, how do we access them? The foundation beneath the foundation"},
+     ]},
+    {"id": "logic", "name": "Logic", "color": "#3B82F6", "category": "Reasoning", "complexity": "Foundation",
+     "origin": "The laws of valid reasoning — the operating system of clear thinking", "components": ["Deduction", "Induction", "Abduction", "Fallacies"],
+     "system": "Formal-Informal reasoning", "uses": "Argumentation, critical thinking, programming, mathematics",
+     "dive_layers": [
+         {"depth": 0, "label": "The Argument", "desc": "Premises + conclusion. If the premises are true and the logic is valid, the conclusion MUST be true. That's the power"},
+         {"depth": 1, "label": "Syllogistic Form", "desc": "All A are B. All B are C. Therefore: All A are C. Valid. 'Some A are B. Some B are C. Therefore: Some A are C.' INVALID"},
+         {"depth": 2, "label": "Common Fallacies", "desc": "Ad hominem, strawman, false dilemma, appeal to authority, slippery slope, red herring — the 20 ways thinking goes wrong"},
+         {"depth": 3, "label": "Propositional Logic", "desc": "P → Q (if P then Q). Modus ponens: P, P→Q, therefore Q. Modus tollens: ¬Q, P→Q, therefore ¬P. The algebra of truth"},
+         {"depth": 4, "label": "Gödel's Incompleteness", "desc": "Any consistent formal system powerful enough to describe arithmetic contains true statements it cannot prove. Logic has limits"},
+         {"depth": 5, "label": "Paraconsistency", "desc": "What if contradictions don't destroy everything? Paraconsistent logics allow local contradiction without global explosion. The frontier"},
+     ]},
+    {"id": "metaphysics", "name": "Metaphysics", "color": "#8B5CF6", "category": "Reality", "complexity": "Advanced",
+     "origin": "The study of what exists — beyond physics, into the nature of reality itself", "components": ["Ontology", "Causation", "Free will", "Time", "Consciousness"],
+     "system": "Ontological-Cosmological axis", "uses": "Worldview formation, science philosophy, theology, AI ethics",
+     "dive_layers": [
+         {"depth": 0, "label": "The Question", "desc": "'What is real?' — the question that launched 2,500 years of Western philosophy and 5,000 years of Eastern inquiry"},
+         {"depth": 1, "label": "Substance & Property", "desc": "What is a 'thing'? A bundle of properties (Hume) or a substance with properties (Aristotle)? This determines everything"},
+         {"depth": 2, "label": "Causation Problem", "desc": "Hume: we never observe causation, only constant conjunction. 'The sun rose every day' ≠ 'The sun will rise tomorrow.' Induction is faith"},
+         {"depth": 3, "label": "Free Will", "desc": "Determinism (every event has a cause) vs libertarian free will vs compatibilism (both somehow). Your answer changes ethics, law, and identity"},
+         {"depth": 4, "label": "Problem of Universals", "desc": "Does 'redness' exist apart from red things? Plato: yes (Forms). Nominalism: no (just a word). This 2,400-year debate is still live"},
+         {"depth": 5, "label": "Hard Problem", "desc": "Chalmers: why does physical processing give rise to subjective experience? Why is there 'something it is like' to be conscious? The deepest question in philosophy"},
+     ]},
+]
+
+PHILOSOPHY_TOOLS = [
+    {"id": "socratic", "name": "Socratic Questioning", "action_verb": "Question", "description": "The method of inquiry through directed questioning that exposes assumptions", "technique": "Never state your position. Ask: 'What do you mean by X?' 'How do you know that?' 'What follows from that?' 'Can you give an example?' The question IS the teaching.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "Q"},
+    {"id": "thought_exp", "name": "Thought Experiment", "action_verb": "Imagine", "description": "Hypothetical scenarios that test the boundaries of concepts and intuitions", "technique": "Trolley Problem, Ship of Theseus, Brain in a Vat, Mary's Room. Construct a scenario that isolates ONE variable. If the intuition conflicts with the theory, one must yield.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "dialectic", "name": "Dialectical Method", "action_verb": "Synthesize", "description": "Thesis → antithesis → synthesis: advancing understanding through structured opposition", "technique": "State position A clearly. State its strongest opposition B. Find the truth in BOTH. Create position C that transcends the contradiction. Repeat. This is how knowledge evolves.", "color": "#8B5CF6", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "fallacy_check", "name": "Fallacy Detection", "action_verb": "Analyze", "description": "Identifying logical errors in arguments — yours and others'", "technique": "Read the argument. Identify the conclusion. Identify each premise. Ask: does this premise actually support the conclusion? Is the connection logical or emotional? Name the fallacy.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "phil_journal", "name": "Philosophical Journal", "action_verb": "Reflect", "description": "Written reflection connecting abstract ideas to lived experience", "technique": "Read a passage. Write what you understood. Write what confused you. Write how it connects to your life. The confusion is where the learning lives. Sit with it.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "J"},
+    {"id": "steelman", "name": "Steelmanning", "action_verb": "Strengthen", "description": "Constructing the strongest possible version of an opposing argument", "technique": "Before you argue against a position, build it up to its BEST form. If you can't present the opposition better than they can, you don't understand it well enough to critique it.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "concept_map", "name": "Concept Mapping", "action_verb": "Map", "description": "Visual diagramming of philosophical relationships and dependencies", "technique": "Central concept in the middle. Branch: causes, effects, related concepts, contradictions. Draw lines between related ideas. The map reveals structure invisible in linear reading.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "phil_dialogue", "name": "Philosophical Dialogue", "action_verb": "Dialogue", "description": "Structured conversation seeking truth rather than victory", "technique": "Rule 1: You must be willing to be wrong. Rule 2: Understand before you respond. Rule 3: Attack ideas, never people. Rule 4: The goal is truth, not winning.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "P"},
+    {"id": "meditation_phil", "name": "Philosophical Meditation", "action_verb": "Contemplate", "description": "Extended contemplation on a single philosophical question or paradox", "technique": "Choose one question: 'Am I the same person I was 10 years ago?' Sit with it for 30 minutes. Don't search for answers — let the question deepen. The depth IS the practice.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "C"},
+]
+
+PEDAGOGY_MATERIALS = [
+    {"id": "lesson_design", "name": "Lesson Design", "color": "#3B82F6", "category": "Planning",
+     "origin": "Backwards design — start with what students should KNOW and DO, then build backward",
+     "components": ["Learning objectives", "Assessment design", "Activity sequence", "Differentiation"],
+     "system": "Instructional design", "uses": "K-12, higher ed, corporate training, workshop facilitation",
+     "dive_layers": [
+         {"depth": 0, "label": "The Plan", "desc": "Objective → Assessment → Instruction. If you can't assess it, you can't teach it. If you can't state it, you don't know what it is"},
+         {"depth": 1, "label": "Bloom's Taxonomy", "desc": "Remember → Understand → Apply → Analyze → Evaluate → Create. Most teaching stays at 'Remember.' Mastery lives at 'Create'"},
+         {"depth": 2, "label": "Backwards Design", "desc": "Wiggins & McTighe: start with the desired result, determine acceptable evidence, THEN plan learning experiences. Most teachers do this backward"},
+         {"depth": 3, "label": "Cognitive Load Theory", "desc": "Intrinsic load (complexity) + extraneous load (poor design) + germane load (learning) = total. Reduce extraneous. Manage intrinsic. Maximize germane"},
+         {"depth": 4, "label": "Schema Formation", "desc": "New knowledge must attach to existing schema. If there's no hook, the information bounces off. Activate prior knowledge FIRST"},
+         {"depth": 5, "label": "Transfer Problem", "desc": "Learning in context A rarely transfers to context B without explicit bridging. This is why school knowledge often can't be applied in life"},
+     ]},
+    {"id": "assessment", "name": "Assessment Design", "color": "#22C55E", "category": "Evaluation",
+     "origin": "Measuring what matters — the difference between testing memory and testing understanding",
+     "components": ["Formative", "Summative", "Authentic", "Portfolio", "Self-assessment"],
+     "system": "Measurement-Feedback axis", "uses": "Grading, feedback, certification, program evaluation",
+     "dive_layers": [
+         {"depth": 0, "label": "The Assessment", "desc": "Formative = checking the oven mid-bake. Summative = tasting the finished cake. Both necessary, different purposes"},
+         {"depth": 1, "label": "Validity & Reliability", "desc": "Validity: does it measure what we claim? Reliability: would we get the same result again? A ruler that's wrong is reliable but invalid"},
+         {"depth": 2, "label": "Authentic Assessment", "desc": "Real-world tasks: build it, present it, solve the actual problem. Multiple-choice tests measure recognition, not capability"},
+         {"depth": 3, "label": "Rubric Design", "desc": "Analytic rubrics: separate scores per criterion. Holistic rubrics: one overall score. Rubrics make invisible expectations visible"},
+         {"depth": 4, "label": "Assessment Bias", "desc": "Language bias, cultural bias, format bias (some students freeze on tests but shine in projects). Every format advantages someone"},
+         {"depth": 5, "label": "Washback Effect", "desc": "Students study for the test format, not the content. If you test memorization, they memorize. If you test thinking, they think. The test SHAPES the learning"},
+     ]},
+    {"id": "classroom_mgmt", "name": "Classroom Management", "color": "#F59E0B", "category": "Environment",
+     "origin": "Creating conditions where learning happens — the invisible architecture of the classroom",
+     "components": ["Routines", "Expectations", "Relationships", "Engagement", "Transitions"],
+     "system": "Environmental-Behavioral axis", "uses": "K-12, workshops, group facilitation, community education",
+     "dive_layers": [
+         {"depth": 0, "label": "The Room", "desc": "The best classroom management is invisible: students are too engaged to misbehave. Engagement IS management"},
+         {"depth": 1, "label": "Proactive Systems", "desc": "80% of management is prevention: clear routines, taught expectations, smooth transitions. Reactive management means the system failed"},
+         {"depth": 2, "label": "Relationship-Driven", "desc": "Students don't learn from people they don't trust. 'They don't care what you know until they know that you care.' (Teddy Roosevelt, paraphrased)"},
+         {"depth": 3, "label": "Restorative Practices", "desc": "Harm → repair → reintegration. 'What happened? Who was affected? How do we make it right?' Punishment controls behavior; restoration builds character"},
+         {"depth": 4, "label": "Self-Determination Theory", "desc": "Autonomy + Competence + Relatedness = intrinsic motivation (Deci & Ryan). Remove any one and motivation collapses to compliance"},
+         {"depth": 5, "label": "Hidden Curriculum", "desc": "The unspoken lessons of HOW the classroom runs: who gets called on, whose ideas are valued, what counts as 'smart.' The structure teaches as much as the content"},
+     ]},
+]
+
+PEDAGOGY_TOOLS = [
+    {"id": "objective_writer", "name": "Objective Writer", "action_verb": "Define", "description": "Crafting measurable learning objectives using Bloom's action verbs", "technique": "'Students will be able to [verb] [content] [condition].' Use Bloom's verbs: analyze, not 'understand.' Evaluate, not 'know about.' If you can't observe and measure it, rewrite it.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "O"},
+    {"id": "formative_check", "name": "Formative Check", "action_verb": "Check", "description": "Quick mid-lesson assessment to adjust instruction in real-time", "technique": "Exit ticket, thumbs up/down, whiteboard response, think-pair-share. Check understanding every 10 minutes. If 30% are lost, STOP and reteach. Don't plow through for the 70%.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "scaffold", "name": "Scaffolding", "action_verb": "Support", "description": "Temporary support structures that enable learners to reach beyond current ability", "technique": "Model → guided practice → independent practice. Gradually remove support as competence grows. The scaffold is not the building — remove it when the walls can stand.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "differentiation", "name": "Differentiation", "action_verb": "Adapt", "description": "Adjusting content, process, or product to meet diverse learner needs", "technique": "Same learning goal, different paths. Tiered tasks: all students work on persuasive writing, but the texts vary in complexity. Choice boards let students select HOW they demonstrate mastery.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "questioning", "name": "Questioning Strategy", "action_verb": "Probe", "description": "Using strategic questions to deepen thinking rather than check recall", "technique": "Wait time: 3-5 seconds after asking. Cold call, not hand-raising (equity). Follow up: 'How do you know?' 'What if...?' 'Can someone add to that?' The second question is where thinking starts.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "Q"},
+    {"id": "cooperative", "name": "Cooperative Learning", "action_verb": "Collaborate", "description": "Structured group work where every member has a role and accountability", "technique": "Jigsaw, think-pair-share, numbered heads, gallery walk. Structure is everything: unstructured group work = one person works, three watch. Assign roles. Build in individual accountability.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "G"},
+    {"id": "feedback_tool", "name": "Feedback Protocol", "action_verb": "Respond", "description": "Giving specific, actionable feedback that improves performance", "technique": "Stars and stairs: what's working + what to improve. Be specific: not 'good job' but 'your thesis clearly states a position.' Timely: feedback 3 weeks later is archaeology, not guidance.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "reflection", "name": "Reflective Practice", "action_verb": "Reflect", "description": "Systematic self-evaluation of teaching effectiveness", "technique": "After every lesson: What worked? What didn't? What will I change? Record a 2-minute voice memo. Review monthly. The teacher who doesn't reflect teaches the same first year 30 times.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "R"},
+    {"id": "culturally_resp", "name": "Cultural Responsiveness", "action_verb": "Honor", "description": "Teaching that validates and incorporates students' cultural identities", "technique": "Learn names correctly. Include diverse perspectives in content. Examine your own biases. 'Windows and mirrors': students need to see themselves AND see others. Representation is not optional.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "H"},
+]
+
+ANATOMY_MATERIALS = [
+    {"id": "musculoskeletal", "name": "Musculoskeletal System", "color": "#94A3B8", "category": "Movement",
+     "origin": "206 bones + 600 muscles — the framework that moves the human body",
+     "components": ["Bones", "Joints", "Skeletal muscle", "Tendons", "Ligaments"],
+     "system": "Structural-Mechanical axis", "uses": "Physical therapy, sports medicine, orthopedics, anatomy education",
+     "dive_layers": [
+         {"depth": 0, "label": "Body in Motion", "desc": "Skeleton provides structure, muscles provide force, joints provide movement. Three systems working as one machine"},
+         {"depth": 1, "label": "Joint Mechanics", "desc": "Ball-and-socket (hip), hinge (elbow), pivot (atlas), saddle (thumb). Each joint type allows specific degrees of freedom"},
+         {"depth": 2, "label": "Muscle Fiber Types", "desc": "Type I (slow oxidative: marathon), Type IIa (fast oxidative: middle distance), Type IIx (fast glycolytic: sprint). Genetics sets the ratio"},
+         {"depth": 3, "label": "Sliding Filament", "desc": "Actin and myosin interdigitate. Myosin heads walk along actin powered by ATP hydrolysis. 10nm power stroke per cycle"},
+         {"depth": 4, "label": "Calcium Signaling", "desc": "Action potential → T-tubule → sarcoplasmic reticulum releases Ca²⁺ → troponin shifts → actin binding sites exposed → contraction"},
+         {"depth": 5, "label": "ATP Synthesis", "desc": "Creatine phosphate (10s) → glycolysis (2min) → oxidative phosphorylation (hours). Three energy systems, one seamless transition"},
+     ]},
+    {"id": "cardiovascular", "name": "Cardiovascular System", "color": "#EF4444", "category": "Circulation",
+     "origin": "The heart pumps 2,000 gallons per day through 60,000 miles of vessels",
+     "components": ["Heart (4 chambers)", "Arteries", "Veins", "Capillaries", "Blood (5L)"],
+     "system": "Circulatory-Oxygen transport", "uses": "Cardiology, emergency medicine, exercise physiology, pathology",
+     "dive_layers": [
+         {"depth": 0, "label": "The Heart", "desc": "Right side: lungs. Left side: body. Four chambers, four valves, one electrical system. Beats 100,000 times per day without rest"},
+         {"depth": 1, "label": "Cardiac Cycle", "desc": "Diastole (fill) → atrial systole (top-off) → ventricular systole (pump). 0.8 seconds per cycle at 75 bpm. S1 (closure of AV valves) S2 (closure of semilunar)"},
+         {"depth": 2, "label": "Hemodynamics", "desc": "Cardiac output = stroke volume × heart rate. Mean arterial pressure = CO × systemic vascular resistance. These two equations explain cardiovascular physiology"},
+         {"depth": 3, "label": "Capillary Exchange", "desc": "Starling forces: hydrostatic pressure pushes fluid out, oncotic pressure pulls it back. The balance determines edema vs dehydration"},
+         {"depth": 4, "label": "Oxygen Transport", "desc": "Hemoglobin: 4 heme groups, each binding one O₂. Cooperative binding: the first O₂ makes the next easier. The sigmoid curve of life"},
+         {"depth": 5, "label": "Cardiac Electrophysiology", "desc": "SA node fires at 60-100 bpm. Gap junctions propagate depolarization as a syncytium. The heart is its own pacemaker — it beats without the brain"},
+     ]},
+    {"id": "nervous_system", "name": "Nervous System", "color": "#A78BFA", "category": "Control",
+     "origin": "86 billion neurons processing reality at 268 mph — the body's command center",
+     "components": ["Brain", "Spinal cord", "Peripheral nerves", "Autonomic system", "Sensory organs"],
+     "system": "Neural-Cognitive axis", "uses": "Neurology, psychiatry, neuroscience, pain management",
+     "dive_layers": [
+         {"depth": 0, "label": "The Network", "desc": "Central (brain + cord) and Peripheral (31 spinal nerves + 12 cranial). Voluntary (move your arm) and Autonomic (digest your food)"},
+         {"depth": 1, "label": "Brain Regions", "desc": "Frontal (decision), Parietal (sensation), Temporal (memory/language), Occipital (vision), Cerebellum (coordination), Brainstem (survival)"},
+         {"depth": 2, "label": "Action Potential", "desc": "Resting: -70mV. Threshold: -55mV. Depolarization: +30mV. Repolarization: -70mV. Refractory. All-or-nothing. 1-2ms per spike"},
+         {"depth": 3, "label": "Synaptic Transmission", "desc": "Vesicles fuse → neurotransmitter floods cleft → binds receptor → ion channel opens → post-synaptic potential. 0.5ms delay per synapse"},
+         {"depth": 4, "label": "Neurotransmitter Systems", "desc": "Glutamate (excitatory), GABA (inhibitory), Dopamine (reward), Serotonin (mood), Acetylcholine (muscle). Five molecules, all of behavior"},
+         {"depth": 5, "label": "Consciousness", "desc": "Integrated Information Theory (Φ): consciousness = the amount of integrated information a system generates. The brain's deepest mystery, quantified"},
+     ]},
+]
+
+ANATOMY_TOOLS = [
+    {"id": "palpation", "name": "Palpation", "action_verb": "Palpate", "description": "Using hands to examine body structures through touch", "technique": "Light palpation first (1-2 cm depth), then deep. Flat fingers for large areas, fingertips for specific structures. Close your eyes — your fingers see more when your eyes are closed.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "P"},
+    {"id": "dissection", "name": "Virtual Dissection", "action_verb": "Dissect", "description": "Layer-by-layer exploration of anatomical structures", "technique": "Skin → fascia → muscle → vessels → nerves → bone. Always identify before cutting. Respect the cadaver — they are your first patient and your greatest teacher.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "imaging", "name": "Medical Imaging", "action_verb": "Image", "description": "Interpreting X-ray, CT, MRI, and ultrasound to see inside the living body", "technique": "X-ray: bones (white), air (black), soft tissue (grey). CT: cross-sections. MRI: soft tissue detail. Ultrasound: real-time, no radiation. Each modality has its strength.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "I"},
+    {"id": "surface_anatomy", "name": "Surface Landmarks", "action_verb": "Locate", "description": "Identifying anatomical structures visible or palpable at the body surface", "technique": "Sternal notch, acromion process, ASIS, tibial tuberosity. These landmarks are your GPS for locating deeper structures. Learn them until you can find them in the dark.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "L"},
+    {"id": "histology", "name": "Histology", "action_verb": "Examine", "description": "Microscopic examination of tissue structure and cellular organization", "technique": "Low power first (orientation), then high power (detail). Identify: epithelial type, connective tissue, muscle type, nerve presence. The tissue tells you the function.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "H"},
+    {"id": "clinical_corr", "name": "Clinical Correlation", "action_verb": "Correlate", "description": "Connecting anatomical knowledge to clinical presentations", "technique": "'The patient has weakness in wrist extension.' Trace the nerve: radial nerve → posterior cord → C5-C8 roots. Where could it be damaged? Anatomy IS diagnosis.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "movement_analysis", "name": "Movement Analysis", "action_verb": "Analyze", "description": "Breaking complex movements into component joint actions and muscle activations", "technique": "Observe the movement. Identify each joint involved. Name the motion (flexion, extension, rotation). Identify the prime mover, synergist, and antagonist. Now you understand the movement.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "anatomy_sketch", "name": "Anatomical Drawing", "action_verb": "Draw", "description": "Hand-drawing anatomical structures to reinforce spatial understanding", "technique": "Draw from observation, not memory (at first). Label as you draw. Drawing forces attention to details you'd skip while reading. The hand teaches the brain spatial relationships.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "systems_review", "name": "Systems Review", "action_verb": "Integrate", "description": "Connecting multiple organ systems to understand whole-body function", "technique": "Pick one function: 'exercise.' Trace through: respiratory (O₂ in), cardiovascular (O₂ delivery), muscular (contraction), nervous (coordination), endocrine (regulation). Everything connects.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "R"},
+]
+
+MACHINING_MATERIALS = [
+    {"id": "lathe_work", "name": "Lathe Work", "color": "#6B7280", "category": "Turning",
+     "origin": "The mother of all machine tools — rotating the workpiece against a fixed cutting tool",
+     "components": ["Chuck", "Tailstock", "Tool post", "Cross-slide", "Lead screw"],
+     "system": "Rotational machining", "uses": "Shafts, bushings, threads, tapers, facing, boring",
+     "dive_layers": [
+         {"depth": 0, "label": "The Setup", "desc": "Workpiece in chuck, tool at center height, RPM set by material and diameter. The lathe is 5,000 years old and still irreplaceable"},
+         {"depth": 1, "label": "Cutting Parameters", "desc": "Surface speed (SFM), feed rate (IPR), depth of cut (DOC). These three numbers determine finish quality, tool life, and cycle time"},
+         {"depth": 2, "label": "Chip Formation", "desc": "Type 1 (continuous), Type 2 (built-up edge), Type 3 (segmented). Chip type reveals if your parameters are correct. Listen to the cut"},
+         {"depth": 3, "label": "Tool Geometry", "desc": "Rake angle (chip flow), clearance angle (no rubbing), nose radius (finish). Each degree matters. Sharpen to specification, not to 'looks sharp'"},
+         {"depth": 4, "label": "Taylor's Tool Life", "desc": "VT^n = C. Speed × Tool-life^exponent = constant. Double the speed, tool life drops exponentially. The fundamental tradeoff of machining"},
+         {"depth": 5, "label": "Cutting Mechanics", "desc": "Merchant's circle: cutting force, thrust force, friction force, shear angle. All of machining is controlled shear deformation of metal"},
+     ]},
+    {"id": "milling", "name": "Milling Operations", "color": "#3B82F6", "category": "Multi-Axis",
+     "origin": "Rotating cutter, fixed workpiece — the most versatile machine tool for flat and complex surfaces",
+     "components": ["Spindle", "End mill", "Vise", "Work table (XYZ)", "Digital readout"],
+     "system": "Multi-axis material removal", "uses": "Pockets, slots, contours, drill patterns, keyways",
+     "dive_layers": [
+         {"depth": 0, "label": "The Machine", "desc": "Vertical or horizontal spindle. Table moves in X-Y-Z. The cutter spins; the work feeds. More flexible than a lathe, less precise by nature"},
+         {"depth": 1, "label": "Climb vs Conventional", "desc": "Climb milling: cutter enters thick, exits thin (better finish). Conventional: enters thin, exits thick (safer on older machines). Direction matters"},
+         {"depth": 2, "label": "End Mill Selection", "desc": "2-flute (aluminum), 4-flute (steel), ball-nose (3D contours). Coating: TiN, TiAlN, AlCrN. The tool is the most expensive consumable in the shop"},
+         {"depth": 3, "label": "Vibration Control", "desc": "Chatter: the self-excited vibration that ruins finish and breaks tools. Caused by improper speed/feed, excessive stickout, or resonance. Change speed first"},
+         {"depth": 4, "label": "Metal Removal Rate", "desc": "MRR = DOC × WOC × Feed. Cubic inches per minute. This number determines if the job makes money or loses it. Time is the enemy"},
+         {"depth": 5, "label": "Finite Element Analysis", "desc": "FEA models predict deflection, thermal expansion, and residual stress from cutting forces. The computer sees what the machinist feels"},
+     ]},
+    {"id": "cnc", "name": "CNC Programming", "color": "#22C55E", "category": "Digital",
+     "origin": "Computer Numerical Control — translating digital geometry into physical parts with micron precision",
+     "components": ["G-code", "CAM software", "Tool library", "Work coordinates", "Probe cycles"],
+     "system": "Digital-Physical bridge", "uses": "Production machining, prototyping, aerospace, medical devices",
+     "dive_layers": [
+         {"depth": 0, "label": "The Program", "desc": "G-code: G00 (rapid), G01 (linear feed), G02/G03 (arc). M03 (spindle on), M05 (spindle off). The language of metal removal"},
+         {"depth": 1, "label": "CAM Toolpaths", "desc": "Adaptive clearing, HSM pocketing, morphed spirals. The software calculates millions of positions the human brain cannot. But the human must verify"},
+         {"depth": 2, "label": "Work Coordinate System", "desc": "G54-G59: up to 6 saved origin points. Touch-off the part, set zero. Everything is measured from this reference. One wrong zero = scrap"},
+         {"depth": 3, "label": "Tolerance & GD&T", "desc": "±0.001 inch is standard. ±0.0001 is precision. Position, flatness, concentricity, runout — GD&T defines what 'good enough' means mathematically"},
+         {"depth": 4, "label": "Servo Control", "desc": "Closed-loop positioning: encoder reads position → compares to command → servo adjusts. 1,000 corrections per second per axis"},
+         {"depth": 5, "label": "Interpolation Algorithm", "desc": "The controller breaks curves into tiny line segments (nanoseconds apart). Bresenham's algorithm for arcs. The machine approximates continuous geometry with discrete steps"},
+     ]},
+]
+
+MACHINING_TOOLS = [
+    {"id": "micrometer", "name": "Micrometer", "action_verb": "Measure", "description": "Precision measuring instrument reading to 0.0001 inch", "technique": "Clean the anvil faces. Use the thimble, not the barrel, to close on the part. Read: barrel (0.1s) + thimble (0.001s) + vernier (0.0001). The last digit matters — it's the difference between a part and scrap.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "indicator", "name": "Dial Indicator", "action_verb": "Indicate", "description": "Measuring runout, flatness, and alignment to 0.0005 inch", "technique": "Mount on magnetic base. Zero the needle. Sweep the surface. One full revolution of the needle = 0.001 inch. Read the total indicator reading (TIR). Half of TIR = actual deviation.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "I"},
+    {"id": "surface_grinder", "name": "Surface Grinder", "action_verb": "Grind", "description": "Abrasive wheel for achieving mirror finishes and tight tolerances", "technique": "Dress the wheel first. Down-feed 0.0005 inch per pass. Flood coolant. Cross-feed overlap 1/3 wheel width. Grinding is the final process — you can't grind what you can't measure.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "G"},
+    {"id": "tap_die", "name": "Tap & Die Set", "action_verb": "Thread", "description": "Cutting internal (tap) and external (die) screw threads by hand or machine", "technique": "Start square to the hole. Turn clockwise 1/2 turn, back 1/4 turn (clears chips). Use cutting oil. Break-through taps for through-holes, bottoming taps for blind holes.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "edge_finder", "name": "Edge Finder", "action_verb": "Locate", "description": "Spinning probe for finding the exact edge of a workpiece on the mill", "technique": "Spin in the spindle at 1,000 RPM. Approach the edge slowly. When the tip kicks (de-centers), you're exactly one half-diameter from the edge. Set your zero.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "E"},
+    {"id": "deburr_tool", "name": "Deburring Tool", "action_verb": "Deburr", "description": "Swivel-blade tool for removing sharp edges from machined parts", "technique": "Draw the blade along every machined edge. One pass. Burrs cause cuts, interfere with assembly, and concentrate stress. A deburred part is a professional part.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "speeds_feeds", "name": "Speeds & Feeds Calc", "action_verb": "Calculate", "description": "Computing optimal RPM and feed rate for any material/tool combination", "technique": "RPM = (SFM × 3.82) / Diameter. Feed = RPM × IPT × number of flutes. Start conservative, adjust by sound and chip formation. The calculator starts the conversation; the machinist finishes it.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "coolant_mgmt", "name": "Coolant Management", "action_verb": "Cool", "description": "Flood and mist coolant systems for temperature and chip control", "technique": "Aim at the cutting zone, not the chip pile. 6-8% concentration for water-soluble. Check with a refractometer weekly. Bad coolant = bad finish + short tool life + skin irritation.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "L"},
+    {"id": "workholding", "name": "Workholding Setup", "action_verb": "Fixture", "description": "Securing the workpiece for repeatable, rigid machining", "technique": "Support near the cut. Clamp against a solid surface. Over-clamping distorts thin parts. Under-clamping = flying parts. The fixture is 50% of the machining problem.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "F"},
+]
+
+# Register V64.0 modules
+MODULES["speaking"] = {"materials": SPEAKING_MATERIALS, "tools": SPEAKING_TOOLS, "mat_key": "topics", "mat_id_key": "topic_id", "skill": "Speaking_Skill"}
+MODULES["philosophy"] = {"materials": PHILOSOPHY_MATERIALS, "tools": PHILOSOPHY_TOOLS, "mat_key": "branches", "mat_id_key": "branch_id", "skill": "Philosophy_Skill"}
+MODULES["pedagogy"] = {"materials": PEDAGOGY_MATERIALS, "tools": PEDAGOGY_TOOLS, "mat_key": "domains", "mat_id_key": "domain_id", "skill": "Pedagogy_Skill"}
+MODULES["anatomy"] = {"materials": ANATOMY_MATERIALS, "tools": ANATOMY_TOOLS, "mat_key": "systems", "mat_id_key": "system_id", "skill": "Anatomy_Skill"}
+MODULES["machining"] = {"materials": MACHINING_MATERIALS, "tools": MACHINING_TOOLS, "mat_key": "operations", "mat_id_key": "operation_id", "skill": "Machining_Skill"}
+
+# Add V64.0 to registry
+WORKSHOP_REGISTRY["speaking"] = {"title": "Public Speaking Workshop", "subtitle": "Human Development — Tap the topic to dive into rhetoric. Select a tool to command the room.", "icon": "Mic", "accentColor": "#F59E0B", "skillKey": "Speaking_Skill", "matLabel": "Topic", "domain": "Exploration"}
+WORKSHOP_REGISTRY["philosophy"] = {"title": "Philosophy Workshop", "subtitle": "Sacred Knowledge — Tap the branch to dive into truth. Select a tool to think.", "icon": "Scale", "accentColor": "#8B5CF6", "skillKey": "Philosophy_Skill", "matLabel": "Branch", "domain": "Sacred Knowledge"}
+WORKSHOP_REGISTRY["pedagogy"] = {"title": "Pedagogy Workshop", "subtitle": "Human Development — Tap the domain to dive into learning science. Select a tool to teach.", "icon": "GraduationCap", "accentColor": "#3B82F6", "skillKey": "Pedagogy_Skill", "matLabel": "Domain", "domain": "Exploration"}
+WORKSHOP_REGISTRY["anatomy"] = {"title": "Anatomy Workshop", "subtitle": "Science Pillar — Tap the system to dive into the human body. Select a tool to explore.", "icon": "Activity", "accentColor": "#EF4444", "skillKey": "Anatomy_Skill", "matLabel": "System", "domain": "Science & Physics"}
+WORKSHOP_REGISTRY["machining"] = {"title": "Machining Workshop", "subtitle": "Trade Pillar — Tap the operation to dive into metal cutting. Select a tool to machine.", "icon": "Cog", "accentColor": "#6B7280", "skillKey": "Machining_Skill", "matLabel": "Operation", "domain": "Trade & Craft"}
+
+
 INTENT_TAGS = {
     "masonry": ["stone", "structure", "foundation", "build", "chisel", "mortar", "architecture", "mineral", "construction", "strength"],
     "carpentry": ["wood", "grain", "joint", "build", "saw", "plane", "furniture", "timber", "craft", "structure"],
@@ -1317,6 +1743,11 @@ INTENT_TAGS = {
     "robotics": ["automation", "sensor", "motor", "programming", "circuit", "control", "feedback", "machine", "intelligence", "mechanism"],
     "first_aid": ["emergency", "rescue", "bleeding", "cpr", "safety", "trauma", "survival", "wound", "response", "life"],
     "hermetics": ["principle", "vibration", "correspondence", "transmutation", "polarity", "alchemy", "consciousness", "universal", "wisdom", "sacred"],
+    "speaking": ["communication", "persuasion", "audience", "voice", "confidence", "rhetoric", "presentation", "story", "influence", "leadership"],
+    "philosophy": ["ethics", "logic", "truth", "reason", "metaphysics", "wisdom", "thinking", "argument", "consciousness", "virtue"],
+    "pedagogy": ["teaching", "learning", "education", "assessment", "curriculum", "classroom", "student", "instruction", "development", "knowledge"],
+    "anatomy": ["body", "muscle", "bone", "nerve", "heart", "brain", "health", "physiology", "movement", "organ"],
+    "machining": ["metal", "precision", "lathe", "mill", "cnc", "measurement", "tolerance", "cutting", "manufacturing", "tool"],
 }
 
 
