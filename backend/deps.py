@@ -49,7 +49,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return {"id": payload["sub"], "name": payload["name"]}
+        user_id = payload["sub"]
+        # Fetch role from DB for permission checks
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0, "role": 1})
+        role = (user_doc or {}).get("role", "user")
+        return {"id": user_id, "name": payload["name"], "role": role}
     except jwt.ExpiredSignatureError:
         from fastapi import HTTPException
         raise HTTPException(status_code=401, detail="Token expired")

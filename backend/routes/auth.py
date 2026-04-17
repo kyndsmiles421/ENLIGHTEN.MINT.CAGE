@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Body
 from pydantic import BaseModel
 from deps import db, get_current_user, logger, create_token
 from datetime import datetime, timezone, timedelta
@@ -131,6 +131,86 @@ async def set_admin(data: dict, user=Depends(get_current_user)):
     )
 
     return {"status": "admin_granted", "user_id": user["id"]}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  INVITE CODE SYSTEM — Creator grants council/admin roles
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post("/auth/generate-invite")
+async def generate_invite_code(data: dict = Body(...), user=Depends(get_current_user)):
+    """Admin/Creator generates an invite code that grants a role to whoever redeems it."""
+    if user.get("role") not in ("admin", "creator"):
+        raise HTTPException(status_code=403, detail="Only Creator/Admin can generate invite codes")
+
+    role = data.get("role", "council")  # council, admin
+    if role not in ("council", "admin"):
+        raise HTTPException(status_code=400, detail="Role must be 'council' or 'admin'")
+
+    max_uses = data.get("max_uses", 1)
+    code = f"EMC-{uuid.uuid4().hex[:8].upper()}"
+
+    await db.invite_codes.insert_one({
+        "code": code,
+        "role": role,
+        "created_by": user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "max_uses": max_uses,
+        "uses": 0,
+        "redeemed_by": [],
+        "active": True,
+    })
+
+    return {"code": code, "role": role, "max_uses": max_uses}
+
+
+@router.post("/auth/redeem-invite")
+async def redeem_invite_code(data: dict = Body(...), user=Depends(get_current_user)):
+    """User redeems an invite code to upgrade their role."""
+    code = data.get("code", "").strip().upper()
+    if not code:
+        raise HTTPException(status_code=400, detail="Invite code required")
+
+    invite = await db.invite_codes.find_one({"code": code, "active": True})
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invalid or expired invite code")
+
+    if invite["uses"] >= invite["max_uses"]:
+        raise HTTPException(status_code=410, detail="Invite code has been fully redeemed")
+
+    if user["id"] in invite.get("redeemed_by", []):
+        raise HTTPException(status_code=409, detail="You already redeemed this code")
+
+    new_role = invite["role"]
+
+    # Update user role
+    await db.users.update_one({"id": user["id"]}, {"$set": {"role": new_role}})
+
+    # Update invite usage
+    await db.invite_codes.update_one(
+        {"code": code},
+        {"$inc": {"uses": 1}, "$push": {"redeemed_by": user["id"]}}
+    )
+
+    # If max uses reached, deactivate
+    if invite["uses"] + 1 >= invite["max_uses"]:
+        await db.invite_codes.update_one({"code": code}, {"$set": {"active": False}})
+
+    return {"status": "role_upgraded", "new_role": new_role, "user_id": user["id"]}
+
+
+@router.get("/auth/my-invites")
+async def get_my_invites(user=Depends(get_current_user)):
+    """Admin/Creator lists their generated invite codes."""
+    if user.get("role") not in ("admin", "creator"):
+        raise HTTPException(status_code=403, detail="Only Creator/Admin can view invite codes")
+
+    invites = await db.invite_codes.find(
+        {"created_by": user["id"]}, {"_id": 0}
+    ).to_list(100)
+
+    return {"invites": invites}
+
 
 
 

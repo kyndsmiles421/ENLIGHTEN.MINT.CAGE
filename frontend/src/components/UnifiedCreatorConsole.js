@@ -19,13 +19,14 @@ import { ArrowLeft, ShoppingCart, Maximize2 } from 'lucide-react';
 import { ZDepthTransition } from './UnifiedFieldEngine';
 import SpatialRouter from './SpatialRouter';
 import { PILLARS, TOTAL, findModule, PHI, PHI_CUBED, DEFAULT_FILTERS, calculateDustAccrual, inverseMultiplier } from './ConsoleConstants';
+import { TOOL_TABS, TIER_LEVELS, TIER_NAMES, TIER_COLORS } from './console/constants';
 
 // Extracted console modules
 import {
   TorusPanel, MixPanel, RecordPanel, AudioPanel,
   TextPanel, OverlayPanel, EffectsPanel, AIPanel,
   ExportPanel, AccountPanel, StoreView, MixerNavBar,
-  CulturalMixerPanel, ParticleField, ResonanceCamera, TOOL_TABS,
+  CulturalMixerPanel, ParticleField, ResonanceCamera,
 } from './console';
 import { useMediaControls } from './console/useMediaControls';
 import { useResonanceCapture } from './console/useResonanceCapture';
@@ -66,6 +67,8 @@ export function MixerProvider({ children }) {
   );
 
   const [tier, setTier] = useState('SEED');
+  const [userTierNum, setUserTierNum] = useState(1);
+  const tierRef = useRef(1);
   const [unlocks, setUnlocks] = useState({ unlocked_pillars: [], unlocked_fx: [], has_full_unlock: false });
   const [pillarLevels, setPillarLevels] = useState(PILLARS.map(() => 75));
   const [expandedPillar, setExpandedPillar] = useState(null);
@@ -117,12 +120,36 @@ export function MixerProvider({ children }) {
 
   useEffect(() => {
     const h = getHeaders();
+    const role = authUser?.role;
+    const isCreator = role === 'admin' || role === 'creator' || role === 'council';
+    
+    if (isCreator) {
+      setTier('CREATOR');
+      setUserTierNum(4);
+      tierRef.current = 4;
+    }
+    
     axios.get(`${API}/transmuter/status`, { headers: h }).then(({ data }) => {
-      const t = (data.tier_name || 'SEED').toUpperCase();
-      if (['BASE', 'SEED', 'ARTISAN', 'SOVEREIGN'].includes(t)) setTier(t);
+      if (!isCreator) {
+        const t = (data.tier_name || 'SEED').toUpperCase();
+        if (['BASE', 'SEED', 'ARTISAN', 'SOVEREIGN'].includes(t)) setTier(t);
+        const num = TIER_LEVELS[t] ?? 1;
+        setUserTierNum(num);
+        tierRef.current = num;
+      }
     }).catch(() => {});
     axios.get(`${API}/marketplace/mixer-unlocks`, { headers: h }).then(({ data }) => setUnlocks(data)).catch(() => {});
-  }, []);
+  }, [authUser]);
+
+  // Safety net: re-apply Creator override if authUser updates after transmuter
+  useEffect(() => {
+    const role = authUser?.role;
+    if (role === 'admin' || role === 'creator' || role === 'council') {
+      setTier('CREATOR');
+      setUserTierNum(4);
+      tierRef.current = 4;
+    }
+  }, [authUser]);
 
   useEffect(() => {
     window.__mixerMuted = mutedModules;
@@ -238,7 +265,7 @@ export function MixerProvider({ children }) {
   const current = findModule(location.pathname);
 
   const ctx = {
-    tier, unlocks, pillarLevels, masterLevel, modStates, viewMode, setViewMode,
+    tier, userTierNum, unlocks, pillarLevels, masterLevel, modStates, viewMode, setViewMode,
     loadStore, handleNav, mutedModules, activePanel, setActivePanel: togglePanel,
     isFullscreen, setIsFullscreen, monitorFilters, setMonitorFilters,
     textOverlays, setTextOverlays, imageOverlays, setImageOverlays,
@@ -333,7 +360,39 @@ export function MixerProvider({ children }) {
                       </div>
                     </div>
                   )}
-                  {PANEL_RENDERERS[activePanel]?.()}
+                  {(() => {
+                    const panel = activePanel;
+                    const tab = TOOL_TABS.find(t => t.key === panel);
+                    const role = authUser?.role || (() => { try { return JSON.parse(localStorage.getItem('zen_user') || '{}').role; } catch(e) { return null; } })();
+                    const isCreator = role === 'admin' || role === 'creator' || role === 'council';
+                    const isLocked = tab && !isCreator && userTierNum < tab.minTier;
+                    
+                    if (isLocked) {
+                      const unlockTier = TIER_NAMES[tab.minTier] || 'SOVEREIGN';
+                      const unlockColor = TIER_COLORS[unlockTier] || '#F59E0B';
+                      return (
+                        <div className="py-8 px-6 text-center" data-testid="locked-panel">
+                          <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                            style={{ background: `${unlockColor}10`, border: `1px solid ${unlockColor}20` }}>
+                            <tab.icon size={24} style={{ color: `${unlockColor}60` }} />
+                          </div>
+                          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-1" style={{ color: unlockColor }}>
+                            {tab.label} — Locked
+                          </p>
+                          <p className="text-[10px] mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                            Unlock at <span className="font-bold" style={{ color: unlockColor }}>{unlockTier}</span> tier
+                          </p>
+                          <button onClick={() => handleNav('/membership')}
+                            className="px-5 py-2 rounded-xl text-xs font-medium active:scale-95 transition-all"
+                            style={{ background: `${unlockColor}12`, border: `1px solid ${unlockColor}25`, color: unlockColor }}
+                            data-testid="upgrade-btn">
+                            Upgrade Tier
+                          </button>
+                        </div>
+                      );
+                    }
+                    return PANEL_RENDERERS[panel]?.();
+                  })()}
                   {/* Resonance Camera — capture ParticleField + audio */}
                   {activePanel === 'torus' && (
                     <ResonanceCamera capture={resonanceCapture} />
@@ -351,6 +410,8 @@ export function MixerProvider({ children }) {
             togglePanel={togglePanel}
             isRecording={media.isRecording}
             setIsFullscreen={setIsFullscreen}
+            userTierNum={userTierNum}
+            userRole={authUser?.role || 'user'}
           />
         )}
 
@@ -378,13 +439,14 @@ export function MixerProvider({ children }) {
 export default function UnifiedCreatorConsole({ onClose }) {
   const navigate = useNavigate();
   const mixer = useMixer();
+  const tierColor = TIER_COLORS[mixer?.tier] || '#A78BFA';
   return (
     <div className="min-h-screen p-4" style={{ background: 'transparent' }}>
       <button onClick={() => onClose ? onClose() : navigate('/sovereign-hub')} className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl active:scale-95" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.75)' }} data-testid="creator-exit"><ArrowLeft size={14} /><span className="text-xs">Hub</span></button>
       <h1 className="text-lg font-bold text-white/80 mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Creator Console</h1>
-      <p className="text-[10px] text-white/25 mb-4">Tap any tool tab below. Everything on the same plane.</p>
+      <p className="text-[10px] text-white/25 mb-4">Tap any tool tab below. Locked tools require tier upgrade.</p>
       <div className="grid grid-cols-4 gap-2 mb-4">
-        {[{ l: 'Channels', v: TOTAL, c: '#C084FC' }, { l: 'Tier', v: mixer?.tier || '-', c: '#8B5CF6' }, { l: 'Master', v: mixer?.masterLevel || 80, c: '#F8FAFC' }, { l: 'Muted', v: mixer?.mutedModules?.size || 0, c: '#EF4444' }].map(m => (
+        {[{ l: 'Channels', v: TOTAL, c: '#C084FC' }, { l: 'Tier', v: mixer?.tier || 'SEED', c: tierColor }, { l: 'Master', v: mixer?.masterLevel || 80, c: '#F8FAFC' }, { l: 'Muted', v: mixer?.mutedModules?.size || 0, c: '#EF4444' }].map(m => (
           <div key={m.l} className="p-2 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}><div className="text-sm font-mono font-bold" style={{ color: m.c }}>{m.v}</div><div className="text-[6px] text-white/25 uppercase">{m.l}</div></div>
         ))}
       </div>
