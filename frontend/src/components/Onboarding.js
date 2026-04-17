@@ -8,11 +8,11 @@ const STEPS = [
   },
   {
     title: 'The Mixer Controls Everything',
-    text: 'The persistent mixer at the bottom of every page lets you control all 58 modules. Switch between Strip and Orbital Sphere modes. Collapse it anytime.',
+    text: 'The persistent mixer at the bottom of every page lets you control all 58 modules. Switch between Strip and Orbital Sphere modes.',
   },
   {
     title: 'The Sovereign Engine is Active',
-    text: 'Your engine accrues Digital Dust as you engage. The longer you stay, the higher your resonance multiplier climbs — up to 4.24x.',
+    text: 'Your engine accrues Digital Dust as you engage. The longer you stay, the higher your resonance multiplier climbs.',
   },
 ];
 
@@ -42,105 +42,51 @@ export default function Onboarding() {
     setVisible(false);
   };
 
+  // INLINE card — NOT an overlay. Flows with page content.
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+          className="mx-4 mb-4 rounded-xl overflow-hidden"
           style={{
-            position: 'fixed', inset: 0, zIndex: 2147483647,
-            background: 'transparent', backdropFilter: 'none',
-            display: 'flex', justifyContent: 'center', alignItems: 'center',
-            padding: '20px',
+            background: 'linear-gradient(135deg, rgba(10,10,20,0.95), rgba(18,18,30,0.95))',
+            border: '1px solid rgba(45,212,191,0.15)',
           }}
-          data-testid="onboarding-overlay"
+          data-testid="onboarding-card"
         >
           <motion.div
             key={step}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              background: 'linear-gradient(135deg, #0a0a14, #12121e)',
-              border: '1px solid rgba(45,212,191,0.2)',
-              borderRadius: '16px',
-              padding: '32px 24px',
-              maxWidth: '360px',
-              width: '100%',
-              textAlign: 'center',
-              boxShadow: '0 0 40px rgba(45,212,191,0.08)',
-            }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.25 }}
+            className="p-5"
           >
-            {/* Step indicator */}
-            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
-              {STEPS.map((_, i) => (
-                <div key={i} style={{
-                  width: i === step ? '24px' : '8px',
-                  height: '8px',
-                  borderRadius: '4px',
-                  background: i === step ? '#2DD4BF' : i < step ? 'rgba(45,212,191,0.4)' : 'rgba(255,255,255,0.1)',
-                  transition: 'all 0.3s',
-                }} />
-              ))}
-            </div>
-
-            <h2 style={{
-              fontSize: '20px',
-              fontWeight: 700,
-              color: '#F8FAFC',
-              marginBottom: '12px',
-              fontFamily: 'Cormorant Garamond, serif',
-              letterSpacing: '0.02em',
-            }}>
+            <p className="text-[9px] font-mono uppercase tracking-wider mb-2" style={{ color: 'rgba(45,212,191,0.5)' }}>
+              {step + 1}/{STEPS.length}
+            </p>
+            <h3 className="text-base font-semibold mb-2" style={{ color: '#fff' }}>
               {STEPS[step].title}
-            </h2>
-
-            <p style={{
-              fontSize: '14px',
-              color: 'rgba(255,255,255,0.8)',
-              lineHeight: 1.6,
-              marginBottom: '28px',
-            }}>
+            </h3>
+            <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
               {STEPS[step].text}
             </p>
-
-            <button
-              onClick={advance}
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '10px',
-                border: 'none',
-                background: 'linear-gradient(135deg, #2DD4BF, #14B8A6)',
-                color: '#000',
-                fontSize: '14px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                letterSpacing: '0.05em',
-              }}
-              data-testid="onboarding-next"
-            >
-              {step === STEPS.length - 1 ? 'Begin Journey' : 'Next'}
-            </button>
-
-            {step === 0 && (
+            <div className="flex items-center gap-3">
               <button
-                onClick={skip}
-                style={{
-                  marginTop: '12px',
-                  background: 'none',
-                  border: 'none',
-                  color: 'rgba(255,255,255,0.6)',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                }}
-                data-testid="onboarding-skip"
+                onClick={advance}
+                className="px-5 py-2 rounded-lg text-xs font-medium"
+                style={{ background: 'rgba(45,212,191,0.15)', border: '1px solid rgba(45,212,191,0.3)', color: '#2DD4BF' }}
+                data-testid="onboarding-next"
               >
+                {step < STEPS.length - 1 ? 'Next' : 'Got It'}
+              </button>
+              <button onClick={skip} className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}
+                data-testid="onboarding-skip">
                 Skip
               </button>
-            )}
+            </div>
           </motion.div>
         </motion.div>
       )}
