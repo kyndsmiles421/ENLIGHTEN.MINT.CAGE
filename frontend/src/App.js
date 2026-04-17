@@ -319,6 +319,7 @@ const GravityWellExchange = lazy(() => import('./pages/GravityWellExchange'));
 const CrypticQuestNodes = lazy(() => import('./pages/CrypticQuestNodes'));
 const CrystalMarketplace = lazy(() => import('./pages/CrystalMarketplace'));
 const MasonryWorkbench = lazy(() => import('./pages/MasonryWorkbench'));
+const CarpentryWorkbench = lazy(() => import('./pages/CarpentryWorkbench'));
 
 function PageLoader() {
   return (
@@ -609,6 +610,7 @@ function AnimatedRoutes() {
         <Route path="/cryptic-quest" element={<CrypticQuestNodes />} />
         <Route path="/crystal-skins" element={<CrystalMarketplace />} />
         <Route path="/masonry-workbench" element={<MasonryWorkbench />} />
+        <Route path="/carpentry-workbench" element={<CarpentryWorkbench />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />

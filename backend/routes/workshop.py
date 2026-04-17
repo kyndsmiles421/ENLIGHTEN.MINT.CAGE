@@ -431,3 +431,263 @@ async def masonry_tool_action(data: dict = Body(...)):
             f"Include safety notes and a professional tip."
         ),
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CARPENTRY 3D CIRCULAR WORKSHOP — Trade Pillar Engine (Clone DNA)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CARPENTRY_WOODS = [
+    {
+        "id": "oak",
+        "name": "White Oak",
+        "color": "#92400E",
+        "density_kg_m3": 770,
+        "janka_hardness": 1360,
+        "bending_mpa": 105,
+        "origin": "Hardwood — slow-growing deciduous tree, 200+ year lifespan",
+        "grain_composition": ["Ring-porous vessels", "Wide medullary rays", "Tyloses (waterproof)"],
+        "cell_structure": "Ring-porous with large earlywood vessels and dense latewood fibers",
+        "uses": "Furniture, barrel-making, boat-building, flooring, timber framing",
+        "dive_layers": [
+            {"depth": 0, "label": "Planed Board", "desc": "Quarter-sawn oak showing prominent ray fleck patterns — the signature 'tiger stripe'"},
+            {"depth": 1, "label": "Growth Rings", "desc": "Annual rings visible: wide earlywood pores and dense latewood bands recording each year's growth"},
+            {"depth": 2, "label": "Vessel Elements", "desc": "Large earlywood vessels (300μm) plugged by tyloses — the cellular 'corks' that make oak watertight"},
+            {"depth": 3, "label": "Cellulose Microfibrils", "desc": "Crystalline cellulose chains wound helically at 10-15° microfibril angle within the S2 cell wall layer"},
+            {"depth": 4, "label": "Lignin Matrix", "desc": "3D phenylpropanoid polymer filling spaces between cellulose — the 'concrete' that makes wood rigid"},
+            {"depth": 5, "label": "Molecular Bonds", "desc": "β-1,4-glycosidic bonds in cellulose; ether bonds cross-linking lignin monomers (coniferyl/sinapyl alcohol)"},
+        ],
+    },
+    {
+        "id": "walnut",
+        "name": "Black Walnut",
+        "color": "#5B3A29",
+        "density_kg_m3": 660,
+        "janka_hardness": 1010,
+        "bending_mpa": 100,
+        "origin": "Hardwood — prized North American species with deep chocolate heartwood",
+        "grain_composition": ["Semi-ring-porous", "Straight to wavy grain", "Fine uniform texture"],
+        "cell_structure": "Semi-ring-porous with diffuse vessels in latewood",
+        "uses": "Fine furniture, gunstocks, musical instruments, veneer, carving",
+        "dive_layers": [
+            {"depth": 0, "label": "Finished Surface", "desc": "Rich chocolate-brown heartwood with purplish streaks — darkens beautifully with age"},
+            {"depth": 1, "label": "Grain Pattern", "desc": "Semi-ring-porous structure with cathedral and straight grain; occasional crotch figure"},
+            {"depth": 2, "label": "Heartwood Chemistry", "desc": "Juglone (5-hydroxy-1,4-naphthoquinone) deposits create the dark color and natural decay resistance"},
+            {"depth": 3, "label": "Cell Wall Layers", "desc": "S1/S2/S3 secondary wall layers with varying microfibril angles controlling strength and flexibility"},
+            {"depth": 4, "label": "Extractives", "desc": "Phenolic compounds and tannins deposited during heartwood formation — nature's wood preservative"},
+            {"depth": 5, "label": "Carbon Architecture", "desc": "Glucose units polymerized into cellulose Iβ crystallites — 36-chain elementary fibrils"},
+        ],
+    },
+    {
+        "id": "pine",
+        "name": "Eastern White Pine",
+        "color": "#D4A76A",
+        "density_kg_m3": 400,
+        "janka_hardness": 380,
+        "bending_mpa": 59,
+        "origin": "Softwood — fast-growing conifer, the 'Tree of Peace' in Haudenosaunee tradition",
+        "grain_composition": ["Non-porous (tracheids only)", "Resin canals", "Uniform texture"],
+        "cell_structure": "Non-porous — 90% tracheids with resin canal network",
+        "uses": "Construction framing, paneling, carving, pattern-making, ship masts",
+        "dive_layers": [
+            {"depth": 0, "label": "Sawn Board", "desc": "Creamy white sapwood with light amber heartwood — the most workable of the pines"},
+            {"depth": 1, "label": "Tracheid Anatomy", "desc": "95% tracheids (water-conducting cells) — no vessels, unlike hardwoods. Bordered pits connect cells"},
+            {"depth": 2, "label": "Resin System", "desc": "Longitudinal and radial resin canals lined with epithelial cells secreting oleoresin (turpentine + rosin)"},
+            {"depth": 3, "label": "Pit Membrane", "desc": "Bordered pit pairs with torus-margo structure — the 'check valve' controlling water flow between tracheids"},
+            {"depth": 4, "label": "Cellulose-Hemicellulose", "desc": "Glucomannan and xylan hemicelluloses hydrogen-bonded to cellulose microfibrils in the matrix"},
+            {"depth": 5, "label": "Terpene Biosynthesis", "desc": "Mevalonic acid pathway producing α-pinene, β-pinene — the molecular defense system"},
+        ],
+    },
+    {
+        "id": "cherry",
+        "name": "American Cherry",
+        "color": "#B5564E",
+        "density_kg_m3": 580,
+        "janka_hardness": 950,
+        "bending_mpa": 85,
+        "origin": "Hardwood — medium-density fruitwood prized for its warm reddish patina",
+        "grain_composition": ["Diffuse-porous", "Fine straight grain", "Occasional gum pockets"],
+        "cell_structure": "Diffuse-porous with small uniform vessels throughout",
+        "uses": "Cabinetry, fine furniture, turning, architectural millwork",
+        "dive_layers": [
+            {"depth": 0, "label": "Planed Surface", "desc": "Warm pinkish-brown that deepens to rich reddish-amber with UV exposure over months"},
+            {"depth": 1, "label": "Diffuse Pores", "desc": "Small uniform vessel elements distributed evenly — why cherry machines so cleanly"},
+            {"depth": 2, "label": "Gum Deposits", "desc": "Traumatic resin canals forming dark flecks — 'gum pockets' triggered by injury during growth"},
+            {"depth": 3, "label": "Ray Parenchyma", "desc": "1-5 seriate rays storing starch and conducting nutrients radially across the stem"},
+            {"depth": 4, "label": "Photodarkening", "desc": "UV-catalyzed oxidation of extractives (flavonoids) — the chemistry behind cherry's famous color shift"},
+            {"depth": 5, "label": "Hydrogen Bonding", "desc": "Intra- and inter-chain H-bonds between cellulose hydroxyl groups creating crystalline domains"},
+        ],
+    },
+    {
+        "id": "maple",
+        "name": "Hard Maple",
+        "color": "#E8D5B7",
+        "density_kg_m3": 720,
+        "janka_hardness": 1450,
+        "bending_mpa": 109,
+        "origin": "Hardwood — extremely dense and wear-resistant, the 'workhorse' hardwood",
+        "grain_composition": ["Diffuse-porous", "Tight uniform grain", "Bird's eye / curly figure"],
+        "cell_structure": "Diffuse-porous with very small vessels; fiber-dominant structure",
+        "uses": "Butcher blocks, bowling lanes, basketball courts, violin backs, workbenches",
+        "dive_layers": [
+            {"depth": 0, "label": "Dressed Stock", "desc": "Pale cream to light tan with subtle grain — the densest common North American hardwood"},
+            {"depth": 1, "label": "Fiber Density", "desc": "Thick-walled libriform fibers packed tightly — why maple is so hard and resistant to denting"},
+            {"depth": 2, "label": "Figured Grain", "desc": "Bird's eye: abnormal growth around dormant buds; Curly/flame: undulating fiber direction"},
+            {"depth": 3, "label": "Vessel Perforation", "desc": "Simple perforation plates in vessels — evolved from scalariform for more efficient water transport"},
+            {"depth": 4, "label": "Sap Chemistry", "desc": "2% sucrose sap concentrated 40:1 into maple syrup — starch-to-sugar conversion in spring"},
+            {"depth": 5, "label": "Crystallinity Index", "desc": "65-70% crystalline cellulose — higher than most hardwoods, explaining maple's superior hardness"},
+        ],
+    },
+    {
+        "id": "cedar",
+        "name": "Western Red Cedar",
+        "color": "#A0522D",
+        "density_kg_m3": 370,
+        "janka_hardness": 350,
+        "bending_mpa": 52,
+        "origin": "Softwood — aromatic decay-resistant conifer, 'Tree of Life' in Pacific Northwest cultures",
+        "grain_composition": ["Non-porous (tracheids)", "Straight even grain", "No resin canals"],
+        "cell_structure": "Non-porous with thin-walled tracheids; no resin canals",
+        "uses": "Shingles, siding, decking, fencing, canoes, totem poles, cedar chests",
+        "dive_layers": [
+            {"depth": 0, "label": "Split Shingle", "desc": "Reddish-brown heartwood with distinctive aromatic scent — splits cleanly along the grain"},
+            {"depth": 1, "label": "Low-Density Structure", "desc": "Thin-walled tracheids with large lumens — why cedar is so light yet dimensionally stable"},
+            {"depth": 2, "label": "Thujaplicin", "desc": "Tropolone compounds (α/β/γ-thujaplicin) naturally deposited — the chemical basis of cedar's rot resistance"},
+            {"depth": 3, "label": "Dimensional Stability", "desc": "Low tangential/radial shrinkage ratio (1.3:1) — cedar barely warps because it barely moves"},
+            {"depth": 4, "label": "Phenolic Extractives", "desc": "Plicatic acid and related lignans — antifungal, antibacterial compounds evolved over 50M years"},
+            {"depth": 5, "label": "Terpenoid Defense", "desc": "Monoterpenes and sesquiterpenes creating the aromatic profile — volatile chemical warfare against insects"},
+        ],
+    },
+]
+
+CARPENTRY_TOOLS = [
+    {
+        "id": "hand_saw",
+        "name": "Panel Saw",
+        "action_verb": "Cut",
+        "description": "Crosscut hand saw with 10 TPI for precise cuts across the grain",
+        "technique": "Start with a few light pull strokes to establish the kerf. Let the saw do the work — guide, don't force. The cut angle should be 45° for crosscuts, 60° for rip cuts.",
+        "color": "#94A3B8",
+        "xp_per_action": 12,
+        "icon_symbol": "W",
+    },
+    {
+        "id": "hand_plane",
+        "name": "Smoothing Plane",
+        "action_verb": "Plane",
+        "description": "Low-angle block plane for final surface finishing and flattening",
+        "technique": "Set blade depth to take whisper-thin shavings. Plane with the grain — against produces tear-out. Wax the sole for smooth glide.",
+        "color": "#22C55E",
+        "xp_per_action": 12,
+        "icon_symbol": "P",
+    },
+    {
+        "id": "wood_chisel",
+        "name": "Bench Chisel",
+        "action_verb": "Pare",
+        "description": "Bevel-edge chisel for paring joints, chopping mortises, and detail work",
+        "technique": "For paring: push with palm, bevel down. For chopping mortises: mallet strikes, bevel facing waste side. Keep razor-sharp — a dull chisel is dangerous.",
+        "color": "#F59E0B",
+        "xp_per_action": 12,
+        "icon_symbol": "C",
+    },
+    {
+        "id": "mallet",
+        "name": "Joiner's Mallet",
+        "action_verb": "Strike",
+        "description": "Wooden mallet with angled faces for driving chisels without damaging handles",
+        "technique": "The angled face compensates for the arc of your swing — strikes land flat automatically. Use for chisels, dowels, and assembly. Never use a metal hammer on chisel handles.",
+        "color": "#EF4444",
+        "xp_per_action": 12,
+        "icon_symbol": "M",
+    },
+    {
+        "id": "marking_gauge",
+        "name": "Marking Gauge",
+        "action_verb": "Scribe",
+        "description": "Adjustable gauge with cutting wheel for scribing precise parallel lines",
+        "technique": "Set the fence to the desired distance. Press the fence firmly against the reference face. Draw the gauge toward you in one smooth motion — the cutter scribes a clean line.",
+        "color": "#3B82F6",
+        "xp_per_action": 12,
+        "icon_symbol": "G",
+    },
+    {
+        "id": "spokeshave",
+        "name": "Spokeshave",
+        "action_verb": "Shave",
+        "description": "Two-handled shaving tool for curves, chamfers, and round profiles",
+        "technique": "Push or pull depending on grain direction. Tilt slightly to create a slicing cut. Perfect for chair legs, tool handles, and any convex or concave shape.",
+        "color": "#A78BFA",
+        "xp_per_action": 12,
+        "icon_symbol": "K",
+    },
+    {
+        "id": "coping_saw",
+        "name": "Coping Saw",
+        "action_verb": "Cope",
+        "description": "Fine-toothed frame saw for cutting curves and interior cutouts",
+        "technique": "Cut on the pull stroke. Rotate the blade in the frame to follow curves. Thread the blade through a drilled hole for interior cuts.",
+        "color": "#EC4899",
+        "xp_per_action": 12,
+        "icon_symbol": "O",
+    },
+    {
+        "id": "brace_bit",
+        "name": "Brace & Bit",
+        "action_verb": "Bore",
+        "description": "Hand-cranked brace drill with auger bit for boring clean holes in wood",
+        "technique": "Center the lead screw on your mark. Apply steady downward pressure while cranking. The auger clears chips automatically. Back out periodically for deep holes.",
+        "color": "#F97316",
+        "xp_per_action": 12,
+        "icon_symbol": "B",
+    },
+    {
+        "id": "try_square",
+        "name": "Try Square",
+        "action_verb": "Check",
+        "description": "Precision reference tool for marking and checking 90-degree angles",
+        "technique": "Hold the stock firmly against the reference face. If light passes between the blade and the work surface, the piece is not square. Mark with a knife, not a pencil, for accuracy.",
+        "color": "#2DD4BF",
+        "xp_per_action": 12,
+        "icon_symbol": "T",
+    },
+]
+
+
+@router.get("/workshop/carpentry/woods")
+async def get_carpentry_woods():
+    """Return all carpentry wood materials with dive layer data. Open to all."""
+    return {"woods": CARPENTRY_WOODS}
+
+
+@router.get("/workshop/carpentry/tools")
+async def get_carpentry_tools():
+    """Return the 9 primary carpentry tools for the sprocket ring. Open to all."""
+    return {"tools": CARPENTRY_TOOLS}
+
+
+@router.post("/workshop/carpentry/tool-action")
+async def carpentry_tool_action(data: dict = Body(...)):
+    """Record a carpentry tool action and return context for tutorial generation. Open to all."""
+    tool_id = data.get("tool_id", "")
+    wood_id = data.get("wood_id", "")
+
+    tool = next((t for t in CARPENTRY_TOOLS if t["id"] == tool_id), None)
+    wood = next((w for w in CARPENTRY_WOODS if w["id"] == wood_id), None)
+    if not tool or not wood:
+        return {"error": "Invalid tool or wood"}
+
+    return {
+        "action": f"{tool['action_verb']} {wood['name']}",
+        "tool": tool["name"],
+        "wood": wood["name"],
+        "xp_awarded": tool["xp_per_action"],
+        "tutorial_context": (
+            f"The user selected the {tool['name']} tool on a piece of {wood['name']}. "
+            f"Technique: {tool['technique']} "
+            f"Wood properties: {wood['origin']}. Janka hardness: {wood['janka_hardness']} lbf. "
+            f"Bending strength: {wood['bending_mpa']} MPa. "
+            f"Generate a practical woodworking tutorial step for using the {tool['name']} on {wood['name']}. "
+            f"Include safety notes, grain direction advice, and a professional tip."
+        ),
+    }

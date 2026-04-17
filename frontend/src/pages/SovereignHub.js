@@ -166,6 +166,7 @@ const PILLARS = [
     { label: 'Trade Circle', route: '/trade-circle' },
     { label: 'Trade Orbital', route: '/trade-orbital' },
     { label: 'Masonry Workbench', route: '/masonry-workbench' },
+    { label: 'Carpentry Workbench', route: '/carpentry-workbench' },
     { label: 'Crystal Skins', route: '/crystal-skins' },
     { label: 'Archives & Vault', route: '/archives' },
     { label: 'Cosmic Ledger', route: '/cosmic-ledger' },

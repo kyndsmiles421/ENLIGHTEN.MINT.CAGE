@@ -39,6 +39,8 @@ const SOURCE_META = {
   masonry_dive:        { label: 'Material Dive',     color: '#4169E1', icon: Sparkles },
   masonry_inspect:     { label: 'Stone Study',       color: '#D4C5A9', icon: Star },
   Carpentry_Skill:     { label: 'Carpentry Work',    color: '#92400E', icon: Shield },
+  carpentry_dive:      { label: 'Grain Dive',        color: '#22C55E', icon: Sparkles },
+  carpentry_inspect:   { label: 'Wood Study',        color: '#D4A76A', icon: Star },
   exploration:         { label: 'Exploration',       color: '#38BDF8', icon: Sparkles },
   vr_sanctuary:        { label: 'VR Sanctuary',      color: '#D8B4FE', icon: Star },
   animal_totems:       { label: 'Animal Totems',     color: '#22C55E', icon: Star },
