@@ -17,13 +17,11 @@ import { useAuth } from '../context/AuthContext';
 import { Hammer, ChevronDown, ChevronUp, Layers, Gem, ArrowLeft, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import BackToHub from '../components/BackToHub';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // STONE CENTER — SVG Mineral Block Renderer
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function StoneBlock({ stone, isActive, onTap }) {
   if (!stone) return null;
@@ -622,7 +620,6 @@ export default function MasonryWorkbench() {
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid="masonry-workbench-page">
-      <BackToHub />
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">

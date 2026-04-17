@@ -221,6 +221,24 @@ const RELATED = {
     { label: 'Fabricator', route: '/fabricator' },
     { label: 'Economy & Dust', route: '/economy' },
   ],
+  '/masonry-workbench': [
+    { label: 'Carpentry Workshop', route: '/carpentry-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+    { label: 'Workshop', route: '/workshop' },
+    { label: 'Trade Circle', route: '/trade-circle' },
+  ],
+  '/carpentry-workbench': [
+    { label: 'Masonry Workshop', route: '/masonry-workbench' },
+    { label: 'Trade Passport', route: '/trade-passport' },
+    { label: 'Workshop', route: '/workshop' },
+    { label: 'Trade Circle', route: '/trade-circle' },
+  ],
+  '/trade-passport': [
+    { label: 'Masonry Workshop', route: '/masonry-workbench' },
+    { label: 'Carpentry Workshop', route: '/carpentry-workbench' },
+    { label: 'RPG Character', route: '/rpg' },
+    { label: 'Trade Circle', route: '/trade-circle' },
+  ],
   '/frequencies': [
     { label: 'Soundscapes', route: '/soundscapes' },
     { label: 'Cosmic Mixer', route: '/cosmic-mixer' },

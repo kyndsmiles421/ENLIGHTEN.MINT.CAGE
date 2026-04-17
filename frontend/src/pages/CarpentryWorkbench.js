@@ -16,7 +16,6 @@ import { useAuth } from '../context/AuthContext';
 import { Axe, ChevronDown, ChevronUp, Layers, Gem, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import BackToHub from '../components/BackToHub';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -431,7 +430,6 @@ export default function CarpentryWorkbench() {
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid="carpentry-workbench-page">
-      <BackToHub />
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">

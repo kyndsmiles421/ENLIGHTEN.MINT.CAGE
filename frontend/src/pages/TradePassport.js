@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Layers, Star, Lock, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
-import BackToHub from '../components/BackToHub';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -231,7 +230,6 @@ export default function TradePassport() {
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid="trade-passport-page">
-      <BackToHub />
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
