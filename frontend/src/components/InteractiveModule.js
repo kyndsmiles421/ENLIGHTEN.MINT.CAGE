@@ -15,8 +15,9 @@
  */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
-  ChevronDown, Sparkles, BookOpen, Star, Headphones,
+  ChevronDown, ChevronRight, Sparkles, BookOpen, Star, Headphones,
   Flame, Eye, Lock, Zap, Award, HelpCircle, Check, X as XIcon,
   Map, Grid3X3, Trophy
 } from 'lucide-react';
@@ -28,6 +29,96 @@ import OmniBridge from './OmniBridge';
 import TraditionLens from './TraditionLens';
 
 const PHI = 1.618033988749895;
+
+// ═══════════════════════════════════════════════════════════════
+// IMMERSIVE MODULE SCENES — Each module is a visual world
+// ═══════════════════════════════════════════════════════════════
+const MODULE_SCENES = {
+  crystals: {
+    image: 'https://images.unsplash.com/photo-1673879279182-76be6b52075c?w=800&q=60',
+    ambience: 'You descend into the crystalline depths. Amethyst and quartz formations pulse with ancient energy...',
+    gradient: 'linear-gradient(180deg, rgba(13,13,26,0.15) 0%, rgba(13,13,26,0.85) 50%, rgba(13,13,26,0.98) 70%)',
+  },
+  herbology: {
+    image: 'https://images.unsplash.com/photo-1547318114-eff5ea85ede9?w=800&q=60',
+    ambience: 'The apothecary shelves are lined with dried roots, leaves and flower essences...',
+    gradient: 'linear-gradient(180deg, rgba(15,26,13,0.15) 0%, rgba(15,26,13,0.85) 50%, rgba(15,26,13,0.98) 70%)',
+  },
+  aromatherapy: {
+    image: 'https://images.unsplash.com/photo-1560521166-99f8bed834f5?w=800&q=60',
+    ambience: 'Amber glass bottles line the essence temple. Lavender, frankincense, and myrrh fill the air...',
+    gradient: 'linear-gradient(180deg, rgba(26,13,26,0.15) 0%, rgba(26,13,26,0.85) 50%, rgba(26,13,26,0.98) 70%)',
+  },
+  elixirs: {
+    image: 'https://images.unsplash.com/photo-1508014861016-f37cdf89e94d?w=800&q=60',
+    ambience: 'The alchemy lab glows with candlelight. Teapots simmer with golden moon milk and fire cider...',
+    gradient: 'linear-gradient(180deg, rgba(26,22,13,0.15) 0%, rgba(26,22,13,0.85) 50%, rgba(26,22,13,0.98) 70%)',
+  },
+  mudras: {
+    image: 'https://images.unsplash.com/photo-1556760678-794ee0436167?w=800&q=60',
+    ambience: 'Stillness fills the mudra studio. Each hand gesture unlocks energy gates within...',
+    gradient: 'linear-gradient(180deg, rgba(24,21,13,0.15) 0%, rgba(24,21,13,0.85) 50%, rgba(24,21,13,0.98) 70%)',
+  },
+  nourishment: {
+    image: 'https://images.unsplash.com/photo-1771830938706-dda943a87246?w=800&q=60',
+    ambience: 'The living kitchen is stocked with sacred foods. Every meal is medicine, every bite an offering...',
+    gradient: 'linear-gradient(180deg, rgba(13,26,15,0.15) 0%, rgba(13,26,15,0.85) 50%, rgba(13,26,15,0.98) 70%)',
+  },
+  reiki: {
+    image: 'https://images.unsplash.com/photo-1719674572258-565976e1fe01?w=800&q=60',
+    ambience: 'Warm light gathers between open palms. The universal life force awaits your intention...',
+    gradient: 'linear-gradient(180deg, rgba(24,13,21,0.15) 0%, rgba(24,13,21,0.85) 50%, rgba(24,13,21,0.98) 70%)',
+  },
+  acupressure: {
+    image: 'https://images.unsplash.com/photo-1739971714008-ce6d363cb90d?w=800&q=60',
+    ambience: 'The meridian map unfolds before you. Invisible rivers of energy course through every point...',
+    gradient: 'linear-gradient(180deg, rgba(13,21,24,0.15) 0%, rgba(13,21,24,0.85) 50%, rgba(13,21,24,0.98) 70%)',
+  },
+};
+
+// Cross-module connections — "The Sage Recommends"
+const CROSS_LINKS = {
+  crystals: [
+    { text: 'Amethyst pairs with lavender oil for deep relaxation', path: '/aromatherapy', module: 'Aromatherapy' },
+    { text: 'Clear Quartz amplifies meditation intention', path: '/meditation', module: 'Meditation' },
+    { text: 'Rose Quartz enhances heart chakra yoga flows', path: '/yoga', module: 'Yoga' },
+  ],
+  herbology: [
+    { text: 'Chamomile tea synergizes with breathing exercises', path: '/breathing', module: 'Breathwork' },
+    { text: 'Ashwagandha supports the Warrior yoga sequence', path: '/yoga', module: 'Yoga' },
+    { text: 'Combine herbs with crystal grids for amplified healing', path: '/crystals', module: 'Crystals' },
+  ],
+  aromatherapy: [
+    { text: 'Frankincense deepens oracle readings', path: '/oracle', module: 'Oracle' },
+    { text: 'Peppermint oil awakens focus for mudra practice', path: '/mudras', module: 'Mudras' },
+    { text: 'Lavender creates the ideal meditation atmosphere', path: '/meditation', module: 'Meditation' },
+  ],
+  elixirs: [
+    { text: 'Golden Milk before meditation enhances stillness', path: '/meditation', module: 'Meditation' },
+    { text: 'Fire Cider activates the solar plexus for breathwork', path: '/breathing', module: 'Breathwork' },
+    { text: 'Moon Milk pairs with dream journaling for lucid work', path: '/dreams', module: 'Dreams' },
+  ],
+  mudras: [
+    { text: 'Gyan Mudra deepens pranayama breathing', path: '/breathing', module: 'Breathwork' },
+    { text: 'Combine mudras with mantra chanting', path: '/mantras', module: 'Mantras' },
+    { text: 'Prithvi Mudra grounds crystal energy healing', path: '/crystals', module: 'Crystals' },
+  ],
+  nourishment: [
+    { text: 'Turmeric activates with the Fire element yoga flows', path: '/yoga', module: 'Yoga' },
+    { text: 'Fasting enhances meditation depth', path: '/meditation', module: 'Meditation' },
+    { text: 'Sacred foods pair with Ayurvedic herbology', path: '/herbology', module: 'Herbology' },
+  ],
+  reiki: {
+    0: { text: 'Reiki Hand positions enhance acupressure work', path: '/acupressure', module: 'Acupressure' },
+    1: { text: 'Crystal grids amplify Reiki energy channels', path: '/crystals', module: 'Crystals' },
+    2: { text: 'Combine Reiki with guided meditation for deep healing', path: '/meditation', module: 'Meditation' },
+  },
+  acupressure: [
+    { text: 'Meridian points align with yoga asanas', path: '/yoga', module: 'Yoga' },
+    { text: 'Acupressure enhances herb absorption pathways', path: '/herbology', module: 'Herbology' },
+    { text: 'Combine with Reiki for full energy body work', path: '/reiki', module: 'Reiki' },
+  ],
+};
 
 // ═══════════════════════════════════════════════════════════════
 // DISCOVERY NODE — Each item is a discoverable node on the map
@@ -502,6 +593,59 @@ function SearchBar({ value, onChange, placeholder, color }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SAGE BOARD — Cross-module suggestions, inline message board
+// Shows connections to other modules based on what you've explored
+// ═══════════════════════════════════════════════════════════════
+function SageBoard({ category, color, discoveredCount }) {
+  const navigate = useNavigate();
+  const links = Array.isArray(CROSS_LINKS[category]) ? CROSS_LINKS[category] : Object.values(CROSS_LINKS[category] || {});
+  // Only show after user has discovered at least 1 item
+  if (discoveredCount < 1 || links.length === 0) return null;
+  // Rotate which suggestion shows based on discovered count
+  const visibleLinks = links.slice(0, Math.min(discoveredCount, links.length));
+
+  return (
+    <div className="mt-8 mb-4" data-testid="sage-board">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles size={12} style={{ color: '#FBBF24' }} />
+        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#FBBF24' }}>
+          The Sage Recommends
+        </span>
+      </div>
+      <div className="space-y-2">
+        {visibleLinks.map((link, i) => (
+          <motion.button
+            key={i}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1 }}
+            onClick={() => navigate(link.path)}
+            className="w-full text-left p-3 rounded-xl flex items-center gap-3 group"
+            style={{
+              background: 'rgba(251,191,36,0.03)',
+              border: '1px solid rgba(251,191,36,0.08)',
+            }}
+            data-testid={`sage-link-${i}`}
+          >
+            <div className="w-1 h-8 rounded-full flex-shrink-0" style={{ background: `${color}40` }} />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                {link.text}
+              </p>
+              <p className="text-[9px] mt-0.5" style={{ color: `${color}60` }}>
+                Continue in {link.module}
+              </p>
+            </div>
+            <ChevronRight size={12} style={{ color: 'rgba(255,255,255,0.2)' }}
+              className="group-hover:translate-x-1 transition-transform" />
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 // MAIN: InteractiveModule — Discovery Exploration Engine
 // ═══════════════════════════════════════════════════════════════
 export default function InteractiveModule({
@@ -568,16 +712,53 @@ export default function InteractiveModule({
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5 max-w-4xl mx-auto" data-testid={`${category}-page`}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        {/* Header */}
-        <div className="flex items-center gap-2 mb-1">
-          {Icon && <Icon size={14} style={{ color }} />}
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color }}>{subtitle || category}</p>
-        </div>
-        <h1 className="text-3xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
-          {title}
-        </h1>
+    <div className="min-h-screen pb-24 max-w-4xl mx-auto" data-testid={`${category}-page`}>
+      {/* V56.2 — IMMERSIVE SCENE HEADER */}
+      {(() => {
+        const scene = MODULE_SCENES[category];
+        if (!scene) return null;
+        return (
+          <div className="relative -mx-0 mb-6 overflow-hidden" style={{ minHeight: 200 }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.2 }}
+              className="absolute inset-0"
+              style={{ backgroundImage: `url(${scene.image})`, backgroundSize: 'cover', backgroundPosition: 'center 35%' }}
+            />
+            <div className="absolute inset-0" style={{ background: scene.gradient }} />
+            <div className="relative px-5 pt-16 pb-5" style={{ zIndex: 2 }}>
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+                className="text-[10px] italic mb-4" style={{ color: `${color}70` }}>
+                {scene.ambience}
+              </motion.p>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="flex items-center gap-2 mb-1">
+                {Icon && <Icon size={14} style={{ color }} />}
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color }}>{subtitle || category}</p>
+              </motion.div>
+              <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+                {title}
+              </motion.h1>
+            </div>
+          </div>
+        );
+      })()}
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="px-5">
+        {/* Header fallback when no scene */}
+        {!MODULE_SCENES[category] && (
+          <>
+            <div className="flex items-center gap-2 mb-1 pt-20">
+              {Icon && <Icon size={14} style={{ color }} />}
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color }}>{subtitle || category}</p>
+            </div>
+            <h1 className="text-3xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
+              {title}
+            </h1>
+          </>
+        )}
 
         {/* Mastery */}
         <ModuleMastery explored={discoveredSet.size} total={items.length} color={color} />
@@ -655,6 +836,9 @@ export default function InteractiveModule({
         {mode === 'challenge' && (
           <KnowledgeChallenge items={items} discoveredSet={discoveredSet} color={color} category={category} />
         )}
+
+        {/* V56.2 — SAGE BOARD: Cross-module suggestions */}
+        <SageBoard category={category} color={color} discoveredCount={discoveredSet.size} />
 
         {children}
       </motion.div>
