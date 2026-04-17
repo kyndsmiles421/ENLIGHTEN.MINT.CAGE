@@ -1,62 +1,59 @@
-# ENLIGHTEN.MINT.CAFE — V57.0 → V58.0 Cohesive Organism
+# ENLIGHTEN.MINT.CAFE — V59.0 Sovereign Engine
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## V58.0 — Metabolic Seal + Dead Import Purge
+## V59.0 — 800KB Metabolic Seal ACHIEVED
 
-### Bundle Optimization (800KB Progress)
-- **Main bundle: 1.03MB** (from 1.1MB) — purged 30+ dead eager imports from App.js
-- Removed: CosmicMixer(100KB), SmartDock(64KB), CosmicToolbar(20KB), SageAvatar, SageAudience, QuestHUD, MissionControlRing, CommandMode, LearningToggle, EmergencyShutOff, TieredNavigation, GlowPortal, PulseEchoVisualizer, VellumOverlay, NebulaScene, UniversalCommand, HexagramGhostLayer, ZeroPointExperience, UtilityDock, OrbitalNavigation, TrialGraduation, OrbCorner, PersistentWaveform, ShambhalaToolbar, ShambhalaCrystalSystem, ShambhalaFrontSide, CreatorMixerUI, MeshCanvasRenderer, CrystalBadge, MantraOverlay
-- Lazy-loaded: CafeSettingsPanel (only loads when settings opened)
-- **Gzipped: 327KB** (from 344KB) — 17KB reduction in what user actually downloads
-- 206 lazy chunks for code-split modules
+### Bundle Optimization (COMPLETED)
+- **Main bundle: 791KB uncompressed / 250KB gzipped** (Target was 800KB)
+- From 1.1MB (V56.8) → 1.03MB (V58.0) → 791KB (V59.0) = **342KB total reduction (30%)**
+- **SovereignProviders**: Consolidated 26 context providers into single lazy-loaded chunk
+- **Dead Import Purge**: Removed 30+ eagerly-imported but never-rendered components
+- **Engine Deferral**: OmnisUniversalCore, EnlightenOS, HardwareAestheticLock deferred to requestIdleCallback
+- **Icon Purge**: Stripped 9 unused lucide-react icons
+- 207 lazy chunks for code-split modules
 
-## V57.0 — Trade Workshop Activation + Passport + Neural Signal
-
-### Trade Workshops
-- **Masonry Workbench** (`/masonry-workbench`): 6 stones × 9 tools × 6-depth mineral lattice dive
+### Trade Workshops (V57.0)
+- **Masonry Workbench** (`/masonry-workbench`): 6 stones × 9 tools × 6-depth mineral dive
 - **Carpentry Workbench** (`/carpentry-workbench`): 6 woods × 9 tools × 6-depth grain dive
 - Universal guest access. GPT-5.2 tutorials + RPG XP for authenticated users
 
-### Sovereign Trade Passport
+### Sovereign Trade Passport (V57.0)
 - `GET /api/rpg/passport`: 7 Skill Domains, 8 Hybrid Titles, Dive Clearance L0-L5
-- Skill Lattice Web (SVG radar chart), domain mastery rows, expandable title cards
+- Skill Lattice Web, domain mastery rows, expandable title cards
 
-### Neural Context Signal
-- AI Panel tracks `window.__moduleJourney` (last 5 module visits)
-- Generator context includes journey thread
+### Neural Context Signal (V57.0)
+- AI Panel tracks `window.__moduleJourney`, Generator context includes journey thread
 - `MODULE_SIBLINGS` map connects related cells
-- Journey breadcrumb visible in Generator UI
 
-### System-Wide Purge
-- Zero duplicate BackToHub renders (global only)
-- Cross-cell "Related" navigation for workshops
-- 153/156 pages fire `__workAccrue` (16 correctly excluded)
+### System-Wide Purge (V57.0-V58.0)
+- Zero duplicate BackToHub renders, cross-cell Related navigation
+- 153/156 pages fire `__workAccrue`
 
 ## Architecture
-- 156 hub nodules across 10 Command Pillars
+- 156 hub nodules, 10 Command Pillars
+- **SovereignProviders.js**: Consolidated provider tree (lazy-loaded)
 - Circular Workshop Engine (reusable DNA)
 - Trade Passport Central Registry
-- Neural Context Signal (cross-cell AI memory)
-- 206 lazy chunks, 1.03MB main bundle (327KB gzipped)
+- Neural Context Signal
+- 207 lazy chunks, **791KB main bundle**
 
 ## Key Files
+- `/app/frontend/src/components/SovereignProviders.js` — Consolidated 26-provider tree
 - `/app/frontend/src/pages/MasonryWorkbench.js`
 - `/app/frontend/src/pages/CarpentryWorkbench.js`
 - `/app/frontend/src/pages/TradePassport.js`
-- `/app/backend/routes/workshop.py`
-- `/app/backend/routes/rpg.py` (Passport endpoint)
-- `/app/frontend/src/components/console/AIPanel.js` (Neural Context Signal)
-- `/app/frontend/src/App.js` (purged dead imports)
+- `/app/backend/routes/workshop.py` — Stone/tool/wood/carpentry endpoints
+- `/app/backend/routes/rpg.py` — Passport endpoint
 
 ## Backlog
 ### P1
-- Continue bundle seal: target 800KB (need ~230KB more reduction)
-  - Candidates: further lazy-load contexts, defer engine initialization, split PerspectiveToggle/CosmicBackground
 - Batch-replicate Circular Workshop DNA to remaining trades (Electrical, Plumbing, Landscaping)
-- Intent-based search (index tags/categories from Passport domains)
+- Intent-based search across Passport domains
+- Cross-cell context signaling improvements
 ### P2
-- Meritocratic depth tiers (volunteer hours → deeper dive access)
+- Meritocratic depth tiers (volunteer hours → deeper dives)
 - Sovereign Leaderboard
-- Native mobile recording, Phygital NFC hooks
+- Apply Workshop pattern to non-trade modules (Nursing, Child Care)
+- Native mobile recording, Phygital NFC

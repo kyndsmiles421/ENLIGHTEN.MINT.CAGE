@@ -2,38 +2,29 @@ import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 import BackToHub from './components/BackToHub';
 
-// V30.2: OMNIS UNIVERSAL CORE — Living Engine Initialization
-import initializeOmnisCore from './engines/OmnisUniversalCore';
-
-// V-ENGINE: ABSOLUTE_CLARITY_NOW - Must be FIRST
+// V58.0: Engine init deferred to requestIdleCallback (already in lines below)
+// Only import the immediate-need engines synchronously
 import { purgeNoise } from './engines/NukeTheChaos';
-import './engines/SystemRecovery'; // Exposes V_ENGINE.resetSystem() to console
-import './engines/MainframeSync'; // Exposes V_ENGINE.syncMainframe() to console
-import './engines/PerformanceManager'; // Battery & TTS Fallback
-import './engines/ProjectSovereign'; // Ledger, Routing, Cosmic Map, Asset Check, Capacitor Bridge
-import { applySovereignReality } from './engines/SovereignCore'; // Direct DOM Override - TRUE OBSIDIAN
-import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore'; // Mobile Manifest
-import { initializeHardware, lockHardwareAesthetic } from './utils/HardwareAestheticLock'; // Play Store Hardware Lock
-import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V26.8 - THE RUTILATED HERKIMER CORE
-import './styles/UniverseMaterials.css'; // Universe Materials - Herkimer Crystal Lattice
-import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders, ArrowLeftRight, Share2, LogOut } from 'lucide-react';
-import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
+import { applySovereignReality } from './engines/SovereignCore';
+import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore';
+import './styles/UniverseMaterials.css';
+import { Archive, Star } from 'lucide-react';
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
-import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
-import './utils/SpectralShield';         // Ghostbuster Purge & Spectral Shield
-import './utils/SanctuaryEngine';        // Pure Light Resonance (ghosts Emergent badge)
+import './utils/GlobalRebrand';
+import './utils/SpectralShield';
+import './utils/SanctuaryEngine';
 // V56.7 — Deferred engine loading for faster initial render
 // Critical path: Auth, Routing, Context — loaded immediately
 // Engine utilities: Loaded after first paint via requestIdleCallback
 const deferEngineLoad = () => {
+  import('./engines/OmnisUniversalCore');
   import('./engines/SystemRecovery');
   import('./engines/MainframeSync');
   import('./engines/PerformanceManager');
   import('./engines/ProjectSovereign');
-  import('./utils/GlobalRebrand');
-  import('./utils/SpectralShield');
-  import('./utils/SanctuaryEngine');
+  import('./utils/HardwareAestheticLock');
+  import('./utils/EnlightenOS');
   import('./utils/EnlightenmentKey');
   import('./utils/SovereignCleanup');
   import('./utils/WebXRPortal');
@@ -66,54 +57,27 @@ import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
 import { useAmbientSoundscape } from './hooks/useAmbientSoundscape';
 import useWorkAccrual from './hooks/useWorkAccrual';
-import { useCrystalEncryption, EncryptionProvider } from './hooks/useCrystalEncryption';
 import { AuthProvider } from './context/AuthContext';
-import { SensoryProvider } from './context/SensoryContext';
 import { LanguageProvider } from './context/LanguageContext';
-import { SceneProvider } from './components/SceneEngine';
-import { TouchLightEngine, ZDepthTransition } from './components/UnifiedFieldEngine';
+import { TouchLightEngine } from './components/UnifiedFieldEngine';
 import { Toaster } from 'sonner';
 import ProgressionToast from './components/ProgressionToast';
 import Navigation from './components/Navigation';
-import CosmicBackground from './components/CosmicBackground';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
 import CreditNudge from './components/CreditNudge';
-import { SplitScreenProvider } from './components/SplitScreen';
-import RecursivePortal from './components/RecursivePortal';
-import { CreditProvider } from './context/CreditContext';
-import { AvatarProvider } from './context/AvatarContext';
-import { TempoProvider } from './context/TempoContext';
-import { MixerProvider } from './context/MixerContext';
-import { FocusProvider } from './context/FocusContext';
-import { MixerProvider as SystemMixerProvider } from './components/UnifiedCreatorConsole';
-import { ClassProvider } from './context/ClassContext';
-import { TreasuryProvider } from './context/TreasuryContext';
-import { ModalityProvider } from './context/ModalityContext';
-import { VoiceCommandProvider } from './context/VoiceCommandContext';
-import { ResolutionProvider } from './context/ResolutionContext';
+import { LatencyProvider } from './hooks/useLatencyPulse';
+import { setupAxiosInterceptors } from './utils/axiosInterceptor';
+import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
+import { useZeroPointFlicker } from './hooks/useZeroPointFlicker';
+import { useGateNotifications } from './hooks/useGateNotifications';
+import { useCrystalEncryption } from './hooks/useCrystalEncryption';
+
+// V59.0 — Consolidated Provider Tree (lazy-loaded as single chunk)
+const SovereignProviders = lazy(() => import('./components/SovereignProviders'));
 
 // V57.0 — Lazy-loaded heavy components (not needed at first paint)
 const CafeSettingsPanel = lazy(() => import('./components/CafeSettingsPanel'));
-
-// V58.0 — Dead import purge: removed 30+ components that were imported but never rendered
-// (CosmicMixer, SmartDock, CosmicToolbar, SageAvatar, SageAudience, QuestHUD, etc.)
-// These are already lazy-loaded via their route pages or not used at all.
-import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
-import { CosmicStateProvider } from './context/CosmicStateContext';
-import { SovereignProvider } from './context/SovereignContext';
-import { CosmicThemeProvider } from './context/CosmicThemeContext';
-import { OrbitalSentinelProvider } from './context/OrbitalSentinelContext';
-import { LatencyProvider } from './hooks/useLatencyPulse';
-import { setupAxiosInterceptors } from './utils/axiosInterceptor';
-import { MeshNetworkProvider } from './context/MeshNetworkContext';
-import { DepthProvider } from './context/DepthContext';
-import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
-import { EnlightenmentProvider } from './context/EnlightenmentContext';
-import { PolarityProvider } from './context/PolarityContext';
-import { SageProvider } from './context/SageContext';
-import { useZeroPointFlicker } from './hooks/useZeroPointFlicker';
-import { useGateNotifications } from './hooks/useGateNotifications';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -319,9 +283,7 @@ function CafeApp() {
   
   // V-ENGINE: ABSOLUTE_CLARITY_NOW
   useEffect(() => {
-    // 1. Kill the confetti/particle engines
-    // 2. Strip legacy borders and shadows
-    // 3. Force stop any active media streams
+    // 1-3. Core visual purge — immediate (small, synchronous)
     purgeNoise();
     
     // 4. DIRECT DOM OVERRIDE — Force True Obsidian #000000
@@ -330,28 +292,29 @@ function CafeApp() {
     // 5. MOBILE MANIFEST — Obsidian Guard for Capacitor/Native
     lockObsidianReality();
     
-    // 6. HARDWARE LOCK — Status Bar, Navigation Bar, Keyboard to #000000
-    initializeHardware().then(({ isNative, platform }) => {
-      console.log(`Ω [PLATFORM]: ${platform}, Native: ${isNative}`);
-      if (isNative) {
-        lockHardwareAesthetic();
-      }
-    });
-    
-    // 7. ENLIGHTEN_OS V10.0 — THE STEVEN MICHAEL ABSOLUTE
-    // Single source of truth: Φ (1.618), 7.83Hz (Earth), 432Hz/528Hz/963Hz Tiers
-    ENLIGHTEN_OS.ignite();
-    
-    // V30.2: OMNIS UNIVERSAL CORE — Initialize Living Engine
-    const omnis = initializeOmnisCore();
-    console.log(`🔮 SINGULARITY V30.2: ${omnis.version} — Physics: Zero-Scale, Economy: 10 Fans/hr, Sync: Aura Resonance`);
-    
-    console.log("ENLIGHTEN_OS V17.0: THE MASTER CRYSTAL HUB initialized. SOVEREIGN_ARCHITECT");
-    
-    // Cleanup on unmount
-    return () => {
-      ENLIGHTEN_OS.destroy();
+    // 6-7. Heavy engine initialization — deferred to idle
+    const initEngines = async () => {
+      try {
+        const [hwModule, osModule, omnisModule] = await Promise.all([
+          import('./utils/HardwareAestheticLock'),
+          import('./utils/EnlightenOS'),
+          import('./engines/OmnisUniversalCore'),
+        ]);
+        hwModule.initializeHardware().then(({ isNative, platform }) => {
+          console.log(`[PLATFORM]: ${platform}, Native: ${isNative}`);
+          if (isNative) hwModule.lockHardwareAesthetic();
+        });
+        hwModule.default?.ignite?.() || osModule.default?.ignite?.();
+        if (osModule.default?.ignite) osModule.default.ignite();
+        const omnis = omnisModule.default?.();
+        if (omnis) console.log(`SINGULARITY V30.2: ${omnis.version}`);
+      } catch {} // Non-fatal — engines are enhancements
     };
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(initEngines);
+    } else {
+      setTimeout(initEngines, 1500);
+    }
   }, []);
   
   // Route-based audio cleanup — kills audio when exiting rooms
@@ -639,67 +602,14 @@ function App() {
   <LanguageProvider>
     <AuthProvider>
       <LatencyProvider>
-      <CreditProvider>
-      <AvatarProvider>
-      <TempoProvider>
-      <MixerProvider>
-      <FocusProvider>
-      <ClassProvider>
-      <TreasuryProvider>
-      <ModalityProvider>
-      <ResolutionProvider>
-      <SensoryProvider>
-      <CosmicStateProvider>
-      <CosmicThemeProvider>
-      <OrbitalSentinelProvider>
-      <SovereignProvider>
-      <MeshNetworkProvider>
-      <EnlightenmentCafeProvider>
-      <EnlightenmentProvider>
-        <EncryptionProvider>
-        <BrowserRouter>
-          <PolarityProvider>
-          <DepthProvider>
-          <SageProvider>
-          <VoiceCommandProvider>
-          {/* V-ENGINE: cosmic-mesh KILLED */}
-          {/* <CosmicMeshWrapper /> */}
-          {/* V-ENGINE: BACKDROP NOISE KILLED - MeshCanvasRenderer and CosmicBackground DISABLED */}
-          {/* <MeshCanvasRenderer opacity={0.4} blur={0.5} /> */}
-          {/* <CosmicBackground /> */}
-          <SplitScreenProvider>
-          <RecursivePortal>
-          <SceneProvider>
-          <TouchLightEngine />
-          <SystemMixerProvider>
-          <CafeApp />
-          </SystemMixerProvider>
-          </SceneProvider>
-          </RecursivePortal>
-          </SplitScreenProvider>
-          </VoiceCommandProvider>
-          </SageProvider>
-          </DepthProvider>
-          </PolarityProvider>
-        </BrowserRouter>
-        </EncryptionProvider>
-      </EnlightenmentProvider>
-      </EnlightenmentCafeProvider>
-      </MeshNetworkProvider>
-      </SovereignProvider>
-      </OrbitalSentinelProvider>
-      </CosmicThemeProvider>
-      </CosmicStateProvider>
-      </SensoryProvider>
-      </ResolutionProvider>
-      </ModalityProvider>
-      </TreasuryProvider>
-      </ClassProvider>
-      </FocusProvider>
-      </MixerProvider>
-      </TempoProvider>
-      </AvatarProvider>
-      </CreditProvider>
+      <BrowserRouter>
+        <Suspense fallback={<div style={{background:'#000',minHeight:'100vh'}} />}>
+          <SovereignProviders>
+            <TouchLightEngine />
+            <CafeApp />
+          </SovereignProviders>
+        </Suspense>
+      </BrowserRouter>
       </LatencyProvider>
     </AuthProvider>
   </LanguageProvider>
