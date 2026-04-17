@@ -2,8 +2,11 @@
  * AIPanel.js — Sage AI Prompt-to-FX engine panel
  * Extracted from UnifiedCreatorConsole.js
  * Contains Sage FX presets, AI prompt handling, and Atmosphere Journal integration.
+ * 
+ * V57.0 — NEURAL CONTEXT SIGNAL: Tracks module journey for cross-cell intelligence.
+ * The AI now remembers what you were doing in the previous module.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Save, BookOpen, Sparkles } from 'lucide-react';
@@ -12,6 +15,57 @@ import { AtmosphereJournal, saveAtmosphere } from '../AtmosphereJournal';
 import { DEFAULT_FILTERS } from '../ConsoleConstants';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// NEURAL CONTEXT SIGNAL — Cross-Cell Memory
+// Tracks the user's last 5 module visits for contextual AI generation.
+// The organism remembers the journey, not just the destination.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const MAX_JOURNEY_LENGTH = 5;
+
+// Module relationship map — siblings that share knowledge
+const MODULE_SIBLINGS = {
+  'masonry workbench': ['carpentry workbench', 'workshop', 'trade circle', 'architecture'],
+  'carpentry workbench': ['masonry workbench', 'workshop', 'trade circle', 'fabricator'],
+  'herbology': ['aromatherapy', 'elixirs', 'nourishment', 'botany'],
+  'aromatherapy': ['herbology', 'elixirs', 'crystals', 'healing'],
+  'meditation': ['breathing', 'yoga', 'mantras', 'soundscapes', 'zen garden'],
+  'breathing': ['meditation', 'yoga', 'frequencies'],
+  'crystals': ['crystal skins', 'rock hounding', 'masonry workbench'],
+  'yoga': ['meditation', 'breathing', 'mudras', 'acupressure'],
+  'oracle': ['star chart', 'numerology', 'cardology', 'cosmic profile'],
+  'quantum field': ['fractal engine', 'physics lab', 'dimensional space'],
+  'workshop': ['masonry workbench', 'carpentry workbench', 'fabricator'],
+};
+
+function getJourneyContext(currentModule) {
+  const journey = window.__moduleJourney || [];
+  if (journey.length === 0) return '';
+
+  const recent = journey.slice(-3);
+  const siblings = MODULE_SIBLINGS[currentModule] || [];
+  const relevantPrev = recent.filter(m => m !== currentModule);
+
+  if (relevantPrev.length === 0) return '';
+
+  const lastModule = relevantPrev[relevantPrev.length - 1];
+  const isSibling = siblings.includes(lastModule);
+
+  if (isSibling) {
+    return `The user just came from the "${lastModule}" module, which is closely related to "${currentModule}". Connect the knowledge — reference what they may have learned there. `;
+  }
+  return `The user's recent journey: ${relevantPrev.join(' → ')} → ${currentModule}. If relevant, weave in connections to their previous exploration. `;
+}
+
+function recordModuleVisit(moduleName) {
+  if (!moduleName || moduleName === 'sovereign hub') return;
+  if (!window.__moduleJourney) window.__moduleJourney = [];
+  const journey = window.__moduleJourney;
+  if (journey[journey.length - 1] === moduleName) return; // Already recorded
+  journey.push(moduleName);
+  if (journey.length > MAX_JOURNEY_LENGTH) journey.shift();
+}
 
 export const SAGE_FX_PRESETS = {
   sunset:    { blur: 0, brightness: 120, contrast: 110, hueRotate: 15, saturate: 140, sepia: 30, invert: 0 },
@@ -41,6 +95,18 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, 
   // Determine current module context for generators
   const currentModule = currentRoute?.replace(/^\//, '').replace(/-/g, ' ') || 'sovereign hub';
 
+  // V57.0 — Record module visit for Neural Context Signal
+  const prevModuleRef = useRef(null);
+  useEffect(() => {
+    if (currentModule && currentModule !== prevModuleRef.current) {
+      recordModuleVisit(currentModule);
+      prevModuleRef.current = currentModule;
+    }
+  }, [currentModule]);
+
+  // Build journey context for AI generation
+  const journeyContext = getJourneyContext(currentModule);
+
   const handleGenerate = useCallback(async (toolType) => {
     setGenLoading(true);
     setGenResult(null);
@@ -48,7 +114,7 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, 
       const res = await axios.post(`${API}/knowledge/deep-dive`, {
         topic: `${toolType} for ${currentModule}`,
         category: toolType === 'script' ? 'spiritual' : toolType === 'game' ? 'wellness' : 'general',
-        context: `Generate a ${toolType} specifically for the ${currentModule} module. The user is currently inside the ${currentModule} room. Make it practical and immediately usable. fresh`,
+        context: `Generate a ${toolType} specifically for the ${currentModule} module. The user is currently inside the ${currentModule} room. ${journeyContext}Make it practical and immediately usable. fresh`,
       }, { timeout: 90000 });
       setGenResult({ type: toolType, content: res.data?.content || 'No content generated' });
       // Award XP — games give more because they trigger quest logic
@@ -69,7 +135,7 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, 
       toast.error('Generator unavailable. Try again.');
     }
     setGenLoading(false);
-  }, [currentModule]);
+  }, [currentModule, journeyContext]);
 
   const handleSagePrompt = useCallback(async (prompt) => {
     const words = prompt.toLowerCase().trim().split(/\s+/);
@@ -201,12 +267,23 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, 
 
           {/* GLOBAL GENERATORS — Context-aware, works from any module */}
           <div className="mt-3 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-            <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex items-center gap-1.5 mb-1">
               <Sparkles size={9} style={{ color: '#FBBF24' }} />
               <span className="text-[7px] font-bold uppercase tracking-wider" style={{ color: '#FBBF24' }}>
                 Generators — {currentModule}
               </span>
             </div>
+            {/* V57.0 Neural Context — show journey thread */}
+            {window.__moduleJourney && window.__moduleJourney.length > 1 && (
+              <div className="flex items-center gap-1 mb-2 px-1" data-testid="journey-context">
+                <span className="text-[7px]" style={{ color: 'rgba(255,255,255,0.25)' }}>Journey:</span>
+                {window.__moduleJourney.slice(-3).map((m, i, arr) => (
+                  <span key={`${m}-${i}`} className="text-[7px]" style={{ color: i === arr.length - 1 ? '#FBBF24' : 'rgba(255,255,255,0.3)' }}>
+                    {m}{i < arr.length - 1 ? ' → ' : ''}
+                  </span>
+                ))}
+              </div>
+            )}
             <div className="grid grid-cols-4 gap-1.5">
               {[
                 { type: 'script', label: 'Script', color: '#C084FC' },
