@@ -1,17 +1,21 @@
-# ENLIGHTEN.MINT.CAFE — V56.4 Universal Command Console
+# ENLIGHTEN.MINT.CAFE — V56.5 Production Ready
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## System Status: FULLY AUDITED
-- **153 hub nodules**: Every .js page file has a button
+## System Status: FULLY AUDITED + BUILD VERIFIED
+- **153 hub nodules** — zero hidden modules
 - **152/153 routes verified functional** via automated browser testing
-- **2 crash bugs fixed** (Settings + RecursiveDive — missing useEffect imports from batch script)
-- **Zero hidden modules**
-- **Zero overlays** (onboarding converted to inline card)
-- **Zero ghost buttons** (all buttons tappable, not blocked)
+- **Production build**: SUCCESS — 1.2MB main bundle + 183 lazy chunks
+- **Code splitting active**: Three.js isolated to 3 chunks (~350KB each), only loaded on VR/StarChart/Fractal pages
+- **Zero overlays**, zero ghost buttons, zero dead links
 
-### 10 Command Pillars
+### Bundle Architecture (Sprocket Data Highway)
+- **Centripetal Core (1.2MB)**: React, Framer Motion, routing, auth, SpatialRoom — loads once
+- **Rotor Lanes (183 chunks)**: Each page is a separate chunk, loaded on-demand
+- **Freight Lane**: Three.js (393KB), @react-three (358KB), heavy 3D (346KB) — only loaded when user enters VR/3D modules
+
+### 10 Command Pillars (153 total)
 | Pillar | Count | Status |
 |--------|-------|--------|
 | Practice | 15 | ALL ALIVE |
@@ -27,21 +31,9 @@
 
 ---
 
-## Architecture
-- 166 pages total, 161 lazy-loaded
-- 170+ backend routes
-- 150/166 pages with XP hooks
-- Adaptive AI (8 perspectives per topic)
-- 11 teacher visual worlds
-- 8 discovery module scenes
-- 4 daily elemental challenges
-- Cross-module Sage Board
-
----
-
 ## Backlog
 ### P1
-- Production build fix (@/index.css path alias)
-- Bundle optimization
+- Further main bundle reduction (target <800KB)
+- Wire generators as global tools
 ### P2
 - Native mobile recording, Phygital NFC
