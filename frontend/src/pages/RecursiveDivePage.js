@@ -12,7 +12,7 @@
  * - 36-bit address display
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Info, Gem, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
