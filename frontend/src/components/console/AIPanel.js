@@ -51,8 +51,20 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, 
         context: `Generate a ${toolType} specifically for the ${currentModule} module. The user is currently inside the ${currentModule} room. Make it practical and immediately usable. fresh`,
       }, { timeout: 90000 });
       setGenResult({ type: toolType, content: res.data?.content || 'No content generated' });
-      if (typeof window.__workAccrue === 'function') window.__workAccrue('generator', 15);
+      // Award XP — games give more because they trigger quest logic
+      const xpAmount = toolType === 'game' ? 25 : 15;
+      if (typeof window.__workAccrue === 'function') window.__workAccrue(`generator_${toolType}`, xpAmount);
       toast.success(`${toolType} generated for ${currentModule}`);
+
+      // If game type, also fire RPG quest completion
+      if (toolType === 'game') {
+        try {
+          await axios.post(`${API}/rpg/character/gain-xp`, {
+            amount: 25,
+            source: `game_generator_${currentModule.replace(/\s+/g, '_')}`,
+          }, { headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` } });
+        } catch {} // Non-fatal
+      }
     } catch {
       toast.error('Generator unavailable. Try again.');
     }

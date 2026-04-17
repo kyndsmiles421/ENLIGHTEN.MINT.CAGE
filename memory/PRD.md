@@ -1,39 +1,57 @@
-# ENLIGHTEN.MINT.CAFE — V56.5 Global Generator Bridge
+# ENLIGHTEN.MINT.CAFE — V56.6 Unified Sovereign Engine
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## V56.5 — Global Tool Bridge (April 17, 2026)
-- **Generators wired globally** via AI panel in bottom toolbar
-- 4 context-aware generators: Script, Lesson, Game, Ritual
-- **Context-aware**: Shows "GENERATORS — [current module]" — knows where you are
-- Generates content using GPT-5.2 specifically for the active module
-- Available from ANY of the 153 modules without leaving the room
-- Awards 15 XP per generation
-
-### Full AI Panel Tools (accessible from any module):
-- Sage Prompt-to-FX (atmosphere presets)
-- Image to Video, AI Art, Text to Image, Text to Speech, AI Music, AI Avatar
-- **Script Generator** — creates scripts/manuals for current module
-- **Lesson Generator** — creates lessons for current module
-- **Game Generator** — creates game scenarios for current module
-- **Ritual Generator** — creates rituals/practices for current module
-- Journal quick-entry
+## System Status: PRODUCTION READY
+- **153 hub nodules** — zero hidden modules
+- **152/153 routes verified** (automated browser audit)
+- **Production build**: 1.2MB core + 183 lazy chunks
+- **Global generators**: Script, Lesson, Game, Ritual — context-aware from any module
+- **Game generator → RPG quest accrual**: Generates game + awards 25 XP + fires RPG gain-xp
+- **Cross-module suggestions API**: POST /api/knowledge/cross-suggest returns personalized module connections
+- **Adaptive AI**: 8 rotating perspectives per topic, visit history tracked
+- **Zero overlays, zero ghost buttons, zero dead links**
 
 ---
 
-## System Status
-- 153 hub nodules, 152 verified functional
-- Zero hidden modules, zero overlays, zero ghost buttons
-- Production build: 1.2MB core + 183 lazy chunks
-- Adaptive AI (8 perspectives), 11 teacher scenes, 8 discovery scenes
-- Global generators accessible from bottom toolbar on every page
+## Full Feature Set
+### Core Engine
+- 10 Command Pillars, 153 nodules
+- Adaptive AI Deep Dive (GPT-5.2, 8 perspectives)
+- Global Generator Bridge (Script/Lesson/Game/Ritual from any module)
+- Cross-module Sage Board with smart suggestions
+- Progressive content gating (milestones)
+- 4 daily elemental challenges with XP multipliers
+
+### Interactive Simulations
+- I Ching Coin Toss (yarrow stalk probabilities)
+- Yoga Guided Flow (breath sync)
+- Discovery Exploration Engine (8 modules, fog-node grid)
+- Knowledge Challenges (quiz from discovered items)
+- 11 immersive teacher scenes
+- 8 immersive module scenes
+
+### Progression
+- XP hooks on 150/166 pages
+- RPG character with level/XP
+- 8 cross-system milestones
+- VitalityBar (disabled fixed positioning)
+- ProgressionToast (disabled fixed positioning)
+- Sovereign Economy (Credits only, Phi-escrow)
+
+### Architecture
+- 183 lazy-loaded chunks (sprocket data highway)
+- Three.js isolated to 3 chunks (~350KB each)
+- Mobile-optimized (no 3D transforms, 8 particles max, no blur)
+- TWA configured for Google Play Store
 
 ---
 
 ## Backlog
 ### P1
-- Deepen room simulations for trade modules
 - Tree-shake main bundle below 800KB
+- Deepen trade module workshops
 ### P2
-- Native mobile recording, Phygital NFC
+- Native mobile recording
+- Phygital NFC

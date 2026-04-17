@@ -273,3 +273,53 @@ async def health_check():
 @router.get("/")
 async def root():
     return {"message": "ENLIGHTEN.MINT.CAFE API is alive"}
+
+@router.post("/knowledge/cross-suggest")
+async def cross_suggest(data: dict = Body(...), user=Depends(get_current_user_optional)):
+    """Return smart cross-module suggestions based on the current module and item."""
+    module = data.get("module", "")
+    _item = data.get("item", "")
+    uid = user["id"] if user else "anon"
+
+    # Get user's recent activity to personalize
+    recent = []
+    async for doc in db.rpg_xp_log.find(
+        {"user_id": uid}, {"_id": 0, "source": 1}
+    ).sort("timestamp", -1).limit(10):
+        recent.append(doc.get("source", ""))
+
+    # Cross-module connection map
+    connections = {
+        "crystals": ["aromatherapy", "reiki", "meditation", "yoga"],
+        "herbology": ["elixirs", "nourishment", "aromatherapy", "meal-planning"],
+        "aromatherapy": ["herbology", "meditation", "reiki", "crystals"],
+        "elixirs": ["herbology", "nourishment", "meditation", "breathing"],
+        "mudras": ["meditation", "breathing", "yoga", "mantras"],
+        "nourishment": ["herbology", "elixirs", "yoga", "meal-planning"],
+        "reiki": ["crystals", "acupressure", "meditation", "mudras"],
+        "acupressure": ["reiki", "yoga", "herbology", "mudras"],
+        "meditation": ["breathing", "mantras", "crystals", "frequencies"],
+        "breathing": ["meditation", "yoga", "mudras", "frequencies"],
+        "yoga": ["breathing", "meditation", "mudras", "acupressure"],
+        "oracle": ["star-chart", "numerology", "crystals", "dreams"],
+        "teachings": ["sacred-texts", "mantras", "meditation", "blessings"],
+        "frequencies": ["meditation", "soundscapes", "breathing", "crystals"],
+        "dreams": ["oracle", "meditation", "journal", "numerology"],
+    }
+
+    related = connections.get(module, ["meditation", "crystals", "herbology"])
+
+    # Filter out modules user already visited recently
+    fresh = [r for r in related if r not in recent[:3]]
+    if not fresh:
+        fresh = related
+
+    suggestions = []
+    for mod in fresh[:3]:
+        suggestions.append({
+            "module": mod,
+            "path": f"/{mod}",
+            "reason": f"Connects to your {module} practice",
+        })
+
+    return {"suggestions": suggestions, "module": module}
