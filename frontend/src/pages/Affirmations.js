@@ -5,7 +5,6 @@ import { RefreshCw, Sparkles, Copy, Check, Wand2, Save, Trash2, Play, Loader2, C
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import NarrationPlayer from '../components/NarrationPlayer';
-import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 import { ProximityItem } from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -361,7 +360,6 @@ export default function Affirmations() {
   const [loading, setLoading] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(THEMES[0]);
   const [copied, setCopied] = useState(false);
-  const recorder = useSpatialRecorder();
 
   useEffect(() => {
     axios.get(`${API}/affirmations/daily`)
@@ -401,7 +399,7 @@ export default function Affirmations() {
           Words of Power
         </h1>
 
-        <SpatialRecorderUI recorder={recorder} />
+        
 
         <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Let these words resonate through every cell of your being.

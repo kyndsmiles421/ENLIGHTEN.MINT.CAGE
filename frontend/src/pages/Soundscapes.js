@@ -7,7 +7,6 @@ import { Volume2, VolumeX, Save, Trash2, Loader2, Upload, Music } from 'lucide-r
 import { useAuth } from '../context/AuthContext';
 import FeaturedVideos from '../components/FeaturedVideos';
 import { ProximityItem } from '../components/SpatialRoom';
-import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -138,7 +137,6 @@ export default function Soundscapes() {
   const [mixName, setMixName] = useState('');
   const [saving, setSaving] = useState(false);
   const [showSavePanel, setShowSavePanel] = useState(false);
-  const recorder = useSpatialRecorder();
 
   const loadSavedMixes = useCallback(async () => {
     if (!user) return;
@@ -244,7 +242,7 @@ export default function Soundscapes() {
           Ambient Worlds
         </h1>
 
-        <SpatialRecorderUI recorder={recorder} />
+        
 
         <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Mix your perfect soundscape. Layer sounds to create your unique sanctuary.

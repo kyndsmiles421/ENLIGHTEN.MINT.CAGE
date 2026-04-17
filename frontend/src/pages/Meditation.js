@@ -12,7 +12,6 @@ import SovereignViewport from '../components/SovereignViewport';
 import FeaturedVideos from '../components/FeaturedVideos';
 import useWorkAccrual from '../hooks/useWorkAccrual';
 import { ProximityItem } from '../components/SpatialRoom';
-import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -1287,7 +1286,6 @@ export default function Meditation() {
   const [mode, setMode] = useState(constellationParam ? 'constellation' : 'guided');
   const [filter, setFilter] = useState('all');
   const [activeSession, setActiveSession] = useState(null);
-  const recorder = useSpatialRecorder();
 
   const filtered = filter === 'all' ? GUIDED_MEDITATIONS : GUIDED_MEDITATIONS.filter(m => m.category === filter);
 
@@ -1302,7 +1300,7 @@ export default function Meditation() {
           Stillness Within
         </h1>
 
-        <SpatialRecorderUI recorder={recorder} />
+        
 
         <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Choose a guided journey or set your own timer. Enter the silence.

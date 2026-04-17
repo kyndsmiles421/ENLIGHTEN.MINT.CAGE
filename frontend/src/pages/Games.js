@@ -10,7 +10,6 @@ import {
   Trophy, RotateCcw, Clock, Star, ChevronRight, Zap
 } from 'lucide-react';
 import { ProximityItem } from '../components/SpatialRoom';
-import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -554,7 +553,6 @@ export default function Games() {
   const [activeGame, setActiveGame] = useState(null);
   const [scores, setScores] = useState({});
   const [saving, setSaving] = useState(false);
-  const recorder = useSpatialRecorder();
 
   useEffect(() => {
     if (!authLoading && !user) { navigate('/auth'); return; }
@@ -630,7 +628,7 @@ export default function Games() {
           Play Your Way to Peace
         </h1>
 
-        <SpatialRecorderUI recorder={recorder} />
+        
 
         <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Games designed to sharpen your mind, deepen your breath, and brighten your mood.

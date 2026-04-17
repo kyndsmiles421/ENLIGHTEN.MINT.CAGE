@@ -7,7 +7,6 @@ import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight, C
 import { toast } from 'sonner';
 import { CosmicBanner, CosmicMiniTag } from '../components/CosmicBanner';
 import { ProximityItem } from '../components/SpatialRoom';
-import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const MOODS = ['peaceful','joyful','anxious','confused','mysterious','frightening','neutral','profound'];
@@ -344,7 +343,6 @@ export default function Dreams() {
   const [moonPhase, setMoonPhase] = useState(null);
   const [tab, setTab] = useState('journal');
   const [loading, setLoading] = useState(true);
-  const recorder = useSpatialRecorder();
 
   const load = () => {
     Promise.all([
@@ -385,7 +383,7 @@ export default function Dreams() {
           )}
         </div>
 
-        <SpatialRecorderUI recorder={recorder} />
+        
 
         <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Record your dreams, discover their symbols, and receive AI-powered spiritual interpretations.

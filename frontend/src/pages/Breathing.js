@@ -8,7 +8,6 @@ import { useAuth } from '../context/AuthContext';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
 import { ProximityItem } from '../components/SpatialRoom';
-import SpatialRecorderUI, { useSpatialRecorder } from '../components/SpatialRecorder';
 import { FlowerOfLife } from '../components/SacredGeometrySVG';
 import { FIB_BREATH_CYCLE, FIB_BREATH_PHASES, FIB_BREATH_TOTAL, getFibBreathPhase } from '../lib/SacredGeometry';
 
@@ -492,8 +491,6 @@ export default function Breathing() {
     setMode('presets');
   };
 
-  const recorder = useSpatialRecorder();
-
   return (
     <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -505,7 +502,7 @@ export default function Breathing() {
           Conscious Breathing
         </h1>
 
-        <SpatialRecorderUI recorder={recorder} />
+        
 
         <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Follow the rhythm. Let each breath expand your awareness.
