@@ -1914,6 +1914,172 @@ NUTRITION_MATERIALS.extend([
      ]},
 ])
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V66.0 ABSOLUTE ZERO PARITY — Final 4 modules from 3 → 6 materials
+# 132 total materials. 100% density. Zero empty shelves.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ── AUTOMOTIVE +3 ──
+AUTOMOTIVE_MATERIALS.extend([
+    {"id": "hybrid_ev", "name": "Hybrid/EV Systems", "color": "#22C55E", "category": "Electrification", "complexity": "Advanced",
+     "origin": "The electrification revolution — where 150 years of combustion engineering meets the lithium ion",
+     "components": ["Battery pack (Li-ion NMC)", "Inverter (DC→AC)", "Permanent magnet motor", "Regenerative braking", "Thermal management"],
+     "system": "Electrochemical-Mechanical axis", "uses": "EV diagnostics, high-voltage safety, battery health, range optimization",
+     "dive_layers": [
+         {"depth": 0, "label": "Under the Hood", "desc": "No engine noise. 400V battery pack under the floor, inverter converts DC to 3-phase AC, motor spins the wheels. 90% drivetrain efficiency vs 25% for ICE"},
+         {"depth": 1, "label": "Battery Architecture", "desc": "Cells → modules → pack. 7,000+ cylindrical cells in a Tesla Model 3. BMS (Battery Management System) balances every cell within 5mV"},
+         {"depth": 2, "label": "Regenerative Braking", "desc": "Motor becomes generator under deceleration. Kinetic energy → electrical energy → stored in battery. Recovers 60-70% of braking energy. Brake pads last 200,000 miles"},
+         {"depth": 3, "label": "Inverter Switching", "desc": "IGBTs or SiC MOSFETs switch 400V at 10,000 Hz. Pulse width modulation creates a synthetic sine wave from DC. The inverter IS the throttle"},
+         {"depth": 4, "label": "Electrochemistry", "desc": "Li⁺ ions shuttle between graphite anode and NMC cathode through liquid electrolyte. Intercalation, not plating. Side reactions = capacity fade"},
+         {"depth": 5, "label": "Solid-State Frontier", "desc": "Replace liquid electrolyte with ceramic (Li₇La₃Zr₂O₁₂). No dendrites, no fires, 2x energy density. The physics of the next paradigm — lithium ions moving through crystal lattice"},
+     ]},
+    {"id": "transmission", "name": "Transmission Overhaul", "color": "#A78BFA", "category": "Powertrain", "complexity": "Advanced",
+     "origin": "Gear-based torque multiplication — matching engine RPM to wheel speed across all driving conditions",
+     "components": ["Planetary gear sets", "Torque converter", "Valve body", "Clutch packs", "Synchronizers"],
+     "system": "Mechanical-Hydraulic axis", "uses": "Transmission rebuild, shift quality diagnosis, fluid service, performance tuning",
+     "dive_layers": [
+         {"depth": 0, "label": "The Gearbox", "desc": "Manual: driver selects gear via synchronizers. Automatic: hydraulic valve body selects via clutch packs. CVT: belt on variable-diameter pulleys. All solve the same problem: torque multiplication"},
+         {"depth": 1, "label": "Planetary Gear Set", "desc": "Sun gear + planet gears + ring gear. Hold any one, drive another, and the third outputs at a different ratio. One gear set, infinite combinations. Simpson/Ravigneaux compound sets give 6-10 ratios"},
+         {"depth": 2, "label": "Torque Converter", "desc": "Impeller (engine-side) throws fluid at turbine (transmission-side). Stator redirects fluid for torque multiplication up to 2.5:1. Lock-up clutch eliminates slip at cruise"},
+         {"depth": 3, "label": "Hydraulic Control", "desc": "Valve body: a hydraulic computer. Governor pressure (speed) + throttle pressure (load) = shift timing. Modern: solenoids replace governors. TCM controls 6+ solenoids simultaneously"},
+         {"depth": 4, "label": "Gear Tooth Contact", "desc": "Hertzian contact stress at gear mesh: 1,000+ MPa on a surface the size of a grain of rice. Involute tooth profile ensures constant velocity ratio regardless of center distance variation"},
+         {"depth": 5, "label": "Conservation of Angular Momentum", "desc": "τ = Iα. Torque = moment of inertia × angular acceleration. Gear ratio trades RPM for torque. Energy is conserved — the transmission does not create power, it transforms it. The fundamental trade: speed for force"},
+     ]},
+    {"id": "ecu_remap", "name": "ECU Remapping", "color": "#3B82F6", "category": "Digital", "complexity": "Expert",
+     "origin": "Rewriting the engine's brain — modifying fuel maps, ignition timing, and boost pressure for performance or efficiency",
+     "components": ["ECU flash tool", "Fuel map (VE table)", "Ignition advance table", "Boost control map", "Lambda targets"],
+     "system": "Digital-Thermodynamic axis", "uses": "Performance tuning, emissions compliance, fuel economy, forced induction management",
+     "dive_layers": [
+         {"depth": 0, "label": "The Flash", "desc": "Connect to OBD-II port. Read stock calibration. Modify tables. Write new calibration. The engine breathes differently in 15 minutes. Power, torque, response — all change"},
+         {"depth": 1, "label": "Fuel Map (VE Table)", "desc": "3D surface: RPM × Load → Volumetric Efficiency (%). Determines injector pulse width at every operating point. 16×16 grid = 256 cells, each hand-tuned on a dyno"},
+         {"depth": 2, "label": "Ignition Advance", "desc": "Degrees before TDC where spark fires. More advance = more power (up to the knock limit). Less advance = safer but slower. The razor edge between peak power and engine destruction"},
+         {"depth": 3, "label": "Knock Detection", "desc": "Piezoelectric sensor on the block listens for detonation vibration (6-8 kHz). ECU retards timing 2° per knock event. Knock = uncontrolled detonation = melted pistons"},
+         {"depth": 4, "label": "Closed-Loop Feedback", "desc": "O₂ sensor reads exhaust → ECU adjusts fuel trim ±25% → targets λ=1 (stoichiometric). Short-term fuel trim is real-time. Long-term fuel trim reveals systematic drift. The engine teaches itself"},
+         {"depth": 5, "label": "Thermodynamic Optimization", "desc": "MBT (Minimum advance for Best Torque): the ignition timing where peak cylinder pressure occurs at 15° ATDC. Every engine has one optimal point for each RPM/load cell. Finding it is finding the engine's truth"},
+     ]},
+])
+
+# ── MEDITATION +3 ──
+MEDITATION_MATERIALS.extend([
+    {"id": "theta_wave", "name": "Theta Wave Induction", "color": "#8B5CF6", "category": "Brainwave", "complexity": "Advanced",
+     "origin": "Accessing the 4-8 Hz frequency band — the gateway between waking consciousness and the subconscious",
+     "components": ["Binaural beats", "Isochronic tones", "Progressive relaxation", "Hypnagogic threshold", "Sensory withdrawal"],
+     "system": "Neuro-Frequency axis", "uses": "Deep meditation, creativity, healing, subconscious reprogramming, lucid dreaming",
+     "dive_layers": [
+         {"depth": 0, "label": "The Practice", "desc": "Lie down. Close eyes. Headphones with 6 Hz binaural beat (200 Hz left, 206 Hz right). Allow the body to dissolve. The theta state is the doorway between wake and sleep"},
+         {"depth": 1, "label": "Brainwave Spectrum", "desc": "Gamma (30+ Hz: insight), Beta (13-30: active), Alpha (8-13: relaxed), Theta (4-8: deep meditation/dreams), Delta (0.5-4: deep sleep). Theta is the creative sweet spot"},
+         {"depth": 2, "label": "Binaural Entrainment", "desc": "Two slightly different frequencies in each ear → the brain generates a 'phantom' beat at the difference frequency. 200 Hz + 206 Hz = 6 Hz theta perception in the superior olivary nucleus"},
+         {"depth": 3, "label": "Hypnagogic State", "desc": "The threshold between wake and sleep: spontaneous imagery, loosened logic, creative associations. Edison and Dalí used this state deliberately. The mind's most fertile ground"},
+         {"depth": 4, "label": "Thalamocortical Oscillation", "desc": "Thalamus acts as a pacemaker: rhythmic inhibition-rebound cycles generate theta waves across the cortex. Meditation deepens these oscillations — coherence spreads hemisphere to hemisphere"},
+         {"depth": 5, "label": "Quantum Coherence in Microtubules", "desc": "Penrose-Hameroff Orch-OR theory: quantum computations in neuronal microtubules may collapse at theta frequencies. Consciousness as orchestrated quantum reduction — the deepest hypothesis on why meditation transforms awareness"},
+     ]},
+    {"id": "heart_coherence", "name": "Heart-Math Coherence", "color": "#EF4444", "category": "Psychophysiology", "complexity": "Intermediate",
+     "origin": "Heart-brain synchronization — the measurable state where heart rhythm, breath, and emotion align into a single coherent wave",
+     "components": ["Heart rate variability", "Coherent breathing (5.5 bpm)", "Positive emotion focus", "Inner Balance sensor", "Autonomic balance"],
+     "system": "Cardiac-Neural axis", "uses": "Stress resilience, emotional regulation, peak performance, trauma recovery, blood pressure management",
+     "dive_layers": [
+         {"depth": 0, "label": "The Practice", "desc": "Focus attention on the heart. Breathe slowly (5.5 breaths/min). Generate a feeling of gratitude or appreciation. Within 60 seconds, your HRV pattern shifts from chaotic to coherent"},
+         {"depth": 1, "label": "HRV Pattern", "desc": "Coherent HRV: smooth sine wave at 0.1 Hz. Incoherent HRV: jagged, erratic. The pattern reflects autonomic nervous system balance. Coherence = sympathetic/parasympathetic harmony"},
+         {"depth": 2, "label": "Baroreflex Loop", "desc": "Blood pressure sensors in the carotid sinus trigger heart rate adjustment every 10 seconds (0.1 Hz). Breathing at this frequency resonates with the baroreflex — maximum HRV amplitude"},
+         {"depth": 3, "label": "Heart-Brain Communication", "desc": "The heart sends MORE information to the brain than the brain sends to the heart. 40,000 sensory neurons in the heart. The vagus nerve carries 80% of its traffic upward"},
+         {"depth": 4, "label": "Electromagnetic Field", "desc": "The heart generates an electromagnetic field 100x stronger than the brain, measurable 3+ feet from the body. Coherent heart rhythm creates coherent field — other people's nervous systems entrain to it"},
+         {"depth": 5, "label": "Nonlinear Dynamics", "desc": "Heart rhythm is a chaotic attractor — deterministic but non-repeating. Coherence shifts the attractor from strange (multi-lobed) to periodic (single loop). Order emerging from chaos — the mathematical signature of flow state"},
+     ]},
+    {"id": "stoic_vis", "name": "Stoic Visualization", "color": "#D4AF37", "category": "Philosophical", "complexity": "Intermediate",
+     "origin": "Premeditatio malorum — the ancient Stoic practice of rehearsing adversity to build unshakable equanimity",
+     "components": ["Negative visualization", "Memento mori", "View from above", "Dichotomy of control", "Voluntary discomfort"],
+     "system": "Cognitive-Stoic axis", "uses": "Anxiety reduction, gratitude cultivation, decision clarity, leadership resilience, fear inoculation",
+     "dive_layers": [
+         {"depth": 0, "label": "The Practice", "desc": "Sit quietly. Visualize losing something you value — health, a loved one, your home. Feel the grief fully. Open your eyes. Everything is still here. Gratitude floods the gap between imagined loss and present reality"},
+         {"depth": 1, "label": "Premeditatio Malorum", "desc": "Seneca: 'We suffer more in imagination than in reality.' By rehearsing adversity calmly, the Stoic is never surprised. The worst case, pre-lived, loses its power to destabilize"},
+         {"depth": 2, "label": "Dichotomy of Control", "desc": "Epictetus: 'Some things are up to us, some are not.' Separate your thoughts, actions, and values (up to you) from outcomes, others' opinions, and events (not up to you). Serenity lives in this separation"},
+         {"depth": 3, "label": "View from Above", "desc": "Marcus Aurelius: zoom out from your problem to your city, your continent, the Earth, the cosmos. Your crisis is a grain of sand on an infinite beach. Perspective dissolves anxiety"},
+         {"depth": 4, "label": "Hedonic Adaptation", "desc": "Brickman & Campbell: lottery winners return to baseline happiness within 6 months. Negative visualization deliberately reverses adaptation — you re-experience what you already have as if newly received"},
+         {"depth": 5, "label": "Amor Fati", "desc": "Nietzsche/Stoic convergence: 'Love your fate.' Not merely accepting what happens, but WANTING it exactly as it is. The universe is not indifferent — it is the forge. Every obstacle is the raw material of growth. This is the deepest meditation: reality itself as teacher"},
+     ]},
+])
+
+# ── SPEAKING +3 ──
+SPEAKING_MATERIALS.extend([
+    {"id": "rhetoric", "name": "Rhetorical Devices", "color": "#3B82F6", "category": "Language Craft",
+     "origin": "The toolbox of eloquence — 2,500 years of techniques for making words unforgettable",
+     "components": ["Anaphora", "Tricolon", "Chiasmus", "Antithesis", "Metaphor"],
+     "system": "Linguistic-Persuasion axis", "uses": "Speechwriting, copywriting, preaching, political oratory, debate",
+     "dive_layers": [
+         {"depth": 0, "label": "The Device", "desc": "Rhetorical devices are patterns in language that create emphasis, rhythm, and memorability. They turn information into impact. Every great speech is a catalog of these patterns"},
+         {"depth": 1, "label": "Repetition Structures", "desc": "Anaphora: 'I have a dream...' (same beginning). Epistrophe: '...of the people, by the people, for the people' (same ending). Symploce: both. Repetition is rhythm is memory"},
+         {"depth": 2, "label": "Tricolon", "desc": "Three parallel phrases: 'Veni, vidi, vici.' 'Life, liberty, pursuit of happiness.' 'Government of, by, and for the people.' The rule of three: two is a coincidence, three is a pattern"},
+         {"depth": 3, "label": "Chiasmus", "desc": "ABBA reversal: 'Ask not what your country can do for you — ask what you can do for your country.' The mirror structure creates a feeling of completion and inevitability"},
+         {"depth": 4, "label": "Metaphor Theory", "desc": "Lakoff & Johnson: we think IN metaphors. 'Argument is war' (attack, defend, win). 'Time is money' (spend, save, waste). The metaphor chosen determines the thought available"},
+         {"depth": 5, "label": "Phonaesthetics", "desc": "Sound symbolism: 'gl-' words often relate to light (glow, glitter, gleam). Plosives (/p/, /b/, /t/, /d/) convey force. Fricatives (/s/, /f/) convey softness. The sound of language carries meaning below conscious awareness"},
+     ]},
+    {"id": "body_analysis", "name": "Body Language Analysis", "color": "#22C55E", "category": "Nonverbal",
+     "origin": "The 93% of communication that isn't words — reading and projecting nonverbal signals",
+     "components": ["Facial microexpressions", "Proxemics", "Gesture clusters", "Posture analysis", "Eye contact patterns"],
+     "system": "Kinesthetic-Social axis", "uses": "Negotiation, interviewing, teaching, leadership, deception detection",
+     "dive_layers": [
+         {"depth": 0, "label": "The Signal", "desc": "Mehrabian's Rule: 7% words, 38% tone, 55% body language. The numbers are debated; the principle is not. When words and body disagree, people believe the body"},
+         {"depth": 1, "label": "Microexpressions", "desc": "Ekman's 7 universal emotions flash across the face in 1/25th of a second: happiness, sadness, anger, fear, surprise, disgust, contempt. Untrained observers miss 80%"},
+         {"depth": 2, "label": "Gesture Clusters", "desc": "Single gestures mean nothing. Crossed arms PLUS averted gaze PLUS leaning back = defensive. Read clusters, not singles. Context determines meaning — the same gesture in two settings means two things"},
+         {"depth": 3, "label": "Proxemics", "desc": "Hall's zones: intimate (0-18 in), personal (18 in-4 ft), social (4-12 ft), public (12+ ft). Violating zone boundaries triggers autonomic stress response. Power = choosing the distance"},
+         {"depth": 4, "label": "Mirror Neuron System", "desc": "We unconsciously mimic others' postures and expressions. Deliberate mirroring builds rapport: the other person's brain registers 'same tribe.' Rapport is a neurological event, not a feeling"},
+         {"depth": 5, "label": "Embodied Cognition", "desc": "Carney/Cuddy (debated but provocative): expansive postures increase testosterone and decrease cortisol. The body doesn't just express the mind — it shapes it. Posture changes biochemistry changes confidence"},
+     ]},
+    {"id": "crisis_comm", "name": "Crisis Communication", "color": "#EF4444", "category": "High-Stakes",
+     "origin": "Speaking when everything is on fire — the communication discipline where stakes are existential",
+     "components": ["Holding statement", "Stakeholder mapping", "Media training", "Empathy-first framing", "Recovery narrative"],
+     "system": "Strategic-Communication axis", "uses": "PR crisis, medical bad news, organizational failure, emergency briefings, legal communication",
+     "dive_layers": [
+         {"depth": 0, "label": "The Crisis", "desc": "Something went wrong. Publicly. People are scared, angry, or both. The first 60 minutes determine whether you recover in weeks or years. Silence is interpreted as guilt"},
+         {"depth": 1, "label": "The Framework", "desc": "Acknowledge → Empathize → Act → Update. Never deny, never minimize, never blame the victim. Lead with what you know, admit what you don't, commit to transparency"},
+         {"depth": 2, "label": "Stakeholder Triage", "desc": "Who is affected? Employees first, customers second, media third, shareholders fourth. Get the order wrong and the crisis multiplies. Internal alignment before external messaging"},
+         {"depth": 3, "label": "Amygdala Hijack", "desc": "Under threat, the audience's amygdala overrides the prefrontal cortex. Logic is offline. Speak to the fear FIRST. 'I understand you're scared. Here's what we're doing.' Calm the limbic system before engaging reason"},
+         {"depth": 4, "label": "Apology Architecture", "desc": "Effective apology = Recognition + Responsibility + Remorse + Remedy. 'We saw it. It's our fault. We're sorry. Here's the fix.' Missing any component and the apology backfires"},
+         {"depth": 5, "label": "Narrative Reclamation", "desc": "Post-crisis: rewrite the story. Johnson & Johnson's Tylenol recall (1982) became the gold standard of crisis response. The crisis BECOMES the proof of character. The deepest communication truth: how you fail defines you more than how you succeed"},
+     ]},
+])
+
+# ── PHILOSOPHY +3 ──
+PHILOSOPHY_MATERIALS.extend([
+    {"id": "existentialism", "name": "Existentialism", "color": "#6B7280", "category": "Existence", "complexity": "Intermediate",
+     "origin": "The philosophy of radical freedom — you are condemned to be free, and must create your own meaning",
+     "components": ["Existence precedes essence", "Radical freedom", "Authenticity", "Absurdity", "Bad faith"],
+     "system": "Existential-Phenomenological axis", "uses": "Personal identity, therapy, literature, death anxiety, meaning-making",
+     "dive_layers": [
+         {"depth": 0, "label": "The Situation", "desc": "'Existence precedes essence' — Sartre. A hammer is designed before it exists (essence → existence). You exist BEFORE you have a purpose. You must create your own meaning"},
+         {"depth": 1, "label": "Radical Freedom", "desc": "Sartre: you are always free to choose. Even in prison, you choose your response. 'Man is condemned to be free.' This freedom is terrifying — it means you are fully responsible"},
+         {"depth": 2, "label": "Bad Faith", "desc": "Pretending you have no choice: 'I had to,' 'I'm just that kind of person.' Bad faith is lying to yourself about your freedom. The waiter who IS a waiter instead of someone playing the role of a waiter"},
+         {"depth": 3, "label": "The Absurd", "desc": "Camus: the universe is silent to our demand for meaning. The Absurd is the gap between our need for purpose and the cosmos' indifference. Sisyphus must imagine himself happy"},
+         {"depth": 4, "label": "Authentic Existence", "desc": "Heidegger: Being-toward-death. Only by confronting your finitude do you stop living the 'They-self' (das Man) and begin living YOUR life. Death is not the end of life — it is the condition that makes life possible"},
+         {"depth": 5, "label": "Facticity and Transcendence", "desc": "You are always both what you are (facticity: your body, history, situation) and what you are not yet (transcendence: your projects, your future). Human existence IS this tension. You are never finished. The final truth of existentialism: you are a verb, not a noun"},
+     ]},
+    {"id": "stoicism", "name": "Stoicism", "color": "#D4AF37", "category": "Practice", "complexity": "Foundation",
+     "origin": "The philosophy of unshakable tranquility — 2,300 years of training the mind to master circumstances",
+     "components": ["Dichotomy of control", "Virtue as sole good", "Amor fati", "Memento mori", "Cosmopolitanism"],
+     "system": "Ethical-Practical axis", "uses": "Resilience, leadership, military training, CBT foundations, daily philosophy",
+     "dive_layers": [
+         {"depth": 0, "label": "The Teaching", "desc": "Control what you can (your thoughts, actions, values). Accept what you cannot (outcomes, others, events). This one distinction eliminates 90% of human suffering"},
+         {"depth": 1, "label": "Four Cardinal Virtues", "desc": "Wisdom (knowing what's good), Courage (acting despite fear), Justice (treating others fairly), Temperance (moderation in all things). Everything else is 'preferred' or 'dispreferred' — not good or bad"},
+         {"depth": 2, "label": "Premeditatio Malorum", "desc": "Seneca: rehearse worst cases in advance. Not pessimism — preparation. The Stoic who has imagined losing everything can never be blindsided. The fear of the thing is worse than the thing itself"},
+         {"depth": 3, "label": "Sympatheia", "desc": "Marcus Aurelius: everything is connected. You are not separate from the cosmos — you are the cosmos experiencing itself locally. Duty to others follows naturally from this insight"},
+         {"depth": 4, "label": "CBT Connection", "desc": "Albert Ellis and Aaron Beck: Cognitive Behavioral Therapy is applied Stoicism. 'It is not things that disturb us, but our judgments about things' — Epictetus (50 AD). The most validated therapy in modern psychology is 2,300 years old"},
+         {"depth": 5, "label": "Logos", "desc": "The Stoic universe is rational — permeated by Logos (divine reason). Every event is part of a causal web that IS fate (heimarmene). Your freedom is not to choose what happens, but to choose how you respond. At the deepest level: the universe is thinking through you"},
+     ]},
+    {"id": "epistemology", "name": "Epistemology", "color": "#60A5FA", "category": "Knowledge", "complexity": "Advanced",
+     "origin": "How do we know what we know? — the study of knowledge, belief, and justification",
+     "components": ["Justified true belief", "Skepticism", "Empiricism vs rationalism", "Reliabilism", "Social epistemology"],
+     "system": "Epistemic-Justification axis", "uses": "Critical thinking, science philosophy, education, AI ethics, media literacy",
+     "dive_layers": [
+         {"depth": 0, "label": "The Question", "desc": "'How do you KNOW that?' — the question that separates opinion from knowledge. Knowledge = justified true belief (JTB). But is that enough? Gettier says no"},
+         {"depth": 1, "label": "Gettier Problem", "desc": "You believe P, P is true, you have justification — but your justification is accidentally right. Do you KNOW? Gettier (1963): 3 pages that destroyed 2,400 years of epistemology"},
+         {"depth": 2, "label": "Skeptical Challenge", "desc": "Descartes: how do you know you're not dreaming? Or a brain in a vat? Radical doubt strips away everything until only 'Cogito ergo sum' remains. But can you rebuild from there?"},
+         {"depth": 3, "label": "Empiricism vs Rationalism", "desc": "Locke/Hume: all knowledge from experience (tabula rasa). Descartes/Leibniz: some knowledge is innate (a priori). Kant: both — the mind structures experience. Kant won, but the debate isn't over"},
+         {"depth": 4, "label": "Reliabilism", "desc": "Goldman: knowledge = belief produced by a reliable cognitive process. No need for the believer to know WHY they know. Your vision is reliable even if you can't explain optics. Externalism vs internalism"},
+         {"depth": 5, "label": "Epistemic Humility", "desc": "The deepest epistemological truth: the more you know, the more you know you don't know. Socrates' wisdom was knowing his ignorance. At the quantum level, Heisenberg's uncertainty principle says reality itself resists complete knowledge. The universe keeps secrets — not from cruelty, but from structure"},
+     ]},
+])
+
+
 
 # Register V64.0 modules
 MODULES["speaking"] = {"materials": SPEAKING_MATERIALS, "tools": SPEAKING_TOOLS, "mat_key": "topics", "mat_id_key": "topic_id", "skill": "Speaking_Skill"}
