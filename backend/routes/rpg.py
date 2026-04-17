@@ -128,12 +128,15 @@ SKILL_DOMAINS = {
     "Trade & Craft": {
         "color": "#FBBF24",
         "sources": ["Masonry_Skill", "masonry_build", "masonry_dive", "masonry_inspect",
-                     "Carpentry_Skill", "carpentry_dive", "carpentry_inspect"],
+                     "Carpentry_Skill", "carpentry_dive", "carpentry_inspect",
+                     "Electrical_Skill", "Plumbing_Skill", "Landscaping_Skill",
+                     "electrical_inspect", "plumbing_inspect", "landscaping_inspect"],
     },
     "Healing Arts": {
         "color": "#22C55E",
         "sources": ["herbology", "aromatherapy", "reiki", "acupressure",
-                     "healing", "elixirs", "nourishment", "meal_planning"],
+                     "healing", "elixirs", "nourishment", "meal_planning",
+                     "Nursing_Skill", "nursing_inspect"],
     },
     "Mind & Spirit": {
         "color": "#A78BFA",
@@ -159,7 +162,8 @@ SKILL_DOMAINS = {
     "Sacred Knowledge": {
         "color": "#D4AF37",
         "sources": ["wisdom_journal", "numerology", "cardology",
-                     "astrology", "sacred_texts", "bible", "mayan"],
+                     "astrology", "sacred_texts", "bible", "mayan",
+                     "Bible_Study_Skill", "bible_inspect"],
     },
 }
 

@@ -259,6 +259,11 @@ const CrystalMarketplace = lazy(() => import('./pages/CrystalMarketplace'));
 const MasonryWorkbench = lazy(() => import('./pages/MasonryWorkbench'));
 const CarpentryWorkbench = lazy(() => import('./pages/CarpentryWorkbench'));
 const TradePassport = lazy(() => import('./pages/TradePassport'));
+const ElectricalWorkbench = lazy(() => import('./pages/ElectricalWorkbench'));
+const PlumbingWorkbench = lazy(() => import('./pages/PlumbingWorkbench'));
+const LandscapingWorkbench = lazy(() => import('./pages/LandscapingWorkbench'));
+const NursingWorkbench = lazy(() => import('./pages/NursingWorkbench'));
+const BibleStudyWorkbench = lazy(() => import('./pages/BibleStudyWorkbench'));
 
 function PageLoader() {
   return (
@@ -554,6 +559,11 @@ function AnimatedRoutes() {
         <Route path="/masonry-workbench" element={<MasonryWorkbench />} />
         <Route path="/carpentry-workbench" element={<CarpentryWorkbench />} />
         <Route path="/trade-passport" element={<TradePassport />} />
+        <Route path="/electrical-workbench" element={<ElectricalWorkbench />} />
+        <Route path="/plumbing-workbench" element={<PlumbingWorkbench />} />
+        <Route path="/landscaping-workbench" element={<LandscapingWorkbench />} />
+        <Route path="/nursing-workbench" element={<NursingWorkbench />} />
+        <Route path="/bible-study-workbench" element={<BibleStudyWorkbench />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
