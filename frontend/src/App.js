@@ -18,7 +18,6 @@ import ENLIGHTEN_OS from './utils/EnlightenOS'; // ENLIGHTEN_OS V26.8 - THE RUTI
 import './styles/UniverseMaterials.css'; // Universe Materials - Herkimer Crystal Lattice
 import { Archive, Clock, Compass, Star, Sparkles, BookOpen, Zap, Sliders, ArrowLeftRight, Share2, LogOut } from 'lucide-react';
 import PerspectiveToggle from './components/PerspectiveToggle'; // Frequency Engine UI
-import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Board (React version)
 
 // SOVEREIGN SYSTEMS: Must be imported FIRST to activate all protocols
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
@@ -77,69 +76,44 @@ import { Toaster } from 'sonner';
 import ProgressionToast from './components/ProgressionToast';
 import Navigation from './components/Navigation';
 import CosmicBackground from './components/CosmicBackground';
-import SmartDock from './components/SmartDock';
-import ShambhalaToolbar from './components/ShambhalaToolbar';
-import ShambhalaCrystalSystem from './components/ShambhalaCrystalSystem';
-import ShambhalaFrontSide from './components/ShambhalaFrontSide';
-import CosmicMixer from './components/CosmicMixer';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
-import { MantraOverlay } from './components/MantraSystem';
 import CreditNudge from './components/CreditNudge';
 import { SplitScreenProvider } from './components/SplitScreen';
+import RecursivePortal from './components/RecursivePortal';
 import { CreditProvider } from './context/CreditContext';
 import { AvatarProvider } from './context/AvatarContext';
 import { TempoProvider } from './context/TempoContext';
 import { MixerProvider } from './context/MixerContext';
-import { MixerProvider as SystemMixerProvider } from './components/UnifiedCreatorConsole';
 import { FocusProvider } from './context/FocusContext';
+import { MixerProvider as SystemMixerProvider } from './components/UnifiedCreatorConsole';
 import { ClassProvider } from './context/ClassContext';
 import { TreasuryProvider } from './context/TreasuryContext';
 import { ModalityProvider } from './context/ModalityContext';
 import { VoiceCommandProvider } from './context/VoiceCommandContext';
 import { ResolutionProvider } from './context/ResolutionContext';
-import CosmicToolbar from './components/CosmicToolbar';
-import CosmicAssistant from './components/CosmicAssistant';
-import PersistentWaveform from './components/PersistentWaveform';
-import OrbCorner from './components/OrbCorner';
+
+// V57.0 — Lazy-loaded heavy components (not needed at first paint)
+const CafeSettingsPanel = lazy(() => import('./components/CafeSettingsPanel'));
+
+// V58.0 — Dead import purge: removed 30+ components that were imported but never rendered
+// (CosmicMixer, SmartDock, CosmicToolbar, SageAvatar, SageAudience, QuestHUD, etc.)
+// These are already lazy-loaded via their route pages or not used at all.
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
 import { CosmicStateProvider } from './context/CosmicStateContext';
 import { SovereignProvider } from './context/SovereignContext';
 import { CosmicThemeProvider } from './context/CosmicThemeContext';
 import { OrbitalSentinelProvider } from './context/OrbitalSentinelContext';
-import CommandMode from './components/CommandMode';
-import { LatencyProvider, LatencyHUD } from './hooks/useLatencyPulse';
+import { LatencyProvider } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
-import TrialGraduation from './components/TrialGraduation';
-import { useGateNotifications } from './hooks/useGateNotifications';
-import OrbitalNavigation from './components/OrbitalNavigation';
-import LearningToggle from './components/LearningToggle';
-import EmergencyShutOff from './components/EmergencyShutOff';
-import MissionControlRing from './components/MissionControlRing';
-import TieredNavigation from './components/TieredNavigation';
-import RecursivePortal from './components/RecursivePortal';
 import { MeshNetworkProvider } from './context/MeshNetworkContext';
 import { DepthProvider } from './context/DepthContext';
-import GlowPortal from './components/GlowPortal';
-import UniversalCommand from './components/UniversalCommand';
-import PulseEchoVisualizer from './components/PulseEchoVisualizer';
 import { EnlightenmentCafeProvider } from './context/EnlightenmentCafeContext';
 import { EnlightenmentProvider } from './context/EnlightenmentContext';
 import { PolarityProvider } from './context/PolarityContext';
-import CafeSettingsPanel, { CafeSettingsToggle } from './components/CafeSettingsPanel';
-import VellumOverlay from './components/VellumOverlay';
-import { Scene as NebulaScene } from './components/nebula';
-import { NebulaViewToggle } from './components/nebula';
-import UtilityDock from './components/UtilityDock';
 import { SageProvider } from './context/SageContext';
-import SageAvatar from './components/SageAvatar';
-import SageAudience from './components/SageAudience';
-import QuestHUD from './components/QuestHUD';
-import HexagramGhostLayer from './components/HexagramGhostLayer';
 import { useZeroPointFlicker } from './hooks/useZeroPointFlicker';
-import ZeroPointExperience from './components/ZeroPointExperience';
-import { CrystalBadge } from './components/CrystalResonancePanel';
-import MeshCanvasRenderer from './components/MeshCanvasRenderer';
+import { useGateNotifications } from './hooks/useGateNotifications';
 
 // Initialize global error handling
 setupAxiosInterceptors();
@@ -445,7 +419,11 @@ function CafeApp() {
         <AnimatedRoutes />
       </div>
       
-      {!isSovereignRoute && <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />}
+      {!isSovereignRoute && (
+        <Suspense fallback={null}>
+          <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
+        </Suspense>
+      )}
     </>
   );
 }
