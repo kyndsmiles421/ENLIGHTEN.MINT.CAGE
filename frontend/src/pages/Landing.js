@@ -942,33 +942,7 @@ export default function Landing() {
       <QuickResetModal open={showQuickReset} onClose={() => setShowQuickReset(false)} />
       <GuidedTour isOpen={showTour} onClose={() => { setShowTour(false); handleTourFinish(); }} onFinish={handleTourFinish} />
 
-      {/* Share Button - Always visible */}
-      <div className="fixed top-4 right-4 z-50">
-        <ShareButton />
-      </div>
-
-      {/* SIGN IN - Top Left (Guest Entry Point) */}
-      {isGuest && (
-        <div className="fixed top-4 left-4 z-50">
-          <button 
-            onClick={() => { Sensories.confirm(); navigate('/auth'); }}
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              border: '2px solid rgba(255,255,255,0.5)',
-              borderRadius: '25px',
-              padding: '10px 24px',
-              color: '#fff',
-              fontWeight: '600',
-              fontSize: '14px',
-              cursor: 'pointer',
-              backdropFilter: 'none',
-            }}
-            data-testid="header-sign-in-btn"
-          >
-            Sign In
-          </button>
-        </div>
-      )}
+      {/* V67.0: Fixed top buttons removed — single inline auth row in hero section below */}
 
       {/* V-ENGINE: Aurora overlays KILLED - Pure Obsidian Void */}
       {/* <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
