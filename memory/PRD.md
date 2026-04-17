@@ -1,6 +1,6 @@
-# ENLIGHTEN.MINT.CAFE — V56.1 Interactive Simulations
+# ENLIGHTEN.MINT.CAFE — V56.2 Mobile Performance Fix
 ## Product Requirements Document
-### Last Updated: April 16, 2026
+### Last Updated: April 17, 2026
 
 ---
 
@@ -10,70 +10,53 @@ Build "The Cosmic Collective" / "ENLIGHTEN.MINT.CAFE", an esoteric, immersive fu
 ---
 
 ## Architecture
-- **Frontend**: React PWA (166 pages, 161 lazy-loaded), 3D Spatial Room Engine, Framer Motion
-- **Backend**: FastAPI with auto-discovered routes (170+), MongoDB
+- **Frontend**: React PWA (166 pages, 161 lazy-loaded), Framer Motion
+- **Backend**: FastAPI (170+ routes), MongoDB
 - **Economy**: Credits-only ($10/hr = 10 Credits/hr), Phi-escrow (1.618%)
-- **3D System**: CSS translate3d/perspective, 9x9xZ grid, Fibonacci depth steps
 - **AI**: GPT-5.2 via Emergent LLM Key
+- **Deployment**: TWA for Google Play Store
 
 ---
 
 ## Implemented Features
 
 ### V55.0 — Foundation
-- Avatar Integration, Sacred Geometry Engine, Sovereign Economy, TWA, OmniBridge, 160+ page migration
+- Avatar, Sacred Geometry, Economy, TWA, OmniBridge, 160+ page migration
 
-### V56.0 — Vitality Overlay + Discovery Engine
-- InteractiveModule → Discovery Exploration Engine (8 pages: Crystals 12, Herbology 12, Aromatherapy 12, Elixirs 10, Mudras 25, Nourishment 8, Reiki 10, Acupressure 10)
-- SpatialRoom atmosphere (cave walls, particles, fog, portal flash, scene images, room name badges)
-- ProgressionToast, useWorkAccrual RPG Bridge, VitalityBar, 8 cross-system milestones
-- CinematicWalkthrough 3D camera, Oracle/Tarot 3D cards
+### V56.0 — Discovery Engine
+- InteractiveModule rewrite (8 pages: Crystals, Herbology, Aromatherapy, Elixirs, Mudras, Nourishment, Reiki, Acupressure)
+- ProgressionToast, useWorkAccrual RPG Bridge, VitalityBar, 8 milestones, Tarot 3D cards
 
 ### V56.1 — Interactive Simulations + Cross-Module Challenges
-- **I Ching Coin Toss**: Yarrow stalk probability model (6.25% Old Yin, 31.25% Young Yang, 43.75% Young Yin, 18.75% Old Yang). 3D animated coin flips, hexagram builds bottom-up line by line (6 lines), auto-fires oracle reading on completion. Changing lines highlighted in gold.
-- **Yoga Guided Flow**: Timed pose sequence with breath sync ring (inhale/hold/exhale phases). Displays poses one at a time with countdown timer. Awards +5 XP per pose, +25 XP for full sequence completion. Breath patterns vary by difficulty (default/restorative/power/meditation).
-- **Progressive Content Gating**: ProgressGate component checks milestones via /api/rpg/milestones before rendering content. Shows locked state with progress bar toward requirement.
-- **Cross-Module Daily Challenges API**: 4 elemental challenges (Earth, Air, Fire, Water) with multi-room tasks and XP multipliers (1.2-1.3x). Tasks span breathing, crystals, oracle, yoga, meditation, herbs, reiki, mood tracking. GET /api/challenges/daily-cross-module + POST /api/challenges/daily-cross-module/claim.
+- I Ching Coin Toss (yarrow stalk probabilities), Yoga Guided Flow (breath sync)
+- ProgressGate on DreamRealms + StarseedAdventure
+- 4 Daily Elemental Challenges (Earth/Air/Fire/Water) with XP multipliers
+- XP hooks on 150/166 pages
+- DailyChallenges UI on Sovereign Hub
+
+### V56.2 — Mobile Performance Fix (April 17, 2026)
+- **Removed ALL 3D CSS transforms** from page transitions (no rotateY, translateZ, blur, preserve-3d)
+- **Mobile transitions**: simple opacity+scale (0.97, 0.25s) instead of 3D rotations
+- **Particle count capped at 8 on mobile** (was 24-32)
+- **Scene images disabled on mobile** (window.innerWidth >= 768 check)
+- **Removed portal flash** (was causing glitch on mobile entry)
+- **Removed backdropFilter blur** from room headers
+- **Simplified cave walls** (4 gradient divs instead of 16 crystal vein lines)
+- **CinematicWalkthrough → Guided Tour**: No longer transforms #app-stage. Actually navigates between rooms using useNavigate() with auto-advance timer and HUD overlay.
 
 ---
 
-## All Verified Data Endpoints (15 APIs confirmed)
-| Endpoint | Items | Status |
-|----------|-------|--------|
-| GET /api/crystals | 12 | OK |
-| GET /api/herbology/herbs | 12 | OK |
-| GET /api/aromatherapy/oils | 12 | OK |
-| GET /api/elixirs/all | 10 | OK |
-| GET /api/mudras | 25 | OK |
-| GET /api/nourishment | 8 | OK |
-| GET /api/reiki/positions | 10 | OK |
-| GET /api/acupressure/points | 10 | OK |
-| GET /api/yoga/styles | 7 | OK |
-| GET /api/oracle/zodiac | 12 | OK |
-| GET /api/frequencies | 12 | OK |
-| GET /api/rpg/character | - | OK |
-| GET /api/rpg/milestones | 8 | OK |
-| POST /api/transmuter/work-submit | - | OK |
-| GET /api/challenges/daily-cross-module | 4 | OK |
+## Verified API Endpoints (15+)
+crystals(12), herbology(12), aromatherapy(12), elixirs(10), mudras(25), nourishment(8), reiki(10), acupressure(10), yoga(7), oracle zodiac(12), frequencies(12), RPG character, RPG milestones(8), work-submit, daily challenges(4)
 
 ---
 
-## Prioritized Backlog
+## Backlog
 
 ### P1
-- Wire ProgressGate into DreamRealms/StarseedAdventure pages
-- Build frontend UI for Cross-Module Daily Challenges display
-- Add more room scene environments
+- Bundle size optimization (1.71MB → target <1MB)
+- More room-specific simulations
 
 ### P2
 - Native mobile recording
 - Phygital NFC hooks
-- Vitality Dashboard (optional)
-
----
-
-## Technical Notes
-- Economy uses CREDITS ONLY. Never "$" or "USD"
-- InteractiveModule powers 8 pages — changes system-wide
-- Never batch-purge 3D CSS (Flatland Trap)
-- Code splitting: 161/166 pages lazy-loaded
