@@ -162,3 +162,272 @@ async def calculate_harmonic_nodes(data: dict = Body(...), user=Depends(get_curr
         "node_count": len(nodes),
         "antinode_count": len(antinodes),
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MASONRY 3D CIRCULAR WORKSHOP — Trade Pillar Engine
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MASONRY_STONES = [
+    {
+        "id": "granite",
+        "name": "Granite",
+        "color": "#94A3B8",
+        "density_kg_m3": 2750,
+        "mohs_hardness": 6.5,
+        "compressive_mpa": 200,
+        "origin": "Igneous — slow-cooled magma deep in Earth's crust",
+        "mineral_composition": ["Feldspar (60%)", "Quartz (30%)", "Mica (10%)"],
+        "crystal_system": "Triclinic (Feldspar) / Hexagonal (Quartz)",
+        "uses": "Foundations, countertops, monuments, curbstones",
+        "dive_layers": [
+            {"depth": 0, "label": "Quarried Block", "desc": "Rough-hewn granite slab with visible grain"},
+            {"depth": 1, "label": "Grain Structure", "desc": "Interlocking feldspar, quartz and mica crystals visible at 2x magnification"},
+            {"depth": 2, "label": "Mineral Domains", "desc": "Orthoclase feldspar pink zones, quartz glass-clear veins, biotite mica dark flakes"},
+            {"depth": 3, "label": "Crystal Lattice", "desc": "SiO4 tetrahedra chains in quartz; AlSi3O8 framework in feldspar"},
+            {"depth": 4, "label": "Molecular Bonds", "desc": "Si-O covalent bonds at 1.61 angstroms; K+ ions in feldspar cleavage planes"},
+            {"depth": 5, "label": "Quantum Shell", "desc": "Silicon 3p orbital hybridization; piezoelectric potential in quartz domains"},
+        ],
+    },
+    {
+        "id": "marble",
+        "name": "Marble",
+        "color": "#E2E8F0",
+        "density_kg_m3": 2710,
+        "mohs_hardness": 3.5,
+        "compressive_mpa": 70,
+        "origin": "Metamorphic — limestone recrystallized under heat and pressure",
+        "mineral_composition": ["Calcite (95%)", "Dolomite (3%)", "Trace minerals (2%)"],
+        "crystal_system": "Trigonal (Calcite rhombohedra)",
+        "uses": "Sculpture, flooring, facades, altars",
+        "dive_layers": [
+            {"depth": 0, "label": "Polished Slab", "desc": "Luminous white surface with grey veining"},
+            {"depth": 1, "label": "Sugar Grain", "desc": "Interlocking calcite sugar-crystals 0.2-2mm across"},
+            {"depth": 2, "label": "Calcite Domains", "desc": "Rhombohedral cleavage faces catching light — double refraction visible"},
+            {"depth": 3, "label": "CaCO3 Lattice", "desc": "Calcium ions + planar carbonate groups in trigonal symmetry"},
+            {"depth": 4, "label": "Ionic Architecture", "desc": "Ca2+ coordinated by 6 oxygen atoms; CO3 plane at 120 degree angles"},
+            {"depth": 5, "label": "Electron Clouds", "desc": "Calcium 4s orbital empty; carbon sp2 hybridization in carbonate"},
+        ],
+    },
+    {
+        "id": "limestone",
+        "name": "Limestone",
+        "color": "#D4C5A9",
+        "density_kg_m3": 2500,
+        "mohs_hardness": 3.0,
+        "compressive_mpa": 55,
+        "origin": "Sedimentary — ancient sea floors compressed over millions of years",
+        "mineral_composition": ["Calcite (80%)", "Aragonite (10%)", "Fossil fragments (10%)"],
+        "crystal_system": "Trigonal (Calcite) / Orthorhombic (Aragonite)",
+        "uses": "Walls, arches, cement production, pyramids of Giza",
+        "dive_layers": [
+            {"depth": 0, "label": "Ashlar Block", "desc": "Cream-colored dressed stone with fossil impressions"},
+            {"depth": 1, "label": "Fossil Matrix", "desc": "Crinoid stems, shell fragments, foram tests in calcite cement"},
+            {"depth": 2, "label": "Biogenic Calcite", "desc": "Microcrystalline calcite (micrite) binding bioclasts"},
+            {"depth": 3, "label": "CaCO3 Microstructure", "desc": "Nanometer-scale calcite rhombs in biological template"},
+            {"depth": 4, "label": "Carbonate Chemistry", "desc": "CO2 + H2O + CaCO3 equilibrium — the carbon cycle in stone"},
+            {"depth": 5, "label": "Isotope Record", "desc": "O-18/O-16 ratio records ancient ocean temperature"},
+        ],
+    },
+    {
+        "id": "slate",
+        "name": "Slate",
+        "color": "#475569",
+        "density_kg_m3": 2800,
+        "mohs_hardness": 5.5,
+        "compressive_mpa": 100,
+        "origin": "Metamorphic — shale compressed and heated, developing foliation",
+        "mineral_composition": ["Quartz (40%)", "Muscovite mica (30%)", "Chlorite (20%)", "Clay minerals (10%)"],
+        "crystal_system": "Monoclinic (Muscovite) / Hexagonal (Quartz)",
+        "uses": "Roofing, flooring, chalkboards, billiard tables",
+        "dive_layers": [
+            {"depth": 0, "label": "Split Slab", "desc": "Dark grey laminar stone split along cleavage planes"},
+            {"depth": 1, "label": "Foliation Layers", "desc": "Paper-thin mica sheets aligned perpendicular to compression"},
+            {"depth": 2, "label": "Mineral Alignment", "desc": "Muscovite mica flakes oriented by tectonic pressure"},
+            {"depth": 3, "label": "Silicate Sheets", "desc": "2D Si2O5 sheets with Al3+ substitution in mica layers"},
+            {"depth": 4, "label": "Interlayer Bonds", "desc": "K+ ions bridging mica sheets; weak van der Waals cleavage"},
+            {"depth": 5, "label": "Metamorphic Memory", "desc": "Crystal preferred orientation records 300 million years of pressure history"},
+        ],
+    },
+    {
+        "id": "sandstone",
+        "name": "Sandstone",
+        "color": "#C2956B",
+        "density_kg_m3": 2200,
+        "mohs_hardness": 6.0,
+        "compressive_mpa": 40,
+        "origin": "Sedimentary — cemented sand grains from ancient rivers and deserts",
+        "mineral_composition": ["Quartz (70%)", "Feldspar (15%)", "Iron oxides (10%)", "Clay cement (5%)"],
+        "crystal_system": "Hexagonal (Quartz grains)",
+        "uses": "Building facades, paving, grindstones, oil reservoirs",
+        "dive_layers": [
+            {"depth": 0, "label": "Dressed Block", "desc": "Warm ochre stone with visible sand-grain texture"},
+            {"depth": 1, "label": "Sand Grains", "desc": "Rounded quartz grains 0.1-2mm cemented by silica or calcite"},
+            {"depth": 2, "label": "Porosity Map", "desc": "15-25% void space between grains — groundwater pathways"},
+            {"depth": 3, "label": "Quartz Overgrowths", "desc": "Secondary SiO2 precipitated in optical continuity with parent grain"},
+            {"depth": 4, "label": "Silica Tetrahedra", "desc": "SiO4 framework with each O shared between two Si atoms"},
+            {"depth": 5, "label": "Provenance Signal", "desc": "Zircon trace elements record the source mountain range"},
+        ],
+    },
+    {
+        "id": "basalt",
+        "name": "Basalt",
+        "color": "#1E293B",
+        "density_kg_m3": 3000,
+        "mohs_hardness": 6.0,
+        "compressive_mpa": 300,
+        "origin": "Igneous — rapidly cooled lava from volcanic eruptions",
+        "mineral_composition": ["Plagioclase (50%)", "Pyroxene (30%)", "Olivine (15%)", "Magnetite (5%)"],
+        "crystal_system": "Triclinic (Plagioclase) / Monoclinic (Pyroxene)",
+        "uses": "Road base, railway ballast, Giant's Causeway columns, countertops",
+        "dive_layers": [
+            {"depth": 0, "label": "Columnar Block", "desc": "Dense dark stone — may show hexagonal columnar jointing"},
+            {"depth": 1, "label": "Microcrystalline", "desc": "Tiny plagioclase laths in pyroxene groundmass — too fine for naked eye"},
+            {"depth": 2, "label": "Mineral Assemblage", "desc": "Green olivine phenocrysts in plagioclase-pyroxene matrix"},
+            {"depth": 3, "label": "Pyroxene Chains", "desc": "Single-chain inosilicate SiO3 units with Mg/Fe bonding"},
+            {"depth": 4, "label": "Magma Chemistry", "desc": "45-52% SiO2 (mafic); Fe/Mg-rich minerals crystallize first (Bowen's series)"},
+            {"depth": 5, "label": "Mantle Origin", "desc": "Partial melting at 70-100km depth; Nd/Sr isotopes trace mantle reservoir"},
+        ],
+    },
+]
+
+MASONRY_TOOLS = [
+    {
+        "id": "trowel",
+        "name": "Trowel",
+        "action_verb": "Spread",
+        "description": "Flat blade for spreading and shaping mortar between stone courses",
+        "technique": "Hold at 45 degrees, load mortar on back edge, sweep forward in one smooth motion. The bed joint should be 10mm thick.",
+        "color": "#94A3B8",
+        "xp_per_action": 12,
+        "icon_symbol": "T",
+    },
+    {
+        "id": "mash_hammer",
+        "name": "Mash Hammer",
+        "action_verb": "Strike",
+        "description": "Heavy double-faced hammer for driving chisels and rough-splitting stone",
+        "technique": "Grip near the end for maximum force. Strike the chisel head squarely — a glancing blow splits the stone unpredictably.",
+        "color": "#EF4444",
+        "xp_per_action": 12,
+        "icon_symbol": "H",
+    },
+    {
+        "id": "chisel",
+        "name": "Point Chisel",
+        "action_verb": "Carve",
+        "description": "Pointed steel chisel for rough shaping and removing bulk material",
+        "technique": "Hold at 60 degrees to the face. Strike rhythmically — listen for the pitch change that signals the stone is about to split.",
+        "color": "#F59E0B",
+        "xp_per_action": 12,
+        "icon_symbol": "C",
+    },
+    {
+        "id": "square",
+        "name": "Try Square",
+        "action_verb": "Measure",
+        "description": "L-shaped precision tool for checking 90-degree angles in dressed stone",
+        "technique": "Press the stock firmly against the reference face. Slide the blade along the test face — light gaps reveal deviation.",
+        "color": "#3B82F6",
+        "xp_per_action": 12,
+        "icon_symbol": "S",
+    },
+    {
+        "id": "level",
+        "name": "Spirit Level",
+        "action_verb": "Level",
+        "description": "Bubble vial instrument for ensuring horizontal and vertical trueness",
+        "technique": "Place on the course. The bubble must center between the lines. Adjust by tapping the stone with the trowel handle.",
+        "color": "#22C55E",
+        "xp_per_action": 12,
+        "icon_symbol": "L",
+    },
+    {
+        "id": "plumb_bob",
+        "name": "Plumb Bob",
+        "action_verb": "Plumb",
+        "description": "Weighted point on a string for checking vertical alignment",
+        "technique": "Hang from the top course. The point should graze the bottom course. Any gap means the wall leans.",
+        "color": "#A78BFA",
+        "xp_per_action": 12,
+        "icon_symbol": "P",
+    },
+    {
+        "id": "jointer",
+        "name": "Jointer",
+        "action_verb": "Joint",
+        "description": "Curved steel tool for finishing and compressing mortar joints",
+        "technique": "Draw along the wet mortar joint with firm pressure. This compresses the mortar, sealing it against water.",
+        "color": "#EC4899",
+        "xp_per_action": 12,
+        "icon_symbol": "J",
+    },
+    {
+        "id": "bolster",
+        "name": "Bolster Chisel",
+        "action_verb": "Split",
+        "description": "Wide-bladed chisel for cutting bricks and stone along a scored line",
+        "technique": "Score the cut line first, then place the bolster blade in the groove. One firm hammer strike splits clean.",
+        "color": "#F97316",
+        "xp_per_action": 12,
+        "icon_symbol": "B",
+    },
+    {
+        "id": "pitching_tool",
+        "name": "Pitching Tool",
+        "action_verb": "Pitch",
+        "description": "Wide chisel for removing large projections and creating dressed faces",
+        "technique": "Place at the stone edge, angle slightly inward. Strike to shear off projections. Work from the edge toward center.",
+        "color": "#2DD4BF",
+        "xp_per_action": 12,
+        "icon_symbol": "X",
+    },
+]
+
+
+@router.get("/workshop/masonry/stones")
+async def get_masonry_stones():
+    """Return all masonry stone materials with dive layer data. Open to all — the Workshop breathes for everyone."""
+    return {"stones": MASONRY_STONES}
+
+
+@router.get("/workshop/masonry/tools")
+async def get_masonry_tools():
+    """Return the 9 primary masonry tools for the sprocket ring. Open to all."""
+    return {"tools": MASONRY_TOOLS}
+
+
+@router.get("/workshop/masonry/stone/{stone_id}")
+async def get_stone_detail(stone_id: str):
+    """Return detailed stone data including dive layers for Recursive Dive. Open to all."""
+    stone = next((s for s in MASONRY_STONES if s["id"] == stone_id), None)
+    if not stone:
+        return {"error": "Stone not found"}
+    return {"stone": stone}
+
+
+@router.post("/workshop/masonry/tool-action")
+async def masonry_tool_action(data: dict = Body(...)):
+    """Record a tool action against a stone and return context for tutorial generation. Open to all."""
+    tool_id = data.get("tool_id", "")
+    stone_id = data.get("stone_id", "")
+
+    tool = next((t for t in MASONRY_TOOLS if t["id"] == tool_id), None)
+    stone = next((s for s in MASONRY_STONES if s["id"] == stone_id), None)
+    if not tool or not stone:
+        return {"error": "Invalid tool or stone"}
+
+    return {
+        "action": f"{tool['action_verb']} {stone['name']}",
+        "tool": tool["name"],
+        "stone": stone["name"],
+        "xp_awarded": tool["xp_per_action"],
+        "tutorial_context": (
+            f"The user selected the {tool['name']} tool on a block of {stone['name']}. "
+            f"Technique: {tool['technique']} "
+            f"Stone properties: {stone['origin']}. Hardness: {stone['mohs_hardness']} Mohs. "
+            f"Compressive strength: {stone['compressive_mpa']} MPa. "
+            f"Generate a practical masonry tutorial step for using the {tool['name']} on {stone['name']}. "
+            f"Include safety notes and a professional tip."
+        ),
+    }
