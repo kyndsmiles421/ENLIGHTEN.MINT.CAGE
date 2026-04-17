@@ -1,64 +1,69 @@
-# ENLIGHTEN.MINT.CAFE — V64.1 The Sovereign Seal
+# ENLIGHTEN.MINT.CAFE — V65.0 Nervous System Lock
 ## PRD — Last Updated: April 17, 2026
 
-## V64.1 — Oracle Vision + Route Purge
+## V65.0 — The Nervous System Lock
 
 ### 22 Workshop Cells in Master Registry
-**Trade & Craft (9):** Masonry, Carpentry, Electrical, Plumbing, Landscaping, Welding, Automotive, HVAC, Machining
-**Healing Arts (5):** Nursing, Child Care, Elderly Care, First Aid, Nutrition
-**Sacred Knowledge (3):** Bible Study, Hermetics, Philosophy
-**Science & Physics (2):** Robotics, Anatomy
-**Mind & Spirit (1):** Meditation
-**Exploration (2):** Public Speaking, Pedagogy
+**Trade & Craft (9):** Masonry, Carpentry, Electrical, Plumbing, Landscaping, Welding(6), Automotive(3), HVAC, Machining(6)
+**Healing Arts (5):** Nursing, Child Care, Elderly Care, First Aid, Nutrition(6)
+**Sacred Knowledge (3):** Bible Study, Hermetics, Philosophy(3)
+**Science & Physics (2):** Robotics, Anatomy(6)
+**Mind & Spirit (1):** Meditation(3)
+**Exploration (2):** Public Speaking(3), Pedagogy(6)
 
 ### Parity Status
-- 13 modules at 6 materials (full parity)
-- 9 modules at 3 materials (Welding, Automotive, Nutrition, Meditation, Speaking, Philosophy, Pedagogy, Anatomy, Machining)
+- 18 modules at 6 materials (full parity)
+- 4 modules at 3 materials (Automotive, Meditation, Speaking, Philosophy)
+- Total materials: 120 (was 93)
 
-### Intent-Based Neural Search (Oracle)
+### V65.0 Parity Push (5 modules expanded)
+- Machining: +Surface Grinding, EDM, Threading
+- Anatomy: +Endocrine System, Lymphatic System, Integumentary (Skin)
+- Pedagogy: +Curriculum Mapping, Differentiated Instruction, Behavioral Psychology
+- Welding: +Flux-Core Arc, Plasma Cutting, Underwater/Hyperbaric
+- Nutrition: +Micronutrient Density, Gut Microbiome, Metabolic Flexibility
+
+### XP Wiring (Nervous System)
+- All 22 modules correctly mapped to SKILL_DOMAINS in rpg.py
+- V65.0 fixed: Machining→Trade, Anatomy→Science, Speaking→Exploration, Pedagogy→Exploration, Philosophy→Sacred
+- 13 Hybrid Titles: General Contractor, Master Artisan, Sovereign Healer, Quantum Architect, Renaissance Soul, Cosmic Navigator, Sage Oracle, Hardscape Engineer, Biomechanical Engineer, Climate Architect, Sovereign Medic, Philosopher King, Sacred Engineer
+
+### Oracle Search (Intent-Based Neural Search)
 - `GET /api/workshop/search?q=` — cross-domain weighted search
-- 22 modules x 10 tags each = 220 intent keywords
-- Bridges physical, biological, and metaphysical domains
-- **Frontend Oracle Search UI** — inline in SovereignHub, groups results by domain, domain bridge bar with glow, "N domains bridged" indicator
-- Pillar glow: Hub accordion pillars glow when their domain has active search results
+- Frontend OracleSearch.js: inline in SovereignHub, domain-grouped results, bridge indicators, pillar glow
+- "foundation" bridges Masonry + Landscaping + Nursing + Child Care + Hermetics + Speaking
 
 ### Architecture
 - `DynamicWorkshop.js` + `/workshop/:moduleId` = infinite modules from one route
-- `OracleSearch.js` = inline neural search with domain-grouped results and bridge indicators
-- `workshop_v60.py` = all data + universal endpoints + registry + search
+- `OracleSearch.js` = inline neural search with domain-grouped results
+- `workshop_v60.py` = master registry + universal endpoints + search
 - `SovereignProviders.js` = 26 contexts consolidated
-- **791KB main bundle** with 210+ lazy chunks
-- **176 hub nodules** total
-- `BackToHub.js` = fully remapped to dynamic `/workshop/` routes (zero legacy `-workbench` paths)
+- `BackToHub.js` = fully remapped to dynamic `/workshop/` routes
+- **791KB main bundle** (Metabolic Seal intact)
 
-### Session Summary (V57-V64.1)
-- V57: 2 manual workshops (Masonry + Carpentry)
-- V58: Dead import purge (1.1MB → 1.03MB)
-- V59: SovereignProviders consolidation (1.03MB → 791KB) — TARGET HIT
-- V60: UniversalWorkshop + 5 new cells
-- V61: Parity + Social Pillar + Neural Clusters
-- V62: Dynamic Router + 4 cells + search endpoint
-- V63: Ancestor migration + 4 more cells + intent tags
-- V64: 5 final cells + parity expansion + complete
-- V64.1: Oracle Search UI (frontend) + BackToHub route purge — COMPLETE
+### Session Summary (V57-V65)
+- V57-V59: Bundle compression (1.1MB → 791KB)
+- V60-V63: Dynamic Router + 22 cells + search endpoint
+- V64: Legacy purge + final cells
+- V64.1: Oracle Search UI + BackToHub route fix
+- V65.0: XP Wiring (5 sources) + Parity Push (15 materials) + 6 Hybrid Titles
 
-## Completed (V64.1)
+## Completed (V65.0)
 - [x] Oracle Search UI in SovereignHub (inline, domain-grouped, bridge indicators)
 - [x] BackToHub.js legacy route purge (all -workbench → /workshop/)
 - [x] Pillar glow effect when search results bridge domains
+- [x] XP wiring for all 22 modules → TradePassport domains
+- [x] 6 new Hybrid Titles (Biomechanical Engineer, Climate Architect, etc.)
+- [x] Parity Push: 5 modules expanded from 3 → 6 materials
 - [x] 22 workshop cells in master registry
 - [x] 791KB Metabolic Seal maintained
-- [x] Dynamic workshop router
-- [x] TradePassport global RPG tracking
 
 ## Backlog
 ### P1
-- Expand remaining 9 modules to 6 materials
-- Update Passport domain sources for new V64 skills
-- Verify XP flow for all 22 registry modules
-- Ensure 36-bit Recursive Dive consistency (6 depths in all modules)
+- Expand remaining 4 modules to 6 materials (Automotive, Meditation, Speaking, Philosophy)
+- 36-Bit Recursive Dive audit (spot-check Depth-6 quality across all pillars)
 ### P2
-- More cells (Economics, Music Theory, Permaculture, etc.)
+- More cells (Economics, Music Theory, Permaculture)
 - Meritocratic depth tiers
 - Sovereign Leaderboard
 - Predictive navigation
