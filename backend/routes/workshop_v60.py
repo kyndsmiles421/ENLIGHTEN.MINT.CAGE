@@ -1,14 +1,10 @@
 """
-V60.0 — Sovereign Interaction Cells: Batch Activation
-5 new modules using the proven Circular Workshop DNA.
-
-Trades: Electrical, Plumbing, Landscaping
-Healing: Nursing
-Sacred: Bible Study
-
+V60.0-V62.0 — Sovereign Interaction Cells: Universal Workshop Engine
+All modules use proven Circular Workshop DNA.
 All endpoints open to guests (Universal Access).
 """
 from fastapi import APIRouter, Body
+from routes.workshop import MASONRY_STONES, MASONRY_TOOLS, CARPENTRY_WOODS, CARPENTRY_TOOLS
 
 router = APIRouter()
 
@@ -1065,6 +1061,10 @@ MODULES["automotive"] = {"materials": AUTOMOTIVE_MATERIALS, "tools": AUTOMOTIVE_
 MODULES["nutrition"] = {"materials": NUTRITION_MATERIALS, "tools": NUTRITION_TOOLS, "mat_key": "foods", "mat_id_key": "food_id", "skill": "Nutrition_Skill"}
 MODULES["meditation"] = {"materials": MEDITATION_MATERIALS, "tools": MEDITATION_TOOLS, "mat_key": "practices", "mat_id_key": "practice_id", "skill": "Meditation_Skill"}
 
+# V63.0 — Ancestor Migration: Masonry & Carpentry join the dynamic registry
+MODULES["masonry"] = {"materials": MASONRY_STONES, "tools": MASONRY_TOOLS, "mat_key": "stones", "mat_id_key": "stone_id", "skill": "Masonry_Skill"}
+MODULES["carpentry"] = {"materials": CARPENTRY_WOODS, "tools": CARPENTRY_TOOLS, "mat_key": "woods", "mat_id_key": "wood_id", "skill": "Carpentry_Skill"}
+
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # V62.0 — MASTER REGISTRY ENDPOINT
@@ -1082,12 +1082,303 @@ WORKSHOP_REGISTRY = {
     "bible": {"title": "Bible Study Workshop", "subtitle": "Sacred Knowledge Cell — Tap the scripture to dive into original language.", "icon": "BookOpen", "accentColor": "#D4AF37", "skillKey": "Bible_Study_Skill", "matLabel": "Scripture", "domain": "Sacred Knowledge"},
     "childcare": {"title": "Child Care Workshop", "subtitle": "Social Pillar — Tap the scenario to dive into child development.", "icon": "Baby", "accentColor": "#F472B6", "skillKey": "Childcare_Skill", "matLabel": "Scenario", "domain": "Healing Arts"},
     "eldercare": {"title": "Elderly Care Workshop", "subtitle": "Social Pillar — Tap the scenario to dive into gerontology.", "icon": "HandHeart", "accentColor": "#A78BFA", "skillKey": "Eldercare_Skill", "matLabel": "Scenario", "domain": "Healing Arts"},
+    "masonry": {"title": "Masonry Workshop", "subtitle": "Trade Pillar — Tap the stone to dive into mineral structure.", "icon": "Hammer", "accentColor": "#94A3B8", "skillKey": "Masonry_Skill", "matLabel": "Stone", "domain": "Trade & Craft"},
+    "carpentry": {"title": "Carpentry Workshop", "subtitle": "Trade Pillar — Tap the wood to dive into grain structure.", "icon": "Axe", "accentColor": "#92400E", "skillKey": "Carpentry_Skill", "matLabel": "Wood", "domain": "Trade & Craft"},
+    "hvac": {"title": "HVAC Workshop", "subtitle": "Trade Pillar — Tap the system to dive into thermodynamics.", "icon": "Wind", "accentColor": "#06B6D4", "skillKey": "HVAC_Skill", "matLabel": "System", "domain": "Trade & Craft"},
+    "robotics": {"title": "Robotics Workshop", "subtitle": "Science Pillar — Tap the component to dive into mechatronics.", "icon": "Cpu", "accentColor": "#8B5CF6", "skillKey": "Robotics_Skill", "matLabel": "Component", "domain": "Science & Physics"},
+    "first_aid": {"title": "First Aid Workshop", "subtitle": "Healing Arts Cell — Tap the emergency to dive into trauma response.", "icon": "Cross", "accentColor": "#EF4444", "skillKey": "FirstAid_Skill", "matLabel": "Emergency", "domain": "Healing Arts"},
+    "hermetics": {"title": "Hermetics Workshop", "subtitle": "Sacred Knowledge Cell — Tap the principle to dive into universal law.", "icon": "Eye", "accentColor": "#D4AF37", "skillKey": "Hermetics_Skill", "matLabel": "Principle", "domain": "Sacred Knowledge"},
 }
+
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V63.0 — HVAC, Robotics, First Aid, Hermetics
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HVAC_MATERIALS = [
+    {"id": "ductwork", "name": "Sheet Metal Duct", "color": "#94A3B8", "category": "Distribution", "complexity": "Foundation",
+     "origin": "Galvanized steel air distribution — the lungs of every building", "composition": ["Galvanized steel", "S-lock seams", "Duct sealant"],
+     "system": "Air distribution", "uses": "Heating, cooling, ventilation, air quality",
+     "dive_layers": [
+         {"depth": 0, "label": "Installed Run", "desc": "Rectangular or round galvanized duct connecting air handler to registers throughout the building"},
+         {"depth": 1, "label": "Airflow Design", "desc": "Static pressure, CFM calculation, duct sizing via ACCA Manual D — the math of moving air"},
+         {"depth": 2, "label": "Heat Transfer", "desc": "Conduction through duct walls, radiation from surfaces, convection within the airstream — three modes simultaneously"},
+         {"depth": 3, "label": "Fluid Dynamics", "desc": "Reynolds number determines laminar vs turbulent flow. Turbulence increases pressure drop but improves mixing"},
+         {"depth": 4, "label": "Psychrometrics", "desc": "Temperature + humidity plotted on the psychrometric chart — the single most powerful HVAC design tool"},
+         {"depth": 5, "label": "Molecular Kinetics", "desc": "Air molecules at 70°F move at 1,100 ft/s (speed of sound). Temperature IS average kinetic energy"},
+     ]},
+    {"id": "refrigerant", "name": "R-410A Refrigerant", "color": "#06B6D4", "category": "Refrigeration", "complexity": "Advanced",
+     "origin": "Hydrofluorocarbon blend — the working fluid that moves heat against nature's gradient", "composition": ["R-32 (50%)", "R-125 (50%)"],
+     "system": "Vapor compression cycle", "uses": "Air conditioning, heat pumps, refrigeration",
+     "dive_layers": [
+         {"depth": 0, "label": "Refrigerant Cycle", "desc": "Liquid absorbs heat (evaporator) → gas is compressed → gas rejects heat (condenser) → liquid again. Repeat"},
+         {"depth": 1, "label": "Phase Change", "desc": "R-410A boils at -61°F at atmospheric pressure. In the evaporator, controlled pressure raises boiling point to 40°F"},
+         {"depth": 2, "label": "Superheat/Subcool", "desc": "Superheat ensures only gas enters compressor. Subcooling ensures only liquid enters TXV. The diagnostic duo"},
+         {"depth": 3, "label": "Compressor Work", "desc": "Isentropic compression: PV^γ = constant. Scroll compressor achieves 70% isentropic efficiency"},
+         {"depth": 4, "label": "COP Analysis", "desc": "Coefficient of Performance = Qcool/Wcompressor. Heat pumps move 3-4x more energy than they consume"},
+         {"depth": 5, "label": "Molecular Dipole", "desc": "R-32 (CH₂F₂) polar molecule with high latent heat. GWP=675 driving transition to R-454B (GWP=466)"},
+     ]},
+    {"id": "thermostat", "name": "Smart Thermostat", "color": "#F59E0B", "category": "Controls", "complexity": "Intermediate",
+     "origin": "Intelligent climate control — the brain that optimizes comfort and energy", "composition": ["Temperature sensor", "Humidity sensor", "Occupancy sensor", "Wi-Fi module"],
+     "system": "Control systems", "uses": "Temperature regulation, energy savings, zoning, scheduling",
+     "dive_layers": [
+         {"depth": 0, "label": "Wall Unit", "desc": "Touch screen displaying temperature, humidity, schedule, and energy usage — the user interface of comfort"},
+         {"depth": 1, "label": "PID Control", "desc": "Proportional-Integral-Derivative: the three-term algorithm that prevents overshoot and oscillation"},
+         {"depth": 2, "label": "Anticipatory Logic", "desc": "Machine learning predicts thermal mass response — starts heating 15 minutes early to hit setpoint on time"},
+         {"depth": 3, "label": "Thermistor Physics", "desc": "NTC thermistor: resistance drops exponentially with temperature. Steinhart-Hart equation converts R to °F"},
+         {"depth": 4, "label": "Feedback Systems", "desc": "Negative feedback: if temperature > setpoint, reduce heating. Positive feedback causes runaway — the thermostat prevents chaos"},
+         {"depth": 5, "label": "Information Theory", "desc": "Shannon entropy of sensor data: how much information each reading carries about the building's thermal state"},
+     ]},
+]
+
+HVAC_TOOLS = [
+    {"id": "manifold_gauges", "name": "Manifold Gauges", "action_verb": "Diagnose", "description": "High/low pressure gauges for reading refrigerant system pressures", "technique": "Blue = low side (suction), Red = high side (discharge). Connect with system running. Compare readings to PT chart for the refrigerant type.", "color": "#06B6D4", "xp_per_action": 12, "icon_symbol": "G"},
+    {"id": "vacuum_pump", "name": "Vacuum Pump", "action_verb": "Evacuate", "description": "Deep vacuum pump for removing moisture and non-condensables from refrigerant systems", "technique": "Pull to 500 microns minimum. Hold for 10 minutes. If vacuum rises, there's a leak. Moisture at 500 microns boils at -40°F — total dehydration.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "V"},
+    {"id": "leak_detector", "name": "Leak Detector", "action_verb": "Detect", "description": "Electronic sniffer for finding refrigerant leaks in sealed systems", "technique": "Start at the top — refrigerant is heavier than air. Move the probe slowly (1 inch/second) around every joint, valve, and fitting. Soap bubbles confirm what the sniffer finds.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "L"},
+    {"id": "anemometer", "name": "Anemometer", "action_verb": "Measure", "description": "Air velocity meter for balancing duct airflow at registers", "technique": "Measure at each supply register. Total CFM must match equipment rating. Adjust dampers to balance: every room should get its designed airflow.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "A"},
+    {"id": "flaring_tool", "name": "Flaring Tool", "action_verb": "Flare", "description": "Precision tool for creating 45° flare connections on copper tubing", "technique": "Cut square, deburr inside, slip nut on FIRST. Clamp tube flush with die block. Lubricate cone. Tighten until flare is smooth and even — one of the most leak-prone joints if done wrong.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "F"},
+    {"id": "combustion_analyzer", "name": "Combustion Analyzer", "action_verb": "Analyze", "description": "Flue gas analyzer measuring efficiency and safety of fuel-burning equipment", "technique": "Insert probe in flue. Read CO, CO₂, O₂, stack temperature. CO above 100 ppm = cracked heat exchanger = immediate shutdown. Safety first.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "recovery_machine", "name": "Recovery Machine", "action_verb": "Recover", "description": "EPA-required machine for capturing refrigerant before system service", "technique": "Connect to liquid and vapor ports. Recover to DOT-approved tank. EPA Section 608 requires recovery before opening any system. Venting is a federal crime.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "R"},
+    {"id": "duct_blaster", "name": "Duct Blaster", "action_verb": "Pressurize", "description": "Calibrated fan for measuring duct leakage in CFM25", "technique": "Seal all registers. Attach fan to one opening. Pressurize to 25 Pa. Read leakage. Industry standard: <4% of total system CFM. Leaky ducts waste 20-30% of energy.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "brazing_torch", "name": "Brazing Torch", "action_verb": "Braze", "description": "Oxy-acetylene or air-acetylene torch for silver brazing copper joints", "technique": "Nitrogen purge while brazing prevents internal oxidation. Heat the fitting, not the tube. Alloy flows toward heat. BCuP-6 (Sil-Fos) for copper-to-copper needs no flux.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "B"},
+]
+
+ROBOTICS_MATERIALS = [
+    {"id": "servo", "name": "Servo Motor", "color": "#8B5CF6", "category": "Actuation", "complexity": "Foundation",
+     "origin": "Closed-loop actuator — precise angular control through feedback", "composition": ["DC motor", "Gear reduction", "Potentiometer", "Control circuit"],
+     "system": "Electromechanical", "uses": "Robotic joints, pan/tilt, grippers, walking robots",
+     "dive_layers": [
+         {"depth": 0, "label": "Servo Unit", "desc": "3-wire connection: power, ground, signal. PWM pulse width (1-2ms) controls angle (0-180°)"},
+         {"depth": 1, "label": "Feedback Loop", "desc": "Potentiometer reads current angle. Error = desired - actual. PID controller drives motor to minimize error"},
+         {"depth": 2, "label": "Gear Train", "desc": "Spur or planetary reduction: 100:1 ratio multiplies torque while dividing speed. Backlash = positional uncertainty"},
+         {"depth": 3, "label": "PWM Encoding", "desc": "50 Hz signal: 1.5ms pulse = center. Resolution: 0.01ms = 1.8° movement. Digital precision from analog signal"},
+         {"depth": 4, "label": "Motor Physics", "desc": "Lorentz force: F = BIL. Current-carrying conductor in magnetic field produces force proportional to current"},
+         {"depth": 5, "label": "Back-EMF", "desc": "Spinning motor generates voltage opposing the supply (Lenz's law). At no-load speed, back-EMF ≈ supply voltage"},
+     ]},
+    {"id": "microcontroller", "name": "Microcontroller", "color": "#3B82F6", "category": "Computing", "complexity": "Intermediate",
+     "origin": "Single-chip computer — the brain of every embedded system and robot", "composition": ["ARM Cortex-M core", "Flash memory", "GPIO pins", "ADC/DAC", "Communication buses"],
+     "system": "Digital computing", "uses": "Sensor reading, motor control, decision-making, communication",
+     "dive_layers": [
+         {"depth": 0, "label": "Dev Board", "desc": "Arduino/ESP32/STM32 — pins, power, USB. Upload code, read sensors, drive actuators. The universal robot brain"},
+         {"depth": 1, "label": "GPIO Control", "desc": "General Purpose I/O: each pin can be input (read sensor) or output (drive LED/motor). Digital or analog"},
+         {"depth": 2, "label": "Interrupt Handling", "desc": "Hardware interrupts: sensor triggers ISR (Interrupt Service Routine) within microseconds. Real-time response"},
+         {"depth": 3, "label": "ADC Conversion", "desc": "10-bit ADC: 0-3.3V mapped to 0-1023. Resolution = 3.2mV per step. Successive approximation register architecture"},
+         {"depth": 4, "label": "Clock Architecture", "desc": "Crystal oscillator → PLL → system clock. 240 MHz = 4.17 ns per cycle. Every instruction takes discrete clock cycles"},
+         {"depth": 5, "label": "Transistor Gates", "desc": "CMOS: complementary NMOS/PMOS pairs. Each logic gate = 2-6 transistors. Billions of gates per chip"},
+     ]},
+    {"id": "sensor_array", "name": "Sensor Array", "color": "#22C55E", "category": "Perception", "complexity": "Intermediate",
+     "origin": "Multi-modal sensing — giving robots the ability to perceive their environment", "composition": ["Ultrasonic", "IR proximity", "IMU (6-axis)", "Camera", "Encoders"],
+     "system": "Perception pipeline", "uses": "Obstacle avoidance, mapping, localization, object recognition",
+     "dive_layers": [
+         {"depth": 0, "label": "Sensor Suite", "desc": "Distance, rotation, acceleration, light — each sensor adds a dimension to the robot's world model"},
+         {"depth": 1, "label": "Sensor Fusion", "desc": "Kalman filter: combine noisy sensor data into optimal state estimate. GPS + IMU + encoders = precise localization"},
+         {"depth": 2, "label": "Signal Processing", "desc": "Low-pass filter removes noise. FFT reveals frequency components. Nyquist theorem: sample at 2x max frequency"},
+         {"depth": 3, "label": "Transduction", "desc": "Physical phenomenon → electrical signal. Piezoelectric (pressure→voltage), photoelectric (light→current)"},
+         {"depth": 4, "label": "Noise Floor", "desc": "Johnson-Nyquist noise: thermal electrons create voltage fluctuations. Signal-to-noise ratio determines sensor quality"},
+         {"depth": 5, "label": "Quantum Sensing", "desc": "Atomic clocks, SQUID magnetometers, quantum gyroscopes — approaching the Heisenberg uncertainty limit"},
+     ]},
+]
+
+ROBOTICS_TOOLS = [
+    {"id": "soldering_iron", "name": "Soldering Iron", "action_verb": "Solder", "description": "Temperature-controlled iron for joining electronic components to PCBs", "technique": "Tin the tip. Heat the pad AND the lead simultaneously for 2 seconds. Touch solder to the joint, not the iron. A good joint is shiny and concave.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "oscilloscope", "name": "Oscilloscope", "action_verb": "Probe", "description": "Time-domain signal analyzer for debugging electronic circuits", "technique": "Set timebase to expected signal period. Set voltage scale to expected amplitude. Trigger on rising edge. The scope shows you what the multimeter only summarizes.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "O"},
+    {"id": "logic_analyzer", "name": "Logic Analyzer", "action_verb": "Decode", "description": "Digital protocol decoder for I2C, SPI, UART, and CAN bus signals", "technique": "Connect probes to data lines. Set protocol decoder. Trigger on start condition. You can now READ the conversation between chips — invaluable for debugging.", "color": "#8B5CF6", "xp_per_action": 12, "icon_symbol": "L"},
+    {"id": "cad_software", "name": "3D CAD", "action_verb": "Design", "description": "Parametric 3D modeling for robot chassis and mechanism design", "technique": "Design for manufacturing: wall thickness, draft angles, tolerance stack-up. Simulate kinematics before cutting metal. If it doesn't work in CAD, it won't work in reality.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "D"},
+    {"id": "motor_driver", "name": "Motor Driver", "action_verb": "Drive", "description": "H-bridge or stepper driver for controlling motor speed and direction", "technique": "L298N for DC motors, A4988 for steppers. PWM frequency above audible range (>20kHz) eliminates motor whine. Current limiting prevents driver burnout.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "wire_crimper", "name": "Dupont Crimper", "action_verb": "Crimp", "description": "Precision crimping tool for making custom wiring harnesses", "technique": "Strip 2mm of insulation. Place wire in crimp pin. Squeeze once — the pin folds around bare wire AND insulation. Tug test. Custom cables are cheaper and more reliable than jumper wires.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "pid_tuner", "name": "PID Tuner", "action_verb": "Tune", "description": "Software tool for optimizing proportional-integral-derivative control loops", "technique": "Ziegler-Nichols: increase P until oscillation (Ku). Set P=0.6Ku, I=Ti/2, D=Ti/8. Fine-tune from there. Every robot joint needs its own PID tuning.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "P"},
+    {"id": "3d_printer", "name": "3D Printer", "action_verb": "Print", "description": "FDM printer for rapid prototyping of robot parts and enclosures", "technique": "PLA for prototypes, PETG for functional parts, TPU for flexible. Layer height = resolution vs speed tradeoff. Orient for strength: layers are weak in tension along Z axis.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "R"},
+    {"id": "firmware_debug", "name": "Debug Console", "action_verb": "Debug", "description": "Serial monitor and debugger for stepping through embedded code", "technique": "Serial.println() is your best friend. Add timestamps. Log state machine transitions. When the robot 'does nothing,' the serial output tells you WHERE it got stuck.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "B"},
+]
+
+FIRSTAID_MATERIALS = [
+    {"id": "wound_emergency", "name": "Wound & Bleeding", "color": "#EF4444", "category": "Trauma", "complexity": "Critical",
+     "origin": "Hemorrhage control — the #1 preventable cause of death in trauma", "components": ["Direct pressure", "Tourniquet", "Wound packing", "Hemostatic agents"],
+     "system": "Hemostatic-Vascular axis", "uses": "Cuts, lacerations, amputations, penetrating injuries",
+     "dive_layers": [
+         {"depth": 0, "label": "Scene Assessment", "desc": "BSI (body substance isolation) first. Scene safe? Mechanism of injury? Number of patients? Call 911."},
+         {"depth": 1, "label": "Hemorrhage Control", "desc": "Direct pressure → elevation → pressure dressing → tourniquet. Escalate in 30-second intervals if bleeding doesn't stop"},
+         {"depth": 2, "label": "Coagulation Cascade", "desc": "Intrinsic + extrinsic pathways converge at Factor X → thrombin → fibrin mesh. The body's emergency repair system"},
+         {"depth": 3, "label": "Shock Physiology", "desc": "Class I-IV hemorrhagic shock: >40% blood loss = Class IV. Tachycardia, hypotension, altered consciousness"},
+         {"depth": 4, "label": "Platelet Activation", "desc": "Collagen exposure → GP Ib/IX/V binding → shape change → granule release → aggregation. 2-5 minutes to primary plug"},
+         {"depth": 5, "label": "Hemostatic Agents", "desc": "Kaolin (QuikClot) activates Factor XII. Chitosan (Celox) binds red blood cells independently of clotting factors"},
+     ]},
+    {"id": "cpr", "name": "CPR & AED", "color": "#3B82F6", "category": "Cardiac", "complexity": "Critical",
+     "origin": "Cardiopulmonary resuscitation — buying time until the heart can be restarted", "components": ["Chest compressions", "Rescue breaths", "AED application", "Recovery position"],
+     "system": "Cardiovascular-Respiratory axis", "uses": "Cardiac arrest, drowning, choking, anaphylaxis",
+     "dive_layers": [
+         {"depth": 0, "label": "Response Check", "desc": "Tap and shout. No response? Call 911, get AED. Check breathing for 10 seconds. No pulse? Start CPR."},
+         {"depth": 1, "label": "Compression Quality", "desc": "2 inches deep, 100-120/min, full recoil. 30:2 ratio. Minimize interruptions. Push hard, push fast, let up completely"},
+         {"depth": 2, "label": "Coronary Perfusion", "desc": "CPR generates 25-33% of normal cardiac output. Coronary perfusion pressure must exceed 15 mmHg for ROSC"},
+         {"depth": 3, "label": "Defibrillation", "desc": "AED analyzes rhythm: VF/pVT = shockable. Asystole/PEA = not shockable. The AED decides — you push the button"},
+         {"depth": 4, "label": "Electrical Conduction", "desc": "200J biphasic shock depolarizes all myocardial cells simultaneously, allowing SA node to resume as pacemaker"},
+         {"depth": 5, "label": "Cellular Ischemia", "desc": "Brain neurons die in 4-6 minutes without oxygen. CPR extends the window. Every minute without CPR = 10% survival decrease"},
+     ]},
+    {"id": "shock", "name": "Shock Management", "color": "#F59E0B", "category": "Systemic", "complexity": "Advanced",
+     "origin": "Systemic hypoperfusion — when the circulatory system fails to meet cellular oxygen demand", "components": ["Recognition", "Positioning", "Temperature control", "Fluid support"],
+     "system": "Circulatory-Metabolic axis", "uses": "Trauma, allergic reactions, burns, dehydration, sepsis",
+     "dive_layers": [
+         {"depth": 0, "label": "Recognition", "desc": "Pale, cool, clammy skin. Rapid weak pulse. Altered mental status. Thirst. Anxiety. These are the early warning signs"},
+         {"depth": 1, "label": "Shock Types", "desc": "Hypovolemic (volume loss), Cardiogenic (pump failure), Distributive (vessel dilation), Obstructive (flow blocked)"},
+         {"depth": 2, "label": "Compensatory Phase", "desc": "Baroreceptors detect pressure drop → sympathetic activation → vasoconstriction + tachycardia. The body fights back"},
+         {"depth": 3, "label": "Cellular Hypoxia", "desc": "Without O₂, cells switch to anaerobic metabolism. Lactic acid accumulates. pH drops. Enzymes denature. Cells die."},
+         {"depth": 4, "label": "Catecholamine Surge", "desc": "Epinephrine and norepinephrine: α₁ (vasoconstriction), β₁ (heart rate/contractility), β₂ (bronchodilation). The fight-or-die hormones"},
+         {"depth": 5, "label": "Irreversible Cascade", "desc": "Lysosomal enzyme release, DIC (disseminated intravascular coagulation), multi-organ failure. The point of no return"},
+     ]},
+]
+
+FIRSTAID_TOOLS = [
+    {"id": "tourniquet", "name": "Tourniquet (CAT)", "action_verb": "Apply", "description": "Combat Application Tourniquet for life-threatening extremity hemorrhage", "technique": "High and tight on the limb. Twist windlass until bleeding stops. Note the time. Do NOT loosen once applied. Painful? Yes. Life-saving? Absolutely.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "aed", "name": "AED", "action_verb": "Shock", "description": "Automated External Defibrillator for cardiac arrest rhythm analysis and treatment", "technique": "Power on. Follow voice prompts. Bare the chest. Apply pads (upper right, lower left). Stand clear during analysis. Press shock if advised. Resume CPR immediately.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "A"},
+    {"id": "bandage", "name": "Pressure Bandage", "action_verb": "Bandage", "description": "Elastic bandage with built-in pressure bar for wound compression", "technique": "Place pad directly over wound. Wrap firmly (not cutting off circulation). Secure tail. If blood soaks through, add MORE on top — never remove the first layer.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "B"},
+    {"id": "splint", "name": "SAM Splint", "action_verb": "Splint", "description": "Moldable aluminum splint for immobilizing suspected fractures", "technique": "Fold into C-curve for rigidity. Pad with gauze. Immobilize the joint above and below the injury. Check CSM (circulation, sensation, movement) after applying.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "epipen", "name": "EpiPen", "action_verb": "Inject", "description": "Auto-injector delivering epinephrine for severe allergic reactions (anaphylaxis)", "technique": "Remove safety cap. Press firmly against outer thigh (through clothing is OK). Hold 10 seconds. Massage site. Call 911 — effects wear off in 15-20 minutes.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "E"},
+    {"id": "cervical_collar", "name": "C-Spine Control", "action_verb": "Stabilize", "description": "Manual in-line stabilization for suspected spinal injury", "technique": "Do NOT move the patient. Hold the head in neutral alignment. 'What happened? Where does it hurt? Can you wiggle your toes?' Movement = potential paralysis.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "chest_seal", "name": "Chest Seal", "action_verb": "Seal", "description": "Occlusive dressing for open chest wounds (sucking chest wound)", "technique": "Apply vented seal over the wound during exhalation. If no commercial seal: plastic wrap taped on 3 sides. The vent lets air OUT but not IN — prevents tension pneumothorax.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "X"},
+    {"id": "pulse_check", "name": "Vital Signs Check", "action_verb": "Assess", "description": "Rapid assessment of breathing, pulse, and consciousness level", "technique": "AVPU: Alert, Voice responsive, Pain responsive, Unresponsive. Radial pulse = SBP >80. Carotid pulse = SBP >60. No pulse = CPR. Reassess every 5 minutes.", "color": "#F97316", "xp_per_action": 12, "icon_symbol": "V"},
+    {"id": "recovery_pos", "name": "Recovery Position", "action_verb": "Position", "description": "Lateral recumbent position for unconscious breathing patients", "technique": "Roll onto side. Lower arm extended forward. Upper knee bent at 90°. Tilt head back slightly. This prevents aspiration if they vomit. Monitor breathing continuously.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "R"},
+]
+
+HERMETICS_MATERIALS = [
+    {"id": "emerald_tablet", "name": "Emerald Tablet", "color": "#22C55E", "category": "Foundation", "complexity": "Advanced",
+     "origin": "Tabula Smaragdina — the foundational text of Hermetic philosophy, attributed to Hermes Trismegistus", "components": ["As above, so below", "The One Thing", "Separation and conjunction", "Ascent and descent"],
+     "literary_form": "Alchemical aphorism", "uses": "Philosophical framework, meditation object, alchemical practice",
+     "dive_layers": [
+         {"depth": 0, "label": "The Text", "desc": "'That which is above is like that which is below' — the master key to correspondence between macrocosm and microcosm"},
+         {"depth": 1, "label": "Hermetic Context", "desc": "Attributed to Hermes Trismegistus (thrice-great). Greco-Egyptian synthesis: Thoth meets Hermes. Wisdom tradition spanning millennia"},
+         {"depth": 2, "label": "Alchemical Operation", "desc": "Solve et Coagula: dissolve the fixed, fix the volatile. The Tablet describes the Great Work in coded language"},
+         {"depth": 3, "label": "Correspondence Principle", "desc": "Microcosm mirrors macrocosm: the atom mirrors the solar system, the cell mirrors the organism, the self mirrors the cosmos"},
+         {"depth": 4, "label": "Prima Materia", "desc": "The 'One Thing' from which all arises — the undifferentiated potential. In modern terms: the quantum vacuum, the unified field"},
+         {"depth": 5, "label": "Universal Vibration", "desc": "All is vibration at different frequencies. Matter is slow light. Consciousness is fast matter. The Tablet encodes this unity"},
+     ]},
+    {"id": "kybalion", "name": "The Kybalion", "color": "#D4AF37", "category": "Principles", "complexity": "Intermediate",
+     "origin": "Seven Hermetic Principles — the operating manual for understanding universal law", "components": ["Mentalism", "Correspondence", "Vibration", "Polarity", "Rhythm", "Cause/Effect", "Gender"],
+     "literary_form": "Philosophical treatise", "uses": "Mental transmutation, understanding duality, mastering rhythm, conscious creation",
+     "dive_layers": [
+         {"depth": 0, "label": "The Seven Principles", "desc": "Mentalism, Correspondence, Vibration, Polarity, Rhythm, Cause and Effect, Gender — the seven keys to the Temple"},
+         {"depth": 1, "label": "Principle of Mentalism", "desc": "'The All is Mind; the Universe is Mental.' Consciousness is not produced BY matter — matter is produced BY consciousness"},
+         {"depth": 2, "label": "Principle of Vibration", "desc": "'Nothing rests; everything moves; everything vibrates.' The difference between lead and gold is vibrational frequency"},
+         {"depth": 3, "label": "Principle of Polarity", "desc": "'Everything is dual; everything has poles.' Hot/cold, love/hate, light/dark are degrees of the SAME thing"},
+         {"depth": 4, "label": "Mental Transmutation", "desc": "The art of changing mental states: raise your vibration by will. You don't eliminate hate — you transmute it to love along the same pole"},
+         {"depth": 5, "label": "The All in All", "desc": "'While All is in THE ALL, THE ALL is in All.' Holographic universe: each part contains the whole. The fractal nature of existence"},
+     ]},
+    {"id": "alchemy", "name": "Alchemical Process", "color": "#8B5CF6", "category": "Transformation", "complexity": "Advanced",
+     "origin": "The Great Work — the systematic transmutation of base nature into spiritual gold", "components": ["Nigredo (blackening)", "Albedo (whitening)", "Citrinitas (yellowing)", "Rubedo (reddening)"],
+     "literary_form": "Symbolic process", "uses": "Inner transformation, shadow work, spiritual development, creative process",
+     "dive_layers": [
+         {"depth": 0, "label": "The Laboratory", "desc": "The alchemist's workspace — simultaneously a physical lab and a metaphor for the inner world of consciousness"},
+         {"depth": 1, "label": "Nigredo", "desc": "The blackening: putrefaction, decomposition, dark night of the soul. The necessary death of the old self before rebirth"},
+         {"depth": 2, "label": "Albedo", "desc": "The whitening: purification, washing, the dawn after darkness. The soul is cleansed of impurities. The mirror becomes clear"},
+         {"depth": 3, "label": "Citrinitas", "desc": "The yellowing: the solar dawn of wisdom. Integration of shadow and light. The yellowing of the white — intellect awakens"},
+         {"depth": 4, "label": "Rubedo", "desc": "The reddening: the Philosopher's Stone achieved. Union of opposites. The Self realized. The gold that was always there, revealed"},
+         {"depth": 5, "label": "Unus Mundus", "desc": "Jung's 'One World': psyche and matter are two aspects of one reality. The alchemist's final insight: the gold is you"},
+     ]},
+]
+
+HERMETICS_TOOLS = [
+    {"id": "contemplation", "name": "Contemplation", "action_verb": "Contemplate", "description": "Deep reflective practice on a Hermetic principle or symbol", "technique": "Choose one principle. Sit with it for 20 minutes. Don't analyze — let it reveal itself. The principle teaches differently each time because YOU are different each time.", "color": "#D4AF37", "xp_per_action": 12, "icon_symbol": "C"},
+    {"id": "correspondence_map", "name": "Correspondence Map", "action_verb": "Map", "description": "Charting the 'as above, so below' connections between domains", "technique": "Pick any two scales: atom and galaxy, cell and city, breath and tide. Find the structural parallels. This is not metaphor — it is pattern recognition across scale.", "color": "#22C55E", "xp_per_action": 12, "icon_symbol": "M"},
+    {"id": "polarity_practice", "name": "Polarity Practice", "action_verb": "Transmute", "description": "Consciously raising vibration along a polar spectrum", "technique": "Identify the negative pole you're experiencing (fear, anger, sadness). Find the SAME pole's positive end (courage, passion, tenderness). Move your attention along the scale.", "color": "#6366F1", "xp_per_action": 12, "icon_symbol": "P"},
+    {"id": "rhythm_awareness", "name": "Rhythm Awareness", "action_verb": "Observe", "description": "Recognizing and working with natural cycles and pendulum swings", "technique": "Track your energy cycles: morning/evening, weekly, seasonal. The pendulum swings both ways. Mastery is not stopping the swing — it is choosing where to stand on the arc.", "color": "#F59E0B", "xp_per_action": 12, "icon_symbol": "R"},
+    {"id": "mental_alchemy", "name": "Mental Alchemy", "action_verb": "Transform", "description": "The practice of consciously changing mental and emotional states", "technique": "Observe your current state without judgment. Name it. Now, recall a time you felt the OPPOSITE. Hold that memory with your whole body. The state shifts. This is transmutation.", "color": "#EF4444", "xp_per_action": 12, "icon_symbol": "A"},
+    {"id": "symbol_study", "name": "Symbol Meditation", "action_verb": "Decode", "description": "Deep study of alchemical and Hermetic symbols as consciousness tools", "technique": "Ouroboros, Caduceus, Philosopher's Stone, Hexagram. Each symbol is a compressed teaching. Gaze at it daily for a week. New meanings emerge as your understanding deepens.", "color": "#A78BFA", "xp_per_action": 12, "icon_symbol": "S"},
+    {"id": "journal_hermes", "name": "Hermetic Journal", "action_verb": "Record", "description": "Documenting insights, synchronicities, and transmutation experiences", "technique": "Record: date, principle studied, insight received, life parallels noticed. Over months, the journal becomes a map of your transformation — your personal Emerald Tablet.", "color": "#94A3B8", "xp_per_action": 12, "icon_symbol": "J"},
+    {"id": "cause_effect", "name": "Causal Analysis", "action_verb": "Trace", "description": "Tracing chains of cause and effect to understand life patterns", "technique": "Choose a current situation. Ask 'What caused this?' five times (5 Whys). You'll reach a root cause — usually a belief or decision, not an event. Change the cause, change the effect.", "color": "#3B82F6", "xp_per_action": 12, "icon_symbol": "T"},
+    {"id": "gender_balance", "name": "Gender Balance", "action_verb": "Balance", "description": "Integrating active (masculine) and receptive (feminine) principles within", "technique": "Not about biological sex — about creative polarity. When stuck: are you too active (forcing) or too passive (waiting)? The Great Work requires both the will to act and the wisdom to receive.", "color": "#EC4899", "xp_per_action": 12, "icon_symbol": "B"},
+]
+
+# Register V63.0 modules
+MODULES["hvac"] = {"materials": HVAC_MATERIALS, "tools": HVAC_TOOLS, "mat_key": "systems", "mat_id_key": "system_id", "skill": "HVAC_Skill"}
+MODULES["robotics"] = {"materials": ROBOTICS_MATERIALS, "tools": ROBOTICS_TOOLS, "mat_key": "components", "mat_id_key": "component_id", "skill": "Robotics_Skill"}
+MODULES["first_aid"] = {"materials": FIRSTAID_MATERIALS, "tools": FIRSTAID_TOOLS, "mat_key": "emergencies", "mat_id_key": "emergency_id", "skill": "FirstAid_Skill"}
+MODULES["hermetics"] = {"materials": HERMETICS_MATERIALS, "tools": HERMETICS_TOOLS, "mat_key": "principles", "mat_id_key": "principle_id", "skill": "Hermetics_Skill"}
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V63.0 — INTENT-BASED SEARCH TAGS + SEARCH ENDPOINT
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INTENT_TAGS = {
+    "masonry": ["stone", "structure", "foundation", "build", "chisel", "mortar", "architecture", "mineral", "construction", "strength"],
+    "carpentry": ["wood", "grain", "joint", "build", "saw", "plane", "furniture", "timber", "craft", "structure"],
+    "electrical": ["wire", "current", "voltage", "circuit", "safety", "power", "conductivity", "energy", "light", "resistance"],
+    "plumbing": ["water", "pipe", "flow", "pressure", "drain", "repair", "solder", "copper", "valve", "fluid"],
+    "landscaping": ["soil", "earth", "plant", "garden", "nature", "drainage", "ecology", "growth", "terrain", "roots"],
+    "welding": ["metal", "heat", "fusion", "steel", "fabrication", "strength", "structure", "arc", "join", "forge"],
+    "automotive": ["engine", "repair", "diagnosis", "brake", "fuel", "drive", "mechanic", "torque", "vehicle", "power"],
+    "nursing": ["care", "health", "vitals", "patient", "healing", "assessment", "medication", "safety", "anatomy", "wellness"],
+    "childcare": ["development", "nurture", "play", "safety", "nutrition", "growth", "learning", "empathy", "child", "education"],
+    "eldercare": ["dignity", "mobility", "memory", "comfort", "aging", "care", "companion", "wellness", "respect", "compassion"],
+    "bible": ["scripture", "faith", "wisdom", "prayer", "theology", "spirit", "word", "study", "gospel", "truth"],
+    "nutrition": ["food", "diet", "health", "vitality", "ferment", "nourish", "gut", "energy", "whole", "superfood"],
+    "meditation": ["breath", "silence", "focus", "awareness", "calm", "mindfulness", "peace", "consciousness", "presence", "stillness"],
+    "hvac": ["air", "temperature", "comfort", "heating", "cooling", "ventilation", "climate", "refrigerant", "duct", "efficiency"],
+    "robotics": ["automation", "sensor", "motor", "programming", "circuit", "control", "feedback", "machine", "intelligence", "mechanism"],
+    "first_aid": ["emergency", "rescue", "bleeding", "cpr", "safety", "trauma", "survival", "wound", "response", "life"],
+    "hermetics": ["principle", "vibration", "correspondence", "transmutation", "polarity", "alchemy", "consciousness", "universal", "wisdom", "sacred"],
+}
+
+
+@router.get("/workshop/search")
+async def search_workshops(q: str = ""):
+    """V63.0 Intent-Based Neural Search — find workshops by concept across all 7 domains."""
+    if not q or len(q) < 2:
+        return {"results": [], "query": q}
+
+    query_lower = q.lower().strip()
+    results = []
+
+    for mod_id, meta in WORKSHOP_REGISTRY.items():
+        score = 0
+        # Title match
+        if query_lower in meta["title"].lower():
+            score += 10
+        # Subtitle match
+        if query_lower in meta["subtitle"].lower():
+            score += 5
+        # Domain match
+        if query_lower in meta["domain"].lower():
+            score += 8
+        # Tag match (cross-domain intent)
+        tags = INTENT_TAGS.get(mod_id, [])
+        for tag in tags:
+            if query_lower in tag or tag in query_lower:
+                score += 3
+
+        # Material name/origin match
+        module = MODULES.get(mod_id)
+        if module:
+            for mat in module["materials"]:
+                if query_lower in mat.get("name", "").lower():
+                    score += 7
+                if query_lower in mat.get("origin", "").lower():
+                    score += 2
+            for tool in module["tools"]:
+                if query_lower in tool.get("name", "").lower():
+                    score += 4
+                if query_lower in tool.get("description", "").lower():
+                    score += 1
+
+        if score > 0:
+            results.append({
+                "id": mod_id,
+                "title": meta["title"],
+                "domain": meta["domain"],
+                "icon": meta["icon"],
+                "accentColor": meta["accentColor"],
+                "route": f"/workshop/{mod_id}",
+                "score": score,
+                "matchedTags": [t for t in tags if query_lower in t or t in query_lower],
+            })
+
+    results.sort(key=lambda r: -r["score"])
+    return {"results": results, "query": q, "total": len(results)}
 
 
 @router.get("/workshop/registry")
 async def get_workshop_registry():
-    """V62.0 Master Registry — returns all available workshop modules with metadata."""
+    """V62.0 Master Registry — returns all available workshop modules with metadata and search tags."""
     registry = []
     for mod_id, meta in WORKSHOP_REGISTRY.items():
         module = MODULES.get(mod_id)
@@ -1103,6 +1394,7 @@ async def get_workshop_registry():
             "materialCount": len(module["materials"]) if module else 0,
             "toolCount": len(module["tools"]) if module else 0,
             "route": f"/workshop/{mod_id}",
+            "tags": INTENT_TAGS.get(mod_id, []),
         })
     return {"modules": registry, "total": len(registry)}
 

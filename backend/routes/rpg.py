@@ -131,7 +131,8 @@ SKILL_DOMAINS = {
                      "Carpentry_Skill", "carpentry_dive", "carpentry_inspect",
                      "Electrical_Skill", "Plumbing_Skill", "Landscaping_Skill",
                      "electrical_inspect", "plumbing_inspect", "landscaping_inspect",
-                     "Welding_Skill", "welding_inspect", "Automotive_Skill", "automotive_inspect"],
+                     "Welding_Skill", "welding_inspect", "Automotive_Skill", "automotive_inspect",
+                     "HVAC_Skill", "hvac_inspect"],
     },
     "Healing Arts": {
         "color": "#22C55E",
@@ -140,7 +141,8 @@ SKILL_DOMAINS = {
                      "Nursing_Skill", "nursing_inspect",
                      "Childcare_Skill", "childcare_inspect",
                      "Eldercare_Skill", "eldercare_inspect",
-                     "Nutrition_Skill", "nutrition_inspect"],
+                     "Nutrition_Skill", "nutrition_inspect",
+                     "FirstAid_Skill", "first_aid_inspect"],
     },
     "Mind & Spirit": {
         "color": "#A78BFA",
@@ -152,7 +154,8 @@ SKILL_DOMAINS = {
     "Science & Physics": {
         "color": "#3B82F6",
         "sources": ["quantum", "fractal", "physics", "astronomy",
-                     "observatory", "dimensional", "planetary"],
+                     "observatory", "dimensional", "planetary",
+                     "Robotics_Skill", "robotics_inspect"],
     },
     "Creative Arts": {
         "color": "#EC4899",
@@ -168,7 +171,8 @@ SKILL_DOMAINS = {
         "color": "#D4AF37",
         "sources": ["wisdom_journal", "numerology", "cardology",
                      "astrology", "sacred_texts", "bible", "mayan",
-                     "Bible_Study_Skill", "bible_inspect"],
+                     "Bible_Study_Skill", "bible_inspect",
+                     "Hermetics_Skill", "hermetics_inspect"],
     },
 }
 

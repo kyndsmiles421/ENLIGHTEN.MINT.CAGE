@@ -10,7 +10,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Zap, Droplets, Leaf, Heart, BookOpen, Baby, Flame, Car, Apple, Brain, HandHeart, Wrench } from 'lucide-react';
+import { Zap, Droplets, Leaf, Heart, BookOpen, Baby, Flame, Car, Apple, Brain, HandHeart, Wrench, Wind, Cpu, Cross, Eye, Hammer, Axe } from 'lucide-react';
 import UniversalWorkshop from './UniversalWorkshop';
 import axios from 'axios';
 
@@ -18,7 +18,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Icon map — resolves string icon names from the registry to Lucide components
 const ICON_MAP = {
-  Zap, Droplets, Leaf, Heart, BookOpen, Baby, Flame, Car, Apple, Brain, HandHeart, Wrench,
+  Zap, Droplets, Leaf, Heart, BookOpen, Baby, Flame, Car, Apple, Brain, HandHeart, Wrench, Wind, Cpu, Cross, Eye, Hammer, Axe,
 };
 
 export default function DynamicWorkshop() {

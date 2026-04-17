@@ -1,51 +1,49 @@
-# ENLIGHTEN.MINT.CAFE — V62.0 Dynamic Registry Architecture
+# ENLIGHTEN.MINT.CAFE — V63.0 Architectural Singularity
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## V62.0 — Dynamic Workshop Router + 4 New Cells + Parity II
+## V63.0 — Ancestor Migration + Intent Search + 4 New Cells
 
-### Dynamic Workshop Router (The Ghost Router)
-- **`DynamicWorkshop.js`**: Single route `/workshop/:moduleId` renders ANY workshop
-- Reads config from `GET /api/workshop/registry`, shapes itself dynamically
-- Adding a new module: 1 data block in workshop_v60.py, 1 registry entry. Zero frontend code.
-- **`GET /api/workshop/registry`**: Returns full manifest of all 11+ workshop modules
+### Strike 1: Ancestor Migration
+- Masonry & Carpentry now live in the dynamic registry at `/workshop/masonry` and `/workshop/carpentry`
+- Data imported from workshop.py into MODULES dict — zero duplication
+- Old manual page routes still work for backwards compatibility
+- Total fractal uniformity: every workshop uses the same DNA
 
-### 4 New Cells (V62.0)
-- **Welding** (`/workshop/welding`): Mild Steel, Aluminum 6061, Stainless 304 × 9 tools
-- **Automotive** (`/workshop/automotive`): Engine Block, Brake System, Electrical Harness × 9 tools
-- **Nutrition** (`/workshop/nutrition`): Whole Foods, Fermented Foods, Superfoods × 9 tools
-- **Meditation** (`/workshop/meditation`): Inner Silence, Breath Awareness, Visualization × 9 tools
+### Strike 2: Intent-Based Neural Search
+- `GET /api/workshop/search?q=safety` returns cross-domain results
+- 17 modules tagged with weighted intent keywords (10 tags each)
+- Scoring: title match (10), domain match (8), tag match (3), material/tool match (7/4)
+- "safety" bridges Child Care + Nursing + Electrical + First Aid
+- "consciousness" bridges Meditation + Hermetics
+- "structure" bridges Masonry + Carpentry + Welding
 
-### Parity II (V62.0)
-- Child Care expanded to 6: +Toddler Nutrition, Conflict Resolution, Cognitive Play
-- Elderly Care expanded to 6: +Palliative Care, Occupational Therapy, End-of-Life Dignity
-
-### Neural Clusters (V62.0)
-- Welding ↔ Automotive ↔ Electrical (Trades cluster)
-- Nutrition ↔ Herbology ↔ Nursing (Healing cluster)
-- Meditation ↔ Yoga ↔ Breathing ↔ Bible Study (Spirit cluster)
+### Strike 3: 4 New Cells
+- **HVAC** (`/workshop/hvac`): Ductwork, Refrigerant R-410A, Smart Thermostat × 9 tools
+- **Robotics** (`/workshop/robotics`): Servo Motor, Microcontroller, Sensor Array × 9 tools
+- **First Aid** (`/workshop/first_aid`): Wound/Bleeding, CPR/AED, Shock Management × 9 tools
+- **Hermetics** (`/workshop/hermetics`): Emerald Tablet, The Kybalion, Alchemical Process × 9 tools
 
 ### System Totals
-- **167 hub nodules**, **13 Circular Workshop cells**
-- **51 materials** with 6-depth Recursive Dives, **117 tools**
-- **791KB main bundle** (unchanged)
-- **11 modules** in the Master Registry, expandable to 200+ with data entries only
+- **171 hub nodules**, **17 workshop cells** in Master Registry
+- **63 materials** with 6-depth Recursive Dives, **153 tools**
+- **791KB main bundle** (unchanged — all new cells are lazy chunks)
+- **7 Passport domains** with all new skills mapped
+- **Intent search** across all modules with weighted cross-domain tagging
 
 ## Architecture
-- `DynamicWorkshop.js` → reads registry → renders `UniversalWorkshop`
-- `workshop_v60.py` → all module data + universal endpoints + Master Registry
-- `SovereignProviders.js` → 26 contexts consolidated
-- Trade Passport: 7 domains, 8+ hybrid titles, all new skills mapped
-- Dynamic route: `/workshop/:moduleId` handles infinite modules
+- `DynamicWorkshop.js` → reads `/api/workshop/registry` → renders any module
+- `workshop_v60.py` → all module data, universal endpoints, registry, search
+- Single route `/workshop/:moduleId` handles infinite modules
+- Adding a module = 1 data block + 1 registry entry (no frontend code)
 
 ## Backlog
 ### P1
-- Intent-based search across Passport domains
-- Expand new V62 modules to 6 materials (parity)
-- Migrate existing workshop pages (Masonry/Carpentry) to dynamic router
+- Expand V62-V63 modules to 6 materials (parity)
+- Frontend search UI component
+- Remove old manual workshop page files (cleanup)
 ### P2
-- More workshop cells via registry (HVAC, Robotics, Public Speaking, Philosophy, etc.)
-- Meritocratic depth tiers
-- Sovereign Leaderboard
+- More cells: Public Speaking, Philosophy, Pedagogy, Anatomy, Machining
+- Meritocratic depth tiers, Sovereign Leaderboard
 - Predictive navigation
