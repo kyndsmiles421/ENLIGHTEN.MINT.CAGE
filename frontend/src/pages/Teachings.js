@@ -8,6 +8,76 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Visual scene for each teacher — their world
+const TEACHER_SCENES = {
+  buddha: {
+    image: 'https://images.unsplash.com/photo-1670945182287-0ab796cea5e2?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(15,12,8,0.3) 0%, rgba(15,12,8,0.85) 50%, rgba(15,12,8,0.97) 70%)',
+    accent: '#FCD34D',
+    ambience: 'Golden light filters through ancient bodhi leaves...',
+  },
+  jesus: {
+    image: 'https://images.unsplash.com/photo-1668570632863-a2a50a6240e4?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(10,8,15,0.2) 0%, rgba(10,8,15,0.8) 45%, rgba(10,8,15,0.97) 70%)',
+    accent: '#FBBF24',
+    ambience: 'Divine light breaks through clouds of gold...',
+  },
+  muhammad: {
+    image: 'https://images.unsplash.com/photo-1774688593348-e04286c947a6?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(8,10,15,0.2) 0%, rgba(8,10,15,0.8) 45%, rgba(8,10,15,0.97) 70%)',
+    accent: '#22C55E',
+    ambience: 'Sacred geometry arcs across the celestial dome...',
+  },
+  krishna: {
+    image: 'https://images.unsplash.com/photo-1702699782364-5c446371c4c3?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(8,8,18,0.3) 0%, rgba(8,8,18,0.85) 50%, rgba(8,8,18,0.97) 70%)',
+    accent: '#6366F1',
+    ambience: 'Cosmic blue light radiates from the divine...',
+  },
+  laotzu: {
+    image: 'https://images.unsplash.com/photo-1774979301592-57f97f8b88e1?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(10,12,8,0.2) 0%, rgba(10,12,8,0.8) 45%, rgba(10,12,8,0.97) 70%)',
+    accent: '#2DD4BF',
+    ambience: 'Mist drifts through the mountain temple...',
+  },
+  rumi: {
+    image: 'https://images.unsplash.com/photo-1743064171564-65aec613439c?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(15,8,10,0.3) 0%, rgba(15,8,10,0.85) 50%, rgba(15,8,10,0.97) 70%)',
+    accent: '#E879F9',
+    ambience: 'The whirling dance dissolves self into light...',
+  },
+  'thich-nhat-hanh': {
+    image: 'https://images.unsplash.com/photo-1694553814050-c8e436ad0a7c?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(8,12,8,0.2) 0%, rgba(8,12,8,0.8) 45%, rgba(8,12,8,0.97) 70%)',
+    accent: '#84CC16',
+    ambience: 'Bamboo sways in the mindful garden...',
+  },
+  yogananda: {
+    image: 'https://images.unsplash.com/photo-1726146198281-750e8308f785?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(15,10,5,0.3) 0%, rgba(15,10,5,0.85) 50%, rgba(15,10,5,0.97) 70%)',
+    accent: '#FB923C',
+    ambience: 'Sacred stillness in the forest ashram...',
+  },
+  ramdass: {
+    image: 'https://images.unsplash.com/photo-1607499699372-7bb722dff7e2?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(8,8,15,0.2) 0%, rgba(8,8,15,0.8) 45%, rgba(8,8,15,0.97) 70%)',
+    accent: '#C084FC',
+    ambience: 'The cosmic journey unfolds within...',
+  },
+  watts: {
+    image: 'https://images.unsplash.com/photo-1581333025546-47f446fee132?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(5,8,15,0.2) 0%, rgba(5,8,15,0.8) 45%, rgba(5,8,15,0.97) 70%)',
+    accent: '#38BDF8',
+    ambience: 'Stars wheeling in the infinite void...',
+  },
+  thoth: {
+    image: 'https://images.unsplash.com/photo-1762530211537-011645caef57?w=800&q=60',
+    gradient: 'linear-gradient(180deg, rgba(15,12,5,0.2) 0%, rgba(15,12,5,0.8) 45%, rgba(15,12,5,0.97) 70%)',
+    accent: '#D4AF37',
+    ambience: 'Ancient pillars inscribed with eternal wisdom...',
+  },
+};
+
 const TRADITION_ICONS = {
   'Buddhism': '&#9784;',
   'Christianity / Mystical Christianity': '&#10013;',
@@ -161,8 +231,9 @@ function TeachingCard({ teaching, teacher, color, authHeaders }) {
 function TeacherDetail({ teacher, onBack, authHeaders }) {
   const [full, setFull] = useState(null);
   const [activeQuote, setActiveQuote] = useState(0);
+  const scene = TEACHER_SCENES[teacher.id] || {};
 
-  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('teachings', 8); }, []);
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('teachings', 12); }, []);
   useEffect(() => {
     axios.get(`${API}/teachings/teacher/${teacher.id}`).then(r => setFull(r.data)).catch(() => {});
   }, [teacher.id]);
@@ -177,73 +248,146 @@ function TeacherDetail({ teacher, onBack, authHeaders }) {
 
   if (!full) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" style={{ color: teacher.color }} /></div>;
 
+  const accent = scene.accent || full.color;
+
   return (
     <div data-testid="teacher-detail-view">
-      <button onClick={onBack} className="flex items-center gap-2 text-xs mb-6 group" style={{ color: 'var(--text-muted)' }} data-testid="teachings-back-btn">
+      {/* Back button */}
+      <button onClick={onBack} className="flex items-center gap-2 text-xs mb-4 group relative" style={{ color: 'rgba(255,255,255,0.7)', zIndex: 5 }} data-testid="teachings-back-btn">
         <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> All Teachers
       </button>
 
-      <div className="flex items-start gap-5 mb-8">
-        <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 relative"
-          style={{ border: `1px solid ${full.color}20` }}>
-          <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${full.color}25, ${full.color}08)` }} />
-          <div className="absolute inset-0 flex items-center justify-center text-3xl" style={{ color: full.color }}
-            dangerouslySetInnerHTML={{ __html: TRADITION_ICONS[full.tradition] || '&#10024;' }} />
-        </div>
-        <div className="flex-1">
-          <h2 className="text-2xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+      {/* Immersive Hero Scene */}
+      <div className="relative -mx-5 mb-8 overflow-hidden" style={{ minHeight: 280 }}>
+        {/* Scene image */}
+        {scene.image && (
+          <motion.div
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2 }}
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${scene.image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 30%',
+            }}
+          />
+        )}
+        {/* Gradient overlay */}
+        <div className="absolute inset-0" style={{ background: scene.gradient || `linear-gradient(180deg, rgba(10,10,18,0.3), rgba(10,10,18,0.95))` }} />
+
+        {/* Teacher info over the scene */}
+        <div className="relative px-5 pt-8 pb-6" style={{ zIndex: 2 }}>
+          {/* Ambience text */}
+          {scene.ambience && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-[10px] italic mb-6"
+              style={{ color: `${accent}60` }}
+            >
+              {scene.ambience}
+            </motion.p>
+          )}
+
+          {/* Name + tradition */}
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-3xl font-light mb-1"
+            style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}
+          >
             {full.name}
-          </h2>
-          <p className="text-xs mb-1" style={{ color: full.color }}>{full.tradition} &middot; {full.era}</p>
-          <p className="text-sm leading-relaxed mt-2" style={{ color: 'var(--text-secondary)' }}>{full.bio}</p>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-xs mb-4"
+            style={{ color: accent }}
+          >
+            {full.tradition} · {full.era}
+          </motion.p>
+
+          {/* Bio */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="text-sm leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.75)' }}
+          >
+            {full.bio}
+          </motion.p>
+
+          {/* Listen to bio */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="mt-4"
+          >
+            <NarrationPlayer text={`${full.name}. ${full.bio}`} label="Listen" color={accent} context="teachings" />
+          </motion.div>
         </div>
       </div>
 
       {/* Core Principle */}
-      <div className="p-5 mb-8" style={{ borderColor: `${full.color}15` }}>
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: full.color }}>Core Principle</p>
-        <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>{full.core_principle}</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="p-5 mb-6 rounded-xl"
+        style={{ background: `${accent}06`, border: `1px solid ${accent}15` }}
+      >
+        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Core Principle</p>
+        <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.85)' }}>{full.core_principle}</p>
+      </motion.div>
 
       {/* Rotating Quote */}
       <div className="mb-8 relative min-h-[80px]">
         <AnimatePresence mode="wait">
           <motion.div key={activeQuote} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="p-5" style={{ borderColor: `${full.color}10` }}>
-            <Quote size={16} className="mb-2" style={{ color: `${full.color}40` }} />
-            <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+            className="p-5 rounded-xl" style={{ background: `${accent}04`, border: `1px solid ${accent}10` }}>
+            <Quote size={16} className="mb-2" style={{ color: `${accent}50` }} />
+            <p className="text-sm italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
               "{full.quotes[activeQuote]}"
             </p>
-            <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>— {full.name}</p>
+            <p className="text-xs mt-2" style={{ color: `${accent}70` }}>— {full.name}</p>
           </motion.div>
         </AnimatePresence>
         <div className="flex justify-center gap-1.5 mt-3">
           {full.quotes.map((_, i) => (
             <button key={i} onClick={() => setActiveQuote(i)}
               className="w-1.5 h-1.5 rounded-full transition-all"
-              style={{ background: i === activeQuote ? full.color : 'rgba(255,255,255,0.1)' }} />
+              style={{ background: i === activeQuote ? accent : 'rgba(255,255,255,0.1)' }} />
           ))}
         </div>
       </div>
 
       {/* Teachings */}
-      <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: accent }}>
         <BookOpen size={12} className="inline mr-2" /> Teachings
       </p>
       <div className="space-y-3 mb-8" data-testid="teachings-list">
         {full.teachings.map(teaching => (
-          <TeachingCard key={teaching.id} teaching={teaching} teacher={full} color={full.color} authHeaders={authHeaders} />
+          <TeachingCard key={teaching.id} teaching={teaching} teacher={full} color={accent} authHeaders={authHeaders} />
         ))}
       </div>
 
       {/* All Quotes */}
-      <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: `${accent}80` }}>
         <Quote size={12} className="inline mr-2" /> Wisdom
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="space-y-2">
         {full.quotes.map((q, i) => (
-          <div key={i} className="p-4">
-            <p className="text-xs italic leading-relaxed" style={{ color: 'var(--text-secondary)' }}>"{q}"</p>
+          <div key={i} className="p-4 rounded-xl" style={{ background: `${accent}04`, border: `1px solid ${accent}08` }}>
+            <p className="text-xs italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>"{q}"</p>
+            <div className="mt-2">
+              <NarrationPlayer text={q} label="Listen" color={accent} context="teachings" />
+            </div>
           </div>
         ))}
       </div>
