@@ -120,6 +120,182 @@ async def gain_xp(data: dict = Body(...), user=Depends(get_current_user)):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  V57.0 SOVEREIGN TRADE PASSPORT — The Central Registry
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Skill domains — map XP sources to unified mastery categories
+SKILL_DOMAINS = {
+    "Trade & Craft": {
+        "color": "#FBBF24",
+        "sources": ["Masonry_Skill", "masonry_build", "masonry_dive", "masonry_inspect",
+                     "Carpentry_Skill", "carpentry_dive", "carpentry_inspect"],
+    },
+    "Healing Arts": {
+        "color": "#22C55E",
+        "sources": ["herbology", "aromatherapy", "reiki", "acupressure",
+                     "healing", "elixirs", "nourishment", "meal_planning"],
+    },
+    "Mind & Spirit": {
+        "color": "#A78BFA",
+        "sources": ["meditation_session", "breathing_exercise", "sacred_breathing",
+                     "yoga_practice", "affirmations", "mantras", "daily_ritual",
+                     "oracle_reading", "dream_journal"],
+    },
+    "Science & Physics": {
+        "color": "#3B82F6",
+        "sources": ["quantum", "fractal", "physics", "astronomy",
+                     "observatory", "dimensional", "planetary"],
+    },
+    "Creative Arts": {
+        "color": "#EC4899",
+        "sources": ["generator_script", "generator_lesson", "generator_game",
+                     "generator_ritual", "creation_stories", "music", "soundscapes"],
+    },
+    "Exploration": {
+        "color": "#F97316",
+        "sources": ["exploration", "module_interaction", "vr_sanctuary",
+                     "animal_totems", "cosmic_profile", "sage_coach"],
+    },
+    "Sacred Knowledge": {
+        "color": "#D4AF37",
+        "sources": ["wisdom_journal", "numerology", "cardology",
+                     "astrology", "sacred_texts", "bible", "mayan"],
+    },
+}
+
+# Hybrid titles unlocked when two+ domains cross thresholds
+HYBRID_TITLES = [
+    {"id": "general_contractor", "title": "General Contractor",
+     "requires": {"Trade & Craft": 20, "Science & Physics": 10},
+     "color": "#FBBF24", "desc": "Mastery of physical trades meets structural science"},
+    {"id": "master_artisan", "title": "Master Artisan",
+     "requires": {"Trade & Craft": 50, "Creative Arts": 20},
+     "color": "#EC4899", "desc": "Craft excellence fused with creative vision"},
+    {"id": "sovereign_healer", "title": "Sovereign Healer",
+     "requires": {"Healing Arts": 30, "Sacred Knowledge": 20},
+     "color": "#22C55E", "desc": "Ancient wisdom channeled through modern healing"},
+    {"id": "quantum_architect", "title": "Quantum Architect",
+     "requires": {"Science & Physics": 30, "Trade & Craft": 20},
+     "color": "#6366F1", "desc": "Building at the intersection of matter and mathematics"},
+    {"id": "renaissance_soul", "title": "Renaissance Soul",
+     "requires": {"Trade & Craft": 15, "Healing Arts": 15, "Mind & Spirit": 15, "Creative Arts": 15},
+     "color": "#D4AF37", "desc": "Balanced mastery across the four pillars of sovereignty"},
+    {"id": "cosmic_navigator", "title": "Cosmic Navigator",
+     "requires": {"Exploration": 40, "Science & Physics": 20},
+     "color": "#38BDF8", "desc": "Charting the depths of both inner and outer space"},
+    {"id": "sage_oracle", "title": "Sage Oracle",
+     "requires": {"Sacred Knowledge": 30, "Mind & Spirit": 30},
+     "color": "#C084FC", "desc": "Wisdom of the ancients meets depth of practice"},
+    {"id": "hardscape_engineer", "title": "Hardscape Engineer",
+     "requires": {"Trade & Craft": 40},
+     "color": "#94A3B8", "desc": "Stone, wood, and steel — shaped by sovereign hands"},
+]
+
+
+def _rank_for_actions(count):
+    """Determine mastery rank from action count."""
+    if count >= 100:
+        return {"rank": "Master", "tier": 4}
+    if count >= 50:
+        return {"rank": "Journeyman", "tier": 3}
+    if count >= 20:
+        return {"rank": "Apprentice", "tier": 2}
+    if count >= 5:
+        return {"rank": "Novice", "tier": 1}
+    return {"rank": "Initiate", "tier": 0}
+
+
+@router.get("/passport")
+async def get_trade_passport(user=Depends(get_current_user)):
+    """V57.0 Sovereign Trade Passport — The Central Registry.
+    Aggregates ALL module activity into a unified skill lattice.
+    Returns domain mastery, hybrid titles, and dive clearance."""
+    uid = user["id"]
+    char = await get_or_create_character(uid)
+    total_xp = char.get("xp", 0)
+    level = level_from_xp(total_xp)
+
+    # Aggregate all XP log entries by source
+    pipeline = [
+        {"$match": {"user_id": uid}},
+        {"$group": {"_id": "$source", "count": {"$sum": 1}, "total_xp": {"$sum": "$amount"}}},
+    ]
+    source_counts = {}
+    source_xp = {}
+    async for doc in db.rpg_xp_log.aggregate(pipeline):
+        source_counts[doc["_id"]] = doc["count"]
+        source_xp[doc["_id"]] = doc["total_xp"]
+
+    # Build domain mastery
+    domains = []
+    domain_action_totals = {}
+    for domain_name, domain_def in SKILL_DOMAINS.items():
+        actions = sum(source_counts.get(s, 0) for s in domain_def["sources"])
+        xp = sum(source_xp.get(s, 0) for s in domain_def["sources"])
+        rank_info = _rank_for_actions(actions)
+        domain_action_totals[domain_name] = actions
+        domains.append({
+            "domain": domain_name,
+            "color": domain_def["color"],
+            "actions": actions,
+            "xp": xp,
+            "rank": rank_info["rank"],
+            "tier": rank_info["tier"],
+            "progress_pct": min(100, int((actions / 100) * 100)),
+        })
+
+    # Calculate hybrid titles
+    unlocked_titles = []
+    locked_titles = []
+    for ht in HYBRID_TITLES:
+        met = all(
+            domain_action_totals.get(dom, 0) >= threshold
+            for dom, threshold in ht["requires"].items()
+        )
+        entry = {
+            "id": ht["id"],
+            "title": ht["title"],
+            "color": ht["color"],
+            "desc": ht["desc"],
+            "requirements": {
+                dom: {"required": threshold, "current": domain_action_totals.get(dom, 0), "met": domain_action_totals.get(dom, 0) >= threshold}
+                for dom, threshold in ht["requires"].items()
+            },
+        }
+        if met:
+            unlocked_titles.append(entry)
+        else:
+            locked_titles.append(entry)
+
+    # Dive clearance — deepest dive unlocked based on total activity
+    total_actions = sum(domain_action_totals.values())
+    if total_actions >= 200:
+        dive_clearance = {"level": 5, "label": "Quantum Shell", "desc": "Full 36-bit lattice access"}
+    elif total_actions >= 100:
+        dive_clearance = {"level": 4, "label": "Molecular Bonds", "desc": "Atomic-scale dive clearance"}
+    elif total_actions >= 50:
+        dive_clearance = {"level": 3, "label": "Crystal Lattice", "desc": "Structural dive clearance"}
+    elif total_actions >= 20:
+        dive_clearance = {"level": 2, "label": "Mineral Domains", "desc": "Compositional dive clearance"}
+    elif total_actions >= 5:
+        dive_clearance = {"level": 1, "label": "Grain Structure", "desc": "Surface dive clearance"}
+    else:
+        dive_clearance = {"level": 0, "label": "Surface", "desc": "Begin exploring to deepen your dives"}
+
+    return {
+        "level": level,
+        "total_xp": total_xp,
+        "total_actions": total_actions,
+        "dive_clearance": dive_clearance,
+        "domains": sorted(domains, key=lambda d: d["actions"], reverse=True),
+        "unlocked_titles": unlocked_titles,
+        "locked_titles": locked_titles,
+        "active_title": unlocked_titles[0]["title"] if unlocked_titles else None,
+    }
+
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  V56.0 VITALITY — CROSS-SYSTEM MILESTONES & QUEST TRIGGERS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
