@@ -84,6 +84,30 @@ STARSEED_ORIGINS = [
         "lore": "The Orion system witnessed the galaxy's greatest conflict — the Orion Wars. This epic struggle between light and dark forces shaped the destiny of countless civilizations. Orion starseeds carry the memory of this duality. They incarnated on Earth not to avoid darkness, but to master it — transforming shadow into light through sheer willpower and spiritual alchemy.",
         "starting_stats": {"wisdom": 4, "courage": 6, "compassion": 3, "intuition": 4, "resilience": 8},
     },
+    {
+        "id": "mintakan",
+        "name": "Mintakan",
+        "star_system": "Mintaka (Orion's Belt)",
+        "element": "Water",
+        "color": "#22C55E",
+        "gradient": ["#22C55E", "#2DD4BF"],
+        "traits": ["Nostalgia", "Deep Love", "Water Affinity", "Lightwork"],
+        "description": "Mintakans are lightworkers from a water world now destroyed. You carry a deep homesickness for a place that no longer exists, and channel that longing into healing others.",
+        "lore": "Mintaka, the western star of Orion's Belt, once orbited a world of crystalline oceans and bioluminescent life. When the planet was lost during the Orion Wars, Mintakan souls scattered across the galaxy, carrying the memory of paradise. They incarnate on Earth drawn to oceans, rain, and the sound of water — always searching for home.",
+        "starting_stats": {"wisdom": 5, "courage": 3, "compassion": 7, "intuition": 6, "resilience": 4},
+    },
+    {
+        "id": "venusian",
+        "name": "Venusian",
+        "star_system": "Venus (Higher Dimensional)",
+        "element": "Earth",
+        "color": "#EC4899",
+        "gradient": ["#EC4899", "#F472B6"],
+        "traits": ["Beauty", "Art", "Divine Feminine", "Harmony"],
+        "description": "Venusians are embodiments of beauty, art, and the divine feminine principle. You perceive the aesthetic dimension of reality and create harmony wherever you walk.",
+        "lore": "Venus exists simultaneously in 3D as a hostile wasteland and in higher dimensions as a paradise of art and love. Venusian souls who incarnate on Earth carry the frequency of divine beauty — they are the artists, musicians, dancers, and healers who remind humanity that life itself is a work of art. Their presence softens the hardest hearts.",
+        "starting_stats": {"wisdom": 5, "courage": 3, "compassion": 7, "intuition": 5, "resilience": 5},
+    },
 ]
 
 

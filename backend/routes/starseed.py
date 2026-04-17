@@ -142,7 +142,9 @@ CHAPTERS = {
 
 @router.get("/origins")
 async def get_origins():
-    return ORIGINS
+    # Delegate to the full starseed_adventure origins with complete data
+    from routes.starseed_adventure import STARSEED_ORIGINS
+    return {"origins": [{k: v for k, v in o.items() if k != "starting_stats"} for o in STARSEED_ORIGINS]}
 
 
 @router.get("/chapter/{chapter_id}")

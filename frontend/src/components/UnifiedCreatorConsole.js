@@ -77,7 +77,7 @@ export function MixerProvider({ children }) {
   const [viewMode, setViewMode] = useState('strip');
   const [mutedModules, setMutedModules] = useState(new Set());
 
-  const [activePanel, setActivePanel] = useState(null);
+  const [activePanel, setActivePanel] = useState('mix');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [monitorFilters, setMonitorFilters] = useState({ ...DEFAULT_FILTERS });
   const [textOverlays, setTextOverlays] = useState([]);
