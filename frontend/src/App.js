@@ -256,17 +256,8 @@ const ResourceAlchemy = lazy(() => import('./pages/ResourceAlchemy'));
 const GravityWellExchange = lazy(() => import('./pages/GravityWellExchange'));
 const CrypticQuestNodes = lazy(() => import('./pages/CrypticQuestNodes'));
 const CrystalMarketplace = lazy(() => import('./pages/CrystalMarketplace'));
-const MasonryWorkbench = lazy(() => import('./pages/MasonryWorkbench'));
-const CarpentryWorkbench = lazy(() => import('./pages/CarpentryWorkbench'));
-const TradePassport = lazy(() => import('./pages/TradePassport'));
-const ElectricalWorkbench = lazy(() => import('./pages/ElectricalWorkbench'));
-const PlumbingWorkbench = lazy(() => import('./pages/PlumbingWorkbench'));
-const LandscapingWorkbench = lazy(() => import('./pages/LandscapingWorkbench'));
-const NursingWorkbench = lazy(() => import('./pages/NursingWorkbench'));
-const BibleStudyWorkbench = lazy(() => import('./pages/BibleStudyWorkbench'));
-const ChildCareWorkbench = lazy(() => import('./pages/ChildCareWorkbench'));
-const ElderCareWorkbench = lazy(() => import('./pages/ElderCareWorkbench'));
 const DynamicWorkshop = lazy(() => import('./components/DynamicWorkshop'));
+const TradePassport = lazy(() => import('./pages/TradePassport'));
 
 function PageLoader() {
   return (
@@ -559,16 +550,17 @@ function AnimatedRoutes() {
         <Route path="/gravity-well" element={<GravityWellExchange />} />
         <Route path="/cryptic-quest" element={<CrypticQuestNodes />} />
         <Route path="/crystal-skins" element={<CrystalMarketplace />} />
-        <Route path="/masonry-workbench" element={<MasonryWorkbench />} />
-        <Route path="/carpentry-workbench" element={<CarpentryWorkbench />} />
+        {/* V64.1: All workshops use the Dynamic Registry Router */}
+        <Route path="/masonry-workbench" element={<Navigate to="/workshop/masonry" replace />} />
+        <Route path="/carpentry-workbench" element={<Navigate to="/workshop/carpentry" replace />} />
         <Route path="/trade-passport" element={<TradePassport />} />
-        <Route path="/electrical-workbench" element={<ElectricalWorkbench />} />
-        <Route path="/plumbing-workbench" element={<PlumbingWorkbench />} />
-        <Route path="/landscaping-workbench" element={<LandscapingWorkbench />} />
-        <Route path="/nursing-workbench" element={<NursingWorkbench />} />
-        <Route path="/bible-study-workbench" element={<BibleStudyWorkbench />} />
-        <Route path="/childcare-workbench" element={<ChildCareWorkbench />} />
-        <Route path="/eldercare-workbench" element={<ElderCareWorkbench />} />
+        <Route path="/electrical-workbench" element={<Navigate to="/workshop/electrical" replace />} />
+        <Route path="/plumbing-workbench" element={<Navigate to="/workshop/plumbing" replace />} />
+        <Route path="/landscaping-workbench" element={<Navigate to="/workshop/landscaping" replace />} />
+        <Route path="/nursing-workbench" element={<Navigate to="/workshop/nursing" replace />} />
+        <Route path="/bible-study-workbench" element={<Navigate to="/workshop/bible" replace />} />
+        <Route path="/childcare-workbench" element={<Navigate to="/workshop/childcare" replace />} />
+        <Route path="/eldercare-workbench" element={<Navigate to="/workshop/eldercare" replace />} />
         <Route path="/workshop/:moduleId" element={<DynamicWorkshop />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
